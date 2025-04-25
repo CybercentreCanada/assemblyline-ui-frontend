@@ -1,4 +1,4 @@
-import ListScroller from './ListScroller';
+import type ListScroller from 'commons/addons/lists/scrollers/ListScroller';
 
 export default class BasicScroller implements ListScroller {
   constructor(private scrollTarget: HTMLElement) {}

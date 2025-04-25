@@ -1,8 +1,8 @@
+import type { Params } from 'components/core/SearchParams/SearchParams';
+import type { GetParams, SearchParamsResult } from 'components/core/SearchParams/SearchParser';
+import { SearchParser } from 'components/core/SearchParams/SearchParser';
 import { once } from 'lodash';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import type { Params } from './SearchParams';
-import type { GetParams, SearchParamsResult } from './SearchParser';
-import { SearchParser } from './SearchParser';
 
 type ContextProps<P extends Params> = {
   /**
@@ -53,7 +53,7 @@ export const DefaultParamsProvider = <P extends Params>({ children, params = nul
 
   const parser = useMemo<SearchParser<P>>(() => new SearchParser<P>(params), [params]);
 
-  const ignoredKeys = useMemo<Array<keyof P>>(() => parser.getIgnoredKeys(), [parser]);
+  const ignoredKeys = useMemo<(keyof P)[]>(() => parser.getIgnoredKeys(), [parser]);
 
   const defaults = useMemo<ContextProps<P>['defaults']>(
     () => parser.fullParams(storageParams),

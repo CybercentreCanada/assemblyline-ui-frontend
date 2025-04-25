@@ -21,6 +21,7 @@ import type { File } from 'components/models/base/file';
 import type { Submission } from 'components/models/base/submission';
 import type { SearchResult } from 'components/models/ui/search';
 import { getProfileNames } from 'components/routes/settings/settings.utils';
+import FileDropper from 'components/routes/submit/components/FileDropper';
 import type { AutoURLServiceIndices, SubmitStore } from 'components/routes/submit/submit.form';
 import { FLOW, useForm } from 'components/routes/submit/submit.form';
 import {
@@ -43,7 +44,6 @@ import generateUUID from 'helpers/uuid';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useNavigate } from 'react-router';
-import FileDropper from './FileDropper';
 
 export const ClassificationInput = React.memo(() => {
   const { t } = useTranslation(['submit']);
@@ -137,7 +137,7 @@ export const HashInput = React.memo(() => {
       }
       children={([loading, disabled, isEditing, type, value]) => (
         <TextInput
-          id={'Hash Input'}
+          id="Hash Input"
           label={configuration.ui.allow_url_submissions ? t('url.input.label') : t('hash.input.label')}
           tooltip={configuration.ui.allow_url_submissions ? t('url.input.tooltip') : t('hash.input.tooltip')}
           helperText={configuration.ui.allow_url_submissions ? t('url.input.helperText') : ''}

@@ -82,7 +82,6 @@ export default function SecurityToken({ user, toggleToken }: Props) {
               });
             })
             .catch(ex => {
-              // eslint-disable-next-line no-console
               setTempToken('');
               showErrorMessage(`${ex.name}: ${ex.message}`);
             });

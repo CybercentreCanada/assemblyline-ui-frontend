@@ -1,4 +1,5 @@
-import { isType, ScrollType, Store } from '..';
+import type { ScrollType, Store } from '..';
+import { isType } from '..';
 
 export const getScrollMaxIndex = (store: Store, hexCodeSize: number) =>
   Math.ceil(hexCodeSize / store.layout.column.size - store.layout.row.size);

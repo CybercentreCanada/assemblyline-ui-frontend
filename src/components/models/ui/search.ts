@@ -182,8 +182,9 @@ export const FIELD_TYPES = [
 
 export type FieldType = (typeof FIELD_TYPES)[number];
 
-export type ListSearchGetResponse = {
-  [field: string]: {
+export type ListSearchGetResponse = Record<
+  string,
+  {
     default?: boolean;
 
     /** Is the field indexed */
@@ -199,8 +200,8 @@ export type ListSearchGetResponse = {
     type: FieldType;
 
     name: string;
-  };
-};
+  }
+>;
 
 /**
  * @name /search/facet/<index>/<field>/
@@ -245,7 +246,7 @@ export type FacetSearchPostRequest = RequestBuilder<
   FaceSearchParams
 >;
 
-export type FacetSearchResponse = { [step: string]: number };
+export type FacetSearchResponse = Record<string, number>;
 
 /**
  * @name /search/histogram/<index>/<field>/
@@ -294,7 +295,7 @@ export type HistogramSearchPostRequest = RequestBuilder<
   HistogramParams
 >;
 
-export type HistogramSearchResponse = { [step: string]: number };
+export type HistogramSearchResponse = Record<string, number>;
 
 /**
  * @name /search/stats/<index>/<int_field>/
@@ -345,7 +346,7 @@ export type SearchRequests =
   | HistogramSearchGetRequest
   | HistogramSearchPostRequest
   | StatsSearchGetRequest
-  | StatsSearchPostRequest
+  | StatsSearchPostRequest;
 
 // prettier-ignore
 export type SearchResponses<Request extends SearchRequests> =
@@ -385,17 +386,18 @@ export type StatResult = {
 };
 
 /** Generate an histogram based on a time or and int field using a specific gap size */
-export type HistogramResult = { [step: string]: number };
+export type HistogramResult = Record<string, number>;
 
 /**
  * Perform field analysis on the selected field. (Also known as facetting in lucene)
     This essentially counts the number of instances a field is seen with each specific values
     where the documents matches the specified queries.
  */
-export type FacetResult = { [step: string]: number };
+export type FacetResult = Record<string, number>;
 
-export type FieldsResult = {
-  [field: string]: {
+export type FieldsResult = Record<
+  string,
+  {
     default?: boolean;
 
     /** Is the field indexed */
@@ -411,5 +413,5 @@ export type FieldsResult = {
     type: FieldType;
 
     name: string;
-  };
-};
+  }
+>;

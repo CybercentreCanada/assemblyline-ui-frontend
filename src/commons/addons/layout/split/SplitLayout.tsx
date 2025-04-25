@@ -1,12 +1,13 @@
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
 import { IconButton, styled } from '@mui/material';
+import FlexHorizontal from 'commons/addons/layout/flexers/FlexHorizontal';
+import Flexport from 'commons/addons/layout/flexers/FlexPort';
+import FlexVertical from 'commons/addons/layout/flexers/FlexVertical';
 import useSplitLayout from 'commons/addons/layout/hooks/useSplitLayout';
+import type { LayoutState } from 'commons/addons/layout/split/layouts/Layouts';
+import Layouts from 'commons/addons/layout/split/layouts/Layouts';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import ReactResizeDetector from 'react-resize-detector';
-import FlexHorizontal from '../flexers/FlexHorizontal';
-import Flexport from '../flexers/FlexPort';
-import FlexVertical from '../flexers/FlexVertical';
-import Layouts, { LayoutState } from './layouts/Layouts';
 
 const SplitLayoutContainer = styled('div')(({ theme }) => ({
   overflow: 'hidden',

@@ -1,6 +1,7 @@
 import { styled, useTheme } from '@mui/material';
 import { useAppBar, useAppLayout, useAppUser } from 'commons/components/app/hooks';
-import React, { ReactNode, useEffect, useMemo } from 'react';
+import type { ReactNode } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router';
 

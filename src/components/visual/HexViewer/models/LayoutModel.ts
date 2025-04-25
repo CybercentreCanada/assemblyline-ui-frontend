@@ -1,4 +1,4 @@
-import { TypesConfig } from '..';
+import type { TypesConfig } from '..';
 
 export type LayoutDisplayMode = 'dual' | 'hex' | 'text';
 export type LayoutFocusMode = 'none' | 'toolbar' | 'body';

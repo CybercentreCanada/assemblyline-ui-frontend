@@ -1,7 +1,7 @@
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import { Autocomplete, Checkbox, TextField } from '@mui/material';
-import { AutocompleteChangeDetails, AutocompleteChangeReason } from '@mui/material/useAutocomplete';
+import type { AutocompleteChangeDetails, AutocompleteChangeReason } from '@mui/material/useAutocomplete';
 import { useTranslation } from 'react-i18next';
 
 export const GLOBAL_FILTER = { id: 999, value: '', key: 'global.filter', label: 'Global', path: '.' };

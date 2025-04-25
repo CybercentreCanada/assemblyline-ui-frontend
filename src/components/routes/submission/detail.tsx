@@ -52,6 +52,13 @@ import type { MultipleKeys } from 'components/models/ui/result';
 import type { SubmissionSummary, SubmissionTags, SubmissionTree } from 'components/models/ui/submission';
 import ForbiddenPage from 'components/routes/403';
 import HeuristicDetail from 'components/routes/manage/heuristic_detail';
+import AISummarySection from 'components/routes/submission/detail/ai_summary';
+import AttackSection from 'components/routes/submission/detail/attack';
+import ErrorSection from 'components/routes/submission/detail/errors';
+import FileTreeSection from 'components/routes/submission/detail/file_tree';
+import InfoSection from 'components/routes/submission/detail/info';
+import MetaSection from 'components/routes/submission/detail/meta';
+import TagSection from 'components/routes/submission/detail/tags';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import FileDetail from 'components/visual/FileDetail';
@@ -67,13 +74,6 @@ import { useTranslation } from 'react-i18next';
 import { Link, useLocation, useNavigate, useParams } from 'react-router';
 import type { Socket } from 'socket.io-client';
 import io from 'socket.io-client';
-import AISummarySection from './detail/ai_summary';
-import AttackSection from './detail/attack';
-import ErrorSection from './detail/errors';
-import FileTreeSection from './detail/file_tree';
-import InfoSection from './detail/info';
-import MetaSection from './detail/meta';
-import TagSection from './detail/tags';
 
 const NAMESPACE = '/live_submission';
 const MESSAGE_TIMEOUT = 5000;
@@ -154,7 +154,7 @@ function WrappedSubmissionDetail() {
 
   const popoverOpen = Boolean(resubmitAnchor);
 
-  const submissionProfiles: { [name: string]: string } = useMemo<{ [name: string]: string }>(() => {
+  const submissionProfiles: Record<string, string> = useMemo<Record<string, string>>(() => {
     let profileMap = {};
     Object.entries(systemConfig.submission.profiles).map(([name, config]) => {
       profileMap = { ...profileMap, [name]: config.display_name };
@@ -173,7 +173,6 @@ function WrappedSubmissionDetail() {
         tempTagMap[key] = [];
       }
 
-      // eslint-disable-next-line guard-for-in
       for (const sectionID in result.result.sections) {
         const section = result.result.sections[sectionID];
         let hType = 'info';
@@ -219,10 +218,9 @@ function WrappedSubmissionDetail() {
 
           // #3: Parse Att&cks
           if (section.heuristic.attack) {
-            // eslint-disable-next-line guard-for-in
             for (const i in section.heuristic.attack) {
               const attack = section.heuristic.attack[i];
-              // eslint-disable-next-line guard-for-in
+
               for (const j in attack.categories) {
                 const cat = attack.categories[j];
                 if (!Object.hasOwnProperty.call(tempSummary.attack_matrix, cat)) {
@@ -257,7 +255,7 @@ function WrappedSubmissionDetail() {
         }
 
         // #3: Parse Tags
-        // eslint-disable-next-line guard-for-in
+
         for (const tagID in section.tags) {
           const tag = section.tags[tagID];
           let summaryType = null;
@@ -562,7 +560,6 @@ function WrappedSubmissionDetail() {
         });
       }
       setResubmitAnchor(null);
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     },
     [showSuccessMessage, submission, t]
   );
@@ -857,7 +854,6 @@ function WrappedSubmissionDetail() {
       console.debug(`SocketIO :: emitListen => Listening for messages on watch queue: ${watchQueue}`);
       socket.emit('listen', { wq_id: watchQueue, from_start: true });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [watchQueue, socket, handleErrorMessage]);
 
   useEffect(() => {
@@ -1042,13 +1038,9 @@ function WrappedSubmissionDetail() {
                       onChange={event => setArchivingUseAlternateDtl(event.target.value)}
                       row
                     >
+                      <FormControlLabel value="false" control={<Radio />} label={t('archive.alternate_expiry.never')} />
                       <FormControlLabel
-                        value={'false'}
-                        control={<Radio />}
-                        label={t('archive.alternate_expiry.never')}
-                      />
-                      <FormControlLabel
-                        value={'true'}
+                        value="true"
                         control={<Radio />}
                         label={moment()
                           .locale(i18n.language)
@@ -1070,7 +1062,7 @@ function WrappedSubmissionDetail() {
                       configuration={field_cfg}
                       value={archivingMetadata[field_name]}
                       onChange={v => {
-                        let cleanMetadata = archivingMetadata;
+                        const cleanMetadata = archivingMetadata;
                         if (v === undefined || v === null || v === '') {
                           // Remove field from metadata if value is null
                           delete cleanMetadata[field_name];
@@ -1081,7 +1073,7 @@ function WrappedSubmissionDetail() {
                         setArchivingMetadata({ ...cleanMetadata });
                       }}
                       onReset={() => {
-                        let cleanMetadata = archivingMetadata;
+                        const cleanMetadata = archivingMetadata;
                         delete cleanMetadata[field_name];
                         setArchivingMetadata({ ...cleanMetadata });
                       }}
@@ -1152,11 +1144,11 @@ function WrappedSubmissionDetail() {
             <Grid flex={1}>
               <div>
                 <Typography variant="h4">{t('title')}</Typography>
-                <Typography variant="caption" component={'div'}>
+                <Typography variant="caption" component="div">
                   {submission ? submission.sid : <Skeleton style={{ width: '10rem' }} />}
                 </Typography>
                 {submission && submission.params.psid && (
-                  <Typography variant="caption" component={'div'}>
+                  <Typography variant="caption" component="div">
                     <i>
                       <span>{t('psid')}: </span>
                       <Link

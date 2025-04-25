@@ -1,7 +1,7 @@
 import { styled, useMediaQuery, useTheme } from '@mui/material';
+import FilterInput from 'commons/addons/lists/filters/FilterInput';
+import type { FilterField } from 'commons/addons/lists/filters/FilterSelector';
 import React from 'react';
-import FilterInput from './FilterInput';
-import { FilterField } from './FilterSelector';
 
 const Filter = styled('div')(({ theme }) => ({
   marginRight: theme.spacing(2),

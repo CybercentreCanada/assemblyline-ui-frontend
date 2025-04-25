@@ -12,6 +12,7 @@ import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import type { ApiKey } from 'components/models/base/user';
 import type { FieldsResult, SearchResult } from 'components/models/ui/search';
+import ApikeyDetail from 'components/routes/admin/apikey_detail';
 import SearchHeader from 'components/visual/SearchBar/SearchHeader';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import ApikeysTable from 'components/visual/SearchResult/apikeys';
@@ -19,7 +20,6 @@ import { safeFieldValue } from 'helpers/utils';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useLocation, useNavigate } from 'react-router';
-import ApikeyDetail from './apikey_detail';
 
 const API_KEYS_PARAMS = createSearchParams(p => ({
   query: p.string(''),

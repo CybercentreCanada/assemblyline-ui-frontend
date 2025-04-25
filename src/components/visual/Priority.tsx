@@ -16,37 +16,37 @@ const WrappedPriority: React.FC<PriorityProps> = ({ priority, size = 'tiny' }) =
     'user-low': {
       tooltip: t('priority.userlow'),
       text: t('priority.low'),
-      color: 'default' as 'default'
+      color: 'default' as const
     },
     'user-medium': {
       tooltip: t('priority.usermedium'),
       text: t('priority.medium'),
-      color: 'primary' as 'primary'
+      color: 'primary' as const
     },
     'user-high': {
       tooltip: t('priority.userhigh'),
       text: t('priority.high'),
-      color: 'warning' as 'warning'
+      color: 'warning' as const
     },
     critical: {
       tooltip: t('priority.critical'),
       text: t('priority.critical'),
-      color: 'error' as 'error'
+      color: 'error' as const
     },
     high: {
       tooltip: t('priority.high'),
       text: t('priority.high'),
-      color: 'warning' as 'warning'
+      color: 'warning' as const
     },
     medium: {
       tooltip: t('priority.medium'),
       text: t('priority.medium'),
-      color: 'primary' as 'primary'
+      color: 'primary' as const
     },
     low: {
       tooltip: t('priority.low'),
       text: t('priority.low'),
-      color: 'default' as 'default'
+      color: 'default' as const
     }
   };
 

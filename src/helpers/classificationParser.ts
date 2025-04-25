@@ -72,28 +72,23 @@ type ClassificationYAMLDefinition = {
   unrestricted: string;
 };
 
-type StringMap = {
-  [propName: string]: string;
-};
+type StringMap = Record<string, string>;
 
-type StringMapArray = {
-  [propName: string]: string[];
-};
+type StringMapArray = Record<string, string[]>;
 
-type StylesheetMap = {
-  [propName: string]: LevelStylesheet;
-};
+type StylesheetMap = Record<string, LevelStylesheet>;
 
-type ParamsMap = {
-  [propName: string]: {
+type ParamsMap = Record<
+  string,
+  {
     is_required_group?: boolean;
     solitary_display_name?: string;
     require_lvl?: number;
     require_group?: string;
     limited_to_group?: string;
     is_hidden?: boolean;
-  };
-};
+  }
+>;
 
 export type ClassificationDefinition = {
   RESTRICTED: string;
@@ -171,7 +166,7 @@ export function getLevelText(
   }
 
   if (text === undefined || text == null) {
-    //ERROR: `Classification level number '${lvl}' was not found in your classification definition.`
+    // ERROR: `Classification level number '${lvl}' was not found in your classification definition.`
     /* eslint-disable no-console */
     console.error(
       `[classificationParser] Classification level number '${lvl}' was not found in your classification definition.`

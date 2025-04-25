@@ -287,7 +287,7 @@ export function verifyTableContent(id: string, expectedContent: string[][]) {
     const rowWrappers = tableWrapper.querySelector('tbody').querySelectorAll('tr');
     rowWrappers.forEach(rowWrapper => {
       const row: string[] = [];
-      let cellWrappers = rowWrapper.querySelectorAll('td');
+      const cellWrappers = rowWrapper.querySelectorAll('td');
       cellWrappers.forEach(cellWrapper => {
         row.push(cellWrapper.textContent);
       });

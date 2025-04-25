@@ -1,4 +1,4 @@
-import { Store } from '..';
+import type { Store } from '..';
 
 export const clampHistoryIndex = (store: Store, index: number) => {
   if (index <= 0) return 0;

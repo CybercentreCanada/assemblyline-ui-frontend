@@ -1,4 +1,4 @@
-import type { RegistryType, ServiceCategory } from './config';
+import type { RegistryType, ServiceCategory } from 'components/models/base/config';
 
 export const ACCESS_MODES = ['ReadWriteOnce', 'ReadWriteMany'] as const;
 export const OPERATING_SYSTEMS = ['windows', 'linux'] as const;
@@ -235,7 +235,7 @@ export type UpdateSource = {
   ca_cert?: string;
 
   /** Processing configuration for source */
-  configuration?: { [key: string]: any };
+  configuration?: Record<string, any>;
 
   /** Default classification used in absence of one defined in files from source */
   default_classification: string;
@@ -252,7 +252,7 @@ export type UpdateSource = {
   /** Headers */
   headers: EnvironmentVariable[];
 
-  //** Ignore caching */
+  //* * Ignore caching */
   ignore_cache: boolean;
 
   /** Name of source */
@@ -301,7 +301,7 @@ export type UpdateConfig = {
   custom_delimiter?: string;
 
   /** Default pattern for finding signatures*/
-  default_pattern: string
+  default_pattern: string;
 
   /** Does the updater produce signatures? */
   generates_signatures: boolean;
@@ -428,7 +428,7 @@ export type ServiceConstants = {
   stages: string[];
 };
 
-export type ServiceUpdates = { [service_name: string]: ServiceUpdateData };
+export type ServiceUpdates = Record<string, ServiceUpdateData>;
 
 export type ServiceIndexed = Pick<
   Service,

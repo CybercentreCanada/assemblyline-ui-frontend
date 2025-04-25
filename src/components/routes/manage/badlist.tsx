@@ -15,14 +15,14 @@ import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import type { CustomUser } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
+import BadlistNew from 'components/routes/manage/badlist_add';
+import BadlistDetail from 'components/routes/manage/badlist_detail';
 import SearchHeader from 'components/visual/SearchBar/SearchHeader';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import BadlistTable from 'components/visual/SearchResult/badlist';
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
-import BadlistNew from './badlist_add';
-import BadlistDetail from './badlist_detail';
 
 const BADLIST_PARAMS = createSearchParams(p => ({
   query: p.string(''),

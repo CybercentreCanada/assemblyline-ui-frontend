@@ -130,8 +130,8 @@ const AutoHideChipList = React.memo(WrappedAutoHideChipList);
 type ResultGroupProps = {
   group: string;
   names: string[];
-  ndMap: Object;
-  valueMap: Object;
+  ndMap: object;
+  valueMap: object;
 };
 
 const WrappedResultGroup: React.FC<ResultGroupProps> = ({ group, names, ndMap, valueMap }) => {
@@ -458,7 +458,7 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, v
             </div>
           )}
 
-          <Typography variant="h4" component={'div'}>
+          <Typography variant="h4" component="div">
             {t('related_external.title')}
           </Typography>
           <Typography variant="caption" style={{ wordBreak: 'break-word' }}>

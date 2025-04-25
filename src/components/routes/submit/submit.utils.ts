@@ -8,15 +8,15 @@ import {
   loadSubmissionProfile,
   PROFILE_KEYS
 } from 'components/routes/settings/settings.utils';
+import type { SubmitStore } from 'components/routes/submit/submit.form';
 import { isURL } from 'helpers/utils';
-import type { SubmitStore } from './submit.form';
 
 export const getPreferredSubmissionProfile = (settings: UserSettings): string =>
   !settings
     ? null
     : Object.keys(settings.submission_profiles).includes(settings.preferred_submission_profile)
-    ? settings.preferred_submission_profile
-    : Object.keys(settings.submission_profiles)[0];
+      ? settings.preferred_submission_profile
+      : Object.keys(settings.submission_profiles)[0];
 
 export const getDefaultExternalSources = (
   settings: UserSettings,
@@ -209,7 +209,7 @@ export const parseSubmitProfile = (profile: ProfileSettings): UserSettings => {
   out.malicious = profile.malicious.value;
   out.preferred_submission_profile = profile.preferred_submission_profile.value;
 
-  //Applying the initial data
+  // Applying the initial data
   out.initial_data = JSON.stringify(profile.initial_data.value, undefined, 2);
 
   return out;

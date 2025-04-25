@@ -16,14 +16,14 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import type { WorkflowIndexed } from 'components/models/base/workflow';
 import type { CustomUser } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
+import WorkflowCreate from 'components/routes/manage/workflows/create';
+import WorkflowDetail from 'components/routes/manage/workflows/detail';
 import SearchHeader from 'components/visual/SearchBar/SearchHeader';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import WorkflowTable from 'components/visual/SearchResult/workflow';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
-import WorkflowCreate from './create';
-import WorkflowDetail from './detail';
 
 type SearchResults = {
   items: WorkflowIndexed[];

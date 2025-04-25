@@ -1,17 +1,14 @@
 import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import { useCallback } from 'react';
+import type { ReducerHandler, Reducers, Store, UseReducer } from '..';
 import {
   COPY_STATE,
   getCopyHexCharacter,
   isAction,
   isType,
-  ReducerHandler,
-  Reducers,
   setStore,
   setStoreWithKeys,
-  singleCharacterString,
-  Store,
-  UseReducer
+  singleCharacterString
 } from '..';
 
 export const useCopyReducer: UseReducer = () => {

@@ -14,13 +14,13 @@ import type { Heuristic } from 'components/models/base/heuristic';
 import type { SearchResult } from 'components/models/ui/search';
 import type { CustomUser } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
+import HeuristicDetail from 'components/routes/manage/heuristic_detail';
 import SearchHeader from 'components/visual/SearchBar/SearchHeader';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import HeuristicsTable from 'components/visual/SearchResult/heuristics';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
-import HeuristicDetail from './heuristic_detail';
 
 const HEURISTICS_PARAMS = createSearchParams(p => ({
   query: p.string(''),

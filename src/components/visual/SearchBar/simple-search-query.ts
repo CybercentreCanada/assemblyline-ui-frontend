@@ -105,7 +105,7 @@ export default class SimpleSearchQuery {
   }
 
   public deleteAll() {
-    let keys = [];
+    const keys = [];
     this.params.forEach((value, key) => keys.push(key));
     keys.forEach(key => this.params.delete(key));
   }

@@ -5,12 +5,6 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import type { Workflow } from 'components/models/base/workflow';
 import ForbiddenPage from 'components/routes/403';
-import Classification from 'components/visual/Classification';
-import CustomChip from 'components/visual/CustomChip';
-import Moment from 'components/visual/Moment';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useParams } from 'react-router';
 import {
   DeleteWorkflowAction,
   DuplicateWorkflowAction,
@@ -18,8 +12,14 @@ import {
   EnableWorkflowAction,
   RunWorkflowAction,
   ShowRelatedAlertsAction
-} from './components/Actions';
-import { AlertHistogram, AlertResults } from './components/Data';
+} from 'components/routes/manage/workflows/components/Actions';
+import { AlertHistogram, AlertResults } from 'components/routes/manage/workflows/components/Data';
+import Classification from 'components/visual/Classification';
+import CustomChip from 'components/visual/CustomChip';
+import Moment from 'components/visual/Moment';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useParams } from 'react-router';
 
 const CUSTOMCHIP_STYLES = {
   borderRadius: '4px',
@@ -241,9 +241,7 @@ const WrappedWorkflowDetail = ({ id: propID = null, onClose = null }: Props) => 
                   <Grid size={{ xs: 9, sm: 8, md: 9, lg: 9 }}>
                     {workflow && workflow.creator ? (
                       <>
-                        {workflow.creator} {'['}
-                        <Moment variant="fromNow">{workflow.creation_date}</Moment>
-                        {']'}
+                        {workflow.creator} [<Moment variant="fromNow">{workflow.creation_date}</Moment>]
                       </>
                     ) : (
                       <Skeleton />
@@ -255,9 +253,7 @@ const WrappedWorkflowDetail = ({ id: propID = null, onClose = null }: Props) => 
                   <Grid size={{ xs: 9, sm: 8, md: 9, lg: 9 }}>
                     {workflow && workflow.edited_by ? (
                       <>
-                        {workflow.edited_by} {'['}
-                        <Moment variant="fromNow">{workflow.last_edit}</Moment>
-                        {']'}
+                        {workflow.edited_by} [<Moment variant="fromNow">{workflow.last_edit}</Moment>]
                       </>
                     ) : (
                       <Skeleton />

@@ -1,5 +1,6 @@
 import { Buffer } from 'buffer';
-import { HIGHER_ASCII_TABLE, NON_PRINTABLE_ASCII_TABLE, Store, toHexChar2 } from '..';
+import type { Store } from '..';
+import { HIGHER_ASCII_TABLE, NON_PRINTABLE_ASCII_TABLE, toHexChar2 } from '..';
 
 export const addRegexAlternation = (text1: string, text2: string): string =>
   text1 === '' || text1 === null ? text2 : text1 + '|' + text2;
@@ -31,7 +32,7 @@ export const get16BitsDirectTextExpression = (value: string): string =>
     .join(' ')
     .concat(' ');
 
-export const spliceBackslash = (array: Array<string>): Array<string> => {
+export const spliceBackslash = (array: string[]): string[] => {
   let i = array.length - 1;
   while (i >= 1) {
     if (array[i - 1] === '\\') {
@@ -44,7 +45,7 @@ export const spliceBackslash = (array: Array<string>): Array<string> => {
   return array;
 };
 
-export const reduceRegex = (array: Array<string>): Array<string> => {
+export const reduceRegex = (array: string[]): string[] => {
   let i = array.length - 1;
   while (i >= 1) {
     let j = i - 1;
@@ -98,7 +99,7 @@ export const getWideTextExpression = (store: Store, value: string): string => {
   const nonPrintableASCII = getNonPrintableASCIILookUpMap(store);
   const higherASCII = getHigherASCIILookUpMap(store);
   const regex: string[][] = value.split('').map(character => {
-    let array: string[] = [];
+    const array: string[] = [];
 
     // Null Character
     if (character === ' ' || character === store.hex.null.char) array.push('(00)');
@@ -133,9 +134,8 @@ export const getTextExpression = (store: Store, value: string): RegExp => {
   const nonPrintableASCII = getNonPrintableASCIILookUpMap(store);
   const higherASCII = getHigherASCIILookUpMap(store);
 
-  // eslint-disable-next-line array-callback-return
   const regex: string[][] = value.split('').map(character => {
-    let array: string[] = [];
+    const array: string[] = [];
 
     // Null Character
     if (character === ' ' || character === store.hex.null.char) array.push('(00)');
@@ -171,7 +171,7 @@ export const countHexcode = (value: string) => value.split(' ').filter(code => c
 export const filterSearchResult = ({
   search: { results },
   cellsRendered: { overscanStartIndex: firstIndex, overscanStopIndex: lastIndex }
-}: Store): Array<{ index: number; length: number }> =>
+}: Store): { index: number; length: number }[] =>
   results.filter(
     (result: { index: number; length: number }, i: number) =>
       firstIndex <= result.index + result.length && result.index <= lastIndex
@@ -216,8 +216,8 @@ export const executeSearchHexRegex = (
   data: string,
   expression: string,
   length: number
-): Array<{ index: number; length: number }> => {
-  let indexes: Array<number> = [];
+): { index: number; length: number }[] => {
+  const indexes: number[] = [];
   const regex = RegExp(expression.replace(/([.?*+^$[\]\\(){}|-])/g, '\\$1'), 'g');
   while (regex.exec(data) !== null) indexes.push((regex.lastIndex - expression.length) / 3);
   return indexes.map(index => ({ index, length }));
@@ -227,15 +227,15 @@ export const executeSearchTextRegex = (
   data: string,
   expression: string,
   length: number
-): Array<{ index: number; length: number }> => {
-  let indexes: Array<number> = [];
+): { index: number; length: number }[] => {
+  const indexes: number[] = [];
   const regex = RegExp(expression, 'g');
   while (regex.exec(data) !== null) indexes.push((regex.lastIndex - length * 3) / 3);
   return indexes.map(index => ({ index, length }));
 };
 
-export const executeSearchRegex = (data: string, regex: RegExp, length: number): Array<number> => {
-  let indexes: Array<number> = [];
+export const executeSearchRegex = (data: string, regex: RegExp, length: number): number[] => {
+  const indexes: number[] = [];
   while (regex.exec(data) !== null) indexes.push((regex.lastIndex - length * 3) / 3);
   return indexes;
 };
@@ -243,7 +243,7 @@ export const executeSearchRegex = (data: string, regex: RegExp, length: number):
 export const hasValidSearchResult = (store: Store): boolean =>
   store.search.selectedResult !== null && store.search.results !== null && store.search.results.length > 0;
 
-export const prevSearchIndex = (results: Array<{ index: number; length: number }>, origin: number) => {
+export const prevSearchIndex = (results: { index: number; length: number }[], origin: number) => {
   if (results === null || results.length === 0) return null;
   else if (origin === null || origin < 0) return results.length - 1;
   else {
@@ -256,7 +256,7 @@ export const prevSearchIndex = (results: Array<{ index: number; length: number }
   }
 };
 
-export const nextSearchIndex = (results: Array<{ index: number; length: number }>, origin: number) => {
+export const nextSearchIndex = (results: { index: number; length: number }[], origin: number) => {
   if (results === null || results.length === 0) return null;
   else if (origin === null || origin < 0) return 0;
   else {

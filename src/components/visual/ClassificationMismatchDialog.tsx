@@ -7,8 +7,8 @@ import {
   DialogContentText,
   DialogTitle
 } from '@mui/material';
+import Classification from 'components/visual/Classification';
 import { useTranslation } from 'react-i18next';
-import Classification from './Classification';
 
 export type ClassificationMismatchDialogProps = {
   open: boolean;
@@ -43,9 +43,9 @@ const ClassificationMismatchDialog = ({
       </DialogTitle>
       <DialogContent>
         <DialogContentText style={{ textAlign: 'center', paddingBottom: '12px' }}>
-          <Classification c12n={dataClassification} type={'text'} />
+          <Classification c12n={dataClassification} type="text" />
           {' > '}
-          <Classification c12n={targetClassification} type={'text'} />
+          <Classification c12n={targetClassification} type="text" />
         </DialogContentText>
         <DialogContentText id="alert-dialog-description">
           {t('classification.text')} {handleAccept && t('classification.text.accept')}

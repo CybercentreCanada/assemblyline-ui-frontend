@@ -1,6 +1,13 @@
+import type { Formatters, MIxinFormat, Params } from 'components/core/SearchParams/SearchParams';
+import {
+  BooleanParam,
+  EnumParam,
+  FiltersParam,
+  NumberParam,
+  StringParam,
+  formatters
+} from 'components/core/SearchParams/SearchParams';
 import _ from 'lodash';
-import type { Formatters, MIxinFormat, Params } from './SearchParams';
-import { BooleanParam, EnumParam, FiltersParam, NumberParam, StringParam, formatters } from './SearchParams';
 
 /**
  * Search Utils
@@ -11,10 +18,10 @@ export type GetParams<P extends Params> = {
   [K in keyof P]: P[K] extends boolean
     ? BooleanParam
     : P[K] extends number
-    ? NumberParam
-    : P[K] extends string
-    ? StringParam
-    : unknown;
+      ? NumberParam
+      : P[K] extends string
+        ? StringParam
+        : unknown;
 };
 
 /**
@@ -114,11 +121,11 @@ export class SearchParser<P extends Params> {
   }
 
   public getIgnoredKeys() {
-    return this.reduce<Array<keyof P>>((prev, [key, format]) => (format.isIgnored() ? [...prev, key] : prev), []);
+    return this.reduce<(keyof P)[]>((prev, [key, format]) => (format.isIgnored() ? [...prev, key] : prev), []);
   }
 
   public getHiddenKeys() {
-    return this.reduce<Array<keyof P>>((prev, [key, format]) => (format.isHidden() ? [...prev, key] : prev), []);
+    return this.reduce<(keyof P)[]>((prev, [key, format]) => (format.isHidden() ? [...prev, key] : prev), []);
   }
 
   public fromParams(input: Input) {
@@ -154,7 +161,7 @@ export class SearchParser<P extends Params> {
     return new SearchParamsResult<P>(this.formats, output);
   }
 
-  public mergeParams(first: Input, second: Input, keys: Array<keyof P>) {
+  public mergeParams(first: Input, second: Input, keys: (keyof P)[]) {
     const left = new URLSearchParams(first);
     const right = new URLSearchParams(second);
     const output = this.reduce<P>((prev, [, param]) => param.merge(prev, left, right, keys), {} as P);

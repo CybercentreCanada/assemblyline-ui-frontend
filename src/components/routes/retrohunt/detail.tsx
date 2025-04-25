@@ -109,7 +109,7 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
 
   const [retrohunt, setRetrohunt] = useState<Retrohunt>(null);
   const [hitResults, setHitResults] = useState<SearchResult<FileIndexed>>(null);
-  const [typeDataSet, setTypeDataSet] = useState<{ [k: string]: number }>(null);
+  const [typeDataSet, setTypeDataSet] = useState<Record<string, number>>(null);
   const [isReloading, setIsReloading] = useState<boolean>(true);
   const [query, setQuery] = useState<SimpleSearchQuery>(null);
 
@@ -245,7 +245,7 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
             filters: curQuery.getAll('filters', [])
           },
           onSuccess: api_data => {
-            let dataset: { [k: string]: number } = api_data.api_response;
+            let dataset: Record<string, number> = api_data.api_response;
             dataset = Object.fromEntries(
               Object.keys(dataset)
                 .sort((a, b) => dataset[b] - dataset[a])
@@ -481,8 +481,7 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
                             <>
                               <Moment variant="localeDate">{retrohunt.created_time}</Moment>
                               {' ('}
-                              <Moment variant="fromNow">{retrohunt.created_time}</Moment>
-                              {')'}
+                              <Moment variant="fromNow">{retrohunt.created_time}</Moment>)
                             </>
                           ) : (
                             <Skeleton />
@@ -497,8 +496,7 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
                             <>
                               <Moment variant="localeDate">{retrohunt.expiry_ts}</Moment>
                               {' ('}
-                              <Moment variant="fromNow">{retrohunt.expiry_ts}</Moment>
-                              {')'}
+                              <Moment variant="fromNow">{retrohunt.expiry_ts}</Moment>)
                             </>
                           ) : (
                             <Skeleton />

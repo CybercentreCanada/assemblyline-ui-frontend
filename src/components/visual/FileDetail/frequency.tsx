@@ -27,8 +27,7 @@ const WrappedFrequencySection: React.FC<Props> = ({ seen = null, nocollapse = fa
               </Typography>
               <Typography color="textSecondary" component="span" variant="body2">
                 {` (`}
-                <Moment format="YYYY-MM-DD HH:mm:ss">{seen?.first}</Moment>
-                {`)`}
+                <Moment format="YYYY-MM-DD HH:mm:ss">{seen?.first}</Moment>)
               </Typography>
             </>
           ) : (
@@ -47,8 +46,7 @@ const WrappedFrequencySection: React.FC<Props> = ({ seen = null, nocollapse = fa
               </Typography>
               <Typography color="textSecondary" component="span" variant="body2">
                 {` (`}
-                <Moment format="YYYY-MM-DD HH:mm:ss">{seen?.last}</Moment>
-                {`)`}
+                <Moment format="YYYY-MM-DD HH:mm:ss">{seen?.last}</Moment>)
               </Typography>
             </>
           ) : (

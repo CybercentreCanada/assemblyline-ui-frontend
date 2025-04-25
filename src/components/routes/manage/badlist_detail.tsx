@@ -349,7 +349,7 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
             <Divider />
             <Grid container>
               <Grid size={{ xs: 4, sm: 3 }}>
-                <span style={{ fontWeight: 500 }}>{'MD5'}</span>
+                <span style={{ fontWeight: 500 }}>MD5</span>
               </Grid>
               <Grid
                 size={{ xs: 8, sm: 9 }}
@@ -362,7 +362,7 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
                 )}
               </Grid>
               <Grid size={{ xs: 4, sm: 3 }}>
-                <span style={{ fontWeight: 500 }}>{'SHA1'}</span>
+                <span style={{ fontWeight: 500 }}>SHA1</span>
               </Grid>
               <Grid
                 size={{ xs: 8, sm: 9 }}
@@ -375,7 +375,7 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
                 )}
               </Grid>
               <Grid size={{ xs: 4, sm: 3 }}>
-                <span style={{ fontWeight: 500 }}>{'SHA256'}</span>
+                <span style={{ fontWeight: 500 }}>SHA256</span>
               </Grid>
               <Grid
                 size={{ xs: 8, sm: 9 }}
@@ -388,7 +388,7 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
                 )}
               </Grid>
               <Grid size={{ xs: 4, sm: 3 }}>
-                <span style={{ fontWeight: 500 }}>{'SSDeep'}</span>
+                <span style={{ fontWeight: 500 }}>SSDeep</span>
               </Grid>
               <Grid
                 size={{ xs: 8, sm: 9 }}
@@ -401,7 +401,7 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
                 )}
               </Grid>
               <Grid size={{ xs: 4, sm: 3 }}>
-                <span style={{ fontWeight: 500 }}>{'TLSH'}</span>
+                <span style={{ fontWeight: 500 }}>TLSH</span>
               </Grid>
               <Grid
                 size={{ xs: 8, sm: 9 }}
@@ -468,7 +468,7 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
             </Grid>
           )}
           <Grid size={{ xs: 12 }}>
-            <Grid container alignItems={'end'}>
+            <Grid container alignItems="end">
               <Grid size={{ xs: 11 }}>
                 <Typography variant="h6">{t('attribution.title')}</Typography>
               </Grid>
@@ -580,7 +580,7 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
             )}
           </Grid>
           <Grid size={{ xs: 12 }}>
-            <Grid container alignItems={'end'}>
+            <Grid container alignItems="end">
               <Grid size={{ xs: 11 }}>
                 <Typography variant="h6">{t('timing')}</Typography>
               </Grid>

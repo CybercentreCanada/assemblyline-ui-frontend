@@ -1,10 +1,10 @@
 import type { FormHelperTextProps, IconButtonProps, ListItemButtonProps, ListItemTextProps } from '@mui/material';
 import { FormHelperText, Switch, useTheme } from '@mui/material';
 import { ListItemText } from 'components/visual/List/ListItemText';
+import { BaseListItemButton } from 'components/visual/ListInputs/components/BaseListInput';
+import { ResetListInput, type ResetListInputProps } from 'components/visual/ListInputs/components/ResetListInput';
+import { SkeletonListInput } from 'components/visual/ListInputs/components/SkeletonListInput';
 import React, { useMemo } from 'react';
-import { BaseListItemButton } from './components/BaseListInput';
-import { ResetListInput, type ResetListInputProps } from './components/ResetListInput';
-import { SkeletonListInput } from './components/SkeletonListInput';
 
 export type BooleanListInputProps = Omit<ListItemButtonProps, 'defaultValue' | 'onChange' | 'onClick' | 'value'> & {
   capitalize?: boolean;

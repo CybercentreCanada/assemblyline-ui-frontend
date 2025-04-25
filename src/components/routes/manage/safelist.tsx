@@ -18,14 +18,14 @@ import type { Safelist } from 'components/models/base/safelist';
 import type { SearchResult } from 'components/models/ui/search';
 import type { CustomUser } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
+import SafelistNew from 'components/routes/manage/safelist_add';
+import SafelistDetail from 'components/routes/manage/safelist_detail';
 import SearchHeader from 'components/visual/SearchBar/SearchHeader';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import SafelistTable from 'components/visual/SearchResult/safelist';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
-import SafelistNew from './safelist_add';
-import SafelistDetail from './safelist_detail';
 
 const SAFELIST_PARAMS = createSearchParams(p => ({
   query: p.string(''),

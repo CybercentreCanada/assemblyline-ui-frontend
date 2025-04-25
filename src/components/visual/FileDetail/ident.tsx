@@ -4,13 +4,13 @@ import type { File as FileInfo } from 'components/models/base/file';
 import type { Section } from 'components/models/base/result';
 import ActionableText from 'components/visual/ActionableText';
 import Classification from 'components/visual/Classification';
+import Moment from 'components/visual/Moment';
 import { GraphBody } from 'components/visual/ResultCard/graph_body';
 import SectionContainer from 'components/visual/SectionContainer';
 import { ImageInlineBody } from 'components/visual/image_inline';
 import { bytesToSize } from 'helpers/utils';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import Moment from '../Moment';
 
 type IdentificationSectionProps = {
   fileinfo: FileInfo;
@@ -138,8 +138,7 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({
               </Typography>
               <Typography color="textSecondary" component="span" variant="body2">
                 {` (`}
-                <Moment format="YYYY-MM-DD HH:mm:ss">{fileinfo.expiry_ts}</Moment>
-                {`)`}
+                <Moment format="YYYY-MM-DD HH:mm:ss">{fileinfo.expiry_ts}</Moment>)
               </Typography>
             </Grid>
           </>

@@ -1,4 +1,4 @@
-import type { Priority, Status } from './workflow';
+import type { Priority, Status } from 'components/models/base/workflow';
 
 export const ES_SUBMITTED = 'submitted';
 export const ES_SKIPPED = 'skipped';

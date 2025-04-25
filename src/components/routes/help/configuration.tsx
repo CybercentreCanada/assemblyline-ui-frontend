@@ -85,9 +85,9 @@ export default function Configuration() {
                     .map((priority: [string, [number, number]], id) => (
                       <Grid key={id} size={{ xs: 12, sm: 6, md: 4, lg: 3, xl: 2 }}>
                         <div style={{ display: 'inline-block', fontWeight: 500 }}>{priority[0]}:&nbsp;&nbsp;</div>
-                        <div
-                          style={{ display: 'inline-block', fontWeight: 300 }}
-                        >{`${priority[1][0]} - ${priority[1][1]}`}</div>
+                        <div style={{ display: 'inline-block', fontWeight: 300 }}>
+                          {`${priority[1][0]} - ${priority[1][1]}`}
+                        </div>
                       </Grid>
                     ))}
                 </>

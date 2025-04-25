@@ -15,11 +15,11 @@ import {
   useTheme
 } from '@mui/material';
 import type { Service } from 'components/models/base/service';
+import ContainerCard from 'components/routes/admin/service_detail/container_card';
+import ContainerDialog from 'components/routes/admin/service_detail/container_dialog';
+import ResetButton from 'components/routes/admin/service_detail/reset_button';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import ContainerCard from './container_card';
-import ContainerDialog from './container_dialog';
-import ResetButton from './reset_button';
 
 type ServiceContainerProps = {
   service: Service;

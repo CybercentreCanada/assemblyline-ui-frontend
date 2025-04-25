@@ -8,10 +8,10 @@ import type {
 import { Checkbox, ListItem, ListItemButton, ListItemIcon, useTheme } from '@mui/material';
 import type { AnchorProps } from 'components/core/TableOfContent/Anchor';
 import { Anchor } from 'components/core/TableOfContent/Anchor';
+import { ListItemText } from 'components/visual/List/ListItemText';
 import type { ResetListInputProps } from 'components/visual/ListInputs/components/ResetListInput';
 import { ResetListInput } from 'components/visual/ListInputs/components/ResetListInput';
 import React, { type FC, type MouseEvent } from 'react';
-import { ListItemText } from './ListItemText';
 
 export type ListHeaderProps = Omit<ListItemProps, 'onChange'> & {
   anchor?: boolean;

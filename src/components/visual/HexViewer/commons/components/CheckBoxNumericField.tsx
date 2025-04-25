@@ -57,7 +57,7 @@ export const WrappedCheckBoxNumericField = ({
             fullWidth
             size="small"
             margin="dense"
-            value={value as number}
+            value={value}
             min={min}
             max={max}
             base={10}

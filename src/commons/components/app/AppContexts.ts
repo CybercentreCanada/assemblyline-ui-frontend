@@ -93,7 +93,7 @@ export type AppSearchServiceState<T = any> = {
   set: (state: AppSearchServiceState<T>) => void; // update app search state.
 };
 
-//NotificationState is only used if feedUrls is empty
+// NotificationState is only used if feedUrls is empty
 export type AppNotificationServiceState = {
   urls: string[]; // The feed urls
   set: (state: AppNotificationServiceState) => void; // Update the feed urls from the state

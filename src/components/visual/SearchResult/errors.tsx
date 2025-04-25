@@ -90,9 +90,11 @@ const WrappedErrorsTable: React.FC<Props> = ({ errorResults, setErrorKey = null,
                   {error.response.message.length > MAX_MESSAGE_SIZE ? (
                     <>
                       <span>{error.response.message.slice(0, MAX_MESSAGE_SIZE)}... </span>
-                      <span style={{ color: theme.palette.secondary.main }}>{`(${bytesToSize(
-                        new Blob([error.response.message.slice(MAX_MESSAGE_SIZE)]).size
-                      )} ${t('more')})`}</span>
+                      <span style={{ color: theme.palette.secondary.main }}>
+                        {`(${bytesToSize(
+                          new Blob([error.response.message.slice(MAX_MESSAGE_SIZE)]).size
+                        )} ${t('more')})`}
+                      </span>
                     </>
                   ) : (
                     <span>{error.response.message}</span>

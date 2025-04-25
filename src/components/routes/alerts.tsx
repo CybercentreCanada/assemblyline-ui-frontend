@@ -9,27 +9,27 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import type { Alert, AlertIndexed, AlertItem } from 'components/models/base/alert';
 import type { Workflow } from 'components/models/base/workflow';
 import type { CustomUser } from 'components/models/ui/user';
+import ForbiddenPage from 'components/routes/403';
+import AlertActions from 'components/routes/alerts/components/Actions';
+import { AlertDefaultSearchParameters } from 'components/routes/alerts/components/DefaultSearchParameters';
+import AlertFavorites from 'components/routes/alerts/components/Favorites';
+import AlertFilters from 'components/routes/alerts/components/Filters';
+import AlertListItem from 'components/routes/alerts/components/ListItem';
+import { AlertSearchResults } from 'components/routes/alerts/components/Results';
+import SearchHeader from 'components/routes/alerts/components/SearchHeader';
+import AlertWorkflows from 'components/routes/alerts/components/Workflows';
+import { AlertsProvider } from 'components/routes/alerts/contexts/AlertsContext';
+import { SearchParamsProvider, useSearchParams } from 'components/routes/alerts/contexts/SearchParamsContext';
+import AlertDetail from 'components/routes/alerts/detail';
+import type { SearchParams } from 'components/routes/alerts/utils/SearchParams';
+import type { SearchResult } from 'components/routes/alerts/utils/SearchParser';
+import { WorkflowCreate } from 'components/routes/manage/workflows/create';
 import InformativeAlert from 'components/visual/InformativeAlert';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
 import { useLocation, useNavigate } from 'react-router';
-import ForbiddenPage from './403';
-import AlertActions from './alerts/components/Actions';
-import { AlertDefaultSearchParameters } from './alerts/components/DefaultSearchParameters';
-import AlertFavorites from './alerts/components/Favorites';
-import AlertFilters from './alerts/components/Filters';
-import AlertListItem from './alerts/components/ListItem';
-import { AlertSearchResults } from './alerts/components/Results';
-import SearchHeader from './alerts/components/SearchHeader';
-import AlertWorkflows from './alerts/components/Workflows';
-import { AlertsProvider } from './alerts/contexts/AlertsContext';
-import { SearchParamsProvider, useSearchParams } from './alerts/contexts/SearchParamsContext';
-import AlertDetail from './alerts/detail';
-import type { SearchParams } from './alerts/utils/SearchParams';
-import type { SearchResult } from './alerts/utils/SearchParser';
-import { WorkflowCreate } from './manage/workflows/create';
 
 type ListResponse = {
   items: AlertIndexed[];
@@ -194,7 +194,6 @@ const WrappedAlertsContent = () => {
     } else {
       closeGlobalDrawer();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [alerts, closeGlobalDrawer, location.hash, setGlobalDrawer]);
 
   useEffect(() => {

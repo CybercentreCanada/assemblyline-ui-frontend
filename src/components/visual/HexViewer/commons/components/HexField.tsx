@@ -17,7 +17,7 @@ export const WrappedHexField = ({
   const inputRef = useRef<HTMLInputElement>(null);
 
   const [textValue, setTextValue] = useState<string>('\\n\\t');
-  const [inputValue, setInputValue] = useState<Array<string>>([]);
+  const [inputValue, setInputValue] = useState<string[]>([]);
 
   const onMouseDown = useCallback((event: Event | any) => {
     console.log(event, inputRef.current.selectionStart);
@@ -32,7 +32,7 @@ export const WrappedHexField = ({
   }, []);
 
   const onPaste = useCallback((event: Event | any) => {
-    let paste = event.clipboardData.getData('text');
+    const paste = event.clipboardData.getData('text');
     console.log(event.type, paste, inputRef.current.selectionStart);
   }, []);
 
@@ -58,10 +58,10 @@ export const WrappedHexField = ({
 
   return (
     <FormControl fullWidth={true} variant="outlined" size="small" sx={{ ...slotSX?.formControl }}>
-      <InputLabel htmlFor={id}>{'label'}</InputLabel>
+      <InputLabel htmlFor={id}>label</InputLabel>
       <OutlinedInput
         inputRef={inputRef}
-        placeholder={'text'}
+        placeholder="text"
         fullWidth
         autoFocus
         size="small"

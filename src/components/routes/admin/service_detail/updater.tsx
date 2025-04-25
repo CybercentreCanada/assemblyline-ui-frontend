@@ -19,12 +19,13 @@ import {
 } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
 import useALContext from 'components/hooks/useALContext';
-import { DEFAULT_SOURCE, Service, UpdateSource } from 'components/models/base/service';
+import type { Service, UpdateSource } from 'components/models/base/service';
+import { DEFAULT_SOURCE } from 'components/models/base/service';
+import ResetButton from 'components/routes/admin/service_detail/reset_button';
+import SourceDialog from 'components/routes/admin/service_detail/source_dialog';
 import { SourceCard } from 'components/routes/manage/signature_sources';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import ResetButton from './reset_button';
-import SourceDialog from './source_dialog';
 
 type ServiceUpdaterProps = {
   service: Service;

@@ -18,10 +18,10 @@ import type { CustomChipProps } from 'components/visual/CustomChip';
 import CustomChip from 'components/visual/CustomChip';
 import type { SearchTextFieldProps } from 'components/visual/SearchBar/search-textfield';
 import SearchTextField from 'components/visual/SearchBar/search-textfield';
+import { SearchCount, TOTAL_TRACKED_RECORDS } from 'components/visual/SearchBar/SearchCount';
 import type { ReactNode } from 'react';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { SearchCount, TOTAL_TRACKED_RECORDS } from './SearchCount';
 
 const Root = styled('div')(({ theme }) => ({
   // marginTop: theme.spacing(1),

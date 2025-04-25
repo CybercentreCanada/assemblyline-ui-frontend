@@ -25,24 +25,24 @@ import type { Section, SectionItem } from 'components/models/base/result';
 import Attack from 'components/visual/Attack';
 import Classification from 'components/visual/Classification';
 import Heuristic from 'components/visual/Heuristic';
+import { GraphBody } from 'components/visual/ResultCard/graph_body';
+import { ImageBody } from 'components/visual/ResultCard/image_body';
+import { InvalidBody } from 'components/visual/ResultCard/invalid_body';
+import { JSONBody } from 'components/visual/ResultCard/json_body';
+import { KVBody } from 'components/visual/ResultCard/kv_body';
+import { MemDumpBody } from 'components/visual/ResultCard/memdump_body';
+import { MultiBody } from 'components/visual/ResultCard/multi_body';
+import { OrderedKVBody } from 'components/visual/ResultCard/ordered_kv_body';
+import { ProcessTreeBody } from 'components/visual/ResultCard/process_tree_body';
+import { TblBody } from 'components/visual/ResultCard/table_body';
+import { TextBody } from 'components/visual/ResultCard/text_body';
+import { TimelineBody } from 'components/visual/ResultCard/timeline_body';
+import { URLBody } from 'components/visual/ResultCard/url_body';
 import SectionHighlight from 'components/visual/SectionHighlight';
 import Tag from 'components/visual/Tag';
 import Verdict from 'components/visual/Verdict';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { GraphBody } from './graph_body';
-import { ImageBody } from './image_body';
-import { InvalidBody } from './invalid_body';
-import { JSONBody } from './json_body';
-import { KVBody } from './kv_body';
-import { MemDumpBody } from './memdump_body';
-import { MultiBody } from './multi_body';
-import { OrderedKVBody } from './ordered_kv_body';
-import { ProcessTreeBody } from './process_tree_body';
-import { TblBody } from './table_body';
-import { TextBody } from './text_body';
-import { TimelineBody } from './timeline_body';
-import { URLBody } from './url_body';
 
 const CLIPBOARD_ICON = <AssignmentOutlinedIcon style={{ marginRight: '16px' }} />;
 const HEURISTIC_ICON = <SimCardOutlinedIcon style={{ marginRight: '16px' }} />;
@@ -60,7 +60,7 @@ const ATTACK_ICON = (
       fontSize: '1.125rem'
     }}
   >
-    {'[&]'}
+    [&]
   </span>
 );
 
@@ -383,7 +383,7 @@ const WrappedResultSection: React.FC<Props> = ({
                               alignItems: 'center'
                             }}
                           >
-                            {'[&]'}
+                            [&]
                           </span>
                         </IconButton>
                       </Tooltip>

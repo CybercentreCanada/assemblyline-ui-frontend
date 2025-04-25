@@ -9,7 +9,6 @@ export const getXSRFCookie = (): string => {
   let xsrfToken: string = null;
   if (document.cookie !== undefined) {
     try {
-      // eslint-disable-next-line prefer-destructuring
       xsrfToken = document.cookie
         .split('; ')
         .find(row => row.startsWith('XSRF-TOKEN'))

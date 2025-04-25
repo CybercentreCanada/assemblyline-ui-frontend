@@ -1,9 +1,8 @@
-/* eslint-disable jsx-a11y/no-static-element-interactions */
 import { Box, TextField, Typography, useMediaQuery, useTheme } from '@mui/material';
+import { insertText } from 'commons/addons/utils/browser';
+import { isArrowDown, isArrowLeft, isArrowRight, isArrowUp, isEnter, isEscape } from 'commons/addons/utils/keyboard';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { insertText } from '../utils/browser';
-import { isArrowDown, isArrowLeft, isArrowRight, isArrowUp, isEnter, isEscape } from '../utils/keyboard';
 
 interface SearchTextFieldProps {
   value: string;

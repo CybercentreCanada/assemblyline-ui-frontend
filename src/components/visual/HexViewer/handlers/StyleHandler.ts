@@ -18,10 +18,10 @@ export const removeClassToRange = (start: number, end: number, classname: string
   for (let i = start; i <= end; i++) removeClass(i, classname);
 };
 
-export const addClassToArray = (indexes: Array<number>, length: number, classname: string) =>
+export const addClassToArray = (indexes: number[], length: number, classname: string) =>
   indexes.forEach(index => addClassToRange(index, index + length - 1, classname));
 
-export const removeClassToArray = (indexes: Array<number>, length: number, classname: string) =>
+export const removeClassToArray = (indexes: number[], length: number, classname: string) =>
   indexes.forEach(index => removeClassToRange(index, index + length - 1, classname));
 
 export const renderIndexClass = (

@@ -1,8 +1,8 @@
 import type { IconButtonProps as MuiIconButtonProps, TooltipProps } from '@mui/material';
 import { IconButton as MuiIconButton } from '@mui/material';
+import { CircularProgress } from 'components/visual/Buttons/CircularProgress';
 import { Tooltip } from 'components/visual/Tooltip';
 import React from 'react';
-import { CircularProgress } from './CircularProgress';
 
 export type IconButtonProps = MuiIconButtonProps & {
   label: string;

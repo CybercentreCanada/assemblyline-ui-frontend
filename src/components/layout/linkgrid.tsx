@@ -1,6 +1,6 @@
 import LinkIcon from '@mui/icons-material/Link';
 import { Button, useTheme } from '@mui/material';
-import { AppLeftNavItem } from 'commons/components/app/AppConfigs';
+import type { AppLeftNavItem } from 'commons/components/app/AppConfigs';
 import { t } from 'i18next';
 import React from 'react';
 import { Link } from 'react-router';

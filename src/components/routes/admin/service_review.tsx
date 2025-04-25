@@ -92,8 +92,8 @@ function ServiceDetail({ stats, comp, show }: ServiceDetailProps) {
         <Typography variant="h3" align="center" gutterBottom>
           {stats ? stats.service.version : <Skeleton width="10rem" style={{ display: 'inline-block' }} />}
         </Typography>
-        <Counter stats={stats} comp={comp} field={'result.count'} />
-        <Counter stats={stats} comp={comp} field={'result.score.avg'} />
+        <Counter stats={stats} comp={comp} field="result.count" />
+        <Counter stats={stats} comp={comp} field="result.score.avg" />
         <div style={{ marginBottom: theme.spacing(2) }}>
           <LineGraph
             dataset={stats && stats.result.score.distribution}
@@ -103,8 +103,8 @@ function ServiceDetail({ stats, comp, show }: ServiceDetailProps) {
             titleSize={20}
           />
         </div>
-        <Counter stats={stats} comp={comp} field={'file.extracted.avg'} />
-        <Counter stats={stats} comp={comp} field={'file.supplementary.avg'} />
+        <Counter stats={stats} comp={comp} field="file.extracted.avg" />
+        <Counter stats={stats} comp={comp} field="file.supplementary.avg" />
         <div style={{ marginBottom: theme.spacing(2) }}>
           <LineGraph
             dataset={stats && stats.heuristic}

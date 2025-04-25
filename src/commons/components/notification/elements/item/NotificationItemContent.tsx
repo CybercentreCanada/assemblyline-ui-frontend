@@ -1,6 +1,5 @@
 import { Box, Link, Typography } from '@mui/material';
 import { type FeedItem } from 'commons/components/notification';
-// eslint-disable-next-line import/no-named-as-default
 import DOMPurify from 'dompurify';
 import { memo, type FC } from 'react';
 import Markdown from 'react-markdown';

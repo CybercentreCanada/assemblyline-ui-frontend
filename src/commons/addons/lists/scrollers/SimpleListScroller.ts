@@ -1,7 +1,11 @@
-import ListScroller from './ListScroller';
+import type ListScroller from 'commons/addons/lists/scrollers/ListScroller';
 
 export default class SimpleListScroller implements ListScroller {
-  constructor(private scrollTarget: HTMLElement, private listElement: HTMLElement, private rowHeight?: number) {}
+  constructor(
+    private scrollTarget: HTMLElement,
+    private listElement: HTMLElement,
+    private rowHeight?: number
+  ) {}
 
   public scrollTo(position: number) {
     const scrollElement = this.scrollElement(position);

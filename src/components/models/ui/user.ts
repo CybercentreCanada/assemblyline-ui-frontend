@@ -13,7 +13,7 @@ export type Field = {
   list: boolean;
 };
 
-export type IndexDefinition = { [field: string]: Field };
+export type IndexDefinition = Record<string, Field>;
 
 export type Indexes = {
   alert: IndexDefinition;

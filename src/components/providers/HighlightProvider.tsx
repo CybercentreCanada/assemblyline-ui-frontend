@@ -1,8 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 
-type HighlighMapProps = {
-  [key: string]: string[];
-};
+type HighlighMapProps = Record<string, string[]>;
 
 export type HighlightContextProps = {
   getKey: (type: string, value: string) => string;
@@ -36,9 +34,10 @@ function HighlightProvider(props: HighlightProviderProps) {
     [highlighted, relatedHighlighted, highlightMap]
   );
 
-  const hasHighlightedKeys = useCallback((keyList: string[]) => keyList.some(item => isHighlighted(item)), [
-    isHighlighted
-  ]);
+  const hasHighlightedKeys = useCallback(
+    (keyList: string[]) => keyList.some(item => isHighlighted(item)),
+    [isHighlighted]
+  );
 
   const triggerHighlight = useCallback((data: string) => {
     window.dispatchEvent(new CustomEvent('tiggerHighlight', { detail: data }));

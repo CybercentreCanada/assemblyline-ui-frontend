@@ -1,17 +1,8 @@
-import { KeyboardEvent, useCallback } from 'react';
-import { ListOnItemsRenderedProps } from 'react-window';
-import {
-  ACTIONS,
-  ActionTypesConfig,
-  Dispatch,
-  DispatchersConfig,
-  isArrowKey,
-  isCopyKey,
-  isHomeEndKey,
-  isPageKey,
-  isType,
-  Store
-} from '..';
+import type { KeyboardEvent } from 'react';
+import { useCallback } from 'react';
+import type { ListOnItemsRenderedProps } from 'react-window';
+import type { ActionTypesConfig, Dispatch, DispatchersConfig, Store } from '..';
+import { ACTIONS, isArrowKey, isCopyKey, isHomeEndKey, isPageKey, isType } from '..';
 
 export type BodyAction =
   | { type: 'bodyInit'; payload: { initialized: boolean } }

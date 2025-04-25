@@ -17,6 +17,7 @@ import type { Signature } from 'components/models/base/signature';
 import type { SearchResult } from 'components/models/ui/search';
 import type { CustomUser } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
+import SignatureDetail from 'components/routes/manage/signature_detail';
 import FileDownloader from 'components/visual/FileDownloader';
 import SearchHeader from 'components/visual/SearchBar/SearchHeader';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
@@ -24,7 +25,6 @@ import SignaturesTable from 'components/visual/SearchResult/signatures';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
-import SignatureDetail from './signature_detail';
 
 const SIGNATURES_PARAMS = createSearchParams(p => ({
   query: p.string(''),

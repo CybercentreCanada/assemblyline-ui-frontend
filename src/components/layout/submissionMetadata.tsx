@@ -4,7 +4,7 @@ import useALContext from 'components/hooks/useALContext';
 import { useTranslation } from 'react-i18next';
 
 type ExternalSourcesProps = {
-  submissionMetadata: { [field_name: string]: any };
+  submissionMetadata: Record<string, any>;
   setSubmissionMetadata: (newMeta) => void;
 };
 
@@ -12,7 +12,7 @@ function SubmissionMetadata({ submissionMetadata, setSubmissionMetadata }: Exter
   const { t } = useTranslation(['submit']);
   const theme = useTheme();
   const { configuration } = useALContext();
-  var fileSources = [];
+  const fileSources = [];
   for (const v of Object.values(configuration.submission.file_sources || [])) {
     v.sources.forEach(i => (fileSources.indexOf(i) === -1 ? fileSources.push(i) : null));
   }

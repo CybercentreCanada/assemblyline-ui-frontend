@@ -17,15 +17,15 @@ import useALContext from 'components/hooks/useALContext';
 import useHighlighter from 'components/hooks/useHighlighter';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useSafeResults from 'components/hooks/useSafeResults';
-import { AlternateResult, FileResult } from 'components/models/base/result';
+import type { AlternateResult, FileResult } from 'components/models/base/result';
 import Classification from 'components/visual/Classification';
 import Moment from 'components/visual/Moment';
+import ExtractedSection from 'components/visual/ResultCard/extracted';
+import ResultSection from 'components/visual/ResultCard/result_section';
+import SupplementarySection from 'components/visual/ResultCard/supplementary';
 import Verdict from 'components/visual/Verdict';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import ExtractedSection from './ResultCard/extracted';
-import ResultSection from './ResultCard/result_section';
-import SupplementarySection from './ResultCard/supplementary';
 
 export const emptyResult = (result: FileResult) =>
   result.result.score === 0 &&
@@ -182,9 +182,9 @@ const WrappedResultCard: React.FC<Props> = ({ result, sid, alternates = null, fo
           <b>{displayedResult.response.service_name}</b>&nbsp;
         </span>
         {!empty && <Verdict score={displayedResult.result.score} mono short size="tiny" />}
-        <small
-          style={{ color: theme.palette.text.secondary }}
-        >{` :: ${displayedResult.response.service_version.replace(/_/g, '.')}`}</small>
+        <small style={{ color: theme.palette.text.secondary }}>
+          {` :: ${displayedResult.response.service_version.replace(/_/g, '.')}`}
+        </small>
         <small style={{ flexGrow: 1, color: theme.palette.text.secondary }}>
           &nbsp;{displayedResult.response.service_context ? `(${displayedResult.response.service_context})` : ''}
         </small>

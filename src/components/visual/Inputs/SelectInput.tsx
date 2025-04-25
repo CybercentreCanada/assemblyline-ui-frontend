@@ -20,11 +20,11 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
+import { HelperText } from 'components/visual/Inputs/components/HelperText';
+import type { ResetInputProps } from 'components/visual/Inputs/components/ResetInput';
+import { ResetInput } from 'components/visual/Inputs/components/ResetInput';
 import { Tooltip } from 'components/visual/Tooltip';
 import React, { useMemo, useState } from 'react';
-import { HelperText } from './components/HelperText';
-import type { ResetInputProps } from './components/ResetInput';
-import { ResetInput } from './components/ResetInput';
 
 export type SelectInputProps = Omit<SelectProps, 'error' | 'value' | 'onChange'> & {
   capitalize?: boolean;

@@ -1,5 +1,6 @@
 import { Buffer } from 'buffer';
-import { getHigherAsciiFromDec, getNonPrintableAsciiFromDec, Store } from '..';
+import type { Store } from '..';
+import { getHigherAsciiFromDec, getNonPrintableAsciiFromDec } from '..';
 
 /**
  * Text Copy Types

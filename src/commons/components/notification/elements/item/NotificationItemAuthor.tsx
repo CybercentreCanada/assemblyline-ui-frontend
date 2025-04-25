@@ -6,7 +6,7 @@ import { type FC, memo, useMemo } from 'react';
 export const NotificationItemAuthor: FC<{ author: FeedAuthor }> = memo(({ author = null }) => {
   const theme = useTheme();
 
-  //Limit github avatar size to 50px
+  // Limit github avatar size to 50px
   const avatar = useMemo<string>(() => {
     if (author?.avatar.includes('github')) {
       const url = new URLSearchParams(author?.avatar);

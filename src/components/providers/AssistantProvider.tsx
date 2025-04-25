@@ -129,7 +129,7 @@ function AssistantProvider({ children }: AssistantProviderProps) {
   const askAssistant = () => {
     const data = [...currentContext];
     const history = [...currentHistory];
-    const newUserQuestion = { role: 'user' as 'user', content: currentInput };
+    const newUserQuestion = { role: 'user' as const, content: currentInput };
     data.push(newUserQuestion);
     history.push(newUserQuestion);
     setCurrentContext(data);
@@ -237,7 +237,7 @@ function AssistantProvider({ children }: AssistantProviderProps) {
 
   const buildDefaultSystemMessage = (): ContextMessageProps => {
     return {
-      role: 'system' as 'system',
+      role: 'system' as const,
       content: null
     };
   };
@@ -333,7 +333,7 @@ function AssistantProvider({ children }: AssistantProviderProps) {
               }}
               open={open}
               anchorEl={anchorEl}
-              placement={'top-end'}
+              placement="top-end"
               transition
               onClick={event => event.stopPropagation()}
             >
@@ -446,7 +446,7 @@ function AssistantProvider({ children }: AssistantProviderProps) {
                               )
                             )}
                           {thinking && (
-                            <Stack direction={'row'} p={1} spacing={1} style={{ wordBreak: 'break-word' }}>
+                            <Stack direction="row" p={1} spacing={1} style={{ wordBreak: 'break-word' }}>
                               <Avatar>
                                 <SmartToyOutlinedIcon />
                               </Avatar>
@@ -462,7 +462,7 @@ function AssistantProvider({ children }: AssistantProviderProps) {
                           )}
                         </div>
                         {currentInsights.length > 0 && (
-                          <Stack direction={'row-reverse'} mt={0.75} ml={1} mr={1} spacing={1}>
+                          <Stack direction="row-reverse" mt={0.75} ml={1} mr={1} spacing={1}>
                             {currentInsights.map((insight, id) => (
                               <CustomChip
                                 key={id}

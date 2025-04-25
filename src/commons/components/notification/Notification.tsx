@@ -26,7 +26,7 @@ export const Notification: FC<Props> = memo(
     dayjsExtends(relativeTime);
 
     const [drawer, setDrawer] = useState<boolean>(false);
-    const [feeds, setFeeds] = useState<{ [k: string]: Feed }>(null);
+    const [feeds, setFeeds] = useState<Record<string, Feed>>(null);
     const [notifications, setNotifications] = useState<FeedItem[]>(null);
     const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading');
 

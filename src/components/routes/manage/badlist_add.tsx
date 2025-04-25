@@ -98,20 +98,20 @@ const BadlistNew = ({}: Props) => {
       return;
     }
 
-    //Tag specific checks
+    // Tag specific checks
     if (badlist?.type === 'tag') {
       // Type not in the list of valid tags
       if (!possibleTags.includes(badlist?.tag.type)) {
         setReady(false);
         return;
       }
-      //There are no tag value
+      // There are no tag value
       if (!badlist?.tag.value) {
         setReady(false);
         return;
       }
     }
-    //File specific checks
+    // File specific checks
     else if (badlist?.type === 'file') {
       // There is not at least one hash
       if (!badlist?.hashes) {
@@ -251,7 +251,7 @@ const BadlistNew = ({}: Props) => {
         {badlist?.type === 'tag' && (
           <Grid container size={{ xs: 12 }}>
             <Typography variant="h6">{t('information.tag')}</Typography>
-            <Grid container spacing={1} width={'100%'}>
+            <Grid container spacing={1} width="100%">
               <Grid size={{ xs: 12, md: 6 }} paddingLeft={theme.spacing(1)}>
                 <FormControl fullWidth required>
                   <FormLabel id="tag-type-label">{t('tag.type.title')}</FormLabel>
@@ -285,9 +285,9 @@ const BadlistNew = ({}: Props) => {
         )}
         {badlist?.type === 'file' && (
           <>
-            <Grid container size={{ xs: 12 }} width={'100%'}>
+            <Grid container size={{ xs: 12 }} width="100%">
               <Typography variant="h6">{t('file.prop')}</Typography>
-              <Grid container spacing={1} width={'100%'} paddingLeft={theme.spacing(1)}>
+              <Grid container spacing={1} width="100%" paddingLeft={theme.spacing(1)}>
                 <Grid size={{ xs: 12 }}>
                   <FormLabel>{t('file.name')}</FormLabel>
                   <TextField
@@ -328,7 +328,7 @@ const BadlistNew = ({}: Props) => {
                 </Grid>
               </Grid>
             </Grid>
-            <Grid container size={{ xs: 12 }} width={'100%'} paddingTop={theme.spacing(2)}>
+            <Grid container size={{ xs: 12 }} width="100%" paddingTop={theme.spacing(2)}>
               <Typography variant="h6">{t('file.hashes')}</Typography>
               <Grid container spacing={1} paddingLeft={theme.spacing(1)}>
                 {badlist?.type === 'file' &&
@@ -352,9 +352,9 @@ const BadlistNew = ({}: Props) => {
           </>
         )}
         {badlist?.type && (
-          <Grid container size={{ xs: 12 }} width={'100%'} paddingTop={theme.spacing(2)}>
+          <Grid container size={{ xs: 12 }} width="100%" paddingTop={theme.spacing(2)}>
             <Typography variant="h6">{t('details')}</Typography>
-            <Grid container spacing={1} width={'100%'}>
+            <Grid container spacing={1} width="100%">
               <Grid size={{ xs: 12, md: 9 }}>
                 <FormControl fullWidth required>
                   <FormLabel id="reason-label">{t('reason.title')}</FormLabel>
@@ -402,9 +402,9 @@ const BadlistNew = ({}: Props) => {
         )}
         {badlist?.type && (
           <>
-            <Grid container size={{ xs: 12 }} width={'100%'} paddingTop={theme.spacing(2)}>
+            <Grid container size={{ xs: 12 }} width="100%" paddingTop={theme.spacing(2)}>
               <Typography variant="h6">{t('attribution')}</Typography>
-              <Grid container spacing={1} width={'100%'} paddingLeft={theme.spacing(1)}>
+              <Grid container spacing={1} width="100%" paddingLeft={theme.spacing(1)}>
                 {ATTRIBUTION_TYPES.map((atype, idx) => (
                   <Grid key={idx} size={{ xs: 12, md: 6 }}>
                     <FormLabel id="tag-value-label">{t(`attribution.${atype}.title`)}</FormLabel>

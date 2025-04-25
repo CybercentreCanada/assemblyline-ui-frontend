@@ -2,18 +2,18 @@ export type SearchInput = string | string[][] | Record<string, string> | URLSear
 
 export type Types = boolean | number | string | string[];
 
-export type Params = { [param: string]: Types };
+export type Params = Record<string, Types>;
 
 export type SearchParams<T extends Params> = {
   -readonly [K in keyof T]: T[K] extends boolean
     ? boolean
     : T[K] extends number
-    ? number
-    : T[K] extends string
-    ? string
-    : T[K] extends Array<string>
-    ? string[]
-    : unknown;
+      ? number
+      : T[K] extends string
+        ? string
+        : T[K] extends string[]
+          ? string[]
+          : unknown;
 };
 
 /**

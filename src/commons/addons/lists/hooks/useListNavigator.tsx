@@ -1,5 +1,5 @@
+import Throttler from 'commons/addons/utils/throttler';
 import { useMemo } from 'react';
-import Throttler from '../../utils/throttler';
 
 const THROTTLER = new Throttler(10);
 

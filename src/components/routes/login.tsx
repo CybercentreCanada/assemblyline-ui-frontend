@@ -283,7 +283,7 @@ export default function LoginScreen({ allowUserPass, allowSAML, allowSignup, oAu
                           );
                           setButtonLoading(true);
                         }}
-                        href={'/api/v4/auth/saml/sso/'}
+                        href="/api/v4/auth/saml/sso/"
                       >
                         {t('button_saml')}
                         {buttonLoading && (

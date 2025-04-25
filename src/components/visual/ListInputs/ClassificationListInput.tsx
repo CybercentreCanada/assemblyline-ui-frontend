@@ -1,12 +1,11 @@
-import type { FormHelperTextProps } from '@mui/material';
-import { useTheme, type IconButtonProps, type ListItemTextProps } from '@mui/material';
+import type { FormHelperTextProps, useTheme, type IconButtonProps, type ListItemTextProps } from '@mui/material';
 import type { ClassificationProps } from 'components/visual/Classification';
 import Classification from 'components/visual/Classification';
 import { ListItemText } from 'components/visual/List/ListItemText';
+import { BaseListItem } from 'components/visual/ListInputs/components/BaseListInput';
+import { ResetListInput, type ResetListInputProps } from 'components/visual/ListInputs/components/ResetListInput';
+import { SkeletonListInput } from 'components/visual/ListInputs/components/SkeletonListInput';
 import React, { useMemo } from 'react';
-import { BaseListItem } from './components/BaseListInput';
-import { ResetListInput, type ResetListInputProps } from './components/ResetListInput';
-import { SkeletonListInput } from './components/SkeletonListInput';
 
 type Props = Omit<ClassificationProps, 'c12n' | 'setClassification'> & {
   capitalize?: boolean;

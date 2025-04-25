@@ -465,7 +465,7 @@ export default function Services() {
           <FileDownloader
             key="file_downloader"
             icon={<GetAppOutlinedIcon />}
-            link={`/api/v4/service/backup/`}
+            link="/api/v4/service/backup/"
             tooltip={t('backup')}
           />,
           <Tooltip
@@ -501,9 +501,9 @@ export default function Services() {
         <Grid size="grow">
           <Typography variant="h5">{t('title.available')}</Typography>
           {availableServices ? (
-            <Typography variant="caption" component="p">{`${availableServices.length} ${t(
-              'count.available'
-            )}`}</Typography>
+            <Typography variant="caption" component="p">
+              {`${availableServices.length} ${t('count.available')}`}
+            </Typography>
           ) : (
             <Skeleton width="8rem" />
           )}
@@ -521,9 +521,9 @@ export default function Services() {
         <Grid size="grow">
           <Typography variant="h5">{t('title.available.community')}</Typography>
           {availableCommunityServices ? (
-            <Typography variant="caption" component="p">{`${availableCommunityServices.length} ${t(
-              'count.available.community'
-            )}`}</Typography>
+            <Typography variant="caption" component="p">
+              {`${availableCommunityServices.length} ${t('count.available.community')}`}
+            </Typography>
           ) : (
             <Skeleton width="8rem" />
           )}

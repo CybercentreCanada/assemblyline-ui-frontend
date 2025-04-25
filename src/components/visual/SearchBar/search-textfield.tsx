@@ -1,4 +1,3 @@
-/* eslint-disable jsx-a11y/no-static-element-interactions */
 import { Box, ClickAwayListener, InputBase, useMediaQuery, useTheme } from '@mui/material';
 import { insertText } from 'commons/addons/utils/browser';
 import { parseEvent } from 'commons/components/utils/keyboard';

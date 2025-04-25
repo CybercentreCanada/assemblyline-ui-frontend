@@ -1,6 +1,6 @@
+import { FormProvider } from 'components/routes/development/customize/customize.form';
+import { CustomizeRoute } from 'components/routes/development/customize/customize.route';
 import React from 'react';
-import { FormProvider } from './customize.form';
-import { CustomizeRoute } from './customize.route';
 
 const WrappedCustomizePage = () => (
   <FormProvider>

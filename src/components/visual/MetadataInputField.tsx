@@ -70,7 +70,7 @@ const MetadataInputField: React.FC<MetadataInputFieldProps> = ({
       url: `/api/v4/search/facet/submission/metadata.${name}/`,
       onSuccess: api_data => {
         // Update with all possible values for field
-        setOptions(Object.keys(api_data.api_response) as string[]);
+        setOptions(Object.keys(api_data.api_response));
       },
       onFailure: () => {
         // We can ignore failures here as this field might never have been set.

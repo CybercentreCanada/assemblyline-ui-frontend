@@ -34,7 +34,7 @@ const WrappedFileTreeSection: React.FC<FileTreeSectionProps> = ({ tree, sid, bas
   const [open, setOpen] = React.useState(true);
   const theme = useTheme();
   const sp2 = theme.spacing(2);
-  const [forcedShown, setForcedShown] = React.useState<Array<string>>([]);
+  const [forcedShown, setForcedShown] = React.useState<string[]>([]);
 
   useEffect(() => {
     if (baseFiles && forcedShown.length === 0) {
@@ -86,7 +86,7 @@ type FileTreeProps = {
   tree: SubmissionTree['tree'];
   sid: string;
   force: boolean;
-  defaultForceShown: Array<string>;
+  defaultForceShown: string[];
 };
 
 const WrappedFileTree: React.FC<FileTreeProps> = ({ tree, sid, defaultForceShown, force = false }) => {

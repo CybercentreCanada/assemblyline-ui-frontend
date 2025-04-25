@@ -165,10 +165,10 @@ const WrappedArchivedTagSection: React.FC<Props> = ({
       );
   }, [filteredResults, query]);
 
-  const groupedResults = useMemo<Array<Result[]>>(() => {
+  const groupedResults = useMemo<Result[][]>(() => {
     if (!sortedResults) return null;
 
-    return sortedResults.reduce((prev: Array<Result[]>, curr: Result, i: number, array: Result[]) => {
+    return sortedResults.reduce((prev: Result[][], curr: Result, i: number, array: Result[]) => {
       const node =
         Array.isArray(prev) &&
         prev?.length > 0 &&
@@ -409,9 +409,9 @@ const WrappedGroupedRow = ({
         )}
       {!showMore && results?.length > 10 && (
         <GridTableRow hover sx={{ cursor: 'pointer', textDecoration: 'none' }} onClick={() => setShowMore(true)}>
-          <GridTableCell center sx={{ gridColumn: c12nDef.enforce ? 'span 5' : 'span 4' }}>{`+ ${
-            results?.length - 10
-          } ${results?.length - 10 <= 1 ? t('row') : t('rows')}`}</GridTableCell>
+          <GridTableCell center sx={{ gridColumn: c12nDef.enforce ? 'span 5' : 'span 4' }}>
+            {`+ ${results?.length - 10} ${results?.length - 10 <= 1 ? t('row') : t('rows')}`}
+          </GridTableCell>
         </GridTableRow>
       )}
     </>

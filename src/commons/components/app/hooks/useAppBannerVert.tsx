@@ -1,5 +1,5 @@
-import { useApp } from './useApp';
-import { useAppConfigs } from './useAppConfigs';
+import { useApp } from 'commons/components/app/hooks/useApp';
+import { useAppConfigs } from 'commons/components/app/hooks/useAppConfigs';
 
 export default function useAppBannerVert() {
   const { theme } = useApp();

@@ -90,11 +90,11 @@ export default function MalwareArchive() {
 
   const filterValue = useRef<string>('');
 
-  const hasFilter = useCallback((filter: string) => (query?.getAll('filters') as string[])?.includes(filter), [query]);
+  const hasFilter = useCallback((filter: string) => query?.getAll('filters')?.includes(filter), [query]);
 
   const handleToggleFilter = useCallback(
     (filter: string) => {
-      if ((query?.getAll('filters') as string[])?.includes(filter)) query.remove('filters', filter);
+      if (query?.getAll('filters')?.includes(filter)) query.remove('filters', filter);
       else query.add('filters', filter);
 
       navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);

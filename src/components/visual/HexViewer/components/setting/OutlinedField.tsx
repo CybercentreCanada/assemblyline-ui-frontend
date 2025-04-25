@@ -1,13 +1,14 @@
 import { FormControl, Grid, TextField, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
-import { memo, PropsWithChildren, default as React } from 'react';
+import type { PropsWithChildren } from 'react';
+import { memo, default as React } from 'react';
 
 export type OutlinedFieldProps = {
   label?: string;
   description?: string;
-  items?: Array<{
+  items?: {
     value: number;
     label: string;
-  }>;
+  }[];
   value?: string;
   onChange?: (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement | any>) => void;
 };

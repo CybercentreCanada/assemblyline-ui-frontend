@@ -69,7 +69,7 @@ export const ListInputsSection = React.memo(() => {
   return (
     <DemoContainer>
       <DemoSection
-        primary={'Basic List Inputs'}
+        primary="Basic List Inputs"
         secondary={
           <>
             <span>{'The following components are all of the inputs used in Assemblyline. '}</span>
@@ -209,7 +209,7 @@ export const ListInputsSection = React.memo(() => {
         }}
       >
         <div>
-          <Typography variant="h6">{'Controlled'}</Typography>
+          <Typography variant="h6">Controlled</Typography>
           <Typography color="textSecondary" variant="body2">
             <span>{'List Input components are controlled by default. '}</span>
           </Typography>
@@ -354,11 +354,11 @@ export const ListInputsSection = React.memo(() => {
       </div>
 
       <DemoSection
-        primary={'Disabled'}
+        primary="Disabled"
         secondary={
           <>
             <span>{'The disabled prop stops the user from making changes. '}</span>
-            <span>{'Note: the label should also be the disabled color.'}</span>
+            <span>Note: the label should also be the disabled color.</span>
           </>
         }
         left={
@@ -497,7 +497,7 @@ export const ListInputsSection = React.memo(() => {
       />
 
       <DemoSection
-        primary={'Loading'}
+        primary="Loading"
         secondary={
           <>
             <span>
@@ -641,13 +641,13 @@ export const ListInputsSection = React.memo(() => {
       />
 
       <DemoSection
-        primary={'Reset'}
+        primary="Reset"
         secondary={
           <>
             <span>
               {'All inputs implements a reset button which the button can be made visible via the reset prop. '}
             </span>
-            <span>{'Handle the reset change can be made using the onReset event handle.'}</span>
+            <span>Handle the reset change can be made using the onReset event handle.</span>
           </>
         }
         left={
@@ -796,7 +796,7 @@ export const ListInputsSection = React.memo(() => {
       />
 
       <DemoSection
-        primary={'Error'}
+        primary="Error"
         secondary={
           <>
             <span>
@@ -947,7 +947,7 @@ export const ListInputsSection = React.memo(() => {
       />
 
       <DemoSection
-        primary={'Read Only'}
+        primary="Read Only"
         secondary={
           <>
             <span>
@@ -1091,7 +1091,7 @@ export const ListInputsSection = React.memo(() => {
       />
 
       <DemoSection
-        primary={'Interactions'}
+        primary="Interactions"
         secondary={
           <>
             <span>{'Use this to test the different interaction with the different props. '}</span>
@@ -1283,7 +1283,7 @@ export const ListInputsSection = React.memo(() => {
       />
 
       <DemoSection
-        primary={'Edge Case: Long label names'}
+        primary="Edge Case: Long label names"
         secondary={
           <>
             <span>{"The labels should handle the case where there's a really long label name "}</span>

@@ -1,5 +1,6 @@
 import { useMediaQuery, useTheme } from '@mui/material';
-import React, { LegacyRef } from 'react';
+import type { LegacyRef } from 'react';
+import React from 'react';
 
 type PageFullSizeProps = {
   id?: string;

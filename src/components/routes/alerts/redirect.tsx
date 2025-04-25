@@ -1,9 +1,9 @@
 import { CircularProgress } from '@mui/material';
 import type { AlertSearchParams } from 'components/routes/alerts';
 import { ALERT_DEFAULT_PARAMS, ALERT_STORAGE_KEY } from 'components/routes/alerts';
+import { SearchParser } from 'components/routes/alerts/utils/SearchParser';
 import React, { useMemo } from 'react';
 import { Navigate } from 'react-router';
-import { SearchParser } from './utils/SearchParser';
 
 export const WrappedAlertsRedirect: React.FC = () => {
   const parser = useMemo(() => new SearchParser<AlertSearchParams>(ALERT_DEFAULT_PARAMS, { enforced: ['rows'] }), []);

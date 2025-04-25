@@ -1,6 +1,5 @@
-/* eslint-disable no-param-reassign */
-/* eslint-disable class-methods-use-this */
-import { Layout, LayoutComputer, LayoutState } from 'commons/addons/layout/split/layouts/Layouts';
+import type { LayoutComputer, LayoutState } from 'commons/addons/layout/split/layouts/Layouts';
+import { Layout } from 'commons/addons/layout/split/layouts/Layouts';
 
 export default class OneLayout implements LayoutComputer {
   private width: number;

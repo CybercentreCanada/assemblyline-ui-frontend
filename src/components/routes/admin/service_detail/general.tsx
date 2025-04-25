@@ -19,11 +19,11 @@ import FormControl from '@mui/material/FormControl';
 import InputAdornment from '@mui/material/InputAdornment';
 import useALContext from 'components/hooks/useALContext';
 import type { Service, ServiceConstants } from 'components/models/base/service';
+import ResetButton from 'components/routes/admin/service_detail/reset_button';
 import Classification from 'components/visual/Classification';
 import type { Dispatch, SetStateAction } from 'react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import ResetButton from './reset_button';
 
 type ServiceGeneralProps = {
   service: Service;
@@ -69,8 +69,6 @@ const ServiceGeneral = ({
       return;
     }
     setInstancesError(false);
-
-    // eslint-disable-next-line
   }, [service.min_instances, service.licence_count]);
 
   if (!constants || !defaults || !service || !serviceNames || !versions) {
@@ -480,7 +478,7 @@ const ServiceGeneral = ({
                     error={instancesError}
                     InputProps={{
                       inputProps: { min: 0, ...(service.licence_count && { max: service.licence_count }) },
-                      endAdornment: <InputAdornment position="end">{'↓'}</InputAdornment>
+                      endAdornment: <InputAdornment position="end">↓</InputAdornment>
                     }}
                     onChange={e => {
                       const value = Number(e.target.value);
@@ -508,7 +506,7 @@ const ServiceGeneral = ({
                     error={instancesError}
                     InputProps={{
                       inputProps: { min: 0 },
-                      endAdornment: <InputAdornment position="end">{'↑'}</InputAdornment>
+                      endAdornment: <InputAdornment position="end">↑</InputAdornment>
                     }}
                     onChange={e => {
                       const value = Number(e.target.value);

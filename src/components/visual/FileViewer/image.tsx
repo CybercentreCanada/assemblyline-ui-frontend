@@ -192,8 +192,8 @@ const WrappedImageSection = ({ name = null, sha256 = null }: Props) => {
     // Calculate dragging speed
     const timeDiff = (new Date() as any) - dragTimer.current;
     const { curX, curY, startX, startY } = data.current;
-    let speedY = ((curY - startY) / timeDiff) * 15;
-    let speedX = ((curX - startX) / timeDiff) * 15;
+    const speedY = ((curY - startY) / timeDiff) * 15;
+    const speedX = ((curX - startX) / timeDiff) * 15;
     let speedYAbsolute = Math.abs(speedY);
     let speedXAbsolute = Math.abs(speedX);
 
@@ -427,7 +427,7 @@ const WrappedImageSection = ({ name = null, sha256 = null }: Props) => {
               max={MAX}
               size="small"
               orientation="vertical"
-              onChange={(event, newValue) => handleZoomChange(newValue as number, null)}
+              onChange={(event, newValue) => handleZoomChange(newValue, null)}
               sx={{
                 '& .MuiSlider-thumb': {
                   boxShadow: 'none'

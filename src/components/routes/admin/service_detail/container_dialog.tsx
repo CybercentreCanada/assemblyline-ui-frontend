@@ -25,9 +25,9 @@ import {
   DEFAULT_ENVIRONMENT_VARIABLE,
   DEFAULT_PERSISTENT_VOLUME
 } from 'components/models/base/service';
+import ResetButton from 'components/routes/admin/service_detail/reset_button';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import ResetButton from './reset_button';
 
 type EnvironmentProps = {
   envVar?: EnvironmentVariable;
@@ -286,8 +286,8 @@ type ContainerDialogProps = {
   container?: DockerConfig;
   defaults?: DockerConfig;
   name?: string;
-  volumes?: { [name: string]: PersistentVolume };
-  onSave: (newContainer: DockerConfig, name?: string, newVolumes?: { [name: string]: PersistentVolume }) => void;
+  volumes?: Record<string, PersistentVolume>;
+  onSave: (newContainer: DockerConfig, name?: string, newVolumes?: Record<string, PersistentVolume>) => void;
 };
 
 const WrappedContainerDialog = ({
@@ -328,7 +328,7 @@ const WrappedContainerDialog = ({
   const handleContainerValueChange = (field, value) => {
     setModified(true);
     if (value === undefined) {
-      let clone = { ...tempContainer };
+      const clone = { ...tempContainer };
       delete clone[field];
       setTempContainer(clone);
     } else {

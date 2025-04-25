@@ -79,11 +79,11 @@ export default function RetrohuntPage() {
     []
   );
 
-  const hasFilter = useCallback((filter: string) => (query?.getAll('filters') as string[])?.includes(filter), [query]);
+  const hasFilter = useCallback((filter: string) => query?.getAll('filters')?.includes(filter), [query]);
 
   const handleToggleFilter = useCallback(
     (filter: string) => {
-      if ((query?.getAll('filters') as string[])?.includes(filter)) query.remove('filters', filter);
+      if (query?.getAll('filters')?.includes(filter)) query.remove('filters', filter);
       else query.add('filters', filter);
 
       navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
@@ -177,7 +177,6 @@ export default function RetrohuntPage() {
     return () => {
       window.removeEventListener('reloadRetrohunts', reload);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [handleReload, query]);
 
   useEffect(() => {

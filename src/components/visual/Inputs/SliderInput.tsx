@@ -7,10 +7,10 @@ import type {
   TypographyProps
 } from '@mui/material';
 import { FormControl, FormHelperText, Skeleton, Slider, Typography, useTheme } from '@mui/material';
+import type { ResetInputProps } from 'components/visual/Inputs/components/ResetInput';
+import { ResetInput } from 'components/visual/Inputs/components/ResetInput';
 import { Tooltip } from 'components/visual/Tooltip';
 import React, { useMemo, useState } from 'react';
-import type { ResetInputProps } from './components/ResetInput';
-import { ResetInput } from './components/ResetInput';
 
 export type SliderInputProps = Omit<SliderProps, 'value' | 'onChange'> & {
   endAdornment?: TextFieldProps['InputProps']['endAdornment'];

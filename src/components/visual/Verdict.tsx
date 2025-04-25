@@ -1,6 +1,6 @@
 import { Tooltip, useTheme } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
-import { Verdict as VerdictType } from 'components/models/base/alert';
+import type { Verdict as VerdictType } from 'components/models/base/alert';
 import CustomChip from 'components/visual/CustomChip';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -38,31 +38,31 @@ const WrappedVerdict: React.FC<VerdictProps> = ({
     info: {
       shortText: t('verdict.info.short'),
       text: t('verdict.info'),
-      color: 'default' as 'default',
+      color: 'default' as const,
       textColor: theme.palette.mode === 'dark' ? '#AAA' : '#888'
     },
     safe: {
       shortText: t('verdict.safe.short'),
       text: t('verdict.safe'),
-      color: 'success' as 'success',
+      color: 'success' as const,
       textColor: theme.palette.mode !== 'dark' ? theme.palette.success.dark : theme.palette.success.light
     },
     suspicious: {
       shortText: t('verdict.suspicious.short'),
       text: t('verdict.suspicious'),
-      color: 'warning' as 'warning',
+      color: 'warning' as const,
       textColor: theme.palette.mode !== 'dark' ? theme.palette.warning.dark : theme.palette.warning.light
     },
     highly_suspicious: {
       shortText: t('verdict.highly_suspicious.short'),
       text: t('verdict.highly_suspicious'),
-      color: 'warning' as 'warning',
+      color: 'warning' as const,
       textColor: theme.palette.mode !== 'dark' ? theme.palette.warning.dark : theme.palette.warning.light
     },
     malicious: {
       shortText: t('verdict.malicious.short'),
       text: t('verdict.malicious'),
-      color: 'error' as 'error',
+      color: 'error' as const,
       textColor: theme.palette.mode !== 'dark' ? theme.palette.error.dark : theme.palette.error.light
     }
   };

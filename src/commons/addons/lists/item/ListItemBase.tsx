@@ -1,4 +1,5 @@
-import { Divider, IconButtonProps, styled } from '@mui/material';
+import type { IconButtonProps } from '@mui/material';
+import { Divider, styled } from '@mui/material';
 import { grey } from '@mui/material/colors';
 import { memo, useCallback } from 'react';
 

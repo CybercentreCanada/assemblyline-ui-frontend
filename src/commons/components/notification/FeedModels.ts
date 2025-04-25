@@ -18,10 +18,10 @@ export type FeedItem = {
   banner_image?: string;
   date_published?: Date;
   date_modified?: Date;
-  authors?: Array<FeedAuthor>;
-  tags?: Array<'new' | 'current' | 'dev' | 'service' | 'blog'>;
+  authors?: FeedAuthor[];
+  tags?: ('new' | 'current' | 'dev' | 'service' | 'blog')[];
   language?: string;
-  attachments?: Array<FeedAttachment>;
+  attachments?: FeedAttachment[];
   _isNew: boolean;
 };
 
@@ -49,11 +49,11 @@ export type Feed = {
   next_url?: string;
   icon?: string;
   favicon?: string;
-  authors?: Array<FeedAuthor>;
+  authors?: FeedAuthor[];
   language?: string;
   expired?: boolean;
-  hubs?: Array<{ type: string; url: string }>;
-  items: Array<FeedItem>;
+  hubs?: { type: string; url: string }[];
+  items: FeedItem[];
 };
 
 export const DEFAULT_FEED: Feed = {

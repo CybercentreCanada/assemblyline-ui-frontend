@@ -487,7 +487,7 @@ const SafelistDetail = ({ safelist_id = null, close = () => null }: SafelistDeta
             )}
           </Grid>
           <Grid size={{ xs: 12 }}>
-            <Grid container alignItems={'end'}>
+            <Grid container alignItems="end">
               <Grid size={{ xs: 11 }}>
                 <Typography variant="h6">{t('timing')}</Typography>
               </Grid>

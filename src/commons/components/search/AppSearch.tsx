@@ -101,7 +101,7 @@ export default function AppSearch() {
 
   // Search input focus handler.
   const onFocus = useCallback(() => {
-    //state.setMenu(!!state?.items && state.items.length > 0);
+    // state.setMenu(!!state?.items && state.items.length > 0);
     state.set({ ...state, menu: true });
   }, [state]);
 
@@ -133,7 +133,7 @@ export default function AppSearch() {
       } else if (isEscape) {
         state.set({ ...state, menu: !state.menu });
       } else if (isArrowDown) {
-        const result = document.querySelector('[data-tui-id="tui-app-search-result"]') as HTMLElement;
+        const result = document.querySelector('[data-tui-id="tui-app-search-result"]');
         if (result) {
           // Prevent scolling before menu list gets focus.
           // Doing this prevents the menu list from scrolling down

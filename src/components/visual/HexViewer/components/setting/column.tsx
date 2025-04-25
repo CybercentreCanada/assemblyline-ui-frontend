@@ -1,9 +1,10 @@
 import { FormControl, Grid, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
 import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
+import type { StoreProps } from 'components/visual/HexViewer';
+import { COLUMNS, NumericField, useDispatch, useStore } from 'components/visual/HexViewer';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { COLUMNS, NumericField, StoreProps, useDispatch, useStore } from '../..';
 
 export const WrappedHexColumnSetting = ({ store }: StoreProps) => {
   const { t } = useTranslation(['hexViewer']);

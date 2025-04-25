@@ -1,12 +1,11 @@
-/* eslint-disable jsx-a11y/no-static-element-interactions */
-/* eslint-disable jsx-a11y/no-noninteractive-tabindex */
 import { CircularProgress, styled } from '@mui/material';
+import useListKeyboard from 'commons/addons/lists/hooks/useListKeyboard';
+import useListNavigator from 'commons/addons/lists/hooks/useListNavigator';
+import type { LineItem } from 'commons/addons/lists/item/ListItemBase';
+import ListItemBase from 'commons/addons/lists/item/ListItemBase';
+import type ListScroller from 'commons/addons/lists/scrollers/ListScroller';
+import SimpleListScroller from 'commons/addons/lists/scrollers/SimpleListScroller';
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import useListKeyboard from '../hooks/useListKeyboard';
-import useListNavigator from '../hooks/useListNavigator';
-import ListItemBase, { LineItem } from '../item/ListItemBase';
-import ListScroller from '../scrollers/ListScroller';
-import SimpleListScroller from '../scrollers/SimpleListScroller';
 
 export const Outer = styled('div')(({ theme }) => ({
   position: 'relative',

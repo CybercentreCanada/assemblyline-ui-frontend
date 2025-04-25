@@ -5,6 +5,13 @@ import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import { Grid, Tooltip, useTheme } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
 import type { Alert, DetailedItem } from 'components/models/base/alert';
+import {
+  AlertExtendedScan,
+  AlertListChip,
+  AlertListChipDetailed,
+  AlertPriority,
+  AlertStatus
+} from 'components/routes/alerts/components/Components';
 import { ChipList } from 'components/visual/ChipList';
 import CustomChip from 'components/visual/CustomChip';
 import Moment from 'components/visual/Moment';
@@ -12,7 +19,6 @@ import Verdict from 'components/visual/Verdict';
 import { verdictRank, verdictToColor } from 'helpers/utils';
 import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AlertExtendedScan, AlertListChip, AlertListChipDetailed, AlertPriority, AlertStatus } from './Components';
 
 type Props = {
   item: Alert;

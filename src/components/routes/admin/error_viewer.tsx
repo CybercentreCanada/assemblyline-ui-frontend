@@ -14,6 +14,7 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import type { Error } from 'components/models/base/error';
 import type { FacetResult, HistogramResult, SearchResult } from 'components/models/ui/search';
 import type { CustomUser } from 'components/models/ui/user';
+import { ErrorDetail } from 'components/routes/admin/error_detail';
 import Histogram from 'components/visual/Histogram';
 import LineGraph from 'components/visual/LineGraph';
 import SearchHeader from 'components/visual/SearchBar/SearchHeader';
@@ -23,7 +24,6 @@ import { safeFieldValue } from 'helpers/utils';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useLocation, useNavigate } from 'react-router';
-import { ErrorDetail } from './error_detail';
 
 const TIME_CONTRAINTS = ['24h', '4d', '7d', '1m', '1y'] as const;
 

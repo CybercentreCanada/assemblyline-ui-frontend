@@ -67,7 +67,9 @@ const SimilarItem: React.FC<SimilarItemProps> = ({ data, drawer }) => {
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap'
             }}
-          >{` :: ${data.value}`}</small>
+          >
+            {` :: ${data.value}`}
+          </small>
         </div>
         <div style={{ gridRow: 'span 2' }}>
           <Tooltip title={t('search.tooltip')} placement="left">

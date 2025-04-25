@@ -24,7 +24,7 @@ interface LeftNavElementsSkeletonProps {
 }
 
 interface ButtonSkeletonProps {
-  style: { [styleAttr: string]: any };
+  style: Record<string, any>;
   withText?: boolean;
   [propName: string]: any;
 }

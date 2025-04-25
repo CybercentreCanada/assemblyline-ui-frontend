@@ -1,9 +1,10 @@
 import { Grid, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
 import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
+import type { StoreProps } from 'components/visual/HexViewer';
+import { useStore } from 'components/visual/HexViewer';
 import { default as React } from 'react';
 import { useTranslation } from 'react-i18next';
-import { StoreProps, useStore } from '../..';
 
 export const WrappedRowFoldingSetting = ({ store }: StoreProps) => {
   const { t } = useTranslation(['hexViewer']);

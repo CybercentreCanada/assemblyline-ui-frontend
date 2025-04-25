@@ -203,7 +203,7 @@ const ApikeyDetail = ({ key_id = null, onClose = () => null }: ApikeyDetailProps
           )}
 
           <Grid size={{ xs: 12 }}>
-            <Grid container alignItems={'end'}>
+            <Grid container alignItems="end">
               <Grid size={{ xs: 11 }}>
                 <Typography variant="h6">{t('timing.title')}</Typography>
               </Grid>
@@ -283,7 +283,7 @@ const ApikeyDetail = ({ key_id = null, onClose = () => null }: ApikeyDetailProps
           </Grid>
 
           <Grid size={{ xs: 12 }}>
-            <Grid container alignItems={'end'}>
+            <Grid container alignItems="end">
               <Grid size={{ xs: 9 }}>
                 <Typography variant="h6">{t('permissions.title')}</Typography>
               </Grid>

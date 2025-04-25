@@ -1,4 +1,4 @@
-import {
+import type {
   ActionConfig,
   ActionPayloadConfig,
   ActionPayloadsConfig,
@@ -8,17 +8,19 @@ import {
   ActionTypeConfig,
   ActionTypesConfig,
   AppAction,
-  APP_ACTION_TYPES,
   BodyAction,
-  BODY_ACTION_TYPES,
   CellAction,
-  CELL_ACTION_TYPES,
   IsActionsConfig,
   ScrollAction,
-  SCROLL_ACTION_TYPES,
   SettingAction,
+  ToolbarAction
+} from '..';
+import {
+  APP_ACTION_TYPES,
+  BODY_ACTION_TYPES,
+  CELL_ACTION_TYPES,
+  SCROLL_ACTION_TYPES,
   SETTING_ACTION_TYPES,
-  ToolbarAction,
   TOOLBAR_ACTION_TYPES
 } from '..';
 

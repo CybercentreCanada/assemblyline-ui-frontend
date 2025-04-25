@@ -39,7 +39,7 @@ const WrappedMultiTypeParam = <T extends 'bool' | 'int' | 'str' | 'list'>({
   onDelete = () => null
 }: MultiTypeParamProps<T>) => {
   const { t } = useTranslation(['adminServices']);
-  const [tempUserParams, setTempUserParams] = useState<ServiceParameter>(DEFAULT_SERVICE_PARAMETER as ServiceParameter);
+  const [tempUserParams, setTempUserParams] = useState<ServiceParameter>(DEFAULT_SERVICE_PARAMETER);
   const theme = useTheme();
 
   const handleSubmissionParamUpdate = event => {
@@ -89,7 +89,7 @@ const WrappedMultiTypeParam = <T extends 'bool' | 'int' | 'str' | 'list'>({
       });
     }
 
-    setTempUserParams(DEFAULT_SERVICE_PARAMETER as ServiceParameter);
+    setTempUserParams(DEFAULT_SERVICE_PARAMETER);
   };
 
   const handleSPNameChange = event => {

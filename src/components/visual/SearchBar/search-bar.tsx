@@ -1,19 +1,19 @@
 import BackspaceIcon from '@mui/icons-material/Backspace';
+import type { IconButtonProps } from '@mui/material';
 import {
   alpha,
   Box,
   Divider,
   IconButton,
-  IconButtonProps,
   LinearProgress,
   styled,
   Tooltip,
   useMediaQuery,
   useTheme
 } from '@mui/material';
+import SearchTextField from 'components/visual/SearchBar/search-textfield';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import SearchTextField from './search-textfield';
 
 const Root = styled('div')(({ theme }) => ({
   '& button': {
