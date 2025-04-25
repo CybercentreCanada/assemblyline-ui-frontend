@@ -22,7 +22,6 @@ import {
   useTheme
 } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
-import makeStyles from '@mui/styles/makeStyles';
 import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -35,16 +34,6 @@ import Moment from 'components/visual/Moment';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BsClipboard } from 'react-icons/bs';
-
-const useStyles = makeStyles(() => ({
-  buttonProgress: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    marginTop: -12,
-    marginLeft: -12
-  }
-}));
 
 /**
  * @name useAPIKeyUtilities

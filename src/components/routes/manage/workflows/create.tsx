@@ -20,7 +20,6 @@ import DoDisturbAltOutlinedIcon from '@mui/icons-material/DoDisturbAltOutlined';
 import FormControl from '@mui/material/FormControl';
 import { withStyles } from '@mui/styles';
 import createStyles from '@mui/styles/createStyles';
-import makeStyles from '@mui/styles/makeStyles';
 import Throttler from 'commons/addons/utils/throttler';
 import PageCenter from 'commons/components/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
@@ -36,16 +35,6 @@ import _ from 'lodash';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useParams } from 'react-router';
-
-const useStyles = makeStyles(() => ({
-  buttonProgress: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    marginTop: -12,
-    marginLeft: -12
-  }
-}));
 
 const THROTTLER = new Throttler(1000);
 
