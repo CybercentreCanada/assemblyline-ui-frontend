@@ -15,7 +15,6 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import { useAppUser } from 'commons/components/app/hooks';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -28,16 +27,6 @@ import Classification from 'components/visual/Classification';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-const useStyles = makeStyles(theme => ({
-  circularProgress: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    marginTop: -12,
-    marginLeft: -12
-  }
-}));
-
 type RetrohuntData = Pick<Retrohunt, 'key' | 'search_classification' | 'ttl'>;
 
 type Props = {
@@ -48,7 +37,6 @@ type Props = {
 function WrappedRetrohuntRepeat({ retrohunt = null, onRepeat = () => null }: Props) {
   const { t } = useTranslation(['retrohunt']);
   const theme = useTheme();
-  const classes = useStyles();
   const { apiCall } = useMyAPI();
   const { c12nDef, configuration } = useALContext();
   const { user: currentUser } = useAppUser<CustomUser>();
@@ -178,11 +166,33 @@ function WrappedRetrohuntRepeat({ retrohunt = null, onRepeat = () => null }: Pro
           <DialogActions>
             <Button color="secondary" onClick={() => setOpen(false)}>
               {t('cancel')}
-              {loading && <CircularProgress className={classes.circularProgress} size={24} />}
+              {loading && (
+                <CircularProgress
+                  size={24}
+                  sx={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    marginTop: -12,
+                    marginLeft: -12
+                  }}
+                />
+              )}
             </Button>
             <Button color="primary" disabled={loading} onClick={() => handleRepeat()}>
               {t('repeat.ok')}
-              {loading && <CircularProgress className={classes.circularProgress} size={24} />}
+              {loading && (
+                <CircularProgress
+                  size={24}
+                  sx={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    marginTop: -12,
+                    marginLeft: -12
+                  }}
+                />
+              )}
             </Button>
           </DialogActions>
         </Dialog>

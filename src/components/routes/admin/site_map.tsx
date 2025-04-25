@@ -14,8 +14,8 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
+import { withStyles } from '@mui/styles';
 import createStyles from '@mui/styles/createStyles';
-import withStyles from '@mui/styles/withStyles';
 import { useAppUser } from 'commons/components/app/hooks';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import useALContext from 'components/hooks/useALContext';

@@ -28,12 +28,6 @@ import { getProvider } from 'helpers/utils';
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter } from 'react-router';
 
-// TODO: Remove this. Constructs the theme object with the default parameters
-// declare module '@mui/styles/defaultTheme' {
-//   // eslint-disable-next-line @typescript-eslint/no-empty-interface
-//   interface DefaultTheme extends Theme {}
-// }
-
 type PossibleApps = 'load' | 'locked' | 'login' | 'routes' | 'tos' | 'quota';
 
 const MyAppMain = () => {

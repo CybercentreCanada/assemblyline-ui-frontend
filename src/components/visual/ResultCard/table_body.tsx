@@ -1,12 +1,12 @@
 import type { Theme } from '@mui/material';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, useTheme } from '@mui/material';
+import { withStyles } from '@mui/styles';
 import createStyles from '@mui/styles/createStyles';
-import withStyles from '@mui/styles/withStyles';
 import type { TableBody as TableData } from 'components/models/base/result_body';
+import { KVBody } from 'components/visual/ResultCard/kv_body';
+import { TextBody } from 'components/visual/ResultCard/text_body';
 import TitleKey from 'components/visual/TitleKey';
 import { default as React } from 'react';
-import { KVBody } from './kv_body';
-import { TextBody } from './text_body';
 
 const StyledTableCell = withStyles((theme: Theme) =>
   createStyles({
@@ -62,7 +62,6 @@ const WrappedTblBody = ({ body, printable, order }: Props) => {
 
   if (body) {
     for (const line of body) {
-      // eslint-disable-next-line guard-for-in
       for (const th in line) {
         const val = line[th];
         if (val !== null && val !== '') {

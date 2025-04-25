@@ -1,24 +1,10 @@
 import { Button, CircularProgress, TextField, Typography } from '@mui/material';
-import createStyles from '@mui/styles/createStyles';
-import makeStyles from '@mui/styles/makeStyles';
 import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
-
-const useStyles = makeStyles(() =>
-  createStyles({
-    buttonProgress: {
-      position: 'absolute',
-      top: '50%',
-      left: '50%',
-      marginTop: -12,
-      marginLeft: -12
-    }
-  })
-);
 
 type ResetPasswordNowProps = {
   buttonLoading: boolean;
@@ -30,7 +16,6 @@ export function ResetPasswordNow({ buttonLoading, setButtonLoading, reset }: Res
   const location = useLocation();
   const navigate = useNavigate();
   const { t } = useTranslation(['login']);
-  const classes = useStyles();
   const { apiCall } = useMyAPI();
   const params = new URLSearchParams(location.search);
   const [resetID, setResetID] = useState('');
@@ -109,7 +94,18 @@ export function ResetPasswordNow({ buttonLoading, setButtonLoading, reset }: Res
               disabled={buttonLoading}
             >
               {t('reset_now.button')}
-              {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
+              {buttonLoading && (
+                <CircularProgress
+                  size={24}
+                  sx={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    marginTop: -12,
+                    marginLeft: -12
+                  }}
+                />
+              )}
             </Button>
           </>
         )}
@@ -126,7 +122,6 @@ type ResetPasswordProps = {
 
 export function ResetPassword({ buttonLoading, setButtonLoading, reset }: ResetPasswordProps) {
   const { t } = useTranslation(['login']);
-  const classes = useStyles();
   const { apiCall } = useMyAPI();
   const [email, setEmail] = useState('');
   const [done, setDone] = useState(false);
@@ -173,7 +168,18 @@ export function ResetPassword({ buttonLoading, setButtonLoading, reset }: ResetP
               disabled={buttonLoading}
             >
               {t('reset.button')}
-              {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
+              {buttonLoading && (
+                <CircularProgress
+                  size={24}
+                  sx={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    marginTop: -12,
+                    marginLeft: -12
+                  }}
+                />
+              )}
             </Button>
           </>
         )}

@@ -1,3 +1,4 @@
+import { Typography } from '@mui/material';
 import type { SnackbarEvents } from 'borealis-ui/dist/data/event';
 import { SNACKBAR_EVENT_ID } from 'borealis-ui/dist/data/event';
 import RedirectSubmission from 'commons/components/utils/RedirectSubmission';
@@ -201,8 +202,9 @@ const WrappedRoutes = () => {
         <Route path="*" element={<Navigate to="/notfound" replace />} />
       </Routes>
       {configuration.system && configuration.system.type !== 'production' && (
-        <div
+        <Typography
           className="no-print"
+          variant="body2"
           style={{
             position: 'fixed',
             bottom: '8px',
@@ -216,7 +218,7 @@ const WrappedRoutes = () => {
         >
           {`Assemblyline ${configuration.system.version} :: `}
           <span style={{ textTransform: 'capitalize' }}>{configuration.system.type}</span>
-        </div>
+        </Typography>
       )}
     </Suspense>
   );

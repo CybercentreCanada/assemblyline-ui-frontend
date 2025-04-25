@@ -11,7 +11,6 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import { useAppUser } from 'commons/components/app/hooks';
 import PageFullSize from 'commons/components/pages/PageFullSize';
 import useALContext from 'components/hooks/useALContext';
@@ -29,16 +28,6 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router';
 
-const useStyles = makeStyles(theme => ({
-  circularProgress: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    marginTop: -12,
-    marginLeft: -12
-  }
-}));
-
 type RetrohuntData = Pick<
   Retrohunt,
   'classification' | 'search_classification' | 'description' | 'yara_signature' | 'indices' | 'key' | 'ttl'
@@ -52,7 +41,6 @@ type Props = {
 function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = () => null }: Props) {
   const { t } = useTranslation(['retrohunt']);
   const theme = useTheme();
-  const classes = useStyles();
   const location = useLocation();
   const { apiCall } = useMyAPI();
   const { closeGlobalDrawer } = useDrawer();
@@ -192,7 +180,18 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = () => nu
                     onClick={() => setIsConfirmationOpen(true)}
                   >
                     {t('add.button')}
-                    {isButtonLoading && <CircularProgress className={classes.circularProgress} size={24} />}
+                    {isButtonLoading && (
+                      <CircularProgress
+                        size={24}
+                        sx={{
+                          position: 'absolute',
+                          top: '50%',
+                          left: '50%',
+                          marginTop: -12,
+                          marginLeft: -12
+                        }}
+                      />
+                    )}
                   </Button>
                 </Grid>
               </Grid>

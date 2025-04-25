@@ -1,6 +1,5 @@
 import ChevronRightOutlinedIcon from '@mui/icons-material/ChevronRightOutlined';
 import CloseIcon from '@mui/icons-material/Close';
-import type { Theme } from '@mui/material';
 import {
   Avatar,
   Box,
@@ -11,6 +10,7 @@ import {
   Grid,
   IconButton,
   Paper,
+  styled,
   Table,
   TableBody,
   TableCell,
@@ -25,7 +25,6 @@ import {
 import Autocomplete from '@mui/material/Autocomplete';
 import Skeleton from '@mui/material/Skeleton';
 import { red } from '@mui/material/colors';
-import withStyles from '@mui/styles/withStyles';
 import PageCenter from 'commons/components/pages/PageCenter';
 import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useALContext from 'components/hooks/useALContext';
@@ -52,16 +51,16 @@ type ParamProps = {
   id: string;
 };
 
-const DeleteButton = withStyles((theme: Theme) => ({
-  root: {
+const DeleteButton = memo(
+  styled(Button)(({ theme }) => ({
     color: theme.palette.getContrastText(red[500]),
     backgroundColor: red[500],
     '&:hover': {
       backgroundColor: red[700]
     },
     minWidth: theme.spacing(16)
-  }
-}))(Button);
+  }))
+);
 
 const ClickRow = ({ children, enabled, onClick, chevron = false, ...other }) => (
   <TableRow

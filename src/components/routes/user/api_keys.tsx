@@ -118,7 +118,6 @@ const APIKeyDeleteDialog = React.memo(
   ({ apikey = null, children = () => null, onAPIKeysChange = () => null }: APIKeyDeleteDialogProps) => {
     const { t } = useTranslation(['adminAPIkeys']);
     const theme = useTheme();
-    const classes = useStyles();
     const { apiCall } = useMyAPI();
     const { showSuccessMessage } = useMySnackbar();
 
@@ -158,11 +157,33 @@ const APIKeyDeleteDialog = React.memo(
           <DialogActions>
             <Button color="primary" autoFocus disabled={loading} onClick={() => setOpen(false)}>
               {t('cancel')}
-              {loading && <CircularProgress size={24} className={classes.buttonProgress} />}
+              {loading && (
+                <CircularProgress
+                  size={24}
+                  sx={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    marginTop: -12,
+                    marginLeft: -12
+                  }}
+                />
+              )}
             </Button>
             <Button color="primary" disabled={loading} onClick={() => handleDelete(apikey)}>
               {t('apikeys.remove')}
-              {loading && <CircularProgress size={24} className={classes.buttonProgress} />}
+              {loading && (
+                <CircularProgress
+                  size={24}
+                  sx={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    marginTop: -12,
+                    marginLeft: -12
+                  }}
+                />
+              )}
             </Button>
           </DialogActions>
         </Dialog>
@@ -252,7 +273,6 @@ const APIKeyUpsertingDialog = React.memo(
   ({ apikey: prevApiKey = null, children = () => null, onAPIKeysChange = () => null }: APIKeyUpsertingDialogProps) => {
     const { t } = useTranslation(['adminAPIkeys']);
     const theme = useTheme();
-    const classes = useStyles();
     const { apiCall } = useMyAPI();
     const { configuration, user: currentUser } = useALContext();
     const { defaults, selectACL, toggleRole } = useAPIKeyUtilities();
@@ -403,7 +423,18 @@ const APIKeyUpsertingDialog = React.memo(
               }}
             >
               {t('cancel')}
-              {loading && <CircularProgress size={24} className={classes.buttonProgress} />}
+              {loading && (
+                <CircularProgress
+                  size={24}
+                  sx={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    marginTop: -12,
+                    marginLeft: -12
+                  }}
+                />
+              )}
             </Button>
             <Button
               color="primary"
@@ -411,7 +442,18 @@ const APIKeyUpsertingDialog = React.memo(
               onClick={() => handleUpsert(apikey)}
             >
               {!prevApiKey ? t('apikeys.add') : t('apikeys.save')}
-              {loading && <CircularProgress size={24} className={classes.buttonProgress} />}
+              {loading && (
+                <CircularProgress
+                  size={24}
+                  sx={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    marginTop: -12,
+                    marginLeft: -12
+                  }}
+                />
+              )}
             </Button>
           </DialogActions>
         </Dialog>
