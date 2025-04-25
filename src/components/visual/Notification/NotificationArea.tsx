@@ -10,7 +10,7 @@ import NotificationsActiveOutlinedIcon from '@mui/icons-material/NotificationsAc
 import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
 import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined';
 import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
-import type { SelectChangeEvent, SvgIconProps } from '@mui/material';
+import type { SelectChangeEvent, SvgIconProps, Theme } from '@mui/material';
 import {
   Badge,
   Button,
@@ -42,22 +42,13 @@ import type { SystemMessage } from 'components/models/ui/user';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import type { PossibleColor } from 'helpers/colors';
 import 'moment-timezone';
-import React, {
-  ComponentProps,
-  ComponentType,
-  CSSProperties,
-  ElementType,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState
-} from 'react';
+import type { ComponentProps, ComponentType, CSSProperties, ElementType } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { JSONFeedItem } from '.';
 import { NotificationItem, useNotificationFeed } from '.';
 
-const Row = styled('div')(({ theme }) => ({
+const Row = styled('div')(() => ({
   width: '100%',
   display: 'flex',
   flexDirection: 'row',
@@ -88,25 +79,7 @@ const SystemMessageIcon = styled(({ severity, fontSize = 'medium', ...props }: S
   marginRight: theme.spacing(1.5)
 }));
 
-type NotificationColorProps<T extends ElementType<unknown>> = ComponentProps<T> & {
-  component: T;
-  children?: React.ReactNode;
-  severity?: PossibleColor;
-  colorType?: 1 | 2 | 3;
-  backgroundColorType?: 1 | 2 | 3;
-};
-
-const NotificationColor = <T extends ComponentType<any>>({
-  component: Component = 'div',
-  children,
-  severity = null,
-  colorType = null,
-  backgroundColorType = null,
-  style,
-  ...props
-}: NotificationColorProps<T>) => {
-  const theme = useTheme();
-
+const getColor = (severity: PossibleColor, variant: 1 | 2 | 3, theme: Theme) => {
   const colors: Record<string, Record<number, CSSProperties>> = {
     error: {
       1: { color: theme.palette.error.main },
@@ -130,6 +103,10 @@ const NotificationColor = <T extends ComponentType<any>>({
     }
   };
 
+  return colors?.[severity]?.[variant];
+};
+
+const getBackgroundColor = (severity: PossibleColor, variant: 1 | 2 | 3, theme: Theme) => {
   const backgroundColors: Record<string, Record<number, CSSProperties>> = {
     error: {
       1: { backgroundColor: theme.palette.error.main },
@@ -153,12 +130,34 @@ const NotificationColor = <T extends ComponentType<any>>({
     }
   };
 
+  return backgroundColors?.[severity]?.[variant];
+};
+
+type NotificationColorProps<T extends ElementType<unknown>> = ComponentProps<T> & {
+  component: T;
+  children?: React.ReactNode;
+  severity?: PossibleColor;
+  colorType?: 1 | 2 | 3;
+  backgroundColorType?: 1 | 2 | 3;
+};
+
+const NotificationColor = <T extends ComponentType<any>>({
+  component: Component = 'div',
+  children,
+  severity = null,
+  colorType = null,
+  backgroundColorType = null,
+  style,
+  ...props
+}: NotificationColorProps<T>) => {
+  const theme = useTheme();
+
   return (
     <Component
       {...props}
       style={{
-        ...colors?.[severity]?.[colorType],
-        ...backgroundColors?.[severity]?.[backgroundColorType],
+        ...getColor(severity, colorType, theme),
+        ...getBackgroundColor(severity, backgroundColorType, theme),
         ...style
       }}
     >
@@ -176,7 +175,7 @@ const WrappedNotificationArea = () => {
   const { systemMessage, setSystemMessage, user: currentUser, configuration } = useALContext();
   const { fetchJSONNotifications } = useNotificationFeed();
 
-  const [notifications, setNotifications] = useState<Array<JSONFeedItem>>([]);
+  const [notifications, setNotifications] = useState<JSONFeedItem[]>([]);
   const [newSystemMessage, setNewSystemMessage] = useState<SystemMessage>({
     user: '',
     title: '',
@@ -297,7 +296,7 @@ const WrappedNotificationArea = () => {
   }, []);
 
   const getVersionValues = useCallback(
-    (value: string): Array<number> =>
+    (value: string): number[] =>
       value
         ?.match(/(\d){1,}\.(\d){1,}\.(\d){1,}\..*/g)
         ?.at(0)
@@ -319,8 +318,8 @@ const WrappedNotificationArea = () => {
       )
         return null;
 
-      const notValues: Array<number> = getVersionValues(notVer);
-      const sysValues: Array<number> = getVersionValues(sysVer);
+      const notValues: number[] = getVersionValues(notVer);
+      const sysValues: number[] = getVersionValues(sysVer);
 
       if (arrayEquals(notValues, sysValues)) return 'current';
       else if (arrayHigher(notValues, sysValues)) return 'newer';
@@ -351,7 +350,7 @@ const WrappedNotificationArea = () => {
           api_data && api_data.api_response && Array.isArray(api_data.api_response) ? api_data.api_response : null;
         fetchJSONNotifications({
           urls: configuration.ui.rss_feeds,
-          onSuccess: (feedItems: Array<JSONFeedItem>) =>
+          onSuccess: (feedItems: JSONFeedItem[]) =>
             setNotifications(_n => {
               const isAdmin = currentUser?.is_admin;
               let newNots = feedItems.filter(n => {
@@ -481,10 +480,7 @@ const WrappedNotificationArea = () => {
 
       <Tooltip title={t('notification.title')} aria-label={t('add.title')}>
         <IconButton color="inherit" aria-label="open drawer" onClick={onOpenNotificationArea} size="large">
-          <NotificationColor
-            component={Badge}
-            severity={systemMessage?.severity}
-            backgroundColorType={1}
+          <Badge
             invisible={systemMessageRead && notifications.filter(n => n._isNew).length === 0}
             max={99}
             badgeContent={
@@ -507,9 +503,14 @@ const WrappedNotificationArea = () => {
                 <NotificationsActiveOutlinedIcon />
               )
             }
-            sx={{
-              color: theme.palette.getContrastText(theme.palette.primary.main),
-              backgroundColor: theme.palette.primary.main
+            slotProps={{
+              badge: {
+                style: {
+                  color: theme.palette.getContrastText(theme.palette.primary.main),
+                  backgroundColor: theme.palette.primary.main,
+                  ...getBackgroundColor(systemMessage?.severity, 1, theme)
+                }
+              }
             }}
           />
         </IconButton>
@@ -704,7 +705,7 @@ const WrappedNotificationArea = () => {
                 }}
               />
               <Typography
-                variant={'h6'}
+                variant="h6"
                 children={t(`notification.header`)}
                 sx={{ fontSize: 'large', fontWeight: 'bolder', flex: 1 }}
               />

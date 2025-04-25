@@ -14,17 +14,17 @@ const Container = styled('div')(({ theme }) => ({
   padding: theme.spacing(1.25)
 }));
 
-const Time = styled(Typography)(({ theme }) => ({
+const Time = styled(Typography)(() => ({
   lineHeight: 'revert'
 }));
 
-const Header = styled(Typography)(({ theme }) => ({
+const Header = styled('div')(() => ({
   width: '100%',
   display: 'flex',
   alignItems: 'center'
 }));
 
-const Content = styled('div')(({ theme }) => ({}));
+const Content = styled('div')(() => ({}));
 
 const Description = styled(Typography)(({ theme }) => ({
   '& a': {
