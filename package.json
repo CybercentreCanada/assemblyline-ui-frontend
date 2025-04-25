@@ -87,9 +87,9 @@
     "serve": "vite preview --port 3000",
     "test": "vitest run",
     "ci-test": "CI=true vitest run --coverage",
-    "ci-lint": "TIMING=all eslint --color --exit-on-fatal-error .",
+    "ci-lint": "TIMING=all eslint --color --exit-on-fatal-error --quiet --no-warn-ignored .",
     "build-test": "CI=true vitest run",
-    "build-lint": "TIMING=all eslint --color --quiet --exit-on-fatal-error ."
+    "build-lint": "TIMING=all eslint --color --exit-on-fatal-error --quiet --no-warn-ignored ."
   },
   "browserslist": {
     "production": [
