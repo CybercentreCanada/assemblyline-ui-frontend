@@ -11,23 +11,9 @@ import {
   useTheme
 } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
-import makeStyles from '@mui/styles/makeStyles';
-import { ServiceParameter, ServiceSpecification } from 'components/models/base/service';
+import type { ServiceParameter, ServiceSpecification } from 'components/models/base/service';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-
-const useStyles = makeStyles(theme => ({
-  no_pad: {
-    padding: 0
-  },
-  item: {
-    marginLeft: 0,
-    width: '100%',
-    '&:hover': {
-      background: theme.palette.action.hover
-    }
-  }
-}));
 
 type ResetButtonProps = {
   value: any;
@@ -134,7 +120,6 @@ type ParamProps = {
 };
 
 function WrappedParam({ disabled, param, pidx, idx, hasResetButton = false, setParam }: ParamProps) {
-  const classes = useStyles();
   const theme = useTheme();
 
   const [value, setValue] = useState<any>(param.value);
@@ -175,7 +160,15 @@ function WrappedParam({ disabled, param, pidx, idx, hasResetButton = false, setP
                 />
               </Typography>
             }
-            className={!disabled ? classes.item : null}
+            sx={{
+              ...(!disabled && {
+                marginLeft: 0,
+                width: '100%',
+                '&:hover': {
+                  background: theme.palette.action.hover
+                }
+              })
+            }}
           />
         </div>
       ) : (

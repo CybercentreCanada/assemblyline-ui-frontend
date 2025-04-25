@@ -2,18 +2,18 @@ import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import SelectAllOutlinedIcon from '@mui/icons-material/SelectAllOutlined';
 import { Menu, MenuItem } from '@mui/material';
-import useAppUser from 'commons/components/app/hooks/useAppUser';
+import { useAppUser } from 'commons/components/app/hooks';
 import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import useALContext from 'components/hooks/useALContext';
 import useHighlighter from 'components/hooks/useHighlighter';
 import useSafeResults from 'components/hooks/useSafeResults';
 import type { CustomUser } from 'components/models/ui/user';
-import type { PossibleColors } from 'components/visual/CustomChip';
 import CustomChip from 'components/visual/CustomChip';
+import type { PossibleColor } from 'helpers/colors';
 import { safeFieldValueURI } from 'helpers/utils';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 const STYLE = { height: 'auto', minHeight: '20px' };
 const SEARCH_ICON = <SearchOutlinedIcon style={{ marginRight: '16px' }} />;
@@ -54,7 +54,7 @@ const WrappedAttack: React.FC<AttackProps> = ({
   const handleClick = useCallback(() => triggerHighlight(highlight_key), [triggerHighlight, highlight_key]);
 
   const maliciousness = lvl || scoreToVerdict(score);
-  const color: PossibleColors = {
+  const color: PossibleColor = {
     suspicious: 'warning' as const,
     malicious: 'error' as const,
     safe: 'success' as const,
@@ -75,7 +75,7 @@ const WrappedAttack: React.FC<AttackProps> = ({
   }, []);
 
   const handleMenuCopy = useCallback(() => {
-    copy(text, 'clipID');
+    copy(text);
     handleClose();
   }, [copy, handleClose, text]);
 

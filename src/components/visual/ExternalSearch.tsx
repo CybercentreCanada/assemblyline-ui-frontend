@@ -22,7 +22,6 @@ import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import Tooltip from '@mui/material/Tooltip';
-import makeStyles from '@mui/styles/makeStyles';
 import useALContext from 'components/hooks/useALContext';
 import useExternalLookup from 'components/hooks/useExternalLookup';
 import type { DetailedItem } from 'components/models/base/alert';
@@ -37,33 +36,6 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 const TARGET_RESULT_COUNT = 10;
-
-const useStyles = makeStyles(theme => ({
-  link: {
-    textDecoration: 'none',
-    color: theme.palette.primary.main,
-    transition: 'color 225ms cubic-bezier(0, 0, 0.2, 1) 0ms',
-    '&:hover': {
-      color: theme.palette.mode === 'dark' ? theme.palette.primary.light : theme.palette.primary.dark
-    }
-  },
-  launch: {},
-  dialogPaper: {
-    minHeight: '95vh',
-    maxHeight: '95vh'
-  },
-  sectionContent: {},
-  collapseTitle: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    cursor: 'pointer',
-    '&:hover, &:focus': {
-      color: theme.palette.text.secondary
-    },
-    color: theme.palette.text.primary
-  }
-}));
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -158,13 +130,12 @@ const AutoHideChipList = React.memo(WrappedAutoHideChipList);
 type ResultGroupProps = {
   group: string;
   names: string[];
-  ndMap: Object;
-  valueMap: Object;
+  ndMap: object;
+  valueMap: object;
 };
 
 const WrappedResultGroup: React.FC<ResultGroupProps> = ({ group, names, ndMap, valueMap }) => {
   const theme = useTheme();
-  const classes = useStyles();
   const [open, setOpen] = React.useState(true);
 
   return group && names ? (
@@ -174,7 +145,16 @@ const WrappedResultGroup: React.FC<ResultGroupProps> = ({ group, names, ndMap, v
         onClick={() => {
           setOpen(!open);
         }}
-        className={classes.collapseTitle}
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          cursor: 'pointer',
+          color: theme.palette.text.primary,
+          '&:hover, &:focus': {
+            color: theme.palette.text.secondary
+          }
+        }}
       >
         <span>{toTitleCase(group)}</span>
         {open ? <ExpandLess /> : <ExpandMore />}
@@ -186,12 +166,12 @@ const WrappedResultGroup: React.FC<ResultGroupProps> = ({ group, names, ndMap, v
           {names.map((keyName, k) => {
             return (
               <React.Fragment key={k}>
-                <Grid item xs={4} sm={4}>
+                <Grid size={{ xs: 4, sm: 4 }}>
                   <Tooltip title={ndMap[keyName]}>
                     <Typography>{keyName}</Typography>
                   </Tooltip>
                 </Grid>
-                <Grid item xs={8} sm={8}>
+                <Grid size={{ xs: 8, sm: 8 }}>
                   <div>
                     <AutoHideChipList items={valueMap[keyName]} />
                   </div>
@@ -215,7 +195,6 @@ type EnrichmentResultProps = {
 
 const WrappedEnrichmentResult: React.FC<EnrichmentResultProps> = ({ num, enrichmentResult, count }) => {
   const { t } = useTranslation();
-  const classes = useStyles();
   const theme = useTheme();
   const [open, setOpen] = React.useState(true);
 
@@ -271,7 +250,17 @@ const WrappedEnrichmentResult: React.FC<EnrichmentResultProps> = ({ num, enrichm
             onClick={() => {
               setOpen(!open);
             }}
-            className={classes.collapseTitle}
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              cursor: 'pointer',
+
+              color: theme.palette.text.primary,
+              '&:hover, &:focus': {
+                color: theme.palette.text.secondary
+              }
+            }}
           >
             <span style={{ flex: 1, textAlign: 'center' }}>
               {toTitleCase(t('result'))} #{num + 1}
@@ -324,7 +313,6 @@ const EnrichmentResult = React.memo(WrappedEnrichmentResult);
 
 const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, value, round }) => {
   const theme = useTheme();
-  const classes = useStyles();
   const { t } = useTranslation();
   const [openedDialog, setOpenedDialog] = React.useState(false);
   const [tabState, setTabState] = React.useState(0);
@@ -438,9 +426,9 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, v
         scroll="paper"
         aria-labelledby={titleId}
         aria-describedby={descriptionId}
-        classes={{ paper: classes.dialogPaper }}
         fullWidth={true}
         maxWidth="xl"
+        slotProps={{ paper: { sx: { minHeight: '95vh', maxHeight: '95vh' } } }}
       >
         <IconButton
           aria-label="close"
@@ -470,7 +458,7 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, v
             </div>
           )}
 
-          <Typography variant="h4" component={'div'}>
+          <Typography variant="h4" component="div">
             {t('related_external.title')}
           </Typography>
           <Typography variant="caption" style={{ wordBreak: 'break-word' }}>

@@ -20,7 +20,7 @@ import Moment from 'components/visual/Moment';
 import { maxLenStr } from 'helpers/utils';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 type Props = {
   safelistResults: SearchResult<Safelist>;
@@ -84,8 +84,8 @@ const WrappedSafelistTable: React.FC<Props> = ({ safelistResults, setSafelistID 
                   {sl_item.type === 'file'
                     ? sl_item.id
                     : sl_item.type === 'signature'
-                    ? maxLenStr(sl_item.signature.name, 100)
-                    : `${sl_item.tag.type} - ${maxLenStr(sl_item.tag.value, 100)}`}
+                      ? maxLenStr(sl_item.signature.name, 100)
+                      : `${sl_item.tag.type} - ${maxLenStr(sl_item.tag.value, 100)}`}
                 </DivTableCell>
                 <DivTableCell breakable>{sl_item.sources.map(obj => obj.name).join(' | ')}</DivTableCell>
                 {c12nDef.enforce && (

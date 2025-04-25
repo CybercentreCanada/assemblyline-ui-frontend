@@ -261,7 +261,7 @@ const ExtraMetadata = React.memo(() => {
           return !metadata.length ? null : (
             <div style={{ margin: theme.spacing(1) }}>
               <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', columnGap: theme.spacing(1) }}>
-                <Typography color={'textSecondary'} variant="body2" sx={{ flex: 1 }}>
+                <Typography color="textSecondary" variant="body2" sx={{ flex: 1 }}>
                   {t('metadata.extra.label')}
                 </Typography>
 

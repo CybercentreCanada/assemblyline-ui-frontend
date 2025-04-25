@@ -1,9 +1,9 @@
 import { useBlocker } from 'components/hooks/useBlocker';
 import useDrawer from 'components/hooks/useDrawer';
 import { GD_EVENT_PREVENTED, GD_EVENT_PROCEED } from 'components/providers/DrawerProvider';
+import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import ConfirmationDialog from './ConfirmationDialog';
 
 export function RouterPrompt(props) {
   const {

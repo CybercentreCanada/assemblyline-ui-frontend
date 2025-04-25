@@ -1,8 +1,7 @@
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
 import TimerOutlinedIcon from '@mui/icons-material/TimerOutlined';
-import { Grid, IconButton, Pagination, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
+import { IconButton, Pagination, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import PageHeader from 'commons/components/pages/PageHeader';
 import useALContext from 'components/hooks/useALContext';
@@ -13,6 +12,7 @@ import type { SearchResult } from 'components/models/ui/search';
 import { RetrohuntCreate } from 'components/routes/retrohunt/create';
 import RetrohuntDetail from 'components/routes/retrohunt/detail';
 import { ChipList } from 'components/visual/ChipList';
+import { PageHeader as ALPageHeader } from 'components/visual/Layouts/PageHeader';
 import SearchBar from 'components/visual/SearchBar/search-bar';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
@@ -20,38 +20,9 @@ import RetrohuntTable from 'components/visual/SearchResult/retrohunt';
 import SearchResultCount from 'components/visual/SearchResultCount';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate, useNavigate } from 'react-router';
-import { useLocation } from 'react-router-dom';
+import { Navigate, useLocation, useNavigate } from 'react-router';
 import type { Socket } from 'socket.io-client';
 import { io } from 'socket.io-client';
-
-const useStyles = makeStyles(theme => ({
-  header: {
-    paddingBottom: theme.spacing(2)
-  },
-  headerButton: {
-    textAlign: 'right',
-    flexGrow: 0
-  },
-  headerIconButton: {
-    color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark
-  },
-  searchContainer: {
-    paddingTop: theme.spacing(1)
-  },
-  searchBar: {
-    fontStyle: 'italic',
-    paddingTop: theme.spacing(0.5),
-    display: 'flex',
-    flexWrap: 'wrap',
-    justifyContent: 'flex-end'
-  },
-  tableContainer: {
-    paddingTop: theme.spacing(2),
-    paddingLeft: theme.spacing(0.5),
-    paddingRight: theme.spacing(0.5)
-  }
-}));
 
 const PAGE_SIZE = 25;
 const MAX_TRACKED_RECORDS = 10000;
@@ -72,7 +43,6 @@ const DEFAULT_QUERY: string = Object.keys(DEFAULT_PARAMS)
 export default function RetrohuntPage() {
   const { t } = useTranslation(['retrohunt']);
   const theme = useTheme();
-  const classes = useStyles();
   const location = useLocation();
   const navigate = useNavigate();
   const { apiCall } = useMyAPI();
@@ -110,11 +80,11 @@ export default function RetrohuntPage() {
     []
   );
 
-  const hasFilter = useCallback((filter: string) => (query?.getAll('filters') as string[])?.includes(filter), [query]);
+  const hasFilter = useCallback((filter: string) => query?.getAll('filters')?.includes(filter), [query]);
 
   const handleToggleFilter = useCallback(
     (filter: string) => {
-      if ((query?.getAll('filters') as string[])?.includes(filter)) query.remove('filters', filter);
+      if (query?.getAll('filters')?.includes(filter)) query.remove('filters', filter);
       else query.add('filters', filter);
 
       navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
@@ -208,7 +178,6 @@ export default function RetrohuntPage() {
     return () => {
       window.removeEventListener('reloadRetrohunts', reload);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [handleReload, query]);
 
   useEffect(() => {
@@ -299,25 +268,22 @@ export default function RetrohuntPage() {
   else
     return (
       <PageFullWidth margin={4}>
-        <div className={classes.header}>
-          <Grid container alignItems="center">
-            <Grid item xs>
-              <Typography variant="h4">{t('title')}</Typography>
-            </Grid>
-            {currentUser.roles.includes('retrohunt_run') && (
-              <Grid className={classes.headerButton} item xs>
-                <Tooltip title={t('tooltip.add')}>
-                  <IconButton color="success" size="large" onClick={handleOpenCreatePage}>
-                    <AddCircleOutlineOutlinedIcon />
-                  </IconButton>
-                </Tooltip>
-              </Grid>
-            )}
-          </Grid>
-        </div>
+        <ALPageHeader
+          primary={t('title')}
+          style={{ paddingBottom: theme.spacing(2) }}
+          actions={[
+            currentUser.roles.includes('retrohunt_run') && (
+              <Tooltip key="add" title={t('tooltip.add')}>
+                <IconButton color="success" size="large" onClick={handleOpenCreatePage}>
+                  <AddCircleOutlineOutlinedIcon />
+                </IconButton>
+              </Tooltip>
+            )
+          ]}
+        />
 
         <PageHeader isSticky>
-          <div className={classes.searchContainer}>
+          <div style={{ paddingTop: theme.spacing(1) }}>
             <SearchBar
               initValue={query ? query.get('query', '') : ''}
               placeholder={t('filter')}
@@ -357,7 +323,15 @@ export default function RetrohuntPage() {
               ]}
             >
               {retrohuntResults !== null && (
-                <div className={classes.searchBar}>
+                <div
+                  style={{
+                    fontStyle: 'italic',
+                    paddingTop: theme.spacing(0.5),
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    justifyContent: 'flex-end'
+                  }}
+                >
                   {retrohuntResults.total !== 0 && (
                     <Typography variant="subtitle1" color="secondary" style={{ flexGrow: 1 }}>
                       {searching ? (
@@ -412,7 +386,13 @@ export default function RetrohuntPage() {
           </div>
         </PageHeader>
 
-        <div className={classes.tableContainer}>
+        <div
+          style={{
+            paddingTop: theme.spacing(2),
+            paddingLeft: theme.spacing(0.5),
+            paddingRight: theme.spacing(0.5)
+          }}
+        >
           <RetrohuntTable
             retrohuntResults={retrohuntResults}
             onRowClick={handleRowClick}

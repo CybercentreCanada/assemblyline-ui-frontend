@@ -6,7 +6,7 @@ import type { IconButtonProps } from 'components/visual/Buttons/IconButton';
 import { IconButton } from 'components/visual/Buttons/IconButton';
 import type { ClassificationProps } from 'components/visual/Classification';
 import Classification from 'components/visual/Classification';
-import type { ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import React, { isValidElement } from 'react';
 
 type TitleActionPartialProps = (IconButtonProps & { type?: 'icon' }) | (ButtonProps & { type?: 'button' });
@@ -19,6 +19,7 @@ function isValidAction(action: TitleActionProps): action is TitleActionPartialPr
 
 export type PageHeaderProps = {
   actions?: TitleActionProps[];
+  actionSpacing?: number;
   classification?: ClassificationProps['c12n'];
   classificationProps?: Omit<ClassificationProps, 'c12n' | 'setClassification'>;
   endAdornment?: React.ReactNode;
@@ -27,12 +28,14 @@ export type PageHeaderProps = {
   primaryProps?: TypographyProps;
   secondary?: React.ReactNode;
   secondaryProps?: TypographyProps;
+  style?: CSSProperties;
   onClassificationChange?: ClassificationProps['setClassification'];
 };
 
 export const PageHeader: React.FC<PageHeaderProps> = React.memo(
   ({
     actions = null,
+    actionSpacing = null,
     classification = '',
     classificationProps = null,
     endAdornment = null,
@@ -41,12 +44,13 @@ export const PageHeader: React.FC<PageHeaderProps> = React.memo(
     primaryProps = null,
     secondary = null,
     secondaryProps = null,
+    style = null,
     onClassificationChange = null
   }: PageHeaderProps) => {
     const theme = useTheme();
 
     return (
-      <div style={{ display: 'flex', flexDirection: 'column' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', ...style }}>
         {!classification ? null : (
           <div style={{ paddingBottom: theme.spacing(4) }}>
             <Classification
@@ -74,24 +78,32 @@ export const PageHeader: React.FC<PageHeaderProps> = React.memo(
               width: '100%',
               display: 'flex',
               flexWrap: 'wrap',
-              alignContent: 'flex-start',
+              alignContent: 'center',
               columnGap: theme.spacing(1)
             }}
           >
             <Typography
               variant="h4"
-              whiteSpace="nowrap"
-              overflow="hidden"
-              textOverflow="ellipsis"
               width="100%"
+              flex={1}
               {...primaryProps}
+              sx={{ overflowWrap: 'break-word', ...primaryProps?.sx }}
             >
               {primary}
             </Typography>
 
-            <Typography variant="caption" color="textSecondary" width="100%" {...secondaryProps}>
-              {loading ? <Skeleton style={{ width: '10rem' }} /> : secondary}
-            </Typography>
+            {secondary && (
+              <Typography
+                variant="caption"
+                color="textSecondary"
+                width="100%"
+                minWidth={0}
+                {...secondaryProps}
+                sx={{ overflowWrap: 'break-word', ...secondaryProps?.sx }}
+              >
+                {loading ? <Skeleton style={{ width: '10rem' }} /> : secondary}
+              </Typography>
+            )}
           </div>
 
           {loading ? null : (
@@ -105,7 +117,14 @@ export const PageHeader: React.FC<PageHeaderProps> = React.memo(
               }}
             >
               {Array.isArray(actions) && (
-                <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', columnGap: theme.spacing(1) }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    flexWrap: 'wrap',
+                    ...(actionSpacing && { gap: theme.spacing(actionSpacing) })
+                  }}
+                >
                   {actions.map((action, i) => {
                     if (isValidAction(action)) {
                       const { children = null, type = 'icon', ...buttonProps } = action;

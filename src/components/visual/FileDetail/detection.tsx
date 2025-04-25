@@ -1,95 +1,28 @@
 import OpenInNewOutlinedIcon from '@mui/icons-material/OpenInNewOutlined';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import SelectAllOutlinedIcon from '@mui/icons-material/SelectAllOutlined';
-import { Collapse, IconButton, Skeleton, Tooltip, useTheme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
-import clsx from 'clsx';
+import { Box, Collapse, IconButton, Skeleton, Tooltip, useTheme } from '@mui/material';
 import useHighlighter from 'components/hooks/useHighlighter';
 import useSafeResults from 'components/hooks/useSafeResults';
-import { HEURISTIC_LEVELS, HeuristicLevel } from 'components/models/base/heuristic';
-import { Section } from 'components/models/base/result';
+import type { HeuristicLevel } from 'components/models/base/heuristic';
+import { HEURISTIC_LEVELS } from 'components/models/base/heuristic';
+import type { Section } from 'components/models/base/result';
 import type { File } from 'components/models/ui/file';
 import ResultSection from 'components/visual/ResultCard/result_section';
 import SectionContainer from 'components/visual/SectionContainer';
 import { safeFieldValueURI } from 'helpers/utils';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router';
 
 const DEFAULT_SEC_SCORE = -1000;
 const SCORE_SHOW_THRESHOLD = 0;
-
-const useStyles = makeStyles(theme => ({
-  header: {
-    fontWeight: 500,
-    fontSize: 'larger',
-    cursor: 'pointer',
-    padding: '5px',
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center'
-  },
-  header_malicious: {
-    color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark,
-    backgroundColor: '#f2000025',
-    '&:hover, &:focus': {
-      backgroundColor: '#f2000035'
-    }
-  },
-  header_suspicious: {
-    color: theme.palette.mode === 'dark' ? theme.palette.warning.light : theme.palette.warning.dark,
-    backgroundColor: '#ff970025',
-    '&:hover, &:focus': {
-      backgroundColor: '#ff970035'
-    }
-  },
-  header_info: {
-    backgroundColor: '#6e6e6e25',
-    '&:hover, &:focus': {
-      backgroundColor: '#6e6e6e35'
-    }
-  },
-  header_safe: {
-    color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark,
-    backgroundColor: '#00f20025',
-    '&:hover, &:focus': {
-      backgroundColor: '#00f20035'
-    }
-  },
-  container: {
-    borderRadius: theme.spacing(0.5),
-    marginBottom: theme.spacing(0.25),
-    overflow: 'hidden'
-  },
-  container_malicious: {
-    border: `1px solid ${theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark}`
-  },
-  container_suspicious: {
-    border: `1px solid ${theme.palette.mode === 'dark' ? theme.palette.warning.light : theme.palette.warning.dark}`
-  },
-  container_info: {
-    border: `1px solid ${theme.palette.divider}`
-  },
-  container_safe: {
-    border: `1px solid ${theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark}`
-  },
-  container_highlight: {
-    border: `1px solid ${theme.palette.mode === 'dark' ? theme.palette.info.light : theme.palette.info.dark}`
-  },
-  highlighted: {
-    color: theme.palette.mode === 'dark' ? theme.palette.info.light : theme.palette.primary.main,
-    backgroundColor: theme.palette.mode === 'dark' ? '#3d485b' : '#cae8f9',
-    '&:hover, &:focus': {
-      backgroundColor: theme.palette.mode === 'dark' ? '#343a44' : '#e2f2fa'
-    }
-  }
-}));
 
 type HeuristicProps = {
   name: string;
   id: string;
   sections: Section[];
-  level: HeuristicLevel;
+  level: HeuristicLevel | 'highlight';
   force?: boolean;
 };
 
@@ -98,7 +31,6 @@ const WrappedHeuristic: React.FC<HeuristicProps> = ({ name, id, sections, level,
   const [open, setOpen] = React.useState(false);
   const [render, setRender] = React.useState(false);
   const { isHighlighted, triggerHighlight, getKey } = useHighlighter();
-  const classes = useStyles();
   const theme = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
@@ -111,16 +43,101 @@ const WrappedHeuristic: React.FC<HeuristicProps> = ({ name, id, sections, level,
   const handleHighlight = useCallback(() => triggerHighlight(getKey('heuristic', id)), [triggerHighlight, getKey, id]);
 
   return level === 'safe' && !showSafeResults && !force ? null : (
-    <div
-      className={clsx(
-        classes.container,
-        classes[`container_${level}`],
-        highlighted ? classes.container_highlight : null
-      )}
+    <Box
+      sx={{
+        borderRadius: theme.spacing(0.5),
+        marginBottom: theme.spacing(0.25),
+        overflow: 'hidden',
+
+        ...(() => {
+          switch (level) {
+            case 'malicious':
+              return {
+                border: `1px solid ${theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark}`
+              };
+            case 'suspicious':
+              return {
+                border: `1px solid ${theme.palette.mode === 'dark' ? theme.palette.warning.light : theme.palette.warning.dark}`
+              };
+            case 'info':
+              return {
+                border: `1px solid ${theme.palette.divider}`
+              };
+            case 'safe':
+              return {
+                border: `1px solid ${theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark}`
+              };
+            case 'highlight':
+              return {
+                border: `1px solid ${theme.palette.mode === 'dark' ? theme.palette.info.light : theme.palette.info.dark}`
+              };
+          }
+        })(),
+
+        ...(highlighted && {
+          color: theme.palette.mode === 'dark' ? theme.palette.info.light : theme.palette.primary.main,
+          backgroundColor: theme.palette.mode === 'dark' ? '#3d485b' : '#cae8f9',
+          '&:hover, &:focus': {
+            backgroundColor: theme.palette.mode === 'dark' ? '#343a44' : '#e2f2fa'
+          }
+        })
+      }}
     >
-      <div
-        className={clsx(classes.header, classes[`header_${level}`], highlighted ? classes.highlighted : null)}
+      <Box
         onClick={() => setOpen(!open)}
+        sx={{
+          fontWeight: 500,
+          fontSize: 'larger',
+          cursor: 'pointer',
+          padding: '5px',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+
+          ...(() => {
+            switch (level) {
+              case 'malicious':
+                return {
+                  color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark,
+                  backgroundColor: '#f2000025',
+                  '&:hover, &:focus': {
+                    backgroundColor: '#f2000035'
+                  }
+                };
+              case 'suspicious':
+                return {
+                  color: theme.palette.mode === 'dark' ? theme.palette.warning.light : theme.palette.warning.dark,
+                  backgroundColor: '#ff970025',
+                  '&:hover, &:focus': {
+                    backgroundColor: '#ff970035'
+                  }
+                };
+              case 'info':
+                return {
+                  backgroundColor: '#6e6e6e25',
+                  '&:hover, &:focus': {
+                    backgroundColor: '#6e6e6e35'
+                  }
+                };
+              case 'safe':
+                return {
+                  color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark,
+                  backgroundColor: '#00f20025',
+                  '&:hover, &:focus': {
+                    backgroundColor: '#00f20035'
+                  }
+                };
+            }
+          })(),
+
+          ...(highlighted && {
+            color: theme.palette.mode === 'dark' ? theme.palette.info.light : theme.palette.primary.main,
+            backgroundColor: theme.palette.mode === 'dark' ? '#3d485b' : '#cae8f9',
+            '&:hover, &:focus': {
+              backgroundColor: theme.palette.mode === 'dark' ? '#343a44' : '#e2f2fa'
+            }
+          })
+        }}
       >
         <div>
           {name} <span style={{ fontSize: 'small' }}>({id})</span>
@@ -156,7 +173,7 @@ const WrappedHeuristic: React.FC<HeuristicProps> = ({ name, id, sections, level,
             </IconButton>
           </Tooltip>
         </div>
-      </div>
+      </Box>
       <Collapse in={open} timeout="auto" style={{ marginRight: theme.spacing(0.5) }} onEnter={() => setRender(true)}>
         {sections &&
           render &&
@@ -166,14 +183,14 @@ const WrappedHeuristic: React.FC<HeuristicProps> = ({ name, id, sections, level,
             </div>
           ))}
       </Collapse>
-    </div>
+    </Box>
   );
 };
 
 const Heuristic = React.memo(WrappedHeuristic);
 
 type DetectionProps = Partial<File> & {
-  section_map?: { [heur_id: string]: Section[] };
+  section_map?: Record<string, Section[]>;
   force?: boolean;
   nocollapse?: boolean;
 };
@@ -188,7 +205,7 @@ const WrappedDetection: React.FC<DetectionProps> = ({
   const { t } = useTranslation(['fileDetail']);
   const { showSafeResults } = useSafeResults();
 
-  const [sectionMap, setSectionMap] = useState<{ [heur_id: string]: Section[] }>({});
+  const [sectionMap, setSectionMap] = useState<Record<string, Section[]>>({});
   const [maxScore, setMaxScore] = useState<number>(DEFAULT_SEC_SCORE);
 
   useEffect(() => {

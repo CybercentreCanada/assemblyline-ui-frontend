@@ -1,22 +1,8 @@
 import { Button, CircularProgress, TextField, Typography } from '@mui/material';
-import createStyles from '@mui/styles/createStyles';
-import makeStyles from '@mui/styles/makeStyles';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-
-const useStyles = makeStyles(() =>
-  createStyles({
-    buttonProgress: {
-      position: 'absolute',
-      top: '50%',
-      left: '50%',
-      marginTop: -12,
-      marginLeft: -12
-    }
-  })
-);
 
 type SignUpProps = {
   buttonLoading: boolean;
@@ -26,7 +12,6 @@ type SignUpProps = {
 
 export function SignUp({ buttonLoading, setButtonLoading, reset }: SignUpProps) {
   const { t } = useTranslation(['login']);
-  const classes = useStyles();
   const { apiCall } = useMyAPI();
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
@@ -107,7 +92,18 @@ export function SignUp({ buttonLoading, setButtonLoading, reset }: SignUpProps) 
               disabled={buttonLoading}
             >
               {t('signup.button')}
-              {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
+              {buttonLoading && (
+                <CircularProgress
+                  size={24}
+                  sx={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    marginTop: -12,
+                    marginLeft: -12
+                  }}
+                />
+              )}
             </Button>
           </>
         )}

@@ -9,92 +9,68 @@ import {
   SvgIcon,
   Tooltip,
   alpha,
+  styled,
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
-import clsx from 'clsx';
 import PageHeader from 'commons/components/pages/PageHeader';
 import type { CustomChipProps } from 'components/visual/CustomChip';
 import CustomChip from 'components/visual/CustomChip';
 import type { SearchTextFieldProps } from 'components/visual/SearchBar/search-textfield';
 import SearchTextField from 'components/visual/SearchBar/search-textfield';
+import { SearchCount, TOTAL_TRACKED_RECORDS } from 'components/visual/SearchBar/SearchCount';
 import type { ReactNode } from 'react';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { SearchCount, TOTAL_TRACKED_RECORDS } from './SearchCount';
 
-const useStyles = makeStyles(theme => ({
-  root: {
-    // marginTop: theme.spacing(1),
-    // marginBottom: theme.spacing(1),
-    display: 'flex',
-    flexDirection: 'column',
-    rowGap: theme.spacing(0.5)
+const Root = styled('div')(({ theme }) => ({
+  // marginTop: theme.spacing(1),
+  // marginBottom: theme.spacing(1),
+  display: 'flex',
+  flexDirection: 'column',
+  rowGap: theme.spacing(0.5)
+}));
+
+const Container = styled('div')(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  flexWrap: 'wrap',
+  paddingLeft: theme.spacing(1),
+  paddingRight: theme.spacing(0.5)
+}));
+
+const SearchWrapper = styled('div')(({ theme }) => ({
+  borderRadius: theme.spacing(0.5),
+  backgroundColor: alpha(theme.palette.text.primary, 0.04),
+  '&:hover': {
+    backgroundColor: alpha(theme.palette.text.primary, 0.06)
   },
-
-  container: {
-    display: 'flex',
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    paddingLeft: theme.spacing(1),
-    paddingRight: theme.spacing(0.5)
-  },
-
-  searchWrapper: {
-    borderRadius: theme.spacing(0.5),
-    backgroundColor: alpha(theme.palette.text.primary, 0.04),
-    '&:hover': {
-      backgroundColor: alpha(theme.palette.text.primary, 0.06)
-    },
-    '& input': {
-      color: theme.palette.text.secondary
-    }
-  },
-
-  searchContainer: {
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    columnGap: theme.spacing(0.5),
-    paddingLeft: theme.spacing(2),
-    paddingRight: theme.spacing(0.5),
-    [theme.breakpoints.up('md')]: {
-      columnGap: theme.spacing(0)
-    }
-  },
-
-  linearProgress: {
-    flexBasis: '100%',
-    height: theme.spacing(0.25),
-    marginTop: theme.spacing(-0.25),
-    width: '100%',
-    borderRadius: '0 0 4px 4px',
-    [theme.breakpoints.up('md')]: {
-      height: theme.spacing(0.5),
-      marginTop: theme.spacing(-0.5)
-    }
-  },
-
-  divider: {
-    margin: `0 ${theme.spacing(0)}`,
-    [theme.breakpoints.up('md')]: {
-      margin: `0 ${theme.spacing(0.75)}`
-    }
-  },
-
-  chiplist: {
-    display: 'inline-flex',
-    flexWrap: 'wrap',
-    listStyle: 'none',
-    boxShadow: 'inherit',
-    margin: 0
-  },
-
-  chip: {
-    marginBottom: theme.spacing(0.5),
-    marginRight: theme.spacing(1)
+  '& input': {
+    color: theme.palette.text.secondary
   }
+}));
+
+const SearchContainer = styled('div')(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center',
+  columnGap: theme.spacing(0.5),
+  paddingLeft: theme.spacing(2),
+  paddingRight: theme.spacing(0.5),
+  [theme.breakpoints.up('md')]: {
+    columnGap: theme.spacing(0)
+  }
+}));
+
+const ChipList = styled('ul')(({ theme }) => ({
+  display: 'inline-flex',
+  flexDirection: 'row',
+  flexWrap: 'wrap',
+  paddingLeft: theme.spacing(1),
+  paddingRight: theme.spacing(0.5),
+  listStyle: 'none',
+  boxShadow: 'inherit',
+  margin: 0
 }));
 
 const MAX_TRACKED_RECORDS = 1000000000;
@@ -114,11 +90,11 @@ type PopoverChipProps = {
 };
 
 const WrappedPopoverChip = ({ chip, popover, children }: PopoverChipProps) => {
-  const classes = useStyles();
+  const theme = useTheme();
 
   const [anchorEl, setAnchorEl] = useState<HTMLDivElement | null>(null);
 
-  const ref = useRef();
+  const ref = useRef(null);
 
   const handleClick = useCallback((event: React.MouseEvent<HTMLDivElement>) => {
     setAnchorEl(event.currentTarget);
@@ -133,11 +109,14 @@ const WrappedPopoverChip = ({ chip, popover, children }: PopoverChipProps) => {
   return (
     <>
       <CustomChip
-        className={classes.chip}
         ref={ref}
         size="small"
         variant="outlined"
         wrap
+        sx={{
+          marginBottom: theme.spacing(0.5),
+          marginRight: theme.spacing(1)
+        }}
         {...chip}
         onClick={handleClick}
       />
@@ -233,15 +212,14 @@ const WrappedSearchHeader = ({
 }: Props) => {
   const { t } = useTranslation();
   const theme = useTheme();
-  const classes = useStyles();
   const upMD = useMediaQuery(theme.breakpoints.up('md'));
 
   const params = useMemo<URLSearchParams>(() => new URLSearchParams(paramsInit), [paramsInit]);
 
   const [queryValue, setQueryValue] = useState<string>(!params.has(queryKey) ? defaultQuery : params.get(queryKey));
 
-  const rootRef = useRef<HTMLInputElement>();
-  const inputRef = useRef<HTMLInputElement>();
+  const rootRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const filters = useMemo(() => params.getAll(filtersKey) || defaultFilters, [defaultFilters, filtersKey, params]);
 
@@ -341,9 +319,9 @@ const WrappedSearchHeader = ({
 
   return (
     <PageHeader isSticky={isSticky}>
-      <div ref={rootRef} className={classes.root}>
-        <div className={classes.searchWrapper} ref={inputRef}>
-          <div className={classes.searchContainer}>
+      <Root ref={rootRef}>
+        <SearchWrapper ref={inputRef}>
+          <SearchContainer>
             <div ref={inputRef} style={{ flex: 1 }}>
               <SearchTextField
                 options={[]}
@@ -362,7 +340,18 @@ const WrappedSearchHeader = ({
                 </IconButton>
               </div>
             </Tooltip>
-            {actionProps.length > 0 && <Divider className={classes.divider} orientation="vertical" flexItem />}
+            {actionProps.length > 0 && (
+              <Divider
+                orientation="vertical"
+                flexItem
+                sx={{
+                  margin: `0 ${theme.spacing(0)}`,
+                  [theme.breakpoints.up('md')]: {
+                    margin: `0 ${theme.spacing(0.75)}`
+                  }
+                }}
+              />
+            )}
             {actionProps.map(({ tooltip, button, icon }, i) =>
               tooltip ? (
                 <Tooltip key={`action-${i}`} {...tooltip}>
@@ -377,15 +366,29 @@ const WrappedSearchHeader = ({
               )
             )}
             {endAdornment}
-          </div>
+          </SearchContainer>
 
-          {loading && <LinearProgress className={classes.linearProgress} />}
-        </div>
+          {loading && (
+            <LinearProgress
+              sx={{
+                flexBasis: '100%',
+                height: theme.spacing(0.25),
+                marginTop: theme.spacing(-0.25),
+                width: '100%',
+                borderRadius: '0 0 4px 4px',
+                [theme.breakpoints.up('md')]: {
+                  height: theme.spacing(0.5),
+                  marginTop: theme.spacing(-0.5)
+                }
+              }}
+            />
+          )}
+        </SearchWrapper>
 
         {/** Result Count */}
         {count > 1 ? (
           <>
-            <div className={classes.container} style={{ justifyContent: 'flex-end', fontStyle: 'italic' }}>
+            <Container style={{ justifyContent: 'flex-end', fontStyle: 'italic' }}>
               <div>
                 {!disableCount && (
                   <SearchCount
@@ -422,7 +425,7 @@ const WrappedSearchHeader = ({
                   onChange={handlePageChange}
                 />
               )}
-            </div>
+            </Container>
           </>
         ) : (
           <div />
@@ -430,7 +433,7 @@ const WrappedSearchHeader = ({
 
         {/** Filters */}
         {!disableFilters && params && (
-          <ul className={clsx(classes.container, classes.chiplist)}>
+          <ChipList>
             {popoverFilterProps.map((props, i) => (
               <li key={`chip-${i}`} children={<PopoverChip {...props} />} />
             ))}
@@ -438,7 +441,18 @@ const WrappedSearchHeader = ({
             {extraFilterProps.map((props, i) => (
               <li
                 key={`chip-${i}`}
-                children={<CustomChip className={classes.chip} size="small" variant="outlined" wrap {...props} />}
+                children={
+                  <CustomChip
+                    size="small"
+                    variant="outlined"
+                    wrap
+                    sx={{
+                      marginBottom: theme.spacing(0.5),
+                      marginRight: theme.spacing(1)
+                    }}
+                    {...props}
+                  />
+                }
               />
             ))}
 
@@ -447,7 +461,6 @@ const WrappedSearchHeader = ({
               .map((f, i) => (
                 <li key={`chiplist-${i}`}>
                   <CustomChip
-                    className={classes.chip}
                     label={f.startsWith('NOT(') && f.endsWith(')') ? f.substring(4, f.length - 1) : f}
                     color={f.startsWith('NOT(') && f.endsWith(')') ? 'error' : null}
                     size="small"
@@ -455,15 +468,19 @@ const WrappedSearchHeader = ({
                     wrap
                     onClick={() => handleFilterClick(f)}
                     onDelete={() => handleFilterDelete(f)}
+                    sx={{
+                      marginBottom: theme.spacing(0.5),
+                      marginRight: theme.spacing(1)
+                    }}
                   />
                 </li>
               ))}
-          </ul>
+          </ChipList>
         )}
 
         {/** Other Components */}
-        {children && <div className={classes.container}>{children}</div>}
-      </div>
+        {children && <Container>{children}</Container>}
+      </Root>
     </PageHeader>
   );
 };

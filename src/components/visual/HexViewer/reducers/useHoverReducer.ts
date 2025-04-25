@@ -1,30 +1,15 @@
 import { useCallback } from 'react';
-import {
-  HoverState,
-  isAction,
-  isCellMouseDown,
-  ReducerHandler,
-  Reducers,
-  RenderHandler,
-  renderIndexClass,
-  Store,
-  useCellStyles,
-  UseReducer
-} from '..';
+import type { HoverState, ReducerHandler, Reducers, RenderHandler, Store, UseReducer } from '..';
+import { isAction, isCellMouseDown, renderIndexClass } from '..';
 
 export const useHoverReducer: UseReducer = () => {
-  const classes = useCellStyles();
-
   const initialState: HoverState = { hover: { index: null } };
 
-  const hoverRender = useCallback(
-    (prevStore: Store, nextStore: Store): void => {
-      const { index: prevIndex } = prevStore.hover;
-      const { index: nextIndex } = nextStore.hover;
-      renderIndexClass(prevIndex, nextIndex, classes.hover, nextStore.cellsRendered);
-    },
-    [classes.hover]
-  );
+  const hoverRender = useCallback((prevStore: Store, nextStore: Store): void => {
+    const { index: prevIndex } = prevStore.hover;
+    const { index: nextIndex } = nextStore.hover;
+    renderIndexClass(prevIndex, nextIndex, 'hex-viewer-hover', nextStore.cellsRendered);
+  }, []);
 
   const hoverMouseEnter: Reducers['cellMouseEnter'] = useCallback(store => {
     return { ...store, hover: { ...store.hover, index: store.cell.mouseEnterIndex } };

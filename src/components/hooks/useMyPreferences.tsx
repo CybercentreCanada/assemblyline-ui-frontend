@@ -43,14 +43,14 @@ const useMyPreferences = () => {
 
   const AL_LIGHT_LOGO = useMemo(
     (): ReactElement<any> => (
-      <img alt={t('logo.alt')} src={`/images/noswoop.svg`} width="40" height="32" style={{ marginLeft: '-8px' }} />
+      <img alt={t('logo.alt')} src="/images/noswoop.svg" width="40" height="32" style={{ marginLeft: '-8px' }} />
     ),
     [t]
   );
 
   const AL_DARK_LOGO = useMemo(
     (): ReactElement<any> => (
-      <img alt={t('logo.alt')} src={`/images/noswoop_dark.svg`} width="40" height="32" style={{ marginLeft: '-8px' }} />
+      <img alt={t('logo.alt')} src="/images/noswoop_dark.svg" width="40" height="32" style={{ marginLeft: '-8px' }} />
     ),
     [t]
   );
@@ -59,7 +59,7 @@ const useMyPreferences = () => {
     (): ReactElement<any> => (
       <img
         style={{ display: 'inline-block', width: '100%', margin: '2rem 0' }}
-        src={`/images/banner.svg`}
+        src="/images/banner.svg"
         alt={t('banner.alt')}
       />
     ),
@@ -70,7 +70,7 @@ const useMyPreferences = () => {
     (): ReactElement<any> => (
       <img
         style={{ display: 'inline-block', width: '100%', margin: '2rem 0' }}
-        src={`/images/banner_dark.svg`}
+        src="/images/banner_dark.svg"
         alt={t('banner.alt')}
       />
     ),
@@ -81,7 +81,7 @@ const useMyPreferences = () => {
     (): ReactElement<any> => (
       <img
         style={{ display: 'inline-block', width: '100%', margin: '2rem 0' }}
-        src={`/images/vertical_banner.svg`}
+        src="/images/vertical_banner.svg"
         alt={t('banner.alt')}
       />
     ),
@@ -92,7 +92,7 @@ const useMyPreferences = () => {
     (): ReactElement<any> => (
       <img
         style={{ display: 'inline-block', width: '100%', margin: '2rem 0' }}
-        src={`/images/vertical_banner_dark.svg`}
+        src="/images/vertical_banner_dark.svg"
         alt={t('banner.alt')}
       />
     ),
@@ -104,7 +104,7 @@ const useMyPreferences = () => {
   const LEFT_MENU_ITEMS = useMemo(
     (): AppLeftNavElement[] => [
       {
-        type: 'item' as 'item',
+        type: 'item' as const,
         element: {
           id: 'submit',
           i18nKey: 'drawer.submit',
@@ -114,7 +114,7 @@ const useMyPreferences = () => {
         }
       },
       {
-        type: 'item' as 'item',
+        type: 'item' as const,
         element: {
           id: 'submissions',
           i18nKey: 'drawer.submissions',
@@ -125,7 +125,7 @@ const useMyPreferences = () => {
         }
       },
       {
-        type: 'item' as 'item',
+        type: 'item' as const,
         element: {
           id: 'alerts',
           i18nKey: 'drawer.alerts',
@@ -136,7 +136,7 @@ const useMyPreferences = () => {
         }
       },
       {
-        type: 'item' as 'item',
+        type: 'item' as const,
         element: {
           id: 'archive',
           i18nKey: 'drawer.archive',
@@ -150,7 +150,7 @@ const useMyPreferences = () => {
         }
       },
       {
-        type: 'item' as 'item',
+        type: 'item' as const,
         element: {
           id: 'retrohunt',
           i18nKey: 'drawer.retrohunt',
@@ -164,7 +164,7 @@ const useMyPreferences = () => {
         }
       },
       {
-        type: 'group' as 'group',
+        type: 'group' as const,
         element: {
           id: 'search',
           i18nKey: 'drawer.search',
@@ -231,11 +231,11 @@ const useMyPreferences = () => {
         }
       },
       {
-        type: 'divider' as 'divider',
+        type: 'divider' as const,
         element: null
       },
       {
-        type: 'item' as 'item',
+        type: 'item' as const,
         element: {
           id: 'dashboard',
           i18nKey: 'drawer.dashboard',
@@ -245,7 +245,7 @@ const useMyPreferences = () => {
         }
       },
       {
-        type: 'group' as 'group',
+        type: 'group' as const,
         element: {
           id: 'manage',
           i18nKey: 'drawer.manage',
@@ -312,7 +312,7 @@ const useMyPreferences = () => {
       },
 
       {
-        type: 'group' as 'group',
+        type: 'group' as const,
         element: {
           id: 'adminmenu',
           i18nKey: 'adminmenu',
@@ -386,11 +386,11 @@ const useMyPreferences = () => {
         }
       },
       {
-        type: 'divider' as 'divider',
+        type: 'divider' as const,
         element: null
       },
       {
-        type: 'group' as 'group',
+        type: 'group' as const,
         element: {
           id: 'help',
           i18nKey: 'drawer.help',
@@ -436,7 +436,7 @@ const useMyPreferences = () => {
         }
       },
       {
-        type: 'group' as 'group',
+        type: 'group' as const,
         element: {
           id: 'development',
           i18nKey: 'drawer.development',
@@ -459,6 +459,18 @@ const useMyPreferences = () => {
             //   route: '/development/api',
             //   nested: true
             // },
+            {
+              id: 'development.customize',
+              i18nKey: 'drawer.development.customize',
+              userPropValidators: [
+                { prop: 'user.is_admin', value: true, enforce: true },
+                { prop: 'configuration.system.type', value: 'development' },
+                { prop: 'configuration.system.type', value: 'staging' }
+              ],
+              icon: <PaletteIcon />,
+              route: '/development/customize',
+              nested: true
+            },
             {
               id: 'development.library',
               i18nKey: 'drawer.development.library',

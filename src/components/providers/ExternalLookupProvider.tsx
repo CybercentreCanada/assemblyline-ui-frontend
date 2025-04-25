@@ -20,21 +20,20 @@ export type ExternalEnrichmentResult = {
   confirmed: boolean; // if result is confirmed malicious
   description: string; // summary/description of the findings
   malicious: boolean; // if the result is malicious or not
-  enrichment: Array<ExternalEnrichmentItem>;
+  enrichment: ExternalEnrichmentItem[];
 };
 
-export type ExternalEnrichmentResults = {
-  [sourceName: string]: {
+export type ExternalEnrichmentResults = Record<
+  string,
+  {
     // Data source of query
     error?: null | string; // error message returned by data source
-    items?: Array<ExternalEnrichmentResult>;
+    items?: ExternalEnrichmentResult[];
     inProgress?: null | boolean;
-  };
-};
+  }
+>;
 
-export type ExternalEnrichmentState = {
-  [tagName: string]: ExternalEnrichmentResults;
-};
+export type ExternalEnrichmentState = Record<string, ExternalEnrichmentResults>;
 
 export type ExternalLookupContextProps = {
   isActionable: (category: string, type: string, value: string) => boolean;
@@ -99,7 +98,7 @@ export function ExternalLookupProvider(props: ExternalLookupProps) {
         qs += `&sources=${encodeURIComponent(source)}`;
       } else {
         // only send query to sources that support the tag name and the classification
-        let s = [];
+        const s = [];
         for (const src of currentUserConfig.ui.external_sources) {
           if (tagSrcMap[tagName].includes(src.name)) {
             // uncomment when classification updates are merged in

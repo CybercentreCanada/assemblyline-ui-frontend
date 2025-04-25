@@ -1,4 +1,5 @@
-import { darken, lighten, SvgIcon, SvgIconProps, useTheme } from '@mui/material';
+import type { SvgIconProps } from '@mui/material';
+import { darken, lighten, SvgIcon, useTheme } from '@mui/material';
 
 const AssemblylineIcon = ({ ...props }: SvgIconProps) => {
   const theme = useTheme();

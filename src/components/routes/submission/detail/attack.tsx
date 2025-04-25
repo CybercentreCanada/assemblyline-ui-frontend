@@ -1,24 +1,11 @@
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import { Collapse, Divider, Grid, Skeleton, Typography, useTheme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import useHighlighter from 'components/hooks/useHighlighter';
-import { AttackMatrix } from 'components/models/ui/file';
+import type { AttackMatrix } from 'components/models/ui/file';
 import Attack from 'components/visual/Attack';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-
-const useStyles = makeStyles(theme => ({
-  title: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    cursor: 'pointer',
-    '&:hover, &:focus': {
-      color: theme.palette.text.secondary
-    }
-  }
-}));
 
 type AttackSectionProps = {
   attack_matrix: AttackMatrix;
@@ -29,7 +16,6 @@ const WrappedAttackSection: React.FC<AttackSectionProps> = ({ attack_matrix, for
   const { t } = useTranslation(['submissionDetail']);
   const [open, setOpen] = React.useState(true);
   const theme = useTheme();
-  const classes = useStyles();
   const sp2 = theme.spacing(2);
   const { getKey } = useHighlighter();
 
@@ -40,7 +26,15 @@ const WrappedAttackSection: React.FC<AttackSectionProps> = ({ attack_matrix, for
         onClick={() => {
           setOpen(!open);
         }}
-        className={classes.title}
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          cursor: 'pointer',
+          '&:hover, &:focus': {
+            color: theme.palette.text.secondary
+          }
+        }}
       >
         <span>{t('attack_matrix')}</span>
         {open ? <ExpandLess /> : <ExpandMore />}
@@ -51,10 +45,10 @@ const WrappedAttackSection: React.FC<AttackSectionProps> = ({ attack_matrix, for
           {attack_matrix
             ? Object.keys(attack_matrix).map((cat, i) => (
                 <Grid container key={i}>
-                  <Grid item xs={12} sm={3} lg={2} paddingTop={0.375}>
+                  <Grid size={{ xs: 12, sm: 3, lg: 2 }} paddingTop={0.375}>
                     <span style={{ fontWeight: 500, textTransform: 'capitalize' }}>{cat.replace(/-/g, ' ')}</span>
                   </Grid>
-                  <Grid item xs={12} sm={9} lg={10}>
+                  <Grid size={{ xs: 12, sm: 9, lg: 10 }}>
                     {attack_matrix[cat].map(([cid, name, lvl], idx) => (
                       <Attack
                         key={`${cid}_${idx}`}
@@ -69,10 +63,10 @@ const WrappedAttackSection: React.FC<AttackSectionProps> = ({ attack_matrix, for
               ))
             : [...Array(3)].map((_, i) => (
                 <Grid container key={i} spacing={1}>
-                  <Grid item xs={12} sm={3} lg={2}>
+                  <Grid size={{ xs: 12, sm: 3, lg: 2 }}>
                     <Skeleton style={{ height: '2rem' }} />
                   </Grid>
-                  <Grid item xs={12} sm={9} lg={10}>
+                  <Grid size={{ xs: 12, sm: 9, lg: 10 }}>
                     <Skeleton style={{ height: '2rem' }} />
                   </Grid>
                 </Grid>

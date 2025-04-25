@@ -3,12 +3,12 @@ import { IconButton, Tooltip, useTheme } from '@mui/material';
 import useHighlighter from 'components/hooks/useHighlighter';
 import useSafeResults from 'components/hooks/useSafeResults';
 import type { Verdict } from 'components/models/base/alert';
+import CustomChip from 'components/visual/CustomChip';
+import Heuristic from 'components/visual/Heuristic';
 import Tag from 'components/visual/Tag';
 import { verdictRank, verdictToColor } from 'helpers/utils';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import CustomChip from './CustomChip';
-import Heuristic from './Heuristic';
 
 const DOMAIN_KEYS = ['network.static.domain', 'network.dynamic.domain'];
 const IP_KEYS = ['network.static.ip', 'network.dynamic.ip'];
@@ -104,13 +104,13 @@ const compareURLs = (a: TagProps, b: TagProps): number => {
   }
 };
 
-const groupDomains = (prev: { [verdict: number]: { [key: string]: TagProps[] } }, current: TagProps) => {
+const groupDomains = (prev: Record<number, Record<string, TagProps[]>>, current: TagProps) => {
   const verdict = current.safelisted ? 4 : verdictRank(current.lvl);
   const key = current.value.split('.').pop();
   return { ...prev, [verdict]: { ...prev?.[verdict], [key]: [...(prev?.[verdict]?.[key] || []), current] } };
 };
 
-const groupURLs = (prev: { [verdict: number]: { [key: string]: TagProps[] } }, current: TagProps) => {
+const groupURLs = (prev: Record<number, Record<string, TagProps[]>>, current: TagProps) => {
   const verdict = current.safelisted ? 4 : verdictRank(current.lvl);
   const key = new URL(current.value).hostname.split('.').slice(-2).join('.');
   return { ...prev, [verdict]: { ...prev?.[verdict], [key]: [...(prev?.[verdict]?.[key] || []), current] } };
@@ -135,10 +135,10 @@ type GroupedTagListProps = {
   items: TagProps[];
   targetMax?: number;
   groupMethod?: (
-    previousValue: { [verdict: number]: { [key: string]: TagProps[] } },
+    previousValue: Record<number, Record<string, TagProps[]>>,
     currentValue: TagProps,
     currentIndex: number
-  ) => { [verdict: number]: { [key: string]: TagProps[] } };
+  ) => Record<number, Record<string, TagProps[]>>;
   children?: (tag: TagProps, index: number) => React.ReactNode;
 };
 

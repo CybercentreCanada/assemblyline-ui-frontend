@@ -1,7 +1,10 @@
 {
   "debug.node.autoAttach": "on",
   "editor.codeActionsOnSave": {
-    "source.organizeImports": "never"
+    "source.organizeImports": "explicit"
+    // "source.addMissingImports.ts": "explicit",
+    // "source.fixAll.sortJSON": "explicit",
+    // "source.removeUnusedImports": "explicit"
   },
   "editor.formatOnSave": true,
   "editor.tabSize": 2,

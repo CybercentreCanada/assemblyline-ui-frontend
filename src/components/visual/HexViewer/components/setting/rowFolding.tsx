@@ -1,9 +1,10 @@
 import { Grid, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
 import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
+import type { StoreProps } from 'components/visual/HexViewer';
+import { useStore } from 'components/visual/HexViewer';
 import { default as React } from 'react';
 import { useTranslation } from 'react-i18next';
-import { StoreProps, useStore } from '../..';
 
 export const WrappedRowFoldingSetting = ({ store }: StoreProps) => {
   const { t } = useTranslation(['hexViewer']);
@@ -13,12 +14,12 @@ export const WrappedRowFoldingSetting = ({ store }: StoreProps) => {
 
   return (
     <>
-      <Grid item sm={4} xs={12} style={{ wordBreak: 'break-word' }}>
+      <Grid size={{ xs: 12, sm: 4 }} style={{ wordBreak: 'break-word' }}>
         <Tooltip title={t('layout.folding.active.description')} placement={upSM ? 'right' : 'bottom-start'}>
           <Typography variant="subtitle2">{t('layout.folding.active.label')}</Typography>
         </Tooltip>
       </Grid>
-      <Grid item sm={2} xs={4} style={{ textAlign: 'left' }}>
+      <Grid size={{ xs: 4, sm: 2 }} style={{ textAlign: 'left' }}>
         <FormControlLabel
           control={
             <Checkbox
@@ -30,7 +31,7 @@ export const WrappedRowFoldingSetting = ({ store }: StoreProps) => {
           label={t('layout.folding.active.checkbox')}
         />
       </Grid>
-      <Grid item sm={6} xs={8}></Grid>
+      <Grid size={{ xs: 8, sm: 6 }}></Grid>
     </>
   );
 };

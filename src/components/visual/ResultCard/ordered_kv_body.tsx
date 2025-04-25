@@ -11,7 +11,7 @@ const WrappedOrderedKVBody = ({ body }: Props) => (
     <tbody>
       {Object.keys(body).map(id => {
         const item = body[id];
-        let key = item[0];
+        const key = item[0];
         let value = item[1];
         if (value instanceof Array) {
           value = value.join(' | ');

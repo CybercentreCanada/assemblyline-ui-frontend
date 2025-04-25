@@ -1,4 +1,4 @@
-import { TypesConfig } from '..';
+import type { TypesConfig } from '..';
 
 export type CellType = 'hex' | 'text';
 export type CellTypes = CellType;

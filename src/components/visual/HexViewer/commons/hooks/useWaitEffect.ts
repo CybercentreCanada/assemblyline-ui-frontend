@@ -5,7 +5,7 @@ export const useWaitEffect = (callback: () => void, condition: () => boolean, de
   const callbackRef = useRef(null);
   const conditionRef = useRef(null);
   const timerRef = useRef(null);
-  const delayRef = useRef();
+  const delayRef = useRef(null);
 
   useEffect(() => {
     callbackRef.current = callback;

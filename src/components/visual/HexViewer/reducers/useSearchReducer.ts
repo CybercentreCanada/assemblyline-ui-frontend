@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import type { ReducerHandler, Reducers, RenderHandler, Store, UseReducer } from '..';
 import {
   addPadToBytes,
   clampSelectedSearchIndex,
@@ -15,44 +16,30 @@ import {
   isAction,
   isType,
   nextSearchIndex,
-  ReducerHandler,
-  Reducers,
   renderArrayClass,
-  RenderHandler,
   SEARCH_STATE,
   setStore,
-  setStoreWithKeys,
-  Store,
-  useCellStyles,
-  UseReducer
+  setStoreWithKeys
 } from '..';
 
 export const useSearchReducer: UseReducer = () => {
-  const classes = useCellStyles();
+  const searchRender = useCallback((prevStore: Store, nextStore: Store): void => {
+    const prev = getSearchResultsIndexes(prevStore);
+    const next = getSearchResultsIndexes(nextStore);
+    renderArrayClass(prev, next, 'hex-viewer-search', nextStore.cellsRendered);
+  }, []);
 
-  const searchRender = useCallback(
-    (prevStore: Store, nextStore: Store): void => {
-      const prev = getSearchResultsIndexes(prevStore);
-      const next = getSearchResultsIndexes(nextStore);
-      renderArrayClass(prev, next, classes.search, nextStore.cellsRendered);
-    },
-    [classes]
-  );
-
-  const selectedSearchRender = useCallback(
-    (prevStore: Store, nextStore: Store): void => {
-      const prev = getSelectedSearchResultIndexes(prevStore);
-      const next = getSelectedSearchResultIndexes(nextStore);
-      renderArrayClass(prev, next, classes.selectedSearch, nextStore.cellsRendered);
-    },
-    [classes]
-  );
+  const selectedSearchRender = useCallback((prevStore: Store, nextStore: Store): void => {
+    const prev = getSelectedSearchResultIndexes(prevStore);
+    const next = getSelectedSearchResultIndexes(nextStore);
+    renderArrayClass(prev, next, 'hex-viewer-selected-search', nextStore.cellsRendered);
+  }, []);
 
   const handleSearchInputValueChange = useCallback((store: Store, inputValue: string): Store => {
     let value = inputValue,
       length = 0;
 
-    let results: Array<{ index: number; length: number }> = [];
+    let results: { index: number; length: number }[] = [];
     let selectedResult = null;
 
     if (isType.search.mode.type(store, 'hex')) {

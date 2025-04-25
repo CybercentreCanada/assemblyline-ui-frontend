@@ -1,5 +1,3 @@
-/* eslint-disable no-bitwise */
-
 /**
  *
  * Generates a valid UUID string

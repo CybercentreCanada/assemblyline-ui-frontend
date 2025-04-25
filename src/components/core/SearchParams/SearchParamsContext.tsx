@@ -1,10 +1,10 @@
+import { useDefaultParams } from 'components/core/SearchParams/DefaultParamsContext';
+import type { Params } from 'components/core/SearchParams/SearchParams';
+import type { GetParams, SearchParamsResult } from 'components/core/SearchParams/SearchParser';
+import { SearchParser } from 'components/core/SearchParams/SearchParser';
 import { once } from 'lodash';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
-import { useDefaultParams } from './DefaultParamsContext';
-import type { Params } from './SearchParams';
-import type { GetParams, SearchParamsResult } from './SearchParser';
-import { SearchParser } from './SearchParser';
 
 type ContextProps<P extends Params> = {
   search: SearchParamsResult<P>;
@@ -42,7 +42,7 @@ export const SearchParamsProvider = <P extends Params>({
     [defaults, params, usingDefaultContext]
   );
 
-  const hiddenKeys = useMemo<Array<keyof P>>(() => parser.getHiddenKeys(), [parser]);
+  const hiddenKeys = useMemo<(keyof P)[]>(() => parser.getHiddenKeys(), [parser]);
 
   const search = useMemo<ContextProps<P>['search']>(
     () => parser.mergeParams(locationParams, hiddenParams, hiddenKeys),

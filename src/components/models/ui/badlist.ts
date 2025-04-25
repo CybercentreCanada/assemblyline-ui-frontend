@@ -168,7 +168,7 @@ export type BadlistRequests =
   | ClassificationBadlistPutRequest
   | SourceBadlistDeleteRequest
   | AttributionBadlistPutRequest
-  | AttributionBadlistDeleteRequest
+  | AttributionBadlistDeleteRequest;
 
 // prettier-ignore
 export type BadlistResponses<Request extends BadlistRequests> =

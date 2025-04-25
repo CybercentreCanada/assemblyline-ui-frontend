@@ -2,34 +2,39 @@ import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import MoodBadIcon from '@mui/icons-material/MoodBad';
 import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
-import { Grid, Skeleton, useMediaQuery, useTheme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
+import type { SvgIconProps } from '@mui/material';
+import { Box, Grid, Skeleton, useMediaQuery, useTheme } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
 import type { SubmissionReport } from 'components/models/ui/submission_report';
 import Verdict from 'components/visual/Verdict';
 import VerdictGauge from 'components/visual/VerdictGauge';
-import React from 'react';
+import type { FC } from 'react';
+import React, { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-const useStyles = makeStyles(theme => ({
-  banner_title: {
-    fontWeight: 500,
-    fontSize: '200%',
-    [theme.breakpoints.only('xs')]: {
-      fontSize: '180%'
-    }
-  },
-  icon: {
-    marginLeft: theme.spacing(3),
-    marginRight: theme.spacing(4.5),
-    fontSize: '400%',
-    [theme.breakpoints.only('xs')]: {
-      marginLeft: theme.spacing(2),
-      marginRight: theme.spacing(2.5),
-      fontSize: '350%'
-    }
-  }
-}));
+type IconProps = SvgIconProps & {
+  component: FC<SvgIconProps>;
+};
+
+const Icon = memo(({ component: Component, ...props }: IconProps) => {
+  const theme = useTheme();
+
+  return (
+    <Component
+      {...props}
+      sx={{
+        marginLeft: theme.spacing(3),
+        marginRight: theme.spacing(4.5),
+        fontSize: '400%',
+        [theme.breakpoints.only('xs')]: {
+          marginLeft: theme.spacing(2),
+          marginRight: theme.spacing(2.5),
+          fontSize: '350%'
+        }
+      }}
+    />
+  );
+});
 
 type Props = {
   report: SubmissionReport;
@@ -38,34 +43,33 @@ type Props = {
 export function WrappedAttributionBanner({ report }: Props) {
   const { t } = useTranslation(['submissionReport']);
   const theme = useTheme();
-  const classes = useStyles();
   const score = report ? report.max_score : 0;
   const isXS = useMediaQuery(theme.breakpoints.only('xs'));
   const { scoreToVerdict } = useALContext();
 
   const BANNER_COLOR_MAP = {
     info: {
-      icon: <HelpOutlineIcon className={classes.icon} />,
+      icon: <Icon component={HelpOutlineIcon} />,
       bgColor: '#6e6e6e15',
       textColor: theme.palette.mode === 'dark' ? '#AAA' : '#888'
     },
     safe: {
-      icon: <VerifiedUserOutlinedIcon className={classes.icon} />,
+      icon: <Icon component={VerifiedUserOutlinedIcon} />,
       bgColor: '#00f20015',
       textColor: theme.palette.mode !== 'dark' ? theme.palette.success.dark : theme.palette.success.light
     },
     suspicious: {
-      icon: <MoodBadIcon className={classes.icon} />,
+      icon: <Icon component={MoodBadIcon} />,
       bgColor: '#ff970015',
       textColor: theme.palette.mode !== 'dark' ? theme.palette.warning.dark : theme.palette.warning.light
     },
     highly_suspicious: {
-      icon: <MoodBadIcon className={classes.icon} />,
+      icon: <Icon component={MoodBadIcon} />,
       bgColor: '#ff970015',
       textColor: theme.palette.mode !== 'dark' ? theme.palette.warning.dark : theme.palette.warning.light
     },
     malicious: {
-      icon: <BugReportOutlinedIcon className={classes.icon} />,
+      icon: <Icon component={BugReportOutlinedIcon} />,
       bgColor: '#f2000015',
       textColor: theme.palette.mode !== 'dark' ? theme.palette.error.dark : theme.palette.error.light
     }
@@ -97,16 +101,28 @@ export function WrappedAttributionBanner({ report }: Props) {
       }}
     >
       <Grid container alignItems="center" justifyContent="center">
-        <Grid className="no-print" item xs style={{ color: textColor, display: isXS ? 'none' : 'inherit' }}>
+        <Grid
+          className="no-print"
+          size={{ xs: 'grow' }}
+          style={{ color: textColor, display: isXS ? 'none' : 'inherit' }}
+        >
           {icon}
         </Grid>
-        <Grid className="print-only" item xs style={{ color: textColor }}>
+        <Grid className="print-only" size={{ xs: 'grow' }} style={{ color: textColor }}>
           {icon}
         </Grid>
-        <Grid item xs style={{ flexGrow: 10 }}>
-          <div className={classes.banner_title}>
+        <Grid size={{ xs: 'grow' }} style={{ flexGrow: 10 }}>
+          <Box
+            sx={{
+              fontWeight: 500,
+              fontSize: '200%',
+              [theme.breakpoints.only('xs')]: {
+                fontSize: '180%'
+              }
+            }}
+          >
             {report ? <Verdict type="text" size="medium" score={report.max_score} /> : <Skeleton />}
-          </div>
+          </Box>
           <table width={report ? null : '100%'} style={{ borderSpacing: 0 }}>
             <tbody>
               <tr>
@@ -167,8 +183,7 @@ export function WrappedAttributionBanner({ report }: Props) {
           </table>
         </Grid>
         <Grid
-          item
-          xs
+          size={{ xs: 'grow' }}
           style={{ color: textColor, marginLeft: theme.spacing(1), marginRight: theme.spacing(1), minHeight: '100px' }}
         >
           {report ? (

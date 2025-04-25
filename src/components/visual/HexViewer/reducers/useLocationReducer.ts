@@ -1,19 +1,8 @@
 import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import React, { useCallback } from 'react';
-import {
-  DEFAULT_STORE,
-  getValueFromPath,
-  isAction,
-  LocationParam,
-  LocationQuery,
-  LOCATION_PARAMS,
-  ReducerHandler,
-  Reducers,
-  setStoreWithPath,
-  Store,
-  UseReducer
-} from '..';
+import type { LocationParam, LocationQuery, ReducerHandler, Reducers, Store, UseReducer } from '..';
+import { DEFAULT_STORE, getValueFromPath, isAction, LOCATION_PARAMS, setStoreWithPath } from '..';
 
 export const useLocationReducer: UseReducer = () => {
   const { copy } = useClipboard();
@@ -53,11 +42,11 @@ export const useLocationReducer: UseReducer = () => {
     if (param.type === 'number') {
       const num = parseInt(value);
       if (isNaN(num) || num === getValueFromPath(DEFAULT_STORE, param.path)) return store;
-      let newStore = setStoreWithPath.Store(store, num, param.path);
+      const newStore = setStoreWithPath.Store(store, num, param.path);
       return setStoreWithPath.Store(store, getValueFromPath(newStore, param.path), ['location', ...param.path]);
     } else if (param.type === 'string') {
       if (value === getValueFromPath(DEFAULT_STORE, param.path)) return store;
-      let newStore = setStoreWithPath.Store(store, value, param.path);
+      const newStore = setStoreWithPath.Store(store, value, param.path);
       return setStoreWithPath.Store(store, getValueFromPath(newStore, param.path), ['location', ...param.path]);
     } else return store;
   }, []);

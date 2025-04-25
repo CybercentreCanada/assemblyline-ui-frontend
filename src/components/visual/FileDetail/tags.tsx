@@ -2,7 +2,6 @@ import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import type { GridProps } from '@mui/material';
 import { Collapse, Divider, Grid, Skeleton, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import useSafeResults from 'components/hooks/useSafeResults';
 import type { Signature } from 'components/models/base/tagging';
 import type { Tags } from 'components/models/ui/file';
@@ -10,33 +9,12 @@ import AutoHideTagList from 'components/visual/AutoHideTagList';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-const useStyles = makeStyles(theme => ({
-  title: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    cursor: 'pointer',
-    '&:hover, &:focus': {
-      color: theme.palette.text.secondary
-    }
-  },
-  meta_key: {
-    overflowX: 'hidden',
-    whiteSpace: 'nowrap',
-    textOverflow: 'ellipsis'
-  },
-  tooltip: {
-    margin: 'auto !important'
-  }
-}));
-
 export interface TooltipGridProps extends Omit<GridProps, 'title'> {
   title?: React.ReactNode;
 }
 
 export const TooltipGrid: React.FC<TooltipGridProps> = ({ title = '', ...props }) => {
   const theme = useTheme();
-  const classes = useStyles();
 
   const [disabled, setDisabled] = useState<boolean>(true);
 
@@ -59,16 +37,31 @@ export const TooltipGrid: React.FC<TooltipGridProps> = ({ title = '', ...props }
   return (
     <Tooltip
       title={title}
-      classes={{
-        tooltip: classes.tooltip
-      }}
       placement={isXS ? 'bottom-start' : 'right-start'}
       disableFocusListener={disabled}
       disableHoverListener={disabled}
       disableInteractive={disabled}
       disableTouchListener={disabled}
+      slotProps={{
+        tooltip: {
+          sx: {
+            margin: 'auto !important'
+          }
+        }
+      }}
     >
-      <Grid ref={ref} className={classes.meta_key} item xs={12} sm={3} lg={2} paddingTop={0.375} {...props} />
+      <Grid
+        ref={ref}
+        size={{ xs: 12, sm: 3, lg: 2 }}
+        paddingTop={0.375}
+        {...props}
+        sx={{
+          overflowX: 'hidden',
+          whiteSpace: 'nowrap',
+          textOverflow: 'ellipsis',
+          ...props?.sx
+        }}
+      />
     </Tooltip>
   );
 };
@@ -83,8 +76,6 @@ const WrappedTagSection: React.FC<TagSectionProps> = ({ signatures, tags, force 
   const { t } = useTranslation(['fileDetail']);
   const [open, setOpen] = React.useState(true);
   const theme = useTheme();
-  const classes = useStyles();
-  const isXS = useMediaQuery(theme.breakpoints.only('xs'));
   const sp2 = theme.spacing(2);
   const { showSafeResults } = useSafeResults();
   const [tagUnsafeMap, setTagUnsafeMap] = React.useState({});
@@ -106,7 +97,19 @@ const WrappedTagSection: React.FC<TagSectionProps> = ({ signatures, tags, force 
 
   return (!signatures && !tags) || someTagNotSafe || forceShowTag || someSigNotSafe || forceShowSig ? (
     <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
-      <Typography variant="h6" onClick={() => setOpen(!open)} className={classes.title}>
+      <Typography
+        variant="h6"
+        onClick={() => setOpen(!open)}
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          cursor: 'pointer',
+          '&:hover, &:focus': {
+            color: theme.palette.text.secondary
+          }
+        }}
+      >
         <span>{t('generated_tags')}</span>
         {open ? <ExpandLess /> : <ExpandMore />}
       </Typography>
@@ -115,12 +118,12 @@ const WrappedTagSection: React.FC<TagSectionProps> = ({ signatures, tags, force 
         <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
           {signatures && (someSigNotSafe || forceShowSig) && (
             <Grid container>
-              <TooltipGrid title={'heuristic.signature'}>
+              <TooltipGrid title="heuristic.signature">
                 <span style={{ fontWeight: 500 }}>heuristic.signature</span>
               </TooltipGrid>
-              <Grid item xs={12} sm={9} lg={10}>
+              <Grid size={{ xs: 12, sm: 9, lg: 10 }}>
                 <AutoHideTagList
-                  tag_type={'heuristic.signature'}
+                  tag_type="heuristic.signature"
                   items={signatures.map(item => ({ value: item[0], lvl: item[1], safelisted: item[2] }))}
                   force={force}
                 />
@@ -134,7 +137,7 @@ const WrappedTagSection: React.FC<TagSectionProps> = ({ signatures, tags, force 
                     <TooltipGrid title={tag_type}>
                       <span style={{ fontWeight: 500 }}>{tag_type}</span>
                     </TooltipGrid>
-                    <Grid item xs={12} sm={9} lg={10}>
+                    <Grid size={{ xs: 12, sm: 9, lg: 10 }}>
                       <AutoHideTagList
                         tag_type={tag_type}
                         items={tags[tag_type].map(item => ({
@@ -151,10 +154,10 @@ const WrappedTagSection: React.FC<TagSectionProps> = ({ signatures, tags, force 
               )
             : [...Array(3)].map((_, i) => (
                 <Grid container key={i} spacing={1}>
-                  <Grid item xs={12} sm={3} lg={2}>
+                  <Grid size={{ xs: 12, sm: 3, lg: 2 }}>
                     <Skeleton style={{ height: '2rem' }} />
                   </Grid>
-                  <Grid item xs={12} sm={9} lg={10}>
+                  <Grid size={{ xs: 12, sm: 9, lg: 10 }}>
                     <Skeleton style={{ height: '2rem' }} />
                   </Grid>
                 </Grid>

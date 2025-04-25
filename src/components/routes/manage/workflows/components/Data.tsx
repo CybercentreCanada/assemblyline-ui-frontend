@@ -1,4 +1,4 @@
-import useAppUser from 'commons/components/app/hooks/useAppUser';
+import { useAppUser } from 'commons/components/app/hooks';
 import useMyAPI from 'components/hooks/useMyAPI';
 import type { Alert } from 'components/models/base/alert';
 import type { SearchResult } from 'components/models/ui/search';
@@ -17,12 +17,12 @@ export const AlertHistogram: React.FC<AlertHistogramProps> = ({ id }) => {
   const { apiCall } = useMyAPI();
   const { user: currentUser } = useAppUser<CustomUser>();
 
-  const [histogram, setHistogram] = useState<{ [s: string]: number }>(null);
+  const [histogram, setHistogram] = useState<Record<string, number>>(null);
 
   const handleReload = useCallback(() => {
     if (!id || !currentUser.roles.includes('alert_view')) return;
 
-    apiCall<{ [s: string]: number }>({
+    apiCall<Record<string, number>>({
       url: '/api/v4/search/histogram/alert/reporting_ts/',
       method: 'POST',
       body: {

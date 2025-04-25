@@ -1,49 +1,22 @@
 import { Card, Grid, Tooltip, useTheme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import type { DockerConfig, PersistentVolume } from 'components/models/base/service';
+import ContainerDialog from 'components/routes/admin/service_detail/container_dialog';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CgSmartphoneChip, CgSmartphoneRam } from 'react-icons/cg';
-import ContainerDialog from './container_dialog';
-
-const useStyles = makeStyles(theme => ({
-  card: {
-    border: `1px solid ${theme.palette.divider}`,
-    borderRadius: '4px',
-    padding: '8px',
-    margin: '0.25rem 0',
-    overflow: 'auto',
-    wordBreak: 'break-word',
-    '&:hover': {
-      backgroundColor: theme.palette.mode === 'dark' ? '#ffffff10' : '#00000005',
-      cursor: 'pointer'
-    }
-  },
-  card_title: {
-    fontSize: 'larger',
-    fontFamily: 'monospace'
-  },
-  label: {
-    fontWeight: 500
-  },
-  mono: {
-    fontFamily: 'monospace'
-  }
-}));
 
 type ContainerCardProps = {
   container: DockerConfig;
   defaults: DockerConfig;
   name?: string;
-  volumes?: { [name: string]: PersistentVolume };
-  onChange: (newContainer: DockerConfig, name?: string, newVolumes?: { [name: string]: PersistentVolume }) => void;
+  volumes?: Record<string, PersistentVolume>;
+  onChange: (newContainer: DockerConfig, name?: string, newVolumes?: Record<string, PersistentVolume>) => void;
 };
 
 const WrappedContainerCard = ({ container, defaults, name = null, volumes = null, onChange }: ContainerCardProps) => {
   const { t } = useTranslation(['adminServices']);
   const [dialog, setDialog] = useState(false);
   const theme = useTheme();
-  const classes = useStyles();
   const yesColor = theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark;
   const noColor = theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark;
 
@@ -62,22 +35,42 @@ const WrappedContainerCard = ({ container, defaults, name = null, volumes = null
         volumes={volumes}
         onSave={handleContainerChange}
       />
-      <Card className={classes.card} onClick={() => setDialog(true)}>
+      <Card
+        onClick={() => setDialog(true)}
+        sx={{
+          border: `1px solid ${theme.palette.divider}`,
+          borderRadius: '4px',
+          padding: '8px',
+          margin: '0.25rem 0',
+          overflow: 'auto',
+          wordBreak: 'break-word',
+          '&:hover': {
+            backgroundColor: theme.palette.mode === 'dark' ? '#ffffff10' : '#00000005',
+            cursor: 'pointer'
+          }
+        }}
+      >
         <Grid container>
           {name && (
-            <Grid item xs={12} className={classes.card_title} style={{ fontWeight: 700 }}>
+            <Grid size={{ xs: 12 }} sx={{ fontWeight: 700, fontSize: 'larger', fontFamily: 'monospace' }}>
               {name}
             </Grid>
           )}
-          <Grid item xs={12} className={classes.card_title}>
+          <Grid
+            size={{ xs: 12 }}
+            sx={{
+              fontSize: 'larger',
+              fontFamily: 'monospace'
+            }}
+          >
             {container.image}
           </Grid>
           {container.registry_password && container.registry_username && (
-            <Grid item xs={12}>
+            <Grid size={{ xs: 12 }}>
               <i>{t('container.card.creds')}</i>
             </Grid>
           )}
-          <Grid item xs={12} style={{ paddingTop: theme.spacing(1), paddingBottom: theme.spacing(1) }}>
+          <Grid size={{ xs: 12 }} style={{ paddingTop: theme.spacing(1), paddingBottom: theme.spacing(1) }}>
             <Tooltip title={t('container.card.cpu')}>
               <div style={{ display: 'inline-block', paddingRight: theme.spacing(4) }}>
                 <CgSmartphoneChip size={24} style={{ verticalAlign: 'middle' }} />
@@ -93,48 +86,46 @@ const WrappedContainerCard = ({ container, defaults, name = null, volumes = null
           </Grid>
           {container.service_account && (
             <>
-              <Grid item xs={5} sm={4} md={2} className={classes.label}>{`${t(
-                'container.card.service_account'
-              )}:`}</Grid>
-              <Grid item xs={7} sm={8} md={10} className={classes.mono}>
+              <Grid size={{ xs: 5, sm: 4, md: 2 }} style={{ fontWeight: 500 }}>
+                {`${t('container.card.service_account')}:`}
+              </Grid>
+              <Grid size={{ xs: 7, sm: 8, md: 10 }} style={{ fontFamily: 'monospace' }}>
                 {container.service_account}
               </Grid>
             </>
           )}
           {container.command && (
             <>
-              <Grid item xs={5} sm={4} md={2} className={classes.label}>{`${t('container.card.command')}:`}</Grid>
-              <Grid item xs={7} sm={8} md={10} className={classes.mono}>
+              <Grid size={{ xs: 5, sm: 4, md: 2 }} style={{ fontWeight: 500 }}>
+                {`${t('container.card.command')}:`}
+              </Grid>
+              <Grid size={{ xs: 7, sm: 8, md: 10 }} style={{ fontFamily: 'monospace' }}>
                 {container.command.join(' ')}
               </Grid>
             </>
           )}
-          <Grid item xs={5} sm={4} md={2} className={classes.label}>{`${t('container.card.internet')}:`}</Grid>
+          <Grid size={{ xs: 5, sm: 4, md: 2 }} style={{ fontWeight: 500 }}>{`${t('container.card.internet')}:`}</Grid>
           <Grid
-            item
-            xs={7}
-            sm={8}
-            md={10}
-            className={classes.mono}
-            style={{ color: container.allow_internet_access ? yesColor : noColor }}
+            size={{ xs: 7, sm: 8, md: 10 }}
+            style={{ color: container.allow_internet_access ? yesColor : noColor, fontFamily: 'monospace' }}
           >
             {container.allow_internet_access ? t('container.card.yes') : t('container.card.no')}
           </Grid>
           {container.environment && container.environment.length !== 0 && (
-            <Grid item xs={12}>
-              <div className={classes.label}>{`${t('container.card.env')}:`}&nbsp;</div>
+            <Grid size={{ xs: 12 }}>
+              <div style={{ fontWeight: 500 }}>{`${t('container.card.env')}:`}&nbsp;</div>
               {container.environment.map((env, id) => (
-                <div key={id} className={classes.mono} style={{ paddingLeft: '2rem' }}>
+                <div key={id} style={{ paddingLeft: '2rem', fontFamily: 'monospace' }}>
                   {`${env.name} = ${env.value}`}
                 </div>
               ))}
             </Grid>
           )}
           {volumes && Object.keys(volumes).length !== 0 && (
-            <Grid item xs={12}>
-              <div className={classes.label}>{`${t('container.card.volumes')}:`}&nbsp;</div>
+            <Grid size={{ xs: 12 }}>
+              <div style={{ fontWeight: 500 }}>{`${t('container.card.volumes')}:`}&nbsp;</div>
               {Object.keys(volumes).map((vol, id) => (
-                <div key={id} className={classes.mono} style={{ paddingLeft: '2rem' }}>
+                <div key={id} style={{ paddingLeft: '2rem', fontFamily: 'monospace' }}>
                   {`${vol} = ${volumes[vol].mount_path} (${volumes[vol].storage_class}|${volumes[vol].access_mode}|${volumes[vol].capacity}B)`}
                 </div>
               ))}

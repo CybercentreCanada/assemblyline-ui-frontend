@@ -1,16 +1,7 @@
-import { useCallback, WheelEvent } from 'react';
-import {
-  ACTIONS,
-  ActionTypesConfig,
-  Dispatch,
-  DispatchersConfig,
-  isEnterKey,
-  isEscapeKey,
-  isType,
-  isUpDownKey,
-  SearchType,
-  Store
-} from '..';
+import type { WheelEvent } from 'react';
+import { useCallback } from 'react';
+import type { ActionTypesConfig, Dispatch, DispatchersConfig, SearchType, Store } from '..';
+import { ACTIONS, isEnterKey, isEscapeKey, isType, isUpDownKey } from '..';
 
 type KE = React.KeyboardEvent<HTMLInputElement | HTMLTextAreaElement> | any;
 

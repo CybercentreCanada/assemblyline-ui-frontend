@@ -1,7 +1,7 @@
 import { Skeleton } from '@mui/material';
 import useSafeResults from 'components/hooks/useSafeResults';
-import { FileResult } from 'components/models/base/result';
-import { Alternates } from 'components/models/ui/file';
+import type { FileResult } from 'components/models/base/result';
+import type { Alternates } from 'components/models/ui/file';
 import ResultCard from 'components/visual/ResultCard';
 import SectionContainer from 'components/visual/SectionContainer';
 import React from 'react';

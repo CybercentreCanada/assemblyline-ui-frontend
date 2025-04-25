@@ -1,11 +1,11 @@
 import { Button, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
 import { ALERT_DEFAULT_PARAMS, type AlertSearchParams } from 'components/routes/alerts';
+import AlertsFiltersSelected from 'components/routes/alerts/components/FiltersSelected';
 import { useSearchParams } from 'components/routes/alerts/contexts/SearchParamsContext';
 import type { FC, ReactNode } from 'react';
 import React, { memo, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FiFilter } from 'react-icons/fi';
-import AlertsFiltersSelected from './FiltersSelected';
 
 type SearchCountProps = {
   children?: ReactNode;

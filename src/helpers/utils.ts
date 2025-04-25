@@ -1,6 +1,6 @@
 import type { Configuration, HashPatternMap } from 'components/models/base/config';
-import type { PossibleColors } from 'components/visual/CustomChip';
-import { URL_REGEX } from './constants';
+import type { PossibleColor } from 'helpers/colors';
+import { URL_REGEX } from 'helpers/constants';
 
 /**
  *
@@ -130,7 +130,8 @@ export function humanReadableNumber(num: number | null) {
  */
 export function resetFavicon() {
   const favicon: HTMLLinkElement = document.querySelector('#favicon');
-  favicon.href = `/favicon.ico`;
+  // TODO: remove query test
+  favicon.href = `/favicon.ico?query=test`;
 }
 
 /**
@@ -142,7 +143,8 @@ export function resetFavicon() {
  */
 export function setNotifyFavicon() {
   const favicon: HTMLLinkElement = document.querySelector('#favicon');
-  favicon.href = `/favicon_done.ico`;
+  // TODO: remove query test
+  favicon.href = `/favicon_done.ico?query=test`;
 }
 
 /**
@@ -165,7 +167,7 @@ const COLOR_MAP = {
  * @returns color
  *
  */
-export function verdictToColor(verdict): PossibleColors {
+export function verdictToColor(verdict): PossibleColor {
   return COLOR_MAP[verdict];
 }
 
@@ -415,7 +417,7 @@ export const isURL = (value: string): boolean => !!URL_REGEX.exec(refang(value))
  * @returns new object with filtered keys
  *
  */
-export function filterObject(obj: Object, callback) {
+export function filterObject(obj: object, callback) {
   return Object.fromEntries(Object.entries(obj).filter(([key, val]) => callback(val, key)));
 }
 
@@ -454,7 +456,5 @@ export function getSubmitType(input: string, configuration: Configuration): [Has
  * @returns type as number
  *
  */
-type ObjectOfInts = {
-  [name: string]: number;
-};
+type ObjectOfInts = Record<string, number>;
 export const sumValues = (obj: ObjectOfInts) => Object.values(obj).reduce((a, b) => a + b, 0);

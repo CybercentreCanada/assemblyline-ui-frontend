@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
-import { ACTIONS, ActionTypesConfig, CellType, Dispatch, DispatchersConfig } from '..';
+import type { ActionTypesConfig, CellType, Dispatch, DispatchersConfig } from '..';
+import { ACTIONS } from '..';
 
 export type CellAction =
   | { type: 'cellMouseEnter'; payload: { index: number; type: CellType }; tracked: false }

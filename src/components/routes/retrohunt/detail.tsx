@@ -3,10 +3,20 @@ import DataObjectOutlinedIcon from '@mui/icons-material/DataObjectOutlined';
 import DoneOutlinedIcon from '@mui/icons-material/DoneOutlined';
 import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import { AlertTitle, Divider, Grid, Pagination, Paper, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
+import {
+  AlertTitle,
+  Divider,
+  Grid,
+  Pagination,
+  Paper,
+  Skeleton,
+  styled,
+  Tooltip,
+  Typography,
+  useTheme
+} from '@mui/material';
 import TableContainer from '@mui/material/TableContainer';
-import makeStyles from '@mui/styles/makeStyles';
-import useAppUser from 'commons/components/app/hooks/useAppUser';
+import { useAppUser } from 'commons/components/app/hooks';
 import PageFullSize from 'commons/components/pages/PageFullSize';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
@@ -18,6 +28,7 @@ import type { CustomUser } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
 import NotFoundPage from 'components/routes/404';
 import RetrohuntErrors from 'components/routes/retrohunt/errors';
+import { RetrohuntRepeat } from 'components/routes/retrohunt/repeat';
 import { ChipList } from 'components/visual/ChipList';
 import Classification from 'components/visual/Classification';
 import type { CustomChipProps } from 'components/visual/CustomChip';
@@ -33,6 +44,7 @@ import {
 } from 'components/visual/DivTable';
 import FileDetail from 'components/visual/FileDetail';
 import InformativeAlert from 'components/visual/InformativeAlert';
+import { PageHeader as ALPageHeader } from 'components/visual/Layouts/PageHeader';
 import LineGraph from 'components/visual/LineGraph';
 import Moment from 'components/visual/Moment';
 import MonacoEditor from 'components/visual/MonacoEditor';
@@ -43,35 +55,20 @@ import SearchResultCount from 'components/visual/SearchResultCount';
 import SteppedProgress from 'components/visual/SteppedProgress';
 import { TabContainer } from 'components/visual/TabContainer';
 import { safeFieldValue } from 'helpers/utils';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router';
 import { io } from 'socket.io-client';
-import { RetrohuntRepeat } from './repeat';
 
-const useStyles = makeStyles(theme => ({
-  results: {
-    fontStyle: 'italic',
-    paddingTop: theme.spacing(0.5),
-    display: 'flex',
-    justifyContent: 'flex-end',
-    flexWrap: 'wrap'
-  },
-  skeletonCustomChip: {
+const SkeletonCustomChip = memo(
+  styled(Skeleton)(() => ({
     height: '1.5rem',
     width: '2rem',
     borderRadius: '4px',
     display: 'inline-block',
     verticalAlign: 'middle'
-  },
-  preview: {
-    margin: 0,
-    padding: theme.spacing(0.75, 1),
-    whiteSpace: 'pre-wrap',
-    wordBreak: 'break-word',
-    backgroundColor: 'inherit'
-  }
-}));
+  }))
+);
 
 type Params = {
   key: string;
@@ -102,7 +99,6 @@ const DEFAULT_QUERY: string = Object.keys(DEFAULT_PARAMS)
 function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = false }: Props) {
   const { t, i18n } = useTranslation(['retrohunt']);
   const theme = useTheme();
-  const classes = useStyles();
   const location = useLocation();
   const navigate = useNavigate();
   const { apiCall } = useMyAPI();
@@ -114,7 +110,7 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
 
   const [retrohunt, setRetrohunt] = useState<Retrohunt>(null);
   const [hitResults, setHitResults] = useState<SearchResult<FileIndexed>>(null);
-  const [typeDataSet, setTypeDataSet] = useState<{ [k: string]: number }>(null);
+  const [typeDataSet, setTypeDataSet] = useState<Record<string, number>>(null);
   const [isReloading, setIsReloading] = useState<boolean>(true);
   const [query, setQuery] = useState<SimpleSearchQuery>(null);
 
@@ -250,7 +246,7 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
             filters: curQuery.getAll('filters', [])
           },
           onSuccess: api_data => {
-            let dataset: { [k: string]: number } = api_data.api_response;
+            let dataset: Record<string, number> = api_data.api_response;
             dataset = Object.fromEntries(
               Object.keys(dataset)
                 .sort((a, b) => dataset[b] - dataset[a])
@@ -381,7 +377,7 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
       <PageLayout>
         <Grid container flexDirection="column" flexWrap="nowrap" flex={1} rowGap={2} marginBottom={theme.spacing(4)}>
           {c12nDef.enforce && (
-            <Grid item paddingBottom={1}>
+            <Grid paddingBottom={1}>
               <Classification
                 format="long"
                 type="pill"
@@ -391,24 +387,18 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
             </Grid>
           )}
 
-          <Grid item>
-            <Grid container flexDirection="row" rowGap={2}>
-              <Grid item flex={1}>
-                <Typography variant="h4" children={!retrohunt ? <Skeleton width="30rem" /> : t('header.view')} />
-                <Typography variant="caption" children={!retrohunt ? <Skeleton width="20rem" /> : retrohunt.key} />
-              </Grid>
-              <Grid item flex={0}>
-                <Grid container flexDirection="row" rowGap={2} wrap="nowrap">
-                  <RetrohuntRepeat retrohunt={retrohunt} onRepeat={handleRepeat} />
-                </Grid>
-              </Grid>
-            </Grid>
-          </Grid>
+          <ALPageHeader
+            primary={t('header.view')}
+            secondary={retrohunt?.key}
+            loading={!retrohunt}
+            style={{ paddingBottom: theme.spacing(2) }}
+            actions={[<RetrohuntRepeat key="repeat" retrohunt={retrohunt} onRepeat={handleRepeat} />]}
+          />
 
           {!retrohunt || retrohunt?.finished ? null : (
-            <Grid item paddingTop={2}>
+            <Grid paddingTop={2}>
               <Grid container flexDirection="row" justifyContent="center">
-                <Grid item xs={12} sm={11} lg={10}>
+                <Grid size={{ xs: 12, sm: 11, lg: 10 }}>
                   <SteppedProgress
                     activeStep={['Filtering', 'Yara', 'Finished'].indexOf(retrohunt.step || 'Starting')}
                     percentage={Math.ceil(100 * retrohunt.progress)}
@@ -431,26 +421,26 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
                 label: t('details'),
                 inner: (
                   <>
-                    <Grid item>
+                    <Grid>
                       <Typography variant="h6">{t('header.information')}</Typography>
                       <Divider />
                     </Grid>
 
-                    <Grid item>
+                    <Grid>
                       <Grid container>
-                        <Grid item xs={4} sm={3} lg={2}>
+                        <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
                           <span style={{ fontWeight: 500 }}>{t('details.description')}</span>
                         </Grid>
-                        <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
+                        <Grid size={{ xs: 8, sm: 9, lg: 10 }} style={{ wordBreak: 'break-word' }}>
                           {retrohunt ? retrohunt.description : <Skeleton />}
                         </Grid>
 
                         {configuration?.datastore?.archive?.enabled && (
                           <>
-                            <Grid item xs={4} sm={3} lg={2}>
+                            <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
                               <span style={{ fontWeight: 500 }}>{t('details.search')}</span>
                             </Grid>
-                            <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
+                            <Grid size={{ xs: 8, sm: 9, lg: 10 }} style={{ wordBreak: 'break-word' }}>
                               {retrohunt ? (
                                 (() => {
                                   switch (retrohunt?.indices) {
@@ -471,39 +461,37 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
                           </>
                         )}
 
-                        <Grid item xs={4} sm={3} lg={2}>
+                        <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
                           <span style={{ fontWeight: 500 }}>{t('details.creator')}</span>
                         </Grid>
-                        <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
+                        <Grid size={{ xs: 8, sm: 9, lg: 10 }} style={{ wordBreak: 'break-word' }}>
                           {retrohunt ? retrohunt.creator : <Skeleton />}
                         </Grid>
 
-                        <Grid item xs={4} sm={3} lg={2}>
+                        <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
                           <span style={{ fontWeight: 500 }}>{t('details.created')}</span>
                         </Grid>
-                        <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
+                        <Grid size={{ xs: 8, sm: 9, lg: 10 }} style={{ wordBreak: 'break-word' }}>
                           {retrohunt ? (
                             <>
                               <Moment variant="localeDate">{retrohunt.created_time}</Moment>
                               {' ('}
-                              <Moment variant="fromNow">{retrohunt.created_time}</Moment>
-                              {')'}
+                              <Moment variant="fromNow">{retrohunt.created_time}</Moment>)
                             </>
                           ) : (
                             <Skeleton />
                           )}
                         </Grid>
 
-                        <Grid item xs={4} sm={3} lg={2}>
+                        <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
                           <span style={{ fontWeight: 500 }}>{t('details.expiry')}</span>
                         </Grid>
-                        <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
+                        <Grid size={{ xs: 8, sm: 9, lg: 10 }} style={{ wordBreak: 'break-word' }}>
                           {retrohunt ? (
                             <>
                               <Moment variant="localeDate">{retrohunt.expiry_ts}</Moment>
                               {' ('}
-                              <Moment variant="fromNow">{retrohunt.expiry_ts}</Moment>
-                              {')'}
+                              <Moment variant="fromNow">{retrohunt.expiry_ts}</Moment>)
                             </>
                           ) : (
                             <Skeleton />
@@ -512,7 +500,7 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
                       </Grid>
                     </Grid>
 
-                    <Grid item>
+                    <Grid>
                       <Tooltip
                         title={t('tooltip.search_classification')}
                         placement="top"
@@ -541,20 +529,20 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
                       />
                     </Grid>
 
-                    <Grid item>
+                    <Grid>
                       <Grid container gap={1}>
-                        <Grid item xs={12} marginTop={1}>
+                        <Grid size={{ xs: 12 }} marginTop={1}>
                           <Typography variant="h6">{t('header.hits')}</Typography>
                           <Divider />
                         </Grid>
                         {!retrohunt ? (
-                          <Grid item>
-                            <Skeleton className={classes.skeletonCustomChip} variant="rectangular" />
+                          <Grid>
+                            <SkeletonCustomChip variant="rectangular" />
                           </Grid>
                         ) : (
                           'truncated' in retrohunt &&
                           retrohunt.truncated && (
-                            <Grid item>
+                            <Grid>
                               <Tooltip title={t('truncated.tooltip')}>
                                 <span>
                                   <CustomChip
@@ -571,14 +559,14 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
                         )}
 
                         {!retrohunt ? (
-                          <Grid item>
-                            <Skeleton className={classes.skeletonCustomChip} variant="rectangular" />
+                          <Grid>
+                            <SkeletonCustomChip variant="rectangular" />
                           </Grid>
                         ) : (
                           'tags' in retrohunt &&
                           Object.keys(retrohunt.tags).length > 0 &&
                           Object.keys(retrohunt.tags).map((key, i) => (
-                            <Grid key={i} item>
+                            <Grid key={i}>
                               <CustomChip
                                 key={'tag-' + i}
                                 type="round"
@@ -602,7 +590,7 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
                       </div>
                     ) : (
                       <>
-                        <Grid item>
+                        <Grid>
                           <SearchBar
                             initValue={query ? query.get('query', '') : ''}
                             placeholder={t('hits.filter')}
@@ -619,7 +607,15 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
                               } else handleQueryRemove(['query', 'rows', 'offset']);
                             }}
                           >
-                            <div className={classes.results}>
+                            <div
+                              style={{
+                                fontStyle: 'italic',
+                                paddingTop: theme.spacing(0.5),
+                                display: 'flex',
+                                justifyContent: 'flex-end',
+                                flexWrap: 'wrap'
+                              }}
+                            >
                               {hitResults && hitResults.total !== 0 && (
                                 <Typography variant="subtitle1" color="secondary" style={{ flexGrow: 1 }}>
                                   {isReloading ? (
@@ -665,7 +661,7 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
                                           query.remove('filters', f);
                                           handleNavigate(query);
                                         }
-                                      } as CustomChipProps)
+                                      }) as CustomChipProps
                                   )}
                                 />
                               </div>
@@ -673,7 +669,7 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
                           </SearchBar>
                         </Grid>
 
-                        <Grid item>
+                        <Grid>
                           <LineGraph
                             dataset={typeDataSet}
                             height="200px"
@@ -689,7 +685,7 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
                           />
                         </Grid>
 
-                        <Grid item>
+                        <Grid>
                           {!hitResults ? (
                             <Skeleton variant="rectangular" style={{ height: '6rem', borderRadius: '4px' }} />
                           ) : hitResults.total === 0 ? (
@@ -815,7 +811,7 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
                           )}
                         </Grid>
 
-                        <Grid item style={{ height: theme.spacing(8) }}></Grid>
+                        <Grid style={{ height: theme.spacing(8) }}></Grid>
                       </>
                     )}
                   </>
@@ -826,7 +822,7 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
                 inner: (
                   <>
                     {!retrohunt ? (
-                      <Grid item>
+                      <Grid>
                         <Skeleton style={{ height: '100%', minHeight: '450px', transform: 'none' }} />
                       </Grid>
                     ) : (

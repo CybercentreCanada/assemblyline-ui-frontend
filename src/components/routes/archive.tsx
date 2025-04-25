@@ -3,7 +3,6 @@ import ClassOutlinedIcon from '@mui/icons-material/ClassOutlined';
 import FileOpenOutlinedIcon from '@mui/icons-material/FileOpenOutlined';
 import { Chip, Grid, MenuItem, Select, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
-import makeStyles from '@mui/styles/makeStyles';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import PageHeader from 'commons/components/pages/PageHeader';
 import useALContext from 'components/hooks/useALContext';
@@ -25,31 +24,7 @@ import SearchResultCount from 'components/visual/SearchResultCount';
 import { safeFieldValue } from 'helpers/utils';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate, useNavigate } from 'react-router';
-import { useLocation } from 'react-router-dom';
-
-const useStyles = makeStyles(theme => ({
-  searchresult: {
-    fontStyle: 'italic',
-    paddingTop: theme.spacing(0.5),
-    paddingBottom: theme.spacing(0.5),
-    display: 'flex',
-    flexWrap: 'wrap',
-    justifyContent: 'flex-end'
-  },
-  drawerPaper: {
-    width: '80%',
-    maxWidth: '800px',
-    [theme.breakpoints.down('xl')]: {
-      width: '100%'
-    }
-  },
-  tableWrapper: {
-    paddingTop: theme.spacing(2),
-    paddingLeft: theme.spacing(0.5),
-    paddingRight: theme.spacing(0.5)
-  }
-}));
+import { Navigate, useLocation, useNavigate } from 'react-router';
 
 const PAGE_SIZE = 25;
 
@@ -95,7 +70,6 @@ const DEFAULT_QUERY: string = Object.keys(DEFAULT_PARAMS)
 export default function MalwareArchive() {
   const { t } = useTranslation(['archive']);
   const theme = useTheme();
-  const classes = useStyles();
   const location = useLocation();
   const downSM = useMediaQuery(theme.breakpoints.down('md'));
 
@@ -116,11 +90,11 @@ export default function MalwareArchive() {
 
   const filterValue = useRef<string>('');
 
-  const hasFilter = useCallback((filter: string) => (query?.getAll('filters') as string[])?.includes(filter), [query]);
+  const hasFilter = useCallback((filter: string) => query?.getAll('filters')?.includes(filter), [query]);
 
   const handleToggleFilter = useCallback(
     (filter: string) => {
-      if ((query?.getAll('filters') as string[])?.includes(filter)) query.remove('filters', filter);
+      if (query?.getAll('filters')?.includes(filter)) query.remove('filters', filter);
       else query.add('filters', filter);
 
       navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
@@ -293,7 +267,7 @@ export default function MalwareArchive() {
     return (
       <PageFullWidth margin={4}>
         <Grid container spacing={2} style={{ paddingBottom: theme.spacing(2) }}>
-          <Grid item xs={12} md={8} xl={10}>
+          <Grid size={{ xs: 12, md: 8, xl: 10 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: theme.spacing(1) }}>
               <Typography variant="h4">{t('title')}</Typography>
               <Tooltip title={t('beta.description')}>
@@ -303,7 +277,7 @@ export default function MalwareArchive() {
               </Tooltip>
             </div>
           </Grid>
-          <Grid item xs={12} md={4} xl={2}>
+          <Grid size={{ xs: 12, md: 4, xl: 2 }}>
             <FormControl size="small" fullWidth>
               <Select
                 disabled={searching}
@@ -370,7 +344,16 @@ export default function MalwareArchive() {
               ]}
             >
               {fileResults !== null && (
-                <div className={classes.searchresult}>
+                <div
+                  style={{
+                    fontStyle: 'italic',
+                    paddingTop: theme.spacing(0.5),
+                    paddingBottom: theme.spacing(0.5),
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    justifyContent: 'flex-end'
+                  }}
+                >
                   {fileResults.total !== 0 && (
                     <Typography variant="subtitle1" color="secondary" style={{ flexGrow: 1 }}>
                       {searching ? (
@@ -427,7 +410,7 @@ export default function MalwareArchive() {
 
         {fileResults !== null && fileResults.total !== 0 && (
           <Grid container spacing={2}>
-            <Grid item xs={12} lg={4}>
+            <Grid size={{ xs: 12, lg: 4 }}>
               <Histogram
                 dataset={histogram}
                 height="200px"
@@ -448,7 +431,7 @@ export default function MalwareArchive() {
                 }}
               />
             </Grid>
-            <Grid item xs={12} md={6} lg={4}>
+            <Grid size={{ xs: 12, md: 6, lg: 4 }}>
               <LineGraph
                 dataset={labels}
                 height="200px"
@@ -463,7 +446,7 @@ export default function MalwareArchive() {
                 }}
               />
             </Grid>
-            <Grid item xs={12} md={6} lg={4}>
+            <Grid size={{ xs: 12, md: 6, lg: 4 }}>
               <LineGraph
                 dataset={types}
                 height="200px"
@@ -481,7 +464,13 @@ export default function MalwareArchive() {
           </Grid>
         )}
 
-        <div className={classes.tableWrapper}>
+        <div
+          style={{
+            paddingTop: theme.spacing(2),
+            paddingLeft: theme.spacing(0.5),
+            paddingRight: theme.spacing(0.5)
+          }}
+        >
           <ArchivesTable fileResults={fileResults} setFileID={handleFileChange} onLabelClick={handleLabelClick} />
         </div>
       </PageFullWidth>

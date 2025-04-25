@@ -1,9 +1,9 @@
-import { CursorState, PartialR, ScrollState, SearchState, SearchType, SelectState, TypesConfig } from '..';
+import type { CursorState, PartialR, ScrollState, SearchState, SearchType, SelectState, TypesConfig } from '..';
 
 export type LocationParam = {
   key: string;
   type: 'number' | 'string' | 'symbol';
-  path: Array<string>;
+  path: string[];
 };
 
 export type LocationQuery = {
@@ -37,7 +37,7 @@ export type LocationState = {
   };
 };
 
-export const LOCATION_PARAMS: Array<LocationParam> = [
+export const LOCATION_PARAMS: LocationParam[] = [
   { key: 'a', type: 'number', path: ['cursor', 'index'] },
   { key: 'b', type: 'number', path: ['select', 'startIndex'] },
   { key: 'c', type: 'number', path: ['select', 'endIndex'] },

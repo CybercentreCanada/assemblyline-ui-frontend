@@ -1,24 +1,11 @@
 import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
-import { AlertTitle, IconButton, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
-import { Childrens } from 'components/models/ui/file';
+import { AlertTitle, Box, IconButton, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
+import type { Childrens } from 'components/models/ui/file';
 import InformativeAlert from 'components/visual/InformativeAlert';
 import SectionContainer from 'components/visual/SectionContainer';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
-
-const useStyles = makeStyles(theme => ({
-  clickable: {
-    color: 'inherit',
-    display: 'block',
-    textDecoration: 'none',
-    cursor: 'pointer',
-    '&:hover, &:focus': {
-      backgroundColor: theme.palette.action.hover
-    }
-  }
-}));
+import { Link } from 'react-router';
 
 type ChildrenSectionProps = {
   childrens: Childrens;
@@ -36,7 +23,6 @@ const WrappedChildrenSection: React.FC<ChildrenSectionProps> = ({
   const { t: tDefault } = useTranslation();
   const { t } = useTranslation(['fileDetail', 'archive']);
   const theme = useTheme();
-  const classes = useStyles();
 
   const [showExtra, setShowExtra] = useState<boolean>(false);
 
@@ -72,15 +58,24 @@ const WrappedChildrenSection: React.FC<ChildrenSectionProps> = ({
       ) : (
         <>
           {filteredChildren?.map((fileItem, i) => (
-            <Link
+            <Box
               key={i}
-              className={classes.clickable}
+              component={Link}
               to={`/file/detail/${fileItem.sha256}?name=${encodeURI(fileItem.name)}`}
-              style={{ wordBreak: 'break-word' }}
+              sx={{
+                wordBreak: 'break-word',
+                color: 'inherit',
+                display: 'block',
+                textDecoration: 'none',
+                cursor: 'pointer',
+                '&:hover, &:focus': {
+                  backgroundColor: theme.palette.action.hover
+                }
+              }}
             >
               <span>{fileItem.name}</span>
               <span style={{ fontSize: '80%', color: theme.palette.text.secondary }}>{` :: ${fileItem.sha256}`}</span>
-            </Link>
+            </Box>
           ))}
           {!showExtra && childrens.length > 10 && (
             <Tooltip title={tDefault('more')}>

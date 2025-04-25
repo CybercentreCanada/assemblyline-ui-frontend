@@ -1,4 +1,4 @@
-import { AppUserContext } from 'commons/components/app/providers/AppUserProvider';
+import { AppUserContext } from 'commons/components/app/AppContexts';
 import type { CustomAppUserService } from 'components/hooks/useMyUser';
 import { useContext } from 'react';
 

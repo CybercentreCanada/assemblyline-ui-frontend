@@ -6,10 +6,10 @@ import type {
   TypographyProps
 } from '@mui/material';
 import { FormControl, InputAdornment, InputLabel, Skeleton, TextField, Typography, useTheme } from '@mui/material';
+import type { ResetInputProps } from 'components/visual/Inputs/components/ResetInput';
+import { ResetInput } from 'components/visual/Inputs/components/ResetInput';
 import { Tooltip } from 'components/visual/Tooltip';
 import React, { useMemo, useState } from 'react';
-import type { ResetInputProps } from './components/ResetInput';
-import { ResetInput } from './components/ResetInput';
 
 export type NumberInputProps = Omit<TextFieldProps, 'error' | 'value' | 'onChange'> & {
   endAdornment?: TextFieldProps['InputProps']['endAdornment'];
@@ -116,14 +116,14 @@ const WrappedNumberInput = ({
               disabled
                 ? null
                 : errorValue
-                ? { variant: 'outlined', sx: { color: theme.palette.error.main, ...errorProps?.sx }, ...errorProps }
-                : helperText
-                ? {
-                    variant: 'outlined',
-                    sx: { color: theme.palette.text.secondary, ...helperTextProps?.sx },
-                    ...errorProps
-                  }
-                : null
+                  ? { variant: 'outlined', sx: { color: theme.palette.error.main, ...errorProps?.sx }, ...errorProps }
+                  : helperText
+                    ? {
+                        variant: 'outlined',
+                        sx: { color: theme.palette.text.secondary, ...helperTextProps?.sx },
+                        ...errorProps
+                      }
+                    : null
             }
             inputProps={{ min: min, max: max, ...(tiny && { sx: { padding: '2.5px 4px 2.5px 8px' } }) }}
             InputProps={{

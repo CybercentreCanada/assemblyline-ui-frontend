@@ -1,16 +1,19 @@
 import { useMediaQuery, useTheme } from '@mui/material';
-import useAppBreadcrumbs from 'commons/components/app/hooks/useAppBreadcrumbs';
-import useAppConfigs from 'commons/components/app/hooks/useAppConfigs';
-import type { BreadcrumbItem } from 'commons/components/app/hooks/useAppSitemap';
-import useAppSitemap from 'commons/components/app/hooks/useAppSitemap';
+import type { AppBreadcrumbsContextType } from 'commons/components/app/AppContexts';
+import { useAppBreadcrumbs, useAppConfigs, useAppSitemap, type BreadcrumbItem } from 'commons/components/app/hooks';
 import BreadcrumbList from 'commons/components/breadcrumbs/BreadcrumbList';
 import { memo, useMemo } from 'react';
+
+export type DefaultBreadcrumbsContextType = AppBreadcrumbsContextType & {
+  last: () => BreadcrumbItem; // the first item in the breacrumbs.
+  first: () => BreadcrumbItem; // the last item in the breadcrumbs.
+};
 
 const Breadcrumbs = ({ disableStyle = false }) => {
   const theme = useTheme();
   const isMedium = useMediaQuery(theme.breakpoints.up('md'));
   const configs = useAppConfigs();
-  const breadcrumbs = useAppBreadcrumbs();
+  const breadcrumbs = useAppBreadcrumbs<DefaultBreadcrumbsContextType>();
   const sitemap = useAppSitemap();
   const current = breadcrumbs.last();
   const isStatic = !!current.route.breadcrumbs;

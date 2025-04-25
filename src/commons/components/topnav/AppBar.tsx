@@ -1,18 +1,20 @@
-import { Box, Toolbar, useMediaQuery, useTheme } from '@mui/material';
-import MuiAppBar from '@mui/material/AppBar';
+import { Box, AppBar as MuiAppBar, Toolbar, useMediaQuery, useTheme } from '@mui/material';
+import {
+  useAppBar,
+  useAppBreadcrumbs,
+  useAppConfigs,
+  useAppLayout,
+  useAppQuickSearch
+} from 'commons/components/app/hooks';
 import { APPBAR_READY_EVENT } from 'commons/components/app/hooks/useAppBarHeight';
-import useAppBreadcrumbs from 'commons/components/app/hooks/useAppBreadcrumbs';
-import useAppConfigs from 'commons/components/app/hooks/useAppConfigs';
-import useAppLayout from 'commons/components/app/hooks/useAppLayout';
-import useAppQuickSearch from 'commons/components/app/hooks/useAppQuickSearch';
 import Breadcrumbs from 'commons/components/breadcrumbs/Breadcrumbs';
+import AppSearch from 'commons/components/search/AppSearch';
+import AppName from 'commons/components/topnav/AppName';
 import AppSwitcher from 'commons/components/topnav/AppSwitcher';
+import { Notifications } from 'commons/components/topnav/Notifications';
 import ThemeSelectionIcon from 'commons/components/topnav/ThemeSelectionIcon';
 import UserProfile from 'commons/components/topnav/UserProfile';
 import { memo, useCallback, useLayoutEffect, useMemo } from 'react';
-import useAppBar from '../app/hooks/useAppBar';
-import AppSearch from '../search/AppSearch';
-import AppName from './AppName';
 
 export const AppBarBase = ({ children }) => {
   const layout = useAppLayout();
@@ -99,13 +101,18 @@ const AppBar = () => {
         {(isTopLayout || isXs) && <AppName noName={isXs} />}
         <Box sx={{ ...(isTopLayout && { marginLeft: 3 }) }} />
         {left}
-        {showBreadcrumbs && <Breadcrumbs />}
+        {showBreadcrumbs &&
+          (configs.overrides?.providers?.breadcrumbs ? (
+            <configs.overrides.providers.breadcrumbs.element />
+          ) : (
+            <Breadcrumbs />
+          ))}
         {leftAfterBreadcrumbs && (
           <Box sx={{ ...(showBreadcrumbs && { marginLeft: 3, marginRight: 3 }) }}>{leftAfterBreadcrumbs}</Box>
         )}
       </Box>
     ),
-    [showBreadcrumbs, leftAfterBreadcrumbs, isTopLayout, left, isXs]
+    [configs, showBreadcrumbs, leftAfterBreadcrumbs, isTopLayout, left, isXs]
   );
 
   return (
@@ -121,6 +128,7 @@ const AppBar = () => {
         {showSpacer && <div style={{ flex: 1 }} />}
         {rightBeforeSearch}
         {quicksearch.show && <AppSearch />}
+        <Notifications />
         {right}
         {themeSelectionMode === 'icon' && <ThemeSelectionIcon />}
         <AppSwitcher />

@@ -15,8 +15,6 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
-import clsx from 'clsx';
 import { AppUserAvatar } from 'commons/components/topnav/UserProfile';
 import useALContext from 'components/hooks/useALContext';
 import type { Author, Comment, ReactionType } from 'components/models/base/file';
@@ -24,157 +22,6 @@ import { REACTIONS_TYPES } from 'components/models/base/file';
 import Moment from 'components/visual/Moment';
 import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-
-const PREVIOUS_CLASS = 'previous';
-const NEXT_CLASS = 'next';
-const CURRENT_USER_CLASS = 'current_user';
-const LOADING_CLASS = 'loading';
-const REACTIONS_CLASS = 'reactions';
-
-const useStyles = makeStyles(theme => ({
-  root: {
-    display: 'flex',
-    alignItems: 'flex-start',
-    justifyContent: 'flex-start',
-    gap: theme.spacing(1),
-    marginTop: theme.spacing(1.5),
-    [`&.${PREVIOUS_CLASS}`]: {
-      marginTop: theme.spacing(0.5)
-    },
-    [`&.${CURRENT_USER_CLASS}`]: {
-      justifyContent: 'flex-end'
-    },
-    [`&.${REACTIONS_CLASS}`]: {
-      margin: `${theme.spacing(1.5)} 0px`
-    }
-  },
-  icon: {
-    alignSelf: 'start',
-    minWidth: '40px',
-    minHeight: '40px',
-    marginTop: '20px'
-  },
-
-  container: {
-    maxWidth: '85%',
-    display: 'flex',
-    flexDirection: 'column',
-    [`&.${LOADING_CLASS}`]: {
-      flex: 1
-    },
-    [theme.breakpoints.down('md')]: {
-      maxWidth: '75%'
-    }
-  },
-  header: {
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    gap: theme.spacing(2.5),
-    marginLeft: theme.spacing(1),
-    height: '20px',
-    [`&.${CURRENT_USER_CLASS}`]: {
-      justifyContent: 'flex-end'
-    }
-  },
-  content: {
-    minHeight: '40px',
-    padding: `${theme.spacing(1)} ${theme.spacing(1.75)}`,
-    borderRadius: theme.spacing(1),
-    color: theme.palette.common.white,
-    boxShadow: theme.shadows[2],
-    [`&:not(.${CURRENT_USER_CLASS})`]: {
-      backgroundColor: theme.palette.grey[theme.palette.mode === 'dark' ? 700 : 500],
-      [`&.${PREVIOUS_CLASS}`]: {
-        borderTopLeftRadius: '0px'
-      },
-      [`&.${NEXT_CLASS}`]: {
-        borderBottomLeftRadius: '0px'
-      }
-    },
-    [`&.${CURRENT_USER_CLASS}`]: {
-      backgroundColor: theme.palette.primary.main,
-      [`&.${PREVIOUS_CLASS}`]: {
-        borderTopRightRadius: '0px'
-      },
-      [`&.${NEXT_CLASS}`]: {
-        borderBottomRightRadius: '0px'
-      }
-    },
-    [`&.${REACTIONS_CLASS}`]: {
-      paddingBottom: theme.spacing(2)
-    }
-  },
-  commentTooltip: {
-    margin: `${theme.spacing(0.5)} !important`,
-    padding: '0px !important'
-  },
-  date: {
-    color: theme.palette.text.secondary
-  },
-  authorText: {},
-  actions: {
-    display: 'flex',
-    alignItems: 'center',
-    backgroundColor: theme.palette.background.default,
-    borderRadius: '4px',
-    boxShadow: theme.shadows[4]
-    // border: '1px solid black'
-  },
-  action: {
-    padding: `${theme.spacing(0.25)} ${theme.spacing(0.5)}`,
-    minWidth: 'auto !important',
-    height: `32px`,
-    color: theme.palette.text.primary
-  },
-  divider: {
-    width: '1px',
-    height: '25px',
-    margin: `0 ${theme.spacing(0.5)}`,
-    backgroundColor: theme.palette.text.primary
-  },
-  tooltip: {
-    backgroundColor: theme.palette.grey[theme.palette.mode === 'dark' ? 700 : 500],
-    margin: `${theme.spacing(0.5)} !important`
-  },
-  reactionTooltip: {
-    padding: 0
-  },
-  reactionList: {
-    borderRadius: '4px',
-    backgroundColor: theme.palette.background.default,
-    boxShadow: theme.shadows[4]
-  },
-  reactionSubHeader: {
-    borderRadius: '4px',
-    backgroundColor: theme.palette.background.default,
-    lineHeight: '36px'
-  },
-  reactionContainer: {
-    display: 'flex',
-    gap: theme.spacing(1),
-    padding: `0px ${theme.spacing(1)}`,
-    justifyContent: 'flex-start',
-    [`&.${CURRENT_USER_CLASS}`]: {
-      justifyContent: 'flex-end'
-    },
-    [`&.${REACTIONS_CLASS}`]: {
-      margin: `-${theme.spacing(1)} 0px`
-      // transform: `translateY(${theme.spacing(2)})`
-    }
-  },
-  reactionChip: {
-    backgroundColor: theme.palette.background.default,
-    borderRadius: '14px'
-  },
-  actionIcon: {
-    fontSize: 'medium'
-  },
-  justifyEnd: {
-    justifyContent: 'flex-end'
-  }
-}));
 
 type Props = {
   currentComment?: Comment;
@@ -200,7 +47,6 @@ const WrappedCommentCard: React.FC<Props> = ({
 }) => {
   const { t, i18n } = useTranslation(['archive']);
   const theme = useTheme();
-  const classes = useStyles();
   const { user: currentUser } = useALContext();
 
   const reactions = useMemo<Record<ReactionType, string[]> | object>(
@@ -275,27 +121,58 @@ const WrappedCommentCard: React.FC<Props> = ({
 
   return (
     <div
-      className={clsx(
-        classes.root,
-        isCurrentUser && CURRENT_USER_CLASS,
-        samePreviousAuthor && previousNarrowTimeSpan && PREVIOUS_CLASS,
-        hasReactions && REACTIONS_CLASS
-      )}
+      style={{
+        display: 'flex',
+        alignItems: 'flex-start',
+        justifyContent: 'flex-start',
+        gap: theme.spacing(1),
+        marginTop: theme.spacing(1.5),
+        ...(samePreviousAuthor && previousNarrowTimeSpan && { marginTop: theme.spacing(0.5) }),
+        ...(isCurrentUser && { justifyContent: 'flex-end' }),
+        ...(hasReactions && { margin: `${theme.spacing(1.5)} 0px` })
+      }}
     >
       {!currentComment ? (
-        <Skeleton className={classes.icon} variant="circular" />
+        <Skeleton
+          variant="circular"
+          style={{ alignSelf: 'start', minWidth: '40px', minHeight: '40px', marginTop: '20px' }}
+        />
       ) : (
         !isCurrentUser && (
-          <div className={classes.icon}>{!samePreviousAuthor ? <AvatarIcon comment={currentComment} /> : <div />}</div>
+          <div style={{ alignSelf: 'start', minWidth: '40px', minHeight: '40px', marginTop: '20px' }}>
+            {!samePreviousAuthor ? <AvatarIcon comment={currentComment} /> : <div />}
+          </div>
         )
       )}
 
-      <div className={clsx(classes.container, !currentComment && LOADING_CLASS)}>
+      <div
+        style={{
+          maxWidth: '85%',
+          display: 'flex',
+          flexDirection: 'column',
+          ...(!currentComment && { flex: 1 }),
+          [theme.breakpoints.down('md')]: {
+            maxWidth: '75%'
+          }
+        }}
+      >
         {!currentComment ? (
           <Typography variant="caption" children={<Skeleton style={{ width: '50%' }} />} />
         ) : (
           (!samePreviousAuthor || !previousNarrowTimeSpan) && (
-            <div className={clsx(classes.header, isCurrentUser && CURRENT_USER_CLASS)}>
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'flex-start',
+                gap: theme.spacing(2.5),
+                marginLeft: theme.spacing(1),
+                height: '20px',
+
+                ...(isCurrentUser && { justifyContent: 'flex-end' })
+              }}
+            >
               {!isCurrentUser && !samePreviousAuthor && (
                 <Typography
                   color={theme.palette.text.secondary}
@@ -304,7 +181,7 @@ const WrappedCommentCard: React.FC<Props> = ({
                 />
               )}
               {(!samePreviousAuthor || !previousNarrowTimeSpan) && (
-                <Typography className={classes.date} variant="caption">
+                <Typography variant="caption" sx={{ color: theme.palette.text.secondary }}>
                   <Moment variant="fromDateTime">{currentComment?.date}</Moment>
                 </Typography>
               )}
@@ -316,43 +193,121 @@ const WrappedCommentCard: React.FC<Props> = ({
           <Skeleton style={{ minHeight: '40px', padding: `${theme.spacing(1)} ${theme.spacing(1.75)}` }} />
         ) : (
           <Tooltip
-            classes={{ tooltip: classes.commentTooltip }}
+            slotProps={{
+              tooltip: {
+                sx: {
+                  margin: `${theme.spacing(0.5)} !important`,
+                  padding: '0px !important'
+                }
+              }
+            }}
             placement="top-end"
             title={
               currentUser.roles.includes('archive_comment') && (
-                <Stack className={classes.actions} direction="row">
+                <Stack
+                  direction="row"
+                  sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    backgroundColor: theme.palette.background.default,
+                    borderRadius: '4px',
+                    boxShadow: theme.shadows[4]
+                    // border: '1px solid black'
+                  }}
+                >
                   {Object.entries(REACTIONS_TYPES).map(([icon, emoji], i) => (
                     <Tooltip
                       key={i}
-                      classes={{ tooltip: classes.tooltip }}
                       placement="top"
                       title={t(`reaction.${icon}`)}
+                      slotProps={{
+                        tooltip: {
+                          sx: {
+                            backgroundColor: theme.palette.grey[theme.palette.mode === 'dark' ? 700 : 500],
+                            margin: `${theme.spacing(0.5)} !important`
+                          }
+                        }
+                      }}
                     >
                       <Button
-                        className={classes.action}
                         size="small"
                         color="inherit"
                         onClick={onReactionClick(currentComment, icon)}
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          backgroundColor: theme.palette.background.default,
+                          borderRadius: '4px',
+                          boxShadow: theme.shadows[4]
+                          // border: '1px solid black'
+                        }}
                       >
-                        <span className={classes.actionIcon}>{emoji}</span>
+                        <span style={{ fontSize: 'medium' }}>{emoji}</span>
                       </Button>
                     </Tooltip>
                   ))}
 
                   {isCurrentUser && (
                     <>
-                      <Divider className={classes.divider} />
-                      <Tooltip classes={{ tooltip: classes.tooltip }} placement="top" title={t('comment.tooltip.edit')}>
-                        <Button className={classes.action} size="small" onClick={onEditClick(currentComment)}>
+                      <Divider
+                        sx={{
+                          width: '1px',
+                          height: '25px',
+                          margin: `0 ${theme.spacing(0.5)}`,
+                          backgroundColor: theme.palette.text.primary
+                        }}
+                      />
+                      <Tooltip
+                        placement="top"
+                        title={t('comment.tooltip.edit')}
+                        slotProps={{
+                          tooltip: {
+                            sx: {
+                              backgroundColor: theme.palette.grey[theme.palette.mode === 'dark' ? 700 : 500],
+                              margin: `${theme.spacing(0.5)} !important`
+                            }
+                          }
+                        }}
+                      >
+                        <Button
+                          size="small"
+                          onClick={onEditClick(currentComment)}
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            backgroundColor: theme.palette.background.default,
+                            borderRadius: '4px',
+                            boxShadow: theme.shadows[4]
+                            // border: '1px solid black'
+                          }}
+                        >
                           <CreateOutlinedIcon />
                         </Button>
                       </Tooltip>
                       <Tooltip
-                        classes={{ tooltip: classes.tooltip }}
                         placement="top"
                         title={t('comment.tooltip.delete')}
+                        slotProps={{
+                          tooltip: {
+                            sx: {
+                              backgroundColor: theme.palette.grey[theme.palette.mode === 'dark' ? 700 : 500],
+                              margin: `${theme.spacing(0.5)} !important`
+                            }
+                          }
+                        }}
                       >
-                        <Button className={classes.action} size="small" onClick={onDeleteClick(currentComment)}>
+                        <Button
+                          size="small"
+                          onClick={onDeleteClick(currentComment)}
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            backgroundColor: theme.palette.background.default,
+                            borderRadius: '4px',
+                            boxShadow: theme.shadows[4]
+                            // border: '1px solid black'
+                          }}
+                        >
                           <ClearOutlinedIcon />
                         </Button>
                       </Tooltip>
@@ -363,13 +318,26 @@ const WrappedCommentCard: React.FC<Props> = ({
             }
           >
             <div
-              className={clsx(
-                classes.content,
-                isCurrentUser && CURRENT_USER_CLASS,
-                previousNarrowTimeSpan && samePreviousAuthor && PREVIOUS_CLASS,
-                nextNarrowTimeSpan && sameNextAuthor && NEXT_CLASS,
-                hasReactions && REACTIONS_CLASS
-              )}
+              style={{
+                minHeight: '40px',
+                padding: `${theme.spacing(1)} ${theme.spacing(1.75)}`,
+                borderRadius: theme.spacing(1),
+                color: theme.palette.common.white,
+                boxShadow: theme.shadows[2],
+
+                ...(!isCurrentUser
+                  ? {
+                      backgroundColor: theme.palette.grey[theme.palette.mode === 'dark' ? 700 : 500],
+                      ...(previousNarrowTimeSpan && samePreviousAuthor && { borderTopLeftRadius: '0px' }),
+                      ...(nextNarrowTimeSpan && sameNextAuthor && { borderBottomLeftRadius: '0px' })
+                    }
+                  : {
+                      backgroundColor: theme.palette.primary.main,
+                      ...(previousNarrowTimeSpan && samePreviousAuthor && { borderTopRightRadius: '0px' }),
+                      ...(nextNarrowTimeSpan && sameNextAuthor && { borderBottomRightRadius: '0px' })
+                    }),
+                ...(hasReactions && { paddingBottom: theme.spacing(2) })
+              }}
             >
               <Typography variant="body2" children={currentComment?.text} />
             </div>
@@ -377,24 +345,39 @@ const WrappedCommentCard: React.FC<Props> = ({
         )}
 
         <div
-          className={clsx(
-            classes.reactionContainer,
-            isCurrentUser && CURRENT_USER_CLASS,
-            hasReactions && REACTIONS_CLASS
-          )}
+          style={{
+            display: 'flex',
+            gap: theme.spacing(1),
+            padding: `0px ${theme.spacing(1)}`,
+            justifyContent: 'flex-start',
+            ...(isCurrentUser && { justifyContent: 'flex-end' }),
+            ...(hasReactions && { margin: `-${theme.spacing(1)} 0px`, transform: `translateY(${theme.spacing(2)})` })
+          }}
         >
           {Object.entries(reactions).map(
             ([reaction, names], i) =>
               names?.length > 0 && (
                 <Tooltip
                   key={i}
-                  classes={{ tooltip: classes.reactionTooltip }}
+                  slotProps={{ tooltip: { sx: { padding: 0 } } }}
                   title={
                     <List
-                      className={classes.reactionList}
+                      sx={{
+                        borderRadius: '4px',
+                        backgroundColor: theme.palette.background.default,
+                        boxShadow: theme.shadows[4]
+                      }}
                       dense={true}
                       subheader={
-                        <ListSubheader className={classes.reactionSubHeader}>{t(`reaction.${reaction}`)}</ListSubheader>
+                        <ListSubheader
+                          sx={{
+                            borderRadius: '4px',
+                            backgroundColor: theme.palette.background.default,
+                            lineHeight: '36px'
+                          }}
+                        >
+                          {t(`reaction.${reaction}`)}
+                        </ListSubheader>
                       }
                     >
                       {names.map((name: string, j: number) => (
@@ -421,7 +404,12 @@ const WrappedCommentCard: React.FC<Props> = ({
                     </List>
                   }
                 >
-                  <div className={classes.reactionChip}>
+                  <div
+                    style={{
+                      backgroundColor: theme.palette.background.default,
+                      borderRadius: '14px'
+                    }}
+                  >
                     <Chip
                       label={
                         <>

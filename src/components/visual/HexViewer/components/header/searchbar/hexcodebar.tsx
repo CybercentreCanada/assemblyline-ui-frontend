@@ -1,74 +1,20 @@
 import ClearIcon from '@mui/icons-material/Clear';
-import { Typography } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
-import React, { useRef } from 'react';
-import { useTranslation } from 'react-i18next';
+import { Typography, useTheme } from '@mui/material';
+import type { StoreProps } from 'components/visual/HexViewer';
 import {
   DelayedTextField,
   isWidthEqualUp,
   NumericField,
-  StoreProps,
   TooltipIconButton,
   useDispatch,
   useEventListener
-} from '../../..';
-
-const useHexStyles = makeStyles(theme => ({
-  endAdornment: {
-    color: theme.palette.secondary.light
-  },
-  iconButton: {
-    padding: 10,
-    [theme.breakpoints.only('sm')]: {
-      padding: 4
-    },
-    [theme.breakpoints.only('xs')]: {
-      padding: 2
-    }
-  },
-  root: {
-    '& > fieldset': {
-      border: 'none !important',
-      borderWidth: '0px'
-    }
-  },
-  formControl: {
-    width: '100%'
-  },
-  outlinedInput: {
-    paddingRight: '4px'
-  },
-  buttonGroup: {
-    display: 'flex',
-    flexDirection: 'column'
-  },
-  endAdornmentButton: {
-    height: '20px',
-    borderRadius: 0,
-    minWidth: '20px'
-  },
-  input: {
-    textAlign: 'left'
-  },
-  indexInput: {
-    textAlign: 'right'
-  },
-  resultNoneIndexes: {
-    textAlign: 'center',
-    cursor: 'default',
-    padding: 8,
-    [theme.breakpoints.only('sm')]: {
-      padding: 2
-    },
-    [theme.breakpoints.only('xs')]: {
-      padding: 0
-    }
-  }
-}));
+} from 'components/visual/HexViewer';
+import React, { useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export const WrappedHexcodeBar = ({ store }: StoreProps) => {
   const { t } = useTranslation(['hexViewer']);
-  const classes = useHexStyles();
+  const theme = useTheme();
   const {
     onSearchClear,
     onSearchBarFocus,
@@ -93,12 +39,6 @@ export const WrappedHexcodeBar = ({ store }: StoreProps) => {
   return (
     <>
       <DelayedTextField
-        classes={{
-          formControl: classes.formControl,
-          outlinedInput: classes.outlinedInput,
-          root: classes.root,
-          input: classes.input
-        }}
         inputRef={inputRef}
         type="text"
         placeholder={t('header.searchfield.text')}
@@ -113,31 +53,69 @@ export const WrappedHexcodeBar = ({ store }: StoreProps) => {
         onWheel={event => onSearchBarWheel({ event })}
         onChange={event => onSearchBarValueChange({ value: event.target.value })}
         onKeyDown={event => onSearchBarKeyDown({ event }, { store })}
+        slotSX={{
+          formControl: { width: '100%' },
+          outlinedInput: { paddingRight: '4px' },
+          root: {
+            '& > fieldset': {
+              border: 'none !important',
+              borderWidth: '0px'
+            }
+          },
+          input: { textAlign: 'left' }
+        }}
       />
 
       {(inputValue === null || inputValue === '') && (results === null || results.length === 0) ? (
         <></>
       ) : results === null || results.length === 0 ? (
         isWidthEqualUp(store, 'sm') ? (
-          <Typography className={classes.resultNoneIndexes} variant="subtitle1" color="error">
+          <Typography
+            variant="subtitle1"
+            color="error"
+            sx={{
+              textAlign: 'center',
+              cursor: 'default',
+              padding: '8px',
+              [theme.breakpoints.only('sm')]: {
+                padding: '2px'
+              },
+              [theme.breakpoints.only('xs')]: {
+                padding: '0px'
+              }
+            }}
+          >
             {t('no-results.desktop')}
           </Typography>
         ) : (
-          <Typography className={classes.resultNoneIndexes} variant="subtitle1" color="error">
+          <Typography
+            variant="subtitle1"
+            color="error"
+            sx={{
+              textAlign: 'center',
+              cursor: 'default',
+              padding: '8px',
+              [theme.breakpoints.only('sm')]: {
+                padding: '2px'
+              },
+              [theme.breakpoints.only('xs')]: {
+                padding: '0px'
+              }
+            }}
+          >
             {t('no-results.mobile')}
           </Typography>
         )
       ) : (
         <>
           <NumericField
-            classes={{ root: classes.root, input: classes.indexInput }}
             // label={t('offset.label')}
             labelWidth={0}
-            placeholder={''}
+            placeholder=""
             size="small"
             margin="dense"
             range="loop"
-            value={selectedResult as number}
+            value={selectedResult}
             min={0}
             max={results.length - 1}
             allowNull={true}
@@ -145,18 +123,40 @@ export const WrappedHexcodeBar = ({ store }: StoreProps) => {
             direction="inverse"
             preventArrowKeyDown
             endAdornment={
-              <div className={classes.endAdornment}>{t('of') + results.length.toString().toUpperCase()}</div>
+              <div style={{ color: theme.palette.secondary.light }}>
+                {t('of') + results.length.toString().toUpperCase()}
+              </div>
             }
             onFocus={() => onSearchBarFocus()}
             onChange={event => onSelectedSearchIndexChange({ index: event.target.valueAsNumber as number })}
             // onKeyDown={event => onSearchBarKeyDown(event, store)}
+            slotSX={{
+              root: {
+                '& .MuiOutlinedInput-notchedOutline': {
+                  border: 'none'
+                }
+              },
+              input: {
+                textAlign: 'right'
+              }
+            }}
           />
           <TooltipIconButton
-            classes={{ iconButton: classes.iconButton }}
             title={t('clear')}
             onClick={() => onSearchClear()}
             disabled={inputValue === null || inputValue === ''}
             icon={<ClearIcon />}
+            slotSX={{
+              iconButton: {
+                padding: '10px',
+                [theme.breakpoints.only('sm')]: {
+                  padding: '4px'
+                },
+                [theme.breakpoints.only('xs')]: {
+                  padding: '2px'
+                }
+              }
+            }}
           />
         </>
       )}

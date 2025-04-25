@@ -1,9 +1,9 @@
 import type { Section } from 'components/models/base/result';
-import type { AttackMatrix, Heuristics, Tags } from './file';
+import type { AttackMatrix, Heuristics, Tags } from 'components/models/ui/file';
 
-export type HeuristicNameMap = { [name: string]: string[] };
-export type HeuristicSection = { [heuristic: string]: Section[] };
-export type Sha256TagMap = { [sha256: string]: string[] };
+export type HeuristicNameMap = Record<string, string[]>;
+export type HeuristicSection = Record<string, Section[]>;
+export type Sha256TagMap = Record<string, string[]>;
 export type SubmissionTags = {
   attribution: Tags;
   behavior: Tags;
@@ -45,7 +45,7 @@ export type SubmissionSummary = {
 
 export type Tree = {
   /** Dictionary of children file blocks */
-  children: { [sha256: string]: Tree };
+  children: Record<string, Tree>;
 
   /** List of possible names for the file */
   name: string[];
@@ -88,5 +88,5 @@ export type SubmissionTree = {
   supplementary: string[];
 
   /** Dictionary of children file blocks */
-  tree: { [sha256: string]: Tree };
+  tree: Record<string, Tree>;
 };

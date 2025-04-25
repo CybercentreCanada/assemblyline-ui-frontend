@@ -1,7 +1,5 @@
-/* eslint-disable jsx-a11y/anchor-is-valid */
-
-import { Button } from '@mui/material';
 import { ExpandMore } from '@mui/icons-material';
+import { Button } from '@mui/material';
 
 export interface TableListMoreConfig {
   onClick: () => void;

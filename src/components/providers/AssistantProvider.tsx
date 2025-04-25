@@ -22,9 +22,8 @@ import {
 } from '@mui/material';
 import MuiPopper from '@mui/material/Popper';
 import { styled } from '@mui/material/styles';
-import makeStyles from '@mui/styles/makeStyles';
 import type { AppUser } from 'commons/components/app/AppUserService';
-import useAppUser from 'commons/components/app/hooks/useAppUser';
+import { useAppUser } from 'commons/components/app/hooks';
 import AppAvatar from 'commons/components/display/AppAvatar';
 import { isEnter } from 'commons/components/utils/keyboard';
 import useALContext from 'components/hooks/useALContext';
@@ -35,9 +34,7 @@ import { ThinkingBadge } from 'components/visual/ThinkingBadge';
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 
-const Popper = styled(MuiPopper, {
-  shouldForwardProp: prop => prop !== 'arrow'
-})(() => ({
+const Popper = styled(MuiPopper)(() => ({
   zIndex: 1,
   '& > div': {
     position: 'relative'
@@ -62,15 +59,6 @@ const Arrow = styled('div')(({ theme }) => ({
     transform: 'translateY(-50%) rotate(45deg)',
     boxShadow: '2px 2px 2px 0px rgb(0 0 0 / 25%)',
     borderRadius: '3px 0px'
-  }
-}));
-
-const useStyles = makeStyles(theme => ({
-  customBadge: {
-    backgroundColor: theme.palette.text.primary
-  },
-  customFab: {
-    backgroundColor: theme.palette.mode === 'dark' ? '#616161' : '#888'
   }
 }));
 
@@ -103,7 +91,6 @@ export const AssistantContext = React.createContext<AssistantContextProps>(null)
 function AssistantProvider({ children }: AssistantProviderProps) {
   const { t, i18n } = useTranslation(['assistant']);
   const theme = useTheme();
-  const classes = useStyles();
   const appUser = useAppUser<AppUser>();
   const { user: currentUser, configuration } = useALContext();
   const { apiCall } = useMyAPI();
@@ -142,7 +129,7 @@ function AssistantProvider({ children }: AssistantProviderProps) {
   const askAssistant = () => {
     const data = [...currentContext];
     const history = [...currentHistory];
-    const newUserQuestion = { role: 'user' as 'user', content: currentInput };
+    const newUserQuestion = { role: 'user' as const, content: currentInput };
     data.push(newUserQuestion);
     history.push(newUserQuestion);
     setCurrentContext(data);
@@ -250,7 +237,7 @@ function AssistantProvider({ children }: AssistantProviderProps) {
 
   const buildDefaultSystemMessage = (): ContextMessageProps => {
     return {
-      role: 'system' as 'system',
+      role: 'system' as const,
       content: null
     };
   };
@@ -346,7 +333,7 @@ function AssistantProvider({ children }: AssistantProviderProps) {
               }}
               open={open}
               anchorEl={anchorEl}
-              placement={'top-end'}
+              placement="top-end"
               transition
               onClick={event => event.stopPropagation()}
             >
@@ -447,10 +434,10 @@ function AssistantProvider({ children }: AssistantProviderProps) {
                                           ? '#414f65'
                                           : '#BADDFB'
                                         : message.isError
-                                        ? theme.palette.mode === 'dark'
-                                          ? '#4f1717'
-                                          : '#ffe2e2'
-                                        : theme.palette.background.paper
+                                          ? theme.palette.mode === 'dark'
+                                            ? '#4f1717'
+                                            : '#ffe2e2'
+                                          : theme.palette.background.paper
                                     }}
                                   >
                                     <AIMarkdown markdown={message.content} truncated={false} dense />
@@ -459,7 +446,7 @@ function AssistantProvider({ children }: AssistantProviderProps) {
                               )
                             )}
                           {thinking && (
-                            <Stack direction={'row'} p={1} spacing={1} style={{ wordBreak: 'break-word' }}>
+                            <Stack direction="row" p={1} spacing={1} style={{ wordBreak: 'break-word' }}>
                               <Avatar>
                                 <SmartToyOutlinedIcon />
                               </Avatar>
@@ -475,7 +462,7 @@ function AssistantProvider({ children }: AssistantProviderProps) {
                           )}
                         </div>
                         {currentInsights.length > 0 && (
-                          <Stack direction={'row-reverse'} mt={0.75} ml={1} mr={1} spacing={1}>
+                          <Stack direction="row-reverse" mt={0.75} ml={1} mr={1} spacing={1}>
                             {currentInsights.map((insight, id) => (
                               <CustomChip
                                 key={id}
@@ -542,9 +529,11 @@ function AssistantProvider({ children }: AssistantProviderProps) {
           <Tooltip title={t('title')} placement="left">
             <Fab
               color="primary"
-              className={classes.customFab}
               onClick={event => toggleAssistant(event.currentTarget)}
               size="medium"
+              sx={{
+                backgroundColor: theme.palette.mode === 'dark' ? '#616161' : '#888'
+              }}
             >
               <Badge variant="dot" invisible={!hasInsights} color="primary">
                 <AssistantIcon />

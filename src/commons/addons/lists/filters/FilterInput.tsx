@@ -1,25 +1,10 @@
 import FilterListIcon from '@mui/icons-material/FilterList';
-import { InputAdornment, TextField, TextFieldProps } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
+import type { TextFieldProps } from '@mui/material';
+import { InputAdornment, TextField, useTheme } from '@mui/material';
+import type { FilterField } from 'commons/addons/lists/filters/FilterSelector';
 import Throttler from 'commons/addons/utils/throttler';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FilterField } from './FilterSelector';
-
-const useStyles = makeStyles(theme => ({
-  filterInput: {
-    padding: 0,
-    '& svg': {
-      transition: theme.transitions.create(['color', 'transform']),
-      color: theme.palette.mode === 'dark' ? 'hsl(0, 0%, 22%)' : 'hsl(0, 0%, 80%)'
-    }
-  },
-  filterInputFocused: {
-    '& svg': {
-      color: theme.palette.primary.main
-    }
-  }
-}));
 
 const THROTTLER = new Throttler(100);
 
@@ -31,7 +16,8 @@ type FilterInputProps = TextFieldProps & {
 
 const FilterInput: React.FC<FilterInputProps> = ({ fullWidth = false, filter, onFilter, ...textFieldProps }) => {
   const { t } = useTranslation();
-  const classes = useStyles();
+  const theme = useTheme();
+
   const [value, setValue] = useState<string>(filter.value);
 
   useEffect(() => {
@@ -48,19 +34,37 @@ const FilterInput: React.FC<FilterInputProps> = ({ fullWidth = false, filter, on
     <TextField
       {...textFieldProps}
       variant="standard"
-      className={classes.filterInput}
       value={value}
       onChange={onChange}
       label={filter.i18nKey ? t(filter.i18nKey) : filter.label}
       fullWidth={fullWidth}
-      InputProps={{
-        className: classes.filterInput,
-        classes: { focused: classes.filterInputFocused },
-        startAdornment: (
-          <InputAdornment position="start" disablePointerEvents>
-            <FilterListIcon color="inherit" />
-          </InputAdornment>
-        )
+      slotProps={{
+        input: {
+          startAdornment: (
+            <InputAdornment position="start" disablePointerEvents>
+              <FilterListIcon color="inherit" />
+            </InputAdornment>
+          ),
+          sx: {
+            padding: 0,
+            '& svg': {
+              transition: theme.transitions.create(['color', 'transform']),
+              color: theme.palette.mode === 'dark' ? 'hsl(0, 0%, 22%)' : 'hsl(0, 0%, 80%)'
+            },
+            ['&:focused']: {
+              '& svg': {
+                color: theme.palette.primary.main
+              }
+            }
+          }
+        }
+      }}
+      sx={{
+        padding: 0,
+        '& svg': {
+          transition: theme.transitions.create(['color', 'transform']),
+          color: theme.palette.mode === 'dark' ? 'hsl(0, 0%, 22%)' : 'hsl(0, 0%, 80%)'
+        }
       }}
     />
   );

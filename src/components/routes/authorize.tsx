@@ -1,7 +1,6 @@
-/* eslint-disable jsx-a11y/anchor-is-valid */
 import { Backdrop, Button, Typography, useTheme } from '@mui/material';
+import { useAppUser } from 'commons/components/app/hooks';
 import useAppBannerVert from 'commons/components/app/hooks/useAppBannerVert';
-import useAppUser from 'commons/components/app/hooks/useAppUser';
 import PageCardCentered from 'commons/components/pages/PageCardCentered';
 import useALContext from 'components/hooks/useALContext';
 import type { Role, Scope } from 'components/models/base/user';
@@ -9,8 +8,7 @@ import { SCOPES } from 'components/models/base/user';
 import type { CustomUser } from 'components/models/ui/user';
 import getXSRFCookie from 'helpers/xsrf';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router';
 
 const VALID_SCOPES: Omit<Scope, 'c'>[] = SCOPES.filter(s => s !== 'c');
 

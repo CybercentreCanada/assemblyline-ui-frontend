@@ -1,39 +1,18 @@
 import NavigationIcon from '@mui/icons-material/Navigation';
 import NumbersOutlinedIcon from '@mui/icons-material/NumbersOutlined';
 import TextFieldsIcon from '@mui/icons-material/TextFields';
-import { Fade, Paper, Popper, useTheme } from '@mui/material';
+import { Fade, ListItemButton, Paper, Popper, useTheme } from '@mui/material';
 import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import makeStyles from '@mui/styles/makeStyles';
 import { isEscape } from 'commons/components/utils/keyboard';
+import type { SearchType, StoreProps } from 'components/visual/HexViewer';
+import { useDispatch, useEventListener } from 'components/visual/HexViewer';
+import { TooltipIconButton } from 'components/visual/HexViewer/commons/components';
 import React, { useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { SearchType, StoreProps, useDispatch, useEventListener } from '../..';
-import { TooltipIconButton } from '../../commons/components';
-
-const useStyles = makeStyles(theme => ({
-  clickAway: {
-    zIndex: theme.zIndex.appBar + 200
-  },
-  popper: {
-    zIndex: theme.zIndex.appBar + 200,
-    minWidth: '280px',
-    marginTop: '16px',
-    padding: theme.spacing(0),
-    backgroundColor: theme.palette.background.paper
-  },
-  searchPaper: {
-    marginTop: '16px',
-    padding: theme.spacing(0),
-    minWidth: '200px',
-    backgroundColor: theme.palette.background.paper
-  }
-}));
 
 export const WrappedHexSearchTypes = ({ store }: StoreProps) => {
-  const classes = useStyles();
   const theme = useTheme();
   const { t } = useTranslation(['hexViewer']);
   const { onSearchTypeChange } = useDispatch();
@@ -96,17 +75,22 @@ export const WrappedHexSearchTypes = ({ store }: StoreProps) => {
       <Popper
         open={isPopperOpen}
         anchorEl={popperAnchorEl}
-        className={classes.popper}
         placement="bottom-start"
         disablePortal={true}
         transition
+        sx={{
+          zIndex: theme.zIndex.appBar + 200,
+          minWidth: '280px',
+          marginTop: '16px',
+          padding: theme.spacing(0),
+          backgroundColor: theme.palette.background.paper
+        }}
       >
         {({ TransitionProps }) => (
           <Fade {...TransitionProps} timeout={250}>
             <Paper style={{ padding: theme.spacing(1) }} elevation={4}>
               <List component="nav" aria-label="main mailbox folders" dense disablePadding>
-                <ListItem
-                  button
+                <ListItemButton
                   selected={searchType === 'cursor'}
                   autoFocus={searchType === 'cursor'}
                   dense
@@ -114,9 +98,8 @@ export const WrappedHexSearchTypes = ({ store }: StoreProps) => {
                 >
                   <ListItemIcon children={<NavigationIcon />} />
                   <ListItemText primary={t('header.selector.cursor')} />
-                </ListItem>
-                <ListItem
-                  button
+                </ListItemButton>
+                <ListItemButton
                   selected={searchType === 'hex'}
                   autoFocus={searchType === 'hex'}
                   dense
@@ -124,9 +107,8 @@ export const WrappedHexSearchTypes = ({ store }: StoreProps) => {
                 >
                   <ListItemIcon children={<NumbersOutlinedIcon />} />
                   <ListItemText primary={t('header.selector.hexcode')} />
-                </ListItem>
-                <ListItem
-                  button
+                </ListItemButton>
+                <ListItemButton
                   selected={searchType === 'text'}
                   autoFocus={searchType === 'text'}
                   dense
@@ -134,7 +116,7 @@ export const WrappedHexSearchTypes = ({ store }: StoreProps) => {
                 >
                   <ListItemIcon children={<TextFieldsIcon />} />
                   <ListItemText primary={t('header.selector.text')} />
-                </ListItem>
+                </ListItemButton>
               </List>
             </Paper>
           </Fade>

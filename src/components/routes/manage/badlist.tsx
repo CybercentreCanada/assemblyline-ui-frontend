@@ -3,8 +3,7 @@ import BlockOutlinedIcon from '@mui/icons-material/BlockOutlined';
 import LabelOutlinedIcon from '@mui/icons-material/LabelOutlined';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
 import { Grid, IconButton, Tooltip, useTheme } from '@mui/material';
-import Typography from '@mui/material/Typography';
-import useAppUser from 'commons/components/app/hooks/useAppUser';
+import { useAppUser } from 'commons/components/app/hooks';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import PageHeader from 'commons/components/pages/PageHeader';
 import { useALQuery } from 'components/core/Query/AL/useALQuery';
@@ -15,15 +14,15 @@ import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import type { CustomUser } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
+import BadlistNew from 'components/routes/manage/badlist_add';
+import BadlistDetail from 'components/routes/manage/badlist_detail';
+import { PageHeader as ALPageHeader } from 'components/visual/Layouts/PageHeader';
 import SearchHeader from 'components/visual/SearchBar/SearchHeader';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import BadlistTable from 'components/visual/SearchResult/badlist';
 import React, { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
-import { useLocation } from 'react-router-dom';
-import BadlistNew from './badlist_add';
-import BadlistDetail from './badlist_detail';
+import { useLocation, useNavigate } from 'react-router';
 
 const BADLIST_PARAMS = createSearchParams(p => ({
   query: p.string(''),
@@ -101,14 +100,12 @@ const BadlistSearch = () => {
 
   return currentUser.roles.includes('badlist_view') ? (
     <PageFullWidth margin={4}>
-      <div style={{ paddingBottom: theme.spacing(2) }}>
-        <Grid container alignItems="center">
-          <Grid item xs>
-            <Typography variant="h4">{t('title')}</Typography>
-          </Grid>
-
-          {currentUser.roles.includes('badlist_manage') && (
-            <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
+      <ALPageHeader
+        primary={t('title')}
+        style={{ marginBottom: theme.spacing(4) }}
+        actions={[
+          currentUser.roles.includes('badlist_manage') && (
+            <Grid key="add" size={{ xs: 'grow' }} style={{ textAlign: 'right', flexGrow: 0 }}>
               <Tooltip title={t('add_badlist')}>
                 <IconButton
                   style={{
@@ -121,9 +118,9 @@ const BadlistSearch = () => {
                 </IconButton>
               </Tooltip>
             </Grid>
-          )}
-        </Grid>
-      </div>
+          )
+        ]}
+      />
 
       <PageHeader isSticky>
         <div style={{ paddingTop: theme.spacing(1) }}>

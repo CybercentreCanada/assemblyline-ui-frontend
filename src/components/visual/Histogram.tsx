@@ -33,10 +33,10 @@ const plugins = [
     id: 'vLineTooltip',
     afterDraw: (chart, args, cfg: TooltipVertLinePluginConfig) => {
       if (cfg.display && chart.tooltip?._active?.length) {
-        let selected = chart.tooltip._active[0].element.x;
-        let axis = chart.scales[cfg.yAxis || 'yAxis'];
+        const selected = chart.tooltip._active[0].element.x;
+        const axis = chart.scales[cfg.yAxis || 'yAxis'];
         if (axis) {
-          let ctx = chart.ctx;
+          const ctx = chart.ctx;
           ctx.save();
           ctx.beginPath();
           ctx.moveTo(selected, axis.top);
@@ -53,10 +53,10 @@ const plugins = [
     id: 'hLineTooltip',
     afterDraw: (chart, args, cfg: HorizontalLinePluginConfig) => {
       if (cfg.display && chart.tooltip?._active?.length) {
-        let selected = chart.tooltip._active[0].element.y;
-        let axis = chart.scales[cfg.xAxis || 'xAxis'];
+        const selected = chart.tooltip._active[0].element.y;
+        const axis = chart.scales[cfg.xAxis || 'xAxis'];
         if (axis) {
-          let ctx = chart.ctx;
+          const ctx = chart.ctx;
           ctx.save();
           ctx.beginPath();
           ctx.moveTo(axis.right, selected);
@@ -72,7 +72,7 @@ const plugins = [
 ];
 
 type HistogramProps = {
-  dataset: { [s: string]: number };
+  dataset: Record<string, number>;
   datatype: string;
   title?: string;
   height?: string;

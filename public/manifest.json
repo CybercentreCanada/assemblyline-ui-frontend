@@ -5,10 +5,12 @@
   "display": "standalone",
   "background_color": "#fff",
   "description": "Assemblyline - Automated malware analysis",
-  "icons": [{
-    "src": "favicon.ico",
-    "sizes": "48x48 72x72 96x96 128x128 256x256",
-    "type": "image/png"
-  }],
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "48x48 72x72 96x96 128x128 256x256",
+      "type": "image/png"
+    }
+  ],
   "related_applications": []
 }

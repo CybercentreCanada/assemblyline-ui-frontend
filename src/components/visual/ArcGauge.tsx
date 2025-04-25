@@ -1,42 +1,7 @@
-import { useTheme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
-import { Skeleton } from '@mui/material';
+import { Skeleton, useTheme } from '@mui/material';
 import { scaleLinear } from 'd3-scale';
 import { arc } from 'd3-shape';
 import React from 'react';
-
-const useStyles = makeStyles(theme => ({
-  caption: {
-    color: theme.palette.text.secondary,
-    fontSize: 'x-small',
-    fontWeight: 500,
-    textAlign: 'center',
-    width: '100%'
-  },
-  graph: {
-    gridColumn: '1 / 1',
-    gridRow: '1 / 1'
-  },
-  outer: {
-    display: 'grid',
-    gridTemplate: '1fr / 1fr',
-    placeItems: 'end'
-  },
-  text: {
-    color: theme.palette.text.secondary,
-    fontWeight: 900,
-    gridColumn: '1 / 1',
-    gridRow: '1 / 1',
-    textAlign: 'center',
-    width: '100%'
-  },
-  title: {
-    color: theme.palette.text.secondary,
-    fontWeight: 500,
-    textAlign: 'center',
-    width: '100%'
-  }
-}));
 
 type ArcGaugeProps = {
   pctValue: number;
@@ -57,7 +22,6 @@ const ArcGauge: React.FC<ArcGaugeProps> = ({
   title = '',
   width = '100px'
 }) => {
-  const classes = useStyles();
   const theme = useTheme();
   const colorFilled = theme.palette.mode === 'dark' ? theme.palette.primary.light : theme.palette.primary.dark;
 
@@ -82,23 +46,81 @@ const ArcGauge: React.FC<ArcGaugeProps> = ({
 
   return (
     <div>
-      {title && <div className={classes.title}>{title}</div>}
-      <div className={classes.outer} style={{ fontSize, lineHeight: fontSize, width }}>
+      {title && (
+        <div
+          style={{
+            color: theme.palette.text.secondary,
+            fontWeight: 500,
+            textAlign: 'center',
+            width: '100%'
+          }}
+        >
+          {title}
+        </div>
+      )}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplate: '1fr / 1fr',
+          placeItems: 'end',
+          fontSize,
+          lineHeight: fontSize,
+          width
+        }}
+      >
         {initialized ? (
-          <span className={classes.text}>{`${Number(pctValue).toFixed(0)}%`}</span>
+          <span
+            style={{
+              color: theme.palette.text.secondary,
+              fontWeight: 900,
+              gridColumn: '1 / 1',
+              gridRow: '1 / 1',
+              textAlign: 'center',
+              width: '100%'
+            }}
+          >
+            {`${Number(pctValue).toFixed(0)}%`}
+          </span>
         ) : (
-          <span className={classes.text}>
+          <span
+            style={{
+              color: theme.palette.text.secondary,
+              fontWeight: 900,
+              gridColumn: '1 / 1',
+              gridRow: '1 / 1',
+              textAlign: 'center',
+              width: '100%'
+            }}
+          >
             <Skeleton variant="rectangular" width="2rem" style={{ borderRadius: '4px', display: 'inline-block' }} />
           </span>
         )}
-        <svg className={classes.graph} viewBox={[-1, -1, 2, 1].join(' ')}>
+        <svg
+          viewBox={[-1, -1, 2, 1].join(' ')}
+          style={{
+            gridColumn: '1 / 1',
+            gridRow: '1 / 1'
+          }}
+        >
           <g>
             <path d={backgroundArc} fill={colorBack} />
             <path d={filledArc} fill={colorFilled} />
           </g>
         </svg>
       </div>
-      {caption && <div className={classes.caption}>{caption}</div>}
+      {caption && (
+        <div
+          style={{
+            color: theme.palette.text.secondary,
+            fontSize: 'x-small',
+            fontWeight: 500,
+            textAlign: 'center',
+            width: '100%'
+          }}
+        >
+          {caption}
+        </div>
+      )}
     </div>
   );
 };

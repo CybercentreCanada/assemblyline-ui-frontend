@@ -8,12 +8,12 @@ export const SIMILAR_TYPES = ['tlsh', 'ssdeep', 'vector'] as const;
 
 export type SimilarType = (typeof SIMILAR_TYPES)[number];
 
-export type Alternates = { [serviceName: string]: AlternateResult[] };
-export type AttackMatrix = { [attack: string]: Attack[] };
+export type Alternates = Record<string, AlternateResult[]>;
+export type AttackMatrix = Record<string, Attack[]>;
 export type Childrens = { name: string; sha256: string }[];
 export type Heuristics = Record<Verdict, [string, string]>;
-export type Metadata = { [level: string]: { [key: string]: any } };
-export type Tags = { [tag_name: string]: Tag[] };
+export type Metadata = Record<string, Record<string, any>>;
+export type Tags = Record<string, Tag[]>;
 
 export type File = {
   alternates: Alternates;

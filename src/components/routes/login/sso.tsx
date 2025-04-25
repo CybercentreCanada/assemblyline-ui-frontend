@@ -1,21 +1,6 @@
-/* eslint-disable jsx-a11y/anchor-is-valid */
 import { Avatar, Button, CircularProgress, Link, Typography, useTheme } from '@mui/material';
 import Skeleton from '@mui/material/Skeleton';
-import createStyles from '@mui/styles/createStyles';
-import makeStyles from '@mui/styles/makeStyles';
 import { useTranslation } from 'react-i18next';
-
-const useStyles = makeStyles(() =>
-  createStyles({
-    buttonProgress: {
-      position: 'absolute',
-      top: '50%',
-      left: '50%',
-      marginTop: -12,
-      marginLeft: -12
-    }
-  })
-);
 
 type SSOProps = {
   avatar: string;
@@ -30,7 +15,6 @@ type SSOProps = {
 
 export function SSOLogin({ avatar, username, email, tokenID, buttonLoading, onSubmit, reset, quickLogin }: SSOProps) {
   const { t } = useTranslation(['login']);
-  const classes = useStyles();
   const theme = useTheme();
 
   // Perform a quick login if we have all the necessary data
@@ -62,7 +46,18 @@ export function SSOLogin({ avatar, username, email, tokenID, buttonLoading, onSu
             disabled={buttonLoading}
           >
             {t('button')}
-            {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
+            {buttonLoading && (
+              <CircularProgress
+                size={24}
+                sx={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  marginTop: -12,
+                  marginLeft: -12
+                }}
+              />
+            )}
           </Button>
         )}
         {!tokenID ? (

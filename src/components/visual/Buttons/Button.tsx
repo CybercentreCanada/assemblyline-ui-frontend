@@ -1,8 +1,8 @@
 import type { ButtonProps as MuiButtonProps, TooltipProps } from '@mui/material';
 import { Button as MuiButton } from '@mui/material';
+import { CircularProgress } from 'components/visual/Buttons/CircularProgress';
 import { Tooltip } from 'components/visual/Tooltip';
 import React from 'react';
-import { CircularProgress } from './CircularProgress';
 
 export type ButtonProps = MuiButtonProps & {
   loading?: boolean;

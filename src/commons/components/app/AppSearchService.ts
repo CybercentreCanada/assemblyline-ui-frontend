@@ -1,5 +1,5 @@
-import { ReactElement } from 'react';
-import { AppSearchServiceState } from './AppContexts';
+import type { ReactElement } from 'react';
+import type { AppSearchServiceState } from 'commons/components/app/AppContexts';
 
 export type AppSearchMode = 'inline' | 'fullscreen';
 

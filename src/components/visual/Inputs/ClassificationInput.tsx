@@ -7,16 +7,15 @@ import {
   DialogTitle,
   Grid,
   List,
-  ListItem,
+  ListItemButton,
   ListItemText,
   Skeleton,
+  styled,
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import useALContext from 'components/hooks/useALContext';
-import type { PossibleColors } from 'components/visual/CustomChip';
-import CustomChip, { ColorMap } from 'components/visual/CustomChip';
+import CustomChip, { COLOR_MAP } from 'components/visual/CustomChip';
 import type { FormatProp } from 'helpers/classificationParser';
 import {
   applyAliases,
@@ -28,47 +27,36 @@ import {
   getParts,
   normalizedClassification
 } from 'helpers/classificationParser';
+import type { PossibleColor } from 'helpers/colors';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-const useStyles = makeStyles(theme => ({
-  classification: {
-    fontWeight: 500
-  },
-  inlineSkel: {
-    display: 'inline-block',
-    width: '8rem',
-    verticalAlign: 'bottom'
-  },
-  // Text Color
-  default: {
-    fontWeight: 500,
-    color: theme.palette.mode === 'dark' ? '#AAA' : '#888'
-  },
-  primary: {
-    fontWeight: 500,
-    color: theme.palette.primary.main
-  },
-  secondary: {
-    fontWeight: 500,
-    color: theme.palette.secondary.main
-  },
-  success: {
-    fontWeight: 500,
-    color: theme.palette.mode !== 'dark' ? theme.palette.success.dark : theme.palette.success.light
-  },
-  info: {
-    fontWeight: 500,
-    color: theme.palette.mode !== 'dark' ? theme.palette.info.dark : theme.palette.info.light
-  },
-  warning: {
-    fontWeight: 500,
-    color: theme.palette.mode !== 'dark' ? theme.palette.warning.dark : theme.palette.warning.light
-  },
-  error: {
-    fontWeight: 500,
-    color: theme.palette.mode !== 'dark' ? theme.palette.error.dark : theme.palette.error.light
-  }
+type ClassificationTextProps = {
+  color: PossibleColor;
+};
+
+const ClassificationText = styled('span', {
+  shouldForwardProp: prop => prop !== 'color'
+})<ClassificationTextProps>(({ theme, color }) => ({
+  fontWeight: 500,
+  color: (() => {
+    switch (color) {
+      case 'default':
+        return theme.palette.mode === 'dark' ? '#AAA' : '#888';
+      case 'primary':
+        return theme.palette.primary.main;
+      case 'secondary':
+        return theme.palette.secondary.main;
+      case 'success':
+        return theme.palette.mode !== 'dark' ? theme.palette.success.dark : theme.palette.success.light;
+      case 'info':
+        return theme.palette.mode !== 'dark' ? theme.palette.info.dark : theme.palette.info.light;
+      case 'warning':
+        return theme.palette.mode !== 'dark' ? theme.palette.warning.dark : theme.palette.warning.light;
+      case 'error':
+        return theme.palette.mode !== 'dark' ? theme.palette.error.dark : theme.palette.error.light;
+    }
+  })()
 }));
 
 export interface ClassificationInputProps {
@@ -96,7 +84,6 @@ function WrappedClassificationInput({
   dynGroup = null,
   disabled = false
 }: ClassificationInputProps) {
-  const classes = useStyles();
   const { t } = useTranslation();
   const theme = useTheme();
   const { user: currentUser, c12nDef, classificationAliases } = useALContext();
@@ -189,12 +176,12 @@ function WrappedClassificationInput({
     );
   }
 
-  const computeColor = (): PossibleColors => {
+  const computeColor = (): PossibleColor => {
     const levelStyles = c12nDef.levels_styles_map[validated.parts.lvl];
     if (!levelStyles) {
       return 'default' as const;
     }
-    return ColorMap[levelStyles.color || levelStyles.label.replace('label-', '')] || ('default' as const);
+    return COLOR_MAP[levelStyles.color || levelStyles.label.replace('label-', '')] || ('default' as const);
   };
 
   const skelheight = {
@@ -219,9 +206,9 @@ function WrappedClassificationInput({
     (!!validated?.parts?.lvl && c12n ? (
       <>
         {type === 'text' ? (
-          <span className={classes[computeColor()]}>
+          <ClassificationText color={computeColor()}>
             {normalizedClassification(validated.parts, c12nDef, format, isMobile, isUser, classificationAliases)}
-          </span>
+          </ClassificationText>
         ) : (
           <div style={{ display: inline ? 'inline-block' : null }}>
             <CustomChip
@@ -229,7 +216,6 @@ function WrappedClassificationInput({
               variant={type === 'outlined' ? 'outlined' : 'filled'}
               size={size}
               color={computeColor()}
-              className={classes.classification}
               label={normalizedClassification(
                 validated.parts,
                 c12nDef,
@@ -241,6 +227,7 @@ function WrappedClassificationInput({
               onClick={type === 'picker' ? () => setShowPicker(true) : null}
               fullWidth={fullWidth}
               disabled={disabled}
+              sx={{ fontWeight: 500 }}
             />
           </div>
         )}
@@ -258,7 +245,6 @@ function WrappedClassificationInput({
                 variant="outlined"
                 size={size}
                 color={computeColor()}
-                className={classes.classification}
                 label={normalizedClassification(
                   validated.parts,
                   c12nDef,
@@ -268,19 +254,19 @@ function WrappedClassificationInput({
                   classificationAliases
                 )}
                 fullWidth={fullWidth}
+                sx={{ fontWeight: 500 }}
               />
             </DialogTitle>
             <DialogContent>
               <Grid container spacing={2}>
-                <Grid item xs={12} md>
+                <Grid size={{ xs: 12, md: 'grow' }}>
                   <Card variant="outlined">
                     <List disablePadding style={{ borderRadius: '6px' }}>
                       {c12nDef.original_definition.levels.map(
                         (lvl, idx) =>
                           (isUser || (lvl.lvl <= uParts.lvlIdx && !lvl.is_hidden)) && (
-                            <ListItem
+                            <ListItemButton
                               key={idx}
-                              button
                               disabled={
                                 validated.disabled.levels.includes(lvl.name) ||
                                 validated.disabled.levels.includes(lvl.short_name)
@@ -289,7 +275,7 @@ function WrappedClassificationInput({
                               onClick={() => selectLevel(lvl.lvl)}
                             >
                               <ListItemText style={{ textAlign: 'center' }} primary={lvl.name} />
-                            </ListItem>
+                            </ListItemButton>
                           )
                       )}
                     </List>
@@ -298,23 +284,22 @@ function WrappedClassificationInput({
                 {((isUser && c12nDef.original_definition.required.length !== 0) ||
                   (uParts.req.length !== 0 &&
                     c12nDef.original_definition.required.filter(r => !r.is_hidden).length !== 0)) && (
-                  <Grid item xs={12} md>
+                  <Grid size={{ xs: 12, md: 'grow' }}>
                     <Card variant="outlined">
                       <List disablePadding>
                         {c12nDef.original_definition.required.map(
                           (req, idx) =>
                             (isUser ||
                               ([req.name, req.short_name].some(r => uParts.req.includes(r)) && !req.is_hidden)) && (
-                              <ListItem
+                              <ListItemButton
                                 key={idx}
-                                button
                                 selected={
                                   validated.parts.req.includes(req.name) || validated.parts.req.includes(req.short_name)
                                 }
                                 onClick={() => toggleRequired(req)}
                               >
                                 <ListItemText style={{ textAlign: 'center' }} primary={req.name} />
-                              </ListItem>
+                              </ListItemButton>
                             )
                         )}
                       </List>
@@ -328,7 +313,7 @@ function WrappedClassificationInput({
                     c12nDef.original_definition.groups.filter(g => !g.is_hidden).length !== 0) ||
                   (uParts.subgroups.length !== 0 &&
                     c12nDef.original_definition.subgroups.filter(sg => !sg.is_hidden).length !== 0)) && (
-                  <Grid item xs={12} md>
+                  <Grid size={{ xs: 12, md: 'grow' }}>
                     {((isUser && (c12nDef.original_definition.groups.length !== 0 || c12nDef.dynamic_groups)) ||
                       (uParts.groups.length !== 0 &&
                         c12nDef.original_definition.groups.filter(g => !g.is_hidden).length !== 0)) && (
@@ -338,9 +323,8 @@ function WrappedClassificationInput({
                             {c12nDef.original_definition.groups
                               .filter(grp => isUser || !grp.is_hidden)
                               .map((grp, idx) => (
-                                <ListItem
+                                <ListItemButton
                                   key={idx}
-                                  button
                                   disabled={
                                     validated.disabled.groups.includes(grp.name) ||
                                     validated.disabled.groups.includes(grp.short_name)
@@ -355,13 +339,12 @@ function WrappedClassificationInput({
                                     style={{ textAlign: 'center' }}
                                     primary={applyAliases(grp.name, classificationAliases)}
                                   />
-                                </ListItem>
+                                </ListItemButton>
                               ))}
                             {c12nDef.dynamic_groups &&
                               ['email', 'all'].includes(c12nDef.dynamic_groups_type) &&
                               currentUser.email && (
-                                <ListItem
-                                  button
+                                <ListItemButton
                                   disabled={validated.disabled.groups.includes(dynGroup || currentUser.dynamic_group)}
                                   selected={validated.parts.groups.includes(dynGroup || currentUser.dynamic_group)}
                                   onClick={() =>
@@ -375,7 +358,7 @@ function WrappedClassificationInput({
                                     style={{ textAlign: 'center' }}
                                     primary={applyAliases(dynGroup || currentUser.dynamic_group, classificationAliases)}
                                   />
-                                </ListItem>
+                                </ListItemButton>
                               )}
                             {c12nDef.dynamic_groups &&
                               ['group', 'all'].includes(c12nDef.dynamic_groups_type) &&
@@ -390,9 +373,8 @@ function WrappedClassificationInput({
                                     )
                                 )
                                 .map((group, idx_group) => (
-                                  <ListItem
+                                  <ListItemButton
                                     key={idx_group}
-                                    button
                                     disabled={validated.disabled.groups.includes(group)}
                                     selected={validated.parts.groups.includes(group)}
                                     onClick={() =>
@@ -406,7 +388,7 @@ function WrappedClassificationInput({
                                       style={{ textAlign: 'center' }}
                                       primary={applyAliases(group, classificationAliases)}
                                     />
-                                  </ListItem>
+                                  </ListItemButton>
                                 ))}
                           </List>
                         </Card>
@@ -420,9 +402,8 @@ function WrappedClassificationInput({
                           {c12nDef.original_definition.subgroups
                             .filter(sgrp => isUser || !sgrp.is_hidden)
                             .map((sgrp, idx) => (
-                              <ListItem
+                              <ListItemButton
                                 key={idx}
-                                button
                                 selected={
                                   validated.parts.subgroups.includes(sgrp.name) ||
                                   validated.parts.subgroups.includes(sgrp.short_name)
@@ -430,7 +411,7 @@ function WrappedClassificationInput({
                                 onClick={() => toggleSubGroups(sgrp)}
                               >
                                 <ListItemText style={{ textAlign: 'center' }} primary={sgrp.name} />
-                              </ListItem>
+                              </ListItemButton>
                             ))}
                         </List>
                       </Card>
@@ -450,9 +431,15 @@ function WrappedClassificationInput({
     ) : (
       <Skeleton
         variant={type === 'text' ? 'text' : 'rectangular'}
-        className={inline ? classes.inlineSkel : null}
         height={type !== 'text' ? skelheight[size] : null}
-        style={{ borderRadius: theme.spacing(0.5) }}
+        style={{
+          borderRadius: theme.spacing(0.5),
+          ...(inline && {
+            display: 'inline-block',
+            width: '8rem',
+            verticalAlign: 'bottom'
+          })
+        }}
       />
     ))
   );

@@ -1,11 +1,6 @@
 import React from 'react';
+import type { Action, ReducerConfig, ReducersConfig, Store, StoreAction, StoreProviderProps } from '..';
 import {
-  Action,
-  ReducerConfig,
-  ReducersConfig,
-  Store,
-  StoreAction,
-  StoreProviderProps,
   useCellReducer,
   useCopyReducer,
   useCursorReducer,

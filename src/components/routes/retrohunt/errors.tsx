@@ -3,8 +3,7 @@ import WarningAmberOutlinedIcon from '@mui/icons-material/WarningAmberOutlined';
 import { AlertTitle, Divider, Grid, Pagination, Paper, Skeleton, Typography, useTheme } from '@mui/material';
 import LinearProgress from '@mui/material/LinearProgress';
 import TableContainer from '@mui/material/TableContainer';
-import makeStyles from '@mui/styles/makeStyles';
-import useAppUser from 'commons/components/app/hooks/useAppUser';
+import { useAppUser } from 'commons/components/app/hooks';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import type { Retrohunt } from 'components/models/base/retrohunt';
@@ -22,36 +21,6 @@ import InformativeAlert from 'components/visual/InformativeAlert';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-
-const useStyles = makeStyles(theme => ({
-  dialogTitle: {
-    display: 'flex',
-    flexDirection: 'row'
-  },
-  titleContainer: {
-    flex: 1
-  },
-  pagination: {
-    justifyContent: 'center'
-  },
-  searchBar: {
-    fontStyle: 'italic',
-    paddingTop: theme.spacing(0.5),
-    display: 'flex',
-    flexWrap: 'wrap',
-    justifyContent: 'flex-end'
-  },
-  title: {
-    fontWeight: 500,
-    marginRight: theme.spacing(0.5),
-    display: 'flex'
-  },
-  skeletonButton: {
-    height: '2.5rem',
-    width: '2.5rem',
-    margin: theme.spacing(0.5)
-  }
-}));
 
 const PAGE_SIZE = 10;
 
@@ -80,7 +49,6 @@ const DEFAULT_QUERY: string = Object.keys(DEFAULT_PARAMS)
 const WrappedRetrohuntErrors = ({ retrohunt = null, isDrawer = false }: Props) => {
   const { t } = useTranslation(['retrohunt']);
   const theme = useTheme();
-  const classes = useStyles();
   const { apiCall } = useMyAPI();
   const { configuration } = useALContext();
   const { user: currentUser } = useAppUser<CustomUser>();
@@ -95,15 +63,15 @@ const WrappedRetrohuntErrors = ({ retrohunt = null, isDrawer = false }: Props) =
       !retrohunt?.total_warnings || retrohunt?.total_warnings === 0
         ? null
         : retrohunt?.total_warnings === 1
-        ? `1 ${t('warning')}`
-        : `${retrohunt?.total_warnings} ${t('warnings')}`;
+          ? `1 ${t('warning')}`
+          : `${retrohunt?.total_warnings} ${t('warnings')}`;
 
     const errors =
       !retrohunt?.total_errors || retrohunt?.total_errors === 0
         ? null
         : retrohunt?.total_errors === 1
-        ? `1 ${t('error')}`
-        : `${retrohunt?.total_errors} ${t('errors')}`;
+          ? `1 ${t('error')}`
+          : `${retrohunt?.total_errors} ${t('errors')}`;
 
     return warnings && errors ? `${warnings} ${t('and')} ${errors}` : warnings ? warnings : errors ? errors : null;
   }, [retrohunt, t]);
@@ -148,11 +116,11 @@ const WrappedRetrohuntErrors = ({ retrohunt = null, isDrawer = false }: Props) =
 
   return (
     <>
-      <Grid item>
+      <Grid>
         <Typography variant="h6">{t('errors.view.title')}</Typography>
         <Divider />
       </Grid>
-      <Grid item>
+      <Grid>
         {!errorResults ? (
           <Skeleton variant="rectangular" style={{ height: '6rem', borderRadius: '4px' }} />
         ) : !('total' in errorResults) || errorResults.total === 0 ? (
@@ -164,7 +132,15 @@ const WrappedRetrohuntErrors = ({ retrohunt = null, isDrawer = false }: Props) =
           </div>
         ) : (
           <>
-            <div className={classes.searchBar}>
+            <div
+              style={{
+                fontStyle: 'italic',
+                paddingTop: theme.spacing(0.5),
+                display: 'flex',
+                flexWrap: 'wrap',
+                justifyContent: 'flex-end'
+              }}
+            >
               {totals && (
                 <Typography variant="subtitle1" color="secondary" style={{ flexGrow: 1 }}>
                   {totals}
@@ -177,9 +153,7 @@ const WrappedRetrohuntErrors = ({ retrohunt = null, isDrawer = false }: Props) =
                   count={pageCount}
                   shape="rounded"
                   size="small"
-                  classes={{
-                    ul: classes.pagination
-                  }}
+                  sx={{ justifyContent: 'center' }}
                 />
               )}
             </div>

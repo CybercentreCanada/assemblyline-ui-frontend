@@ -1,6 +1,6 @@
+import AppHexRoot from 'components/visual/HexViewer/app/appRoot';
 import React from 'react';
 import { AppStore } from '.';
-import AppHexRoot from './appRoot';
 
 export type DataProps = {
   data: string;

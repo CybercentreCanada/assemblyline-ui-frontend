@@ -17,7 +17,6 @@ import {
   Tooltip,
   useTheme
 } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import useALContext from 'components/hooks/useALContext';
 import useHighlighter from 'components/hooks/useHighlighter';
@@ -26,24 +25,24 @@ import type { Section, SectionItem } from 'components/models/base/result';
 import Attack from 'components/visual/Attack';
 import Classification from 'components/visual/Classification';
 import Heuristic from 'components/visual/Heuristic';
+import { GraphBody } from 'components/visual/ResultCard/graph_body';
+import { ImageBody } from 'components/visual/ResultCard/image_body';
+import { InvalidBody } from 'components/visual/ResultCard/invalid_body';
+import { JSONBody } from 'components/visual/ResultCard/json_body';
+import { KVBody } from 'components/visual/ResultCard/kv_body';
+import { MemDumpBody } from 'components/visual/ResultCard/memdump_body';
+import { MultiBody } from 'components/visual/ResultCard/multi_body';
+import { OrderedKVBody } from 'components/visual/ResultCard/ordered_kv_body';
+import { ProcessTreeBody } from 'components/visual/ResultCard/process_tree_body';
+import { TblBody } from 'components/visual/ResultCard/table_body';
+import { TextBody } from 'components/visual/ResultCard/text_body';
+import { TimelineBody } from 'components/visual/ResultCard/timeline_body';
+import { URLBody } from 'components/visual/ResultCard/url_body';
 import SectionHighlight from 'components/visual/SectionHighlight';
 import Tag from 'components/visual/Tag';
 import Verdict from 'components/visual/Verdict';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { GraphBody } from './graph_body';
-import { ImageBody } from './image_body';
-import { InvalidBody } from './invalid_body';
-import { JSONBody } from './json_body';
-import { KVBody } from './kv_body';
-import { MemDumpBody } from './memdump_body';
-import { MultiBody } from './multi_body';
-import { OrderedKVBody } from './ordered_kv_body';
-import { ProcessTreeBody } from './process_tree_body';
-import { TblBody } from './table_body';
-import { TextBody } from './text_body';
-import { TimelineBody } from './timeline_body';
-import { URLBody } from './url_body';
 
 const CLIPBOARD_ICON = <AssignmentOutlinedIcon style={{ marginRight: '16px' }} />;
 const HEURISTIC_ICON = <SimCardOutlinedIcon style={{ marginRight: '16px' }} />;
@@ -61,31 +60,9 @@ const ATTACK_ICON = (
       fontSize: '1.125rem'
     }}
   >
-    {'[&]'}
+    [&]
   </span>
 );
-
-const useStyles = makeStyles(theme => ({
-  section_title: {
-    display: 'flex',
-    alignItems: 'center',
-    '&:hover': {
-      backgroundColor: theme.palette.action.hover,
-      cursor: 'pointer'
-    },
-    minHeight: theme.spacing(4.5),
-    marginLeft: theme.spacing(-1),
-    padding: theme.spacing(0.25, 0, 0.25, 1),
-    borderRadius: theme.spacing(0.5)
-  },
-  printable_section_title: {
-    display: 'flex',
-    alignItems: 'center'
-  },
-  muted: {
-    color: theme.palette.text.secondary
-  }
-}));
 
 type Props = {
   section: Section;
@@ -109,7 +86,6 @@ const WrappedResultSection: React.FC<Props> = ({
   force = false
 }) => {
   const { t } = useTranslation(['fileDetail']);
-  const classes = useStyles();
   const theme = useTheme();
   const { c12nDef } = useALContext();
   const { copy } = useClipboard();
@@ -206,7 +182,7 @@ const WrappedResultSection: React.FC<Props> = ({
   }, [showHeur, handleClose]);
 
   const handleMenuCopy = useCallback(() => {
-    copy(typeof section.body === 'string' ? section.body : JSON.stringify(section.body, undefined, 2), 'clipID');
+    copy(typeof section.body === 'string' ? section.body : JSON.stringify(section.body, undefined, 2));
     handleClose();
   }, [copy, handleClose, section.body]);
 
@@ -319,7 +295,25 @@ const WrappedResultSection: React.FC<Props> = ({
         )}
 
         <div style={{ width: `calc(100% - ${!nested ? 8 : 0}px)` }}>
-          <Box className={printable ? classes.printable_section_title : classes.section_title} onClick={handleClick}>
+          <Box
+            onClick={handleClick}
+            sx={
+              printable
+                ? { display: 'flex', alignItems: 'center' }
+                : {
+                    display: 'flex',
+                    alignItems: 'center',
+                    '&:hover': {
+                      backgroundColor: theme.palette.action.hover,
+                      cursor: 'pointer'
+                    },
+                    minHeight: theme.spacing(4.5),
+                    marginLeft: theme.spacing(-1),
+                    padding: theme.spacing(0.25, 0, 0.25, 1),
+                    borderRadius: theme.spacing(0.5)
+                  }
+            }
+          >
             {c12nDef.enforce && !printable && (
               <>
                 <Classification c12n={section.classification} type="text" />
@@ -389,14 +383,18 @@ const WrappedResultSection: React.FC<Props> = ({
                               alignItems: 'center'
                             }}
                           >
-                            {'[&]'}
+                            [&]
                           </span>
                         </IconButton>
                       </Tooltip>
                     )}
                 </div>
                 {!printable &&
-                  (open ? <ExpandLess className={classes.muted} /> : <ExpandMore className={classes.muted} />)}
+                  (open ? (
+                    <ExpandLess sx={{ color: theme.palette.text.secondary }} />
+                  ) : (
+                    <ExpandMore sx={{ color: theme.palette.text.secondary }} />
+                  ))}
               </>
             )}
           </Box>

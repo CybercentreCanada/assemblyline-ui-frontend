@@ -74,7 +74,6 @@ export default function OTP({ setDrawerOpen, set2FAEnabled }: OTPProps) {
           {response ? (
             <div
               style={{ backgroundColor: 'white' }}
-              // eslint-disable-next-line react/no-danger
               dangerouslySetInnerHTML={{
                 __html: response.qrcode
               }}

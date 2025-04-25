@@ -1,4 +1,4 @@
-import ListScroller from 'commons/addons/lists/scrollers/ListScroller';
+import type ListScroller from 'commons/addons/lists/scrollers/ListScroller';
 import { isArrowDown, isArrowUp, isEnter, isEscape } from 'commons/addons/utils/keyboard';
 import Throttler from 'commons/addons/utils/throttler';
 import { useCallback, useEffect, useMemo, useState } from 'react';

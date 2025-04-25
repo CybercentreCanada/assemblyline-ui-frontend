@@ -1,5 +1,5 @@
 import { Alert, Collapse, styled, useMediaQuery, useTheme } from '@mui/material';
-import useAppBanner from 'commons/components/app/hooks/useAppBanner';
+import { useAppBanner } from 'commons/components/app/hooks';
 import PageCenter from 'commons/components/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -11,15 +11,8 @@ import {
   loadDefaultProfile,
   loadSubmissionProfile
 } from 'components/routes/settings/settings.utils';
-import type { SubmitStore } from 'components/routes/submit/submit.form';
-import { useForm } from 'components/routes/submit/submit.form';
-import { TabContainer } from 'components/visual/TabContainer';
-import { getSubmitType } from 'helpers/utils';
-import React, { useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useLocation } from 'react-router';
-import { ServiceParameters } from './components/ServiceParameters';
-import { SubmissionData } from './components/SubmissionData';
+import { ServiceParameters } from 'components/routes/submit/components/ServiceParameters';
+import { SubmissionData } from 'components/routes/submit/components/SubmissionData';
 import {
   AdjustButton,
   AnalyzeSubmission,
@@ -34,11 +27,21 @@ import {
   MaliciousInput,
   SubmissionProfileInput,
   ToS
-} from './components/SubmissionInputs';
-import { SubmissionMetadata } from './components/SubmissionMetadata';
-import { SubmissionOptions } from './components/SubmissionOptions';
-import type { SubmitState } from './submit.form';
-import { getDefaultExternalSources, getPreferredSubmissionProfile, isValidJSON } from './submit.utils';
+} from 'components/routes/submit/components/SubmissionInputs';
+import { SubmissionMetadata } from 'components/routes/submit/components/SubmissionMetadata';
+import { SubmissionOptions } from 'components/routes/submit/components/SubmissionOptions';
+import type { SubmitState, SubmitStore } from 'components/routes/submit/submit.form';
+import { useForm } from 'components/routes/submit/submit.form';
+import {
+  getDefaultExternalSources,
+  getPreferredSubmissionProfile,
+  isValidJSON
+} from 'components/routes/submit/submit.utils';
+import { TabContainer } from 'components/visual/TabContainer';
+import { getSubmitType } from 'helpers/utils';
+import React, { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useLocation } from 'react-router';
 
 type AdjustProps = {
   adjust: boolean;

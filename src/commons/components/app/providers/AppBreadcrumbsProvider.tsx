@@ -1,11 +1,11 @@
-import useAppConfigs from 'commons/components/app/hooks/useAppConfigs';
-import useAppSitemap, { BreadcrumbItem, getRoute } from 'commons/components/app/hooks/useAppSitemap';
+import { AppStorageKeys } from 'commons/components/app/AppConstants';
+import { type BreadcrumbItem, getRoute, useAppSitemap } from 'commons/components/app/hooks/useAppSitemap';
 import useLocalStorageItem from 'commons/components/utils/hooks/useLocalStorageItem';
-import { createContext, ReactNode, useEffect, useMemo, useState } from 'react';
+import { type ReactNode, useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router';
-import { AppStorageKeys } from '../AppConstants';
-import { AppBreadcrumbsContextType } from '../AppContexts';
-import useAppUser from '../hooks/useAppUser';
+
+import { AppBreadcrumbsContext } from 'commons/components/app/AppContexts';
+import { useAppConfigs, useAppUser } from 'commons/components/app/hooks';
 
 const { LS_KEY_BREADCRUMBS_ENABLED } = AppStorageKeys;
 
@@ -13,9 +13,7 @@ type AppBreadcrumbsProviderProps = {
   children: ReactNode;
 };
 
-export const AppBreadcrumbsContext = createContext<AppBreadcrumbsContextType>(null);
-
-export default function AppBreadcrumbsProvider({ children }: AppBreadcrumbsProviderProps) {
+const DefaultAppBreadcrumbsProvider = ({ children }: AppBreadcrumbsProviderProps) => {
   const { pathname } = useLocation();
   const { sitemap, preferences } = useAppConfigs();
   const user = useAppUser();
@@ -52,4 +50,17 @@ export default function AppBreadcrumbsProvider({ children }: AppBreadcrumbsProvi
     };
   }, [preferences.allowBreadcrumbs, show, items, setShow]);
   return <AppBreadcrumbsContext.Provider value={context}>{children}</AppBreadcrumbsContext.Provider>;
-}
+};
+
+const AppBreadcrumbsProvider = ({ children }: AppBreadcrumbsProviderProps) => {
+  const { overrides } = useAppConfigs();
+  const _breadcrumbs = overrides?.providers?.breadcrumbs?.provider;
+
+  if (_breadcrumbs) {
+    return <_breadcrumbs>{children}</_breadcrumbs>;
+  }
+
+  return <DefaultAppBreadcrumbsProvider>{children}</DefaultAppBreadcrumbsProvider>;
+};
+
+export default AppBreadcrumbsProvider;

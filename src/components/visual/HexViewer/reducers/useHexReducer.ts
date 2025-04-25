@@ -1,15 +1,6 @@
 import { useCallback } from 'react';
-import {
-  HEX_STATE,
-  isAction,
-  parseDataToHexcodeMap,
-  ReducerHandler,
-  Reducers,
-  setStore,
-  setStoreWithKeys,
-  singleCharacterString,
-  UseReducer
-} from '..';
+import type { ReducerHandler, Reducers, UseReducer } from '..';
+import { HEX_STATE, isAction, parseDataToHexcodeMap, setStore, setStoreWithKeys, singleCharacterString } from '..';
 
 export const useHexReducer: UseReducer = () => {
   const hexDataChange: Reducers['appLoad'] = useCallback((store, { data }) => {

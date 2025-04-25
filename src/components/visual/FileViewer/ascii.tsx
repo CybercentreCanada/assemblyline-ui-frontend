@@ -1,9 +1,18 @@
 import AssistantOutlinedIcon from '@mui/icons-material/AssistantOutlined';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import { Alert, Button, CircularProgress, Grid, LinearProgress, Tooltip, useMediaQuery, useTheme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
-import useAppUser from 'commons/components/app/hooks/useAppUser';
+import {
+  Alert,
+  Button,
+  CircularProgress,
+  Grid,
+  LinearProgress,
+  styled,
+  Tooltip,
+  useMediaQuery,
+  useTheme
+} from '@mui/material';
+import { useAppUser } from 'commons/components/app/hooks';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import type { CustomUser } from 'components/models/ui/user';
@@ -14,47 +23,48 @@ import type { editor } from 'monaco-editor';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-const useStyles = makeStyles(theme => ({
-  aiButton: {
-    height: '100%',
-    minWidth: theme.spacing(6),
-    padding: `${theme.spacing(2)} ${theme.spacing(1)}`,
-    borderColor: theme.palette.divider,
-    borderRadius: 0,
-    alignItems: 'flex-start',
-    borderLeftWidth: '0px'
-  },
-  code: {
-    display: 'flex',
-    flexDirection: 'column',
-    backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#FFF',
-    border: `1px solid ${theme.palette.divider}`,
-    color: theme.palette.mode === 'dark' ? theme.palette.text.secondary : theme.palette.text.primary,
-    padding: theme.spacing(2),
-    textAlign: 'left',
-    whiteSpace: 'normal',
-    overflowY: 'auto',
-    borderLeftWidth: '0px',
-    wordBreak: 'break-word',
-    position: 'absolute',
-    top: 0,
-    bottom: 0,
-    right: 0,
-    left: 0
-  },
-  spinner: {
-    textAlign: 'center',
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)'
-  },
-  watermark: {
-    float: 'right',
-    color: theme.palette.text.disabled,
-    fontSize: 'smaller',
-    cursor: 'pointer'
-  }
+const AIButton = styled(Button)(({ theme }) => ({
+  height: '100%',
+  minWidth: theme.spacing(6),
+  padding: `${theme.spacing(2)} ${theme.spacing(1)}`,
+  borderColor: theme.palette.divider,
+  borderRadius: 0,
+  alignItems: 'flex-start',
+  borderLeftWidth: '0px'
+}));
+
+const Code = styled('div')(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#FFF',
+  border: `1px solid ${theme.palette.divider}`,
+  color: theme.palette.mode === 'dark' ? theme.palette.text.secondary : theme.palette.text.primary,
+  padding: theme.spacing(2),
+  textAlign: 'left',
+  whiteSpace: 'normal',
+  overflowY: 'auto',
+  borderLeftWidth: '0px',
+  wordBreak: 'break-word',
+  position: 'absolute',
+  top: 0,
+  bottom: 0,
+  right: 0,
+  left: 0
+}));
+
+const Spinner = styled('div')(({ theme }) => ({
+  textAlign: 'center',
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)'
+}));
+
+const Watermark = styled('div')(({ theme }) => ({
+  float: 'right',
+  color: theme.palette.text.disabled,
+  fontSize: 'smaller',
+  cursor: 'pointer'
 }));
 
 type Props = {
@@ -76,7 +86,6 @@ const WrappedASCIISection: React.FC<Props> = ({
 }) => {
   const { t, i18n } = useTranslation(['fileViewer']);
   const theme = useTheme();
-  const classes = useStyles();
   const { apiCall } = useMyAPI();
   const { showErrorMessage, closeSnackbar } = useMySnackbar();
   const { user: currentUser } = useAppUser<CustomUser>();
@@ -167,7 +176,7 @@ const WrappedASCIISection: React.FC<Props> = ({
   else
     return (
       <Grid container style={{ flexGrow: 1 }}>
-        <Grid item flexGrow={1} style={{ display: 'flex' }}>
+        <Grid flexGrow={1} style={{ display: 'flex' }}>
           <MonacoEditor
             value={data}
             language={LANGUAGE_SELECTOR[type]}
@@ -177,16 +186,16 @@ const WrappedASCIISection: React.FC<Props> = ({
         </Grid>
         {codeAllowed && isMdUp && (
           <>
-            <Grid item flexGrow={showCodeSummary ? 0.5 : 0}>
+            <Grid flexGrow={showCodeSummary ? 0.5 : 0}>
               <div style={{ position: 'relative', height: '100%' }}>
                 {showCodeSummary && (
-                  <div className={classes.code}>
+                  <Code>
                     <div style={{ flexGrow: 1, marginTop: !analysing && !codeError ? theme.spacing(-2) : null }}>
                       {analysing ? (
-                        <div className={classes.spinner}>
+                        <Spinner>
                           <div style={{ paddingBottom: theme.spacing(2) }}>{t('analysing_code')}</div>
                           <CircularProgress variant="indeterminate" />
-                        </div>
+                        </Spinner>
                       ) : codeError ? (
                         <Alert severity="error" style={{ marginTop: theme.spacing(2) }}>
                           {codeError}
@@ -198,31 +207,24 @@ const WrappedASCIISection: React.FC<Props> = ({
                     {!analysing && (codeSummary || codeError) && (
                       <div>
                         <Tooltip title={t('powered_by_ai.tooltip')} placement="top-end">
-                          <div className={classes.watermark} onClick={() => getCodeSummary(true)}>
-                            {t('powered_by_ai')}
-                          </div>
+                          <Watermark onClick={() => getCodeSummary(true)}>{t('powered_by_ai')}</Watermark>
                         </Tooltip>
                       </div>
                     )}
-                  </div>
+                  </Code>
                 )}
               </div>
             </Grid>
-            <Grid item style={{ minWidth: theme.spacing(6), height: '100%' }}>
+            <Grid style={{ minWidth: theme.spacing(6), height: '100%' }}>
               <Tooltip title={t(`${showCodeSummary ? 'hide' : 'show'}_analyse_code`)} placement="top">
-                <Button
-                  onClick={() => setShowCodeSummary(!showCodeSummary)}
-                  variant="outlined"
-                  className={classes.aiButton}
-                  color="inherit"
-                >
+                <AIButton onClick={() => setShowCodeSummary(!showCodeSummary)} variant="outlined" color="inherit">
                   <div style={{ display: 'flex', flexDirection: 'column' }}>
                     <AssistantOutlinedIcon color="action" />
                     <div style={{ paddingTop: theme.spacing(2) }}>
                       {showCodeSummary ? <ChevronRightIcon color="action" /> : <ChevronLeftIcon color="action" />}
                     </div>
                   </div>
-                </Button>
+                </AIButton>
               </Tooltip>
             </Grid>
           </>

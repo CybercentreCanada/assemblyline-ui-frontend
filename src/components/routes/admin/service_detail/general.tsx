@@ -19,11 +19,11 @@ import FormControl from '@mui/material/FormControl';
 import InputAdornment from '@mui/material/InputAdornment';
 import useALContext from 'components/hooks/useALContext';
 import type { Service, ServiceConstants } from 'components/models/base/service';
+import ResetButton from 'components/routes/admin/service_detail/reset_button';
 import Classification from 'components/visual/Classification';
 import type { Dispatch, SetStateAction } from 'react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import ResetButton from './reset_button';
 
 type ServiceGeneralProps = {
   service: Service;
@@ -69,8 +69,6 @@ const ServiceGeneral = ({
       return;
     }
     setInstancesError(false);
-
-    // eslint-disable-next-line
   }, [service.min_instances, service.licence_count]);
 
   if (!constants || !defaults || !service || !serviceNames || !versions) {
@@ -79,7 +77,7 @@ const ServiceGeneral = ({
     return (
       <div>
         <Grid container spacing={2}>
-          <Grid item xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Typography variant="subtitle2">{t('general.name')}</Typography>
             {service ? (
               <TextField fullWidth size="small" margin="dense" variant="outlined" disabled value={service.name} />
@@ -87,7 +85,7 @@ const ServiceGeneral = ({
               <Skeleton style={{ height: '2.5rem' }} />
             )}
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Typography variant="subtitle2">
               {t('general.version')}
               <ResetButton
@@ -144,7 +142,7 @@ const ServiceGeneral = ({
             />
           </Grid>
           {c12nDef.enforce && (
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <Typography variant="subtitle2">
                 {t('general.classification')}
                 <ResetButton
@@ -168,7 +166,7 @@ const ServiceGeneral = ({
             </Grid>
           )}
           {c12nDef.enforce && (
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <Typography variant="subtitle2">
                 {t('general.result_classification')}
                 <ResetButton
@@ -191,7 +189,7 @@ const ServiceGeneral = ({
               />
             </Grid>
           )}
-          <Grid item xs={12}>
+          <Grid size={{ xs: 12 }}>
             <Typography variant="subtitle2">
               {t('general.description')}
               <ResetButton
@@ -222,7 +220,7 @@ const ServiceGeneral = ({
               <Skeleton style={{ height: '2.5rem' }} />
             )}
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Typography variant="subtitle2">
               {t('general.stage')}
               <ResetButton
@@ -263,7 +261,7 @@ const ServiceGeneral = ({
               <Skeleton style={{ height: '2.5rem' }} />
             )}
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Typography variant="subtitle2">
               {t('general.category')}
               <ResetButton
@@ -304,7 +302,7 @@ const ServiceGeneral = ({
               <Skeleton style={{ height: '2.5rem' }} />
             )}
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Typography variant="subtitle2">
               {t('general.accept')}
               <ResetButton
@@ -333,7 +331,7 @@ const ServiceGeneral = ({
               <Skeleton style={{ height: '2.5rem' }} />
             )}
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Typography variant="subtitle2">
               {t('general.reject')}
               <ResetButton
@@ -362,7 +360,7 @@ const ServiceGeneral = ({
               <Skeleton style={{ height: '2.5rem' }} />
             )}
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Typography variant="subtitle2">
               {t('general.recursion_prevention')}
               <ResetButton
@@ -418,7 +416,7 @@ const ServiceGeneral = ({
             )}
           </Grid>
 
-          <Grid item xs={12} sm={4}>
+          <Grid size={{ xs: 12, sm: 4 }}>
             <Typography variant="subtitle2" noWrap>
               {t('general.timeout')}
               <ResetButton
@@ -449,7 +447,7 @@ const ServiceGeneral = ({
               <Skeleton style={{ height: '2.5rem' }} />
             )}
           </Grid>
-          <Grid item xs={12} sm={4}>
+          <Grid size={{ xs: 12, sm: 4 }}>
             <Typography variant="subtitle2" noWrap>
               {t('general.instances')}
               <ResetButton
@@ -467,7 +465,7 @@ const ServiceGeneral = ({
               />
             </Typography>
             <Grid container spacing={theme.spacing(1)}>
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 {service ? (
                   <TextField
                     fullWidth
@@ -480,7 +478,7 @@ const ServiceGeneral = ({
                     error={instancesError}
                     InputProps={{
                       inputProps: { min: 0, ...(service.licence_count && { max: service.licence_count }) },
-                      endAdornment: <InputAdornment position="end">{'↓'}</InputAdornment>
+                      endAdornment: <InputAdornment position="end">↓</InputAdornment>
                     }}
                     onChange={e => {
                       const value = Number(e.target.value);
@@ -495,7 +493,7 @@ const ServiceGeneral = ({
                   <Skeleton style={{ height: '2.5rem' }} />
                 )}
               </Grid>
-              <Grid item xs={12} sm={6}>
+              <Grid size={{ xs: 12, sm: 6 }}>
                 {service ? (
                   <TextField
                     fullWidth
@@ -508,7 +506,7 @@ const ServiceGeneral = ({
                     error={instancesError}
                     InputProps={{
                       inputProps: { min: 0 },
-                      endAdornment: <InputAdornment position="end">{'↑'}</InputAdornment>
+                      endAdornment: <InputAdornment position="end">↑</InputAdornment>
                     }}
                     onChange={e => {
                       const value = Number(e.target.value);
@@ -527,7 +525,7 @@ const ServiceGeneral = ({
               </Grid>
             </Grid>
           </Grid>
-          <Grid item xs={12} sm={4}>
+          <Grid size={{ xs: 12, sm: 4 }}>
             <Typography variant="subtitle2" noWrap>
               {t('general.max_queue_length')}
               <ResetButton
@@ -560,7 +558,7 @@ const ServiceGeneral = ({
             )}
             <Typography variant="caption">{t('general.max_queue_length.desc')}</Typography>
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Typography variant="subtitle2">
               {t('general.location')}
               <ResetButton
@@ -588,7 +586,7 @@ const ServiceGeneral = ({
               <Skeleton style={{ height: '2.5rem' }} />
             )}
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Typography variant="subtitle2">
               {t('general.caching')}
               <ResetButton

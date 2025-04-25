@@ -1,41 +1,43 @@
-import type { TableBodyProps, TableCellProps, TableHeadProps, TableProps, TableRowProps, Theme } from '@mui/material';
-import { Link as MaterialLink, Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel } from '@mui/material';
-import createStyles from '@mui/styles/createStyles';
-import withStyles from '@mui/styles/withStyles';
+import type { TableBodyProps, TableCellProps, TableHeadProps, TableProps, TableRowProps } from '@mui/material';
+import {
+  Link as MaterialLink,
+  styled,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableRow,
+  TableSortLabel
+} from '@mui/material';
 import type SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import React from 'react';
 import type { To } from 'react-router';
-import { useNavigate } from 'react-router';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router';
 
-const StyledTableCell = withStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      paddingRight: theme.spacing(1),
-      paddingLeft: theme.spacing(1)
-    },
-    head: {
-      backgroundColor: 'rgba(0, 0, 0, 5%)',
-      whiteSpace: 'nowrap'
-    }
-  })
-)(TableCell);
+const StyledTableCell = styled(TableCell)(({ theme }) => ({
+  ['&.MuiTableCell-root']: {
+    paddingRight: theme.spacing(1),
+    paddingLeft: theme.spacing(1)
+  },
+  ['&.MuiTableCell-head']: {
+    backgroundColor: 'rgba(0, 0, 0, 5%)',
+    whiteSpace: 'nowrap'
+  }
+}));
 
-const BreakableTableCell = withStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      paddingRight: theme.spacing(1),
-      paddingLeft: theme.spacing(1),
-      [theme.breakpoints.up('md')]: {
-        wordBreak: 'break-word'
-      }
-    },
-    head: {
-      backgroundColor: 'rgba(0, 0, 0, 5%)',
-      whiteSpace: 'nowrap'
+const BreakableTableCell = styled(TableCell)(({ theme }) => ({
+  ['&.MuiTableCell-root']: {
+    paddingRight: theme.spacing(1),
+    paddingLeft: theme.spacing(1),
+    [theme.breakpoints.up('md')]: {
+      wordBreak: 'break-word'
     }
-  })
-)(TableCell);
+  },
+  ['&.MuiTableCell-head']: {
+    backgroundColor: 'rgba(0, 0, 0, 5%)',
+    whiteSpace: 'nowrap'
+  }
+}));
 
 interface CellProps extends TableCellProps {
   children?: React.ReactNode;

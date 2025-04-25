@@ -1,13 +1,14 @@
 import { FormControl, Grid, TextField, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
-import { default as React, memo, PropsWithChildren } from 'react';
+import type { PropsWithChildren } from 'react';
+import { memo, default as React } from 'react';
 
 export type OutlinedFieldProps = {
   label?: string;
   description?: string;
-  items?: Array<{
+  items?: {
     value: number;
     label: string;
-  }>;
+  }[];
   value?: string;
   onChange?: (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement | any>) => void;
 };
@@ -24,12 +25,12 @@ export const WrappedOutlinedField = ({
 
   return (
     <>
-      <Grid item sm={4} xs={12} style={{ wordBreak: 'break-word' }}>
+      <Grid size={{ xs: 12, sm: 4 }} style={{ wordBreak: 'break-word' }}>
         <Tooltip title={description} placement={upSM ? 'right' : 'bottom-start'}>
           <Typography variant="subtitle2">{label}</Typography>
         </Tooltip>
       </Grid>
-      <Grid item sm={8} xs={12} style={{ textAlign: 'right' }}>
+      <Grid size={{ xs: 12, sm: 8 }} style={{ textAlign: 'right' }}>
         <FormControl style={{ width: '100%' }}>
           <TextField
             variant="outlined"

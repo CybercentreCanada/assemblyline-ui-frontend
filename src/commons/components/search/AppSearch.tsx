@@ -9,43 +9,47 @@ import {
   IconButton,
   Popper,
   Slide,
+  Stack,
   styled,
   Tooltip,
   useMediaQuery,
   useTheme
 } from '@mui/material';
 
-import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
+import { useAppSearchService } from 'commons/components/app/hooks/useAppSearchService';
+import AppSearchInput from 'commons/components/search/AppSearchInput';
+import AppSearchResult from 'commons/components/search/AppSearchResult';
 import { parseEvent } from 'commons/components/utils/keyboard';
-import type { ChangeEvent, KeyboardEvent } from 'react';
-import { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
+import { type ChangeEvent, forwardRef, type KeyboardEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import useAppSearchService from '../app/hooks/useAppSearchService';
-import AppSearchInput from './AppSearchInput';
-import AppSearchResult from './AppSearchResult';
 
 const MENU_LIST_SX = { maxHeight: 500, overflow: 'auto' };
 
-const AppSearchRoot = styled(Box, { shouldForwardProp: prop => prop !== 'menuOpen' })<{ menuOpen: boolean }>(
-  ({ theme, menuOpen }) => {
-    const backgroundColor = emphasize(theme.palette.background.default, theme.palette.mode === 'dark' ? 0.1 : 0.033);
-    return {
-      position: 'relative',
-      borderRadius: theme.shape.borderRadius,
-      '.app-search-input': {
-        backgroundColor: backgroundColor,
-        boxShadow: menuOpen && theme.shadows[4]
-      },
-      '.app-search-result': {
-        backgroundColor: theme.palette.mode === 'dark' ? backgroundColor : theme.palette.background.default,
-        borderBottomLeftRadius: theme.shape.borderRadius,
-        borderBottomRightRadius: theme.shape.borderRadius,
-        boxShadow: menuOpen && theme.shadows[4],
-        color: theme.palette.text.primary
-      }
-    };
-  }
-);
+const AppSearchRoot = styled(Box, { shouldForwardProp: prop => prop !== 'menuOpen' })<{ menuOpen: boolean }>(({
+  theme,
+  menuOpen
+}) => {
+  const backgroundColor = emphasize(theme.palette.background.default, 0.1);
+  return {
+    position: 'relative',
+    borderRadius: theme.shape.borderRadius,
+    borderBottomLeftRadius: menuOpen && 0,
+    borderBottomRightRadius: menuOpen && 0,
+
+    '.app-search-input': {
+      backgroundColor:
+        theme.palette.mode === 'dark' ? backgroundColor : menuOpen ? theme.palette.background.default : backgroundColor,
+      boxShadow: menuOpen && theme.shadows[4]
+    },
+    '.app-search-result': {
+      backgroundColor: theme.palette.mode === 'dark' ? backgroundColor : theme.palette.background.default,
+      borderBottomLeftRadius: theme.shape.borderRadius,
+      borderBottomRightRadius: theme.shape.borderRadius,
+      boxShadow: menuOpen && theme.shadows[4],
+      color: theme.palette.text.primary
+    }
+  };
+});
 
 const ModalTransition = forwardRef(function Transition(props: any, ref: any) {
   const { children, ..._props } = props;
@@ -59,17 +63,18 @@ const ModalTransition = forwardRef(function Transition(props: any, ref: any) {
 export default function AppSearch() {
   const theme = useTheme();
   const menuRef = useRef<HTMLDivElement>(null);
-  const isPhoneMode = useMediaQuery(theme.breakpoints.only('xs'));
-  const isTabletMode = useMediaQuery(theme.breakpoints.only('sm'));
+  const showSearchIcon = useMediaQuery(theme.breakpoints.down('lg'));
   const { t } = useTranslation();
   const { provided, state, service } = useAppSearchService();
   const [value, setValue] = useState<string>('');
+  // const [fullscreen, setFullscreen] = useState<boolean>(false);
 
-  useEffectOnce(() => {
+  useEffect(() => {
     if (service.onMounted) {
       service.onMounted(setValue, state);
     }
-  });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // keyboard[window] handler.
   // this is to trigger the CTLR+K shortcut to appsearch.
@@ -79,8 +84,10 @@ export default function AppSearch() {
       if (isCtrl && key === 'k') {
         event.preventDefault();
         const inputRef = menuRef.current.querySelector('input');
-        if (!inputRef || isPhoneMode) {
-          state.set({ ...state, menu: state.menu || isPhoneMode, mode: 'fullscreen' });
+        if (provided && !inputRef) {
+          state.set({ ...state, menu: !state.menu, mode: 'fullscreen' });
+        } else if (provided && state.menu) {
+          state.set({ ...state, mode: 'fullscreen' });
         } else {
           inputRef.focus();
         }
@@ -90,16 +97,12 @@ export default function AppSearch() {
     return () => {
       window.removeEventListener('keydown', keyHandler);
     };
-  }, [provided, isPhoneMode, state]);
+  }, [provided, state]);
 
   // Search input focus handler.
   const onFocus = useCallback(() => {
-    state.set({ ...state, menu: true, focused: true });
-  }, [state]);
-
-  // Search input focus handler.
-  const onBlur = useCallback(() => {
-    state.set({ ...state, focused: false });
+    // state.setMenu(!!state?.items && state.items.length > 0);
+    state.set({ ...state, menu: true });
   }, [state]);
 
   // Search input change handler.
@@ -116,18 +119,7 @@ export default function AppSearch() {
   // keyboard[ENTER] handler.
   const onEnter = useCallback(() => {
     if (service.onEnter) {
-      if (state.autoReset) {
-        const inputRef = menuRef.current.querySelector('input');
-        let newFocus = true;
-        if (inputRef) {
-          inputRef.blur();
-          newFocus = false;
-        }
-        state.set({ ...state, menu: false, mode: 'inline', focused: newFocus });
-        setValue('');
-      } else {
-        state.set({ ...state, menu: true });
-      }
+      state.set({ ...state, menu: true });
       service.onEnter(value, state);
     }
   }, [value, state, service]);
@@ -135,12 +127,11 @@ export default function AppSearch() {
   // Keyboard handler.
   const onKeyDown = useCallback(
     (event: KeyboardEvent<HTMLElement>) => {
-      const { isEnter, isEscape, isTab, isArrowDown } = parseEvent(event);
+      const { isEnter, isEscape, isArrowDown } = parseEvent(event);
       if (isEnter) {
         onEnter();
-      } else if (isEscape || isTab) {
-        setTimeout(() => menuRef.current.querySelector('input')?.blur(), 50);
-        state.set({ ...state, menu: false });
+      } else if (isEscape) {
+        state.set({ ...state, menu: !state.menu });
       } else if (isArrowDown) {
         const result = document.querySelector('[data-tui-id="tui-app-search-result"]') as HTMLElement;
         if (result) {
@@ -163,31 +154,31 @@ export default function AppSearch() {
 
   // Fullscreen modal toggle handler.
   const onToggleFullscreen = useCallback(() => {
-    state.set({
-      ...state,
-      menu: state.menu || isPhoneMode,
-      mode: state.mode === 'inline' ? 'fullscreen' : 'inline'
-    });
-  }, [isPhoneMode, state]);
+    state.set({ ...state, mode: state.mode === 'inline' ? 'fullscreen' : 'inline' });
+  }, [state]);
 
   return (
     <ClickAwayListener onClickAway={() => state.set({ ...state, menu: false })}>
-      <AppSearchRoot
-        ref={menuRef}
-        sx={{ mr: !isPhoneMode && 1, display: 'flex', flexGrow: 1, justifyContent: 'flex-end' }}
-        menuOpen={state.menu}
-      >
-        {isPhoneMode ? (
-          <IconButton color="inherit" size="large" onClick={onToggleFullscreen}>
-            <Tooltip title={t('app.search.fullscreen')}>
+      <AppSearchRoot ref={menuRef} sx={{ mr: !showSearchIcon && 1 }} menuOpen={state.menu}>
+        {showSearchIcon ? (
+          <IconButton
+            color="inherit"
+            size="large"
+            onClick={() => state.set({ ...state, menu: !state.menu, mode: 'fullscreen' })}
+          >
+            <Tooltip
+              title={
+                <Stack direction="column" textAlign="center">
+                  <span>{t('app.search.fullscreen')}</span> <span>CTLR+K</span>
+                </Stack>
+              }
+            >
               <Search />
             </Tooltip>
           </IconButton>
         ) : (
           <>
             <AppSearchInput
-              autoFocus={false}
-              focused={state.focused}
               showToggle
               provided={provided}
               className="app-search-input"
@@ -195,12 +186,10 @@ export default function AppSearch() {
               searching={state.searching}
               open={state.menu}
               onFocus={onFocus}
-              onBlur={onBlur}
               onChange={onChange}
               onKeyDown={onKeyDown}
               onClear={onClear}
-              minWidth={isTabletMode ? '100%' : '250px'}
-              maxWidth={isTabletMode ? '100%' : '350px'}
+              onToggleFullscreen={onToggleFullscreen}
             />
             {provided && (
               <Popper
@@ -231,20 +220,17 @@ export default function AppSearch() {
           }}
           PaperProps={{
             sx: {
-              borderRadius: 0,
+              borderTopLeftRadius: 0,
+              borderTopRightRadius: 0,
               margin: 0,
               width: '100%'
             }
           }}
         >
-          <DialogTitle
-            sx={{
-              padding: theme.spacing(1, 1.5)
-            }}
-          >
+          <DialogTitle>
             <AppSearchInput
+              // eslint-disable-next-line jsx-a11y/no-autofocus
               autoFocus
-              focused={state.focused}
               className="app-search-input"
               style={{ backgroundColor: emphasize(theme.palette.background.default, 0.1) }}
               showToggle={false}
@@ -252,10 +238,10 @@ export default function AppSearch() {
               searching={state.searching}
               open={false}
               onFocus={onFocus}
-              onBlur={onBlur}
               onChange={onChange}
               onKeyDown={onKeyDown}
               onClear={onClear}
+              onToggleFullscreen={onToggleFullscreen}
             />
           </DialogTitle>
           {provided && state.items && (

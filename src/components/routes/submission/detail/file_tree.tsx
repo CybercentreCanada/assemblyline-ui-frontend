@@ -4,41 +4,15 @@ import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { Box, Button, Collapse, Divider, IconButton, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import useHighlighter from 'components/hooks/useHighlighter';
 import useSafeResults from 'components/hooks/useSafeResults';
 import type { SubmissionTree, Tree } from 'components/models/ui/submission';
 import Verdict from 'components/visual/Verdict';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router';
 
 const MAX_FILE_COUNT = 500;
-
-const useStyles = makeStyles(theme => ({
-  file_item: {
-    cursor: 'pointer',
-    '&:hover, &:focus': {
-      backgroundColor: theme.palette.action.hover
-    },
-    flexGrow: 1,
-    width: '100%',
-    all: 'unset'
-  },
-  title: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    cursor: 'pointer',
-    '&:hover, &:focus': {
-      color: theme.palette.text.secondary
-    }
-  },
-  noMaxWidth: {
-    maxWidth: 'none'
-  }
-}));
 
 const isVisible = (curItem, forcedShown, isHighlighted, showSafeResults) =>
   (curItem.score < 0 && !showSafeResults) ||
@@ -59,9 +33,8 @@ const WrappedFileTreeSection: React.FC<FileTreeSectionProps> = ({ tree, sid, bas
   const { t } = useTranslation(['submissionDetail']);
   const [open, setOpen] = React.useState(true);
   const theme = useTheme();
-  const classes = useStyles();
   const sp2 = theme.spacing(2);
-  const [forcedShown, setForcedShown] = React.useState<Array<string>>([]);
+  const [forcedShown, setForcedShown] = React.useState<string[]>([]);
 
   useEffect(() => {
     if (baseFiles && forcedShown.length === 0) {
@@ -77,7 +50,15 @@ const WrappedFileTreeSection: React.FC<FileTreeSectionProps> = ({ tree, sid, bas
         onClick={() => {
           setOpen(!open);
         }}
-        className={classes.title}
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          cursor: 'pointer',
+          '&:hover, &:focus': {
+            color: theme.palette.text.secondary
+          }
+        }}
       >
         <span>{t('tree')}</span>
         {open ? <ExpandLess /> : <ExpandMore />}
@@ -105,13 +86,12 @@ type FileTreeProps = {
   tree: SubmissionTree['tree'];
   sid: string;
   force: boolean;
-  defaultForceShown: Array<string>;
+  defaultForceShown: string[];
 };
 
 const WrappedFileTree: React.FC<FileTreeProps> = ({ tree, sid, defaultForceShown, force = false }) => {
   const { t } = useTranslation(['submissionDetail']);
   const theme = useTheme();
-  const classes = useStyles();
   const navigate = useNavigate();
   const { isHighlighted } = useHighlighter();
   const { showSafeResults } = useSafeResults();
@@ -170,16 +150,23 @@ const WrappedFileTree: React.FC<FileTreeProps> = ({ tree, sid, defaultForceShown
               <span style={{ marginLeft: theme.spacing(3) }} />
             )}
             <Box
-              className={classes.file_item}
               component={item.sha256 ? Link : 'span'}
               to={`/file/detail/${item.sha256}`}
               onClick={e => {
                 e.preventDefault();
                 if (item.sha256) navigate(`/submission/detail/${sid}/${item.sha256}?name=${encodeURI(item.name[0])}`);
               }}
-              style={{
+              sx={{
+                cursor: 'pointer',
+                flexGrow: 1,
+                width: '100%',
+                color: 'inherit',
+                textDecoration: 'none',
                 wordBreak: 'break-word',
-                backgroundColor: isHighlighted(sha256) ? (theme.palette.mode === 'dark' ? '#343a44' : '#d8e3ea') : null
+                backgroundColor: isHighlighted(sha256) ? (theme.palette.mode === 'dark' ? '#343a44' : '#d8e3ea') : null,
+                '&:hover, &:focus': {
+                  backgroundColor: theme.palette.action.hover
+                }
               }}
             >
               <div style={{ display: 'flex' }}>

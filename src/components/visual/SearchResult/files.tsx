@@ -6,10 +6,6 @@ import useALContext from 'components/hooks/useALContext';
 import type { FileIndexed } from 'components/models/base/file';
 import type { SearchResult } from 'components/models/ui/search';
 import Classification from 'components/visual/Classification';
-import Moment from 'components/visual/Moment';
-import React from 'react';
-import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
 import {
   DivTable,
   DivTableBody,
@@ -18,8 +14,12 @@ import {
   DivTableRow,
   LinkRow,
   SortableHeaderCell
-} from '../DivTable';
-import InformativeAlert from '../InformativeAlert';
+} from 'components/visual/DivTable';
+import InformativeAlert from 'components/visual/InformativeAlert';
+import Moment from 'components/visual/Moment';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router';
 
 type Props = {
   fileResults: SearchResult<FileIndexed>;

@@ -18,7 +18,7 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import useAppUser from 'commons/components/app/hooks/useAppUser';
+import { useAppUser } from 'commons/components/app/hooks';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useALContext from 'components/hooks/useALContext';
@@ -30,6 +30,7 @@ import type { CustomUser } from 'components/models/ui/user';
 import ServiceDetail from 'components/routes/admin/service_detail';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import FileDownloader from 'components/visual/FileDownloader';
+import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import type { JSONFeedItem } from 'components/visual/Notification/useNotificationFeed';
 import { useNotificationFeed } from 'components/visual/Notification/useNotificationFeed';
 import ServiceTable from 'components/visual/SearchResult/service';
@@ -387,99 +388,103 @@ export default function Services() {
           </Button>
         </DialogActions>
       </Dialog>
-      <Grid container alignItems="center" spacing={3}>
-        <Grid item xs>
-          <Typography variant="h4">{t('title')}</Typography>
-        </Grid>
-        <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
-          <div style={{ display: 'flex', marginBottom: theme.spacing(1), justifyContent: 'flex-end' }}>
-            <Tooltip
-              PopperProps={{
-                disablePortal: true
+
+      <PageHeader
+        primary={t('title')}
+        actions={[
+          <Tooltip
+            key="add"
+            PopperProps={{
+              disablePortal: true
+            }}
+            disableInteractive
+            title={t('add')}
+          >
+            <IconButton
+              style={{
+                color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark
               }}
-              disableInteractive
-              title={t('add')}
+              onClick={() => setOpen(true)}
+              size="large"
             >
+              <AddCircleOutlineIcon />
+            </IconButton>
+          </Tooltip>,
+          <Tooltip
+            key="update"
+            PopperProps={{
+              disablePortal: true
+            }}
+            disableInteractive
+            title={
+              updates && Object.values(updates).some((srv: any) => srv.update_available && !srv.updating)
+                ? t('update_all')
+                : t('update_none')
+            }
+          >
+            <span>
               <IconButton
-                style={{
-                  color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark
-                }}
-                onClick={() => setOpen(true)}
+                color="primary"
+                onClick={updateAll}
+                disabled={!updates || !Object.values(updates).some((srv: any) => srv.update_available && !srv.updating)}
                 size="large"
               >
-                <AddCircleOutlineIcon />
+                <SystemUpdateAltIcon />
               </IconButton>
-            </Tooltip>
-            <Tooltip
-              PopperProps={{
-                disablePortal: true
-              }}
-              disableInteractive
-              title={
-                updates && Object.values(updates).some((srv: any) => srv.update_available && !srv.updating)
-                  ? t('update_all')
-                  : t('update_none')
-              }
-            >
-              <span>
-                <IconButton
-                  color="primary"
-                  onClick={updateAll}
-                  disabled={
-                    !updates || !Object.values(updates).some((srv: any) => srv.update_available && !srv.updating)
-                  }
-                  size="large"
-                >
-                  <SystemUpdateAltIcon />
-                </IconButton>
-              </span>
-            </Tooltip>
-            <Tooltip
-              PopperProps={{
-                disablePortal: true
-              }}
-              disableInteractive
-              title={
-                availableServices &&
-                availableServices.length > 0 &&
-                availableServices.some(s => !installingServices?.includes(s?.summary))
-                  ? t('install_all')
-                  : t('install_none')
-              }
-            >
-              <span>
-                <IconButton
-                  color="primary"
-                  onClick={() => onInstallServices(availableServices)}
-                  disabled={
-                    !availableServices ||
-                    availableServices.length === 0 ||
-                    availableServices.every(s => installingServices?.includes(s?.summary))
-                  }
-                  size="large"
-                >
-                  <CloudDownloadOutlinedIcon />
-                </IconButton>
-              </span>
-            </Tooltip>
-            <FileDownloader icon={<GetAppOutlinedIcon />} link={`/api/v4/service/backup/`} tooltip={t('backup')} />
-            <Tooltip
-              PopperProps={{
-                disablePortal: true
-              }}
-              disableInteractive
-              title={t('restore')}
-            >
-              <IconButton onClick={() => setOpenRestore(true)} size="large">
-                <RestoreOutlinedIcon />
+            </span>
+          </Tooltip>,
+          <Tooltip
+            key="available"
+            PopperProps={{
+              disablePortal: true
+            }}
+            disableInteractive
+            title={
+              availableServices &&
+              availableServices.length > 0 &&
+              availableServices.some(s => !installingServices?.includes(s?.summary))
+                ? t('install_all')
+                : t('install_none')
+            }
+          >
+            <span>
+              <IconButton
+                color="primary"
+                onClick={() => onInstallServices(availableServices)}
+                disabled={
+                  !availableServices ||
+                  availableServices.length === 0 ||
+                  availableServices.every(s => installingServices?.includes(s?.summary))
+                }
+                size="large"
+              >
+                <CloudDownloadOutlinedIcon />
               </IconButton>
-            </Tooltip>
-          </div>
-        </Grid>
-      </Grid>
+            </span>
+          </Tooltip>,
+          <FileDownloader
+            key="file_downloader"
+            icon={<GetAppOutlinedIcon />}
+            link="/api/v4/service/backup/"
+            tooltip={t('backup')}
+          />,
+          <Tooltip
+            key="restore"
+            PopperProps={{
+              disablePortal: true
+            }}
+            disableInteractive
+            title={t('restore')}
+          >
+            <IconButton onClick={() => setOpenRestore(true)} size="large">
+              <RestoreOutlinedIcon />
+            </IconButton>
+          </Tooltip>
+        ]}
+      />
 
       <Grid container alignItems="center" spacing={3}>
-        <Grid item xs>
+        <Grid size="grow">
           <Typography variant="h5">{t('title.loaded')}</Typography>
           {serviceResults ? (
             <Typography variant="caption" component="p">{`${serviceResults.length} ${t('count')}`}</Typography>
@@ -493,12 +498,12 @@ export default function Services() {
       </div>
 
       <Grid container alignItems="center" spacing={3} style={{ marginTop: theme.spacing(2) }}>
-        <Grid item xs>
+        <Grid size="grow">
           <Typography variant="h5">{t('title.available')}</Typography>
           {availableServices ? (
-            <Typography variant="caption" component="p">{`${availableServices.length} ${t(
-              'count.available'
-            )}`}</Typography>
+            <Typography variant="caption" component="p">
+              {`${availableServices.length} ${t('count.available')}`}
+            </Typography>
           ) : (
             <Skeleton width="8rem" />
           )}
@@ -513,12 +518,12 @@ export default function Services() {
       </div>
 
       <Grid container alignItems="center" spacing={3} style={{ marginTop: theme.spacing(2) }}>
-        <Grid item xs>
+        <Grid size="grow">
           <Typography variant="h5">{t('title.available.community')}</Typography>
           {availableCommunityServices ? (
-            <Typography variant="caption" component="p">{`${availableCommunityServices.length} ${t(
-              'count.available.community'
-            )}`}</Typography>
+            <Typography variant="caption" component="p">
+              {`${availableCommunityServices.length} ${t('count.available.community')}`}
+            </Typography>
           ) : (
             <Skeleton width="8rem" />
           )}

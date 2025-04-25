@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
-import { getType, isAction, MODE_STATE, ReducerHandler, Reducers, setStore, setStoreWithKeys, UseReducer } from '..';
+import type { ReducerHandler, Reducers, UseReducer } from '..';
+import { getType, isAction, MODE_STATE, setStore, setStoreWithKeys } from '..';
 
 export const useModeReducer: UseReducer = () => {
   const appModeThemeChange: Reducers['appModeThemeChange'] = useCallback(

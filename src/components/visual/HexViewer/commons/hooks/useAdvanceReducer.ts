@@ -1,9 +1,9 @@
 import React, { useEffect } from 'react';
 
-//tracked, untracked forced, update
+// tracked, untracked forced, update
 export type Dispatch<Action> = { type: Action | any; payload: any; tracked?: boolean; repeat?: boolean };
 
-type NonObject = null | Array<any> | Date | Map<any, any>;
+type NonObject = null | any[] | Date | Map<any, any>;
 type IsObject<O> = O extends NonObject ? never : O extends object ? (keyof O extends never ? never : O) : never;
 type Value<O, P> = IsObject<O> extends never ? never : P extends keyof O ? O[P] : never;
 type PartialR<T> = {
@@ -27,7 +27,7 @@ const isObject = (data: any, empty: boolean = true): boolean => {
   else return true;
 };
 
-const getValueFromPath = (obj: any, path: Array<string>): any => {
+const getValueFromPath = (obj: any, path: string[]): any => {
   let current = obj;
   if (obj === undefined || obj === null) return null;
   for (let i = 0; i < path.length; ++i) {
@@ -50,12 +50,7 @@ const updateObject = (first: any, second: any): any => {
       : first;
 };
 
-const applySubObject = (
-  origin: any,
-  value: any,
-  path: Array<string>,
-  method: (origin: any, value: any) => any
-): any => {
+const applySubObject = (origin: any, value: any, path: string[], method: (origin: any, value: any) => any): any => {
   if (path !== null && path.length === 0) return method(origin, value);
   else if (isObject(origin) && Object.keys(origin).includes(path[0])) {
     const obj = Object.fromEntries([[path[0], applySubObject(origin[path[0]], value, [...path.slice(1)], method)]]);
@@ -79,8 +74,8 @@ export const useAdvanceReducer = <State, Action>(
   const delayRef = React.useRef<number>(delay);
   const actionRef = React.useRef<Dispatch<Action>>(null);
   const lastActionRef = React.useRef<Action | string>(null);
-  const changeRef = React.useRef<{ data: any; path: Array<string>; tracked?: boolean; repeat?: boolean }>(null);
-  const lastChangeRef = React.useRef<{ data: any; path: Array<string> }>(null);
+  const changeRef = React.useRef<{ data: any; path: string[]; tracked?: boolean; repeat?: boolean }>(null);
+  const lastChangeRef = React.useRef<{ data: any; path: string[] }>(null);
 
   const timeout = React.useRef(null);
 
@@ -101,7 +96,7 @@ export const useAdvanceReducer = <State, Action>(
     actionRef.current = null;
   }, []);
 
-  const change = React.useCallback(<T extends any>(data: T, path: Array<string>) => {
+  const change = React.useCallback(<T extends any>(data: T, path: string[]) => {
     nextStateRef.current = applySubObject(nextStateRef.current, data, path, updateObject);
     changeRef.current = null;
   }, []);
@@ -157,7 +152,7 @@ export const useAdvanceReducer = <State, Action>(
   );
 
   const changeCallback = React.useCallback(
-    <T extends any>(path: Array<string>) =>
+    <T extends any>(path: string[]) =>
       (input: T | ((data: T) => T), tracked = true, repeat = true): void => {
         const newPath = [...path.slice(1)];
         const inputData =
@@ -180,8 +175,8 @@ export const useAdvanceReducer = <State, Action>(
   );
 
   const updateCallback = React.useCallback(
-    (data: any, path: Array<string> = []) => {
-      let newElements: Array<[number | string | symbol, any]> = [];
+    (data: any, path: string[] = []) => {
+      const newElements: [number | string | symbol, any][] = [];
       Object.keys(data).forEach(key => {
         newElements.push([`set${key.charAt(0).toUpperCase() + key.slice(1)}`, changeCallback([...path, key])]);
         if (isObject(data[key])) newElements.push([key, updateCallback(data[key], [...path, key])]);

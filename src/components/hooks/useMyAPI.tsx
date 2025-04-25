@@ -1,11 +1,11 @@
+import useALContext from 'components/hooks/useALContext';
+import useMySnackbar from 'components/hooks/useMySnackbar';
+import type { WhoAmIProps } from 'components/hooks/useMyUser';
+import useQuota from 'components/hooks/useQuota';
 import type { Configuration } from 'components/models/base/config';
 import { getFileName } from 'helpers/utils';
 import getXSRFCookie from 'helpers/xsrf';
 import { useTranslation } from 'react-i18next';
-import useALContext from './useALContext';
-import useMySnackbar from './useMySnackbar';
-import type { WhoAmIProps } from './useMyUser';
-import useQuota from './useQuota';
 
 const DEFAULT_RETRY_MS = 32;
 
@@ -129,7 +129,6 @@ const useMyAPI = (): UseMyAPIReturn => {
         api_status_code: 400
       }))
       .then((api_data: APIResponseProps<unknown>) => {
-        // eslint-disable-next-line no-prototype-builtins
         if (!isAPIData(api_data)) {
           // We got no response
           showErrorMessage(t('api.invalid'), 30000);
@@ -269,7 +268,6 @@ const useMyAPI = (): UseMyAPIReturn => {
         if (onExit) onExit();
 
         // Check Api response validity
-        // eslint-disable-next-line no-prototype-builtins
         if (!isAPIData(api_data)) {
           showErrorMessage(t('api.invalid'));
           return;
@@ -409,7 +407,6 @@ const useMyAPI = (): UseMyAPIReturn => {
         if (onExit) onExit();
 
         // Check Api response validity
-        // eslint-disable-next-line no-prototype-builtins
         if (!isAPIData(api_data)) {
           showErrorMessage(t('api.invalid'));
           return;

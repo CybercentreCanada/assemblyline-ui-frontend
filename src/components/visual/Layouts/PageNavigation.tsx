@@ -21,8 +21,8 @@ import {
   useTheme
 } from '@mui/material';
 import React, { useMemo, useState } from 'react';
-import type { LinkProps } from 'react-router-dom';
-import { Link } from 'react-router-dom';
+import type { LinkProps } from 'react-router';
+import { Link } from 'react-router';
 
 type PageNavigationDrawerProps = {
   children?: React.ReactNode;
@@ -225,16 +225,16 @@ export const PageNavigation: React.FC<PageNavigationProps> = React.memo(
           {loading
             ? null
             : !Array.isArray(options)
-            ? children
-            : options.map((option, i) =>
-                !renderItem ? (
-                  <PageNavigationItem key={i} variant={variant} onPageNavigation={onPageNavigation} {...option} />
-                ) : (
-                  renderItem(option, i, props => (
-                    <PageNavigationItem key={i} variant={variant} onPageNavigation={onPageNavigation} {...props} />
-                  ))
-                )
-              )}
+              ? children
+              : options.map((option, i) =>
+                  !renderItem ? (
+                    <PageNavigationItem key={i} variant={variant} onPageNavigation={onPageNavigation} {...option} />
+                  ) : (
+                    renderItem(option, i, props => (
+                      <PageNavigationItem key={i} variant={variant} onPageNavigation={onPageNavigation} {...props} />
+                    ))
+                  )
+                )}
         </List>
       </PageNavigationDrawer>
     )

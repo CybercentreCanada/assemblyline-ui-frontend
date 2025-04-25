@@ -6,43 +6,16 @@ import SourceIcon from '@mui/icons-material/Source';
 import StarIcon from '@mui/icons-material/Star';
 import type { ChipProps, MenuItemProps } from '@mui/material';
 import { ListItemIcon, ListItemText, Menu, MenuItem, useTheme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
-import clsx from 'clsx';
 import type { AlertSearchParams } from 'components/routes/alerts';
+import type { Favorite } from 'components/routes/alerts/components/Favorites';
+import type { Option } from 'components/routes/alerts/components/Filters';
+import { GROUPBY_OPTIONS, SORT_OPTIONS, TC_OPTIONS } from 'components/routes/alerts/components/Filters';
 import { useAlerts } from 'components/routes/alerts/contexts/AlertsContext';
 import CustomChip from 'components/visual/CustomChip';
 import Moment from 'components/visual/Moment';
 import type { ReactNode } from 'react';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { Favorite } from './Favorites';
-import type { Option } from './Filters';
-import { GROUPBY_OPTIONS, SORT_OPTIONS, TC_OPTIONS } from './Filters';
-
-const useStyles = makeStyles(theme => ({
-  desc: {
-    transform: 'rotate(0deg)',
-    transition: theme.transitions.create('transform', {
-      easing: theme.transitions.easing.easeInOut,
-      duration: theme.transitions.duration.shortest
-    })
-  },
-  asc: {
-    transform: 'rotate(180deg)'
-  },
-  deleteIcon: {
-    fontSize: 'large !important',
-    color: `${theme.palette.text.primary} !important`
-  },
-  icon: {
-    marginLeft: `${theme.spacing(0.5)} !important`
-  },
-  other: {
-    '&>.MuiChip-icon': {
-      marginLeft: `${theme.spacing(0.5)} !important`
-    }
-  }
-}));
 
 type Filter = {
   value: string;
@@ -62,7 +35,7 @@ type MenuFilterProps = {
   param: string;
   visible: boolean;
   disabled: boolean;
-  classes?: ChipProps['classes'];
+  sx?: ChipProps['sx'];
   variant?: ChipProps['variant'];
   size?: ChipProps['size'] | 'tiny';
 
@@ -87,7 +60,6 @@ const MenuFilter: React.FC<MenuFilterProps> = React.memo(
     param = null,
     visible = true,
     disabled = false,
-    classes = null,
     variant = 'outlined',
     size = 'small',
     icon = null,
@@ -95,6 +67,7 @@ const MenuFilter: React.FC<MenuFilterProps> = React.memo(
     options = [],
     style = null,
     disableCloseOnSelect = false,
+    sx = null,
 
     getLabel = null,
     getSelected = null,
@@ -112,7 +85,6 @@ const MenuFilter: React.FC<MenuFilterProps> = React.memo(
     return !visible || param === null || param === undefined ? null : (
       <div ref={ref}>
         <CustomChip
-          classes={classes}
           variant={variant}
           label={getLabel(param)}
           size={size}
@@ -121,6 +93,7 @@ const MenuFilter: React.FC<MenuFilterProps> = React.memo(
           style={{ minHeight: '25px', ...style }}
           onClick={disabled ? null : () => setOpen(o => !o)}
           onDelete={!deleteIcon || disabled ? null : event => onDelete(event)}
+          sx={sx}
         />
         <Menu
           anchorEl={ref.current}
@@ -165,7 +138,6 @@ const WrappedAlertFiltersSelected = ({
 }: Props) => {
   const { t } = useTranslation('alerts');
   const theme = useTheme();
-  const classes = useStyles();
   const alertValues = useAlerts();
 
   const allFavorites = useMemo<Favorite[]>(
@@ -209,8 +181,8 @@ const WrappedAlertFiltersSelected = ({
           filter.filter !== f
             ? f
             : filter.not
-            ? f.replace(`NOT(${filter.value})`, filter.value)
-            : f.replace(filter.value, `NOT(${filter.value})`)
+              ? f.replace(`NOT(${filter.value})`, filter.value)
+              : f.replace(filter.value, `NOT(${filter.value})`)
         )
       }));
     },
@@ -261,9 +233,24 @@ const WrappedAlertFiltersSelected = ({
       )}
 
       <MenuFilter
-        classes={{
-          icon: classes.icon,
-          deleteIcon: clsx(classes.deleteIcon, classes.desc, search.sort && search.sort.endsWith('asc') && classes.asc)
+        sx={{
+          '&>.MuiChip-icon': {
+            marginLeft: `${theme.spacing(0.5)} !important`
+          },
+          '&>.MuiChip-deleteIcon': {
+            fontSize: 'large !important',
+            color: `${theme.palette.text.primary} !important`,
+            transform: 'rotate(0deg)',
+            transition: theme.transitions.create('transform', {
+              easing: theme.transitions.easing.easeInOut,
+              duration: theme.transitions.duration.shortest
+            }),
+
+            ...(search.sort &&
+              search.sort.endsWith('asc') && {
+                transform: 'rotate(180deg)'
+              })
+          }
         }}
         getLabel={item => (
           <div style={{ display: 'flex', flexDirection: 'row', gap: theme.spacing(0.5), alignItems: 'center' }}>
@@ -275,8 +262,18 @@ const WrappedAlertFiltersSelected = ({
         getListItemIcon={option =>
           search.sort.startsWith(option.value) && (
             <ArrowDownwardIcon
-              className={clsx(classes.desc, search.sort.endsWith('asc') && classes.asc)}
               fontSize="small"
+              sx={{
+                transform: 'rotate(0deg)',
+                transition: theme.transitions.create('transform', {
+                  easing: theme.transitions.easing.easeInOut,
+                  duration: theme.transitions.duration.shortest
+                }),
+
+                ...(search.sort.endsWith('asc') && {
+                  transform: 'rotate(180deg)'
+                })
+              }}
             />
           )
         }
@@ -308,7 +305,6 @@ const WrappedAlertFiltersSelected = ({
       />
 
       <MenuFilter
-        classes={{ icon: classes.icon }}
         getLabel={() => {
           const option = GROUPBY_OPTIONS.find(o => o.value === search.group_by);
           return option && option.value !== ''
@@ -324,10 +320,14 @@ const WrappedAlertFiltersSelected = ({
         options={GROUPBY_OPTIONS}
         style={{ minHeight: '25px' }}
         onClick={(_, option) => handleChange(v => ({ ...v, group_by: option.value }))}
+        sx={{
+          '&>.MuiChip-icon': {
+            marginLeft: `${theme.spacing(0.5)} !important`
+          }
+        }}
       />
 
       <MenuFilter
-        classes={{ icon: classes.icon }}
         getLabel={() => {
           const option = TC_OPTIONS.find(o => o.value === search.tc);
           return option && option.value !== '' ? `${t('tc')}: ${t(option.label)}` : `${t('tc')}: ${t('none')}`;
@@ -341,11 +341,15 @@ const WrappedAlertFiltersSelected = ({
         options={TC_OPTIONS}
         style={{ minHeight: '25px' }}
         onClick={(_, option) => handleChange(v => ({ ...v, tc: option.value }))}
+        sx={{
+          '&>.MuiChip-icon': {
+            marginLeft: `${theme.spacing(0.5)} !important`
+          }
+        }}
       />
 
       {visible.includes('tc_start') && search.tc_start && (
         <CustomChip
-          classes={{ icon: classes.icon }}
           variant="outlined"
           size="small"
           wrap
@@ -366,12 +370,16 @@ const WrappedAlertFiltersSelected = ({
                     return v;
                   })
           }
+          sx={{
+            '&>.MuiChip-icon': {
+              marginLeft: `${theme.spacing(0.5)} !important`
+            }
+          }}
         />
       )}
 
       {visible.includes('timerange') && search.tc_start && (
         <CustomChip
-          classes={{ icon: classes.icon }}
           variant="outlined"
           size="small"
           wrap
@@ -416,13 +424,17 @@ const WrappedAlertFiltersSelected = ({
               })()}
             </div>
           }
+          sx={{
+            '&>.MuiChip-icon': {
+              marginLeft: `${theme.spacing(0.5)} !important`
+            }
+          }}
         />
       )}
 
       {filters.favorites.map((favorite, i) => (
         <CustomChip
           key={`${favorite.filter}-${i}`}
-          className={classes.other}
           variant="outlined"
           size="small"
           wrap
@@ -441,13 +453,18 @@ const WrappedAlertFiltersSelected = ({
           tooltip={
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               <div style={{ fontStyle: 'normal' }}>{favorite.query}</div>
-              <div
-                style={{ placeSelf: 'flex-end', color: theme.palette.text.secondary }}
-              >{`(${favorite.created_by})`}</div>
+              <div style={{ placeSelf: 'flex-end', color: theme.palette.text.secondary }}>
+                {`(${favorite.created_by})`}
+              </div>
             </div>
           }
           onClick={disabled ? null : () => handleQueryChange(favorite)}
           onDelete={disabled ? null : () => handleQueryRemove(favorite)}
+          sx={{
+            '&>.MuiChip-icon': {
+              marginLeft: `${theme.spacing(0.5)} !important`
+            }
+          }}
         />
       ))}
 
@@ -496,7 +513,6 @@ const WrappedAlertFiltersSelected = ({
       {filters.others.map((other, i) => (
         <CustomChip
           key={`${other.filter}-${i}`}
-          className={classes.other}
           variant="outlined"
           size="small"
           wrap
@@ -505,6 +521,11 @@ const WrappedAlertFiltersSelected = ({
           label={other.value}
           onClick={disabled ? null : () => handleQueryChange(other)}
           onDelete={disabled ? null : () => handleQueryRemove(other)}
+          sx={{
+            '&>.MuiChip-icon': {
+              marginLeft: `${theme.spacing(0.5)} !important`
+            }
+          }}
         />
       ))}
     </div>

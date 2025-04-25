@@ -6,7 +6,7 @@ import {
   isEnter,
   isEscape
 } from 'commons/components/utils/keyboard';
-import { KeyboardEvent } from 'react';
+import type { KeyboardEvent } from 'react';
 
 export const isArrowKey = (event: KeyboardEvent) =>
   isArrowLeft(event.key) || isArrowRight(event.key) || isArrowUp(event.key) || isArrowDown(event.key);

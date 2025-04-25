@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import type { ReducerHandler, Reducers, Store, UseReducer } from '..';
 import {
   COLUMNS,
   getRowFoldingMap,
@@ -7,11 +8,7 @@ import {
   isAction,
   isType,
   LAYOUT_STATE,
-  ReducerHandler,
-  Reducers,
-  setStore,
-  Store,
-  UseReducer
+  setStore
 } from '..';
 
 export const useLayoutReducer: UseReducer = () => {
@@ -23,8 +20,8 @@ export const useLayoutReducer: UseReducer = () => {
         folding: { active: foldingActive }
       } = store.layout;
 
-      const newColumnSize = handleLayoutColumnResize2(store, width as number);
-      const newRowSize = handleLayoutRowResize(height as number);
+      const newColumnSize = handleLayoutColumnResize2(store, width);
+      const newRowSize = handleLayoutRowResize(height);
       const ColumnSize = columnAuto ? newColumnSize : Math.min(newColumnSize, maxColumns);
       const RowSize = rowAuto && isType.mode.body(store, 'table') ? newRowSize : Math.min(newRowSize, maxRows);
       const foldingRows = foldingActive ? getRowFoldingMap(store, ColumnSize) : new Map();
@@ -33,7 +30,7 @@ export const useLayoutReducer: UseReducer = () => {
         ...store,
         layout: {
           ...store.layout,
-          display: { ...store.layout.display, width: width as number, height: height as number },
+          display: { ...store.layout.display, width: width, height: height },
           column: { ...store.layout.column, size: ColumnSize },
           row: { ...store.layout.row, size: RowSize },
           folding: { ...store.layout.folding, rows: foldingRows }
@@ -82,7 +79,7 @@ export const useLayoutReducer: UseReducer = () => {
 
   const settingAutoColumnChange: Reducers['settingAutoColumnChange'] = useCallback(store => {
     const { width = 1 } = document.getElementById('hex-viewer')?.getBoundingClientRect();
-    const newColumnSize = handleLayoutColumnResize2(store, width as number);
+    const newColumnSize = handleLayoutColumnResize2(store, width);
     return setStore.store.setting.layout.Column(store, store.setting.layout.column, data => ({
       auto: !data.auto,
       max: data.auto ? data.max : newColumnSize
@@ -91,7 +88,7 @@ export const useLayoutReducer: UseReducer = () => {
 
   const settingLoad: Reducers['settingLoad'] = useCallback(
     store => {
-      let newStore = setStore.store.Layout(store, store.setting.storage.data?.layout, data => {
+      const newStore = setStore.store.Layout(store, store.setting.storage.data?.layout, data => {
         const maxColumn =
           data?.column?.max === undefined || !COLUMNS.map(c => c.columns).includes(data?.column?.max)
             ? undefined
@@ -114,7 +111,7 @@ export const useLayoutReducer: UseReducer = () => {
 
   const settingSave: Reducers['settingSave'] = useCallback(
     store => {
-      let newStore = setStore.store.Layout(store, store.setting.layout);
+      const newStore = setStore.store.Layout(store, store.setting.layout);
       const { height = 1, width = 1 } = document.getElementById('hex-viewer')?.getBoundingClientRect();
       return handleResize(newStore, { height, width });
     },
@@ -123,7 +120,7 @@ export const useLayoutReducer: UseReducer = () => {
 
   const settingReset: Reducers['settingReset'] = useCallback(store => {
     const { width = 1 } = document.getElementById('hex-viewer')?.getBoundingClientRect();
-    const newColumnSize = handleLayoutColumnResize2(store, width as number);
+    const newColumnSize = handleLayoutColumnResize2(store, width);
     return setStore.store.setting.Layout(store, LAYOUT_STATE.layout, data => ({
       column: { auto: data?.column?.auto, max: newColumnSize },
       folding: { active: data?.folding?.active }

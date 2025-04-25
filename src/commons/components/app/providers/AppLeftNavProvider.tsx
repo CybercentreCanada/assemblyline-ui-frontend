@@ -1,18 +1,15 @@
-import useAppConfigs from 'commons/components/app/hooks/useAppConfigs';
 import useLocalStorageItem from 'commons/components/utils/hooks/useLocalStorageItem';
-import type { ReactNode } from 'react';
-import { createContext, useCallback, useMemo, useState } from 'react';
-import type { AppLeftNavElement } from '../AppConfigs';
-import { AppStorageKeys } from '../AppConstants';
-import type { AppLeftNavContextType } from '../AppContexts';
+import { type ReactNode, useCallback, useMemo, useState } from 'react';
+import { type AppLeftNavElement } from 'commons/components/app/AppConfigs';
+import { AppStorageKeys } from 'commons/components/app/AppConstants';
+import { AppLeftNavContext } from 'commons/components/app/AppContexts';
+import { useAppConfigs } from 'commons/components/app/hooks';
 
 const { LS_KEY_LEFTNAV_OPEN } = AppStorageKeys;
 
 type LeftNavProviderProps = {
   children: ReactNode;
 };
-
-export const AppLeftNavContext = createContext<AppLeftNavContextType>(null);
 
 export default function AppLeftNavProvider({ children }: LeftNavProviderProps) {
   const { preferences } = useAppConfigs();
@@ -23,12 +20,11 @@ export default function AppLeftNavProvider({ children }: LeftNavProviderProps) {
     () => ({
       open,
       elements: elements || preferences.leftnav.elements,
-      hideNestedIcons: preferences.leftnav.hideNestedIcons,
       setOpen,
       setElements,
       toggle
     }),
-    [open, elements, preferences.leftnav.elements, preferences.leftnav.hideNestedIcons, setOpen, toggle]
+    [open, elements, preferences.leftnav.elements, setOpen, toggle]
   );
   return <AppLeftNavContext.Provider value={context}>{children}</AppLeftNavContext.Provider>;
 }

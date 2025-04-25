@@ -1,6 +1,6 @@
 import type { AppSwitcherItem } from 'commons/components/app/AppConfigs';
-import type { ServiceSelection } from './submission';
-import type { ACL, Role, Type } from './user';
+import type { ServiceSelection } from 'components/models/base/submission';
+import type { ACL, Role, Type } from 'components/models/base/user';
 
 export const API_PRIV = ['READ', 'READ_WRITE', 'WRITE', 'CUSTOM', 'EXTENDED'] as const;
 export const AUTO_PROPERTY_TYPES = ['access', 'classification', 'type', 'role', 'remove_role', 'group'];
@@ -304,7 +304,7 @@ export type UI = {
   allow_zip_downloads: boolean;
 
   /** Proxy requests to the configured API target and add headers */
-  api_proxies: { [proxy: string]: any };
+  api_proxies: Record<string, any>;
 
   /** Hogwarts App data */
   apps: AppSwitcherItem[];
@@ -313,7 +313,7 @@ export type UI = {
   audit: boolean;
 
   /** Banner message display on the main page (format: {<language_code>: message}) */
-  banner: { [language: string]: string };
+  banner: Record<string, string>;
 
   /** Banner message level */
   banner_level: BannerLevel;
@@ -331,10 +331,10 @@ export type UI = {
   enforce_quota: boolean;
 
   /** List of external pivot links */
-  external_links: Record<ExternalLinkType, { [key: string]: ExternalLink }>;
+  external_links: Record<ExternalLinkType, Record<string, ExternalLink>>;
 
   /** List of external sources to query */
-  external_source_tags: { [tag: string]: string[] };
+  external_source_tags: Record<string, string[]>;
 
   /** List of external sources to query */
   external_sources: ExternalSource[];
@@ -457,7 +457,7 @@ export type SubmissionProfileParams = {
   priority?: number;
 
   /** Service-specific parameters */
-  service_spec?: { [service: string]: { [param: string]: any } };
+  service_spec?: Record<string, Record<string, any>>;
 
   /** Service selection */
   services?: ServiceSelection;
@@ -475,7 +475,7 @@ export type SubmissionProfile = {
   display_name: string;
 
   /** A list of service-specific parameters that can be configured */
-  restricted_params: { [service: string]: string[] };
+  restricted_params: Record<string, string[]>;
 
   /** Default submission parameters for profile */
   params: SubmissionProfileParams;
@@ -541,7 +541,7 @@ export type Submission = {
   metadata: MetadataConfig;
 
   /** Submission profiles with preset submission parameters */
-  profiles: { [profile_name: string]: SubmissionProfile };
+  profiles: Record<string, SubmissionProfile>;
 
   /** List of external source to fetch file via their SHA256 hashes */
   sha256_sources: string[];
