@@ -82,21 +82,22 @@ export const HeaderSection = React.memo(() => {
               !tab
                 ? null
                 : tab === 'interface'
-                ? t('profile.interface')
-                : tab === 'default'
-                ? t('profile.custom')
-                : configuration.submission.profiles[tab].display_name
+                  ? t('profile.interface')
+                  : tab === 'default'
+                    ? t('profile.custom')
+                    : configuration.submission.profiles[tab].display_name
             }
             secondary={
               !tab
                 ? null
                 : tab === 'interface'
-                ? null
-                : tab === 'default'
-                ? t('profile.custom_desc')
-                : configuration.submission.profiles[tab].description
+                  ? null
+                  : tab === 'default'
+                    ? t('profile.custom_desc')
+                    : configuration.submission.profiles[tab].description
             }
             loading={loading}
+            actionSpacing={1}
             actions={[
               {
                 children: t('button.cancel.label'),

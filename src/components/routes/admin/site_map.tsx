@@ -1,10 +1,10 @@
 import DataUsageOutlinedIcon from '@mui/icons-material/DataUsageOutlined';
 import HttpsOutlinedIcon from '@mui/icons-material/HttpsOutlined';
 import NoEncryptionOutlinedIcon from '@mui/icons-material/NoEncryptionOutlined';
-import type { Theme } from '@mui/material';
 import {
   Paper,
   Skeleton,
+  styled,
   Table,
   TableBody,
   TableCell,
@@ -14,8 +14,6 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
-import { withStyles } from '@mui/styles';
-import createStyles from '@mui/styles/createStyles';
 import { useAppUser } from 'commons/components/app/hooks';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import useALContext from 'components/hooks/useALContext';
@@ -25,25 +23,25 @@ import type { SiteMap } from 'components/models/ui';
 import type { CustomUser } from 'components/models/ui/user';
 import CustomChip from 'components/visual/CustomChip';
 import type { PossibleColor } from 'helpers/colors';
-import { useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate } from 'react-router';
 
-const StyledTableCell = withStyles((theme: Theme) =>
-  createStyles({
-    root: {
+const StyledTableCell = memo(
+  styled(TableCell)(({ theme }) => ({
+    ['&.MuiTableCell-root']: {
       paddingRight: theme.spacing(1),
       paddingLeft: theme.spacing(1),
       [theme.breakpoints.up('md')]: {
         wordBreak: 'break-word'
       }
     },
-    head: {
+    ['&.MuiTableCell-head']: {
       backgroundColor: theme.palette.mode === 'dark' ? '#404040' : '#EEE',
       whiteSpace: 'nowrap'
     }
-  })
-)(TableCell);
+  }))
+);
 
 export default function SiteMapPage() {
   const { t } = useTranslation(['adminSiteMap']);

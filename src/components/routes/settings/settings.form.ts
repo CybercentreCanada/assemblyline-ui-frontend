@@ -1,6 +1,6 @@
 import { createFormContext } from 'components/core/form/createFormContext';
 import type { UserSettings } from 'components/models/base/user_settings';
-import type { ProfileSettings } from './settings.utils';
+import type { ProfileSettings } from 'components/routes/settings/settings.utils';
 
 export type SettingsStore = {
   /** State related to the interface of the Settings page */

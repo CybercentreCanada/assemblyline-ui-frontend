@@ -1,4 +1,4 @@
-import type { CardProps, Theme } from '@mui/material';
+import type { CardProps } from '@mui/material';
 import {
   Box,
   Card,
@@ -11,8 +11,6 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
-import { withStyles } from '@mui/styles';
-import createStyles from '@mui/styles/createStyles';
 import type { ContentWithTOCItemDef } from 'commons/addons/toc/Toc';
 import ContentWithTOC from 'commons/addons/toc/Toc';
 import { useAppBar, useAppLayout } from 'commons/components/app/hooks';
@@ -68,18 +66,18 @@ const Toc: ContentWithTOCItemDef[] = [
   { id: 'reserved' }
 ];
 
-const StyledTableCell = withStyles((theme: Theme) =>
-  createStyles({
-    root: {
+const StyledTableCell = memo(
+  styled(TableCell)(({ theme }) => ({
+    ['&.MuiTableCell-root']: {
       paddingRight: '8px',
       paddingLeft: '8px'
     },
-    head: {
+    ['&.MuiTableCell-head']: {
       backgroundColor: theme.palette.mode === 'dark' ? '#404040' : '#EEE',
       whiteSpace: 'nowrap'
     }
-  })
-)(TableCell);
+  }))
+);
 
 function Paragraph({ id, children }) {
   const theme = useTheme();

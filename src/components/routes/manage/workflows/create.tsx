@@ -1,5 +1,5 @@
 import CheckIcon from '@mui/icons-material/Check';
-import type { Theme } from '@mui/material';
+import DoDisturbAltOutlinedIcon from '@mui/icons-material/DoDisturbAltOutlined';
 import {
   Autocomplete,
   Checkbox,
@@ -10,16 +10,13 @@ import {
   MenuItem,
   Select,
   Skeleton,
+  styled,
   TextField,
   Tooltip,
   Typography,
   useTheme
 } from '@mui/material';
-
-import DoDisturbAltOutlinedIcon from '@mui/icons-material/DoDisturbAltOutlined';
 import FormControl from '@mui/material/FormControl';
-import { withStyles } from '@mui/styles';
-import createStyles from '@mui/styles/createStyles';
 import Throttler from 'commons/addons/utils/throttler';
 import PageCenter from 'commons/components/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
@@ -32,19 +29,21 @@ import type { SearchResult } from 'components/models/ui/search';
 import ForbiddenPage from 'components/routes/403';
 import Classification from 'components/visual/Classification';
 import _ from 'lodash';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useParams } from 'react-router';
 
 const THROTTLER = new Throttler(1000);
 
-const MyMenuItem = withStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      minHeight: theme.spacing(4)
+const MyMenuItem = memo(
+  styled(MenuItem)(({ theme }) => ({
+    ['& .MuiMenuItem-root']: {
+      root: {
+        minHeight: theme.spacing(4)
+      }
     }
-  })
-)(MenuItem);
+  }))
+);
 
 type Params = {
   id: string;

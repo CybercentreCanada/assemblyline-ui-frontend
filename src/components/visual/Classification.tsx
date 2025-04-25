@@ -432,7 +432,10 @@ function WrappedClassification({
       <Skeleton
         variant={type === 'text' ? 'text' : 'rectangular'}
         height={type !== 'text' ? skelheight[size] : null}
-        style={{ borderRadius: theme.spacing(0.5), display: 'inline-block', width: '8rem', verticalAlign: 'bottom' }}
+        sx={{
+          borderRadius: theme.spacing(0.5),
+          ...(inline && { display: 'inline-block', width: '8rem', verticalAlign: 'bottom' })
+        }}
       />
     ))
   );

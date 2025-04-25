@@ -19,6 +19,7 @@ function isValidAction(action: TitleActionProps): action is TitleActionPartialPr
 
 export type PageHeaderProps = {
   actions?: TitleActionProps[];
+  actionSpacing?: number;
   classification?: ClassificationProps['c12n'];
   classificationProps?: Omit<ClassificationProps, 'c12n' | 'setClassification'>;
   endAdornment?: React.ReactNode;
@@ -34,6 +35,7 @@ export type PageHeaderProps = {
 export const PageHeader: React.FC<PageHeaderProps> = React.memo(
   ({
     actions = null,
+    actionSpacing = null,
     classification = '',
     classificationProps = null,
     endAdornment = null,
@@ -113,7 +115,14 @@ export const PageHeader: React.FC<PageHeaderProps> = React.memo(
               }}
             >
               {Array.isArray(actions) && (
-                <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap' }}>
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    flexWrap: 'wrap',
+                    ...(actionSpacing && { columnGap: theme.spacing(actionSpacing) })
+                  }}
+                >
                   {actions.map((action, i) => {
                     if (isValidAction(action)) {
                       const { children = null, type = 'icon', ...buttonProps } = action;

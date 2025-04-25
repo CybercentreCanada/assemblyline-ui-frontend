@@ -1,49 +1,44 @@
-import type { Theme } from '@mui/material';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, useTheme } from '@mui/material';
-import { withStyles } from '@mui/styles';
-import createStyles from '@mui/styles/createStyles';
+import { styled, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, useTheme } from '@mui/material';
 import type { TableBody as TableData } from 'components/models/base/result_body';
 import { KVBody } from 'components/visual/ResultCard/kv_body';
 import { TextBody } from 'components/visual/ResultCard/text_body';
 import TitleKey from 'components/visual/TitleKey';
-import { default as React } from 'react';
+import { memo, default as React } from 'react';
 
-const StyledTableCell = withStyles((theme: Theme) =>
-  createStyles({
-    root: {
+const StyledTableCell = memo(
+  styled(TableCell)(({ theme }) => ({
+    ['&.MuiTableCell-root']: {
       '@media print': {
         color: 'black'
       },
       fontSize: 'inherit',
       lineHeight: 'inherit'
     },
-    head: {
+    ['&.MuiTableCell-head']: {
       '@media print': {
         color: 'black',
         backgroundColor: '#DDD !important'
       },
       backgroundColor: theme.palette.mode === 'dark' ? '#404040' : '#EEE'
     },
-    body: {
+    ['&.MuiTableCell-body']: {
       [theme.breakpoints.up('md')]: {
         wordBreak: 'break-word'
       }
     }
-  })
-)(TableCell);
+  }))
+);
 
-const StyledTableRow = withStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      '&:nth-of-type(odd)': {
-        '@media print': {
-          backgroundColor: '#EEE !important'
-        },
-        backgroundColor: theme.palette.mode === 'dark' ? '#ffffff08' : '#00000008'
-      }
+const StyledTableRow = memo(
+  styled(TableRow)(({ theme }) => ({
+    '&:nth-of-type(odd)': {
+      '@media print': {
+        backgroundColor: '#EEE !important'
+      },
+      backgroundColor: theme.palette.mode === 'dark' ? '#ffffff08' : '#00000008'
     }
-  })
-)(TableRow);
+  }))
+);
 
 type Props = {
   body: TableData;

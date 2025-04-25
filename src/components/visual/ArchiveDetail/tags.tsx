@@ -134,8 +134,8 @@ const WrappedArchivedTagSection: React.FC<Props> = ({
         key !== 'h_type'
           ? !!value.toString().match(query.get(key, ''))
           : query.get(key, '') === ''
-          ? true
-          : query.get(key, '').split(',').includes(value.toString())
+            ? true
+            : query.get(key, '').split(',').includes(value.toString())
       )
     );
   }, [query, results]);

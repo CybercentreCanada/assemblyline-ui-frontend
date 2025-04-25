@@ -1,4 +1,4 @@
-import { styled, useTheme } from '@mui/material';
+import { styled } from '@mui/material';
 import React from 'react';
 
 const Root = styled('div')(({ theme }) => ({
@@ -73,8 +73,6 @@ export const PageLayout: React.FC<PageLayoutProps> = React.memo(
     headerRef = null,
     margin = 0
   }: PageLayoutProps) => {
-    const theme = useTheme();
-
     return (
       <Root ref={rootRef}>
         {!leftNav ? null : <Navigation>{leftNav}</Navigation>}

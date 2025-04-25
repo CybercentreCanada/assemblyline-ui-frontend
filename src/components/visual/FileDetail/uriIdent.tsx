@@ -1,6 +1,6 @@
 import { Grid, Skeleton, useMediaQuery, useTheme } from '@mui/material';
-import { File as FileInfo } from 'components/models/base/file';
-import { Section } from 'components/models/base/result';
+import type { File as FileInfo } from 'components/models/base/file';
+import type { Section } from 'components/models/base/result';
 import type { KeyValueBody, OrderedKeyValueBody } from 'components/models/base/result_body';
 import { ImageInlineBody } from 'components/visual/image_inline';
 import SectionContainer from 'components/visual/SectionContainer';
@@ -80,7 +80,7 @@ const WrappedURIIdentificationSection: React.FC<URIIdentificationSectionProps> =
         }
       }}
     >
-      <Grid container>
+      <Grid container flex={1}>
         <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
           <span style={{ fontWeight: 500, marginRight: theme.spacing(0.5), display: 'flex' }}>{t('scheme')}</span>
         </Grid>
