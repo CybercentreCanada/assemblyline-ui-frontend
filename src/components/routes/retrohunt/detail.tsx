@@ -3,9 +3,19 @@ import DataObjectOutlinedIcon from '@mui/icons-material/DataObjectOutlined';
 import DoneOutlinedIcon from '@mui/icons-material/DoneOutlined';
 import FilterAltOutlinedIcon from '@mui/icons-material/FilterAltOutlined';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import { AlertTitle, Divider, Grid, Pagination, Paper, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
+import {
+  AlertTitle,
+  Divider,
+  Grid,
+  Pagination,
+  Paper,
+  Skeleton,
+  styled,
+  Tooltip,
+  Typography,
+  useTheme
+} from '@mui/material';
 import TableContainer from '@mui/material/TableContainer';
-import makeStyles from '@mui/styles/makeStyles';
 import { useAppUser } from 'commons/components/app/hooks';
 import PageFullSize from 'commons/components/pages/PageFullSize';
 import useALContext from 'components/hooks/useALContext';
@@ -18,6 +28,7 @@ import type { CustomUser } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
 import NotFoundPage from 'components/routes/404';
 import RetrohuntErrors from 'components/routes/retrohunt/errors';
+import { RetrohuntRepeat } from 'components/routes/retrohunt/repeat';
 import { ChipList } from 'components/visual/ChipList';
 import Classification from 'components/visual/Classification';
 import type { CustomChipProps } from 'components/visual/CustomChip';
@@ -43,35 +54,20 @@ import SearchResultCount from 'components/visual/SearchResultCount';
 import SteppedProgress from 'components/visual/SteppedProgress';
 import { TabContainer } from 'components/visual/TabContainer';
 import { safeFieldValue } from 'helpers/utils';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation, useNavigate, useParams } from 'react-router';
 import { io } from 'socket.io-client';
-import { RetrohuntRepeat } from './repeat';
 
-const useStyles = makeStyles(theme => ({
-  results: {
-    fontStyle: 'italic',
-    paddingTop: theme.spacing(0.5),
-    display: 'flex',
-    justifyContent: 'flex-end',
-    flexWrap: 'wrap'
-  },
-  skeletonCustomChip: {
+const SkeletonCustomChip = memo(
+  styled(Skeleton)(() => ({
     height: '1.5rem',
     width: '2rem',
     borderRadius: '4px',
     display: 'inline-block',
     verticalAlign: 'middle'
-  },
-  preview: {
-    margin: 0,
-    padding: theme.spacing(0.75, 1),
-    whiteSpace: 'pre-wrap',
-    wordBreak: 'break-word',
-    backgroundColor: 'inherit'
-  }
-}));
+  }))
+);
 
 type Params = {
   key: string;
@@ -102,7 +98,6 @@ const DEFAULT_QUERY: string = Object.keys(DEFAULT_PARAMS)
 function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = false }: Props) {
   const { t, i18n } = useTranslation(['retrohunt']);
   const theme = useTheme();
-  const classes = useStyles();
   const location = useLocation();
   const navigate = useNavigate();
   const { apiCall } = useMyAPI();
@@ -549,7 +544,7 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
                         </Grid>
                         {!retrohunt ? (
                           <Grid>
-                            <Skeleton className={classes.skeletonCustomChip} variant="rectangular" />
+                            <SkeletonCustomChip variant="rectangular" />
                           </Grid>
                         ) : (
                           'truncated' in retrohunt &&
@@ -572,7 +567,7 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
 
                         {!retrohunt ? (
                           <Grid>
-                            <Skeleton className={classes.skeletonCustomChip} variant="rectangular" />
+                            <SkeletonCustomChip variant="rectangular" />
                           </Grid>
                         ) : (
                           'tags' in retrohunt &&
@@ -619,7 +614,15 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
                               } else handleQueryRemove(['query', 'rows', 'offset']);
                             }}
                           >
-                            <div className={classes.results}>
+                            <div
+                              style={{
+                                fontStyle: 'italic',
+                                paddingTop: theme.spacing(0.5),
+                                display: 'flex',
+                                justifyContent: 'flex-end',
+                                flexWrap: 'wrap'
+                              }}
+                            >
                               {hitResults && hitResults.total !== 0 && (
                                 <Typography variant="subtitle1" color="secondary" style={{ flexGrow: 1 }}>
                                   {isReloading ? (

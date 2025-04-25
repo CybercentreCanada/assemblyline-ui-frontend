@@ -3,7 +3,6 @@ import WarningAmberOutlinedIcon from '@mui/icons-material/WarningAmberOutlined';
 import { AlertTitle, Divider, Grid, Pagination, Paper, Skeleton, Typography, useTheme } from '@mui/material';
 import LinearProgress from '@mui/material/LinearProgress';
 import TableContainer from '@mui/material/TableContainer';
-import makeStyles from '@mui/styles/makeStyles';
 import { useAppUser } from 'commons/components/app/hooks';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -22,36 +21,6 @@ import InformativeAlert from 'components/visual/InformativeAlert';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-
-const useStyles = makeStyles(theme => ({
-  dialogTitle: {
-    display: 'flex',
-    flexDirection: 'row'
-  },
-  titleContainer: {
-    flex: 1
-  },
-  pagination: {
-    justifyContent: 'center'
-  },
-  searchBar: {
-    fontStyle: 'italic',
-    paddingTop: theme.spacing(0.5),
-    display: 'flex',
-    flexWrap: 'wrap',
-    justifyContent: 'flex-end'
-  },
-  title: {
-    fontWeight: 500,
-    marginRight: theme.spacing(0.5),
-    display: 'flex'
-  },
-  skeletonButton: {
-    height: '2.5rem',
-    width: '2.5rem',
-    margin: theme.spacing(0.5)
-  }
-}));
 
 const PAGE_SIZE = 10;
 
@@ -80,7 +49,6 @@ const DEFAULT_QUERY: string = Object.keys(DEFAULT_PARAMS)
 const WrappedRetrohuntErrors = ({ retrohunt = null, isDrawer = false }: Props) => {
   const { t } = useTranslation(['retrohunt']);
   const theme = useTheme();
-  const classes = useStyles();
   const { apiCall } = useMyAPI();
   const { configuration } = useALContext();
   const { user: currentUser } = useAppUser<CustomUser>();
@@ -164,7 +132,15 @@ const WrappedRetrohuntErrors = ({ retrohunt = null, isDrawer = false }: Props) =
           </div>
         ) : (
           <>
-            <div className={classes.searchBar}>
+            <div
+              style={{
+                fontStyle: 'italic',
+                paddingTop: theme.spacing(0.5),
+                display: 'flex',
+                flexWrap: 'wrap',
+                justifyContent: 'flex-end'
+              }}
+            >
               {totals && (
                 <Typography variant="subtitle1" color="secondary" style={{ flexGrow: 1 }}>
                   {totals}
@@ -177,9 +153,7 @@ const WrappedRetrohuntErrors = ({ retrohunt = null, isDrawer = false }: Props) =
                   count={pageCount}
                   shape="rounded"
                   size="small"
-                  classes={{
-                    ul: classes.pagination
-                  }}
+                  sx={{ justifyContent: 'center' }}
                 />
               )}
             </div>

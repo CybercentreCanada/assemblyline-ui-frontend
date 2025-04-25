@@ -16,32 +16,35 @@ import {
   Select,
   Skeleton,
   Slider,
+  styled,
   TextField,
   Typography,
   useTheme
 } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import useALContext from 'components/hooks/useALContext';
 import { FETCH_METHODS, type EnvironmentVariable, type UpdateSource } from 'components/models/base/service';
 import ResetButton from 'components/routes/admin/service_detail/reset_button';
 import Classification from 'components/visual/Classification';
 import Moment from 'components/visual/Moment';
 import { TabContainer } from 'components/visual/TabContainer';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { memo, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-const useStyles = makeStyles(theme => ({
-  checkbox: {
+const CheckBox = memo(
+  styled(FormControlLabel)(({ theme }) => ({
     marginLeft: 0,
     width: '100%',
     '&:hover': {
       background: theme.palette.action.hover
     }
-  },
-  label: {
+  }))
+);
+
+const Label = memo(
+  styled('div')(() => ({
     fontWeight: 500
-  }
-}));
+  }))
+);
 
 type Props = {
   source: UpdateSource;
@@ -62,7 +65,6 @@ const WrappedSourceDetail = ({
 }: Props) => {
   const { t } = useTranslation(['manageSignatureSources']);
   const theme = useTheme();
-  const classes = useStyles();
   const { c12nDef } = useALContext();
 
   const [showPassword, setShowPassword] = useState<boolean>(false);
@@ -153,10 +155,10 @@ const WrappedSourceDetail = ({
       <>
         {c12nDef.enforce && (
           <Grid size={{ xs: 12 }}>
-            <div className={classes.label}>
+            <Label>
               {t('classification')}
               <ResetButton service={source} defaults={defaults} field="default_classification" reset={resetField} />
-            </div>
+            </Label>
             <Classification
               c12n={source.default_classification}
               type="picker"
@@ -182,7 +184,7 @@ const WrappedSourceDetail = ({
                   <Grid container spacing={1}>
                     <Grid size={{ xs: 12, sm: 6 }}>
                       <Badge color="error" variant="dot" invisible={source.name !== ''}>
-                        <div className={classes.label} style={{ whiteSpace: 'pre-wrap' }}>{`${t('name')} `}</div>
+                        <Label style={{ whiteSpace: 'pre-wrap' }}>{`${t('name')} `}</Label>
                       </Badge>
                       <TextField
                         id="name"
@@ -195,10 +197,10 @@ const WrappedSourceDetail = ({
                       />
                     </Grid>
                     <Grid size={{ xs: 12, sm: 6 }}>
-                      <div className={classes.label}>
+                      <Label>
                         {t('pattern')}
                         <ResetButton service={source} defaults={defaults} field="pattern" reset={resetField} />
-                      </div>
+                      </Label>
                       <TextField
                         id="pattern"
                         size="small"
@@ -214,10 +216,10 @@ const WrappedSourceDetail = ({
                   </Grid>
                   <Grid container spacing={1} style={{ paddingTop: theme.spacing(1) }}>
                     <Grid size={{ xs: 12, md: 12 }}>
-                      <div className={classes.label}>
+                      <Label>
                         {t('update_interval')}
                         <ResetButton service={source} defaults={defaults} field="update_interval" reset={resetField} />
-                      </div>
+                      </Label>
                       <Grid container spacing={2}>
                         <Grid size={{ xs: 12, sm: 9 }}>
                           <div style={{ marginLeft: theme.spacing(1), marginRight: theme.spacing(1) }}>
@@ -274,7 +276,7 @@ const WrappedSourceDetail = ({
                       </Grid>
                     </Grid>
                     <Grid size={{ xs: 12 }}>
-                      <div className={classes.label}>{t('configuration')}</div>
+                      <Label>{t('configuration')}</Label>
                       <JSONEditor
                         src={source.configuration}
                         onAdd={handleConfigurationChange}
@@ -294,7 +296,7 @@ const WrappedSourceDetail = ({
                     {['ignore_cache', 'override_classification', 'sync'].map(field => {
                       return (
                         <Grid key={field} size={{ xs: 6 }}>
-                          <FormControlLabel
+                          <CheckBox
                             control={
                               <Checkbox
                                 id={field}
@@ -310,7 +312,6 @@ const WrappedSourceDetail = ({
                                 <ResetButton service={source} defaults={defaults} field={field} reset={resetField} />
                               </Typography>
                             }
-                            className={classes.checkbox}
                           />
                         </Grid>
                       );
@@ -331,10 +332,10 @@ const WrappedSourceDetail = ({
                 <>
                   <Grid container spacing={1}>
                     <Grid size={{ xs: 12, sm: 2 }}>
-                      <div className={classes.label}>
+                      <Label>
                         {t('fetch_method')}
                         <ResetButton service={source} defaults={defaults} field="fetch_method" reset={resetField} />
-                      </div>
+                      </Label>
                       <Select
                         name="fetch_method"
                         value={source.fetch_method}
@@ -353,10 +354,10 @@ const WrappedSourceDetail = ({
                     </Grid>
                     <Grid size={{ xs: 12, sm: gitFetch ? 7 : 10 }}>
                       <Badge color="error" variant="dot" invisible={source.uri !== ''}>
-                        <div className={classes.label} style={{ whiteSpace: 'pre-wrap' }}>
+                        <Label style={{ whiteSpace: 'pre-wrap' }}>
                           {`${t('uri')} `}
                           <ResetButton service={source} defaults={defaults} field="uri" reset={resetField} />
-                        </div>
+                        </Label>
                       </Badge>
 
                       <TextField
@@ -370,7 +371,7 @@ const WrappedSourceDetail = ({
                     </Grid>
                     {gitFetch && (
                       <Grid size={{ xs: 12, sm: 3 }}>
-                        <div className={classes.label}>{t('git_branch')}</div>
+                        <Label>{t('git_branch')}</Label>
                         <TextField
                           id="git_branch"
                           size="small"
@@ -382,10 +383,10 @@ const WrappedSourceDetail = ({
                       </Grid>
                     )}
                     <Grid size={{ xs: 12, md: 6 }} style={{ paddingTop: theme.spacing(1) }}>
-                      <div className={classes.label}>
+                      <Label>
                         {t('username')}
                         <ResetButton service={source} defaults={defaults} field="username" reset={resetField} />
-                      </div>
+                      </Label>
                       <TextField
                         id="username"
                         size="small"
@@ -396,10 +397,10 @@ const WrappedSourceDetail = ({
                       />
                     </Grid>
                     <Grid size={{ xs: 12, md: 6 }}>
-                      <div className={classes.label}>
+                      <Label>
                         {t('password')}
                         <ResetButton service={source} defaults={defaults} field="password" reset={resetField} />
-                      </div>
+                      </Label>
                       <TextField
                         autoComplete="new-password"
                         id="password"
@@ -425,10 +426,10 @@ const WrappedSourceDetail = ({
                       />
                     </Grid>
                     <Grid size={{ xs: 12 }}>
-                      <div className={classes.label}>
+                      <Label>
                         {t('private_key')}
                         <ResetButton service={source} defaults={defaults} field="private_key" reset={resetField} />
-                      </div>
+                      </Label>
                       <TextField
                         id="private_key"
                         size="small"
@@ -456,7 +457,7 @@ const WrappedSourceDetail = ({
                       />
                     </Grid>
                     <Grid size={{ xs: 12 }}>
-                      <div className={classes.label}>{t('headers')}</div>
+                      <Label>{t('headers')}</Label>
                       <JSONEditor
                         name={false}
                         src={Object.fromEntries(source.headers.map(x => [x.name, x.value]))}
@@ -481,7 +482,7 @@ const WrappedSourceDetail = ({
                     </Grid>
                     {postFetch && (
                       <Grid size={{ xs: 12 }}>
-                        <div className={classes.label}>{t('post_data')}</div>
+                        <Label>{t('post_data')}</Label>
                         <TextField
                           id="data"
                           size="small"
@@ -496,10 +497,10 @@ const WrappedSourceDetail = ({
                       </Grid>
                     )}
                     <Grid size={{ xs: 12 }}>
-                      <div className={classes.label}>
+                      <Label>
                         {t('proxy')}
                         <ResetButton service={source} defaults={defaults} field="proxy" reset={resetField} />
-                      </div>
+                      </Label>
                       <TextField
                         id="proxy"
                         size="small"
@@ -511,10 +512,10 @@ const WrappedSourceDetail = ({
                       />
                     </Grid>
                     <Grid size={{ xs: 12 }}>
-                      <div className={classes.label}>
+                      <Label>
                         {t('ca')}
                         <ResetButton service={source} defaults={defaults} field="ca_cert" reset={resetField} />
-                      </div>
+                      </Label>
                       <TextField
                         id="ca_cert"
                         size="small"
@@ -528,7 +529,7 @@ const WrappedSourceDetail = ({
                       />
                     </Grid>
                     <Grid size={{ xs: 6 }}>
-                      <FormControlLabel
+                      <CheckBox
                         control={
                           <Checkbox
                             id="ssl_ignore_errors"
@@ -549,7 +550,6 @@ const WrappedSourceDetail = ({
                             />
                           </Typography>
                         }
-                        className={classes.checkbox}
                       />
                     </Grid>
 

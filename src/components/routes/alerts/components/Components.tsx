@@ -19,8 +19,6 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
-import clsx from 'clsx';
 import type { AlertItem, DetailedItem } from 'components/models/base/alert';
 import { detailedItemCompare } from 'components/routes/alerts/utils/alertUtils';
 import { ActionableChipList } from 'components/visual/ActionableChipList';
@@ -43,34 +41,6 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { HiOutlineExternalLink } from 'react-icons/hi';
 
-const useStyles = makeStyles(theme => ({
-  extended: {
-    '& > svg': {
-      verticalAlign: 'bottom'
-    }
-  },
-  priority: {
-    '& > svg': {
-      verticalAlign: 'bottom'
-    }
-  },
-  success: {
-    color: theme.palette.mode !== 'dark' ? theme.palette.success.dark : theme.palette.success.light
-  },
-  info: {
-    color: theme.palette.mode !== 'dark' ? theme.palette.info.dark : theme.palette.info.light
-  },
-  default: {
-    color: theme.palette.text.disabled
-  },
-  warning: {
-    color: theme.palette.mode !== 'dark' ? theme.palette.warning.dark : theme.palette.warning.light
-  },
-  error: {
-    color: theme.palette.mode !== 'dark' ? theme.palette.error.dark : theme.palette.error.light
-  }
-}));
-
 type PossibleColors = 'info' | 'default' | 'error' | 'success' | 'primary' | 'secondary' | 'warning';
 
 type AlertExtendedScanProps = {
@@ -81,10 +51,8 @@ type AlertExtendedScanProps = {
 
 export const AlertExtendedScan: React.FC<AlertExtendedScanProps> = React.memo(
   ({ name, withChip = false, size = 'small' }: AlertExtendedScanProps) => {
-    //TODO
-    return null;
     const { t } = useTranslation('alerts');
-    const classes = useStyles();
+    const theme = useTheme();
 
     const data = useMemo<{ color: PossibleColors; arrow: ReactNode }>(() => {
       const dataMap: Record<string, { color: PossibleColors; arrow: ReactNode }> = {
@@ -109,7 +77,39 @@ export const AlertExtendedScan: React.FC<AlertExtendedScanProps> = React.memo(
       />
     ) : (
       <Tooltip title={t(`extended_${name}_desc`)}>
-        <Box display="inline-block" className={clsx(classes.extended, classes[data.color] as unknown)}>
+        <Box
+          display="inline-block"
+          sx={{
+            '& > svg': {
+              verticalAlign: 'bottom'
+            },
+
+            ...(() => {
+              switch (data.color) {
+                case 'success':
+                  return {
+                    color: theme.palette.mode !== 'dark' ? theme.palette.success.dark : theme.palette.success.light
+                  };
+                case 'info':
+                  return {
+                    color: theme.palette.mode !== 'dark' ? theme.palette.info.dark : theme.palette.info.light
+                  };
+                case 'default':
+                  return {
+                    color: theme.palette.text.disabled
+                  };
+                case 'warning':
+                  return {
+                    color: theme.palette.mode !== 'dark' ? theme.palette.warning.dark : theme.palette.warning.light
+                  };
+                case 'error':
+                  return {
+                    color: theme.palette.mode !== 'dark' ? theme.palette.error.dark : theme.palette.error.light
+                  };
+              }
+            })()
+          }}
+        >
           {data.arrow}
         </Box>
       </Tooltip>
@@ -125,10 +125,8 @@ type AlertPriorityProps = {
 
 export const AlertPriority: React.FC<AlertPriorityProps> = React.memo(
   ({ name, withChip = false, size = 'small' }: AlertPriorityProps) => {
-    //TODO
-    return null;
     const { t } = useTranslation('alerts');
-    const classes = useStyles();
+    const theme = useTheme();
 
     const data = useMemo<{ color: PossibleColors; arrow: ReactNode }>(() => {
       const dataMap: Record<string, { color: PossibleColors; arrow: ReactNode }> = {
@@ -154,7 +152,38 @@ export const AlertPriority: React.FC<AlertPriorityProps> = React.memo(
       />
     ) : (
       <Tooltip title={name ? `${t('priority')}: ${t(`priority_${name}`)}` : `${t('priority')}: ${t('priority_unset')}`}>
-        <Box display="inline-block" className={clsx(classes.priority, classes[data.color] as unknown)}>
+        <Box
+          sx={{
+            '& > svg': {
+              verticalAlign: 'bottom'
+            },
+
+            ...(() => {
+              switch (data.color) {
+                case 'success':
+                  return {
+                    color: theme.palette.mode !== 'dark' ? theme.palette.success.dark : theme.palette.success.light
+                  };
+                case 'info':
+                  return {
+                    color: theme.palette.mode !== 'dark' ? theme.palette.info.dark : theme.palette.info.light
+                  };
+                case 'default':
+                  return {
+                    color: theme.palette.text.disabled
+                  };
+                case 'warning':
+                  return {
+                    color: theme.palette.mode !== 'dark' ? theme.palette.warning.dark : theme.palette.warning.light
+                  };
+                case 'error':
+                  return {
+                    color: theme.palette.mode !== 'dark' ? theme.palette.error.dark : theme.palette.error.light
+                  };
+              }
+            })()
+          }}
+        >
           {data.arrow}
         </Box>
       </Tooltip>

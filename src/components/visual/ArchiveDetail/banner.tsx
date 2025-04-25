@@ -27,17 +27,17 @@ import clsx from 'clsx';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import { LabelCategories } from 'components/models/base/file';
+import type { LabelCategories } from 'components/models/base/file';
 import type { File } from 'components/models/ui/file';
+import Classification from 'components/visual/Classification';
 import CustomChip from 'components/visual/CustomChip';
+import FileDownloader from 'components/visual/FileDownloader';
+import InputDialog from 'components/visual/InputDialog';
 import Moment from 'components/visual/Moment';
 import { bytesToSize } from 'helpers/utils';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation, useNavigate } from 'react-router';
-import Classification from '../Classification';
-import FileDownloader from '../FileDownloader';
-import InputDialog from '../InputDialog';
 
 const VERDICTS = {
   malicious: { className: 'malicious' },
@@ -190,7 +190,6 @@ type Props = {
 const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid = null, force = false }) => {
   const { t } = useTranslation(['fileDetail', 'archive']);
   const theme = useTheme();
-  const classes = useStyles();
   const location = useLocation();
   const navigate = useNavigate();
   const { apiCall } = useMyAPI();
@@ -219,7 +218,7 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
     currentVerdict: keyof typeof VERDICTS;
   }>(() => {
     let results = [];
-    let values = {
+    const values = {
       verdicts: { malicious: 0, highly_suspicious: 0, suspicious: 0, safe: 0, info: 0, other: 0 },
       currentVerdict: 'info' as keyof typeof VERDICTS
     };
@@ -228,12 +227,12 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
     results.forEach(item => {
       if (Object.keys(VERDICTS).includes(item)) values.verdicts[item] += 1;
     });
-    let value = Object.entries(values.verdicts).find(([k, v]) => v > 0);
+    const value = Object.entries(values.verdicts).find(([k, v]) => v > 0);
     values.currentVerdict = (value ? value[0] : 'info') as keyof typeof VERDICTS;
     return values;
   }, [file, scoreToVerdict]);
 
-  const labels = useMemo<Array<{ category: string; label: string }>>(
+  const labels = useMemo<{ category: string; label: string }[]>(
     () =>
       file?.file_info?.label_categories &&
       ['attribution', 'technique', 'info'].flatMap(
@@ -388,7 +387,7 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
   }, []);
 
   useEffect(() => {
-    let element = ref.current;
+    const element = ref.current;
     if (!element || !initiated) {
       initiate();
       return;

@@ -1,52 +1,42 @@
 import CheckOutlinedIcon from '@mui/icons-material/CheckOutlined';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { Box, Card, Collapse, Grid, MenuItem, Select, Typography, useMediaQuery, useTheme } from '@mui/material';
+import {
+  Box,
+  Card,
+  Collapse,
+  Grid,
+  MenuItem,
+  Select,
+  styled,
+  Typography,
+  useMediaQuery,
+  useTheme
+} from '@mui/material';
 import FormControl from '@mui/material/FormControl';
 import Skeleton from '@mui/material/Skeleton';
-import makeStyles from '@mui/styles/makeStyles';
-import clsx from 'clsx';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import CustomChip from 'components/visual/CustomChip';
-import { useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const apiHeight = '48px';
-const useStyles = makeStyles(theme => ({
-  api: {
-    minHeight: apiHeight,
-    cursor: 'pointer',
-    '&:hover': {
-      backgroundColor: theme.palette.action.selected
-    }
-  },
-  blueprint: {
-    minHeight: apiHeight,
-    alignItems: 'center',
-    borderColor: theme.palette.action.disabledBackground,
-    cursor: 'pointer',
-    '&:hover': {
-      backgroundColor: theme.palette.action.selected
-    }
-  },
-  blueprintSkel: {
-    minHeight: apiHeight,
-    alignItems: 'center',
-    borderColor: theme.palette.action.disabledBackground
-  },
-  expand: {
+
+const Expand = memo(
+  styled(ExpandMoreIcon)<{ open?: boolean }>(({ theme, open = false }) => ({
     transform: 'rotate(0deg)',
     marginLeft: theme.spacing(2),
     transition: theme.transitions.create('transform', {
       duration: theme.transitions.duration.shortest
+    }),
+
+    ...(open && {
+      transform: 'rotate(180deg)'
     })
-  },
-  expandOpen: {
-    transform: 'rotate(180deg)'
-  }
-}));
+  }))
+);
 
 export default function ApiDoc() {
   const { apiCall } = useMyAPI();
@@ -54,7 +44,6 @@ export default function ApiDoc() {
   const [apiSelected, setApiSelected] = useState(null);
   const [apiDefinition, setApiDefinition] = useState(null);
   const { configuration } = useALContext();
-  const classes = useStyles();
   const [expandMap, setExpandMap] = useState({});
   const theme = useTheme();
   const { t } = useTranslation(['helpAPI']);
@@ -192,10 +181,18 @@ export default function ApiDoc() {
                   display="flex"
                   flexDirection="row"
                   flexWrap="wrap"
-                  className={classes.blueprint}
                   borderBottom={1}
                   px={1}
                   onClick={() => toggleBlueprintExpand(bp)}
+                  sx={{
+                    minHeight: apiHeight,
+                    alignItems: 'center',
+                    borderColor: theme.palette.action.disabledBackground,
+                    cursor: 'pointer',
+                    '&:hover': {
+                      backgroundColor: theme.palette.action.selected
+                    }
+                  }}
                 >
                   <Typography variant="body2" color="textSecondary" style={{ fontWeight: 800, lineHeight: 2 }}>
                     {`/api/${apiSelected}/`}&nbsp;
@@ -209,11 +206,7 @@ export default function ApiDoc() {
                     <Typography variant="body2" color="textSecondary" align="right" style={{ lineHeight: 2 }}>
                       {apiDefinition.blueprints[bp]}
                     </Typography>
-                    <ExpandMoreIcon
-                      className={clsx(classes.expand, {
-                        [classes.expandOpen]: expandMap[bp]
-                      })}
-                    />
+                    <Expand open={expandMap?.[bp]} />
                   </div>
                 </Box>
                 <Collapse in={expandMap[bp]} timeout="auto" unmountOnExit>
@@ -225,13 +218,19 @@ export default function ApiDoc() {
                     {blueprintAPIs(bp).map((api, idx) => (
                       <div key={idx}>
                         <Box
-                          className={classes.api}
                           px={1}
                           display="flex"
                           flexDirection={xs ? 'column' : 'row'}
                           flexWrap="wrap"
                           alignItems={xs ? 'flex-start' : 'center'}
                           onClick={() => toggleBlueprintExpand(api.name)}
+                          sx={{
+                            minHeight: apiHeight,
+                            cursor: 'pointer',
+                            '&:hover': {
+                              backgroundColor: theme.palette.action.selected
+                            }
+                          }}
                         >
                           <div>
                             {api.methods.map((method, midx) => (
@@ -264,11 +263,7 @@ export default function ApiDoc() {
                               {api.name}
                             </Typography>
 
-                            <ExpandMoreIcon
-                              className={clsx(classes.expand, {
-                                [classes.expandOpen]: expandMap[api.name]
-                              })}
-                            />
+                            <Expand open={expandMap?.[bp]} />
                           </div>
                         </Box>
                         <Collapse in={expandMap[api.name]} timeout="auto" unmountOnExit>
@@ -394,9 +389,11 @@ export default function ApiDoc() {
                   display: 'flex',
                   flexDirection: 'row',
                   flexWrap: 'wrap',
-                  borderBottom: 1
+                  borderBottom: 1,
+                  minHeight: apiHeight,
+                  alignItems: 'center',
+                  borderColor: theme.palette.action.disabledBackground
                 }}
-                className={classes.blueprintSkel}
               >
                 <Typography variant="body2" style={{ paddingRight: '8px' }}>
                   <Skeleton width="2rem" />

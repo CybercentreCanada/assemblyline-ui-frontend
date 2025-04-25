@@ -9,11 +9,11 @@ import RemoveIcon from '@mui/icons-material/Remove';
 import { CircularProgress, IconButton, Modal, Skeleton, Slider, Tooltip, alpha, styled, useTheme } from '@mui/material';
 import Carousel from 'commons/addons/carousel/Carousel';
 import useMyAPI from 'components/hooks/useMyAPI';
-import { Image as ImageData } from 'components/models/base/result_body';
+import type { Image as ImageData } from 'components/models/base/result_body';
+import CarouselItem from 'components/visual/Carousel/Item';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLocation } from 'react-router';
-import CarouselItem from './Item';
 
 const ZOOM_CLASS = 'zooming';
 const MIN_IMAGE_SIZE_REM = 4;
@@ -241,7 +241,7 @@ const WrappedCarouselContainer = ({
   const [loading, setLoading] = useState<boolean>(false);
   const [isZooming, setIsZooming] = useState<boolean>(false);
   const [zoom, setZoom] = useState<number>(100);
-  const [imageRendering, setImageRendering] = useState<'auto' | 'pixelated'>('auto' as 'auto');
+  const [imageRendering, setImageRendering] = useState<'auto' | 'pixelated'>('auto' as const);
 
   const navbarRef = useRef<HTMLDivElement>(null);
   const navbarScroll = useRef<Dragging>({ isDown: false, isDragging: false, scrollLeft: 0, startX: 0 });
@@ -302,8 +302,8 @@ const WrappedCarouselContainer = ({
 
     // Calculate dragging speed
     const timeDiff = (new Date() as any) - dragTimer.current;
-    let speedY = ((containerRef.current.scrollTop - imageDrag.current.scrollTop.valueOf()) / timeDiff) * 15;
-    let speedX = ((containerRef.current.scrollLeft - imageDrag.current.scrollLeft.valueOf()) / timeDiff) * 15;
+    const speedY = ((containerRef.current.scrollTop - imageDrag.current.scrollTop.valueOf()) / timeDiff) * 15;
+    const speedX = ((containerRef.current.scrollLeft - imageDrag.current.scrollLeft.valueOf()) / timeDiff) * 15;
     let speedYAbsolute = Math.abs(speedY);
     let speedXAbsolute = Math.abs(speedX);
 
@@ -432,7 +432,7 @@ const WrappedCarouselContainer = ({
 
   useEffect(() => {
     if (imgData !== null) {
-      var i = new Image();
+      const i = new Image();
       i.onload = function () {
         if (i.width <= 128 || i.height <= 128) {
           setImageRendering('pixelated');
@@ -582,7 +582,7 @@ const WrappedCarouselContainer = ({
                     min={10}
                     max={500}
                     size="small"
-                    onChange={(event, newValue) => setZoom(Math.floor(newValue as number))}
+                    onChange={(event, newValue) => setZoom(Math.floor(newValue))}
                     orientation="vertical"
                     sx={{
                       '& .MuiSlider-thumb': {

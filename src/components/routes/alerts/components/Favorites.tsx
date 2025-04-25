@@ -1,13 +1,16 @@
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import EditIcon from '@mui/icons-material/Edit';
 import StarIcon from '@mui/icons-material/Star';
+import type { PaperProps } from '@mui/material';
 import {
+  Box,
   Button,
   Divider,
   Drawer,
   Grid,
   IconButton,
   Paper,
+  styled,
   Switch,
   TextField,
   Tooltip,
@@ -15,7 +18,6 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import { useAppUser } from 'commons/components/app/hooks';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -27,37 +29,20 @@ import { useSearchParams } from 'components/routes/alerts/contexts/SearchParamsC
 import { ChipList } from 'components/visual/ChipList';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-const useStyles = makeStyles(theme => ({
-  drawerInner: {
-    display: 'flex',
-    flexDirection: 'column',
-    padding: theme.spacing(3),
-    width: '600px',
-    [theme.breakpoints.only('xs')]: {
-      width: '100vw'
-    }
-  },
-  preview: {
+const Preview = memo(
+  styled(({ component = 'pre', variant = 'outlined', ...props }: PaperProps) => (
+    <Paper component={component} variant={variant} {...props} />
+  ))<PaperProps>(({ theme }) => ({
     margin: 0,
     padding: theme.spacing(0.75, 1),
     whiteSpace: 'pre-wrap',
     wordBreak: 'break-word',
     backgroundColor: theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[200]
-  },
-  editIconButton: {
-    borderRadius: '50%',
-    backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.26)' : 'rgba(0, 0, 0, 0.26)',
-    padding: 'inherit',
-    height: '18.33px',
-    width: '18.33px',
-    '&:hover': {
-      backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.4)'
-    }
-  }
-}));
+  }))
+);
 
 export type Favorite = {
   classification: string;
@@ -76,7 +61,7 @@ type AddFavoriteProps = {
 const AddFavorite: React.FC<AddFavoriteProps> = React.memo(
   ({ favorite, global = false, show = true, onSuccess }: AddFavoriteProps) => {
     const { t } = useTranslation('favorites');
-    const classes = useStyles();
+    const theme = useTheme();
     const { apiCall } = useMyAPI();
     const { c12nDef } = useALContext();
     const { user: currentUser } = useAppUser<CustomUser>();
@@ -146,9 +131,7 @@ const AddFavorite: React.FC<AddFavoriteProps> = React.memo(
 
               <Grid style={{ width: '100%' }}>
                 <Typography variant="subtitle2">{t('confirmation.query')}</Typography>
-                <Paper component="pre" variant="outlined" className={classes.preview}>
-                  {favorite.query}
-                </Paper>
+                <Preview>{favorite.query}</Preview>
               </Grid>
 
               <Grid component="span" children={t('confirmation.confirm')} />
@@ -172,7 +155,7 @@ type UpdateFavoriteProps = {
 const UpdateFavorite: React.FC<UpdateFavoriteProps> = React.memo(
   ({ favorite, globalFavorites, userFavorites, global = false, show = true, onSuccess }: UpdateFavoriteProps) => {
     const { t } = useTranslation('favorites');
-    const classes = useStyles();
+    const theme = useTheme();
     const { apiCall } = useMyAPI();
     const { c12nDef } = useALContext();
     const { user: currentUser } = useAppUser<CustomUser>();
@@ -246,18 +229,16 @@ const UpdateFavorite: React.FC<UpdateFavoriteProps> = React.memo(
 
               <Grid style={{ width: '100%' }}>
                 <Typography variant="subtitle2">{t('confirmation.from')}</Typography>
-                <Paper component="pre" variant="outlined" className={classes.preview}>
+                <Preview>
                   {global
                     ? globalFavorites.find(f => f.name === favorite.name)?.query
                     : userFavorites.find(f => f.name === favorite.name)?.query}
-                </Paper>
+                </Preview>
               </Grid>
 
               <Grid style={{ width: '100%' }}>
                 <Typography variant="subtitle2">{t('confirmation.to')}</Typography>
-                <Paper component="pre" variant="outlined" className={classes.preview}>
-                  {favorite.query}
-                </Paper>
+                <Preview>{favorite.query}</Preview>
               </Grid>
 
               <Grid component="span" children={t('confirmation.confirm')} />
@@ -279,7 +260,7 @@ type DeleteFavoriteProps = {
 const DeleteFavorite: React.FC<DeleteFavoriteProps> = React.memo(
   ({ favorite, global = false, show = true, onSuccess }: DeleteFavoriteProps) => {
     const { t } = useTranslation('favorites');
-    const classes = useStyles();
+    const theme = useTheme();
     const { apiCall } = useMyAPI();
     const { user: currentUser } = useAppUser<CustomUser>();
     const { showSuccessMessage, showErrorMessage } = useMySnackbar();
@@ -341,9 +322,7 @@ const DeleteFavorite: React.FC<DeleteFavoriteProps> = React.memo(
 
               <Grid style={{ width: '100%' }}>
                 <Typography variant="subtitle2">{t('confirmation.query')}</Typography>
-                <Paper component="pre" variant="outlined" className={classes.preview}>
-                  {favorite.query}
-                </Paper>
+                <Preview>{favorite.query}</Preview>
               </Grid>
 
               <Grid component="span" children={t('confirmation.confirm')} />
@@ -357,7 +336,6 @@ const DeleteFavorite: React.FC<DeleteFavoriteProps> = React.memo(
 
 const WrappedAlertFavorites = () => {
   const { t } = useTranslation('favorites');
-  const classes = useStyles();
   const theme = useTheme();
   const { c12nDef } = useALContext();
   const { user: currentUser } = useAppUser<CustomUser>();
@@ -459,7 +437,17 @@ const WrappedAlertFavorites = () => {
                 <CloseOutlinedIcon />
               </IconButton>
             </div>
-            <div className={classes.drawerInner}>
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                padding: theme.spacing(3),
+                width: '600px',
+                [theme.breakpoints.only('xs')]: {
+                  width: '100vw'
+                }
+              }}
+            >
               <div style={{ paddingBottom: theme.spacing(2) }}>
                 <Typography variant="h4">{t('favorites')}</Typography>
               </div>
@@ -551,7 +539,20 @@ const WrappedAlertFavorites = () => {
                     label: <span>{f.name}</span>,
                     tooltip: f.query,
                     deleteIcon: (
-                      <IconButton className={classes.editIconButton}>
+                      <IconButton
+                        sx={{
+                          borderRadius: '50%',
+                          backgroundColor:
+                            theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.26)' : 'rgba(0, 0, 0, 0.26)',
+                          padding: 'inherit',
+                          height: '18.33px',
+                          width: '18.33px',
+                          '&:hover': {
+                            backgroundColor:
+                              theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.4)'
+                          }
+                        }}
+                      >
                         <EditIcon style={{ color: theme.palette.background.paper, fontSize: 'small' }} />
                       </IconButton>
                     ),
@@ -572,13 +573,26 @@ const WrappedAlertFavorites = () => {
                     tooltip: (
                       <div style={{ display: 'flex', flexDirection: 'column' }}>
                         <div style={{ fontStyle: 'normal' }}>{f.query}</div>
-                        <div
-                          style={{ placeSelf: 'flex-end', color: theme.palette.text.secondary }}
-                        >{`(${f.created_by})`}</div>
+                        <div style={{ placeSelf: 'flex-end', color: theme.palette.text.secondary }}>
+                          {`(${f.created_by})`}
+                        </div>
                       </div>
                     ),
                     deleteIcon: (
-                      <IconButton className={classes.editIconButton}>
+                      <IconButton
+                        sx={{
+                          borderRadius: '50%',
+                          backgroundColor:
+                            theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.26)' : 'rgba(0, 0, 0, 0.26)',
+                          padding: 'inherit',
+                          height: '18.33px',
+                          width: '18.33px',
+                          '&:hover': {
+                            backgroundColor:
+                              theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.4)'
+                          }
+                        }}
+                      >
                         <EditIcon style={{ color: theme.palette.background.paper, fontSize: 'small' }} />
                       </IconButton>
                     ),
@@ -587,7 +601,7 @@ const WrappedAlertFavorites = () => {
                   }))}
                 />
               </div>
-            </div>
+            </Box>
           </>
         )}
       </Drawer>

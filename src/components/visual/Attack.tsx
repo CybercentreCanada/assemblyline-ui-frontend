@@ -8,8 +8,8 @@ import useALContext from 'components/hooks/useALContext';
 import useHighlighter from 'components/hooks/useHighlighter';
 import useSafeResults from 'components/hooks/useSafeResults';
 import type { CustomUser } from 'components/models/ui/user';
-import type { PossibleColors } from 'components/visual/CustomChip';
 import CustomChip from 'components/visual/CustomChip';
+import type { PossibleColor } from 'helpers/colors';
 import { safeFieldValueURI } from 'helpers/utils';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -54,7 +54,7 @@ const WrappedAttack: React.FC<AttackProps> = ({
   const handleClick = useCallback(() => triggerHighlight(highlight_key), [triggerHighlight, highlight_key]);
 
   const maliciousness = lvl || scoreToVerdict(score);
-  const color: PossibleColors = {
+  const color: PossibleColor = {
     suspicious: 'warning' as const,
     malicious: 'error' as const,
     safe: 'success' as const,

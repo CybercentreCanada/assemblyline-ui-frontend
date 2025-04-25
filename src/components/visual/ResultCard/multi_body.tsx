@@ -1,26 +1,17 @@
 import { Divider, useTheme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import type { MultiBody as MultiData } from 'components/models/base/result_body';
+import { GraphBody } from 'components/visual/ResultCard/graph_body';
+import { ImageBody } from 'components/visual/ResultCard/image_body';
+import { JSONBody } from 'components/visual/ResultCard/json_body';
+import { KVBody } from 'components/visual/ResultCard/kv_body';
+import { MemDumpBody } from 'components/visual/ResultCard/memdump_body';
+import { OrderedKVBody } from 'components/visual/ResultCard/ordered_kv_body';
+import { ProcessTreeBody } from 'components/visual/ResultCard/process_tree_body';
+import { TblBody } from 'components/visual/ResultCard/table_body';
+import { TextBody } from 'components/visual/ResultCard/text_body';
+import { URLBody } from 'components/visual/ResultCard/url_body';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { GraphBody } from './graph_body';
-import { ImageBody } from './image_body';
-import { JSONBody } from './json_body';
-import { KVBody } from './kv_body';
-import { MemDumpBody } from './memdump_body';
-import { OrderedKVBody } from './ordered_kv_body';
-import { ProcessTreeBody } from './process_tree_body';
-import { TblBody } from './table_body';
-import { TextBody } from './text_body';
-import { URLBody } from './url_body';
-
-const useStyles = makeStyles(theme => ({
-  divider: {
-    '@media print': {
-      backgroundColor: '#0000001f !important'
-    }
-  }
-}));
 
 type Props = {
   body: MultiData;
@@ -29,8 +20,8 @@ type Props = {
 
 const WrappedMultiBody = ({ body, printable = false }: Props) => {
   const { t } = useTranslation(['fileDetail']);
-  const classes = useStyles();
   const theme = useTheme();
+
   return body ? (
     <div style={{ display: 'flex', flexDirection: 'column', gap: theme.spacing(1) }}>
       {body.map((part, idx) => (
@@ -70,7 +61,15 @@ const WrappedMultiBody = ({ body, printable = false }: Props) => {
                     return <div style={{ margin: '2rem' }}>{t('invalid_section')}</div>;
                 }
               })()
-            : part[0] === 'DIVIDER' && <Divider className={classes.divider} />}
+            : part[0] === 'DIVIDER' && (
+                <Divider
+                  sx={{
+                    '@media print': {
+                      backgroundColor: '#0000001f !important'
+                    }
+                  }}
+                />
+              )}
         </div>
       ))}
     </div>

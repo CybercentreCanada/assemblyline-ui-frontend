@@ -7,19 +7,18 @@ import {
   ListItemIcon,
   ListItemText,
   MenuItem,
-  MenuList,
   Popper,
   useTheme
 } from '@mui/material';
+import useSorters from 'commons/addons/lists/hooks/useSorters';
+import type { LineItem } from 'commons/addons/lists/item/ListItemBase';
+import type { SorterField } from 'commons/addons/lists/sorters/SorterSelector';
+import SorterTrigger from 'commons/addons/lists/sorters/SorterTrigger';
+import type { TableListLayout } from 'commons/addons/lists/table/TableListLayout';
+import type { TableColumnField } from 'commons/addons/lists/table/types';
+import { HeaderCell, HeaderCellMenuBtn, HeaderCellMenuPopper } from 'commons/addons/lists/table/useStyles';
 import { memo, useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import useSorters from '../hooks/useSorters';
-import { LineItem } from '../item/ListItemBase';
-import { SorterField } from '../sorters/SorterSelector';
-import SorterTrigger from '../sorters/SorterTrigger';
-import { TableListLayout } from './TableListLayout';
-import { TableColumnField } from './types';
-import { useTableStyles } from './useStyles';
 
 interface TableListHeaderProps<T extends LineItem> {
   items: T[];
@@ -42,17 +41,15 @@ const TableListHeader = memo(
     onSort
   }: TableListHeaderProps<T>) => {
     const { t } = useTranslation();
-    const classes = useTableStyles();
     const [menuOpenIndex, onMenuBtnClick] = useState<number>(-1);
     const cellRenderer = useCallback(
       (column: TableColumnField, sorter, cellIndex, cellWidth, menuOpen) => {
         const label = column.i18nKey ? t(column.i18nKey) : column.label;
         return (
-          <div
+          <HeaderCell
             key={`tablelist.header[${cellIndex}]`}
-            className={`${classes.headerCell} ${!menuOpen && sorter ? itemClasses.itemHover : ''} ${
-              !noDivider ? itemClasses.itemDivider : ''
-            }`}
+            hover={!menuOpen && sorter}
+            divider={!noDivider}
             style={{ minWidth: cellWidth, maxWidth: cellWidth }}
             data-column={cellIndex}
             data-menuopen={menuOpen}
@@ -68,10 +65,10 @@ const TableListHeader = memo(
                 onMenuBtnClick={onMenuBtnClick}
               />
             )}
-          </div>
+          </HeaderCell>
         );
       },
-      [classes, itemClasses, sorters, noDivider, t, onSort]
+      [noDivider, onSort, sorters, t]
     );
 
     return (
@@ -107,7 +104,6 @@ const TableListHeaderCellMenu = memo(
     const theme = useTheme();
     const { t } = useTranslation();
     const { icon } = useSorters();
-    const classes = useTableStyles();
     const actionMenuRef = useRef(null);
 
     const onDeleteSorter = () => {
@@ -131,7 +127,7 @@ const TableListHeaderCellMenu = memo(
 
     return (
       <div ref={actionMenuRef}>
-        <div className={classes.headerCellMenuBtn}>
+        <HeaderCellMenuBtn>
           <IconButton size="small" onClick={() => onMenuBtnClick(columnIndex)}>
             <MoreVertIcon />
           </IconButton>
@@ -145,20 +141,20 @@ const TableListHeaderCellMenu = memo(
             {({ TransitionProps }) => (
               <ClickAwayListener onClickAway={() => onMenuBtnClick(-1)}>
                 <Fade {...TransitionProps}>
-                  <MenuList className={classes.headerCellMenuPopper}>
+                  <HeaderCellMenuPopper>
                     <MenuItem onClick={onUnsort} disabled={sorter.state === 'unset'}>
-                      <ListItemIcon>{icon('unset' as 'unset')}</ListItemIcon>
+                      <ListItemIcon>{icon('unset' as const)}</ListItemIcon>
                       <ListItemText>{t('list.selector.sorters.unsort')}</ListItemText>
                     </MenuItem>
                     <MenuItem onClick={onSortAsc} disabled={sorter.state === 'asc'}>
                       <ListItemIcon>
-                        <ListItemIcon>{icon('asc' as 'asc')}</ListItemIcon>
+                        <ListItemIcon>{icon('asc' as const)}</ListItemIcon>
                       </ListItemIcon>
                       <ListItemText>{t('list.selector.sorters.asc')}</ListItemText>
                     </MenuItem>
                     <MenuItem onClick={onSortDesc} disabled={sorter.state === 'desc'}>
                       <ListItemIcon>
-                        <ListItemIcon>{icon('desc' as 'desc')}</ListItemIcon>
+                        <ListItemIcon>{icon('desc' as const)}</ListItemIcon>
                       </ListItemIcon>
                       <ListItemText>{t('list.selector.sorters.desc')}</ListItemText>
                     </MenuItem>
@@ -168,12 +164,12 @@ const TableListHeaderCellMenu = memo(
                       </ListItemIcon>
                       <ListItemText>{t('list.selector.sorters.remove')}</ListItemText>
                     </MenuItem>
-                  </MenuList>
+                  </HeaderCellMenuPopper>
                 </Fade>
               </ClickAwayListener>
             )}
           </Popper>
-        </div>
+        </HeaderCellMenuBtn>
       </div>
     );
   }

@@ -1,8 +1,18 @@
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import { Box, Button, Collapse, Divider, Grid, Skeleton, Typography, useMediaQuery, useTheme } from '@mui/material';
+import {
+  Box,
+  Button,
+  Collapse,
+  Divider,
+  Grid,
+  Skeleton,
+  styled,
+  Typography,
+  useMediaQuery,
+  useTheme
+} from '@mui/material';
 import Alert from '@mui/material/Alert';
-import makeStyles from '@mui/styles/makeStyles';
 import { Fetcher } from 'borealis-ui';
 import ListCarousel from 'commons/addons/lists/carousel/ListCarousel';
 import ListNavigator from 'commons/addons/lists/navigator/ListNavigator';
@@ -42,33 +52,45 @@ import Verdict from 'components/visual/Verdict';
 import VerdictBar from 'components/visual/VerdictBar';
 import { ImageInline } from 'components/visual/image_inline';
 import { verdictToColor } from 'helpers/utils';
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BsClipboard } from 'react-icons/bs';
 import { useParams } from 'react-router';
 
-const useStyles = makeStyles(theme => ({
-  section: {
+const Section = memo(
+  styled('div')(({ theme }) => ({
     marginBottom: theme.spacing(2),
     '& > hr': {
       marginBottom: theme.spacing(1)
     }
-  },
-  sectionTitle: {
-    fontWeight: 'bold'
-  },
-  sectionContent: {
+  }))
+);
+
+const SectionTitle = memo(
+  styled(Typography)(({ theme }) => ({
+    marginBottom: theme.spacing(2),
+    '& > hr': {
+      marginBottom: theme.spacing(1)
+    }
+  }))
+);
+
+const SectionContent = memo(
+  styled('div')(({ theme }) => ({
     display: 'flex',
     flexDirection: 'row',
     columnGap: theme.spacing(1)
-  },
-  clipboardIcon: {
+  }))
+);
+
+const ClipboardIcon = memo(
+  styled(BsClipboard)(({ theme }) => ({
     '&:hover': {
       cursor: 'pointer',
       transform: 'scale(1.1)'
     }
-  }
-}));
+  }))
+);
 
 type Params = {
   id?: string;
@@ -85,7 +107,6 @@ type Props = {
 const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null, inDrawer = false }: Props) => {
   const { t } = useTranslation(['alerts']);
   const theme = useTheme();
-  const classes = useStyles();
   const { apiCall } = useMyAPI();
   const { copy } = useClipboard();
   const { addInsight, removeInsight } = useAssistant();
@@ -215,10 +236,10 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
           <Grid container spacing={1}>
             <Grid size={{ xs: 12, md: 6 }}>
               {/* Alert Information Section */}
-              <div className={classes.section}>
-                <Typography className={classes.sectionTitle}>{t('alert_info')}</Typography>
+              <Section>
+                <SectionTitle>{t('alert_info')}</SectionTitle>
                 <Divider />
-                <div className={classes.sectionContent}>
+                <SectionContent>
                   <Grid container alignItems="center">
                     {/* Alert ID */}
                     <Grid size={{ xs: 3, sm: 2, md: 4 }}>{t('alert_id')}</Grid>
@@ -277,16 +298,16 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                       )}
                     </Grid>
                   </Grid>
-                </div>
-              </div>
+                </SectionContent>
+              </Section>
             </Grid>
             <Grid size={{ xs: 12, md: 6 }}>
               <div>
                 {/* Score Section. */}
-                <div className={classes.section}>
-                  <Typography className={classes.sectionTitle}>{t('verdict')}</Typography>
+                <Section>
+                  <SectionTitle>{t('verdict')}</SectionTitle>
                   <Divider />
-                  <div className={classes.sectionContent}>
+                  <SectionContent>
                     <Grid container>
                       <Grid size={{ xs: 3, sm: 2, md: 4 }}>{t('score')}</Grid>
                       <Grid size={{ xs: 9, sm: 10, md: 8 }}>
@@ -308,13 +329,13 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                         )}
                       </Grid>
                     </Grid>
-                  </div>
-                </div>
+                  </SectionContent>
+                </Section>
                 {/* Labels Section */}
-                <div className={classes.section}>
-                  <Typography className={classes.sectionTitle}>{t('label')}</Typography>
+                <Section>
+                  <SectionTitle>{t('label')}</SectionTitle>
                   <Divider />
-                  <div className={classes.sectionContent}>
+                  <SectionContent>
                     <ActionableChipList
                       items={
                         alert
@@ -326,18 +347,17 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                           : null
                       }
                     />
-                  </div>
-                </div>
+                  </SectionContent>
+                </Section>
               </div>
             </Grid>
           </Grid>
 
           {/* File Info */}
-          <div className={classes.section}>
-            <Typography className={classes.sectionTitle}>{t('file_info')}</Typography>
+          <Section>
+            <SectionTitle>{t('file_info')}</SectionTitle>
             <Divider />
-            <div
-              className={classes.sectionContent}
+            <SectionContent
               style={{
                 display: 'flex',
                 alignItems: upSM ? 'start' : 'center',
@@ -365,7 +385,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                   </Typography>
                 </Grid>
                 <Grid size={{ xs: 3, sm: 2 }}>
-                  <BsClipboard className={classes.clipboardIcon} onClick={alert ? () => copy(alert.file.md5) : null} />
+                  <ClipboardIcon onClick={alert ? () => copy(alert.file.md5) : null} />
                   <Typography variant="caption" style={{ marginLeft: theme.spacing(0.5) }}>
                     MD5:
                   </Typography>
@@ -383,7 +403,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                   )}
                 </Grid>
                 <Grid size={{ xs: 3, sm: 2 }}>
-                  <BsClipboard className={classes.clipboardIcon} onClick={alert ? () => copy(alert.file.sha1) : null} />
+                  <ClipboardIcon onClick={alert ? () => copy(alert.file.sha1) : null} />
                   <Typography variant="caption" style={{ marginLeft: theme.spacing(0.5) }}>
                     SHA1:
                   </Typography>
@@ -401,10 +421,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                   )}
                 </Grid>
                 <Grid size={{ xs: 3, sm: 2 }}>
-                  <BsClipboard
-                    className={classes.clipboardIcon}
-                    onClick={alert ? () => copy(alert.file.sha256) : null}
-                  />
+                  <ClipboardIcon onClick={alert ? () => copy(alert.file.sha256) : null} />
                   <Typography variant="caption" style={{ marginLeft: theme.spacing(0.5) }}>
                     SHA256:
                   </Typography>
@@ -423,12 +440,12 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                 </Grid>
               </Grid>
               {alert && alert.file.screenshots && <ImageInline data={alert.file.screenshots} size="small" />}
-            </div>
-          </div>
+            </SectionContent>
+          </Section>
 
           {/* Metadata Section */}
           {!alert || (alert.metadata && Object.keys(alert.metadata).length > 0) ? (
-            <div className={classes.section}>
+            <Section>
               <div
                 style={{
                   display: 'flex',
@@ -436,7 +453,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                   justifyContent: 'space-between'
                 }}
               >
-                <Typography className={classes.sectionTitle}>{t('metadata')}</Typography>
+                <SectionTitle>{t('metadata')}</SectionTitle>
                 {alert &&
                   Object.keys(alert.metadata).filter(k => configuration.ui.alerting_meta.important.indexOf(k) === -1)
                     .length !== 0 && (
@@ -460,7 +477,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                   )}
               </div>
               <Divider />
-              <div className={classes.sectionContent}>
+              <SectionContent>
                 <div style={{ flex: 1 }}>
                   <pre style={{ margin: 0, whiteSpace: 'pre-wrap', wordBreak: 'break-all' }}>
                     {alert ? (
@@ -538,8 +555,8 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                     />
                   </div>
                 )}
-              </div>
-            </div>
+              </SectionContent>
+            </Section>
           ) : null}
 
           {(!alert ||
@@ -553,7 +570,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
             alert.al.behavior.length !== 0 ||
             alert.al.yara.length !== 0) && (
             <>
-              <Typography className={classes.sectionTitle}>{t('al_results')}</Typography>
+              <SectionTitle>{t('al_results')}</SectionTitle>
               <Divider />
               <Grid container spacing={1} style={{ marginTop: theme.spacing(1) }}>
                 {/* AL Attributions Section */}
@@ -561,7 +578,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                   <>
                     <Grid size={{ xs: 3, sm: 2 }}>{t('attributions')}</Grid>
                     <Grid size={{ xs: 9, sm: 10 }}>
-                      <div className={classes.sectionContent}>
+                      <SectionContent>
                         {alert && alert.al.detailed ? (
                           <ActionableChipList
                             items={alert.al.detailed.attrib.map(item => {
@@ -598,7 +615,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                             }
                           />
                         )}
-                      </div>
+                      </SectionContent>
                     </Grid>
                   </>
                 ) : null}
@@ -608,7 +625,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                   <>
                     <Grid size={{ xs: 3, sm: 2 }}>{t('avhits')}</Grid>
                     <Grid size={{ xs: 9, sm: 10 }}>
-                      <div className={classes.sectionContent}>
+                      <SectionContent>
                         {alert && alert.al.detailed ? (
                           <AutoHideChipList
                             items={alert.al.detailed.av}
@@ -628,7 +645,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                             }
                           />
                         )}
-                      </div>
+                      </SectionContent>
                     </Grid>
                   </>
                 ) : null}
@@ -638,7 +655,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                   <>
                     <Grid size={{ xs: 3, sm: 2 }}>{t('ip')}</Grid>
                     <Grid size={{ xs: 9, sm: 10 }}>
-                      <div className={classes.sectionContent}>
+                      <SectionContent>
                         <Grid container spacing={1}>
                           {(!alert || alert.al.ip_dynamic.length !== 0) && (
                             <Grid size={{ xs: 12, md: !alert || alert.al.ip_static.length !== 0 ? 6 : 12 }}>
@@ -693,7 +710,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                             </Grid>
                           )}
                         </Grid>
-                      </div>
+                      </SectionContent>
                     </Grid>
                   </>
                 ) : null}
@@ -703,7 +720,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                   <>
                     <Grid size={{ xs: 3, sm: 2 }}>{t('domain')}</Grid>
                     <Grid size={{ xs: 9, sm: 10 }}>
-                      <div className={classes.sectionContent}>
+                      <SectionContent>
                         <Grid container spacing={1}>
                           {(!alert || alert.al.domain_dynamic.length !== 0) && (
                             <Grid size={{ xs: 12, md: !alert || alert.al.domain_static.length !== 0 ? 6 : 12 }}>
@@ -762,7 +779,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                             </Grid>
                           )}
                         </Grid>
-                      </div>
+                      </SectionContent>
                     </Grid>
                   </>
                 ) : null}
@@ -772,7 +789,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                   <>
                     <Grid size={{ xs: 3, sm: 2 }}>{t('uri')}</Grid>
                     <Grid size={{ xs: 9, sm: 10 }}>
-                      <div className={classes.sectionContent}>
+                      <SectionContent>
                         <Grid container spacing={1}>
                           {(!alert || alert.al.uri_dynamic.length !== 0) && (
                             <Grid size={{ xs: 12, md: !alert || alert.al.uri_static.length !== 0 ? 6 : 12 }}>
@@ -827,7 +844,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                             </Grid>
                           )}
                         </Grid>
-                      </div>
+                      </SectionContent>
                     </Grid>
                   </>
                 ) : null}
@@ -837,7 +854,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                   <>
                     <Grid size={{ xs: 3, sm: 2 }}>{t('heuristic')}</Grid>
                     <Grid size={{ xs: 9, sm: 10 }}>
-                      <div className={classes.sectionContent}>
+                      <SectionContent>
                         {alert && alert.al.detailed ? (
                           <AutoHideChipList
                             category={null}
@@ -859,7 +876,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                             }
                           />
                         )}
-                      </div>
+                      </SectionContent>
                     </Grid>
                   </>
                 ) : null}
@@ -869,7 +886,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                   <>
                     <Grid size={{ xs: 3, sm: 2 }}>{t('behaviors')}</Grid>
                     <Grid size={{ xs: 9, sm: 10 }}>
-                      <div className={classes.sectionContent}>
+                      <SectionContent>
                         {alert && alert.al.detailed ? (
                           <AutoHideChipList
                             items={alert.al.detailed.behavior}
@@ -889,7 +906,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                             }
                           />
                         )}
-                      </div>
+                      </SectionContent>
                     </Grid>
                   </>
                 ) : null}
@@ -899,7 +916,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                   <>
                     <Grid size={{ xs: 3, sm: 2 }}>{t('yara')}</Grid>
                     <Grid size={{ xs: 9, sm: 10 }}>
-                      <div className={classes.sectionContent}>
+                      <SectionContent>
                         {alert && alert.al.detailed ? (
                           <AutoHideChipList
                             items={alert.al.detailed.yara}
@@ -919,7 +936,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                             }
                           />
                         )}
-                      </div>
+                      </SectionContent>
                     </Grid>
                   </>
                 ) : null}
@@ -929,7 +946,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                   <>
                     <Grid size={{ xs: 3, sm: 2 }}>{t('attack')}</Grid>
                     <Grid size={{ xs: 9, sm: 10 }}>
-                      <div className={classes.sectionContent}>
+                      <SectionContent>
                         <Grid container spacing={1}>
                           <Grid size={{ xs: 12, md: 6 }}>
                             <Typography variant="caption" style={{ marginRight: theme.spacing(1) }} component="div">
@@ -984,7 +1001,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                             )}
                           </Grid>
                         </Grid>
-                      </div>
+                      </SectionContent>
                     </Grid>
                   </>
                 ) : null}

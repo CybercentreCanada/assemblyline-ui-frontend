@@ -12,7 +12,6 @@ import {
   useTheme
 } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
-import makeStyles from '@mui/styles/makeStyles';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useALContext from 'components/hooks/useALContext';
@@ -34,12 +33,6 @@ import { HASH_MAP, MD5_REGEX, SHA1_REGEX, SHA256_REGEX, SSDEEP_REGEX, TLSH_REGEX
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate, useParams } from 'react-router';
-
-const useStyles = makeStyles(theme => ({
-  endAdornment: {
-    paddingRight: theme.spacing(0.5)
-  }
-}));
 
 type ParamProps = {
   id: string;
@@ -66,7 +59,6 @@ const SafelistNew = ({}: Props) => {
   const { showSuccessMessage } = useMySnackbar();
   const { apiCall } = useMyAPI();
   const navigate = useNavigate();
-  const classes = useStyles();
 
   useEffectOnce(() => {
     const tempTags = Object.keys(indexes.result)
@@ -428,10 +420,11 @@ const SafelistNew = ({}: Props) => {
                             })
                           }
                         />
-                      ),
-                      classes: {
-                        adornedEnd: classes.endAdornment
-                      }
+                      )
+                      // TODO
+                      // classes: {
+                      //   adornedEnd: classes.endAdornment
+                      // }
                     }}
                   />
                 </FormControl>

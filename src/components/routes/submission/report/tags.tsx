@@ -1,35 +1,8 @@
 import { Divider, Grid, Typography, useTheme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import type { SubmissionReport } from 'components/models/ui/submission_report';
 import TextVerdict from 'components/visual/TextVerdict';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-
-const useStyles = makeStyles(theme => ({
-  tag_type: {
-    fontSize: '110%',
-    fontWeight: 600
-  },
-  divider: {
-    '@media print': {
-      backgroundColor: '#0000001f !important'
-    }
-  },
-  section_title: {
-    marginTop: theme.spacing(4),
-    pageBreakAfter: 'avoid',
-    pageBreakInside: 'avoid'
-  },
-  section_content: {
-    marginTop: theme.spacing(2),
-    marginBottom: theme.spacing(2),
-    pageBreakBefore: 'avoid',
-    pageBreakInside: 'avoid'
-  },
-  section: {
-    pageBreakInside: 'avoid'
-  }
-}));
 
 type TagTableProps = {
   group: string;
@@ -40,7 +13,6 @@ function TagTable({ group, items }: TagTableProps) {
   const { t } = useTranslation(['submissionReport']);
   const theme = useTheme();
   const orderedItems = {};
-  const classes = useStyles();
 
   Object.keys(items).map(tagType =>
     Object.keys(items[tagType]).map(tagValue => {
@@ -54,12 +26,35 @@ function TagTable({ group, items }: TagTableProps) {
   );
 
   return Object.keys(orderedItems).length !== 0 ? (
-    <div className={classes.section}>
-      <div className={classes.section_title}>
+    <div
+      style={{
+        pageBreakInside: 'avoid'
+      }}
+    >
+      <div
+        style={{
+          marginTop: theme.spacing(4),
+          pageBreakAfter: 'avoid',
+          pageBreakInside: 'avoid'
+        }}
+      >
         <Typography variant="h6">{t(`tag.${group}`)}</Typography>
-        <Divider className={classes.divider} />
+        <Divider
+          sx={{
+            '@media print': {
+              backgroundColor: '#0000001f !important'
+            }
+          }}
+        />
       </div>
-      <div className={classes.section_content}>
+      <div
+        style={{
+          marginTop: theme.spacing(2),
+          marginBottom: theme.spacing(2),
+          pageBreakBefore: 'avoid',
+          pageBreakInside: 'avoid'
+        }}
+      >
         <Grid container spacing={0.5}>
           {Object.keys(orderedItems).map((k, idx) => (
             <Grid
@@ -71,7 +66,14 @@ function TagTable({ group, items }: TagTableProps) {
             >
               <div style={{ display: 'flex', gap: theme.spacing(0.5) }}>
                 <TextVerdict verdict={orderedItems[k].verdict} mono />
-                <span className={classes.tag_type}>{t(orderedItems[k].type)}</span>
+                <span
+                  style={{
+                    fontSize: '110%',
+                    fontWeight: 600
+                  }}
+                >
+                  {t(orderedItems[k].type)}
+                </span>
               </div>
 
               <div

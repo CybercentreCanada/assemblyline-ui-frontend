@@ -8,10 +8,7 @@ import Paper from '@mui/material/Paper';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableSortLabel from '@mui/material/TableSortLabel';
-import type { Theme } from '@mui/material/styles';
 import { alpha, useTheme } from '@mui/material/styles';
-import createStyles from '@mui/styles/createStyles';
-import makeStyles from '@mui/styles/makeStyles';
 import Throttler from 'commons/addons/utils/throttler';
 import PageHeader from 'commons/components/pages/PageHeader';
 import Classification from 'components/visual/Classification';
@@ -61,17 +58,6 @@ export interface Cell {
   numeric: boolean;
 }
 
-const useHeaderStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    comfortable: {
-      paddingLeft: theme.spacing(1),
-      paddingRight: theme.spacing(1),
-      paddingTop: theme.spacing(1.5),
-      paddingBottom: theme.spacing(1.5)
-    }
-  })
-);
-
 interface EnhancedTableHeadProps {
   cells: Cell[];
   dense?: boolean;
@@ -87,7 +73,7 @@ const WrappedEnhancedTableHead: React.FC<EnhancedTableHeadProps> = ({
   orderBy,
   onRequestSort
 }) => {
-  const classes = useHeaderStyles();
+  const theme = useTheme();
   const createSortHandler = (property: string) => (event: React.MouseEvent<unknown>) => {
     onRequestSort(event, property);
   };
@@ -98,10 +84,17 @@ const WrappedEnhancedTableHead: React.FC<EnhancedTableHeadProps> = ({
         {cells.map(cell => (
           <DivTableCell
             key={cell.id}
-            className={!dense ? classes.comfortable : null}
             align={cell.numeric ? 'right' : 'left'}
             padding={cell.disablePadding ? 'none' : 'normal'}
             sortDirection={orderBy === cell.id ? order : false}
+            sx={{
+              ...(!dense && {
+                paddingLeft: theme.spacing(1),
+                paddingRight: theme.spacing(1),
+                paddingTop: theme.spacing(1.5),
+                paddingBottom: theme.spacing(1.5)
+              })
+            }}
           >
             <TableSortLabel
               active={orderBy === cell.id}

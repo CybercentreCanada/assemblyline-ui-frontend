@@ -1,6 +1,7 @@
 import BackspaceIcon from '@mui/icons-material/Backspace';
 import type { IconButtonProps, TooltipProps } from '@mui/material';
 import {
+  Box,
   Divider,
   IconButton,
   LinearProgress,
@@ -11,7 +12,6 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import PageHeader from 'commons/components/pages/PageHeader';
 import { ChipList } from 'components/visual/ChipList';
 import SearchTextField from 'components/visual/SearchBar/search-textfield';
@@ -19,55 +19,6 @@ import SearchResultCount from 'components/visual/SearchResultCount';
 import type { ReactNode } from 'react';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-
-const useStyles = makeStyles(theme => ({
-  root: {
-    '& button': {
-      marginRight: theme.spacing(1)
-    }
-  },
-  wrapper: {
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    borderRadius: '4px',
-    paddingLeft: theme.spacing(2),
-    paddingRight: theme.spacing(0.5),
-    backgroundColor: alpha(theme.palette.text.primary, 0.04),
-    '&:hover': {
-      backgroundColor: alpha(theme.palette.text.primary, 0.06)
-    },
-    '& input': {
-      color: theme.palette.text.secondary
-    }
-  },
-  container: {
-    display: 'relative',
-    flex: 1
-  },
-  // searchbar: {
-  //   borderRadius: '4px',
-  //   paddingLeft: theme.spacing(2),
-  //   backgroundColor: alpha(theme.palette.text.primary, 0.04),
-  //   '&:hover': {
-  //     backgroundColor: alpha(theme.palette.text.primary, 0.06)
-  //   },
-  //   '& input': {
-  //     color: theme.palette.text.secondary
-  //   }
-  // },
-  searchresult: {
-    display: 'flex',
-    flexWrap: 'wrap',
-    justifyContent: 'flex-end',
-    // fontStyle: 'italic',
-    // color: theme.palette.primary.light,
-    paddingLeft: theme.spacing(1),
-    paddingBottom: theme.spacing(1),
-    paddingTop: theme.spacing(0.5)
-    // paddingBottom: theme.spacing(0.5)
-  }
-}));
 
 const MAX_TRACKED_RECORDS = 10000;
 
@@ -151,7 +102,6 @@ const WrappedSearchHeader = ({
 }: Props) => {
   const { t } = useTranslation();
   const theme = useTheme();
-  const classes = useStyles();
   const upMD = useMediaQuery(theme.breakpoints.up('md'));
 
   const params = useMemo<URLSearchParams>(() => new URLSearchParams(value), [value]);
@@ -244,9 +194,38 @@ const WrappedSearchHeader = ({
   return (
     <PageHeader isSticky={isSticky}>
       <div style={{ paddingTop: theme.spacing(1), paddingBottom: theme.spacing(1) }}>
-        <div ref={rootRef} className={classes.root}>
-          <div className={classes.wrapper}>
-            <div className={classes.container} ref={inputRef}>
+        <Box
+          ref={rootRef}
+          sx={{
+            '& button': {
+              marginRight: theme.spacing(1)
+            }
+          }}
+        >
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'row',
+              alignItems: 'center',
+              borderRadius: '4px',
+              paddingLeft: theme.spacing(2),
+              paddingRight: theme.spacing(0.5),
+              backgroundColor: alpha(theme.palette.text.primary, 0.04),
+              '&:hover': {
+                backgroundColor: alpha(theme.palette.text.primary, 0.06)
+              },
+              '& input': {
+                color: theme.palette.text.secondary
+              }
+            }}
+          >
+            <div
+              ref={inputRef}
+              style={{
+                display: 'relative',
+                flex: 1
+              }}
+            >
               <SearchTextField
                 value={queryValue}
                 placeholder={placeholder}
@@ -302,7 +281,7 @@ const WrappedSearchHeader = ({
               )
             )}
             {endAdornment}
-          </div>
+          </Box>
           {loading && (
             <LinearProgress
               style={{
@@ -313,9 +292,36 @@ const WrappedSearchHeader = ({
               }}
             />
           )}
-          <div className={classes.searchresult}>{children}</div>
+          <div
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              justifyContent: 'flex-end',
+              // fontStyle: 'italic',
+              // color: theme.palette.primary.light,
+              paddingLeft: theme.spacing(1),
+              paddingBottom: theme.spacing(1),
+              paddingTop: theme.spacing(0.5)
+              // paddingBottom: theme.spacing(0.5)
+            }}
+          >
+            {children}
+          </div>
 
-          <div className={classes.searchresult} style={{ fontStyle: 'italic' }}>
+          <div
+            style={{
+              fontStyle: 'italic',
+              display: 'flex',
+              flexWrap: 'wrap',
+              justifyContent: 'flex-end',
+              // fontStyle: 'italic',
+              // color: theme.palette.primary.light,
+              paddingLeft: theme.spacing(1),
+              paddingBottom: theme.spacing(1),
+              paddingTop: theme.spacing(0.5)
+              // paddingBottom: theme.spacing(0.5)
+            }}
+          >
             {disableTotalResults ? null : loading ? (
               <Typography variant="subtitle1" color="primary" style={{ flexGrow: 1 }} children={t('loading')} />
             ) : (
@@ -361,7 +367,7 @@ const WrappedSearchHeader = ({
                     />
                   </div>
                 )}
-        </div>
+        </Box>
       </div>
     </PageHeader>
   );

@@ -1,6 +1,6 @@
 import YoutubeSearchedForIcon from '@mui/icons-material/YoutubeSearchedFor';
-import { Grid, IconButton, Paper, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
+import type { PaperProps } from '@mui/material';
+import { Grid, IconButton, Paper, Skeleton, styled, Tooltip, Typography, useTheme } from '@mui/material';
 import { useAppUser } from 'commons/components/app/hooks';
 import PageCenter from 'commons/components/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
@@ -14,31 +14,20 @@ import Histogram from 'components/visual/Histogram';
 import Moment from 'components/visual/Moment';
 import ResultsTable from 'components/visual/SearchResult/results';
 import { safeFieldValueURI } from 'helpers/utils';
-import { useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, useParams } from 'react-router';
 
-const useStyles = makeStyles(theme => ({
-  preview: {
+const Preview = memo(
+  styled(({ component = 'pre', variant = 'outlined', ...props }: PaperProps) => (
+    <Paper component={component} variant={variant} {...props} />
+  ))<PaperProps>(({ theme }) => ({
     margin: 0,
     padding: theme.spacing(0.75, 1),
     whiteSpace: 'pre-wrap',
     wordBreak: 'break-word'
-  },
-  drawerPaper: {
-    maxWidth: '1200px',
-    [theme.breakpoints.down('sm')]: {
-      width: '100%'
-    }
-  },
-  buttonProgress: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    marginTop: -12,
-    marginLeft: -12
-  }
-}));
+  }))
+);
 
 type ParamProps = {
   id: string;
@@ -57,7 +46,6 @@ const HeuristicDetail = ({ heur_id = null }: HeuristicDetailProps) => {
   const [histogram, setHistogram] = useState<any>(null);
   const [results, setResults] = useState<any>(null);
   const { apiCall } = useMyAPI();
-  const classes = useStyles();
   const { c12nDef } = useALContext();
   const { user: currentUser } = useAppUser<CustomUser>();
 
@@ -157,50 +145,24 @@ const HeuristicDetail = ({ heur_id = null }: HeuristicDetailProps) => {
         <Grid container spacing={3}>
           <Grid size={{ xs: 12, sm: 6 }}>
             <Typography variant="subtitle2">{t('name')}</Typography>
-            {heuristic ? (
-              <Paper component="pre" variant="outlined" className={classes.preview}>
-                {heuristic.name}
-              </Paper>
-            ) : (
-              <Skeleton style={{ height: '2.5rem' }} />
-            )}
+            {heuristic ? <Preview>{heuristic.name}</Preview> : <Skeleton style={{ height: '2.5rem' }} />}
           </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>
             <Typography variant="subtitle2">{t('filetype')}</Typography>
-            {heuristic ? (
-              <Paper component="pre" variant="outlined" className={classes.preview}>
-                {heuristic.filetype}
-              </Paper>
-            ) : (
-              <Skeleton style={{ height: '2.5rem' }} />
-            )}
+            {heuristic ? <Preview>{heuristic.filetype}</Preview> : <Skeleton style={{ height: '2.5rem' }} />}
           </Grid>
           <Grid size={{ xs: 12 }}>
             <Typography variant="subtitle2">{t('desc')}</Typography>
-            {heuristic ? (
-              <Paper component="pre" variant="outlined" className={classes.preview}>
-                {heuristic.description}
-              </Paper>
-            ) : (
-              <Skeleton style={{ height: '2.5rem' }} />
-            )}
+            {heuristic ? <Preview>{heuristic.description}</Preview> : <Skeleton style={{ height: '2.5rem' }} />}
           </Grid>
           <Grid size={{ xs: 12, sm: 6, md: 4 }}>
             <Typography variant="subtitle2">{t('score')}</Typography>
-            {heuristic ? (
-              <Paper component="pre" variant="outlined" className={classes.preview}>
-                {heuristic.score}
-              </Paper>
-            ) : (
-              <Skeleton style={{ height: '2.5rem' }} />
-            )}
+            {heuristic ? <Preview>{heuristic.score}</Preview> : <Skeleton style={{ height: '2.5rem' }} />}
           </Grid>
           <Grid size={{ xs: 12, sm: 6, md: 4 }}>
             <Typography variant="subtitle2">{t('max_score')}</Typography>
             {heuristic ? (
-              <Paper component="pre" variant="outlined" className={classes.preview}>
-                {heuristic.max_score || t('no_max')}
-              </Paper>
+              <Preview>{heuristic.max_score || t('no_max')}</Preview>
             ) : (
               <Skeleton style={{ height: '2.5rem' }} />
             )}
@@ -208,11 +170,11 @@ const HeuristicDetail = ({ heur_id = null }: HeuristicDetailProps) => {
           <Grid size={{ xs: 12, sm: 6, md: 4 }}>
             <Typography variant="subtitle2">{t('attack_id')}</Typography>
             {heuristic ? (
-              <Paper component="pre" variant="outlined" className={classes.preview}>
+              <Preview>
                 {heuristic.attack_id && heuristic.attack_id.length !== 0
                   ? heuristic.attack_id.join(', ')
                   : t('no_attack_id')}
-              </Paper>
+              </Preview>
             ) : (
               <Skeleton style={{ height: '2.5rem' }} />
             )}
@@ -220,7 +182,7 @@ const HeuristicDetail = ({ heur_id = null }: HeuristicDetailProps) => {
           <Grid size={{ xs: 12 }}>
             <Typography variant="subtitle2">{t('signature_score_map')}</Typography>
             {heuristic ? (
-              <Paper component="pre" variant="outlined" className={classes.preview}>
+              <Preview>
                 {heuristic.signature_score_map && Object.keys(heuristic.signature_score_map).length !== 0 ? (
                   <Grid container spacing={1}>
                     {Object.keys(heuristic.signature_score_map).map((key, i) => (
@@ -232,7 +194,7 @@ const HeuristicDetail = ({ heur_id = null }: HeuristicDetailProps) => {
                 ) : (
                   t('no_sigs')
                 )}
-              </Paper>
+              </Preview>
             ) : (
               <Skeleton style={{ height: '2.5rem' }} />
             )}

@@ -24,7 +24,6 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import match from 'autosuggest-highlight/match';
 import parse from 'autosuggest-highlight/parse';
 import useALContext from 'components/hooks/useALContext';
@@ -39,28 +38,6 @@ import SectionContainer from 'components/visual/SectionContainer';
 import type { PossibleColor } from 'helpers/colors';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-
-const useStyles = makeStyles(theme => ({
-  preview: {
-    margin: 0,
-    padding: theme.spacing(0.75, 1),
-    whiteSpace: 'pre-wrap',
-    wordBreak: 'break-word'
-  },
-  searchTextFieldOptionsInner: {
-    backgroundColor: theme.palette.background.default
-  },
-  searchTextFieldItem: {
-    padding: theme.spacing(1),
-    '&:hover': {
-      cursor: 'pointer',
-      backgroundColor: theme.palette.action.hover
-    },
-    '&[data-searchtextfieldoption-selected="true"]': {
-      backgroundColor: theme.palette.action.selected
-    }
-  }
-}));
 
 const LABELS: Record<keyof LabelCategories, { color: PossibleColor }> = {
   attribution: { color: 'primary' },
@@ -87,7 +64,6 @@ type Props = {
 const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabels = null, nocollapse = false }) => {
   const { t } = useTranslation(['archive']);
   const theme = useTheme();
-  const classes = useStyles();
   const { apiCall } = useMyAPI();
   const { showSuccessMessage, showErrorMessage } = useMySnackbar();
   const { user: currentUser } = useALContext();
@@ -266,9 +242,22 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
                   </Grid>
                   <Grid>
                     <Autocomplete
-                      classes={{
-                        listbox: classes.searchTextFieldOptionsInner,
-                        option: classes.searchTextFieldItem
+                      slotProps={{
+                        listbox: { sx: { backgroundColor: theme.palette.background.default } },
+                        popper: {
+                          sx: {
+                            ['& .MuiAutocomplete-option']: {
+                              padding: theme.spacing(1),
+                              '&:hover': {
+                                cursor: 'pointer',
+                                backgroundColor: theme.palette.action.hover
+                              },
+                              '&[data-searchtextfieldoption-selected="true"]': {
+                                backgroundColor: theme.palette.action.selected
+                              }
+                            }
+                          }
+                        }
                       }}
                       value={selectedOption}
                       onChange={(event: any, newValue: Option | null) => {
@@ -342,7 +331,16 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
               {confirmation.type === 'delete' && (
                 <Grid>
                   <Typography variant="subtitle2" children={t(newLabel.category)} />
-                  <Paper component="pre" variant="outlined" className={classes.preview}>
+                  <Paper
+                    component="pre"
+                    variant="outlined"
+                    sx={{
+                      margin: 0,
+                      padding: theme.spacing(0.75, 1),
+                      whiteSpace: 'pre-wrap',
+                      wordBreak: 'break-word'
+                    }}
+                  >
                     {newLabel.value}
                   </Paper>
                 </Grid>

@@ -4,6 +4,7 @@ import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import RemoveIcon from '@mui/icons-material/Remove';
 import {
   Alert,
+  Box,
   Button,
   CircularProgress,
   Drawer,
@@ -16,7 +17,6 @@ import {
 } from '@mui/material';
 import type { AutocompleteChangeReason } from '@mui/material/Autocomplete';
 import Autocomplete from '@mui/material/Autocomplete';
-import makeStyles from '@mui/styles/makeStyles';
 import match from 'autosuggest-highlight/match';
 import parse from 'autosuggest-highlight/parse';
 import { useAppUser } from 'commons/components/app/hooks';
@@ -26,6 +26,7 @@ import type { AlertItem } from 'components/models/base/alert';
 import { LABELS, PRIORITIES, STATUSES, type Label, type Priority, type Status } from 'components/models/base/workflow';
 import type { CustomUser } from 'components/models/ui/user';
 import type { AlertSearchParams } from 'components/routes/alerts';
+import AlertFiltersSelected from 'components/routes/alerts/components/FiltersSelected';
 import { useSearchParams } from 'components/routes/alerts/contexts/SearchParamsContext';
 import type { SearchResult } from 'components/routes/alerts/utils/SearchParser';
 import CustomChip from 'components/visual/CustomChip';
@@ -33,22 +34,6 @@ import type { SyntheticEvent } from 'react';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
-import AlertFiltersSelected from './FiltersSelected';
-
-const useStyles = makeStyles(theme => ({
-  drawerInner: {
-    display: 'flex',
-    flexDirection: 'column',
-    padding: theme.spacing(3),
-    width: '600px',
-    [theme.breakpoints.only('xs')]: {
-      width: '100vw'
-    }
-  },
-  selectMenu: {
-    backgroundColor: theme.palette.background.default
-  }
-}));
 
 type WorkflowBody = {
   priority: Priority;
@@ -75,7 +60,6 @@ export const AlertWorkflowDrawer = React.memo(
   }: AlertWorkflowDrawerProps) => {
     const { t } = useTranslation(['alerts']);
     const theme = useTheme();
-    const classes = useStyles();
     const { apiCall } = useMyAPI();
     const { user: currentUser } = useAppUser<CustomUser>();
     const { showErrorMessage, showSuccessMessage } = useMySnackbar();
@@ -193,7 +177,17 @@ export const AlertWorkflowDrawer = React.memo(
               <CloseOutlinedIcon />
             </IconButton>
           </div>
-          <div className={classes.drawerInner}>
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              padding: theme.spacing(3),
+              width: '600px',
+              [theme.breakpoints.only('xs')]: {
+                width: '100vw'
+              }
+            }}
+          >
             <div style={{ margin: theme.spacing(1), marginBottom: theme.spacing(2) }}>
               <Typography variant="h4">{t('workflow.title')}</Typography>
             </div>
@@ -231,7 +225,7 @@ export const AlertWorkflowDrawer = React.memo(
             <div style={{ margin: theme.spacing(1), marginTop: theme.spacing(2) }}>
               <div style={{ marginBottom: theme.spacing(2) }}>
                 <Autocomplete
-                  classes={{ listbox: classes.selectMenu }}
+                  slotProps={{ listbox: { sx: { backgroundColor: theme.palette.background.default } } }}
                   fullWidth
                   multiple={false}
                   options={STATUSES}
@@ -244,7 +238,7 @@ export const AlertWorkflowDrawer = React.memo(
               </div>
               <div style={{ marginBottom: theme.spacing(2) }}>
                 <Autocomplete
-                  classes={{ listbox: classes.selectMenu }}
+                  slotProps={{ listbox: { sx: { backgroundColor: theme.palette.background.default } } }}
                   fullWidth
                   multiple={false}
                   options={PRIORITIES}
@@ -257,7 +251,7 @@ export const AlertWorkflowDrawer = React.memo(
               </div>
               <div style={{ marginBottom: theme.spacing(2) }}>
                 <Autocomplete
-                  classes={{ listbox: classes.selectMenu }}
+                  slotProps={{ listbox: { sx: { backgroundColor: theme.palette.background.default } } }}
                   fullWidth
                   multiple
                   freeSolo
@@ -347,7 +341,7 @@ export const AlertWorkflowDrawer = React.memo(
                 </span>
               </Tooltip>
             </div>
-          </div>
+          </Box>
         </Drawer>
       </>
     );

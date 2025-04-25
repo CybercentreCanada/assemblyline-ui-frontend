@@ -18,7 +18,6 @@ import {
   useTheme
 } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
-import makeStyles from '@mui/styles/makeStyles';
 import { useAppTheme } from 'commons/components/app/hooks';
 import PageCenter from 'commons/components/pages/PageCenter';
 import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
@@ -53,26 +52,6 @@ const LANG_SELECTOR = {
   sigma: 'yaml',
   tagcheck: 'yara'
 };
-
-const useStyles = makeStyles(theme => ({
-  stats: {
-    margin: 0,
-    padding: theme.spacing(0.75, 1)
-  },
-  openPaper: {
-    maxWidth: '1200px',
-    [theme.breakpoints.down('sm')]: {
-      width: '100%'
-    }
-  },
-  buttonProgress: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    marginTop: -12,
-    marginLeft: -12
-  }
-}));
 
 type SaveSignatureProps = {
   signature: Signature;
@@ -240,7 +219,6 @@ const SignatureDetail = ({
   const navigate = useNavigate();
   const { showSuccessMessage, showErrorMessage } = useMySnackbar();
   const { apiCall } = useMyAPI();
-  const classes = useStyles();
   const { user: currentUser, c12nDef } = useALContext();
   const { isDark: isDarkTheme } = useAppTheme();
   // const editorRef = useRef(null);

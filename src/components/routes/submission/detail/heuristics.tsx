@@ -1,24 +1,11 @@
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import { Collapse, Divider, Grid, Skeleton, Typography, useTheme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import useHighlighter from 'components/hooks/useHighlighter';
-import { Heuristics } from 'components/models/ui/file';
+import type { Heuristics } from 'components/models/ui/file';
 import Heuristic from 'components/visual/Heuristic';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-
-const useStyles = makeStyles(theme => ({
-  title: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    cursor: 'pointer',
-    '&:hover, &:focus': {
-      color: theme.palette.text.secondary
-    }
-  }
-}));
 
 type Props = {
   heuristics: Heuristics;
@@ -28,7 +15,6 @@ const WrappedHeuristicSection: React.FC<Props> = ({ heuristics }) => {
   const { t } = useTranslation(['submissionDetail']);
   const [open, setOpen] = React.useState(true);
   const theme = useTheme();
-  const classes = useStyles();
   const sp2 = theme.spacing(2);
   const { getKey } = useHighlighter();
 
@@ -39,7 +25,15 @@ const WrappedHeuristicSection: React.FC<Props> = ({ heuristics }) => {
         onClick={() => {
           setOpen(!open);
         }}
-        className={classes.title}
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          cursor: 'pointer',
+          '&:hover, &:focus': {
+            color: theme.palette.text.secondary
+          }
+        }}
       >
         <span>{t('heuristics')}</span>
         {open ? <ExpandLess /> : <ExpandMore />}

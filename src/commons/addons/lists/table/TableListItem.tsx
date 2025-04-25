@@ -1,9 +1,8 @@
-/* eslint-disable jsx-a11y/no-static-element-interactions */
-/* eslint-disable jsx-a11y/click-events-have-key-events */
 import { styled } from '@mui/material';
 import { darken, lighten } from '@mui/material/styles';
-import { memo, ReactElement, useCallback } from 'react';
-import { LineItem } from '../item/ListItemBase';
+import type { LineItem } from 'commons/addons/lists/item/ListItemBase';
+import type { ReactElement } from 'react';
+import { memo, useCallback } from 'react';
 
 type ItemProps = {
   divider?: boolean;

@@ -15,28 +15,16 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import { Author, Comment, DEFAULT_COMMENT } from 'components/models/base/file';
+import type { Author, Comment } from 'components/models/base/file';
+import { DEFAULT_COMMENT } from 'components/models/base/file';
 import CommentCard from 'components/visual/CommentCard';
 import SectionContainer from 'components/visual/SectionContainer';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { io } from 'socket.io-client';
-
-const useStyles = makeStyles(theme => ({
-  dialog: {
-    minWidth: '50vw'
-  },
-  preview: {
-    margin: 0,
-    padding: theme.spacing(0.75, 1),
-    whiteSpace: 'pre-wrap',
-    wordBreak: 'break-word'
-  }
-}));
 
 type Confirmation = {
   open: boolean;
@@ -60,7 +48,6 @@ const WrappedCommentSection: React.FC<Props> = ({
 }) => {
   const { t } = useTranslation(['archive']);
   const theme = useTheme();
-  const classes = useStyles();
   const { apiCall } = useMyAPI();
   const { user: currentUser } = useALContext();
   const { showSuccessMessage, showErrorMessage } = useMySnackbar();
@@ -303,7 +290,11 @@ const WrappedCommentSection: React.FC<Props> = ({
               onReactionClick={handleReactionClick}
             />
           ))}
-      <Dialog classes={{ paper: classes.dialog }} open={confirmation.open} onClose={handleCloseConfirmation}>
+      <Dialog
+        open={confirmation.open}
+        onClose={handleCloseConfirmation}
+        slotProps={{ paper: { sx: { minWidth: '50vw' } } }}
+      >
         <DialogTitle>
           {confirmation.type === 'add' && t('comment.confirmation.title.add')}
           {confirmation.type === 'edit' && t('comment.confirmation.title.edit')}
@@ -337,7 +328,16 @@ const WrappedCommentSection: React.FC<Props> = ({
               {confirmation.type === 'delete' && (
                 <Grid>
                   <Typography variant="subtitle2" children={t('comment.content')} />
-                  <Paper component="pre" variant="outlined" className={classes.preview}>
+                  <Paper
+                    component="pre"
+                    variant="outlined"
+                    sx={{
+                      margin: 0,
+                      padding: theme.spacing(0.75, 1),
+                      whiteSpace: 'pre-wrap',
+                      wordBreak: 'break-word'
+                    }}
+                  >
                     {currentComment?.text}
                   </Paper>
                 </Grid>

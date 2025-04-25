@@ -1,11 +1,11 @@
 import { Divider, Link, styled, Typography, useTheme } from '@mui/material';
+import CustomChip from 'components/visual/CustomChip';
 import Moment from 'components/visual/Moment';
 import DOMPurify from 'dompurify';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import Markdown from 'react-markdown';
-import { JSONFeedAuthor, JSONFeedItem } from '.';
-import CustomChip from '../CustomChip';
+import type { JSONFeedAuthor, JSONFeedItem } from '.';
 
 const Container = styled('div')(({ theme }) => ({
   width: '100%',

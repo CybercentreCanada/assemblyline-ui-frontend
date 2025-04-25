@@ -9,15 +9,15 @@ import { ListItemIcon, ListItemText, Menu, MenuItem, useTheme } from '@mui/mater
 import makeStyles from '@mui/styles/makeStyles';
 import clsx from 'clsx';
 import type { AlertSearchParams } from 'components/routes/alerts';
+import type { Favorite } from 'components/routes/alerts/components/Favorites';
+import type { Option } from 'components/routes/alerts/components/Filters';
+import { GROUPBY_OPTIONS, SORT_OPTIONS, TC_OPTIONS } from 'components/routes/alerts/components/Filters';
 import { useAlerts } from 'components/routes/alerts/contexts/AlertsContext';
 import CustomChip from 'components/visual/CustomChip';
 import Moment from 'components/visual/Moment';
 import type { ReactNode } from 'react';
 import React, { useCallback, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { Favorite } from './Favorites';
-import type { Option } from './Filters';
-import { GROUPBY_OPTIONS, SORT_OPTIONS, TC_OPTIONS } from './Filters';
 
 const useStyles = makeStyles(theme => ({
   desc: {
@@ -165,7 +165,6 @@ const WrappedAlertFiltersSelected = ({
 }: Props) => {
   const { t } = useTranslation('alerts');
   const theme = useTheme();
-  const classes = useStyles();
   const alertValues = useAlerts();
 
   const allFavorites = useMemo<Favorite[]>(
@@ -275,8 +274,18 @@ const WrappedAlertFiltersSelected = ({
         getListItemIcon={option =>
           search.sort.startsWith(option.value) && (
             <ArrowDownwardIcon
-              className={clsx(classes.desc, search.sort.endsWith('asc') && classes.asc)}
               fontSize="small"
+              sx={{
+                transform: 'rotate(0deg)',
+                transition: theme.transitions.create('transform', {
+                  easing: theme.transitions.easing.easeInOut,
+                  duration: theme.transitions.duration.shortest
+                }),
+
+                ...(search.sort.endsWith('asc') && {
+                  transform: 'rotate(180deg)'
+                })
+              }}
             />
           )
         }
@@ -441,9 +450,9 @@ const WrappedAlertFiltersSelected = ({
           tooltip={
             <div style={{ display: 'flex', flexDirection: 'column' }}>
               <div style={{ fontStyle: 'normal' }}>{favorite.query}</div>
-              <div
-                style={{ placeSelf: 'flex-end', color: theme.palette.text.secondary }}
-              >{`(${favorite.created_by})`}</div>
+              <div style={{ placeSelf: 'flex-end', color: theme.palette.text.secondary }}>
+                {`(${favorite.created_by})`}
+              </div>
             </div>
           }
           onClick={disabled ? null : () => handleQueryChange(favorite)}

@@ -1,5 +1,6 @@
 import ManageSearchIcon from '@mui/icons-material/ManageSearch';
 import {
+  Box,
   Button,
   Dialog,
   DialogActions,
@@ -9,16 +10,16 @@ import {
   IconButton,
   Paper,
   Tooltip,
-  Typography
+  Typography,
+  useTheme
 } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { ALERT_DEFAULT_PARAMS, ALERT_STORAGE_KEY, type AlertSearchParams } from 'components/routes/alerts';
+import AlertFiltersSelected from 'components/routes/alerts/components/FiltersSelected';
 import { useSearchParams } from 'components/routes/alerts/contexts/SearchParamsContext';
 import { SearchParser, type SearchResult } from 'components/routes/alerts/utils/SearchParser';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import AlertFiltersSelected from './FiltersSelected';
 
 const IGNORED_PARAMETERS: (keyof AlertSearchParams)[] = [
   'q',
@@ -30,39 +31,9 @@ const IGNORED_PARAMETERS: (keyof AlertSearchParams)[] = [
   'rows'
 ];
 
-const useStyles = makeStyles(theme => ({
-  preview: {
-    display: 'grid',
-    gridTemplateColumns: 'auto 1fr',
-    columnGap: theme.spacing(1),
-    margin: 0,
-    padding: theme.spacing(1.5),
-    whiteSpace: 'pre-wrap',
-    wordBreak: 'break-word',
-    backgroundColor: theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[200]
-  },
-  dialogPaper: {
-    maxWidth: '1000px'
-  },
-  dialogContent: {
-    display: 'grid',
-    gridTemplateColumns: '1fr 1fr',
-    gap: theme.spacing(2),
-    '@media (max-width:850px)': {
-      gridTemplateColumns: '1fr'
-    }
-  },
-  dialogDescription: {
-    gridColumn: 'span 2',
-    '@media (max-width:850px)': {
-      gridColumn: 'span 1'
-    }
-  }
-}));
-
 const WrappedAlertDefaultSearchParameters = () => {
   const { t } = useTranslation('alerts');
-  const classes = useStyles();
+  const theme = useTheme();
   const { showSuccessMessage } = useMySnackbar();
   const { search } = useSearchParams<AlertSearchParams>();
 
@@ -115,14 +86,55 @@ const WrappedAlertDefaultSearchParameters = () => {
           </IconButton>
         </div>
       </Tooltip>
-      <Dialog classes={{ paper: classes.dialogPaper }} open={open} onClose={() => setOpen(false)}>
+      <Dialog
+        open={open}
+        onClose={() => setOpen(false)}
+        slotProps={{
+          paper: {
+            sx: {
+              maxWidth: '1000px'
+            }
+          }
+        }}
+      >
         <DialogTitle>{t('session.title')}</DialogTitle>
-        <DialogContent className={classes.dialogContent}>
-          <div className={classes.dialogDescription}>{t('session.description')}</div>
+        <DialogContent
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: theme.spacing(2),
+            '@media (max-width:850px)': {
+              gridTemplateColumns: '1fr'
+            }
+          }}
+        >
+          <Box
+            sx={{
+              gridColumn: 'span 2',
+              '@media (max-width:850px)': {
+                gridColumn: 'span 1'
+              }
+            }}
+          >
+            {t('session.description')}
+          </Box>
 
           <Grid style={{ width: '100%' }}>
             <Typography variant="subtitle2">{t('session.existing')}</Typography>
-            <Paper component="pre" variant="outlined" className={classes.preview}>
+            <Paper
+              component="pre"
+              variant="outlined"
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: 'auto 1fr',
+                columnGap: theme.spacing(1),
+                margin: 0,
+                padding: theme.spacing(1.5),
+                whiteSpace: 'pre-wrap',
+                wordBreak: 'break-word',
+                backgroundColor: theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[200]
+              }}
+            >
               {defaults.toString() === '' ? (
                 <div>{t('none')}</div>
               ) : (
@@ -133,7 +145,20 @@ const WrappedAlertDefaultSearchParameters = () => {
 
           <Grid style={{ width: '100%' }}>
             <Typography variant="subtitle2">{t('session.current')}</Typography>
-            <Paper component="pre" variant="outlined" className={classes.preview}>
+            <Paper
+              component="pre"
+              variant="outlined"
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: 'auto 1fr',
+                columnGap: theme.spacing(1),
+                margin: 0,
+                padding: theme.spacing(1.5),
+                whiteSpace: 'pre-wrap',
+                wordBreak: 'break-word',
+                backgroundColor: theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[200]
+              }}
+            >
               {filteredSearch.toString() === '' ? (
                 <div>{t('none')}</div>
               ) : (

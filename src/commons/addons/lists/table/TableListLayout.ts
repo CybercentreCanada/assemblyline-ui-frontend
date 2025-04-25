@@ -1,4 +1,4 @@
-import { TableColumnField } from './types';
+import type { TableColumnField } from 'commons/addons/lists/table/types';
 
 export interface TableListLayout {
   cw: number;

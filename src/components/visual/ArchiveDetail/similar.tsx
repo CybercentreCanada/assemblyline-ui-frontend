@@ -1,7 +1,6 @@
 import ArchiveIcon from '@mui/icons-material/Archive';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
-import { AlertTitle, IconButton, Skeleton, TableContainer, Tooltip, Typography, useTheme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
+import { AlertTitle, Box, IconButton, Skeleton, TableContainer, Tooltip, Typography, useTheme } from '@mui/material';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import type { File, SimilarResult, SimilarResults, SimilarType } from 'components/models/ui/file';
@@ -22,30 +21,6 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 
-const useStyles = makeStyles(theme => ({
-  container: {
-    width: '100%',
-    padding: theme.spacing(1)
-  },
-  caption: {
-    display: 'grid',
-    gridTemplateRows: 'repeat(2, 1fr)',
-    gridTemplateColumns: '1fr auto',
-    marginBottom: theme.spacing(1),
-    borderRadius: '4px 4px 0px 0px',
-    '&>div': {
-      overflow: 'hidden',
-      textOverflow: 'ellipsis'
-    }
-  },
-  muted: {
-    color: theme.palette.text.secondary,
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap'
-  }
-}));
-
 const DEFAULT_SIMILAR: Record<SimilarType, { label: string; prefix: string; suffix: string }> = {
   tlsh: { label: 'TLSH', prefix: '/search/file?query=tlsh:', suffix: '&use_archive=true' },
   ssdeep: { label: 'SSDEEP', prefix: '/search/file?query=ssdeep:', suffix: '~&use_archive=true' },
@@ -58,16 +33,41 @@ type SimilarItemProps = {
 };
 
 const SimilarItem: React.FC<SimilarItemProps> = ({ data, drawer }) => {
-  const { t, i18n } = useTranslation(['archive']);
+  const { t } = useTranslation(['archive']);
   const theme = useTheme();
-  const classes = useStyles();
   const hasArchived = data.items.some(item => item?.from_archive);
   return (
-    <StyledPaper className={classes.container} paper={!drawer} variant="outlined">
-      <div className={classes.caption}>
+    <StyledPaper
+      paper={!drawer}
+      variant="outlined"
+      sx={{
+        width: '100%',
+        padding: theme.spacing(1)
+      }}
+    >
+      <Box
+        sx={{
+          display: 'grid',
+          gridTemplateRows: 'repeat(2, 1fr)',
+          gridTemplateColumns: '1fr auto',
+          marginBottom: theme.spacing(1),
+          borderRadius: '4px 4px 0px 0px',
+          '&>div': {
+            overflow: 'hidden',
+            textOverflow: 'ellipsis'
+          }
+        }}
+      >
         <div>
           <b>{t(DEFAULT_SIMILAR[data.type].label)}</b>&nbsp;
-          <small className={classes.muted}>{` :: ${data.value}`}</small>
+          <small
+            style={{
+              color: theme.palette.text.secondary,
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap'
+            }}
+          >{` :: ${data.value}`}</small>
         </div>
         <div style={{ gridRow: 'span 2' }}>
           <Tooltip title={t('search.tooltip')} placement="left">
@@ -89,7 +89,7 @@ const SimilarItem: React.FC<SimilarItemProps> = ({ data, drawer }) => {
             {data.total}&nbsp;{t(`result${data.total === 1 ? '' : 's'}`)}
           </small>
         </div>
-      </div>
+      </Box>
       <TableContainer
         style={{
           overflow: 'hidden',
