@@ -236,7 +236,7 @@ describe('Test `resetFavicon`', () => {
     favicon.setAttribute('href', initial);
     expect(favicon.getAttribute('href')).toBe(initial);
     resetFavicon();
-    expect(favicon.getAttribute('href')).toBe(`${defaultURL}/favicon.ico`);
+    expect(favicon.getAttribute('href')).toBe(`${defaultURL}/favicon.ico?query=test`);
   });
 });
 
@@ -257,7 +257,7 @@ describe('Test `setNotifyFavicon`', () => {
     favicon.setAttribute('href', initial);
     expect(favicon.getAttribute('href')).toBe(initial);
     setNotifyFavicon();
-    expect(favicon.getAttribute('href')).toBe(`${defaultURL}/favicon_done.ico`);
+    expect(favicon.getAttribute('href')).toBe(`${defaultURL}/favicon_done.ico?query=test`);
   });
 });
 
