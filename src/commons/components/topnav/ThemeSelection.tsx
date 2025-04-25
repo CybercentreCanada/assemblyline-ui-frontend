@@ -23,6 +23,7 @@ import {
   useAppTheme
 } from 'commons/components/app/hooks';
 import { AppThemesContext } from 'commons/components/app/providers/AppThemesProvider';
+import useSafeResults from 'components/hooks/useSafeResults';
 import { memo, useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -39,6 +40,8 @@ const ThemeSelection = () => {
   const { themes } = useContext(configs.overrides?.providers?.themesProvider?.context ?? AppThemesContext);
   const localStorage = useLocalStorage(APP_STORAGE_PREFIX);
   const isSmDown = useMediaQuery(theme.breakpoints.down('sm'));
+
+  const { showSafeResults, toggleShowSafeResults } = useSafeResults();
 
   const clearStorage = () => {
     localStorage.clear();
@@ -126,6 +129,16 @@ const ThemeSelection = () => {
             >
               <ListItemButton onClick={breadcrumbs.toggle} id="personalization-showbreadcrumbs">
                 <ListItemText>{t('personalization.showbreadcrumbs')}</ListItemText>
+              </ListItemButton>
+            </ListItem>
+          )}
+          {configs.preferences.allowShowSafeResults && (
+            <ListItem
+              disablePadding
+              secondaryAction={<Switch edge="end" checked={showSafeResults} onClick={toggleShowSafeResults} />}
+            >
+              <ListItemButton onClick={toggleShowSafeResults} id="personalization-showsaferesults">
+                <ListItemText>{t('personalization.showsaferesults')}</ListItemText>
               </ListItemButton>
             </ListItem>
           )}

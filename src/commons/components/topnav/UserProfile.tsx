@@ -5,6 +5,7 @@ import {
   Divider,
   Fade,
   IconButton,
+  LinearProgress,
   List,
   ListItem,
   ListItemButton,
@@ -19,9 +20,11 @@ import {
   useTheme
 } from '@mui/material';
 import type { AppBarUserMenuElement } from 'commons/components//app/AppConfigs';
-import { useAppConfigs, useAppLayout, useAppUser } from 'commons/components/app/hooks';
+import { useAppConfigs, useAppLayout } from 'commons/components/app/hooks';
 import AppAvatar from 'commons/components/display/AppAvatar';
 import ThemeSelection from 'commons/components/topnav/ThemeSelection';
+import useALContext from 'components/hooks/useALContext';
+import useQuota from 'components/hooks/useQuota';
 import { memo, useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
@@ -41,9 +44,10 @@ const UserProfile = () => {
   const theme = useTheme();
   const anchorRef = useRef<HTMLButtonElement>(undefined);
   const configs = useAppConfigs();
+  const { user, configuration } = useALContext();
   const layout = useAppLayout();
   const { t } = useTranslation();
-  const { user } = useAppUser();
+  const { apiQuotaRemaining, submissionQuotaRemaining } = useQuota();
   const [open, setOpen] = useState<boolean>(false);
   const onProfileClick = useCallback(() => setOpen(_open => !_open), []);
   const onClickAway = useCallback(() => setOpen(false), []);
@@ -64,6 +68,52 @@ const UserProfile = () => {
     },
     [configs.allowPersonalization, configs.preferences.allowTranslate, configs.preferences.allowReset]
   );
+
+  const renderQuotas = useCallback(() => {
+    const usedAPIPercent = ((user.api_daily_quota - apiQuotaRemaining) / user.api_daily_quota) * 100;
+    const usedSubmissionPercent =
+      ((user.submission_daily_quota - submissionQuotaRemaining) / user.submission_daily_quota) * 100;
+
+    if (
+      (user.api_daily_quota !== 0 && apiQuotaRemaining !== null) ||
+      (user.submission_daily_quota !== 0 && submissionQuotaRemaining !== null)
+    ) {
+      return (
+        <div>
+          <Divider />
+          <List dense subheader={<ListSubheader disableSticky>{t('quotas')}</ListSubheader>}>
+            {user.api_daily_quota !== 0 && apiQuotaRemaining !== null && (
+              <Tooltip title={`${apiQuotaRemaining} ${t('quotas.api.remaining')}`} placement="left">
+                <ListItem>
+                  <span style={{ whiteSpace: 'nowrap' }}>{t('quotas.api')}</span>
+                  <LinearProgress
+                    variant="determinate"
+                    color={usedAPIPercent < 65 ? 'success' : usedAPIPercent < 90 ? 'warning' : 'error'}
+                    value={usedAPIPercent}
+                    style={{ marginLeft: theme.spacing(2), width: '100%' }}
+                  />
+                </ListItem>
+              </Tooltip>
+            )}
+            {user.submission_daily_quota !== 0 && submissionQuotaRemaining !== null && (
+              <Tooltip title={`${submissionQuotaRemaining} ${t('quotas.submission.remaining')}`} placement="left">
+                <ListItem>
+                  <span style={{ whiteSpace: 'nowrap' }}>{t('quotas.submission')}</span>
+                  <LinearProgress
+                    variant="determinate"
+                    color={usedSubmissionPercent < 65 ? 'success' : usedSubmissionPercent < 90 ? 'warning' : 'error'}
+                    value={usedSubmissionPercent}
+                    style={{ marginLeft: theme.spacing(2), width: '100%' }}
+                  />
+                </ListItem>
+              </Tooltip>
+            )}
+          </List>
+        </div>
+      );
+    }
+    return null;
+  }, [apiQuotaRemaining, submissionQuotaRemaining, t, theme, user.api_daily_quota, user.submission_daily_quota]);
 
   const renderMenu = useCallback(
     (type: AppBarUserMenuType, menuItems: AppBarUserMenuElement[], title: string, i18nKey: string) => {
@@ -105,24 +155,37 @@ const UserProfile = () => {
   );
 
   return (
-    <ClickAwayListener onClickAway={onClickAway} mouseEvent="onMouseUp">
-      <IconButton
-        ref={anchorRef}
-        edge="end"
-        sx={{
-          padding: 0,
-          marginLeft: theme.spacing(1),
-          marginRight: theme.spacing(1)
-        }}
-        onClick={onProfileClick}
-        size="large"
-      >
-        <AppUserAvatar alt={user.name} url={user.avatar} email={user.email} id="user-avatar">
-          {user.name
-            .split(' ', 2)
-            .map(n => n[0].toUpperCase())
-            .join('')}
-        </AppUserAvatar>
+    <ClickAwayListener onClickAway={onClickAway}>
+      <div>
+        <Tooltip title={t('usermenu')}>
+          <IconButton
+            ref={anchorRef}
+            edge="end"
+            sx={{
+              padding: '6px',
+              marginLeft: theme.spacing(0),
+              marginRight: theme.spacing(0)
+            }}
+            onClick={onProfileClick}
+            size="large"
+          >
+            <AppUserAvatar
+              sx={{
+                fontWeight: 500
+              }}
+              alt={user.name}
+              url={user.avatar}
+              email={user.email}
+            >
+              {user.name
+                .split(' ')
+                .filter(w => w !== '')
+                .splice(0, 2)
+                .map(n => (n ? n[0].toUpperCase() : ''))
+                .join('')}
+            </AppUserAvatar>
+          </IconButton>
+        </Tooltip>
         <Popper
           sx={{ zIndex: theme.zIndex.appBar + 200, minWidth: '280px' }}
           open={open}
@@ -146,14 +209,21 @@ const UserProfile = () => {
                       }}
                     >
                       <AppAvatar
-                        sx={{ width: theme.spacing(8), height: theme.spacing(8) }}
+                        sx={{
+                          width: theme.spacing(8),
+                          height: theme.spacing(8),
+                          fontWeight: 500,
+                          fontSize: theme.spacing(3.5)
+                        }}
                         alt={user.name}
                         url={user.avatar}
                         email={user.email}
                       >
                         {user.name
-                          .split(' ', 2)
-                          .map(n => n[0].toUpperCase())
+                          .split(' ')
+                          .filter(w => w !== '')
+                          .splice(0, 2)
+                          .map(n => (n ? n[0].toUpperCase() : ''))
                           .join('')}
                       </AppAvatar>
                       <Box sx={{ paddingLeft: 2 }}>
@@ -167,6 +237,9 @@ const UserProfile = () => {
                     </Box>
                   </ListItem>
                 </List>
+                {configuration.ui.enforce_quota &&
+                  (user.api_daily_quota !== 0 || user.submission_daily_quota !== 0) &&
+                  renderQuotas()}
                 {renderMenu(
                   'usermenu',
                   configs.preferences.topnav.userMenu,
@@ -185,7 +258,7 @@ const UserProfile = () => {
             </Fade>
           )}
         </Popper>
-      </IconButton>
+      </div>
     </ClickAwayListener>
   );
 };
