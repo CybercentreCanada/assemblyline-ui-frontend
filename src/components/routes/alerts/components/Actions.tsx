@@ -703,9 +703,17 @@ const WrappedAlertActions = ({ alert, inDrawer = false }: Props) => {
       >
         <SpeedDial
           ariaLabel={t('action_menu')}
-          slotProps={{
-            root: { style: { ...(permanent && { display: 'none', color: theme.palette.text.secondary }) } },
-            transition: { style: { ...(!vertical && { width: 0 }) } }
+          sx={{
+            ...(permanent && {
+              ['&.MuiSpeedDial-root']: {
+                marginRight: '-6px'
+              }
+            }),
+            ...(!vertical && {
+              ['&.MuiSpeedDial-actionsClosed']: {
+                width: 0
+              }
+            })
           }}
           icon={
             <SpeedDialIcon

@@ -67,11 +67,8 @@ const Section = memo(
 );
 
 const SectionTitle = memo(
-  styled(Typography)(({ theme }) => ({
-    marginBottom: theme.spacing(2),
-    '& > hr': {
-      marginBottom: theme.spacing(1)
-    }
+  styled(Typography)(() => ({
+    fontWeight: 'bold'
   }))
 );
 
@@ -84,7 +81,7 @@ const SectionContent = memo(
 );
 
 const ClipboardIcon = memo(
-  styled(BsClipboard)(({ theme }) => ({
+  styled(BsClipboard)(() => ({
     '&:hover': {
       cursor: 'pointer',
       transform: 'scale(1.1)'

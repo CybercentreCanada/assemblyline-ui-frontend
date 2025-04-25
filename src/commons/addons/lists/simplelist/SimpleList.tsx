@@ -7,7 +7,7 @@ import type ListScroller from 'commons/addons/lists/scrollers/ListScroller';
 import SimpleListScroller from 'commons/addons/lists/scrollers/SimpleListScroller';
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 
-export const Outer = styled('div')(({ theme }) => ({
+export const Outer = styled('div')(() => ({
   position: 'relative',
   display: 'flex',
   flexDirection: 'column',
@@ -18,7 +18,7 @@ export const Outer = styled('div')(({ theme }) => ({
   outline: 'none'
 }));
 
-export const Inner = styled('div')(({ theme }) => ({
+export const Inner = styled('div')(() => ({
   position: 'relative',
   width: '100%',
   outline: 'none'

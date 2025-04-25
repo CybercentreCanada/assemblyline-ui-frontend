@@ -12,17 +12,18 @@ const Item = styled('div', {
   shouldForwardProp: prop => prop !== 'disableBackgrounds' && prop !== 'card'
 })<ItemProps>(({ theme, disableBackgrounds, card }) => ({
   position: 'relative',
-  '&:hover': {
-    cursor: 'pointer'
+  ['&:hover']: {
+    cursor: 'pointer',
+    ...(!disableBackgrounds && {
+      backgroundColor: theme.palette.mode === 'dark' ? 'hsl(0, 0%, 19%)' : 'hsl(0, 0%, 95%)'
+    })
   },
-  '&:hover $itemActions': {
+
+  ['&:hover .itemActions']: {
     display: 'inherit'
   },
 
   ...(!disableBackgrounds && {
-    '&:hover': {
-      backgroundColor: theme.palette.mode === 'dark' ? 'hsl(0, 0%, 19%)' : 'hsl(0, 0%, 95%)'
-    },
     '&[data-listitem-focus="true"]': {
       backgroundColor: theme.palette.mode === 'dark' ? 'hsl(0, 0%, 19%)' : 'hsl(0, 0%, 95%)'
     },
@@ -36,7 +37,7 @@ const Item = styled('div', {
   })
 }));
 
-const DividerContainer = styled('div')(({ theme }) => ({
+const DividerContainer = styled('div')(() => ({
   position: 'absolute',
   bottom: 0,
   left: 0,
@@ -116,7 +117,9 @@ const ListItemBase = ({
       <DividerContainer style={{ display: noDivider ? 'none' : null }}>
         <Divider />
       </DividerContainer>
-      <ItemActions onClick={onItemActionsClick}>{onRenderActions && onRenderActions(item, index)}</ItemActions>
+      <ItemActions className="itemActions" onClick={onItemActionsClick}>
+        {onRenderActions && onRenderActions(item, index)}
+      </ItemActions>
     </Item>
   );
 };
