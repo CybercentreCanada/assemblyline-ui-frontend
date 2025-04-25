@@ -1,8 +1,7 @@
 import BlockIcon from '@mui/icons-material/Block';
 import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
 import RecordVoiceOverOutlinedIcon from '@mui/icons-material/RecordVoiceOverOutlined';
-import { Grid, useMediaQuery, useTheme } from '@mui/material';
-import Typography from '@mui/material/Typography';
+import { useMediaQuery, useTheme } from '@mui/material';
 import { useAppUser } from 'commons/components/app/hooks';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import PageHeader from 'commons/components/pages/PageHeader';
@@ -19,6 +18,7 @@ import type { CustomUser } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
 import SignatureDetail from 'components/routes/manage/signature_detail';
 import FileDownloader from 'components/visual/FileDownloader';
+import { PageHeader as ALPageHeader } from 'components/visual/Layouts/PageHeader';
 import SearchHeader from 'components/visual/SearchBar/SearchHeader';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import SignaturesTable from 'components/visual/SearchResult/signatures';
@@ -153,22 +153,19 @@ const SignaturesSearch = () => {
 
   return currentUser.roles.includes('signature_view') ? (
     <PageFullWidth margin={4}>
-      <div style={{ paddingBottom: theme.spacing(2) }}>
-        <Grid container alignItems="center">
-          <Grid flexGrow={1}>
-            <Typography variant="h4">{t('title')}</Typography>
-          </Grid>
-          {currentUser.roles.includes('signature_download') && (
-            <Grid size={{ xs: 'grow' }} style={{ textAlign: 'right', flexGrow: 0 }}>
-              <FileDownloader
-                icon={<GetAppOutlinedIcon />}
-                link={`/api/v4/signature/download/?${downloadLink}`}
-                tooltip={t('download_desc')}
-              />
-            </Grid>
-          )}
-        </Grid>
-      </div>
+      <ALPageHeader
+        primary={t('title')}
+        style={{ paddingBottom: theme.spacing(2) }}
+        actions={[
+          currentUser.roles.includes('signature_download') && (
+            <FileDownloader
+              icon={<GetAppOutlinedIcon />}
+              link={`/api/v4/signature/download/?${downloadLink}`}
+              tooltip={t('download_desc')}
+            />
+          )
+        ]}
+      />
 
       <PageHeader isSticky>
         <div style={{ paddingTop: theme.spacing(1) }}>

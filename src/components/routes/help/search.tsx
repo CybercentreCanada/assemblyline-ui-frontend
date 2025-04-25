@@ -17,6 +17,7 @@ import { useAppBar, useAppLayout } from 'commons/components/app/hooks';
 import PageCenter from 'commons/components/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import CustomChip from 'components/visual/CustomChip';
+import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -133,8 +134,7 @@ export default function Search() {
   return (
     <PageCenter margin={4} width="100%" textAlign="left">
       <ContentWithTOC translation="helpSearch" items={Toc}>
-        <Typography variant="h4">{t('title')}</Typography>
-        <Typography variant="subtitle2">{t('subtitle')}</Typography>
+        <PageHeader primary={t('title')} secondary={t('subtitle')} />
 
         <Paragraph id="overview">
           <Typography variant="h5">{t('overview')}</Typography>

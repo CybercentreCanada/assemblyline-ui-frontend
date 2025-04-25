@@ -23,6 +23,7 @@ import { useAPIKeyUtilities } from 'components/routes/user/api_keys';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import CustomChip from 'components/visual/CustomChip';
 import DatePicker from 'components/visual/DatePicker';
+import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import Moment from 'components/visual/Moment';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -145,41 +146,39 @@ const ApikeyDetail = ({ key_id = null, onClose = () => null }: ApikeyDetailProps
         waiting={waitingDialog}
       />
 
-      <div style={{ textAlign: 'left' }}>
-        <div style={{ paddingBottom: theme.spacing(4) }}>
-          <Grid container alignItems="center" spacing={1}>
-            <Grid size={{ xs: 12 }}>
-              <Typography variant="h4">{t('apikey')}</Typography>
-            </Grid>
-            <Grid size={{ xs: 12, sm: 'grow' }} style={{ textAlign: 'right', flexGrow: 0 }}>
-              {apiKey ? (
-                (key_id || id) && (
-                  <div style={{ display: 'flex', marginBottom: theme.spacing(1) }}>
-                    <Tooltip title={t('apikey.remove.tooltip')}>
-                      <div>
-                        <IconButton
-                          disabled={loading}
-                          size="large"
-                          onClick={() => setDeleteDialog(true)}
-                          sx={{
-                            color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
-                          }}
-                        >
-                          <DeleteOutlineOutlinedIcon />
-                        </IconButton>
-                      </div>
-                    </Tooltip>
+      <PageHeader
+        primary={t('apikey')}
+        style={{ paddingBottom: theme.spacing(4), textAlign: 'start' }}
+        actionSpacing={1}
+        actions={[
+          apiKey ? (
+            (key_id || id) && (
+              <div key="delete" style={{ display: 'flex', marginBottom: theme.spacing(1) }}>
+                <Tooltip title={t('apikey.remove.tooltip')}>
+                  <div>
+                    <IconButton
+                      disabled={loading}
+                      size="large"
+                      onClick={() => setDeleteDialog(true)}
+                      sx={{
+                        color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+                      }}
+                    >
+                      <DeleteOutlineOutlinedIcon />
+                    </IconButton>
                   </div>
-                )
-              ) : (
-                <div style={{ display: 'flex' }}>
-                  <Skeleton variant="circular" height="3rem" width="3rem" style={{ margin: theme.spacing(0.5) }} />
-                </div>
-              )}
-            </Grid>
-          </Grid>
-        </div>
+                </Tooltip>
+              </div>
+            )
+          ) : (
+            <div key="delete" style={{ display: 'flex' }}>
+              <Skeleton variant="circular" height="3rem" width="3rem" style={{ margin: theme.spacing(0.5) }} />
+            </div>
+          )
+        ]}
+      />
 
+      <div style={{ textAlign: 'left' }}>
         <Grid container spacing={3}>
           {apiKey && (
             <Grid size={{ xs: 12 }}>
@@ -204,10 +203,10 @@ const ApikeyDetail = ({ key_id = null, onClose = () => null }: ApikeyDetailProps
 
           <Grid size={{ xs: 12 }}>
             <Grid container alignItems="end">
-              <Grid size={{ xs: 11 }}>
+              <Grid size="grow">
                 <Typography variant="h6">{t('timing.title')}</Typography>
               </Grid>
-              <Grid size={{ xs: 11 }} style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
+              <Grid size="auto" style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
                 {apiKey ? (
                   <DatePicker
                     aria-labelledby="expiry_ts-label"

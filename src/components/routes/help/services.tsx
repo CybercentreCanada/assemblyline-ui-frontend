@@ -5,6 +5,7 @@ import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useMyAPI from 'components/hooks/useMyAPI';
 import Classification from 'components/visual/Classification';
 import CustomChip from 'components/visual/CustomChip';
+import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -94,14 +95,13 @@ export default function Services() {
   });
   return (
     <PageFullWidth margin={4}>
-      <div style={{ marginBottom: theme.spacing(4) }}>
-        <Typography variant="h4">{t('title')}</Typography>
-        {services ? (
-          <Typography variant="caption">{`${services.length} ${t('count')}`}</Typography>
-        ) : (
-          <Skeleton width="8rem" />
-        )}
-      </div>
+      <PageHeader
+        primary={t('title')}
+        secondary={`${services.length} ${t('count')}`}
+        loading={!services}
+        style={{ marginBottom: theme.spacing(4) }}
+      />
+
       {services ? (
         <Grid container spacing={2}>
           {services.map((s, i) => (

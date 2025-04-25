@@ -21,6 +21,7 @@ import CustomChip from 'components/visual/CustomChip';
 import DatePicker from 'components/visual/DatePicker';
 import Histogram from 'components/visual/Histogram';
 import InputDialog from 'components/visual/InputDialog';
+import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import Moment from 'components/visual/Moment';
 import { bytesToSize, safeFieldValue, safeFieldValueURI } from 'helpers/utils';
 import { useState } from 'react';
@@ -252,97 +253,83 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
         </div>
       )}
       <div style={{ textAlign: 'left' }}>
-        <div style={{ paddingBottom: theme.spacing(4) }}>
-          <Grid container alignItems="center" spacing={1}>
-            <Grid size={{ xs: 12 }}>
-              <Typography variant="h4">{badlist ? t(`title.${badlist.type}`) : t('title')}</Typography>
-              <Typography variant="caption" style={{ wordBreak: 'break-word' }}>
-                {badlist ? badlist_id || id : <Skeleton style={{ width: '10rem' }} />}
-              </Typography>
-            </Grid>
-            <Grid size={{ xs: 12, sm: 'grow' }} style={{ textAlign: 'right', flexGrow: 0 }}>
-              {badlist ? (
-                <>
-                  {(badlist_id || id) && (
-                    <div style={{ display: 'flex', marginBottom: theme.spacing(1) }}>
-                      {currentUser.roles.includes('submission_view') && (
-                        <Tooltip title={t('usage')}>
-                          <IconButton
-                            component={Link}
-                            style={{
-                              color: theme.palette.action.active
-                            }}
-                            to={
-                              badlist.type === 'file'
-                                ? `/search/?query=sha256:${badlist.hashes.sha256 || badlist_id || id} OR results:${
-                                    badlist.hashes.sha256 || badlist_id || id
-                                  }* OR errors:${badlist.hashes.sha256 || badlist_id || id}* OR file.sha256:${
-                                    badlist.hashes.sha256 || badlist_id || id
-                                  }`
-                                : `/search/result/?query=result.sections.tags.${badlist.tag.type}:${safeFieldValueURI(
-                                    badlist.tag.value
-                                  )}`
-                            }
-                            size="large"
-                          >
-                            <YoutubeSearchedForIcon />
-                          </IconButton>
-                        </Tooltip>
-                      )}
-                      {currentUser.roles.includes('badlist_manage') && (
-                        <Tooltip title={badlist.enabled ? t('enabled') : t('disabled')}>
-                          <IconButton
-                            onClick={badlist.enabled ? () => setDisableDialog(true) : () => setEnableDialog(true)}
-                            size="large"
-                          >
-                            {badlist.enabled ? <ToggleOnIcon /> : <ToggleOffOutlinedIcon />}
-                          </IconButton>
-                        </Tooltip>
-                      )}
-
-                      {currentUser.roles.includes('badlist_manage') && (
-                        <Tooltip title={t('remove')}>
-                          <IconButton
-                            style={{
-                              color:
-                                theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
-                            }}
-                            onClick={() => setDeleteDialog(true)}
-                            size="large"
-                          >
-                            <RemoveCircleOutlineOutlinedIcon />
-                          </IconButton>
-                        </Tooltip>
-                      )}
-                    </div>
-                  )}
-                </>
-              ) : (
-                <>
-                  <div style={{ display: 'flex' }}>
-                    <Skeleton variant="circular" height="3rem" width="3rem" style={{ margin: theme.spacing(0.5) }} />
+        <PageHeader
+          primary={badlist ? t(`title.${badlist.type}`) : t('title')}
+          secondary={badlist_id || id}
+          loading={!badlist}
+          style={{ paddingBottom: theme.spacing(4) }}
+          actions={[
+            badlist ? (
+              <>
+                {(badlist_id || id) && (
+                  <div style={{ display: 'flex', marginBottom: theme.spacing(1) }}>
+                    {currentUser.roles.includes('submission_view') && (
+                      <Tooltip title={t('usage')}>
+                        <IconButton
+                          component={Link}
+                          style={{
+                            color: theme.palette.action.active
+                          }}
+                          to={
+                            badlist.type === 'file'
+                              ? `/search/?query=sha256:${badlist.hashes.sha256 || badlist_id || id} OR results:${
+                                  badlist.hashes.sha256 || badlist_id || id
+                                }* OR errors:${badlist.hashes.sha256 || badlist_id || id}* OR file.sha256:${
+                                  badlist.hashes.sha256 || badlist_id || id
+                                }`
+                              : `/search/result/?query=result.sections.tags.${badlist.tag.type}:${safeFieldValueURI(
+                                  badlist.tag.value
+                                )}`
+                          }
+                          size="large"
+                        >
+                          <YoutubeSearchedForIcon />
+                        </IconButton>
+                      </Tooltip>
+                    )}
                     {currentUser.roles.includes('badlist_manage') && (
-                      <>
-                        <Skeleton
-                          variant="circular"
-                          height="3rem"
-                          width="3rem"
-                          style={{ margin: theme.spacing(0.5) }}
-                        />
-                        <Skeleton
-                          variant="circular"
-                          height="3rem"
-                          width="3rem"
-                          style={{ margin: theme.spacing(0.5) }}
-                        />
-                      </>
+                      <Tooltip title={badlist.enabled ? t('enabled') : t('disabled')}>
+                        <IconButton
+                          onClick={badlist.enabled ? () => setDisableDialog(true) : () => setEnableDialog(true)}
+                          size="large"
+                        >
+                          {badlist.enabled ? <ToggleOnIcon /> : <ToggleOffOutlinedIcon />}
+                        </IconButton>
+                      </Tooltip>
+                    )}
+
+                    {currentUser.roles.includes('badlist_manage') && (
+                      <Tooltip title={t('remove')}>
+                        <IconButton
+                          style={{
+                            color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+                          }}
+                          onClick={() => setDeleteDialog(true)}
+                          size="large"
+                        >
+                          <RemoveCircleOutlineOutlinedIcon />
+                        </IconButton>
+                      </Tooltip>
                     )}
                   </div>
-                </>
-              )}
-            </Grid>
-          </Grid>
-        </div>
+                )}
+              </>
+            ) : (
+              <>
+                <div style={{ display: 'flex' }}>
+                  <Skeleton variant="circular" height="3rem" width="3rem" style={{ margin: theme.spacing(0.5) }} />
+                  {currentUser.roles.includes('badlist_manage') && (
+                    <>
+                      <Skeleton variant="circular" height="3rem" width="3rem" style={{ margin: theme.spacing(0.5) }} />
+                      <Skeleton variant="circular" height="3rem" width="3rem" style={{ margin: theme.spacing(0.5) }} />
+                    </>
+                  )}
+                </div>
+              </>
+            )
+          ]}
+        />
+
         <Grid container spacing={3}>
           <Grid size={{ xs: 12 }} style={{ display: badlist && badlist.type === 'file' ? 'initial' : 'none' }}>
             <Typography variant="h6">{t('hashes')}</Typography>
@@ -469,10 +456,10 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
           )}
           <Grid size={{ xs: 12 }}>
             <Grid container alignItems="end">
-              <Grid size={{ xs: 11 }}>
+              <Grid size="grow">
                 <Typography variant="h6">{t('attribution.title')}</Typography>
               </Grid>
-              <Grid size={{ xs: 11 }} style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
+              <Grid size="auto" style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
                 {currentUser.roles.includes('badlist_manage') &&
                   (badlist ? (
                     <Tooltip title={t('add.attribution')}>
@@ -581,10 +568,10 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
           </Grid>
           <Grid size={{ xs: 12 }}>
             <Grid container alignItems="end">
-              <Grid size={{ xs: 11 }}>
+              <Grid size="grow">
                 <Typography variant="h6">{t('timing')}</Typography>
               </Grid>
-              <Grid size={{ xs: 11 }} style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
+              <Grid size="auto" style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
                 {currentUser.roles.includes('badlist_manage') &&
                   (badlist ? (
                     <DatePicker

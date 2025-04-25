@@ -19,6 +19,7 @@ import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import CustomChip from 'components/visual/CustomChip';
+import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -146,33 +147,32 @@ export default function ApiDoc() {
   return (
     <PageFullWidth margin={4}>
       <div style={{ textAlign: 'left' }}>
-        <div style={{ marginBottom: theme.spacing(4) }}>
-          <Grid container>
-            <Grid size={{ xs: 12, sm: 'grow' }}>
-              <Typography variant="h4">{t('title')}</Typography>
-            </Grid>
-            <Grid size={{ xs: 12, sm: 12, md: 'grow' }} style={{ textAlign: 'end' }}>
-              {apiList && apiSelected ? (
-                <FormControl size="small">
-                  <Select
-                    id="api"
-                    value={apiSelected}
-                    onChange={event => setApiSelected(event.target.value)}
-                    variant="outlined"
-                  >
-                    {apiList.map((version, index) => (
-                      <MenuItem key={index} value={version}>
-                        {version.replace('v', t('version')) + t('version_end')}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              ) : (
-                <Skeleton variant="rectangular" style={{ display: 'inline-block', height: '2rem', width: '14rem' }} />
-              )}
-            </Grid>
-          </Grid>
-        </div>
+        <PageHeader
+          primary={t('title')}
+          style={{ marginBottom: theme.spacing(4), textAlign: 'left' }}
+          actionSpacing={1}
+          actions={[
+            apiList && apiSelected ? (
+              <FormControl size="small">
+                <Select
+                  id="api"
+                  value={apiSelected}
+                  onChange={event => setApiSelected(event.target.value)}
+                  variant="outlined"
+                >
+                  {apiList.map((version, index) => (
+                    <MenuItem key={index} value={version}>
+                      {version.replace('v', t('version')) + t('version_end')}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            ) : (
+              <Skeleton variant="rectangular" style={{ display: 'inline-block', height: '2rem', width: '14rem' }} />
+            )
+          ]}
+        />
+
         {apiDefinition ? (
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             {Object.keys(apiDefinition.blueprints).map((bp, i) => (

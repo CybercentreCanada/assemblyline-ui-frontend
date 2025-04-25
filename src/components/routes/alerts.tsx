@@ -1,5 +1,5 @@
 import AddIcon from '@mui/icons-material/Add';
-import { AlertTitle, Grid, IconButton, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
+import { AlertTitle, IconButton, Tooltip, useMediaQuery, useTheme } from '@mui/material';
 import SimpleList from 'commons/addons/lists/simplelist/SimpleList';
 import { useAppUser } from 'commons/components/app/hooks';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
@@ -11,7 +11,7 @@ import type { Workflow } from 'components/models/base/workflow';
 import type { CustomUser } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
 import AlertActions from 'components/routes/alerts/components/Actions';
-import { AlertDefaultSearchParameters } from 'components/routes/alerts/components/DefaultSearchParameters';
+import AlertDefaultSearchParameters from 'components/routes/alerts/components/DefaultSearchParameters';
 import AlertFavorites from 'components/routes/alerts/components/Favorites';
 import AlertFilters from 'components/routes/alerts/components/Filters';
 import AlertListItem from 'components/routes/alerts/components/ListItem';
@@ -25,6 +25,7 @@ import type { SearchParams } from 'components/routes/alerts/utils/SearchParams';
 import type { SearchResult } from 'components/routes/alerts/utils/SearchParser';
 import { WorkflowCreate } from 'components/routes/manage/workflows/create';
 import InformativeAlert from 'components/visual/InformativeAlert';
+import { PageHeader as ALPageHeader } from 'components/visual/Layouts/PageHeader';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -238,15 +239,13 @@ const WrappedAlertsContent = () => {
   else
     return (
       <PageFullWidth margin={4}>
-        <Grid container alignItems="center" paddingBottom={2}>
-          <Grid size={{ xs: 12 }}>
-            <Typography variant="h4">{t('alerts')}</Typography>
-          </Grid>
-
-          <Grid size={{ xs: 'grow' }} style={{ display: 'flex', textAlign: 'right', flex: 0 }}>
-            <AlertDefaultSearchParameters />
-            {currentUser.roles.includes('workflow_manage') && (
-              <Tooltip title={t('workflow.tooltip')}>
+        <ALPageHeader
+          primary={t('alerts')}
+          style={{ paddingBottom: theme.spacing(2), textAlign: 'left' }}
+          actions={[
+            <AlertDefaultSearchParameters key="default-search-parameters" />,
+            currentUser.roles.includes('workflow_manage') && (
+              <Tooltip key="add" title={t('workflow.tooltip')}>
                 <div>
                   <IconButton size="large" onClick={handleCreateWorkflow}>
                     <BiNetworkChart fontSize="x-large" />
@@ -254,9 +253,9 @@ const WrappedAlertsContent = () => {
                   </IconButton>
                 </div>
               </Tooltip>
-            )}
-          </Grid>
-        </Grid>
+            )
+          ]}
+        />
 
         <SearchHeader
           value={search.toParams()}

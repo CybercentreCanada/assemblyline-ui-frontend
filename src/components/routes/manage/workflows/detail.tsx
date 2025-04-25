@@ -16,6 +16,7 @@ import {
 import { AlertHistogram, AlertResults } from 'components/routes/manage/workflows/components/Data';
 import Classification from 'components/visual/Classification';
 import CustomChip from 'components/visual/CustomChip';
+import { PageHeader as ALPageHeader } from 'components/visual/Layouts/PageHeader';
 import Moment from 'components/visual/Moment';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -90,13 +91,13 @@ const WrappedWorkflowDetail = ({ id: propID = null, onClose = null }: Props) => 
         )}
 
         <div style={{ textAlign: 'left' }}>
-          <div style={{ paddingBottom: theme.spacing(2) }}>
-            <Grid container alignItems="center">
-              <Grid flexGrow={1}>
-                <Typography variant="h4">{t('title')}</Typography>
-                <Typography variant="caption">{workflow ? id : <Skeleton style={{ width: '10rem' }} />}</Typography>
-              </Grid>
-              <Grid size={{ xs: 12, sm: 'grow' }} style={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <ALPageHeader
+            primary={t('title')}
+            secondary={id}
+            loading={!workflow}
+            style={{ paddingBottom: theme.spacing(2) }}
+            actions={[
+              <>
                 <RunWorkflowAction id={id} workflow={workflow} />
                 <ShowRelatedAlertsAction id={id} workflow={workflow} />
                 <DuplicateWorkflowAction id={id} workflow={workflow} />
@@ -107,9 +108,10 @@ const WrappedWorkflowDetail = ({ id: propID = null, onClose = null }: Props) => 
                   onChange={enabled => setWorkflow(wf => ({ ...wf, enabled: enabled }))}
                 />
                 <DeleteWorkflowAction id={id} workflow={workflow} />
-              </Grid>
-            </Grid>
-          </div>
+              </>
+            ]}
+          />
+
           <Grid container spacing={2}>
             <Grid size={{ xs: 12 }}>
               <Typography variant="subtitle2">{t('name')}</Typography>

@@ -78,7 +78,7 @@ export const PageHeader: React.FC<PageHeaderProps> = React.memo(
               width: '100%',
               display: 'flex',
               flexWrap: 'wrap',
-              alignContent: 'flex-start',
+              alignContent: 'center',
               columnGap: theme.spacing(1)
             }}
           >
@@ -92,16 +92,18 @@ export const PageHeader: React.FC<PageHeaderProps> = React.memo(
               {primary}
             </Typography>
 
-            <Typography
-              variant="caption"
-              color="textSecondary"
-              width="100%"
-              minWidth={0}
-              {...secondaryProps}
-              sx={{ overflowWrap: 'break-word', ...secondaryProps?.sx }}
-            >
-              {loading ? <Skeleton style={{ width: '10rem' }} /> : secondary}
-            </Typography>
+            {secondary && (
+              <Typography
+                variant="caption"
+                color="textSecondary"
+                width="100%"
+                minWidth={0}
+                {...secondaryProps}
+                sx={{ overflowWrap: 'break-word', ...secondaryProps?.sx }}
+              >
+                {loading ? <Skeleton style={{ width: '10rem' }} /> : secondary}
+              </Typography>
+            )}
           </div>
 
           {loading ? null : (
@@ -120,7 +122,7 @@ export const PageHeader: React.FC<PageHeaderProps> = React.memo(
                     display: 'flex',
                     flexDirection: 'row',
                     flexWrap: 'wrap',
-                    ...(actionSpacing && { columnGap: theme.spacing(actionSpacing) })
+                    ...(actionSpacing && { gap: theme.spacing(actionSpacing) })
                   }}
                 >
                   {actions.map((action, i) => {

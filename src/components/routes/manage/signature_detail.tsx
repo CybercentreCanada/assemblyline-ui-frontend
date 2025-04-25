@@ -31,6 +31,7 @@ import ForbiddenPage from 'components/routes/403';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import Histogram from 'components/visual/Histogram';
+import { PageHeader as ALPageHeader } from 'components/visual/Layouts/PageHeader';
 import Moment from 'components/visual/Moment';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
 import ResultsTable from 'components/visual/SearchResult/results';
@@ -434,79 +435,77 @@ const SignatureDetail = ({
           <Classification size="tiny" c12n={signature ? signature.classification : null} />
         </div>
       )}
+
       <div style={{ textAlign: 'left' }}>
-        <Grid container alignItems="center" spacing={2.5}>
-          <Grid size={{ xs: 12 }}>
-            <Typography variant="h4">{t('title')}</Typography>
-            <Typography variant="caption">
-              {signature ? (
-                `${signature.type}_${signature.source}_${signature.signature_id}`
-              ) : (
-                <Skeleton style={{ width: '10rem' }} />
-              )}
-            </Typography>
-          </Grid>
-          <Grid size={{ xs: 'grow' }} style={{ textAlign: 'right', flexGrow: 0 }}>
-            {signature ? (
+        <ALPageHeader
+          primary={t('title')}
+          secondary={`${signature?.type}_${signature?.source}_${signature?.signature_id}`}
+          loading={!signature}
+          style={{ paddingBottom: theme.spacing(2) }}
+          endAdornment={
+            signature ? (
+              <SignatureStatus
+                status={signature.status}
+                onClick={currentUser.roles.includes('signature_manage') ? () => setOpen(true) : null}
+              />
+            ) : (
+              <Skeleton
+                variant="rectangular"
+                height="1rem"
+                width="6rem"
+                style={{
+                  marginBottom: theme.spacing(1),
+                  marginTop: theme.spacing(1),
+                  borderRadius: theme.spacing(1)
+                }}
+              />
+            )
+          }
+          actions={[
+            signature ? (
               <>
-                <div style={{ display: 'flex', marginBottom: theme.spacing(1), justifyContent: 'flex-end' }}>
-                  {currentUser.roles.includes('submission_view') && (
-                    <Tooltip title={t('usage')}>
-                      <IconButton
-                        component={Link}
-                        style={{ color: theme.palette.action.active }}
-                        to={`/search/result/?query=result.sections.tags.file.rule.${signature.type}:${safeFieldValueURI(
-                          `${signature.source}.${signature.name}`
-                        )}`}
-                        size="large"
-                      >
-                        <YoutubeSearchedForIcon />
-                      </IconButton>
-                    </Tooltip>
-                  )}
-                  <ResetSignatureToSource
-                    signature={signature}
-                    onSignatureChange={value => setSignature(old => ({ ...old, ...value }))}
-                  />
-                  {currentUser.roles.includes('signature_manage') && (
-                    <Tooltip title={t('remove')}>
-                      <IconButton
-                        style={{
-                          color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
-                        }}
-                        onClick={handleDeleteButtonClick}
-                        size="large"
-                      >
-                        <RemoveCircleOutlineOutlinedIcon />
-                      </IconButton>
-                    </Tooltip>
-                  )}
-                </div>
-                <SignatureStatus
-                  status={signature.status}
-                  onClick={currentUser.roles.includes('signature_manage') ? () => setOpen(true) : null}
+                {currentUser.roles.includes('submission_view') && (
+                  <Tooltip title={t('usage')}>
+                    <IconButton
+                      component={Link}
+                      style={{ color: theme.palette.action.active }}
+                      to={`/search/result/?query=result.sections.tags.file.rule.${signature.type}:${safeFieldValueURI(
+                        `${signature.source}.${signature.name}`
+                      )}`}
+                      size="large"
+                    >
+                      <YoutubeSearchedForIcon />
+                    </IconButton>
+                  </Tooltip>
+                )}
+                <ResetSignatureToSource
+                  signature={signature}
+                  onSignatureChange={value => setSignature(old => ({ ...old, ...value }))}
                 />
+                {currentUser.roles.includes('signature_manage') && (
+                  <Tooltip title={t('remove')}>
+                    <IconButton
+                      style={{
+                        color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+                      }}
+                      onClick={handleDeleteButtonClick}
+                      size="large"
+                    >
+                      <RemoveCircleOutlineOutlinedIcon />
+                    </IconButton>
+                  </Tooltip>
+                )}
               </>
             ) : (
               <>
-                <div style={{ display: 'flex' }}>
-                  <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
-                  <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
-                </div>
-                <Skeleton
-                  variant="rectangular"
-                  height="1rem"
-                  width="6rem"
-                  style={{
-                    marginBottom: theme.spacing(1),
-                    marginTop: theme.spacing(1),
-                    borderRadius: theme.spacing(1)
-                  }}
-                />
+                <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
+                <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
               </>
-            )}
-          </Grid>
+            )
+          ]}
+        />
 
+        <Grid container alignItems="center" spacing={2.5}>
           {signature?.state_change_user && signature?.state_change_date && (
             <Grid size={{ xs: 12 }} textAlign="center">
               <Alert severity="info">

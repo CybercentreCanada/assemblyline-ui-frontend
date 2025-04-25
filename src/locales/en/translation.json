@@ -70,6 +70,7 @@
   "drawer.dashboard": "Dashboard",
   "drawer.development": "Development",
   "drawer.development.api": "API Call",
+  "drawer.development.customize": "Customize",
   "drawer.development.library": "Library",
   "drawer.development.theme": "Theme",
   "drawer.expand": "Expand Menu",

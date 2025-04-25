@@ -11,6 +11,7 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import type { Service as ServiceData } from 'components/models/base/service';
 import type { ServiceStats as ServiceStatsData } from 'components/models/ui/service';
 import type { CustomUser } from 'components/models/ui/user';
+import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import LineGraph from 'components/visual/LineGraph';
 import { getVersionQuery } from 'helpers/utils';
 import type { Dispatch, SetStateAction } from 'react';
@@ -267,21 +268,18 @@ export default function ServiceReview() {
 
   return currentUser.is_admin ? (
     <PageFullWidth margin={4}>
-      <Grid
-        container
-        alignItems="center"
-        justifyContent="space-between"
-        spacing={3}
+      <PageHeader
+        primary={t('title')}
+        secondary={t('subtitle')}
         style={{ paddingBottom: theme.spacing(2) }}
-      >
-        <Grid size={{ xs: 12, md: 'grow' }}>
-          <Typography variant="h4">{t('title')}</Typography>
-          <Typography variant="subtitle1">{t('subtitle')}</Typography>
-        </Grid>
-        <Grid size={{ xs: 12, md: 'grow' }} style={{ flexGrow: 0 }}>
-          {services ? (
+        actionSpacing={1}
+        actions={[
+          services ? (
             <>
-              <div style={{ display: 'flex', marginBottom: theme.spacing(1), justifyContent: 'flex-end' }}>
+              <div
+                key="selection"
+                style={{ display: 'flex', marginBottom: theme.spacing(1), justifyContent: 'flex-end' }}
+              >
                 <FormControl size="small" fullWidth>
                   <Select
                     id="channel"
@@ -308,10 +306,11 @@ export default function ServiceReview() {
               </div>
             </>
           ) : (
-            <Skeleton variant="rectangular" height={theme.spacing(5)} width={theme.spacing(30)} />
-          )}
-        </Grid>
-      </Grid>
+            <Skeleton key="selection" variant="rectangular" height={theme.spacing(5)} width={theme.spacing(30)} />
+          )
+        ]}
+      />
+
       {selectedService && selectedService !== '' && (
         <>
           <Typography variant="h3" align="center" gutterBottom style={{ marginTop: theme.spacing(2) }}>

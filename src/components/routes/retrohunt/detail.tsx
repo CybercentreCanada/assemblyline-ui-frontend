@@ -44,6 +44,7 @@ import {
 } from 'components/visual/DivTable';
 import FileDetail from 'components/visual/FileDetail';
 import InformativeAlert from 'components/visual/InformativeAlert';
+import { PageHeader as ALPageHeader } from 'components/visual/Layouts/PageHeader';
 import LineGraph from 'components/visual/LineGraph';
 import Moment from 'components/visual/Moment';
 import MonacoEditor from 'components/visual/MonacoEditor';
@@ -386,19 +387,13 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
             </Grid>
           )}
 
-          <Grid>
-            <Grid container flexDirection="row" rowGap={2}>
-              <Grid flex={1}>
-                <Typography variant="h4" children={!retrohunt ? <Skeleton width="30rem" /> : t('header.view')} />
-                <Typography variant="caption" children={!retrohunt ? <Skeleton width="20rem" /> : retrohunt.key} />
-              </Grid>
-              <Grid flex={0}>
-                <Grid container flexDirection="row" rowGap={2} wrap="nowrap">
-                  <RetrohuntRepeat retrohunt={retrohunt} onRepeat={handleRepeat} />
-                </Grid>
-              </Grid>
-            </Grid>
-          </Grid>
+          <ALPageHeader
+            primary={t('header.view')}
+            secondary={retrohunt?.key}
+            loading={!retrohunt}
+            style={{ paddingBottom: theme.spacing(2) }}
+            actions={[<RetrohuntRepeat key="repeat" retrohunt={retrohunt} onRepeat={handleRepeat} />]}
+          />
 
           {!retrohunt || retrohunt?.finished ? null : (
             <Grid paddingTop={2}>

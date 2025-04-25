@@ -11,7 +11,6 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Typography,
   useTheme
 } from '@mui/material';
 import { useAppUser } from 'commons/components/app/hooks';
@@ -22,6 +21,7 @@ import type { Role } from 'components/models/base/user';
 import type { SiteMap } from 'components/models/ui';
 import type { CustomUser } from 'components/models/ui/user';
 import CustomChip from 'components/visual/CustomChip';
+import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import type { PossibleColor } from 'helpers/colors';
 import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -105,14 +105,13 @@ export default function SiteMapPage() {
 
   return currentUser.is_admin ? (
     <PageFullWidth margin={4}>
-      <div style={{ marginBottom: theme.spacing(2), textAlign: 'left' }}>
-        <Typography variant="h4">{t('title')}</Typography>
-        {siteMap ? (
-          <Typography variant="caption">{`${siteMap.length} ${t('caption')}`}</Typography>
-        ) : (
-          <Skeleton width="10rem" />
-        )}
-      </div>
+      <PageHeader
+        primary={t('title')}
+        secondary={`${siteMap.length} ${t('caption')}`}
+        loading={!siteMap}
+        style={{ marginBottom: theme.spacing(2), textAlign: 'left' }}
+      />
+
       {siteMap ? (
         <TableContainer component={Paper}>
           <Table size="small" stickyHeader>

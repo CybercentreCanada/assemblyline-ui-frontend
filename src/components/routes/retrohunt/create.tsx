@@ -22,6 +22,7 @@ import type { CustomUser } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
+import { PageHeader as ALPageHeader } from 'components/visual/Layouts/PageHeader';
 import { MonacoEditor } from 'components/visual/MonacoEditor';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -167,35 +168,32 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = () => nu
               </Grid>
             )}
 
-            <Grid>
-              <Grid container flexDirection="row">
-                <Grid size="grow">
-                  <Typography variant="h4" children={t('header.add')} />
-                </Grid>
-                <Grid>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    disabled={isButtonLoading || !retrohunt?.description || !retrohunt?.yara_signature}
-                    onClick={() => setIsConfirmationOpen(true)}
-                  >
-                    {t('add.button')}
-                    {isButtonLoading && (
-                      <CircularProgress
-                        size={24}
-                        sx={{
-                          position: 'absolute',
-                          top: '50%',
-                          left: '50%',
-                          marginTop: -12,
-                          marginLeft: -12
-                        }}
-                      />
-                    )}
-                  </Button>
-                </Grid>
-              </Grid>
-            </Grid>
+            <ALPageHeader
+              primary={t('header.add')}
+              actions={[
+                <Button
+                  key="add"
+                  variant="contained"
+                  color="primary"
+                  disabled={isButtonLoading || !retrohunt?.description || !retrohunt?.yara_signature}
+                  onClick={() => setIsConfirmationOpen(true)}
+                >
+                  {t('add.button')}
+                  {isButtonLoading && (
+                    <CircularProgress
+                      size={24}
+                      sx={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        marginTop: -12,
+                        marginLeft: -12
+                      }}
+                    />
+                  )}
+                </Button>
+              ]}
+            />
 
             <Grid>
               <Typography variant="subtitle2">{t('details.description')}</Typography>

@@ -1,7 +1,7 @@
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
 import TimerOutlinedIcon from '@mui/icons-material/TimerOutlined';
-import { Grid, IconButton, Pagination, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
+import { IconButton, Pagination, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import PageHeader from 'commons/components/pages/PageHeader';
 import useALContext from 'components/hooks/useALContext';
@@ -12,6 +12,7 @@ import type { SearchResult } from 'components/models/ui/search';
 import { RetrohuntCreate } from 'components/routes/retrohunt/create';
 import RetrohuntDetail from 'components/routes/retrohunt/detail';
 import { ChipList } from 'components/visual/ChipList';
+import { PageHeader as ALPageHeader } from 'components/visual/Layouts/PageHeader';
 import SearchBar from 'components/visual/SearchBar/search-bar';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
@@ -267,28 +268,19 @@ export default function RetrohuntPage() {
   else
     return (
       <PageFullWidth margin={4}>
-        <div style={{ paddingBottom: theme.spacing(2) }}>
-          <Grid container alignItems="center">
-            <Grid flexGrow={1}>
-              <Typography variant="h4">{t('title')}</Typography>
-            </Grid>
-            {currentUser.roles.includes('retrohunt_run') && (
-              <Grid
-                size={{ xs: 'grow' }}
-                sx={{
-                  textAlign: 'right',
-                  flexGrow: 0
-                }}
-              >
-                <Tooltip title={t('tooltip.add')}>
-                  <IconButton color="success" size="large" onClick={handleOpenCreatePage}>
-                    <AddCircleOutlineOutlinedIcon />
-                  </IconButton>
-                </Tooltip>
-              </Grid>
-            )}
-          </Grid>
-        </div>
+        <ALPageHeader
+          primary={t('title')}
+          style={{ paddingBottom: theme.spacing(2) }}
+          actions={[
+            currentUser.roles.includes('retrohunt_run') && (
+              <Tooltip key="add" title={t('tooltip.add')}>
+                <IconButton color="success" size="large" onClick={handleOpenCreatePage}>
+                  <AddCircleOutlineOutlinedIcon />
+                </IconButton>
+              </Tooltip>
+            )
+          ]}
+        />
 
         <PageHeader isSticky>
           <div style={{ paddingTop: theme.spacing(1) }}>

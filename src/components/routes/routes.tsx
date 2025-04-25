@@ -134,23 +134,23 @@ const WrappedRoutes = () => {
       <Routes>
         <Route path="/" element={<Submit />} />
         <Route path="/account" element={<Account />} />
-        <Route path="/alerts" element={<Alerts />} />
-        <Route path="/alerts_redirect" element={<AlertsRedirect />} />
-        <Route path="/alerts/:id" element={<AlertDetails />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="/admin/actions" element={<AdminActions />} />
+        <Route path="/admin/apikeys" element={<AdminApikeys />} />
+        <Route path="/admin/apikeys/:id" element={<AdminApikeysDetail />} />
         <Route path="/admin/errors" element={<AdminErrorViewer />} />
         <Route path="/admin/errors/:key" element={<AdminErrorDetail />} />
         <Route path="/admin/identify" element={<AdminIdentify />} />
-        <Route path="/admin/services" element={<AdminServices />} />
         <Route path="/admin/service_review" element={<ServiceReview />} />
+        <Route path="/admin/services" element={<AdminServices />} />
         <Route path="/admin/services/:svc" element={<Service />} />
         <Route path="/admin/sitemap" element={<AdminSiteMap />} />
         <Route path="/admin/tag_safelist" element={<AdminTagSafelist />} />
         <Route path="/admin/users" element={<AdminUsers />} />
-        <Route path="/admin/apikeys" element={<AdminApikeys />} />
-        <Route path="/admin/apikeys/:id" element={<AdminApikeysDetail />} />
         <Route path="/admin/users/:id" element={<User />} />
+        <Route path="/alerts_redirect" element={<AlertsRedirect />} />
+        <Route path="/alerts" element={<Alerts />} />
+        <Route path="/alerts/:id" element={<AlertDetails />} />
         <Route path="/archive" element={<MalwareArchive />} />
         <Route path="/archive/:id" element={<ArchiveDetail />} />
         <Route path="/archive/:id/:tab" element={<ArchiveDetail />} />
@@ -161,8 +161,9 @@ const WrappedRoutes = () => {
         <Route path="/development/library" element={<DevelopmentLibrary />} />
         <Route path="/development/theme" element={<DevelopmentTheme />} />
         <Route path="/file/detail/:id" element={<FileFullDetail />} />
-        <Route path="/file/viewer/:id/:tab" element={<FileViewer />} />
         <Route path="/file/viewer/:id" element={<FileViewer />} />
+        <Route path="/file/viewer/:id/:tab" element={<FileViewer />} />
+        <Route path="/forbidden" element={<ForbiddenPage />} />
         <Route path="/help" element={<Help />} />
         <Route path="/help/api" element={<HelpApiDoc />} />
         <Route path="/help/classification" element={<HelpClassification />} />
@@ -170,35 +171,34 @@ const WrappedRoutes = () => {
         <Route path="/help/search" element={<HelpSearch />} />
         <Route path="/help/services" element={<HelpServices />} />
         <Route path="/logout" element={<Logout />} />
-        <Route path="/manage/heuristics" element={<ManageHeuristics />} />
+        <Route path="/manage" element={<Manage />} />
+        <Route path="/manage/badlist" element={<ManageBadlist />} />
+        <Route path="/manage/badlist/:id" element={<BadlistDetail />} />
         <Route path="/manage/heuristic/:id" element={<HeuristicDetail />} />
-        <Route path="/manage/signatures" element={<ManageSignatures />} />
+        <Route path="/manage/heuristics" element={<ManageHeuristics />} />
+        <Route path="/manage/safelist" element={<ManageSafelist />} />
+        <Route path="/manage/safelist/:id" element={<SafelistDetail />} />
         <Route path="/manage/signature/:id" element={<SignatureDetail />} />
         <Route path="/manage/signature/:type/:source/:name" element={<SignatureDetail />} />
+        <Route path="/manage/signatures" element={<ManageSignatures />} />
         <Route path="/manage/sources" element={<ManageSignatureSources />} />
         <Route path="/manage/workflow/create/:id" element={<WorkflowCreate />} />
         <Route path="/manage/workflow/detail/:id" element={<WorkflowDetail />} />
         <Route path="/manage/workflows" element={<ManageWorkflows />} />
-        <Route path="/manage/safelist/:id" element={<SafelistDetail />} />
-        <Route path="/manage/safelist" element={<ManageSafelist />} />
-        <Route path="/manage/badlist/:id" element={<BadlistDetail />} />
-        <Route path="/manage/badlist" element={<ManageBadlist />} />
-        <Route path="/manage" element={<Manage />} />
+        <Route path="/notfound" element={<NotFoundPage />} />
         <Route path="/retrohunt" element={<RetroHunt />} />
         <Route path="/retrohunt/:key" element={<RetroHuntDetail />} />
         <Route path="/search" element={<Search />} />
         <Route path="/search/:id" element={<Search />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/settings/:tab" element={<Settings />} />
-        <Route path="/submit" element={<Submit />} />
-        <Route path="/submission/detail/:id/:fid" element={<SubmissionDetail />} />
-        <Route path="/submission/detail/:id" element={<SubmissionDetail />} />
-        <Route path="/submission/report/:id" element={<SubmissionReport />} />
         <Route path="/submission/:id" element={<RedirectSubmission />} />
+        <Route path="/submission/detail/:id" element={<SubmissionDetail />} />
+        <Route path="/submission/detail/:id/:fid" element={<SubmissionDetail />} />
+        <Route path="/submission/report/:id" element={<SubmissionReport />} />
         <Route path="/submissions" element={<Submissions />} />
+        <Route path="/submit" element={<Submit />} />
         <Route path="/tos" element={<Tos />} />
-        <Route path="/forbidden" element={<ForbiddenPage />} />
-        <Route path="/notfound" element={<NotFoundPage />} />
         <Route path="*" element={<Navigate to="/notfound" replace />} />
       </Routes>
       {configuration.system && configuration.system.type !== 'production' && (

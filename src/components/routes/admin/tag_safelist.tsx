@@ -1,21 +1,12 @@
 import Editor, { DiffEditor, loader } from '@monaco-editor/react';
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Grid,
-  Skeleton,
-  Typography,
-  useTheme
-} from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Skeleton, useTheme } from '@mui/material';
 import { useAppTheme, useAppUser } from 'commons/components/app/hooks';
 import PageFullSize from 'commons/components/pages/PageFullSize';
 import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import type { CustomUser } from 'components/models/ui/user';
+import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -84,43 +75,35 @@ export default function AdminTagSafelist() {
   return currentUser.is_admin ? (
     <PageFullSize margin={4}>
       <RouterPrompt when={tagSafelist !== originalTagSafelist} />
-      <div style={{ marginBottom: theme.spacing(4), textAlign: 'left' }}>
-        <Grid container alignItems="center" spacing={2}>
-          <Grid style={{ flexGrow: 1 }}>
-            <div>
-              <Typography variant="h4">{t('title')}</Typography>
-            </div>
-          </Grid>
-          <Grid>
-            <Grid container spacing={2}>
-              <Grid>
-                <Button variant="outlined" onClick={() => reload(true)}>
-                  {t('reset')}
-                </Button>
-              </Grid>
-              <Grid>
-                <Button
-                  variant="contained"
-                  onClick={() => setTagSafelist(originalTagSafelist)}
-                  disabled={tagSafelist === originalTagSafelist}
-                >
-                  {t('undo')}
-                </Button>
-              </Grid>
-              <Grid>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  disabled={tagSafelist === originalTagSafelist}
-                  onClick={() => setOpen(true)}
-                >
-                  {t('save')}
-                </Button>
-              </Grid>
-            </Grid>
-          </Grid>
-        </Grid>
-      </div>
+
+      <PageHeader
+        primary={t('title')}
+        style={{ marginBottom: theme.spacing(4), textAlign: 'left' }}
+        actionSpacing={1}
+        actions={[
+          <Button key="reset" variant="outlined" onClick={() => reload(true)}>
+            {t('reset')}
+          </Button>,
+          <Button
+            key="undo"
+            variant="contained"
+            onClick={() => setTagSafelist(originalTagSafelist)}
+            disabled={tagSafelist === originalTagSafelist}
+          >
+            {t('undo')}
+          </Button>,
+          <Button
+            key="save"
+            variant="contained"
+            color="primary"
+            disabled={tagSafelist === originalTagSafelist}
+            onClick={() => setOpen(true)}
+          >
+            {t('save')}
+          </Button>
+        ]}
+      />
+
       <Dialog open={open} onClose={() => setOpen(false)} aria-labelledby="dialog-title" fullWidth maxWidth="md">
         <DialogTitle id="dialog-title">{t('save.title')}</DialogTitle>
         <DialogContent>

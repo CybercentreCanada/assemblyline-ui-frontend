@@ -14,6 +14,7 @@ import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import DatePicker from 'components/visual/DatePicker';
 import Histogram from 'components/visual/Histogram';
+import { PageHeader as ALPageHeader } from 'components/visual/Layouts/PageHeader';
 import Moment from 'components/visual/Moment';
 import { bytesToSize, safeFieldValue, safeFieldValueURI } from 'helpers/utils';
 import { useEffect, useState } from 'react';
@@ -237,97 +238,83 @@ const SafelistDetail = ({ safelist_id = null, close = () => null }: SafelistDeta
         </div>
       )}
       <div style={{ textAlign: 'left' }}>
-        <div style={{ paddingBottom: theme.spacing(4) }}>
-          <Grid container alignItems="center" spacing={1}>
-            <Grid size={{ xs: 12 }}>
-              <Typography variant="h4">{safelist ? t(`title.${safelist.type}`) : t('title')}</Typography>
-              <Typography variant="caption" style={{ wordBreak: 'break-word' }}>
-                {safelist ? safelist_id || id : <Skeleton style={{ width: '10rem' }} />}
-              </Typography>
-            </Grid>
-            <Grid size={{ xs: 12, sm: 'grow' }} style={{ textAlign: 'right', flexGrow: 0 }}>
-              {safelist ? (
-                <>
-                  {(safelist_id || id) && (
-                    <div style={{ display: 'flex', marginBottom: theme.spacing(1) }}>
-                      {currentUser.roles.includes('submission_view') && (
-                        <Tooltip title={t('usage')}>
-                          <IconButton
-                            component={Link}
-                            style={{ color: theme.palette.action.active }}
-                            to={
-                              safelist.type === 'file'
-                                ? `/search/result/?query=result.sections.heuristic.signature.name:"SAFELIST_${
-                                    safelist_id || id
-                                  }"`
-                                : safelist.type === 'signature'
-                                  ? `/search/result/?query=result.sections.heuristic.signature.name:${safeFieldValueURI(
-                                      safelist.signature.name
-                                    )}`
-                                  : `/search/result/?query=result.sections.safelisted_tags.${
-                                      safelist.tag.type
-                                    }:${safeFieldValueURI(safelist.tag.value)}`
-                            }
-                            size="large"
-                          >
-                            <YoutubeSearchedForIcon />
-                          </IconButton>
-                        </Tooltip>
-                      )}
-                      {currentUser.roles.includes('safelist_manage') && (
-                        <Tooltip title={safelist.enabled ? t('enabled') : t('disabled')}>
-                          <IconButton
-                            onClick={safelist.enabled ? () => setDisableDialog(true) : () => setEnableDialog(true)}
-                            size="large"
-                          >
-                            {safelist.enabled ? <ToggleOnIcon /> : <ToggleOffOutlinedIcon />}
-                          </IconButton>
-                        </Tooltip>
-                      )}
-
-                      {currentUser.roles.includes('safelist_manage') && (
-                        <Tooltip title={t('remove')}>
-                          <IconButton
-                            style={{
-                              color:
-                                theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
-                            }}
-                            onClick={() => setDeleteDialog(true)}
-                            size="large"
-                          >
-                            <RemoveCircleOutlineOutlinedIcon />
-                          </IconButton>
-                        </Tooltip>
-                      )}
-                    </div>
-                  )}
-                </>
-              ) : (
-                <>
-                  <div style={{ display: 'flex' }}>
-                    <Skeleton variant="circular" height="3rem" width="3rem" style={{ margin: theme.spacing(0.5) }} />
+        <ALPageHeader
+          primary={t('title')}
+          secondary={safelist_id || id}
+          loading={!safelist}
+          style={{ paddingBottom: theme.spacing(4) }}
+          actions={[
+            safelist ? (
+              <>
+                {(safelist_id || id) && (
+                  <div style={{ display: 'flex', marginBottom: theme.spacing(1) }}>
+                    {currentUser.roles.includes('submission_view') && (
+                      <Tooltip title={t('usage')}>
+                        <IconButton
+                          component={Link}
+                          style={{ color: theme.palette.action.active }}
+                          to={
+                            safelist.type === 'file'
+                              ? `/search/result/?query=result.sections.heuristic.signature.name:"SAFELIST_${
+                                  safelist_id || id
+                                }"`
+                              : safelist.type === 'signature'
+                                ? `/search/result/?query=result.sections.heuristic.signature.name:${safeFieldValueURI(
+                                    safelist.signature.name
+                                  )}`
+                                : `/search/result/?query=result.sections.safelisted_tags.${
+                                    safelist.tag.type
+                                  }:${safeFieldValueURI(safelist.tag.value)}`
+                          }
+                          size="large"
+                        >
+                          <YoutubeSearchedForIcon />
+                        </IconButton>
+                      </Tooltip>
+                    )}
                     {currentUser.roles.includes('safelist_manage') && (
-                      <>
-                        <Skeleton
-                          variant="circular"
-                          height="3rem"
-                          width="3rem"
-                          style={{ margin: theme.spacing(0.5) }}
-                        />
-                        <Skeleton
-                          variant="circular"
-                          height="3rem"
-                          width="3rem"
-                          style={{ margin: theme.spacing(0.5) }}
-                        />
-                      </>
+                      <Tooltip title={safelist.enabled ? t('enabled') : t('disabled')}>
+                        <IconButton
+                          onClick={safelist.enabled ? () => setDisableDialog(true) : () => setEnableDialog(true)}
+                          size="large"
+                        >
+                          {safelist.enabled ? <ToggleOnIcon /> : <ToggleOffOutlinedIcon />}
+                        </IconButton>
+                      </Tooltip>
+                    )}
+
+                    {currentUser.roles.includes('safelist_manage') && (
+                      <Tooltip title={t('remove')}>
+                        <IconButton
+                          style={{
+                            color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+                          }}
+                          onClick={() => setDeleteDialog(true)}
+                          size="large"
+                        >
+                          <RemoveCircleOutlineOutlinedIcon />
+                        </IconButton>
+                      </Tooltip>
                     )}
                   </div>
-                </>
-              )}
-            </Grid>
-          </Grid>
-        </div>
+                )}
+              </>
+            ) : (
+              <>
+                <div style={{ display: 'flex' }}>
+                  <Skeleton variant="circular" height="3rem" width="3rem" style={{ margin: theme.spacing(0.5) }} />
+                  {currentUser.roles.includes('safelist_manage') && (
+                    <>
+                      <Skeleton variant="circular" height="3rem" width="3rem" style={{ margin: theme.spacing(0.5) }} />
+                      <Skeleton variant="circular" height="3rem" width="3rem" style={{ margin: theme.spacing(0.5) }} />
+                    </>
+                  )}
+                </div>
+              </>
+            )
+          ]}
+        />
+
         <Grid container spacing={3}>
           <Grid size={{ xs: 12 }} style={{ display: safelist && safelist.type === 'file' ? 'initial' : 'none' }}>
             <Typography variant="h6">{t('hashes')}</Typography>

@@ -28,6 +28,7 @@ import { LABELS, PRIORITIES, STATUSES } from 'components/models/base/workflow';
 import type { SearchResult } from 'components/models/ui/search';
 import ForbiddenPage from 'components/routes/403';
 import Classification from 'components/visual/Classification';
+import { PageHeader as ALPageHeader } from 'components/visual/Layouts/PageHeader';
 import _ from 'lodash';
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -231,50 +232,26 @@ const WrappedWorkflowCreate = ({ id: propID = null, onClose = () => null }: Prop
           </div>
         )}
 
-        <div style={{ textAlign: 'left' }}>
-          <div style={{ paddingBottom: theme.spacing(2) }}>
-            <Grid container alignItems="center">
-              <Grid flexGrow={1}>
-                <Typography variant="h4">{t(id ? 'edit.title' : 'add.title')}</Typography>
-                <Typography variant="caption">
-                  {!id ? null : workflow ? id : <Skeleton style={{ width: '10rem' }} />}
-                </Typography>
-              </Grid>
-
-              <Grid
-                size={{ xs: 12, sm: 'grow' }}
-                style={{ display: 'flex', justifyContent: 'flex-end', columnGap: theme.spacing(1) }}
-              >
-                {id ? (
-                  <>
-                    <Tooltip title={t('cancel.button')}>
-                      <IconButton
-                        style={{
-                          color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
-                        }}
-                        onClick={() => onClose(id)}
-                      >
-                        <DoDisturbAltOutlinedIcon />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title={t('update.button')}>
-                      <IconButton
-                        style={{
-                          color: !disabled
-                            ? theme.palette.mode === 'dark'
-                              ? theme.palette.success.light
-                              : theme.palette.success.dark
-                            : theme.palette.grey[750]
-                        }}
-                        disabled={disabled}
-                        onClick={() => handleUpdate(workflow, runWorkflow)}
-                      >
-                        <CheckIcon />
-                      </IconButton>
-                    </Tooltip>
-                  </>
-                ) : (
-                  <Tooltip title={t('add.button')}>
+        <ALPageHeader
+          primary={t(id ? 'edit.title' : 'add.title')}
+          secondary={id}
+          loading={!workflow}
+          style={{ paddingBottom: theme.spacing(2), textAlign: 'left' }}
+          actions={[
+            <>
+              {id ? (
+                <>
+                  <Tooltip title={t('cancel.button')}>
+                    <IconButton
+                      style={{
+                        color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+                      }}
+                      onClick={() => onClose(id)}
+                    >
+                      <DoDisturbAltOutlinedIcon />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title={t('update.button')}>
                     <IconButton
                       style={{
                         color: !disabled
@@ -284,16 +261,32 @@ const WrappedWorkflowCreate = ({ id: propID = null, onClose = () => null }: Prop
                           : theme.palette.grey[750]
                       }}
                       disabled={disabled}
-                      onClick={() => handleAdd(workflow, runWorkflow)}
+                      onClick={() => handleUpdate(workflow, runWorkflow)}
                     >
                       <CheckIcon />
                     </IconButton>
                   </Tooltip>
-                )}
-              </Grid>
-            </Grid>
-          </div>
-        </div>
+                </>
+              ) : (
+                <Tooltip title={t('add.button')}>
+                  <IconButton
+                    style={{
+                      color: !disabled
+                        ? theme.palette.mode === 'dark'
+                          ? theme.palette.success.light
+                          : theme.palette.success.dark
+                        : theme.palette.grey[750]
+                    }}
+                    disabled={disabled}
+                    onClick={() => handleAdd(workflow, runWorkflow)}
+                  >
+                    <CheckIcon />
+                  </IconButton>
+                </Tooltip>
+              )}
+            </>
+          ]}
+        />
 
         <Grid container spacing={2} textAlign="start">
           <Grid size={{ xs: 12 }}>

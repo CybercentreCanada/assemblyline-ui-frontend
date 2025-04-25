@@ -11,6 +11,7 @@ import type { CustomUser } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
 import Classification from 'components/visual/Classification';
 import Histogram from 'components/visual/Histogram';
+import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import Moment from 'components/visual/Moment';
 import ResultsTable from 'components/visual/SearchResult/results';
 import { safeFieldValueURI } from 'helpers/utils';
@@ -112,36 +113,29 @@ const HeuristicDetail = ({ heur_id = null }: HeuristicDetailProps) => {
         </div>
       )}
       <div style={{ textAlign: 'left' }}>
-        <div style={{ paddingBottom: theme.spacing(4) }}>
-          <Grid container alignItems="center">
-            <Grid flexGrow={1}>
-              <Typography variant="h4">{t('title')}</Typography>
-              <Typography variant="caption">
-                {heuristic ? heuristic.heur_id : <Skeleton style={{ width: '10rem' }} />}
-              </Typography>
-            </Grid>
-            {currentUser.roles.includes('submission_view') && (
-              <Grid size={{ xs: 12, sm: 'grow' }} style={{ textAlign: 'right', flexGrow: 0 }}>
-                {heuristic ? (
-                  <Tooltip title={t('usage')}>
-                    <IconButton
-                      component={Link}
-                      style={{ color: theme.palette.action.active }}
-                      to={`/search/result/?query=result.sections.heuristic.heur_id:${safeFieldValueURI(
-                        heuristic.heur_id
-                      )}`}
-                      size="large"
-                    >
-                      <YoutubeSearchedForIcon />
-                    </IconButton>
-                  </Tooltip>
-                ) : (
-                  <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
-                )}
-              </Grid>
-            )}
-          </Grid>
-        </div>
+        <PageHeader
+          primary={t('title')}
+          secondary={heuristic?.heur_id}
+          loading={!heuristic}
+          style={{ paddingBottom: theme.spacing(4) }}
+          actions={[
+            !currentUser.roles.includes('submission_view') ? null : heuristic ? (
+              <Tooltip title={t('usage')}>
+                <IconButton
+                  component={Link}
+                  style={{ color: theme.palette.action.active }}
+                  to={`/search/result/?query=result.sections.heuristic.heur_id:${safeFieldValueURI(heuristic.heur_id)}`}
+                  size="large"
+                >
+                  <YoutubeSearchedForIcon />
+                </IconButton>
+              </Tooltip>
+            ) : (
+              <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
+            )
+          ]}
+        />
+
         <Grid container spacing={3}>
           <Grid size={{ xs: 12, sm: 6 }}>
             <Typography variant="subtitle2">{t('name')}</Typography>

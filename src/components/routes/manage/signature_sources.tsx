@@ -36,6 +36,7 @@ import ForbiddenPage from 'components/routes/403';
 import { SourceDetail } from 'components/routes/manage/signature_sources_details';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
+import { PageHeader as ALPageHeader } from 'components/visual/Layouts/PageHeader';
 import Moment from 'components/visual/Moment';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
 import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
@@ -170,88 +171,84 @@ const WrappedSourceDetailDrawer = ({
           waiting={buttonLoading}
         />
 
-        <div style={{ paddingBottom: theme.spacing(2) }}>
-          <Grid container alignItems="center">
-            <Grid flexGrow={1}>
-              <Typography variant="h4">{service}</Typography>
-              <Typography variant="caption">
-                {`${t(base ? 'editing_source' : 'adding_source')}${base ? ` (${base.name})` : ''}`}
-              </Typography>
-            </Grid>
-            <Grid size={{ xs: 12, sm: 'grow' }} style={{ textAlign: 'right', flexGrow: 1 }}>
-              {base && (
-                <Tooltip title={t(source.enabled ? 'disable' : 'enable')}>
-                  <IconButton onClick={toggleSource} size="large">
-                    {source.enabled ? <ToggleOnIcon /> : <ToggleOffOutlinedIcon />}
-                  </IconButton>
-                </Tooltip>
-              )}
-              {base && generatesSignatures && (
-                <Tooltip title={t('view_signatures')}>
-                  <IconButton
-                    style={{
-                      color: theme.palette.mode === 'dark' ? '#F' : '#0'
-                    }}
-                    component={Link}
-                    to={`/manage/signatures/?query=${encodeURIComponent(
-                      `type:${service.toLowerCase()} AND source:${source.name}`
-                    )}`}
-                    size="large"
-                  >
-                    <FingerprintOutlinedIcon />
-                  </IconButton>
-                </Tooltip>
-              )}
-              {base && (
-                <Tooltip title={t('update')}>
-                  <IconButton
-                    style={{
-                      color: isSourceUpdating(source)
-                        ? theme.palette.action.disabled
-                        : theme.palette.mode === 'dark'
-                          ? theme.palette.info.light
-                          : theme.palette.info.dark
-                    }}
-                    disabled={isSourceUpdating(source)}
-                    onClick={triggerSourceUpdate}
-                    size="large"
-                  >
-                    <SystemUpdateAltIcon />
-                  </IconButton>
-                </Tooltip>
-              )}
-              <Tooltip title={t(base ? 'change.save' : 'add.save')}>
-                <IconButton
-                  style={{
-                    color: saveEnabled
-                      ? theme.palette.mode === 'dark'
-                        ? theme.palette.success.light
-                        : theme.palette.success.dark
-                      : theme.palette.grey[750]
-                  }}
-                  onClick={saveChanges}
-                  disabled={!saveEnabled}
-                  size="large"
-                >
-                  <CheckIcon />
+        <ALPageHeader
+          primary={service}
+          secondary={`${t(base ? 'editing_source' : 'adding_source')}${base ? ` (${base.name})` : ''}`}
+          style={{ paddingBottom: theme.spacing(2) }}
+          actions={[
+            base && (
+              <Tooltip key="enabled" title={t(source.enabled ? 'disable' : 'enable')}>
+                <IconButton onClick={toggleSource} size="large">
+                  {source.enabled ? <ToggleOnIcon /> : <ToggleOffOutlinedIcon />}
                 </IconButton>
               </Tooltip>
-              {base && (
-                <Tooltip title={t('delete')}>
-                  <IconButton
-                    style={{
-                      color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
-                    }}
-                    onClick={deleteSource}
-                    size="large"
-                  >
-                    <RemoveCircleOutlineOutlinedIcon />
-                  </IconButton>
-                </Tooltip>
-              )}
-            </Grid>
-          </Grid>
-        </div>
+            ),
+            base && generatesSignatures && (
+              <Tooltip key="view" title={t('view_signatures')}>
+                <IconButton
+                  style={{
+                    color: theme.palette.mode === 'dark' ? '#F' : '#0'
+                  }}
+                  component={Link}
+                  to={`/manage/signatures/?query=${encodeURIComponent(
+                    `type:${service.toLowerCase()} AND source:${source.name}`
+                  )}`}
+                  size="large"
+                >
+                  <FingerprintOutlinedIcon />
+                </IconButton>
+              </Tooltip>
+            ),
+            base && (
+              <Tooltip key="update" title={t('update')}>
+                <IconButton
+                  style={{
+                    color: isSourceUpdating(source)
+                      ? theme.palette.action.disabled
+                      : theme.palette.mode === 'dark'
+                        ? theme.palette.info.light
+                        : theme.palette.info.dark
+                  }}
+                  disabled={isSourceUpdating(source)}
+                  onClick={triggerSourceUpdate}
+                  size="large"
+                >
+                  <SystemUpdateAltIcon />
+                </IconButton>
+              </Tooltip>
+            ),
+            <Tooltip key="save" title={t(base ? 'change.save' : 'add.save')}>
+              <IconButton
+                style={{
+                  color: saveEnabled
+                    ? theme.palette.mode === 'dark'
+                      ? theme.palette.success.light
+                      : theme.palette.success.dark
+                    : theme.palette.grey[750]
+                }}
+                onClick={saveChanges}
+                disabled={!saveEnabled}
+                size="large"
+              >
+                <CheckIcon />
+              </IconButton>
+            </Tooltip>,
+            base && (
+              <Tooltip key="removve" title={t('delete')}>
+                <IconButton
+                  style={{
+                    color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+                  }}
+                  onClick={deleteSource}
+                  size="large"
+                >
+                  <RemoveCircleOutlineOutlinedIcon />
+                </IconButton>
+              </Tooltip>
+            )
+          ]}
+        />
+
         <SourceDetail
           source={source}
           defaults={defaults}
@@ -660,12 +657,12 @@ export default function SignatureSources() {
   return currentUser.roles.includes('signature_manage') ? (
     <PageFullWidth margin={4}>
       <div style={{ textAlign: 'left' }}>
-        <div style={{ paddingBottom: theme.spacing(2) }}>
-          <Typography variant="h4">{t('title')}</Typography>
-          <Typography variant="caption">
-            {sources ? `${Object.keys(sources).length} ${t('caption')}` : <Skeleton />}
-          </Typography>
-        </div>
+        <ALPageHeader
+          primary={t('title')}
+          secondary={`${Object.keys(sources || {}).length} ${t('caption')}`}
+          loading={!sources}
+          style={{ paddingBottom: theme.spacing(2) }}
+        />
 
         {sources
           ? Object.keys(sources).map((key, id) => (

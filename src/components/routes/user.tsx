@@ -600,7 +600,7 @@ function User({ username = null }: UserProps) {
           </Grid>
         </Grid>
 
-        <Grid size={{ sm: 12, md: 9 }} style={{ width: '100%' }}>
+        <Grid size={{ sm: 12, md: 9 }}>
           <Classification
             type={currentUser.is_admin ? 'picker' : 'pill'}
             size="medium"

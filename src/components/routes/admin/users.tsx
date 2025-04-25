@@ -1,7 +1,6 @@
 import BlockIcon from '@mui/icons-material/Block';
 import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount';
-import { Grid, useTheme } from '@mui/material';
-import Typography from '@mui/material/Typography';
+import { useTheme } from '@mui/material';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import PageHeader from 'commons/components/pages/PageHeader';
 import type { SearchParams } from 'components/core/SearchParams/SearchParams';
@@ -13,6 +12,7 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import type { UserIndexed } from 'components/models/base/user';
 import type { SearchResult } from 'components/models/ui/search';
 import { AddUserPage } from 'components/routes/admin/users_add';
+import { PageHeader as ALPageHeader } from 'components/visual/Layouts/PageHeader';
 import { SearchHeader } from 'components/visual/SearchBar/SearchHeader';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import UsersTable from 'components/visual/SearchResult/users';
@@ -102,16 +102,11 @@ const UsersSearch = () => {
     <Navigate to="/forbidden" replace />
   ) : (
     <PageFullWidth margin={4}>
-      <div style={{ paddingBottom: theme.spacing(2) }}>
-        <Grid container alignItems="center">
-          <Grid flexGrow={1}>
-            <Typography variant="h4">{t('title')}</Typography>
-          </Grid>
-          <Grid size={{ xs: 'grow' }} style={{ textAlign: 'right' }}>
-            <AddUserPage />
-          </Grid>
-        </Grid>
-      </div>
+      <ALPageHeader
+        primary={t('title')}
+        style={{ paddingBottom: theme.spacing(2) }}
+        actions={[<AddUserPage key="add-user" />]}
+      />
 
       <PageHeader isSticky>
         <div style={{ paddingTop: theme.spacing(1) }}>
