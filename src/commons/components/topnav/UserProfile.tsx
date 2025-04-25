@@ -154,6 +154,36 @@ const UserProfile = () => {
     [t, configs.preferences.allowFocusMode, layout]
   );
 
+  // TODO: Add renderButtonMenu to commons
+  const renderButtonMenu = useCallback(
+    (menuItems: AppBarUserMenuElement[]) => {
+      if (menuItems !== undefined && menuItems !== null && menuItems.length !== 0) {
+        return (
+          <div style={{ marginBottom: theme.spacing(-2), textAlign: 'end' }}>
+            {menuItems.map(
+              (a, i) =>
+                a.icon && (
+                  <Tooltip key={`buttonmenu-${i}`} title={t(a.i18nKey)}>
+                    <IconButton
+                      component={Link}
+                      color="inherit"
+                      to={a.route}
+                      size="large"
+                      onClick={() => setOpen(false)}
+                    >
+                      {a.icon}
+                    </IconButton>
+                  </Tooltip>
+                )
+            )}
+          </div>
+        );
+      }
+      return null;
+    },
+    [t, theme]
+  );
+
   return (
     <ClickAwayListener onClickAway={onClickAway}>
       <div>
@@ -233,6 +263,8 @@ const UserProfile = () => {
                         <Typography variant="caption" noWrap>
                           {user.email}
                         </Typography>
+                        {configs.preferences.topnav.userMenuType === 'icon' &&
+                          renderButtonMenu(configs.preferences.topnav.userMenu)}
                       </Box>
                     </Box>
                   </ListItem>
@@ -240,12 +272,13 @@ const UserProfile = () => {
                 {configuration.ui.enforce_quota &&
                   (user.api_daily_quota !== 0 || user.submission_daily_quota !== 0) &&
                   renderQuotas()}
-                {renderMenu(
-                  'usermenu',
-                  configs.preferences.topnav.userMenu,
-                  configs.preferences.topnav.userMenuTitle,
-                  configs.preferences.topnav.userMenuI18nKey
-                )}
+                {configs.preferences.topnav.userMenuType === 'list' &&
+                  renderMenu(
+                    'usermenu',
+                    configs.preferences.topnav.userMenu,
+                    configs.preferences.topnav.userMenuTitle,
+                    configs.preferences.topnav.userMenuI18nKey
+                  )}
                 {user.is_admin &&
                   renderMenu(
                     'adminmenu',
