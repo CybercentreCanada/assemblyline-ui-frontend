@@ -35,7 +35,7 @@ const Description = styled(Typography)(({ theme }) => ({
       color: theme.palette.mode === 'dark' ? theme.palette.primary.light : theme.palette.primary.dark
     }
   },
-  '&>*': {
+  '& > *': {
     marginBlockStart: theme.spacing(0.5),
     marginBlockEnd: theme.spacing(0.5)
   }
