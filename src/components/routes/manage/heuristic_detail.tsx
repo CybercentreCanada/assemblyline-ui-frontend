@@ -200,7 +200,7 @@ const HeuristicDetail = ({ heur_id = null }: HeuristicDetailProps) => {
             <Typography variant="subtitle1" style={{ fontWeight: 600, fontStyle: 'italic' }}>
               {t('hits')}
             </Typography>
-            <Grid container>
+            <Grid container size="grow">
               <Grid size={{ xs: 3, sm: 4, md: 3, lg: 2 }}>
                 <span style={{ fontWeight: 500 }}>{t('hit.count')}</span>
               </Grid>
@@ -239,7 +239,7 @@ const HeuristicDetail = ({ heur_id = null }: HeuristicDetailProps) => {
             <Typography variant="subtitle1" style={{ fontWeight: 600, fontStyle: 'italic' }}>
               {t('contribution')}
             </Typography>
-            <Grid container>
+            <Grid container size="grow">
               <Grid size={{ xs: 3, sm: 4, md: 3, lg: 2 }}>
                 <span style={{ fontWeight: 500 }}>{t('score.min')}</span>
               </Grid>

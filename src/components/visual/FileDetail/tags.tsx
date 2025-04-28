@@ -117,7 +117,7 @@ const WrappedTagSection: React.FC<TagSectionProps> = ({ signatures, tags, force 
       <Collapse in={open} timeout="auto">
         <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
           {signatures && (someSigNotSafe || forceShowSig) && (
-            <Grid container>
+            <Grid container size="grow">
               <TooltipGrid title="heuristic.signature">
                 <span style={{ fontWeight: 500 }}>heuristic.signature</span>
               </TooltipGrid>

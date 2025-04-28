@@ -15,7 +15,7 @@ const WrappedFrequencySection: React.FC<Props> = ({ seen = null, nocollapse = fa
 
   return (
     <SectionContainer title={t('frequency')} nocollapse={nocollapse}>
-      <Grid container>
+      <Grid container size="grow">
         <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
           <span style={{ fontWeight: 500 }}>{t('seen.first')}</span>
         </Grid>

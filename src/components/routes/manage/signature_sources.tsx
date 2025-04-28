@@ -445,7 +445,7 @@ export const SourceCard = ({ source, onClick, service, generatesSignatures, show
             </>
           )}
         </div>
-        <Grid container>
+        <Grid container size="grow">
           {source.pattern && (
             <>
               <Grid size={{ xs: 5, sm: 4, md: 2 }} sx={{ fontWeight: 500 }}>{`${t('pattern')}:`}</Grid>

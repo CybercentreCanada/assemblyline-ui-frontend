@@ -48,7 +48,7 @@ const WrappedInfoSection: React.FC<Props> = ({ submission }) => {
         {useMemo(
           () => (
             <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
-              <Grid container>
+              <Grid container size="grow">
                 <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
                   <span style={{ fontWeight: 500 }}>{t('params.description')}</span>
                 </Grid>

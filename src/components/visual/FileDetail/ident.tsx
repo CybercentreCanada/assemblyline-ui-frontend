@@ -44,7 +44,7 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({
         }
       }}
     >
-      <Grid container>
+      <Grid container size="grow">
         {c12nDef.enforce && (
           <>
             <Grid size={{ xs: 4, sm: 3, lg: 2 }}>

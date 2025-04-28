@@ -50,7 +50,7 @@ const WrappedContainerCard = ({ container, defaults, name = null, volumes = null
           }
         }}
       >
-        <Grid container>
+        <Grid container size="grow">
           {name && (
             <Grid size={{ xs: 12 }} sx={{ fontWeight: 700, fontSize: 'larger', fontFamily: 'monospace' }}>
               {name}
