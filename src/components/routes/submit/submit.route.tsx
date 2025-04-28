@@ -15,6 +15,7 @@ import type { SubmitStore } from 'components/routes/submit/submit.form';
 import { useForm } from 'components/routes/submit/submit.form';
 import { TabContainer } from 'components/visual/TabContainer';
 import { getSubmitType } from 'helpers/utils';
+import generateUUID from 'helpers/uuid';
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router';
@@ -132,6 +133,9 @@ const WrappedSubmitRoute = () => {
 
   useEffect(() => {
     closeSnackbar();
+
+    form.reset();
+    form.setFieldValue('state.uuid', generateUUID());
 
     form.setFieldValue('state.disabled', !currentUser.is_admin && !currentUser.roles.includes('submission_create'));
     form.setFieldValue('state.customize', currentUser.is_admin || currentUser.roles.includes('submission_customize'));
