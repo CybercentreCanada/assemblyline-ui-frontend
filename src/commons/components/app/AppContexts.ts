@@ -1,6 +1,5 @@
 import type { PaletteMode } from '@mui/material';
 import type { AppConfigs, AppLayoutMode, AppLeftNavElement, AppSwitcherItem } from 'commons/components/app/AppConfigs';
-import type { ItemComponentProps } from 'commons/components/app/AppNotificationService';
 import type { AppSearchItem, AppSearchMode, AppSearchService } from 'commons/components/app/AppSearchService';
 import type { AppUser, AppUserService } from 'commons/components/app/AppUserService';
 import { createContext, type Dispatch, type ReactElement, type SetStateAction } from 'react';
@@ -33,7 +32,7 @@ export type AppSearchServiceContextType<T = any> = {
 
 export type AppNotificationServiceContextType = {
   provided: boolean; // has a search service been provided? - if false, then it means the default service is being used.
-  service: AppNotificationService; // the search service implementation to use.
+  // service: AppNotificationService; // the search service implementation to use.
   state: AppNotificationServiceState; // the state of the search service.
 };
 
@@ -99,10 +98,11 @@ export type AppNotificationServiceState = {
   set: (state: AppNotificationServiceState) => void; // Update the feed urls from the state
 };
 
-export type AppNotificationService = {
-  feedUrls?: string[]; // Static urls can be provided at initialization or see state object (AppNotificationServiceState)
-  notificationRenderer?: (item: ItemComponentProps) => ReactElement; // Custom component for notification rendering
-};
+// Using our own Notification component
+// export type AppNotificationService = {
+//   feedUrls?: string[]; // Static urls can be provided at initialization or see state object (AppNotificationServiceState)
+//   notificationRenderer?: (item: ItemComponentProps) => ReactElement; // Custom component for notification rendering
+// };
 
 // Specification interface of the AppDrawer's 'open' method arguments object.
 export type AppDrawerOpenProps = {
