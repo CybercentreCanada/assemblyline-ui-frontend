@@ -2,12 +2,12 @@ import { HIDE_EVENT_ID } from 'borealis-ui/dist/data/event';
 import useALContext from 'components/hooks/useALContext';
 import useHighlighter from 'components/hooks/useHighlighter';
 import useSafeResults from 'components/hooks/useSafeResults';
-import CustomChip from 'components/visual/CustomChip';
-import ExternalLinks from 'components/visual/ExternalSearch';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import ActionMenu from 'components/visual/ActionMenu';
+import CustomChip from 'components/visual/CustomChip';
 import EnrichmentCustomChip, { BOREALIS_TYPE_MAP } from 'components/visual/EnrichmentCustomChip';
+import ExternalLinks from 'components/visual/ExternalSearch';
 import type { PossibleColor } from 'helpers/colors';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
 const STYLE = { height: 'auto', minHeight: '22px' };
 const initialMenuState = {
