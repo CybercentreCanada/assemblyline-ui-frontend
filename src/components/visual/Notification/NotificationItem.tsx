@@ -1,11 +1,11 @@
 import { Divider, Link, styled, Typography, useTheme } from '@mui/material';
 import CustomChip from 'components/visual/CustomChip';
 import Moment from 'components/visual/Moment';
+import type { JSONFeedAuthor, JSONFeedItem } from 'components/visual/Notification/useNotificationFeed';
 import DOMPurify from 'dompurify';
 import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import Markdown from 'react-markdown';
-import type { JSONFeedAuthor, JSONFeedItem } from '.';
 
 const Container = styled('div')(({ theme }) => ({
   width: '100%',
@@ -35,7 +35,7 @@ const Description = styled(Typography)(({ theme }) => ({
       color: theme.palette.mode === 'dark' ? theme.palette.primary.light : theme.palette.primary.dark
     }
   },
-  '&>*': {
+  '& > *': {
     marginBlockStart: theme.spacing(0.5),
     marginBlockEnd: theme.spacing(0.5)
   }

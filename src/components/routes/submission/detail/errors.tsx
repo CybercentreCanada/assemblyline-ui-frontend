@@ -288,7 +288,7 @@ const WrappedErrorSection: React.FC<Props> = ({ sid, errors }) => {
           paddingBottom: sp2,
           paddingTop: sp2,
           '& *': {
-            color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+            color: `${theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark} !important`
           },
           '& *:not(strong, a, svg, path)': {
             fontSize: '14px',

@@ -111,7 +111,6 @@
     "@iconify/icons-simple-icons": "^1.2.74",
     "@iconify/react": "^5.2.1",
     "@jest/globals": "^29.6.4",
-    "@stylistic/eslint-plugin": "^4.2.0",
     "@tanstack/eslint-plugin-query": "^5.72.0",
     "@tanstack/react-query-devtools": "^5.69.0",
     "@testing-library/dom": "^10.4.0",

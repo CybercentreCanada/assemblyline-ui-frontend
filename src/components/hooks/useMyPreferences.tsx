@@ -32,7 +32,7 @@ import SupervisorAccountOutlinedIcon from '@mui/icons-material/SupervisorAccount
 import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
 import type { AppBarUserMenuElement, AppLeftNavElement, AppPreferenceConfigs } from 'commons/components/app/AppConfigs';
-import { Notification } from 'components/visual/Notification';
+import NotificationArea from 'components/visual/Notification/NotificationArea';
 import type { ReactElement, ReactNode } from 'react';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -99,7 +99,7 @@ const useMyPreferences = () => {
     [t]
   );
 
-  const TOP_NAV_RIGHT = useMemo((): ReactNode => <Notification />, []);
+  const TOP_NAV_RIGHT = useMemo((): ReactNode => <NotificationArea />, []);
 
   const LEFT_MENU_ITEMS = useMemo(
     (): AppLeftNavElement[] => [

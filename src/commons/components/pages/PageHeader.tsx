@@ -1,13 +1,5 @@
-import {
-  AppBar,
-  Button,
-  type ButtonProps,
-  IconButton,
-  type IconButtonProps,
-  Toolbar,
-  Tooltip,
-  useTheme
-} from '@mui/material';
+import type { ButtonProps, IconButtonProps } from '@mui/material';
+import { AppBar, Button, IconButton, Toolbar, Tooltip, useTheme } from '@mui/material';
 import { useAppBar, useAppBarHeight, useAppLayout } from 'commons/components/app/hooks';
 import { memo } from 'react';
 

@@ -6,7 +6,7 @@ import type {
   AppTheme,
   AppThemeConfigs
 } from 'commons/components/app/AppConfigs';
-import { AppContext, type AppNotificationService } from 'commons/components/app/AppContexts';
+import { AppContext } from 'commons/components/app/AppContexts';
 import { AppDrawerContainer } from 'commons/components/app/AppDrawerContainer';
 import type { AppSearchService } from 'commons/components/app/AppSearchService';
 import type { AppUser, AppUserService } from 'commons/components/app/AppUserService';
@@ -35,7 +35,6 @@ export type AppProviderProps<U extends AppUser> = {
   sitemap?: AppSiteMapConfigs;
   user?: AppUserService<U>;
   search?: AppSearchService;
-  notification?: AppNotificationService;
   children: ReactNode;
 };
 
@@ -43,7 +42,6 @@ export const AppProviderInner = <U extends AppUser>({
   user,
   search,
   sitemap,
-  notification,
   preferences,
   overrides,
   children
@@ -80,7 +78,7 @@ export const AppProviderInner = <U extends AppUser>({
                       <CarouselProvider>
                         <AppDrawerProvider>
                           <DrawerProvider>
-                            <AppBarProvider search={search} notification={notification}>
+                            <AppBarProvider search={search}>
                               <AppBreadcrumbsProvider>
                                 <AppLeftNavProvider>
                                   <AppDrawerContainer>
@@ -110,21 +108,13 @@ const AppProvider = <U extends AppUser>({
   user,
   search,
   sitemap,
-  notification,
   preferences,
   overrides,
   children
 }: AppProviderProps<U>) => {
   return (
     <AppThemesProvider initTheme={theme} themes={themes} preferences={preferences}>
-      <AppProviderInner
-        user={user}
-        search={search}
-        sitemap={sitemap}
-        notification={notification}
-        preferences={preferences}
-        overrides={overrides}
-      >
+      <AppProviderInner user={user} search={search} sitemap={sitemap} preferences={preferences} overrides={overrides}>
         {children}
       </AppProviderInner>
     </AppThemesProvider>

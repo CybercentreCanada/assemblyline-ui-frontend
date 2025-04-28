@@ -11,7 +11,6 @@ import Breadcrumbs from 'commons/components/breadcrumbs/Breadcrumbs';
 import AppSearch from 'commons/components/search/AppSearch';
 import AppName from 'commons/components/topnav/AppName';
 import AppSwitcher from 'commons/components/topnav/AppSwitcher';
-import { Notifications } from 'commons/components/topnav/Notifications';
 import ThemeSelectionIcon from 'commons/components/topnav/ThemeSelectionIcon';
 import UserProfile from 'commons/components/topnav/UserProfile';
 import { memo, useCallback, useLayoutEffect, useMemo } from 'react';
@@ -128,7 +127,6 @@ const AppBar = () => {
         {showSpacer && <div style={{ flex: 1 }} />}
         {rightBeforeSearch}
         {quicksearch.show && <AppSearch />}
-        <Notifications />
         {right}
         {themeSelectionMode === 'icon' && <ThemeSelectionIcon />}
         <AppSwitcher />

@@ -40,13 +40,14 @@ import type { Configuration } from 'components/models/base/config';
 import type { ServiceIndexed } from 'components/models/base/service';
 import type { SystemMessage } from 'components/models/ui/user';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
+import NotificationItem from 'components/visual/Notification/NotificationItem';
+import type { JSONFeedItem } from 'components/visual/Notification/useNotificationFeed';
+import { useNotificationFeed } from 'components/visual/Notification/useNotificationFeed';
 import type { PossibleColor } from 'helpers/colors';
 import 'moment-timezone';
 import type { ComponentProps, ComponentType, CSSProperties, ElementType } from 'react';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { JSONFeedItem } from '.';
-import { NotificationItem, useNotificationFeed } from '.';
 
 const Row = styled('div')(() => ({
   width: '100%',
