@@ -1,5 +1,4 @@
 import eslint from '@eslint/js';
-import stylisticPlugin from '@stylistic/eslint-plugin';
 import importPlugin from 'eslint-plugin-import';
 import jsxA11yPlugin from 'eslint-plugin-jsx-a11y';
 import noRelativeImportPathsPlugin from 'eslint-plugin-no-relative-import-paths';
@@ -99,45 +98,6 @@ export default tseslint.config(
       '@stylistic/indent': 'off'
     }
   })),
-
-  // Stylistic ESLint Plugin
-  {
-    ...stylisticPlugin.configs.recommended,
-    ...defaultConfig,
-    rules: {
-      ...stylisticPlugin.configs.recommended.rules,
-      '@stylistic/arrow-parens': ['error', 'as-needed'],
-      '@stylistic/brace-style': 'off',
-      '@stylistic/comma-dangle': 'off',
-      '@stylistic/comma-spacing': 'warn',
-      '@stylistic/indent-binary-ops': 'warn',
-      '@stylistic/indent': 'off',
-      '@stylistic/jsx-closing-tag-location': 'warn',
-      '@stylistic/jsx-curly-brace-presence': 'warn',
-      '@stylistic/jsx-curly-brace-presence': 'warn',
-      '@stylistic/jsx-curly-newline': 'off',
-      '@stylistic/jsx-one-expression-per-line': 'off',
-      '@stylistic/jsx-wrap-multilines': 'warn',
-      '@stylistic/linebreak-style': 'off',
-      '@stylistic/max-len': ['off', { code: 120, ignoreComments: true, ignoreRegExpLiterals: true, tabWidth: 2 }],
-      '@stylistic/member-delimiter-style': 'off',
-      '@stylistic/multiline-ternary': 'off',
-      '@stylistic/no-async-promise-executor': 'off',
-      '@stylistic/no-extra-boolean-cast': 'off',
-      '@stylistic/no-multiple-empty-lines': 'warn',
-      '@stylistic/no-nested-ternary': 'off',
-      '@stylistic/no-plusplus': 'off',
-      '@stylistic/no-underscore-dangle': 'off',
-      '@stylistic/operator-linebreak': 'off',
-      '@stylistic/operator-linebreak': 'warn',
-      '@stylistic/quote-props': 'off',
-      '@stylistic/quotes': 'off',
-      '@stylistic/radix': 'off',
-      '@stylistic/semi': 'warn',
-      '@stylistic/spaced-comment': 'off',
-      '@stylistic/spaced-comment': 'warn'
-    }
-  },
 
   // Imports Plugin
   {
