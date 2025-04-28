@@ -1,8 +1,7 @@
 import { AppStorageKeys } from 'commons/components/app/AppConstants';
-import { AppBarContext, type AppNotificationService } from 'commons/components/app/AppContexts';
+import { AppBarContext } from 'commons/components/app/AppContexts';
 import type { AppSearchService } from 'commons/components/app/AppSearchService';
 import { useAppConfigs } from 'commons/components/app/hooks';
-import AppNotificationServiceProvider from 'commons/components/app/providers/AppNotificationProvider';
 import AppQuickSearchProvider from 'commons/components/app/providers/AppQuickSearchProvider';
 import AppSwitcherProvider from 'commons/components/app/providers/AppSwitcherProvider';
 import useLocalStorageItem from 'commons/components/utils/hooks/useLocalStorageItem';
@@ -12,11 +11,10 @@ const { LS_KEY_AUTOHIDE_APPBAR } = AppStorageKeys;
 
 type AppTopNavProviderProps = {
   search?: AppSearchService;
-  notification?: AppNotificationService;
   children: ReactElement | ReactElement[];
 };
 
-export default function AppBarProvider({ search, notification, children }: AppTopNavProviderProps) {
+export default function AppBarProvider({ search, children }: AppTopNavProviderProps) {
   const configs = useAppConfigs();
   const [show, setShow] = useState<boolean>(true);
   const [autoHide, setAutoHide] = useLocalStorageItem<boolean>(
@@ -36,9 +34,7 @@ export default function AppBarProvider({ search, notification, children }: AppTo
   return (
     <AppBarContext.Provider value={context}>
       <AppSwitcherProvider>
-        <AppNotificationServiceProvider service={notification}>
-          <AppQuickSearchProvider search={search}>{children}</AppQuickSearchProvider>
-        </AppNotificationServiceProvider>
+        <AppQuickSearchProvider search={search}>{children}</AppQuickSearchProvider>
       </AppSwitcherProvider>
     </AppBarContext.Provider>
   );
