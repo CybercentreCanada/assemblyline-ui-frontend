@@ -98,7 +98,6 @@ export const MyApp: React.FC = () => {
   const myUser: AppUserService<CustomUser> = useMyUser();
   // TODO: add this back in
   // const mySearch: AppSearchService<SearchItem> = useMySearch();
-  // const myNotification = useMyNotification();
 
   return (
     <BrowserRouter basename="/">
@@ -111,7 +110,6 @@ export const MyApp: React.FC = () => {
               sitemap={mySitemap}
               user={myUser}
               // search={mySearch}
-              // notification={myNotification}
             >
               <MyAppMain />
             </AppProvider>
