@@ -16,7 +16,7 @@ import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import CustomChip from 'components/visual/CustomChip';
 import Empty from 'components/visual/Empty';
 import { PageHeader } from 'components/visual/Layouts/PageHeader';
-import type { JSONFeedItem } from 'components/visual/Notification';
+import type { JSONFeedItem } from 'components/visual/Notification/useNotificationFeed';
 import { useNotificationFeed } from 'components/visual/Notification/useNotificationFeed';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
 import { getVersionQuery } from 'helpers/utils';
