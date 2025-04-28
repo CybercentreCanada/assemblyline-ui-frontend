@@ -77,7 +77,7 @@ export default function Configuration() {
             {t('priorities.desc_list')}
           </Typography>
           <div style={{ paddingTop: sp1, paddingBottom: sp2 }}>
-            <Grid container>
+            <Grid container size="grow">
               {constants ? (
                 <>
                   {Object.entries(constants.priorities)
@@ -121,7 +121,7 @@ export default function Configuration() {
             {t('file_types.specific')}
           </Typography>
           <div style={{ paddingTop: sp1, paddingBottom: sp2 }}>
-            <Grid container>
+            <Grid container size="grow">
               {constants
                 ? constants.file_types.map((type, id) =>
                     type[0] !== '*' && type[1].length !== 0 ? (
@@ -149,7 +149,7 @@ export default function Configuration() {
             {t('file_types.non_specific')}
           </Typography>
           <div style={{ paddingTop: sp1, paddingBottom: sp2 }}>
-            <Grid container>
+            <Grid container size="grow">
               {constants
                 ? constants.file_types.map((type, id) =>
                     type[0] !== '*' && type[1].length === 0 ? (

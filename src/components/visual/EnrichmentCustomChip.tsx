@@ -68,7 +68,8 @@ const StyledEnrichedChip: FC<StyledEnrichedChipProps> = memo(
         sx={{ '& .iconify': { marginLeft: '8px', flexShrink: 0 } }}
         {...props}
       />
-    )
+    ),
+    { shouldForwardProp: prop => prop !== 'showPreview' && prop !== 'wrap' && prop !== 'fullWidth' }
   )<StyledEnrichedChipProps>(
     ({
       color = 'default',
@@ -80,15 +81,6 @@ const StyledEnrichedChip: FC<StyledEnrichedChipProps> = memo(
       variant = 'outlined',
       wrap = false
     }) => ({
-      ...(!mono
-        ? null
-        : size === 'tiny'
-          ? { fontFamily: 'monospace', fontSize: '1rem' }
-          : { fontFamily: 'monospace', fontSize: '1.15rem' }),
-
-      ...(!wrap ? null : { height: 'auto' }),
-      ...(!fullWidth ? null : { width: '100%' }),
-
       ...{
         square: { borderRadius: '0px', margin: '2px 4px 2px 0' },
         rounded: { borderRadius: '3px', margin: '2px 4px 2px 0' },
@@ -100,6 +92,15 @@ const StyledEnrichedChip: FC<StyledEnrichedChipProps> = memo(
         small: null,
         medium: null
       }?.[size],
+
+      ...(!mono
+        ? null
+        : size === 'tiny'
+          ? { fontFamily: 'monospace', fontSize: '1rem' }
+          : { fontFamily: 'monospace', fontSize: '1.15rem' }),
+
+      ...(!wrap ? null : { height: 'auto' }),
+      ...(!fullWidth ? null : { width: '100%' }),
 
       ...(variant === 'outlined'
         ? {

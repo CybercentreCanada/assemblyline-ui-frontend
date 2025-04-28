@@ -305,7 +305,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                   <SectionTitle>{t('verdict')}</SectionTitle>
                   <Divider />
                   <SectionContent>
-                    <Grid container>
+                    <Grid container size="grow">
                       <Grid size={{ xs: 3, sm: 2, md: 4 }}>{t('score')}</Grid>
                       <Grid size={{ xs: 9, sm: 10, md: 8 }}>
                         {alert ? <Verdict size="tiny" score={alert.al.score} fullWidth /> : <Skeleton />}
@@ -362,7 +362,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                 rowGap: theme.spacing(2)
               }}
             >
-              <Grid container>
+              <Grid container size="grow">
                 <Grid
                   size={{ xs: 12 }}
                   style={{ marginBottom: theme.spacing(1), display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}

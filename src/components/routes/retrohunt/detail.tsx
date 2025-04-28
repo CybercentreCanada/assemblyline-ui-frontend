@@ -427,7 +427,7 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
                     </Grid>
 
                     <Grid>
-                      <Grid container>
+                      <Grid container size="grow">
                         <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
                           <span style={{ fontWeight: 500 }}>{t('details.description')}</span>
                         </Grid>

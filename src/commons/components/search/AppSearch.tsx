@@ -159,7 +159,7 @@ export default function AppSearch() {
 
   return (
     <ClickAwayListener onClickAway={() => state.set({ ...state, menu: false })}>
-      <AppSearchRoot ref={menuRef} sx={{ mr: !showSearchIcon && 1 }} menuOpen={state.menu}>
+      <AppSearchRoot ref={menuRef} sx={{ mr: showSearchIcon ? 0 : 1 }} menuOpen={state.menu}>
         {showSearchIcon ? (
           <IconButton
             color="inherit"

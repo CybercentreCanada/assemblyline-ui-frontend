@@ -319,7 +319,7 @@ const SafelistDetail = ({ safelist_id = null, close = () => null }: SafelistDeta
           <Grid size={{ xs: 12 }} style={{ display: safelist && safelist.type === 'file' ? 'initial' : 'none' }}>
             <Typography variant="h6">{t('hashes')}</Typography>
             <Divider />
-            <Grid container>
+            <Grid container size="grow">
               <Grid size={{ xs: 4, sm: 3 }}>
                 <span style={{ fontWeight: 500 }}>MD5</span>
               </Grid>
@@ -365,7 +365,7 @@ const SafelistDetail = ({ safelist_id = null, close = () => null }: SafelistDeta
             <Grid size={{ xs: 12 }}>
               <Typography variant="h6">{t('file.title')}</Typography>
               <Divider />
-              <Grid container>
+              <Grid container size="grow">
                 <Grid size={{ xs: 4, sm: 3 }}>
                   <span style={{ fontWeight: 500 }}>{t('file.name')}</span>
                 </Grid>
@@ -399,7 +399,7 @@ const SafelistDetail = ({ safelist_id = null, close = () => null }: SafelistDeta
             <Grid size={{ xs: 12 }}>
               <Typography variant="h6">{t('signature.title')}</Typography>
               <Divider />
-              <Grid container>
+              <Grid container size="grow">
                 <Grid size={{ xs: 4, sm: 3 }}>
                   <span style={{ fontWeight: 500 }}>{t('signature.name')}</span>
                 </Grid>
@@ -411,7 +411,7 @@ const SafelistDetail = ({ safelist_id = null, close = () => null }: SafelistDeta
             <Grid size={{ xs: 12 }}>
               <Typography variant="h6">{t('tag.title')}</Typography>
               <Divider />
-              <Grid container>
+              <Grid container size="grow">
                 <Grid size={{ xs: 4, sm: 3 }}>
                   <span style={{ fontWeight: 500 }}>{t('tag.type')}</span>
                 </Grid>
@@ -499,7 +499,7 @@ const SafelistDetail = ({ safelist_id = null, close = () => null }: SafelistDeta
               </Grid>
             </Grid>
             <Divider />
-            <Grid container>
+            <Grid container size="grow">
               <Grid size={{ xs: 4, sm: 3 }}>
                 <span style={{ fontWeight: 500 }}>{t('timing.added')}</span>
               </Grid>

@@ -1140,7 +1140,7 @@ function WrappedSubmissionDetail() {
           </div>
         )}
         <div style={{ paddingBottom: sp4 }}>
-          <Grid container>
+          <Grid container size="grow">
             <Grid flex={1}>
               <div>
                 <Typography variant="h4">{t('title')}</Typography>
@@ -1359,7 +1359,7 @@ function WrappedSubmissionDetail() {
                         <>
                           <VerdictBar verdicts={submission.verdict} />
                           {currentUser.roles.includes('submission_manage') && (
-                            <Grid container>
+                            <Grid container size="grow">
                               <Grid size={{ xs: 5 }} style={{ textAlign: 'left' }}>
                                 <Tooltip
                                   title={t(

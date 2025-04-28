@@ -334,7 +334,7 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
           <Grid size={{ xs: 12 }} style={{ display: badlist && badlist.type === 'file' ? 'initial' : 'none' }}>
             <Typography variant="h6">{t('hashes')}</Typography>
             <Divider />
-            <Grid container>
+            <Grid container size="grow">
               <Grid size={{ xs: 4, sm: 3 }}>
                 <span style={{ fontWeight: 500 }}>MD5</span>
               </Grid>
@@ -406,7 +406,7 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
             <Grid size={{ xs: 12 }}>
               <Typography variant="h6">{t('file.title')}</Typography>
               <Divider />
-              <Grid container>
+              <Grid container size="grow">
                 <Grid size={{ xs: 4, sm: 3 }}>
                   <span style={{ fontWeight: 500 }}>{t('file.name')}</span>
                 </Grid>
@@ -440,7 +440,7 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
             <Grid size={{ xs: 12 }}>
               <Typography variant="h6">{t('tag.title')}</Typography>
               <Divider />
-              <Grid container>
+              <Grid container size="grow">
                 <Grid size={{ xs: 4, sm: 3 }}>
                   <span style={{ fontWeight: 500 }}>{t('tag.type')}</span>
                 </Grid>
@@ -592,7 +592,7 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
               </Grid>
             </Grid>
             <Divider />
-            <Grid container>
+            <Grid container size="grow">
               <Grid size={{ xs: 4, sm: 3 }}>
                 <span style={{ fontWeight: 500 }}>{t('timing.added')}</span>
               </Grid>

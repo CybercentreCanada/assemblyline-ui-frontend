@@ -42,7 +42,8 @@ const StyledChip: FC<StyledChipProps> = memo(
       <Chip color={COLOR_MAP?.[color]} size={SIZE_MAP?.[size]} variant={variant} {...props} />
     ),
     {
-      shouldForwardProp: prop => prop !== 'fullWidth' && prop !== 'mono' && prop !== 'type' && prop !== 'wrap'
+      shouldForwardProp: prop =>
+        prop !== 'fullWidth' && prop !== 'mono' && prop !== 'type' && prop !== 'wrap' && prop !== 'showPreview'
     }
   )<StyledChipProps>(
     ({
@@ -55,15 +56,6 @@ const StyledChip: FC<StyledChipProps> = memo(
       variant = 'filled',
       wrap = false
     }) => ({
-      ...(!mono
-        ? null
-        : size === 'tiny'
-          ? { fontFamily: 'monospace', fontSize: '1rem' }
-          : { fontFamily: 'monospace', fontSize: '1.15rem' }),
-
-      ...(!wrap ? null : { height: 'auto' }),
-      ...(!fullWidth ? null : { width: '100%' }),
-
       ...{
         square: { borderRadius: '0px', margin: '2px 4px 2px 0' },
         rounded: { borderRadius: '3px', margin: '2px 4px 2px 0' },
@@ -75,6 +67,15 @@ const StyledChip: FC<StyledChipProps> = memo(
         small: null,
         medium: null
       }?.[size],
+
+      ...(!mono
+        ? null
+        : size === 'tiny'
+          ? { fontFamily: 'monospace', fontSize: '1rem' }
+          : { fontFamily: 'monospace', fontSize: '1.15rem' }),
+
+      ...(!wrap ? null : { height: 'auto' }),
+      ...(!fullWidth ? null : { width: '100%' }),
 
       ...(variant === 'outlined'
         ? {

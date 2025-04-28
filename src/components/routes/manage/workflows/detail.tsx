@@ -197,7 +197,7 @@ const WrappedWorkflowDetail = ({ id: propID = null, onClose = null }: Props) => 
           </Grid>
 
           <Grid style={{ paddingTop: theme.spacing(4) }}>
-            <Grid container>
+            <Grid container size="grow">
               <Grid size={{ xs: 12 }}>
                 <Typography variant="h6">{t('statistics')}</Typography>
               </Grid>
@@ -205,7 +205,7 @@ const WrappedWorkflowDetail = ({ id: propID = null, onClose = null }: Props) => 
                 <Typography variant="subtitle1" style={{ fontWeight: 600, fontStyle: 'italic' }}>
                   {t('hits')}
                 </Typography>
-                <Grid container>
+                <Grid container size="grow">
                   <Grid size={{ xs: 3, sm: 4, md: 3, lg: 3 }}>
                     <span style={{ fontWeight: 500 }}>{t('hit.count')}</span>
                   </Grid>
@@ -236,7 +236,7 @@ const WrappedWorkflowDetail = ({ id: propID = null, onClose = null }: Props) => 
                 <Typography variant="subtitle1" style={{ fontWeight: 600, fontStyle: 'italic' }}>
                   {t('details')}
                 </Typography>
-                <Grid container>
+                <Grid container size="grow">
                   <Grid size={{ xs: 3, sm: 4, md: 3, lg: 3 }}>
                     <span style={{ fontWeight: 500 }}>{t('created_by')}:</span>
                   </Grid>

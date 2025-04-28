@@ -196,7 +196,7 @@ const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
 
   return (
     <PageHeader isSticky>
-      <Grid container>
+      <Grid container size="grow">
         <Grid size={{ xs: 12, md: 6 }}>
           <Box
             sx={{
