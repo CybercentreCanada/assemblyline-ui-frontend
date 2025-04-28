@@ -12,7 +12,7 @@ import {
   loadSubmissionProfile
 } from 'components/routes/settings/settings.utils';
 import type { SubmitStore } from 'components/routes/submit/submit.form';
-import { useForm } from 'components/routes/submit/submit.form';
+import { FLOW, useForm } from 'components/routes/submit/submit.form';
 import { TabContainer } from 'components/visual/TabContainer';
 import { getSubmitType } from 'helpers/utils';
 import generateUUID from 'helpers/uuid';
@@ -136,6 +136,11 @@ const WrappedSubmitRoute = () => {
 
     form.reset();
     form.setFieldValue('state.uuid', generateUUID());
+
+    FLOW.cancel();
+    FLOW.off('complete');
+    FLOW.off('fileError');
+    FLOW.off('progress');
 
     form.setFieldValue('state.disabled', !currentUser.is_admin && !currentUser.roles.includes('submission_create'));
     form.setFieldValue('state.customize', currentUser.is_admin || currentUser.roles.includes('submission_customize'));
