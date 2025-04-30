@@ -1,7 +1,7 @@
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export type ExternalEnrichmentItem = {
@@ -54,7 +54,7 @@ export function ExternalLookupProvider(props: ExternalLookupProps) {
   const { apiCall } = useMyAPI();
   const { user: currentUser, configuration: currentUserConfig } = useALContext();
   const { showSuccessMessage, showWarningMessage, showErrorMessage } = useMySnackbar();
-  const [enrichmentState, setEnrichmentState] = React.useState<ExternalEnrichmentState>({});
+  const [enrichmentState, setEnrichmentState] = useState<ExternalEnrichmentState>({});
 
   const isActionable = useCallback(
     (category, type, value) => {

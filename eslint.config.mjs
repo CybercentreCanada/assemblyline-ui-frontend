@@ -7,6 +7,7 @@ import noRelativeImportPathsPlugin from 'eslint-plugin-no-relative-import-paths'
 import reactPlugin from 'eslint-plugin-react';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import reactRefreshPlugin from 'eslint-plugin-react-refresh';
+import requireExplicitGenericsPlugin from 'eslint-plugin-require-explicit-generics';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
@@ -23,12 +24,14 @@ const typescriptRules = {
   '@typescript-eslint/consistent-type-definitions': 'off',
   '@typescript-eslint/consistent-type-imports': 'warn',
   '@typescript-eslint/default-param-last': 'off',
+  '@typescript-eslint/explicit-function-return-type': 'off',
   '@typescript-eslint/indent': 'off',
   '@typescript-eslint/no-base-to-string': 'warn',
   '@typescript-eslint/no-duplicate-type-constituents': 'off',
   '@typescript-eslint/no-dynamic-delete': 'warn',
   '@typescript-eslint/no-empty-function': 'warn',
   '@typescript-eslint/no-empty-object-type': 'warn',
+  '@typescript-eslint/no-explicit-any': 'warn',
   '@typescript-eslint/no-explicit-any': 'warn',
   '@typescript-eslint/no-floating-promises': 'warn',
   '@typescript-eslint/no-for-in-array': 'warn',
@@ -176,6 +179,15 @@ export default tseslint.config(
       'jsonc/key-name-casing': 'off'
     }
   })),
+
+  // Require Explicit Generics Plugin
+  {
+    ...defaultConfig,
+    plugins: { 'require-explicit-generics': requireExplicitGenericsPlugin },
+    rules: {
+      'require-explicit-generics/require-explicit-generics': ['warn', ['useState', 'useRef']]
+    }
+  },
 
   // React Refresh Plugin
   {

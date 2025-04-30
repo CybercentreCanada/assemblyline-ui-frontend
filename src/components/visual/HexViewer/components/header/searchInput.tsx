@@ -4,7 +4,7 @@ import TextField from '@mui/material/TextField';
 import type { StoreProps } from 'components/visual/HexViewer';
 import { useDispatch } from 'components/visual/HexViewer';
 import type { SyntheticEvent } from 'react';
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export const WrappedHexSearchbar = ({ store }: StoreProps) => {
@@ -15,11 +15,11 @@ export const WrappedHexSearchbar = ({ store }: StoreProps) => {
   const { onSearchBarChange, onSearchBarInputChange, onSearchBarFocus, onSearchBarBlur, onSearchBarKeyDown } =
     useDispatch();
 
-  const [value, setValue] = React.useState<string>('');
-  const [inputValue, setInputValue] = React.useState<string>('');
+  const [value, setValue] = useState<string>('');
+  const [inputValue, setInputValue] = useState<string>('');
 
-  const [suggestionOpen, setSuggestionOpen] = React.useState(true);
-  const [suggestionLabels, setSuggestionLabels] = React.useState(['asd']);
+  const [suggestionOpen, setSuggestionOpen] = useState(true);
+  const [suggestionLabels, setSuggestionLabels] = useState(['asd']);
 
   return (
     <Autocomplete

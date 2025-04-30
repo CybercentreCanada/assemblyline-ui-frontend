@@ -31,7 +31,7 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import AIMarkdown from 'components/visual/AiMarkdown';
 import CustomChip from 'components/visual/CustomChip';
 import { ThinkingBadge } from 'components/visual/ThinkingBadge';
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const Popper = styled(MuiPopper)(() => ({
@@ -95,18 +95,18 @@ function AssistantProvider({ children }: AssistantProviderProps) {
   const { user: currentUser, configuration } = useALContext();
   const { apiCall } = useMyAPI();
 
-  const [open, setOpen] = React.useState(false);
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const [currentInsights, setCurrentInsights] = React.useState<AssistantInsightProps[]>([]);
-  const [thinking, setThinking] = React.useState(false);
-  const [currentContext, setCurrentContext] = React.useState<ContextMessageProps[]>([]);
-  const [currentHistory, setCurrentHistory] = React.useState<ContextMessageProps[]>([]);
-  const [currentInput, setCurrentInput] = React.useState<string>('');
-  const [hasInsights, setHasInsights] = React.useState<boolean>(false);
+  const [open, setOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [currentInsights, setCurrentInsights] = useState<AssistantInsightProps[]>([]);
+  const [thinking, setThinking] = useState(false);
+  const [currentContext, setCurrentContext] = useState<ContextMessageProps[]>([]);
+  const [currentHistory, setCurrentHistory] = useState<ContextMessageProps[]>([]);
+  const [currentInput, setCurrentInput] = useState<string>('');
+  const [hasInsights, setHasInsights] = useState<boolean>(false);
   const upSM = useMediaQuery(theme.breakpoints.up('md'));
   const isXS = useMediaQuery(theme.breakpoints.only('xs'));
-  const inputRef = React.useRef(null);
-  const chatRef = React.useRef(null);
+  const inputRef = useRef(null);
+  const chatRef = useRef(null);
 
   const assistantAllowed =
     currentUser && currentUser.roles.includes('assistant_use') && configuration && configuration.ui.ai.enabled;

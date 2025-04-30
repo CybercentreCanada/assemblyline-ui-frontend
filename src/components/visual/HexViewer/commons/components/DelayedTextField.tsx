@@ -1,7 +1,7 @@
 import FormControl from '@mui/material/FormControl';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import type { SxProps } from '@mui/material/styles';
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 export type DelayedTextFieldProps = {
   id?: string;
@@ -94,14 +94,14 @@ export const WrappedDelayedTextField = ({
   onSubmit = () => null,
   onPaste = () => null
 }: DelayedTextFieldProps) => {
-  const [_value, setValue] = React.useState<string>(value);
+  const [_value, setValue] = useState<string>(value);
 
-  const _inputRef = React.useRef<any>(null);
-  const valueRef = React.useRef<string>(value);
-  const delayRef = React.useRef<number>(delay);
-  const timerRef = React.useRef(null);
-  const onChangeRef = React.useRef<(event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => void>(null);
-  const onChangeEventRef = React.useRef(null);
+  const _inputRef = useRef<any>(null);
+  const valueRef = useRef<string>(value);
+  const delayRef = useRef<number>(delay);
+  const timerRef = useRef(null);
+  const onChangeRef = useRef<(event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => void>(null);
+  const onChangeEventRef = useRef(null);
 
   useEffect(() => {
     valueRef.current = value;

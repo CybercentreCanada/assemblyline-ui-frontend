@@ -28,8 +28,8 @@ type HeuristicProps = {
 
 const WrappedHeuristic: React.FC<HeuristicProps> = ({ name, id, sections, level, force = false }: HeuristicProps) => {
   const { t } = useTranslation();
-  const [open, setOpen] = React.useState(false);
-  const [render, setRender] = React.useState(false);
+  const [open, setOpen] = useState(false);
+  const [render, setRender] = useState(false);
   const { isHighlighted, triggerHighlight, getKey } = useHighlighter();
   const theme = useTheme();
   const navigate = useNavigate();

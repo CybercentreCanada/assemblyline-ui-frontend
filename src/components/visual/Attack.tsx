@@ -11,7 +11,7 @@ import type { CustomUser } from 'components/models/ui/user';
 import CustomChip from 'components/visual/CustomChip';
 import type { PossibleColor } from 'helpers/colors';
 import { safeFieldValueURI } from 'helpers/utils';
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 
@@ -44,7 +44,7 @@ const WrappedAttack: React.FC<AttackProps> = ({
   force = false
 }) => {
   const { t } = useTranslation();
-  const [state, setState] = React.useState(initialMenuState);
+  const [state, setState] = useState(initialMenuState);
   const { isHighlighted, triggerHighlight } = useHighlighter();
   const { copy } = useClipboard();
   const { showSafeResults } = useSafeResults();

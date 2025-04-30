@@ -4,7 +4,7 @@ import { Collapse, Divider, Grid, Skeleton, Typography, useTheme } from '@mui/ma
 import useHighlighter from 'components/hooks/useHighlighter';
 import type { Heuristics } from 'components/models/ui/file';
 import Heuristic from 'components/visual/Heuristic';
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 type HeuristicSectionProps = {
@@ -13,7 +13,7 @@ type HeuristicSectionProps = {
 
 const WrappedHeuristicSection: React.FC<HeuristicSectionProps> = ({ heuristics }) => {
   const { t } = useTranslation(['fileDetail']);
-  const [open, setOpen] = React.useState(true);
+  const [open, setOpen] = useState(true);
   const theme = useTheme();
   const sp2 = theme.spacing(2);
   const { getKey } = useHighlighter();

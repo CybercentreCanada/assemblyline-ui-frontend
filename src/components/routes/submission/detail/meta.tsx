@@ -5,7 +5,7 @@ import { Fetcher } from 'borealis-ui';
 import useALContext from 'components/hooks/useALContext';
 import type { Metadata } from 'components/models/base/submission';
 import ActionableText from 'components/visual/ActionableText';
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const Empty = styled('pre')(({ theme }) => ({
@@ -33,7 +33,7 @@ const WrappedMetaSection: React.FC<Props> = ({ metadata, classification }) => {
   const { t } = useTranslation(['submissionDetail']);
   const theme = useTheme();
   const { configuration } = useALContext();
-  const [metaOpen, setMetaOpen] = React.useState(false);
+  const [metaOpen, setMetaOpen] = useState(false);
 
   return !metadata || Object.keys(metadata).length !== 0 ? (
     <div style={{ paddingTop: theme.spacing(2) }}>

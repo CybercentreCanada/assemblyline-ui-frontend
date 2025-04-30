@@ -31,10 +31,10 @@ type FileTreeSectionProps = {
 
 const WrappedFileTreeSection: React.FC<FileTreeSectionProps> = ({ tree, sid, baseFiles, force = false }) => {
   const { t } = useTranslation(['submissionDetail']);
-  const [open, setOpen] = React.useState(true);
+  const [open, setOpen] = useState(true);
   const theme = useTheme();
   const sp2 = theme.spacing(2);
-  const [forcedShown, setForcedShown] = React.useState<string[]>([]);
+  const [forcedShown, setForcedShown] = useState<string[]>([]);
 
   useEffect(() => {
     if (baseFiles && forcedShown.length === 0) {

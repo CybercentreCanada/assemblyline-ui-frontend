@@ -2,7 +2,7 @@ import { Link as MaterialLink, Skeleton, useTheme } from '@mui/material';
 import useExternalLookup from 'components/hooks/useExternalLookup';
 import ActionMenu from 'components/visual/ActionMenu';
 import ExternalLinks from 'components/visual/ExternalSearch';
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 
 const initialMenuState = {
   mouseX: null,
@@ -19,7 +19,7 @@ type TagProps = {
 const WrappedActionableText: React.FC<TagProps> = ({ category, type, value, classification }) => {
   const theme = useTheme();
 
-  const [state, setState] = React.useState(initialMenuState);
+  const [state, setState] = useState(initialMenuState);
 
   const handleMenuClick = useCallback(event => {
     event.preventDefault();

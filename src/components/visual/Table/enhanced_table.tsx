@@ -441,10 +441,10 @@ const WrappedEnhancedTable: React.FC<EnhancedTableProps> = ({
   defaultOrderDirection = 'asc',
   showEmpty = false
 }) => {
-  const [filteredRows, setFilteredRows] = React.useState(rows);
-  const [page, setPage] = React.useState(0);
-  const [filter, setFilter] = React.useState('');
-  const [rowsPerPage, setRowsPerPage] = React.useState(25);
+  const [filteredRows, setFilteredRows] = useState<any[]>(rows);
+  const [page, setPage] = useState<number>(0);
+  const [filter, setFilter] = useState<string>('');
+  const [rowsPerPage, setRowsPerPage] = useState<number>(25);
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);

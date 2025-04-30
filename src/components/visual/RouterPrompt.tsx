@@ -17,8 +17,8 @@ export function RouterPrompt(props) {
   } = props;
   const { t } = useTranslation();
   const { setDrawerClosePrompt } = useDrawer();
-  const [open, setOpen] = useState(false);
-  const [cancel, setCancel] = useState(false);
+  const [open, setOpen] = useState<boolean>(false);
+  const [cancel, setCancel] = useState<boolean>(false);
   const [currentTX, setCurrentTX] = useState(null);
 
   // Block history transactions

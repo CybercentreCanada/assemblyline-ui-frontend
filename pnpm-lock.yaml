@@ -339,6 +339,9 @@ importers:
       eslint-plugin-react-refresh:
         specifier: ^0.4.19
         version: 0.4.19(eslint@9.24.0(jiti@2.4.2))
+      eslint-plugin-require-explicit-generics:
+        specifier: ^1.0.0
+        version: 1.0.0
       globals:
         specifier: ^16.0.0
         version: 16.0.0
@@ -2761,6 +2764,9 @@ packages:
     engines: {node: '>=4'}
     peerDependencies:
       eslint: ^3 || ^4 || ^5 || ^6 || ^7 || ^8 || ^9.7
+
+  eslint-plugin-require-explicit-generics@1.0.0:
+    resolution: {integrity: sha512-oThnGQYUBlosjZO4zOld8lzUphygok8/+x1RYVyCPDRd5k9Z88THSAo49oRhivleiPLS0H0DbdxZdmApihCqsg==}
 
   eslint-plugin-vitest@0.5.4:
     resolution: {integrity: sha512-um+odCkccAHU53WdKAw39MY61+1x990uXjSPguUCq3VcEHdqJrOb8OTMrbYlY6f9jAKx7x98kLVlIe3RJeJqoQ==}
@@ -7715,6 +7721,8 @@ snapshots:
       semver: 6.3.1
       string.prototype.matchall: 4.0.12
       string.prototype.repeat: 1.0.0
+
+  eslint-plugin-require-explicit-generics@1.0.0: {}
 
   eslint-plugin-vitest@0.5.4(@typescript-eslint/eslint-plugin@8.30.0(@typescript-eslint/parser@8.30.0(eslint@9.24.0(jiti@2.4.2))(typescript@5.8.3))(eslint@9.24.0(jiti@2.4.2))(typescript@5.8.3))(eslint@9.24.0(jiti@2.4.2))(typescript@5.8.3)(vitest@3.1.1):
     dependencies:

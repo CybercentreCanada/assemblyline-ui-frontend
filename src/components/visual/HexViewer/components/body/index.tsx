@@ -10,7 +10,7 @@ import {
   WindowRow
 } from 'components/visual/HexViewer';
 import type { KeyboardEvent, PropsWithChildren } from 'react';
-import { memo, default as React, useMemo } from 'react';
+import React, { memo, useMemo, useRef } from 'react';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import type { FixedSizeListProps, ListOnItemsRenderedProps } from 'react-window';
 import { FixedSizeList } from 'react-window';
@@ -38,7 +38,7 @@ const HexTableBody = memo(({ store }: StoreProps) => {
     onBodyScrollInit,
     onScrollTouchEnd
   } = useDispatch();
-  const bodyRef = React.useRef<HTMLDivElement>(null);
+  const bodyRef = useRef<HTMLDivElement>(null);
 
   useEventListener('resize', () => onBodyResize(bodyRef?.current?.getBoundingClientRect()));
   useEventListener('keydown', (event: KeyboardEvent) => onCursorKeyDown({ event }, { store }));
@@ -112,8 +112,8 @@ const HexWindowBody = memo(({ store }: StoreProps) => {
   } = useDispatch();
   const { dispatch } = useStore();
 
-  const listRef = React.useRef<FixedSizeListProps<unknown>>(null);
-  const bodyRef = React.useRef<HTMLDivElement>(null);
+  const listRef = useRef<FixedSizeListProps<unknown>>(null);
+  const bodyRef = useRef<HTMLDivElement>(null);
 
   useEventListener('keydown', (event: KeyboardEvent) => onCursorKeyDown({ event }, { store }));
   useEventListener('keydown', (event: KeyboardEvent) => onCopyKeyDown(undefined, { event, store }));

@@ -4,7 +4,7 @@ import useSafeResults from 'components/hooks/useSafeResults';
 import ActionMenu from 'components/visual/ActionMenu';
 import CustomChip from 'components/visual/CustomChip';
 import type { PossibleColor } from 'helpers/colors';
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 
 const STYLE = { height: 'auto', minHeight: '20px' };
 const initialMenuState = {
@@ -35,7 +35,7 @@ const WrappedHeuristic: React.FC<HeuristicProps> = ({
   safe = false,
   force = false
 }) => {
-  const [state, setState] = React.useState(initialMenuState);
+  const [state, setState] = useState(initialMenuState);
   const { isHighlighted, triggerHighlight } = useHighlighter();
   const { scoreToVerdict } = useALContext();
   const { showSafeResults } = useSafeResults();

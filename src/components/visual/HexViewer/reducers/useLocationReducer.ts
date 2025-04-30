@@ -1,13 +1,13 @@
 import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
-import React, { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 import type { LocationParam, LocationQuery, ReducerHandler, Reducers, Store, UseReducer } from '..';
 import { DEFAULT_STORE, getValueFromPath, isAction, LOCATION_PARAMS, setStoreWithPath } from '..';
 
 export const useLocationReducer: UseReducer = () => {
   const { copy } = useClipboard();
 
-  const query = React.useRef<SimpleSearchQuery>(new SimpleSearchQuery(window.location.search, ''));
+  const query = useRef<SimpleSearchQuery>(new SimpleSearchQuery(window.location.search, ''));
 
   const handleLocationShare = useCallback((store: Store, param: LocationParam): void => {
     const value = getValueFromPath(store, param.path);

@@ -74,11 +74,11 @@ type TagSectionProps = {
 
 const WrappedTagSection: React.FC<TagSectionProps> = ({ signatures, tags, force = false }) => {
   const { t } = useTranslation(['fileDetail']);
-  const [open, setOpen] = React.useState(true);
+  const [open, setOpen] = useState(true);
   const theme = useTheme();
   const sp2 = theme.spacing(2);
   const { showSafeResults } = useSafeResults();
-  const [tagUnsafeMap, setTagUnsafeMap] = React.useState({});
+  const [tagUnsafeMap, setTagUnsafeMap] = useState({});
 
   const someSigNotSafe = signatures && signatures.some(i => i[1] !== 'safe' && !i[2]);
   const forceShowSig = signatures && signatures.length !== 0 && (showSafeResults || force);
