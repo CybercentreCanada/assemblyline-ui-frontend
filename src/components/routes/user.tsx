@@ -499,12 +499,7 @@ function User({ username = null }: UserProps) {
                       onClick={handleDeleteUser}
                     >
                       {t('remove')}
-                      {buttonLoading && (
-                        <CircularProgress
-                          size={24}
-                          sx={{ position: 'absolute', top: '50%', left: '50%', marginTop: -12, marginLeft: -12 }}
-                        />
-                      )}
+                      {buttonLoading && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
                     </DeleteButton>
                   ) : (
                     <Skeleton
@@ -975,12 +970,7 @@ function User({ username = null }: UserProps) {
             >
               <Button variant="contained" color="primary" disabled={buttonLoading || !modified} onClick={saveUser}>
                 {t('save')}
-                {buttonLoading && (
-                  <CircularProgress
-                    size={24}
-                    sx={{ position: 'absolute', top: '50%', left: '50%', marginTop: -12, marginLeft: -12 }}
-                  />
-                )}
+                {buttonLoading && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
               </Button>
             </div>
           ) : null}
