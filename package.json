@@ -69,7 +69,7 @@
     "react-window": "^1.8.8",
     "selfsigned": "^2.1.1",
     "socket.io-client": "^4.8.1",
-    "vite": "^6.0.14",
+    "vite": "^6.2.7",
     "vite-plugin-mkcert": "^1.17.3",
     "vite-tsconfig-paths": "^4.2.2",
     "vitest": "^3.0.5",
