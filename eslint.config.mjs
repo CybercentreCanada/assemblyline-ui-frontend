@@ -1,5 +1,7 @@
 import eslint from '@eslint/js';
+import eslintConfigPrettier from 'eslint-config-prettier/flat';
 import importPlugin from 'eslint-plugin-import';
+import jsoncPlugin from 'eslint-plugin-jsonc';
 import jsxA11yPlugin from 'eslint-plugin-jsx-a11y';
 import noRelativeImportPathsPlugin from 'eslint-plugin-no-relative-import-paths';
 import reactPlugin from 'eslint-plugin-react';
@@ -77,6 +79,13 @@ const typescriptRules = {
 export default tseslint.config(
   // ESLint rules
   { ...eslint.configs.recommended, ...defaultConfig },
+  // {
+  //   ...eslint.configs.recommended,
+  //   ...defaultConfig,
+  //   rules: {
+  //     'sort-keys': ['warn', 'asc', { caseSensitive: false, natural: false, minKeys: 2 }]
+  //   }
+  // },
 
   // Strict Typescript ESLint
   tseslint.configs.strict.map(config => ({
@@ -116,6 +125,9 @@ export default tseslint.config(
     }
   },
 
+  // Prettier
+  eslintConfigPrettier,
+
   // JSX A11y Plugin
   {
     ...defaultConfig,
@@ -152,6 +164,18 @@ export default tseslint.config(
       'react-hooks/rules-of-hooks': 'error'
     }
   },
+
+  // JSON C Plugin
+  jsoncPlugin.configs['flat/all'].map(config => ({
+    ...config,
+    ...defaultConfig,
+    files: ['src/**/*.json'],
+    rules: {
+      ...config.rules,
+      'jsonc/indent': 'off',
+      'jsonc/key-name-casing': 'off'
+    }
+  })),
 
   // React Refresh Plugin
   {
