@@ -215,18 +215,7 @@ const BadlistNew = ({}: Props) => {
       >
         <Button variant="contained" onClick={saveBadlist} disabled={!ready || waiting}>
           {t('save')}
-          {waiting && (
-            <CircularProgress
-              size={24}
-              style={{
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                marginTop: -12,
-                marginLeft: -12
-              }}
-            />
-          )}
+          {waiting && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
         </Button>
       </div>
       <Grid container spacing={2}>

@@ -93,19 +93,7 @@ const AlertActionButton: React.FC<AlertActionButtonProps> = React.memo(
             icon={
               <>
                 {icon}
-                {loading && (
-                  <CircularProgress
-                    size={24}
-                    sx={{
-                      color: theme.palette.primary.main,
-                      position: 'absolute',
-                      top: '50%',
-                      left: '50%',
-                      marginTop: -12,
-                      marginLeft: -12
-                    }}
-                  />
-                )}
+                {loading && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
               </>
             }
             open={open}
@@ -142,19 +130,7 @@ const AlertActionButton: React.FC<AlertActionButtonProps> = React.memo(
               style={{ ...(loading ? { color: theme.palette.action.disabled } : color && { color: color }) }}
             >
               {icon}
-              {loading && (
-                <CircularProgress
-                  size={24}
-                  sx={{
-                    color: theme.palette.primary.main,
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    marginTop: -12,
-                    marginLeft: -12
-                  }}
-                />
-              )}
+              {loading && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
             </IconButton>
           </span>
         </Tooltip>

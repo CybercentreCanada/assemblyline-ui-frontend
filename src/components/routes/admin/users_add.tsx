@@ -332,18 +332,7 @@ const WrappedAddUserPage = () => {
               onClick={() => handleAddUser(newUser)}
             >
               {t('newuser.save')}
-              {loading && (
-                <CircularProgress
-                  size={24}
-                  sx={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    marginTop: -12,
-                    marginLeft: -12
-                  }}
-                />
-              )}
+              {loading && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
             </Button>
           </Box>
         </div>

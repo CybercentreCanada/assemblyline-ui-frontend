@@ -38,18 +38,7 @@ export function UserPassLogin({ onSubmit, buttonLoading, setPassword, setUsernam
           disabled={buttonLoading}
         >
           {t('button')}
-          {buttonLoading && (
-            <CircularProgress
-              size={24}
-              sx={{
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                marginTop: -12,
-                marginLeft: -12
-              }}
-            />
-          )}
+          {buttonLoading && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
         </Button>
       </div>
     </form>
