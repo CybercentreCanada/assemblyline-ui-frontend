@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import type { Action, ReducerConfig, ReducersConfig, Store, StoreAction, StoreProviderProps } from '..';
 import {
   useCellReducer,
