@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useRef } from 'react';
 import type {
   AppDispatchers,
   BodyDispatchers,
@@ -33,8 +33,8 @@ export const dispatchContext = React.createContext<DispatchContextProps>(null);
 export const useDispatch = () => React.useContext(dispatchContext);
 
 export const DispatchProvider = ({ children }: StoreProviderProps) => {
-  const dispatchRef: DispatchRef = React.useRef<React.Dispatch<DispatchProps>>(null);
-  const dispatch: Dispatch = React.useCallback((props: DispatchProps) => dispatchRef.current(props), []);
+  const dispatchRef: DispatchRef = useRef<React.Dispatch<DispatchProps>>(null);
+  const dispatch: Dispatch = useCallback((props: DispatchProps) => dispatchRef.current(props), []);
 
   const appDispatchers: AppDispatchers = useAppDispatcher(dispatch);
   const bodyDispatchers: BodyDispatchers = useBodyDispatcher(dispatch);

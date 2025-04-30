@@ -166,33 +166,11 @@ function WrappedRetrohuntRepeat({ retrohunt = null, onRepeat = () => null }: Pro
           <DialogActions>
             <Button color="secondary" onClick={() => setOpen(false)}>
               {t('cancel')}
-              {loading && (
-                <CircularProgress
-                  size={24}
-                  sx={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    marginTop: -12,
-                    marginLeft: -12
-                  }}
-                />
-              )}
+              {loading && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
             </Button>
             <Button color="primary" disabled={loading} onClick={() => handleRepeat()}>
               {t('repeat.ok')}
-              {loading && (
-                <CircularProgress
-                  size={24}
-                  sx={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    marginTop: -12,
-                    marginLeft: -12
-                  }}
-                />
-              )}
+              {loading && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
             </Button>
           </DialogActions>
         </Dialog>

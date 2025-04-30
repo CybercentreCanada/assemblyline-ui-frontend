@@ -21,7 +21,7 @@ import InputDialog from 'components/visual/InputDialog';
 import SafeBadItem from 'components/visual/SafeBadItem';
 import { isAccessible } from 'helpers/classificationParser';
 import { getSubmitType, safeFieldValueURI, toTitleCase } from 'helpers/utils';
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { HiOutlineExternalLink } from 'react-icons/hi';
 import { Link } from 'react-router';
@@ -89,24 +89,24 @@ const WrappedActionMenu: React.FC<TagProps> = ({
   const { t } = useTranslation();
   const { user: currentUser, configuration: currentUserConfig, c12nDef } = useALContext();
   const { copy } = useClipboard();
-  const [confirmationDialog, setConfirmationDialog] = React.useState(false);
-  const [currentEvent, setCurrentEvent] = React.useState<Event>(null);
-  const [currentAllowBypass, setCurrentAllowBypass] = React.useState(false);
-  const [currentLinkClassification, setCurrentLinkClassification] = React.useState('');
-  const [safelistDialog, setSafelistDialog] = React.useState(false);
-  const [safelistReason, setSafelistReason] = React.useState<string>(null);
-  const [badlistDialog, setBadlistDialog] = React.useState(false);
-  const [badlistReason, setBadlistReason] = React.useState<string>(null);
-  const [waitingDialog, setWaitingDialog] = React.useState(false);
-  const [badlisted, setBadlisted] = React.useState(null);
-  const [safelisted, setSafelisted] = React.useState(null);
+  const [confirmationDialog, setConfirmationDialog] = useState(false);
+  const [currentEvent, setCurrentEvent] = useState<Event>(null);
+  const [currentAllowBypass, setCurrentAllowBypass] = useState(false);
+  const [currentLinkClassification, setCurrentLinkClassification] = useState('');
+  const [safelistDialog, setSafelistDialog] = useState(false);
+  const [safelistReason, setSafelistReason] = useState<string>(null);
+  const [badlistDialog, setBadlistDialog] = useState(false);
+  const [badlistReason, setBadlistReason] = useState<string>(null);
+  const [waitingDialog, setWaitingDialog] = useState(false);
+  const [badlisted, setBadlisted] = useState(null);
+  const [safelisted, setSafelisted] = useState(null);
   const { showSuccessMessage } = useMySnackbar();
   const { triggerHighlight } = useHighlighter();
   const { apiCall } = useMyAPI();
 
   const { enrichTagExternal, enrichmentState, getKey } = useExternalLookup();
   const externalLookupResults = enrichmentState[getKey(type, value)];
-  const [allInProgress, setAllInProgress] = React.useState(false);
+  const [allInProgress, setAllInProgress] = useState(false);
   const submitType = category === 'tag' && type.endsWith('.uri') ? 'url' : getSubmitType(value, currentUserConfig)[0];
 
   useEffect(() => {

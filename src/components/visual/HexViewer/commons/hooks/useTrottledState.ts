@@ -1,4 +1,4 @@
-import React from 'react';
+import { useCallback, useRef, useState } from 'react';
 
 const isFunction = (value: any): value is Function => typeof value === 'function';
 
@@ -6,17 +6,17 @@ export const useTrottledState = <T>(
   initialState: T | (() => T),
   delay: number = 1000
 ): [Partial<T>, (newState: Partial<T> | ((prevState: Partial<T>) => Partial<T>)) => void] => {
-  const [state, setState] = React.useState<Partial<T>>(initialState);
-  const prevStateRef = React.useRef<Partial<T>>(state);
-  const nextStateRef = React.useRef<Partial<T>>(state);
-  const timeout = React.useRef(null);
+  const [state, setState] = useState<Partial<T>>(initialState);
+  const prevStateRef = useRef<Partial<T>>(state);
+  const nextStateRef = useRef<Partial<T>>(state);
+  const timeout = useRef(null);
 
-  const clear = React.useCallback(() => {
+  const clear = useCallback(() => {
     clearTimeout(timeout.current);
     timeout.current = null;
   }, []);
 
-  const reset = React.useCallback(() => {
+  const reset = useCallback(() => {
     timeout.current = setTimeout(() => {
       if (!Object.is(prevStateRef.current, nextStateRef.current)) {
         prevStateRef.current = nextStateRef.current;
@@ -27,7 +27,7 @@ export const useTrottledState = <T>(
     }, delay);
   }, [clear, delay]);
 
-  const setStateCallback = React.useCallback(
+  const setStateCallback = useCallback(
     (newState: Partial<T> | ((prevState: Partial<T>) => Partial<T>)) => {
       if (isFunction(newState)) nextStateRef.current = newState(nextStateRef.current);
       else nextStateRef.current = newState;

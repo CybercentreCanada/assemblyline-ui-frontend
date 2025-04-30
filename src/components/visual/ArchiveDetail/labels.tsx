@@ -365,18 +365,7 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
             children={
               <>
                 {t(`label.${confirmation.type === 'add' ? 'add' : 'delete'}.ok`)}
-                {waiting && (
-                  <CircularProgress
-                    size={24}
-                    style={{
-                      position: 'absolute',
-                      top: '50%',
-                      left: '50%',
-                      marginTop: -12,
-                      marginLeft: -12
-                    }}
-                  />
-                )}
+                {waiting && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
               </>
             }
             onClick={confirmation.type === 'add' ? () => handleAddLabel(newLabel) : () => handleDeleteLabel(newLabel)}

@@ -1,10 +1,13 @@
 import eslint from '@eslint/js';
+import eslintConfigPrettier from 'eslint-config-prettier/flat';
 import importPlugin from 'eslint-plugin-import';
+import jsoncPlugin from 'eslint-plugin-jsonc';
 import jsxA11yPlugin from 'eslint-plugin-jsx-a11y';
 import noRelativeImportPathsPlugin from 'eslint-plugin-no-relative-import-paths';
 import reactPlugin from 'eslint-plugin-react';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import reactRefreshPlugin from 'eslint-plugin-react-refresh';
+import requireExplicitGenericsPlugin from 'eslint-plugin-require-explicit-generics';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
@@ -21,12 +24,14 @@ const typescriptRules = {
   '@typescript-eslint/consistent-type-definitions': 'off',
   '@typescript-eslint/consistent-type-imports': 'warn',
   '@typescript-eslint/default-param-last': 'off',
+  '@typescript-eslint/explicit-function-return-type': 'off',
   '@typescript-eslint/indent': 'off',
   '@typescript-eslint/no-base-to-string': 'warn',
   '@typescript-eslint/no-duplicate-type-constituents': 'off',
   '@typescript-eslint/no-dynamic-delete': 'warn',
   '@typescript-eslint/no-empty-function': 'warn',
   '@typescript-eslint/no-empty-object-type': 'warn',
+  '@typescript-eslint/no-explicit-any': 'warn',
   '@typescript-eslint/no-explicit-any': 'warn',
   '@typescript-eslint/no-floating-promises': 'warn',
   '@typescript-eslint/no-for-in-array': 'warn',
@@ -77,6 +82,13 @@ const typescriptRules = {
 export default tseslint.config(
   // ESLint rules
   { ...eslint.configs.recommended, ...defaultConfig },
+  // {
+  //   ...eslint.configs.recommended,
+  //   ...defaultConfig,
+  //   rules: {
+  //     'sort-keys': ['warn', 'asc', { caseSensitive: false, natural: false, minKeys: 2 }]
+  //   }
+  // },
 
   // Strict Typescript ESLint
   tseslint.configs.strict.map(config => ({
@@ -116,6 +128,9 @@ export default tseslint.config(
     }
   },
 
+  // Prettier
+  eslintConfigPrettier,
+
   // JSX A11y Plugin
   {
     ...defaultConfig,
@@ -150,6 +165,27 @@ export default tseslint.config(
     rules: {
       'react-hooks/exhaustive-deps': 'warn',
       'react-hooks/rules-of-hooks': 'error'
+    }
+  },
+
+  // JSON C Plugin
+  jsoncPlugin.configs['flat/all'].map(config => ({
+    ...config,
+    ...defaultConfig,
+    files: ['src/**/*.json'],
+    rules: {
+      ...config.rules,
+      'jsonc/indent': 'off',
+      'jsonc/key-name-casing': 'off'
+    }
+  })),
+
+  // Require Explicit Generics Plugin
+  {
+    ...defaultConfig,
+    plugins: { 'require-explicit-generics': requireExplicitGenericsPlugin },
+    rules: {
+      'require-explicit-generics/require-explicit-generics': ['warn', ['useState', 'useRef']]
     }
   },
 

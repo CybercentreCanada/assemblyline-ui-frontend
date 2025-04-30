@@ -32,7 +32,7 @@ import type { CustomChipProps } from 'components/visual/CustomChip';
 import CustomChip from 'components/visual/CustomChip';
 import { getMaxClassification } from 'helpers/classificationParser';
 import { toTitleCase, verdictToColor } from 'helpers/utils';
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const TARGET_RESULT_COUNT = 10;
@@ -85,8 +85,8 @@ function a11yProps(index: number) {
 
 const WrappedAutoHideChipList: React.FC<AutoHideChipListProps> = ({ items }) => {
   const { t } = useTranslation();
-  const [state, setState] = React.useState<AutoHideChipListState | null>(null);
-  const [shownChips, setShownChips] = React.useState<CustomChipProps[]>([]);
+  const [state, setState] = useState<AutoHideChipListState | null>(null);
+  const [shownChips, setShownChips] = useState<CustomChipProps[]>([]);
 
   React.useEffect(() => {
     const fullChipList = items.map(item => ({
@@ -136,7 +136,7 @@ type ResultGroupProps = {
 
 const WrappedResultGroup: React.FC<ResultGroupProps> = ({ group, names, ndMap, valueMap }) => {
   const theme = useTheme();
-  const [open, setOpen] = React.useState(true);
+  const [open, setOpen] = useState(true);
 
   return group && names ? (
     <Box sx={{ marginBottom: theme.spacing(2) }}>
@@ -196,7 +196,7 @@ type EnrichmentResultProps = {
 const WrappedEnrichmentResult: React.FC<EnrichmentResultProps> = ({ num, enrichmentResult, count }) => {
   const { t } = useTranslation();
   const theme = useTheme();
-  const [open, setOpen] = React.useState(true);
+  const [open, setOpen] = useState(true);
 
   let verdict = 'info';
   if (enrichmentResult.malicious === false) {
@@ -314,19 +314,19 @@ const EnrichmentResult = React.memo(WrappedEnrichmentResult);
 const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, value, round }) => {
   const theme = useTheme();
   const { t } = useTranslation();
-  const [openedDialog, setOpenedDialog] = React.useState(false);
-  const [tabState, setTabState] = React.useState(0);
+  const [openedDialog, setOpenedDialog] = useState(false);
+  const [tabState, setTabState] = useState(0);
   const { c12nDef } = useALContext();
 
   const { enrichmentState, isActionable, getKey } = useExternalLookup();
   const actionable = isActionable(category, type, value);
   const externalLookupResults = enrichmentState[getKey(type, value)];
-  const [inProgress, setInProgress] = React.useState(false);
+  const [inProgress, setInProgress] = useState(false);
   const titleId = openedDialog ? 'external-result-dialog-title' : undefined;
   const descriptionId = openedDialog ? 'external-result-dialog-description' : undefined;
 
-  const [resultClassification, setResultClassification] = React.useState(c12nDef.UNRESTRICTED);
-  const [resultTT, setResultTT] = React.useState('');
+  const [resultClassification, setResultClassification] = useState(c12nDef.UNRESTRICTED);
+  const [resultTT, setResultTT] = useState('');
   const handleTabChange = (event: React.SyntheticEvent, newState: number) => {
     setTabState(newState);
   };
@@ -356,7 +356,7 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, v
     }
   }, [externalLookupResults]);
 
-  const descriptionElementRef = React.useRef<HTMLElement>(null);
+  const descriptionElementRef = useRef<HTMLElement>(null);
   React.useEffect(() => {
     if (openedDialog) {
       const { current: descriptionElement } = descriptionElementRef;

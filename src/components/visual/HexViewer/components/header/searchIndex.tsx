@@ -2,7 +2,7 @@ import { Tooltip, useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import type { StoreProps } from 'components/visual/HexViewer';
 import { FieldPopper, NumericField, useDispatch } from 'components/visual/HexViewer';
-import React, { useCallback } from 'react';
+import React, { useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export const WrappedHexSearchIndex = ({ store }: StoreProps) => {
@@ -11,7 +11,7 @@ export const WrappedHexSearchIndex = ({ store }: StoreProps) => {
   const { onSelectedSearchIndexChange } = useDispatch();
   const { inputValue, results, selectedResult } = store.search;
 
-  const searchFieldPopper = React.useRef(null);
+  const searchFieldPopper = useRef(null);
   const handleClick = useCallback((e: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
     searchFieldPopper.current.open(e);
   }, []);

@@ -94,18 +94,7 @@ export function ResetPasswordNow({ buttonLoading, setButtonLoading, reset }: Res
               disabled={buttonLoading}
             >
               {t('reset_now.button')}
-              {buttonLoading && (
-                <CircularProgress
-                  size={24}
-                  sx={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    marginTop: -12,
-                    marginLeft: -12
-                  }}
-                />
-              )}
+              {buttonLoading && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
             </Button>
           </>
         )}
@@ -168,18 +157,7 @@ export function ResetPassword({ buttonLoading, setButtonLoading, reset }: ResetP
               disabled={buttonLoading}
             >
               {t('reset.button')}
-              {buttonLoading && (
-                <CircularProgress
-                  size={24}
-                  sx={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    marginTop: -12,
-                    marginLeft: -12
-                  }}
-                />
-              )}
+              {buttonLoading && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
             </Button>
           </>
         )}

@@ -179,18 +179,7 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = () => nu
                   onClick={() => setIsConfirmationOpen(true)}
                 >
                   {t('add.button')}
-                  {isButtonLoading && (
-                    <CircularProgress
-                      size={24}
-                      sx={{
-                        position: 'absolute',
-                        top: '50%',
-                        left: '50%',
-                        marginTop: -12,
-                        marginLeft: -12
-                      }}
-                    />
-                  )}
+                  {isButtonLoading && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
                 </Button>
               ]}
             />

@@ -3,7 +3,7 @@ import ExpandMore from '@mui/icons-material/ExpandMore';
 import { Box, Collapse, useTheme } from '@mui/material';
 import type { Error } from 'components/models/base/error';
 import Moment from 'components/visual/Moment';
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 type Props = {
@@ -14,7 +14,7 @@ const ErrorCard: React.FC<Props> = ({ error }) => {
   const { t } = useTranslation(['adminErrorViewer']);
   const theme = useTheme();
   const sp2 = theme.spacing(2);
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
 
   const handleClick = () => {
     setOpen(!open);

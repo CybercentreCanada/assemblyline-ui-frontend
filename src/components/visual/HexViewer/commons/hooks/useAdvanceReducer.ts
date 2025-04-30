@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 // tracked, untracked forced, update
 export type Dispatch<Action> = { type: Action | any; payload: any; tracked?: boolean; repeat?: boolean };
@@ -64,20 +64,20 @@ export const useAdvanceReducer = <State, Action>(
   render?: (prevState: Partial<State>, nextState: Partial<State>) => void,
   delay: number = 1000
 ): [State, (action: Dispatch<Action>) => void, UpdateMemo<{ store: State }, State>, React.MutableRefObject<State>] => {
-  const [store, setStore] = React.useState<State>({ ...initialState });
-  const initialStateRef = React.useRef<State>({ ...initialState });
-  const prevStateRef = React.useRef<State>({ ...initialState });
-  const nextStateRef = React.useRef<State>({ ...initialState });
+  const [store, setStore] = useState<State>({ ...initialState });
+  const initialStateRef = useRef<State>({ ...initialState });
+  const prevStateRef = useRef<State>({ ...initialState });
+  const nextStateRef = useRef<State>({ ...initialState });
 
-  const reducerRef = React.useRef(reducer);
-  const renderRef = React.useRef(render);
-  const delayRef = React.useRef<number>(delay);
-  const actionRef = React.useRef<Dispatch<Action>>(null);
-  const lastActionRef = React.useRef<Action | string>(null);
-  const changeRef = React.useRef<{ data: any; path: string[]; tracked?: boolean; repeat?: boolean }>(null);
-  const lastChangeRef = React.useRef<{ data: any; path: string[] }>(null);
+  const reducerRef = useRef(reducer);
+  const renderRef = useRef(render);
+  const delayRef = useRef<number>(delay);
+  const actionRef = useRef<Dispatch<Action>>(null);
+  const lastActionRef = useRef<Action | string>(null);
+  const changeRef = useRef<{ data: any; path: string[]; tracked?: boolean; repeat?: boolean }>(null);
+  const lastChangeRef = useRef<{ data: any; path: string[] }>(null);
 
-  const timeout = React.useRef(null);
+  const timeout = useRef(null);
 
   useEffect(() => {
     reducerRef.current = reducer;
@@ -91,17 +91,17 @@ export const useAdvanceReducer = <State, Action>(
     delayRef.current = delay;
   }, [delay]);
 
-  const reduce = React.useCallback((action: Dispatch<Action>) => {
+  const reduce = useCallback((action: Dispatch<Action>) => {
     nextStateRef.current = reducerRef.current({ ...nextStateRef.current }, { ...action });
     actionRef.current = null;
   }, []);
 
-  const change = React.useCallback(<T extends any>(data: T, path: string[]) => {
+  const change = useCallback(<T extends any>(data: T, path: string[]) => {
     nextStateRef.current = applySubObject(nextStateRef.current, data, path, updateObject);
     changeRef.current = null;
   }, []);
 
-  const set = React.useCallback(() => {
+  const set = useCallback(() => {
     if (actionRef.current !== null) reduce({ ...actionRef.current });
     if (changeRef.current !== null) change(changeRef.current.data, changeRef.current.path);
     renderRef.current({ ...prevStateRef.current }, { ...nextStateRef.current });
@@ -109,7 +109,7 @@ export const useAdvanceReducer = <State, Action>(
     setStore({ ...nextStateRef.current });
   }, [change, reduce]);
 
-  const clear = React.useCallback(() => {
+  const clear = useCallback(() => {
     clearTimeout(timeout.current);
     actionRef.current = null;
     changeRef.current = null;
@@ -121,7 +121,7 @@ export const useAdvanceReducer = <State, Action>(
     return clear;
   }, [delay, set, clear]);
 
-  const reset = React.useCallback(() => {
+  const reset = useCallback(() => {
     timeout.current = setTimeout(() => {
       if (
         !Object.is(prevStateRef.current, nextStateRef.current) ||
@@ -135,7 +135,7 @@ export const useAdvanceReducer = <State, Action>(
     }, delayRef.current);
   }, [clear, set]);
 
-  const dispatchCallback = React.useCallback(
+  const dispatchCallback = useCallback(
     ({ type, payload, tracked = true, repeat = true }: Dispatch<Action>) => {
       if (!repeat && type === lastActionRef.current) return;
       lastActionRef.current = type;
@@ -151,7 +151,7 @@ export const useAdvanceReducer = <State, Action>(
     [reduce, reset, set]
   );
 
-  const changeCallback = React.useCallback(
+  const changeCallback = useCallback(
     <T extends any>(path: string[]) =>
       (input: T | ((data: T) => T), tracked = true, repeat = true): void => {
         const newPath = [...path.slice(1)];
@@ -174,7 +174,7 @@ export const useAdvanceReducer = <State, Action>(
     [change, reset, set]
   );
 
-  const updateCallback = React.useCallback(
+  const updateCallback = useCallback(
     (data: any, path: string[] = []) => {
       const newElements: [number | string | symbol, any][] = [];
       Object.keys(data).forEach(key => {

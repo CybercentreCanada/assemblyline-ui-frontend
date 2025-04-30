@@ -58,18 +58,7 @@ const ClassificationMismatchDialog = ({
         {handleAccept && (
           <Button onClick={handleAccept} color="primary" autoFocus disabled={waiting}>
             {t('classification.acceptText')}
-            {waiting && (
-              <CircularProgress
-                size={24}
-                style={{
-                  position: 'absolute',
-                  top: '50%',
-                  left: '50%',
-                  marginTop: -12,
-                  marginLeft: -12
-                }}
-              />
-            )}
+            {waiting && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
           </Button>
         )}
       </DialogActions>

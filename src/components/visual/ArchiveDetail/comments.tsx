@@ -357,18 +357,7 @@ const WrappedCommentSection: React.FC<Props> = ({
                 {confirmation.type === 'add' && t('comment.confirmation.action.add')}
                 {confirmation.type === 'edit' && t('comment.confirmation.action.edit')}
                 {confirmation.type === 'delete' && t('comment.confirmation.action.delete')}
-                {waiting && (
-                  <CircularProgress
-                    size={24}
-                    style={{
-                      position: 'absolute',
-                      top: '50%',
-                      left: '50%',
-                      marginTop: -12,
-                      marginLeft: -12
-                    }}
-                  />
-                )}
+                {waiting && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
               </>
             }
             onClick={

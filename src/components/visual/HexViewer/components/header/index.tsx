@@ -5,7 +5,7 @@ import Divider from '@mui/material/Divider';
 import type { StoreProps } from 'components/visual/HexViewer';
 import { HexSearchBar, HexSearchTypes, TooltipIconButton, useDispatch } from 'components/visual/HexViewer';
 import type { PropsWithChildren } from 'react';
-import React, { memo } from 'react';
+import React, { memo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export * from './cursorButton';
@@ -18,7 +18,7 @@ const WrappedHexDesktopHeader = ({ store }: StoreProps) => {
   const { t } = useTranslation(['hexViewer']);
   const theme = useTheme();
   const { onLocationShare, onSettingOpen, onBodyMouseLeave } = useDispatch();
-  const toolbarRef = React.useRef(null);
+  const toolbarRef = useRef(null);
 
   return (
     <div

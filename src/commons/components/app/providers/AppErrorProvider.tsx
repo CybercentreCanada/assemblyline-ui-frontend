@@ -2,7 +2,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import { Button, Collapse, LinearProgress, Paper, SvgIcon, Typography, useMediaQuery, useTheme } from '@mui/material';
 import { keyframes, styled } from '@mui/material/styles';
 import PageCenter from 'commons/components/pages/PageCenter';
-import React from 'react';
+import React, { useState } from 'react';
 import type { FallbackProps } from 'react-error-boundary';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useTranslation } from 'react-i18next';
@@ -139,7 +139,7 @@ export const ErrorFallback: React.FC<FallbackProps> = ({ error, resetErrorBounda
   const { t } = useTranslation();
   const theme = useTheme();
   const downSM = useMediaQuery(theme.breakpoints.down('md'));
-  const [expanded, setExpanded] = React.useState(false);
+  const [expanded, setExpanded] = useState(false);
 
   React.useEffect(() => {
     if (error.name === 'ChunkLoadError') {

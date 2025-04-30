@@ -4,7 +4,7 @@ import { Collapse, Divider, Grid, Skeleton, Typography, useTheme } from '@mui/ma
 import useHighlighter from 'components/hooks/useHighlighter';
 import type { AttackMatrix } from 'components/models/ui/file';
 import Attack from 'components/visual/Attack';
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 type AttackSectionProps = {
@@ -14,7 +14,7 @@ type AttackSectionProps = {
 
 const WrappedAttackSection: React.FC<AttackSectionProps> = ({ attack_matrix, force = false }) => {
   const { t } = useTranslation(['submissionDetail']);
-  const [open, setOpen] = React.useState(true);
+  const [open, setOpen] = useState(true);
   const theme = useTheme();
   const sp2 = theme.spacing(2);
   const { getKey } = useHighlighter();

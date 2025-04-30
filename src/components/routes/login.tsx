@@ -255,18 +255,7 @@ export default function LoginScreen({ allowUserPass, allowSAML, allowSignup, oAu
                           href={`/api/v4/auth/login/?oauth_provider=${item}`}
                         >
                           {`${t('button_oauth')} ${item.replace(/_/g, ' ')}`}
-                          {buttonLoading && (
-                            <CircularProgress
-                              size={24}
-                              sx={{
-                                position: 'absolute',
-                                top: '50%',
-                                left: '50%',
-                                marginTop: -12,
-                                marginLeft: -12
-                              }}
-                            />
-                          )}
+                          {buttonLoading && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
                         </Button>
                       ))}
                     {allowSAML && (
@@ -286,18 +275,7 @@ export default function LoginScreen({ allowUserPass, allowSAML, allowSignup, oAu
                         href="/api/v4/auth/saml/sso/"
                       >
                         {t('button_saml')}
-                        {buttonLoading && (
-                          <CircularProgress
-                            size={24}
-                            sx={{
-                              position: 'absolute',
-                              top: '50%',
-                              left: '50%',
-                              marginTop: -12,
-                              marginLeft: -12
-                            }}
-                          />
-                        )}
+                        {buttonLoading && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
                       </Button>
                     )}
                   </Stack>

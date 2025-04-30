@@ -146,33 +146,11 @@ const APIKeyDeleteDialog = React.memo(
           <DialogActions>
             <Button color="primary" autoFocus disabled={loading} onClick={() => setOpen(false)}>
               {t('cancel')}
-              {loading && (
-                <CircularProgress
-                  size={24}
-                  sx={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    marginTop: -12,
-                    marginLeft: -12
-                  }}
-                />
-              )}
+              {loading && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
             </Button>
             <Button color="primary" disabled={loading} onClick={() => handleDelete(apikey)}>
               {t('apikeys.remove')}
-              {loading && (
-                <CircularProgress
-                  size={24}
-                  sx={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    marginTop: -12,
-                    marginLeft: -12
-                  }}
-                />
-              )}
+              {loading && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
             </Button>
           </DialogActions>
         </Dialog>
@@ -412,18 +390,7 @@ const APIKeyUpsertingDialog = React.memo(
               }}
             >
               {t('cancel')}
-              {loading && (
-                <CircularProgress
-                  size={24}
-                  sx={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    marginTop: -12,
-                    marginLeft: -12
-                  }}
-                />
-              )}
+              {loading && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
             </Button>
             <Button
               color="primary"
@@ -431,18 +398,7 @@ const APIKeyUpsertingDialog = React.memo(
               onClick={() => handleUpsert(apikey)}
             >
               {!prevApiKey ? t('apikeys.add') : t('apikeys.save')}
-              {loading && (
-                <CircularProgress
-                  size={24}
-                  sx={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    marginTop: -12,
-                    marginLeft: -12
-                  }}
-                />
-              )}
+              {loading && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
             </Button>
           </DialogActions>
         </Dialog>
