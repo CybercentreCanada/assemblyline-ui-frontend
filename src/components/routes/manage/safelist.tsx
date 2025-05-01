@@ -4,8 +4,8 @@ import LabelOutlinedIcon from '@mui/icons-material/LabelOutlined';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
 import { IconButton, Tooltip, useTheme } from '@mui/material';
 import { useAppUser } from 'commons/components/app/hooks';
+import PageContainer from 'commons/components/pages/PageContainer';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
-import PageHeader from 'commons/components/pages/PageHeader';
 import type { SearchParams } from 'components/core/SearchParams/SearchParams';
 import { createSearchParams } from 'components/core/SearchParams/SearchParams';
 import { SearchParamsProvider, useSearchParams } from 'components/core/SearchParams/SearchParamsContext';
@@ -148,7 +148,7 @@ const SafelistSearch = () => {
         ]}
       />
 
-      <PageHeader isSticky>
+      <PageContainer isSticky>
         <div style={{ paddingTop: theme.spacing(1) }}>
           <SearchHeader
             params={search.toParams()}
@@ -194,7 +194,7 @@ const SafelistSearch = () => {
             ]}
           />
         </div>
-      </PageHeader>
+      </PageContainer>
 
       <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
         <SafelistTable safelistResults={safelistResults} setSafelistID={setSafelistID} />

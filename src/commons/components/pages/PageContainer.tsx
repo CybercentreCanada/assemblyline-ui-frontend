@@ -25,7 +25,7 @@ type PageHeaderProps = {
   className?: string;
 };
 
-const PageHeader: React.FC<PageHeaderProps> = ({
+const PageContainer: React.FC<PageHeaderProps> = ({
   children,
   left,
   right,
@@ -106,4 +106,4 @@ const PageHeader: React.FC<PageHeaderProps> = ({
   );
 };
 
-export default memo(PageHeader);
+export default memo(PageContainer);

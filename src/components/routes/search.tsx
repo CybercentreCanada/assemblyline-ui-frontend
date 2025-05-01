@@ -2,8 +2,8 @@ import ArchiveIcon from '@mui/icons-material/Archive';
 import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
 import CenterFocusStrongOutlinedIcon from '@mui/icons-material/CenterFocusStrongOutlined';
 import { IconButton, Paper, Tab, Tabs, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
+import PageContainer from 'commons/components/pages/PageContainer';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
-import PageHeader from 'commons/components/pages/PageHeader';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
@@ -246,7 +246,8 @@ function Search({ index = null }: Props) {
       <div style={{ paddingBottom: theme.spacing(2), textAlign: 'left', width: '100%' }}>
         <Typography variant="h4">{t(`title_${index || id || 'all'}`)}</Typography>
       </div>
-      <PageHeader isSticky>
+
+      <PageContainer isSticky>
         <div style={{ paddingTop: theme.spacing(1) }}>
           <SearchBar
             initValue={query ? query.get('query', '') : ''}
@@ -420,7 +421,7 @@ function Search({ index = null }: Props) {
             )}
           </div>
         </div>
-      </PageHeader>
+      </PageContainer>
       <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
         {tab === 'alert' && query && query.get('query') && (
           <AlertsTable alertResults={alertResults} allowSort={!!currentIndex} />

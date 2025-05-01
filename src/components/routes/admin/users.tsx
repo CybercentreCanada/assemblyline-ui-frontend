@@ -1,8 +1,8 @@
 import BlockIcon from '@mui/icons-material/Block';
 import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount';
 import { useTheme } from '@mui/material';
+import PageContainer from 'commons/components/pages/PageContainer';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
-import PageHeader from 'commons/components/pages/PageHeader';
 import type { SearchParams } from 'components/core/SearchParams/SearchParams';
 import { createSearchParams } from 'components/core/SearchParams/SearchParams';
 import { SearchParamsProvider, useSearchParams } from 'components/core/SearchParams/SearchParamsContext';
@@ -108,7 +108,7 @@ const UsersSearch = () => {
         actions={[<AddUserPage key="add-user" />]}
       />
 
-      <PageHeader isSticky>
+      <PageContainer isSticky>
         <div style={{ paddingTop: theme.spacing(1) }}>
           <SearchHeader
             params={search.toParams()}
@@ -148,7 +148,7 @@ const UsersSearch = () => {
             ]}
           />
         </div>
-      </PageHeader>
+      </PageContainer>
 
       <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
         <UsersTable userResults={userResults} />

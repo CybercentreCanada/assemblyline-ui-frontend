@@ -2,8 +2,8 @@ import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOu
 import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
 import TimerOutlinedIcon from '@mui/icons-material/TimerOutlined';
 import { IconButton, Pagination, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
+import PageContainer from 'commons/components/pages/PageContainer';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
-import PageHeader from 'commons/components/pages/PageHeader';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -282,7 +282,7 @@ export default function RetrohuntPage() {
           ]}
         />
 
-        <PageHeader isSticky>
+        <PageContainer isSticky>
           <div style={{ paddingTop: theme.spacing(1) }}>
             <SearchBar
               initValue={query ? query.get('query', '') : ''}
@@ -384,7 +384,7 @@ export default function RetrohuntPage() {
               )}
             </SearchBar>
           </div>
-        </PageHeader>
+        </PageContainer>
 
         <div
           style={{

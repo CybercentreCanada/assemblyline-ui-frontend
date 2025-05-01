@@ -3,8 +3,8 @@ import ClassOutlinedIcon from '@mui/icons-material/ClassOutlined';
 import FileOpenOutlinedIcon from '@mui/icons-material/FileOpenOutlined';
 import { Chip, Grid, MenuItem, Select, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
+import PageContainer from 'commons/components/pages/PageContainer';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
-import PageHeader from 'commons/components/pages/PageHeader';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -299,7 +299,7 @@ export default function MalwareArchive() {
           </Grid>
         </Grid>
 
-        <PageHeader isSticky>
+        <PageContainer isSticky>
           <div style={{ paddingTop: theme.spacing(1) }}>
             <SearchBar
               initValue={query && query.get('query') !== '*' ? query.get('query', '') : ''}

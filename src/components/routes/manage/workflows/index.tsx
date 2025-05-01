@@ -3,8 +3,8 @@ import EventBusyOutlinedIcon from '@mui/icons-material/EventBusyOutlined';
 import EventOutlinedIcon from '@mui/icons-material/EventOutlined';
 import { Grid, IconButton, Tooltip, useTheme } from '@mui/material';
 import { useAppUser } from 'commons/components/app/hooks';
+import PageContainer from 'commons/components/pages/PageContainer';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
-import PageHeader from 'commons/components/pages/PageHeader';
 import type { SearchParams } from 'components/core/SearchParams/SearchParams';
 import { createSearchParams } from 'components/core/SearchParams/SearchParams';
 import { SearchParamsProvider, useSearchParams } from 'components/core/SearchParams/SearchParamsContext';
@@ -170,7 +170,7 @@ const WorkflowsSearch = () => {
         ]}
       />
 
-      <PageHeader isSticky>
+      <PageContainer isSticky>
         <div style={{ paddingTop: theme.spacing(1) }}>
           <SearchHeader
             params={search.toParams()}
@@ -210,7 +210,7 @@ const WorkflowsSearch = () => {
             ]}
           />
         </div>
-      </PageHeader>
+      </PageContainer>
 
       <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
         <WorkflowTable workflowResults={workflowResults} setWorkflowID={setWorkflowID} />

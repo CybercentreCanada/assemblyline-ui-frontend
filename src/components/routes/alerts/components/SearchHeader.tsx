@@ -12,7 +12,7 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import PageHeader from 'commons/components/pages/PageHeader';
+import PageContainer from 'commons/components/pages/PageContainer';
 import { ChipList } from 'components/visual/ChipList';
 import SearchTextField from 'components/visual/SearchBar/search-textfield';
 import SearchResultCount from 'components/visual/SearchResultCount';
@@ -192,7 +192,7 @@ const WrappedSearchHeader = ({
   }, [getInputEl, loading]);
 
   return (
-    <PageHeader isSticky={isSticky}>
+    <PageContainer isSticky={isSticky}>
       <div style={{ paddingTop: theme.spacing(1), paddingBottom: theme.spacing(1) }}>
         <Box
           ref={rootRef}
@@ -369,7 +369,7 @@ const WrappedSearchHeader = ({
                 )}
         </Box>
       </div>
-    </PageHeader>
+    </PageContainer>
   );
 };
 
