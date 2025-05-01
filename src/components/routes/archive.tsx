@@ -406,7 +406,7 @@ export default function MalwareArchive() {
               )}
             </SearchBar>
           </div>
-        </PageHeader>
+        </PageContainer>
 
         {fileResults !== null && fileResults.total !== 0 && (
           <Grid container spacing={2}>
