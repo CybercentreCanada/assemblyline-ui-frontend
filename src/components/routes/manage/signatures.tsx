@@ -18,7 +18,7 @@ import type { CustomUser } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
 import SignatureDetail from 'components/routes/manage/signature_detail';
 import FileDownloader from 'components/visual/FileDownloader';
-import { PageHeader as ALPageHeader } from 'components/visual/Layouts/PageHeader';
+import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import SearchHeader from 'components/visual/SearchBar/SearchHeader';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import SignaturesTable from 'components/visual/SearchResult/signatures';
@@ -153,7 +153,7 @@ const SignaturesSearch = () => {
 
   return currentUser.roles.includes('signature_view') ? (
     <PageFullWidth margin={4}>
-      <ALPageHeader
+      <PageHeader
         primary={t('title')}
         style={{ paddingBottom: theme.spacing(2) }}
         actions={[

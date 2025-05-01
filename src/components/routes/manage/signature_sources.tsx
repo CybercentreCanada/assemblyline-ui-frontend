@@ -36,7 +36,7 @@ import ForbiddenPage from 'components/routes/403';
 import { SourceDetail } from 'components/routes/manage/signature_sources_details';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
-import { PageHeader as ALPageHeader } from 'components/visual/Layouts/PageHeader';
+import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import Moment from 'components/visual/Moment';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
 import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
@@ -171,7 +171,7 @@ const WrappedSourceDetailDrawer = ({
           waiting={buttonLoading}
         />
 
-        <ALPageHeader
+        <PageHeader
           primary={service}
           secondary={`${t(base ? 'editing_source' : 'adding_source')}${base ? ` (${base.name})` : ''}`}
           style={{ paddingBottom: theme.spacing(2) }}
@@ -657,7 +657,7 @@ export default function SignatureSources() {
   return currentUser.roles.includes('signature_manage') ? (
     <PageFullWidth margin={4}>
       <div style={{ textAlign: 'left' }}>
-        <ALPageHeader
+        <PageHeader
           primary={t('title')}
           secondary={`${Object.keys(sources || {}).length} ${t('caption')}`}
           loading={!sources}

@@ -12,7 +12,7 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import type { UserIndexed } from 'components/models/base/user';
 import type { SearchResult } from 'components/models/ui/search';
 import { AddUserPage } from 'components/routes/admin/users_add';
-import { PageHeader as ALPageHeader } from 'components/visual/Layouts/PageHeader';
+import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import { SearchHeader } from 'components/visual/SearchBar/SearchHeader';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import UsersTable from 'components/visual/SearchResult/users';
@@ -102,7 +102,7 @@ const UsersSearch = () => {
     <Navigate to="/forbidden" replace />
   ) : (
     <PageFullWidth margin={4}>
-      <ALPageHeader
+      <PageHeader
         primary={t('title')}
         style={{ paddingBottom: theme.spacing(2) }}
         actions={[<AddUserPage key="add-user" />]}

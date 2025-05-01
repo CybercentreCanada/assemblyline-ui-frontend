@@ -44,7 +44,7 @@ import {
 } from 'components/visual/DivTable';
 import FileDetail from 'components/visual/FileDetail';
 import InformativeAlert from 'components/visual/InformativeAlert';
-import { PageHeader as ALPageHeader } from 'components/visual/Layouts/PageHeader';
+import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import LineGraph from 'components/visual/LineGraph';
 import Moment from 'components/visual/Moment';
 import MonacoEditor from 'components/visual/MonacoEditor';
@@ -387,7 +387,7 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
             </Grid>
           )}
 
-          <ALPageHeader
+          <PageHeader
             primary={t('header.view')}
             secondary={retrohunt?.key}
             loading={!retrohunt}

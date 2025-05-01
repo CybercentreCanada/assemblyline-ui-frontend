@@ -16,7 +16,7 @@ import type { CustomUser } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
 import BadlistNew from 'components/routes/manage/badlist_add';
 import BadlistDetail from 'components/routes/manage/badlist_detail';
-import { PageHeader as ALPageHeader } from 'components/visual/Layouts/PageHeader';
+import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import SearchHeader from 'components/visual/SearchBar/SearchHeader';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import BadlistTable from 'components/visual/SearchResult/badlist';
@@ -100,7 +100,7 @@ const BadlistSearch = () => {
 
   return currentUser.roles.includes('badlist_view') ? (
     <PageFullWidth margin={4}>
-      <ALPageHeader
+      <PageHeader
         primary={t('title')}
         style={{ marginBottom: theme.spacing(4) }}
         actions={[

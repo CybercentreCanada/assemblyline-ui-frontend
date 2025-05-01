@@ -31,7 +31,7 @@ import ForbiddenPage from 'components/routes/403';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import Histogram from 'components/visual/Histogram';
-import { PageHeader as ALPageHeader } from 'components/visual/Layouts/PageHeader';
+import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import Moment from 'components/visual/Moment';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
 import ResultsTable from 'components/visual/SearchResult/results';
@@ -437,7 +437,7 @@ const SignatureDetail = ({
       )}
 
       <div style={{ textAlign: 'left' }}>
-        <ALPageHeader
+        <PageHeader
           primary={t('title')}
           secondary={`${signature?.type}_${signature?.source}_${signature?.signature_id}`}
           loading={!signature}

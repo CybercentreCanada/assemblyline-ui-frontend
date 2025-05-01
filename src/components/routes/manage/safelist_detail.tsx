@@ -14,7 +14,7 @@ import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import DatePicker from 'components/visual/DatePicker';
 import Histogram from 'components/visual/Histogram';
-import { PageHeader as ALPageHeader } from 'components/visual/Layouts/PageHeader';
+import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import Moment from 'components/visual/Moment';
 import { bytesToSize, safeFieldValue, safeFieldValueURI } from 'helpers/utils';
 import { useEffect, useState } from 'react';
@@ -238,7 +238,7 @@ const SafelistDetail = ({ safelist_id = null, close = () => null }: SafelistDeta
         </div>
       )}
       <div style={{ textAlign: 'left' }}>
-        <ALPageHeader
+        <PageHeader
           primary={t('title')}
           secondary={safelist_id || id}
           loading={!safelist}

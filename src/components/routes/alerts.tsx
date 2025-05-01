@@ -25,7 +25,7 @@ import type { SearchParams } from 'components/routes/alerts/utils/SearchParams';
 import type { SearchResult } from 'components/routes/alerts/utils/SearchParser';
 import { WorkflowCreate } from 'components/routes/manage/workflows/create';
 import InformativeAlert from 'components/visual/InformativeAlert';
-import { PageHeader as ALPageHeader } from 'components/visual/Layouts/PageHeader';
+import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -239,7 +239,7 @@ const WrappedAlertsContent = () => {
   else
     return (
       <PageFullWidth margin={4}>
-        <ALPageHeader
+        <PageHeader
           primary={t('alerts')}
           style={{ paddingBottom: theme.spacing(2), textAlign: 'left' }}
           actions={[

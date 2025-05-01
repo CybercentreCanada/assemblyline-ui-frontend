@@ -12,7 +12,7 @@ import type { SearchResult } from 'components/models/ui/search';
 import { RetrohuntCreate } from 'components/routes/retrohunt/create';
 import RetrohuntDetail from 'components/routes/retrohunt/detail';
 import { ChipList } from 'components/visual/ChipList';
-import { PageHeader as ALPageHeader } from 'components/visual/Layouts/PageHeader';
+import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import SearchBar from 'components/visual/SearchBar/search-bar';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
@@ -268,7 +268,7 @@ export default function RetrohuntPage() {
   else
     return (
       <PageFullWidth margin={4}>
-        <ALPageHeader
+        <PageHeader
           primary={t('title')}
           style={{ paddingBottom: theme.spacing(2) }}
           actions={[
