@@ -72,18 +72,22 @@ const SaveSignature: React.FC<SaveSignatureProps> = React.memo(
     const [open, setOpen] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
 
-    const handleStateSaveButtonClick = useCallback(() => {
-      apiCall({
-        url: `/api/v4/signature/change_status/${signature.id}/${signature.status}/`,
-        onSuccess: () => {
-          showSuccessMessage(t('change.success'));
-          handleSuccess();
-        },
-        onEnter: () => setLoading(true),
-        onExit: () => setLoading(false)
-      });
+    const handleStateSaveButtonClick = useCallback(
+      (sign: Signature) => {
+        if (!sign) return;
+        apiCall({
+          url: `/api/v4/signature/change_status/${sign.id}/${sign.status}/`,
+          onSuccess: () => {
+            showSuccessMessage(t('change.success'));
+            handleSuccess();
+          },
+          onEnter: () => setLoading(true),
+          onExit: () => setLoading(false)
+        });
+      },
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [handleSuccess, signature?.id, signature?.status, t]);
+      [handleSuccess, t]
+    );
 
     if (!currentUser.roles.includes('signature_manage') || !signature || !modified) return null;
     else
@@ -112,7 +116,7 @@ const SaveSignature: React.FC<SaveSignatureProps> = React.memo(
             waiting={loading}
             handleClose={() => setOpen(false)}
             handleCancel={() => setOpen(false)}
-            handleAccept={handleStateSaveButtonClick}
+            handleAccept={() => handleStateSaveButtonClick(signature)}
             title={t('save.title')}
             cancelText={t('cancel')}
             acceptText={t('save.acceptText')}
@@ -139,20 +143,23 @@ const ResetSignatureToSource: React.FC<ResetSignatureToSourceProps> = React.memo
     const [open, setOpen] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
 
-    const handleResetSignatureToSource = useCallback(() => {
-      if (!currentUser.roles.includes('signature_manage')) return;
-      apiCall({
-        url: `/api/v4/signature/clear_status/${signature.id}/`,
-        onSuccess: () => {
-          showSuccessMessage(t('restore.success'));
-          onSignatureChange({ state_change_date: null, state_change_user: null });
-          setOpen(false);
-        },
-        onEnter: () => setLoading(true),
-        onExit: () => setLoading(false)
-      });
+    const handleResetSignatureToSource = useCallback(
+      (sign: Signature) => {
+        if (!currentUser.roles.includes('signature_manage')) return;
+        apiCall({
+          url: `/api/v4/signature/clear_status/${sign.id}/`,
+          onSuccess: () => {
+            showSuccessMessage(t('restore.success'));
+            onSignatureChange({ state_change_date: null, state_change_user: null });
+            setOpen(false);
+          },
+          onEnter: () => setLoading(true),
+          onExit: () => setLoading(false)
+        });
+      },
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentUser.roles, onSignatureChange, signature.id, t]);
+      [currentUser.roles, onSignatureChange, t]
+    );
 
     if (
       !currentUser.roles.includes('signature_manage') ||
@@ -177,7 +184,7 @@ const ResetSignatureToSource: React.FC<ResetSignatureToSourceProps> = React.memo
             waiting={loading}
             handleClose={() => setOpen(false)}
             handleCancel={() => setOpen(false)}
-            handleAccept={handleResetSignatureToSource}
+            handleAccept={() => handleResetSignatureToSource(signature)}
             title={t('restore.title')}
             cancelText={t('cancel')}
             acceptText={t('restore.acceptText')}
@@ -439,7 +446,7 @@ const SignatureDetail = ({
       <div style={{ textAlign: 'left' }}>
         <PageHeader
           primary={t('title')}
-          secondary={`${signature?.type}_${signature?.source}_${signature?.signature_id}`}
+          secondary={() => `${signature.type}_${signature.source}_${signature.signature_id}`}
           loading={!signature}
           slotProps={{
             root: { style: { marginBottom: theme.spacing(2) } }

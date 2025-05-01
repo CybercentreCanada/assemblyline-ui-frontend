@@ -278,13 +278,13 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
                 <YoutubeSearchedForIcon />
               </IconButton>
               <IconButton
-                tooltip={badlist.enabled ? t('enabled') : t('disabled')}
+                tooltip={!badlist ? null : badlist.enabled ? t('enabled') : t('disabled')}
                 loading={!badlist}
                 size="large"
                 preventRender={!(badlist_id || id) || !currentUser.roles.includes('badlist_manage')}
-                onClick={badlist.enabled ? () => setDisableDialog(true) : () => setEnableDialog(true)}
+                onClick={!badlist ? null : badlist.enabled ? () => setDisableDialog(true) : () => setEnableDialog(true)}
               >
-                {badlist.enabled ? <ToggleOnIcon /> : <ToggleOffOutlinedIcon />}
+                {!badlist ? null : badlist.enabled ? <ToggleOnIcon /> : <ToggleOffOutlinedIcon />}
               </IconButton>
               <IconButton
                 tooltip={t('remove')}
