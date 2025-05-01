@@ -107,9 +107,11 @@ export default function SiteMapPage() {
     <PageFullWidth margin={4}>
       <PageHeader
         primary={t('title')}
-        secondary={`${siteMap.length} ${t('caption')}`}
+        secondary={() => `${siteMap.length} ${t('caption')}`}
         loading={!siteMap}
-        style={{ marginBottom: theme.spacing(2), textAlign: 'left' }}
+        slotProps={{
+          root: { style: { marginBottom: theme.spacing(2) } }
+        }}
       />
 
       {siteMap ? (

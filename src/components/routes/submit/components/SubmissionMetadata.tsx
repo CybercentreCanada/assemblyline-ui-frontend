@@ -266,7 +266,7 @@ const ExtraMetadata = React.memo(() => {
                 </Typography>
 
                 <IconButton
-                  label={t('metadata.edit.tooltip')}
+                  tooltip={t('metadata.edit.tooltip')}
                   disabled={disabled || !isEditing}
                   preventRender={!customize}
                   size="small"
@@ -277,7 +277,7 @@ const ExtraMetadata = React.memo(() => {
                   <EditIcon fontSize="small" />
                 </IconButton>
                 <IconButton
-                  label={t('metadata.clear.tooltip')}
+                  tooltip={t('metadata.clear.tooltip')}
                   disabled={disabled || !isEditing}
                   size="small"
                   onClick={handleClear}

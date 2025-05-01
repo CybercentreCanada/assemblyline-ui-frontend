@@ -3,8 +3,8 @@ import EventBusyOutlinedIcon from '@mui/icons-material/EventBusyOutlined';
 import EventOutlinedIcon from '@mui/icons-material/EventOutlined';
 import { Grid, IconButton, Tooltip, useTheme } from '@mui/material';
 import { useAppUser } from 'commons/components/app/hooks';
+import PageContainer from 'commons/components/pages/PageContainer';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
-import PageHeader from 'commons/components/pages/PageHeader';
 import type { SearchParams } from 'components/core/SearchParams/SearchParams';
 import { createSearchParams } from 'components/core/SearchParams/SearchParams';
 import { SearchParamsProvider, useSearchParams } from 'components/core/SearchParams/SearchParamsContext';
@@ -17,7 +17,7 @@ import type { CustomUser } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
 import WorkflowCreate from 'components/routes/manage/workflows/create';
 import WorkflowDetail from 'components/routes/manage/workflows/detail';
-import { PageHeader as ALPageHeader } from 'components/visual/Layouts/PageHeader';
+import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import SearchHeader from 'components/visual/SearchBar/SearchHeader';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import WorkflowTable from 'components/visual/SearchResult/workflow';
@@ -148,10 +148,12 @@ const WorkflowsSearch = () => {
 
   return currentUser.roles.includes('workflow_view') ? (
     <PageFullWidth margin={4}>
-      <ALPageHeader
+      <PageHeader
         primary={t('title')}
-        style={{ paddingBottom: theme.spacing(2) }}
-        actions={[
+        slotProps={{
+          root: { style: { marginBottom: theme.spacing(2) } }
+        }}
+        actions={
           currentUser.roles.includes('workflow_manage') && (
             <Grid size={{ xs: 'grow' }} style={{ textAlign: 'right', flexGrow: 0 }}>
               <Tooltip title={t('add_workflow')}>
@@ -167,10 +169,10 @@ const WorkflowsSearch = () => {
               </Tooltip>
             </Grid>
           )
-        ]}
+        }
       />
 
-      <PageHeader isSticky>
+      <PageContainer isSticky>
         <div style={{ paddingTop: theme.spacing(1) }}>
           <SearchHeader
             params={search.toParams()}
@@ -210,7 +212,7 @@ const WorkflowsSearch = () => {
             ]}
           />
         </div>
-      </PageHeader>
+      </PageContainer>
 
       <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
         <WorkflowTable workflowResults={workflowResults} setWorkflowID={setWorkflowID} />

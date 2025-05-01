@@ -10,7 +10,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableSortLabel from '@mui/material/TableSortLabel';
 import { alpha, useTheme } from '@mui/material/styles';
 import Throttler from 'commons/addons/utils/throttler';
-import PageHeader from 'commons/components/pages/PageHeader';
+import PageContainer from 'commons/components/pages/PageContainer';
 import Classification from 'components/visual/Classification';
 import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow, LinkRow } from 'components/visual/DivTable';
 import React, { useEffect, useState } from 'react';
@@ -195,7 +195,7 @@ const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
   const theme = useTheme();
 
   return (
-    <PageHeader isSticky>
+    <PageContainer isSticky>
       <Grid container size="grow">
         <Grid size={{ xs: 12, md: 6 }}>
           <Box
@@ -266,7 +266,7 @@ const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
           />
         </Grid>
       </Grid>
-    </PageHeader>
+    </PageContainer>
   );
 };
 

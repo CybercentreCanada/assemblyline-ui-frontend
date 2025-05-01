@@ -1,9 +1,9 @@
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
 import TimerOutlinedIcon from '@mui/icons-material/TimerOutlined';
-import { IconButton, Pagination, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
+import { Pagination, Typography, useMediaQuery, useTheme } from '@mui/material';
+import PageContainer from 'commons/components/pages/PageContainer';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
-import PageHeader from 'commons/components/pages/PageHeader';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -11,8 +11,9 @@ import type { Retrohunt, RetrohuntIndexed, RetrohuntProgress } from 'components/
 import type { SearchResult } from 'components/models/ui/search';
 import { RetrohuntCreate } from 'components/routes/retrohunt/create';
 import RetrohuntDetail from 'components/routes/retrohunt/detail';
+import { IconButton } from 'components/visual/Buttons/IconButton';
 import { ChipList } from 'components/visual/ChipList';
-import { PageHeader as ALPageHeader } from 'components/visual/Layouts/PageHeader';
+import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import SearchBar from 'components/visual/SearchBar/search-bar';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
@@ -268,21 +269,25 @@ export default function RetrohuntPage() {
   else
     return (
       <PageFullWidth margin={4}>
-        <ALPageHeader
+        <PageHeader
           primary={t('title')}
-          style={{ paddingBottom: theme.spacing(2) }}
-          actions={[
-            currentUser.roles.includes('retrohunt_run') && (
-              <Tooltip key="add" title={t('tooltip.add')}>
-                <IconButton color="success" size="large" onClick={handleOpenCreatePage}>
-                  <AddCircleOutlineOutlinedIcon />
-                </IconButton>
-              </Tooltip>
-            )
-          ]}
+          slotProps={{
+            root: { style: { marginBottom: theme.spacing(2) } }
+          }}
+          actions={
+            <IconButton
+              color="success"
+              preventRender={!currentUser.roles.includes('retrohunt_run')}
+              size="large"
+              tooltip={t('tooltip.add')}
+              onClick={handleOpenCreatePage}
+            >
+              <AddCircleOutlineOutlinedIcon />
+            </IconButton>
+          }
         />
 
-        <PageHeader isSticky>
+        <PageContainer isSticky>
           <div style={{ paddingTop: theme.spacing(1) }}>
             <SearchBar
               initValue={query ? query.get('query', '') : ''}
@@ -384,7 +389,7 @@ export default function RetrohuntPage() {
               )}
             </SearchBar>
           </div>
-        </PageHeader>
+        </PageContainer>
 
         <div
           style={{

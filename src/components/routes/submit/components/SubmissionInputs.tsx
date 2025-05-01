@@ -620,9 +620,9 @@ export const FindButton = React.memo(() => {
         }
         children={([loading, disabled, tab, file, hashType, hashValue]) => (
           <IconButton
-            label={t('find.button.tooltip')}
             disabled={disabled || (tab === 'file' ? !file : tab === 'hash' ? !hashType : false)}
             loading={loading}
+            tooltip={t('find.button.tooltip')}
             tooltipProps={{ placement: 'bottom' }}
             onClick={() => {
               setOpen(true);
@@ -651,7 +651,7 @@ export const AdjustButton = React.memo(() => {
       selector={state => [state.values.state.adjust] as const}
       children={([adjust]) => (
         <IconButton
-          label={adjust ? t('adjust.button.close.tooltip') : t('adjust.button.open.tooltip')}
+          tooltip={adjust ? t('adjust.button.close.tooltip') : t('adjust.button.open.tooltip')}
           tooltipProps={{ placement: 'bottom' }}
           onClick={() => form.setFieldValue('state.adjust', s => !s)}
         >
@@ -681,7 +681,8 @@ const AnalyzeButton = React.memo(({ children, ...props }: ButtonProps) => {
       children={([phase, disabled, tab, file, hash, progress]) => (
         <Button
           disabled={disabled || (tab === 'file' ? file : tab === 'hash' ? hash : false)}
-          loading={phase !== 'editing'}
+          loading={phase === 'loading'}
+          progress={phase !== 'editing'}
           tooltip={t('submit.button.tooltip')}
           tooltipProps={{ placement: 'bottom' }}
           variant="contained"

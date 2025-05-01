@@ -1,62 +1,80 @@
 import type { TypographyProps } from '@mui/material';
 import { Skeleton, Typography, useTheme } from '@mui/material';
-import type { ButtonProps } from 'components/visual/Buttons/Button';
-import { Button } from 'components/visual/Buttons/Button';
-import type { IconButtonProps } from 'components/visual/Buttons/IconButton';
-import { IconButton } from 'components/visual/Buttons/IconButton';
+import { useAppBar, useAppBarHeight, useAppLayout } from 'commons/components/app/hooks';
+import useALContext from 'components/hooks/useALContext';
 import type { ClassificationProps } from 'components/visual/Classification';
 import Classification from 'components/visual/Classification';
-import type { CSSProperties, ReactNode } from 'react';
-import React, { isValidElement } from 'react';
-
-type TitleActionPartialProps = (IconButtonProps & { type?: 'icon' }) | (ButtonProps & { type?: 'button' });
-
-export type TitleActionProps = ReactNode | TitleActionPartialProps;
-
-function isValidAction(action: TitleActionProps): action is TitleActionPartialProps {
-  return !isValidElement(action);
-}
+import type { CSSProperties, DetailedHTMLProps, HTMLAttributes, ReactNode } from 'react';
+import React, { useMemo } from 'react';
 
 export type PageHeaderProps = {
-  actions?: TitleActionProps[];
-  actionSpacing?: number;
-  classification?: ClassificationProps['c12n'];
-  classificationProps?: Omit<ClassificationProps, 'c12n' | 'setClassification'>;
-  endAdornment?: React.ReactNode;
+  classification?: ClassificationProps['c12n'] | ((loading?: boolean) => ClassificationProps['c12n']);
+  primary: ReactNode | ((loading?: boolean) => ReactNode);
+  secondary?: ReactNode | ((loading?: boolean) => ReactNode);
+  actions?: ReactNode;
+  endAdornment?: ReactNode;
+
   loading?: boolean;
-  primary: React.ReactNode;
-  primaryProps?: TypographyProps;
-  secondary?: React.ReactNode;
-  secondaryProps?: TypographyProps;
-  style?: CSSProperties;
+  isSticky?: boolean;
+  top?: CSSProperties['top'];
   onClassificationChange?: ClassificationProps['setClassification'];
+
+  slotProps?: {
+    root?: DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement>;
+    classification?: Omit<ClassificationProps, 'c12n' | 'setClassification'>;
+    primary?: TypographyProps;
+    secondary?: TypographyProps;
+    actions?: DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> & { spacing?: number };
+  };
 };
 
 export const PageHeader: React.FC<PageHeaderProps> = React.memo(
   ({
     actions = null,
-    actionSpacing = null,
-    classification = '',
-    classificationProps = null,
+    classification = undefined,
     endAdornment = null,
     loading = false,
+    isSticky = false,
     primary = null,
-    primaryProps = null,
+    top = null,
     secondary = null,
-    secondaryProps = null,
-    style = null,
+
+    slotProps = {},
     onClassificationChange = null
   }: PageHeaderProps) => {
     const theme = useTheme();
+    const layout = useAppLayout();
+    const appbar = useAppBar();
+    const appBarHeight = useAppBarHeight();
+    const { c12nDef } = useALContext();
+
+    const barWillHide = useMemo(() => layout.current !== 'top' && appbar.autoHide, [appbar.autoHide, layout]);
+
+    const {
+      root: rootProps,
+      classification: classificationProps,
+      primary: primaryProps,
+      secondary: secondaryProps,
+      actions: actionsProps
+    } = useMemo<PageHeaderProps['slotProps']>(() => slotProps, [slotProps]);
 
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', ...style }}>
-        {!classification ? null : (
+      <div
+        {...rootProps}
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          top: top !== null ? top : isSticky ? (barWillHide ? 0 : appBarHeight) : null,
+          zIndex: !isSticky ? theme.zIndex.appBar - 100 : null,
+          ...rootProps?.style
+        }}
+      >
+        {!c12nDef.enforce || (!loading && classification === undefined) ? null : (
           <div style={{ paddingBottom: theme.spacing(4) }}>
             <Classification
               type={!onClassificationChange ? 'pill' : 'picker'}
               size="tiny"
-              c12n={loading ? null : classification}
+              c12n={loading ? null : typeof classification === 'function' ? classification(loading) : classification}
               setClassification={onClassificationChange}
               {...classificationProps}
             />
@@ -89,7 +107,7 @@ export const PageHeader: React.FC<PageHeaderProps> = React.memo(
               {...primaryProps}
               sx={{ overflowWrap: 'break-word', ...primaryProps?.sx }}
             >
-              {primary}
+              {typeof primary === 'function' ? primary(loading) : primary}
             </Typography>
 
             {secondary && (
@@ -101,12 +119,18 @@ export const PageHeader: React.FC<PageHeaderProps> = React.memo(
                 {...secondaryProps}
                 sx={{ overflowWrap: 'break-word', ...secondaryProps?.sx }}
               >
-                {loading ? <Skeleton style={{ width: '10rem' }} /> : secondary}
+                {loading ? (
+                  <Skeleton style={{ width: '10rem' }} />
+                ) : typeof secondary === 'function' ? (
+                  secondary(loading)
+                ) : (
+                  secondary
+                )}
               </Typography>
             )}
           </div>
 
-          {loading ? null : (
+          {
             <div
               style={{
                 display: 'flex',
@@ -116,35 +140,24 @@ export const PageHeader: React.FC<PageHeaderProps> = React.memo(
                 paddingTop: theme.spacing(0.5)
               }}
             >
-              {Array.isArray(actions) && (
+              {actions && (
                 <div
+                  {...actionsProps}
                   style={{
                     display: 'flex',
                     flexDirection: 'row',
                     flexWrap: 'wrap',
-                    ...(actionSpacing && { gap: theme.spacing(actionSpacing) })
+                    ...actionsProps?.style,
+                    ...(actionsProps?.spacing && { gap: theme.spacing(actionsProps?.spacing) })
                   }}
                 >
-                  {actions.map((action, i) => {
-                    if (isValidAction(action)) {
-                      const { children = null, type = 'icon', ...buttonProps } = action;
-                      return type === 'icon' ? (
-                        <IconButton key={i} size="large" {...(buttonProps as IconButtonProps)}>
-                          {children}
-                        </IconButton>
-                      ) : (
-                        <Button key={i} {...(buttonProps as ButtonProps)}>
-                          {children}
-                        </Button>
-                      );
-                    } else return action;
-                  })}
+                  {actions}
                 </div>
               )}
 
               {endAdornment}
             </div>
-          )}
+          }
         </div>
       </div>
     );

@@ -13,7 +13,7 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import PageHeader from 'commons/components/pages/PageHeader';
+import PageContainer from 'commons/components/pages/PageContainer';
 import type { CustomChipProps } from 'components/visual/CustomChip';
 import CustomChip from 'components/visual/CustomChip';
 import type { SearchTextFieldProps } from 'components/visual/SearchBar/search-textfield';
@@ -318,7 +318,7 @@ const WrappedSearchHeader = ({
   }, [getInputEl, loading]);
 
   return (
-    <PageHeader isSticky={isSticky}>
+    <PageContainer isSticky={isSticky}>
       <Root ref={rootRef}>
         <SearchWrapper ref={inputRef}>
           <SearchContainer>
@@ -481,7 +481,7 @@ const WrappedSearchHeader = ({
         {/** Other Components */}
         {children && <Container>{children}</Container>}
       </Root>
-    </PageHeader>
+    </PageContainer>
   );
 };
 

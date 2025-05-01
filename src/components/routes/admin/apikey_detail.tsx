@@ -5,11 +5,9 @@ import {
   Divider,
   FormControl,
   Grid,
-  IconButton,
   MenuItem,
   Select,
   Skeleton,
-  Tooltip,
   Typography,
   useTheme
 } from '@mui/material';
@@ -20,6 +18,7 @@ import useMySnackbar from 'components/hooks/useMySnackbar';
 import { type ApiKey } from 'components/models/base/user';
 import ForbiddenPage from 'components/routes/403';
 import { useAPIKeyUtilities } from 'components/routes/user/api_keys';
+import { IconButton } from 'components/visual/Buttons/IconButton';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import CustomChip from 'components/visual/CustomChip';
 import DatePicker from 'components/visual/DatePicker';
@@ -148,34 +147,26 @@ const ApikeyDetail = ({ key_id = null, onClose = () => null }: ApikeyDetailProps
 
       <PageHeader
         primary={t('apikey')}
-        style={{ paddingBottom: theme.spacing(4), textAlign: 'start' }}
-        actionSpacing={1}
-        actions={[
-          apiKey ? (
-            (key_id || id) && (
-              <div key="delete" style={{ display: 'flex', marginBottom: theme.spacing(1) }}>
-                <Tooltip title={t('apikey.remove.tooltip')}>
-                  <div>
-                    <IconButton
-                      disabled={loading}
-                      size="large"
-                      onClick={() => setDeleteDialog(true)}
-                      sx={{
-                        color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
-                      }}
-                    >
-                      <DeleteOutlineOutlinedIcon />
-                    </IconButton>
-                  </div>
-                </Tooltip>
-              </div>
-            )
-          ) : (
-            <div key="delete" style={{ display: 'flex' }}>
-              <Skeleton variant="circular" height="3rem" width="3rem" style={{ margin: theme.spacing(0.5) }} />
-            </div>
-          )
-        ]}
+        loading={!apiKey}
+        slotProps={{
+          root: { style: { marginBottom: theme.spacing(4) } },
+          actions: { spacing: 1 }
+        }}
+        actions={
+          <IconButton
+            disabled={loading}
+            loading={!apiKey}
+            preventRender={!(key_id || id)}
+            size="large"
+            tooltip={t('apikey.remove.tooltip')}
+            onClick={() => setDeleteDialog(true)}
+            sx={{
+              color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+            }}
+          >
+            <DeleteOutlineOutlinedIcon />
+          </IconButton>
+        }
       />
 
       <div style={{ textAlign: 'left' }}>

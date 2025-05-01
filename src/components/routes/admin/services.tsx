@@ -391,96 +391,100 @@ export default function Services() {
 
       <PageHeader
         primary={t('title')}
-        actions={[
-          <Tooltip
-            key="add"
-            PopperProps={{
-              disablePortal: true
-            }}
-            disableInteractive
-            title={t('add')}
-          >
-            <IconButton
-              style={{
-                color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark
+        actions={
+          <>
+            <Tooltip
+              key="add"
+              PopperProps={{
+                disablePortal: true
               }}
-              onClick={() => setOpen(true)}
-              size="large"
+              disableInteractive
+              title={t('add')}
             >
-              <AddCircleOutlineIcon />
-            </IconButton>
-          </Tooltip>,
-          <Tooltip
-            key="update"
-            PopperProps={{
-              disablePortal: true
-            }}
-            disableInteractive
-            title={
-              updates && Object.values(updates).some((srv: any) => srv.update_available && !srv.updating)
-                ? t('update_all')
-                : t('update_none')
-            }
-          >
-            <span>
               <IconButton
-                color="primary"
-                onClick={updateAll}
-                disabled={!updates || !Object.values(updates).some((srv: any) => srv.update_available && !srv.updating)}
+                style={{
+                  color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark
+                }}
+                onClick={() => setOpen(true)}
                 size="large"
               >
-                <SystemUpdateAltIcon />
+                <AddCircleOutlineIcon />
               </IconButton>
-            </span>
-          </Tooltip>,
-          <Tooltip
-            key="available"
-            PopperProps={{
-              disablePortal: true
-            }}
-            disableInteractive
-            title={
-              availableServices &&
-              availableServices.length > 0 &&
-              availableServices.some(s => !installingServices?.includes(s?.summary))
-                ? t('install_all')
-                : t('install_none')
-            }
-          >
-            <span>
-              <IconButton
-                color="primary"
-                onClick={() => onInstallServices(availableServices)}
-                disabled={
-                  !availableServices ||
-                  availableServices.length === 0 ||
-                  availableServices.every(s => installingServices?.includes(s?.summary))
-                }
-                size="large"
-              >
-                <CloudDownloadOutlinedIcon />
+            </Tooltip>
+            <Tooltip
+              key="update"
+              PopperProps={{
+                disablePortal: true
+              }}
+              disableInteractive
+              title={
+                updates && Object.values(updates).some((srv: any) => srv.update_available && !srv.updating)
+                  ? t('update_all')
+                  : t('update_none')
+              }
+            >
+              <span>
+                <IconButton
+                  color="primary"
+                  onClick={updateAll}
+                  disabled={
+                    !updates || !Object.values(updates).some((srv: any) => srv.update_available && !srv.updating)
+                  }
+                  size="large"
+                >
+                  <SystemUpdateAltIcon />
+                </IconButton>
+              </span>
+            </Tooltip>
+            <Tooltip
+              key="available"
+              PopperProps={{
+                disablePortal: true
+              }}
+              disableInteractive
+              title={
+                availableServices &&
+                availableServices.length > 0 &&
+                availableServices.some(s => !installingServices?.includes(s?.summary))
+                  ? t('install_all')
+                  : t('install_none')
+              }
+            >
+              <span>
+                <IconButton
+                  color="primary"
+                  onClick={() => onInstallServices(availableServices)}
+                  disabled={
+                    !availableServices ||
+                    availableServices.length === 0 ||
+                    availableServices.every(s => installingServices?.includes(s?.summary))
+                  }
+                  size="large"
+                >
+                  <CloudDownloadOutlinedIcon />
+                </IconButton>
+              </span>
+            </Tooltip>
+            <FileDownloader
+              key="file_downloader"
+              icon={<GetAppOutlinedIcon />}
+              link="/api/v4/service/backup/"
+              tooltip={t('backup')}
+            />
+            <Tooltip
+              key="restore"
+              PopperProps={{
+                disablePortal: true
+              }}
+              disableInteractive
+              title={t('restore')}
+            >
+              <IconButton onClick={() => setOpenRestore(true)} size="large">
+                <RestoreOutlinedIcon />
               </IconButton>
-            </span>
-          </Tooltip>,
-          <FileDownloader
-            key="file_downloader"
-            icon={<GetAppOutlinedIcon />}
-            link="/api/v4/service/backup/"
-            tooltip={t('backup')}
-          />,
-          <Tooltip
-            key="restore"
-            PopperProps={{
-              disablePortal: true
-            }}
-            disableInteractive
-            title={t('restore')}
-          >
-            <IconButton onClick={() => setOpenRestore(true)} size="large">
-              <RestoreOutlinedIcon />
-            </IconButton>
-          </Tooltip>
-        ]}
+            </Tooltip>
+          </>
+        }
       />
 
       <Grid container alignItems="center" spacing={3}>

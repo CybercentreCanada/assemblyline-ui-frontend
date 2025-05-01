@@ -3,23 +3,24 @@ import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOut
 import ToggleOffOutlinedIcon from '@mui/icons-material/ToggleOffOutlined';
 import ToggleOnIcon from '@mui/icons-material/ToggleOn';
 import YoutubeSearchedForIcon from '@mui/icons-material/YoutubeSearchedFor';
-import { Divider, Grid, IconButton, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
+import { Divider, Grid, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
 import PageCenter from 'commons/components/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import type { Safelist } from 'components/models/base/safelist';
 import ForbiddenPage from 'components/routes/403';
+import { IconButton } from 'components/visual/Buttons/IconButton';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import DatePicker from 'components/visual/DatePicker';
 import Histogram from 'components/visual/Histogram';
-import { PageHeader as ALPageHeader } from 'components/visual/Layouts/PageHeader';
+import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import Moment from 'components/visual/Moment';
 import { bytesToSize, safeFieldValue, safeFieldValueURI } from 'helpers/utils';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useNavigate, useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 
 type ParamProps = {
   id: string;
@@ -238,81 +239,54 @@ const SafelistDetail = ({ safelist_id = null, close = () => null }: SafelistDeta
         </div>
       )}
       <div style={{ textAlign: 'left' }}>
-        <ALPageHeader
+        <PageHeader
           primary={t('title')}
           secondary={safelist_id || id}
           loading={!safelist}
-          style={{ paddingBottom: theme.spacing(4) }}
-          actions={[
-            safelist ? (
-              <>
-                {(safelist_id || id) && (
-                  <div style={{ display: 'flex', marginBottom: theme.spacing(1) }}>
-                    {currentUser.roles.includes('submission_view') && (
-                      <Tooltip title={t('usage')}>
-                        <IconButton
-                          component={Link}
-                          style={{ color: theme.palette.action.active }}
-                          to={
-                            safelist.type === 'file'
-                              ? `/search/result/?query=result.sections.heuristic.signature.name:"SAFELIST_${
-                                  safelist_id || id
-                                }"`
-                              : safelist.type === 'signature'
-                                ? `/search/result/?query=result.sections.heuristic.signature.name:${safeFieldValueURI(
-                                    safelist.signature.name
-                                  )}`
-                                : `/search/result/?query=result.sections.safelisted_tags.${
-                                    safelist.tag.type
-                                  }:${safeFieldValueURI(safelist.tag.value)}`
-                          }
-                          size="large"
-                        >
-                          <YoutubeSearchedForIcon />
-                        </IconButton>
-                      </Tooltip>
-                    )}
-                    {currentUser.roles.includes('safelist_manage') && (
-                      <Tooltip title={safelist.enabled ? t('enabled') : t('disabled')}>
-                        <IconButton
-                          onClick={safelist.enabled ? () => setDisableDialog(true) : () => setEnableDialog(true)}
-                          size="large"
-                        >
-                          {safelist.enabled ? <ToggleOnIcon /> : <ToggleOffOutlinedIcon />}
-                        </IconButton>
-                      </Tooltip>
-                    )}
-
-                    {currentUser.roles.includes('safelist_manage') && (
-                      <Tooltip title={t('remove')}>
-                        <IconButton
-                          style={{
-                            color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
-                          }}
-                          onClick={() => setDeleteDialog(true)}
-                          size="large"
-                        >
-                          <RemoveCircleOutlineOutlinedIcon />
-                        </IconButton>
-                      </Tooltip>
-                    )}
-                  </div>
-                )}
-              </>
-            ) : (
-              <>
-                <div style={{ display: 'flex' }}>
-                  <Skeleton variant="circular" height="3rem" width="3rem" style={{ margin: theme.spacing(0.5) }} />
-                  {currentUser.roles.includes('safelist_manage') && (
-                    <>
-                      <Skeleton variant="circular" height="3rem" width="3rem" style={{ margin: theme.spacing(0.5) }} />
-                      <Skeleton variant="circular" height="3rem" width="3rem" style={{ margin: theme.spacing(0.5) }} />
-                    </>
-                  )}
-                </div>
-              </>
-            )
-          ]}
+          slotProps={{
+            root: { style: { marginBottom: theme.spacing(4) } }
+          }}
+          actions={
+            <>
+              <IconButton
+                tooltip={t('usage')}
+                loading={!safelist}
+                preventRender={!(safelist_id || id) || !currentUser.roles.includes('submission_view')}
+                sx={{ color: theme.palette.action.active }}
+                to={() =>
+                  safelist.type === 'file'
+                    ? `/search/result/?query=result.sections.heuristic.signature.name:"SAFELIST_${safelist_id || id}"`
+                    : safelist.type === 'signature'
+                      ? `/search/result/?query=result.sections.heuristic.signature.name:${safeFieldValueURI(safelist.signature.name)}`
+                      : `/search/result/?query=result.sections.safelisted_tags.${safelist.tag.type}:${safeFieldValueURI(safelist.tag.value)}`
+                }
+                size="large"
+              >
+                <YoutubeSearchedForIcon />
+              </IconButton>
+              <IconButton
+                tooltip={!safelist ? null : safelist.enabled ? t('enabled') : t('disabled')}
+                loading={!safelist}
+                size="large"
+                preventRender={!(safelist_id || id) || !currentUser.roles.includes('safelist_manage')}
+                onClick={
+                  !safelist ? null : safelist.enabled ? () => setDisableDialog(true) : () => setEnableDialog(true)
+                }
+              >
+                {safelist.enabled ? <ToggleOnIcon /> : <ToggleOffOutlinedIcon />}
+              </IconButton>
+              <IconButton
+                tooltip={t('remove')}
+                loading={!safelist}
+                size="large"
+                preventRender={!(safelist_id || id) || !currentUser.roles.includes('safelist_manage')}
+                sx={{ color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark }}
+                onClick={() => setDeleteDialog(true)}
+              >
+                <RemoveCircleOutlineOutlinedIcon />
+              </IconButton>
+            </>
+          }
         />
 
         <Grid container spacing={3}>

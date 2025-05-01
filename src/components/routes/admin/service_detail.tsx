@@ -2,7 +2,7 @@ import CompareArrowsOutlinedIcon from '@mui/icons-material/CompareArrowsOutlined
 import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
-import { Button, CircularProgress, IconButton, Paper, Skeleton, Tab, Tooltip, useTheme } from '@mui/material';
+import { Button, CircularProgress, Paper, Skeleton, Tab, useTheme } from '@mui/material';
 import PageCenter from 'commons/components/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -12,6 +12,7 @@ import ServiceContainer from 'components/routes/admin/service_detail/container';
 import ServiceGeneral from 'components/routes/admin/service_detail/general';
 import ServiceParams from 'components/routes/admin/service_detail/parameters';
 import ServiceUpdater from 'components/routes/admin/service_detail/updater';
+import { IconButton } from 'components/visual/Buttons/IconButton';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import CustomChip from 'components/visual/CustomChip';
 import Empty from 'components/visual/Empty';
@@ -22,7 +23,7 @@ import { RouterPrompt } from 'components/visual/RouterPrompt';
 import { getVersionQuery } from 'helpers/utils';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, Navigate, useNavigate, useParams } from 'react-router';
+import { Navigate, useNavigate, useParams } from 'react-router';
 
 const TAB_TYPES = ['general', 'docker', 'updater', 'params'] as const;
 type TabType = (typeof TAB_TYPES)[number];
@@ -194,67 +195,48 @@ function Service({ name = null, onDeleted = () => null, onUpdated = () => null }
       <PageHeader
         primary={service ? service.name : <Skeleton style={{ width: '20rem' }} />}
         secondary={t('title.detail')}
-        style={{ paddingBottom: theme.spacing(2) }}
+        loading={!service}
+        slotProps={{
+          root: { style: { marginBottom: theme.spacing(2) } }
+        }}
         actions={
-          service
-            ? [
-                <Tooltip key="action-1" title={t('errors')}>
-                  <IconButton
-                    component={Link}
-                    style={{ color: theme.palette.action.active }}
-                    to={`/admin/errors?filters=response.service_name%3A${service.name}&filters=${getVersionQuery(
-                      service.version
-                    )}`}
-                    size="large"
-                  >
-                    <ErrorOutlineOutlinedIcon />
-                  </IconButton>
-                </Tooltip>,
-                <Tooltip key="action-2" title={t('compare')}>
-                  <IconButton
-                    component={Link}
-                    style={{ color: theme.palette.action.active }}
-                    to={`/admin/service_review?service=${service.name}&v1=${service.version}`}
-                    size="large"
-                  >
-                    <CompareArrowsOutlinedIcon />
-                  </IconButton>
-                </Tooltip>,
-                <Tooltip key="action-3" title={t('remove')}>
-                  <IconButton
-                    style={{
-                      color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
-                    }}
-                    onClick={handleDeleteButtonClick}
-                    size="large"
-                  >
-                    <RemoveCircleOutlineOutlinedIcon />
-                  </IconButton>
-                </Tooltip>
-              ]
-            : [
-                <Skeleton
-                  key="loading-1"
-                  variant="circular"
-                  height="2.5rem"
-                  width="2.5rem"
-                  style={{ margin: theme.spacing(0.5) }}
-                />,
-                <Skeleton
-                  key="loading-2"
-                  variant="circular"
-                  height="2.5rem"
-                  width="2.5rem"
-                  style={{ margin: theme.spacing(0.5) }}
-                />,
-                <Skeleton
-                  key="loading-3"
-                  variant="circular"
-                  height="2.5rem"
-                  width="2.5rem"
-                  style={{ margin: theme.spacing(0.5) }}
-                />
-              ]
+          <>
+            <IconButton
+              loading={!service}
+              size="large"
+              sx={{ color: theme.palette.action.active }}
+              tooltip={t('errors')}
+              to={() =>
+                `/admin/errors?filters=response.service_name%3A${service.name}&filters=${getVersionQuery(
+                  service.version
+                )}`
+              }
+            >
+              <ErrorOutlineOutlinedIcon />
+            </IconButton>
+
+            <IconButton
+              loading={!service}
+              size="large"
+              sx={{ color: theme.palette.action.active }}
+              to={() => `/admin/service_review?service=${service.name}&v1=${service.version}`}
+              tooltip={t('compare')}
+            >
+              <CompareArrowsOutlinedIcon />
+            </IconButton>
+
+            <IconButton
+              loading={!service}
+              size="large"
+              tooltip={t('remove')}
+              onClick={handleDeleteButtonClick}
+              sx={{
+                color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+              }}
+            >
+              <RemoveCircleOutlineOutlinedIcon />
+            </IconButton>
+          </>
         }
       />
 

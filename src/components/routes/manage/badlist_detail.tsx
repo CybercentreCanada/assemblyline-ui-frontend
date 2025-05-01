@@ -4,7 +4,7 @@ import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOut
 import ToggleOffOutlinedIcon from '@mui/icons-material/ToggleOffOutlined';
 import ToggleOnIcon from '@mui/icons-material/ToggleOn';
 import YoutubeSearchedForIcon from '@mui/icons-material/YoutubeSearchedFor';
-import { Divider, Grid, IconButton, MenuItem, Skeleton, TextField, Tooltip, Typography, useTheme } from '@mui/material';
+import { Divider, Grid, MenuItem, Skeleton, TextField, Tooltip, Typography, useTheme } from '@mui/material';
 import PageCenter from 'commons/components/pages/PageCenter';
 import { invalidateALQuery } from 'components/core/Query/AL/invalidateALQuery';
 import { updateALQuery } from 'components/core/Query/AL/updateALQuery';
@@ -15,6 +15,7 @@ import useMySnackbar from 'components/hooks/useMySnackbar';
 import type { Badlist } from 'components/models/base/badlist';
 import { ATTRIBUTION_TYPES, DEFAULT_TEMP_ATTRIBUTION } from 'components/models/base/badlist';
 import ForbiddenPage from 'components/routes/403';
+import { IconButton } from 'components/visual/Buttons/IconButton';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import CustomChip from 'components/visual/CustomChip';
@@ -26,7 +27,7 @@ import Moment from 'components/visual/Moment';
 import { bytesToSize, safeFieldValue, safeFieldValueURI } from 'helpers/utils';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useNavigate, useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 
 type ParamProps = {
   id: string;
@@ -257,77 +258,46 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
           primary={badlist ? t(`title.${badlist.type}`) : t('title')}
           secondary={badlist_id || id}
           loading={!badlist}
-          style={{ paddingBottom: theme.spacing(4) }}
-          actions={[
-            badlist ? (
-              <>
-                {(badlist_id || id) && (
-                  <div style={{ display: 'flex', marginBottom: theme.spacing(1) }}>
-                    {currentUser.roles.includes('submission_view') && (
-                      <Tooltip title={t('usage')}>
-                        <IconButton
-                          component={Link}
-                          style={{
-                            color: theme.palette.action.active
-                          }}
-                          to={
-                            badlist.type === 'file'
-                              ? `/search/?query=sha256:${badlist.hashes.sha256 || badlist_id || id} OR results:${
-                                  badlist.hashes.sha256 || badlist_id || id
-                                }* OR errors:${badlist.hashes.sha256 || badlist_id || id}* OR file.sha256:${
-                                  badlist.hashes.sha256 || badlist_id || id
-                                }`
-                              : `/search/result/?query=result.sections.tags.${badlist.tag.type}:${safeFieldValueURI(
-                                  badlist.tag.value
-                                )}`
-                          }
-                          size="large"
-                        >
-                          <YoutubeSearchedForIcon />
-                        </IconButton>
-                      </Tooltip>
-                    )}
-                    {currentUser.roles.includes('badlist_manage') && (
-                      <Tooltip title={badlist.enabled ? t('enabled') : t('disabled')}>
-                        <IconButton
-                          onClick={badlist.enabled ? () => setDisableDialog(true) : () => setEnableDialog(true)}
-                          size="large"
-                        >
-                          {badlist.enabled ? <ToggleOnIcon /> : <ToggleOffOutlinedIcon />}
-                        </IconButton>
-                      </Tooltip>
-                    )}
-
-                    {currentUser.roles.includes('badlist_manage') && (
-                      <Tooltip title={t('remove')}>
-                        <IconButton
-                          style={{
-                            color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
-                          }}
-                          onClick={() => setDeleteDialog(true)}
-                          size="large"
-                        >
-                          <RemoveCircleOutlineOutlinedIcon />
-                        </IconButton>
-                      </Tooltip>
-                    )}
-                  </div>
-                )}
-              </>
-            ) : (
-              <>
-                <div style={{ display: 'flex' }}>
-                  <Skeleton variant="circular" height="3rem" width="3rem" style={{ margin: theme.spacing(0.5) }} />
-                  {currentUser.roles.includes('badlist_manage') && (
-                    <>
-                      <Skeleton variant="circular" height="3rem" width="3rem" style={{ margin: theme.spacing(0.5) }} />
-                      <Skeleton variant="circular" height="3rem" width="3rem" style={{ margin: theme.spacing(0.5) }} />
-                    </>
-                  )}
-                </div>
-              </>
-            )
-          ]}
+          slotProps={{
+            root: { style: { marginBottom: theme.spacing(4) } }
+          }}
+          actions={
+            <>
+              <IconButton
+                tooltip={t('usage')}
+                loading={!badlist}
+                preventRender={!(badlist_id || id) || !currentUser.roles.includes('submission_view')}
+                size="large"
+                sx={{ color: theme.palette.action.active }}
+                to={() =>
+                  badlist.type === 'file'
+                    ? `/search/?query=sha256:${badlist.hashes.sha256 || badlist_id || id} OR results:${badlist.hashes.sha256 || badlist_id || id}* OR errors:${badlist.hashes.sha256 || badlist_id || id}* OR file.sha256:${badlist.hashes.sha256 || badlist_id || id}`
+                    : `/search/result/?query=result.sections.tags.${badlist.tag.type}:${safeFieldValueURI(badlist.tag.value)}`
+                }
+              >
+                <YoutubeSearchedForIcon />
+              </IconButton>
+              <IconButton
+                tooltip={badlist.enabled ? t('enabled') : t('disabled')}
+                loading={!badlist}
+                size="large"
+                preventRender={!(badlist_id || id) || !currentUser.roles.includes('badlist_manage')}
+                onClick={badlist.enabled ? () => setDisableDialog(true) : () => setEnableDialog(true)}
+              >
+                {badlist.enabled ? <ToggleOnIcon /> : <ToggleOffOutlinedIcon />}
+              </IconButton>
+              <IconButton
+                tooltip={t('remove')}
+                loading={!badlist}
+                size="large"
+                preventRender={!(badlist_id || id) || !currentUser.roles.includes('badlist_manage')}
+                sx={{ color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark }}
+                onClick={() => setDeleteDialog(true)}
+              >
+                <RemoveCircleOutlineOutlinedIcon />
+              </IconButton>
+            </>
+          }
         />
 
         <Grid container spacing={3}>

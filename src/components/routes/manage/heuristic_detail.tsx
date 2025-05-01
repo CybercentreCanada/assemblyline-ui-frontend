@@ -1,6 +1,6 @@
 import YoutubeSearchedForIcon from '@mui/icons-material/YoutubeSearchedFor';
 import type { PaperProps } from '@mui/material';
-import { Grid, IconButton, Paper, Skeleton, styled, Tooltip, Typography, useTheme } from '@mui/material';
+import { Grid, Paper, Skeleton, styled, Typography, useTheme } from '@mui/material';
 import { useAppUser } from 'commons/components/app/hooks';
 import PageCenter from 'commons/components/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
@@ -9,6 +9,7 @@ import type { Heuristic } from 'components/models/base/heuristic';
 import { DEFAULT_STATS, type Statistic } from 'components/models/base/statistic';
 import type { CustomUser } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
+import { IconButton } from 'components/visual/Buttons/IconButton';
 import Classification from 'components/visual/Classification';
 import Histogram from 'components/visual/Histogram';
 import { PageHeader } from 'components/visual/Layouts/PageHeader';
@@ -17,7 +18,7 @@ import ResultsTable from 'components/visual/SearchResult/results';
 import { safeFieldValueURI } from 'helpers/utils';
 import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useParams } from 'react-router';
+import { useParams } from 'react-router';
 
 const Preview = memo(
   styled(({ component = 'pre', variant = 'outlined', ...props }: PaperProps) => (
@@ -117,23 +118,23 @@ const HeuristicDetail = ({ heur_id = null }: HeuristicDetailProps) => {
           primary={t('title')}
           secondary={heuristic?.heur_id}
           loading={!heuristic}
-          style={{ paddingBottom: theme.spacing(4) }}
-          actions={[
-            !currentUser.roles.includes('submission_view') ? null : heuristic ? (
-              <Tooltip title={t('usage')}>
-                <IconButton
-                  component={Link}
-                  style={{ color: theme.palette.action.active }}
-                  to={`/search/result/?query=result.sections.heuristic.heur_id:${safeFieldValueURI(heuristic.heur_id)}`}
-                  size="large"
-                >
-                  <YoutubeSearchedForIcon />
-                </IconButton>
-              </Tooltip>
-            ) : (
-              <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
-            )
-          ]}
+          slotProps={{
+            root: { style: { marginBottom: theme.spacing(4) } }
+          }}
+          actions={
+            <IconButton
+              loading={!heuristic}
+              preventRender={!currentUser.roles.includes('submission_view')}
+              size="large"
+              sx={{ color: theme.palette.action.active }}
+              to={() =>
+                `/search/result/?query=result.sections.heuristic.heur_id:${safeFieldValueURI(heuristic.heur_id)}`
+              }
+              tooltip={t('usage')}
+            >
+              <YoutubeSearchedForIcon />
+            </IconButton>
+          }
         />
 
         <Grid container spacing={3}>

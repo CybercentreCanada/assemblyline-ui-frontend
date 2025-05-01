@@ -1,8 +1,8 @@
 import BlockIcon from '@mui/icons-material/Block';
 import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount';
 import { useTheme } from '@mui/material';
+import PageContainer from 'commons/components/pages/PageContainer';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
-import PageHeader from 'commons/components/pages/PageHeader';
 import type { SearchParams } from 'components/core/SearchParams/SearchParams';
 import { createSearchParams } from 'components/core/SearchParams/SearchParams';
 import { SearchParamsProvider, useSearchParams } from 'components/core/SearchParams/SearchParamsContext';
@@ -12,7 +12,7 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import type { UserIndexed } from 'components/models/base/user';
 import type { SearchResult } from 'components/models/ui/search';
 import { AddUserPage } from 'components/routes/admin/users_add';
-import { PageHeader as ALPageHeader } from 'components/visual/Layouts/PageHeader';
+import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import { SearchHeader } from 'components/visual/SearchBar/SearchHeader';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import UsersTable from 'components/visual/SearchResult/users';
@@ -102,13 +102,16 @@ const UsersSearch = () => {
     <Navigate to="/forbidden" replace />
   ) : (
     <PageFullWidth margin={4}>
-      <ALPageHeader
+      <PageHeader
         primary={t('title')}
-        style={{ paddingBottom: theme.spacing(2) }}
-        actions={[<AddUserPage key="add-user" />]}
+        slotProps={{
+          root: { style: { marginBottom: theme.spacing(2) } },
+          actions: { spacing: 1 }
+        }}
+        actions={<AddUserPage />}
       />
 
-      <PageHeader isSticky>
+      <PageContainer isSticky>
         <div style={{ paddingTop: theme.spacing(1) }}>
           <SearchHeader
             params={search.toParams()}
@@ -148,7 +151,7 @@ const UsersSearch = () => {
             ]}
           />
         </div>
-      </PageHeader>
+      </PageContainer>
 
       <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
         <UsersTable userResults={userResults} />

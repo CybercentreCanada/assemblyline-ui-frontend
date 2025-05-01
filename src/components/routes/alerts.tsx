@@ -1,5 +1,5 @@
 import AddIcon from '@mui/icons-material/Add';
-import { AlertTitle, IconButton, Tooltip, useMediaQuery, useTheme } from '@mui/material';
+import { AlertTitle, useMediaQuery, useTheme } from '@mui/material';
 import SimpleList from 'commons/addons/lists/simplelist/SimpleList';
 import { useAppUser } from 'commons/components/app/hooks';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
@@ -24,8 +24,9 @@ import AlertDetail from 'components/routes/alerts/detail';
 import type { SearchParams } from 'components/routes/alerts/utils/SearchParams';
 import type { SearchResult } from 'components/routes/alerts/utils/SearchParser';
 import { WorkflowCreate } from 'components/routes/manage/workflows/create';
+import { IconButton } from 'components/visual/Buttons/IconButton';
 import InformativeAlert from 'components/visual/InformativeAlert';
-import { PageHeader as ALPageHeader } from 'components/visual/Layouts/PageHeader';
+import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -239,22 +240,25 @@ const WrappedAlertsContent = () => {
   else
     return (
       <PageFullWidth margin={4}>
-        <ALPageHeader
+        <PageHeader
           primary={t('alerts')}
-          style={{ paddingBottom: theme.spacing(2), textAlign: 'left' }}
-          actions={[
-            <AlertDefaultSearchParameters key="default-search-parameters" />,
-            currentUser.roles.includes('workflow_manage') && (
-              <Tooltip key="add" title={t('workflow.tooltip')}>
-                <div>
-                  <IconButton size="large" onClick={handleCreateWorkflow}>
-                    <BiNetworkChart fontSize="x-large" />
-                    <AddIcon style={{ position: 'absolute', bottom: '10px', right: '6px', fontSize: 'small' }} />
-                  </IconButton>
-                </div>
-              </Tooltip>
-            )
-          ]}
+          slotProps={{
+            root: { style: { marginBottom: theme.spacing(2) } }
+          }}
+          actions={
+            <>
+              <AlertDefaultSearchParameters key="default-search-parameters" />
+              <IconButton
+                preventRender={!currentUser.roles.includes('workflow_manage')}
+                size="large"
+                tooltip={t('workflow.tooltip')}
+                onClick={handleCreateWorkflow}
+              >
+                <BiNetworkChart fontSize="x-large" />
+                <AddIcon style={{ position: 'absolute', bottom: '10px', right: '6px', fontSize: 'small' }} />
+              </IconButton>
+            </>
+          }
         />
 
         <SearchHeader

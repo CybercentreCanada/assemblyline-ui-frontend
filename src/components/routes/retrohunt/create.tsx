@@ -22,7 +22,7 @@ import type { CustomUser } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
-import { PageHeader as ALPageHeader } from 'components/visual/Layouts/PageHeader';
+import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import { MonacoEditor } from 'components/visual/MonacoEditor';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -168,11 +168,10 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = () => nu
               </Grid>
             )}
 
-            <ALPageHeader
+            <PageHeader
               primary={t('header.add')}
-              actions={[
+              actions={
                 <Button
-                  key="add"
                   variant="contained"
                   color="primary"
                   disabled={isButtonLoading || !retrohunt?.description || !retrohunt?.yara_signature}
@@ -181,7 +180,7 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = () => nu
                   {t('add.button')}
                   {isButtonLoading && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
                 </Button>
-              ]}
+              }
             />
 
             <Grid>

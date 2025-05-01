@@ -28,7 +28,7 @@ import { LABELS, PRIORITIES, STATUSES } from 'components/models/base/workflow';
 import type { SearchResult } from 'components/models/ui/search';
 import ForbiddenPage from 'components/routes/403';
 import Classification from 'components/visual/Classification';
-import { PageHeader as ALPageHeader } from 'components/visual/Layouts/PageHeader';
+import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import _ from 'lodash';
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -232,12 +232,14 @@ const WrappedWorkflowCreate = ({ id: propID = null, onClose = () => null }: Prop
           </div>
         )}
 
-        <ALPageHeader
+        <PageHeader
           primary={t(id ? 'edit.title' : 'add.title')}
           secondary={id}
           loading={!workflow}
-          style={{ paddingBottom: theme.spacing(2), textAlign: 'left' }}
-          actions={[
+          slotProps={{
+            root: { style: { marginBottom: theme.spacing(2) } }
+          }}
+          actions={
             <>
               {id ? (
                 <>
@@ -285,7 +287,7 @@ const WrappedWorkflowCreate = ({ id: propID = null, onClose = () => null }: Prop
                 </Tooltip>
               )}
             </>
-          ]}
+          }
         />
 
         <Grid container spacing={2} textAlign="start">

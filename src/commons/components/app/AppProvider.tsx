@@ -77,17 +77,17 @@ export const AppProviderInner = <U extends AppUser>({
                     <ExternalLookupProvider>
                       <CarouselProvider>
                         <AppDrawerProvider>
-                          <DrawerProvider>
-                            <AppBarProvider search={search}>
-                              <AppBreadcrumbsProvider>
-                                <AppLeftNavProvider>
-                                  <AppDrawerContainer>
-                                    <AppLayoutProvider>{children}</AppLayoutProvider>
-                                  </AppDrawerContainer>
-                                </AppLeftNavProvider>
-                              </AppBreadcrumbsProvider>
-                            </AppBarProvider>
-                          </DrawerProvider>
+                          <AppBarProvider search={search}>
+                            <AppBreadcrumbsProvider>
+                              <AppLeftNavProvider>
+                                <AppDrawerContainer>
+                                  <AppLayoutProvider>
+                                    <DrawerProvider>{children}</DrawerProvider>
+                                  </AppLayoutProvider>
+                                </AppDrawerContainer>
+                              </AppLeftNavProvider>
+                            </AppBreadcrumbsProvider>
+                          </AppBarProvider>
                         </AppDrawerProvider>
                       </CarouselProvider>
                     </ExternalLookupProvider>

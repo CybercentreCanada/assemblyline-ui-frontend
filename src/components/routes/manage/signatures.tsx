@@ -3,8 +3,8 @@ import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
 import RecordVoiceOverOutlinedIcon from '@mui/icons-material/RecordVoiceOverOutlined';
 import { useMediaQuery, useTheme } from '@mui/material';
 import { useAppUser } from 'commons/components/app/hooks';
+import PageContainer from 'commons/components/pages/PageContainer';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
-import PageHeader from 'commons/components/pages/PageHeader';
 import type { SearchParams } from 'components/core/SearchParams/SearchParams';
 import { createSearchParams } from 'components/core/SearchParams/SearchParams';
 import { SearchParamsProvider, useSearchParams } from 'components/core/SearchParams/SearchParamsContext';
@@ -18,7 +18,7 @@ import type { CustomUser } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
 import SignatureDetail from 'components/routes/manage/signature_detail';
 import FileDownloader from 'components/visual/FileDownloader';
-import { PageHeader as ALPageHeader } from 'components/visual/Layouts/PageHeader';
+import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import SearchHeader from 'components/visual/SearchBar/SearchHeader';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import SignaturesTable from 'components/visual/SearchResult/signatures';
@@ -153,10 +153,12 @@ const SignaturesSearch = () => {
 
   return currentUser.roles.includes('signature_view') ? (
     <PageFullWidth margin={4}>
-      <ALPageHeader
+      <PageHeader
         primary={t('title')}
-        style={{ paddingBottom: theme.spacing(2) }}
-        actions={[
+        slotProps={{
+          root: { style: { marginBottom: theme.spacing(2) } }
+        }}
+        actions={
           currentUser.roles.includes('signature_download') && (
             <FileDownloader
               icon={<GetAppOutlinedIcon />}
@@ -164,10 +166,10 @@ const SignaturesSearch = () => {
               tooltip={t('download_desc')}
             />
           )
-        ]}
+        }
       />
 
-      <PageHeader isSticky>
+      <PageContainer isSticky>
         <div style={{ paddingTop: theme.spacing(1) }}>
           <SearchHeader
             params={search.toParams()}
@@ -207,7 +209,7 @@ const SignaturesSearch = () => {
             ]}
           />
         </div>
-      </PageHeader>
+      </PageContainer>
 
       <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
         <SignaturesTable signatureResults={signatureResults} setSignatureID={setSignatureID} />

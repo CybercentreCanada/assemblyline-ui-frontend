@@ -1,10 +1,11 @@
 import CancelIcon from '@mui/icons-material/Cancel';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import { Button, IconButton, Tooltip } from '@mui/material';
+import { Button } from '@mui/material';
 import { DemoContainer } from 'components/routes/development/library/components/DemoContainer';
 import { DemoSection } from 'components/routes/development/library/components/DemoSection';
 import { useForm } from 'components/routes/development/library/contexts/form';
+import { IconButton } from 'components/visual/Buttons/IconButton';
 import CustomChip from 'components/visual/CustomChip';
 import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import { PageSection } from 'components/visual/Layouts/PageSection';
@@ -54,17 +55,19 @@ export const LayoutSection = React.memo(() => {
                 primary="Page Header"
                 secondary="Description of the Page Header"
                 classification={value}
-                actions={[
-                  { children: <InfoOutlinedIcon />, tooltip: 'Information' },
-                  { children: <CloseOutlinedIcon />, tooltip: 'Closed', tooltipProps: { placement: 'top' } },
-                  <Tooltip key={3} title="Cancel">
-                    <div>
-                      <IconButton size="large">
-                        <CancelIcon />
-                      </IconButton>
-                    </div>
-                  </Tooltip>
-                ]}
+                actions={
+                  <>
+                    <IconButton size="large" tooltip="Information">
+                      <InfoOutlinedIcon />
+                    </IconButton>
+                    <IconButton size="large" tooltip="Closed" tooltipProps={{ placement: 'top' }}>
+                      <CloseOutlinedIcon />
+                    </IconButton>
+                    <IconButton size="large" tooltip="Cancel">
+                      <CancelIcon />
+                    </IconButton>
+                  </>
+                }
                 endAdornment={<CustomChip label="End Adornment" />}
               />
             )}
@@ -149,17 +152,19 @@ export const LayoutSection = React.memo(() => {
                 secondary="Description of the Page Header"
                 classification={value}
                 loading
-                actions={[
-                  { children: <InfoOutlinedIcon />, tooltip: 'Information' },
-                  { children: <CloseOutlinedIcon />, tooltip: 'Closed', tooltipProps: { placement: 'top' } },
-                  <Tooltip key={3} title="Cancel">
-                    <div>
-                      <IconButton size="large">
-                        <CancelIcon />
-                      </IconButton>
-                    </div>
-                  </Tooltip>
-                ]}
+                actions={
+                  <>
+                    <IconButton size="large" tooltip="Information" loading>
+                      <InfoOutlinedIcon />
+                    </IconButton>
+                    <IconButton size="large" tooltip="Closed" tooltipProps={{ placement: 'top' }} loading>
+                      <CloseOutlinedIcon />
+                    </IconButton>
+                    <IconButton size="large" tooltip="Cancel" loading>
+                      <CancelIcon />
+                    </IconButton>
+                  </>
+                }
                 endAdornment={<CustomChip label="End Adornment" />}
               />
             )}
@@ -203,17 +208,19 @@ export const LayoutSection = React.memo(() => {
                 primary="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aliquam enim malesuada sapien pellentesque, fringilla consequat diam suscipit. Donec sed arcu blandit, luctus lorem quis, sodales elit. Phasellus blandit posuere sapien, ut pharetra ipsum efficitur at. Sed vel nulla risus. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Fusce efficitur nunc at urna imperdiet mattis. Sed condimentum vel ex et semper."
                 secondary="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aliquam enim malesuada sapien pellentesque, fringilla consequat diam suscipit. Donec sed arcu blandit, luctus lorem quis, sodales elit. Phasellus blandit posuere sapien, ut pharetra ipsum efficitur at. Sed vel nulla risus. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Fusce efficitur nunc at urna imperdiet mattis. Sed condimentum vel ex et semper."
                 classification={value}
-                actions={[
-                  { children: <InfoOutlinedIcon />, tooltip: 'Information' },
-                  { children: <CloseOutlinedIcon />, tooltip: 'Closed', tooltipProps: { placement: 'top' } },
-                  <Tooltip key={3} title="Cancel">
-                    <div>
-                      <IconButton size="large">
-                        <CancelIcon />
-                      </IconButton>
-                    </div>
-                  </Tooltip>
-                ]}
+                actions={
+                  <>
+                    <IconButton size="large" tooltip="Information">
+                      <InfoOutlinedIcon />
+                    </IconButton>
+                    <IconButton size="large" tooltip="Closed" tooltipProps={{ placement: 'top' }}>
+                      <CloseOutlinedIcon />
+                    </IconButton>
+                    <IconButton size="large" tooltip="Cancel">
+                      <CancelIcon />
+                    </IconButton>
+                  </>
+                }
                 endAdornment={<CustomChip label="End Adornment" />}
               />
             )}
