@@ -273,7 +273,7 @@ const SafelistDetail = ({ safelist_id = null, close = () => null }: SafelistDeta
                   !safelist ? null : safelist.enabled ? () => setDisableDialog(true) : () => setEnableDialog(true)
                 }
               >
-                {safelist.enabled ? <ToggleOnIcon /> : <ToggleOffOutlinedIcon />}
+                {!safelist ? null : safelist.enabled ? <ToggleOnIcon /> : <ToggleOffOutlinedIcon />}
               </IconButton>
               <IconButton
                 tooltip={t('remove')}

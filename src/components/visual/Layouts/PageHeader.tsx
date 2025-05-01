@@ -1,5 +1,5 @@
 import type { TypographyProps } from '@mui/material';
-import { Skeleton, Typography, useTheme } from '@mui/material';
+import { Skeleton, Typography, useMediaQuery, useTheme } from '@mui/material';
 import { useAppBar, useAppBarHeight, useAppLayout } from 'commons/components/app/hooks';
 import useALContext from 'components/hooks/useALContext';
 import type { ClassificationProps } from 'components/visual/Classification';
@@ -31,7 +31,7 @@ export type PageHeaderProps = {
 export const PageHeader: React.FC<PageHeaderProps> = React.memo(
   ({
     actions = null,
-    classification = undefined,
+    classification = 'undefined',
     endAdornment = null,
     loading = false,
     isSticky = false,
@@ -49,6 +49,8 @@ export const PageHeader: React.FC<PageHeaderProps> = React.memo(
     const { c12nDef } = useALContext();
 
     const barWillHide = useMemo(() => layout.current !== 'top' && appbar.autoHide, [appbar.autoHide, layout]);
+
+    const isDown = useMediaQuery(theme.breakpoints.down('md'));
 
     const {
       root: rootProps,
@@ -69,7 +71,7 @@ export const PageHeader: React.FC<PageHeaderProps> = React.memo(
           ...rootProps?.style
         }}
       >
-        {!c12nDef.enforce || (!loading && classification === undefined) ? null : (
+        {!c12nDef.enforce || classification === 'undefined' ? null : (
           <div style={{ paddingBottom: theme.spacing(4) }}>
             <Classification
               type={!onClassificationChange ? 'pill' : 'picker'}
@@ -87,7 +89,10 @@ export const PageHeader: React.FC<PageHeaderProps> = React.memo(
             flexDirection: 'row',
             flexWrap: 'wrap',
             alignContent: 'flex-start',
-            rowGap: theme.spacing(1)
+            rowGap: theme.spacing(1),
+            ...(isDown && {
+              flexDirection: 'column'
+            })
           }}
         >
           <div
@@ -97,7 +102,8 @@ export const PageHeader: React.FC<PageHeaderProps> = React.memo(
               display: 'flex',
               flexWrap: 'wrap',
               alignContent: 'center',
-              columnGap: theme.spacing(1)
+              columnGap: theme.spacing(1),
+              textAlign: 'left'
             }}
           >
             <Typography
@@ -130,34 +136,32 @@ export const PageHeader: React.FC<PageHeaderProps> = React.memo(
             )}
           </div>
 
-          {
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'stretch',
-                rowGap: theme.spacing(1),
-                paddingTop: theme.spacing(0.5)
-              }}
-            >
-              {actions && (
-                <div
-                  {...actionsProps}
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'row',
-                    flexWrap: 'wrap',
-                    ...actionsProps?.style,
-                    ...(actionsProps?.spacing && { gap: theme.spacing(actionsProps?.spacing) })
-                  }}
-                >
-                  {actions}
-                </div>
-              )}
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'stretch',
+              rowGap: theme.spacing(1),
+              paddingTop: theme.spacing(0.5)
+            }}
+          >
+            {actions && (
+              <div
+                {...actionsProps}
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  flexWrap: 'wrap',
+                  ...actionsProps?.style,
+                  ...(actionsProps?.spacing && { gap: theme.spacing(actionsProps?.spacing) })
+                }}
+              >
+                {actions}
+              </div>
+            )}
 
-              {endAdornment}
-            </div>
-          }
+            {endAdornment}
+          </div>
         </div>
       </div>
     );
