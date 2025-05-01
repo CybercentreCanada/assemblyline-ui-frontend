@@ -2,31 +2,21 @@ import type { TypographyProps } from '@mui/material';
 import { Skeleton, Typography, useTheme } from '@mui/material';
 import { useAppBar, useAppBarHeight, useAppLayout } from 'commons/components/app/hooks';
 import useALContext from 'components/hooks/useALContext';
-import { Button, type ButtonProps } from 'components/visual/Buttons/Button';
-import { IconButton, type IconButtonProps } from 'components/visual/Buttons/IconButton';
 import type { ClassificationProps } from 'components/visual/Classification';
 import Classification from 'components/visual/Classification';
 import type { CSSProperties, DetailedHTMLProps, HTMLAttributes, ReactNode } from 'react';
-import React, { isValidElement, useMemo } from 'react';
-
-type TitleActionPartialProps =
-  | ReactNode
-  | (IconButtonProps & { actionType: 'icon' })
-  | (ButtonProps & { actionType: 'button' });
-
-export type TitleActionProps = ReactNode | TitleActionPartialProps;
+import React, { useMemo } from 'react';
 
 export type PageHeaderProps = {
   classification?: ClassificationProps['c12n'] | ((loading?: boolean) => ClassificationProps['c12n']);
   primary: ReactNode | ((loading?: boolean) => ReactNode);
   secondary?: ReactNode | ((loading?: boolean) => ReactNode);
-  actions?: TitleActionProps[];
+  actions?: ReactNode;
   endAdornment?: ReactNode;
 
   loading?: boolean;
   isSticky?: boolean;
   top?: CSSProperties['top'];
-  backgroundColor?: CSSProperties['backgroundColor'];
   onClassificationChange?: ClassificationProps['setClassification'];
 
   slotProps?: {
@@ -46,7 +36,6 @@ export const PageHeader: React.FC<PageHeaderProps> = React.memo(
     loading = false,
     isSticky = false,
     primary = null,
-    backgroundColor = null,
     top = null,
     secondary = null,
 
@@ -76,7 +65,6 @@ export const PageHeader: React.FC<PageHeaderProps> = React.memo(
           display: 'flex',
           flexDirection: 'column',
           top: top !== null ? top : isSticky ? (barWillHide ? 0 : appBarHeight) : null,
-          backgroundColor: backgroundColor || theme.palette.background.default,
           zIndex: !isSticky ? theme.zIndex.appBar - 100 : null,
           ...rootProps?.style
         }}
@@ -152,7 +140,7 @@ export const PageHeader: React.FC<PageHeaderProps> = React.memo(
                 paddingTop: theme.spacing(0.5)
               }}
             >
-              {Array.isArray(actions) && (
+              {actions && (
                 <div
                   {...actionsProps}
                   style={{
@@ -163,33 +151,7 @@ export const PageHeader: React.FC<PageHeaderProps> = React.memo(
                     ...(actionsProps?.spacing && { gap: theme.spacing(actionsProps?.spacing) })
                   }}
                 >
-                  {actions.map((action, i) => {
-                    if (isValidElement(action)) return action;
-
-                    const { actionType, ...actionProps } = action as any;
-
-                    switch (actionType) {
-                      case 'icon':
-                        return (
-                          <IconButton
-                            key={`${i}-${actionProps?.children || ''}`}
-                            loading={loading}
-                            size="large"
-                            {...(actionProps as IconButtonProps)}
-                          />
-                        );
-                      case 'button':
-                        return (
-                          <Button
-                            key={`${i}-${actionProps?.children || ''}`}
-                            loading={loading}
-                            {...(actionProps as ButtonProps)}
-                          />
-                        );
-                      default:
-                        return null;
-                    }
-                  })}
+                  {actions}
                 </div>
               )}
 

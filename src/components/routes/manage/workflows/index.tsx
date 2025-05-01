@@ -150,8 +150,10 @@ const WorkflowsSearch = () => {
     <PageFullWidth margin={4}>
       <PageHeader
         primary={t('title')}
-        style={{ paddingBottom: theme.spacing(2) }}
-        actions={[
+        slotProps={{
+          root: { style: { marginBottom: theme.spacing(2) } }
+        }}
+        actions={
           currentUser.roles.includes('workflow_manage') && (
             <Grid size={{ xs: 'grow' }} style={{ textAlign: 'right', flexGrow: 0 }}>
               <Tooltip title={t('add_workflow')}>
@@ -167,7 +169,7 @@ const WorkflowsSearch = () => {
               </Tooltip>
             </Grid>
           )
-        ]}
+        }
       />
 
       <PageContainer isSticky>

@@ -2,7 +2,7 @@ import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOu
 import BlockOutlinedIcon from '@mui/icons-material/BlockOutlined';
 import LabelOutlinedIcon from '@mui/icons-material/LabelOutlined';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
-import { IconButton, Tooltip, useTheme } from '@mui/material';
+import { useTheme } from '@mui/material';
 import { useAppUser } from 'commons/components/app/hooks';
 import PageContainer from 'commons/components/pages/PageContainer';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
@@ -19,6 +19,7 @@ import type { CustomUser } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
 import SafelistNew from 'components/routes/manage/safelist_add';
 import SafelistDetail from 'components/routes/manage/safelist_detail';
+import { IconButton } from 'components/visual/Buttons/IconButton';
 import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import SearchHeader from 'components/visual/SearchBar/SearchHeader';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
@@ -130,22 +131,20 @@ const SafelistSearch = () => {
     <PageFullWidth margin={4}>
       <PageHeader
         primary={t('title')}
-        style={{ paddingBottom: theme.spacing(2) }}
-        actions={[
-          !currentUser.roles.includes('safelist_manage') ? null : (
-            <Tooltip title={t('add_safelist')}>
-              <IconButton
-                style={{
-                  color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark
-                }}
-                onClick={() => navigate(`${location.pathname}${location.search || ''}#new`)}
-                size="large"
-              >
-                <AddCircleOutlineOutlinedIcon />
-              </IconButton>
-            </Tooltip>
-          )
-        ]}
+        slotProps={{
+          root: { style: { marginBottom: theme.spacing(2) } }
+        }}
+        actions={
+          <IconButton
+            tooltip={t('add_safelist')}
+            preventRender={!currentUser.roles.includes('safelist_manage')}
+            size="large"
+            sx={{ color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark }}
+            onClick={() => navigate(`${location.pathname}${location.search || ''}#new`)}
+          >
+            <AddCircleOutlineOutlinedIcon />
+          </IconButton>
+        }
       />
 
       <PageContainer isSticky>

@@ -15,11 +15,13 @@ export const Tooltip: React.FC<TooltipProps> = React.memo(
       <MuiTooltip
         title={title}
         placement="bottom-start"
+        disableInteractive
         open={open}
         onOpen={() => setOpen(true)}
         onClose={() => setOpen(false)}
         slotProps={{
           popper: {
+            disablePortal: true,
             // modifiers: [{ name: 'offset', options: { offset: [0, 0] } }],
             onMouseOver: () => setOpen(false)
           }

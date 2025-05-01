@@ -1,11 +1,12 @@
 import Editor, { DiffEditor, loader } from '@monaco-editor/react';
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Skeleton, useTheme } from '@mui/material';
+import { Dialog, DialogActions, DialogContent, DialogTitle, Skeleton, useTheme } from '@mui/material';
 import { useAppTheme, useAppUser } from 'commons/components/app/hooks';
 import PageFullSize from 'commons/components/pages/PageFullSize';
 import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import type { CustomUser } from 'components/models/ui/user';
+import { Button } from 'components/visual/Buttons/Button';
 import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
 import { useRef, useState } from 'react';
@@ -76,30 +77,32 @@ export default function AdminActions() {
 
       <PageHeader
         primary={t('title')}
-        style={{ paddingBottom: theme.spacing(4) }}
-        actionSpacing={1}
-        actions={[
-          <Button key="reset" variant="outlined" onClick={() => reload(true)}>
-            {t('reset')}
-          </Button>,
-          <Button
-            key="undo"
-            variant="contained"
-            onClick={() => setActions(originalActions)}
-            disabled={actions === originalActions}
-          >
-            {t('undo')}
-          </Button>,
-          <Button
-            key="save"
-            variant="contained"
-            color="primary"
-            disabled={actions === originalActions}
-            onClick={() => setOpen(true)}
-          >
-            {t('save')}
-          </Button>
-        ]}
+        slotProps={{
+          root: { style: { marginBottom: theme.spacing(4) } },
+          actions: { spacing: 1 }
+        }}
+        actions={
+          <>
+            <Button variant="outlined" onClick={() => reload(true)}>
+              {t('reset')}
+            </Button>
+            <Button
+              variant="contained"
+              onClick={() => setActions(originalActions)}
+              disabled={actions === originalActions}
+            >
+              {t('undo')}
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              disabled={actions === originalActions}
+              onClick={() => setOpen(true)}
+            >
+              {t('save')}
+            </Button>
+          </>
+        }
       />
 
       <Dialog open={open} onClose={() => setOpen(false)} aria-labelledby="dialog-title" fullWidth maxWidth="md">

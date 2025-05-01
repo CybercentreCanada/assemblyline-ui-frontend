@@ -95,8 +95,10 @@ const WrappedWorkflowDetail = ({ id: propID = null, onClose = null }: Props) => 
             primary={t('title')}
             secondary={id}
             loading={!workflow}
-            style={{ paddingBottom: theme.spacing(2) }}
-            actions={[
+            slotProps={{
+              root: { style: { marginBottom: theme.spacing(2) } }
+            }}
+            actions={
               <>
                 <RunWorkflowAction id={id} workflow={workflow} />
                 <ShowRelatedAlertsAction id={id} workflow={workflow} />
@@ -109,7 +111,7 @@ const WrappedWorkflowDetail = ({ id: propID = null, onClose = null }: Props) => 
                 />
                 <DeleteWorkflowAction id={id} workflow={workflow} />
               </>
-            ]}
+            }
           />
 
           <Grid container spacing={2}>

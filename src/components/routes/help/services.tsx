@@ -99,7 +99,9 @@ export default function Services() {
         primary={t('title')}
         secondary={`${services.length} ${t('count')}`}
         loading={!services}
-        style={{ marginBottom: theme.spacing(4) }}
+        slotProps={{
+          root: { style: { marginBottom: theme.spacing(4) } }
+        }}
       />
 
       {services ? (

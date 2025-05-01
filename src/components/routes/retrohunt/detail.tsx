@@ -389,10 +389,12 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
 
           <PageHeader
             primary={t('header.view')}
-            secondary={retrohunt?.key}
+            secondary={() => retrohunt.key}
             loading={!retrohunt}
-            style={{ paddingBottom: theme.spacing(2) }}
-            actions={[<RetrohuntRepeat key="repeat" retrohunt={retrohunt} onRepeat={handleRepeat} />]}
+            slotProps={{
+              root: { style: { marginBottom: theme.spacing(2) } }
+            }}
+            actions={<RetrohuntRepeat key="repeat" retrohunt={retrohunt} onRepeat={handleRepeat} />}
           />
 
           {!retrohunt || retrohunt?.finished ? null : (

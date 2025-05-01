@@ -9,7 +9,6 @@ import {
   DialogContent,
   DialogTitle,
   Grid,
-  IconButton,
   MenuItem,
   Select,
   Skeleton,
@@ -28,6 +27,7 @@ import type { Signature } from 'components/models/base/signature';
 import type { Statistic } from 'components/models/base/statistic';
 import { DEFAULT_STATS } from 'components/models/base/statistic';
 import ForbiddenPage from 'components/routes/403';
+import { IconButton } from 'components/visual/Buttons/IconButton';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import Histogram from 'components/visual/Histogram';
@@ -42,7 +42,7 @@ import { yaraConfig, yaraDef } from 'helpers/yara';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TbUserX } from 'react-icons/tb';
-import { Link, useNavigate, useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
 
 loader.config({ paths: { vs: '/cdn/monaco_0.35.0/vs' } });
 
@@ -441,7 +441,9 @@ const SignatureDetail = ({
           primary={t('title')}
           secondary={`${signature?.type}_${signature?.source}_${signature?.signature_id}`}
           loading={!signature}
-          style={{ paddingBottom: theme.spacing(2) }}
+          slotProps={{
+            root: { style: { marginBottom: theme.spacing(2) } }
+          }}
           endAdornment={
             signature ? (
               <SignatureStatus
@@ -461,48 +463,36 @@ const SignatureDetail = ({
               />
             )
           }
-          actions={[
-            signature ? (
-              <>
-                {currentUser.roles.includes('submission_view') && (
-                  <Tooltip title={t('usage')}>
-                    <IconButton
-                      component={Link}
-                      style={{ color: theme.palette.action.active }}
-                      to={`/search/result/?query=result.sections.tags.file.rule.${signature.type}:${safeFieldValueURI(
-                        `${signature.source}.${signature.name}`
-                      )}`}
-                      size="large"
-                    >
-                      <YoutubeSearchedForIcon />
-                    </IconButton>
-                  </Tooltip>
-                )}
-                <ResetSignatureToSource
-                  signature={signature}
-                  onSignatureChange={value => setSignature(old => ({ ...old, ...value }))}
-                />
-                {currentUser.roles.includes('signature_manage') && (
-                  <Tooltip title={t('remove')}>
-                    <IconButton
-                      style={{
-                        color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
-                      }}
-                      onClick={handleDeleteButtonClick}
-                      size="large"
-                    >
-                      <RemoveCircleOutlineOutlinedIcon />
-                    </IconButton>
-                  </Tooltip>
-                )}
-              </>
-            ) : (
-              <>
-                <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
-                <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
-              </>
-            )
-          ]}
+          actions={
+            <>
+              <IconButton
+                loading={!signature}
+                preventRender={!currentUser.roles.includes('submission_view')}
+                size="large"
+                sx={{ color: theme.palette.action.active }}
+                to={() =>
+                  `/search/result/?query=result.sections.tags.file.rule.${signature.type}:${safeFieldValueURI(`${signature.source}.${signature.name}`)}`
+                }
+                tooltip={t('usage')}
+              >
+                <YoutubeSearchedForIcon />
+              </IconButton>
+              <ResetSignatureToSource
+                signature={signature}
+                onSignatureChange={value => setSignature(old => ({ ...old, ...value }))}
+              />
+              <IconButton
+                loading={!signature}
+                preventRender={!currentUser.roles.includes('signature_manage')}
+                size="large"
+                sx={{ color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark }}
+                tooltip={t('remove')}
+                onClick={handleDeleteButtonClick}
+              >
+                <RemoveCircleOutlineOutlinedIcon />
+              </IconButton>
+            </>
+          }
         />
 
         <Grid container alignItems="center" spacing={2.5}>

@@ -155,8 +155,10 @@ const SignaturesSearch = () => {
     <PageFullWidth margin={4}>
       <PageHeader
         primary={t('title')}
-        style={{ paddingBottom: theme.spacing(2) }}
-        actions={[
+        slotProps={{
+          root: { style: { marginBottom: theme.spacing(2) } }
+        }}
+        actions={
           currentUser.roles.includes('signature_download') && (
             <FileDownloader
               icon={<GetAppOutlinedIcon />}
@@ -164,7 +166,7 @@ const SignaturesSearch = () => {
               tooltip={t('download_desc')}
             />
           )
-        ]}
+        }
       />
 
       <PageContainer isSticky>

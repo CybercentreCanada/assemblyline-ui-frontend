@@ -271,44 +271,44 @@ export default function ServiceReview() {
       <PageHeader
         primary={t('title')}
         secondary={t('subtitle')}
-        style={{ paddingBottom: theme.spacing(2) }}
-        actionSpacing={1}
-        actions={[
+        slotProps={{
+          root: { style: { marginBottom: theme.spacing(2) } },
+          actions: { spacing: 1 }
+        }}
+        actions={
           services ? (
-            <>
-              <div
-                key="selection"
-                style={{ display: 'flex', marginBottom: theme.spacing(1), justifyContent: 'flex-end' }}
-              >
-                <FormControl size="small" fullWidth>
-                  <Select
-                    id="channel"
-                    fullWidth
-                    value={selectedService}
-                    onChange={handleServiceChange}
-                    displayEmpty
-                    variant="outlined"
-                    style={{
-                      minWidth: theme.spacing(30),
-                      color: selectedService === '' ? theme.palette.text.disabled : null
-                    }}
-                  >
-                    <MenuItem value="" disabled>
-                      {t('service.selection')}
+            <div
+              key="selection"
+              style={{ display: 'flex', marginBottom: theme.spacing(1), justifyContent: 'flex-end' }}
+            >
+              <FormControl size="small" fullWidth>
+                <Select
+                  id="channel"
+                  fullWidth
+                  value={selectedService}
+                  onChange={handleServiceChange}
+                  displayEmpty
+                  variant="outlined"
+                  style={{
+                    minWidth: theme.spacing(30),
+                    color: selectedService === '' ? theme.palette.text.disabled : null
+                  }}
+                >
+                  <MenuItem value="" disabled>
+                    {t('service.selection')}
+                  </MenuItem>
+                  {services.map((srv, id) => (
+                    <MenuItem key={id} value={srv}>
+                      {srv}
                     </MenuItem>
-                    {services.map((srv, id) => (
-                      <MenuItem key={id} value={srv}>
-                        {srv}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </div>
-            </>
+                  ))}
+                </Select>
+              </FormControl>
+            </div>
           ) : (
             <Skeleton key="selection" variant="rectangular" height={theme.spacing(5)} width={theme.spacing(30)} />
           )
-        ]}
+        }
       />
 
       {selectedService && selectedService !== '' && (

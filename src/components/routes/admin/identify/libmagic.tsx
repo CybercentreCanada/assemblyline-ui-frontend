@@ -1,9 +1,10 @@
 import Editor, { DiffEditor, loader } from '@monaco-editor/react';
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Skeleton, useTheme } from '@mui/material';
+import { Dialog, DialogActions, DialogContent, DialogTitle, Skeleton, useTheme } from '@mui/material';
 import { useAppTheme } from 'commons/components/app/hooks';
 import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import { Button } from 'components/visual/Buttons/Button';
 import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -141,33 +142,35 @@ function WrappedLibMagic({ reload, magicFile, originalMagicFile, setMagicFile })
 
       <PageHeader
         primary={t('title.magic')}
-        primaryProps={{ variant: 'h5' }}
-        style={{ marginBottom: theme.spacing(1) }}
-        actionSpacing={1}
-        actions={[
-          <Button key="reset" size="small" variant="outlined" onClick={() => reload(true, setOpen)}>
-            {t('reset')}
-          </Button>,
-          <Button
-            key="undo"
-            size="small"
-            variant="contained"
-            onClick={() => setMagicFile(originalMagicFile)}
-            disabled={magicFile === originalMagicFile}
-          >
-            {t('undo')}
-          </Button>,
-          <Button
-            key="save"
-            variant="contained"
-            size="small"
-            color="primary"
-            disabled={magicFile === originalMagicFile}
-            onClick={() => setOpen(true)}
-          >
-            {t('save')}
-          </Button>
-        ]}
+        slotProps={{
+          root: { style: { marginBottom: theme.spacing(1) } },
+          primary: { variant: 'h5' },
+          actions: { spacing: 1 }
+        }}
+        actions={
+          <>
+            <Button size="small" variant="outlined" onClick={() => reload(true, setOpen)}>
+              {t('reset')}
+            </Button>
+            <Button
+              size="small"
+              variant="contained"
+              onClick={() => setMagicFile(originalMagicFile)}
+              disabled={magicFile === originalMagicFile}
+            >
+              {t('undo')}
+            </Button>
+            <Button
+              variant="contained"
+              size="small"
+              color="primary"
+              disabled={magicFile === originalMagicFile}
+              onClick={() => setOpen(true)}
+            >
+              {t('save')}
+            </Button>
+          </>
+        }
       />
 
       <div

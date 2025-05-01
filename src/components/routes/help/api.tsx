@@ -149,9 +149,11 @@ export default function ApiDoc() {
       <div style={{ textAlign: 'left' }}>
         <PageHeader
           primary={t('title')}
-          style={{ marginBottom: theme.spacing(4), textAlign: 'left' }}
-          actionSpacing={1}
-          actions={[
+          slotProps={{
+            root: { style: { marginBottom: theme.spacing(4) } },
+            actions: { spacing: 1 }
+          }}
+          actions={
             apiList && apiSelected ? (
               <FormControl size="small">
                 <Select
@@ -170,7 +172,7 @@ export default function ApiDoc() {
             ) : (
               <Skeleton variant="rectangular" style={{ display: 'inline-block', height: '2rem', width: '14rem' }} />
             )
-          ]}
+          }
         />
 
         {apiDefinition ? (

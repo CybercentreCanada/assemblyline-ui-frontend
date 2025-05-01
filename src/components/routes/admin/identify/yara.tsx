@@ -100,33 +100,37 @@ function WrappedYara({ reload, yaraFile, originalYaraFile, setYaraFile }) {
 
       <PageHeader
         primary={t('title.patterns')}
-        primaryProps={{ variant: 'h5' }}
-        style={{ marginBottom: theme.spacing(1) }}
-        actionSpacing={1}
-        actions={[
-          <Button key="reset" size="small" variant="outlined" onClick={() => reload(true, setOpen)}>
-            {t('reset')}
-          </Button>,
-          <Button
-            key="undo"
-            size="small"
-            variant="contained"
-            onClick={() => setYaraFile(originalYaraFile)}
-            disabled={yaraFile === originalYaraFile}
-          >
-            {t('undo')}
-          </Button>,
-          <Button
-            key="save"
-            size="small"
-            variant="contained"
-            color="primary"
-            disabled={yaraFile === originalYaraFile}
-            onClick={() => setOpen(true)}
-          >
-            {t('save')}
-          </Button>
-        ]}
+        slotProps={{
+          root: { style: { marginBottom: theme.spacing(1) } },
+          primary: { variant: 'h5' },
+          actions: { spacing: 1 }
+        }}
+        actions={
+          <>
+            <Button key="reset" size="small" variant="outlined" onClick={() => reload(true, setOpen)}>
+              {t('reset')}
+            </Button>
+            <Button
+              key="undo"
+              size="small"
+              variant="contained"
+              onClick={() => setYaraFile(originalYaraFile)}
+              disabled={yaraFile === originalYaraFile}
+            >
+              {t('undo')}
+            </Button>
+            <Button
+              key="save"
+              size="small"
+              variant="contained"
+              color="primary"
+              disabled={yaraFile === originalYaraFile}
+              onClick={() => setOpen(true)}
+            >
+              {t('save')}
+            </Button>
+          </>
+        }
       />
 
       <div

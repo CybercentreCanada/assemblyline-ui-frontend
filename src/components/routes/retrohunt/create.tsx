@@ -170,9 +170,8 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = () => nu
 
             <PageHeader
               primary={t('header.add')}
-              actions={[
+              actions={
                 <Button
-                  key="add"
                   variant="contained"
                   color="primary"
                   disabled={isButtonLoading || !retrohunt?.description || !retrohunt?.yara_signature}
@@ -181,7 +180,7 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = () => nu
                   {t('add.button')}
                   {isButtonLoading && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
                 </Button>
-              ]}
+              }
             />
 
             <Grid>

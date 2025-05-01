@@ -2,7 +2,7 @@ import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOu
 import BlockOutlinedIcon from '@mui/icons-material/BlockOutlined';
 import LabelOutlinedIcon from '@mui/icons-material/LabelOutlined';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
-import { Grid, IconButton, Tooltip, useTheme } from '@mui/material';
+import { useTheme } from '@mui/material';
 import { useAppUser } from 'commons/components/app/hooks';
 import PageContainer from 'commons/components/pages/PageContainer';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
@@ -16,6 +16,7 @@ import type { CustomUser } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
 import BadlistNew from 'components/routes/manage/badlist_add';
 import BadlistDetail from 'components/routes/manage/badlist_detail';
+import { IconButton } from 'components/visual/Buttons/IconButton';
 import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import SearchHeader from 'components/visual/SearchBar/SearchHeader';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
@@ -102,24 +103,20 @@ const BadlistSearch = () => {
     <PageFullWidth margin={4}>
       <PageHeader
         primary={t('title')}
-        style={{ marginBottom: theme.spacing(4) }}
-        actions={[
-          currentUser.roles.includes('badlist_manage') && (
-            <Grid key="add" size={{ xs: 'grow' }} style={{ textAlign: 'right', flexGrow: 0 }}>
-              <Tooltip title={t('add_badlist')}>
-                <IconButton
-                  style={{
-                    color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark
-                  }}
-                  onClick={() => navigate(`${location.pathname}${location.search || ''}#new`)}
-                  size="large"
-                >
-                  <AddCircleOutlineOutlinedIcon />
-                </IconButton>
-              </Tooltip>
-            </Grid>
-          )
-        ]}
+        slotProps={{
+          root: { style: { marginBottom: theme.spacing(4) } }
+        }}
+        actions={
+          <IconButton
+            tooltip={t('add_badlist')}
+            preventRender={!currentUser.roles.includes('badlist_manage')}
+            size="large"
+            sx={{ color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark }}
+            onClick={() => navigate(`${location.pathname}${location.search || ''}#new`)}
+          >
+            <AddCircleOutlineOutlinedIcon />
+          </IconButton>
+        }
       />
 
       <PageContainer isSticky>

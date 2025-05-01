@@ -236,8 +236,10 @@ const WrappedWorkflowCreate = ({ id: propID = null, onClose = () => null }: Prop
           primary={t(id ? 'edit.title' : 'add.title')}
           secondary={id}
           loading={!workflow}
-          style={{ paddingBottom: theme.spacing(2), textAlign: 'left' }}
-          actions={[
+          slotProps={{
+            root: { style: { marginBottom: theme.spacing(2) } }
+          }}
+          actions={
             <>
               {id ? (
                 <>
@@ -285,7 +287,7 @@ const WrappedWorkflowCreate = ({ id: propID = null, onClose = () => null }: Prop
                 </Tooltip>
               )}
             </>
-          ]}
+          }
         />
 
         <Grid container spacing={2} textAlign="start">
