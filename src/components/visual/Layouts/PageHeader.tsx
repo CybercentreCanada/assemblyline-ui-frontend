@@ -48,7 +48,10 @@ export const PageHeader: React.FC<PageHeaderProps> = React.memo(
     const appBarHeight = useAppBarHeight();
     const { c12nDef } = useALContext();
 
-    const barWillHide = useMemo(() => layout.current !== 'top' && appbar.autoHide, [appbar.autoHide, layout]);
+    const barWillHide = useMemo(
+      () => (layout?.current !== 'top' ? appbar?.autoHide : null),
+      [appbar?.autoHide, layout]
+    );
 
     const isDown = useMediaQuery(theme.breakpoints.down('md'));
 
