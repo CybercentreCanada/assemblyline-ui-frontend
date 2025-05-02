@@ -32,7 +32,7 @@ type Props = {
 const WrappedMetaSection: React.FC<Props> = ({ metadata, classification }) => {
   const { t } = useTranslation(['submissionDetail']);
   const theme = useTheme();
-  const { configuration } = useALContext();
+  const { user: currentUser, configuration } = useALContext();
   const [metaOpen, setMetaOpen] = useState(false);
 
   return !metadata || Object.keys(metadata).length !== 0 ? (
@@ -150,6 +150,7 @@ const WrappedMetaSection: React.FC<Props> = ({ metadata, classification }) => {
               fetcherId="eml-preview.preview"
               type="eml_id"
               value={metadata?.eml_path}
+              classification={currentUser.classification}
               slotProps={{ paper: { style: { maxWidth: '128px', minWidth: '128px', maxHeight: '128px' } } }}
             />
           </div>
