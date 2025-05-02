@@ -1,7 +1,7 @@
 import type { ButtonProps, IconButtonProps } from '@mui/material';
 import { AppBar, Button, IconButton, Toolbar, Tooltip, useTheme } from '@mui/material';
 import { useAppBar, useAppBarHeight, useAppLayout } from 'commons/components/app/hooks';
-import { memo } from 'react';
+import { memo, useMemo } from 'react';
 
 export type PageHeaderAction = {
   key?: string;
@@ -40,7 +40,8 @@ const PageContainer: React.FC<PageHeaderProps> = ({
   const layout = useAppLayout();
   const appbar = useAppBar();
   const appBarHeight = useAppBarHeight();
-  const barWillHide = layout.current !== 'top' && appbar.autoHide;
+
+  const barWillHide = useMemo(() => (layout?.current !== 'top' ? appbar?.autoHide : null), [appbar?.autoHide, layout]);
 
   return (
     <AppBar
