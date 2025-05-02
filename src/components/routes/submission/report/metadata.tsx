@@ -54,7 +54,7 @@ type Props = {
 
 function WrappedMetadata({ report }: Props) {
   const { t } = useTranslation(['submissionReport']);
-  const { configuration } = useALContext();
+  const { user: currentUser, configuration } = useALContext();
   const theme = useTheme();
   const classes = useStyles();
   const [metaOpen, setMetaOpen] = useState(false);
@@ -176,6 +176,7 @@ function WrappedMetadata({ report }: Props) {
                 fetcherId="eml-preview.preview"
                 type="eml_id"
                 value={report?.metadata?.eml_path}
+                classification={currentUser.classification}
                 slotProps={{ paper: { style: { maxWidth: '128px', minWidth: '128px', maxHeight: '128px' } } }}
               />
             </div>

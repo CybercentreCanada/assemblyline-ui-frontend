@@ -565,6 +565,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                       fetcherId="eml-preview.preview"
                       type="eml_id"
                       value={alert?.metadata?.eml_path}
+                      classification={currentUser.classification}
                       slotProps={{ paper: { style: { maxWidth: '128px', minWidth: '128px', maxHeight: '128px' } } }}
                     />
                   </div>
