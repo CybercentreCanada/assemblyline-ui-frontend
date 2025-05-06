@@ -131,7 +131,7 @@ export function humanReadableNumber(num: number | null) {
 export function resetFavicon() {
   const favicon: HTMLLinkElement = document.querySelector('#favicon');
   // TODO: remove query test
-  favicon.href = `/favicon.ico?query=test`;
+  favicon.href = `/favicon.ico`;
 }
 
 /**
@@ -144,7 +144,7 @@ export function resetFavicon() {
 export function setNotifyFavicon() {
   const favicon: HTMLLinkElement = document.querySelector('#favicon');
   // TODO: remove query test
-  favicon.href = `/favicon_done.ico?query=test`;
+  favicon.href = `/favicon_done.ico`;
 }
 
 /**
