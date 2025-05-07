@@ -81,7 +81,7 @@ export const HeaderSection = React.memo(() => {
           <PageHeader
             primary={
               !tab
-                ? null
+                ? t('profile.interface')
                 : tab === 'interface'
                   ? t('profile.interface')
                   : tab === 'default'

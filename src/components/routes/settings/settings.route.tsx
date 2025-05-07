@@ -50,14 +50,6 @@ const WrappedSettingsRoute = () => {
 
   useEffect(() => {
     if (tabParam === form.getFieldValue('state.tab')) return;
-    const nextTab = ['interface', ...Object.keys(settings.submission_profiles)].includes(tabParam)
-      ? tabParam
-      : 'interface';
-    navigate(`/settings/${nextTab}`);
-  }, [form, navigate, settings.submission_profiles, tabParam]);
-
-  useEffect(() => {
-    if (tabParam === form.getFieldValue('state.tab')) return;
     form.setFieldValue('state.tab', tabParam);
     handleProfileChange();
   }, [form, handleProfileChange, tabParam]);
