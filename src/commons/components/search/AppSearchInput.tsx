@@ -10,14 +10,19 @@ import {
   Tooltip
 } from '@mui/material';
 
+import type { CSSProperties } from 'react';
 import { memo, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 type AppSearchInputProps = {
   searching?: boolean;
   provided?: boolean;
+  focused?: boolean;
   showToggle?: boolean;
+  showClear?: boolean;
   open?: boolean;
+  minWidth?: CSSProperties['minWidth'];
+  maxWidth?: CSSProperties['maxWidth'];
   onClear: () => void;
   onToggleFullscreen: () => void;
 } & InputBaseProps;
@@ -25,10 +30,15 @@ type AppSearchInputProps = {
 const AppSearchInput = ({
   searching,
   provided,
+  focused,
   autoFocus,
   showToggle,
+  showClear,
   value,
   open,
+  maxWidth = '100%',
+  minWidth = '100%',
+  onBlur,
   onClear,
   onToggleFullscreen,
   onFocus,
@@ -50,7 +60,7 @@ const AppSearchInput = ({
   }, [open, provided, onToggleFullscreen]);
 
   return (
-    <Stack direction="row" ref={rootRef}>
+    <Stack direction="row" justifyContent="flex-end" flexGrow={2} ref={rootRef}>
       <InputBase
         {...inputProps}
         fullWidth
@@ -58,6 +68,7 @@ const AppSearchInput = ({
         // eslint-disable-next-line jsx-a11y/no-autofocus
         autoFocus={autoFocus}
         value={value}
+        onBlur={onBlur}
         onFocus={onFocus}
         onChange={onChange}
         onKeyDown={onKeyDown}
@@ -70,29 +81,34 @@ const AppSearchInput = ({
         }
         endAdornment={
           <InputAdornment position="end" sx={theme => ({ color: theme.palette.text.disabled })}>
-            {showToggle && (
+            {showToggle && !focused && (
               <Tooltip title={t(open && provided ? 'app.search.fullscreen' : 'app.search.shortcut')}>
-                <Button size="small" color="inherit" onClick={onToggleClick}>
+                <Button
+                  size="small"
+                  color="inherit"
+                  onClick={onToggleClick}
+                  sx={{ fontSize: 'small', marginRight: '8px', padding: 0, minWidth: 'auto' }}
+                >
                   CTRL+K
                 </Button>
               </Tooltip>
             )}
-            <IconButton color="inherit" onClick={onClear}>
-              <Clear />
-            </IconButton>
+            {showClear && (
+              <IconButton color="inherit" onClick={onClear} disabled={!value}>
+                <Clear />
+              </IconButton>
+            )}
           </InputAdornment>
         }
         sx={theme => ({
           color: theme.palette.text.secondary,
-          width: '100%',
           paddingTop: 0.5,
           paddingBottom: 0.5,
           paddingLeft: 1.5,
           paddingRight: 1,
-          borderTopLeftRadius: theme.spacing(0.5),
-          borderTopRightRadius: theme.spacing(0.5),
-          borderBottomLeftRadius: open ? 0 : theme.spacing(0.5),
-          borderBottomRightRadius: open ? 0 : theme.spacing(0.5)
+          maxWidth: maxWidth,
+          minWidth: minWidth,
+          borderRadius: theme.spacing(0.5)
         })}
       />
     </Stack>

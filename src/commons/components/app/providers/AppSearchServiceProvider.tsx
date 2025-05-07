@@ -1,5 +1,3 @@
-import { type ReactElement, useMemo, useState } from 'react';
-import { useNavigate } from 'react-router';
 import {
   AppSearchServiceContext,
   type AppSearchServiceContextType,
@@ -7,6 +5,8 @@ import {
 } from 'commons/components/app/AppContexts';
 import type { AppSearchService } from 'commons/components/app/AppSearchService';
 import { useAppConfigs } from 'commons/components/app/hooks';
+import { type ReactElement, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router';
 
 const DEFAULT_CONTEXT: AppSearchServiceContextType = {
   provided: false,
@@ -18,6 +18,8 @@ const DEFAULT_CONTEXT: AppSearchServiceContextType = {
     menu: false,
     mode: 'inline',
     items: null,
+    autoReset: true,
+    focused: false,
     set: () => null
   }
 };

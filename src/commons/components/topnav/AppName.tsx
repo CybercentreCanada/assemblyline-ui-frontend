@@ -28,6 +28,7 @@ const AppName = ({ noName }: { noName?: boolean }) => {
   const configs = useAppConfigs();
   const leftnav = useAppLeftNav();
   const isXs = useMediaQuery(theme.breakpoints.only('xs'));
+
   if (isXs) {
     return (
       <StyledTitle style={{ paddingLeft: theme.spacing(2) }}>
@@ -36,7 +37,7 @@ const AppName = ({ noName }: { noName?: boolean }) => {
             <Menu />
           </IconButton>
         </StyledIcon>
-        <div>{!noName ? appBrandName : configs.preferences.appName}</div>
+        <div>{noName ? appBrandName : configs.preferences.appName}</div>
       </StyledTitle>
     );
   }

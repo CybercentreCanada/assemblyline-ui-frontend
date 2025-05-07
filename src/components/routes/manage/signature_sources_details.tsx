@@ -382,7 +382,7 @@ const WrappedSourceDetail = ({
                         />
                       </Grid>
                     )}
-                    <Grid size={{ xs: 12, md: 6 }} style={{ paddingTop: theme.spacing(1) }}>
+                    <Grid size={{ xs: 12, md: 6 }}>
                       <Label>
                         {t('username')}
                         <ResetButton service={source} defaults={defaults} field="username" reset={resetField} />

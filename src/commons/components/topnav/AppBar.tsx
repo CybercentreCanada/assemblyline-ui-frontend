@@ -124,7 +124,7 @@ const AppBar = () => {
         }}
       >
         {renderLeft()}
-        <div style={{ flex: 1 }} />
+        {showSpacer && <div style={{ flex: 1 }} />}
         {rightBeforeSearch}
         {quicksearch.show && <AppSearch />}
         {right}

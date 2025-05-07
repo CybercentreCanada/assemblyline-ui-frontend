@@ -48,8 +48,8 @@ importers:
         specifier: ^5.69.0
         version: 5.74.3
       '@tanstack/react-form':
-        specifier: ^1.0.5
-        version: 1.3.3(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+        specifier: ^1.9.1
+        version: 1.9.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@tanstack/react-query':
         specifier: ^5.69.0
         version: 5.74.3(react@19.1.0)
@@ -1462,8 +1462,8 @@ packages:
     peerDependencies:
       eslint: ^8.57.0 || ^9.0.0
 
-  '@tanstack/form-core@1.3.2':
-    resolution: {integrity: sha512-hqRLw9EJ8bLJ5zvorGgTI4INcKh1hAtjPRTslwdB529soP8LpguzqWhn7yVV5/c2GcMSlqmpy5NZarkF5Mf54A==}
+  '@tanstack/form-core@1.9.1':
+    resolution: {integrity: sha512-v/bz3UB7EHfxDUkzGZm44NhlbRqR8x26xozTIWR/0UfuQBtp6CDGIL/kQArWIrKkWV2zX2KZ7vR9XTsNdzHMgQ==}
 
   '@tanstack/query-core@5.74.3':
     resolution: {integrity: sha512-Mqk+5o3qTuAiZML248XpNH8r2cOzl15+LTbUsZQEwvSvn1GU4VQhvqzAbil36p+MBxpr/58oBSnRzhrBevDhfg==}
@@ -1477,8 +1477,8 @@ packages:
   '@tanstack/query-sync-storage-persister@5.74.3':
     resolution: {integrity: sha512-XqgMr5mfR5oaT8+b9xq3R0T2jn+Uo12mmGIrRYPn3IH0xIU07I4f0TqY91iLChnBFw5niRYjd2mqTgBBOKzd0A==}
 
-  '@tanstack/react-form@1.3.3':
-    resolution: {integrity: sha512-rjZU6ufaQYbZU9I0uIXUJ1CPQ9M/LFyfpbsgA4oqpX/lLoiCFYsV7tZYVlWMMHkpSr1hhmAywp/8rmCFt14lnw==}
+  '@tanstack/react-form@1.9.1':
+    resolution: {integrity: sha512-DGJXpAGoCVJUsuzFqtvuBNre86tr53QQsJxK1IivckYsqz8jOZCQfGYudnqoiPeC0azQPgTp1ezifxdslSrHbw==}
     peerDependencies:
       '@tanstack/react-start': ^1.112.0
       react: ^17.0.0 || ^18.0.0 || ^19.0.0
@@ -6193,7 +6193,7 @@ snapshots:
       - supports-color
       - typescript
 
-  '@tanstack/form-core@1.3.2':
+  '@tanstack/form-core@1.9.1':
     dependencies:
       '@tanstack/store': 0.7.0
 
@@ -6210,9 +6210,9 @@ snapshots:
       '@tanstack/query-core': 5.74.3
       '@tanstack/query-persist-client-core': 5.74.3
 
-  '@tanstack/react-form@1.3.3(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
+  '@tanstack/react-form@1.9.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
     dependencies:
-      '@tanstack/form-core': 1.3.2
+      '@tanstack/form-core': 1.9.1
       '@tanstack/react-store': 0.7.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       decode-formdata: 0.9.0
       devalue: 5.1.1

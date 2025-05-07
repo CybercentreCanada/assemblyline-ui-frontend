@@ -35,7 +35,7 @@ export const { FormProvider, useForm } = createFormContext<SettingsStore>({
       disabled: false,
       loading: false,
       submitting: false,
-      tab: null
+      tab: 'interface'
     },
     settings: null,
     user: null
