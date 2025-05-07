@@ -84,10 +84,8 @@ export default function AppSearch() {
       if (isCtrl && key === 'k') {
         event.preventDefault();
         const inputRef = menuRef.current.querySelector('input');
-        if (provided && !inputRef) {
-          state.set({ ...state, menu: !state.menu, mode: 'fullscreen' });
-        } else if (provided && state.menu) {
-          state.set({ ...state, mode: 'fullscreen' });
+        if (!inputRef || isPhoneMode) {
+          state.set({ ...state, menu: state.menu || isPhoneMode, mode: 'fullscreen' });
         } else {
           inputRef.focus();
         }
@@ -97,12 +95,16 @@ export default function AppSearch() {
     return () => {
       window.removeEventListener('keydown', keyHandler);
     };
-  }, [provided, state]);
+  }, [provided, isPhoneMode, state]);
 
   // Search input focus handler.
   const onFocus = useCallback(() => {
-    // state.setMenu(!!state?.items && state.items.length > 0);
-    state.set({ ...state, menu: true });
+    state.set({ ...state, menu: true, focused: true });
+  }, [state]);
+
+  // Search input focus handler.
+  const onBlur = useCallback(() => {
+    state.set({ ...state, focused: false });
   }, [state]);
 
   // Search input change handler.
@@ -119,7 +121,18 @@ export default function AppSearch() {
   // keyboard[ENTER] handler.
   const onEnter = useCallback(() => {
     if (service.onEnter) {
-      state.set({ ...state, menu: true });
+      if (state.autoReset) {
+        const inputRef = menuRef.current.querySelector('input');
+        let newFocus = true;
+        if (inputRef) {
+          inputRef.blur();
+          newFocus = false;
+        }
+        state.set({ ...state, menu: false, mode: 'inline', focused: newFocus });
+        setValue('');
+      } else {
+        state.set({ ...state, menu: true });
+      }
       service.onEnter(value, state);
     }
   }, [value, state, service]);
@@ -127,11 +140,12 @@ export default function AppSearch() {
   // Keyboard handler.
   const onKeyDown = useCallback(
     (event: KeyboardEvent<HTMLElement>) => {
-      const { isEnter, isEscape, isArrowDown } = parseEvent(event);
+      const { isEnter, isEscape, isTab, isArrowDown } = parseEvent(event);
       if (isEnter) {
         onEnter();
-      } else if (isEscape) {
-        state.set({ ...state, menu: !state.menu });
+      } else if (isEscape || isTab) {
+        setTimeout(() => menuRef.current.querySelector('input')?.blur(), 50);
+        state.set({ ...state, menu: false });
       } else if (isArrowDown) {
         const result = document.querySelector('[data-tui-id="tui-app-search-result"]') as HTMLElement;
         if (result) {
@@ -154,8 +168,12 @@ export default function AppSearch() {
 
   // Fullscreen modal toggle handler.
   const onToggleFullscreen = useCallback(() => {
-    state.set({ ...state, mode: state.mode === 'inline' ? 'fullscreen' : 'inline' });
-  }, [state]);
+    state.set({
+      ...state,
+      menu: state.menu || isPhoneMode,
+      mode: state.mode === 'inline' ? 'fullscreen' : 'inline'
+    });
+  }, [isPhoneMode, state]);
 
   return (
     <ClickAwayListener onClickAway={() => state.set({ ...state, menu: false })}>
@@ -183,6 +201,8 @@ export default function AppSearch() {
         ) : (
           <>
             <AppSearchInput
+              autoFocus={false}
+              focused={state.focused}
               showToggle
               provided={provided}
               className="app-search-input"
@@ -190,6 +210,7 @@ export default function AppSearch() {
               searching={state.searching}
               open={state.menu}
               onFocus={onFocus}
+              onBlur={onBlur}
               onChange={onChange}
               onKeyDown={onKeyDown}
               onClear={onClear}
@@ -226,8 +247,7 @@ export default function AppSearch() {
           }}
           PaperProps={{
             sx: {
-              borderTopLeftRadius: 0,
-              borderTopRightRadius: 0,
+              borderRadius: 0,
               margin: 0,
               width: '100%'
             }
@@ -241,6 +261,7 @@ export default function AppSearch() {
             <AppSearchInput
               // eslint-disable-next-line jsx-a11y/no-autofocus
               autoFocus
+              focused={state.focused}
               className="app-search-input"
               style={{ backgroundColor: emphasize(theme.palette.background.default, 0.1) }}
               showToggle={false}
@@ -248,6 +269,7 @@ export default function AppSearch() {
               searching={state.searching}
               open={false}
               onFocus={onFocus}
+              onBlur={onBlur}
               onChange={onChange}
               onKeyDown={onKeyDown}
               onClear={onClear}
