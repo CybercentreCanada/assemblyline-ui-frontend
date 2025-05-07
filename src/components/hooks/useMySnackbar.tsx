@@ -59,8 +59,9 @@ export default function useMySnackbar() {
       showErrorMessage,
       showWarningMessage,
       showSuccessMessage,
-      showInfoMessage
+      showInfoMessage,
+      closeSnackbar
     }),
-    [showErrorMessage, showInfoMessage, showSuccessMessage, showWarningMessage]
+    [closeSnackbar, showErrorMessage, showInfoMessage, showSuccessMessage, showWarningMessage]
   );
 }
