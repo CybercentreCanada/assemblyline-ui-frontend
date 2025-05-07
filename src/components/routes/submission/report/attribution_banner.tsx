@@ -101,17 +101,13 @@ export function WrappedAttributionBanner({ report }: Props) {
       }}
     >
       <Grid container alignItems="center" justifyContent="center">
-        <Grid
-          className="no-print"
-          size={{ xs: 'grow' }}
-          style={{ color: textColor, display: isXS ? 'none' : 'inherit' }}
-        >
+        <Grid className="no-print" style={{ color: textColor, display: isXS ? 'none' : 'inherit' }}>
           {icon}
         </Grid>
-        <Grid className="print-only" size={{ xs: 'grow' }} style={{ color: textColor }}>
+        <Grid className="print-only" style={{ color: textColor }}>
           {icon}
         </Grid>
-        <Grid size={{ xs: 'grow' }} style={{ flexGrow: 10 }}>
+        <Grid style={{ flexGrow: 10 }}>
           <Box
             sx={{
               fontWeight: 500,
@@ -183,7 +179,6 @@ export function WrappedAttributionBanner({ report }: Props) {
           </table>
         </Grid>
         <Grid
-          size={{ xs: 'grow' }}
           style={{ color: textColor, marginLeft: theme.spacing(1), marginRight: theme.spacing(1), minHeight: '100px' }}
         >
           {report ? (
