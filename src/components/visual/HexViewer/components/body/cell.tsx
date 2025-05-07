@@ -38,6 +38,7 @@ export const WrappedHexCell = ({
         width: type === 'hex' ? LAYOUT_SIZE.hexWidth : LAYOUT_SIZE.textWidth,
         paddingLeft: theme.spacing(0.2),
         paddingRight: theme.spacing(0.2),
+        fontSize: '16px',
         fontWeight: theme.palette.mode === 'dark' ? 400 : 600,
         userSelect: 'none',
         ...(Tag === 'div' && { display: 'block' }),
