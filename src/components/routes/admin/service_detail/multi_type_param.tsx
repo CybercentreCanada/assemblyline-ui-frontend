@@ -136,7 +136,7 @@ const WrappedMultiTypeParam = <T extends 'bool' | 'int' | 'str' | 'list'>({
           </div>
         }
         // Render labels to show what are options to the user and what is selected by default
-        style={{ marginRight: theme.spacing(0.5) }}
+
         onClick={() => onUpdate({ ...param, default: value, value } as ServiceParameter, id)}
         onDelete={() =>
           handleSubmissionParamListUpdate(
@@ -163,7 +163,7 @@ const WrappedMultiTypeParam = <T extends 'bool' | 'int' | 'str' | 'list'>({
           </div>
         }
         // Render labels to show what are options to the user and what is selected by default
-        style={{ marginRight: theme.spacing(0.5) }}
+
         onClick={() => setTempUserParams({ ...tempUserParams, default: value, value } as ServiceParameter)}
         onDelete={() =>
           handleSPListChange(
@@ -214,6 +214,11 @@ const WrappedMultiTypeParam = <T extends 'bool' | 'int' | 'str' | 'list'>({
             onChange={(event, value, reason) => handleSubmissionParamListUpdate(value as string[])}
             renderTags={(value, getTagProps, ownerState) => renderParamLabelTags(value)}
             value={param.list}
+            sx={{
+              '& .MuiInputBase-root': {
+                gap: theme.spacing(0.5)
+              }
+            }}
           />
         ) : (
           <TextField
@@ -296,6 +301,11 @@ const WrappedMultiTypeParam = <T extends 'bool' | 'int' | 'str' | 'list'>({
             renderInput={params => <TextField {...params}></TextField>}
             renderTags={(value, getTagProps, ownerState) => renderSPLabelTags(value)}
             onChange={(event, value, reason) => handleSPListChange(value as string[])}
+            sx={{
+              '& .MuiInputBase-root': {
+                gap: theme.spacing(0.5)
+              }
+            }}
           />
         ) : (
           <TextField
@@ -310,7 +320,7 @@ const WrappedMultiTypeParam = <T extends 'bool' | 'int' | 'str' | 'list'>({
           />
         )}
       </Grid>
-      <Grid size={{ xs: 2, sm: 1 }} style={{ height: theme.spacing(8) }}>
+      <Grid size={{ xs: 2, sm: 1 }}>
         {tempUserParams.name !== '' && (
           <Tooltip title={t('params.user.add')}>
             <IconButton

@@ -277,7 +277,7 @@ const WrappedMultiTypeConfig = ({
           />
         )}
       </Grid>
-      <Grid size={{ xs: 2, sm: 1 }} style={{ height: theme.spacing(8) }}>
+      <Grid size={{ xs: 2, sm: 1 }}>
         {tempConfig.name !== '' && (
           <Tooltip title={t('params.user.add')}>
             <IconButton

@@ -122,7 +122,7 @@ const WrappedEnvironment = ({
           style={{ margin: 0 }}
         />
       </Grid>
-      <Grid size={{ xs: 2, sm: 1 }} style={{ height: theme.spacing(8) }}>
+      <Grid size={{ xs: 2, sm: 1 }}>
         {tempEnvVar.name !== '' && tempEnvVar.value !== '' && (
           <Tooltip title={t('params.user.add')}>
             <IconButton
@@ -259,7 +259,7 @@ const WrappedVolumeControl = ({
           style={{ margin: 0 }}
         />
       </Grid>
-      <Grid size={{ xs: 2, sm: 1 }} style={{ height: theme.spacing(8) }}>
+      <Grid size={{ xs: 2, sm: 1 }}>
         {tempName !== '' && tempVol.capacity !== '' && tempVol.mount_path !== '' && tempVol.storage_class !== '' && (
           <Tooltip title={t('params.user.add')}>
             <IconButton
@@ -528,7 +528,7 @@ const WrappedContainerDialog = ({
                 />
               </Typography>
               <Grid container spacing={1}>
-                <Grid size={{ xs: 12, md: 6 }}>
+                <Grid size={{ xs: 12, sm: 6, md: 6 }}>
                   <TextField
                     fullWidth
                     type="number"
@@ -539,7 +539,7 @@ const WrappedContainerDialog = ({
                     value={tempContainer.ram_mb_min}
                   />
                 </Grid>
-                <Grid size={{ xs: 12, md: 6 }}>
+                <Grid size={{ xs: 12, sm: 6, md: 6 }}>
                   <TextField
                     fullWidth
                     type="number"
