@@ -195,7 +195,7 @@ const WrappedAddUserPage = () => {
                 value={newUser.name}
               />
             </Grid>
-            <Grid size={{ xs: 12, md: 6 }}>
+            <Grid size={{ xs: 12 }}>
               <Typography variant="caption">{t('newuser.groups')}</Typography>
               <Autocomplete
                 sx={{ display: 'block', margin: theme.spacing(2, 0) }}
