@@ -1,5 +1,5 @@
 import type { TypographyProps } from '@mui/material';
-import { Skeleton, Typography, useMediaQuery, useTheme } from '@mui/material';
+import { Skeleton, Typography, useTheme } from '@mui/material';
 import { useAppBar, useAppBarHeight, useAppLayout } from 'commons/components/app/hooks';
 import useALContext from 'components/hooks/useALContext';
 import type { ClassificationProps } from 'components/visual/Classification';
@@ -53,8 +53,6 @@ export const PageHeader: React.FC<PageHeaderProps> = React.memo(
       [appbar?.autoHide, layout]
     );
 
-    const isDown = useMediaQuery(theme.breakpoints.down('md'));
-
     const {
       root: rootProps,
       classification: classificationProps,
@@ -92,10 +90,7 @@ export const PageHeader: React.FC<PageHeaderProps> = React.memo(
             flexDirection: 'row',
             flexWrap: 'wrap',
             alignContent: 'flex-start',
-            rowGap: theme.spacing(1),
-            ...(isDown && {
-              flexDirection: 'column'
-            })
+            rowGap: theme.spacing(1)
           }}
         >
           <div
