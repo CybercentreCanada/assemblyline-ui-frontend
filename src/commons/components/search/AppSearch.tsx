@@ -29,7 +29,7 @@ const AppSearchRoot = styled(Box, { shouldForwardProp: prop => prop !== 'menuOpe
   theme,
   menuOpen
 }) => {
-  const backgroundColor = emphasize(theme.palette.background.default, 0.1);
+  const backgroundColor = emphasize(theme.palette.background.default, theme.palette.mode === 'dark' ? 0.1 : 0.033);
   return {
     position: 'relative',
     borderRadius: theme.shape.borderRadius,
@@ -63,11 +63,11 @@ const ModalTransition = forwardRef(function Transition(props: any, ref: any) {
 export default function AppSearch() {
   const theme = useTheme();
   const menuRef = useRef<HTMLDivElement>(null);
-  const showSearchIcon = useMediaQuery(theme.breakpoints.down('lg'));
+  const isPhoneMode = useMediaQuery(theme.breakpoints.only('xs'));
+  const isTabletMode = useMediaQuery(theme.breakpoints.only('sm'));
   const { t } = useTranslation();
   const { provided, state, service } = useAppSearchService();
   const [value, setValue] = useState<string>('');
-  // const [fullscreen, setFullscreen] = useState<boolean>(false);
 
   useEffect(() => {
     if (service.onMounted) {
@@ -159,8 +159,12 @@ export default function AppSearch() {
 
   return (
     <ClickAwayListener onClickAway={() => state.set({ ...state, menu: false })}>
-      <AppSearchRoot ref={menuRef} sx={{ mr: showSearchIcon ? 0 : 1 }} menuOpen={state.menu}>
-        {showSearchIcon ? (
+      <AppSearchRoot
+        ref={menuRef}
+        sx={{ mr: isPhoneMode ? 0 : 1, display: 'flex', flexGrow: 1, justifyContent: 'flex-end' }}
+        menuOpen={state.menu}
+      >
+        {isPhoneMode ? (
           <IconButton
             color="inherit"
             size="large"
@@ -190,6 +194,8 @@ export default function AppSearch() {
               onKeyDown={onKeyDown}
               onClear={onClear}
               onToggleFullscreen={onToggleFullscreen}
+              minWidth={isTabletMode ? '100%' : '250px'}
+              maxWidth={isTabletMode ? '100%' : '350px'}
             />
             {provided && (
               <Popper
@@ -227,7 +233,11 @@ export default function AppSearch() {
             }
           }}
         >
-          <DialogTitle>
+          <DialogTitle
+            sx={{
+              padding: theme.spacing(1, 1.5)
+            }}
+          >
             <AppSearchInput
               // eslint-disable-next-line jsx-a11y/no-autofocus
               autoFocus

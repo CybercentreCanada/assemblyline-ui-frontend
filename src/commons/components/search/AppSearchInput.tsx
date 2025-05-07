@@ -10,6 +10,7 @@ import {
   Tooltip
 } from '@mui/material';
 
+import type { CSSProperties } from 'react';
 import { memo, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -18,6 +19,8 @@ type AppSearchInputProps = {
   provided?: boolean;
   showToggle?: boolean;
   open?: boolean;
+  minWidth?: CSSProperties['minWidth'];
+  maxWidth?: CSSProperties['maxWidth'];
   onClear: () => void;
   onToggleFullscreen: () => void;
 } & InputBaseProps;
@@ -29,6 +32,8 @@ const AppSearchInput = ({
   showToggle,
   value,
   open,
+  maxWidth = '100%',
+  minWidth = '100%',
   onClear,
   onToggleFullscreen,
   onFocus,
@@ -50,7 +55,7 @@ const AppSearchInput = ({
   }, [open, provided, onToggleFullscreen]);
 
   return (
-    <Stack direction="row" ref={rootRef}>
+    <Stack direction="row" justifyContent="flex-end" flexGrow={2} ref={rootRef}>
       <InputBase
         {...inputProps}
         fullWidth
@@ -84,15 +89,13 @@ const AppSearchInput = ({
         }
         sx={theme => ({
           color: theme.palette.text.secondary,
-          width: '100%',
           paddingTop: 0.5,
           paddingBottom: 0.5,
           paddingLeft: 1.5,
           paddingRight: 1,
-          borderTopLeftRadius: theme.spacing(0.5),
-          borderTopRightRadius: theme.spacing(0.5),
-          borderBottomLeftRadius: open ? 0 : theme.spacing(0.5),
-          borderBottomRightRadius: open ? 0 : theme.spacing(0.5)
+          maxWidth: maxWidth,
+          minWidth: minWidth,
+          borderRadius: theme.spacing(0.5)
         })}
       />
     </Stack>

@@ -81,7 +81,7 @@ const LeftNavDrawer = () => {
   const { preferences } = useAppConfigs();
   const layout = useAppLayout();
   const leftnav = useAppLeftNav();
-  const isSmDown = useMediaQuery(theme.breakpoints.down('sm'));
+  const isSmDown = useMediaQuery(theme.breakpoints.down('md'));
   const isTopLayout = layout.current === 'top';
 
   const onCloseDrawerIfOpen = useCallback(() => {
