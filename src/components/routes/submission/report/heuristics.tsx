@@ -185,7 +185,7 @@ function WrappedHeuristics({ report }: Props) {
             )}
           </>
         ) : (
-          [...Array(3)].map((_, i) => <HeuristicsListSkel key={i} />)
+          Array.from({ length: 3 }).map((_, i) => <HeuristicsListSkel key={i} />)
         )}
       </>
     )

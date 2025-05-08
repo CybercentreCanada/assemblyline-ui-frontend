@@ -18,7 +18,7 @@ const WrappedEmptySection: React.FC<EmptySectionProps> = ({ emptys, sid, nocolla
     <SectionContainer title={t('emptys')} nocollapse={nocollapse}>
       {emptys
         ? emptys.map((result, i) => <ResultCard key={i} result={result} sid={sid} />)
-        : [...Array(2)].map((_, i) => (
+        : Array.from({ length: 2 }).map((_, i) => (
             <Skeleton
               variant="rectangular"
               key={i}

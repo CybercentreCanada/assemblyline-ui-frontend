@@ -394,7 +394,6 @@ export default function Services() {
         actions={
           <>
             <Tooltip
-              key="add"
               PopperProps={{
                 disablePortal: true
               }}
@@ -412,7 +411,6 @@ export default function Services() {
               </IconButton>
             </Tooltip>
             <Tooltip
-              key="update"
               PopperProps={{
                 disablePortal: true
               }}
@@ -437,7 +435,6 @@ export default function Services() {
               </span>
             </Tooltip>
             <Tooltip
-              key="available"
               PopperProps={{
                 disablePortal: true
               }}
@@ -465,14 +462,8 @@ export default function Services() {
                 </IconButton>
               </span>
             </Tooltip>
-            <FileDownloader
-              key="file_downloader"
-              icon={<GetAppOutlinedIcon />}
-              link="/api/v4/service/backup/"
-              tooltip={t('backup')}
-            />
+            <FileDownloader icon={<GetAppOutlinedIcon />} link="/api/v4/service/backup/" tooltip={t('backup')} />
             <Tooltip
-              key="restore"
               PopperProps={{
                 disablePortal: true
               }}

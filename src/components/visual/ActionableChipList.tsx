@@ -49,7 +49,7 @@ const ActionableChipList: React.FC<ActionableChipListProps> = ({ items, nowrap =
               />
             </li>
           ))
-        : [...Array(3)].map((k, i) => (
+        : Array.from({ length: 3 }).map((k, i) => (
             <Skeleton
               key={`chiplist-${i}`}
               variant="rectangular"

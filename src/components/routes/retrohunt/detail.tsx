@@ -97,7 +97,7 @@ const DEFAULT_QUERY: string = Object.keys(DEFAULT_PARAMS)
   .join('&');
 
 function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = false }: Props) {
-  const { t, i18n } = useTranslation(['retrohunt']);
+  const { t } = useTranslation(['retrohunt']);
   const theme = useTheme();
   const location = useLocation();
   const navigate = useNavigate();

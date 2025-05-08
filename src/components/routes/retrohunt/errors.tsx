@@ -154,6 +154,10 @@ const WrappedRetrohuntErrors = ({ retrohunt = null, isDrawer = false }: Props) =
                   shape="rounded"
                   size="small"
                   sx={{ justifyContent: 'center' }}
+                  // TODO: this might cause an issue
+                  // classes={{
+                  //   ul: classes.pagination -> { justifyContent: 'center' }
+                  // }}
                 />
               )}
             </div>
