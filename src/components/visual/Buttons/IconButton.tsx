@@ -54,7 +54,3 @@ export const IconButton: React.FC<IconButtonProps> = React.memo(
       </Tooltip>
     )
 );
-
-// <MuiIconButton sx={{ padding: 0, flexDirection: 'column' }}>
-//   <Skeleton variant="circular" sx={{ flex: 1, aspectRatio: '1 / 1' }} />
-// </MuiIconButton>

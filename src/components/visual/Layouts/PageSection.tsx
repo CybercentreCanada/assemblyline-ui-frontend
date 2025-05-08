@@ -24,26 +24,26 @@ const ExpandMore = styled(({ expand = false, ...other }: ExpandMoreProps) => {
   ]
 }));
 
-const Root = styled('div')(({ theme }) => ({
+const Root = styled('div')(() => ({
   display: 'flex',
   flexDirection: 'column',
   flex: 1
 }));
 
-const Container = styled('div')(({ theme }) => ({
+const Container = styled('div')(() => ({
   position: 'relative',
   width: '100%',
   minHeight: 'auto'
 }));
 
-const Titles = styled('div')(({ theme }) => ({
+const Titles = styled('div')(() => ({
   flex: 1,
   minWidth: 0,
   display: 'flex',
   flexDirection: 'column'
 }));
 
-const EndAdornment = styled('div')(({ theme }) => ({
+const EndAdornment = styled('div')(() => ({
   position: 'absolute',
   right: 0,
   top: 0,

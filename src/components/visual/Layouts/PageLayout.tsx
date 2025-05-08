@@ -1,14 +1,14 @@
 import { styled } from '@mui/material';
 import React from 'react';
 
-const Root = styled('div')(({ theme }) => ({
+const Root = styled('div')(() => ({
   display: 'flex',
   flexDirection: 'row',
   flexWrap: 'nowrap',
   overflowY: 'auto'
 }));
 
-const Wrapper = styled('div')(({ theme }) => ({
+const Wrapper = styled('div')(() => ({
   minWidth: 0,
   flex: 1,
   display: 'flex',
@@ -16,14 +16,14 @@ const Wrapper = styled('div')(({ theme }) => ({
   height: 'fit-content'
 }));
 
-const Container = styled('div')(({ theme }) => ({
+const Container = styled('div')(() => ({
   display: 'flex',
   flexDirection: 'column',
   width: '100%',
   maxWidth: '1200px'
 }));
 
-const Navigation = styled('div')(({ theme }) => ({
+const Navigation = styled('div')(() => ({
   position: 'sticky',
   top: '0px',
   overflowX: 'hidden',

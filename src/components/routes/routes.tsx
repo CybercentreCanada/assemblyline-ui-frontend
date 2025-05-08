@@ -29,9 +29,6 @@ import ArchiveDetail from 'components/routes/archive/detail';
 import AppRegistration from 'components/routes/authorize';
 import CrashTest from 'components/routes/crash';
 import Dashboard from 'components/routes/dashboard';
-import DevelopmentCustomize from 'components/routes/development/customize/customize';
-import DevelopmentLibrary from 'components/routes/development/library';
-import DevelopmentTheme from 'components/routes/development/theme';
 import FileFullDetail from 'components/routes/file/detail';
 import FileViewer from 'components/routes/file/viewer';
 import Help from 'components/routes/help';
@@ -66,8 +63,12 @@ import Submit from 'components/routes/submit/submit';
 import Tos from 'components/routes/tos';
 import User from 'components/routes/user';
 import { resetFavicon } from 'helpers/utils';
-import { memo, Suspense, useEffect, useState } from 'react';
+import { lazy, memo, Suspense, useEffect, useState } from 'react';
 import { matchPath, Navigate, Route, Routes, useLocation } from 'react-router';
+
+const DevelopmentCustomize = lazy(() => import('components/routes/development/customize/customize'));
+const DevelopmentLibrary = lazy(() => import('components/routes/development/library'));
+const DevelopmentTheme = lazy(() => import('components/routes/development/theme'));
 
 const APP_NAME = 'AL4';
 

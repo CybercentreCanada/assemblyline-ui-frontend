@@ -27,7 +27,7 @@ type Props = {
 };
 
 const WrappedFilesTable: React.FC<Props> = ({ fileResults, allowSort = true }) => {
-  const { t, i18n } = useTranslation(['search']);
+  const { t } = useTranslation(['search']);
   const { c12nDef } = useALContext();
 
   return fileResults ? (

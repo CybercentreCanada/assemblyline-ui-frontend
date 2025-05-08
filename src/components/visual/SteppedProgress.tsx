@@ -1,33 +1,12 @@
 import { Avatar, Icon, LinearProgress, StepIcon as MuiStepIcon, styled, Typography, useTheme } from '@mui/material';
 import React, { useMemo } from 'react';
 
-const Main = styled('div')(({ theme }) => ({
-  width: '100%',
-  display: 'flex',
-  flexDirection: 'row',
-  justifyItems: 'center'
-}));
-
 const Item = styled('div')(({ theme }) => ({
   position: 'relative',
   flexDirection: 'column',
   flex: '1',
   paddingLeft: theme.spacing(1),
   paddingRight: theme.spacing(1)
-}));
-
-const LabelContainer = styled('span')(({ theme }) => ({
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center'
-}));
-
-const PercentageContainer = styled('span')(({ theme }) => ({
-  position: 'absolute',
-  top: '14px',
-  left: 'calc(-50% + 22px)',
-  right: 'calc(50% + 22px)',
-  textAlign: 'center'
 }));
 
 type Step = {
@@ -46,7 +25,13 @@ const WrappedStepIcon = ({ step = null, index = 0, loading = false, completed = 
   const theme = useTheme();
 
   return (
-    <LabelContainer>
+    <span
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center'
+      }}
+    >
       {'icon' in step ? (
         <Avatar
           sx={{
@@ -73,7 +58,7 @@ const WrappedStepIcon = ({ step = null, index = 0, loading = false, completed = 
         />
       )}
       {'label' in step ? <Typography children={step.label} variant="subtitle2" marginTop={theme.spacing(2)} /> : null}
-    </LabelContainer>
+    </span>
   );
 };
 
@@ -86,12 +71,20 @@ type ProgressProps = {
 
 const WrappedProgress = ({ percentage = 0, loading = false }: ProgressProps) => {
   return (
-    <PercentageContainer>
+    <span
+      style={{
+        position: 'absolute',
+        top: '14px',
+        left: 'calc(-50% + 22px)',
+        right: 'calc(50% + 22px)',
+        textAlign: 'center'
+      }}
+    >
       <LinearProgress variant={loading ? 'indeterminate' : 'determinate'} value={percentage} />
       {!loading && 0 < percentage && percentage < 100 ? (
         <Typography variant="subtitle2">{`${percentage}%`}</Typography>
       ) : null}
-    </PercentageContainer>
+    </span>
   );
 };
 
@@ -115,7 +108,7 @@ const WrappedSteppedPercentage: React.FC<Props> = ({
 
   if (steps && Array.isArray(steps) && steps.length >= 1)
     return (
-      <Main>
+      <div style={{ width: '100%', display: 'flex', flexDirection: 'row', justifyItems: 'center' }}>
         <Item>
           <StepIcon step={steps[0]} index={0} loading={loading} completed={0 <= activeStep} />
         </Item>
@@ -125,7 +118,7 @@ const WrappedSteppedPercentage: React.FC<Props> = ({
             <StepIcon step={step} index={i + 1} loading={loading} completed={i < activeStep} />
           </Item>
         ))}
-      </Main>
+      </div>
     );
 };
 

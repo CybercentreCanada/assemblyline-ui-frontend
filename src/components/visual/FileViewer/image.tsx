@@ -20,7 +20,7 @@ const Wrapper = styled('div')(({ theme }) => ({
   height: '1px'
 }));
 
-const Root = styled('div')(({ theme }) => ({
+const Root = styled('div')(() => ({
   height: '100%',
   width: '100%',
   overflow: 'hidden',
@@ -35,7 +35,7 @@ type ImageProps = {
 
 const Image = styled('img', {
   shouldForwardProp: prop => prop !== 'zoom' && prop !== 'pixelated'
-})<ImageProps>(({ theme, zoom, pixelated }) => ({
+})<ImageProps>(({ zoom, pixelated }) => ({
   maxHeight: '100%',
   maxWidth: '100%',
   minHeight: `128px`,

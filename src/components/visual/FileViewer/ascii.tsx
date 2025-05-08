@@ -52,7 +52,7 @@ const Code = styled('div')(({ theme }) => ({
   left: 0
 }));
 
-const Spinner = styled('div')(({ theme }) => ({
+const Spinner = styled('div')(() => ({
   textAlign: 'center',
   position: 'absolute',
   top: '50%',
