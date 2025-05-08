@@ -1,6 +1,6 @@
+import FilterComparator from 'commons/addons/lists/filters/FilterComparator';
+import type { FilterField } from 'commons/addons/lists/filters/FilterSelector';
 import { useEffect, useMemo, useState } from 'react';
-import FilterComparator from '../filters/FilterComparator';
-import { FilterField } from '../filters/FilterSelector';
 
 const DEFAULT_FIELDS = [];
 

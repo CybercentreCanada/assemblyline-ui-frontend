@@ -39,7 +39,7 @@ const WrappedMultiTypeParam = <T extends 'bool' | 'int' | 'str' | 'list'>({
   onDelete = () => null
 }: MultiTypeParamProps<T>) => {
   const { t } = useTranslation(['adminServices']);
-  const [tempUserParams, setTempUserParams] = useState<ServiceParameter>(DEFAULT_SERVICE_PARAMETER as ServiceParameter);
+  const [tempUserParams, setTempUserParams] = useState<ServiceParameter>(DEFAULT_SERVICE_PARAMETER);
   const theme = useTheme();
 
   const handleSubmissionParamUpdate = event => {
@@ -89,7 +89,7 @@ const WrappedMultiTypeParam = <T extends 'bool' | 'int' | 'str' | 'list'>({
       });
     }
 
-    setTempUserParams(DEFAULT_SERVICE_PARAMETER as ServiceParameter);
+    setTempUserParams(DEFAULT_SERVICE_PARAMETER);
   };
 
   const handleSPNameChange = event => {
@@ -136,7 +136,7 @@ const WrappedMultiTypeParam = <T extends 'bool' | 'int' | 'str' | 'list'>({
           </div>
         }
         // Render labels to show what are options to the user and what is selected by default
-        style={{ marginRight: theme.spacing(0.5) }}
+
         onClick={() => onUpdate({ ...param, default: value, value } as ServiceParameter, id)}
         onDelete={() =>
           handleSubmissionParamListUpdate(
@@ -163,7 +163,7 @@ const WrappedMultiTypeParam = <T extends 'bool' | 'int' | 'str' | 'list'>({
           </div>
         }
         // Render labels to show what are options to the user and what is selected by default
-        style={{ marginRight: theme.spacing(0.5) }}
+
         onClick={() => setTempUserParams({ ...tempUserParams, default: value, value } as ServiceParameter)}
         onDelete={() =>
           handleSPListChange(
@@ -179,17 +179,17 @@ const WrappedMultiTypeParam = <T extends 'bool' | 'int' | 'str' | 'list'>({
 
   return param ? (
     <Grid container spacing={1} alignItems="center">
-      <Grid item xs={10} sm={3} style={{ wordBreak: 'break-word' }}>
+      <Grid size={{ xs: 10, sm: 3 }} style={{ wordBreak: 'break-word' }}>
         {`${param.name} [${param.type}]:`}
       </Grid>
-      <Grid item xs={2} sm={1}>
+      <Grid size={{ xs: 2, sm: 1 }}>
         <Tooltip title={t(param.hide ? 'params.user.show' : 'params.user.hide')}>
           <IconButton onClick={handleParamHide} size="large">
             {param.hide ? <VisibilityOffIcon /> : <VisibilityIcon />}
           </IconButton>
         </Tooltip>
       </Grid>
-      <Grid item xs={10} sm={7}>
+      <Grid size={{ xs: 10, sm: 7 }}>
         {param.type === 'bool' ? (
           <FormControl size="small" fullWidth>
             <Select
@@ -214,6 +214,11 @@ const WrappedMultiTypeParam = <T extends 'bool' | 'int' | 'str' | 'list'>({
             onChange={(event, value, reason) => handleSubmissionParamListUpdate(value as string[])}
             renderTags={(value, getTagProps, ownerState) => renderParamLabelTags(value)}
             value={param.list}
+            sx={{
+              '& .MuiInputBase-root': {
+                gap: theme.spacing(0.5)
+              }
+            }}
           />
         ) : (
           <TextField
@@ -228,7 +233,7 @@ const WrappedMultiTypeParam = <T extends 'bool' | 'int' | 'str' | 'list'>({
           />
         )}
       </Grid>
-      <Grid item xs={2} sm={1}>
+      <Grid size={{ xs: 2, sm: 1 }}>
         <Tooltip title={t('params.user.remove')}>
           <IconButton
             style={{
@@ -244,7 +249,7 @@ const WrappedMultiTypeParam = <T extends 'bool' | 'int' | 'str' | 'list'>({
     </Grid>
   ) : (
     <Grid container spacing={1} alignItems="center">
-      <Grid item xs={10} sm={3}>
+      <Grid size={{ xs: 10, sm: 3 }}>
         <TextField
           fullWidth
           size="small"
@@ -255,7 +260,7 @@ const WrappedMultiTypeParam = <T extends 'bool' | 'int' | 'str' | 'list'>({
           style={{ margin: 0 }}
         />
       </Grid>
-      <Grid item xs={10} sm={2}>
+      <Grid size={{ xs: 10, sm: 2 }}>
         <FormControl size="small" fullWidth>
           <Select
             id="user_spec_params"
@@ -271,7 +276,7 @@ const WrappedMultiTypeParam = <T extends 'bool' | 'int' | 'str' | 'list'>({
           </Select>
         </FormControl>
       </Grid>
-      <Grid item xs={10} sm={6}>
+      <Grid size={{ xs: 10, sm: 6 }}>
         {tempUserParams.type === 'bool' ? (
           <FormControl size="small" fullWidth>
             <Select
@@ -296,6 +301,11 @@ const WrappedMultiTypeParam = <T extends 'bool' | 'int' | 'str' | 'list'>({
             renderInput={params => <TextField {...params}></TextField>}
             renderTags={(value, getTagProps, ownerState) => renderSPLabelTags(value)}
             onChange={(event, value, reason) => handleSPListChange(value as string[])}
+            sx={{
+              '& .MuiInputBase-root': {
+                gap: theme.spacing(0.5)
+              }
+            }}
           />
         ) : (
           <TextField
@@ -310,7 +320,7 @@ const WrappedMultiTypeParam = <T extends 'bool' | 'int' | 'str' | 'list'>({
           />
         )}
       </Grid>
-      <Grid item xs={2} sm={1} style={{ height: theme.spacing(8) }}>
+      <Grid size={{ xs: 2, sm: 1 }}>
         {tempUserParams.name !== '' && (
           <Tooltip title={t('params.user.add')}>
             <IconButton
@@ -325,7 +335,7 @@ const WrappedMultiTypeParam = <T extends 'bool' | 'int' | 'str' | 'list'>({
           </Tooltip>
         )}
       </Grid>
-      <Grid item xs={12}>
+      <Grid size={{ xs: 12 }}>
         <FormControlLabel
           control={
             <Checkbox

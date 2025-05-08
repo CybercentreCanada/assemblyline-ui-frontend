@@ -1,5 +1,6 @@
 import { isArrowDown, isArrowUp } from 'commons/components/utils/keyboard';
 import { useCallback } from 'react';
+import type { ReducerHandler, Reducers, ScrollType, Store, UseReducer } from '..';
 import {
   clampScrollIndex,
   DEFAULT_STORE,
@@ -16,13 +17,8 @@ import {
   isPageUp,
   isType,
   LAYOUT_SIZE,
-  ReducerHandler,
-  Reducers,
   scrollToTableIndex,
-  ScrollType,
-  setStore,
-  Store,
-  UseReducer
+  setStore
 } from '..';
 
 export const useScrollReducer: UseReducer = () => {
@@ -100,7 +96,6 @@ export const useScrollReducer: UseReducer = () => {
       if (event.type === 'mousemove' || event.type === 'mousedown') {
         return scrollRowIndexChange(store, store.scroll.maxRowIndex - (newValue as number));
       } else if (event.type === 'keydown') {
-        // eslint-disable-next-line @typescript-eslint/dot-notation
         const keyCode = event['key'];
         let newScrollIndex: number = store.scroll.rowIndex;
 
@@ -152,7 +147,7 @@ export const useScrollReducer: UseReducer = () => {
     (store, { initialized }) => {
       if (DEFAULT_STORE.location.scroll.index === store.location.scroll.index) return { ...store };
       else {
-        let newStore = { ...store, scroll: { ...store.scroll, index: store.location.scroll.index } };
+        const newStore = { ...store, scroll: { ...store.scroll, index: store.location.scroll.index } };
         return scrollIndexChange(newStore, store.location.scroll.index, 'top');
       }
     },

@@ -1,5 +1,5 @@
+import { isObject } from 'components/core/form/form.utils';
 import { expect } from 'vitest';
-import { isObject } from './form.utils';
 
 describe('Test `Form Utilities`', () => {
   it('testing the `isObject()`', () => {

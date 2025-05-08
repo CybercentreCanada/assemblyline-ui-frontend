@@ -12,7 +12,7 @@ export type SubmitState = {
 };
 
 export type SubmitMetadata = {
-  data: { [key: string]: unknown };
+  data: Record<string, unknown>;
   edit: string;
 };
 

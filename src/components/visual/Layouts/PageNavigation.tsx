@@ -2,6 +2,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import type {
   CheckboxProps,
   DrawerProps,
+  IconButtonProps,
   ListItemProps,
   ListItemTextProps,
   ListProps,
@@ -21,34 +22,43 @@ import {
   useTheme
 } from '@mui/material';
 import React, { useMemo, useState } from 'react';
-import type { LinkProps } from 'react-router-dom';
-import { Link } from 'react-router-dom';
+import type { LinkProps } from 'react-router';
+import { Link } from 'react-router';
 
 type PageNavigationDrawerProps = {
+  open: DrawerProps['open'];
   children?: React.ReactNode;
   variant?: DrawerProps['anchor'];
+  onOpen: IconButtonProps['onClick'];
+  onClose: DrawerProps['onClose'];
 };
 
-const PageNavigationDrawer = React.memo(({ children = null, variant = 'left' }: PageNavigationDrawerProps) => {
-  const theme = useTheme();
+const PageNavigationDrawer = React.memo(
+  ({
+    open = false,
+    children = null,
+    variant = 'left',
+    onOpen = () => null,
+    onClose = () => null
+  }: PageNavigationDrawerProps) => {
+    const theme = useTheme();
 
-  const [open, setOpen] = useState<boolean>(false);
+    const isDownLG = useMediaQuery(theme.breakpoints.down('lg'));
 
-  const isDownLG = useMediaQuery(theme.breakpoints.down('lg'));
-
-  return isDownLG ? (
-    <>
-      <IconButton onClick={() => setOpen(true)}>
-        <MenuIcon />
-      </IconButton>
-      <Drawer open={open} anchor={variant === 'left' ? 'left' : 'right'} onClose={() => setOpen(false)}>
-        {children}
-      </Drawer>
-    </>
-  ) : (
-    <>{children}</>
-  );
-});
+    return isDownLG ? (
+      <>
+        <IconButton onClick={onOpen}>
+          <MenuIcon />
+        </IconButton>
+        <Drawer open={open} anchor={variant === 'left' ? 'left' : 'right'} onClose={onClose}>
+          {children}
+        </Drawer>
+      </>
+    ) : (
+      <>{children}</>
+    );
+  }
+);
 
 export type PageNavigationItemProp = ListItemProps & {
   active?: boolean;
@@ -77,7 +87,7 @@ export const PageNavigationItem: React.FC<PageNavigationItemProp> = React.memo((
     subheader = false,
     to = null,
     variant = 'left',
-    onPageNavigation = () => null,
+    onPageNavigation = null,
     ...listItemProps
   } = useMemo<PageNavigationItemProp>(() => props, [props]);
 
@@ -151,8 +161,8 @@ export const PageNavigationItem: React.FC<PageNavigationItemProp> = React.memo((
             }
           })
         }}
-        onClick={event => onPageNavigation(event, props)}
-        {...(to !== null && { LinkComponent: Link, to: to })}
+        {...(onPageNavigation && { onClick: event => onPageNavigation(event, props) })}
+        {...(to !== null && { component: Link, to: to })}
       >
         <Typography
           color={active ? 'primary' : subheader ? 'textSecondary' : 'textPrimary'}
@@ -199,9 +209,11 @@ export const PageNavigation: React.FC<PageNavigationProps> = React.memo(
     renderItem = null,
     onPageNavigation = () => null,
     ...listProps
-  }: PageNavigationProps) =>
-    preventRender ? null : (
-      <PageNavigationDrawer variant={variant}>
+  }: PageNavigationProps) => {
+    const [open, setOpen] = useState<boolean>(false);
+
+    return preventRender ? null : (
+      <PageNavigationDrawer open={open} variant={variant} onOpen={() => setOpen(true)} onClose={() => setOpen(false)}>
         <List
           component="nav"
           subheader={
@@ -225,17 +237,34 @@ export const PageNavigation: React.FC<PageNavigationProps> = React.memo(
           {loading
             ? null
             : !Array.isArray(options)
-            ? children
-            : options.map((option, i) =>
-                !renderItem ? (
-                  <PageNavigationItem key={i} variant={variant} onPageNavigation={onPageNavigation} {...option} />
-                ) : (
-                  renderItem(option, i, props => (
-                    <PageNavigationItem key={i} variant={variant} onPageNavigation={onPageNavigation} {...props} />
-                  ))
-                )
-              )}
+              ? children
+              : options.map((option, i) =>
+                  !renderItem ? (
+                    <PageNavigationItem
+                      key={i}
+                      variant={variant}
+                      onPageNavigation={(event, props) => {
+                        setOpen(false);
+                        onPageNavigation(event, props);
+                      }}
+                      {...option}
+                    />
+                  ) : (
+                    renderItem(option, i, props => (
+                      <PageNavigationItem
+                        key={i}
+                        variant={variant}
+                        onPageNavigation={(event, props) => {
+                          setOpen(false);
+                          onPageNavigation(event, props);
+                        }}
+                        {...props}
+                      />
+                    ))
+                  )
+                )}
         </List>
       </PageNavigationDrawer>
-    )
+    );
+  }
 );

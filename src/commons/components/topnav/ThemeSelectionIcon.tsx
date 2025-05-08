@@ -1,13 +1,11 @@
-import TuneIcon from '@mui/icons-material/Tune';
-import { ClickAwayListener, Fade, IconButton, Paper, Popper, Tooltip, useTheme } from '@mui/material';
-import useAppConfigs from 'commons/components/app/hooks/useAppConfigs';
+import { Tune } from '@mui/icons-material';
+import { ClickAwayListener, Fade, IconButton, Paper, Popper, useTheme } from '@mui/material';
+import { useAppConfigs } from 'commons/components/app/hooks/useAppConfigs';
 import ThemeSelection from 'commons/components/topnav/ThemeSelection';
 import { useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 
 const ThemeSelectionIcon = () => {
-  const anchorEl = useRef();
-  const { t } = useTranslation();
+  const anchorEl = useRef<HTMLButtonElement>(undefined);
   const theme = useTheme();
   const { allowPersonalization, preferences } = useAppConfigs();
   const [open, setOpen] = useState<boolean>(false);
@@ -15,19 +13,9 @@ const ThemeSelectionIcon = () => {
   const onClickAway = () => setOpen(false);
 
   return allowPersonalization || preferences.allowTranslate || preferences.allowReset ? (
-    <ClickAwayListener onClickAway={onClickAway}>
-      <div>
-        <Tooltip title={t('theme')}>
-          <IconButton
-            ref={anchorEl}
-            color="inherit"
-            aria-label="open drawer"
-            onClick={onThemeSelectionClick}
-            size="large"
-          >
-            <TuneIcon />
-          </IconButton>
-        </Tooltip>
+    <ClickAwayListener onClickAway={onClickAway} mouseEvent="onMouseUp">
+      <IconButton ref={anchorEl} color="inherit" aria-label="open drawer" onClick={onThemeSelectionClick} size="large">
+        <Tune />
         <Popper
           sx={{ zIndex: theme.zIndex.drawer + 2, minWidth: '280px' }}
           open={open}
@@ -43,7 +31,7 @@ const ThemeSelectionIcon = () => {
             </Fade>
           )}
         </Popper>
-      </div>
+      </IconButton>
     </ClickAwayListener>
   ) : null;
 };

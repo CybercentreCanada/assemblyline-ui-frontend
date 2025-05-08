@@ -15,8 +15,7 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
-import useAppUser from 'commons/components/app/hooks/useAppUser';
+import { useAppUser } from 'commons/components/app/hooks';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
@@ -28,16 +27,6 @@ import Classification from 'components/visual/Classification';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-const useStyles = makeStyles(theme => ({
-  circularProgress: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    marginTop: -12,
-    marginLeft: -12
-  }
-}));
-
 type RetrohuntData = Pick<Retrohunt, 'key' | 'search_classification' | 'ttl'>;
 
 type Props = {
@@ -48,7 +37,6 @@ type Props = {
 function WrappedRetrohuntRepeat({ retrohunt = null, onRepeat = () => null }: Props) {
   const { t } = useTranslation(['retrohunt']);
   const theme = useTheme();
-  const classes = useStyles();
   const { apiCall } = useMyAPI();
   const { c12nDef, configuration } = useALContext();
   const { user: currentUser } = useAppUser<CustomUser>();
@@ -115,19 +103,19 @@ function WrappedRetrohuntRepeat({ retrohunt = null, onRepeat = () => null }: Pro
             {data && (
               <DialogContentText component="div">
                 <Grid container flexDirection="column" spacing={2}>
-                  <Grid item>
+                  <Grid>
                     <span>{t('repeat.content1')}</span>
                     <b>{retrohunt.key}</b>
                     <span>{t('repeat.content2')}</span>
                   </Grid>
 
-                  <Grid item style={{ display: 'flex', alignItems: 'center', gap: theme.spacing(1) }}>
+                  <Grid style={{ display: 'flex', alignItems: 'center', gap: theme.spacing(1) }}>
                     <InfoOutlinedIcon />
                     <span>{t('repeat.note')}</span>
                   </Grid>
 
                   {c12nDef.enforce && (
-                    <Grid item>
+                    <Grid>
                       <Tooltip title={t('tooltip.search_classification')} placement="top">
                         <div
                           style={{
@@ -152,7 +140,7 @@ function WrappedRetrohuntRepeat({ retrohunt = null, onRepeat = () => null }: Pro
                     </Grid>
                   )}
 
-                  <Grid item flexGrow={2}>
+                  <Grid flexGrow={2}>
                     <Typography variant="subtitle2">
                       {`${t('ttl')} (${maxDaysToLive ? `${t('ttl.max')}: ${maxDaysToLive}` : t('ttl.forever')})`}
                     </Typography>
@@ -170,7 +158,7 @@ function WrappedRetrohuntRepeat({ retrohunt = null, onRepeat = () => null }: Pro
                     />
                   </Grid>
 
-                  <Grid item>{t('repeat.confirm')}</Grid>
+                  <Grid>{t('repeat.confirm')}</Grid>
                 </Grid>
               </DialogContentText>
             )}
@@ -178,11 +166,11 @@ function WrappedRetrohuntRepeat({ retrohunt = null, onRepeat = () => null }: Pro
           <DialogActions>
             <Button color="secondary" onClick={() => setOpen(false)}>
               {t('cancel')}
-              {loading && <CircularProgress className={classes.circularProgress} size={24} />}
+              {loading && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
             </Button>
             <Button color="primary" disabled={loading} onClick={() => handleRepeat()}>
               {t('repeat.ok')}
-              {loading && <CircularProgress className={classes.circularProgress} size={24} />}
+              {loading && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
             </Button>
           </DialogActions>
         </Dialog>

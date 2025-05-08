@@ -1,51 +1,26 @@
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import { Button, Collapse, Divider, Skeleton, Typography, useTheme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
+import { Button, Collapse, Divider, Skeleton, styled, Typography, useTheme } from '@mui/material';
 import { Fetcher } from 'borealis-ui';
 import useALContext from 'components/hooks/useALContext';
 import type { SubmissionReport } from 'components/models/ui/submission_report';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-const useStyles = makeStyles(theme => ({
-  alert: {
-    '@media print': {
-      backgroundColor: '#00000005',
-      border: '1px solid #DDD',
-      color: '#888'
-    },
-    backgroundColor: theme.palette.mode === 'dark' ? '#ffffff05' : '#00000005',
-    border: `1px solid ${theme.palette.divider}`,
-    borderRadius: '4px',
-    color: theme.palette.text.secondary,
-    margin: '0.25rem 0',
-    padding: '16px 8px',
-    textAlign: 'center',
-    whiteSpace: 'pre-wrap'
+const Alert = styled('pre')(({ theme }) => ({
+  '@media print': {
+    backgroundColor: '#00000005',
+    border: '1px solid #DDD',
+    color: '#888'
   },
-  divider: {
-    '@media print': {
-      backgroundColor: '#0000001f !important'
-    }
-  },
-  section_title: {
-    marginTop: theme.spacing(4),
-    pageBreakAfter: 'avoid',
-    pageBreakInside: 'avoid'
-  },
-  section_content: {
-    marginTop: theme.spacing(2),
-    marginBottom: theme.spacing(2),
-    pageBreakBefore: 'avoid',
-    pageBreakInside: 'avoid',
-    display: 'flex',
-    flexDirection: 'row',
-    columnGap: theme.spacing(1)
-  },
-  section: {
-    pageBreakInside: 'avoid'
-  }
+  backgroundColor: theme.palette.mode === 'dark' ? '#ffffff05' : '#00000005',
+  border: `1px solid ${theme.palette.divider}`,
+  borderRadius: '4px',
+  color: theme.palette.text.secondary,
+  margin: '0.25rem 0',
+  padding: '16px 8px',
+  textAlign: 'center',
+  whiteSpace: 'pre-wrap'
 }));
 
 type Props = {
@@ -54,9 +29,8 @@ type Props = {
 
 function WrappedMetadata({ report }: Props) {
   const { t } = useTranslation(['submissionReport']);
-  const { configuration } = useALContext();
+  const { user: currentUser, configuration } = useALContext();
   const theme = useTheme();
-  const classes = useStyles();
   const [metaOpen, setMetaOpen] = useState(false);
 
   return (
@@ -67,10 +41,25 @@ function WrappedMetadata({ report }: Props) {
           Object.keys(report.metadata).filter(k => configuration.ui.alerting_meta.important.indexOf(k) !== -1)
             .length === 0
             ? 'no-print'
-            : classes.section
+            : null
+        }
+        style={
+          !report ||
+          Object.keys(report.metadata).filter(k => configuration.ui.alerting_meta.important.indexOf(k) !== -1)
+            .length === 0
+            ? null
+            : {
+                pageBreakInside: 'avoid'
+              }
         }
       >
-        <div className={classes.section_title}>
+        <div
+          style={{
+            marginTop: theme.spacing(4),
+            pageBreakAfter: 'avoid',
+            pageBreakInside: 'avoid'
+          }}
+        >
           <div
             style={{
               display: 'flex',
@@ -103,9 +92,25 @@ function WrappedMetadata({ report }: Props) {
                 </Button>
               )}
           </div>
-          <Divider className={classes.divider} />
+          <Divider
+            sx={{
+              '@media print': {
+                backgroundColor: '#0000001f !important'
+              }
+            }}
+          />
         </div>
-        <div className={classes.section_content}>
+        <div
+          style={{
+            marginTop: theme.spacing(2),
+            marginBottom: theme.spacing(2),
+            pageBreakBefore: 'avoid',
+            pageBreakInside: 'avoid',
+            display: 'flex',
+            flexDirection: 'row',
+            columnGap: theme.spacing(1)
+          }}
+        >
           <div style={{ flex: 1 }}>
             {report ? (
               Object.keys(report.metadata).filter(k => configuration.ui.alerting_meta.important.indexOf(k) !== -1)
@@ -128,13 +133,13 @@ function WrappedMetadata({ report }: Props) {
                 </table>
               ) : (
                 <Collapse in={!metaOpen} timeout="auto">
-                  <pre className={classes.alert}>{t('meta.empty')}</pre>
+                  <Alert>{t('meta.empty')}</Alert>
                 </Collapse>
               )
             ) : (
               <table width="100%">
                 <tbody>
-                  {[...Array(3)].map((_, i) => (
+                  {Array.from({ length: 3 }).map((_, i) => (
                     <tr key={i} style={{ width: '100%' }}>
                       <td width="33%">
                         <Skeleton />
@@ -176,6 +181,7 @@ function WrappedMetadata({ report }: Props) {
                 fetcherId="eml-preview.preview"
                 type="eml_id"
                 value={report?.metadata?.eml_path}
+                classification={currentUser.classification}
                 slotProps={{ paper: { style: { maxWidth: '128px', minWidth: '128px', maxHeight: '128px' } } }}
               />
             </div>

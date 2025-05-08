@@ -333,6 +333,12 @@ export default function useMySitemap() {
       //   breadcrumbs: ['/development']
       // },
       {
+        path: '/development/customize',
+        title: t('drawer.development.customize'),
+        icon: <PaletteIcon />,
+        breadcrumbs: ['/development']
+      },
+      {
         path: '/development/library',
         title: t('drawer.development.library'),
         icon: <LibraryBooksIcon />,

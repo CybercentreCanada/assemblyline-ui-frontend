@@ -1,5 +1,4 @@
-import { Typography, useTheme } from '@mui/material';
-import Grid from '@mui/material/Unstable_Grid2';
+import { Grid, Typography, useTheme } from '@mui/material';
 import { DemoContainer } from 'components/routes/development/library/components/DemoContainer';
 import { DemoSection } from 'components/routes/development/library/components/DemoSection';
 import { useForm } from 'components/routes/development/library/contexts/form';
@@ -70,7 +69,7 @@ export const ListInputsSection = React.memo(() => {
   return (
     <DemoContainer>
       <DemoSection
-        primary={'Basic List Inputs'}
+        primary="Basic List Inputs"
         secondary={
           <>
             <span>{'The following components are all of the inputs used in Assemblyline. '}</span>
@@ -210,14 +209,14 @@ export const ListInputsSection = React.memo(() => {
         }}
       >
         <div>
-          <Typography variant="h6">{'Controlled'}</Typography>
+          <Typography variant="h6">Controlled</Typography>
           <Typography color="textSecondary" variant="body2">
             <span>{'List Input components are controlled by default. '}</span>
           </Typography>
         </div>
 
         <Grid container spacing={2}>
-          <Grid md={6} xs={12}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <form.Subscribe
               selector={state => state.values.components.list_inputs.values.text}
               children={value => (
@@ -231,7 +230,7 @@ export const ListInputsSection = React.memo(() => {
             />
           </Grid>
 
-          <Grid md={6} xs={12} container alignItems="center">
+          <Grid size={{ xs: 12, md: 6 }} alignItems="center">
             <form.Subscribe
               selector={state => state.values.components.list_inputs.values.text}
               children={value => (
@@ -243,7 +242,7 @@ export const ListInputsSection = React.memo(() => {
             />
           </Grid>
 
-          <Grid md={6} xs={12}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <form.Subscribe
               selector={state => state.values.components.list_inputs.values.number}
               children={value => (
@@ -257,7 +256,7 @@ export const ListInputsSection = React.memo(() => {
             />
           </Grid>
 
-          <Grid md={6} xs={12} container alignItems="center">
+          <Grid size={{ xs: 12, md: 6 }} alignItems="center">
             <form.Subscribe
               selector={state => state.values.components.list_inputs.values.number}
               children={value => (
@@ -269,7 +268,7 @@ export const ListInputsSection = React.memo(() => {
             />
           </Grid>
 
-          <Grid md={6} xs={12}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <form.Subscribe
               selector={state => state.values.components.list_inputs.values.select}
               children={value => (
@@ -288,7 +287,7 @@ export const ListInputsSection = React.memo(() => {
             />
           </Grid>
 
-          <Grid md={6} xs={12} container alignItems="center">
+          <Grid size={{ xs: 12, md: 6 }} alignItems="center">
             <form.Subscribe
               selector={state => state.values.components.list_inputs.values.select}
               children={value => (
@@ -300,7 +299,7 @@ export const ListInputsSection = React.memo(() => {
             />
           </Grid>
 
-          <Grid md={6} xs={12}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <form.Subscribe
               selector={state => state.values.components.list_inputs.values.classification}
               children={value => (
@@ -314,7 +313,7 @@ export const ListInputsSection = React.memo(() => {
             />
           </Grid>
 
-          <Grid md={6} xs={12} container alignItems="center">
+          <Grid size={{ xs: 12, md: 6 }} alignItems="center">
             <form.Subscribe
               selector={state => state.values.components.list_inputs.values.classification}
               children={value => (
@@ -326,7 +325,7 @@ export const ListInputsSection = React.memo(() => {
             />
           </Grid>
 
-          <Grid md={6} xs={12}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <form.Subscribe
               selector={state => state.values.components.list_inputs.values.boolean}
               children={value => (
@@ -340,7 +339,7 @@ export const ListInputsSection = React.memo(() => {
             />
           </Grid>
 
-          <Grid md={6} xs={12} container alignItems="center">
+          <Grid size={{ xs: 12, md: 6 }} alignItems="center">
             <form.Subscribe
               selector={state => state.values.components.list_inputs.values.boolean}
               children={value => (
@@ -355,11 +354,11 @@ export const ListInputsSection = React.memo(() => {
       </div>
 
       <DemoSection
-        primary={'Disabled'}
+        primary="Disabled"
         secondary={
           <>
             <span>{'The disabled prop stops the user from making changes. '}</span>
-            <span>{'Note: the label should also be the disabled color.'}</span>
+            <span>Note: the label should also be the disabled color.</span>
           </>
         }
         left={
@@ -498,7 +497,7 @@ export const ListInputsSection = React.memo(() => {
       />
 
       <DemoSection
-        primary={'Loading'}
+        primary="Loading"
         secondary={
           <>
             <span>
@@ -642,13 +641,13 @@ export const ListInputsSection = React.memo(() => {
       />
 
       <DemoSection
-        primary={'Reset'}
+        primary="Reset"
         secondary={
           <>
             <span>
               {'All inputs implements a reset button which the button can be made visible via the reset prop. '}
             </span>
-            <span>{'Handle the reset change can be made using the onReset event handle.'}</span>
+            <span>Handle the reset change can be made using the onReset event handle.</span>
           </>
         }
         left={
@@ -797,7 +796,7 @@ export const ListInputsSection = React.memo(() => {
       />
 
       <DemoSection
-        primary={'Error'}
+        primary="Error"
         secondary={
           <>
             <span>
@@ -948,7 +947,7 @@ export const ListInputsSection = React.memo(() => {
       />
 
       <DemoSection
-        primary={'Read Only'}
+        primary="Read Only"
         secondary={
           <>
             <span>
@@ -1092,7 +1091,7 @@ export const ListInputsSection = React.memo(() => {
       />
 
       <DemoSection
-        primary={'Interactions'}
+        primary="Interactions"
         secondary={
           <>
             <span>{'Use this to test the different interaction with the different props. '}</span>
@@ -1284,7 +1283,7 @@ export const ListInputsSection = React.memo(() => {
       />
 
       <DemoSection
-        primary={'Edge Case: Long label names'}
+        primary="Edge Case: Long label names"
         secondary={
           <>
             <span>{"The labels should handle the case where there's a really long label name "}</span>

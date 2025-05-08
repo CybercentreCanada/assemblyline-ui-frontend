@@ -1,5 +1,6 @@
 import { isArrowDown, isArrowLeft, isArrowRight, isArrowUp } from 'commons/components/utils/keyboard';
 import { useCallback } from 'react';
+import type { ReducerHandler, Reducers, RenderHandler, Store, UseReducer } from '..';
 import {
   DEFAULT_STORE,
   isAction,
@@ -9,26 +10,15 @@ import {
   isPageDown,
   isPageUp,
   isSameCellClick,
-  ReducerHandler,
-  Reducers,
-  RenderHandler,
-  renderIndexClass,
-  Store,
-  useCellStyles,
-  UseReducer
+  renderIndexClass
 } from '..';
 
 export const useCursorReducer: UseReducer = () => {
-  const classes = useCellStyles();
-
-  const cursorRender = useCallback(
-    (prevStore: Store, nextStore: Store): void => {
-      const { index: prevIndex } = prevStore.cursor;
-      const { index: nextIndex } = nextStore.cursor;
-      renderIndexClass(prevIndex, nextIndex, classes.cursor, nextStore.cellsRendered);
-    },
-    [classes.cursor]
-  );
+  const cursorRender = useCallback((prevStore: Store, nextStore: Store): void => {
+    const { index: prevIndex } = prevStore.cursor;
+    const { index: nextIndex } = nextStore.cursor;
+    renderIndexClass(prevIndex, nextIndex, 'hex-viewer-cursor', nextStore.cellsRendered);
+  }, []);
 
   const handleCursorIndex = useCallback((store: Store, index: number): Store => {
     if (index === null) return { ...store, cursor: { ...store.cursor, index: null } };

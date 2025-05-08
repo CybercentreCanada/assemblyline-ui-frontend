@@ -1,6 +1,6 @@
-import type { PaletteMode } from '@mui/material';
+import { type PaletteMode } from '@mui/material';
 import { useMemo } from 'react';
-import useApp from './useApp';
+import { useApp } from 'commons/components/app/hooks';
 
 export type AppThemeType = {
   theme: PaletteMode;
@@ -9,7 +9,7 @@ export type AppThemeType = {
   toggle: () => void;
 };
 
-export default function useAppTheme(): AppThemeType {
+export function useAppTheme(): AppThemeType {
   const { theme, toggleTheme } = useApp();
   return useMemo(
     () => ({

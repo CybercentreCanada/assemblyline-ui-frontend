@@ -4,104 +4,37 @@ import FingerprintOutlinedIcon from '@mui/icons-material/FingerprintOutlined';
 import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
 import SettingsEthernetOutlinedIcon from '@mui/icons-material/SettingsEthernetOutlined';
 import WidgetsOutlinedIcon from '@mui/icons-material/WidgetsOutlined';
-import { Theme, Tooltip } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
+import type { SvgIconProps } from '@mui/material';
+import { Box, styled, Tooltip, useTheme } from '@mui/material';
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
 import { TreeItem } from '@mui/x-tree-view/TreeItem';
-import clsx from 'clsx';
 import useALContext from 'components/hooks/useALContext';
 import useSafeResults from 'components/hooks/useSafeResults';
 import type { ProcessTreeBody as ProcessTreeData } from 'components/models/base/result_body';
 import { humanReadableNumber } from 'helpers/utils';
-import React from 'react';
+import type { FC } from 'react';
+import React, { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-const useTreeItemStyles = makeStyles((theme: Theme) => ({
-  root: {
-    '&:hover > .MuiTreeItem-content, &:focus > .MuiTreeItem-content, .MuiTreeItem-content.Mui-focused, .MuiTreeItem-content.Mui-selected, .MuiTreeItem-content.Mui-selected.Mui-focused':
-      {
-        backgroundColor: 'transparent'
-      }
-  },
-  treeItem: {
-    '&:hover, .MuiTreeItem-content:hover &, .MuiTreeItem-content.Mui-focused &': {
-      backgroundColor: theme.palette.mode === 'dark' ? '#FFFFFF10' : '#00000010'
-    },
-    '@media print': {
-      border: '1px solid #DDD'
-    },
-    [theme.breakpoints.up('md')]: {
-      width: '40rem'
-    },
-    [theme.breakpoints.up('lg')]: {
-      width: '50rem'
-    },
-    border: `1px solid ${theme.palette.divider}`,
-    margin: '0.2em 0em',
-    borderRadius: '4px',
-    display: 'flex',
-    maxWidth: '50rem',
-    minWidth: '30rem'
-  },
-  pid: {
-    '@media print': {
-      backgroundColor: '#00000010'
-    },
-    padding: '5px',
-    backgroundColor: theme.palette.mode === 'dark' ? '#FFFFFF10' : '#00000010',
-    borderRadius: '4px 0px 0px 4px'
-  },
-  counter: {
-    '@media print': {
-      backgroundColor: '#00000010',
-      color: 'black'
-    },
-    alignItems: 'flex-end',
-    backgroundColor: theme.palette.mode === 'dark' ? '#FFFFFF10' : '#00000010',
-    color: theme.palette.text.secondary,
-    display: 'flex',
-    flexDirection: 'column',
-    fontSize: '90%',
-    minWidth: theme.spacing(6)
-  },
-  counter_img: {
-    height: theme.spacing(2.25)
-  },
-  counter_item: {
+const CounterItem = memo(
+  styled('div')(({ theme }) => ({
     display: 'flex',
     justifyContent: 'space-between',
     padding: theme.spacing(0.25),
     width: '100%',
     alignItems: 'center'
-  },
-  safe: {
-    '&:hover, .MuiTreeItem-content:hover &, .MuiTreeItem-content.Mui-focused &': {
-      backgroundColor: theme.palette.mode === 'dark' ? '#355e35' : '#c0efc0'
-    },
-    '@media print': {
-      backgroundColor: '#d0ffd0'
-    },
-    backgroundColor: theme.palette.mode === 'dark' ? '#254e25' : '#d0ffd0'
-  },
-  suspicious: {
-    '&:hover, .MuiTreeItem-content:hover &, .MuiTreeItem-content.Mui-focused &': {
-      backgroundColor: theme.palette.mode === 'dark' ? '#755322' : '#efddc4'
-    },
-    '@media print': {
-      backgroundColor: '#ffedd4'
-    },
-    backgroundColor: theme.palette.mode === 'dark' ? '#654312' : '#ffedd4'
-  },
-  malicious: {
-    '&:hover, .MuiTreeItem-content:hover &, .MuiTreeItem-content.Mui-focused &': {
-      backgroundColor: theme.palette.mode === 'dark' ? '#5e3535' : '#efc0c0'
-    },
-    '@media print': {
-      backgroundColor: '#ffd0d0'
-    },
-    backgroundColor: theme.palette.mode === 'dark' ? '#4e2525' : '#ffd0d0'
-  }
-}));
+  }))
+);
+
+type CounterImgProps = SvgIconProps & {
+  component: FC<SvgIconProps>;
+};
+
+const CounterImg = memo(
+  styled(({ component: Component, ...props }: CounterImgProps) => <Component {...props} />)(({ theme }) => ({
+    height: theme.spacing(2.25)
+  }))
+);
 
 type ProcessTreeItemProps = {
   process: ProcessTreeData;
@@ -112,38 +45,106 @@ type ProcessTreeItemProps = {
 
 const ProcessTreeItem = ({ process, index = 0, depth = 0, force = false }: ProcessTreeItemProps) => {
   const { t } = useTranslation(['fileDetail']);
-  const classes = useTreeItemStyles();
+  const theme = useTheme();
   const { showSafeResults } = useSafeResults();
   const { scoreToVerdict } = useALContext();
-  const classMap = {
-    suspicious: classes.suspicious,
-    highly_suspicious: classes.suspicious,
-    malicious: classes.malicious
-  };
 
   return process.safelisted && process.children.length === 0 && !showSafeResults && !force ? null : (
     <TreeItem
       itemId={`${process.process_pid}-${index}-${depth}`}
-      classes={{
-        root: classes.root
+      sx={{
+        '&:hover > .MuiTreeItem-content, &:focus > .MuiTreeItem-content, .MuiTreeItem-content.Mui-focused, .MuiTreeItem-content.Mui-selected, .MuiTreeItem-content.Mui-selected.Mui-focused':
+          {
+            backgroundColor: 'transparent'
+          }
       }}
       label={
-        <div
-          className={clsx(
-            classes.treeItem,
-            process.safelisted
-              ? classes.safe
-              : classMap[
-                  scoreToVerdict(
-                    Object.keys(process.signatures).reduce(
-                      (sum, key) => sum + parseFloat(process.signatures[key] || 0),
-                      0
+        <Box
+          sx={{
+            '&:hover, .MuiTreeItem-content:hover &, .MuiTreeItem-content.Mui-focused &': {
+              backgroundColor: theme.palette.mode === 'dark' ? '#FFFFFF10' : '#00000010'
+            },
+            '@media print': {
+              border: '1px solid #DDD'
+            },
+            [theme.breakpoints.up('md')]: {
+              width: '40rem'
+            },
+            [theme.breakpoints.up('lg')]: {
+              width: '50rem'
+            },
+            border: `1px solid ${theme.palette.divider}`,
+            margin: '0.2em 0em',
+            borderRadius: '4px',
+            display: 'flex',
+            maxWidth: '50rem',
+            minWidth: '30rem',
+
+            ...(process.safelisted
+              ? {
+                  '&:hover, .MuiTreeItem-content:hover &, .MuiTreeItem-content.Mui-focused &': {
+                    backgroundColor: theme.palette.mode === 'dark' ? '#355e35' : '#c0efc0'
+                  },
+                  '@media print': {
+                    backgroundColor: '#d0ffd0'
+                  },
+                  backgroundColor: theme.palette.mode === 'dark' ? '#254e25' : '#d0ffd0'
+                }
+              : (() => {
+                  switch (
+                    scoreToVerdict(
+                      Object.keys(process.signatures).reduce(
+                        (sum, key) => sum + parseFloat(process.signatures[key] || 0),
+                        0
+                      )
                     )
-                  )
-                ]
-          )}
+                  ) {
+                    case 'malicious':
+                      return {
+                        '&:hover, .MuiTreeItem-content:hover &, .MuiTreeItem-content.Mui-focused &': {
+                          backgroundColor: theme.palette.mode === 'dark' ? '#5e3535' : '#efc0c0'
+                        },
+                        '@media print': {
+                          backgroundColor: '#ffd0d0'
+                        },
+                        backgroundColor: theme.palette.mode === 'dark' ? '#4e2525' : '#ffd0d0'
+                      };
+                    case 'highly_suspicious':
+                      return {
+                        '&:hover, .MuiTreeItem-content:hover &, .MuiTreeItem-content.Mui-focused &': {
+                          backgroundColor: theme.palette.mode === 'dark' ? '#755322' : '#efddc4'
+                        },
+                        '@media print': {
+                          backgroundColor: '#ffedd4'
+                        },
+                        backgroundColor: theme.palette.mode === 'dark' ? '#654312' : '#ffedd4'
+                      };
+                    case 'suspicious':
+                      return {
+                        '&:hover, .MuiTreeItem-content:hover &, .MuiTreeItem-content.Mui-focused &': {
+                          backgroundColor: theme.palette.mode === 'dark' ? '#755322' : '#efddc4'
+                        },
+                        '@media print': {
+                          backgroundColor: '#ffedd4'
+                        },
+                        backgroundColor: theme.palette.mode === 'dark' ? '#654312' : '#ffedd4'
+                      };
+                  }
+                })())
+          }}
         >
-          <div className={classes.pid}>{process.process_pid}</div>
+          <Box
+            sx={{
+              '@media print': {
+                backgroundColor: '#00000010'
+              },
+              padding: '5px',
+              backgroundColor: theme.palette.mode === 'dark' ? '#FFFFFF10' : '#00000010',
+              borderRadius: '4px 0px 0px 4px'
+            }}
+          >
+            {process.process_pid}
+          </Box>
           <div style={{ padding: '5px', flexGrow: 1, wordBreak: 'break-word' }}>
             <div style={{ paddingBottom: '5px' }}>
               <b>{process.process_name}</b>
@@ -158,7 +159,21 @@ const ProcessTreeItem = ({ process, index = 0, depth = 0, force = false }: Proce
           (process.network_count && process.network_count !== 0) ||
           (process.file_count && process.file_count !== 0) ||
           (process.registry_count && process.registry_count !== 0) ? (
-            <div className={classes.counter}>
+            <Box
+              sx={{
+                '@media print': {
+                  backgroundColor: '#00000010',
+                  color: 'black'
+                },
+                alignItems: 'flex-end',
+                backgroundColor: theme.palette.mode === 'dark' ? '#FFFFFF10' : '#00000010',
+                color: theme.palette.text.secondary,
+                display: 'flex',
+                flexDirection: 'column',
+                fontSize: '90%',
+                minWidth: theme.spacing(6)
+              }}
+            >
               {process.signatures && Object.keys(process.signatures).length !== 0 && (
                 <Tooltip
                   placement="left"
@@ -166,39 +181,39 @@ const ProcessTreeItem = ({ process, index = 0, depth = 0, force = false }: Proce
                     process.signatures
                   ).join(' | ')})`}
                 >
-                  <div className={classes.counter_item}>
-                    <FingerprintOutlinedIcon className={classes.counter_img} />
+                  <CounterItem>
+                    <CounterImg component={FingerprintOutlinedIcon} />
                     <span> {humanReadableNumber(Object.keys(process.signatures).length)}</span>
-                  </div>
+                  </CounterItem>
                 </Tooltip>
               )}
               {process.network_count && process.network_count !== 0 ? (
                 <Tooltip placement="left" title={`${process.network_count} ${t('process_network')}`}>
-                  <div className={classes.counter_item}>
-                    <SettingsEthernetOutlinedIcon className={classes.counter_img} />
+                  <CounterItem>
+                    <CounterImg component={SettingsEthernetOutlinedIcon} />
                     <span>{humanReadableNumber(process.network_count)}</span>
-                  </div>
+                  </CounterItem>
                 </Tooltip>
               ) : null}
               {process.file_count && process.file_count !== 0 ? (
                 <Tooltip placement="left" title={`${process.file_count} ${t('process_file')}`}>
-                  <div className={classes.counter_item}>
-                    <InsertDriveFileOutlinedIcon className={classes.counter_img} />
+                  <CounterItem>
+                    <CounterImg component={InsertDriveFileOutlinedIcon} />
                     <span>{humanReadableNumber(process.file_count)}</span>
-                  </div>
+                  </CounterItem>
                 </Tooltip>
               ) : null}
               {process.registry_count && process.registry_count !== 0 ? (
                 <Tooltip placement="left" title={`${process.registry_count} ${t('process_registry')}`}>
-                  <div className={classes.counter_item}>
-                    <WidgetsOutlinedIcon className={classes.counter_img} />
+                  <CounterItem>
+                    <CounterImg component={WidgetsOutlinedIcon} />
                     <span>{humanReadableNumber(process.registry_count)}</span>
-                  </div>
+                  </CounterItem>
                 </Tooltip>
               ) : null}
-            </div>
+            </Box>
           ) : null}
-        </div>
+        </Box>
       }
     >
       {process.children.length !== 0 && <ProcessTreeItemList processes={process.children} depth={depth + 1} />}

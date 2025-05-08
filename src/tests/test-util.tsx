@@ -1,9 +1,7 @@
-import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import type { JSX } from 'react';
 import 'setimmediate';
 import { expect } from 'vitest';
-import DEFAULT_THEME from '../components/hooks/useMyTheme';
 
 /**
  * Button State, can be one of notPresent, disabled or enabled.
@@ -289,7 +287,7 @@ export function verifyTableContent(id: string, expectedContent: string[][]) {
     const rowWrappers = tableWrapper.querySelector('tbody').querySelectorAll('tr');
     rowWrappers.forEach(rowWrapper => {
       const row: string[] = [];
-      let cellWrappers = rowWrapper.querySelectorAll('td');
+      const cellWrappers = rowWrapper.querySelectorAll('td');
       cellWrappers.forEach(cellWrapper => {
         row.push(cellWrapper.textContent);
       });
@@ -713,9 +711,10 @@ export function dispatchEvents(events: CustomEvent[]) {
   });
 }
 
-export function wrapWithTheme(element: JSX.Element): JSX.Element {
-  return <ThemeProvider theme={createTheme({ palette: DEFAULT_THEME().palette.light })}>{element}</ThemeProvider>;
-}
+// TODO: this doesn't work any more...
+// export function wrapWithTheme(element: JSX.Element): JSX.Element {
+//   return <ThemeProvider theme={createTheme({ palette: DEFAULT_THEME().palette.light })}>{element}</ThemeProvider>;
+// }
 
 /**
  * Convenience function for rendering a component and waiting for any active promises.

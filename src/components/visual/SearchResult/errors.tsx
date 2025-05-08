@@ -21,7 +21,7 @@ import { bytesToSize } from 'helpers/utils';
 import type { ReactElement } from 'react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 const MAX_MESSAGE_SIZE = 2500;
 
@@ -32,7 +32,7 @@ type Props = {
 };
 
 const WrappedErrorsTable: React.FC<Props> = ({ errorResults, setErrorKey = null, allowSort = true }) => {
-  const { t, i18n } = useTranslation(['adminErrorViewer']);
+  const { t } = useTranslation(['adminErrorViewer']);
   const theme = useTheme();
 
   const errorMap: Record<ErrorType, ReactElement> = {
@@ -90,9 +90,11 @@ const WrappedErrorsTable: React.FC<Props> = ({ errorResults, setErrorKey = null,
                   {error.response.message.length > MAX_MESSAGE_SIZE ? (
                     <>
                       <span>{error.response.message.slice(0, MAX_MESSAGE_SIZE)}... </span>
-                      <span style={{ color: theme.palette.secondary.main }}>{`(${bytesToSize(
-                        new Blob([error.response.message.slice(MAX_MESSAGE_SIZE)]).size
-                      )} ${t('more')})`}</span>
+                      <span style={{ color: theme.palette.secondary.main }}>
+                        {`(${bytesToSize(
+                          new Blob([error.response.message.slice(MAX_MESSAGE_SIZE)]).size
+                        )} ${t('more')})`}
+                      </span>
                     </>
                   ) : (
                     <span>{error.response.message}</span>

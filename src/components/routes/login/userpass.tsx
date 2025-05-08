@@ -1,19 +1,5 @@
 import { Button, CircularProgress, TextField } from '@mui/material';
-import createStyles from '@mui/styles/createStyles';
-import makeStyles from '@mui/styles/makeStyles';
 import { useTranslation } from 'react-i18next';
-
-const useStyles = makeStyles(() =>
-  createStyles({
-    buttonProgress: {
-      position: 'absolute',
-      top: '50%',
-      left: '50%',
-      marginTop: -12,
-      marginLeft: -12
-    }
-  })
-);
 
 type UserPassLoginProps = {
   onSubmit: (event) => void;
@@ -24,7 +10,6 @@ type UserPassLoginProps = {
 
 export function UserPassLogin({ onSubmit, buttonLoading, setPassword, setUsername }: UserPassLoginProps) {
   const { t } = useTranslation(['login']);
-  const classes = useStyles();
 
   return (
     <form onSubmit={onSubmit}>
@@ -53,7 +38,7 @@ export function UserPassLogin({ onSubmit, buttonLoading, setPassword, setUsernam
           disabled={buttonLoading}
         >
           {t('button')}
-          {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
+          {buttonLoading && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
         </Button>
       </div>
     </form>

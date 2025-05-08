@@ -139,7 +139,7 @@ const isObject = (data: any, empty: boolean = true): boolean => {
   else return true;
 };
 
-export const getValueFromPath = (obj: object, path: Array<string>): any => {
+export const getValueFromPath = (obj: object, path: string[]): any => {
   let current = obj;
   if (obj === undefined || obj === null) return null;
   for (let i = 0; i < path.length; ++i) {
@@ -177,12 +177,7 @@ const mergeObject = (first: any, second: any): any => {
   else return first;
 };
 
-const applySubObject = (
-  origin: object,
-  value: any,
-  path: Array<string>,
-  method: (origin: any, value: any) => any
-): any => {
+const applySubObject = (origin: object, value: any, path: string[], method: (origin: any, value: any) => any): any => {
   if (path !== null && path.length === 0) return method(origin, value);
   else if (isObject(origin) && Object.keys(origin).includes(path[0])) {
     const obj = Object.fromEntries([[path[0], applySubObject(origin[path[0]], value, [...path.slice(1)], method)]]);
@@ -207,14 +202,14 @@ const cleanTypes = (origin: any, types: any) => {
   } else return origin;
 };
 
-const validateStoreTypes = (origin: any, types: any, path: Array<string> = []) => {
+const validateStoreTypes = (origin: any, types: any, path: string[] = []) => {
   if (path !== null && path.length === 0) return cleanTypes(origin, types);
   else if (isObject(types) && Object.keys(types).includes(path[0]))
     return validateStoreTypes(origin, types[path[0]], [...path.slice(1)]);
   else return origin;
 };
 
-const getObjectWithKeys = (obj: object, keys: Array<any>) =>
+const getObjectWithKeys = (obj: object, keys: any[]) =>
   keys === null || keys.length === 0
     ? obj
     : Object.fromEntries(
@@ -223,7 +218,7 @@ const getObjectWithKeys = (obj: object, keys: Array<any>) =>
           .map(key => [key, obj[key]])
       );
 
-const getObjectWithoutKeys = (obj: object, keys: Array<any>) =>
+const getObjectWithoutKeys = (obj: object, keys: any[]) =>
   keys === null || keys.length === 0
     ? obj
     : Object.fromEntries(
@@ -234,7 +229,7 @@ const getObjectWithoutKeys = (obj: object, keys: Array<any>) =>
 
 // 2. Configs
 const setStoreConfig =
-  <T extends any>(store: Store, path: Array<string>) =>
+  <T extends any>(store: Store, path: string[]) =>
   (first: Store, second: T, clean: (data: T) => T = null): Store => {
     const newPath = [...path.slice(1)];
     const newStore = applySubObject(DEFAULT_STORE, first, [], mergeObject);
@@ -244,7 +239,7 @@ const setStoreConfig =
   };
 
 const setStoreWithKeysConfig =
-  <T extends object>(store: Store, path: Array<string>) =>
+  <T extends object>(store: Store, path: string[]) =>
   (first: Store, second: T, keys: (keyof T)[]): Store => {
     const newPath = [...path.slice(1)];
     const newStore = applySubObject(DEFAULT_STORE, first, [], mergeObject);
@@ -254,7 +249,7 @@ const setStoreWithKeysConfig =
   };
 
 const setStoreWithoutKeysConfig =
-  <T extends object>(store: Store, path: Array<string>) =>
+  <T extends object>(store: Store, path: string[]) =>
   (first: Store, second: T, keys: (keyof T)[]): Store => {
     const newPath = [...path.slice(1)];
     let newStore = applySubObject(DEFAULT_STORE, first, [], mergeObject);
@@ -265,7 +260,7 @@ const setStoreWithoutKeysConfig =
   };
 
 const removeStoreKeysConfig =
-  <T extends object>(store: Store, path: Array<string>) =>
+  <T extends object>(store: Store, path: string[]) =>
   (first: Store, keys: (keyof T)[]): Store => {
     const newPath = [...path.slice(1)];
     let sub = getValueFromPath(first, newPath);
@@ -275,8 +270,8 @@ const removeStoreKeysConfig =
   };
 
 const setStoreWithPathConfig =
-  (origin: Store, path: Array<string>) =>
-  (store: Store, data: any, valuePath: Array<string> = []): Store => {
+  (origin: Store, path: string[]) =>
+  (store: Store, data: any, valuePath: string[] = []): Store => {
     const newPath = [...path.slice(1)];
     const newStore = applySubObject(DEFAULT_STORE, store, [], mergeObject);
     data = validateStoreTypes(data, STORE_TYPES, [...newPath, ...valuePath]);
@@ -284,8 +279,8 @@ const setStoreWithPathConfig =
   };
 
 // 3. Builders
-const storeBuilder = (data: any, method: (data: any, p?: Array<string>) => any, path: Array<string> = []) => {
-  const newElements: Array<[number | string | symbol, any]> = [];
+const storeBuilder = (data: any, method: (data: any, p?: string[]) => any, path: string[] = []) => {
+  const newElements: [number | string | symbol, any][] = [];
   Object.keys(data).forEach(key => {
     newElements.push([`${key.charAt(0).toUpperCase() + key.slice(1)}`, method(data[key], [...path, key])]);
     if (isObject(data[key])) newElements.push([key, storeBuilder(data[key], method, [...path, key])]);

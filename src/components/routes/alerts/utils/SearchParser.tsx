@@ -1,5 +1,11 @@
-import type { Params, Types } from './SearchParams';
-import { ArrayParam, BaseParam, BooleanParam, NumberParam, StringParam } from './SearchParams';
+import type { Params, Types } from 'components/routes/alerts/utils/SearchParams';
+import {
+  ArrayParam,
+  BaseParam,
+  BooleanParam,
+  NumberParam,
+  StringParam
+} from 'components/routes/alerts/utils/SearchParams';
 
 type SearchInput = string | string[][] | Record<string, string> | URLSearchParams;
 

@@ -18,7 +18,7 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import useAppUser from 'commons/components/app/hooks/useAppUser';
+import { useAppUser } from 'commons/components/app/hooks';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useALContext from 'components/hooks/useALContext';
@@ -30,6 +30,7 @@ import type { CustomUser } from 'components/models/ui/user';
 import ServiceDetail from 'components/routes/admin/service_detail';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import FileDownloader from 'components/visual/FileDownloader';
+import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import type { JSONFeedItem } from 'components/visual/Notification/useNotificationFeed';
 import { useNotificationFeed } from 'components/visual/Notification/useNotificationFeed';
 import ServiceTable from 'components/visual/SearchResult/service';
@@ -387,12 +388,11 @@ export default function Services() {
           </Button>
         </DialogActions>
       </Dialog>
-      <Grid container alignItems="center" spacing={3}>
-        <Grid item xs>
-          <Typography variant="h4">{t('title')}</Typography>
-        </Grid>
-        <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
-          <div style={{ display: 'flex', marginBottom: theme.spacing(1), justifyContent: 'flex-end' }}>
+
+      <PageHeader
+        primary={t('title')}
+        actions={
+          <>
             <Tooltip
               PopperProps={{
                 disablePortal: true
@@ -462,7 +462,7 @@ export default function Services() {
                 </IconButton>
               </span>
             </Tooltip>
-            <FileDownloader icon={<GetAppOutlinedIcon />} link={`/api/v4/service/backup/`} tooltip={t('backup')} />
+            <FileDownloader icon={<GetAppOutlinedIcon />} link="/api/v4/service/backup/" tooltip={t('backup')} />
             <Tooltip
               PopperProps={{
                 disablePortal: true
@@ -474,12 +474,12 @@ export default function Services() {
                 <RestoreOutlinedIcon />
               </IconButton>
             </Tooltip>
-          </div>
-        </Grid>
-      </Grid>
+          </>
+        }
+      />
 
       <Grid container alignItems="center" spacing={3}>
-        <Grid item xs>
+        <Grid size="grow">
           <Typography variant="h5">{t('title.loaded')}</Typography>
           {serviceResults ? (
             <Typography variant="caption" component="p">{`${serviceResults.length} ${t('count')}`}</Typography>
@@ -493,12 +493,12 @@ export default function Services() {
       </div>
 
       <Grid container alignItems="center" spacing={3} style={{ marginTop: theme.spacing(2) }}>
-        <Grid item xs>
+        <Grid size="grow">
           <Typography variant="h5">{t('title.available')}</Typography>
           {availableServices ? (
-            <Typography variant="caption" component="p">{`${availableServices.length} ${t(
-              'count.available'
-            )}`}</Typography>
+            <Typography variant="caption" component="p">
+              {`${availableServices.length} ${t('count.available')}`}
+            </Typography>
           ) : (
             <Skeleton width="8rem" />
           )}
@@ -513,12 +513,12 @@ export default function Services() {
       </div>
 
       <Grid container alignItems="center" spacing={3} style={{ marginTop: theme.spacing(2) }}>
-        <Grid item xs>
+        <Grid size="grow">
           <Typography variant="h5">{t('title.available.community')}</Typography>
           {availableCommunityServices ? (
-            <Typography variant="caption" component="p">{`${availableCommunityServices.length} ${t(
-              'count.available.community'
-            )}`}</Typography>
+            <Typography variant="caption" component="p">
+              {`${availableCommunityServices.length} ${t('count.available.community')}`}
+            </Typography>
           ) : (
             <Skeleton width="8rem" />
           )}

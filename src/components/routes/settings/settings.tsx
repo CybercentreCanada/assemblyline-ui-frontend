@@ -1,6 +1,6 @@
 import TableOfContentProvider from 'components/core/TableOfContent/TableOfContent';
-import { FormProvider } from './settings.form';
-import { SettingsRoute } from './settings.route';
+import { FormProvider } from 'components/routes/settings/settings.form';
+import { SettingsRoute } from 'components/routes/settings/settings.route';
 
 const Settings = () => (
   <TableOfContentProvider>

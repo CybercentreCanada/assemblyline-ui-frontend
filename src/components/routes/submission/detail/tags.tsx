@@ -1,30 +1,12 @@
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import { Collapse, Divider, Grid, Typography, useTheme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import useSafeResults from 'components/hooks/useSafeResults';
 import type { Tags } from 'components/models/ui/file';
 import AutoHideTagList from 'components/visual/AutoHideTagList';
 import { TooltipGrid } from 'components/visual/FileDetail/tags';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-
-const useStyles = makeStyles(theme => ({
-  title: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    cursor: 'pointer',
-    '&:hover, &:focus': {
-      color: theme.palette.text.secondary
-    }
-  },
-  meta_key: {
-    overflowX: 'hidden',
-    whiteSpace: 'nowrap',
-    textOverflow: 'ellipsis'
-  }
-}));
 
 type Props = {
   tag_group: string;
@@ -35,7 +17,6 @@ type Props = {
 const WrappedTagSection: React.FC<Props> = ({ tag_group, tags, force = false }) => {
   const { t } = useTranslation(['submissionDetail']);
   const theme = useTheme();
-  const classes = useStyles();
   const { showSafeResults } = useSafeResults();
 
   const [tagUnsafeMap, setTagUnsafeMap] = useState<Tags>({});
@@ -58,7 +39,19 @@ const WrappedTagSection: React.FC<Props> = ({ tag_group, tags, force = false }) 
 
   return someTagNotSafe || forceShowTag ? (
     <div style={{ paddingTop: sp2 }}>
-      <Typography variant="h6" onClick={() => setOpen(!open)} className={classes.title}>
+      <Typography
+        variant="h6"
+        onClick={() => setOpen(!open)}
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          cursor: 'pointer',
+          '&:hover, &:focus': {
+            color: theme.palette.text.secondary
+          }
+        }}
+      >
         <span>{t(tag_group)}</span>
         {open ? <ExpandLess /> : <ExpandMore />}
       </Typography>
@@ -72,7 +65,7 @@ const WrappedTagSection: React.FC<Props> = ({ tag_group, tags, force = false }) 
                   <span style={{ fontWeight: 500 }}>{tag_type}</span>
                 </TooltipGrid>
 
-                <Grid item xs={12} sm={9} lg={10}>
+                <Grid size={{ xs: 12, sm: 9, lg: 10 }}>
                   <AutoHideTagList
                     tag_type={tag_type}
                     items={tags[tag_type].map(item => {

@@ -20,8 +20,7 @@ import Moment from 'components/visual/Moment';
 import { maxLenStr } from 'helpers/utils';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router';
 
 type Props = {
   badlistResults: SearchResult<Badlist>;
@@ -93,8 +92,8 @@ const WrappedBadlistTable: React.FC<Props> = ({ badlistResults, allowSort = true
                 {sl_item.type === 'file'
                   ? sl_item.id
                   : sl_item.type === 'signature'
-                  ? maxLenStr(sl_item.signature.name, 100)
-                  : `${sl_item.tag.type} - ${maxLenStr(sl_item.tag.value, 100)}`}
+                    ? maxLenStr(sl_item.signature.name, 100)
+                    : `${sl_item.tag.type} - ${maxLenStr(sl_item.tag.value, 100)}`}
               </DivTableCell>
               <DivTableCell breakable>{sl_item.sources.map(obj => obj.name).join(' | ')}</DivTableCell>
               {c12nDef.enforce && (

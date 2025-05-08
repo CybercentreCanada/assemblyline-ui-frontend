@@ -1,22 +1,9 @@
 import { Checkbox, FormControlLabel, Typography, useTheme } from '@mui/material';
 import Skeleton from '@mui/material/Skeleton';
-import createStyles from '@mui/styles/createStyles';
-import makeStyles from '@mui/styles/makeStyles';
 import useALContext from 'components/hooks/useALContext';
-import { UserSettings } from 'components/models/base/user_settings';
+import type { UserSettings } from 'components/models/base/user_settings';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-
-const useStyles = makeStyles(theme =>
-  createStyles({
-    item: {
-      width: '100%',
-      '&:hover': {
-        background: theme.palette.action.hover
-      }
-    }
-  })
-);
 
 type ExternalSourcesProps = {
   settings: UserSettings;
@@ -25,9 +12,8 @@ type ExternalSourcesProps = {
   size?: 'medium' | 'small';
 };
 
-function ExternalSources({ settings, onChange, disabled = false, size = 'medium' as 'medium' }: ExternalSourcesProps) {
+function ExternalSources({ settings, onChange, disabled = false, size = 'medium' as const }: ExternalSourcesProps) {
   const { t } = useTranslation(['settings']);
-  const classes = useStyles();
   const theme = useTheme();
   const { configuration } = useALContext();
 
@@ -69,7 +55,15 @@ function ExternalSources({ settings, onChange, disabled = false, size = 'medium'
               )
             }
             label={<Typography variant="body2">{source}</Typography>}
-            className={settings && !disabled ? classes.item : null}
+            sx={{
+              ...(settings &&
+                !disabled && {
+                  width: '100%',
+                  '&:hover': {
+                    background: theme.palette.action.hover
+                  }
+                })
+            }}
           />
         </div>
       ))}

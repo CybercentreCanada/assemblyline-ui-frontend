@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import type { ReducerHandler, Reducers, RenderHandler, Store, UseReducer } from '..';
 import {
   DEFAULT_STORE,
   getSelectIndexes,
@@ -6,27 +7,16 @@ import {
   isCellMouseDown,
   isSameCellClick,
   orderSelectIndexes,
-  ReducerHandler,
-  Reducers,
   renderArrayClass,
-  RenderHandler,
-  setStore,
-  Store,
-  useCellStyles,
-  UseReducer
+  setStore
 } from '..';
 
 export const useSelectReducer: UseReducer = () => {
-  const classes = useCellStyles();
-
-  const selectRender = useCallback(
-    (prevStore: Store, nextStore: Store): void => {
-      const prev = getSelectIndexes(prevStore);
-      const next = getSelectIndexes(nextStore);
-      renderArrayClass(prev, next, classes.select, nextStore.cellsRendered);
-    },
-    [classes.select]
-  );
+  const selectRender = useCallback((prevStore: Store, nextStore: Store): void => {
+    const prev = getSelectIndexes(prevStore);
+    const next = getSelectIndexes(nextStore);
+    renderArrayClass(prev, next, 'hex-viewer-select', nextStore.cellsRendered);
+  }, []);
 
   const selectClear: Reducers['appClickAway'] = useCallback(
     store => ({ ...store, select: { ...store.select, startIndex: -1, endIndex: -1 } }),

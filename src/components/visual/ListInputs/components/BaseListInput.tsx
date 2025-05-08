@@ -3,6 +3,7 @@ import { FormHelperText, ListItem, ListItemButton, useTheme } from '@mui/materia
 import React, { type FC } from 'react';
 
 interface BaseListItemProps extends ListItemProps {
+  disabled?: boolean;
   error?: boolean;
   helperText?: React.ReactNode;
   FormHelperTextProps?: FormHelperTextProps;

@@ -8,7 +8,7 @@ type Props = {
   service: DockerConfig | Service | UpdateConfig | UpdateSource;
   defaults: DockerConfig | Service | UpdateConfig | UpdateSource;
   field: string | string[];
-  reset: (field: string) => void;
+  reset: (field: string | string[]) => void;
 };
 
 const WrappedResetButton = ({ service, defaults, field, reset }: Props) => {
@@ -28,7 +28,10 @@ const WrappedResetButton = ({ service, defaults, field, reset }: Props) => {
     }
   }, [defaults, field, getValue, service]);
 
-  return service && defaults && hasChanges() && typeof field === 'string' ? (
+  return service &&
+    defaults &&
+    hasChanges() &&
+    (typeof field === 'string' || (Array.isArray(field) && field.every(f => typeof f === 'string'))) ? (
     <Tooltip title={t('reset.tooltip')}>
       <IconButton
         color="secondary"

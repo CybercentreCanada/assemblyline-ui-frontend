@@ -1,8 +1,7 @@
-import { AppBar, Button, ButtonProps, IconButton, IconButtonProps, Toolbar, Tooltip, useTheme } from '@mui/material';
-import useAppBar from 'commons/components/app/hooks/useAppBar';
-import useAppBarHeight from 'commons/components/app/hooks/useAppBarHeight';
-import useAppLayout from 'commons/components/app/hooks/useAppLayout';
-import { memo } from 'react';
+import type { ButtonProps, IconButtonProps } from '@mui/material';
+import { AppBar, Button, IconButton, Toolbar, Tooltip, useTheme } from '@mui/material';
+import { useAppBar, useAppBarHeight, useAppLayout } from 'commons/components/app/hooks';
+import { memo, useMemo } from 'react';
 
 export type PageHeaderAction = {
   key?: string;
@@ -26,7 +25,7 @@ type PageHeaderProps = {
   className?: string;
 };
 
-const PageHeader: React.FC<PageHeaderProps> = ({
+const PageContainer: React.FC<PageHeaderProps> = ({
   children,
   left,
   right,
@@ -41,7 +40,8 @@ const PageHeader: React.FC<PageHeaderProps> = ({
   const layout = useAppLayout();
   const appbar = useAppBar();
   const appBarHeight = useAppBarHeight();
-  const barWillHide = layout.current !== 'top' && appbar.autoHide;
+
+  const barWillHide = useMemo(() => (layout?.current !== 'top' ? appbar?.autoHide : null), [appbar?.autoHide, layout]);
 
   return (
     <AppBar
@@ -107,4 +107,4 @@ const PageHeader: React.FC<PageHeaderProps> = ({
   );
 };
 
-export default memo(PageHeader);
+export default memo(PageContainer);

@@ -1,4 +1,4 @@
-import type { APIResponse, BlobResponse } from './api.models';
+import type { APIResponse, BlobResponse } from 'components/core/Query/components/api.models';
 
 export const isAPIData = (value: object): value is APIResponse =>
   value !== undefined &&

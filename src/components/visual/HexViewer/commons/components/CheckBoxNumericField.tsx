@@ -32,12 +32,12 @@ export const WrappedCheckBoxNumericField = ({
 
   return (
     <>
-      <Grid item sm={4} xs={12} style={{ wordBreak: 'break-word' }}>
+      <Grid size={{ xs: 12, sm: 4 }} style={{ wordBreak: 'break-word' }}>
         <Tooltip title={description} placement={upSM ? 'right' : 'bottom-start'}>
           <Typography variant="subtitle2">{label}</Typography>
         </Tooltip>
       </Grid>
-      <Grid item sm={2} xs={4} style={{ textAlign: 'right' }}>
+      <Grid size={{ xs: 4, sm: 2 }} style={{ textAlign: 'right' }}>
         <FormControlLabel
           control={
             <Checkbox
@@ -49,7 +49,7 @@ export const WrappedCheckBoxNumericField = ({
           label={checkedLabel}
         />
       </Grid>
-      <Grid item sm={6} xs={8}>
+      <Grid size={{ xs: 8, sm: 6 }}>
         <FormControl style={{ width: '100%' }} size="small">
           <NumericField
             id={label}
@@ -57,7 +57,7 @@ export const WrappedCheckBoxNumericField = ({
             fullWidth
             size="small"
             margin="dense"
-            value={value as number}
+            value={value}
             min={min}
             max={max}
             base={10}

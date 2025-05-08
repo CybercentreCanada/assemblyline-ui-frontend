@@ -1,46 +1,45 @@
-/* eslint-disable jsx-a11y/no-static-element-interactions */
-/* eslint-disable jsx-a11y/no-noninteractive-tabindex */
-import { CircularProgress } from '@mui/material';
-import { makeStyles } from '@mui/styles';
+import { CircularProgress, styled } from '@mui/material';
+import useListKeyboard from 'commons/addons/lists/hooks/useListKeyboard';
+import useListNavigator from 'commons/addons/lists/hooks/useListNavigator';
+import type { LineItem } from 'commons/addons/lists/item/ListItemBase';
+import ListItemBase from 'commons/addons/lists/item/ListItemBase';
+import type ListScroller from 'commons/addons/lists/scrollers/ListScroller';
+import SimpleListScroller from 'commons/addons/lists/scrollers/SimpleListScroller';
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import useListKeyboard from '../hooks/useListKeyboard';
-import useListNavigator from '../hooks/useListNavigator';
-import ListItemBase, { LineItem } from '../item/ListItemBase';
-import ListScroller from '../scrollers/ListScroller';
-import SimpleListScroller from '../scrollers/SimpleListScroller';
 
-export const useStyles = makeStyles(theme => ({
-  outer: {
-    position: 'relative',
-    display: 'flex',
-    flexDirection: 'column',
-    overflow: 'auto',
-    minHeight: 300,
-    height: '100%',
-    width: '100%',
-    outline: 'none'
-  },
-  inner: {
-    position: 'relative',
-    width: '100%',
-    outline: 'none'
-  },
-  progressCt: {
-    position: 'absolute',
-    top: 0,
-    bottom: 0,
-    left: 0,
-    right: 0,
-    opacity: 0.7,
-    zIndex: 1,
-    alignItems: 'center',
-    backgroundColor: theme.palette.background.default
-  },
-  progressSpinner: {
-    position: 'absolute',
-    left: '50%',
-    top: '50%'
-  }
+export const Outer = styled('div')(() => ({
+  position: 'relative',
+  display: 'flex',
+  flexDirection: 'column',
+  overflow: 'auto',
+  minHeight: 300,
+  height: '100%',
+  width: '100%',
+  outline: 'none'
+}));
+
+export const Inner = styled('div')(() => ({
+  position: 'relative',
+  width: '100%',
+  outline: 'none'
+}));
+
+export const ProgressCt = styled('div')(({ theme }) => ({
+  position: 'absolute',
+  top: 0,
+  bottom: 0,
+  left: 0,
+  right: 0,
+  opacity: 0.7,
+  zIndex: 1,
+  alignItems: 'center',
+  backgroundColor: theme.palette.background.default
+}));
+
+export const ProgressSpinner = styled(CircularProgress)(({ theme }) => ({
+  position: 'absolute',
+  left: '50%',
+  top: '50%'
 }));
 
 export interface SimpleListProps {
@@ -82,16 +81,13 @@ const SimpleList: React.FC<SimpleListProps> = ({
   onRenderActions,
   onLoadNext
 }) => {
-  // Hooks.
-  const classes = useStyles();
-
   // List Navigator hook to register event handling.
   const { register } = useListNavigator(id);
 
   // Some refs.
-  const outerEL = useRef<HTMLDivElement>();
-  const scrollEL = useRef<HTMLElement>();
-  const innerEL = useRef<HTMLDivElement>();
+  const outerEL = useRef<HTMLDivElement>(null);
+  const scrollEL = useRef<HTMLElement>(null);
+  const innerEL = useRef<HTMLDivElement>(null);
   const nextScrollThreshold = useRef<number>(scrollLoadNextThreshold);
 
   // Some states.
@@ -180,20 +176,19 @@ const SimpleList: React.FC<SimpleListProps> = ({
   );
 
   return (
-    <div
+    <Outer
       id={id}
       tabIndex={0}
       ref={outerEL}
-      className={classes.outer}
       onKeyDown={!loading ? onKeyDown : null}
       style={{ overflow: !scrollTargetId ? 'auto' : null }}
     >
       {loading && !disableProgress && (
-        <div className={classes.progressCt}>
-          <CircularProgress className={classes.progressSpinner} />
-        </div>
+        <ProgressCt>
+          <CircularProgress sx={{ position: 'absolute', left: '50%', top: '50%' }} />
+        </ProgressCt>
       )}
-      <div ref={innerEL} className={classes.inner}>
+      <Inner ref={innerEL}>
         {items && items.length !== 0
           ? items.map((item, index) => (
               <ListItemBase
@@ -210,10 +205,10 @@ const SimpleList: React.FC<SimpleListProps> = ({
               </ListItemBase>
             ))
           : !loading
-          ? emptyValue
-          : null}
-      </div>
-    </div>
+            ? emptyValue
+            : null}
+      </Inner>
+    </Outer>
   );
 };
 

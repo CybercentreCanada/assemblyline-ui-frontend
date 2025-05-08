@@ -11,8 +11,7 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
-import useAppUser from 'commons/components/app/hooks/useAppUser';
+import { useAppUser } from 'commons/components/app/hooks';
 import PageFullSize from 'commons/components/pages/PageFullSize';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
@@ -23,21 +22,12 @@ import type { CustomUser } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
+import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import { MonacoEditor } from 'components/visual/MonacoEditor';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation } from 'react-router-dom';
-
-const useStyles = makeStyles(theme => ({
-  circularProgress: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    marginTop: -12,
-    marginLeft: -12
-  }
-}));
+import { useLocation } from 'react-router';
 
 type RetrohuntData = Pick<
   Retrohunt,
@@ -52,7 +42,6 @@ type Props = {
 function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = () => null }: Props) {
   const { t } = useTranslation(['retrohunt']);
   const theme = useTheme();
-  const classes = useStyles();
   const location = useLocation();
   const { apiCall } = useMyAPI();
   const { closeGlobalDrawer } = useDrawer();
@@ -168,7 +157,7 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = () => nu
 
           <Grid container flexDirection="column" flexWrap="nowrap" flex={1} rowGap={1}>
             {c12nDef.enforce && (
-              <Grid item paddingBottom={theme.spacing(2)}>
+              <Grid paddingBottom={theme.spacing(2)}>
                 <Classification
                   format="long"
                   type="picker"
@@ -179,26 +168,22 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = () => nu
               </Grid>
             )}
 
-            <Grid item>
-              <Grid container flexDirection="row">
-                <Grid item flexGrow={1}>
-                  <Typography variant="h4" children={t('header.add')} />
-                </Grid>
-                <Grid item>
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    disabled={isButtonLoading || !retrohunt?.description || !retrohunt?.yara_signature}
-                    onClick={() => setIsConfirmationOpen(true)}
-                  >
-                    {t('add.button')}
-                    {isButtonLoading && <CircularProgress className={classes.circularProgress} size={24} />}
-                  </Button>
-                </Grid>
-              </Grid>
-            </Grid>
+            <PageHeader
+              primary={t('header.add')}
+              actions={
+                <Button
+                  variant="contained"
+                  color="primary"
+                  disabled={isButtonLoading || !retrohunt?.description || !retrohunt?.yara_signature}
+                  onClick={() => setIsConfirmationOpen(true)}
+                >
+                  {t('add.button')}
+                  {isButtonLoading && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
+                </Button>
+              }
+            />
 
-            <Grid item>
+            <Grid>
               <Typography variant="subtitle2">{t('details.description')}</Typography>
               <TextField
                 fullWidth
@@ -213,10 +198,10 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = () => nu
               />
             </Grid>
 
-            <Grid item>
+            <Grid>
               <Grid container flexDirection="row" rowGap={2}>
                 {configuration?.datastore?.archive?.enabled && (
-                  <Grid item flexGrow={3}>
+                  <Grid flexGrow={3}>
                     <Typography variant="subtitle2">{t('details.search')}</Typography>
                     <RadioGroup
                       row
@@ -244,7 +229,7 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = () => nu
                     </RadioGroup>
                   </Grid>
                 )}
-                <Grid item flexGrow={2}>
+                <Grid flexGrow={2}>
                   <Typography variant="subtitle2">
                     {`${t('ttl')} (${maxDaysToLive ? `${t('ttl.max')}: ${maxDaysToLive}` : t('ttl.forever')})`}
                   </Typography>
@@ -267,7 +252,7 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = () => nu
             </Grid>
 
             {c12nDef.enforce && (
-              <Grid item marginBottom={1}>
+              <Grid marginBottom={1}>
                 <Tooltip title={t('tooltip.search_classification')} placement="top">
                   <div
                     style={{
@@ -292,7 +277,7 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = () => nu
               </Grid>
             )}
 
-            <Grid item flex={1}>
+            <Grid flex={1}>
               <Grid container flexDirection="column" height="100%" minHeight="500px">
                 <Typography variant="h6" children={t('details.yara_rule')} />
                 <MonacoEditor

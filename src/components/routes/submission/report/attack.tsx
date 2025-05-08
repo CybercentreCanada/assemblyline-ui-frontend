@@ -1,42 +1,15 @@
-import { Divider, Skeleton, Typography, useTheme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
+import { Divider, Skeleton, styled, Typography, useTheme } from '@mui/material';
 import type { SubmissionReport, TAttackMatrix } from 'components/models/ui/submission_report';
 import TextVerdict from 'components/visual/TextVerdict';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-const useStyles = makeStyles(theme => ({
-  attack_bloc: {
-    height: '100%',
-    width: '100%',
-    display: 'inline-block',
-    pageBreakInside: 'avoid',
-    marginBottom: theme.spacing(2)
-  },
-  attack_title: {
-    fontSize: '110%',
-    textTransform: 'capitalize',
-    fontWeight: 600
-  },
-  divider: {
-    '@media print': {
-      backgroundColor: '#0000001f !important'
-    }
-  },
-  section_title: {
-    marginTop: theme.spacing(4),
-    pageBreakAfter: 'avoid',
-    pageBreakInside: 'avoid'
-  },
-  section_content: {
-    marginTop: theme.spacing(2),
-    marginBottom: theme.spacing(2),
-    pageBreakBefore: 'avoid',
-    pageBreakInside: 'avoid'
-  },
-  section: {
-    pageBreakInside: 'avoid'
-  }
+const AttackBloc = styled('div')(({ theme }) => ({
+  height: '100%',
+  width: '100%',
+  display: 'inline-block',
+  pageBreakInside: 'avoid',
+  marginBottom: theme.spacing(2)
 }));
 
 type AttackMatrixBlockProps = {
@@ -45,10 +18,11 @@ type AttackMatrixBlockProps = {
 };
 
 function AttackMatrixBlock({ attack, items }: AttackMatrixBlockProps) {
-  const classes = useStyles();
   return (
-    <div className={classes.attack_bloc}>
-      <span className={classes.attack_title}>{attack.replace(/-/g, ' ')}</span>
+    <AttackBloc>
+      <span style={{ fontSize: '110%', textTransform: 'capitalize', fontWeight: 600 }}>
+        {attack.replace(/-/g, ' ')}
+      </span>
       {Object.keys(items).map((cat, idx) =>
         items[cat].h_type === 'safe' ? null : (
           <div key={idx}>
@@ -57,15 +31,15 @@ function AttackMatrixBlock({ attack, items }: AttackMatrixBlockProps) {
           </div>
         )
       )}
-    </div>
+    </AttackBloc>
   );
 }
 
 function AttackMatrixSkel() {
-  const classes = useStyles();
   const theme = useTheme();
+
   return (
-    <div className={classes.attack_bloc}>
+    <AttackBloc>
       <Skeleton style={{ height: '2rem' }} />
       <div style={{ display: 'flex', flexDirection: 'row' }}>
         <Skeleton style={{ height: '2rem', width: '1.5rem', marginRight: theme.spacing(2) }} />
@@ -75,7 +49,7 @@ function AttackMatrixSkel() {
         <Skeleton style={{ height: '2rem', width: '1.5rem', marginRight: theme.spacing(2) }} />
         <Skeleton style={{ height: '2rem', flexGrow: 1 }} />
       </div>
-    </div>
+    </AttackBloc>
   );
 }
 
@@ -85,27 +59,36 @@ type AttackProps = {
 
 function WrappedAttack({ report }: AttackProps) {
   const { t } = useTranslation(['submissionReport']);
-  const classes = useStyles();
+  const theme = useTheme();
 
   return (
     (!report || Object.keys(report.attack_matrix).length !== 0) && (
-      <div className={classes.section}>
-        <div className={classes.section_title}>
+      <div style={{ pageBreakInside: 'avoid' }}>
+        <div style={{ marginTop: theme.spacing(4), pageBreakAfter: 'avoid', pageBreakInside: 'avoid' }}>
           <Typography variant="h6">{t('attack')}</Typography>
-          <Divider className={classes.divider} />
+          <Divider
+            sx={{
+              '@media print': {
+                backgroundColor: '#0000001f !important'
+              }
+            }}
+          />
         </div>
         <div
-          className={classes.section_content}
           style={{
             columnWidth: '20rem',
-            columnGap: '1rem'
+            columnGap: '1rem',
+            marginTop: theme.spacing(2),
+            marginBottom: theme.spacing(2),
+            pageBreakBefore: 'avoid',
+            pageBreakInside: 'avoid'
           }}
         >
           {report
             ? Object.keys(report.attack_matrix).map((att, i) => (
                 <AttackMatrixBlock key={i} attack={att} items={report.attack_matrix[att]} />
               ))
-            : [...Array(5)].map((_, i) => <AttackMatrixSkel key={i} />)}
+            : Array.from({ length: 5 }).map((_, i) => <AttackMatrixSkel key={i} />)}
         </div>
       </div>
     )

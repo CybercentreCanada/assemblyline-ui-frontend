@@ -1,19 +1,5 @@
 import { Button, CircularProgress, TextField } from '@mui/material';
-import createStyles from '@mui/styles/createStyles';
-import makeStyles from '@mui/styles/makeStyles';
 import { useTranslation } from 'react-i18next';
-
-const useStyles = makeStyles(() =>
-  createStyles({
-    buttonProgress: {
-      position: 'absolute',
-      top: '50%',
-      left: '50%',
-      marginTop: -12,
-      marginLeft: -12
-    }
-  })
-);
 
 type OTPProps = {
   onSubmit: (event) => void;
@@ -23,7 +9,6 @@ type OTPProps = {
 
 export function OneTimePassLogin({ onSubmit, buttonLoading, setOneTimePass }: OTPProps) {
   const { t } = useTranslation(['login']);
-  const classes = useStyles();
 
   return (
     <form onSubmit={onSubmit}>
@@ -44,7 +29,7 @@ export function OneTimePassLogin({ onSubmit, buttonLoading, setOneTimePass }: OT
           disabled={buttonLoading}
         >
           {t('button')}
-          {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
+          {buttonLoading && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
         </Button>
       </div>
     </form>

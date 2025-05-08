@@ -1,8 +1,8 @@
 import PersonIcon from '@mui/icons-material/Person';
 import { Grid, useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
+import PageContainer from 'commons/components/pages/PageContainer';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
-import PageHeader from 'commons/components/pages/PageHeader';
 import type { SearchParams } from 'components/core/SearchParams/SearchParams';
 import { createSearchParams } from 'components/core/SearchParams/SearchParams';
 import { SearchParamsProvider, useSearchParams } from 'components/core/SearchParams/SearchParamsContext';
@@ -12,15 +12,14 @@ import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import type { ApiKey } from 'components/models/base/user';
 import type { FieldsResult, SearchResult } from 'components/models/ui/search';
+import ApikeyDetail from 'components/routes/admin/apikey_detail';
 import SearchHeader from 'components/visual/SearchBar/SearchHeader';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import ApikeysTable from 'components/visual/SearchResult/apikeys';
 import { safeFieldValue } from 'helpers/utils';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate, useNavigate } from 'react-router';
-import { useLocation } from 'react-router-dom';
-import ApikeyDetail from './apikey_detail';
+import { Navigate, useLocation, useNavigate } from 'react-router';
 
 const API_KEYS_PARAMS = createSearchParams(p => ({
   query: p.string(''),
@@ -134,13 +133,13 @@ const APIKeysSearch = () => {
     <PageFullWidth margin={4}>
       <div style={{ paddingBottom: theme.spacing(2) }}>
         <Grid container alignItems="center">
-          <Grid item xs>
+          <Grid flexGrow={1}>
             <Typography variant="h4">{t('apikeys.title')}</Typography>
           </Grid>
         </Grid>
       </div>
 
-      <PageHeader isSticky>
+      <PageContainer isSticky>
         <div style={{ paddingTop: theme.spacing(1) }}>
           <SearchHeader
             params={search.toParams()}
@@ -170,7 +169,7 @@ const APIKeysSearch = () => {
             ]}
           />
         </div>
-      </PageHeader>
+      </PageContainer>
 
       <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
         <ApikeysTable apikeySearchResults={apikeySearchResults} setApikeyID={setApikeyID} />

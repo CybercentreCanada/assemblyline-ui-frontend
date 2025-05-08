@@ -2,49 +2,28 @@ import CompareArrowsOutlinedIcon from '@mui/icons-material/CompareArrowsOutlined
 import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
-import {
-  Button,
-  CircularProgress,
-  Grid,
-  IconButton,
-  Paper,
-  Skeleton,
-  Tab,
-  Tooltip,
-  Typography,
-  useTheme
-} from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
+import { Button, CircularProgress, Paper, Skeleton, Tab, useTheme } from '@mui/material';
 import PageCenter from 'commons/components/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import type { ServiceConstants, Service as ServiceData } from 'components/models/base/service';
+import ServiceContainer from 'components/routes/admin/service_detail/container';
+import ServiceGeneral from 'components/routes/admin/service_detail/general';
+import ServiceParams from 'components/routes/admin/service_detail/parameters';
+import ServiceUpdater from 'components/routes/admin/service_detail/updater';
+import { IconButton } from 'components/visual/Buttons/IconButton';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import CustomChip from 'components/visual/CustomChip';
 import Empty from 'components/visual/Empty';
-import type { JSONFeedItem } from 'components/visual/Notification';
+import { PageHeader } from 'components/visual/Layouts/PageHeader';
+import type { JSONFeedItem } from 'components/visual/Notification/useNotificationFeed';
 import { useNotificationFeed } from 'components/visual/Notification/useNotificationFeed';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
 import { getVersionQuery } from 'helpers/utils';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate, useNavigate } from 'react-router';
-import { Link, useParams } from 'react-router-dom';
-import ServiceContainer from './service_detail/container';
-import ServiceGeneral from './service_detail/general';
-import ServiceParams from './service_detail/parameters';
-import ServiceUpdater from './service_detail/updater';
-
-const useStyles = makeStyles(() => ({
-  buttonProgress: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    marginTop: -12,
-    marginLeft: -12
-  }
-}));
+import { Navigate, useNavigate, useParams } from 'react-router';
 
 const TAB_TYPES = ['general', 'docker', 'updater', 'params'] as const;
 type TabType = (typeof TAB_TYPES)[number];
@@ -63,7 +42,6 @@ function Service({ name = null, onDeleted = () => null, onUpdated = () => null }
   const { t } = useTranslation(['adminServices']);
   const theme = useTheme();
   const navigate = useNavigate();
-  const classes = useStyles();
   const { svc } = useParams<ParamProps>();
   const { apiCall } = useMyAPI();
   const { user: currentUser, configuration } = useALContext();
@@ -180,8 +158,6 @@ function Service({ name = null, onDeleted = () => null, onUpdated = () => null }
   useEffect(() => {
     // Set the global error flag based on each sub-error value
     setOverallError(serviceGeneralError);
-
-    // eslint-disable-next-line
   }, [serviceGeneralError]);
 
   useEffect(() => {
@@ -215,57 +191,54 @@ function Service({ name = null, onDeleted = () => null, onUpdated = () => null }
         text={t('delete.text')}
         waiting={buttonLoading}
       />
-      <Grid container alignItems="center" spacing={3} style={{ paddingBottom: theme.spacing(2) }}>
-        <Grid item xs>
-          <Typography variant="h4">{service ? service.name : <Skeleton style={{ width: '20rem' }} />}</Typography>
-          <Typography variant="caption">{t('title.detail')}</Typography>
-        </Grid>
-        <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
-          {service ? (
-            <div style={{ display: 'flex', marginBottom: theme.spacing(1), justifyContent: 'flex-end' }}>
-              <Tooltip title={t('errors')}>
-                <IconButton
-                  component={Link}
-                  style={{ color: theme.palette.action.active }}
-                  to={`/admin/errors?filters=response.service_name%3A${service.name}&filters=${getVersionQuery(
-                    service.version
-                  )}`}
-                  size="large"
-                >
-                  <ErrorOutlineOutlinedIcon />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title={t('compare')}>
-                <IconButton
-                  component={Link}
-                  style={{ color: theme.palette.action.active }}
-                  to={`/admin/service_review?service=${service.name}&v1=${service.version}`}
-                  size="large"
-                >
-                  <CompareArrowsOutlinedIcon />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title={t('remove')}>
-                <IconButton
-                  style={{
-                    color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
-                  }}
-                  onClick={handleDeleteButtonClick}
-                  size="large"
-                >
-                  <RemoveCircleOutlineOutlinedIcon />
-                </IconButton>
-              </Tooltip>
-            </div>
-          ) : (
-            <div style={{ display: 'flex', marginBottom: theme.spacing(1), justifyContent: 'flex-end' }}>
-              <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
-              <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
-              <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
-            </div>
-          )}
-        </Grid>
-      </Grid>
+
+      <PageHeader
+        primary={service ? service.name : <Skeleton style={{ width: '20rem' }} />}
+        secondary={t('title.detail')}
+        loading={!service}
+        slotProps={{
+          root: { style: { marginBottom: theme.spacing(2) } }
+        }}
+        actions={
+          <>
+            <IconButton
+              loading={!service}
+              size="large"
+              sx={{ color: theme.palette.action.active }}
+              tooltip={t('errors')}
+              to={() =>
+                `/admin/errors?filters=response.service_name%3A${service.name}&filters=${getVersionQuery(
+                  service.version
+                )}`
+              }
+            >
+              <ErrorOutlineOutlinedIcon />
+            </IconButton>
+
+            <IconButton
+              loading={!service}
+              size="large"
+              sx={{ color: theme.palette.action.active }}
+              to={() => `/admin/service_review?service=${service.name}&v1=${service.version}`}
+              tooltip={t('compare')}
+            >
+              <CompareArrowsOutlinedIcon />
+            </IconButton>
+
+            <IconButton
+              loading={!service}
+              size="large"
+              tooltip={t('remove')}
+              onClick={handleDeleteButtonClick}
+              sx={{
+                color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+              }}
+            >
+              <RemoveCircleOutlineOutlinedIcon />
+            </IconButton>
+          </>
+        }
+      />
 
       {service ? (
         <CustomChip
@@ -355,7 +328,7 @@ function Service({ name = null, onDeleted = () => null, onUpdated = () => null }
             onClick={saveService}
           >
             {t('save')}
-            {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
+            {buttonLoading && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
           </Button>
         </div>
       ) : null}

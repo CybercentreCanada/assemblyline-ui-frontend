@@ -1,5 +1,5 @@
+import { useTableOfContent } from 'components/core/TableOfContent/TableOfContent';
 import React, { useEffect, useId } from 'react';
-import { useTableOfContent } from './TableOfContent';
 
 export type AnchorProps = React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> & {
   anchor?: string;

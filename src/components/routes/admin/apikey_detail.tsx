@@ -5,11 +5,9 @@ import {
   Divider,
   FormControl,
   Grid,
-  IconButton,
   MenuItem,
   Select,
   Skeleton,
-  Tooltip,
   Typography,
   useTheme
 } from '@mui/material';
@@ -20,15 +18,16 @@ import useMySnackbar from 'components/hooks/useMySnackbar';
 import { type ApiKey } from 'components/models/base/user';
 import ForbiddenPage from 'components/routes/403';
 import { useAPIKeyUtilities } from 'components/routes/user/api_keys';
+import { IconButton } from 'components/visual/Buttons/IconButton';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import CustomChip from 'components/visual/CustomChip';
 import DatePicker from 'components/visual/DatePicker';
+import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import Moment from 'components/visual/Moment';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router';
 
 type ParamProps = {
   id: string;
@@ -146,69 +145,59 @@ const ApikeyDetail = ({ key_id = null, onClose = () => null }: ApikeyDetailProps
         waiting={waitingDialog}
       />
 
-      <div style={{ textAlign: 'left' }}>
-        <div style={{ paddingBottom: theme.spacing(4) }}>
-          <Grid container alignItems="center" spacing={1}>
-            <Grid item xs>
-              <Typography variant="h4">{t('apikey')}</Typography>
-            </Grid>
-            <Grid item xs={12} sm style={{ textAlign: 'right', flexGrow: 0 }}>
-              {apiKey ? (
-                (key_id || id) && (
-                  <div style={{ display: 'flex', marginBottom: theme.spacing(1) }}>
-                    <Tooltip title={t('apikey.remove.tooltip')}>
-                      <div>
-                        <IconButton
-                          disabled={loading}
-                          size="large"
-                          onClick={() => setDeleteDialog(true)}
-                          sx={{
-                            color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
-                          }}
-                        >
-                          <DeleteOutlineOutlinedIcon />
-                        </IconButton>
-                      </div>
-                    </Tooltip>
-                  </div>
-                )
-              ) : (
-                <div style={{ display: 'flex' }}>
-                  <Skeleton variant="circular" height="3rem" width="3rem" style={{ margin: theme.spacing(0.5) }} />
-                </div>
-              )}
-            </Grid>
-          </Grid>
-        </div>
+      <PageHeader
+        primary={t('apikey')}
+        loading={!apiKey}
+        slotProps={{
+          root: { style: { marginBottom: theme.spacing(4) } },
+          actions: { spacing: 1 }
+        }}
+        actions={
+          <IconButton
+            disabled={loading}
+            loading={!apiKey}
+            preventRender={!(key_id || id)}
+            size="large"
+            tooltip={t('apikey.remove.tooltip')}
+            onClick={() => setDeleteDialog(true)}
+            sx={{
+              color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+            }}
+          >
+            <DeleteOutlineOutlinedIcon />
+          </IconButton>
+        }
+      />
 
+      <div style={{ textAlign: 'left' }}>
         <Grid container spacing={3}>
           {apiKey && (
-            <Grid item xs={12}>
+            <Grid size={{ xs: 12 }}>
               <Typography variant="h6"> {t('key.detail.title')}</Typography>
               <Divider />
               <Grid container marginTop={1}>
-                <Grid item xs={4} sm={3}>
+                <Grid size={{ xs: 4, sm: 3 }}>
                   <span style={{ fontWeight: 500 }}>{t('key.name.title')}</span>
                 </Grid>
-                <Grid item xs={8} sm={9}>
+                <Grid size={{ xs: 8, sm: 9 }}>
                   <span style={{ fontWeight: 500 }}>{apiKey.key_name}</span>
                 </Grid>
-                <Grid item xs={4} sm={3}>
+                <Grid size={{ xs: 4, sm: 3 }}>
                   <span style={{ fontWeight: 500 }}>{t('username.title')}</span>
                 </Grid>
-                <Grid item xs={8} sm={9} style={{ wordBreak: 'break-word' }}>
+                <Grid size={{ xs: 8, sm: 9 }} style={{ wordBreak: 'break-word' }}>
                   <span style={{ fontWeight: 500 }}>{apiKey.uname}</span>
                 </Grid>
               </Grid>
             </Grid>
           )}
 
-          <Grid item xs={12}>
-            <Grid container alignItems={'end'}>
-              <Grid item xs={11}>
+          <Grid size={{ xs: 12 }}>
+            <Grid container alignItems="end">
+              <Grid size="grow">
                 <Typography variant="h6">{t('timing.title')}</Typography>
               </Grid>
-              <Grid item xs={1} style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
+              <Grid size="auto" style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
                 {apiKey ? (
                   <DatePicker
                     aria-labelledby="expiry_ts-label"
@@ -224,10 +213,10 @@ const ApikeyDetail = ({ key_id = null, onClose = () => null }: ApikeyDetailProps
             </Grid>
             <Divider />
             <Grid container marginTop={1}>
-              <Grid item xs={4} sm={3}>
+              <Grid size={{ xs: 4, sm: 3 }}>
                 <span style={{ fontWeight: 500 }}>{t('creation_date')}</span>
               </Grid>
-              <Grid item xs={8} sm={9}>
+              <Grid size={{ xs: 8, sm: 9 }}>
                 {apiKey ? (
                   apiKey?.creation_date ? (
                     <div>
@@ -243,10 +232,10 @@ const ApikeyDetail = ({ key_id = null, onClose = () => null }: ApikeyDetailProps
                   <Skeleton />
                 )}
               </Grid>
-              <Grid item xs={4} sm={3}>
+              <Grid size={{ xs: 4, sm: 3 }}>
                 <span style={{ fontWeight: 500 }}>{t('last_used')}</span>
               </Grid>
-              <Grid item xs={8} sm={9}>
+              <Grid size={{ xs: 8, sm: 9 }}>
                 {apiKey ? (
                   apiKey?.last_used ? (
                     <div>
@@ -261,10 +250,10 @@ const ApikeyDetail = ({ key_id = null, onClose = () => null }: ApikeyDetailProps
                   <Skeleton />
                 )}
               </Grid>
-              <Grid item xs={4} sm={3}>
+              <Grid size={{ xs: 4, sm: 3 }}>
                 <span style={{ fontWeight: 500 }}>{t('expiration_date')}</span>
               </Grid>
-              <Grid item xs={8} sm={9}>
+              <Grid size={{ xs: 8, sm: 9 }}>
                 {apiKey ? (
                   apiKey.expiry_ts ? (
                     <div>
@@ -283,12 +272,15 @@ const ApikeyDetail = ({ key_id = null, onClose = () => null }: ApikeyDetailProps
             </Grid>
           </Grid>
 
-          <Grid item xs={12}>
-            <Grid container alignItems={'end'}>
-              <Grid item xs={9}>
+          <Grid size={{ xs: 12 }}>
+            <Grid container alignItems="end">
+              <Grid size={{ xs: 9 }}>
                 <Typography variant="h6">{t('permissions.title')}</Typography>
               </Grid>
-              <Grid item xs={3} style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}></Grid>
+              <Grid
+                size={{ xs: 3 }}
+                style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}
+              ></Grid>
             </Grid>
             <Divider />
             <Grid container marginTop={1}>

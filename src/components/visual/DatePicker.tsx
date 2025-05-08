@@ -1,6 +1,6 @@
 import EventIcon from '@mui/icons-material/Event';
 import type { TextFieldProps } from '@mui/material';
-import { Button, Dialog, DialogActions, IconButton, TextField, Tooltip, useTheme } from '@mui/material';
+import { Button, Dialog, DialogActions, IconButton, Tooltip, useTheme } from '@mui/material';
 import { LocalizationProvider, DatePicker as MuiDatePicker, StaticDatePicker } from '@mui/x-date-pickers';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import type { Moment } from 'moment';
@@ -81,7 +81,6 @@ function WrappedDatePicker({
               onChange={newValue => {
                 setTempDate(newValue);
               }}
-              renderInput={params => <TextField {...params} />}
               minDate={minDateTomorrow ? tomorrow : null}
               maxDate={maxDateToday ? today : null}
             />
@@ -118,23 +117,20 @@ function WrappedDatePicker({
       ) : (
         <MuiDatePicker
           value={tempDate}
+          minDate={minDateTomorrow ? tomorrow : null}
+          maxDate={maxDateToday ? today : null}
+          disabled={disabled}
           onChange={newValue => {
             setTempDate(newValue);
             setDate(newValue && newValue.isValid() ? `${newValue.format('YYYY-MM-DDThh:mm:ss.SSSSSS')}Z` : null);
           }}
-          renderInput={({ inputRef, inputProps, InputProps }) => (
-            <TextField
-              size="small"
-              label={tooltip ? tooltip : null}
-              ref={inputRef}
-              {...textFieldProps}
-              inputProps={{ ...inputProps, ...textFieldProps?.inputProps }}
-              InputProps={{ ...InputProps, ...textFieldProps?.InputProps }}
-            />
-          )}
-          minDate={minDateTomorrow ? tomorrow : null}
-          maxDate={maxDateToday ? today : null}
-          disabled={disabled}
+          slotProps={{
+            textField: {
+              size: 'small',
+              label: tooltip ? tooltip : null,
+              ...textFieldProps
+            }
+          }}
         />
       )}
     </LocalizationProvider>

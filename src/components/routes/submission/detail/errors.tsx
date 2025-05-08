@@ -2,6 +2,7 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import type { ButtonProps, SvgIconProps } from '@mui/material';
 import {
+  Box,
   Button,
   Collapse,
   Divider,
@@ -12,33 +13,13 @@ import {
   useTheme
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import makeStyles from '@mui/styles/makeStyles';
 import type { Submission } from 'components/models/base/submission';
 import { getErrorIDFromKey, getErrorTypeFromKey, getHashFromKey, getServiceFromKey } from 'helpers/errors';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 const MAX_ERROR_COUNT = 500;
-
-const useStyles = makeStyles(theme => ({
-  title: {
-    color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark,
-    flexGrow: 1
-  },
-  startIcon: {
-    marginRight: theme.spacing(1)
-  },
-  content: {
-    '& *': {
-      color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
-    },
-    '& *:not(strong, a, svg, path)': {
-      fontSize: '14px',
-      fontWeight: 400
-    }
-  }
-}));
 
 export const ERROR_TYPE_MAP = {
   UNKNOWN: 'unknown',
@@ -284,7 +265,6 @@ type Props = {
 const WrappedErrorSection: React.FC<Props> = ({ sid, errors }) => {
   const { t } = useTranslation(['submissionDetail']);
   const theme = useTheme();
-  const classes = useStyles();
   const sp2 = theme.spacing(2);
 
   const parsed = useMemo<ParsedErrors>(() => parseErrors(errors), [errors]);
@@ -292,16 +272,34 @@ const WrappedErrorSection: React.FC<Props> = ({ sid, errors }) => {
   return (
     <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
       <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between' }}>
-        <Typography className={classes.title} variant="h6">
+        <Typography
+          variant="h6"
+          sx={{
+            color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark,
+            flexGrow: 1
+          }}
+        >
           <span>{t('errors')}</span>
         </Typography>
       </div>
       <Divider />
-      <div className={classes.content} style={{ paddingBottom: sp2, paddingTop: sp2 }}>
+      <Box
+        sx={{
+          paddingBottom: sp2,
+          paddingTop: sp2,
+          '& *': {
+            color: `${theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark} !important`
+          },
+          '& *:not(strong, a, svg, path)': {
+            fontSize: '14px',
+            fontWeight: 400
+          }
+        }}
+      >
         {Object.entries(parsed).map(([type, services]: [ErrorTypeValues, Record<string, string[]>], i) => (
           <ErrorTypes key={i} sid={sid} type={type} services={services} />
         ))}
-      </div>
+      </Box>
     </div>
   );
 };

@@ -1,7 +1,8 @@
 import { CircularProgress, IconButton, Tooltip } from '@mui/material';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import { MouseEventHandler, useState } from 'react';
+import type { MouseEventHandler } from 'react';
+import { useState } from 'react';
 
 type EmptyProps = {
   icon: React.ReactNode;
@@ -36,7 +37,7 @@ function FileDownloader({
       onSuccess: api_data => {
         if (successMessage) showSuccessMessage(successMessage);
 
-        let chunks = [];
+        const chunks = [];
         let curProgress = 0;
         const reader = api_data.api_response.getReader();
         setProgress(0);
@@ -82,30 +83,13 @@ function FileDownloader({
           disabled={waiting || total !== null}
           size={size}
         >
-          {(waiting || total === 0) && (
-            <CircularProgress
-              size={24}
-              style={{
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                marginTop: -12,
-                marginLeft: -12
-              }}
-            />
-          )}
+          {(waiting || total === 0) && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
           {total !== null && total !== 0 && progress !== null && (
             <CircularProgress
               size={24}
-              style={{
-                position: 'absolute',
-                top: '50%',
-                left: '50%',
-                marginTop: -12,
-                marginLeft: -12
-              }}
+              sx={{ position: 'absolute' }}
               value={(progress / total) * 100}
-              variant={'determinate'}
+              variant="determinate"
             />
           )}
           {icon}

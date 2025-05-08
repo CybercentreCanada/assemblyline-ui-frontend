@@ -10,9 +10,7 @@ export type Alias = {
   short_name: string;
 };
 
-export type ClassificationAliases = {
-  [key: string]: Alias;
-};
+export type ClassificationAliases = Record<string, Alias>;
 
 export interface CustomAppUserService extends AppUserService<CustomUser> {
   c12nDef: ClassificationDefinition;

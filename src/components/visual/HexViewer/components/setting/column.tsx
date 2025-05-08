@@ -1,9 +1,10 @@
 import { FormControl, Grid, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
 import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
+import type { StoreProps } from 'components/visual/HexViewer';
+import { COLUMNS, NumericField, useDispatch, useStore } from 'components/visual/HexViewer';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { COLUMNS, NumericField, StoreProps, useDispatch, useStore } from '../..';
 
 export const WrappedHexColumnSetting = ({ store }: StoreProps) => {
   const { t } = useTranslation(['hexViewer']);
@@ -14,12 +15,12 @@ export const WrappedHexColumnSetting = ({ store }: StoreProps) => {
 
   return (
     <>
-      <Grid item sm={4} xs={12} style={{ wordBreak: 'break-word' }}>
+      <Grid size={{ xs: 12, sm: 4 }} style={{ wordBreak: 'break-word' }}>
         <Tooltip title={t('columns.description')} placement={upSM ? 'right' : 'bottom-start'}>
           <Typography variant="subtitle2">{t('columns.label')}</Typography>
         </Tooltip>
       </Grid>
-      <Grid item sm={2} xs={4} style={{ textAlign: 'left' }}>
+      <Grid size={{ xs: 4, sm: 2 }} style={{ textAlign: 'left' }}>
         <FormControlLabel
           control={
             <Checkbox
@@ -31,7 +32,7 @@ export const WrappedHexColumnSetting = ({ store }: StoreProps) => {
           label={t('columns.auto')}
         />
       </Grid>
-      <Grid item sm={6} xs={8}>
+      <Grid size={{ xs: 8, sm: 6 }}>
         <FormControl style={{ width: '100%' }}>
           <NumericField
             id={t('columns.label')}

@@ -1,6 +1,7 @@
 import { isArrowDown, isArrowUp } from 'commons/components/utils/keyboard';
 import { useCallback } from 'react';
-import { ActionProps, HistoryType, isAction, ReducerHandler, Reducers, Store, UseReducer } from '..';
+import type { ActionProps, HistoryType, ReducerHandler, Reducers, Store, UseReducer } from '..';
+import { isAction } from '..';
 
 export const useHistoryReducer: UseReducer = () => {
   const historyLoad: Reducers['appLoad'] = useCallback((store, { data }) => {

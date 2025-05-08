@@ -3,21 +3,21 @@ import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
 import PersonIcon from '@mui/icons-material/Person';
 import { useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
+import PageContainer from 'commons/components/pages/PageContainer';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
-import PageHeader from 'commons/components/pages/PageHeader';
 import type { SearchParams } from 'components/core/SearchParams/SearchParams';
 import { createSearchParams } from 'components/core/SearchParams/SearchParams';
 import { SearchParamsProvider, useSearchParams } from 'components/core/SearchParams/SearchParamsContext';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import type { SubmissionIndexed } from 'components/models/base/submission';
+import ForbiddenPage from 'components/routes/403';
 import SearchHeader from 'components/visual/SearchBar/SearchHeader';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import SubmissionsTable from 'components/visual/SearchResult/submissions';
 import { safeFieldValue } from 'helpers/utils';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import ForbiddenPage from './403';
 
 type SearchResults = {
   items: SubmissionIndexed[];
@@ -85,7 +85,7 @@ const SubmissionSearch = () => {
         <Typography variant="h4">{t('title')}</Typography>
       </div>
 
-      <PageHeader isSticky>
+      <PageContainer isSticky>
         <div style={{ paddingTop: theme.spacing(1) }}>
           <SearchHeader
             params={search.toParams()}
@@ -126,8 +126,8 @@ const SubmissionSearch = () => {
                     color: !search.has('filters', 'state:completed')
                       ? 'default'
                       : theme.palette.mode === 'dark'
-                      ? theme.palette.success.light
-                      : theme.palette.success.dark
+                        ? theme.palette.success.light
+                        : theme.palette.success.dark
                   },
                   onClick: () => handleToggleFilter('state:completed')
                 }
@@ -144,8 +144,8 @@ const SubmissionSearch = () => {
                     color: !search.has('filters', 'max_score:>=1000')
                       ? 'default'
                       : theme.palette.mode === 'dark'
-                      ? theme.palette.error.light
-                      : theme.palette.error.dark
+                        ? theme.palette.error.light
+                        : theme.palette.error.dark
                   },
                   onClick: () => handleToggleFilter('max_score:>=1000')
                 }
@@ -153,7 +153,7 @@ const SubmissionSearch = () => {
             ]}
           />
         </div>
-      </PageHeader>
+      </PageContainer>
 
       <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
         <SubmissionsTable submissionResults={submissionResults} />

@@ -4,7 +4,7 @@ import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOut
 import ToggleOffOutlinedIcon from '@mui/icons-material/ToggleOffOutlined';
 import ToggleOnIcon from '@mui/icons-material/ToggleOn';
 import YoutubeSearchedForIcon from '@mui/icons-material/YoutubeSearchedFor';
-import { Divider, Grid, IconButton, MenuItem, Skeleton, TextField, Tooltip, Typography, useTheme } from '@mui/material';
+import { Divider, Grid, MenuItem, Skeleton, TextField, Tooltip, Typography, useTheme } from '@mui/material';
 import PageCenter from 'commons/components/pages/PageCenter';
 import { invalidateALQuery } from 'components/core/Query/AL/invalidateALQuery';
 import { updateALQuery } from 'components/core/Query/AL/updateALQuery';
@@ -15,18 +15,19 @@ import useMySnackbar from 'components/hooks/useMySnackbar';
 import type { Badlist } from 'components/models/base/badlist';
 import { ATTRIBUTION_TYPES, DEFAULT_TEMP_ATTRIBUTION } from 'components/models/base/badlist';
 import ForbiddenPage from 'components/routes/403';
+import { IconButton } from 'components/visual/Buttons/IconButton';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import CustomChip from 'components/visual/CustomChip';
 import DatePicker from 'components/visual/DatePicker';
 import Histogram from 'components/visual/Histogram';
 import InputDialog from 'components/visual/InputDialog';
+import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import Moment from 'components/visual/Moment';
 import { bytesToSize, safeFieldValue, safeFieldValueURI } from 'helpers/utils';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
-import { Link, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router';
 
 type ParamProps = {
   id: string;
@@ -253,146 +254,116 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
         </div>
       )}
       <div style={{ textAlign: 'left' }}>
-        <div style={{ paddingBottom: theme.spacing(4) }}>
-          <Grid container alignItems="center" spacing={1}>
-            <Grid item xs>
-              <Typography variant="h4">{badlist ? t(`title.${badlist.type}`) : t('title')}</Typography>
-              <Typography variant="caption" style={{ wordBreak: 'break-word' }}>
-                {badlist ? badlist_id || id : <Skeleton style={{ width: '10rem' }} />}
-              </Typography>
-            </Grid>
-            <Grid item xs={12} sm style={{ textAlign: 'right', flexGrow: 0 }}>
-              {badlist ? (
-                <>
-                  {(badlist_id || id) && (
-                    <div style={{ display: 'flex', marginBottom: theme.spacing(1) }}>
-                      {currentUser.roles.includes('submission_view') && (
-                        <Tooltip title={t('usage')}>
-                          <IconButton
-                            component={Link}
-                            style={{
-                              color: theme.palette.action.active
-                            }}
-                            to={
-                              badlist.type === 'file'
-                                ? `/search/?query=sha256:${badlist.hashes.sha256 || badlist_id || id} OR results:${
-                                    badlist.hashes.sha256 || badlist_id || id
-                                  }* OR errors:${badlist.hashes.sha256 || badlist_id || id}* OR file.sha256:${
-                                    badlist.hashes.sha256 || badlist_id || id
-                                  }`
-                                : `/search/result/?query=result.sections.tags.${badlist.tag.type}:${safeFieldValueURI(
-                                    badlist.tag.value
-                                  )}`
-                            }
-                            size="large"
-                          >
-                            <YoutubeSearchedForIcon />
-                          </IconButton>
-                        </Tooltip>
-                      )}
-                      {currentUser.roles.includes('badlist_manage') && (
-                        <Tooltip title={badlist.enabled ? t('enabled') : t('disabled')}>
-                          <IconButton
-                            onClick={badlist.enabled ? () => setDisableDialog(true) : () => setEnableDialog(true)}
-                            size="large"
-                          >
-                            {badlist.enabled ? <ToggleOnIcon /> : <ToggleOffOutlinedIcon />}
-                          </IconButton>
-                        </Tooltip>
-                      )}
+        <PageHeader
+          primary={badlist ? t(`title.${badlist.type}`) : t('title')}
+          secondary={badlist_id || id}
+          loading={!badlist}
+          slotProps={{
+            root: { style: { marginBottom: theme.spacing(4) } }
+          }}
+          actions={
+            <>
+              <IconButton
+                tooltip={t('usage')}
+                loading={!badlist}
+                preventRender={!(badlist_id || id) || !currentUser.roles.includes('submission_view')}
+                size="large"
+                sx={{ color: theme.palette.action.active }}
+                to={() =>
+                  badlist.type === 'file'
+                    ? `/search/?query=sha256:${badlist.hashes.sha256 || badlist_id || id} OR results:${badlist.hashes.sha256 || badlist_id || id}* OR errors:${badlist.hashes.sha256 || badlist_id || id}* OR file.sha256:${badlist.hashes.sha256 || badlist_id || id}`
+                    : `/search/result/?query=result.sections.tags.${badlist.tag.type}:${safeFieldValueURI(badlist.tag.value)}`
+                }
+              >
+                <YoutubeSearchedForIcon />
+              </IconButton>
+              <IconButton
+                tooltip={!badlist ? null : badlist.enabled ? t('enabled') : t('disabled')}
+                loading={!badlist}
+                size="large"
+                preventRender={!(badlist_id || id) || !currentUser.roles.includes('badlist_manage')}
+                onClick={!badlist ? null : badlist.enabled ? () => setDisableDialog(true) : () => setEnableDialog(true)}
+              >
+                {!badlist ? null : badlist.enabled ? <ToggleOnIcon /> : <ToggleOffOutlinedIcon />}
+              </IconButton>
+              <IconButton
+                tooltip={t('remove')}
+                loading={!badlist}
+                size="large"
+                preventRender={!(badlist_id || id) || !currentUser.roles.includes('badlist_manage')}
+                sx={{ color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark }}
+                onClick={() => setDeleteDialog(true)}
+              >
+                <RemoveCircleOutlineOutlinedIcon />
+              </IconButton>
+            </>
+          }
+        />
 
-                      {currentUser.roles.includes('badlist_manage') && (
-                        <Tooltip title={t('remove')}>
-                          <IconButton
-                            style={{
-                              color:
-                                theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
-                            }}
-                            onClick={() => setDeleteDialog(true)}
-                            size="large"
-                          >
-                            <RemoveCircleOutlineOutlinedIcon />
-                          </IconButton>
-                        </Tooltip>
-                      )}
-                    </div>
-                  )}
-                </>
-              ) : (
-                <>
-                  <div style={{ display: 'flex' }}>
-                    <Skeleton variant="circular" height="3rem" width="3rem" style={{ margin: theme.spacing(0.5) }} />
-                    {currentUser.roles.includes('badlist_manage') && (
-                      <>
-                        <Skeleton
-                          variant="circular"
-                          height="3rem"
-                          width="3rem"
-                          style={{ margin: theme.spacing(0.5) }}
-                        />
-                        <Skeleton
-                          variant="circular"
-                          height="3rem"
-                          width="3rem"
-                          style={{ margin: theme.spacing(0.5) }}
-                        />
-                      </>
-                    )}
-                  </div>
-                </>
-              )}
-            </Grid>
-          </Grid>
-        </div>
         <Grid container spacing={3}>
-          <Grid item xs={12} style={{ display: badlist && badlist.type === 'file' ? 'initial' : 'none' }}>
+          <Grid size={{ xs: 12 }} style={{ display: badlist && badlist.type === 'file' ? 'initial' : 'none' }}>
             <Typography variant="h6">{t('hashes')}</Typography>
             <Divider />
-            <Grid container>
-              <Grid item xs={4} sm={3}>
-                <span style={{ fontWeight: 500 }}>{'MD5'}</span>
+            <Grid container size="grow">
+              <Grid size={{ xs: 4, sm: 3 }}>
+                <span style={{ fontWeight: 500 }}>MD5</span>
               </Grid>
-              <Grid item xs={8} sm={9} style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}>
+              <Grid
+                size={{ xs: 8, sm: 9 }}
+                style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}
+              >
                 {badlist ? (
                   badlist.hashes.md5 || <span style={{ color: theme.palette.text.disabled }}>{t('unknown')}</span>
                 ) : (
                   <Skeleton />
                 )}
               </Grid>
-              <Grid item xs={4} sm={3}>
-                <span style={{ fontWeight: 500 }}>{'SHA1'}</span>
+              <Grid size={{ xs: 4, sm: 3 }}>
+                <span style={{ fontWeight: 500 }}>SHA1</span>
               </Grid>
-              <Grid item xs={8} sm={9} style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}>
+              <Grid
+                size={{ xs: 8, sm: 9 }}
+                style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}
+              >
                 {badlist ? (
                   badlist.hashes.sha1 || <span style={{ color: theme.palette.text.disabled }}>{t('unknown')}</span>
                 ) : (
                   <Skeleton />
                 )}
               </Grid>
-              <Grid item xs={4} sm={3}>
-                <span style={{ fontWeight: 500 }}>{'SHA256'}</span>
+              <Grid size={{ xs: 4, sm: 3 }}>
+                <span style={{ fontWeight: 500 }}>SHA256</span>
               </Grid>
-              <Grid item xs={8} sm={9} style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}>
+              <Grid
+                size={{ xs: 8, sm: 9 }}
+                style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}
+              >
                 {badlist ? (
                   badlist.hashes.sha256 || <span style={{ color: theme.palette.text.disabled }}>{t('unknown')}</span>
                 ) : (
                   <Skeleton />
                 )}
               </Grid>
-              <Grid item xs={4} sm={3}>
-                <span style={{ fontWeight: 500 }}>{'SSDeep'}</span>
+              <Grid size={{ xs: 4, sm: 3 }}>
+                <span style={{ fontWeight: 500 }}>SSDeep</span>
               </Grid>
-              <Grid item xs={8} sm={9} style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}>
+              <Grid
+                size={{ xs: 8, sm: 9 }}
+                style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}
+              >
                 {badlist ? (
                   badlist.hashes.ssdeep || <span style={{ color: theme.palette.text.disabled }}>{t('unknown')}</span>
                 ) : (
                   <Skeleton />
                 )}
               </Grid>
-              <Grid item xs={4} sm={3}>
-                <span style={{ fontWeight: 500 }}>{'TLSH'}</span>
+              <Grid size={{ xs: 4, sm: 3 }}>
+                <span style={{ fontWeight: 500 }}>TLSH</span>
               </Grid>
-              <Grid item xs={8} sm={9} style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}>
+              <Grid
+                size={{ xs: 8, sm: 9 }}
+                style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}
+              >
                 {badlist ? (
                   badlist.hashes.tlsh || <span style={{ color: theme.palette.text.disabled }}>{t('unknown')}</span>
                 ) : (
@@ -402,20 +373,20 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
             </Grid>
           </Grid>
           {badlist && badlist.file && (
-            <Grid item xs={12}>
+            <Grid size={{ xs: 12 }}>
               <Typography variant="h6">{t('file.title')}</Typography>
               <Divider />
-              <Grid container>
-                <Grid item xs={4} sm={3}>
+              <Grid container size="grow">
+                <Grid size={{ xs: 4, sm: 3 }}>
                   <span style={{ fontWeight: 500 }}>{t('file.name')}</span>
                 </Grid>
-                <Grid item xs={8} sm={9}>
+                <Grid size={{ xs: 8, sm: 9 }}>
                   {badlist ? badlist.file.name.map((name, i) => <div key={i}>{name}</div>) : <Skeleton />}
                 </Grid>
-                <Grid item xs={4} sm={3}>
+                <Grid size={{ xs: 4, sm: 3 }}>
                   <span style={{ fontWeight: 500 }}>{t('file.size')}</span>
                 </Grid>
-                <Grid item xs={8} sm={9}>
+                <Grid size={{ xs: 8, sm: 9 }}>
                   {badlist.file.size ? (
                     <span>
                       {badlist.file.size}
@@ -426,41 +397,39 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
                   )}
                 </Grid>
 
-                <Grid item xs={4} sm={3}>
+                <Grid size={{ xs: 4, sm: 3 }}>
                   <span style={{ fontWeight: 500 }}>{t('file.type')}</span>
                 </Grid>
-                <Grid item xs={8} sm={9} style={{ wordBreak: 'break-word' }}>
+                <Grid size={{ xs: 8, sm: 9 }} style={{ wordBreak: 'break-word' }}>
                   {badlist.file.type || <span style={{ color: theme.palette.text.disabled }}>{t('unknown')}</span>}
                 </Grid>
               </Grid>
             </Grid>
           )}
           {badlist && badlist.tag && (
-            <Grid item xs={12}>
+            <Grid size={{ xs: 12 }}>
               <Typography variant="h6">{t('tag.title')}</Typography>
               <Divider />
-              <Grid container>
-                <Grid item xs={4} sm={3}>
+              <Grid container size="grow">
+                <Grid size={{ xs: 4, sm: 3 }}>
                   <span style={{ fontWeight: 500 }}>{t('tag.type')}</span>
                 </Grid>
-                <Grid item xs={8} sm={9}>
-                  {badlist.tag.type}
-                </Grid>
-                <Grid item xs={4} sm={3}>
+                <Grid size={{ xs: 8, sm: 9 }}>{badlist.tag.type}</Grid>
+                <Grid size={{ xs: 4, sm: 3 }}>
                   <span style={{ fontWeight: 500 }}>{t('tag.value')}</span>
                 </Grid>
-                <Grid item xs={8} sm={9} style={{ wordBreak: 'break-word' }}>
+                <Grid size={{ xs: 8, sm: 9 }} style={{ wordBreak: 'break-word' }}>
                   {badlist.tag.value}
                 </Grid>
               </Grid>
             </Grid>
           )}
-          <Grid item xs={12}>
-            <Grid container alignItems={'end'}>
-              <Grid item xs={11}>
+          <Grid size={{ xs: 12 }}>
+            <Grid container alignItems="end">
+              <Grid size="grow">
                 <Typography variant="h6">{t('attribution.title')}</Typography>
               </Grid>
-              <Grid item xs={1} style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
+              <Grid size="auto" style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
                 {currentUser.roles.includes('badlist_manage') &&
                   (badlist ? (
                     <Tooltip title={t('add.attribution')}>
@@ -498,10 +467,10 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
                 )
                 .map((k: keyof Badlist['attribution'], kid) => (
                   <Grid key={kid} container spacing={2}>
-                    <Grid item xs={4} sm={3}>
+                    <Grid size={{ xs: 4, sm: 3 }}>
                       <span style={{ fontWeight: 500 }}>{t(`attribution.${k}`)}</span>
                     </Grid>
-                    <Grid item xs={8} sm={9}>
+                    <Grid size={{ xs: 8, sm: 9 }}>
                       {badlist.attribution[k].map((x, i) => (
                         <CustomChip
                           key={i}
@@ -519,13 +488,13 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
                   </Grid>
                 ))}
           </Grid>
-          <Grid item xs={12}>
+          <Grid size={{ xs: 12 }}>
             <Typography variant="h6">{t('sources')}</Typography>
             <Divider />
             {badlist ? (
               badlist.sources.map((src, src_id) => (
                 <Grid key={src_id} container>
-                  <Grid item xs={12} sm={3}>
+                  <Grid size={{ xs: 12, sm: 3 }}>
                     <span style={{ fontWeight: 500 }}>
                       {src.name} ({t(src.type)})
                       {(currentUser.is_admin || currentUser.username === src.name) && badlist.sources.length !== 1 && (
@@ -540,13 +509,13 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
                       )}
                     </span>
                   </Grid>
-                  <Grid item xs={12} sm={c12nDef.enforce ? 7 : 9}>
+                  <Grid size={{ xs: 12, sm: c12nDef.enforce ? 7 : 9 }}>
                     {src.reason.map((reason, i) => (
                       <div key={i}>{reason}</div>
                     ))}
                   </Grid>
                   {c12nDef.enforce && (
-                    <Grid item xs={12} sm={2}>
+                    <Grid size={{ xs: 12, sm: 2 }}>
                       <Classification
                         fullWidth
                         size="small"
@@ -567,12 +536,12 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
               <Skeleton />
             )}
           </Grid>
-          <Grid item xs={12}>
-            <Grid container alignItems={'end'}>
-              <Grid item xs={11}>
+          <Grid size={{ xs: 12 }}>
+            <Grid container alignItems="end">
+              <Grid size="grow">
                 <Typography variant="h6">{t('timing')}</Typography>
               </Grid>
-              <Grid item xs={1} style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
+              <Grid size="auto" style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
                 {currentUser.roles.includes('badlist_manage') &&
                   (badlist ? (
                     <DatePicker
@@ -593,11 +562,11 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
               </Grid>
             </Grid>
             <Divider />
-            <Grid container>
-              <Grid item xs={4} sm={3}>
+            <Grid container size="grow">
+              <Grid size={{ xs: 4, sm: 3 }}>
                 <span style={{ fontWeight: 500 }}>{t('timing.added')}</span>
               </Grid>
-              <Grid item xs={8} sm={9}>
+              <Grid size={{ xs: 8, sm: 9 }}>
                 {badlist ? (
                   <div>
                     <Moment format="YYYY-MM-DD">{badlist.added}</Moment>&nbsp; (
@@ -607,10 +576,10 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
                   <Skeleton />
                 )}
               </Grid>
-              <Grid item xs={4} sm={3}>
+              <Grid size={{ xs: 4, sm: 3 }}>
                 <span style={{ fontWeight: 500 }}>{t('timing.updated')}</span>
               </Grid>
-              <Grid item xs={8} sm={9}>
+              <Grid size={{ xs: 8, sm: 9 }}>
                 {badlist ? (
                   <div>
                     <Moment format="YYYY-MM-DD">{badlist.updated}</Moment>&nbsp; (
@@ -620,10 +589,10 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
                   <Skeleton />
                 )}
               </Grid>
-              <Grid item xs={4} sm={3}>
+              <Grid size={{ xs: 4, sm: 3 }}>
                 <span style={{ fontWeight: 500 }}>{t('timing.expiry_ts')}</span>
               </Grid>
-              <Grid item xs={8} sm={9}>
+              <Grid size={{ xs: 8, sm: 9 }}>
                 {badlist ? (
                   badlist.expiry_ts ? (
                     <div>
@@ -640,7 +609,7 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
             </Grid>
           </Grid>
           {currentUser.roles.includes('submission_view') && (
-            <Grid item xs={12}>
+            <Grid size={{ xs: 12 }}>
               <Histogram
                 dataset={histogram}
                 height="300px"

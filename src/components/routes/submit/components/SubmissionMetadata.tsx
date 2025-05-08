@@ -261,12 +261,12 @@ const ExtraMetadata = React.memo(() => {
           return !metadata.length ? null : (
             <div style={{ margin: theme.spacing(1) }}>
               <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', columnGap: theme.spacing(1) }}>
-                <Typography color={'textSecondary'} variant="body2" sx={{ flex: 1 }}>
+                <Typography color="textSecondary" variant="body2" sx={{ flex: 1 }}>
                   {t('metadata.extra.label')}
                 </Typography>
 
                 <IconButton
-                  label={t('metadata.edit.tooltip')}
+                  tooltip={t('metadata.edit.tooltip')}
                   disabled={disabled || !isEditing}
                   preventRender={!customize}
                   size="small"
@@ -277,7 +277,7 @@ const ExtraMetadata = React.memo(() => {
                   <EditIcon fontSize="small" />
                 </IconButton>
                 <IconButton
-                  label={t('metadata.clear.tooltip')}
+                  tooltip={t('metadata.clear.tooltip')}
                   disabled={disabled || !isEditing}
                   size="small"
                   onClick={handleClear}

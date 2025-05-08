@@ -22,7 +22,6 @@ import {
   useTheme
 } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
-import makeStyles from '@mui/styles/makeStyles';
 import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -35,16 +34,6 @@ import Moment from 'components/visual/Moment';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BsClipboard } from 'react-icons/bs';
-
-const useStyles = makeStyles(() => ({
-  buttonProgress: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    marginTop: -12,
-    marginLeft: -12
-  }
-}));
 
 /**
  * @name useAPIKeyUtilities
@@ -118,7 +107,6 @@ const APIKeyDeleteDialog = React.memo(
   ({ apikey = null, children = () => null, onAPIKeysChange = () => null }: APIKeyDeleteDialogProps) => {
     const { t } = useTranslation(['adminAPIkeys']);
     const theme = useTheme();
-    const classes = useStyles();
     const { apiCall } = useMyAPI();
     const { showSuccessMessage } = useMySnackbar();
 
@@ -158,11 +146,11 @@ const APIKeyDeleteDialog = React.memo(
           <DialogActions>
             <Button color="primary" autoFocus disabled={loading} onClick={() => setOpen(false)}>
               {t('cancel')}
-              {loading && <CircularProgress size={24} className={classes.buttonProgress} />}
+              {loading && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
             </Button>
             <Button color="primary" disabled={loading} onClick={() => handleDelete(apikey)}>
               {t('apikeys.remove')}
-              {loading && <CircularProgress size={24} className={classes.buttonProgress} />}
+              {loading && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
             </Button>
           </DialogActions>
         </Dialog>
@@ -212,7 +200,7 @@ const NewAPIKeyDialog = React.memo(({ apikey = null, onClose = () => null }: New
                 <Typography component="span" sx={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
                   {apikey.keypassword}
                 </Typography>
-                <IconButton color="primary" size="large" onClick={() => copy(apikey.keypassword, 'drawerTop')}>
+                <IconButton color="primary" size="large" onClick={() => copy(apikey.keypassword)}>
                   <BsClipboard fontSize="large" />
                 </IconButton>
               </Card>
@@ -252,7 +240,6 @@ const APIKeyUpsertingDialog = React.memo(
   ({ apikey: prevApiKey = null, children = () => null, onAPIKeysChange = () => null }: APIKeyUpsertingDialogProps) => {
     const { t } = useTranslation(['adminAPIkeys']);
     const theme = useTheme();
-    const classes = useStyles();
     const { apiCall } = useMyAPI();
     const { configuration, user: currentUser } = useALContext();
     const { defaults, selectACL, toggleRole } = useAPIKeyUtilities();
@@ -403,7 +390,7 @@ const APIKeyUpsertingDialog = React.memo(
               }}
             >
               {t('cancel')}
-              {loading && <CircularProgress size={24} className={classes.buttonProgress} />}
+              {loading && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
             </Button>
             <Button
               color="primary"
@@ -411,7 +398,7 @@ const APIKeyUpsertingDialog = React.memo(
               onClick={() => handleUpsert(apikey)}
             >
               {!prevApiKey ? t('apikeys.add') : t('apikeys.save')}
-              {loading && <CircularProgress size={24} className={classes.buttonProgress} />}
+              {loading && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
             </Button>
           </DialogActions>
         </Dialog>

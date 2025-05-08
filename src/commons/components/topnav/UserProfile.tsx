@@ -1,3 +1,4 @@
+import { SelfImprovement } from '@mui/icons-material';
 import {
   Box,
   ClickAwayListener,
@@ -7,6 +8,7 @@ import {
   LinearProgress,
   List,
   ListItem,
+  ListItemButton,
   ListItemIcon,
   ListItemText,
   ListSubheader,
@@ -17,15 +19,15 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
-import useAppConfigs from 'commons/components/app/hooks/useAppConfigs';
+import type { AppBarUserMenuElement } from 'commons/components//app/AppConfigs';
+import { useAppConfigs, useAppLayout } from 'commons/components/app/hooks';
+import AppAvatar from 'commons/components/display/AppAvatar';
 import ThemeSelection from 'commons/components/topnav/ThemeSelection';
 import useALContext from 'components/hooks/useALContext';
 import useQuota from 'components/hooks/useQuota';
 import { memo, useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
-import type { AppBarUserMenuElement } from '../app/AppConfigs';
-import AppAvatar from '../display/AppAvatar';
+import { Link } from 'react-router';
 
 export const AppUserAvatar = styled(AppAvatar)(({ theme }) => ({
   width: theme.spacing(5),
@@ -40,16 +42,17 @@ type AppBarUserMenuType = 'usermenu' | 'adminmenu';
 
 const UserProfile = () => {
   const theme = useTheme();
-  const { t } = useTranslation();
+  const anchorRef = useRef<HTMLButtonElement>(undefined);
   const configs = useAppConfigs();
   const { user, configuration } = useALContext();
-  const anchorRef = useRef();
+  const layout = useAppLayout();
+  const { t } = useTranslation();
   const { apiQuotaRemaining, submissionQuotaRemaining } = useQuota();
   const [open, setOpen] = useState<boolean>(false);
   const onProfileClick = useCallback(() => setOpen(_open => !_open), []);
   const onClickAway = useCallback(() => setOpen(false), []);
   const renderThemeSelection = useCallback(
-    enabled => {
+    (enabled: boolean) => {
       if (
         enabled &&
         (configs.allowPersonalization || configs.preferences.allowTranslate || configs.preferences.allowReset)
@@ -119,14 +122,27 @@ const UserProfile = () => {
           <div>
             <Divider />
             <List dense subheader={<ListSubheader disableSticky>{i18nKey ? t(i18nKey) : title}</ListSubheader>}>
+              {type === 'usermenu' && configs.preferences.allowFocusMode && (
+                <Tooltip title={t('personalization.focus.mode.tooltip')}>
+                  <ListItem disablePadding>
+                    <ListItemButton onClick={() => layout.setFocus(_focus => !_focus)} id="personalization-focusmode">
+                      <ListItemIcon>
+                        <SelfImprovement />
+                      </ListItemIcon>
+                      <ListItemText>{t('personalization.focus.mode.label')}</ListItemText>
+                    </ListItemButton>
+                  </ListItem>
+                </Tooltip>
+              )}
+
               {menuItems.map((a, i) =>
                 a.element ? (
                   <ListItem key={`${type}-${i}`}>{a.element}</ListItem>
                 ) : (
-                  <ListItem button component={Link} to={a.route} key={`${type}-${i}`}>
+                  <ListItemButton component={Link} to={a.route} key={`${type}-${i}`}>
                     {a.icon && <ListItemIcon>{a.icon}</ListItemIcon>}
                     <ListItemText>{a.i18nKey ? t(a.i18nKey) : a.title}</ListItemText>
-                  </ListItem>
+                  </ListItemButton>
                 )
               )}
             </List>
@@ -135,7 +151,7 @@ const UserProfile = () => {
       }
       return null;
     },
-    [t]
+    [t, configs.preferences.allowFocusMode, layout]
   );
 
   // TODO: Add renderButtonMenu to commons

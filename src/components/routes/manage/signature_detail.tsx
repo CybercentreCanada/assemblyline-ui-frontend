@@ -9,7 +9,6 @@ import {
   DialogContent,
   DialogTitle,
   Grid,
-  IconButton,
   MenuItem,
   Select,
   Skeleton,
@@ -18,8 +17,7 @@ import {
   useTheme
 } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
-import makeStyles from '@mui/styles/makeStyles';
-import useAppTheme from 'commons/components/app/hooks/useAppTheme';
+import { useAppTheme } from 'commons/components/app/hooks';
 import PageCenter from 'commons/components/pages/PageCenter';
 import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useALContext from 'components/hooks/useALContext';
@@ -29,9 +27,11 @@ import type { Signature } from 'components/models/base/signature';
 import type { Statistic } from 'components/models/base/statistic';
 import { DEFAULT_STATS } from 'components/models/base/statistic';
 import ForbiddenPage from 'components/routes/403';
+import { IconButton } from 'components/visual/Buttons/IconButton';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import Histogram from 'components/visual/Histogram';
+import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import Moment from 'components/visual/Moment';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
 import ResultsTable from 'components/visual/SearchResult/results';
@@ -42,8 +42,7 @@ import { yaraConfig, yaraDef } from 'helpers/yara';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { TbUserX } from 'react-icons/tb';
-import { useNavigate } from 'react-router';
-import { Link, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router';
 
 loader.config({ paths: { vs: '/cdn/monaco_0.35.0/vs' } });
 
@@ -54,26 +53,6 @@ const LANG_SELECTOR = {
   sigma: 'yaml',
   tagcheck: 'yara'
 };
-
-const useStyles = makeStyles(theme => ({
-  stats: {
-    margin: 0,
-    padding: theme.spacing(0.75, 1)
-  },
-  openPaper: {
-    maxWidth: '1200px',
-    [theme.breakpoints.down('sm')]: {
-      width: '100%'
-    }
-  },
-  buttonProgress: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    marginTop: -12,
-    marginLeft: -12
-  }
-}));
 
 type SaveSignatureProps = {
   signature: Signature;
@@ -93,18 +72,22 @@ const SaveSignature: React.FC<SaveSignatureProps> = React.memo(
     const [open, setOpen] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
 
-    const handleStateSaveButtonClick = useCallback(() => {
-      apiCall({
-        url: `/api/v4/signature/change_status/${signature.id}/${signature.status}/`,
-        onSuccess: () => {
-          showSuccessMessage(t('change.success'));
-          handleSuccess();
-        },
-        onEnter: () => setLoading(true),
-        onExit: () => setLoading(false)
-      });
+    const handleStateSaveButtonClick = useCallback(
+      (sign: Signature) => {
+        if (!sign) return;
+        apiCall({
+          url: `/api/v4/signature/change_status/${sign.id}/${sign.status}/`,
+          onSuccess: () => {
+            showSuccessMessage(t('change.success'));
+            handleSuccess();
+          },
+          onEnter: () => setLoading(true),
+          onExit: () => setLoading(false)
+        });
+      },
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [handleSuccess, signature?.id, signature?.status, t]);
+      [handleSuccess, t]
+    );
 
     if (!currentUser.roles.includes('signature_manage') || !signature || !modified) return null;
     else
@@ -133,7 +116,7 @@ const SaveSignature: React.FC<SaveSignatureProps> = React.memo(
             waiting={loading}
             handleClose={() => setOpen(false)}
             handleCancel={() => setOpen(false)}
-            handleAccept={handleStateSaveButtonClick}
+            handleAccept={() => handleStateSaveButtonClick(signature)}
             title={t('save.title')}
             cancelText={t('cancel')}
             acceptText={t('save.acceptText')}
@@ -160,20 +143,23 @@ const ResetSignatureToSource: React.FC<ResetSignatureToSourceProps> = React.memo
     const [open, setOpen] = useState<boolean>(false);
     const [loading, setLoading] = useState<boolean>(false);
 
-    const handleResetSignatureToSource = useCallback(() => {
-      if (!currentUser.roles.includes('signature_manage')) return;
-      apiCall({
-        url: `/api/v4/signature/clear_status/${signature.id}/`,
-        onSuccess: () => {
-          showSuccessMessage(t('restore.success'));
-          onSignatureChange({ state_change_date: null, state_change_user: null });
-          setOpen(false);
-        },
-        onEnter: () => setLoading(true),
-        onExit: () => setLoading(false)
-      });
+    const handleResetSignatureToSource = useCallback(
+      (sign: Signature) => {
+        if (!currentUser.roles.includes('signature_manage')) return;
+        apiCall({
+          url: `/api/v4/signature/clear_status/${sign.id}/`,
+          onSuccess: () => {
+            showSuccessMessage(t('restore.success'));
+            onSignatureChange({ state_change_date: null, state_change_user: null });
+            setOpen(false);
+          },
+          onEnter: () => setLoading(true),
+          onExit: () => setLoading(false)
+        });
+      },
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentUser.roles, onSignatureChange, signature.id, t]);
+      [currentUser.roles, onSignatureChange, t]
+    );
 
     if (
       !currentUser.roles.includes('signature_manage') ||
@@ -198,7 +184,7 @@ const ResetSignatureToSource: React.FC<ResetSignatureToSourceProps> = React.memo
             waiting={loading}
             handleClose={() => setOpen(false)}
             handleCancel={() => setOpen(false)}
-            handleAccept={handleResetSignatureToSource}
+            handleAccept={() => handleResetSignatureToSource(signature)}
             title={t('restore.title')}
             cancelText={t('cancel')}
             acceptText={t('restore.acceptText')}
@@ -241,7 +227,6 @@ const SignatureDetail = ({
   const navigate = useNavigate();
   const { showSuccessMessage, showErrorMessage } = useMySnackbar();
   const { apiCall } = useMyAPI();
-  const classes = useStyles();
   const { user: currentUser, c12nDef } = useALContext();
   const { isDark: isDarkTheme } = useAppTheme();
   // const editorRef = useRef(null);
@@ -457,81 +442,69 @@ const SignatureDetail = ({
           <Classification size="tiny" c12n={signature ? signature.classification : null} />
         </div>
       )}
-      <div style={{ textAlign: 'left' }}>
-        <Grid container alignItems="center" spacing={2.5}>
-          <Grid item xs>
-            <Typography variant="h4">{t('title')}</Typography>
-            <Typography variant="caption">
-              {signature ? (
-                `${signature.type}_${signature.source}_${signature.signature_id}`
-              ) : (
-                <Skeleton style={{ width: '10rem' }} />
-              )}
-            </Typography>
-          </Grid>
-          <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
-            {signature ? (
-              <>
-                <div style={{ display: 'flex', marginBottom: theme.spacing(1), justifyContent: 'flex-end' }}>
-                  {currentUser.roles.includes('submission_view') && (
-                    <Tooltip title={t('usage')}>
-                      <IconButton
-                        component={Link}
-                        style={{ color: theme.palette.action.active }}
-                        to={`/search/result/?query=result.sections.tags.file.rule.${signature.type}:${safeFieldValueURI(
-                          `${signature.source}.${signature.name}`
-                        )}`}
-                        size="large"
-                      >
-                        <YoutubeSearchedForIcon />
-                      </IconButton>
-                    </Tooltip>
-                  )}
-                  <ResetSignatureToSource
-                    signature={signature}
-                    onSignatureChange={value => setSignature(old => ({ ...old, ...value }))}
-                  />
-                  {currentUser.roles.includes('signature_manage') && (
-                    <Tooltip title={t('remove')}>
-                      <IconButton
-                        style={{
-                          color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
-                        }}
-                        onClick={handleDeleteButtonClick}
-                        size="large"
-                      >
-                        <RemoveCircleOutlineOutlinedIcon />
-                      </IconButton>
-                    </Tooltip>
-                  )}
-                </div>
-                <SignatureStatus
-                  status={signature.status}
-                  onClick={currentUser.roles.includes('signature_manage') ? () => setOpen(true) : null}
-                />
-              </>
-            ) : (
-              <>
-                <div style={{ display: 'flex' }}>
-                  <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
-                  <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />
-                </div>
-                <Skeleton
-                  variant="rectangular"
-                  height="1rem"
-                  width="6rem"
-                  style={{
-                    marginBottom: theme.spacing(1),
-                    marginTop: theme.spacing(1),
-                    borderRadius: theme.spacing(1)
-                  }}
-                />
-              </>
-            )}
-          </Grid>
 
+      <div style={{ textAlign: 'left' }}>
+        <PageHeader
+          primary={t('title')}
+          secondary={() => `${signature.type}_${signature.source}_${signature.signature_id}`}
+          loading={!signature}
+          slotProps={{
+            root: { style: { marginBottom: theme.spacing(2) } }
+          }}
+          endAdornment={
+            signature ? (
+              <SignatureStatus
+                status={signature.status}
+                onClick={currentUser.roles.includes('signature_manage') ? () => setOpen(true) : null}
+              />
+            ) : (
+              <Skeleton
+                variant="rectangular"
+                height="1rem"
+                width="6rem"
+                style={{
+                  marginBottom: theme.spacing(1),
+                  marginTop: theme.spacing(1),
+                  borderRadius: theme.spacing(1)
+                }}
+              />
+            )
+          }
+          actions={
+            <>
+              <IconButton
+                loading={!signature}
+                preventRender={!currentUser.roles.includes('submission_view')}
+                size="large"
+                sx={{ color: theme.palette.action.active }}
+                to={() =>
+                  `/search/result/?query=result.sections.tags.file.rule.${signature.type}:${safeFieldValueURI(`${signature.source}.${signature.name}`)}`
+                }
+                tooltip={t('usage')}
+              >
+                <YoutubeSearchedForIcon />
+              </IconButton>
+              <ResetSignatureToSource
+                signature={signature}
+                onSignatureChange={value => setSignature(old => ({ ...old, ...value }))}
+              />
+              <IconButton
+                loading={!signature}
+                preventRender={!currentUser.roles.includes('signature_manage')}
+                size="large"
+                sx={{ color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark }}
+                tooltip={t('remove')}
+                onClick={handleDeleteButtonClick}
+              >
+                <RemoveCircleOutlineOutlinedIcon />
+              </IconButton>
+            </>
+          }
+        />
+
+        <Grid container alignItems="center" spacing={2.5}>
           {signature?.state_change_user && signature?.state_change_date && (
-            <Grid item xs={12} textAlign="center">
+            <Grid size={{ xs: 12 }} textAlign="center">
               <Alert severity="info">
                 <Typography color="secondary" variant="body2">
                   <b> {signature?.state_change_user}</b>
@@ -542,7 +515,7 @@ const SignatureDetail = ({
             </Grid>
           )}
 
-          <Grid item xs={12}>
+          <Grid size={{ xs: 12 }}>
             {signature ? (
               <div
                 style={{
@@ -571,24 +544,22 @@ const SignatureDetail = ({
               <Skeleton variant="rectangular" height="6rem" />
             )}
           </Grid>
-          <Grid item xs={12}>
+          <Grid size={{ xs: 12 }}>
             <Typography variant="h6">{t('statistics')}</Typography>
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Typography variant="subtitle1" style={{ fontWeight: 600, fontStyle: 'italic' }}>
               {t('hits')}
             </Typography>
-            <Grid container>
-              <Grid item xs={3} sm={4} md={3} lg={2}>
+            <Grid container size="grow">
+              <Grid size={{ xs: 3, sm: 4, md: 3, lg: 2 }}>
                 <span style={{ fontWeight: 500 }}>{t('hit.count')}</span>
               </Grid>
-              <Grid item xs={9} sm={8} md={9} lg={10}>
-                {signature && stats ? stats.count : <Skeleton />}
-              </Grid>
-              <Grid item xs={3} sm={4} md={3} lg={2}>
+              <Grid size={{ xs: 9, sm: 8, md: 9, lg: 10 }}>{signature && stats ? stats.count : <Skeleton />}</Grid>
+              <Grid size={{ xs: 3, sm: 4, md: 3, lg: 2 }}>
                 <span style={{ fontWeight: 500 }}>{t('hit.first')}</span>
               </Grid>
-              <Grid item xs={9} sm={8} md={9} lg={10}>
+              <Grid size={{ xs: 9, sm: 8, md: 9, lg: 10 }}>
                 {signature && stats ? (
                   stats.first_hit ? (
                     <Moment variant="fromNow">{stats.first_hit}</Moment>
@@ -599,10 +570,10 @@ const SignatureDetail = ({
                   <Skeleton />
                 )}
               </Grid>
-              <Grid item xs={3} sm={4} md={3} lg={2}>
+              <Grid size={{ xs: 3, sm: 4, md: 3, lg: 2 }}>
                 <span style={{ fontWeight: 500 }}>{t('hit.last')}</span>
               </Grid>
-              <Grid item xs={9} sm={8} md={9} lg={10}>
+              <Grid size={{ xs: 9, sm: 8, md: 9, lg: 10 }}>
                 {signature && stats ? (
                   stats.last_hit ? (
                     <Moment variant="fromNow">{stats.last_hit}</Moment>
@@ -615,34 +586,30 @@ const SignatureDetail = ({
               </Grid>
             </Grid>
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Typography variant="subtitle1" style={{ fontWeight: 600, fontStyle: 'italic' }}>
               {t('contribution')}
             </Typography>
-            <Grid container>
-              <Grid item xs={3} sm={4} md={3} lg={2}>
+            <Grid container size="grow">
+              <Grid size={{ xs: 3, sm: 4, md: 3, lg: 2 }}>
                 <span style={{ fontWeight: 500 }}>{t('score.min')}</span>
               </Grid>
-              <Grid item xs={9} sm={8} md={9} lg={10}>
-                {signature && stats ? stats.min : <Skeleton />}
-              </Grid>
-              <Grid item xs={3} sm={4} md={3} lg={2}>
+              <Grid size={{ xs: 9, sm: 8, md: 9, lg: 10 }}>{signature && stats ? stats.min : <Skeleton />}</Grid>
+              <Grid size={{ xs: 3, sm: 4, md: 3, lg: 2 }}>
                 <span style={{ fontWeight: 500 }}>{t('score.avg')}</span>
               </Grid>
-              <Grid item xs={9} sm={8} md={9} lg={10}>
+              <Grid size={{ xs: 9, sm: 8, md: 9, lg: 10 }}>
                 {signature && stats ? Number(stats.avg).toFixed(0) : <Skeleton />}
               </Grid>
-              <Grid item xs={3} sm={4} md={3} lg={2}>
+              <Grid size={{ xs: 3, sm: 4, md: 3, lg: 2 }}>
                 <span style={{ fontWeight: 500 }}>{t('score.max')}</span>
               </Grid>
-              <Grid item xs={9} sm={8} md={9} lg={10}>
-                {signature && stats ? stats.max : <Skeleton />}
-              </Grid>
+              <Grid size={{ xs: 9, sm: 8, md: 9, lg: 10 }}>{signature && stats ? stats.max : <Skeleton />}</Grid>
             </Grid>
           </Grid>
           {currentUser.roles.includes('submission_view') && (
             <>
-              <Grid item xs={12}>
+              <Grid size={{ xs: 12 }}>
                 <Histogram
                   dataset={histogram}
                   height="250px"
@@ -652,10 +619,10 @@ const SignatureDetail = ({
                   verticalLine
                 />
               </Grid>
-              <Grid item xs={12}>
+              <Grid size={{ xs: 12 }}>
                 <Typography variant="h6">{t('last10')}</Typography>
               </Grid>
-              <Grid item xs={12}>
+              <Grid size={{ xs: 12 }}>
                 <ResultsTable resultResults={results} allowSort={false} />
               </Grid>
             </>

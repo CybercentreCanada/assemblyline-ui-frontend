@@ -1,4 +1,5 @@
-import { FoldingType, Store } from '..';
+import type { Store } from '..';
+import { FoldingType } from '..';
 
 export type LayoutSize = {
   windowHeight: number;
@@ -20,7 +21,7 @@ export const LAYOUT_SIZE: LayoutSize = {
   spacingWidth: 10
 };
 
-export const COLUMNS: Array<{ width: number; columns: number }> = [
+export const COLUMNS: { width: number; columns: number }[] = [
   { width: 4750, columns: 128 },
   { width: 4160, columns: 112 },
   { width: 3590, columns: 96 },
@@ -69,7 +70,7 @@ export const getRowFoldingMap = (
   columnSize: number
 ): Map<number, { index: number; type: FoldingType }> => {
   const data = store.hex.data.replaceAll(' ', '').match(new RegExp(`.{1,${2 * columnSize}}`, 'g'));
-  const map: Map<number, { index: number; type: FoldingType }> = new Map();
+  const map = new Map<number, { index: number; type: FoldingType }>();
   const zeroes = '0'.repeat(2 * columnSize);
 
   let i: number = 1; // data

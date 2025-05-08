@@ -17,118 +17,42 @@ import {
   Grid,
   IconButton,
   Skeleton,
+  styled,
   Tooltip,
   Typography,
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
-import useAppUser from 'commons/components/app/hooks/useAppUser';
+import { useAppUser } from 'commons/components/app/hooks';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import type { UpdateConfig } from 'components/models/base/service';
-import { DEFAULT_SOURCE, type UpdateSource } from 'components/models/base/service';
+import type { UpdateConfig, UpdateSource } from 'components/models/base/service';
+import { DEFAULT_SOURCE } from 'components/models/base/service';
 import type { CustomUser } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
+import { SourceDetail } from 'components/routes/manage/signature_sources_details';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
+import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import Moment from 'components/visual/Moment';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { DiGitBranch } from 'react-icons/di';
-import { Link } from 'react-router-dom';
-import { SourceDetail } from './signature_sources_details';
+import { Link } from 'react-router';
 
-const useStyles = makeStyles(theme => ({
-  actionButton: {
-    marginTop: '-16px'
-  },
-  buttonProgress: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    marginTop: -12,
-    marginLeft: -12
-  },
-  card: {
-    border: `1px solid ${theme.palette.divider}`,
-    borderRadius: '4px',
-    padding: '8px',
-    margin: '0.25rem 0',
-    overflow: 'auto',
-    wordBreak: 'break-word',
-    '&:hover': {
-      backgroundColor: theme.palette.mode === 'dark' ? '#ffffff10' : '#00000005',
-      cursor: 'pointer'
-    }
-  },
-  disableCard: {
-    border: `1px solid ${theme.palette.divider}`,
-    borderRadius: '4px',
-    padding: '8px',
-    margin: '0.25rem 0',
-    overflow: 'auto',
-    opacity: '50%',
-    wordBreak: 'break-word',
-    '&:hover': {
-      backgroundColor: theme.palette.mode === 'dark' ? '#ffffff10' : '#00000010',
-      cursor: 'pointer'
-    }
-  },
-  errorCard: {
-    border: `1px solid ${theme.palette.divider}`,
-    borderRadius: '4px',
-    padding: '8px',
-    margin: '0.25rem 0',
-    overflow: 'auto',
-    backgroundColor: theme.palette.mode === 'dark' ? '#ff000017' : '#FFE4E4',
-    wordBreak: 'break-word',
-    '&:hover': {
-      cursor: 'pointer'
-    }
-  },
-  checkbox: {
-    marginLeft: 0,
-    width: '100%',
-    '&:hover': {
-      background: theme.palette.action.hover
-    }
-  },
-  card_title: {
-    fontSize: 'larger',
-    fontFamily: 'monospace'
-  },
-  card_caption: {
+const CardCaption = memo(
+  styled('div')(() => ({
     fontSize: 'smaller',
     fontFamily: 'monospace',
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis'
-  },
-  drawerPaper: {
-    width: '80%',
-    maxWidth: '800px',
-    [theme.breakpoints.down('sm')]: {
-      width: '100%'
-    }
-  },
-  label: {
-    fontWeight: 500
-  },
-  mono: {
-    fontFamily: 'monospace'
-  },
-  title: {
-    cursor: 'pointer',
-    '&:hover, &:focus': {
-      color: theme.palette.text.secondary
-    }
-  }
-}));
+  }))
+);
 
 const isSourceUpdating = (source: UpdateSource) => source.status.state === 'UPDATING';
 const queueSourceUpdate = (source: UpdateSource) => ({
@@ -247,24 +171,23 @@ const WrappedSourceDetailDrawer = ({
           waiting={buttonLoading}
         />
 
-        <div style={{ paddingBottom: theme.spacing(2) }}>
-          <Grid container alignItems="center">
-            <Grid item xs>
-              <Typography variant="h4">{service}</Typography>
-              <Typography variant="caption">
-                {`${t(base ? 'editing_source' : 'adding_source')}${base ? ` (${base.name})` : ''}`}
-              </Typography>
-            </Grid>
-            <Grid item xs={12} sm style={{ textAlign: 'right', flexGrow: 1 }}>
+        <PageHeader
+          primary={service}
+          secondary={`${t(base ? 'editing_source' : 'adding_source')}${base ? ` (${base.name})` : ''}`}
+          slotProps={{
+            root: { style: { marginBottom: theme.spacing(2) } }
+          }}
+          actions={
+            <>
               {base && (
-                <Tooltip title={t(source.enabled ? 'disable' : 'enable')}>
+                <Tooltip key="enabled" title={t(source.enabled ? 'disable' : 'enable')}>
                   <IconButton onClick={toggleSource} size="large">
                     {source.enabled ? <ToggleOnIcon /> : <ToggleOffOutlinedIcon />}
                   </IconButton>
                 </Tooltip>
               )}
               {base && generatesSignatures && (
-                <Tooltip title={t('view_signatures')}>
+                <Tooltip key="view" title={t('view_signatures')}>
                   <IconButton
                     style={{
                       color: theme.palette.mode === 'dark' ? '#F' : '#0'
@@ -280,14 +203,14 @@ const WrappedSourceDetailDrawer = ({
                 </Tooltip>
               )}
               {base && (
-                <Tooltip title={t('update')}>
+                <Tooltip key="update" title={t('update')}>
                   <IconButton
                     style={{
                       color: isSourceUpdating(source)
                         ? theme.palette.action.disabled
                         : theme.palette.mode === 'dark'
-                        ? theme.palette.info.light
-                        : theme.palette.info.dark
+                          ? theme.palette.info.light
+                          : theme.palette.info.dark
                     }}
                     disabled={isSourceUpdating(source)}
                     onClick={triggerSourceUpdate}
@@ -297,7 +220,7 @@ const WrappedSourceDetailDrawer = ({
                   </IconButton>
                 </Tooltip>
               )}
-              <Tooltip title={t(base ? 'change.save' : 'add.save')}>
+              <Tooltip key="save" title={t(base ? 'change.save' : 'add.save')}>
                 <IconButton
                   style={{
                     color: saveEnabled
@@ -314,7 +237,7 @@ const WrappedSourceDetailDrawer = ({
                 </IconButton>
               </Tooltip>
               {base && (
-                <Tooltip title={t('delete')}>
+                <Tooltip key="removve" title={t('delete')}>
                   <IconButton
                     style={{
                       color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
@@ -326,9 +249,10 @@ const WrappedSourceDetailDrawer = ({
                   </IconButton>
                 </Tooltip>
               )}
-            </Grid>
-          </Grid>
-        </div>
+            </>
+          }
+        />
+
         <SourceDetail
           source={source}
           defaults={defaults}
@@ -358,11 +282,9 @@ export const SourceCard = ({ source, onClick, service, generatesSignatures, show
   const { t, i18n } = useTranslation(['manageSignatureSources']);
   const theme = useTheme();
   const { c12nDef } = useALContext();
-  const classes = useStyles();
   const { apiCall } = useMyAPI();
   const { showSuccessMessage } = useMySnackbar();
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const triggerSourceUpdate = e => {
     apiCall({
       method: 'PUT',
@@ -378,14 +300,48 @@ export const SourceCard = ({ source, onClick, service, generatesSignatures, show
   return (
     <div style={{ paddingTop: theme.spacing(1) }}>
       <Card
-        className={
-          !source.enabled
-            ? classes.disableCard
-            : source.status && source.status.state === 'ERROR'
-            ? classes.errorCard
-            : classes.card
-        }
         onClick={onClick}
+        sx={{
+          ...(!source.enabled
+            ? {
+                border: `1px solid ${theme.palette.divider}`,
+                borderRadius: '4px',
+                padding: '8px',
+                margin: '0.25rem 0',
+                overflow: 'auto',
+                opacity: '50%',
+                wordBreak: 'break-word',
+                '&:hover': {
+                  backgroundColor: theme.palette.mode === 'dark' ? '#ffffff10' : '#00000010',
+                  cursor: 'pointer'
+                }
+              }
+            : source.status && source.status.state === 'ERROR'
+              ? {
+                  border: `1px solid ${theme.palette.divider}`,
+                  borderRadius: '4px',
+                  padding: '8px',
+                  margin: '0.25rem 0',
+                  overflow: 'auto',
+                  backgroundColor: theme.palette.mode === 'dark' ? '#ff000017' : '#FFE4E4',
+                  wordBreak: 'break-word',
+                  '&:hover': {
+                    cursor: 'pointer'
+                  }
+                }
+              : {
+                  border: `1px solid ${theme.palette.divider}`,
+                  borderRadius: '4px',
+                  padding: '8px',
+                  margin: '0.25rem 0',
+                  overflow: 'auto',
+                  wordBreak: 'break-word',
+                  '&:hover': {
+                    backgroundColor: theme.palette.mode === 'dark' ? '#ffffff10' : '#00000005',
+                    cursor: 'pointer'
+                  }
+                })
+        }}
       >
         <div style={{ paddingBottom: theme.spacing(2) }}>
           <div style={{ float: 'right', marginTop: '8px' }}>
@@ -419,7 +375,6 @@ export const SourceCard = ({ source, onClick, service, generatesSignatures, show
                 {generatesSignatures && (
                   <Tooltip title={t('view_signatures')}>
                     <IconButton
-                      className={classes.actionButton}
                       component={Link}
                       to={`/manage/signatures/?query=${encodeURIComponent(
                         `type:${service.toLowerCase()} AND source:${source.name}`
@@ -431,6 +386,7 @@ export const SourceCard = ({ source, onClick, service, generatesSignatures, show
                         e.stopPropagation();
                       }}
                       size="large"
+                      sx={{ marginTop: '-16px' }}
                     >
                       <FingerprintOutlinedIcon />
                     </IconButton>
@@ -438,17 +394,17 @@ export const SourceCard = ({ source, onClick, service, generatesSignatures, show
                 )}
                 <Tooltip title={t('update')}>
                   <IconButton
-                    className={classes.actionButton}
                     style={{
                       color: isSourceUpdating(source)
                         ? theme.palette.action.disabled
                         : theme.palette.mode === 'dark'
-                        ? theme.palette.info.light
-                        : theme.palette.info.dark
+                          ? theme.palette.info.light
+                          : theme.palette.info.dark
                     }}
                     disabled={isSourceUpdating(source)}
                     onClick={triggerSourceUpdate}
                     size="large"
+                    sx={{ marginTop: '-16px' }}
                   >
                     <SystemUpdateAltIcon />
                   </IconButton>
@@ -456,50 +412,56 @@ export const SourceCard = ({ source, onClick, service, generatesSignatures, show
               </span>
             )}
           </div>
-          <span className={classes.card_title}>{source.name}&nbsp;</span>
-          <span className={classes.mono}>({source.uri})&nbsp;</span>
+          <span
+            style={{
+              fontSize: 'larger',
+              fontFamily: 'monospace'
+            }}
+          >
+            {source.name}&nbsp;
+          </span>
+          <span style={{ fontFamily: 'monospace' }}>({source.uri})&nbsp;</span>
           {source.git_branch && (
             <span>
               <DiGitBranch style={{ verticalAlign: 'text-bottom' }}></DiGitBranch>
-              <span className={classes.mono}>{source.git_branch}</span>
+              <span style={{ fontFamily: 'monospace' }}>{source.git_branch}</span>
             </span>
           )}
           {showDetails && (
             <>
               <div>
-                <span className={classes.card_caption}>{t('update.label.last_successful')}:&nbsp;</span>
+                <CardCaption>{t('update.label.last_successful')}:&nbsp;</CardCaption>
                 {source.status.last_successful_update !== '1970-01-01T00:00:00Z' ? (
                   <Tooltip title={source.status.last_successful_update}>
-                    <div className={classes.card_caption}>
+                    <CardCaption>
                       <Moment variant="fromNow">{source.status.last_successful_update}</Moment>
-                    </div>
+                    </CardCaption>
                   </Tooltip>
                 ) : (
-                  <div className={classes.card_caption}>{t('update.never')}</div>
+                  <CardCaption>{t('update.never')}</CardCaption>
                 )}
               </div>
               <Tooltip title={`${source.status.message} @ ${source.status.ts}`}>
-                <div className={classes.card_caption}>
+                <CardCaption>
                   {t('update.label.status')}: {source.status.message}
-                </div>
+                </CardCaption>
               </Tooltip>
             </>
           )}
         </div>
-        <Grid container>
+        <Grid container size="grow">
           {source.pattern && (
             <>
-              <Grid item xs={5} sm={4} md={2} className={classes.label}>{`${t('pattern')}:`}</Grid>
-              <Grid item xs={7} sm={8} md={10} className={classes.mono}>
+              <Grid size={{ xs: 5, sm: 4, md: 2 }} sx={{ fontWeight: 500 }}>{`${t('pattern')}:`}</Grid>
+              <Grid size={{ xs: 7, sm: 8, md: 10 }} style={{ fontFamily: 'monospace' }}>
                 {source.pattern}
               </Grid>
             </>
           )}
           {c12nDef.enforce && (
             <>
-              <Grid item xs={5} sm={4} md={2} className={classes.label}>{`${t('classification')}:`}</Grid>
-
-              <Grid item xs={7} sm={8} md={10}>
+              <Grid size={{ xs: 5, sm: 4, md: 2 }} sx={{ fontWeight: 500 }}>{`${t('classification')}:`}</Grid>
+              <Grid size={{ xs: 7, sm: 8, md: 10 }}>
                 <Classification type="text" c12n={source.default_classification || c12nDef.UNRESTRICTED} />
               </Grid>
             </>
@@ -527,7 +489,6 @@ const ServiceDetail = ({
 }: ServiceDetailProps) => {
   const { t } = useTranslation(['manageSignatureSources']);
   const theme = useTheme();
-  const classes = useStyles();
   const { c12nDef } = useALContext();
   const { apiCall } = useMyAPI();
   const { closeGlobalDrawer, setGlobalDrawer } = useDrawer();
@@ -535,7 +496,6 @@ const ServiceDetail = ({
 
   const [open, setOpen] = useState<boolean>(true);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const triggerSourceUpdateAll = () => {
     apiCall({
       method: 'PUT',
@@ -567,9 +527,14 @@ const ServiceDetail = ({
           <div>
             <Typography
               variant="h6"
-              className={classes.title}
               onClick={() => {
                 setOpen(!open);
+              }}
+              sx={{
+                cursor: 'pointer',
+                '&:hover, &:focus': {
+                  color: theme.palette.text.secondary
+                }
               }}
             >
               {service}
@@ -624,8 +589,8 @@ const ServiceDetail = ({
                     color: sources.some(isSourceUpdating)
                       ? theme.palette.action.disabled
                       : theme.palette.mode === 'dark'
-                      ? theme.palette.info.light
-                      : theme.palette.info.dark
+                        ? theme.palette.info.light
+                        : theme.palette.info.dark
                   }}
                   disabled={sources.some(isSourceUpdating)}
                   onClick={triggerSourceUpdateAll}
@@ -659,18 +624,7 @@ const ServiceDetail = ({
         </Collapse>
       </div>
     ),
-    [
-      classes.title,
-      generatesSignatures,
-      open,
-      openDrawer,
-      service,
-      sources,
-      t,
-      theme,
-      triggerSourceUpdateAll,
-      updateIntervalSeconds
-    ]
+    [generatesSignatures, open, openDrawer, service, sources, t, theme, triggerSourceUpdateAll, updateIntervalSeconds]
   );
 };
 
@@ -680,11 +634,11 @@ export default function SignatureSources() {
   const { apiCall } = useMyAPI();
   const { user: currentUser } = useAppUser<CustomUser>();
 
-  const [sources, setSources] = useState<{ [service: string]: UpdateConfig }>(null);
+  const [sources, setSources] = useState<Record<string, UpdateConfig>>(null);
 
   const reload = useCallback(() => {
     if (currentUser.roles.includes('signature_manage')) {
-      apiCall<{ [service: string]: UpdateConfig }>({
+      apiCall<Record<string, UpdateConfig>>({
         url: '/api/v4/signature/sources/',
         onSuccess: ({ api_response }) => setSources(api_response)
       });
@@ -694,7 +648,7 @@ export default function SignatureSources() {
 
   useEffect(() => {
     reload();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
     const intervalID = setInterval(reload, 15000);
 
     window.addEventListener('reloadUpdateSources', reload);
@@ -707,12 +661,14 @@ export default function SignatureSources() {
   return currentUser.roles.includes('signature_manage') ? (
     <PageFullWidth margin={4}>
       <div style={{ textAlign: 'left' }}>
-        <div style={{ paddingBottom: theme.spacing(2) }}>
-          <Typography variant="h4">{t('title')}</Typography>
-          <Typography variant="caption">
-            {sources ? `${Object.keys(sources).length} ${t('caption')}` : <Skeleton />}
-          </Typography>
-        </div>
+        <PageHeader
+          primary={t('title')}
+          secondary={`${Object.keys(sources || {}).length} ${t('caption')}`}
+          loading={!sources}
+          slotProps={{
+            root: { style: { marginBottom: theme.spacing(2) } }
+          }}
+        />
 
         {sources
           ? Object.keys(sources).map((key, id) => (
@@ -725,7 +681,7 @@ export default function SignatureSources() {
                 defaultPattern={sources[key].default_pattern}
               />
             ))
-          : [...Array(2)].map((item, i) => (
+          : Array.from({ length: 2 }).map((item, i) => (
               <div key={i} style={{ marginTop: theme.spacing(2) }}>
                 <Typography variant="h6" style={{ marginTop: theme.spacing(0.5), marginBottom: theme.spacing(0.5) }}>
                   <Skeleton />

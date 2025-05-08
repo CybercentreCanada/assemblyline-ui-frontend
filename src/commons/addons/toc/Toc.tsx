@@ -1,66 +1,63 @@
-import { useTheme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
-import useAppBar from 'commons/components/app/hooks/useAppBar';
-import useAppLayout from 'commons/components/app/hooks/useAppLayout';
-import useAppUser from 'commons/components/app/hooks/useAppUser';
-import React, { ReactNode, useEffect, useMemo } from 'react';
+import { styled, useTheme } from '@mui/material';
+import { useAppBar, useAppLayout, useAppUser } from 'commons/components/app/hooks';
+import type { ReactNode } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation } from 'react-router';
 
-// TODO: Add to the commons
-const useStyles = makeStyles(theme => ({
-  tocBar: {
-    display: 'none',
-    paddingLeft: '16px',
-    [theme.breakpoints.up('md')]: {
-      display: 'block'
-    }
+const ToCBar = styled('div')(({ theme }) => ({
+  display: 'none',
+  paddingLeft: '16px',
+  [theme.breakpoints.up('md')]: {
+    display: 'block'
+  }
+}));
+
+const ToC = styled('ul')(({ theme }) => ({
+  listStyle: 'none',
+  paddingInlineStart: 0,
+  [theme.breakpoints.only('md')]: {
+    width: '124px'
   },
-  toc: {
-    listStyle: 'none',
-    paddingInlineStart: 0,
-    [theme.breakpoints.only('md')]: {
-      width: '124px'
-    },
-    [theme.breakpoints.up('lg')]: {
-      width: '164px'
-    },
-    '& li': {
-      color: theme.palette.text.primary,
-      marginLeft: theme.spacing(1),
-      marginBottom: theme.spacing(0.5),
-      paddingLeft: theme.spacing(1.25),
-      paddingRight: theme.spacing(1)
-    },
-    '& .active': {
-      borderLeft: `solid ${theme.palette.primary.main} 2px`,
-      paddingLeft: theme.spacing(1),
-      color: theme.palette.primary.main
-    },
-    '& li:hover': {
-      borderLeft: `solid ${theme.palette.text.disabled} 1px`,
-      paddingLeft: '9px',
-      color: theme.palette.text.disabled
-    },
-    '& li > a': {
-      color: 'inherit',
-      display: 'block',
-      textDecoration: 'none',
-      width: '100%'
-    }
+  [theme.breakpoints.up('lg')]: {
+    width: '164px'
   },
-  top: {
-    paddingTop: theme.spacing(2.5),
-    marginLeft: theme.spacing(2.25),
+  '& li': {
     color: theme.palette.text.primary,
-    '& a': {
-      color: 'inherit',
-      display: 'block',
-      textDecoration: 'none'
-    },
-    '& :hover': {
-      color: theme.palette.text.disabled
-    }
+    marginLeft: theme.spacing(1),
+    marginBottom: theme.spacing(0.5),
+    paddingLeft: theme.spacing(1.25),
+    paddingRight: theme.spacing(1)
+  },
+  '& .active': {
+    borderLeft: `solid ${theme.palette.primary.main} 2px`,
+    paddingLeft: theme.spacing(1),
+    color: theme.palette.primary.main
+  },
+  '& li:hover': {
+    borderLeft: `solid ${theme.palette.text.disabled} 1px`,
+    paddingLeft: '9px',
+    color: theme.palette.text.disabled
+  },
+  '& li > a': {
+    color: 'inherit',
+    display: 'block',
+    textDecoration: 'none',
+    width: '100%'
+  }
+}));
+
+const Top = styled('div')(({ theme }) => ({
+  paddingTop: theme.spacing(2.5),
+  marginLeft: theme.spacing(2.25),
+  color: theme.palette.text.primary,
+  '& a': {
+    color: 'inherit',
+    display: 'block',
+    textDecoration: 'none'
+  },
+  '& :hover': {
+    color: theme.palette.text.disabled
   }
 }));
 
@@ -78,7 +75,6 @@ export type ContentWithTOCItemProps = {
 const ContentWithTOCItem: React.FC<ContentWithTOCItemProps> = ({ translation, item }) => {
   const { autoHide: autoHideAppbar } = useAppBar();
   const { current: currentLayout } = useAppLayout();
-  const classes = useStyles(autoHideAppbar && currentLayout !== 'top');
   const location = useLocation();
   const { t } = useTranslation([translation]);
   const currentHash = location.hash && location.hash !== '' ? location.hash.substring(1) : null;
@@ -94,11 +90,11 @@ const ContentWithTOCItem: React.FC<ContentWithTOCItemProps> = ({ translation, it
           </Link>
         </li>
         {active && item.subItems && (
-          <ul className={classes.toc} style={{ fontSize: 'smaller', paddingInlineStart: '8px' }}>
+          <ToC style={{ fontSize: 'smaller', paddingInlineStart: '8px' }}>
             {item.subItems.map(itm => (
               <ContentWithTOCItem key={itm.id} item={itm} translation={translation} />
             ))}
-          </ul>
+          </ToC>
         )}
       </>
     )
@@ -123,7 +119,6 @@ const WrappedContentWithTOC: React.FC<ContentWithTOCProps> = ({
   const { autoHide: autoHideAppbar } = useAppBar();
   const { current: currentLayout } = useAppLayout();
   const theme = useTheme();
-  const classes = useStyles();
   const location = useLocation();
   const { t } = useTranslation([translation]);
 
@@ -143,7 +138,7 @@ const WrappedContentWithTOC: React.FC<ContentWithTOCProps> = ({
   return (
     <div id="top" style={{ display: 'flex' }}>
       <div id="content">{children}</div>
-      <div id="toc" className={classes.tocBar}>
+      <ToCBar id="toc">
         <div
           style={{
             position: 'sticky',
@@ -154,23 +149,23 @@ const WrappedContentWithTOC: React.FC<ContentWithTOCProps> = ({
             () => (
               <>
                 {titleI18nKey && <div style={{ fontSize: '1.25rem', marginLeft: '18px' }}>{t(titleI18nKey)}</div>}
-                <ul className={classes.toc}>
+                <ToC>
                   {items &&
                     items.map(item => <ContentWithTOCItem key={item.id} item={item} translation={translation} />)}
                   {topI18nKey && (
-                    <div className={classes.top}>
+                    <Top>
                       <Link to="#top" target="_self">
                         {t(topI18nKey)}
                       </Link>
-                    </div>
+                    </Top>
                   )}
-                </ul>
+                </ToC>
               </>
             ),
-            [classes.toc, classes.top, items, t, titleI18nKey, topI18nKey, translation]
+            [items, t, titleI18nKey, topI18nKey, translation]
           )}
         </div>
-      </div>
+      </ToCBar>
     </div>
   );
 };

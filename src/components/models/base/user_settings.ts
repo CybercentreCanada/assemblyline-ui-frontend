@@ -1,5 +1,5 @@
-import type { SubmissionProfileParams } from './config';
-import type { SelectedServiceCategory, ServiceSpecification } from './service';
+import type { SubmissionProfileParams } from 'components/models/base/config';
+import type { SelectedServiceCategory, ServiceSpecification } from 'components/models/base/service';
 
 export const ENCODINGS = ['cart', 'raw', 'zip'] as const;
 export const VIEWS = ['report', 'details'] as const;
@@ -60,7 +60,7 @@ export type UserSettings = {
   preferred_submission_profile?: string;
 
   /** Default submission profile settings */
-  submission_profiles?: { [profile_name: string]: SubmissionProfileParams };
+  submission_profiles?: Record<string, SubmissionProfileParams>;
 
   /** Default service specific settings */
   service_spec: ServiceSpecification[];

@@ -1,28 +1,11 @@
-import { Tooltip } from '@mui/material';
+import type { TooltipProps } from '@mui/material';
+import { Tooltip, styled } from '@mui/material';
+import { darken } from '@mui/material/styles';
 import { EnrichedChip } from 'borealis-ui';
-import clsx from 'clsx';
-import React from 'react';
-import type { CustomChipProps } from './CustomChip';
-import { useStyles } from './CustomChip';
-
-declare module '@mui/material/Chip' {
-  interface ChipPropsSizeOverrides {
-    tiny: true;
-  }
-}
-
-export type EnrichmentCustomChipProps = CustomChipProps & {
-  dataType: string;
-  dataValue: string;
-  dataClassification?: string;
-  contextIcon?: boolean;
-  counters?: boolean;
-  hideDetails?: boolean;
-  showPreview?: boolean;
-  hideLoading?: boolean;
-  forceDetails?: boolean;
-  setForceDetails?: (value: boolean) => void;
-};
+import type { CustomChipProps } from 'components/visual/CustomChip';
+import { COLOR_MAP, SIZE_MAP } from 'components/visual/CustomChip';
+import type { FC } from 'react';
+import { memo } from 'react';
 
 export const BOREALIS_TYPE_MAP = {
   'network.static.ip': 'ip',
@@ -35,124 +18,203 @@ export const BOREALIS_TYPE_MAP = {
   sha1: 'sha1',
   sha256: 'sha256',
   'email.address': 'eml_address'
+} as const;
+
+export type StyledEnrichedChipProps = CustomChipProps & {
+  dataType: string;
+  dataValue: string;
+  dataClassification?: string;
+  contextIcon?: boolean;
+  counters?: boolean;
+  hideDetails?: boolean;
+  showPreview?: boolean;
+  hideLoading?: boolean;
+  forceDetails?: boolean;
+  setForceDetails?: (value: boolean) => void;
 };
 
-const WrappedEnrichmentCustomChip: React.FC<EnrichmentCustomChipProps> = ({
-  dataType,
-  dataValue,
-  dataClassification,
-  contextIcon = false,
-  counters = false,
-  hideDetails = false,
-  showPreview = false,
-  hideLoading = false,
-  forceDetails = false,
-  setForceDetails = null,
-  className = null,
-  type = 'round',
-  size = 'medium',
-  color = 'default',
-  variant = 'outlined',
-  mono = false,
-  wrap = false,
-  tooltip = null,
-  fullWidth = false,
-  tooltipPlacement = 'bottom',
-  children,
-  ...otherProps
-}) => {
-  const classes = useStyles();
+const StyledEnrichedChip: FC<StyledEnrichedChipProps> = memo(
+  styled(
+    ({
+      color = 'default',
+      contextIcon = false,
+      counters = false,
+      dataClassification,
+      dataType,
+      dataValue,
+      forceDetails = false,
+      hideDetails = false,
+      hideLoading = false,
+      setForceDetails = null,
+      showPreview = false,
+      size = 'medium',
+      variant = 'outlined',
+      ...props
+    }: StyledEnrichedChipProps) => (
+      <EnrichedChip
+        type={dataType}
+        value={dataValue}
+        classification={dataClassification}
+        contextIcon={contextIcon}
+        counters={counters}
+        hideDetails={hideDetails}
+        showPreview={showPreview}
+        hideLoading={hideLoading}
+        color={COLOR_MAP?.[color]}
+        size={SIZE_MAP?.[size]}
+        variant={variant}
+        forceDetails={forceDetails}
+        setForceDetails={setForceDetails}
+        sx={{ '& .iconify': { marginLeft: '8px', flexShrink: 0 } }}
+        {...props}
+      />
+    ),
+    { shouldForwardProp: prop => prop !== 'showPreview' && prop !== 'wrap' && prop !== 'fullWidth' }
+  )<StyledEnrichedChipProps>(
+    ({
+      color = 'default',
+      fullWidth = false,
+      mono = false,
+      size = 'medium',
+      theme,
+      type = 'round',
+      variant = 'outlined',
+      wrap = false
+    }) => ({
+      ...{
+        square: { borderRadius: '0px', margin: '2px 4px 2px 0' },
+        rounded: { borderRadius: '3px', margin: '2px 4px 2px 0' },
+        round: null
+      }?.[type],
 
-  // Define classnames maps
-  const typeClassMap = {
-    square: classes.square,
-    rounded: classes.rounded,
-    round: null
-  };
-  const sizeLabelClassMap = {
-    tiny: classes.label_tiny,
-    small: null,
-    medium: null
-  };
-  const sizeClassMap = {
-    tiny: classes.tiny,
-    small: classes.small,
-    medium: null
-  };
-  const colorClassMap = {
-    success: classes.success,
-    warning: classes.warning,
-    error: classes.error,
-    info: classes.info,
-    success_outlined: classes.success_outlined,
-    warning_outlined: classes.warning_outlined,
-    error_outlined: classes.error_outlined,
-    info_outlined: classes.info_outlined,
-    default: classes.default,
-    primary: classes.primary,
-    secondary: classes.secondary
-  };
-  const colorMap = {
-    primary: 'primary',
-    secondary: 'secondary'
-  };
-  const sizeMap = {
-    tiny: 'small' as const,
-    small: 'small' as const,
-    medium: 'medium' as const
-  };
+      ...{
+        tiny: { height: '20px', fontSize: '0.775rem' },
+        small: null,
+        medium: null
+      }?.[size],
 
-  // Compute values applied to the original chip component
-  const appliedClassName = clsx(
-    mono ? (size === 'tiny' ? classes.tiny_mono : classes.mono) : null,
-    wrap ? classes.auto_height : null,
-    fullWidth ? classes.fullWidth : null,
-    typeClassMap[type],
-    sizeClassMap[size],
-    variant === 'outlined' ? colorClassMap[`${color}_outlined`] : colorClassMap[color],
-    className
-  );
-  const labelClassName = clsx(sizeLabelClassMap[size], wrap ? classes.wrap : null);
+      ...(!mono
+        ? null
+        : size === 'tiny'
+          ? { fontFamily: 'monospace', fontSize: '1rem' }
+          : { fontFamily: 'monospace', fontSize: '1.15rem' }),
 
-  // Build chip based on computed values
-  const chip = (
-    <EnrichedChip
-      type={dataType}
-      value={dataValue}
-      classification={dataClassification}
-      contextIcon={contextIcon}
-      counters={counters}
-      hideDetails={hideDetails}
-      showPreview={showPreview}
-      hideLoading={hideLoading}
-      classes={{ label: labelClassName, icon: variant !== 'outlined' ? classes.icon : null }}
-      className={appliedClassName}
-      color={colorMap[color]}
-      size={sizeMap[size]}
-      variant={variant}
-      forceDetails={forceDetails}
-      setForceDetails={setForceDetails}
-      sx={{ '& .iconify': { marginLeft: '8px', flexShrink: 0 } }}
-      {...otherProps}
-    />
-  );
+      ...(!wrap ? null : { height: 'auto' }),
+      ...(!fullWidth ? null : { width: '100%' }),
 
-  // Do we have a tooltip?
-  return tooltip ? (
-    <Tooltip
-      PopperProps={{
-        disablePortal: true
-      }}
-      title={tooltip}
-      placement={tooltipPlacement}
-      disableInteractive
-    >
-      {chip}
-    </Tooltip>
-  ) : (
-    chip
-  );
+      ...(variant === 'outlined'
+        ? {
+            default: {},
+            primary: {},
+            secondary: {},
+            success: {
+              borderColor: theme.palette.mode !== 'dark' ? theme.palette.success.dark : theme.palette.success.light,
+              color: theme.palette.mode !== 'dark' ? theme.palette.success.dark : theme.palette.success.light
+            },
+            warning: {
+              borderColor: theme.palette.mode !== 'dark' ? theme.palette.warning.dark : theme.palette.warning.light,
+              color: theme.palette.mode !== 'dark' ? theme.palette.warning.dark : theme.palette.warning.light
+            },
+            error: {
+              borderColor: theme.palette.mode !== 'dark' ? theme.palette.error.dark : theme.palette.error.light,
+              color: theme.palette.mode !== 'dark' ? theme.palette.error.dark : theme.palette.error.light
+            },
+            info: {
+              borderColor: theme.palette.mode !== 'dark' ? theme.palette.info.dark : theme.palette.info.light,
+              color: theme.palette.mode !== 'dark' ? theme.palette.info.dark : theme.palette.info.light
+            }
+          }?.[color]
+        : {
+            default: {
+              backgroundColor: theme.palette.mode === 'dark' ? '#616161' : '#999',
+              color: theme.palette.common.white,
+              ['[role=button]&:hover, [role=button]&:focus']: {
+                backgroundColor: darken(theme.palette.mode === 'dark' ? '#616161' : '#999', 0.2)
+              }
+            },
+            primary: {
+              ['[role=button]&:hover, [role=button]&:focus']: {
+                backgroundColor: theme.palette.primary.dark
+              }
+            },
+            secondary: {
+              ['[role=button]&:hover, [role=button]&:focus']: {
+                backgroundColor: theme.palette.secondary.dark
+              }
+            },
+            success: {
+              backgroundColor: theme.palette.success.main,
+              color: theme.palette.success.contrastText,
+              ['[role=button]&:hover, [role=button]&:focus']: {
+                backgroundColor: theme.palette.success.dark
+              }
+            },
+            warning: {
+              backgroundColor: theme.palette.warning.main,
+              color: theme.palette.warning.contrastText,
+              ['[role=button]&:hover, [role=button]&:focus']: {
+                backgroundColor: theme.palette.warning.dark
+              }
+            },
+            error: {
+              backgroundColor: theme.palette.error.dark,
+              color: theme.palette.error.contrastText,
+              ['[role=button]&:hover, [role=button]&:focus']: {
+                backgroundColor: darken(theme.palette.error.dark, 0.25)
+              }
+            },
+            info: {
+              backgroundColor: theme.palette.info.main,
+              color: theme.palette.info.contrastText,
+              ['[role=button]&:hover, [role=button]&:focus']: {
+                backgroundColor: theme.palette.info.dark
+              }
+            }
+          }?.[color]),
+
+      ['& .MuiChip-label']: {
+        ...{
+          tiny: { paddingLeft: '6px', paddingRight: '6px' },
+          small: null,
+          medium: null
+        }?.[size],
+
+        ...(!wrap
+          ? null
+          : {
+              whiteSpace: 'pre-wrap',
+              wordBreak: 'break-word',
+              paddingTop: '2px',
+              paddingBottom: '2px'
+            })
+      },
+
+      ['& .MuiChip-icon']: {
+        ...(variant === 'outlined' ? null : { color: theme.palette.common.white })
+      }
+    })
+  )
+);
+
+export type EnrichmentCustomChipProps = StyledEnrichedChipProps & {
+  tooltip?: TooltipProps['title'];
+  tooltipPlacement?: TooltipProps['placement'];
 };
 
-const EnrichmentCustomChip = React.memo(WrappedEnrichmentCustomChip);
+export const EnrichmentCustomChip: FC<EnrichmentCustomChipProps> = memo(
+  ({ tooltip = null, tooltipPlacement = 'bottom', ...chipProps }: EnrichmentCustomChipProps) =>
+    tooltip ? (
+      <Tooltip
+        title={tooltip}
+        placement={tooltipPlacement}
+        disableInteractive
+        slotProps={{ popper: { disablePortal: true } }}
+      >
+        <StyledEnrichedChip {...chipProps} />
+      </Tooltip>
+    ) : (
+      <StyledEnrichedChip {...chipProps} />
+    )
+);
+
 export default EnrichmentCustomChip;

@@ -23,7 +23,7 @@ import {
   IconButton,
   LinearProgress,
   List,
-  ListItem,
+  ListItemButton,
   ListItemIcon,
   ListItemText,
   Popover,
@@ -52,6 +52,13 @@ import type { MultipleKeys } from 'components/models/ui/result';
 import type { SubmissionSummary, SubmissionTags, SubmissionTree } from 'components/models/ui/submission';
 import ForbiddenPage from 'components/routes/403';
 import HeuristicDetail from 'components/routes/manage/heuristic_detail';
+import AISummarySection from 'components/routes/submission/detail/ai_summary';
+import AttackSection from 'components/routes/submission/detail/attack';
+import ErrorSection from 'components/routes/submission/detail/errors';
+import FileTreeSection from 'components/routes/submission/detail/file_tree';
+import InfoSection from 'components/routes/submission/detail/info';
+import MetaSection from 'components/routes/submission/detail/meta';
+import TagSection from 'components/routes/submission/detail/tags';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import FileDetail from 'components/visual/FileDetail';
@@ -64,17 +71,9 @@ import { setNotifyFavicon } from 'helpers/utils';
 import moment from 'moment';
 import React, { useCallback, useEffect, useMemo, useReducer, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router';
 import type { Socket } from 'socket.io-client';
 import io from 'socket.io-client';
-import AISummarySection from './detail/ai_summary';
-import AttackSection from './detail/attack';
-import ErrorSection from './detail/errors';
-import FileTreeSection from './detail/file_tree';
-import InfoSection from './detail/info';
-import MetaSection from './detail/meta';
-import TagSection from './detail/tags';
 
 const NAMESPACE = '/live_submission';
 const MESSAGE_TIMEOUT = 5000;
@@ -155,7 +154,7 @@ function WrappedSubmissionDetail() {
 
   const popoverOpen = Boolean(resubmitAnchor);
 
-  const submissionProfiles: { [name: string]: string } = useMemo<{ [name: string]: string }>(() => {
+  const submissionProfiles: Record<string, string> = useMemo<Record<string, string>>(() => {
     let profileMap = {};
     Object.entries(systemConfig.submission.profiles).map(([name, config]) => {
       profileMap = { ...profileMap, [name]: config.display_name };
@@ -174,7 +173,6 @@ function WrappedSubmissionDetail() {
         tempTagMap[key] = [];
       }
 
-      // eslint-disable-next-line guard-for-in
       for (const sectionID in result.result.sections) {
         const section = result.result.sections[sectionID];
         let hType = 'info';
@@ -220,10 +218,9 @@ function WrappedSubmissionDetail() {
 
           // #3: Parse Att&cks
           if (section.heuristic.attack) {
-            // eslint-disable-next-line guard-for-in
             for (const i in section.heuristic.attack) {
               const attack = section.heuristic.attack[i];
-              // eslint-disable-next-line guard-for-in
+
               for (const j in attack.categories) {
                 const cat = attack.categories[j];
                 if (!Object.hasOwnProperty.call(tempSummary.attack_matrix, cat)) {
@@ -258,7 +255,7 @@ function WrappedSubmissionDetail() {
         }
 
         // #3: Parse Tags
-        // eslint-disable-next-line guard-for-in
+
         for (const tagID in section.tags) {
           const tag = section.tags[tagID];
           let summaryType = null;
@@ -563,7 +560,6 @@ function WrappedSubmissionDetail() {
         });
       }
       setResubmitAnchor(null);
-      // eslint-disable-next-line react-hooks/exhaustive-deps
     },
     [showSuccessMessage, submission, t]
   );
@@ -858,7 +854,6 @@ function WrappedSubmissionDetail() {
       console.debug(`SocketIO :: emitListen => Listening for messages on watch queue: ${watchQueue}`);
       socket.emit('listen', { wq_id: watchQueue, from_start: true });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [watchQueue, socket, handleErrorMessage]);
 
   useEffect(() => {
@@ -1043,13 +1038,9 @@ function WrappedSubmissionDetail() {
                       onChange={event => setArchivingUseAlternateDtl(event.target.value)}
                       row
                     >
+                      <FormControlLabel value="false" control={<Radio />} label={t('archive.alternate_expiry.never')} />
                       <FormControlLabel
-                        value={'false'}
-                        control={<Radio />}
-                        label={t('archive.alternate_expiry.never')}
-                      />
-                      <FormControlLabel
-                        value={'true'}
+                        value="true"
                         control={<Radio />}
                         label={moment()
                           .locale(i18n.language)
@@ -1071,7 +1062,7 @@ function WrappedSubmissionDetail() {
                       configuration={field_cfg}
                       value={archivingMetadata[field_name]}
                       onChange={v => {
-                        let cleanMetadata = archivingMetadata;
+                        const cleanMetadata = archivingMetadata;
                         if (v === undefined || v === null || v === '') {
                           // Remove field from metadata if value is null
                           delete cleanMetadata[field_name];
@@ -1082,7 +1073,7 @@ function WrappedSubmissionDetail() {
                         setArchivingMetadata({ ...cleanMetadata });
                       }}
                       onReset={() => {
-                        let cleanMetadata = archivingMetadata;
+                        const cleanMetadata = archivingMetadata;
                         delete cleanMetadata[field_name];
                         setArchivingMetadata({ ...cleanMetadata });
                       }}
@@ -1124,21 +1115,19 @@ function WrappedSubmissionDetail() {
           >
             <span style={{ fontWeight: 500, textAlign: 'left' }}>{t('outstanding.title')}</span>
             <Grid container style={{ marginTop: theme.spacing(1) }}>
-              <Grid item xs={6}>
+              <Grid size={{ xs: 6 }}>
                 <b>{t('outstanding.services')}</b>
               </Grid>
-              <Grid item xs={6}>
+              <Grid size={{ xs: 6 }}>
                 <b>{t('outstanding.files')}</b>
               </Grid>
             </Grid>
             {Object.keys(outstanding).map(service => (
               <Grid key={service} container>
-                <Grid item xs={6}>
+                <Grid size={{ xs: 6 }}>
                   <b>{service}</b>
                 </Grid>
-                <Grid item xs={6}>
-                  {outstanding[service]}
-                </Grid>
+                <Grid size={{ xs: 6 }}>{outstanding[service]}</Grid>
               </Grid>
             ))}
           </Alert>
@@ -1151,15 +1140,15 @@ function WrappedSubmissionDetail() {
           </div>
         )}
         <div style={{ paddingBottom: sp4 }}>
-          <Grid container>
-            <Grid item xs>
+          <Grid container size="grow">
+            <Grid flex={1}>
               <div>
                 <Typography variant="h4">{t('title')}</Typography>
-                <Typography variant="caption" component={'div'}>
+                <Typography variant="caption" component="div">
                   {submission ? submission.sid : <Skeleton style={{ width: '10rem' }} />}
                 </Typography>
                 {submission && submission.params.psid && (
-                  <Typography variant="caption" component={'div'}>
+                  <Typography variant="caption" component="div">
                     <i>
                       <span>{t('psid')}: </span>
                       <Link
@@ -1205,7 +1194,7 @@ function WrappedSubmissionDetail() {
                 </div>
               )}
             </Grid>
-            <Grid item xs={12} sm={12} md={4} style={{ display: 'flex', justifyContent: 'flex-end', flexGrow: 0 }}>
+            <Grid size={{ xs: 12, sm: 12, md: 4 }} style={{ display: 'flex', justifyContent: 'flex-end', flexGrow: 0 }}>
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 {submission ? (
                   submission.state === 'completed' ? (
@@ -1276,8 +1265,7 @@ function WrappedSubmissionDetail() {
                             }}
                           >
                             <List disablePadding>
-                              <ListItem
-                                button
+                              <ListItemButton
                                 component={Link}
                                 to={`/submit?hash=${submission.files[0].sha256}`}
                                 state={{
@@ -1291,28 +1279,28 @@ function WrappedSubmissionDetail() {
                                   <TuneOutlinedIcon />
                                 </ListItemIcon>
                                 <ListItemText primary={t('resubmit.modify')} />
-                              </ListItem>
-                              <ListItem button dense onClick={() => resubmitWithType('dynamic')}>
+                              </ListItemButton>
+                              <ListItemButton dense onClick={() => resubmitWithType('dynamic')}>
                                 <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
                                   <OndemandVideoOutlinedIcon />
                                 </ListItemIcon>
                                 <ListItemText primary={t('resubmit.dynamic')} />
-                              </ListItem>
+                              </ListItemButton>
                               {submissionProfiles &&
                                 Object.entries(submissionProfiles).map(([name, display]) => (
-                                  <ListItem key={name} button dense onClick={() => resubmitWithType(name)}>
+                                  <ListItemButton key={name} dense onClick={() => resubmitWithType(name)}>
                                     <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
                                       <OndemandVideoOutlinedIcon />
                                     </ListItemIcon>
                                     <ListItemText primary={`${t('resubmit.with')} "${display}"`} />
-                                  </ListItem>
+                                  </ListItemButton>
                                 ))}
-                              <ListItem button dense onClick={resubmit}>
+                              <ListItemButton dense onClick={resubmit}>
                                 <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
                                   <RepeatOutlinedIcon />
                                 </ListItemIcon>
                                 <ListItemText primary={t('resubmit.carbon_copy')} />
-                              </ListItem>
+                              </ListItemButton>
                             </List>
                           </Popover>
                         </>
@@ -1371,8 +1359,8 @@ function WrappedSubmissionDetail() {
                         <>
                           <VerdictBar verdicts={submission.verdict} />
                           {currentUser.roles.includes('submission_manage') && (
-                            <Grid container>
-                              <Grid item xs={5} style={{ textAlign: 'left' }}>
+                            <Grid container size="grow">
+                              <Grid size={{ xs: 5 }} style={{ textAlign: 'left' }}>
                                 <Tooltip
                                   title={t(
                                     `verdict.${
@@ -1392,8 +1380,8 @@ function WrappedSubmissionDetail() {
                                   </IconButton>
                                 </Tooltip>
                               </Grid>
-                              <Grid item xs={2} />
-                              <Grid item xs={5} style={{ textAlign: 'right' }}>
+                              <Grid size={{ xs: 2 }} />
+                              <Grid size={{ xs: 5 }} style={{ textAlign: 'right' }}>
                                 <Tooltip
                                   title={t(
                                     `verdict.${

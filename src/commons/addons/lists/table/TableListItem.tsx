@@ -1,8 +1,55 @@
-/* eslint-disable jsx-a11y/no-static-element-interactions */
-/* eslint-disable jsx-a11y/click-events-have-key-events */
-import { memo, ReactElement, useCallback } from 'react';
-import { LineItem } from '../item/ListItemBase';
-import { useItemStyles } from './useStyles';
+import { styled } from '@mui/material';
+import { darken, lighten } from '@mui/material/styles';
+import type { LineItem } from 'commons/addons/lists/item/ListItemBase';
+import type { ReactElement } from 'react';
+import { memo, useCallback } from 'react';
+
+type ItemProps = {
+  divider?: boolean;
+  hover?: boolean;
+};
+
+const Item = styled('div', {
+  shouldForwardProp: prop => prop !== 'divider' && prop !== 'hover'
+})<ItemProps>(({ theme, divider, hover }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  position: 'relative',
+  '&[data-listitem-focus="true"]': {
+    backgroundColor:
+      theme.palette.mode === 'dark'
+        ? lighten(theme.palette.background.default, 0.25)
+        : darken(theme.palette.background.default, 0.25)
+  },
+  '&[data-listitem-selected="true"]': {
+    backgroundColor:
+      theme.palette.mode === 'dark'
+        ? lighten(theme.palette.background.default, 0.025)
+        : darken(theme.palette.background.default, 0.025)
+  },
+
+  ...(divider && {
+    borderBottom: '1px solid',
+    borderBottomColor: theme.palette.divider
+  }),
+
+  ...(hover && {
+    '& $actions': {
+      display: 'none',
+      verticalAlign: 'center'
+    },
+    '&:hover': {
+      cursor: 'pointer',
+      backgroundColor:
+        theme.palette.mode === 'dark'
+          ? lighten(theme.palette.background.default, 0.05)
+          : darken(theme.palette.background.default, 0.05)
+    },
+    '&:hover $actions': {
+      display: 'inherit'
+    }
+  })
+}));
 
 export interface TableListItemStyleProps {
   rowHover?: boolean;
@@ -32,19 +79,6 @@ const TableListItem = <T extends LineItem>({
   onRenderActions,
   children
 }: TableListItemProps<T>) => {
-  const classes = useItemStyles();
-
-  const buildStyles = useCallback(() => {
-    const itemClasses = [classes.item];
-    if (!noHover) {
-      itemClasses.push(classes.itemHover);
-    }
-    if (!noDivider && index < itemCount - 1) {
-      itemClasses.push(classes.itemDivider);
-    }
-    return itemClasses.join(' ');
-  }, [noHover, noDivider, index, itemCount, classes]);
-
   const onClick = useCallback(() => {
     if (onSelection) {
       onSelection(item, index);
@@ -52,14 +86,23 @@ const TableListItem = <T extends LineItem>({
   }, [onSelection, item, index]);
 
   return (
-    <div className={buildStyles()} data-listitem-position={index} data-listitem-selected={selected} onClick={onClick}>
-      <div className={classes.children}>{children(item, index)}</div>
+    <Item
+      hover={!noHover}
+      divider={!noDivider}
+      data-listitem-position={index}
+      data-listitem-selected={selected}
+      onClick={onClick}
+    >
+      <div>{children(item, index)}</div>
       {onRenderActions && (
-        <div className={classes.actions} onClick={event => event.stopPropagation()}>
+        <div
+          onClick={event => event.stopPropagation()}
+          style={{ position: 'absolute', right: 0, backgroundColor: 'inherit', margin: 'auto' }}
+        >
           {onRenderActions(item, index)}
         </div>
       )}
-    </div>
+    </Item>
   );
 };
 

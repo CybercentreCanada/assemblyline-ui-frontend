@@ -5,15 +5,15 @@ import type {
   TooltipProps,
   TypographyProps
 } from '@mui/material';
-import { FormControl, InputAdornment, InputLabel, Skeleton, TextField, Typography, useTheme } from '@mui/material';
+import { FormControl, InputAdornment, InputLabel, Skeleton, Typography, useTheme } from '@mui/material';
 import { LocalizationProvider, DatePicker as MuiDatePicker } from '@mui/x-date-pickers';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
+import type { ResetInputProps } from 'components/visual/Inputs/components/ResetInput';
+import { ResetInput } from 'components/visual/Inputs/components/ResetInput';
 import { Tooltip } from 'components/visual/Tooltip';
 import type { Moment } from 'moment';
 import moment from 'moment';
 import React, { useEffect, useMemo, useState } from 'react';
-import type { ResetInputProps } from './components/ResetInput';
-import { ResetInput } from './components/ResetInput';
 
 export type DateInputProps = Omit<TextFieldProps, 'error' | 'value' | 'onChange'> & {
   defaultDateOffset?: number | null;
@@ -140,6 +140,9 @@ const WrappedDateInput = ({
             <MuiDatePicker
               value={tempDate}
               readOnly={readOnly}
+              minDate={minDateTomorrow ? tomorrow : null}
+              maxDate={maxDateToday ? today : null}
+              disabled={disabled}
               onChange={newValue => {
                 setTempDate(newValue);
 
@@ -151,32 +154,29 @@ const WrappedDateInput = ({
                 const err = error(parsedValue);
                 if (err) onError(err);
               }}
-              renderInput={({ inputRef, inputProps, InputProps }) => (
-                <TextField
-                  id={id}
-                  size="small"
-                  ref={inputRef}
-                  error={!!errorValue && !disabled}
-                  disabled={disabled}
-                  helperText={disabled ? null : errorValue || helperText}
-                  FormHelperTextProps={
-                    disabled
-                      ? null
-                      : errorValue
+              slotProps={{
+                textField: {
+                  id: id,
+                  size: 'small',
+                  error: !!errorValue && !disabled,
+                  disabled: disabled,
+                  helperText: disabled ? null : errorValue || helperText,
+                  FormHelperTextProps: disabled
+                    ? null
+                    : errorValue
                       ? {
                           variant: 'outlined',
                           sx: { color: theme.palette.error.main, ...errorProps?.sx },
                           ...errorProps
                         }
                       : helperText
-                      ? {
-                          variant: 'outlined',
-                          sx: { color: theme.palette.text.secondary, ...helperTextProps?.sx },
-                          ...errorProps
-                        }
-                      : null
-                  }
-                  sx={{
+                        ? {
+                            variant: 'outlined',
+                            sx: { color: theme.palette.text.secondary, ...helperTextProps?.sx },
+                            ...errorProps
+                          }
+                        : null,
+                  sx: {
                     '& .MuiInputBase-input': {
                       ...(tiny && { fontSize: '14px' }),
                       ...(readOnly && !disabled && { cursor: 'default' })
@@ -188,24 +188,18 @@ const WrappedDateInput = ({
                             theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.23)' : 'rgba(0, 0, 0, 0.23)'
                         })
                     }
-                  }}
-                  {...(readOnly && !disabled && { focused: null })}
-                  {...textFieldProps}
-                  onFocus={event => setFocused(document.activeElement === event.target)}
-                  onBlur={() => setFocused(false)}
-                  inputProps={{
-                    ...inputProps,
-                    ...textFieldProps?.inputProps,
+                  },
+                  ...(readOnly && !disabled && { focused: null }),
+                  ...textFieldProps,
+                  onFocus: event => setFocused(document.activeElement === event.target),
+                  onBlur: () => setFocused(false),
+                  inputProps: {
                     ...(tiny && { sx: { padding: '2.5px 4px 2.5px 8px' } })
-                  }}
-                  InputProps={{
-                    ...InputProps,
-                    ...textFieldProps?.InputProps,
-
+                  },
+                  InputProps: {
                     placeholder: placeholder,
                     endAdornment: (
                       <>
-                        {InputProps?.endAdornment}
                         {loading || !reset || disabled || readOnly ? null : (
                           <InputAdornment
                             position="end"
@@ -222,12 +216,9 @@ const WrappedDateInput = ({
                         )}
                       </>
                     )
-                  }}
-                />
-              )}
-              minDate={minDateTomorrow ? tomorrow : null}
-              maxDate={maxDateToday ? today : null}
-              disabled={disabled}
+                  }
+                }
+              }}
             />
           )}
         </FormControl>

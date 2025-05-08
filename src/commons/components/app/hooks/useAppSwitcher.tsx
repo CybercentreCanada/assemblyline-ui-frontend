@@ -1,6 +1,6 @@
 import { useContext } from 'react';
-import { AppSwitcherContext } from '../providers/AppSwitcherProvider';
+import { AppSwitcherContext } from 'commons/components/app/AppContexts';
 
-export default function useAppSwitcher() {
+export function useAppSwitcher() {
   return useContext(AppSwitcherContext);
 }

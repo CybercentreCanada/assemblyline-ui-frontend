@@ -1,5 +1,6 @@
-import { TouchEvent } from 'react';
-import { ACTIONS, ActionTypesConfig, Dispatch, DispatchersConfig } from '..';
+import type { TouchEvent } from 'react';
+import type { ActionTypesConfig, Dispatch, DispatchersConfig } from '..';
+import { ACTIONS } from '..';
 
 export type ScrollAction =
   | { type: 'scrollButtonClick'; payload: { value: number } }

@@ -1,24 +1,8 @@
-import { Theme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
-import clsx from 'clsx';
+import { Box, useTheme } from '@mui/material';
 import useCarousel from 'components/hooks/useCarousel';
 import type { Image, ImageBody as ImageData } from 'components/models/base/result_body';
 import { ImageItem } from 'components/visual/image_inline';
 import { default as React, useEffect, useState } from 'react';
-
-const useStyles = makeStyles((theme: Theme) => ({
-  imageList: {
-    display: 'flex',
-    flexWrap: 'nowrap',
-    marginRight: theme.spacing(2),
-    overflowX: 'auto',
-    paddingBottom: theme.spacing(0.5),
-    paddingTop: theme.spacing(0.5)
-  },
-  printable: {
-    flexWrap: 'wrap'
-  }
-}));
 
 type Props = {
   body: ImageData;
@@ -27,7 +11,7 @@ type Props = {
 };
 
 const WrappedImageBody = ({ body, printable = false }: Props) => {
-  const classes = useStyles();
+  const theme = useTheme();
   const { openCarousel } = useCarousel();
   const [data, setData] = useState<Image[]>([]);
 
@@ -47,7 +31,20 @@ const WrappedImageBody = ({ body, printable = false }: Props) => {
   }, [body]);
 
   return body && Array.isArray(body) ? (
-    <div className={clsx(classes.imageList, printable && classes.printable)}>
+    <Box
+      sx={{
+        display: 'flex',
+        flexWrap: 'nowrap',
+        marginRight: theme.spacing(2),
+        overflowX: 'auto',
+        paddingBottom: theme.spacing(0.5),
+        paddingTop: theme.spacing(0.5),
+
+        ...(printable && {
+          flexWrap: 'wrap'
+        })
+      }}
+    >
       {data.map((element, index) => (
         <ImageItem
           key={index}
@@ -58,7 +55,7 @@ const WrappedImageBody = ({ body, printable = false }: Props) => {
           onImageClick={(e, i) => openCarousel(index, data)}
         />
       ))}
-    </div>
+    </Box>
   ) : null;
 };
 

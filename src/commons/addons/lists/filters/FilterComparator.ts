@@ -1,6 +1,6 @@
-/* eslint-disable class-methods-use-this */
+import type { FilterField } from 'commons/addons/lists/filters/FilterSelector';
+import { GLOBAL_FILTER } from 'commons/addons/lists/filters/FilterSelector';
 import lodash from 'lodash';
-import { FilterField, GLOBAL_FILTER } from './FilterSelector';
 
 export function isNumber(value: any): boolean {
   return !lodash.isNull(value) && !lodash.isNaN(value);

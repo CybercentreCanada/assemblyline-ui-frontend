@@ -1,4 +1,4 @@
-import { TypesConfig } from '..';
+import type { TypesConfig } from '..';
 
 export type SearchType = 'cursor' | 'hex' | 'text';
 export type SearchEncoding = '8Bits' | '16Bits' | 'both';
@@ -16,10 +16,10 @@ export type SearchState = {
     inputValue: string;
 
     selectedResult: number;
-    results: Array<{
+    results: {
       index: number;
       length: number;
-    }>;
+    }[];
   };
 };
 

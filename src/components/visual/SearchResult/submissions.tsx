@@ -25,7 +25,7 @@ import Verdict from 'components/visual/Verdict';
 import { maxLenStr } from 'helpers/utils';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 type Props = {
   submissionResults: SearchResult<SubmissionIndexed>;
@@ -33,7 +33,7 @@ type Props = {
 };
 
 const WrappedSubmissionsTable: React.FC<Props> = ({ submissionResults, allowSort = true }) => {
-  const { t, i18n } = useTranslation(['search']);
+  const { t } = useTranslation(['search']);
   const { c12nDef } = useALContext();
   const searchParams = useSearchParams<SubmissionParams>();
 

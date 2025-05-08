@@ -1,8 +1,8 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import ChevronRightOutlinedIcon from '@mui/icons-material/ChevronRightOutlined';
 import CloseIcon from '@mui/icons-material/Close';
 import {
   Avatar,
+  Box,
   Button,
   Chip,
   CircularProgress,
@@ -10,6 +10,7 @@ import {
   Grid,
   IconButton,
   Paper,
+  styled,
   Table,
   TableBody,
   TableCell,
@@ -17,7 +18,6 @@ import {
   TableHead,
   TableRow,
   TextField,
-  Theme,
   Typography,
   useMediaQuery,
   useTheme
@@ -25,14 +25,13 @@ import {
 import Autocomplete from '@mui/material/Autocomplete';
 import Skeleton from '@mui/material/Skeleton';
 import { red } from '@mui/material/colors';
-import makeStyles from '@mui/styles/makeStyles';
-import withStyles from '@mui/styles/withStyles';
 import PageCenter from 'commons/components/pages/PageCenter';
 import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import APIKeys from 'components/routes/user/api_keys';
+import Apps from 'components/routes/user/apps';
 import DisableOTP from 'components/routes/user/disable_otp';
 import OTP from 'components/routes/user/otp';
 import SecurityToken from 'components/routes/user/token';
@@ -42,9 +41,7 @@ import CustomChip from 'components/visual/CustomChip';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
 import React, { memo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate, useNavigate } from 'react-router';
-import { useLocation, useParams } from 'react-router-dom';
-import Apps from './user/apps';
+import { Navigate, useLocation, useNavigate, useParams } from 'react-router';
 
 type UserProps = {
   username?: string | null;
@@ -54,47 +51,16 @@ type ParamProps = {
   id: string;
 };
 
-const useStyles = makeStyles(theme => ({
-  drawer: {
-    width: '500px',
-    [theme.breakpoints.only('xs')]: {
-      width: '100vw'
-    }
-  },
-  row: {
-    height: '62px'
-  },
-  group: {
-    marginTop: '1rem'
-  },
-  skelItem: {
-    display: 'inline-block',
-    margin: theme.spacing(0.5)
-  },
-  skelButton: {
-    display: 'inline-block',
-    width: '9rem',
-    height: theme.spacing(5)
-  },
-  buttonProgress: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    marginTop: -12,
-    marginLeft: -12
-  }
-}));
-
-const DeleteButton = withStyles((theme: Theme) => ({
-  root: {
+const DeleteButton = memo(
+  styled(Button)(({ theme }) => ({
     color: theme.palette.getContrastText(red[500]),
     backgroundColor: red[500],
     '&:hover': {
       backgroundColor: red[700]
     },
     minWidth: theme.spacing(16)
-  }
-}))(Button);
+  }))
+);
 
 const ClickRow = ({ children, enabled, onClick, chevron = false, ...other }) => (
   <TableRow
@@ -110,12 +76,16 @@ const ClickRow = ({ children, enabled, onClick, chevron = false, ...other }) => 
 );
 
 function User({ username = null }: UserProps) {
+  const { t } = useTranslation(['user']);
+  const theme = useTheme();
   const { id } = useParams<ParamProps>();
   const location = useLocation();
   const inputRef = useRef(null);
-  const { t } = useTranslation(['user']);
-  const theme = useTheme();
   const navigate = useNavigate();
+  const { apiCall } = useMyAPI();
+  const { user: currentUser, configuration } = useALContext();
+  const { showErrorMessage, showSuccessMessage, showWarningMessage } = useMySnackbar();
+
   const [drawerType, setDrawerType] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [deleteDialog, setDeleteDialog] = useState(false);
@@ -124,17 +94,12 @@ function User({ username = null }: UserProps) {
   const [modified, setModified] = useState(false);
   const [editable, setEditable] = useState(false);
   const [buttonLoading, setButtonLoading] = useState(false);
-  const { user: currentUser, configuration } = useALContext();
+
   const downSM = useMediaQuery(theme.breakpoints.down('md'));
   const isXS = useMediaQuery(theme.breakpoints.only('xs'));
-  const { showErrorMessage, showSuccessMessage, showWarningMessage } = useMySnackbar();
   const sp1 = theme.spacing(1);
   const sp4 = theme.spacing(4);
   const sp6 = theme.spacing(6);
-
-  const { apiCall } = useMyAPI();
-
-  const classes = useStyles();
 
   const doDeleteUser = () => {
     apiCall({
@@ -335,16 +300,19 @@ function User({ username = null }: UserProps) {
               <CloseIcon />
             </IconButton>
           </div>
-          <div
-            style={{
+          <Box
+            sx={{
               paddingTop: sp4,
               paddingBottom: sp6,
               paddingLeft: sp4,
               paddingRight: sp4,
               display: 'flex',
-              flexDirection: 'column'
+              flexDirection: 'column',
+              width: '500px',
+              [theme.breakpoints.only('xs')]: {
+                width: '100vw'
+              }
             }}
-            className={classes.drawer}
           >
             {drawerType && user
               ? {
@@ -502,7 +470,7 @@ function User({ username = null }: UserProps) {
                   apps: <Apps user={user} toggleApp={toggleApp} />
                 }[drawerType]
               : null}
-          </div>
+          </Box>
         </Drawer>
       </React.Fragment>
 
@@ -518,10 +486,10 @@ function User({ username = null }: UserProps) {
       />
 
       <Grid container spacing={2} justifyContent="center">
-        <Grid item xs={12} sm={12} md={3}>
-          <Grid container className={classes.group}>
+        <Grid size={{ xs: 12, sm: 12, md: 3 }}>
+          <Grid container sx={{ marginTop: '1rem' }}>
             {id && (
-              <Grid item xs={12}>
+              <Grid size={{ xs: 12 }}>
                 <div style={{ paddingBottom: sp4 }}>
                   {user ? (
                     <DeleteButton
@@ -531,19 +499,23 @@ function User({ username = null }: UserProps) {
                       onClick={handleDeleteUser}
                     >
                       {t('remove')}
-                      {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
+                      {buttonLoading && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
                     </DeleteButton>
                   ) : (
                     <Skeleton
                       variant="rectangular"
-                      className={classes.skelButton}
-                      style={{ minWidth: theme.spacing(16), width: downSM ? '100%' : null }}
+                      sx={{
+                        display: 'inline-block',
+                        height: theme.spacing(5),
+                        minWidth: theme.spacing(16),
+                        width: downSM ? '100%' : '9rem'
+                      }}
                     />
                   )}
                 </div>
               </Grid>
             )}
-            <Grid item xs={12}>
+            <Grid size={{ xs: 12 }}>
               {user ? (
                 <>
                   <input
@@ -585,15 +557,18 @@ function User({ username = null }: UserProps) {
                 </>
               ) : (
                 <Skeleton
-                  className={classes.skelItem}
                   variant="circular"
                   width={downSM ? theme.spacing(24.5) : theme.spacing(16.5)}
                   height={downSM ? theme.spacing(24.5) : theme.spacing(16.5)}
+                  sx={{
+                    display: 'inline-block',
+                    margin: theme.spacing(0.5)
+                  }}
                 />
               )}
               <Typography gutterBottom>{user ? user.uname : <Skeleton />}</Typography>
             </Grid>
-            <Grid item style={{ marginTop: '2rem' }} xs={12}>
+            <Grid size={{ xs: 12 }} style={{ marginTop: '2rem' }}>
               <div style={{ paddingBottom: id ? 0 : sp4 }}>
                 {user ? (
                   <CustomChip
@@ -607,8 +582,12 @@ function User({ username = null }: UserProps) {
                 ) : (
                   <Skeleton
                     variant="rectangular"
-                    className={classes.skelButton}
-                    style={{ minWidth: theme.spacing(16), width: downSM ? '100%' : null }}
+                    sx={{
+                      display: 'inline-block',
+                      height: theme.spacing(5),
+                      minWidth: theme.spacing(16),
+                      width: downSM ? '100%' : '9rem'
+                    }}
                   />
                 )}
               </div>
@@ -616,7 +595,7 @@ function User({ username = null }: UserProps) {
           </Grid>
         </Grid>
 
-        <Grid item sm={12} md={9} style={{ width: '100%' }}>
+        <Grid size={{ sm: 12, md: 9 }}>
           <Classification
             type={currentUser.is_admin ? 'picker' : 'pill'}
             size="medium"
@@ -626,7 +605,7 @@ function User({ username = null }: UserProps) {
             isUser
             dynGroup={user && user.email ? user.email.toUpperCase().split('@')[1] : null}
           />
-          <TableContainer className={classes.group} component={Paper}>
+          <TableContainer component={Paper} sx={{ marginTop: '1rem' }}>
             <Table aria-label={t('profile')}>
               <TableHead>
                 <TableRow>
@@ -638,7 +617,7 @@ function User({ username = null }: UserProps) {
                 </TableRow>
               </TableHead>
               <TableBody>
-                <TableRow className={classes.row}>
+                <TableRow sx={{ height: '62px' }}>
                   {isXS ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('uname')}</TableCell>}
                   <TableCell width="100%">
                     {!isXS ? null : <Typography variant="caption">{t('uname')}</Typography>}
@@ -660,7 +639,7 @@ function User({ username = null }: UserProps) {
                     {user ? <div>{user.groups.join(' | ')}</div> : <Skeleton />}
                   </TableCell>
                 </ClickRow>
-                <TableRow className={classes.row}>
+                <TableRow sx={{ height: '62px' }}>
                   {isXS ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('email')}</TableCell>}
                   <TableCell width="100%">
                     {!isXS ? null : <Typography variant="caption">{t('email')}</Typography>}
@@ -669,7 +648,7 @@ function User({ username = null }: UserProps) {
                   <TableCell align="right" />
                 </TableRow>
                 {currentUser.is_admin && (
-                  <TableRow className={classes.row}>
+                  <TableRow sx={{ height: '62px' }}>
                     {isXS ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('identity_id')}</TableCell>}
                     <TableCell width="100%">
                       {!isXS ? null : <Typography variant="caption">{t('identity_id')}</Typography>}
@@ -682,7 +661,7 @@ function User({ username = null }: UserProps) {
             </Table>
           </TableContainer>
 
-          <TableContainer className={classes.group} component={Paper}>
+          <TableContainer component={Paper} sx={{ marginTop: '1rem' }}>
             <Table aria-label={t('options')}>
               <TableHead>
                 <TableRow>
@@ -748,10 +727,10 @@ function User({ username = null }: UserProps) {
                   <TableCell align="right" />
                 </TableRow>
                 <TableRow
-                  className={classes.row}
                   hover={currentUser.is_admin}
                   style={{ cursor: currentUser.is_admin ? 'pointer' : 'default' }}
                   onClick={currentUser.is_admin ? () => toggleDrawer('api_quota') : null}
+                  sx={{ height: '62px' }}
                 >
                   {isXS ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('api_quota')}</TableCell>}
                   <TableCell width="100%">
@@ -772,10 +751,10 @@ function User({ username = null }: UserProps) {
                   <TableCell align="right">{currentUser.is_admin ? <ChevronRightOutlinedIcon /> : null}</TableCell>
                 </TableRow>
                 <TableRow
-                  className={classes.row}
                   hover={currentUser.is_admin}
                   style={{ cursor: currentUser.is_admin ? 'pointer' : 'default' }}
                   onClick={currentUser.is_admin ? () => toggleDrawer('api_daily_quota') : null}
+                  sx={{ height: '62px' }}
                 >
                   {isXS ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('api_daily_quota')}</TableCell>}
                   <TableCell width="100%">
@@ -809,10 +788,10 @@ function User({ username = null }: UserProps) {
                   <TableCell align="right">{currentUser.is_admin ? <ChevronRightOutlinedIcon /> : null}</TableCell>
                 </TableRow>
                 <TableRow
-                  className={classes.row}
                   hover={currentUser.is_admin}
                   style={{ cursor: currentUser.is_admin ? 'pointer' : 'default' }}
                   onClick={currentUser.is_admin ? () => toggleDrawer('submission_quota') : null}
+                  sx={{ height: '62px' }}
                 >
                   {isXS ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('submission_quota')}</TableCell>}
                   <TableCell width="100%">
@@ -837,10 +816,10 @@ function User({ username = null }: UserProps) {
                   <TableCell align="right">{currentUser.is_admin ? <ChevronRightOutlinedIcon /> : null}</TableCell>
                 </TableRow>
                 <TableRow
-                  className={classes.row}
                   hover={currentUser.is_admin}
                   style={{ cursor: currentUser.is_admin ? 'pointer' : 'default' }}
                   onClick={currentUser.is_admin ? () => toggleDrawer('submission_async_quota') : null}
+                  sx={{ height: '62px' }}
                 >
                   {isXS ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('submission_async_quota')}</TableCell>}
                   <TableCell width="100%">
@@ -865,10 +844,10 @@ function User({ username = null }: UserProps) {
                   <TableCell align="right">{currentUser.is_admin ? <ChevronRightOutlinedIcon /> : null}</TableCell>
                 </TableRow>
                 <TableRow
-                  className={classes.row}
                   hover={currentUser.is_admin}
                   style={{ cursor: currentUser.is_admin ? 'pointer' : 'default' }}
                   onClick={currentUser.is_admin ? () => toggleDrawer('submission_daily_quota') : null}
+                  sx={{ height: '62px' }}
                 >
                   {isXS ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('submission_daily_quota')}</TableCell>}
                   <TableCell width="100%">
@@ -906,7 +885,7 @@ function User({ username = null }: UserProps) {
           </TableContainer>
 
           {editable && (
-            <TableContainer className={classes.group} component={Paper}>
+            <TableContainer component={Paper} sx={{ marginTop: '1rem' }}>
               <Table aria-label={t('security')}>
                 <TableHead>
                   <TableRow>
@@ -991,7 +970,7 @@ function User({ username = null }: UserProps) {
             >
               <Button variant="contained" color="primary" disabled={buttonLoading || !modified} onClick={saveUser}>
                 {t('save')}
-                {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
+                {buttonLoading && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
               </Button>
             </div>
           ) : null}

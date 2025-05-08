@@ -21,6 +21,7 @@ import type { File } from 'components/models/base/file';
 import type { Submission } from 'components/models/base/submission';
 import type { SearchResult } from 'components/models/ui/search';
 import { getProfileNames } from 'components/routes/settings/settings.utils';
+import FileDropper from 'components/routes/submit/components/FileDropper';
 import type { AutoURLServiceIndices, SubmitStore } from 'components/routes/submit/submit.form';
 import { FLOW, useForm } from 'components/routes/submit/submit.form';
 import {
@@ -42,8 +43,7 @@ import { getSubmitType } from 'helpers/utils';
 import generateUUID from 'helpers/uuid';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useNavigate } from 'react-router-dom';
-import FileDropper from './FileDropper';
+import { Link, useNavigate } from 'react-router';
 
 export const ClassificationInput = React.memo(() => {
   const { t } = useTranslation(['submit']);
@@ -137,7 +137,7 @@ export const HashInput = React.memo(() => {
       }
       children={([loading, disabled, isEditing, type, value]) => (
         <TextInput
-          id={'Hash Input'}
+          id="Hash Input"
           label={configuration.ui.allow_url_submissions ? t('url.input.label') : t('hash.input.label')}
           tooltip={configuration.ui.allow_url_submissions ? t('url.input.tooltip') : t('hash.input.tooltip')}
           helperText={configuration.ui.allow_url_submissions ? t('url.input.helperText') : ''}
@@ -620,9 +620,9 @@ export const FindButton = React.memo(() => {
         }
         children={([loading, disabled, tab, file, hashType, hashValue]) => (
           <IconButton
-            label={t('find.button.tooltip')}
             disabled={disabled || (tab === 'file' ? !file : tab === 'hash' ? !hashType : false)}
             loading={loading}
+            tooltip={t('find.button.tooltip')}
             tooltipProps={{ placement: 'bottom' }}
             onClick={() => {
               setOpen(true);
@@ -651,7 +651,7 @@ export const AdjustButton = React.memo(() => {
       selector={state => [state.values.state.adjust] as const}
       children={([adjust]) => (
         <IconButton
-          label={adjust ? t('adjust.button.close.tooltip') : t('adjust.button.open.tooltip')}
+          tooltip={adjust ? t('adjust.button.close.tooltip') : t('adjust.button.open.tooltip')}
           tooltipProps={{ placement: 'bottom' }}
           onClick={() => form.setFieldValue('state.adjust', s => !s)}
         >
@@ -681,7 +681,8 @@ const AnalyzeButton = React.memo(({ children, ...props }: ButtonProps) => {
       children={([phase, disabled, tab, file, hash, progress]) => (
         <Button
           disabled={disabled || (tab === 'file' ? file : tab === 'hash' ? hash : false)}
-          loading={phase !== 'editing'}
+          loading={phase === 'loading'}
+          progress={phase !== 'editing'}
           tooltip={t('submit.button.tooltip')}
           tooltipProps={{ placement: 'bottom' }}
           variant="contained"
@@ -691,16 +692,16 @@ const AnalyzeButton = React.memo(({ children, ...props }: ButtonProps) => {
           {children
             ? children
             : phase === 'redirecting'
-            ? t('submit.button.redirecting.label')
-            : phase === 'uploading'
-            ? progress
-              ? `${progress}% ${t('submit.button.uploadProgress.label')}`
-              : t('submit.button.uploading.label')
-            : phase === 'editing'
-            ? t('submit.button.editing.label')
-            : phase === 'loading'
-            ? t('submit.button.loading.label')
-            : null}
+              ? t('submit.button.redirecting.label')
+              : phase === 'uploading'
+                ? progress
+                  ? `${progress}% ${t('submit.button.uploadProgress.label')}`
+                  : t('submit.button.uploading.label')
+                : phase === 'editing'
+                  ? t('submit.button.editing.label')
+                  : phase === 'loading'
+                    ? t('submit.button.loading.label')
+                    : null}
         </Button>
       )}
     />

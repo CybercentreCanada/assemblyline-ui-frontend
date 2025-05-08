@@ -1,24 +1,24 @@
-import React from 'react';
+import React, { useCallback, useRef } from 'react';
 
 export const useTrottledCallback = <T>(
   trottledCallback: (props: T) => any,
   delay: number = 1000
 ): ((props: T) => void) => {
-  const trottledCallbackRef = React.useRef(null);
-  const propsRef = React.useRef(null);
-  const timeout = React.useRef(null);
+  const trottledCallbackRef = useRef(null);
+  const propsRef = useRef(null);
+  const timeout = useRef(null);
 
   React.useEffect(() => {
     trottledCallbackRef.current = trottledCallback;
   }, [trottledCallback]);
 
-  const clear = React.useCallback(() => {
+  const clear = useCallback(() => {
     clearTimeout(timeout.current);
     propsRef.current = null;
     timeout.current = null;
   }, []);
 
-  const reset = React.useCallback(() => {
+  const reset = useCallback(() => {
     timeout.current = setTimeout(() => {
       if (propsRef.current !== null) {
         trottledCallbackRef.current([...propsRef.current]);
@@ -28,7 +28,7 @@ export const useTrottledCallback = <T>(
     }, delay);
   }, [clear, delay]);
 
-  const callback = React.useCallback(
+  const callback = useCallback(
     (...props) => {
       if (timeout.current === null) {
         trottledCallbackRef.current([...props]);

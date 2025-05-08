@@ -40,7 +40,7 @@ export const ListSection = React.memo(() => {
   return (
     <DemoContainer>
       <DemoSection
-        primary={'Basics'}
+        primary="Basics"
         secondary={null}
         left={
           <div>
@@ -114,7 +114,7 @@ export const ListSection = React.memo(() => {
       />
 
       <DemoSection
-        primary={'Checkbox'}
+        primary="Checkbox"
         secondary={
           <>
             <span>{'To add a checkbox to the ListHeader, provide a value for the "checked" prop. '}</span>
@@ -222,7 +222,7 @@ export const ListSection = React.memo(() => {
       />
 
       <DemoSection
-        primary={'Uncontrolled'}
+        primary="Uncontrolled"
         secondary={
           'If a value for the "onChange" prop is not provided in the ListHeader component, it will not act as a button. '
         }
@@ -310,7 +310,7 @@ export const ListSection = React.memo(() => {
       />
 
       <DemoSection
-        primary={'Disabled'}
+        primary="Disabled"
         secondary={'Add the "disable" prop to disable the component. '}
         left={
           <div>
@@ -415,8 +415,8 @@ export const ListSection = React.memo(() => {
       />
 
       <DemoSection
-        primary={'Long Names'}
-        secondary={''}
+        primary="Long Names"
+        secondary=""
         left={
           <div>
             <form.Subscribe

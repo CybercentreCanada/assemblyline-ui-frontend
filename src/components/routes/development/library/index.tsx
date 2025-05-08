@@ -1,16 +1,16 @@
 import { TableOfContentProvider, useTableOfContent } from 'components/core/TableOfContent/TableOfContent';
+import type { LibraryFormStore } from 'components/routes/development/library/contexts/form';
+import { FormProvider, useForm } from 'components/routes/development/library/contexts/form';
+import { InputsSection } from 'components/routes/development/library/sections/Inputs';
+import { LayoutSection } from 'components/routes/development/library/sections/Layout';
+import { ListSection } from 'components/routes/development/library/sections/List';
+import { ListInputsSection } from 'components/routes/development/library/sections/ListInputs';
 import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import { PageLayout } from 'components/visual/Layouts/PageLayout';
 import { PageNavigation } from 'components/visual/Layouts/PageNavigation';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import React, { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router';
-import type { LibraryFormStore } from './contexts/form';
-import { FormProvider, useForm } from './contexts/form';
-import { InputsSection } from './sections/Inputs';
-import { LayoutSection } from './sections/Layout';
-import { ListSection } from './sections/List';
-import { ListInputsSection } from './sections/ListInputs';
 
 const LibraryContent = () => {
   const { rootRef, headerRef, Anchors, ActiveAnchor, scrollTo } = useTableOfContent();

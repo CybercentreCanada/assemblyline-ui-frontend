@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
-import { isAction, ReducerHandler, Reducers, setStore, Store, UseReducer } from '..';
+import type { ReducerHandler, Reducers, Store, UseReducer } from '..';
+import { isAction, setStore } from '..';
 
 export const useLoadingReducer: UseReducer = () => {
   const handleLoading = useCallback((store: Store): Store => {

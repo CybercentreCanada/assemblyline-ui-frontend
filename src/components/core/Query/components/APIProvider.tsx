@@ -1,10 +1,10 @@
 import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
 import { keepPreviousData, QueryClient } from '@tanstack/react-query';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
+import type { APIQueryKey } from 'components/core/Query/components/api.models';
+import { DEFAULT_GC_TIME, DEFAULT_STALE_TIME } from 'components/core/Query/components/constants';
 import { compress, decompress } from 'lz-string';
 import React from 'react';
-import type { APIQueryKey } from './api.models';
-import { DEFAULT_GC_TIME, DEFAULT_STALE_TIME } from './constants';
 
 export const queryClient = new QueryClient({
   defaultOptions: {

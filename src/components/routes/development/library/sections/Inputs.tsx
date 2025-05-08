@@ -1,5 +1,4 @@
-import { Button, Typography, useTheme } from '@mui/material';
-import Grid from '@mui/material/Unstable_Grid2';
+import { Button, Grid, Typography, useTheme } from '@mui/material';
 import { DemoContainer } from 'components/routes/development/library/components/DemoContainer';
 import { DemoSection } from 'components/routes/development/library/components/DemoSection';
 import { useForm } from 'components/routes/development/library/contexts/form';
@@ -75,8 +74,8 @@ export const InputsSection = React.memo(() => {
   return (
     <DemoContainer>
       <DemoSection
-        id={'Basic Example'}
-        primary={'Basic Example'}
+        id="Basic Example"
+        primary="Basic Example"
         secondary={
           <>
             <span>{'The following components are all of the inputs used in Assemblyline. '}</span>
@@ -224,12 +223,12 @@ export const InputsSection = React.memo(() => {
       />
 
       <PageSection
-        primary={'Controlled'}
+        primary="Controlled"
         secondary={<span>{'Input components are controlled by default. '}</span>}
         anchor
       >
         <Grid container spacing={2}>
-          <Grid md={6} xs={12}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <form.Subscribe
               selector={state => state.values.components.inputs.values.text}
               children={value => (
@@ -244,7 +243,7 @@ export const InputsSection = React.memo(() => {
             />
           </Grid>
 
-          <Grid md={6} xs={12} container alignItems="flex-end" paddingBottom={2} paddingLeft={2}>
+          <Grid size={{ xs: 12, md: 6 }} alignItems="flex-end" paddingBottom={2} paddingLeft={2}>
             <form.Subscribe
               selector={state => state.values.components.inputs.values.text}
               children={value => (
@@ -256,7 +255,7 @@ export const InputsSection = React.memo(() => {
             />
           </Grid>
 
-          <Grid md={6} xs={12}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <form.Subscribe
               selector={state => state.values.components.inputs.values.number}
               children={value => (
@@ -271,7 +270,7 @@ export const InputsSection = React.memo(() => {
             />
           </Grid>
 
-          <Grid md={6} xs={12} container alignItems="flex-end" paddingBottom={2} paddingLeft={2}>
+          <Grid size={{ xs: 12, md: 6 }} alignItems="flex-end" paddingBottom={2} paddingLeft={2}>
             <form.Subscribe
               selector={state => state.values.components.inputs.values.number}
               children={value => (
@@ -283,7 +282,7 @@ export const InputsSection = React.memo(() => {
             />
           </Grid>
 
-          <Grid md={6} xs={12}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <form.Subscribe
               selector={state => state.values.components.inputs.values.select}
               children={value => (
@@ -303,7 +302,7 @@ export const InputsSection = React.memo(() => {
             />
           </Grid>
 
-          <Grid md={6} xs={12} container alignItems="flex-end" paddingBottom={2} paddingLeft={2}>
+          <Grid size={{ xs: 12, md: 6 }} alignItems="flex-end" paddingBottom={2} paddingLeft={2}>
             <form.Subscribe
               selector={state => state.values.components.inputs.values.select}
               children={value => (
@@ -315,7 +314,7 @@ export const InputsSection = React.memo(() => {
             />
           </Grid>
 
-          <Grid md={6} xs={12}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <form.Subscribe
               selector={state => state.values.components.inputs.values.date}
               children={value => (
@@ -330,7 +329,7 @@ export const InputsSection = React.memo(() => {
             />
           </Grid>
 
-          <Grid md={6} xs={12} container alignItems="flex-end" paddingBottom={2} paddingLeft={2}>
+          <Grid size={{ xs: 12, md: 6 }} alignItems="flex-end" paddingBottom={2} paddingLeft={2}>
             <form.Subscribe
               selector={state => state.values.components.inputs.values.date}
               children={value => (
@@ -342,7 +341,7 @@ export const InputsSection = React.memo(() => {
             />
           </Grid>
 
-          <Grid md={6} xs={12}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <form.Subscribe
               selector={state => state.values.components.inputs.values.slider}
               children={value => (
@@ -357,7 +356,7 @@ export const InputsSection = React.memo(() => {
             />
           </Grid>
 
-          <Grid md={6} xs={12} container alignItems="flex-end" paddingBottom={2} paddingLeft={2}>
+          <Grid size={{ xs: 12, md: 6 }} alignItems="flex-end" paddingBottom={2} paddingLeft={2}>
             <form.Subscribe
               selector={state => state.values.components.inputs.values.slider}
               children={value => (
@@ -369,7 +368,7 @@ export const InputsSection = React.memo(() => {
             />
           </Grid>
 
-          <Grid md={6} xs={12}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <form.Subscribe
               selector={state => state.values.components.inputs.values.checkbox}
               children={value => (
@@ -384,7 +383,7 @@ export const InputsSection = React.memo(() => {
             />
           </Grid>
 
-          <Grid md={6} xs={12} container alignItems="flex-end" paddingBottom={2} paddingLeft={2}>
+          <Grid size={{ xs: 12, md: 6 }} alignItems="flex-end" paddingBottom={2} paddingLeft={2}>
             <form.Subscribe
               selector={state => state.values.components.inputs.values.checkbox}
               children={value => (
@@ -396,7 +395,7 @@ export const InputsSection = React.memo(() => {
             />
           </Grid>
 
-          <Grid md={6} xs={12}>
+          <Grid size={{ xs: 12, md: 6 }}>
             <form.Subscribe
               selector={state => state.values.components.inputs.values.switch}
               children={value => (
@@ -411,7 +410,7 @@ export const InputsSection = React.memo(() => {
             />
           </Grid>
 
-          <Grid md={6} xs={12} container alignItems="flex-end" paddingBottom={2} paddingLeft={2}>
+          <Grid size={{ xs: 12, md: 6 }} alignItems="flex-end" paddingBottom={2} paddingLeft={2}>
             <form.Subscribe
               selector={state => state.values.components.inputs.values.switch}
               children={value => (
@@ -426,11 +425,11 @@ export const InputsSection = React.memo(() => {
       </PageSection>
 
       <DemoSection
-        primary={'Disabled'}
+        primary="Disabled"
         secondary={
           <>
             <span>{'The disabled prop stops the user from making changes. '}</span>
-            <span>{'Note: the label should also be the disabled color.'}</span>
+            <span>Note: the label should also be the disabled color.</span>
           </>
         }
         left={
@@ -588,7 +587,7 @@ export const InputsSection = React.memo(() => {
       />
 
       <DemoSection
-        primary={'Loading'}
+        primary="Loading"
         secondary={
           <>
             <span>
@@ -751,11 +750,11 @@ export const InputsSection = React.memo(() => {
       />
 
       <DemoSection
-        primary={'Reset'}
+        primary="Reset"
         secondary={
           <>
             <span>{'All inputs implements a reset button which the button can be made visible '}</span>
-            <span>{'via the reset prop. Handle the reset change can be made using the onReset event handle.'}</span>
+            <span>via the reset prop. Handle the reset change can be made using the onReset event handle.</span>
           </>
         }
         left={
@@ -927,10 +926,10 @@ export const InputsSection = React.memo(() => {
       />
 
       <DemoSection
-        primary={'Tooltip'}
+        primary="Tooltip"
         secondary={
           <>
-            <span>{'Hovering the label should open a tooltip.'}</span>
+            <span>Hovering the label should open a tooltip.</span>
           </>
         }
         left={
@@ -1082,7 +1081,7 @@ export const InputsSection = React.memo(() => {
       />
 
       <DemoSection
-        primary={'Error'}
+        primary="Error"
         secondary={
           <>
             <span>
@@ -1248,7 +1247,7 @@ export const InputsSection = React.memo(() => {
       />
 
       <DemoSection
-        primary={'Helper Text'}
+        primary="Helper Text"
         secondary={
           <>
             <span>
@@ -1405,7 +1404,7 @@ export const InputsSection = React.memo(() => {
       />
 
       <DemoSection
-        primary={'Placeholder'}
+        primary="Placeholder"
         secondary={
           <>
             <span></span>
@@ -1506,7 +1505,7 @@ export const InputsSection = React.memo(() => {
       />
 
       <DemoSection
-        primary={'Read Only'}
+        primary="Read Only"
         secondary={
           <>
             <span>
@@ -1671,7 +1670,7 @@ export const InputsSection = React.memo(() => {
       />
 
       <DemoSection
-        primary={'End Adornment'}
+        primary="End Adornment"
         secondary={
           <>
             <span></span>
@@ -1685,7 +1684,7 @@ export const InputsSection = React.memo(() => {
                 <TextInput
                   label="End Adornment Text Input"
                   value={value}
-                  endAdornment={<Button variant="contained">{'Submit'}</Button>}
+                  endAdornment={<Button variant="contained">Submit</Button>}
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.text', next)}
                 />
               )}
@@ -1696,7 +1695,7 @@ export const InputsSection = React.memo(() => {
                 <NumberInput
                   label="End Adornment Number Input"
                   value={value}
-                  endAdornment={<Button variant="contained">{'Submit'}</Button>}
+                  endAdornment={<Button variant="contained">Submit</Button>}
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.number', next)}
                 />
               )}
@@ -1707,7 +1706,7 @@ export const InputsSection = React.memo(() => {
                 <SelectInput
                   label="End Adornment Select Input"
                   value={value}
-                  endAdornment={<Button variant="contained">{'Submit'}</Button>}
+                  endAdornment={<Button variant="contained">Submit</Button>}
                   options={[
                     { primary: 'Options 1', value: 'option 1' },
                     { primary: 'Options 2', value: 'option 2' },
@@ -1723,7 +1722,7 @@ export const InputsSection = React.memo(() => {
                 <DateInput
                   label="End Adornment Date Input"
                   value={value}
-                  endAdornment={<Button variant="contained">{'Submit'}</Button>}
+                  endAdornment={<Button variant="contained">Submit</Button>}
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.date', next)}
                 />
               )}
@@ -1734,7 +1733,7 @@ export const InputsSection = React.memo(() => {
                 <SliderInput
                   label="End Adornment Slider Input"
                   value={value}
-                  endAdornment={<Button variant="contained">{'Submit'}</Button>}
+                  endAdornment={<Button variant="contained">Submit</Button>}
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.slider', next)}
                 />
               )}
@@ -1824,7 +1823,7 @@ export const InputsSection = React.memo(() => {
       />
 
       <DemoSection
-        primary={'Tiny Size'}
+        primary="Tiny Size"
         secondary={
           <>
             <span></span>
@@ -1972,7 +1971,7 @@ export const InputsSection = React.memo(() => {
       />
 
       <DemoSection
-        primary={'Interactions'}
+        primary="Interactions"
         secondary={
           <>
             <span>{'Use this to test the different interaction with the different props. '}</span>
@@ -2024,7 +2023,7 @@ export const InputsSection = React.memo(() => {
                       {...(error && { error: v => (v !== '' ? null : 'Input field cannot be null') })}
                       {...(helperText && { helperText: 'Helper Text' })}
                       {...(placeholder && { placeholder: 'Placeholder' })}
-                      {...(endAdornment && { endAdornment: <Button variant="contained">{'Submit'}</Button> })}
+                      {...(endAdornment && { endAdornment: <Button variant="contained">Submit</Button> })}
                     />
                   )}
                 />
@@ -2048,7 +2047,7 @@ export const InputsSection = React.memo(() => {
                       {...(error && { error: v => (v !== 0 ? null : 'Input field cannot be 0') })}
                       {...(helperText && { helperText: 'Helper Text' })}
                       {...(placeholder && { placeholder: 'Placeholder' })}
-                      {...(endAdornment && { endAdornment: <Button variant="contained">{'Submit'}</Button> })}
+                      {...(endAdornment && { endAdornment: <Button variant="contained">Submit</Button> })}
                     />
                   )}
                 />
@@ -2077,7 +2076,7 @@ export const InputsSection = React.memo(() => {
                       {...(error && { error: v => (v !== '' ? null : 'Input field cannot be null') })}
                       {...(helperText && { helperText: 'Helper Text' })}
                       {...(placeholder && { placeholder: 'Placeholder' })}
-                      {...(endAdornment && { endAdornment: <Button variant="contained">{'Submit'}</Button> })}
+                      {...(endAdornment && { endAdornment: <Button variant="contained">Submit</Button> })}
                     />
                   )}
                 />
@@ -2101,7 +2100,7 @@ export const InputsSection = React.memo(() => {
                       {...(error && { error: v => (v !== null ? null : 'Input field cannot be null') })}
                       {...(helperText && { helperText: 'Helper Text' })}
                       {...(placeholder && { placeholder: 'Placeholder' })}
-                      {...(endAdornment && { endAdornment: <Button variant="contained">{'Submit'}</Button> })}
+                      {...(endAdornment && { endAdornment: <Button variant="contained">Submit</Button> })}
                     />
                   )}
                 />
@@ -2125,7 +2124,7 @@ export const InputsSection = React.memo(() => {
                       {...(error && { error: v => (v !== 0 ? null : 'Input field cannot be 0') })}
                       {...(helperText && { helperText: 'Helper Text' })}
                       {...(placeholder && { placeholder: 'Placeholder' })}
-                      {...(endAdornment && { endAdornment: <Button variant="contained">{'Submit'}</Button> })}
+                      {...(endAdornment && { endAdornment: <Button variant="contained">Submit</Button> })}
                     />
                   )}
                 />
@@ -2149,7 +2148,7 @@ export const InputsSection = React.memo(() => {
                       {...(error && { error: v => (v !== false ? null : 'Input field cannot be null') })}
                       {...(helperText && { helperText: 'Helper Text' })}
                       {...(placeholder && { placeholder: 'Placeholder' })}
-                      {...(endAdornment && { endAdornment: <Button variant="contained">{'Submit'}</Button> })}
+                      {...(endAdornment && { endAdornment: <Button variant="contained">Submit</Button> })}
                     />
                   )}
                 />
@@ -2173,7 +2172,7 @@ export const InputsSection = React.memo(() => {
                       {...(error && { error: v => (v !== false ? null : 'Input field cannot be null') })}
                       {...(helperText && { helperText: 'Helper Text' })}
                       {...(placeholder && { placeholder: 'Placeholder' })}
-                      {...(endAdornment && { endAdornment: <Button variant="contained">{'Submit'}</Button> })}
+                      {...(endAdornment && { endAdornment: <Button variant="contained">Submit</Button> })}
                     />
                   )}
                 />
@@ -2288,7 +2287,7 @@ export const InputsSection = React.memo(() => {
       />
 
       <DemoSection
-        primary={'Edge Case: Long label names'}
+        primary="Edge Case: Long label names"
         secondary={
           <>
             <span>{"The labels should handle the case where there's a really long label name "}</span>

@@ -14,7 +14,7 @@ import type { Workflow } from 'components/models/base/workflow';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router';
 
 type RunWorkflowActionProps = {
   id: string;

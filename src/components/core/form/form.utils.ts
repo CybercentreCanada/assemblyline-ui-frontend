@@ -1,10 +1,10 @@
-import type { NestedTypeUsingTuplesAgain2, ValidPathTuples } from './form.models';
+import type { NestedTypeUsingTuplesAgain2, ValidPathTuples } from 'components/core/form/form.models';
 
 export type FieldPath<Data> = Data extends any[]
   ? { [K in keyof Data]: FieldPath<Data[K]> }
   : Data extends object
-  ? { [K in keyof Data]: FieldPath<Data[K]> } & { toPath: () => string }
-  : { toPath: () => string };
+    ? { [K in keyof Data]: FieldPath<Data[K]> } & { toPath: () => string }
+    : { toPath: () => string };
 
 export function isObject(data: unknown, empty: boolean = true): data is object {
   if (typeof data !== 'object') return false;

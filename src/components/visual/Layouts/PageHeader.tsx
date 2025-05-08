@@ -1,58 +1,83 @@
 import type { TypographyProps } from '@mui/material';
 import { Skeleton, Typography, useTheme } from '@mui/material';
-import type { ButtonProps } from 'components/visual/Buttons/Button';
-import { Button } from 'components/visual/Buttons/Button';
-import type { IconButtonProps } from 'components/visual/Buttons/IconButton';
-import { IconButton } from 'components/visual/Buttons/IconButton';
+import { useAppBar, useAppBarHeight, useAppLayout } from 'commons/components/app/hooks';
+import useALContext from 'components/hooks/useALContext';
 import type { ClassificationProps } from 'components/visual/Classification';
 import Classification from 'components/visual/Classification';
-import type { ReactNode } from 'react';
-import React, { isValidElement } from 'react';
-
-type TitleActionPartialProps = (IconButtonProps & { type?: 'icon' }) | (ButtonProps & { type?: 'button' });
-
-export type TitleActionProps = ReactNode | TitleActionPartialProps;
-
-function isValidAction(action: TitleActionProps): action is TitleActionPartialProps {
-  return !isValidElement(action);
-}
+import type { CSSProperties, DetailedHTMLProps, HTMLAttributes, ReactNode } from 'react';
+import React, { useMemo } from 'react';
 
 export type PageHeaderProps = {
-  actions?: TitleActionProps[];
-  classification?: ClassificationProps['c12n'];
-  classificationProps?: Omit<ClassificationProps, 'c12n' | 'setClassification'>;
-  endAdornment?: React.ReactNode;
+  classification?: ClassificationProps['c12n'] | ((loading?: boolean) => ClassificationProps['c12n']);
+  primary: ReactNode | ((loading?: boolean) => ReactNode);
+  secondary?: ReactNode | ((loading?: boolean) => ReactNode);
+  actions?: ReactNode;
+  endAdornment?: ReactNode;
+
   loading?: boolean;
-  primary: React.ReactNode;
-  primaryProps?: TypographyProps;
-  secondary?: React.ReactNode;
-  secondaryProps?: TypographyProps;
+  isSticky?: boolean;
+  top?: CSSProperties['top'];
   onClassificationChange?: ClassificationProps['setClassification'];
+
+  slotProps?: {
+    root?: DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement>;
+    classification?: Omit<ClassificationProps, 'c12n' | 'setClassification'>;
+    primary?: TypographyProps;
+    secondary?: TypographyProps;
+    actions?: DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> & { spacing?: number };
+  };
 };
 
 export const PageHeader: React.FC<PageHeaderProps> = React.memo(
   ({
     actions = null,
-    classification = '',
-    classificationProps = null,
+    classification = 'undefined',
     endAdornment = null,
     loading = false,
+    isSticky = false,
     primary = null,
-    primaryProps = null,
+    top = null,
     secondary = null,
-    secondaryProps = null,
+
+    slotProps = {},
     onClassificationChange = null
   }: PageHeaderProps) => {
     const theme = useTheme();
+    const layout = useAppLayout();
+    const appbar = useAppBar();
+    const appBarHeight = useAppBarHeight();
+    const { c12nDef } = useALContext();
+
+    const barWillHide = useMemo(
+      () => (layout?.current !== 'top' ? appbar?.autoHide : null),
+      [appbar?.autoHide, layout]
+    );
+
+    const {
+      root: rootProps,
+      classification: classificationProps,
+      primary: primaryProps,
+      secondary: secondaryProps,
+      actions: actionsProps
+    } = useMemo<PageHeaderProps['slotProps']>(() => slotProps, [slotProps]);
 
     return (
-      <div style={{ display: 'flex', flexDirection: 'column' }}>
-        {!classification ? null : (
+      <div
+        {...rootProps}
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          top: top !== null ? top : isSticky ? (barWillHide ? 0 : appBarHeight) : null,
+          zIndex: !isSticky ? theme.zIndex.appBar - 100 : null,
+          ...rootProps?.style
+        }}
+      >
+        {!c12nDef.enforce || classification === 'undefined' ? null : (
           <div style={{ paddingBottom: theme.spacing(4) }}>
             <Classification
               type={!onClassificationChange ? 'pill' : 'picker'}
               size="tiny"
-              c12n={loading ? null : classification}
+              c12n={loading ? null : typeof classification === 'function' ? classification(loading) : classification}
               setClassification={onClassificationChange}
               {...classificationProps}
             />
@@ -74,58 +99,67 @@ export const PageHeader: React.FC<PageHeaderProps> = React.memo(
               width: '100%',
               display: 'flex',
               flexWrap: 'wrap',
-              alignContent: 'flex-start',
-              columnGap: theme.spacing(1)
+              alignContent: 'center',
+              columnGap: theme.spacing(1),
+              textAlign: 'left'
             }}
           >
             <Typography
               variant="h4"
-              whiteSpace="nowrap"
-              overflow="hidden"
-              textOverflow="ellipsis"
               width="100%"
+              flex={1}
               {...primaryProps}
+              sx={{ overflowWrap: 'break-word', ...primaryProps?.sx }}
             >
-              {primary}
+              {typeof primary === 'function' ? primary(loading) : primary}
             </Typography>
 
-            <Typography variant="caption" color="textSecondary" width="100%" {...secondaryProps}>
-              {loading ? <Skeleton style={{ width: '10rem' }} /> : secondary}
-            </Typography>
+            {secondary && (
+              <Typography
+                variant="caption"
+                color="textSecondary"
+                width="100%"
+                minWidth={0}
+                {...secondaryProps}
+                sx={{ overflowWrap: 'break-word', ...secondaryProps?.sx }}
+              >
+                {loading ? (
+                  <Skeleton style={{ width: '10rem' }} />
+                ) : typeof secondary === 'function' ? (
+                  secondary(loading)
+                ) : (
+                  secondary
+                )}
+              </Typography>
+            )}
           </div>
 
-          {loading ? null : (
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'stretch',
-                rowGap: theme.spacing(1),
-                paddingTop: theme.spacing(0.5)
-              }}
-            >
-              {Array.isArray(actions) && (
-                <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', columnGap: theme.spacing(1) }}>
-                  {actions.map((action, i) => {
-                    if (isValidAction(action)) {
-                      const { children = null, type = 'icon', ...buttonProps } = action;
-                      return type === 'icon' ? (
-                        <IconButton key={i} size="large" {...(buttonProps as IconButtonProps)}>
-                          {children}
-                        </IconButton>
-                      ) : (
-                        <Button key={i} {...(buttonProps as ButtonProps)}>
-                          {children}
-                        </Button>
-                      );
-                    } else return action;
-                  })}
-                </div>
-              )}
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'stretch',
+              rowGap: theme.spacing(1),
+              paddingTop: theme.spacing(0.5)
+            }}
+          >
+            {actions && (
+              <div
+                {...actionsProps}
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  flexWrap: 'wrap',
+                  ...actionsProps?.style,
+                  ...(actionsProps?.spacing && { gap: theme.spacing(actionsProps?.spacing) })
+                }}
+              >
+                {actions}
+              </div>
+            )}
 
-              {endAdornment}
-            </div>
-          )}
+            {endAdornment}
+          </div>
         </div>
       </div>
     );

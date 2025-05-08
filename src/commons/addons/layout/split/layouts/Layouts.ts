@@ -1,6 +1,5 @@
-/* eslint-disable class-methods-use-this */
-import OneLayout from './OneLayout';
-import TwoLayout from './TwoLayout';
+import OneLayout from 'commons/addons/layout/split/layouts/OneLayout';
+import TwoLayout from 'commons/addons/layout/split/layouts/TwoLayout';
 
 export interface LayoutState {
   leftOpen: boolean;
@@ -42,7 +41,11 @@ export default class Layouts implements LayoutComputer {
 
   private layout: Layout;
 
-  public constructor(public minLeftWidth: number, public minRightWidth: number, initLeftWidthPerc: number) {
+  public constructor(
+    public minLeftWidth: number,
+    public minRightWidth: number,
+    initLeftWidthPerc: number
+  ) {
     this.twoLayout = new TwoLayout(minLeftWidth, minRightWidth, initLeftWidthPerc);
     this.oneLayout = new OneLayout();
   }

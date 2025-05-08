@@ -1,46 +1,73 @@
-import ExpandLess from '@mui/icons-material/ExpandLess';
-import ExpandMore from '@mui/icons-material/ExpandMore';
-import { Collapse, List, ListItem, ListItemIcon, ListItemText, Popover, Tooltip } from '@mui/material';
+import { ChevronRight, ExpandLess, ExpandMore } from '@mui/icons-material';
+import { Collapse, List, ListItemButton, ListItemIcon, ListItemText, Popover, Tooltip, useTheme } from '@mui/material';
+import type { AppLeftNavGroup } from 'commons/components/app/AppConfigs';
+import { useAppConfigs, useAppLeftNav, useAppUser } from 'commons/components/app/hooks';
 import LeftNavItem from 'commons/components/leftnav/LeftNavItem';
-import React, { memo, useCallback, useEffect, useState } from 'react';
+import { memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { AppLeftNavGroup } from '../app/AppConfigs';
-import useAppLeftNav from '../app/hooks/useAppLeftNav';
-import useAppUser from '../app/hooks/useAppUser';
-
-type GroupListItemProps = {
-  group: AppLeftNavGroup;
-  leftNavOpen: boolean;
-  collapsed: boolean;
-  onClick: (event: React.MouseEvent) => void;
-};
-
-const WrappedGroupListItem = ({ group, leftNavOpen, collapsed, onClick }: GroupListItemProps) => {
-  const { t } = useTranslation();
-  const title = group.i18nKey ? t(group.i18nKey) : group.title;
-  return (
-    <Tooltip title={!leftNavOpen ? title : ''} aria-label={title} placement="right">
-      <ListItem button key={group.id} onClick={onClick}>
-        <ListItemIcon>{group.icon}</ListItemIcon>
-        <ListItemText primary={title} />
-        {collapsed ? <ExpandLess color="action" /> : <ExpandMore color="action" />}
-      </ListItem>
-    </Tooltip>
-  );
-};
-
-const GroupListItem = memo(WrappedGroupListItem);
 
 interface LeftNavGroupProps {
   group: AppLeftNavGroup;
   onItemClick: () => void;
 }
 
+const GroupListItem = memo(
+  ({
+    group,
+    leftNavOpen,
+    collapseOpen,
+    popoverOpen,
+    onClick
+  }: {
+    group: AppLeftNavGroup;
+    leftNavOpen: boolean;
+    collapseOpen: boolean;
+    popoverOpen: boolean;
+    onClick: (event: React.MouseEvent) => void;
+  }) => {
+    const { t } = useTranslation();
+    const title = group.i18nKey ? t(group.i18nKey) : group.title;
+    const theme = useTheme();
+
+    return (
+      <Tooltip title={!leftNavOpen ? title : ''} aria-label={title} placement="right">
+        <ListItemButton key={group.id} onClick={onClick} selected={popoverOpen}>
+          {!leftNavOpen && (
+            <ChevronRight
+              sx={{
+                position: 'absolute',
+                right: 0,
+                width: 16,
+                height: 16,
+                transform: popoverOpen && 'rotate(180deg)',
+                transition: theme.transitions.create('transform', {
+                  easing: theme.transitions.easing.sharp,
+                  duration: popoverOpen
+                    ? theme.transitions.duration.leavingScreen
+                    : theme.transitions.duration.enteringScreen
+                })
+              }}
+              fontSize="inherit"
+            />
+          )}
+
+          <ListItemIcon>{group.icon}</ListItemIcon>
+          <ListItemText primary={title} />
+          {collapseOpen ? <ExpandLess color="action" /> : <ExpandMore color="action" />}
+        </ListItemButton>
+      </Tooltip>
+    );
+  }
+);
+
 const LeftNavGroup = ({ group, onItemClick }: LeftNavGroupProps) => {
+  const user = useAppUser();
   const leftnav = useAppLeftNav();
+  const { preferences } = useAppConfigs();
   const [popoverTarget, setPopoverTarget] = useState<(EventTarget & Element) | undefined>();
   const [collapseOpen, setCollapseOpen] = useState(false);
-  const { validateProps } = useAppUser();
+
+  const groupHasIcons = group.items.some(i => !!i.icon);
 
   const handleClick = useCallback(
     (event: React.MouseEvent) => {
@@ -61,13 +88,25 @@ const LeftNavGroup = ({ group, onItemClick }: LeftNavGroupProps) => {
     }
   }, [leftnav.open, collapseOpen]);
 
-  return validateProps(group.userPropValidators) ? (
+  return user.validateProps(group.userPropValidators) ? (
     <div>
-      <GroupListItem group={group} leftNavOpen={leftnav.open} collapsed={collapseOpen} onClick={handleClick} />
+      <GroupListItem
+        group={group}
+        leftNavOpen={leftnav.open}
+        collapseOpen={collapseOpen}
+        onClick={handleClick}
+        popoverOpen={!!popoverTarget}
+      />
       <Collapse in={collapseOpen} timeout="auto" unmountOnExit>
         <List component="div" disablePadding>
           {group.items.map(i => (
-            <LeftNavItem key={i.id} item={i} onClick={onItemClick} />
+            <LeftNavItem
+              key={i.id}
+              context="group"
+              item={i}
+              hideIcon={preferences.leftnav.hideNestedIcons}
+              onClick={onItemClick}
+            />
           ))}
         </List>
       </Collapse>
@@ -87,7 +126,14 @@ const LeftNavGroup = ({ group, onItemClick }: LeftNavGroupProps) => {
       >
         <List disablePadding>
           {group.items.map(i => (
-            <LeftNavItem key={i.id} item={i} onClick={onItemClick} />
+            <LeftNavItem
+              popover
+              context="group"
+              key={i.id}
+              item={i}
+              hideIcon={preferences.leftnav.hideNestedIcons || !groupHasIcons}
+              onClick={onItemClick}
+            />
           ))}
         </List>
       </Popover>

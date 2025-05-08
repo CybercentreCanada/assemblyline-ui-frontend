@@ -32,10 +32,10 @@ export type JSONFeedItem = {
   banner_image?: string;
   date_published?: string;
   date_modified?: string;
-  authors?: Array<JSONFeedAuthor>;
-  tags?: Array<'new' | 'current' | 'dev' | 'service' | 'blog' | 'community'>;
+  authors?: JSONFeedAuthor[];
+  tags?: ('new' | 'current' | 'dev' | 'service' | 'blog' | 'community')[];
   language?: string;
-  attachments?: Array<JSONFeedItemAttachment>;
+  attachments?: JSONFeedItemAttachment[];
   _isNew: boolean;
 };
 
@@ -49,21 +49,21 @@ export type JSONFeed = {
   next_url?: string;
   icon?: string;
   favicon?: string;
-  authors?: Array<JSONFeedAuthor>;
+  authors?: JSONFeedAuthor[];
   language?: string;
   expired?: boolean;
-  hubs?: Array<{ type: string; url: string }>;
-  items: Array<JSONFeedItem>;
+  hubs?: { type: string; url: string }[];
+  items: JSONFeedItem[];
 };
 
 type FetchJSONProps = {
-  urls: Array<string>;
-  onSuccess?: (feeds: Array<JSONFeedItem>) => void;
+  urls: string[];
+  onSuccess?: (feeds: JSONFeedItem[]) => void;
   onError?: (err: any) => void;
 };
 
 export type UseNotificationFeedReturn = {
-  fetchJSONFeeds: (urls?: Array<string>) => Promise<JSONFeed[]>;
+  fetchJSONFeeds: (urls?: string[]) => Promise<JSONFeed[]>;
   fetchJSONNotifications: ({ urls, onSuccess, onError }: FetchJSONProps) => void;
 };
 
@@ -132,25 +132,25 @@ export const useNotificationFeed = (): UseNotificationFeedReturn => {
 
   const decodeHTML = useCallback((html: string) => {
     if (!html) return '';
-    var txt = document.createElement('textarea');
+    const txt = document.createElement('textarea');
     txt.innerHTML = html;
     return txt.value;
   }, []);
 
   const parseJSONFeedItemAttachment = useCallback(
-    (attachments: Array<any>): Array<JSONFeedItemAttachment> =>
+    (attachments: any[]): JSONFeedItemAttachment[] =>
       !attachments ? [] : attachments.map(attachment => ({ ...DEFAULT_JSON_FEED_ITEM_ATTACHMENT, ...attachment })),
     [DEFAULT_JSON_FEED_ITEM_ATTACHMENT]
   );
 
   const parseJSONFeedAuthor = useCallback(
-    (authors: Array<any>): Array<JSONFeedAuthor> =>
+    (authors: any[]): JSONFeedAuthor[] =>
       !authors ? [] : authors.map(author => ({ ...DEFAULT_JSON_FEED_AUTHOR, ...author })),
     [DEFAULT_JSON_FEED_AUTHOR]
   );
 
   const parseJSONFeedItem = useCallback(
-    (items: Array<any>) =>
+    (items: any[]) =>
       !items
         ? []
         : items.map(item => ({
@@ -200,7 +200,7 @@ export const useNotificationFeed = (): UseNotificationFeedReturn => {
   );
 
   const fetchJSONFeeds = useCallback(
-    (urls: Array<string> = []): Promise<JSONFeed[]> =>
+    (urls: string[] = []): Promise<JSONFeed[]> =>
       new Promise(async (resolve, reject) => {
         if (!urls) {
           reject('no urls');

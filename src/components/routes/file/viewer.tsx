@@ -4,9 +4,8 @@ import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
 import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
 import WrapTextOutlinedIcon from '@mui/icons-material/WrapTextOutlined';
-import { Grid, IconButton, Skeleton, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
-import useAppUser from 'commons/components/app/hooks/useAppUser';
+import { Grid, IconButton, Skeleton, styled, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
+import { useAppUser } from 'commons/components/app/hooks';
 import PageFullSize from 'commons/components/pages/PageFullSize';
 import useALContext from 'components/hooks/useALContext';
 import useAssistant from 'components/hooks/useAssistant';
@@ -20,24 +19,15 @@ import CodeSection from 'components/visual/FileViewer/code_summary';
 import { TabContainer } from 'components/visual/TabContainer';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
-import { Link, useLocation, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router';
 
 loader.config({ paths: { vs: '/cdn/monaco_0.35.0/vs' } });
 
-const useStyles = makeStyles(theme => ({
-  main: {
-    marginTop: theme.spacing(1),
-    flexGrow: 1,
-    display: 'flex',
-    flexDirection: 'column'
-  },
-  tab: {
-    flexGrow: 1,
-    display: 'flex',
-    flexDirection: 'column',
-    paddingTop: theme.spacing(2)
-  }
+const TabContent = styled('div')(({ theme }) => ({
+  flexGrow: 1,
+  display: 'flex',
+  flexDirection: 'column',
+  paddingTop: theme.spacing(2)
 }));
 
 export type Tab = 'ascii' | 'code' | 'strings' | 'hex' | 'image';
@@ -53,7 +43,6 @@ type ParamProps = {
 
 const WrappedFileViewer = () => {
   const { t } = useTranslation(['fileViewer']);
-  const classes = useStyles();
   const theme = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
@@ -112,7 +101,7 @@ const WrappedFileViewer = () => {
   return currentUser.roles.includes('file_detail') ? (
     <PageFullSize margin={4}>
       <Grid container alignItems="center">
-        <Grid item xs>
+        <Grid flexGrow={1}>
           <Typography variant="h4">{t('title')}</Typography>
           {dataTruncated ? (
             <Tooltip title={t('error.truncated')} placement="bottom-start">
@@ -135,7 +124,7 @@ const WrappedFileViewer = () => {
             </Typography>
           )}
         </Grid>
-        <Grid item xs={12} sm={12} md={4} style={{ textAlign: 'right', flexGrow: 0 }}>
+        <Grid size={{ xs: 12, sm: 12, md: 4 }} style={{ textAlign: 'right', flexGrow: 0 }}>
           <div style={{ display: 'flex', marginBottom: theme.spacing(1), justifyContent: 'flex-end' }}>
             {currentUser.roles.includes('submission_view') && (
               <Tooltip title={wordwrap == 'on' ? t('linewrap.off') : t('linewrap.on')}>
@@ -183,7 +172,14 @@ const WrappedFileViewer = () => {
           style={{ marginTop: theme.spacing(2), marginBottom: theme.spacing(2) }}
         />
       ) : (
-        <div className={classes.main}>
+        <div
+          style={{
+            marginTop: theme.spacing(1),
+            flexGrow: 1,
+            display: 'flex',
+            flexDirection: 'column'
+          }}
+        >
           <TabContainer
             value={paramTab}
             defaultTab={DEFAULT_TAB}
@@ -195,7 +191,7 @@ const WrappedFileViewer = () => {
               ascii: {
                 label: t('ascii'),
                 inner: (
-                  <div className={classes.tab}>
+                  <TabContent>
                     <ASCIISection
                       sha256={sha256}
                       type={type}
@@ -203,46 +199,46 @@ const WrappedFileViewer = () => {
                       options={{ wordWrap: wordwrap }}
                       onDataTruncated={setDataTruncated}
                     />
-                  </div>
+                  </TabContent>
                 )
               },
               code: {
                 label: t('code'),
                 inner: (
-                  <div className={classes.tab}>
+                  <TabContent>
                     <CodeSection sha256={sha256} />
-                  </div>
+                  </TabContent>
                 ),
                 preventRender: isMdUp || !codeAllowed
               },
               strings: {
                 label: t('strings'),
                 inner: (
-                  <div className={classes.tab}>
+                  <TabContent>
                     <StringsSection
                       sha256={sha256}
                       type={type}
                       options={{ wordWrap: wordwrap }}
                       onDataTruncated={setDataTruncated}
                     />
-                  </div>
+                  </TabContent>
                 )
               },
               hex: {
                 label: t('hex'),
                 inner: (
-                  <div className={classes.tab}>
+                  <TabContent>
                     <HexSection sha256={sha256} onDataTruncated={setDataTruncated} />
-                  </div>
+                  </TabContent>
                 )
               },
               image: {
                 label: t('image'),
                 preventRender: !imageAllowed,
                 inner: (
-                  <div className={classes.tab}>
+                  <TabContent>
                     <ImageSection sha256={sha256} name={sha256} />
-                  </div>
+                  </TabContent>
                 )
               }
             }}

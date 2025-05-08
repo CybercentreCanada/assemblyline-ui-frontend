@@ -5,6 +5,7 @@ import ShareIcon from '@mui/icons-material/Share';
 import StarIcon from '@mui/icons-material/Star';
 import {
   Autocomplete,
+  Box,
   Button,
   Drawer,
   FormControl,
@@ -18,61 +19,19 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
-import clsx from 'clsx';
-import useAppUser from 'commons/components/app/hooks/useAppUser';
+import { useAppUser } from 'commons/components/app/hooks';
 import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import useMyAPI from 'components/hooks/useMyAPI';
 import type { CustomUser } from 'components/models/ui/user';
 import type { AlertSearchParams } from 'components/routes/alerts';
 import { ALERT_DEFAULT_PARAMS } from 'components/routes/alerts';
+import type { Favorite } from 'components/routes/alerts/components/Favorites';
 import { useAlerts } from 'components/routes/alerts/contexts/AlertsContext';
 import { useSearchParams } from 'components/routes/alerts/contexts/SearchParamsContext';
 import CustomChip from 'components/visual/CustomChip';
 import { humanReadableNumber, safeFieldValue } from 'helpers/utils';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { Favorite } from './Favorites';
-
-const useStyles = makeStyles(theme => ({
-  drawerInner: {
-    display: 'flex',
-    flexDirection: 'column',
-    padding: theme.spacing(3),
-    width: '600px',
-    [theme.breakpoints.only('xs')]: {
-      width: '100vw'
-    }
-  },
-  listbox: {
-    backgroundColor: theme.palette.background.default
-  },
-  actions: {
-    display: 'flex',
-    gap: theme.spacing(1),
-    justifyContent: 'flex-end',
-    flexWrap: 'wrap',
-    marginTop: theme.spacing(1)
-  },
-  selectMenu: {
-    '& .MuiList-root': {
-      backgroundColor: theme.palette.background.default
-    }
-  },
-  option: {
-    columnGap: theme.spacing(2)
-  },
-  desc: {
-    transform: 'rotate(0deg)',
-    transition: theme.transitions.create('transform', {
-      easing: theme.transitions.easing.easeInOut,
-      duration: theme.transitions.duration.shortest
-    })
-  },
-  asc: {
-    transform: 'rotate(180deg)'
-  }
-}));
 
 export type Filter = {
   label?: string;
@@ -119,7 +78,6 @@ type AlertSortProps = {
 
 const AlertSort: React.FC<AlertSortProps> = React.memo(({ value = null, onChange = () => null }: AlertSortProps) => {
   const { t } = useTranslation('alerts');
-  const classes = useStyles();
   const theme = useTheme();
 
   const [open, setOpen] = useState<boolean>(false);
@@ -151,10 +109,29 @@ const AlertSort: React.FC<AlertSortProps> = React.memo(({ value = null, onChange
           value={field}
           onOpen={() => setOpen(true)}
           onClose={(e: any) => handleClose(e)}
-          MenuProps={{ className: classes.selectMenu, MenuListProps: { ref: menuRef } }}
+          MenuProps={{
+            MenuListProps: { ref: menuRef },
+            sx: {
+              '& .MuiList-root': {
+                backgroundColor: theme.palette.background.default
+              }
+            }
+          }}
           renderValue={() => (
             <div style={{ display: 'flex', columnGap: theme.spacing(1) }}>
-              <ArrowDownwardIcon className={clsx(classes.desc, dir.endsWith('asc') && classes.asc)} />
+              <ArrowDownwardIcon
+                sx={{
+                  transform: 'rotate(0deg)',
+                  transition: theme.transitions.create('transform', {
+                    easing: theme.transitions.easing.easeInOut,
+                    duration: theme.transitions.duration.shortest
+                  }),
+
+                  ...(dir.endsWith('asc') && {
+                    transform: 'rotate(180deg)'
+                  })
+                }}
+              />
               <Typography>{t(SORT_OPTIONS.find(o => o.value === field).label)}</Typography>
             </div>
           )}
@@ -169,7 +146,19 @@ const AlertSort: React.FC<AlertSortProps> = React.memo(({ value = null, onChange
             >
               <ListItemIcon>
                 {field === option.value && (
-                  <ArrowDownwardIcon className={clsx(classes.desc, dir === 'asc' && classes.asc)} />
+                  <ArrowDownwardIcon
+                    sx={{
+                      transform: 'rotate(0deg)',
+                      transition: theme.transitions.create('transform', {
+                        easing: theme.transitions.easing.easeInOut,
+                        duration: theme.transitions.duration.shortest
+                      }),
+
+                      ...(dir === 'asc' && {
+                        transform: 'rotate(180deg)'
+                      })
+                    }}
+                  />
                 )}
               </ListItemIcon>
               {t(option.label)}
@@ -192,7 +181,6 @@ type AlertSelectProps = {
 const AlertSelect: React.FC<AlertSelectProps> = React.memo(
   ({ value = null, defaultValue = null, label = '', options = [], onChange = () => null }: AlertSelectProps) => {
     const { t } = useTranslation('alerts');
-    const classes = useStyles();
     const theme = useTheme();
 
     return (
@@ -203,7 +191,13 @@ const AlertSelect: React.FC<AlertSelectProps> = React.memo(
             displayEmpty
             value={options.map(option => option.value).includes(value) ? value : defaultValue}
             onChange={event => onChange(event.target.value)}
-            MenuProps={{ className: classes.selectMenu }}
+            MenuProps={{
+              sx: {
+                '& .MuiList-root': {
+                  backgroundColor: theme.palette.background.default
+                }
+              }
+            }}
           >
             {options.map((option, i) => (
               <MenuItem key={`${option.value}-${i}`} value={option.value}>
@@ -240,7 +234,6 @@ const AlertFilterInput: React.FC<AlertFilterInputProps> = React.memo(
     onChange = () => null
   }: AlertFilterInputProps) => {
     const { t } = useTranslation('alerts');
-    const classes = useStyles();
     const theme = useTheme();
 
     const [inputValue, setInputValue] = useState<string>('');
@@ -249,7 +242,10 @@ const AlertFilterInput: React.FC<AlertFilterInputProps> = React.memo(
       <div style={{ marginBottom: theme.spacing(2) }}>
         <label>{t(label)}</label>
         <Autocomplete
-          classes={{ listbox: classes.listbox, option: classes.option }}
+          slotProps={{
+            listbox: { sx: { backgroundColor: theme.palette.background.default } },
+            popper: { sx: { columnGap: theme.spacing(2) } }
+          }}
           value={filters}
           onChange={(_event, items) =>
             onChange(items.map(item => (typeof item !== 'string' ? item : { label: item, value: item, not: false })))
@@ -279,8 +275,8 @@ const AlertFilterInput: React.FC<AlertFilterInputProps> = React.memo(
                       value.label !== item.label
                         ? value
                         : typeof value !== 'string'
-                        ? { ...value, not: !value.not }
-                        : { label: value, value: value, not: true }
+                          ? { ...value, not: !value.not }
+                          : { label: value, value: value, not: true }
                     )
                   )
                 }
@@ -302,9 +298,9 @@ const AlertFilterInput: React.FC<AlertFilterInputProps> = React.memo(
                   <>
                     <span style={{ color: theme.palette.common.white }}>{`${humanReadableNumber(item.count)} `}</span>
                     {item.total && item.total > 0 ? (
-                      <span style={{ color: 'rgba(255, 255, 255, 0.7)' }}>{`/ ${humanReadableNumber(
-                        item.total
-                      )}`}</span>
+                      <span style={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+                        {`/ ${humanReadableNumber(item.total)}`}
+                      </span>
                     ) : null}
                   </>
                 }
@@ -326,7 +322,6 @@ type FavoritesProps = {
 const Favorites: React.FC<FavoritesProps> = React.memo(
   ({ value: favorites = [], onChange = () => null }: FavoritesProps) => {
     const { t } = useTranslation('alerts');
-    const classes = useStyles();
     const theme = useTheme();
 
     const alertValues = useAlerts();
@@ -340,7 +335,10 @@ const Favorites: React.FC<FavoritesProps> = React.memo(
       <div style={{ marginBottom: theme.spacing(2) }}>
         <label>{t('favorites')}</label>
         <Autocomplete
-          classes={{ listbox: classes.listbox, option: classes.option }}
+          slotProps={{
+            listbox: { sx: { backgroundColor: theme.palette.background.default } },
+            popper: { sx: { columnGap: theme.spacing(2) } }
+          }}
           value={favorites}
           onChange={(_event, items) =>
             onChange(items.map(item => ({ ...item, label: item.query, value: item.query, not: false })))
@@ -368,9 +366,9 @@ const Favorites: React.FC<FavoritesProps> = React.memo(
                 tooltip={
                   <div style={{ display: 'flex', flexDirection: 'column' }}>
                     <div style={{ fontStyle: 'normal' }}>{item.query}</div>
-                    <div
-                      style={{ placeSelf: 'flex-end', color: 'rgba(255, 255, 255, 0.7)' }}
-                    >{`(${item.created_by})`}</div>
+                    <div style={{ placeSelf: 'flex-end', color: 'rgba(255, 255, 255, 0.7)' }}>
+                      {`(${item.created_by})`}
+                    </div>
                   </div>
                 }
                 variant={item.not ? 'outlined' : 'filled'}
@@ -437,7 +435,6 @@ type Filters = {
 
 const WrappedAlertFilters = () => {
   const { t } = useTranslation('alerts');
-  const classes = useStyles();
   const theme = useTheme();
   const { apiCall } = useMyAPI();
   const { copy } = useClipboard();
@@ -692,7 +689,17 @@ const WrappedAlertFilters = () => {
                 <CloseOutlinedIcon />
               </IconButton>
             </div>
-            <div className={classes.drawerInner}>
+            <Box
+              sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                padding: theme.spacing(3),
+                width: '600px',
+                [theme.breakpoints.only('xs')]: {
+                  width: '100vw'
+                }
+              }}
+            >
               <div
                 style={{
                   display: 'flex',
@@ -802,7 +809,15 @@ const WrappedAlertFilters = () => {
                   onChange={value => handleFiltersChange('', value, filters.others)}
                 />
               </div>
-              <div className={classes.actions}>
+              <div
+                style={{
+                  display: 'flex',
+                  gap: theme.spacing(1),
+                  justifyContent: 'flex-end',
+                  flexWrap: 'wrap',
+                  marginTop: theme.spacing(1)
+                }}
+              >
                 <Tooltip title={t('filters.clear')}>
                   <Button variant="outlined" onClick={handleClear}>
                     {t('reset')}
@@ -815,7 +830,7 @@ const WrappedAlertFilters = () => {
                   </Button>
                 </Tooltip>
               </div>
-            </div>
+            </Box>
           </>
         )}
       </Drawer>

@@ -1,38 +1,27 @@
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import { Button, Collapse, Divider, Grid, Skeleton, Typography, useTheme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
+import { Button, Collapse, Divider, Grid, Skeleton, styled, Typography, useTheme } from '@mui/material';
 import { Fetcher } from 'borealis-ui';
 import useALContext from 'components/hooks/useALContext';
 import type { Metadata } from 'components/models/base/submission';
 import ActionableText from 'components/visual/ActionableText';
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-const useStyles = makeStyles(theme => ({
-  title: {
-    flexGrow: 1
+const Empty = styled('pre')(({ theme }) => ({
+  '@media print': {
+    backgroundColor: '#00000005',
+    border: '1px solid #DDD',
+    color: '#888'
   },
-  meta_key: {
-    overflowX: 'hidden',
-    whiteSpace: 'nowrap',
-    textOverflow: 'ellipsis'
-  },
-  alert: {
-    '@media print': {
-      backgroundColor: '#00000005',
-      border: '1px solid #DDD',
-      color: '#888'
-    },
-    backgroundColor: theme.palette.mode === 'dark' ? '#ffffff05' : '#00000005',
-    border: `1px solid ${theme.palette.divider}`,
-    borderRadius: '4px',
-    color: theme.palette.text.secondary,
-    margin: '0.25rem 0',
-    padding: '16px 8px',
-    textAlign: 'center',
-    whiteSpace: 'pre-wrap'
-  }
+  backgroundColor: theme.palette.mode === 'dark' ? '#ffffff05' : '#00000005',
+  border: `1px solid ${theme.palette.divider}`,
+  borderRadius: '4px',
+  color: theme.palette.text.secondary,
+  margin: '0.25rem 0',
+  padding: '16px 8px',
+  textAlign: 'center',
+  whiteSpace: 'pre-wrap'
 }));
 
 type Props = {
@@ -43,9 +32,8 @@ type Props = {
 const WrappedMetaSection: React.FC<Props> = ({ metadata, classification }) => {
   const { t } = useTranslation(['submissionDetail']);
   const theme = useTheme();
-  const classes = useStyles();
-  const { configuration } = useALContext();
-  const [metaOpen, setMetaOpen] = React.useState(false);
+  const { user: currentUser, configuration } = useALContext();
+  const [metaOpen, setMetaOpen] = useState(false);
 
   return !metadata || Object.keys(metadata).length !== 0 ? (
     <div style={{ paddingTop: theme.spacing(2) }}>
@@ -56,7 +44,7 @@ const WrappedMetaSection: React.FC<Props> = ({ metadata, classification }) => {
           justifyContent: 'space-between'
         }}
       >
-        <Typography variant="h6" className={classes.title}>
+        <Typography variant="h6" sx={{ flexGrow: 1 }}>
           {t('metadata')}
         </Typography>
         {metadata &&
@@ -96,10 +84,13 @@ const WrappedMetaSection: React.FC<Props> = ({ metadata, classification }) => {
                 .filter(k => configuration.ui.alerting_meta.important.indexOf(k) !== -1)
                 .map((meta, i) => (
                   <Grid container key={i}>
-                    <Grid className={classes.meta_key} item xs={12} sm={3} lg={2}>
+                    <Grid
+                      size={{ xs: 12, sm: 3, lg: 2 }}
+                      sx={{ overflowX: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}
+                    >
                       <span style={{ fontWeight: 500 }}>{meta}</span>
                     </Grid>
-                    <Grid item xs={12} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
+                    <Grid size={{ xs: 12, sm: 9, lg: 10 }} style={{ wordBreak: 'break-word' }}>
                       <ActionableText
                         category="metadata"
                         type={meta}
@@ -111,16 +102,16 @@ const WrappedMetaSection: React.FC<Props> = ({ metadata, classification }) => {
                 ))
             ) : (
               <Collapse in={!metaOpen} timeout="auto">
-                <pre className={classes.alert}>{t('meta.empty')}</pre>
+                <Empty>{t('meta.empty')}</Empty>
               </Collapse>
             )
           ) : (
-            [...Array(3)].map((_, i) => (
+            Array.from({ length: 3 }).map((_, i) => (
               <Grid container key={i} spacing={1}>
-                <Grid item xs={12} sm={3} lg={2}>
+                <Grid size={{ xs: 12, sm: 3, lg: 2 }}>
                   <Skeleton style={{ height: '2rem' }} />
                 </Grid>
-                <Grid item xs={12} sm={9} lg={10}>
+                <Grid size={{ xs: 12, sm: 9, lg: 10 }}>
                   <Skeleton style={{ height: '2rem' }} />
                 </Grid>
               </Grid>
@@ -134,10 +125,13 @@ const WrappedMetaSection: React.FC<Props> = ({ metadata, classification }) => {
                   .filter(k => configuration.ui.alerting_meta.important.indexOf(k) === -1)
                   .map((meta, i) => (
                     <Grid container key={i}>
-                      <Grid className={classes.meta_key} item xs={12} sm={3} lg={2}>
+                      <Grid
+                        size={{ xs: 12, sm: 3, lg: 2 }}
+                        sx={{ overflowX: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}
+                      >
                         <span style={{ fontWeight: 500 }}>{meta}</span>
                       </Grid>
-                      <Grid item xs={12} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
+                      <Grid size={{ xs: 12, sm: 9, lg: 10 }} style={{ wordBreak: 'break-word' }}>
                         <ActionableText
                           category="metadata"
                           type={meta}
@@ -156,6 +150,7 @@ const WrappedMetaSection: React.FC<Props> = ({ metadata, classification }) => {
               fetcherId="eml-preview.preview"
               type="eml_id"
               value={metadata?.eml_path}
+              classification={currentUser.classification}
               slotProps={{ paper: { style: { maxWidth: '128px', minWidth: '128px', maxHeight: '128px' } } }}
             />
           </div>

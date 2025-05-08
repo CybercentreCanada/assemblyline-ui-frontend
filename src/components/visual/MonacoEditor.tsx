@@ -1,7 +1,7 @@
 import type { Monaco } from '@monaco-editor/react';
 import Editor, { DiffEditor, loader } from '@monaco-editor/react';
 import { useTheme } from '@mui/material';
-import useAppTheme from 'commons/components/app/hooks/useAppTheme';
+import { useAppTheme } from 'commons/components/app/hooks';
 import { registerYaraCompletionItemProvider, yaraConfig, yaraDef } from 'helpers/yara';
 import type { editor } from 'monaco-editor';
 import React, { useCallback, useEffect } from 'react';

@@ -1,9 +1,8 @@
 import BlockIcon from '@mui/icons-material/Block';
 import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount';
-import { Grid, useTheme } from '@mui/material';
-import Typography from '@mui/material/Typography';
+import { useTheme } from '@mui/material';
+import PageContainer from 'commons/components/pages/PageContainer';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
-import PageHeader from 'commons/components/pages/PageHeader';
 import type { SearchParams } from 'components/core/SearchParams/SearchParams';
 import { createSearchParams } from 'components/core/SearchParams/SearchParams';
 import { SearchParamsProvider, useSearchParams } from 'components/core/SearchParams/SearchParamsContext';
@@ -12,13 +11,14 @@ import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import type { UserIndexed } from 'components/models/base/user';
 import type { SearchResult } from 'components/models/ui/search';
+import { AddUserPage } from 'components/routes/admin/users_add';
+import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import { SearchHeader } from 'components/visual/SearchBar/SearchHeader';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import UsersTable from 'components/visual/SearchResult/users';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate } from 'react-router';
-import { AddUserPage } from './users_add';
 
 const USERS_PARAMS = createSearchParams(p => ({
   query: p.string(''),
@@ -102,18 +102,16 @@ const UsersSearch = () => {
     <Navigate to="/forbidden" replace />
   ) : (
     <PageFullWidth margin={4}>
-      <div style={{ paddingBottom: theme.spacing(2) }}>
-        <Grid container alignItems="center">
-          <Grid item xs>
-            <Typography variant="h4">{t('title')}</Typography>
-          </Grid>
-          <Grid item xs style={{ textAlign: 'right' }}>
-            <AddUserPage />
-          </Grid>
-        </Grid>
-      </div>
+      <PageHeader
+        primary={t('title')}
+        slotProps={{
+          root: { style: { marginBottom: theme.spacing(2) } },
+          actions: { spacing: 1 }
+        }}
+        actions={<AddUserPage />}
+      />
 
-      <PageHeader isSticky>
+      <PageContainer isSticky>
         <div style={{ paddingTop: theme.spacing(1) }}>
           <SearchHeader
             params={search.toParams()}
@@ -153,7 +151,7 @@ const UsersSearch = () => {
             ]}
           />
         </div>
-      </PageHeader>
+      </PageContainer>
 
       <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
         <UsersTable userResults={userResults} />

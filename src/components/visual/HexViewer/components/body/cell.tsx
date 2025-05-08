@@ -1,36 +1,16 @@
-import makeStyles from '@mui/styles/makeStyles';
+import { useTheme } from '@mui/material';
 import clsx from 'clsx';
+import type { CellType, StoreProps } from 'components/visual/HexViewer';
+import { getCellClasses, getHexValue, getTextValue, LAYOUT_SIZE, useDispatch } from 'components/visual/HexViewer';
+import type { CSSProperties } from 'react';
 import React from 'react';
-import {
-  CellType,
-  getCellClasses,
-  getHexValue,
-  getTextValue,
-  LAYOUT_SIZE,
-  StoreProps,
-  useCellStyles,
-  useDispatch
-} from '../..';
-
-const useHexStyles = makeStyles(theme => ({
-  cell: {
-    paddingLeft: theme.spacing(0.2),
-    paddingRight: theme.spacing(0.2),
-    fontWeight: theme.palette.mode === 'dark' ? 400 : 600,
-    userSelect: 'none',
-    'td&': {},
-    'div&': {
-      display: 'block'
-    }
-  }
-}));
 
 export type HexCellProps = StoreProps & {
   columnIndex?: number;
   index?: number;
   Tag?: 'div' | 'td';
   type?: CellType;
-  style?: string;
+  style?: CSSProperties;
 };
 
 export const WrappedHexCell = ({
@@ -39,10 +19,9 @@ export const WrappedHexCell = ({
   index = -1,
   Tag = 'div',
   type = 'hex',
-  style = ''
+  style = null
 }: HexCellProps) => {
-  const classes = useHexStyles();
-  const cellClasses = useCellStyles();
+  const theme = useTheme();
   const { onCellMouseEnter, onCellMouseDown } = useDispatch();
 
   const { codes: hexcodes } = store.hex;
@@ -51,10 +30,20 @@ export const WrappedHexCell = ({
     <Tag
       id={Tag + '-' + index}
       data-index={index}
-      className={clsx('cell', classes.cell, style, getCellClasses(store, type, columnIndex, index, cellClasses))}
+      data-theme={theme.palette.mode}
+      className={clsx('cell', getCellClasses(store, type, columnIndex, index))}
       onMouseEnter={() => onCellMouseEnter({ index, type })}
       onMouseDown={event => onCellMouseDown({ index, type }, { event })}
-      style={{ width: type === 'hex' ? LAYOUT_SIZE.hexWidth : LAYOUT_SIZE.textWidth }}
+      style={{
+        width: type === 'hex' ? LAYOUT_SIZE.hexWidth : LAYOUT_SIZE.textWidth,
+        paddingLeft: theme.spacing(0.2),
+        paddingRight: theme.spacing(0.2),
+        fontSize: '16px',
+        fontWeight: theme.palette.mode === 'dark' ? 400 : 600,
+        userSelect: 'none',
+        ...(Tag === 'div' && { display: 'block' }),
+        ...style
+      }}
     >
       {type === 'hex' ? getHexValue(hexcodes, index) : getTextValue(store, hexcodes, index)}
     </Tag>

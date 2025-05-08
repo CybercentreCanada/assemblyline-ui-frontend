@@ -1,9 +1,7 @@
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
-import { Alert, alpha, IconButton, LinearProgress, Slider } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
-import clsx from 'clsx';
-import useAppUser from 'commons/components/app/hooks/useAppUser';
+import { Alert, alpha, IconButton, LinearProgress, Slider, styled } from '@mui/material';
+import { useAppUser } from 'commons/components/app/hooks';
 import useMyAPI from 'components/hooks/useMyAPI';
 import type { CustomUser } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
@@ -11,66 +9,69 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 const MIN = 100;
 const MAX = 900;
-const ZOOM_CLASS = 'zooming';
-const PIXELATED_CLASS = 'pixelated';
 
-const useStyles = makeStyles(theme => ({
-  wrapper: {
-    backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#FAFAFA',
-    border: `1px solid ${theme.palette.divider}`,
-    padding: theme.spacing(1),
-    flexGrow: 1,
-    display: 'flex',
-    flexDirection: 'column',
-    height: '1px'
+const Wrapper = styled('div')(({ theme }) => ({
+  backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#FAFAFA',
+  border: `1px solid ${theme.palette.divider}`,
+  padding: theme.spacing(1),
+  flexGrow: 1,
+  display: 'flex',
+  flexDirection: 'column',
+  height: '1px'
+}));
+
+const Root = styled('div')(() => ({
+  height: '100%',
+  width: '100%',
+  overflow: 'hidden',
+  display: 'grid',
+  placeItems: 'center'
+}));
+
+type ImageProps = {
+  zoom?: boolean;
+  pixelated?: boolean;
+};
+
+const Image = styled('img', {
+  shouldForwardProp: prop => prop !== 'zoom' && prop !== 'pixelated'
+})<ImageProps>(({ zoom, pixelated }) => ({
+  maxHeight: '100%',
+  maxWidth: '100%',
+  minHeight: `128px`,
+  minWidth: `128px`,
+  objectFit: 'contain',
+  cursor: 'pointer',
+  imageRendering: 'auto',
+
+  ...(zoom && {
+    objectFit: 'initial',
+    maxHeight: 'none',
+    maxWidth: 'none'
+  }),
+
+  ...(pixelated && {
+    imageRendering: 'pixelated'
+  })
+}));
+
+const Zoom = styled('div')(({ theme }) => ({
+  position: 'absolute',
+  right: `calc(50px - ${theme.spacing(1)})`,
+  backgroundColor: alpha(theme.palette.background.paper, 0.7),
+  borderRadius: theme.spacing(3),
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'center',
+  rowGap: theme.spacing(1),
+  height: '250px',
+  width: '50px',
+  padding: `${theme.spacing(2)} 0`,
+  [theme.breakpoints.down('md')]: {
+    right: `calc(50px - ${theme.spacing(3)})`
   },
-  root: {
-    height: '100%',
-    width: '100%',
-    overflow: 'hidden',
-    display: 'grid',
-    placeItems: 'center'
-  },
-  image: {
-    maxHeight: '100%',
-    maxWidth: '100%',
-    minHeight: `128px`,
-    minWidth: `128px`,
-    objectFit: 'contain',
-    cursor: 'pointer',
-    imageRendering: 'auto',
-    [`&.${ZOOM_CLASS}`]: {
-      objectFit: 'initial',
-      maxHeight: 'none',
-      maxWidth: 'none'
-    },
-    [`&.${PIXELATED_CLASS}`]: {
-      imageRendering: 'pixelated'
-    }
-  },
-  zoom: {
-    position: 'absolute',
-    right: `calc(50px - ${theme.spacing(1)})`,
-    backgroundColor: alpha(theme.palette.background.paper, 0.7),
-    borderRadius: theme.spacing(3),
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    rowGap: theme.spacing(1),
-    height: '250px',
-    width: '50px',
-    padding: `${theme.spacing(2)} 0`,
-    [theme.breakpoints.down('md')]: {
-      right: `calc(50px - ${theme.spacing(3)})`
-    },
-    '@media (max-height: 600px)': {
-      display: 'none'
-    }
-  },
-  zoomSlider: {
-    '& .MuiSlider-thumb': {
-      boxShadow: 'none'
-    }
+  '@media (max-height: 600px)': {
+    display: 'none'
   }
 }));
 
@@ -95,7 +96,6 @@ type Props = {
 };
 
 const WrappedImageSection = ({ name = null, sha256 = null }: Props) => {
-  const classes = useStyles();
   const { apiCall } = useMyAPI();
   const { user: currentUser } = useAppUser<CustomUser>();
 
@@ -109,7 +109,7 @@ const WrappedImageSection = ({ name = null, sha256 = null }: Props) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const imgRef = useRef<HTMLImageElement>(null);
   const dragTimer = useRef<number>(null);
-  const animationID = useRef<number>();
+  const animationID = useRef<number>(null);
   const data = useRef<Data>({
     isDown: false,
     prevZoom: 0,
@@ -192,8 +192,8 @@ const WrappedImageSection = ({ name = null, sha256 = null }: Props) => {
     // Calculate dragging speed
     const timeDiff = (new Date() as any) - dragTimer.current;
     const { curX, curY, startX, startY } = data.current;
-    let speedY = ((curY - startY) / timeDiff) * 15;
-    let speedX = ((curX - startX) / timeDiff) * 15;
+    const speedY = ((curY - startY) / timeDiff) * 15;
+    const speedX = ((curX - startX) / timeDiff) * 15;
     let speedYAbsolute = Math.abs(speedY);
     let speedXAbsolute = Math.abs(speedX);
 
@@ -402,26 +402,18 @@ const WrappedImageSection = ({ name = null, sha256 = null }: Props) => {
   else
     return (
       src && (
-        <div className={classes.wrapper}>
-          <div
+        <Wrapper>
+          <Root
             ref={containerRef}
-            className={classes.root}
             onWheel={handleWheel}
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
             onTouchStart={handleTouchStart}
             onTouchMove={handleTouchMove}
           >
-            <img
-              ref={imgRef}
-              className={clsx(classes.image, isZooming && ZOOM_CLASS, isPixelated && PIXELATED_CLASS)}
-              src={src}
-              alt={alt}
-              draggable={false}
-              onLoad={handleLoad}
-            />
-          </div>
-          <div className={classes.zoom}>
+            <Image ref={imgRef} src={src} alt={alt} draggable={false} onLoad={handleLoad} />
+          </Root>
+          <Zoom>
             <div style={{ textAlign: 'end', minWidth: '35px' }}>{`${Math.floor(zoom)}%`}</div>
             <IconButton
               size="small"
@@ -429,22 +421,26 @@ const WrappedImageSection = ({ name = null, sha256 = null }: Props) => {
               onClick={() => handleZoomChange(null, 10)}
             />
             <Slider
-              className={classes.zoomSlider}
               value={zoom}
               step={10}
               min={MIN}
               max={MAX}
               size="small"
               orientation="vertical"
-              onChange={(event, newValue) => handleZoomChange(newValue as number, null)}
+              onChange={(event, newValue) => handleZoomChange(newValue, null)}
+              sx={{
+                '& .MuiSlider-thumb': {
+                  boxShadow: 'none'
+                }
+              }}
             />
             <IconButton
               size="small"
               children={<RemoveIcon fontSize="small" />}
               onClick={() => handleZoomChange(null, -10)}
             />
-          </div>
-        </div>
+          </Zoom>
+        </Wrapper>
       )
     );
 };

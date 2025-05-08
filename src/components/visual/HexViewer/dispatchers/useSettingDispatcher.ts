@@ -1,5 +1,6 @@
-import { ChangeEvent } from 'react';
-import { ACTIONS, ActionTypesConfig, Dispatch, DispatchersConfig } from '..';
+import type { ChangeEvent } from 'react';
+import type { ActionTypesConfig, Dispatch, DispatchersConfig } from '..';
+import { ACTIONS } from '..';
 
 export type SettingAction =
   | { type: 'settingFetch'; payload: void }

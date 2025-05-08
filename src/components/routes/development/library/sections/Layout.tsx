@@ -1,10 +1,11 @@
 import CancelIcon from '@mui/icons-material/Cancel';
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import { Button, IconButton, Tooltip } from '@mui/material';
+import { Button } from '@mui/material';
 import { DemoContainer } from 'components/routes/development/library/components/DemoContainer';
 import { DemoSection } from 'components/routes/development/library/components/DemoSection';
 import { useForm } from 'components/routes/development/library/contexts/form';
+import { IconButton } from 'components/visual/Buttons/IconButton';
 import CustomChip from 'components/visual/CustomChip';
 import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import { PageSection } from 'components/visual/Layouts/PageSection';
@@ -39,11 +40,11 @@ export const LayoutSection = React.memo(() => {
 
       <DemoSection
         id="Page Header: Basic Example"
-        primary={'Basic Example'}
+        primary="Basic Example"
         secondary={
           <>
             <span>{'This Header is the component used on top of every page. '}</span>
-            <span>{'It implements all the features that are present on most pages.'}</span>
+            <span>It implements all the features that are present on most pages.</span>
           </>
         }
         left={
@@ -54,17 +55,19 @@ export const LayoutSection = React.memo(() => {
                 primary="Page Header"
                 secondary="Description of the Page Header"
                 classification={value}
-                actions={[
-                  { children: <InfoOutlinedIcon />, tooltip: 'Information' },
-                  { children: <CloseOutlinedIcon />, tooltip: 'Closed', tooltipProps: { placement: 'top' } },
-                  <Tooltip key={3} title="Cancel">
-                    <div>
-                      <IconButton size="large">
-                        <CancelIcon />
-                      </IconButton>
-                    </div>
-                  </Tooltip>
-                ]}
+                actions={
+                  <>
+                    <IconButton size="large" tooltip="Information">
+                      <InfoOutlinedIcon />
+                    </IconButton>
+                    <IconButton size="large" tooltip="Closed" tooltipProps={{ placement: 'top' }}>
+                      <CloseOutlinedIcon />
+                    </IconButton>
+                    <IconButton size="large" tooltip="Cancel">
+                      <CancelIcon />
+                    </IconButton>
+                  </>
+                }
                 endAdornment={<CustomChip label="End Adornment" />}
               />
             )}
@@ -97,7 +100,7 @@ export const LayoutSection = React.memo(() => {
 
       <DemoSection
         id="Page Header: Classification"
-        primary={'Classification'}
+        primary="Classification"
         secondary={
           <>
             <span>{'Use the onClassificationChange to change to classifiation component into a picker. '}</span>
@@ -132,12 +135,12 @@ export const LayoutSection = React.memo(() => {
 
       <DemoSection
         id="Page Header: Loading"
-        primary={'Loading'}
+        primary="Loading"
         secondary={
           <>
             <span>{'Use the loading prop to enter the loading state. '}</span>
             <span>{'None of the secondary, actions and end adorment will be rendered '}</span>
-            <span>{'to avoid crashing by a value not existing yet.'}</span>
+            <span>to avoid crashing by a value not existing yet.</span>
           </>
         }
         left={
@@ -149,17 +152,19 @@ export const LayoutSection = React.memo(() => {
                 secondary="Description of the Page Header"
                 classification={value}
                 loading
-                actions={[
-                  { children: <InfoOutlinedIcon />, tooltip: 'Information' },
-                  { children: <CloseOutlinedIcon />, tooltip: 'Closed', tooltipProps: { placement: 'top' } },
-                  <Tooltip key={3} title="Cancel">
-                    <div>
-                      <IconButton size="large">
-                        <CancelIcon />
-                      </IconButton>
-                    </div>
-                  </Tooltip>
-                ]}
+                actions={
+                  <>
+                    <IconButton size="large" tooltip="Information" loading>
+                      <InfoOutlinedIcon />
+                    </IconButton>
+                    <IconButton size="large" tooltip="Closed" tooltipProps={{ placement: 'top' }} loading>
+                      <CloseOutlinedIcon />
+                    </IconButton>
+                    <IconButton size="large" tooltip="Cancel" loading>
+                      <CancelIcon />
+                    </IconButton>
+                  </>
+                }
                 endAdornment={<CustomChip label="End Adornment" />}
               />
             )}
@@ -193,8 +198,8 @@ export const LayoutSection = React.memo(() => {
 
       <DemoSection
         id="Page Header: Long names"
-        primary={'Long names'}
-        secondary={'The Header component should handle long names'}
+        primary="Long names"
+        secondary="The Header component should handle long names"
         left={
           <form.Subscribe
             selector={state => state.values.components.layout.values.classification}
@@ -203,17 +208,19 @@ export const LayoutSection = React.memo(() => {
                 primary="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aliquam enim malesuada sapien pellentesque, fringilla consequat diam suscipit. Donec sed arcu blandit, luctus lorem quis, sodales elit. Phasellus blandit posuere sapien, ut pharetra ipsum efficitur at. Sed vel nulla risus. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Fusce efficitur nunc at urna imperdiet mattis. Sed condimentum vel ex et semper."
                 secondary="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aliquam enim malesuada sapien pellentesque, fringilla consequat diam suscipit. Donec sed arcu blandit, luctus lorem quis, sodales elit. Phasellus blandit posuere sapien, ut pharetra ipsum efficitur at. Sed vel nulla risus. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Fusce efficitur nunc at urna imperdiet mattis. Sed condimentum vel ex et semper."
                 classification={value}
-                actions={[
-                  { children: <InfoOutlinedIcon />, tooltip: 'Information' },
-                  { children: <CloseOutlinedIcon />, tooltip: 'Closed', tooltipProps: { placement: 'top' } },
-                  <Tooltip key={3} title="Cancel">
-                    <div>
-                      <IconButton size="large">
-                        <CancelIcon />
-                      </IconButton>
-                    </div>
-                  </Tooltip>
-                ]}
+                actions={
+                  <>
+                    <IconButton size="large" tooltip="Information">
+                      <InfoOutlinedIcon />
+                    </IconButton>
+                    <IconButton size="large" tooltip="Closed" tooltipProps={{ placement: 'top' }}>
+                      <CloseOutlinedIcon />
+                    </IconButton>
+                    <IconButton size="large" tooltip="Cancel">
+                      <CancelIcon />
+                    </IconButton>
+                  </>
+                }
                 endAdornment={<CustomChip label="End Adornment" />}
               />
             )}
@@ -249,12 +256,12 @@ export const LayoutSection = React.memo(() => {
 
       <DemoSection
         id="Page Section: Basic Example"
-        primary={'Basic Example'}
+        primary="Basic Example"
         secondary={
           <>
             <span>{'This section component. Use the Use the loading prop to enter the loading state. '}</span>
             <span>{'None of the secondary, actions and end adorment will be rendered '}</span>
-            <span>{'to avoid crashing by a value not existing yet.'}</span>
+            <span>to avoid crashing by a value not existing yet.</span>
           </>
         }
         left={
@@ -263,11 +270,13 @@ export const LayoutSection = React.memo(() => {
             secondary="Description of the Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aliquam enim malesuada sapien pellentesque"
             collapsible
             divider
-            endAdornment={<Button variant="outlined">{'End Adornement'}</Button>}
+            endAdornment={<Button variant="outlined">End Adornement</Button>}
           >
-            {
-              'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aliquam enim malesuada sapien pellentesque, fringilla consequat diam suscipit. Donec sed arcu blandit, luctus lorem quis, sodales elit. Phasellus blandit posuere sapien, ut pharetra ipsum efficitur at. Sed vel nulla risus. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Fusce efficitur nunc at urna imperdiet mattis. Sed condimentum vel ex et semper.'
-            }
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aliquam enim malesuada sapien pellentesque,
+            fringilla consequat diam suscipit. Donec sed arcu blandit, luctus lorem quis, sodales elit. Phasellus
+            blandit posuere sapien, ut pharetra ipsum efficitur at. Sed vel nulla risus. Orci varius natoque penatibus
+            et magnis dis parturient montes, nascetur ridiculus mus. Fusce efficitur nunc at urna imperdiet mattis. Sed
+            condimentum vel ex et semper.
           </PageSection>
         }
         right={
@@ -289,7 +298,7 @@ export const LayoutSection = React.memo(() => {
 
       <DemoSection
         id="Page Section: Not collapsible and no divider"
-        primary={'Not collapsible and no divider'}
+        primary="Not collapsible and no divider"
         secondary={
           <>
             <span>{'If the collapsible prop is not provided, the button functionality will not be present. '}</span>
@@ -298,9 +307,11 @@ export const LayoutSection = React.memo(() => {
         }
         left={
           <PageSection primary="Page Section" secondary="Description of the Page Section">
-            {
-              'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aliquam enim malesuada sapien pellentesque, fringilla consequat diam suscipit. Donec sed arcu blandit, luctus lorem quis, sodales elit. Phasellus blandit posuere sapien, ut pharetra ipsum efficitur at. Sed vel nulla risus. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Fusce efficitur nunc at urna imperdiet mattis. Sed condimentum vel ex et semper.'
-            }
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aliquam enim malesuada sapien pellentesque,
+            fringilla consequat diam suscipit. Donec sed arcu blandit, luctus lorem quis, sodales elit. Phasellus
+            blandit posuere sapien, ut pharetra ipsum efficitur at. Sed vel nulla risus. Orci varius natoque penatibus
+            et magnis dis parturient montes, nascetur ridiculus mus. Fusce efficitur nunc at urna imperdiet mattis. Sed
+            condimentum vel ex et semper.
           </PageSection>
         }
         right={
@@ -319,7 +330,7 @@ export const LayoutSection = React.memo(() => {
 
       <DemoSection
         id="Page Section: Controlled"
-        primary={'Controlled'}
+        primary="Controlled"
         secondary={
           <>
             <span>{'By default, the component manages its own collapsible state. '}</span>
@@ -337,9 +348,11 @@ export const LayoutSection = React.memo(() => {
                 open={value}
                 onChange={next => form.setFieldValue('components.layout.values.sectionOpen', next)}
               >
-                {
-                  'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aliquam enim malesuada sapien pellentesque, fringilla consequat diam suscipit. Donec sed arcu blandit, luctus lorem quis, sodales elit. Phasellus blandit posuere sapien, ut pharetra ipsum efficitur at. Sed vel nulla risus. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Fusce efficitur nunc at urna imperdiet mattis. Sed condimentum vel ex et semper.'
-                }
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aliquam enim malesuada sapien
+                pellentesque, fringilla consequat diam suscipit. Donec sed arcu blandit, luctus lorem quis, sodales
+                elit. Phasellus blandit posuere sapien, ut pharetra ipsum efficitur at. Sed vel nulla risus. Orci varius
+                natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Fusce efficitur nunc at urna
+                imperdiet mattis. Sed condimentum vel ex et semper.
               </PageSection>
             )}
           />

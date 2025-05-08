@@ -1,36 +1,38 @@
 import MenuOpenIcon from '@mui/icons-material/MenuOpen';
-import { IconButton } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
+import { IconButton, styled } from '@mui/material';
+import FlexHorizontal from 'commons/addons/layout/flexers/FlexHorizontal';
+import Flexport from 'commons/addons/layout/flexers/FlexPort';
+import FlexVertical from 'commons/addons/layout/flexers/FlexVertical';
 import useSplitLayout from 'commons/addons/layout/hooks/useSplitLayout';
+import type { LayoutState } from 'commons/addons/layout/split/layouts/Layouts';
+import Layouts from 'commons/addons/layout/split/layouts/Layouts';
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import ReactResizeDetector from 'react-resize-detector';
-import FlexHorizontal from '../flexers/FlexHorizontal';
-import Flexport from '../flexers/FlexPort';
-import FlexVertical from '../flexers/FlexVertical';
-import Layouts, { LayoutState } from './layouts/Layouts';
 
-const useStyles = makeStyles(theme => ({
-  splitLayoutContainer: {
-    overflow: 'hidden',
-    flexGrow: 1
-  },
-  splitLayoutLeftCt: {
-    height: '100%',
-    display: 'inline-block',
-    backgroundColor: theme.palette.background.default
-  },
-  splitLayoutRightCt: {
-    height: '100%',
-    display: 'inline-block',
-    backgroundColor: theme.palette.background.default
-  },
-  splitLayoutDock: {},
-  splitLayoutLeftAnchor: {
-    width: '10px',
-    '&:hover': {
-      backgroundColor: theme.palette.background.paper,
-      cursor: 'col-resize'
-    }
+const SplitLayoutContainer = styled('div')(({ theme }) => ({
+  overflow: 'hidden',
+  flexGrow: 1
+}));
+
+const SplitLayoutLeftCt = styled('div')(({ theme }) => ({
+  height: '100%',
+  display: 'inline-block',
+  backgroundColor: theme.palette.background.default
+}));
+
+const SplitLayoutRightCt = styled('div')(({ theme }) => ({
+  height: '100%',
+  display: 'inline-block',
+  backgroundColor: theme.palette.background.default
+}));
+
+const SplitLayoutDock = styled('div')(({ theme }) => ({}));
+
+const SplitLayoutLeftAnchor = styled('div')(({ theme }) => ({
+  width: '10px',
+  '&:hover': {
+    backgroundColor: theme.palette.background.paper,
+    cursor: 'col-resize'
   }
 }));
 
@@ -61,9 +63,6 @@ const SplitLayout = ({
   onRenderLeftDock,
   onRenderRightDock
 }: SplitLayoutProps) => {
-  // Some styles
-  const classes = useStyles();
-
   // Some states
   const [state, setState] = useState<LayoutState>({
     leftOpen: true,
@@ -84,8 +83,8 @@ const SplitLayout = ({
   const mouseDownRef = useRef<boolean>(false);
 
   // Some DOM refs
-  const containerRef = useRef<HTMLDivElement>();
-  const anchorRef = useRef<HTMLDivElement>();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const anchorRef = useRef<HTMLDivElement>(null);
 
   // Utility function the get the current width of container.
   const getWidth = (): number => containerRef.current.getBoundingClientRect().width;
@@ -182,15 +181,13 @@ const SplitLayout = ({
         <FlexHorizontal>
           <ReactResizeDetector handleWidth handleHeight={false} targetRef={containerRef} onResize={onResize}>
             {() => (
-              <div
+              <SplitLayoutContainer
                 ref={containerRef}
-                className={classes.splitLayoutContainer}
                 onMouseUp={onContainerMouseUp}
                 onMouseMove={onContainerMouseMove}
                 onMouseLeave={onContainerMouseLeave}
               >
-                <div
-                  className={classes.splitLayoutLeftCt}
+                <SplitLayoutLeftCt
                   style={{
                     position: 'absolute',
                     width: state.leftOpen ? state.leftWidth : leftMinWidth,
@@ -201,13 +198,10 @@ const SplitLayout = ({
                     {persistentMenu && persistentMenuDock === 'left' && renderLeftDock()}
                     <div style={{ flexGrow: 1, overflow: state.leftOpen ? 'auto' : 'hidden' }}>{leftNode}</div>
                     {!state.rightOpen && renderRightDock()}
-                    {!disableManualResize && (
-                      <div ref={anchorRef} className={classes.splitLayoutLeftAnchor} onMouseDown={onAnchorMouseDown} />
-                    )}
+                    {!disableManualResize && <SplitLayoutLeftAnchor ref={anchorRef} onMouseDown={onAnchorMouseDown} />}
                   </FlexHorizontal>
-                </div>
-                <div
-                  className={classes.splitLayoutRightCt}
+                </SplitLayoutLeftCt>
+                <SplitLayoutRightCt
                   style={{
                     position: 'absolute',
                     width: state.rightOpen ? state.rightWidth : rightMinWidth,
@@ -220,8 +214,8 @@ const SplitLayout = ({
                     <div style={{ flexGrow: 1, overflow: state.rightOpen ? 'auto' : 'hidden' }}>{rightNode}</div>
                     {persistentMenu && persistentMenuDock === 'right' && renderRightDock()}
                   </FlexHorizontal>
-                </div>
-              </div>
+                </SplitLayoutRightCt>
+              </SplitLayoutContainer>
             )}
           </ReactResizeDetector>
         </FlexHorizontal>

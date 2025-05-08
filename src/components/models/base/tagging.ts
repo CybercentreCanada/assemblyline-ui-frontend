@@ -1,4 +1,4 @@
-import type { Verdict } from './alert';
+import type { Verdict } from 'components/models/base/alert';
 
 /**
  * Attack Matrix Model

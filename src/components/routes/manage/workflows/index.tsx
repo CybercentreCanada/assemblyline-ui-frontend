@@ -2,10 +2,9 @@ import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOu
 import EventBusyOutlinedIcon from '@mui/icons-material/EventBusyOutlined';
 import EventOutlinedIcon from '@mui/icons-material/EventOutlined';
 import { Grid, IconButton, Tooltip, useTheme } from '@mui/material';
-import Typography from '@mui/material/Typography';
-import useAppUser from 'commons/components/app/hooks/useAppUser';
+import { useAppUser } from 'commons/components/app/hooks';
+import PageContainer from 'commons/components/pages/PageContainer';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
-import PageHeader from 'commons/components/pages/PageHeader';
 import type { SearchParams } from 'components/core/SearchParams/SearchParams';
 import { createSearchParams } from 'components/core/SearchParams/SearchParams';
 import { SearchParamsProvider, useSearchParams } from 'components/core/SearchParams/SearchParamsContext';
@@ -16,15 +15,15 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import type { WorkflowIndexed } from 'components/models/base/workflow';
 import type { CustomUser } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
+import WorkflowCreate from 'components/routes/manage/workflows/create';
+import WorkflowDetail from 'components/routes/manage/workflows/detail';
+import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import SearchHeader from 'components/visual/SearchBar/SearchHeader';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import WorkflowTable from 'components/visual/SearchResult/workflow';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
-import { useLocation } from 'react-router-dom';
-import WorkflowCreate from './create';
-import WorkflowDetail from './detail';
+import { useLocation, useNavigate } from 'react-router';
 
 type SearchResults = {
   items: WorkflowIndexed[];
@@ -149,13 +148,14 @@ const WorkflowsSearch = () => {
 
   return currentUser.roles.includes('workflow_view') ? (
     <PageFullWidth margin={4}>
-      <div style={{ paddingBottom: theme.spacing(2) }}>
-        <Grid container alignItems="center">
-          <Grid item xs>
-            <Typography variant="h4">{t('title')}</Typography>
-          </Grid>
-          {currentUser.roles.includes('workflow_manage') && (
-            <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
+      <PageHeader
+        primary={t('title')}
+        slotProps={{
+          root: { style: { marginBottom: theme.spacing(2) } }
+        }}
+        actions={
+          currentUser.roles.includes('workflow_manage') && (
+            <Grid size={{ xs: 'grow' }} style={{ textAlign: 'right', flexGrow: 0 }}>
               <Tooltip title={t('add_workflow')}>
                 <IconButton
                   style={{
@@ -168,11 +168,11 @@ const WorkflowsSearch = () => {
                 </IconButton>
               </Tooltip>
             </Grid>
-          )}
-        </Grid>
-      </div>
+          )
+        }
+      />
 
-      <PageHeader isSticky>
+      <PageContainer isSticky>
         <div style={{ paddingTop: theme.spacing(1) }}>
           <SearchHeader
             params={search.toParams()}
@@ -212,7 +212,7 @@ const WorkflowsSearch = () => {
             ]}
           />
         </div>
-      </PageHeader>
+      </PageContainer>
 
       <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
         <WorkflowTable workflowResults={workflowResults} setWorkflowID={setWorkflowID} />

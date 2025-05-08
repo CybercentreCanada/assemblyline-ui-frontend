@@ -3,19 +3,23 @@ import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import type { UserSettings } from 'components/models/base/user_settings';
 import ForbiddenPage from 'components/routes/403';
+import { ExternalSourcesSection } from 'components/routes/settings/components/ExternalSources';
+import { HeaderSection } from 'components/routes/settings/components/Header';
+import { InterfaceSection } from 'components/routes/settings/components/Interface';
+import { LeftNav } from 'components/routes/settings/components/LeftNav';
+import { RightNav } from 'components/routes/settings/components/RightNav';
+import { ServicesSection } from 'components/routes/settings/components/Services';
+import { SubmissionSection } from 'components/routes/settings/components/Submission';
+import type { SettingsStore } from 'components/routes/settings/settings.form';
+import { useForm } from 'components/routes/settings/settings.form';
+import {
+  initializeSettings,
+  loadDefaultProfile,
+  loadSubmissionProfile
+} from 'components/routes/settings/settings.utils';
 import { PageLayout } from 'components/visual/Layouts/PageLayout';
 import React, { useCallback, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router';
-import { ExternalSourcesSection } from './components/ExternalSources';
-import { HeaderSection } from './components/Header';
-import { InterfaceSection } from './components/Interface';
-import { LeftNav } from './components/LeftNav';
-import { RightNav } from './components/RightNav';
-import { ServicesSection } from './components/Services';
-import { SubmissionSection } from './components/Submission';
-import type { SettingsStore } from './settings.form';
-import { useForm } from './settings.form';
-import { initializeSettings, loadDefaultProfile, loadSubmissionProfile } from './settings.utils';
 
 type Params = {
   tab: SettingsStore['state']['tab'];
@@ -43,14 +47,6 @@ const WrappedSettingsRoute = () => {
     form.setFieldValue('settings', s);
     form.setFieldValue('state.tab', tab);
   }, [configuration.submission.profiles, currentUser, form]);
-
-  useEffect(() => {
-    if (tabParam === form.getFieldValue('state.tab')) return;
-    const nextTab = ['interface', ...Object.keys(settings.submission_profiles)].includes(tabParam)
-      ? tabParam
-      : 'interface';
-    navigate(`/settings/${nextTab}`);
-  }, [form, navigate, settings.submission_profiles, tabParam]);
 
   useEffect(() => {
     if (tabParam === form.getFieldValue('state.tab')) return;

@@ -226,7 +226,7 @@ describe('Test `resetFavicon`', () => {
 
     let favicon = document.getElementById('favicon');
     if (!favicon) {
-      let l = window.document.createElement('link');
+      const l = window.document.createElement('link');
       l.setAttribute('id', 'favicon');
       l.setAttribute('rel', 'icon');
       document.head.appendChild(l);
@@ -247,7 +247,7 @@ describe('Test `setNotifyFavicon`', () => {
 
     let favicon = document.getElementById('favicon');
     if (!favicon) {
-      let l = window.document.createElement('link');
+      const l = window.document.createElement('link');
       l.setAttribute('id', 'favicon');
       l.setAttribute('rel', 'icon');
       document.head.appendChild(l);

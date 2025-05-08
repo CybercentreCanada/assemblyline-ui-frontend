@@ -1,4 +1,4 @@
-import { SearchType, TypesConfig } from '..';
+import type { SearchType, TypesConfig } from '..';
 
 export type HistoryType = {
   type: SearchType;
@@ -9,7 +9,7 @@ export type HistoryTypes = never;
 
 export type HistoryState = {
   history: {
-    values: Array<HistoryType>;
+    values: HistoryType[];
     index: number;
     maxSize: number;
     storageKey: string;

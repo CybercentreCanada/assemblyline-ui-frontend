@@ -18,7 +18,7 @@ import InformativeAlert from 'components/visual/InformativeAlert';
 import Moment from 'components/visual/Moment';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 
 type Props = {
   heuristicResults: SearchResult<Heuristic>;
@@ -27,7 +27,7 @@ type Props = {
 };
 
 const WrappedHeuristicsTable: React.FC<Props> = ({ heuristicResults, setHeuristicID = null, allowSort = true }) => {
-  const { t, i18n } = useTranslation(['search']);
+  const { t } = useTranslation(['search']);
   const { c12nDef } = useALContext();
 
   return heuristicResults ? (

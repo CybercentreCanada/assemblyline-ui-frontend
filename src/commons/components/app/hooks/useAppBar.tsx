@@ -1,6 +1,6 @@
+import { AppBarContext } from 'commons/components/app/AppContexts';
 import { useContext } from 'react';
-import { AppBarContext } from '../providers/AppBarProvider';
 
-export default function useAppBar() {
+export function useAppBar() {
   return useContext(AppBarContext);
 }

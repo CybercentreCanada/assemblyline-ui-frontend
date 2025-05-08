@@ -162,7 +162,7 @@ export default function HelpClassification() {
                   <Classification size="tiny" type="text" c12n={lvl.name} format="long" /> :: {lvl.description}
                 </li>
               ))
-            : [...Array(2)].map((_, i) => (
+            : Array.from({ length: 2 }).map((_, i) => (
                 <li key={i}>
                   <Skeleton />
                 </li>
@@ -194,7 +194,7 @@ export default function HelpClassification() {
               </Typography>
             )
           ) : (
-            [...Array(2)].map((_, i) => (
+            Array.from({ length: 2 }).map((_, i) => (
               <li key={i}>
                 <Skeleton />
               </li>
@@ -227,7 +227,7 @@ export default function HelpClassification() {
               </Typography>
             )
           ) : (
-            [...Array(2)].map((_, i) => (
+            Array.from({ length: 2 }).map((_, i) => (
               <li key={i}>
                 <Skeleton />
               </li>
@@ -263,7 +263,7 @@ export default function HelpClassification() {
               </Typography>
             )
           ) : (
-            [...Array(2)].map((_, i) => (
+            Array.from({ length: 2 }).map((_, i) => (
               <li key={i}>
                 <Skeleton />
               </li>

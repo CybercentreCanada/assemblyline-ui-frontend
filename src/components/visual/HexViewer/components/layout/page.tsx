@@ -1,33 +1,9 @@
-import makeStyles from '@mui/styles/makeStyles';
-import clsx from 'clsx';
+import type { StoreProps } from 'components/visual/HexViewer';
+import { HexBody, HexHeader, HexSettings, useDispatch, useEventListener } from 'components/visual/HexViewer';
 import React, { useRef } from 'react';
-import { HexBody, HexHeader, HexSettings, StoreProps, useDispatch, useEventListener } from '../..';
-
-const useHexStyles = makeStyles(theme => ({
-  root: {
-    display: 'flex',
-    flexDirection: 'column',
-    cursor: 'default',
-    flexGrow: 1,
-
-    userSelection: 'none',
-    '-webkit-user-select': 'none' /* Safari */,
-    '-khtml-user-select': 'none' /* Konqueror HTML */,
-    '-moz-user-select': 'none' /* Firefox */,
-    '-ms-user-select': 'none' /* Internet Explorer/Edge */
-  },
-
-  hidden: {
-    visibility: 'hidden'
-  },
-  container: {
-    flexGrow: 1
-  }
-}));
 
 export const WrappedHexPageLayout = ({ store }: StoreProps) => {
   const ref = useRef(null);
-  const classes = useHexStyles();
   const { onAppClickAway } = useDispatch();
 
   // Mouse Up
@@ -36,9 +12,26 @@ export const WrappedHexPageLayout = ({ store }: StoreProps) => {
   });
 
   return (
-    <div ref={ref} className={clsx(classes.root, store.loading.status !== 'initialized' && classes.hidden)}>
+    <div
+      ref={ref}
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        cursor: 'default',
+        flexGrow: 1,
+
+        userSelect: 'none' /* Safari */,
+        WebkitUserSelect: 'none' /* Konqueror HTML */,
+        KhtmlUserSelect: 'none' /* Firefox */,
+        msUserSelect: 'none' /* Internet Explorer/Edge */,
+
+        ...(store.loading.status !== 'initialized' && {
+          visibility: 'hidden'
+        })
+      }}
+    >
       <HexHeader store={store} />
-      <div className={classes.container}>
+      <div style={{ flexGrow: 1 }}>
         <HexBody store={store} />
       </div>
       <HexSettings store={store} />

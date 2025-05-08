@@ -1,5 +1,5 @@
 import CheckIcon from '@mui/icons-material/Check';
-import type { Theme } from '@mui/material';
+import DoDisturbAltOutlinedIcon from '@mui/icons-material/DoDisturbAltOutlined';
 import {
   Autocomplete,
   Checkbox,
@@ -10,17 +10,13 @@ import {
   MenuItem,
   Select,
   Skeleton,
+  styled,
   TextField,
   Tooltip,
   Typography,
   useTheme
 } from '@mui/material';
-
-import DoDisturbAltOutlinedIcon from '@mui/icons-material/DoDisturbAltOutlined';
 import FormControl from '@mui/material/FormControl';
-import createStyles from '@mui/styles/createStyles';
-import makeStyles from '@mui/styles/makeStyles';
-import withStyles from '@mui/styles/withStyles';
 import Throttler from 'commons/addons/utils/throttler';
 import PageCenter from 'commons/components/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
@@ -32,31 +28,23 @@ import { LABELS, PRIORITIES, STATUSES } from 'components/models/base/workflow';
 import type { SearchResult } from 'components/models/ui/search';
 import ForbiddenPage from 'components/routes/403';
 import Classification from 'components/visual/Classification';
+import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import _ from 'lodash';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation } from 'react-router';
-import { useParams } from 'react-router-dom';
-
-const useStyles = makeStyles(() => ({
-  buttonProgress: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    marginTop: -12,
-    marginLeft: -12
-  }
-}));
+import { useLocation, useParams } from 'react-router';
 
 const THROTTLER = new Throttler(1000);
 
-const MyMenuItem = withStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      minHeight: theme.spacing(4)
+const MyMenuItem = memo(
+  styled(MenuItem)(({ theme }) => ({
+    ['& .MuiMenuItem-root']: {
+      root: {
+        minHeight: theme.spacing(4)
+      }
     }
-  })
-)(MenuItem);
+  }))
+);
 
 type Params = {
   id: string;
@@ -244,52 +232,28 @@ const WrappedWorkflowCreate = ({ id: propID = null, onClose = () => null }: Prop
           </div>
         )}
 
-        <div style={{ textAlign: 'left' }}>
-          <div style={{ paddingBottom: theme.spacing(2) }}>
-            <Grid container alignItems="center">
-              <Grid item xs>
-                <Typography variant="h4">{t(id ? 'edit.title' : 'add.title')}</Typography>
-                <Typography variant="caption">
-                  {!id ? null : workflow ? id : <Skeleton style={{ width: '10rem' }} />}
-                </Typography>
-              </Grid>
-
-              <Grid
-                item
-                xs={12}
-                sm
-                style={{ display: 'flex', justifyContent: 'flex-end', columnGap: theme.spacing(1) }}
-              >
-                {id ? (
-                  <>
-                    <Tooltip title={t('cancel.button')}>
-                      <IconButton
-                        style={{
-                          color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
-                        }}
-                        onClick={() => onClose(id)}
-                      >
-                        <DoDisturbAltOutlinedIcon />
-                      </IconButton>
-                    </Tooltip>
-                    <Tooltip title={t('update.button')}>
-                      <IconButton
-                        style={{
-                          color: !disabled
-                            ? theme.palette.mode === 'dark'
-                              ? theme.palette.success.light
-                              : theme.palette.success.dark
-                            : theme.palette.grey[750]
-                        }}
-                        disabled={disabled}
-                        onClick={() => handleUpdate(workflow, runWorkflow)}
-                      >
-                        <CheckIcon />
-                      </IconButton>
-                    </Tooltip>
-                  </>
-                ) : (
-                  <Tooltip title={t('add.button')}>
+        <PageHeader
+          primary={t(id ? 'edit.title' : 'add.title')}
+          secondary={id}
+          loading={!workflow}
+          slotProps={{
+            root: { style: { marginBottom: theme.spacing(2) } }
+          }}
+          actions={
+            <>
+              {id ? (
+                <>
+                  <Tooltip title={t('cancel.button')}>
+                    <IconButton
+                      style={{
+                        color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+                      }}
+                      onClick={() => onClose(id)}
+                    >
+                      <DoDisturbAltOutlinedIcon />
+                    </IconButton>
+                  </Tooltip>
+                  <Tooltip title={t('update.button')}>
                     <IconButton
                       style={{
                         color: !disabled
@@ -299,19 +263,35 @@ const WrappedWorkflowCreate = ({ id: propID = null, onClose = () => null }: Prop
                           : theme.palette.grey[750]
                       }}
                       disabled={disabled}
-                      onClick={() => handleAdd(workflow, runWorkflow)}
+                      onClick={() => handleUpdate(workflow, runWorkflow)}
                     >
                       <CheckIcon />
                     </IconButton>
                   </Tooltip>
-                )}
-              </Grid>
-            </Grid>
-          </div>
-        </div>
+                </>
+              ) : (
+                <Tooltip title={t('add.button')}>
+                  <IconButton
+                    style={{
+                      color: !disabled
+                        ? theme.palette.mode === 'dark'
+                          ? theme.palette.success.light
+                          : theme.palette.success.dark
+                        : theme.palette.grey[750]
+                    }}
+                    disabled={disabled}
+                    onClick={() => handleAdd(workflow, runWorkflow)}
+                  >
+                    <CheckIcon />
+                  </IconButton>
+                </Tooltip>
+              )}
+            </>
+          }
+        />
 
         <Grid container spacing={2} textAlign="start">
-          <Grid item xs={12}>
+          <Grid size={{ xs: 12 }}>
             <Typography variant="subtitle2">{`${t('name')} ${t('required')}`}</Typography>
             {!workflow ? (
               <Skeleton style={{ height: '2.5rem' }} />
@@ -327,7 +307,7 @@ const WrappedWorkflowCreate = ({ id: propID = null, onClose = () => null }: Prop
               />
             )}
           </Grid>
-          <Grid item xs={12}>
+          <Grid size={{ xs: 12 }}>
             <Typography variant="subtitle2">{`${t('query')} ${t('required')}`}</Typography>
             {!workflow ? (
               <Skeleton style={{ height: '2.5rem' }} />
@@ -344,7 +324,7 @@ const WrappedWorkflowCreate = ({ id: propID = null, onClose = () => null }: Prop
               />
             )}
           </Grid>
-          <Grid item xs={12}>
+          <Grid size={{ xs: 12 }}>
             <Typography variant="subtitle2">{t('labels')}</Typography>
             {!workflow ? (
               <Skeleton style={{ height: '2.5rem' }} />
@@ -364,7 +344,7 @@ const WrappedWorkflowCreate = ({ id: propID = null, onClose = () => null }: Prop
               />
             )}
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Typography variant="subtitle2">{t('priority')}</Typography>
             {workflow ? (
               <FormControl size="small" fullWidth>
@@ -386,7 +366,7 @@ const WrappedWorkflowCreate = ({ id: propID = null, onClose = () => null }: Prop
               <Skeleton style={{ height: '2.5rem' }} />
             )}
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <Typography variant="subtitle2">{t('status')}</Typography>
             {workflow ? (
               <FormControl size="small" fullWidth>
@@ -410,7 +390,7 @@ const WrappedWorkflowCreate = ({ id: propID = null, onClose = () => null }: Prop
           </Grid>
 
           {!id && (
-            <Grid item xs={12}>
+            <Grid size={{ xs: 12 }}>
               {!workflow ? (
                 <Skeleton style={{ height: '2.5rem' }} />
               ) : (

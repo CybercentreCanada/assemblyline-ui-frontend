@@ -1,5 +1,3 @@
-import makeStyles from '@mui/styles/makeStyles';
-import clsx from 'clsx';
 import type { StoreProps } from 'components/visual/HexViewer';
 import {
   HexRow,
@@ -12,7 +10,7 @@ import {
   WindowRow
 } from 'components/visual/HexViewer';
 import type { KeyboardEvent, PropsWithChildren } from 'react';
-import { memo, default as React, useMemo } from 'react';
+import React, { memo, useMemo, useRef } from 'react';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import type { FixedSizeListProps, ListOnItemsRenderedProps } from 'react-window';
 import { FixedSizeList } from 'react-window';
@@ -25,41 +23,7 @@ export * from './row';
 export * from './scrollbar';
 export * from './spacer';
 
-const useHexStyles = makeStyles(theme => ({
-  root: {
-    fontFamily:
-      '"Source Code Pro", "HexEd.it Symbols", "Courier New", Consolas, Menlo, "PT Mono", "Liberation Mono", monospace;',
-    fontSize: '1rem',
-    lineHeight: 1.15,
-    display: 'flex',
-    flexDirection: 'row',
-    width: '100%',
-    height: '100%',
-    cursor: 'default',
-    overflowX: 'hidden',
-    overflowY: 'hidden',
-    alignItems: 'stretch',
-    userSelection: 'none',
-    padding: 0,
-    margin: 0,
-    borderSpacing: 0
-  },
-  table: {
-    padding: 0,
-    margin: 0,
-    borderSpacing: 0
-  },
-  tableBody: {
-    padding: 0,
-    margin: 0
-  },
-  spacer: {
-    flex: 1
-  }
-}));
-
 const HexTableBody = memo(({ store }: StoreProps) => {
-  const classes = useHexStyles();
   const {
     onBodyInit,
     onBodyResize,
@@ -74,7 +38,7 @@ const HexTableBody = memo(({ store }: StoreProps) => {
     onBodyScrollInit,
     onScrollTouchEnd
   } = useDispatch();
-  const bodyRef = React.useRef<HTMLDivElement>(null);
+  const bodyRef = useRef<HTMLDivElement>(null);
 
   useEventListener('resize', () => onBodyResize(bodyRef?.current?.getBoundingClientRect()));
   useEventListener('keydown', (event: KeyboardEvent) => onCursorKeyDown({ event }, { store }));
@@ -107,7 +71,7 @@ const HexTableBody = memo(({ store }: StoreProps) => {
   return (
     <div
       ref={bodyRef}
-      className={classes.root}
+      className="hex-viewer-root"
       onWheel={(event: React.WheelEvent<HTMLDivElement>) => onBodyScrollWheel({ event })}
       onMouseLeave={() => onBodyMouseLeave()}
       onTouchStart={(event: React.TouchEvent<HTMLDivElement>) => onScrollTouchStart({ event })}
@@ -116,15 +80,15 @@ const HexTableBody = memo(({ store }: StoreProps) => {
     >
       {store.loading.status === 'initialized' ? (
         <>
-          <div className={classes.spacer} />
-          <table className={classes.table}>
-            <tbody className={classes.tableBody}>
+          <div style={{ flex: 1 }} />
+          <table style={{ padding: '0px', margin: '0px', borderSpacing: '0px' }}>
+            <tbody style={{ padding: '0px', margin: '0px' }}>
               {rowIndexes.map(rowIndex => (
                 <HexRow key={rowIndex} store={store} rowIndex={rowIndex} Tag="tr" />
               ))}
             </tbody>
           </table>
-          <div className={classes.spacer} />
+          <div style={{ flex: 1 }} />
           <HexScrollBar store={store} />
         </>
       ) : (
@@ -135,7 +99,6 @@ const HexTableBody = memo(({ store }: StoreProps) => {
 });
 
 const HexWindowBody = memo(({ store }: StoreProps) => {
-  const classes = useHexStyles();
   const {
     onBodyInit,
     onBodyRefInit,
@@ -149,8 +112,8 @@ const HexWindowBody = memo(({ store }: StoreProps) => {
   } = useDispatch();
   const { dispatch } = useStore();
 
-  const listRef = React.useRef<FixedSizeListProps<unknown>>(null);
-  const bodyRef = React.useRef<HTMLDivElement>(null);
+  const listRef = useRef<FixedSizeListProps<unknown>>(null);
+  const bodyRef = useRef<HTMLDivElement>(null);
 
   useEventListener('keydown', (event: KeyboardEvent) => onCursorKeyDown({ event }, { store }));
   useEventListener('keydown', (event: KeyboardEvent) => onCopyKeyDown(undefined, { event, store }));
@@ -208,7 +171,7 @@ const HexWindowBody = memo(({ store }: StoreProps) => {
         <List
           ref={listRef}
           innerRef={bodyRef}
-          className={clsx(classes.root)}
+          className="hex-viewer-root"
           height={height}
           width={width}
           itemSize={LAYOUT_SIZE.rowHeight}

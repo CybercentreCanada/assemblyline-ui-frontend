@@ -3,8 +3,8 @@ import type { File } from 'components/models/base/file';
 import type { PromoteTo } from 'components/models/base/result';
 import type { SectionBody } from 'components/models/base/result_body';
 import type { Submission } from 'components/models/base/submission';
-import type { Tags } from './file';
-import type { SubmissionSummary } from './submission';
+import type { Tags } from 'components/models/ui/file';
+import type { SubmissionSummary } from 'components/models/ui/submission';
 
 /** */
 export type TPromotedSection = SectionBody & {
@@ -24,7 +24,7 @@ export type TAttack = {
   files: TAttackFile[];
 };
 
-export type TAttackMatrix = { [attack: string]: TAttack };
+export type TAttackMatrix = Record<string, TAttack>;
 
 export type TSubmissionTags = {
   attributions: Tags;
@@ -56,7 +56,7 @@ export type SubmissionReport = Pick<
 > &
   Pick<SubmissionSummary, 'heuristic_name_map' | 'heuristic_sections' | 'heuristics'> & {
     /** ATT&CK Matrix object */
-    attack_matrix: { [category: string]: TAttackMatrix };
+    attack_matrix: Record<string, TAttackMatrix>;
     file_info: File;
     file_tree: string;
 
