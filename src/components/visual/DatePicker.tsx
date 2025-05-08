@@ -1,4 +1,5 @@
 import EventIcon from '@mui/icons-material/Event';
+import type { TextFieldProps } from '@mui/material';
 import { Button, Dialog, DialogActions, IconButton, Tooltip, useTheme } from '@mui/material';
 import { LocalizationProvider, DatePicker as MuiDatePicker, StaticDatePicker } from '@mui/x-date-pickers';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
@@ -13,6 +14,7 @@ export type DatePickerProps = {
   tooltip?: string;
   type?: 'button' | 'input';
   defaultDateOffset?: number | null;
+  textFieldProps?: TextFieldProps;
   minDateTomorrow?: boolean;
   maxDateToday?: boolean;
   disabled?: boolean;
@@ -24,6 +26,7 @@ function WrappedDatePicker({
   tooltip = null,
   type = 'button',
   defaultDateOffset = null,
+  textFieldProps = null,
   minDateTomorrow = false,
   maxDateToday = false,
   disabled = false
@@ -124,7 +127,8 @@ function WrappedDatePicker({
           slotProps={{
             textField: {
               size: 'small',
-              label: tooltip ? tooltip : null
+              label: tooltip ? tooltip : null,
+              ...textFieldProps
             }
           }}
         />
