@@ -28,7 +28,7 @@ const WrappedMetadataSection: React.FC<MetadataSectionProps> = ({ metadata, noco
               </Grid>
             </Grid>
           ))
-        : [...Array(3)].map((_, i) => (
+        : Array.from({ length: 3 }).map((_, i) => (
             <Grid container key={i} spacing={1}>
               <Grid size={{ xs: 12, sm: 3, lg: 2 }}>
                 <Skeleton style={{ height: '2rem' }} />

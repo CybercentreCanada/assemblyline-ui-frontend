@@ -29,7 +29,7 @@ type Props = {
 };
 
 const WrappedSafelistTable: React.FC<Props> = ({ safelistResults, setSafelistID = null, allowSort = true }) => {
-  const { t, i18n } = useTranslation(['search']);
+  const { t } = useTranslation(['search']);
   const { c12nDef } = useALContext();
 
   return safelistResults ? (

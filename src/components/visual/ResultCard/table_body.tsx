@@ -88,7 +88,7 @@ const WrappedTblBody = ({ body, printable, order }: Props) => {
           stickyHeader
           size="small"
           sx={{
-            root: {
+            ['&.MuiTable-root']: {
               [theme.breakpoints.down('sm')]: {
                 width: printable ? '100%' : 'max-content'
               }

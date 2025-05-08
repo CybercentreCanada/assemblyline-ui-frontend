@@ -69,7 +69,7 @@ const WrappedFileTreeSection: React.FC<FileTreeSectionProps> = ({ tree, sid, bas
           {tree !== null ? (
             <FileTree tree={tree} sid={sid} force={force} defaultForceShown={forcedShown} />
           ) : (
-            [...Array(3)].map((_, i) => (
+            Array.from({ length: 3 }).map((_, i) => (
               <div style={{ display: 'flex' }} key={i}>
                 <Skeleton style={{ height: '2rem', width: '1.5rem', marginRight: '0.5rem' }} />
                 <Skeleton style={{ flexGrow: 1 }} />

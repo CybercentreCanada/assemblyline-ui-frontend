@@ -567,7 +567,7 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
               </>
             ) : (
               <div style={{ display: 'inline-flex' }}>
-                {[...Array(5)].map((_, i) => (
+                {Array.from({ length: 5 }).map((_, i) => (
                   <Skeleton
                     key={i}
                     variant="circular"

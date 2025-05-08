@@ -31,7 +31,7 @@ const WrappedResultSection: React.FC<Props> = ({ results, sid, alternates, force
               force={force}
             />
           ))
-        : [...Array(2)].map((_, i) => (
+        : Array.from({ length: 2 }).map((_, i) => (
             <Skeleton
               variant="rectangular"
               key={i}

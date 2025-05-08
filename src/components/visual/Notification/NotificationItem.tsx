@@ -195,12 +195,12 @@ const WrappedNotificationItem = ({ notification = null, hideDivider = false }: P
           </Header>
           {notification.content_md && notification.content_md !== '' ? (
             <Content>
-              <Markdown
-                // TODO: check this
-                // className={classes.description}
-                components={{ a: props => <Link href={props.href}>{props.children}</Link> }}
-                children={notification.content_md}
-              />
+              <Description variant="body2" color="textPrimary">
+                <Markdown
+                  components={{ a: props => <Link href={props.href}>{props.children}</Link> }}
+                  children={notification.content_md}
+                />
+              </Description>
             </Content>
           ) : notification.content_html && notification.content_html !== '' ? (
             <Content>

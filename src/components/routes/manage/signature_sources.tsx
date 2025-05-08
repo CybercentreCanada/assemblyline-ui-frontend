@@ -681,7 +681,7 @@ export default function SignatureSources() {
                 defaultPattern={sources[key].default_pattern}
               />
             ))
-          : [...Array(2)].map((item, i) => (
+          : Array.from({ length: 2 }).map((item, i) => (
               <div key={i} style={{ marginTop: theme.spacing(2) }}>
                 <Typography variant="h6" style={{ marginTop: theme.spacing(0.5), marginBottom: theme.spacing(0.5) }}>
                   <Skeleton />

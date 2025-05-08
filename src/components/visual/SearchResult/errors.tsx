@@ -32,7 +32,7 @@ type Props = {
 };
 
 const WrappedErrorsTable: React.FC<Props> = ({ errorResults, setErrorKey = null, allowSort = true }) => {
-  const { t, i18n } = useTranslation(['adminErrorViewer']);
+  const { t } = useTranslation(['adminErrorViewer']);
   const theme = useTheme();
 
   const errorMap: Record<ErrorType, ReactElement> = {

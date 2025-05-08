@@ -27,7 +27,7 @@ type Props = {
 };
 
 const WrappedHeuristicsTable: React.FC<Props> = ({ heuristicResults, setHeuristicID = null, allowSort = true }) => {
-  const { t, i18n } = useTranslation(['search']);
+  const { t } = useTranslation(['search']);
   const { c12nDef } = useALContext();
 
   return heuristicResults ? (

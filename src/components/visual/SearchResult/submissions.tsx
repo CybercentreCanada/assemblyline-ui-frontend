@@ -33,7 +33,7 @@ type Props = {
 };
 
 const WrappedSubmissionsTable: React.FC<Props> = ({ submissionResults, allowSort = true }) => {
-  const { t, i18n } = useTranslation(['search']);
+  const { t } = useTranslation(['search']);
   const { c12nDef } = useALContext();
   const searchParams = useSearchParams<SubmissionParams>();
 

@@ -88,7 +88,7 @@ function WrappedAttack({ report }: AttackProps) {
             ? Object.keys(report.attack_matrix).map((att, i) => (
                 <AttackMatrixBlock key={i} attack={att} items={report.attack_matrix[att]} />
               ))
-            : [...Array(5)].map((_, i) => <AttackMatrixSkel key={i} />)}
+            : Array.from({ length: 5 }).map((_, i) => <AttackMatrixSkel key={i} />)}
         </div>
       </div>
     )

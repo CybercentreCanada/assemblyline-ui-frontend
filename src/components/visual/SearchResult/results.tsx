@@ -29,7 +29,7 @@ type Props = {
 };
 
 const WrappedResultsTable: React.FC<Props> = ({ resultResults, component = Paper, allowSort = true }) => {
-  const { t, i18n } = useTranslation(['search']);
+  const { t } = useTranslation(['search']);
   const { c12nDef } = useALContext();
   const theme = useTheme();
   const location = useLocation();

@@ -127,7 +127,8 @@ function WrappedDatePicker({
           slotProps={{
             textField: {
               size: 'small',
-              label: tooltip ? tooltip : null
+              label: tooltip ? tooltip : null,
+              ...textFieldProps
             }
           }}
         />

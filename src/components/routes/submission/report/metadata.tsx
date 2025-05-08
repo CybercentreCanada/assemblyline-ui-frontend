@@ -139,7 +139,7 @@ function WrappedMetadata({ report }: Props) {
             ) : (
               <table width="100%">
                 <tbody>
-                  {[...Array(3)].map((_, i) => (
+                  {Array.from({ length: 3 }).map((_, i) => (
                     <tr key={i} style={{ width: '100%' }}>
                       <td width="33%">
                         <Skeleton />

@@ -34,7 +34,7 @@ const WrappedRetrohuntTable: React.FC<Props> = ({
   onRowClick = null,
   onSort = () => null
 }) => {
-  const { t, i18n } = useTranslation(['search']);
+  const { t } = useTranslation(['search']);
   const location = useLocation();
   const { c12nDef } = useALContext();
 

@@ -266,7 +266,7 @@ const WrappedDetection: React.FC<DetectionProps> = ({
               </div>
             ) : null;
           })
-        : [...Array(3)].map((_, i) => <Skeleton key={i} style={{ height: '3rem' }} />)}
+        : Array.from({ length: 3 }).map((_, i) => <Skeleton key={i} style={{ height: '3rem' }} />)}
     </SectionContainer>
   );
 };

@@ -196,7 +196,7 @@ type EnrichmentResultProps = {
 const WrappedEnrichmentResult: React.FC<EnrichmentResultProps> = ({ num, enrichmentResult, count }) => {
   const { t } = useTranslation();
   const theme = useTheme();
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState<boolean>(true);
 
   let verdict = 'info';
   if (enrichmentResult.malicious === false) {
@@ -314,14 +314,14 @@ const EnrichmentResult = React.memo(WrappedEnrichmentResult);
 const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, value, round }) => {
   const theme = useTheme();
   const { t } = useTranslation();
-  const [openedDialog, setOpenedDialog] = useState(false);
-  const [tabState, setTabState] = useState(0);
+  const [openedDialog, setOpenedDialog] = useState<boolean>(false);
+  const [tabState, setTabState] = useState<number>(0);
   const { c12nDef } = useALContext();
 
   const { enrichmentState, isActionable, getKey } = useExternalLookup();
   const actionable = isActionable(category, type, value);
   const externalLookupResults = enrichmentState[getKey(type, value)];
-  const [inProgress, setInProgress] = useState(false);
+  const [inProgress, setInProgress] = useState<boolean>(false);
   const titleId = openedDialog ? 'external-result-dialog-title' : undefined;
   const descriptionId = openedDialog ? 'external-result-dialog-description' : undefined;
 
