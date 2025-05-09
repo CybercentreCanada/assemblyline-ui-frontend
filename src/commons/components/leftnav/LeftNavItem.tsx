@@ -18,10 +18,10 @@ const LeftNavItemInner = ({ item, context, popover, hideIcon, label, leftnavOpen
   const nested = item.nested !== undefined ? item.nested : context === 'group';
   const showIcon = useMemo(() => item.icon && !hideIcon, [item, hideIcon]);
 
-  const spacer = useMemo(() => {
-    const showSpacer = !popover && leftnavOpen && nested;
-    return showSpacer && <Box id="spacer" sx={{ marginLeft: theme.spacing(showIcon ? 2 : 7) }} />;
-  }, [nested, showIcon, theme, leftnavOpen, popover]);
+  const spacer = useMemo(
+    () => (!nested ? null : <Box id="spacer" sx={{ marginLeft: theme.spacing(2) }} />),
+    [nested, theme]
+  );
 
   const itemIcon = useMemo(() => {
     const showNested = !popover && context === 'group' && nested;
@@ -61,6 +61,7 @@ const LeftNavItem = ({ item, context = 'item', popover = false, hideIcon = false
             component={route ? Link : ListItemButton}
             target={item.target}
             to={route}
+            dense={!!nested}
             key={text}
             onClick={onClick ? onClick : null}
           >
