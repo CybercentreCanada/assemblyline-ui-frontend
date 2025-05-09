@@ -19,7 +19,7 @@ const LeftNavItemInner = ({ item, context, popover, hideIcon, label, leftnavOpen
   const showIcon = useMemo(() => item.icon && !hideIcon, [item, hideIcon]);
 
   const spacer = useMemo(
-    () => (!nested ? null : <Box id="spacer" sx={{ marginLeft: theme.spacing(3) }} />),
+    () => (!nested ? null : <Box id="spacer" sx={{ marginLeft: theme.spacing(2) }} />),
     [nested, theme]
   );
 
