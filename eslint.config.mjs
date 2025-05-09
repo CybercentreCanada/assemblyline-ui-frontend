@@ -104,10 +104,10 @@ export default tseslint.config(
     rules: {
       ...config.rules,
       ...typescriptRules,
-      '@stylistic/quote-props': 'off',
+      '@stylistic/indent': 'off',
       '@stylistic/jsx-curly-brace-presence': 'off',
       '@stylistic/operator-linebreak': 'off',
-      '@stylistic/indent': 'off'
+      '@stylistic/quote-props': 'off'
     }
   })),
 
@@ -233,6 +233,7 @@ export default tseslint.config(
       'react/jsx-wrap-multilines': 'off',
       'react/no-array-index-key': 'off',
       'react/no-children-prop': 'off',
+      'react/no-deprecated': 'warn',
       'react/prop-types': 'off',
       'react/react-in-jsx-scope': 'off'
     }
@@ -250,8 +251,8 @@ export default tseslint.config(
     },
     rules: {
       'no-async-promise-executor': 'off',
-      'no-extra-boolean-cast': 'off',
       'no-console': 'warn',
+      'no-extra-boolean-cast': 'off',
       'no-param-reassign': 'warn',
       'no-prototype-builtins': 'warn',
       'no-unsafe-optional-chaining': 'warn',
