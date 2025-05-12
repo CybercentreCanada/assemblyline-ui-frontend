@@ -38,7 +38,7 @@ export type ProfileParam<T> = {
 export type ProfileSettings = {
   [K in keyof Pick<UserSettings, InterfaceKey>]: { value: UserSettings[K]; prev: UserSettings[K] };
 } & {
-  [K in keyof Pick<UserSettings, ProfileKey>]: ProfileParam<UserSettings[K] | ProfileParam<null>>;
+  [K in keyof Pick<UserSettings, ProfileKey>]: ProfileParam<UserSettings[K]> | ProfileParam<null>;
 } & {
   services: ({
     [K in keyof Omit<UserSettings['services'][number], 'services'>]: UserSettings['services'][number][K];
