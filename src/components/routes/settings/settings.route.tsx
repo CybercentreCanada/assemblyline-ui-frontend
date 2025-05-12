@@ -19,7 +19,7 @@ import {
 } from 'components/routes/settings/settings.utils';
 import { PageLayout } from 'components/visual/Layouts/PageLayout';
 import React, { useCallback, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router';
+import { useParams } from 'react-router';
 
 type Params = {
   tab: SettingsStore['state']['tab'];
@@ -27,7 +27,6 @@ type Params = {
 
 const WrappedSettingsRoute = () => {
   const form = useForm();
-  const navigate = useNavigate();
   const { apiCall } = useMyAPI();
   const { rootRef, headerRef } = useTableOfContent();
   const { tab: tabParam } = useParams<Params>();
