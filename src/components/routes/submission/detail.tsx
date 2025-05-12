@@ -543,9 +543,10 @@ function WrappedSubmissionDetail() {
   }, [resetLiveMode, showSuccessMessage, submission, t]);
 
   const resubmitWithType = useCallback(
-    (resubmit_type: string) => {
+    (resubmit_type: string, isProfile: boolean) => {
       if (submission != null) {
         apiCall<Submission>({
+          method: isProfile ? 'PUT' : 'GET',
           url: `/api/v4/submit/${resubmit_type}/${submission.files[0].sha256}/?copy_sid=${submission.sid}`,
           onSuccess: api_data => {
             showSuccessMessage(t('submit.success'));
@@ -1280,7 +1281,7 @@ function WrappedSubmissionDetail() {
                                 </ListItemIcon>
                                 <ListItemText primary={t('resubmit.modify')} />
                               </ListItemButton>
-                              <ListItemButton dense onClick={() => resubmitWithType('dynamic')}>
+                              <ListItemButton dense onClick={() => resubmitWithType('dynamic', false)}>
                                 <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
                                   <OndemandVideoOutlinedIcon />
                                 </ListItemIcon>
@@ -1288,7 +1289,7 @@ function WrappedSubmissionDetail() {
                               </ListItemButton>
                               {submissionProfiles &&
                                 Object.entries(submissionProfiles).map(([name, display]) => (
-                                  <ListItemButton key={name} dense onClick={() => resubmitWithType(name)}>
+                                  <ListItemButton key={name} dense onClick={() => resubmitWithType(name, true)}>
                                     <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
                                       <OndemandVideoOutlinedIcon />
                                     </ListItemIcon>
