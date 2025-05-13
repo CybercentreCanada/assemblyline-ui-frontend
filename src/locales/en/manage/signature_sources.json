@@ -49,6 +49,7 @@
   "update_all.response.success": "All sources for the following service were triggered for update",
   "update_interval": "Update interval",
   "uri": "URI",
+  "use_managed_identity": "Use managed identity",
   "username": "Username",
   "view_signatures": "View Signatures"
 }

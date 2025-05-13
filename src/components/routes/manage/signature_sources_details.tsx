@@ -382,49 +382,79 @@ const WrappedSourceDetail = ({
                         />
                       </Grid>
                     )}
-                    <Grid size={{ xs: 12, md: 6 }}>
-                      <Label>
-                        {t('username')}
-                        <ResetButton service={source} defaults={defaults} field="username" reset={resetField} />
-                      </Label>
-                      <TextField
-                        id="username"
-                        size="small"
-                        value={source.username}
-                        fullWidth
-                        variant="outlined"
-                        onChange={handleFieldChange}
-                      />
-                    </Grid>
-                    <Grid size={{ xs: 12, md: 6 }}>
-                      <Label>
-                        {t('password')}
-                        <ResetButton service={source} defaults={defaults} field="password" reset={resetField} />
-                      </Label>
-                      <TextField
-                        autoComplete="new-password"
-                        id="password"
-                        size="small"
-                        value={source.password}
-                        fullWidth
-                        variant="outlined"
-                        onChange={handleFieldChange}
-                        type={showPassword ? 'text' : 'password'}
-                        InputProps={{
-                          endAdornment: (
-                            <InputAdornment position="end">
-                              <IconButton
-                                aria-label={showPassword ? 'hide the password' : 'display the password'}
-                                onClick={() => setShowPassword(!showPassword)}
-                                edge="end"
-                              >
-                                {showPassword ? <VisibilityOff /> : <Visibility />}
-                              </IconButton>
-                            </InputAdornment>
-                          )
-                        }}
-                      />
-                    </Grid>
+                    {gitFetch && (
+                      <Grid size={{ xs: 12 }}>
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              id="use_managed_identity"
+                              size="small"
+                              checked={source.use_managed_identity}
+                              name="label"
+                              onChange={handleFieldChange}
+                            />
+                          }
+                          label={
+                            <Typography variant="body2">
+                              {t('use_managed_identity')}
+                              <ResetButton
+                                service={source}
+                                defaults={defaults}
+                                field="use_managed_identity"
+                                reset={resetField}
+                              />
+                            </Typography>
+                          }
+                        />
+                      </Grid>
+                    )}
+                    {source.use_managed_identity === false && (
+                      <>
+                        <Grid size={{ xs: 12, md: 6 }}>
+                          <Label>
+                            {t('username')}
+                            <ResetButton service={source} defaults={defaults} field="username" reset={resetField} />
+                          </Label>
+                          <TextField
+                            id="username"
+                            size="small"
+                            value={source.username}
+                            fullWidth
+                            variant="outlined"
+                            onChange={handleFieldChange}
+                          />
+                        </Grid>
+                        <Grid size={{ xs: 12, md: 6 }}>
+                          <Label>
+                            {t('password')}
+                            <ResetButton service={source} defaults={defaults} field="password" reset={resetField} />
+                          </Label>
+                          <TextField
+                            autoComplete="new-password"
+                            id="password"
+                            size="small"
+                            value={source.password}
+                            fullWidth
+                            variant="outlined"
+                            onChange={handleFieldChange}
+                            type={showPassword ? 'text' : 'password'}
+                            InputProps={{
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  <IconButton
+                                    aria-label={showPassword ? 'hide the password' : 'display the password'}
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    edge="end"
+                                  >
+                                    {showPassword ? <VisibilityOff /> : <Visibility />}
+                                  </IconButton>
+                                </InputAdornment>
+                              )
+                            }}
+                          />
+                        </Grid>
+                      </>
+                    )}
                     <Grid size={{ xs: 12 }}>
                       <Label>
                         {t('private_key')}
