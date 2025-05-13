@@ -49,6 +49,7 @@
   "update_all.response.success": "Toutes les sources du service suivant ont été déclenchées pour la mise à jour",
   "update_interval": "Intervalle de mise à jour",
   "uri": "URI",
+  "use_managed_identity": "Utiliser managed identity",
   "username": "Nom d'utilisateur",
   "view_signatures": "Afficher les signatures"
 }
