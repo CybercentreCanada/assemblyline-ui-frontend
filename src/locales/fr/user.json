@@ -13,7 +13,7 @@
   "2fa_temp_otp": "Entrez le jeton OTP temporaire",
   "api_daily_quota": "Quota d'API quotidien",
   "api_daily_quota_edit_title": "Nombre maximum d'appels API que l'utilisateur est autorisé à émettre par jour.",
-  "api_quota": "Quota d'API",
+  "api_quota": "Limite de simultanéité de l'API",
   "api_quota_edit_title": "Nombre maximum d'appels d'API simultanés qui peuvent s'exécuter à l'intérieur du serveur d'API. C'est l'équivalent du nombre de threads qu'un script exécuté sous votre compte peut avoir connecté au serveur API simultanément.",
   "apikeys": "Gérer les clés d'API",
   "apikeys.add": "Ajouter une clé d'API",
