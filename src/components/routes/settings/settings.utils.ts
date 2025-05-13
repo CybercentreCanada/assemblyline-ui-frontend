@@ -200,10 +200,10 @@ export const loadSubmissionProfile = (
   Object.keys(out).forEach((key: ProfileKey) => {
     if (PROFILE_KEYS.includes(key)) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      out[key].value = settings?.submission_profiles?.[name]?.[key] || settings[key];
+      out[key].value = settings?.submission_profiles?.[name]?.[key];
       out[key].restricted = !customize && profiles?.[name]?.restricted_params?.submission?.includes(key);
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      out[key].default = profiles?.[name]?.params?.[key] || settings[key];
+      out[key].default = profiles?.[name]?.params?.[key] || out[key].value;
       out[key].prev = out[key].value;
     }
   });
