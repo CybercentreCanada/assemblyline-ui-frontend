@@ -16,7 +16,7 @@ export const PasswordInput = React.memo(() => {
           state.values.state.phase === 'loading',
           state.values.state.disabled,
           state.values.state.phase === 'editing',
-          state.values.settings.initial_data.value?.passwords || ''
+          state.values.settings.initial_data.value?.passwords || []
         ] as const
       }
       children={([loading, disabled, isEditing, passwords]) => (
@@ -28,7 +28,7 @@ export const PasswordInput = React.memo(() => {
           disabled={disabled || !isEditing}
           onChange={(e, v) => {
             form.setFieldValue('settings.initial_data.value', s => {
-              s.passwords = v;
+              s.passwords = [v];
               return s;
             });
           }}
