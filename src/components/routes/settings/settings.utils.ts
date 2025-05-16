@@ -91,24 +91,24 @@ export const initializeSettings = (settings: UserSettings): ProfileSettings => {
 
   // Applying the services parameter
   out.services = settings.services
-    // .sort((a, b) => a.name.localeCompare(b.name))
+    .sort((a, b) => a.name.localeCompare(b.name))
     .map(category => ({
       ...category,
       default: false,
       prev: category.selected,
       restricted: true,
       services: category.services
-        // .sort((a, b) => a.name.localeCompare(b.name))
+        .sort((a, b) => a.name.localeCompare(b.name))
         .map(service => ({ ...service, default: false, prev: service.selected, restricted: true }))
     }));
 
   // Applying the service spec parameters
   out.service_spec = settings.service_spec
-    // .sort((a, b) => a.name.localeCompare(b.name))
+    .sort((a, b) => a.name.localeCompare(b.name))
     .map(spec => ({
       ...spec,
       params: spec.params
-        // .sort((a, b) => a.name.localeCompare(b.name))
+        .sort((a, b) => a.name.localeCompare(b.name))
         .map(param => ({ ...param, prev: param.value, restricted: true }))
     }));
 
