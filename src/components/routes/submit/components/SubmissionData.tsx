@@ -23,7 +23,7 @@ export const PasswordInput = React.memo(() => {
         <TextInput
           label={t('data.password.label')}
           tooltip={t('data.password.tooltip')}
-          value={passwords as string}
+          value={(passwords ? passwords[0] : '') as string}
           loading={loading}
           disabled={disabled || !isEditing}
           onChange={(e, v) => {
