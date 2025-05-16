@@ -113,7 +113,7 @@ export const initializeSettings = (settings: UserSettings): ProfileSettings => {
     }));
 
   // Applying the initial data
-  out.initial_data = { value: { password: '' }, prev: { password: '' } };
+  out.initial_data = { value: { passwords: [] }, prev: { passwords: [] } };
 
   return out;
 };
@@ -171,7 +171,7 @@ export const loadDefaultProfile = (out: ProfileSettings, settings: UserSettings,
   });
 
   // Applying the initial data
-  out.initial_data = { value: { password: '' }, prev: { password: '' } };
+  out.initial_data = { value: { passwords: [] }, prev: { passwords: [] } };
   out.description = { value: null, prev: null, default: null, restricted: false };
   out.malicious = { value: false, prev: false };
 
@@ -252,7 +252,7 @@ export const loadSubmissionProfile = (
   });
 
   // Applying the initial data
-  out.initial_data = { value: { password: '' }, prev: { password: '' } };
+  out.initial_data = { value: { passwords: [] }, prev: { passwords: [] } };
   out.description = { value: null, prev: null, default: null, restricted: false };
   out.malicious = { value: false, prev: false };
 
