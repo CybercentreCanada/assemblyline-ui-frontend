@@ -16,19 +16,19 @@ export const PasswordInput = React.memo(() => {
           state.values.state.phase === 'loading',
           state.values.state.disabled,
           state.values.state.phase === 'editing',
-          state.values.settings.initial_data.value?.password || ''
+          state.values.settings.initial_data.value?.passwords || ''
         ] as const
       }
-      children={([loading, disabled, isEditing, password]) => (
+      children={([loading, disabled, isEditing, passwords]) => (
         <TextInput
           label={t('data.password.label')}
           tooltip={t('data.password.tooltip')}
-          value={password as string}
+          value={passwords as string}
           loading={loading}
           disabled={disabled || !isEditing}
           onChange={(e, v) => {
             form.setFieldValue('settings.initial_data.value', s => {
-              s.password = v;
+              s.passwords = v;
               return s;
             });
           }}
