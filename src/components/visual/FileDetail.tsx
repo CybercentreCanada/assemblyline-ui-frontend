@@ -163,8 +163,9 @@ const WrappedFileDetail: React.FC<Props> = ({
   };
 
   const resubmit = useCallback(
-    (resubmit_type: string) => {
+    (resubmit_type: string, isProfile: boolean) => {
       apiCall<Submission>({
+        method: isProfile ? 'PUT' : 'GET',
         url: `/api/v4/submit/${resubmit_type}/${sha256}/${sid ? `?copy_sid=${sid}` : ''}`,
         onSuccess: api_data => {
           showSuccessMessage(t('resubmit.success'));
@@ -499,7 +500,7 @@ const WrappedFileDetail: React.FC<Props> = ({
                           </ListItemIcon>
                           <ListItemText primary={t('resubmit.modify')} />
                         </ListItemButton>
-                        <ListItemButton dense onClick={() => resubmit('dynamic')}>
+                        <ListItemButton dense onClick={() => resubmit('dynamic', false)}>
                           <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
                             <OndemandVideoOutlinedIcon />
                           </ListItemIcon>
@@ -507,7 +508,7 @@ const WrappedFileDetail: React.FC<Props> = ({
                         </ListItemButton>
                         {submissionProfiles &&
                           Object.entries(submissionProfiles).map(([name, display]) => (
-                            <ListItemButton key={name} dense onClick={() => resubmit(name)}>
+                            <ListItemButton key={name} dense onClick={() => resubmit(name, true)}>
                               <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
                                 <OndemandVideoOutlinedIcon />
                               </ListItemIcon>

@@ -38,7 +38,7 @@ export type ProfileParam<T> = {
 export type ProfileSettings = {
   [K in keyof Pick<UserSettings, InterfaceKey>]: { value: UserSettings[K]; prev: UserSettings[K] };
 } & {
-  [K in keyof Pick<UserSettings, ProfileKey>]: ProfileParam<UserSettings[K]>;
+  [K in keyof Pick<UserSettings, ProfileKey>]: ProfileParam<UserSettings[K]> | ProfileParam<null>;
 } & {
   services: ({
     [K in keyof Omit<UserSettings['services'][number], 'services'>]: UserSettings['services'][number][K];
@@ -85,38 +85,35 @@ export const initializeSettings = (settings: UserSettings): ProfileSettings => {
     }
   });
 
-  // Applying the profile parameters
-  Object.entries(settings).forEach(([key, value]: [string, unknown]) => {
-    if (PROFILE_KEYS.includes(key as ProfileKey)) {
-      out[key] = { default: value, value: value, prev: value, restricted: true };
-    }
+  Object.entries(PROFILE_KEYS).forEach(([_, key]) => {
+    out[key] = { default: null, value: null, prev: null, restricted: true };
   });
 
   // Applying the services parameter
   out.services = settings.services
-    // .sort((a, b) => a.name.localeCompare(b.name))
+    .sort((a, b) => a.name.localeCompare(b.name))
     .map(category => ({
       ...category,
       default: false,
       prev: category.selected,
       restricted: true,
       services: category.services
-        // .sort((a, b) => a.name.localeCompare(b.name))
+        .sort((a, b) => a.name.localeCompare(b.name))
         .map(service => ({ ...service, default: false, prev: service.selected, restricted: true }))
     }));
 
   // Applying the service spec parameters
   out.service_spec = settings.service_spec
-    // .sort((a, b) => a.name.localeCompare(b.name))
+    .sort((a, b) => a.name.localeCompare(b.name))
     .map(spec => ({
       ...spec,
       params: spec.params
-        // .sort((a, b) => a.name.localeCompare(b.name))
+        .sort((a, b) => a.name.localeCompare(b.name))
         .map(param => ({ ...param, prev: param.value, restricted: true }))
     }));
 
   // Applying the initial data
-  out.initial_data = { value: { password: '' }, prev: { password: '' } };
+  out.initial_data = { value: { passwords: [] }, prev: { passwords: [] } };
 
   return out;
 };
@@ -125,21 +122,13 @@ export const loadDefaultProfile = (out: ProfileSettings, settings: UserSettings,
   if (!settings || !settings?.submission_profiles?.default) return out;
 
   const customize = user.is_admin || user.roles.includes('submission_customize');
-
-  // Applying interface parameters
-  Object.entries(settings).forEach(([key, value]) => {
-    if (INTERFACE_KEYS.includes(key as InterfaceKey)) {
-      out[key] = { value: value, prev: value };
-    }
-  });
-
   // Applying the profile parameters
-  Object.keys(settings).forEach((key: ProfileKey) => {
+  Object.keys(settings.submission_profiles.default).forEach((key: ProfileKey) => {
     if (PROFILE_KEYS.includes(key)) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      out[key].value = settings?.submission_profiles?.default?.[key] || settings[key];
+      out[key].value = settings.submission_profiles.default?.[key];
       out[key].restricted = !customize;
-      out[key].default = settings[key];
+      out[key].default = settings.submission_profiles.default?.[key];
       out[key].prev = out[key].value;
     }
   });
@@ -182,7 +171,7 @@ export const loadDefaultProfile = (out: ProfileSettings, settings: UserSettings,
   });
 
   // Applying the initial data
-  out.initial_data = { value: { password: '' }, prev: { password: '' } };
+  out.initial_data = { value: { passwords: [] }, prev: { passwords: [] } };
   out.description = { value: null, prev: null, default: null, restricted: false };
   out.malicious = { value: false, prev: false };
 
@@ -211,10 +200,10 @@ export const loadSubmissionProfile = (
   Object.keys(out).forEach((key: ProfileKey) => {
     if (PROFILE_KEYS.includes(key)) {
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      out[key].value = settings?.submission_profiles?.[name]?.[key] || settings[key];
+      out[key].value = settings?.submission_profiles?.[name]?.[key];
       out[key].restricted = !customize && profiles?.[name]?.restricted_params?.submission?.includes(key);
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      out[key].default = profiles?.[name]?.params?.[key] || settings[key];
+      out[key].default = profiles?.[name]?.params?.[key] || out[key].value;
       out[key].prev = out[key].value;
     }
   });
@@ -263,7 +252,7 @@ export const loadSubmissionProfile = (
   });
 
   // Applying the initial data
-  out.initial_data = { value: { password: '' }, prev: { password: '' } };
+  out.initial_data = { value: { passwords: [] }, prev: { passwords: [] } };
   out.description = { value: null, prev: null, default: null, restricted: false };
   out.malicious = { value: false, prev: false };
 
@@ -281,10 +270,6 @@ export const parseSubmissionProfile = (
   const out = structuredClone(settings);
   const params = {} as SubmissionProfileParams;
 
-  // Applying the description and malicious
-  out.description = profile.description.value;
-  out.malicious = profile.malicious.value;
-
   // Applying interface parameters
   Object.keys(out).forEach(key => {
     if (INTERFACE_KEYS.includes(key as InterfaceKey)) {
@@ -293,7 +278,7 @@ export const parseSubmissionProfile = (
   });
 
   // Applying the profile parameters
-  Object.keys(out).forEach(key => {
+  Object.keys(profile).forEach(key => {
     const p = profile[key] as ProfileSettings[ProfileKey];
     if (PROFILE_KEYS.includes(key as ProfileKey) && !p.restricted && p.value !== p.default) {
       params[key] = p.value;
@@ -370,11 +355,12 @@ export const hasDifferentPreviousSubmissionValues = (out: ProfileSettings): bool
   });
 
   // Applying the initial data
-  Object.keys(out.initial_data?.value || {}).forEach(k => {
-    if (out?.initial_data?.value?.[k] !== out.initial_data?.prev?.[k]) {
-      res = true;
-    }
-  });
+  if (
+    out?.initial_data?.value &&
+    JSON.stringify(out?.initial_data?.value) !== JSON.stringify(out?.initial_data?.prev)
+  ) {
+    res = true;
+  }
 
   return res;
 };
