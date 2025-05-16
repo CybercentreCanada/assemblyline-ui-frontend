@@ -355,11 +355,12 @@ export const hasDifferentPreviousSubmissionValues = (out: ProfileSettings): bool
   });
 
   // Applying the initial data
-  Object.keys(out.initial_data?.value || {}).forEach(k => {
-    if (out?.initial_data?.value?.[k] !== out.initial_data?.prev?.[k]) {
-      res = true;
-    }
-  });
+  if (
+    out?.initial_data?.value &&
+    JSON.stringify(out?.initial_data?.value) !== JSON.stringify(out?.initial_data?.prev)
+  ) {
+    res = true;
+  }
 
   return res;
 };
