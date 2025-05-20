@@ -229,8 +229,8 @@ export type SourceStatus = {
   ts: string;
 };
 
-/** Update Source Configuration */
-export type UpdateSource = {
+/** Common parts of Update Source Configuration */
+export type UpdateSourceCommon = {
   /** CA cert for source */
   ca_cert?: string;
 
@@ -252,7 +252,7 @@ export type UpdateSource = {
   /** Headers */
   headers: EnvironmentVariable[];
 
-  //* * Ignore caching */
+  /** Ignore caching */
   ignore_cache: boolean;
 
   /** Name of source */
@@ -260,9 +260,6 @@ export type UpdateSource = {
 
   /** Override signature classification with source */
   override_classification: boolean;
-
-  /** Password used to authenticate with source */
-  password?: string;
 
   /** Pattern used to find files of interest from source */
   pattern?: string;
@@ -279,7 +276,7 @@ export type UpdateSource = {
   /** Ignore SSL errors when reaching out to source? */
   ssl_ignore_errors: boolean;
 
-  /**  */
+  /** Source status */
   status: SourceStatus;
 
   /** Synchronize signatures with remote source. Allows system to auto-disable signatures no longer found in source. */
@@ -291,9 +288,23 @@ export type UpdateSource = {
   /** URI to source */
   uri: string;
 
-  /** Username used to authenticate with source */
-  username?: string;
+  /** Use managed identity to authenticate git pull*/
+  use_managed_identity: boolean;
 };
+
+/** Update Source Configuration with managed identity constraints */
+export type UpdateSource = UpdateSourceCommon &
+  (
+    | {
+        use_managed_identity: true;
+        fetch_method: 'GIT';
+      }
+    | {
+        use_managed_identity: false;
+        username?: string;
+        password?: string;
+      }
+  );
 
 /** Update Configuration for Signatures */
 export type UpdateConfig = {
@@ -471,5 +482,6 @@ export const DEFAULT_SOURCE: UpdateSource = {
     state: '',
     ts: ''
   },
-  sync: false
+  sync: false,
+  use_managed_identity: false
 };
