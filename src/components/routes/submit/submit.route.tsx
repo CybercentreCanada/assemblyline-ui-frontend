@@ -81,7 +81,7 @@ const LeftInnerPanel = styled('div')<AdjustProps>(({ theme }) => ({
   top: '64px',
   display: 'flex',
   flexDirection: 'column',
-  rowGap: theme.spacing(3),
+  rowGap: theme.spacing(2),
   justifyContent: 'start',
   [theme.breakpoints.down('md')]: {
     position: 'initial',
@@ -252,14 +252,6 @@ const WrappedSubmitRoute = () => {
 
                 <SubmissionProfileInput />
 
-                {loading ? null : (
-                  <>
-                    <MaliciousInput />
-                    <ExternalSources />
-                    <ExternalServices />
-                  </>
-                )}
-
                 <LeftPanelAction adjust={adjust}>
                   <CancelButton />
                   <div style={{ flex: 1 }} />
@@ -267,6 +259,14 @@ const WrappedSubmitRoute = () => {
                   <AdjustButton />
                   <AnalyzeSubmission />
                 </LeftPanelAction>
+
+                {loading ? null : (
+                  <>
+                    <MaliciousInput />
+                    <ExternalSources />
+                    <ExternalServices />
+                  </>
+                )}
 
                 <ToS />
               </LeftInnerPanel>
