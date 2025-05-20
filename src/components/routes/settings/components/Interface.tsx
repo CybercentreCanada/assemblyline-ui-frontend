@@ -84,13 +84,13 @@ export const InterfaceSection = React.memo(() => {
                   loading={loading}
                   disabled={disabled}
                   options={[
-                    ...(configuration.ui.allow_raw_downloads && [
-                      { value: 'raw', primary: t('interface.encoding_raw') }
-                    ]),
+                    ...(configuration.ui.allow_raw_downloads
+                      ? [{ value: 'raw', primary: t('interface.encoding_raw') }]
+                      : []),
                     { value: 'cart', primary: t('interface.encoding_cart') },
-                    ...(configuration.ui.allow_zip_downloads && [
-                      { value: 'zip', primary: t('interface.encoding_zip') }
-                    ])
+                    ...(configuration.ui.allow_zip_downloads
+                      ? [{ value: 'zip', primary: t('interface.encoding_zip') }]
+                      : [])
                   ]}
                   onChange={(event, v) =>
                     form.setFieldValue('settings.download_encoding.value', v as 'raw' | 'cart' | 'zip')

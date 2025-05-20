@@ -13,7 +13,7 @@
   "2fa_temp_otp": "Enter a temporary OTP Token",
   "api_daily_quota": "Daily API Quota",
   "api_daily_quota_edit_title": "Maximum number of API calls the user is allow to issue each day.",
-  "api_quota": "API Quota",
+  "api_quota": "API Concurrency Limit",
   "api_quota_edit_title": "Maximum number of concurrent API calls that can run inside the API server. It is the equivalent to the number of threads a script running under your account can have connected to the API server at the same time.",
   "apikeys": "Manage API Keys",
   "apikeys.add": "Add API Key",
