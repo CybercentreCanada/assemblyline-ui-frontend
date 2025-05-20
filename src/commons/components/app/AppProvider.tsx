@@ -13,6 +13,7 @@ import type { AppUser, AppUserService } from 'commons/components/app/AppUserServ
 import AppBarProvider from 'commons/components/app/providers/AppBarProvider';
 import AppBreadcrumbsProvider from 'commons/components/app/providers/AppBreadcrumbsProvider';
 import { AppDrawerProvider } from 'commons/components/app/providers/AppDrawerProvider';
+import { AppErrorProvider } from 'commons/components/app/providers/AppErrorProvider';
 import AppLayoutProvider from 'commons/components/app/providers/AppLayoutProvider';
 import AppLeftNavProvider from 'commons/components/app/providers/AppLeftNavProvider';
 import AppSnackbarProvider from 'commons/components/app/providers/AppSnackbarProvider';
@@ -68,35 +69,37 @@ export const AppProviderInner = <U extends AppUser>({
   return (
     <AppContext.Provider value={contextValue}>
       <AppStyledEngineProvider>
-        <AppUserProvider service={user}>
-          <AppSnackbarProvider>
-            <BorealisProvider baseURL={location.origin + '/api/v4/proxy/borealis'} getToken={() => null}>
-              <AppUserProvider service={user}>
-                <AssistantProvider>
-                  <HighlightProvider>
-                    <ExternalLookupProvider>
-                      <CarouselProvider>
-                        <AppDrawerProvider>
-                          <DrawerProvider>
-                            <AppBarProvider search={search}>
-                              <AppBreadcrumbsProvider>
-                                <AppLeftNavProvider>
-                                  <AppDrawerContainer>
-                                    <AppLayoutProvider>{children}</AppLayoutProvider>
-                                  </AppDrawerContainer>
-                                </AppLeftNavProvider>
-                              </AppBreadcrumbsProvider>
-                            </AppBarProvider>
-                          </DrawerProvider>
-                        </AppDrawerProvider>
-                      </CarouselProvider>
-                    </ExternalLookupProvider>
-                  </HighlightProvider>
-                </AssistantProvider>
-              </AppUserProvider>
-            </BorealisProvider>
-          </AppSnackbarProvider>
-        </AppUserProvider>
+        <AppErrorProvider>
+          <AppUserProvider service={user}>
+            <AppSnackbarProvider>
+              <BorealisProvider baseURL={location.origin + '/api/v4/proxy/borealis'} getToken={() => null}>
+                <AppUserProvider service={user}>
+                  <AssistantProvider>
+                    <HighlightProvider>
+                      <ExternalLookupProvider>
+                        <CarouselProvider>
+                          <AppDrawerProvider>
+                            <DrawerProvider>
+                              <AppBarProvider search={search}>
+                                <AppBreadcrumbsProvider>
+                                  <AppLeftNavProvider>
+                                    <AppDrawerContainer>
+                                      <AppLayoutProvider>{children}</AppLayoutProvider>
+                                    </AppDrawerContainer>
+                                  </AppLeftNavProvider>
+                                </AppBreadcrumbsProvider>
+                              </AppBarProvider>
+                            </DrawerProvider>
+                          </AppDrawerProvider>
+                        </CarouselProvider>
+                      </ExternalLookupProvider>
+                    </HighlightProvider>
+                  </AssistantProvider>
+                </AppUserProvider>
+              </BorealisProvider>
+            </AppSnackbarProvider>
+          </AppUserProvider>
+        </AppErrorProvider>
       </AppStyledEngineProvider>
     </AppContext.Provider>
   );
