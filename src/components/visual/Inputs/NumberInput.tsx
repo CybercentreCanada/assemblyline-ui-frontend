@@ -33,6 +33,7 @@ export type NumberInputProps = Omit<TextFieldProps, 'error' | 'value' | 'onChang
   tiny?: boolean;
   tooltip?: TooltipProps['title'];
   tooltipProps?: Omit<TooltipProps, 'children' | 'title'>;
+  unnullable?: boolean;
   value: number;
   onChange?: (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>, value: number) => void;
   onReset?: IconButtonProps['onClick'];
@@ -63,6 +64,7 @@ const WrappedNumberInput = ({
   tiny = false,
   tooltip,
   tooltipProps,
+  unnullable = false,
   value,
   onChange = () => null,
   onReset = () => null,
@@ -107,7 +109,7 @@ const WrappedNumberInput = ({
             type="number"
             size="small"
             fullWidth
-            value={value?.toString() || ''}
+            value={value === null ? '' : value?.toString()}
             disabled={disabled}
             error={!!errorValue}
             {...(readOnly && !disabled && { focused: null })}
@@ -152,16 +154,28 @@ const WrappedNumberInput = ({
               )
             }}
             onChange={event => {
-              let num = Number(event.target.value);
-              num = max ? Math.min(num, max) : num;
-              num = min ? Math.max(num, min) : num;
-              onChange(event, num);
+              const value = event.target.value;
 
-              const err = error(num);
-              if (err) onError(err);
+              if (!unnullable && (value === undefined || value === null || value === '')) {
+                onChange(event, null);
+
+                const err = error(null);
+                if (err) onError(null);
+              } else {
+                let num = Number(event.target.value);
+                num = max ? Math.min(num, max) : num;
+                num = min ? Math.max(num, min) : num;
+                onChange(event, num);
+
+                const err = error(num);
+                if (err) onError(err);
+              }
             }}
             onFocus={event => setFocused(document.activeElement === event.target)}
-            onBlur={() => setFocused(false)}
+            onBlur={event => {
+              setFocused(false);
+              textFieldProps?.onBlur(event);
+            }}
             sx={{
               ...(readOnly &&
                 !disabled && {
