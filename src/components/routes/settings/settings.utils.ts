@@ -264,7 +264,7 @@ export const parseSubmissionProfile = (
   profile: ProfileSettings,
   name: string
 ): UserSettings => {
-  if (!settings || !profile || !(name in settings.submission_profiles || name === 'interface')) return null;
+  if (!settings || !profile) return null;
 
   const profileName = name === 'interface' ? 'default' : name;
   const out = structuredClone(settings);
