@@ -1,4 +1,4 @@
-import { ThemeProvider, useMediaQuery, type PaletteMode } from '@mui/material';
+import { CssBaseline, ThemeProvider, useMediaQuery, type PaletteMode } from '@mui/material';
 import type {} from '@mui/material/themeCssVarsAugmentation';
 import type { AppPreferenceConfigs, AppTheme, AppThemeConfigs } from 'commons/components/app/AppConfigs';
 import { AppStorageKeys } from 'commons/components/app/AppConstants';
@@ -110,7 +110,10 @@ export const AppThemesProvider: FC<
 
   return (
     <AppThemesContext.Provider value={context}>
-      <ThemeProvider theme={_darkMode ? darkTheme : lightTheme}>{children}</ThemeProvider>
+      <ThemeProvider theme={_darkMode ? darkTheme : lightTheme}>
+        <CssBaseline enableColorScheme />
+        {children}
+      </ThemeProvider>
     </AppThemesContext.Provider>
   );
 };
