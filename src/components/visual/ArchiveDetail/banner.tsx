@@ -39,7 +39,8 @@ import { bytesToSize } from 'helpers/utils';
 import type { CSSProperties } from 'react';
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useLocation, useNavigate } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
+import { Link } from 'react-router-dom';
 
 const VERDICTS = {
   malicious: { className: 'malicious' },

@@ -20,7 +20,8 @@ import Moment from 'components/visual/Moment';
 import Verdict from 'components/visual/Verdict';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useLocation } from 'react-router';
+import { useLocation } from 'react-router';
+import { Link } from 'react-router-dom';
 
 type Props = {
   resultResults: SearchResult<ResultIndexed>;

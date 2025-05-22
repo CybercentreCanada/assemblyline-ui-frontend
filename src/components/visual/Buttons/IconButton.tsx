@@ -3,8 +3,8 @@ import { IconButton as MuiIconButton, Skeleton } from '@mui/material';
 import { CircularProgress } from 'components/visual/Buttons/CircularProgress';
 import { Tooltip } from 'components/visual/Tooltip';
 import React from 'react';
-import type { LinkProps } from 'react-router';
-import { Link } from 'react-router';
+import type { LinkProps } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 export type IconButtonProps = MuiIconButtonProps & {
   loading?: boolean;

@@ -22,8 +22,8 @@ import {
   useTheme
 } from '@mui/material';
 import React, { useMemo, useState } from 'react';
-import type { LinkProps } from 'react-router';
-import { Link } from 'react-router';
+import type { LinkProps } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 type PageNavigationDrawerProps = {
   open: DrawerProps['open'];

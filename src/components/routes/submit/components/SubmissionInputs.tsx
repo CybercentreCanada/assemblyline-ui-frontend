@@ -43,7 +43,8 @@ import { getSubmitType } from 'helpers/utils';
 import generateUUID from 'helpers/uuid';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useNavigate } from 'react-router';
+import { useNavigate } from 'react-router';
+import { Link } from 'react-router-dom';
 
 export const ClassificationInput = React.memo(() => {
   const { t } = useTranslation(['submit']);
@@ -300,63 +301,65 @@ export const ExternalSources = React.memo(() => {
   );
 });
 
-const AutoURLServicesSelection = React.memo(({ hasURLservices = false }: { hasURLservices: boolean }) => {
-  const { configuration } = useALContext();
-  const form = useForm();
+const AutoURLServicesSelection = React.memo(
+  ({ profile, hasURLservices = false }: { profile: string; hasURLservices: boolean }) => {
+    const { configuration } = useALContext();
+    const form = useForm();
 
-  const addURLServiceSelection = useCallback(() => {
-    const current: AutoURLServiceIndices = [];
+    const addURLServiceSelection = useCallback(() => {
+      const current: AutoURLServiceIndices = [];
 
-    form.setFieldValue('settings.services', categories => {
-      categories.forEach((category, i) => {
-        category.services.forEach((service, j) => {
-          if (configuration.ui.url_submission_auto_service_selection.includes(service.name)) {
-            current.push([i, j]);
-            categories[i].services[j].selected = true;
+      form.setFieldValue('settings.services', categories => {
+        categories.forEach((category, i) => {
+          category.services.forEach((service, j) => {
+            if (configuration.ui.url_submission_auto_service_selection.includes(service.name)) {
+              current.push([i, j]);
+              categories[i].services[j].selected = true;
+            }
+          });
+          categories[i].selected = category.services.every(s => s.selected);
+        });
+
+        return categories;
+      });
+
+      form.setFieldValue('autoURLServiceSelection.prev', services => {
+        current.forEach(c => {
+          if (!services.some(s => s[0] === c[0] && s[1] === c[1])) {
+            services = [...services, c];
           }
         });
-        categories[i].selected = category.services.every(s => s.selected);
+        return services;
+      });
+    }, [configuration.ui.url_submission_auto_service_selection, form]);
+
+    const removeURLServiceSelection = useCallback(() => {
+      const urlServices = form.getFieldValue('autoURLServiceSelection.prev');
+      if (urlServices.length == 0) return;
+
+      form.setFieldValue('settings.services', categories => {
+        urlServices.forEach(([i, j]) => {
+          categories[i].services[j].selected = categories[i].services[j].default;
+        });
+
+        categories.forEach((category, i) => {
+          categories[i].selected = category.services.every(s => s.selected);
+        });
+
+        return categories;
       });
 
-      return categories;
-    });
+      form.setFieldValue('autoURLServiceSelection.prev', []);
+    }, [form]);
 
-    form.setFieldValue('autoURLServiceSelection.prev', services => {
-      current.forEach(c => {
-        if (!services.some(s => s[0] === c[0] && s[1] === c[1])) {
-          services = [...services, c];
-        }
-      });
-      return services;
-    });
-  }, [configuration.ui.url_submission_auto_service_selection, form]);
+    useEffect(() => {
+      if (hasURLservices) addURLServiceSelection();
+      else removeURLServiceSelection();
+    }, [addURLServiceSelection, hasURLservices, profile, removeURLServiceSelection]);
 
-  const removeURLServiceSelection = useCallback(() => {
-    const urlServices = form.getFieldValue('autoURLServiceSelection.prev');
-    if (urlServices.length == 0) return;
-
-    form.setFieldValue('settings.services', categories => {
-      urlServices.forEach(([i, j]) => {
-        categories[i].services[j].selected = categories[i].services[j].default;
-      });
-
-      categories.forEach((category, i) => {
-        categories[i].selected = category.services.every(s => s.selected);
-      });
-
-      return categories;
-    });
-
-    form.setFieldValue('autoURLServiceSelection.prev', []);
-  }, [form]);
-
-  useEffect(() => {
-    if (hasURLservices) addURLServiceSelection();
-    else removeURLServiceSelection();
-  }, [addURLServiceSelection, hasURLservices, removeURLServiceSelection]);
-
-  return null;
-});
+    return null;
+  }
+);
 
 export const ExternalServices = React.memo(() => {
   const { t } = useTranslation(['submit']);
@@ -368,6 +371,7 @@ export const ExternalServices = React.memo(() => {
       <form.Subscribe
         selector={state =>
           [
+            state.values.state.profile,
             state.values.state.tab === 'hash' &&
               state.values.hash.type === 'url' &&
               state.values.settings.services.some(
@@ -381,7 +385,9 @@ export const ExternalServices = React.memo(() => {
               )
           ] as const
         }
-        children={([hasURLservices]) => <AutoURLServicesSelection hasURLservices={hasURLservices} />}
+        children={([profile, hasURLservices]) => (
+          <AutoURLServicesSelection profile={profile} hasURLservices={hasURLservices} />
+        )}
       />
       <form.Subscribe
         selector={state =>

@@ -13,7 +13,7 @@ import type { PossibleColor } from 'helpers/colors';
 import { safeFieldValueURI } from 'helpers/utils';
 import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 
 const STYLE = { height: 'auto', minHeight: '20px' };
 const SEARCH_ICON = <SearchOutlinedIcon style={{ marginRight: '16px' }} />;

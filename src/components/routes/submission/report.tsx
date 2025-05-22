@@ -26,7 +26,8 @@ import Classification from 'components/visual/Classification';
 import { filterObject } from 'helpers/utils';
 import { memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useNavigate, useParams } from 'react-router';
+import { useNavigate, useParams } from 'react-router';
+import { Link } from 'react-router-dom';
 
 type ParamProps = {
   id: string;

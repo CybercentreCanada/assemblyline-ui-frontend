@@ -71,7 +71,8 @@ import { setNotifyFavicon } from 'helpers/utils';
 import moment from 'moment';
 import React, { useCallback, useEffect, useMemo, useReducer, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useLocation, useNavigate, useParams } from 'react-router';
+import { useLocation, useNavigate, useParams } from 'react-router';
+import { Link } from 'react-router-dom';
 import type { Socket } from 'socket.io-client';
 import io from 'socket.io-client';
 

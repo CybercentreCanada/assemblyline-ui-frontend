@@ -4,7 +4,7 @@ import InformativeAlert from 'components/visual/InformativeAlert';
 import SectionContainer from 'components/visual/SectionContainer';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 
 type ParentSectionProps = {
   parents: string[];
