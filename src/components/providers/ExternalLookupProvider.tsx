@@ -193,8 +193,7 @@ export function ExternalLookupProvider(props: ExternalLookupProps) {
         }
       });
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [showErrorMessage, showSuccessMessage, showWarningMessage, t]
+    [currentUserConfig, apiCall, showErrorMessage, t, showWarningMessage, showSuccessMessage]
   );
   return (
     <ExternalLookupContext.Provider value={{ getKey, isActionable, enrichmentState, enrichTagExternal }}>

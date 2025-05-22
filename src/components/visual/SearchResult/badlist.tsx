@@ -20,7 +20,8 @@ import Moment from 'components/visual/Moment';
 import { maxLenStr } from 'helpers/utils';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useLocation, useNavigate } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
+import { Link } from 'react-router-dom';
 
 type Props = {
   badlistResults: SearchResult<Badlist>;

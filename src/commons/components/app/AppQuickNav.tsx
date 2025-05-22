@@ -19,7 +19,7 @@ import { useAppConfigs, useAppLayout, useAppLeftNav } from 'commons/components/a
 import { parseEvent } from 'commons/components/utils/keyboard';
 import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent, type KeyboardEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 
 type AppQuickNavItem = { type: 'item'; label: string; index?: number; grouped: boolean } & AppLeftNavItem;
 

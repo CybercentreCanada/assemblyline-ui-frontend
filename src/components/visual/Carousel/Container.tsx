@@ -13,7 +13,8 @@ import type { Image as ImageData } from 'components/models/base/result_body';
 import CarouselItem from 'components/visual/Carousel/Item';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useLocation } from 'react-router';
+import { useLocation } from 'react-router';
+import { Link } from 'react-router-dom';
 
 const ZOOM_CLASS = 'zooming';
 const MIN_IMAGE_SIZE_REM = 4;

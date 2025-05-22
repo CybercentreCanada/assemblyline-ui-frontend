@@ -48,10 +48,13 @@ const StyledEnrichedChip: FC<StyledEnrichedChipProps> = memo(
       setForceDetails = null,
       showPreview = false,
       size = 'medium',
+      type = 'rounded',
       variant = 'outlined',
+      sx,
       ...props
     }: StyledEnrichedChipProps) => (
       <EnrichedChip
+        {...props}
         type={dataType}
         value={dataValue}
         classification={dataClassification}
@@ -65,8 +68,7 @@ const StyledEnrichedChip: FC<StyledEnrichedChipProps> = memo(
         variant={variant}
         forceDetails={forceDetails}
         setForceDetails={setForceDetails}
-        sx={{ '& .iconify': { marginLeft: '8px', flexShrink: 0 } }}
-        {...props}
+        sx={{ '& .iconify': { marginLeft: '8px', flexShrink: 0 }, ...sx }}
       />
     ),
     { shouldForwardProp: prop => prop !== 'showPreview' && prop !== 'wrap' && prop !== 'fullWidth' }

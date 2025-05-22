@@ -19,7 +19,7 @@ import SectionContainer from 'components/visual/SectionContainer';
 import { safeFieldValueURI } from 'helpers/utils';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 
 const DEFAULT_SIMILAR: Record<SimilarType, { label: string; prefix: string; suffix: string }> = {
   tlsh: { label: 'TLSH', prefix: '/search/file?query=tlsh:', suffix: '&use_archive=true' },

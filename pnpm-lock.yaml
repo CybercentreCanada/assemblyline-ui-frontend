@@ -67,7 +67,7 @@ importers:
         version: 3.3.4
       borealis-ui:
         specifier: ^0.9.0
-        version: 0.9.0(tmwbwrosw3x2ib5caevfto6klu)
+        version: 0.9.0(3b010636427c855d557b7973e4b72b50)
       browser-detect:
         specifier: ^0.2.28
         version: 0.2.28
@@ -171,8 +171,8 @@ importers:
         specifier: ^8.0.3
         version: 8.1.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       react-router:
-        specifier: ^7.5.2
-        version: 7.5.2(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+        specifier: ~6.3.0
+        version: 6.3.0(react@19.1.0)
       react-router-dom:
         specifier: ~6.3.0
         version: 6.3.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -2268,10 +2268,6 @@ packages:
   convert-source-map@2.0.0:
     resolution: {integrity: sha512-Kvp459HrV2FEJ1CAsi1Ku+MY3kasH19TFykTz2xWmMeq6bk2NU3XXvfJ+Q61m0xktWwt+1HSYf3JZsTms3aRJg==}
 
-  cookie@1.0.2:
-    resolution: {integrity: sha512-9Kr/j4O16ISv8zBBhJoi4bXOYNTkFLOqSL3UDB0njXxCXNezjeyVrJyGOWtgfs/q2km1gwBcfH8q1yEGoMYunA==}
-    engines: {node: '>=18'}
-
   core-js@2.6.12:
     resolution: {integrity: sha512-Kb2wC0fvsWfQrgk8HU5lW6U/Lcs8+9aaYcy4ZFc6DDlo4nZ7n70dEgE5rtR0oG6ufKDUnrwfWL1mXR5ljDatrQ==}
     deprecated: core-js@<3.23.3 is no longer maintained and not recommended for usage due to the number of issues. Because of the V8 engine whims, feature detection in old core-js versions could cause a slowdown up to 100x even if nothing is polyfilled. Some versions have web compatibility issues. Please, upgrade your dependencies to the actual version of core-js.
@@ -4252,16 +4248,6 @@ packages:
     peerDependencies:
       react: '>=16.8'
 
-  react-router@7.5.2:
-    resolution: {integrity: sha512-9Rw8r199klMnlGZ8VAsV/I8WrIF6IyJ90JQUdboupx1cdkgYqwnrYjH+I/nY/7cA1X5zia4mDJqH36npP7sxGQ==}
-    engines: {node: '>=20.0.0'}
-    peerDependencies:
-      react: '>=18'
-      react-dom: '>=18'
-    peerDependenciesMeta:
-      react-dom:
-        optional: true
-
   react-syntax-highlighter@15.6.1:
     resolution: {integrity: sha512-OqJ2/vL7lEeV5zTJyG7kmARppUjiB9h9udl4qHQjjgEos66z00Ia0OckwYfRxCSFrW8RJIBnsBwQsHZbVPspqg==}
     peerDependencies:
@@ -4412,9 +4398,6 @@ packages:
     resolution: {integrity: sha512-hlq8tAfn0m/61p4BVRcPzIGr6LKiMwo4VM6dGi6pt4qcRkmNzTcWq6eCEjEh+qXjkMDvPlOFFSGwQjoEa6gyMA==}
     engines: {node: '>=10'}
     hasBin: true
-
-  set-cookie-parser@2.7.1:
-    resolution: {integrity: sha512-IOc8uWeOZgnb3ptbCURJWNjWUPcO3ZnTTdzsurqERrP6nPyv+paC55vJM0LpOlT2ne+Ix+9+CRG1MNLlyZ4GjQ==}
 
   set-function-length@1.2.2:
     resolution: {integrity: sha512-pgRc4hJ4/sNjWCSS9AmnS40x3bNMDTknHgL5UaMBTMyJnU90EgWh1Rz+MC9eFu4BuN/UwZjKQuY/1v3rM7HMfg==}
@@ -4731,9 +4714,6 @@ packages:
 
   tslib@2.8.1:
     resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
-
-  turbo-stream@2.4.0:
-    resolution: {integrity: sha512-FHncC10WpBd2eOmGwpmQsWLDoK4cqsA/UT/GqNoaKOQnT8uzhtCbg3EoUDMvqpOSAI0S26mr0rkjzbOO6S3v1g==}
 
   type-check@0.4.0:
     resolution: {integrity: sha512-XleUoc9uwGXqjWwXaUTZAmzMcFZ5858QA2vvx1Ur5xIcixXIP+8LnFDgRplU30us6teqdlskFfu+ae4K79Ooew==}
@@ -5777,7 +5757,7 @@ snapshots:
       ajv-formats: 2.1.1(ajv@8.17.1)
       lodash: 4.17.21
 
-  '@jsonforms/material-renderers@3.5.1(6qj6pwm2hvojinj2pxsny7m2vu)':
+  '@jsonforms/material-renderers@3.5.1(1d023a87042b18ffe707089711e10bcb)':
     dependencies:
       '@date-io/dayjs': 3.2.0(dayjs@1.10.7)
       '@emotion/react': 11.14.0(@types/react@19.1.2)(react@19.1.0)
@@ -6917,12 +6897,12 @@ snapshots:
 
   base64-js@1.5.1: {}
 
-  borealis-ui@0.9.0(tmwbwrosw3x2ib5caevfto6klu):
+  borealis-ui@0.9.0(3b010636427c855d557b7973e4b72b50):
     dependencies:
       '@emotion/react': 11.14.0(@types/react@19.1.2)(react@19.1.0)
       '@emotion/styled': 11.14.0(@emotion/react@11.14.0(@types/react@19.1.2)(react@19.1.0))(@types/react@19.1.2)(react@19.1.0)
       '@jsonforms/core': 3.5.1
-      '@jsonforms/material-renderers': 3.5.1(6qj6pwm2hvojinj2pxsny7m2vu)
+      '@jsonforms/material-renderers': 3.5.1(1d023a87042b18ffe707089711e10bcb)
       '@jsonforms/react': 3.5.1(@jsonforms/core@3.5.1)(react@19.1.0)
       '@microlink/react-json-view': 1.26.1(@types/react@19.1.2)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@mui/lab': 7.0.0-beta.11(@emotion/react@11.14.0(@types/react@19.1.2)(react@19.1.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.1.2)(react@19.1.0))(@types/react@19.1.2)(react@19.1.0))(@mui/material@7.0.2(@emotion/react@11.14.0(@types/react@19.1.2)(react@19.1.0))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.1.2)(react@19.1.0))(@types/react@19.1.2)(react@19.1.0))(@types/react@19.1.2)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(@types/react@19.1.2)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -7104,8 +7084,6 @@ snapshots:
   convert-source-map@1.9.0: {}
 
   convert-source-map@2.0.0: {}
-
-  cookie@1.0.2: {}
 
   core-js@2.6.12: {}
 
@@ -9702,15 +9680,6 @@ snapshots:
       history: 5.3.0
       react: 19.1.0
 
-  react-router@7.5.2(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
-    dependencies:
-      cookie: 1.0.2
-      react: 19.1.0
-      set-cookie-parser: 2.7.1
-      turbo-stream: 2.4.0
-    optionalDependencies:
-      react-dom: 19.1.0(react@19.1.0)
-
   react-syntax-highlighter@15.6.1(react@19.1.0):
     dependencies:
       '@babel/runtime': 7.27.0
@@ -9917,8 +9886,6 @@ snapshots:
   semver@6.3.1: {}
 
   semver@7.7.1: {}
-
-  set-cookie-parser@2.7.1: {}
 
   set-function-length@1.2.2:
     dependencies:
@@ -10270,8 +10237,6 @@ snapshots:
   tslib@2.6.2: {}
 
   tslib@2.8.1: {}
-
-  turbo-stream@2.4.0: {}
 
   type-check@0.4.0:
     dependencies:

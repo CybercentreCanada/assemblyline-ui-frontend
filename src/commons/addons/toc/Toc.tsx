@@ -3,7 +3,8 @@ import { useAppBar, useAppLayout, useAppUser } from 'commons/components/app/hook
 import type { ReactNode } from 'react';
 import React, { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useLocation } from 'react-router';
+import { useLocation } from 'react-router';
+import { Link } from 'react-router-dom';
 
 const ToCBar = styled('div')(({ theme }) => ({
   display: 'none',

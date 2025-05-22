@@ -268,7 +268,7 @@ const APIKeyUpsertingDialog = React.memo(
           onSuccess: ({ api_response }) => {
             if (!prevApiKey) {
               setNewApiKey(api_response);
-              setApiKey(defaults);
+              setApiKey(prevApiKey || defaults);
             } else {
               showSuccessMessage(`${t('apikey.updated')} ${api_response.key_name}`);
             }
@@ -293,7 +293,7 @@ const APIKeyUpsertingDialog = React.memo(
           open={open}
           onClose={() => {
             setOpen(false);
-            setApiKey(defaults);
+            setApiKey(prevApiKey || defaults);
           }}
         >
           <DialogTitle>{!prevApiKey ? t('apikeys.add_title') : t('apikeys.modify_title')}</DialogTitle>
@@ -367,9 +367,9 @@ const APIKeyUpsertingDialog = React.memo(
               </FormControl>
             </div>
             <div style={{ marginTop: theme.spacing(2) }}>
-              {currentUser.roles.sort().map((role, role_id) => (
+              {currentUser.roles.sort().map((role, i) => (
                 <CustomChip
-                  key={role_id}
+                  key={`${role}-${i}`}
                   type="rounded"
                   size="small"
                   color={apikey.roles.includes(role) ? 'primary' : 'default'}
@@ -386,7 +386,7 @@ const APIKeyUpsertingDialog = React.memo(
               disabled={loading}
               onClick={() => {
                 setOpen(false);
-                setApiKey(defaults);
+                setApiKey(prevApiKey || defaults);
               }}
             >
               {t('cancel')}
@@ -507,11 +507,11 @@ const APIKeyCard = ({ apikey, onAPIKeysChange = () => null }: APIKeyCardProps) =
           </div>
 
           <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-            {apikey.roles?.sort().map((e, x) => (
-              <div key={x} style={{ marginRight: theme.spacing(0.5), marginBottom: theme.spacing(0.25) }}>
-                <CustomChip type="rounded" label={t(`role.${e}`)} size="tiny" color="primary" />
-              </div>
-            ))}
+            {apikey.roles
+              ?.sort()
+              .map((role, i) => (
+                <CustomChip key={`${role}-${i}`} type="rounded" label={t(`role.${role}`)} size="tiny" color="primary" />
+              ))}
           </div>
         </div>
       </CardContent>
@@ -534,9 +534,9 @@ export default function APIKeys({ username }: APIKeysProps) {
   const theme = useTheme();
   const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
 
-  const onAPIKeysChange = (changeApiKeys: (prev: ApiKey[]) => ApiKey[]) => {
-    setApiKeys(changeApiKeys(apiKeys));
-  };
+  const onAPIKeysChange = useCallback((changeApiKeys: (prev: ApiKey[]) => ApiKey[]) => {
+    setApiKeys(prev => changeApiKeys(prev));
+  }, []);
 
   useEffect(() => {
     apiCall<ApiKey[]>({
@@ -577,9 +577,7 @@ export default function APIKeys({ username }: APIKeysProps) {
         </Typography>
         {apiKeys.length !== 0 ? (
           apiKeys
-            .sort((a, b) => {
-              return a.key_name.localeCompare(b.key_name);
-            })
+            .sort((a, b) => a.key_name.localeCompare(b.key_name))
             .map((apikey, i) => (
               <APIKeyCard key={`${apikey.id}-${i}`} apikey={apikey} onAPIKeysChange={onAPIKeysChange} />
             ))

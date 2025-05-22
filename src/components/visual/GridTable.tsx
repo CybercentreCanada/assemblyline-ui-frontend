@@ -11,7 +11,8 @@ import type SimpleSearchQuery from 'components/visual/SearchBar/simple-search-qu
 import type { FC } from 'react';
 import React, { forwardRef, memo } from 'react';
 import type { To } from 'react-router';
-import { Link, useLocation, useNavigate } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
+import { Link } from 'react-router-dom';
 
 interface StyledPaperProps extends PaperProps {
   component?: any;

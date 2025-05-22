@@ -18,7 +18,8 @@ import Moment from 'components/visual/Moment';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BsClipboard } from 'react-icons/bs';
-import { Link, Navigate, useLocation, useParams } from 'react-router';
+import { Navigate, useLocation, useParams } from 'react-router';
+import { Link } from 'react-router-dom';
 
 const StyledBsClipboard = styled(BsClipboard)(({ theme }) => ({
   marginRight: theme.spacing(1),

@@ -20,7 +20,7 @@ import Moment from 'components/visual/Moment';
 import { maxLenStr } from 'helpers/utils';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 
 type Props = {
   safelistResults: SearchResult<Safelist>;

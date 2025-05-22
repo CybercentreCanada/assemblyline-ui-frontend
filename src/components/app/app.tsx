@@ -26,7 +26,7 @@ import Tos from 'components/routes/tos';
 import setMomentFRLocale from 'helpers/moment-fr-locale';
 import { getProvider } from 'helpers/utils';
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter } from 'react-router';
+import { BrowserRouter } from 'react-router-dom';
 
 type PossibleApps = 'load' | 'locked' | 'login' | 'routes' | 'tos' | 'quota';
 

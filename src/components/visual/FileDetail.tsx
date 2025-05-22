@@ -54,7 +54,8 @@ import InputDialog from 'components/visual/InputDialog';
 import { emptyResult } from 'components/visual/ResultCard';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useLocation, useNavigate } from 'react-router';
+import { useLocation, useNavigate } from 'react-router';
+import { Link } from 'react-router-dom';
 
 type Props = {
   sha256: string;
