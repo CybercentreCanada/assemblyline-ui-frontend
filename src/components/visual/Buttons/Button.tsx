@@ -23,19 +23,30 @@ export const Button: React.FC<ButtonProps> = React.memo(
     loading = false,
     preventRender = false,
     progress = false,
+    size = 'medium',
     to = null,
     tooltip = null,
     tooltipProps = null,
     ...props
   }: ButtonProps) =>
     preventRender ? null : loading ? (
-      <MuiButton disabled sx={{ padding: 0 }}>
-        <Skeleton variant="rounded" width="50px" sx={{ flex: 1, height: '100%' }} />
+      <MuiButton disabled size={size} sx={{ padding: 0 }}>
+        <Skeleton
+          variant="rounded"
+          width="50px"
+          sx={{
+            flex: 1,
+            ...(size === 'small' && { height: '30.75px' }),
+            ...(size === 'medium' && { height: '36.5px' }),
+            ...(size === 'large' && { height: '42.25px' })
+          }}
+        />
       </MuiButton>
     ) : (
       <Tooltip title={tooltip} placement="bottom" {...tooltipProps}>
         <MuiButton
           disabled={progress || disabled}
+          size={size}
           {...(!to || loading ? null : { component: Link, to: typeof to === 'function' ? to() : to })}
           {...props}
         >

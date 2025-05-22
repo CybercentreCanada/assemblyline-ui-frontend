@@ -648,11 +648,12 @@ export const AdjustButton = React.memo(() => {
 
   return (
     <form.Subscribe
-      selector={state => [state.values.state.adjust] as const}
-      children={([adjust]) => (
+      selector={state => [state.values.state.adjust, state.values.state.phase === 'loading'] as const}
+      children={([adjust, loading]) => (
         <IconButton
           tooltip={adjust ? t('adjust.button.close.tooltip') : t('adjust.button.open.tooltip')}
           tooltipProps={{ placement: 'bottom' }}
+          loading={loading}
           onClick={() => form.setFieldValue('state.adjust', s => !s)}
         >
           <TuneIcon />
