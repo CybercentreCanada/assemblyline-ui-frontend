@@ -5,7 +5,7 @@ import SpeedOutlinedIcon from '@mui/icons-material/SpeedOutlined';
 import type { CardProps } from '@mui/material';
 import { Card, Grid, Skeleton, styled, Switch, Tooltip, Typography, useTheme } from '@mui/material';
 import { useAppUser } from 'commons/components/app/hooks';
-import PageFullScreen from 'commons/components/pages/PageFullScreen';
+import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -1564,7 +1564,7 @@ const Dashboard = () => {
   });
 
   return (
-    <PageFullScreen margin={4}>
+    <PageFullWidth margin={4}>
       <Typography gutterBottom color="primary" variant="h2" align="center">
         {t('title')}
       </Typography>
@@ -1649,7 +1649,7 @@ const Dashboard = () => {
             </Grid>
           ))}
       </Grid>
-    </PageFullScreen>
+    </PageFullWidth>
   );
 };
 
