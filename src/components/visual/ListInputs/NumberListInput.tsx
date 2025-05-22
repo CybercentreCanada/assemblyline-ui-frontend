@@ -97,14 +97,20 @@ const WrappedNumberListInput = ({
             type="number"
             size="small"
             fullWidth
-            value={value === null ? '' : value?.toString()}
+            value={[null, undefined, '', NaN].includes(value) ? '' : `${value}`}
             disabled={disabled}
             error={!!errorValue && !readOnly}
             {...(readOnly && !disabled && { focused: null })}
-            inputProps={{ id: id || primary.toString(), min: min, max: max }}
-            InputProps={{
-              readOnly: readOnly,
-              endAdornment: endAdornment && <InputAdornment position="end">{endAdornment}</InputAdornment>
+            slotProps={{
+              input: {
+                inputProps: {
+                  id: id || primary.toString(),
+                  min: min,
+                  max: max
+                },
+                readOnly: readOnly,
+                endAdornment: endAdornment && <InputAdornment position="end">{endAdornment}</InputAdornment>
+              }
             }}
             sx={{
               maxWidth: '30%',
@@ -120,7 +126,7 @@ const WrappedNumberListInput = ({
             onChange={event => {
               const value = event.target.value;
 
-              if (!unnullable && (value === undefined || value === null || value === '')) {
+              if (!unnullable && [null, undefined, '', NaN].includes(value)) {
                 onChange(event, null);
 
                 const err = error(null);

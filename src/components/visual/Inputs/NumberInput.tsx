@@ -36,8 +36,8 @@ export type NumberInputProps = Omit<TextFieldProps, 'error' | 'value' | 'onChang
   unnullable?: boolean;
   value: number;
   onChange?: (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>, value: number) => void;
-  onReset?: IconButtonProps['onClick'];
   onError?: (error: string) => void;
+  onReset?: IconButtonProps['onClick'];
 };
 
 const WrappedNumberInput = ({
@@ -66,9 +66,11 @@ const WrappedNumberInput = ({
   tooltipProps,
   unnullable = false,
   value,
+  onBlur = () => null,
   onChange = () => null,
-  onReset = () => null,
   onError = () => null,
+  onFocus = () => null,
+  onReset = () => null,
   ...textFieldProps
 }: NumberInputProps) => {
   const theme = useTheme();
@@ -109,13 +111,13 @@ const WrappedNumberInput = ({
             type="number"
             size="small"
             fullWidth
-            value={value === null ? '' : value?.toString()}
+            value={[null, undefined, '', NaN].includes(value) ? '' : `${value}`}
             disabled={disabled}
             error={!!errorValue}
             {...(readOnly && !disabled && { focused: null })}
             helperText={disabled ? null : errorValue || helperText}
-            FormHelperTextProps={
-              disabled
+            slotProps={{
+              formHelperText: disabled
                 ? null
                 : errorValue
                   ? { variant: 'outlined', sx: { color: theme.palette.error.main, ...errorProps?.sx }, ...errorProps }
@@ -125,38 +127,43 @@ const WrappedNumberInput = ({
                         sx: { color: theme.palette.text.secondary, ...helperTextProps?.sx },
                         ...errorProps
                       }
-                    : null
-            }
-            inputProps={{ min: min, max: max, ...(tiny && { sx: { padding: '2.5px 4px 2.5px 8px' } }) }}
-            InputProps={{
-              placeholder: placeholder,
-              readOnly: readOnly,
-              sx: {
-                paddingRight: '9px',
-                ...(tiny && { '& .MuiInputBase-root': { padding: '2px !important', fontSize: '14px' } })
-              },
-              startAdornment: startAdornment && <InputAdornment position="start">{startAdornment}</InputAdornment>,
-              endAdornment: (
-                <>
-                  {loading || !reset || disabled || readOnly ? null : (
-                    <InputAdornment position="end">
-                      <ResetInput
-                        id={id}
-                        preventRender={loading || !reset || disabled || readOnly}
-                        tiny={tiny}
-                        onReset={onReset}
-                        {...resetProps}
-                      />
-                    </InputAdornment>
-                  )}
-                  {endAdornment && <InputAdornment position="end">{endAdornment}</InputAdornment>}
-                </>
-              )
+                    : null,
+
+              input: {
+                inputProps: {
+                  min: min,
+                  max: max,
+                  ...(tiny && { sx: { padding: '2.5px 4px 2.5px 8px' } })
+                },
+                placeholder: placeholder,
+                readOnly: readOnly,
+                sx: {
+                  paddingRight: '9px',
+                  ...(tiny && { '& .MuiInputBase-root': { padding: '2px !important', fontSize: '14px' } })
+                },
+                startAdornment: startAdornment && <InputAdornment position="start">{startAdornment}</InputAdornment>,
+                endAdornment: (
+                  <>
+                    {loading || !reset || disabled || readOnly ? null : (
+                      <InputAdornment position="end">
+                        <ResetInput
+                          id={id}
+                          preventRender={loading || !reset || disabled || readOnly}
+                          tiny={tiny}
+                          onReset={onReset}
+                          {...resetProps}
+                        />
+                      </InputAdornment>
+                    )}
+                    {endAdornment && <InputAdornment position="end">{endAdornment}</InputAdornment>}
+                  </>
+                )
+              }
             }}
             onChange={event => {
               const value = event.target.value;
 
-              if (!unnullable && (value === undefined || value === null || value === '')) {
+              if (!unnullable && [null, undefined, '', NaN].includes(value)) {
                 onChange(event, null);
 
                 const err = error(null);
@@ -171,10 +178,13 @@ const WrappedNumberInput = ({
                 if (err) onError(err);
               }
             }}
-            onFocus={event => setFocused(document.activeElement === event.target)}
-            onBlur={event => {
+            onFocus={(event, ...other) => {
+              setFocused(document.activeElement === event.target);
+              onFocus(event, ...other);
+            }}
+            onBlur={(event, ...other) => {
               setFocused(false);
-              textFieldProps?.onBlur(event);
+              onBlur(event, ...other);
             }}
             sx={{
               ...(readOnly &&
