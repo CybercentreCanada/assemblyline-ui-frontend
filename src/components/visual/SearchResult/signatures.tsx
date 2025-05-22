@@ -19,7 +19,7 @@ import Moment from 'components/visual/Moment';
 import SignatureStatus from 'components/visual/SignatureStatus';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 
 type Props = {
   signatureResults: SearchResult<SignatureIndexed>;

@@ -3,7 +3,7 @@ import { Button, useTheme } from '@mui/material';
 import type { AppLeftNavItem } from 'commons/components/app/AppConfigs';
 import { t } from 'i18next';
 import React from 'react';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 
 type LinkGridProps = {
   items: AppLeftNavItem[];

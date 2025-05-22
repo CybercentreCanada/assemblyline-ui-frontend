@@ -4,7 +4,8 @@ import type { File } from 'components/models/base/result';
 import { DEFAULT_TAB, TAB_OPTIONS } from 'components/routes/file/viewer';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link as RouterLink, useLocation } from 'react-router';
+import { useLocation } from 'react-router';
+import { Link as RouterLink } from 'react-router-dom';
 
 type Props = {
   file: File;

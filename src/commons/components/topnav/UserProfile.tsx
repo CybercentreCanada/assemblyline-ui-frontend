@@ -27,7 +27,7 @@ import useALContext from 'components/hooks/useALContext';
 import useQuota from 'components/hooks/useQuota';
 import { memo, useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 
 export const AppUserAvatar = styled(AppAvatar)(({ theme }) => ({
   width: theme.spacing(5),

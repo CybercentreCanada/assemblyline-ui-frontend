@@ -43,7 +43,8 @@ import { getSubmitType } from 'helpers/utils';
 import generateUUID from 'helpers/uuid';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useNavigate } from 'react-router';
+import { useNavigate } from 'react-router';
+import { Link } from 'react-router-dom';
 
 export const ClassificationInput = React.memo(() => {
   const { t } = useTranslation(['submit']);

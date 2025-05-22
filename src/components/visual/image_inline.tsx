@@ -4,7 +4,7 @@ import useCarousel from 'components/hooks/useCarousel';
 import useMyAPI from 'components/hooks/useMyAPI';
 import type { Image, ImageBody } from 'components/models/base/result_body';
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 
 type ImageInlineBodyProps = {
   body: ImageBody;

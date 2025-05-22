@@ -10,7 +10,8 @@ import type { SubmissionTree, Tree } from 'components/models/ui/submission';
 import Verdict from 'components/visual/Verdict';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useNavigate } from 'react-router';
+import { useNavigate } from 'react-router';
+import { Link } from 'react-router-dom';
 
 const MAX_FILE_COUNT = 500;
 

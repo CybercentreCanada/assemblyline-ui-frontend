@@ -21,7 +21,7 @@ export const LeftNav = React.memo(() => {
           options={[
             {
               primary: t('interface'),
-              active: !tab,
+              active: !tab || tab === 'interface',
               to: `/settings/interface`
             },
             { primary: t('profiles'), subheader: true, readOnly: true },

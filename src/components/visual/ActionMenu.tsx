@@ -24,7 +24,7 @@ import { getSubmitType, safeFieldValueURI, toTitleCase } from 'helpers/utils';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { HiOutlineExternalLink } from 'react-icons/hi';
-import { Link } from 'react-router';
+import { Link } from 'react-router-dom';
 
 const SEARCH_ICON = <SearchOutlinedIcon style={{ marginRight: '16px' }} />;
 const CLIPBOARD_ICON = <AssignmentOutlinedIcon style={{ marginRight: '16px' }} />;
