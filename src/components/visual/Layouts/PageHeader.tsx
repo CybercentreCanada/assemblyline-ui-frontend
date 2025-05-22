@@ -90,7 +90,7 @@ export const PageHeader: React.FC<PageHeaderProps> = React.memo(
             flexDirection: 'row',
             flexWrap: 'wrap',
             alignContent: 'flex-start',
-            rowGap: theme.spacing(1)
+            gap: theme.spacing(1)
           }}
         >
           <div
