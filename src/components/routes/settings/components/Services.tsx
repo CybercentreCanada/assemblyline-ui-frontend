@@ -67,6 +67,14 @@ const Parameter = React.memo(
                   reset={defaultValue !== null && value !== defaultValue}
                   value={value as number}
                   onChange={(event, v) => handleChange(v)}
+                  onBlur={() => {
+                    if (value === null) {
+                      form.setFieldValue('settings.service_spec', service_spec => {
+                        service_spec[spec_id].params[param_id].value = defaultValue;
+                        return service_spec;
+                      });
+                    }
+                  }}
                   onReset={() => handleChange(defaultValue)}
                 />
               );

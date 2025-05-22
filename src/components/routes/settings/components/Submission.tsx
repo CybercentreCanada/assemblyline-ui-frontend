@@ -71,6 +71,11 @@ export const SubmissionSection = React.memo(() => {
                   max={configuration.submission.max_dtl !== 0 ? configuration.submission.max_dtl : 365}
                   onChange={(event, v) => form.setFieldValue(`settings.ttl.value`, v)}
                   onReset={() => form.setFieldValue(`settings.ttl.value`, defaultValue)}
+                  onBlur={() => {
+                    if (value === null) {
+                      form.setFieldValue(`settings.ttl.value`, defaultValue);
+                    }
+                  }}
                 />
               )}
             />

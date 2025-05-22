@@ -53,7 +53,7 @@ export const HeaderSection = React.memo(() => {
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [currentUser.username, t]
+    [currentUser.username, form, settings, t]
   );
 
   return (

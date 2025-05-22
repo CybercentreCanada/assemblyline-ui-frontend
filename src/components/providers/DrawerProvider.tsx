@@ -216,7 +216,7 @@ function DrawerProvider({ children }: DrawerProviderProps) {
                 </div>
               </>
             ),
-            [t, closeGlobalDrawer, isXL, isMaximized, globalDrawer]
+            [theme, closeGlobalDrawer, isXL, isMaximized, t, globalDrawer]
           )}
         </Drawer>
       </AppMain>
