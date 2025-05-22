@@ -310,9 +310,9 @@ const ApikeyDetail = ({ key_id = null, onClose = () => null }: ApikeyDetailProps
                     {t('roles')}
                   </Typography>
                   <div>
-                    {currentUser.roles.sort().map((role, role_id) => (
+                    {currentUser.roles.sort().map((role, i) => (
                       <CustomChip
-                        key={role_id}
+                        key={`${role}-${i}`}
                         label={t(`role.${role}`)}
                         type="rounded"
                         size="small"
