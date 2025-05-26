@@ -72,7 +72,13 @@ export const AppProviderInner = <U extends AppUser>({
         <AppErrorProvider>
           <AppUserProvider service={user}>
             <AppSnackbarProvider>
-              <BorealisProvider baseURL={location.origin + '/api/v4/proxy/borealis'} getToken={() => null}>
+              <BorealisProvider
+                baseURL={location.origin + '/api/v4/proxy/borealis'}
+                getToken={() => null}
+                chunkSize={250}
+                maxRequestCount={10}
+                defaultTimeout={10}
+              >
                 <AppUserProvider service={user}>
                   <AssistantProvider>
                     <HighlightProvider>
