@@ -1,6 +1,6 @@
-import type { Configuration, HashPatternMap } from 'components/models/base/config';
+import type { Configuration, FileSource, HashPatternMap } from 'components/models/base/config';
 import type { PossibleColor } from 'helpers/colors';
-import { URL_REGEX } from 'helpers/constants';
+import { LOWERCASE_HASH, URL_REGEX } from 'helpers/constants';
 
 /**
  *
@@ -437,10 +437,13 @@ export function getSubmitType(input: string, configuration: Configuration): [Has
 
   // If we're trying to auto-detect the input type, iterate over file sources
   const detectedHashType = Object.entries(configuration.submission.file_sources).find(
-    ([, hashProps]) => hashProps && value.trim().match(new RegExp(hashProps?.pattern))
+    ([hashType, hashProps]: [HashPatternMap, FileSource]) =>
+      hashProps &&
+      (LOWERCASE_HASH.includes(hashType) ? value.toLowerCase() : value).trim().match(new RegExp(hashProps?.pattern))
   )?.[0] as HashPatternMap;
 
-  if (detectedHashType) return [detectedHashType, value.trim()];
+  if (detectedHashType)
+    return [detectedHashType, (LOWERCASE_HASH.includes(detectedHashType) ? value.toLowerCase() : value).trim()];
   else if (!detectedHashType && isURL(value)) return ['url', value.trimStart()];
   else return [null, input];
 }
