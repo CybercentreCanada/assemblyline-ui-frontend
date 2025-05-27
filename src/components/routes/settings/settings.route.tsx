@@ -1,7 +1,5 @@
 import { useTableOfContent } from 'components/core/TableOfContent/TableOfContent';
 import useALContext from 'components/hooks/useALContext';
-import useMyAPI from 'components/hooks/useMyAPI';
-import type { UserSettings } from 'components/models/base/user_settings';
 import ForbiddenPage from 'components/routes/403';
 import { ExternalSourcesSection } from 'components/routes/settings/components/ExternalSources';
 import { HeaderSection } from 'components/routes/settings/components/Header';
@@ -27,7 +25,6 @@ type Params = {
 
 const WrappedSettingsRoute = () => {
   const form = useForm();
-  const { apiCall } = useMyAPI();
   const { rootRef, headerRef } = useTableOfContent();
   const { tab: tabParam } = useParams<Params>();
   const { user: currentUser, configuration, settings } = useALContext();
@@ -57,18 +54,10 @@ const WrappedSettingsRoute = () => {
     form.setFieldValue('state.disabled', !currentUser.is_admin && !currentUser.roles.includes('self_manage'));
     form.setFieldValue('state.customize', currentUser.is_admin || currentUser.roles.includes('submission_customize'));
 
-    apiCall<UserSettings>({
-      url: `/api/v4/user/settings/${currentUser.username}/`,
-      onSuccess: ({ api_response }) => {
-        form.setFieldValue('user', api_response);
-        form.setFieldValue('settings', initializeSettings(api_response));
-        handleProfileChange();
-      },
-      onEnter: () => form.setFieldValue('state.loading', true),
-      onExit: () => form.setFieldValue('state.loading', false)
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentUser.is_admin, currentUser.roles, currentUser.username, form]);
+    form.setFieldValue('user', settings);
+    form.setFieldValue('settings', initializeSettings(settings));
+    handleProfileChange();
+  }, [currentUser.is_admin, currentUser.roles, form, handleProfileChange, settings]);
 
   if (!currentUser.is_admin && !currentUser.roles.includes('self_manage')) return <ForbiddenPage />;
   else
