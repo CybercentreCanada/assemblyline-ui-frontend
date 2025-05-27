@@ -8,7 +8,7 @@ import type { LoginParamsProps } from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import useQuota from 'components/hooks/useQuota';
 import type { Configuration } from 'components/models/base/config';
-import type { WhoAmIProps } from 'components/models/ui/user';
+import type { CustomUser, WhoAmIProps } from 'components/models/ui/user';
 import getXSRFCookie from 'helpers/xsrf';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -26,18 +26,20 @@ export type UseBootstrapQueryProps = {
   switchRenderedApp: (value: string) => void;
   setConfiguration: (cfg: Configuration) => void;
   setLoginParams: (params: LoginParamsProps) => void;
-  setUser: (user: WhoAmIProps) => void;
-  setReady: (layout: boolean, borealis: boolean) => void;
+  setUser: (user: WhoAmIProps | CustomUser) => void;
+  setReady: (layout: boolean, borealis: boolean, iconifyUrl: string) => void;
+  enabled?: boolean;
   retryAfter?: number;
 };
 
 export const useBootstrapQuery = ({
   queryProps = null,
-  switchRenderedApp,
-  setConfiguration,
-  setLoginParams,
-  setUser,
-  setReady,
+  switchRenderedApp = () => null,
+  setConfiguration = () => null,
+  setLoginParams = () => null,
+  setUser = () => null,
+  setReady = () => null,
+  enabled = true,
   retryAfter = DEFAULT_RETRY_MS
 }: UseBootstrapQueryProps) => {
   const queryClient = useQueryClient();
@@ -54,18 +56,23 @@ export const useBootstrapQuery = ({
   >(
     {
       ...queryProps,
+      enabled: !!enabled,
       queryKey: [
         {
           url: '/api/v4/user/whoami/',
-          contentType: 'application/json',
           method: 'GET',
-          allowCache: false,
-          retryAfter
+          body: null,
+          enabled: !!enabled
         }
       ],
       retry: (failureCount, error) => failureCount < 1 || error?.api_status_code === 502,
       retryDelay: failureCount => (failureCount < 1 ? 1000 : Math.min(retryAfter, 10000)),
       queryFn: async ({ signal }) => {
+        // Reject if the query is not enabled
+        if (!enabled) {
+          return Promise.reject(null);
+        }
+
         // fetching the API's data
         const res = await fetch('/api/v4/user/whoami/', {
           method: 'GET',
@@ -148,7 +155,11 @@ export const useBootstrapQuery = ({
           setUser(user);
 
           // Mark the interface ready
-          setReady(true, user.configuration.ui.api_proxies.includes('borealis'));
+          setReady(
+            true,
+            'borealis' in user.configuration.ui.api_proxies,
+            user.configuration?.ui?.api_proxies?.borealis?.custom_iconify || null
+          );
 
           // Render appropriate page
           if (!user.agrees_with_tos && user.configuration.ui.tos) {
