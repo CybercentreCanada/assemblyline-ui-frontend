@@ -2,10 +2,8 @@ import { Alert, Collapse, styled, useMediaQuery, useTheme } from '@mui/material'
 import { useAppBanner } from 'commons/components/app/hooks';
 import PageCenter from 'commons/components/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
-import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import type { Metadata } from 'components/models/base/submission';
-import type { UserSettings } from 'components/models/base/user_settings';
 import {
   initializeSettings,
   loadDefaultProfile,
@@ -126,9 +124,8 @@ const WrappedSubmitRoute = () => {
   const theme = useTheme();
   const banner = useAppBanner();
   const location = useLocation();
-  const { apiCall } = useMyAPI();
   const { closeSnackbar } = useMySnackbar();
-  const { user: currentUser, configuration } = useALContext();
+  const { user: currentUser, configuration, settings } = useALContext();
 
   const form = useForm();
 
@@ -148,53 +145,48 @@ const WrappedSubmitRoute = () => {
     form.setFieldValue('state.disabled', !currentUser.is_admin && !currentUser.roles.includes('submission_create'));
     form.setFieldValue('state.customize', currentUser.is_admin || currentUser.roles.includes('submission_customize'));
 
-    apiCall<UserSettings>({
-      url: `/api/v4/user/settings/${currentUser.username}/`,
-      onSuccess: ({ api_response: settings }) => {
-        form.setFieldValue('settings', initializeSettings(settings));
-        const profile = getPreferredSubmissionProfile(settings);
-        form.setFieldValue('state.profile', profile);
-        if (profile === 'default') form.setFieldValue('settings', s => loadDefaultProfile(s, settings, currentUser));
-        else
-          form.setFieldValue('settings', s =>
-            loadSubmissionProfile(s, settings, configuration.submission.profiles, currentUser, profile)
-          );
-        form.setFieldValue('settings.default_external_sources', getDefaultExternalSources(settings, configuration));
+    form.setFieldValue('settings', initializeSettings(settings));
+    const profile = getPreferredSubmissionProfile(settings);
+    form.setFieldValue('state.profile', profile);
+    if (profile === 'default') form.setFieldValue('settings', s => loadDefaultProfile(s, settings, currentUser));
+    else
+      form.setFieldValue('settings', s =>
+        loadSubmissionProfile(s, settings, configuration.submission.profiles, currentUser, profile)
+      );
+    form.setFieldValue('settings.default_external_sources', getDefaultExternalSources(settings, configuration));
 
-        const search = new URLSearchParams(location.search);
-        const state = location.state as SubmitState;
+    const search = new URLSearchParams(location.search);
+    const state = location.state as SubmitState;
 
-        if (state?.c12n) {
-          form.setFieldValue('settings.classification.value', state.c12n);
-        } else if (search.get('classification')) {
-          form.setFieldValue('settings.classification.value', search.get('classification'));
-        }
+    if (state?.c12n) {
+      form.setFieldValue('settings.classification.value', state.c12n);
+    } else if (search.get('classification')) {
+      form.setFieldValue('settings.classification.value', search.get('classification'));
+    }
 
-        if (state?.hash) {
-          const [type, value] = getSubmitType(state?.hash || '', configuration);
-          form.setFieldValue('state.tab', 'hash');
-          form.setFieldValue('hash.type', type);
-          form.setFieldValue('hash.value', value);
-        } else if (search.get('hash')) {
-          const [type, value] = getSubmitType(search.get('hash'), configuration);
-          form.setFieldValue('state.tab', 'hash');
-          form.setFieldValue('hash.type', type);
-          form.setFieldValue('hash.value', value);
-        }
+    if (state?.hash) {
+      const [type, value] = getSubmitType(state?.hash || '', configuration);
+      form.setFieldValue('state.tab', 'hash');
+      form.setFieldValue('hash.type', type);
+      form.setFieldValue('hash.value', value);
+    } else if (search.get('hash')) {
+      const [type, value] = getSubmitType(search.get('hash'), configuration);
+      form.setFieldValue('state.tab', 'hash');
+      form.setFieldValue('hash.type', type);
+      form.setFieldValue('hash.value', value);
+    }
 
-        if (state?.metadata && typeof state.metadata === 'object' && Object.keys(state.metadata).length > 0) {
-          form.setFieldValue('metadata.data', state.metadata);
-        } else if (isValidJSON(search.get('metadata'))) {
-          const metadata = JSON.parse(search.get('metadata')) as Metadata;
-          form.setFieldValue('metadata.data', metadata);
-        }
+    if (state?.metadata && typeof state.metadata === 'object' && Object.keys(state.metadata).length > 0) {
+      form.setFieldValue('metadata.data', state.metadata);
+    } else if (isValidJSON(search.get('metadata'))) {
+      const metadata = JSON.parse(search.get('metadata')) as Metadata;
+      form.setFieldValue('metadata.data', metadata);
+    }
 
-        form.setFieldValue('state.phase', 'editing');
-      }
-    });
+    form.setFieldValue('state.phase', 'editing');
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [configuration, currentUser]);
+  }, [configuration, currentUser, settings]);
 
   return (
     <PageCenter maxWidth={downMD ? '100%' : `${theme.breakpoints.values.md}px`} margin={3.5} width="100%">
