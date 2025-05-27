@@ -143,7 +143,7 @@ type GroupedTagListProps = {
 };
 
 const GroupedTagList: React.FC<GroupedTagListProps> = React.memo(
-  ({ items = [], targetMax = 10, groupMethod = () => null, children = () => null }: GroupedTagListProps) => {
+  ({ items = [], targetMax = 5, groupMethod = () => null, children = () => null }: GroupedTagListProps) => {
     const { t } = useTranslation();
     const theme = useTheme();
 
