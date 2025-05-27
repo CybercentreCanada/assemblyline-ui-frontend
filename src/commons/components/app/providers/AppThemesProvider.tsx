@@ -112,7 +112,7 @@ export const AppThemesProvider: FC<
     <AppThemesContext.Provider value={context}>
       <ThemeProvider theme={_darkMode ? darkTheme : lightTheme}>
         <CssBaseline enableColorScheme />
-        {children}
+        {typeof currentTheme === 'object' && Object.keys(currentTheme).length === 0 ? null : children}
       </ThemeProvider>
     </AppThemesContext.Provider>
   );
