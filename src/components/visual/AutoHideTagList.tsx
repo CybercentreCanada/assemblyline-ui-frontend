@@ -118,22 +118,23 @@ const groupURLs = (prev: Record<number, Record<string, TagProps[]>>, current: Ta
 
 type TagListProps = {
   items: TagProps[];
-  targetMax?: number;
+  totalMax?: number;
   children?: (tag: TagProps, index: number) => React.ReactNode;
 };
 
-const TagList: React.FC<TagListProps> = React.memo(({ items, targetMax = 10, children = () => null }: TagListProps) => (
+const TagList: React.FC<TagListProps> = React.memo(({ items, totalMax = 10, children = () => null }: TagListProps) => (
   <>
-    {items.slice(0, targetMax).map((tag, idx) => children(tag, idx))}
-    <ShowMore open={items.length <= targetMax} count={items.length - targetMax}>
-      {items.slice(targetMax).map((tag, idx) => children(tag, idx))}
+    {items.slice(0, totalMax).map((tag, idx) => children(tag, idx))}
+    <ShowMore open={items.length <= totalMax} count={items.length - totalMax}>
+      {items.slice(totalMax).map((tag, idx) => children(tag, idx))}
     </ShowMore>
   </>
 ));
 
 type GroupedTagListProps = {
   items: TagProps[];
-  targetMax?: number;
+  groupMax?: number;
+  totalMax?: number;
   groupMethod?: (
     previousValue: Record<number, Record<string, TagProps[]>>,
     currentValue: TagProps,
@@ -143,7 +144,13 @@ type GroupedTagListProps = {
 };
 
 const GroupedTagList: React.FC<GroupedTagListProps> = React.memo(
-  ({ items = [], targetMax = 5, groupMethod = () => null, children = () => null }: GroupedTagListProps) => {
+  ({
+    items = [],
+    groupMax = 5,
+    totalMax = 10,
+    groupMethod = () => null,
+    children = () => null
+  }: GroupedTagListProps) => {
     const { t } = useTranslation();
     const theme = useTheme();
 
@@ -151,9 +158,9 @@ const GroupedTagList: React.FC<GroupedTagListProps> = React.memo(
 
     return hideExtra ? (
       <>
-        {items.slice(0, targetMax).map((tag, idx) => children(tag, idx))}
-        {items.length > targetMax && (
-          <Tooltip title={`${items.length - targetMax} ${t('show_more.count')}`}>
+        {items.slice(0, totalMax).map((tag, idx) => children(tag, idx))}
+        {items.length > totalMax && (
+          <Tooltip title={`${items.length - totalMax} ${t('show_more.count')}`}>
             <IconButton size="small" onClick={() => setHideExtra(false)} style={{ padding: 0 }}>
               <MoreHorizOutlinedIcon />
             </IconButton>
@@ -185,9 +192,9 @@ const GroupedTagList: React.FC<GroupedTagListProps> = React.memo(
                 style={{ marginRight: theme.spacing(1) }}
               />
 
-              {tags.slice(0, targetMax).map((tag, idx) => children(tag, idx))}
-              <ShowMore open={tags.length <= targetMax} count={tags.length - targetMax}>
-                {tags.slice(targetMax).map((tag, idx) => children(tag, idx))}
+              {tags.slice(0, groupMax).map((tag, idx) => children(tag, idx))}
+              <ShowMore open={tags.length <= groupMax} count={tags.length - groupMax}>
+                {tags.slice(groupMax).map((tag, idx) => children(tag, idx))}
               </ShowMore>
             </div>
           ))}
@@ -201,11 +208,12 @@ type AutoHideTagListProps = {
   tag_type: string;
   items: TagProps[];
   force?: boolean;
-  targetMax?: number;
+  groupMax?: number;
+  totalMax?: number;
 };
 
 export const AutoHideTagList: React.FC<AutoHideTagListProps> = React.memo(
-  ({ tag_type, items, targetMax = 10, force = false }: AutoHideTagListProps) => {
+  ({ tag_type, items, groupMax = 5, totalMax = 10, force = false }: AutoHideTagListProps) => {
     const { getKey } = useHighlighter();
     const { showSafeResults } = useSafeResults();
 
@@ -213,7 +221,7 @@ export const AutoHideTagList: React.FC<AutoHideTagListProps> = React.memo(
       return (
         <TagList
           items={items.filter(tag => showSafeResults || force || !tag.safelisted).sort(compareTags)}
-          targetMax={targetMax}
+          totalMax={totalMax}
         >
           {(tag, idx) => (
             <Heuristic
@@ -232,7 +240,7 @@ export const AutoHideTagList: React.FC<AutoHideTagListProps> = React.memo(
       return (
         <TagList
           items={items.filter(tag => showSafeResults || force || !tag.safelisted).sort(compareIPs)}
-          targetMax={targetMax}
+          totalMax={totalMax}
         >
           {(tag, idx) => (
             <Tag
@@ -250,7 +258,12 @@ export const AutoHideTagList: React.FC<AutoHideTagListProps> = React.memo(
       );
     else if (DOMAIN_KEYS.includes(tag_type))
       return (
-        <GroupedTagList items={items.sort(compareDomains)} groupMethod={groupDomains} targetMax={targetMax}>
+        <GroupedTagList
+          items={items.sort(compareDomains)}
+          groupMethod={groupDomains}
+          groupMax={groupMax}
+          totalMax={totalMax}
+        >
           {(tag, idx) => (
             <Tag
               key={idx}
@@ -267,7 +280,7 @@ export const AutoHideTagList: React.FC<AutoHideTagListProps> = React.memo(
       );
     else if (URI_KEYS.includes(tag_type))
       return (
-        <GroupedTagList items={items.sort(compareURLs)} groupMethod={groupURLs} targetMax={targetMax}>
+        <GroupedTagList items={items.sort(compareURLs)} groupMethod={groupURLs} groupMax={groupMax} totalMax={totalMax}>
           {(tag, idx) => (
             <Tag
               key={idx}
@@ -286,7 +299,7 @@ export const AutoHideTagList: React.FC<AutoHideTagListProps> = React.memo(
       return (
         <TagList
           items={items.filter(tag => showSafeResults || force || !tag.safelisted).sort(compareTags)}
-          targetMax={targetMax}
+          totalMax={totalMax}
         >
           {(tag, idx) => (
             <Tag
