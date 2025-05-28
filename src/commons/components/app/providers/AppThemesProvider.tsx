@@ -5,7 +5,7 @@ import { AppStorageKeys } from 'commons/components/app/AppConstants';
 import { AppDefaultsPreferencesConfigs } from 'commons/components/app/AppDefaults';
 import useLocalStorageItem from 'commons/components/utils/hooks/useLocalStorageItem';
 import useThemeBuilder from 'commons/components/utils/hooks/useThemeBuilder';
-import { createContext, useCallback, useMemo, type FC, type PropsWithChildren } from 'react';
+import { createContext, useCallback, useMemo, useEffect, type FC, type PropsWithChildren } from 'react';
 
 const { LS_KEY_THEME, LS_KEY_DARK_MODE } = AppStorageKeys;
 
@@ -38,7 +38,14 @@ export const AppThemesProvider: FC<
     ((defaultTheme ?? prefersDarkMode) ? 'dark' : 'light') as PaletteMode
   );
 
-  // Enforce default theme if selection isn't alloweed.
+  // Effect to update darkMode based on system preference
+  useEffect(() => {
+    if (allowThemeSelection) {
+      setMode(prefersDarkMode ? 'dark' : 'light');
+    }
+  }, [prefersDarkMode, allowThemeSelection, setMode]);
+
+  // Enforce default theme if selection isn't allowed.
   const _darkMode = allowThemeSelection ? mode === 'dark' : defaultTheme === 'dark';
 
   const toggleMode = useCallback(() => {
@@ -51,7 +58,7 @@ export const AppThemesProvider: FC<
     // 1: If a list of theme is provided:
     //  1.1: pick the default's id.
     //  1.2: no default, pick the first's id.
-    // 2: Else don't set a value in local strorage.
+    // 2: Else don't set a value in local storage.
     themes?.length > 0 ? themes?.find(_theme => _theme.default)?.id || themes[0].id : null
   );
 
