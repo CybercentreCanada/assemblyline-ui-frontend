@@ -43,7 +43,7 @@ export const AppThemesProvider: FC<
     if (allowThemeSelection) {
       setMode(prefersDarkMode ? 'dark' : 'light');
     }
-  }, [prefersDarkMode, allowThemeSelection, setMode]);
+  }, [prefersDarkMode, allowThemeSelection]);
 
   // Enforce default theme if selection isn't allowed.
   const _darkMode = allowThemeSelection ? mode === 'dark' : defaultTheme === 'dark';
