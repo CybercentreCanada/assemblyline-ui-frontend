@@ -160,7 +160,12 @@ const WrappedSelectInput = ({
             renderValue={option => (
               <ListItemText
                 primary={options.find(o => o.value === option)?.primary || ''}
-                primaryTypographyProps={{ sx: { cursor: 'pointer' }, ...(tiny && { variant: 'body2' }) }}
+                slotProps={{
+                  primary: {
+                    sx: { cursor: 'pointer', ...(readOnly && { cursor: 'text', userSelect: 'text' }) },
+                    ...(tiny && { variant: 'body2' })
+                  }
+                }}
                 sx={{ margin: 0, ...(readOnly && { marginLeft: '6px' }) }}
               />
             )}
