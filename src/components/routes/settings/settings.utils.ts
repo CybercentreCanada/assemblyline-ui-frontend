@@ -68,6 +68,15 @@ export type ProfileSettings = {
   initial_data: { prev: Record<string, unknown>; value: Record<string, unknown> };
 };
 
+export const getValidValue = <T>(...values: (T | null | undefined)[]): T | null => {
+  for (const value of values) {
+    if (value !== null && value !== undefined) {
+      return value;
+    }
+  }
+  return null;
+};
+
 export const getProfileNames = (settings: UserSettings) => Object.keys(settings?.submission_profiles || {});
 
 export const initializeSettings = (settings: UserSettings): ProfileSettings => {
@@ -128,14 +137,17 @@ export const loadDefaultProfile = (out: ProfileSettings, settings: UserSettings,
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       out[key].value = settings.submission_profiles.default?.[key];
       out[key].restricted = !customize;
-      out[key].default = settings.submission_profiles.default?.[key];
+      out[key].default = null;
       out[key].prev = out[key].value;
     }
   });
 
   // Applying the services parameter
   out.services.forEach((cat, i) => {
-    out.services[i].selected = settings.submission_profiles?.default?.services?.selected?.includes(cat?.name) || false;
+    out.services[i].selected = getValidValue(
+      settings.submission_profiles?.default?.services?.selected?.includes(cat?.name),
+      false
+    );
     out.services[i].restricted = !customize;
     out.services[i].default = out.services[i].selected;
     out.services[i].prev = out.services[i].selected;
@@ -159,13 +171,17 @@ export const loadDefaultProfile = (out: ProfileSettings, settings: UserSettings,
         ?.find(s => s.name === svr.name)
         ?.params?.find(p => p.name === param.name);
 
-      out.service_spec[i].params[j].value =
-        (settings?.submission_profiles?.default?.service_spec?.[svr.name]?.[param.name] as string | number | boolean) ||
-        settingsSpec?.value ||
-        out.service_spec[i].params[j].value;
+      out.service_spec[i].params[j].value = getValidValue(
+        settings?.submission_profiles?.default?.service_spec?.[svr.name]?.[param.name] as string | number | boolean,
+        settingsSpec?.value,
+        out.service_spec[i].params[j].value
+      );
 
       out.service_spec[i].params[j].restricted = !customize;
-      out.service_spec[i].params[j].default = settingsSpec?.default || out.service_spec[i].params[j].default;
+      out.service_spec[i].params[j].default = getValidValue(
+        settingsSpec?.default,
+        out.service_spec[i].params[j].default
+      );
       out.service_spec[i].params[j].prev = out.service_spec[i].params[j].value;
     });
   });
@@ -203,7 +219,7 @@ export const loadSubmissionProfile = (
       out[key].value = settings?.submission_profiles?.[name]?.[key];
       out[key].restricted = !customize && profiles?.[name]?.restricted_params?.submission?.includes(key);
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      out[key].default = profiles?.[name]?.params?.[key] || out[key].value;
+      out[key].default = getValidValue(profiles?.[name]?.params?.[key], out[key].value);
       out[key].prev = out[key].value;
     }
   });
@@ -234,15 +250,17 @@ export const loadSubmissionProfile = (
         ?.find(s => s.name === svr.name)
         ?.params?.find(p => p.name === param.name);
 
-      out.service_spec[i].params[j].value =
-        (settings?.submission_profiles?.[name]?.service_spec?.[svr.name]?.[param.name] as string | number | boolean) ||
-        settingsSpec?.value ||
-        out.service_spec[i].params[j].value;
+      out.service_spec[i].params[j].value = getValidValue(
+        settings?.submission_profiles?.[name]?.service_spec?.[svr.name]?.[param.name] as string | number | boolean,
+        settingsSpec?.value,
+        out.service_spec[i].params[j].value
+      );
 
-      out.service_spec[i].params[j].default =
-        (profiles?.[name]?.params?.service_spec?.[svr.name]?.[param.name] as string | number | boolean) ||
-        settingsSpec?.default ||
-        out.service_spec[i].params[j].default;
+      out.service_spec[i].params[j].default = getValidValue(
+        profiles?.[name]?.params?.service_spec?.[svr.name]?.[param.name] as string | number | boolean,
+        settingsSpec?.default,
+        out.service_spec[i].params[j].default
+      );
 
       out.service_spec[i].params[j].restricted =
         !customize && profiles?.[name].restricted_params?.[svr.name]?.includes(param.name);
