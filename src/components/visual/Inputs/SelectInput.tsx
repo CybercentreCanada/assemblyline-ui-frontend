@@ -161,7 +161,7 @@ const WrappedSelectInput = ({
               <ListItemText
                 primary={options.find(o => o.value === option)?.primary || ''}
                 primaryTypographyProps={{ sx: { cursor: 'pointer' }, ...(tiny && { variant: 'body2' }) }}
-                sx={{ margin: 0 }}
+                sx={{ margin: 0, ...(readOnly && { marginLeft: '6px' }) }}
               />
             )}
             sx={{ textTransform: 'capitalize' }}
