@@ -1,3 +1,4 @@
+import LockOutlineIcon from '@mui/icons-material/LockOutline';
 import type {
   FormHelperTextProps,
   IconButtonProps,
@@ -14,6 +15,7 @@ import { Tooltip } from 'components/visual/Tooltip';
 import type { Moment } from 'moment';
 import moment from 'moment';
 import React, { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export type DateInputProps = Omit<TextFieldProps, 'error' | 'value' | 'onChange'> & {
   defaultDateOffset?: number | null;
@@ -72,6 +74,7 @@ const WrappedDateInput = ({
   onError = () => null,
   ...textFieldProps
 }: DateInputProps) => {
+  const { t } = useTranslation();
   const theme = useTheme();
 
   const [tempDate, setTempDate] = useState<Moment>(null);
@@ -198,6 +201,25 @@ const WrappedDateInput = ({
                   },
                   InputProps: {
                     placeholder: placeholder,
+                    startAdornment: (
+                      <>
+                        {readOnly && (
+                          <Tooltip
+                            title={!readOnly ? null : t('readonly')}
+                            placement="bottom"
+                            arrow
+                            slotProps={{
+                              tooltip: { sx: { backgroundColor: theme.palette.primary.main } },
+                              arrow: { sx: { color: theme.palette.primary.main } }
+                            }}
+                          >
+                            <InputAdornment position="start" sx={{ marginRight: '0px', marginLeft: '-8px' }}>
+                              <LockOutlineIcon color="disabled" />
+                            </InputAdornment>
+                          </Tooltip>
+                        )}
+                      </>
+                    ),
                     endAdornment: (
                       <>
                         {loading || !reset || disabled || readOnly ? null : (

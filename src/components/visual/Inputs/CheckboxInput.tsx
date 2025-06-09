@@ -1,3 +1,4 @@
+import LockOutlineIcon from '@mui/icons-material/LockOutline';
 import type { ButtonProps, FormHelperTextProps, IconButtonProps, TooltipProps, TypographyProps } from '@mui/material';
 import { Button, Checkbox, FormControl, FormControlLabel, Skeleton, useTheme } from '@mui/material';
 import type { ExpandInputProps } from 'components/visual/Inputs/components/ExpandInput';
@@ -7,6 +8,7 @@ import type { ResetInputProps } from 'components/visual/Inputs/components/ResetI
 import { ResetInput } from 'components/visual/Inputs/components/ResetInput';
 import { Tooltip } from 'components/visual/Tooltip';
 import React, { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export type CheckboxInputProps = Omit<ButtonProps, 'onChange' | 'onClick' | 'value'> & {
   divider?: boolean;
@@ -70,6 +72,7 @@ export const CheckboxInput: React.FC<CheckboxInputProps> = React.memo(
     onError = () => null,
     ...buttonProps
   }: CheckboxInputProps) => {
+    const { t } = useTranslation();
     const theme = useTheme();
 
     const [focused, setFocused] = useState<boolean>(false);
@@ -148,6 +151,19 @@ export const CheckboxInput: React.FC<CheckboxInputProps> = React.memo(
                 <div
                   style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', columnGap: theme.spacing(1) }}
                 >
+                  {readOnly && (
+                    <Tooltip
+                      title={!readOnly ? null : t('readonly')}
+                      placement="bottom"
+                      arrow
+                      slotProps={{
+                        tooltip: { sx: { backgroundColor: theme.palette.primary.main } },
+                        arrow: { sx: { color: theme.palette.primary.main } }
+                      }}
+                    >
+                      <LockOutlineIcon color="disabled" />
+                    </Tooltip>
+                  )}
                   <span style={{ textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden' }}>{label}</span>
                   {endAdornment}
                 </div>

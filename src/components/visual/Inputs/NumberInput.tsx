@@ -1,3 +1,4 @@
+import LockOutlineIcon from '@mui/icons-material/LockOutline';
 import type {
   FormHelperTextProps,
   IconButtonProps,
@@ -10,6 +11,7 @@ import type { ResetInputProps } from 'components/visual/Inputs/components/ResetI
 import { ResetInput } from 'components/visual/Inputs/components/ResetInput';
 import { Tooltip } from 'components/visual/Tooltip';
 import React, { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export type NumberInputProps = Omit<TextFieldProps, 'error' | 'value' | 'onChange'> & {
   endAdornment?: TextFieldProps['InputProps']['endAdornment'];
@@ -73,6 +75,7 @@ const WrappedNumberInput = ({
   onReset = () => null,
   ...textFieldProps
 }: NumberInputProps) => {
+  const { t } = useTranslation();
   const theme = useTheme();
 
   const [focused, setFocused] = useState<boolean>(false);
@@ -141,7 +144,26 @@ const WrappedNumberInput = ({
                   paddingRight: '9px',
                   ...(tiny && { '& .MuiInputBase-root': { padding: '2px !important', fontSize: '14px' } })
                 },
-                startAdornment: startAdornment && <InputAdornment position="start">{startAdornment}</InputAdornment>,
+                startAdornment: (
+                  <>
+                    {readOnly && (
+                      <Tooltip
+                        title={!readOnly ? null : t('readonly')}
+                        placement="bottom"
+                        arrow
+                        slotProps={{
+                          tooltip: { sx: { backgroundColor: theme.palette.primary.main } },
+                          arrow: { sx: { color: theme.palette.primary.main } }
+                        }}
+                      >
+                        <InputAdornment position="start" sx={{ marginRight: '0px', marginLeft: '-8px' }}>
+                          <LockOutlineIcon color="disabled" />
+                        </InputAdornment>
+                      </Tooltip>
+                    )}
+                    {startAdornment && <InputAdornment position="start">{startAdornment}</InputAdornment>}
+                  </>
+                ),
                 endAdornment: (
                   <>
                     {loading || !reset || disabled || readOnly ? null : (

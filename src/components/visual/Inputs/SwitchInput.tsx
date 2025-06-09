@@ -1,3 +1,4 @@
+import LockOutlineIcon from '@mui/icons-material/LockOutline';
 import type {
   ButtonProps,
   FormHelperTextProps,
@@ -12,6 +13,7 @@ import type { ResetInputProps } from 'components/visual/Inputs/components/ResetI
 import { ResetInput } from 'components/visual/Inputs/components/ResetInput';
 import { Tooltip } from 'components/visual/Tooltip';
 import React, { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export type SwitchInputProps = Omit<ButtonProps, 'onChange' | 'onClick' | 'value'> & {
   endAdornment?: React.ReactNode;
@@ -62,6 +64,7 @@ export const SwitchInput: React.FC<SwitchInputProps> = React.memo(
     onError = () => null,
     ...buttonProps
   }: SwitchInputProps) => {
+    const { t } = useTranslation();
     const theme = useTheme();
 
     const [focused, setFocused] = useState<boolean>(false);
@@ -123,7 +126,9 @@ export const SwitchInput: React.FC<SwitchInputProps> = React.memo(
                     disableTouchRipple
                     size="small"
                     sx={{
-                      '&>.Mui-disabled': { ...((preventDisabledColor || readOnly) && { color: 'inherit !important' }) }
+                      '&>.Mui-disabled': {
+                        ...((preventDisabledColor || readOnly) && { color: 'inherit !important' })
+                      }
                     }}
                   />
                 )
@@ -133,6 +138,19 @@ export const SwitchInput: React.FC<SwitchInputProps> = React.memo(
                 <div
                   style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', columnGap: theme.spacing(1) }}
                 >
+                  {readOnly && (
+                    <Tooltip
+                      title={!readOnly ? null : t('readonly')}
+                      placement="bottom"
+                      arrow
+                      slotProps={{
+                        tooltip: { sx: { backgroundColor: theme.palette.primary.main } },
+                        arrow: { sx: { color: theme.palette.primary.main } }
+                      }}
+                    >
+                      <LockOutlineIcon color="disabled" />
+                    </Tooltip>
+                  )}
                   <span style={{ textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden' }}>{label}</span>
                   {endAdornment}
                 </div>

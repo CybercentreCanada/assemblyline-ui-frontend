@@ -1,3 +1,4 @@
+import LockOutlineIcon from '@mui/icons-material/LockOutline';
 import type {
   FormHelperTextProps,
   IconButtonProps,
@@ -25,6 +26,7 @@ import type { ResetInputProps } from 'components/visual/Inputs/components/ResetI
 import { ResetInput } from 'components/visual/Inputs/components/ResetInput';
 import { Tooltip } from 'components/visual/Tooltip';
 import React, { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export type SelectInputProps = Omit<SelectProps, 'error' | 'value' | 'onChange'> & {
   capitalize?: boolean;
@@ -88,6 +90,7 @@ const WrappedSelectInput = ({
   onError = () => null,
   ...selectProps
 }: SelectInputProps) => {
+  const { t } = useTranslation();
   const theme = useTheme();
 
   const [focused, setFocused] = useState<boolean>(false);
@@ -157,8 +160,13 @@ const WrappedSelectInput = ({
             renderValue={option => (
               <ListItemText
                 primary={options.find(o => o.value === option)?.primary || ''}
-                primaryTypographyProps={{ sx: { cursor: 'pointer' }, ...(tiny && { variant: 'body2' }) }}
-                sx={{ margin: 0 }}
+                slotProps={{
+                  primary: {
+                    sx: { cursor: 'pointer', ...(readOnly && { cursor: 'text', userSelect: 'text' }) },
+                    ...(tiny && { variant: 'body2' })
+                  }
+                }}
+                sx={{ margin: 0, ...(readOnly && { marginLeft: '6px' }) }}
               />
             )}
             sx={{ textTransform: 'capitalize' }}
@@ -171,6 +179,25 @@ const WrappedSelectInput = ({
             }}
             onFocus={event => setFocused(document.activeElement === event.target)}
             onBlur={() => setFocused(false)}
+            startAdornment={
+              <>
+                {readOnly && (
+                  <Tooltip
+                    title={!readOnly ? null : t('readonly')}
+                    placement="bottom"
+                    arrow
+                    slotProps={{
+                      tooltip: { sx: { backgroundColor: theme.palette.primary.main } },
+                      arrow: { sx: { color: theme.palette.primary.main } }
+                    }}
+                  >
+                    <InputAdornment position="start" sx={{ marginRight: '0px', marginLeft: '-8px' }}>
+                      <LockOutlineIcon color="disabled" />
+                    </InputAdornment>
+                  </Tooltip>
+                )}
+              </>
+            }
             endAdornment={
               <>
                 {loading || !reset || disabled || readOnly ? null : (

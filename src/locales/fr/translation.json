@@ -189,6 +189,7 @@
   "quotas.api.remaining": "appels API restants",
   "quotas.submission": "Soumissions",
   "quotas.submission.remaining": "soumissions restantes",
+  "readonly": "Lecture seulement",
   "related": "Trouver des résultats liés",
   "related_external": "Rechercher dans des sources externes",
   "related_external.all": "Toutes sources",

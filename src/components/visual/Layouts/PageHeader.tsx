@@ -12,6 +12,7 @@ export type PageHeaderProps = {
   primary: ReactNode | ((loading?: boolean) => ReactNode);
   secondary?: ReactNode | ((loading?: boolean) => ReactNode);
   actions?: ReactNode;
+  startAdornment?: ReactNode;
   endAdornment?: ReactNode;
 
   loading?: boolean;
@@ -32,6 +33,7 @@ export const PageHeader: React.FC<PageHeaderProps> = React.memo(
   ({
     actions = null,
     classification = 'undefined',
+    startAdornment = null,
     endAdornment = null,
     loading = false,
     isSticky = false,
@@ -132,6 +134,8 @@ export const PageHeader: React.FC<PageHeaderProps> = React.memo(
                 )}
               </Typography>
             )}
+
+            {startAdornment}
           </div>
 
           <div

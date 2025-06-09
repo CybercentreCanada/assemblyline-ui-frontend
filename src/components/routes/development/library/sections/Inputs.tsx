@@ -3,6 +3,7 @@ import { DemoContainer } from 'components/routes/development/library/components/
 import { DemoSection } from 'components/routes/development/library/components/DemoSection';
 import { useForm } from 'components/routes/development/library/contexts/form';
 import { CheckboxInput } from 'components/visual/Inputs/CheckboxInput';
+import { ChipsInput } from 'components/visual/Inputs/ChipsInput';
 import { DateInput } from 'components/visual/Inputs/DateInput';
 import { NumberInput } from 'components/visual/Inputs/NumberInput';
 import { SelectInput } from 'components/visual/Inputs/SelectInput';
@@ -30,6 +31,7 @@ export type InputsLibraryState = {
     };
     values: {
       text: string;
+      chips: string[];
       number: number;
       date: string;
       select: string;
@@ -57,6 +59,7 @@ export const INPUTS_LIBRARY_STATE: InputsLibraryState = {
     },
     values: {
       text: '',
+      chips: [],
       number: null,
       date: '',
       select: '',
@@ -91,6 +94,17 @@ export const InputsSection = React.memo(() => {
                   label="Text Input"
                   value={value}
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.text', next)}
+                />
+              )}
+            />
+
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.chips}
+              children={value => (
+                <ChipsInput
+                  label="Chips Input"
+                  value={value}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.chips', next)}
                 />
               )}
             />
@@ -177,6 +191,12 @@ export const InputsSection = React.memo(() => {
   onChange={(event, next) => {}}
   />
 
+  <ChipsInput
+  label="Text Input"
+  value={value}
+  onChange={(event, next) => {}}
+  />
+
   <NumberInput
   label="Number Input"
   value={value}
@@ -246,6 +266,33 @@ export const InputsSection = React.memo(() => {
           <Grid size={{ xs: 12, md: 6 }} alignItems="flex-end" paddingBottom={2} paddingLeft={2}>
             <form.Subscribe
               selector={state => state.values.components.inputs.values.text}
+              children={value => (
+                <div>
+                  <Typography variant="body2">{`Type: ${typeof value}`}</Typography>
+                  <Typography variant="body2">{`Value: ${value}`}</Typography>
+                </div>
+              )}
+            />
+          </Grid>
+
+          <Grid size={{ xs: 12, md: 6 }}>
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.chips}
+              children={value => (
+                <ChipsInput
+                  label="Controlled Chips Input"
+                  value={value}
+                  reset
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.chips', next)}
+                  onReset={() => form.setFieldValue('components.inputs.values.chips', [])}
+                />
+              )}
+            />
+          </Grid>
+
+          <Grid size={{ xs: 12, md: 6 }} alignItems="flex-end" paddingBottom={2} paddingLeft={2}>
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.chips}
               children={value => (
                 <div>
                   <Typography variant="body2">{`Type: ${typeof value}`}</Typography>
@@ -447,6 +494,18 @@ export const InputsSection = React.memo(() => {
             />
 
             <form.Subscribe
+              selector={state => state.values.components.inputs.values.chips}
+              children={value => (
+                <ChipsInput
+                  label="Disabled Chips Input"
+                  value={value}
+                  disabled
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.chips', next)}
+                />
+              )}
+            />
+
+            <form.Subscribe
               selector={state => state.values.components.inputs.values.number}
               children={value => (
                 <NumberInput
@@ -535,6 +594,13 @@ export const InputsSection = React.memo(() => {
   onChange={(event, next) => {}}
   />
 
+  <ChipsInput
+  label="Disabled Chips Input"
+  value={value}
+  disabled
+  onChange={(event, next) => {}}
+  />
+
   <NumberInput
   label="Disabled Number Input"
   value={value}
@@ -602,6 +668,18 @@ export const InputsSection = React.memo(() => {
               children={value => (
                 <TextInput
                   label="Loading Text Input"
+                  value={value}
+                  loading
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.text', next)}
+                />
+              )}
+            />
+
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.text}
+              children={value => (
+                <TextInput
+                  label="Loading Chips Input"
                   value={value}
                   loading
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.text', next)}
@@ -698,6 +776,13 @@ export const InputsSection = React.memo(() => {
   onChange={(event, next) => {}}
   />
 
+  <ChipsInput
+  label="Loading Chips Input"
+  value={value}
+  loading
+  onChange={(event, next) => {}}
+  />
+
   <NumberInput
   label="Loading Number Input"
   value={value}
@@ -768,6 +853,19 @@ export const InputsSection = React.memo(() => {
                   reset
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.text', next)}
                   onReset={() => form.setFieldValue('components.inputs.values.text', '')}
+                />
+              )}
+            />
+
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.chips}
+              children={value => (
+                <ChipsInput
+                  label="Reset Chips Input"
+                  value={value}
+                  reset
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.chips', next)}
+                  onReset={() => form.setFieldValue('components.inputs.values.chips', [])}
                 />
               )}
             />
@@ -868,6 +966,14 @@ export const InputsSection = React.memo(() => {
     onReset={() => {}}
   />
 
+  <ChipsInput
+    label="Reset Chips Input"
+    value={value}
+    reset
+    onChange={(event, next) => {}}
+    onReset={() => {}}
+  />
+
   <NumberInput
     label="Reset Number Input"
     value={value}
@@ -942,6 +1048,17 @@ export const InputsSection = React.memo(() => {
                   tooltip="Tooltip Text Input"
                   value={value}
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.text', next)}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.chips}
+              children={value => (
+                <ChipsInput
+                  label="Tooltip Chips Input"
+                  tooltip="Tooltip Chips Input"
+                  value={value}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.chips', next)}
                 />
               )}
             />
@@ -1029,6 +1146,13 @@ export const InputsSection = React.memo(() => {
   onChange={(event, next) => {}}
   />
 
+  <TextInput
+  label="Tooltip Chips Input"
+  tooltip="Tooltip Chips Input"
+  value={value}
+  onChange={(event, next) => {}}
+  />
+
   <NumberInput
   label="Tooltip Number Input"
   tooltip="Tooltip Number Input"
@@ -1101,6 +1225,17 @@ export const InputsSection = React.memo(() => {
                   value={value}
                   error={v => (v !== '' ? null : 'Input field cannot be empty')}
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.text', next)}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.chips}
+              children={value => (
+                <ChipsInput
+                  label="Error Chips Input"
+                  value={value}
+                  error={v => (v.length !== 0 ? null : 'Input field cannot be empty')}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.chips', next)}
                 />
               )}
             />
@@ -1189,6 +1324,14 @@ export const InputsSection = React.memo(() => {
   onError={error => {}}
   />
 
+  <ChipsInput
+  label="Error Chips Input"
+  value={value}
+  error={v => (v !== '' ? null : 'Input field cannot be empty')}
+  onChange={(event, next) => {}}
+  onError={error => {}}
+  />
+
   <NumberInput
   label="Error Number Input"
   value={value}
@@ -1265,6 +1408,17 @@ export const InputsSection = React.memo(() => {
                   value={value}
                   helperText="Helper Text"
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.text', next)}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.chips}
+              children={value => (
+                <ChipsInput
+                  label="Helper Text Chips Input"
+                  value={value}
+                  helperText="Helper Text"
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.chips', next)}
                 />
               )}
             />
@@ -1352,6 +1506,13 @@ export const InputsSection = React.memo(() => {
   onChange={(event, next) => {}}
   />
 
+  <ChipsInput
+  label="Helper Text Chips Input"
+  value={value}
+  helperText='Helper Text'
+  onChange={(event, next) => {}}
+  />
+
   <NumberInput
   label="Helper Text Number Input"
   value={value}
@@ -1424,6 +1585,17 @@ export const InputsSection = React.memo(() => {
               )}
             />
             <form.Subscribe
+              selector={state => state.values.components.inputs.values.chips}
+              children={value => (
+                <ChipsInput
+                  label="Placeholder Chips Input"
+                  value={value}
+                  placeholder="Placeholder"
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.chips', next)}
+                />
+              )}
+            />
+            <form.Subscribe
               selector={state => state.values.components.inputs.values.number}
               children={value => (
                 <NumberInput
@@ -1469,6 +1641,13 @@ export const InputsSection = React.memo(() => {
             value={`<>
   <TextInput
   label="Placeholder Text Input"
+  value={value}
+  placeholder="Placeholder"
+  onChange={(event, next) => {}}
+  />
+
+  <ChipsInput
+  label="Placeholder Chips Input"
   value={value}
   placeholder="Placeholder"
   onChange={(event, next) => {}}
@@ -1525,6 +1704,18 @@ export const InputsSection = React.memo(() => {
                   value={value}
                   readOnly
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.text', next)}
+                />
+              )}
+            />
+
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.chips}
+              children={value => (
+                <ChipsInput
+                  label="ReadOnly Chips Input"
+                  value={value}
+                  readOnly
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.chips', next)}
                 />
               )}
             />
@@ -1618,6 +1809,13 @@ export const InputsSection = React.memo(() => {
   onChange={(event, next) => {}}
   />
 
+  <ChipsInput
+  label="ReadOnly Chips Input"
+  value={value}
+  readOnly
+  onChange={(event, next) => {}}
+  />
+
   <NumberInput
   label="ReadOnly Number Input"
   value={value}
@@ -1686,6 +1884,17 @@ export const InputsSection = React.memo(() => {
                   value={value}
                   endAdornment={<Button variant="contained">Submit</Button>}
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.text', next)}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.chips}
+              children={value => (
+                <ChipsInput
+                  label="End Adornment Chips Input"
+                  value={value}
+                  endAdornment={<Button variant="contained">Submit</Button>}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.chips', next)}
                 />
               )}
             />
@@ -1771,6 +1980,13 @@ export const InputsSection = React.memo(() => {
   onChange={(event, next) => {}}
   />
 
+  <ChipsInput
+  label="End Adornment Chips Input"
+  value={value}
+  endAdornment={<Button variant="contained">{'Submit'}</Button>}
+  onChange={(event, next) => {}}
+  />
+
   <NumberInput
   label="End Adornment Number Input"
   value={value}
@@ -1839,6 +2055,17 @@ export const InputsSection = React.memo(() => {
                   value={value}
                   tiny
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.text', next)}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.chips}
+              children={value => (
+                <ChipsInput
+                  label="Tiny Chips Input"
+                  value={value}
+                  tiny
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.chips', next)}
                 />
               )}
             />
@@ -1921,6 +2148,12 @@ export const InputsSection = React.memo(() => {
             value={`<>
   <TextInput
   label="End Adornment Text Input"
+  value={value}
+  onChange={(event, next) => {}}
+  />
+
+  <ChipsInput
+  label="End Adornment Chips Input"
   value={value}
   onChange={(event, next) => {}}
   />
@@ -2021,6 +2254,30 @@ export const InputsSection = React.memo(() => {
                       })}
                       {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
                       {...(error && { error: v => (v !== '' ? null : 'Input field cannot be null') })}
+                      {...(helperText && { helperText: 'Helper Text' })}
+                      {...(placeholder && { placeholder: 'Placeholder' })}
+                      {...(endAdornment && { endAdornment: <Button variant="contained">Submit</Button> })}
+                    />
+                  )}
+                />
+
+                <form.Subscribe
+                  selector={state => state.values.components.inputs.values.chips}
+                  children={value => (
+                    <ChipsInput
+                      label="Interaction Chips Input"
+                      value={value}
+                      onChange={(event, next) => form.setFieldValue('components.inputs.values.chips', next)}
+                      {...(disabled && { disabled })}
+                      {...(loading && { loading })}
+                      {...(readOnly && { readOnly })}
+                      {...(tiny && { tiny })}
+                      {...(reset && {
+                        reset,
+                        onReset: () => form.setFieldValue('components.inputs.values.chips', [])
+                      })}
+                      {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
+                      {...(error && { error: v => (v.length !== 0 ? null : 'Input field cannot be null') })}
                       {...(helperText && { helperText: 'Helper Text' })}
                       {...(placeholder && { placeholder: 'Placeholder' })}
                       {...(endAdornment && { endAdornment: <Button variant="contained">Submit</Button> })}
@@ -2308,6 +2565,17 @@ export const InputsSection = React.memo(() => {
             />
 
             <form.Subscribe
+              selector={state => state.values.components.inputs.values.chips}
+              children={value => (
+                <ChipsInput
+                  label="Chips Input: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc."
+                  value={value}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.chips', next)}
+                />
+              )}
+            />
+
+            <form.Subscribe
               selector={state => state.values.components.inputs.values.number}
               children={value => (
                 <NumberInput
@@ -2387,6 +2655,12 @@ export const InputsSection = React.memo(() => {
             value={`<>
   <TextInput
   label="Text Input"
+  value={value}
+  onChange={(event, next) => {}}
+  />
+
+  <ChipsInput
+  label="Chips Input"
   value={value}
   onChange={(event, next) => {}}
   />
