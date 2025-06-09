@@ -35,17 +35,18 @@ export type ChipsInputProps<
   ChipComponent extends ElementType = ElementType
 > = Omit<
   AutocompleteProps<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>,
-  'renderInput' | 'options' | 'onChange' | 'value'
+  'isOptionEqualToValue' | 'renderInput' | 'options' | 'onChange' | 'value'
 > & {
   endAdornment?: TextFieldProps['InputProps']['endAdornment'];
   error?: (value: string[]) => string;
   errorProps?: FormHelperTextProps;
   helperText?: string;
   helperTextProps?: FormHelperTextProps;
+  isOptionEqualToValue?: (option: string, value: string) => boolean;
   label: string;
   labelProps?: TypographyProps;
   loading?: boolean;
-  options?: AutocompleteProps<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>['options'];
+  options?: string[];
   placeholder?: TextFieldProps['InputProps']['placeholder'];
   preventDisabledColor?: boolean;
   preventRender?: boolean;
@@ -77,6 +78,7 @@ const WrappedChipsInput = <
   helperText = null,
   helperTextProps = null,
   id: idProp = null,
+  isOptionEqualToValue = null,
   label,
   labelProps,
   loading = false,
@@ -87,9 +89,9 @@ const WrappedChipsInput = <
   readOnly = false,
   reset = false,
   resetProps = null,
+  rootProps = null,
   startAdornment = null,
   tiny = false,
-  rootProps = null,
   tooltip = null,
   tooltipProps = null,
   value,
@@ -141,6 +143,7 @@ const WrappedChipsInput = <
             options={options}
             disabled={disabled}
             readOnly={readOnly}
+            isOptionEqualToValue={!isOptionEqualToValue ? null : isOptionEqualToValue}
             onChange={(e, v: string[], p) => {
               onChange(e, v, p);
 
