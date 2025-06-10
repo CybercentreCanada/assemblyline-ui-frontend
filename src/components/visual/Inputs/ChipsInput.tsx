@@ -1,4 +1,3 @@
-import LockOutlineIcon from '@mui/icons-material/LockOutline';
 import type {
   AutocompleteChangeReason,
   AutocompleteProps,
@@ -134,120 +133,116 @@ const WrappedChipsInput = <
         {loading ? (
           <Skeleton sx={{ height: '40px', transform: 'unset', ...(tiny && { height: '28px' }) }} />
         ) : (
-          <Autocomplete
-            id={id}
-            freeSolo
-            multiple
-            size="small"
-            value={value}
-            options={options}
-            disabled={disabled}
-            readOnly={readOnly}
-            isOptionEqualToValue={!isOptionEqualToValue ? null : isOptionEqualToValue}
-            onChange={(e, v: string[], p) => {
-              onChange(e, v, p);
-
-              const err = error(v);
-              if (err) onError(err);
+          <Tooltip
+            title={!readOnly ? null : t('readonly')}
+            placement="bottom"
+            arrow
+            slotProps={{
+              tooltip: { sx: { backgroundColor: theme.palette.primary.main } },
+              arrow: { sx: { color: theme.palette.primary.main } }
             }}
-            onFocus={event => setFocused(document.activeElement === event.target)}
-            onBlur={() => setFocused(false)}
-            renderInput={params => (
-              <TextField
-                {...params}
-                id={id}
-                variant="outlined"
-                error={!!errorValue}
-                placeholder={placeholder}
-                {...(readOnly && !disabled && { focused: null })}
-                slotProps={{
-                  input: {
-                    ...params?.InputProps,
-                    ...(reset && { style: { paddingRight: '85px' } }),
-                    'aria-describedby': disabled || !(errorValue || helperText) ? null : `${id}-helper-text`,
-                    startAdornment: (
-                      <>
-                        {readOnly && (
-                          <Tooltip
-                            title={!readOnly ? null : t('readonly')}
-                            placement="bottom"
-                            arrow
-                            slotProps={{
-                              tooltip: { sx: { backgroundColor: theme.palette.primary.main } },
-                              arrow: { sx: { color: theme.palette.primary.main } }
-                            }}
-                          >
-                            <InputAdornment position="start" sx={{ marginRight: '0px' }}>
-                              <LockOutlineIcon color="disabled" />
+          >
+            <Autocomplete
+              id={id}
+              freeSolo
+              multiple
+              size="small"
+              value={value}
+              options={options}
+              disabled={disabled}
+              readOnly={readOnly}
+              isOptionEqualToValue={!isOptionEqualToValue ? null : isOptionEqualToValue}
+              onChange={(e, v: string[], p) => {
+                onChange(e, v, p);
+
+                const err = error(v);
+                if (err) onError(err);
+              }}
+              onFocus={event => setFocused(document.activeElement === event.target)}
+              onBlur={() => setFocused(false)}
+              renderInput={params => (
+                <TextField
+                  {...params}
+                  id={id}
+                  variant="outlined"
+                  error={!!errorValue}
+                  placeholder={placeholder}
+                  {...(readOnly && !disabled && { focused: null })}
+                  slotProps={{
+                    input: {
+                      ...params?.InputProps,
+                      ...(reset && { style: { paddingRight: '85px' } }),
+                      'aria-describedby': disabled || !(errorValue || helperText) ? null : `${id}-helper-text`,
+                      startAdornment: (
+                        <>
+                          {startAdornment && <InputAdornment position="start">{startAdornment}</InputAdornment>}
+                          {params?.InputProps?.startAdornment}
+                        </>
+                      ),
+                      endAdornment: (
+                        <>
+                          {endAdornment && <InputAdornment position="end">{endAdornment}</InputAdornment>}
+                          {loading || !reset || disabled || readOnly ? null : (
+                            <InputAdornment
+                              position="end"
+                              sx={{
+                                position: 'absolute',
+                                right: '37px',
+                                top: '50%',
+                                transform: 'translate(0, -50%)',
+                                ...(!focused && { visibility: 'hidden' })
+                              }}
+                              style={{ display: 'hidden' }}
+                            >
+                              <ResetInput
+                                id={id}
+                                preventRender={loading || !reset || disabled || readOnly}
+                                tiny={tiny}
+                                onReset={onReset}
+                                {...resetProps}
+                              />
                             </InputAdornment>
-                          </Tooltip>
-                        )}
-                        {startAdornment && <InputAdornment position="start">{startAdornment}</InputAdornment>}
-                        {params?.InputProps?.startAdornment}
-                      </>
-                    ),
-                    endAdornment: (
-                      <>
-                        {endAdornment && <InputAdornment position="end">{endAdornment}</InputAdornment>}
-                        {loading || !reset || disabled || readOnly ? null : (
-                          <InputAdornment
-                            position="end"
-                            sx={{
-                              position: 'absolute',
-                              right: '37px',
-                              top: '50%',
-                              transform: 'translate(0, -50%)',
-                              ...(!focused && { visibility: 'hidden' })
-                            }}
-                            style={{ display: 'hidden' }}
-                          >
-                            <ResetInput
-                              id={id}
-                              preventRender={loading || !reset || disabled || readOnly}
-                              tiny={tiny}
-                              onReset={onReset}
-                              {...resetProps}
-                            />
-                          </InputAdornment>
-                        )}
-                        {params?.InputProps?.endAdornment}
-                      </>
-                    )
-                  }
-                }}
-                sx={{
-                  ...(tiny && {
-                    '& .MuiInputBase-root': {
-                      paddingTop: '2px !important',
-                      paddingBottom: '2px !important',
-                      fontSize: '14px'
+                          )}
+                          {params?.InputProps?.endAdornment}
+                        </>
+                      )
                     }
-                  }),
-                  ...(readOnly &&
-                    !disabled && {
-                      '& .MuiInputBase-input': { cursor: 'default' },
-                      '& .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline': {
-                        borderColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.23)' : 'rgba(0, 0, 0, 0.23)'
+                  }}
+                  sx={{
+                    ...(tiny && {
+                      '& .MuiInputBase-root': {
+                        paddingTop: '2px !important',
+                        paddingBottom: '2px !important',
+                        fontSize: '14px'
                       }
-                    })
-                }}
-              />
-            )}
-            renderValue={(values: string[], getItemProps) =>
-              values.map((option: string, index: number) => {
-                const { key, ...itemProps } = getItemProps({ index });
-                return (
-                  <CustomChip
-                    key={key}
-                    label={option}
-                    {...itemProps}
-                    onDelete={disabled ? undefined : itemProps.onDelete}
-                  />
-                );
-              })
-            }
-            {...(autocompleteProps as unknown as object)}
-          />
+                    }),
+                    ...(readOnly &&
+                      !disabled && {
+                        '& .MuiInputBase-input': { cursor: 'default' },
+                        '& .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline': {
+                          borderColor:
+                            theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.23)' : 'rgba(0, 0, 0, 0.23)'
+                        }
+                      })
+                  }}
+                />
+              )}
+              renderValue={(values: string[], getItemProps) =>
+                values.map((option: string, index: number) => {
+                  const { key, ...itemProps } = getItemProps({ index });
+                  return (
+                    <CustomChip
+                      key={key}
+                      label={option}
+                      {...itemProps}
+                      onDelete={disabled ? undefined : itemProps.onDelete}
+                    />
+                  );
+                })
+              }
+              {...(autocompleteProps as unknown as object)}
+            />
+          </Tooltip>
         )}
         <HelperText
           disabled={disabled}
