@@ -219,7 +219,7 @@ export const loadSubmissionProfile = (
       out[key].value = settings?.submission_profiles?.[name]?.[key];
       out[key].restricted = !customize && profiles?.[name]?.restricted_params?.submission?.includes(key);
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      out[key].default = getValidValue(profiles?.[name]?.params?.[key], out[key].value);
+      out[key].default = getValidValue(profiles?.[name]?.params?.[key], null);
       out[key].prev = out[key].value;
     }
   });
