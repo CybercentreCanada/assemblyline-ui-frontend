@@ -53,10 +53,14 @@ export const ExternalSourcesSection = React.memo(() => {
                     value={value}
                     loading={loading}
                     disabled={disabled}
-                    onChange={() => {
+                    onChange={(e, v) => {
                       form.setFieldValue('settings', s => {
-                        if (value) s.default_external_sources.value.filter(item => item !== source);
-                        else s.default_external_sources.value.push(source);
+                        if (v) s.default_external_sources.value.push(source);
+                        else
+                          s.default_external_sources.value = s.default_external_sources.value.filter(
+                            item => item !== source
+                          );
+
                         return s;
                       });
                     }}
