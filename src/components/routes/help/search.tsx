@@ -56,7 +56,8 @@ const Toc: ContentWithTOCItemDef[] = [
       { id: 'regex.minmax' },
       { id: 'regex.grouping' },
       { id: 'regex.alternation' },
-      { id: 'regex.class' }
+      { id: 'regex.class' },
+      { id: 'regex.reserved_characters' }
     ]
   },
   { id: 'fuzziness' },
@@ -138,7 +139,11 @@ export default function Search() {
 
         <Paragraph id="overview">
           <Typography variant="h5">{t('overview')}</Typography>
-          {t('overview.text')}
+          {t('overview.text1')}
+          <a href="https://lucene.apache.org/core/" target="_blank" rel="noopener noreferrer">
+            {t('overview.search_link')}
+          </a>
+          {t('overview.text2')}
         </Paragraph>
 
         <Paragraph id="basic">
@@ -370,6 +375,17 @@ export default function Search() {
           <StyledCard>{t('regex.class.ex2')}</StyledCard>
         </Paragraph>
 
+        <Paragraph id="regex.reserved_characters">
+          <Typography variant="h6">{t('regex.reserved_characters')}</Typography>
+          <Padded>{t('regex.reserved_characters.text1')}</Padded>
+          <StyledCard>{t('regex.reserved_characters.ex1')}</StyledCard>
+          <Padded>{t('regex.reserved_characters.text2')}</Padded>
+          <StyledCard>{t('regex.reserved_characters.ex2')}</StyledCard>
+          <Padded>{t('regex.reserved_characters.text3')}</Padded>
+          <StyledCard>{t('regex.reserved_characters.ex3')}</StyledCard>
+          <Padded>{t('regex.reserved_characters.text4')}</Padded>
+        </Paragraph>
+
         <Paragraph id="fuzziness">
           <Typography variant="h5">{t('fuzziness')}</Typography>
           <Padded>{t('fuzziness.text')}</Padded>
@@ -477,6 +493,8 @@ export default function Search() {
 
         <Paragraph id="reserved">
           <Typography variant="h5">{t('reserved')}</Typography>
+          <Padded>{t('reserved.text')}</Padded>
+          <StyledCard>{t('reserved.ex')}</StyledCard>
           <Padded>{t('reserved.text')}</Padded>
           <Padded>{t('reserved.text2')}</Padded>
           <StyledCard>{t('reserved.ex')}</StyledCard>
