@@ -1,4 +1,4 @@
-import { Alert, Tooltip, useTheme } from '@mui/material';
+import { Alert, Tooltip, Typography, useTheme } from '@mui/material';
 import { invalidateAPIQuery } from 'components/core/Query/API/invalidateAPIQuery';
 import { useAPIMutation } from 'components/core/Query/API/useAPIMutation';
 import useALContext from 'components/hooks/useALContext';
@@ -86,13 +86,25 @@ export const HeaderSection = React.memo(() => {
                     : configuration.submission.profiles[tab].display_name
             }
             secondary={
-              !tab
-                ? null
-                : tab === 'interface'
-                  ? null
-                  : tab === 'default'
-                    ? t('profile.custom_desc')
-                    : configuration.submission.profiles[tab].description
+              <>
+                {!tab ? null : tab === 'interface' ? null : tab === 'default' ? (
+                  <>
+                    <Typography
+                      color="secondary"
+                      style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}
+                    >{`{"submission_profile": "default"}`}</Typography>
+                    {t('profile.custom_desc')}
+                  </>
+                ) : (
+                  <>
+                    <Typography
+                      color="secondary"
+                      style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}
+                    >{`{"submission_profile": "${tab}"}`}</Typography>
+                    {configuration.submission.profiles[tab].description}
+                  </>
+                )}
+              </>
             }
             loading={loading}
             slotProps={{ actions: { spacing: 1 } }}
