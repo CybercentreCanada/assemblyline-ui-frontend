@@ -1,4 +1,3 @@
-import LockOutlineIcon from '@mui/icons-material/LockOutline';
 import type {
   FormHelperTextProps,
   IconButtonProps,
@@ -136,121 +135,112 @@ const WrappedSelectInput = ({
         {loading ? (
           <Skeleton sx={{ height: '40px', transform: 'unset', ...(tiny && { height: '28px' }) }} />
         ) : (
-          <Select
-            aria-describedby={disabled || !(errorValue || helperText) ? null : `${id}-helper-text`}
-            disabled={disabled}
-            displayEmpty
-            fullWidth
-            // TODO: Add placeholder
-            readOnly={readOnly}
-            size="small"
-            value={options.some(o => o.value === value) ? value : ''}
-            variant="outlined"
-            inputProps={{
-              id: id,
-              sx: {
-                display: 'flex',
-                alignItems: 'center',
-                ...(tiny && {
-                  paddingTop: theme.spacing(0.25),
-                  paddingBottom: theme.spacing(0.25)
-                })
-              }
+          <Tooltip
+            title={!readOnly ? null : t('readonly')}
+            placement="bottom"
+            arrow
+            slotProps={{
+              tooltip: { sx: { backgroundColor: theme.palette.primary.main } },
+              arrow: { sx: { color: theme.palette.primary.main } }
             }}
-            renderValue={option => (
-              <ListItemText
-                primary={options.find(o => o.value === option)?.primary || ''}
-                slotProps={{
-                  primary: {
-                    sx: { cursor: 'pointer', ...(readOnly && { cursor: 'text', userSelect: 'text' }) },
-                    ...(tiny && { variant: 'body2' })
-                  }
-                }}
-                sx={{ margin: 0, ...(readOnly && { marginLeft: '6px' }) }}
-              />
-            )}
-            sx={{ textTransform: 'capitalize' }}
-            onChange={event => {
-              const v = event.target.value as string;
-              onChange(event, v);
-
-              const err = error(v);
-              if (err) onError(err);
-            }}
-            onFocus={event => setFocused(document.activeElement === event.target)}
-            onBlur={() => setFocused(false)}
-            startAdornment={
-              <>
-                {readOnly && (
-                  <Tooltip
-                    title={!readOnly ? null : t('readonly')}
-                    placement="bottom"
-                    arrow
-                    slotProps={{
-                      tooltip: { sx: { backgroundColor: theme.palette.primary.main } },
-                      arrow: { sx: { color: theme.palette.primary.main } }
-                    }}
-                  >
-                    <InputAdornment position="start" sx={{ marginRight: '0px', marginLeft: '-8px' }}>
-                      <LockOutlineIcon color="disabled" />
-                    </InputAdornment>
-                  </Tooltip>
-                )}
-              </>
-            }
-            endAdornment={
-              <>
-                {loading || !reset || disabled || readOnly ? null : (
-                  <InputAdornment position="end" style={{ marginRight: theme.spacing(2) }}>
-                    <ResetInput
-                      id={id}
-                      preventRender={loading || !reset || disabled || readOnly}
-                      tiny={tiny}
-                      onReset={onReset}
-                      {...resetProps}
-                    />
-                  </InputAdornment>
-                )}
-                {endAdornment && (
-                  <InputAdornment position="end" style={{ marginRight: theme.spacing(2) }}>
-                    {endAdornment}
-                  </InputAdornment>
-                )}
-              </>
-            }
-            MenuProps={{ sx: { maxWidth: 'min-content' } }}
-            {...selectProps}
           >
-            {hasEmpty && <MenuItem value="" sx={{ height: '36px' }}></MenuItem>}
-            {options.map((option, i) => (
-              <MenuItem
-                key={i}
-                value={option.value}
-                sx={{
-                  '&>div': { margin: 0, cursor: 'pointer !important' },
-                  ...(capitalize && { textTransform: 'capitalize' })
-                }}
-              >
+            <Select
+              aria-describedby={disabled || !(errorValue || helperText) ? null : `${id}-helper-text`}
+              disabled={disabled}
+              displayEmpty
+              fullWidth
+              // TODO: Add placeholder
+              readOnly={readOnly}
+              size="small"
+              value={options.some(o => o.value === value) ? value : ''}
+              variant="outlined"
+              inputProps={{
+                id: id,
+                sx: {
+                  display: 'flex',
+                  alignItems: 'center',
+                  ...(tiny && {
+                    paddingTop: theme.spacing(0.25),
+                    paddingBottom: theme.spacing(0.25)
+                  })
+                }
+              }}
+              renderValue={option => (
                 <ListItemText
-                  primary={option.primary}
-                  secondary={option.secondary}
-                  primaryTypographyProps={{
-                    textTransform: 'capitalize',
-                    overflow: 'auto',
-                    textOverflow: 'initial',
-                    whiteSpace: 'normal',
-                    ...(tiny && { variant: 'body2' })
+                  primary={options.find(o => o.value === option)?.primary || ''}
+                  slotProps={{
+                    primary: {
+                      sx: { cursor: 'pointer', ...(readOnly && { cursor: 'text', userSelect: 'text' }) },
+                      ...(tiny && { variant: 'body2' })
+                    }
                   }}
-                  secondaryTypographyProps={{
-                    overflow: 'auto',
-                    textOverflow: 'initial',
-                    whiteSpace: 'normal',
-                    ...(tiny && { variant: 'body2' })
-                  }}
+                  sx={{ margin: 0, ...(readOnly && { marginLeft: '6px' }) }}
                 />
-              </MenuItem>
-            ))}
-          </Select>
+              )}
+              sx={{ textTransform: 'capitalize' }}
+              onChange={event => {
+                const v = event.target.value as string;
+                onChange(event, v);
+
+                const err = error(v);
+                if (err) onError(err);
+              }}
+              onFocus={event => setFocused(document.activeElement === event.target)}
+              onBlur={() => setFocused(false)}
+              endAdornment={
+                <>
+                  {loading || !reset || disabled || readOnly ? null : (
+                    <InputAdornment position="end" style={{ marginRight: theme.spacing(2) }}>
+                      <ResetInput
+                        id={id}
+                        preventRender={loading || !reset || disabled || readOnly}
+                        tiny={tiny}
+                        onReset={onReset}
+                        {...resetProps}
+                      />
+                    </InputAdornment>
+                  )}
+                  {endAdornment && (
+                    <InputAdornment position="end" style={{ marginRight: theme.spacing(2) }}>
+                      {endAdornment}
+                    </InputAdornment>
+                  )}
+                </>
+              }
+              MenuProps={{ sx: { maxWidth: 'min-content' } }}
+              {...selectProps}
+            >
+              {hasEmpty && <MenuItem value="" sx={{ height: '36px' }}></MenuItem>}
+              {options.map((option, i) => (
+                <MenuItem
+                  key={i}
+                  value={option.value}
+                  sx={{
+                    '&>div': { margin: 0, cursor: 'pointer !important' },
+                    ...(capitalize && { textTransform: 'capitalize' })
+                  }}
+                >
+                  <ListItemText
+                    primary={option.primary}
+                    secondary={option.secondary}
+                    primaryTypographyProps={{
+                      textTransform: 'capitalize',
+                      overflow: 'auto',
+                      textOverflow: 'initial',
+                      whiteSpace: 'normal',
+                      ...(tiny && { variant: 'body2' })
+                    }}
+                    secondaryTypographyProps={{
+                      overflow: 'auto',
+                      textOverflow: 'initial',
+                      whiteSpace: 'normal',
+                      ...(tiny && { variant: 'body2' })
+                    }}
+                  />
+                </MenuItem>
+              ))}
+            </Select>
+          </Tooltip>
         )}
         <HelperText
           id={id}
