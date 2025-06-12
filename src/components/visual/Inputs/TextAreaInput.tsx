@@ -6,7 +6,6 @@ import type {
   TypographyProps
 } from '@mui/material';
 import { FormControl, InputAdornment, InputLabel, Skeleton, TextField, Typography, useTheme } from '@mui/material';
-import { HelperText } from 'components/visual/Inputs/components/HelperText';
 import type { ResetInputProps } from 'components/visual/Inputs/components/ResetInput';
 import { ResetInput } from 'components/visual/Inputs/components/ResetInput';
 import { Tooltip } from 'components/visual/Tooltip';
@@ -22,8 +21,6 @@ export type TextAreaInputProps = Omit<TextFieldProps, 'rows' | 'onChange' | 'err
   label: string;
   labelProps?: TypographyProps;
   loading?: boolean;
-
-  rows: TextFieldProps['rows'];
   placeholder?: TextFieldProps['InputProps']['placeholder'];
   preventDisabledColor?: boolean;
   preventRender?: boolean;
@@ -31,6 +28,7 @@ export type TextAreaInputProps = Omit<TextFieldProps, 'rows' | 'onChange' | 'err
   reset?: boolean;
   resetProps?: ResetInputProps;
   rootProps?: React.HTMLAttributes<HTMLDivElement>;
+  rows: TextFieldProps['rows'];
   startAdornment?: TextFieldProps['InputProps']['startAdornment'];
   tiny?: boolean;
   tooltip?: TooltipProps['title'];
@@ -52,7 +50,6 @@ const WrappedTextAreaInput = ({
   label,
   labelProps,
   loading = false,
-  // options = [],
   placeholder = null,
   preventDisabledColor = false,
   preventRender = false,
