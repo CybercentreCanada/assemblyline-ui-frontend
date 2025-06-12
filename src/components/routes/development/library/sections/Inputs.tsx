@@ -404,6 +404,33 @@ export const InputsSection = React.memo(() => {
 
           <Grid size={{ xs: 12, md: 6 }}>
             <form.Subscribe
+              selector={state => state.values.components.inputs.values.classification}
+              children={value => (
+                <ClassificationInput
+                  label="Controlled Classification Input"
+                  value={value}
+                  reset
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.classification', next)}
+                  onReset={() => form.setFieldValue('components.inputs.values.classification', null)}
+                />
+              )}
+            />
+          </Grid>
+
+          <Grid size={{ xs: 12, md: 6 }} alignItems="flex-end" paddingBottom={2} paddingLeft={2}>
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.classification}
+              children={value => (
+                <div>
+                  <Typography variant="body2">{`Type: ${typeof value}`}</Typography>
+                  <Typography variant="body2">{`Value: ${value}`}</Typography>
+                </div>
+              )}
+            />
+          </Grid>
+
+          <Grid size={{ xs: 12, md: 6 }}>
+            <form.Subscribe
               selector={state => state.values.components.inputs.values.slider}
               children={value => (
                 <SliderInput
@@ -556,6 +583,18 @@ export const InputsSection = React.memo(() => {
                   value={value}
                   disabled
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.date', next)}
+                />
+              )}
+            />
+
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.classification}
+              children={value => (
+                <ClassificationInput
+                  label="Disabled Classification Input"
+                  value={value}
+                  disabled
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.classification', next)}
                 />
               )}
             />
@@ -738,6 +777,18 @@ export const InputsSection = React.memo(() => {
                   value={value}
                   loading
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.date', next)}
+                />
+              )}
+            />
+
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.classification}
+              children={value => (
+                <ClassificationInput
+                  label="Loading Classification Input"
+                  value={value}
+                  loading
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.classification', next)}
                 />
               )}
             />
@@ -929,6 +980,19 @@ export const InputsSection = React.memo(() => {
             />
 
             <form.Subscribe
+              selector={state => state.values.components.inputs.values.classification}
+              children={value => (
+                <ClassificationInput
+                  label="Reset Classification Input"
+                  value={value}
+                  reset
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.classification', next)}
+                  onReset={() => form.setFieldValue('components.inputs.values.classification', 'TLP:CLEAR')}
+                />
+              )}
+            />
+
+            <form.Subscribe
               selector={state => state.values.components.inputs.values.slider}
               children={value => (
                 <SliderInput
@@ -1115,6 +1179,17 @@ export const InputsSection = React.memo(() => {
               )}
             />
             <form.Subscribe
+              selector={state => state.values.components.inputs.values.classification}
+              children={value => (
+                <ClassificationInput
+                  label="Tooltip Classification Input"
+                  tooltip="Tooltip Classification Input"
+                  value={value}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.date', next)}
+                />
+              )}
+            />
+            <form.Subscribe
               selector={state => state.values.components.inputs.values.slider}
               children={value => (
                 <SliderInput
@@ -1288,6 +1363,17 @@ export const InputsSection = React.memo(() => {
                   value={value}
                   error={v => (v !== null ? null : 'Input field cannot be null')}
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.date', next)}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.classification}
+              children={value => (
+                <ClassificationInput
+                  label="Error Classification Input"
+                  value={value}
+                  error={v => (v !== 'TLP:CLEAR' ? null : 'Input field cannot be TLP:CLEAR')}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.classification', next)}
                 />
               )}
             />
@@ -1471,6 +1557,17 @@ export const InputsSection = React.memo(() => {
                   value={value}
                   helperText="Helper Text"
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.date', next)}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.classification}
+              children={value => (
+                <ClassificationInput
+                  label="Helper Text Classification Input"
+                  value={value}
+                  helperText="Helper Text"
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.classification', next)}
                 />
               )}
             />
@@ -1776,6 +1873,18 @@ export const InputsSection = React.memo(() => {
             />
 
             <form.Subscribe
+              selector={state => state.values.components.inputs.values.classification}
+              children={value => (
+                <ClassificationInput
+                  label="ReadOnly Classification Input"
+                  value={value}
+                  readOnly
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.classification', next)}
+                />
+              )}
+            />
+
+            <form.Subscribe
               selector={state => state.values.components.inputs.values.slider}
               children={value => (
                 <SliderInput
@@ -1951,6 +2060,17 @@ export const InputsSection = React.memo(() => {
               )}
             />
             <form.Subscribe
+              selector={state => state.values.components.inputs.values.classification}
+              children={value => (
+                <ClassificationInput
+                  label="End Adornment Classification Input"
+                  value={value}
+                  endAdornment={<Button variant="contained">Submit</Button>}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.classification', next)}
+                />
+              )}
+            />
+            <form.Subscribe
               selector={state => state.values.components.inputs.values.slider}
               children={value => (
                 <SliderInput
@@ -2118,6 +2238,17 @@ export const InputsSection = React.memo(() => {
                   value={value}
                   tiny
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.date', next)}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.classification}
+              children={value => (
+                <ClassificationInput
+                  label="Tiny Classification Input"
+                  value={value}
+                  tiny
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.classification', next)}
                 />
               )}
             />
@@ -2359,6 +2490,30 @@ export const InputsSection = React.memo(() => {
                       label="Interaction Date Input"
                       value={value}
                       onChange={(event, next) => form.setFieldValue('components.inputs.values.date', next)}
+                      {...(disabled && { disabled })}
+                      {...(loading && { loading })}
+                      {...(readOnly && { readOnly })}
+                      {...(tiny && { tiny })}
+                      {...(reset && {
+                        reset,
+                        onReset: () => form.setFieldValue('components.inputs.values.date', null)
+                      })}
+                      {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
+                      {...(error && { error: v => (v !== null ? null : 'Input field cannot be null') })}
+                      {...(helperText && { helperText: 'Helper Text' })}
+                      {...(placeholder && { placeholder: 'Placeholder' })}
+                      {...(endAdornment && { endAdornment: <Button variant="contained">Submit</Button> })}
+                    />
+                  )}
+                />
+
+                <form.Subscribe
+                  selector={state => state.values.components.inputs.values.classification}
+                  children={value => (
+                    <ClassificationInput
+                      label="Interaction Classification Input"
+                      value={value}
+                      onChange={(event, next) => form.setFieldValue('components.inputs.values.classification', next)}
                       {...(disabled && { disabled })}
                       {...(loading && { loading })}
                       {...(readOnly && { readOnly })}
@@ -2620,6 +2775,17 @@ export const InputsSection = React.memo(() => {
               selector={state => state.values.components.inputs.values.date}
               children={value => (
                 <DateInput
+                  label="Date Input: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc."
+                  value={value}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.date', next)}
+                />
+              )}
+            />
+
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.classification}
+              children={value => (
+                <ClassificationInput
                   label="Date Input: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc."
                   value={value}
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.date', next)}

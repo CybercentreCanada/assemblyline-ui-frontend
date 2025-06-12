@@ -25,6 +25,7 @@ import {
 } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
 import type { WhoAmI } from 'components/models/ui/user';
+import type { ClassificationProps } from 'components/visual/Classification';
 import CustomChip, { COLOR_MAP } from 'components/visual/CustomChip';
 import { HelperText } from 'components/visual/Inputs/components/HelperText';
 import type { ResetInputProps } from 'components/visual/Inputs/components/ResetInput';
@@ -43,17 +44,17 @@ import type { PossibleColor } from 'helpers/colors';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-export interface ClassificationInputProps {
-  c12n: string;
-  setClassification?: (classification: string) => void;
-  size?: 'medium' | 'small' | 'tiny';
+export type ClassificationInputProps = Omit<ClassificationProps, 'c12n' | 'setClassification'> & {
+  // c12n: string;
+  // setClassification?: (classification: string) => void;
+  // size?: 'medium' | 'small' | 'tiny';
   // type?: 'picker' | 'pill' | 'outlined' | 'text';
-  format?: FormatProp;
-  inline?: boolean;
-  isUser?: boolean;
-  fullWidth?: boolean;
-  dynGroup?: string;
-  disabled?: boolean;
+  // format?: FormatProp;
+  // inline?: boolean;
+  // isUser?: boolean;
+  // fullWidth?: boolean;
+  // dynGroup?: string;
+  // disabled?: boolean;
 
   id?: string;
   endAdornment?: TextFieldProps['InputProps']['endAdornment'];
@@ -76,19 +77,18 @@ export interface ClassificationInputProps {
   tiny?: boolean;
   tooltip?: TooltipProps['title'];
   tooltipProps?: Omit<TooltipProps, 'children' | 'title'>;
-  value: string;
+  value: ClassificationProps['c12n'];
   onChange?: (event: unknown, classification: string) => void;
   onReset?: IconButtonProps['onClick'];
   onError?: (error: string) => void;
-}
+};
 
 function WrappedClassificationInput({
-  // c12n = null,
   format = 'short',
   inline = false,
-  // setClassification = null,
-  size = 'medium',
-  // type = 'pill',
+
+  // size = 'medium',
+
   isUser = false,
   fullWidth = true,
   dynGroup = null,
@@ -114,8 +114,8 @@ function WrappedClassificationInput({
   rootProps = null,
   tooltip = null,
   tooltipProps = null,
-  value: c12n = null,
-  onChange: setClassification = () => null,
+  value = null,
+  onChange = () => null,
   onReset = () => null,
   onError = () => null,
   ...autocompleteProps
@@ -138,11 +138,19 @@ function WrappedClassificationInput({
     [c12nDef, classificationAliases, format, isMobile, isUser, validated.parts]
   );
 
+  const computedColor = useMemo<PossibleColor>(() => {
+    const levelStyles = c12nDef.levels_styles_map[validated.parts.lvl];
+    if (!levelStyles) {
+      return 'default' as const;
+    }
+    return COLOR_MAP[levelStyles.color || levelStyles.label.replace('label-', '')] || ('default' as const);
+  }, [c12nDef.levels_styles_map, validated.parts.lvl]);
+
   const id = useMemo<string>(() => (idProp || label).replaceAll(' ', '-'), [idProp, label]);
 
-  const errorValue = useMemo<string>(() => error(c12n), [error, c12n]);
+  const errorValue = useMemo<string>(() => error(value), [error, value]);
 
-  const toggleGroups = useCallback(
+  const handleGroupsChange = useCallback(
     (grp: WhoAmI['classification_aliases'][keyof WhoAmI['classification_aliases']]) => {
       const newGrp = validated.parts.groups;
 
@@ -169,7 +177,7 @@ function WrappedClassificationInput({
     [c12nDef, format, isMobile, isUser, validated.parts]
   );
 
-  const toggleSubGroups = useCallback(
+  const handleSubGroupsChange = useCallback(
     (sgrp: WhoAmI['classification_aliases'][keyof WhoAmI['classification_aliases']]) => {
       const newSGrp = validated.parts.subgroups;
 
@@ -188,7 +196,7 @@ function WrappedClassificationInput({
     [c12nDef, format, isMobile, isUser, validated.parts]
   );
 
-  const toggleRequired = useCallback(
+  const handleRequiredChange = useCallback(
     (req: WhoAmI['classification_aliases'][keyof WhoAmI['classification_aliases']]) => {
       const newReq = validated.parts.req;
 
@@ -205,7 +213,7 @@ function WrappedClassificationInput({
     [c12nDef, format, isMobile, isUser, validated.parts]
   );
 
-  const selectLevel = useCallback(
+  const handleLevelChange = useCallback(
     (lvlIdx: number) =>
       setValidated(
         applyClassificationRules(
@@ -219,32 +227,32 @@ function WrappedClassificationInput({
     [c12nDef, format, isMobile, isUser, validated.parts]
   );
 
-  const computeColor = useCallback((): PossibleColor => {
-    const levelStyles = c12nDef.levels_styles_map[validated.parts.lvl];
-    if (!levelStyles) {
-      return 'default' as const;
-    }
-    return COLOR_MAP[levelStyles.color || levelStyles.label.replace('label-', '')] || ('default' as const);
-  }, [c12nDef.levels_styles_map, validated.parts.lvl]);
-
-  const handleClassificationChange = useCallback(
+  const handleChange = useCallback(
     (event: unknown) => {
       const newC12n = normalizedClassification(validated.parts, c12nDef, format, isMobile, isUser);
       setShowPicker(false);
-      setClassification(event, newC12n);
+      onChange(event, newC12n);
     },
-    [c12nDef, format, isMobile, isUser, setClassification, validated.parts]
+    [c12nDef, format, isMobile, isUser, onChange, validated.parts]
+  );
+
+  const handleReset = useCallback(
+    (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+      setShowPicker(false);
+      onReset(event);
+    },
+    [onReset]
   );
 
   useEffect(() => {
-    if (c12nDef && c12nDef?.enforce && c12n) {
-      const parts = getParts(c12n.toLocaleUpperCase(), c12nDef, format, isMobile);
+    if (c12nDef && c12nDef?.enforce && value) {
+      const parts = getParts(value.toLocaleUpperCase(), c12nDef, format, isMobile);
       setUserParts(getParts(currentUser.classification, c12nDef, format, isMobile));
       setValidated(applyClassificationRules(parts, c12nDef, format, isMobile, isUser));
     }
-  }, [c12n, c12nDef, currentUser, format, isMobile, isUser]);
+  }, [c12nDef, currentUser, format, isMobile, isUser, value]);
 
-  return preventRender || !c12nDef?.enforce || !validated?.parts?.lvl || !c12n ? null : (
+  return preventRender || !c12nDef?.enforce || !validated?.parts?.lvl || !value ? null : (
     <div {...rootProps} style={{ textAlign: 'left', ...rootProps?.style }}>
       <Tooltip title={tooltip} {...tooltipProps}>
         <Typography
@@ -282,13 +290,14 @@ function WrappedClassificationInput({
               <CustomChip
                 type="rounded"
                 variant="filled"
-                size={size}
-                color={computeColor()}
+                size="medium"
+                color={computedColor}
                 label={normalClassification}
                 fullWidth={fullWidth}
                 disabled={disabled}
-                onClick={() => setShowPicker(true)}
+                onClick={readOnly ? null : () => setShowPicker(true)}
                 sx={{ fontWeight: 500, marginBottom: theme.spacing(0.75) }}
+                {...(tiny && { size: 'tiny' })}
               />
             </div>
 
@@ -297,14 +306,14 @@ function WrappedClassificationInput({
               fullWidth
               maxWidth={isMobile ? 'xs' : 'md'}
               open={showPicker}
-              onClose={event => handleClassificationChange(event)}
+              onClose={event => handleChange(event)}
             >
               <DialogTitle>
                 <CustomChip
                   type="rounded"
                   variant="outlined"
-                  size={size}
-                  color={computeColor()}
+                  size="medium"
+                  color={computedColor}
                   label={normalClassification}
                   fullWidth={fullWidth}
                   sx={{ fontWeight: 500 }}
@@ -325,7 +334,7 @@ function WrappedClassificationInput({
                                   validated.disabled.levels.includes(lvl.short_name)
                                 }
                                 selected={validated.parts.lvlIdx === lvl.lvl}
-                                onClick={() => selectLevel(lvl.lvl)}
+                                onClick={() => handleLevelChange(lvl.lvl)}
                               >
                                 <ListItemText style={{ textAlign: 'center' }} primary={lvl.name} />
                               </ListItemButton>
@@ -350,7 +359,7 @@ function WrappedClassificationInput({
                                     validated.parts.req.includes(req.name) ||
                                     validated.parts.req.includes(req.short_name)
                                   }
-                                  onClick={() => toggleRequired(req)}
+                                  onClick={() => handleRequiredChange(req)}
                                 >
                                   <ListItemText style={{ textAlign: 'center' }} primary={req.name} />
                                 </ListItemButton>
@@ -387,7 +396,7 @@ function WrappedClassificationInput({
                                       validated.parts.groups.includes(grp.name) ||
                                       validated.parts.groups.includes(grp.short_name)
                                     }
-                                    onClick={() => toggleGroups(grp)}
+                                    onClick={() => handleGroupsChange(grp)}
                                   >
                                     <ListItemText
                                       style={{ textAlign: 'center' }}
@@ -402,7 +411,7 @@ function WrappedClassificationInput({
                                     disabled={validated.disabled.groups.includes(dynGroup || currentUser.dynamic_group)}
                                     selected={validated.parts.groups.includes(dynGroup || currentUser.dynamic_group)}
                                     onClick={() =>
-                                      toggleGroups({
+                                      handleGroupsChange({
                                         name: dynGroup || currentUser.dynamic_group,
                                         short_name: dynGroup || currentUser.dynamic_group
                                       })
@@ -435,7 +444,7 @@ function WrappedClassificationInput({
                                       disabled={validated.disabled.groups.includes(group)}
                                       selected={validated.parts.groups.includes(group)}
                                       onClick={() =>
-                                        toggleGroups({
+                                        handleGroupsChange({
                                           name: group,
                                           short_name: group
                                         })
@@ -465,7 +474,7 @@ function WrappedClassificationInput({
                                     validated.parts.subgroups.includes(sgrp.name) ||
                                     validated.parts.subgroups.includes(sgrp.short_name)
                                   }
-                                  onClick={() => toggleSubGroups(sgrp)}
+                                  onClick={() => handleSubGroupsChange(sgrp)}
                                 >
                                   <ListItemText style={{ textAlign: 'center' }} primary={sgrp.name} />
                                 </ListItemButton>
@@ -478,7 +487,12 @@ function WrappedClassificationInput({
                 </Grid>
               </DialogContent>
               <DialogActions>
-                <Button onClick={event => handleClassificationChange(event)} color="primary" autoFocus>
+                {reset && (
+                  <Button onClick={event => handleReset(event)} color="secondary">
+                    {t('classification.reset')}
+                  </Button>
+                )}
+                <Button onClick={event => handleChange(event)} color="primary" autoFocus>
                   {t('classification.done')}
                 </Button>
               </DialogActions>

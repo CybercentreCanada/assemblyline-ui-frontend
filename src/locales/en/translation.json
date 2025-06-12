@@ -50,6 +50,7 @@
   "classification.acceptText": "Proceed",
   "classification.cancelText": "Cancel",
   "classification.done": "Done",
+  "classification.reset": "Reset",
   "classification.text": "The classification of this item is higher than the maximum classification that the external source supports.",
   "classification.text.accept": "Are you sure that you want to proceed?",
   "classification.title": "Classification accessibility warning",
