@@ -7,9 +7,11 @@ import { ChipsInput } from 'components/visual/Inputs/ChipsInput';
 import { ClassificationInput } from 'components/visual/Inputs/ClassificationInput';
 import { DateInput } from 'components/visual/Inputs/DateInput';
 import { NumberInput } from 'components/visual/Inputs/NumberInput';
+import { RadioInput } from 'components/visual/Inputs/RadioInput';
 import { SelectInput } from 'components/visual/Inputs/SelectInput';
 import { SliderInput } from 'components/visual/Inputs/SliderInput';
 import { SwitchInput } from 'components/visual/Inputs/SwitchInput';
+import { TextAreaInput } from 'components/visual/Inputs/TextAreaInput';
 import { TextInput } from 'components/visual/Inputs/TextInput';
 import { PageSection } from 'components/visual/Layouts/PageSection';
 import MonacoEditor from 'components/visual/MonacoEditor';
@@ -20,26 +22,28 @@ export type InputsLibraryState = {
     name: string;
     state: {
       disabled: boolean;
-      loading: boolean;
-      reset: boolean;
-      tooltip: boolean;
-      error: boolean;
-      readOnly: boolean;
-      helperText: boolean;
-      placeholder: boolean;
       endAdornment: boolean;
+      error: boolean;
+      helperText: boolean;
+      loading: boolean;
+      placeholder: boolean;
+      readOnly: boolean;
+      reset: boolean;
       tiny: boolean;
+      tooltip: boolean;
     };
     values: {
-      text: string;
-      chips: string[];
-      number: number;
-      date: string;
-      classification: string;
-      select: string;
       checkbox: boolean;
-      switch: boolean;
+      chips: string[];
+      classification: string;
+      date: string;
+      number: number;
+      radio: unknown;
+      select: string;
       slider: number;
+      switch: boolean;
+      text: string;
+      textarea: string;
     };
   };
 };
@@ -60,15 +64,17 @@ export const INPUTS_LIBRARY_STATE: InputsLibraryState = {
       tiny: false
     },
     values: {
-      text: '',
-      chips: [],
-      number: null,
-      date: '',
-      select: '',
-      classification: 'TLP:CLEAR',
       checkbox: false,
+      chips: [],
+      classification: 'TLP:CLEAR',
+      date: '',
+      number: null,
+      radio: null,
+      select: '',
+      slider: 0,
       switch: false,
-      slider: 0
+      text: '',
+      textarea: ''
     }
   }
 } as const;
@@ -157,6 +163,18 @@ export const InputsSection = React.memo(() => {
                   label="Classification Input"
                   value={value}
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.classification', next)}
+                />
+              )}
+            />
+
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.textarea}
+              children={value => (
+                <TextAreaInput
+                  label="Text Area Input"
+                  value={value}
+                  rows={3}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.textarea', next)}
                 />
               )}
             />
@@ -431,6 +449,34 @@ export const InputsSection = React.memo(() => {
 
           <Grid size={{ xs: 12, md: 6 }}>
             <form.Subscribe
+              selector={state => state.values.components.inputs.values.textarea}
+              children={value => (
+                <TextAreaInput
+                  label="Controlled Text Area Input"
+                  value={value}
+                  reset
+                  rows={3}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.textarea', next)}
+                  onReset={() => form.setFieldValue('components.inputs.values.textarea', null)}
+                />
+              )}
+            />
+          </Grid>
+
+          <Grid size={{ xs: 12, md: 6 }} alignItems="flex-end" paddingBottom={2} paddingLeft={2}>
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.textarea}
+              children={value => (
+                <div>
+                  <Typography variant="body2">{`Type: ${typeof value}`}</Typography>
+                  <Typography variant="body2">{`Value: ${value}`}</Typography>
+                </div>
+              )}
+            />
+          </Grid>
+
+          <Grid size={{ xs: 12, md: 6 }}>
+            <form.Subscribe
               selector={state => state.values.components.inputs.values.slider}
               children={value => (
                 <SliderInput
@@ -595,6 +641,19 @@ export const InputsSection = React.memo(() => {
                   value={value}
                   disabled
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.classification', next)}
+                />
+              )}
+            />
+
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.textarea}
+              children={value => (
+                <TextAreaInput
+                  label="Disabled Text Area Input"
+                  value={value}
+                  disabled
+                  rows={3}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.textarea', next)}
                 />
               )}
             />
@@ -789,6 +848,19 @@ export const InputsSection = React.memo(() => {
                   value={value}
                   loading
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.classification', next)}
+                />
+              )}
+            />
+
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.textarea}
+              children={value => (
+                <TextAreaInput
+                  label="Loading Text Area Input"
+                  value={value}
+                  loading
+                  rows={3}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.textarea', next)}
                 />
               )}
             />
@@ -993,6 +1065,20 @@ export const InputsSection = React.memo(() => {
             />
 
             <form.Subscribe
+              selector={state => state.values.components.inputs.values.textarea}
+              children={value => (
+                <TextAreaInput
+                  label="Reset Classification Input"
+                  value={value}
+                  reset
+                  rows={3}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.textarea', next)}
+                  onReset={() => form.setFieldValue('components.inputs.values.textarea', '')}
+                />
+              )}
+            />
+
+            <form.Subscribe
               selector={state => state.values.components.inputs.values.slider}
               children={value => (
                 <SliderInput
@@ -1190,6 +1276,18 @@ export const InputsSection = React.memo(() => {
               )}
             />
             <form.Subscribe
+              selector={state => state.values.components.inputs.values.textarea}
+              children={value => (
+                <TextAreaInput
+                  label="Tooltip Text Area Input"
+                  tooltip="Tooltip Text Area Input"
+                  value={value}
+                  rows={3}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.textarea', next)}
+                />
+              )}
+            />
+            <form.Subscribe
               selector={state => state.values.components.inputs.values.slider}
               children={value => (
                 <SliderInput
@@ -1374,6 +1472,18 @@ export const InputsSection = React.memo(() => {
                   value={value}
                   error={v => (v !== 'TLP:CLEAR' ? null : 'Input field cannot be TLP:CLEAR')}
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.classification', next)}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.textarea}
+              children={value => (
+                <TextAreaInput
+                  label="Error Text Area Input"
+                  value={value}
+                  rows={3}
+                  error={v => (v !== '' ? null : 'Input field cannot be empty')}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.textarea', next)}
                 />
               )}
             />
@@ -1572,6 +1682,18 @@ export const InputsSection = React.memo(() => {
               )}
             />
             <form.Subscribe
+              selector={state => state.values.components.inputs.values.textarea}
+              children={value => (
+                <TextAreaInput
+                  label="Helper Text Text Area Input"
+                  value={value}
+                  rows={3}
+                  helperText="Helper Text"
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.textarea', next)}
+                />
+              )}
+            />
+            <form.Subscribe
               selector={state => state.values.components.inputs.values.slider}
               children={value => (
                 <SliderInput
@@ -1744,6 +1866,19 @@ export const InputsSection = React.memo(() => {
                 />
               )}
             />
+
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.textarea}
+              children={value => (
+                <TextAreaInput
+                  label="Placeholder Text Area Input"
+                  value={value}
+                  rows={3}
+                  placeholder="Placeholder"
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.textarea', next)}
+                />
+              )}
+            />
           </>
         }
         right={
@@ -1880,6 +2015,19 @@ export const InputsSection = React.memo(() => {
                   value={value}
                   readOnly
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.classification', next)}
+                />
+              )}
+            />
+
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.textarea}
+              children={value => (
+                <TextAreaInput
+                  label="ReadOnly Text Area Input"
+                  value={value}
+                  rows={3}
+                  readOnly
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.textarea', next)}
                 />
               )}
             />
@@ -2071,6 +2219,18 @@ export const InputsSection = React.memo(() => {
               )}
             />
             <form.Subscribe
+              selector={state => state.values.components.inputs.values.textarea}
+              children={value => (
+                <TextAreaInput
+                  label="End Adornment Text Area Input"
+                  value={value}
+                  rows={3}
+                  endAdornment={<Button variant="contained">Submit</Button>}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.textarea', next)}
+                />
+              )}
+            />
+            <form.Subscribe
               selector={state => state.values.components.inputs.values.slider}
               children={value => (
                 <SliderInput
@@ -2249,6 +2409,18 @@ export const InputsSection = React.memo(() => {
                   value={value}
                   tiny
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.classification', next)}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.textarea}
+              children={value => (
+                <TextAreaInput
+                  label="Tiny Text Area Input"
+                  value={value}
+                  rows={3}
+                  tiny
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.textarea', next)}
                 />
               )}
             />
@@ -2520,7 +2692,32 @@ export const InputsSection = React.memo(() => {
                       {...(tiny && { tiny })}
                       {...(reset && {
                         reset,
-                        onReset: () => form.setFieldValue('components.inputs.values.date', null)
+                        onReset: () => form.setFieldValue('components.inputs.values.classification', null)
+                      })}
+                      {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
+                      {...(error && { error: v => (v !== null ? null : 'Input field cannot be null') })}
+                      {...(helperText && { helperText: 'Helper Text' })}
+                      {...(placeholder && { placeholder: 'Placeholder' })}
+                      {...(endAdornment && { endAdornment: <Button variant="contained">Submit</Button> })}
+                    />
+                  )}
+                />
+
+                <form.Subscribe
+                  selector={state => state.values.components.inputs.values.textarea}
+                  children={value => (
+                    <TextAreaInput
+                      label="Interaction Text Area Input"
+                      value={value}
+                      rows={3}
+                      onChange={(event, next) => form.setFieldValue('components.inputs.values.textarea', next)}
+                      {...(disabled && { disabled })}
+                      {...(loading && { loading })}
+                      {...(readOnly && { readOnly })}
+                      {...(tiny && { tiny })}
+                      {...(reset && {
+                        reset,
+                        onReset: () => form.setFieldValue('components.inputs.values.textarea', '')
                       })}
                       {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
                       {...(error && { error: v => (v !== null ? null : 'Input field cannot be null') })}
@@ -2786,9 +2983,21 @@ export const InputsSection = React.memo(() => {
               selector={state => state.values.components.inputs.values.classification}
               children={value => (
                 <ClassificationInput
-                  label="Date Input: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc."
+                  label="Classification Input: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc."
                   value={value}
-                  onChange={(event, next) => form.setFieldValue('components.inputs.values.date', next)}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.classification', next)}
+                />
+              )}
+            />
+
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.textarea}
+              children={value => (
+                <TextAreaInput
+                  label="Text Area Input: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc."
+                  value={value}
+                  rows={3}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.textarea', next)}
                 />
               )}
             />
