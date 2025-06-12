@@ -30,7 +30,7 @@ import CustomChip, { COLOR_MAP } from 'components/visual/CustomChip';
 import { HelperText } from 'components/visual/Inputs/components/HelperText';
 import type { ResetInputProps } from 'components/visual/Inputs/components/ResetInput';
 import { Tooltip } from 'components/visual/Tooltip';
-import type { ClassificationParts, ClassificationValidator, FormatProp } from 'helpers/classificationParser';
+import type { ClassificationParts, ClassificationValidator } from 'helpers/classificationParser';
 import {
   applyAliases,
   applyClassificationRules,
@@ -105,7 +105,7 @@ function WrappedClassificationInput({
   loading = false,
   placeholder = null,
   preventDisabledColor = false,
-  preventRender = false,
+  preventRender: preventRenderProp = false,
   readOnly = false,
   reset = false,
   resetProps = null,
@@ -133,18 +133,28 @@ function WrappedClassificationInput({
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const sp2 = theme.spacing(2);
 
+  const preventRender = useMemo(
+    () => preventRenderProp || !c12nDef?.enforce || !validated?.parts?.lvl,
+    [c12nDef?.enforce, preventRenderProp, validated?.parts?.lvl]
+  );
+
   const normalClassification = useMemo(
-    () => normalizedClassification(validated.parts, c12nDef, format, isMobile, isUser, classificationAliases),
-    [c12nDef, classificationAliases, format, isMobile, isUser, validated.parts]
+    () =>
+      preventRender
+        ? null
+        : normalizedClassification(validated.parts, c12nDef, format, isMobile, isUser, classificationAliases),
+    [c12nDef, classificationAliases, format, isMobile, isUser, preventRender, validated.parts]
   );
 
   const computedColor = useMemo<PossibleColor>(() => {
+    if (preventRender) return null;
+
     const levelStyles = c12nDef.levels_styles_map[validated.parts.lvl];
     if (!levelStyles) {
       return 'default' as const;
     }
     return COLOR_MAP[levelStyles.color || levelStyles.label.replace('label-', '')] || ('default' as const);
-  }, [c12nDef.levels_styles_map, validated.parts.lvl]);
+  }, [c12nDef.levels_styles_map, preventRender, validated.parts.lvl]);
 
   const id = useMemo<string>(() => (idProp || label).replaceAll(' ', '-'), [idProp, label]);
 
@@ -250,9 +260,9 @@ function WrappedClassificationInput({
       setUserParts(getParts(currentUser.classification, c12nDef, format, isMobile));
       setValidated(applyClassificationRules(parts, c12nDef, format, isMobile, isUser));
     }
-  }, [c12nDef, currentUser, format, isMobile, isUser, value]);
+  }, [c12nDef, currentUser.classification, format, isMobile, isUser, value]);
 
-  return preventRender || !c12nDef?.enforce || !validated?.parts?.lvl || !value ? null : (
+  return preventRender || !value ? null : (
     <div {...rootProps} style={{ textAlign: 'left', ...rootProps?.style }}>
       <Tooltip title={tooltip} {...tooltipProps}>
         <Typography
