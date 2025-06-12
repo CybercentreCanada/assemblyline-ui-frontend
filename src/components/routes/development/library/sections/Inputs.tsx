@@ -4,6 +4,7 @@ import { DemoSection } from 'components/routes/development/library/components/De
 import { useForm } from 'components/routes/development/library/contexts/form';
 import { CheckboxInput } from 'components/visual/Inputs/CheckboxInput';
 import { ChipsInput } from 'components/visual/Inputs/ChipsInput';
+import { ClassificationInput } from 'components/visual/Inputs/ClassificationInput';
 import { DateInput } from 'components/visual/Inputs/DateInput';
 import { NumberInput } from 'components/visual/Inputs/NumberInput';
 import { SelectInput } from 'components/visual/Inputs/SelectInput';
@@ -34,6 +35,7 @@ export type InputsLibraryState = {
       chips: string[];
       number: number;
       date: string;
+      classification: string;
       select: string;
       checkbox: boolean;
       switch: boolean;
@@ -63,6 +65,7 @@ export const INPUTS_LIBRARY_STATE: InputsLibraryState = {
       number: null,
       date: '',
       select: '',
+      classification: 'TLP:CLEAR',
       checkbox: false,
       switch: false,
       slider: 0
@@ -143,6 +146,17 @@ export const InputsSection = React.memo(() => {
                   label="Date Input"
                   value={value}
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.date', next)}
+                />
+              )}
+            />
+
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.classification}
+              children={value => (
+                <ClassificationInput
+                  label="Classification Input"
+                  value={value}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.classification', next)}
                 />
               )}
             />
