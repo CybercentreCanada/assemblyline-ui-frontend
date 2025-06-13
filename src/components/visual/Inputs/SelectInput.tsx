@@ -218,7 +218,7 @@ export const SelectInput: <O extends Option[]>(props: SelectInputProps<O>) => Re
                 {options?.map((option, i) => (
                   <MenuItem
                     key={i}
-                    value={option.value}
+                    value={option.value as unknown as MenuItemProps['value']}
                     sx={{
                       '&>div': { margin: 0, cursor: 'pointer !important' },
                       ...(capitalize && { textTransform: 'capitalize' })
