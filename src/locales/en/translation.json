@@ -222,6 +222,8 @@
   "submission.state.submitted": "Scanning...",
   "submit": "Submit",
   "theme": "Theme settings",
+  "theme.default.label": "Aurora",
+  "theme.nostalgia.label": "Nostalgia",
   "thememenu": "Theme",
   "thememenu.option.mui": "MaterialUI",
   "thememenu.option.solarized": "Solarized",
