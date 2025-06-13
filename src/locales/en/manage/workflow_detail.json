@@ -48,6 +48,7 @@
   "priority.MEDIUM": "MEDIUM",
   "priority.null": "",
   "query": "Query",
+  "query.error": "Invalid query value",
   "remove": "Remove workflow",
   "required": "(Required)",
   "run.acceptText": "Yes, run it!",
