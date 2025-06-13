@@ -630,7 +630,7 @@ function levelList(c12nDef: ClassificationDefinition) {
   return out;
 }
 
-export type ClassificationValidator = {
+type ClassificationValidator = {
   disabled: DisabledControls;
   parts: ClassificationParts;
 };

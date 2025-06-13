@@ -11,7 +11,6 @@ import type { ResetInputProps } from 'components/visual/Inputs/components/ResetI
 import { ResetInput } from 'components/visual/Inputs/components/ResetInput';
 import { Tooltip } from 'components/visual/Tooltip';
 import React, { useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 
 export type SliderInputProps = Omit<SliderProps, 'value' | 'onChange'> & {
   endAdornment?: TextFieldProps['InputProps']['endAdornment'];
@@ -61,7 +60,6 @@ const WrappedSliderInput = ({
   onError = () => null,
   ...sliderProps
 }: SliderInputProps) => {
-  const { t } = useTranslation();
   const theme = useTheme();
 
   const [focused, setFocused] = useState<boolean>(false);
@@ -96,15 +94,7 @@ const WrappedSliderInput = ({
         {loading ? (
           <Skeleton sx={{ height: '40px', transform: 'unset', ...(tiny && { height: '28px' }) }} />
         ) : (
-          <Tooltip
-            title={!readOnly ? null : t('readonly')}
-            placement="bottom"
-            arrow
-            slotProps={{
-              tooltip: { sx: { backgroundColor: theme.palette.primary.main } },
-              arrow: { sx: { color: theme.palette.primary.main } }
-            }}
-          >
+          <>
             <div style={{ display: 'flex', alignItems: 'flex-start' }}>
               <div style={{ flex: 1, marginLeft: '20px', marginRight: '20px' }}>
                 <Slider
@@ -150,7 +140,7 @@ const WrappedSliderInput = ({
                 {helperText}
               </FormHelperText>
             ) : null}
-          </Tooltip>
+          </>
         )}
       </FormControl>
     </div>

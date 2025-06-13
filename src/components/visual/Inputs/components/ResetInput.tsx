@@ -25,7 +25,7 @@ export const ResetInput: React.FC<ResetInputProps> = React.memo(
           onReset(event);
         }}
         {...buttonProps}
-        sx={{ padding: theme.spacing(0.5), ...buttonProps?.sx }}
+        sx={{ ...(tiny && { padding: theme.spacing(0.5) }), ...buttonProps?.sx }}
       >
         <RefreshOutlinedIcon fontSize="small" />
       </IconButton>
