@@ -1,19 +1,20 @@
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
 import { Button, Grid, IconButton, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
-import type { Service } from 'components/models/base/service';
+import type { DockerConfig, PersistentVolume, Service } from 'components/models/base/service';
 import ContainerCard from 'components/routes/admin/service_detail/container_card';
 import ContainerDialog from 'components/routes/admin/service_detail/container_dialog';
 import { showReset } from 'components/routes/admin/service_detail/service.utils';
 import { RadioInput } from 'components/visual/Inputs/RadioInput';
 import { SelectInput } from 'components/visual/Inputs/SelectInput';
-import { useState } from 'react';
+import type { Dispatch, SetStateAction } from 'react';
+import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 type ServiceContainerProps = {
   service: Service;
   defaults: Service;
-  setService: (value: Service) => void;
-  setModified: (value: boolean) => void;
+  setService: Dispatch<SetStateAction<Service>>;
+  setModified: Dispatch<SetStateAction<boolean>>;
 };
 
 const ServiceContainer = ({ service, defaults, setService, setModified }: ServiceContainerProps) => {
@@ -22,24 +23,37 @@ const ServiceContainer = ({ service, defaults, setService, setModified }: Servic
 
   const [dialog, setDialog] = useState<boolean>(false);
 
-  const onDependencyDelete = name => {
-    const depList = { ...service.dependencies };
-    delete depList[name];
-    setModified(true);
-    setService({ ...service, dependencies: depList });
-  };
+  const onDependencyDelete = useCallback(
+    (name: keyof Service['dependencies']) => {
+      setModified(true);
+      setService(s => {
+        const depList = { ...s.dependencies };
+        delete depList[name];
+        return { ...s, dependencies: depList };
+      });
+    },
+    [setModified, setService]
+  );
 
-  const handleContainerImageChange = newContainer => {
-    setModified(true);
-    setService({ ...service, docker_config: newContainer });
-  };
+  const handleContainerImageChange = useCallback(
+    (newContainer: DockerConfig) => {
+      setModified(true);
+      setService(s => ({ ...s, docker_config: newContainer }));
+    },
+    [setModified, setService]
+  );
 
-  const handleDependencyChange = (newDep, name, newVolumes) => {
-    const depList = { ...service.dependencies };
-    depList[name] = { container: newDep, volumes: newVolumes };
-    setModified(true);
-    setService({ ...service, dependencies: depList });
-  };
+  const handleDependencyChange = useCallback(
+    (newDep: DockerConfig, name: keyof Service['dependencies'], newVolumes: Record<string, PersistentVolume>) => {
+      setModified(true);
+      setService(s => {
+        const depList = { ...s.dependencies };
+        depList[name] = { container: newDep, volumes: newVolumes };
+        return { ...s, dependencies: depList };
+      });
+    },
+    [setModified, setService]
+  );
 
   return (
     <Grid container spacing={2}>

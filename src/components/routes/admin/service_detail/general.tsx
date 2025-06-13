@@ -308,7 +308,7 @@ const ServiceGeneral = ({
               reset={showReset(service, defaults, 'min_instances')}
               min={0}
               {...(service.licence_count && { max: service.licence_count })}
-              endAdornment={<InputAdornment position="end">↓</InputAdornment>}
+              endAdornment={<InputAdornment position="end">{'↓'}</InputAdornment>}
               error={() =>
                 service.licence_count < 1
                   ? null
@@ -335,7 +335,7 @@ const ServiceGeneral = ({
               value={!service ? null : service.licence_count > 0 ? service.licence_count : null}
               reset={showReset(service, defaults, 'licence_count')}
               min={0}
-              endAdornment={<InputAdornment position="end">↑</InputAdornment>}
+              endAdornment={<InputAdornment position="end">{'↑'}</InputAdornment>}
               onChange={(e, v) => {
                 setModified(true);
                 setService(s => ({
