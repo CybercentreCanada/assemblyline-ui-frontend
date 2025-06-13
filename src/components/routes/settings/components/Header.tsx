@@ -104,7 +104,7 @@ export const HeaderSection = React.memo(() => {
                 <Button
                   color="primary"
                   disabled={submitting || !modified}
-                  loading={submitting}
+                  progress={submitting}
                   tooltip={t('button.cancel.tooltip')}
                   tooltipProps={{ placement: 'bottom' }}
                   variant="outlined"
@@ -115,7 +115,7 @@ export const HeaderSection = React.memo(() => {
                 <Button
                   color="secondary"
                   disabled={submitting || !hasReset}
-                  loading={submitting}
+                  progress={submitting}
                   tooltip={t('button.reset.tooltip')}
                   tooltipProps={{ placement: 'bottom' }}
                   variant="contained"
@@ -126,7 +126,7 @@ export const HeaderSection = React.memo(() => {
                 <Button
                   color="primary"
                   disabled={submitting || !modified}
-                  loading={submitting}
+                  progress={submitting}
                   tooltip={t('button.save.tooltip')}
                   tooltipProps={{ placement: 'bottom' }}
                   variant="contained"

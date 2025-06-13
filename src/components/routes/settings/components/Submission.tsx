@@ -107,9 +107,9 @@ export const SubmissionSection = React.memo(() => {
               }}
               children={([value, defaultValue, restricted]) => (
                 <BooleanListInput
-                  id="settings:submissions.recursion_prevention"
-                  primary={t('settings:submissions.recursion_prevention')}
-                  secondary={t('settings:submissions.recursion_prevention_desc')}
+                  id="settings:submissions.ignore_recursion_prevention"
+                  primary={t('settings:submissions.ignore_recursion_prevention')}
+                  secondary={t('settings:submissions.ignore_recursion_prevention_desc')}
                   value={value}
                   loading={loading}
                   disabled={disabled || (!customize && restricted)}
@@ -127,9 +127,9 @@ export const SubmissionSection = React.memo(() => {
               }}
               children={([value, defaultValue, restricted]) => (
                 <BooleanListInput
-                  id="settings:submissions.filtering"
-                  primary={t('settings:submissions.filtering')}
-                  secondary={t('settings:submissions.filtering_desc')}
+                  id="settings:submissions.ignore_filtering"
+                  primary={t('settings:submissions.ignore_filtering')}
+                  secondary={t('settings:submissions.ignore_filtering_desc')}
                   value={value}
                   loading={loading}
                   disabled={disabled || (!customize && restricted)}
@@ -167,9 +167,9 @@ export const SubmissionSection = React.memo(() => {
               }}
               children={([value, defaultValue, restricted]) => (
                 <BooleanListInput
-                  id="settings:submissions.result_caching"
-                  primary={t('settings:submissions.result_caching')}
-                  secondary={t('settings:submissions.result_caching_desc')}
+                  id="settings:submissions.ignore_cache"
+                  primary={t('settings:submissions.ignore_cache')}
+                  secondary={t('settings:submissions.ignore_cache_desc')}
                   value={value}
                   loading={loading}
                   disabled={disabled || (!customize && restricted)}
