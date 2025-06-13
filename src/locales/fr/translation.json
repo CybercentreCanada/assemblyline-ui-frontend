@@ -224,6 +224,8 @@
   "submission.state.submitted": "Examine...",
   "submit": "Soumettre",
   "theme": "Paramètres du thème",
+  "theme.default.label": "Aurora",
+  "theme.nostalgia.label": "Nostalgie",
   "thememenu": "Thème",
   "thememenu.option.mui": "MaterialUI",
   "thememenu.option.solarized": "Solarized",
