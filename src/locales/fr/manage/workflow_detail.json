@@ -48,6 +48,7 @@
   "priority.MEDIUM": "MOYENNE",
   "priority.null": "",
   "query": "Requête",
+  "query.error": "Valeur de requête invalide",
   "remove": "Supprimer ce flux de travail",
   "required": "(Requis)",
   "run.acceptText": "Oui, exécutez-le !",
