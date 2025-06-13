@@ -28,7 +28,7 @@ const typescriptRules = {
   '@typescript-eslint/indent': 'off',
   '@typescript-eslint/no-base-to-string': 'warn',
   '@typescript-eslint/no-duplicate-type-constituents': 'off',
-  '@typescript-eslint/no-dynamic-delete': 'warn',
+  '@typescript-eslint/no-dynamic-delete': 'off',
   '@typescript-eslint/no-empty-function': 'warn',
   '@typescript-eslint/no-empty-object-type': 'warn',
   '@typescript-eslint/no-explicit-any': 'warn',

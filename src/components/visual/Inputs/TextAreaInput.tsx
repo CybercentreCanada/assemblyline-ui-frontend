@@ -12,17 +12,15 @@ import { Tooltip } from 'components/visual/Tooltip';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-export type NumberInputProps = Omit<TextFieldProps, 'error' | 'value' | 'onChange'> & {
+export type TextAreaInputProps = Omit<TextFieldProps, 'rows' | 'onChange' | 'error'> & {
   endAdornment?: TextFieldProps['InputProps']['endAdornment'];
-  error?: (value: number) => string;
+  error?: (value: string) => string;
   errorProps?: FormHelperTextProps;
   helperText?: string;
   helperTextProps?: FormHelperTextProps;
-  label?: string;
+  label: string;
   labelProps?: TypographyProps;
   loading?: boolean;
-  max?: number;
-  min?: number;
   placeholder?: TextFieldProps['InputProps']['placeholder'];
   preventDisabledColor?: boolean;
   preventRender?: boolean;
@@ -30,20 +28,20 @@ export type NumberInputProps = Omit<TextFieldProps, 'error' | 'value' | 'onChang
   reset?: boolean;
   resetProps?: ResetInputProps;
   rootProps?: React.HTMLAttributes<HTMLDivElement>;
+  rows: TextFieldProps['rows'];
   startAdornment?: TextFieldProps['InputProps']['startAdornment'];
   tiny?: boolean;
   tooltip?: TooltipProps['title'];
   tooltipProps?: Omit<TooltipProps, 'children' | 'title'>;
-  unnullable?: boolean;
-  value: number;
-  onChange?: (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>, value: number) => void;
-  onError?: (error: string) => void;
+  value: string;
+  onChange?: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, value: string) => void;
   onReset?: IconButtonProps['onClick'];
+  onError?: (error: string) => void;
 };
 
-export const NumberInput: React.FC<NumberInputProps> = React.memo(
+export const TextAreaInput: React.FC<TextAreaInputProps> = React.memo(
   ({
-    disabled = false,
+    disabled,
     endAdornment = null,
     error = () => null,
     errorProps = null,
@@ -53,8 +51,6 @@ export const NumberInput: React.FC<NumberInputProps> = React.memo(
     label,
     labelProps,
     loading = false,
-    max,
-    min,
     placeholder = null,
     preventDisabledColor = false,
     preventRender = false,
@@ -62,11 +58,11 @@ export const NumberInput: React.FC<NumberInputProps> = React.memo(
     reset = false,
     resetProps = null,
     rootProps = null,
+    rows = 1,
     startAdornment = null,
     tiny = false,
-    tooltip,
-    tooltipProps,
-    unnullable = false,
+    tooltip = null,
+    tooltipProps = null,
     value,
     onBlur = () => null,
     onChange = () => null,
@@ -74,7 +70,7 @@ export const NumberInput: React.FC<NumberInputProps> = React.memo(
     onFocus = () => null,
     onReset = () => null,
     ...textFieldProps
-  }: NumberInputProps) => {
+  }: TextAreaInputProps) => {
     const { t } = useTranslation();
     const theme = useTheme();
 
@@ -108,7 +104,9 @@ export const NumberInput: React.FC<NumberInputProps> = React.memo(
         </Tooltip>
         <FormControl fullWidth>
           {loading ? (
-            <Skeleton sx={{ height: '40px', transform: 'unset', ...(tiny && { height: '28px' }) }} />
+            <Skeleton
+              sx={{ height: `calc(23px * ${rows} + 17px)`, transform: 'unset', ...(tiny && { height: '28px' }) }}
+            />
           ) : (
             <Tooltip
               title={!readOnly ? null : t('readonly')}
@@ -120,11 +118,13 @@ export const NumberInput: React.FC<NumberInputProps> = React.memo(
               }}
             >
               <TextField
-                id={id}
-                type="number"
-                size="small"
                 fullWidth
-                value={[null, undefined, '', NaN].includes(value) ? '' : `${value}`}
+                size="small"
+                multiline
+                rows={rows}
+                margin="dense"
+                variant="outlined"
+                value={value}
                 disabled={disabled}
                 error={!!errorValue}
                 {...(readOnly && !disabled && { focused: null })}
@@ -148,8 +148,6 @@ export const NumberInput: React.FC<NumberInputProps> = React.memo(
 
                   input: {
                     inputProps: {
-                      min: min,
-                      max: max,
                       ...(tiny && { sx: { padding: '2.5px 4px 2.5px 8px' } })
                     },
                     placeholder: placeholder,
@@ -180,22 +178,10 @@ export const NumberInput: React.FC<NumberInputProps> = React.memo(
                   }
                 }}
                 onChange={event => {
-                  const value = event.target.value;
+                  onChange(event, event.target.value);
 
-                  if (!unnullable && [null, undefined, '', NaN].includes(value)) {
-                    onChange(event, null);
-
-                    const err = error(null);
-                    if (err) onError(null);
-                  } else {
-                    let num = Number(event.target.value);
-                    num = max ? Math.min(num, max) : num;
-                    num = min ? Math.max(num, min) : num;
-                    onChange(event, num);
-
-                    const err = error(num);
-                    if (err) onError(err);
-                  }
+                  const err = error(event.target.value);
+                  if (err) onError(err);
                 }}
                 onFocus={(event, ...other) => {
                   setFocused(document.activeElement === event.target);
@@ -206,6 +192,7 @@ export const NumberInput: React.FC<NumberInputProps> = React.memo(
                   onBlur(event, ...other);
                 }}
                 sx={{
+                  margin: 0,
                   ...(readOnly &&
                     !disabled && {
                       '& .MuiInputBase-input': { cursor: 'default' },
