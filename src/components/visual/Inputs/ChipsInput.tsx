@@ -63,199 +63,208 @@ export type ChipsInputProps<
   onError?: (error: string) => void;
 };
 
-const WrappedChipsInput = <
+export const ChipsInput: <
   Value extends string[] = string[],
   Multiple extends boolean = boolean,
   DisableClearable extends boolean = boolean,
   FreeSolo extends boolean = boolean,
   ChipComponent extends ElementType = ElementType
->({
-  disabled,
-  endAdornment = null,
-  error = () => null,
-  errorProps = null,
-  helperText = null,
-  helperTextProps = null,
-  id: idProp = null,
-  isOptionEqualToValue = null,
-  label,
-  labelProps,
-  loading = false,
-  options = [],
-  placeholder = null,
-  preventDisabledColor = false,
-  preventRender = false,
-  readOnly = false,
-  reset = false,
-  resetProps = null,
-  rootProps = null,
-  startAdornment = null,
-  tiny = false,
-  tooltip = null,
-  tooltipProps = null,
-  value,
-  onChange = () => null,
-  onReset = () => null,
-  onError = () => null,
-  ...autocompleteProps
-}: ChipsInputProps<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>) => {
-  const { t } = useTranslation();
-  const theme = useTheme();
+>(
+  props: ChipsInputProps<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>
+) => React.ReactNode = React.memo(
+  <
+    Value extends string[] = string[],
+    Multiple extends boolean = boolean,
+    DisableClearable extends boolean = boolean,
+    FreeSolo extends boolean = boolean,
+    ChipComponent extends ElementType = ElementType
+  >({
+    disabled,
+    endAdornment = null,
+    error = () => null,
+    errorProps = null,
+    helperText = null,
+    helperTextProps = null,
+    id: idProp = null,
+    isOptionEqualToValue = null,
+    label,
+    labelProps,
+    loading = false,
+    options = [],
+    placeholder = null,
+    preventDisabledColor = false,
+    preventRender = false,
+    readOnly = false,
+    reset = false,
+    resetProps = null,
+    rootProps = null,
+    startAdornment = null,
+    tiny = false,
+    tooltip = null,
+    tooltipProps = null,
+    value,
+    onChange = () => null,
+    onReset = () => null,
+    onError = () => null,
+    ...autocompleteProps
+  }: ChipsInputProps<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>) => {
+    const { t } = useTranslation();
+    const theme = useTheme();
 
-  const [focused, setFocused] = useState<boolean>(false);
+    const [focused, setFocused] = useState<boolean>(false);
 
-  const id = useMemo<string>(() => (idProp || label).replaceAll(' ', '-'), [idProp, label]);
+    const id = useMemo<string>(() => (idProp || label).replaceAll(' ', '-'), [idProp, label]);
 
-  const errorValue = useMemo<string>(() => error(value), [error, value]);
+    const errorValue = useMemo<string>(() => error(value), [error, value]);
 
-  return preventRender ? null : (
-    <div {...rootProps} style={{ textAlign: 'left', ...rootProps?.style }}>
-      <Tooltip title={tooltip} {...tooltipProps}>
-        <Typography
-          color={!disabled && errorValue ? 'error' : focused ? 'primary' : 'textSecondary'}
-          component={InputLabel}
-          gutterBottom
-          htmlFor={id}
-          variant="body2"
-          whiteSpace="nowrap"
-          {...labelProps}
-          children={label}
-          sx={{
-            ...labelProps?.sx,
-            ...(disabled &&
-              !preventDisabledColor && {
-                WebkitTextFillColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.38)'
-              })
-          }}
-        />
-      </Tooltip>
-      <FormControl fullWidth>
-        {loading ? (
-          <Skeleton sx={{ height: '40px', transform: 'unset', ...(tiny && { height: '28px' }) }} />
-        ) : (
-          <Tooltip
-            title={!readOnly ? null : t('readonly')}
-            placement="bottom"
-            arrow
-            slotProps={{
-              tooltip: { sx: { backgroundColor: theme.palette.primary.main } },
-              arrow: { sx: { color: theme.palette.primary.main } }
-            }}
-          >
-            <Autocomplete
-              id={id}
-              freeSolo
-              multiple
-              size="small"
-              value={value}
-              options={options}
-              disabled={disabled}
-              readOnly={readOnly}
-              isOptionEqualToValue={!isOptionEqualToValue ? null : isOptionEqualToValue}
-              onChange={(e, v: string[], p) => {
-                onChange(e, v, p);
-
-                const err = error(v);
-                if (err) onError(err);
-              }}
-              onFocus={event => setFocused(document.activeElement === event.target)}
-              onBlur={() => setFocused(false)}
-              renderInput={params => (
-                <TextField
-                  {...params}
-                  id={id}
-                  variant="outlined"
-                  error={!!errorValue}
-                  placeholder={placeholder}
-                  {...(readOnly && !disabled && { focused: null })}
-                  slotProps={{
-                    input: {
-                      ...params?.InputProps,
-                      ...(reset && { style: { paddingRight: '85px' } }),
-                      'aria-describedby': disabled || !(errorValue || helperText) ? null : `${id}-helper-text`,
-                      startAdornment: (
-                        <>
-                          {startAdornment && <InputAdornment position="start">{startAdornment}</InputAdornment>}
-                          {params?.InputProps?.startAdornment}
-                        </>
-                      ),
-                      endAdornment: (
-                        <>
-                          {endAdornment && <InputAdornment position="end">{endAdornment}</InputAdornment>}
-                          {loading || !reset || disabled || readOnly ? null : (
-                            <InputAdornment
-                              position="end"
-                              sx={{
-                                position: 'absolute',
-                                right: '37px',
-                                top: '50%',
-                                transform: 'translate(0, -50%)',
-                                ...(!focused && { visibility: 'hidden' })
-                              }}
-                              style={{ display: 'hidden' }}
-                            >
-                              <ResetInput
-                                id={id}
-                                preventRender={loading || !reset || disabled || readOnly}
-                                tiny={tiny}
-                                onReset={onReset}
-                                {...resetProps}
-                              />
-                            </InputAdornment>
-                          )}
-                          {params?.InputProps?.endAdornment}
-                        </>
-                      )
-                    }
-                  }}
-                  sx={{
-                    ...(tiny && {
-                      '& .MuiInputBase-root': {
-                        paddingTop: '2px !important',
-                        paddingBottom: '2px !important',
-                        fontSize: '14px'
-                      }
-                    }),
-                    ...(readOnly &&
-                      !disabled && {
-                        '& .MuiInputBase-input': { cursor: 'default' },
-                        '& .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline': {
-                          borderColor:
-                            theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.23)' : 'rgba(0, 0, 0, 0.23)'
-                        }
-                      })
-                  }}
-                />
-              )}
-              renderValue={(values: string[], getItemProps) =>
-                values.map((option: string, index: number) => {
-                  const { key, ...itemProps } = getItemProps({ index });
-                  return (
-                    <CustomChip
-                      key={key}
-                      label={option}
-                      {...itemProps}
-                      onDelete={disabled ? undefined : itemProps.onDelete}
-                    />
-                  );
+    return preventRender ? null : (
+      <div {...rootProps} style={{ textAlign: 'left', ...rootProps?.style }}>
+        <Tooltip title={tooltip} {...tooltipProps}>
+          <Typography
+            color={!disabled && errorValue ? 'error' : focused ? 'primary' : 'textSecondary'}
+            component={InputLabel}
+            gutterBottom
+            htmlFor={id}
+            variant="body2"
+            whiteSpace="nowrap"
+            {...labelProps}
+            children={label}
+            sx={{
+              ...labelProps?.sx,
+              ...(disabled &&
+                !preventDisabledColor && {
+                  WebkitTextFillColor:
+                    theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.38)'
                 })
-              }
-              {...(autocompleteProps as unknown as object)}
-            />
-          </Tooltip>
-        )}
-        <HelperText
-          disabled={disabled}
-          errorProps={errorProps}
-          errorText={errorValue}
-          helperText={helperText}
-          helperTextProps={helperTextProps}
-          id={id}
-          label={label}
-        />
-      </FormControl>
-    </div>
-  );
-};
+            }}
+          />
+        </Tooltip>
+        <FormControl fullWidth>
+          {loading ? (
+            <Skeleton sx={{ height: '40px', transform: 'unset', ...(tiny && { height: '28px' }) }} />
+          ) : (
+            <Tooltip
+              title={!readOnly ? null : t('readonly')}
+              placement="bottom"
+              arrow
+              slotProps={{
+                tooltip: { sx: { backgroundColor: theme.palette.primary.main } },
+                arrow: { sx: { color: theme.palette.primary.main } }
+              }}
+            >
+              <Autocomplete
+                id={id}
+                freeSolo
+                multiple
+                size="small"
+                value={value}
+                options={options}
+                disabled={disabled}
+                readOnly={readOnly}
+                isOptionEqualToValue={!isOptionEqualToValue ? null : isOptionEqualToValue}
+                onChange={(e, v: string[], p) => {
+                  onChange(e, v, p);
 
-export const ChipsInput = React.memo(WrappedChipsInput);
+                  const err = error(v);
+                  if (err) onError(err);
+                }}
+                onFocus={event => setFocused(document.activeElement === event.target)}
+                onBlur={() => setFocused(false)}
+                renderInput={params => (
+                  <TextField
+                    {...params}
+                    id={id}
+                    variant="outlined"
+                    error={!!errorValue}
+                    placeholder={placeholder}
+                    {...(readOnly && !disabled && { focused: null })}
+                    slotProps={{
+                      input: {
+                        ...params?.InputProps,
+                        ...(reset && { style: { paddingRight: '85px' } }),
+                        'aria-describedby': disabled || !(errorValue || helperText) ? null : `${id}-helper-text`,
+                        startAdornment: (
+                          <>
+                            {startAdornment && <InputAdornment position="start">{startAdornment}</InputAdornment>}
+                            {params?.InputProps?.startAdornment}
+                          </>
+                        ),
+                        endAdornment: (
+                          <>
+                            {endAdornment && <InputAdornment position="end">{endAdornment}</InputAdornment>}
+                            {loading || !reset || disabled || readOnly ? null : (
+                              <InputAdornment
+                                position="end"
+                                sx={{
+                                  position: 'absolute',
+                                  right: '37px',
+                                  top: '50%',
+                                  transform: 'translate(0, -50%)',
+                                  ...(!focused && { visibility: 'hidden' })
+                                }}
+                                style={{ display: 'hidden' }}
+                              >
+                                <ResetInput
+                                  id={id}
+                                  preventRender={loading || !reset || disabled || readOnly}
+                                  tiny={tiny}
+                                  onReset={onReset}
+                                  {...resetProps}
+                                />
+                              </InputAdornment>
+                            )}
+                            {params?.InputProps?.endAdornment}
+                          </>
+                        )
+                      }
+                    }}
+                    sx={{
+                      ...(tiny && {
+                        '& .MuiInputBase-root': {
+                          paddingTop: '2px !important',
+                          paddingBottom: '2px !important',
+                          fontSize: '14px'
+                        }
+                      }),
+                      ...(readOnly &&
+                        !disabled && {
+                          '& .MuiInputBase-input': { cursor: 'default' },
+                          '& .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline': {
+                            borderColor:
+                              theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.23)' : 'rgba(0, 0, 0, 0.23)'
+                          }
+                        })
+                    }}
+                  />
+                )}
+                renderValue={(values: string[], getItemProps) =>
+                  values.map((option: string, index: number) => {
+                    const { key, ...itemProps } = getItemProps({ index });
+                    return (
+                      <CustomChip
+                        key={key}
+                        label={option}
+                        {...itemProps}
+                        onDelete={disabled ? undefined : itemProps.onDelete}
+                      />
+                    );
+                  })
+                }
+                {...(autocompleteProps as unknown as object)}
+              />
+            </Tooltip>
+          )}
+          <HelperText
+            disabled={disabled}
+            errorProps={errorProps}
+            errorText={errorValue}
+            helperText={helperText}
+            helperTextProps={helperTextProps}
+            id={id}
+            label={label}
+          />
+        </FormControl>
+      </div>
+    );
+  }
+);
