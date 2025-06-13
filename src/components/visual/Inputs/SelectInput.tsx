@@ -33,7 +33,10 @@ export type Option = {
   value: MenuItemProps['value'] | boolean;
 };
 
-export type SelectInputProps<O extends Option[]> = Omit<SelectProps, 'error' | 'options' | 'value' | 'onChange'> & {
+export type SelectInputProps<O extends Option[] = []> = Omit<
+  SelectProps,
+  'error' | 'options' | 'value' | 'onChange'
+> & {
   capitalize?: boolean;
   endAdornment?: TextFieldProps['InputProps']['endAdornment'];
   error?: (value: O[number]['value']) => string;
