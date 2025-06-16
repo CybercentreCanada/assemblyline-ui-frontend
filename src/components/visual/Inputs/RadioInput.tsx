@@ -22,7 +22,6 @@ import type { ResetInputProps } from 'components/visual/Inputs/components/ResetI
 import { ResetInput } from 'components/visual/Inputs/components/ResetInput';
 import { Tooltip } from 'components/visual/Tooltip';
 import React, { useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 
 type Option = Omit<FormControlLabelProps, 'control'> & { control?: FormControlLabelProps['control'] };
 
@@ -86,7 +85,6 @@ export const RadioInput: <O extends Option[]>(props: RadioInputProps<O>) => Reac
     onReset = () => null,
     onError = () => null
   }: RadioInputProps<O>) => {
-    const { t } = useTranslation();
     const theme = useTheme();
 
     const [focused, setFocused] = useState<boolean>(false);

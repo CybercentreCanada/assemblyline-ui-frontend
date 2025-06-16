@@ -24,7 +24,6 @@ import { ResetInput } from 'components/visual/Inputs/components/ResetInput';
 import { Tooltip } from 'components/visual/Tooltip';
 import type { ElementType } from 'react';
 import React, { useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 
 export type ChipsInputProps<
   Value extends string[] = string[],
@@ -108,7 +107,6 @@ export const ChipsInput: <
     onError = () => null,
     ...autocompleteProps
   }: ChipsInputProps<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>) => {
-    const { t } = useTranslation();
     const theme = useTheme();
 
     const [focused, setFocused] = useState<boolean>(false);

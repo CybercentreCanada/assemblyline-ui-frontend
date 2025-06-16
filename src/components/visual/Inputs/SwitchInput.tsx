@@ -12,7 +12,6 @@ import type { ResetInputProps } from 'components/visual/Inputs/components/ResetI
 import { ResetInput } from 'components/visual/Inputs/components/ResetInput';
 import { Tooltip } from 'components/visual/Tooltip';
 import React, { useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 
 export type SwitchInputProps = Omit<ButtonProps, 'onChange' | 'onClick' | 'value'> & {
   endAdornment?: React.ReactNode;
@@ -63,7 +62,6 @@ export const SwitchInput: React.FC<SwitchInputProps> = React.memo(
     onError = () => null,
     ...buttonProps
   }: SwitchInputProps) => {
-    const { t } = useTranslation();
     const theme = useTheme();
 
     const [focused, setFocused] = useState<boolean>(false);

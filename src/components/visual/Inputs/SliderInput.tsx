@@ -11,7 +11,6 @@ import type { ResetInputProps } from 'components/visual/Inputs/components/ResetI
 import { ResetInput } from 'components/visual/Inputs/components/ResetInput';
 import { Tooltip } from 'components/visual/Tooltip';
 import React, { useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 
 export type SliderInputProps = Omit<SliderProps, 'value' | 'onChange'> & {
   endAdornment?: TextFieldProps['InputProps']['endAdornment'];
@@ -62,7 +61,6 @@ export const SliderInput: React.FC<SliderInputProps> = React.memo(
     onError = () => null,
     ...sliderProps
   }: SliderInputProps) => {
-    const { t } = useTranslation();
     const theme = useTheme();
 
     const [focused, setFocused] = useState<boolean>(false);

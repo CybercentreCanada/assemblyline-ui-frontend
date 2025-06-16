@@ -7,7 +7,6 @@ import type { ResetInputProps } from 'components/visual/Inputs/components/ResetI
 import { ResetInput } from 'components/visual/Inputs/components/ResetInput';
 import { Tooltip } from 'components/visual/Tooltip';
 import React, { useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 
 export type CheckboxInputProps = Omit<ButtonProps, 'onChange' | 'onClick' | 'value'> & {
   divider?: boolean;
@@ -71,7 +70,6 @@ export const CheckboxInput: React.FC<CheckboxInputProps> = React.memo(
     onError = () => null,
     ...buttonProps
   }: CheckboxInputProps) => {
-    const { t } = useTranslation();
     const theme = useTheme();
 
     const [focused, setFocused] = useState<boolean>(false);

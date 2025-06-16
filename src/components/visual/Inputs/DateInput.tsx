@@ -14,7 +14,6 @@ import { Tooltip } from 'components/visual/Tooltip';
 import type { Moment } from 'moment';
 import moment from 'moment';
 import React, { useEffect, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 
 export type DateInputProps = Omit<TextFieldProps, 'error' | 'value' | 'onChange'> & {
   defaultDateOffset?: number | null;
@@ -74,7 +73,6 @@ export const DateInput: React.FC<DateInputProps> = React.memo(
     onError = () => null,
     ...textFieldProps
   }: DateInputProps) => {
-    const { t } = useTranslation();
     const theme = useTheme();
 
     const [tempDate, setTempDate] = useState<Moment>(null);

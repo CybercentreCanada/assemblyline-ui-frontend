@@ -25,7 +25,6 @@ import type { ResetInputProps } from 'components/visual/Inputs/components/ResetI
 import { ResetInput } from 'components/visual/Inputs/components/ResetInput';
 import { Tooltip } from 'components/visual/Tooltip';
 import React, { useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 
 export type Option = {
   primary: ListItemTextProps['primary'];
@@ -95,7 +94,6 @@ export const SelectInput: <O extends Option[]>(props: SelectInputProps<O>) => Re
     onError = () => null,
     ...selectProps
   }: SelectInputProps<O>) => {
-    const { t } = useTranslation();
     const theme = useTheme();
 
     const [focused, setFocused] = useState<boolean>(false);
