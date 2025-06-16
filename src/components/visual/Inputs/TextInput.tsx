@@ -99,9 +99,11 @@ export const TextInput: <
     tooltip = null,
     tooltipProps = null,
     value,
+    onBlur = () => null,
     onChange = () => null,
-    onReset = () => null,
     onError = () => null,
+    onFocus = () => null,
+    onReset = () => null,
     ...autocompleteProps
   }: TextInputProps<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>) => {
     const theme = useTheme();
@@ -160,8 +162,14 @@ export const TextInput: <
                 const err = error(v);
                 if (err) onError(err);
               }}
-              onFocus={event => setFocused(document.activeElement === event.target)}
-              onBlur={() => setFocused(false)}
+              onFocus={(event, ...other) => {
+                setFocused(!readOnly && !disabled && document.activeElement === event.target);
+                onFocus(event, ...other);
+              }}
+              onBlur={(event, ...other) => {
+                setFocused(false);
+                onBlur(event, ...other);
+              }}
               renderOption={(props, option) => (
                 <Typography {...props} key={option} {...(tiny && { variant: 'body2' })}>
                   {option}

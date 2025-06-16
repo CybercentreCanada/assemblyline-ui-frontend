@@ -68,9 +68,11 @@ export const DateInput: React.FC<DateInputProps> = React.memo(
     tooltip = null,
     tooltipProps = null,
     value,
+    onBlur = () => null,
     onChange = () => null,
-    onReset = () => null,
     onError = () => null,
+    onFocus = () => null,
+    onReset = () => null,
     ...textFieldProps
   }: DateInputProps) => {
     const theme = useTheme();
@@ -193,8 +195,14 @@ export const DateInput: React.FC<DateInputProps> = React.memo(
                     },
                     ...(readOnly && !disabled && { focused: null }),
                     ...textFieldProps,
-                    onFocus: event => setFocused(document.activeElement === event.target),
-                    onBlur: () => setFocused(false),
+                    onFocus: (event, ...other) => {
+                      setFocused(!readOnly && !disabled && document.activeElement === event.target);
+                      onFocus(event, ...other);
+                    },
+                    onBlur: (event, ...other) => {
+                      setFocused(false);
+                      onBlur(event, ...other);
+                    },
                     inputProps: {
                       ...(tiny && { sx: { padding: '2.5px 4px 2.5px 8px' } })
                     },

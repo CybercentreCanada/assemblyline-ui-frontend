@@ -56,9 +56,11 @@ export const SliderInput: React.FC<SliderInputProps> = React.memo(
     tooltip = null,
     tooltipProps = null,
     value,
+    onBlur = () => null,
     onChange = () => null,
-    onReset = () => null,
     onError = () => null,
+    onFocus = () => null,
+    onReset = () => null,
     ...sliderProps
   }: SliderInputProps) => {
     const theme = useTheme();
@@ -113,8 +115,14 @@ export const SliderInput: React.FC<SliderInputProps> = React.memo(
                       const err = error(v as number);
                       if (err) onError(err);
                     }}
-                    onFocus={event => setFocused(document.activeElement === event.target)}
-                    onBlur={() => setFocused(false)}
+                    onFocus={(event, ...other) => {
+                      setFocused(!readOnly && !disabled && document.activeElement === event.target);
+                      onFocus(event, ...other);
+                    }}
+                    onBlur={(event, ...other) => {
+                      setFocused(false);
+                      onBlur(event, ...other);
+                    }}
                     {...sliderProps}
                   />
                 </div>

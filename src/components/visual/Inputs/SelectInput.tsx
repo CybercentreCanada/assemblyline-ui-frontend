@@ -89,9 +89,11 @@ export const SelectInput: <O extends Option[]>(props: SelectInputProps<O>) => Re
     tooltip = null,
     tooltipProps = null,
     value,
+    onBlur = () => null,
     onChange = () => null,
-    onReset = () => null,
     onError = () => null,
+    onFocus = () => null,
+    onReset = () => null,
     ...selectProps
   }: SelectInputProps<O>) => {
     const theme = useTheme();
@@ -181,8 +183,14 @@ export const SelectInput: <O extends Option[]>(props: SelectInputProps<O>) => Re
                 const err = error(v);
                 if (err) onError(err);
               }}
-              onFocus={event => setFocused(document.activeElement === event.target)}
-              onBlur={() => setFocused(false)}
+              onFocus={(event, ...other) => {
+                setFocused(!readOnly && !disabled && document.activeElement === event.target);
+                onFocus(event, ...other);
+              }}
+              onBlur={(event, ...other) => {
+                setFocused(false);
+                onBlur(event, ...other);
+              }}
               endAdornment={
                 <>
                   {loading || !reset || disabled || readOnly ? null : (

@@ -57,9 +57,11 @@ export const SwitchInput: React.FC<SwitchInputProps> = React.memo(
     tooltip = null,
     tooltipProps = null,
     value = false,
+    onBlur = () => null,
     onChange = () => null,
-    onReset = () => null,
     onError = () => null,
+    onFocus = () => null,
+    onReset = () => null,
     ...buttonProps
   }: SwitchInputProps) => {
     const theme = useTheme();
@@ -86,8 +88,14 @@ export const SwitchInput: React.FC<SwitchInputProps> = React.memo(
               const err = error(!value);
               if (err) onError(err);
             }}
-            onFocus={event => setFocused(document.activeElement === event.target)}
-            onBlur={() => setFocused(false)}
+            onFocus={(event, ...other) => {
+              setFocused(!readOnly && !disabled && document.activeElement === event.target);
+              onFocus(event, ...other);
+            }}
+            onBlur={(event, ...other) => {
+              setFocused(false);
+              onBlur(event, ...other);
+            }}
             sx={{
               justifyContent: 'start',
               color: 'inherit',

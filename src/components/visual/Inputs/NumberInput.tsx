@@ -187,7 +187,7 @@ export const NumberInput: React.FC<NumberInputProps> = React.memo(
                 }
               }}
               onFocus={(event, ...other) => {
-                setFocused(document.activeElement === event.target);
+                setFocused(!readOnly && !disabled && document.activeElement === event.target);
                 onFocus(event, ...other);
               }}
               onBlur={(event, ...other) => {

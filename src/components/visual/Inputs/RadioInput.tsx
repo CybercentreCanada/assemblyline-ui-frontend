@@ -50,9 +50,11 @@ export type RadioInputProps<O extends Option[] = []> = {
   tooltip?: TooltipProps['title'];
   tooltipProps?: Omit<TooltipProps, 'children' | 'title'>;
   value: O[number]['value'];
+  onBlur?: (...props: unknown[]) => void;
   onChange?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>, value: O[number]['value']) => void;
-  onReset?: IconButtonProps['onClick'];
   onError?: (error: string) => void;
+  onFocus?: (...props: unknown[]) => void;
+  onReset?: IconButtonProps['onClick'];
 };
 
 export const RadioInput: <O extends Option[]>(props: RadioInputProps<O>) => React.ReactNode = React.memo(
@@ -81,9 +83,11 @@ export const RadioInput: <O extends Option[]>(props: RadioInputProps<O>) => Reac
     tooltip = null,
     tooltipProps = null,
     value,
+    onBlur = () => null,
     onChange = () => null,
-    onReset = () => null,
-    onError = () => null
+    onError = () => null,
+    onFocus = () => null,
+    onReset = () => null
   }: RadioInputProps<O>) => {
     const theme = useTheme();
 
@@ -136,8 +140,14 @@ export const RadioInput: <O extends Option[]>(props: RadioInputProps<O>) => Reac
                   const err = error(!option.value);
                   if (err) onError(err);
                 }}
-                onFocus={event => setFocused(document.activeElement === event.target)}
-                onBlur={() => setFocused(false)}
+                onFocus={(event, ...other) => {
+                  setFocused(!readOnly && !disabled && document.activeElement === event.target);
+                  onFocus(event, ...other);
+                }}
+                onBlur={(event, ...other) => {
+                  setFocused(false);
+                  onBlur(event, ...other);
+                }}
                 sx={{
                   justifyContent: 'start',
                   color: 'inherit',
