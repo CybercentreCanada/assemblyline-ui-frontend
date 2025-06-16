@@ -22,7 +22,6 @@ import type { ResetInputProps } from 'components/visual/Inputs/components/ResetI
 import { ResetInput } from 'components/visual/Inputs/components/ResetInput';
 import { Tooltip } from 'components/visual/Tooltip';
 import React, { useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 
 type Option = Omit<FormControlLabelProps, 'control'> & { control?: FormControlLabelProps['control'] };
 
@@ -51,88 +50,84 @@ export type RadioInputProps<O extends Option[] = []> = {
   tooltip?: TooltipProps['title'];
   tooltipProps?: Omit<TooltipProps, 'children' | 'title'>;
   value: O[number]['value'];
+  onBlur?: (...props: unknown[]) => void;
   onChange?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>, value: O[number]['value']) => void;
-  onReset?: IconButtonProps['onClick'];
   onError?: (error: string) => void;
+  onFocus?: (...props: unknown[]) => void;
+  onReset?: IconButtonProps['onClick'];
 };
 
-const WrappedRadioInput = <O extends Option[] = []>({
-  disabled,
-  endAdornment = null,
-  error = () => null,
-  errorProps = null,
-  helperText = null,
-  helperTextProps = null,
-  id: idProp = null,
-  label,
-  labelProps,
-  loading = false,
-  divider = false,
-  options = null,
-  placeholder = null,
-  preventDisabledColor = false,
-  preventRender = false,
-  readOnly = false,
-  reset = false,
-  resetProps = null,
-  rootProps = null,
-  startAdornment = null,
-  tiny = false,
-  tooltip = null,
-  tooltipProps = null,
-  value,
-  onChange = () => null,
-  onReset = () => null,
-  onError = () => null
-}: RadioInputProps<O>) => {
-  const { t } = useTranslation();
-  const theme = useTheme();
+export const RadioInput: <O extends Option[]>(props: RadioInputProps<O>) => React.ReactNode = React.memo(
+  <O extends Option[]>({
+    disabled,
+    endAdornment = null,
+    error = () => null,
+    errorProps = null,
+    helperText = null,
+    helperTextProps = null,
+    id: idProp = null,
+    label,
+    labelProps,
+    loading = false,
+    divider = false,
+    options = null,
+    placeholder = null,
+    preventDisabledColor = false,
+    preventRender = false,
+    readOnly = false,
+    reset = false,
+    resetProps = null,
+    rootProps = null,
+    startAdornment = null,
+    tiny = false,
+    tooltip = null,
+    tooltipProps = null,
+    value,
+    onBlur = () => null,
+    onChange = () => null,
+    onError = () => null,
+    onFocus = () => null,
+    onReset = () => null
+  }: RadioInputProps<O>) => {
+    const theme = useTheme();
 
-  const [focused, setFocused] = useState<boolean>(false);
+    const [focused, setFocused] = useState<boolean>(false);
 
-  const id = useMemo<string>(() => (idProp || label).replaceAll(' ', '-'), [idProp, label]);
+    const id = useMemo<string>(() => (idProp || label).replaceAll(' ', '-'), [idProp, label]);
 
-  const errorValue = useMemo<string>(() => error(value), [error, value]);
+    const errorValue = useMemo<string>(() => error(value), [error, value]);
 
-  return preventRender ? null : (
-    <div {...rootProps} style={{ textAlign: 'left', ...rootProps?.style }}>
-      <Tooltip title={tooltip} {...tooltipProps}>
-        <Typography
-          color={!disabled && errorValue ? 'error' : focused ? 'primary' : 'textSecondary'}
-          component={InputLabel}
-          gutterBottom
-          htmlFor={id}
-          variant="body2"
-          whiteSpace="nowrap"
-          {...labelProps}
-          children={label}
-          sx={{
-            ...labelProps?.sx,
-            ...(disabled &&
-              !preventDisabledColor && {
-                WebkitTextFillColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.38)'
-              })
-          }}
-        />
-      </Tooltip>
-      <FormControl
-        size="small"
-        fullWidth
-        sx={{ ...(divider && { borderBottom: `1px solid ${theme.palette.divider}` }) }}
-      >
-        <Tooltip
-          title={!readOnly ? null : t('readonly')}
-          placement="bottom"
-          arrow
-          slotProps={{
-            tooltip: { sx: { backgroundColor: theme.palette.primary.main } },
-            arrow: { sx: { color: theme.palette.primary.main } }
-          }}
+    return preventRender ? null : (
+      <div {...rootProps} style={{ textAlign: 'left', ...rootProps?.style }}>
+        <Tooltip title={tooltip} {...tooltipProps}>
+          <Typography
+            color={!disabled && errorValue ? 'error' : focused ? 'primary' : 'textSecondary'}
+            component={InputLabel}
+            gutterBottom
+            htmlFor={id}
+            variant="body2"
+            whiteSpace="nowrap"
+            {...labelProps}
+            children={label}
+            sx={{
+              ...labelProps?.sx,
+              ...(disabled &&
+                !preventDisabledColor && {
+                  WebkitTextFillColor:
+                    theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.38)'
+                })
+            }}
+          />
+        </Tooltip>
+        <FormControl
+          size="small"
+          fullWidth
+          sx={{ ...(divider && { borderBottom: `1px solid ${theme.palette.divider}` }) }}
         >
           <RadioGroup value={value}>
-            {options.map(({ value, label }, key) => (
+            {options.map((option, key) => (
               <Button
-                key={`${key}-${label}`}
+                key={`${key}-${option.label}`}
                 color="inherit"
                 disabled={loading || disabled || readOnly}
                 fullWidth
@@ -140,13 +135,19 @@ const WrappedRadioInput = <O extends Option[] = []>({
                 onClick={event => {
                   event.stopPropagation();
                   event.preventDefault();
-                  onChange(event, value);
+                  onChange(event, option.value);
 
-                  const err = error(!value);
+                  const err = error(!option.value);
                   if (err) onError(err);
                 }}
-                onFocus={event => setFocused(document.activeElement === event.target)}
-                onBlur={() => setFocused(false)}
+                onFocus={(event, ...other) => {
+                  setFocused(!readOnly && !disabled && document.activeElement === event.target);
+                  onFocus(event, ...other);
+                }}
+                onBlur={(event, ...other) => {
+                  setFocused(false);
+                  onBlur(event, ...other);
+                }}
                 sx={{
                   justifyContent: 'start',
                   color: 'inherit',
@@ -159,7 +160,7 @@ const WrappedRadioInput = <O extends Option[] = []>({
                 }}
               >
                 <FormControlLabel
-                  value={value}
+                  value={option.value}
                   control={
                     loading ? (
                       <div>
@@ -197,14 +198,19 @@ const WrappedRadioInput = <O extends Option[] = []>({
                       }}
                     >
                       <span style={{ textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden' }}>
-                        {label}
+                        {option?.label}
                       </span>
                       {endAdornment}
                     </div>
                   }
                   slotProps={{
                     typography: {
-                      color: !disabled && errorValue ? 'error' : 'textPrimary',
+                      color:
+                        !disabled && errorValue
+                          ? 'error'
+                          : focused && value === option.value
+                            ? 'primary'
+                            : 'textPrimary',
                       marginLeft: theme.spacing(1.25),
                       overflow: 'hidden',
                       textAlign: 'start',
@@ -224,30 +230,36 @@ const WrappedRadioInput = <O extends Option[] = []>({
               </Button>
             ))}
           </RadioGroup>
-        </Tooltip>
 
-        <HelperText
-          disabled={disabled}
-          errorProps={errorProps}
-          errorText={errorValue}
-          helperText={helperText}
-          helperTextProps={helperTextProps}
-          id={id}
-          label={label}
-        />
-
-        <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, display: 'flex', alignItems: 'center' }}>
-          <ResetInput
+          <HelperText
+            disabled={disabled}
+            errorProps={errorProps}
+            errorText={errorValue}
+            helperText={helperText}
+            helperTextProps={helperTextProps}
             id={id}
-            preventRender={loading || !reset || disabled || readOnly}
-            tiny={tiny}
-            onReset={onReset}
-            {...resetProps}
+            label={label}
           />
-        </div>
-      </FormControl>
-    </div>
-  );
-};
 
-export const RadioInput = React.memo(WrappedRadioInput);
+          <div
+            style={{
+              position: 'absolute',
+              right: theme.spacing(0.75),
+              top: theme.spacing(0.75),
+              display: 'flex',
+              alignItems: 'center'
+            }}
+          >
+            <ResetInput
+              id={id}
+              preventRender={loading || !reset || disabled || readOnly}
+              tiny={tiny}
+              onReset={onReset}
+              {...resetProps}
+            />
+          </div>
+        </FormControl>
+      </div>
+    );
+  }
+);

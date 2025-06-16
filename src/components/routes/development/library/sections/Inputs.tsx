@@ -38,7 +38,7 @@ export type InputsLibraryState = {
       classification: string;
       date: string;
       number: number;
-      radio: unknown;
+      radio: string;
       select: string;
       slider: number;
       switch: boolean;
@@ -77,7 +77,7 @@ export const INPUTS_LIBRARY_STATE: InputsLibraryState = {
       textarea: ''
     }
   }
-} as const;
+};
 
 export const InputsSection = React.memo(() => {
   const theme = useTheme();
@@ -3023,14 +3023,14 @@ export const InputsSection = React.memo(() => {
                         { value: 'first', label: 'First' },
                         { value: 'second', label: 'Second' }
                       ]}
-                      onChange={(event, next) => form.setFieldValue('components.inputs.values.radio', next)}
+                      onChange={(event, next: string) => form.setFieldValue('components.inputs.values.radio', next)}
                       {...(disabled && { disabled })}
                       {...(loading && { loading })}
                       {...(readOnly && { readOnly })}
                       {...(tiny && { tiny })}
                       {...(reset && {
                         reset,
-                        onReset: () => form.setFieldValue('components.inputs.values.radio', false)
+                        onReset: () => form.setFieldValue('components.inputs.values.radio', null)
                       })}
                       {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
                       {...(error && { error: v => (v !== false ? null : 'Input field cannot be null') })}

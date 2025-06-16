@@ -23,7 +23,6 @@ import { ResetInput } from 'components/visual/Inputs/components/ResetInput';
 import { Tooltip } from 'components/visual/Tooltip';
 import type { ElementType } from 'react';
 import React, { useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 
 export type TextInputProps<
   Value extends string = string,
@@ -61,86 +60,88 @@ export type TextInputProps<
   onError?: (error: string) => void;
 };
 
-const WrappedTextInput = <
+export const TextInput: <
   Value extends string = string,
   Multiple extends boolean = boolean,
   DisableClearable extends boolean = boolean,
   FreeSolo extends boolean = boolean,
   ChipComponent extends ElementType = ElementType
->({
-  disabled,
-  endAdornment = null,
-  error = () => null,
-  errorProps = null,
-  helperText = null,
-  helperTextProps = null,
-  id: idProp = null,
-  label,
-  labelProps,
-  loading = false,
-  options = [],
-  placeholder = null,
-  preventDisabledColor = false,
-  preventRender = false,
-  readOnly = false,
-  reset = false,
-  resetProps = null,
-  rootProps = null,
-  startAdornment = null,
-  tiny = false,
-  tooltip = null,
-  tooltipProps = null,
-  value,
-  onChange = () => null,
-  onReset = () => null,
-  onError = () => null,
-  ...autocompleteProps
-}: TextInputProps<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>) => {
-  const { t } = useTranslation();
-  const theme = useTheme();
+>(
+  props: TextInputProps<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>
+) => React.ReactNode = React.memo(
+  <
+    Value extends string = string,
+    Multiple extends boolean = boolean,
+    DisableClearable extends boolean = boolean,
+    FreeSolo extends boolean = boolean,
+    ChipComponent extends ElementType = ElementType
+  >({
+    disabled,
+    endAdornment = null,
+    error = () => null,
+    errorProps = null,
+    helperText = null,
+    helperTextProps = null,
+    id: idProp = null,
+    label,
+    labelProps,
+    loading = false,
+    options = [],
+    placeholder = null,
+    preventDisabledColor = false,
+    preventRender = false,
+    readOnly = false,
+    reset = false,
+    resetProps = null,
+    rootProps = null,
+    startAdornment = null,
+    tiny = false,
+    tooltip = null,
+    tooltipProps = null,
+    value,
+    onBlur = () => null,
+    onChange = () => null,
+    onError = () => null,
+    onFocus = () => null,
+    onReset = () => null,
+    ...autocompleteProps
+  }: TextInputProps<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>) => {
+    const theme = useTheme();
 
-  const [_value, setValue] =
-    useState<AutocompleteValue<Value, Multiple, true | DisableClearable, true | FreeSolo>>(null);
-  const [focused, setFocused] = useState<boolean>(false);
+    const [_value, setValue] =
+      useState<AutocompleteValue<Value, Multiple, true | DisableClearable, true | FreeSolo>>(null);
+    const [focused, setFocused] = useState<boolean>(false);
 
-  const id = useMemo<string>(() => (idProp || label).replaceAll(' ', '-'), [idProp, label]);
+    const id = useMemo<string>(() => (idProp || label).replaceAll(' ', '-'), [idProp, label]);
 
-  const errorValue = useMemo<string>(() => error(value), [error, value]);
+    const errorValue = useMemo<string>(() => error(value), [error, value]);
 
-  return preventRender ? null : (
-    <div {...rootProps} style={{ textAlign: 'left', ...rootProps?.style }}>
-      <Tooltip title={tooltip} {...tooltipProps}>
-        <Typography
-          color={!disabled && errorValue ? 'error' : focused ? 'primary' : 'textSecondary'}
-          component={InputLabel}
-          gutterBottom
-          htmlFor={id}
-          variant="body2"
-          whiteSpace="nowrap"
-          {...labelProps}
-          children={label}
-          sx={{
-            ...labelProps?.sx,
-            ...(disabled &&
-              !preventDisabledColor && {
-                WebkitTextFillColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.38)'
-              })
-          }}
-        />
-      </Tooltip>
-      <FormControl fullWidth>
-        {loading ? (
-          <Skeleton sx={{ height: '40px', transform: 'unset', ...(tiny && { height: '28px' }) }} />
-        ) : (
-          <Tooltip
-            title={!readOnly ? null : t('readonly')}
-            placement="bottom"
-            arrow
-            slotProps={{
-              tooltip: { sx: { backgroundColor: theme.palette.primary.main } },
-              arrow: { sx: { color: theme.palette.primary.main } }
+    return preventRender ? null : (
+      <div {...rootProps} style={{ textAlign: 'left', ...rootProps?.style }}>
+        <Tooltip title={tooltip} {...tooltipProps}>
+          <Typography
+            color={!disabled && errorValue ? 'error' : focused ? 'primary' : 'textSecondary'}
+            component={InputLabel}
+            gutterBottom
+            htmlFor={id}
+            variant="body2"
+            whiteSpace="nowrap"
+            {...labelProps}
+            children={label}
+            sx={{
+              ...labelProps?.sx,
+              ...(disabled &&
+                !preventDisabledColor && {
+                  WebkitTextFillColor:
+                    theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.38)'
+                })
             }}
-          >
+          />
+        </Tooltip>
+        <FormControl fullWidth>
+          {loading ? (
+            <Skeleton sx={{ height: '40px', transform: 'unset', ...(tiny && { height: '28px' }) }} />
+          ) : (
             <Autocomplete
               id={id}
               autoComplete
@@ -161,8 +162,14 @@ const WrappedTextInput = <
                 const err = error(v);
                 if (err) onError(err);
               }}
-              onFocus={event => setFocused(document.activeElement === event.target)}
-              onBlur={() => setFocused(false)}
+              onFocus={(event, ...other) => {
+                setFocused(!readOnly && !disabled && document.activeElement === event.target);
+                onFocus(event, ...other);
+              }}
+              onBlur={(event, ...other) => {
+                setFocused(false);
+                onBlur(event, ...other);
+              }}
               renderOption={(props, option) => (
                 <Typography {...props} key={option} {...(tiny && { variant: 'body2' })}>
                   {option}
@@ -210,6 +217,7 @@ const WrappedTextInput = <
                     }),
                     ...(readOnly &&
                       !disabled && {
+                        '& .MuiInputBase-root': { cursor: 'default' },
                         '& .MuiInputBase-input': { cursor: 'default' },
                         '& .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline': {
                           borderColor:
@@ -221,20 +229,18 @@ const WrappedTextInput = <
               )}
               {...autocompleteProps}
             />
-          </Tooltip>
-        )}
-        <HelperText
-          disabled={disabled}
-          errorProps={errorProps}
-          errorText={errorValue}
-          helperText={helperText}
-          helperTextProps={helperTextProps}
-          id={id}
-          label={label}
-        />
-      </FormControl>
-    </div>
-  );
-};
-
-export const TextInput = React.memo(WrappedTextInput);
+          )}
+          <HelperText
+            disabled={disabled}
+            errorProps={errorProps}
+            errorText={errorValue}
+            helperText={helperText}
+            helperTextProps={helperTextProps}
+            id={id}
+            label={label}
+          />
+        </FormControl>
+      </div>
+    );
+  }
+);

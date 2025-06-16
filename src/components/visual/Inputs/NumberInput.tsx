@@ -10,7 +10,6 @@ import type { ResetInputProps } from 'components/visual/Inputs/components/ResetI
 import { ResetInput } from 'components/visual/Inputs/components/ResetInput';
 import { Tooltip } from 'components/visual/Tooltip';
 import React, { useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
 
 export type NumberInputProps = Omit<TextFieldProps, 'error' | 'value' | 'onChange'> & {
   endAdornment?: TextFieldProps['InputProps']['endAdornment'];
@@ -41,82 +40,74 @@ export type NumberInputProps = Omit<TextFieldProps, 'error' | 'value' | 'onChang
   onReset?: IconButtonProps['onClick'];
 };
 
-const WrappedNumberInput = ({
-  disabled = false,
-  endAdornment = null,
-  error = () => null,
-  errorProps = null,
-  helperText = null,
-  helperTextProps = null,
-  id: idProp = null,
-  label,
-  labelProps,
-  loading = false,
-  max,
-  min,
-  placeholder = null,
-  preventDisabledColor = false,
-  preventRender = false,
-  readOnly = false,
-  reset = false,
-  resetProps = null,
-  rootProps = null,
-  startAdornment = null,
-  tiny = false,
-  tooltip,
-  tooltipProps,
-  unnullable = false,
-  value,
-  onBlur = () => null,
-  onChange = () => null,
-  onError = () => null,
-  onFocus = () => null,
-  onReset = () => null,
-  ...textFieldProps
-}: NumberInputProps) => {
-  const { t } = useTranslation();
-  const theme = useTheme();
+export const NumberInput: React.FC<NumberInputProps> = React.memo(
+  ({
+    disabled = false,
+    endAdornment = null,
+    error = () => null,
+    errorProps = null,
+    helperText = null,
+    helperTextProps = null,
+    id: idProp = null,
+    label,
+    labelProps,
+    loading = false,
+    max,
+    min,
+    placeholder = null,
+    preventDisabledColor = false,
+    preventRender = false,
+    readOnly = false,
+    reset = false,
+    resetProps = null,
+    rootProps = null,
+    startAdornment = null,
+    tiny = false,
+    tooltip,
+    tooltipProps,
+    unnullable = false,
+    value,
+    onBlur = () => null,
+    onChange = () => null,
+    onError = () => null,
+    onFocus = () => null,
+    onReset = () => null,
+    ...textFieldProps
+  }: NumberInputProps) => {
+    const theme = useTheme();
 
-  const [focused, setFocused] = useState<boolean>(false);
+    const [focused, setFocused] = useState<boolean>(false);
 
-  const id = useMemo<string>(() => (idProp || label).replaceAll(' ', '-'), [idProp, label]);
+    const id = useMemo<string>(() => (idProp || label).replaceAll(' ', '-'), [idProp, label]);
 
-  const errorValue = useMemo<string>(() => error(value), [error, value]);
+    const errorValue = useMemo<string>(() => error(value), [error, value]);
 
-  return preventRender ? null : (
-    <div {...rootProps} style={{ textAlign: 'left', ...rootProps?.style }}>
-      <Tooltip title={tooltip} {...tooltipProps}>
-        <Typography
-          color={!disabled && errorValue ? 'error' : focused ? 'primary' : 'textSecondary'}
-          component={InputLabel}
-          gutterBottom
-          htmlFor={id}
-          variant="body2"
-          whiteSpace="nowrap"
-          {...labelProps}
-          children={label}
-          sx={{
-            ...labelProps?.sx,
-            ...(disabled &&
-              !preventDisabledColor && {
-                WebkitTextFillColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.38)'
-              })
-          }}
-        />
-      </Tooltip>
-      <FormControl fullWidth>
-        {loading ? (
-          <Skeleton sx={{ height: '40px', transform: 'unset', ...(tiny && { height: '28px' }) }} />
-        ) : (
-          <Tooltip
-            title={!readOnly ? null : t('readonly')}
-            placement="bottom"
-            arrow
-            slotProps={{
-              tooltip: { sx: { backgroundColor: theme.palette.primary.main } },
-              arrow: { sx: { color: theme.palette.primary.main } }
+    return preventRender ? null : (
+      <div {...rootProps} style={{ textAlign: 'left', ...rootProps?.style }}>
+        <Tooltip title={tooltip} {...tooltipProps}>
+          <Typography
+            color={!disabled && errorValue ? 'error' : focused ? 'primary' : 'textSecondary'}
+            component={InputLabel}
+            gutterBottom
+            htmlFor={id}
+            variant="body2"
+            whiteSpace="nowrap"
+            {...labelProps}
+            children={label}
+            sx={{
+              ...labelProps?.sx,
+              ...(disabled &&
+                !preventDisabledColor && {
+                  WebkitTextFillColor:
+                    theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.38)'
+                })
             }}
-          >
+          />
+        </Tooltip>
+        <FormControl fullWidth>
+          {loading ? (
+            <Skeleton sx={{ height: '40px', transform: 'unset', ...(tiny && { height: '28px' }) }} />
+          ) : (
             <TextField
               id={id}
               type="number"
@@ -131,7 +122,11 @@ const WrappedNumberInput = ({
                 formHelperText: disabled
                   ? null
                   : errorValue
-                    ? { variant: 'outlined', sx: { color: theme.palette.error.main, ...errorProps?.sx }, ...errorProps }
+                    ? {
+                        variant: 'outlined',
+                        sx: { color: theme.palette.error.main, ...errorProps?.sx },
+                        ...errorProps
+                      }
                     : helperText
                       ? {
                           variant: 'outlined',
@@ -192,7 +187,7 @@ const WrappedNumberInput = ({
                 }
               }}
               onFocus={(event, ...other) => {
-                setFocused(document.activeElement === event.target);
+                setFocused(!readOnly && !disabled && document.activeElement === event.target);
                 onFocus(event, ...other);
               }}
               onBlur={(event, ...other) => {
@@ -202,6 +197,7 @@ const WrappedNumberInput = ({
               sx={{
                 ...(readOnly &&
                   !disabled && {
+                    '& .MuiInputBase-root': { cursor: 'default' },
                     '& .MuiInputBase-input': { cursor: 'default' },
                     '& .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline': {
                       borderColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.23)' : 'rgba(0, 0, 0, 0.23)'
@@ -210,11 +206,9 @@ const WrappedNumberInput = ({
               }}
               {...textFieldProps}
             />
-          </Tooltip>
-        )}
-      </FormControl>
-    </div>
-  );
-};
-
-export const NumberInput = React.memo(WrappedNumberInput);
+          )}
+        </FormControl>
+      </div>
+    );
+  }
+);
