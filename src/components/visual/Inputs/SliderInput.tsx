@@ -98,15 +98,7 @@ export const SliderInput: React.FC<SliderInputProps> = React.memo(
           {loading ? (
             <Skeleton sx={{ height: '40px', transform: 'unset', ...(tiny && { height: '28px' }) }} />
           ) : (
-            <Tooltip
-              title={!readOnly ? null : t('readonly')}
-              placement="bottom"
-              arrow
-              slotProps={{
-                tooltip: { sx: { backgroundColor: theme.palette.primary.main } },
-                arrow: { sx: { color: theme.palette.primary.main } }
-              }}
-            >
+            <>
               <div style={{ display: 'flex', alignItems: 'flex-start' }}>
                 <div style={{ flex: 1, marginLeft: '20px', marginRight: '20px' }}>
                   <Slider
@@ -152,7 +144,7 @@ export const SliderInput: React.FC<SliderInputProps> = React.memo(
                   {helperText}
                 </FormHelperText>
               ) : null}
-            </Tooltip>
+            </>
           )}
         </FormControl>
       </div>

@@ -136,106 +136,97 @@ export const DateInput: React.FC<DateInputProps> = React.memo(
               children={label}
             />
           </Tooltip>
-          <Tooltip
-            title={!readOnly ? null : t('readonly')}
-            placement="bottom"
-            arrow
-            slotProps={{
-              tooltip: { sx: { backgroundColor: theme.palette.primary.main } },
-              arrow: { sx: { color: theme.palette.primary.main } }
-            }}
-          >
-            <FormControl fullWidth>
-              {loading ? (
-                <Skeleton sx={{ height: '40px', transform: 'unset', ...(tiny && { height: '28px' }) }} />
-              ) : (
-                <MuiDatePicker
-                  value={tempDate}
-                  readOnly={readOnly}
-                  minDate={minDateTomorrow ? tomorrow : null}
-                  maxDate={maxDateToday ? today : null}
-                  disabled={disabled}
-                  onChange={newValue => {
-                    setTempDate(newValue);
 
-                    const parsedValue =
-                      newValue && newValue.isValid() ? `${newValue.format('YYYY-MM-DDThh:mm:ss.SSSSSS')}Z` : null;
+          <FormControl fullWidth>
+            {loading ? (
+              <Skeleton sx={{ height: '40px', transform: 'unset', ...(tiny && { height: '28px' }) }} />
+            ) : (
+              <MuiDatePicker
+                value={tempDate}
+                readOnly={readOnly}
+                minDate={minDateTomorrow ? tomorrow : null}
+                maxDate={maxDateToday ? today : null}
+                disabled={disabled}
+                onChange={newValue => {
+                  setTempDate(newValue);
 
-                    onChange(null, parsedValue);
+                  const parsedValue =
+                    newValue && newValue.isValid() ? `${newValue.format('YYYY-MM-DDThh:mm:ss.SSSSSS')}Z` : null;
 
-                    const err = error(parsedValue);
-                    if (err) onError(err);
-                  }}
-                  slotProps={{
-                    textField: {
-                      id: id,
-                      size: 'small',
-                      error: !!errorValue && !disabled,
-                      disabled: disabled,
-                      helperText: disabled ? null : errorValue || helperText,
-                      FormHelperTextProps: disabled
-                        ? null
-                        : errorValue
+                  onChange(null, parsedValue);
+
+                  const err = error(parsedValue);
+                  if (err) onError(err);
+                }}
+                slotProps={{
+                  textField: {
+                    id: id,
+                    size: 'small',
+                    error: !!errorValue && !disabled,
+                    disabled: disabled,
+                    helperText: disabled ? null : errorValue || helperText,
+                    FormHelperTextProps: disabled
+                      ? null
+                      : errorValue
+                        ? {
+                            variant: 'outlined',
+                            sx: { color: theme.palette.error.main, ...errorProps?.sx },
+                            ...errorProps
+                          }
+                        : helperText
                           ? {
                               variant: 'outlined',
-                              sx: { color: theme.palette.error.main, ...errorProps?.sx },
+                              sx: { color: theme.palette.text.secondary, ...helperTextProps?.sx },
                               ...errorProps
                             }
-                          : helperText
-                            ? {
-                                variant: 'outlined',
-                                sx: { color: theme.palette.text.secondary, ...helperTextProps?.sx },
-                                ...errorProps
-                              }
-                            : null,
-                      sx: {
-                        '& .MuiInputBase-input': {
-                          ...(tiny && { fontSize: '14px' }),
-                          ...(readOnly && !disabled && { cursor: 'default' })
-                        },
-                        '& .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline': {
-                          ...(readOnly &&
-                            !disabled && {
-                              borderColor:
-                                theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.23)' : 'rgba(0, 0, 0, 0.23)'
-                            })
-                        }
+                          : null,
+                    sx: {
+                      '& .MuiInputBase-input': {
+                        ...(tiny && { fontSize: '14px' }),
+                        ...(readOnly && !disabled && { cursor: 'default' })
                       },
-                      ...(readOnly && !disabled && { focused: null }),
-                      ...textFieldProps,
-                      onFocus: event => setFocused(document.activeElement === event.target),
-                      onBlur: () => setFocused(false),
-                      inputProps: {
-                        ...(tiny && { sx: { padding: '2.5px 4px 2.5px 8px' } })
-                      },
-                      InputProps: {
-                        placeholder: placeholder,
-
-                        endAdornment: (
-                          <>
-                            {loading || !reset || disabled || readOnly ? null : (
-                              <InputAdornment
-                                position="end"
-                                sx={{ paddingLeft: theme.spacing(0.5), marginRight: theme.spacing(-0.5) }}
-                              >
-                                <ResetInput
-                                  id={id}
-                                  preventRender={loading || !reset || disabled || readOnly}
-                                  tiny={tiny}
-                                  onReset={onReset}
-                                  {...resetProps}
-                                />
-                              </InputAdornment>
-                            )}
-                          </>
-                        )
+                      '& .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline': {
+                        ...(readOnly &&
+                          !disabled && {
+                            borderColor:
+                              theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.23)' : 'rgba(0, 0, 0, 0.23)'
+                          })
                       }
+                    },
+                    ...(readOnly && !disabled && { focused: null }),
+                    ...textFieldProps,
+                    onFocus: event => setFocused(document.activeElement === event.target),
+                    onBlur: () => setFocused(false),
+                    inputProps: {
+                      ...(tiny && { sx: { padding: '2.5px 4px 2.5px 8px' } })
+                    },
+                    InputProps: {
+                      placeholder: placeholder,
+
+                      endAdornment: (
+                        <>
+                          {loading || !reset || disabled || readOnly ? null : (
+                            <InputAdornment
+                              position="end"
+                              sx={{ paddingLeft: theme.spacing(0.5), marginRight: theme.spacing(-0.5) }}
+                            >
+                              <ResetInput
+                                id={id}
+                                preventRender={loading || !reset || disabled || readOnly}
+                                tiny={tiny}
+                                onReset={onReset}
+                                {...resetProps}
+                              />
+                            </InputAdornment>
+                          )}
+                        </>
+                      )
                     }
-                  }}
-                />
-              )}
-            </FormControl>
-          </Tooltip>
+                  }
+                }}
+              />
+            )}
+          </FormControl>
         </div>
       </LocalizationProvider>
     );

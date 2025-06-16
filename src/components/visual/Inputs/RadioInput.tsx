@@ -122,116 +122,106 @@ export const RadioInput: <O extends Option[]>(props: RadioInputProps<O>) => Reac
           fullWidth
           sx={{ ...(divider && { borderBottom: `1px solid ${theme.palette.divider}` }) }}
         >
-          <Tooltip
-            title={!readOnly ? null : t('readonly')}
-            placement="bottom"
-            arrow
-            slotProps={{
-              tooltip: { sx: { backgroundColor: theme.palette.primary.main } },
-              arrow: { sx: { color: theme.palette.primary.main } }
-            }}
-          >
-            <RadioGroup value={value}>
-              {options.map((option, key) => (
-                <Button
-                  key={`${key}-${option.label}`}
-                  color="inherit"
-                  disabled={loading || disabled || readOnly}
-                  fullWidth
-                  size="small"
-                  onClick={event => {
-                    event.stopPropagation();
-                    event.preventDefault();
-                    onChange(event, option.value);
+          <RadioGroup value={value}>
+            {options.map((option, key) => (
+              <Button
+                key={`${key}-${option.label}`}
+                color="inherit"
+                disabled={loading || disabled || readOnly}
+                fullWidth
+                size="small"
+                onClick={event => {
+                  event.stopPropagation();
+                  event.preventDefault();
+                  onChange(event, option.value);
 
-                    const err = error(!option.value);
-                    if (err) onError(err);
-                  }}
-                  onFocus={event => setFocused(document.activeElement === event.target)}
-                  onBlur={() => setFocused(false)}
-                  sx={{
-                    justifyContent: 'start',
-                    color: 'inherit',
-                    textTransform: 'none',
-                    height: '40px',
-                    paddingLeft: theme.spacing(2),
+                  const err = error(!option.value);
+                  if (err) onError(err);
+                }}
+                onFocus={event => setFocused(document.activeElement === event.target)}
+                onBlur={() => setFocused(false)}
+                sx={{
+                  justifyContent: 'start',
+                  color: 'inherit',
+                  textTransform: 'none',
+                  height: '40px',
+                  paddingLeft: theme.spacing(2),
 
-                    ...((preventDisabledColor || readOnly) && { color: 'inherit !important' }),
-                    ...(tiny && { height: 'auto' })
-                  }}
-                >
-                  <FormControlLabel
-                    value={option.value}
-                    control={
-                      loading ? (
-                        <div>
-                          <Skeleton
-                            variant="circular"
-                            sx={{
-                              height: '24px',
-                              width: '24px',
-                              marginLeft: theme.spacing(0.75),
-                              marginRight: theme.spacing(1.25)
-                            }}
-                          />
-                        </div>
-                      ) : (
-                        <Radio
-                          disableFocusRipple
-                          disableRipple
-                          disableTouchRipple
-                          size="small"
+                  ...((preventDisabledColor || readOnly) && { color: 'inherit !important' }),
+                  ...(tiny && { height: 'auto' })
+                }}
+              >
+                <FormControlLabel
+                  value={option.value}
+                  control={
+                    loading ? (
+                      <div>
+                        <Skeleton
+                          variant="circular"
                           sx={{
-                            ...(tiny && { paddingTop: theme.spacing(0.25), paddingBottom: theme.spacing(0.25) }),
-                            ...((preventDisabledColor || readOnly) && { color: 'inherit !important' })
+                            height: '24px',
+                            width: '24px',
+                            marginLeft: theme.spacing(0.75),
+                            marginRight: theme.spacing(1.25)
                           }}
                         />
-                      )
-                    }
-                    disabled={loading || disabled || readOnly}
-                    label={
-                      <div
-                        style={{
-                          display: 'flex',
-                          flexDirection: 'row',
-                          alignItems: 'center',
-                          columnGap: theme.spacing(1)
-                        }}
-                      >
-                        <span style={{ textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden' }}>
-                          {option?.label}
-                        </span>
-                        {endAdornment}
                       </div>
-                    }
-                    slotProps={{
-                      typography: {
-                        color:
-                          !disabled && errorValue
-                            ? 'error'
-                            : focused && value === option.value
-                              ? 'primary'
-                              : 'textPrimary',
-                        marginLeft: theme.spacing(1.25),
-                        overflow: 'hidden',
-                        textAlign: 'start',
-                        textOverflow: 'ellipsis',
-                        variant: 'body2',
-                        whiteSpace: 'nowrap',
-                        width: '100%',
-                        ...((preventDisabledColor || readOnly) && { color: 'inherit !important' }),
-                        ...labelProps
-                      }
-                    }}
-                    sx={{
+                    ) : (
+                      <Radio
+                        disableFocusRipple
+                        disableRipple
+                        disableTouchRipple
+                        size="small"
+                        sx={{
+                          ...(tiny && { paddingTop: theme.spacing(0.25), paddingBottom: theme.spacing(0.25) }),
+                          ...((preventDisabledColor || readOnly) && { color: 'inherit !important' })
+                        }}
+                      />
+                    )
+                  }
+                  disabled={loading || disabled || readOnly}
+                  label={
+                    <div
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        columnGap: theme.spacing(1)
+                      }}
+                    >
+                      <span style={{ textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden' }}>
+                        {option?.label}
+                      </span>
+                      {endAdornment}
+                    </div>
+                  }
+                  slotProps={{
+                    typography: {
+                      color:
+                        !disabled && errorValue
+                          ? 'error'
+                          : focused && value === option.value
+                            ? 'primary'
+                            : 'textPrimary',
+                      marginLeft: theme.spacing(1.25),
                       overflow: 'hidden',
-                      ...(!(loading || !reset || disabled || readOnly) && { paddingRight: theme.spacing(2) })
-                    }}
-                  />
-                </Button>
-              ))}
-            </RadioGroup>
-          </Tooltip>
+                      textAlign: 'start',
+                      textOverflow: 'ellipsis',
+                      variant: 'body2',
+                      whiteSpace: 'nowrap',
+                      width: '100%',
+                      ...((preventDisabledColor || readOnly) && { color: 'inherit !important' }),
+                      ...labelProps
+                    }
+                  }}
+                  sx={{
+                    overflow: 'hidden',
+                    ...(!(loading || !reset || disabled || readOnly) && { paddingRight: theme.spacing(2) })
+                  }}
+                />
+              </Button>
+            ))}
+          </RadioGroup>
 
           <HelperText
             disabled={disabled}

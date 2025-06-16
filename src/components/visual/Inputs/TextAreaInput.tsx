@@ -108,102 +108,92 @@ export const TextAreaInput: React.FC<TextAreaInputProps> = React.memo(
               sx={{ height: `calc(23px * ${rows} + 17px)`, transform: 'unset', ...(tiny && { height: '28px' }) }}
             />
           ) : (
-            <Tooltip
-              title={!readOnly ? null : t('readonly')}
-              placement="bottom"
-              arrow
+            <TextField
+              fullWidth
+              size="small"
+              multiline
+              rows={rows}
+              margin="dense"
+              variant="outlined"
+              value={value}
+              disabled={disabled}
+              error={!!errorValue}
+              {...(readOnly && !disabled && { focused: null })}
+              helperText={disabled ? null : errorValue || helperText}
               slotProps={{
-                tooltip: { sx: { backgroundColor: theme.palette.primary.main } },
-                arrow: { sx: { color: theme.palette.primary.main } }
-              }}
-            >
-              <TextField
-                fullWidth
-                size="small"
-                multiline
-                rows={rows}
-                margin="dense"
-                variant="outlined"
-                value={value}
-                disabled={disabled}
-                error={!!errorValue}
-                {...(readOnly && !disabled && { focused: null })}
-                helperText={disabled ? null : errorValue || helperText}
-                slotProps={{
-                  formHelperText: disabled
-                    ? null
-                    : errorValue
+                formHelperText: disabled
+                  ? null
+                  : errorValue
+                    ? {
+                        variant: 'outlined',
+                        sx: { color: theme.palette.error.main, ...errorProps?.sx },
+                        ...errorProps
+                      }
+                    : helperText
                       ? {
                           variant: 'outlined',
-                          sx: { color: theme.palette.error.main, ...errorProps?.sx },
+                          sx: { color: theme.palette.text.secondary, ...helperTextProps?.sx },
                           ...errorProps
                         }
-                      : helperText
-                        ? {
-                            variant: 'outlined',
-                            sx: { color: theme.palette.text.secondary, ...helperTextProps?.sx },
-                            ...errorProps
-                          }
-                        : null,
+                      : null,
 
-                  input: {
-                    inputProps: {
-                      ...(tiny && { sx: { padding: '2.5px 4px 2.5px 8px' } })
-                    },
-                    placeholder: placeholder,
-                    readOnly: readOnly,
-                    sx: {
-                      paddingRight: '9px',
-                      ...(tiny && { '& .MuiInputBase-root': { padding: '2px !important', fontSize: '14px' } })
-                    },
-                    startAdornment: (
-                      <>{startAdornment && <InputAdornment position="start">{startAdornment}</InputAdornment>}</>
-                    ),
-                    endAdornment: (
-                      <>
-                        {loading || !reset || disabled || readOnly ? null : (
-                          <InputAdornment position="end">
-                            <ResetInput
-                              id={id}
-                              preventRender={loading || !reset || disabled || readOnly}
-                              tiny={tiny}
-                              onReset={onReset}
-                              {...resetProps}
-                            />
-                          </InputAdornment>
-                        )}
-                        {endAdornment && <InputAdornment position="end">{endAdornment}</InputAdornment>}
-                      </>
-                    )
-                  }
-                }}
-                onChange={event => {
-                  onChange(event, event.target.value);
+                input: {
+                  inputProps: {
+                    ...(tiny && { sx: { padding: '2.5px 4px 2.5px 8px' } })
+                  },
+                  placeholder: placeholder,
+                  readOnly: readOnly,
+                  sx: {
+                    paddingRight: '9px',
+                    ...(tiny && { '& .MuiInputBase-root': { padding: '2px !important', fontSize: '14px' } })
+                  },
+                  startAdornment: (
+                    <>{startAdornment && <InputAdornment position="start">{startAdornment}</InputAdornment>}</>
+                  ),
+                  endAdornment: (
+                    <>
+                      {loading || !reset || disabled || readOnly ? null : (
+                        <InputAdornment position="end">
+                          <ResetInput
+                            id={id}
+                            preventRender={loading || !reset || disabled || readOnly}
+                            tiny={tiny}
+                            onReset={onReset}
+                            {...resetProps}
+                          />
+                        </InputAdornment>
+                      )}
+                      {endAdornment && <InputAdornment position="end">{endAdornment}</InputAdornment>}
+                    </>
+                  )
+                }
+              }}
+              onChange={event => {
+                onChange(event, event.target.value);
 
-                  const err = error(event.target.value);
-                  if (err) onError(err);
-                }}
-                onFocus={(event, ...other) => {
-                  setFocused(document.activeElement === event.target);
-                  onFocus(event, ...other);
-                }}
-                onBlur={(event, ...other) => {
-                  setFocused(false);
-                  onBlur(event, ...other);
-                }}
-                sx={{
-                  margin: 0,
-                  ...(readOnly &&
-                    !disabled && {
-                      '& .MuiInputBase-input': { cursor: 'default' },
-                      '& .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline': {
-                        borderColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.23)' : 'rgba(0, 0, 0, 0.23)'
-                      }
-                    })
-                }}
-                {...textFieldProps}
-              />
-            </Tooltip>
+                const err = error(event.target.value);
+                if (err) onError(err);
+              }}
+              onFocus={(event, ...other) => {
+                setFocused(document.activeElement === event.target);
+                onFocus(event, ...other);
+              }}
+              onBlur={(event, ...other) => {
+                setFocused(false);
+                onBlur(event, ...other);
+              }}
+              sx={{
+                margin: 0,
+                ...(readOnly &&
+                  !disabled && {
+                    '& .MuiInputBase-input': { cursor: 'default' },
+                    '& .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline': {
+                      borderColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.23)' : 'rgba(0, 0, 0, 0.23)'
+                    }
+                  })
+              }}
+              {...textFieldProps}
+            />
           )}
         </FormControl>
       </div>

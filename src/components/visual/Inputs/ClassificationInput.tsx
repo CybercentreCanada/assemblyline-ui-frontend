@@ -291,15 +291,7 @@ export const ClassificationInput: React.FC<ClassificationInputProps> = React.mem
           {loading ? (
             <Skeleton sx={{ height: '40px', transform: 'unset', ...(tiny && { height: '28px' }) }} />
           ) : (
-            <Tooltip
-              title={!readOnly ? null : t('readonly')}
-              placement="bottom"
-              arrow
-              slotProps={{
-                tooltip: { sx: { backgroundColor: theme.palette.primary.main } },
-                arrow: { sx: { color: theme.palette.primary.main } }
-              }}
-            >
+            <>
               <div style={{ display: inline ? 'inline-block' : null }}>
                 <CustomChip
                   type="rounded"
@@ -513,7 +505,7 @@ export const ClassificationInput: React.FC<ClassificationInputProps> = React.mem
                   </Button>
                 </DialogActions>
               </Dialog>
-            </Tooltip>
+            </>
           )}
           <HelperText
             disabled={disabled}
