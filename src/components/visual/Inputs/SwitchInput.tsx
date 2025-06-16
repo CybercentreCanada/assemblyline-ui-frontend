@@ -180,7 +180,16 @@ export const SwitchInput: React.FC<SwitchInputProps> = React.memo(
               helperTextProps={helperTextProps}
             />
 
-            <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, display: 'flex', alignItems: 'center' }}>
+            <div
+              style={{
+                position: 'absolute',
+                right: theme.spacing(0.75),
+                top: 0,
+                bottom: 0,
+                display: 'flex',
+                alignItems: 'center'
+              }}
+            >
               <div>
                 <ResetInput
                   id={id}

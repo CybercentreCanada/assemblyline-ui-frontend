@@ -177,7 +177,7 @@ export const SelectInput: <O extends Option[]>(props: SelectInputProps<O>) => Re
                     primary={options?.find(o => o.value === option)?.primary || ''}
                     slotProps={{
                       primary: {
-                        sx: { cursor: 'pointer', ...(readOnly && { cursor: 'text', userSelect: 'text' }) },
+                        sx: { cursor: 'pointer', ...(readOnly && { cursor: 'default', userSelect: 'text' }) },
                         ...(tiny && { variant: 'body2' })
                       }
                     }}

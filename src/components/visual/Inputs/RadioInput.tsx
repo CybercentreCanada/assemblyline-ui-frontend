@@ -132,9 +132,9 @@ export const RadioInput: <O extends Option[]>(props: RadioInputProps<O>) => Reac
             }}
           >
             <RadioGroup value={value}>
-              {options.map(({ value, label }, key) => (
+              {options.map((option, key) => (
                 <Button
-                  key={`${key}-${label}`}
+                  key={`${key}-${option.label}`}
                   color="inherit"
                   disabled={loading || disabled || readOnly}
                   fullWidth
@@ -142,9 +142,9 @@ export const RadioInput: <O extends Option[]>(props: RadioInputProps<O>) => Reac
                   onClick={event => {
                     event.stopPropagation();
                     event.preventDefault();
-                    onChange(event, value);
+                    onChange(event, option.value);
 
-                    const err = error(!value);
+                    const err = error(!option.value);
                     if (err) onError(err);
                   }}
                   onFocus={event => setFocused(document.activeElement === event.target)}
@@ -161,7 +161,7 @@ export const RadioInput: <O extends Option[]>(props: RadioInputProps<O>) => Reac
                   }}
                 >
                   <FormControlLabel
-                    value={value}
+                    value={option.value}
                     control={
                       loading ? (
                         <div>
@@ -199,14 +199,19 @@ export const RadioInput: <O extends Option[]>(props: RadioInputProps<O>) => Reac
                         }}
                       >
                         <span style={{ textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden' }}>
-                          {label}
+                          {option?.label}
                         </span>
                         {endAdornment}
                       </div>
                     }
                     slotProps={{
                       typography: {
-                        color: !disabled && errorValue ? 'error' : 'textPrimary',
+                        color:
+                          !disabled && errorValue
+                            ? 'error'
+                            : focused && value === option.value
+                              ? 'primary'
+                              : 'textPrimary',
                         marginLeft: theme.spacing(1.25),
                         overflow: 'hidden',
                         textAlign: 'start',
@@ -238,7 +243,15 @@ export const RadioInput: <O extends Option[]>(props: RadioInputProps<O>) => Reac
             label={label}
           />
 
-          <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, display: 'flex', alignItems: 'center' }}>
+          <div
+            style={{
+              position: 'absolute',
+              right: theme.spacing(0.75),
+              top: theme.spacing(0.75),
+              display: 'flex',
+              alignItems: 'center'
+            }}
+          >
             <ResetInput
               id={id}
               preventRender={loading || !reset || disabled || readOnly}

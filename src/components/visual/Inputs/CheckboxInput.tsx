@@ -193,7 +193,16 @@ export const CheckboxInput: React.FC<CheckboxInputProps> = React.memo(
               helperTextProps={helperTextProps}
             />
 
-            <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, display: 'flex', alignItems: 'center' }}>
+            <div
+              style={{
+                position: 'absolute',
+                right: theme.spacing(0.75),
+                top: 0,
+                bottom: 0,
+                display: 'flex',
+                alignItems: 'center'
+              }}
+            >
               <ResetInput
                 id={id}
                 preventRender={loading || !reset || disabled || readOnly}
