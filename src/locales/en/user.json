@@ -129,7 +129,7 @@
   "uname": "Username",
   "unset_otp": "Unset one time password (OTP) for 2-Factor Authentication",
   "unset_otp.button": "Unset OTP",
-  "unset_otp.desc": "Remove one time password(OTP) for 2-Factor Authentication for this user. This user will no longer be asked for one-time password to log in and all security tokens will be removed from this account.",
+  "unset_otp.desc": "Remove one time password (OTP) for 2-Factor Authentication for this user. This user will no longer be asked for one-time password to log in and all security tokens will be removed from this account.",
   "unset_otp.title": "Unset OTP for 2-Factor Authentication",
   "user_type.admin": "Administrator",
   "user_type.signature_importer": "Signature Importer",
