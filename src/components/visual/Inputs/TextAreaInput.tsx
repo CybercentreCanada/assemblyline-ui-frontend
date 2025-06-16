@@ -109,6 +109,7 @@ export const TextAreaInput: React.FC<TextAreaInputProps> = React.memo(
             />
           ) : (
             <TextField
+              id={id}
               fullWidth
               size="small"
               multiline
