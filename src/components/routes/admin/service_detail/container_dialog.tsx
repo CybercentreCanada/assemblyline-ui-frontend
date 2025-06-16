@@ -495,7 +495,7 @@ const WrappedContainerDialog = ({
 
             <Grid size={{ xs: 6, md: 3 }}>
               <NumberInput
-                label={t('container.dialog.ram_mb_min')}
+                label={t('container.dialog.ram')}
                 loading={!tempContainer}
                 value={!tempContainer ? null : tempContainer.ram_mb_min}
                 reset={showReset(tempContainer, defaults, 'ram_mb_min')}
@@ -510,7 +510,7 @@ const WrappedContainerDialog = ({
 
             <Grid size={{ xs: 6, md: 3 }}>
               <NumberInput
-                label={t('container.dialog.ram')}
+                label={'\u00A0'}
                 loading={!tempContainer}
                 value={!tempContainer ? null : tempContainer.ram_mb}
                 reset={showReset(tempContainer, defaults, 'ram_mb')}
@@ -601,7 +601,9 @@ const WrappedContainerDialog = ({
             </Grid>
 
             <Grid size={{ xs: 12 }}>
-              <Typography variant="subtitle2">{t('container.dialog.environment')}</Typography>
+              <Typography color="textSecondary" variant="subtitle2">
+                {t('container.dialog.environment')}
+              </Typography>
               {tempContainer.environment.map((env, i) => (
                 <Environment key={i} envVar={env} onUpdate={handleEnvAddUpdate} onDelete={handleEnvDelete} />
               ))}
@@ -612,7 +614,9 @@ const WrappedContainerDialog = ({
             </Grid>
 
             <Grid size={{ xs: 12 }}>
-              <Typography variant="subtitle2">{t('container.dialog.labels')}</Typography>
+              <Typography color="textSecondary" variant="subtitle2">
+                {t('container.dialog.labels')}
+              </Typography>
               {(tempContainer.labels || []).map((env, i) => (
                 <Environment key={i} envVar={env} onUpdate={handleLabelAddUpdate} onDelete={handleLabelDelete} />
               ))}

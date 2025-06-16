@@ -108,7 +108,9 @@ const ServiceContainer = ({ service, defaults, setService, setModified }: Servic
       </Grid>
 
       <Grid size={{ xs: 12 }}>
-        <Typography variant="subtitle2">{t('container.image')}</Typography>
+        <Typography color="textSecondary" variant="subtitle2">
+          {t('container.image')}
+        </Typography>
         {service ? (
           <ContainerCard
             container={service.docker_config}
@@ -121,7 +123,9 @@ const ServiceContainer = ({ service, defaults, setService, setModified }: Servic
       </Grid>
 
       <Grid size={{ xs: 12 }}>
-        <Typography variant="subtitle2">{t('container.dependencies')}</Typography>
+        <Typography color="textSecondary" variant="subtitle2">
+          {t('container.dependencies')}
+        </Typography>
         {service ? (
           Object.keys(service.dependencies).length !== 0 ? (
             Object.keys(service.dependencies).map(name => (
@@ -151,7 +155,7 @@ const ServiceContainer = ({ service, defaults, setService, setModified }: Servic
               </div>
             ))
           ) : (
-            <Typography color="textSecondary" variant="caption" component="div">
+            <Typography color="textPrimary" variant="caption" component="div">
               {t('container.dependencies.none')}
             </Typography>
           )

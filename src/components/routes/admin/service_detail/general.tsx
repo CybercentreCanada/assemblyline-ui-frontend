@@ -329,7 +329,7 @@ const ServiceGeneral = ({
 
           <Grid size={{ xs: 6, sm: 3 }}>
             <NumberInput
-              label={t('general.licence_count')}
+              label={'\u00A0'}
               loading={!service}
               placeholder={t('limit.none')}
               value={!service ? null : service.licence_count > 0 ? service.licence_count : null}
