@@ -209,6 +209,7 @@ export const TextInput: <
                     }),
                     ...(readOnly &&
                       !disabled && {
+                        '& .MuiInputBase-root': { cursor: 'default' },
                         '& .MuiInputBase-input': { cursor: 'default' },
                         '& .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline': {
                           borderColor:

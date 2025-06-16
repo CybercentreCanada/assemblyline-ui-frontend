@@ -217,6 +217,7 @@ export const ChipsInput: <
                     }),
                     ...(readOnly &&
                       !disabled && {
+                        '& .MuiInputBase-root': { cursor: 'default' },
                         '& .MuiInputBase-input': { cursor: 'default' },
                         '& .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline': {
                           borderColor:
@@ -235,6 +236,12 @@ export const ChipsInput: <
                       label={option}
                       {...itemProps}
                       onDelete={disabled ? undefined : itemProps.onDelete}
+                      sx={{
+                        ...(readOnly &&
+                          !disabled && {
+                            cursor: 'default'
+                          })
+                      }}
                     />
                   );
                 })

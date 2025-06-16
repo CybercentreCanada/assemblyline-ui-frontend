@@ -197,6 +197,7 @@ export const NumberInput: React.FC<NumberInputProps> = React.memo(
               sx={{
                 ...(readOnly &&
                   !disabled && {
+                    '& .MuiInputBase-root': { cursor: 'default' },
                     '& .MuiInputBase-input': { cursor: 'default' },
                     '& .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline': {
                       borderColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.23)' : 'rgba(0, 0, 0, 0.23)'
