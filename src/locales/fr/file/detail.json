@@ -78,6 +78,7 @@
   "tags": "Tags",
   "title": "Détails du fichier",
   "type": "Type",
+  "uri_classification": "Classification du URI",
   "uri_identification": "Identification du URI",
   "uri_title": "Détails du URI",
   "username": "Nom d'utilisateur",
