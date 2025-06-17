@@ -8,19 +8,7 @@ import ReplayOutlinedIcon from '@mui/icons-material/ReplayOutlined';
 import TuneOutlinedIcon from '@mui/icons-material/TuneOutlined';
 import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
-import {
-  Grid,
-  IconButton,
-  List,
-  ListItemButton,
-  ListItemIcon,
-  ListItemText,
-  Popover,
-  Skeleton,
-  Tooltip,
-  Typography,
-  useTheme
-} from '@mui/material';
+import { List, ListItemButton, ListItemIcon, ListItemText, Popover, useTheme } from '@mui/material';
 import { useAppUser } from 'commons/components/app/hooks';
 import useALContext from 'components/hooks/useALContext';
 import useAssistant from 'components/hooks/useAssistant';
@@ -36,6 +24,7 @@ import { DEFAULT_TAB, TAB_OPTIONS } from 'components/routes/file/viewer';
 import HeuristicDetail from 'components/routes/manage/heuristic_detail';
 import SignatureDetail from 'components/routes/manage/signature_detail';
 import AISummarySection from 'components/routes/submission/detail/ai_summary';
+import { IconButton } from 'components/visual/Buttons/IconButton';
 import Classification from 'components/visual/Classification';
 import AttackSection from 'components/visual/FileDetail/attacks';
 import ChildrenSection from 'components/visual/FileDetail/childrens';
@@ -51,6 +40,7 @@ import TagSection from 'components/visual/FileDetail/tags';
 import URIIdentificationSection from 'components/visual/FileDetail/uriIdent';
 import FileDownloader from 'components/visual/FileDownloader';
 import InputDialog from 'components/visual/InputDialog';
+import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import { emptyResult } from 'components/visual/ResultCard';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -412,145 +402,143 @@ const WrappedFileDetail: React.FC<Props> = ({
           />
         }
       />
-      {c12nDef.enforce && (
-        <div style={{ paddingBottom: sp4, paddingTop: sp2 }}>
-          <Classification size="tiny" c12n={file ? file.classification : null} />
-        </div>
-      )}
-      <div style={{ paddingBottom: sp4 }}>
-        <Grid container alignItems="center">
-          <Grid flexGrow={1}>
-            <Typography variant="h4">
-              {file?.file_info?.type.startsWith('uri/') ? t('uri_title') : t('title')}
-            </Typography>
-            <Typography variant="caption" style={{ wordBreak: 'break-word' }}>
-              {file?.file_info?.type.startsWith('uri/') && file?.file_info?.uri_info?.uri ? (
-                file?.file_info?.uri_info?.uri
-              ) : file ? (
-                fileName
-              ) : (
-                <Skeleton style={{ width: '10rem' }} />
-              )}
-            </Typography>
-          </Grid>
-          <Grid size={{ xs: 12, sm: 12, md: 4 }} style={{ display: 'flex', justifyContent: 'flex-end', flexGrow: 0 }}>
-            {file ? (
-              <>
-                <Tooltip title={t('related')}>
-                  <IconButton
-                    component={Link}
-                    to={`/search/submission?query=files.sha256:${file.file_info.sha256} OR results:${file.file_info.sha256}* OR errors:${file.file_info.sha256}*`}
-                    size="large"
-                  >
-                    <ViewCarouselOutlinedIcon />
-                  </IconButton>
-                </Tooltip>
-                {currentUser.roles.includes('file_download') && (
-                  <FileDownloader
-                    icon={<GetAppOutlinedIcon />}
-                    link={`/api/v4/file/download/${file.file_info.sha256}/?${
-                      fileName && file.file_info.sha256 !== fileName ? `name=${fileName}&` : ''
-                    }${sid ? `sid=${sid}&` : ''}`}
-                    tooltip={t('download')}
-                  />
-                )}
-                {currentUser.roles.includes('file_detail') && (
-                  <Tooltip title={t('file_viewer')}>
-                    <IconButton component={Link} to={fileViewerPath} size="large">
-                      <PageviewOutlinedIcon />
-                    </IconButton>
-                  </Tooltip>
-                )}
-                {currentUser.roles.includes('submission_create') && (
-                  <>
-                    <Tooltip title={t('resubmit')}>
-                      <IconButton onClick={event => setResubmitAnchor(event.currentTarget)} size="large">
-                        <ReplayOutlinedIcon />
-                        {popoverOpen ? (
-                          <ExpandLessIcon style={{ position: 'absolute', right: 0, bottom: 10, fontSize: 'medium' }} />
-                        ) : (
-                          <ExpandMoreIcon style={{ position: 'absolute', right: 0, bottom: 10, fontSize: 'medium' }} />
-                        )}
-                      </IconButton>
-                    </Tooltip>
-                    <Popover
-                      open={popoverOpen}
-                      anchorEl={resubmitAnchor}
-                      onClose={() => setResubmitAnchor(null)}
-                      anchorOrigin={{
-                        vertical: 'bottom',
-                        horizontal: 'right'
-                      }}
-                      transformOrigin={{
-                        vertical: 'top',
-                        horizontal: 'right'
-                      }}
-                    >
-                      <List disablePadding>
-                        <ListItemButton
-                          component={Link}
-                          to={`/submit?hash=${file.file_info.sha256}`}
-                          state={{
-                            c12n: file.file_info.classification
-                          }}
-                          dense
-                          onClick={() => setResubmitAnchor(null)}
-                        >
-                          <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
-                            <TuneOutlinedIcon />
-                          </ListItemIcon>
-                          <ListItemText primary={t('resubmit.modify')} />
-                        </ListItemButton>
-                        <ListItemButton dense onClick={() => resubmit('dynamic', false)}>
-                          <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
-                            <OndemandVideoOutlinedIcon />
-                          </ListItemIcon>
-                          <ListItemText primary={t('resubmit.dynamic')} />
-                        </ListItemButton>
-                        {submissionProfiles &&
-                          Object.entries(submissionProfiles).map(([name, display]) => (
-                            <ListItemButton key={name} dense onClick={() => resubmit(name, true)}>
-                              <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
-                                <OndemandVideoOutlinedIcon />
-                              </ListItemIcon>
-                              <ListItemText primary={`${t('resubmit.with')} "${display}"`} />
-                            </ListItemButton>
-                          ))}
-                      </List>
-                    </Popover>
-                  </>
-                )}
-                {currentUser.roles.includes('safelist_manage') && (
-                  <Tooltip title={t('safelist')}>
-                    <IconButton onClick={prepareSafelist} size="large">
-                      <VerifiedUserOutlinedIcon />
-                    </IconButton>
-                  </Tooltip>
-                )}
-                {currentUser.roles.includes('badlist_manage') && (
-                  <Tooltip title={t('badlist')}>
-                    <IconButton onClick={prepareBadlist} size="large">
-                      <BugReportOutlinedIcon />
-                    </IconButton>
-                  </Tooltip>
-                )}
-              </>
-            ) : (
-              <div style={{ display: 'inline-flex' }}>
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Skeleton
-                    key={i}
-                    variant="circular"
-                    height="2.5rem"
-                    width="2.5rem"
-                    style={{ margin: theme.spacing(0.5) }}
-                  />
-                ))}
-              </div>
+
+      <PageHeader
+        classification={file ? file.classification : null}
+        primary={!file ? null : file?.file_info?.type.startsWith('uri/') ? t('uri_title') : t('title')}
+        secondary={
+          !file
+            ? null
+            : file?.file_info?.type.startsWith('uri/') && file?.file_info?.uri_info?.uri
+              ? file?.file_info?.uri_info?.uri
+              : fileName
+        }
+        loading={!file}
+        slotProps={{ root: { style: { marginBottom: theme.spacing(2) } } }}
+        actions={
+          <>
+            <IconButton
+              component={Link}
+              loading={!file}
+              size="large"
+              to={
+                !file
+                  ? null
+                  : `/search/submission?query=files.sha256:${file.file_info.sha256} OR results:${file.file_info.sha256}* OR errors:${file.file_info.sha256}*`
+              }
+              tooltip={t('related')}
+            >
+              <ViewCarouselOutlinedIcon />
+            </IconButton>
+            {currentUser.roles.includes('file_download') && (
+              <FileDownloader
+                icon={<GetAppOutlinedIcon />}
+                link={
+                  !file
+                    ? null
+                    : `/api/v4/file/download/${file.file_info.sha256}/?${
+                        fileName && file.file_info.sha256 !== fileName ? `name=${fileName}&` : ''
+                      }${sid ? `sid=${sid}&` : ''}`
+                }
+                tooltip={t('download')}
+              />
             )}
-          </Grid>
-        </Grid>
-      </div>
+            <IconButton
+              component={Link}
+              loading={!file}
+              size="large"
+              to={fileViewerPath}
+              tooltip={t('file_viewer')}
+              preventRender={!currentUser.roles.includes('file_detail')}
+            >
+              <PageviewOutlinedIcon />
+            </IconButton>
+
+            <IconButton
+              loading={!file}
+              size="large"
+              tooltip={t('resubmit')}
+              preventRender={!currentUser.roles.includes('submission_create')}
+              onClick={event => setResubmitAnchor(event.currentTarget)}
+            >
+              <ReplayOutlinedIcon />
+              {popoverOpen ? (
+                <ExpandLessIcon style={{ position: 'absolute', right: 0, bottom: 10, fontSize: 'medium' }} />
+              ) : (
+                <ExpandMoreIcon style={{ position: 'absolute', right: 0, bottom: 10, fontSize: 'medium' }} />
+              )}
+            </IconButton>
+            {!file || !currentUser.roles.includes('submission_create') ? null : (
+              <Popover
+                open={popoverOpen}
+                anchorEl={resubmitAnchor}
+                onClose={() => setResubmitAnchor(null)}
+                anchorOrigin={{
+                  vertical: 'bottom',
+                  horizontal: 'right'
+                }}
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right'
+                }}
+              >
+                <List disablePadding>
+                  <ListItemButton
+                    component={Link}
+                    to={`/submit?hash=${file.file_info.sha256}`}
+                    state={{
+                      c12n: file.file_info.classification
+                    }}
+                    dense
+                    onClick={() => setResubmitAnchor(null)}
+                  >
+                    <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
+                      <TuneOutlinedIcon />
+                    </ListItemIcon>
+                    <ListItemText primary={t('resubmit.modify')} />
+                  </ListItemButton>
+                  <ListItemButton dense onClick={() => resubmit('dynamic', false)}>
+                    <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
+                      <OndemandVideoOutlinedIcon />
+                    </ListItemIcon>
+                    <ListItemText primary={t('resubmit.dynamic')} />
+                  </ListItemButton>
+                  {submissionProfiles &&
+                    Object.entries(submissionProfiles).map(([name, display]) => (
+                      <ListItemButton key={name} dense onClick={() => resubmit(name, true)}>
+                        <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
+                          <OndemandVideoOutlinedIcon />
+                        </ListItemIcon>
+                        <ListItemText primary={`${t('resubmit.with')} "${display}"`} />
+                      </ListItemButton>
+                    ))}
+                </List>
+              </Popover>
+            )}
+
+            <IconButton
+              loading={!file}
+              size="large"
+              tooltip={t('safelist')}
+              preventRender={!currentUser.roles.includes('safelist_manage')}
+              onClick={prepareSafelist}
+            >
+              <VerifiedUserOutlinedIcon />
+            </IconButton>
+
+            <IconButton
+              loading={!file}
+              size="large"
+              tooltip={t('badlist')}
+              preventRender={!currentUser.roles.includes('badlist_manage')}
+              onClick={prepareBadlist}
+            >
+              <BugReportOutlinedIcon />
+            </IconButton>
+          </>
+        }
+      />
+
       <div style={{ paddingBottom: sp2 }}>
         {file?.file_info?.type.startsWith('uri/') ? (
           <URIIdentificationSection fileinfo={file ? file.file_info : null} promotedSections={promotedSections} />
