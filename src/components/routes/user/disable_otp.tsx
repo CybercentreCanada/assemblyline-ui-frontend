@@ -1,38 +1,43 @@
 import { Button, Typography, useTheme } from '@mui/material';
 import useMyAPI from 'components/hooks/useMyAPI';
+import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
 type DisableOTPProps = {
-  setDrawerOpen: (value: boolean) => void;
-  set2FAEnabled: (value: boolean) => void;
   isUnsetOTP: boolean;
   username?: String;
+  setDrawerOpen: (value: boolean) => void;
+  set2FAEnabled: (value: boolean) => void;
 };
 
-export default function DisableOTP({ setDrawerOpen, set2FAEnabled, isUnsetOTP = false, username }: DisableOTPProps) {
+export default function DisableOTP({ isUnsetOTP = false, username, setDrawerOpen, set2FAEnabled }: DisableOTPProps) {
   const { apiCall } = useMyAPI();
   const { t } = useTranslation(['user']);
   const theme = useTheme();
 
-  function disableOTP() {
+  const disableOTP = useCallback(() => {
     apiCall({
       url: '/api/v4/auth/disable_otp/',
-      onSuccess: api_data => {
+      onSuccess: () => {
         setDrawerOpen(false);
         set2FAEnabled(false);
       }
     });
-  }
 
-  function unsetOTP() {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const unsetOTP = useCallback(() => {
     apiCall({
       url: `/api/v4/auth/unset_otp/${username}/`,
-      onSuccess: api_data => {
+      onSuccess: () => {
         setDrawerOpen(false);
         set2FAEnabled(false);
       }
     });
-  }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <>
