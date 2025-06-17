@@ -121,7 +121,7 @@ export default function Services() {
         showSuccessMessage(t('add.success'));
         closeServiceDialog();
         setTimeout(() => reload(), 1000);
-        invalidateAPIQuery(({ url }) => '/api/v4/user/whoami/' === url);
+        invalidateAPIQuery(({ url }) => '/api/v4/user/whoami/' === url, 3000);
       }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -138,7 +138,7 @@ export default function Services() {
         closeRestoreDialog();
         setRestoreConfirmation(false);
         setTimeout(() => reload(), 1000);
-        invalidateAPIQuery(({ url }) => '/api/v4/user/whoami/' === url);
+        invalidateAPIQuery(({ url }) => '/api/v4/user/whoami/' === url, 3000);
       },
       onEnter: () => setWaitingDialog(true),
       onExit: () => setWaitingDialog(false)
@@ -174,7 +174,7 @@ export default function Services() {
           const newUpdates = { ...updates };
           newUpdates[svc] = { ...newUpdates[svc], updating: true };
           setUpdates(newUpdates);
-          invalidateAPIQuery(({ url }) => '/api/v4/user/whoami/' === url);
+          invalidateAPIQuery(({ url }) => '/api/v4/user/whoami/' === url, 3000);
         }
       });
     },
@@ -196,7 +196,7 @@ export default function Services() {
             delete newUpdates[srv];
           }
           setUpdates(newUpdates);
-          invalidateAPIQuery(({ url }) => '/api/v4/user/whoami/' === url);
+          invalidateAPIQuery(({ url }) => '/api/v4/user/whoami/' === url, 3000);
         }
       });
     },
@@ -221,13 +221,13 @@ export default function Services() {
   const onUpdated = useCallback(() => {
     if (!isXL) closeGlobalDrawer();
     setTimeout(() => window.dispatchEvent(new CustomEvent('reloadServicesEvent')), 1000);
-    invalidateAPIQuery(({ url }) => '/api/v4/user/whoami/' === url);
+    invalidateAPIQuery(({ url }) => '/api/v4/user/whoami/' === url, 3000);
   }, [closeGlobalDrawer, isXL]);
 
   const onDeleted = useCallback(() => {
     closeGlobalDrawer();
     setTimeout(() => window.dispatchEvent(new CustomEvent('reloadServicesEvent')), 1000);
-    invalidateAPIQuery(({ url }) => '/api/v4/user/whoami/' === url);
+    invalidateAPIQuery(({ url }) => '/api/v4/user/whoami/' === url, 3000);
   }, [closeGlobalDrawer]);
 
   useEffectOnce(() => {
