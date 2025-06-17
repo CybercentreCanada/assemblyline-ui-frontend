@@ -94,7 +94,7 @@ const WrappedURIIdentificationSection: React.FC<URIIdentificationSectionProps> =
                   display: 'flex'
                 }}
               >
-                {t('file_classification')}
+                {t('uri_classification')}
               </span>
             </Grid>
             <Grid size={{ xs: 8, sm: 9, lg: 10 }} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
