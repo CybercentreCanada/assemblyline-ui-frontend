@@ -21,11 +21,12 @@ import {
 import { useAppUser } from 'commons/components/app/hooks';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
+import { invalidateAPIQuery } from 'components/core/Query/API/invalidateAPIQuery';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import type { ServiceIndexed, ServiceUpdates } from 'components/models/base/service';
+import type { ServiceIndexed, ServiceUpdateData, ServiceUpdates } from 'components/models/base/service';
 import type { CustomUser } from 'components/models/ui/user';
 import ServiceDetail from 'components/routes/admin/service_detail';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
@@ -36,6 +37,7 @@ import { useNotificationFeed } from 'components/visual/Notification/useNotificat
 import ServiceTable from 'components/visual/SearchResult/service';
 import CommunityServiceTable from 'components/visual/ServiceManagement/CommunityServiceTable';
 import NewServiceTable from 'components/visual/ServiceManagement/NewServiceTable';
+import type { ChangeEvent } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useLocation, useNavigate } from 'react-router';
@@ -79,55 +81,6 @@ export default function Services() {
     [serviceFeeds]
   );
 
-  const handleAddService = () => {
-    apiCall({
-      method: 'PUT',
-      contentType: 'text/plain',
-      url: '/api/v4/service/',
-      body: manifest,
-      onSuccess: api_data => {
-        showSuccessMessage(t('add.success'));
-        closeServiceDialog();
-        setTimeout(() => reload(), 1000);
-      }
-    });
-  };
-
-  const closeServiceDialog = useCallback(() => {
-    setManifest('');
-    setOpen(false);
-  }, []);
-
-  const handleRestore = () => {
-    apiCall({
-      method: 'PUT',
-      contentType: 'text/plain',
-      url: '/api/v4/service/restore/',
-      body: restore,
-      onSuccess: api_data => {
-        showSuccessMessage(t('restore.success'));
-        closeRestoreDialog();
-        setRestoreConfirmation(false);
-        setTimeout(() => reload(), 1000);
-      },
-      onEnter: () => setWaitingDialog(true),
-      onExit: () => setWaitingDialog(false)
-    });
-  };
-
-  const closeRestoreDialog = () => {
-    setRestore('');
-    setOpenRestore(false);
-  };
-
-  function handleRestoreChange(event) {
-    setRestore(event.target.value);
-  }
-
-  function handleManifestChange(event) {
-    setManifest(event.target.value);
-  }
-
   const reload = useCallback(() => {
     apiCall<ServiceIndexed[]>({
       url: '/api/v4/service/all/',
@@ -139,6 +92,59 @@ export default function Services() {
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const closeServiceDialog = useCallback(() => {
+    setManifest('');
+    setOpen(false);
+  }, []);
+
+  const closeRestoreDialog = useCallback(() => {
+    setRestore('');
+    setOpenRestore(false);
+  }, []);
+
+  const handleRestoreChange = useCallback((event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setRestore(event.target.value);
+  }, []);
+
+  const handleManifestChange = useCallback((event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setManifest(event.target.value);
+  }, []);
+
+  const handleAddService = useCallback(() => {
+    apiCall({
+      method: 'PUT',
+      contentType: 'text/plain',
+      url: '/api/v4/service/',
+      body: manifest,
+      onSuccess: () => {
+        showSuccessMessage(t('add.success'));
+        closeServiceDialog();
+        setTimeout(() => reload(), 1000);
+        invalidateAPIQuery(({ url }) => '/api/v4/user/whoami/' === url);
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [manifest, reload, t]);
+
+  const handleRestore = useCallback(() => {
+    apiCall({
+      method: 'PUT',
+      contentType: 'text/plain',
+      url: '/api/v4/service/restore/',
+      body: restore,
+      onSuccess: () => {
+        showSuccessMessage(t('restore.success'));
+        closeRestoreDialog();
+        setRestoreConfirmation(false);
+        setTimeout(() => reload(), 1000);
+        invalidateAPIQuery(({ url }) => '/api/v4/user/whoami/' === url);
+      },
+      onEnter: () => setWaitingDialog(true),
+      onExit: () => setWaitingDialog(false)
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reload, restore, t]);
 
   const pollInstalling = useCallback(first => {
     apiCall<string[]>({
@@ -155,19 +161,8 @@ export default function Services() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffectOnce(() => {
-    if (currentUser.is_admin) {
-      reload();
-      pollInstalling(true);
-    }
-    window.addEventListener('reloadServicesEvent', reload);
-    return () => {
-      window.removeEventListener('reloadServicesEvent', reload);
-    };
-  });
-
   const onUpdate = useCallback(
-    (svc, updateData) => {
+    (svc: string, updateData: ServiceUpdateData) => {
       apiCall({
         method: 'PUT',
         url: '/api/v4/service/update/',
@@ -179,6 +174,7 @@ export default function Services() {
           const newUpdates = { ...updates };
           newUpdates[svc] = { ...newUpdates[svc], updating: true };
           setUpdates(newUpdates);
+          invalidateAPIQuery(({ url }) => '/api/v4/user/whoami/' === url);
         }
       });
     },
@@ -200,6 +196,7 @@ export default function Services() {
             delete newUpdates[srv];
           }
           setUpdates(newUpdates);
+          invalidateAPIQuery(({ url }) => '/api/v4/user/whoami/' === url);
         }
       });
     },
@@ -224,12 +221,25 @@ export default function Services() {
   const onUpdated = useCallback(() => {
     if (!isXL) closeGlobalDrawer();
     setTimeout(() => window.dispatchEvent(new CustomEvent('reloadServicesEvent')), 1000);
+    invalidateAPIQuery(({ url }) => '/api/v4/user/whoami/' === url);
   }, [closeGlobalDrawer, isXL]);
 
   const onDeleted = useCallback(() => {
     closeGlobalDrawer();
     setTimeout(() => window.dispatchEvent(new CustomEvent('reloadServicesEvent')), 1000);
+    invalidateAPIQuery(({ url }) => '/api/v4/user/whoami/' === url);
   }, [closeGlobalDrawer]);
+
+  useEffectOnce(() => {
+    if (currentUser.is_admin) {
+      reload();
+      pollInstalling(true);
+    }
+    window.addEventListener('reloadServicesEvent', reload);
+    return () => {
+      window.removeEventListener('reloadServicesEvent', reload);
+    };
+  });
 
   useEffect(() => {
     if (serviceResults !== null && !globalDrawerOpened && location.hash) {
@@ -416,7 +426,8 @@ export default function Services() {
               }}
               disableInteractive
               title={
-                updates && Object.values(updates).some((srv: any) => srv.update_available && !srv.updating)
+                updates &&
+                Object.values(updates).some((srv: ServiceUpdateData) => srv.update_available && !srv.updating)
                   ? t('update_all')
                   : t('update_none')
               }
@@ -426,7 +437,8 @@ export default function Services() {
                   color="primary"
                   onClick={updateAll}
                   disabled={
-                    !updates || !Object.values(updates).some((srv: any) => srv.update_available && !srv.updating)
+                    !updates ||
+                    !Object.values(updates).some((srv: ServiceUpdateData) => srv.update_available && !srv.updating)
                   }
                   size="large"
                 >
