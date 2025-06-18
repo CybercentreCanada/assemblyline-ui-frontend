@@ -70,7 +70,7 @@
   "overview": "Overview",
   "overview.search_link": "mini-language",
   "overview.text1": "The search query “",
-  "overview.text2": "” is used by the Search API. Operators allow you to customize the search -- the available options are explained bellow:",
+  "overview.text2": "” is used by the Search API. Operators allow you to customize the search -- the available options are explained below:",
   "proximity": "Proximity Searches",
   "proximity.ex": "\"quick fox\"~5",
   "proximity.text": "While a phrase query (eg \"john smith\") expects all of the terms in exactly the same order, a proximity query allows the specified words to be further apart or in a different order. In the same way that fuzzy queries can specify a maximum edit distance for characters in a word, a proximity search allows us to specify a maximum edit distance of words in a phrase:",
