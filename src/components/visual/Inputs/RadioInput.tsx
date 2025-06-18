@@ -34,7 +34,7 @@ export type RadioInputProps<O extends Option[] = []> = {
   helperText?: string;
   helperTextProps?: FormHelperTextProps;
   id?: string;
-  label: string;
+  label?: string;
   labelProps?: TypographyProps;
   loading?: boolean;
   options: O;
@@ -45,6 +45,7 @@ export type RadioInputProps<O extends Option[] = []> = {
   reset?: boolean;
   resetProps?: ResetInputProps;
   rootProps?: React.HTMLAttributes<HTMLDivElement>;
+  showOverflow?: boolean;
   startAdornment?: TextFieldProps['InputProps']['startAdornment'];
   tiny?: boolean;
   tooltip?: TooltipProps['title'];
@@ -60,16 +61,16 @@ export type RadioInputProps<O extends Option[] = []> = {
 export const RadioInput: <O extends Option[]>(props: RadioInputProps<O>) => React.ReactNode = React.memo(
   <O extends Option[]>({
     disabled,
+    divider = false,
     endAdornment = null,
     error = () => null,
     errorProps = null,
     helperText = null,
     helperTextProps = null,
     id: idProp = null,
-    label,
+    label: labelProp = null,
     labelProps,
     loading = false,
-    divider = false,
     options = null,
     placeholder = null,
     preventDisabledColor = false,
@@ -78,6 +79,7 @@ export const RadioInput: <O extends Option[]>(props: RadioInputProps<O>) => Reac
     reset = false,
     resetProps = null,
     rootProps = null,
+    showOverflow = false,
     startAdornment = null,
     tiny = false,
     tooltip = null,
@@ -93,6 +95,7 @@ export const RadioInput: <O extends Option[]>(props: RadioInputProps<O>) => Reac
 
     const [focused, setFocused] = useState<boolean>(false);
 
+    const label = useMemo<string>(() => labelProp ?? '\u00A0', [labelProp]);
     const id = useMemo<string>(() => (idProp || label).replaceAll(' ', '-'), [idProp, label]);
 
     const errorValue = useMemo<string>(() => error(value), [error, value]);
@@ -197,7 +200,11 @@ export const RadioInput: <O extends Option[]>(props: RadioInputProps<O>) => Reac
                         columnGap: theme.spacing(1)
                       }}
                     >
-                      <span style={{ textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden' }}>
+                      <span
+                        style={{
+                          ...(!showOverflow && { textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden' })
+                        }}
+                      >
                         {option?.label}
                       </span>
                       {endAdornment}
@@ -212,18 +219,16 @@ export const RadioInput: <O extends Option[]>(props: RadioInputProps<O>) => Reac
                             ? 'primary'
                             : 'textPrimary',
                       marginLeft: theme.spacing(1.25),
-                      overflow: 'hidden',
                       textAlign: 'start',
-                      textOverflow: 'ellipsis',
                       variant: 'body2',
-                      whiteSpace: 'nowrap',
                       width: '100%',
+                      ...(!showOverflow && { textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden' }),
                       ...((preventDisabledColor || readOnly) && { color: 'inherit !important' }),
                       ...labelProps
                     }
                   }}
                   sx={{
-                    overflow: 'hidden',
+                    ...(!showOverflow && { overflow: 'hidden' }),
                     ...(!(loading || !reset || disabled || readOnly) && { paddingRight: theme.spacing(2) })
                   }}
                 />

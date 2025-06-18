@@ -1,23 +1,27 @@
 import type {
   FormHelperTextProps,
   IconButtonProps,
-  SliderProps,
   TextFieldProps,
   TooltipProps,
   TypographyProps
 } from '@mui/material';
-import { FormControl, FormHelperText, Skeleton, Slider, Typography, useTheme } from '@mui/material';
+import { FormControl, FormHelperText, Skeleton, Typography, useTheme } from '@mui/material';
+import { useAppTheme } from 'commons/components/app/hooks';
 import type { ResetInputProps } from 'components/visual/Inputs/components/ResetInput';
 import { ResetInput } from 'components/visual/Inputs/components/ResetInput';
 import { Tooltip } from 'components/visual/Tooltip';
 import React, { useMemo, useState } from 'react';
+import type { InteractionProps, ReactJsonViewProps, ThemeObject } from 'react-json-view';
+import ReactJson from 'react-json-view';
 
-export type SliderInputProps = Omit<SliderProps, 'value' | 'onChange'> & {
+export type JSONInputProps = Omit<ReactJsonViewProps, 'src' | 'onAdd' | 'onDelete' | 'onEdit'> & {
+  disabled?: boolean;
   endAdornment?: TextFieldProps['InputProps']['endAdornment'];
-  error?: (value: number) => string;
+  error?: (value: object) => string;
   errorProps?: FormHelperTextProps;
   helperText?: string;
   helperTextProps?: FormHelperTextProps;
+  id?: string;
   label?: string;
   labelProps?: TypographyProps;
   loading?: boolean;
@@ -29,15 +33,17 @@ export type SliderInputProps = Omit<SliderProps, 'value' | 'onChange'> & {
   tiny?: boolean;
   tooltip?: TooltipProps['title'];
   tooltipProps?: Omit<TooltipProps, 'children' | 'title'>;
-  value: number;
-  onChange?: (event: Event, value: number) => void;
-  onReset?: IconButtonProps['onClick'];
+  value: object;
+  onBlur?: () => void;
+  onChange?: (event: InteractionProps, value: object) => void;
   onError?: (error: string) => void;
+  onFocus?: () => void;
+  onReset?: IconButtonProps['onClick'];
 };
 
-export const SliderInput: React.FC<SliderInputProps> = React.memo(
+export const JSONInput: React.FC<JSONInputProps> = React.memo(
   ({
-    disabled,
+    disabled = false,
     endAdornment = null,
     error = () => null,
     errorProps = null,
@@ -62,8 +68,9 @@ export const SliderInput: React.FC<SliderInputProps> = React.memo(
     onFocus = () => null,
     onReset = () => null,
     ...sliderProps
-  }: SliderInputProps) => {
+  }: JSONInputProps) => {
     const theme = useTheme();
+    const { isDark: isDarkTheme } = useAppTheme();
 
     const [focused, setFocused] = useState<boolean>(false);
 
@@ -71,6 +78,28 @@ export const SliderInput: React.FC<SliderInputProps> = React.memo(
     const id = useMemo<string>(() => (idProp || label).replaceAll(' ', '-'), [idProp, label]);
 
     const errorValue = useMemo<string>(() => error(value), [error, value]);
+
+    const jsonTheme = useMemo<ThemeObject>(
+      () => ({
+        base00: 'transparent', // Background
+        base01: theme.palette.grey[isDarkTheme ? 800 : 300], // Add key title + Edit value background
+        base02: theme.palette.grey[isDarkTheme ? 700 : 400], // Borders and DataType Background
+        base03: '#444', // Unused
+        base04: theme.palette.grey[isDarkTheme ? 700 : 400], // Object size and Add key border
+        base05: theme.palette.grey[isDarkTheme ? 400 : 600], // Undefined and Add key background
+        base06: '#444', // Unused
+        base07: theme.palette.text.primary, // Brace, Key and Borders
+        base08: theme.palette.text.secondary, // NaN
+        base09: isDarkTheme ? theme.palette.warning.light : theme.palette.warning.dark, // Strings and Icons
+        base0A: theme.palette.grey[isDarkTheme ? 300 : 800], // Null, Regex and edit text color
+        base0B: isDarkTheme ? theme.palette.error.light : theme.palette.error.dark, // Float
+        base0C: isDarkTheme ? theme.palette.secondary.light : theme.palette.secondary.dark, // Array Key
+        base0D: isDarkTheme ? theme.palette.info.light : theme.palette.info.dark, // Date, function, expand icon
+        base0E: isDarkTheme ? theme.palette.info.light : theme.palette.info.dark, // Boolean
+        base0F: isDarkTheme ? theme.palette.error.light : theme.palette.error.dark // Integer
+      }),
+      []
+    );
 
     return preventRender ? null : (
       <div style={{ textAlign: 'left' }}>
@@ -101,32 +130,27 @@ export const SliderInput: React.FC<SliderInputProps> = React.memo(
           ) : (
             <>
               <div style={{ display: 'flex', alignItems: 'flex-start' }}>
-                <div style={{ flex: 1, marginLeft: '20px', marginRight: '20px' }}>
-                  <Slider
-                    aria-label={id}
-                    id={id}
-                    color={!disabled && errorValue ? 'error' : 'primary'}
-                    disabled={disabled || readOnly}
-                    valueLabelDisplay="auto"
-                    size="small"
-                    value={value}
-                    onChange={(e, v) => {
-                      onChange(e, v as number);
-
-                      const err = error(v as number);
-                      if (err) onError(err);
-                    }}
-                    onFocus={(event, ...other) => {
-                      setFocused(!readOnly && !disabled && document.activeElement === event.target);
-                      onFocus(event, ...other);
-                    }}
-                    onBlur={(event, ...other) => {
-                      setFocused(false);
-                      onBlur(event, ...other);
-                    }}
-                    {...sliderProps}
-                  />
-                </div>
+                <ReactJson
+                  theme={jsonTheme}
+                  name={false}
+                  enableClipboard={false}
+                  groupArraysAfterLength={10}
+                  displayDataTypes={false}
+                  displayObjectSize={false}
+                  src={value}
+                  onAdd={event => onChange(event, event.updated_src)}
+                  onDelete={event => onChange(event, event.updated_src)}
+                  onEdit={event => onChange(event, event.updated_src)}
+                  style={{
+                    border: `1px solid ${theme.palette.divider}`,
+                    borderRadius: '4px',
+                    fontSize: '1rem',
+                    minHeight: theme.spacing(5),
+                    padding: '4px',
+                    overflowX: 'auto',
+                    width: '100%'
+                  }}
+                />
                 <ResetInput
                   id={id}
                   preventRender={loading || !reset || disabled || readOnly}

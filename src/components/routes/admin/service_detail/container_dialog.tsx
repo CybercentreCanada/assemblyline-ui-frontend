@@ -510,7 +510,7 @@ const WrappedContainerDialog = ({
 
             <Grid size={{ xs: 6, md: 3 }}>
               <NumberInput
-                label={'\u00A0'}
+                id="ram_mb_min"
                 loading={!tempContainer}
                 value={!tempContainer ? null : tempContainer.ram_mb}
                 reset={showReset(tempContainer, defaults, 'ram_mb')}

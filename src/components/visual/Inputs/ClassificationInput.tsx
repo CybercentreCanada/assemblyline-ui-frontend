@@ -62,7 +62,7 @@ export type ClassificationInputProps = Omit<ClassificationProps, 'c12n' | 'setCl
   errorProps?: FormHelperTextProps;
   helperText?: string;
   helperTextProps?: FormHelperTextProps;
-  label: string;
+  label?: string;
   labelProps?: TypographyProps;
   loading?: boolean;
 
@@ -101,7 +101,7 @@ export const ClassificationInput: React.FC<ClassificationInputProps> = React.mem
     helperText = null,
     helperTextProps = null,
     id: idProp = null,
-    label,
+    label: labelProp = null,
     labelProps,
     loading = false,
     placeholder = null,
@@ -133,6 +133,8 @@ export const ClassificationInput: React.FC<ClassificationInputProps> = React.mem
     const isPhone = useMediaQuery(theme.breakpoints.only('xs'));
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
     const sp2 = theme.spacing(2);
+
+    const label = useMemo<string>(() => labelProp ?? '\u00A0', [labelProp]);
 
     const preventRender = useMemo(
       () => preventRenderProp || !c12nDef?.enforce || !validated?.parts?.lvl,

@@ -74,7 +74,7 @@ export const SelectInput: <O extends Option[]>(props: SelectInputProps<O>) => Re
     helperText = null,
     helperTextProps = null,
     id: idProp = null,
-    label,
+    label: labelProp = null,
     labelProps,
     loading = false,
     options = null,
@@ -100,6 +100,7 @@ export const SelectInput: <O extends Option[]>(props: SelectInputProps<O>) => Re
 
     const [focused, setFocused] = useState<boolean>(false);
 
+    const label = useMemo<string>(() => labelProp ?? '\u00A0', [labelProp]);
     const id = useMemo<string>(() => (idProp || label).replaceAll(' ', '-'), [idProp, label]);
 
     const errorValue = useMemo<string>(() => error(value), [error, value]);
