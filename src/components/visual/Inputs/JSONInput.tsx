@@ -1,3 +1,5 @@
+import type { InteractionProps, ReactJsonViewProps, ThemeObject } from '@microlink/react-json-view';
+import ReactJson from '@microlink/react-json-view';
 import type {
   FormHelperTextProps,
   IconButtonProps,
@@ -11,8 +13,6 @@ import type { ResetInputProps } from 'components/visual/Inputs/components/ResetI
 import { ResetInput } from 'components/visual/Inputs/components/ResetInput';
 import { Tooltip } from 'components/visual/Tooltip';
 import React, { useMemo, useState } from 'react';
-import type { InteractionProps, ReactJsonViewProps, ThemeObject } from 'react-json-view';
-import ReactJson from 'react-json-view';
 
 export type JSONInputProps = Omit<ReactJsonViewProps, 'src' | 'onAdd' | 'onDelete' | 'onEdit'> & {
   disabled?: boolean;
