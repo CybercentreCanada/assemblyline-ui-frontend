@@ -53,7 +53,7 @@ export const DateInput: React.FC<DateInputProps> = React.memo(
     helperText = null,
     helperTextProps = null,
     id: idProp = null,
-    label,
+    label: labelProp = null,
     labelProps,
     loading = false,
     maxDateToday = false,
@@ -82,6 +82,7 @@ export const DateInput: React.FC<DateInputProps> = React.memo(
     const [today, setToday] = useState<Moment>(null);
     const [focused, setFocused] = useState<boolean>(false);
 
+    const label = useMemo<string>(() => labelProp ?? '\u00A0', [labelProp]);
     const id = useMemo<string>(() => (idProp || label).replaceAll(' ', '-'), [idProp, label]);
 
     const errorValue = useMemo<string>(

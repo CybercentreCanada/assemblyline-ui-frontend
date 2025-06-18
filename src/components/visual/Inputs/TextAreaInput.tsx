@@ -17,9 +17,10 @@ export type TextAreaInputProps = Omit<TextFieldProps, 'rows' | 'onChange' | 'err
   errorProps?: FormHelperTextProps;
   helperText?: string;
   helperTextProps?: FormHelperTextProps;
-  label: string;
+  label?: string;
   labelProps?: TypographyProps;
   loading?: boolean;
+  monospace?: boolean;
   placeholder?: TextFieldProps['InputProps']['placeholder'];
   preventDisabledColor?: boolean;
   preventRender?: boolean;
@@ -47,9 +48,10 @@ export const TextAreaInput: React.FC<TextAreaInputProps> = React.memo(
     helperText = null,
     helperTextProps = null,
     id: idProp = null,
-    label,
+    label: labelProp = null,
     labelProps,
     loading = false,
+    monospace = false,
     placeholder = null,
     preventDisabledColor = false,
     preventRender = false,
@@ -74,6 +76,7 @@ export const TextAreaInput: React.FC<TextAreaInputProps> = React.memo(
 
     const [focused, setFocused] = useState<boolean>(false);
 
+    const label = useMemo<string>(() => labelProp ?? '\u00A0', [labelProp]);
     const id = useMemo<string>(() => (idProp || label).replaceAll(' ', '-'), [idProp, label]);
 
     const errorValue = useMemo<string>(() => error(value), [error, value]);
@@ -183,14 +186,26 @@ export const TextAreaInput: React.FC<TextAreaInputProps> = React.memo(
               }}
               sx={{
                 margin: 0,
-                ...(readOnly &&
-                  !disabled && {
-                    '& .MuiInputBase-root': { cursor: 'default' },
-                    '& .MuiInputBase-input': { cursor: 'default' },
-                    '& .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline': {
+                '& .MuiInputBase-root': {
+                  ...(tiny && {
+                    paddingTop: '2px !important',
+                    paddingBottom: '2px !important',
+                    fontSize: '14px'
+                  }),
+                  ...(readOnly && !disabled && { cursor: 'default' })
+                },
+
+                '& .MuiInputBase-input': {
+                  ...(readOnly && !disabled && { cursor: 'default' }),
+                  ...(monospace && { fontFamily: 'monospace' })
+                },
+
+                '& .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline': {
+                  ...(readOnly &&
+                    !disabled && {
                       borderColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.23)' : 'rgba(0, 0, 0, 0.23)'
-                    }
-                  })
+                    })
+                }
               }}
               {...textFieldProps}
             />

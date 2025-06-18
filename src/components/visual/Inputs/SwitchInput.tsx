@@ -19,7 +19,7 @@ export type SwitchInputProps = Omit<ButtonProps, 'onChange' | 'onClick' | 'value
   errorProps?: FormHelperTextProps;
   helperText?: string;
   helperTextProps?: FormHelperTextProps;
-  label: string;
+  label?: string;
   labelProps?: TypographyProps;
   loading?: boolean;
   preventDisabledColor?: boolean;
@@ -27,6 +27,7 @@ export type SwitchInputProps = Omit<ButtonProps, 'onChange' | 'onClick' | 'value
   readOnly?: boolean;
   reset?: boolean;
   resetProps?: ResetInputProps;
+  showOverflow?: boolean;
   tiny?: boolean;
   tooltip?: TooltipProps['title'];
   tooltipProps?: Omit<TooltipProps, 'children' | 'title'>;
@@ -45,7 +46,7 @@ export const SwitchInput: React.FC<SwitchInputProps> = React.memo(
     helperText = null,
     helperTextProps = null,
     id: idProp = null,
-    label = null,
+    label: labelProp = null,
     labelProps = null,
     loading = false,
     preventDisabledColor = false,
@@ -53,6 +54,7 @@ export const SwitchInput: React.FC<SwitchInputProps> = React.memo(
     readOnly = false,
     reset = false,
     resetProps = null,
+    showOverflow = false,
     tiny = false,
     tooltip = null,
     tooltipProps = null,
@@ -68,6 +70,7 @@ export const SwitchInput: React.FC<SwitchInputProps> = React.memo(
 
     const [focused, setFocused] = useState<boolean>(false);
 
+    const label = useMemo<string>(() => labelProp ?? '\u00A0', [labelProp]);
     const id = useMemo<string>(() => (idProp || label).replaceAll(' ', '-'), [idProp, label]);
 
     const errorValue = useMemo<string>(() => error(value), [error, value]);
@@ -143,7 +146,13 @@ export const SwitchInput: React.FC<SwitchInputProps> = React.memo(
                 <div
                   style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', columnGap: theme.spacing(1) }}
                 >
-                  <span style={{ textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden' }}>{label}</span>
+                  <span
+                    style={{
+                      ...(!showOverflow && { textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden' })
+                    }}
+                  >
+                    {label}
+                  </span>
                   {endAdornment}
                 </div>
               }
@@ -151,18 +160,16 @@ export const SwitchInput: React.FC<SwitchInputProps> = React.memo(
                 typography: {
                   color: !disabled && errorValue ? 'error' : focused ? 'primary' : 'textPrimary',
                   marginLeft: theme.spacing(1),
-                  overflow: 'hidden',
                   textAlign: 'start',
-                  textOverflow: 'ellipsis',
                   variant: 'body2',
-                  whiteSpace: 'nowrap',
                   width: '100%',
+                  ...(!showOverflow && { textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden' }),
                   ...((preventDisabledColor || readOnly) && { color: 'inherit !important' }),
                   ...labelProps
                 }
               }}
               sx={{
-                overflow: 'hidden',
+                ...(!showOverflow && { overflow: 'hidden' }),
                 ...(!(loading || !reset || disabled || readOnly) && { paddingRight: theme.spacing(2) })
               }}
             />

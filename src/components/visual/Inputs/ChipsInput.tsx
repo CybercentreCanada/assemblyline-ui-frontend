@@ -41,9 +41,10 @@ export type ChipsInputProps<
   helperText?: string;
   helperTextProps?: FormHelperTextProps;
   isOptionEqualToValue?: (option: string, value: string) => boolean;
-  label: string;
+  label?: string;
   labelProps?: TypographyProps;
   loading?: boolean;
+  monospace?: boolean;
   options?: string[];
   placeholder?: TextFieldProps['InputProps']['placeholder'];
   preventDisabledColor?: boolean;
@@ -86,9 +87,10 @@ export const ChipsInput: <
     helperTextProps = null,
     id: idProp = null,
     isOptionEqualToValue = null,
-    label,
+    label: labelProp = null,
     labelProps,
     loading = false,
+    monospace = false,
     options = [],
     placeholder = null,
     preventDisabledColor = false,
@@ -113,6 +115,7 @@ export const ChipsInput: <
 
     const [focused, setFocused] = useState<boolean>(false);
 
+    const label = useMemo<string>(() => labelProp ?? '\u00A0', [labelProp]);
     const id = useMemo<string>(() => (idProp || label).replaceAll(' ', '-'), [idProp, label]);
 
     const errorValue = useMemo<string>(() => error(value), [error, value]);
@@ -216,22 +219,27 @@ export const ChipsInput: <
                     }
                   }}
                   sx={{
-                    ...(tiny && {
-                      '& .MuiInputBase-root': {
+                    '& .MuiInputBase-root': {
+                      ...(tiny && {
                         paddingTop: '2px !important',
                         paddingBottom: '2px !important',
                         fontSize: '14px'
-                      }
-                    }),
-                    ...(readOnly &&
-                      !disabled && {
-                        '& .MuiInputBase-root': { cursor: 'default' },
-                        '& .MuiInputBase-input': { cursor: 'default' },
-                        '& .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline': {
+                      }),
+                      ...(readOnly && !disabled && { cursor: 'default' })
+                    },
+
+                    '& .MuiInputBase-input': {
+                      ...(readOnly && !disabled && { cursor: 'default' }),
+                      ...(monospace && { fontFamily: 'monospace' })
+                    },
+
+                    '& .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline': {
+                      ...(readOnly &&
+                        !disabled && {
                           borderColor:
                             theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.23)' : 'rgba(0, 0, 0, 0.23)'
-                        }
-                      })
+                        })
+                    }
                   }}
                 />
               )}
