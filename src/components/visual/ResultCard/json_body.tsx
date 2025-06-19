@@ -1,7 +1,7 @@
+import ReactJson from '@microlink/react-json-view';
 import { styled, useTheme } from '@mui/material';
 import type { JSONBody as JSONData } from 'components/models/base/result_body';
 import { default as React } from 'react';
-import ReactJson from 'react-json-view';
 
 const JSONContainer = styled('pre')(({ theme }) => ({
   '@media print': {
