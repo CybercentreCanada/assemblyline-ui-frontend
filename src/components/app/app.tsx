@@ -5,11 +5,10 @@ import AppProvider from 'commons/components/app/AppProvider';
 import type { AppUserService } from 'commons/components/app/AppUserService';
 import { useAppLayout } from 'commons/components/app/hooks';
 import { useAppSwitcher } from 'commons/components/app/hooks/useAppSwitcher';
-import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
+import { useBootstrapQuery } from 'components/core/Query/AL/useBootstrapQuery';
 import { APIProvider } from 'components/core/Query/components/APIProvider';
 import useALContext from 'components/hooks/useALContext';
 import type { LoginParamsProps } from 'components/hooks/useMyAPI';
-import useMyAPI from 'components/hooks/useMyAPI';
 import useMyPreferences from 'components/hooks/useMyPreferences';
 import useMySitemap from 'components/hooks/useMySitemap';
 import useMyTheme from 'components/hooks/useMyTheme';
@@ -25,7 +24,7 @@ import Routes from 'components/routes/routes';
 import Tos from 'components/routes/tos';
 import setMomentFRLocale from 'helpers/moment-fr-locale';
 import { getProvider } from 'helpers/utils';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { BrowserRouter } from 'react-router-dom';
 
 type PossibleApps = 'load' | 'locked' | 'login' | 'routes' | 'tos' | 'quota';
@@ -39,22 +38,27 @@ const MyAppMain = () => {
   const { setReady: setAppLayoutReady } = useAppLayout();
   const { setReady: setBorealisReady, setCustomIconify } = useBorealis();
   const { setItems } = useAppSwitcher();
-  const { bootstrap } = useMyAPI();
 
   const [renderedApp, setRenderedApp] = useState<PossibleApps>(user ? 'routes' : provider ? 'login' : 'load');
   const [loginParams, setLoginParams] = useState<LoginParamsProps | null>(defaultLoginParams);
 
-  const switchRenderedApp = (value: PossibleApps) => {
-    if (renderedApp !== value) {
-      setRenderedApp(value);
-    }
-  };
+  const switchRenderedApp = useCallback(
+    (value: PossibleApps) => {
+      if (renderedApp !== value) {
+        setRenderedApp(value);
+      }
+    },
+    [renderedApp]
+  );
 
-  const setReady = (layout: boolean, borealis: boolean, iconifyUrl: string = null) => {
-    setAppLayoutReady(layout);
-    setBorealisReady(borealis);
-    setCustomIconify(iconifyUrl);
-  };
+  const setReady = useCallback(
+    (layout: boolean, borealis: boolean, iconifyUrl: string = null) => {
+      setAppLayoutReady(layout);
+      setBorealisReady(borealis);
+      setCustomIconify(iconifyUrl);
+    },
+    [setAppLayoutReady, setBorealisReady, setCustomIconify]
+  );
 
   useEffect(() => {
     if (configuration && configuration.ui.apps) {
@@ -62,12 +66,12 @@ const MyAppMain = () => {
     }
   }, [configuration, setItems]);
 
-  useEffectOnce(() => {
-    if (user || provider) {
-      return;
-    }
-
-    bootstrap({ switchRenderedApp, setConfiguration, setLoginParams, setUser, setReady });
+  useBootstrapQuery({
+    switchRenderedApp,
+    setConfiguration,
+    setLoginParams,
+    setUser,
+    setReady
   });
 
   setMomentFRLocale();
