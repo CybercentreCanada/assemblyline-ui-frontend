@@ -68,7 +68,7 @@ export const AppProviderInner = <U extends AppUser>({
       autoDetectColorScheme,
       toggleAutoDetectColorScheme
     };
-  }, [themeMode, overrides, preferences, theme,autoDetectColorScheme, toggleAutoDetectColorScheme, sitemap, toggleMode, toggleLanguage]);
+  }, [themeMode, overrides, preferences, theme, autoDetectColorScheme, toggleAutoDetectColorScheme, sitemap, toggleMode, toggleLanguage]);
 
   return (
     <AppContext.Provider value={contextValue}>
