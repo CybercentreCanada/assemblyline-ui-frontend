@@ -156,6 +156,14 @@ const ThemeSelection = () => {
             )}
             <ListItem
               disablePadding
+              secondaryAction={<Switch edge="end" onChange={appTheme.toggleAutoDetectColorScheme} checked={appTheme.autoDetectColorScheme} />}
+            >
+              <ListItemButton onClick={appTheme.toggleAutoDetectColorScheme} id="personalization -autoCS">
+                <ListItemText>{t('personalization.autoDetectColorScheme')}</ListItemText>
+              </ListItemButton>
+            </ListItem>
+            <ListItem
+              disablePadding
               secondaryAction={<Switch edge="end" onChange={appTheme.toggle} checked={theme.palette.mode === 'dark'} />}
             >
               <ListItemButton onClick={appTheme.toggle} id="personalization -dark">
