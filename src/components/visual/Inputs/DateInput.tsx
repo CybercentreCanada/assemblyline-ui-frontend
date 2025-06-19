@@ -14,6 +14,7 @@ import { Tooltip } from 'components/visual/Tooltip';
 import type { Moment } from 'moment';
 import moment from 'moment';
 import React, { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export type DateInputProps = Omit<TextFieldProps, 'error' | 'value' | 'onChange'> & {
   defaultDateOffset?: number | null;
@@ -74,6 +75,7 @@ const WrappedDateInput = ({
   onReset = () => null,
   ...textFieldProps
 }: DateInputProps) => {
+  const { i18n } = useTranslation();
   const theme = useTheme();
 
   const [tempDate, setTempDate] = useState<Moment>(null);
@@ -114,7 +116,7 @@ const WrappedDateInput = ({
   }, [defaultDateOffset, value]);
 
   return preventRender ? null : (
-    <LocalizationProvider dateAdapter={AdapterMoment}>
+    <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale={i18n.language}>
       <div style={{ textAlign: 'left' }}>
         <Tooltip title={tooltip} {...tooltipProps}>
           <Typography
