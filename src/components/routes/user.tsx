@@ -105,7 +105,7 @@ function User({ username = null }: UserProps) {
   const [drawerType, setDrawerType] = useState<string>(null);
   const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
   const [deleteDialog, setDeleteDialog] = useState<boolean>(false);
-  const [user, setUser] = useState<ParsedUser>(null);
+  const [user, setUser] = useState(null);
   const [quotas, setQuotas] = useState<{ daily_submission: number; daily_api: number }>(null);
   const [modified, setModified] = useState<boolean>(false);
   const [editable, setEditable] = useState<boolean>(false);
@@ -503,7 +503,7 @@ function User({ username = null }: UserProps) {
                   ),
                   otp: <OTP setDrawerOpen={setDrawerOpen} set2FAEnabled={set2FAEnabled} />,
                   disable_otp: <DisableOTP setDrawerOpen={setDrawerOpen} set2FAEnabled={set2FAEnabled} />,
-                  token: <SecurityToken user={user as User} toggleToken={toggleToken} />,
+                  token: <SecurityToken user={user} toggleToken={toggleToken} />,
                   api_key: <APIKeys username={user?.uname} />,
                   apps: <Apps user={user as User} toggleApp={toggleApp} />
                 }[drawerType]
