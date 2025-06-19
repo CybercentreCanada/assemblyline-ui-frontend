@@ -50,7 +50,9 @@ export const AppProviderInner = <U extends AppUser>({
   const {
     current: theme,
     mode: themeMode,
-    toggleMode
+    toggleMode,
+    autoDetectColorScheme,
+    toggleAutoDetectColorScheme
   } = useContext(overrides?.providers?.themesProvider?.context ?? AppThemesContext);
 
   // Callback to toggle language.
@@ -62,9 +64,11 @@ export const AppProviderInner = <U extends AppUser>({
       theme: themeMode,
       configs: { overrides, preferences, theme, sitemap },
       toggleTheme: toggleMode,
-      toggleLanguage
+      toggleLanguage,
+      autoDetectColorScheme,
+      toggleAutoDetectColorScheme
     };
-  }, [themeMode, overrides, preferences, theme, sitemap, toggleMode, toggleLanguage]);
+  }, [themeMode, overrides, preferences, theme,autoDetectColorScheme, toggleAutoDetectColorScheme, sitemap, toggleMode, toggleLanguage]);
 
   return (
     <AppContext.Provider value={contextValue}>

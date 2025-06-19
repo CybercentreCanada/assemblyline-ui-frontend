@@ -12,16 +12,20 @@ const { LS_KEY_AUTO_DETECT_COLOR_SCHEME, LS_KEY_THEME, LS_KEY_DARK_MODE } = AppS
 export type AppThemeContextProps = {
   current: AppThemeConfigs;
   mode: PaletteMode;
+  autoDetectColorScheme?: boolean;
   themes?: AppTheme[];
   setTheme: (id: string) => void;
   toggleMode: () => void;
+  toggleAutoDetectColorScheme: () => void;
 };
 
 export const AppThemesContext = createContext<AppThemeContextProps>({
   current: {},
   mode: 'dark',
+  autoDetectColorScheme: true,
   setTheme: () => null,
-  toggleMode: () => null
+  toggleMode: () => null,
+  toggleAutoDetectColorScheme: () => null,
 });
 
 export const AppThemesProvider: FC<

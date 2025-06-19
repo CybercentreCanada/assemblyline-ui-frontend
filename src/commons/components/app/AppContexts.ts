@@ -125,8 +125,10 @@ export type AppDrawerMode = 'float' | 'pin';
 // React Context for the AppProvider (Root Context).
 export const AppContext = createContext<AppContextType>({
   configs: {},
+  autoDetectColorScheme: true,
   theme: 'dark',
   toggleTheme: () => {},
+  toggleAutoDetectColorScheme: () => {},
   toggleLanguage: () => {}
 });
 
