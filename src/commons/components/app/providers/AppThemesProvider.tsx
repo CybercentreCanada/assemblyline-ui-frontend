@@ -57,7 +57,8 @@ export const AppThemesProvider: FC<
   const toggleAutoDetectColorScheme = useCallback(() => setAutoDetectCS(!autoDetectCS), [autoDetectCS, setAutoDetectCS]);
   const toggleMode = useCallback(() => {
     setMode(mode === 'dark' ? 'light' : 'dark');
-  }, [mode, setMode]);
+    if (autoDetectCS) setAutoDetectCS(false);
+  }, [autoDetectCS, mode, setMode, setAutoDetectCS]);
 
   const [current, setCurrent] = useLocalStorageItem<string>(
     LS_KEY_THEME,
