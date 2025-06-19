@@ -161,6 +161,7 @@
   "pager.rows": "Items per page:",
   "personalization": "Personalization",
   "personalization.autohideappbar": "Auto Hide Topbar",
+  "personalization.autoDetectColorScheme": "Sync with Computer",
   "personalization.dark": "Dark Mode",
   "personalization.focus.mode.label": "Focus Mode",
   "personalization.focus.mode.tooltip": "Focus mode removes all navigation elements (e.g., left nav and top bar) from the application layout.",

@@ -161,6 +161,7 @@
   "pager.rows": "Items par page:",
   "personalization": "Personnalisation",
   "personalization.autohideappbar": "Masquer la barre supérieure",
+  "personalization.autoDetectColorScheme": "Synchroniser avec l'ordinateur",
   "personalization.dark": "Mode Sombre",
   "personalization.focus.mode.label": "Mode Focus",
   "personalization.focus.mode.tooltip": "Le mode Focus supprime tous les éléments de navigation, par ex. navigation de gauche et barre supérieure, à partir de la présentation de l'application.",

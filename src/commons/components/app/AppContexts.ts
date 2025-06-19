@@ -8,7 +8,9 @@ export type AppContextType = {
   // configs as provided by client application.
   configs: AppConfigs; // app specific configurations.
   theme: PaletteMode; // provided theme config.
+  autoDetectColorScheme: boolean;
   toggleTheme: () => void; // toggle between light/dark theme mode.
+  toggleAutoDetectColorScheme: () => void,
   toggleLanguage: () => void; // toggle between french/english language.
 };
 

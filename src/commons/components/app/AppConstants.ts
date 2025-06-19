@@ -1,6 +1,7 @@
 export const APP_STORAGE_PREFIX = 'templateui.core';
 
 export const AppStorageKeys = {
+  LS_KEY_AUTO_DETECT_COLOR_SCHEME: `${APP_STORAGE_PREFIX}.autoDetectColorScheme`,
   LS_KEY_THEME: `${APP_STORAGE_PREFIX}.theme`,
   LS_KEY_DARK_MODE: `${APP_STORAGE_PREFIX}.darkMode`,
   LS_KEY_LAYOUT_MODE: `${APP_STORAGE_PREFIX}.navLayout`,
