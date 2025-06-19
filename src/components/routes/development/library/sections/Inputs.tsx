@@ -6,6 +6,7 @@ import { CheckboxInput } from 'components/visual/Inputs/CheckboxInput';
 import { ChipsInput } from 'components/visual/Inputs/ChipsInput';
 import { ClassificationInput } from 'components/visual/Inputs/ClassificationInput';
 import { DateInput } from 'components/visual/Inputs/DateInput';
+import { JSONInput } from 'components/visual/Inputs/JSONInput';
 import { NumberInput } from 'components/visual/Inputs/NumberInput';
 import { RadioInput } from 'components/visual/Inputs/RadioInput';
 import { SelectInput } from 'components/visual/Inputs/SelectInput';
@@ -37,6 +38,7 @@ export type InputsLibraryState = {
       chips: string[];
       classification: string;
       date: string;
+      json: object;
       number: number;
       radio: string;
       select: string;
@@ -68,7 +70,8 @@ export const INPUTS_LIBRARY_STATE: InputsLibraryState = {
       chips: [],
       classification: 'TLP:CLEAR',
       date: '',
-      number: null,
+      json: {},
+      number: 0,
       radio: null,
       select: '',
       slider: 0,
@@ -227,6 +230,17 @@ export const InputsSection = React.memo(() => {
                 />
               )}
             />
+
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.json}
+              children={value => (
+                <JSONInput
+                  label="JSON Input"
+                  value={value}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.json', next)}
+                />
+              )}
+            />
           </div>
         }
         right={
@@ -344,7 +358,7 @@ export const InputsSection = React.memo(() => {
               children={value => (
                 <div>
                   <Typography variant="body2">{`Type: ${typeof value}`}</Typography>
-                  <Typography variant="body2">{`Value: ${value}`}</Typography>
+                  <Typography variant="body2">{`Value: ${JSON.stringify(value)}`}</Typography>
                 </div>
               )}
             />
@@ -391,7 +405,7 @@ export const InputsSection = React.memo(() => {
                     { primary: 'Options 3', value: 'option 3' }
                   ]}
                   onChange={(event, next: string) => form.setFieldValue('components.inputs.values.select', next)}
-                  onReset={() => form.setFieldValue('components.inputs.values.select', '')}
+                  onReset={() => form.setFieldValue('components.inputs.values.select', null)}
                 />
               )}
             />
@@ -579,12 +593,14 @@ export const InputsSection = React.memo(() => {
                 <RadioInput
                   label="Controlled Radio Input"
                   value={value}
+                  reset
                   options={[
                     { value: null, label: 'Null' },
                     { value: 'first', label: 'First' },
                     { value: 'second', label: 'Second' }
                   ]}
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.radio', next)}
+                  onReset={() => form.setFieldValue('components.inputs.values.switch', null)}
                 />
               )}
             />
@@ -597,6 +613,33 @@ export const InputsSection = React.memo(() => {
                 <div>
                   <Typography variant="body2">{`Type: ${typeof value}`}</Typography>
                   <Typography variant="body2">{`Value: ${value}`}</Typography>
+                </div>
+              )}
+            />
+          </Grid>
+
+          <Grid size={{ xs: 12, md: 6 }}>
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.json}
+              children={value => (
+                <JSONInput
+                  label="Controlled JSON Input"
+                  value={value}
+                  reset
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.json', next)}
+                  onReset={() => form.setFieldValue('components.inputs.values.json', {})}
+                />
+              )}
+            />
+          </Grid>
+
+          <Grid size={{ xs: 12, md: 6 }} alignItems="flex-end" paddingBottom={2} paddingLeft={2}>
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.json}
+              children={value => (
+                <div>
+                  <Typography variant="body2">{`Type: ${typeof value}`}</Typography>
+                  <Typography variant="body2">{`Value: ${JSON.stringify(value)}`}</Typography>
                 </div>
               )}
             />
@@ -753,6 +796,18 @@ export const InputsSection = React.memo(() => {
                     { value: 'second', label: 'Second' }
                   ]}
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.radio', next)}
+                />
+              )}
+            />
+
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.json}
+              children={value => (
+                <JSONInput
+                  label="Disabled JSON Input"
+                  value={value}
+                  disabled
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.json', next)}
                 />
               )}
             />
@@ -968,7 +1023,7 @@ export const InputsSection = React.memo(() => {
               selector={state => state.values.components.inputs.values.radio}
               children={value => (
                 <RadioInput
-                  label="Disabled Radio Input"
+                  label="Loading Radio Input"
                   value={value}
                   loading
                   options={[
@@ -977,6 +1032,18 @@ export const InputsSection = React.memo(() => {
                     { value: 'second', label: 'Second' }
                   ]}
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.radio', next)}
+                />
+              )}
+            />
+
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.json}
+              children={value => (
+                <JSONInput
+                  label="Loading JSON Input"
+                  value={value}
+                  loading
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.json', next)}
                 />
               )}
             />
@@ -1201,7 +1268,7 @@ export const InputsSection = React.memo(() => {
               selector={state => state.values.components.inputs.values.radio}
               children={value => (
                 <RadioInput
-                  label="Disabled Radio Input"
+                  label="Reset Radio Input"
                   value={value}
                   reset
                   options={[
@@ -1211,6 +1278,19 @@ export const InputsSection = React.memo(() => {
                   ]}
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.radio', next)}
                   onReset={() => form.setFieldValue('components.inputs.values.radio', null)}
+                />
+              )}
+            />
+
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.json}
+              children={value => (
+                <JSONInput
+                  label="Reset JSON Input"
+                  value={value}
+                  reset
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.json', next)}
+                  onReset={() => form.setFieldValue('components.inputs.values.json', {})}
                 />
               )}
             />
@@ -1425,14 +1505,24 @@ export const InputsSection = React.memo(() => {
                   label="Tooltip Radio Input"
                   tooltip="Tooltip Radio Input"
                   value={value}
-                  reset
                   options={[
                     { value: null, label: 'Null' },
                     { value: 'first', label: 'First' },
                     { value: 'second', label: 'Second' }
                   ]}
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.radio', next)}
-                  onReset={() => form.setFieldValue('components.inputs.values.radio', null)}
+                />
+              )}
+            />
+
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.json}
+              children={value => (
+                <JSONInput
+                  label="Tooltip JSON Input"
+                  tooltip="Tooltip JSON Input"
+                  value={value}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.json', next)}
                 />
               )}
             />
@@ -1649,6 +1739,17 @@ export const InputsSection = React.memo(() => {
                     { value: 'second', label: 'Second' }
                   ]}
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.radio', next)}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.json}
+              children={value => (
+                <JSONInput
+                  label="Error JSON Input"
+                  value={value}
+                  error={v => (JSON.stringify(v) !== '{}' ? null : 'Input field cannot be {}')}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.json', next)}
                 />
               )}
             />
@@ -1874,6 +1975,17 @@ export const InputsSection = React.memo(() => {
                 />
               )}
             />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.json}
+              children={value => (
+                <JSONInput
+                  label="Helper Text JSON Input"
+                  helperText="Helper Text"
+                  value={value}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.json', next)}
+                />
+              )}
+            />
           </>
         }
         right={
@@ -2040,6 +2152,17 @@ export const InputsSection = React.memo(() => {
                     { value: 'second', label: 'Second' }
                   ]}
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.radio', next)}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.json}
+              children={value => (
+                <JSONInput
+                  label="Placeholder JSON Input"
+                  placeholder="Placeholder"
+                  value={value}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.json', next)}
                 />
               )}
             />
@@ -2245,6 +2368,18 @@ export const InputsSection = React.memo(() => {
                     { value: 'second', label: 'Second' }
                   ]}
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.radio', next)}
+                />
+              )}
+            />
+
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.json}
+              children={value => (
+                <JSONInput
+                  label="ReadOnly JSON Input"
+                  readOnly
+                  value={value}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.json', next)}
                 />
               )}
             />
@@ -2457,6 +2592,16 @@ export const InputsSection = React.memo(() => {
                 />
               )}
             />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.json}
+              children={value => (
+                <JSONInput
+                  label="End Adornment JSON Input"
+                  value={value}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.json', next)}
+                />
+              )}
+            />
           </>
         }
         right={
@@ -2666,6 +2811,17 @@ export const InputsSection = React.memo(() => {
                     { value: 'second', label: 'Second' }
                   ]}
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.radio', next)}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.json}
+              children={value => (
+                <JSONInput
+                  label="Tiny JSON Input"
+                  tiny
+                  value={value}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.json', next)}
                 />
               )}
             />
@@ -2907,7 +3063,7 @@ export const InputsSection = React.memo(() => {
                         onReset: () => form.setFieldValue('components.inputs.values.classification', null)
                       })}
                       {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
-                      {...(error && { error: v => (v !== null ? null : 'Input field cannot be null') })}
+                      {...(error && { error: v => (v !== 'TLP:CLEAR' ? null : 'Input field cannot be TLP:CLEAR') })}
                       {...(helperText && { helperText: 'Helper Text' })}
                       {...(placeholder && { placeholder: 'Placeholder' })}
                       {...(endAdornment && { endAdornment: <Button variant="contained">Submit</Button> })}
@@ -2932,7 +3088,7 @@ export const InputsSection = React.memo(() => {
                         onReset: () => form.setFieldValue('components.inputs.values.textarea', '')
                       })}
                       {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
-                      {...(error && { error: v => (v !== null ? null : 'Input field cannot be null') })}
+                      {...(error && { error: v => (v !== '' ? null : "Input field cannot be''") })}
                       {...(helperText && { helperText: 'Helper Text' })}
                       {...(placeholder && { placeholder: 'Placeholder' })}
                       {...(endAdornment && { endAdornment: <Button variant="contained">Submit</Button> })}
@@ -3033,7 +3189,31 @@ export const InputsSection = React.memo(() => {
                         onReset: () => form.setFieldValue('components.inputs.values.radio', null)
                       })}
                       {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
-                      {...(error && { error: v => (v !== false ? null : 'Input field cannot be null') })}
+                      {...(error && { error: v => (v !== null ? null : 'Input field cannot be null') })}
+                      {...(helperText && { helperText: 'Helper Text' })}
+                      {...(placeholder && { placeholder: 'Placeholder' })}
+                      {...(endAdornment && { endAdornment: <Button variant="contained">Submit</Button> })}
+                    />
+                  )}
+                />
+
+                <form.Subscribe
+                  selector={state => state.values.components.inputs.values.json}
+                  children={value => (
+                    <JSONInput
+                      label="Interaction JSON Input"
+                      value={value}
+                      onChange={(event, next) => form.setFieldValue('components.inputs.values.json', next)}
+                      {...(disabled && { disabled })}
+                      {...(loading && { loading })}
+                      {...(readOnly && { readOnly })}
+                      {...(tiny && { tiny })}
+                      {...(reset && {
+                        reset,
+                        onReset: () => form.setFieldValue('components.inputs.values.radio', null)
+                      })}
+                      {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
+                      {...(error && { error: v => (JSON.stringify(v) !== '{}' ? null : 'Input field cannot be {}') })}
                       {...(helperText && { helperText: 'Helper Text' })}
                       {...(placeholder && { placeholder: 'Placeholder' })}
                       {...(endAdornment && { endAdornment: <Button variant="contained">Submit</Button> })}
@@ -3303,6 +3483,18 @@ export const InputsSection = React.memo(() => {
                     }
                   ]}
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.radio', next)}
+                />
+              )}
+            />
+
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.json}
+              children={value => (
+                <JSONInput
+                  label="JSON Input: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc."
+                  value={value}
+                  reset
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.json', next)}
                 />
               )}
             />

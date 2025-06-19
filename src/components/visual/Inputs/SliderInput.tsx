@@ -35,126 +35,123 @@ export type SliderInputProps = Omit<SliderProps, 'value' | 'onChange'> & {
   onError?: (error: string) => void;
 };
 
-export const SliderInput: React.FC<SliderInputProps> = React.memo(
-  ({
-    disabled,
-    endAdornment = null,
-    error = () => null,
-    errorProps = null,
-    helperText = null,
-    helperTextProps = null,
-    id: idProp = null,
-    label: labelProp = null,
-    labelProps,
-    loading,
-    preventDisabledColor = false,
-    preventRender,
-    readOnly = false,
-    reset = false,
-    resetProps = null,
-    tiny = false,
-    tooltip = null,
-    tooltipProps = null,
-    value,
-    onBlur = () => null,
-    onChange = () => null,
-    onError = () => null,
-    onFocus = () => null,
-    onReset = () => null,
-    ...sliderProps
-  }: SliderInputProps) => {
-    const theme = useTheme();
+export const WrappedSliderInput = ({
+  disabled,
+  endAdornment = null,
+  error = () => null,
+  errorProps = null,
+  helperText = null,
+  helperTextProps = null,
+  id: idProp = null,
+  label: labelProp = null,
+  labelProps,
+  loading,
+  preventDisabledColor = false,
+  preventRender,
+  readOnly = false,
+  reset = false,
+  resetProps = null,
+  tiny = false,
+  tooltip = null,
+  tooltipProps = null,
+  value = null,
+  onBlur = () => null,
+  onChange = () => null,
+  onError = () => null,
+  onFocus = () => null,
+  onReset = () => null,
+  ...sliderProps
+}: SliderInputProps) => {
+  const theme = useTheme();
 
-    const [focused, setFocused] = useState<boolean>(false);
+  const [focused, setFocused] = useState<boolean>(false);
 
-    const label = useMemo<string>(() => labelProp ?? '\u00A0', [labelProp]);
-    const id = useMemo<string>(() => (idProp || label).replaceAll(' ', '-'), [idProp, label]);
+  const label = useMemo<string>(() => labelProp ?? '\u00A0', [labelProp]);
+  const id = useMemo<string>(() => (idProp || label).replaceAll(' ', '-'), [idProp, label]);
+  const errorValue = useMemo<string>(() => error(value), [error, value]);
 
-    const errorValue = useMemo<string>(() => error(value), [error, value]);
-
-    return preventRender ? null : (
-      <div style={{ textAlign: 'left' }}>
-        <Tooltip title={tooltip} {...tooltipProps}>
-          <Typography
-            color={!disabled && errorValue ? 'error' : focused ? 'primary' : 'textSecondary'}
-            gutterBottom
-            overflow="hidden"
-            textAlign="start"
-            textOverflow="ellipsis"
-            variant="body2"
-            whiteSpace="nowrap"
-            width="100%"
-            sx={{
-              ...(disabled &&
-                !preventDisabledColor && {
-                  WebkitTextFillColor:
-                    theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.38)'
-                })
-            }}
-            {...labelProps}
-            children={label}
-          />
-        </Tooltip>
-        <FormControl fullWidth error={!!errorValue}>
-          {loading ? (
-            <Skeleton sx={{ height: '40px', transform: 'unset', ...(tiny && { height: '28px' }) }} />
-          ) : (
-            <>
-              <div style={{ display: 'flex', alignItems: 'flex-start' }}>
-                <div style={{ flex: 1, marginLeft: '20px', marginRight: '20px' }}>
-                  <Slider
-                    aria-label={id}
-                    id={id}
-                    color={!disabled && errorValue ? 'error' : 'primary'}
-                    disabled={disabled || readOnly}
-                    valueLabelDisplay="auto"
-                    size="small"
-                    value={value}
-                    onChange={(e, v) => {
-                      onChange(e, v as number);
-
-                      const err = error(v as number);
-                      if (err) onError(err);
-                    }}
-                    onFocus={(event, ...other) => {
-                      setFocused(!readOnly && !disabled && document.activeElement === event.target);
-                      onFocus(event, ...other);
-                    }}
-                    onBlur={(event, ...other) => {
-                      setFocused(false);
-                      onBlur(event, ...other);
-                    }}
-                    {...sliderProps}
-                  />
-                </div>
-                <ResetInput
+  return preventRender ? null : (
+    <div style={{ textAlign: 'left' }}>
+      <Tooltip title={tooltip} {...tooltipProps}>
+        <Typography
+          color={!disabled && errorValue ? 'error' : focused ? 'primary' : 'textSecondary'}
+          gutterBottom
+          overflow="hidden"
+          textAlign="start"
+          textOverflow="ellipsis"
+          variant="body2"
+          whiteSpace="nowrap"
+          width="100%"
+          sx={{
+            ...(disabled &&
+              !preventDisabledColor && {
+                WebkitTextFillColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.38)'
+              })
+          }}
+          {...labelProps}
+          children={label}
+        />
+      </Tooltip>
+      <FormControl fullWidth error={!!errorValue}>
+        {loading ? (
+          <Skeleton sx={{ height: '40px', transform: 'unset', ...(tiny && { height: '28px' }) }} />
+        ) : (
+          <>
+            <div style={{ display: 'flex', alignItems: 'flex-start' }}>
+              <div style={{ flex: 1, marginLeft: '20px', marginRight: '20px' }}>
+                <Slider
+                  aria-label={id}
                   id={id}
-                  preventRender={loading || !reset || disabled || readOnly}
-                  onReset={onReset}
-                  {...resetProps}
+                  color={!disabled && errorValue ? 'error' : 'primary'}
+                  disabled={disabled || readOnly}
+                  valueLabelDisplay="auto"
+                  size="small"
+                  value={value}
+                  onChange={(e, v) => {
+                    onChange(e, v as number);
+
+                    const err = error(v as number);
+                    if (err) onError(err);
+                  }}
+                  onFocus={(event, ...other) => {
+                    setFocused(!readOnly && !disabled && document.activeElement === event.target);
+                    onFocus(event, ...other);
+                  }}
+                  onBlur={(event, ...other) => {
+                    setFocused(false);
+                    onBlur(event, ...other);
+                  }}
+                  {...sliderProps}
                 />
               </div>
-              {disabled ? null : errorValue ? (
-                <FormHelperText
-                  sx={{ color: theme.palette.error.main, ...errorProps?.sx }}
-                  variant="outlined"
-                  {...errorProps}
-                >
-                  {errorValue}
-                </FormHelperText>
-              ) : helperText ? (
-                <FormHelperText
-                  sx={{ color: theme.palette.text.secondary, ...helperTextProps?.sx }}
-                  variant="outlined"
-                  {...helperTextProps}
-                >
-                  {helperText}
-                </FormHelperText>
-              ) : null}
-            </>
-          )}
-        </FormControl>
-      </div>
-    );
-  }
-);
+              <ResetInput
+                id={id}
+                preventRender={loading || !reset || disabled || readOnly}
+                onReset={onReset}
+                {...resetProps}
+              />
+            </div>
+            {disabled ? null : errorValue ? (
+              <FormHelperText
+                sx={{ color: theme.palette.error.main, ...errorProps?.sx }}
+                variant="outlined"
+                {...errorProps}
+              >
+                {errorValue}
+              </FormHelperText>
+            ) : helperText ? (
+              <FormHelperText
+                sx={{ color: theme.palette.text.secondary, ...helperTextProps?.sx }}
+                variant="outlined"
+                {...helperTextProps}
+              >
+                {helperText}
+              </FormHelperText>
+            ) : null}
+          </>
+        )}
+      </FormControl>
+    </div>
+  );
+};
+export const SliderInput: React.FC<SliderInputProps> = React.memo(WrappedSliderInput);
