@@ -502,7 +502,17 @@ function User({ username = null }: UserProps) {
                     </>
                   ),
                   otp: <OTP setDrawerOpen={setDrawerOpen} set2FAEnabled={set2FAEnabled} />,
-                  disable_otp: <DisableOTP setDrawerOpen={setDrawerOpen} set2FAEnabled={set2FAEnabled} />,
+                  disable_otp: (
+                    <DisableOTP setDrawerOpen={setDrawerOpen} set2FAEnabled={set2FAEnabled} isUnsetOTP={false} />
+                  ),
+                  unset_otp: (
+                    <DisableOTP
+                      setDrawerOpen={setDrawerOpen}
+                      set2FAEnabled={set2FAEnabled}
+                      isUnsetOTP={true}
+                      username={user?.uname}
+                    />
+                  ),
                   token: <SecurityToken user={user as User} toggleToken={toggleToken} />,
                   api_key: <APIKeys username={user?.uname} />,
                   apps: <Apps user={user as User} toggleApp={toggleApp} />
@@ -954,7 +964,8 @@ function User({ username = null }: UserProps) {
                       <ChevronRightOutlinedIcon />
                     </TableCell>
                   </TableRow>
-                  {user && currentUser.username === user.uname && configuration.auth.allow_2fa && (
+
+                  {!user || !configuration.auth.allow_2fa ? null : currentUser.username === user.uname ? (
                     <TableRow
                       hover
                       style={{ cursor: 'pointer' }}
@@ -967,7 +978,16 @@ function User({ username = null }: UserProps) {
                         <ChevronRightOutlinedIcon />
                       </TableCell>
                     </TableRow>
+                  ) : // admin can unset OTP for a user
+                  !currentUser.is_admin || !user['2fa_enabled'] ? null : (
+                    <TableRow hover style={{ cursor: 'pointer' }} onClick={() => toggleDrawer('unset_otp')}>
+                      <TableCell width="100%">{t('unset_otp')}</TableCell>
+                      <TableCell align="right">
+                        <ChevronRightOutlinedIcon />
+                      </TableCell>
+                    </TableRow>
                   )}
+
                   {user &&
                     currentUser.username === user.uname &&
                     user['2fa_enabled'] &&
