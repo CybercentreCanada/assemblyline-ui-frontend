@@ -11,17 +11,15 @@ import { ResetInput } from 'components/visual/Inputs/components/ResetInput';
 import { Tooltip } from 'components/visual/Tooltip';
 import React, { useMemo, useState } from 'react';
 
-export type NumberInputProps = Omit<TextFieldProps, 'error' | 'value' | 'onChange'> & {
+export type TextAreaInputProps = Omit<TextFieldProps, 'rows' | 'onChange' | 'error'> & {
   endAdornment?: TextFieldProps['InputProps']['endAdornment'];
-  error?: (value: number) => string;
+  error?: (value: string) => string;
   errorProps?: FormHelperTextProps;
   helperText?: string;
   helperTextProps?: FormHelperTextProps;
   label?: string;
   labelProps?: TypographyProps;
   loading?: boolean;
-  max?: number;
-  min?: number;
   monospace?: boolean;
   placeholder?: TextFieldProps['InputProps']['placeholder'];
   preventDisabledColor?: boolean;
@@ -30,19 +28,19 @@ export type NumberInputProps = Omit<TextFieldProps, 'error' | 'value' | 'onChang
   reset?: boolean;
   resetProps?: ResetInputProps;
   rootProps?: React.HTMLAttributes<HTMLDivElement>;
+  rows: TextFieldProps['rows'];
   startAdornment?: TextFieldProps['InputProps']['startAdornment'];
   tiny?: boolean;
   tooltip?: TooltipProps['title'];
   tooltipProps?: Omit<TooltipProps, 'children' | 'title'>;
-  unnullable?: boolean;
-  value: number;
-  onChange?: (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>, value: number) => void;
-  onError?: (error: string) => void;
+  value: string;
+  onChange?: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, value: string) => void;
   onReset?: IconButtonProps['onClick'];
+  onError?: (error: string) => void;
 };
 
-const WrappedNumberInput = ({
-  disabled = false,
+const WrappedTextAreaInput = ({
+  disabled,
   endAdornment = null,
   error = () => null,
   errorProps = null,
@@ -52,8 +50,6 @@ const WrappedNumberInput = ({
   label: labelProp = null,
   labelProps,
   loading = false,
-  max = null,
-  min = null,
   monospace = false,
   placeholder = null,
   preventDisabledColor = false,
@@ -62,19 +58,19 @@ const WrappedNumberInput = ({
   reset = false,
   resetProps = null,
   rootProps = null,
+  rows = 1,
   startAdornment = null,
   tiny = false,
-  tooltip,
-  tooltipProps,
-  unnullable = false,
-  value = null,
+  tooltip = null,
+  tooltipProps = null,
+  value,
   onBlur = () => null,
   onChange = () => null,
   onError = () => null,
   onFocus = () => null,
   onReset = () => null,
   ...textFieldProps
-}: NumberInputProps) => {
+}: TextAreaInputProps) => {
   const theme = useTheme();
 
   const [focused, setFocused] = useState<boolean>(false);
@@ -106,14 +102,19 @@ const WrappedNumberInput = ({
       </Tooltip>
       <FormControl fullWidth>
         {loading ? (
-          <Skeleton sx={{ height: '40px', transform: 'unset', ...(tiny && { height: '28px' }) }} />
+          <Skeleton
+            sx={{ height: `calc(23px * ${rows} + 17px)`, transform: 'unset', ...(tiny && { height: '28px' }) }}
+          />
         ) : (
           <TextField
             id={id}
-            type="number"
-            size="small"
             fullWidth
-            value={[null, undefined, '', NaN].includes(value) ? '' : `${value}`}
+            size="small"
+            multiline
+            rows={rows}
+            margin="dense"
+            variant="outlined"
+            value={value}
             disabled={disabled}
             error={!!errorValue}
             {...(readOnly && !disabled && { focused: null })}
@@ -137,8 +138,6 @@ const WrappedNumberInput = ({
 
               input: {
                 inputProps: {
-                  ...(min && { min: min }),
-                  ...(max && { max: max }),
                   ...(tiny && { sx: { padding: '2.5px 4px 2.5px 8px' } })
                 },
                 placeholder: placeholder,
@@ -169,22 +168,10 @@ const WrappedNumberInput = ({
               }
             }}
             onChange={event => {
-              const value = event.target.value;
+              onChange(event, event.target.value);
 
-              if (!unnullable && [null, undefined, '', NaN].includes(value)) {
-                onChange(event, null);
-
-                const err = error(null);
-                if (err) onError(null);
-              } else {
-                let num = Number(event.target.value);
-                num = max !== null || max !== undefined ? Math.min(num, max) : num;
-                num = min !== null || min !== undefined ? Math.max(num, min) : num;
-                onChange(event, num);
-
-                const err = error(num);
-                if (err) onError(err);
-              }
+              const err = error(event.target.value);
+              if (err) onError(err);
             }}
             onFocus={(event, ...other) => {
               setFocused(!readOnly && !disabled && document.activeElement === event.target);
@@ -195,6 +182,7 @@ const WrappedNumberInput = ({
               onBlur(event, ...other);
             }}
             sx={{
+              margin: 0,
               '& .MuiInputBase-root': {
                 ...(tiny && {
                   paddingTop: '2px !important',
@@ -224,4 +212,4 @@ const WrappedNumberInput = ({
   );
 };
 
-export const NumberInput: React.FC<NumberInputProps> = React.memo(WrappedNumberInput);
+export const TextAreaInput: React.FC<TextAreaInputProps> = React.memo(WrappedTextAreaInput);

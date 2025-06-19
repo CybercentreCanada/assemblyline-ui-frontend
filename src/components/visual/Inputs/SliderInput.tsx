@@ -18,7 +18,7 @@ export type SliderInputProps = Omit<SliderProps, 'value' | 'onChange'> & {
   errorProps?: FormHelperTextProps;
   helperText?: string;
   helperTextProps?: FormHelperTextProps;
-  label: string;
+  label?: string;
   labelProps?: TypographyProps;
   loading?: boolean;
   preventDisabledColor?: boolean;
@@ -35,7 +35,7 @@ export type SliderInputProps = Omit<SliderProps, 'value' | 'onChange'> & {
   onError?: (error: string) => void;
 };
 
-const WrappedSliderInput = ({
+export const WrappedSliderInput = ({
   disabled,
   endAdornment = null,
   error = () => null,
@@ -43,7 +43,7 @@ const WrappedSliderInput = ({
   helperText = null,
   helperTextProps = null,
   id: idProp = null,
-  label,
+  label: labelProp = null,
   labelProps,
   loading,
   preventDisabledColor = false,
@@ -54,18 +54,20 @@ const WrappedSliderInput = ({
   tiny = false,
   tooltip = null,
   tooltipProps = null,
-  value,
+  value = null,
+  onBlur = () => null,
   onChange = () => null,
-  onReset = () => null,
   onError = () => null,
+  onFocus = () => null,
+  onReset = () => null,
   ...sliderProps
 }: SliderInputProps) => {
   const theme = useTheme();
 
   const [focused, setFocused] = useState<boolean>(false);
 
+  const label = useMemo<string>(() => labelProp ?? '\u00A0', [labelProp]);
   const id = useMemo<string>(() => (idProp || label).replaceAll(' ', '-'), [idProp, label]);
-
   const errorValue = useMemo<string>(() => error(value), [error, value]);
 
   return preventRender ? null : (
@@ -111,8 +113,14 @@ const WrappedSliderInput = ({
                     const err = error(v as number);
                     if (err) onError(err);
                   }}
-                  onFocus={event => setFocused(document.activeElement === event.target)}
-                  onBlur={() => setFocused(false)}
+                  onFocus={(event, ...other) => {
+                    setFocused(!readOnly && !disabled && document.activeElement === event.target);
+                    onFocus(event, ...other);
+                  }}
+                  onBlur={(event, ...other) => {
+                    setFocused(false);
+                    onBlur(event, ...other);
+                  }}
                   {...sliderProps}
                 />
               </div>
@@ -146,5 +154,4 @@ const WrappedSliderInput = ({
     </div>
   );
 };
-
-export const SliderInput = React.memo(WrappedSliderInput);
+export const SliderInput: React.FC<SliderInputProps> = React.memo(WrappedSliderInput);
