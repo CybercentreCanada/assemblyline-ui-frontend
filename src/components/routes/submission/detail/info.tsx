@@ -3,6 +3,7 @@ import CheckBoxOutlinedIcon from '@mui/icons-material/CheckBoxOutlined';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import { Collapse, Divider, Grid, Skeleton, Typography, useTheme } from '@mui/material';
+import useALContext from 'components/hooks/useALContext';
 import type { ParsedSubmission } from 'components/models/base/submission';
 import Moment from 'components/visual/Moment';
 import Priority from 'components/visual/Priority';
@@ -16,10 +17,10 @@ type Props = {
 
 const WrappedInfoSection: React.FC<Props> = ({ submission }) => {
   const { t } = useTranslation(['submissionDetail']);
-
   const theme = useTheme();
+  const { classificationAliases } = useALContext();
 
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState<boolean>(true);
 
   const sp2 = theme.spacing(2);
 
@@ -60,7 +61,17 @@ const WrappedInfoSection: React.FC<Props> = ({ submission }) => {
                   <span style={{ fontWeight: 500 }}>{t('params.groups')}</span>
                 </Grid>
                 <Grid size={{ xs: 8, sm: 9, lg: 10 }} style={{ wordBreak: 'break-word' }}>
-                  {submission ? submission.params.groups.join(' | ') : <Skeleton />}
+                  {submission ? (
+                    submission.params.groups
+                      .map(group =>
+                        group in classificationAliases
+                          ? classificationAliases?.[group]?.short_name || classificationAliases?.[group]?.name || group
+                          : group
+                      )
+                      .join(' | ')
+                  ) : (
+                    <Skeleton />
+                  )}
                 </Grid>
 
                 <Grid size={{ xs: 4, sm: 3, lg: 2 }}>

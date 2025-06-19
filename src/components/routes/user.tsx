@@ -30,6 +30,7 @@ import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import type { User } from 'components/models/base/user';
 import APIKeys from 'components/routes/user/api_keys';
 import Apps from 'components/routes/user/apps';
 import DisableOTP from 'components/routes/user/disable_otp';
@@ -39,9 +40,24 @@ import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import CustomChip from 'components/visual/CustomChip';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
-import React, { memo, useRef, useState } from 'react';
+import React, { memo, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useLocation, useNavigate, useParams } from 'react-router';
+
+type ParsedUser = Omit<
+  User,
+  'api_daily_quota' | 'api_quota' | 'submission_async_quota' | 'submission_daily_quota' | 'submission_quota'
+> & {
+  '2fa_enabled'?: boolean;
+  api_daily_quota?: User['api_daily_quota'] | string;
+  api_quota?: User['api_quota'] | string;
+  identity_id?: string;
+  new_pass_confirm?: string;
+  new_pass?: string;
+  submission_async_quota?: User['submission_async_quota'] | string;
+  submission_daily_quota?: User['submission_daily_quota'] | string;
+  submission_quota?: User['submission_quota'] | string;
+};
 
 type UserProps = {
   username?: string | null;
@@ -83,23 +99,25 @@ function User({ username = null }: UserProps) {
   const inputRef = useRef(null);
   const navigate = useNavigate();
   const { apiCall } = useMyAPI();
-  const { user: currentUser, configuration } = useALContext();
+  const { user: currentUser, configuration, classificationAliases } = useALContext();
   const { showErrorMessage, showSuccessMessage, showWarningMessage } = useMySnackbar();
 
-  const [drawerType, setDrawerType] = useState(null);
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [deleteDialog, setDeleteDialog] = useState(false);
+  const [drawerType, setDrawerType] = useState<string>(null);
+  const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
+  const [deleteDialog, setDeleteDialog] = useState<boolean>(false);
   const [user, setUser] = useState(null);
-  const [quotas, setQuotas] = useState(null);
-  const [modified, setModified] = useState(false);
-  const [editable, setEditable] = useState(false);
-  const [buttonLoading, setButtonLoading] = useState(false);
+  const [quotas, setQuotas] = useState<{ daily_submission: number; daily_api: number }>(null);
+  const [modified, setModified] = useState<boolean>(false);
+  const [editable, setEditable] = useState<boolean>(false);
+  const [buttonLoading, setButtonLoading] = useState<boolean>(false);
 
   const downSM = useMediaQuery(theme.breakpoints.down('md'));
   const isXS = useMediaQuery(theme.breakpoints.only('xs'));
   const sp1 = theme.spacing(1);
   const sp4 = theme.spacing(4);
   const sp6 = theme.spacing(6);
+
+  const classificationAliasesValues = useMemo(() => Object.entries(classificationAliases), [classificationAliases]);
 
   const doDeleteUser = () => {
     apiCall({
@@ -385,14 +403,34 @@ function User({ username = null }: UserProps) {
                         multiple
                         freeSolo
                         options={[]}
-                        value={user.groups}
+                        value={user.groups.map(group =>
+                          group in classificationAliases
+                            ? classificationAliases?.[group]?.short_name ||
+                              classificationAliases?.[group]?.name ||
+                              group
+                            : group
+                        )}
                         renderInput={params => <TextField {...params} />}
                         renderTags={(value, getTagProps) =>
                           value.map((option, index) => (
                             <Chip key={index} variant="outlined" label={option} {...getTagProps({ index })} />
                           ))
                         }
-                        onChange={(_, value) => setGroups([...new Set(value.map(x => x.toUpperCase()))])}
+                        onChange={(_, value) =>
+                          setGroups([
+                            ...new Set(
+                              value.map(group =>
+                                (
+                                  classificationAliasesValues.find(
+                                    v =>
+                                      (!!v?.[1]?.short_name && v?.[1]?.short_name === group) ||
+                                      (!!v?.[1]?.name && v?.[1]?.name === group)
+                                  )?.[0] ?? group
+                                ).toUpperCase()
+                              )
+                            )
+                          ])
+                        }
                       />
                     </>
                   ),
@@ -477,7 +515,7 @@ function User({ username = null }: UserProps) {
                   ),
                   token: <SecurityToken user={user} toggleToken={toggleToken} />,
                   api_key: <APIKeys username={user?.uname} />,
-                  apps: <Apps user={user} toggleApp={toggleApp} />
+                  apps: <Apps user={user as User} toggleApp={toggleApp} />
                 }[drawerType]
               : null}
           </Box>
@@ -646,7 +684,22 @@ function User({ username = null }: UserProps) {
                   {isXS ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('groups')}</TableCell>}
                   <TableCell width="100%">
                     {!isXS ? null : <Typography variant="caption">{t('groups')}</Typography>}
-                    {user ? <div>{user.groups.join(' | ')}</div> : <Skeleton />}
+                    {user ? (
+                      <div>
+                        {user.groups &&
+                          user.groups
+                            .map(group =>
+                              group in classificationAliases
+                                ? classificationAliases?.[group]?.short_name ||
+                                  classificationAliases?.[group]?.name ||
+                                  group
+                                : group
+                            )
+                            .join(' | ')}
+                      </div>
+                    ) : (
+                      <Skeleton />
+                    )}
                   </TableCell>
                 </ClickRow>
                 <TableRow sx={{ height: '62px' }}>

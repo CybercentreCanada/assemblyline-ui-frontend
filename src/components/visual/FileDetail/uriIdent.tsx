@@ -1,7 +1,9 @@
 import { Grid, Skeleton, useMediaQuery, useTheme } from '@mui/material';
+import useALContext from 'components/hooks/useALContext';
 import type { File as FileInfo } from 'components/models/base/file';
 import type { Section } from 'components/models/base/result';
 import type { KeyValueBody, OrderedKeyValueBody } from 'components/models/base/result_body';
+import Classification from 'components/visual/Classification';
 import { ImageInlineBody } from 'components/visual/image_inline';
 import SectionContainer from 'components/visual/SectionContainer';
 import React from 'react';
@@ -62,6 +64,7 @@ const WrappedURIIdentificationSection: React.FC<URIIdentificationSectionProps> =
 }) => {
   const { t } = useTranslation(['fileDetail']);
   const theme = useTheme();
+  const { c12nDef } = useALContext();
   const sp2 = theme.spacing(2);
   const upSM = useMediaQuery(theme.breakpoints.up('sm'));
 
@@ -81,6 +84,25 @@ const WrappedURIIdentificationSection: React.FC<URIIdentificationSectionProps> =
       }}
     >
       <Grid container flex={1}>
+        {c12nDef.enforce && (
+          <>
+            <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
+              <span
+                style={{
+                  fontWeight: 500,
+                  marginRight: theme.spacing(0.5),
+                  display: 'flex'
+                }}
+              >
+                {t('uri_classification')}
+              </span>
+            </Grid>
+            <Grid size={{ xs: 8, sm: 9, lg: 10 }} style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}>
+              <Classification type="text" format="long" c12n={fileinfo ? fileinfo.classification : null} />
+            </Grid>
+          </>
+        )}
+
         <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
           <span style={{ fontWeight: 500, marginRight: theme.spacing(0.5), display: 'flex' }}>{t('scheme')}</span>
         </Grid>
