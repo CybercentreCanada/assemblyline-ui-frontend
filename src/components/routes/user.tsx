@@ -405,9 +405,9 @@ function User({ username = null }: UserProps) {
                         options={[]}
                         value={user.groups.map(group =>
                           group in classificationAliases
-                            ? (classificationAliases?.[group]?.short_name ??
-                              classificationAliases?.[group]?.name ??
-                              group)
+                            ? classificationAliases?.[group]?.short_name ||
+                              classificationAliases?.[group]?.name ||
+                              group
                             : group
                         )}
                         renderInput={params => <TextField {...params} />}
