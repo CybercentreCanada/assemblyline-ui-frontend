@@ -39,7 +39,7 @@ import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import CustomChip from 'components/visual/CustomChip';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
-import React, { memo, useRef, useState } from 'react';
+import React, { memo, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useLocation, useNavigate, useParams } from 'react-router';
 
@@ -83,7 +83,7 @@ function User({ username = null }: UserProps) {
   const inputRef = useRef(null);
   const navigate = useNavigate();
   const { apiCall } = useMyAPI();
-  const { user: currentUser, configuration } = useALContext();
+  const { user: currentUser, configuration, classificationAliases } = useALContext();
   const { showErrorMessage, showSuccessMessage, showWarningMessage } = useMySnackbar();
 
   const [drawerType, setDrawerType] = useState(null);
@@ -100,6 +100,8 @@ function User({ username = null }: UserProps) {
   const sp1 = theme.spacing(1);
   const sp4 = theme.spacing(4);
   const sp6 = theme.spacing(6);
+
+  const classificationAliasesValues = useMemo(() => Object.entries(classificationAliases), [classificationAliases]);
 
   const doDeleteUser = () => {
     apiCall({
@@ -385,14 +387,26 @@ function User({ username = null }: UserProps) {
                         multiple
                         freeSolo
                         options={[]}
-                        value={user.groups}
+                        value={user.groups.map(group =>
+                          group in classificationAliases ? (classificationAliases?.[group]?.name ?? group) : group
+                        )}
                         renderInput={params => <TextField {...params} />}
                         renderTags={(value, getTagProps) =>
                           value.map((option, index) => (
                             <Chip key={index} variant="outlined" label={option} {...getTagProps({ index })} />
                           ))
                         }
-                        onChange={(_, value) => setGroups([...new Set(value.map(x => x.toUpperCase()))])}
+                        onChange={(_, value) =>
+                          setGroups([
+                            ...new Set(
+                              value.map(group =>
+                                (
+                                  classificationAliasesValues.find(v => v?.[1]?.name === group)?.[0] ?? group
+                                ).toUpperCase()
+                              )
+                            )
+                          ])
+                        }
                       />
                     </>
                   ),
@@ -646,7 +660,20 @@ function User({ username = null }: UserProps) {
                   {isXS ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('groups')}</TableCell>}
                   <TableCell width="100%">
                     {!isXS ? null : <Typography variant="caption">{t('groups')}</Typography>}
-                    {user ? <div>{user.groups.join(' | ')}</div> : <Skeleton />}
+                    {user ? (
+                      <div>
+                        {user.groups &&
+                          user.groups
+                            .map(group =>
+                              group in classificationAliases
+                                ? (classificationAliases?.[group]?.short_name ?? group)
+                                : group
+                            )
+                            .join(' | ')}
+                      </div>
+                    ) : (
+                      <Skeleton />
+                    )}
                   </TableCell>
                 </ClickRow>
                 <TableRow sx={{ height: '62px' }}>

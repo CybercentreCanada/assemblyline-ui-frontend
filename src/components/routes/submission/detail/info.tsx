@@ -62,12 +62,11 @@ const WrappedInfoSection: React.FC<Props> = ({ submission }) => {
                 </Grid>
                 <Grid size={{ xs: 8, sm: 9, lg: 10 }} style={{ wordBreak: 'break-word' }}>
                   {submission ? (
-                    (() =>
-                      submission.params.groups
-                        .map(group =>
-                          group in classificationAliases ? classificationAliases?.[group]?.short_name : group
-                        )
-                        .join(' | '))()
+                    submission.params.groups
+                      .map(group =>
+                        group in classificationAliases ? (classificationAliases?.[group]?.name ?? group) : group
+                      )
+                      .join(' | ')
                   ) : (
                     <Skeleton />
                   )}
