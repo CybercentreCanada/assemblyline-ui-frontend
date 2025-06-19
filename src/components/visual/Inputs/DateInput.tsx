@@ -43,199 +43,198 @@ export type DateInputProps = Omit<TextFieldProps, 'error' | 'value' | 'onChange'
   onError?: (error: string) => void;
 };
 
-export const DateInput: React.FC<DateInputProps> = React.memo(
-  ({
-    defaultDateOffset = null,
-    disabled,
-    endAdornment = null,
-    error = () => null,
-    errorProps = null,
-    helperText = null,
-    helperTextProps = null,
-    id: idProp = null,
-    label: labelProp = null,
-    labelProps,
-    loading = false,
-    maxDateToday = false,
-    minDateTomorrow = false,
-    placeholder = null,
-    preventDisabledColor = false,
-    preventRender = false,
-    readOnly = false,
-    reset = false,
-    resetProps = null,
-    tiny = false,
-    tooltip = null,
-    tooltipProps = null,
-    value,
-    onBlur = () => null,
-    onChange = () => null,
-    onError = () => null,
-    onFocus = () => null,
-    onReset = () => null,
-    ...textFieldProps
-  }: DateInputProps) => {
-    const theme = useTheme();
+const WrappedDateInput = ({
+  defaultDateOffset = null,
+  disabled,
+  endAdornment = null,
+  error = () => null,
+  errorProps = null,
+  helperText = null,
+  helperTextProps = null,
+  id: idProp = null,
+  label: labelProp = null,
+  labelProps,
+  loading = false,
+  maxDateToday = false,
+  minDateTomorrow = false,
+  placeholder = null,
+  preventDisabledColor = false,
+  preventRender = false,
+  readOnly = false,
+  reset = false,
+  resetProps = null,
+  tiny = false,
+  tooltip = null,
+  tooltipProps = null,
+  value = '',
+  onBlur = () => null,
+  onChange = () => null,
+  onError = () => null,
+  onFocus = () => null,
+  onReset = () => null,
+  ...textFieldProps
+}: DateInputProps) => {
+  const theme = useTheme();
 
-    const [tempDate, setTempDate] = useState<Moment>(null);
-    const [tomorrow, setTomorrow] = useState<Moment>(null);
-    const [today, setToday] = useState<Moment>(null);
-    const [focused, setFocused] = useState<boolean>(false);
+  const [tempDate, setTempDate] = useState<Moment>(null);
+  const [tomorrow, setTomorrow] = useState<Moment>(null);
+  const [today, setToday] = useState<Moment>(null);
+  const [focused, setFocused] = useState<boolean>(false);
 
-    const label = useMemo<string>(() => labelProp ?? '\u00A0', [labelProp]);
-    const id = useMemo<string>(() => (idProp || label).replaceAll(' ', '-'), [idProp, label]);
+  const label = useMemo<string>(() => labelProp ?? '\u00A0', [labelProp]);
+  const id = useMemo<string>(() => (idProp || label).replaceAll(' ', '-'), [idProp, label]);
+  const errorValue = useMemo<string>(
+    () => error(tempDate && tempDate.isValid() ? `${tempDate.format('YYYY-MM-DDThh:mm:ss.SSSSSS')}Z` : null),
+    [error, tempDate]
+  );
 
-    const errorValue = useMemo<string>(
-      () => error(tempDate && tempDate.isValid() ? `${tempDate.format('YYYY-MM-DDThh:mm:ss.SSSSSS')}Z` : null),
-      [error, tempDate]
-    );
+  useEffect(() => {
+    const tempTomorrow = new Date();
+    tempTomorrow.setDate(tempTomorrow.getDate() + 1);
+    tempTomorrow.setHours(0, 0, 0, 0);
+    setTomorrow(moment(tempTomorrow));
 
-    useEffect(() => {
-      const tempTomorrow = new Date();
-      tempTomorrow.setDate(tempTomorrow.getDate() + 1);
-      tempTomorrow.setHours(0, 0, 0, 0);
-      setTomorrow(moment(tempTomorrow));
+    const tempToday = new Date();
+    tempToday.setDate(tempToday.getDate() + 1);
+    tempToday.setHours(0, 0, 0, 0);
+    setToday(moment(tempToday));
+  }, []);
 
-      const tempToday = new Date();
-      tempToday.setDate(tempToday.getDate() + 1);
-      tempToday.setHours(0, 0, 0, 0);
-      setToday(moment(tempToday));
-    }, []);
+  useEffect(() => {
+    if (value === null && defaultDateOffset) {
+      const defaultDate = new Date();
+      defaultDate.setDate(defaultDate.getDate() + defaultDateOffset);
+      defaultDate.setHours(0, 0, 0, 0);
+      setTempDate(moment(defaultDate));
+    } else if (value) {
+      setTempDate(moment(value));
+    } else if (value === undefined || value === null) {
+      setTempDate(null);
+    }
+  }, [defaultDateOffset, value]);
 
-    useEffect(() => {
-      if (value === null && defaultDateOffset) {
-        const defaultDate = new Date();
-        defaultDate.setDate(defaultDate.getDate() + defaultDateOffset);
-        defaultDate.setHours(0, 0, 0, 0);
-        setTempDate(moment(defaultDate));
-      } else if (value) {
-        setTempDate(moment(value));
-      } else if (value === undefined || value === null) {
-        setTempDate(null);
-      }
-    }, [defaultDateOffset, value]);
+  return preventRender ? null : (
+    <LocalizationProvider dateAdapter={AdapterMoment}>
+      <div style={{ textAlign: 'left' }}>
+        <Tooltip title={tooltip} {...tooltipProps}>
+          <Typography
+            component={InputLabel}
+            htmlFor={id}
+            color={!disabled && errorValue ? 'error' : focused ? 'primary' : 'textSecondary'}
+            variant="body2"
+            whiteSpace="nowrap"
+            gutterBottom
+            sx={{
+              ...(disabled &&
+                !preventDisabledColor && {
+                  WebkitTextFillColor:
+                    theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.38)'
+                })
+            }}
+            {...labelProps}
+            children={label}
+          />
+        </Tooltip>
 
-    return preventRender ? null : (
-      <LocalizationProvider dateAdapter={AdapterMoment}>
-        <div style={{ textAlign: 'left' }}>
-          <Tooltip title={tooltip} {...tooltipProps}>
-            <Typography
-              component={InputLabel}
-              htmlFor={id}
-              color={!disabled && errorValue ? 'error' : focused ? 'primary' : 'textSecondary'}
-              variant="body2"
-              whiteSpace="nowrap"
-              gutterBottom
-              sx={{
-                ...(disabled &&
-                  !preventDisabledColor && {
-                    WebkitTextFillColor:
-                      theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.38)'
-                  })
+        <FormControl fullWidth>
+          {loading ? (
+            <Skeleton sx={{ height: '40px', transform: 'unset', ...(tiny && { height: '28px' }) }} />
+          ) : (
+            <MuiDatePicker
+              value={tempDate}
+              readOnly={readOnly}
+              minDate={minDateTomorrow ? tomorrow : null}
+              maxDate={maxDateToday ? today : null}
+              disabled={disabled}
+              onChange={newValue => {
+                setTempDate(newValue);
+
+                const parsedValue =
+                  newValue && newValue.isValid() ? `${newValue.format('YYYY-MM-DDThh:mm:ss.SSSSSS')}Z` : null;
+
+                onChange(null, parsedValue);
+
+                const err = error(parsedValue);
+                if (err) onError(err);
               }}
-              {...labelProps}
-              children={label}
-            />
-          </Tooltip>
-
-          <FormControl fullWidth>
-            {loading ? (
-              <Skeleton sx={{ height: '40px', transform: 'unset', ...(tiny && { height: '28px' }) }} />
-            ) : (
-              <MuiDatePicker
-                value={tempDate}
-                readOnly={readOnly}
-                minDate={minDateTomorrow ? tomorrow : null}
-                maxDate={maxDateToday ? today : null}
-                disabled={disabled}
-                onChange={newValue => {
-                  setTempDate(newValue);
-
-                  const parsedValue =
-                    newValue && newValue.isValid() ? `${newValue.format('YYYY-MM-DDThh:mm:ss.SSSSSS')}Z` : null;
-
-                  onChange(null, parsedValue);
-
-                  const err = error(parsedValue);
-                  if (err) onError(err);
-                }}
-                slotProps={{
-                  textField: {
-                    id: id,
-                    size: 'small',
-                    error: !!errorValue && !disabled,
-                    disabled: disabled,
-                    helperText: disabled ? null : errorValue || helperText,
-                    FormHelperTextProps: disabled
-                      ? null
-                      : errorValue
+              slotProps={{
+                textField: {
+                  id: id,
+                  size: 'small',
+                  error: !!errorValue && !disabled,
+                  disabled: disabled,
+                  helperText: disabled ? null : errorValue || helperText,
+                  ...(readOnly && !disabled && { focused: null }),
+                  ...textFieldProps,
+                  FormHelperTextProps: disabled
+                    ? null
+                    : errorValue
+                      ? {
+                          variant: 'outlined',
+                          sx: { color: theme.palette.error.main, ...errorProps?.sx },
+                          ...errorProps
+                        }
+                      : helperText
                         ? {
                             variant: 'outlined',
-                            sx: { color: theme.palette.error.main, ...errorProps?.sx },
+                            sx: { color: theme.palette.text.secondary, ...helperTextProps?.sx },
                             ...errorProps
                           }
-                        : helperText
-                          ? {
-                              variant: 'outlined',
-                              sx: { color: theme.palette.text.secondary, ...helperTextProps?.sx },
-                              ...errorProps
-                            }
-                          : null,
-                    sx: {
-                      '& .MuiInputBase-input': {
-                        ...(tiny && { fontSize: '14px' }),
-                        ...(readOnly && !disabled && { cursor: 'default' })
-                      },
-                      '& .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline': {
-                        ...(readOnly &&
-                          !disabled && {
-                            borderColor:
-                              theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.23)' : 'rgba(0, 0, 0, 0.23)'
-                          })
-                      }
+                        : null,
+                  sx: {
+                    '& .MuiInputBase-input': {
+                      ...(tiny && { fontSize: '14px' }),
+                      ...(readOnly && !disabled && { cursor: 'default' })
                     },
-                    ...(readOnly && !disabled && { focused: null }),
-                    ...textFieldProps,
-                    onFocus: (event, ...other) => {
-                      setFocused(!readOnly && !disabled && document.activeElement === event.target);
-                      onFocus(event, ...other);
-                    },
-                    onBlur: (event, ...other) => {
-                      setFocused(false);
-                      onBlur(event, ...other);
-                    },
-                    inputProps: {
-                      ...(tiny && { sx: { padding: '2.5px 4px 2.5px 8px' } })
-                    },
-                    InputProps: {
-                      placeholder: placeholder,
-
-                      endAdornment: (
-                        <>
-                          {loading || !reset || disabled || readOnly ? null : (
-                            <InputAdornment
-                              position="end"
-                              sx={{ paddingLeft: theme.spacing(0.5), marginRight: theme.spacing(-0.5) }}
-                            >
-                              <ResetInput
-                                id={id}
-                                preventRender={loading || !reset || disabled || readOnly}
-                                tiny={tiny}
-                                onReset={onReset}
-                                {...resetProps}
-                              />
-                            </InputAdornment>
-                          )}
-                        </>
-                      )
+                    '& .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline': {
+                      ...(readOnly &&
+                        !disabled && {
+                          borderColor:
+                            theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.23)' : 'rgba(0, 0, 0, 0.23)'
+                        })
                     }
+                  },
+                  onFocus: (event, ...other) => {
+                    setFocused(!readOnly && !disabled && document.activeElement === event.target);
+                    onFocus(event, ...other);
+                  },
+                  onBlur: (event, ...other) => {
+                    setFocused(false);
+                    onBlur(event, ...other);
+                  },
+                  inputProps: {
+                    ...(tiny && { sx: { padding: '2.5px 4px 2.5px 8px' } })
+                  },
+                  InputProps: {
+                    placeholder: placeholder,
+
+                    endAdornment: (
+                      <>
+                        {loading || !reset || disabled || readOnly ? null : (
+                          <InputAdornment
+                            position="end"
+                            sx={{ paddingLeft: theme.spacing(0.5), marginRight: theme.spacing(-0.5) }}
+                          >
+                            <ResetInput
+                              id={id}
+                              preventRender={loading || !reset || disabled || readOnly}
+                              tiny={tiny}
+                              onReset={onReset}
+                              {...resetProps}
+                            />
+                          </InputAdornment>
+                        )}
+                      </>
+                    )
                   }
-                }}
-              />
-            )}
-          </FormControl>
-        </div>
-      </LocalizationProvider>
-    );
-  }
-);
+                }
+              }}
+            />
+          )}
+        </FormControl>
+      </div>
+    </LocalizationProvider>
+  );
+};
+
+export const DateInput: React.FC<DateInputProps> = React.memo(WrappedDateInput);

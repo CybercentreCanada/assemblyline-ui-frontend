@@ -139,7 +139,7 @@ export default tseslint.config(
     rules: {
       ...jsxA11yPlugin.configs.recommended.rules,
       'jsx-a11y/click-events-have-key-events': 'warn',
-      'jsx-a11y/no-autofocus': 'warn',
+      'jsx-a11y/no-autofocus': 'off',
       'jsx-a11y/no-noninteractive-element-interactions': 'warn',
       'jsx-a11y/no-noninteractive-tabindex': 'warn',
       'jsx-a11y/no-static-element-interactions': 'warn'
