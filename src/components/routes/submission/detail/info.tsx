@@ -64,7 +64,11 @@ const WrappedInfoSection: React.FC<Props> = ({ submission }) => {
                   {submission ? (
                     submission.params.groups
                       .map(group =>
-                        group in classificationAliases ? (classificationAliases?.[group]?.name ?? group) : group
+                        group in classificationAliases
+                          ? (classificationAliases?.[group]?.short_name ??
+                            classificationAliases?.[group]?.name ??
+                            group)
+                          : group
                       )
                       .join(' | ')
                   ) : (
