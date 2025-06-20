@@ -436,7 +436,7 @@ const WrappedClassificationInput = ({
                                     >
                                       <ListItemText
                                         style={{ textAlign: 'center' }}
-                                        primary={applyAliases(group, classificationAliases), format}
+                                        primary={applyAliases(group, classificationAliases, format)}
                                       />
                                     </ListItemButton>
                                   ))}
