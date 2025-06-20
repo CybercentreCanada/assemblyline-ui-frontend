@@ -26,6 +26,7 @@
   "ignore_ssl": "Ignore SSL Errors",
   "ignore_ssl_used": "SSL Errors will be ignored when connecting to this source",
   "name": "Source Name",
+  "name.error": "Source name cannot be empty",
   "network": "Network",
   "no_sources": "There are currently no signature sources for this service.",
   "override_classification": "Override signature-defined classification with source classification",
@@ -49,6 +50,7 @@
   "update_all.response.success": "All sources for the following service were triggered for update",
   "update_interval": "Update interval",
   "uri": "URI",
+  "uri.error": "URI cannot be empty",
   "use_managed_identity": "Use managed identity",
   "username": "Username",
   "view_signatures": "View Signatures"

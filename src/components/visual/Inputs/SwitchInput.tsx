@@ -19,7 +19,7 @@ export type SwitchInputProps = Omit<ButtonProps, 'onChange' | 'onClick' | 'value
   errorProps?: FormHelperTextProps;
   helperText?: string;
   helperTextProps?: FormHelperTextProps;
-  label: string;
+  label?: string;
   labelProps?: TypographyProps;
   loading?: boolean;
   preventDisabledColor?: boolean;
@@ -27,6 +27,7 @@ export type SwitchInputProps = Omit<ButtonProps, 'onChange' | 'onClick' | 'value
   readOnly?: boolean;
   reset?: boolean;
   resetProps?: ResetInputProps;
+  showOverflow?: boolean;
   tiny?: boolean;
   tooltip?: TooltipProps['title'];
   tooltipProps?: Omit<TooltipProps, 'children' | 'title'>;
@@ -45,7 +46,7 @@ export const SwitchInput: React.FC<SwitchInputProps> = React.memo(
     helperText = null,
     helperTextProps = null,
     id: idProp = null,
-    label = null,
+    label: labelProp = null,
     labelProps = null,
     loading = false,
     preventDisabledColor = false,
@@ -53,19 +54,23 @@ export const SwitchInput: React.FC<SwitchInputProps> = React.memo(
     readOnly = false,
     reset = false,
     resetProps = null,
+    showOverflow = false,
     tiny = false,
     tooltip = null,
     tooltipProps = null,
     value = false,
+    onBlur = () => null,
     onChange = () => null,
-    onReset = () => null,
     onError = () => null,
+    onFocus = () => null,
+    onReset = () => null,
     ...buttonProps
   }: SwitchInputProps) => {
     const theme = useTheme();
 
     const [focused, setFocused] = useState<boolean>(false);
 
+    const label = useMemo<string>(() => labelProp ?? '\u00A0', [labelProp]);
     const id = useMemo<string>(() => (idProp || label).replaceAll(' ', '-'), [idProp, label]);
 
     const errorValue = useMemo<string>(() => error(value), [error, value]);
@@ -86,8 +91,14 @@ export const SwitchInput: React.FC<SwitchInputProps> = React.memo(
               const err = error(!value);
               if (err) onError(err);
             }}
-            onFocus={event => setFocused(document.activeElement === event.target)}
-            onBlur={() => setFocused(false)}
+            onFocus={(event, ...other) => {
+              setFocused(!readOnly && !disabled && document.activeElement === event.target);
+              onFocus(event, ...other);
+            }}
+            onBlur={(event, ...other) => {
+              setFocused(false);
+              onBlur(event, ...other);
+            }}
             sx={{
               justifyContent: 'start',
               color: 'inherit',
@@ -123,7 +134,9 @@ export const SwitchInput: React.FC<SwitchInputProps> = React.memo(
                     disableTouchRipple
                     size="small"
                     sx={{
-                      '&>.Mui-disabled': { ...((preventDisabledColor || readOnly) && { color: 'inherit !important' }) }
+                      '&>.Mui-disabled': {
+                        ...((preventDisabledColor || readOnly) && { color: 'inherit !important' })
+                      }
                     }}
                   />
                 )
@@ -133,7 +146,13 @@ export const SwitchInput: React.FC<SwitchInputProps> = React.memo(
                 <div
                   style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', columnGap: theme.spacing(1) }}
                 >
-                  <span style={{ textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden' }}>{label}</span>
+                  <span
+                    style={{
+                      ...(!showOverflow && { textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden' })
+                    }}
+                  >
+                    {label}
+                  </span>
                   {endAdornment}
                 </div>
               }
@@ -141,18 +160,16 @@ export const SwitchInput: React.FC<SwitchInputProps> = React.memo(
                 typography: {
                   color: !disabled && errorValue ? 'error' : focused ? 'primary' : 'textPrimary',
                   marginLeft: theme.spacing(1),
-                  overflow: 'hidden',
                   textAlign: 'start',
-                  textOverflow: 'ellipsis',
                   variant: 'body2',
-                  whiteSpace: 'nowrap',
                   width: '100%',
+                  ...(!showOverflow && { textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden' }),
                   ...((preventDisabledColor || readOnly) && { color: 'inherit !important' }),
                   ...labelProps
                 }
               }}
               sx={{
-                overflow: 'hidden',
+                ...(!showOverflow && { overflow: 'hidden' }),
                 ...(!(loading || !reset || disabled || readOnly) && { paddingRight: theme.spacing(2) })
               }}
             />
@@ -167,7 +184,16 @@ export const SwitchInput: React.FC<SwitchInputProps> = React.memo(
             helperTextProps={helperTextProps}
           />
 
-          <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, display: 'flex', alignItems: 'center' }}>
+          <div
+            style={{
+              position: 'absolute',
+              right: theme.spacing(0.75),
+              top: 0,
+              bottom: 0,
+              display: 'flex',
+              alignItems: 'center'
+            }}
+          >
             <div>
               <ResetInput
                 id={id}
