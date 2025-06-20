@@ -13,16 +13,46 @@ import { useTranslation } from 'react-i18next';
 
 type Props = {
   submission: ParsedSubmission;
+  serviceCategories: [string, string[]][];
 };
 
-const WrappedInfoSection: React.FC<Props> = ({ submission }) => {
+const WrappedInfoSection: React.FC<Props> = ({ submission, serviceCategories }) => {
   const { t } = useTranslation(['submissionDetail']);
   const theme = useTheme();
   const { classificationAliases } = useALContext();
-
   const [open, setOpen] = useState<boolean>(true);
 
   const sp2 = theme.spacing(2);
+
+  // Calculate selected services by combining selected and rescan services, excluding any that are in the excluded list
+  const selectedServices = useMemo(() => {
+    if (!submission) return [];
+    const selected = new Set([...submission.params.services.selected, ...submission.params.services.rescan]);
+    const excluded = new Set(submission.params.services.excluded);
+
+    // Account for services that were excluded but the category is still selected
+    serviceCategories.forEach(tuple => {
+      const [category, services] = tuple;
+
+      if (submission.params.services.excluded.includes(category) && selected.has(category)) {
+        // Remove category from selected
+        selected.delete(category);
+      }
+
+      // If the category is selected, check to see if any of its services are excluded
+      else if (!Array.from(services).every(service => excluded.has(service))) {
+        // If not all services are excluded, substitute the category for the services that should be selected
+        selected.delete(category);
+        services.forEach(service => {
+          if (!excluded.has(service)) {
+            selected.add(service);
+          }
+        });
+      }
+    });
+
+    return Array.from(selected);
+  }, [submission, serviceCategories]);
 
   return (
     <div style={{ paddingTop: sp2 }}>
@@ -79,18 +109,7 @@ const WrappedInfoSection: React.FC<Props> = ({ submission }) => {
                 </Grid>
                 <Grid size={{ xs: 8, sm: 9, lg: 10 }} style={{ wordBreak: 'break-word' }}>
                   {submission ? (
-                    submission.params.services.rescan ? (
-                      [
-                        ...submission.params.services.selected,
-                        ...submission.params.services.rescan.filter(
-                          word => submission.params.services.selected.indexOf(word) === -1
-                        )
-                      ]
-                        .sort((a: string, b: string) => a.localeCompare(b))
-                        .join(' | ')
-                    ) : (
-                      submission.params.services.selected.sort((a: string, b: string) => a.localeCompare(b)).join(' | ')
-                    )
+                    selectedServices.sort((a: string, b: string) => a.localeCompare(b)).join(' | ')
                   ) : (
                     <Skeleton />
                   )}

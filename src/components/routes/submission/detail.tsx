@@ -1413,8 +1413,10 @@ function WrappedSubmissionDetail() {
       />
 
       <div style={{ textAlign: 'left' }}>
-        <InfoSection submission={submission} />
-
+        <InfoSection
+          submission={submission}
+          serviceCategories={configuration ? configuration['services.categories'] : []}
+        />
         {filtered && (
           <div style={{ paddingBottom: theme.spacing(2), paddingTop: theme.spacing(2) }}>
             <Typography variant="subtitle1">
@@ -1422,7 +1424,6 @@ function WrappedSubmissionDetail() {
             </Typography>
           </div>
         )}
-
         {partial && (
           <div style={{ paddingBottom: theme.spacing(2), paddingTop: theme.spacing(2) }}>
             <Typography variant="subtitle1">
@@ -1430,7 +1431,6 @@ function WrappedSubmissionDetail() {
             </Typography>
           </div>
         )}
-
         <MetaSection
           metadata={submission ? submission.metadata : null}
           classification={submission ? submission.classification : null}
@@ -1447,7 +1447,6 @@ function WrappedSubmissionDetail() {
           attack_matrix={summary ? summary.attack_matrix : null}
           force={submission && submission.max_score < 0}
         />
-
         {summary &&
           Object.keys(summary.tags).length !== 0 &&
           Object.keys(summary.tags).map(
@@ -1461,15 +1460,12 @@ function WrappedSubmissionDetail() {
                 />
               )
           )}
-
         {submission && submission.state === 'completed' && Object.keys(submission.errors).length !== 0 && (
           <ErrorSection sid={id} errors={submission.errors} />
         )}
-
         {submission && submission.state !== 'completed' && liveErrorKeys.length !== 0 && liveErrors !== null && (
           <ErrorSection sid={id} errors={liveErrors} />
         )}
-
         <FileTreeSection tree={tree} sid={id} baseFiles={baseFiles} force={submission && submission.max_score < 0} />
       </div>
     </PageCenter>
