@@ -405,8 +405,8 @@ function User({ username = null }: UserProps) {
                         options={[]}
                         value={user.groups.map(group =>
                           group in classificationAliases
-                            ? classificationAliases?.[group]?.short_name ||
-                              classificationAliases?.[group]?.name ||
+                            ? classificationAliases?.[group]?.name ||
+                              classificationAliases?.[group]?.short_name ||
                               group
                             : group
                         )}
@@ -690,8 +690,8 @@ function User({ username = null }: UserProps) {
                           user.groups
                             .map(group =>
                               group in classificationAliases
-                                ? classificationAliases?.[group]?.short_name ||
-                                  classificationAliases?.[group]?.name ||
+                                ? classificationAliases?.[group]?.name ||
+                                  classificationAliases?.[group]?.short_name ||
                                   group
                                 : group
                             )

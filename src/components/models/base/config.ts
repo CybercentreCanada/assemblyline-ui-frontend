@@ -203,7 +203,7 @@ export type Retrohunt = {
 /** Services Configuration */
 export type Services = {
   /** List of categories a service can be assigned to */
-  categories: string[];
+  categories: [string, string[]][];
 
   /** Default update channel to be used for new services */
   preferred_update_channel: string;
