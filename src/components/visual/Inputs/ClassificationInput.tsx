@@ -383,7 +383,7 @@ const WrappedClassificationInput = ({
                                   >
                                     <ListItemText
                                       style={{ textAlign: 'center' }}
-                                      primary={applyAliases(grp.name, classificationAliases)}
+                                      primary={applyAliases(grp.name, classificationAliases, format)}
                                     />
                                   </ListItemButton>
                                 ))}
@@ -404,7 +404,8 @@ const WrappedClassificationInput = ({
                                       style={{ textAlign: 'center' }}
                                       primary={applyAliases(
                                         dynGroup || currentUser.dynamic_group,
-                                        classificationAliases
+                                        classificationAliases,
+                                        format
                                       )}
                                     />
                                   </ListItemButton>
@@ -435,7 +436,7 @@ const WrappedClassificationInput = ({
                                     >
                                       <ListItemText
                                         style={{ textAlign: 'center' }}
-                                        primary={applyAliases(group, classificationAliases)}
+                                        primary={applyAliases(group, classificationAliases, format)}
                                       />
                                     </ListItemButton>
                                   ))}
