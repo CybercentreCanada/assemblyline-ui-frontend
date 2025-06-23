@@ -29,6 +29,8 @@ export type DateInputProps = Omit<TextFieldProps, 'error' | 'value' | 'onChange'
   loading?: boolean;
   maxDateToday?: boolean;
   minDateTomorrow?: boolean;
+  monospace?: boolean;
+  password?: boolean;
   placeholder?: TextFieldProps['InputProps']['placeholder'];
   preventDisabledColor?: boolean;
   preventRender?: boolean;
@@ -58,6 +60,8 @@ const WrappedDateInput = ({
   loading = false,
   maxDateToday = false,
   minDateTomorrow = false,
+  monospace = false,
+  password = false,
   placeholder = null,
   preventDisabledColor = false,
   preventRender = false,
@@ -82,6 +86,7 @@ const WrappedDateInput = ({
   const [tomorrow, setTomorrow] = useState<Moment>(null);
   const [today, setToday] = useState<Moment>(null);
   const [focused, setFocused] = useState<boolean>(false);
+  const [showPassword, setShowPassword] = useState<boolean>(true);
 
   const label = useMemo<string>(() => labelProp ?? '\u00A0', [labelProp]);
   const id = useMemo<string>(() => (idProp || label).replaceAll(' ', '-'), [idProp, label]);
@@ -186,7 +191,8 @@ const WrappedDateInput = ({
                   sx: {
                     '& .MuiInputBase-input': {
                       ...(tiny && { fontSize: '14px' }),
-                      ...(readOnly && !disabled && { cursor: 'default' })
+                      ...(readOnly && !disabled && { cursor: 'default' }),
+                      ...(monospace && { fontFamily: 'monospace' })
                     },
                     '& .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline': {
                       ...(readOnly &&

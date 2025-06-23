@@ -21,6 +21,8 @@ export type SliderInputProps = Omit<SliderProps, 'value' | 'onChange'> & {
   label?: string;
   labelProps?: TypographyProps;
   loading?: boolean;
+  monospace?: boolean;
+  password?: boolean;
   preventDisabledColor?: boolean;
   preventRender?: boolean;
   readOnly?: boolean;
@@ -46,6 +48,8 @@ export const WrappedSliderInput = ({
   label: labelProp = null,
   labelProps,
   loading,
+  monospace = false,
+  password = false,
   preventDisabledColor = false,
   preventRender,
   readOnly = false,

@@ -18,6 +18,7 @@ import {
   useTheme
 } from '@mui/material';
 import { HelperText } from 'components/visual/Inputs/components/HelperText';
+import { PasswordInput } from 'components/visual/Inputs/components/PasswordInput';
 import type { ResetInputProps } from 'components/visual/Inputs/components/ResetInput';
 import { ResetInput } from 'components/visual/Inputs/components/ResetInput';
 import { Tooltip } from 'components/visual/Tooltip';
@@ -37,7 +38,9 @@ export type RadioInputProps<O extends Option[] = []> = {
   label?: string;
   labelProps?: TypographyProps;
   loading?: boolean;
+  monospace?: boolean;
   options: O;
+  password?: boolean;
   placeholder?: TextFieldProps['InputProps']['placeholder'];
   preventDisabledColor?: boolean;
   preventRender?: boolean;
@@ -70,7 +73,9 @@ const WrappedRadioInput = <O extends Option[]>({
   label: labelProp = null,
   labelProps,
   loading = false,
+  monospace = false,
   options = null,
+  password = false,
   placeholder = null,
   preventDisabledColor = false,
   preventRender = false,
@@ -93,6 +98,7 @@ const WrappedRadioInput = <O extends Option[]>({
   const theme = useTheme();
 
   const [focused, setFocused] = useState<boolean>(false);
+  const [showPassword, setShowPassword] = useState<boolean>(true);
 
   const label = useMemo<string>(() => labelProp ?? '\u00A0', [labelProp]);
   const id = useMemo<string>(() => (idProp || label).replaceAll(' ', '-'), [idProp, label]);
@@ -199,7 +205,15 @@ const WrappedRadioInput = <O extends Option[]>({
                   >
                     <span
                       style={{
-                        ...(!showOverflow && { textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden' })
+                        ...(!showOverflow && { textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden' }),
+                        ...(monospace && { fontFamily: 'monospace' }),
+                        ...(password &&
+                          showPassword && {
+                            fontFamily: 'password',
+                            WebkitTextSecurity: 'disc',
+                            MozTextSecurity: 'disc',
+                            textSecurity: 'disc'
+                          })
                       }}
                     >
                       {option?.label}
@@ -248,6 +262,13 @@ const WrappedRadioInput = <O extends Option[]>({
             alignItems: 'center'
           }}
         >
+          <PasswordInput
+            id={id}
+            preventRender={loading || !password || disabled || readOnly}
+            tiny={tiny}
+            showPassword={showPassword}
+            onShowPassword={() => setShowPassword(p => !p)}
+          />
           <ResetInput
             id={id}
             preventRender={loading || !reset || disabled || readOnly}

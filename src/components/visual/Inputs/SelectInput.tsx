@@ -21,6 +21,7 @@ import {
   useTheme
 } from '@mui/material';
 import { HelperText } from 'components/visual/Inputs/components/HelperText';
+import { PasswordInput } from 'components/visual/Inputs/components/PasswordInput';
 import type { ResetInputProps } from 'components/visual/Inputs/components/ResetInput';
 import { ResetInput } from 'components/visual/Inputs/components/ResetInput';
 import { Tooltip } from 'components/visual/Tooltip';
@@ -45,7 +46,9 @@ export type SelectInputProps<O extends Option[] = []> = Omit<
   label?: string;
   labelProps?: TypographyProps;
   loading?: boolean;
+  monospace?: boolean;
   options: O;
+  password?: boolean;
   placeholder?: TextFieldProps['InputProps']['placeholder'];
   preventDisabledColor?: boolean;
   preventRender?: boolean;
@@ -75,7 +78,9 @@ const WrappedSelectInput = <O extends Option[]>({
   label: labelProp = null,
   labelProps,
   loading = false,
+  monospace = false,
   options = null,
+  password = false,
   preventDisabledColor = false,
   preventRender = false,
   readOnly = false,
@@ -96,6 +101,7 @@ const WrappedSelectInput = <O extends Option[]>({
   const theme = useTheme();
 
   const [focused, setFocused] = useState<boolean>(false);
+  const [showPassword, setShowPassword] = useState<boolean>(true);
 
   const label = useMemo<string>(() => labelProp ?? '\u00A0', [labelProp]);
   const id = useMemo<string>(() => (idProp || label).replaceAll(' ', '-'), [idProp, label]);
@@ -164,10 +170,29 @@ const WrappedSelectInput = <O extends Option[]>({
                 slotProps={{
                   primary: {
                     sx: { cursor: 'pointer', ...(readOnly && { cursor: 'default', userSelect: 'text' }) },
-                    ...(tiny && { variant: 'body2' })
+                    ...(tiny && { variant: 'body2' }),
+                    ...(monospace && { fontFamily: 'monospace' }),
+                    ...(password &&
+                      showPassword && {
+                        fontFamily: 'password',
+                        WebkitTextSecurity: 'disc',
+                        MozTextSecurity: 'disc',
+                        textSecurity: 'disc'
+                      })
                   }
                 }}
-                sx={{ margin: 0, ...(readOnly && { marginLeft: '6px' }) }}
+                sx={{
+                  margin: 0,
+                  ...(readOnly && { marginLeft: '6px' }),
+                  ...(monospace && { fontFamily: 'monospace' }),
+                  ...(password &&
+                    showPassword && {
+                      fontFamily: 'password',
+                      WebkitTextSecurity: 'disc',
+                      MozTextSecurity: 'disc',
+                      textSecurity: 'disc'
+                    })
+                }}
               />
             )}
             sx={{ textTransform: 'capitalize' }}
@@ -187,24 +212,28 @@ const WrappedSelectInput = <O extends Option[]>({
               onBlur(event, ...other);
             }}
             endAdornment={
-              <>
+              <InputAdornment position="end" style={{ marginRight: theme.spacing(2) }}>
+                {loading || !password || disabled || readOnly ? null : (
+                  <PasswordInput
+                    id={id}
+                    preventRender={loading || !password || disabled || readOnly}
+                    tiny={tiny}
+                    showPassword={showPassword}
+                    onShowPassword={() => setShowPassword(p => !p)}
+                    {...resetProps}
+                  />
+                )}
                 {loading || !reset || disabled || readOnly ? null : (
-                  <InputAdornment position="end" style={{ marginRight: theme.spacing(2) }}>
-                    <ResetInput
-                      id={id}
-                      preventRender={loading || !reset || disabled || readOnly}
-                      tiny={tiny}
-                      onReset={onReset}
-                      {...resetProps}
-                    />
-                  </InputAdornment>
+                  <ResetInput
+                    id={id}
+                    preventRender={loading || !reset || disabled || readOnly}
+                    tiny={tiny}
+                    onReset={onReset}
+                    {...resetProps}
+                  />
                 )}
-                {endAdornment && (
-                  <InputAdornment position="end" style={{ marginRight: theme.spacing(2) }}>
-                    {endAdornment}
-                  </InputAdornment>
-                )}
-              </>
+                {endAdornment}
+              </InputAdornment>
             }
             MenuProps={{ sx: { maxWidth: 'min-content' } }}
             {...selectProps}

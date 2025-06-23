@@ -9,10 +9,11 @@ import type {
 } from '@mui/material';
 import { FormControl, FormHelperText, Skeleton, Typography, useTheme } from '@mui/material';
 import { useAppTheme } from 'commons/components/app/hooks';
+import { PasswordInput } from 'components/visual/Inputs/components/PasswordInput';
 import type { ResetInputProps } from 'components/visual/Inputs/components/ResetInput';
 import { ResetInput } from 'components/visual/Inputs/components/ResetInput';
 import { Tooltip } from 'components/visual/Tooltip';
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 
 export type JSONInputProps = Omit<ReactJsonViewProps, 'src' | 'onAdd' | 'onDelete' | 'onEdit'> & {
   disabled?: boolean;
@@ -25,6 +26,8 @@ export type JSONInputProps = Omit<ReactJsonViewProps, 'src' | 'onAdd' | 'onDelet
   label?: string;
   labelProps?: TypographyProps;
   loading?: boolean;
+  monospace?: boolean;
+  password?: boolean;
   placeholder?: string;
   preventDisabledColor?: boolean;
   preventRender?: boolean;
@@ -53,6 +56,8 @@ const WrappedJSONInput = ({
   label: labelProp = null,
   labelProps,
   loading,
+  monospace = false,
+  password = false,
   placeholder = null,
   preventDisabledColor = false,
   preventRender,
@@ -71,6 +76,8 @@ const WrappedJSONInput = ({
 }: JSONInputProps) => {
   const theme = useTheme();
   const { isDark: isDarkTheme } = useAppTheme();
+
+  const [showPassword, setShowPassword] = useState<boolean>(true);
 
   const label = useMemo<string>(() => labelProp ?? '\u00A0', [labelProp]);
   const id = useMemo<string>(() => (idProp || label).replaceAll(' ', '-'), [idProp, label]);
@@ -190,6 +197,7 @@ const WrappedJSONInput = ({
                   padding: '4px',
                   overflowX: 'auto',
                   width: '100%',
+                  ...(monospace && { fontFamily: 'monospace' }),
                   ...(!tiny
                     ? {
                         minHeight: theme.spacing(5)
@@ -197,7 +205,14 @@ const WrappedJSONInput = ({
                     : {
                         paddingTop: '2px !important',
                         paddingBottom: '2px !important'
-                      })
+                      }),
+                  ...(password &&
+                    showPassword && {
+                      fontFamily: 'password',
+                      WebkitTextSecurity: 'disc',
+                      MozTextSecurity: 'disc',
+                      textSecurity: 'disc'
+                    })
                 }}
               />
 
@@ -210,6 +225,13 @@ const WrappedJSONInput = ({
                   alignItems: 'center'
                 }}
               >
+                <PasswordInput
+                  id={id}
+                  preventRender={loading || !password || disabled || readOnly}
+                  tiny={tiny}
+                  showPassword={showPassword}
+                  onShowPassword={() => setShowPassword(p => !p)}
+                />
                 <ResetInput
                   id={id}
                   preventRender={loading || !reset || disabled || readOnly}

@@ -32,6 +32,8 @@ export type InputsLibraryState = {
       reset: boolean;
       tiny: boolean;
       tooltip: boolean;
+      monospace: boolean;
+      password: boolean;
     };
     values: {
       checkbox: boolean;
@@ -63,7 +65,9 @@ export const INPUTS_LIBRARY_STATE: InputsLibraryState = {
       helperText: false,
       placeholder: false,
       endAdornment: false,
-      tiny: false
+      tiny: false,
+      monospace: false,
+      password: false
     },
     values: {
       checkbox: false,
@@ -2889,6 +2893,452 @@ export const InputsSection = React.memo(() => {
       />
 
       <DemoSection
+        primary="Monospace"
+        secondary={
+          <>
+            <span></span>
+          </>
+        }
+        left={
+          <>
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.text}
+              children={value => (
+                <TextInput
+                  label="Monospace Text Input"
+                  value={value}
+                  monospace
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.text', next)}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.chips}
+              children={value => (
+                <ChipsInput
+                  label="Monospace Chips Input"
+                  value={value}
+                  monospace
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.chips', next)}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.number}
+              children={value => (
+                <NumberInput
+                  label="Monospace Number Input"
+                  value={value}
+                  monospace
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.number', next)}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.select}
+              children={value => (
+                <SelectInput
+                  label="Monospace Select Input"
+                  value={value}
+                  monospace
+                  options={[
+                    { primary: 'Options 1', value: 'option 1' },
+                    { primary: 'Options 2', value: 'option 2' },
+                    { primary: 'Options 3', value: 'option 3' }
+                  ]}
+                  onChange={(event, next: string) => form.setFieldValue('components.inputs.values.select', next)}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.date}
+              children={value => (
+                <DateInput
+                  label="Monospace Date Input"
+                  value={value}
+                  monospace
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.date', next)}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.classification}
+              children={value => (
+                <ClassificationInput
+                  label="Monospace Classification Input"
+                  value={value}
+                  monospace
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.classification', next)}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.textarea}
+              children={value => (
+                <TextAreaInput
+                  label="Monospace Text Area Input"
+                  value={value}
+                  rows={3}
+                  monospace
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.textarea', next)}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.slider}
+              children={value => (
+                <SliderInput
+                  label="Monospace Slider Input"
+                  value={value}
+                  monospace
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.slider', next)}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.checkbox}
+              children={value => (
+                <CheckboxInput
+                  label="Monospace Checkbox Input"
+                  value={value}
+                  monospace
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.checkbox', next)}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.switch}
+              children={value => (
+                <SwitchInput
+                  label="Monospace Switch Input"
+                  value={value}
+                  monospace
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.switch', next)}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.radio}
+              children={value => (
+                <RadioInput
+                  label="Monospace Radio Input"
+                  value={value}
+                  monospace
+                  options={[
+                    { value: null, label: 'Null' },
+                    { value: 'first', label: 'First' },
+                    { value: 'second', label: 'Second' }
+                  ]}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.radio', next)}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.json}
+              children={value => (
+                <JSONInput
+                  label="Monospace JSON Input"
+                  monospace
+                  value={value}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.json', next)}
+                />
+              )}
+            />
+          </>
+        }
+        right={
+          <MonacoEditor
+            language="javascript"
+            value={`<>
+  <TextInput
+  label="Monospace Text Input"
+  value={value}
+  monospace
+  onChange={(event, next) => {}}
+  />
+
+  <ChipsInput
+  label="Monospace Chips Input"
+  value={value}
+  monospace
+  onChange={(event, next) => {}}
+  />
+
+  <NumberInput
+  label="Monospace Number Input"
+  value={value}
+  monospace
+  onChange={(event, next) => {}}
+  />
+
+  <SelectInput
+  label="Monospace Select Input"
+  value={value}
+  monospace
+  options={[
+    { primary: 'Options 1', value: 'option 1' },
+    { primary: 'Options 2', value: 'option 2' },
+    { primary: 'Options 3', value: 'option 3' }
+  ]}
+  onChange={(event, next) => {}}
+  />
+
+  <DateInput
+  label="Monospace Date Input"
+  value={value}
+  monospace
+  onChange={next => {}}
+  />
+
+  <SliderInput
+  label="Monospace Slider Input"
+  value={value}
+  monospace
+  onChange={(event, next) => {}}
+  />
+
+  <CheckboxInput
+  label="Monospace Checkbox Input"
+  value={value}
+  monospace
+  onChange={(event, next) => {}}
+  />
+
+  <SwitchInput
+  label="Monospace Switch Input"
+  value={value}
+  monospace
+  onChange={(event, next) => {}}
+  />
+</>`}
+          />
+        }
+      />
+
+      <DemoSection
+        primary="Password"
+        secondary={
+          <>
+            <span></span>
+          </>
+        }
+        left={
+          <>
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.text}
+              children={value => (
+                <TextInput
+                  label="Password Text Input"
+                  value={value}
+                  password
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.text', next)}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.chips}
+              children={value => (
+                <ChipsInput
+                  label="Password Chips Input"
+                  value={value}
+                  password
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.chips', next)}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.number}
+              children={value => (
+                <NumberInput
+                  label="Password Number Input"
+                  value={value}
+                  password
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.number', next)}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.select}
+              children={value => (
+                <SelectInput
+                  label="Password Select Input"
+                  value={value}
+                  password
+                  options={[
+                    { primary: 'Options 1', value: 'option 1' },
+                    { primary: 'Options 2', value: 'option 2' },
+                    { primary: 'Options 3', value: 'option 3' }
+                  ]}
+                  onChange={(event, next: string) => form.setFieldValue('components.inputs.values.select', next)}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.date}
+              children={value => (
+                <DateInput
+                  label="Password Date Input"
+                  value={value}
+                  password
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.date', next)}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.classification}
+              children={value => (
+                <ClassificationInput
+                  label="Password Classification Input"
+                  value={value}
+                  password
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.classification', next)}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.textarea}
+              children={value => (
+                <TextAreaInput
+                  label="Password Text Area Input"
+                  value={value}
+                  rows={3}
+                  password
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.textarea', next)}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.slider}
+              children={value => (
+                <SliderInput
+                  label="Password Slider Input"
+                  value={value}
+                  password
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.slider', next)}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.checkbox}
+              children={value => (
+                <CheckboxInput
+                  label="Password Checkbox Input"
+                  value={value}
+                  password
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.checkbox', next)}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.switch}
+              children={value => (
+                <SwitchInput
+                  label="Password Switch Input"
+                  value={value}
+                  password
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.switch', next)}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.radio}
+              children={value => (
+                <RadioInput
+                  label="Password Radio Input"
+                  value={value}
+                  password
+                  options={[
+                    { value: null, label: 'Null' },
+                    { value: 'first', label: 'First' },
+                    { value: 'second', label: 'Second' }
+                  ]}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.radio', next)}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.json}
+              children={value => (
+                <JSONInput
+                  label="Password JSON Input"
+                  password
+                  value={value}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.json', next)}
+                />
+              )}
+            />
+          </>
+        }
+        right={
+          <MonacoEditor
+            language="javascript"
+            value={`<>
+  <TextInput
+  label="Password Text Input"
+  value={value}
+  password
+  onChange={(event, next) => {}}
+  />
+
+  <ChipsInput
+  label="Password Chips Input"
+  value={value}
+  password
+  onChange={(event, next) => {}}
+  />
+
+  <NumberInput
+  label="Password Number Input"
+  value={value}
+  password
+  onChange={(event, next) => {}}
+  />
+
+  <SelectInput
+  label="Password Select Input"
+  value={value}
+  password
+  options={[
+    { primary: 'Options 1', value: 'option 1' },
+    { primary: 'Options 2', value: 'option 2' },
+    { primary: 'Options 3', value: 'option 3' }
+  ]}
+  onChange={(event, next) => {}}
+  />
+
+  <DateInput
+  label="Password Date Input"
+  value={value}
+  password
+  onChange={next => {}}
+  />
+
+  <SliderInput
+  label="Password Slider Input"
+  value={value}
+  password
+  onChange={(event, next) => {}}
+  />
+
+  <CheckboxInput
+  label="Password Checkbox Input"
+  value={value}
+  password
+  onChange={(event, next) => {}}
+  />
+
+  <SwitchInput
+  label="Password Switch Input"
+  value={value}
+  password
+  onChange={(event, next) => {}}
+  />
+</>`}
+          />
+        }
+      />
+
+      <DemoSection
         primary="Interactions"
         secondary={
           <>
@@ -2907,7 +3357,9 @@ export const InputsSection = React.memo(() => {
               state.values.components.inputs.state.helperText,
               state.values.components.inputs.state.placeholder,
               state.values.components.inputs.state.endAdornment,
-              state.values.components.inputs.state.tiny
+              state.values.components.inputs.state.tiny,
+              state.values.components.inputs.state.monospace,
+              state.values.components.inputs.state.password
             ]}
             children={([
               disabled,
@@ -2919,7 +3371,9 @@ export const InputsSection = React.memo(() => {
               helperText,
               placeholder,
               endAdornment,
-              tiny
+              tiny,
+              monospace,
+              password
             ]) => (
               <>
                 <form.Subscribe
@@ -2942,6 +3396,8 @@ export const InputsSection = React.memo(() => {
                       {...(helperText && { helperText: 'Helper Text' })}
                       {...(placeholder && { placeholder: 'Placeholder' })}
                       {...(endAdornment && { endAdornment: <Button variant="contained">Submit</Button> })}
+                      {...(monospace && { monospace: true })}
+                      {...(password && { password: true })}
                     />
                   )}
                 />
@@ -2966,6 +3422,8 @@ export const InputsSection = React.memo(() => {
                       {...(helperText && { helperText: 'Helper Text' })}
                       {...(placeholder && { placeholder: 'Placeholder' })}
                       {...(endAdornment && { endAdornment: <Button variant="contained">Submit</Button> })}
+                      {...(monospace && { monospace: true })}
+                      {...(password && { password: true })}
                     />
                   )}
                 />
@@ -2990,6 +3448,8 @@ export const InputsSection = React.memo(() => {
                       {...(helperText && { helperText: 'Helper Text' })}
                       {...(placeholder && { placeholder: 'Placeholder' })}
                       {...(endAdornment && { endAdornment: <Button variant="contained">Submit</Button> })}
+                      {...(monospace && { monospace: true })}
+                      {...(password && { password: true })}
                     />
                   )}
                 />
@@ -3019,6 +3479,8 @@ export const InputsSection = React.memo(() => {
                       {...(helperText && { helperText: 'Helper Text' })}
                       {...(placeholder && { placeholder: 'Placeholder' })}
                       {...(endAdornment && { endAdornment: <Button variant="contained">Submit</Button> })}
+                      {...(monospace && { monospace: true })}
+                      {...(password && { password: true })}
                     />
                   )}
                 />
@@ -3043,6 +3505,8 @@ export const InputsSection = React.memo(() => {
                       {...(helperText && { helperText: 'Helper Text' })}
                       {...(placeholder && { placeholder: 'Placeholder' })}
                       {...(endAdornment && { endAdornment: <Button variant="contained">Submit</Button> })}
+                      {...(monospace && { monospace: true })}
+                      {...(password && { password: true })}
                     />
                   )}
                 />
@@ -3067,6 +3531,8 @@ export const InputsSection = React.memo(() => {
                       {...(helperText && { helperText: 'Helper Text' })}
                       {...(placeholder && { placeholder: 'Placeholder' })}
                       {...(endAdornment && { endAdornment: <Button variant="contained">Submit</Button> })}
+                      {...(monospace && { monospace: true })}
+                      {...(password && { password: true })}
                     />
                   )}
                 />
@@ -3092,6 +3558,8 @@ export const InputsSection = React.memo(() => {
                       {...(helperText && { helperText: 'Helper Text' })}
                       {...(placeholder && { placeholder: 'Placeholder' })}
                       {...(endAdornment && { endAdornment: <Button variant="contained">Submit</Button> })}
+                      {...(monospace && { monospace: true })}
+                      {...(password && { password: true })}
                     />
                   )}
                 />
@@ -3116,6 +3584,8 @@ export const InputsSection = React.memo(() => {
                       {...(helperText && { helperText: 'Helper Text' })}
                       {...(placeholder && { placeholder: 'Placeholder' })}
                       {...(endAdornment && { endAdornment: <Button variant="contained">Submit</Button> })}
+                      {...(monospace && { monospace: true })}
+                      {...(password && { password: true })}
                     />
                   )}
                 />
@@ -3140,6 +3610,8 @@ export const InputsSection = React.memo(() => {
                       {...(helperText && { helperText: 'Helper Text' })}
                       {...(placeholder && { placeholder: 'Placeholder' })}
                       {...(endAdornment && { endAdornment: <Button variant="contained">Submit</Button> })}
+                      {...(monospace && { monospace: true })}
+                      {...(password && { password: true })}
                     />
                   )}
                 />
@@ -3164,6 +3636,8 @@ export const InputsSection = React.memo(() => {
                       {...(helperText && { helperText: 'Helper Text' })}
                       {...(placeholder && { placeholder: 'Placeholder' })}
                       {...(endAdornment && { endAdornment: <Button variant="contained">Submit</Button> })}
+                      {...(monospace && { monospace: true })}
+                      {...(password && { password: true })}
                     />
                   )}
                 />
@@ -3193,6 +3667,8 @@ export const InputsSection = React.memo(() => {
                       {...(helperText && { helperText: 'Helper Text' })}
                       {...(placeholder && { placeholder: 'Placeholder' })}
                       {...(endAdornment && { endAdornment: <Button variant="contained">Submit</Button> })}
+                      {...(monospace && { monospace: true })}
+                      {...(password && { password: true })}
                     />
                   )}
                 />
@@ -3217,6 +3693,8 @@ export const InputsSection = React.memo(() => {
                       {...(helperText && { helperText: 'Helper Text' })}
                       {...(placeholder && { placeholder: 'Placeholder' })}
                       {...(endAdornment && { endAdornment: <Button variant="contained">Submit</Button> })}
+                      {...(monospace && { monospace: true })}
+                      {...(password && { password: true })}
                     />
                   )}
                 />
@@ -3323,6 +3801,26 @@ export const InputsSection = React.memo(() => {
                   label="Tiny"
                   value={value}
                   onChange={(event, next) => form.setFieldValue('components.inputs.state.tiny', next)}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.state.monospace}
+              children={value => (
+                <CheckboxInput
+                  label="Monospace"
+                  value={value}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.state.monospace', next)}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.state.password}
+              children={value => (
+                <CheckboxInput
+                  label="Password"
+                  value={value}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.state.password', next)}
                 />
               )}
             />
