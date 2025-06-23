@@ -171,7 +171,7 @@ const WrappedChipsInput = <
                 id={id}
                 variant="outlined"
                 error={!!errorValue}
-                type={showPassword ? 'password' : 'text'}
+                type={password && showPassword ? 'password' : 'text'}
                 placeholder={placeholder}
                 {...(readOnly && !disabled && { focused: null })}
                 slotProps={{
