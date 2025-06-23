@@ -612,7 +612,7 @@ const WrappedArchiveCard = ({ archive }) => {
   );
 };
 
-const WrappedExpiryCard = ({ expiry }) => {
+const WrappedExpiryCard = ({ expiry, configuration }) => {
   const { t } = useTranslation(['dashboard']);
   const [timer, setTimer] = useState(null);
   const [error, setError] = useState(null);
@@ -674,6 +674,15 @@ const WrappedExpiryCard = ({ expiry }) => {
               title="R"
               tooltip={t('queues.result')}
             />
+            {configuration?.retrohunt?.enabled && (
+              <MetricCounter
+                init={expiry.initialized}
+                value={expiry.queues.retrohunt_hit}
+                title="R"
+                tooltip={t('queues.retrohunt_hit')}
+              />
+            )}
+
             <MetricCounter
               init={expiry.initialized}
               value={expiry.queues.submission + expiry.queues.submission_summary + expiry.queues.submission_tree}
@@ -723,6 +732,15 @@ const WrappedExpiryCard = ({ expiry }) => {
               title="R"
               tooltip={t('expired.result')}
             />
+            {configuration?.retrohunt?.enabled && (
+              <MetricCounter
+                init={expiry.initialized}
+                value={expiry.metrics.retrohunt_hit}
+                title="R"
+                tooltip={t('expired.retrohunt_hit')}
+              />
+            )}
+
             <MetricCounter
               init={expiry.initialized}
               value={expiry.metrics.submission + expiry.metrics.submission_summary + expiry.metrics.submission_tree}
@@ -1268,6 +1286,7 @@ const DEFAULT_EXPIRY = {
     file: 0,
     filescore: 0,
     result: 0,
+    retrohunt_hit: 0,
     safelist: 0,
     submission: 0,
     submission_tree: 0,
@@ -1282,6 +1301,7 @@ const DEFAULT_EXPIRY = {
     file: 0,
     filescore: 0,
     result: 0,
+    retrohunt_hit: 0,
     safelist: 0,
     submission: 0,
     submission_tree: 0,
@@ -1593,7 +1613,7 @@ const Dashboard = () => {
                   : 6
           }}
         >
-          <ExpiryCard expiry={expiry} />
+          <ExpiryCard expiry configuration />
         </Grid>
         {configuration.datastore.archive.enabled && (
           <Grid size={{ xs: 12, md: 6, xl: configuration.retrohunt.enabled ? 4 : 6 }}>
