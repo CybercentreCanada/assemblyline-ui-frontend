@@ -337,7 +337,7 @@ function WrappedClassification({
                                 >
                                   <ListItemText
                                     style={{ textAlign: 'center' }}
-                                    primary={applyAliases(grp.name, classificationAliases)}
+                                    primary={applyAliases(grp.name, classificationAliases, format)}
                                   />
                                 </ListItemButton>
                               ))}
@@ -356,7 +356,11 @@ function WrappedClassification({
                                 >
                                   <ListItemText
                                     style={{ textAlign: 'center' }}
-                                    primary={applyAliases(dynGroup || currentUser.dynamic_group, classificationAliases)}
+                                    primary={applyAliases(
+                                      dynGroup || currentUser.dynamic_group,
+                                      classificationAliases,
+                                      format
+                                    )}
                                   />
                                 </ListItemButton>
                               )}
@@ -386,7 +390,7 @@ function WrappedClassification({
                                   >
                                     <ListItemText
                                       style={{ textAlign: 'center' }}
-                                      primary={applyAliases(group, classificationAliases)}
+                                      primary={applyAliases(group, classificationAliases, format)}
                                     />
                                   </ListItemButton>
                                 ))}
