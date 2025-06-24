@@ -65,7 +65,7 @@ export type ProcessTreeBody = {
   process_pid: number;
   registry_count: number;
   safelisted: boolean;
-  signatures: { [signature: string]: number | any };
+  signatures: Record<string, number | any>;
 };
 
 /** Table Body */

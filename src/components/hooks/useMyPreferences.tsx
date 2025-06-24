@@ -6,6 +6,7 @@ import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
 import BuildOutlinedIcon from '@mui/icons-material/BuildOutlined';
 import BusinessOutlinedIcon from '@mui/icons-material/BusinessOutlined';
+import CodeIcon from '@mui/icons-material/Code';
 import CodeOutlinedIcon from '@mui/icons-material/CodeOutlined';
 import CompareArrowsOutlinedIcon from '@mui/icons-material/CompareArrowsOutlined';
 import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined';
@@ -15,9 +16,12 @@ import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import FindInPageOutlinedIcon from '@mui/icons-material/FindInPageOutlined';
 import FingerprintOutlinedIcon from '@mui/icons-material/FingerprintOutlined';
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
+import KeyOutlinedIcon from '@mui/icons-material/KeyOutlined';
 import LabelOutlinedIcon from '@mui/icons-material/LabelOutlined';
+import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
 import MapOutlinedIcon from '@mui/icons-material/MapOutlined';
 import NotificationImportantOutlinedIcon from '@mui/icons-material/NotificationImportantOutlined';
+import PaletteIcon from '@mui/icons-material/Palette';
 import PlaylistPlayOutlinedIcon from '@mui/icons-material/PlaylistPlayOutlined';
 import PublishOutlinedIcon from '@mui/icons-material/PublishOutlined';
 import SearchIcon from '@mui/icons-material/Search';
@@ -28,7 +32,7 @@ import SupervisorAccountOutlinedIcon from '@mui/icons-material/SupervisorAccount
 import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
 import type { AppBarUserMenuElement, AppLeftNavElement, AppPreferenceConfigs } from 'commons/components/app/AppConfigs';
-import { Notification } from 'components/visual/Notification';
+import NotificationArea from 'components/visual/Notification/NotificationArea';
 import type { ReactElement, ReactNode } from 'react';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -39,14 +43,14 @@ const useMyPreferences = () => {
 
   const AL_LIGHT_LOGO = useMemo(
     (): ReactElement<any> => (
-      <img alt={t('logo.alt')} src={`/images/noswoop.svg`} width="40" height="32" style={{ marginLeft: '-8px' }} />
+      <img alt={t('logo.alt')} src="/images/noswoop.svg" width="40" height="32" style={{ marginLeft: '-8px' }} />
     ),
     [t]
   );
 
   const AL_DARK_LOGO = useMemo(
     (): ReactElement<any> => (
-      <img alt={t('logo.alt')} src={`/images/noswoop_dark.svg`} width="40" height="32" style={{ marginLeft: '-8px' }} />
+      <img alt={t('logo.alt')} src="/images/noswoop_dark.svg" width="40" height="32" style={{ marginLeft: '-8px' }} />
     ),
     [t]
   );
@@ -55,7 +59,7 @@ const useMyPreferences = () => {
     (): ReactElement<any> => (
       <img
         style={{ display: 'inline-block', width: '100%', margin: '2rem 0' }}
-        src={`/images/banner.svg`}
+        src="/images/banner.svg"
         alt={t('banner.alt')}
       />
     ),
@@ -66,7 +70,7 @@ const useMyPreferences = () => {
     (): ReactElement<any> => (
       <img
         style={{ display: 'inline-block', width: '100%', margin: '2rem 0' }}
-        src={`/images/banner_dark.svg`}
+        src="/images/banner_dark.svg"
         alt={t('banner.alt')}
       />
     ),
@@ -77,7 +81,7 @@ const useMyPreferences = () => {
     (): ReactElement<any> => (
       <img
         style={{ display: 'inline-block', width: '100%', margin: '2rem 0' }}
-        src={`/images/vertical_banner.svg`}
+        src="/images/vertical_banner.svg"
         alt={t('banner.alt')}
       />
     ),
@@ -88,19 +92,19 @@ const useMyPreferences = () => {
     (): ReactElement<any> => (
       <img
         style={{ display: 'inline-block', width: '100%', margin: '2rem 0' }}
-        src={`/images/vertical_banner_dark.svg`}
+        src="/images/vertical_banner_dark.svg"
         alt={t('banner.alt')}
       />
     ),
     [t]
   );
 
-  const TOP_NAV_RIGHT = useMemo((): ReactNode => <Notification />, []);
+  const TOP_NAV_RIGHT = useMemo((): ReactNode => <NotificationArea />, []);
 
   const LEFT_MENU_ITEMS = useMemo(
     (): AppLeftNavElement[] => [
       {
-        type: 'item' as 'item',
+        type: 'item' as const,
         element: {
           id: 'submit',
           i18nKey: 'drawer.submit',
@@ -110,7 +114,7 @@ const useMyPreferences = () => {
         }
       },
       {
-        type: 'item' as 'item',
+        type: 'item' as const,
         element: {
           id: 'submissions',
           i18nKey: 'drawer.submissions',
@@ -121,7 +125,7 @@ const useMyPreferences = () => {
         }
       },
       {
-        type: 'item' as 'item',
+        type: 'item' as const,
         element: {
           id: 'alerts',
           i18nKey: 'drawer.alerts',
@@ -132,7 +136,7 @@ const useMyPreferences = () => {
         }
       },
       {
-        type: 'item' as 'item',
+        type: 'item' as const,
         element: {
           id: 'archive',
           i18nKey: 'drawer.archive',
@@ -146,7 +150,7 @@ const useMyPreferences = () => {
         }
       },
       {
-        type: 'item' as 'item',
+        type: 'item' as const,
         element: {
           id: 'retrohunt',
           i18nKey: 'drawer.retrohunt',
@@ -160,7 +164,7 @@ const useMyPreferences = () => {
         }
       },
       {
-        type: 'group' as 'group',
+        type: 'group' as const,
         element: {
           id: 'search',
           i18nKey: 'drawer.search',
@@ -227,11 +231,11 @@ const useMyPreferences = () => {
         }
       },
       {
-        type: 'divider' as 'divider',
+        type: 'divider' as const,
         element: null
       },
       {
-        type: 'item' as 'item',
+        type: 'item' as const,
         element: {
           id: 'dashboard',
           i18nKey: 'drawer.dashboard',
@@ -241,7 +245,7 @@ const useMyPreferences = () => {
         }
       },
       {
-        type: 'group' as 'group',
+        type: 'group' as const,
         element: {
           id: 'manage',
           i18nKey: 'drawer.manage',
@@ -308,13 +312,20 @@ const useMyPreferences = () => {
       },
 
       {
-        type: 'group' as 'group',
+        type: 'group' as const,
         element: {
           id: 'adminmenu',
           i18nKey: 'adminmenu',
           userPropValidators: [{ prop: 'user.is_admin', value: true }],
           icon: <BusinessOutlinedIcon />,
           items: [
+            {
+              id: 'adminmenu.apikeys',
+              i18nKey: 'adminmenu.apikeys',
+              route: '/admin/apikeys',
+              icon: <KeyOutlinedIcon />,
+              nested: true
+            },
             {
               id: 'adminmenu.errors',
               i18nKey: 'adminmenu.errors',
@@ -375,11 +386,11 @@ const useMyPreferences = () => {
         }
       },
       {
-        type: 'divider' as 'divider',
+        type: 'divider' as const,
         element: null
       },
       {
-        type: 'group' as 'group',
+        type: 'group' as const,
         element: {
           id: 'help',
           i18nKey: 'drawer.help',
@@ -419,6 +430,69 @@ const useMyPreferences = () => {
               i18nKey: 'drawer.help.services',
               icon: <AccountTreeOutlinedIcon />,
               route: '/help/services',
+              nested: true
+            }
+          ]
+        }
+      },
+      {
+        type: 'group' as const,
+        element: {
+          id: 'development',
+          i18nKey: 'drawer.development',
+          userPropValidators: [
+            { prop: 'user.is_admin', value: true, enforce: true },
+            { prop: 'configuration.system.type', value: 'development' },
+            { prop: 'configuration.system.type', value: 'staging' }
+          ],
+          icon: <CodeIcon />,
+          items: [
+            // {
+            //   id: 'development.api',
+            //   i18nKey: 'drawer.development.api',
+            //   userPropValidators: [
+            //     { prop: 'user.is_admin', value: true, enforce: true },
+            //     { prop: 'configuration.system.type', value: 'development' },
+            //     { prop: 'configuration.system.type', value: 'staging' }
+            //   ],
+            //   icon: <ApiIcon />,
+            //   route: '/development/api',
+            //   nested: true
+            // },
+            {
+              id: 'development.customize',
+              i18nKey: 'drawer.development.customize',
+              userPropValidators: [
+                { prop: 'user.is_admin', value: true, enforce: true },
+                { prop: 'configuration.system.type', value: 'development' },
+                { prop: 'configuration.system.type', value: 'staging' }
+              ],
+              icon: <PaletteIcon />,
+              route: '/development/customize',
+              nested: true
+            },
+            {
+              id: 'development.library',
+              i18nKey: 'drawer.development.library',
+              userPropValidators: [
+                { prop: 'user.is_admin', value: true, enforce: true },
+                { prop: 'configuration.system.type', value: 'development' },
+                { prop: 'configuration.system.type', value: 'staging' }
+              ],
+              icon: <LibraryBooksIcon />,
+              route: '/development/library',
+              nested: true
+            },
+            {
+              id: 'development.theme',
+              i18nKey: 'drawer.development.theme',
+              userPropValidators: [
+                { prop: 'user.is_admin', value: true, enforce: true },
+                { prop: 'configuration.system.type', value: 'development' },
+                { prop: 'configuration.system.type', value: 'staging' }
+              ],
+              icon: <PaletteIcon />,
+              route: '/development/theme',
               nested: true
             }
           ]

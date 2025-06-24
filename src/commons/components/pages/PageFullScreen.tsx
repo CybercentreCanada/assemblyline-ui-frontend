@@ -2,13 +2,11 @@ import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import FullscreenExitIcon from '@mui/icons-material/FullscreenExit';
 import { IconButton, Tooltip, useTheme } from '@mui/material';
 import browser from 'browser-detect';
-import useAppBar from 'commons/components/app/hooks/useAppBar';
-import useAppBarHeight from 'commons/components/app/hooks/useAppBarHeight';
-import useAppLayout from 'commons/components/app/hooks/useAppLayout';
+import { useAppBar, useAppBarHeight, useAppLayout } from 'commons/components/app/hooks';
+import PageContent from 'commons/components/pages/PageContent';
 import useFullscreenStatus from 'commons/components/utils/hooks/useFullscreenStatus';
 import { memo, useCallback, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import PageContent from './PageContent';
 
 type PageFullscreenProps = {
   children: React.ReactNode;
@@ -17,15 +15,27 @@ type PageFullscreenProps = {
   ml?: number;
   mr?: number;
   mt?: number;
+  test?: React.CSSProperties;
+  fsIconPos?: 'absolute' | 'fixed' | 'relative' | 'static' | 'sticky'; // fullscreen icon position
 };
 
-const PageFullscreen = ({ children, margin = null, mb = 2, ml = 2, mr = 2, mt = 2 }: PageFullscreenProps) => {
-  const maximizableElement = useRef(null);
+const PageFullscreen = ({
+  children,
+  margin = null,
+  mb = 2,
+  ml = 2,
+  mr = 2,
+  mt = 2,
+  fsIconPos = 'sticky'
+}: PageFullscreenProps) => {
+  const { t } = useTranslation();
+  const theme = useTheme();
   const appBarHeight = useAppBarHeight();
   const layout = useAppLayout();
   const appbar = useAppBar();
-  const { t } = useTranslation();
-  const theme = useTheme();
+
+  const maximizableElement = useRef(null);
+
   let isFullscreen: boolean;
   let setIsFullscreen: () => void;
   let fullscreenSupported: boolean;
@@ -36,7 +46,7 @@ const PageFullscreen = ({ children, margin = null, mb = 2, ml = 2, mr = 2, mt = 
 
   try {
     [isFullscreen, setIsFullscreen] = useFullscreenStatus(maximizableElement);
-  } catch (e) {
+  } catch {
     fullscreenSupported = false;
     isFullscreen = false;
     setIsFullscreen = undefined;
@@ -61,25 +71,25 @@ const PageFullscreen = ({ children, margin = null, mb = 2, ml = 2, mr = 2, mt = 
       <PageContent margin={margin} mb={mb} ml={ml} mr={mr} mt={mt}>
         <div
           style={{
-            position: 'sticky',
             float: 'right',
             paddingTop: theme.spacing(2),
+            position: fsIconPos,
             right: theme.spacing(2),
             zIndex: theme.zIndex.appBar + 1,
             top: barWillHide || isFullscreen ? 0 : appBarHeight,
             ...(!isFirefox
               ? null
               : !isFullscreen
-              ? {
-                  position: 'fixed',
-                  top: '96px',
-                  right: '32px'
-                }
-              : {
-                  position: 'fixed',
-                  top: '32px',
-                  right: '32px'
-                })
+                ? {
+                    position: 'fixed',
+                    top: '96px',
+                    right: '32px'
+                  }
+                : {
+                    position: 'fixed',
+                    top: '32px',
+                    right: '32px'
+                  })
           }}
         >
           {fullscreenSupported ? null : (

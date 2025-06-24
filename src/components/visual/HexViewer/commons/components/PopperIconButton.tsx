@@ -1,25 +1,16 @@
 import AdbIcon from '@mui/icons-material/Adb';
-import { ClickAwayListener, Fade, Popper } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
-import clsx from 'clsx';
+import type { SxProps } from '@mui/material';
+import { ClickAwayListener, Fade, Popper, useTheme } from '@mui/material';
 import { isEscape } from 'commons/components/utils/keyboard';
+import type { CSSProperties } from 'react';
 import { default as React, forwardRef, useCallback, useImperativeHandle, useState } from 'react';
 import { TooltipIconButton } from '.';
 
-const useHexStyles = makeStyles(theme => ({
-  searchPaper: {
-    marginTop: '16px',
-    padding: theme.spacing(0),
-    minWidth: '200px',
-    backgroundColor: theme.palette.background.paper
-  }
-}));
-
 export type PopperIconButtonProps = {
   id?: string;
-  classes?: {
-    iconButton: string;
-    paper: string;
+  slotSX?: {
+    iconButton: SxProps;
+    paper: CSSProperties;
   };
   title?: string;
   icon?: React.ReactElement;
@@ -44,7 +35,7 @@ export type PopperIconButtonProps = {
 export const WrappedPopperIconButton = (
   {
     id = '',
-    classes = {
+    slotSX = {
       iconButton: null,
       paper: null
     },
@@ -57,7 +48,7 @@ export const WrappedPopperIconButton = (
   }: PopperIconButtonProps,
   ref: React.Ref<any>
 ) => {
-  const c = useHexStyles();
+  const theme = useTheme();
 
   const [open, setOpen] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
@@ -96,18 +87,27 @@ export const WrappedPopperIconButton = (
   return (
     <>
       <TooltipIconButton
-        classes={{ iconButton: classes.iconButton }}
         title={title}
         icon={icon}
         disabled={disabled}
         size={size}
         onClick={handleOpen}
+        slotSX={{ iconButton: slotSX?.iconButton }}
       />
       <Popper open={open} anchorEl={anchorEl} placement={placement} transition disablePortal={true}>
         {({ TransitionProps }) => (
           <ClickAwayListener onClickAway={handleClickAway}>
             <Fade {...TransitionProps} timeout={200}>
-              <div className={clsx(c.searchPaper, classes.paper)} onKeyDown={handleCloseKeyDown}>
+              <div
+                onKeyDown={handleCloseKeyDown}
+                style={{
+                  marginTop: '16px',
+                  padding: theme.spacing(0),
+                  minWidth: '200px',
+                  backgroundColor: theme.palette.background.paper,
+                  ...slotSX?.paper
+                }}
+              >
                 {field}
               </div>
             </Fade>

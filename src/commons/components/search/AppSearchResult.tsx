@@ -1,13 +1,11 @@
-import type { MenuListProps } from '@mui/material';
-import { Box, MenuItem, MenuList, Typography } from '@mui/material';
-import type { KeyboardEvent } from 'react';
-import { memo, useMemo } from 'react';
+import { Box, MenuItem, MenuList, type MenuListProps, Typography } from '@mui/material';
+import type { AppSearchItem } from 'commons/components/app/AppSearchService';
+import { useAppSearchService } from 'commons/components/app/hooks/useAppSearchService';
+import { type KeyboardEvent, memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { AppSearchItem } from '../app/AppSearchService';
-import useAppSearchService from '../app/hooks/useAppSearchService';
 
-import AppListEmpty from '../display/AppListEmpty';
-import { parseEvent } from '../utils/keyboard';
+import AppListEmpty from 'commons/components/display/AppListEmpty';
+import { parseEvent } from 'commons/components/utils/keyboard';
 
 type AppSearchResultProps = MenuListProps;
 
@@ -29,7 +27,7 @@ const AppSearchResult = ({ ...menuProps }: AppSearchResultProps) => {
   const options = useMemo(
     () =>
       state.items?.reduce(
-        (_options, item, index) => ({
+        (_options, _item, index) => ({
           ..._options,
           [index]: { state, index, last: index === state.items.length - 1 }
         }),

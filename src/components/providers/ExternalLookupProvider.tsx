@@ -1,7 +1,7 @@
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export type ExternalEnrichmentItem = {
@@ -20,21 +20,20 @@ export type ExternalEnrichmentResult = {
   confirmed: boolean; // if result is confirmed malicious
   description: string; // summary/description of the findings
   malicious: boolean; // if the result is malicious or not
-  enrichment: Array<ExternalEnrichmentItem>;
+  enrichment: ExternalEnrichmentItem[];
 };
 
-export type ExternalEnrichmentResults = {
-  [sourceName: string]: {
+export type ExternalEnrichmentResults = Record<
+  string,
+  {
     // Data source of query
     error?: null | string; // error message returned by data source
-    items?: Array<ExternalEnrichmentResult>;
+    items?: ExternalEnrichmentResult[];
     inProgress?: null | boolean;
-  };
-};
+  }
+>;
 
-export type ExternalEnrichmentState = {
-  [tagName: string]: ExternalEnrichmentResults;
-};
+export type ExternalEnrichmentState = Record<string, ExternalEnrichmentResults>;
 
 export type ExternalLookupContextProps = {
   isActionable: (category: string, type: string, value: string) => boolean;
@@ -55,7 +54,7 @@ export function ExternalLookupProvider(props: ExternalLookupProps) {
   const { apiCall } = useMyAPI();
   const { user: currentUser, configuration: currentUserConfig } = useALContext();
   const { showSuccessMessage, showWarningMessage, showErrorMessage } = useMySnackbar();
-  const [enrichmentState, setEnrichmentState] = React.useState<ExternalEnrichmentState>({});
+  const [enrichmentState, setEnrichmentState] = useState<ExternalEnrichmentState>({});
 
   const isActionable = useCallback(
     (category, type, value) => {
@@ -99,7 +98,7 @@ export function ExternalLookupProvider(props: ExternalLookupProps) {
         qs += `&sources=${encodeURIComponent(source)}`;
       } else {
         // only send query to sources that support the tag name and the classification
-        let s = [];
+        const s = [];
         for (const src of currentUserConfig.ui.external_sources) {
           if (tagSrcMap[tagName].includes(src.name)) {
             // uncomment when classification updates are merged in
@@ -194,8 +193,7 @@ export function ExternalLookupProvider(props: ExternalLookupProps) {
         }
       });
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [showErrorMessage, showSuccessMessage, showWarningMessage, t]
+    [currentUserConfig, apiCall, showErrorMessage, t, showWarningMessage, showSuccessMessage]
   );
   return (
     <ExternalLookupContext.Provider value={{ getKey, isActionable, enrichmentState, enrichTagExternal }}>

@@ -15,7 +15,7 @@ import {
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import { Apps as AppData, User } from 'components/models/base/user';
+import type { Apps as AppData, User } from 'components/models/base/user';
 import CustomChip from 'components/visual/CustomChip';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';

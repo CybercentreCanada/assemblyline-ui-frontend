@@ -1,10 +1,9 @@
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
 import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
 import TimerOutlinedIcon from '@mui/icons-material/TimerOutlined';
-import { Grid, IconButton, Pagination, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
+import { Pagination, Typography, useMediaQuery, useTheme } from '@mui/material';
+import PageContainer from 'commons/components/pages/PageContainer';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
-import PageHeader from 'commons/components/pages/PageHeader';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -12,7 +11,9 @@ import type { Retrohunt, RetrohuntIndexed, RetrohuntProgress } from 'components/
 import type { SearchResult } from 'components/models/ui/search';
 import { RetrohuntCreate } from 'components/routes/retrohunt/create';
 import RetrohuntDetail from 'components/routes/retrohunt/detail';
+import { IconButton } from 'components/visual/Buttons/IconButton';
 import { ChipList } from 'components/visual/ChipList';
+import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import SearchBar from 'components/visual/SearchBar/search-bar';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
@@ -20,38 +21,9 @@ import RetrohuntTable from 'components/visual/SearchResult/retrohunt';
 import SearchResultCount from 'components/visual/SearchResultCount';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate, useNavigate } from 'react-router';
-import { useLocation } from 'react-router-dom';
+import { Navigate, useLocation, useNavigate } from 'react-router';
 import type { Socket } from 'socket.io-client';
 import { io } from 'socket.io-client';
-
-const useStyles = makeStyles(theme => ({
-  header: {
-    paddingBottom: theme.spacing(2)
-  },
-  headerButton: {
-    textAlign: 'right',
-    flexGrow: 0
-  },
-  headerIconButton: {
-    color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark
-  },
-  searchContainer: {
-    paddingTop: theme.spacing(1)
-  },
-  searchBar: {
-    fontStyle: 'italic',
-    paddingTop: theme.spacing(0.5),
-    display: 'flex',
-    flexWrap: 'wrap',
-    justifyContent: 'flex-end'
-  },
-  tableContainer: {
-    paddingTop: theme.spacing(2),
-    paddingLeft: theme.spacing(0.5),
-    paddingRight: theme.spacing(0.5)
-  }
-}));
 
 const PAGE_SIZE = 25;
 const MAX_TRACKED_RECORDS = 10000;
@@ -72,7 +44,6 @@ const DEFAULT_QUERY: string = Object.keys(DEFAULT_PARAMS)
 export default function RetrohuntPage() {
   const { t } = useTranslation(['retrohunt']);
   const theme = useTheme();
-  const classes = useStyles();
   const location = useLocation();
   const navigate = useNavigate();
   const { apiCall } = useMyAPI();
@@ -99,6 +70,27 @@ export default function RetrohuntPage() {
         ? Math.ceil(Math.min(retrohuntResults.total, MAX_TRACKED_RECORDS) / PAGE_SIZE)
         : 0,
     [retrohuntResults]
+  );
+
+  const last24hDate = useMemo<string>(
+    () =>
+      new Date(new Date().setMinutes(0, 0, 0) - 24 * 60 * 60 * 1000)
+        .toISOString()
+        .replaceAll(':', '\\:')
+        .replaceAll('.', '\\.'),
+    []
+  );
+
+  const hasFilter = useCallback((filter: string) => query?.getAll('filters')?.includes(filter), [query]);
+
+  const handleToggleFilter = useCallback(
+    (filter: string) => {
+      if (query?.getAll('filters')?.includes(filter)) query.remove('filters', filter);
+      else query.add('filters', filter);
+
+      navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
+    },
+    [location.hash, location.pathname, navigate, query]
   );
 
   const handleQueryChange = useCallback(
@@ -187,7 +179,6 @@ export default function RetrohuntPage() {
     return () => {
       window.removeEventListener('reloadRetrohunts', reload);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [handleReload, query]);
 
   useEffect(() => {
@@ -278,25 +269,26 @@ export default function RetrohuntPage() {
   else
     return (
       <PageFullWidth margin={4}>
-        <div className={classes.header}>
-          <Grid container alignItems="center">
-            <Grid item xs>
-              <Typography variant="h4">{t('title')}</Typography>
-            </Grid>
-            {currentUser.roles.includes('retrohunt_run') && (
-              <Grid className={classes.headerButton} item xs>
-                <Tooltip title={t('tooltip.add')}>
-                  <IconButton color="success" size="large" onClick={handleOpenCreatePage}>
-                    <AddCircleOutlineOutlinedIcon />
-                  </IconButton>
-                </Tooltip>
-              </Grid>
-            )}
-          </Grid>
-        </div>
+        <PageHeader
+          primary={t('title')}
+          slotProps={{
+            root: { style: { marginBottom: theme.spacing(2) } }
+          }}
+          actions={
+            <IconButton
+              color="success"
+              preventRender={!currentUser.roles.includes('retrohunt_run')}
+              size="large"
+              tooltip={t('tooltip.add')}
+              onClick={handleOpenCreatePage}
+            >
+              <AddCircleOutlineOutlinedIcon />
+            </IconButton>
+          }
+        />
 
-        <PageHeader isSticky>
-          <div className={classes.searchContainer}>
+        <PageContainer isSticky>
+          <div style={{ paddingTop: theme.spacing(1) }}>
             <SearchBar
               initValue={query ? query.get('query', '') : ''}
               placeholder={t('filter')}
@@ -315,32 +307,36 @@ export default function RetrohuntPage() {
               buttons={[
                 {
                   icon: <TimerOutlinedIcon fontSize={downSM ? 'small' : 'medium'} />,
-                  tooltip: t('filter.completed_last_24'),
+                  tooltip: hasFilter(`completed_time:>=${last24hDate}`)
+                    ? t('filter.completed_last_24.remove')
+                    : t('filter.completed_last_24.add'),
                   props: {
-                    onClick: () => {
-                      const completedTime = new Date(new Date().getTime() - 24 * 60 * 60 * 1000)
-                        .toISOString()
-                        .replaceAll(':', '\\:')
-                        .replaceAll('.', '\\.');
-                      query.add('filters', `completed_time:>=${completedTime}`);
-                      navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-                    }
+                    color: hasFilter(`completed_time:>=${last24hDate}`) ? 'primary' : 'default',
+                    onClick: () => handleToggleFilter(`completed_time:>=${last24hDate}`)
                   }
                 },
                 {
                   icon: <PersonOutlinedIcon fontSize={downSM ? 'small' : 'medium'} />,
-                  tooltip: t('filter.creator_self'),
+                  tooltip: hasFilter(`creator:${currentUser.username}`)
+                    ? t('filter.creator_self.remove')
+                    : t('filter.creator_self.add'),
                   props: {
-                    onClick: () => {
-                      query.add('filters', `creator:${currentUser.username}`);
-                      navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-                    }
+                    color: hasFilter(`creator:${currentUser.username}`) ? 'primary' : 'default',
+                    onClick: () => handleToggleFilter(`creator:${currentUser.username}`)
                   }
                 }
               ]}
             >
               {retrohuntResults !== null && (
-                <div className={classes.searchBar}>
+                <div
+                  style={{
+                    fontStyle: 'italic',
+                    paddingTop: theme.spacing(0.5),
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    justifyContent: 'flex-end'
+                  }}
+                >
                   {retrohuntResults.total !== 0 && (
                     <Typography variant="subtitle1" color="secondary" style={{ flexGrow: 1 }}>
                       {searching ? (
@@ -393,9 +389,15 @@ export default function RetrohuntPage() {
               )}
             </SearchBar>
           </div>
-        </PageHeader>
+        </PageContainer>
 
-        <div className={classes.tableContainer}>
+        <div
+          style={{
+            paddingTop: theme.spacing(2),
+            paddingLeft: theme.spacing(0.5),
+            paddingRight: theme.spacing(0.5)
+          }}
+        >
           <RetrohuntTable
             retrohuntResults={retrohuntResults}
             onRowClick={handleRowClick}

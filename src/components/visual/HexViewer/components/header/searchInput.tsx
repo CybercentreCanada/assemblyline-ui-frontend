@@ -1,50 +1,13 @@
 import { useMediaQuery, useTheme } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
-import makeStyles from '@mui/styles/makeStyles';
-import React, { SyntheticEvent } from 'react';
+import type { StoreProps } from 'components/visual/HexViewer';
+import { useDispatch } from 'components/visual/HexViewer';
+import type { SyntheticEvent } from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { StoreProps, useDispatch } from '../..';
-
-const useHexStyles = makeStyles(theme => ({
-  autocompleteInputRoot: {
-    '& > fieldset': {
-      border: 'none !important',
-      borderWidth: '0px'
-    }
-  },
-  autocompletePopper: {
-    [theme.breakpoints.only('xs')]: {
-      display: 'none'
-    },
-    width: '50vw'
-  },
-  autocompletePaper: {
-    margin: `${theme.spacing(1)} 0px`,
-    borderRadius: `0 0 ${theme.spacing(0.5)} ${theme.spacing(0.5)}`,
-    width: '50vw'
-  },
-  autocompleteList: {
-    margin: 0,
-    padding: 0,
-    maxHeight: `180px`
-  },
-  autocompleteOption: {
-    fontSize: theme.typography.fontSize,
-    backgroundColor: theme.palette.background.default,
-    padding: theme.spacing(1),
-    '&[data-focus="true"]': {
-      cursor: 'pointer',
-      backgroundColor: theme.palette.action.hover
-    },
-    '&[aria-selected="true"]': {
-      backgroundColor: theme.palette.action.selected
-    }
-  }
-}));
 
 export const WrappedHexSearchbar = ({ store }: StoreProps) => {
-  const classes = useHexStyles();
   const { t } = useTranslation(['hexViewer']);
   const theme = useTheme();
   const upXS = useMediaQuery(theme.breakpoints.up('xs'));
@@ -52,21 +15,14 @@ export const WrappedHexSearchbar = ({ store }: StoreProps) => {
   const { onSearchBarChange, onSearchBarInputChange, onSearchBarFocus, onSearchBarBlur, onSearchBarKeyDown } =
     useDispatch();
 
-  const [value, setValue] = React.useState<string>('');
-  const [inputValue, setInputValue] = React.useState<string>('');
+  const [value, setValue] = useState<string>('');
+  const [inputValue, setInputValue] = useState<string>('');
 
-  const [suggestionOpen, setSuggestionOpen] = React.useState(true);
-  const [suggestionLabels, setSuggestionLabels] = React.useState(['asd']);
+  const [suggestionOpen, setSuggestionOpen] = useState(true);
+  const [suggestionLabels, setSuggestionLabels] = useState(['asd']);
 
   return (
     <Autocomplete
-      classes={{
-        inputRoot: classes.autocompleteInputRoot,
-        popper: classes.autocompletePopper,
-        paper: classes.autocompletePaper,
-        listbox: classes.autocompleteList,
-        option: classes.autocompleteOption
-      }}
       multiple={false}
       freeSolo
       disableClearable
@@ -115,13 +71,57 @@ export const WrappedHexSearchbar = ({ store }: StoreProps) => {
         <TextField
           {...params}
           placeholder={t('find')}
-          variant={'outlined'}
+          variant="outlined"
           inputProps={{
             ...params.inputProps,
             autoComplete: 'new-password'
           }}
         />
       )}
+      sx={{
+        '& > fieldset': {
+          border: 'none !important',
+          borderWidth: '0px'
+        }
+      }}
+      slotProps={{
+        popper: {
+          sx: {
+            [theme.breakpoints.only('xs')]: {
+              display: 'none'
+            },
+            width: '50vw'
+          }
+        },
+        paper: {
+          sx: {
+            margin: `${theme.spacing(1)} 0px`,
+            borderRadius: `0 0 ${theme.spacing(0.5)} ${theme.spacing(0.5)}`,
+            width: '50vw'
+          }
+        },
+        listbox: {
+          sx: {
+            margin: '0px',
+            padding: '0px',
+            maxHeight: `180px`
+          }
+        }
+        // option: {
+        //   sx: {
+        //     fontSize: theme.typography.fontSize,
+        //     backgroundColor: theme.palette.background.default,
+        //     padding: theme.spacing(1),
+        //     '&[data-focus="true"]': {
+        //       cursor: 'pointer',
+        //       backgroundColor: theme.palette.action.hover
+        //     },
+        //     '&[aria-selected="true"]': {
+        //       backgroundColor: theme.palette.action.selected
+        //     }
+        //   }
+        // }
+      }}
     />
   );
 };

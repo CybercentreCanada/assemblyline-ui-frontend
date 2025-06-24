@@ -6,11 +6,6 @@ import useALContext from 'components/hooks/useALContext';
 import type { ResultIndexed } from 'components/models/base/result';
 import type { SearchResult } from 'components/models/ui/search';
 import Classification from 'components/visual/Classification';
-import Moment from 'components/visual/Moment';
-import Verdict from 'components/visual/Verdict';
-import React from 'react';
-import { useTranslation } from 'react-i18next';
-import { Link, useLocation } from 'react-router-dom';
 import {
   DivTable,
   DivTableBody,
@@ -19,8 +14,14 @@ import {
   DivTableRow,
   LinkRow,
   SortableHeaderCell
-} from '../DivTable';
-import InformativeAlert from '../InformativeAlert';
+} from 'components/visual/DivTable';
+import InformativeAlert from 'components/visual/InformativeAlert';
+import Moment from 'components/visual/Moment';
+import Verdict from 'components/visual/Verdict';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { useLocation } from 'react-router';
+import { Link } from 'react-router-dom';
 
 type Props = {
   resultResults: SearchResult<ResultIndexed>;
@@ -29,7 +30,7 @@ type Props = {
 };
 
 const WrappedResultsTable: React.FC<Props> = ({ resultResults, component = Paper, allowSort = true }) => {
-  const { t, i18n } = useTranslation(['search']);
+  const { t } = useTranslation(['search']);
   const { c12nDef } = useALContext();
   const theme = useTheme();
   const location = useLocation();

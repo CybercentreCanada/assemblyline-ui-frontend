@@ -29,7 +29,7 @@ type Props = {
 };
 
 const WrappedSafelistTable: React.FC<Props> = ({ safelistResults, setSafelistID = null, allowSort = true }) => {
-  const { t, i18n } = useTranslation(['search']);
+  const { t } = useTranslation(['search']);
   const { c12nDef } = useALContext();
 
   return safelistResults ? (
@@ -84,8 +84,8 @@ const WrappedSafelistTable: React.FC<Props> = ({ safelistResults, setSafelistID 
                   {sl_item.type === 'file'
                     ? sl_item.id
                     : sl_item.type === 'signature'
-                    ? maxLenStr(sl_item.signature.name, 100)
-                    : `${sl_item.tag.type} - ${maxLenStr(sl_item.tag.value, 100)}`}
+                      ? maxLenStr(sl_item.signature.name, 100)
+                      : `${sl_item.tag.type} - ${maxLenStr(sl_item.tag.value, 100)}`}
                 </DivTableCell>
                 <DivTableCell breakable>{sl_item.sources.map(obj => obj.name).join(' | ')}</DivTableCell>
                 {c12nDef.enforce && (

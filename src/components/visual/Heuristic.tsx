@@ -1,9 +1,10 @@
 import useALContext from 'components/hooks/useALContext';
 import useHighlighter from 'components/hooks/useHighlighter';
 import useSafeResults from 'components/hooks/useSafeResults';
-import CustomChip, { PossibleColors } from 'components/visual/CustomChip';
-import React, { useCallback } from 'react';
-import ActionMenu from './ActionMenu';
+import ActionMenu from 'components/visual/ActionMenu';
+import CustomChip from 'components/visual/CustomChip';
+import type { PossibleColor } from 'helpers/colors';
+import React, { useCallback, useState } from 'react';
 
 const STYLE = { height: 'auto', minHeight: '20px' };
 const initialMenuState = {
@@ -34,7 +35,7 @@ const WrappedHeuristic: React.FC<HeuristicProps> = ({
   safe = false,
   force = false
 }) => {
-  const [state, setState] = React.useState(initialMenuState);
+  const [state, setState] = useState(initialMenuState);
   const { isHighlighted, triggerHighlight } = useHighlighter();
   const { scoreToVerdict } = useALContext();
   const { showSafeResults } = useSafeResults();
@@ -46,12 +47,12 @@ const WrappedHeuristic: React.FC<HeuristicProps> = ({
     maliciousness = 'safe';
   }
 
-  const color: PossibleColors = {
-    suspicious: 'warning' as 'warning',
-    malicious: 'error' as 'error',
-    safe: 'success' as 'success',
-    info: 'default' as 'default',
-    highly_suspicious: 'warning' as 'warning'
+  const color: PossibleColor = {
+    suspicious: 'warning' as const,
+    malicious: 'error' as const,
+    safe: 'success' as const,
+    info: 'default' as const,
+    highly_suspicious: 'warning' as const
   }[maliciousness];
 
   const handleMenuClick = useCallback(event => {
@@ -67,7 +68,7 @@ const WrappedHeuristic: React.FC<HeuristicProps> = ({
       {state !== initialMenuState && (
         <ActionMenu
           category={signature ? 'signature' : 'heuristic'}
-          type={''}
+          type=""
           value={text}
           state={state}
           setState={setState}

@@ -10,6 +10,7 @@ import {
   Link,
   Paper,
   Skeleton,
+  styled,
   Table,
   TableBody,
   TableCell,
@@ -19,7 +20,6 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import {
   DivTable,
@@ -47,37 +47,26 @@ export type ServiceResult = {
   version: string;
 };
 
+const StyledBsClipboard = styled(BsClipboard)(({ theme }) => ({
+  marginLeft: theme.spacing(1),
+  '&:hover': {
+    cursor: 'pointer',
+    transform: 'scale(1.1)'
+  }
+}));
+
 type Props = {
   services: JSONFeedItem[];
   installingServices: string[];
   onInstall: (s: JSONFeedItem[]) => void;
 };
 
-const useStyles = makeStyles(theme => ({
-  center: {
-    textAlign: 'center'
-  },
-  noBorder: {
-    borderBottom: 'transparent'
-  },
-  noDecoration: {
-    textDecoration: 'none'
-  },
-  clipboardIcon: {
-    marginLeft: theme.spacing(1),
-    '&:hover': {
-      cursor: 'pointer',
-      transform: 'scale(1.1)'
-    }
-  }
-}));
-
 const WrappedCommunityServiceTable: React.FC<Props> = ({ services, installingServices, onInstall }: Props) => {
   const { t } = useTranslation(['adminCommunityServices']);
-  const [serviceToInstall, setServiceToInstall] = useState<JSONFeedItem>(null);
-  const classes = useStyles();
   const theme = useTheme();
   const { copy } = useClipboard();
+
+  const [serviceToInstall, setServiceToInstall] = useState<JSONFeedItem>(null);
 
   return services ? (
     services.length !== 0 ? (
@@ -98,37 +87,34 @@ const WrappedCommunityServiceTable: React.FC<Props> = ({ services, installingSer
             <Table size="small">
               <TableBody>
                 <TableRow>
-                  <TableCell className={classes.noBorder}>{t('serviceToInstall.author')}</TableCell>
-                  <TableCell className={classes.noBorder}>
-                    <Link className={classes.noDecoration} target="_blank" href={serviceToInstall?.authors[0].url}>
+                  <TableCell sx={{ borderBottom: 'transparent' }}>{t('serviceToInstall.author')}</TableCell>
+                  <TableCell sx={{ borderBottom: 'transparent' }}>
+                    <Link sx={{ textDecoration: 'none' }} target="_blank" href={serviceToInstall?.authors[0].url}>
                       {serviceToInstall?.authors[0].name}
                     </Link>
                   </TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell className={classes.noBorder}>{t('serviceToInstall.code')}</TableCell>
-                  <TableCell className={classes.noBorder}>
-                    <Link className={classes.noDecoration} target="_blank" href={serviceToInstall?.url}>
+                  <TableCell sx={{ borderBottom: 'transparent' }}>{t('serviceToInstall.code')}</TableCell>
+                  <TableCell sx={{ borderBottom: 'transparent' }}>
+                    <Link sx={{ textDecoration: 'none' }} target="_blank" href={serviceToInstall?.url}>
                       {serviceToInstall?.url}
                     </Link>
                   </TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell className={classes.noBorder}>{t('serviceToInstall.pipeline')}</TableCell>
-                  <TableCell className={classes.noBorder}>
-                    <Link className={classes.noDecoration} target="_blank" href={serviceToInstall?.external_url}>
+                  <TableCell sx={{ borderBottom: 'transparent' }}>{t('serviceToInstall.pipeline')}</TableCell>
+                  <TableCell sx={{ borderBottom: 'transparent' }}>
+                    <Link sx={{ textDecoration: 'none' }} target="_blank" href={serviceToInstall?.external_url}>
                       {serviceToInstall?.external_url}
                     </Link>
                   </TableCell>
                 </TableRow>
                 <TableRow>
-                  <TableCell className={classes.noBorder}>{t('serviceToInstall.container')}</TableCell>
-                  <TableCell className={classes.noBorder}>
+                  <TableCell sx={{ borderBottom: 'transparent' }}>{t('serviceToInstall.container')}</TableCell>
+                  <TableCell sx={{ borderBottom: 'transparent' }}>
                     docker pull {serviceToInstall?.id}{' '}
-                    <BsClipboard
-                      className={classes.clipboardIcon}
-                      onClick={() => copy(`docker pull ${serviceToInstall?.id}`)}
-                    />
+                    <StyledBsClipboard onClick={() => copy(`docker pull ${serviceToInstall?.id}`)} />
                   </TableCell>
                 </TableRow>
               </TableBody>
@@ -169,8 +155,7 @@ const WrappedCommunityServiceTable: React.FC<Props> = ({ services, installingSer
                   <DivTableCell>{service.authors[0].name}</DivTableCell>
                   <DivTableCell>{service.content_text}</DivTableCell>
                   <DivTableCell
-                    className={classes.center}
-                    style={{ whiteSpace: 'nowrap', paddingTop: 0, paddingBottom: 0, width: 0 }}
+                    style={{ textAlign: 'center', whiteSpace: 'nowrap', paddingTop: 0, paddingBottom: 0, width: 0 }}
                   >
                     <Tooltip
                       PopperProps={{

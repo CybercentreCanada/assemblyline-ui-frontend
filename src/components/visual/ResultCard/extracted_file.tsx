@@ -1,37 +1,11 @@
 import PageviewOutlinedIcon from '@mui/icons-material/PageviewOutlined';
-import { IconButton, Link, Tooltip } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
-import { File } from 'components/models/base/result';
+import { IconButton, Link, Tooltip, useTheme } from '@mui/material';
+import type { File } from 'components/models/base/result';
 import { DEFAULT_TAB, TAB_OPTIONS } from 'components/routes/file/viewer';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link as RouterLink, useLocation } from 'react-router-dom';
-
-const useStyles = makeStyles(theme => ({
-  file: {
-    marginRight: theme.spacing(1)
-  },
-  description: {
-    color: theme.palette.text.secondary,
-    marginRight: theme.spacing(1),
-    fontSize: 'smaller'
-  },
-  button: {
-    marginTop: '-5px',
-    marginBottom: '-5px'
-  },
-  line: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    minHeight: theme.spacing(3.25)
-  },
-  text: {
-    display: 'flex',
-    flexWrap: 'wrap',
-    alignItems: 'center',
-    wordBreak: 'break-word'
-  }
-}));
+import { useLocation } from 'react-router';
+import { Link as RouterLink } from 'react-router-dom';
 
 type Props = {
   file: File;
@@ -41,7 +15,7 @@ type Props = {
 
 const WrappedExtractedFile: React.FC<Props> = ({ file, download = false, sid = null }) => {
   const { t } = useTranslation(['fileDetail']);
-  const classes = useStyles();
+  const theme = useTheme();
   const location = useLocation();
 
   const fileViewerPath = useMemo<string>(() => {
@@ -52,9 +26,9 @@ const WrappedExtractedFile: React.FC<Props> = ({ file, download = false, sid = n
   }, [file?.sha256, location.hash, location.pathname, location.search]);
 
   return (
-    <div className={classes.line}>
-      <div className={classes.text}>
-        <div className={classes.file}>
+    <div style={{ display: 'flex', justifyContent: 'space-between', minHeight: theme.spacing(3.25) }}>
+      <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', wordBreak: 'break-word' }}>
+        <div style={{ marginRight: theme.spacing(1) }}>
           {download ? (
             <Link
               href={`/api/v4/file/download/${file.sha256}/?${sid ? `sid=${sid}&` : ''}name=${encodeURI(file.name)}`}
@@ -74,9 +48,11 @@ const WrappedExtractedFile: React.FC<Props> = ({ file, download = false, sid = n
             </Link>
           )}
         </div>
-        <div className={classes.description}>{file.description}</div>
+        <div style={{ color: theme.palette.text.secondary, marginRight: theme.spacing(1), fontSize: 'smaller' }}>
+          {file.description}
+        </div>
       </div>
-      <div className={classes.button}>
+      <div style={{ marginTop: '-5px', marginBottom: '-5px' }}>
         <Tooltip title={`${t('view_file')}: ${file.name}`} placement="left">
           <IconButton component={RouterLink} to={fileViewerPath} size="small" color="primary">
             <PageviewOutlinedIcon />

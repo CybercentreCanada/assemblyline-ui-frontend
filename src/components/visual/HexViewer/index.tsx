@@ -8,4 +8,3 @@ export * from './handlers';
 export * from './models';
 export * from './reducers';
 export * from './stores';
-export * from './styles';

@@ -19,7 +19,8 @@ import InformativeAlert from 'components/visual/InformativeAlert';
 import Moment from 'components/visual/Moment';
 import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router';
+import { Link } from 'react-router-dom';
 
 type Props = {
   retrohuntResults: SearchResult<RetrohuntIndexed>;
@@ -34,7 +35,7 @@ const WrappedRetrohuntTable: React.FC<Props> = ({
   onRowClick = null,
   onSort = () => null
 }) => {
-  const { t, i18n } = useTranslation(['search']);
+  const { t } = useTranslation(['search']);
   const location = useLocation();
   const { c12nDef } = useALContext();
 

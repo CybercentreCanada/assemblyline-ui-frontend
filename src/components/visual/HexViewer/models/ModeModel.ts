@@ -1,4 +1,4 @@
-import { TypesConfig } from '..';
+import type { TypesConfig } from '..';
 
 export type ModeTheme = 'light' | 'dark';
 export type ModeLanguage = 'en' | 'fr';

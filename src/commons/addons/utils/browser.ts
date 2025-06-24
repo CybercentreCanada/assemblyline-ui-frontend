@@ -1,4 +1,3 @@
-/* eslint-disable no-param-reassign */
 import browser from 'browser-detect';
 
 export function insertText(input, from, to, text) {

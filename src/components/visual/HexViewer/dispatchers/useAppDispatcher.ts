@@ -1,5 +1,4 @@
-import {
-  ACTIONS,
+import type {
   ActionTypesConfig,
   Dispatch,
   DispatchersConfig,
@@ -11,6 +10,7 @@ import {
   ModeWidth,
   Store
 } from '..';
+import { ACTIONS } from '..';
 
 export type AppAction =
   | { type: 'storeDefault'; payload: any; tracked: boolean; repeat: boolean }

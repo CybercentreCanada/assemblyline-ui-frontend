@@ -6,8 +6,8 @@
 import type { Blocker, History, Transition } from 'history';
 import type { ContextType } from 'react';
 import { useContext, useEffect, useRef } from 'react';
-import type { Navigator as BaseNavigator } from 'react-router-dom';
-import { UNSAFE_NavigationContext as NavigationContext } from 'react-router-dom';
+import type { Navigator as BaseNavigator } from 'react-router';
+import { UNSAFE_NavigationContext as NavigationContext } from 'react-router';
 
 interface Navigator extends BaseNavigator {
   block: History['block'];
@@ -23,8 +23,8 @@ type NavigationContextWithBlock = ContextType<typeof NavigationContext> & { navi
 export function useBlocker(blocker: Blocker, when = true) {
   const { navigator } = useContext(NavigationContext) as NavigationContextWithBlock;
 
-  //main tweak required to OP was wrapping unblock in ref so we're only pushing one blocker on the stack for this when expression (i.e. not for every render)
-  const refUnBlock = useRef<() => void>();
+  // main tweak required to OP was wrapping unblock in ref so we're only pushing one blocker on the stack for this when expression (i.e. not for every render)
+  const refUnBlock = useRef<() => void>(null);
 
   useEffect(() => {
     if (!when) {
@@ -37,7 +37,7 @@ export function useBlocker(blocker: Blocker, when = true) {
         const autoUnblockingTx = {
           ...tx,
           retry() {
-            refUnBlock.current?.(); //need to unblock so retry succeeds
+            refUnBlock.current?.(); // need to unblock so retry succeeds
             tx.retry();
           }
         };

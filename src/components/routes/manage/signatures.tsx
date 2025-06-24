@@ -1,11 +1,14 @@
 import BlockIcon from '@mui/icons-material/Block';
 import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
 import RecordVoiceOverOutlinedIcon from '@mui/icons-material/RecordVoiceOverOutlined';
-import { Grid, useMediaQuery, useTheme } from '@mui/material';
-import Typography from '@mui/material/Typography';
-import useAppUser from 'commons/components/app/hooks/useAppUser';
+import { useMediaQuery, useTheme } from '@mui/material';
+import { useAppUser } from 'commons/components/app/hooks';
+import PageContainer from 'commons/components/pages/PageContainer';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
-import PageHeader from 'commons/components/pages/PageHeader';
+import type { SearchParams } from 'components/core/SearchParams/SearchParams';
+import { createSearchParams } from 'components/core/SearchParams/SearchParams';
+import { SearchParamsProvider, useSearchParams } from 'components/core/SearchParams/SearchParamsContext';
+import type { SearchParamsResult } from 'components/core/SearchParams/SearchParser';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -13,19 +16,15 @@ import type { Signature } from 'components/models/base/signature';
 import type { SearchResult } from 'components/models/ui/search';
 import type { CustomUser } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
+import SignatureDetail from 'components/routes/manage/signature_detail';
 import FileDownloader from 'components/visual/FileDownloader';
+import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import SearchHeader from 'components/visual/SearchBar/SearchHeader';
-import type { SearchParams } from 'components/visual/SearchBar/SearchParams';
-import { createSearchParams } from 'components/visual/SearchBar/SearchParams';
-import { SearchParamsProvider, useSearchParams } from 'components/visual/SearchBar/SearchParamsContext';
-import type { SearchParamsResult } from 'components/visual/SearchBar/SearchParser';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import SignaturesTable from 'components/visual/SearchResult/signatures';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
-import { useLocation } from 'react-router-dom';
-import SignatureDetail from './signature_detail';
+import { useLocation, useNavigate } from 'react-router';
 
 const SIGNATURES_PARAMS = createSearchParams(p => ({
   query: p.string(''),
@@ -68,6 +67,16 @@ const SignaturesSearch = () => {
         .pick(['query'])
         .toString(),
     [search]
+  );
+
+  const handleToggleFilter = useCallback(
+    (filter: string) => {
+      setSearchObject(o => {
+        const filters = o.filters.includes(filter) ? o.filters.filter(f => f !== filter) : [...o.filters, filter];
+        return { ...o, offset: 0, filters };
+      });
+    },
+    [setSearchObject]
   );
 
   const handleReload = useCallback(
@@ -144,24 +153,23 @@ const SignaturesSearch = () => {
 
   return currentUser.roles.includes('signature_view') ? (
     <PageFullWidth margin={4}>
-      <div style={{ paddingBottom: theme.spacing(2) }}>
-        <Grid container alignItems="center">
-          <Grid item xs>
-            <Typography variant="h4">{t('title')}</Typography>
-          </Grid>
-          {currentUser.roles.includes('signature_download') && (
-            <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
-              <FileDownloader
-                icon={<GetAppOutlinedIcon />}
-                link={`/api/v4/signature/download/?${downloadLink}`}
-                tooltip={t('download_desc')}
-              />
-            </Grid>
-          )}
-        </Grid>
-      </div>
+      <PageHeader
+        primary={t('title')}
+        slotProps={{
+          root: { style: { marginBottom: theme.spacing(2) } }
+        }}
+        actions={
+          currentUser.roles.includes('signature_download') && (
+            <FileDownloader
+              icon={<GetAppOutlinedIcon />}
+              link={`/api/v4/signature/download/?${downloadLink}`}
+              tooltip={t('download_desc')}
+            />
+          )
+        }
+      />
 
-      <PageHeader isSticky>
+      <PageContainer isSticky>
         <div style={{ paddingTop: theme.spacing(1) }}>
           <SearchHeader
             params={search.toParams()}
@@ -177,23 +185,31 @@ const SignaturesSearch = () => {
             searchInputProps={{ placeholder: t('filter'), options: suggestions }}
             actionProps={[
               {
-                tooltip: { title: t('noisy') },
+                tooltip: {
+                  title: search.has('filters', 'status:NOISY') ? t('filter.noisy.remove') : t('filter.noisy.add')
+                },
                 icon: { children: <RecordVoiceOverOutlinedIcon /> },
                 button: {
-                  onClick: () => setSearchObject(o => ({ ...o, offset: 0, filters: [...o.filters, 'status:NOISY'] }))
+                  color: search.has('filters', 'status:NOISY') ? 'primary' : 'default',
+                  onClick: () => handleToggleFilter('status:NOISY')
                 }
               },
               {
-                tooltip: { title: t('disabled') },
+                tooltip: {
+                  title: search.has('filters', 'status:DISABLED')
+                    ? t('filter.disabled.remove')
+                    : t('filter.disabled.add')
+                },
                 icon: { children: <BlockIcon /> },
                 button: {
-                  onClick: () => setSearchObject(o => ({ ...o, offset: 0, filters: [...o.filters, 'status:DISABLED'] }))
+                  color: search.has('filters', 'status:DISABLED') ? 'primary' : 'default',
+                  onClick: () => handleToggleFilter('status:DISABLED')
                 }
               }
             ]}
           />
         </div>
-      </PageHeader>
+      </PageContainer>
 
       <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
         <SignaturesTable signatureResults={signatureResults} setSignatureID={setSignatureID} />

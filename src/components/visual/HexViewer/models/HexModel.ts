@@ -1,4 +1,4 @@
-import { TypesConfig } from '..';
+import type { TypesConfig } from '..';
 
 /**
  * ASCII encoding : 7 bits

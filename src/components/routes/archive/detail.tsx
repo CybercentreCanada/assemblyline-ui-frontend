@@ -36,8 +36,7 @@ import { emptyResult } from 'components/visual/ResultCard';
 import { TabContainer } from 'components/visual/TabContainer';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate, useNavigate } from 'react-router';
-import { useLocation, useParams } from 'react-router-dom';
+import { Navigate, useLocation, useNavigate, useParams } from 'react-router';
 
 type Params = {
   id?: string;
@@ -281,7 +280,7 @@ const WrappedArchiveDetail: React.FC<Props> = ({ sha256: propSha256, force = fal
             code: {
               label: t('code'),
               inner: <CodeSection sha256={sha256} archiveOnly />,
-              disabled: isMdUp || !codeAllowed
+              preventRender: isMdUp || !codeAllowed
             },
             strings: { label: t('strings'), inner: <StringsSection sha256={sha256} type={file?.file_info?.type} /> },
             hex: { label: t('hex'), inner: <HexSection sha256={sha256} /> },

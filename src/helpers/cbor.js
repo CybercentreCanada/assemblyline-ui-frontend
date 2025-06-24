@@ -28,22 +28,6 @@
   in the linter therefor we will disable those checks for this
   file.
 */
-/* eslint-disable no-mixed-operators */
-/* eslint-disable no-shadow-restricted-names */
-/* eslint-disable strict */
-/* eslint-disable default-case */
-/* eslint-disable no-throw-literal */
-/* eslint-disable no-undef */
-/* eslint-disable no-bitwise */
-/* eslint-disable no-shadow */
-/* eslint-disable vars-on-top */
-/* eslint-disable consistent-return */
-/* eslint-disable no-var */
-/* eslint-disable no-param-reassign */
-/* eslint-disable func-names */
-/* eslint-disable @typescript-eslint/no-use-before-define */
-/* eslint-disable @typescript-eslint/no-throw-literal */
-/* eslint-disable @typescript-eslint/no-shadow */
 
 'use strict';
 

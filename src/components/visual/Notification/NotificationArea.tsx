@@ -10,7 +10,7 @@ import NotificationsActiveOutlinedIcon from '@mui/icons-material/NotificationsAc
 import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
 import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined';
 import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
-import type { SelectChangeEvent } from '@mui/material';
+import type { SelectChangeEvent, SvgIconProps, Theme } from '@mui/material';
 import {
   Badge,
   Button,
@@ -25,6 +25,7 @@ import {
   MenuItem,
   Select,
   Skeleton,
+  styled,
   TextField,
   Tooltip,
   Typography,
@@ -32,8 +33,6 @@ import {
 } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
 import { blue } from '@mui/material/colors';
-import makeStyles from '@mui/styles/makeStyles';
-import clsx from 'clsx';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
@@ -41,144 +40,135 @@ import type { Configuration } from 'components/models/base/config';
 import type { ServiceIndexed } from 'components/models/base/service';
 import type { SystemMessage } from 'components/models/ui/user';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
+import NotificationItem from 'components/visual/Notification/NotificationItem';
+import type { JSONFeedItem } from 'components/visual/Notification/useNotificationFeed';
+import { useNotificationFeed } from 'components/visual/Notification/useNotificationFeed';
+import type { PossibleColor } from 'helpers/colors';
 import 'moment-timezone';
+import type { ComponentProps, ComponentType, CSSProperties, ElementType } from 'react';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { JSONFeedItem } from '.';
-import { NotificationItem, useNotificationFeed } from '.';
 
-const useStyles = makeStyles(theme => ({
-  drawer: {
-    width: '80%',
-    maxWidth: '500px',
-    [theme.breakpoints.down('sm')]: {
-      width: '100%'
-    }
-  },
-  root: {
-    height: '100%',
-    width: '100%',
-    overflowX: 'hidden',
-    pageBreakBefore: 'avoid',
-    pageBreakInside: 'avoid',
-    padding: theme.spacing(2.5),
-    paddingTop: 0
-  },
-  container: {
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'flex-start',
-    alignItems: 'center',
-    alignContent: 'stretch',
-    flexWrap: 'nowrap'
-  },
-  row: {
-    width: '100%',
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center'
-  },
-  closeRow: {
-    position: 'sticky',
-    paddingTop: theme.spacing(1),
-    zIndex: 20000,
-    top: '0px',
-    backgroundColor: theme.palette.background.paper
-  },
-  center: {
-    justifyContent: 'center'
-  },
-  close: {},
-  skeleton: {
-    width: '100%',
-    height: theme.spacing(8)
-  },
-  divider: {
-    marginBottom: theme.spacing(2),
-    width: '100%',
-    '@media print': {
-      backgroundColor: '#0000001f !important'
-    }
-  },
-  icon: {
-    color: 'inherit',
-    backgroundColor: 'inherit',
-    marginLeft: theme.spacing(1.5),
-    marginRight: theme.spacing(1.5)
-  },
-  header: {
-    paddingTop: theme.spacing(2)
-  },
-  title: {
-    fontSize: 'large',
-    fontWeight: 'bolder',
-    flex: 1
-  },
-  messageTitle: {
-    fontSize: 'large',
-    fontWeight: 'bolder',
-    paddingLeft: theme.spacing(1.25)
-  },
-  messageBody: {
-    paddingLeft: theme.spacing(1.25)
-  },
-  message: {
-    paddingLeft: theme.spacing(1.25)
-  },
-  item: {
-    width: '100%',
-    display: 'flex',
-    flexDirection: 'column',
-    paddingTop: theme.spacing(1.25),
-    paddingBottom: theme.spacing(1.25)
-  },
-  user: {
-    textAlign: 'right',
-    paddingTop: theme.spacing(1),
-    paddingRight: theme.spacing(1)
-  },
-  action: {
-    paddingLeft: theme.spacing(0.5),
-    paddingRight: theme.spacing(0.5)
-  },
-  baseColor: {
-    color: theme.palette.getContrastText(theme.palette.primary.main),
-    backgroundColor: theme.palette.primary.main
-  },
-  colorError1: { color: theme.palette.error.main },
-  colorWarning1: { color: theme.palette.warning.main },
-  colorInfo1: { color: blue[500] },
-  colorSuccess1: { color: theme.palette.success.main },
-
-  colorError2: { color: theme.palette.mode === 'dark' ? 'rgb(250, 179, 174)' : 'rgb(97, 26, 21)' },
-  colorWarning2: { color: theme.palette.mode === 'dark' ? 'rgb(255, 213, 153)' : 'rgb(102, 60, 0)' },
-  colorInfo2: { color: theme.palette.mode === 'dark' ? 'rgb(166, 213, 250)' : 'rgb(13, 60, 97)' },
-  colorSuccess2: { color: theme.palette.mode === 'dark' ? 'rgb(183, 223, 185)' : 'rgb(30, 70, 32)' },
-
-  colorError3: { color: theme.palette.getContrastText(theme.palette.error.main) },
-  colorWarning3: { color: theme.palette.getContrastText(theme.palette.warning.main) },
-  colorInfo3: { color: theme.palette.getContrastText(theme.palette.primary.main) },
-  colorSuccess3: { color: theme.palette.getContrastText(theme.palette.success.main) },
-
-  bgColorError1: { backgroundColor: theme.palette.error.main },
-  bgColorWarning1: { backgroundColor: theme.palette.warning.main },
-  bgColorInfo1: { backgroundColor: blue[500] },
-  bgColorSuccess1: { backgroundColor: theme.palette.success.main },
-
-  bgColorError2: { backgroundColor: theme.palette.mode === 'dark' ? 'rgb(24, 6, 5)' : 'rgb(253, 236, 234)' },
-  bgColorWarning2: { backgroundColor: theme.palette.mode === 'dark' ? 'rgb(25, 15, 0)' : 'rgb(255, 244, 229)' },
-  bgColorInfo2: { backgroundColor: theme.palette.mode === 'dark' ? 'rgb(3, 14, 24)' : 'rgb(232, 244, 253)' },
-  bgColorSuccess2: { backgroundColor: theme.palette.mode === 'dark' ? 'rgb(7, 17, 7)' : 'rgb(237, 247, 237)' },
-
-  bgColorError3: { backgroundColor: theme.palette.getContrastText(theme.palette.error.main) },
-  bgColorWarning3: { backgroundColor: theme.palette.getContrastText(theme.palette.warning.main) },
-  bgColorInfo3: { backgroundColor: theme.palette.getContrastText(theme.palette.primary.main) },
-  bgColorSuccess3: { backgroundColor: theme.palette.getContrastText(theme.palette.success.main) }
+const Row = styled('div')(() => ({
+  width: '100%',
+  display: 'flex',
+  flexDirection: 'row',
+  alignItems: 'center'
 }));
+
+type SystemMessageIconProps = SvgIconProps & {
+  severity?: PossibleColor;
+};
+
+const SystemMessageIcon = styled(({ severity, fontSize = 'medium', ...props }: SystemMessageIconProps) => {
+  switch (severity) {
+    case 'error':
+      return <ErrorOutlineOutlinedIcon fontSize={fontSize} {...props} />;
+    case 'warning':
+      return <ReportProblemOutlinedIcon fontSize={fontSize} {...props} />;
+    case 'info':
+      return <InfoOutlinedIcon fontSize={fontSize} {...props} />;
+    case 'success':
+      return <CheckCircleOutlinedIcon fontSize={fontSize} {...props} />;
+    default:
+      return <NotificationsOutlinedIcon fontSize={fontSize} {...props} />;
+  }
+})<SystemMessageIconProps>(({ theme }) => ({
+  color: 'inherit',
+  backgroundColor: 'inherit',
+  marginLeft: theme.spacing(1.5),
+  marginRight: theme.spacing(1.5)
+}));
+
+const getColor = (severity: PossibleColor, variant: 1 | 2 | 3, theme: Theme) => {
+  const colors: Record<string, Record<number, CSSProperties>> = {
+    error: {
+      1: { color: theme.palette.error.main },
+      2: { color: theme.palette.mode === 'dark' ? 'rgb(250, 179, 174)' : 'rgb(97, 26, 21)' },
+      3: { color: theme.palette.getContrastText(theme.palette.error.main) }
+    },
+    warning: {
+      1: { color: theme.palette.warning.main },
+      2: { color: theme.palette.mode === 'dark' ? 'rgb(255, 213, 153)' : 'rgb(102, 60, 0)' },
+      3: { color: theme.palette.getContrastText(theme.palette.warning.main) }
+    },
+    info: {
+      1: { color: blue[500] },
+      2: { color: theme.palette.mode === 'dark' ? 'rgb(166, 213, 250)' : 'rgb(13, 60, 97)' },
+      3: { color: theme.palette.getContrastText(theme.palette.primary.main) }
+    },
+    success: {
+      1: { color: theme.palette.success.main },
+      2: { color: theme.palette.mode === 'dark' ? 'rgb(183, 223, 185)' : 'rgb(30, 70, 32)' },
+      3: { color: theme.palette.getContrastText(theme.palette.success.main) }
+    }
+  };
+
+  return colors?.[severity]?.[variant];
+};
+
+const getBackgroundColor = (severity: PossibleColor, variant: 1 | 2 | 3, theme: Theme) => {
+  const backgroundColors: Record<string, Record<number, CSSProperties>> = {
+    error: {
+      1: { backgroundColor: theme.palette.error.main },
+      2: { backgroundColor: theme.palette.mode === 'dark' ? 'rgb(24, 6, 5)' : 'rgb(253, 236, 234)' },
+      3: { backgroundColor: theme.palette.getContrastText(theme.palette.error.main) }
+    },
+    warning: {
+      1: { backgroundColor: theme.palette.warning.main },
+      2: { backgroundColor: theme.palette.mode === 'dark' ? 'rgb(25, 15, 0)' : 'rgb(255, 244, 229)' },
+      3: { backgroundColor: theme.palette.getContrastText(theme.palette.warning.main) }
+    },
+    info: {
+      1: { backgroundColor: blue[500] },
+      2: { backgroundColor: theme.palette.mode === 'dark' ? 'rgb(3, 14, 24)' : 'rgb(232, 244, 253)' },
+      3: { backgroundColor: theme.palette.getContrastText(theme.palette.primary.main) }
+    },
+    success: {
+      1: { backgroundColor: theme.palette.success.main },
+      2: { backgroundColor: theme.palette.mode === 'dark' ? 'rgb(7, 17, 7)' : 'rgb(237, 247, 237)' },
+      3: { backgroundColor: theme.palette.getContrastText(theme.palette.success.main) }
+    }
+  };
+
+  return backgroundColors?.[severity]?.[variant];
+};
+
+type NotificationColorProps<T extends ElementType<unknown>> = ComponentProps<T> & {
+  component: T;
+  children?: React.ReactNode;
+  severity?: PossibleColor;
+  colorType?: 1 | 2 | 3;
+  backgroundColorType?: 1 | 2 | 3;
+};
+
+const NotificationColor = <T extends ComponentType<any>>({
+  component: Component = 'div',
+  children,
+  severity = null,
+  colorType = null,
+  backgroundColorType = null,
+  style,
+  ...props
+}: NotificationColorProps<T>) => {
+  const theme = useTheme();
+
+  return (
+    <Component
+      {...props}
+      style={{
+        ...getColor(severity, colorType, theme),
+        ...getBackgroundColor(severity, backgroundColorType, theme),
+        ...style
+      }}
+    >
+      {children}
+    </Component>
+  );
+};
 
 const WrappedNotificationArea = () => {
   const { t } = useTranslation(['notification']);
-  const classes = useStyles();
   const theme = useTheme();
   const { apiCall } = useMyAPI();
   const { showSuccessMessage } = useMySnackbar();
@@ -186,7 +176,7 @@ const WrappedNotificationArea = () => {
   const { systemMessage, setSystemMessage, user: currentUser, configuration } = useALContext();
   const { fetchJSONNotifications } = useNotificationFeed();
 
-  const [notifications, setNotifications] = useState<Array<JSONFeedItem>>([]);
+  const [notifications, setNotifications] = useState<JSONFeedItem[]>([]);
   const [newSystemMessage, setNewSystemMessage] = useState<SystemMessage>({
     user: '',
     title: '',
@@ -289,15 +279,6 @@ const WrappedNotificationArea = () => {
     });
   };
 
-  const getColor = useCallback(
-    (sm: SystemMessage, color: 'color' | 'bgColor' = 'color', type: 1 | 2 | 3 = 1) => {
-      if (sm === null || sm === undefined || sm.severity === null) return null;
-      const c = classes[color + sm.severity.charAt(0).toUpperCase() + sm.severity.slice(1) + type];
-      return c === undefined ? null : c;
-    },
-    [classes]
-  );
-
   const arrayEquals = useCallback(
     (a, b) =>
       Array.isArray(a) && Array.isArray(b) && a.length === b.length && a.every((val, index) => val === b[index]),
@@ -316,7 +297,7 @@ const WrappedNotificationArea = () => {
   }, []);
 
   const getVersionValues = useCallback(
-    (value: string): Array<number> =>
+    (value: string): number[] =>
       value
         ?.match(/(\d){1,}\.(\d){1,}\.(\d){1,}\..*/g)
         ?.at(0)
@@ -338,8 +319,8 @@ const WrappedNotificationArea = () => {
       )
         return null;
 
-      const notValues: Array<number> = getVersionValues(notVer);
-      const sysValues: Array<number> = getVersionValues(sysVer);
+      const notValues: number[] = getVersionValues(notVer);
+      const sysValues: number[] = getVersionValues(sysVer);
 
       if (arrayEquals(notValues, sysValues)) return 'current';
       else if (arrayHigher(notValues, sysValues)) return 'newer';
@@ -370,7 +351,7 @@ const WrappedNotificationArea = () => {
           api_data && api_data.api_response && Array.isArray(api_data.api_response) ? api_data.api_response : null;
         fetchJSONNotifications({
           urls: configuration.ui.rss_feeds,
-          onSuccess: (feedItems: Array<JSONFeedItem>) =>
+          onSuccess: (feedItems: JSONFeedItem[]) =>
             setNotifications(_n => {
               const isAdmin = currentUser?.is_admin;
               let newNots = feedItems.filter(n => {
@@ -502,19 +483,18 @@ const WrappedNotificationArea = () => {
         <IconButton color="inherit" aria-label="open drawer" onClick={onOpenNotificationArea} size="large">
           <Badge
             invisible={systemMessageRead && notifications.filter(n => n._isNew).length === 0}
-            classes={{ badge: clsx(classes.baseColor, systemMessage && getColor(systemMessage, 'bgColor', 1)) }}
             max={99}
             badgeContent={
               systemMessage
                 ? systemMessage.severity === 'error'
                   ? `!`
                   : systemMessage.severity === 'warning'
-                  ? `!`
-                  : systemMessage.severity === 'info'
-                  ? `i`
-                  : systemMessage.severity === 'success'
-                  ? `\u2714`
-                  : ''
+                    ? `!`
+                    : systemMessage.severity === 'info'
+                      ? `i`
+                      : systemMessage.severity === 'success'
+                        ? `\u2714`
+                        : ''
                 : notifications.filter(n => n._isNew).length
             }
             children={
@@ -524,71 +504,116 @@ const WrappedNotificationArea = () => {
                 <NotificationsActiveOutlinedIcon />
               )
             }
+            slotProps={{
+              badge: {
+                style: {
+                  color: theme.palette.getContrastText(theme.palette.primary.main),
+                  backgroundColor: theme.palette.primary.main,
+                  ...getBackgroundColor(systemMessage?.severity, 1, theme)
+                }
+              }
+            }}
           />
         </IconButton>
       </Tooltip>
-      <Drawer anchor="right" classes={{ paper: classes.drawer }} open={drawer} onClose={onCloseNotificationArea}>
-        <div className={classes.root}>
-          <div className={classes.container}>
-            <div className={clsx(classes.row, classes.closeRow)}>
-              <IconButton
-                className={classes.close}
-                onClick={onCloseNotificationArea}
-                children={<CloseOutlinedIcon fontSize="medium" />}
-                size="large"
-              />
-            </div>
+      <Drawer
+        anchor="right"
+        open={drawer}
+        onClose={onCloseNotificationArea}
+        slotProps={{
+          paper: {
+            sx: {
+              width: '80%',
+              maxWidth: '500px',
+              [theme.breakpoints.down('sm')]: {
+                width: '100%'
+              }
+            }
+          }
+        }}
+      >
+        <div
+          style={{
+            height: '100%',
+            width: '100%',
+            overflowX: 'hidden',
+            pageBreakBefore: 'avoid',
+            pageBreakInside: 'avoid',
+            padding: theme.spacing(2.5),
+            paddingTop: 0
+          }}
+        >
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'flex-start',
+              alignItems: 'center',
+              alignContent: 'stretch',
+              flexWrap: 'nowrap'
+            }}
+          >
+            <Row
+              style={{
+                position: 'sticky',
+                paddingTop: theme.spacing(1),
+                zIndex: 20000,
+                top: '0px',
+                backgroundColor: theme.palette.background.paper
+              }}
+            >
+              <IconButton size="large" onClick={onCloseNotificationArea}>
+                <CloseOutlinedIcon fontSize="medium" />
+              </IconButton>
+            </Row>
             {(systemMessage || (currentUser && currentUser.is_admin)) && (
               <>
-                <div className={clsx(classes.row, classes.header)}>
-                  {systemMessage ? (
-                    systemMessage.severity === 'error' ? (
-                      <ErrorOutlineOutlinedIcon
-                        className={clsx(classes.icon, getColor(systemMessage, 'color', 1))}
-                        fontSize="medium"
-                      />
-                    ) : systemMessage.severity === 'warning' ? (
-                      <ReportProblemOutlinedIcon
-                        className={clsx(classes.icon, getColor(systemMessage, 'color', 1))}
-                        fontSize="medium"
-                      />
-                    ) : systemMessage.severity === 'info' ? (
-                      <InfoOutlinedIcon
-                        className={clsx(classes.icon, getColor(systemMessage, 'color', 1))}
-                        fontSize="medium"
-                      />
-                    ) : systemMessage.severity === 'success' ? (
-                      <CheckCircleOutlinedIcon
-                        className={clsx(classes.icon, getColor(systemMessage, 'color', 1))}
-                        fontSize="medium"
-                      />
-                    ) : null
-                  ) : (
-                    <NotificationsOutlinedIcon className={clsx(classes.icon)} fontSize="medium" />
-                  )}
-                  <Typography
-                    className={clsx(classes.title, getColor(systemMessage, 'color', 2))}
-                    variant={'h6'}
+                <Row style={{ paddingTop: theme.spacing(2) }}>
+                  <NotificationColor
+                    component={SystemMessageIcon}
+                    severity={systemMessage?.severity}
+                    colorType={1}
+                    sx={{
+                      color: 'inherit',
+                      backgroundColor: 'inherit',
+                      marginLeft: theme.spacing(1.5),
+                      marginRight: theme.spacing(1.5)
+                    }}
+                  />
+                  <NotificationColor
+                    component={Typography}
+                    severity={systemMessage?.severity}
+                    colorType={2}
+                    variant="h6"
                     children={t('systemMessage.header')}
+                    sx={{
+                      fontSize: 'large',
+                      fontWeight: 'bolder',
+                      flex: 1
+                    }}
                   />
                   {currentUser &&
                     currentUser.is_admin &&
                     (systemMessage ? (
                       <>
-                        <div className={clsx(classes.action)}>
+                        <div style={{ paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
                           <Tooltip title={t('edit.title')} aria-label={t('edit.title')}>
-                            <IconButton
-                              className={clsx(getColor(systemMessage, 'color', 2))}
+                            <NotificationColor
+                              component={IconButton}
+                              severity={systemMessage?.severity}
+                              colorType={2}
                               size="small"
                               onClick={onOpenEditSystemMessageDialog}
                               children={<EditOutlinedIcon />}
                             />
                           </Tooltip>
                         </div>
-                        <div className={clsx(classes.action)}>
+                        <div style={{ paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
                           <Tooltip title={t('delete.title')} aria-label={t('delete.title')}>
-                            <IconButton
-                              className={clsx(getColor(systemMessage, 'color', 2))}
+                            <NotificationColor
+                              component={IconButton}
+                              severity={systemMessage?.severity}
+                              colorType={2}
                               size="small"
                               onClick={() => setDeleteConfirmation(true)}
                               children={<DeleteOutlineOutlinedIcon />}
@@ -597,7 +622,7 @@ const WrappedNotificationArea = () => {
                         </div>
                       </>
                     ) : (
-                      <div className={clsx(classes.action)}>
+                      <div style={{ paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
                         <Tooltip title={t('add.title')} aria-label={t('add.title')}>
                           <IconButton
                             size="small"
@@ -608,48 +633,102 @@ const WrappedNotificationArea = () => {
                         </Tooltip>
                       </div>
                     ))}
-                </div>
-                <Divider className={clsx(classes.divider, getColor(systemMessage, 'bgColor', 1))} variant="fullWidth" />
+                </Row>
+                <NotificationColor
+                  component={Divider}
+                  severity={systemMessage?.severity}
+                  backgroundColorType={2}
+                  variant="fullWidth"
+                  sx={{
+                    marginBottom: theme.spacing(2),
+                    width: '100%',
+                    '@media print': {
+                      backgroundColor: '#0000001f !important'
+                    }
+                  }}
+                />
                 {systemMessage ? (
-                  <div className={clsx(classes.item)}>
-                    <Typography
-                      className={clsx(classes.messageTitle, getColor(systemMessage, 'color', 2))}
+                  <div
+                    style={{
+                      width: '100%',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      paddingTop: theme.spacing(1.25),
+                      paddingBottom: theme.spacing(1.25)
+                    }}
+                  >
+                    <NotificationColor
+                      component={Typography}
+                      severity={systemMessage?.severity}
+                      colorType={2}
                       variant="body1"
                       children={systemMessage.title}
+                      sx={{
+                        fontSize: 'large',
+                        fontWeight: 'bolder',
+                        paddingLeft: theme.spacing(1.25)
+                      }}
                     />
                     <Typography
-                      className={clsx(classes.messageBody)}
                       variant="body2"
                       color="textPrimary"
                       children={systemMessage.message}
+                      sx={{
+                        paddingLeft: theme.spacing(1.25)
+                      }}
                     />
                     <Typography
-                      className={classes.user}
                       variant="caption"
                       color="textSecondary"
                       children={systemMessage.user}
+                      sx={{
+                        textAlign: 'right',
+                        paddingTop: theme.spacing(1),
+                        paddingRight: theme.spacing(1)
+                      }}
                     />
                   </div>
                 ) : (
-                  <div className={clsx(classes.row, classes.center)}>
+                  <Row style={{ justifyContent: 'center' }}>
                     <Typography variant="body2" color="secondary" children={t(`systemMessage.none`)} />
-                  </div>
+                  </Row>
                 )}
               </>
             )}
-            <div className={clsx(classes.row, classes.header)}>
-              <FeedbackOutlinedIcon className={clsx(classes.icon)} fontSize="medium" />
-              <Typography className={clsx(classes.title)} variant={'h6'} children={t(`notification.header`)} />
-            </div>
-            <Divider className={clsx(classes.divider)} variant="fullWidth" />
+            <Row style={{ paddingTop: theme.spacing(2) }}>
+              <FeedbackOutlinedIcon
+                fontSize="medium"
+                sx={{
+                  color: 'inherit',
+                  backgroundColor: 'inherit',
+                  marginLeft: theme.spacing(1.5),
+                  marginRight: theme.spacing(1.5)
+                }}
+              />
+              <Typography
+                variant="h6"
+                children={t(`notification.header`)}
+                sx={{ fontSize: 'large', fontWeight: 'bolder', flex: 1 }}
+              />
+            </Row>
+            <Divider
+              variant="fullWidth"
+              sx={{
+                marginBottom: theme.spacing(2),
+                width: '100%',
+                '@media print': {
+                  backgroundColor: '#0000001f !important'
+                }
+              }}
+            />
             {notifications === null ? (
-              <div className={clsx(classes.row)}>
-                <Skeleton className={clsx(classes.skeleton)} variant="text" animation="wave" />
-              </div>
+              <Row>
+                <Skeleton variant="text" animation="wave" sx={{ width: '100%', height: theme.spacing(8) }} />
+              </Row>
             ) : notifications.length === 0 ? (
-              <div className={clsx(classes.row, classes.center)}>
+              <Row style={{ justifyContent: 'center' }}>
                 <Typography variant="body2" color="secondary" children={t('notification.none')} />
-              </div>
+              </Row>
             ) : (
               notifications.map((n, i) => (
                 <NotificationItem key={i} notification={n} hideDivider={i === notifications.length - 1} />

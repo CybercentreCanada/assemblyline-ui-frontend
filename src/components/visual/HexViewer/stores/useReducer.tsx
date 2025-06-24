@@ -1,11 +1,6 @@
-import React from 'react';
+import React, { useCallback } from 'react';
+import type { Action, ReducerConfig, ReducersConfig, Store, StoreAction, StoreProviderProps } from '..';
 import {
-  Action,
-  ReducerConfig,
-  ReducersConfig,
-  Store,
-  StoreAction,
-  StoreProviderProps,
   useCellReducer,
   useCopyReducer,
   useCursorReducer,
@@ -52,7 +47,7 @@ export const ReducerProvider = ({ children }: StoreProviderProps) => {
   const select = useSelectReducer();
   const setting = useSettingReducer();
 
-  const reducer = React.useCallback(
+  const reducer = useCallback(
     (store: Store, action: Action) => {
       const prevStore = { ...store };
 
@@ -81,7 +76,7 @@ export const ReducerProvider = ({ children }: StoreProviderProps) => {
     [cell, copy, cursor, hex, history, hover, layout, loading, location, mode, scroll, search, select, setting]
   );
 
-  const render = React.useCallback(
+  const render = useCallback(
     (prevStore: Store, nextStore: Store) => {
       if (nextStore.loading.status !== 'initialized') return;
 

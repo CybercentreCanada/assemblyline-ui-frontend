@@ -1,38 +1,40 @@
-import {
+import type {
   CellTypes,
-  CELL_TYPES,
   CopyTypes,
-  COPY_TYPES,
   CursorTypes,
-  CURSOR_TYPES,
   FindTypeConfig,
   GetTypeConfig,
   GetValueConfig,
   HexTypes,
-  HEX_TYPES,
   HistoryTypes,
-  HISTORY_TYPES,
   HoverTypes,
-  HOVER_TYPES,
   IsTypeConfig,
   ItemConfig,
   ItemsConfig,
   LayoutTypes,
-  LAYOUT_TYPES,
   LoadingTypes,
-  LOADING_TYPES,
   LocationTypes,
-  LOCATION_TYPES,
   ModeTypes,
-  MODE_TYPES,
   ScrollTypes,
-  SCROLL_TYPES,
   SearchTypes,
-  SEARCH_TYPES,
   SelectTypes,
-  SELECT_TYPES,
   Store,
   TypesConfig
+} from '..';
+import {
+  CELL_TYPES,
+  COPY_TYPES,
+  CURSOR_TYPES,
+  HEX_TYPES,
+  HISTORY_TYPES,
+  HOVER_TYPES,
+  LAYOUT_TYPES,
+  LOADING_TYPES,
+  LOCATION_TYPES,
+  MODE_TYPES,
+  SCROLL_TYPES,
+  SEARCH_TYPES,
+  SELECT_TYPES
 } from '..';
 
 export type HexViewerTypes =
@@ -82,7 +84,7 @@ export const STORE_TYPES: TypesConfig<Omit<Store, 'setting'>, HexViewerTypes> = 
 });
 
 // 1. Helper functions
-const getValueFromPath = (obj: object, path: Array<string>): number | string | object => {
+const getValueFromPath = (obj: object, path: string[]): number | string | object => {
   let current = obj;
   if (obj === undefined || obj === null) return null;
   for (let i = 0; i < path.length; ++i) {
@@ -93,7 +95,7 @@ const getValueFromPath = (obj: object, path: Array<string>): number | string | o
 };
 
 // 2. Type methods
-const methodConfig = (data: any, method: (data: any, p?: Array<string>) => any, path: Array<string> = []) => {
+const methodConfig = (data: any, method: (data: any, p?: string[]) => any, path: string[] = []) => {
   if ([null, undefined].includes(data)) return data;
   else if (Array.isArray(data)) return method(data, path);
   else if (typeof data === 'object')
@@ -102,9 +104,9 @@ const methodConfig = (data: any, method: (data: any, p?: Array<string>) => any, 
 };
 
 const isTypeConfig =
-  <T extends string | number | symbol>(properties: Array<ItemConfig<T>>, path: Array<string>) =>
+  <T extends string | number | symbol>(properties: ItemConfig<T>[], path: string[]) =>
   (property: T | object, match: T = null) => {
-    const types: Array<string | number | symbol> = properties.map(p => p.type);
+    const types: (string | number | symbol)[] = properties.map(p => p.type);
     if ([undefined, null].includes(property)) return false;
     else if (typeof property === 'string' || typeof property === 'number') {
       if ([null, undefined].includes(match)) return types.includes(property);
@@ -119,7 +121,7 @@ const isTypeConfig =
   };
 
 const getItemsConfig =
-  <T extends ItemConfig<any>>(properties: Array<T>) =>
+  <T extends ItemConfig<any>>(properties: T[]) =>
   (store: Store) =>
     properties.map(i => ({
       value: i.value,
@@ -127,7 +129,7 @@ const getItemsConfig =
     }));
 
 const getValueConfig =
-  <T extends ItemConfig<any>>(properties: Array<T>, path: Array<string>) =>
+  <T extends ItemConfig<any>>(properties: T[], path: string[]) =>
   (input: T | Store) => {
     if (properties === null || properties.length === 0) return null;
     else if ([undefined, null].includes(input)) return properties[0]?.value;
@@ -142,7 +144,7 @@ const getValueConfig =
   };
 
 const getTypeConfig =
-  <T extends ItemConfig<any>>(properties: Array<T>, path: Array<string>) =>
+  <T extends ItemConfig<any>>(properties: T[], path: string[]) =>
   (value: T | Store) => {
     if (properties === null || properties.length === 0) return null;
     else if (typeof value === 'number') {
@@ -156,7 +158,7 @@ const getTypeConfig =
   };
 
 const findTypeConfig =
-  <T extends ItemConfig<any>>(properties: Array<T>, path: Array<string>) =>
+  <T extends ItemConfig<any>>(properties: T[], path: string[]) =>
   (first: T | Store, second: T | Store = null) => {
     if (properties === null || properties.length === 0) return null;
 

@@ -9,43 +9,47 @@ import {
   IconButton,
   Popper,
   Slide,
+  Stack,
   styled,
   Tooltip,
   useMediaQuery,
   useTheme
 } from '@mui/material';
 
-import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
+import { useAppSearchService } from 'commons/components/app/hooks/useAppSearchService';
+import AppSearchInput from 'commons/components/search/AppSearchInput';
+import AppSearchResult from 'commons/components/search/AppSearchResult';
 import { parseEvent } from 'commons/components/utils/keyboard';
-import type { ChangeEvent, KeyboardEvent } from 'react';
-import { forwardRef, useCallback, useEffect, useRef, useState } from 'react';
+import { type ChangeEvent, forwardRef, type KeyboardEvent, useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import useAppSearchService from '../app/hooks/useAppSearchService';
-import AppSearchInput from './AppSearchInput';
-import AppSearchResult from './AppSearchResult';
 
 const MENU_LIST_SX = { maxHeight: 500, overflow: 'auto' };
 
-const AppSearchRoot = styled(Box, { shouldForwardProp: prop => prop !== 'menuOpen' })<{ menuOpen: boolean }>(
-  ({ theme, menuOpen }) => {
-    const backgroundColor = emphasize(theme.palette.background.default, theme.palette.mode === 'dark' ? 0.1 : 0.033);
-    return {
-      position: 'relative',
-      borderRadius: theme.shape.borderRadius,
-      '.app-search-input': {
-        backgroundColor: backgroundColor,
-        boxShadow: menuOpen && theme.shadows[4]
-      },
-      '.app-search-result': {
-        backgroundColor: theme.palette.mode === 'dark' ? backgroundColor : theme.palette.background.default,
-        borderBottomLeftRadius: theme.shape.borderRadius,
-        borderBottomRightRadius: theme.shape.borderRadius,
-        boxShadow: menuOpen && theme.shadows[4],
-        color: theme.palette.text.primary
-      }
-    };
-  }
-);
+const AppSearchRoot = styled(Box, { shouldForwardProp: prop => prop !== 'menuOpen' })<{ menuOpen: boolean }>(({
+  theme,
+  menuOpen
+}) => {
+  const backgroundColor = emphasize(theme.palette.background.default, theme.palette.mode === 'dark' ? 0.1 : 0.033);
+  return {
+    position: 'relative',
+    borderRadius: theme.shape.borderRadius,
+    borderBottomLeftRadius: menuOpen && 0,
+    borderBottomRightRadius: menuOpen && 0,
+
+    '.app-search-input': {
+      backgroundColor:
+        theme.palette.mode === 'dark' ? backgroundColor : menuOpen ? theme.palette.background.default : backgroundColor,
+      boxShadow: menuOpen && theme.shadows[4]
+    },
+    '.app-search-result': {
+      backgroundColor: theme.palette.mode === 'dark' ? backgroundColor : theme.palette.background.default,
+      borderBottomLeftRadius: theme.shape.borderRadius,
+      borderBottomRightRadius: theme.shape.borderRadius,
+      boxShadow: menuOpen && theme.shadows[4],
+      color: theme.palette.text.primary
+    }
+  };
+});
 
 const ModalTransition = forwardRef(function Transition(props: any, ref: any) {
   const { children, ..._props } = props;
@@ -65,11 +69,12 @@ export default function AppSearch() {
   const { provided, state, service } = useAppSearchService();
   const [value, setValue] = useState<string>('');
 
-  useEffectOnce(() => {
+  useEffect(() => {
     if (service.onMounted) {
       service.onMounted(setValue, state);
     }
-  });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // keyboard[window] handler.
   // this is to trigger the CTLR+K shortcut to appsearch.
@@ -174,12 +179,22 @@ export default function AppSearch() {
     <ClickAwayListener onClickAway={() => state.set({ ...state, menu: false })}>
       <AppSearchRoot
         ref={menuRef}
-        sx={{ mr: !isPhoneMode && 1, display: 'flex', flexGrow: 1, justifyContent: 'flex-end' }}
+        sx={{ mr: isPhoneMode ? 0 : 1, display: 'flex', flexGrow: 1, justifyContent: 'flex-end' }}
         menuOpen={state.menu}
       >
         {isPhoneMode ? (
-          <IconButton color="inherit" size="large" onClick={onToggleFullscreen}>
-            <Tooltip title={t('app.search.fullscreen')}>
+          <IconButton
+            color="inherit"
+            size="large"
+            onClick={() => state.set({ ...state, menu: !state.menu, mode: 'fullscreen' })}
+          >
+            <Tooltip
+              title={
+                <Stack direction="column" textAlign="center">
+                  <span>{t('app.search.fullscreen')}</span> <span>CTLR+K</span>
+                </Stack>
+              }
+            >
               <Search />
             </Tooltip>
           </IconButton>
@@ -199,6 +214,7 @@ export default function AppSearch() {
               onChange={onChange}
               onKeyDown={onKeyDown}
               onClear={onClear}
+              onToggleFullscreen={onToggleFullscreen}
               minWidth={isTabletMode ? '100%' : '250px'}
               maxWidth={isTabletMode ? '100%' : '350px'}
             />
@@ -243,6 +259,7 @@ export default function AppSearch() {
             }}
           >
             <AppSearchInput
+              // eslint-disable-next-line jsx-a11y/no-autofocus
               autoFocus
               focused={state.focused}
               className="app-search-input"
@@ -256,6 +273,7 @@ export default function AppSearch() {
               onChange={onChange}
               onKeyDown={onKeyDown}
               onClear={onClear}
+              onToggleFullscreen={onToggleFullscreen}
             />
           </DialogTitle>
           {provided && state.items && (

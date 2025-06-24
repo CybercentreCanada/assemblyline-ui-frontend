@@ -7,7 +7,7 @@ import { Bar } from 'react-chartjs-2';
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
 type LineGraphProps = {
-  dataset: { [s: string]: number };
+  dataset: Record<string, number>;
   datatype: string;
   title?: string;
   height?: string;
@@ -25,7 +25,7 @@ function WrappedLineGraph({ dataset, height, title, datatype, onClick, sorter, t
     maintainAspectRatio: false,
     responsive: true,
     interaction: {
-      mode: 'x' as 'x',
+      mode: 'x' as const,
       intersect: false
     },
     plugins: {
@@ -60,7 +60,7 @@ function WrappedLineGraph({ dataset, height, title, datatype, onClick, sorter, t
 
   useEffect(() => {
     if (dataset) {
-      let labels = Object.keys(dataset);
+      const labels = Object.keys(dataset);
       let data = Object.values(dataset);
 
       if (sorter) {

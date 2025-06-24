@@ -1,23 +1,10 @@
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
-import { Box, Collapse } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
-import { File } from 'components/models/base/result';
-import React, { useMemo } from 'react';
+import { Box, Collapse, useTheme } from '@mui/material';
+import type { File } from 'components/models/base/result';
+import ExtractedFile from 'components/visual/ResultCard/extracted_file';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import ExtractedFile from './extracted_file';
-
-const useStyles = makeStyles(theme => ({
-  title: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    cursor: 'pointer',
-    '&:hover, &:focus': {
-      color: theme.palette.text.secondary
-    }
-  }
-}));
 
 type ExtractedSectionProps = {
   extracted: File[];
@@ -26,15 +13,22 @@ type ExtractedSectionProps = {
 
 const WrappedExtractedSection: React.FC<ExtractedSectionProps> = ({ extracted, sid }) => {
   const { t } = useTranslation(['fileDetail']);
-  const [open, setOpen] = React.useState(true);
-  const classes = useStyles();
+  const theme = useTheme();
+
+  const [open, setOpen] = useState<boolean>(true);
 
   return (
     <div>
       <Box
-        className={classes.title}
-        onClick={() => {
-          setOpen(!open);
+        onClick={() => setOpen(!open)}
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          cursor: 'pointer',
+          '&:hover, &:focus': {
+            color: theme.palette.text.secondary
+          }
         }}
       >
         <h3>{t('extracted')}</h3>

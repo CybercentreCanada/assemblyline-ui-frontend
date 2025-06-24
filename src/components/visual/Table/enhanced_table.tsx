@@ -3,21 +3,17 @@ import FirstPageIcon from '@mui/icons-material/FirstPage';
 import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
 import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 import LastPageIcon from '@mui/icons-material/LastPage';
-import { Grid, IconButton, InputBase, TablePagination, Tooltip } from '@mui/material';
+import { Box, Grid, IconButton, InputBase, TablePagination, Tooltip } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableSortLabel from '@mui/material/TableSortLabel';
-import type { Theme } from '@mui/material/styles';
-import { alpha } from '@mui/material/styles';
-import createStyles from '@mui/styles/createStyles';
-import makeStyles from '@mui/styles/makeStyles';
-import clsx from 'clsx';
+import { alpha, useTheme } from '@mui/material/styles';
 import Throttler from 'commons/addons/utils/throttler';
-import PageHeader from 'commons/components/pages/PageHeader';
+import PageContainer from 'commons/components/pages/PageContainer';
 import Classification from 'components/visual/Classification';
 import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow, LinkRow } from 'components/visual/DivTable';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
@@ -38,7 +34,7 @@ type Order = 'asc' | 'desc';
 function getComparator<Key extends keyof any>(
   order: Order,
   orderBy: Key
-): (a: { [key in Key]: number | string }, b: { [key in Key]: number | string }) => number {
+): (a: Record<Key, number | string>, b: Record<Key, number | string>) => number {
   return order === 'desc'
     ? (a, b) => descendingComparator(a, b, orderBy)
     : (a, b) => -descendingComparator(a, b, orderBy);
@@ -62,17 +58,6 @@ export interface Cell {
   numeric: boolean;
 }
 
-const useHeaderStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    comfortable: {
-      paddingLeft: theme.spacing(1),
-      paddingRight: theme.spacing(1),
-      paddingTop: theme.spacing(1.5),
-      paddingBottom: theme.spacing(1.5)
-    }
-  })
-);
-
 interface EnhancedTableHeadProps {
   cells: Cell[];
   dense?: boolean;
@@ -88,7 +73,7 @@ const WrappedEnhancedTableHead: React.FC<EnhancedTableHeadProps> = ({
   orderBy,
   onRequestSort
 }) => {
-  const classes = useHeaderStyles();
+  const theme = useTheme();
   const createSortHandler = (property: string) => (event: React.MouseEvent<unknown>) => {
     onRequestSort(event, property);
   };
@@ -99,10 +84,17 @@ const WrappedEnhancedTableHead: React.FC<EnhancedTableHeadProps> = ({
         {cells.map(cell => (
           <DivTableCell
             key={cell.id}
-            className={!dense ? classes.comfortable : null}
             align={cell.numeric ? 'right' : 'left'}
             padding={cell.disablePadding ? 'none' : 'normal'}
             sortDirection={orderBy === cell.id ? order : false}
+            sx={{
+              ...(!dense && {
+                paddingLeft: theme.spacing(1),
+                paddingRight: theme.spacing(1),
+                paddingTop: theme.spacing(1.5),
+                paddingBottom: theme.spacing(1.5)
+              })
+            }}
           >
             <TableSortLabel
               active={orderBy === cell.id}
@@ -187,50 +179,6 @@ function TablePaginationActions(props: TablePaginationActionsProps) {
   );
 }
 
-const useToolbarStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      paddingLeft: theme.spacing(2),
-      paddingRight: theme.spacing(1)
-    },
-    flexItem: {
-      flex: '1 1 100%'
-    },
-    search: {
-      position: 'relative',
-      alignSelf: 'center',
-      borderRadius: theme.shape.borderRadius,
-      backgroundColor: alpha(theme.palette.text.primary, 0.04),
-      '&:hover': {
-        backgroundColor: alpha(theme.palette.text.primary, 0.06)
-      },
-      height: 'fit-content',
-      marginTop: theme.spacing(1),
-      width: 300,
-      [theme.breakpoints.only('xs')]: {
-        width: '100%'
-      }
-    },
-    searchIcon: {
-      padding: theme.spacing(0, 1),
-      height: '100%',
-      position: 'absolute',
-      pointerEvents: 'none',
-      display: 'flex',
-      alignItems: 'center'
-    },
-    inputRoot: {
-      color: 'inherit',
-      width: '100%'
-    },
-    inputInput: {
-      padding: theme.spacing(1, 1, 1, 0),
-      paddingLeft: `calc(1em + ${theme.spacing(3)})`,
-      width: '100%'
-    }
-  })
-);
-
 interface EnhancedTableToolbarProps {
   itemCount: number;
   rowsPerPage: number;
@@ -244,30 +192,65 @@ interface EnhancedTableToolbarProps {
 const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
   const { itemCount, rowsPerPage, page, filter, handleChangePage, handleChangeRowsPerPage, handleFilter } = props;
   const { t } = useTranslation();
-  const classes = useToolbarStyles();
+  const theme = useTheme();
 
   return (
-    <PageHeader isSticky>
-      <Grid container>
-        <Grid item xs={12} md={6}>
-          <div className={classes.search}>
-            <div className={classes.searchIcon}>
+    <PageContainer isSticky>
+      <Grid container size="grow">
+        <Grid size={{ xs: 12, md: 6 }}>
+          <Box
+            sx={{
+              position: 'relative',
+              alignSelf: 'center',
+              borderRadius: theme.shape.borderRadius,
+              backgroundColor: alpha(theme.palette.text.primary, 0.04),
+              '&:hover': {
+                backgroundColor: alpha(theme.palette.text.primary, 0.06)
+              },
+              height: 'fit-content',
+              marginTop: theme.spacing(1),
+              width: 300,
+              [theme.breakpoints.only('xs')]: {
+                width: '100%'
+              }
+            }}
+          >
+            <Box
+              sx={{
+                padding: theme.spacing(0, 1),
+                height: '100%',
+                position: 'absolute',
+                pointerEvents: 'none',
+                display: 'flex',
+                alignItems: 'center'
+              }}
+            >
               <FilterListIcon />
-            </div>
+            </Box>
             <InputBase
               onChange={event => handleFilter(event.target.value)}
               placeholder={t('filter')}
-              classes={{
-                root: classes.inputRoot,
-                input: classes.inputInput
-              }}
               value={filter}
+              slotProps={{
+                root: {
+                  sx: {
+                    color: 'inherit',
+                    width: '100%'
+                  }
+                },
+                input: {
+                  sx: {
+                    padding: theme.spacing(1, 1, 1, 0),
+                    paddingLeft: `calc(1em + ${theme.spacing(3)})`,
+                    width: '100%'
+                  }
+                }
+              }}
             />
-          </div>
+          </Box>
         </Grid>
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <TablePagination
-            className={classes.flexItem}
             labelRowsPerPage={t('pager.rows')}
             labelDisplayedRows={({ from, to, count }) =>
               `${from}-${to} ${t('pager.of')} ${count !== -1 ? count : `${t('pager.more')} ${to}`}`
@@ -279,38 +262,13 @@ const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
             onPageChange={handleChangePage}
             onRowsPerPageChange={handleChangeRowsPerPage}
             ActionsComponent={TablePaginationActions}
+            sx={{ flex: '1 1 100%' }}
           />
         </Grid>
       </Grid>
-    </PageHeader>
+    </PageContainer>
   );
 };
-
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      width: '100%'
-    },
-    paper: {
-      width: '100%',
-      marginBottom: theme.spacing(2)
-    },
-    table: {
-      minWidth: 750
-    },
-    comfortable: {
-      paddingLeft: theme.spacing(1),
-      paddingRight: theme.spacing(1),
-      paddingTop: theme.spacing(1.5),
-      paddingBottom: theme.spacing(1.5)
-    },
-    break: {
-      [theme.breakpoints.up('md')]: {
-        wordBreak: 'break-word'
-      }
-    }
-  })
-);
 
 interface EnhancedTableBodyProps {
   cells: Cell[];
@@ -339,9 +297,10 @@ const WrappedEnhancedTableBody: React.FC<EnhancedTableBodyProps> = ({
   defaultOrderDirection = 'asc',
   showEmpty = false
 }) => {
-  const classes = useStyles();
-  const [order, setOrder] = React.useState<Order>(defaultOrderDirection);
-  const [orderBy, setOrderBy] = React.useState<string>(defaultOrderBy);
+  const theme = useTheme();
+
+  const [order, setOrder] = useState<Order>(defaultOrderDirection);
+  const [orderBy, setOrderBy] = useState<string>(defaultOrderBy);
 
   const handleRequestSort = (event: React.MouseEvent<unknown>, property: string) => {
     const isAsc = orderBy === property && order === 'asc';
@@ -353,9 +312,14 @@ const WrappedEnhancedTableBody: React.FC<EnhancedTableBodyProps> = ({
 
   return (
     <div style={{ paddingTop: '16px', paddingLeft: '4px', paddingRight: '4px' }}>
-      <Paper className={classes.paper}>
+      <Paper
+        sx={{
+          width: '100%',
+          marginBottom: theme.spacing(2)
+        }}
+      >
         <TableContainer>
-          <DivTable className={classes.table} aria-labelledby="tableTitle" aria-label="enhanced table">
+          <DivTable aria-labelledby="tableTitle" aria-label="enhanced table" sx={{ minWidth: 750 }}>
             <EnhancedTableHead
               dense={dense}
               cells={cells}
@@ -386,8 +350,21 @@ const WrappedEnhancedTableBody: React.FC<EnhancedTableBodyProps> = ({
                       {cells.map(head => (
                         <DivTableCell
                           key={head.id}
-                          className={clsx(!dense ? classes.comfortable : null, head.break ? classes.break : null)}
                           align={head.numeric ? 'right' : 'inherit'}
+                          sx={{
+                            ...(!dense && {
+                              paddingLeft: theme.spacing(1),
+                              paddingRight: theme.spacing(1),
+                              paddingTop: theme.spacing(1.5),
+                              paddingBottom: theme.spacing(1.5)
+                            }),
+
+                            ...(head.break && {
+                              [theme.breakpoints.up('md')]: {
+                                wordBreak: 'break-word'
+                              }
+                            })
+                          }}
                         >
                           {head.id === 'classification' ? (
                             <Classification c12n={row[head.id]} type="text" />
@@ -402,8 +379,21 @@ const WrappedEnhancedTableBody: React.FC<EnhancedTableBodyProps> = ({
                       {cells.map(head => (
                         <DivTableCell
                           key={head.id}
-                          className={clsx(!dense ? classes.comfortable : null, head.break ? classes.break : null)}
                           align={head.numeric ? 'right' : 'inherit'}
+                          sx={{
+                            ...(!dense && {
+                              paddingLeft: theme.spacing(1),
+                              paddingRight: theme.spacing(1),
+                              paddingTop: theme.spacing(1.5),
+                              paddingBottom: theme.spacing(1.5)
+                            }),
+
+                            ...(head.break && {
+                              [theme.breakpoints.up('md')]: {
+                                wordBreak: 'break-word'
+                              }
+                            })
+                          }}
                         >
                           {head.id === 'classification' ? (
                             <Classification c12n={row[head.id]} type="text" />
@@ -451,11 +441,10 @@ const WrappedEnhancedTable: React.FC<EnhancedTableProps> = ({
   defaultOrderDirection = 'asc',
   showEmpty = false
 }) => {
-  const classes = useStyles();
-  const [filteredRows, setFilteredRows] = React.useState(rows);
-  const [page, setPage] = React.useState(0);
-  const [filter, setFilter] = React.useState('');
-  const [rowsPerPage, setRowsPerPage] = React.useState(25);
+  const [filteredRows, setFilteredRows] = useState<any[]>(rows);
+  const [page, setPage] = useState<number>(0);
+  const [filter, setFilter] = useState<string>('');
+  const [rowsPerPage, setRowsPerPage] = useState<number>(25);
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
@@ -485,7 +474,7 @@ const WrappedEnhancedTable: React.FC<EnhancedTableProps> = ({
   }, [filter, rows]);
 
   return (
-    <div className={classes.root}>
+    <div style={{ width: '100%' }}>
       <EnhancedTableToolbar
         itemCount={filteredRows.length}
         rowsPerPage={rowsPerPage}

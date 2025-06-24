@@ -1,4 +1,4 @@
-import { TypesConfig } from '..';
+import type { TypesConfig } from '..';
 
 export type ScrollType = 'top' | 'middle' | 'bottom' | 'include' | 'includeMiddle' | 'smart';
 

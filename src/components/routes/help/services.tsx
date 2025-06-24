@@ -5,6 +5,7 @@ import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useMyAPI from 'components/hooks/useMyAPI';
 import Classification from 'components/visual/Classification';
 import CustomChip from 'components/visual/CustomChip';
+import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -43,25 +44,25 @@ function ServiceCard({ service }) {
           {service.description}
         </div>
         <Grid container spacing={1}>
-          <Grid item xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <label style={{ fontWeight: 500 }}>{t('accepts')}:&nbsp;&nbsp;</label>
             <Typography variant="caption" style={{ overflowWrap: 'anywhere', display: 'inline-block' }}>
               {service.accepts}
             </Typography>
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <label style={{ fontWeight: 500 }}>{t('rejects')}:&nbsp;&nbsp;</label>
             <Typography variant="caption" style={{ overflowWrap: 'anywhere', display: 'inline-block' }}>
               {service.rejects}
             </Typography>
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <label style={{ fontWeight: 500 }}>{t('category')}:&nbsp;&nbsp;</label>
             <Typography variant="caption" style={{ overflowWrap: 'anywhere', display: 'inline-block' }}>
               {service.category}
             </Typography>
           </Grid>
-          <Grid item xs={12} sm={6}>
+          <Grid size={{ xs: 12, sm: 6 }}>
             <label style={{ fontWeight: 500 }}>{t('stage')}:&nbsp;&nbsp;</label>
             <Typography variant="caption" style={{ overflowWrap: 'anywhere', display: 'inline-block' }}>
               {service.stage}
@@ -94,18 +95,19 @@ export default function Services() {
   });
   return (
     <PageFullWidth margin={4}>
-      <div style={{ marginBottom: theme.spacing(4) }}>
-        <Typography variant="h4">{t('title')}</Typography>
-        {services ? (
-          <Typography variant="caption">{`${services.length} ${t('count')}`}</Typography>
-        ) : (
-          <Skeleton width="8rem" />
-        )}
-      </div>
+      <PageHeader
+        primary={t('title')}
+        secondary={() => `${services.length} ${t('count')}`}
+        loading={!services}
+        slotProps={{
+          root: { style: { marginBottom: theme.spacing(4) } }
+        }}
+      />
+
       {services ? (
         <Grid container spacing={2}>
           {services.map((s, i) => (
-            <Grid key={i} item xs={12} md={6} xl={4}>
+            <Grid key={i} size={{ xs: 12, md: 6, xl: 4 }}>
               <ServiceCard service={s} />
             </Grid>
           ))}
@@ -113,7 +115,7 @@ export default function Services() {
       ) : (
         <Grid container spacing={2}>
           {[...Array(8)].map((_, i) => (
-            <Grid key={i} item xs={12} md={6} xl={4}>
+            <Grid key={i} size={{ xs: 12, md: 6, xl: 4 }}>
               <Skeleton variant="rectangular" style={{ height: minCardHeight }} />
             </Grid>
           ))}

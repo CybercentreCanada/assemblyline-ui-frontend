@@ -1,43 +1,34 @@
 import { loader } from '@monaco-editor/react';
-import { Alert, Grid, Hidden, Paper, Tab, Tabs, Typography, useTheme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
-import useAppUser from 'commons/components/app/hooks/useAppUser';
+import { Alert, Box, Grid, Paper, styled, Tab, Tabs, Typography, useTheme } from '@mui/material';
+import { useAppUser } from 'commons/components/app/hooks';
 import PageFullSize from 'commons/components/pages/PageFullSize';
 import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useMyAPI from 'components/hooks/useMyAPI';
 import type { CustomUser } from 'components/models/ui/user';
+import LibMagic from 'components/routes/admin/identify/libmagic';
+import Mimes from 'components/routes/admin/identify/mimes';
+import Patterns from 'components/routes/admin/identify/patterns';
+import Yara from 'components/routes/admin/identify/yara';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate } from 'react-router';
-import LibMagic from './identify/libmagic';
-import Mimes from './identify/mimes';
-import Patterns from './identify/patterns';
-import Yara from './identify/yara';
 
 loader.config({ paths: { vs: '/cdn/monaco_0.35.0/vs' } });
 
-const useStyles = makeStyles(theme => ({
-  main: {
-    marginTop: theme.spacing(1),
-    flexGrow: 1,
-    display: 'flex',
-    flexDirection: 'column'
-  },
-  tab: {
-    flexGrow: 1,
-    display: 'flex',
-    flexDirection: 'column',
-    paddingTop: theme.spacing(2)
-  }
+const TabContent = styled('div')(({ theme }) => ({
+  flexGrow: 1,
+  display: 'flex',
+  flexDirection: 'column',
+  paddingTop: theme.spacing(2)
 }));
 
 export default function AdminIdentify() {
-  const classes = useStyles();
   const { t, i18n } = useTranslation(['adminIdentify']);
   const theme = useTheme();
   const { user: currentUser } = useAppUser<CustomUser>();
   const { apiCall } = useMyAPI();
+
   const [value, setValue] = useState('magic');
   const [magicFile, setMagicFile] = useState(null);
   const [originalMagicFile, setOriginalMagicFile] = useState(null);
@@ -122,17 +113,24 @@ export default function AdminIdentify() {
       />
       <div style={{ marginBottom: theme.spacing(2), textAlign: 'left' }}>
         <Grid container alignItems="center" spacing={1}>
-          <Grid item xs={12}>
+          <Grid size={{ xs: 12 }}>
             <Typography variant="h4">{t('title')}</Typography>
           </Grid>
-          <Grid item xs={12}>
-            <Hidden lgDown>
+          <Grid size={{ xs: 12 }}>
+            <Box sx={{ display: { xs: 'none', lg: 'block' } }}>
               <Alert severity="warning">{t('warning')}</Alert>
-            </Hidden>
+            </Box>
           </Grid>
         </Grid>
       </div>
-      <div className={classes.main}>
+      <div
+        style={{
+          marginTop: theme.spacing(1),
+          flexGrow: 1,
+          display: 'flex',
+          flexDirection: 'column'
+        }}
+      >
         <Paper square>
           <Tabs
             value={value}
@@ -149,39 +147,39 @@ export default function AdminIdentify() {
           </Tabs>
         </Paper>
         {value === 'magic' && (
-          <div className={classes.tab}>
+          <TabContent>
             <LibMagic
               reload={loadMagic}
               magicFile={magicFile}
               originalMagicFile={originalMagicFile}
               setMagicFile={setMagicFile}
             />
-          </div>
+          </TabContent>
         )}
         {value === 'mimes' && (
-          <div className={classes.tab}>
+          <TabContent>
             <Mimes
               reload={loadMimes}
               mimesFile={mimesFile}
               originalMimesFile={originalMimesFile}
               setMimesFile={setMimesFile}
             />
-          </div>
+          </TabContent>
         )}
         {value === 'patterns' && (
-          <div className={classes.tab}>
+          <TabContent>
             <Patterns
               reload={loadPatterns}
               patternsFile={patternsFile}
               originalPatternsFile={originalPatternsFile}
               setPatternsFile={setPatternsFile}
             />
-          </div>
+          </TabContent>
         )}
         {value === 'yara' && (
-          <div className={classes.tab}>
+          <TabContent>
             <Yara reload={loadYara} yaraFile={yaraFile} originalYaraFile={originalYaraFile} setYaraFile={setYaraFile} />
-          </div>
+          </TabContent>
         )}
       </div>
     </PageFullSize>

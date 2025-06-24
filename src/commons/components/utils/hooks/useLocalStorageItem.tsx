@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from 'react';
-import useLocalStorage from './useLocalStorage';
+import useLocalStorage from 'commons/components/utils/hooks/useLocalStorage';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 
 /**
  * This hooks backs the typical 'useState' hook with local storage.
@@ -14,7 +14,10 @@ import useLocalStorage from './useLocalStorage';
  * @param initialValue - local storage initialization value.
  * @returns a stateful value, a function to update it, and a function to remove it.
  */
-export default function useLocalStorageItem<T>(key: string, initialValue?: T): [T, (value: T) => void, () => void] {
+export default function useLocalStorageItem<T>(
+  key: string,
+  initialValue?: T
+): [T, (newValue: T | ((prev: T) => T), save?: boolean) => void, () => void] {
   const { get, set, has, remove } = useLocalStorage();
   const [value, setValue] = useState<T>(get(key) ?? initialValue);
 
@@ -24,15 +27,24 @@ export default function useLocalStorageItem<T>(key: string, initialValue?: T): [
     }
   }, [key, initialValue, has, set]);
 
-  return useMemo(
-    () => [
-      value,
-      newValue => {
-        set(key, newValue);
-        setValue(newValue);
-      },
-      () => remove(key)
-    ],
-    [key, value, set, remove]
+  const setter = useCallback(
+    (newValue: T | ((prev: T) => T), save: boolean = true) => {
+      const computedValue = typeof newValue === 'function' ? (newValue as (prev: T) => T)(value) : newValue;
+
+      if (save) {
+        if (computedValue !== undefined) {
+          set(key, computedValue);
+        } else {
+          remove(key);
+        }
+      }
+
+      setValue(computedValue);
+    },
+    [key, remove, set, value]
   );
+
+  const remover = useCallback(() => remove(key), [key, remove]);
+
+  return useMemo(() => [value, setter, remover], [remover, setter, value]);
 }

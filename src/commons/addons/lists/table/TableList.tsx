@@ -1,21 +1,32 @@
-/* eslint-disable jsx-a11y/no-noninteractive-tabindex */
-/* eslint-disable jsx-a11y/no-static-element-interactions */
 import FlexVertical from 'commons/addons/layout/flexers/FlexVertical';
+import FilterList from 'commons/addons/lists/filters/FilterList';
+import type { FilterField } from 'commons/addons/lists/filters/FilterSelector';
+import FilterSelector from 'commons/addons/lists/filters/FilterSelector';
+import useListKeyboard from 'commons/addons/lists/hooks/useListKeyboard';
+import type { LineItem } from 'commons/addons/lists/item/ListItemBase';
+import BasicScroller from 'commons/addons/lists/scrollers/BasicScroller';
+import type ListScroller from 'commons/addons/lists/scrollers/ListScroller';
+import type { SorterField } from 'commons/addons/lists/sorters/SorterSelector';
+import TableListHeader from 'commons/addons/lists/table/TableListHeader';
+import TableListItem from 'commons/addons/lists/table/TableListItem';
+import type { TableListLayout } from 'commons/addons/lists/table/TableListLayout';
+import TableListLayoutComputer from 'commons/addons/lists/table/TableListLayout';
+import type { TableColumnField } from 'commons/addons/lists/table/types';
+import {
+  BodyInnerFlex,
+  BodyOuter,
+  Cell,
+  Container,
+  FilterListWrap,
+  FilterSelectorWrap,
+  Header,
+  Row,
+  RowInner,
+  Top
+} from 'commons/addons/lists/table/useStyles';
 import lodash from 'lodash';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import ReactResizeDetector from 'react-resize-detector';
-import FilterList from '../filters/FilterList';
-import FilterSelector, { FilterField } from '../filters/FilterSelector';
-import useListKeyboard from '../hooks/useListKeyboard';
-import { LineItem } from '../item/ListItemBase';
-import BasicScroller from '../scrollers/BasicScroller';
-import ListScroller from '../scrollers/ListScroller';
-import { SorterField } from '../sorters/SorterSelector';
-import TableListHeader from './TableListHeader';
-import TableListItem from './TableListItem';
-import TableListLayoutComputer, { TableListLayout } from './TableListLayout';
-import { TableColumnField } from './types';
-import { useTableStyles } from './useStyles';
 
 const DEFAULT_EMPTY_LIST = [];
 
@@ -81,15 +92,12 @@ export default function TableList<T extends LineItem>(props: TableListProps<T>) 
     children = DEFAULT_CELL_RENDERER
   } = props;
 
-  // styles
-  const classes = useTableStyles();
-
   // refs
-  const containerRef = useRef<HTMLDivElement>();
-  const headerRef = useRef<HTMLDivElement>();
-  const bodyOuterRef = useRef<HTMLDivElement>();
-  const bodyInnerRef = useRef<HTMLDivElement>();
-  const bodyContentRef = useRef<HTMLDivElement>();
+  const containerRef = useRef<HTMLDivElement>(null);
+  const headerRef = useRef<HTMLDivElement>(null);
+  const bodyOuterRef = useRef<HTMLDivElement>(null);
+  const bodyInnerRef = useRef<HTMLDivElement>(null);
+  const bodyContentRef = useRef<HTMLDivElement>(null);
 
   // Scroll hook to monitor position of scrollbar.
   // TODO: implement infinite scroll support.
@@ -113,26 +121,25 @@ export default function TableList<T extends LineItem>(props: TableListProps<T>) 
   // row renderer..
   const rowRenderer = useCallback(
     (item: T, rowIndex: number) => (
-      <div className={classes.row} key={`tablelist.row[${rowIndex}]`}>
-        <div className={classes.rowInner}>
+      <Row key={`tablelist.row[${rowIndex}]`}>
+        <RowInner>
           {columns.map((column, cellIndex) => {
             const cellValue = column.getValue ? column.getValue(item) : lodash.get(item, column.path, '');
             const cellWidth = layout.columnWidths[cellIndex];
             return (
-              <div
+              <Cell
                 key={`tablelist.cell[${rowIndex}][${cellIndex}]`}
-                className={classes.cell}
                 style={{ minWidth: cellWidth, maxWidth: cellWidth }}
                 data-column={cellIndex}
               >
                 {children(cellIndex, rowIndex, cellValue, item, column)}
-              </div>
+              </Cell>
             );
           })}
-        </div>
-      </div>
+        </RowInner>
+      </Row>
     ),
-    [children, classes.cell, classes.row, classes.rowInner, layout, columns]
+    [children, columns, layout.columnWidths]
   );
 
   // Layout computer.
@@ -153,21 +160,21 @@ export default function TableList<T extends LineItem>(props: TableListProps<T>) 
 
   return (
     <FlexVertical>
-      <div id={id} tabIndex={0} ref={containerRef} className={classes.container} onKeyDown={onKeyDown}>
-        <div className={classes.top}>
+      <Container id={id} tabIndex={0} ref={containerRef} onKeyDown={onKeyDown}>
+        <Top>
           {filterFields && filterFields.length > 0 && (
-            <div className={classes.filterSelector}>
+            <FilterSelectorWrap>
               <FilterSelector fields={filterFields} selections={filters} onFilter={onFilter} />
-            </div>
+            </FilterSelectorWrap>
           )}
-        </div>
+        </Top>
         {filters && filters.length > 0 && (
-          <div className={classes.filterList}>
+          <FilterListWrap>
             <FilterList filters={filters} onFilter={onFilter} />
-          </div>
+          </FilterListWrap>
         )}
         {!noHeader && (
-          <div ref={headerRef} className={classes.header}>
+          <Header ref={headerRef}>
             {layout && (
               <TableListHeader
                 items={filteredItems}
@@ -179,10 +186,10 @@ export default function TableList<T extends LineItem>(props: TableListProps<T>) 
                 onSort={onSort}
               />
             )}
-          </div>
+          </Header>
         )}
-        <div ref={bodyOuterRef} className={classes.bodyOuter}>
-          <div ref={bodyInnerRef} className={height === 'flex' ? classes.bodyInnerFlex : null}>
+        <BodyOuter ref={bodyOuterRef}>
+          <BodyInnerFlex ref={bodyInnerRef} flex={height === 'flex'}>
             <ReactResizeDetector handleWidth handleHeight={false} targetRef={bodyContentRef} onResize={onBodyResize}>
               <div ref={bodyContentRef}>
                 {layout && (!items || items.length === 0) && emptyValue}
@@ -205,9 +212,9 @@ export default function TableList<T extends LineItem>(props: TableListProps<T>) 
                   ))}
               </div>
             </ReactResizeDetector>
-          </div>
-        </div>
-      </div>
+          </BodyInnerFlex>
+        </BodyOuter>
+      </Container>
     </FlexVertical>
   );
 }

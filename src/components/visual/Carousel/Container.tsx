@@ -6,223 +6,207 @@ import ChevronRightOutlinedIcon from '@mui/icons-material/ChevronRightOutlined';
 import CloseIcon from '@mui/icons-material/Close';
 import PageviewOutlinedIcon from '@mui/icons-material/PageviewOutlined';
 import RemoveIcon from '@mui/icons-material/Remove';
-import { CircularProgress, IconButton, Modal, Skeleton, Slider, Tooltip, alpha } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
-import clsx from 'clsx';
+import { CircularProgress, IconButton, Modal, Skeleton, Slider, Tooltip, alpha, styled, useTheme } from '@mui/material';
 import Carousel from 'commons/addons/carousel/Carousel';
 import useMyAPI from 'components/hooks/useMyAPI';
-import { Image as ImageData } from 'components/models/base/result_body';
-import md5 from 'md5';
+import type { Image as ImageData } from 'components/models/base/result_body';
+import CarouselItem from 'components/visual/Carousel/Item';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useLocation } from 'react-router-dom';
-import CarouselItem from './Item';
+import { useLocation } from 'react-router';
+import { Link } from 'react-router-dom';
 
 const ZOOM_CLASS = 'zooming';
 const MIN_IMAGE_SIZE_REM = 4;
+const NAV_BAR_HEIGHT = 'min(128px, 30vw, 30vh)';
+const IMAGE_SIZE = `min(${MIN_IMAGE_SIZE_REM}rem, 30vw, 30vh)`;
 
-const useStyles = makeStyles(theme => {
-  const navbarHeight = 'min(128px, 30vw, 30vh)';
-  const imageSize = `min(${MIN_IMAGE_SIZE_REM}rem, 30vw, 30vh)`;
-  const backgroundColor = alpha(theme.palette.background.paper, 0.7);
-
-  const options = {
+const ImageContainer = styled('div')(({ theme }) => ({
+  position: 'absolute',
+  width: '100%',
+  top: '64px',
+  bottom: NAV_BAR_HEIGHT,
+  display: 'grid',
+  placeItems: 'center',
+  overflow: 'scroll',
+  userSelect: 'none',
+  scrollbarWidth: 'none', // Firefox
+  '-ms-overflow-style': 'none', // Internet Explorer 10+
+  '&::-webkit-scrollbar': {
+    display: 'none' // Safari and Chrome
+  },
+  transition: theme.transitions.create(['all'], {
     easing: theme.transitions.easing.easeInOut,
     duration: theme.transitions.duration.shortest
-  };
+  }),
+  [`&.${ZOOM_CLASS}`]: {
+    top: 0,
+    bottom: 0,
+    left: 0,
+    right: 0
+  }
+}));
 
-  return {
-    backdrop: {
-      outline: 'none',
-      backdropFilter: 'blur(2px)',
-      transition: 'backdrop-filter 225ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;',
-      zIndex: 1350,
-      '&:focus-visible': {
-        outline: 'none'
-      }
-    },
-    root: {
-      height: '100%',
-      width: '100%',
-      outline: 'none'
-    },
-    menu: {
-      position: 'absolute',
-      width: '100%',
-      display: 'grid',
-      gridTemplateColumns: 'auto 1fr auto',
-      alignItems: 'start',
-      justifyItems: 'center'
-    },
-    menuPane: {
-      position: 'absolute',
-      maxWidth: 'calc(100% - 128px)',
-      display: 'grid',
-      gridTemplateColumns: '1fr auto',
-      alignItems: 'center',
-      borderRadius: '0px 0px 4px 4px',
-      padding: theme.spacing(1),
-      backgroundColor: backgroundColor,
-      minWidth: '10vw',
-      transition: theme.transitions.create(['all'], options),
-      [`&.${ZOOM_CLASS}`]: {
-        marginTop: '-64px'
-      }
-    },
-    info: {
-      display: 'grid',
-      alignContent: 'end',
-      alignItems: 'stretch',
-      gridTemplateColumns: 'auto 1fr',
-      columnGap: theme.spacing(1),
-      transition: theme.transitions.create(['all'], options),
-      '&:hover>div': {
-        whiteSpace: 'wrap !important'
-      },
-      '&>div:nth-child(2n+1)': {
-        fontWeight: 500
-      },
-      '&>div:nth-child(2n)': {
-        fontWeight: 400,
-        overflowX: 'hidden',
-        whiteSpace: 'nowrap',
-        textOverflow: 'ellipsis'
-      }
-    },
-    buttonWrapper: {
-      margin: theme.spacing(1),
-      borderRadius: theme.spacing(3),
-      backgroundColor: backgroundColor
-    },
-    navButtonWrapper: {
-      margin: theme.spacing(1),
-      borderRadius: theme.spacing(3),
-      backgroundColor: backgroundColor,
-      position: 'absolute',
-      top: '50%',
-      bottom: '50%',
-      display: 'none',
-      cursor: 'pointer',
-      height: '48px',
-      width: '48px'
-    },
-    navbarContainer: {
-      position: 'absolute',
-      bottom: 0,
-      width: '100%',
-      height: navbarHeight,
-      overflow: 'scroll',
-      userSelect: 'none',
-      scrollbarWidth: 'none', // Firefox
-      '-ms-overflow-style': 'none', // Internet Explorer 10+
-      '&::-webkit-scrollbar': {
-        display: 'none' // Safari and Chrome
-      },
-      transition: theme.transitions.create(['all'], options),
-      [`&.${ZOOM_CLASS}`]: {
-        bottom: `calc(0px - ${navbarHeight})`
-      }
-    },
-    navbar: {
-      height: '100%',
-      width: 'fit-content',
-      minWidth: '100%',
-      display: 'flex',
-      justifyContent: 'center',
-      gap: theme.spacing(1),
-      padding: theme.spacing(1)
-    },
-    imageContainer: {
-      position: 'absolute',
-      width: '100%',
-      top: '64px',
-      bottom: navbarHeight,
-      display: 'grid',
-      placeItems: 'center',
-      overflow: 'scroll',
-      userSelect: 'none',
-      scrollbarWidth: 'none', // Firefox
-      '-ms-overflow-style': 'none', // Internet Explorer 10+
-      '&::-webkit-scrollbar': {
-        display: 'none' // Safari and Chrome
-      },
-      transition: theme.transitions.create(['all'], options),
-      [`&.${ZOOM_CLASS}`]: {
-        top: 0,
-        bottom: 0,
-        left: 0,
-        right: 0
-      }
-    },
-    containerNavOverlay: {
-      height: '100%',
-      width: '25%',
-      cursor: 'pointer',
-      position: 'absolute',
-      zIndex: '1',
-      [`&.${ZOOM_CLASS}`]: {
-        width: '0%'
-      },
-      '&:hover>div': {
-        display: 'flex'
-      }
-    },
-    image: {
-      height: 'auto',
-      width: 'auto',
-      minHeight: imageSize,
-      minWidth: imageSize,
-      maxWidth: '100vw',
-      maxHeight: `calc(100vh - 64px - ${navbarHeight})`,
-      transition: theme.transitions.create(['all'], options),
-      [`&.${ZOOM_CLASS}`]: {
-        maxHeight: 'none',
-        maxWidth: 'none'
-      }
-    },
-    loadingContainer: {
-      height: `calc(2 * ${navbarHeight})`,
-      aspectRatio: '4 / 3',
-      display: 'grid',
-      placeItems: 'center',
-      borderRadius: theme.spacing(0.5),
-      backgroundColor: backgroundColor,
-      backgroundPosition: 'center',
-      backgroundRepeat: 'no-repeat',
-      backgroundSize: 'cover',
-      backgroundBlendMode: 'soft-light',
-      imageRendering: 'unset',
-      overflow: 'hidden'
-    },
-    zoom: {
-      backgroundColor: backgroundColor,
-      borderRadius: theme.spacing(3),
-      position: 'fixed',
-      top: theme.spacing(1),
-      right: theme.spacing(1)
-    },
-    zoomAttributes: {
-      display: 'flex',
-      flexDirection: 'column',
-      flexWrap: 'nowrap',
-      alignItems: 'center',
-      gap: theme.spacing(1),
-      height: 0,
-      opacity: 0,
-      transition: theme.transitions.create(['all'], options),
-      [`&.${ZOOM_CLASS}`]: {
-        paddingBottom: theme.spacing(1),
-        height: '200px',
-        opacity: 1
-      }
-    },
-    zoomSlider: {
-      '& .MuiSlider-thumb': {
-        boxShadow: 'none'
-      }
-    }
-  };
-});
+const NavOverlayContainer = styled('div')(({ theme }) => ({
+  height: '100%',
+  width: '25%',
+  cursor: 'pointer',
+  position: 'absolute',
+  zIndex: '1',
+  [`&.${ZOOM_CLASS}`]: {
+    width: '0%'
+  },
+  '&:hover>div': {
+    display: 'flex'
+  }
+}));
+
+const NavButtonWrapper = styled('div')(({ theme }) => ({
+  margin: theme.spacing(1),
+  borderRadius: theme.spacing(3),
+  backgroundColor: alpha(theme.palette.background.paper, 0.7),
+  position: 'absolute',
+  top: '50%',
+  bottom: '50%',
+  display: 'none',
+  cursor: 'pointer',
+  height: '48px',
+  width: '48px'
+}));
+
+const Img = styled('img')(({ theme }) => ({
+  height: 'auto',
+  width: 'auto',
+  minHeight: IMAGE_SIZE,
+  minWidth: IMAGE_SIZE,
+  maxWidth: '100vw',
+  maxHeight: `calc(100vh - 64px - ${NAV_BAR_HEIGHT})`,
+  transition: theme.transitions.create(['all'], {
+    easing: theme.transitions.easing.easeInOut,
+    duration: theme.transitions.duration.shortest
+  }),
+  [`&.${ZOOM_CLASS}`]: {
+    maxHeight: 'none',
+    maxWidth: 'none'
+  }
+}));
+
+const LoadingContainer = styled('div')(({ theme }) => ({
+  height: `calc(2 * ${NAV_BAR_HEIGHT})`,
+  aspectRatio: '4 / 3',
+  display: 'grid',
+  placeItems: 'center',
+  borderRadius: theme.spacing(0.5),
+  backgroundColor: alpha(theme.palette.background.paper, 0.7),
+  backgroundPosition: 'center',
+  backgroundRepeat: 'no-repeat',
+  backgroundSize: 'cover',
+  backgroundBlendMode: 'soft-light',
+  imageRendering: 'unset',
+  overflow: 'hidden'
+}));
+
+const Menu = styled('div')(({ theme }) => ({
+  position: 'absolute',
+  width: '100%',
+  display: 'grid',
+  gridTemplateColumns: 'auto 1fr auto',
+  alignItems: 'start',
+  justifyItems: 'center'
+}));
+
+const ZoomAttributes = styled('div')(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  flexWrap: 'nowrap',
+  alignItems: 'center',
+  gap: theme.spacing(1),
+  height: 0,
+  opacity: 0,
+  transition: theme.transitions.create(['all'], {
+    easing: theme.transitions.easing.easeInOut,
+    duration: theme.transitions.duration.shortest
+  }),
+  [`&.${ZOOM_CLASS}`]: {
+    paddingBottom: theme.spacing(1),
+    height: '200px',
+    opacity: 1
+  }
+}));
+
+const MenuPane = styled('div')(({ theme }) => ({
+  position: 'absolute',
+  maxWidth: 'calc(100% - 128px)',
+  display: 'grid',
+  gridTemplateColumns: '1fr auto',
+  alignItems: 'center',
+  borderRadius: '0px 0px 4px 4px',
+  padding: theme.spacing(1),
+  backgroundColor: alpha(theme.palette.background.paper, 0.7),
+  minWidth: '10vw',
+  transition: theme.transitions.create(['all'], {
+    easing: theme.transitions.easing.easeInOut,
+    duration: theme.transitions.duration.shortest
+  }),
+  [`&.${ZOOM_CLASS}`]: {
+    marginTop: '-64px'
+  }
+}));
+
+const Info = styled('div')(({ theme }) => ({
+  display: 'grid',
+  alignContent: 'end',
+  alignItems: 'stretch',
+  gridTemplateColumns: 'auto 1fr',
+  columnGap: theme.spacing(1),
+  transition: theme.transitions.create(['all'], {
+    easing: theme.transitions.easing.easeInOut,
+    duration: theme.transitions.duration.shortest
+  }),
+  '&:hover>div': {
+    whiteSpace: 'wrap !important'
+  },
+  '&>div:nth-child(2n+1)': {
+    fontWeight: 500
+  },
+  '&>div:nth-child(2n)': {
+    fontWeight: 400,
+    overflowX: 'hidden',
+    whiteSpace: 'nowrap',
+    textOverflow: 'ellipsis'
+  }
+}));
+
+const NavBarContainer = styled('div')(({ theme }) => ({
+  position: 'absolute',
+  bottom: 0,
+  width: '100%',
+  height: NAV_BAR_HEIGHT,
+  overflow: 'scroll',
+  userSelect: 'none',
+  scrollbarWidth: 'none', // Firefox
+  '-ms-overflow-style': 'none', // Internet Explorer 10+
+  '&::-webkit-scrollbar': {
+    display: 'none' // Safari and Chrome
+  },
+  transition: theme.transitions.create(['all'], {
+    easing: theme.transitions.easing.easeInOut,
+    duration: theme.transitions.duration.shortest
+  }),
+  [`&.${ZOOM_CLASS}`]: {
+    bottom: `calc(0px - ${NAV_BAR_HEIGHT})`
+  }
+}));
+
+const NavBar = styled('div')(({ theme }) => ({
+  height: '100%',
+  width: 'fit-content',
+  minWidth: '100%',
+  display: 'flex',
+  justifyContent: 'center',
+  gap: theme.spacing(1),
+  padding: theme.spacing(1)
+}));
 
 type Dragging = {
   isDown: boolean;
@@ -249,7 +233,7 @@ const WrappedCarouselContainer = ({
   onClose = () => null
 }: CarouselContainerProps) => {
   const { t } = useTranslation('carousel');
-  const classes = useStyles();
+  const theme = useTheme();
   const { apiCall } = useMyAPI();
   const location = useLocation();
 
@@ -258,6 +242,7 @@ const WrappedCarouselContainer = ({
   const [loading, setLoading] = useState<boolean>(false);
   const [isZooming, setIsZooming] = useState<boolean>(false);
   const [zoom, setZoom] = useState<number>(100);
+  const [imageRendering, setImageRendering] = useState<'auto' | 'pixelated'>('auto' as const);
 
   const navbarRef = useRef<HTMLDivElement>(null);
   const navbarScroll = useRef<Dragging>({ isDown: false, isDragging: false, scrollLeft: 0, startX: 0 });
@@ -271,12 +256,6 @@ const WrappedCarouselContainer = ({
     startX: 0,
     startY: 0
   });
-
-  const test = md5('asd');
-
-  const test2 = useMemo(() => md5('asd'), []);
-
-  const [imageRendering, setImageRendering] = useState<'auto' | 'pixelated'>('auto' as 'auto');
 
   const zoomTimer = useRef<number>(null);
   const zoomClass = useMemo<string | null>(() => isZooming && ZOOM_CLASS, [isZooming]);
@@ -324,8 +303,8 @@ const WrappedCarouselContainer = ({
 
     // Calculate dragging speed
     const timeDiff = (new Date() as any) - dragTimer.current;
-    let speedY = ((containerRef.current.scrollTop - imageDrag.current.scrollTop.valueOf()) / timeDiff) * 15;
-    let speedX = ((containerRef.current.scrollLeft - imageDrag.current.scrollLeft.valueOf()) / timeDiff) * 15;
+    const speedY = ((containerRef.current.scrollTop - imageDrag.current.scrollTop.valueOf()) / timeDiff) * 15;
+    const speedX = ((containerRef.current.scrollLeft - imageDrag.current.scrollLeft.valueOf()) / timeDiff) * 15;
     let speedYAbsolute = Math.abs(speedY);
     let speedXAbsolute = Math.abs(speedX);
 
@@ -454,7 +433,7 @@ const WrappedCarouselContainer = ({
 
   useEffect(() => {
     if (imgData !== null) {
-      var i = new Image();
+      const i = new Image();
       i.onload = function () {
         if (i.width <= 128 || i.height <= 128) {
           setImageRendering('pixelated');
@@ -473,11 +452,23 @@ const WrappedCarouselContainer = ({
         onPrevious={!isZooming ? handleImageChange(-1) : null}
         onNext={!isZooming ? handleImageChange(1) : null}
       >
-        <Modal className={classes.backdrop} open={open} onClose={handleClose}>
-          <div id="carousel" className={classes.root}>
-            <div
+        <Modal
+          open={open}
+          onClose={handleClose}
+          sx={{
+            outline: 'none',
+            backdropFilter: 'blur(2px)',
+            transition: 'backdrop-filter 225ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;',
+            zIndex: 1350,
+            '&:focus-visible': {
+              outline: 'none'
+            }
+          }}
+        >
+          <div id="carousel" style={{ height: '100%', width: '100%', outline: 'none' }}>
+            <ImageContainer
               ref={containerRef}
-              className={clsx(classes.imageContainer, zoomClass)}
+              className={zoomClass}
               onClick={!isZooming ? handleClose : null}
               onMouseDown={isZooming ? handleZoomDown : null}
               onMouseUp={isZooming ? handleZoomStop : null}
@@ -485,12 +476,8 @@ const WrappedCarouselContainer = ({
               onMouseMove={isZooming ? handleZoomMove : null}
               onWheel={isZooming ? handleZoomWheel : null}
             >
-              <div
-                className={clsx(classes.containerNavOverlay, zoomClass)}
-                onClick={handleImageChange(-1)}
-                style={{ left: 0 }}
-              >
-                <div className={classes.navButtonWrapper}>
+              <NavOverlayContainer className={zoomClass} onClick={handleImageChange(-1)} style={{ left: '0' }}>
+                <NavButtonWrapper>
                   <Tooltip title={t('prev')} placement="right">
                     <IconButton
                       component="div"
@@ -499,53 +486,45 @@ const WrappedCarouselContainer = ({
                       onClick={handleImageChange(-1)}
                     />
                   </Tooltip>
-                </div>
-              </div>
+                </NavButtonWrapper>
+              </NavOverlayContainer>
 
               {imgData ? (
-                <img
+                <Img
                   ref={imgRef}
-                  className={clsx(classes.image, zoomClass)}
+                  className={zoomClass}
                   src={imgData}
                   alt={currentImage?.name}
                   draggable={false}
-                  style={
-                    isZooming
-                      ? {
-                          width:
-                            imgRef.current.naturalWidth > 128
-                              ? `calc(${zoom / 100} * ${imgRef.current.naturalWidth}px)`
-                              : `calc(${zoom / 100} * ${MIN_IMAGE_SIZE_REM}rem)`,
-                          height:
-                            imgRef.current.naturalHeight > 128
-                              ? `calc(${zoom / 100} * ${imgRef.current.naturalHeight}px)`
-                              : `calc(${zoom / 100} * ${MIN_IMAGE_SIZE_REM}rem)`,
-                          minWidth: 0,
-                          minHeight: 0,
-                          imageRendering: imageRendering
-                        }
-                      : {
-                          imageRendering: imageRendering
-                        }
-                  }
+                  style={{
+                    imageRendering: imageRendering,
+                    ...(isZooming && {
+                      width:
+                        imgRef.current.naturalWidth > 128
+                          ? `calc(${zoom / 100} * ${imgRef.current.naturalWidth}px)`
+                          : `calc(${zoom / 100} * ${MIN_IMAGE_SIZE_REM}rem)`,
+                      height:
+                        imgRef.current.naturalHeight > 128
+                          ? `calc(${zoom / 100} * ${imgRef.current.naturalHeight}px)`
+                          : `calc(${zoom / 100} * ${MIN_IMAGE_SIZE_REM}rem)`,
+                      minWidth: 0,
+                      minHeight: 0
+                    })
+                  }}
                   onClick={imgData ? handleZoomClick : null}
                 />
               ) : (
-                <div className={classes.loadingContainer} style={thumbData && { backgroundImage: `url(${thumbData})` }}>
+                <LoadingContainer style={!thumbData ? null : { backgroundImage: `url(${thumbData})` }}>
                   {loading ? (
                     <CircularProgress color="primary" />
                   ) : (
                     <BrokenImageOutlinedIcon color="primary" fontSize="large" />
                   )}
-                </div>
+                </LoadingContainer>
               )}
 
-              <div
-                className={clsx(classes.containerNavOverlay, zoomClass)}
-                onClick={handleImageChange(1)}
-                style={{ right: '0' }}
-              >
-                <div className={classes.navButtonWrapper} style={{ right: 0 }}>
+              <NavOverlayContainer className={zoomClass} onClick={handleImageChange(1)} style={{ right: '0' }}>
+                <NavButtonWrapper style={{ right: 0 }}>
                   <Tooltip title={t('next')} placement="left">
                     <IconButton
                       component="div"
@@ -554,18 +533,33 @@ const WrappedCarouselContainer = ({
                       onClick={handleImageChange(1)}
                     />
                   </Tooltip>
-                </div>
-              </div>
-            </div>
+                </NavButtonWrapper>
+              </NavOverlayContainer>
+            </ImageContainer>
 
-            <div id="carousel-menu" className={classes.menu}>
-              <div className={classes.buttonWrapper}>
+            <Menu id="carousel-menu">
+              <div
+                style={{
+                  margin: theme.spacing(1),
+                  borderRadius: theme.spacing(3),
+                  backgroundColor: alpha(theme.palette.background.paper, 0.7)
+                }}
+              >
                 <Tooltip title={t('close')} placement="right">
                   <IconButton onClick={handleClose} size="large" children={<CloseIcon />} />
                 </Tooltip>
               </div>
 
-              <div className={clsx(classes.zoom, zoomClass)}>
+              <div
+                className={zoomClass}
+                style={{
+                  backgroundColor: alpha(theme.palette.background.paper, 0.7),
+                  borderRadius: theme.spacing(3),
+                  position: 'fixed',
+                  top: theme.spacing(1),
+                  right: theme.spacing(1)
+                }}
+              >
                 <Tooltip title={t('zoom')} placement="left">
                   <div>
                     <IconButton
@@ -576,7 +570,7 @@ const WrappedCarouselContainer = ({
                     />
                   </div>
                 </Tooltip>
-                <div className={clsx(classes.zoomAttributes, zoomClass)}>
+                <ZoomAttributes className={zoomClass}>
                   <div style={{ textAlign: 'end', minWidth: '35px' }}>{`${zoom}%`}</div>
                   <IconButton
                     size="small"
@@ -584,30 +578,34 @@ const WrappedCarouselContainer = ({
                     children={<AddIcon fontSize="small" />}
                   />
                   <Slider
-                    className={classes.zoomSlider}
                     value={zoom}
                     step={10}
                     min={10}
                     max={500}
                     size="small"
-                    onChange={(event, newValue) => setZoom(Math.floor(newValue as number))}
+                    onChange={(event, newValue) => setZoom(Math.floor(newValue))}
                     orientation="vertical"
+                    sx={{
+                      '& .MuiSlider-thumb': {
+                        boxShadow: 'none'
+                      }
+                    }}
                   />
                   <IconButton
                     size="small"
                     onClick={() => setZoom(z => Math.max(10, z - 10))}
                     children={<RemoveIcon fontSize="small" />}
                   />
-                </div>
+                </ZoomAttributes>
               </div>
 
-              <div className={clsx(classes.menuPane, zoomClass)}>
-                <div className={classes.info}>
+              <MenuPane className={zoomClass}>
+                <Info>
                   <div>{t('name')}</div>
                   <div>{currentImage ? currentImage?.name : loading && <Skeleton variant="rounded" />}</div>
                   <div>{t('description')}</div>
                   <div>{currentImage ? currentImage?.description : loading && <Skeleton variant="rounded" />}</div>
-                </div>
+                </Info>
                 <Tooltip title={t('view_file')} placement="bottom">
                   <IconButton
                     component={Link}
@@ -622,19 +620,19 @@ const WrappedCarouselContainer = ({
                     <PageviewOutlinedIcon />
                   </IconButton>
                 </Tooltip>
-              </div>
-            </div>
+              </MenuPane>
+            </Menu>
 
-            <div
+            <NavBarContainer
               id="carousel-navbar"
               ref={navbarRef}
-              className={clsx(classes.navbarContainer, zoomClass)}
+              className={zoomClass}
               onMouseDown={handleNavbarDown}
               onMouseLeave={handleNavbarStop}
               onMouseUp={handleNavbarStop}
               onMouseMove={handleNavbarMove}
             >
-              <div className={clsx(classes.navbar)}>
+              <NavBar>
                 {images.map((image, i) => (
                   <CarouselItem
                     key={'thumb-' + i}
@@ -644,8 +642,8 @@ const WrappedCarouselContainer = ({
                     onClick={() => !navbarScroll.current.isDragging && setIndex(i)}
                   />
                 ))}
-              </div>
-            </div>
+              </NavBar>
+            </NavBarContainer>
           </div>
         </Modal>
       </Carousel>

@@ -1,10 +1,6 @@
-/* eslint-disable jsx-a11y/anchor-is-valid */
 import { Box, Button, CircularProgress, Link, Stack, Typography } from '@mui/material';
-import createStyles from '@mui/styles/createStyles';
-import makeStyles from '@mui/styles/makeStyles';
-import useAppBanner from 'commons/components/app/hooks/useAppBanner';
+import { useAppBanner, useAppLayout } from 'commons/components/app/hooks';
 import useAppBannerVert from 'commons/components/app/hooks/useAppBannerVert';
-import useAppLayout from 'commons/components/app/hooks/useAppLayout';
 import PageCardCentered from 'commons/components/pages/PageCardCentered';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
@@ -18,20 +14,7 @@ import TextDivider from 'components/visual/TextDivider';
 import { getProvider, getSAMLData } from 'helpers/utils';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
-import { useLocation } from 'react-router-dom';
-
-const useStyles = makeStyles(() =>
-  createStyles({
-    buttonProgress: {
-      position: 'absolute',
-      top: '50%',
-      left: '50%',
-      marginTop: -12,
-      marginLeft: -12
-    }
-  })
-);
+import { useLocation, useNavigate } from 'react-router';
 
 type LoginScreenProps = {
   allowUserPass: boolean;
@@ -45,7 +28,6 @@ export default function LoginScreen({ allowUserPass, allowSAML, allowSignup, oAu
   const navigate = useNavigate();
   const params = new URLSearchParams(location.search);
   const { t } = useTranslation(['login']);
-  const classes = useStyles();
   const { apiCall } = useMyAPI();
   const bannerVert = useAppBannerVert();
   const banner = useAppBanner();
@@ -67,7 +49,7 @@ export default function LoginScreen({ allowUserPass, allowSAML, allowSignup, oAu
   const [buttonLoading, setButtonLoading] = useState(false);
 
   // Quick login can only be used if there's exactly one external authentication service configured
-  const quickSSOLogin = allowSAML && !oAuthProviders ? true : !allowSAML && oAuthProviders?.length === 1;
+  const quickSSOLogin = allowSAML && oAuthProviders.length === 0 ? true : !allowSAML && oAuthProviders?.length === 1;
 
   function reset(event) {
     if ((['oauth'].includes(shownControls) && oauthTokenID) || !['oauth'].includes(shownControls)) {
@@ -273,7 +255,7 @@ export default function LoginScreen({ allowUserPass, allowSAML, allowSignup, oAu
                           href={`/api/v4/auth/login/?oauth_provider=${item}`}
                         >
                           {`${t('button_oauth')} ${item.replace(/_/g, ' ')}`}
-                          {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
+                          {buttonLoading && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
                         </Button>
                       ))}
                     {allowSAML && (
@@ -290,10 +272,10 @@ export default function LoginScreen({ allowUserPass, allowSAML, allowSignup, oAu
                           );
                           setButtonLoading(true);
                         }}
-                        href={'/api/v4/auth/saml/sso/'}
+                        href="/api/v4/auth/saml/sso/"
                       >
                         {t('button_saml')}
-                        {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
+                        {buttonLoading && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
                       </Button>
                     )}
                   </Stack>

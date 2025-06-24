@@ -1,41 +1,23 @@
 import BackspaceIcon from '@mui/icons-material/Backspace';
+import type { IconButtonProps } from '@mui/material';
 import {
   alpha,
   Box,
   Divider,
   IconButton,
-  IconButtonProps,
   LinearProgress,
+  styled,
   Tooltip,
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
+import SearchTextField from 'components/visual/SearchBar/search-textfield';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import SearchTextField from './search-textfield';
 
-const useStyles = makeStyles(theme => ({
-  root: {
-    '& button': {
-      marginRight: theme.spacing(1)
-    }
-  },
-  searchbar: {
-    borderRadius: '4px',
-    paddingLeft: theme.spacing(2),
-    backgroundColor: alpha(theme.palette.text.primary, 0.04),
-    '&:hover': {
-      backgroundColor: alpha(theme.palette.text.primary, 0.06)
-    },
-    '& input': {
-      color: theme.palette.text.secondary
-    }
-  },
-  searchresult: {
-    color: theme.palette.primary.light,
-    paddingLeft: theme.spacing(1),
-    paddingBottom: theme.spacing(1)
+const Root = styled('div')(({ theme }) => ({
+  '& button': {
+    marginRight: theme.spacing(1)
   }
 }));
 
@@ -72,8 +54,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
 }) => {
   const { t } = useTranslation();
   const theme = useTheme();
-  const classes = useStyles();
-  const element = useRef<HTMLInputElement>();
+  const element = useRef<HTMLInputElement>(null);
   const [value, setValue] = useState<string>(initValue);
   const upMD = useMediaQuery(theme.breakpoints.up('md'));
 
@@ -106,13 +87,23 @@ const SearchBar: React.FC<SearchBarProps> = ({
   }, [initValue]);
 
   return (
-    <div ref={element} className={classes.root}>
+    <Root ref={element}>
       <Box
         display="flex"
         flexDirection="row"
-        className={classes.searchbar}
         alignItems="center"
-        style={{ paddingRight: !extras ? theme.spacing(0.5) : null }}
+        sx={{
+          borderRadius: '4px',
+          paddingLeft: theme.spacing(2),
+          paddingRight: !extras ? theme.spacing(0.5) : null,
+          backgroundColor: alpha(theme.palette.text.primary, 0.04),
+          '&:hover': {
+            backgroundColor: alpha(theme.palette.text.primary, 0.06)
+          },
+          '& input': {
+            color: theme.palette.text.secondary
+          }
+        }}
       >
         <Box flex={1} display="relative">
           <SearchTextField
@@ -181,8 +172,16 @@ const SearchBar: React.FC<SearchBarProps> = ({
           }}
         />
       )}
-      <div className={classes.searchresult}>{children}</div>
-    </div>
+      <div
+        style={{
+          color: theme.palette.primary.light,
+          paddingLeft: theme.spacing(1),
+          paddingBottom: theme.spacing(1)
+        }}
+      >
+        {children}
+      </div>
+    </Root>
   );
 };
 

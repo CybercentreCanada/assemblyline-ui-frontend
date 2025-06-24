@@ -1,7 +1,7 @@
 import { Tooltip } from '@mui/material';
 import type { Verdict } from 'components/models/base/alert';
-import type { PossibleColor } from 'components/models/utils/color';
 import CustomChip from 'components/visual/CustomChip';
+import type { PossibleColor } from 'helpers/colors';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 

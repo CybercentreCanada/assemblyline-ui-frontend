@@ -13,46 +13,19 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import useALContext from 'components/hooks/useALContext';
 import useHighlighter from 'components/hooks/useHighlighter';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useSafeResults from 'components/hooks/useSafeResults';
-import { AlternateResult, FileResult } from 'components/models/base/result';
+import type { AlternateResult, FileResult } from 'components/models/base/result';
 import Classification from 'components/visual/Classification';
 import Moment from 'components/visual/Moment';
+import ExtractedSection from 'components/visual/ResultCard/extracted';
+import ResultSection from 'components/visual/ResultCard/result_section';
+import SupplementarySection from 'components/visual/ResultCard/supplementary';
 import Verdict from 'components/visual/Verdict';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import ExtractedSection from './ResultCard/extracted';
-import ResultSection from './ResultCard/result_section';
-import SupplementarySection from './ResultCard/supplementary';
-
-const useStyles = makeStyles(theme => ({
-  card: {
-    backgroundColor: theme.palette.background.default,
-    border: `solid 1px ${theme.palette.mode === 'dark' ? '#393939' : '#ddd'}`,
-    borderRadius: '4px'
-  },
-  card_title: {
-    backgroundColor: theme.palette.mode === 'dark' ? '#393939' : '#f0f0f0',
-    padding: '6px',
-    borderRadius: '4px 4px 0px 0px',
-    display: 'flex',
-    alignItems: 'center',
-    flexWrap: 'wrap',
-    '&:hover': {
-      backgroundColor: theme.palette.mode === 'dark' ? '#505050' : '#e6e6e6',
-      cursor: 'pointer'
-    }
-  },
-  content: {
-    padding: '6px'
-  },
-  muted: {
-    color: theme.palette.text.secondary
-  }
-}));
 
 export const emptyResult = (result: FileResult) =>
   result.result.score === 0 &&
@@ -69,7 +42,6 @@ type Props = {
 
 const WrappedResultCard: React.FC<Props> = ({ result, sid, alternates = null, force = false }) => {
   const { t } = useTranslation(['fileDetail']);
-  const classes = useStyles();
   const theme = useTheme();
   const { apiCall } = useMyAPI();
   const sp2 = theme.spacing(2);
@@ -146,7 +118,14 @@ const WrappedResultCard: React.FC<Props> = ({ result, sid, alternates = null, fo
   }, [selected]);
 
   return displayedResult.result.score < 0 && !showSafeResults && !force ? null : (
-    <div className={classes.card} style={{ marginBottom: sp2 }}>
+    <div
+      style={{
+        marginBottom: sp2,
+        backgroundColor: theme.palette.background.default,
+        border: `solid 1px ${theme.palette.mode === 'dark' ? '#393939' : '#ddd'}`,
+        borderRadius: '4px'
+      }}
+    >
       <Popper
         open={popper}
         anchorEl={anchorEl}
@@ -180,8 +159,19 @@ const WrappedResultCard: React.FC<Props> = ({ result, sid, alternates = null, fo
         )}
       </Popper>
       <Box
-        className={classes.card_title}
         onClick={handleClick}
+        sx={{
+          backgroundColor: theme.palette.mode === 'dark' ? '#393939' : '#f0f0f0',
+          padding: '6px',
+          borderRadius: '4px 4px 0px 0px',
+          display: 'flex',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          '&:hover': {
+            backgroundColor: theme.palette.mode === 'dark' ? '#505050' : '#e6e6e6',
+            cursor: 'pointer'
+          }
+        }}
         style={{
           backgroundColor: hasHighlightedKeys(allTags) ? (theme.palette.mode === 'dark' ? '#343a44' : '#d8e3ea') : null
         }}
@@ -192,43 +182,45 @@ const WrappedResultCard: React.FC<Props> = ({ result, sid, alternates = null, fo
           <b>{displayedResult.response.service_name}</b>&nbsp;
         </span>
         {!empty && <Verdict score={displayedResult.result.score} mono short size="tiny" />}
-        <small className={classes.muted}>{` :: ${displayedResult.response.service_version.replace(/_/g, '.')}`}</small>
-        <small className={classes.muted} style={{ flexGrow: 1 }}>
+        <small style={{ color: theme.palette.text.secondary }}>
+          {` :: ${displayedResult.response.service_version.replace(/_/g, '.')}`}
+        </small>
+        <small style={{ flexGrow: 1, color: theme.palette.text.secondary }}>
           &nbsp;{displayedResult.response.service_context ? `(${displayedResult.response.service_context})` : ''}
         </small>
         {!empty && !sid && (
           <div>
             {alternates ? (
               <Button
-                className={classes.muted}
                 variant="outlined"
                 size="small"
                 onClick={handlePopperClick}
-                style={{ fontSize: 'smaller' }}
+                style={{ fontSize: 'smaller', color: theme.palette.text.secondary }}
               >
                 <Moment variant="fromNow">{displayedResult.created}</Moment>
               </Button>
             ) : (
               <Typography
-                className={classes.muted}
                 variant="button"
-                style={{ fontSize: 'smaller', paddingRight: theme.spacing(1.4) }}
+                style={{ fontSize: 'smaller', paddingRight: theme.spacing(1.4), color: theme.palette.text.secondary }}
               >
                 <Moment variant="fromNow">{displayedResult.created}</Moment>
               </Typography>
             )}
           </div>
         )}
-        {open ? <ExpandLess className={classes.muted} /> : <ExpandMore className={classes.muted} />}
+        {open ? (
+          <ExpandLess sx={{ color: theme.palette.text.secondary }} />
+        ) : (
+          <ExpandMore sx={{ color: theme.palette.text.secondary }} />
+        )}
       </Box>
       <Collapse in={open} timeout="auto" onEnter={() => setRender(true)}>
         {empty ? (
-          <div className={classes.content} style={{ color: theme.palette.text.secondary }}>
-            {t('nothing_to_report')}
-          </div>
+          <div style={{ padding: '6px', color: theme.palette.text.secondary }}>{t('nothing_to_report')}</div>
         ) : (
           render && (
-            <div className={classes.content}>
+            <div style={{ padding: '6px' }}>
               {displayedResult.section_hierarchy
                 ? displayedResult.section_hierarchy.map(item => (
                     <ResultSection

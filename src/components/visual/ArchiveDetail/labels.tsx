@@ -24,7 +24,6 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import match from 'autosuggest-highlight/match';
 import parse from 'autosuggest-highlight/parse';
 import useALContext from 'components/hooks/useALContext';
@@ -32,35 +31,13 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import type { LabelCategories } from 'components/models/base/file';
 import { DEFAULT_LABELS, LABELS_COLOR_MAP } from 'components/models/base/file';
-import type { PossibleColor } from 'components/models/utils/color';
 import { ChipList } from 'components/visual/ChipList';
 import CustomChip from 'components/visual/CustomChip';
 import { useDebounce } from 'components/visual/HexViewer';
 import SectionContainer from 'components/visual/SectionContainer';
+import type { PossibleColor } from 'helpers/colors';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-
-const useStyles = makeStyles(theme => ({
-  preview: {
-    margin: 0,
-    padding: theme.spacing(0.75, 1),
-    whiteSpace: 'pre-wrap',
-    wordBreak: 'break-word'
-  },
-  searchTextFieldOptionsInner: {
-    backgroundColor: theme.palette.background.default
-  },
-  searchTextFieldItem: {
-    padding: theme.spacing(1),
-    '&:hover': {
-      cursor: 'pointer',
-      backgroundColor: theme.palette.action.hover
-    },
-    '&[data-searchtextfieldoption-selected="true"]': {
-      backgroundColor: theme.palette.action.selected
-    }
-  }
-}));
 
 const LABELS: Record<keyof LabelCategories, { color: PossibleColor }> = {
   attribution: { color: 'primary' },
@@ -87,7 +64,6 @@ type Props = {
 const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabels = null, nocollapse = false }) => {
   const { t } = useTranslation(['archive']);
   const theme = useTheme();
-  const classes = useStyles();
   const { apiCall } = useMyAPI();
   const { showSuccessMessage, showErrorMessage } = useMySnackbar();
   const { user: currentUser } = useALContext();
@@ -229,8 +205,8 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
                   color: !labels
                     ? theme.palette.text.disabled
                     : theme.palette.mode === 'dark'
-                    ? theme.palette.success.light
-                    : theme.palette.success.dark
+                      ? theme.palette.success.light
+                      : theme.palette.success.dark
                 }}
                 onClick={handleAddConfirmation}
               >
@@ -246,11 +222,11 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
         <DialogContent>
           <DialogContentText component="div">
             <Grid container flexDirection="column" spacing={2}>
-              <Grid item children={t(`label.${confirmation.type === 'add' ? 'add' : 'delete'}.content`)} />
+              <Grid children={t(`label.${confirmation.type === 'add' ? 'add' : 'delete'}.content`)} />
 
               {confirmation.type === 'add' && (
                 <>
-                  <Grid item>
+                  <Grid>
                     <FormLabel>{t('category')}</FormLabel>
                     <RadioGroup
                       value={newLabel.category}
@@ -264,11 +240,24 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
                       <FormControlLabel value="info" label={t('info')} control={<Radio size="small" />} />
                     </RadioGroup>
                   </Grid>
-                  <Grid item>
+                  <Grid>
                     <Autocomplete
-                      classes={{
-                        listbox: classes.searchTextFieldOptionsInner,
-                        option: classes.searchTextFieldItem
+                      slotProps={{
+                        listbox: { sx: { backgroundColor: theme.palette.background.default } },
+                        popper: {
+                          sx: {
+                            ['& .MuiAutocomplete-option']: {
+                              padding: theme.spacing(1),
+                              '&:hover': {
+                                cursor: 'pointer',
+                                backgroundColor: theme.palette.action.hover
+                              },
+                              '&[data-searchtextfieldoption-selected="true"]': {
+                                backgroundColor: theme.palette.action.selected
+                              }
+                            }
+                          }
+                        }
                       }}
                       value={selectedOption}
                       onChange={(event: any, newValue: Option | null) => {
@@ -277,8 +266,8 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
                           [null, undefined].includes(newValue)
                             ? { ...l, value: '' }
                             : typeof newValue === 'string'
-                            ? { ...l, value: newValue }
-                            : { category: newValue?.category, value: newValue?.label }
+                              ? { ...l, value: newValue }
+                              : { category: newValue?.category, value: newValue?.label }
                         );
                       }}
                       inputValue={newLabel?.value}
@@ -299,7 +288,7 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
                         const parts = parse(option?.label, matches);
                         return (
                           <Grid component="li" container {...props} key={JSON.stringify(option)}>
-                            <Grid item md={3}>
+                            <Grid size={{ md: 3 }}>
                               <CustomChip
                                 size="small"
                                 label={t(option?.category)}
@@ -307,14 +296,14 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
                                 variant="outlined"
                               />
                             </Grid>
-                            <Grid item md={8}>
+                            <Grid size={{ md: 8 }}>
                               {parts.map((part, index) => (
                                 <span key={index} style={{ fontWeight: part.highlight ? 700 : 400 }}>
                                   {part.text}
                                 </span>
                               ))}
                             </Grid>
-                            <Grid item md={1}>
+                            <Grid size={{ md: 1 }}>
                               <CustomChip size="small" label={option?.count} />
                             </Grid>
                           </Grid>
@@ -340,16 +329,25 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
               )}
 
               {confirmation.type === 'delete' && (
-                <Grid item>
+                <Grid>
                   <Typography variant="subtitle2" children={t(newLabel.category)} />
-                  <Paper component="pre" variant="outlined" className={classes.preview}>
+                  <Paper
+                    component="pre"
+                    variant="outlined"
+                    sx={{
+                      margin: 0,
+                      padding: theme.spacing(0.75, 1),
+                      whiteSpace: 'pre-wrap',
+                      wordBreak: 'break-word'
+                    }}
+                  >
                     {newLabel.value}
                   </Paper>
                 </Grid>
               )}
 
               {newLabel?.category in LABELS && ![null, undefined, ''].includes(newLabel?.value) && (
-                <Grid item children={t(`label.${confirmation.type === 'add' ? 'add' : 'delete'}.confirm`)} />
+                <Grid children={t(`label.${confirmation.type === 'add' ? 'add' : 'delete'}.confirm`)} />
               )}
             </Grid>
           </DialogContentText>
@@ -367,18 +365,7 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
             children={
               <>
                 {t(`label.${confirmation.type === 'add' ? 'add' : 'delete'}.ok`)}
-                {waiting && (
-                  <CircularProgress
-                    size={24}
-                    style={{
-                      position: 'absolute',
-                      top: '50%',
-                      left: '50%',
-                      marginTop: -12,
-                      marginLeft: -12
-                    }}
-                  />
-                )}
+                {waiting && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
               </>
             }
             onClick={confirmation.type === 'add' ? () => handleAddLabel(newLabel) : () => handleDeleteLabel(newLabel)}
@@ -388,10 +375,10 @@ const WrappedLabelSection: React.FC<Props> = ({ sha256 = null, labels: propLabel
 
       {Object.keys(LABELS).map((cat, i) => (
         <Grid key={i} container>
-          <Grid item xs={12} sm={3} lg={2}>
+          <Grid size={{ xs: 12, sm: 3, lg: 2 }}>
             <span style={{ fontWeight: 500 }}>{t(cat)}</span>
           </Grid>
-          <Grid item xs={12} sm={9} lg={10}>
+          <Grid size={{ xs: 12, sm: 9, lg: 10 }}>
             {!labels || !(cat in labels) ? (
               <Skeleton />
             ) : sortedLabels[cat].length === 0 ? (

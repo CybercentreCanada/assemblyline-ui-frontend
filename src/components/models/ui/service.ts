@@ -1,5 +1,5 @@
 import type { ErrorType } from 'components/models/base/error';
-import type { StatResult } from './search';
+import type { StatResult } from 'components/models/ui/search';
 
 /** Get statistics for a service */
 export type ServiceStats = {
@@ -8,7 +8,7 @@ export type ServiceStats = {
     extracted: Partial<StatResult>;
     supplementary: Partial<StatResult>;
   };
-  heuristic: { [heuristicID: string]: number };
+  heuristic: Record<string, number>;
   result: {
     count: number;
     score: {

@@ -4,20 +4,21 @@ import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import type { TypographyProps } from '@mui/material';
 import { Grid, IconButton, MenuItem, Select, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
-import useAppUser from 'commons/components/app/hooks/useAppUser';
+import { useAppUser } from 'commons/components/app/hooks';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useMyAPI from 'components/hooks/useMyAPI';
 import type { Service as ServiceData } from 'components/models/base/service';
 import type { ServiceStats as ServiceStatsData } from 'components/models/ui/service';
 import type { CustomUser } from 'components/models/ui/user';
+import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import LineGraph from 'components/visual/LineGraph';
 import { getVersionQuery } from 'helpers/utils';
 import type { Dispatch, SetStateAction } from 'react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate } from 'react-router';
-import { Link, useLocation } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router';
+import { Link } from 'react-router-dom';
 
 // TODO: version doesn't seem to be set correctly
 type ServiceStats = ServiceStatsData & { version: string };
@@ -93,8 +94,8 @@ function ServiceDetail({ stats, comp, show }: ServiceDetailProps) {
         <Typography variant="h3" align="center" gutterBottom>
           {stats ? stats.service.version : <Skeleton width="10rem" style={{ display: 'inline-block' }} />}
         </Typography>
-        <Counter stats={stats} comp={comp} field={'result.count'} />
-        <Counter stats={stats} comp={comp} field={'result.score.avg'} />
+        <Counter stats={stats} comp={comp} field="result.count" />
+        <Counter stats={stats} comp={comp} field="result.score.avg" />
         <div style={{ marginBottom: theme.spacing(2) }}>
           <LineGraph
             dataset={stats && stats.result.score.distribution}
@@ -104,8 +105,8 @@ function ServiceDetail({ stats, comp, show }: ServiceDetailProps) {
             titleSize={20}
           />
         </div>
-        <Counter stats={stats} comp={comp} field={'file.extracted.avg'} />
-        <Counter stats={stats} comp={comp} field={'file.supplementary.avg'} />
+        <Counter stats={stats} comp={comp} field="file.extracted.avg" />
+        <Counter stats={stats} comp={comp} field="file.supplementary.avg" />
         <div style={{ marginBottom: theme.spacing(2) }}>
           <LineGraph
             dataset={stats && stats.heuristic}
@@ -268,51 +269,49 @@ export default function ServiceReview() {
 
   return currentUser.is_admin ? (
     <PageFullWidth margin={4}>
-      <Grid
-        container
-        alignItems="center"
-        justifyContent="space-between"
-        spacing={3}
-        style={{ paddingBottom: theme.spacing(2) }}
-      >
-        <Grid item xs={12} md>
-          <Typography variant="h4">{t('title')}</Typography>
-          <Typography variant="subtitle1">{t('subtitle')}</Typography>
-        </Grid>
-        <Grid item xs={12} md style={{ flexGrow: 0 }}>
-          {services ? (
-            <>
-              <div style={{ display: 'flex', marginBottom: theme.spacing(1), justifyContent: 'flex-end' }}>
-                <FormControl size="small" fullWidth>
-                  <Select
-                    id="channel"
-                    fullWidth
-                    value={selectedService}
-                    onChange={handleServiceChange}
-                    displayEmpty
-                    variant="outlined"
-                    style={{
-                      minWidth: theme.spacing(30),
-                      color: selectedService === '' ? theme.palette.text.disabled : null
-                    }}
-                  >
-                    <MenuItem value="" disabled>
-                      {t('service.selection')}
+      <PageHeader
+        primary={t('title')}
+        secondary={t('subtitle')}
+        slotProps={{
+          root: { style: { marginBottom: theme.spacing(2) } },
+          actions: { spacing: 1 }
+        }}
+        actions={
+          services ? (
+            <div
+              key="selection"
+              style={{ display: 'flex', marginBottom: theme.spacing(1), justifyContent: 'flex-end' }}
+            >
+              <FormControl size="small" fullWidth>
+                <Select
+                  id="channel"
+                  fullWidth
+                  value={selectedService}
+                  onChange={handleServiceChange}
+                  displayEmpty
+                  variant="outlined"
+                  style={{
+                    minWidth: theme.spacing(30),
+                    color: selectedService === '' ? theme.palette.text.disabled : null
+                  }}
+                >
+                  <MenuItem value="" disabled>
+                    {t('service.selection')}
+                  </MenuItem>
+                  {services.map((srv, id) => (
+                    <MenuItem key={id} value={srv}>
+                      {srv}
                     </MenuItem>
-                    {services.map((srv, id) => (
-                      <MenuItem key={id} value={srv}>
-                        {srv}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </div>
-            </>
+                  ))}
+                </Select>
+              </FormControl>
+            </div>
           ) : (
-            <Skeleton variant="rectangular" height={theme.spacing(5)} width={theme.spacing(30)} />
-          )}
-        </Grid>
-      </Grid>
+            <Skeleton key="selection" variant="rectangular" height={theme.spacing(5)} width={theme.spacing(30)} />
+          )
+        }
+      />
+
       {selectedService && selectedService !== '' && (
         <>
           <Typography variant="h3" align="center" gutterBottom style={{ marginTop: theme.spacing(2) }}>
@@ -324,7 +323,7 @@ export default function ServiceReview() {
             spacing={3}
             style={{ paddingTop: theme.spacing(2), paddingBottom: theme.spacing(2) }}
           >
-            <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <VersionSelector
                 possibleVersions={possibleVersions}
                 selectedService={selectedService}
@@ -334,7 +333,7 @@ export default function ServiceReview() {
               />
               <ServiceDetail stats={stats1} comp={stats2} show={version1 !== ''} />
             </Grid>
-            <Grid item xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <VersionSelector
                 possibleVersions={possibleVersions}
                 selectedService={selectedService}

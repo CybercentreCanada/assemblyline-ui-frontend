@@ -1,17 +1,7 @@
-import { ClickAwayListener, Fade, Paper, Popper } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
+import { ClickAwayListener, Fade, Paper, Popper, useTheme } from '@mui/material';
 import { isEnter, isEscape } from 'commons/components/utils/keyboard';
+import { NumericField } from 'components/visual/HexViewer';
 import { default as React, forwardRef, useCallback, useImperativeHandle, useState } from 'react';
-import { NumericField } from '../..';
-
-export const useHexStyles = makeStyles(theme => ({
-  searchPaper: {
-    marginTop: '16px',
-    padding: theme.spacing(1),
-    minWidth: '200px',
-    backgroundColor: theme.palette.background.paper
-  }
-}));
 
 export type NumberFieldPopperProps = {
   id?: string;
@@ -43,7 +33,7 @@ export const WrappedNumberFieldPopper = (
   }: NumberFieldPopperProps,
   ref
 ) => {
-  const classes = useHexStyles();
+  const theme = useTheme();
 
   const [open, setOpen] = useState<boolean>(false);
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
@@ -79,7 +69,14 @@ export const WrappedNumberFieldPopper = (
       {({ TransitionProps }) => (
         <ClickAwayListener onClickAway={handleClickAway}>
           <Fade {...TransitionProps} timeout={200}>
-            <Paper className={classes.searchPaper}>
+            <Paper
+              sx={{
+                marginTop: '16px',
+                padding: theme.spacing(1),
+                minWidth: '200px',
+                backgroundColor: theme.palette.background.paper
+              }}
+            >
               <NumericField
                 id={id}
                 label={label}

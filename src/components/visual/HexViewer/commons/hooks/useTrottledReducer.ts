@@ -1,5 +1,5 @@
 import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
-import React from 'react';
+import React, { useCallback, useRef, useState } from 'react';
 
 export const useTrottledReducer = <State, Action>(
   reducer: (state: Partial<State>, action: Action) => State,
@@ -10,22 +10,22 @@ export const useTrottledReducer = <State, Action>(
   //   reducer,
   //   initialState
   // );
-  const [state, setState] = React.useState<State>(initialState);
-  const prevStateRef = React.useRef<State>(initialState);
-  const nextStateRef = React.useRef<State>(initialState);
-  const dispatchRef = React.useRef(setState);
-  const timeout = React.useRef(null);
+  const [state, setState] = useState<State>(initialState);
+  const prevStateRef = useRef<State>(initialState);
+  const nextStateRef = useRef<State>(initialState);
+  const dispatchRef = useRef(setState);
+  const timeout = useRef(null);
 
   useEffectOnce(() => {
     dispatchRef.current = setState;
   });
 
-  const clear = React.useCallback(() => {
+  const clear = useCallback(() => {
     clearTimeout(timeout.current);
     timeout.current = null;
   }, []);
 
-  const reset = React.useCallback(() => {
+  const reset = useCallback(() => {
     timeout.current = setTimeout(() => {
       if (!Object.is(prevStateRef.current, nextStateRef.current)) {
         prevStateRef.current = nextStateRef.current;
@@ -36,7 +36,7 @@ export const useTrottledReducer = <State, Action>(
     }, delay);
   }, [clear, delay]);
 
-  const dispatchCallback = React.useCallback(
+  const dispatchCallback = useCallback(
     (action: Action) => {
       nextStateRef.current = reducer(nextStateRef.current, action);
 

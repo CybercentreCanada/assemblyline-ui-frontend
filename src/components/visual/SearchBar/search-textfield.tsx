@@ -1,44 +1,10 @@
-/* eslint-disable jsx-a11y/no-static-element-interactions */
 import { Box, ClickAwayListener, InputBase, useMediaQuery, useTheme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import { insertText } from 'commons/addons/utils/browser';
 import { parseEvent } from 'commons/components/utils/keyboard';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export const DEFAULT_SUGGESTION = ['OR', 'AND', 'NOT', 'TO', 'now', 'd', 'M', 'y', 'h', 'm'];
-
-const useStyles = makeStyles(theme => ({
-  searchTextFieldOptionsCt: {
-    textAlign: 'left',
-    position: 'relative',
-    height: 0,
-    outline: 'none',
-    borderRadius: '0 0 4px 4px'
-  },
-  searchTextFieldOptionsInner: {
-    display: 'inline-block',
-    position: 'absolute',
-    overflow: 'auto',
-    zIndex: 1,
-    top: theme.spacing(1),
-    minWidth: '100%',
-    maxHeight: 250,
-    backgroundColor: theme.palette.background.default,
-    boxShadow: theme.shadows[4],
-    borderRadius: '0 0 4px 4px'
-  },
-  searchTextFieldItem: {
-    padding: theme.spacing(1),
-    '&:hover': {
-      cursor: 'pointer',
-      backgroundColor: theme.palette.action.hover
-    },
-    '&[data-searchtextfieldoption-selected="true"]': {
-      backgroundColor: theme.palette.action.selected
-    }
-  }
-}));
 
 export interface SearchTextFieldProps {
   value: string;
@@ -62,7 +28,6 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
   onClear
 }) => {
   const theme = useTheme();
-  const classes = useStyles();
   const [cursor, setCursor] = useState<number>(-1);
   const [filteredOptions, setFilteredOptions] = useState<{ start: number; end: number; items: string[] }>({
     start: 0,
@@ -71,8 +36,8 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
   });
   const { t } = useTranslation();
   const [open, setOpen] = useState<boolean>(false);
-  const element = useRef<HTMLDivElement>();
-  const optionsElement = useRef<HTMLDivElement>();
+  const element = useRef<HTMLDivElement>(null);
+  const optionsElement = useRef<HTMLDivElement>(null);
   const isLTEMedium = useMediaQuery(theme.breakpoints.up('md'));
 
   // Ensure we update options if a new list is provided.
@@ -275,8 +240,24 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
           fullWidth
         />
         {open && isLTEMedium ? (
-          <div ref={optionsElement} className={classes.searchTextFieldOptionsCt}>
-            <div className={classes.searchTextFieldOptionsInner}>
+          <div
+            ref={optionsElement}
+            style={{ textAlign: 'left', position: 'relative', height: 0, outline: 'none', borderRadius: '0 0 4px 4px' }}
+          >
+            <div
+              style={{
+                display: 'inline-block',
+                position: 'absolute',
+                overflow: 'auto',
+                zIndex: 1,
+                top: theme.spacing(1),
+                minWidth: '100%',
+                maxHeight: 250,
+                backgroundColor: theme.palette.background.default,
+                boxShadow: theme.shadows[4],
+                borderRadius: '0 0 4px 4px'
+              }}
+            >
               {filteredOptions.items.map((item, index) => (
                 <SearchTextOption
                   key={`SearchTextField-item-${index}`}
@@ -300,13 +281,23 @@ const SearchTextOption: React.FC<{
   selected: boolean;
   onSelection: () => void;
 }> = ({ text, position, selected = false, onSelection }) => {
-  const classes = useStyles();
+  const theme = useTheme();
+
   return (
     <Box
-      className={classes.searchTextFieldItem}
       data-searchtextfieldoption-position={position}
       data-searchtextfieldoption-selected={selected}
       onClick={() => onSelection()}
+      sx={{
+        padding: theme.spacing(1),
+        '&:hover': {
+          cursor: 'pointer',
+          backgroundColor: theme.palette.action.hover
+        },
+        '&[data-searchtextfieldoption-selected="true"]': {
+          backgroundColor: theme.palette.action.selected
+        }
+      }}
     >
       {text}
     </Box>

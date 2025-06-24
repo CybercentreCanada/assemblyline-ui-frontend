@@ -14,7 +14,8 @@ import type { Workflow } from 'components/models/base/workflow';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router';
+import { Link } from 'react-router-dom';
 
 type RunWorkflowActionProps = {
   id: string;
@@ -34,7 +35,7 @@ export const RunWorkflowAction: React.FC<RunWorkflowActionProps> = React.memo(({
   const handleWorkflowRun = useCallback(() => {
     if (!currentUser.roles.includes('workflow_manage')) return;
     apiCall({
-      url: `/api/v4/workflow/${id}/run`,
+      url: `/api/v4/workflow/${id}/run/`,
       method: 'GET',
       onSuccess: () => {
         setDialog(false);
@@ -177,22 +178,30 @@ type EditWorkflowActionProps = {
 export const EditWorkflowAction: React.FC<EditWorkflowActionProps> = React.memo(({ id = null, workflow = null }) => {
   const { t } = useTranslation(['manageWorkflowDetail']);
   const theme = useTheme();
-  const { user: currentUser } = useALContext();
+  const { user: currentUser, configuration } = useALContext();
+  // Editing of workflows aren't allowed if it wasn't created on the current instance
+  const editingDisabled = workflow?.origin !== configuration.ui.fqdn;
+  console.log(location);
 
   if (!id || !currentUser.roles.includes('workflow_manage')) return null;
   else if (!workflow)
     return <Skeleton variant="circular" height="2.5rem" width="2.5rem" style={{ margin: theme.spacing(0.5) }} />;
   else
     return (
-      <Tooltip title={t('edit')}>
+      <Tooltip title={editingDisabled ? t('edit.disabled') : t('edit')}>
         <div>
           <IconButton
             style={{ color: theme.palette.primary.main }}
             component={Link}
-            to={`${location.pathname}${location.search}#/create/${id}`}
+            to={
+              location.pathname === '/manage/workflows'
+                ? `/manage/workflows${location.search}#/create/${id}`
+                : location.pathname.replace('detail', 'create')
+            }
             size="large"
+            disabled={editingDisabled}
           >
-            <EditOutlinedIcon />
+            <EditOutlinedIcon color={editingDisabled ? 'disabled' : 'primary'} />
           </IconButton>
         </div>
       </Tooltip>

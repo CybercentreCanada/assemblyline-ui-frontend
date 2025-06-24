@@ -1,34 +1,13 @@
-import { Link as MaterialLink, Skeleton } from '@mui/material';
-import { makeStyles } from '@mui/styles';
+import { Link as MaterialLink, Skeleton, useTheme } from '@mui/material';
 import useExternalLookup from 'components/hooks/useExternalLookup';
-import React, { useCallback } from 'react';
-import ActionMenu from './ActionMenu';
-import ExternalLinks from './ExternalSearch';
+import ActionMenu from 'components/visual/ActionMenu';
+import ExternalLinks from 'components/visual/ExternalSearch';
+import React, { useCallback, useState } from 'react';
 
 const initialMenuState = {
   mouseX: null,
   mouseY: null
 };
-
-const useStyles = makeStyles(theme => ({
-  listSubHeaderRoot: {
-    lineHeight: '32px'
-  },
-  link: {
-    marginLeft: theme.spacing(-0.5),
-    paddingLeft: theme.spacing(0.5),
-    borderRadius: theme.spacing(0.5),
-    textDecoration: 'none',
-    minHeight: '22px',
-    color: 'inherit',
-    alignItems: 'center',
-    display: 'flex',
-    cursor: 'pointer',
-    '&:hover': {
-      backgroundColor: theme.palette.action.hover
-    }
-  }
-}));
 
 type TagProps = {
   category: 'metadata' | 'hash';
@@ -38,8 +17,9 @@ type TagProps = {
 };
 
 const WrappedActionableText: React.FC<TagProps> = ({ category, type, value, classification }) => {
-  const [state, setState] = React.useState(initialMenuState);
-  const classes = useStyles();
+  const theme = useTheme();
+
+  const [state, setState] = useState(initialMenuState);
 
   const handleMenuClick = useCallback(event => {
     event.preventDefault();
@@ -67,7 +47,24 @@ const WrappedActionableText: React.FC<TagProps> = ({ category, type, value, clas
                 classification={classification}
               />
             )}
-            <MaterialLink className={classes.link} onClick={handleMenuClick} onContextMenu={handleMenuClick}>
+            <MaterialLink
+              onClick={handleMenuClick}
+              onContextMenu={handleMenuClick}
+              sx={{
+                marginLeft: theme.spacing(-0.5),
+                paddingLeft: theme.spacing(0.5),
+                borderRadius: theme.spacing(0.5),
+                textDecoration: 'none',
+                minHeight: '22px',
+                color: 'inherit',
+                alignItems: 'center',
+                display: 'flex',
+                cursor: 'pointer',
+                '&:hover': {
+                  backgroundColor: theme.palette.action.hover
+                }
+              }}
+            >
               <div style={{ marginTop: '2px' }}>{value}</div>
               <ExternalLinks category={category} type={type} value={value} />
             </MaterialLink>

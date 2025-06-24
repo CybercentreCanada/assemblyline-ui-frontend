@@ -1,7 +1,7 @@
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { Box, IconButton } from '@mui/material';
-import useListNavigator from '../hooks/useListNavigator';
+import useListNavigator from 'commons/addons/lists/hooks/useListNavigator';
 
 const ListNavigator = ({ id }) => {
   const { selectNext, selectPrevious } = useListNavigator(id);

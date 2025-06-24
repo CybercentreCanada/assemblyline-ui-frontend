@@ -1,10 +1,22 @@
 import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
+import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import LabelOutlinedIcon from '@mui/icons-material/LabelOutlined';
 import SimCardOutlinedIcon from '@mui/icons-material/SimCardOutlined';
-import { Box, Collapse, IconButton, Menu, MenuItem, Tooltip, useTheme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
+import TableViewOutlinedIcon from '@mui/icons-material/TableViewOutlined';
+import {
+  Box,
+  Collapse,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  IconButton,
+  Menu,
+  MenuItem,
+  Tooltip,
+  useTheme
+} from '@mui/material';
 import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import useALContext from 'components/hooks/useALContext';
 import useHighlighter from 'components/hooks/useHighlighter';
@@ -13,27 +25,28 @@ import type { Section, SectionItem } from 'components/models/base/result';
 import Attack from 'components/visual/Attack';
 import Classification from 'components/visual/Classification';
 import Heuristic from 'components/visual/Heuristic';
+import { GraphBody } from 'components/visual/ResultCard/graph_body';
+import { ImageBody } from 'components/visual/ResultCard/image_body';
+import { InvalidBody } from 'components/visual/ResultCard/invalid_body';
+import { JSONBody } from 'components/visual/ResultCard/json_body';
+import { KVBody } from 'components/visual/ResultCard/kv_body';
+import { MemDumpBody } from 'components/visual/ResultCard/memdump_body';
+import { MultiBody } from 'components/visual/ResultCard/multi_body';
+import { OrderedKVBody } from 'components/visual/ResultCard/ordered_kv_body';
+import { ProcessTreeBody } from 'components/visual/ResultCard/process_tree_body';
+import { TblBody } from 'components/visual/ResultCard/table_body';
+import { TextBody } from 'components/visual/ResultCard/text_body';
+import { TimelineBody } from 'components/visual/ResultCard/timeline_body';
+import { URLBody } from 'components/visual/ResultCard/url_body';
 import SectionHighlight from 'components/visual/SectionHighlight';
 import Tag from 'components/visual/Tag';
 import Verdict from 'components/visual/Verdict';
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { GraphBody } from './graph_body';
-import { ImageBody } from './image_body';
-import { InvalidBody } from './invalid_body';
-import { JSONBody } from './json_body';
-import { KVBody } from './kv_body';
-import { MemDumpBody } from './memdump_body';
-import { MultiBody } from './multi_body';
-import { OrderedKVBody } from './ordered_kv_body';
-import { ProcessTreeBody } from './process_tree_body';
-import { TblBody } from './table_body';
-import { TextBody } from './text_body';
-import { TimelineBody } from './timeline_body';
-import { URLBody } from './url_body';
 
 const CLIPBOARD_ICON = <AssignmentOutlinedIcon style={{ marginRight: '16px' }} />;
 const HEURISTIC_ICON = <SimCardOutlinedIcon style={{ marginRight: '16px' }} />;
+const TABLE_ICON = <TableViewOutlinedIcon style={{ marginRight: '16px' }} />;
 const TAGS_ICON = <LabelOutlinedIcon style={{ marginRight: '16px' }} />;
 const ATTACK_ICON = (
   <span
@@ -47,31 +60,9 @@ const ATTACK_ICON = (
       fontSize: '1.125rem'
     }}
   >
-    {'[&]'}
+    [&]
   </span>
 );
-
-const useStyles = makeStyles(theme => ({
-  section_title: {
-    display: 'flex',
-    alignItems: 'center',
-    '&:hover': {
-      backgroundColor: theme.palette.action.hover,
-      cursor: 'pointer'
-    },
-    minHeight: theme.spacing(4.5),
-    marginLeft: theme.spacing(-1),
-    padding: theme.spacing(0.25, 0, 0.25, 1),
-    borderRadius: theme.spacing(0.5)
-  },
-  printable_section_title: {
-    display: 'flex',
-    alignItems: 'center'
-  },
-  muted: {
-    color: theme.palette.text.secondary
-  }
-}));
 
 type Props = {
   section: Section;
@@ -95,18 +86,19 @@ const WrappedResultSection: React.FC<Props> = ({
   force = false
 }) => {
   const { t } = useTranslation(['fileDetail']);
-  const classes = useStyles();
   const theme = useTheme();
-  const [open, setOpen] = React.useState(!section.auto_collapse || printable);
-  const [render, setRender] = React.useState(!section.auto_collapse || printable);
-  const [showTags, setShowTags] = React.useState(false);
-  const [showHeur, setShowHeur] = React.useState(false);
-  const [showAttack, setShowAttack] = React.useState(false);
-  const { getKey, hasHighlightedKeys } = useHighlighter();
   const { c12nDef } = useALContext();
-  const [state, setState] = React.useState(null);
   const { copy } = useClipboard();
+  const { getKey, hasHighlightedKeys } = useHighlighter();
   const { showSafeResults } = useSafeResults();
+
+  const [state, setState] = useState<{ mouseX: number; mouseY: number }>(null);
+  const [open, setOpen] = useState<boolean>(!section.auto_collapse || printable);
+  const [render, setRender] = useState<boolean>(!section.auto_collapse || printable);
+  const [showTags, setShowTags] = useState<boolean>(false);
+  const [showHeur, setShowHeur] = useState<boolean>(false);
+  const [showAttack, setShowAttack] = useState<boolean>(false);
+  const [showTable, setShowTable] = useState<boolean>(false);
 
   const allTags = useMemo(() => {
     const tagList = [];
@@ -190,7 +182,7 @@ const WrappedResultSection: React.FC<Props> = ({
   }, [showHeur, handleClose]);
 
   const handleMenuCopy = useCallback(() => {
-    copy(typeof section.body === 'string' ? section.body : JSON.stringify(section.body, undefined, 2), 'clipID');
+    copy(typeof section.body === 'string' ? section.body : JSON.stringify(section.body, undefined, 2));
     handleClose();
   }, [copy, handleClose, section.body]);
 
@@ -207,6 +199,18 @@ const WrappedResultSection: React.FC<Props> = ({
             {CLIPBOARD_ICON}
             {t('clipboard')}
           </MenuItem>
+          {section.body_format === 'TABLE' && (
+            <MenuItem
+              dense
+              onClick={() => {
+                setShowTable(true);
+                setState(null);
+              }}
+            >
+              {TABLE_ICON}
+              {t('table.menubutton')}
+            </MenuItem>
+          )}
           {!highlighted && section.heuristic && (
             <MenuItem
               dense
@@ -243,6 +247,34 @@ const WrappedResultSection: React.FC<Props> = ({
             )}
         </Menu>
       )}
+      {section.body_format !== 'TABLE' ? null : (
+        <Dialog
+          open={showTable}
+          aria-labelledby="result-table-dialog-title"
+          aria-describedby="result-table-dialog-description"
+          maxWidth="xl"
+          fullWidth
+          onClose={() => setShowTable(false)}
+        >
+          <div>
+            <IconButton
+              size="large"
+              style={{ float: 'right', padding: theme.spacing(2) }}
+              onClick={() => setShowTable(false)}
+            >
+              <CloseOutlinedIcon />
+            </IconButton>
+            <DialogTitle id="result-table-dialog-title">{t('table.title')}</DialogTitle>
+            <DialogContent>
+              <TblBody
+                body={section.body}
+                printable={printable}
+                order={section.body_config ? section.body_config.column_order : []}
+              />
+            </DialogContent>
+          </div>
+        </Dialog>
+      )}
       <div
         style={{
           display: 'flex',
@@ -263,7 +295,25 @@ const WrappedResultSection: React.FC<Props> = ({
         )}
 
         <div style={{ width: `calc(100% - ${!nested ? 8 : 0}px)` }}>
-          <Box className={printable ? classes.printable_section_title : classes.section_title} onClick={handleClick}>
+          <Box
+            onClick={handleClick}
+            sx={
+              printable
+                ? { display: 'flex', alignItems: 'center' }
+                : {
+                    display: 'flex',
+                    alignItems: 'center',
+                    '&:hover': {
+                      backgroundColor: theme.palette.action.hover,
+                      cursor: 'pointer'
+                    },
+                    minHeight: theme.spacing(4.5),
+                    marginLeft: theme.spacing(-1),
+                    padding: theme.spacing(0.25, 0, 0.25, 1),
+                    borderRadius: theme.spacing(0.5)
+                  }
+            }
+          >
             {c12nDef.enforce && !printable && (
               <>
                 <Classification c12n={section.classification} type="text" />
@@ -289,6 +339,20 @@ const WrappedResultSection: React.FC<Props> = ({
             {!printable && (
               <>
                 <div style={{ color: theme.palette.text.disabled, whiteSpace: 'nowrap' }} onClick={stopPropagation}>
+                  {section.body_format !== 'TABLE' ? null : (
+                    <Tooltip title={t('table.menubutton')} placement="top">
+                      <IconButton
+                        color="inherit"
+                        size="small"
+                        onClick={() => {
+                          setShowTable(true);
+                          setState(null);
+                        }}
+                      >
+                        <TableViewOutlinedIcon />
+                      </IconButton>
+                    </Tooltip>
+                  )}
                   {section.heuristic && (
                     <Tooltip title={t('show_heur')} placement="top">
                       <IconButton size="small" onClick={handleShowHeur} color={showHeur ? 'default' : 'inherit'}>
@@ -319,14 +383,18 @@ const WrappedResultSection: React.FC<Props> = ({
                               alignItems: 'center'
                             }}
                           >
-                            {'[&]'}
+                            [&]
                           </span>
                         </IconButton>
                       </Tooltip>
                     )}
                 </div>
                 {!printable &&
-                  (open ? <ExpandLess className={classes.muted} /> : <ExpandMore className={classes.muted} />)}
+                  (open ? (
+                    <ExpandLess sx={{ color: theme.palette.text.secondary }} />
+                  ) : (
+                    <ExpandMore sx={{ color: theme.palette.text.secondary }} />
+                  ))}
               </>
             )}
           </Box>

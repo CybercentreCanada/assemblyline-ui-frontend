@@ -1,59 +1,17 @@
-import makeStyles from '@mui/styles/makeStyles';
-import clsx from 'clsx';
+import { useTheme } from '@mui/material';
+import type { StoreProps } from 'components/visual/HexViewer';
+import { FoldingType, HexCell, HexOffset, HexSpacer, LAYOUT_SIZE, useStore } from 'components/visual/HexViewer';
+import type { CSSProperties } from 'react';
 import React, { useMemo } from 'react';
-import { FoldingType, HexCell, HexOffset, HexSpacer, LAYOUT_SIZE, StoreProps, useStore } from '../..';
-
-const useHexStyles = makeStyles(theme => ({
-  row: {
-    padding: 0,
-    margin: 0,
-    height: LAYOUT_SIZE.rowHeight,
-    'tr&': {},
-    'div&': {
-      display: 'flex',
-      flexDirection: 'row',
-      justifyContent: 'center'
-    }
-  },
-  spacer: {
-    width: LAYOUT_SIZE.spacingWidth,
-    padding: 0,
-    margin: 0
-  },
-  empty: {
-    adding: 0,
-    margin: 0
-  },
-  emptyHex: {
-    'div&': {
-      width: LAYOUT_SIZE.hexWidth
-    }
-  },
-  emptyText: {
-    'div&': {
-      width: LAYOUT_SIZE.textWidth
-    }
-  },
-  center: {
-    width: '100%',
-    display: 'grid',
-    alignItems: 'center'
-  },
-  hidden: {
-    width: '100%',
-    height: LAYOUT_SIZE.rowHeight / 4,
-    backgroundColor: theme.palette.background.paper
-  }
-}));
 
 export type HexRowProps = StoreProps & {
   rowIndex?: number;
-  style?: React.CSSProperties;
+  style?: CSSProperties;
   Tag?: 'div' | 'tr';
 };
 
 export const WrappedHexRow = ({ store, rowIndex = 0, style = null, Tag = 'div' }: HexRowProps) => {
-  const classes = useHexStyles();
+  const theme = useTheme();
 
   const hexcodes = store.hex.codes;
   const cellTag = useMemo(() => (Tag === 'tr' ? 'td' : 'div'), [Tag]);
@@ -74,28 +32,74 @@ export const WrappedHexRow = ({ store, rowIndex = 0, style = null, Tag = 'div' }
 
   if (active && hexRowType === FoldingType.HIDE)
     return (
-      <Tag className={classes.row} style={style}>
-        <div className={classes.center}>
-          <div className={classes.hidden}> </div>
+      <Tag
+        style={{
+          padding: '0px',
+          margin: '0px',
+          height: LAYOUT_SIZE.rowHeight,
+          ...(Tag === 'div' && {
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'center'
+          }),
+          ...style
+        }}
+      >
+        <div
+          style={{
+            width: '100%',
+            display: 'grid',
+            alignItems: 'center'
+          }}
+        >
+          <div
+            style={{
+              width: '100%',
+              height: LAYOUT_SIZE.rowHeight / 4,
+              backgroundColor: theme.palette.background.paper
+            }}
+          >
+            {' '}
+          </div>
         </div>
       </Tag>
     );
   else
     return (
-      <Tag className={classes.row} style={style}>
+      <Tag
+        style={{
+          padding: '0px',
+          margin: '0px',
+          height: LAYOUT_SIZE.rowHeight,
+          ...(Tag === 'div' && {
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'center'
+          }),
+          ...style
+        }}
+      >
         <HexOffset store={store} index={hexRowIndex * store.layout.column.size} Tag={cellTag} />
-        <HexSpacer Tag={cellTag} style={classes.spacer} />
+        <HexSpacer Tag={cellTag} style={{ width: LAYOUT_SIZE.spacingWidth, padding: '0px', margin: '0px' }} />
         {indexes.map((index, columnIndex) =>
           index >= hexcodes.size ? (
-            <HexSpacer key={index} Tag={cellTag} style={clsx(classes.empty, classes.emptyHex)} />
+            <HexSpacer
+              key={index}
+              Tag={cellTag}
+              style={{ padding: '0px', margin: '0px', ...(cellTag === 'div' && { width: LAYOUT_SIZE.hexWidth }) }}
+            />
           ) : (
             <HexCell key={index} store={store} Tag={cellTag} type="hex" columnIndex={columnIndex} index={index} />
           )
         )}
-        <HexSpacer Tag={cellTag} style={classes.spacer} />
+        <HexSpacer Tag={cellTag} style={{ width: LAYOUT_SIZE.spacingWidth, padding: '0px', margin: '0px' }} />
         {indexes.map((index, columnIndex) =>
           index >= hexcodes.size ? (
-            <HexSpacer key={index} Tag={cellTag} style={clsx(classes.empty, classes.emptyText)} />
+            <HexSpacer
+              key={index}
+              Tag={cellTag}
+              style={{ padding: '0px', margin: '0px', ...(cellTag === 'div' && { width: LAYOUT_SIZE.textWidth }) }}
+            />
           ) : (
             <HexCell
               key={columnIndex}
@@ -107,7 +111,7 @@ export const WrappedHexRow = ({ store, rowIndex = 0, style = null, Tag = 'div' }
             />
           )
         )}
-        <HexSpacer Tag={cellTag} style={classes.spacer} />
+        <HexSpacer Tag={cellTag} style={{ width: LAYOUT_SIZE.spacingWidth, padding: '0px', margin: '0px' }} />
       </Tag>
     );
 };

@@ -2,11 +2,14 @@ import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOu
 import BlockOutlinedIcon from '@mui/icons-material/BlockOutlined';
 import LabelOutlinedIcon from '@mui/icons-material/LabelOutlined';
 import PersonOutlineOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
-import { Grid, IconButton, Tooltip, useTheme } from '@mui/material';
-import Typography from '@mui/material/Typography';
-import useAppUser from 'commons/components/app/hooks/useAppUser';
+import { useTheme } from '@mui/material';
+import { useAppUser } from 'commons/components/app/hooks';
+import PageContainer from 'commons/components/pages/PageContainer';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
-import PageHeader from 'commons/components/pages/PageHeader';
+import type { SearchParams } from 'components/core/SearchParams/SearchParams';
+import { createSearchParams } from 'components/core/SearchParams/SearchParams';
+import { SearchParamsProvider, useSearchParams } from 'components/core/SearchParams/SearchParamsContext';
+import type { SearchParamsResult } from 'components/core/SearchParams/SearchParser';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -14,19 +17,16 @@ import type { Safelist } from 'components/models/base/safelist';
 import type { SearchResult } from 'components/models/ui/search';
 import type { CustomUser } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
+import SafelistNew from 'components/routes/manage/safelist_add';
+import SafelistDetail from 'components/routes/manage/safelist_detail';
+import { IconButton } from 'components/visual/Buttons/IconButton';
+import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import SearchHeader from 'components/visual/SearchBar/SearchHeader';
-import type { SearchParams } from 'components/visual/SearchBar/SearchParams';
-import { createSearchParams } from 'components/visual/SearchBar/SearchParams';
-import { SearchParamsProvider, useSearchParams } from 'components/visual/SearchBar/SearchParamsContext';
-import type { SearchParamsResult } from 'components/visual/SearchBar/SearchParser';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import SafelistTable from 'components/visual/SearchResult/safelist';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
-import { useLocation } from 'react-router-dom';
-import SafelistNew from './safelist_add';
-import SafelistDetail from './safelist_detail';
+import { useLocation, useNavigate } from 'react-router';
 
 const SAFELIST_PARAMS = createSearchParams(p => ({
   query: p.string(''),
@@ -60,6 +60,16 @@ const SafelistSearch = () => {
         ? [...Object.keys(indexes.safelist).filter(name => indexes.safelist[name].indexed), ...DEFAULT_SUGGESTION]
         : [...DEFAULT_SUGGESTION],
     [indexes.safelist]
+  );
+
+  const handleToggleFilter = useCallback(
+    (filter: string) => {
+      setSearchObject(o => {
+        const filters = o.filters.includes(filter) ? o.filters.filter(f => f !== filter) : [...o.filters, filter];
+        return { ...o, offset: 0, filters };
+      });
+    },
+    [setSearchObject]
   );
 
   const handleReload = useCallback(
@@ -119,30 +129,25 @@ const SafelistSearch = () => {
 
   return currentUser.roles.includes('safelist_view') ? (
     <PageFullWidth margin={4}>
-      <div style={{ paddingBottom: theme.spacing(2) }}>
-        <Grid container alignItems="center">
-          <Grid item xs>
-            <Typography variant="h4">{t('title')}</Typography>
-          </Grid>
-          {currentUser.roles.includes('safelist_manage') && (
-            <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
-              <Tooltip title={t('add_safelist')}>
-                <IconButton
-                  style={{
-                    color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark
-                  }}
-                  onClick={() => navigate(`${location.pathname}${location.search || ''}#new`)}
-                  size="large"
-                >
-                  <AddCircleOutlineOutlinedIcon />
-                </IconButton>
-              </Tooltip>
-            </Grid>
-          )}
-        </Grid>
-      </div>
+      <PageHeader
+        primary={t('title')}
+        slotProps={{
+          root: { style: { marginBottom: theme.spacing(2) } }
+        }}
+        actions={
+          <IconButton
+            tooltip={t('add_safelist')}
+            preventRender={!currentUser.roles.includes('safelist_manage')}
+            size="large"
+            sx={{ color: theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark }}
+            onClick={() => navigate(`${location.pathname}${location.search || ''}#new`)}
+          >
+            <AddCircleOutlineOutlinedIcon />
+          </IconButton>
+        }
+      />
 
-      <PageHeader isSticky>
+      <PageContainer isSticky>
         <div style={{ paddingTop: theme.spacing(1) }}>
           <SearchHeader
             params={search.toParams()}
@@ -158,31 +163,37 @@ const SafelistSearch = () => {
             searchInputProps={{ placeholder: t('filter'), options: suggestions }}
             actionProps={[
               {
-                tooltip: { title: t('user') },
+                tooltip: {
+                  title: search.has('filters', 'sources.type:user') ? t('filter.user.remove') : t('filter.user.add')
+                },
                 icon: { children: <PersonOutlineOutlinedIcon /> },
                 button: {
-                  onClick: () =>
-                    setSearchObject(o => ({ ...o, offset: 0, filters: [...o.filters, 'sources.type:user'] }))
+                  color: search.has('filters', 'sources.type:user') ? 'primary' : 'default',
+                  onClick: () => handleToggleFilter('sources.type:user')
                 }
               },
               {
-                tooltip: { title: t('tag') },
+                tooltip: { title: search.has('filters', 'type:tag') ? t('filter.tag.remove') : t('filter.tag.add') },
                 icon: { children: <LabelOutlinedIcon /> },
                 button: {
-                  onClick: () => setSearchObject(o => ({ ...o, offset: 0, filters: [...o.filters, 'type:tag'] }))
+                  color: search.has('filters', 'type:tag') ? 'primary' : 'default',
+                  onClick: () => handleToggleFilter('type:tag')
                 }
               },
               {
-                tooltip: { title: t('disabled') },
+                tooltip: {
+                  title: search.has('filters', 'enabled:false') ? t('filter.disabled.remove') : t('filter.disabled.add')
+                },
                 icon: { children: <BlockOutlinedIcon /> },
                 button: {
-                  onClick: () => setSearchObject(o => ({ ...o, offset: 0, filters: [...o.filters, 'enabled:false'] }))
+                  color: search.has('filters', 'enabled:false') ? 'primary' : 'default',
+                  onClick: () => handleToggleFilter('enabled:false')
                 }
               }
             ]}
           />
         </div>
-      </PageHeader>
+      </PageContainer>
 
       <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
         <SafelistTable safelistResults={safelistResults} setSafelistID={setSafelistID} />

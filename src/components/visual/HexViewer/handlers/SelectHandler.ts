@@ -1,5 +1,5 @@
 import { addClassToRange, removeClassToRange } from '.';
-import { Store } from '..';
+import type { Store } from '..';
 
 export const orderSelectIndexes = (startIndex: number, endIndex: number): { startIndex: number; endIndex: number } => ({
   startIndex: Math.min(startIndex, endIndex),

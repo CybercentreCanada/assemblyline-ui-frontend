@@ -1,52 +1,43 @@
 import CheckOutlinedIcon from '@mui/icons-material/CheckOutlined';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { Box, Card, Collapse, Grid, MenuItem, Select, Typography, useMediaQuery, useTheme } from '@mui/material';
+import {
+  Box,
+  Card,
+  Collapse,
+  Grid,
+  MenuItem,
+  Select,
+  styled,
+  Typography,
+  useMediaQuery,
+  useTheme
+} from '@mui/material';
 import FormControl from '@mui/material/FormControl';
 import Skeleton from '@mui/material/Skeleton';
-import makeStyles from '@mui/styles/makeStyles';
-import clsx from 'clsx';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import CustomChip from 'components/visual/CustomChip';
-import { useEffect, useState } from 'react';
+import { PageHeader } from 'components/visual/Layouts/PageHeader';
+import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const apiHeight = '48px';
-const useStyles = makeStyles(theme => ({
-  api: {
-    minHeight: apiHeight,
-    cursor: 'pointer',
-    '&:hover': {
-      backgroundColor: theme.palette.action.selected
-    }
-  },
-  blueprint: {
-    minHeight: apiHeight,
-    alignItems: 'center',
-    borderColor: theme.palette.action.disabledBackground,
-    cursor: 'pointer',
-    '&:hover': {
-      backgroundColor: theme.palette.action.selected
-    }
-  },
-  blueprintSkel: {
-    minHeight: apiHeight,
-    alignItems: 'center',
-    borderColor: theme.palette.action.disabledBackground
-  },
-  expand: {
+
+const Expand = memo(
+  styled(ExpandMoreIcon)<{ open?: boolean }>(({ theme, open = false }) => ({
     transform: 'rotate(0deg)',
     marginLeft: theme.spacing(2),
     transition: theme.transitions.create('transform', {
       duration: theme.transitions.duration.shortest
+    }),
+
+    ...(open && {
+      transform: 'rotate(180deg)'
     })
-  },
-  expandOpen: {
-    transform: 'rotate(180deg)'
-  }
-}));
+  }))
+);
 
 export default function ApiDoc() {
   const { apiCall } = useMyAPI();
@@ -54,7 +45,6 @@ export default function ApiDoc() {
   const [apiSelected, setApiSelected] = useState(null);
   const [apiDefinition, setApiDefinition] = useState(null);
   const { configuration } = useALContext();
-  const classes = useStyles();
   const [expandMap, setExpandMap] = useState({});
   const theme = useTheme();
   const { t } = useTranslation(['helpAPI']);
@@ -157,33 +147,34 @@ export default function ApiDoc() {
   return (
     <PageFullWidth margin={4}>
       <div style={{ textAlign: 'left' }}>
-        <div style={{ marginBottom: theme.spacing(4) }}>
-          <Grid container>
-            <Grid item xs={12} sm>
-              <Typography variant="h4">{t('title')}</Typography>
-            </Grid>
-            <Grid item xs={12} sm={12} md style={{ textAlign: 'end' }}>
-              {apiList && apiSelected ? (
-                <FormControl size="small">
-                  <Select
-                    id="api"
-                    value={apiSelected}
-                    onChange={event => setApiSelected(event.target.value)}
-                    variant="outlined"
-                  >
-                    {apiList.map((version, index) => (
-                      <MenuItem key={index} value={version}>
-                        {version.replace('v', t('version')) + t('version_end')}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              ) : (
-                <Skeleton variant="rectangular" style={{ display: 'inline-block', height: '2rem', width: '14rem' }} />
-              )}
-            </Grid>
-          </Grid>
-        </div>
+        <PageHeader
+          primary={t('title')}
+          slotProps={{
+            root: { style: { marginBottom: theme.spacing(4) } },
+            actions: { spacing: 1 }
+          }}
+          actions={
+            apiList && apiSelected ? (
+              <FormControl size="small">
+                <Select
+                  id="api"
+                  value={apiSelected}
+                  onChange={event => setApiSelected(event.target.value)}
+                  variant="outlined"
+                >
+                  {apiList.map((version, index) => (
+                    <MenuItem key={index} value={version}>
+                      {version.replace('v', t('version')) + t('version_end')}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            ) : (
+              <Skeleton variant="rectangular" style={{ display: 'inline-block', height: '2rem', width: '14rem' }} />
+            )
+          }
+        />
+
         {apiDefinition ? (
           <div style={{ display: 'flex', flexDirection: 'column' }}>
             {Object.keys(apiDefinition.blueprints).map((bp, i) => (
@@ -192,10 +183,18 @@ export default function ApiDoc() {
                   display="flex"
                   flexDirection="row"
                   flexWrap="wrap"
-                  className={classes.blueprint}
                   borderBottom={1}
                   px={1}
                   onClick={() => toggleBlueprintExpand(bp)}
+                  sx={{
+                    minHeight: apiHeight,
+                    alignItems: 'center',
+                    borderColor: theme.palette.action.disabledBackground,
+                    cursor: 'pointer',
+                    '&:hover': {
+                      backgroundColor: theme.palette.action.selected
+                    }
+                  }}
                 >
                   <Typography variant="body2" color="textSecondary" style={{ fontWeight: 800, lineHeight: 2 }}>
                     {`/api/${apiSelected}/`}&nbsp;
@@ -209,11 +208,7 @@ export default function ApiDoc() {
                     <Typography variant="body2" color="textSecondary" align="right" style={{ lineHeight: 2 }}>
                       {apiDefinition.blueprints[bp]}
                     </Typography>
-                    <ExpandMoreIcon
-                      className={clsx(classes.expand, {
-                        [classes.expandOpen]: expandMap[bp]
-                      })}
-                    />
+                    <Expand open={expandMap?.[bp]} />
                   </div>
                 </Box>
                 <Collapse in={expandMap[bp]} timeout="auto" unmountOnExit>
@@ -225,13 +220,19 @@ export default function ApiDoc() {
                     {blueprintAPIs(bp).map((api, idx) => (
                       <div key={idx}>
                         <Box
-                          className={classes.api}
                           px={1}
                           display="flex"
                           flexDirection={xs ? 'column' : 'row'}
                           flexWrap="wrap"
                           alignItems={xs ? 'flex-start' : 'center'}
                           onClick={() => toggleBlueprintExpand(api.name)}
+                          sx={{
+                            minHeight: apiHeight,
+                            cursor: 'pointer',
+                            '&:hover': {
+                              backgroundColor: theme.palette.action.selected
+                            }
+                          }}
                         >
                           <div>
                             {api.methods.map((method, midx) => (
@@ -264,11 +265,7 @@ export default function ApiDoc() {
                               {api.name}
                             </Typography>
 
-                            <ExpandMoreIcon
-                              className={clsx(classes.expand, {
-                                [classes.expandOpen]: expandMap[api.name]
-                              })}
-                            />
+                            <Expand open={expandMap?.[bp]} />
                           </div>
                         </Box>
                         <Collapse in={expandMap[api.name]} timeout="auto" unmountOnExit>
@@ -284,10 +281,10 @@ export default function ApiDoc() {
                           >
                             <Grid container alignItems="center">
                               <>
-                                <Grid item xs={8} sm={4} md={3} lg={2}>
+                                <Grid size={{ xs: 8, sm: 4, md: 3, lg: 2 }}>
                                   <div style={{ fontWeight: 500 }}>{t('complete')}:</div>
                                 </Grid>
-                                <Grid item xs={4} sm={8} md={9} lg={4}>
+                                <Grid size={{ xs: 4, sm: 8, md: 9, lg: 4 }}>
                                   {api.complete ? (
                                     <CheckOutlinedIcon htmlColor={theme.palette.success.main} />
                                   ) : (
@@ -296,10 +293,10 @@ export default function ApiDoc() {
                                 </Grid>
                               </>
                               <>
-                                <Grid item xs={8} sm={4} md={3} lg={2}>
+                                <Grid size={{ xs: 8, sm: 4, md: 3, lg: 2 }}>
                                   <div style={{ fontWeight: 500 }}>{t('protected')}:</div>
                                 </Grid>
-                                <Grid item xs={4} sm={8} md={9} lg={4}>
+                                <Grid size={{ xs: 4, sm: 8, md: 9, lg: 4 }}>
                                   {api.protected ? (
                                     <CheckOutlinedIcon htmlColor={theme.palette.success.main} />
                                   ) : (
@@ -309,10 +306,10 @@ export default function ApiDoc() {
                               </>
                               {configuration.ui.enforce_quota && (
                                 <>
-                                  <Grid item xs={12} sm={4} md={3} lg={2}>
+                                  <Grid size={{ xs: 12, sm: 4, md: 3, lg: 2 }}>
                                     <div style={{ fontWeight: 500 }}>{t('quota')}:</div>
                                   </Grid>
-                                  <Grid item xs={12} sm={8} md={9} lg={4}>
+                                  <Grid size={{ xs: 12, sm: 8, md: 9, lg: 4 }}>
                                     {api.count_towards_quota ? (
                                       <CheckOutlinedIcon htmlColor={theme.palette.success.main} />
                                     ) : (
@@ -322,10 +319,10 @@ export default function ApiDoc() {
                                 </>
                               )}
                               <>
-                                <Grid item xs={12} sm={4} md={3} lg={2}>
+                                <Grid size={{ xs: 12, sm: 4, md: 3, lg: 2 }}>
                                   <div style={{ fontWeight: 500 }}>{t('require_role')}:</div>
                                 </Grid>
-                                <Grid item xs={12} sm={8} md={9} lg={4}>
+                                <Grid size={{ xs: 12, sm: 8, md: 9, lg: 4 }}>
                                   {api.require_role.map((utype, uidx) => (
                                     <CustomChip
                                       key={uidx}
@@ -338,10 +335,10 @@ export default function ApiDoc() {
                                 </Grid>
                               </>
                               <>
-                                <Grid item xs={12} sm={4} md={3} lg={2}>
+                                <Grid size={{ xs: 12, sm: 4, md: 3, lg: 2 }}>
                                   <div style={{ fontWeight: 500 }}>{t('methods')}:</div>
                                 </Grid>
-                                <Grid item xs={12} sm={8} md={9} lg={4}>
+                                <Grid size={{ xs: 12, sm: 8, md: 9, lg: 4 }}>
                                   {api.methods.map((met, metid) => (
                                     <CustomChip
                                       key={metid}
@@ -354,20 +351,20 @@ export default function ApiDoc() {
                                 </Grid>
                               </>
                               <>
-                                <Grid item xs={12} sm={4} md={3} lg={2}>
+                                <Grid size={{ xs: 12, sm: 4, md: 3, lg: 2 }}>
                                   <div style={{ fontWeight: 500 }}>{t('path')}:</div>
                                 </Grid>
-                                <Grid item xs={12} sm={8} md={9} lg={4}>
+                                <Grid size={{ xs: 12, sm: 8, md: 9, lg: 4 }}>
                                   <div style={{ lineHeight: 2, fontFamily: 'Monospace', wordBreak: 'break-word' }}>
                                     {api.path}
                                   </div>
                                 </Grid>
                               </>
                               <>
-                                <Grid item xs={12}>
+                                <Grid size={{ xs: 12 }}>
                                   <div style={{ fontWeight: 500, lineHeight: 2 }}>{t('description')}:</div>
                                 </Grid>
-                                <Grid item xs={12}>
+                                <Grid size={{ xs: 12 }}>
                                   <Card variant="outlined" style={{ overflowX: 'auto' }}>
                                     <pre style={{ paddingLeft: sp2, paddingRight: sp2 }}>{api.description}</pre>
                                   </Card>
@@ -394,9 +391,11 @@ export default function ApiDoc() {
                   display: 'flex',
                   flexDirection: 'row',
                   flexWrap: 'wrap',
-                  borderBottom: 1
+                  borderBottom: 1,
+                  minHeight: apiHeight,
+                  alignItems: 'center',
+                  borderColor: theme.palette.action.disabledBackground
                 }}
-                className={classes.blueprintSkel}
               >
                 <Typography variant="body2" style={{ paddingRight: '8px' }}>
                   <Skeleton width="2rem" />

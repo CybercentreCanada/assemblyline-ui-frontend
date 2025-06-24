@@ -1,58 +1,44 @@
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Theme } from '@mui/material';
-import createStyles from '@mui/styles/createStyles';
-import makeStyles from '@mui/styles/makeStyles';
-import withStyles from '@mui/styles/withStyles';
+import { styled, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, useTheme } from '@mui/material';
 import type { TableBody as TableData } from 'components/models/base/result_body';
-import { default as React } from 'react';
-import TitleKey from '../TitleKey';
-import { KVBody } from './kv_body';
-import { TextBody } from './text_body';
+import { KVBody } from 'components/visual/ResultCard/kv_body';
+import { TextBody } from 'components/visual/ResultCard/text_body';
+import TitleKey from 'components/visual/TitleKey';
+import { memo, default as React } from 'react';
 
-const useStyles = printable =>
-  makeStyles(theme => ({
-    root: {
-      [theme.breakpoints.down('sm')]: {
-        width: printable ? '100%' : 'max-content'
-      }
-    }
-  }))();
-
-const StyledTableCell = withStyles((theme: Theme) =>
-  createStyles({
-    root: {
+const StyledTableCell = memo(
+  styled(TableCell)(({ theme }) => ({
+    ['&.MuiTableCell-root']: {
       '@media print': {
         color: 'black'
       },
       fontSize: 'inherit',
       lineHeight: 'inherit'
     },
-    head: {
+    ['&.MuiTableCell-head']: {
       '@media print': {
         color: 'black',
         backgroundColor: '#DDD !important'
       },
       backgroundColor: theme.palette.mode === 'dark' ? '#404040' : '#EEE'
     },
-    body: {
+    ['&.MuiTableCell-body']: {
       [theme.breakpoints.up('md')]: {
         wordBreak: 'break-word'
       }
     }
-  })
-)(TableCell);
+  }))
+);
 
-const StyledTableRow = withStyles((theme: Theme) =>
-  createStyles({
-    root: {
-      '&:nth-of-type(odd)': {
-        '@media print': {
-          backgroundColor: '#EEE !important'
-        },
-        backgroundColor: theme.palette.mode === 'dark' ? '#ffffff08' : '#00000008'
-      }
+const StyledTableRow = memo(
+  styled(TableRow)(({ theme }) => ({
+    '&:nth-of-type(odd)': {
+      '@media print': {
+        backgroundColor: '#EEE !important'
+      },
+      backgroundColor: theme.palette.mode === 'dark' ? '#ffffff08' : '#00000008'
     }
-  })
-)(TableRow);
+  }))
+);
 
 type Props = {
   body: TableData;
@@ -61,7 +47,8 @@ type Props = {
 };
 
 const WrappedTblBody = ({ body, printable, order }: Props) => {
-  const classes = useStyles(printable);
+  const theme = useTheme();
+
   const headers = [];
 
   if (!Array.isArray(body)) {
@@ -70,7 +57,6 @@ const WrappedTblBody = ({ body, printable, order }: Props) => {
 
   if (body) {
     for (const line of body) {
-      // eslint-disable-next-line guard-for-in
       for (const th in line) {
         const val = line[th];
         if (val !== null && val !== '') {
@@ -98,7 +84,17 @@ const WrappedTblBody = ({ body, printable, order }: Props) => {
       <TableContainer
         style={{ fontSize: '90%', maxHeight: printable ? null : '500px', maxWidth: printable ? '100%' : null }}
       >
-        <Table stickyHeader size="small" classes={{ root: classes.root }}>
+        <Table
+          stickyHeader
+          size="small"
+          sx={{
+            ['&.MuiTable-root']: {
+              [theme.breakpoints.down('sm')]: {
+                width: printable ? '100%' : 'max-content'
+              }
+            }
+          }}
+        >
           <TableHead>
             <TableRow>
               {headers.map((th, id) => (

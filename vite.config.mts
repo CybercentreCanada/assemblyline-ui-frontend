@@ -16,7 +16,7 @@ export default defineConfig(({ mode }) => {
       outDir: 'build',
       rollupOptions: {
         output: {
-          entryFileNames: `[name].js`,
+          entryFileNames: '[name]-[hash].js',
           chunkFileNames: 'js/[name]-[hash].js',
           assetFileNames: 'assets/[name]-[hash][extname]'
         }
@@ -39,7 +39,8 @@ export default defineConfig(({ mode }) => {
       hmr: {
         overlay: false,
         path: '/ws',
-        protocol: 'wss'
+        protocol: 'wss',
+        ...(env?.EXTERNAL_IP && { host: `${env.EXTERNAL_IP}.nip.io` })
       }
     },
     test: {

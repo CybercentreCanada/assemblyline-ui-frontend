@@ -1,22 +1,13 @@
 import Editor, { DiffEditor, loader } from '@monaco-editor/react';
-import {
-  Button,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  Grid,
-  Skeleton,
-  Typography,
-  useTheme
-} from '@mui/material';
-import useAppTheme from 'commons/components/app/hooks/useAppTheme';
-import useAppUser from 'commons/components/app/hooks/useAppUser';
+import { Dialog, DialogActions, DialogContent, DialogTitle, Skeleton, useTheme } from '@mui/material';
+import { useAppTheme, useAppUser } from 'commons/components/app/hooks';
 import PageFullSize from 'commons/components/pages/PageFullSize';
 import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import type { CustomUser } from 'components/models/ui/user';
+import { Button } from 'components/visual/Buttons/Button';
+import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -37,8 +28,8 @@ export default function AdminTagSafelist() {
   const [originalTagSafelist, setOriginalTagSafelist] = useState<string>(null);
   const [open, setOpen] = useState<boolean>(false);
 
-  const containerEL = useRef<HTMLDivElement>();
-  const containerDialogEL = useRef<HTMLDivElement>();
+  const containerEL = useRef<HTMLDivElement>(null);
+  const containerDialogEL = useRef<HTMLDivElement>(null);
 
   useEffectOnce(() => {
     if (currentUser.is_admin) {
@@ -85,43 +76,37 @@ export default function AdminTagSafelist() {
   return currentUser.is_admin ? (
     <PageFullSize margin={4}>
       <RouterPrompt when={tagSafelist !== originalTagSafelist} />
-      <div style={{ marginBottom: theme.spacing(4), textAlign: 'left' }}>
-        <Grid container alignItems="center" spacing={2}>
-          <Grid item style={{ flexGrow: 1 }}>
-            <div>
-              <Typography variant="h4">{t('title')}</Typography>
-            </div>
-          </Grid>
-          <Grid item>
-            <Grid container spacing={2}>
-              <Grid item>
-                <Button variant="outlined" onClick={() => reload(true)}>
-                  {t('reset')}
-                </Button>
-              </Grid>
-              <Grid item>
-                <Button
-                  variant="contained"
-                  onClick={() => setTagSafelist(originalTagSafelist)}
-                  disabled={tagSafelist === originalTagSafelist}
-                >
-                  {t('undo')}
-                </Button>
-              </Grid>
-              <Grid item>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  disabled={tagSafelist === originalTagSafelist}
-                  onClick={() => setOpen(true)}
-                >
-                  {t('save')}
-                </Button>
-              </Grid>
-            </Grid>
-          </Grid>
-        </Grid>
-      </div>
+
+      <PageHeader
+        primary={t('title')}
+        slotProps={{
+          root: { style: { marginBottom: theme.spacing(4) } },
+          actions: { spacing: 1 }
+        }}
+        actions={
+          <>
+            <Button variant="outlined" onClick={() => reload(true)}>
+              {t('reset')}
+            </Button>
+            <Button
+              variant="contained"
+              disabled={tagSafelist === originalTagSafelist}
+              onClick={() => setTagSafelist(originalTagSafelist)}
+            >
+              {t('undo')}
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              disabled={tagSafelist === originalTagSafelist}
+              onClick={() => setOpen(true)}
+            >
+              {t('save')}
+            </Button>
+          </>
+        }
+      />
+
       <Dialog open={open} onClose={() => setOpen(false)} aria-labelledby="dialog-title" fullWidth maxWidth="md">
         <DialogTitle id="dialog-title">{t('save.title')}</DialogTitle>
         <DialogContent>

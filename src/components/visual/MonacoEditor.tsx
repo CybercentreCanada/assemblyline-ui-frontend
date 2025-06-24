@@ -1,7 +1,9 @@
+import type { Monaco } from '@monaco-editor/react';
 import Editor, { DiffEditor, loader } from '@monaco-editor/react';
 import { useTheme } from '@mui/material';
-import useAppTheme from 'commons/components/app/hooks/useAppTheme';
+import { useAppTheme } from 'commons/components/app/hooks';
 import { registerYaraCompletionItemProvider, yaraConfig, yaraDef } from 'helpers/yara';
+import type { editor } from 'monaco-editor';
 import React, { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import AutoSizer from 'react-virtualized-auto-sizer';
@@ -140,18 +142,12 @@ export const LANGUAGE_SELECTOR: Record<string, Language> = {
   'code/lisp': 'lisp'
 };
 
-// Supported Options
-interface Options {
-  readOnly?: boolean;
-  links?: boolean;
-  beautify?: boolean;
-}
-
 type EditorProps = {
   diff?: boolean;
   value?: string;
   language?: Language;
-  options?: Options;
+  options?: editor.IStandaloneEditorConstructionOptions;
+  beautify?: boolean;
   onChange?: (value: string) => void;
   reload?: () => void;
 };
@@ -161,7 +157,9 @@ type DiffEditorProps = {
   original?: string;
   modified?: string;
   language?: Language;
-  options?: Options;
+  options?: editor.IStandaloneEditorConstructionOptions;
+  beautify?: boolean;
+  error?: boolean;
   onChange?: (value: string) => void;
   reload?: () => void;
 };
@@ -173,6 +171,8 @@ const WrappedMonacoEditor: React.FC<EditorProps | DiffEditorProps> = ({
   modified,
   language = 'plaintext',
   options = {},
+  beautify = false,
+  error = false,
   onChange = () => null,
   reload = () => null
 }: EditorProps & DiffEditorProps) => {
@@ -191,7 +191,7 @@ const WrappedMonacoEditor: React.FC<EditorProps | DiffEditorProps> = ({
     }
   });
 
-  const beforeMount = useCallback(monaco => {
+  const beforeMount = useCallback((monaco: Monaco) => {
     if (!monaco.languages.getLanguages().some(({ id }) => id === 'yara')) {
       // Register a new language
       monaco.languages.register({ id: 'yara' });
@@ -204,11 +204,11 @@ const WrappedMonacoEditor: React.FC<EditorProps | DiffEditorProps> = ({
     }
   }, []);
 
-  const onMount = useCallback(editor => {
+  const onMount = useCallback((editor: editor.IStandaloneCodeEditor) => {
     editor.focus();
   }, []);
 
-  const beautifyJSON = useCallback(inputData => {
+  const beautifyJSON = useCallback((inputData: string) => {
     try {
       return JSON.stringify(JSON.parse(inputData), null, 4);
     } catch {
@@ -221,20 +221,21 @@ const WrappedMonacoEditor: React.FC<EditorProps | DiffEditorProps> = ({
       style={{
         flexGrow: 1,
         border: `1px solid ${theme.palette.divider}`,
-        position: 'relative'
+        position: 'relative',
+        ...(error && { border: `1px solid ${theme.palette.error.main}` })
       }}
     >
       <div style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}>
         <AutoSizer>
-          {({ width, height }) =>
+          {({ width, height }: { width: number; height: number }) =>
             diff ? (
               <DiffEditor
                 language={language}
                 width={width}
                 height={height}
                 theme={isDarkTheme ? 'vs-dark' : 'vs'}
-                original={language === 'json' && options?.beautify ? beautifyJSON(original) : original}
-                modified={language === 'json' && options?.beautify ? beautifyJSON(modified) : modified}
+                original={language === 'json' && beautify ? beautifyJSON(original) : original}
+                modified={language === 'json' && beautify ? beautifyJSON(modified) : modified}
                 loading={t('loading')}
                 options={{ links: false, renderSideBySide: false, readOnly: true, ...options }}
               />
@@ -245,7 +246,7 @@ const WrappedMonacoEditor: React.FC<EditorProps | DiffEditorProps> = ({
                 height={height}
                 theme={isDarkTheme ? 'vs-dark' : 'vs'}
                 loading={t('loading')}
-                value={language === 'json' && options?.beautify ? beautifyJSON(value) : value}
+                value={language === 'json' && beautify ? beautifyJSON(value) : value}
                 onChange={v => onChange(v)}
                 beforeMount={beforeMount}
                 onMount={onMount}

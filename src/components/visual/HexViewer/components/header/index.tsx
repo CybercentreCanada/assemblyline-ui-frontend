@@ -1,11 +1,12 @@
-import { Paper } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
-import Divider from '@mui/material/Divider';
 import SettingsIcon from '@mui/icons-material/Settings';
 import ShareIcon from '@mui/icons-material/Share';
-import React, { memo, PropsWithChildren } from 'react';
+import { Paper, useTheme } from '@mui/material';
+import Divider from '@mui/material/Divider';
+import type { StoreProps } from 'components/visual/HexViewer';
+import { HexSearchBar, HexSearchTypes, TooltipIconButton, useDispatch } from 'components/visual/HexViewer';
+import type { PropsWithChildren } from 'react';
+import React, { memo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { HexSearchBar, HexSearchTypes, StoreProps, TooltipIconButton, useDispatch } from '../..';
 
 export * from './cursorButton';
 export * from './searchbar';
@@ -13,41 +14,39 @@ export * from './searchButtons';
 export * from './searchIndex';
 export * from './searchTypes';
 
-const useHexStyles = makeStyles(theme => ({
-  root: {
-    paddingBottom: theme.spacing(2),
-    display: 'flex',
-    justifyContent: 'center'
-  },
-  toolbar: {
-    padding: '2px 4px',
-    display: 'flex',
-    alignItems: 'center',
-    width: '100%',
-    maxWidth: '1200px',
-    '&:hover': {
-      backgroundColor: theme.palette.mode === 'dark' ? '#484848' : '#FAFAFA'
-    }
-  },
-  divider: {
-    height: 28,
-    margin: 4
-  }
-}));
-
 const WrappedHexDesktopHeader = ({ store }: StoreProps) => {
   const { t } = useTranslation(['hexViewer']);
-  const classes = useHexStyles();
-
+  const theme = useTheme();
   const { onLocationShare, onSettingOpen, onBodyMouseLeave } = useDispatch();
-  const toolbarRef = React.useRef(null);
+  const toolbarRef = useRef(null);
 
   return (
-    <div className={classes.root} ref={toolbarRef} onMouseEnter={() => onBodyMouseLeave()}>
-      <Paper component="form" className={classes.toolbar} elevation={2}>
+    <div
+      ref={toolbarRef}
+      onMouseEnter={() => onBodyMouseLeave()}
+      style={{
+        paddingBottom: theme.spacing(2),
+        display: 'flex',
+        justifyContent: 'center'
+      }}
+    >
+      <Paper
+        component="form"
+        elevation={2}
+        sx={{
+          padding: '2px 4px',
+          display: 'flex',
+          alignItems: 'center',
+          width: '100%',
+          maxWidth: '1200px',
+          '&:hover': {
+            backgroundColor: theme.palette.mode === 'dark' ? '#484848' : '#FAFAFA'
+          }
+        }}
+      >
         <HexSearchTypes store={store} />
         <HexSearchBar store={store} />
-        <Divider className={classes.divider} orientation="vertical" />
+        <Divider orientation="vertical" sx={{ height: '28px', margin: '4px' }} />
         <TooltipIconButton title={t('share')} onClick={() => onLocationShare()} icon={<ShareIcon />} />
         <TooltipIconButton title={t('settings.label')} onClick={() => onSettingOpen()} icon={<SettingsIcon />} />
       </Paper>

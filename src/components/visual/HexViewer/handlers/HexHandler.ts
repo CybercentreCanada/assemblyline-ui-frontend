@@ -1,7 +1,7 @@
 import { Buffer } from 'buffer';
-import { HexASCII, Store } from '..';
+import type { HexASCII, Store } from '..';
 
-export const ASCII: Array<HexASCII> = [
+export const ASCII: HexASCII[] = [
   {
     type: 'null',
     value: '·',
@@ -200,7 +200,11 @@ export const HIGHER_ASCII_TABLE = new Map<
   [255, { dec: 255, hex: 'FF', bin: '11111111', html: '&#255;', CP437: '⍽', windows1252: 'ÿ' }]
 ]);
 
-export const getNonPrintableAsciiFromDec = (index: number, encoding: 'CP437' | 'caret' | 'copy', prefix: string = '') =>
+export const getNonPrintableAsciiFromDec = (
+  index: number,
+  encoding: 'CP437' | 'caret' | 'copy',
+  prefix: string = ''
+) =>
   !['CP437', 'caret', 'copy'].includes(encoding) || index < 0 || index > 31
     ? ''
     : prefix.slice(-1) + NON_PRINTABLE_ASCII_TABLE.get(index)[encoding];
@@ -234,7 +238,7 @@ export const getHigherAsciiFromHex = (hex: string, encoding: 'CP437' | 'windows1
 
 export const parseDataToHexcodeMap = (data: string) => {
   if (data === undefined || data === null || data === '') return new Map();
-  let map = new Map();
+  const map = new Map();
   data.split(/[ ]+/).forEach((hex, index) => {
     map.set(index, hex);
   });
@@ -250,7 +254,7 @@ export const parseHexToString = (hex: string) => Buffer.from(hex, 'hex').toStrin
 
 export const parseDataToHexMap = (data: string) => {
   if (data === undefined || data === null || data === '') return new Map();
-  let map = new Map();
+  const map = new Map();
   data
     .split('\n')
     .map(el => el.slice(11, 58))
@@ -263,7 +267,7 @@ export const parseDataToHexMap = (data: string) => {
 };
 
 export const parseDataToTextMap = (data: string) => {
-  let map = new Map();
+  const map = new Map();
   data
     .split('\n')
     .map(el => el.slice(61, 77))
@@ -282,7 +286,7 @@ export const parseDataToTextContent = (data: string) =>
     .join('');
 
 export const parseHexDataToHexMap = (data: string) => {
-  let map = new Map();
+  const map = new Map();
   data.split(/[ ]+/).forEach((hex, index) => {
     map.set(index, hex);
   });

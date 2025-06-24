@@ -1,20 +1,15 @@
-/* eslint-disable jsx-a11y/no-static-element-interactions */
-/* eslint-disable jsx-a11y/click-events-have-key-events */
-import { useMediaQuery, useTheme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
+import { styled, useMediaQuery, useTheme } from '@mui/material';
+import useSorters from 'commons/addons/lists/hooks/useSorters';
+import type { SorterField } from 'commons/addons/lists/sorters/SorterSelector';
 import { useTranslation } from 'react-i18next';
-import useSorters from '../hooks/useSorters';
-import { SorterField } from './SorterSelector';
 
-const useStyles = makeStyles({
-  sorterTrigger: {
-    display: 'flex',
-    alignItems: 'center',
-    '&:hover': {
-      cursor: 'pointer'
-    }
+const SortTrigger = styled('div')(() => ({
+  display: 'flex',
+  alignItems: 'center',
+  '&:hover': {
+    cursor: 'pointer'
   }
-});
+}));
 
 export interface SorterTriggerProps {
   label?: string;
@@ -28,7 +23,6 @@ const SorterTrigger = ({ label, sorter, sorters, className, onSort }: SorterTrig
   const theme = useTheme();
   const { t } = useTranslation();
   const isMd = useMediaQuery(theme.breakpoints.down('lg'));
-  const classes = useStyles();
   const { icon, nextState } = useSorters();
 
   // ordinal position of sorter.
@@ -43,8 +37,9 @@ const SorterTrigger = ({ label, sorter, sorters, className, onSort }: SorterTrig
   };
 
   return (
-    <div className={`${classes.sorterTrigger} ${className}`} onClick={onClick}>
-      {label ?? (sorter.i18nKey ? t(sorter.i18nKey) : sorter.label)}&nbsp;
+    <SortTrigger className={className} onClick={onClick}>
+      {label ?? (sorter.i18nKey ? t(sorter.i18nKey) : sorter.label)}
+      &nbsp;
       {isMd ? (
         /* Stack the number and arrow for smaller resolutions */
         <div>
@@ -59,7 +54,7 @@ const SorterTrigger = ({ label, sorter, sorters, className, onSort }: SorterTrig
           {position > -1 && sorters.length > 1 && <em>({position + 1})</em>}
         </>
       )}
-    </div>
+    </SortTrigger>
   );
 };
 

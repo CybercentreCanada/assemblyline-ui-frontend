@@ -22,7 +22,6 @@ import Dialog from '@mui/material/Dialog';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import Tooltip from '@mui/material/Tooltip';
-import makeStyles from '@mui/styles/makeStyles';
 import useALContext from 'components/hooks/useALContext';
 import useExternalLookup from 'components/hooks/useExternalLookup';
 import type { DetailedItem } from 'components/models/base/alert';
@@ -33,37 +32,10 @@ import type { CustomChipProps } from 'components/visual/CustomChip';
 import CustomChip from 'components/visual/CustomChip';
 import { getMaxClassification } from 'helpers/classificationParser';
 import { toTitleCase, verdictToColor } from 'helpers/utils';
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const TARGET_RESULT_COUNT = 10;
-
-const useStyles = makeStyles(theme => ({
-  link: {
-    textDecoration: 'none',
-    color: theme.palette.primary.main,
-    transition: 'color 225ms cubic-bezier(0, 0, 0.2, 1) 0ms',
-    '&:hover': {
-      color: theme.palette.mode === 'dark' ? theme.palette.primary.light : theme.palette.primary.dark
-    }
-  },
-  launch: {},
-  dialogPaper: {
-    minHeight: '95vh',
-    maxHeight: '95vh'
-  },
-  sectionContent: {},
-  collapseTitle: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    cursor: 'pointer',
-    '&:hover, &:focus': {
-      color: theme.palette.text.secondary
-    },
-    color: theme.palette.text.primary
-  }
-}));
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -113,8 +85,8 @@ function a11yProps(index: number) {
 
 const WrappedAutoHideChipList: React.FC<AutoHideChipListProps> = ({ items }) => {
   const { t } = useTranslation();
-  const [state, setState] = React.useState<AutoHideChipListState | null>(null);
-  const [shownChips, setShownChips] = React.useState<CustomChipProps[]>([]);
+  const [state, setState] = useState<AutoHideChipListState | null>(null);
+  const [shownChips, setShownChips] = useState<CustomChipProps[]>([]);
 
   React.useEffect(() => {
     const fullChipList = items.map(item => ({
@@ -158,14 +130,13 @@ const AutoHideChipList = React.memo(WrappedAutoHideChipList);
 type ResultGroupProps = {
   group: string;
   names: string[];
-  ndMap: Object;
-  valueMap: Object;
+  ndMap: object;
+  valueMap: object;
 };
 
 const WrappedResultGroup: React.FC<ResultGroupProps> = ({ group, names, ndMap, valueMap }) => {
   const theme = useTheme();
-  const classes = useStyles();
-  const [open, setOpen] = React.useState(true);
+  const [open, setOpen] = useState(true);
 
   return group && names ? (
     <Box sx={{ marginBottom: theme.spacing(2) }}>
@@ -174,7 +145,16 @@ const WrappedResultGroup: React.FC<ResultGroupProps> = ({ group, names, ndMap, v
         onClick={() => {
           setOpen(!open);
         }}
-        className={classes.collapseTitle}
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          cursor: 'pointer',
+          color: theme.palette.text.primary,
+          '&:hover, &:focus': {
+            color: theme.palette.text.secondary
+          }
+        }}
       >
         <span>{toTitleCase(group)}</span>
         {open ? <ExpandLess /> : <ExpandMore />}
@@ -186,12 +166,12 @@ const WrappedResultGroup: React.FC<ResultGroupProps> = ({ group, names, ndMap, v
           {names.map((keyName, k) => {
             return (
               <React.Fragment key={k}>
-                <Grid item xs={4} sm={4}>
+                <Grid size={{ xs: 4, sm: 4 }}>
                   <Tooltip title={ndMap[keyName]}>
                     <Typography>{keyName}</Typography>
                   </Tooltip>
                 </Grid>
-                <Grid item xs={8} sm={8}>
+                <Grid size={{ xs: 8, sm: 8 }}>
                   <div>
                     <AutoHideChipList items={valueMap[keyName]} />
                   </div>
@@ -215,9 +195,8 @@ type EnrichmentResultProps = {
 
 const WrappedEnrichmentResult: React.FC<EnrichmentResultProps> = ({ num, enrichmentResult, count }) => {
   const { t } = useTranslation();
-  const classes = useStyles();
   const theme = useTheme();
-  const [open, setOpen] = React.useState(true);
+  const [open, setOpen] = useState<boolean>(true);
 
   let verdict = 'info';
   if (enrichmentResult.malicious === false) {
@@ -271,7 +250,17 @@ const WrappedEnrichmentResult: React.FC<EnrichmentResultProps> = ({ num, enrichm
             onClick={() => {
               setOpen(!open);
             }}
-            className={classes.collapseTitle}
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              cursor: 'pointer',
+
+              color: theme.palette.text.primary,
+              '&:hover, &:focus': {
+                color: theme.palette.text.secondary
+              }
+            }}
           >
             <span style={{ flex: 1, textAlign: 'center' }}>
               {toTitleCase(t('result'))} #{num + 1}
@@ -324,21 +313,20 @@ const EnrichmentResult = React.memo(WrappedEnrichmentResult);
 
 const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, value, round }) => {
   const theme = useTheme();
-  const classes = useStyles();
   const { t } = useTranslation();
-  const [openedDialog, setOpenedDialog] = React.useState(false);
-  const [tabState, setTabState] = React.useState(0);
+  const [openedDialog, setOpenedDialog] = useState<boolean>(false);
+  const [tabState, setTabState] = useState<number>(0);
   const { c12nDef } = useALContext();
 
   const { enrichmentState, isActionable, getKey } = useExternalLookup();
   const actionable = isActionable(category, type, value);
   const externalLookupResults = enrichmentState[getKey(type, value)];
-  const [inProgress, setInProgress] = React.useState(false);
+  const [inProgress, setInProgress] = useState<boolean>(false);
   const titleId = openedDialog ? 'external-result-dialog-title' : undefined;
   const descriptionId = openedDialog ? 'external-result-dialog-description' : undefined;
 
-  const [resultClassification, setResultClassification] = React.useState(c12nDef.UNRESTRICTED);
-  const [resultTT, setResultTT] = React.useState('');
+  const [resultClassification, setResultClassification] = useState(c12nDef.UNRESTRICTED);
+  const [resultTT, setResultTT] = useState('');
   const handleTabChange = (event: React.SyntheticEvent, newState: number) => {
     setTabState(newState);
   };
@@ -368,7 +356,7 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, v
     }
   }, [externalLookupResults]);
 
-  const descriptionElementRef = React.useRef<HTMLElement>(null);
+  const descriptionElementRef = useRef<HTMLElement>(null);
   React.useEffect(() => {
     if (openedDialog) {
       const { current: descriptionElement } = descriptionElementRef;
@@ -438,9 +426,9 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, v
         scroll="paper"
         aria-labelledby={titleId}
         aria-describedby={descriptionId}
-        classes={{ paper: classes.dialogPaper }}
         fullWidth={true}
         maxWidth="xl"
+        slotProps={{ paper: { sx: { minHeight: '95vh', maxHeight: '95vh' } } }}
       >
         <IconButton
           aria-label="close"
@@ -470,14 +458,20 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, v
             </div>
           )}
 
-          <Typography variant="h4" component={'div'}>
+          <Typography variant="h4" component="div">
             {t('related_external.title')}
           </Typography>
           <Typography variant="caption" style={{ wordBreak: 'break-word' }}>
             {value}
           </Typography>
           <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-            <Tabs value={tabState} onChange={handleTabChange} aria-label="external source names">
+            <Tabs
+              value={tabState}
+              onChange={handleTabChange}
+              aria-label="external source names"
+              variant="scrollable"
+              scrollButtons="auto"
+            >
               {sources.map((source, i) => (
                 <Tab key={i} label={source} {...a11yProps(i)} />
               ))}

@@ -1,38 +1,49 @@
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
-import { Collapse, Divider, Typography } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
-import clsx from 'clsx';
+import { Collapse, Divider, styled, Typography } from '@mui/material';
 import React, { useState } from 'react';
 
-const useStyles = makeStyles(theme => ({
-  container: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    color: 'inherit',
-    gap: theme.spacing(1)
-  },
-  clickable: {
+/**
+ * TODO: change to PageSection
+ */
+
+type ContainerProps = {
+  clickable?: boolean;
+};
+
+const Container = styled('div', {
+  shouldForwardProp: prop => prop !== 'clickable'
+})<ContainerProps>(({ theme, clickable }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  color: 'inherit',
+  gap: theme.spacing(1),
+
+  ...(clickable && {
     textDecoration: 'none',
     cursor: 'pointer',
     '&:hover>span, &:focus>span': {
       color: theme.palette.text.secondary
     }
-  },
-  spacer: {
-    paddingBottom: theme.spacing(2),
-    paddingTop: theme.spacing(2)
-  },
-  center: {
-    display: 'grid',
-    placeItems: 'center'
-  },
-  flex: {
+  })
+}));
+
+type SpacerProps = {
+  variant?: 'default' | 'flex';
+};
+
+const Spacer = styled('div', {
+  shouldForwardProp: prop => prop !== 'variant'
+})<SpacerProps>(({ theme, variant }) => ({
+  paddingBottom: theme.spacing(2),
+  paddingTop: theme.spacing(2),
+
+  ...(variant === 'flex' && {
     display: 'flex',
     flexDirection: 'column',
     flex: 1
-  }
+  })
 }));
 
 type SectionContainerProps = {
@@ -58,22 +69,19 @@ const WrappedSectionContainer: React.FC<SectionContainerProps> = ({
   slots = { end: null },
   slotProps = { wrapper: null }
 }) => {
-  const classes = useStyles();
-
   const [open, setOpen] = useState<boolean>(!closed);
   const [render, setRender] = useState<boolean>(!closed);
 
   return (
-    <div className={clsx(classes.spacer, variant === 'flex' && classes.flex)}>
-      <div
-        className={clsx(classes.container, !nocollapse && classes.clickable)}
-        onClick={() => (nocollapse ? null : setOpen(o => !o))}
-      >
+    <Spacer variant={variant}>
+      <Container clickable={!nocollapse} onClick={() => (nocollapse ? null : setOpen(o => !o))}>
         <Typography variant="h6" children={title} />
         <div style={{ flex: 1 }} />
         {slots?.end}
-        <div className={clsx(classes.center)}>{nocollapse ? null : open ? <ExpandLess /> : <ExpandMore />}</div>
-      </div>
+        <div style={{ display: 'grid', placeItems: 'center' }}>
+          {nocollapse ? null : open ? <ExpandLess /> : <ExpandMore />}
+        </div>
+      </Container>
       <Divider />
       <Collapse
         in={open}
@@ -87,11 +95,11 @@ const WrappedSectionContainer: React.FC<SectionContainerProps> = ({
           })
         }}
       >
-        <div className={clsx(classes.spacer, variant === 'flex' && classes.flex)} {...slotProps?.wrapper}>
+        <Spacer variant={variant} {...(slotProps?.wrapper as any)}>
           {render && children}
-        </div>
+        </Spacer>
       </Collapse>
-    </div>
+    </Spacer>
   );
 };
 

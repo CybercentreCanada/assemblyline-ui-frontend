@@ -20,10 +20,9 @@ import {
   FormControl,
   FormControlLabel,
   Grid,
-  IconButton,
   LinearProgress,
   List,
-  ListItem,
+  ListItemButton,
   ListItemIcon,
   ListItemText,
   Popover,
@@ -52,29 +51,30 @@ import type { MultipleKeys } from 'components/models/ui/result';
 import type { SubmissionSummary, SubmissionTags, SubmissionTree } from 'components/models/ui/submission';
 import ForbiddenPage from 'components/routes/403';
 import HeuristicDetail from 'components/routes/manage/heuristic_detail';
-import Classification from 'components/visual/Classification';
+import AISummarySection from 'components/routes/submission/detail/ai_summary';
+import AttackSection from 'components/routes/submission/detail/attack';
+import ErrorSection from 'components/routes/submission/detail/errors';
+import FileTreeSection from 'components/routes/submission/detail/file_tree';
+import InfoSection from 'components/routes/submission/detail/info';
+import MetaSection from 'components/routes/submission/detail/meta';
+import TagSection from 'components/routes/submission/detail/tags';
+import { IconButton } from 'components/visual/Buttons/IconButton';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import FileDetail from 'components/visual/FileDetail';
 import Detection from 'components/visual/FileDetail/detection';
 import FileDownloader from 'components/visual/FileDownloader';
+import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import MetadataInputField from 'components/visual/MetadataInputField';
 import VerdictBar from 'components/visual/VerdictBar';
 import { getErrorIDFromKey, getServiceFromKey } from 'helpers/errors';
 import { setNotifyFavicon } from 'helpers/utils';
 import moment from 'moment';
-import React, { useCallback, useEffect, useReducer, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useReducer, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router';
-import { Link, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router';
+import { Link } from 'react-router-dom';
 import type { Socket } from 'socket.io-client';
 import io from 'socket.io-client';
-import AISummarySection from './detail/ai_summary';
-import AttackSection from './detail/attack';
-import ErrorSection from './detail/errors';
-import FileTreeSection from './detail/file_tree';
-import InfoSection from './detail/info';
-import MetaSection from './detail/meta';
-import TagSection from './detail/tags';
 
 const NAMESPACE = '/live_submission';
 const MESSAGE_TIMEOUT = 5000;
@@ -155,6 +155,14 @@ function WrappedSubmissionDetail() {
 
   const popoverOpen = Boolean(resubmitAnchor);
 
+  const submissionProfiles: Record<string, string> = useMemo<Record<string, string>>(() => {
+    let profileMap = {};
+    Object.entries(systemConfig.submission.profiles).map(([name, config]) => {
+      profileMap = { ...profileMap, [name]: config.display_name };
+    });
+    return profileMap;
+  }, [systemConfig]);
+
   const updateLiveSumary = (results: object) => {
     const tempSummary: any = summary !== null ? { ...summary } : { tags: {}, heuristics: {}, attack_matrix: {} };
     const tempTagMap = liveTagMap !== null ? { ...liveTagMap } : {};
@@ -166,7 +174,6 @@ function WrappedSubmissionDetail() {
         tempTagMap[key] = [];
       }
 
-      // eslint-disable-next-line guard-for-in
       for (const sectionID in result.result.sections) {
         const section = result.result.sections[sectionID];
         let hType = 'info';
@@ -212,10 +219,9 @@ function WrappedSubmissionDetail() {
 
           // #3: Parse Att&cks
           if (section.heuristic.attack) {
-            // eslint-disable-next-line guard-for-in
             for (const i in section.heuristic.attack) {
               const attack = section.heuristic.attack[i];
-              // eslint-disable-next-line guard-for-in
+
               for (const j in attack.categories) {
                 const cat = attack.categories[j];
                 if (!Object.hasOwnProperty.call(tempSummary.attack_matrix, cat)) {
@@ -250,7 +256,7 @@ function WrappedSubmissionDetail() {
         }
 
         // #3: Parse Tags
-        // eslint-disable-next-line guard-for-in
+
         for (const tagID in section.tags) {
           const tag = section.tags[tagID];
           let summaryType = null;
@@ -537,25 +543,28 @@ function WrappedSubmissionDetail() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resetLiveMode, showSuccessMessage, submission, t]);
 
-  const resubmitDynamic = useCallback(() => {
-    if (submission != null) {
-      apiCall<Submission>({
-        url: `/api/v4/submit/dynamic/${submission.files[0].sha256}/?copy_sid=${submission.sid}`,
-        onSuccess: api_data => {
-          showSuccessMessage(t('submit.success'));
-          resetLiveMode();
-          setSubmission(null);
-          setSummary(null);
-          setTree(null);
-          setTimeout(() => {
-            navigate(`/submission/detail/${api_data.api_response.sid}`);
-          }, 500);
-        }
-      });
-    }
-    setResubmitAnchor(null);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showSuccessMessage, submission, t]);
+  const resubmitWithType = useCallback(
+    (resubmit_type: string, isProfile: boolean) => {
+      if (submission != null) {
+        apiCall<Submission>({
+          method: isProfile ? 'PUT' : 'GET',
+          url: `/api/v4/submit/${resubmit_type}/${submission.files[0].sha256}/?copy_sid=${submission.sid}`,
+          onSuccess: api_data => {
+            showSuccessMessage(t('submit.success'));
+            resetLiveMode();
+            setSubmission(null);
+            setSummary(null);
+            setTree(null);
+            setTimeout(() => {
+              navigate(`/submission/detail/${api_data.api_response.sid}`);
+            }, 500);
+          }
+        });
+      }
+      setResubmitAnchor(null);
+    },
+    [showSuccessMessage, submission, t]
+  );
 
   const replay = useCallback(() => {
     if (submission != null && systemConfig.ui.allow_replay) {
@@ -847,7 +856,6 @@ function WrappedSubmissionDetail() {
       console.debug(`SocketIO :: emitListen => Listening for messages on watch queue: ${watchQueue}`);
       socket.emit('listen', { wq_id: watchQueue, from_start: true });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [watchQueue, socket, handleErrorMessage]);
 
   useEffect(() => {
@@ -876,6 +884,7 @@ function WrappedSubmissionDetail() {
           <FileDetail
             sha256={fid}
             sid={id}
+            metadata={submission?.metadata}
             liveResultKeys={liveResultKeys}
             liveErrors={curFileLiveErrors}
             force={submission && submission.max_score < 0}
@@ -883,9 +892,17 @@ function WrappedSubmissionDetail() {
           { hasMaximize: true }
         );
       } else {
-        setGlobalDrawer(<FileDetail sha256={fid} sid={id} force={submission && submission.max_score < 0} />, {
-          hasMaximize: true
-        });
+        setGlobalDrawer(
+          <FileDetail
+            sha256={fid}
+            sid={id}
+            metadata={submission?.metadata}
+            force={submission && submission.max_score < 0}
+          />,
+          {
+            hasMaximize: true
+          }
+        );
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1023,13 +1040,9 @@ function WrappedSubmissionDetail() {
                       onChange={event => setArchivingUseAlternateDtl(event.target.value)}
                       row
                     >
+                      <FormControlLabel value="false" control={<Radio />} label={t('archive.alternate_expiry.never')} />
                       <FormControlLabel
-                        value={'false'}
-                        control={<Radio />}
-                        label={t('archive.alternate_expiry.never')}
-                      />
-                      <FormControlLabel
-                        value={'true'}
+                        value="true"
                         control={<Radio />}
                         label={moment()
                           .locale(i18n.language)
@@ -1051,7 +1064,7 @@ function WrappedSubmissionDetail() {
                       configuration={field_cfg}
                       value={archivingMetadata[field_name]}
                       onChange={v => {
-                        let cleanMetadata = archivingMetadata;
+                        const cleanMetadata = archivingMetadata;
                         if (v === undefined || v === null || v === '') {
                           // Remove field from metadata if value is null
                           delete cleanMetadata[field_name];
@@ -1062,7 +1075,7 @@ function WrappedSubmissionDetail() {
                         setArchivingMetadata({ ...cleanMetadata });
                       }}
                       onReset={() => {
-                        let cleanMetadata = archivingMetadata;
+                        const cleanMetadata = archivingMetadata;
                         delete cleanMetadata[field_name];
                         setArchivingMetadata({ ...cleanMetadata });
                       }}
@@ -1104,318 +1117,302 @@ function WrappedSubmissionDetail() {
           >
             <span style={{ fontWeight: 500, textAlign: 'left' }}>{t('outstanding.title')}</span>
             <Grid container style={{ marginTop: theme.spacing(1) }}>
-              <Grid item xs={6}>
+              <Grid size={{ xs: 6 }}>
                 <b>{t('outstanding.services')}</b>
               </Grid>
-              <Grid item xs={6}>
+              <Grid size={{ xs: 6 }}>
                 <b>{t('outstanding.files')}</b>
               </Grid>
             </Grid>
             {Object.keys(outstanding).map(service => (
               <Grid key={service} container>
-                <Grid item xs={6}>
+                <Grid size={{ xs: 6 }}>
                   <b>{service}</b>
                 </Grid>
-                <Grid item xs={6}>
-                  {outstanding[service]}
-                </Grid>
+                <Grid size={{ xs: 6 }}>{outstanding[service]}</Grid>
               </Grid>
             ))}
           </Alert>
         </Snackbar>
       )}
-      <div style={{ textAlign: 'left' }}>
-        {c12nDef.enforce && (
-          <div style={{ paddingBottom: sp4 }}>
-            <Classification size="tiny" c12n={submission ? submission.classification : null} />
-          </div>
-        )}
-        <div style={{ paddingBottom: sp4 }}>
-          <Grid container>
-            <Grid item xs>
-              <div>
-                <Typography variant="h4">{t('title')}</Typography>
-                <Typography variant="caption" component={'div'}>
-                  {submission ? submission.sid : <Skeleton style={{ width: '10rem' }} />}
-                </Typography>
-                {submission && submission.params.psid && (
-                  <Typography variant="caption" component={'div'}>
-                    <i>
-                      <span>{t('psid')}: </span>
-                      <Link
-                        style={{ textDecoration: 'none', color: theme.palette.primary.main }}
-                        to={`/submission/detail/${submission.params.psid}`}
-                      >
-                        {submission.params.psid}
-                      </Link>
-                    </i>
-                  </Typography>
-                )}
-              </div>
-              {socket && (
-                <div
-                  style={{
-                    display: 'flex',
-                    color: theme.palette.mode === 'dark' ? theme.palette.primary.light : theme.palette.primary.dark,
-                    paddingBottom: theme.spacing(3),
-                    paddingTop: theme.spacing(2)
-                  }}
-                >
-                  {liveStatus === 'processing' ? (
-                    <PlayCircleOutlineIcon
-                      style={{
-                        height: theme.spacing(3),
-                        width: theme.spacing(3),
-                        marginRight: theme.spacing(1)
-                      }}
-                    />
-                  ) : (
-                    <PauseCircleOutlineOutlinedIcon
-                      style={{
-                        height: theme.spacing(3),
-                        width: theme.spacing(3),
-                        marginRight: theme.spacing(1)
-                      }}
-                    />
-                  )}
-                  <div style={{ width: '100%' }}>
-                    {t(liveStatus)}
-                    <LinearProgress />
-                  </div>
-                </div>
-              )}
-            </Grid>
-            <Grid item xs={12} sm={12} md={4} style={{ display: 'flex', justifyContent: 'flex-end', flexGrow: 0 }}>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                {submission ? (
-                  submission.state === 'completed' ? (
-                    <div style={{ display: 'flex' }}>
-                      {currentUser.roles.includes('submission_delete') && (
-                        <Tooltip title={t('delete')}>
-                          <IconButton
-                            onClick={() => setDeleteDialog(true)}
-                            style={{
-                              color:
-                                theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
-                            }}
-                            size="large"
-                          >
-                            <RemoveCircleOutlineOutlinedIcon />
-                          </IconButton>
-                        </Tooltip>
-                      )}
-                      {currentUser.roles.includes('bundle_download') && (
-                        <FileDownloader
-                          icon={<CloudDownloadOutlinedIcon />}
-                          link={`/api/v4/bundle/${submission.sid}/`}
-                          tooltip={t('download')}
-                        />
-                      )}
-                      {systemConfig.datastore.archive.enabled && currentUser.roles.includes('archive_trigger') && (
-                        <Tooltip title={t(submission.archived || submission.from_archive ? 'archived' : 'archive')}>
-                          <div>
-                            <IconButton
-                              onClick={() => setArchiveDialog(true)}
-                              disabled={submission.archived || submission.from_archive}
-                              size="large"
-                            >
-                              <ArchiveOutlinedIcon />
-                            </IconButton>
-                          </div>
-                        </Tooltip>
-                      )}
-                      {currentUser.roles.includes('submission_create') && (
-                        <>
-                          <Tooltip title={t('resubmit')}>
-                            <IconButton onClick={event => setResubmitAnchor(event.currentTarget)} size="large">
-                              <ReplayOutlinedIcon />
-                              {popoverOpen ? (
-                                <ExpandLessIcon
-                                  style={{ position: 'absolute', right: 0, bottom: 10, fontSize: 'medium' }}
-                                />
-                              ) : (
-                                <ExpandMoreIcon
-                                  style={{ position: 'absolute', right: 0, bottom: 10, fontSize: 'medium' }}
-                                />
-                              )}
-                            </IconButton>
-                          </Tooltip>
-                          <Popover
-                            open={popoverOpen}
-                            anchorEl={resubmitAnchor}
-                            onClose={() => setResubmitAnchor(null)}
-                            anchorOrigin={{
-                              vertical: 'bottom',
-                              horizontal: 'right'
-                            }}
-                            transformOrigin={{
-                              vertical: 'top',
-                              horizontal: 'right'
-                            }}
-                          >
-                            <List disablePadding>
-                              <ListItem
-                                button
-                                component={Link}
-                                to="/submit"
-                                state={{
-                                  hash: submission.files[0].sha256,
-                                  tabContext: '1',
-                                  c12n: submission.classification,
-                                  metadata: submission.metadata
-                                }}
-                                dense
-                                onClick={() => setResubmitAnchor(null)}
-                              >
-                                <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
-                                  <TuneOutlinedIcon />
-                                </ListItemIcon>
-                                <ListItemText primary={t('resubmit.modify')} />
-                              </ListItem>
-                              <ListItem button dense onClick={resubmitDynamic}>
-                                <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
-                                  <OndemandVideoOutlinedIcon />
-                                </ListItemIcon>
-                                <ListItemText primary={t('resubmit.dynamic')} />
-                              </ListItem>
-                              <ListItem button dense onClick={resubmit}>
-                                <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
-                                  <RepeatOutlinedIcon />
-                                </ListItemIcon>
-                                <ListItemText primary={t('resubmit.carbon_copy')} />
-                              </ListItem>
-                            </List>
-                          </Popover>
-                        </>
-                      )}
-                      {systemConfig.ui.allow_replay && currentUser.roles.includes('replay_trigger') && (
-                        <Tooltip title={t('replay')}>
-                          <IconButton onClick={replay} disabled={!!submission.metadata.replay} size="large">
-                            <PublishOutlinedIcon />
-                          </IconButton>
-                        </Tooltip>
-                      )}
-                      <Tooltip title={t('report_view')}>
-                        <IconButton component={Link} to={`/submission/report/${submission.sid}`} size="large">
-                          <ChromeReaderModeOutlinedIcon />
-                        </IconButton>
-                      </Tooltip>
-                    </div>
-                  ) : (
-                    currentUser.roles.includes('submission_delete') && (
-                      <Tooltip title={t('delete')}>
-                        <IconButton
-                          onClick={() => setDeleteDialog(true)}
-                          style={{
-                            color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
-                          }}
-                          size="large"
-                        >
-                          <RemoveCircleOutlineOutlinedIcon />
-                        </IconButton>
-                      </Tooltip>
+
+      <PageHeader
+        classification={submission ? submission.classification : null}
+        primary={t('title')}
+        secondary={submission ? submission.sid : null}
+        loading={!submission}
+        actions={
+          <>
+            <IconButton
+              size="large"
+              tooltip={t('delete')}
+              onClick={() => setDeleteDialog(true)}
+              style={{
+                color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+              }}
+              {...(!submission
+                ? { loading: true }
+                : {
+                    preventRender:
+                      !currentUser.roles.includes('administration') &&
+                      (!currentUser.roles.includes('submission_delete') ||
+                        submission.params.submitter !== currentUser.username)
+                  })}
+            >
+              <RemoveCircleOutlineOutlinedIcon />
+            </IconButton>
+
+            {!submission ? (
+              <IconButton loading size="large" />
+            ) : !currentUser.roles.includes('bundle_download') || submission.state !== 'completed' ? null : (
+              <FileDownloader
+                icon={<CloudDownloadOutlinedIcon />}
+                link={`/api/v4/bundle/${submission.sid}/`}
+                tooltip={t('download')}
+              />
+            )}
+
+            <IconButton
+              loading={!submission}
+              size="large"
+              onClick={() => setArchiveDialog(true)}
+              {...(!submission
+                ? {
+                    loading: true,
+                    preventRender: !(
+                      systemConfig.datastore.archive.enabled && currentUser.roles.includes('archive_trigger')
                     )
+                  }
+                : {
+                    preventRender:
+                      submission.state !== 'completed' ||
+                      !(systemConfig.datastore.archive.enabled && currentUser.roles.includes('archive_trigger')),
+                    tooltip: t(submission.archived || submission.from_archive ? 'archived' : 'archive')
+                  })}
+            >
+              <ArchiveOutlinedIcon />
+            </IconButton>
+
+            {currentUser.roles.includes('submission_create') && (
+              <>
+                <IconButton
+                  size="large"
+                  tooltip={t('resubmit')}
+                  onClick={event => setResubmitAnchor(event.currentTarget)}
+                  {...(!submission
+                    ? { loading: true, preventRender: !currentUser.roles.includes('submission_create') }
+                    : {
+                        preventRender:
+                          submission.state !== 'completed' || !currentUser.roles.includes('submission_create')
+                      })}
+                >
+                  <ReplayOutlinedIcon />
+                  {popoverOpen ? (
+                    <ExpandLessIcon style={{ position: 'absolute', right: 0, bottom: 10, fontSize: 'medium' }} />
+                  ) : (
+                    <ExpandMoreIcon style={{ position: 'absolute', right: 0, bottom: 10, fontSize: 'medium' }} />
+                  )}
+                </IconButton>
+                {!submission ? null : (
+                  <Popover
+                    open={popoverOpen}
+                    anchorEl={resubmitAnchor}
+                    onClose={() => setResubmitAnchor(null)}
+                    anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                    transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+                  >
+                    <List disablePadding>
+                      <ListItemButton
+                        component={Link}
+                        to={`/submit?hash=${submission.files[0].sha256}`}
+                        state={{
+                          c12n: submission.classification,
+                          metadata: submission.metadata
+                        }}
+                        dense
+                        onClick={() => setResubmitAnchor(null)}
+                      >
+                        <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
+                          <TuneOutlinedIcon />
+                        </ListItemIcon>
+                        <ListItemText primary={t('resubmit.modify')} />
+                      </ListItemButton>
+                      <ListItemButton dense onClick={() => resubmitWithType('dynamic', false)}>
+                        <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
+                          <OndemandVideoOutlinedIcon />
+                        </ListItemIcon>
+                        <ListItemText primary={t('resubmit.dynamic')} />
+                      </ListItemButton>
+                      {submissionProfiles &&
+                        Object.entries(submissionProfiles).map(([name, display]) => (
+                          <ListItemButton key={name} dense onClick={() => resubmitWithType(name, true)}>
+                            <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
+                              <OndemandVideoOutlinedIcon />
+                            </ListItemIcon>
+                            <ListItemText primary={`${t('resubmit.with')} "${display}"`} />
+                          </ListItemButton>
+                        ))}
+                      <ListItemButton dense onClick={resubmit}>
+                        <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
+                          <RepeatOutlinedIcon />
+                        </ListItemIcon>
+                        <ListItemText primary={t('resubmit.carbon_copy')} />
+                      </ListItemButton>
+                    </List>
+                  </Popover>
+                )}
+              </>
+            )}
+
+            <IconButton
+              size="large"
+              tooltip={t('replay')}
+              onClick={replay}
+              {...(!submission
+                ? {
+                    loading: true,
+                    preventRender: !(systemConfig.ui.allow_replay && currentUser.roles.includes('replay_trigger'))
+                  }
+                : {
+                    disabled: !!submission.metadata.replay,
+                    preventRender:
+                      submission.state !== 'completed' ||
+                      !(systemConfig.ui.allow_replay && currentUser.roles.includes('replay_trigger'))
+                  })}
+            >
+              <PublishOutlinedIcon />
+            </IconButton>
+
+            <IconButton
+              component={Link}
+              size="large"
+              tooltip={t('report_view')}
+              {...(!submission
+                ? { loading: true }
+                : {
+                    preventRender: submission.state !== 'completed',
+                    to: `/submission/report/${submission.sid}`
+                  })}
+            >
+              <ChromeReaderModeOutlinedIcon />
+            </IconButton>
+          </>
+        }
+        startAdornment={
+          socket && (
+            <div
+              style={{
+                display: 'flex',
+                color: theme.palette.mode === 'dark' ? theme.palette.primary.light : theme.palette.primary.dark,
+                paddingBottom: theme.spacing(3),
+                paddingTop: theme.spacing(2)
+              }}
+            >
+              {liveStatus === 'processing' ? (
+                <PlayCircleOutlineIcon
+                  style={{
+                    height: theme.spacing(3),
+                    width: theme.spacing(3),
+                    marginRight: theme.spacing(1)
+                  }}
+                />
+              ) : (
+                <PauseCircleOutlineOutlinedIcon
+                  style={{
+                    height: theme.spacing(3),
+                    width: theme.spacing(3),
+                    marginRight: theme.spacing(1)
+                  }}
+                />
+              )}
+              <div style={{ width: '100%' }}>
+                {t(liveStatus)}
+                <LinearProgress />
+              </div>
+            </div>
+          )
+        }
+        endAdornment={
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            {!(submission && submission.state !== 'completed') && (
+              <div style={{ width: '164px', marginTop: '8px' }}>
+                {submission ? (
+                  submission.state === 'completed' && (
+                    <>
+                      <VerdictBar verdicts={submission.verdict} />
+                      {currentUser.roles.includes('submission_manage') && (
+                        <Grid container size="grow">
+                          <Grid size={{ xs: 5 }} style={{ textAlign: 'left' }}>
+                            <Tooltip
+                              title={t(
+                                `verdict.${
+                                  submission.verdict.malicious.indexOf(currentUser.username) !== -1 ? 'is' : 'set'
+                                }.malicious`
+                              )}
+                            >
+                              <IconButton size="small" onClick={() => setVerdict('malicious')}>
+                                <BugReportOutlinedIcon
+                                  style={{
+                                    color:
+                                      submission.verdict.malicious.indexOf(currentUser.username) !== -1
+                                        ? theme.palette.error.dark
+                                        : null
+                                  }}
+                                />
+                              </IconButton>
+                            </Tooltip>
+                          </Grid>
+                          <Grid size={{ xs: 2 }} />
+                          <Grid size={{ xs: 5 }} style={{ textAlign: 'right' }}>
+                            <Tooltip
+                              title={t(
+                                `verdict.${
+                                  submission.verdict.non_malicious.indexOf(currentUser.username) !== -1 ? 'is' : 'set'
+                                }.non_malicious`
+                              )}
+                            >
+                              <IconButton size="small" onClick={() => setVerdict('non_malicious')}>
+                                <VerifiedUserOutlinedIcon
+                                  style={{
+                                    color:
+                                      submission.verdict.non_malicious.indexOf(currentUser.username) !== -1
+                                        ? theme.palette.success.dark
+                                        : null
+                                  }}
+                                />
+                              </IconButton>
+                            </Tooltip>
+                          </Grid>
+                        </Grid>
+                      )}
+                    </>
                   )
                 ) : (
-                  <div style={{ display: 'inline-flex' }}>
-                    {[...Array(systemConfig.ui.allow_replay ? 6 : 5)].map((_, i) => (
+                  <>
+                    <Skeleton variant="rectangular" style={{ height: '15px', width: '100%' }} />
+                    <div style={{ display: 'inline-flex', width: '100%', justifyContent: 'space-between' }}>
                       <Skeleton
-                        key={i}
                         variant="circular"
-                        height="2.5rem"
-                        width="2.5rem"
+                        height="1.5rem"
+                        width="1.5rem"
                         style={{ margin: theme.spacing(0.5) }}
                       />
-                    ))}
-                  </div>
-                )}
-
-                {!(submission && submission.state !== 'completed') && (
-                  <div
-                    style={{
-                      width: '164px',
-                      marginTop: '8px'
-                    }}
-                  >
-                    {submission ? (
-                      submission.state === 'completed' && (
-                        <>
-                          <VerdictBar verdicts={submission.verdict} />
-                          {currentUser.roles.includes('submission_manage') && (
-                            <Grid container>
-                              <Grid item xs={5} style={{ textAlign: 'left' }}>
-                                <Tooltip
-                                  title={t(
-                                    `verdict.${
-                                      submission.verdict.malicious.indexOf(currentUser.username) !== -1 ? 'is' : 'set'
-                                    }.malicious`
-                                  )}
-                                >
-                                  <IconButton size="small" onClick={() => setVerdict('malicious')}>
-                                    <BugReportOutlinedIcon
-                                      style={{
-                                        color:
-                                          submission.verdict.malicious.indexOf(currentUser.username) !== -1
-                                            ? theme.palette.error.dark
-                                            : null
-                                      }}
-                                    />
-                                  </IconButton>
-                                </Tooltip>
-                              </Grid>
-                              <Grid item xs={2} />
-                              <Grid item xs={5} style={{ textAlign: 'right' }}>
-                                <Tooltip
-                                  title={t(
-                                    `verdict.${
-                                      submission.verdict.non_malicious.indexOf(currentUser.username) !== -1
-                                        ? 'is'
-                                        : 'set'
-                                    }.non_malicious`
-                                  )}
-                                >
-                                  <IconButton size="small" onClick={() => setVerdict('non_malicious')}>
-                                    <VerifiedUserOutlinedIcon
-                                      style={{
-                                        color:
-                                          submission.verdict.non_malicious.indexOf(currentUser.username) !== -1
-                                            ? theme.palette.success.dark
-                                            : null
-                                      }}
-                                    />
-                                  </IconButton>
-                                </Tooltip>
-                              </Grid>
-                            </Grid>
-                          )}
-                        </>
-                      )
-                    ) : (
-                      <>
-                        <Skeleton variant="rectangular" style={{ height: '15px', width: '100%' }} />
-                        <div style={{ display: 'inline-flex', width: '100%', justifyContent: 'space-between' }}>
-                          <Skeleton
-                            variant="circular"
-                            height="1.5rem"
-                            width="1.5rem"
-                            style={{ margin: theme.spacing(0.5) }}
-                          />
-                          <Skeleton
-                            variant="circular"
-                            height="1.5rem"
-                            width="1.5rem"
-                            style={{ margin: theme.spacing(0.5) }}
-                          />
-                        </div>
-                      </>
-                    )}
-                  </div>
+                      <Skeleton
+                        variant="circular"
+                        height="1.5rem"
+                        width="1.5rem"
+                        style={{ margin: theme.spacing(0.5) }}
+                      />
+                    </div>
+                  </>
                 )}
               </div>
-            </Grid>
-          </Grid>
-        </div>
+            )}
+          </div>
+        }
+      />
 
+      <div style={{ textAlign: 'left' }}>
         <InfoSection submission={submission} />
 
         {filtered && (

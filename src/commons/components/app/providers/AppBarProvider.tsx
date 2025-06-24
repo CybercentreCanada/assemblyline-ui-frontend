@@ -1,13 +1,11 @@
+import { AppStorageKeys } from 'commons/components/app/AppConstants';
+import { AppBarContext } from 'commons/components/app/AppContexts';
+import type { AppSearchService } from 'commons/components/app/AppSearchService';
+import { useAppConfigs } from 'commons/components/app/hooks';
+import AppQuickSearchProvider from 'commons/components/app/providers/AppQuickSearchProvider';
+import AppSwitcherProvider from 'commons/components/app/providers/AppSwitcherProvider';
 import useLocalStorageItem from 'commons/components/utils/hooks/useLocalStorageItem';
-import type { ReactElement } from 'react';
-import { createContext, useMemo, useState } from 'react';
-import { AppStorageKeys } from '../AppConstants';
-import type { AppBarContextType } from '../AppContexts';
-import type { AppSearchService } from '../AppSearchService';
-import useAppConfigs from '../hooks/useAppConfigs';
-import AppBreadcrumbsProvider from './AppBreadcrumbsProvider';
-import AppQuickSearchProvider from './AppQuickSearchProvider';
-import AppSwitcherProvider from './AppSwitcherProvider';
+import { type ReactElement, useMemo, useState } from 'react';
 
 const { LS_KEY_AUTOHIDE_APPBAR } = AppStorageKeys;
 
@@ -15,8 +13,6 @@ type AppTopNavProviderProps = {
   search?: AppSearchService;
   children: ReactElement | ReactElement[];
 };
-
-export const AppBarContext = createContext<AppBarContextType>(null);
 
 export default function AppBarProvider({ search, children }: AppTopNavProviderProps) {
   const configs = useAppConfigs();
@@ -37,11 +33,9 @@ export default function AppBarProvider({ search, children }: AppTopNavProviderPr
   );
   return (
     <AppBarContext.Provider value={context}>
-      <AppBreadcrumbsProvider>
-        <AppSwitcherProvider>
-          <AppQuickSearchProvider search={search}>{children}</AppQuickSearchProvider>
-        </AppSwitcherProvider>
-      </AppBreadcrumbsProvider>
+      <AppSwitcherProvider>
+        <AppQuickSearchProvider search={search}>{children}</AppQuickSearchProvider>
+      </AppSwitcherProvider>
     </AppBarContext.Provider>
   );
 }

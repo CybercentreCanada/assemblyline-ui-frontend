@@ -2,6 +2,7 @@ import type { AppUser } from 'commons/components/app/AppUserService';
 import type { Configuration } from 'components/models/base/config';
 import type { Role, Type, User } from 'components/models/base/user';
 import type { UserSettings } from 'components/models/base/user_settings';
+import type { RequestBuilder } from 'components/models/utils/request';
 import type { ClassificationDefinition } from 'helpers/classificationParser';
 
 export type Field = {
@@ -13,7 +14,7 @@ export type Field = {
   list: boolean;
 };
 
-export type IndexDefinition = { [field: string]: Field };
+export type IndexDefinition = Record<string, Field>;
 
 export type Indexes = {
   alert: IndexDefinition;
@@ -112,3 +113,28 @@ export type WhoAmI = CustomUser & {
   /** User Settings configuration */
   settings: UserSettings;
 };
+
+/**
+ * @name /user/whoami/
+ * @description Return the currently logged in user as well as the system configuration
+ * @method GET
+ */
+type WhoAmIGetRequest = RequestBuilder<`/api/v4/user/whoami/`, 'GET', null>;
+
+/**
+ * @name /settings/<username>/
+ * @description Load the user's settings.
+ * @method GET
+ */
+type SettingsGetRequest = RequestBuilder<`/api/v4/user/settings/${string}/`, 'GET', null>;
+
+// prettier-ignore
+export type UserRequests =
+  | WhoAmIGetRequest
+  | SettingsGetRequest;
+
+// prettier-ignore
+export type UserResponses<Request extends UserRequests> =
+  Request extends WhoAmIGetRequest ? WhoAmI :
+  Request extends SettingsGetRequest ? UserSettings :
+  never;

@@ -56,7 +56,7 @@ const WrappedTimelineBody = ({ body }: Props) => {
                 <TimelineOppositeContent
                   alignSelf="center"
                   variant="body2"
-                  textOverflow={'ellipsis'}
+                  textOverflow="ellipsis"
                   whiteSpace="nowrap"
                   overflow={{ overflowX: 'hidden' }}
                 >
@@ -82,7 +82,7 @@ const WrappedTimelineBody = ({ body }: Props) => {
               </TimelineSeparator>
               <TimelineContent
                 alignSelf="center"
-                textOverflow={'ellipsis'}
+                textOverflow="ellipsis"
                 whiteSpace="nowrap"
                 overflow={{ overflowX: 'hidden' }}
               >

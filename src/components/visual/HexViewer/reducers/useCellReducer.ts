@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
-import { isAction, ReducerHandler, Reducers, UseReducer } from '..';
+import type { ReducerHandler, Reducers, UseReducer } from '..';
+import { isAction } from '..';
 
 export const useCellReducer: UseReducer = () => {
   const cellMouseEnter: Reducers['cellMouseEnter'] = useCallback((store, { type, index }) => {

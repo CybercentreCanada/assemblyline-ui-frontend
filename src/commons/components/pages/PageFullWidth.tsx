@@ -1,10 +1,11 @@
+import PageContent from 'commons/components/pages/PageContent';
+import type { CSSProperties } from 'react';
 import { memo } from 'react';
-import PageContent from './PageContent';
 
 type PageFullWidthProps = {
   children: React.ReactNode;
-  height?: number | string;
-  width?: number | string;
+  height?: CSSProperties['height'];
+  width?: CSSProperties['width'];
   margin?: number;
   mb?: number;
   ml?: number;

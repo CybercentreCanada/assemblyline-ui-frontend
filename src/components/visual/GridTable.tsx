@@ -11,8 +11,8 @@ import type SimpleSearchQuery from 'components/visual/SearchBar/simple-search-qu
 import type { FC } from 'react';
 import React, { forwardRef, memo } from 'react';
 import type { To } from 'react-router';
-import { useNavigate } from 'react-router';
-import { Link, useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router';
+import { Link } from 'react-router-dom';
 
 interface StyledPaperProps extends PaperProps {
   component?: any;
@@ -32,8 +32,8 @@ export const StyledPaper: FC<StyledPaperProps> = memo(
         ? '#00000010'
         : '#FFFFFF06'
       : theme.palette.mode === 'dark'
-      ? '#FFFFFF10'
-      : '#00000006'
+        ? '#FFFFFF10'
+        : '#00000006'
   }))
 );
 
@@ -62,16 +62,16 @@ export const GridTable: FC<GridTableProps> = memo(
         ? theme.palette.background.default
         : theme.palette.background.paper
       : theme.palette.mode === 'dark'
-      ? theme.palette.background.paper
-      : theme.palette.background.default,
+        ? theme.palette.background.paper
+        : theme.palette.background.default,
     '&>*>*>*.MuiTableCell-head': {
       backgroundColor: paper
         ? theme.palette.mode === 'dark'
           ? '#383838'
           : '#F6F6F6'
         : theme.palette.mode === 'dark'
-        ? '#494949'
-        : '#F3F3F3'
+          ? '#494949'
+          : '#F3F3F3'
     }
   }))
 );

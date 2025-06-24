@@ -3,25 +3,13 @@ import CheckBoxOutlinedIcon from '@mui/icons-material/CheckBoxOutlined';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import { Collapse, Divider, Grid, Skeleton, Typography, useTheme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
-import { ParsedSubmission } from 'components/models/base/submission';
+import useALContext from 'components/hooks/useALContext';
+import type { ParsedSubmission } from 'components/models/base/submission';
 import Moment from 'components/visual/Moment';
 import Priority from 'components/visual/Priority';
 import Verdict from 'components/visual/Verdict';
-import React, { Fragment, useMemo } from 'react';
+import React, { Fragment, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-
-const useStyles = makeStyles(theme => ({
-  title: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    cursor: 'pointer',
-    '&:hover, &:focus': {
-      color: theme.palette.text.secondary
-    }
-  }
-}));
 
 type Props = {
   submission: ParsedSubmission;
@@ -29,10 +17,13 @@ type Props = {
 
 const WrappedInfoSection: React.FC<Props> = ({ submission }) => {
   const { t } = useTranslation(['submissionDetail']);
-  const [open, setOpen] = React.useState(true);
   const theme = useTheme();
-  const classes = useStyles();
+  const { classificationAliases } = useALContext();
+
+  const [open, setOpen] = useState<boolean>(true);
+
   const sp2 = theme.spacing(2);
+
   return (
     <div style={{ paddingTop: sp2 }}>
       <Typography
@@ -40,7 +31,15 @@ const WrappedInfoSection: React.FC<Props> = ({ submission }) => {
         onClick={() => {
           setOpen(!open);
         }}
-        className={classes.title}
+        sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          cursor: 'pointer',
+          '&:hover, &:focus': {
+            color: theme.palette.text.secondary
+          }
+        }}
       >
         <span>{t('information')}</span>
         {open ? <ExpandLess /> : <ExpandMore />}
@@ -50,25 +49,35 @@ const WrappedInfoSection: React.FC<Props> = ({ submission }) => {
         {useMemo(
           () => (
             <div style={{ paddingBottom: sp2, paddingTop: sp2 }}>
-              <Grid container>
-                <Grid item xs={4} sm={3} lg={2}>
+              <Grid container size="grow">
+                <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
                   <span style={{ fontWeight: 500 }}>{t('params.description')}</span>
                 </Grid>
-                <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
+                <Grid size={{ xs: 8, sm: 9, lg: 10 }} style={{ wordBreak: 'break-word' }}>
                   {submission ? submission.params.description : <Skeleton />}
                 </Grid>
 
-                <Grid item xs={4} sm={3} lg={2}>
+                <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
                   <span style={{ fontWeight: 500 }}>{t('params.groups')}</span>
                 </Grid>
-                <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
-                  {submission ? submission.params.groups.join(' | ') : <Skeleton />}
+                <Grid size={{ xs: 8, sm: 9, lg: 10 }} style={{ wordBreak: 'break-word' }}>
+                  {submission ? (
+                    submission.params.groups
+                      .map(group =>
+                        group in classificationAliases
+                          ? classificationAliases?.[group]?.short_name || classificationAliases?.[group]?.name || group
+                          : group
+                      )
+                      .join(' | ')
+                  ) : (
+                    <Skeleton />
+                  )}
                 </Grid>
 
-                <Grid item xs={4} sm={3} lg={2}>
+                <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
                   <span style={{ fontWeight: 500 }}>{t('params.services.selected')}</span>
                 </Grid>
-                <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
+                <Grid size={{ xs: 8, sm: 9, lg: 10 }} style={{ wordBreak: 'break-word' }}>
                   {submission ? (
                     submission.params.services.rescan ? (
                       [
@@ -89,10 +98,10 @@ const WrappedInfoSection: React.FC<Props> = ({ submission }) => {
 
                 {submission && Object.keys(submission.params.service_spec).length !== 0 && (
                   <>
-                    <Grid item xs={4} sm={3} lg={2}>
+                    <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
                       <span style={{ fontWeight: 500 }}>{t('params.services.service_spec')}</span>
                     </Grid>
-                    <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
+                    <Grid size={{ xs: 8, sm: 9, lg: 10 }} style={{ wordBreak: 'break-word' }}>
                       {Object.keys(submission.params.service_spec).map(service => (
                         <div key={service}>
                           <i>{service}</i>:
@@ -107,42 +116,41 @@ const WrappedInfoSection: React.FC<Props> = ({ submission }) => {
                   </>
                 )}
 
-                {[
-                  'generate_alert',
-                  'deep_scan',
-                  'ignore_cache',
-                  'ignore_dynamic_recursion_prevention',
-                  'ignore_filtering'
-                ].map((k, i) => (
-                  <Fragment key={i}>
-                    <Grid item xs={4} sm={3} lg={2} style={{ paddingTop: theme.spacing(0.5) }}>
-                      <span style={{ fontWeight: 500 }}>{t(`params.${k}`)}</span>
-                    </Grid>
-                    <Grid item xs={8} sm={9} lg={10} style={{ height: theme.spacing(3.75) }}>
-                      {submission ? (
-                        submission.params[k] ? (
-                          <CheckBoxOutlinedIcon />
+                {['generate_alert', 'deep_scan', 'ignore_cache', 'ignore_recursion_prevention', 'ignore_filtering'].map(
+                  (k, i) => (
+                    <Fragment key={i}>
+                      <Grid size={{ xs: 4, sm: 3, lg: 2 }} style={{ paddingTop: theme.spacing(0.5) }}>
+                        <span style={{ fontWeight: 500 }}>{t(`params.${k}`)}</span>
+                      </Grid>
+                      <Grid size={{ xs: 8, sm: 9, lg: 10 }} style={{ height: theme.spacing(3.75) }}>
+                        {submission ? (
+                          submission.params[k] ? (
+                            <CheckBoxOutlinedIcon />
+                          ) : (
+                            <CheckBoxOutlineBlankOutlinedIcon />
+                          )
                         ) : (
-                          <CheckBoxOutlineBlankOutlinedIcon />
-                        )
-                      ) : (
-                        <Skeleton variant="rectangular" style={{ width: theme.spacing(3), height: theme.spacing(3) }} />
-                      )}
-                    </Grid>
-                  </Fragment>
-                ))}
+                          <Skeleton
+                            variant="rectangular"
+                            style={{ width: theme.spacing(3), height: theme.spacing(3) }}
+                          />
+                        )}
+                      </Grid>
+                    </Fragment>
+                  )
+                )}
 
-                <Grid item xs={4} sm={3} lg={2}>
+                <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
                   <span style={{ fontWeight: 500 }}>{t('params.submitter')}</span>
                 </Grid>
-                <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
+                <Grid size={{ xs: 8, sm: 9, lg: 10 }} style={{ wordBreak: 'break-word' }}>
                   {submission ? submission.params.submitter : <Skeleton />}
                 </Grid>
 
-                <Grid item xs={4} sm={3} lg={2}>
+                <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
                   <span style={{ fontWeight: 500 }}>{t('max_score')}</span>
                 </Grid>
-                <Grid item xs={8} sm={9} lg={10}>
+                <Grid size={{ xs: 8, sm: 9, lg: 10 }}>
                   {submission ? (
                     <Verdict score={submission.max_score} />
                   ) : (
@@ -150,10 +158,10 @@ const WrappedInfoSection: React.FC<Props> = ({ submission }) => {
                   )}
                 </Grid>
 
-                <Grid item xs={4} sm={3} lg={2}>
+                <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
                   <span style={{ fontWeight: 500 }}>{t('params.priority')}</span>
                 </Grid>
-                <Grid item xs={8} sm={9} lg={10}>
+                <Grid size={{ xs: 8, sm: 9, lg: 10 }}>
                   {submission ? (
                     <Priority priority={submission.params.priority} />
                   ) : (
@@ -163,19 +171,19 @@ const WrappedInfoSection: React.FC<Props> = ({ submission }) => {
 
                 {submission && submission.params.ttl !== 0 && (
                   <>
-                    <Grid item xs={4} sm={3} lg={2}>
+                    <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
                       <span style={{ fontWeight: 500 }}>{t('params.dtl')}</span>
                     </Grid>
-                    <Grid item xs={8} sm={9} lg={10} style={{ wordBreak: 'break-word' }}>
+                    <Grid size={{ xs: 8, sm: 9, lg: 10 }} style={{ wordBreak: 'break-word' }}>
                       {submission.params.ttl}
                     </Grid>
                   </>
                 )}
 
-                <Grid item xs={4} sm={3} lg={2}>
+                <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
                   <span style={{ fontWeight: 500 }}>{t('times.submitted')}</span>
                 </Grid>
-                <Grid item xs={8} sm={9} lg={10}>
+                <Grid size={{ xs: 8, sm: 9, lg: 10 }}>
                   {submission ? (
                     <Moment format="YYYY-MM-DD HH:mm:ss">{submission.times.submitted}</Moment>
                   ) : (
@@ -183,10 +191,10 @@ const WrappedInfoSection: React.FC<Props> = ({ submission }) => {
                   )}
                 </Grid>
 
-                <Grid item xs={4} sm={3} lg={2}>
+                <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
                   <span style={{ fontWeight: 500 }}>{t('times.completed')}</span>
                 </Grid>
-                <Grid item xs={8} sm={9} lg={10}>
+                <Grid size={{ xs: 8, sm: 9, lg: 10 }}>
                   {submission && submission.times.completed ? (
                     <Moment format="YYYY-MM-DD HH:mm:ss">{submission.times.completed}</Moment>
                   ) : (

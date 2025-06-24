@@ -1,5 +1,6 @@
 import { useCallback } from 'react';
-import { isAction, parseJSON, ReducerHandler, Reducers, removeStoreKeys, UseReducer } from '..';
+import type { ReducerHandler, Reducers, UseReducer } from '..';
+import { isAction, parseJSON, removeStoreKeys } from '..';
 
 export const useSettingReducer: UseReducer = () => {
   const appLoad: Reducers['appLoad'] = useCallback(store => {
@@ -10,11 +11,11 @@ export const useSettingReducer: UseReducer = () => {
   }, []);
 
   const settingFetch: Reducers['settingFetch'] = useCallback(store => {
-    const value = localStorage.getItem(store.setting.storage.key) as string;
+    const value = localStorage.getItem(store.setting.storage.key);
     const json = parseJSON(
       value,
       "Invalid setting data ! Reset and save the HexViewer's settings in the Setting Menu."
-    ) as any;
+    );
     if (value === null || value === '' || Array.isArray(json)) return { ...store };
     else return { ...store, setting: { ...store.setting, storage: { ...store.setting.storage, data: json } } };
   }, []);

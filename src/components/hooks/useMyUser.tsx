@@ -3,16 +3,14 @@ import type { Configuration } from 'components/models/base/config';
 import type { UserSettings } from 'components/models/base/user_settings';
 import type { CustomUser, Indexes, SystemMessage } from 'components/models/ui/user';
 import type { ClassificationDefinition } from 'helpers/classificationParser';
-import { useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 export type Alias = {
   name: string;
   short_name: string;
 };
 
-export type ClassificationAliases = {
-  [key: string]: Alias;
-};
+export type ClassificationAliases = Record<string, Alias>;
 
 export interface CustomAppUserService extends AppUserService<CustomUser> {
   c12nDef: ClassificationDefinition;
@@ -47,7 +45,7 @@ export default function useMyUser(): CustomAppUserService {
   const [classificationAliases, setClassificationAliases] = useState<ClassificationAliases>(null);
   const [flattenedProps, setFlattenedProps] = useState(null);
 
-  function flatten(ob) {
+  const flatten = useCallback(ob => {
     const toReturn = {};
 
     for (const i in ob) {
@@ -65,133 +63,165 @@ export default function useMyUser(): CustomAppUserService {
       }
     }
     return toReturn;
-  }
+  }, []);
 
-  const setUser = (whoAmIData: WhoAmIProps) => {
-    const {
-      configuration: cfg,
-      classification_aliases: c12nAliases,
-      c12nDef: c12n,
-      indexes: idx,
-      system_message: msg,
-      settings: userSettings,
-      ...curUser
-    } = whoAmIData;
-    const upperC12n = {
-      ...c12n,
-      original_definition: {
-        ...c12n.original_definition,
-        groups: c12n.original_definition.groups.map(grp => ({
-          ...grp,
-          aliases: grp.aliases.map(val => val.toUpperCase()),
-          name: grp.name.toLocaleUpperCase(),
-          short_name: grp.short_name.toLocaleUpperCase()
-        })),
-        levels: c12n.original_definition.levels.map(lvl => ({
-          ...lvl,
-          aliases: lvl.aliases.map(val => val.toUpperCase()),
-          name: lvl.name.toLocaleUpperCase(),
-          short_name: lvl.short_name.toLocaleUpperCase()
-        })),
-        subgroups: c12n.original_definition.subgroups.map(sg => ({
-          ...sg,
-          aliases: sg.aliases.map(val => val.toUpperCase()),
-          name: sg.name.toLocaleUpperCase(),
-          short_name: sg.short_name.toLocaleUpperCase()
-        })),
-        required: c12n.original_definition.required.map(req => ({
-          ...req,
-          aliases: req.aliases.map(val => val.toUpperCase()),
-          name: req.name.toLocaleUpperCase(),
-          short_name: req.short_name.toLocaleUpperCase()
-        }))
-      }
-    };
-    setC12nDef(upperC12n);
-    setClassificationAliases(c12nAliases);
-    setConfiguration(cfg);
-    setIndexes(idx);
-    setSystemMessage(msg);
-    setState({
-      ...curUser,
-      dynamic_group: curUser.email ? curUser.email.toUpperCase().split('@')[1] : null
-    });
-    setSettings(userSettings);
-    setFlattenedProps(
-      flatten({
-        user: curUser,
-        classificationAliases: c12nAliases,
-        c12nDef: upperC12n,
+  const setUser = useCallback(
+    (whoAmIData: WhoAmIProps) => {
+      const {
         configuration: cfg,
+        classification_aliases: c12nAliases,
+        c12nDef: c12n,
         indexes: idx,
-        settings: userSettings
-      })
-    );
-  };
+        system_message: msg,
+        settings: userSettings,
+        ...curUser
+      } = whoAmIData;
+      const upperC12n = {
+        ...c12n,
+        original_definition: {
+          ...c12n.original_definition,
+          groups: c12n.original_definition.groups.map(grp => ({
+            ...grp,
+            aliases: grp.aliases.map(val => val.toUpperCase()),
+            name: grp.name.toLocaleUpperCase(),
+            short_name: grp.short_name.toLocaleUpperCase()
+          })),
+          levels: c12n.original_definition.levels.map(lvl => ({
+            ...lvl,
+            aliases: lvl.aliases.map(val => val.toUpperCase()),
+            name: lvl.name.toLocaleUpperCase(),
+            short_name: lvl.short_name.toLocaleUpperCase()
+          })),
+          subgroups: c12n.original_definition.subgroups.map(sg => ({
+            ...sg,
+            aliases: sg.aliases.map(val => val.toUpperCase()),
+            name: sg.name.toLocaleUpperCase(),
+            short_name: sg.short_name.toLocaleUpperCase()
+          })),
+          required: c12n.original_definition.required.map(req => ({
+            ...req,
+            aliases: req.aliases.map(val => val.toUpperCase()),
+            name: req.name.toLocaleUpperCase(),
+            short_name: req.short_name.toLocaleUpperCase()
+          }))
+        }
+      };
+      setC12nDef(upperC12n);
+      setClassificationAliases(c12nAliases);
+      setConfiguration(cfg);
+      setIndexes(idx);
+      setSystemMessage(msg);
+      setState({
+        ...curUser,
+        dynamic_group: curUser.email ? curUser.email.toUpperCase().split('@')[1] : null
+      });
+      setSettings(userSettings);
+      setFlattenedProps(
+        flatten({
+          user: curUser,
+          classificationAliases: c12nAliases,
+          c12nDef: upperC12n,
+          configuration: cfg,
+          indexes: idx,
+          settings: userSettings
+        })
+      );
+    },
+    [flatten]
+  );
 
-  const validateProp = (propDef: AppUserValidatedProp) => {
-    const obj = flattenedProps[propDef.prop];
-    if (Array.isArray(obj)) {
-      return obj.indexOf(propDef.value) !== -1;
-    }
-    return obj === propDef.value;
-  };
+  const validateProp = useCallback(
+    (propDef: AppUserValidatedProp) => {
+      const obj = flattenedProps[propDef.prop];
+      if (Array.isArray(obj)) {
+        return obj.indexOf(propDef.value) !== -1;
+      }
+      return obj === propDef.value;
+    },
+    [flattenedProps]
+  );
 
-  const validateProps = (props: AppUserValidatedProp[]) => {
-    if (props === undefined || !Array.isArray(props)) return true;
+  const validateProps = useCallback(
+    (props: AppUserValidatedProp[]) => {
+      if (props === undefined || !Array.isArray(props)) return true;
 
-    const enforcedProps: AppUserValidatedProp[] = [];
-    const unEnforcedProps: AppUserValidatedProp[] = [];
-    props.forEach(prop => (prop?.enforce ? enforcedProps.push(prop) : unEnforcedProps.push(prop)));
+      const enforcedProps: AppUserValidatedProp[] = [];
+      const unEnforcedProps: AppUserValidatedProp[] = [];
+      props.forEach(prop => (prop?.enforce ? enforcedProps.push(prop) : unEnforcedProps.push(prop)));
 
-    const enforcedValidated = enforcedProps.length > 0 ? enforcedProps.every(validateProp) : true;
-    const unEnforcedValidated = unEnforcedProps.length > 0 ? unEnforcedProps.some(validateProp) : true;
+      const enforcedValidated = enforcedProps.length > 0 ? enforcedProps.every(validateProp) : true;
+      const unEnforcedValidated = unEnforcedProps.length > 0 ? unEnforcedProps.some(validateProp) : true;
 
-    return enforcedValidated && unEnforcedValidated;
-  };
+      return enforcedValidated && unEnforcedValidated;
+    },
+    [validateProp]
+  );
 
-  const isReady = () => {
+  const isReady = useCallback(() => {
     if (user === null || (!user.agrees_with_tos && configuration.ui.tos) || !user.is_active) {
       return false;
     }
 
     return true;
-  };
+  }, [configuration?.ui?.tos, user]);
 
-  const scoreToVerdict = (score: number | null) => {
-    if (score >= configuration.submission.verdicts.malicious) {
-      return 'malicious';
-    }
+  const scoreToVerdict = useCallback(
+    (score: number | null) => {
+      if (score >= configuration.submission.verdicts.malicious) {
+        return 'malicious';
+      }
 
-    if (score >= configuration.submission.verdicts.highly_suspicious) {
-      return 'highly_suspicious';
-    }
+      if (score >= configuration.submission.verdicts.highly_suspicious) {
+        return 'highly_suspicious';
+      }
 
-    if (score >= configuration.submission.verdicts.suspicious) {
-      return 'suspicious';
-    }
+      if (score >= configuration.submission.verdicts.suspicious) {
+        return 'suspicious';
+      }
 
-    if (score === null || score >= configuration.submission.verdicts.info) {
-      return 'info';
-    }
+      if (score === null || score >= configuration.submission.verdicts.info) {
+        return 'info';
+      }
 
-    return 'safe';
-  };
+      return 'safe';
+    },
+    [
+      configuration?.submission?.verdicts?.highly_suspicious,
+      configuration?.submission?.verdicts?.info,
+      configuration?.submission?.verdicts?.malicious,
+      configuration?.submission?.verdicts?.suspicious
+    ]
+  );
 
-  return {
-    c12nDef,
-    classificationAliases,
-    configuration,
-    indexes,
-    systemMessage,
-    settings,
-    user,
-    setUser,
-    setClassificationAliases,
-    setConfiguration,
-    setSystemMessage,
-    isReady,
-    validateProps,
-    scoreToVerdict
-  };
+  return useMemo(
+    () => ({
+      c12nDef,
+      classificationAliases,
+      configuration,
+      indexes,
+      systemMessage,
+      settings,
+      user,
+      setUser,
+      setClassificationAliases,
+      setConfiguration,
+      setSystemMessage,
+      isReady,
+      validateProps,
+      scoreToVerdict
+    }),
+    [
+      c12nDef,
+      classificationAliases,
+      configuration,
+      indexes,
+      isReady,
+      scoreToVerdict,
+      setUser,
+      settings,
+      systemMessage,
+      user,
+      validateProps
+    ]
+  );
 }

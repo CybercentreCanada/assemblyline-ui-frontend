@@ -1,4 +1,4 @@
-import type { ParsedErrors } from './error';
+import type { ParsedErrors } from 'components/models/base/error';
 
 export const SUBMISSION_STATES = ['failed', 'submitted', 'completed'] as const;
 
@@ -26,9 +26,6 @@ export type ServiceSelection = {
 
   /** Add to service selection when resubmitting */
   resubmit: string[];
-
-  /** List of runtime excluded services */
-  runtime_excluded: string[];
 
   /** List of selected services */
   selected: string[];
@@ -61,7 +58,7 @@ export type SubmissionParams = {
   ignore_cache: boolean;
 
   /** Should we ignore dynamic recursion prevention? */
-  ignore_dynamic_recursion_prevention: boolean;
+  ignore_recursion_prevention: boolean;
 
   /** Should we ignore filtering services? */
   ignore_filtering: boolean;
@@ -86,9 +83,6 @@ export type SubmissionParams = {
 
   /** Priority of the scan */
   priority: number;
-
-  /** Should the submission do extra profiling? */
-  profile: boolean;
 
   /** Parent submission ID */
   psid?: string;

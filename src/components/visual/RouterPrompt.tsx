@@ -1,9 +1,9 @@
 import { useBlocker } from 'components/hooks/useBlocker';
 import useDrawer from 'components/hooks/useDrawer';
 import { GD_EVENT_PREVENTED, GD_EVENT_PROCEED } from 'components/providers/DrawerProvider';
+import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import ConfirmationDialog from './ConfirmationDialog';
 
 export function RouterPrompt(props) {
   const {
@@ -17,8 +17,8 @@ export function RouterPrompt(props) {
   } = props;
   const { t } = useTranslation();
   const { setDrawerClosePrompt } = useDrawer();
-  const [open, setOpen] = useState(false);
-  const [cancel, setCancel] = useState(false);
+  const [open, setOpen] = useState<boolean>(false);
+  const [cancel, setCancel] = useState<boolean>(false);
   const [currentTX, setCurrentTX] = useState(null);
 
   // Block history transactions

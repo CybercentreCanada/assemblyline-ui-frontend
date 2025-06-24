@@ -1,7 +1,6 @@
-import { Button, CircularProgress, Link, Typography, useTheme } from '@mui/material';
+import { Box, Button, CircularProgress, Link, Typography, useTheme } from '@mui/material';
 import Skeleton from '@mui/material/Skeleton';
-import makeStyles from '@mui/styles/makeStyles';
-import useAppBanner from 'commons/components/app/hooks/useAppBanner';
+import { useAppBanner } from 'commons/components/app/hooks';
 import PageCenter from 'commons/components/pages/PageCenter';
 import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useALContext from 'components/hooks/useALContext';
@@ -11,39 +10,16 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Markdown from 'react-markdown';
 
-const useStyles = makeStyles(curTheme => ({
-  no_pad: {
-    padding: 0
-  },
-  page: {
-    maxWidth: '960px',
-    width: '100%',
-    [curTheme.breakpoints.down('sm')]: {
-      maxWidth: '100%'
-    },
-    [curTheme.breakpoints.only('md')]: {
-      maxWidth: '630px'
-    }
-  },
-  buttonProgress: {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    marginTop: -12,
-    marginLeft: -12
-  }
-}));
-
 export default function Tos() {
   const { t } = useTranslation(['tos']);
   const theme = useTheme();
-  const [tos, setTos] = useState('');
-  const [buttonLoading, setButtonLoading] = useState(false);
-  const { user: currentUser, configuration } = useALContext();
   const banner = useAppBanner();
   const { apiCall } = useMyAPI();
+  const { user: currentUser, configuration } = useALContext();
 
-  const classes = useStyles();
+  const [tos, setTos] = useState('');
+  const [buttonLoading, setButtonLoading] = useState(false);
+
   const sp6 = theme.spacing(6);
 
   function acceptTOS() {
@@ -75,7 +51,20 @@ export default function Tos() {
 
   return configuration.ui.tos ? (
     <PageCenter margin={4} width="100%">
-      <div className={classes.page} style={{ display: 'inline-block', textAlign: 'center' }}>
+      <Box
+        sx={{
+          display: 'inline-block',
+          textAlign: 'center',
+          maxWidth: '960px',
+          width: '100%',
+          [theme.breakpoints.down('sm')]: {
+            maxWidth: '100%'
+          },
+          [theme.breakpoints.only('md')]: {
+            maxWidth: '630px'
+          }
+        }}
+      >
         <div>{banner}</div>
         <div style={{ marginBottom: sp6, textAlign: 'left' }}>
           <Typography variant="h3" gutterBottom>
@@ -103,7 +92,7 @@ export default function Tos() {
                   onClick={acceptTOS}
                 >
                   {t('button')}
-                  {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
+                  {buttonLoading && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
                 </Button>
                 <Button
                   style={{ marginLeft: '1rem', marginTop: '3rem', marginBottom: '3rem' }}
@@ -113,7 +102,7 @@ export default function Tos() {
                   onClick={cancelTOS}
                 >
                   {t('logout')}
-                  {buttonLoading && <CircularProgress size={24} className={classes.buttonProgress} />}
+                  {buttonLoading && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
                 </Button>
               </div>
             )}
@@ -128,7 +117,7 @@ export default function Tos() {
             <Skeleton />
           </>
         )}
-      </div>
+      </Box>
     </PageCenter>
   ) : (
     <NotFoundPage />

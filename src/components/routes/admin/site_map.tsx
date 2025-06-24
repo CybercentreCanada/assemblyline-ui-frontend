@@ -1,49 +1,47 @@
 import DataUsageOutlinedIcon from '@mui/icons-material/DataUsageOutlined';
 import HttpsOutlinedIcon from '@mui/icons-material/HttpsOutlined';
 import NoEncryptionOutlinedIcon from '@mui/icons-material/NoEncryptionOutlined';
-import type { Theme } from '@mui/material';
 import {
   Paper,
   Skeleton,
+  styled,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
-  Typography,
   useTheme
 } from '@mui/material';
-import createStyles from '@mui/styles/createStyles';
-import withStyles from '@mui/styles/withStyles';
-import useAppUser from 'commons/components/app/hooks/useAppUser';
+import { useAppUser } from 'commons/components/app/hooks';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import type { Role } from 'components/models/base/user';
 import type { SiteMap } from 'components/models/ui';
 import type { CustomUser } from 'components/models/ui/user';
-import type { PossibleColor } from 'components/models/utils/color';
 import CustomChip from 'components/visual/CustomChip';
-import { useEffect, useState } from 'react';
+import { PageHeader } from 'components/visual/Layouts/PageHeader';
+import type { PossibleColor } from 'helpers/colors';
+import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate } from 'react-router';
 
-const StyledTableCell = withStyles((theme: Theme) =>
-  createStyles({
-    root: {
+const StyledTableCell = memo(
+  styled(TableCell)(({ theme }) => ({
+    ['&.MuiTableCell-root']: {
       paddingRight: theme.spacing(1),
       paddingLeft: theme.spacing(1),
       [theme.breakpoints.up('md')]: {
         wordBreak: 'break-word'
       }
     },
-    head: {
+    ['&.MuiTableCell-head']: {
       backgroundColor: theme.palette.mode === 'dark' ? '#404040' : '#EEE',
       whiteSpace: 'nowrap'
     }
-  })
-)(TableCell);
+  }))
+);
 
 export default function SiteMapPage() {
   const { t } = useTranslation(['adminSiteMap']);
@@ -86,6 +84,7 @@ export default function SiteMapPage() {
     signature_manage: 'info',
     signature_view: 'default',
     submission_create: 'success',
+    submission_customize: 'info',
     submission_delete: 'error',
     submission_manage: 'info',
     submission_view: 'default',
@@ -106,14 +105,15 @@ export default function SiteMapPage() {
 
   return currentUser.is_admin ? (
     <PageFullWidth margin={4}>
-      <div style={{ marginBottom: theme.spacing(2), textAlign: 'left' }}>
-        <Typography variant="h4">{t('title')}</Typography>
-        {siteMap ? (
-          <Typography variant="caption">{`${siteMap.length} ${t('caption')}`}</Typography>
-        ) : (
-          <Skeleton width="10rem" />
-        )}
-      </div>
+      <PageHeader
+        primary={t('title')}
+        secondary={() => `${siteMap.length} ${t('caption')}`}
+        loading={!siteMap}
+        slotProps={{
+          root: { style: { marginBottom: theme.spacing(2) } }
+        }}
+      />
+
       {siteMap ? (
         <TableContainer component={Paper}>
           <Table size="small" stickyHeader>

@@ -8,24 +8,23 @@ import SelectAllOutlinedIcon from '@mui/icons-material/SelectAllOutlined';
 import TravelExploreOutlinedIcon from '@mui/icons-material/TravelExploreOutlined';
 import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import { Divider, ListSubheader, Link as MaterialLink, Menu, MenuItem, Tooltip } from '@mui/material';
-import { makeStyles } from '@mui/styles';
 import useClipboard from 'commons/components/utils/hooks/useClipboard';
 import useALContext from 'components/hooks/useALContext';
 import useExternalLookup from 'components/hooks/useExternalLookup';
 import useHighlighter from 'components/hooks/useHighlighter';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import Classification from 'components/visual/Classification';
+import ClassificationMismatchDialog from 'components/visual/ClassificationMismatchDialog';
+import { BOREALIS_TYPE_MAP } from 'components/visual/EnrichmentCustomChip';
+import InputDialog from 'components/visual/InputDialog';
+import SafeBadItem from 'components/visual/SafeBadItem';
 import { isAccessible } from 'helpers/classificationParser';
 import { getSubmitType, safeFieldValueURI, toTitleCase } from 'helpers/utils';
-import React, { useCallback, useEffect } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { HiOutlineExternalLink } from 'react-icons/hi';
 import { Link } from 'react-router-dom';
-import Classification from './Classification';
-import ClassificationMismatchDialog from './ClassificationMismatchDialog';
-import { BOREALIS_TYPE_MAP } from './EnrichmentCustomChip';
-import InputDialog from './InputDialog';
-import SafeBadItem from './SafeBadItem';
 
 const SEARCH_ICON = <SearchOutlinedIcon style={{ marginRight: '16px' }} />;
 const CLIPBOARD_ICON = <AssignmentOutlinedIcon style={{ marginRight: '16px' }} />;
@@ -42,24 +41,6 @@ const initialMenuState = {
   mouseX: null,
   mouseY: null
 };
-
-const useStyles = makeStyles(theme => ({
-  listSubHeaderRoot: {
-    lineHeight: '32px'
-  },
-  link: {
-    marginLeft: theme.spacing(-0.5),
-    paddingLeft: theme.spacing(0.5),
-    borderRadius: theme.spacing(0.5),
-    textDecoration: 'none',
-    color: 'inherit',
-    display: 'flex',
-    cursor: 'pointer',
-    '&:hover': {
-      backgroundColor: theme.palette.action.hover
-    }
-  }
-}));
 
 type Coordinates = {
   mouseX: number | null;
@@ -108,25 +89,24 @@ const WrappedActionMenu: React.FC<TagProps> = ({
   const { t } = useTranslation();
   const { user: currentUser, configuration: currentUserConfig, c12nDef } = useALContext();
   const { copy } = useClipboard();
-  const classes = useStyles();
-  const [confirmationDialog, setConfirmationDialog] = React.useState(false);
-  const [currentEvent, setCurrentEvent] = React.useState<Event>(null);
-  const [currentAllowBypass, setCurrentAllowBypass] = React.useState(false);
-  const [currentLinkClassification, setCurrentLinkClassification] = React.useState('');
-  const [safelistDialog, setSafelistDialog] = React.useState(false);
-  const [safelistReason, setSafelistReason] = React.useState<string>(null);
-  const [badlistDialog, setBadlistDialog] = React.useState(false);
-  const [badlistReason, setBadlistReason] = React.useState<string>(null);
-  const [waitingDialog, setWaitingDialog] = React.useState(false);
-  const [badlisted, setBadlisted] = React.useState(null);
-  const [safelisted, setSafelisted] = React.useState(null);
+  const [confirmationDialog, setConfirmationDialog] = useState(false);
+  const [currentEvent, setCurrentEvent] = useState<Event>(null);
+  const [currentAllowBypass, setCurrentAllowBypass] = useState(false);
+  const [currentLinkClassification, setCurrentLinkClassification] = useState('');
+  const [safelistDialog, setSafelistDialog] = useState(false);
+  const [safelistReason, setSafelistReason] = useState<string>(null);
+  const [badlistDialog, setBadlistDialog] = useState(false);
+  const [badlistReason, setBadlistReason] = useState<string>(null);
+  const [waitingDialog, setWaitingDialog] = useState(false);
+  const [badlisted, setBadlisted] = useState(null);
+  const [safelisted, setSafelisted] = useState(null);
   const { showSuccessMessage } = useMySnackbar();
   const { triggerHighlight } = useHighlighter();
   const { apiCall } = useMyAPI();
 
   const { enrichTagExternal, enrichmentState, getKey } = useExternalLookup();
   const externalLookupResults = enrichmentState[getKey(type, value)];
-  const [allInProgress, setAllInProgress] = React.useState(false);
+  const [allInProgress, setAllInProgress] = useState(false);
   const submitType = category === 'tag' && type.endsWith('.uri') ? 'url' : getSubmitType(value, currentUserConfig)[0];
 
   useEffect(() => {
@@ -193,7 +173,7 @@ const WrappedActionMenu: React.FC<TagProps> = ({
   );
 
   const handleMenuCopy = useCallback(() => {
-    copy(value, 'clipID');
+    copy(value);
     handleClose();
   }, [copy, handleClose, value]);
 
@@ -457,10 +437,9 @@ const WrappedActionMenu: React.FC<TagProps> = ({
             <MenuItem
               dense
               component={Link}
-              to="/submit"
+              to={`/submit`}
               state={{
                 hash: value,
-                tabContext: '1',
                 c12n: classification
               }}
             >
@@ -471,7 +450,7 @@ const WrappedActionMenu: React.FC<TagProps> = ({
         {hasExternalQuery && (
           <div>
             <Divider />
-            <ListSubheader disableSticky classes={{ root: classes.listSubHeaderRoot }}>
+            <ListSubheader disableSticky sx={{ lineHeight: '32px' }}>
               {t('related_external')}
             </ListSubheader>
             <MenuItem dense onClick={() => handleMenuExternalSearch(null)} disabled={allInProgress}>
@@ -493,7 +472,7 @@ const WrappedActionMenu: React.FC<TagProps> = ({
         {hasExternalLinks && (
           <div>
             <Divider />
-            <ListSubheader disableSticky classes={{ root: classes.listSubHeaderRoot }}>
+            <ListSubheader disableSticky sx={{ lineHeight: '32px' }}>
               {t('external_link')}
             </ListSubheader>
 

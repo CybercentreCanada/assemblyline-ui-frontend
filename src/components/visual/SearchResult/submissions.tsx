@@ -2,6 +2,7 @@ import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
 import { AlertTitle, Skeleton, Tooltip } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
+import { useSearchParams } from 'components/core/SearchParams/SearchParamsContext';
 import useALContext from 'components/hooks/useALContext';
 import type { SubmissionIndexed } from 'components/models/base/submission';
 import type { SearchResult } from 'components/models/ui/search';
@@ -19,7 +20,6 @@ import {
 } from 'components/visual/DivTable';
 import InformativeAlert from 'components/visual/InformativeAlert';
 import Moment from 'components/visual/Moment';
-import { useSearchParams } from 'components/visual/SearchBar/SearchParamsContext';
 import SubmissionState from 'components/visual/SubmissionState';
 import Verdict from 'components/visual/Verdict';
 import { maxLenStr } from 'helpers/utils';
@@ -33,7 +33,7 @@ type Props = {
 };
 
 const WrappedSubmissionsTable: React.FC<Props> = ({ submissionResults, allowSort = true }) => {
-  const { t, i18n } = useTranslation(['search']);
+  const { t } = useTranslation(['search']);
   const { c12nDef } = useALContext();
   const searchParams = useSearchParams<SubmissionParams>();
 

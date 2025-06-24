@@ -1,12 +1,12 @@
 import useALContext from 'components/hooks/useALContext';
 import useExternalLookup from 'components/hooks/useExternalLookup';
 import type { ExternalLinkType } from 'components/models/base/config';
-import React, { useCallback } from 'react';
-import ActionMenu from './ActionMenu';
-import type { CustomChipProps } from './CustomChip';
-import CustomChip from './CustomChip';
-import EnrichmentCustomChip, { BOREALIS_TYPE_MAP } from './EnrichmentCustomChip';
-import ExternalLinks from './ExternalSearch';
+import ActionMenu from 'components/visual/ActionMenu';
+import type { CustomChipProps } from 'components/visual/CustomChip';
+import CustomChip from 'components/visual/CustomChip';
+import EnrichmentCustomChip, { BOREALIS_TYPE_MAP } from 'components/visual/EnrichmentCustomChip';
+import ExternalLinks from 'components/visual/ExternalSearch';
+import React, { useCallback, useState } from 'react';
 
 export type ActionableCustomChipProps = CustomChipProps & {
   category?: ExternalLinkType;
@@ -33,7 +33,7 @@ const WrappedActionableCustomChip: React.FC<ActionableCustomChipProps> = ({
   variant = 'outlined',
   ...otherProps
 }) => {
-  const [state, setState] = React.useState(initialMenuState);
+  const [state, setState] = useState(initialMenuState);
   const { configuration } = useALContext();
 
   const handleMenuClick = useCallback(event => {

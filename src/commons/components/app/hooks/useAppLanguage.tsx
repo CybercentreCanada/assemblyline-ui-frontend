@@ -1,4 +1,4 @@
-import { AppContext } from 'commons/components/app/AppProvider';
+import { AppContext } from 'commons/components/app/AppContexts';
 import i18n from 'i18n';
 import { useContext, useEffect, useMemo } from 'react';
 
@@ -8,7 +8,7 @@ export type AppLanguageType = {
   toggle: () => void;
 };
 
-export default function useAppLanguage(onChange?: (language: 'en' | 'fr') => void): AppLanguageType {
+export function useAppLanguage(onChange?: (language: 'en' | 'fr') => void): AppLanguageType {
   const { toggleLanguage } = useContext(AppContext);
 
   useEffect(() => {

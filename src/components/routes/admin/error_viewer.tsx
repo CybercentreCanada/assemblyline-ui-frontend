@@ -3,34 +3,27 @@ import PanToolOutlinedIcon from '@mui/icons-material/PanToolOutlined';
 import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
 import { Grid, MenuItem, Select, Typography, useTheme } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
-import useAppUser from 'commons/components/app/hooks/useAppUser';
+import { useAppUser } from 'commons/components/app/hooks';
+import PageContainer from 'commons/components/pages/PageContainer';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
-import PageHeader from 'commons/components/pages/PageHeader';
+import type { SearchParams } from 'components/core/SearchParams/SearchParams';
+import { createSearchParams } from 'components/core/SearchParams/SearchParams';
+import { SearchParamsProvider, useSearchParams } from 'components/core/SearchParams/SearchParamsContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import type { Error } from 'components/models/base/error';
+import type { FacetResult, HistogramResult, SearchResult } from 'components/models/ui/search';
 import type { CustomUser } from 'components/models/ui/user';
+import { ErrorDetail } from 'components/routes/admin/error_detail';
 import Histogram from 'components/visual/Histogram';
 import LineGraph from 'components/visual/LineGraph';
 import SearchHeader from 'components/visual/SearchBar/SearchHeader';
-import type { SearchParams } from 'components/visual/SearchBar/SearchParams';
-import { createSearchParams } from 'components/visual/SearchBar/SearchParams';
-import { SearchParamsProvider, useSearchParams } from 'components/visual/SearchBar/SearchParamsContext';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import ErrorsTable from 'components/visual/SearchResult/errors';
 import { safeFieldValue } from 'helpers/utils';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate, useNavigate } from 'react-router';
-import { useLocation } from 'react-router-dom';
-import { ErrorDetail } from './error_detail';
-
-type SearchResults = {
-  items: Error[];
-  offset: number;
-  rows: number;
-  total: number;
-};
+import { Navigate, useLocation, useNavigate } from 'react-router';
 
 const TIME_CONTRAINTS = ['24h', '4d', '7d', '1m', '1y'] as const;
 
@@ -86,10 +79,10 @@ const ErrorViewer = () => {
   const { globalDrawerOpened, setGlobalDrawer, closeGlobalDrawer } = useDrawer();
   const { search, setSearchParams, setSearchObject } = useSearchParams<ErrorViewerParams>();
 
-  const [errorResults, setErrorResults] = useState<SearchResults>(null);
-  const [histogram, setHistogram] = useState<{ [s: string]: number }>(null);
-  const [types, setTypes] = useState<{ [s: string]: number }>(null);
-  const [names, setNames] = useState<{ [s: string]: number }>(null);
+  const [errorResults, setErrorResults] = useState<SearchResult<Error>>(null);
+  const [histogram, setHistogram] = useState<HistogramResult>(null);
+  const [types, setTypes] = useState<FacetResult>(null);
+  const [names, setNames] = useState<FacetResult>(null);
   const [searching, setSearching] = useState<boolean>(false);
   const [suggestions, setSuggestions] = useState<string[]>(DEFAULT_SUGGESTION);
 
@@ -97,6 +90,16 @@ const ErrorViewer = () => {
     (error_key: string) => navigate(`${location.pathname}${location.search || ''}#${error_key}`),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [location.search]
+  );
+
+  const handleToggleFilter = useCallback(
+    (filter: string) => {
+      setSearchObject(o => {
+        const filters = o.filters.includes(filter) ? o.filters.filter(f => f !== filter) : [...o.filters, filter];
+        return { ...o, offset: 0, filters };
+      });
+    },
+    [setSearchObject]
   );
 
   useEffect(() => {
@@ -108,23 +111,16 @@ const ErrorViewer = () => {
       filters: o.tc in TC_MAP && o.tc !== '1y' ? [...o.filters, TC_MAP[o.tc]] : o.filters
     }));
 
-    apiCall({
+    apiCall<SearchResult<Error>>({
       url: `/api/v4/error/list/?${body
         .pick(['query', 'filters', 'offset', 'rows', 'sort', 'track_total_hits'])
         .toString()}`,
-      onSuccess: ({ api_response }) => setErrorResults(api_response as SearchResults),
+      onSuccess: ({ api_response }) => setErrorResults(api_response),
       onEnter: () => setSearching(true),
       onExit: () => setSearching(false)
     });
 
-    apiCall({
-      url: '/api/v4/search/facet/error/response.service_name/',
-      method: 'POST',
-      body: body.pick(['query', 'mincount', 'filters', 'timeout', 'use_archive', 'archive_only']).toObject(),
-      onSuccess: ({ api_response }) => setNames(api_response as { [s: string]: number })
-    });
-
-    apiCall({
+    apiCall<HistogramResult>({
       url: '/api/v4/search/histogram/error/created/',
       method: 'POST',
       body: {
@@ -133,14 +129,47 @@ const ErrorViewer = () => {
         end: 'now',
         gap: GAP_MAP[body.get('tc')]
       },
-      onSuccess: ({ api_response }) => setHistogram(api_response as { [s: string]: number })
+      onSuccess: ({ api_response }) => setHistogram(api_response)
     });
 
-    apiCall({
+    apiCall<FacetResult>({
+      url: '/api/v4/search/facet/error/response.service_name/',
+      method: 'POST',
+      body: body
+        .pick(['query', 'mincount', 'filters', 'timeout', 'use_archive', 'archive_only'])
+        .set(s => {
+          s.mincount = 1;
+          return s;
+        })
+        .toObject(),
+      onSuccess: ({ api_response }) =>
+        setNames(
+          Object.fromEntries(
+            Object.keys(api_response)
+              .sort((a, b) => api_response[b] - api_response[a])
+              .map(k => [k, api_response[k]])
+          )
+        )
+    });
+
+    apiCall<FacetResult>({
       url: '/api/v4/search/facet/error/type/',
       method: 'POST',
-      body: body.pick(['query', 'mincount', 'filters', 'timeout', 'use_archive', 'archive_only']).toObject(),
-      onSuccess: ({ api_response }) => setTypes(api_response as { [s: string]: number })
+      body: body
+        .pick(['query', 'mincount', 'filters', 'timeout', 'use_archive', 'archive_only'])
+        .set(s => {
+          s.mincount = 1;
+          return s;
+        })
+        .toObject(),
+      onSuccess: ({ api_response }) =>
+        setTypes(
+          Object.fromEntries(
+            Object.keys(api_response)
+              .sort((a, b) => api_response[b] - api_response[a])
+              .map(k => [k, api_response[k]])
+          )
+        )
     });
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -172,10 +201,10 @@ const ErrorViewer = () => {
   return currentUser.is_admin ? (
     <PageFullWidth margin={4}>
       <Grid container spacing={2} style={{ paddingBottom: theme.spacing(2) }}>
-        <Grid item xs={12} sm={7} md={9} xl={10}>
+        <Grid size={{ xs: 12, sm: 7, md: 9, xl: 10 }}>
           <Typography variant="h4">{t('title')}</Typography>
         </Grid>
-        <Grid item xs={12} sm={5} md={3} xl={2}>
+        <Grid size={{ xs: 12, sm: 5, md: 3, xl: 2 }}>
           <FormControl size="small" fullWidth>
             <Select
               disabled={searching}
@@ -192,7 +221,7 @@ const ErrorViewer = () => {
         </Grid>
       </Grid>
 
-      <PageHeader isSticky>
+      <PageContainer isSticky>
         <div style={{ paddingTop: theme.spacing(1) }}>
           <SearchHeader
             params={search.toParams()}
@@ -207,36 +236,47 @@ const ErrorViewer = () => {
             searchInputProps={{ placeholder: t('filter'), options: suggestions }}
             actionProps={[
               {
-                tooltip: { title: t('exception') },
+                tooltip: {
+                  title: search.has('filters', 'type:(EXCEPTION OR UNKNOWN)')
+                    ? t('filter.exception.remove')
+                    : t('filter.exception.add')
+                },
                 icon: { children: <ReportProblemOutlinedIcon /> },
                 button: {
-                  onClick: () =>
-                    setSearchObject(o => ({ ...o, offset: 0, filters: [...o.filters, 'type:(EXCEPTION OR UNKNOWN)'] }))
+                  color: search.has('filters', 'type:(EXCEPTION OR UNKNOWN)') ? 'primary' : 'default',
+                  onClick: () => handleToggleFilter('type:(EXCEPTION OR UNKNOWN)')
                 }
               },
               {
-                tooltip: { title: t('canceled') },
+                tooltip: {
+                  title: search.has('filters', 'type:(SERVICE* OR TASK*)')
+                    ? t('filter.canceled.remove')
+                    : t('filter.canceled.add')
+                },
                 icon: { children: <CancelOutlinedIcon /> },
                 button: {
-                  onClick: () =>
-                    setSearchObject(o => ({ ...o, offset: 0, filters: [...o.filters, 'type:(SERVICE* OR TASK*)'] }))
+                  color: search.has('filters', 'type:(SERVICE* OR TASK*)') ? 'primary' : 'default',
+                  onClick: () => handleToggleFilter('type:(SERVICE* OR TASK*)')
                 }
               },
               {
-                tooltip: { title: t('maxed') },
+                tooltip: {
+                  title: search.has('filters', 'type:MAX*') ? t('filter.maxed.remove') : t('filter.maxed.add')
+                },
                 icon: { children: <PanToolOutlinedIcon /> },
                 button: {
-                  onClick: () => setSearchObject(o => ({ ...o, offset: 0, filters: [...o.filters, 'type:MAX*'] }))
+                  color: search.has('filters', 'type:MAX*') ? 'primary' : 'default',
+                  onClick: () => handleToggleFilter('type:MAX*')
                 }
               }
             ]}
           />
         </div>
-      </PageHeader>
+      </PageContainer>
 
       {errorResults !== null && errorResults.total !== 0 && (
         <Grid container spacing={2}>
-          <Grid item xs={12} lg={4}>
+          <Grid size={{ xs: 12, lg: 4 }}>
             <Histogram
               dataset={histogram}
               height="200px"
@@ -246,7 +286,7 @@ const ErrorViewer = () => {
               verticalLine
             />
           </Grid>
-          <Grid item xs={12} md={6} lg={4}>
+          <Grid size={{ xs: 12, md: 6, lg: 4 }}>
             <LineGraph
               dataset={names}
               height="200px"
@@ -260,7 +300,7 @@ const ErrorViewer = () => {
               }}
             />
           </Grid>
-          <Grid item xs={12} md={6} lg={4}>
+          <Grid size={{ xs: 12, md: 6, lg: 4 }}>
             <LineGraph
               dataset={types}
               height="200px"

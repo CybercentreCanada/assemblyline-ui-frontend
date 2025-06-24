@@ -9,17 +9,18 @@ import {
   TextField,
   Typography
 } from '@mui/material';
+import type { ChangeEvent, MouseEvent } from 'react';
 
 export type InputDialogProps = {
   open: boolean;
-  handleClose: (event?: any) => void;
-  handleAccept: (event?: any) => void;
+  handleClose: (event?: MouseEvent<HTMLButtonElement>) => void;
+  handleAccept: (event?: MouseEvent<HTMLButtonElement>) => void;
   title: string;
   cancelText: string;
   acceptText: string;
   waiting?: boolean;
   text?: string | React.ReactNode;
-  handleInputChange: (event?: any) => void;
+  handleInputChange: (event?: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   inputValue: string;
   inputLabel?: string;
   extra?: React.ReactNode;
@@ -72,18 +73,7 @@ const InputDialog = ({
       </Button>
       <Button onClick={handleAccept} color="primary" disabled={!inputValue || waiting}>
         {acceptText}
-        {waiting && (
-          <CircularProgress
-            size={24}
-            style={{
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              marginTop: -12,
-              marginLeft: -12
-            }}
-          />
-        )}
+        {waiting && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
       </Button>
     </DialogActions>
   </Dialog>

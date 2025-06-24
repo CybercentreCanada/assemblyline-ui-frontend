@@ -1,24 +1,7 @@
-import type { Theme } from '@mui/material';
 import { Skeleton, useTheme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
+import type { ActionableCustomChipProps } from 'components/visual/ActionableCustomChip';
+import ActionableCustomChip from 'components/visual/ActionableCustomChip';
 import React from 'react';
-import type { ActionableCustomChipProps } from './ActionableCustomChip';
-import ActionableCustomChip from './ActionableCustomChip';
-
-const useStyles = makeStyles((theme: Theme) => ({
-  chiplist: {
-    display: 'inline-flex',
-    flexWrap: 'wrap',
-    listStyle: 'none',
-    padding: 0,
-    boxShadow: 'inherit',
-    margin: 0
-  },
-  chip: {
-    marginBottom: theme.spacing(0.5),
-    marginRight: theme.spacing(1)
-  }
-}));
 
 type ActionableChipListProps = {
   items: ActionableCustomChipProps[];
@@ -40,16 +23,33 @@ const ChipSkeletonInline = () => (
 
 const ActionableChipList: React.FC<ActionableChipListProps> = ({ items, nowrap = false }) => {
   const theme = useTheme();
-  const classes = useStyles();
   return (
-    <ul className={classes.chiplist}>
+    <ul
+      style={{
+        display: 'inline-flex',
+        flexWrap: 'wrap',
+        listStyle: 'none',
+        padding: 0,
+        boxShadow: 'inherit',
+        margin: 0
+      }}
+    >
       {items
         ? items.map((cp, i) => (
             <li key={`chiplist-${i}`}>
-              <ActionableCustomChip size="small" className={classes.chip} wrap={!nowrap} {...cp} />
+              <ActionableCustomChip
+                size="small"
+                wrap={!nowrap}
+                {...cp}
+                sx={{
+                  marginBottom: theme.spacing(0.5),
+                  marginRight: theme.spacing(1),
+                  ...cp?.sx
+                }}
+              />
             </li>
           ))
-        : [...Array(3)].map((k, i) => (
+        : Array.from({ length: 3 }).map((k, i) => (
             <Skeleton
               key={`chiplist-${i}`}
               variant="rectangular"

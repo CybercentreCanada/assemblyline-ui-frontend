@@ -1,23 +1,20 @@
-import { useTheme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
+import ReactJson from '@microlink/react-json-view';
+import { styled, useTheme } from '@mui/material';
 import type { JSONBody as JSONData } from 'components/models/base/result_body';
 import { default as React } from 'react';
-import ReactJson from 'react-json-view';
 
-const useStyles = makeStyles(theme => ({
-  json: {
-    '@media print': {
-      backgroundColor: '#00000005',
-      border: '1px solid #DDD'
-    },
-    backgroundColor: theme.palette.mode === 'dark' ? '#ffffff05' : '#00000005',
-    border: `1px solid ${theme.palette.divider}`,
-    borderRadius: '4px',
-    padding: '4px',
-    whiteSpace: 'pre-wrap',
-    wordBreak: 'break-word',
-    margin: '0.25rem 0'
-  }
+const JSONContainer = styled('pre')(({ theme }) => ({
+  '@media print': {
+    backgroundColor: '#00000005',
+    border: '1px solid #DDD'
+  },
+  backgroundColor: theme.palette.mode === 'dark' ? '#ffffff05' : '#00000005',
+  border: `1px solid ${theme.palette.divider}`,
+  borderRadius: '4px',
+  padding: '4px',
+  whiteSpace: 'pre-wrap',
+  wordBreak: 'break-word',
+  margin: '0.25rem 0'
 }));
 
 type Props = {
@@ -26,15 +23,14 @@ type Props = {
 };
 
 const WrappedJSONBody = ({ body, printable }: Props) => {
-  const classes = useStyles();
   const theme = useTheme();
 
   if (printable) {
     const pprint = JSON.stringify(body, undefined, 2);
     return (
-      <pre id="json" className={classes.json}>
+      <JSONContainer id="json">
         <code>{pprint}</code>
-      </pre>
+      </JSONContainer>
     );
   } else {
     const jsonTheme = {

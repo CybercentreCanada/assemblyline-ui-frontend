@@ -1,5 +1,6 @@
-import type { Configuration, HashPatternMap } from 'components/models/base/config';
-import type { PossibleColors } from 'components/visual/CustomChip';
+import type { Configuration, FileSource, HashPatternMap } from 'components/models/base/config';
+import type { PossibleColor } from 'helpers/colors';
+import { LOWERCASE_HASH, URL_REGEX } from 'helpers/constants';
 
 /**
  *
@@ -164,7 +165,7 @@ const COLOR_MAP = {
  * @returns color
  *
  */
-export function verdictToColor(verdict): PossibleColors {
+export function verdictToColor(verdict): PossibleColor {
   return COLOR_MAP[verdict];
 }
 
@@ -374,6 +375,26 @@ export function matchSHA256(data: string) {
 
 /**
  *
+ * A defanged URL has had some of its parts changed to make it inaccessible or unclickable
+ * Here is the list of techniques used to refang URLs:
+ * https://www.npmjs.com/package/fanger
+ *
+ * @param value - URL to be refanged
+ * @returns refanged URL
+ */
+const refang = (value: string): string =>
+  value
+    .replaceAll(' ', '')
+    .replaceAll(/[[|(|{](\.|dot)[\]|)|}]/g, '.')
+    .replaceAll(/[[|(|{](@|at)[\]|)|}]/g, '@')
+    .replaceAll(/[[|(|{]\/[\]|)|}]/g, '/')
+    .replaceAll(/[[|(|{]:[\]|)|}]/g, ':')
+    .replaceAll(/[[|(|{]:\/\/[\]|)|}]/g, '://')
+    .replaceAll('\\.', '.')
+    .replaceAll(/h(x|X){1,2}p/g, 'http');
+
+/**
+ *
  * Matches on valid URL and returns the result array. Returns `null` on invalid URLs.
  * Note: Path and Query params are validated but not captured.
  *
@@ -382,11 +403,7 @@ export function matchSHA256(data: string) {
  * @returns Matching RegEx Result Array or NULL
  *
  */
-export function matchURL(data: string): RegExpExecArray | null {
-  const urlParseRE =
-    /((([A-Za-z]{3,9}:(?:\/\/)?)(?:[-;:&=+$,\w]+@)?[A-Za-z0-9.-]+|(?:www\.|[-;:&=+$,\w]+@)[A-Za-z0-9.-]+)((?:\/[+~%/.\w\-_]*)?\??(?:[-+=&;%@.\w_]*)#?(?:[.!/\\\w]*))?)/;
-  return urlParseRE.exec(data);
-}
+export const isURL = (value: string): boolean => !!URL_REGEX.exec(refang(value));
 
 /**
  *
@@ -398,7 +415,7 @@ export function matchURL(data: string): RegExpExecArray | null {
  * @returns new object with filtered keys
  *
  */
-export function filterObject(obj: Object, callback) {
+export function filterObject(obj: object, callback) {
   return Object.fromEntries(Object.entries(obj).filter(([key, val]) => callback(val, key)));
 }
 
@@ -420,11 +437,14 @@ export function getSubmitType(input: string, configuration: Configuration): [Has
 
   // If we're trying to auto-detect the input type, iterate over file sources
   const detectedHashType = Object.entries(configuration.submission.file_sources).find(
-    ([_, hashProps]) => hashProps && value.trim().match(new RegExp(hashProps?.pattern))
+    ([hashType, hashProps]: [HashPatternMap, FileSource]) =>
+      hashProps &&
+      (LOWERCASE_HASH.includes(hashType) ? value.toLowerCase() : value).trim().match(new RegExp(hashProps?.pattern))
   )?.[0] as HashPatternMap;
 
-  if (detectedHashType) return [detectedHashType, value.trim()];
-  else if (!detectedHashType && matchURL(value.trimStart())) return ['url', value.trimStart()];
+  if (detectedHashType)
+    return [detectedHashType, (LOWERCASE_HASH.includes(detectedHashType) ? value.toLowerCase() : value).trim()];
+  else if (!detectedHashType && isURL(value)) return ['url', value.trimStart()];
   else return [null, input];
 }
 
@@ -437,7 +457,5 @@ export function getSubmitType(input: string, configuration: Configuration): [Has
  * @returns type as number
  *
  */
-type ObjectOfInts = {
-  [name: string]: number;
-};
+type ObjectOfInts = Record<string, number>;
 export const sumValues = (obj: ObjectOfInts) => Object.values(obj).reduce((a, b) => a + b, 0);

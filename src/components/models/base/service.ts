@@ -1,13 +1,7 @@
+import type { RegistryType, ServiceCategory } from 'components/models/base/config';
+
 export const ACCESS_MODES = ['ReadWriteOnce', 'ReadWriteMany'] as const;
-export const DEFAULT_SERVICE_SELECTED = [
-  'Filtering',
-  'Antivirus',
-  'Static Analysis',
-  'Extraction',
-  'Networking'
-] as const;
 export const OPERATING_SYSTEMS = ['windows', 'linux'] as const;
-export const REGISTRY_TYPES = ['docker', 'harbor'] as const;
 export const SUBMISSION_PARAM_TYPES = ['str', 'int', 'list', 'bool'] as const;
 export const UPDATE_CHANNELS = ['stable', 'rc', 'beta', 'dev'] as const;
 export const FETCH_METHODS = ['GET', 'POST', 'GIT'] as const;
@@ -23,9 +17,7 @@ export const SIGNATURE_DELIMITERS = {
 } as const;
 
 export type AccessMode = (typeof ACCESS_MODES)[number];
-export type DefaultServiceSelected = (typeof DEFAULT_SERVICE_SELECTED)[number];
 export type OperatingSystem = (typeof OPERATING_SYSTEMS)[number];
-export type RegistryType = (typeof REGISTRY_TYPES)[number];
 export type SubmissionParamType = (typeof SUBMISSION_PARAM_TYPES)[number];
 export type UpdateChannel = (typeof UPDATE_CHANNELS)[number];
 export type SignatureDelimiter = keyof typeof SIGNATURE_DELIMITERS;
@@ -44,7 +36,7 @@ export type FetchMethod = (typeof FETCH_METHODS)[number];
 export type ServiceParameter =
   | {
       type: 'bool';
-      hide: boolean | 'true' | 'false';
+      hide?: boolean | 'true' | 'false';
       name: string;
       value: boolean | 'true' | 'false';
       default: boolean | 'true' | 'false';
@@ -52,7 +44,7 @@ export type ServiceParameter =
     }
   | {
       type: 'int';
-      hide: boolean | 'true' | 'false';
+      hide?: boolean | 'true' | 'false';
       name: string;
       value: number;
       default: number;
@@ -60,7 +52,7 @@ export type ServiceParameter =
     }
   | {
       type: 'str';
-      hide: boolean | 'true' | 'false';
+      hide?: boolean | 'true' | 'false';
       name: string;
       value: string;
       default: string;
@@ -68,7 +60,7 @@ export type ServiceParameter =
     }
   | {
       type: 'list';
-      hide: boolean | 'true' | 'false';
+      hide?: boolean | 'true' | 'false';
       name: string;
       value: string;
       default: string;
@@ -97,16 +89,25 @@ export type ServiceSpecification = {
 /** Selected services */
 export type SelectedService = {
   /** Which category does this service belong to? */
-  category?: DefaultServiceSelected;
+  category?: ServiceCategory;
 
   /** Description of service */
-  description: string;
+  description?: string;
 
   /** Does this service perform analysis outside of Assemblyline? */
   is_external?: boolean;
 
   /** Name of the service category */
-  name?: DefaultServiceSelected;
+  name?: string;
+
+  /** Is the category selected */
+  selected?: boolean;
+};
+
+/** Selected services */
+export type SelectedServiceCategory = {
+  /** Name of the service category */
+  name?: ServiceCategory;
 
   /** Is the category selected */
   selected?: boolean;
@@ -228,13 +229,13 @@ export type SourceStatus = {
   ts: string;
 };
 
-/** Update Source Configuration */
-export type UpdateSource = {
+/** Common parts of Update Source Configuration */
+export type UpdateSourceCommon = {
   /** CA cert for source */
   ca_cert?: string;
 
   /** Processing configuration for source */
-  configuration?: { [key: string]: any };
+  configuration?: Record<string, any>;
 
   /** Default classification used in absence of one defined in files from source */
   default_classification: string;
@@ -251,7 +252,7 @@ export type UpdateSource = {
   /** Headers */
   headers: EnvironmentVariable[];
 
-  //** Ignore caching */
+  /** Ignore caching */
   ignore_cache: boolean;
 
   /** Name of source */
@@ -260,11 +261,11 @@ export type UpdateSource = {
   /** Override signature classification with source */
   override_classification: boolean;
 
-  /** Password used to authenticate with source */
-  password?: string;
-
   /** Pattern used to find files of interest from source */
   pattern?: string;
+
+  /** Data that's sent in POST requests */
+  data?: string;
 
   /** Private key used to authenticate with source */
   private_key?: string;
@@ -275,7 +276,7 @@ export type UpdateSource = {
   /** Ignore SSL errors when reaching out to source? */
   ssl_ignore_errors: boolean;
 
-  /**  */
+  /** Source status */
   status: SourceStatus;
 
   /** Synchronize signatures with remote source. Allows system to auto-disable signatures no longer found in source. */
@@ -287,14 +288,31 @@ export type UpdateSource = {
   /** URI to source */
   uri: string;
 
-  /** Username used to authenticate with source */
-  username?: string;
+  /** Use managed identity to authenticate git pull*/
+  use_managed_identity: boolean;
 };
+
+/** Update Source Configuration with managed identity constraints */
+export type UpdateSource = UpdateSourceCommon &
+  (
+    | {
+        use_managed_identity: true;
+        fetch_method: 'GIT';
+      }
+    | {
+        use_managed_identity: false;
+        username?: string;
+        password?: string;
+      }
+  );
 
 /** Update Configuration for Signatures */
 export type UpdateConfig = {
   /** Custom delimiter definition */
   custom_delimiter?: string;
+
+  /** Default pattern for finding signatures*/
+  default_pattern: string;
 
   /** Does the updater produce signatures? */
   generates_signatures: boolean;
@@ -316,6 +334,9 @@ export type UpdateConfig = {
 export type Service = {
   /** Regex to accept files as identified by Assemblyline */
   accepts: string;
+
+  /** Should the service auto-update? */
+  auto_update: boolean;
 
   /** Which category does this service belong to? */
   category: string;
@@ -418,7 +439,7 @@ export type ServiceConstants = {
   stages: string[];
 };
 
-export type ServiceUpdates = { [service_name: string]: ServiceUpdateData };
+export type ServiceUpdates = Record<string, ServiceUpdateData>;
 
 export type ServiceIndexed = Pick<
   Service,
@@ -447,6 +468,7 @@ export const DEFAULT_SOURCE: UpdateSource = {
   override_classification: false,
   password: '',
   pattern: '',
+  data: null,
   private_key: '',
   proxy: '',
   ssl_ignore_errors: false,
@@ -460,5 +482,6 @@ export const DEFAULT_SOURCE: UpdateSource = {
     state: '',
     ts: ''
   },
-  sync: false
+  sync: false,
+  use_managed_identity: false
 };

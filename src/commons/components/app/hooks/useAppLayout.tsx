@@ -1,6 +1,6 @@
-import { AppLayoutContext } from 'commons/components/app/providers/AppLayoutProvider';
+import { AppLayoutContext } from 'commons/components/app/AppContexts';
 import { useContext } from 'react';
 
-export default function useAppLayout() {
+export function useAppLayout() {
   return useContext(AppLayoutContext);
 }

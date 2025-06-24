@@ -1,7 +1,16 @@
-/* eslint-disable no-unused-vars */
 import { Clear, Search } from '@mui/icons-material';
-import type { InputBaseProps } from '@mui/material';
-import { CircularProgress, IconButton, InputAdornment, InputBase, Stack, Typography } from '@mui/material';
+import {
+  Button,
+  CircularProgress,
+  IconButton,
+  InputAdornment,
+  InputBase,
+  type InputBaseProps,
+  Stack,
+  Tooltip
+} from '@mui/material';
+
+import type { CSSProperties } from 'react';
 import { memo, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -12,9 +21,10 @@ type AppSearchInputProps = {
   showToggle?: boolean;
   showClear?: boolean;
   open?: boolean;
-  minWidth?: string | number;
-  maxWidth?: string | number;
+  minWidth?: CSSProperties['minWidth'];
+  maxWidth?: CSSProperties['maxWidth'];
   onClear: () => void;
+  onToggleFullscreen: () => void;
 } & InputBaseProps;
 
 const AppSearchInput = ({
@@ -30,19 +40,24 @@ const AppSearchInput = ({
   minWidth = '100%',
   onBlur,
   onClear,
+  onToggleFullscreen,
   onFocus,
   onChange,
   onKeyDown,
   ...inputProps
 }: AppSearchInputProps) => {
   const { t } = useTranslation();
-  const rootRef = useRef<HTMLDivElement>();
+  const rootRef = useRef<HTMLDivElement>(undefined);
 
   // CTRL+K button click handler.
   // Decicde whether to open search in normal or fullscreen/modal mode.
   const onToggleClick = useCallback(() => {
-    rootRef.current.querySelector('input').focus();
-  }, []);
+    if (open && provided) {
+      onToggleFullscreen();
+    } else {
+      rootRef.current.querySelector('input').focus();
+    }
+  }, [open, provided, onToggleFullscreen]);
 
   return (
     <Stack direction="row" justifyContent="flex-end" flexGrow={2} ref={rootRef}>
@@ -50,6 +65,7 @@ const AppSearchInput = ({
         {...inputProps}
         fullWidth
         autoComplete="off"
+        // eslint-disable-next-line jsx-a11y/no-autofocus
         autoFocus={autoFocus}
         value={value}
         onBlur={onBlur}
@@ -66,14 +82,16 @@ const AppSearchInput = ({
         endAdornment={
           <InputAdornment position="end" sx={theme => ({ color: theme.palette.text.disabled })}>
             {showToggle && !focused && (
-              <Typography
-                variant="button"
-                color="inherit"
-                sx={{ fontSize: 'small', marginRight: '8px' }}
-                onClick={onToggleClick}
-              >
-                CTRL+K
-              </Typography>
+              <Tooltip title={t(open && provided ? 'app.search.fullscreen' : 'app.search.shortcut')}>
+                <Button
+                  size="small"
+                  color="inherit"
+                  onClick={onToggleClick}
+                  sx={{ fontSize: 'small', marginRight: '8px', padding: 0, minWidth: 'auto' }}
+                >
+                  CTRL+K
+                </Button>
+              </Tooltip>
             )}
             {showClear && (
               <IconButton color="inherit" onClick={onClear} disabled={!value}>

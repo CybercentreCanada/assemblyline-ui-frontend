@@ -1,16 +1,6 @@
 import { useMediaQuery, useTheme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
-import React, { LegacyRef } from 'react';
-
-const useStyles = makeStyles(theme => ({
-  page: {
-    display: 'flex',
-    flexDirection: 'column',
-    height: '100%',
-    width: '100%',
-    minHeight: 0
-  }
-}));
+import type { LegacyRef } from 'react';
+import React from 'react';
 
 type PageFullSizeProps = {
   id?: string;
@@ -28,7 +18,6 @@ type PageFullSizeProps = {
 };
 
 const PageFullSize: React.FC<PageFullSizeProps> = ({
-  id,
   ref,
   children,
   margin = null,
@@ -41,12 +30,21 @@ const PageFullSize: React.FC<PageFullSizeProps> = ({
     paper: null
   }
 }) => {
-  const classes = useStyles();
   const theme = useTheme();
   const divider = useMediaQuery(theme.breakpoints.up('md')) ? 1 : 2;
 
   return (
-    <div className={classes.page} ref={ref} style={{ ...styles.root }}>
+    <div
+      ref={ref}
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        width: '100%',
+        minHeight: 0,
+        ...styles.root
+      }}
+    >
       <div
         style={{
           marginBottom: theme.spacing(margin / divider || mb / divider),

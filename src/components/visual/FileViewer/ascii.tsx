@@ -1,58 +1,70 @@
 import AssistantOutlinedIcon from '@mui/icons-material/AssistantOutlined';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import { Alert, Button, CircularProgress, Grid, LinearProgress, Tooltip, useMediaQuery, useTheme } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
-import useAppUser from 'commons/components/app/hooks/useAppUser';
+import {
+  Alert,
+  Button,
+  CircularProgress,
+  Grid,
+  LinearProgress,
+  styled,
+  Tooltip,
+  useMediaQuery,
+  useTheme
+} from '@mui/material';
+import { useAppUser } from 'commons/components/app/hooks';
 import useMyAPI from 'components/hooks/useMyAPI';
+import useMySnackbar from 'components/hooks/useMySnackbar';
 import type { CustomUser } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
 import AIMarkdown from 'components/visual/AiMarkdown';
 import MonacoEditor, { LANGUAGE_SELECTOR } from 'components/visual/MonacoEditor';
+import type { editor } from 'monaco-editor';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-const useStyles = makeStyles(theme => ({
-  aiButton: {
-    height: '100%',
-    minWidth: theme.spacing(6),
-    padding: `${theme.spacing(2)} ${theme.spacing(1)}`,
-    borderColor: theme.palette.divider,
-    borderRadius: 0,
-    alignItems: 'flex-start',
-    borderLeftWidth: '0px'
-  },
-  code: {
-    display: 'flex',
-    flexDirection: 'column',
-    backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#FFF',
-    border: `1px solid ${theme.palette.divider}`,
-    color: theme.palette.mode === 'dark' ? theme.palette.text.secondary : theme.palette.text.primary,
-    padding: theme.spacing(2),
-    textAlign: 'left',
-    whiteSpace: 'normal',
-    overflowY: 'auto',
-    borderLeftWidth: '0px',
-    wordBreak: 'break-word',
-    position: 'absolute',
-    top: 0,
-    bottom: 0,
-    right: 0,
-    left: 0
-  },
-  spinner: {
-    textAlign: 'center',
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)'
-  },
-  watermark: {
-    float: 'right',
-    color: theme.palette.text.disabled,
-    fontSize: 'smaller',
-    cursor: 'pointer'
-  }
+const AIButton = styled(Button)(({ theme }) => ({
+  height: '100%',
+  minWidth: theme.spacing(6),
+  padding: `${theme.spacing(2)} ${theme.spacing(1)}`,
+  borderColor: theme.palette.divider,
+  borderRadius: 0,
+  alignItems: 'flex-start',
+  borderLeftWidth: '0px'
+}));
+
+const Code = styled('div')(({ theme }) => ({
+  display: 'flex',
+  flexDirection: 'column',
+  backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#FFF',
+  border: `1px solid ${theme.palette.divider}`,
+  color: theme.palette.mode === 'dark' ? theme.palette.text.secondary : theme.palette.text.primary,
+  padding: theme.spacing(2),
+  textAlign: 'left',
+  whiteSpace: 'normal',
+  overflowY: 'auto',
+  borderLeftWidth: '0px',
+  wordBreak: 'break-word',
+  position: 'absolute',
+  top: 0,
+  bottom: 0,
+  right: 0,
+  left: 0
+}));
+
+const Spinner = styled('div')(() => ({
+  textAlign: 'center',
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)'
+}));
+
+const Watermark = styled('div')(({ theme }) => ({
+  float: 'right',
+  color: theme.palette.text.disabled,
+  fontSize: 'smaller',
+  cursor: 'pointer'
 }));
 
 type Props = {
@@ -60,29 +72,33 @@ type Props = {
   type?: string;
   codeAllowed?: boolean;
   archiveOnly?: boolean;
+  options?: editor.IStandaloneEditorConstructionOptions;
+  onDataTruncated?: (truncated: boolean) => void;
 };
 
 const WrappedASCIISection: React.FC<Props> = ({
   sha256,
   type: propType = null,
   codeAllowed = false,
-  archiveOnly = false
+  archiveOnly = false,
+  options = null,
+  onDataTruncated = () => null
 }) => {
-  const { apiCall } = useMyAPI();
-  const { user: currentUser } = useAppUser<CustomUser>();
   const { t, i18n } = useTranslation(['fileViewer']);
-  const classes = useStyles();
   const theme = useTheme();
-  const [analysing, setAnalysing] = useState(false);
-  const [codeError, setCodeError] = useState(null);
-  const [codeSummary, setCodeSummary] = useState(null);
-  const [codeTruncated, setCodeTruncated] = useState(false);
-  const [showCodeSummary, setShowCodeSummary] = useState(false);
-
-  const isMdUp = useMediaQuery(theme.breakpoints.up('md'));
+  const { apiCall } = useMyAPI();
+  const { showErrorMessage, closeSnackbar } = useMySnackbar();
+  const { user: currentUser } = useAppUser<CustomUser>();
 
   const [data, setData] = useState<string>(null);
   const [error, setError] = useState<string>(null);
+  const [codeError, setCodeError] = useState<string>(null);
+  const [codeSummary, setCodeSummary] = useState<string>(null);
+  const [analysing, setAnalysing] = useState<boolean>(false);
+  const [codeTruncated, setCodeTruncated] = useState<boolean>(false);
+  const [showCodeSummary, setShowCodeSummary] = useState<boolean>(false);
+
+  const isMdUp = useMediaQuery(theme.breakpoints.up('md'));
 
   const type = useMemo<string>(() => (propType && propType in LANGUAGE_SELECTOR ? propType : 'unknown'), [propType]);
 
@@ -95,7 +111,7 @@ const WrappedASCIISection: React.FC<Props> = ({
       if (archiveOnly) {
         params.push('archive_only');
       }
-      apiCall({
+      apiCall<{ content: string; truncated: boolean }>({
         allowCache: !noCache,
         url: `/api/v4/file/code_summary/${sha256}/${params ? `?${params.join('&')}` : ''}`,
         onSuccess: api_data => {
@@ -120,14 +136,19 @@ const WrappedASCIISection: React.FC<Props> = ({
 
   useEffect(() => {
     if (!sha256 || data) return;
-    apiCall({
+    apiCall<{ content: string; truncated: boolean }>({
       url: `/api/v4/file/ascii/${sha256}/`,
       allowCache: true,
       onEnter: () => {
         setData(null);
         setError(null);
+        closeSnackbar();
       },
-      onSuccess: api_data => setData(api_data.api_response),
+      onSuccess: ({ api_response }) => {
+        setData(api_response?.content || '');
+        onDataTruncated(api_response?.truncated || false);
+        if (api_response?.truncated) showErrorMessage(t('error.truncated'));
+      },
       onFailure: api_data => setError(api_data.api_error_message)
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -155,25 +176,26 @@ const WrappedASCIISection: React.FC<Props> = ({
   else
     return (
       <Grid container style={{ flexGrow: 1 }}>
-        <Grid item flexGrow={1} style={{ display: 'flex' }}>
+        <Grid flexGrow={1} style={{ display: 'flex' }}>
           <MonacoEditor
             value={data}
             language={LANGUAGE_SELECTOR[type]}
-            options={{ links: false, readOnly: true, beautify: true }}
+            options={{ links: false, readOnly: true, ...options }}
+            beautify
           />
         </Grid>
         {codeAllowed && isMdUp && (
           <>
-            <Grid item flexGrow={showCodeSummary ? 0.5 : 0}>
+            <Grid flexGrow={showCodeSummary ? 0.5 : 0}>
               <div style={{ position: 'relative', height: '100%' }}>
                 {showCodeSummary && (
-                  <div className={classes.code}>
+                  <Code>
                     <div style={{ flexGrow: 1, marginTop: !analysing && !codeError ? theme.spacing(-2) : null }}>
                       {analysing ? (
-                        <div className={classes.spinner}>
+                        <Spinner>
                           <div style={{ paddingBottom: theme.spacing(2) }}>{t('analysing_code')}</div>
                           <CircularProgress variant="indeterminate" />
-                        </div>
+                        </Spinner>
                       ) : codeError ? (
                         <Alert severity="error" style={{ marginTop: theme.spacing(2) }}>
                           {codeError}
@@ -185,31 +207,24 @@ const WrappedASCIISection: React.FC<Props> = ({
                     {!analysing && (codeSummary || codeError) && (
                       <div>
                         <Tooltip title={t('powered_by_ai.tooltip')} placement="top-end">
-                          <div className={classes.watermark} onClick={() => getCodeSummary(true)}>
-                            {t('powered_by_ai')}
-                          </div>
+                          <Watermark onClick={() => getCodeSummary(true)}>{t('powered_by_ai')}</Watermark>
                         </Tooltip>
                       </div>
                     )}
-                  </div>
+                  </Code>
                 )}
               </div>
             </Grid>
-            <Grid item style={{ minWidth: theme.spacing(6), height: '100%' }}>
+            <Grid style={{ minWidth: theme.spacing(6), height: '100%' }}>
               <Tooltip title={t(`${showCodeSummary ? 'hide' : 'show'}_analyse_code`)} placement="top">
-                <Button
-                  onClick={() => setShowCodeSummary(!showCodeSummary)}
-                  variant="outlined"
-                  className={classes.aiButton}
-                  color="inherit"
-                >
+                <AIButton onClick={() => setShowCodeSummary(!showCodeSummary)} variant="outlined" color="inherit">
                   <div style={{ display: 'flex', flexDirection: 'column' }}>
                     <AssistantOutlinedIcon color="action" />
                     <div style={{ paddingTop: theme.spacing(2) }}>
                       {showCodeSummary ? <ChevronRightIcon color="action" /> : <ChevronLeftIcon color="action" />}
                     </div>
                   </div>
-                </Button>
+                </AIButton>
               </Tooltip>
             </Grid>
           </>

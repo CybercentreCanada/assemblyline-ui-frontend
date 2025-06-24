@@ -1,6 +1,6 @@
-import { PossibleColor } from '../utils/color';
-import type { UserIndexed } from './user';
-import type { UserAvatar } from './user_avatar';
+import type { UserIndexed } from 'components/models/base/user';
+import type { UserAvatar } from 'components/models/base/user_avatar';
+import type { PossibleColor } from 'helpers/colors';
 
 export const REACTIONS_TYPES = {
   thumbs_up: '👍',

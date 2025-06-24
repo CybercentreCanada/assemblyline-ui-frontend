@@ -1,5 +1,4 @@
-import useAppConfigs from 'commons/components/app/hooks/useAppConfigs';
-import useAppUser from 'commons/components/app/hooks/useAppUser';
+import { useAppConfigs, useAppUser } from 'commons/components/app/hooks';
 import PageCenter from 'commons/components/pages/PageCenter';
 import LinkGrid from 'components/layout/linkgrid';
 import type { CustomUser } from 'components/models/ui/user';
@@ -8,10 +7,9 @@ import { Navigate } from 'react-router';
 export default function Admin() {
   const { preferences: layout } = useAppConfigs();
   const { user: currentUser, validateProps } = useAppUser<CustomUser>();
-  let items = [];
+  const items = [];
   for (const item of layout.leftnav.elements) {
     if (item.type === 'group' && item.element.id === 'adminmenu') {
-      // eslint-disable-next-line @typescript-eslint/dot-notation
       for (const i of item.element['items']) {
         if (validateProps(i.userPropValidators)) {
           items.push(i);

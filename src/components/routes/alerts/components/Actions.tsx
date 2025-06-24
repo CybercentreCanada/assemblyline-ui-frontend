@@ -24,14 +24,15 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
-import clsx from 'clsx';
-import useAppUser from 'commons/components/app/hooks/useAppUser';
+import { useAppUser } from 'commons/components/app/hooks';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import type { AlertItem } from 'components/models/base/alert';
 import type { CustomUser } from 'components/models/ui/user';
 import type { AlertSearchParams } from 'components/routes/alerts';
+import { AlertEventsTable } from 'components/routes/alerts/components/Components';
+import AlertFiltersSelected from 'components/routes/alerts/components/FiltersSelected';
+import { AlertWorkflowDrawer } from 'components/routes/alerts/components/Workflows';
 import { useSearchParams } from 'components/routes/alerts/contexts/SearchParamsContext';
 import type { SearchResult } from 'components/routes/alerts/utils/SearchParser';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
@@ -41,60 +42,8 @@ import type { CSSProperties } from 'react';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
-import { Link, useLocation } from 'react-router-dom';
-import { AlertEventsTable } from './Components';
-import AlertFiltersSelected from './FiltersSelected';
-import { AlertWorkflowDrawer } from './Workflows';
-
-const useStyles = makeStyles(theme => ({
-  verticalSpeedDialFab: {
-    backgroundColor: theme.palette.background.paper,
-    boxShadow: theme.shadows[0],
-    '&.MuiFab-root': {
-      backgroundColor: theme.palette.background.paper
-    },
-    '&.MuiFab-root:hover': {
-      backgroundColor: theme.palette.action.hover
-    },
-    '&.MuiFab-root:active': {
-      boxShadow: theme.shadows[0]
-    },
-    color: theme.palette.text.secondary
-  },
-  permanentSpeedDialFab: {
-    display: 'none',
-    color: theme.palette.text.secondary
-  },
-  permanentSpeedDial: {
-    marginRight: '-6px'
-  },
-  actionsClosed: {
-    width: 0
-  },
-  disabled: {
-    '&.Mui-disabled': {
-      backgroundColor: 'initial'
-    }
-  },
-  buttonProgress: {
-    color: theme.palette.primary.main,
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    marginTop: -12,
-    marginLeft: -12
-  },
-  preview: {
-    display: 'grid',
-    gridTemplateColumns: 'auto 1fr',
-    columnGap: theme.spacing(1),
-    margin: 0,
-    padding: theme.spacing(1.5),
-    whiteSpace: 'pre-wrap',
-    wordBreak: 'break-word',
-    backgroundColor: theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[200]
-  }
-}));
+import { useLocation } from 'react-router';
+import { Link } from 'react-router-dom';
 
 type AlertActionButtonProps = {
   authorized?: boolean;
@@ -129,7 +78,6 @@ const AlertActionButton: React.FC<AlertActionButtonProps> = React.memo(
     onClick = () => null
   }: AlertActionButtonProps) => {
     const theme = useTheme();
-    const classes = useStyles();
 
     const Wrapper = useCallback<React.FC<{ children: React.ReactNode; href: To }>>(
       ({ children, href }) => (href ? <Link to={href}>{children}</Link> : <div>{children}</div>),
@@ -146,16 +94,16 @@ const AlertActionButton: React.FC<AlertActionButtonProps> = React.memo(
             icon={
               <>
                 {icon}
-                {loading && <CircularProgress size={24} className={classes.buttonProgress} />}
+                {loading && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
               </>
             }
             open={open}
             tooltipTitle={tooltipTitle}
             tooltipPlacement={vertical ? 'left' : 'bottom'}
             FabProps={{
-              className: clsx(permanent && classes.disabled),
               disabled: disabled || loading,
               size: permanent ? 'medium' : 'small',
+              sx: { ...(permanent && { '&.Mui-disabled': { backgroundColor: 'initial' } }) },
               style: {
                 boxShadow: permanent ? theme.shadows[0] : null,
                 margin: permanent ? '8px 2px 8px 2px' : null,
@@ -171,15 +119,19 @@ const AlertActionButton: React.FC<AlertActionButtonProps> = React.memo(
         <Tooltip title={tooltipTitle}>
           <span>
             <IconButton
-              className={classes.disabled}
               href={!to ? null : typeof to === 'string' ? to : `${to.pathname}${to.search}${to.hash}`}
               disabled={disabled || loading}
               size="large"
               onClick={disabled || loading ? null : onClick}
+              sx={{
+                '&.Mui-disabled': {
+                  backgroundColor: 'initial'
+                }
+              }}
               style={{ ...(loading ? { color: theme.palette.action.disabled } : color && { color: color }) }}
             >
               {icon}
-              {loading && <CircularProgress size={24} className={classes.buttonProgress} />}
+              {loading && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
             </IconButton>
           </span>
         </Tooltip>
@@ -299,7 +251,6 @@ export const AlertOwnership: React.FC<AlertActionProps> = React.memo(
   }: AlertActionProps) => {
     const { t } = useTranslation(['alerts']);
     const theme = useTheme();
-    const classes = useStyles();
     const { apiCall } = useMyAPI();
     const { user: currentUser } = useAppUser<CustomUser>();
     const { showErrorMessage, showSuccessMessage } = useMySnackbar();
@@ -377,9 +328,23 @@ export const AlertOwnership: React.FC<AlertActionProps> = React.memo(
               search.get('group_by') ? (
                 <Grid container rowGap={2}>
                   <Grid>{t('actions.takeownershipdiag.content.grouped')}</Grid>
-                  <Grid item style={{ width: '100%' }}>
+                  <Grid style={{ width: '100%' }}>
                     <Typography variant="subtitle2">{t('actions.takeownershipdiag.properties')}</Typography>
-                    <Paper component="pre" variant="outlined" className={classes.preview}>
+                    <Paper
+                      component="pre"
+                      variant="outlined"
+                      sx={{
+                        display: 'grid',
+                        gridTemplateColumns: 'auto 1fr',
+                        columnGap: theme.spacing(1),
+                        margin: 0,
+                        padding: theme.spacing(1.5),
+                        whiteSpace: 'pre-wrap',
+                        wordBreak: 'break-word',
+                        backgroundColor:
+                          theme.palette.mode === 'dark' ? theme.palette.grey[900] : theme.palette.grey[200]
+                      }}
+                    >
                       {!query || query.toString() === '' ? (
                         <div>{t('none')}</div>
                       ) : (
@@ -671,7 +636,6 @@ type Props = {
 const WrappedAlertActions = ({ alert, inDrawer = false }: Props) => {
   const { t } = useTranslation('alerts');
   const theme = useTheme();
-  const classes = useStyles();
   const location = useLocation();
   const { user: currentUser } = useAppUser<CustomUser>();
 
@@ -716,9 +680,17 @@ const WrappedAlertActions = ({ alert, inDrawer = false }: Props) => {
       >
         <SpeedDial
           ariaLabel={t('action_menu')}
-          classes={{
-            actionsClosed: vertical ? null : classes.actionsClosed,
-            root: permanent ? classes.permanentSpeedDial : null
+          sx={{
+            ...(permanent && {
+              ['&.MuiSpeedDial-root']: {
+                marginRight: '-6px'
+              }
+            }),
+            ...(!vertical && {
+              ['&.MuiSpeedDial-actionsClosed']: {
+                width: 0
+              }
+            })
           }}
           icon={
             <SpeedDialIcon
@@ -735,13 +707,35 @@ const WrappedAlertActions = ({ alert, inDrawer = false }: Props) => {
           FabProps={{
             size: vertical ? 'medium' : 'small',
             color: 'primary',
-            className: vertical ? classes.verticalSpeedDialFab : permanent ? classes.permanentSpeedDialFab : null
+            sx: {
+              ...(vertical
+                ? {
+                    backgroundColor: theme.palette.background.paper,
+                    boxShadow: theme.shadows[0],
+                    '&.MuiFab-root': {
+                      backgroundColor: theme.palette.background.paper
+                    },
+                    '&.MuiFab-root:hover': {
+                      backgroundColor: theme.palette.action.hover
+                    },
+                    '&.MuiFab-root:active': {
+                      boxShadow: theme.shadows[0]
+                    },
+                    color: theme.palette.text.secondary
+                  }
+                : permanent
+                  ? {
+                      display: 'none',
+                      color: theme.palette.text.secondary
+                    }
+                  : null)
+            }
           }}
         >
           {!alert || !render
             ? [
                 <AlertActionButton
-                  key={`alert.default`}
+                  key="alert.default"
                   open={true}
                   loading={false}
                   disabled={false}

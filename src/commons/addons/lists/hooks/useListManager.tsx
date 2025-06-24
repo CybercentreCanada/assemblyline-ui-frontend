@@ -1,9 +1,9 @@
+import type { FilterField } from 'commons/addons/lists/filters/FilterSelector';
+import useFilters from 'commons/addons/lists/hooks/useFilters';
+import useSorters from 'commons/addons/lists/hooks/useSorters';
+import type { LineItem } from 'commons/addons/lists/item/ListItemBase';
+import type { SorterField } from 'commons/addons/lists/sorters/SorterSelector';
 import { useCallback, useMemo, useState } from 'react';
-import { FilterField } from '../filters/FilterSelector';
-import { LineItem } from '../item/ListItemBase';
-import { SorterField } from '../sorters/SorterSelector';
-import useFilters from './useFilters';
-import useSorters from './useSorters';
 
 const DEFAULT_ITEMS = [];
 

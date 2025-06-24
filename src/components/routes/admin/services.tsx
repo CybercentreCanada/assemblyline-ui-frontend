@@ -18,23 +18,26 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import useAppUser from 'commons/components/app/hooks/useAppUser';
+import { useAppUser } from 'commons/components/app/hooks';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
+import { invalidateAPIQuery } from 'components/core/Query/API/invalidateAPIQuery';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import type { ServiceIndexed, ServiceUpdates } from 'components/models/base/service';
+import type { ServiceIndexed, ServiceUpdateData, ServiceUpdates } from 'components/models/base/service';
 import type { CustomUser } from 'components/models/ui/user';
 import ServiceDetail from 'components/routes/admin/service_detail';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import FileDownloader from 'components/visual/FileDownloader';
+import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import type { JSONFeedItem } from 'components/visual/Notification/useNotificationFeed';
 import { useNotificationFeed } from 'components/visual/Notification/useNotificationFeed';
 import ServiceTable from 'components/visual/SearchResult/service';
 import CommunityServiceTable from 'components/visual/ServiceManagement/CommunityServiceTable';
 import NewServiceTable from 'components/visual/ServiceManagement/NewServiceTable';
+import type { ChangeEvent } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useLocation, useNavigate } from 'react-router';
@@ -78,55 +81,6 @@ export default function Services() {
     [serviceFeeds]
   );
 
-  const handleAddService = () => {
-    apiCall({
-      method: 'PUT',
-      contentType: 'text/plain',
-      url: '/api/v4/service/',
-      body: manifest,
-      onSuccess: api_data => {
-        showSuccessMessage(t('add.success'));
-        closeServiceDialog();
-        setTimeout(() => reload(), 1000);
-      }
-    });
-  };
-
-  const closeServiceDialog = useCallback(() => {
-    setManifest('');
-    setOpen(false);
-  }, []);
-
-  const handleRestore = () => {
-    apiCall({
-      method: 'PUT',
-      contentType: 'text/plain',
-      url: '/api/v4/service/restore/',
-      body: restore,
-      onSuccess: api_data => {
-        showSuccessMessage(t('restore.success'));
-        closeRestoreDialog();
-        setRestoreConfirmation(false);
-        setTimeout(() => reload(), 1000);
-      },
-      onEnter: () => setWaitingDialog(true),
-      onExit: () => setWaitingDialog(false)
-    });
-  };
-
-  const closeRestoreDialog = () => {
-    setRestore('');
-    setOpenRestore(false);
-  };
-
-  function handleRestoreChange(event) {
-    setRestore(event.target.value);
-  }
-
-  function handleManifestChange(event) {
-    setManifest(event.target.value);
-  }
-
   const reload = useCallback(() => {
     apiCall<ServiceIndexed[]>({
       url: '/api/v4/service/all/',
@@ -138,6 +92,59 @@ export default function Services() {
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const closeServiceDialog = useCallback(() => {
+    setManifest('');
+    setOpen(false);
+  }, []);
+
+  const closeRestoreDialog = useCallback(() => {
+    setRestore('');
+    setOpenRestore(false);
+  }, []);
+
+  const handleRestoreChange = useCallback((event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setRestore(event.target.value);
+  }, []);
+
+  const handleManifestChange = useCallback((event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setManifest(event.target.value);
+  }, []);
+
+  const handleAddService = useCallback(() => {
+    apiCall({
+      method: 'PUT',
+      contentType: 'text/plain',
+      url: '/api/v4/service/',
+      body: manifest,
+      onSuccess: () => {
+        showSuccessMessage(t('add.success'));
+        closeServiceDialog();
+        setTimeout(() => reload(), 1000);
+        invalidateAPIQuery(({ url }) => '/api/v4/user/whoami/' === url, 3000);
+      }
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [manifest, reload, t]);
+
+  const handleRestore = useCallback(() => {
+    apiCall({
+      method: 'PUT',
+      contentType: 'text/plain',
+      url: '/api/v4/service/restore/',
+      body: restore,
+      onSuccess: () => {
+        showSuccessMessage(t('restore.success'));
+        closeRestoreDialog();
+        setRestoreConfirmation(false);
+        setTimeout(() => reload(), 1000);
+        invalidateAPIQuery(({ url }) => '/api/v4/user/whoami/' === url, 3000);
+      },
+      onEnter: () => setWaitingDialog(true),
+      onExit: () => setWaitingDialog(false)
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [reload, restore, t]);
 
   const pollInstalling = useCallback(first => {
     apiCall<string[]>({
@@ -154,19 +161,8 @@ export default function Services() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffectOnce(() => {
-    if (currentUser.is_admin) {
-      reload();
-      pollInstalling(true);
-    }
-    window.addEventListener('reloadServicesEvent', reload);
-    return () => {
-      window.removeEventListener('reloadServicesEvent', reload);
-    };
-  });
-
   const onUpdate = useCallback(
-    (svc, updateData) => {
+    (svc: string, updateData: ServiceUpdateData) => {
       apiCall({
         method: 'PUT',
         url: '/api/v4/service/update/',
@@ -178,6 +174,7 @@ export default function Services() {
           const newUpdates = { ...updates };
           newUpdates[svc] = { ...newUpdates[svc], updating: true };
           setUpdates(newUpdates);
+          invalidateAPIQuery(({ url }) => '/api/v4/user/whoami/' === url, 3000);
         }
       });
     },
@@ -199,6 +196,7 @@ export default function Services() {
             delete newUpdates[srv];
           }
           setUpdates(newUpdates);
+          invalidateAPIQuery(({ url }) => '/api/v4/user/whoami/' === url, 3000);
         }
       });
     },
@@ -223,12 +221,25 @@ export default function Services() {
   const onUpdated = useCallback(() => {
     if (!isXL) closeGlobalDrawer();
     setTimeout(() => window.dispatchEvent(new CustomEvent('reloadServicesEvent')), 1000);
+    invalidateAPIQuery(({ url }) => '/api/v4/user/whoami/' === url, 3000);
   }, [closeGlobalDrawer, isXL]);
 
   const onDeleted = useCallback(() => {
     closeGlobalDrawer();
     setTimeout(() => window.dispatchEvent(new CustomEvent('reloadServicesEvent')), 1000);
+    invalidateAPIQuery(({ url }) => '/api/v4/user/whoami/' === url, 3000);
   }, [closeGlobalDrawer]);
+
+  useEffectOnce(() => {
+    if (currentUser.is_admin) {
+      reload();
+      pollInstalling(true);
+    }
+    window.addEventListener('reloadServicesEvent', reload);
+    return () => {
+      window.removeEventListener('reloadServicesEvent', reload);
+    };
+  });
 
   useEffect(() => {
     if (serviceResults !== null && !globalDrawerOpened && location.hash) {
@@ -239,14 +250,7 @@ export default function Services() {
 
   useEffect(() => {
     if (location.hash) {
-      setGlobalDrawer(
-        <ServiceDetail
-          name={location.hash.slice(1)}
-          serviceNames={serviceNames}
-          onDeleted={onDeleted}
-          onUpdated={onUpdated}
-        />
-      );
+      setGlobalDrawer(<ServiceDetail name={location.hash.slice(1)} onDeleted={onDeleted} onUpdated={onUpdated} />);
     } else {
       closeGlobalDrawer();
     }
@@ -394,12 +398,11 @@ export default function Services() {
           </Button>
         </DialogActions>
       </Dialog>
-      <Grid container alignItems="center" spacing={3}>
-        <Grid item xs>
-          <Typography variant="h4">{t('title')}</Typography>
-        </Grid>
-        <Grid item xs style={{ textAlign: 'right', flexGrow: 0 }}>
-          <div style={{ display: 'flex', marginBottom: theme.spacing(1), justifyContent: 'flex-end' }}>
+
+      <PageHeader
+        primary={t('title')}
+        actions={
+          <>
             <Tooltip
               PopperProps={{
                 disablePortal: true
@@ -423,7 +426,8 @@ export default function Services() {
               }}
               disableInteractive
               title={
-                updates && Object.values(updates).some((srv: any) => srv.update_available && !srv.updating)
+                updates &&
+                Object.values(updates).some((srv: ServiceUpdateData) => srv.update_available && !srv.updating)
                   ? t('update_all')
                   : t('update_none')
               }
@@ -433,7 +437,8 @@ export default function Services() {
                   color="primary"
                   onClick={updateAll}
                   disabled={
-                    !updates || !Object.values(updates).some((srv: any) => srv.update_available && !srv.updating)
+                    !updates ||
+                    !Object.values(updates).some((srv: ServiceUpdateData) => srv.update_available && !srv.updating)
                   }
                   size="large"
                 >
@@ -469,7 +474,7 @@ export default function Services() {
                 </IconButton>
               </span>
             </Tooltip>
-            <FileDownloader icon={<GetAppOutlinedIcon />} link={`/api/v4/service/backup/`} tooltip={t('backup')} />
+            <FileDownloader icon={<GetAppOutlinedIcon />} link="/api/v4/service/backup/" tooltip={t('backup')} />
             <Tooltip
               PopperProps={{
                 disablePortal: true
@@ -481,12 +486,12 @@ export default function Services() {
                 <RestoreOutlinedIcon />
               </IconButton>
             </Tooltip>
-          </div>
-        </Grid>
-      </Grid>
+          </>
+        }
+      />
 
       <Grid container alignItems="center" spacing={3}>
-        <Grid item xs>
+        <Grid size="grow">
           <Typography variant="h5">{t('title.loaded')}</Typography>
           {serviceResults ? (
             <Typography variant="caption" component="p">{`${serviceResults.length} ${t('count')}`}</Typography>
@@ -500,12 +505,12 @@ export default function Services() {
       </div>
 
       <Grid container alignItems="center" spacing={3} style={{ marginTop: theme.spacing(2) }}>
-        <Grid item xs>
+        <Grid size="grow">
           <Typography variant="h5">{t('title.available')}</Typography>
           {availableServices ? (
-            <Typography variant="caption" component="p">{`${availableServices.length} ${t(
-              'count.available'
-            )}`}</Typography>
+            <Typography variant="caption" component="p">
+              {`${availableServices.length} ${t('count.available')}`}
+            </Typography>
           ) : (
             <Skeleton width="8rem" />
           )}
@@ -520,12 +525,12 @@ export default function Services() {
       </div>
 
       <Grid container alignItems="center" spacing={3} style={{ marginTop: theme.spacing(2) }}>
-        <Grid item xs>
+        <Grid size="grow">
           <Typography variant="h5">{t('title.available.community')}</Typography>
           {availableCommunityServices ? (
-            <Typography variant="caption" component="p">{`${availableCommunityServices.length} ${t(
-              'count.available.community'
-            )}`}</Typography>
+            <Typography variant="caption" component="p">
+              {`${availableCommunityServices.length} ${t('count.available.community')}`}
+            </Typography>
           ) : (
             <Skeleton width="8rem" />
           )}

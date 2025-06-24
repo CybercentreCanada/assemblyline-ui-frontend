@@ -9,12 +9,12 @@ export const parseJSON = (response: string, msg: string) => {
 };
 
 export function lzwEncode(s) {
-  var dict = {};
-  var data = (s + '').split('');
-  var out = [];
-  var currChar;
-  var phrase = data[0];
-  var code = 256;
+  const dict = {};
+  const data = (s + '').split('');
+  const out = [];
+  let currChar;
+  let phrase = data[0];
+  let code = 256;
   for (var i = 1; i < data.length; i++) {
     currChar = data[i];
     if (dict[phrase + currChar] != null) {
@@ -35,15 +35,15 @@ export function lzwEncode(s) {
 
 // Decompress an LZW-encoded string
 export function lzwDecode(s) {
-  var dict = {};
-  var data = (s + '').split('');
-  var currChar = data[0];
-  var oldPhrase = currChar;
-  var out = [currChar];
-  var code = 256;
-  var phrase;
-  for (var i = 1; i < data.length; i++) {
-    var currCode = data[i].charCodeAt(0);
+  const dict = {};
+  const data = (s + '').split('');
+  let currChar = data[0];
+  let oldPhrase = currChar;
+  const out = [currChar];
+  let code = 256;
+  let phrase;
+  for (let i = 1; i < data.length; i++) {
+    const currCode = data[i].charCodeAt(0);
     if (currCode < 256) {
       phrase = data[i];
     } else {

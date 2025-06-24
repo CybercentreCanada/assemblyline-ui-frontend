@@ -15,28 +15,16 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
-import makeStyles from '@mui/styles/makeStyles';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import { Author, Comment, DEFAULT_COMMENT } from 'components/models/base/file';
+import type { Author, Comment } from 'components/models/base/file';
+import { DEFAULT_COMMENT } from 'components/models/base/file';
 import CommentCard from 'components/visual/CommentCard';
 import SectionContainer from 'components/visual/SectionContainer';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { io } from 'socket.io-client';
-
-const useStyles = makeStyles(theme => ({
-  dialog: {
-    minWidth: '50vw'
-  },
-  preview: {
-    margin: 0,
-    padding: theme.spacing(0.75, 1),
-    whiteSpace: 'pre-wrap',
-    wordBreak: 'break-word'
-  }
-}));
 
 type Confirmation = {
   open: boolean;
@@ -60,7 +48,6 @@ const WrappedCommentSection: React.FC<Props> = ({
 }) => {
   const { t } = useTranslation(['archive']);
   const theme = useTheme();
-  const classes = useStyles();
   const { apiCall } = useMyAPI();
   const { user: currentUser } = useALContext();
   const { showSuccessMessage, showErrorMessage } = useMySnackbar();
@@ -275,8 +262,8 @@ const WrappedCommentSection: React.FC<Props> = ({
                   color: !comments
                     ? theme.palette.text.disabled
                     : theme.palette.mode === 'dark'
-                    ? theme.palette.success.light
-                    : theme.palette.success.dark
+                      ? theme.palette.success.light
+                      : theme.palette.success.dark
                 }}
                 onClick={handleAddConfirmation}
               >
@@ -303,7 +290,11 @@ const WrappedCommentSection: React.FC<Props> = ({
               onReactionClick={handleReactionClick}
             />
           ))}
-      <Dialog classes={{ paper: classes.dialog }} open={confirmation.open} onClose={handleCloseConfirmation}>
+      <Dialog
+        open={confirmation.open}
+        onClose={handleCloseConfirmation}
+        slotProps={{ paper: { sx: { minWidth: '50vw' } } }}
+      >
         <DialogTitle>
           {confirmation.type === 'add' && t('comment.confirmation.title.add')}
           {confirmation.type === 'edit' && t('comment.confirmation.title.edit')}
@@ -312,13 +303,13 @@ const WrappedCommentSection: React.FC<Props> = ({
         <DialogContent>
           <DialogContentText component="div">
             <Grid container flexDirection="column" spacing={2}>
-              <Grid item>
+              <Grid>
                 {confirmation.type === 'add' && t('comment.confirmation.content.add')}
                 {confirmation.type === 'edit' && t('comment.confirmation.content.edit')}
                 {confirmation.type === 'delete' && t('comment.confirmation.content.delete')}
               </Grid>
               {['add', 'edit'].includes(confirmation.type) && (
-                <Grid item>
+                <Grid>
                   <TextField
                     value={currentComment?.text}
                     disabled={waiting}
@@ -335,14 +326,23 @@ const WrappedCommentSection: React.FC<Props> = ({
                 </Grid>
               )}
               {confirmation.type === 'delete' && (
-                <Grid item>
+                <Grid>
                   <Typography variant="subtitle2" children={t('comment.content')} />
-                  <Paper component="pre" variant="outlined" className={classes.preview}>
+                  <Paper
+                    component="pre"
+                    variant="outlined"
+                    sx={{
+                      margin: 0,
+                      padding: theme.spacing(0.75, 1),
+                      whiteSpace: 'pre-wrap',
+                      wordBreak: 'break-word'
+                    }}
+                  >
                     {currentComment?.text}
                   </Paper>
                 </Grid>
               )}
-              <Grid item>{t('comment.confirmation.confirm')}</Grid>
+              <Grid>{t('comment.confirmation.confirm')}</Grid>
             </Grid>
           </DialogContentText>
         </DialogContent>
@@ -357,28 +357,17 @@ const WrappedCommentSection: React.FC<Props> = ({
                 {confirmation.type === 'add' && t('comment.confirmation.action.add')}
                 {confirmation.type === 'edit' && t('comment.confirmation.action.edit')}
                 {confirmation.type === 'delete' && t('comment.confirmation.action.delete')}
-                {waiting && (
-                  <CircularProgress
-                    size={24}
-                    style={{
-                      position: 'absolute',
-                      top: '50%',
-                      left: '50%',
-                      marginTop: -12,
-                      marginLeft: -12
-                    }}
-                  />
-                )}
+                {waiting && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
               </>
             }
             onClick={
               confirmation.type === 'add'
                 ? handleAddComment(currentComment)
                 : confirmation.type === 'edit'
-                ? handleEditComment(currentComment)
-                : confirmation.type === 'delete'
-                ? handleDeleteComment(currentComment)
-                : null
+                  ? handleEditComment(currentComment)
+                  : confirmation.type === 'delete'
+                    ? handleDeleteComment(currentComment)
+                    : null
             }
           />
         </DialogActions>

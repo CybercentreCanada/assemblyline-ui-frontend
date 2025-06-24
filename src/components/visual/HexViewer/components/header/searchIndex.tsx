@@ -1,45 +1,17 @@
-import { Tooltip } from '@mui/material';
+import { Tooltip, useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
-import makeStyles from '@mui/styles/makeStyles';
-import React, { useCallback } from 'react';
+import type { StoreProps } from 'components/visual/HexViewer';
+import { FieldPopper, NumericField, useDispatch } from 'components/visual/HexViewer';
+import React, { useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { FieldPopper, NumericField, StoreProps, useDispatch } from '../..';
-
-const useHexStyles = makeStyles(theme => ({
-  formControl: {
-    minWidth: '150px'
-  },
-  resultIndexes: {
-    textAlign: 'center',
-    cursor: 'pointer',
-    padding: 8,
-    [theme.breakpoints.only('sm')]: {
-      padding: 2
-    },
-    [theme.breakpoints.only('xs')]: {
-      padding: 0
-    }
-  },
-  resultNoneIndexes: {
-    textAlign: 'center',
-    cursor: 'default',
-    padding: 8,
-    [theme.breakpoints.only('sm')]: {
-      padding: 2
-    },
-    [theme.breakpoints.only('xs')]: {
-      padding: 0
-    }
-  }
-}));
 
 export const WrappedHexSearchIndex = ({ store }: StoreProps) => {
   const { t } = useTranslation(['hexViewer']);
-  const classes = useHexStyles();
+  const theme = useTheme();
   const { onSelectedSearchIndexChange } = useDispatch();
   const { inputValue, results, selectedResult } = store.search;
 
-  const searchFieldPopper = React.useRef(null);
+  const searchFieldPopper = useRef(null);
   const handleClick = useCallback((e: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
     searchFieldPopper.current.open(e);
   }, []);
@@ -49,7 +21,6 @@ export const WrappedHexSearchIndex = ({ store }: StoreProps) => {
       <>
         <NumericField
           id="search-index"
-          classes={{ formControl: classes.formControl }}
           placeholder={t('search.placeholder')}
           size="small"
           margin="dense"
@@ -66,13 +37,24 @@ export const WrappedHexSearchIndex = ({ store }: StoreProps) => {
           onChange={(event: React.ChangeEvent<any>) => {
             onSelectedSearchIndexChange({ index: event.target.valueAsNumber as number });
           }}
+          slotSX={{ formControl: { minWidth: '150px' } }}
         />
         <Tooltip title={t('search')}>
           <Typography
-            className={classes.resultIndexes}
             variant="subtitle1"
             color="textPrimary"
             onClick={e => handleClick(e)}
+            sx={{
+              textAlign: 'center',
+              cursor: 'pointer',
+              padding: '8px',
+              [theme.breakpoints.only('sm')]: {
+                padding: '2px'
+              },
+              [theme.breakpoints.only('xs')]: {
+                padding: '0px'
+              }
+            }}
           >
             {selectedResult !== null ? selectedResult + 1 + t('of') + results.length : t('of') + results.length}
           </Typography>
@@ -112,7 +94,21 @@ export const WrappedHexSearchIndex = ({ store }: StoreProps) => {
   } else {
     return (
       <Tooltip title={t('search')}>
-        <Typography className={classes.resultNoneIndexes} variant="subtitle1" color="error">
+        <Typography
+          variant="subtitle1"
+          color="error"
+          sx={{
+            textAlign: 'center',
+            cursor: 'default',
+            padding: '8px',
+            [theme.breakpoints.only('sm')]: {
+              padding: '2px'
+            },
+            [theme.breakpoints.only('xs')]: {
+              padding: '0px'
+            }
+          }}
+        >
           {t('no-results')}
         </Typography>
       </Tooltip>
