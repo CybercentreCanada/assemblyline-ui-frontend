@@ -54,7 +54,7 @@ const WrappedUsersTable: React.FC<Props> = ({ userResults }) => {
                     user.groups
                       .map(group =>
                         group in classificationAliases
-                          ? classificationAliases?.[group]?.short_name || classificationAliases?.[group]?.name || group
+                          ? classificationAliases?.[group]?.name || classificationAliases?.[group]?.short_name || group
                           : group
                       )
                       .join(' | ')}
