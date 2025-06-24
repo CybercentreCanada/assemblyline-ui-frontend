@@ -1,12 +1,12 @@
+import type { APIRequest, APIResponse } from 'components/core/Query/components/api.models';
+import { DEFAULT_RETRY_MS } from 'components/core/Query/components/constants';
+import { isAPIData } from 'components/core/Query/components/utils';
 import useALContext from 'components/hooks/useALContext';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import useQuota from 'components/hooks/useQuota';
 import getXSRFCookie from 'helpers/xsrf';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { APIRequest, APIResponse } from 'components/core/Query/components/api.models';
-import { DEFAULT_RETRY_MS } from 'components/core/Query/components/constants';
-import { isAPIData } from 'components/core/Query/components/utils';
 
 export type UseAPICallFnProps<
   Response extends APIResponse,
@@ -20,7 +20,7 @@ export type UseAPICallFnProps<
     retryAfter?: number;
     signal?: AbortSignal;
     onSuccess?: (data: Response) => void;
-    onFailure?: (Error: Error) => void;
+    onFailure?: (error: Error) => void;
     onEnter?: () => void;
     onExit?: () => void;
   };

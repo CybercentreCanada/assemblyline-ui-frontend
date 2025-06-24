@@ -26,7 +26,7 @@ type Props = {
 
 const WrappedUsersTable: React.FC<Props> = ({ userResults }) => {
   const { t } = useTranslation(['adminUsers']);
-  const { c12nDef } = useALContext();
+  const { c12nDef, classificationAliases } = useALContext();
 
   return userResults ? (
     userResults.total !== 0 ? (
@@ -49,7 +49,16 @@ const WrappedUsersTable: React.FC<Props> = ({ userResults }) => {
               <LinkRow key={user.id} to={`/admin/users/${user.uname}`} hover style={{ textDecoration: 'none' }}>
                 <DivTableCell style={{ whiteSpace: 'nowrap' }}>{user.uname}</DivTableCell>
                 <DivTableCell>{user.name}</DivTableCell>
-                <DivTableCell>{user.groups && user.groups.join(' | ')}</DivTableCell>
+                <DivTableCell>
+                  {user.groups &&
+                    user.groups
+                      .map(group =>
+                        group in classificationAliases
+                          ? classificationAliases?.[group]?.name || classificationAliases?.[group]?.short_name || group
+                          : group
+                      )
+                      .join(' | ')}
+                </DivTableCell>
                 {c12nDef.enforce && (
                   <DivTableCell style={{ whiteSpace: 'nowrap' }}>
                     <Classification type="text" size="tiny" c12n={user.classification} format="short" isUser />

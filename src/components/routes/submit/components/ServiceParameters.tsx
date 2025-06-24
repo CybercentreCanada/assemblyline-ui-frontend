@@ -53,7 +53,7 @@ const Param: React.FC<ParamProps> = React.memo(({ param_id, spec_id, service }) 
                 value={value as boolean}
                 disabled={disabled || !isEditing || (!customize && restricted)}
                 preventRender={!customize && restricted}
-                reset={value !== defaultValue}
+                reset={defaultValue !== null && value !== defaultValue}
                 onChange={(e, v) =>
                   form.setFieldValue('settings.service_spec', s => {
                     s[spec_id].params[param_id].value = v;
@@ -77,7 +77,7 @@ const Param: React.FC<ParamProps> = React.memo(({ param_id, spec_id, service }) 
                 value={value as number}
                 disabled={disabled || !isEditing || (!customize && restricted)}
                 preventRender={!customize && restricted}
-                reset={value !== defaultValue}
+                reset={defaultValue !== null && value !== defaultValue}
                 rootProps={{ style: { padding: theme.spacing(1) } }}
                 onChange={(e, v) =>
                   form.setFieldValue('settings.service_spec', s => {
@@ -103,7 +103,7 @@ const Param: React.FC<ParamProps> = React.memo(({ param_id, spec_id, service }) 
                 disabled={disabled || !isEditing || (!customize && restricted)}
                 preventRender={!customize && restricted}
                 options={list}
-                reset={value !== defaultValue}
+                reset={defaultValue !== null && value !== defaultValue}
                 rootProps={{ style: { padding: theme.spacing(1) } }}
                 onChange={(e, v) =>
                   form.setFieldValue('settings.service_spec', s => {
@@ -129,7 +129,7 @@ const Param: React.FC<ParamProps> = React.memo(({ param_id, spec_id, service }) 
                 disabled={disabled || !isEditing || (!customize && restricted)}
                 preventRender={!customize && restricted}
                 options={list.map(key => ({ primary: key.replaceAll('_', ' '), value: key })).sort()}
-                reset={value !== defaultValue}
+                reset={defaultValue !== null && value !== defaultValue}
                 rootProps={{ style: { padding: theme.spacing(1) } }}
                 onChange={(e, v) =>
                   form.setFieldValue('settings.service_spec', s => {
@@ -158,7 +158,6 @@ type ServiceProps = {
 };
 
 const Service: React.FC<ServiceProps> = React.memo(({ cat_id, svr_id, service }) => {
-  const theme = useTheme();
   const form = useForm();
 
   const handleHasParams = useCallback(
@@ -377,9 +376,7 @@ export const ServiceParameters = React.memo(() => {
         selector={state => [state.values.settings.services] as const}
         children={([categories]) => (
           <div style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(0.25) }}>
-            {categories?.map((category, cat_id) => (
-              <Category key={cat_id} cat_id={cat_id} category={category} />
-            ))}
+            {categories?.map((category, cat_id) => <Category key={cat_id} cat_id={cat_id} category={category} />)}
           </div>
         )}
       />

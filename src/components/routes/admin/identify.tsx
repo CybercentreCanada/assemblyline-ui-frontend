@@ -117,7 +117,7 @@ export default function AdminIdentify() {
             <Typography variant="h4">{t('title')}</Typography>
           </Grid>
           <Grid size={{ xs: 12 }}>
-            <Box sx={{ display: { xs: 'block', lg: 'none' } }}>
+            <Box sx={{ display: { xs: 'none', lg: 'block' } }}>
               <Alert severity="warning">{t('warning')}</Alert>
             </Box>
           </Grid>
