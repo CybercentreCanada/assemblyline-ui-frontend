@@ -2,7 +2,7 @@ import CheckBoxOutlineBlankOutlinedIcon from '@mui/icons-material/CheckBoxOutlin
 import CheckBoxOutlinedIcon from '@mui/icons-material/CheckBoxOutlined';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
-import { Collapse, Divider, Grid, IconButton, Skeleton, Typography, useMediaQuery, useTheme } from '@mui/material';
+import { Button, Collapse, Divider, Grid, Skeleton, Typography, useMediaQuery, useTheme } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
 import type { ParsedSubmission } from 'components/models/base/submission';
 import Moment from 'components/visual/Moment';
@@ -97,59 +97,59 @@ const WrappedInfoSection: React.FC<Props> = ({ submission }) => {
             </Grid>
 
             <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
-              <span style={{ fontWeight: 500 }}>{t('params.services.selected')}</span>
+              <Button
+                color="inherit"
+                onClick={() => setExpanded(e => !e)}
+                sx={{
+                  fontWeight: 500,
+                  textTransform: 'none',
+                  padding: `${theme.spacing(0.5)} ${theme.spacing(1)} ${theme.spacing(0.5)} ${theme.spacing(0)}`
+                }}
+                endIcon={
+                  <ExpandMore
+                    fontSize="small"
+                    sx={{
+                      transition: theme.transitions.create('transform', {
+                        duration: theme.transitions.duration.shortest
+                      }),
+                      transform: 'rotate(0deg)',
+                      ...(expanded && { transform: 'rotate(180deg)' })
+                    }}
+                  />
+                }
+              >
+                {t('params.services.selected')}
+              </Button>
             </Grid>
-            <Grid
-              size={{ xs: 8, sm: 9, lg: 10 }}
-              sx={{ display: 'flex', flexDirection: 'row' }}
-              style={{ wordBreak: 'break-word' }}
-            >
+            <Grid size={{ xs: 8, sm: 9, lg: 10 }} style={{ wordBreak: 'break-word' }}>
               {submission ? (
                 <>
-                  <div style={{ flex: 1 }}>
-                    <Collapse in={!expanded} timeout="auto">
-                      {Array.from(
-                        new Set([...submission.params.services.selected, ...submission.params.services.rescan])
-                      )
-                        .sort((a, b) => a.localeCompare(b))
-                        .join(' | ')}
-                    </Collapse>
-                    <Collapse in={expanded} timeout="auto">
-                      <div
-                        style={{
-                          display: 'grid',
-                          gridTemplateColumns: 'auto 1fr',
-                          rowGap: theme.spacing(0.25),
-                          ...(isDownMD && { gridTemplateColumns: '1fr' })
-                        }}
-                      >
-                        {groupedServices.map(([cat, included, excluded]) => (
-                          <>
-                            <i>{cat}: </i>
-                            <div style={{ marginLeft: '1.5rem' }}>
-                              <span>{included.join(' | ')}</span>
-                              {included.length > 0 && excluded.length > 0 && <span>{' | '}</span>}
-                              <span style={{ color: theme.palette.action.disabled }}>{excluded.join(' | ')}</span>
-                            </div>
-                          </>
-                        ))}
-                      </div>
-                    </Collapse>
-                  </div>
-                  <div>
-                    <IconButton onClick={() => setExpanded(e => !e)}>
-                      <ExpandMore
-                        fontSize="small"
-                        sx={{
-                          transition: theme.transitions.create('transform', {
-                            duration: theme.transitions.duration.shortest
-                          }),
-                          transform: 'rotate(0deg)',
-                          ...(expanded && { transform: 'rotate(180deg)' })
-                        }}
-                      />
-                    </IconButton>
-                  </div>
+                  <Collapse in={!expanded} timeout="auto">
+                    {Array.from(new Set([...submission.params.services.selected, ...submission.params.services.rescan]))
+                      .sort((a, b) => a.localeCompare(b))
+                      .join(' | ')}
+                  </Collapse>
+                  <Collapse in={expanded} timeout="auto">
+                    <div
+                      style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'auto 1fr',
+                        rowGap: theme.spacing(0.25),
+                        ...(isDownMD && { gridTemplateColumns: '1fr' })
+                      }}
+                    >
+                      {groupedServices.map(([cat, included, excluded]) => (
+                        <>
+                          <i>{cat}: </i>
+                          <div style={{ marginLeft: '1.5rem' }}>
+                            <span>{included.join(' | ')}</span>
+                            {included.length > 0 && excluded.length > 0 && <span>{' | '}</span>}
+                            <span style={{ color: theme.palette.action.disabled }}>{excluded.join(' | ')}</span>
+                          </div>
+                        </>
+                      ))}
+                    </div>
+                  </Collapse>
                 </>
               ) : (
                 <Skeleton />
