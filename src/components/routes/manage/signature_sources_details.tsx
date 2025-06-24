@@ -153,7 +153,7 @@ const WrappedSourceDetail = ({
 
                     <Grid size={{ xs: 12, sm: 3 }}>
                       <NumberInput
-                        id={t('pattern')}
+                        id="update-interval-time"
                         loading={!source}
                         value={!source ? null : source.update_interval}
                         reset={showReset(source, defaults, 'update_interval')}
