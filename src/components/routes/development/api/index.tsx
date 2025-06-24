@@ -1,11 +1,12 @@
 import type { Monaco } from '@monaco-editor/react';
 import Editor, { loader } from '@monaco-editor/react';
-import { Button, Skeleton, Typography, useTheme } from '@mui/material';
+import { Button, Grid, Paper, Skeleton, Typography, useTheme } from '@mui/material';
 import PageFullSize from 'commons/components/pages/PageFullSize';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import type { Role } from 'components/models/base/user';
+import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import type { editor } from 'monaco-editor';
 import { languages } from 'monaco-editor';
 import { useCallback, useDeferredValue, useEffect, useMemo, useState } from 'react';
@@ -105,7 +106,6 @@ export const DevelopmentAPI = () => {
   }, [request?.url, routes]);
 
   const handleSubmit = useCallback((req: Request) => {
-    console.log(req);
     if (!currentRoute) return;
     apiCall<unknown>({
       url: req.url,
@@ -119,8 +119,7 @@ export const DevelopmentAPI = () => {
         showErrorMessage(api_error_message);
         setValue(v => stringifyRequest({ ...parseRequest(v), response: api_error_message }));
         setResponse({ serverVersion: api_server_version, statusCode: api_status_code });
-      },
-      onEnter: () => {}
+      }
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -181,45 +180,70 @@ export const DevelopmentAPI = () => {
   else
     return (
       <PageFullSize margin={4}>
-        <div style={{ display: 'flex' }}>
-          <Typography variant="h4" sx={{ flex: 1 }}>
-            {t('title')}
-          </Typography>
-          <Button disabled={!currentRoute} variant="contained" onClick={() => handleSubmit(request)}>
-            {t('submit')}
-          </Button>
-        </div>
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', rowGap: theme.spacing(2) }}>
+          <PageHeader
+            primary={t('title')}
+            actions={
+              <Button disabled={!currentRoute} variant="contained" onClick={() => handleSubmit(request)}>
+                {t('submit')}
+              </Button>
+            }
+          />
 
-        {loading ? (
-          <Skeleton />
-        ) : (
-          <div
-            style={{
-              flexGrow: 1,
-              border: `1px solid ${theme.palette.divider}`,
-              position: 'relative'
-            }}
-          >
-            <div style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}>
-              <AutoSizer>
-                {({ width, height }: { width: number; height: number }) => (
-                  <Editor
-                    language="json"
-                    width={width}
-                    height={height}
-                    theme={theme.palette.mode === 'dark' ? 'vs-dark' : 'vs'}
-                    loading={t('loading')}
-                    value={value}
-                    onChange={setValue}
-                    beforeMount={beforeMount}
-                    onMount={onMount}
-                    options={{ links: false }}
-                  />
-                )}
-              </AutoSizer>
+          <Grid container component={Paper}>
+            <Grid size={{ xs: 12, sm: 6 }} sx={{ padding: theme.spacing(1) }}>
+              <Typography variant="body1">Request</Typography>
+              <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', columnGap: theme.spacing(1) }}>
+                <div style={{ color: theme.palette.text.secondary }}>URL:</div>
+                <div>{request?.url}</div>
+
+                <div style={{ color: theme.palette.text.secondary }}>Method:</div>
+                <div>{request?.method}</div>
+              </div>
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }} sx={{ padding: theme.spacing(1) }}>
+              <Typography variant="body1">Response</Typography>
+              <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', columnGap: theme.spacing(1) }}>
+                <div style={{ color: theme.palette.text.secondary }}>Code:</div>
+                <div>{Response?.statusCode}</div>
+
+                <div style={{ color: theme.palette.text.secondary }}>Version:</div>
+                <div>{Response?.serverVersion}</div>
+              </div>
+            </Grid>
+          </Grid>
+
+          {loading ? (
+            <Skeleton />
+          ) : (
+            <div
+              style={{
+                flexGrow: 1,
+                border: `1px solid ${theme.palette.divider}`,
+                position: 'relative'
+              }}
+            >
+              <div style={{ position: 'absolute', top: 0, bottom: 0, left: 0, right: 0 }}>
+                <AutoSizer>
+                  {({ width, height }: { width: number; height: number }) => (
+                    <Editor
+                      language="json"
+                      width={width}
+                      height={height}
+                      theme={theme.palette.mode === 'dark' ? 'vs-dark' : 'vs'}
+                      loading={t('loading')}
+                      value={value}
+                      onChange={setValue}
+                      beforeMount={beforeMount}
+                      onMount={onMount}
+                      options={{ links: false }}
+                    />
+                  )}
+                </AutoSizer>
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </PageFullSize>
     );
 };
