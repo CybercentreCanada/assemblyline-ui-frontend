@@ -121,7 +121,11 @@ const WrappedInfoSection: React.FC<Props> = ({ submission }) => {
                 {t('params.services.selected')}
               </Button>
             </Grid>
-            <Grid size={{ xs: 8, sm: 9, lg: 10 }} style={{ wordBreak: 'break-word' }}>
+            <Grid
+              size={{ xs: 8, sm: 9, lg: 10 }}
+              sx={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}
+              style={{ wordBreak: 'break-word' }}
+            >
               {submission ? (
                 <>
                   <Collapse in={!expanded} timeout="auto">
