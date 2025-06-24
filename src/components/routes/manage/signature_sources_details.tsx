@@ -1,8 +1,6 @@
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import SettingsEthernetIcon from '@mui/icons-material/SettingsEthernet';
-import Visibility from '@mui/icons-material/Visibility';
-import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import { Grid, IconButton, Typography, useTheme } from '@mui/material';
+import { Grid, Typography, useTheme } from '@mui/material';
 import Badge from '@mui/material/Badge';
 import useALContext from 'components/hooks/useALContext';
 import type { EnvironmentVariable, UpdateSource, UpdateSourceCommon } from 'components/models/base/service';
@@ -14,10 +12,11 @@ import { JSONInput } from 'components/visual/Inputs/JSONInput';
 import { NumberInput } from 'components/visual/Inputs/NumberInput';
 import { SelectInput } from 'components/visual/Inputs/SelectInput';
 import { SliderInput } from 'components/visual/Inputs/SliderInput';
+import { TextAreaInput } from 'components/visual/Inputs/TextAreaInput';
 import { TextInput } from 'components/visual/Inputs/TextInput';
 import Moment from 'components/visual/Moment';
 import { TabContainer } from 'components/visual/TabContainer';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 type Props = {
@@ -40,9 +39,6 @@ const WrappedSourceDetail = ({
   const { t } = useTranslation(['manageSignatureSources']);
   const theme = useTheme();
   const { c12nDef } = useALContext();
-
-  const [showPassword, setShowPassword] = useState<boolean>(false);
-  const [showPrivateKey, setShowPrivateKey] = useState<boolean>(false);
 
   const gitFetch = useMemo<boolean>(() => source.fetch_method === 'GIT', [source.fetch_method]);
   const postFetch = useMemo<boolean>(() => source.fetch_method === 'POST', [source.fetch_method]);
@@ -316,20 +312,7 @@ const WrappedSourceDetail = ({
                             loading={!source}
                             value={!source ? null : source.password}
                             reset={showReset(source, defaults, 'password')}
-                            textfieldProps={{
-                              autoComplete: 'new-password',
-                              type: showPassword ? 'text' : 'password'
-                            }}
-                            endAdornment={
-                              <IconButton
-                                aria-label={showPassword ? 'hide the password' : 'display the password'}
-                                size="small"
-                                onClick={() => setShowPassword(!showPassword)}
-                                sx={{ padding: theme.spacing(0.25) }}
-                              >
-                                {showPassword ? <VisibilityOff /> : <Visibility />}
-                              </IconButton>
-                            }
+                            password
                             onChange={(e, v) => {
                               setModified(true);
                               setSource(s => ({ ...s, password: v }));
@@ -344,28 +327,15 @@ const WrappedSourceDetail = ({
                     )}
 
                     <Grid size={{ xs: 12 }}>
-                      <TextInput
+                      <TextAreaInput
                         label={t('private_key')}
                         loading={!source}
                         value={!source ? null : source.private_key}
                         reset={showReset(source, defaults, 'private_key')}
+                        autoComplete="new-password"
+                        rows={6}
+                        password
                         monospace
-                        textfieldProps={{
-                          autoComplete: 'new-password',
-                          type: showPrivateKey ? 'text' : 'password',
-                          multiline: showPrivateKey,
-                          rows: 6
-                        }}
-                        endAdornment={
-                          <IconButton
-                            aria-label={showPrivateKey ? 'hide the password' : 'display the password'}
-                            size="small"
-                            onClick={() => setShowPrivateKey(!showPrivateKey)}
-                            sx={{ padding: theme.spacing(0.25) }}
-                          >
-                            {showPassword ? <VisibilityOff /> : <Visibility />}
-                          </IconButton>
-                        }
                         onChange={(e, v) => {
                           setModified(true);
                           setSource(s => ({ ...s, private_key: v }));
@@ -396,15 +366,12 @@ const WrappedSourceDetail = ({
 
                     {postFetch && (
                       <Grid size={{ xs: 12 }}>
-                        <TextInput
+                        <TextAreaInput
                           label={t('post_data')}
                           loading={!source}
                           value={!source ? null : source.data}
                           monospace
-                          textfieldProps={{
-                            multiline: true,
-                            rows: 6
-                          }}
+                          rows={6}
                           onChange={(e, v) => {
                             setModified(true);
                             setSource(s => ({ ...s, data: v }));
@@ -432,16 +399,13 @@ const WrappedSourceDetail = ({
                     </Grid>
 
                     <Grid size={{ xs: 12 }}>
-                      <TextInput
+                      <TextAreaInput
                         label={t('ca')}
                         loading={!source}
                         value={!source ? null : source.ca_cert}
                         reset={showReset(source, defaults, 'ca_cert')}
                         monospace
-                        textfieldProps={{
-                          multiline: true,
-                          rows: 6
-                        }}
+                        rows={6}
                         onChange={(e, v) => {
                           setModified(true);
                           setSource(s => ({ ...s, ca_cert: v }));
