@@ -14,6 +14,7 @@ import { Tooltip } from 'components/visual/Tooltip';
 import type { Moment } from 'moment';
 import moment from 'moment';
 import React, { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export type DateInputProps = Omit<TextFieldProps, 'error' | 'value' | 'onChange'> & {
   defaultDateOffset?: number | null;
@@ -28,6 +29,8 @@ export type DateInputProps = Omit<TextFieldProps, 'error' | 'value' | 'onChange'
   loading?: boolean;
   maxDateToday?: boolean;
   minDateTomorrow?: boolean;
+  monospace?: boolean;
+  password?: boolean;
   placeholder?: TextFieldProps['InputProps']['placeholder'];
   preventDisabledColor?: boolean;
   preventRender?: boolean;
@@ -52,11 +55,13 @@ const WrappedDateInput = ({
   helperText = null,
   helperTextProps = null,
   id: idProp = null,
-  label,
+  label: labelProp = null,
   labelProps,
   loading = false,
   maxDateToday = false,
   minDateTomorrow = false,
+  monospace = false,
+  password = false,
   placeholder = null,
   preventDisabledColor = false,
   preventRender = false,
@@ -66,21 +71,25 @@ const WrappedDateInput = ({
   tiny = false,
   tooltip = null,
   tooltipProps = null,
-  value,
+  value = '',
+  onBlur = () => null,
   onChange = () => null,
-  onReset = () => null,
   onError = () => null,
+  onFocus = () => null,
+  onReset = () => null,
   ...textFieldProps
 }: DateInputProps) => {
+  const { i18n } = useTranslation();
   const theme = useTheme();
 
   const [tempDate, setTempDate] = useState<Moment>(null);
   const [tomorrow, setTomorrow] = useState<Moment>(null);
   const [today, setToday] = useState<Moment>(null);
   const [focused, setFocused] = useState<boolean>(false);
+  const [showPassword, setShowPassword] = useState<boolean>(true);
 
+  const label = useMemo<string>(() => labelProp ?? '\u00A0', [labelProp]);
   const id = useMemo<string>(() => (idProp || label).replaceAll(' ', '-'), [idProp, label]);
-
   const errorValue = useMemo<string>(
     () => error(tempDate && tempDate.isValid() ? `${tempDate.format('YYYY-MM-DDThh:mm:ss.SSSSSS')}Z` : null),
     [error, tempDate]
@@ -112,7 +121,7 @@ const WrappedDateInput = ({
   }, [defaultDateOffset, value]);
 
   return preventRender ? null : (
-    <LocalizationProvider dateAdapter={AdapterMoment}>
+    <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale={i18n.language}>
       <div style={{ textAlign: 'left' }}>
         <Tooltip title={tooltip} {...tooltipProps}>
           <Typography
@@ -133,6 +142,7 @@ const WrappedDateInput = ({
             children={label}
           />
         </Tooltip>
+
         <FormControl fullWidth>
           {loading ? (
             <Skeleton sx={{ height: '40px', transform: 'unset', ...(tiny && { height: '28px' }) }} />
@@ -161,6 +171,8 @@ const WrappedDateInput = ({
                   error: !!errorValue && !disabled,
                   disabled: disabled,
                   helperText: disabled ? null : errorValue || helperText,
+                  ...(readOnly && !disabled && { focused: null }),
+                  ...textFieldProps,
                   FormHelperTextProps: disabled
                     ? null
                     : errorValue
@@ -179,7 +191,8 @@ const WrappedDateInput = ({
                   sx: {
                     '& .MuiInputBase-input': {
                       ...(tiny && { fontSize: '14px' }),
-                      ...(readOnly && !disabled && { cursor: 'default' })
+                      ...(readOnly && !disabled && { cursor: 'default' }),
+                      ...(monospace && { fontFamily: 'monospace' })
                     },
                     '& .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline': {
                       ...(readOnly &&
@@ -189,15 +202,20 @@ const WrappedDateInput = ({
                         })
                     }
                   },
-                  ...(readOnly && !disabled && { focused: null }),
-                  ...textFieldProps,
-                  onFocus: event => setFocused(document.activeElement === event.target),
-                  onBlur: () => setFocused(false),
+                  onFocus: (event, ...other) => {
+                    setFocused(!readOnly && !disabled && document.activeElement === event.target);
+                    onFocus(event, ...other);
+                  },
+                  onBlur: (event, ...other) => {
+                    setFocused(false);
+                    onBlur(event, ...other);
+                  },
                   inputProps: {
                     ...(tiny && { sx: { padding: '2.5px 4px 2.5px 8px' } })
                   },
                   InputProps: {
                     placeholder: placeholder,
+
                     endAdornment: (
                       <>
                         {loading || !reset || disabled || readOnly ? null : (
@@ -227,4 +245,4 @@ const WrappedDateInput = ({
   );
 };
 
-export const DateInput = React.memo(WrappedDateInput);
+export const DateInput: React.FC<DateInputProps> = React.memo(WrappedDateInput);
