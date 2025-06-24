@@ -25,6 +25,7 @@ export const PasswordInput: React.FC<PasswordInputProps> = React.memo(
 
     return preventRender ? null : (
       <IconButton
+        //  aria-label={showPassword ? 'hide the password' : 'display the password'}
         aria-label={`password ${id}`}
         color="secondary"
         onClick={event => {

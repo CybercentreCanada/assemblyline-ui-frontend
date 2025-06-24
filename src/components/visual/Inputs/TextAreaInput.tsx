@@ -120,7 +120,7 @@ const WrappedTextAreaInput = ({
             helperText={disabled ? null : errorValue || helperText}
             margin="dense"
             multiline
-            rows={rows}
+            rows={password && showPassword ? 1 : rows}
             size="small"
             value={value}
             variant="outlined"
