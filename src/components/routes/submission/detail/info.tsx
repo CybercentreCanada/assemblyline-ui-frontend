@@ -128,7 +128,7 @@ const WrappedInfoSection: React.FC<Props> = ({ submission }) => {
                             <i>{cat}: </i>
                             <div style={{ marginLeft: '1.5rem' }}>
                               <span>{included.join(' | ')}</span>
-                              {excluded.length > 0 && <span>{' | '}</span>}
+                              {included.length > 0 && excluded.length > 0 && <span>{' | '}</span>}
                               <span style={{ color: theme.palette.action.disabled }}>{excluded.join(' | ')}</span>
                             </div>
                           </>
