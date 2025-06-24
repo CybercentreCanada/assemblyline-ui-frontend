@@ -18,6 +18,7 @@ import {
   useTheme
 } from '@mui/material';
 import { HelperText } from 'components/visual/Inputs/components/HelperText';
+import { PasswordInput } from 'components/visual/Inputs/components/PasswordInput';
 import type { ResetInputProps } from 'components/visual/Inputs/components/ResetInput';
 import { ResetInput } from 'components/visual/Inputs/components/ResetInput';
 import { Tooltip } from 'components/visual/Tooltip';
@@ -44,6 +45,7 @@ export type TextInputProps<
   loading?: boolean;
   monospace?: boolean;
   options?: AutocompleteProps<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>['options'];
+  password?: boolean;
   placeholder?: TextFieldProps['InputProps']['placeholder'];
   preventDisabledColor?: boolean;
   preventRender?: boolean;
@@ -69,6 +71,7 @@ const WrappedTextInput = <
   FreeSolo extends boolean = boolean,
   ChipComponent extends ElementType = ElementType
 >({
+  autoComplete,
   disabled,
   endAdornment = null,
   error = () => null,
@@ -81,6 +84,7 @@ const WrappedTextInput = <
   loading = false,
   monospace = false,
   options = [],
+  password = false,
   placeholder = null,
   preventDisabledColor = false,
   preventRender = false,
@@ -106,6 +110,7 @@ const WrappedTextInput = <
   const [_value, setValue] =
     useState<AutocompleteValue<Value, Multiple, true | DisableClearable, true | FreeSolo>>(null);
   const [focused, setFocused] = useState<boolean>(false);
+  const [showPassword, setShowPassword] = useState<boolean>(true);
 
   const label = useMemo<string>(() => labelProp ?? '\u00A0', [labelProp]);
   const id = useMemo<string>(() => (idProp || label).replaceAll(' ', '-'), [idProp, label]);
@@ -138,6 +143,7 @@ const WrappedTextInput = <
         ) : (
           <Autocomplete
             id={id}
+            autoComplete={autoComplete}
             disableClearable
             disabled={disabled}
             freeSolo
@@ -174,6 +180,7 @@ const WrappedTextInput = <
                 id={id}
                 variant="outlined"
                 error={!!errorValue}
+                type={password && showPassword ? 'password' : 'text'}
                 {...(readOnly && !disabled && { focused: null })}
                 {...params}
                 InputProps={{
@@ -185,20 +192,27 @@ const WrappedTextInput = <
                     <>{startAdornment && <InputAdornment position="start">{startAdornment}</InputAdornment>}</>
                   ),
                   endAdornment: (
-                    <>
-                      {loading || !reset || disabled || readOnly ? null : (
-                        <InputAdornment position="end">
-                          <ResetInput
-                            id={id}
-                            preventRender={loading || !reset || disabled || readOnly}
-                            tiny={tiny}
-                            onReset={onReset}
-                            {...resetProps}
-                          />
-                        </InputAdornment>
+                    <InputAdornment position="end">
+                      {loading || !password || disabled || readOnly ? null : (
+                        <PasswordInput
+                          id={id}
+                          preventRender={loading || !password || disabled || readOnly}
+                          tiny={tiny}
+                          showPassword={showPassword}
+                          onShowPassword={() => setShowPassword(p => !p)}
+                        />
                       )}
-                      {endAdornment && <InputAdornment position="end">{endAdornment}</InputAdornment>}
-                    </>
+                      {loading || !reset || disabled || readOnly ? null : (
+                        <ResetInput
+                          id={id}
+                          preventRender={loading || !reset || disabled || readOnly}
+                          tiny={tiny}
+                          onReset={onReset}
+                          {...resetProps}
+                        />
+                      )}
+                      {endAdornment}
+                    </InputAdornment>
                   )
                 }}
                 sx={{

@@ -3,6 +3,7 @@ import { Button, Checkbox, FormControl, FormControlLabel, Skeleton, useTheme } f
 import type { ExpandInputProps } from 'components/visual/Inputs/components/ExpandInput';
 import { ExpandInput } from 'components/visual/Inputs/components/ExpandInput';
 import { HelperText } from 'components/visual/Inputs/components/HelperText';
+import { PasswordInput } from 'components/visual/Inputs/components/PasswordInput';
 import type { ResetInputProps } from 'components/visual/Inputs/components/ResetInput';
 import { ResetInput } from 'components/visual/Inputs/components/ResetInput';
 import { Tooltip } from 'components/visual/Tooltip';
@@ -21,6 +22,8 @@ export type CheckboxInputProps = Omit<ButtonProps, 'onChange' | 'onClick' | 'val
   label?: string;
   labelProps?: TypographyProps;
   loading?: boolean;
+  monospace?: boolean;
+  password?: boolean;
   preventDisabledColor?: boolean;
   preventRender?: boolean;
   readOnly?: boolean;
@@ -55,6 +58,8 @@ const WrappedCheckboxInput = ({
   label: labelProp = null,
   labelProps = null,
   loading = false,
+  monospace = false,
+  password = false,
   preventDisabledColor = false,
   preventRender = false,
   readOnly = false,
@@ -76,6 +81,7 @@ const WrappedCheckboxInput = ({
   const theme = useTheme();
 
   const [focused, setFocused] = useState<boolean>(false);
+  const [showPassword, setShowPassword] = useState<boolean>(true);
 
   const label = useMemo<string>(() => labelProp ?? '\u00A0', [labelProp]);
   const id = useMemo<string>(() => (idProp || label).replaceAll(' ', '-'), [idProp, label]);
@@ -157,7 +163,15 @@ const WrappedCheckboxInput = ({
               <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', columnGap: theme.spacing(1) }}>
                 <span
                   style={{
-                    ...(!showOverflow && { textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden' })
+                    ...(!showOverflow && { textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden' }),
+                    ...(monospace && { fontFamily: 'monospace' }),
+                    ...(password &&
+                      showPassword && {
+                        fontFamily: 'password',
+                        WebkitTextSecurity: 'disc',
+                        MozTextSecurity: 'disc',
+                        textSecurity: 'disc'
+                      })
                   }}
                 >
                   {label}
@@ -203,6 +217,15 @@ const WrappedCheckboxInput = ({
             alignItems: 'center'
           }}
         >
+          <PasswordInput
+            id={id}
+            preventRender={loading || !password || disabled || readOnly}
+            tiny={tiny}
+            showPassword={showPassword}
+            onShowPassword={() => setShowPassword(p => !p)}
+            {...resetProps}
+          />
+
           <ResetInput
             id={id}
             preventRender={loading || !reset || disabled || readOnly}

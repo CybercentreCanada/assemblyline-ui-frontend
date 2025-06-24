@@ -14,6 +14,7 @@ import { Tooltip } from 'components/visual/Tooltip';
 import type { Moment } from 'moment';
 import moment from 'moment';
 import React, { useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export type DateInputProps = Omit<TextFieldProps, 'error' | 'value' | 'onChange'> & {
   defaultDateOffset?: number | null;
@@ -28,6 +29,8 @@ export type DateInputProps = Omit<TextFieldProps, 'error' | 'value' | 'onChange'
   loading?: boolean;
   maxDateToday?: boolean;
   minDateTomorrow?: boolean;
+  monospace?: boolean;
+  password?: boolean;
   placeholder?: TextFieldProps['InputProps']['placeholder'];
   preventDisabledColor?: boolean;
   preventRender?: boolean;
@@ -57,6 +60,8 @@ const WrappedDateInput = ({
   loading = false,
   maxDateToday = false,
   minDateTomorrow = false,
+  monospace = false,
+  password = false,
   placeholder = null,
   preventDisabledColor = false,
   preventRender = false,
@@ -74,12 +79,14 @@ const WrappedDateInput = ({
   onReset = () => null,
   ...textFieldProps
 }: DateInputProps) => {
+  const { i18n } = useTranslation();
   const theme = useTheme();
 
   const [tempDate, setTempDate] = useState<Moment>(null);
   const [tomorrow, setTomorrow] = useState<Moment>(null);
   const [today, setToday] = useState<Moment>(null);
   const [focused, setFocused] = useState<boolean>(false);
+  const [showPassword, setShowPassword] = useState<boolean>(true);
 
   const label = useMemo<string>(() => labelProp ?? '\u00A0', [labelProp]);
   const id = useMemo<string>(() => (idProp || label).replaceAll(' ', '-'), [idProp, label]);
@@ -114,7 +121,7 @@ const WrappedDateInput = ({
   }, [defaultDateOffset, value]);
 
   return preventRender ? null : (
-    <LocalizationProvider dateAdapter={AdapterMoment}>
+    <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale={i18n.language}>
       <div style={{ textAlign: 'left' }}>
         <Tooltip title={tooltip} {...tooltipProps}>
           <Typography
@@ -184,7 +191,8 @@ const WrappedDateInput = ({
                   sx: {
                     '& .MuiInputBase-input': {
                       ...(tiny && { fontSize: '14px' }),
-                      ...(readOnly && !disabled && { cursor: 'default' })
+                      ...(readOnly && !disabled && { cursor: 'default' }),
+                      ...(monospace && { fontFamily: 'monospace' })
                     },
                     '& .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline': {
                       ...(readOnly &&

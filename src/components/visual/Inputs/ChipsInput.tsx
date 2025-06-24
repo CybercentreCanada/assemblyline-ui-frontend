@@ -19,6 +19,7 @@ import {
 } from '@mui/material';
 import CustomChip from 'components/visual/CustomChip';
 import { HelperText } from 'components/visual/Inputs/components/HelperText';
+import { PasswordInput } from 'components/visual/Inputs/components/PasswordInput';
 import type { ResetInputProps } from 'components/visual/Inputs/components/ResetInput';
 import { ResetInput } from 'components/visual/Inputs/components/ResetInput';
 import { Tooltip } from 'components/visual/Tooltip';
@@ -46,6 +47,7 @@ export type ChipsInputProps<
   loading?: boolean;
   monospace?: boolean;
   options?: string[];
+  password?: boolean;
   placeholder?: TextFieldProps['InputProps']['placeholder'];
   preventDisabledColor?: boolean;
   preventRender?: boolean;
@@ -70,6 +72,7 @@ const WrappedChipsInput = <
   FreeSolo extends boolean = boolean,
   ChipComponent extends ElementType = ElementType
 >({
+  autoComplete,
   disabled,
   endAdornment = null,
   error = () => null,
@@ -83,6 +86,7 @@ const WrappedChipsInput = <
   loading = false,
   monospace = false,
   options = [],
+  password = false,
   placeholder = null,
   preventDisabledColor = false,
   preventRender = false,
@@ -105,6 +109,7 @@ const WrappedChipsInput = <
   const theme = useTheme();
 
   const [focused, setFocused] = useState<boolean>(false);
+  const [showPassword, setShowPassword] = useState<boolean>(true);
 
   const label = useMemo<string>(() => labelProp ?? '\u00A0', [labelProp]);
   const id = useMemo<string>(() => (idProp || label).replaceAll(' ', '-'), [idProp, label]);
@@ -136,6 +141,7 @@ const WrappedChipsInput = <
           <Skeleton sx={{ height: '40px', transform: 'unset', ...(tiny && { height: '28px' }) }} />
         ) : (
           <Autocomplete
+            autoComplete={autoComplete}
             id={id}
             freeSolo
             multiple
@@ -165,6 +171,7 @@ const WrappedChipsInput = <
                 id={id}
                 variant="outlined"
                 error={!!errorValue}
+                type={password && showPassword ? 'password' : 'text'}
                 placeholder={placeholder}
                 {...(readOnly && !disabled && { focused: null })}
                 slotProps={{
@@ -180,19 +187,29 @@ const WrappedChipsInput = <
                     ),
                     endAdornment: (
                       <>
-                        {endAdornment && <InputAdornment position="end">{endAdornment}</InputAdornment>}
-                        {loading || !reset || disabled || readOnly ? null : (
-                          <InputAdornment
-                            position="end"
-                            sx={{
-                              position: 'absolute',
-                              right: '37px',
-                              top: '50%',
-                              transform: 'translate(0, -50%)',
-                              ...(!focused && { visibility: 'hidden' })
-                            }}
-                            style={{ display: 'hidden' }}
-                          >
+                        <InputAdornment
+                          position="end"
+                          sx={{
+                            position: 'absolute',
+                            right: '37px',
+                            top: '50%',
+                            transform: 'translate(0, -50%)',
+                            ...(!focused && { visibility: 'hidden' })
+                          }}
+                          style={{ display: 'hidden' }}
+                        >
+                          {endAdornment}
+                          {loading || !password || disabled || readOnly ? null : (
+                            <PasswordInput
+                              id={id}
+                              preventRender={loading || !password || disabled || readOnly}
+                              tiny={tiny}
+                              showPassword={showPassword}
+                              onShowPassword={() => setShowPassword(p => !p)}
+                              {...resetProps}
+                            />
+                          )}
+                          {loading || !reset || disabled || readOnly ? null : (
                             <ResetInput
                               id={id}
                               preventRender={loading || !reset || disabled || readOnly}
@@ -200,8 +217,9 @@ const WrappedChipsInput = <
                               onReset={onReset}
                               {...resetProps}
                             />
-                          </InputAdornment>
-                        )}
+                          )}
+                          {/* {params?.InputProps?.endAdornment} */}
+                        </InputAdornment>
                         {params?.InputProps?.endAdornment}
                       </>
                     )
@@ -244,6 +262,14 @@ const WrappedChipsInput = <
                       ...(readOnly &&
                         !disabled && {
                           cursor: 'default'
+                        }),
+                      ...(monospace && { fontFamily: 'monospace' }),
+                      ...(password &&
+                        showPassword && {
+                          fontFamily: 'password',
+                          WebkitTextSecurity: 'disc',
+                          MozTextSecurity: 'disc',
+                          textSecurity: 'disc'
                         })
                     }}
                   />

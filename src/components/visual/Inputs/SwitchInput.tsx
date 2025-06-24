@@ -8,6 +8,7 @@ import type {
 } from '@mui/material';
 import { Button, FormControl, FormControlLabel, Skeleton, Switch, useTheme } from '@mui/material';
 import { HelperText } from 'components/visual/Inputs/components/HelperText';
+import { PasswordInput } from 'components/visual/Inputs/components/PasswordInput';
 import type { ResetInputProps } from 'components/visual/Inputs/components/ResetInput';
 import { ResetInput } from 'components/visual/Inputs/components/ResetInput';
 import { Tooltip } from 'components/visual/Tooltip';
@@ -22,6 +23,8 @@ export type SwitchInputProps = Omit<ButtonProps, 'onChange' | 'onClick' | 'value
   label?: string;
   labelProps?: TypographyProps;
   loading?: boolean;
+  monospace?: boolean;
+  password?: boolean;
   preventDisabledColor?: boolean;
   preventRender?: boolean;
   readOnly?: boolean;
@@ -49,6 +52,8 @@ export const SwitchInput: React.FC<SwitchInputProps> = React.memo(
     label: labelProp = null,
     labelProps = null,
     loading = false,
+    monospace = false,
+    password = false,
     preventDisabledColor = false,
     preventRender = false,
     readOnly = false,
@@ -69,6 +74,7 @@ export const SwitchInput: React.FC<SwitchInputProps> = React.memo(
     const theme = useTheme();
 
     const [focused, setFocused] = useState<boolean>(false);
+    const [showPassword, setShowPassword] = useState<boolean>(true);
 
     const label = useMemo<string>(() => labelProp ?? '\u00A0', [labelProp]);
     const id = useMemo<string>(() => (idProp || label).replaceAll(' ', '-'), [idProp, label]);
@@ -148,7 +154,15 @@ export const SwitchInput: React.FC<SwitchInputProps> = React.memo(
                 >
                   <span
                     style={{
-                      ...(!showOverflow && { textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden' })
+                      ...(!showOverflow && { textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden' }),
+                      ...(monospace && { fontFamily: 'monospace' }),
+                      ...(password &&
+                        showPassword && {
+                          fontFamily: 'password',
+                          WebkitTextSecurity: 'disc',
+                          MozTextSecurity: 'disc',
+                          textSecurity: 'disc'
+                        })
                     }}
                   >
                     {label}
@@ -195,6 +209,13 @@ export const SwitchInput: React.FC<SwitchInputProps> = React.memo(
             }}
           >
             <div>
+              <PasswordInput
+                id={id}
+                preventRender={loading || !password || disabled || readOnly}
+                tiny={tiny}
+                showPassword={showPassword}
+                onShowPassword={() => setShowPassword(p => !p)}
+              />
               <ResetInput
                 id={id}
                 preventRender={loading || !reset || disabled || readOnly}

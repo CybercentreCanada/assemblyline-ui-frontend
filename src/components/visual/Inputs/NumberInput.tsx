@@ -6,6 +6,7 @@ import type {
   TypographyProps
 } from '@mui/material';
 import { FormControl, InputAdornment, InputLabel, Skeleton, TextField, Typography, useTheme } from '@mui/material';
+import { PasswordInput } from 'components/visual/Inputs/components/PasswordInput';
 import type { ResetInputProps } from 'components/visual/Inputs/components/ResetInput';
 import { ResetInput } from 'components/visual/Inputs/components/ResetInput';
 import { Tooltip } from 'components/visual/Tooltip';
@@ -23,6 +24,7 @@ export type NumberInputProps = Omit<TextFieldProps, 'error' | 'value' | 'onChang
   max?: number;
   min?: number;
   monospace?: boolean;
+  password?: boolean;
   placeholder?: TextFieldProps['InputProps']['placeholder'];
   preventDisabledColor?: boolean;
   preventRender?: boolean;
@@ -55,6 +57,7 @@ const WrappedNumberInput = ({
   max = null,
   min = null,
   monospace = false,
+  password = false,
   placeholder = null,
   preventDisabledColor = false,
   preventRender = false,
@@ -78,6 +81,7 @@ const WrappedNumberInput = ({
   const theme = useTheme();
 
   const [focused, setFocused] = useState<boolean>(false);
+  const [showPassword, setShowPassword] = useState<boolean>(true);
 
   const label = useMemo<string>(() => labelProp ?? '\u00A0', [labelProp]);
   const id = useMemo<string>(() => (idProp || label).replaceAll(' ', '-'), [idProp, label]);
@@ -110,12 +114,12 @@ const WrappedNumberInput = ({
         ) : (
           <TextField
             id={id}
-            type="number"
             size="small"
             fullWidth
             value={[null, undefined, '', NaN].includes(value) ? '' : `${value}`}
             disabled={disabled}
             error={!!errorValue}
+            type={password && showPassword ? 'password' : 'text'}
             {...(readOnly && !disabled && { focused: null })}
             helperText={disabled ? null : errorValue || helperText}
             slotProps={{
@@ -152,6 +156,18 @@ const WrappedNumberInput = ({
                 ),
                 endAdornment: (
                   <>
+                    {loading || !password || disabled || readOnly ? null : (
+                      <InputAdornment position="end">
+                        <PasswordInput
+                          id={id}
+                          preventRender={loading || !password || disabled || readOnly}
+                          tiny={tiny}
+                          showPassword={showPassword}
+                          onShowPassword={() => setShowPassword(p => !p)}
+                          {...resetProps}
+                        />
+                      </InputAdornment>
+                    )}
                     {loading || !reset || disabled || readOnly ? null : (
                       <InputAdornment position="end">
                         <ResetInput
@@ -178,8 +194,8 @@ const WrappedNumberInput = ({
                 if (err) onError(null);
               } else {
                 let num = Number(event.target.value);
-                num = max !== null || max !== undefined ? Math.min(num, max) : num;
-                num = min !== null || min !== undefined ? Math.max(num, min) : num;
+                num = max !== null && max !== undefined ? Math.min(num, max) : num;
+                num = min !== null && min !== undefined ? Math.max(num, min) : num;
                 onChange(event, num);
 
                 const err = error(num);

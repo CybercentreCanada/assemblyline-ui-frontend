@@ -6,6 +6,7 @@ import type {
   TypographyProps
 } from '@mui/material';
 import { FormControl, InputAdornment, InputLabel, Skeleton, TextField, Typography, useTheme } from '@mui/material';
+import { PasswordInput } from 'components/visual/Inputs/components/PasswordInput';
 import type { ResetInputProps } from 'components/visual/Inputs/components/ResetInput';
 import { ResetInput } from 'components/visual/Inputs/components/ResetInput';
 import { Tooltip } from 'components/visual/Tooltip';
@@ -21,6 +22,7 @@ export type TextAreaInputProps = Omit<TextFieldProps, 'rows' | 'onChange' | 'err
   labelProps?: TypographyProps;
   loading?: boolean;
   monospace?: boolean;
+  password?: boolean;
   placeholder?: TextFieldProps['InputProps']['placeholder'];
   preventDisabledColor?: boolean;
   preventRender?: boolean;
@@ -40,6 +42,7 @@ export type TextAreaInputProps = Omit<TextFieldProps, 'rows' | 'onChange' | 'err
 };
 
 const WrappedTextAreaInput = ({
+  autoComplete,
   disabled,
   endAdornment = null,
   error = () => null,
@@ -51,6 +54,7 @@ const WrappedTextAreaInput = ({
   labelProps,
   loading = false,
   monospace = false,
+  password = false,
   placeholder = null,
   preventDisabledColor = false,
   preventRender = false,
@@ -74,6 +78,7 @@ const WrappedTextAreaInput = ({
   const theme = useTheme();
 
   const [focused, setFocused] = useState<boolean>(false);
+  const [showPassword, setShowPassword] = useState<boolean>(true);
 
   const label = useMemo<string>(() => labelProp ?? '\u00A0', [labelProp]);
   const id = useMemo<string>(() => (idProp || label).replaceAll(' ', '-'), [idProp, label]);
@@ -108,17 +113,18 @@ const WrappedTextAreaInput = ({
         ) : (
           <TextField
             id={id}
-            fullWidth
-            size="small"
-            multiline
-            rows={rows}
-            margin="dense"
-            variant="outlined"
-            value={value}
+            autoComplete={autoComplete}
             disabled={disabled}
             error={!!errorValue}
-            {...(readOnly && !disabled && { focused: null })}
+            fullWidth
             helperText={disabled ? null : errorValue || helperText}
+            margin="dense"
+            multiline
+            rows={rows}
+            size="small"
+            value={value}
+            variant="outlined"
+            {...(readOnly && !disabled && { focused: null })}
             slotProps={{
               formHelperText: disabled
                 ? null
@@ -138,7 +144,16 @@ const WrappedTextAreaInput = ({
 
               input: {
                 inputProps: {
-                  ...(tiny && { sx: { padding: '2.5px 4px 2.5px 8px' } })
+                  sx: {
+                    ...(tiny && { padding: '2.5px 4px 2.5px 8px' }),
+                    ...(password &&
+                      showPassword && {
+                        fontFamily: 'password',
+                        WebkitTextSecurity: 'disc',
+                        MozTextSecurity: 'disc',
+                        textSecurity: 'disc'
+                      })
+                  }
                 },
                 placeholder: placeholder,
                 readOnly: readOnly,
@@ -150,20 +165,27 @@ const WrappedTextAreaInput = ({
                   <>{startAdornment && <InputAdornment position="start">{startAdornment}</InputAdornment>}</>
                 ),
                 endAdornment: (
-                  <>
-                    {loading || !reset || disabled || readOnly ? null : (
-                      <InputAdornment position="end">
-                        <ResetInput
-                          id={id}
-                          preventRender={loading || !reset || disabled || readOnly}
-                          tiny={tiny}
-                          onReset={onReset}
-                          {...resetProps}
-                        />
-                      </InputAdornment>
+                  <InputAdornment position="end">
+                    {loading || !password || disabled || readOnly ? null : (
+                      <PasswordInput
+                        id={id}
+                        preventRender={loading || !password || disabled || readOnly}
+                        tiny={tiny}
+                        showPassword={showPassword}
+                        onShowPassword={() => setShowPassword(p => !p)}
+                      />
                     )}
-                    {endAdornment && <InputAdornment position="end">{endAdornment}</InputAdornment>}
-                  </>
+                    {loading || !reset || disabled || readOnly ? null : (
+                      <ResetInput
+                        id={id}
+                        preventRender={loading || !reset || disabled || readOnly}
+                        tiny={tiny}
+                        onReset={onReset}
+                        {...resetProps}
+                      />
+                    )}
+                    {endAdornment}
+                  </InputAdornment>
                 )
               }
             }}

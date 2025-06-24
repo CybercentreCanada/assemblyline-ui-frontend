@@ -28,6 +28,7 @@ import type { WhoAmI } from 'components/models/ui/user';
 import type { ClassificationProps } from 'components/visual/Classification';
 import CustomChip, { COLOR_MAP } from 'components/visual/CustomChip';
 import { HelperText } from 'components/visual/Inputs/components/HelperText';
+import { PasswordInput } from 'components/visual/Inputs/components/PasswordInput';
 import { Tooltip } from 'components/visual/Tooltip';
 import type { ClassificationParts, ClassificationValidator } from 'helpers/classificationParser';
 import {
@@ -53,6 +54,8 @@ export type ClassificationInputProps = Omit<ClassificationProps, 'c12n' | 'setCl
   label?: string;
   labelProps?: TypographyProps;
   loading?: boolean;
+  monospace?: boolean;
+  password?: boolean;
   placeholder?: TextFieldProps['InputProps']['placeholder'];
   preventDisabledColor?: boolean;
   preventRender?: boolean;
@@ -84,6 +87,8 @@ const WrappedClassificationInput = ({
   label: labelProp = null,
   labelProps,
   loading = false,
+  monospace = false,
+  password = false,
   preventDisabledColor = false,
   preventRender: preventRenderProp = false,
   readOnly = false,
@@ -104,6 +109,7 @@ const WrappedClassificationInput = ({
   const [showPicker, setShowPicker] = useState<boolean>(false);
   const [uParts, setUserParts] = useState<ClassificationParts>(defaultParts);
   const [validated, setValidated] = useState<ClassificationValidator>(defaultClassificationValidator);
+  const [showPassword, setShowPassword] = useState<boolean>(true);
 
   const isPhone = useMediaQuery(theme.breakpoints.only('xs'));
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
@@ -279,7 +285,18 @@ const WrappedClassificationInput = ({
                 fullWidth={fullWidth}
                 disabled={disabled}
                 onClick={readOnly ? null : () => setShowPicker(true)}
-                sx={{ fontWeight: 500, marginBottom: theme.spacing(0.75) }}
+                sx={{
+                  fontWeight: 500,
+                  marginBottom: theme.spacing(0.75),
+                  ...(monospace && { fontFamily: 'monospace' }),
+                  ...(password &&
+                    showPassword && {
+                      fontFamily: 'password',
+                      WebkitTextSecurity: 'disc',
+                      MozTextSecurity: 'disc',
+                      textSecurity: 'disc'
+                    })
+                }}
                 {...(tiny && { size: 'tiny' })}
               />
             </div>
@@ -471,6 +488,13 @@ const WrappedClassificationInput = ({
                 </Grid>
               </DialogContent>
               <DialogActions>
+                <PasswordInput
+                  id={id}
+                  preventRender={loading || !password || disabled || readOnly}
+                  tiny={tiny}
+                  showPassword={showPassword}
+                  onShowPassword={() => setShowPassword(p => !p)}
+                />
                 {reset && (
                   <Button onClick={event => handleReset(event)} color="secondary">
                     {t('classification.reset')}
