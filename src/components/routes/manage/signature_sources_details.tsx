@@ -93,7 +93,7 @@ const WrappedSourceDetail = ({
                         label={t('name')}
                         loading={!source}
                         disabled={!addMode}
-                        error={value => (value ? null : t('name.error'))}
+                        error={value => (value !== '' ? null : t('name.error'))}
                         value={!source ? null : source.name}
                         onChange={(e, v) => {
                           setModified(true);
@@ -240,7 +240,7 @@ const WrappedSourceDetail = ({
                       <TextInput
                         label={t('uri')}
                         loading={!source}
-                        error={value => (value ? null : t('uri.error'))}
+                        error={value => (value !== '' ? null : t('uri.error'))}
                         value={!source ? null : source.uri}
                         reset={showReset(source, defaults, 'uri')}
                         onChange={(e, v) => {
