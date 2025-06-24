@@ -118,7 +118,7 @@ function WrappedSubmissionDetail() {
   const { apiCall } = useMyAPI();
   const { addInsight, removeInsight } = useAssistant();
   const { showSuccessMessage, showErrorMessage } = useMySnackbar();
-  const { user: currentUser, c12nDef, configuration: systemConfig, settings } = useALContext();
+  const { user: currentUser, configuration: systemConfig, settings } = useALContext();
   const { setHighlightMap } = useHighlighter();
   const { setGlobalDrawer, globalDrawerOpened } = useDrawer();
   const { id, fid } = useParams<ParamProps>();
@@ -1413,10 +1413,7 @@ function WrappedSubmissionDetail() {
       />
 
       <div style={{ textAlign: 'left' }}>
-        <InfoSection
-          submission={submission}
-          serviceCategories={configuration ? configuration['services.categories'] : []}
-        />
+        <InfoSection submission={submission} />
         {filtered && (
           <div style={{ paddingBottom: theme.spacing(2), paddingTop: theme.spacing(2) }}>
             <Typography variant="subtitle1">
