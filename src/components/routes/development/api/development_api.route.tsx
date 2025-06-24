@@ -2,14 +2,16 @@ import type { Monaco } from '@monaco-editor/react';
 import Editor, { loader } from '@monaco-editor/react';
 import { Button, Grid, Paper, Skeleton, Typography, useTheme } from '@mui/material';
 import PageFullSize from 'commons/components/pages/PageFullSize';
+import { useALQuery } from 'components/core/Query/AL/useALQuery';
+import { useAPIMutation } from 'components/core/Query/API/useAPIMutation';
 import useALContext from 'components/hooks/useALContext';
-import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import type { Role } from 'components/models/base/user';
+import type { ApiDocumentation } from 'components/models/ui';
 import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import type { editor } from 'monaco-editor';
 import { languages } from 'monaco-editor';
-import { useCallback, useDeferredValue, useEffect, useMemo, useState } from 'react';
+import { useCallback, useDeferredValue, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate } from 'react-router';
 import AutoSizer from 'react-virtualized-auto-sizer';
@@ -49,16 +51,15 @@ type Response = {
 export const DevelopmentAPI = () => {
   const { t } = useTranslation(['developmentAPI']);
   const theme = useTheme();
-  const { apiCall } = useMyAPI();
   const { user: currentUser, configuration } = useALContext();
   const { showErrorMessage } = useMySnackbar();
 
   const [value, setValue] = useState<string>('');
-  const [routes, setRoutes] = useState<Route[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
   const [Response, setResponse] = useState<Response>(null);
 
   const deferredValue = useDeferredValue(value);
+
+  const { data: routes, isLoading } = useALQuery({ url: `/api/v4/` });
 
   const parseRequest = useCallback((v: string): Request => {
     let out: Request = { comment: null, url: null, method: null, body: null, response: null, error: null };
@@ -95,85 +96,75 @@ export const DevelopmentAPI = () => {
 
   const request = useMemo<Request>(() => parseRequest(deferredValue), [deferredValue, parseRequest]);
 
-  const currentRoute = useMemo<Route>(() => {
-    if (!request?.url) return null;
+  const currentRoute = useMemo<ApiDocumentation>(() => {
+    if (!request?.url || !routes?.apis) return null;
     const url = new URL(`${window.location.origin}${request?.url}`);
     return !request?.url
       ? null
-      : routes.find(route =>
+      : routes.apis.find(route =>
           new RegExp(`^${route.path.replaceAll(/<[^>]*>/g, '.*').replaceAll('/', '\\/')}$`).test(url.pathname)
         );
-  }, [request?.url, routes]);
-
-  const handleSubmit = useCallback((req: Request) => {
-    if (!currentRoute) return;
-    apiCall<unknown>({
-      url: req.url,
-      method: req.method,
-      body: req.body as object,
-      onSuccess: ({ api_response, api_server_version, api_status_code }) => {
-        setValue(v => stringifyRequest({ ...parseRequest(v), response: api_response }));
-        setResponse({ serverVersion: api_server_version, statusCode: api_status_code });
-      },
-      onFailure: ({ api_error_message, api_server_version, api_status_code }) => {
-        showErrorMessage(api_error_message);
-        setValue(v => stringifyRequest({ ...parseRequest(v), response: api_error_message }));
-        setResponse({ serverVersion: api_server_version, statusCode: api_status_code });
-      }
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [request?.url, routes?.apis]);
 
   const beforeMount = useCallback(
     (monaco: Monaco) => {
       monaco.languages.json.jsonDefaults.setDiagnosticsOptions({ comments: 'ignore' });
       monaco.languages.registerCompletionItemProvider('json', {
-        provideCompletionItems: (model, position) => ({
-          suggestions: routes.map(route => ({
-            label: {
-              label: route.path,
-              description: route.name
-            },
-            insertText: stringifyRequest({
-              comment: `/* ${route.description}*/`,
-              url: route.path,
-              method: `$\{100000000:${route.methods?.[0]}}` as Method,
-              body: '${100000001:null}'
-            }),
-            detail: route.name,
-            kind: languages.CompletionItemKind.Module,
-            insertTextRules: languages.CompletionItemInsertTextRule.InsertAsSnippet,
-            documentation: {
-              value: `<pre>${route.description}</pre>`,
-              supportHtml: true,
-              supportThemeIcons: true
-            },
-            range: {
-              startLineNumber: position.lineNumber,
-              startColumn: model.getWordUntilPosition(position).startColumn,
-              endLineNumber: position.lineNumber,
-              endColumn: model.getWordUntilPosition(position).endColumn
-            }
-          }))
-        })
+        provideCompletionItems: (model, position) =>
+          !routes?.apis
+            ? null
+            : {
+                suggestions: routes?.apis?.map(route => ({
+                  label: {
+                    label: route.path,
+                    description: route.name
+                  },
+                  insertText: stringifyRequest({
+                    comment: `/* ${route.description}*/`,
+                    url: route.path,
+                    method: `$\{100000000:${route.methods?.[0]}}` as Method,
+                    body: '${100000001:null}'
+                  }),
+                  detail: route.name,
+                  kind: languages.CompletionItemKind.Module,
+                  insertTextRules: languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                  documentation: {
+                    value: `<pre>${route.description}</pre>`,
+                    supportHtml: true,
+                    supportThemeIcons: true
+                  },
+                  range: {
+                    startLineNumber: position.lineNumber,
+                    startColumn: model.getWordUntilPosition(position).startColumn,
+                    endLineNumber: position.lineNumber,
+                    endColumn: model.getWordUntilPosition(position).endColumn
+                  }
+                }))
+              }
       });
     },
-    [routes, stringifyRequest]
+    [routes?.apis, stringifyRequest]
   );
 
   const onMount = useCallback((e: editor.IStandaloneCodeEditor) => {
     e.focus();
   }, []);
 
-  useEffect(() => {
-    apiCall<{ apis: Route[] }>({
-      url: `/api/v4/`,
-      onSuccess: ({ api_response }) => setRoutes(api_response.apis),
-      onEnter: () => setLoading(true),
-      onExit: () => setLoading(false)
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const handleSubmit2 = useAPIMutation((req: Request) => ({
+    url: req.url,
+    method: req.method,
+    body: req.body as object,
+    enabled: !currentRoute,
+    onSuccess: ({ api_response, api_server_version, api_status_code }) => {
+      setValue(v => stringifyRequest({ ...parseRequest(v), response: api_response }));
+      setResponse({ serverVersion: api_server_version, statusCode: api_status_code });
+    },
+    onFailure: ({ api_error_message, api_server_version, api_status_code }) => {
+      showErrorMessage(api_error_message);
+      setValue(v => stringifyRequest({ ...parseRequest(v), response: api_error_message }));
+      setResponse({ serverVersion: api_server_version, statusCode: api_status_code });
+    }
+  }));
 
   if (!currentUser.is_admin || !['development', 'staging'].includes(configuration.system.type))
     return <Navigate to="/forbidden" replace />;
@@ -184,7 +175,7 @@ export const DevelopmentAPI = () => {
           <PageHeader
             primary={t('title')}
             actions={
-              <Button disabled={!currentRoute} variant="contained" onClick={() => handleSubmit(request)}>
+              <Button disabled={!currentRoute} variant="contained" onClick={() => handleSubmit2.mutate(request)}>
                 {t('submit')}
               </Button>
             }
@@ -213,7 +204,7 @@ export const DevelopmentAPI = () => {
             </Grid>
           </Grid>
 
-          {loading ? (
+          {isLoading ? (
             <Skeleton />
           ) : (
             <div
