@@ -195,7 +195,6 @@ const WrappedSelectInput = <O extends Option[]>({
                 }}
               />
             )}
-            sx={{ textTransform: 'capitalize' }}
             onChange={event => {
               const v = event.target.value as string;
               onChange(event, v);
