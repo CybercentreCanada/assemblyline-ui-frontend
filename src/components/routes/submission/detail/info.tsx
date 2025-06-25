@@ -144,13 +144,13 @@ const WrappedInfoSection: React.FC<Props> = ({ submission }) => {
                     >
                       {groupedServices.map(([cat, included, excluded]) => (
                         <>
-                          <i {...(included.length === 0 && { style: { color: theme.palette.action.disabled } })}>
+                          <i {...(included.length === 0 && { style: { color: theme.palette.text.disabled } })}>
                             {`${cat}:`}
                           </i>
                           <div style={{ marginLeft: '1.5rem' }}>
                             <span>{included.join(' | ')}</span>
                             {included.length > 0 && excluded.length > 0 && <span>{' | '}</span>}
-                            <span style={{ color: theme.palette.action.disabled }}>{excluded.join(' | ')}</span>
+                            <span style={{ color: theme.palette.text.disabled }}>{excluded.join(' | ')}</span>
                           </div>
                         </>
                       ))}
