@@ -1,5 +1,7 @@
 import borealisEN from 'borealis-ui/dist/en/translation.json';
 import borealisFR from 'borealis-ui/dist/fr/translation.json';
+import developmentAPIEN from 'components/routes/development/api/development_api.i18n.en.json';
+import developmentAPIFR from 'components/routes/development/api/development_api.i18n.fr.json';
 import settingsEN from 'components/routes/settings/settings.i18n.en.json';
 import settingsFR from 'components/routes/settings/settings.i18n.fr.json';
 import submitEN from 'components/routes/submit/submit.i18n.en.json';
@@ -135,6 +137,7 @@ const resources = {
     borealis: borealisEN,
     carousel: carouselEN,
     dashboard: dashboardEN,
+    developmentAPI: developmentAPIEN,
     error403: error403EN,
     error404: error404EN,
     favorites: favoritesEN,
@@ -194,6 +197,7 @@ const resources = {
     borealis: borealisFR,
     carousel: carouselFR,
     dashboard: dashboardFR,
+    developmentAPI: developmentAPIFR,
     error403: error403FR,
     error404: error404FR,
     favorites: favoritesFR,
