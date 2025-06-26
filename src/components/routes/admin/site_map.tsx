@@ -18,7 +18,7 @@ import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import type { Role } from 'components/models/base/user';
-import type { SiteMap } from 'components/models/ui';
+import type { SiteMapResponse } from 'components/models/ui';
 import type { CustomUser } from 'components/models/ui/user';
 import CustomChip from 'components/visual/CustomChip';
 import { PageHeader } from 'components/visual/Layouts/PageHeader';
@@ -50,7 +50,7 @@ export default function SiteMapPage() {
   const { apiCall } = useMyAPI();
   const { user: currentUser } = useAppUser<CustomUser>();
 
-  const [siteMap, setSiteMap] = useState<SiteMap>(null);
+  const [siteMap, setSiteMap] = useState<SiteMapResponse>(null);
 
   const reqMapColor: Record<Role, PossibleColor> = {
     administration: 'error',
@@ -94,7 +94,7 @@ export default function SiteMapPage() {
 
   useEffect(() => {
     if (currentUser.is_admin) {
-      apiCall<SiteMap>({
+      apiCall<SiteMapResponse>({
         method: 'GET',
         url: '/api/site_map/',
         onSuccess: api_data => setSiteMap(api_data.api_response)
@@ -148,7 +148,7 @@ export default function SiteMapPage() {
                     </StyledTableCell>
                   )}
                   <StyledTableCell>
-                    {path.required_type &&
+                    {Array.isArray(path?.required_type) &&
                       path.required_type.map((req, rid) => (
                         <div key={rid}>
                           <CustomChip

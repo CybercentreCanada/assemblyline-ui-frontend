@@ -7,6 +7,7 @@ export type APIRequest = {
 };
 
 export type APIResponse<T = unknown> = {
+  message?: string;
   api_error_message: string;
   api_response: T;
   api_server_version: string;

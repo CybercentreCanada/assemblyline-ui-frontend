@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined';
+import ApiIcon from '@mui/icons-material/Api';
 import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
 import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
@@ -447,18 +448,18 @@ const useMyPreferences = () => {
           ],
           icon: <CodeIcon />,
           items: [
-            // {
-            //   id: 'development.api',
-            //   i18nKey: 'drawer.development.api',
-            //   userPropValidators: [
-            //     { prop: 'user.is_admin', value: true, enforce: true },
-            //     { prop: 'configuration.system.type', value: 'development' },
-            //     { prop: 'configuration.system.type', value: 'staging' }
-            //   ],
-            //   icon: <ApiIcon />,
-            //   route: '/development/api',
-            //   nested: true
-            // },
+            {
+              id: 'development.api',
+              i18nKey: 'drawer.development.api',
+              userPropValidators: [
+                { prop: 'user.is_admin', value: true, enforce: true },
+                { prop: 'configuration.system.type', value: 'development' },
+                { prop: 'configuration.system.type', value: 'staging' }
+              ],
+              icon: <ApiIcon />,
+              route: '/development/api',
+              nested: true
+            },
             {
               id: 'development.customize',
               i18nKey: 'drawer.development.customize',
