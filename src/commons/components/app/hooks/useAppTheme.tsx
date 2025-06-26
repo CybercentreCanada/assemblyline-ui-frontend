@@ -3,21 +3,25 @@ import { useMemo } from 'react';
 import { useApp } from 'commons/components/app/hooks';
 
 export type AppThemeType = {
+  autoDetectColorScheme: boolean;
   theme: PaletteMode;
   isDark: boolean;
   isLight: boolean;
   toggle: () => void;
+  toggleAutoDetectColorScheme: () => void;
 };
 
 export function useAppTheme(): AppThemeType {
-  const { theme, toggleTheme } = useApp();
+  const { autoDetectColorScheme, toggleAutoDetectColorScheme, theme, toggleTheme } = useApp();
   return useMemo(
     () => ({
+      autoDetectColorScheme,
       theme,
       isDark: theme === 'dark',
       isLight: theme === 'light',
-      toggle: toggleTheme
+      toggle: toggleTheme,
+      toggleAutoDetectColorScheme
     }),
-    [theme, toggleTheme]
+    [autoDetectColorScheme, toggleAutoDetectColorScheme, theme, toggleTheme]
   );
 }
