@@ -1,6 +1,7 @@
 import { TableOfContentProvider, useTableOfContent } from 'components/core/TableOfContent/TableOfContent';
 import type { LibraryFormStore } from 'components/routes/development/library/contexts/form';
 import { FormProvider, useForm } from 'components/routes/development/library/contexts/form';
+import { DateTimeSection } from 'components/routes/development/library/sections/DateTime';
 import { InputsSection } from 'components/routes/development/library/sections/Inputs';
 import { LayoutSection } from 'components/routes/development/library/sections/Layout';
 import { ListSection } from 'components/routes/development/library/sections/List';
@@ -104,6 +105,8 @@ const LibraryContent = () => {
                 return <ListSection />;
               case 'list_inputs':
                 return <ListInputsSection />;
+              case 'datetime':
+                return <DateTimeSection />;
             }
           })()}
         </PageLayout>
