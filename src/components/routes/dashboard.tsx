@@ -2,18 +2,30 @@ import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import PauseCircleOutlineIcon from '@mui/icons-material/PauseCircleOutline';
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
 import SpeedOutlinedIcon from '@mui/icons-material/SpeedOutlined';
-import type { CardProps } from '@mui/material';
+import type { CardProps, SwitchProps, TooltipProps } from '@mui/material';
 import { Card, Grid, Skeleton, styled, Switch, Tooltip, Typography, useTheme } from '@mui/material';
 import { useAppUser } from 'commons/components/app/hooks';
-import PageFullScreen from 'commons/components/pages/PageFullScreen';
+import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
+import type { AlerterMessage } from 'components/models/messages/alerter_heartbeat';
+import type { ArchiveMessage } from 'components/models/messages/archive_heartbeat';
+import type { DispatcherMessage } from 'components/models/messages/dispatcher_heartbeat';
+import type { ElasticMessage } from 'components/models/messages/elastic_heartbeat';
+import type { ExpiryMessage } from 'components/models/messages/expiry_heartbeat';
+import type { IngestMessage } from 'components/models/messages/ingest_heartbeat';
+import type { RetrohuntMessage } from 'components/models/messages/retrohunt_heartbeat';
+import type { ScalerMessage } from 'components/models/messages/scaler_heartbeat';
+import type { ScalerStatusMessage } from 'components/models/messages/scaler_status_heartbeat';
+import type { ServiceMessage } from 'components/models/messages/service_heartbeat';
 import type { CustomUser } from 'components/models/ui/user';
 import ArcGauge from 'components/visual/ArcGauge';
+import type { CustomChipProps } from 'components/visual/CustomChip';
 import CustomChip from 'components/visual/CustomChip';
 import { bytesToSize, humanSeconds, sumValues } from 'helpers/utils';
-import React, { useEffect, useReducer, useState } from 'react';
+import type { AnyActionArg, CSSProperties, ReactNode } from 'react';
+import React, { useEffect, useMemo, useReducer, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import io from 'socket.io-client';
 
@@ -60,7 +72,15 @@ const ErrorIcon = styled('div')(({ theme }) => ({
   float: 'right'
 }));
 
-const WrappedMetricCounter = ({ value, title, tooltip, init = false, margin = '8px' }) => {
+type MetricCounterProps = {
+  init: boolean;
+  margin?: CSSProperties['margin'];
+  title: CustomChipProps['label'];
+  tooltip: TooltipProps['title'];
+  value: string | number | ReactNode;
+};
+
+const WrappedMetricCounter = ({ value, title, tooltip, init = false, margin = '8px' }: MetricCounterProps) => {
   const theme = useTheme();
 
   return !init ? (
@@ -86,14 +106,24 @@ const WrappedMetricCounter = ({ value, title, tooltip, init = false, margin = '8
 };
 const MetricCounter = React.memo(WrappedMetricCounter);
 
-const WrappedIngestCard = ({ ingester, handleStatusChange, status }) => {
+type IngestCardProps = {
+  ingester: IngestMessage['msg'];
+  status: boolean;
+  handleStatusChange: SwitchProps['onChange'];
+};
+
+const WrappedIngestCard = ({ ingester, status, handleStatusChange }: IngestCardProps) => {
   const { t } = useTranslation(['dashboard']);
   const theme = useTheme();
-
-  const [timer, setTimer] = useState(null);
-  const [error, setError] = useState(null);
-  const busyness = (ingester.metrics.cpu_seconds * ingester.metrics.cpu_seconds_count) / ingester.instances / 60;
   const { user: currentUser } = useAppUser<CustomUser>();
+
+  const [timer, setTimer] = useState<NodeJS.Timeout>(null);
+  const [error, setError] = useState<string>(null);
+
+  const busyness = useMemo<number>(
+    () => (ingester.metrics.cpu_seconds * ingester.metrics.cpu_seconds_count) / ingester.instances / 60,
+    [ingester.instances, ingester.metrics.cpu_seconds, ingester.metrics.cpu_seconds_count]
+  );
 
   useEffect(() => {
     if (ingester.processing_chance.critical !== 1) {
@@ -320,12 +350,21 @@ const WrappedIngestCard = ({ ingester, handleStatusChange, status }) => {
   );
 };
 
-const WrappedDispatcherCard = ({ dispatcher, up, down, handleStatusChange, status }) => {
+type DispatcherCardProps = {
+  dispatcher: DispatcherMessage['msg'];
+  status: boolean;
+  up: string[];
+  down: string[];
+  handleStatusChange: SwitchProps['onChange'];
+};
+
+const WrappedDispatcherCard = ({ dispatcher, up, down, status, handleStatusChange }: DispatcherCardProps) => {
   const { t } = useTranslation(['dashboard']);
   const theme = useTheme();
 
-  const [timer, setTimer] = useState(null);
-  const [error, setError] = useState(null);
+  const [timer, setTimer] = useState<NodeJS.Timeout>(null);
+  const [error, setError] = useState<string>(null);
+
   const busyness = (dispatcher.metrics.cpu_seconds * dispatcher.metrics.cpu_seconds_count) / dispatcher.instances / 60;
   const startQueue = dispatcher.queues.start.reduce((x, y) => x + y, 0);
   const resultQueue = dispatcher.queues.result.reduce((x, y) => x + y, 0);
@@ -510,12 +549,15 @@ const WrappedDispatcherCard = ({ dispatcher, up, down, handleStatusChange, statu
   );
 };
 
-const WrappedArchiveCard = ({ archive }) => {
-  const { t } = useTranslation(['dashboard']);
-  const theme = useTheme();
+type ArchiveCardProps = {
+  archive: ArchiveMessage['msg'];
+};
 
-  const [timer, setTimer] = useState(null);
-  const [error, setError] = useState(null);
+const WrappedArchiveCard = ({ archive }: ArchiveCardProps) => {
+  const { t } = useTranslation(['dashboard']);
+
+  const [timer, setTimer] = useState<NodeJS.Timeout>(null);
+  const [error, setError] = useState<string>(null);
 
   useEffect(() => {
     if (archive.initialized && archive.metrics.exception > 0) {
@@ -612,10 +654,16 @@ const WrappedArchiveCard = ({ archive }) => {
   );
 };
 
-const WrappedExpiryCard = ({ expiry }) => {
+type ExpiryCardProps = {
+  expiry: ExpiryMessage['msg'];
+};
+
+const WrappedExpiryCard = ({ expiry }: ExpiryCardProps) => {
   const { t } = useTranslation(['dashboard']);
-  const [timer, setTimer] = useState(null);
-  const [error, setError] = useState(null);
+  const { configuration } = useALContext();
+
+  const [timer, setTimer] = useState<NodeJS.Timeout>(null);
+  const [error, setError] = useState<string>(null);
 
   useEffect(() => {
     if (expiry.initialized && sumValues(expiry.queues) > 0 && sumValues(expiry.metrics) === 0) {
@@ -674,6 +722,15 @@ const WrappedExpiryCard = ({ expiry }) => {
               title="R"
               tooltip={t('queues.result')}
             />
+            {configuration?.retrohunt?.enabled && (
+              <MetricCounter
+                init={expiry.initialized}
+                value={expiry.queues.retrohunt_hit}
+                title="R"
+                tooltip={t('queues.retrohunt_hit')}
+              />
+            )}
+
             <MetricCounter
               init={expiry.initialized}
               value={expiry.queues.submission + expiry.queues.submission_summary + expiry.queues.submission_tree}
@@ -723,6 +780,15 @@ const WrappedExpiryCard = ({ expiry }) => {
               title="R"
               tooltip={t('expired.result')}
             />
+            {configuration?.retrohunt?.enabled && (
+              <MetricCounter
+                init={expiry.initialized}
+                value={expiry.metrics.retrohunt_hit}
+                title="R"
+                tooltip={t('expired.retrohunt_hit')}
+              />
+            )}
+
             <MetricCounter
               init={expiry.initialized}
               value={expiry.metrics.submission + expiry.metrics.submission_summary + expiry.metrics.submission_tree}
@@ -749,10 +815,15 @@ const WrappedExpiryCard = ({ expiry }) => {
   );
 };
 
-const WrappedAlerterCard = ({ alerter }) => {
+type AlerterCardProps = {
+  alerter: AlerterMessage['msg'];
+};
+
+const WrappedAlerterCard = ({ alerter }: AlerterCardProps) => {
   const { t } = useTranslation(['dashboard']);
-  const [timer, setTimer] = useState(null);
-  const [error, setError] = useState(null);
+
+  const [timer, setTimer] = useState<NodeJS.Timeout>(null);
+  const [error, setError] = useState<string>(null);
 
   useEffect(() => {
     if (alerter.metrics.error > 0) {
@@ -843,10 +914,15 @@ const WrappedAlerterCard = ({ alerter }) => {
   );
 };
 
-const WrappedScalerResourcesCard = ({ scaler }) => {
+type ScalerResourcesCardProps = {
+  scaler: ScalerMessage['msg'];
+};
+
+const WrappedScalerResourcesCard = ({ scaler }: ScalerResourcesCardProps) => {
   const { t } = useTranslation(['dashboard']);
-  const [timer, setTimer] = useState(null);
-  const [error, setError] = useState(null);
+
+  const [timer, setTimer] = useState<NodeJS.Timeout>(null);
+  const [error, setError] = useState<string>(null);
 
   useEffect(() => {
     if ((timer !== null && scaler.initialized) || (timer === null && !scaler.initialized)) {
@@ -913,11 +989,15 @@ const WrappedScalerResourcesCard = ({ scaler }) => {
   );
 };
 
-const WrappedServiceCard = ({ service, max_inflight }) => {
-  const { t } = useTranslation(['dashboard']);
-  const theme = useTheme();
+type ServiceCardProps = {
+  service: ServiceMessage['msg'];
+  max_inflight: number;
+};
 
-  const [error, setError] = useState(null);
+const WrappedServiceCard = ({ service, max_inflight }: ServiceCardProps) => {
+  const { t } = useTranslation(['dashboard']);
+
+  const [error, setError] = useState<string>(null);
 
   useEffect(() => {
     if (service.scaler.target !== 0 && service.instances === 0) {
@@ -965,13 +1045,18 @@ const WrappedServiceCard = ({ service, max_inflight }) => {
 
 const WARN_SHARD_SIZE = 40_000_000_000;
 
-const WrappedElasticCard = ({ elastic }) => {
-  const { t } = useTranslation(['dashboard']);
-  const [timer, setTimer] = useState(null);
-  const [error, setError] = useState(null);
+type ElasticCardProps = {
+  elastic: ElasticMessage['msg'];
+};
 
-  let largestIndex = null;
-  let shardSize = null;
+const WrappedElasticCard = ({ elastic }: ElasticCardProps) => {
+  const { t } = useTranslation(['dashboard']);
+
+  const [timer, setTimer] = useState<NodeJS.Timeout>(null);
+  const [error, setError] = useState<string>(null);
+
+  let largestIndex: string = null;
+  let shardSize: number = null;
   if (elastic.shard_sizes.length > 0) {
     const row = elastic.shard_sizes.reduce((a, b) => (a.shard_size > b.shard_size ? a : b));
     largestIndex = row.name;
@@ -1050,12 +1135,17 @@ const WrappedElasticCard = ({ elastic }) => {
 
 const WARN_RETROHUNT_STORAGE = 10_000_000_000;
 
-const WrappedRetrohuntCard = ({ retrohunt }) => {
-  const { t } = useTranslation(['dashboard']);
-  const [timer, setTimer] = useState(null);
-  const [error, setError] = useState(null);
+type RetrohuntCardProps = {
+  retrohunt: RetrohuntMessage['msg'];
+};
 
-  let pendingFiles = retrohunt.pending_files;
+const WrappedRetrohuntCard = ({ retrohunt }: RetrohuntCardProps) => {
+  const { t } = useTranslation(['dashboard']);
+
+  const [timer, setTimer] = useState<NodeJS.Timeout>(null);
+  const [error, setError] = useState<string>(null);
+
+  let pendingFiles: number | string = retrohunt.pending_files;
   if (pendingFiles === 1_000_000) {
     pendingFiles = pendingFiles.toString() + '+';
   }
@@ -1159,9 +1249,18 @@ const ServiceCard = React.memo(WrappedServiceCard);
 const ElasticCard = React.memo(WrappedElasticCard);
 const RetrohuntCard = React.memo(WrappedRetrohuntCard);
 
-const basicReducer = (state, newState) => ({ ...state, ...newState });
+type ServicesList = {
+  up: string[] | any;
+  down: string[] | any;
+  timing: Record<string, number>;
+};
 
-const serviceReducer = (state, serviceState) => {
+const basicReducer = <T extends object>(state: T, newState: T) => ({ ...state, ...newState });
+
+const serviceReducer = (
+  state: Record<string, ServiceMessage['msg']>,
+  serviceState: { type: 'service' | 'scaler'; hb: ScalerStatusMessage['msg'] | ServiceMessage['msg'] }
+) => {
   const { type: hbType, hb } = serviceState;
   const current = state[hb.service_name] || {};
   if (hbType === 'scaler') {
@@ -1184,7 +1283,7 @@ const serviceReducer = (state, serviceState) => {
   return { ...state, ...newState };
 };
 
-const serviceListReducer = (state, serviceName) => {
+const serviceListReducer = (state: ServicesList, serviceName: string) => {
   const { up, down, timing } = state;
   const curTime = Math.floor(new Date().getTime() / 1000);
   timing[serviceName] = curTime;
@@ -1192,6 +1291,7 @@ const serviceListReducer = (state, serviceName) => {
     up.push(serviceName);
   }
   if (down.indexOf(serviceName) !== -1) {
+    // This is a bug
     down.pop(serviceName);
   }
 
@@ -1213,7 +1313,7 @@ const DEFAULT_ALERTER = {
   },
   error: null,
   initialized: false
-};
+} as AlerterMessage['msg'];
 
 const DEFAULT_DISPATCHER = {
   instances: 0,
@@ -1239,7 +1339,7 @@ const DEFAULT_DISPATCHER = {
   },
   error: null,
   initialized: false
-};
+} as DispatcherMessage['msg'];
 
 const DEFAULT_ARCHIVE = {
   instances: 0,
@@ -1255,7 +1355,7 @@ const DEFAULT_ARCHIVE = {
   error: null,
   initialized: false,
   queued: 0
-};
+} as ArchiveMessage['msg'];
 
 const DEFAULT_EXPIRY = {
   instances: 0,
@@ -1268,6 +1368,7 @@ const DEFAULT_EXPIRY = {
     file: 0,
     filescore: 0,
     result: 0,
+    retrohunt_hit: 0,
     safelist: 0,
     submission: 0,
     submission_tree: 0,
@@ -1282,6 +1383,7 @@ const DEFAULT_EXPIRY = {
     file: 0,
     filescore: 0,
     result: 0,
+    retrohunt_hit: 0,
     safelist: 0,
     submission: 0,
     submission_tree: 0,
@@ -1289,7 +1391,7 @@ const DEFAULT_EXPIRY = {
   },
   error: null,
   initialized: false
-};
+} as ExpiryMessage['msg'];
 
 const DEFAULT_INGESTER = {
   instances: 0,
@@ -1332,7 +1434,7 @@ const DEFAULT_INGESTER = {
   },
   error: null,
   initialized: false
-};
+} as IngestMessage['msg'];
 
 const DEFAULT_SCALER = {
   instances: 0,
@@ -1344,7 +1446,7 @@ const DEFAULT_SCALER = {
   },
   error: null,
   initialized: false
-};
+} as ScalerMessage['msg'];
 
 const DEFAULT_SERVICE = {
   duty_cycle: 0,
@@ -1377,22 +1479,22 @@ const DEFAULT_SERVICE = {
   },
   service_name: null,
   error: null
-};
+} as ServiceMessage['msg'];
 
 const DEFAULT_SERVICE_LIST = {
   up: [],
   down: [],
   timing: {}
-};
+} as ServicesList;
 
 const DEFAULT_ELASTIC = {
   instances: 0,
   request_time: 0,
   unassigned_shards: 0,
-  shard_sizes: {},
+  shard_sizes: [],
   error: null,
   initialized: false
-};
+} as ElasticMessage['msg'];
 
 const DEFAULT_RETROHUNT = {
   instances: 0,
@@ -1406,26 +1508,32 @@ const DEFAULT_RETROHUNT = {
   total_memory_used: 0,
   error: null,
   initialized: false
-};
+} as RetrohuntMessage['msg'];
 
 const Dashboard = () => {
   const { t } = useTranslation(['dashboard']);
-  const [alerter, setAlerter] = useReducer(basicReducer, DEFAULT_ALERTER);
-  const [archive, setArchive] = useReducer(basicReducer, DEFAULT_ARCHIVE);
-  const [dispatcher, setDispatcher] = useReducer(basicReducer, DEFAULT_DISPATCHER);
-  const [expiry, setExpiry] = useReducer(basicReducer, DEFAULT_EXPIRY);
-  const [ingester, setIngester] = useReducer(basicReducer, DEFAULT_INGESTER);
-  const [scaler, setScaler] = useReducer(basicReducer, DEFAULT_SCALER);
-  const [elastic, setElastic] = useReducer(basicReducer, DEFAULT_ELASTIC);
-  const [retrohunt, setRetrohunt] = useReducer(basicReducer, DEFAULT_RETROHUNT);
-  const [services, setServices] = useReducer(serviceReducer, {});
-  const [servicesList, setServicesList] = useReducer(serviceListReducer, DEFAULT_SERVICE_LIST);
-
-  const [dispatcherStatus, setDispatcherStatus] = useState(null);
-  const [ingestStatus, setIngestStatus] = useState(null);
-
   const { apiCall } = useMyAPI();
   const { configuration } = useALContext();
+
+  const [alerter, setAlerter] = useReducer<AlerterMessage['msg'], AnyActionArg>(basicReducer, DEFAULT_ALERTER);
+  const [archive, setArchive] = useReducer<ArchiveMessage['msg'], AnyActionArg>(basicReducer, DEFAULT_ARCHIVE);
+  const [dispatcher, setDispatcher] = useReducer<DispatcherMessage['msg'], AnyActionArg>(
+    basicReducer,
+    DEFAULT_DISPATCHER
+  );
+  const [expiry, setExpiry] = useReducer<ExpiryMessage['msg'], AnyActionArg>(basicReducer, DEFAULT_EXPIRY);
+  const [ingester, setIngester] = useReducer<IngestMessage['msg'], AnyActionArg>(basicReducer, DEFAULT_INGESTER);
+  const [scaler, setScaler] = useReducer<ScalerMessage['msg'], AnyActionArg>(basicReducer, DEFAULT_SCALER);
+  const [elastic, setElastic] = useReducer<ElasticMessage['msg'], AnyActionArg>(basicReducer, DEFAULT_ELASTIC);
+  const [retrohunt, setRetrohunt] = useReducer<RetrohuntMessage['msg'], AnyActionArg>(basicReducer, DEFAULT_RETROHUNT);
+  const [services, setServices] = useReducer<Record<string, ServiceMessage['msg']>, AnyActionArg>(serviceReducer, {});
+  const [servicesList, setServicesList] = useReducer<ServicesList, AnyActionArg>(
+    serviceListReducer,
+    DEFAULT_SERVICE_LIST
+  );
+
+  const [dispatcherStatus, setDispatcherStatus] = useState<boolean>(null);
+  const [ingestStatus, setIngestStatus] = useState<boolean>(null);
 
   function handleIngesterStatusChange(event) {
     apiCall({
@@ -1470,62 +1578,62 @@ const Dashboard = () => {
     };
   });
 
-  const handleAlerterHeartbeat = hb => {
+  const handleAlerterHeartbeat = (hb: AlerterMessage['msg']) => {
     // eslint-disable-next-line no-console
     console.debug('Socket-IO :: AlerterHeartbeat', hb);
     setAlerter({ ...hb, initialized: true });
   };
 
-  const handleArchiveHeartbeat = hb => {
+  const handleArchiveHeartbeat = (hb: ArchiveMessage['msg']) => {
     // eslint-disable-next-line no-console
     console.debug('Socket-IO :: ArchiveHeartbeat', hb);
     setArchive({ ...hb, initialized: true });
   };
 
-  const handleDispatcherHeartbeat = hb => {
+  const handleDispatcherHeartbeat = (hb: DispatcherMessage['msg']) => {
     // eslint-disable-next-line no-console
     console.debug('Socket-IO :: DispatcherHeartbeat', hb);
     setDispatcher({ ...hb, initialized: true });
   };
 
-  const handleExpiryHeartbeat = hb => {
+  const handleExpiryHeartbeat = (hb: ExpiryMessage['msg']) => {
     // eslint-disable-next-line no-console
     console.debug('Socket-IO :: ExpiryHeartbeat', hb);
     setExpiry({ ...hb, initialized: true });
   };
 
-  const handleIngestHeartbeat = hb => {
+  const handleIngestHeartbeat = (hb: IngestMessage['msg']) => {
     // eslint-disable-next-line no-console
     console.debug('Socket-IO :: IngestHeartbeat', hb);
     setIngester({ ...hb, initialized: true });
   };
 
-  const handleScalerHeartbeat = hb => {
+  const handleScalerHeartbeat = (hb: ScalerMessage['msg']) => {
     // eslint-disable-next-line no-console
     console.debug('Socket-IO :: ScalerHeartbeat', hb);
     setScaler({ ...hb, initialized: true });
   };
 
-  const handleElasticHeartbeat = hb => {
+  const handleElasticHeartbeat = (hb: ElasticMessage['msg']) => {
     // eslint-disable-next-line no-console
     console.debug('Socket-IO :: ElasticHeartbeat', hb);
     setElastic({ ...hb, initialized: true });
   };
 
-  const handleRetrohuntHeartbeat = hb => {
+  const handleRetrohuntHeartbeat = (hb: RetrohuntMessage['msg']) => {
     // eslint-disable-next-line no-console
     console.debug('Socket-IO :: RetrohuntHeartbeat', hb);
     setRetrohunt({ ...hb, initialized: true });
   };
 
-  const handleServiceHeartbeat = hb => {
+  const handleServiceHeartbeat = (hb: ServiceMessage['msg']) => {
     // eslint-disable-next-line no-console
     console.debug(`Socket-IO :: ServiceHeartbeat ${hb.service_name}`, hb);
     setServicesList(hb.service_name);
     setServices({ type: 'service', hb: { ...hb, last_hb: Math.floor(new Date().getTime() / 1000) } });
   };
 
-  const handleScalerStatusHeartbeat = hb => {
+  const handleScalerStatusHeartbeat = (hb: ScalerStatusMessage['msg']) => {
     // eslint-disable-next-line no-console
     console.debug(`Socket-IO :: ScalerStatusHeartbeat ${hb.service_name}`, hb);
     setServices({ type: 'scaler', hb });
@@ -1564,7 +1672,7 @@ const Dashboard = () => {
   });
 
   return (
-    <PageFullScreen margin={4}>
+    <PageFullWidth margin={4}>
       <Typography gutterBottom color="primary" variant="h2" align="center">
         {t('title')}
       </Typography>
@@ -1649,7 +1757,7 @@ const Dashboard = () => {
             </Grid>
           ))}
       </Grid>
-    </PageFullScreen>
+    </PageFullWidth>
   );
 };
 

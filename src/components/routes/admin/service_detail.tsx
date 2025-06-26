@@ -259,7 +259,13 @@ function Service({ name = null, onDeleted = () => null, onUpdated = () => null }
             square
             style={{ backgroundColor: name ? theme.palette.background.default : theme.palette.background.paper }}
           >
-            <TabList onChange={onChangeTab} indicatorColor="primary" textColor="primary">
+            <TabList
+              onChange={onChangeTab}
+              indicatorColor="primary"
+              textColor="primary"
+              variant="scrollable"
+              scrollButtons="auto"
+            >
               <Tab label={t('tab.general')} value="general" />
               <Tab label={t('tab.docker')} value="docker" />
               {service.update_config ? <Tab label={t('tab.updater')} value="updater" /> : <Empty />}

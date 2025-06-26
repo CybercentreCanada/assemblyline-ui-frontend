@@ -59,13 +59,13 @@ export const SubmissionOptions = React.memo(() => {
                     loading={loading}
                     disabled={disabled || !isEditing || (!customize && restricted)}
                     preventRender={!customize && restricted}
-                    reset={value !== defaultValue}
+                    reset={defaultValue !== null && value !== defaultValue}
                     placeholder={
                       tab === 'file' && file
                         ? `Inspection of file: ${file?.name}`
                         : tab === 'hash' && hashType
-                        ? `Inspection of ${hashType.toUpperCase()}: ${hashValue}`
-                        : null
+                          ? `Inspection of ${hashType.toUpperCase()}: ${hashValue}`
+                          : null
                     }
                     rootProps={{ style: { marginBottom: theme.spacing(1) } }}
                     onChange={(e, v) => form.setFieldValue('settings.description.value', v)}
@@ -88,14 +88,14 @@ export const SubmissionOptions = React.memo(() => {
                       loading={loading}
                       disabled={disabled || !isEditing || (!customize && restricted)}
                       preventRender={!customize && restricted}
-                      reset={value !== defaultValue}
+                      reset={defaultValue !== null && value !== defaultValue}
                       options={priorityOptions}
                       error={v =>
                         !v
                           ? t('options.submission.priority.error.empty')
                           : !priorityOptions.some(o => o.value === v)
-                          ? t('options.submission.priority.error.invalid')
-                          : null
+                            ? t('options.submission.priority.error.invalid')
+                            : null
                       }
                       rootProps={{ style: { marginBottom: theme.spacing(1), flex: 1 } }}
                       onChange={(e, v) => form.setFieldValue('settings.priority.value', v as number)}
@@ -122,7 +122,7 @@ export const SubmissionOptions = React.memo(() => {
                       loading={loading}
                       disabled={disabled || !isEditing || (!customize && restricted)}
                       preventRender={!customize && restricted}
-                      reset={value !== defaultValue}
+                      reset={defaultValue !== null && value !== defaultValue}
                       min={configuration.submission.max_dtl !== 0 ? 1 : 0}
                       max={configuration.submission.max_dtl !== 0 ? configuration.submission.max_dtl : 365}
                       rootProps={{ style: { marginBottom: theme.spacing(1), flex: 1 } }}
@@ -146,7 +146,7 @@ export const SubmissionOptions = React.memo(() => {
                     loading={loading}
                     disabled={disabled || !isEditing || (!customize && restricted)}
                     preventRender={!customize && restricted}
-                    reset={value !== defaultValue}
+                    reset={defaultValue !== null && value !== defaultValue}
                     labelProps={{ color: 'textPrimary' }}
                     onChange={(e, v) => form.setFieldValue('settings.generate_alert.value', v)}
                     onReset={() => form.setFieldValue('settings.generate_alert.value', defaultValue)}
@@ -167,7 +167,7 @@ export const SubmissionOptions = React.memo(() => {
                     loading={loading}
                     disabled={disabled || !isEditing || (!customize && restricted)}
                     preventRender={!customize && restricted}
-                    reset={value !== defaultValue}
+                    reset={defaultValue !== null && value !== defaultValue}
                     labelProps={{ color: 'textPrimary' }}
                     onChange={(e, v) => form.setFieldValue('settings.ignore_filtering.value', v)}
                     onReset={() => form.setFieldValue('settings.ignore_filtering.value', defaultValue)}
@@ -188,7 +188,7 @@ export const SubmissionOptions = React.memo(() => {
                     loading={loading}
                     disabled={disabled || !isEditing || (!customize && restricted)}
                     preventRender={!customize && restricted}
-                    reset={value !== defaultValue}
+                    reset={defaultValue !== null && value !== defaultValue}
                     labelProps={{ color: 'textPrimary' }}
                     onChange={(e, v) => form.setFieldValue('settings.ignore_cache.value', v)}
                     onReset={() => form.setFieldValue('settings.ignore_cache.value', defaultValue)}
@@ -209,7 +209,7 @@ export const SubmissionOptions = React.memo(() => {
                     loading={loading}
                     disabled={disabled || !isEditing || (!customize && restricted)}
                     preventRender={!customize && restricted}
-                    reset={value !== defaultValue}
+                    reset={defaultValue !== null && value !== defaultValue}
                     labelProps={{ color: 'textPrimary' }}
                     onChange={(e, v) => form.setFieldValue('settings.ignore_recursion_prevention.value', v)}
                     onReset={() => form.setFieldValue('settings.ignore_recursion_prevention.value', defaultValue)}
@@ -230,7 +230,7 @@ export const SubmissionOptions = React.memo(() => {
                     loading={loading}
                     disabled={disabled || !isEditing || (!customize && restricted)}
                     preventRender={!customize && restricted}
-                    reset={value !== defaultValue}
+                    reset={defaultValue !== null && value !== defaultValue}
                     labelProps={{ color: 'textPrimary' }}
                     onChange={(e, v) => form.setFieldValue('settings.deep_scan.value', v)}
                     onReset={() => form.setFieldValue('settings.deep_scan.value', defaultValue)}
