@@ -1,6 +1,9 @@
 {
   "complete": "Complete",
   "count_towards_quota": "Count towards quota",
+  "description": "Description",
+  "elapse_time": "Elapse time",
+  "error": "Error",
   "method": "Method",
   "name": "Name",
   "path": "Path",

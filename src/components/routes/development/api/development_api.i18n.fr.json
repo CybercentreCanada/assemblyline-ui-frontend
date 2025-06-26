@@ -1,6 +1,9 @@
 {
   "complete": "Complet",
   "count_towards_quota": "Compte pour le quota",
+  "description": "Description",
+  "elapse_time": "Temps écoulé",
+  "error": "Erreur",
   "method": "Méthode",
   "name": "Nom",
   "path": "Chemin",

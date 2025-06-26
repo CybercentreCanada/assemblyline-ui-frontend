@@ -12,4 +12,5 @@ export type Request = {
 export type Response = {
   statusCode: number;
   serverVersion: string;
+  elapseTime: number;
 };
