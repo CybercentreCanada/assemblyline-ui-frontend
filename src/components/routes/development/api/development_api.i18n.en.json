@@ -1,3 +1,16 @@
 {
-  "title": "API Request"
+  "complete": "Complete",
+  "count_towards_quota": "Count towards quota",
+  "method": "Method",
+  "name": "Name",
+  "path": "Path",
+  "protected": "Protected",
+  "request": "Request",
+  "required_role": "Required roles",
+  "response": "Response",
+  "status_code": "Code",
+  "title": "API Request",
+  "ui_only": "UI only",
+  "url": "URL",
+  "version": "Version"
 }

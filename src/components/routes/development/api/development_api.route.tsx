@@ -6,47 +6,23 @@ import { useALQuery } from 'components/core/Query/AL/useALQuery';
 import { useAPIMutation } from 'components/core/Query/API/useAPIMutation';
 import useALContext from 'components/hooks/useALContext';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import type { Role } from 'components/models/base/user';
 import type { ApiDocumentation } from 'components/models/ui';
+import type { Method } from 'components/models/utils/request';
+import type { Request, Response } from 'components/routes/development/api/development_api.models';
+import {
+  METHOD_COLOR_MAP,
+  parseRequest,
+  stringifyRequest
+} from 'components/routes/development/api/development_api.utils';
+import CustomChip from 'components/visual/CustomChip';
 import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import type { editor } from 'monaco-editor';
-import { languages } from 'monaco-editor';
-import { useCallback, useDeferredValue, useMemo, useState } from 'react';
+import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate } from 'react-router';
 import AutoSizer from 'react-virtualized-auto-sizer';
 
 loader.config({ paths: { vs: '/cdn/monaco_0.35.0/vs' } });
-
-type Method = 'GET' | 'POST';
-
-type Route = {
-  complete: boolean;
-  count_towards_quota: boolean;
-  description: string;
-  function: string;
-  id: string;
-  methods: Method[];
-  name: string;
-  path: string;
-  protected: boolean;
-  require_role: Role[];
-  ui_only: boolean;
-};
-
-type Request = {
-  comment?: string;
-  url?: string;
-  method?: Method;
-  body?: unknown;
-  response?: unknown;
-  error?: unknown;
-};
-
-type Response = {
-  statusCode: number;
-  serverVersion: string;
-};
 
 export const DevelopmentAPI = () => {
   const { t } = useTranslation(['developmentAPI']);
@@ -57,114 +33,150 @@ export const DevelopmentAPI = () => {
   const [value, setValue] = useState<string>('');
   const [Response, setResponse] = useState<Response>(null);
 
-  const deferredValue = useDeferredValue(value);
+  const deferredValue = useDeferredValue<string>(value);
 
   const { data: routes, isLoading } = useALQuery({ url: `/api/v4/` });
 
-  const parseRequest = useCallback((v: string): Request => {
-    let out: Request = { comment: null, url: null, method: null, body: null, response: null, error: null };
-    out.comment = v.match(/\/\*[\s\S]*?\*\//)?.[0] || null;
+  const request = useMemo<Request>(() => parseRequest(deferredValue), [deferredValue]);
 
-    try {
-      const data = JSON.parse(v.replace(out.comment, '')) as Request;
-      out = {
-        ...out,
-        url: data?.url || null,
-        method: data?.method || null,
-        body: data?.body || null,
-        response: data?.response || null,
-        error: null
-      };
-    } catch (e: unknown) {
-      out.error = e;
-    }
+  const requestRef = useRef<Request>(request);
 
-    return out;
-  }, []);
-
-  const stringifyRequest = useCallback(
-    ({ comment = '', url = '', method = 'GET', body = null, response = null }: Request): string =>
-      `${comment}\n` +
-      `{\n` +
-      `\t"url": "${url.replaceAll(/<[^>]*>/g, (v, i) => `$\{${i}:${v}}`)}",\n` +
-      `\t"method": "${method}",\n` +
-      `\t"body": ${body === null ? 'null' : typeof body === 'string' ? body : JSON.stringify(body, null, '\t')},\n` +
-      `\t"response": ${response ? JSON.stringify(response, null, '\t') : 'null'}\n` +
-      `}`,
-    []
-  );
-
-  const request = useMemo<Request>(() => parseRequest(deferredValue), [deferredValue, parseRequest]);
-
-  const currentRoute = useMemo<ApiDocumentation>(() => {
+  const currentRoute = useMemo<ApiDocumentation | null>(() => {
+    // Ensure request URL and API routes are valid before proceeding
     if (!request?.url || !routes?.apis) return null;
-    const url = new URL(`${window.location.origin}${request?.url}`);
-    return !request?.url
-      ? null
-      : routes.apis.find(route =>
-          new RegExp(`^${route.path.replaceAll(/<[^>]*>/g, '.*').replaceAll('/', '\\/')}$`).test(url.pathname)
-        );
+
+    // Parse the current request URL
+    const currentUrl = new URL(request.url, window.location.origin);
+
+    // Find the matching route based on the request URL
+    return (
+      routes.apis.find(apiRoute => {
+        const routeRegex = new RegExp(`^${apiRoute.path.replaceAll(/<[^>]*>/g, '.*').replaceAll('/', '\\/')}$`);
+        return routeRegex.test(currentUrl.pathname);
+      }) || null
+    ); // Return null if no matching route is found
   }, [request?.url, routes?.apis]);
+
+  const handleSubmit = useAPIMutation((req: Request) => {
+    console.log(req);
+    return {
+      url: req.url,
+      method: req.method,
+      body: req.body as object,
+      onSuccess: ({ api_response, api_server_version, api_status_code }) => {
+        setValue(v => stringifyRequest({ ...parseRequest(v), response: api_response }));
+        setResponse({ serverVersion: api_server_version, statusCode: api_status_code });
+
+        console.log(api_response);
+      },
+      onFailure: ({ api_error_message, api_server_version, api_status_code }) => {
+        showErrorMessage(api_error_message);
+        setValue(v => stringifyRequest({ ...parseRequest(v), response: api_error_message }));
+        setResponse({ serverVersion: api_server_version, statusCode: api_status_code });
+      }
+    };
+  });
+
+  console.log(handleSubmit);
 
   const beforeMount = useCallback(
     (monaco: Monaco) => {
+      // Ignore comments in JSON diagnostics
       monaco.languages.json.jsonDefaults.setDiagnosticsOptions({ comments: 'ignore' });
+
+      // Register a completion item provider for JSON
       monaco.languages.registerCompletionItemProvider('json', {
-        provideCompletionItems: (model, position) =>
-          !routes?.apis
-            ? null
-            : {
-                suggestions: routes?.apis?.map(route => ({
-                  label: {
-                    label: route.path,
-                    description: route.name
-                  },
-                  insertText: stringifyRequest({
-                    comment: `/* ${route.description}*/`,
-                    url: route.path,
-                    method: `$\{100000000:${route.methods?.[0]}}` as Method,
-                    body: '${100000001:null}'
-                  }),
-                  detail: route.name,
-                  kind: languages.CompletionItemKind.Module,
-                  insertTextRules: languages.CompletionItemInsertTextRule.InsertAsSnippet,
-                  documentation: {
-                    value: `<pre>${route.description}</pre>`,
-                    supportHtml: true,
-                    supportThemeIcons: true
-                  },
-                  range: {
-                    startLineNumber: position.lineNumber,
-                    startColumn: model.getWordUntilPosition(position).startColumn,
-                    endLineNumber: position.lineNumber,
-                    endColumn: model.getWordUntilPosition(position).endColumn
-                  }
-                }))
+        provideCompletionItems: (model, position) => {
+          // Check that we are only on the first line
+          if (position.lineNumber !== 1) {
+            return null; // Do not provide suggestions for any other lines
+          }
+
+          // If `routes.apis` is unavailable, return nothing
+          if (!routes?.apis) {
+            return null;
+          }
+
+          // Provide suggestions for the first line
+          return {
+            suggestions: routes.apis.map(route => ({
+              label: {
+                label: route.path,
+                description: route.name
+              },
+              insertText: stringifyRequest({
+                comment: `/* ${route.description}*/`,
+                url: route.path,
+                method: `$\{100000000:${route.methods?.[0]}}` as Method,
+                body: '${100000001:null}'
+              }),
+              detail: route.name,
+              kind: monaco.languages.CompletionItemKind.Module,
+              insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+              documentation: {
+                value: `<pre>${route.description}</pre>`,
+                supportHtml: true,
+                supportThemeIcons: true
+              },
+              range: {
+                startLineNumber: position.lineNumber,
+                startColumn: model.getWordUntilPosition(position).startColumn,
+                endLineNumber: position.lineNumber,
+                endColumn: model.getWordUntilPosition(position).endColumn
               }
+            }))
+          };
+        }
       });
     },
-    [routes?.apis, stringifyRequest]
+    [routes?.apis]
   );
 
-  const onMount = useCallback((e: editor.IStandaloneCodeEditor) => {
-    e.focus();
-  }, []);
+  const onMount = useCallback(
+    (editor: editor.IStandaloneCodeEditor, monaco: Monaco) => {
+      editor.focus();
 
-  const handleSubmit2 = useAPIMutation((req: Request) => ({
-    url: req.url,
-    method: req.method,
-    body: req.body as object,
-    enabled: !currentRoute,
-    onSuccess: ({ api_response, api_server_version, api_status_code }) => {
-      setValue(v => stringifyRequest({ ...parseRequest(v), response: api_response }));
-      setResponse({ serverVersion: api_server_version, statusCode: api_status_code });
+      // Add a custom format action (Ctrl+Shift+F / Cmd+Shift+F)
+      editor.addAction({
+        id: 'format-code',
+        label: 'Format Code',
+        keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS],
+        run: () => {
+          // Trigger the editor's built-in format action
+          editor.getAction('editor.action.formatDocument').run();
+        }
+      });
+
+      // Add a custom format action (Ctrl+Shift+F / Cmd+Shift+F)
+      editor.addAction({
+        id: 'format-code',
+        label: 'Format Code',
+        keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS],
+        run: () => {
+          // Trigger the editor's built-in format action
+          editor.getAction('editor.action.formatDocument').run();
+        }
+      });
+
+      // Add a custom action to capture Ctrl+Enter
+      editor.addAction({
+        id: 'ctrl-enter-action',
+        label: 'Trigger on Ctrl+Enter',
+        keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyCode.Enter], // Combine Ctrl/Cmd key with Enter key
+        run: () => {
+          console.log('asdasd', requestRef.current);
+          handleSubmit.mutate(requestRef.current);
+        }
+      });
     },
-    onFailure: ({ api_error_message, api_server_version, api_status_code }) => {
-      showErrorMessage(api_error_message);
-      setValue(v => stringifyRequest({ ...parseRequest(v), response: api_error_message }));
-      setResponse({ serverVersion: api_server_version, statusCode: api_status_code });
-    }
-  }));
+    [handleSubmit]
+  );
+
+  useEffect(() => {
+    requestRef.current = request;
+  }, [request]);
+
+  console.log(routes);
 
   if (!currentUser.is_admin || !['development', 'staging'].includes(configuration.system.type))
     return <Navigate to="/forbidden" replace />;
@@ -175,7 +187,7 @@ export const DevelopmentAPI = () => {
           <PageHeader
             primary={t('title')}
             actions={
-              <Button disabled={!currentRoute} variant="contained" onClick={() => handleSubmit2.mutate(request)}>
+              <Button disabled={!currentRoute} variant="contained" onClick={() => handleSubmit.mutate(request)}>
                 {t('submit')}
               </Button>
             }
@@ -183,22 +195,90 @@ export const DevelopmentAPI = () => {
 
           <Grid container component={Paper}>
             <Grid size={{ xs: 12, sm: 6 }} sx={{ padding: theme.spacing(1) }}>
-              <Typography variant="body1">Request</Typography>
-              <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', columnGap: theme.spacing(1) }}>
-                <div style={{ color: theme.palette.text.secondary }}>URL:</div>
-                <div>{request?.url}</div>
+              <Typography variant="body1">{t('request')}</Typography>
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'auto 1fr',
+                  columnGap: theme.spacing(1),
+                  rowGap: theme.spacing(0.25)
+                }}
+              >
+                <div style={{ color: theme.palette.text.secondary }}>{t('name')}:</div>
+                <div>{currentRoute?.name}</div>
 
-                <div style={{ color: theme.palette.text.secondary }}>Method:</div>
-                <div>{request?.method}</div>
+                <div style={{ color: theme.palette.text.secondary }}>{t('path')}:</div>
+                <div>{currentRoute?.path}</div>
+
+                <div style={{ color: theme.palette.text.secondary }}>{t('method')}:</div>
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    flexWrap: 'wrap',
+                    columnGap: theme.spacing(0.5)
+                  }}
+                >
+                  {currentRoute?.methods.map((method, i) => (
+                    <CustomChip
+                      key={`${method}-${i}`}
+                      label={method}
+                      color={METHOD_COLOR_MAP?.[method] || 'default'}
+                      size="tiny"
+                    />
+                  ))}
+                </div>
+
+                <div style={{ color: theme.palette.text.secondary }}>{t('required_role')}:</div>
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    flexWrap: 'wrap',
+                    columnGap: theme.spacing(0.5)
+                  }}
+                >
+                  {currentRoute?.require_role.map((role, i) => (
+                    <CustomChip
+                      key={`${role}-${i}`}
+                      label={role}
+                      size="tiny"
+                      type="rounded"
+                      variant="outlined"
+                      {...(!currentUser.roles.includes(role) && { disabled: true })}
+                    />
+                  ))}
+                </div>
+
+                <div></div>
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    flexWrap: 'wrap',
+                    columnGap: theme.spacing(0.5)
+                  }}
+                >
+                  {!currentRoute ? null : (
+                    <>
+                      {currentRoute?.complete && <CustomChip label={t('complete')} size="tiny" type="rounded" />}
+                      {currentRoute?.count_towards_quota && (
+                        <CustomChip label={t('count_towards_quota')} size="tiny" type="rounded" />
+                      )}
+                      {currentRoute?.protected && <CustomChip label={t('protected')} size="tiny" type="rounded" />}
+                      {currentRoute?.ui_only && <CustomChip label={t('ui_only')} size="tiny" type="rounded" />}
+                    </>
+                  )}
+                </div>
               </div>
             </Grid>
             <Grid size={{ xs: 12, sm: 6 }} sx={{ padding: theme.spacing(1) }}>
-              <Typography variant="body1">Response</Typography>
+              <Typography variant="body1">{t('response')}</Typography>
               <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', columnGap: theme.spacing(1) }}>
-                <div style={{ color: theme.palette.text.secondary }}>Code:</div>
+                <div style={{ color: theme.palette.text.secondary }}>{t('status_code')}:</div>
                 <div>{Response?.statusCode}</div>
 
-                <div style={{ color: theme.palette.text.secondary }}>Version:</div>
+                <div style={{ color: theme.palette.text.secondary }}>{t('version')}:</div>
                 <div>{Response?.serverVersion}</div>
               </div>
             </Grid>
