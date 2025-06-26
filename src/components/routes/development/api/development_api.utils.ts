@@ -3,7 +3,15 @@ import type { Request } from 'components/routes/development/api/development_api.
 import type { PossibleColor } from 'helpers/colors';
 
 export const METHOD_COLOR_MAP: Record<Method, PossibleColor> = {
-  GET: 'success'
+  GET: 'success',
+  HEAD: 'default',
+  POST: 'default',
+  PUT: 'default',
+  DELETE: 'default',
+  CONNECT: 'default',
+  OPTIONS: 'default',
+  TRACE: 'default',
+  PATCH: 'default'
 };
 
 export const parseRequest = (input: string): Request => {
