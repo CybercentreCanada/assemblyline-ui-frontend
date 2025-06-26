@@ -52,11 +52,46 @@ type ApiDocumentationResponse = {
   blueprints: Record<string, string>;
 };
 
+// Define the structure of a single page entry in the result
+export type Path = {
+  /** The function name or identifier, potentially including a prefix (e.g., "api.v4.") */
+  function: string;
+
+  /** The URL to the page */
+  url: string;
+
+  /** HTTP methods allowed to access the page (e.g., ["GET", "POST"]) */
+  methods: string[];
+
+  /** Indicates if the page is protected by a login decorator */
+  protected: boolean;
+
+  /** List of user roles allowed to view the page, or false if no roles are required */
+  required_type: boolean | string[];
+
+  /** Indicates if auditing is enabled for the page */
+  audit: boolean;
+
+  /** Indicates if the page contributes to a quota count */
+  count_towards_quota: boolean;
+};
+
+/**
+ * @name /site_map/
+ * @description Check if all pages have been protected by a login decorator
+ * @method GET
+ */
+type SiteMapRequest = RequestBuilder<`/api/v4/site_map/`, 'GET', null>;
+
+export type SiteMapResponse = Path[];
+
 // prettier-ignore
 export type RootRequests =
   | ApiDocumentationRequest
+  | SiteMapRequest
 
 // prettier-ignore
 export type RootResponses<Request extends RootRequests> =
   Request extends ApiDocumentationRequest ? ApiDocumentationResponse :
+  Request extends SiteMapRequest ? SiteMapResponse :
   never;
