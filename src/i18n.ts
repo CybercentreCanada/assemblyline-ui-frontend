@@ -4,6 +4,8 @@ import settingsEN from 'components/routes/settings/settings.i18n.en.json';
 import settingsFR from 'components/routes/settings/settings.i18n.fr.json';
 import submitEN from 'components/routes/submit/submit.i18n.en.json';
 import submitFR from 'components/routes/submit/submit.i18n.fr.json';
+import dateTimeEN from 'components/visual/DateTime/datetime.i18n.en.json';
+import dateTimeFR from 'components/visual/DateTime/datetime.i18n.fr.json';
 import { default as i18n } from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import error403EN from 'locales/en/403.json';
@@ -135,6 +137,7 @@ const resources = {
     borealis: borealisEN,
     carousel: carouselEN,
     dashboard: dashboardEN,
+    dateTime: dateTimeEN,
     error403: error403EN,
     error404: error404EN,
     favorites: favoritesEN,
@@ -194,6 +197,7 @@ const resources = {
     borealis: borealisFR,
     carousel: carouselFR,
     dashboard: dashboardFR,
+    dateTime: dateTimeFR,
     error403: error403FR,
     error404: error404FR,
     favorites: favoritesFR,
