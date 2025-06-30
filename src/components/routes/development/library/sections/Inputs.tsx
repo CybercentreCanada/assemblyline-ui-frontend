@@ -18,6 +18,12 @@ import { PageSection } from 'components/visual/Layouts/PageSection';
 import MonacoEditor from 'components/visual/MonacoEditor';
 import React from 'react';
 
+const SELECT_OPTIONS = [
+  { primary: 'Options 1', value: 'option 1' },
+  { primary: 'Options 2', value: 'option 2' },
+  { primary: 'Options 3', value: 'option 3' }
+];
+
 export type InputsLibraryState = {
   inputs: {
     name: string;
@@ -142,11 +148,7 @@ export const InputsSection = React.memo(() => {
                 <SelectInput
                   label="Select Input"
                   value={value}
-                  options={[
-                    { primary: 'Options 1', value: 'option 1' },
-                    { primary: 'Options 2', value: 'option 2' },
-                    { primary: 'Options 3', value: 'option 3' }
-                  ]}
+                  options={SELECT_OPTIONS}
                   onChange={(event, next: string) => form.setFieldValue('components.inputs.values.select', next)}
                 />
               )}
@@ -403,11 +405,7 @@ export const InputsSection = React.memo(() => {
                   label="Controlled Select Input"
                   value={value}
                   reset
-                  options={[
-                    { primary: 'Options 1', value: 'option 1' },
-                    { primary: 'Options 2', value: 'option 2' },
-                    { primary: 'Options 3', value: 'option 3' }
-                  ]}
+                  options={SELECT_OPTIONS}
                   onChange={(event, next: string) => form.setFieldValue('components.inputs.values.select', next)}
                   onReset={() => form.setFieldValue('components.inputs.values.select', null)}
                 />
@@ -704,11 +702,7 @@ export const InputsSection = React.memo(() => {
                   label="Disabled Select Input"
                   value={value}
                   disabled
-                  options={[
-                    { primary: 'Options 1', value: 'option 1' },
-                    { primary: 'Options 2', value: 'option 2' },
-                    { primary: 'Options 3', value: 'option 3' }
-                  ]}
+                  options={SELECT_OPTIONS}
                   onChange={(event, next: string) => form.setFieldValue('components.inputs.values.select', next)}
                 />
               )}
@@ -940,11 +934,7 @@ export const InputsSection = React.memo(() => {
                   label="Loading Select Input"
                   value={value}
                   loading
-                  options={[
-                    { primary: 'Options 1', value: 'option 1' },
-                    { primary: 'Options 2', value: 'option 2' },
-                    { primary: 'Options 3', value: 'option 3' }
-                  ]}
+                  options={SELECT_OPTIONS}
                   onChange={(event, next: string) => form.setFieldValue('components.inputs.values.select', next)}
                 />
               )}
@@ -1178,11 +1168,7 @@ export const InputsSection = React.memo(() => {
                   label="Reset Select Input"
                   value={value}
                   reset
-                  options={[
-                    { primary: 'Options 1', value: 'option 1' },
-                    { primary: 'Options 2', value: 'option 2' },
-                    { primary: 'Options 3', value: 'option 3' }
-                  ]}
+                  options={SELECT_OPTIONS}
                   onChange={(event, next: string) => form.setFieldValue('components.inputs.values.select', next)}
                   onReset={() => form.setFieldValue('components.inputs.values.select', 'option 1')}
                 />
@@ -1426,11 +1412,7 @@ export const InputsSection = React.memo(() => {
                   label="Tooltip Select Input"
                   tooltip="Tooltip Select Input"
                   value={value}
-                  options={[
-                    { primary: 'Options 1', value: 'option 1' },
-                    { primary: 'Options 2', value: 'option 2' },
-                    { primary: 'Options 3', value: 'option 3' }
-                  ]}
+                  options={SELECT_OPTIONS}
                   onChange={(event, next: string) => form.setFieldValue('components.inputs.values.select', next)}
                 />
               )}
@@ -1654,11 +1636,7 @@ export const InputsSection = React.memo(() => {
                   label="Error Select Input"
                   value={value}
                   error={v => (v !== '' ? null : 'Input field cannot be null')}
-                  options={[
-                    { primary: 'Options 1', value: 'option 1' },
-                    { primary: 'Options 2', value: 'option 2' },
-                    { primary: 'Options 3', value: 'option 3' }
-                  ]}
+                  options={SELECT_OPTIONS}
                   onChange={(event, next: string) => form.setFieldValue('components.inputs.values.select', next)}
                 />
               )}
@@ -1887,11 +1865,7 @@ export const InputsSection = React.memo(() => {
                   label="Helper Text Select Input"
                   value={value}
                   helperText="Helper Text"
-                  options={[
-                    { primary: 'Options 1', value: 'option 1' },
-                    { primary: 'Options 2', value: 'option 2' },
-                    { primary: 'Options 3', value: 'option 3' }
-                  ]}
+                  options={SELECT_OPTIONS}
                   onChange={(event, next: string) => form.setFieldValue('components.inputs.values.select', next)}
                 />
               )}
@@ -2110,11 +2084,7 @@ export const InputsSection = React.memo(() => {
                   label="Placeholder Select Input"
                   value={value}
                   placeholder="Placeholder"
-                  options={[
-                    { primary: 'Options 1', value: 'option 1' },
-                    { primary: 'Options 2', value: 'option 2' },
-                    { primary: 'Options 3', value: 'option 3' }
-                  ]}
+                  options={SELECT_OPTIONS}
                   onChange={(event, next: string) => form.setFieldValue('components.inputs.values.select', next)}
                 />
               )}
@@ -2276,11 +2246,7 @@ export const InputsSection = React.memo(() => {
                   label="ReadOnly Select Input"
                   value={value}
                   readOnly
-                  options={[
-                    { primary: 'Options 1', value: 'option 1' },
-                    { primary: 'Options 2', value: 'option 2' },
-                    { primary: 'Options 3', value: 'option 3' }
-                  ]}
+                  options={SELECT_OPTIONS}
                   onChange={(event, next: string) => form.setFieldValue('components.inputs.values.select', next)}
                 />
               )}
@@ -2507,11 +2473,7 @@ export const InputsSection = React.memo(() => {
                   label="End Adornment Select Input"
                   value={value}
                   endAdornment={<Button variant="contained">Submit</Button>}
-                  options={[
-                    { primary: 'Options 1', value: 'option 1' },
-                    { primary: 'Options 2', value: 'option 2' },
-                    { primary: 'Options 3', value: 'option 3' }
-                  ]}
+                  options={SELECT_OPTIONS}
                   onChange={(event, next: string) => form.setFieldValue('components.inputs.values.select', next)}
                 />
               )}
@@ -2726,11 +2688,7 @@ export const InputsSection = React.memo(() => {
                   label="Tiny Select Input"
                   value={value}
                   tiny
-                  options={[
-                    { primary: 'Options 1', value: 'option 1' },
-                    { primary: 'Options 2', value: 'option 2' },
-                    { primary: 'Options 3', value: 'option 3' }
-                  ]}
+                  options={SELECT_OPTIONS}
                   onChange={(event, next: string) => form.setFieldValue('components.inputs.values.select', next)}
                 />
               )}
@@ -2941,11 +2899,7 @@ export const InputsSection = React.memo(() => {
                   label="Monospace Select Input"
                   value={value}
                   monospace
-                  options={[
-                    { primary: 'Options 1', value: 'option 1' },
-                    { primary: 'Options 2', value: 'option 2' },
-                    { primary: 'Options 3', value: 'option 3' }
-                  ]}
+                  options={SELECT_OPTIONS}
                   onChange={(event, next: string) => form.setFieldValue('components.inputs.values.select', next)}
                 />
               )}
@@ -3164,11 +3118,7 @@ export const InputsSection = React.memo(() => {
                   label="Password Select Input"
                   value={value}
                   password
-                  options={[
-                    { primary: 'Options 1', value: 'option 1' },
-                    { primary: 'Options 2', value: 'option 2' },
-                    { primary: 'Options 3', value: 'option 3' }
-                  ]}
+                  options={SELECT_OPTIONS}
                   onChange={(event, next: string) => form.setFieldValue('components.inputs.values.select', next)}
                 />
               )}
@@ -3460,11 +3410,7 @@ export const InputsSection = React.memo(() => {
                     <SelectInput
                       label="Interaction Select Input"
                       value={value}
-                      options={[
-                        { primary: 'Options 1', value: 'option 1' },
-                        { primary: 'Options 2', value: 'option 2' },
-                        { primary: 'Options 3', value: 'option 3' }
-                      ]}
+                      options={SELECT_OPTIONS}
                       onChange={(event, next: string) => form.setFieldValue('components.inputs.values.select', next)}
                       {...(disabled && { disabled })}
                       {...(loading && { loading })}
@@ -3877,11 +3823,7 @@ export const InputsSection = React.memo(() => {
                 <SelectInput
                   label="Select Input: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc."
                   value={value}
-                  options={[
-                    { primary: 'Options 1', value: 'option 1' },
-                    { primary: 'Options 2', value: 'option 2' },
-                    { primary: 'Options 3', value: 'option 3' }
-                  ]}
+                  options={SELECT_OPTIONS}
                   onChange={(event, next: string) => form.setFieldValue('components.inputs.values.select', next)}
                 />
               )}

@@ -158,12 +158,16 @@ const WrappedNumberInput = ({
                 placeholder: placeholder,
                 readOnly: readOnly,
                 sx: {
-                  paddingRight: '9px',
-                  ...(tiny && { '& .MuiInputBase-root': { padding: '2px !important', fontSize: '14px' } })
+                  '& .MuiInputBase-root': {
+                    ...(tiny && { padding: '2px !important', fontSize: '14px' })
+                  },
+                  '& .MuiInputBase-input': {
+                    whiteSpace: 'nowrap',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis'
+                  }
                 },
-                startAdornment: (
-                  <>{startAdornment && <InputAdornment position="start">{startAdornment}</InputAdornment>}</>
-                ),
+                startAdornment: startAdornment && <InputAdornment position="start">{startAdornment}</InputAdornment>,
                 endAdornment:
                   preventPasswordRender && preventResetRender && !endAdornment ? null : (
                     <InputAdornment position="end">

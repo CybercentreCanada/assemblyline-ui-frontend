@@ -179,7 +179,14 @@ const WrappedSelectInput = <O extends Option[]>({
                 primary={options?.find(o => o.value === option)?.primary || ''}
                 slotProps={{
                   primary: {
-                    sx: { cursor: 'pointer', ...(readOnly && { cursor: 'default', userSelect: 'text' }) },
+                    sx: {
+                      paddingRight: '0px',
+                      cursor: 'pointer',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      ...(readOnly && { cursor: 'default', userSelect: 'text' })
+                    },
                     ...(tiny && { variant: 'body2' }),
                     ...(monospace && { fontFamily: 'monospace' }),
                     ...(password &&

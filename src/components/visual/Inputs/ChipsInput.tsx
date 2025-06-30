@@ -263,6 +263,7 @@ const WrappedChipsInput = <
                   <CustomChip
                     key={key}
                     label={option}
+                    wrap
                     {...itemProps}
                     onDelete={disabled ? undefined : itemProps.onDelete}
                     sx={{
