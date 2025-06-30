@@ -87,6 +87,16 @@ const WrappedNumberInput = ({
   const id = useMemo<string>(() => (idProp || label).replaceAll(' ', '-'), [idProp, label]);
   const errorValue = useMemo<string>(() => error(value), [error, value]);
 
+  const preventResetRender = useMemo<boolean>(
+    () => loading || !reset || disabled || readOnly,
+    [disabled, loading, readOnly, reset]
+  );
+
+  const preventPasswordRender = useMemo<boolean>(
+    () => loading || !password || disabled || readOnly,
+    [disabled, loading, password, readOnly]
+  );
+
   return preventRender ? null : (
     <div {...rootProps} style={{ textAlign: 'left', ...rootProps?.style }}>
       <Tooltip title={tooltip} {...tooltipProps}>
@@ -154,34 +164,26 @@ const WrappedNumberInput = ({
                 startAdornment: (
                   <>{startAdornment && <InputAdornment position="start">{startAdornment}</InputAdornment>}</>
                 ),
-                endAdornment: (
-                  <>
-                    {loading || !password || disabled || readOnly ? null : (
-                      <InputAdornment position="end">
-                        <PasswordInput
-                          id={id}
-                          preventRender={loading || !password || disabled || readOnly}
-                          tiny={tiny}
-                          showPassword={showPassword}
-                          onShowPassword={() => setShowPassword(p => !p)}
-                          {...resetProps}
-                        />
-                      </InputAdornment>
-                    )}
-                    {loading || !reset || disabled || readOnly ? null : (
-                      <InputAdornment position="end">
-                        <ResetInput
-                          id={id}
-                          preventRender={loading || !reset || disabled || readOnly}
-                          tiny={tiny}
-                          onReset={onReset}
-                          {...resetProps}
-                        />
-                      </InputAdornment>
-                    )}
-                    {endAdornment && <InputAdornment position="end">{endAdornment}</InputAdornment>}
-                  </>
-                )
+                endAdornment:
+                  preventPasswordRender && preventResetRender && !endAdornment ? null : (
+                    <InputAdornment position="end">
+                      <PasswordInput
+                        id={id}
+                        preventRender={preventPasswordRender}
+                        tiny={tiny}
+                        showPassword={showPassword}
+                        onShowPassword={() => setShowPassword(p => !p)}
+                      />
+                      <ResetInput
+                        id={id}
+                        preventRender={preventResetRender}
+                        tiny={tiny}
+                        onReset={onReset}
+                        {...resetProps}
+                      />
+                      {endAdornment}
+                    </InputAdornment>
+                  )
               }
             }}
             onChange={event => {

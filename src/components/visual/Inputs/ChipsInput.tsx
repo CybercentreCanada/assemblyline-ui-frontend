@@ -115,6 +115,16 @@ const WrappedChipsInput = <
   const id = useMemo<string>(() => (idProp || label).replaceAll(' ', '-'), [idProp, label]);
   const errorValue = useMemo<string>(() => error(value), [error, value]);
 
+  const preventResetRender = useMemo<boolean>(
+    () => loading || !reset || disabled || readOnly,
+    [disabled, loading, readOnly, reset]
+  );
+
+  const preventPasswordRender = useMemo<boolean>(
+    () => loading || !password || disabled || readOnly,
+    [disabled, loading, password, readOnly]
+  );
+
   return preventRender ? null : (
     <div {...rootProps} style={{ textAlign: 'left', ...rootProps?.style }}>
       <Tooltip title={tooltip} {...tooltipProps}>
@@ -187,39 +197,36 @@ const WrappedChipsInput = <
                     ),
                     endAdornment: (
                       <>
-                        <InputAdornment
-                          position="end"
-                          sx={{
-                            position: 'absolute',
-                            right: '37px',
-                            top: '50%',
-                            transform: 'translate(0, -50%)',
-                            ...(!focused && { visibility: 'hidden' })
-                          }}
-                          style={{ display: 'hidden' }}
-                        >
-                          {endAdornment}
-                          {loading || !password || disabled || readOnly ? null : (
+                        {preventPasswordRender && preventResetRender && !endAdornment ? null : (
+                          <InputAdornment
+                            position="end"
+                            sx={{
+                              position: 'absolute',
+                              right: '37px',
+                              top: '50%',
+                              transform: 'translate(0, -50%)',
+                              ...(!focused && { visibility: 'hidden' })
+                            }}
+                            style={{ display: 'hidden' }}
+                          >
                             <PasswordInput
                               id={id}
-                              preventRender={loading || !password || disabled || readOnly}
+                              preventRender={preventPasswordRender}
                               tiny={tiny}
                               showPassword={showPassword}
                               onShowPassword={() => setShowPassword(p => !p)}
                               {...resetProps}
                             />
-                          )}
-                          {loading || !reset || disabled || readOnly ? null : (
                             <ResetInput
                               id={id}
-                              preventRender={loading || !reset || disabled || readOnly}
+                              preventRender={preventResetRender}
                               tiny={tiny}
                               onReset={onReset}
                               {...resetProps}
                             />
-                          )}
-                          {/* {params?.InputProps?.endAdornment} */}
-                        </InputAdornment>
+                            {endAdornment}
+                          </InputAdornment>
+                        )}
                         {params?.InputProps?.endAdornment}
                       </>
                     )

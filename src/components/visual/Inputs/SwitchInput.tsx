@@ -78,8 +78,17 @@ export const SwitchInput: React.FC<SwitchInputProps> = React.memo(
 
     const label = useMemo<string>(() => labelProp ?? '\u00A0', [labelProp]);
     const id = useMemo<string>(() => (idProp || label).replaceAll(' ', '-'), [idProp, label]);
-
     const errorValue = useMemo<string>(() => error(value), [error, value]);
+
+    const preventResetRender = useMemo<boolean>(
+      () => loading || !reset || disabled || readOnly,
+      [disabled, loading, readOnly, reset]
+    );
+
+    const preventPasswordRender = useMemo<boolean>(
+      () => loading || !password || disabled || readOnly,
+      [disabled, loading, password, readOnly]
+    );
 
     return preventRender ? null : (
       <Tooltip title={loading ? null : tooltip} {...tooltipProps}>
@@ -198,33 +207,27 @@ export const SwitchInput: React.FC<SwitchInputProps> = React.memo(
             helperTextProps={helperTextProps}
           />
 
-          <div
-            style={{
-              position: 'absolute',
-              right: theme.spacing(0.75),
-              top: 0,
-              bottom: 0,
-              display: 'flex',
-              alignItems: 'center'
-            }}
-          >
-            <div>
+          {preventPasswordRender && preventResetRender ? null : (
+            <div
+              style={{
+                position: 'absolute',
+                right: theme.spacing(0.75),
+                top: 0,
+                bottom: 0,
+                display: 'flex',
+                alignItems: 'center'
+              }}
+            >
               <PasswordInput
                 id={id}
-                preventRender={loading || !password || disabled || readOnly}
+                preventRender={preventPasswordRender}
                 tiny={tiny}
                 showPassword={showPassword}
                 onShowPassword={() => setShowPassword(p => !p)}
               />
-              <ResetInput
-                id={id}
-                preventRender={loading || !reset || disabled || readOnly}
-                tiny={tiny}
-                onReset={onReset}
-                {...resetProps}
-              />
+              <ResetInput id={id} preventRender={preventResetRender} tiny={tiny} onReset={onReset} {...resetProps} />
             </div>
-          </div>
+          )}
         </FormControl>
       </Tooltip>
     );

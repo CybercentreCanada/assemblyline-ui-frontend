@@ -83,6 +83,16 @@ const WrappedJSONInput = ({
   const id = useMemo<string>(() => (idProp || label).replaceAll(' ', '-'), [idProp, label]);
   const errorValue = useMemo<string>(() => error(value), [error, value]);
 
+  const preventResetRender = useMemo<boolean>(
+    () => loading || !reset || disabled || readOnly,
+    [disabled, loading, readOnly, reset]
+  );
+
+  const preventPasswordRender = useMemo<boolean>(
+    () => loading || !password || disabled || readOnly,
+    [disabled, loading, password, readOnly]
+  );
+
   const jsonTheme = useMemo<ThemeObject>(
     () => ({
       base00: 'transparent', // Background
@@ -216,30 +226,33 @@ const WrappedJSONInput = ({
                 }}
               />
 
-              <div
-                style={{
-                  position: 'absolute',
-                  right: theme.spacing(0.75),
-                  top: theme.spacing(0.75),
-                  display: 'flex',
-                  alignItems: 'center'
-                }}
-              >
-                <PasswordInput
-                  id={id}
-                  preventRender={loading || !password || disabled || readOnly}
-                  tiny={tiny}
-                  showPassword={showPassword}
-                  onShowPassword={() => setShowPassword(p => !p)}
-                />
-                <ResetInput
-                  id={id}
-                  preventRender={loading || !reset || disabled || readOnly}
-                  tiny={tiny}
-                  onReset={onReset}
-                  {...resetProps}
-                />
-              </div>
+              {preventPasswordRender && preventResetRender && !endAdornment ? null : (
+                <div
+                  style={{
+                    position: 'absolute',
+                    right: theme.spacing(0.75),
+                    top: theme.spacing(0.75),
+                    display: 'flex',
+                    alignItems: 'center'
+                  }}
+                >
+                  <PasswordInput
+                    id={id}
+                    preventRender={preventPasswordRender}
+                    tiny={tiny}
+                    showPassword={showPassword}
+                    onShowPassword={() => setShowPassword(p => !p)}
+                  />
+                  <ResetInput
+                    id={id}
+                    preventRender={preventResetRender}
+                    tiny={tiny}
+                    onReset={onReset}
+                    {...resetProps}
+                  />
+                  {endAdornment}
+                </div>
+              )}
             </div>
             {disabled ? null : errorValue ? (
               <FormHelperText
