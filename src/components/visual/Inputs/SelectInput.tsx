@@ -21,27 +21,34 @@ import {
   useTheme
 } from '@mui/material';
 import { HelperText } from 'components/visual/Inputs/components/HelperText';
+import { PasswordInput } from 'components/visual/Inputs/components/PasswordInput';
 import type { ResetInputProps } from 'components/visual/Inputs/components/ResetInput';
 import { ResetInput } from 'components/visual/Inputs/components/ResetInput';
 import { Tooltip } from 'components/visual/Tooltip';
 import React, { useMemo, useState } from 'react';
 
-export type SelectInputProps = Omit<SelectProps, 'error' | 'value' | 'onChange'> & {
+export type Option = {
+  primary: ListItemTextProps['primary'];
+  secondary?: ListItemTextProps['secondary'];
+  value: MenuItemProps['value'] | boolean;
+};
+
+export type SelectInputProps<O extends Option[] = []> = Omit<
+  SelectProps,
+  'error' | 'options' | 'value' | 'onChange'
+> & {
   capitalize?: boolean;
   endAdornment?: TextFieldProps['InputProps']['endAdornment'];
-  error?: (value: MenuItemProps['value']) => string;
+  error?: (value: O[number]['value']) => string;
   errorProps?: FormHelperTextProps;
-  hasEmpty?: boolean;
   helperText?: string;
   helperTextProps?: FormHelperTextProps;
   label?: string;
   labelProps?: TypographyProps;
   loading?: boolean;
-  options: {
-    primary: ListItemTextProps['primary'];
-    secondary?: ListItemTextProps['secondary'];
-    value: MenuItemProps['value'];
-  }[];
+  monospace?: boolean;
+  options: O;
+  password?: boolean;
   placeholder?: TextFieldProps['InputProps']['placeholder'];
   preventDisabledColor?: boolean;
   preventRender?: boolean;
@@ -52,27 +59,28 @@ export type SelectInputProps = Omit<SelectProps, 'error' | 'value' | 'onChange'>
   tiny?: boolean;
   tooltip?: TooltipProps['title'];
   tooltipProps?: Omit<TooltipProps, 'children' | 'title'>;
-  value: MenuItemProps['value'];
-  onChange?: (event: SelectChangeEvent<unknown>, value: MenuItemProps['value']) => void;
+  value: O[number]['value'];
+  onChange?: (event: SelectChangeEvent<unknown>, value: O[number]['value']) => void;
   onReset?: IconButtonProps['onClick'];
   onError?: (error: string) => void;
 };
 
-const WrappedSelectInput = ({
+const WrappedSelectInput = <O extends Option[]>({
   capitalize = false,
   disabled,
+  displayEmpty = false,
   endAdornment = null,
   error = () => null,
   errorProps = null,
-  hasEmpty = false,
   helperText = null,
   helperTextProps = null,
   id: idProp = null,
-  label,
+  label: labelProp = null,
   labelProps,
   loading = false,
-  options = [],
-  placeholder = null,
+  monospace = false,
+  options = null,
+  password = false,
   preventDisabledColor = false,
   preventRender = false,
   readOnly = false,
@@ -82,19 +90,32 @@ const WrappedSelectInput = ({
   tiny = false,
   tooltip = null,
   tooltipProps = null,
-  value,
+  value = null,
+  onBlur = () => null,
   onChange = () => null,
-  onReset = () => null,
   onError = () => null,
+  onFocus = () => null,
+  onReset = () => null,
   ...selectProps
-}: SelectInputProps) => {
+}: SelectInputProps<O>) => {
   const theme = useTheme();
 
   const [focused, setFocused] = useState<boolean>(false);
+  const [showPassword, setShowPassword] = useState<boolean>(true);
 
+  const label = useMemo<string>(() => labelProp ?? '\u00A0', [labelProp]);
   const id = useMemo<string>(() => (idProp || label).replaceAll(' ', '-'), [idProp, label]);
-
   const errorValue = useMemo<string>(() => error(value), [error, value]);
+
+  const preventResetRender = useMemo<boolean>(
+    () => loading || !reset || disabled || readOnly,
+    [disabled, loading, readOnly, reset]
+  );
+
+  const preventPasswordRender = useMemo<boolean>(
+    () => loading || !password || disabled || readOnly,
+    [disabled, loading, password, readOnly]
+  );
 
   return preventRender ? null : (
     <div {...rootProps} style={{ textAlign: 'left', ...rootProps?.style }}>
@@ -136,12 +157,11 @@ const WrappedSelectInput = ({
           <Select
             aria-describedby={disabled || !(errorValue || helperText) ? null : `${id}-helper-text`}
             disabled={disabled}
-            displayEmpty
+            displayEmpty={displayEmpty}
             fullWidth
-            // TODO: Add placeholder
             readOnly={readOnly}
             size="small"
-            value={options.some(o => o.value === value) ? value : ''}
+            value={options?.some(o => o.value === value) ? value : ''}
             variant="outlined"
             inputProps={{
               id: id,
@@ -156,12 +176,42 @@ const WrappedSelectInput = ({
             }}
             renderValue={option => (
               <ListItemText
-                primary={options.find(o => o.value === option)?.primary || ''}
-                primaryTypographyProps={{ sx: { cursor: 'pointer' }, ...(tiny && { variant: 'body2' }) }}
-                sx={{ margin: 0 }}
+                primary={options?.find(o => o.value === option)?.primary || ''}
+                slotProps={{
+                  primary: {
+                    sx: {
+                      paddingRight: '0px',
+                      cursor: 'pointer',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      ...(readOnly && { cursor: 'default', userSelect: 'text' })
+                    },
+                    ...(tiny && { variant: 'body2' }),
+                    ...(monospace && { fontFamily: 'monospace' }),
+                    ...(password &&
+                      showPassword && {
+                        fontFamily: 'password',
+                        WebkitTextSecurity: 'disc',
+                        MozTextSecurity: 'disc',
+                        textSecurity: 'disc'
+                      })
+                  }
+                }}
+                sx={{
+                  margin: 0,
+                  ...(readOnly && { marginLeft: '6px' }),
+                  ...(monospace && { fontFamily: 'monospace' }),
+                  ...(password &&
+                    showPassword && {
+                      fontFamily: 'password',
+                      WebkitTextSecurity: 'disc',
+                      MozTextSecurity: 'disc',
+                      textSecurity: 'disc'
+                    })
+                }}
               />
             )}
-            sx={{ textTransform: 'capitalize' }}
             onChange={event => {
               const v = event.target.value as string;
               onChange(event, v);
@@ -169,36 +219,44 @@ const WrappedSelectInput = ({
               const err = error(v);
               if (err) onError(err);
             }}
-            onFocus={event => setFocused(document.activeElement === event.target)}
-            onBlur={() => setFocused(false)}
+            onFocus={(event, ...other) => {
+              setFocused(!readOnly && !disabled && document.activeElement === event.target);
+              onFocus(event, ...other);
+            }}
+            onBlur={(event, ...other) => {
+              setFocused(false);
+              onBlur(event, ...other);
+            }}
             endAdornment={
-              <>
-                {loading || !reset || disabled || readOnly ? null : (
-                  <InputAdornment position="end" style={{ marginRight: theme.spacing(2) }}>
-                    <ResetInput
-                      id={id}
-                      preventRender={loading || !reset || disabled || readOnly}
-                      tiny={tiny}
-                      onReset={onReset}
-                      {...resetProps}
-                    />
-                  </InputAdornment>
-                )}
-                {endAdornment && (
-                  <InputAdornment position="end" style={{ marginRight: theme.spacing(2) }}>
-                    {endAdornment}
-                  </InputAdornment>
-                )}
-              </>
+              preventPasswordRender && preventResetRender && !endAdornment ? null : (
+                <InputAdornment position="end" style={{ marginRight: theme.spacing(2) }}>
+                  <PasswordInput
+                    id={id}
+                    preventRender={preventPasswordRender}
+                    tiny={tiny}
+                    showPassword={showPassword}
+                    onShowPassword={() => setShowPassword(p => !p)}
+                    {...resetProps}
+                  />
+                  <ResetInput
+                    id={id}
+                    preventRender={preventResetRender}
+                    tiny={tiny}
+                    onReset={onReset}
+                    {...resetProps}
+                  />
+                  {endAdornment}
+                </InputAdornment>
+              )
             }
             MenuProps={{ sx: { maxWidth: 'min-content' } }}
             {...selectProps}
           >
-            {hasEmpty && <MenuItem value="" sx={{ height: '36px' }}></MenuItem>}
-            {options.map((option, i) => (
+            {/* {hasEmpty && <MenuItem value={null} sx={{ height: '36px' }}></MenuItem>} */}
+            {options?.map((option, i) => (
               <MenuItem
                 key={i}
-                value={option.value}
+                value={option.value as unknown as MenuItemProps['value']}
                 sx={{
                   '&>div': { margin: 0, cursor: 'pointer !important' },
                   ...(capitalize && { textTransform: 'capitalize' })
@@ -207,18 +265,24 @@ const WrappedSelectInput = ({
                 <ListItemText
                   primary={option.primary}
                   secondary={option.secondary}
-                  primaryTypographyProps={{
-                    textTransform: 'capitalize',
-                    overflow: 'auto',
-                    textOverflow: 'initial',
-                    whiteSpace: 'normal',
-                    ...(tiny && { variant: 'body2' })
-                  }}
-                  secondaryTypographyProps={{
-                    overflow: 'auto',
-                    textOverflow: 'initial',
-                    whiteSpace: 'normal',
-                    ...(tiny && { variant: 'body2' })
+                  slotProps={{
+                    primary: {
+                      sx: {
+                        textTransform: 'capitalize',
+                        overflow: 'auto',
+                        textOverflow: 'initial',
+                        whiteSpace: 'normal',
+                        ...(tiny && { variant: 'body2' })
+                      }
+                    },
+                    secondary: {
+                      sx: {
+                        overflow: 'auto',
+                        textOverflow: 'initial',
+                        whiteSpace: 'normal',
+                        ...(tiny && { variant: 'body2' })
+                      }
+                    }
                   }}
                 />
               </MenuItem>
@@ -239,4 +303,5 @@ const WrappedSelectInput = ({
   );
 };
 
-export const SelectInput = React.memo(WrappedSelectInput);
+export const SelectInput: <O extends Option[]>(props: SelectInputProps<O>) => React.ReactNode =
+  React.memo(WrappedSelectInput);

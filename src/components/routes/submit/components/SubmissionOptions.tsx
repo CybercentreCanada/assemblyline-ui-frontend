@@ -3,7 +3,6 @@ import useALContext from 'components/hooks/useALContext';
 import { useForm } from 'components/routes/submit/submit.form';
 import { CheckboxInput } from 'components/visual/Inputs/CheckboxInput';
 import { NumberInput } from 'components/visual/Inputs/NumberInput';
-import type { SelectInputProps } from 'components/visual/Inputs/SelectInput';
 import { SelectInput } from 'components/visual/Inputs/SelectInput';
 import { TextInput } from 'components/visual/Inputs/TextInput';
 import React, { useMemo } from 'react';
@@ -15,7 +14,7 @@ export const SubmissionOptions = React.memo(() => {
   const { configuration } = useALContext();
   const form = useForm();
 
-  const priorityOptions = useMemo<SelectInputProps['options']>(
+  const priorityOptions = useMemo(
     () => [
       { primary: t('options.submission.priority.low'), value: 500 },
       { primary: t('options.submission.priority.medium'), value: 1000 },
@@ -98,7 +97,7 @@ export const SubmissionOptions = React.memo(() => {
                             : null
                       }
                       rootProps={{ style: { marginBottom: theme.spacing(1), flex: 1 } }}
-                      onChange={(e, v) => form.setFieldValue('settings.priority.value', v as number)}
+                      onChange={(e, v) => form.setFieldValue('settings.priority.value', v)}
                       onReset={() => form.setFieldValue('settings.priority.value', defaultValue)}
                     />
                   )}

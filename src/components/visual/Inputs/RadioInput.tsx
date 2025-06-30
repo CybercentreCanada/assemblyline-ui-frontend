@@ -1,0 +1,292 @@
+import type {
+  FormControlLabelProps,
+  FormHelperTextProps,
+  IconButtonProps,
+  TextFieldProps,
+  TooltipProps,
+  TypographyProps
+} from '@mui/material';
+import {
+  Button,
+  FormControl,
+  FormControlLabel,
+  InputLabel,
+  Radio,
+  RadioGroup,
+  Skeleton,
+  Typography,
+  useTheme
+} from '@mui/material';
+import { HelperText } from 'components/visual/Inputs/components/HelperText';
+import { PasswordInput } from 'components/visual/Inputs/components/PasswordInput';
+import type { ResetInputProps } from 'components/visual/Inputs/components/ResetInput';
+import { ResetInput } from 'components/visual/Inputs/components/ResetInput';
+import { Tooltip } from 'components/visual/Tooltip';
+import React, { useMemo, useState } from 'react';
+
+type Option = Omit<FormControlLabelProps, 'control'> & { control?: FormControlLabelProps['control'] };
+
+export type RadioInputProps<O extends Option[] = []> = {
+  disabled?: boolean;
+  divider?: boolean;
+  endAdornment?: TextFieldProps['InputProps']['endAdornment'];
+  error?: (value: O[number]['value']) => string;
+  errorProps?: FormHelperTextProps;
+  helperText?: string;
+  helperTextProps?: FormHelperTextProps;
+  id?: string;
+  label?: string;
+  labelProps?: TypographyProps;
+  loading?: boolean;
+  monospace?: boolean;
+  options: O;
+  password?: boolean;
+  placeholder?: TextFieldProps['InputProps']['placeholder'];
+  preventDisabledColor?: boolean;
+  preventRender?: boolean;
+  readOnly?: boolean;
+  reset?: boolean;
+  resetProps?: ResetInputProps;
+  rootProps?: React.HTMLAttributes<HTMLDivElement>;
+  showOverflow?: boolean;
+  startAdornment?: TextFieldProps['InputProps']['startAdornment'];
+  tiny?: boolean;
+  tooltip?: TooltipProps['title'];
+  tooltipProps?: Omit<TooltipProps, 'children' | 'title'>;
+  value: O[number]['value'];
+  onBlur?: (...props: unknown[]) => void;
+  onChange?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>, value: O[number]['value']) => void;
+  onError?: (error: string) => void;
+  onFocus?: (...props: unknown[]) => void;
+  onReset?: IconButtonProps['onClick'];
+};
+
+const WrappedRadioInput = <O extends Option[]>({
+  disabled,
+  divider = false,
+  endAdornment = null,
+  error = () => null,
+  errorProps = null,
+  helperText = null,
+  helperTextProps = null,
+  id: idProp = null,
+  label: labelProp = null,
+  labelProps,
+  loading = false,
+  monospace = false,
+  options = null,
+  password = false,
+  placeholder = null,
+  preventDisabledColor = false,
+  preventRender = false,
+  readOnly = false,
+  reset = false,
+  resetProps = null,
+  rootProps = null,
+  showOverflow = false,
+  startAdornment = null,
+  tiny = false,
+  tooltip = null,
+  tooltipProps = null,
+  value,
+  onBlur = () => null,
+  onChange = () => null,
+  onError = () => null,
+  onFocus = () => null,
+  onReset = () => null
+}: RadioInputProps<O>) => {
+  const theme = useTheme();
+
+  const [focused, setFocused] = useState<boolean>(false);
+  const [showPassword, setShowPassword] = useState<boolean>(true);
+
+  const label = useMemo<string>(() => labelProp ?? '\u00A0', [labelProp]);
+  const id = useMemo<string>(() => (idProp || label).replaceAll(' ', '-'), [idProp, label]);
+  const errorValue = useMemo<string>(() => error(value), [error, value]);
+
+  const preventResetRender = useMemo<boolean>(
+    () => loading || !reset || disabled || readOnly,
+    [disabled, loading, readOnly, reset]
+  );
+
+  const preventPasswordRender = useMemo<boolean>(
+    () => loading || !password || disabled || readOnly,
+    [disabled, loading, password, readOnly]
+  );
+
+  return preventRender ? null : (
+    <div {...rootProps} style={{ textAlign: 'left', ...rootProps?.style }}>
+      <Tooltip title={tooltip} {...tooltipProps}>
+        <Typography
+          color={!disabled && errorValue ? 'error' : focused ? 'primary' : 'textSecondary'}
+          component={InputLabel}
+          gutterBottom
+          htmlFor={id}
+          variant="body2"
+          whiteSpace="nowrap"
+          {...labelProps}
+          children={label}
+          sx={{
+            ...labelProps?.sx,
+            ...(disabled &&
+              !preventDisabledColor && {
+                WebkitTextFillColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.38)'
+              })
+          }}
+        />
+      </Tooltip>
+      <FormControl
+        size="small"
+        fullWidth
+        sx={{ ...(divider && { borderBottom: `1px solid ${theme.palette.divider}` }) }}
+      >
+        <RadioGroup value={value}>
+          {options.map((option, key) => (
+            <Button
+              key={`${key}-${option.label as string}`}
+              color="inherit"
+              disabled={loading || disabled || readOnly}
+              fullWidth
+              size="small"
+              onClick={event => {
+                event.stopPropagation();
+                event.preventDefault();
+                onChange(event, option.value);
+
+                const err = error(!option.value);
+                if (err) onError(err);
+              }}
+              onFocus={(event, ...other) => {
+                setFocused(!readOnly && !disabled && document.activeElement === event.target);
+                onFocus(event, ...other);
+              }}
+              onBlur={(event, ...other) => {
+                setFocused(false);
+                onBlur(event, ...other);
+              }}
+              sx={{
+                justifyContent: 'start',
+                color: 'inherit',
+                textTransform: 'none',
+                height: '40px',
+                paddingLeft: theme.spacing(2),
+
+                ...((preventDisabledColor || readOnly) && { color: 'inherit !important' }),
+                ...(tiny && { height: 'auto' })
+              }}
+            >
+              <FormControlLabel
+                value={option.value}
+                control={
+                  loading ? (
+                    <div>
+                      <Skeleton
+                        variant="circular"
+                        sx={{
+                          height: '24px',
+                          width: '24px',
+                          marginLeft: theme.spacing(0.75),
+                          marginRight: theme.spacing(1.25)
+                        }}
+                      />
+                    </div>
+                  ) : (
+                    <Radio
+                      disableFocusRipple
+                      disableRipple
+                      disableTouchRipple
+                      size="small"
+                      sx={{
+                        ...(tiny && { paddingTop: theme.spacing(0.25), paddingBottom: theme.spacing(0.25) }),
+                        ...((preventDisabledColor || readOnly) && { color: 'inherit !important' })
+                      }}
+                    />
+                  )
+                }
+                disabled={loading || disabled || readOnly}
+                label={
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      columnGap: theme.spacing(1)
+                    }}
+                  >
+                    <span
+                      style={{
+                        ...(!showOverflow && { textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden' }),
+                        ...(monospace && { fontFamily: 'monospace' }),
+                        ...(password &&
+                          showPassword && {
+                            fontFamily: 'password',
+                            WebkitTextSecurity: 'disc',
+                            MozTextSecurity: 'disc',
+                            textSecurity: 'disc'
+                          })
+                      }}
+                    >
+                      {option?.label}
+                    </span>
+                    {endAdornment}
+                  </div>
+                }
+                slotProps={{
+                  typography: {
+                    color:
+                      !disabled && errorValue ? 'error' : focused && value === option.value ? 'primary' : 'textPrimary',
+                    marginLeft: theme.spacing(1.25),
+                    textAlign: 'start',
+                    variant: 'body2',
+                    width: '100%',
+                    ...(!showOverflow && { textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden' }),
+                    ...((preventDisabledColor || readOnly) && { color: 'inherit !important' }),
+                    ...labelProps
+                  }
+                }}
+                sx={{
+                  ...(!showOverflow && { overflow: 'hidden' }),
+                  ...(!(loading || !reset || disabled || readOnly) && { paddingRight: theme.spacing(2) })
+                }}
+              />
+            </Button>
+          ))}
+        </RadioGroup>
+
+        <HelperText
+          disabled={disabled}
+          errorProps={errorProps}
+          errorText={errorValue}
+          helperText={helperText}
+          helperTextProps={helperTextProps}
+          id={id}
+          label={label}
+        />
+
+        {preventPasswordRender && preventResetRender ? null : (
+          <div
+            style={{
+              position: 'absolute',
+              right: theme.spacing(0.75),
+              top: theme.spacing(0.75),
+              display: 'flex',
+              alignItems: 'center'
+            }}
+          >
+            <PasswordInput
+              id={id}
+              preventRender={preventPasswordRender}
+              tiny={tiny}
+              showPassword={showPassword}
+              onShowPassword={() => setShowPassword(p => !p)}
+            />
+            <ResetInput id={id} preventRender={preventResetRender} tiny={tiny} onReset={onReset} {...resetProps} />
+          </div>
+        )}
+      </FormControl>
+    </div>
+  );
+};
+
+export const RadioInput: <O extends Option[]>(props: RadioInputProps<O>) => React.ReactNode =
+  React.memo(WrappedRadioInput);
