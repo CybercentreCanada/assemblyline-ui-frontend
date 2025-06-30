@@ -86,13 +86,17 @@ const WrappedDateInput = ({
   const [tomorrow, setTomorrow] = useState<Moment>(null);
   const [today, setToday] = useState<Moment>(null);
   const [focused, setFocused] = useState<boolean>(false);
-  const [showPassword, setShowPassword] = useState<boolean>(true);
 
   const label = useMemo<string>(() => labelProp ?? '\u00A0', [labelProp]);
   const id = useMemo<string>(() => (idProp || label).replaceAll(' ', '-'), [idProp, label]);
   const errorValue = useMemo<string>(
     () => error(tempDate && tempDate.isValid() ? `${tempDate.format('YYYY-MM-DDThh:mm:ss.SSSSSS')}Z` : null),
     [error, tempDate]
+  );
+
+  const preventResetRender = useMemo<boolean>(
+    () => loading || !reset || disabled || readOnly,
+    [disabled, loading, readOnly, reset]
   );
 
   useEffect(() => {
@@ -215,24 +219,19 @@ const WrappedDateInput = ({
                   },
                   InputProps: {
                     placeholder: placeholder,
-
-                    endAdornment: (
-                      <>
-                        {loading || !reset || disabled || readOnly ? null : (
-                          <InputAdornment
-                            position="end"
-                            sx={{ paddingLeft: theme.spacing(0.5), marginRight: theme.spacing(-0.5) }}
-                          >
-                            <ResetInput
-                              id={id}
-                              preventRender={loading || !reset || disabled || readOnly}
-                              tiny={tiny}
-                              onReset={onReset}
-                              {...resetProps}
-                            />
-                          </InputAdornment>
-                        )}
-                      </>
+                    endAdornment: preventResetRender ? null : (
+                      <InputAdornment
+                        position="end"
+                        sx={{ paddingLeft: theme.spacing(0.5), marginRight: theme.spacing(-0.5) }}
+                      >
+                        <ResetInput
+                          id={id}
+                          preventRender={preventResetRender}
+                          tiny={tiny}
+                          onReset={onReset}
+                          {...resetProps}
+                        />
+                      </InputAdornment>
                     )
                   }
                 }
