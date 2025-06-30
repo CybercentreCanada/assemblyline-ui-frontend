@@ -20,22 +20,19 @@ import { DigitalClock, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
 import { DateTimePicker as MuiDateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-import type { RelativeDateTime } from 'components/visual/DateTime/utils/datetime.utils';
+import type { DateTimeValues } from 'components/visual/DateTime/utils/datetime.utils';
 import {
-  convertAbsoluteToRelativeDateTime2,
-  convertRelativeToAbsoluteDateTime,
-  isValidRelativeDateTime,
+  isValidDateTimeRange,
+  parseDateTimeString,
   QUICK_SELECT_OPTIONS,
-  RELATIVE_DATETIME_OPTIONS,
-  splitRelativeDatetime
+  RELATIVE_DATETIME_OPTIONS
 } from 'components/visual/DateTime/utils/datetime.utils';
 import { NumberInput } from 'components/visual/Inputs/NumberInput';
 import { SelectInput } from 'components/visual/Inputs/SelectInput';
 import { SwitchInput } from 'components/visual/Inputs/SwitchInput';
-import { add, format, isValid, sub } from 'date-fns';
+import { format } from 'date-fns';
 import type { Moment } from 'moment';
-import moment from 'moment';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const StyledDigitalClock = styled(DigitalClock)(() => ({
@@ -51,16 +48,13 @@ const CommonlyUsedButton = styled(({ ...props }: ButtonProps) => <Button fullWid
 }));
 
 type DateTimeProps = {
-  absoluteDateTime: Moment;
-  relativeDateTime: RelativeDateTime;
-  variant: 'start' | 'end';
-
-  onAbsoluteChange?: (value: Moment) => void;
-  onRelativeChange?: (value: RelativeDateTime) => void;
+  value?: DateTimeValues;
+  variant?: 'start' | 'end';
+  onChange?: (event: unknown, value: string) => void;
 };
 
 type QuickSelectMenuProps = {
-  onChange?: (event: unknown, value: unknown) => void;
+  onChange: (event: unknown, value: string) => void;
 };
 
 const QuickSelectMenu = ({ onChange = () => null }: QuickSelectMenuProps) => {
@@ -191,24 +185,8 @@ const QuickSelectMenu = ({ onChange = () => null }: QuickSelectMenuProps) => {
   );
 };
 
-type AbsoluteTabProps = {
-  value: Moment | RelativeDateTime;
-  type: 'start' | 'end';
-  onChange?: (value: Moment | RelativeDateTime) => void;
-};
-
-const AbsoluteTab = ({ value, type = 'start', onChange = () => null }: AbsoluteTabProps) => {
+const AbsoluteTab = ({ value, variant = 'start', onChange = () => null }: DateTimeProps) => {
   const theme = useTheme();
-
-  const absoluteDateTime = useMemo<Moment>(
-    () =>
-      moment(value).isValid()
-        ? (value as Moment)
-        : isValidRelativeDateTime(value)
-          ? convertRelativeToAbsoluteDateTime(value)
-          : null,
-    [value]
-  );
 
   return (
     <>
@@ -224,17 +202,17 @@ const AbsoluteTab = ({ value, type = 'start', onChange = () => null }: AbsoluteT
         <DateCalendar
           views={['month', 'day']}
           // timezone="utc"
-          value={absoluteDateTime}
-          onChange={(next: Moment) => onChange(next)}
+          value={value.absolute}
+          onChange={(v: Moment) => onChange(null, v.toISOString())}
         />
         <StyledDigitalClock
-          value={absoluteDateTime}
+          value={value.absolute}
           // timezone="utc"
-          onChange={next => onChange(next)}
+          onChange={v => onChange(null, v.toISOString())}
         />
       </div>
       <MuiDateTimePicker
-        value={absoluteDateTime}
+        value={value.absolute}
         disableOpenPicker
         // timezone="utc"
         slotProps={{
@@ -250,48 +228,37 @@ const AbsoluteTab = ({ value, type = 'start', onChange = () => null }: AbsoluteT
             )
           }
         }}
-        onChange={newValue => onChange(newValue)}
+        onChange={v => onChange(null, v.toISOString())}
       />
     </>
   );
 };
 
-type RelativeTimeSpan = {
-  timeSpanAmount: number;
-  relativeTimeSpan: (typeof RELATIVE_DATETIME_OPTIONS)[number]['value'];
-};
-
-type RelativeTabProps = {
-  value: RelativeDateTime | Moment;
-  type: 'start' | 'end';
-  onChange?: (value: Moment) => void;
-};
-
-const RelativeTab = ({ value = null, type, onChange = () => null }: RelativeTabProps) => {
+const RelativeTab = ({ value = null, variant, onChange = () => null }: DateTimeProps) => {
   const theme = useTheme();
 
-  const absoluteDateTime = useMemo<Moment>(
-    () =>
-      moment(value).isValid()
-        ? (value as Moment)
-        : isValidRelativeDateTime(value)
-          ? convertRelativeToAbsoluteDateTime(value)
-          : null,
-    [value]
-  );
+  // const absoluteDateTime = useMemo<Moment>(
+  //   () =>
+  //     moment(value).isValid()
+  //       ? (value as Moment)
+  //       : isValidRelativeDateTime(value)
+  //         ? convertRelativeToAbsoluteDateTime(value)
+  //         : null,
+  //   [value]
+  // );
 
-  const relativeDateTime = useMemo<RelativeDateTime>(
-    () =>
-      isValidRelativeDateTime(value)
-        ? value
-        : moment(value).isValid()
-          ? convertAbsoluteToRelativeDateTime2(value)
-          : null,
+  // const relativeDateTime = useMemo<RelativeDateTime>(
+  //   () =>
+  //     isValidRelativeDateTime(value)
+  //       ? value
+  //       : moment(value).isValid()
+  //         ? convertAbsoluteToRelativeDateTime2(value)
+  //         : null,
 
-    [value]
-  );
+  //   [value]
+  // );
 
-  const { sign, amount, timeSpan } = useMemo(() => splitRelativeDatetime(relativeDateTime), [relativeDateTime]);
+  // const { sign, amount, timeSpan } = useMemo(() => splitRelativeDatetime(value.relative), [value?.relative]);
 
   // const { timeSpanAmount, relativeTimeSpan } = useMemo<RelativeDateTime>(
   //   () => convertAbsoluteToRelativeDateTime(value),
@@ -299,8 +266,6 @@ const RelativeTab = ({ value = null, type, onChange = () => null }: RelativeTabP
   // );
 
   // console.log(timeSpanAmount, relativeTimeSpan);
-
-  console.log(relativeDateTime);
 
   return (
     <div
@@ -312,22 +277,20 @@ const RelativeTab = ({ value = null, type, onChange = () => null }: RelativeTabP
     >
       <NumberInput
         id="relative value"
-        value={amount}
+        value={value.relative.amount}
         min={0}
-        onChange={(e, v) => onChange(convertRelativeToAbsoluteDateTime(`now${sign}${v}${timeSpan}`))}
+        onChange={(e, v) => onChange(e, `now${value.relative.sign}${v}${value.relative.timeSpan}`)}
       />
       <SelectInput
         id="relative select"
         options={RELATIVE_DATETIME_OPTIONS.map(option => ({ primary: option.primary, value: option.value }))}
-        value={`${sign}${timeSpan}`}
-        onChange={(e, v) =>
-          onChange(convertRelativeToAbsoluteDateTime(`now${v[0]}${amount}${v[1]}` as RelativeDateTime))
-        }
+        value={`${value.relative.sign}${value.relative.timeSpan}`}
+        onChange={(e, v) => onChange(e, `now${v[0]}${value.relative.amount}${v[1]}`)}
       />
 
       <div style={{ gridColumn: 'span 2' }}>
         <MuiDateTimePicker
-          value={absoluteDateTime}
+          value={value.absolute}
           disableOpenPicker
           // timezone="utc"
           readOnly
@@ -358,7 +321,7 @@ const RelativeTab = ({ value = null, type, onChange = () => null }: RelativeTabP
           //   />
           // )}
           // TextFieldProps={{ size: 'small', fullWidth: true }}
-          onChange={newValue => onChange(newValue)}
+          onChange={v => onChange(null, v.toISOString())}
         />
       </div>
 
@@ -369,31 +332,13 @@ const RelativeTab = ({ value = null, type, onChange = () => null }: RelativeTabP
   );
 };
 
-type NowTabProps = {
-  value: Moment;
-  type: 'start' | 'end';
-  onChange?: (value: Moment) => void;
-};
-
-const NowTab = ({ value = null, type, onChange = () => null }: NowTabProps) => {
+const NowTab = ({ value = null, variant, onChange = () => null }: DateTimeProps) => {
   const { t } = useTranslation('dateTime');
   const theme = useTheme();
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        rowGap: theme.spacing(2)
-      }}
-    >
-      <Button
-        size="small"
-        variant="contained"
-        onClick={() => {
-          onChange('now');
-        }}
-      >
+    <div style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(2) }}>
+      <Button size="small" variant="contained" onClick={event => onChange(event, 'now')}>
         {t('set_now')}
       </Button>
     </div>
@@ -401,12 +346,12 @@ const NowTab = ({ value = null, type, onChange = () => null }: NowTabProps) => {
 };
 
 type DateTimeInputProps = {
-  value: Moment;
-  type: 'start' | 'end';
-  onChange?: (value: Moment) => void;
+  value: DateTimeValues;
+  variant: 'start' | 'end';
+  onChange?: (event: unknown, value: string) => void;
 };
 
-const DateTimeInput = ({ value = null, type, onChange = () => null }: DateTimeInputProps) => {
+const DateTimeInput = ({ value = null, variant, onChange = () => null }: DateTimeInputProps) => {
   const theme = useTheme();
 
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
@@ -414,8 +359,7 @@ const DateTimeInput = ({ value = null, type, onChange = () => null }: DateTimeIn
 
   const open = useMemo<boolean>(() => Boolean(anchorEl), [anchorEl]);
 
-  console.log(value.toString());
-  console.log(isValid(value.toString()));
+  console.log(value.relative.toLuceneString());
 
   return (
     <>
@@ -424,7 +368,11 @@ const DateTimeInput = ({ value = null, type, onChange = () => null }: DateTimeIn
         onClick={event => setAnchorEl(event.currentTarget)}
         sx={{ textTransform: 'inherit', minWidth: 'inherit', fontWeight: 'inherit' }}
       >
-        {format(value.toDate(), 'PPpp')}
+        {value.type === 'absolute'
+          ? format(value.absolute.toDate(), 'PPpp')
+          : value.type === 'relative'
+            ? value.relative.toLuceneString()
+            : null}
       </Button>
 
       <Popover
@@ -464,11 +412,11 @@ const DateTimeInput = ({ value = null, type, onChange = () => null }: DateTimeIn
           {(() => {
             switch (tab) {
               case 'absolute':
-                return <AbsoluteTab value={value} type={type} onChange={onChange} />;
+                return <AbsoluteTab value={value} variant={variant} onChange={onChange} />;
               case 'relative':
-                return <RelativeTab value={value} type={type} onChange={onChange} />;
+                return <RelativeTab value={value} variant={variant} onChange={onChange} />;
               case 'now':
-                return <NowTab value={value} type={type} onChange={onChange} />;
+                return <NowTab value={value} variant={variant} onChange={onChange} />;
             }
           })()}
         </div>
@@ -479,56 +427,77 @@ const DateTimeInput = ({ value = null, type, onChange = () => null }: DateTimeIn
 
 export type DateTimePickerProps = {
   value?: string;
-  fullscreen?: boolean;
+  fullWidth?: boolean;
   onChange?: (event: unknown, value: string) => void;
 };
 
 export const DateTimePicker: React.FC<DateTimePickerProps> = React.memo(
-  ({ value, fullscreen = false, onChange = () => null, ...props }: DateTimePickerProps) => {
+  ({ value, fullWidth = false, onChange = () => null, ...props }: DateTimePickerProps) => {
     const { t, i18n } = useTranslation('dateTime');
     const theme = useTheme();
+
+    const [fromStr, setFromStr] = useState<string>(null);
+    const [toStr, setToStr] = useState<string>(null);
+
+    const fromDateTime = useMemo<DateTimeValues>(() => parseDateTimeString(fromStr), [fromStr]);
+    const toDateTime = useMemo<DateTimeValues>(() => parseDateTimeString(toStr), [toStr]);
+
+    console.log(fromDateTime.absolute.toISOString(), fromDateTime.relative, fromDateTime.type);
 
     // const [from, setFrom] = useState<string>('');
     // const [to, setTo] = useState<string>('');
 
-    const [quickSelectAnchor, setQuickSelectAnchor] = useState<HTMLButtonElement | null>(null);
-    const [fromAnchor, setFromAnchor] = useState<HTMLButtonElement | null>(null);
-    const [toAnchor, setToAnchor] = useState<HTMLButtonElement | null>(null);
-    const [tab, setTab] = useState<'absolute' | 'relative' | 'now'>('absolute');
+    // const [quickSelectAnchor, setQuickSelectAnchor] = useState<HTMLButtonElement | null>(null);
+    // const [fromAnchor, setFromAnchor] = useState<HTMLButtonElement | null>(null);
+    // const [toAnchor, setToAnchor] = useState<HTMLButtonElement | null>(null);
+    // const [tab, setTab] = useState<'absolute' | 'relative' | 'now'>('absolute');
 
-    const fromValue = useMemo<string>(() => (!!value && value.slice(1, -1).split(' TO ')?.[0]) || null, [value]);
-    const toValue = useMemo<string>(() => (!!value && value.slice(1, -1).split(' TO ')?.[1]) || null, [value]);
+    // const fromValue = useMemo<string>(() => (!!value && value.slice(1, -1).split(' TO ')?.[0]) || null, [value]);
+    // const toValue = useMemo<string>(() => (!!value && value.slice(1, -1).split(' TO ')?.[1]) || null, [value]);
 
-    const fromDate = useMemo<Moment>(() => moment(value), [value]);
-    const toDate = useMemo<Moment>(() => moment(value), [value]);
+    // const fromDate = useMemo<Moment>(() => moment(value), [value]);
+    // const toDate = useMemo<Moment>(() => moment(value), [value]);
 
-    const quickSelectOpen = useMemo<boolean>(() => Boolean(quickSelectAnchor), [quickSelectAnchor]);
-    const fromOpen = useMemo<boolean>(() => Boolean(fromAnchor), [fromAnchor]);
-    const toOpen = useMemo<boolean>(() => Boolean(toAnchor), [toAnchor]);
+    // const quickSelectOpen = useMemo<boolean>(() => Boolean(quickSelectAnchor), [quickSelectAnchor]);
+    // const fromOpen = useMemo<boolean>(() => Boolean(fromAnchor), [fromAnchor]);
+    // const toOpen = useMemo<boolean>(() => Boolean(toAnchor), [toAnchor]);
 
-    function getRelativeDate(expression) {
-      const now = new Date();
+    // function getRelativeDate(expression) {
+    //   const now = new Date();
 
-      const match = /now\s*([+-])\s*(\d+)\s*(days|months|years|hours|minutes|seconds)/i.exec(expression);
+    //   const match = /now\s*([+-])\s*(\d+)\s*(days|months|years|hours|minutes|seconds)/i.exec(expression);
 
-      if (!match) {
-        throw new Error('Invalid date expression format');
-      }
+    //   if (!match) {
+    //     throw new Error('Invalid date expression format');
+    //   }
 
-      const operator = match[1]; // "+" or "-"
-      const value = parseInt(match[2], 10); // Number (e.g., 15)
-      const unit = match[3].toLowerCase(); // Time unit (days, months, etc.)
+    //   const operator = match[1]; // "+" or "-"
+    //   const value = parseInt(match[2], 10); // Number (e.g., 15)
+    //   const unit = match[3].toLowerCase(); // Time unit (days, months, etc.)
 
-      // Map the correct function based on the operator
-      return operator === '+' ? add(now, { [unit]: value }) : sub(now, { [unit]: value });
-    }
+    //   // Map the correct function based on the operator
+    //   return operator === '+' ? add(now, { [unit]: value }) : sub(now, { [unit]: value });
+    // }
 
-    useEffect(() => {}, []);
+    // useEffect(() => {}, []);
 
     // console.log(new Date(Date.now()).toUTCString());
     // console.log(getRelativeDate(new Date(Date.now()).toUTCString()));
 
-    const [startDateTime, setStartDateTime] = useState(moment(Date.now()));
+    // const [startDateTime, setStartDateTime] = useState(moment(Date.now()));
+
+    const applyChanges = useCallback(() => {}, []);
+
+    console.log(value, fromStr, toStr);
+
+    useEffect(() => {
+      if (!value) return;
+      const strippedValue = value.replaceAll(' ', '');
+      if (!isValidDateTimeRange(strippedValue)) return;
+      const parts = strippedValue.slice(1, -1).split('TO');
+      setFromStr(parts?.[0] || null);
+      setToStr(parts?.[1] || null);
+    }, [value]);
 
     return (
       <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale={i18n.language}>
@@ -541,9 +510,9 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = React.memo(
             borderRadius: theme.shape.borderRadius
           }}
         >
-          <QuickSelectMenu />
+          <QuickSelectMenu from={fromDateTime} to={toDateTime} onChange={onChange} />
 
-          <DateTimeInput value={startDateTime} type="start" onChange={next => setStartDateTime(next)} />
+          <DateTimeInput value={fromDateTime} variant="start" onChange={(e, v) => setFromStr(v)} />
 
           <Button
             color="inherit"
@@ -553,7 +522,7 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = React.memo(
             <ArrowForwardIcon />
           </Button>
 
-          <DateTimeInput value={moment(Date.now())} type="end" />
+          <DateTimeInput value={toDateTime} variant="end" onChange={(e, v) => setFromStr(v)} />
         </div>
       </LocalizationProvider>
     );

@@ -1,1 +1,27 @@
-{}
+{
+  "+M": "months from now",
+  "+d": "days from now",
+  "+h": "hours from now",
+  "+m": "minutes from now",
+  "+s": "seconds from now",
+  "+w": "weeks from now",
+  "+y": "years from now",
+  "-M": "months ago",
+  "-d": "days ago",
+  "-h": "hours ago",
+  "-m": "minutes ago",
+  "-s": "seconds ago",
+  "-w": "weeks ago",
+  "-y": "years ago",
+  "/M": "rounded to the month",
+  "/d": "rounded to the day",
+  "/h": "rounded to the hour",
+  "/m": "rounded to the minute",
+  "/s": "rounded to the second",
+  "/w": "rounded to the week",
+  "/y": "rounded to the year",
+  "last": "last",
+  "next": "next",
+  "this_week": "This week",
+  "today": "Today"
+}

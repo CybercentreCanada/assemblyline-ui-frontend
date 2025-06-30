@@ -71,10 +71,6 @@ export const DateTimeSection = React.memo(() => {
     return operator === '+' ? add(now, adjustment) : sub(now, adjustment);
   }
 
-  console.log(luceneToDate('now-15m')); // 15 minutes ago
-  console.log(luceneToDate('now+2h')); // 2 hours from now
-  console.log(luceneToDate('now-1d')); // 1 day ago
-
   return (
     <DemoContainer>
       <PageSection primary="Date Time Field" anchor>
