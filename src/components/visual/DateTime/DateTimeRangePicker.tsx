@@ -6,6 +6,7 @@ import type { ButtonProps } from '@mui/material';
 import {
   Button,
   InputAdornment,
+  InputLabel,
   MenuItem,
   Popover,
   Select,
@@ -16,31 +17,72 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
+import type { DateCalendarProps, DigitalClockProps } from '@mui/x-date-pickers';
 import { DigitalClock, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
-import { DateTimePicker as MuiDateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-import type { DateTimeValues } from 'components/visual/DateTime/utils/datetime.utils';
-import {
-  isValidDateTimeRange,
-  parseDateTimeString,
-  QUICK_SELECT_OPTIONS,
-  RELATIVE_DATETIME_OPTIONS
-} from 'components/visual/DateTime/utils/datetime.utils';
+import type { DateTimePickerProps } from '@mui/x-date-pickers/DateTimePicker';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
+import { QUICK_SELECT_OPTIONS, RELATIVE_DATETIME_OPTIONS } from 'components/visual/DateTime/utils/datetime.utils';
+import { LuceneDateTime } from 'components/visual/DateTime/utils/lucenedatetime';
+import { LuceneDateTimeBox } from 'components/visual/DateTime/utils/LuceneDateTimeBox';
 import { NumberInput } from 'components/visual/Inputs/NumberInput';
 import { SelectInput } from 'components/visual/Inputs/SelectInput';
 import { SwitchInput } from 'components/visual/Inputs/SwitchInput';
-import { format } from 'date-fns';
 import type { Moment } from 'moment';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-const StyledDigitalClock = styled(DigitalClock)(() => ({
+const StyledDigitalClock = styled(({ ...props }: DigitalClockProps<Moment>) => (
+  <DigitalClock
+    // timezone="utc"
+    {...props}
+  />
+))(() => ({
   maxHeight: '300px',
   '& .MuiDigitalClock-item': {
     fontSize: '12px'
   }
 }));
+
+const StyledDateTimePicker = styled(({ ...props }: DateTimePickerProps<Moment>) => {
+  const { t, i18n } = useTranslation('dateTime');
+
+  return (
+    <DateTimePicker
+      disableOpenPicker
+      // timezone="utc"
+      format={i18n.language === 'fr' ? 'Do MMMM YYYY H[h]mm' : 'MMMM D YYYY, h:mm a'}
+      slotProps={{
+        textField: {
+          size: 'small',
+          fullWidth: true
+        },
+        inputAdornment: {
+          children: (
+            <InputAdornment position="start" disablePointerEvents>
+              <FilterListIcon color="inherit" />
+            </InputAdornment>
+          )
+        }
+      }}
+      {...props}
+    />
+  );
+})(({ theme, readOnly }) => ({
+  '& .MuiInputBase-input': {
+    ...(readOnly && { cursor: 'default' })
+  }
+}));
+
+const StyledDateCalendar = styled(({ ...props }: DateCalendarProps<Moment>) => (
+  <DateCalendar
+    views={['month', 'day']}
+    // timezone="utc"
+    showDaysOutsideCurrentMonth
+    {...props}
+  />
+))(() => ({}));
 
 const CommonlyUsedButton = styled(({ ...props }: ButtonProps) => <Button fullWidth size="small" {...props} />)(() => ({
   textTransform: 'inherit',
@@ -48,12 +90,14 @@ const CommonlyUsedButton = styled(({ ...props }: ButtonProps) => <Button fullWid
 }));
 
 type DateTimeProps = {
-  value?: DateTimeValues;
+  value?: LuceneDateTime;
   variant?: 'start' | 'end';
   onChange?: (event: unknown, value: string) => void;
 };
 
 type QuickSelectMenuProps = {
+  from: LuceneDateTime;
+  to: LuceneDateTime;
   onChange: (event: unknown, value: string) => void;
 };
 
@@ -186,6 +230,7 @@ const QuickSelectMenu = ({ onChange = () => null }: QuickSelectMenuProps) => {
 };
 
 const AbsoluteTab = ({ value, variant = 'start', onChange = () => null }: DateTimeProps) => {
+  const { t, i18n } = useTranslation('dateTime');
   const theme = useTheme();
 
   return (
@@ -199,42 +244,25 @@ const AbsoluteTab = ({ value, variant = 'start', onChange = () => null }: DateTi
           alignItems: 'center'
         }}
       >
-        <DateCalendar
-          views={['month', 'day']}
-          // timezone="utc"
-          value={value.absolute}
-          onChange={(v: Moment) => onChange(null, v.toISOString())}
-        />
-        <StyledDigitalClock
-          value={value.absolute}
-          // timezone="utc"
-          onChange={v => onChange(null, v.toISOString())}
-        />
+        <StyledDateCalendar value={value.absolute} onChange={(v: Moment) => onChange(null, v.toISOString())} />
+        <StyledDigitalClock value={value.absolute} onChange={(v: Moment) => onChange(null, v.toISOString())} />
       </div>
-      <MuiDateTimePicker
-        value={value.absolute}
-        disableOpenPicker
-        // timezone="utc"
-        slotProps={{
-          textField: {
-            size: 'small',
-            fullWidth: true
-          },
-          inputAdornment: {
-            children: (
-              <InputAdornment position="start" disablePointerEvents>
-                <FilterListIcon color="inherit" />
-              </InputAdornment>
-            )
-          }
-        }}
-        onChange={v => onChange(null, v.toISOString())}
-      />
+      <div>
+        <Typography
+          component={InputLabel}
+          variant="body2"
+          whiteSpace="nowrap"
+          gutterBottom
+          children={variant === 'start' ? t('start_date') : t('end_date')}
+        />
+        <StyledDateTimePicker value={value.absolute} onChange={v => onChange(null, v.toISOString())} />
+      </div>
     </>
   );
 };
 
 const RelativeTab = ({ value = null, variant, onChange = () => null }: DateTimeProps) => {
+  const { t } = useTranslation('dateTime');
   const theme = useTheme();
 
   // const absoluteDateTime = useMemo<Moment>(
@@ -277,56 +305,34 @@ const RelativeTab = ({ value = null, variant, onChange = () => null }: DateTimeP
     >
       <NumberInput
         id="relative value"
-        value={value.relative.amount}
+        value={value.amount}
         min={0}
-        onChange={(e, v) => onChange(e, `now${value.relative.sign}${v}${value.relative.timeSpan}`)}
+        onChange={(e, v) => onChange(e, `now${value.sign}${v}${value.timeSpan}`)}
       />
       <SelectInput
         id="relative select"
-        options={RELATIVE_DATETIME_OPTIONS.map(option => ({ primary: option.primary, value: option.value }))}
-        value={`${value.relative.sign}${value.relative.timeSpan}`}
-        onChange={(e, v) => onChange(e, `now${v[0]}${value.relative.amount}${v[1]}`)}
+        options={RELATIVE_DATETIME_OPTIONS.map(option => ({ primary: t(option.value), value: option.value }))}
+        value={`${value.sign}${value.timeSpan}`}
+        onChange={(e, v) => onChange(e, `now${v[0]}${value.amount}${v[1]}`)}
       />
 
       <div style={{ gridColumn: 'span 2' }}>
-        <MuiDateTimePicker
-          value={value.absolute}
-          disableOpenPicker
-          // timezone="utc"
-          readOnly
-          sx={{
-            '& .MuiInputBase-input': {
-              cursor: 'default'
-            }
-          }}
-          slotProps={{
-            textField: {
-              size: 'small',
-              fullWidth: true
-            },
-            inputAdornment: {
-              children: (
-                <InputAdornment position="start" disablePointerEvents>
-                  <FilterListIcon color="inherit" />
-                </InputAdornment>
-              )
-            }
-          }}
-          // formatDensity="dense"
-          // renderInput={params => (
-          //   <TextField
-          //     {...params}
-          //     size="small" // This makes the TextField smaller
-          //     fullWidth
-          //   />
-          // )}
-          // TextFieldProps={{ size: 'small', fullWidth: true }}
-          onChange={v => onChange(null, v.toISOString())}
+        <Typography
+          component={InputLabel}
+          variant="body2"
+          whiteSpace="nowrap"
+          gutterBottom
+          children={variant === 'start' ? t('start_date') : t('end_date')}
         />
+        <StyledDateTimePicker value={value.absolute} readOnly onChange={v => onChange(null, v.toISOString())} />
       </div>
 
       <div style={{ gridColumn: 'span 2' }}>
-        <SwitchInput label={''} value={false} />
+        <SwitchInput
+          label={t(`/${value.timeSpan}`)}
+          value={value.rounded && value.timeSpan === value.rounded}
+          onChange={(e, v) => onChange(e, v)}
+        />
       </div>
     </div>
   );
@@ -346,7 +352,7 @@ const NowTab = ({ value = null, variant, onChange = () => null }: DateTimeProps)
 };
 
 type DateTimeInputProps = {
-  value: DateTimeValues;
+  value: LuceneDateTime;
   variant: 'start' | 'end';
   onChange?: (event: unknown, value: string) => void;
 };
@@ -359,7 +365,7 @@ const DateTimeInput = ({ value = null, variant, onChange = () => null }: DateTim
 
   const open = useMemo<boolean>(() => Boolean(anchorEl), [anchorEl]);
 
-  console.log(value.relative.toLuceneString());
+  console.log(value.relative);
 
   return (
     <>
@@ -368,11 +374,7 @@ const DateTimeInput = ({ value = null, variant, onChange = () => null }: DateTim
         onClick={event => setAnchorEl(event.currentTarget)}
         sx={{ textTransform: 'inherit', minWidth: 'inherit', fontWeight: 'inherit' }}
       >
-        {value.type === 'absolute'
-          ? format(value.absolute.toDate(), 'PPpp')
-          : value.type === 'relative'
-            ? value.relative.toLuceneString()
-            : null}
+        <LuceneDateTimeBox value={value} />
       </Button>
 
       <Popover
@@ -425,24 +427,40 @@ const DateTimeInput = ({ value = null, variant, onChange = () => null }: DateTim
   );
 };
 
-export type DateTimePickerProps = {
+export type DateTimeRangePickerProps = {
   value?: string;
   fullWidth?: boolean;
   onChange?: (event: unknown, value: string) => void;
 };
 
-export const DateTimePicker: React.FC<DateTimePickerProps> = React.memo(
-  ({ value, fullWidth = false, onChange = () => null, ...props }: DateTimePickerProps) => {
+export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = React.memo(
+  ({ value, fullWidth = false, onChange = () => null, ...props }: DateTimeRangePickerProps) => {
     const { t, i18n } = useTranslation('dateTime');
     const theme = useTheme();
 
-    const [fromStr, setFromStr] = useState<string>(null);
-    const [toStr, setToStr] = useState<string>(null);
+    const [fromStr, toStr] = useMemo<[string, string]>(() => {
+      // Check if the value matches the format: [${string}TO${string}]
+      if (!/^\[.+?TO.+?\]$/.test(value)) return [null, null];
 
-    const fromDateTime = useMemo<DateTimeValues>(() => parseDateTimeString(fromStr), [fromStr]);
-    const toDateTime = useMemo<DateTimeValues>(() => parseDateTimeString(toStr), [toStr]);
+      return (value.slice(1, -1).split(' TO ') as [string, string]) || [null, null];
+    }, [value]);
 
-    console.log(fromDateTime.absolute.toISOString(), fromDateTime.relative, fromDateTime.type);
+    const [from, setFrom] = useState<LuceneDateTime>(new LuceneDateTime(fromStr));
+    const [to, setTo] = useState<LuceneDateTime>(new LuceneDateTime(fromStr));
+
+    const applyChanges = useCallback(() => {}, []);
+
+    useEffect(() => {
+      setFrom(new LuceneDateTime(fromStr));
+      setTo(new LuceneDateTime(toStr));
+    }, [fromStr, toStr]);
+
+    console.log(from, to);
+
+    // const fromDateTime = useMemo<DateTimeValues>(() => parseDateTimeString(fromStr), [fromStr]);
+    // const toDateTime = useMemo<DateTimeValues>(() => parseDateTimeString(toStr), [toStr]);
+
+    // console.log(fromDateTime.absolute.toISOString(), fromDateTime.relative, fromDateTime.type);
 
     // const [from, setFrom] = useState<string>('');
     // const [to, setTo] = useState<string>('');
@@ -486,19 +504,6 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = React.memo(
 
     // const [startDateTime, setStartDateTime] = useState(moment(Date.now()));
 
-    const applyChanges = useCallback(() => {}, []);
-
-    console.log(value, fromStr, toStr);
-
-    useEffect(() => {
-      if (!value) return;
-      const strippedValue = value.replaceAll(' ', '');
-      if (!isValidDateTimeRange(strippedValue)) return;
-      const parts = strippedValue.slice(1, -1).split('TO');
-      setFromStr(parts?.[0] || null);
-      setToStr(parts?.[1] || null);
-    }, [value]);
-
     return (
       <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale={i18n.language}>
         <div
@@ -510,9 +515,9 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = React.memo(
             borderRadius: theme.shape.borderRadius
           }}
         >
-          <QuickSelectMenu from={fromDateTime} to={toDateTime} onChange={onChange} />
+          <QuickSelectMenu from={from} to={to} onChange={onChange} />
 
-          <DateTimeInput value={fromDateTime} variant="start" onChange={(e, v) => setFromStr(v)} />
+          <DateTimeInput value={from} variant="start" onChange={(e, v) => setFrom(() => new LuceneDateTime(v))} />
 
           <Button
             color="inherit"
@@ -522,7 +527,7 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = React.memo(
             <ArrowForwardIcon />
           </Button>
 
-          <DateTimeInput value={toDateTime} variant="end" onChange={(e, v) => setFromStr(v)} />
+          <DateTimeInput value={to} variant="end" onChange={(e, v) => setTo(() => new LuceneDateTime(v))} />
         </div>
       </LocalizationProvider>
     );

@@ -1,12 +1,8 @@
-import { DateTimeLucene } from 'components/visual/DateTime/utils/DateTimeLucene';
-import type { Moment } from 'moment';
-import moment from 'moment';
-
-export type DateTimeValues = {
-  absolute: Moment;
-  relative: DateTimeLucene;
-  type: 'absolute' | 'relative';
-};
+// export type DateTimeValues = {
+//   absolute: Moment;
+//   relative: DateTimeLucene;
+//   type: 'absolute' | 'relative';
+// };
 
 export type DateTimeRange = `[${string} TO ${string}]`;
 
@@ -41,426 +37,426 @@ export const RELATIVE_DATETIME_OPTIONS = [
   { primary: 'years_from_now', value: '+y' }
 ] as const;
 
-/**
- * Validates if a string is of the format [${string}TO${string}].
- * @param {string} value - The string to validate.
- * @returns {boolean} - True if the string is valid, otherwise false.
- */
-export const isValidDateTimeRange = (value: string): value is DateTimeRange => {
-  // Regex to match the format: [${string}TO${string}]
-  const regex = /^\[.+?TO.+?\]$/;
+// /**
+//  * Validates if a string is of the format [${string}TO${string}].
+//  * @param {string} value - The string to validate.
+//  * @returns {boolean} - True if the string is valid, otherwise false.
+//  */
+// export const isValidDateTimeRange = (value: string): value is DateTimeRange => {
+//   // Regex to match the format: [${string}TO${string}]
+//   const regex = /^\[.+?TO.+?\]$/;
 
-  // Check if the value matches the regex pattern
-  return regex.test(value);
-};
-
-export const isValidRelativeDateTime = (input: unknown): input is RelativeDateTime => {
-  if (typeof input !== 'string') return false;
-  const relativeDatetimeRegex = /^now([+-]\d+)?[smhdwMy]?$/;
-  return relativeDatetimeRegex.test(input);
-};
-
-// type RelativeDateTime = {
-//   timeSpanAmount: number;
-//   relativeTimeSpan: (typeof RELATIVE_DATETIME_OPTIONS)[number]['value'];
+//   // Check if the value matches the regex pattern
+//   return regex.test(value);
 // };
 
-export const convertAbsoluteToRelativeDateTime = (value: Moment): RelativeDateTimeParts => {
-  if (!value) {
-    // Default when datetime is null
-    return { timeSpanAmount: 0, relativeTimeSpan: '[now/d TO now/d]' };
-  }
+// export const isValidRelativeDateTime = (input: unknown): input is RelativeDateTime => {
+//   if (typeof input !== 'string') return false;
+//   const relativeDatetimeRegex = /^now([+-]\d+)?[smhdwMy]?$/;
+//   return relativeDatetimeRegex.test(input);
+// };
 
-  // Calculate the difference between the given datetime and now in milliseconds
-  const now = moment();
-  const diff = value.diff(now); // Positive if future, negative if past
+// // type RelativeDateTime = {
+// //   timeSpanAmount: number;
+// //   relativeTimeSpan: (typeof RELATIVE_DATETIME_OPTIONS)[number]['value'];
+// // };
 
-  // Determine the time span in absolute terms and the unit of difference
-  const seconds = Math.abs(diff / 1000);
-  const minutes = Math.abs(seconds / 60);
-  const hours = Math.abs(minutes / 60);
-  const days = Math.abs(hours / 24);
-  const weeks = Math.abs(days / 7);
-  const months = Math.abs(days / 30); // Approximation
-  const years = Math.abs(days / 365); // Approximation
+// export const convertAbsoluteToRelativeDateTime = (value: Moment): RelativeDateTimeParts => {
+//   if (!value) {
+//     // Default when datetime is null
+//     return { timeSpanAmount: 0, relativeTimeSpan: '[now/d TO now/d]' };
+//   }
 
-  // Assign the closest relative option
-  if (seconds < 60) {
-    return {
-      timeSpanAmount: Math.round(seconds),
-      relativeTimeSpan:
-        diff < 0
-          ? RELATIVE_DATETIME_OPTIONS.find(opt => opt.primary === 'seconds_ago').value
-          : RELATIVE_DATETIME_OPTIONS.find(opt => opt.primary === 'seconds_from_now').value
-    };
-  } else if (minutes < 60) {
-    return {
-      timeSpanAmount: Math.round(minutes),
-      relativeTimeSpan:
-        diff < 0
-          ? RELATIVE_DATETIME_OPTIONS.find(opt => opt.primary === 'minutes_ago').value
-          : RELATIVE_DATETIME_OPTIONS.find(opt => opt.primary === 'minutes_from_now').value
-    };
-  } else if (hours < 24) {
-    return {
-      timeSpanAmount: Math.round(hours),
-      relativeTimeSpan:
-        diff < 0
-          ? RELATIVE_DATETIME_OPTIONS.find(opt => opt.primary === 'hours_ago').value
-          : RELATIVE_DATETIME_OPTIONS.find(opt => opt.primary === 'hours_from_now').value
-    };
-  } else if (days < 7) {
-    return {
-      timeSpanAmount: Math.round(days),
-      relativeTimeSpan:
-        diff < 0
-          ? RELATIVE_DATETIME_OPTIONS.find(opt => opt.primary === 'days_ago').value
-          : RELATIVE_DATETIME_OPTIONS.find(opt => opt.primary === 'days_from_now').value
-    };
-  } else if (weeks < 4) {
-    return {
-      timeSpanAmount: Math.round(weeks),
-      relativeTimeSpan:
-        diff < 0
-          ? RELATIVE_DATETIME_OPTIONS.find(opt => opt.primary === 'weeks_ago').value
-          : RELATIVE_DATETIME_OPTIONS.find(opt => opt.primary === 'weeks_from_now').value
-    };
-  } else if (months < 12) {
-    return {
-      timeSpanAmount: Math.round(months),
-      relativeTimeSpan:
-        diff < 0
-          ? RELATIVE_DATETIME_OPTIONS.find(opt => opt.primary === 'months_ago').value
-          : RELATIVE_DATETIME_OPTIONS.find(opt => opt.primary === 'months_from_now').value
-    };
-  } else {
-    return {
-      timeSpanAmount: Math.round(years),
-      relativeTimeSpan:
-        diff < 0
-          ? RELATIVE_DATETIME_OPTIONS.find(opt => opt.primary === 'years_ago').value
-          : RELATIVE_DATETIME_OPTIONS.find(opt => opt.primary === 'years_from_now').value
-    };
-  }
-};
+//   // Calculate the difference between the given datetime and now in milliseconds
+//   const now = moment();
+//   const diff = value.diff(now); // Positive if future, negative if past
 
-/**
- * Converts a Moment datetime to a relative datetime string.
- * @param {Moment} absoluteMoment - The absolute Moment datetime to convert.
- * @returns {string} The relative datetime string (e.g. "now+5m", "now-2h", "now").
- */
-export const convertAbsoluteToRelativeDateTime2 = (input: Moment): RelativeDateTime => {
-  // Get the current time as a Moment object
-  const now = moment();
+//   // Determine the time span in absolute terms and the unit of difference
+//   const seconds = Math.abs(diff / 1000);
+//   const minutes = Math.abs(seconds / 60);
+//   const hours = Math.abs(minutes / 60);
+//   const days = Math.abs(hours / 24);
+//   const weeks = Math.abs(days / 7);
+//   const months = Math.abs(days / 30); // Approximation
+//   const years = Math.abs(days / 365); // Approximation
 
-  // Calculate the difference between `absoluteMoment` and `now` in seconds
-  const diffInSeconds = input.diff(now, 'seconds');
+//   // Assign the closest relative option
+//   if (seconds < 60) {
+//     return {
+//       timeSpanAmount: Math.round(seconds),
+//       relativeTimeSpan:
+//         diff < 0
+//           ? RELATIVE_DATETIME_OPTIONS.find(opt => opt.primary === 'seconds_ago').value
+//           : RELATIVE_DATETIME_OPTIONS.find(opt => opt.primary === 'seconds_from_now').value
+//     };
+//   } else if (minutes < 60) {
+//     return {
+//       timeSpanAmount: Math.round(minutes),
+//       relativeTimeSpan:
+//         diff < 0
+//           ? RELATIVE_DATETIME_OPTIONS.find(opt => opt.primary === 'minutes_ago').value
+//           : RELATIVE_DATETIME_OPTIONS.find(opt => opt.primary === 'minutes_from_now').value
+//     };
+//   } else if (hours < 24) {
+//     return {
+//       timeSpanAmount: Math.round(hours),
+//       relativeTimeSpan:
+//         diff < 0
+//           ? RELATIVE_DATETIME_OPTIONS.find(opt => opt.primary === 'hours_ago').value
+//           : RELATIVE_DATETIME_OPTIONS.find(opt => opt.primary === 'hours_from_now').value
+//     };
+//   } else if (days < 7) {
+//     return {
+//       timeSpanAmount: Math.round(days),
+//       relativeTimeSpan:
+//         diff < 0
+//           ? RELATIVE_DATETIME_OPTIONS.find(opt => opt.primary === 'days_ago').value
+//           : RELATIVE_DATETIME_OPTIONS.find(opt => opt.primary === 'days_from_now').value
+//     };
+//   } else if (weeks < 4) {
+//     return {
+//       timeSpanAmount: Math.round(weeks),
+//       relativeTimeSpan:
+//         diff < 0
+//           ? RELATIVE_DATETIME_OPTIONS.find(opt => opt.primary === 'weeks_ago').value
+//           : RELATIVE_DATETIME_OPTIONS.find(opt => opt.primary === 'weeks_from_now').value
+//     };
+//   } else if (months < 12) {
+//     return {
+//       timeSpanAmount: Math.round(months),
+//       relativeTimeSpan:
+//         diff < 0
+//           ? RELATIVE_DATETIME_OPTIONS.find(opt => opt.primary === 'months_ago').value
+//           : RELATIVE_DATETIME_OPTIONS.find(opt => opt.primary === 'months_from_now').value
+//     };
+//   } else {
+//     return {
+//       timeSpanAmount: Math.round(years),
+//       relativeTimeSpan:
+//         diff < 0
+//           ? RELATIVE_DATETIME_OPTIONS.find(opt => opt.primary === 'years_ago').value
+//           : RELATIVE_DATETIME_OPTIONS.find(opt => opt.primary === 'years_from_now').value
+//     };
+//   }
+// };
 
-  // Check if the time is now (within 1 second tolerance)
-  if (Math.abs(diffInSeconds) < 1) {
-    return 'now'; // Return "now" if the time is essentially the current moment
-  }
+// /**
+//  * Converts a Moment datetime to a relative datetime string.
+//  * @param {Moment} absoluteMoment - The absolute Moment datetime to convert.
+//  * @returns {string} The relative datetime string (e.g. "now+5m", "now-2h", "now").
+//  */
+// export const convertAbsoluteToRelativeDateTime2 = (input: Moment): RelativeDateTime => {
+//   // Get the current time as a Moment object
+//   const now = moment();
 
-  // Determine the sign (positive or negative) based on the difference
-  const sign = diffInSeconds > 0 ? '+' : '-';
+//   // Calculate the difference between `absoluteMoment` and `now` in seconds
+//   const diffInSeconds = input.diff(now, 'seconds');
 
-  // Get the absolute difference in seconds
-  const absoluteDiff = Math.abs(diffInSeconds);
+//   // Check if the time is now (within 1 second tolerance)
+//   if (Math.abs(diffInSeconds) < 1) {
+//     return 'now'; // Return "now" if the time is essentially the current moment
+//   }
 
-  // Format the relative time in terms of larger units (s, m, h, d, w, M, y)
-  if (absoluteDiff < 60) {
-    return `now${sign}${absoluteDiff}s`; // Seconds
-  } else if (absoluteDiff < 3600) {
-    const minutes = Math.round(absoluteDiff / 60);
-    return `now${sign}${minutes}m`; // Minutes
-  } else if (absoluteDiff < 86400) {
-    const hours = Math.round(absoluteDiff / 3600);
-    return `now${sign}${hours}h`; // Hours
-  } else if (absoluteDiff < 604800) {
-    const days = Math.round(absoluteDiff / 86400);
-    return `now${sign}${days}d`; // Days
-  } else if (absoluteDiff < 2592000) {
-    const weeks = Math.round(absoluteDiff / 604800);
-    return `now${sign}${weeks}w`; // Weeks
-  } else if (absoluteDiff < 31536000) {
-    const months = Math.round(absoluteDiff / 2592000);
-    return `now${sign}${months}M`; // Months
-  } else {
-    const years = Math.round(absoluteDiff / 31536000);
-    return `now${sign}${years}y`; // Years
-  }
-};
+//   // Determine the sign (positive or negative) based on the difference
+//   const sign = diffInSeconds > 0 ? '+' : '-';
 
-/**
- * Splits a relative datetime (e.g., "now+5m", "now-2h") into its components.
- * @param {string} relativeDatetime - The relative datetime string to split.
- * @returns {RelativeDatetimeComponents | null} The sign, amount, and time span, or null if the input is invalid.
- */
-export const splitRelativeDatetime = (relativeDatetime: string): RelativeDateTimeParts | null => {
-  // Regex to match the format: now[+|-][number][s|m|h|d|w|M|y]
-  const regex = /^now([+-])(\d+)([smhdwMy])$/;
+//   // Get the absolute difference in seconds
+//   const absoluteDiff = Math.abs(diffInSeconds);
 
-  const match = relativeDatetime.match(regex);
-  if (!match) {
-    // If the format doesn't match, return null
-    return null;
-  }
+//   // Format the relative time in terms of larger units (s, m, h, d, w, M, y)
+//   if (absoluteDiff < 60) {
+//     return `now${sign}${absoluteDiff}s`; // Seconds
+//   } else if (absoluteDiff < 3600) {
+//     const minutes = Math.round(absoluteDiff / 60);
+//     return `now${sign}${minutes}m`; // Minutes
+//   } else if (absoluteDiff < 86400) {
+//     const hours = Math.round(absoluteDiff / 3600);
+//     return `now${sign}${hours}h`; // Hours
+//   } else if (absoluteDiff < 604800) {
+//     const days = Math.round(absoluteDiff / 86400);
+//     return `now${sign}${days}d`; // Days
+//   } else if (absoluteDiff < 2592000) {
+//     const weeks = Math.round(absoluteDiff / 604800);
+//     return `now${sign}${weeks}w`; // Weeks
+//   } else if (absoluteDiff < 31536000) {
+//     const months = Math.round(absoluteDiff / 2592000);
+//     return `now${sign}${months}M`; // Months
+//   } else {
+//     const years = Math.round(absoluteDiff / 31536000);
+//     return `now${sign}${years}y`; // Years
+//   }
+// };
 
-  const [, sign, amount, timeSpan] = match;
+// /**
+//  * Splits a relative datetime (e.g., "now+5m", "now-2h") into its components.
+//  * @param {string} relativeDatetime - The relative datetime string to split.
+//  * @returns {RelativeDatetimeComponents | null} The sign, amount, and time span, or null if the input is invalid.
+//  */
+// export const splitRelativeDatetime = (relativeDatetime: string): RelativeDateTimeParts | null => {
+//   // Regex to match the format: now[+|-][number][s|m|h|d|w|M|y]
+//   const regex = /^now([+-])(\d+)([smhdwMy])$/;
 
-  return {
-    sign: sign as '+' | '-',
-    amount: parseInt(amount, 10),
-    timeSpan: timeSpan as 's' | 'm' | 'h' | 'd' | 'w' | 'M' | 'y'
-  };
-};
+//   const match = relativeDatetime.match(regex);
+//   if (!match) {
+//     // If the format doesn't match, return null
+//     return null;
+//   }
 
-export const convertRelativeToAbsoluteDateTime = (relativeDateTime: RelativeDateTime): Moment => {
-  // Match against the relative datetime pattern
-  const regex = /^now([+-]\d+)?([smhdwMy])?$/;
-  const match = relativeDateTime.match(regex);
+//   const [, sign, amount, timeSpan] = match;
 
-  if (!match) {
-    throw new Error('Invalid relative datetime format');
-  }
+//   return {
+//     sign: sign as '+' | '-',
+//     amount: parseInt(amount, 10),
+//     timeSpan: timeSpan as 's' | 'm' | 'h' | 'd' | 'w' | 'M' | 'y'
+//   };
+// };
 
-  // Destructure the matched groups
-  const [, offsetExpression = '', unit = ''] = match;
+// export const convertRelativeToAbsoluteDateTime = (relativeDateTime: RelativeDateTime): Moment => {
+//   // Match against the relative datetime pattern
+//   const regex = /^now([+-]\d+)?([smhdwMy])?$/;
+//   const match = relativeDateTime.match(regex);
 
-  // If it's "now" without offset, return the current time
-  if (!offsetExpression) {
-    return moment();
-  }
+//   if (!match) {
+//     throw new Error('Invalid relative datetime format');
+//   }
 
-  // Parse the offset as a number and check the direction (+ or -)
-  const direction = offsetExpression.startsWith('+') ? 'add' : 'subtract';
-  const amount = parseInt(offsetExpression.slice(1), 10); // Remove + or - and parse the number
+//   // Destructure the matched groups
+//   const [, offsetExpression = '', unit = ''] = match;
 
-  // Apply the offset using the appropriate unit
-  return direction === 'add'
-    ? moment().add(amount, unit as moment.DurationInputArg2)
-    : moment().subtract(amount, unit as moment.DurationInputArg2);
-};
+//   // If it's "now" without offset, return the current time
+//   if (!offsetExpression) {
+//     return moment();
+//   }
 
-/**
- * Parses a RelativeDateTimeStr into its components.
- * @param {RelativeDateTimeStr} value - The relative datetime string to parse.
- * @returns {RelativeDateTime | null} The parsed object or null if the input is invalid.
- */
-export const parseRelativeDateTime = (value: string): RelativeDateTime | null => {
-  // Regex to match the relative datetime format
-  const regex = /^now(?:(\+|-)(\d+)([smhdwMy]))?(?:\/([smhdwMy]))?$/;
+//   // Parse the offset as a number and check the direction (+ or -)
+//   const direction = offsetExpression.startsWith('+') ? 'add' : 'subtract';
+//   const amount = parseInt(offsetExpression.slice(1), 10); // Remove + or - and parse the number
 
-  // Match the input string
-  const match = value.match(regex);
-  if (!match) {
-    // Return null if the input doesn't match the expected structure
-    return null;
-  }
+//   // Apply the offset using the appropriate unit
+//   return direction === 'add'
+//     ? moment().add(amount, unit as moment.DurationInputArg2)
+//     : moment().subtract(amount, unit as moment.DurationInputArg2);
+// };
 
-  const [, sign, amountStr, timeSpan, rounded] = match;
+// /**
+//  * Parses a RelativeDateTimeStr into its components.
+//  * @param {RelativeDateTimeStr} value - The relative datetime string to parse.
+//  * @returns {RelativeDateTime | null} The parsed object or null if the input is invalid.
+//  */
+// export const parseRelativeDateTime = (value: string): RelativeDateTime | null => {
+//   // Regex to match the relative datetime format
+//   const regex = /^now(?:(\+|-)(\d+)([smhdwMy]))?(?:\/([smhdwMy]))?$/;
 
-  // If "sign" is null/undefined, it's just "now"
-  if (!sign) {
-    return {
-      sign: '+',
-      amount: 0,
-      timeSpan: 's', // Default to 's' (seconds), as "now" implies no offset
-      rounded: null // No rounding specified
-    };
-  }
+//   // Match the input string
+//   const match = value.match(regex);
+//   if (!match) {
+//     // Return null if the input doesn't match the expected structure
+//     return null;
+//   }
 
-  return {
-    sign: sign as '+' | '-',
-    amount: parseInt(amountStr, 10),
-    timeSpan: timeSpan as RelativeDateTime['timeSpan'],
-    rounded: rounded ? (rounded as RelativeDateTime['rounded']) : null
-  };
-};
+//   const [, sign, amountStr, timeSpan, rounded] = match;
 
-/**
- * Parses a Lucene datetime string (e.g., "now-2d/d") into its components (RelativeDateTimeParts).
- *
- * @param input - A relative Lucene datetime string (e.g., "now-2d/d").
- * @returns The parsed components as a RelativeDateTimeParts object.
- * @throws An error if the input is not a valid Lucene datetime string.
- */
-export const parseLuceneDateTime = (input: string): RelativeDateTimeParts => {
-  // Regex to match Lucene datetime strings
-  const regex = /^now([+-])?(\d+)?([smhdwMy])?(?:\/([smhdwMy]))?$/;
+//   // If "sign" is null/undefined, it's just "now"
+//   if (!sign) {
+//     return {
+//       sign: '+',
+//       amount: 0,
+//       timeSpan: 's', // Default to 's' (seconds), as "now" implies no offset
+//       rounded: null // No rounding specified
+//     };
+//   }
 
-  // Match the input string against the regex
-  const match = input.match(regex);
+//   return {
+//     sign: sign as '+' | '-',
+//     amount: parseInt(amountStr, 10),
+//     timeSpan: timeSpan as RelativeDateTime['timeSpan'],
+//     rounded: rounded ? (rounded as RelativeDateTime['rounded']) : null
+//   };
+// };
 
-  // If the string doesn't match the expected pattern, throw an error
-  if (!match) {
-    throw new Error(`Invalid Lucene datetime format: "${input}"`);
-  }
+// /**
+//  * Parses a Lucene datetime string (e.g., "now-2d/d") into its components (RelativeDateTimeParts).
+//  *
+//  * @param input - A relative Lucene datetime string (e.g., "now-2d/d").
+//  * @returns The parsed components as a RelativeDateTimeParts object.
+//  * @throws An error if the input is not a valid Lucene datetime string.
+//  */
+// export const parseLuceneDateTime = (input: string): RelativeDateTimeParts => {
+//   // Regex to match Lucene datetime strings
+//   const regex = /^now([+-])?(\d+)?([smhdwMy])?(?:\/([smhdwMy]))?$/;
 
-  // Extract the components of the match
-  const [, sign = '+', amount = '0', timeSpan = 'd', rounded = null] = match;
+//   // Match the input string against the regex
+//   const match = input.match(regex);
 
-  // Construct and return the RelativeDateTimeParts object
-  return {
-    sign: sign as '+' | '-', // "+" or "-"
-    amount: parseInt(amount, 10), // Convert the amount to a number (default is 0)
-    timeSpan: timeSpan as TimeSpan, // Ensure the timeSpan is one of the valid TimeSpan types
-    rounded: rounded as TimeSpan | null // Convert the rounded unit (if present) or leave it as null
-  };
-};
+//   // If the string doesn't match the expected pattern, throw an error
+//   if (!match) {
+//     throw new Error(`Invalid Lucene datetime format: "${input}"`);
+//   }
 
-/**
- * Converts a RelativeDateTimeParts object into its corresponding Lucene datetime string.
- *
- * @param parts - The `RelativeDateTimeParts` object to convert.
- * @returns The equivalent Lucene datetime string (e.g., "now-2d/d").
- */
-export const relativeDateTimeToLucene = (parts: RelativeDateTimeParts): string => {
-  const { sign, amount, timeSpan, rounded } = parts;
+//   // Extract the components of the match
+//   const [, sign = '+', amount = '0', timeSpan = 'd', rounded = null] = match;
 
-  // Begin with "now"
-  let result = 'now';
+//   // Construct and return the RelativeDateTimeParts object
+//   return {
+//     sign: sign as '+' | '-', // "+" or "-"
+//     amount: parseInt(amount, 10), // Convert the amount to a number (default is 0)
+//     timeSpan: timeSpan as TimeSpan, // Ensure the timeSpan is one of the valid TimeSpan types
+//     rounded: rounded as TimeSpan | null // Convert the rounded unit (if present) or leave it as null
+//   };
+// };
 
-  // Add the relative offset (e.g., "-2d" or "+3h")
-  if (amount > 0) {
-    result += `${sign}${amount}${timeSpan}`;
-  }
+// /**
+//  * Converts a RelativeDateTimeParts object into its corresponding Lucene datetime string.
+//  *
+//  * @param parts - The `RelativeDateTimeParts` object to convert.
+//  * @returns The equivalent Lucene datetime string (e.g., "now-2d/d").
+//  */
+// export const relativeDateTimeToLucene = (parts: RelativeDateTimeParts): string => {
+//   const { sign, amount, timeSpan, rounded } = parts;
 
-  // Add rounding (e.g., "/d")
-  if (rounded) {
-    result += `/${rounded}`;
-  }
+//   // Begin with "now"
+//   let result = 'now';
 
-  return result;
-};
+//   // Add the relative offset (e.g., "-2d" or "+3h")
+//   if (amount > 0) {
+//     result += `${sign}${amount}${timeSpan}`;
+//   }
 
-/**
- * Converts a Moment object to a relative datetime object (RelativeDateTimeParts).
- * The relative datetime is based on the difference between the provided Moment object
- * and the current date & time (`now`).
- *
- * @param target - The target Moment object (to calculate the relative time from `now`).
- * @param roundTo - The optional TimeSpan for rounding (e.g., "d" for day, "h" for hour).
- *                  If provided, the function will round `now` and `target` to that unit.
- * @returns A `RelativeDateTimeParts` object describing the relative datetime.
- */
-export const momentToRelativeDateTime = (target: Moment, roundTo: TimeSpan | null = null): RelativeDateTimeParts => {
-  // Get the current datetime ("now")
-  const now = roundTo ? moment().startOf(roundTo) : moment();
+//   // Add rounding (e.g., "/d")
+//   if (rounded) {
+//     result += `/${rounded}`;
+//   }
 
-  // Optionally round the target time to the specified unit
-  const roundedTarget = roundTo ? target.clone().startOf(roundTo) : target;
+//   return result;
+// };
 
-  // Calculate the difference in milliseconds between `now` and `target`
-  const diffInMs = roundedTarget.diff(now);
+// /**
+//  * Converts a Moment object to a relative datetime object (RelativeDateTimeParts).
+//  * The relative datetime is based on the difference between the provided Moment object
+//  * and the current date & time (`now`).
+//  *
+//  * @param target - The target Moment object (to calculate the relative time from `now`).
+//  * @param roundTo - The optional TimeSpan for rounding (e.g., "d" for day, "h" for hour).
+//  *                  If provided, the function will round `now` and `target` to that unit.
+//  * @returns A `RelativeDateTimeParts` object describing the relative datetime.
+//  */
+// export const momentToRelativeDateTime = (target: Moment, roundTo: TimeSpan | null = null): RelativeDateTimeParts => {
+//   // Get the current datetime ("now")
+//   const now = roundTo ? moment().startOf(roundTo) : moment();
 
-  // Determine the sign ("+" for future, "-" for past)
-  const sign = diffInMs >= 0 ? '+' : '-';
+//   // Optionally round the target time to the specified unit
+//   const roundedTarget = roundTo ? target.clone().startOf(roundTo) : target;
 
-  // Convert the absolute difference into a Moment duration
-  const duration = moment.duration(Math.abs(diffInMs));
+//   // Calculate the difference in milliseconds between `now` and `target`
+//   const diffInMs = roundedTarget.diff(now);
 
-  // Determine the appropriate TimeSpan based on the largest non-zero unit of the duration
-  let amount: number;
-  let timeSpan: TimeSpan;
+//   // Determine the sign ("+" for future, "-" for past)
+//   const sign = diffInMs >= 0 ? '+' : '-';
 
-  if (duration.years() > 0) {
-    amount = duration.years();
-    timeSpan = 'y';
-  } else if (duration.months() > 0) {
-    amount = duration.months();
-    timeSpan = 'M';
-  } else if (duration.weeks() > 0) {
-    amount = Math.floor(duration.asWeeks());
-    timeSpan = 'w';
-  } else if (duration.days() > 0) {
-    amount = duration.days();
-    timeSpan = 'd';
-  } else if (duration.hours() > 0) {
-    amount = duration.hours();
-    timeSpan = 'h';
-  } else if (duration.minutes() > 0) {
-    amount = duration.minutes();
-    timeSpan = 'm';
-  } else {
-    amount = duration.seconds();
-    timeSpan = 's';
-  }
+//   // Convert the absolute difference into a Moment duration
+//   const duration = moment.duration(Math.abs(diffInMs));
 
-  // Return the RelativeDateTimeParts object
-  return {
-    sign,
-    amount,
-    timeSpan,
-    rounded: roundTo // The unit for rounding (or null if not provided)
-  };
-};
+//   // Determine the appropriate TimeSpan based on the largest non-zero unit of the duration
+//   let amount: number;
+//   let timeSpan: TimeSpan;
 
-/**
- * Converts a relative Lucene datetime string (e.g., "now-2d/d") to an absolute Moment datetime.
- *
- * @param input - A relative datetime string in the Lucene format (e.g., "now-2d/d").
- * @returns The equivalent absolute Moment datetime.
- */
-export const relativeToAbsoluteMoment = (input: string): Moment => {
-  // Match patterns like "now", "now-2d", "now-2d/d", or "now+5h/h"
-  const regex = /^now([+-])?(\d+)?([smhdwMy])?(?:\/([smhdwMy]))?$/;
-  const match = input.match(regex);
+//   if (duration.years() > 0) {
+//     amount = duration.years();
+//     timeSpan = 'y';
+//   } else if (duration.months() > 0) {
+//     amount = duration.months();
+//     timeSpan = 'M';
+//   } else if (duration.weeks() > 0) {
+//     amount = Math.floor(duration.asWeeks());
+//     timeSpan = 'w';
+//   } else if (duration.days() > 0) {
+//     amount = duration.days();
+//     timeSpan = 'd';
+//   } else if (duration.hours() > 0) {
+//     amount = duration.hours();
+//     timeSpan = 'h';
+//   } else if (duration.minutes() > 0) {
+//     amount = duration.minutes();
+//     timeSpan = 'm';
+//   } else {
+//     amount = duration.seconds();
+//     timeSpan = 's';
+//   }
 
-  if (!match) {
-    throw new Error(`Invalid relative datetime format: "${input}"`);
-  }
+//   // Return the RelativeDateTimeParts object
+//   return {
+//     sign,
+//     amount,
+//     timeSpan,
+//     rounded: roundTo // The unit for rounding (or null if not provided)
+//   };
+// };
 
-  // Extract matches from the regex
-  const [, sign, amount, timeSpan, rounded] = match;
+// /**
+//  * Converts a relative Lucene datetime string (e.g., "now-2d/d") to an absolute Moment datetime.
+//  *
+//  * @param input - A relative datetime string in the Lucene format (e.g., "now-2d/d").
+//  * @returns The equivalent absolute Moment datetime.
+//  */
+// export const relativeToAbsoluteMoment = (input: string): Moment => {
+//   // Match patterns like "now", "now-2d", "now-2d/d", or "now+5h/h"
+//   const regex = /^now([+-])?(\d+)?([smhdwMy])?(?:\/([smhdwMy]))?$/;
+//   const match = input.match(regex);
 
-  // Default values
-  const offsetSign = sign === '-' ? -1 : 1; // Determine if it's a "+" or "-"
-  const offsetAmount = amount ? parseInt(amount, 10) : 0; // Default to 0 if no amount is specified
-  const offsetTimeSpan = (timeSpan as TimeSpan) || 'd'; // Default to "d" (days) if no unit is specified
-  const roundingTimeSpan = rounded ? (rounded as TimeSpan) : null; // Optional rounding
+//   if (!match) {
+//     throw new Error(`Invalid relative datetime format: "${input}"`);
+//   }
 
-  // Start with the "now" timestamp
-  let result = moment();
+//   // Extract matches from the regex
+//   const [, sign, amount, timeSpan, rounded] = match;
 
-  // Apply the offset (if any, based on sign, amount, and timeSpan)
-  if (offsetAmount > 0) {
-    result = result.add(offsetSign * offsetAmount, offsetTimeSpan);
-  }
+//   // Default values
+//   const offsetSign = sign === '-' ? -1 : 1; // Determine if it's a "+" or "-"
+//   const offsetAmount = amount ? parseInt(amount, 10) : 0; // Default to 0 if no amount is specified
+//   const offsetTimeSpan = (timeSpan as TimeSpan) || 'd'; // Default to "d" (days) if no unit is specified
+//   const roundingTimeSpan = rounded ? (rounded as TimeSpan) : null; // Optional rounding
 
-  // Apply rounding (if specified)
-  if (roundingTimeSpan) {
-    result = result.startOf(roundingTimeSpan);
-  }
+//   // Start with the "now" timestamp
+//   let result = moment();
 
-  return result;
-};
+//   // Apply the offset (if any, based on sign, amount, and timeSpan)
+//   if (offsetAmount > 0) {
+//     result = result.add(offsetSign * offsetAmount, offsetTimeSpan);
+//   }
 
-/**
- * Parses a date-time string and determines whether it is an absolute or relative date-time.
- * @param {string} value - The input date-time string to parse.
- * @returns {DateTimeValues} An object containing the absolute and relative representations of the date-time.
- */
-export const parseDateTimeString = (value: string): DateTimeValues => {
-  // If the input is a valid absolute date (e.g., ISO 8601 or other valid formats)
-  if (moment(value, moment.ISO_8601, true).isValid()) {
-    const absolute = moment(value);
-    const relative = DateTimeLucene.fromMoment(absolute);
-    return { absolute, relative, type: 'absolute' };
-  }
+//   // Apply rounding (if specified)
+//   if (roundingTimeSpan) {
+//     result = result.startOf(roundingTimeSpan);
+//   }
 
-  // If the input is a valid relative date/time (e.g., "now-4d", "now+2h/M")
-  if (DateTimeLucene.isValid(value)) {
-    const relative = DateTimeLucene.fromLuceneString(value);
-    console.log(value, relative);
-    const absolute = relative.toMoment();
-    return { absolute, relative, type: 'relative' };
-  }
+//   return result;
+// };
 
-  // Fallback: If the input is invalid, default to 'now'
-  console.warn(`Invalid date-time string provided: "${value}", defaulting to 'now'.`);
+// /**
+//  * Parses a date-time string and determines whether it is an absolute or relative date-time.
+//  * @param {string} value - The input date-time string to parse.
+//  * @returns {DateTimeValues} An object containing the absolute and relative representations of the date-time.
+//  */
+// export const parseDateTimeString = (value: string): DateTimeValues => {
+//   // If the input is a valid absolute date (e.g., ISO 8601 or other valid formats)
+//   if (moment(value, moment.ISO_8601, true).isValid()) {
+//     const absolute = moment(value);
+//     const relative = DateTimeLucene.fromMoment(absolute);
+//     return { absolute, relative, type: 'absolute' };
+//   }
 
-  const relative = DateTimeLucene.fromLuceneString('now');
-  const absolute = relative.toMoment();
-  return { absolute, relative, type: 'relative' };
-};
+//   // If the input is a valid relative date/time (e.g., "now-4d", "now+2h/M")
+//   if (DateTimeLucene.isValid(value)) {
+//     const relative = DateTimeLucene.fromLuceneString(value);
+//     console.log(value, relative);
+//     const absolute = relative.toMoment();
+//     return { absolute, relative, type: 'relative' };
+//   }
+
+//   // Fallback: If the input is invalid, default to 'now'
+//   console.warn(`Invalid date-time string provided: "${value}", defaulting to 'now'.`);
+
+//   const relative = DateTimeLucene.fromLuceneString('now');
+//   const absolute = relative.toMoment();
+//   return { absolute, relative, type: 'relative' };
+// };

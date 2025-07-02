@@ -1,9 +1,13 @@
 import type { Moment } from 'moment';
 import moment from 'moment';
+
 // Define the TimeSpan type (e.g., "d" for days, "h" for hours, etc.)
 export type TimeSpan = 's' | 'm' | 'h' | 'd' | 'w' | 'M' | 'y';
 
-export type RelativeDateTime = 'now' | `now${'+' | '-'}${TimeSpan}${TimeSpan extends null ? `` : `/${TimeSpan}`}`;
+// Define the Relative Date Time using the Lucene format
+export type RelativeDateTime =
+  | 'now'
+  | `now${'+' | '-'}${number}${TimeSpan}${TimeSpan extends null ? `` : `/${TimeSpan}`}`;
 
 // Define the structure of the relative datetime object
 export type RelativeDateTimeParts = {
@@ -20,31 +24,46 @@ export type RelativeDateTimeParts = {
   rounded: null | TimeSpan;
 };
 
-export class DateTimeLucene {
-  sign: '+' | '-'; // Whether the offset is in the future ("+") or the past ("-")
-  amount: number; // The numeric value representing the offset
-  timeSpan: TimeSpan; // The unit of time for the offset (e.g., "d" for days)
-  rounded: null | TimeSpan; // The unit of time for rounding (optional, or null if not rounded)
+export class LuceneDateTime {
+  public value: string; // Original value
+  public type: 'absolute' | 'relative'; // Type of the original value
+  public absolute: Moment; // Absolute date time formatted to Moment
+  public relative: RelativeDateTime; // Relative date time formatted
+  public sign: '+' | '-'; // Whether the offset is in the future ("+") or the past ("-")
+  public amount: number; // The numeric value representing the offset
+  public timeSpan: TimeSpan; // The unit of time for the offset (e.g., "d" for days)
+  public rounded: null | TimeSpan; // The unit of time for rounding (optional, or null if not rounded)
 
-  /**
-   * Constructor to initialize the RelativeDateTimeParts object.
-   * @param sign - "+" (future) or "-" (past).
-   * @param amount - The numeric offset (e.g., 2 for "2 days").
-   * @param timeSpan - The unit of time for the offset (e.g., "d" for days).
-   * @param rounded - The unit of time to round to (e.g., "d" for days), or `null` if none.
-   */
-  constructor(sign: '+' | '-', amount: number, timeSpan: TimeSpan, rounded: null | TimeSpan = null) {
-    if (amount < 0) {
-      throw new Error('Amount must be a non-negative number.');
+  constructor(value: string) {
+    this.value = value;
+
+    let relativeParts: RelativeDateTimeParts = LuceneDateTime.fromLuceneString('now');
+
+    if (moment(value, moment.ISO_8601, true).isValid()) {
+      this.absolute = moment(value);
+      relativeParts = LuceneDateTime.fromMoment(this.absolute);
+      this.relative = LuceneDateTime.convertPartsToRelative(relativeParts);
+      this.type = 'absolute';
+    } else if (LuceneDateTime.isValidRelative(value)) {
+      relativeParts = LuceneDateTime.fromLuceneString(value);
+      this.absolute = LuceneDateTime.convertPartsToMoment(relativeParts);
+      this.relative = LuceneDateTime.convertPartsToRelative(relativeParts);
+      this.type = 'relative';
+    } else {
+      // Fallback: If the input is invalid, default to 'now'
+      console.warn(`Invalid date-time string provided: "${value}", defaulting to 'now'.`);
+      this.absolute = LuceneDateTime.convertPartsToMoment(relativeParts);
+      this.relative = LuceneDateTime.convertPartsToRelative(relativeParts);
+      this.type = 'relative';
     }
 
-    this.sign = sign;
-    this.amount = amount;
-    this.timeSpan = timeSpan;
-    this.rounded = rounded;
+    this.sign = relativeParts.sign;
+    this.amount = relativeParts.amount;
+    this.timeSpan = relativeParts.timeSpan;
+    this.rounded = relativeParts.rounded;
   }
 
-  static isValid(input: string): input is RelativeDateTime {
+  private static isValidRelative(input: string): input is RelativeDateTime {
     if (typeof input !== 'string') return false;
     const relativeDatetimeRegex = /^now([+-])?(\d+)?([smhdwMy])?(?:\/([smhdwMy]))?$/;
     return relativeDatetimeRegex.test(input);
@@ -55,7 +74,7 @@ export class DateTimeLucene {
    * @param input - A relative Lucene datetime string.
    * @returns An instance of `RelativeDateTimeParts`.
    */
-  static fromLuceneString(input: string): DateTimeLucene {
+  private static fromLuceneString(input: string): RelativeDateTimeParts {
     const regex = /^now([+-])?(\d+)?([smhdwMy])?(?:\/([smhdwMy]))?$/;
     const match = input.match(regex);
 
@@ -65,13 +84,53 @@ export class DateTimeLucene {
 
     const [, sign = '+', amount = '0', timeSpan = 'd', rounded = null] = match;
 
-    return new DateTimeLucene(
-      sign as '+' | '-',
-      parseInt(amount, 10),
-      timeSpan as TimeSpan,
-      rounded as TimeSpan | null
-    );
+    return { sign, amount: parseInt(amount, 10), timeSpan, rounded } as RelativeDateTimeParts;
   }
+
+  private static convertPartsToMoment = ({ sign, amount, timeSpan, rounded }: RelativeDateTimeParts): Moment => {
+    // Default values
+    const offsetSign = sign === '-' ? -1 : 1; // Determine if it's a "+" or "-"
+    const offsetAmount = amount || 0; // Default to 0 if no amount is specified
+    const offsetTimeSpan = timeSpan || 'd'; // Default to "d" (days) if no unit is specified
+    const roundingTimeSpan = rounded; // Optional rounding
+
+    // Start with the "now" timestamp
+    let result = moment();
+
+    // Apply the offset (if any, based on sign, amount, and timeSpan)
+    if (offsetAmount > 0) {
+      result = result.add(offsetSign * offsetAmount, offsetTimeSpan);
+    }
+
+    // Apply rounding (if specified)
+    if (roundingTimeSpan) {
+      result = result.startOf(roundingTimeSpan);
+    }
+
+    return result;
+  };
+
+  private static convertPartsToRelative = ({
+    sign,
+    amount,
+    timeSpan,
+    rounded
+  }: RelativeDateTimeParts): RelativeDateTime => {
+    // Begin with "now"
+    let result = 'now';
+
+    // Add the relative offset (e.g., "-2d" or "+3h")
+    if (amount > 0) {
+      result += `${sign}${amount}${timeSpan}`;
+    }
+
+    // Add rounding (e.g., "/d")
+    if (rounded) {
+      result += `/${rounded}`;
+    }
+
+    return result as RelativeDateTime;
+  };
 
   /**
    * Converts a Moment object to a relative datetime object (RelativeDateTimeParts).
@@ -83,7 +142,7 @@ export class DateTimeLucene {
    *                  If provided, the function will round `now` and `target` to that unit.
    * @returns A `RelativeDateTimeParts` object describing the relative datetime.
    */
-  static fromMoment(target: Moment, roundTo: TimeSpan | null = null): DateTimeLucene {
+  private static fromMoment(target: Moment, roundTo: TimeSpan | null = null): RelativeDateTimeParts {
     // Validate that the input is a valid Moment object
     if (!moment.isMoment(target) || !target.isValid()) {
       throw new Error('Invalid Moment object provided.');
@@ -131,15 +190,15 @@ export class DateTimeLucene {
       timeSpan = 's';
     }
 
-    // Return the DateTimeLucene instance
-    return new DateTimeLucene(sign, amount, timeSpan, roundTo);
+    // Return the LuceneDateTime instance
+    return { sign, amount, timeSpan, rounded: roundTo };
   }
 
   /**
    * Converts this `RelativeDateTimeParts` object back into a Lucene timestamp string.
    * @returns The equivalent relative Lucene datetime string (e.g., "now-2d/d").
    */
-  toLuceneString(): string {
+  public toLuceneString(): string {
     // Start with "now"
     let result = 'now';
 
@@ -156,7 +215,7 @@ export class DateTimeLucene {
     return result;
   }
 
-  toMoment(): Moment {
+  public toMoment(): Moment {
     // Default values
     const offsetSign = this.sign === '-' ? -1 : 1; // Determine if it's a "+" or "-"
     const offsetAmount = this.amount; // Default to 0 if no amount is specified
@@ -183,7 +242,7 @@ export class DateTimeLucene {
    * Converts the `RelativeDateTimeParts` instance into a human-readable format.
    * @returns A string representation of the object.
    */
-  toString(): string {
+  public toString(): string {
     return `Sign: ${this.sign}, Amount: ${this.amount}, TimeSpan: ${this.timeSpan}, Rounded: ${this.rounded}`;
   }
 }

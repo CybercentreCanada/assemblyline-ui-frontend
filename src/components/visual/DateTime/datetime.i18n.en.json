@@ -20,8 +20,10 @@
   "/s": "rounded to the second",
   "/w": "rounded to the week",
   "/y": "rounded to the year",
+  "end_date": "End date",
   "last": "last",
   "next": "next",
+  "start_date": "Start date",
   "this_week": "This week",
   "today": "Today"
 }
