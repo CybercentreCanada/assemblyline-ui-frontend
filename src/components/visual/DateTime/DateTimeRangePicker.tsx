@@ -379,11 +379,18 @@ const NowTab = ({ variant = null, onChange = () => null }: DateTimeProps) => {
 type DateTimeInputProps = {
   value: LuceneDateTime;
   variant: 'start' | 'end';
+  fullWidth?: boolean;
   onChange?: (event: unknown, value: string) => void;
   onApply?: () => void;
 };
 
-const DateTimeInput = ({ value = null, variant, onChange = () => null, onApply = () => null }: DateTimeInputProps) => {
+const DateTimeInput = ({
+  value = null,
+  variant,
+  fullWidth = false,
+  onChange = () => null,
+  onApply = () => null
+}: DateTimeInputProps) => {
   const theme = useTheme();
   const { i18n } = useTranslation('dateTime');
 
@@ -401,7 +408,12 @@ const DateTimeInput = ({ value = null, variant, onChange = () => null, onApply =
       <Button
         color="inherit"
         onClick={event => setAnchorEl(event.currentTarget)}
-        sx={{ textTransform: 'inherit', minWidth: 'inherit', fontWeight: 'inherit' }}
+        sx={{
+          textTransform: 'inherit',
+          minWidth: 'inherit',
+          fontWeight: 'inherit',
+          width: fullWidth ? '100%' : 'auto'
+        }}
       >
         {value.toString({ language: i18n.language })}
       </Button>
@@ -477,13 +489,12 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = React.mem
       return (value.slice(1, -1).split(' TO ') as [string, string]) || [null, null];
     }, [value]);
 
-    const [from, setFrom] = useState<LuceneDateTime>(new LuceneDateTime(fromStr));
-    const [to, setTo] = useState<LuceneDateTime>(new LuceneDateTime(fromStr));
+    const [from, setFrom] = useState<LuceneDateTime>(new LuceneDateTime(fromStr, 'start'));
+    const [to, setTo] = useState<LuceneDateTime>(new LuceneDateTime(fromStr, 'end'));
     const [error, setError] = useState<string>(null);
 
     const validateDateTimeRange = useCallback(
-      (earlier: LuceneDateTime, later: LuceneDateTime): boolean =>
-        later.absolute.valueOf() - earlier.absolute.valueOf() >= 1000,
+      (earlier: LuceneDateTime, later: LuceneDateTime): boolean => later.toValue() - earlier.toValue() >= 1000,
       []
     );
 
@@ -497,14 +508,15 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = React.mem
     }, [from, onChange, to, validateDateTimeRange]);
 
     useEffect(() => {
-      setFrom(new LuceneDateTime(fromStr));
-      setTo(new LuceneDateTime(toStr));
+      setFrom(new LuceneDateTime(fromStr, 'start'));
+      setTo(new LuceneDateTime(toStr, 'end'));
     }, [fromStr, toStr]);
 
     return (
       <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale={i18n.language}>
         <div
           style={{
+            width: fullWidth ? '100%' : 'fit-content',
             display: 'flex',
             flexDirection: 'row',
             justifyContent: 'space-between',
@@ -513,11 +525,19 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = React.mem
             ...(error && { border: `1px solid ${theme.palette.error.main}` })
           }}
         >
-          <QuickSelectMenu from={from} to={to} onChange={onChange} />
+          <QuickSelectMenu
+            from={from}
+            to={to}
+            onChange={(e, v) => {
+              setError(null);
+              onChange(e, v);
+            }}
+          />
 
           <DateTimeInput
             value={from}
             variant="start"
+            fullWidth={fullWidth}
             onChange={(e, v) => setFrom(() => new LuceneDateTime(v))}
             onApply={() => applyChanges()}
           />
@@ -533,6 +553,7 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = React.mem
           <DateTimeInput
             value={to}
             variant="end"
+            fullWidth={fullWidth}
             onChange={(e, v) => setTo(() => new LuceneDateTime(v))}
             onApply={() => applyChanges()}
           />

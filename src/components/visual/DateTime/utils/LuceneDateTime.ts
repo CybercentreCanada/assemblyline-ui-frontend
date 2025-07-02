@@ -13,6 +13,8 @@ export type RelativeDateTime =
 
 export type DateTimeType = 'absolute' | 'relative';
 
+export type DateTimeVariant = 'start' | 'end';
+
 // Define the structure of the relative datetime object
 export type RelativeDateTimeParts = {
   /** Indicates whether the time is in the future ("+") or past ("-") */
@@ -33,13 +35,16 @@ export class LuceneDateTime {
   public type: 'absolute' | 'relative'; // Type of the original value
   public absolute: Moment; // Absolute date time formatted to Moment
   public relative: RelativeDateTime; // Relative date time formatted
-  public sign: '+' | '-'; // Whether the offset is in the future ("+") or the past ("-")
-  public amount: number; // The numeric value representing the offset
-  public timeSpan: TimeSpan; // The unit of time for the offset (e.g., "d" for days)
-  public rounded: null | TimeSpan; // The unit of time for rounding (optional, or null if not rounded)
 
-  constructor(value: string) {
+  public sign: RelativeDateTimeParts['sign']; // Whether the offset is in the future ("+") or the past ("-")
+  public amount: RelativeDateTimeParts['amount']; // The numeric value representing the offset
+  public timeSpan: RelativeDateTimeParts['timeSpan']; // The unit of time for the offset (e.g., "d" for days)
+  public rounded: RelativeDateTimeParts['rounded']; // The unit of time for rounding (optional, or null if not rounded)
+  public variant: DateTimeVariant;
+
+  constructor(value: string, variant: DateTimeVariant = 'start') {
     this.value = value;
+    this.variant = variant;
 
     let relativeParts: RelativeDateTimeParts = LuceneDateTime.fromLuceneString('now');
 
@@ -50,11 +55,11 @@ export class LuceneDateTime {
       this.type = 'absolute';
     } else if (LuceneDateTime.isValidRelative(value)) {
       relativeParts = LuceneDateTime.fromLuceneString(value);
-      this.absolute = LuceneDateTime.convertPartsToMoment(relativeParts);
+      this.absolute = LuceneDateTime.convertPartsToMoment(relativeParts, variant);
       this.relative = LuceneDateTime.convertPartsToRelative(relativeParts);
       this.type = 'relative';
     } else {
-      this.absolute = LuceneDateTime.convertPartsToMoment(relativeParts);
+      this.absolute = LuceneDateTime.convertPartsToMoment(relativeParts, variant);
       this.relative = LuceneDateTime.convertPartsToRelative(relativeParts);
       this.type = 'relative';
     }
@@ -89,7 +94,10 @@ export class LuceneDateTime {
     return { sign, amount: parseInt(amount, 10), timeSpan, rounded } as RelativeDateTimeParts;
   }
 
-  private static convertPartsToMoment = ({ sign, amount, timeSpan, rounded }: RelativeDateTimeParts): Moment => {
+  private static convertPartsToMoment = (
+    { sign, amount, timeSpan, rounded }: RelativeDateTimeParts,
+    variant: DateTimeVariant
+  ): Moment => {
     // Default values
     const offsetSign = sign === '-' ? -1 : 1; // Determine if it's a "+" or "-"
     const offsetAmount = amount || 0; // Default to 0 if no amount is specified
@@ -106,7 +114,11 @@ export class LuceneDateTime {
 
     // Apply rounding (if specified)
     if (roundingTimeSpan) {
-      result = result.startOf(roundingTimeSpan);
+      if (variant === 'start') {
+        result = result.startOf(roundingTimeSpan);
+      } else {
+        result = result.endOf(roundingTimeSpan);
+      }
     }
 
     return result;
@@ -234,7 +246,11 @@ export class LuceneDateTime {
 
     // Apply rounding (if specified)
     if (roundingTimeSpan) {
-      result = result.startOf(roundingTimeSpan);
+      if (this.variant === 'start') {
+        result = result.startOf(roundingTimeSpan);
+      } else {
+        result = result.endOf(roundingTimeSpan);
+      }
     }
 
     return result;
@@ -268,7 +284,7 @@ export class LuceneDateTime {
         });
 
         // if (this.rounded) {
-        //   result += ' rounded';
+        //   result += ` ${t(`/${this.rounded}`)}`;
         // }
 
         return result;
@@ -280,5 +296,14 @@ export class LuceneDateTime {
 
   public toStringifiedParts() {
     return `now${this.sign}${this.amount}${this.timeSpan}${this.rounded && this.rounded === this.timeSpan ? `/${this.rounded}` : ''}`;
+  }
+
+  public toValue() {
+    switch (this.type) {
+      case 'absolute':
+        return this.absolute.valueOf();
+      case 'relative':
+        return this.toMoment().valueOf();
+    }
   }
 }

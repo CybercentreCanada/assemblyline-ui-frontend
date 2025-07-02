@@ -137,15 +137,10 @@ export const DateTimeSection = React.memo(() => {
             <form.Subscribe
               selector={state => state.values.components.datetime.values.datetime}
               children={value => (
-                <div style={{ width: 'fit-content' }}>
-                  <DateTimeRangePicker
-                    // label="Controlled Text Input"
-                    value={value}
-                    // reset
-                    onChange={(event, next) => form.setFieldValue('components.datetime.values.datetime', next)}
-                    // onReset={() => form.setFieldValue('components.datetime.values.datetime', '')}
-                  />
-                </div>
+                <DateTimeRangePicker
+                  value={value}
+                  onChange={(event, next) => form.setFieldValue('components.datetime.values.datetime', next)}
+                />
               )}
             />
           </Grid>
