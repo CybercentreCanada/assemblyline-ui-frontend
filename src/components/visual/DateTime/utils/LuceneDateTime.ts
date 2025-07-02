@@ -1,3 +1,5 @@
+import { format, formatDistance } from 'date-fns';
+import { enCA as localeEN, frCA as localeFR } from 'date-fns/locale';
 import type { Moment } from 'moment';
 import moment from 'moment';
 
@@ -50,8 +52,6 @@ export class LuceneDateTime {
       this.relative = LuceneDateTime.convertPartsToRelative(relativeParts);
       this.type = 'relative';
     } else {
-      // Fallback: If the input is invalid, default to 'now'
-      console.warn(`Invalid date-time string provided: "${value}", defaulting to 'now'.`);
       this.absolute = LuceneDateTime.convertPartsToMoment(relativeParts);
       this.relative = LuceneDateTime.convertPartsToRelative(relativeParts);
       this.type = 'relative';
@@ -238,11 +238,54 @@ export class LuceneDateTime {
     return result;
   }
 
-  /**
-   * Converts the `RelativeDateTimeParts` instance into a human-readable format.
-   * @returns A string representation of the object.
-   */
-  public toString(): string {
-    return `Sign: ${this.sign}, Amount: ${this.amount}, TimeSpan: ${this.timeSpan}, Rounded: ${this.rounded}`;
+  public toLucene(type: 'absolute' | 'relative' = null): string {
+    switch (type || this.type) {
+      case 'absolute':
+        return this.absolute.toISOString();
+      case 'relative':
+        return this.relative;
+      default:
+        return null;
+    }
+  }
+
+  public toString(params: { type?: 'absolute' | 'relative'; language?: string } = null): string {
+    const { type = null, language = 'en' } = params || {};
+
+    switch (type || this.type) {
+      case 'absolute':
+        return format(this.absolute.toDate(), language === 'fr' ? "do MMMM yyyy, H'h'mm" : 'MMMM d yyyy, h:mm a', {
+          locale: language === 'fr' ? localeFR : localeEN
+        });
+      case 'relative':
+        if (this.relative === 'now') return language === 'fr' ? 'maintenant' : 'now';
+
+        let result = formatDistance(this.absolute.toDate(), new Date(), {
+          addSuffix: true,
+          locale: language === 'fr' ? localeFR : localeEN
+        });
+
+        // if (this.rounded) {
+        //   result += ' rounded';
+        // }
+
+        return result;
+      default:
+        return null;
+    }
+
+    return '';
+    // if (this.type === 'absolute') {
+    //   return format(this.absolute.toDate(), this.type, { locale: i18n.language === 'fr' ? localeFR : localeEN });
+    // } else if (this.type === 'relative') {
+    //   if (value.relative === 'now') return t('now');
+    //   else
+    //     return formatDistance(value.absolute.toDate(), new Date(), {
+    //       addSuffix: true,
+    //       locale: i18n.language === 'fr' ? localeFR : localeEN
+    //     });
+    // } else {
+    //   return null;
+    // }
   }
 }

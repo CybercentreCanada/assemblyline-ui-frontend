@@ -2,7 +2,7 @@ import { Grid, Typography, useTheme } from '@mui/material';
 import { DemoContainer } from 'components/routes/development/library/components/DemoContainer';
 import { useForm } from 'components/routes/development/library/contexts/form';
 import { DateTimeField } from 'components/visual/DateTime/DateTimeField';
-import { DateTimePicker } from 'components/visual/DateTime/DateTimeRangePicker';
+import { DateTimeRangePicker } from 'components/visual/DateTime/DateTimeRangePicker';
 import { PageSection } from 'components/visual/Layouts/PageSection';
 import { add, formatDistanceToNow, sub } from 'date-fns';
 import { enCA, frCA } from 'date-fns/locale';
@@ -138,7 +138,7 @@ export const DateTimeSection = React.memo(() => {
               selector={state => state.values.components.datetime.values.datetime}
               children={value => (
                 <div style={{ width: 'fit-content' }}>
-                  <DateTimePicker
+                  <DateTimeRangePicker
                     // label="Controlled Text Input"
                     value={value}
                     // reset
