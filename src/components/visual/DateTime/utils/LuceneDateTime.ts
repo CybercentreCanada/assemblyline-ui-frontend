@@ -84,7 +84,7 @@ export class LuceneDateTime {
       throw new Error(`Invalid Lucene datetime format: "${input}"`);
     }
 
-    const [, sign = '+', amount = '0', timeSpan = 'd', rounded = null] = match;
+    const [, sign = '-', amount = '0', timeSpan = 's', rounded = null] = match;
 
     return { sign, amount: parseInt(amount, 10), timeSpan, rounded } as RelativeDateTimeParts;
   }
@@ -276,19 +276,9 @@ export class LuceneDateTime {
       default:
         return null;
     }
+  }
 
-    return '';
-    // if (this.type === 'absolute') {
-    //   return format(this.absolute.toDate(), this.type, { locale: i18n.language === 'fr' ? localeFR : localeEN });
-    // } else if (this.type === 'relative') {
-    //   if (value.relative === 'now') return t('now');
-    //   else
-    //     return formatDistance(value.absolute.toDate(), new Date(), {
-    //       addSuffix: true,
-    //       locale: i18n.language === 'fr' ? localeFR : localeEN
-    //     });
-    // } else {
-    //   return null;
-    // }
+  public toStringifiedParts() {
+    return `now${this.sign}${this.amount}${this.timeSpan}${this.rounded && this.rounded === this.timeSpan ? `/${this.rounded}` : ''}`;
   }
 }

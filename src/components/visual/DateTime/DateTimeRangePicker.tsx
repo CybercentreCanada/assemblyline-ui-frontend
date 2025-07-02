@@ -5,15 +5,13 @@ import FilterListIcon from '@mui/icons-material/FilterList';
 import type { ButtonProps } from '@mui/material';
 import {
   Button,
+  FormHelperText,
   InputAdornment,
   InputLabel,
-  MenuItem,
   Popover,
-  Select,
   styled,
   Tab,
   Tabs,
-  TextField,
   Typography,
   useTheme
 } from '@mui/material';
@@ -24,7 +22,8 @@ import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
 import type { DateTimePickerProps } from '@mui/x-date-pickers/DateTimePicker';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { QUICK_SELECT_OPTIONS, RELATIVE_DATETIME_OPTIONS } from 'components/visual/DateTime/utils/datetime.utils';
-import { DateTimeType, LuceneDateTime } from 'components/visual/DateTime/utils/LuceneDateTime';
+import type { DateTimeType, TimeSpan } from 'components/visual/DateTime/utils/LuceneDateTime';
+import { LuceneDateTime } from 'components/visual/DateTime/utils/LuceneDateTime';
 import { NumberInput } from 'components/visual/Inputs/NumberInput';
 import { SelectInput } from 'components/visual/Inputs/SelectInput';
 import { SwitchInput } from 'components/visual/Inputs/SwitchInput';
@@ -44,18 +43,20 @@ const StyledDigitalClock = styled(({ ...props }: DigitalClockProps<Moment>) => (
   }
 }));
 
-const StyledDateTimePicker = styled(({ ...props }: DateTimePickerProps<Moment>) => {
-  const { t, i18n } = useTranslation('dateTime');
+const StyledDateTimePicker = styled(({ readOnly = false, ...props }: DateTimePickerProps<Moment>) => {
+  const { i18n } = useTranslation('dateTime');
 
   return (
     <DateTimePicker
       disableOpenPicker
       // timezone="utc"
       format={i18n.language === 'fr' ? 'Do MMMM YYYY, H[h]mm' : 'MMMM D YYYY, h:mm a'}
+      readOnly={readOnly}
       slotProps={{
         textField: {
           size: 'small',
-          fullWidth: true
+          fullWidth: true,
+          ...(readOnly && { readOnly: true, select: false })
         },
         inputAdornment: {
           children: (
@@ -71,6 +72,11 @@ const StyledDateTimePicker = styled(({ ...props }: DateTimePickerProps<Moment>) 
 })(({ theme, readOnly }) => ({
   '& .MuiInputBase-input': {
     ...(readOnly && { cursor: 'default' })
+  },
+  '& .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline': {
+    ...(readOnly && {
+      borderColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.23)' : 'rgba(0, 0, 0, 0.23)'
+    })
   }
 }));
 
@@ -101,13 +107,28 @@ type QuickSelectMenuProps = {
   onChange: (event: unknown, value: string) => void;
 };
 
-const QuickSelectMenu = ({ onChange = () => null }: QuickSelectMenuProps) => {
+const QuickSelectMenu = ({ from = null, to = null, onChange = () => null }: QuickSelectMenuProps) => {
   const { t } = useTranslation('dateTime');
   const theme = useTheme();
 
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+  const [sign, setSign] = useState<'+' | '-'>('-');
+  const [amount, setAmount] = useState<number>(0);
+  const [timeSpan, setTimeSpan] = useState<TimeSpan>('s');
 
   const open = useMemo<boolean>(() => Boolean(anchorEl), [anchorEl]);
+
+  useEffect(() => {
+    if (from.relative === 'now') {
+      setSign(to.sign);
+      setAmount(to.amount);
+      setTimeSpan(to.timeSpan);
+    } else {
+      setSign(from.sign);
+      setAmount(from.amount);
+      setTimeSpan(from.timeSpan);
+    }
+  }, [from, to]);
 
   return (
     <>
@@ -162,38 +183,57 @@ const QuickSelectMenu = ({ onChange = () => null }: QuickSelectMenuProps) => {
             }}
           >
             <Typography color="textSecondary" variant="body2">
-              Quick Select
+              {t('quick_select')}
             </Typography>
-            <div style={{ display: 'flex', flexDirection: 'row', gap: theme.spacing(1) }}>
-              <Select
-                // disabled={disabled}
-                // value={param.value}
-                variant="outlined"
+            <div
+              style={{
+                width: 'auto',
+                display: 'grid',
+                gridTemplateColumns: 'repeat(4, 1fr)',
+                alignItems: 'end',
+                gap: theme.spacing(1)
+              }}
+            >
+              <SelectInput
+                id="sign"
+                value={sign}
+                options={[
+                  { primary: t('last'), value: '-' },
+                  { primary: t('next'), value: '+' }
+                ]}
+                onChange={(e, v: '-' | '+') => setSign(v)}
+              />
+
+              <NumberInput id="amount" value={amount} min={0} onChange={(e, v) => setAmount(v)} />
+
+              <SelectInput
+                id="timeSpan"
+                value={timeSpan}
+                options={[
+                  { primary: t('.s'), value: 's' },
+                  { primary: t('.m'), value: 'm' },
+                  { primary: t('.h'), value: 'h' },
+                  { primary: t('.d'), value: 'd' },
+                  { primary: t('.w'), value: 'w' },
+                  { primary: t('.M'), value: 'M' },
+                  { primary: t('.y'), value: 'y' }
+                ]}
+                onChange={(e, v: TimeSpan) => setTimeSpan(v)}
+              />
+
+              <Button
                 size="small"
-                // onChange={event => setParam(idx, pidx, event.target.value)}
-                fullWidth
-                MenuProps={{ sx: { '& .MuiPaper-root': { border: `1px solid ${theme.palette.divider}` } } }}
+                variant="contained"
+                onClick={e => {
+                  onChange(
+                    e,
+                    sign === '+' ? `[now TO now${sign}${amount}${timeSpan}]` : `[now${sign}${amount}${timeSpan} TO now]`
+                  );
+                  setAnchorEl(null);
+                }}
+                sx={{ height: '40px' }}
               >
-                <MenuItem value="last">Last</MenuItem>
-                <MenuItem value="next">Next</MenuItem>
-              </Select>
-
-              <TextField size="small" />
-
-              <Select
-                // disabled={disabled}
-                // value={param.value}
-                variant="outlined"
-                size="small"
-                // onChange={event => setParam(idx, pidx, event.target.value)}
-                fullWidth
-              >
-                <MenuItem value="last">Last</MenuItem>
-                <MenuItem value="next">Next</MenuItem>
-              </Select>
-
-              <Button size="small" variant="contained">
-                Apply
+                {t('apply')}
               </Button>
             </div>
           </div>
@@ -206,7 +246,7 @@ const QuickSelectMenu = ({ onChange = () => null }: QuickSelectMenuProps) => {
             }}
           >
             <Typography color="textSecondary" variant="body2">
-              Commonly Used
+              {t('commonly_used')}
             </Typography>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: theme.spacing(0.25) }}>
@@ -277,15 +317,20 @@ const RelativeTab = ({ value = null, variant, onChange = () => null }: DateTimeP
         id="relative value"
         value={value.amount}
         min={0}
-        onChange={(e, v) =>
-          onChange(e, `now${value.sign}${v}${value.timeSpan}${value.rounded ? `/${value.rounded}` : ''}`)
-        }
+        onChange={(e, v) => {
+          value.amount = v;
+          onChange(e, value.toStringifiedParts());
+        }}
       />
       <SelectInput
         id="relative select"
-        options={RELATIVE_DATETIME_OPTIONS.map(option => ({ primary: t(option.value), value: option.value }))}
         value={`${value.sign}${value.timeSpan}`}
-        onChange={(e, v) => onChange(e, `now${v[0]}${value.amount}${v[1]}${value.rounded ? `/${value.rounded}` : ''}`)}
+        options={RELATIVE_DATETIME_OPTIONS.map(option => ({ primary: t(option.value), value: option.value }))}
+        onChange={(e, v) => {
+          value.sign = v[0] as '+' | '-';
+          value.timeSpan = v[1] as TimeSpan;
+          onChange(e, value.toStringifiedParts());
+        }}
       />
 
       <div style={{ gridColumn: 'span 2' }}>
@@ -296,30 +341,36 @@ const RelativeTab = ({ value = null, variant, onChange = () => null }: DateTimeP
           gutterBottom
           children={variant === 'start' ? t('start_date') : t('end_date')}
         />
-        <StyledDateTimePicker value={value.absolute} readOnly onChange={v => onChange(null, v.toISOString())} />
+        <StyledDateTimePicker value={value.absolute} readOnly />
       </div>
 
       <div style={{ gridColumn: 'span 2' }}>
         <SwitchInput
           label={t(`/${value.timeSpan}`)}
           value={value.rounded && value.timeSpan === value.rounded}
-          onChange={(e, v) =>
-            onChange(e, `now${value.sign}${value.amount}${value.timeSpan}${v ? `/${value.timeSpan}` : ''}`)
-          }
+          onChange={(e, v) => {
+            value.rounded = v ? value.timeSpan : null;
+            onChange(e, value.toStringifiedParts());
+          }}
         />
       </div>
     </div>
   );
 };
 
-const NowTab = ({ onChange = () => null }: DateTimeProps) => {
+const NowTab = ({ variant = null, onChange = () => null }: DateTimeProps) => {
   const { t } = useTranslation('dateTime');
   const theme = useTheme();
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(2) }}>
-      <Button size="small" variant="contained" onClick={event => onChange(event, 'now')}>
-        {t('set_now')}
+      <Button
+        size="small"
+        variant="contained"
+        onClick={event => onChange(event, 'now')}
+        sx={{ textTransform: 'inherit' }}
+      >
+        {variant === 'end' ? t('set_end_now') : t('set_start_now')}
       </Button>
     </div>
   );
@@ -428,10 +479,22 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = React.mem
 
     const [from, setFrom] = useState<LuceneDateTime>(new LuceneDateTime(fromStr));
     const [to, setTo] = useState<LuceneDateTime>(new LuceneDateTime(fromStr));
+    const [error, setError] = useState<string>(null);
+
+    const validateDateTimeRange = useCallback(
+      (earlier: LuceneDateTime, later: LuceneDateTime): boolean =>
+        later.absolute.valueOf() - earlier.absolute.valueOf() >= 1000,
+      []
+    );
 
     const applyChanges = useCallback(() => {
-      onChange(null, `[${from.toLucene()} TO ${to.toLucene()}]`);
-    }, [from, onChange, to]);
+      if (!validateDateTimeRange(from, to)) {
+        setError('error');
+      } else {
+        onChange(null, `[${from.toLucene()} TO ${to.toLucene()}]`);
+        setError(null);
+      }
+    }, [from, onChange, to, validateDateTimeRange]);
 
     useEffect(() => {
       setFrom(new LuceneDateTime(fromStr));
@@ -446,7 +509,8 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = React.mem
             flexDirection: 'row',
             justifyContent: 'space-between',
             border: `1px solid ${theme.palette.divider}`,
-            borderRadius: theme.shape.borderRadius
+            borderRadius: theme.shape.borderRadius,
+            ...(error && { border: `1px solid ${theme.palette.error.main}` })
           }}
         >
           <QuickSelectMenu from={from} to={to} onChange={onChange} />
@@ -473,6 +537,9 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = React.mem
             onApply={() => applyChanges()}
           />
         </div>
+        <FormHelperText variant="outlined" sx={{ color: theme.palette.error.main }}>
+          {t(error)}
+        </FormHelperText>
       </LocalizationProvider>
     );
   }
