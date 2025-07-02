@@ -24,7 +24,7 @@ import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
 import type { DateTimePickerProps } from '@mui/x-date-pickers/DateTimePicker';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { QUICK_SELECT_OPTIONS, RELATIVE_DATETIME_OPTIONS } from 'components/visual/DateTime/utils/datetime.utils';
-import { LuceneDateTime } from 'components/visual/DateTime/utils/LuceneDateTime';
+import { DateTimeType, LuceneDateTime } from 'components/visual/DateTime/utils/LuceneDateTime';
 import { NumberInput } from 'components/visual/Inputs/NumberInput';
 import { SelectInput } from 'components/visual/Inputs/SelectInput';
 import { SwitchInput } from 'components/visual/Inputs/SwitchInput';
@@ -332,14 +332,18 @@ type DateTimeInputProps = {
   onApply?: () => void;
 };
 
-const DateTimeInput = ({ value = null, variant, onChange = () => null }: DateTimeInputProps) => {
+const DateTimeInput = ({ value = null, variant, onChange = () => null, onApply = () => null }: DateTimeInputProps) => {
   const theme = useTheme();
-  const { t, i18n } = useTranslation('dateTime');
+  const { i18n } = useTranslation('dateTime');
 
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
-  const [tab, setTab] = useState<'absolute' | 'relative' | 'now'>('absolute');
+  const [tab, setTab] = useState<'absolute' | 'relative' | 'now'>(value.type);
 
   const open = useMemo<boolean>(() => Boolean(anchorEl), [anchorEl]);
+
+  useEffect(() => {
+    setTab(value.type);
+  }, [value.type]);
 
   return (
     <>
@@ -354,7 +358,10 @@ const DateTimeInput = ({ value = null, variant, onChange = () => null }: DateTim
       <Popover
         open={open}
         anchorEl={anchorEl}
-        onClose={() => setAnchorEl(null)}
+        onClose={() => {
+          setAnchorEl(null);
+          onApply();
+        }}
         anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
         transformOrigin={{ vertical: -20, horizontal: 'center' }}
         transitionDuration={{
@@ -365,9 +372,7 @@ const DateTimeInput = ({ value = null, variant, onChange = () => null }: DateTim
       >
         <Tabs
           value={tab}
-          onChange={(e, t) => {
-            setTab(t);
-          }}
+          onChange={(e, t: DateTimeType) => setTab(t)}
           indicatorColor="primary"
           textColor="primary"
           scrollButtons="auto"

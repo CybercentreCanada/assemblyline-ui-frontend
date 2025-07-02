@@ -11,6 +11,8 @@ export type RelativeDateTime =
   | 'now'
   | `now${'+' | '-'}${number}${TimeSpan}${TimeSpan extends null ? `` : `/${TimeSpan}`}`;
 
+export type DateTimeType = 'absolute' | 'relative';
+
 // Define the structure of the relative datetime object
 export type RelativeDateTimeParts = {
   /** Indicates whether the time is in the future ("+") or past ("-") */
@@ -238,7 +240,7 @@ export class LuceneDateTime {
     return result;
   }
 
-  public toLucene(type: 'absolute' | 'relative' = null): string {
+  public toLucene(type: DateTimeType = null): string {
     switch (type || this.type) {
       case 'absolute':
         return this.absolute.toISOString();
@@ -249,7 +251,7 @@ export class LuceneDateTime {
     }
   }
 
-  public toString(params: { type?: 'absolute' | 'relative'; language?: string } = null): string {
+  public toString(params: { type?: DateTimeType; language?: string } = null): string {
     const { type = null, language = 'en' } = params || {};
 
     switch (type || this.type) {
@@ -270,6 +272,7 @@ export class LuceneDateTime {
         // }
 
         return result;
+
       default:
         return null;
     }
