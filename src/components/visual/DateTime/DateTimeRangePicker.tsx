@@ -28,8 +28,18 @@ import { NumberInput } from 'components/visual/Inputs/NumberInput';
 import { SelectInput } from 'components/visual/Inputs/SelectInput';
 import { SwitchInput } from 'components/visual/Inputs/SwitchInput';
 import type { Moment } from 'moment';
+import moment from 'moment';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
+// This function updates the week start for the specified locale
+function configureMomentLocale(language: string) {
+  moment.updateLocale(language, {
+    week: {
+      dow: 0 // Week starts on Sunday (0 = Sunday, 1 = Monday, etc.)
+    }
+  });
+}
 
 const StyledDigitalClock = styled(({ ...props }: DigitalClockProps<Moment>) => (
   <DigitalClock
@@ -204,7 +214,13 @@ const QuickSelectMenu = ({ from = null, to = null, onChange = () => null }: Quic
                 onChange={(e, v: '-' | '+') => setSign(v)}
               />
 
-              <NumberInput id="amount" value={amount} min={0} onChange={(e, v) => setAmount(v)} />
+              <NumberInput
+                id="amount"
+                value={amount}
+                min={0}
+                onChange={(e, v) => setAmount(v)}
+                sx={{ width: '140px' }}
+              />
 
               <SelectInput
                 id="timeSpan"
@@ -347,7 +363,7 @@ const RelativeTab = ({ value = null, variant, onChange = () => null }: DateTimeP
       <div style={{ gridColumn: 'span 2' }}>
         <SwitchInput
           label={t(`/${value.timeSpan}`)}
-          value={value.rounded && value.timeSpan === value.rounded}
+          value={!!value.rounded && value.timeSpan === value.rounded}
           onChange={(e, v) => {
             value.rounded = v ? value.timeSpan : null;
             onChange(e, value.toStringifiedParts());
@@ -511,6 +527,10 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = React.mem
       setFrom(new LuceneDateTime(fromStr, 'start'));
       setTo(new LuceneDateTime(toStr, 'end'));
     }, [fromStr, toStr]);
+
+    useEffect(() => {
+      configureMomentLocale(i18n.language);
+    }, [i18n.language]);
 
     return (
       <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale={i18n.language}>

@@ -1,7 +1,11 @@
+import type { Locale } from 'date-fns';
 import { format, formatDistance } from 'date-fns';
-import { enCA as localeEN, frCA as localeFR } from 'date-fns/locale';
+import { enCA, frCA } from 'date-fns/locale';
 import type { Moment } from 'moment';
 import moment from 'moment';
+
+export const EN_CA: Locale = { ...enCA, options: { ...enCA.options, weekStartsOn: 0 } };
+export const FR_CA: Locale = { ...frCA, options: { ...frCA.options, weekStartsOn: 0 } };
 
 // Define the TimeSpan type (e.g., "d" for days, "h" for hours, etc.)
 export type TimeSpan = 's' | 'm' | 'h' | 'd' | 'w' | 'M' | 'y';
@@ -76,6 +80,25 @@ export class LuceneDateTime {
     return relativeDatetimeRegex.test(input);
   }
 
+  private static reduceTimeSpan(input: TimeSpan): TimeSpan {
+    switch (input) {
+      case 'y':
+        return 'M';
+      case 'M':
+        return 'w';
+      case 'w':
+        return 'd';
+      case 'd':
+        return 'h';
+      case 'h':
+        return 'm';
+      case 'm':
+        return 's';
+      default:
+        return null;
+    }
+  }
+
   /**
    * Converts a Lucene timestamp string (e.g., "now-2d/d") into a RelativeDateTimeParts object.
    * @param input - A relative Lucene datetime string.
@@ -89,9 +112,14 @@ export class LuceneDateTime {
       throw new Error(`Invalid Lucene datetime format: "${input}"`);
     }
 
-    const [, sign = '-', amount = '0', timeSpan = 's', rounded = null] = match;
+    const [, sign = '-', amount = '0', timeSpan = null, rounded = null] = match;
 
-    return { sign, amount: parseInt(amount, 10), timeSpan, rounded } as RelativeDateTimeParts;
+    return {
+      sign,
+      amount: parseInt(amount, 10),
+      timeSpan: timeSpan || LuceneDateTime.reduceTimeSpan(rounded as TimeSpan) || 's',
+      rounded
+    } as RelativeDateTimeParts;
   }
 
   private static convertPartsToMoment = (
@@ -156,17 +184,26 @@ export class LuceneDateTime {
    *                  If provided, the function will round `now` and `target` to that unit.
    * @returns A `RelativeDateTimeParts` object describing the relative datetime.
    */
-  private static fromMoment(target: Moment, roundTo: TimeSpan | null = null): RelativeDateTimeParts {
+  public static fromMoment(
+    target: Moment,
+    roundTo: TimeSpan | null = null,
+    variant: DateTimeVariant = 'start'
+  ): RelativeDateTimeParts {
     // Validate that the input is a valid Moment object
     if (!moment.isMoment(target) || !target.isValid()) {
       throw new Error('Invalid Moment object provided.');
     }
 
     // Get the current datetime ("now")
-    const now = roundTo ? moment().startOf(roundTo) : moment();
+    // const now = roundTo ? (variant === 'start' ? moment().startOf(roundTo) : moment().endOf(roundTo)) : moment();
+    const now = moment();
 
     // Round the target time to the specified unit if rounding is required
-    const roundedTarget = roundTo ? target.clone().startOf(roundTo) : target;
+    const roundedTarget = roundTo
+      ? variant === 'start'
+        ? target.clone().startOf(roundTo)
+        : target.clone().endOf(roundTo)
+      : target;
 
     // Calculate the difference in milliseconds between `roundedTarget` and `now`
     const diffInMs = roundedTarget.diff(now);
@@ -273,19 +310,16 @@ export class LuceneDateTime {
     switch (type || this.type) {
       case 'absolute':
         return format(this.absolute.toDate(), language === 'fr' ? "do MMMM yyyy, H'h'mm" : 'MMMM d yyyy, h:mm a', {
-          locale: language === 'fr' ? localeFR : localeEN
+          locale: language === 'fr' ? FR_CA : EN_CA
         });
       case 'relative':
         if (this.relative === 'now') return language === 'fr' ? 'maintenant' : 'now';
 
-        let result = formatDistance(this.absolute.toDate(), new Date(), {
+        // Format the relative distance
+        const result = formatDistance(this.absolute.toDate(), new Date(), {
           addSuffix: true,
-          locale: language === 'fr' ? localeFR : localeEN
+          locale: language === 'fr' ? frCA : enCA
         });
-
-        // if (this.rounded) {
-        //   result += ` ${t(`/${this.rounded}`)}`;
-        // }
 
         return result;
 
@@ -294,16 +328,24 @@ export class LuceneDateTime {
     }
   }
 
-  public toStringifiedParts() {
+  public toStringifiedParts(): string {
     return `now${this.sign}${this.amount}${this.timeSpan}${this.rounded && this.rounded === this.timeSpan ? `/${this.rounded}` : ''}`;
   }
 
-  public toValue() {
+  public toValue(): number {
     switch (this.type) {
       case 'absolute':
         return this.absolute.valueOf();
       case 'relative':
         return this.toMoment().valueOf();
     }
+  }
+
+  public static previousTimeWindow(start: LuceneDateTime, end: LuceneDateTime): [LuceneDateTime, LuceneDateTime] {
+    return [null, null];
+  }
+
+  public static nextTimeWindow(start: LuceneDateTime, end: LuceneDateTime): [LuceneDateTime, LuceneDateTime] {
+    return [null, null];
   }
 }
