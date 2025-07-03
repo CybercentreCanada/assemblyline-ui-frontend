@@ -25,9 +25,8 @@ import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
 import type { DateTimePickerProps } from '@mui/x-date-pickers/DateTimePicker';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-import { QUICK_SELECT_OPTIONS, RELATIVE_DATETIME_OPTIONS } from 'components/visual/DateTime/utils/datetime.utils';
-import type { DateTimeType, TimeSpan } from 'components/visual/DateTime/utils/LuceneDateTime';
-import { LuceneDateTime } from 'components/visual/DateTime/utils/LuceneDateTime';
+import type { DateTimeType, TimeSpan } from 'components/visual/DateTime/LuceneDateTime';
+import { LuceneDateTime } from 'components/visual/DateTime/LuceneDateTime';
 import { NumberInput } from 'components/visual/Inputs/NumberInput';
 import { SelectInput } from 'components/visual/Inputs/SelectInput';
 import { SwitchInput } from 'components/visual/Inputs/SwitchInput';
@@ -35,6 +34,8 @@ import type { Moment } from 'moment';
 import moment from 'moment';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
+export type DateTimeRange = `[${string} TO ${string}]`;
 
 // This function updates the week start for the specified locale
 function configureMomentLocale(language: string) {
@@ -108,12 +109,18 @@ const CommonlyUsedButton = styled(({ ...props }: ButtonProps) => <Button fullWid
   justifyContent: 'start'
 }));
 
-type DateTimeProps = {
-  value?: LuceneDateTime;
-  variant?: 'start' | 'end';
-  onChange?: (event: unknown, value: string) => void;
-  onApply?: () => void;
-};
+export const QUICK_SELECT_OPTIONS = [
+  { primary: 'today', value: '[now/d TO now/d]' },
+  { primary: 'last_24h', value: '[now-24h/h TO now]' },
+  { primary: 'this_week', value: '[now/w TO now/w]' },
+  { primary: 'last_7d', value: '[now-7d/d TO now]' },
+  { primary: 'last_15m', value: '[now-15m TO now]' },
+  { primary: 'last_30d', value: '[now-30d/d TO now]' },
+  { primary: 'last_30m', value: '[now-30m TO now]' },
+  { primary: 'last_90d', value: '[now-90d/d TO now]' },
+  { primary: 'last_1h', value: '[now-1h TO now]' },
+  { primary: 'last_1y', value: '[now-1y/d TO now]' }
+] as const;
 
 type QuickSelectMenuProps = {
   from: LuceneDateTime;
@@ -186,7 +193,6 @@ const QuickSelectMenu = ({ from = null, to = null, onChange = () => null }: Quic
             flexDirection: 'column',
             rowGap: theme.spacing(2),
             border: `1px solid ${theme.palette.divider}`
-            // borderRadius: theme.shape.borderRadius
           }}
         >
           <div
@@ -324,6 +330,13 @@ const QuickSelectMenu = ({ from = null, to = null, onChange = () => null }: Quic
   );
 };
 
+type DateTimeProps = {
+  value?: LuceneDateTime;
+  variant?: 'start' | 'end';
+  onChange?: (event: unknown, value: string) => void;
+  onApply?: () => void;
+};
+
 const AbsoluteTab = ({ value, variant = 'start', onChange = () => null }: DateTimeProps) => {
   const { t } = useTranslation('dateTime');
   const theme = useTheme();
@@ -355,6 +368,24 @@ const AbsoluteTab = ({ value, variant = 'start', onChange = () => null }: DateTi
     </>
   );
 };
+
+export const RELATIVE_DATETIME_OPTIONS = [
+  { primary: 'seconds_ago', value: '-s' },
+  { primary: 'minutes_ago', value: '-m' },
+  { primary: 'hours_ago', value: '-h' },
+  { primary: 'days_ago', value: '-d' },
+  { primary: 'weeks_ago', value: '-w' },
+  { primary: 'months_ago', value: '-M' },
+  { primary: 'years_ago', value: '-y' },
+
+  { primary: 'seconds_from_now', value: '+s' },
+  { primary: 'minutes_from_now', value: '+m' },
+  { primary: 'hours_from_now', value: '+h' },
+  { primary: 'days_from_now', value: '+d' },
+  { primary: 'weeks_from_now', value: '+w' },
+  { primary: 'months_from_now', value: '+M' },
+  { primary: 'years_from_now', value: '+y' }
+] as const;
 
 const RelativeTab = ({ value = null, variant, onChange = () => null }: DateTimeProps) => {
   const { t } = useTranslation('dateTime');
