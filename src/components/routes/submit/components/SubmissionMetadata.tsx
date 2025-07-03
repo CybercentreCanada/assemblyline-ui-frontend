@@ -130,6 +130,7 @@ export const MetadataParam: React.FC<MetadataParamParam> = React.memo(
                     .map(v => ({ primary: v.replaceAll('_', ' '), value: v }))
                     .sort()}
                   reset={!!value}
+                  sx={{ textTransform: 'capitalize' }}
                 />
               );
             case 'integer':

@@ -1,6 +1,6 @@
 import type {
+  AutocompleteChangeReason,
   AutocompleteProps,
-  AutocompleteValue,
   FormHelperTextProps,
   IconButtonProps,
   TextFieldProps,
@@ -17,6 +17,7 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
+import CustomChip from 'components/visual/CustomChip';
 import { HelperText } from 'components/visual/Inputs/components/HelperText';
 import { PasswordInput } from 'components/visual/Inputs/components/PasswordInput';
 import type { ResetInputProps } from 'components/visual/Inputs/components/ResetInput';
@@ -25,26 +26,27 @@ import { Tooltip } from 'components/visual/Tooltip';
 import type { ElementType } from 'react';
 import React, { useMemo, useState } from 'react';
 
-export type TextInputProps<
-  Value extends string = string,
+export type ChipsInputProps<
+  Value extends string[] = string[],
   Multiple extends boolean = boolean,
   DisableClearable extends boolean = boolean,
   FreeSolo extends boolean = boolean,
   ChipComponent extends ElementType = ElementType
 > = Omit<
   AutocompleteProps<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>,
-  'renderInput' | 'options' | 'onChange' | 'value'
+  'isOptionEqualToValue' | 'renderInput' | 'options' | 'onChange' | 'value'
 > & {
   endAdornment?: TextFieldProps['InputProps']['endAdornment'];
-  error?: (value: string) => string;
+  error?: (value: string[]) => string;
   errorProps?: FormHelperTextProps;
   helperText?: string;
   helperTextProps?: FormHelperTextProps;
+  isOptionEqualToValue?: (option: string, value: string) => boolean;
   label?: string;
   labelProps?: TypographyProps;
   loading?: boolean;
   monospace?: boolean;
-  options?: AutocompleteProps<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>['options'];
+  options?: string[];
   password?: boolean;
   placeholder?: TextFieldProps['InputProps']['placeholder'];
   preventDisabledColor?: boolean;
@@ -54,18 +56,17 @@ export type TextInputProps<
   resetProps?: ResetInputProps;
   rootProps?: React.HTMLAttributes<HTMLDivElement>;
   startAdornment?: TextFieldProps['InputProps']['startAdornment'];
-  textfieldProps?: TextFieldProps;
   tiny?: boolean;
   tooltip?: TooltipProps['title'];
   tooltipProps?: Omit<TooltipProps, 'children' | 'title'>;
-  value: string;
-  onChange?: AutocompleteProps<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>['onInputChange'];
+  value: string[];
+  onChange?: (event: React.SyntheticEvent<Element, Event>, value: string[], reason: AutocompleteChangeReason) => void;
   onReset?: IconButtonProps['onClick'];
   onError?: (error: string) => void;
 };
 
-const WrappedTextInput = <
-  Value extends string = string,
+const WrappedChipsInput = <
+  Value extends string[] = string[],
   Multiple extends boolean = boolean,
   DisableClearable extends boolean = boolean,
   FreeSolo extends boolean = boolean,
@@ -79,6 +80,7 @@ const WrappedTextInput = <
   helperText = null,
   helperTextProps = null,
   id: idProp = null,
+  isOptionEqualToValue = null,
   label: labelProp = null,
   labelProps,
   loading = false,
@@ -93,22 +95,19 @@ const WrappedTextInput = <
   resetProps = null,
   rootProps = null,
   startAdornment = null,
-  textfieldProps = null,
   tiny = false,
   tooltip = null,
   tooltipProps = null,
-  value = '',
+  value,
   onBlur = () => null,
   onChange = () => null,
   onError = () => null,
   onFocus = () => null,
   onReset = () => null,
   ...autocompleteProps
-}: TextInputProps<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>) => {
+}: ChipsInputProps<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>) => {
   const theme = useTheme();
 
-  const [_value, setValue] =
-    useState<AutocompleteValue<Value, Multiple, true | DisableClearable, true | FreeSolo>>(null);
   const [focused, setFocused] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState<boolean>(true);
 
@@ -152,21 +151,18 @@ const WrappedTextInput = <
           <Skeleton sx={{ height: '40px', transform: 'unset', ...(tiny && { height: '28px' }) }} />
         ) : (
           <Autocomplete
-            id={id}
             autoComplete={autoComplete}
-            disableClearable
-            disabled={disabled}
+            id={id}
             freeSolo
-            fullWidth
-            inputValue={value || ''}
-            options={options}
-            readOnly={readOnly}
+            multiple
             size="small"
-            value={_value}
-            onChange={(e, v) => setValue(v)}
-            onInputChange={(e, v, o) => {
-              setValue(v as AutocompleteValue<Value, Multiple, true | DisableClearable, true | FreeSolo>);
-              onChange(e, v, o);
+            value={value}
+            options={options}
+            disabled={disabled}
+            readOnly={readOnly}
+            isOptionEqualToValue={isOptionEqualToValue ?? ((option, value) => option === value)}
+            onChange={(e, v: string[], p) => {
+              onChange(e, v, p);
 
               const err = error(v);
               if (err) onError(err);
@@ -179,48 +175,62 @@ const WrappedTextInput = <
               setFocused(false);
               onBlur(event, ...other);
             }}
-            renderOption={(props, option) => (
-              <Typography {...props} key={option} {...(tiny && { variant: 'body2' })}>
-                {option}
-              </Typography>
-            )}
             renderInput={params => (
               <TextField
-                {...textfieldProps}
+                {...params}
                 id={id}
                 variant="outlined"
                 error={!!errorValue}
                 type={password && showPassword ? 'password' : 'text'}
+                placeholder={placeholder}
                 {...(readOnly && !disabled && { focused: null })}
-                {...params}
-                InputProps={{
-                  ...params?.InputProps,
-                  'aria-describedby': disabled || !(errorValue || helperText) ? null : `${id}-helper-text`,
-                  placeholder: placeholder,
-                  readOnly: readOnly,
-                  startAdornment: (
-                    <>{startAdornment && <InputAdornment position="start">{startAdornment}</InputAdornment>}</>
-                  ),
-                  endAdornment:
-                    preventPasswordRender && preventResetRender && !endAdornment ? null : (
-                      <InputAdornment position="end">
-                        <PasswordInput
-                          id={id}
-                          preventRender={preventPasswordRender}
-                          tiny={tiny}
-                          showPassword={showPassword}
-                          onShowPassword={() => setShowPassword(p => !p)}
-                        />
-                        <ResetInput
-                          id={id}
-                          preventRender={preventResetRender}
-                          tiny={tiny}
-                          onReset={onReset}
-                          {...resetProps}
-                        />
-                        {endAdornment}
-                      </InputAdornment>
+                slotProps={{
+                  input: {
+                    ...params?.InputProps,
+                    ...(reset && { style: { paddingRight: '85px' } }),
+                    'aria-describedby': disabled || !(errorValue || helperText) ? null : `${id}-helper-text`,
+                    startAdornment: (
+                      <>
+                        {startAdornment && <InputAdornment position="start">{startAdornment}</InputAdornment>}
+                        {params?.InputProps?.startAdornment}
+                      </>
+                    ),
+                    endAdornment: (
+                      <>
+                        {preventPasswordRender && preventResetRender && !endAdornment ? null : (
+                          <InputAdornment
+                            position="end"
+                            sx={{
+                              position: 'absolute',
+                              right: '37px',
+                              top: '50%',
+                              transform: 'translate(0, -50%)',
+                              ...(!focused && { visibility: 'hidden' })
+                            }}
+                            style={{ display: 'hidden' }}
+                          >
+                            <PasswordInput
+                              id={id}
+                              preventRender={preventPasswordRender}
+                              tiny={tiny}
+                              showPassword={showPassword}
+                              onShowPassword={() => setShowPassword(p => !p)}
+                              {...resetProps}
+                            />
+                            <ResetInput
+                              id={id}
+                              preventRender={preventResetRender}
+                              tiny={tiny}
+                              onReset={onReset}
+                              {...resetProps}
+                            />
+                            {endAdornment}
+                          </InputAdornment>
+                        )}
+                        {params?.InputProps?.endAdornment}
+                      </>
                     )
+                  }
                 }}
                 sx={{
                   '& .MuiInputBase-root': {
@@ -246,7 +256,35 @@ const WrappedTextInput = <
                 }}
               />
             )}
-            {...autocompleteProps}
+            renderValue={(values: string[], getItemProps) =>
+              values.map((option: string, index: number) => {
+                const { key, ...itemProps } = getItemProps({ index });
+                return (
+                  <CustomChip
+                    key={key}
+                    label={option}
+                    wrap
+                    {...itemProps}
+                    onDelete={disabled ? undefined : itemProps.onDelete}
+                    sx={{
+                      ...(readOnly &&
+                        !disabled && {
+                          cursor: 'default'
+                        }),
+                      ...(monospace && { fontFamily: 'monospace' }),
+                      ...(password &&
+                        showPassword && {
+                          fontFamily: 'password',
+                          WebkitTextSecurity: 'disc',
+                          MozTextSecurity: 'disc',
+                          textSecurity: 'disc'
+                        })
+                    }}
+                  />
+                );
+              })
+            }
+            {...(autocompleteProps as unknown as object)}
           />
         )}
         <HelperText
@@ -263,12 +301,12 @@ const WrappedTextInput = <
   );
 };
 
-export const TextInput: <
-  Value extends string = string,
+export const ChipsInput: <
+  Value extends string[] = string[],
   Multiple extends boolean = boolean,
   DisableClearable extends boolean = boolean,
   FreeSolo extends boolean = boolean,
   ChipComponent extends ElementType = ElementType
 >(
-  props: TextInputProps<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>
-) => React.ReactNode = React.memo(WrappedTextInput);
+  props: ChipsInputProps<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>
+) => React.ReactNode = React.memo(WrappedChipsInput);
