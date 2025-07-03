@@ -1,4 +1,6 @@
+import ArrowBackIosNewOutlinedIcon from '@mui/icons-material/ArrowBackIosNewOutlined';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import ArrowForwardIosOutlinedIcon from '@mui/icons-material/ArrowForwardIosOutlined';
 import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined';
 import ExpandMoreOutlinedIcon from '@mui/icons-material/ExpandMoreOutlined';
 import FilterListIcon from '@mui/icons-material/FilterList';
@@ -6,12 +8,14 @@ import type { ButtonProps } from '@mui/material';
 import {
   Button,
   FormHelperText,
+  IconButton,
   InputAdornment,
   InputLabel,
   Popover,
   styled,
   Tab,
   Tabs,
+  Tooltip,
   Typography,
   useTheme
 } from '@mui/material';
@@ -192,9 +196,44 @@ const QuickSelectMenu = ({ from = null, to = null, onChange = () => null }: Quic
               rowGap: theme.spacing(1)
             }}
           >
-            <Typography color="textSecondary" variant="body2">
-              {t('quick_select')}
-            </Typography>
+            <div
+              style={{
+                width: '100%',
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                columnGap: theme.spacing(1)
+              }}
+            >
+              <Typography color="textSecondary" variant="body2" sx={{ flex: 1 }}>
+                {t('quick_select')}
+              </Typography>
+
+              <Tooltip title="previous_window">
+                <IconButton
+                  size="small"
+                  onClick={() => {
+                    const [start, end] = LuceneDateTime.previousTimeWindow(from, to);
+                    onChange(null, `[${start} TO ${end}]`);
+                  }}
+                >
+                  <ArrowBackIosNewOutlinedIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+
+              <Tooltip title="next_window">
+                <IconButton
+                  size="small"
+                  onClick={() => {
+                    const [start, end] = LuceneDateTime.nextTimeWindow(from, to);
+                    onChange(null, `[${start} TO ${end}]`);
+                  }}
+                >
+                  <ArrowForwardIosOutlinedIcon fontSize="small" />
+                </IconButton>
+              </Tooltip>
+            </div>
+
             <div
               style={{
                 width: 'auto',

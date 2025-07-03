@@ -341,11 +341,25 @@ export class LuceneDateTime {
     }
   }
 
-  public static previousTimeWindow(start: LuceneDateTime, end: LuceneDateTime): [LuceneDateTime, LuceneDateTime] {
-    return [null, null];
+  public static previousTimeWindow(start: LuceneDateTime, end: LuceneDateTime): [string, string] {
+    // Compute the duration between start and end
+    const duration = moment(end.absolute).diff(moment(start.absolute));
+
+    // Subtract the duration from the start to get the new start and end of the previous window
+    const previousEnd = moment(start.absolute);
+    const previousStart = moment(start.absolute).subtract(duration);
+
+    return [previousStart.toISOString(), previousEnd.toISOString()];
   }
 
-  public static nextTimeWindow(start: LuceneDateTime, end: LuceneDateTime): [LuceneDateTime, LuceneDateTime] {
-    return [null, null];
+  public static nextTimeWindow(start: LuceneDateTime, end: LuceneDateTime): [string, string] {
+    // Compute the duration between start and end
+    const duration = moment(end.absolute).diff(moment(start.absolute));
+
+    // Add the duration to the end to get the new start and end of the next window
+    const nextStart = moment(end.absolute);
+    const nextEnd = moment(end.absolute).add(duration);
+
+    return [nextStart.toISOString(), nextEnd.toISOString()];
   }
 }

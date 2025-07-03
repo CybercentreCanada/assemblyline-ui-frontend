@@ -40,6 +40,8 @@
   "last_7d": "7 derniers jours",
   "last_90d": "90 derniers jours",
   "next": "Suivant",
+  "next_window": "Fenêtre temporelle suivante",
+  "previous_window": "Fenêtre temporelle précédente",
   "quick_select": "Sélection rapide",
   "set_end_now": "Définir la date et l'heure de fin à maintenant",
   "set_start_now": "Définir la date et l'heure de début à maintenant",
