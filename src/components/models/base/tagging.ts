@@ -23,7 +23,7 @@ export type Signature = [string, Verdict, boolean];
  * @param safelisted is the tag safelisted
  * @param classification tag classification
  */
-export type Tag = [string, Verdict, boolean, string];
+export type Tag = [string, Verdict] | [string, Verdict, boolean] | [string, Verdict, boolean, string];
 
 /** Tagging Model */
 export type Tagging = {};
