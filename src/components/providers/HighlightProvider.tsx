@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 
-type HighlighMapProps = Record<string, string[]>;
+export type HighlighMapProps = Record<string, string[]>;
 
 export type HighlightContextProps = {
   getKey: (type: string, value: string) => string;
