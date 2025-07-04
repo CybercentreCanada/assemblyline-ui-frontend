@@ -70,9 +70,9 @@ const WrappedBadlistTable: React.FC<Props> = ({ badlistResults, allowSort = true
           </DivTableRow>
         </DivTableHead>
         <DivTableBody>
-          {badlistResults.items.map(sl_item => (
+          {badlistResults.items.map((sl_item, i) => (
             <LinkRow
-              key={sl_item.id}
+              key={`${sl_item.id}-${i}`}
               component={Link}
               hover
               to={`/manage/badlist/${sl_item.id}`}
