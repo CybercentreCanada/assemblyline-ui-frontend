@@ -59,9 +59,9 @@ const WrappedSafelistTable: React.FC<Props> = ({ safelistResults, setSafelistID 
             </DivTableRow>
           </DivTableHead>
           <DivTableBody>
-            {safelistResults.items.map(sl_item => (
+            {safelistResults.items.map((sl_item, i) => (
               <LinkRow
-                key={sl_item.id}
+                key={`${sl_item.id}-${i}`}
                 component={Link}
                 to={`/manage/safelist/${sl_item.id}`}
                 onClick={event => {

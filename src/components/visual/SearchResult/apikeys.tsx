@@ -88,9 +88,9 @@ const WrappedUsersApiTable: React.FC<ApiTableProps> = ({ apikeySearchResults, se
         </DivTableHead>
 
         <DivTableBody>
-          {apikeySearchResults.items.map(userApikey => (
+          {apikeySearchResults.items.map((userApikey, i) => (
             <LinkRow
-              key={userApikey.id}
+              key={`${userApikey.id}-${i}`}
               hover
               component={Link}
               to={`/admin/apikeys/${userApikey.id}`}
