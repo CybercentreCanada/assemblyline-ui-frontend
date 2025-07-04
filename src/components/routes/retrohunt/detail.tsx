@@ -763,7 +763,7 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
                                 <DivTableBody id="hit-body">
                                   {hitResults.items.map((file, i) => (
                                     <LinkRow
-                                      key={i}
+                                      key={`${file.sha256}-${i}`}
                                       component={Link}
                                       to={`/file/detail/${file.sha256}`}
                                       hover

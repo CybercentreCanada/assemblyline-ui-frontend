@@ -184,7 +184,7 @@ const WrappedRetrohuntErrors = ({ retrohunt = null, isDrawer = false }: Props) =
                 </DivTableHead>
                 <DivTableBody>
                   {errorResults.items.map((error, id) => (
-                    <DivTableRow key={id} hover style={{ textDecoration: 'none' }}>
+                    <DivTableRow key={`${error.type}-${id}`} hover style={{ textDecoration: 'none' }}>
                       {error.type === 'warning' ? (
                         <DivTableCell style={{ paddingLeft: theme.spacing(2) }}>
                           <WarningAmberOutlinedIcon color="warning" />
