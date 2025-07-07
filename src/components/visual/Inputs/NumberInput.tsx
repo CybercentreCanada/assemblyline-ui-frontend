@@ -129,7 +129,7 @@ const WrappedNumberInput = ({
             value={[null, undefined, '', NaN].includes(value) ? '' : `${value}`}
             disabled={disabled}
             error={!!errorValue}
-            type={password && showPassword ? 'password' : 'text'}
+            type={password && showPassword ? 'password' : 'number'}
             {...(readOnly && !disabled && { focused: null })}
             helperText={disabled ? null : errorValue || helperText}
             slotProps={{
