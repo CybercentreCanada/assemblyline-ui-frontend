@@ -489,8 +489,6 @@ type DateTimeInputProps = {
   value: LuceneDateTime;
   variant: 'start' | 'end';
   disabled?: boolean;
-  fullWidth?: boolean;
-
   onChange?: (event: unknown, value: string) => void;
   onApply?: () => void;
 };
@@ -499,7 +497,6 @@ const DateTimeInput = ({
   value = null,
   variant,
   disabled = false,
-  fullWidth = false,
   onChange = () => null,
   onApply = () => null
 }: DateTimeInputProps) => {
@@ -526,7 +523,7 @@ const DateTimeInput = ({
           textTransform: 'inherit',
           minWidth: 'inherit',
           fontWeight: 'inherit',
-          width: fullWidth ? '100%' : 'auto',
+          width: 'auto',
           paddingLeft: theme.spacing(0.5),
           paddingRight: theme.spacing(0.5),
           overflow: 'hidden',
@@ -593,12 +590,11 @@ const DateTimeInput = ({
 export type DateTimeRangePickerProps = {
   value?: string;
   disabled?: boolean;
-  fullWidth?: boolean;
   onChange?: (event: unknown, value: string) => void;
 };
 
 export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = React.memo(
-  ({ value, disabled = false, fullWidth = false, onChange = () => null }: DateTimeRangePickerProps) => {
+  ({ value, disabled = false, onChange = () => null }: DateTimeRangePickerProps) => {
     const { t, i18n } = useTranslation('dateTime');
     const theme = useTheme();
 
@@ -638,11 +634,11 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = React.mem
 
     return (
       <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale={i18n.language}>
-        <div>
+        <div style={{ flex: 0, width: '100%', display: 'flex', alignItems: 'end' }}>
           <div
             style={{
               position: 'relative',
-              width: fullWidth ? '100%' : 'fit-content',
+              width: '100%',
               minHeight: '40px',
               display: 'flex',
               flexDirection: 'row',
@@ -666,7 +662,6 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = React.mem
               value={from}
               variant="start"
               disabled={disabled}
-              fullWidth={fullWidth}
               onChange={(e, v) => setFrom(() => new LuceneDateTime(v))}
               onApply={() => applyChanges()}
             />
@@ -684,7 +679,6 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = React.mem
               value={to}
               variant="end"
               disabled={disabled}
-              fullWidth={fullWidth}
               onChange={(e, v) => setTo(() => new LuceneDateTime(v))}
               onApply={() => applyChanges()}
             />

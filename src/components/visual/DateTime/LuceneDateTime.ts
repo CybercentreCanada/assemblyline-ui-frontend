@@ -393,11 +393,7 @@ export class LuceneDateTime {
       gapUnit = 'd'; // Days
       gapValue = Math.floor(gapValue / 24);
     }
-    if (gapValue >= 7 && gapUnit === 'd') {
-      gapUnit = 'w'; // Weeks
-      gapValue = Math.floor(gapValue / 7);
-    }
-    if (gapValue >= 4 && gapUnit === 'w') {
+    if (gapValue >= 365 / 12 && gapUnit === 'd') {
       gapUnit = 'M'; // Months
       gapValue = Math.floor(gapValue / 4);
     }
