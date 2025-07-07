@@ -117,7 +117,7 @@ export class LuceneDateTime {
     return {
       sign,
       amount: parseInt(amount, 10),
-      timeSpan: timeSpan || LuceneDateTime.reduceTimeSpan(rounded as TimeSpan) || 's',
+      timeSpan: timeSpan || (rounded as TimeSpan) || 's',
       rounded
     } as RelativeDateTimeParts;
   }
