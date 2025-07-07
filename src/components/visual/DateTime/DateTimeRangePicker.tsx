@@ -36,8 +36,6 @@ import moment from 'moment';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-export type DateTimeRange = `[${string} TO ${string}]`;
-
 // This function updates the week start for the specified locale
 function configureMomentLocale(language: string) {
   moment.updateLocale(language, {
@@ -126,10 +124,11 @@ export const QUICK_SELECT_OPTIONS = [
 type QuickSelectMenuProps = {
   from: LuceneDateTime;
   to: LuceneDateTime;
+  disabled?: boolean;
   onChange: (event: unknown, value: string) => void;
 };
 
-const QuickSelectMenu = ({ from = null, to = null, onChange = () => null }: QuickSelectMenuProps) => {
+const QuickSelectMenu = ({ from = null, to = null, disabled = false, onChange = () => null }: QuickSelectMenuProps) => {
   const { t } = useTranslation('dateTime');
   const theme = useTheme();
 
@@ -156,6 +155,7 @@ const QuickSelectMenu = ({ from = null, to = null, onChange = () => null }: Quic
     <>
       <Button
         color="inherit"
+        disabled={disabled}
         variant="contained"
         onClick={event => setAnchorEl(event.currentTarget)}
         endIcon={
@@ -488,7 +488,9 @@ const NowTab = ({ variant = null, onChange = () => null }: DateTimeProps) => {
 type DateTimeInputProps = {
   value: LuceneDateTime;
   variant: 'start' | 'end';
+  disabled?: boolean;
   fullWidth?: boolean;
+
   onChange?: (event: unknown, value: string) => void;
   onApply?: () => void;
 };
@@ -496,6 +498,7 @@ type DateTimeInputProps = {
 const DateTimeInput = ({
   value = null,
   variant,
+  disabled = false,
   fullWidth = false,
   onChange = () => null,
   onApply = () => null
@@ -516,14 +519,19 @@ const DateTimeInput = ({
     <>
       <Button
         color="inherit"
+        disabled={disabled}
         onClick={event => setAnchorEl(event.currentTarget)}
         sx={{
+          display: 'block',
           textTransform: 'inherit',
           minWidth: 'inherit',
           fontWeight: 'inherit',
           width: fullWidth ? '100%' : 'auto',
           paddingLeft: theme.spacing(0.5),
-          paddingRight: theme.spacing(0.5)
+          paddingRight: theme.spacing(0.5),
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap'
         }}
       >
         {value.toString({ language: i18n.language })}
@@ -633,18 +641,21 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = React.mem
         <div>
           <div
             style={{
+              position: 'relative',
               width: fullWidth ? '100%' : 'fit-content',
+              minHeight: '40px',
               display: 'flex',
               flexDirection: 'row',
               justifyContent: 'space-between',
               border: `1px solid ${theme.palette.divider}`,
-              borderRadius: theme.shape.borderRadius,
+              borderRadius: '5px',
               ...(error && { border: `1px solid ${theme.palette.error.main}` })
             }}
           >
             <QuickSelectMenu
               from={from}
               to={to}
+              disabled={disabled}
               onChange={(e, v) => {
                 setError(null);
                 onChange(e, v);
@@ -654,6 +665,7 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = React.mem
             <DateTimeInput
               value={from}
               variant="start"
+              disabled={disabled}
               fullWidth={fullWidth}
               onChange={(e, v) => setFrom(() => new LuceneDateTime(v))}
               onApply={() => applyChanges()}
@@ -671,14 +683,17 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = React.mem
             <DateTimeInput
               value={to}
               variant="end"
+              disabled={disabled}
               fullWidth={fullWidth}
               onChange={(e, v) => setTo(() => new LuceneDateTime(v))}
               onApply={() => applyChanges()}
             />
           </div>
-          <FormHelperText variant="outlined" sx={{ color: theme.palette.error.main }}>
-            {t(error)}
-          </FormHelperText>
+          {error && (
+            <FormHelperText variant="outlined" sx={{ color: theme.palette.error.main }}>
+              {t(error)}
+            </FormHelperText>
+          )}
         </div>
       </LocalizationProvider>
     );
