@@ -11,10 +11,13 @@ import {
   IconButton,
   InputAdornment,
   InputLabel,
+  MenuItem,
   Popover,
+  Select,
   styled,
   Tab,
   Tabs,
+  TextField,
   Tooltip,
   Typography,
   useTheme
@@ -27,8 +30,6 @@ import type { DateTimePickerProps } from '@mui/x-date-pickers/DateTimePicker';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import type { DateTimeType, TimeSpan } from 'components/visual/DateTime/LuceneDateTime';
 import { LuceneDateTime } from 'components/visual/DateTime/LuceneDateTime';
-import { NumberInput } from 'components/visual/Inputs/NumberInput';
-import { SelectInput } from 'components/visual/Inputs/SelectInput';
 import { SwitchInput } from 'components/visual/Inputs/SwitchInput';
 import type { Moment } from 'moment';
 import moment from 'moment';
@@ -169,7 +170,13 @@ const QuickSelectMenu = ({ from = null, to = null, onChange = () => null }: Quic
             }}
           />
         }
-        sx={{ padding: `${theme.spacing(0.75)} ${theme.spacing(0.5)}` }}
+        sx={{
+          padding: `${theme.spacing(0.75)} ${theme.spacing(0.5)}`,
+          minWidth: theme.spacing(6),
+          '& .MuiButton-icon': {
+            marginLeft: '0px'
+          }
+        }}
       >
         <CalendarMonthOutlinedIcon />
       </Button>
@@ -249,38 +256,43 @@ const QuickSelectMenu = ({ from = null, to = null, onChange = () => null }: Quic
                 gap: theme.spacing(1)
               }}
             >
-              <SelectInput
-                id="sign"
+              <Select
+                id="sign-input"
+                size="small"
                 value={sign}
-                options={[
-                  { primary: t('last'), value: '-' },
-                  { primary: t('next'), value: '+' }
-                ]}
-                onChange={(e, v: '-' | '+') => setSign(v)}
-              />
+                defaultValue={'-'}
+                onChange={e => setSign(e.target.value as '-' | '+')}
+              >
+                <MenuItem value="-">{t('last')}</MenuItem>
+                <MenuItem value="+">{t('next')}</MenuItem>
+              </Select>
 
-              <NumberInput
-                id="amount"
+              <TextField
+                id="amount-input"
+                size="small"
+                type="number"
+                variant="outlined"
                 value={amount}
-                min={0}
-                onChange={(e, v) => setAmount(v)}
+                onChange={e => setAmount(Number(e.target.value))}
+                slotProps={{ input: { inputProps: { min: 0 } } }}
                 sx={{ width: '140px' }}
               />
 
-              <SelectInput
-                id="timeSpan"
+              <Select
+                id="timeSpan-input"
+                size="small"
                 value={timeSpan}
-                options={[
-                  { primary: t('.s'), value: 's' },
-                  { primary: t('.m'), value: 'm' },
-                  { primary: t('.h'), value: 'h' },
-                  { primary: t('.d'), value: 'd' },
-                  { primary: t('.w'), value: 'w' },
-                  { primary: t('.M'), value: 'M' },
-                  { primary: t('.y'), value: 'y' }
-                ]}
-                onChange={(e, v: TimeSpan) => setTimeSpan(v)}
-              />
+                defaultValue={'h'}
+                onChange={e => setTimeSpan(e.target.value as TimeSpan)}
+              >
+                <MenuItem value="s">{t('.s')}</MenuItem>
+                <MenuItem value="m">{t('.m')}</MenuItem>
+                <MenuItem value="h">{t('.h')}</MenuItem>
+                <MenuItem value="d">{t('.d')}</MenuItem>
+                <MenuItem value="w">{t('.w')}</MenuItem>
+                <MenuItem value="M">{t('.M')}</MenuItem>
+                <MenuItem value="y">{t('.y')}</MenuItem>
+              </Select>
 
               <Button
                 size="small"
@@ -399,25 +411,36 @@ const RelativeTab = ({ value = null, variant, onChange = () => null }: DateTimeP
         gap: theme.spacing(1)
       }}
     >
-      <NumberInput
-        id="relative value"
+      <TextField
+        id="relative-amount-input"
+        size="small"
+        type="number"
+        variant="outlined"
         value={value.amount}
-        min={0}
-        onChange={(e, v) => {
-          value.amount = v;
+        onChange={e => {
+          value.amount = Number(e.target.value);
           onChange(e, value.toStringifiedParts());
         }}
+        slotProps={{ input: { inputProps: { min: 0 } } }}
       />
-      <SelectInput
-        id="relative select"
+
+      <Select
+        id="relative-datetime-select"
+        size="small"
         value={`${value.sign}${value.timeSpan}`}
-        options={RELATIVE_DATETIME_OPTIONS.map(option => ({ primary: t(option.value), value: option.value }))}
-        onChange={(e, v) => {
-          value.sign = v[0] as '+' | '-';
-          value.timeSpan = v[1] as TimeSpan;
+        defaultValue={`-h`}
+        onChange={e => {
+          value.sign = (e.target.value?.[0] as '+' | '-') || '-';
+          value.timeSpan = (e.target.value?.[1] as TimeSpan) || 'h';
           onChange(e, value.toStringifiedParts());
         }}
-      />
+      >
+        {RELATIVE_DATETIME_OPTIONS.map((option, i) => (
+          <MenuItem key={`${option.value}-${i}`} value={option.value}>
+            {t(option.value)}
+          </MenuItem>
+        ))}
+      </Select>
 
       <div style={{ gridColumn: 'span 2' }}>
         <Typography
@@ -498,7 +521,9 @@ const DateTimeInput = ({
           textTransform: 'inherit',
           minWidth: 'inherit',
           fontWeight: 'inherit',
-          width: fullWidth ? '100%' : 'auto'
+          width: fullWidth ? '100%' : 'auto',
+          paddingLeft: theme.spacing(0.5),
+          paddingRight: theme.spacing(0.5)
         }}
       >
         {value.toString({ language: i18n.language })}
@@ -559,12 +584,13 @@ const DateTimeInput = ({
 
 export type DateTimeRangePickerProps = {
   value?: string;
+  disabled?: boolean;
   fullWidth?: boolean;
   onChange?: (event: unknown, value: string) => void;
 };
 
 export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = React.memo(
-  ({ value, fullWidth = false, onChange = () => null }: DateTimeRangePickerProps) => {
+  ({ value, disabled = false, fullWidth = false, onChange = () => null }: DateTimeRangePickerProps) => {
     const { t, i18n } = useTranslation('dateTime');
     const theme = useTheme();
 
@@ -604,53 +630,56 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = React.mem
 
     return (
       <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale={i18n.language}>
-        <div
-          style={{
-            width: fullWidth ? '100%' : 'fit-content',
-            display: 'flex',
-            flexDirection: 'row',
-            justifyContent: 'space-between',
-            border: `1px solid ${theme.palette.divider}`,
-            borderRadius: theme.shape.borderRadius,
-            ...(error && { border: `1px solid ${theme.palette.error.main}` })
-          }}
-        >
-          <QuickSelectMenu
-            from={from}
-            to={to}
-            onChange={(e, v) => {
-              setError(null);
-              onChange(e, v);
+        <div>
+          <div
+            style={{
+              width: fullWidth ? '100%' : 'fit-content',
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              border: `1px solid ${theme.palette.divider}`,
+              borderRadius: theme.shape.borderRadius,
+              ...(error && { border: `1px solid ${theme.palette.error.main}` })
             }}
-          />
-
-          <DateTimeInput
-            value={from}
-            variant="start"
-            fullWidth={fullWidth}
-            onChange={(e, v) => setFrom(() => new LuceneDateTime(v))}
-            onApply={() => applyChanges()}
-          />
-
-          <Button
-            color="inherit"
-            disabled
-            sx={{ textTransform: 'inherit', minWidth: 'inherit', paddingLeft: 0, paddingRight: 0 }}
           >
-            <ArrowForwardIcon />
-          </Button>
+            <QuickSelectMenu
+              from={from}
+              to={to}
+              onChange={(e, v) => {
+                setError(null);
+                onChange(e, v);
+              }}
+            />
 
-          <DateTimeInput
-            value={to}
-            variant="end"
-            fullWidth={fullWidth}
-            onChange={(e, v) => setTo(() => new LuceneDateTime(v))}
-            onApply={() => applyChanges()}
-          />
+            <DateTimeInput
+              value={from}
+              variant="start"
+              fullWidth={fullWidth}
+              onChange={(e, v) => setFrom(() => new LuceneDateTime(v))}
+              onApply={() => applyChanges()}
+            />
+
+            <Button
+              color="inherit"
+              disabled
+              size="small"
+              sx={{ textTransform: 'inherit', minWidth: 'inherit', paddingLeft: 0, paddingRight: 0 }}
+            >
+              <ArrowForwardIcon fontSize="small" />
+            </Button>
+
+            <DateTimeInput
+              value={to}
+              variant="end"
+              fullWidth={fullWidth}
+              onChange={(e, v) => setTo(() => new LuceneDateTime(v))}
+              onApply={() => applyChanges()}
+            />
+          </div>
+          <FormHelperText variant="outlined" sx={{ color: theme.palette.error.main }}>
+            {t(error)}
+          </FormHelperText>
         </div>
-        <FormHelperText variant="outlined" sx={{ color: theme.palette.error.main }}>
-          {t(error)}
-        </FormHelperText>
       </LocalizationProvider>
     );
   }
