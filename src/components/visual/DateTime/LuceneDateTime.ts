@@ -34,6 +34,8 @@ export type RelativeDateTimeParts = {
   rounded: null | TimeSpan;
 };
 
+export type DateTimeRange = `[${string} TO ${string}]`;
+
 export class LuceneDateTime {
   public value: string; // Original value
   public type: 'absolute' | 'relative'; // Type of the original value
@@ -117,7 +119,7 @@ export class LuceneDateTime {
     return {
       sign,
       amount: parseInt(amount, 10),
-      timeSpan: timeSpan || LuceneDateTime.reduceTimeSpan(rounded as TimeSpan) || 's',
+      timeSpan: timeSpan || (rounded as TimeSpan) || 's',
       rounded
     } as RelativeDateTimeParts;
   }
@@ -361,5 +363,53 @@ export class LuceneDateTime {
     const nextEnd = moment(end.absolute).add(duration);
 
     return [nextStart.toISOString(), nextEnd.toISOString()];
+  }
+
+  public static getHistogramParts(date: string, gapCount: number = 50): { start: string; end: string; gap: string } {
+    // Extract the start and end values from the DateTimeRange
+    const [startRaw, endRaw] = date.slice(1, -1).split(' TO ');
+
+    // Parse the start and end values into LuceneDateTime objects
+    const startDate = new LuceneDateTime(startRaw, 'start');
+    const endDate = new LuceneDateTime(endRaw, 'end');
+
+    // Calculate the total duration in milliseconds
+    const totalDurationMs = endDate.absolute.diff(startDate.absolute);
+
+    // Determine the largest possible gap unit and its value
+    let gapUnit: TimeSpan = 's'; // Default to seconds
+    let gapValue = Math.floor(totalDurationMs / gapCount / 1000); // Convert ms to seconds
+
+    // Adjust the gap unit and value based on the duration
+    if (gapValue >= 60) {
+      gapUnit = 'm'; // Minutes
+      gapValue = Math.floor(gapValue / 60);
+    }
+    if (gapValue >= 60 && gapUnit === 'm') {
+      gapUnit = 'h'; // Hours
+      gapValue = Math.floor(gapValue / 60);
+    }
+    if (gapValue >= 24 && gapUnit === 'h') {
+      gapUnit = 'd'; // Days
+      gapValue = Math.floor(gapValue / 24);
+    }
+    if (gapValue >= 365 / 12 && gapUnit === 'd') {
+      gapUnit = 'M'; // Months
+      gapValue = Math.floor(gapValue / 4);
+    }
+    if (gapValue >= 12 && gapUnit === 'M') {
+      gapUnit = 'y'; // Years
+      gapValue = Math.floor(gapValue / 12);
+    }
+
+    // Construct the gap string
+    const gap = `${gapValue}${gapUnit}`;
+
+    // Return the start, end, and gap values
+    return {
+      start: startDate.value,
+      end: endDate.value,
+      gap
+    };
   }
 }
