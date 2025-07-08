@@ -468,3 +468,121 @@ export class LuceneDateTime {
     return newGap || defaultGap;
   }
 }
+
+export class LuceneDateTimeGap {
+  /** The gap duration (e.g., "6h", "15m"). Validated or recalculated if needed. */
+  public gap: `${number}${TimeSpan}`;
+
+  /** The start of the datetime range as a `LuceneDateTime` object. */
+  public start: LuceneDateTime;
+
+  /** The end of the datetime range as a `LuceneDateTime` object. */
+  public end: LuceneDateTime;
+
+  /** Desired number of intervals for the range, default is 50. */
+  public interval: number;
+
+  /** Default gap value if the provided gap is invalid, default is "4h". */
+  public defaultGap: `${number}${TimeSpan}`;
+
+  constructor(
+    gap: string,
+    start: string,
+    end: string,
+    defaultInterval: number = 50,
+    defaultGap: `${number}${TimeSpan}` = '4h'
+  ) {
+    // Convert start and end to LuceneDateTime if they're provided as strings
+    this.start = new LuceneDateTime(start, 'start');
+    this.end = new LuceneDateTime(end, 'end');
+
+    // Initialize the interval and default gap
+    this.interval = defaultInterval;
+    this.defaultGap = defaultGap;
+
+    // Validate or calculate the gap using parseGap
+    this.parseGap(gap);
+  }
+
+  /**
+   * Validates whether a gap is in the correct format (e.g., "10m", "5h").
+   * @param gap - The gap string to validate.
+   * @returns True if the gap is valid, false otherwise.
+   */
+  public static isValidGap(gap: string): gap is `${number}${TimeSpan}` {
+    const validGapRegex = /^\d+(s|m|h|d|w|M|y)$/; // Supported time units
+    return validGapRegex.test(gap);
+  }
+
+  private getIntervalCount(gap: `${number}${TimeSpan}`): number {
+    if (!LuceneDateTimeGap.isValidGap(gap)) {
+      throw new Error(`Invalid gap format: "${gap}"`);
+    }
+
+    // Calculate the total duration in milliseconds
+    const totalDurationMs = this.end.absolute.diff(this.start.absolute);
+
+    // Parse the gap value (e.g., "2h" -> 2, "h")
+    const [, gapValueStr, gapUnit] = gap.match(/^(\d+)([smhdwMy])$/);
+    const gapValue = parseInt(gapValueStr, 10);
+
+    // Convert the gap into milliseconds
+    const gapInMs = moment.duration(gapValue, gapUnit as moment.unitOfTime.DurationConstructor).asMilliseconds();
+
+    if (gapInMs === 0) {
+      throw new Error(`Gap cannot represent zero milliseconds: "${gap}"`);
+    }
+
+    // Calculate the number of intervals
+    const intervalCount = Math.floor(totalDurationMs / gapInMs);
+
+    return intervalCount;
+  }
+
+  private getGap(): `${number}${TimeSpan}` {
+    // Calculate the total duration in milliseconds
+    const totalDurationMs = this.end.absolute.diff(this.start.absolute);
+
+    // Determine the largest possible gap unit and its value
+    let gapUnit: TimeSpan = 's'; // Default to seconds
+    let gapValue = Math.floor(totalDurationMs / this.interval / 1000); // Convert ms to seconds and divide by interval
+
+    // Adjust the gap unit and value based on the total range duration
+    if (gapValue >= 60) {
+      gapUnit = 'm';
+      gapValue = Math.floor(gapValue / 60);
+    }
+    if (gapValue >= 60 && gapUnit === 'm') {
+      gapUnit = 'h';
+      gapValue = Math.floor(gapValue / 60);
+    }
+    if (gapValue >= 24 && gapUnit === 'h') {
+      gapUnit = 'd';
+      gapValue = Math.floor(gapValue / 24);
+    }
+
+    // Return the computed gap
+    return `${gapValue}${gapUnit}` as `${number}${TimeSpan}`;
+  }
+
+  private parseGap(initialGap: string): void {
+    // Validate the initial gap
+    if (LuceneDateTimeGap.isValidGap(initialGap)) {
+      // Calculate the number of intervals for the given gap
+      const numberOfIntervals = this.getIntervalCount(initialGap);
+
+      // If the number of intervals is within the accepted range, return the initial gap
+      if (numberOfIntervals > 0 && numberOfIntervals <= 100) {
+        this.gap = initialGap;
+        return null;
+      }
+    }
+
+    // If the initial gap is invalid or the number of intervals is out of range, calculate a new gap
+    const newGap = this.getGap();
+
+    // Fallback to default gap if no valid gap is calculated
+    this.gap = newGap || this.defaultGap;
+    return null;
+  }
+}
