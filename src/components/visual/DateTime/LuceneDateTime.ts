@@ -365,7 +365,53 @@ export class LuceneDateTime {
     return [nextStart.toISOString(), nextEnd.toISOString()];
   }
 
-  public static getGap(range: DateTimeRange, gapCount: number = 50): `${number}${TimeSpan}` {
+  public static isValidGap(gap: string): gap is `${number}${TimeSpan}` {
+    // Define a regex to match patterns like "14s", "30m", "2h", "1d"
+    const validGapRegex = /^\d+(s|m|h|d)$/;
+
+    // Test if the gap matches the allowed format
+    return validGapRegex.test(gap);
+  }
+
+  /**
+   * Calculates the number of intervals of a given gap within the datetime range.
+   * @param range - The datetime range in Lucene range format (e.g., "[START_TIME TO END_TIME]").
+   * @param gap - The gap between intervals (e.g., "2h", "15m", "10s").
+   * @returns The number of intervals within the range.
+   */
+  public static getIntervalCount(range: DateTimeRange, gap: `${number}${TimeSpan}`): number {
+    if (!LuceneDateTime.isValidGap(gap)) {
+      throw new Error(`Invalid gap format: "${gap}"`);
+    }
+
+    // Parse the start and end from the range
+    const [startRaw, endRaw] = range.slice(1, -1).split(' TO ');
+
+    // Create LuceneDateTime objects for the start and end of the range
+    const startDate = new LuceneDateTime(startRaw, 'start');
+    const endDate = new LuceneDateTime(endRaw, 'end');
+
+    // Calculate the total duration in milliseconds
+    const totalDurationMs = endDate.absolute.diff(startDate.absolute);
+
+    // Extract the time span and value from the gap (e.g., "2h" -> 2, "h")
+    const [, gapValueStr, gapUnit] = gap.match(/^(\d+)([smhdwMy])$/);
+    const gapValue = parseInt(gapValueStr, 10);
+
+    // Convert the gap value to milliseconds
+    const gapInMs = moment.duration(gapValue, gapUnit as moment.unitOfTime.DurationConstructor).asMilliseconds();
+
+    if (gapInMs === 0) {
+      throw new Error(`Gap cannot represent zero milliseconds: "${gap}"`);
+    }
+
+    // Calculate the number of intervals
+    const intervalCount = Math.floor(totalDurationMs / gapInMs);
+
+    return intervalCount;
+  }
+
+  public static getGap(range: DateTimeRange, interval: number = 50): `${number}${TimeSpan}` {
     // Extract the start and end values from the DateTimeRange
     const [startRaw, endRaw] = range.slice(1, -1).split(' TO ');
 
@@ -378,7 +424,7 @@ export class LuceneDateTime {
 
     // Determine the largest possible gap unit and its value
     let gapUnit: TimeSpan = 's'; // Default to seconds
-    let gapValue = Math.floor(totalDurationMs / gapCount / 1000); // Convert ms to seconds
+    let gapValue = Math.floor(totalDurationMs / interval / 1000); // Convert ms to seconds
 
     // Adjust the gap unit and value based on the duration
     if (gapValue >= 60) {
@@ -393,16 +439,32 @@ export class LuceneDateTime {
       gapUnit = 'd'; // Days
       gapValue = Math.floor(gapValue / 24);
     }
-    if (gapValue >= 365 / 12 && gapUnit === 'd') {
-      gapUnit = 'M'; // Months
-      gapValue = Math.floor(gapValue / 4);
-    }
-    if (gapValue >= 12 && gapUnit === 'M') {
-      gapUnit = 'y'; // Years
-      gapValue = Math.floor(gapValue / 12);
-    }
 
     // Return the gap string
     return `${gapValue}${gapUnit}`;
+  }
+
+  public static parseGap(
+    initialGap: string,
+    range: DateTimeRange,
+    defaultInterval: number = 50,
+    defaultGap: `${number}${TimeSpan}` = '4h'
+  ): `${number}${TimeSpan}` {
+    // Check if the initial gap is valid
+    if (LuceneDateTime.isValidGap(initialGap)) {
+      // Calculate the number of intervals based on the provided gap
+      const numberOfIntervals = LuceneDateTime.getIntervalCount(range, initialGap);
+
+      // If the interval count is within the accepted range, return the initial gap
+      if (numberOfIntervals > 0 && numberOfIntervals <= 100) {
+        return initialGap;
+      }
+    }
+
+    // If not valid or interval count is out of range, calculate a new gap
+    const newGap = LuceneDateTime.getGap(range, defaultInterval);
+
+    // Fallback to a default gap if needed
+    return newGap || defaultGap;
   }
 }

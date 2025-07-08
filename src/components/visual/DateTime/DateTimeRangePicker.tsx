@@ -123,18 +123,20 @@ export const QUICK_SELECT_OPTIONS = [
 ] as const;
 
 type QuickSelectMenuProps = {
-  from: LuceneDateTime;
-  to: LuceneDateTime;
+  start: LuceneDateTime;
+  end: LuceneDateTime;
+  gap: string;
   disabled?: boolean;
-  gapCount?: number;
+  interval?: number;
   onChange: (event: unknown, values: { value: string; start: string; end: string; gap: string }) => void;
 };
 
 const QuickSelectMenu = ({
-  from = null,
-  to = null,
+  start = null,
+  end = null,
+  gap = null,
   disabled = false,
-  gapCount,
+  interval,
   onChange = () => null
 }: QuickSelectMenuProps) => {
   const { t } = useTranslation('dateTime');
@@ -148,16 +150,16 @@ const QuickSelectMenu = ({
   const open = useMemo<boolean>(() => Boolean(anchorEl), [anchorEl]);
 
   useEffect(() => {
-    if (from.relative === 'now') {
-      setSign(to.sign);
-      setAmount(to.amount);
-      setTimeSpan(to.timeSpan);
+    if (start.relative === 'now') {
+      setSign(end.sign);
+      setAmount(end.amount);
+      setTimeSpan(end.timeSpan);
     } else {
-      setSign(from.sign);
-      setAmount(from.amount);
-      setTimeSpan(from.timeSpan);
+      setSign(start.sign);
+      setAmount(start.amount);
+      setTimeSpan(start.timeSpan);
     }
-  }, [from, to]);
+  }, [start, end]);
 
   return (
     <>
@@ -238,12 +240,12 @@ const QuickSelectMenu = ({
                 <IconButton
                   size="small"
                   onClick={() => {
-                    const [start, end] = LuceneDateTime.previousTimeWindow(from, to);
+                    const [_start, _end] = LuceneDateTime.previousTimeWindow(start, end);
                     onChange(null, {
-                      value: `[${start} TO ${end}]`,
-                      start: start,
-                      end: end,
-                      gap: LuceneDateTime.getGap(`[${start} TO ${end}]`, gapCount)
+                      value: `[${_start} TO ${_end}]`,
+                      start: _start,
+                      end: _end,
+                      gap: LuceneDateTime.parseGap(gap, `[${_start} TO ${_end}]`, interval)
                     });
                   }}
                 >
@@ -255,12 +257,12 @@ const QuickSelectMenu = ({
                 <IconButton
                   size="small"
                   onClick={() => {
-                    const [start, end] = LuceneDateTime.nextTimeWindow(from, to);
+                    const [_start, _end] = LuceneDateTime.nextTimeWindow(start, end);
                     onChange(null, {
-                      value: `[${start} TO ${end}]`,
-                      start: start,
-                      end: end,
-                      gap: LuceneDateTime.getGap(`[${start} TO ${end}]`, gapCount)
+                      value: `[${_start} TO ${_end}]`,
+                      start: _start,
+                      end: _end,
+                      gap: LuceneDateTime.parseGap(gap, `[${_start} TO ${_end}]`, interval)
                     });
                   }}
                 >
@@ -327,13 +329,13 @@ const QuickSelectMenu = ({
                           value: `[now TO now${sign}${amount}${timeSpan}]`,
                           start: 'end',
                           end: `now${sign}${amount}${timeSpan}`,
-                          gap: LuceneDateTime.getGap(`[now TO now${sign}${amount}${timeSpan}]`, gapCount)
+                          gap: LuceneDateTime.parseGap(gap, `[now TO now${sign}${amount}${timeSpan}]`, interval)
                         }
                       : {
                           value: `[now${sign}${amount}${timeSpan} TO now]`,
                           start: `now${sign}${amount}${timeSpan}`,
                           end: 'now',
-                          gap: LuceneDateTime.getGap(`[now${sign}${amount}${timeSpan} TO now]`, gapCount)
+                          gap: LuceneDateTime.parseGap(gap, `[now${sign}${amount}${timeSpan} TO now]`, interval)
                         }
                   );
                   setAnchorEl(null);
@@ -380,9 +382,7 @@ export const GAP_DATETIME_OPTIONS = [
   { primary: '.s', value: 's' },
   { primary: '.m', value: 'm' },
   { primary: '.h', value: 'h' },
-  { primary: '.d', value: 'd' },
-  { primary: '.M', value: 'M' },
-  { primary: '.y', value: 'y' }
+  { primary: '.d', value: 'd' }
 ] as const;
 
 type GapInputProps = {
@@ -731,27 +731,28 @@ const DateTimeInput = ({
 };
 
 export type DateTimeRangePickerProps = {
-  value?: string;
+  value?: { start: string; end: string; gap: string };
   disabled?: boolean;
-  gapCount?: number;
-  onChange?: (event: unknown, values: { value: string; start: string; end: string; gap: string }) => void;
+  interval?: number;
+  onChange?: (event: unknown, values: { start: string; end: string; gap: string }) => void;
 };
 
 export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = React.memo(
-  ({ value, disabled = false, gapCount = 50, onChange = () => null }: DateTimeRangePickerProps) => {
+  ({ value, disabled = false, interval = 50, onChange = () => null }: DateTimeRangePickerProps) => {
     const { t, i18n } = useTranslation('dateTime');
     const theme = useTheme();
 
-    const [fromStr, toStr] = useMemo<[string, string]>(() => {
-      // Check if the value matches the format: [${string}TO${string}]
-      if (!/^\[.+?TO.+?\]$/.test(value)) return [null, null];
+    const {
+      start: startRaw,
+      end: endRaw,
+      gap: gapRaw
+    } = useMemo<{ start: string; end: string; gap: string }>(() => value, [value]);
 
-      return (value.slice(1, -1).split(' TO ') as [string, string]) || [null, null];
-    }, [value]);
-
-    const [from, setFrom] = useState<LuceneDateTime>(new LuceneDateTime(fromStr, 'start'));
-    const [to, setTo] = useState<LuceneDateTime>(new LuceneDateTime(fromStr, 'end'));
-    const [gap, setGap] = useState<string>(LuceneDateTime.getGap(`[${fromStr} TO ${toStr}]`, gapCount));
+    const [start, setStart] = useState<LuceneDateTime>(new LuceneDateTime(startRaw, 'start'));
+    const [end, setEnd] = useState<LuceneDateTime>(new LuceneDateTime(startRaw, 'end'));
+    const [gap, setGap] = useState<string>(
+      LuceneDateTime.parseGap(gapRaw, `[${start.toLucene()} TO ${end.toLucene()}]`, interval)
+    );
     const [error, setError] = useState<string>(null);
 
     const validateDateTimeRange = useCallback(
@@ -760,29 +761,32 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = React.mem
     );
 
     const applyChanges = useCallback(() => {
-      if (!validateDateTimeRange(from, to)) {
+      if (!validateDateTimeRange(start, end)) {
         setError('error');
       } else {
         setError(null);
-
         onChange(null, {
-          value: `[${from.toLucene()} TO ${to.toLucene()}]`,
-          start: from.toLucene(),
-          end: to.toLucene(),
-          gap: gap
+          start: start.toLucene(),
+          end: end.toLucene(),
+          gap: LuceneDateTime.parseGap(gap, `[${start.toLucene()} TO ${end.toLucene()}]`, interval)
         });
       }
-    }, [from, gap, onChange, to, validateDateTimeRange]);
+    }, [validateDateTimeRange, start, end, onChange, gap, interval]);
 
     useEffect(() => {
-      setFrom(new LuceneDateTime(fromStr, 'start'));
-      setTo(new LuceneDateTime(toStr, 'end'));
-      setGap(LuceneDateTime.getGap(`[${fromStr} TO ${toStr}]`, gapCount));
-    }, [fromStr, gapCount, toStr]);
+      const _start = new LuceneDateTime(startRaw, 'start');
+      const _end = new LuceneDateTime(endRaw, 'end');
+
+      setStart(_start);
+      setEnd(_end);
+      setGap(LuceneDateTime.parseGap(gapRaw, `[${_start.toLucene()} TO ${_end.toLucene()}]`, interval));
+    }, [endRaw, gapRaw, interval, startRaw]);
 
     useEffect(() => {
       configureMomentLocale(i18n.language);
     }, [i18n.language]);
+
+    console.log(gap);
 
     return (
       <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale={i18n.language}>
@@ -801,10 +805,11 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = React.mem
             }}
           >
             <QuickSelectMenu
-              from={from}
-              to={to}
+              start={start}
+              end={end}
+              gap={gap}
               disabled={disabled}
-              gapCount={gapCount}
+              interval={interval}
               onChange={(e, v) => {
                 setError(null);
                 onChange(e, v);
@@ -812,10 +817,10 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = React.mem
             />
 
             <DateTimeInput
-              value={from}
+              value={start}
               variant="start"
               disabled={disabled}
-              onChange={(e, v) => setFrom(() => new LuceneDateTime(v))}
+              onChange={(e, v) => setStart(() => new LuceneDateTime(v))}
               onApply={() => applyChanges()}
             />
 
@@ -829,10 +834,10 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = React.mem
             </Button>
 
             <DateTimeInput
-              value={to}
+              value={end}
               variant="end"
               disabled={disabled}
-              onChange={(e, v) => setTo(() => new LuceneDateTime(v))}
+              onChange={(e, v) => setEnd(() => new LuceneDateTime(v))}
               onApply={() => applyChanges()}
             />
 

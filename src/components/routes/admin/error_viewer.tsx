@@ -15,6 +15,7 @@ import type { FacetResult, HistogramResult, SearchResult } from 'components/mode
 import type { CustomUser } from 'components/models/ui/user';
 import { ErrorDetail } from 'components/routes/admin/error_detail';
 import { DateTimeRangePicker } from 'components/visual/DateTime/DateTimeRangePicker';
+import { LuceneDateTime } from 'components/visual/DateTime/LuceneDateTime';
 import Histogram from 'components/visual/Histogram';
 import LineGraph from 'components/visual/LineGraph';
 import SearchHeader from 'components/visual/SearchBar/SearchHeader';
@@ -30,7 +31,6 @@ const ERROR_VIEWER_PARAMS = createSearchParams(p => ({
   offset: p.number(0).min(0).hidden().ignored(),
   rows: p.number(25).enforced().hidden().ignored(),
   sort: p.string('created desc').ignored(),
-  tc: p.string('[now-4d TO now]'),
   start: p.string('now-4d'),
   end: p.string('now'),
   gap: p.string('4h'),
@@ -80,11 +80,20 @@ const ErrorViewer = () => {
   useEffect(() => {
     if (!search || !currentUser.is_admin) return;
 
-    const body = search.set(o => ({
-      ...o,
-      query: o.query || '*',
-      filters: [...o.filters, `created:${o.tc}`]
-    }));
+    const body = search.set(o => {
+      const start = new LuceneDateTime(o.start).toLucene();
+      const end = new LuceneDateTime(o.end).toLucene();
+      const gap = LuceneDateTime.parseGap(o.gap, `[${o.start} TO ${o.end}]`, 50);
+
+      return {
+        ...o,
+        query: o.query || '*',
+        start,
+        end,
+        gap,
+        filters: [...o.filters, `created:[${start} TO ${end}]`]
+      };
+    });
 
     apiCall<SearchResult<Error>>({
       url: `/api/v4/error/list/?${body
@@ -187,11 +196,9 @@ const ErrorViewer = () => {
         </Typography>
 
         <DateTimeRangePicker
-          value={search.get('tc')}
+          value={{ start: search.get('start'), end: search.get('end'), gap: search.get('gap') }}
           disabled={searching}
-          onChange={(e, { value, start, end, gap }) =>
-            setSearchObject(o => ({ ...o, offset: 0, tc: value, start, end, gap }))
-          }
+          onChange={(e, { start, end, gap }) => setSearchObject(o => ({ ...o, offset: 0, start, end, gap }))}
         />
       </div>
 
@@ -254,7 +261,7 @@ const ErrorViewer = () => {
             <Histogram
               dataset={histogram}
               height="200px"
-              title={t(`graph.histogram.title.${search.get('tc')}`)}
+              title={t('graph.histogram.title')}
               datatype={t('graph.datatype')}
               isDate
               verticalLine
