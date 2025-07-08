@@ -13,7 +13,7 @@ import { useForm } from 'components/routes/submit/submit.form';
 import { isValidMetadata } from 'components/routes/submit/submit.utils';
 import { Button } from 'components/visual/Buttons/Button';
 import { IconButton } from 'components/visual/Buttons/IconButton';
-import { DateInput } from 'components/visual/Inputs/DateInput';
+import { DateInput, DateInputProps } from 'components/visual/Inputs/DateInput';
 import type { NumberInputProps } from 'components/visual/Inputs/NumberInput';
 import { NumberInput } from 'components/visual/Inputs/NumberInput';
 import type { SelectInputProps } from 'components/visual/Inputs/SelectInput';
@@ -108,19 +108,7 @@ export const MetadataParam: React.FC<MetadataParamParam> = React.memo(
                 <SwitchInput {...(props as SwitchInputProps)} value={(value as boolean) || false} reset={!!value} />
               );
             case 'date':
-              return (
-                <DateInput
-                  id={`metadata-${name.replace('_', ' ')}`}
-                  label={`${name.replace('_', ' ')}  [ ${metadata.validator_type.toUpperCase()} ]`}
-                  labelProps={{ textTransform: 'capitalize' }}
-                  value={value as string}
-                  loading={loading}
-                  disabled={disabled}
-                  reset={!!value}
-                  onChange={(event, v) => handleChange(v)}
-                  onReset={() => handleReset()}
-                />
-              );
+              return <DateInput {...(props as DateInputProps)} value={value as string} reset={!!value} />;
             case 'enum':
               return (
                 <SelectInput
