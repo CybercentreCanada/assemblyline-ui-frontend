@@ -7,6 +7,7 @@ import FilterListIcon from '@mui/icons-material/FilterList';
 import type { ButtonProps } from '@mui/material';
 import {
   Button,
+  Divider,
   FormHelperText,
   IconButton,
   InputAdornment,
@@ -109,26 +110,33 @@ const CommonlyUsedButton = styled(({ ...props }: ButtonProps) => <Button fullWid
 }));
 
 export const QUICK_SELECT_OPTIONS = [
-  { primary: 'today', value: '[now/d TO now/d]' },
-  { primary: 'last_24h', value: '[now-24h/h TO now]' },
-  { primary: 'this_week', value: '[now/w TO now/w]' },
-  { primary: 'last_7d', value: '[now-7d/d TO now]' },
-  { primary: 'last_15m', value: '[now-15m TO now]' },
-  { primary: 'last_30d', value: '[now-30d/d TO now]' },
-  { primary: 'last_30m', value: '[now-30m TO now]' },
-  { primary: 'last_90d', value: '[now-90d/d TO now]' },
-  { primary: 'last_1h', value: '[now-1h TO now]' },
-  { primary: 'last_1y', value: '[now-1y/d TO now]' }
+  { primary: 'today', value: { value: '[now/d TO now/d]', start: 'now/d', end: 'now/d', gap: '1h' } },
+  { primary: 'last_24h', value: { value: '[now-24h/h TO now]', start: 'now-24h/h', end: '', gap: '1h' } },
+  { primary: 'this_week', value: { value: '[now/w TO now/w]', start: 'now/w', end: 'now/w', gap: '1d' } },
+  { primary: 'last_7d', value: { value: '[now-7d/d TO now]', start: 'now-7d/d', end: 'now', gap: '1d' } },
+  { primary: 'last_15m', value: { value: '[now-15m TO now]', start: 'now-15m', end: 'now', gap: '1m' } },
+  { primary: 'last_30d', value: { value: '[now-30d/d TO now]', start: 'now-30d/d', end: 'now', gap: '1d' } },
+  { primary: 'last_30m', value: { value: '[now-30m TO now]', start: 'now-30m', end: 'now', gap: '1m' } },
+  { primary: 'last_90d', value: { value: '[now-90d/d TO now]', start: 'now-90d/d', end: 'now', gap: '7d' } },
+  { primary: 'last_1h', value: { value: '[now-1h TO now]', start: 'now-1h', end: 'now', gap: '1m' } },
+  { primary: 'last_1y', value: { value: '[now-1y/d TO now]', start: 'now-1y/d', end: 'now', gap: '1M' } }
 ] as const;
 
 type QuickSelectMenuProps = {
   from: LuceneDateTime;
   to: LuceneDateTime;
   disabled?: boolean;
-  onChange: (event: unknown, value: string) => void;
+  gapCount?: number;
+  onChange: (event: unknown, values: { value: string; start: string; end: string; gap: string }) => void;
 };
 
-const QuickSelectMenu = ({ from = null, to = null, disabled = false, onChange = () => null }: QuickSelectMenuProps) => {
+const QuickSelectMenu = ({
+  from = null,
+  to = null,
+  disabled = false,
+  gapCount,
+  onChange = () => null
+}: QuickSelectMenuProps) => {
   const { t } = useTranslation('dateTime');
   const theme = useTheme();
 
@@ -173,6 +181,9 @@ const QuickSelectMenu = ({ from = null, to = null, disabled = false, onChange = 
         sx={{
           padding: `${theme.spacing(0.75)} ${theme.spacing(0.5)}`,
           minWidth: theme.spacing(6),
+          borderTopRightRadius: 0,
+          borderBottomRightRadius: 0,
+          boxShadow: 'unset',
           '& .MuiButton-icon': {
             marginLeft: '0px'
           }
@@ -199,7 +210,8 @@ const QuickSelectMenu = ({ from = null, to = null, disabled = false, onChange = 
             display: 'flex',
             flexDirection: 'column',
             rowGap: theme.spacing(2),
-            border: `1px solid ${theme.palette.divider}`
+            border: `1px solid ${theme.palette.divider}`,
+            borderRadius: theme.spacing(0.5)
           }}
         >
           <div
@@ -227,7 +239,12 @@ const QuickSelectMenu = ({ from = null, to = null, disabled = false, onChange = 
                   size="small"
                   onClick={() => {
                     const [start, end] = LuceneDateTime.previousTimeWindow(from, to);
-                    onChange(null, `[${start} TO ${end}]`);
+                    onChange(null, {
+                      value: `[${start} TO ${end}]`,
+                      start: start,
+                      end: end,
+                      gap: LuceneDateTime.getGap(`[${start} TO ${end}]`, gapCount)
+                    });
                   }}
                 >
                   <ArrowBackIosNewOutlinedIcon fontSize="small" />
@@ -239,7 +256,12 @@ const QuickSelectMenu = ({ from = null, to = null, disabled = false, onChange = 
                   size="small"
                   onClick={() => {
                     const [start, end] = LuceneDateTime.nextTimeWindow(from, to);
-                    onChange(null, `[${start} TO ${end}]`);
+                    onChange(null, {
+                      value: `[${start} TO ${end}]`,
+                      start: start,
+                      end: end,
+                      gap: LuceneDateTime.getGap(`[${start} TO ${end}]`, gapCount)
+                    });
                   }}
                 >
                   <ArrowForwardIosOutlinedIcon fontSize="small" />
@@ -300,7 +322,19 @@ const QuickSelectMenu = ({ from = null, to = null, disabled = false, onChange = 
                 onClick={e => {
                   onChange(
                     e,
-                    sign === '+' ? `[now TO now${sign}${amount}${timeSpan}]` : `[now${sign}${amount}${timeSpan} TO now]`
+                    sign === '+'
+                      ? {
+                          value: `[now TO now${sign}${amount}${timeSpan}]`,
+                          start: 'end',
+                          end: `now${sign}${amount}${timeSpan}`,
+                          gap: LuceneDateTime.getGap(`[now TO now${sign}${amount}${timeSpan}]`, gapCount)
+                        }
+                      : {
+                          value: `[now${sign}${amount}${timeSpan} TO now]`,
+                          start: `now${sign}${amount}${timeSpan}`,
+                          end: 'now',
+                          gap: LuceneDateTime.getGap(`[now${sign}${amount}${timeSpan} TO now]`, gapCount)
+                        }
                   );
                   setAnchorEl(null);
                 }}
@@ -336,6 +370,113 @@ const QuickSelectMenu = ({ from = null, to = null, disabled = false, onChange = 
               ))}
             </div>
           </div>
+        </div>
+      </Popover>
+    </>
+  );
+};
+
+export const GAP_DATETIME_OPTIONS = [
+  { primary: '.s', value: 's' },
+  { primary: '.m', value: 'm' },
+  { primary: '.h', value: 'h' },
+  { primary: '.d', value: 'd' },
+  { primary: '.M', value: 'M' },
+  { primary: '.y', value: 'y' }
+] as const;
+
+type GapInputProps = {
+  value?: string;
+  disabled?: boolean;
+  onChange?: (event: unknown, values: string) => void;
+  onApply?: () => void;
+};
+
+const GapInput = ({ value = null, disabled = false, onChange = () => null, onApply = () => null }: GapInputProps) => {
+  const theme = useTheme();
+  const { t } = useTranslation('dateTime');
+
+  const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+
+  const open = useMemo<boolean>(() => Boolean(anchorEl), [anchorEl]);
+
+  const { amount, timeSpan } = useMemo<{ amount: number; timeSpan: TimeSpan }>(() => {
+    const match = value.match(/^(\d+)([a-zA-Z]+)$/);
+    if (!match) return { amount: 1, timeSpan: 'h' };
+    const [, amount, timeSpan] = match;
+    return { amount: parseInt(amount, 10), timeSpan: timeSpan as TimeSpan };
+  }, [value]);
+
+  return (
+    <>
+      <Button
+        color="inherit"
+        disabled={disabled}
+        onClick={event => setAnchorEl(event.currentTarget)}
+        sx={{
+          display: 'block',
+          textTransform: 'inherit',
+          minWidth: 'inherit',
+          fontWeight: 'inherit',
+          width: 'auto',
+          borderTopLeftRadius: 0,
+          borderBottomLeftRadius: 0,
+          paddingLeft: theme.spacing(0.75),
+          paddingRight: theme.spacing(0.75),
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap'
+        }}
+      >
+        {value}
+      </Button>
+
+      <Popover
+        open={open}
+        anchorEl={anchorEl}
+        onClose={() => {
+          setAnchorEl(null);
+          onApply();
+        }}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+        transformOrigin={{ vertical: -20, horizontal: 'center' }}
+        transitionDuration={{
+          appear: theme.transitions.duration.shortest,
+          enter: theme.transitions.duration.shortest,
+          exit: theme.transitions.duration.shortest
+        }}
+        slotProps={{ paper: { sx: { padding: theme.spacing(2), border: `1px solid ${theme.palette.divider}` } } }}
+      >
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '1fr 1fr',
+            gap: theme.spacing(1)
+          }}
+        >
+          <TextField
+            id="gap-amount-input"
+            size="small"
+            type="number"
+            variant="outlined"
+            value={amount}
+            onChange={e => onChange(e, `${Number(e.target.value)}${timeSpan}`)}
+            slotProps={{ input: { inputProps: { min: 1 } } }}
+          />
+
+          <Select
+            id="gap-datetime-select"
+            size="small"
+            value={timeSpan}
+            defaultValue={`h`}
+            onChange={e => onChange(e, `${amount}${e.target.value || 'h'}`)}
+          >
+            {GAP_DATETIME_OPTIONS.map(({ primary, value }, i) => (
+              <MenuItem key={`${value}-${i}`} value={value}>
+                {t(primary)}
+              </MenuItem>
+            ))}
+          </Select>
         </div>
       </Popover>
     </>
@@ -382,21 +523,21 @@ const AbsoluteTab = ({ value, variant = 'start', onChange = () => null }: DateTi
 };
 
 export const RELATIVE_DATETIME_OPTIONS = [
-  { primary: 'seconds_ago', value: '-s' },
-  { primary: 'minutes_ago', value: '-m' },
-  { primary: 'hours_ago', value: '-h' },
-  { primary: 'days_ago', value: '-d' },
-  { primary: 'weeks_ago', value: '-w' },
-  { primary: 'months_ago', value: '-M' },
-  { primary: 'years_ago', value: '-y' },
+  { primary: '-s', value: '-s' },
+  { primary: '-m', value: '-m' },
+  { primary: '-h', value: '-h' },
+  { primary: '-d', value: '-d' },
+  { primary: '-w', value: '-w' },
+  { primary: '-M', value: '-M' },
+  { primary: '-y', value: '-y' },
 
-  { primary: 'seconds_from_now', value: '+s' },
-  { primary: 'minutes_from_now', value: '+m' },
-  { primary: 'hours_from_now', value: '+h' },
-  { primary: 'days_from_now', value: '+d' },
-  { primary: 'weeks_from_now', value: '+w' },
-  { primary: 'months_from_now', value: '+M' },
-  { primary: 'years_from_now', value: '+y' }
+  { primary: '+s', value: '+s' },
+  { primary: '+m', value: '+m' },
+  { primary: '+h', value: '+h' },
+  { primary: '+d', value: '+d' },
+  { primary: '+w', value: '+w' },
+  { primary: '+M', value: '+M' },
+  { primary: '+y', value: '+y' }
 ] as const;
 
 const RelativeTab = ({ value = null, variant, onChange = () => null }: DateTimeProps) => {
@@ -435,9 +576,9 @@ const RelativeTab = ({ value = null, variant, onChange = () => null }: DateTimeP
           onChange(e, value.toStringifiedParts());
         }}
       >
-        {RELATIVE_DATETIME_OPTIONS.map((option, i) => (
-          <MenuItem key={`${option.value}-${i}`} value={option.value}>
-            {t(option.value)}
+        {RELATIVE_DATETIME_OPTIONS.map(({ primary, value }, i) => (
+          <MenuItem key={`${value}-${i}`} value={value}>
+            {t(primary)}
           </MenuItem>
         ))}
       </Select>
@@ -524,8 +665,9 @@ const DateTimeInput = ({
           minWidth: 'inherit',
           fontWeight: 'inherit',
           width: 'auto',
-          paddingLeft: theme.spacing(0.5),
-          paddingRight: theme.spacing(0.5),
+          borderRadius: 0,
+          paddingLeft: theme.spacing(0.75),
+          paddingRight: theme.spacing(0.75),
           overflow: 'hidden',
           textOverflow: 'ellipsis',
           whiteSpace: 'nowrap'
@@ -548,6 +690,7 @@ const DateTimeInput = ({
           enter: theme.transitions.duration.shortest,
           exit: theme.transitions.duration.shortest
         }}
+        slotProps={{ paper: { sx: { border: `1px solid ${theme.palette.divider}` } } }}
       >
         <Tabs
           value={tab}
@@ -590,11 +733,12 @@ const DateTimeInput = ({
 export type DateTimeRangePickerProps = {
   value?: string;
   disabled?: boolean;
-  onChange?: (event: unknown, value: string) => void;
+  gapCount?: number;
+  onChange?: (event: unknown, values: { value: string; start: string; end: string; gap: string }) => void;
 };
 
 export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = React.memo(
-  ({ value, disabled = false, onChange = () => null }: DateTimeRangePickerProps) => {
+  ({ value, disabled = false, gapCount = 50, onChange = () => null }: DateTimeRangePickerProps) => {
     const { t, i18n } = useTranslation('dateTime');
     const theme = useTheme();
 
@@ -607,6 +751,7 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = React.mem
 
     const [from, setFrom] = useState<LuceneDateTime>(new LuceneDateTime(fromStr, 'start'));
     const [to, setTo] = useState<LuceneDateTime>(new LuceneDateTime(fromStr, 'end'));
+    const [gap, setGap] = useState<string>(LuceneDateTime.getGap(`[${fromStr} TO ${toStr}]`, gapCount));
     const [error, setError] = useState<string>(null);
 
     const validateDateTimeRange = useCallback(
@@ -618,15 +763,22 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = React.mem
       if (!validateDateTimeRange(from, to)) {
         setError('error');
       } else {
-        onChange(null, `[${from.toLucene()} TO ${to.toLucene()}]`);
         setError(null);
+
+        onChange(null, {
+          value: `[${from.toLucene()} TO ${to.toLucene()}]`,
+          start: from.toLucene(),
+          end: to.toLucene(),
+          gap: gap
+        });
       }
-    }, [from, onChange, to, validateDateTimeRange]);
+    }, [from, gap, onChange, to, validateDateTimeRange]);
 
     useEffect(() => {
       setFrom(new LuceneDateTime(fromStr, 'start'));
       setTo(new LuceneDateTime(toStr, 'end'));
-    }, [fromStr, toStr]);
+      setGap(LuceneDateTime.getGap(`[${fromStr} TO ${toStr}]`, gapCount));
+    }, [fromStr, gapCount, toStr]);
 
     useEffect(() => {
       configureMomentLocale(i18n.language);
@@ -652,6 +804,7 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = React.mem
               from={from}
               to={to}
               disabled={disabled}
+              gapCount={gapCount}
               onChange={(e, v) => {
                 setError(null);
                 onChange(e, v);
@@ -682,6 +835,10 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = React.mem
               onChange={(e, v) => setTo(() => new LuceneDateTime(v))}
               onApply={() => applyChanges()}
             />
+
+            <Divider orientation="vertical" flexItem />
+
+            <GapInput value={gap} disabled={disabled} onChange={(e, v) => setGap(v)} onApply={() => applyChanges()} />
           </div>
           {error && (
             <FormHelperText variant="outlined" sx={{ color: theme.palette.error.main }}>

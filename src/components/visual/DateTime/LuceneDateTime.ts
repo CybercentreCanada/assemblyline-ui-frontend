@@ -365,9 +365,9 @@ export class LuceneDateTime {
     return [nextStart.toISOString(), nextEnd.toISOString()];
   }
 
-  public static getHistogramParts(date: string, gapCount: number = 50): { start: string; end: string; gap: string } {
+  public static getGap(range: DateTimeRange, gapCount: number = 50): `${number}${TimeSpan}` {
     // Extract the start and end values from the DateTimeRange
-    const [startRaw, endRaw] = date.slice(1, -1).split(' TO ');
+    const [startRaw, endRaw] = range.slice(1, -1).split(' TO ');
 
     // Parse the start and end values into LuceneDateTime objects
     const startDate = new LuceneDateTime(startRaw, 'start');
@@ -402,14 +402,7 @@ export class LuceneDateTime {
       gapValue = Math.floor(gapValue / 12);
     }
 
-    // Construct the gap string
-    const gap = `${gapValue}${gapUnit}`;
-
-    // Return the start, end, and gap values
-    return {
-      start: startDate.value,
-      end: endDate.value,
-      gap
-    };
+    // Return the gap string
+    return `${gapValue}${gapUnit}`;
   }
 }
