@@ -638,7 +638,7 @@ const DateTimeInput = ({
   onApply = () => null
 }: DateTimeInputProps) => {
   const theme = useTheme();
-  const { i18n } = useTranslation('dateTime');
+  const { t, i18n } = useTranslation('dateTime');
 
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
   const [tab, setTab] = useState<'absolute' | 'relative' | 'now'>(value.type);
@@ -702,9 +702,9 @@ const DateTimeInput = ({
           slotProps={{ list: { sx: { justifyContent: 'center' } } }}
           sx={{ borderBottom: `1px solid ${theme.palette.divider}` }}
         >
-          <Tab label="absolute" value="absolute" />
-          <Tab label="relative" value="relative" />
-          <Tab label="now" value="now" />
+          <Tab label={t('absolute')} value="absolute" />
+          <Tab label={t('relative')} value="relative" />
+          <Tab label={t('now')} value="now" />
         </Tabs>
 
         <div
