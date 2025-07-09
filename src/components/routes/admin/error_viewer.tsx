@@ -15,7 +15,7 @@ import type { FacetResult, HistogramResult, SearchResult } from 'components/mode
 import type { CustomUser } from 'components/models/ui/user';
 import { ErrorDetail } from 'components/routes/admin/error_detail';
 import { DateTimeRangePicker } from 'components/visual/DateTime/DateTimeRangePicker';
-import { LuceneDateTime } from 'components/visual/DateTime/LuceneDateTime';
+import { LuceneDateTime, LuceneDateTimeGap } from 'components/visual/DateTime/LuceneDateTime';
 import Histogram from 'components/visual/Histogram';
 import LineGraph from 'components/visual/LineGraph';
 import SearchHeader from 'components/visual/SearchBar/SearchHeader';
@@ -83,7 +83,9 @@ const ErrorViewer = () => {
     const body = search.set(o => {
       const start = new LuceneDateTime(o.start).toLucene();
       const end = new LuceneDateTime(o.end).toLucene();
-      const gap = LuceneDateTime.parseGap(o.gap, `[${o.start} TO ${o.end}]`, 50);
+      const gap = new LuceneDateTimeGap(o.gap, start, end, 50, '4h').toString();
+
+      console.log(start, end, gap);
 
       return {
         ...o,
