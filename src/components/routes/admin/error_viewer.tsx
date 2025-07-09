@@ -85,8 +85,6 @@ const ErrorViewer = () => {
       const end = new LuceneDateTime(o.end).toLucene();
       const gap = new LuceneDateTimeGap(o.gap, start, end, 50, '4h').toString();
 
-      console.log(start, end, gap);
-
       return {
         ...o,
         query: o.query || '*',
