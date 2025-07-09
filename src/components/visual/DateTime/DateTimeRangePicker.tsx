@@ -110,16 +110,16 @@ const CommonlyUsedButton = styled(({ ...props }: ButtonProps) => <Button fullWid
 }));
 
 export const QUICK_SELECT_OPTIONS = [
-  { primary: 'today', value: { value: '[now/d TO now/d]', start: 'now/d', end: 'now/d', gap: '1h' } },
-  { primary: 'last_24h', value: { value: '[now-24h/h TO now]', start: 'now-24h/h', end: '', gap: '1h' } },
-  { primary: 'this_week', value: { value: '[now/w TO now/w]', start: 'now/w', end: 'now/w', gap: '1d' } },
-  { primary: 'last_7d', value: { value: '[now-7d/d TO now]', start: 'now-7d/d', end: 'now', gap: '1d' } },
-  { primary: 'last_15m', value: { value: '[now-15m TO now]', start: 'now-15m', end: 'now', gap: '1m' } },
-  { primary: 'last_30d', value: { value: '[now-30d/d TO now]', start: 'now-30d/d', end: 'now', gap: '1d' } },
-  { primary: 'last_30m', value: { value: '[now-30m TO now]', start: 'now-30m', end: 'now', gap: '1m' } },
-  { primary: 'last_90d', value: { value: '[now-90d/d TO now]', start: 'now-90d/d', end: 'now', gap: '7d' } },
-  { primary: 'last_1h', value: { value: '[now-1h TO now]', start: 'now-1h', end: 'now', gap: '1m' } },
-  { primary: 'last_1y', value: { value: '[now-1y/d TO now]', start: 'now-1y/d', end: 'now', gap: '1M' } }
+  { primary: 'today', value: { start: 'now/d', end: 'now/d', gap: '1h' } },
+  { primary: 'last_24h', value: { start: 'now-24h/h', end: 'now', gap: '1h' } },
+  { primary: 'this_week', value: { start: 'now/w', end: 'now/w', gap: '1d' } },
+  { primary: 'last_7d', value: { start: 'now-7d/d', end: 'now', gap: '1d' } },
+  { primary: 'last_15m', value: { start: 'now-15m', end: 'now', gap: '1m' } },
+  { primary: 'last_30d', value: { start: 'now-30d/d', end: 'now', gap: '1d' } },
+  { primary: 'last_30m', value: { start: 'now-30m', end: 'now', gap: '1m' } },
+  { primary: 'last_90d', value: { start: 'now-90d/d', end: 'now', gap: '7d' } },
+  { primary: 'last_1h', value: { start: 'now-1h', end: 'now', gap: '1m' } },
+  { primary: 'last_1y', value: { start: 'now-1y/d', end: 'now', gap: '1M' } }
 ] as const;
 
 type QuickSelectMenuProps = {
@@ -234,7 +234,7 @@ const QuickSelectMenu = ({
                 {t('quick_select')}
               </Typography>
 
-              <Tooltip title="previous_window">
+              <Tooltip title={t('previous_window')}>
                 <IconButton
                   size="small"
                   onClick={() => {
@@ -247,7 +247,7 @@ const QuickSelectMenu = ({
                 </IconButton>
               </Tooltip>
 
-              <Tooltip title="next_window">
+              <Tooltip title={t('next_window')}>
                 <IconButton
                   size="small"
                   onClick={() => {
@@ -432,34 +432,45 @@ const GapInput = ({ value = null, disabled = false, onChange = () => null, onApp
       >
         <div
           style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            gap: theme.spacing(1)
+            display: 'flex',
+            flexDirection: 'column',
+            rowGap: theme.spacing(1)
           }}
         >
-          <TextField
-            id="gap-amount-input"
-            size="small"
-            type="number"
-            variant="outlined"
-            value={`${amount}`}
-            onChange={e => onChange(e, `${Number(e.target.value)}${timeSpan}`)}
-            slotProps={{ input: { inputProps: { min: 1 } } }}
-          />
-
-          <Select
-            id="gap-datetime-select"
-            size="small"
-            value={timeSpan}
-            defaultValue={`h`}
-            onChange={e => onChange(e, `${amount}${e.target.value || 'h'}`)}
+          <Typography color="textSecondary" variant="body2" sx={{ flex: 1 }}>
+            {t('interval_gap')}
+          </Typography>
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              columnGap: theme.spacing(1)
+            }}
           >
-            {GAP_DATETIME_OPTIONS.map(({ primary, value }, i) => (
-              <MenuItem key={`${value}-${i}`} value={value}>
-                {t(primary)}
-              </MenuItem>
-            ))}
-          </Select>
+            <TextField
+              id="gap-amount-input"
+              size="small"
+              type="number"
+              variant="outlined"
+              value={`${amount}`}
+              onChange={e => onChange(e, `${Number(e.target.value)}${timeSpan}`)}
+              slotProps={{ input: { inputProps: { min: 1 } } }}
+            />
+
+            <Select
+              id="gap-datetime-select"
+              size="small"
+              value={timeSpan}
+              defaultValue={`h`}
+              onChange={e => onChange(e, `${amount}${e.target.value || 'h'}`)}
+            >
+              {GAP_DATETIME_OPTIONS.map(({ primary, value }, i) => (
+                <MenuItem key={`${value}-${i}`} value={value}>
+                  {t(primary)}
+                </MenuItem>
+              ))}
+            </Select>
+          </div>
         </div>
       </Popover>
     </>
@@ -720,12 +731,12 @@ const DateTimeInput = ({
 };
 
 export type DateTimeRangePickerProps = {
-  value?: { start: string; end: string; gap: string };
+  value?: { start: string; end: string; gap?: string };
   disabled?: boolean;
   interval?: number;
   defaultGap?: `${number}${TimeSpan}`;
   hasGap?: boolean;
-  onChange?: (event: unknown, values: { start: string; end: string; gap: string }) => void;
+  onChange?: (event: unknown, values: { start: string; end: string; gap?: string }) => void;
 };
 
 export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = React.memo(
@@ -744,7 +755,7 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = React.mem
       start: startRaw,
       end: endRaw,
       gap: gapRaw
-    } = useMemo<{ start: string; end: string; gap: string }>(() => value, [value]);
+    } = useMemo<{ start: string; end: string; gap?: string }>(() => value, [value]);
 
     const [start, setStart] = useState<LuceneDateTime>(new LuceneDateTime(startRaw, 'start'));
     const [end, setEnd] = useState<LuceneDateTime>(new LuceneDateTime(endRaw, 'end'));
@@ -769,7 +780,7 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = React.mem
 
     useEffect(() => {
       setStart(new LuceneDateTime(startRaw, 'start'));
-      setEnd(new LuceneDateTime(endRaw, 'start'));
+      setEnd(new LuceneDateTime(endRaw, 'end'));
       setGap(new LuceneDateTimeGap(gapRaw, startRaw, endRaw, interval, defaultGap));
     }, [defaultGap, endRaw, gapRaw, interval, startRaw]);
 

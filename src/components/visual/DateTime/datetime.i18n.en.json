@@ -30,6 +30,7 @@
   "commonly_used": "Commonly used",
   "end_date": "End date",
   "error": "Invalid date time range",
+  "interval_gap": "Interval gap",
   "last": "Last",
   "last_15m": "Last 15 minutes",
   "last_1h": "Last 1 hour",
