@@ -200,6 +200,7 @@ const ErrorViewer = () => {
         <DateTimeRangePicker
           value={{ start: search.get('start'), end: search.get('end'), gap: search.get('gap') }}
           disabled={searching}
+          hasGap
           onChange={(e, { start, end, gap }) => setSearchObject(o => ({ ...o, offset: 0, start, end, gap }))}
         />
       </div>

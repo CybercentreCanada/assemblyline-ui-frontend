@@ -286,7 +286,7 @@ const QuickSelectMenu = ({
                 size="small"
                 type="number"
                 variant="outlined"
-                value={amount}
+                value={`${amount}`}
                 onChange={e => setAmount(Number(e.target.value))}
                 slotProps={{ input: { inputProps: { min: 0 } } }}
                 sx={{ width: '140px' }}
@@ -442,7 +442,7 @@ const GapInput = ({ value = null, disabled = false, onChange = () => null, onApp
             size="small"
             type="number"
             variant="outlined"
-            value={amount}
+            value={`${amount}`}
             onChange={e => onChange(e, `${Number(e.target.value)}${timeSpan}`)}
             slotProps={{ input: { inputProps: { min: 1 } } }}
           />
@@ -540,7 +540,7 @@ const RelativeTab = ({ value = null, variant, onChange = () => null }: DateTimeP
         size="small"
         type="number"
         variant="outlined"
-        value={value.amount}
+        value={`${value.amount}`}
         onChange={e => {
           value.amount = Number(e.target.value);
           onChange(e, value.toStringifiedParts());
@@ -613,6 +613,7 @@ type DateTimeInputProps = {
   value: LuceneDateTime;
   variant: 'start' | 'end';
   disabled?: boolean;
+  hasGap?: boolean;
   onChange: (event: unknown, value: string) => void;
   onApply: () => void;
 };
@@ -621,6 +622,7 @@ const DateTimeInput = ({
   value = null,
   variant,
   disabled = false,
+  hasGap = true,
   onChange = () => null,
   onApply = () => null
 }: DateTimeInputProps) => {
@@ -653,7 +655,11 @@ const DateTimeInput = ({
           paddingRight: theme.spacing(0.75),
           overflow: 'hidden',
           textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap'
+          whiteSpace: 'nowrap',
+          ...(!hasGap && {
+            borderTopRightRadius: theme.spacing(0.5),
+            borderBottomRightRadius: theme.spacing(0.5)
+          })
         }}
       >
         {value.toString({ language: i18n.language })}
@@ -718,11 +724,19 @@ export type DateTimeRangePickerProps = {
   disabled?: boolean;
   interval?: number;
   defaultGap?: `${number}${TimeSpan}`;
+  hasGap?: boolean;
   onChange?: (event: unknown, values: { start: string; end: string; gap: string }) => void;
 };
 
 export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = React.memo(
-  ({ value, disabled = false, interval = 50, defaultGap = '4h', onChange = () => null }: DateTimeRangePickerProps) => {
+  ({
+    value,
+    disabled = false,
+    interval = 50,
+    defaultGap = '4h',
+    hasGap = false,
+    onChange = () => null
+  }: DateTimeRangePickerProps) => {
     const { t, i18n } = useTranslation('dateTime');
     const theme = useTheme();
 
@@ -811,20 +825,25 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = React.mem
               value={end}
               variant="end"
               disabled={disabled}
+              hasGap={hasGap}
               onChange={(e, v) => setEnd(() => new LuceneDateTime(v))}
               onApply={() => applyChanges()}
             />
 
-            <Divider orientation="vertical" flexItem />
+            {hasGap && (
+              <>
+                <Divider orientation="vertical" flexItem />
 
-            <GapInput
-              value={gap}
-              disabled={disabled}
-              onChange={(e, v) =>
-                setGap(() => new LuceneDateTimeGap(v, start.toLucene(), end.toLucene(), interval, defaultGap))
-              }
-              onApply={() => applyChanges()}
-            />
+                <GapInput
+                  value={gap}
+                  disabled={disabled}
+                  onChange={(e, v) =>
+                    setGap(() => new LuceneDateTimeGap(v, start.toLucene(), end.toLucene(), interval, defaultGap))
+                  }
+                  onApply={() => applyChanges()}
+                />
+              </>
+            )}
           </div>
           {error && (
             <FormHelperText variant="outlined" sx={{ color: theme.palette.error.main }}>
