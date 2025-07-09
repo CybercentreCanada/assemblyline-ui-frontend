@@ -30,6 +30,7 @@
   "commonly_used": "Couramment utilisé",
   "end_date": "Date de fin",
   "error": "Plage de dates invalide",
+  "interval_gap": "Écart d'intervalle",
   "last": "Dernier",
   "last_15m": "15 dernières minutes",
   "last_1h": "Dernière heure",

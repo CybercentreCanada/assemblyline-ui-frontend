@@ -15,7 +15,7 @@ import type { FacetResult, HistogramResult, SearchResult } from 'components/mode
 import type { CustomUser } from 'components/models/ui/user';
 import { ErrorDetail } from 'components/routes/admin/error_detail';
 import { DateTimeRangePicker } from 'components/visual/DateTime/DateTimeRangePicker';
-import { LuceneDateTime } from 'components/visual/DateTime/LuceneDateTime';
+import { LuceneDateTime, LuceneDateTimeGap } from 'components/visual/DateTime/LuceneDateTime';
 import Histogram from 'components/visual/Histogram';
 import LineGraph from 'components/visual/LineGraph';
 import SearchHeader from 'components/visual/SearchBar/SearchHeader';
@@ -31,7 +31,9 @@ const ERROR_VIEWER_PARAMS = createSearchParams(p => ({
   offset: p.number(0).min(0).hidden().ignored(),
   rows: p.number(25).enforced().hidden().ignored(),
   sort: p.string('created desc').ignored(),
-  tc: p.string('[now-4d TO now]'),
+  start: p.string('now-4d'),
+  end: p.string('now'),
+  gap: p.string('4h'),
   filters: p.filters([]),
   track_total_hits: p.number(10000).nullable().ignored(),
   mincount: p.number(0).min(0).hidden().ignored(),
@@ -78,13 +80,20 @@ const ErrorViewer = () => {
   useEffect(() => {
     if (!search || !currentUser.is_admin) return;
 
-    const body = search.set(o => ({
-      ...o,
-      query: o.query || '*',
-      filters: [...o.filters, `created:${o.tc}`]
-    }));
+    const body = search.set(o => {
+      const start = new LuceneDateTime(o.start).toLucene();
+      const end = new LuceneDateTime(o.end).toLucene();
+      const gap = new LuceneDateTimeGap(o.gap, start, end, 50, '4h').toString();
 
-    const { start, end, gap } = LuceneDateTime.getHistogramParts(body.get('tc'), 25);
+      return {
+        ...o,
+        query: o.query || '*',
+        start,
+        end,
+        gap,
+        filters: [...o.filters, `created:[${start} TO ${end}]`]
+      };
+    });
 
     apiCall<SearchResult<Error>>({
       url: `/api/v4/error/list/?${body
@@ -98,12 +107,9 @@ const ErrorViewer = () => {
     apiCall<HistogramResult>({
       url: '/api/v4/search/histogram/error/created/',
       method: 'POST',
-      body: {
-        start,
-        end,
-        gap,
-        ...body.pick(['query', 'mincount', 'filters', 'timeout', 'use_archive', 'archive_only']).toObject()
-      },
+      body: body
+        .pick(['query', 'mincount', 'filters', 'timeout', 'use_archive', 'archive_only', 'start', 'end', 'gap'])
+        .toObject(),
       onSuccess: ({ api_response }) => setHistogram(api_response)
     });
 
@@ -190,9 +196,10 @@ const ErrorViewer = () => {
         </Typography>
 
         <DateTimeRangePicker
-          value={search.get('tc')}
+          value={{ start: search.get('start'), end: search.get('end'), gap: search.get('gap') }}
           disabled={searching}
-          onChange={(e, v) => setSearchObject(o => ({ ...o, offset: 0, tc: v }))}
+          hasGap
+          onChange={(e, { start, end, gap }) => setSearchObject(o => ({ ...o, offset: 0, start, end, gap }))}
         />
       </div>
 
@@ -255,7 +262,7 @@ const ErrorViewer = () => {
             <Histogram
               dataset={histogram}
               height="200px"
-              title={t(`graph.histogram.title.${search.get('tc')}`)}
+              title={t('graph.histogram.title')}
               datatype={t('graph.datatype')}
               isDate
               verticalLine

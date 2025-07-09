@@ -4,8 +4,6 @@ import { useForm } from 'components/routes/development/library/contexts/form';
 import { DateTimeField } from 'components/visual/DateTime/DateTimeField';
 import { DateTimeRangePicker } from 'components/visual/DateTime/DateTimeRangePicker';
 import { PageSection } from 'components/visual/Layouts/PageSection';
-import { add, formatDistanceToNow, sub } from 'date-fns';
-import { enCA, frCA } from 'date-fns/locale';
 import React from 'react';
 
 export type DateTimeLibraryState = {
@@ -13,16 +11,17 @@ export type DateTimeLibraryState = {
     name: string;
     values: {
       sectionOpen: boolean;
-      datetime: string;
+      datetime: { start: string; end: string; gap?: string };
     };
   };
 };
+
 export const DATETIME_LIBRARY_STATE: DateTimeLibraryState = {
   datetime: {
     name: 'DateTime',
     values: {
       sectionOpen: true,
-      datetime: null
+      datetime: { start: 'now-4d', end: 'now', gap: '4h' }
     }
   }
 } as const;
@@ -31,45 +30,6 @@ export const DateTimeSection = React.memo(() => {
   const theme = useTheme();
 
   const form = useForm();
-
-  const pastDate = new Date(2025, 5, 20); // Example date: Sep 25, 2023
-  const futureDate = new Date(2025, 5, 19); // Example date: Dec 25, 2023
-
-  const pastRelative = formatDistanceToNow(pastDate, { addSuffix: true, locale: enCA }); // "5 days ago"
-  const futureRelative = formatDistanceToNow(futureDate, { addSuffix: true, locale: frCA }); // "in 3 months"
-
-  console.log(pastRelative, futureRelative);
-
-  function luceneToDate(luceneDate) {
-    const now = new Date();
-
-    // Regex to parse Lucene-style datetime
-    const match = /now([+-])(\d+)([smhd])/i.exec(luceneDate);
-
-    if (!match) {
-      throw new Error('Invalid Lucene date format');
-    }
-
-    const operator = match[1]; // "+" or "-"
-    const value = parseInt(match[2], 10); // Numeric value
-    const unit = match[3].toLowerCase(); // Unit of time (s, m, h, d)
-
-    // `date-fns` requires the time unit as a key in an object
-    const timeUnitMap = {
-      s: 'seconds',
-      m: 'minutes',
-      h: 'hours',
-      d: 'days',
-      w: 'weeks',
-      M: 'months',
-      y: 'years'
-    };
-
-    const adjustment = { [timeUnitMap[unit]]: value };
-
-    // Use `add` or `sub` based on the operator
-    return operator === '+' ? add(now, adjustment) : sub(now, adjustment);
-  }
 
   return (
     <DemoContainer>
