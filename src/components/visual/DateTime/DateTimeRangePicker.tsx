@@ -119,7 +119,7 @@ export const QUICK_SELECT_OPTIONS = [
   { primary: 'last_30m', value: { start: 'now-30m', end: 'now', gap: '1m' } },
   { primary: 'last_90d', value: { start: 'now-90d/d', end: 'now', gap: '7d' } },
   { primary: 'last_1h', value: { start: 'now-1h', end: 'now', gap: '1m' } },
-  { primary: 'last_1y', value: { start: 'now-1y/d', end: 'now', gap: '1M' } }
+  { primary: 'last_1y', value: { start: 'now-1y/d', end: 'now', gap: '30d' } }
 ] as const;
 
 type QuickSelectMenuProps = {
