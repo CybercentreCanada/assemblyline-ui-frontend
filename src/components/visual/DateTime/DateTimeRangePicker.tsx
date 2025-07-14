@@ -8,7 +8,6 @@ import type { ButtonProps } from '@mui/material';
 import {
   Button,
   Divider,
-  FormHelperText,
   IconButton,
   InputAdornment,
   InputLabel,
@@ -748,7 +747,7 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = React.mem
     hasGap = false,
     onChange = () => null
   }: DateTimeRangePickerProps) => {
-    const { t, i18n } = useTranslation('dateTime');
+    const { i18n } = useTranslation('dateTime');
     const theme = useTheme();
 
     const {
@@ -762,7 +761,7 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = React.mem
     const [gap, setGap] = useState<LuceneDateTimeGap>(
       new LuceneDateTimeGap(gapRaw, startRaw, endRaw, interval, defaultGap)
     );
-    const [error, setError] = useState<string>(null);
+    const [error, setError] = useState<boolean>(false);
 
     const validateDateTimeRange = useCallback(
       (earlier: LuceneDateTime, later: LuceneDateTime): boolean => later.toValue() - earlier.toValue() >= 1000,
@@ -771,7 +770,7 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = React.mem
 
     const applyChanges = useCallback(() => {
       if (!validateDateTimeRange(start, end)) {
-        setError('error');
+        setError(true);
       } else {
         setError(null);
         onChange(null, { start: start.toLucene(), end: end.toLucene(), gap: gap.toString() });
@@ -790,7 +789,7 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = React.mem
 
     return (
       <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale={i18n.language}>
-        <div style={{ flex: 0, width: '100%', display: 'flex', alignItems: 'end' }}>
+        <div style={{ flex: 0, width: '100%', display: 'flex', flexDirection: 'column' }}>
           <div
             style={{
               position: 'relative',
@@ -800,7 +799,7 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = React.mem
               flexDirection: 'row',
               justifyContent: 'space-between',
               border: `1px solid ${theme.palette.divider}`,
-              borderRadius: '5px',
+              borderRadius: '4px',
               ...(error && { border: `1px solid ${theme.palette.error.main}` })
             }}
           >
@@ -856,11 +855,6 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = React.mem
               </>
             )}
           </div>
-          {error && (
-            <FormHelperText variant="outlined" sx={{ color: theme.palette.error.main }}>
-              {t(error)}
-            </FormHelperText>
-          )}
         </div>
       </LocalizationProvider>
     );
