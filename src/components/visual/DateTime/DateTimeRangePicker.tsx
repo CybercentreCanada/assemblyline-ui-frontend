@@ -265,7 +265,7 @@ const QuickSelectMenu = ({
                 width: 'auto',
                 display: 'grid',
                 gridTemplateColumns: 'repeat(4, 1fr)',
-                alignItems: 'end',
+                alignItems: 'start',
                 gap: theme.spacing(1)
               }}
             >
@@ -285,9 +285,16 @@ const QuickSelectMenu = ({
                 size="small"
                 type="number"
                 variant="outlined"
-                value={`${amount}`}
-                onChange={e => setAmount(Number(e.target.value))}
-                slotProps={{ input: { inputProps: { min: 0 } } }}
+                helperText={amount !== null ? null : t('amount.error')}
+                value={amount === null ? '' : `${amount}`}
+                onChange={e => {
+                  if ([null, undefined, '', NaN].includes(e.target.value)) setAmount(null);
+                  else setAmount(Number(e.target.value));
+                }}
+                slotProps={{
+                  input: { inputProps: { min: 0 } },
+                  formHelperText: { sx: { color: theme.palette.error.main } }
+                }}
                 sx={{ width: '140px' }}
               />
 
@@ -308,6 +315,7 @@ const QuickSelectMenu = ({
               </Select>
 
               <Button
+                disabled={amount === null}
                 size="small"
                 variant="contained"
                 onClick={e => {
@@ -537,11 +545,18 @@ const RelativeTab = ({ value = null, variant, onChange = () => null }: DateTimeP
   const { t } = useTranslation('dateTime');
   const theme = useTheme();
 
+  const [amount, setAmount] = useState<number>(value.amount);
+
+  useEffect(() => {
+    setAmount(value.amount);
+  }, [value?.amount]);
+
   return (
     <div
       style={{
         display: 'grid',
         gridTemplateColumns: '1fr 1fr',
+        alignItems: 'start',
         gap: theme.spacing(1)
       }}
     >
@@ -550,12 +565,15 @@ const RelativeTab = ({ value = null, variant, onChange = () => null }: DateTimeP
         size="small"
         type="number"
         variant="outlined"
-        value={`${value.amount}`}
+        value={amount === null ? '' : `${amount}`}
+        helperText={amount !== null ? null : t('amount.error')}
         onChange={e => {
-          value.amount = Number(e.target.value);
+          const newAmount = [null, undefined, '', NaN].includes(e.target.value) ? null : Number(e.target.value);
+          value.amount = newAmount === null ? value.amount : newAmount;
+          setAmount(newAmount);
           onChange(e, value.toStringifiedParts());
         }}
-        slotProps={{ input: { inputProps: { min: 0 } } }}
+        slotProps={{ input: { inputProps: { min: 0 } }, formHelperText: { sx: { color: theme.palette.error.main } } }}
       />
 
       <Select

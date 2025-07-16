@@ -28,6 +28,7 @@
   "/w": "rounded to the week",
   "/y": "rounded to the year",
   "absolute": "Absolute",
+  "amount.error": "Must be >= 0",
   "apply": "Apply",
   "commonly_used": "Commonly used",
   "end_date": "End date",
