@@ -343,8 +343,9 @@ const WrappedActionMenu = ({
               );
 
               resolve({ ...link, url });
+              // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
             } catch (err) {
-              reject(err);
+              reject(link);
             }
           })
       )
