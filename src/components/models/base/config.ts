@@ -334,7 +334,7 @@ export type UI = {
   enforce_quota: boolean;
 
   /** List of external pivot links */
-  external_links: Record<ExternalLinkType, Record<string, ExternalLink>>;
+  external_links: Record<ExternalLinkType, Record<string, ExternalLink[]>>;
 
   /** List of external sources to query */
   external_source_tags: Record<string, string[]>;
