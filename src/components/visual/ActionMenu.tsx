@@ -15,7 +15,7 @@ import useHighlighter from 'components/hooks/useHighlighter';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import type { Badlist } from 'components/models/base/badlist';
-import type { ExternalLinkType, HashPatternMap } from 'components/models/base/config';
+import type { ExternalLink, ExternalLinkType, HashPatternMap } from 'components/models/base/config';
 import type { Safelist } from 'components/models/base/safelist';
 import type { ExternalEnrichmentResults } from 'components/providers/ExternalLookupProvider';
 import Classification from 'components/visual/Classification';
@@ -111,6 +111,7 @@ const WrappedActionMenu = ({
   const [badlisted, setBadlisted] = useState<Badlist>(null);
   const [safelisted, setSafelisted] = useState<Safelist>(null);
   const [allInProgress, setAllInProgress] = useState<boolean>(false);
+  const [externalLinks, setExternalLinks] = useState<ExternalLink[]>([]);
 
   const externalLookupResults = useMemo<ExternalEnrichmentResults>(
     () => enrichmentState[getKey(type, value)],
@@ -323,6 +324,33 @@ const WrappedActionMenu = ({
     }
   }, [externalLookupResults]);
 
+  useEffect(() => {
+    if (!hasExternalLinks) setExternalLinks([]);
+
+    void Promise.all(
+      currentUserConfig.ui.external_links[category as ExternalLinkType][type].map(
+        link =>
+          new Promise<ExternalLink>(async (resolve, reject) => {
+            try {
+              const url = encodeURIComponent(
+                link.double_encode
+                  ? link.encoding === 'url'
+                    ? encodeURIComponent(value)
+                    : link.encoding === 'sha256'
+                      ? await getSHA256(value)
+                      : value
+                  : value
+              );
+
+              resolve({ ...link, url });
+            } catch (err) {
+              reject(err);
+            }
+          })
+      )
+    ).then(links => setExternalLinks(links));
+  }, [category, currentUserConfig?.ui?.external_links, hasExternalLinks, type, value]);
+
   return hasExternalLinks ||
     hasExternalQuery ||
     submitType ||
@@ -492,25 +520,14 @@ const WrappedActionMenu = ({
               {t('external_link')}
             </ListSubheader>
 
-            {currentUserConfig.ui.external_links[category as ExternalLinkType][type].map((link, i) => (
+            {externalLinks.map((link, i) => (
               <MenuItem
                 dense
                 component={MaterialLink}
                 key={`source_${i}`}
                 rel="noopener noreferrer"
                 target="_blank"
-                href={link.url.replace(
-                  link.replace_pattern,
-                  encodeURIComponent(
-                    link.double_encode
-                      ? link.encoding === 'url'
-                        ? encodeURIComponent(value)
-                        : link.encoding === 'sha256'
-                          ? getSHA256(value)
-                          : value
-                      : value
-                  )
-                )}
+                href={link.url}
                 onClick={event => checkClassification(event, link.max_classification, link.allow_bypass)}
               >
                 {EXTERNAL_ICON} {link.name}

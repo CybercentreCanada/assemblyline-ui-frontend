@@ -6,6 +6,7 @@ export const API_PRIV = ['READ', 'READ_WRITE', 'WRITE', 'CUSTOM', 'EXTENDED'] as
 export const AUTO_PROPERTY_TYPES = ['access', 'classification', 'type', 'role', 'remove_role', 'group'];
 export const BANNER_LEVELS = ['info', 'warning', 'success', 'error'] as const;
 export const DOWNLOAD_ENCODINGS = ['raw', 'cart', 'zip'] as const;
+export const EXTERNAL_LINK_ENCODING = ['sha256', 'url'] as const;
 export const EXTERNAL_LINK_TYPES = ['hash', 'metadata', 'tag'] as const;
 export const URI_HASH_PATTERN_MAP = ['url', 'ip', 'domain'] as const;
 export const HASH_PATTERN_MAP = ['sha256', 'sha1', 'md5', 'tlsh', 'ssdeep', 'url'] as const;
@@ -44,6 +45,7 @@ export type APIPriv = (typeof API_PRIV)[number];
 export type AutoPropertyType = (typeof AUTO_PROPERTY_TYPES)[number];
 export type BannerLevel = (typeof BANNER_LEVELS)[number];
 export type DownloadEncoding = (typeof DOWNLOAD_ENCODINGS)[number];
+export type ExternalLinkEncoding = (typeof EXTERNAL_LINK_ENCODING)[number];
 export type ExternalLinkType = (typeof EXTERNAL_LINK_TYPES)[number];
 export type HashPatternMap = (typeof HASH_PATTERN_MAP)[number];
 export type KubernetesLabelOps = (typeof KUBERNETES_LABEL_OPS)[number];
@@ -265,7 +267,7 @@ export type ExternalLink = {
   url: string;
 
   /** Encoding of target value passed to redirect */
-  encoding: 'url' | 'sha256';
+  encoding: ExternalLinkEncoding;
 };
 
 /** Connection details for external systems/data sources. */

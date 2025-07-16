@@ -1,5 +1,4 @@
 import type { Configuration, FileSource, HashPatternMap } from 'components/models/base/config';
-import crypto from 'crypto';
 import type { PossibleColor } from 'helpers/colors';
 import { LOWERCASE_HASH, URL_REGEX } from 'helpers/constants';
 
@@ -460,11 +459,3 @@ export function getSubmitType(input: string, configuration: Configuration): [Has
  */
 type ObjectOfInts = Record<string, number>;
 export const sumValues = (obj: ObjectOfInts) => Object.values(obj).reduce((a, b) => a + b, 0);
-
-/**
- * Computes the SHA-256 hash of a given string.
- *
- * @param {string} message - The input string to hash.
- * @returns {string} - The SHA-256 hash as a hexadecimal string.
- */
-export const getSHA256 = (value: string): string => crypto.createHash('sha256').update(value).digest('hex');
