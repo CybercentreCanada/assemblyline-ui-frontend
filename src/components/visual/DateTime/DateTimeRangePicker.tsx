@@ -29,8 +29,7 @@ import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
 import type { DateTimePickerProps } from '@mui/x-date-pickers/DateTimePicker';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import type { DateTimeType, TimeSpan } from 'components/visual/DateTime/LuceneDateTime';
-import { LuceneDateTime, LuceneDateTimeGap } from 'components/visual/DateTime/LuceneDateTime';
-import { SwitchInput } from 'components/visual/Inputs/SwitchInput';
+import { LuceneDateTime, LuceneDateTimeGap, TIME_SPAN } from 'components/visual/DateTime/LuceneDateTime';
 import type { Moment } from 'moment';
 import moment from 'moment';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -502,6 +501,7 @@ const GapInput = ({ value = null, disabled = false, onChange = () => null, onApp
 type DateTimeProps = {
   value: LuceneDateTime;
   variant: 'start' | 'end';
+  otherRounding?: TimeSpan;
   onChange: (event: unknown, value: string) => void;
   onApply?: () => void;
 };
@@ -556,7 +556,7 @@ export const RELATIVE_DATETIME_OPTIONS = [
   { primary: '+y', value: '+y' }
 ] as const;
 
-const RelativeTab = ({ value = null, variant, onChange = () => null }: DateTimeProps) => {
+const RelativeTab = ({ value = null, variant, otherRounding = null, onChange = () => null }: DateTimeProps) => {
   const { t } = useTranslation('dateTime');
   const theme = useTheme();
 
@@ -610,6 +610,39 @@ const RelativeTab = ({ value = null, variant, onChange = () => null }: DateTimeP
       </Select>
 
       <div style={{ gridColumn: 'span 2' }}>
+        <Select
+          id="timeSpan-input"
+          size="small"
+          fullWidth
+          value={value.rounding}
+          defaultValue={'h'}
+          // onChange={e => setTimeSpan(e.target.value as TimeSpan)}
+          displayEmpty
+          onChange={e => {
+            value.rounding = e.target.value as TimeSpan;
+            onChange(e, value.toStringifiedParts());
+          }}
+        >
+          <MenuItem color={theme.palette.text.disabled} value={null}>
+            {t('no.rounding')}
+          </MenuItem>
+          {Object.keys(TIME_SPAN)
+            .filter(v =>
+              otherRounding === null
+                ? true
+                : variant === 'start'
+                  ? TIME_SPAN[v] >= TIME_SPAN[otherRounding]
+                  : TIME_SPAN[v] <= TIME_SPAN[otherRounding]
+            )
+            .map(v => (
+              <MenuItem key={v} value={v}>
+                {t(`/${v}`)}
+              </MenuItem>
+            ))}
+        </Select>
+      </div>
+
+      <div style={{ gridColumn: 'span 2' }}>
         <Typography
           component={InputLabel}
           variant="body2"
@@ -619,35 +652,6 @@ const RelativeTab = ({ value = null, variant, onChange = () => null }: DateTimeP
         />
         <StyledDateTimePicker value={value.absolute} readOnly />
       </div>
-
-      <div style={{ gridColumn: 'span 2' }}>
-        <SwitchInput
-          label={t(`/${value.timeSpan}`)}
-          value={!!value.rounded && value.timeSpan === value.rounded}
-          onChange={(e, v) => {
-            value.rounded = v ? value.timeSpan : null;
-            onChange(e, value.toStringifiedParts());
-          }}
-        />
-      </div>
-    </div>
-  );
-};
-
-const NowTab = ({ variant = null, onChange = () => null }: DateTimeProps) => {
-  const { t } = useTranslation('dateTime');
-  const theme = useTheme();
-
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(2) }}>
-      <Button
-        size="small"
-        variant="contained"
-        onClick={event => onChange(event, 'now')}
-        sx={{ textTransform: 'inherit' }}
-      >
-        {variant === 'end' ? t('set_end_now') : t('set_start_now')}
-      </Button>
     </div>
   );
 };
@@ -657,6 +661,7 @@ type DateTimeInputProps = {
   variant: 'start' | 'end';
   disabled?: boolean;
   hasGap?: boolean;
+  otherRounding?: TimeSpan;
   onChange: (event: unknown, value: string) => void;
   onApply: () => void;
 };
@@ -666,6 +671,7 @@ const DateTimeInput = ({
   variant,
   disabled = false,
   hasGap = true,
+  otherRounding = null,
   onChange = () => null,
   onApply = () => null
 }: DateTimeInputProps) => {
@@ -705,7 +711,7 @@ const DateTimeInput = ({
           })
         }}
       >
-        {value.toString({ language: i18n.language, type: tab === 'absolute' ? 'absolute' : 'relative' })}
+        {value.toString({ language: i18n.language })}
       </Button>
 
       <Popover
@@ -751,9 +757,25 @@ const DateTimeInput = ({
               case 'absolute':
                 return <AbsoluteTab value={value} variant={variant} onChange={onChange} />;
               case 'relative':
-                return <RelativeTab value={value} variant={variant} onChange={onChange} />;
+                return (
+                  <RelativeTab value={value} variant={variant} otherRounding={otherRounding} onChange={onChange} />
+                );
               case 'now':
-                return <NowTab value={value} variant={variant} onChange={onChange} />;
+                return (
+                  <div style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(2) }}>
+                    <Button
+                      size="small"
+                      variant="contained"
+                      onClick={event => {
+                        onChange(event, 'now');
+                        setAnchorEl(null);
+                      }}
+                      sx={{ textTransform: 'inherit' }}
+                    >
+                      {variant === 'end' ? t('set_end_now') : t('set_start_now')}
+                    </Button>
+                  </div>
+                );
             }
           })()}
         </div>
@@ -851,6 +873,7 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = React.mem
               value={start}
               variant="start"
               disabled={disabled}
+              otherRounding={end.rounding}
               onChange={(e, v) => setStart(() => new LuceneDateTime(v))}
               onApply={() => applyChanges()}
             />
@@ -868,6 +891,7 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = React.mem
               value={end}
               variant="end"
               disabled={disabled}
+              otherRounding={start.rounding}
               hasGap={hasGap}
               onChange={(e, v) => setEnd(() => new LuceneDateTime(v))}
               onApply={() => applyChanges()}

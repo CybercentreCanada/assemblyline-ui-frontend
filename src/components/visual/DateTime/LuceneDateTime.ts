@@ -4,11 +4,24 @@ import { enCA, frCA } from 'date-fns/locale';
 import type { Moment } from 'moment';
 import moment from 'moment';
 
+// Week starts on Sunday (0 = Sunday, 1 = Monday, etc.)
+moment.updateLocale('en', { week: { dow: 0 } });
+
 export const EN_CA: Locale = { ...enCA, options: { ...enCA.options, weekStartsOn: 0 } };
 export const FR_CA: Locale = { ...frCA, options: { ...frCA.options, weekStartsOn: 0 } };
 
 // Define the TimeSpan type (e.g., "d" for days, "h" for hours, etc.)
-export type TimeSpan = 's' | 'm' | 'h' | 'd' | 'w' | 'M' | 'y';
+export const TIME_SPAN = {
+  s: 1,
+  m: 2,
+  h: 3,
+  d: 4,
+  w: 5,
+  M: 6,
+  y: 7
+} as const;
+
+export type TimeSpan = keyof typeof TIME_SPAN;
 
 // Define the Relative Date Time using the Lucene format
 export type RelativeDateTime =
@@ -30,8 +43,8 @@ export type RelativeDateTimeParts = {
   /** Unit of time for the offset (e.g., "d" for days) */
   timeSpan: TimeSpan;
 
-  /** If not null, the unit of time to which the result is rounded (e.g., "d" means rounded to the day) */
-  rounded: null | TimeSpan;
+  /** If not null, the unit of time to which the result is rounding (e.g., "d" means rounding to the day) */
+  rounding: null | TimeSpan;
 };
 
 export type DateTimeRange = `[${string} TO ${string}]`;
@@ -45,7 +58,7 @@ export class LuceneDateTime {
   public sign: RelativeDateTimeParts['sign']; // Whether the offset is in the future ("+") or the past ("-")
   public amount: RelativeDateTimeParts['amount']; // The numeric value representing the offset
   public timeSpan: RelativeDateTimeParts['timeSpan']; // The unit of time for the offset (e.g., "d" for days)
-  public rounded: RelativeDateTimeParts['rounded']; // The unit of time for rounding (optional, or null if not rounded)
+  public rounding: RelativeDateTimeParts['rounding']; // The unit of time for rounding (optional, or null if not rounding)
   public variant: DateTimeVariant;
 
   constructor(value: string, variant: DateTimeVariant = 'start') {
@@ -73,7 +86,7 @@ export class LuceneDateTime {
     this.sign = relativeParts.sign;
     this.amount = relativeParts.amount;
     this.timeSpan = relativeParts.timeSpan;
-    this.rounded = relativeParts.rounded;
+    this.rounding = relativeParts.rounding;
   }
 
   private static isValidRelative(input: string): input is RelativeDateTime {
@@ -114,25 +127,25 @@ export class LuceneDateTime {
       throw new Error(`Invalid Lucene datetime format: "${input}"`);
     }
 
-    const [, sign = '-', amount = '0', timeSpan = null, rounded = null] = match;
+    const [, sign = '-', amount = '0', timeSpan = null, rounding = null] = match;
 
     return {
       sign,
       amount: parseInt(amount, 10),
-      timeSpan: timeSpan || (rounded as TimeSpan) || 's',
-      rounded
+      timeSpan: timeSpan || (rounding as TimeSpan) || 's',
+      rounding
     } as RelativeDateTimeParts;
   }
 
   private static convertPartsToMoment = (
-    { sign, amount, timeSpan, rounded }: RelativeDateTimeParts,
+    { sign, amount, timeSpan, rounding }: RelativeDateTimeParts,
     variant: DateTimeVariant
   ): Moment => {
     // Default values
     const offsetSign = sign === '-' ? -1 : 1; // Determine if it's a "+" or "-"
     const offsetAmount = amount || 0; // Default to 0 if no amount is specified
     const offsetTimeSpan = timeSpan || 'd'; // Default to "d" (days) if no unit is specified
-    const roundingTimeSpan = rounded; // Optional rounding
+    const roundingTimeSpan = rounding; // Optional rounding
 
     // Start with the "now" timestamp
     let result = moment();
@@ -158,7 +171,7 @@ export class LuceneDateTime {
     sign,
     amount,
     timeSpan,
-    rounded
+    rounding
   }: RelativeDateTimeParts): RelativeDateTime => {
     // Begin with "now"
     let result = 'now';
@@ -169,8 +182,8 @@ export class LuceneDateTime {
     }
 
     // Add rounding (e.g., "/d")
-    if (rounded) {
-      result += `/${rounded}`;
+    if (rounding) {
+      result += `/${rounding}`;
     }
 
     return result as RelativeDateTime;
@@ -201,14 +214,14 @@ export class LuceneDateTime {
     const now = moment();
 
     // Round the target time to the specified unit if rounding is required
-    const roundedTarget = roundTo
+    const roundingTarget = roundTo
       ? variant === 'start'
         ? target.clone().startOf(roundTo)
         : target.clone().endOf(roundTo)
       : target;
 
-    // Calculate the difference in milliseconds between `roundedTarget` and `now`
-    const diffInMs = roundedTarget.diff(now);
+    // Calculate the difference in milliseconds between `roundingTarget` and `now`
+    const diffInMs = roundingTarget.diff(now);
 
     // Determine the sign ("+" for future, "-" for past)
     const sign = diffInMs >= 0 ? '+' : '-';
@@ -244,7 +257,7 @@ export class LuceneDateTime {
     }
 
     // Return the LuceneDateTime instance
-    return { sign, amount, timeSpan, rounded: roundTo };
+    return { sign, amount, timeSpan, rounding: roundTo };
   }
 
   /**
@@ -261,8 +274,8 @@ export class LuceneDateTime {
     }
 
     // Add rounding if applicable
-    if (this.rounded) {
-      result += `/${this.rounded}`;
+    if (this.rounding) {
+      result += `/${this.rounding}`;
     }
 
     return result;
@@ -273,7 +286,7 @@ export class LuceneDateTime {
     const offsetSign = this.sign === '-' ? -1 : 1; // Determine if it's a "+" or "-"
     const offsetAmount = this.amount; // Default to 0 if no amount is specified
     const offsetTimeSpan = this.timeSpan || 'd'; // Default to "d" (days) if no unit is specified
-    const roundingTimeSpan = this.rounded ? this.rounded : null; // Optional rounding
+    const roundingTimeSpan = this.rounding ? this.rounding : null; // Optional rounding
 
     // Start with the "now" timestamp
     let result = moment();
@@ -331,7 +344,7 @@ export class LuceneDateTime {
   }
 
   public toStringifiedParts(): string {
-    return `now${this.sign}${this.amount}${this.timeSpan}${this.rounded && this.rounded === this.timeSpan ? `/${this.rounded}` : ''}`;
+    return `now${this.sign}${this.amount}${this.timeSpan}${this.rounding ? `/${this.rounding}` : ''}`;
   }
 
   public toValue(): number {
@@ -401,8 +414,11 @@ export class LuceneDateTimeGap {
     this.end = new LuceneDateTime(end, 'end');
     this.interval = defaultInterval;
 
-    const newGap = LuceneDateTimeGap.isValidGap(gap) ? gap : defaultGap;
-    [this.amount, this.timeSpan] = LuceneDateTimeGap.parseGap(newGap);
+    const [gapAmount, gapTimeSpan] = LuceneDateTimeGap.parseGap(gap);
+    const [defaultGapAmount, defaultGapTimeSpan] = LuceneDateTimeGap.parseGap(defaultGap);
+
+    this.amount = gapAmount ? gapAmount : defaultGapAmount;
+    this.timeSpan = gapAmount ? gapTimeSpan : defaultGapTimeSpan;
   }
 
   /**
@@ -419,9 +435,9 @@ export class LuceneDateTimeGap {
    * @param gap - Gap string (e.g., "10m", "5h").
    * @returns Tuple of numeric value and time span unit.
    */
-  public static parseGap(gap: `${number}${TimeSpan}`): [number, TimeSpan] {
+  public static parseGap(gap: string): [number, TimeSpan] {
     const match = gap.match(/^(\d+)([smhd])$/);
-    if (!match) throw new Error(`Invalid gap format: "${gap}"`);
+    if (!match) return [0, 'h'];
     return [parseInt(match[1], 10), match[2] as TimeSpan];
   }
 
@@ -445,6 +461,9 @@ export class LuceneDateTimeGap {
    */
   private calculateGap(): `${number}${TimeSpan}` {
     const totalDurationMs = this.end.absolute.diff(this.start.absolute);
+
+    if (totalDurationMs <= 1000) return `${this.amount}${this.timeSpan}`;
+
     let gapUnit: TimeSpan = 's';
     let gapValue = Math.floor(totalDurationMs / this.interval / 1000);
 
