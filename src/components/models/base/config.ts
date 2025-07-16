@@ -263,6 +263,9 @@ export type ExternalLink = {
 
   /** URL to redirect to */
   url: string;
+
+  /** Encoding of target value passed to redirect */
+  encoding: 'url' | 'sha256';
 };
 
 /** Connection details for external systems/data sources. */

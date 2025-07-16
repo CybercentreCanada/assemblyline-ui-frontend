@@ -485,7 +485,15 @@ const WrappedActionMenu: React.FC<TagProps> = ({
                 target="_blank"
                 href={link.url.replace(
                   link.replace_pattern,
-                  encodeURIComponent(link.double_encode ? encodeURIComponent(value) : value)
+                  encodeURIComponent(
+                    link.double_encode
+                      ? link.encoding === 'url'
+                        ? encodeURIComponent(value)
+                        : link.encoding === 'sha256'
+                          ? // TODO: SHA256 the value and pass it back for URL encoding
+                          : value
+                      : value
+                  )
                 )}
                 onClick={event => checkClassification(event, link.max_classification, link.allow_bypass)}
               >
