@@ -20,7 +20,7 @@ import { BOREALIS_TYPE_MAP } from 'components/visual/EnrichmentCustomChip';
 import InputDialog from 'components/visual/InputDialog';
 import SafeBadItem from 'components/visual/SafeBadItem';
 import { isAccessible } from 'helpers/classificationParser';
-import { getSubmitType, safeFieldValueURI, toTitleCase } from 'helpers/utils';
+import { getSHA256, getSubmitType, safeFieldValueURI, toTitleCase } from 'helpers/utils';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { HiOutlineExternalLink } from 'react-icons/hi';
@@ -490,7 +490,7 @@ const WrappedActionMenu: React.FC<TagProps> = ({
                       ? link.encoding === 'url'
                         ? encodeURIComponent(value)
                         : link.encoding === 'sha256'
-                          ? // TODO: SHA256 the value and pass it back for URL encoding
+                          ? getSHA256(value)
                           : value
                       : value
                   )
