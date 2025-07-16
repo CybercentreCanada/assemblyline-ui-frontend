@@ -367,18 +367,29 @@ export class LuceneDateTime {
 }
 
 export class LuceneDateTimeGap {
-  /** The validated or recalculated gap duration (e.g., "6h", "15m"). */
-  private gap: `${number}${TimeSpan}`;
+  /** Numeric value of the gap duration (e.g., 6, 15). */
+  public amount: number;
 
-  /** The start of the datetime range as a `LuceneDateTime` object. */
+  /** Time span unit of the gap (e.g., "h" for hours, "m" for minutes). */
+  public timeSpan: TimeSpan;
+
+  /** Desired number of intervals in the range (default: 50). */
+  public interval: number;
+
+  /** Start of the datetime range as a `LuceneDateTime` object. */
   private start: LuceneDateTime;
 
-  /** The end of the datetime range as a `LuceneDateTime` object. */
+  /** End of the datetime range as a `LuceneDateTime` object. */
   private end: LuceneDateTime;
 
-  /** The desired number of intervals within the range, default is 50. */
-  private interval: number;
-
+  /**
+   * Creates a `LuceneDateTimeGap` instance.
+   * @param gap - Gap string (e.g., "4h", "10m"). Defaults to `defaultGap` if invalid.
+   * @param start - Start of the datetime range.
+   * @param end - End of the datetime range.
+   * @param defaultInterval - Number of intervals (default: 50).
+   * @param defaultGap - Default gap string (default: "4h").
+   */
   constructor(
     gap: string,
     start: string,
@@ -386,65 +397,57 @@ export class LuceneDateTimeGap {
     defaultInterval: number = 50,
     defaultGap: `${number}${TimeSpan}` = '4h'
   ) {
-    // Convert start and end to LuceneDateTime
     this.start = new LuceneDateTime(start, 'start');
     this.end = new LuceneDateTime(end, 'end');
-
-    // Initialize the interval and default gap
     this.interval = defaultInterval;
 
-    // Validate and assign a gap value
-    this.gap = this.isValidGap(gap) ? gap : defaultGap;
+    const newGap = LuceneDateTimeGap.isValidGap(gap) ? gap : defaultGap;
+    [this.amount, this.timeSpan] = LuceneDateTimeGap.parseGap(newGap);
   }
 
   /**
-   * Validates whether a gap is in the correct format (e.g., "10m", "5h").
-   * @param gap - The gap string to validate.
-   * @returns True if the gap is valid, false otherwise.
+   * Checks if a gap string is valid (e.g., "10m", "5h").
+   * @param value - Gap string to validate.
+   * @returns True if valid, false otherwise.
    */
-  private isValidGap(gap: string): gap is `${number}${TimeSpan}` {
-    const validGapRegex = /^\d+(s|m|h|d)$/; // Supported time units
-    return validGapRegex.test(gap);
+  public static isValidGap(value: string): value is `${number}${TimeSpan}` {
+    return /^\d+(s|m|h|d)$/.test(value);
   }
 
   /**
-   * Computes the number of intervals a given gap creates within the range.
-   * @param gap - The validated gap value (e.g., "2h", "15m").
-   * @returns The number of intervals within the range.
-   * @throws Error if the gap is invalid.
+   * Parses a valid gap string into its numeric value and time span unit.
+   * @param gap - Gap string (e.g., "10m", "5h").
+   * @returns Tuple of numeric value and time span unit.
+   */
+  public static parseGap(gap: `${number}${TimeSpan}`): [number, TimeSpan] {
+    const match = gap.match(/^(\d+)([smhd])$/);
+    if (!match) throw new Error(`Invalid gap format: "${gap}"`);
+    return [parseInt(match[1], 10), match[2] as TimeSpan];
+  }
+
+  /**
+   * Calculates the number of intervals the gap creates within the range.
+   * @returns Number of intervals.
    */
   private calculateInterval(): number {
-    // Calculate total duration in milliseconds
     const totalDurationMs = this.end.absolute.diff(this.start.absolute);
+    const gapInMs = moment
+      .duration(this.amount, this.timeSpan as moment.unitOfTime.DurationConstructor)
+      .asMilliseconds();
 
-    // Extract the numeric value and time unit from the gap (e.g., "2h" -> 2, "h")
-    const [, gapValueStr, gapUnit] = this.gap.match(/^(\d+)([smhdwMy])$/);
-    const gapValue = parseInt(gapValueStr, 10);
-
-    // Convert the gap into milliseconds
-    const gapInMs = moment.duration(gapValue, gapUnit as moment.unitOfTime.DurationConstructor).asMilliseconds();
-
-    if (gapInMs === 0) {
-      throw new Error(`Gap cannot represent zero milliseconds: "${this.gap}"`);
-    }
-
-    // Calculate and return the number of intervals
+    if (gapInMs === 0) throw new Error(`Gap cannot represent zero milliseconds.`);
     return Math.floor(totalDurationMs / gapInMs);
   }
 
   /**
-   * Calculates a suitable default gap for the given range and interval count.
-   * @returns The calculated gap as a string (e.g., "4h", "1d").
+   * Dynamically calculates a default gap for the range and interval count.
+   * @returns Gap string (e.g., "4h", "1d").
    */
   private calculateGap(): `${number}${TimeSpan}` {
-    // Calculate total duration in milliseconds
     const totalDurationMs = this.end.absolute.diff(this.start.absolute);
-
-    // Default to seconds as the smallest gap unit
     let gapUnit: TimeSpan = 's';
-    let gapValue = Math.floor(totalDurationMs / this.interval / 1000); // Convert ms to seconds and divide by interval
+    let gapValue = Math.floor(totalDurationMs / this.interval / 1000);
 
-    // Adjust gap unit and value based on total duration
     if (gapValue >= 60) {
       gapUnit = 'm';
       gapValue = Math.floor(gapValue / 60);
@@ -458,41 +461,35 @@ export class LuceneDateTimeGap {
       gapValue = Math.floor(gapValue / 24);
     }
 
-    // Format and return the calculated gap
     return `${gapValue}${gapUnit}` as `${number}${TimeSpan}`;
   }
 
   /**
-   * Updates the range of the `LuceneDateTimeGap` instance with new start and end values,
-   * and recalculates the gap based on the new range.
-   * @param newStart - The new start of the datetime range as a string.
-   * @param newEnd - The new end of the datetime range as a string.
+   * Updates the range and recalculates the gap.
+   * @param newStart - New start of the range.
+   * @param newEnd - New end of the range.
+   * @returns Updated instance.
    */
   public updateRange(newStart: string, newEnd: string): this {
-    // Update the `start` and `end` properties with new LuceneDateTime instances
     this.start = new LuceneDateTime(newStart, 'start');
     this.end = new LuceneDateTime(newEnd, 'end');
     return this;
   }
 
-  public toValues(): [number, TimeSpan] {
-    const match = this.gap.match(/^(\d+)([a-zA-Z]+)$/);
-    if (!match) return [1, 'h'];
-    const [, amount, timeSpan] = match;
-    return [parseInt(amount, 10), timeSpan as TimeSpan];
-  }
-
   /**
-   * Converts the `LuceneDateTimeGap` instance to a string representation of the gap.
-   * @returns The gap duration as a string (e.g., "6h", "15m").
+   * Converts the gap to a string representation.
+   * @returns Gap string (e.g., "6h", "15m").
    */
   public toString(): string {
     const interval = this.calculateInterval();
-    if (0 < interval && interval < 100) return this.gap;
-    else return this.calculateGap();
+    return 0 < interval && interval < 100 ? `${this.amount}${this.timeSpan}` : this.calculateGap();
   }
 
+  /**
+   * Retrieves the gap as a string.
+   * @returns Gap string (e.g., "6h", "15m").
+   */
   public getGap(): string {
-    return this.gap;
+    return `${this.amount}${this.timeSpan}`;
   }
 }

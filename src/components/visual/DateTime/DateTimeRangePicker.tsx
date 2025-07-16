@@ -285,8 +285,8 @@ const QuickSelectMenu = ({
                 size="small"
                 type="number"
                 variant="outlined"
-                helperText={amount !== null ? null : t('amount.error')}
                 value={amount === null ? '' : `${amount}`}
+                helperText={amount !== null ? null : t('amount.error')}
                 onChange={e => {
                   if ([null, undefined, '', NaN].includes(e.target.value)) setAmount(null);
                   else setAmount(Number(e.target.value));
@@ -391,11 +391,14 @@ const GapInput = ({ value = null, disabled = false, onChange = () => null, onApp
   const theme = useTheme();
   const { t } = useTranslation('dateTime');
 
+  const [amount, setAmount] = useState<number>(value.amount);
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 
   const open = useMemo<boolean>(() => Boolean(anchorEl), [anchorEl]);
 
-  const [amount, timeSpan] = useMemo<[number, TimeSpan]>(() => value.toValues(), [value]);
+  useEffect(() => {
+    setAmount(value.amount);
+  }, [value?.amount]);
 
   return (
     <>
@@ -451,6 +454,7 @@ const GapInput = ({ value = null, disabled = false, onChange = () => null, onApp
             style={{
               display: 'grid',
               gridTemplateColumns: '1fr 1fr',
+              alignItems: 'start',
               columnGap: theme.spacing(1)
             }}
           >
@@ -459,15 +463,26 @@ const GapInput = ({ value = null, disabled = false, onChange = () => null, onApp
               size="small"
               type="number"
               variant="outlined"
-              value={`${amount}`}
-              onChange={e => onChange(e, `${Number(e.target.value)}${timeSpan}`)}
-              slotProps={{ input: { inputProps: { min: 1 } } }}
+              value={amount === null ? '' : `${amount}`}
+              helperText={amount !== null ? null : t('gap.amount.error')}
+              onChange={e => {
+                const newAmount = [null, undefined, '', NaN].includes(e.target.value)
+                  ? null
+                  : Math.max(Number(e.target.value), 1);
+                value.amount = newAmount === null ? value.amount : newAmount;
+                setAmount(newAmount);
+                onChange(e, `${value.amount}${value.timeSpan}`);
+              }}
+              slotProps={{
+                input: { inputProps: { min: 1 } },
+                formHelperText: { sx: { color: theme.palette.error.main } }
+              }}
             />
 
             <Select
               id="gap-datetime-select"
               size="small"
-              value={timeSpan}
+              value={value.timeSpan}
               defaultValue={`h`}
               onChange={e => onChange(e, `${amount}${e.target.value || 'h'}`)}
             >
@@ -690,7 +705,7 @@ const DateTimeInput = ({
           })
         }}
       >
-        {value.toString({ language: i18n.language })}
+        {value.toString({ language: i18n.language, type: tab === 'absolute' ? 'absolute' : 'relative' })}
       </Button>
 
       <Popover
