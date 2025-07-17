@@ -814,7 +814,7 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = React.mem
     const [start, setStart] = useState<LuceneDateTime>(new LuceneDateTime(startRaw, 'start'));
     const [end, setEnd] = useState<LuceneDateTime>(new LuceneDateTime(endRaw, 'end'));
     const [gap, setGap] = useState<LuceneDateTimeGap>(
-      new LuceneDateTimeGap(gapRaw, startRaw, endRaw, interval, defaultGap)
+      new LuceneDateTimeGap(gapRaw, startRaw, endRaw, interval, defaultGap, hasGap)
     );
     const [error, setError] = useState<boolean>(false);
 
@@ -835,8 +835,8 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = React.mem
     useEffect(() => {
       setStart(new LuceneDateTime(startRaw, 'start'));
       setEnd(new LuceneDateTime(endRaw, 'end'));
-      setGap(new LuceneDateTimeGap(gapRaw, startRaw, endRaw, interval, defaultGap));
-    }, [defaultGap, endRaw, gapRaw, interval, startRaw]);
+      setGap(new LuceneDateTimeGap(gapRaw, startRaw, endRaw, interval, defaultGap, hasGap));
+    }, [defaultGap, endRaw, gapRaw, hasGap, interval, startRaw]);
 
     useEffect(() => {
       configureMomentLocale(i18n.language);

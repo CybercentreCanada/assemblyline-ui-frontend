@@ -381,19 +381,22 @@ export class LuceneDateTime {
 
 export class LuceneDateTimeGap {
   /** Numeric value of the gap duration (e.g., 6, 15). */
-  public amount: number;
+  public amount: number = 4;
 
   /** Time span unit of the gap (e.g., "h" for hours, "m" for minutes). */
-  public timeSpan: TimeSpan;
+  public timeSpan: TimeSpan = 'h';
 
   /** Desired number of intervals in the range (default: 50). */
-  public interval: number;
+  public interval: number = 50;
 
   /** Start of the datetime range as a `LuceneDateTime` object. */
-  private start: LuceneDateTime;
+  private start: LuceneDateTime = null;
 
   /** End of the datetime range as a `LuceneDateTime` object. */
-  private end: LuceneDateTime;
+  private end: LuceneDateTime = null;
+
+  /** Is the Gap enabled? */
+  private enabled: boolean = true;
 
   /**
    * Creates a `LuceneDateTimeGap` instance.
@@ -402,23 +405,29 @@ export class LuceneDateTimeGap {
    * @param end - End of the datetime range.
    * @param defaultInterval - Number of intervals (default: 50).
    * @param defaultGap - Default gap string (default: "4h").
+   * @param enabled - Is the Gap enabled?
    */
   constructor(
     gap: string,
     start: string,
     end: string,
     defaultInterval: number = 50,
-    defaultGap: `${number}${TimeSpan}` = '4h'
+    defaultGap: `${number}${TimeSpan}` = '4h',
+    enabled: boolean = true
   ) {
-    this.start = new LuceneDateTime(start, 'start');
-    this.end = new LuceneDateTime(end, 'end');
-    this.interval = defaultInterval;
+    if (!enabled) {
+      this.enabled = enabled;
+    } else {
+      this.start = new LuceneDateTime(start, 'start');
+      this.end = new LuceneDateTime(end, 'end');
+      this.interval = defaultInterval;
 
-    const [gapAmount, gapTimeSpan] = LuceneDateTimeGap.parseGap(gap);
-    const [defaultGapAmount, defaultGapTimeSpan] = LuceneDateTimeGap.parseGap(defaultGap);
+      const [gapAmount, gapTimeSpan] = LuceneDateTimeGap.parseGap(gap);
+      const [defaultGapAmount, defaultGapTimeSpan] = LuceneDateTimeGap.parseGap(defaultGap);
 
-    this.amount = gapAmount ? gapAmount : defaultGapAmount;
-    this.timeSpan = gapAmount ? gapTimeSpan : defaultGapTimeSpan;
+      this.amount = gapAmount ? gapAmount : defaultGapAmount;
+      this.timeSpan = gapAmount ? gapTimeSpan : defaultGapTimeSpan;
+    }
   }
 
   /**
@@ -435,7 +444,7 @@ export class LuceneDateTimeGap {
    * @param gap - Gap string (e.g., "10m", "5h").
    * @returns Tuple of numeric value and time span unit.
    */
-  public static parseGap(gap: string): [number, TimeSpan] {
+  public static parseGap(gap: string = ''): [number, TimeSpan] {
     const match = gap.match(/^(\d+)([smhd])$/);
     if (!match) return [0, 'h'];
     return [parseInt(match[1], 10), match[2] as TimeSpan];
@@ -500,6 +509,8 @@ export class LuceneDateTimeGap {
    * @returns Gap string (e.g., "6h", "15m").
    */
   public toString(): string {
+    if (!this.enabled) return null;
+
     const interval = this.calculateInterval();
     return 0 < interval && interval < 100 ? `${this.amount}${this.timeSpan}` : this.calculateGap();
   }
@@ -509,6 +520,8 @@ export class LuceneDateTimeGap {
    * @returns Gap string (e.g., "6h", "15m").
    */
   public getGap(): string {
+    if (!this.enabled) return null;
+
     return `${this.amount}${this.timeSpan}`;
   }
 }
