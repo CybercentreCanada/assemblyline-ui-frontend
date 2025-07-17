@@ -219,7 +219,7 @@ export default tseslint.config(
       'react/jsx-curly-newline': 'off',
       'react/jsx-filename-extension': ['warn', { extensions: ['.js', '.jsx', '.ts', '.tsx'] }],
       'react/jsx-no-literals': [
-        'warn',
+        'off',
         {
           allowedStrings: ['/', ':', '(', ')', ':&nbsp;', '-', 'APA2B', '.'],
           ignoreProps: false,
@@ -251,6 +251,7 @@ export default tseslint.config(
     },
     rules: {
       'no-async-promise-executor': 'off',
+      'no-case-declarations': 'off',
       'no-console': 'warn',
       'no-extra-boolean-cast': 'off',
       'no-param-reassign': 'warn',
