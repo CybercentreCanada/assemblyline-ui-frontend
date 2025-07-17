@@ -327,12 +327,18 @@ const WrappedActionMenu = ({
   useEffect(() => {
     if (!hasExternalLinks) setExternalLinks([]);
 
+    const externalLinks = currentUserConfig.ui.external_links[category as ExternalLinkType][type];
+    if (externalLinks === undefined) {
+      setExternalLinks([]);
+      return;
+    }
+
     void Promise.all(
-      currentUserConfig.ui.external_links[category as ExternalLinkType][type].map(
+      externalLinks.map(
         link =>
           new Promise<ExternalLink>(async (resolve, reject) => {
             try {
-              const url = encodeURIComponent(
+              const targetValue = encodeURIComponent(
                 link.double_encode
                   ? link.encoding === 'url'
                     ? encodeURIComponent(value)
@@ -342,7 +348,7 @@ const WrappedActionMenu = ({
                   : value
               );
 
-              resolve({ ...link, url });
+              resolve({ ...link, url: link.url.replace(link.replace_pattern, targetValue) });
               // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
             } catch (err) {
               reject(link);
@@ -521,7 +527,7 @@ const WrappedActionMenu = ({
               {t('external_link')}
             </ListSubheader>
 
-            {externalLinks.map((link, i) => (
+            {externalLinks?.map((link, i) => (
               <MenuItem
                 dense
                 component={MaterialLink}
