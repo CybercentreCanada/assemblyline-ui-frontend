@@ -325,37 +325,34 @@ const WrappedActionMenu = ({
   }, [externalLookupResults]);
 
   useEffect(() => {
-    if (!hasExternalLinks) setExternalLinks([]);
-
-    const externalLinks = currentUserConfig.ui.external_links[category as ExternalLinkType][type];
-    if (externalLinks === undefined) {
+    const externalLinks = currentUserConfig?.ui?.external_links?.[category as ExternalLinkType]?.[type];
+    if (!hasExternalLinks || !externalLinks) {
       setExternalLinks([]);
-      return;
+    } else {
+      void Promise.all(
+        externalLinks.map(
+          link =>
+            new Promise<ExternalLink>(async (resolve, reject) => {
+              try {
+                const targetValue = encodeURIComponent(
+                  link.double_encode
+                    ? link.encoding === 'url'
+                      ? encodeURIComponent(value)
+                      : link.encoding === 'sha256'
+                        ? await getSHA256(value)
+                        : value
+                    : value
+                );
+
+                resolve({ ...link, url: link.url.replace(link.replace_pattern, targetValue) });
+                // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
+              } catch (err) {
+                reject(link);
+              }
+            })
+        )
+      ).then(links => setExternalLinks(links));
     }
-
-    void Promise.all(
-      externalLinks.map(
-        link =>
-          new Promise<ExternalLink>(async (resolve, reject) => {
-            try {
-              const targetValue = encodeURIComponent(
-                link.double_encode
-                  ? link.encoding === 'url'
-                    ? encodeURIComponent(value)
-                    : link.encoding === 'sha256'
-                      ? await getSHA256(value)
-                      : value
-                  : value
-              );
-
-              resolve({ ...link, url: link.url.replace(link.replace_pattern, targetValue) });
-              // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
-            } catch (err) {
-              reject(link);
-            }
-          })
-      )
-    ).then(links => setExternalLinks(links));
   }, [category, currentUserConfig?.ui?.external_links, hasExternalLinks, type, value]);
 
   return hasExternalLinks ||
