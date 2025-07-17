@@ -14,14 +14,18 @@ import useExternalLookup from 'components/hooks/useExternalLookup';
 import useHighlighter from 'components/hooks/useHighlighter';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
+import type { Badlist } from 'components/models/base/badlist';
+import type { ExternalLink, ExternalLinkType, HashPatternMap } from 'components/models/base/config';
+import type { Safelist } from 'components/models/base/safelist';
+import type { ExternalEnrichmentResults } from 'components/providers/ExternalLookupProvider';
 import Classification from 'components/visual/Classification';
 import ClassificationMismatchDialog from 'components/visual/ClassificationMismatchDialog';
 import { BOREALIS_TYPE_MAP } from 'components/visual/EnrichmentCustomChip';
 import InputDialog from 'components/visual/InputDialog';
 import SafeBadItem from 'components/visual/SafeBadItem';
 import { isAccessible } from 'helpers/classificationParser';
-import { getSubmitType, safeFieldValueURI, toTitleCase } from 'helpers/utils';
-import React, { useCallback, useEffect, useState } from 'react';
+import { getSHA256, getSubmitType, safeFieldValueURI, toTitleCase } from 'helpers/utils';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { HiOutlineExternalLink } from 'react-icons/hi';
 import { Link } from 'react-router-dom';
@@ -37,26 +41,15 @@ const SIGNATURE_ICON = <FingerprintOutlinedIcon style={{ marginRight: '16px' }} 
 const BORELIS_ICON = <LandscapeOutlinedIcon style={{ marginRight: '16px' }} />;
 
 const EXTERNAL_ICON = <HiOutlineExternalLink style={{ marginRight: '16px', fontSize: '22px' }} />;
-const initialMenuState = {
-  mouseX: null,
-  mouseY: null
-};
 
 type Coordinates = {
   mouseX: number | null;
   mouseY: number | null;
 };
 
-type TagProps = {
-  category: 'heuristic' | 'signature' | 'hash' | 'metadata' | 'tag';
-  index?: string;
-  type: string;
-  value: string;
-  classification?: string | null;
-  state: Coordinates;
-  setState: (Coordinates) => void;
-  highlight_key?: string;
-  setBorealisDetails?: (value: boolean) => void;
+const initialMenuState: Coordinates = {
+  mouseX: null,
+  mouseY: null
 };
 
 const categoryPrefix = {
@@ -65,7 +58,7 @@ const categoryPrefix = {
   metadata: 'metadata.',
   tag: 'result.sections.tags.',
   hash: ''
-};
+} as const;
 
 const categoryIndex = {
   heuristic: '/result',
@@ -73,9 +66,21 @@ const categoryIndex = {
   metadata: '',
   tag: '/result',
   hash: ''
+} as const;
+
+type ActionMenuProps = {
+  category: 'heuristic' | 'signature' | 'hash' | 'metadata' | 'tag';
+  index?: string;
+  type: string;
+  value: string;
+  classification?: string | null;
+  state: Coordinates;
+  highlight_key?: string;
+  setState: (coordinates: Coordinates) => void;
+  setBorealisDetails?: (value: boolean) => void;
 };
 
-const WrappedActionMenu: React.FC<TagProps> = ({
+const WrappedActionMenu = ({
   category,
   index = null,
   type,
@@ -85,68 +90,56 @@ const WrappedActionMenu: React.FC<TagProps> = ({
   setState,
   highlight_key = null,
   setBorealisDetails = null
-}) => {
+}: ActionMenuProps) => {
   const { t } = useTranslation();
   const { user: currentUser, configuration: currentUserConfig, c12nDef } = useALContext();
   const { copy } = useClipboard();
-  const [confirmationDialog, setConfirmationDialog] = useState(false);
-  const [currentEvent, setCurrentEvent] = useState<Event>(null);
-  const [currentAllowBypass, setCurrentAllowBypass] = useState(false);
-  const [currentLinkClassification, setCurrentLinkClassification] = useState('');
-  const [safelistDialog, setSafelistDialog] = useState(false);
-  const [safelistReason, setSafelistReason] = useState<string>(null);
-  const [badlistDialog, setBadlistDialog] = useState(false);
-  const [badlistReason, setBadlistReason] = useState<string>(null);
-  const [waitingDialog, setWaitingDialog] = useState(false);
-  const [badlisted, setBadlisted] = useState(null);
-  const [safelisted, setSafelisted] = useState(null);
   const { showSuccessMessage } = useMySnackbar();
   const { triggerHighlight } = useHighlighter();
   const { apiCall } = useMyAPI();
-
   const { enrichTagExternal, enrichmentState, getKey } = useExternalLookup();
-  const externalLookupResults = enrichmentState[getKey(type, value)];
-  const [allInProgress, setAllInProgress] = useState(false);
-  const submitType = category === 'tag' && type.endsWith('.uri') ? 'url' : getSubmitType(value, currentUserConfig)[0];
 
-  useEffect(() => {
-    if (state.mouseY !== null) {
-      if (currentUser.roles.includes('safelist_manage')) {
-        if (category === 'tag') {
-          apiCall({
-            url: `/api/v4/safelist/${type}/${encodeURIComponent(encodeURIComponent(value))}/`,
-            method: 'GET',
-            onSuccess: resp => {
-              setSafelisted(resp.api_response);
-            },
-            onFailure: () => setSafelisted(null)
-          });
-        }
-        if (category === 'signature') {
-          apiCall({
-            url: `/api/v4/safelist/signature/${encodeURIComponent(encodeURIComponent(value))}/`,
-            method: 'GET',
-            onSuccess: resp => {
-              setSafelisted(resp.api_response);
-            },
-            onFailure: () => setSafelisted(null)
-          });
-        }
-      }
-      if (category === 'tag' && currentUser.roles.includes('badlist_manage')) {
-        apiCall({
-          url: `/api/v4/badlist/${type}/${encodeURIComponent(encodeURIComponent(value))}/`,
-          method: 'GET',
-          onSuccess: resp => {
-            setBadlisted(resp.api_response);
-          },
-          onFailure: () => setBadlisted(null)
-        });
-      }
-    }
+  const [confirmationDialog, setConfirmationDialog] = useState<boolean>(false);
+  const [currentEvent, setCurrentEvent] = useState<React.MouseEvent<HTMLAnchorElement, MouseEvent>>(null);
+  const [currentAllowBypass, setCurrentAllowBypass] = useState<boolean>(false);
+  const [currentLinkClassification, setCurrentLinkClassification] = useState<string>('');
+  const [safelistDialog, setSafelistDialog] = useState<boolean>(false);
+  const [safelistReason, setSafelistReason] = useState<string>(null);
+  const [badlistDialog, setBadlistDialog] = useState<boolean>(false);
+  const [badlistReason, setBadlistReason] = useState<string>(null);
+  const [waitingDialog, setWaitingDialog] = useState<boolean>(false);
+  const [badlisted, setBadlisted] = useState<Badlist>(null);
+  const [safelisted, setSafelisted] = useState<Safelist>(null);
+  const [allInProgress, setAllInProgress] = useState<boolean>(false);
+  const [externalLinks, setExternalLinks] = useState<ExternalLink[]>([]);
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state]);
+  const externalLookupResults = useMemo<ExternalEnrichmentResults>(
+    () => enrichmentState[getKey(type, value)],
+    [enrichmentState, getKey, type, value]
+  );
+
+  const submitType = useMemo<HashPatternMap>(
+    () => (category === 'tag' && type.endsWith('.uri') ? 'url' : getSubmitType(value, currentUserConfig)[0]),
+    [category, currentUserConfig, type, value]
+  );
+
+  const hasExternalQuery = useMemo<boolean>(
+    () =>
+      !!currentUser.roles.includes('external_query') &&
+      !!currentUserConfig.ui.external_sources?.length &&
+      type in currentUserConfig.ui.external_source_tags,
+    [
+      currentUser?.roles,
+      currentUserConfig?.ui?.external_source_tags,
+      currentUserConfig?.ui?.external_sources?.length,
+      type
+    ]
+  );
+
+  const hasExternalLinks = useMemo<boolean>(
+    () => category in currentUserConfig.ui.external_links && type in currentUserConfig.ui.external_links[category],
+    [category, currentUserConfig?.ui?.external_links, type]
+  );
 
   const handleClose = useCallback(() => {
     setState(initialMenuState);
@@ -159,7 +152,7 @@ const WrappedActionMenu: React.FC<TagProps> = ({
   }, [currentEvent]);
 
   const checkClassification = useCallback(
-    (event, link_classification, allow_bypass) => {
+    (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>, link_classification: string, allow_bypass: boolean) => {
       if (!isAccessible(link_classification, classification, c12nDef, c12nDef.enforce)) {
         event.preventDefault();
         setCurrentEvent(event);
@@ -173,12 +166,12 @@ const WrappedActionMenu: React.FC<TagProps> = ({
   );
 
   const handleMenuCopy = useCallback(() => {
-    copy(value);
+    void copy(value);
     handleClose();
   }, [copy, handleClose, value]);
 
   const handleMenuExternalSearch = useCallback(
-    source => {
+    (source: string) => {
       enrichTagExternal(source, type, value, classification);
       handleClose();
     },
@@ -198,7 +191,7 @@ const WrappedActionMenu: React.FC<TagProps> = ({
   }, [setSafelistDialog, handleClose]);
 
   const addToSafelist = useCallback(() => {
-    let data = null;
+    let data: Safelist = null;
     if (category === 'signature') {
       data = {
         signature: {
@@ -212,7 +205,7 @@ const WrappedActionMenu: React.FC<TagProps> = ({
           }
         ],
         type: 'signature'
-      };
+      } as Safelist;
     } else {
       data = {
         tag: {
@@ -228,14 +221,14 @@ const WrappedActionMenu: React.FC<TagProps> = ({
           }
         ],
         type: 'tag'
-      };
+      } as Safelist;
     }
 
     apiCall({
       url: `/api/v4/safelist/`,
       method: 'PUT',
       body: data,
-      onSuccess: _ => {
+      onSuccess: () => {
         setSafelistDialog(false);
         showSuccessMessage(t('safelist.success'));
       },
@@ -270,13 +263,13 @@ const WrappedActionMenu: React.FC<TagProps> = ({
         }
       ],
       type: 'tag'
-    };
+    } as Badlist;
 
     apiCall({
       url: `/api/v4/badlist/`,
       method: 'PUT',
       body: data,
-      onSuccess: _ => {
+      onSuccess: () => {
         setBadlistDialog(false);
         showSuccessMessage(t('badlist.success'));
       },
@@ -286,14 +279,38 @@ const WrappedActionMenu: React.FC<TagProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [badlistReason, t, type, value]);
 
-  const hasExternalQuery =
-    !!currentUser.roles.includes('external_query') &&
-    !!currentUserConfig.ui.external_sources?.length &&
-    !!currentUserConfig.ui.external_source_tags?.hasOwnProperty(type);
+  useEffect(() => {
+    if (state.mouseY !== null) {
+      if (currentUser.roles.includes('safelist_manage')) {
+        if (category === 'tag') {
+          apiCall<Safelist>({
+            url: `/api/v4/safelist/${type}/${encodeURIComponent(encodeURIComponent(value))}/`,
+            method: 'GET',
+            onSuccess: ({ api_response }) => setSafelisted(api_response),
+            onFailure: () => setSafelisted(null)
+          });
+        }
+        if (category === 'signature') {
+          apiCall<Safelist>({
+            url: `/api/v4/safelist/signature/${encodeURIComponent(encodeURIComponent(value))}/`,
+            method: 'GET',
+            onSuccess: ({ api_response }) => setSafelisted(api_response),
+            onFailure: () => setSafelisted(null)
+          });
+        }
+      }
+      if (category === 'tag' && currentUser.roles.includes('badlist_manage')) {
+        apiCall<Badlist>({
+          url: `/api/v4/badlist/${type}/${encodeURIComponent(encodeURIComponent(value))}/`,
+          method: 'GET',
+          onSuccess: ({ api_response }) => setBadlisted(api_response),
+          onFailure: () => setBadlisted(null)
+        });
+      }
+    }
 
-  const hasExternalLinks =
-    !!currentUserConfig.ui.external_links?.hasOwnProperty(category) &&
-    !!currentUserConfig.ui.external_links[category].hasOwnProperty(type);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state]);
 
   useEffect(() => {
     if (!!externalLookupResults) {
@@ -306,6 +323,40 @@ const WrappedActionMenu: React.FC<TagProps> = ({
       setAllInProgress(inProgress);
     }
   }, [externalLookupResults]);
+
+  useEffect(() => {
+    if (!hasExternalLinks) setExternalLinks([]);
+
+    const externalLinks = currentUserConfig.ui.external_links[category as ExternalLinkType][type];
+    if (externalLinks === undefined) {
+      setExternalLinks([]);
+      return;
+    }
+
+    void Promise.all(
+      externalLinks.map(
+        link =>
+          new Promise<ExternalLink>(async (resolve, reject) => {
+            try {
+              const targetValue = encodeURIComponent(
+                link.double_encode
+                  ? link.encoding === 'url'
+                    ? encodeURIComponent(value)
+                    : link.encoding === 'sha256'
+                      ? await getSHA256(value)
+                      : value
+                  : value
+              );
+
+              resolve({ ...link, url: link.url.replace(link.replace_pattern, targetValue) });
+              // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
+            } catch (err) {
+              reject(link);
+            }
+          })
+      )
+    ).then(links => setExternalLinks(links));
+  }, [category, currentUserConfig?.ui?.external_links, hasExternalLinks, type, value]);
 
   return hasExternalLinks ||
     hasExternalQuery ||
@@ -476,17 +527,14 @@ const WrappedActionMenu: React.FC<TagProps> = ({
               {t('external_link')}
             </ListSubheader>
 
-            {currentUserConfig.ui.external_links[category][type].map((link, i) => (
+            {externalLinks.map((link, i) => (
               <MenuItem
                 dense
                 component={MaterialLink}
                 key={`source_${i}`}
                 rel="noopener noreferrer"
                 target="_blank"
-                href={link.url.replace(
-                  link.replace_pattern,
-                  encodeURIComponent(link.double_encode ? encodeURIComponent(value) : value)
-                )}
+                href={link.url}
                 onClick={event => checkClassification(event, link.max_classification, link.allow_bypass)}
               >
                 {EXTERNAL_ICON} {link.name}
