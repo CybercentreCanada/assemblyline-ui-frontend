@@ -4,8 +4,14 @@ import { enCA, frCA } from 'date-fns/locale';
 import type { Moment } from 'moment';
 import moment from 'moment';
 
-// Week starts on Sunday (0 = Sunday, 1 = Monday, etc.)
-moment.updateLocale('en', { week: { dow: 0 } });
+// This function updates the week start for the specified locale
+function configureMomentLocale(language: string) {
+  moment.updateLocale(language, {
+    week: {
+      dow: 0 // Week starts on Sunday (0 = Sunday, 1 = Monday, etc.)
+    }
+  });
+}
 
 export const EN_CA: Locale = { ...enCA, options: { ...enCA.options, weekStartsOn: 0 } };
 export const FR_CA: Locale = { ...frCA, options: { ...frCA.options, weekStartsOn: 0 } };
@@ -61,7 +67,9 @@ export class LuceneDateTime {
   public rounding: RelativeDateTimeParts['rounding']; // The unit of time for rounding (optional, or null if not rounding)
   public variant: DateTimeVariant;
 
-  constructor(value: string, variant: DateTimeVariant = 'start') {
+  constructor(value: string, variant: DateTimeVariant, language: string) {
+    configureMomentLocale(language);
+
     this.value = value;
     this.variant = variant;
 
@@ -411,15 +419,18 @@ export class LuceneDateTimeGap {
     gap: string,
     start: string,
     end: string,
-    defaultInterval: number = 50,
-    defaultGap: `${number}${TimeSpan}` = '4h',
-    enabled: boolean = true
+    defaultInterval: number,
+    defaultGap: `${number}${TimeSpan}`,
+    enabled: boolean,
+    language: string
   ) {
+    configureMomentLocale(language);
+
     if (!enabled) {
       this.enabled = enabled;
     } else {
-      this.start = new LuceneDateTime(start, 'start');
-      this.end = new LuceneDateTime(end, 'end');
+      this.start = new LuceneDateTime(start, 'start', language);
+      this.end = new LuceneDateTime(end, 'end', language);
       this.interval = defaultInterval;
 
       const [gapAmount, gapTimeSpan] = LuceneDateTimeGap.parseGap(gap);
@@ -499,8 +510,8 @@ export class LuceneDateTimeGap {
    * @returns Updated instance.
    */
   public updateRange(newStart: string, newEnd: string): this {
-    this.start = new LuceneDateTime(newStart, 'start');
-    this.end = new LuceneDateTime(newEnd, 'end');
+    this.start = new LuceneDateTime(newStart, 'start', 'en');
+    this.end = new LuceneDateTime(newEnd, 'end', 'en');
     return this;
   }
 

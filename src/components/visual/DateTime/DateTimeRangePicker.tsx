@@ -682,8 +682,9 @@ const DateTimeInput = ({
               value.rounding = e.target.value as TimeSpan;
               onChange(e, value.toStringifiedParts());
             }}
+            slotProps={{ input: { sx: { ...(!value.rounding && { color: theme.palette.text.disabled }) } } }}
           >
-            <MenuItem color={theme.palette.text.disabled} value={null}>
+            <MenuItem color={theme.palette.text.disabled} value={null} sx={{ color: theme.palette.text.disabled }}>
               {t('none')}
             </MenuItem>
             {Object.keys(TIME_SPAN)
@@ -783,10 +784,10 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = React.mem
       gap: gapRaw
     } = useMemo<{ start: string; end: string; gap?: string }>(() => value, [value]);
 
-    const [start, setStart] = useState<LuceneDateTime>(new LuceneDateTime(startRaw, 'start'));
-    const [end, setEnd] = useState<LuceneDateTime>(new LuceneDateTime(endRaw, 'end'));
+    const [start, setStart] = useState<LuceneDateTime>(new LuceneDateTime(startRaw, 'start', i18n.language));
+    const [end, setEnd] = useState<LuceneDateTime>(new LuceneDateTime(endRaw, 'end', i18n.language));
     const [gap, setGap] = useState<LuceneDateTimeGap>(
-      new LuceneDateTimeGap(gapRaw, startRaw, endRaw, interval, defaultGap, hasGap)
+      new LuceneDateTimeGap(gapRaw, startRaw, endRaw, interval, defaultGap, hasGap, i18n.language)
     );
     const [error, setError] = useState<boolean>(false);
 
@@ -805,10 +806,10 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = React.mem
     }, [validateDateTimeRange, start, end, onChange, gap]);
 
     useEffect(() => {
-      setStart(new LuceneDateTime(startRaw, 'start'));
-      setEnd(new LuceneDateTime(endRaw, 'end'));
-      setGap(new LuceneDateTimeGap(gapRaw, startRaw, endRaw, interval, defaultGap, hasGap));
-    }, [defaultGap, endRaw, gapRaw, hasGap, interval, startRaw]);
+      setStart(new LuceneDateTime(startRaw, 'start', i18n.language));
+      setEnd(new LuceneDateTime(endRaw, 'end', i18n.language));
+      setGap(new LuceneDateTimeGap(gapRaw, startRaw, endRaw, interval, defaultGap, hasGap, i18n.language));
+    }, [defaultGap, endRaw, gapRaw, hasGap, i18n.language, interval, startRaw]);
 
     useEffect(() => {
       configureMomentLocale(i18n.language);
@@ -846,7 +847,7 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = React.mem
               variant="start"
               disabled={disabled}
               otherRounding={end.rounding}
-              onChange={(e, v) => setStart(() => new LuceneDateTime(v))}
+              onChange={(e, v) => setStart(new LuceneDateTime(v, 'start', i18n.language))}
               onApply={() => applyChanges()}
             />
 
@@ -865,7 +866,7 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = React.mem
               disabled={disabled}
               otherRounding={start.rounding}
               hasGap={hasGap}
-              onChange={(e, v) => setEnd(() => new LuceneDateTime(v))}
+              onChange={(e, v) => setEnd(new LuceneDateTime(v, 'end', i18n.language))}
               onApply={() => applyChanges()}
             />
 
@@ -877,7 +878,17 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = React.mem
                   value={gap}
                   disabled={disabled}
                   onChange={(e, v) =>
-                    setGap(() => new LuceneDateTimeGap(v, start.toLucene(), end.toLucene(), interval, defaultGap))
+                    setGap(
+                      new LuceneDateTimeGap(
+                        v,
+                        start.toLucene(),
+                        end.toLucene(),
+                        interval,
+                        defaultGap,
+                        hasGap,
+                        i18n.language
+                      )
+                    )
                   }
                   onApply={() => applyChanges()}
                 />

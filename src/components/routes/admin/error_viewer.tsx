@@ -45,7 +45,7 @@ const ERROR_VIEWER_PARAMS = createSearchParams(p => ({
 type ErrorViewerParams = SearchParams<typeof ERROR_VIEWER_PARAMS>;
 
 const ErrorViewer = () => {
-  const { t } = useTranslation(['adminErrorViewer']);
+  const { t, i18n } = useTranslation(['adminErrorViewer']);
   const theme = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
@@ -81,9 +81,9 @@ const ErrorViewer = () => {
     if (!search || !currentUser.is_admin) return;
 
     const body = search.set(o => {
-      const start = new LuceneDateTime(o.start).toLucene();
-      const end = new LuceneDateTime(o.end).toLucene();
-      const gap = new LuceneDateTimeGap(o.gap, start, end, 50, '4h').toString();
+      const start = new LuceneDateTime(o.start, 'start', i18n.language).toLucene();
+      const end = new LuceneDateTime(o.end, 'end', i18n.language).toLucene();
+      const gap = new LuceneDateTimeGap(o.gap, start, end, 50, '4h', true, i18n.language).toString();
 
       return {
         ...o,
