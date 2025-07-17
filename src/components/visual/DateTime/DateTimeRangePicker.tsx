@@ -4,6 +4,8 @@ import ArrowForwardIosOutlinedIcon from '@mui/icons-material/ArrowForwardIosOutl
 import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined';
 import ExpandMoreOutlinedIcon from '@mui/icons-material/ExpandMoreOutlined';
 import FilterListIcon from '@mui/icons-material/FilterList';
+import HistoryOutlinedIcon from '@mui/icons-material/HistoryOutlined';
+import UpdateOutlinedIcon from '@mui/icons-material/UpdateOutlined';
 import type { ButtonProps } from '@mui/material';
 import {
   Button,
@@ -15,9 +17,9 @@ import {
   Popover,
   Select,
   styled,
-  Tab,
-  Tabs,
   TextField,
+  ToggleButton,
+  ToggleButtonGroup,
   Tooltip,
   Typography,
   useTheme
@@ -28,7 +30,7 @@ import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
 import type { DateTimePickerProps } from '@mui/x-date-pickers/DateTimePicker';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-import type { DateTimeType, TimeSpan } from 'components/visual/DateTime/LuceneDateTime';
+import type { TimeSpan } from 'components/visual/DateTime/LuceneDateTime';
 import { LuceneDateTime, LuceneDateTimeGap, TIME_SPAN } from 'components/visual/DateTime/LuceneDateTime';
 import type { Moment } from 'moment';
 import moment from 'moment';
@@ -50,7 +52,7 @@ const StyledDigitalClock = styled(({ ...props }: DigitalClockProps<Moment>) => (
     {...props}
   />
 ))(() => ({
-  maxHeight: '300px',
+  maxHeight: '320px',
   '& .MuiDigitalClock-item': {
     fontSize: '12px'
   }
@@ -98,6 +100,8 @@ const StyledDateCalendar = styled(({ ...props }: DateCalendarProps<Moment>) => (
     views={['month', 'day']}
     // timezone="utc"
     showDaysOutsideCurrentMonth
+    sx={{ height: '320px' }}
+    slotProps={{ calendarHeader: { sx: { marginTop: '0px', marginBottom: '0px' } } }}
     {...props}
   />
 ))(() => ({}));
@@ -556,6 +560,16 @@ export const RELATIVE_DATETIME_OPTIONS = [
   { primary: '+y', value: '+y' }
 ] as const;
 
+export const RELATIVE_DATETIME_OPTIONS2 = [
+  { primary: 's', value: 's' },
+  { primary: 'm', value: 'm' },
+  { primary: 'h', value: 'h' },
+  { primary: 'd', value: 'd' },
+  { primary: 'w', value: 'w' },
+  { primary: 'M', value: 'M' },
+  { primary: 'y', value: 'y' }
+] as const;
+
 const RelativeTab = ({ value = null, variant, otherRounding = null, onChange = () => null }: DateTimeProps) => {
   const { t } = useTranslation('dateTime');
   const theme = useTheme();
@@ -687,6 +701,12 @@ const DateTimeInput = ({
     setTab(value.type);
   }, [value.type]);
 
+  const [amount, setAmount] = useState<number>(value.amount);
+
+  useEffect(() => {
+    setAmount(value.amount);
+  }, [value?.amount]);
+
   return (
     <>
       <Button
@@ -728,56 +748,173 @@ const DateTimeInput = ({
           enter: theme.transitions.duration.shortest,
           exit: theme.transitions.duration.shortest
         }}
-        slotProps={{ paper: { sx: { border: `1px solid ${theme.palette.divider}` } } }}
+        slotProps={{
+          paper: {
+            sx: {
+              width: '500px',
+              border: `1px solid ${theme.palette.divider}`,
+              // padding: theme.spacing(2),
+              display: 'flex',
+              flexDirection: 'column'
+              // rowGap: theme.spacing(2)
+            }
+          }
+        }}
       >
-        <Tabs
-          value={tab}
-          onChange={(e, t: DateTimeType) => setTab(t)}
-          indicatorColor="primary"
-          textColor="primary"
-          scrollButtons="auto"
-          centered
-          slotProps={{ list: { sx: { justifyContent: 'center' } } }}
-          sx={{ borderBottom: `1px solid ${theme.palette.divider}` }}
+        <div
+          style={{
+            padding: theme.spacing(1),
+            display: 'flex',
+            flexDirection: 'row',
+            flexWrap: 'nowrap',
+            alignItems: 'end',
+            gap: theme.spacing(1)
+          }}
         >
-          <Tab label={t('absolute')} value="absolute" />
-          <Tab label={t('relative')} value="relative" />
-          <Tab label={t('now')} value="now" />
-        </Tabs>
+          <div>
+            <Typography
+              component={InputLabel}
+              variant="body2"
+              whiteSpace="nowrap"
+              gutterBottom
+              children={value.sign === '+' ? t('time_from_now') : t('time_ago')}
+            />
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                flexWrap: 'nowrap',
+                gap: theme.spacing(1)
+              }}
+            >
+              <TextField
+                id="relative-amount-input"
+                size="small"
+                type="number"
+                variant="outlined"
+                value={amount === null ? '' : `${amount}`}
+                helperText={amount !== null ? null : t('amount.error')}
+                onChange={e => {
+                  const newAmount = [null, undefined, '', NaN].includes(e.target.value) ? null : Number(e.target.value);
+                  value.amount = newAmount === null ? value.amount : newAmount;
+                  setAmount(newAmount);
+                  onChange(e, value.toStringifiedParts());
+                }}
+                sx={{ width: '100px' }}
+                slotProps={{
+                  input: { inputProps: { min: 0 } },
+                  formHelperText: { sx: { color: theme.palette.error.main } }
+                }}
+              />
+
+              <Select
+                id="relative-datetime-select"
+                size="small"
+                value={value.timeSpan}
+                defaultValue={`-h`}
+                onChange={e => {
+                  value.timeSpan = e.target.value as TimeSpan;
+                  onChange(e, value.toStringifiedParts());
+                }}
+                sx={{ width: '135px' }}
+              >
+                {Object.keys(TIME_SPAN).map((value, i) => (
+                  <MenuItem key={`${value}-${i}`} value={value}>
+                    {t(`.${value}`)}
+                  </MenuItem>
+                ))}
+              </Select>
+            </div>
+          </div>
+
+          <ToggleButtonGroup
+            size="small"
+            aria-label="text alignment"
+            exclusive
+            value={value.sign}
+            onChange={(e, v) => {
+              value.sign = v as '+' | '-';
+              onChange(e, value.toStringifiedParts());
+            }}
+            sx={{ height: '40px' }}
+          >
+            <ToggleButton value="-" aria-label="left aligned">
+              <HistoryOutlinedIcon />
+            </ToggleButton>
+            <ToggleButton value="+" aria-label="centered">
+              <UpdateOutlinedIcon />
+            </ToggleButton>
+          </ToggleButtonGroup>
+
+          <div>
+            <Typography
+              component={InputLabel}
+              variant="body2"
+              whiteSpace="nowrap"
+              gutterBottom
+              children={t('rounded_to')}
+            />
+            <Select
+              id="timeSpan-input"
+              size="small"
+              fullWidth
+              value={value.rounding}
+              defaultValue={'h'}
+              // onChange={e => setTimeSpan(e.target.value as TimeSpan)}
+              displayEmpty
+              onChange={e => {
+                value.rounding = e.target.value as TimeSpan;
+                onChange(e, value.toStringifiedParts());
+              }}
+              sx={{ width: '135px' }}
+            >
+              <MenuItem color={theme.palette.text.disabled} value={null}>
+                {t('none')}
+              </MenuItem>
+              {Object.keys(TIME_SPAN)
+                .filter(v =>
+                  otherRounding === null
+                    ? true
+                    : variant === 'start'
+                      ? TIME_SPAN[v] >= TIME_SPAN[otherRounding]
+                      : TIME_SPAN[v] <= TIME_SPAN[otherRounding]
+                )
+                .map(v => (
+                  <MenuItem key={v} value={v}>
+                    {t(`.${v}`)}
+                  </MenuItem>
+                ))}
+            </Select>
+          </div>
+        </div>
+
+        <Divider />
 
         <div
           style={{
-            margin: theme.spacing(2),
-            display: 'flex',
-            flexDirection: 'column'
+            width: '100%',
+            padding: theme.spacing(1),
+            display: 'grid',
+            gridTemplateColumns: 'auto auto',
+            justifyContent: 'content',
+            gap: theme.spacing(0.25)
           }}
         >
-          {(() => {
-            switch (tab) {
-              case 'absolute':
-                return <AbsoluteTab value={value} variant={variant} onChange={onChange} />;
-              case 'relative':
-                return (
-                  <RelativeTab value={value} variant={variant} otherRounding={otherRounding} onChange={onChange} />
-                );
-              case 'now':
-                return (
-                  <div style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(2) }}>
-                    <Button
-                      size="small"
-                      variant="contained"
-                      onClick={event => {
-                        onChange(event, 'now');
-                        setAnchorEl(null);
-                      }}
-                      sx={{ textTransform: 'inherit' }}
-                    >
-                      {variant === 'end' ? t('set_end_now') : t('set_start_now')}
-                    </Button>
-                  </div>
-                );
-            }
-          })()}
+          <StyledDateCalendar value={value.absolute} onChange={(v: Moment) => onChange(null, v.toISOString())} />
+          <StyledDigitalClock value={value.absolute} onChange={(v: Moment) => onChange(null, v.toISOString())} />
+        </div>
+
+        <Divider />
+
+        <div style={{ padding: theme.spacing(1) }}>
+          <Typography
+            component={InputLabel}
+            variant="body2"
+            whiteSpace="nowrap"
+            gutterBottom
+            children={variant === 'start' ? t('start_date') : t('end_date')}
+          />
+          <StyledDateTimePicker value={value.absolute} onChange={v => onChange(null, v.toISOString())} />
         </div>
       </Popover>
     </>

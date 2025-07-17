@@ -51,9 +51,12 @@
   "previous_window": "Previous time window",
   "quick_select": "Quick select",
   "relative": "Relative",
+  "rounded_to": "Rounded to",
   "set_end_now": "Set end date and time to now",
   "set_start_now": "Set start date and time to now",
   "start_date": "Start date",
   "this_week": "This week",
+  "time_ago": "Time ago",
+  "time_from_now": "Time from now",
   "today": "Today"
 }

@@ -51,9 +51,12 @@
   "previous_window": "Fenêtre temporelle précédente",
   "quick_select": "Sélection rapide",
   "relative": "Relatif",
+  "rounded_to": "arrondi aux",
   "set_end_now": "Définir la date et l'heure de fin à maintenant",
   "set_start_now": "Définir la date et l'heure de début à maintenant",
   "start_date": "Date de début",
   "this_week": "Cette semaine",
+  "time_ago": "Temps passé",
+  "time_from_now": "Temps futur",
   "today": "Aujourd'hui"
 }
