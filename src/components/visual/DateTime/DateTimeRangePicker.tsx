@@ -753,79 +753,74 @@ const DateTimeInput = ({
             sx: {
               width: '500px',
               border: `1px solid ${theme.palette.divider}`,
-              // padding: theme.spacing(2),
               display: 'flex',
               flexDirection: 'column'
-              // rowGap: theme.spacing(2)
             }
           }
         }}
       >
         <div
           style={{
-            padding: theme.spacing(1),
-            display: 'flex',
-            flexDirection: 'row',
-            flexWrap: 'nowrap',
-            alignItems: 'end',
-            gap: theme.spacing(1)
+            padding: theme.spacing(2),
+            paddingBottom: theme.spacing(1),
+            display: 'grid',
+            gridTemplateColumns: '110px 126px 80px 126px',
+            alignItems: 'start',
+            columnGap: theme.spacing(1)
           }}
         >
-          <div>
-            <Typography
-              component={InputLabel}
-              variant="body2"
-              whiteSpace="nowrap"
-              gutterBottom
-              children={value.sign === '+' ? t('time_from_now') : t('time_ago')}
-            />
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'row',
-                flexWrap: 'nowrap',
-                gap: theme.spacing(1)
-              }}
-            >
-              <TextField
-                id="relative-amount-input"
-                size="small"
-                type="number"
-                variant="outlined"
-                value={amount === null ? '' : `${amount}`}
-                helperText={amount !== null ? null : t('amount.error')}
-                onChange={e => {
-                  const newAmount = [null, undefined, '', NaN].includes(e.target.value) ? null : Number(e.target.value);
-                  value.amount = newAmount === null ? value.amount : newAmount;
-                  setAmount(newAmount);
-                  onChange(e, value.toStringifiedParts());
-                }}
-                sx={{ width: '100px' }}
-                slotProps={{
-                  input: { inputProps: { min: 0 } },
-                  formHelperText: { sx: { color: theme.palette.error.main } }
-                }}
-              />
+          <Typography
+            component={InputLabel}
+            variant="body2"
+            whiteSpace="nowrap"
+            gutterBottom
+            children={value.sign === '+' ? t('time_from_now') : t('time_ago')}
+            sx={{ gridColumn: 'span 3' }}
+          />
 
-              <Select
-                id="relative-datetime-select"
-                size="small"
-                value={value.timeSpan}
-                defaultValue={`-h`}
-                onChange={e => {
-                  value.timeSpan = e.target.value as TimeSpan;
-                  onChange(e, value.toStringifiedParts());
-                }}
-                sx={{ width: '135px' }}
-              >
-                {Object.keys(TIME_SPAN).map((value, i) => (
-                  <MenuItem key={`${value}-${i}`} value={value}>
-                    {t(`.${value}`)}
-                  </MenuItem>
-                ))}
-              </Select>
-            </div>
-          </div>
+          <Typography
+            component={InputLabel}
+            variant="body2"
+            whiteSpace="nowrap"
+            gutterBottom
+            children={t('rounded_to')}
+          />
+
+          <TextField
+            id="relative-amount-input"
+            size="small"
+            type="number"
+            variant="outlined"
+            value={amount === null ? '' : `${amount}`}
+            helperText={amount !== null ? null : t('amount.error')}
+            onChange={e => {
+              const newAmount = [null, undefined, '', NaN].includes(e.target.value) ? null : Number(e.target.value);
+              value.amount = newAmount === null ? value.amount : newAmount;
+              setAmount(newAmount);
+              onChange(e, value.toStringifiedParts());
+            }}
+            slotProps={{
+              input: { inputProps: { min: 0 } },
+              formHelperText: { sx: { color: theme.palette.error.main } }
+            }}
+          />
+
+          <Select
+            id="relative-datetime-select"
+            size="small"
+            value={value.timeSpan}
+            defaultValue={`-h`}
+            onChange={e => {
+              value.timeSpan = e.target.value as TimeSpan;
+              onChange(e, value.toStringifiedParts());
+            }}
+          >
+            {Object.keys(TIME_SPAN).map((value, i) => (
+              <MenuItem key={`${value}-${i}`} value={value}>
+                {t(`.${value}`)}
+              </MenuItem>
+            ))}
+          </Select>
 
           <ToggleButtonGroup
             size="small"
@@ -846,46 +841,35 @@ const DateTimeInput = ({
             </ToggleButton>
           </ToggleButtonGroup>
 
-          <div>
-            <Typography
-              component={InputLabel}
-              variant="body2"
-              whiteSpace="nowrap"
-              gutterBottom
-              children={t('rounded_to')}
-            />
-            <Select
-              id="timeSpan-input"
-              size="small"
-              fullWidth
-              value={value.rounding}
-              defaultValue={'h'}
-              // onChange={e => setTimeSpan(e.target.value as TimeSpan)}
-              displayEmpty
-              onChange={e => {
-                value.rounding = e.target.value as TimeSpan;
-                onChange(e, value.toStringifiedParts());
-              }}
-              sx={{ width: '135px' }}
-            >
-              <MenuItem color={theme.palette.text.disabled} value={null}>
-                {t('none')}
-              </MenuItem>
-              {Object.keys(TIME_SPAN)
-                .filter(v =>
-                  otherRounding === null
-                    ? true
-                    : variant === 'start'
-                      ? TIME_SPAN[v] >= TIME_SPAN[otherRounding]
-                      : TIME_SPAN[v] <= TIME_SPAN[otherRounding]
-                )
-                .map(v => (
-                  <MenuItem key={v} value={v}>
-                    {t(`.${v}`)}
-                  </MenuItem>
-                ))}
-            </Select>
-          </div>
+          <Select
+            id="timeSpan-input"
+            size="small"
+            fullWidth
+            value={value.rounding}
+            defaultValue={'h'}
+            displayEmpty
+            onChange={e => {
+              value.rounding = e.target.value as TimeSpan;
+              onChange(e, value.toStringifiedParts());
+            }}
+          >
+            <MenuItem color={theme.palette.text.disabled} value={null}>
+              {t('none')}
+            </MenuItem>
+            {Object.keys(TIME_SPAN)
+              .filter(v =>
+                otherRounding === null
+                  ? true
+                  : variant === 'start'
+                    ? TIME_SPAN[v] >= TIME_SPAN[otherRounding]
+                    : TIME_SPAN[v] <= TIME_SPAN[otherRounding]
+              )
+              .map(v => (
+                <MenuItem key={v} value={v}>
+                  {t(`.${v}`)}
+                </MenuItem>
+              ))}
+          </Select>
         </div>
 
         <Divider />
@@ -893,7 +877,7 @@ const DateTimeInput = ({
         <div
           style={{
             width: '100%',
-            padding: theme.spacing(1),
+            padding: `${theme.spacing(1)} ${theme.spacing(2)}`,
             display: 'grid',
             gridTemplateColumns: 'auto auto',
             justifyContent: 'content',
@@ -906,7 +890,7 @@ const DateTimeInput = ({
 
         <Divider />
 
-        <div style={{ padding: theme.spacing(1) }}>
+        <div style={{ padding: theme.spacing(2), paddingTop: theme.spacing(1) }}>
           <Typography
             component={InputLabel}
             variant="body2"
