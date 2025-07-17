@@ -55,6 +55,8 @@
   "rounded_to": "Rounded to",
   "set_end_now": "Set end date and time to now",
   "set_start_now": "Set start date and time to now",
+  "set_time_ago": "Set to a time in the past",
+  "set_time_from_now": "Set to a time in the future",
   "start_date": "Start date",
   "this_week": "This week",
   "time_ago": "Time ago",

@@ -659,12 +659,16 @@ const DateTimeInput = ({
             }}
             sx={{ height: '40px' }}
           >
-            <ToggleButton value="-" aria-label="left aligned">
-              <HistoryOutlinedIcon />
-            </ToggleButton>
-            <ToggleButton value="+" aria-label="centered">
-              <UpdateOutlinedIcon />
-            </ToggleButton>
+            <Tooltip title={t('set_time_ago')}>
+              <ToggleButton value="-" aria-label="left aligned">
+                <HistoryOutlinedIcon />
+              </ToggleButton>
+            </Tooltip>
+            <Tooltip title={t('set_time_from_now')}>
+              <ToggleButton value="+" aria-label="centered">
+                <UpdateOutlinedIcon />
+              </ToggleButton>
+            </Tooltip>
           </ToggleButtonGroup>
 
           <Select
@@ -716,15 +720,36 @@ const DateTimeInput = ({
 
         <Divider />
 
-        <div style={{ padding: theme.spacing(2), paddingTop: theme.spacing(1) }}>
+        <div
+          style={{
+            padding: theme.spacing(2),
+            paddingTop: theme.spacing(1),
+            display: 'grid',
+            gridTemplateColumns: '1fr auto',
+            columnGap: theme.spacing(1)
+          }}
+        >
           <Typography
             component={InputLabel}
             variant="body2"
             whiteSpace="nowrap"
             gutterBottom
             children={variant === 'start' ? t('start_date') : t('end_date')}
+            sx={{ gridColumn: 'span 2' }}
           />
+
           <StyledDateTimePicker value={value.absolute} onChange={v => onChange(null, v.toISOString())} />
+
+          <Tooltip title={variant === 'end' ? t('set_end_now') : t('set_start_now')}>
+            <Button
+              size="small"
+              variant="contained"
+              onClick={event => onChange(event, 'now')}
+              sx={{ textTransform: 'inherit' }}
+            >
+              {t('now')}
+            </Button>
+          </Tooltip>
         </div>
       </Popover>
     </>
