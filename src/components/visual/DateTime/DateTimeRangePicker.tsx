@@ -4,6 +4,8 @@ import ArrowForwardIosOutlinedIcon from '@mui/icons-material/ArrowForwardIosOutl
 import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined';
 import ExpandMoreOutlinedIcon from '@mui/icons-material/ExpandMoreOutlined';
 import FilterListIcon from '@mui/icons-material/FilterList';
+import HistoryOutlinedIcon from '@mui/icons-material/HistoryOutlined';
+import UpdateOutlinedIcon from '@mui/icons-material/UpdateOutlined';
 import type { ButtonProps } from '@mui/material';
 import {
   Button,
@@ -15,9 +17,9 @@ import {
   Popover,
   Select,
   styled,
-  Tab,
-  Tabs,
   TextField,
+  ToggleButton,
+  ToggleButtonGroup,
   Tooltip,
   Typography,
   useTheme
@@ -28,9 +30,8 @@ import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
 import type { DateTimePickerProps } from '@mui/x-date-pickers/DateTimePicker';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-import type { DateTimeType, TimeSpan } from 'components/visual/DateTime/LuceneDateTime';
-import { LuceneDateTime, LuceneDateTimeGap } from 'components/visual/DateTime/LuceneDateTime';
-import { SwitchInput } from 'components/visual/Inputs/SwitchInput';
+import type { TimeSpan } from 'components/visual/DateTime/LuceneDateTime';
+import { LuceneDateTime, LuceneDateTimeGap, TIME_SPAN } from 'components/visual/DateTime/LuceneDateTime';
 import type { Moment } from 'moment';
 import moment from 'moment';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -51,7 +52,7 @@ const StyledDigitalClock = styled(({ ...props }: DigitalClockProps<Moment>) => (
     {...props}
   />
 ))(() => ({
-  maxHeight: '300px',
+  maxHeight: '320px',
   '& .MuiDigitalClock-item': {
     fontSize: '12px'
   }
@@ -99,6 +100,8 @@ const StyledDateCalendar = styled(({ ...props }: DateCalendarProps<Moment>) => (
     views={['month', 'day']}
     // timezone="utc"
     showDaysOutsideCurrentMonth
+    sx={{ height: '320px' }}
+    slotProps={{ calendarHeader: { sx: { marginTop: '0px', marginBottom: '0px' } } }}
     {...props}
   />
 ))(() => ({}));
@@ -265,7 +268,7 @@ const QuickSelectMenu = ({
                 width: 'auto',
                 display: 'grid',
                 gridTemplateColumns: 'repeat(4, 1fr)',
-                alignItems: 'end',
+                alignItems: 'start',
                 gap: theme.spacing(1)
               }}
             >
@@ -285,9 +288,16 @@ const QuickSelectMenu = ({
                 size="small"
                 type="number"
                 variant="outlined"
-                value={`${amount}`}
-                onChange={e => setAmount(Number(e.target.value))}
-                slotProps={{ input: { inputProps: { min: 0 } } }}
+                value={amount === null ? '' : `${amount}`}
+                helperText={amount !== null ? null : t('amount.error')}
+                onChange={e => {
+                  if ([null, undefined, '', NaN].includes(e.target.value)) setAmount(null);
+                  else setAmount(Number(e.target.value));
+                }}
+                slotProps={{
+                  input: { inputProps: { min: 0 } },
+                  formHelperText: { sx: { color: theme.palette.error.main } }
+                }}
                 sx={{ width: '140px' }}
               />
 
@@ -308,6 +318,7 @@ const QuickSelectMenu = ({
               </Select>
 
               <Button
+                disabled={amount === null}
                 size="small"
                 variant="contained"
                 onClick={e => {
@@ -383,11 +394,14 @@ const GapInput = ({ value = null, disabled = false, onChange = () => null, onApp
   const theme = useTheme();
   const { t } = useTranslation('dateTime');
 
+  const [amount, setAmount] = useState<number>(value.amount);
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
 
   const open = useMemo<boolean>(() => Boolean(anchorEl), [anchorEl]);
 
-  const [amount, timeSpan] = useMemo<[number, TimeSpan]>(() => value.toValues(), [value]);
+  useEffect(() => {
+    setAmount(value.amount);
+  }, [value?.amount]);
 
   return (
     <>
@@ -443,6 +457,7 @@ const GapInput = ({ value = null, disabled = false, onChange = () => null, onApp
             style={{
               display: 'grid',
               gridTemplateColumns: '1fr 1fr',
+              alignItems: 'start',
               columnGap: theme.spacing(1)
             }}
           >
@@ -451,15 +466,26 @@ const GapInput = ({ value = null, disabled = false, onChange = () => null, onApp
               size="small"
               type="number"
               variant="outlined"
-              value={`${amount}`}
-              onChange={e => onChange(e, `${Number(e.target.value)}${timeSpan}`)}
-              slotProps={{ input: { inputProps: { min: 1 } } }}
+              value={amount === null ? '' : `${amount}`}
+              helperText={amount !== null ? null : t('gap.amount.error')}
+              onChange={e => {
+                const newAmount = [null, undefined, '', NaN].includes(e.target.value)
+                  ? null
+                  : Math.max(Number(e.target.value), 1);
+                value.amount = newAmount === null ? value.amount : newAmount;
+                setAmount(newAmount);
+                onChange(e, `${value.amount}${value.timeSpan}`);
+              }}
+              slotProps={{
+                input: { inputProps: { min: 1 } },
+                formHelperText: { sx: { color: theme.palette.error.main } }
+              }}
             />
 
             <Select
               id="gap-datetime-select"
               size="small"
-              value={timeSpan}
+              value={value.timeSpan}
               defaultValue={`h`}
               onChange={e => onChange(e, `${amount}${e.target.value || 'h'}`)}
             >
@@ -476,154 +502,12 @@ const GapInput = ({ value = null, disabled = false, onChange = () => null, onApp
   );
 };
 
-type DateTimeProps = {
-  value: LuceneDateTime;
-  variant: 'start' | 'end';
-  onChange: (event: unknown, value: string) => void;
-  onApply?: () => void;
-};
-
-const AbsoluteTab = ({ value, variant = 'start', onChange = () => null }: DateTimeProps) => {
-  const { t } = useTranslation('dateTime');
-  const theme = useTheme();
-
-  return (
-    <>
-      <div
-        style={{
-          width: '100%',
-          display: 'grid',
-          gridTemplateColumns: 'auto auto',
-          gap: theme.spacing(0.25),
-          alignItems: 'center'
-        }}
-      >
-        <StyledDateCalendar value={value.absolute} onChange={(v: Moment) => onChange(null, v.toISOString())} />
-        <StyledDigitalClock value={value.absolute} onChange={(v: Moment) => onChange(null, v.toISOString())} />
-      </div>
-      <div>
-        <Typography
-          component={InputLabel}
-          variant="body2"
-          whiteSpace="nowrap"
-          gutterBottom
-          children={variant === 'start' ? t('start_date') : t('end_date')}
-        />
-        <StyledDateTimePicker value={value.absolute} onChange={v => onChange(null, v.toISOString())} />
-      </div>
-    </>
-  );
-};
-
-export const RELATIVE_DATETIME_OPTIONS = [
-  { primary: '-s', value: '-s' },
-  { primary: '-m', value: '-m' },
-  { primary: '-h', value: '-h' },
-  { primary: '-d', value: '-d' },
-  { primary: '-w', value: '-w' },
-  { primary: '-M', value: '-M' },
-  { primary: '-y', value: '-y' },
-
-  { primary: '+s', value: '+s' },
-  { primary: '+m', value: '+m' },
-  { primary: '+h', value: '+h' },
-  { primary: '+d', value: '+d' },
-  { primary: '+w', value: '+w' },
-  { primary: '+M', value: '+M' },
-  { primary: '+y', value: '+y' }
-] as const;
-
-const RelativeTab = ({ value = null, variant, onChange = () => null }: DateTimeProps) => {
-  const { t } = useTranslation('dateTime');
-  const theme = useTheme();
-
-  return (
-    <div
-      style={{
-        display: 'grid',
-        gridTemplateColumns: '1fr 1fr',
-        gap: theme.spacing(1)
-      }}
-    >
-      <TextField
-        id="relative-amount-input"
-        size="small"
-        type="number"
-        variant="outlined"
-        value={`${value.amount}`}
-        onChange={e => {
-          value.amount = Number(e.target.value);
-          onChange(e, value.toStringifiedParts());
-        }}
-        slotProps={{ input: { inputProps: { min: 0 } } }}
-      />
-
-      <Select
-        id="relative-datetime-select"
-        size="small"
-        value={`${value.sign}${value.timeSpan}`}
-        defaultValue={`-h`}
-        onChange={e => {
-          value.sign = (e.target.value?.[0] as '+' | '-') || '-';
-          value.timeSpan = (e.target.value?.[1] as TimeSpan) || 'h';
-          onChange(e, value.toStringifiedParts());
-        }}
-      >
-        {RELATIVE_DATETIME_OPTIONS.map(({ primary, value }, i) => (
-          <MenuItem key={`${value}-${i}`} value={value}>
-            {t(primary)}
-          </MenuItem>
-        ))}
-      </Select>
-
-      <div style={{ gridColumn: 'span 2' }}>
-        <Typography
-          component={InputLabel}
-          variant="body2"
-          whiteSpace="nowrap"
-          gutterBottom
-          children={variant === 'start' ? t('start_date') : t('end_date')}
-        />
-        <StyledDateTimePicker value={value.absolute} readOnly />
-      </div>
-
-      <div style={{ gridColumn: 'span 2' }}>
-        <SwitchInput
-          label={t(`/${value.timeSpan}`)}
-          value={!!value.rounded && value.timeSpan === value.rounded}
-          onChange={(e, v) => {
-            value.rounded = v ? value.timeSpan : null;
-            onChange(e, value.toStringifiedParts());
-          }}
-        />
-      </div>
-    </div>
-  );
-};
-
-const NowTab = ({ variant = null, onChange = () => null }: DateTimeProps) => {
-  const { t } = useTranslation('dateTime');
-  const theme = useTheme();
-
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(2) }}>
-      <Button
-        size="small"
-        variant="contained"
-        onClick={event => onChange(event, 'now')}
-        sx={{ textTransform: 'inherit' }}
-      >
-        {variant === 'end' ? t('set_end_now') : t('set_start_now')}
-      </Button>
-    </div>
-  );
-};
-
 type DateTimeInputProps = {
   value: LuceneDateTime;
   variant: 'start' | 'end';
   disabled?: boolean;
   hasGap?: boolean;
+  otherRounding?: TimeSpan;
   onChange: (event: unknown, value: string) => void;
   onApply: () => void;
 };
@@ -633,6 +517,7 @@ const DateTimeInput = ({
   variant,
   disabled = false,
   hasGap = true,
+  otherRounding = null,
   onChange = () => null,
   onApply = () => null
 }: DateTimeInputProps) => {
@@ -640,13 +525,13 @@ const DateTimeInput = ({
   const { t, i18n } = useTranslation('dateTime');
 
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
-  const [tab, setTab] = useState<'absolute' | 'relative' | 'now'>(value.type);
+  const [amount, setAmount] = useState<number>(value.amount);
 
   const open = useMemo<boolean>(() => Boolean(anchorEl), [anchorEl]);
 
   useEffect(() => {
-    setTab(value.type);
-  }, [value.type]);
+    setAmount(value.amount);
+  }, [value?.amount]);
 
   return (
     <>
@@ -689,40 +574,183 @@ const DateTimeInput = ({
           enter: theme.transitions.duration.shortest,
           exit: theme.transitions.duration.shortest
         }}
-        slotProps={{ paper: { sx: { border: `1px solid ${theme.palette.divider}` } } }}
+        slotProps={{
+          paper: {
+            sx: {
+              width: '500px',
+              border: `1px solid ${theme.palette.divider}`,
+              display: 'flex',
+              flexDirection: 'column'
+            }
+          }
+        }}
       >
-        <Tabs
-          value={tab}
-          onChange={(e, t: DateTimeType) => setTab(t)}
-          indicatorColor="primary"
-          textColor="primary"
-          scrollButtons="auto"
-          centered
-          slotProps={{ list: { sx: { justifyContent: 'center' } } }}
-          sx={{ borderBottom: `1px solid ${theme.palette.divider}` }}
+        <div
+          style={{
+            padding: theme.spacing(2),
+            paddingBottom: theme.spacing(1),
+            display: 'grid',
+            gridTemplateColumns: '110px 126px 80px 126px',
+            alignItems: 'start',
+            columnGap: theme.spacing(1)
+          }}
         >
-          <Tab label={t('absolute')} value="absolute" />
-          <Tab label={t('relative')} value="relative" />
-          <Tab label={t('now')} value="now" />
-        </Tabs>
+          <Typography
+            component={InputLabel}
+            variant="body2"
+            whiteSpace="nowrap"
+            gutterBottom
+            children={value.sign === '+' ? t('time_from_now') : t('time_ago')}
+            sx={{ gridColumn: 'span 3' }}
+          />
+
+          <Typography
+            component={InputLabel}
+            variant="body2"
+            whiteSpace="nowrap"
+            gutterBottom
+            children={t('rounded_to')}
+          />
+
+          <TextField
+            id="relative-amount-input"
+            size="small"
+            type="number"
+            variant="outlined"
+            value={amount === null ? '' : `${amount}`}
+            helperText={amount !== null ? null : t('amount.error')}
+            onChange={e => {
+              const newAmount = [null, undefined, '', NaN].includes(e.target.value) ? null : Number(e.target.value);
+              value.amount = newAmount === null ? value.amount : newAmount;
+              setAmount(newAmount);
+              onChange(e, value.toStringifiedParts());
+            }}
+            slotProps={{
+              input: { inputProps: { min: 0 } },
+              formHelperText: { sx: { color: theme.palette.error.main } }
+            }}
+          />
+
+          <Select
+            id="relative-datetime-select"
+            size="small"
+            value={value.timeSpan}
+            defaultValue={`-h`}
+            onChange={e => {
+              value.timeSpan = e.target.value as TimeSpan;
+              onChange(e, value.toStringifiedParts());
+            }}
+          >
+            {Object.keys(TIME_SPAN).map((value, i) => (
+              <MenuItem key={`${value}-${i}`} value={value}>
+                {t(`.${value}`)}
+              </MenuItem>
+            ))}
+          </Select>
+
+          <ToggleButtonGroup
+            size="small"
+            aria-label="text alignment"
+            exclusive
+            value={value.sign}
+            onChange={(e, v) => {
+              value.sign = v as '+' | '-';
+              onChange(e, value.toStringifiedParts());
+            }}
+            sx={{ height: '40px' }}
+          >
+            <Tooltip title={t('set_time_ago')}>
+              <ToggleButton value="-" aria-label="left aligned">
+                <HistoryOutlinedIcon />
+              </ToggleButton>
+            </Tooltip>
+            <Tooltip title={t('set_time_from_now')}>
+              <ToggleButton value="+" aria-label="centered">
+                <UpdateOutlinedIcon />
+              </ToggleButton>
+            </Tooltip>
+          </ToggleButtonGroup>
+
+          <Select
+            id="timeSpan-input"
+            size="small"
+            fullWidth
+            value={value.rounding}
+            defaultValue={'h'}
+            displayEmpty
+            onChange={e => {
+              value.rounding = e.target.value as TimeSpan;
+              onChange(e, value.toStringifiedParts());
+            }}
+            slotProps={{ input: { sx: { ...(!value.rounding && { color: theme.palette.text.disabled }) } } }}
+          >
+            <MenuItem color={theme.palette.text.disabled} value={null} sx={{ color: theme.palette.text.disabled }}>
+              {t('none')}
+            </MenuItem>
+            {Object.keys(TIME_SPAN)
+              .filter(v =>
+                otherRounding === null
+                  ? true
+                  : variant === 'start'
+                    ? TIME_SPAN[v] >= TIME_SPAN[otherRounding]
+                    : TIME_SPAN[v] <= TIME_SPAN[otherRounding]
+              )
+              .map(v => (
+                <MenuItem key={v} value={v}>
+                  {t(`.${v}`)}
+                </MenuItem>
+              ))}
+          </Select>
+        </div>
+
+        <Divider />
 
         <div
           style={{
-            margin: theme.spacing(2),
-            display: 'flex',
-            flexDirection: 'column'
+            width: '100%',
+            padding: `${theme.spacing(1)} ${theme.spacing(2)}`,
+            display: 'grid',
+            gridTemplateColumns: 'auto auto',
+            justifyContent: 'content',
+            gap: theme.spacing(0.25)
           }}
         >
-          {(() => {
-            switch (tab) {
-              case 'absolute':
-                return <AbsoluteTab value={value} variant={variant} onChange={onChange} />;
-              case 'relative':
-                return <RelativeTab value={value} variant={variant} onChange={onChange} />;
-              case 'now':
-                return <NowTab value={value} variant={variant} onChange={onChange} />;
-            }
-          })()}
+          <StyledDateCalendar value={value.absolute} onChange={(v: Moment) => onChange(null, v.toISOString())} />
+          <StyledDigitalClock value={value.absolute} onChange={(v: Moment) => onChange(null, v.toISOString())} />
+        </div>
+
+        <Divider />
+
+        <div
+          style={{
+            padding: theme.spacing(2),
+            paddingTop: theme.spacing(1),
+            display: 'grid',
+            gridTemplateColumns: '1fr auto',
+            columnGap: theme.spacing(1)
+          }}
+        >
+          <Typography
+            component={InputLabel}
+            variant="body2"
+            whiteSpace="nowrap"
+            gutterBottom
+            children={variant === 'start' ? t('start_date') : t('end_date')}
+            sx={{ gridColumn: 'span 2' }}
+          />
+
+          <StyledDateTimePicker value={value.absolute} onChange={v => onChange(null, v.toISOString())} />
+
+          <Tooltip title={variant === 'end' ? t('set_end_now') : t('set_start_now')}>
+            <Button
+              size="small"
+              variant="contained"
+              onClick={event => onChange(event, 'now')}
+              sx={{ textTransform: 'inherit' }}
+            >
+              {t('now')}
+            </Button>
+          </Tooltip>
         </div>
       </Popover>
     </>
@@ -756,10 +784,10 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = React.mem
       gap: gapRaw
     } = useMemo<{ start: string; end: string; gap?: string }>(() => value, [value]);
 
-    const [start, setStart] = useState<LuceneDateTime>(new LuceneDateTime(startRaw, 'start'));
-    const [end, setEnd] = useState<LuceneDateTime>(new LuceneDateTime(endRaw, 'end'));
+    const [start, setStart] = useState<LuceneDateTime>(new LuceneDateTime(startRaw, 'start', i18n.language));
+    const [end, setEnd] = useState<LuceneDateTime>(new LuceneDateTime(endRaw, 'end', i18n.language));
     const [gap, setGap] = useState<LuceneDateTimeGap>(
-      new LuceneDateTimeGap(gapRaw, startRaw, endRaw, interval, defaultGap)
+      new LuceneDateTimeGap(gapRaw, startRaw, endRaw, interval, defaultGap, hasGap, i18n.language)
     );
     const [error, setError] = useState<boolean>(false);
 
@@ -778,10 +806,10 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = React.mem
     }, [validateDateTimeRange, start, end, onChange, gap]);
 
     useEffect(() => {
-      setStart(new LuceneDateTime(startRaw, 'start'));
-      setEnd(new LuceneDateTime(endRaw, 'end'));
-      setGap(new LuceneDateTimeGap(gapRaw, startRaw, endRaw, interval, defaultGap));
-    }, [defaultGap, endRaw, gapRaw, interval, startRaw]);
+      setStart(new LuceneDateTime(startRaw, 'start', i18n.language));
+      setEnd(new LuceneDateTime(endRaw, 'end', i18n.language));
+      setGap(new LuceneDateTimeGap(gapRaw, startRaw, endRaw, interval, defaultGap, hasGap, i18n.language));
+    }, [defaultGap, endRaw, gapRaw, hasGap, i18n.language, interval, startRaw]);
 
     useEffect(() => {
       configureMomentLocale(i18n.language);
@@ -818,7 +846,8 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = React.mem
               value={start}
               variant="start"
               disabled={disabled}
-              onChange={(e, v) => setStart(() => new LuceneDateTime(v))}
+              otherRounding={end.rounding}
+              onChange={(e, v) => setStart(new LuceneDateTime(v, 'start', i18n.language))}
               onApply={() => applyChanges()}
             />
 
@@ -835,8 +864,9 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = React.mem
               value={end}
               variant="end"
               disabled={disabled}
+              otherRounding={start.rounding}
               hasGap={hasGap}
-              onChange={(e, v) => setEnd(() => new LuceneDateTime(v))}
+              onChange={(e, v) => setEnd(new LuceneDateTime(v, 'end', i18n.language))}
               onApply={() => applyChanges()}
             />
 
@@ -848,7 +878,17 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = React.mem
                   value={gap}
                   disabled={disabled}
                   onChange={(e, v) =>
-                    setGap(() => new LuceneDateTimeGap(v, start.toLucene(), end.toLucene(), interval, defaultGap))
+                    setGap(
+                      new LuceneDateTimeGap(
+                        v,
+                        start.toLucene(),
+                        end.toLucene(),
+                        interval,
+                        defaultGap,
+                        hasGap,
+                        i18n.language
+                      )
+                    )
                   }
                   onApply={() => applyChanges()}
                 />
