@@ -527,7 +527,7 @@ const WrappedActionMenu = ({
               {t('external_link')}
             </ListSubheader>
 
-            {externalLinks?.map((link, i) => (
+            {externalLinks.map((link, i) => (
               <MenuItem
                 dense
                 component={MaterialLink}
