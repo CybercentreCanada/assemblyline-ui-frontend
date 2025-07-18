@@ -27,7 +27,7 @@ const WrappedInfoSection: React.FC<Props> = ({ submission }) => {
   const isDownMD = useMediaQuery(theme.breakpoints.down('md'));
 
   const groupedServices = useMemo<[string, string[], string[]][]>(() => {
-    if (!submission) return [[null, [], []]];
+    if (!submission) return [];
 
     const { selected = [], rescan = [], excluded = [] } = submission.params.services;
     const exc = new Set(excluded);
@@ -47,6 +47,18 @@ const WrappedInfoSection: React.FC<Props> = ({ submission }) => {
         )
       ]) as [string, string[], string[]][];
   }, [settings.services, submission]);
+
+  const executedServices = useMemo<string[]>(
+    () =>
+      groupedServices
+        .reduce(
+          (prev: string[], [category, included, excluded]) =>
+            prev.concat(included.length > 0 && excluded.length === 0 ? category : included),
+          [] as string[]
+        )
+        .sort((a, b) => a.localeCompare(b)),
+    [groupedServices]
+  );
 
   return (
     <div style={{ paddingTop: sp2 }}>
@@ -118,7 +130,7 @@ const WrappedInfoSection: React.FC<Props> = ({ submission }) => {
                   />
                 }
               >
-                {t('params.services.selected')}
+                {t('params.services.executed')}
               </Button>
             </Grid>
             <Grid
@@ -129,9 +141,7 @@ const WrappedInfoSection: React.FC<Props> = ({ submission }) => {
               {submission ? (
                 <>
                   <Collapse in={!expanded} timeout="auto">
-                    {Array.from(new Set([...submission.params.services.selected, ...submission.params.services.rescan]))
-                      .sort((a, b) => a.localeCompare(b))
-                      .join(' | ')}
+                    {executedServices.join(' | ')}
                   </Collapse>
                   <Collapse in={expanded} timeout="auto">
                     <div
