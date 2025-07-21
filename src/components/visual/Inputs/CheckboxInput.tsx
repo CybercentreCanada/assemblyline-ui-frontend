@@ -10,6 +10,7 @@ import { Tooltip } from 'components/visual/Tooltip';
 import React, { useMemo, useState } from 'react';
 
 export type CheckboxInputProps = Omit<ButtonProps, 'onChange' | 'onClick' | 'value'> & {
+  defaultValue?: boolean;
   divider?: boolean;
   endAdornment?: React.ReactNode;
   error?: (value: boolean) => string;
@@ -27,8 +28,7 @@ export type CheckboxInputProps = Omit<ButtonProps, 'onChange' | 'onClick' | 'val
   preventDisabledColor?: boolean;
   preventRender?: boolean;
   readOnly?: boolean;
-  reset?: boolean;
-  resetProps?: ResetInputProps;
+  resetProps?: ResetInputProps<boolean>;
   showOverflow?: boolean;
   tiny?: boolean;
   tooltip?: TooltipProps['title'];
@@ -39,11 +39,11 @@ export type CheckboxInputProps = Omit<ButtonProps, 'onChange' | 'onClick' | 'val
     event: React.MouseEvent<HTMLButtonElement, MouseEvent> | React.FormEvent<HTMLButtonElement>,
     value: boolean
   ) => void;
-  onReset?: IconButtonProps['onClick'];
   onError?: (error: string) => void;
 };
 
 const WrappedCheckboxInput = ({
+  defaultValue = null,
   disabled = false,
   divider = false,
   endAdornment = null,
@@ -63,7 +63,6 @@ const WrappedCheckboxInput = ({
   preventDisabledColor = false,
   preventRender = false,
   readOnly = false,
-  reset = false,
   resetProps = null,
   showOverflow = false,
   tiny = false,
@@ -75,7 +74,6 @@ const WrappedCheckboxInput = ({
   onError = () => null,
   onExpand = () => null,
   onFocus = () => null,
-  onReset = () => null,
   ...buttonProps
 }: CheckboxInputProps) => {
   const theme = useTheme();
@@ -88,8 +86,8 @@ const WrappedCheckboxInput = ({
   const errorValue = useMemo<string>(() => error(value), [error, value]);
 
   const preventResetRender = useMemo<boolean>(
-    () => loading || !reset || disabled || readOnly,
-    [disabled, loading, readOnly, reset]
+    () => loading || disabled || readOnly || defaultValue === null || value === defaultValue,
+    [defaultValue, disabled, loading, readOnly, value]
   );
 
   const preventPasswordRender = useMemo<boolean>(
@@ -203,7 +201,7 @@ const WrappedCheckboxInput = ({
             }}
             sx={{
               ...(!showOverflow && { overflow: 'hidden' }),
-              ...(!(loading || !reset || disabled || readOnly) && { paddingRight: theme.spacing(2) })
+              ...(!preventResetRender && { paddingRight: theme.spacing(2) })
             }}
           />
         </Button>
@@ -234,9 +232,15 @@ const WrappedCheckboxInput = ({
               tiny={tiny}
               showPassword={showPassword}
               onShowPassword={() => setShowPassword(p => !p)}
+            />
+            <ResetInput
+              id={id}
+              preventRender={preventResetRender}
+              tiny={tiny}
+              value={defaultValue}
+              onChange={onChange}
               {...resetProps}
             />
-            <ResetInput id={id} preventRender={preventResetRender} tiny={tiny} onReset={onReset} {...resetProps} />
             <ExpandInput id={id} open={expand} onExpand={onExpand} {...expandProps} />
           </div>
         )}
