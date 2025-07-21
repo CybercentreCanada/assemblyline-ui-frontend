@@ -37,6 +37,7 @@ export type DateInputProps = Omit<TextFieldProps, 'error' | 'value' | 'onChange'
   readOnly?: boolean;
   reset?: boolean;
   resetProps?: ResetInputProps;
+  rootProps?: React.HTMLAttributes<HTMLDivElement>;
   tiny?: boolean;
   tooltip?: TooltipProps['title'];
   tooltipProps?: Omit<TooltipProps, 'children' | 'title'>;
@@ -68,6 +69,7 @@ const WrappedDateInput = ({
   readOnly = false,
   reset = false,
   resetProps = null,
+  rootProps = null,
   tiny = false,
   tooltip = null,
   tooltipProps = null,
@@ -126,7 +128,7 @@ const WrappedDateInput = ({
 
   return preventRender ? null : (
     <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale={i18n.language}>
-      <div style={{ textAlign: 'left' }}>
+      <div {...rootProps} style={{ textAlign: 'left', ...rootProps?.style }}>
         <Tooltip title={tooltip} {...tooltipProps}>
           <Typography
             component={InputLabel}
