@@ -4,6 +4,7 @@ import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import { Button, Collapse, Divider, Grid, Skeleton, Typography, useMediaQuery, useTheme } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
+import type { SelectedService } from 'components/models/base/service';
 import type { ParsedSubmission } from 'components/models/base/submission';
 import Moment from 'components/visual/Moment';
 import Priority from 'components/visual/Priority';
@@ -27,26 +28,39 @@ const WrappedInfoSection: React.FC<Props> = ({ submission }) => {
   const isDownMD = useMediaQuery(theme.breakpoints.down('md'));
 
   const groupedServices = useMemo<[string, string[], string[]][]>(() => {
-    if (!submission) return [[null, [], []]];
+    if (!submission) return [];
 
     const { selected = [], rescan = [], excluded = [] } = submission.params.services;
-    const exc = new Set(excluded);
-    const inc = new Set([...selected, ...rescan]);
+
+    const excludedSet = new Set(excluded);
+    const includedSet = new Set([...selected, ...rescan]);
+
+    const classifyService = (service: SelectedService, included: string[], excluded: string[]) => {
+      const isExcluded = excludedSet.has(service.category) || excludedSet.has(service.name);
+      const isIncluded = includedSet.has(service.category) || includedSet.has(service.name);
+      if (isIncluded && !isExcluded) included.push(service.name);
+      else excluded.push(service.name);
+    };
 
     return settings.services
       .sort((a, b) => a.name.localeCompare(b.name))
-      .map(category => [
-        category.name,
-        ...category.services.reduce(
-          ([included, excluded], { category: c, name: n }) => {
-            const isExcluded = exc.has(c) || exc.has(n);
-            const isIncluded = inc.has(c) || inc.has(n);
-            return isIncluded && !isExcluded ? [included.concat(n), excluded] : [included, excluded.concat(n)];
-          },
-          [[], []] as [string[], string[]]
-        )
-      ]) as [string, string[], string[]][];
+      .map(category => {
+        const included: string[] = [];
+        const excluded: string[] = [];
+        category.services.forEach(service => classifyService(service, included, excluded));
+        return [category.name, included, excluded];
+      });
   }, [settings.services, submission]);
+
+  const executedServices = useMemo<string[]>(() => {
+    if (!groupedServices || groupedServices.length === 0) return [];
+
+    return groupedServices
+      .flatMap(([category, included, excluded]) =>
+        included.length > 0 && excluded.length === 0 ? [category] : included
+      )
+      .sort((a, b) => a.localeCompare(b));
+  }, [groupedServices]);
 
   return (
     <div style={{ paddingTop: sp2 }}>
@@ -118,7 +132,7 @@ const WrappedInfoSection: React.FC<Props> = ({ submission }) => {
                   />
                 }
               >
-                {t('params.services.selected')}
+                {t('params.services.executed')}
               </Button>
             </Grid>
             <Grid
@@ -129,9 +143,7 @@ const WrappedInfoSection: React.FC<Props> = ({ submission }) => {
               {submission ? (
                 <>
                   <Collapse in={!expanded} timeout="auto">
-                    {Array.from(new Set([...submission.params.services.selected, ...submission.params.services.rescan]))
-                      .sort((a, b) => a.localeCompare(b))
-                      .join(' | ')}
+                    {executedServices.join(' | ')}
                   </Collapse>
                   <Collapse in={expanded} timeout="auto">
                     <div
