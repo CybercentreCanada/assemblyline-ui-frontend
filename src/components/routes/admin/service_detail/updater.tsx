@@ -3,7 +3,6 @@ import { Button, Grid, IconButton, Tooltip, Typography, useTheme } from '@mui/ma
 import useALContext from 'components/hooks/useALContext';
 import type { Service, UpdateSource } from 'components/models/base/service';
 import { DEFAULT_SOURCE } from 'components/models/base/service';
-import { showReset } from 'components/routes/admin/service_detail/service.utils';
 import SourceDialog from 'components/routes/admin/service_detail/source_dialog';
 import { SourceCard } from 'components/routes/manage/signature_sources';
 import { NumberInput } from 'components/visual/Inputs/NumberInput';
@@ -100,11 +99,10 @@ const ServiceUpdater = ({ service, defaults, setService, setModified }: ServiceU
         <SliderInput
           label={t('updater.interval')}
           value={!service ? null : service.update_config.update_interval_seconds}
+          defaultValue={!defaults ? undefined : defaults?.update_config?.update_interval_seconds}
           loading={!service}
-          reset={showReset(service.update_config, defaults.update_config, 'update_interval_seconds')}
           min={3600}
           max={86400}
-          defaultValue={3600}
           valueLabelDisplay="off"
           step={null}
           marks={[
@@ -122,16 +120,6 @@ const ServiceUpdater = ({ service, defaults, setService, setModified }: ServiceU
               update_config: {
                 ...service.update_config,
                 update_interval_seconds: v
-              }
-            });
-          }}
-          onReset={() => {
-            setModified(true);
-            setService({
-              ...service,
-              update_config: {
-                ...service.update_config,
-                update_interval_seconds: defaults.update_config.update_interval_seconds
               }
             });
           }}
@@ -162,7 +150,7 @@ const ServiceUpdater = ({ service, defaults, setService, setModified }: ServiceU
           label={t('updater.signatures')}
           loading={!service}
           value={!service ? null : service.update_config.generates_signatures}
-          reset={showReset(service.update_config, defaults.update_config, 'generates_signatures')}
+          defaultValue={!defaults ? undefined : defaults?.update_config?.generates_signatures}
           options={
             [
               { value: true, label: t('updater.signatures.yes') },
@@ -179,16 +167,6 @@ const ServiceUpdater = ({ service, defaults, setService, setModified }: ServiceU
               }
             });
           }}
-          onReset={() => {
-            setModified(true);
-            setService({
-              ...service,
-              update_config: {
-                ...service.update_config,
-                generates_signatures: defaults.update_config.generates_signatures
-              }
-            });
-          }}
         />
       </Grid>
 
@@ -197,7 +175,7 @@ const ServiceUpdater = ({ service, defaults, setService, setModified }: ServiceU
           label={t('updater.wait')}
           loading={!service}
           value={!service ? null : service.update_config.wait_for_update}
-          reset={showReset(service.update_config, defaults.update_config, 'wait_for_update')}
+          defaultValue={!defaults ? undefined : defaults?.update_config?.wait_for_update}
           options={
             [
               { value: true, label: t('updater.wait.yes') },
@@ -214,16 +192,6 @@ const ServiceUpdater = ({ service, defaults, setService, setModified }: ServiceU
               }
             });
           }}
-          onReset={() => {
-            setModified(true);
-            setService({
-              ...service,
-              update_config: {
-                ...service.update_config,
-                wait_for_update: defaults.update_config.wait_for_update
-              }
-            });
-          }}
         />
       </Grid>
 
@@ -234,10 +202,7 @@ const ServiceUpdater = ({ service, defaults, setService, setModified }: ServiceU
               label={t('updater.signature_delimiter')}
               loading={!service}
               value={!service ? null : service.update_config.signature_delimiter}
-              reset={showReset(service.update_config, defaults.update_config, [
-                'signature_delimiter',
-                'custom_delimiter'
-              ])}
+              defaultValue={!defaults ? undefined : defaults?.update_config?.signature_delimiter}
               options={
                 [
                   { value: 'new_line', primary: t('updater.signature_delimiter.new_line') },
@@ -252,16 +217,14 @@ const ServiceUpdater = ({ service, defaults, setService, setModified }: ServiceU
               }
               onChange={(e, v) => {
                 setModified(true);
-                setService({ ...service, update_config: { ...service.update_config, signature_delimiter: v } });
-              }}
-              onReset={() => {
-                setModified(true);
                 setService({
                   ...service,
                   update_config: {
                     ...service.update_config,
-                    signature_delimiter: defaults.update_config.signature_delimiter,
-                    custom_delimiter: defaults.update_config.custom_delimiter || ''
+                    signature_delimiter: v,
+                    ...(v === defaults.update_config.signature_delimiter && {
+                      custom_delimiter: defaults.update_config.custom_delimiter || ''
+                    })
                   }
                 });
               }}

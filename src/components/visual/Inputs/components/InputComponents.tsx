@@ -57,7 +57,12 @@ export const usePreventReset = <T,>({
   value = undefined
 }: InputProps<T>) =>
   useMemo(
-    () => loading || disabled || readOnly || defaultValue === undefined || value === defaultValue,
+    () =>
+      loading ||
+      disabled ||
+      readOnly ||
+      defaultValue === undefined ||
+      (Array.isArray(value) ? JSON.stringify(defaultValue) === JSON.stringify(value) : defaultValue === value),
     [defaultValue, disabled, loading, readOnly, value]
   );
 

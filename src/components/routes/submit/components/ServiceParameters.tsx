@@ -51,18 +51,12 @@ const Param: React.FC<ParamProps> = React.memo(({ param_id, spec_id, service }) 
                 label={name.replaceAll('_', ' ')}
                 labelProps={{ textTransform: 'capitalize' }}
                 value={value as boolean}
+                defaultValue={defaultValue as boolean}
                 disabled={disabled || !isEditing || (!customize && restricted)}
                 preventRender={!customize && restricted}
-                reset={defaultValue !== null && value !== defaultValue}
                 onChange={(e, v) =>
                   form.setFieldValue('settings.service_spec', s => {
                     s[spec_id].params[param_id].value = v;
-                    return s;
-                  })
-                }
-                onReset={() =>
-                  form.setFieldValue('settings.service_spec', s => {
-                    s[spec_id].params[param_id].value = defaultValue as boolean;
                     return s;
                   })
                 }
@@ -75,19 +69,13 @@ const Param: React.FC<ParamProps> = React.memo(({ param_id, spec_id, service }) 
                 label={name.replaceAll('_', ' ')}
                 labelProps={{ textTransform: 'capitalize' }}
                 value={value as number}
+                defaultValue={defaultValue as number}
                 disabled={disabled || !isEditing || (!customize && restricted)}
                 preventRender={!customize && restricted}
-                reset={defaultValue !== null && value !== defaultValue}
                 rootProps={{ style: { padding: theme.spacing(1) } }}
                 onChange={(e, v) =>
                   form.setFieldValue('settings.service_spec', s => {
                     s[spec_id].params[param_id].value = v;
-                    return s;
-                  })
-                }
-                onReset={() =>
-                  form.setFieldValue('settings.service_spec', s => {
-                    s[spec_id].params[param_id].value = defaultValue as number;
                     return s;
                   })
                 }
@@ -100,20 +88,14 @@ const Param: React.FC<ParamProps> = React.memo(({ param_id, spec_id, service }) 
                 label={name.replaceAll('_', ' ')}
                 labelProps={{ textTransform: 'capitalize' }}
                 value={value as string}
+                defaultValue={defaultValue as string}
                 disabled={disabled || !isEditing || (!customize && restricted)}
                 preventRender={!customize && restricted}
                 options={list}
-                reset={defaultValue !== null && value !== defaultValue}
                 rootProps={{ style: { padding: theme.spacing(1) } }}
                 onChange={(e, v) =>
                   form.setFieldValue('settings.service_spec', s => {
                     s[spec_id].params[param_id].value = v;
-                    return s;
-                  })
-                }
-                onReset={() =>
-                  form.setFieldValue('settings.service_spec', s => {
-                    s[spec_id].params[param_id].value = defaultValue as string;
                     return s;
                   })
                 }
@@ -126,21 +108,15 @@ const Param: React.FC<ParamProps> = React.memo(({ param_id, spec_id, service }) 
                 label={name.replaceAll('_', ' ')}
                 labelProps={{ textTransform: 'capitalize' }}
                 value={value as string}
+                defaultValue={defaultValue as string}
                 disabled={disabled || !isEditing || (!customize && restricted)}
                 preventRender={!customize && restricted}
                 options={list.map(key => ({ primary: key.replaceAll('_', ' '), value: key })).sort()}
-                reset={defaultValue !== null && value !== defaultValue}
                 rootProps={{ style: { padding: theme.spacing(1) } }}
                 sx={{ textTransform: 'capitalize' }}
                 onChange={(e, v) =>
                   form.setFieldValue('settings.service_spec', s => {
-                    s[spec_id].params[param_id].value = v as string;
-                    return s;
-                  })
-                }
-                onReset={() =>
-                  form.setFieldValue('settings.service_spec', s => {
-                    s[spec_id].params[param_id].value = defaultValue as string;
+                    s[spec_id].params[param_id].value = v;
                     return s;
                   })
                 }
@@ -240,11 +216,10 @@ const Service: React.FC<ServiceProps> = React.memo(({ cat_id, svr_id, service })
               endAdornment={!external ? null : <OpenInNewOutlinedIcon style={{ fontSize: 'small' }} />}
               expand={!hasParams ? null : open}
               preventRender={!customize && restricted && !selected}
-              reset={defaultValue !== null && selected !== defaultValue}
               value={selected}
+              defaultValue={defaultValue}
               onChange={!customize && restricted ? null : (e, v) => handleChange(v)}
               onExpand={() => setOpen(o => !o)}
-              onReset={!customize && restricted ? null : () => handleChange(defaultValue)}
             />
           )}
           closed
@@ -345,11 +320,10 @@ const Category = React.memo(({ cat_id, category }: CategoryProps) => {
               expand={open}
               indeterminate={indeterminate}
               preventRender={!customize && restricted && !selected && !indeterminate}
-              reset={defaultValue !== null && selected !== defaultValue}
               value={selected}
+              defaultValue={defaultValue}
               onChange={!customize && restricted ? null : (e, v) => handleChange(v)}
               onExpand={() => setOpen(o => !o)}
-              onReset={!customize && restricted ? null : () => handleChange(defaultValue)}
             />
           )}
           preventRender={!customize && restricted && !(selected || indeterminate)}
