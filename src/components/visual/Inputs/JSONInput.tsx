@@ -1,97 +1,45 @@
-import type { InteractionProps, ReactJsonViewProps, ThemeObject } from '@microlink/react-json-view';
+import type { ReactJsonViewProps, ThemeObject } from '@microlink/react-json-view';
 import ReactJson from '@microlink/react-json-view';
-import type {
-  FormHelperTextProps,
-  IconButtonProps,
-  TextFieldProps,
-  TooltipProps,
-  TypographyProps
-} from '@mui/material';
-import { FormControl, FormHelperText, Skeleton, Typography, useTheme } from '@mui/material';
+import { useTheme } from '@mui/material';
 import { useAppTheme } from 'commons/components/app/hooks';
+import { ExpandInput } from 'components/visual/Inputs/components/ExpandInput';
+import { HelperText } from 'components/visual/Inputs/components/HelperText';
+import {
+  StyledEndAdornmentBox,
+  StyledFormControl,
+  StyledFormLabel,
+  StyledInputSkeleton
+} from 'components/visual/Inputs/components/InputComponents';
 import { PasswordInput } from 'components/visual/Inputs/components/PasswordInput';
-import type { ResetInputProps } from 'components/visual/Inputs/components/ResetInput';
 import { ResetInput } from 'components/visual/Inputs/components/ResetInput';
-import { Tooltip } from 'components/visual/Tooltip';
+import type { InputProps } from 'components/visual/Inputs/models/Input';
 import React, { useMemo, useState } from 'react';
 
-export type JSONInputProps = Omit<ReactJsonViewProps, 'src' | 'onAdd' | 'onDelete' | 'onEdit'> & {
-  disabled?: boolean;
-  endAdornment?: TextFieldProps['InputProps']['endAdornment'];
-  error?: (value: object) => string;
-  errorProps?: FormHelperTextProps;
-  helperText?: string;
-  helperTextProps?: FormHelperTextProps;
-  id?: string;
-  label?: string;
-  labelProps?: TypographyProps;
-  loading?: boolean;
-  monospace?: boolean;
-  password?: boolean;
-  placeholder?: string;
-  preventDisabledColor?: boolean;
-  preventRender?: boolean;
-  readOnly?: boolean;
-  reset?: boolean;
-  resetProps?: ResetInputProps;
-  tiny?: boolean;
-  tooltip?: TooltipProps['title'];
-  tooltipProps?: Omit<TooltipProps, 'children' | 'title'>;
-  value: object;
-  onBlur?: () => void;
-  onChange?: (event: InteractionProps, value: object) => void;
-  onError?: (error: string) => void;
-  onFocus?: () => void;
-  onReset?: IconButtonProps['onClick'];
-};
+export type JSONInputProps = Omit<ReactJsonViewProps, 'src' | 'onAdd' | 'onDelete' | 'onEdit'> & InputProps<object>;
 
-const WrappedJSONInput = ({
-  disabled = false,
-  endAdornment = null,
-  error = () => null,
-  errorProps = null,
-  helperText = null,
-  helperTextProps = null,
-  id: idProp = null,
-  label: labelProp = null,
-  labelProps,
-  loading,
-  monospace = false,
-  password = false,
-  placeholder = null,
-  preventDisabledColor = false,
-  preventRender,
-  readOnly = false,
-  reset = false,
-  resetProps = null,
-  tiny = false,
-  tooltip = null,
-  tooltipProps = null,
-  value,
-  onBlur = () => null,
-  onChange = () => null,
-  onError = () => null,
-  onFocus = () => null,
-  onReset = () => null
-}: JSONInputProps) => {
+const WrappedJSONInput = (props: JSONInputProps) => {
+  const {
+    disabled = false,
+    endAdornment = null,
+    error = () => '',
+    loading,
+    monospace = false,
+    password = false,
+    preventRender,
+    readOnly = false,
+    rootProps,
+    tiny = false,
+    value,
+    onChange = () => null,
+    onError = () => null
+  } = props;
+
   const theme = useTheme();
   const { isDark: isDarkTheme } = useAppTheme();
 
   const [showPassword, setShowPassword] = useState<boolean>(true);
 
-  const label = useMemo<string>(() => labelProp ?? '\u00A0', [labelProp]);
-  const id = useMemo<string>(() => (idProp || label).replaceAll(' ', '-'), [idProp, label]);
   const errorValue = useMemo<string>(() => error(value), [error, value]);
-
-  const preventResetRender = useMemo<boolean>(
-    () => loading || !reset || disabled || readOnly,
-    [disabled, loading, readOnly, reset]
-  );
-
-  const preventPasswordRender = useMemo<boolean>(
-    () => loading || !password || disabled || readOnly,
-    [disabled, loading, password, readOnly]
-  );
 
   const jsonTheme = useMemo<ThemeObject>(
     () => ({
@@ -129,30 +77,11 @@ const WrappedJSONInput = ({
   );
 
   return preventRender ? null : (
-    <div style={{ textAlign: 'left' }}>
-      <Tooltip title={tooltip} {...tooltipProps}>
-        <Typography
-          color={!disabled && errorValue ? 'error' : 'textSecondary'}
-          gutterBottom
-          overflow="hidden"
-          textAlign="start"
-          textOverflow="ellipsis"
-          variant="body2"
-          whiteSpace="nowrap"
-          width="100%"
-          sx={{
-            ...(disabled &&
-              !preventDisabledColor && {
-                WebkitTextFillColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.38)'
-              })
-          }}
-          {...labelProps}
-          children={label}
-        />
-      </Tooltip>
-      <FormControl fullWidth error={!!errorValue}>
+    <div {...rootProps} style={{ textAlign: 'left', ...rootProps?.style }}>
+      <StyledFormLabel props={props} />
+      <StyledFormControl props={props}>
         {loading ? (
-          <Skeleton sx={{ height: '40px', transform: 'unset', ...(tiny && { height: '28px' }) }} />
+          <StyledInputSkeleton props={props} />
         ) : (
           <>
             <div
@@ -176,7 +105,7 @@ const WrappedJSONInput = ({
                   disabled || readOnly
                     ? false
                     : event => {
-                        onChange(event, event.updated_src);
+                        onChange(event as unknown as Event, event.updated_src);
 
                         const err = error(event.updated_src);
                         if (err) onError(err);
@@ -186,7 +115,7 @@ const WrappedJSONInput = ({
                   disabled || readOnly
                     ? false
                     : event => {
-                        onChange(event, event.updated_src);
+                        onChange(event as unknown as Event, event.updated_src);
 
                         const err = error(event.updated_src);
                         if (err) onError(err);
@@ -196,7 +125,7 @@ const WrappedJSONInput = ({
                   disabled || readOnly
                     ? false
                     : event => {
-                        onChange(event, event.updated_src);
+                        onChange(event as unknown as Event, event.updated_src);
 
                         const err = error(event.updated_src);
                         if (err) onError(err);
@@ -226,54 +155,21 @@ const WrappedJSONInput = ({
                 }}
               />
 
-              {preventPasswordRender && preventResetRender && !endAdornment ? null : (
-                <div
-                  style={{
-                    position: 'absolute',
-                    right: theme.spacing(0.75),
-                    top: theme.spacing(0.75),
-                    display: 'flex',
-                    alignItems: 'center'
-                  }}
-                >
-                  <PasswordInput
-                    id={id}
-                    preventRender={preventPasswordRender}
-                    tiny={tiny}
-                    showPassword={showPassword}
-                    onShowPassword={() => setShowPassword(p => !p)}
-                  />
-                  <ResetInput
-                    id={id}
-                    preventRender={preventResetRender}
-                    tiny={tiny}
-                    onReset={onReset}
-                    {...resetProps}
-                  />
-                  {endAdornment}
-                </div>
-              )}
+              <StyledEndAdornmentBox props={props}>
+                <PasswordInput
+                  props={props}
+                  showPassword={showPassword}
+                  onShowPassword={() => setShowPassword(p => !p)}
+                />
+                <ResetInput props={props} />
+                <ExpandInput props={props} />
+                {endAdornment}
+              </StyledEndAdornmentBox>
             </div>
-            {disabled ? null : errorValue ? (
-              <FormHelperText
-                sx={{ color: theme.palette.error.main, ...errorProps?.sx }}
-                variant="outlined"
-                {...errorProps}
-              >
-                {errorValue}
-              </FormHelperText>
-            ) : helperText ? (
-              <FormHelperText
-                sx={{ color: theme.palette.text.secondary, ...helperTextProps?.sx }}
-                variant="outlined"
-                {...helperTextProps}
-              >
-                {helperText}
-              </FormHelperText>
-            ) : null}
+            <HelperText props={props} />
           </>
         )}
-      </FormControl>
+      </StyledFormControl>
     </div>
   );
 };

@@ -1,158 +1,74 @@
-import type {
-  AutocompleteChangeReason,
-  AutocompleteProps,
-  FormHelperTextProps,
-  IconButtonProps,
-  TextFieldProps,
-  TooltipProps,
-  TypographyProps
-} from '@mui/material';
-import {
-  Autocomplete,
-  FormControl,
-  InputAdornment,
-  InputLabel,
-  Skeleton,
-  TextField,
-  Typography,
-  useTheme
-} from '@mui/material';
+import type { AutocompleteProps } from '@mui/material';
+import { Autocomplete, InputAdornment, TextField, useTheme } from '@mui/material';
 import CustomChip from 'components/visual/CustomChip';
 import { HelperText } from 'components/visual/Inputs/components/HelperText';
+import {
+  getAriaDescribedBy,
+  getAriaLabel,
+  StyledFormControl,
+  StyledFormLabel,
+  StyledInputSkeleton,
+  usePreventPassword,
+  usePreventReset
+} from 'components/visual/Inputs/components/InputComponents';
 import { PasswordInput } from 'components/visual/Inputs/components/PasswordInput';
-import type { ResetInputProps } from 'components/visual/Inputs/components/ResetInput';
 import { ResetInput } from 'components/visual/Inputs/components/ResetInput';
-import { Tooltip } from 'components/visual/Tooltip';
+import type { InputProps } from 'components/visual/Inputs/models/Input';
 import type { ElementType } from 'react';
 import React, { useMemo, useState } from 'react';
 
-export type ChipsInputProps<
-  Value extends string[] = string[],
-  Multiple extends boolean = boolean,
-  DisableClearable extends boolean = boolean,
-  FreeSolo extends boolean = boolean,
-  ChipComponent extends ElementType = ElementType
-> = Omit<
-  AutocompleteProps<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>,
-  'isOptionEqualToValue' | 'renderInput' | 'options' | 'onChange' | 'value'
-> & {
-  endAdornment?: TextFieldProps['InputProps']['endAdornment'];
-  error?: (value: string[]) => string;
-  errorProps?: FormHelperTextProps;
-  helperText?: string;
-  helperTextProps?: FormHelperTextProps;
-  isOptionEqualToValue?: (option: string, value: string) => boolean;
-  label?: string;
-  labelProps?: TypographyProps;
-  loading?: boolean;
-  monospace?: boolean;
-  options?: string[];
-  password?: boolean;
-  placeholder?: TextFieldProps['InputProps']['placeholder'];
-  preventDisabledColor?: boolean;
-  preventRender?: boolean;
-  readOnly?: boolean;
-  reset?: boolean;
-  resetProps?: ResetInputProps;
-  rootProps?: React.HTMLAttributes<HTMLDivElement>;
-  startAdornment?: TextFieldProps['InputProps']['startAdornment'];
-  tiny?: boolean;
-  tooltip?: TooltipProps['title'];
-  tooltipProps?: Omit<TooltipProps, 'children' | 'title'>;
-  value: string[];
-  onChange?: (event: React.SyntheticEvent<Element, Event>, value: string[], reason: AutocompleteChangeReason) => void;
-  onReset?: IconButtonProps['onClick'];
-  onError?: (error: string) => void;
-};
+export type ChipsInputProps = Omit<
+  AutocompleteProps<string[], boolean, boolean, boolean, ElementType>,
+  'isOptionEqualToValue' | 'renderInput' | 'options' | 'onChange' | 'value' | 'defaultValue'
+> &
+  InputProps<string[]> & {
+    isOptionEqualToValue?: (option: string, value: string) => boolean;
+    options?: AutocompleteProps<string, boolean, boolean, boolean, ElementType>['options'];
+  };
 
-const WrappedChipsInput = <
-  Value extends string[] = string[],
-  Multiple extends boolean = boolean,
-  DisableClearable extends boolean = boolean,
-  FreeSolo extends boolean = boolean,
-  ChipComponent extends ElementType = ElementType
->({
-  autoComplete,
-  disabled,
-  endAdornment = null,
-  error = () => null,
-  errorProps = null,
-  helperText = null,
-  helperTextProps = null,
-  id: idProp = null,
-  isOptionEqualToValue = null,
-  label: labelProp = null,
-  labelProps,
-  loading = false,
-  monospace = false,
-  options = [],
-  password = false,
-  placeholder = null,
-  preventDisabledColor = false,
-  preventRender = false,
-  readOnly = false,
-  reset = false,
-  resetProps = null,
-  rootProps = null,
-  startAdornment = null,
-  tiny = false,
-  tooltip = null,
-  tooltipProps = null,
-  value,
-  onBlur = () => null,
-  onChange = () => null,
-  onError = () => null,
-  onFocus = () => null,
-  onReset = () => null,
-  ...autocompleteProps
-}: ChipsInputProps<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>) => {
+const WrappedChipsInput = (props: ChipsInputProps) => {
   const theme = useTheme();
+
+  const {
+    autoComplete,
+    disabled,
+    endAdornment = null,
+    error = () => '',
+    isOptionEqualToValue = () => null,
+    loading = false,
+    monospace = false,
+    options = [],
+    password = false,
+    placeholder = null,
+    preventRender = false,
+    readOnly = false,
+    rootProps = null,
+    startAdornment = null,
+    tiny = false,
+    value,
+    onBlur = () => null,
+    onChange = () => null,
+    onError = () => null,
+    onFocus = () => null
+  } = props;
 
   const [focused, setFocused] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState<boolean>(true);
 
-  const label = useMemo<string>(() => labelProp ?? '\u00A0', [labelProp]);
-  const id = useMemo<string>(() => (idProp || label).replaceAll(' ', '-'), [idProp, label]);
   const errorValue = useMemo<string>(() => error(value), [error, value]);
-
-  const preventResetRender = useMemo<boolean>(
-    () => loading || !reset || disabled || readOnly,
-    [disabled, loading, readOnly, reset]
-  );
-
-  const preventPasswordRender = useMemo<boolean>(
-    () => loading || !password || disabled || readOnly,
-    [disabled, loading, password, readOnly]
-  );
+  const preventPasswordRender = usePreventPassword(props);
+  const preventResetRender = usePreventReset(props);
 
   return preventRender ? null : (
     <div {...rootProps} style={{ textAlign: 'left', ...rootProps?.style }}>
-      <Tooltip title={tooltip} {...tooltipProps}>
-        <Typography
-          color={!disabled && errorValue ? 'error' : focused ? 'primary' : 'textSecondary'}
-          component={InputLabel}
-          gutterBottom
-          htmlFor={id}
-          variant="body2"
-          whiteSpace="nowrap"
-          {...labelProps}
-          children={label}
-          sx={{
-            ...labelProps?.sx,
-            ...(disabled &&
-              !preventDisabledColor && {
-                WebkitTextFillColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.38)'
-              })
-          }}
-        />
-      </Tooltip>
-      <FormControl fullWidth>
+      <StyledFormLabel props={props} focused={focused} />
+      <StyledFormControl props={props}>
         {loading ? (
-          <Skeleton sx={{ height: '40px', transform: 'unset', ...(tiny && { height: '28px' }) }} />
+          <StyledInputSkeleton props={props} />
         ) : (
           <Autocomplete
             autoComplete={autoComplete}
-            id={id}
+            id={getAriaLabel(props)}
             freeSolo
             multiple
             size="small"
@@ -178,7 +94,7 @@ const WrappedChipsInput = <
             renderInput={params => (
               <TextField
                 {...params}
-                id={id}
+                id={getAriaLabel(props)}
                 variant="outlined"
                 error={!!errorValue}
                 type={password && showPassword ? 'password' : 'text'}
@@ -187,8 +103,8 @@ const WrappedChipsInput = <
                 slotProps={{
                   input: {
                     ...params?.InputProps,
-                    ...(reset && { style: { paddingRight: '85px' } }),
-                    'aria-describedby': disabled || !(errorValue || helperText) ? null : `${id}-helper-text`,
+                    ...(!preventResetRender && { style: { paddingRight: '85px' } }),
+                    'aria-describedby': getAriaDescribedBy(props),
                     startAdornment: (
                       <>
                         {startAdornment && <InputAdornment position="start">{startAdornment}</InputAdornment>}
@@ -210,20 +126,11 @@ const WrappedChipsInput = <
                             style={{ display: 'hidden' }}
                           >
                             <PasswordInput
-                              id={id}
-                              preventRender={preventPasswordRender}
-                              tiny={tiny}
+                              props={props}
                               showPassword={showPassword}
                               onShowPassword={() => setShowPassword(p => !p)}
-                              {...resetProps}
                             />
-                            <ResetInput
-                              id={id}
-                              preventRender={preventResetRender}
-                              tiny={tiny}
-                              onReset={onReset}
-                              {...resetProps}
-                            />
+                            <ResetInput props={props} />
                             {endAdornment}
                           </InputAdornment>
                         )}
@@ -284,29 +191,12 @@ const WrappedChipsInput = <
                 );
               })
             }
-            {...(autocompleteProps as unknown as object)}
           />
         )}
-        <HelperText
-          disabled={disabled}
-          errorProps={errorProps}
-          errorText={errorValue}
-          helperText={helperText}
-          helperTextProps={helperTextProps}
-          id={id}
-          label={label}
-        />
-      </FormControl>
+        <HelperText props={props} />
+      </StyledFormControl>
     </div>
   );
 };
 
-export const ChipsInput: <
-  Value extends string[] = string[],
-  Multiple extends boolean = boolean,
-  DisableClearable extends boolean = boolean,
-  FreeSolo extends boolean = boolean,
-  ChipComponent extends ElementType = ElementType
->(
-  props: ChipsInputProps<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>
-) => React.ReactNode = React.memo(WrappedChipsInput);
+export const ChipsInput: (props: ChipsInputProps) => React.ReactNode = React.memo(WrappedChipsInput);
