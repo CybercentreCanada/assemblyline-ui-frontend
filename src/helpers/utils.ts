@@ -459,3 +459,32 @@ export function getSubmitType(input: string, configuration: Configuration): [Has
  */
 type ObjectOfInts = Record<string, number>;
 export const sumValues = (obj: ObjectOfInts) => Object.values(obj).reduce((a, b) => a + b, 0);
+
+/**
+ * Computes the SHA-256 hash of a given string.
+ *
+ * @param {string} message - The input string to hash.
+ * @returns {string} - The SHA-256 hash as a hexadecimal string.
+ */
+export const getSHA256 = (value: string) =>
+  new Promise<string>(async (resolve, reject) => {
+    try {
+      // Encode the string as a Uint8Array
+      const encoder = new TextEncoder();
+      const data = encoder.encode(value);
+
+      // Compute the SHA-256 hash
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+
+      // Convert the hash to a hexadecimal string
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const hashHex = hashArray.map(byte => byte.toString(16).padStart(2, '0')).join('');
+
+      resolve(hashHex);
+    } catch (error) {
+      reject(null);
+
+      // eslint-disable-next-line no-console
+      console.error(`Hashing of value "${value}" failed: ${error}`);
+    }
+  });
