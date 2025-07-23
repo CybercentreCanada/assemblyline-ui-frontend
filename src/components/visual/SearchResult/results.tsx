@@ -75,7 +75,7 @@ const WrappedResultsTable: React.FC<Props> = ({
               <LinkRow
                 key={`${result.id}-${id}`}
                 component={Link}
-                to={`/file/detail/${result.id.substring(0, 64)}${!allowHash ? null : location.hash}`}
+                to={`/file/detail/${result.id.substring(0, 64)}${!allowHash ? '' : location.hash}`}
                 hover
                 style={{ textDecoration: 'none' }}
               >
