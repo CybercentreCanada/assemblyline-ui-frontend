@@ -273,7 +273,7 @@ const HeuristicDetail = ({ heur_id = null }: HeuristicDetailProps) => {
                 <Typography variant="h6">{t('last10')}</Typography>
               </Grid>
               <Grid size={{ xs: 12 }}>
-                <ResultsTable resultResults={results} allowSort={false} />
+                <ResultsTable resultResults={results} allowSort={false} allowHash />
               </Grid>
             </>
           )}
