@@ -50,6 +50,7 @@ export type AppPreferenceConfigs = {
   allowTranslate?: boolean; // Allow the user to switch language
   allowFocusMode?: boolean; // Allow user to remove navigation elements (side nav, top bar) from layout.
   defaultLayout?: AppLayoutMode; // Either "top" (sticky topbar) or "side" (invisible top bar)
+  autoDetectColorScheme?: boolean;
   defaultTheme?: PaletteMode; // The default theme of the application.  'dark' or 'light'.
   defaultDrawerOpen?: boolean; // Should the lef nav drawer be opened by default
   defaultShowQuickSearch?: boolean; // Should the quick search be shown by default

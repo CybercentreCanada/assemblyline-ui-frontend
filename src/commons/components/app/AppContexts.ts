@@ -8,7 +8,9 @@ export type AppContextType = {
   // configs as provided by client application.
   configs: AppConfigs; // app specific configurations.
   theme: PaletteMode; // provided theme config.
+  autoDetectColorScheme: boolean;
   toggleTheme: () => void; // toggle between light/dark theme mode.
+  toggleAutoDetectColorScheme: () => void,
   toggleLanguage: () => void; // toggle between french/english language.
 };
 
@@ -123,8 +125,10 @@ export type AppDrawerMode = 'float' | 'pin';
 // React Context for the AppProvider (Root Context).
 export const AppContext = createContext<AppContextType>({
   configs: {},
+  autoDetectColorScheme: true,
   theme: 'dark',
   toggleTheme: () => {},
+  toggleAutoDetectColorScheme: () => {},
   toggleLanguage: () => {}
 });
 
