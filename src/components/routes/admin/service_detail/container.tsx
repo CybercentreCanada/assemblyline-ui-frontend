@@ -3,6 +3,7 @@ import { Button, Grid, IconButton, Skeleton, Tooltip, Typography, useTheme } fro
 import type { DockerConfig, PersistentVolume, Service } from 'components/models/base/service';
 import ContainerCard from 'components/routes/admin/service_detail/container_card';
 import ContainerDialog from 'components/routes/admin/service_detail/container_dialog';
+import { showReset } from 'components/routes/admin/service_detail/service.utils';
 import { RadioInput } from 'components/visual/Inputs/RadioInput';
 import { SelectInput } from 'components/visual/Inputs/SelectInput';
 import type { Dispatch, SetStateAction } from 'react';
@@ -65,7 +66,7 @@ const ServiceContainer = ({ service, defaults, setService, setModified }: Servic
           label={t('container.channel')}
           loading={!service}
           value={!service ? null : service.update_channel}
-          defaultValue={!defaults ? undefined : defaults?.update_channel}
+          reset={showReset(service, defaults, 'update_channel')}
           options={
             [
               { value: 'stable', primary: t('container.channel.stable') },
@@ -76,6 +77,10 @@ const ServiceContainer = ({ service, defaults, setService, setModified }: Servic
             setModified(true);
             setService({ ...service, update_channel: v });
           }}
+          onReset={() => {
+            setModified(true);
+            setService({ ...service, update_channel: defaults.update_channel });
+          }}
         />
       </Grid>
 
@@ -84,7 +89,7 @@ const ServiceContainer = ({ service, defaults, setService, setModified }: Servic
           label={t('container.privileged')}
           loading={!service}
           value={!service ? null : service.privileged}
-          defaultValue={!defaults ? undefined : defaults?.privileged}
+          reset={showReset(service, defaults, 'privileged')}
           options={
             [
               { value: true, label: t('container.privileged.true') },
@@ -94,6 +99,10 @@ const ServiceContainer = ({ service, defaults, setService, setModified }: Servic
           onChange={(e, v) => {
             setModified(true);
             setService({ ...service, privileged: v });
+          }}
+          onReset={() => {
+            setModified(true);
+            setService({ ...service, privileged: !!defaults.privileged });
           }}
         />
       </Grid>

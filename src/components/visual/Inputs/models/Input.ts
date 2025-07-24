@@ -2,18 +2,14 @@ import type { FormHelperTextProps, IconButtonProps, TooltipProps, TypographyProp
 import type React from 'react';
 
 export type InputProps<Type> = {
-  children?: React.ReactNode;
   defaultValue?: Type;
   disabled?: boolean;
   divider?: boolean;
-  startAdornment?: React.ReactNode;
   endAdornment?: React.ReactNode;
-  placeholder?: string;
   error?: (value: Type) => string;
   errorProps?: FormHelperTextProps;
   expand?: boolean;
   expandProps?: IconButtonProps;
-  rootProps?: React.HTMLAttributes<HTMLDivElement>;
   helperText?: string;
   helperTextProps?: FormHelperTextProps;
   id?: string;
@@ -23,18 +19,23 @@ export type InputProps<Type> = {
   loading?: boolean;
   monospace?: boolean;
   password?: boolean;
+  placeholder?: string;
   preventDisabledColor?: boolean;
   preventRender?: boolean;
   readOnly?: boolean;
+  reset?: boolean;
   resetProps?: IconButtonProps;
+  rootProps?: React.HTMLAttributes<HTMLDivElement>;
   showOverflow?: boolean;
+  startAdornment?: React.ReactNode;
   tiny?: boolean;
   tooltip?: TooltipProps['title'];
   tooltipProps?: Omit<TooltipProps, 'children' | 'title'>;
   value: Type;
-  onFocus?: (event: React.SyntheticEvent | Event) => void;
   onBlur?: (event: React.SyntheticEvent | Event) => void;
   onChange?: (event: React.SyntheticEvent | Event, value: Type, ...other: unknown[]) => void;
   onError?: (error: string) => void;
   onExpand?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+  onFocus?: (event: React.SyntheticEvent | Event) => void;
+  onReset?: IconButtonProps['onClick'];
 };

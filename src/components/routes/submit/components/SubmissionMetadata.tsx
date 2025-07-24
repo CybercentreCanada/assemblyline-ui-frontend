@@ -70,6 +70,10 @@ export const MetadataParam: React.FC<MetadataParamParam> = React.memo(
       [form, name]
     );
 
+    const handleReset = useCallback(() => {
+      form.setFieldValue(`metadata.data`, m => _.omit(m || {}, name));
+    }, [form, name]);
+
     useEffect(() => {
       if (disabled || metadata.validator_type in ['enum', 'boolean', 'integer', 'date']) return;
       apiCall<string[]>({
@@ -83,16 +87,16 @@ export const MetadataParam: React.FC<MetadataParamParam> = React.memo(
     const props = useMemo<unknown>(
       () => ({
         id: `metadata-${name.replaceAll('_', ' ')}`,
-        defaultValue: null,
         label: `${name.replaceAll('_', ' ')}  [ ${metadata.validator_type.toUpperCase()} ]`,
         labelProps: { textTransform: 'capitalize' },
         disabled: disabled || !editing,
         loading: loading,
         width: '60%',
         rootProps: { style: { margin: theme.spacing(1) } },
-        onChange: (e, v) => handleChange(v)
+        onChange: (e, v) => handleChange(v),
+        onReset: () => handleReset()
       }),
-      [disabled, handleChange, loading, metadata.validator_type, name, theme, editing]
+      [disabled, handleChange, handleReset, loading, metadata.validator_type, name, theme, editing]
     );
 
     return (
@@ -101,9 +105,11 @@ export const MetadataParam: React.FC<MetadataParamParam> = React.memo(
         children={value => {
           switch (metadata.validator_type) {
             case 'boolean':
-              return <SwitchInput {...(props as SwitchInputProps)} value={(value as boolean) || false} />;
+              return (
+                <SwitchInput {...(props as SwitchInputProps)} value={(value as boolean) || false} reset={!!value} />
+              );
             case 'date':
-              return <DateInput {...(props as DateInputProps)} value={value as string} />;
+              return <DateInput {...(props as DateInputProps)} value={value as string} reset={!!value} />;
             case 'enum':
               return (
                 <SelectInput
@@ -112,6 +118,7 @@ export const MetadataParam: React.FC<MetadataParamParam> = React.memo(
                   options={(metadata.validator_params.values as string[])
                     .map(v => ({ primary: v.replaceAll('_', ' '), value: v }))
                     .sort()}
+                  reset={!!value}
                   sx={{ textTransform: 'capitalize' }}
                 />
               );
@@ -122,6 +129,7 @@ export const MetadataParam: React.FC<MetadataParamParam> = React.memo(
                   value={value as number}
                   min={metadata?.validator_params?.min as number}
                   max={metadata?.validator_params?.max as number}
+                  reset={!!value}
                 />
               );
             case 'regex':
@@ -130,6 +138,7 @@ export const MetadataParam: React.FC<MetadataParamParam> = React.memo(
                   {...(props as TextInputProps)}
                   value={(value as string) || ''}
                   options={options}
+                  reset={!!value}
                   error={v => handleValid(v)}
                   tooltip={(metadata?.validator_params?.validation_regex || null) as string}
                   tooltipProps={{ placement: 'right' }}
@@ -141,6 +150,7 @@ export const MetadataParam: React.FC<MetadataParamParam> = React.memo(
                   {...(props as TextInputProps)}
                   value={(value as string) || ''}
                   options={options}
+                  reset={!!value}
                   error={v => handleValid(v)}
                 />
               );

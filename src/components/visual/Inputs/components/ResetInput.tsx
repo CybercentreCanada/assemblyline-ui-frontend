@@ -14,22 +14,24 @@ export const ResetInput = <T,>({ props }: ResetInputProps<T>) => {
 
   const preventRender = usePreventReset(props);
 
-  const { defaultValue = undefined, tiny = false, resetProps, onChange = () => null } = props;
+  const { defaultValue = undefined, tiny = false, resetProps, onChange = () => null, onReset = null } = props;
 
   return preventRender ? null : (
     <Tooltip
       arrow
       title={
-        <>
-          <span style={{ color: theme.palette.text.secondary }}>{t('reset_to')}</span>
-          <span>
-            {typeof defaultValue === 'object'
-              ? JSON.stringify(defaultValue)
-              : typeof defaultValue === 'string'
-                ? `"${defaultValue}"`
-                : `${defaultValue}`}
-          </span>
-        </>
+        defaultValue === undefined ? null : (
+          <>
+            <span style={{ color: theme.palette.text.secondary }}>{t('reset_to')}</span>
+            <span>
+              {typeof defaultValue === 'object'
+                ? JSON.stringify(defaultValue)
+                : typeof defaultValue === 'string'
+                  ? `"${defaultValue}"`
+                  : `${defaultValue}`}
+            </span>
+          </>
+        )
       }
     >
       <IconButton
@@ -39,7 +41,7 @@ export const ResetInput = <T,>({ props }: ResetInputProps<T>) => {
         onClick={event => {
           event.preventDefault();
           event.stopPropagation();
-          onChange(event, defaultValue);
+          onReset ? onReset(event) : onChange(event, defaultValue);
         }}
         {...resetProps}
         sx={{

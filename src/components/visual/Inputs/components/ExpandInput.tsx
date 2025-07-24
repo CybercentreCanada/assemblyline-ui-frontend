@@ -12,7 +12,7 @@ export const ExpandInput = <T,>({ props }: ExpandInputProps<T>) => {
 
   const preventRender = usePreventExpand(props);
 
-  const { onExpand, expandProps } = props;
+  const { expand, onExpand, expandProps } = props;
 
   return preventRender ? null : (
     <ListItemIcon sx={{ minWidth: 0 }}>
@@ -33,7 +33,7 @@ export const ExpandInput = <T,>({ props }: ExpandInputProps<T>) => {
               duration: theme.transitions.duration.shortest
             }),
             transform: 'rotate(0deg)',
-            ...(open && { transform: 'rotate(180deg)' })
+            ...(expand && { transform: 'rotate(180deg)' })
           }}
         />
       </IconButton>

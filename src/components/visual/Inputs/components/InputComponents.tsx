@@ -50,21 +50,11 @@ export const usePreventPassword = <T,>({
   useMemo(() => loading || disabled || readOnly || !password, [disabled, loading, password, readOnly]);
 
 export const usePreventReset = <T,>({
-  defaultValue = undefined,
   disabled = false,
   loading = false,
   readOnly = false,
-  value = undefined
-}: InputProps<T>) =>
-  useMemo(
-    () =>
-      loading ||
-      disabled ||
-      readOnly ||
-      defaultValue === undefined ||
-      (Array.isArray(value) ? JSON.stringify(defaultValue) === JSON.stringify(value) : defaultValue === value),
-    [defaultValue, disabled, loading, readOnly, value]
-  );
+  reset = false
+}: InputProps<T>) => useMemo(() => loading || disabled || readOnly || !reset, [disabled, loading, readOnly, reset]);
 
 export const usePreventExpand = <T,>({ expand = null }: InputProps<T>) => useMemo(() => expand === null, [expand]);
 
