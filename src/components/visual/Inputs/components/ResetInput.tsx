@@ -1,34 +1,56 @@
 import RefreshOutlinedIcon from '@mui/icons-material/RefreshOutlined';
-import type { IconButtonProps } from '@mui/material';
-import { IconButton, useTheme } from '@mui/material';
-import React from 'react';
+import { IconButton, Tooltip, useTheme } from '@mui/material';
+import { getAriaLabel, usePreventReset } from 'components/visual/Inputs/components/InputComponents';
+import type { InputProps } from 'components/visual/Inputs/models/Input';
+import { useTranslation } from 'react-i18next';
 
-export type ResetInputProps = Omit<IconButtonProps, 'id'> & {
-  id: string;
-  preventRender?: boolean;
-  tiny?: boolean;
-  onReset: IconButtonProps['onClick'];
+export type ResetInputProps<T> = {
+  props: InputProps<T>;
 };
 
-export const ResetInput: React.FC<ResetInputProps> = React.memo(
-  ({ id = null, preventRender = false, tiny = false, onReset, ...buttonProps }: ResetInputProps) => {
-    const theme = useTheme();
+export const ResetInput = <T,>({ props }: ResetInputProps<T>) => {
+  const { t } = useTranslation();
+  const theme = useTheme();
 
-    return preventRender ? null : (
+  const preventRender = usePreventReset(props);
+
+  const { defaultValue = undefined, tiny = false, resetProps, onChange = () => null, onReset = null } = props;
+
+  return preventRender ? null : (
+    <Tooltip
+      arrow
+      title={
+        defaultValue === undefined ? null : (
+          <>
+            <span style={{ color: theme.palette.text.secondary }}>{t('reset_to')}</span>
+            <span>
+              {typeof defaultValue === 'object'
+                ? JSON.stringify(defaultValue)
+                : typeof defaultValue === 'string'
+                  ? `"${defaultValue}"`
+                  : `${defaultValue}`}
+            </span>
+          </>
+        )
+      }
+    >
       <IconButton
-        aria-label={`refresh ${id}`}
+        aria-label={`${getAriaLabel(props)}-reset`}
         type="reset"
         color="secondary"
         onClick={event => {
           event.preventDefault();
           event.stopPropagation();
-          onReset(event);
+          onReset ? onReset(event) : onChange(event, defaultValue);
         }}
-        {...buttonProps}
-        sx={{ ...(tiny && { padding: theme.spacing(0.5) }), ...buttonProps?.sx }}
+        {...resetProps}
+        sx={{
+          padding: tiny ? theme.spacing(0.25) : theme.spacing(0.5),
+          ...resetProps?.sx
+        }}
       >
         <RefreshOutlinedIcon fontSize="small" />
       </IconButton>
-    );
-  }
-);
+    </Tooltip>
+  );
+};

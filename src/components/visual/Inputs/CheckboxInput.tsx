@@ -1,199 +1,93 @@
-import type { ButtonProps, FormHelperTextProps, IconButtonProps, TooltipProps, TypographyProps } from '@mui/material';
-import { Button, Checkbox, FormControl, FormControlLabel, Skeleton, useTheme } from '@mui/material';
-import type { ExpandInputProps } from 'components/visual/Inputs/components/ExpandInput';
+import type { ButtonProps } from '@mui/material';
+import { Checkbox } from '@mui/material';
 import { ExpandInput } from 'components/visual/Inputs/components/ExpandInput';
 import { HelperText } from 'components/visual/Inputs/components/HelperText';
-import type { ResetInputProps } from 'components/visual/Inputs/components/ResetInput';
+import {
+  StyledEndAdornmentBox,
+  StyledFormButton,
+  StyledFormControl,
+  StyledFormControlLabel
+} from 'components/visual/Inputs/components/InputComponents';
+import { PasswordInput } from 'components/visual/Inputs/components/PasswordInput';
 import { ResetInput } from 'components/visual/Inputs/components/ResetInput';
+import type { InputProps } from 'components/visual/Inputs/models/Input';
 import { Tooltip } from 'components/visual/Tooltip';
-import React, { useMemo, useState } from 'react';
+import React, { useState } from 'react';
 
-export type CheckboxInputProps = Omit<ButtonProps, 'onChange' | 'onClick' | 'value'> & {
-  divider?: boolean;
-  endAdornment?: React.ReactNode;
-  error?: (value: boolean) => string;
-  errorProps?: FormHelperTextProps;
-  expand?: boolean;
-  expandProps?: ExpandInputProps;
-  helperText?: string;
-  helperTextProps?: FormHelperTextProps;
-  indeterminate?: boolean;
-  label: string;
-  labelProps?: TypographyProps;
-  loading?: boolean;
-  preventDisabledColor?: boolean;
-  preventRender?: boolean;
-  readOnly?: boolean;
-  reset?: boolean;
-  resetProps?: ResetInputProps;
-  tiny?: boolean;
-  tooltip?: TooltipProps['title'];
-  tooltipProps?: Omit<TooltipProps, 'children' | 'title'>;
-  value: boolean;
-  onExpand?: IconButtonProps['onClick'];
-  onChange?: (
-    event: React.MouseEvent<HTMLButtonElement, MouseEvent> | React.FormEvent<HTMLButtonElement>,
-    value: boolean
-  ) => void;
-  onReset?: IconButtonProps['onClick'];
-  onError?: (error: string) => void;
-};
+export type CheckboxInputProps = Omit<
+  ButtonProps,
+  'onChange' | 'onClick' | 'value' | 'error' | 'onBlur' | 'onFocus' | 'defaultValue'
+> &
+  InputProps<boolean>;
 
-export const CheckboxInput: React.FC<CheckboxInputProps> = React.memo(
-  ({
+const WrappedCheckboxInput = (props: CheckboxInputProps) => {
+  const {
     disabled = false,
-    divider = false,
-    endAdornment = null,
-    error = () => null,
-    errorProps = null,
-    expand = null,
-    expandProps = null,
-    helperText = null,
-    helperTextProps = null,
-    id: idProp = null,
+    error = () => '',
     indeterminate = false,
-    label = null,
-    labelProps = null,
     loading = false,
     preventDisabledColor = false,
     preventRender = false,
     readOnly = false,
-    reset = false,
-    resetProps = null,
-    tiny = false,
     tooltip = null,
     tooltipProps = null,
     value = false,
-    onExpand = () => null,
+    onBlur = () => null,
     onChange = () => null,
-    onReset = () => null,
     onError = () => null,
-    ...buttonProps
-  }: CheckboxInputProps) => {
-    const theme = useTheme();
+    onFocus = () => null
+  } = props;
 
-    const [focused, setFocused] = useState<boolean>(false);
+  const [focused, setFocused] = useState<boolean>(false);
+  const [showPassword, setShowPassword] = useState<boolean>(true);
 
-    const id = useMemo<string>(() => (idProp || label).replaceAll(' ', '-'), [idProp, label]);
-
-    const errorValue = useMemo<string>(() => error(value), [error, value]);
-
-    return preventRender ? null : (
-      <Tooltip title={loading ? null : tooltip} {...tooltipProps}>
-        <FormControl
-          size="small"
-          fullWidth
-          sx={{ ...(divider && { borderBottom: `1px solid ${theme.palette.divider}` }) }}
+  return preventRender ? null : (
+    <Tooltip title={loading ? null : tooltip} {...tooltipProps}>
+      <StyledFormControl props={props}>
+        <StyledFormButton
+          props={props}
+          onChange={event => {
+            onChange(event, !value);
+            const err = error(!value);
+            if (err) onError(err);
+          }}
+          onFocus={(event, ...other) => {
+            setFocused(!readOnly && !disabled && document.activeElement === event.target);
+            onFocus(event, ...other);
+          }}
+          onBlur={(event, ...other) => {
+            setFocused(false);
+            onBlur(event, ...other);
+          }}
         >
-          <Button
-            color="inherit"
-            disabled={loading || disabled || readOnly}
-            fullWidth
-            size="small"
-            onClick={event => {
-              event.stopPropagation();
-              event.preventDefault();
-              onChange(event, !value);
-
-              const err = error(!value);
-              if (err) onError(err);
-            }}
-            onFocus={event => setFocused(document.activeElement === event.target)}
-            onBlur={() => setFocused(false)}
-            sx={{
-              justifyContent: 'start',
-              color: 'inherit',
-              textTransform: 'none',
-              height: '40px',
-              paddingLeft: theme.spacing(2),
-
-              ...((preventDisabledColor || readOnly) && { color: 'inherit !important' }),
-              ...(tiny && {
-                height: 'auto'
-              })
-            }}
-            {...buttonProps}
-          >
-            <FormControlLabel
-              control={
-                loading ? (
-                  <div>
-                    <Skeleton
-                      variant="circular"
-                      sx={{
-                        height: '24px',
-                        width: '24px',
-                        marginLeft: theme.spacing(0.75),
-                        marginRight: theme.spacing(1.25)
-                      }}
-                    />
-                  </div>
-                ) : (
-                  <Checkbox
-                    checked={value}
-                    indeterminate={indeterminate}
-                    disableFocusRipple
-                    disableRipple
-                    disableTouchRipple
-                    size="small"
-                    sx={{
-                      ...(tiny && { paddingTop: theme.spacing(0.25), paddingBottom: theme.spacing(0.25) }),
-                      ...((preventDisabledColor || readOnly) && { color: 'inherit !important' })
-                    }}
-                  />
-                )
-              }
-              disabled={loading || disabled || readOnly}
-              label={
-                <div
-                  style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', columnGap: theme.spacing(1) }}
-                >
-                  <span style={{ textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden' }}>{label}</span>
-                  {endAdornment}
-                </div>
-              }
-              slotProps={{
-                typography: {
-                  color: !disabled && errorValue ? 'error' : focused ? 'primary' : 'textPrimary',
-                  marginLeft: theme.spacing(1.25),
-                  overflow: 'hidden',
-                  textAlign: 'start',
-                  textOverflow: 'ellipsis',
-                  variant: 'body2',
-                  whiteSpace: 'nowrap',
-                  width: '100%',
-                  ...((preventDisabledColor || readOnly) && { color: 'inherit !important' }),
-                  ...labelProps
-                }
-              }}
+          <StyledFormControlLabel props={props} focused={focused} showPassword={showPassword}>
+            <Checkbox
+              checked={value}
+              indeterminate={indeterminate}
+              disableFocusRipple
+              disableRipple
+              disableTouchRipple
+              size="small"
               sx={{
-                overflow: 'hidden',
-                ...(!(loading || !reset || disabled || readOnly) && { paddingRight: theme.spacing(2) })
+                paddingTop: '0px',
+                paddingBottom: '0px',
+                minWidth: '40px',
+                ...((preventDisabledColor || readOnly) && { color: 'inherit !important' })
               }}
             />
-          </Button>
-          <HelperText
-            id={id}
-            label={label}
-            disabled={disabled}
-            errorProps={errorProps}
-            errorText={errorValue}
-            helperText={helperText}
-            helperTextProps={helperTextProps}
-          />
+          </StyledFormControlLabel>
+        </StyledFormButton>
 
-          <div style={{ position: 'absolute', right: 0, top: 0, bottom: 0, display: 'flex', alignItems: 'center' }}>
-            <ResetInput
-              id={id}
-              preventRender={loading || !reset || disabled || readOnly}
-              tiny={tiny}
-              onReset={onReset}
-              {...resetProps}
-            />
-            <ExpandInput id={id} open={expand} onExpand={onExpand} {...expandProps} />
-          </div>
-        </FormControl>
-      </Tooltip>
-    );
-  }
-);
+        <HelperText props={props} />
+
+        <StyledEndAdornmentBox props={props}>
+          <PasswordInput props={props} showPassword={showPassword} onShowPassword={() => setShowPassword(p => !p)} />
+          <ResetInput props={props} />
+          <ExpandInput props={props} />
+        </StyledEndAdornmentBox>
+      </StyledFormControl>
+    </Tooltip>
+  );
+};
+
+export const CheckboxInput = React.memo(WrappedCheckboxInput);
