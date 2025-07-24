@@ -1,47 +1,42 @@
-import type { FormHelperTextProps } from '@mui/material';
 import { FormHelperText, useTheme } from '@mui/material';
-import React from 'react';
+import { getAriaLabel } from 'components/visual/Inputs/components/InputComponents';
+import type { InputProps } from 'components/visual/Inputs/models/Input';
 
-export type HelperTextProps = {
-  disabled: boolean;
-  errorProps: FormHelperTextProps;
-  errorText: string;
-  helperText: string;
-  helperTextProps: FormHelperTextProps;
-  id: string;
-  label: string;
+export type HelperTextProps<T> = {
+  props: InputProps<T>;
 };
 
-export const HelperText = React.memo(
-  ({
+export const HelperText = <T,>({ props }: HelperTextProps<T>) => {
+  const theme = useTheme();
+
+  const {
     disabled = false,
+    error = () => null,
     errorProps = null,
-    errorText = '',
     helperText = '',
     helperTextProps = null,
-    id = null,
-    label = null
-  }: HelperTextProps) => {
-    const theme = useTheme();
+    loading = false,
+    readOnly = false,
+    value
+  } = props;
 
-    return helperText ? (
-      <FormHelperText
-        id={`${id || label}-helper-text`}
-        variant="outlined"
-        {...helperTextProps}
-        sx={{ color: theme.palette.text.secondary, ...helperTextProps?.sx }}
-      >
-        {helperText}
-      </FormHelperText>
-    ) : disabled ? null : errorText ? (
-      <FormHelperText
-        id={`${id || label}-helper-text`}
-        variant="outlined"
-        {...errorProps}
-        sx={{ color: theme.palette.error.main, ...errorProps?.sx }}
-      >
-        {errorText}
-      </FormHelperText>
-    ) : null;
-  }
-);
+  return disabled || loading || readOnly ? null : error(value) ? (
+    <FormHelperText
+      id={`${getAriaLabel(props)}-helper-text`}
+      variant="outlined"
+      {...errorProps}
+      sx={{ color: theme.palette.error.main, ...errorProps?.sx }}
+    >
+      {error(value)}
+    </FormHelperText>
+  ) : helperText ? (
+    <FormHelperText
+      id={`${getAriaLabel(props)}-helper-text`}
+      variant="outlined"
+      {...helperTextProps}
+      sx={{ color: theme.palette.text.secondary, ...helperTextProps?.sx }}
+    >
+      {helperText}
+    </FormHelperText>
+  ) : null;
+};

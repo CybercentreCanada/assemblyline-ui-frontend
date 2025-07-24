@@ -1,10 +1,3 @@
-import type {
-  FormHelperTextProps,
-  IconButtonProps,
-  TextFieldProps,
-  TooltipProps,
-  TypographyProps
-} from '@mui/material';
 import {
   Button,
   Card,
@@ -12,14 +5,10 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  FormControl,
   Grid,
-  InputLabel,
   List,
   ListItemButton,
   ListItemText,
-  Skeleton,
-  Typography,
   useMediaQuery,
   useTheme
 } from '@mui/material';
@@ -28,8 +17,13 @@ import type { WhoAmI } from 'components/models/ui/user';
 import type { ClassificationProps } from 'components/visual/Classification';
 import CustomChip, { COLOR_MAP } from 'components/visual/CustomChip';
 import { HelperText } from 'components/visual/Inputs/components/HelperText';
+import {
+  StyledFormControl,
+  StyledFormLabel,
+  StyledInputSkeleton
+} from 'components/visual/Inputs/components/InputComponents';
 import { PasswordInput } from 'components/visual/Inputs/components/PasswordInput';
-import { Tooltip } from 'components/visual/Tooltip';
+import type { InputProps } from 'components/visual/Inputs/models/Input';
 import type { ClassificationParts, ClassificationValidator } from 'helpers/classificationParser';
 import {
   applyAliases,
@@ -44,64 +38,30 @@ import type { PossibleColor } from 'helpers/colors';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-export type ClassificationInputProps = Omit<ClassificationProps, 'c12n' | 'setClassification'> & {
-  endAdornment?: TextFieldProps['InputProps']['endAdornment'];
-  error?: (value: string) => string;
-  errorProps?: FormHelperTextProps;
-  helperText?: string;
-  helperTextProps?: FormHelperTextProps;
-  id?: string;
-  label?: string;
-  labelProps?: TypographyProps;
-  loading?: boolean;
-  monospace?: boolean;
-  password?: boolean;
-  placeholder?: TextFieldProps['InputProps']['placeholder'];
-  preventDisabledColor?: boolean;
-  preventRender?: boolean;
-  readOnly?: boolean;
-  reset?: boolean;
-  rootProps?: React.HTMLAttributes<HTMLDivElement>;
-  startAdornment?: TextFieldProps['InputProps']['startAdornment'];
-  tiny?: boolean;
-  tooltip?: TooltipProps['title'];
-  tooltipProps?: Omit<TooltipProps, 'children' | 'title'>;
-  value: ClassificationProps['c12n'];
-  onChange?: (event: unknown, classification: string) => void;
-  onReset?: IconButtonProps['onClick'];
-  onError?: (error: string) => void;
-};
+export type ClassificationInputProps = Omit<ClassificationProps, 'c12n' | 'setClassification'> & InputProps<string>;
 
-const WrappedClassificationInput = ({
-  disabled = false,
-  dynGroup = null,
-  error = () => null,
-  errorProps = null,
-  format = 'short',
-  fullWidth = true,
-  helperText = null,
-  helperTextProps = null,
-  id: idProp = null,
-  inline = false,
-  isUser = false,
-  label: labelProp = null,
-  labelProps,
-  loading = false,
-  monospace = false,
-  password = false,
-  preventDisabledColor = false,
-  preventRender: preventRenderProp = false,
-  readOnly = false,
-  reset = false,
-  rootProps = null,
-  tiny = false,
-  tooltip = null,
-  tooltipProps = null,
-  value = null,
-  onChange = () => null,
-  onReset = () => null,
-  onError = () => null
-}: ClassificationInputProps) => {
+const WrappedClassificationInput = (props: ClassificationInputProps) => {
+  const {
+    defaultValue = undefined,
+    disabled = false,
+    dynGroup = null,
+    error = () => '',
+    format = 'short',
+    fullWidth = true,
+    inline = false,
+    isUser = false,
+    loading = false,
+    monospace = false,
+    password = false,
+    preventRender: preventRenderProp = false,
+    readOnly = false,
+    rootProps = null,
+    tiny = false,
+    value = null,
+    onChange = () => null,
+    onError = () => null
+  } = props;
+
   const { t } = useTranslation();
   const theme = useTheme();
   const { user: currentUser, c12nDef, classificationAliases } = useALContext();
@@ -114,8 +74,6 @@ const WrappedClassificationInput = ({
   const isPhone = useMediaQuery(theme.breakpoints.only('xs'));
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const sp2 = theme.spacing(2);
-
-  const label = useMemo<string>(() => labelProp ?? '\u00A0', [labelProp]);
 
   const preventRender = useMemo(
     () => preventRenderProp || !c12nDef?.enforce || !validated?.parts?.lvl,
@@ -139,10 +97,6 @@ const WrappedClassificationInput = ({
     }
     return COLOR_MAP[levelStyles.color || levelStyles.label.replace('label-', '')] || ('default' as const);
   }, [c12nDef.levels_styles_map, preventRender, validated.parts.lvl]);
-
-  const id = useMemo<string>(() => (idProp || label).replaceAll(' ', '-'), [idProp, label]);
-
-  const errorValue = useMemo<string>(() => error(value), [error, value]);
 
   const handleGroupsChange = useCallback(
     (grp: WhoAmI['classification_aliases'][keyof WhoAmI['classification_aliases']]) => {
@@ -225,7 +179,7 @@ const WrappedClassificationInput = ({
     (event: unknown) => {
       const newC12n = normalizedClassification(validated.parts, c12nDef, format, isMobile, isUser);
       setShowPicker(false);
-      onChange(event, newC12n);
+      onChange(event as Event, newC12n);
 
       const err = error(newC12n);
       if (err) onError(err);
@@ -234,11 +188,11 @@ const WrappedClassificationInput = ({
   );
 
   const handleReset = useCallback(
-    (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    (event: unknown) => {
       setShowPicker(false);
-      onReset(event);
+      onChange(event as Event, defaultValue);
     },
-    [onReset]
+    [defaultValue, onChange]
   );
 
   useEffect(() => {
@@ -251,28 +205,10 @@ const WrappedClassificationInput = ({
 
   return preventRender || !value ? null : (
     <div {...rootProps} style={{ textAlign: 'left', ...rootProps?.style }}>
-      <Tooltip title={tooltip} {...tooltipProps}>
-        <Typography
-          color={!disabled && errorValue ? 'error' : showPicker ? 'primary' : 'textSecondary'}
-          component={InputLabel}
-          gutterBottom
-          htmlFor={id}
-          variant="body2"
-          whiteSpace="nowrap"
-          {...labelProps}
-          children={label}
-          sx={{
-            ...labelProps?.sx,
-            ...(disabled &&
-              !preventDisabledColor && {
-                WebkitTextFillColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.38)'
-              })
-          }}
-        />
-      </Tooltip>
-      <FormControl fullWidth>
+      <StyledFormLabel props={props} />
+      <StyledFormControl props={props}>
         {loading ? (
-          <Skeleton sx={{ height: '40px', transform: 'unset', ...(tiny && { height: '28px' }) }} />
+          <StyledInputSkeleton props={props} />
         ) : (
           <>
             <div style={{ display: inline ? 'inline-block' : null }}>
@@ -489,13 +425,11 @@ const WrappedClassificationInput = ({
               </DialogContent>
               <DialogActions>
                 <PasswordInput
-                  id={id}
-                  preventRender={loading || !password || disabled || readOnly}
-                  tiny={tiny}
+                  props={props}
                   showPassword={showPassword}
                   onShowPassword={() => setShowPassword(p => !p)}
                 />
-                {reset && (
+                {defaultValue !== undefined && value !== defaultValue && (
                   <Button onClick={event => handleReset(event)} color="secondary">
                     {t('classification.reset')}
                   </Button>
@@ -507,16 +441,8 @@ const WrappedClassificationInput = ({
             </Dialog>
           </>
         )}
-        <HelperText
-          disabled={disabled}
-          errorProps={errorProps}
-          errorText={errorValue}
-          helperText={helperText}
-          helperTextProps={helperTextProps}
-          id={id}
-          label={label}
-        />
-      </FormControl>
+        <HelperText props={props} />
+      </StyledFormControl>
     </div>
   );
 };

@@ -1,120 +1,58 @@
-import type {
-  FormHelperTextProps,
-  IconButtonProps,
-  SliderProps,
-  TextFieldProps,
-  TooltipProps,
-  TypographyProps
-} from '@mui/material';
-import { FormControl, FormHelperText, Skeleton, Slider, Typography, useTheme } from '@mui/material';
-import type { ResetInputProps } from 'components/visual/Inputs/components/ResetInput';
+import type { SliderProps } from '@mui/material';
+import { FormControl, Slider } from '@mui/material';
+import { HelperText } from 'components/visual/Inputs/components/HelperText';
+import {
+  getAriaLabel,
+  StyledFormLabel,
+  StyledInputSkeleton
+} from 'components/visual/Inputs/components/InputComponents';
 import { ResetInput } from 'components/visual/Inputs/components/ResetInput';
-import { Tooltip } from 'components/visual/Tooltip';
+import type { InputProps } from 'components/visual/Inputs/models/Input';
 import React, { useMemo, useState } from 'react';
 
-export type SliderInputProps = Omit<SliderProps, 'value' | 'onChange'> & {
-  endAdornment?: TextFieldProps['InputProps']['endAdornment'];
-  error?: (value: number) => string;
-  errorProps?: FormHelperTextProps;
-  helperText?: string;
-  helperTextProps?: FormHelperTextProps;
-  label?: string;
-  labelProps?: TypographyProps;
-  loading?: boolean;
-  monospace?: boolean;
-  password?: boolean;
-  preventDisabledColor?: boolean;
-  preventRender?: boolean;
-  readOnly?: boolean;
-  reset?: boolean;
-  resetProps?: ResetInputProps;
-  tiny?: boolean;
-  tooltip?: TooltipProps['title'];
-  tooltipProps?: Omit<TooltipProps, 'children' | 'title'>;
-  value: number;
-  onChange?: (event: Event, value: number) => void;
-  onReset?: IconButtonProps['onClick'];
-  onError?: (error: string) => void;
-};
+export type SliderInputProps = Omit<SliderProps, 'value' | 'onChange'> & InputProps<number>;
 
-export const WrappedSliderInput = ({
-  disabled,
-  endAdornment = null,
-  error = () => null,
-  errorProps = null,
-  helperText = null,
-  helperTextProps = null,
-  id: idProp = null,
-  label: labelProp = null,
-  labelProps,
-  loading,
-  monospace = false,
-  password = false,
-  preventDisabledColor = false,
-  preventRender,
-  readOnly = false,
-  reset = false,
-  resetProps = null,
-  tiny = false,
-  tooltip = null,
-  tooltipProps = null,
-  value = null,
-  onBlur = () => null,
-  onChange = () => null,
-  onError = () => null,
-  onFocus = () => null,
-  onReset = () => null,
-  ...sliderProps
-}: SliderInputProps) => {
-  const theme = useTheme();
+export const WrappedSliderInput = (props: SliderInputProps) => {
+  const {
+    disabled,
+    error = () => '',
+    loading,
+    preventRender,
+    readOnly = false,
+    rootProps = null,
+    value = null,
+    onBlur = () => null,
+    onChange = () => null,
+    onError = () => null,
+    onFocus = () => null
+  } = props;
 
   const [focused, setFocused] = useState<boolean>(false);
 
-  const label = useMemo<string>(() => labelProp ?? '\u00A0', [labelProp]);
-  const id = useMemo<string>(() => (idProp || label).replaceAll(' ', '-'), [idProp, label]);
   const errorValue = useMemo<string>(() => error(value), [error, value]);
 
   return preventRender ? null : (
-    <div style={{ textAlign: 'left' }}>
-      <Tooltip title={tooltip} {...tooltipProps}>
-        <Typography
-          color={!disabled && errorValue ? 'error' : focused ? 'primary' : 'textSecondary'}
-          gutterBottom
-          overflow="hidden"
-          textAlign="start"
-          textOverflow="ellipsis"
-          variant="body2"
-          whiteSpace="nowrap"
-          width="100%"
-          sx={{
-            ...(disabled &&
-              !preventDisabledColor && {
-                WebkitTextFillColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.38)'
-              })
-          }}
-          {...labelProps}
-          children={label}
-        />
-      </Tooltip>
+    <div {...rootProps} style={{ textAlign: 'left', ...rootProps?.style }}>
+      <StyledFormLabel props={props} focused={focused} />
       <FormControl fullWidth error={!!errorValue}>
         {loading ? (
-          <Skeleton sx={{ height: '40px', transform: 'unset', ...(tiny && { height: '28px' }) }} />
+          <StyledInputSkeleton props={props} />
         ) : (
           <>
             <div style={{ display: 'flex', alignItems: 'flex-start' }}>
               <div style={{ flex: 1, marginLeft: '20px', marginRight: '20px' }}>
                 <Slider
-                  aria-label={id}
-                  id={id}
+                  aria-label={getAriaLabel(props)}
+                  id={getAriaLabel(props)}
                   color={!disabled && errorValue ? 'error' : 'primary'}
                   disabled={disabled || readOnly}
                   valueLabelDisplay="auto"
                   size="small"
                   value={value}
                   onChange={(e, v) => {
-                    onChange(e, v as number);
+                    onChange(e, v);
 
-                    const err = error(v as number);
+                    const err = error(v);
                     if (err) onError(err);
                   }}
                   onFocus={(event, ...other) => {
@@ -125,33 +63,11 @@ export const WrappedSliderInput = ({
                     setFocused(false);
                     onBlur(event, ...other);
                   }}
-                  {...sliderProps}
                 />
               </div>
-              <ResetInput
-                id={id}
-                preventRender={loading || !reset || disabled || readOnly}
-                onReset={onReset}
-                {...resetProps}
-              />
+              <ResetInput props={props} />
             </div>
-            {disabled ? null : errorValue ? (
-              <FormHelperText
-                sx={{ color: theme.palette.error.main, ...errorProps?.sx }}
-                variant="outlined"
-                {...errorProps}
-              >
-                {errorValue}
-              </FormHelperText>
-            ) : helperText ? (
-              <FormHelperText
-                sx={{ color: theme.palette.text.secondary, ...helperTextProps?.sx }}
-                variant="outlined"
-                {...helperTextProps}
-              >
-                {helperText}
-              </FormHelperText>
-            ) : null}
+            <HelperText props={props} />
           </>
         )}
       </FormControl>

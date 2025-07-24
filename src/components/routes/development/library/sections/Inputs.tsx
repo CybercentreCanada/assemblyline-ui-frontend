@@ -33,13 +33,15 @@ export type InputsLibraryState = {
       error: boolean;
       helperText: boolean;
       loading: boolean;
+      longname: boolean;
+      monospace: boolean;
+      password: boolean;
       placeholder: boolean;
       readOnly: boolean;
       reset: boolean;
+      showOverflow: boolean;
       tiny: boolean;
       tooltip: boolean;
-      monospace: boolean;
-      password: boolean;
     };
     values: {
       checkbox: boolean;
@@ -63,17 +65,19 @@ export const INPUTS_LIBRARY_STATE: InputsLibraryState = {
     name: 'Inputs',
     state: {
       disabled: false,
-      loading: false,
-      reset: false,
-      tooltip: false,
-      error: false,
-      readOnly: false,
-      helperText: false,
-      placeholder: false,
       endAdornment: false,
-      tiny: false,
+      error: false,
+      helperText: false,
+      loading: false,
+      longname: false,
       monospace: false,
-      password: false
+      password: false,
+      placeholder: false,
+      readOnly: false,
+      reset: false,
+      showOverflow: false,
+      tiny: false,
+      tooltip: false
     },
     values: {
       checkbox: false,
@@ -323,6 +327,7 @@ export const InputsSection = React.memo(() => {
                 <TextInput
                   label="Controlled Text Input"
                   value={value}
+                  defaultValue={''}
                   reset
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.text', next)}
                   onReset={() => form.setFieldValue('components.inputs.values.text', '')}
@@ -350,6 +355,7 @@ export const InputsSection = React.memo(() => {
                 <ChipsInput
                   label="Controlled Chips Input"
                   value={value}
+                  defaultValue={[]}
                   reset
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.chips', next)}
                   onReset={() => form.setFieldValue('components.inputs.values.chips', [])}
@@ -377,6 +383,7 @@ export const InputsSection = React.memo(() => {
                 <NumberInput
                   label="Controlled Number Input"
                   value={value}
+                  defaultValue={0}
                   reset
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.number', next)}
                   onReset={() => form.setFieldValue('components.inputs.values.number', 0)}
@@ -404,6 +411,7 @@ export const InputsSection = React.memo(() => {
                 <SelectInput
                   label="Controlled Select Input"
                   value={value}
+                  defaultValue={'option 1'}
                   reset
                   options={SELECT_OPTIONS}
                   onChange={(event, next: string) => form.setFieldValue('components.inputs.values.select', next)}
@@ -432,6 +440,7 @@ export const InputsSection = React.memo(() => {
                 <DateInput
                   label="Controlled Date Input"
                   value={value}
+                  defaultValue={null}
                   reset
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.date', next)}
                   onReset={() => form.setFieldValue('components.inputs.values.date', null)}
@@ -459,6 +468,7 @@ export const InputsSection = React.memo(() => {
                 <ClassificationInput
                   label="Controlled Classification Input"
                   value={value}
+                  defaultValue={'TLP:CLEAR'}
                   reset
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.classification', next)}
                   onReset={() => form.setFieldValue('components.inputs.values.classification', null)}
@@ -486,6 +496,7 @@ export const InputsSection = React.memo(() => {
                 <TextAreaInput
                   label="Controlled Text Area Input"
                   value={value}
+                  defaultValue={''}
                   reset
                   rows={3}
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.textarea', next)}
@@ -514,6 +525,7 @@ export const InputsSection = React.memo(() => {
                 <SliderInput
                   label="Controlled Slider Input"
                   value={value}
+                  defaultValue={0}
                   reset
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.slider', next)}
                   onReset={() => form.setFieldValue('components.inputs.values.slider', 0)}
@@ -541,6 +553,7 @@ export const InputsSection = React.memo(() => {
                 <CheckboxInput
                   label="Controlled Checkbox Input"
                   value={value}
+                  defaultValue={false}
                   reset
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.checkbox', next)}
                   onReset={() => form.setFieldValue('components.inputs.values.checkbox', false)}
@@ -568,6 +581,7 @@ export const InputsSection = React.memo(() => {
                 <SwitchInput
                   label="Controlled Switch Input"
                   value={value}
+                  defaultValue={false}
                   reset
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.switch', next)}
                   onReset={() => form.setFieldValue('components.inputs.values.switch', false)}
@@ -595,6 +609,7 @@ export const InputsSection = React.memo(() => {
                 <RadioInput
                   label="Controlled Radio Input"
                   value={value}
+                  defaultValue={null}
                   reset
                   options={[
                     { value: null, label: 'Null' },
@@ -627,6 +642,7 @@ export const InputsSection = React.memo(() => {
                 <JSONInput
                   label="Controlled JSON Input"
                   value={value}
+                  defaultValue={{}}
                   reset
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.json', next)}
                   onReset={() => form.setFieldValue('components.inputs.values.json', {})}
@@ -1128,6 +1144,7 @@ export const InputsSection = React.memo(() => {
                 <TextInput
                   label="Reset Text Input"
                   value={value}
+                  defaultValue={''}
                   reset
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.text', next)}
                   onReset={() => form.setFieldValue('components.inputs.values.text', '')}
@@ -1141,6 +1158,7 @@ export const InputsSection = React.memo(() => {
                 <ChipsInput
                   label="Reset Chips Input"
                   value={value}
+                  defaultValue={[]}
                   reset
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.chips', next)}
                   onReset={() => form.setFieldValue('components.inputs.values.chips', [])}
@@ -1154,6 +1172,7 @@ export const InputsSection = React.memo(() => {
                 <NumberInput
                   label="Reset Number Input"
                   value={value}
+                  defaultValue={0}
                   reset
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.number', next)}
                   onReset={() => form.setFieldValue('components.inputs.values.number', 0)}
@@ -1167,6 +1186,7 @@ export const InputsSection = React.memo(() => {
                 <SelectInput
                   label="Reset Select Input"
                   value={value}
+                  defaultValue={'option 1'}
                   reset
                   options={SELECT_OPTIONS}
                   onChange={(event, next: string) => form.setFieldValue('components.inputs.values.select', next)}
@@ -1181,6 +1201,7 @@ export const InputsSection = React.memo(() => {
                 <DateInput
                   label="Reset Date Input"
                   value={value}
+                  defaultValue={null}
                   reset
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.date', next)}
                   onReset={() => form.setFieldValue('components.inputs.values.date', null)}
@@ -1194,6 +1215,7 @@ export const InputsSection = React.memo(() => {
                 <ClassificationInput
                   label="Reset Classification Input"
                   value={value}
+                  defaultValue={'TLP:CLEAR'}
                   reset
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.classification', next)}
                   onReset={() => form.setFieldValue('components.inputs.values.classification', 'TLP:CLEAR')}
@@ -1207,6 +1229,7 @@ export const InputsSection = React.memo(() => {
                 <TextAreaInput
                   label="Reset Classification Input"
                   value={value}
+                  defaultValue={''}
                   reset
                   rows={3}
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.textarea', next)}
@@ -1221,6 +1244,7 @@ export const InputsSection = React.memo(() => {
                 <SliderInput
                   label="Reset Slider Input"
                   value={value}
+                  defaultValue={0}
                   reset
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.slider', next)}
                   onReset={() => form.setFieldValue('components.inputs.values.slider', 0)}
@@ -1234,6 +1258,7 @@ export const InputsSection = React.memo(() => {
                 <CheckboxInput
                   label="Reset Checkbox Input"
                   value={value}
+                  defaultValue={false}
                   reset
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.checkbox', next)}
                   onReset={() => form.setFieldValue('components.inputs.values.checkbox', false)}
@@ -1247,6 +1272,7 @@ export const InputsSection = React.memo(() => {
                 <SwitchInput
                   label="Reset Switch Input"
                   value={value}
+                  defaultValue={false}
                   reset
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.switch', next)}
                   onReset={() => form.setFieldValue('components.inputs.values.switch', false)}
@@ -1260,6 +1286,7 @@ export const InputsSection = React.memo(() => {
                 <RadioInput
                   label="Reset Radio Input"
                   value={value}
+                  defaultValue={null}
                   reset
                   options={[
                     { value: null, label: 'Null' },
@@ -1278,6 +1305,7 @@ export const InputsSection = React.memo(() => {
                 <JSONInput
                   label="Reset JSON Input"
                   value={value}
+                  defaultValue={{}}
                   reset
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.json', next)}
                   onReset={() => form.setFieldValue('components.inputs.values.json', {})}
@@ -3309,7 +3337,9 @@ export const InputsSection = React.memo(() => {
               state.values.components.inputs.state.endAdornment,
               state.values.components.inputs.state.tiny,
               state.values.components.inputs.state.monospace,
-              state.values.components.inputs.state.password
+              state.values.components.inputs.state.password,
+              state.values.components.inputs.state.longname,
+              state.values.components.inputs.state.showOverflow
             ]}
             children={([
               disabled,
@@ -3323,7 +3353,9 @@ export const InputsSection = React.memo(() => {
               endAdornment,
               tiny,
               monospace,
-              password
+              password,
+              longname,
+              showOverflow
             ]) => (
               <>
                 <form.Subscribe
@@ -3339,6 +3371,7 @@ export const InputsSection = React.memo(() => {
                       {...(tiny && { tiny })}
                       {...(reset && {
                         reset,
+                        defaultValue: '',
                         onReset: () => form.setFieldValue('components.inputs.values.text', '')
                       })}
                       {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
@@ -3348,6 +3381,11 @@ export const InputsSection = React.memo(() => {
                       {...(endAdornment && { endAdornment: <Button variant="contained">Submit</Button> })}
                       {...(monospace && { monospace: true })}
                       {...(password && { password: true })}
+                      {...(showOverflow && { showOverflow: true })}
+                      {...(longname && {
+                        label:
+                          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc.'
+                      })}
                     />
                   )}
                 />
@@ -3365,6 +3403,7 @@ export const InputsSection = React.memo(() => {
                       {...(tiny && { tiny })}
                       {...(reset && {
                         reset,
+                        defaultValue: [],
                         onReset: () => form.setFieldValue('components.inputs.values.chips', [])
                       })}
                       {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
@@ -3374,6 +3413,11 @@ export const InputsSection = React.memo(() => {
                       {...(endAdornment && { endAdornment: <Button variant="contained">Submit</Button> })}
                       {...(monospace && { monospace: true })}
                       {...(password && { password: true })}
+                      {...(showOverflow && { showOverflow: true })}
+                      {...(longname && {
+                        label:
+                          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc.'
+                      })}
                     />
                   )}
                 />
@@ -3391,6 +3435,7 @@ export const InputsSection = React.memo(() => {
                       {...(tiny && { tiny })}
                       {...(reset && {
                         reset,
+                        defaultValue: 0,
                         onReset: () => form.setFieldValue('components.inputs.values.number', 0)
                       })}
                       {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
@@ -3400,6 +3445,11 @@ export const InputsSection = React.memo(() => {
                       {...(endAdornment && { endAdornment: <Button variant="contained">Submit</Button> })}
                       {...(monospace && { monospace: true })}
                       {...(password && { password: true })}
+                      {...(showOverflow && { showOverflow: true })}
+                      {...(longname && {
+                        label:
+                          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc.'
+                      })}
                     />
                   )}
                 />
@@ -3418,6 +3468,7 @@ export const InputsSection = React.memo(() => {
                       {...(tiny && { tiny })}
                       {...(reset && {
                         reset,
+                        defaultValue: 'option 1',
                         onReset: () => form.setFieldValue('components.inputs.values.select', '')
                       })}
                       {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
@@ -3427,6 +3478,11 @@ export const InputsSection = React.memo(() => {
                       {...(endAdornment && { endAdornment: <Button variant="contained">Submit</Button> })}
                       {...(monospace && { monospace: true })}
                       {...(password && { password: true })}
+                      {...(showOverflow && { showOverflow: true })}
+                      {...(longname && {
+                        label:
+                          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc.'
+                      })}
                     />
                   )}
                 />
@@ -3444,6 +3500,7 @@ export const InputsSection = React.memo(() => {
                       {...(tiny && { tiny })}
                       {...(reset && {
                         reset,
+                        defaultValue: null,
                         onReset: () => form.setFieldValue('components.inputs.values.date', null)
                       })}
                       {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
@@ -3453,6 +3510,11 @@ export const InputsSection = React.memo(() => {
                       {...(endAdornment && { endAdornment: <Button variant="contained">Submit</Button> })}
                       {...(monospace && { monospace: true })}
                       {...(password && { password: true })}
+                      {...(showOverflow && { showOverflow: true })}
+                      {...(longname && {
+                        label:
+                          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc.'
+                      })}
                     />
                   )}
                 />
@@ -3470,6 +3532,7 @@ export const InputsSection = React.memo(() => {
                       {...(tiny && { tiny })}
                       {...(reset && {
                         reset,
+                        defaultValue: null,
                         onReset: () => form.setFieldValue('components.inputs.values.classification', null)
                       })}
                       {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
@@ -3479,6 +3542,11 @@ export const InputsSection = React.memo(() => {
                       {...(endAdornment && { endAdornment: <Button variant="contained">Submit</Button> })}
                       {...(monospace && { monospace: true })}
                       {...(password && { password: true })}
+                      {...(showOverflow && { showOverflow: true })}
+                      {...(longname && {
+                        label:
+                          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc.'
+                      })}
                     />
                   )}
                 />
@@ -3497,6 +3565,7 @@ export const InputsSection = React.memo(() => {
                       {...(tiny && { tiny })}
                       {...(reset && {
                         reset,
+                        defaultValue: '',
                         onReset: () => form.setFieldValue('components.inputs.values.textarea', '')
                       })}
                       {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
@@ -3506,6 +3575,11 @@ export const InputsSection = React.memo(() => {
                       {...(endAdornment && { endAdornment: <Button variant="contained">Submit</Button> })}
                       {...(monospace && { monospace: true })}
                       {...(password && { password: true })}
+                      {...(showOverflow && { showOverflow: true })}
+                      {...(longname && {
+                        label:
+                          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc.'
+                      })}
                     />
                   )}
                 />
@@ -3523,6 +3597,7 @@ export const InputsSection = React.memo(() => {
                       {...(tiny && { tiny })}
                       {...(reset && {
                         reset,
+                        defaultValue: 0,
                         onReset: () => form.setFieldValue('components.inputs.values.slider', 0)
                       })}
                       {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
@@ -3532,6 +3607,11 @@ export const InputsSection = React.memo(() => {
                       {...(endAdornment && { endAdornment: <Button variant="contained">Submit</Button> })}
                       {...(monospace && { monospace: true })}
                       {...(password && { password: true })}
+                      {...(showOverflow && { showOverflow: true })}
+                      {...(longname && {
+                        label:
+                          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc.'
+                      })}
                     />
                   )}
                 />
@@ -3549,6 +3629,7 @@ export const InputsSection = React.memo(() => {
                       {...(tiny && { tiny })}
                       {...(reset && {
                         reset,
+                        defaultValue: false,
                         onReset: () => form.setFieldValue('components.inputs.values.checkbox', false)
                       })}
                       {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
@@ -3558,6 +3639,11 @@ export const InputsSection = React.memo(() => {
                       {...(endAdornment && { endAdornment: <Button variant="contained">Submit</Button> })}
                       {...(monospace && { monospace: true })}
                       {...(password && { password: true })}
+                      {...(showOverflow && { showOverflow: true })}
+                      {...(longname && {
+                        label:
+                          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc.'
+                      })}
                     />
                   )}
                 />
@@ -3575,6 +3661,7 @@ export const InputsSection = React.memo(() => {
                       {...(tiny && { tiny })}
                       {...(reset && {
                         reset,
+                        defaultValue: false,
                         onReset: () => form.setFieldValue('components.inputs.values.switch', false)
                       })}
                       {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
@@ -3584,6 +3671,11 @@ export const InputsSection = React.memo(() => {
                       {...(endAdornment && { endAdornment: <Button variant="contained">Submit</Button> })}
                       {...(monospace && { monospace: true })}
                       {...(password && { password: true })}
+                      {...(showOverflow && { showOverflow: true })}
+                      {...(longname && {
+                        label:
+                          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc.'
+                      })}
                     />
                   )}
                 />
@@ -3606,6 +3698,7 @@ export const InputsSection = React.memo(() => {
                       {...(tiny && { tiny })}
                       {...(reset && {
                         reset,
+                        defaultValue: false,
                         onReset: () => form.setFieldValue('components.inputs.values.radio', null)
                       })}
                       {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
@@ -3615,6 +3708,11 @@ export const InputsSection = React.memo(() => {
                       {...(endAdornment && { endAdornment: <Button variant="contained">Submit</Button> })}
                       {...(monospace && { monospace: true })}
                       {...(password && { password: true })}
+                      {...(showOverflow && { showOverflow: true })}
+                      {...(longname && {
+                        label:
+                          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc.'
+                      })}
                     />
                   )}
                 />
@@ -3632,6 +3730,7 @@ export const InputsSection = React.memo(() => {
                       {...(tiny && { tiny })}
                       {...(reset && {
                         reset,
+                        defaultValue: {},
                         onReset: () => form.setFieldValue('components.inputs.values.radio', null)
                       })}
                       {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
@@ -3641,6 +3740,11 @@ export const InputsSection = React.memo(() => {
                       {...(endAdornment && { endAdornment: <Button variant="contained">Submit</Button> })}
                       {...(monospace && { monospace: true })}
                       {...(password && { password: true })}
+                      {...(showOverflow && { showOverflow: true })}
+                      {...(longname && {
+                        label:
+                          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc.'
+                      })}
                     />
                   )}
                 />
@@ -3767,6 +3871,26 @@ export const InputsSection = React.memo(() => {
                   label="Password"
                   value={value}
                   onChange={(event, next) => form.setFieldValue('components.inputs.state.password', next)}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.state.longname}
+              children={value => (
+                <CheckboxInput
+                  label="Long Name"
+                  value={value}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.state.longname', next)}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.state.showOverflow}
+              children={value => (
+                <CheckboxInput
+                  label="Show Overflow"
+                  value={value}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.state.showOverflow', next)}
                 />
               )}
             />

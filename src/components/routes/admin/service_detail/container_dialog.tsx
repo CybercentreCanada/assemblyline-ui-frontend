@@ -452,6 +452,7 @@ const WrappedContainerDialog = ({
                 label={t('container.dialog.image')}
                 loading={!tempContainer}
                 value={!tempContainer ? null : tempContainer.image}
+                defaultValue={!defaults ? undefined : defaults?.image}
                 reset={showReset(tempContainer, defaults, 'image')}
                 onChange={(e, v) => handleContainerValueChange('image', v)}
                 onReset={() => {
@@ -466,6 +467,7 @@ const WrappedContainerDialog = ({
                 label={t('container.dialog.registry_type')}
                 loading={!tempContainer}
                 value={!tempContainer ? null : tempContainer.registry_type}
+                defaultValue={!defaults ? undefined : defaults?.registry_type}
                 reset={showReset(tempContainer, defaults, 'registry_type')}
                 options={[
                   { value: 'docker', primary: t('Docker') },
@@ -484,6 +486,7 @@ const WrappedContainerDialog = ({
                 label={t('container.dialog.cpu')}
                 loading={!tempContainer}
                 value={!tempContainer ? null : tempContainer.cpu_cores}
+                defaultValue={!defaults ? undefined : defaults?.cpu_cores}
                 reset={showReset(tempContainer, defaults, 'cpu_cores')}
                 onChange={(e, v) => handleContainerValueChange('cpu_cores', v)}
                 onReset={() => {
@@ -498,6 +501,7 @@ const WrappedContainerDialog = ({
                 label={t('container.dialog.ram')}
                 loading={!tempContainer}
                 value={!tempContainer ? null : tempContainer.ram_mb_min}
+                defaultValue={!defaults ? undefined : defaults?.ram_mb_min}
                 reset={showReset(tempContainer, defaults, 'ram_mb_min')}
                 endAdornment="MB"
                 onChange={(e, v) => handleContainerValueChange('ram_mb_min', v)}
@@ -513,6 +517,7 @@ const WrappedContainerDialog = ({
                 id="ram_mb_min"
                 loading={!tempContainer}
                 value={!tempContainer ? null : tempContainer.ram_mb}
+                defaultValue={!defaults ? undefined : defaults?.ram_mb}
                 reset={showReset(tempContainer, defaults, 'ram_mb')}
                 endAdornment="MB"
                 onChange={(e, v) => handleContainerValueChange('ram_mb', v)}
@@ -528,6 +533,7 @@ const WrappedContainerDialog = ({
                 label={t('container.dialog.registry_username')}
                 loading={!tempContainer}
                 value={!tempContainer ? null : tempContainer.registry_username ? tempContainer.registry_username : ''}
+                defaultValue={!defaults ? undefined : defaults?.registry_username}
                 reset={showReset(tempContainer, defaults, 'registry_username')}
                 onChange={(e, v) => handleContainerValueChange('registry_username', v || undefined)}
                 onReset={() => {
@@ -542,6 +548,7 @@ const WrappedContainerDialog = ({
                 label={t('container.dialog.registry_password')}
                 loading={!tempContainer}
                 value={(!tempContainer ? null : (tempContainer.registry_password ?? '')) as string}
+                defaultValue={(!defaults ? undefined : (defaults?.registry_password ?? '')) as string}
                 reset={showReset(tempContainer, defaults, 'registry_password')}
                 onChange={(e, v) => handleContainerValueChange('registry_password', v || undefined)}
                 onReset={() => {
@@ -556,6 +563,7 @@ const WrappedContainerDialog = ({
                 label={t('container.dialog.service_account')}
                 loading={!tempContainer}
                 value={!tempContainer ? null : tempContainer.service_account ? tempContainer.service_account : ''}
+                defaultValue={!defaults ? undefined : defaults?.service_account}
                 reset={showReset(tempContainer, defaults, 'service_account')}
                 onChange={(e, v) => handleContainerValueChange('service_account', v || undefined)}
                 onReset={() => {
@@ -570,6 +578,7 @@ const WrappedContainerDialog = ({
                 label={t('container.dialog.command')}
                 loading={!tempContainer}
                 value={!tempContainer ? null : tempContainer.command ? tempContainer.command.join(' ') : ''}
+                defaultValue={!defaults ? undefined : defaults?.command ? defaults.command.join(' ') : ''}
                 reset={showReset(tempContainer, defaults, 'command')}
                 onChange={(e, v) => handleContainerCommandChange(e)}
                 onReset={() => {
@@ -584,6 +593,7 @@ const WrappedContainerDialog = ({
                 label={t('container.dialog.allow_internet')}
                 loading={!tempContainer}
                 value={!tempContainer ? null : tempContainer.allow_internet_access}
+                defaultValue={!defaults ? undefined : defaults?.allow_internet_access}
                 reset={showReset(tempContainer, defaults, 'allow_internet_access')}
                 options={[
                   { value: true, label: t('container.dialog.allow_internet.yes') },
