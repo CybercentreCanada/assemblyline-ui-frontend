@@ -1,5 +1,6 @@
 import type { TextFieldProps } from '@mui/material';
 import {
+  Badge,
   Button,
   FormControl,
   FormControlLabel,
@@ -10,22 +11,17 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
+import { PasswordInput } from 'components/visual/Inputs/components/PasswordInput';
+import { ResetInput } from 'components/visual/Inputs/components/ResetInput';
 import type { InputProps } from 'components/visual/Inputs/models/Input';
 import { Tooltip } from 'components/visual/Tooltip';
 import type { ReactNode } from 'react';
-import React, { useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 
-type Props<T> = {
+type Props<T, P> = {
   props: Omit<InputProps<T>, 'onFocus' | 'onBlur' | 'onChange' | 'onError' | 'onExpand'>;
+  state: ReturnType<typeof useInputState<T, P>>;
   children?: ReactNode;
-  focused?: boolean;
-  showPassword?: boolean;
-
-  onFocus?: InputProps<T>['onFocus'];
-  onBlur?: InputProps<T>['onBlur'];
-  onChange?: InputProps<T>['onChange'];
-  onError?: InputProps<T>['onError'];
-  onExpand?: InputProps<T>['onExpand'];
 };
 
 export const getAriaLabel = <T,>({ id = null, label = null }: InputProps<T>) =>
@@ -58,14 +54,117 @@ export const usePreventReset = <T,>({
 
 export const usePreventExpand = <T,>({ expand = null }: InputProps<T>) => useMemo(() => expand === null, [expand]);
 
-export const StyledEndAdornmentBox = <T,>({ children, props }: Props<T>) => {
+export const isValidValue = (value: unknown): boolean =>
+  value !== null && value !== undefined && value !== '' && (typeof value !== 'number' || !isNaN(value));
+
+export const isValidNumber = (value: number, { min = null, max = null }: { min?: number; max?: number }): boolean =>
+  !isNaN(value) && (min === null || value >= min) && (max === null || value <= max);
+
+export const useInputState = <T, P = string>(
+  {
+    disabled,
+    id: idProp = null,
+    label: labelProp = null,
+    expand = null,
+    helperText = null,
+    loading = false,
+    password = false,
+    readOnly = false,
+    reset = false,
+    value,
+    onBlur = () => null,
+    onChange = () => null,
+    onError = () => null,
+    onFocus = () => null
+  }: InputProps<T>,
+
+  validator: (value: T) => string = () => null,
+  encoder: (value: T) => P = v => v as unknown as P,
+  decoder: (value: P) => T = v => v as unknown as T
+) => {
+  const [inputValue, setInputValue] = useState<P>(encoder(value));
+  const [focused, setFocused] = useState<boolean>(false);
+  const [showPassword, setShowPassword] = useState<boolean>(true);
+
+  const label = useMemo<string>(() => labelProp ?? '\u00A0', [labelProp]);
+  const id = useMemo<string>(() => (idProp || label).replaceAll(' ', '-'), [idProp, label]);
+  const error = useMemo<string>(() => validator(value), [validator, value]);
+  const ariaDescribeBy = useMemo<string>(
+    () => (disabled || !(error || helperText) ? null : (id || (label ?? '\u00A0')).replaceAll(' ', '-')),
+    [disabled, error, helperText, id, label]
+  );
+
+  const preventExpandRender = useMemo<boolean>(() => expand === null, [expand]);
+  const preventPasswordRender = useMemo<boolean>(
+    () => loading || disabled || readOnly || !password,
+    [disabled, loading, password, readOnly]
+  );
+  const preventResetRender = useMemo<boolean>(
+    () => loading || disabled || readOnly || !reset,
+    [disabled, loading, readOnly, reset]
+  );
+
+  const togglePassword = useCallback((event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    event.preventDefault();
+    event.stopPropagation();
+    setShowPassword(p => !p);
+  }, []);
+
+  const handleChange = useCallback(
+    (value: P = null) => {
+      setInputValue(value);
+      const parsedValue = decoder(value);
+      const err = validator(parsedValue);
+      if (!err) onChange(event, parsedValue);
+    },
+    [decoder, onChange, validator]
+  );
+
+  const handleFocus = useCallback(
+    (event: React.SyntheticEvent) => {
+      setFocused(!readOnly && !disabled && document.activeElement === event.target);
+      onFocus(event);
+      setInputValue(encoder(value));
+    },
+    [disabled, encoder, onFocus, readOnly, value]
+  );
+
+  const handleBlur = useCallback(
+    (event: React.SyntheticEvent) => {
+      setFocused(false);
+      onBlur(event);
+      setInputValue(encoder(value));
+    },
+    [encoder, onBlur, value]
+  );
+
+  useEffect(() => {
+    onError(error);
+  }, [error, onError]);
+
+  return {
+    ariaDescribeBy,
+    error,
+    focused,
+    id,
+    inputValue,
+    label,
+    preventExpandRender,
+    preventPasswordRender,
+    preventResetRender,
+    showPassword,
+    setInputValue,
+    handleChange,
+    handleFocus,
+    handleBlur,
+    togglePassword
+  };
+};
+
+export const StyledEndAdornmentBox = <T, P>({ children, state }: Props<T, P>) => {
   const theme = useTheme();
 
-  const preventExpandRender = usePreventExpand(props);
-  const preventPasswordRender = usePreventPassword(props);
-  const preventResetRender = usePreventReset(props);
-
-  return preventResetRender && preventPasswordRender && preventExpandRender ? null : (
+  return state.preventResetRender && state.preventPasswordRender && state.preventExpandRender ? null : (
     <div
       style={{
         position: 'absolute',
@@ -81,17 +180,23 @@ export const StyledEndAdornmentBox = <T,>({ children, props }: Props<T>) => {
   );
 };
 
+export const StyledEndAdornment = <T, P>({ children, state }: Props<T, P>) => {
+  return state.preventResetRender && state.preventPasswordRender && state.preventExpandRender ? null : (
+    <InputAdornment position="end">{children}</InputAdornment>
+  );
+};
+
 export const StyledCircularSkeleton = () => (
   <div style={{ minWidth: '40px', display: 'flex', justifyContent: 'center' }}>
     <Skeleton variant="circular" sx={{ height: '24px', width: '24px' }} />
   </div>
 );
 
-export const StyledInputSkeleton = <T,>({ props }: Props<T>) => (
+export const StyledInputSkeleton = <T, P>({ props }: Props<T, P>) => (
   <Skeleton sx={{ height: '40px', transform: 'unset', ...(props?.tiny && { height: '28px' }) }} />
 );
 
-export const StyledFormControl = <T,>({ children, props }: Props<T>) => {
+export const StyledFormControl = <T, P>({ children, props }: Props<T, P>) => {
   const theme = useTheme();
 
   const { readOnly = false, disabled = false } = props;
@@ -118,8 +223,10 @@ export const StyledFormControl = <T,>({ children, props }: Props<T>) => {
   );
 };
 
-export const StyledButtonLabel = <T,>({ props, focused = false, showPassword = false }: Props<T>) => {
+export const StyledButtonLabel = <T, P>({ props, state }: Props<T, P>) => {
   const theme = useTheme();
+
+  const { focused, showPassword } = state;
 
   const {
     disabled = false,
@@ -180,23 +287,15 @@ export const StyledButtonLabel = <T,>({ props, focused = false, showPassword = f
   );
 };
 
-export const StyledFormControlLabel = <T,>({
-  props,
-  children = null,
-  focused = false,
-  showPassword = false
-}: Props<T>) => {
+export const StyledFormControlLabel = <T, P>({ props, children = null, state }: Props<T, P>) => {
+  const { preventExpandRender, preventPasswordRender, preventResetRender } = state;
   const { disabled = false, loading = false, readOnly = false, showOverflow = false, tiny = false, value } = props;
-
-  const preventExpandRender = usePreventExpand(props);
-  const preventPasswordRender = usePreventPassword(props);
-  const preventResetRender = usePreventReset(props);
 
   return (
     <FormControlLabel
       control={loading ? <StyledCircularSkeleton /> : (children as React.ReactElement)}
       disabled={loading || disabled || readOnly}
-      label={<StyledButtonLabel props={props} focused={focused} showPassword={showPassword} />}
+      label={<StyledButtonLabel props={props} state={state} />}
       slotProps={{ typography: { width: '100%' } }}
       value={value}
       sx={{
@@ -209,14 +308,16 @@ export const StyledFormControlLabel = <T,>({
   );
 };
 
-export const StyledFormButton = <T,>({
-  props,
-  children = null,
-  onBlur = () => null,
-  onChange = () => null,
-  onFocus = () => null
-}: Props<T>) => {
-  const { disabled = false, loading = false, preventDisabledColor = false, readOnly = false, tiny = false } = props;
+export const StyledFormButton = ({ props, state, children = null }: Props<boolean, boolean>) => {
+  const { handleChange, handleFocus, handleBlur } = state;
+  const {
+    disabled = false,
+    loading = false,
+    preventDisabledColor = false,
+    readOnly = false,
+    tiny = false,
+    value = false
+  } = props;
 
   return (
     <Button
@@ -227,10 +328,10 @@ export const StyledFormButton = <T,>({
       onClick={event => {
         event.stopPropagation();
         event.preventDefault();
-        onChange(event, null);
+        handleChange(!value);
       }}
-      onFocus={onFocus}
-      onBlur={onBlur}
+      onFocus={handleFocus}
+      onBlur={handleBlur}
       sx={{
         justifyContent: 'start',
         color: 'inherit',
@@ -244,8 +345,10 @@ export const StyledFormButton = <T,>({
   );
 };
 
-export const StyledFormLabel = <T,>({ props, focused = false }: Props<T>) => {
+export const StyledFormLabel = <T, P>({ props, state }: Props<T, P>) => {
   const theme = useTheme();
+
+  const { id, focused } = state;
 
   const {
     disabled,
@@ -253,6 +356,7 @@ export const StyledFormLabel = <T,>({ props, focused = false }: Props<T>) => {
     label = null,
     labelProps,
     preventDisabledColor = false,
+    required = false,
     tooltip = null,
     tooltipProps = null,
     value
@@ -260,72 +364,84 @@ export const StyledFormLabel = <T,>({ props, focused = false }: Props<T>) => {
 
   return (
     <Tooltip title={tooltip} {...tooltipProps}>
-      <Typography
-        color={!disabled && error(value) ? 'error' : focused ? 'primary' : 'textSecondary'}
-        component={InputLabel}
-        gutterBottom
-        htmlFor={getAriaLabel(props)}
-        variant="body2"
-        whiteSpace="nowrap"
-        {...labelProps}
-        sx={{
-          ...labelProps?.sx,
-          ...(disabled &&
-            !preventDisabledColor && {
-              WebkitTextFillColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.38)'
-            })
-        }}
-      >
-        {label}
-      </Typography>
+      <Badge color="error" variant="dot" invisible={!required || !['', undefined, null].includes(value as string)}>
+        <Typography
+          color={!disabled && error(value) ? 'error' : focused ? 'primary' : 'textSecondary'}
+          component={InputLabel}
+          gutterBottom
+          htmlFor={id}
+          variant="body2"
+          whiteSpace="nowrap"
+          {...labelProps}
+          sx={{
+            ...labelProps?.sx,
+            ...(disabled &&
+              !preventDisabledColor && {
+                WebkitTextFillColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.38)'
+              })
+          }}
+        >
+          {label}
+        </Typography>
+      </Badge>
     </Tooltip>
   );
 };
 
-export type StyledTextField<T> = TextFieldProps & {
+export type StyledTextField<T, P> = TextFieldProps & {
   props: Omit<InputProps<T>, 'onFocus' | 'onBlur' | 'onChange' | 'onError' | 'onExpand'>;
-  showPassword?: boolean;
+  state: ReturnType<typeof useInputState<T, P>>;
 };
 
-export const StyledTextField = <T,>({ props, showPassword = false, ...textFieldProps }: StyledTextField<T>) => {
+export const StyledTextField = <T,>({ props, state, ...textFieldProps }: StyledTextField<T, string>) => {
   const theme = useTheme();
+
+  const { id, error, inputValue, showPassword, handleChange, handleFocus, handleBlur } = state;
 
   const {
     disabled,
-    error = () => '',
     monospace = false,
     password = false,
     placeholder = null,
     readOnly = false,
     startAdornment = null,
-    tiny = false,
-    value
+    endAdornment = null,
+    tiny = false
   } = props;
-
-  const errorValue = useMemo<string>(() => error(value), [error, value]);
 
   return (
     <TextField
-      id={getAriaLabel(props)}
+      id={id}
       disabled={disabled}
-      error={!!errorValue}
+      error={!!error}
       fullWidth
       margin="dense"
       size="small"
       type={password && showPassword ? 'password' : 'text'}
+      value={inputValue}
       variant="outlined"
       {...(readOnly && !disabled && { focused: null })}
       {...textFieldProps}
       slotProps={{
         ...textFieldProps?.slotProps,
         input: {
-          ...textFieldProps?.slotProps?.input,
           'aria-describedby': getAriaDescribedBy(props),
           placeholder: placeholder,
           readOnly: readOnly,
-          startAdornment: startAdornment && <InputAdornment position="start">{startAdornment}</InputAdornment>
+          startAdornment: startAdornment && <InputAdornment position="start">{startAdornment}</InputAdornment>,
+          endAdornment: (
+            <StyledEndAdornment props={props} state={state}>
+              <PasswordInput props={props} state={state} />
+              <ResetInput props={props} state={state} />
+              {endAdornment}
+            </StyledEndAdornment>
+          ),
+          ...textFieldProps?.slotProps?.input
         }
       }}
+      onChange={e => handleChange(e.target.value)}
+      onFocus={handleFocus}
+      onBlur={handleBlur}
       sx={{
         ...textFieldProps?.sx,
         margin: 0,

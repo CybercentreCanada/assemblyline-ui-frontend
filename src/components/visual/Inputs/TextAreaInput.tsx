@@ -19,6 +19,8 @@ export type TextAreaInputProps = Omit<TextFieldProps, 'rows' | 'onChange' | 'err
   };
 
 const WrappedTextAreaInput = (props: TextAreaInputProps) => {
+  return null;
+
   const {
     disabled,
     endAdornment = null,

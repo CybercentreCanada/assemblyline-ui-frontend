@@ -21,6 +21,8 @@ export type SwitchInputProps = Omit<
   InputProps<boolean>;
 
 export const SwitchInput: React.FC<SwitchInputProps> = React.memo((props: SwitchInputProps) => {
+  return null;
+
   const {
     disabled = false,
     error = () => '',

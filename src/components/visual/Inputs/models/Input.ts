@@ -1,4 +1,5 @@
 import type { FormHelperTextProps, IconButtonProps, TooltipProps, TypographyProps } from '@mui/material';
+import type { useInputState } from 'components/visual/Inputs/components/InputComponents';
 import type React from 'react';
 
 export type InputProps<Type> = {
@@ -23,6 +24,7 @@ export type InputProps<Type> = {
   preventDisabledColor?: boolean;
   preventRender?: boolean;
   readOnly?: boolean;
+  required?: boolean;
   reset?: boolean;
   resetProps?: IconButtonProps;
   rootProps?: React.HTMLAttributes<HTMLDivElement>;
@@ -39,3 +41,5 @@ export type InputProps<Type> = {
   onFocus?: (event: React.SyntheticEvent | Event) => void;
   onReset?: IconButtonProps['onClick'];
 };
+
+export type InputState<Type, P> = ReturnType<typeof useInputState<Type, P>>;

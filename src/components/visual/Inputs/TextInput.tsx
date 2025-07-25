@@ -1,20 +1,18 @@
 import type { AutocompleteProps, AutocompleteValue } from '@mui/material';
-import { Autocomplete, InputAdornment, Typography } from '@mui/material';
+import { Autocomplete, Typography } from '@mui/material';
 import { HelperText } from 'components/visual/Inputs/components/HelperText';
 import {
-  getAriaLabel,
+  isValidValue,
   StyledFormControl,
   StyledFormLabel,
   StyledInputSkeleton,
   StyledTextField,
-  usePreventPassword,
-  usePreventReset
+  useInputState
 } from 'components/visual/Inputs/components/InputComponents';
-import { PasswordInput } from 'components/visual/Inputs/components/PasswordInput';
-import { ResetInput } from 'components/visual/Inputs/components/ResetInput';
 import type { InputProps } from 'components/visual/Inputs/models/Input';
 import type { ElementType } from 'react';
-import React, { useState } from 'react';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 export type TextInputProps = Omit<
   AutocompleteProps<string, boolean, boolean, boolean, ElementType>,
@@ -25,40 +23,39 @@ export type TextInputProps = Omit<
   };
 
 const WrappedTextInput = (props: TextInputProps) => {
+  const { t } = useTranslation('inputs');
+
+  return null;
+
   const {
     autoComplete,
     disabled,
-    endAdornment = null,
     error = () => '',
     loading = false,
     options = [],
     preventRender = false,
     readOnly = false,
+    required = false,
     rootProps = null,
     tiny = false,
-    value = '',
-    onBlur = () => null,
-    onChange = () => null,
-    onError = () => null,
-    onFocus = () => null
+    value = ''
   } = props;
 
-  const [_value, setValue] = useState<AutocompleteValue<string, boolean, boolean, boolean>>(null);
-  const [focused, setFocused] = useState<boolean>(false);
-  const [showPassword, setShowPassword] = useState<boolean>(true);
-
-  const preventPasswordRender = usePreventPassword(props);
-  const preventResetRender = usePreventReset(props);
+  const state = useInputState<string, AutocompleteValue<string, boolean, boolean, boolean>>(props, v => {
+    if (error(v)) return error(v);
+    else if (required && !isValidValue(v)) return t('error.required');
+    else return null;
+  });
 
   return preventRender ? null : (
     <div {...rootProps} style={{ textAlign: 'left', ...rootProps?.style }}>
-      <StyledFormLabel props={props} focused={focused} />
-      <StyledFormControl props={props}>
+      <StyledFormLabel props={props} state={state} />
+      <StyledFormControl props={props} state={state}>
         {loading ? (
-          <StyledInputSkeleton props={props} />
+          <StyledInputSkeleton props={props} state={state} />
         ) : (
           <Autocomplete
-            id={getAriaLabel(props)}
+            id={state.id}
             autoComplete={autoComplete}
             disableClearable
             disabled={disabled}
@@ -68,51 +65,18 @@ const WrappedTextInput = (props: TextInputProps) => {
             options={options}
             readOnly={readOnly}
             size="small"
-            value={_value}
-            onChange={(e, v) => setValue(v)}
-            onInputChange={(e, v, o) => {
-              setValue(v as AutocompleteValue<string, boolean, boolean, boolean>);
-              onChange(e, v, o);
-
-              const err = error(v);
-              if (err) onError(err);
-            }}
-            onFocus={(event, ...other) => {
-              setFocused(!readOnly && !disabled && document.activeElement === event.target);
-              onFocus(event, ...other);
-            }}
-            onBlur={(event, ...other) => {
-              setFocused(false);
-              onBlur(event, ...other);
-            }}
+            value={state.inputValue}
+            onChange={(e, v) => state.setInputValue(v)}
+            onInputChange={(e, v) => state.handleChange(e, v)}
+            onFocus={e => state.handleFocus(e)}
+            onBlur={e => state.handleBlur(e)}
             renderOption={(props, option) => (
               <Typography {...props} key={option} {...(tiny && { variant: 'body2' })} children={option} />
             )}
-            renderInput={params => (
-              <StyledTextField
-                {...params}
-                props={props}
-                slotProps={{
-                  input: {
-                    endAdornment:
-                      preventPasswordRender && preventResetRender && !endAdornment ? null : (
-                        <InputAdornment position="end">
-                          <PasswordInput
-                            props={props}
-                            showPassword={showPassword}
-                            onShowPassword={() => setShowPassword(p => !p)}
-                          />
-                          <ResetInput props={props} />
-                          {endAdornment}
-                        </InputAdornment>
-                      )
-                  }
-                }}
-              />
-            )}
+            renderInput={params => <StyledTextField {...params} props={props} state={state} />}
           />
         )}
-        <HelperText props={props} />
+        <HelperText props={props} state={state} />
       </StyledFormControl>
     </div>
   );

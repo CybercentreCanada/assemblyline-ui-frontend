@@ -41,6 +41,8 @@ import { useTranslation } from 'react-i18next';
 export type ClassificationInputProps = Omit<ClassificationProps, 'c12n' | 'setClassification'> & InputProps<string>;
 
 const WrappedClassificationInput = (props: ClassificationInputProps) => {
+  return null;
+
   const {
     defaultValue = undefined,
     disabled = false,

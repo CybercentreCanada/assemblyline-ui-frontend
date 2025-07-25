@@ -30,6 +30,8 @@ export type SelectInputProps<O extends Option[] = []> = Omit<SelectProps, 'error
 const WrappedSelectInput = <O extends Option[]>({ ...props }: SelectInputProps<O>) => {
   const theme = useTheme();
 
+  return null;
+
   const {
     capitalize = false,
     disabled,
@@ -168,11 +170,11 @@ const WrappedSelectInput = <O extends Option[]>({ ...props }: SelectInputProps<O
                   slotProps={{
                     primary: {
                       sx: {
-                        textTransform: 'capitalize',
                         overflow: 'auto',
                         textOverflow: 'initial',
                         whiteSpace: 'normal',
-                        ...(tiny && { variant: 'body2' })
+                        ...(tiny && { variant: 'body2' }),
+                        ...(capitalize && { textTransform: 'capitalize' })
                       }
                     },
                     secondary: {

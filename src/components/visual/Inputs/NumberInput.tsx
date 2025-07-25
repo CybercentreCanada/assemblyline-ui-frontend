@@ -1,18 +1,17 @@
 import type { TextFieldProps } from '@mui/material';
-import { InputAdornment } from '@mui/material';
 import { HelperText } from 'components/visual/Inputs/components/HelperText';
 import {
+  isValidNumber,
+  isValidValue,
   StyledFormControl,
   StyledFormLabel,
   StyledInputSkeleton,
   StyledTextField,
-  usePreventPassword,
-  usePreventReset
+  useInputState
 } from 'components/visual/Inputs/components/InputComponents';
-import { PasswordInput } from 'components/visual/Inputs/components/PasswordInput';
-import { ResetInput } from 'components/visual/Inputs/components/ResetInput';
 import type { InputProps } from 'components/visual/Inputs/models/Input';
-import React, { useState } from 'react';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 export type NumberInputProps = Omit<TextFieldProps, 'error' | 'value' | 'onChange'> &
   InputProps<number> & {
@@ -22,93 +21,59 @@ export type NumberInputProps = Omit<TextFieldProps, 'error' | 'value' | 'onChang
   };
 
 const WrappedNumberInput = (props: NumberInputProps) => {
+  const { t } = useTranslation('inputs');
+
   const {
-    disabled = false,
-    endAdornment = null,
     error = () => '',
     loading = false,
     max = null,
     min = null,
     password = false,
     preventRender = false,
-    readOnly = false,
+    required = false,
     rootProps = null,
-    tiny = false,
-    unnullable = false,
-    value = null,
-    onBlur = () => null,
-    onChange = () => null,
-    onError = () => null,
-    onFocus = () => null
+    tiny = false
   } = props;
 
-  const [focused, setFocused] = useState<boolean>(false);
-  const [showPassword, setShowPassword] = useState<boolean>(true);
-
-  const preventPasswordRender = usePreventPassword(props);
-  const preventResetRender = usePreventReset(props);
+  const state = useInputState<number, string>(
+    props,
+    v => {
+      const num = isValidValue(v) ? Number(v) : null;
+      if (error(num)) return error(num);
+      else if (required && !isValidValue(num)) return t('error.required');
+      else if (!isValidNumber(num, props)) {
+        if (typeof min === 'number' && typeof max === 'number') return t('error.minmax', { min, max });
+        else if (typeof min === 'number') return t('error.min', { min });
+        else if (typeof max === 'number') return t('error.max', { max });
+      } else return null;
+    },
+    v => (typeof v === 'object' ? '' : `${v}`),
+    v => (v !== null && v !== undefined && v !== '' ? Number(v) : null)
+  );
 
   return preventRender ? null : (
     <div {...rootProps} style={{ textAlign: 'left', ...rootProps?.style }}>
-      <StyledFormLabel props={props} focused={focused} />
-      <StyledFormControl props={props}>
+      <StyledFormLabel props={props} state={state} />
+      <StyledFormControl props={props} state={state}>
         {loading ? (
-          <StyledInputSkeleton props={props} />
+          <StyledInputSkeleton props={props} state={state} />
         ) : (
           <>
             <StyledTextField
               props={props}
-              value={[null, undefined, '', NaN].includes(value) ? '' : `${value}`}
-              type={password && showPassword ? 'password' : 'number'}
+              state={state}
+              type={password && state.showPassword ? 'password' : 'number'}
               slotProps={{
                 input: {
                   inputProps: {
                     ...(min && { min: min }),
                     ...(max && { max: max }),
                     ...(tiny && { sx: { padding: '2.5px 4px 2.5px 8px' } })
-                  },
-                  endAdornment:
-                    preventPasswordRender && preventResetRender && !endAdornment ? null : (
-                      <InputAdornment position="end">
-                        <PasswordInput
-                          props={props}
-                          showPassword={showPassword}
-                          onShowPassword={() => setShowPassword(p => !p)}
-                        />
-                        <ResetInput props={props} />
-                        {endAdornment}
-                      </InputAdornment>
-                    )
+                  }
                 }
-              }}
-              onChange={event => {
-                const value = event.target.value;
-
-                if (!unnullable && [null, undefined, '', NaN].includes(value)) {
-                  onChange(event, null);
-
-                  const err = error(null);
-                  if (err) onError(null);
-                } else {
-                  let num = Number(event.target.value);
-                  num = max !== null && max !== undefined ? Math.min(num, max) : num;
-                  num = min !== null && min !== undefined ? Math.max(num, min) : num;
-                  onChange(event, num);
-
-                  const err = error(num);
-                  if (err) onError(err);
-                }
-              }}
-              onFocus={(event, ...other) => {
-                setFocused(!readOnly && !disabled && document.activeElement === event.target);
-                onFocus(event, ...other);
-              }}
-              onBlur={(event, ...other) => {
-                setFocused(false);
-                onBlur(event, ...other);
               }}
             />
-            <HelperText props={props} />
+            <HelperText props={props} state={state} />
           </>
         )}
       </StyledFormControl>

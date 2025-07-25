@@ -29,6 +29,8 @@ export type ChipsInputProps = Omit<
 const WrappedChipsInput = (props: ChipsInputProps) => {
   const theme = useTheme();
 
+  return null;
+
   const {
     autoComplete,
     disabled,

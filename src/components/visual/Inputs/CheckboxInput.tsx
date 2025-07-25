@@ -3,16 +3,19 @@ import { Checkbox } from '@mui/material';
 import { ExpandInput } from 'components/visual/Inputs/components/ExpandInput';
 import { HelperText } from 'components/visual/Inputs/components/HelperText';
 import {
+  isValidValue,
   StyledEndAdornmentBox,
   StyledFormButton,
   StyledFormControl,
-  StyledFormControlLabel
+  StyledFormControlLabel,
+  useInputState
 } from 'components/visual/Inputs/components/InputComponents';
 import { PasswordInput } from 'components/visual/Inputs/components/PasswordInput';
 import { ResetInput } from 'components/visual/Inputs/components/ResetInput';
 import type { InputProps } from 'components/visual/Inputs/models/Input';
 import { Tooltip } from 'components/visual/Tooltip';
-import React, { useState } from 'react';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 export type CheckboxInputProps = Omit<
   ButtonProps,
@@ -21,46 +24,32 @@ export type CheckboxInputProps = Omit<
   InputProps<boolean>;
 
 const WrappedCheckboxInput = (props: CheckboxInputProps) => {
+  const { t } = useTranslation('inputs');
+
   const {
-    disabled = false,
     error = () => '',
     indeterminate = false,
     loading = false,
     preventDisabledColor = false,
     preventRender = false,
+    required = false,
     readOnly = false,
     tooltip = null,
     tooltipProps = null,
-    value = false,
-    onBlur = () => null,
-    onChange = () => null,
-    onError = () => null,
-    onFocus = () => null
+    value = false
   } = props;
 
-  const [focused, setFocused] = useState<boolean>(false);
-  const [showPassword, setShowPassword] = useState<boolean>(true);
+  const state = useInputState<boolean, boolean>(props, v => {
+    if (error(v)) return error(v);
+    else if (required && !isValidValue(v)) return t('error.required');
+    else return null;
+  });
 
   return preventRender ? null : (
     <Tooltip title={loading ? null : tooltip} {...tooltipProps}>
-      <StyledFormControl props={props}>
-        <StyledFormButton
-          props={props}
-          onChange={event => {
-            onChange(event, !value);
-            const err = error(!value);
-            if (err) onError(err);
-          }}
-          onFocus={(event, ...other) => {
-            setFocused(!readOnly && !disabled && document.activeElement === event.target);
-            onFocus(event, ...other);
-          }}
-          onBlur={(event, ...other) => {
-            setFocused(false);
-            onBlur(event, ...other);
-          }}
-        >
-          <StyledFormControlLabel props={props} focused={focused} showPassword={showPassword}>
+      <StyledFormControl props={props} state={state}>
+        <StyledFormButton props={props} state={state}>
+          <StyledFormControlLabel props={props} state={state}>
             <Checkbox
               checked={value}
               indeterminate={indeterminate}
@@ -78,12 +67,12 @@ const WrappedCheckboxInput = (props: CheckboxInputProps) => {
           </StyledFormControlLabel>
         </StyledFormButton>
 
-        <HelperText props={props} />
+        <HelperText props={props} state={state} />
 
-        <StyledEndAdornmentBox props={props}>
-          <PasswordInput props={props} showPassword={showPassword} onShowPassword={() => setShowPassword(p => !p)} />
-          <ResetInput props={props} />
-          <ExpandInput props={props} />
+        <StyledEndAdornmentBox props={props} state={state}>
+          <PasswordInput props={props} state={state} />
+          <ResetInput props={props} state={state} />
+          <ExpandInput props={props} state={state} />
         </StyledEndAdornmentBox>
       </StyledFormControl>
     </Tooltip>

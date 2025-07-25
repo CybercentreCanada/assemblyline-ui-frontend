@@ -13,6 +13,8 @@ import React, { useMemo, useState } from 'react';
 export type SliderInputProps = Omit<SliderProps, 'value' | 'onChange'> & InputProps<number>;
 
 export const WrappedSliderInput = (props: SliderInputProps) => {
+  return null;
+
   const {
     disabled,
     error = () => '',
@@ -39,7 +41,7 @@ export const WrappedSliderInput = (props: SliderInputProps) => {
           <StyledInputSkeleton props={props} />
         ) : (
           <>
-            <div style={{ display: 'flex', alignItems: 'flex-start' }}>
+            <div style={{ minHeight: '40px', display: 'flex', alignItems: 'center' }}>
               <div style={{ flex: 1, marginLeft: '20px', marginRight: '20px' }}>
                 <Slider
                   aria-label={getAriaLabel(props)}

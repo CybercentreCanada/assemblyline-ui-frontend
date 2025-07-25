@@ -1,22 +1,22 @@
 import RefreshOutlinedIcon from '@mui/icons-material/RefreshOutlined';
 import { IconButton, Tooltip, useTheme } from '@mui/material';
-import { getAriaLabel, usePreventReset } from 'components/visual/Inputs/components/InputComponents';
+import type { useInputState } from 'components/visual/Inputs/components/InputComponents';
 import type { InputProps } from 'components/visual/Inputs/models/Input';
 import { useTranslation } from 'react-i18next';
 
-export type ResetInputProps<T> = {
+export type ResetInputProps<T, P> = {
   props: InputProps<T>;
+  state: ReturnType<typeof useInputState<T, P>>;
 };
 
-export const ResetInput = <T,>({ props }: ResetInputProps<T>) => {
+export const ResetInput = <T, P>({ props, state }: ResetInputProps<T, P>) => {
   const { t } = useTranslation();
   const theme = useTheme();
 
-  const preventRender = usePreventReset(props);
-
+  const { id, preventResetRender } = state;
   const { defaultValue = undefined, tiny = false, resetProps, onChange = () => null, onReset = null } = props;
 
-  return preventRender ? null : (
+  return preventResetRender ? null : (
     <Tooltip
       arrow
       title={
@@ -35,7 +35,7 @@ export const ResetInput = <T,>({ props }: ResetInputProps<T>) => {
       }
     >
       <IconButton
-        aria-label={`${getAriaLabel(props)}-reset`}
+        aria-label={`${id}-reset`}
         type="reset"
         color="secondary"
         onClick={event => {

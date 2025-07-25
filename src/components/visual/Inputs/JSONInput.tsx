@@ -18,6 +18,8 @@ import React, { useMemo, useState } from 'react';
 export type JSONInputProps = Omit<ReactJsonViewProps, 'src' | 'onAdd' | 'onDelete' | 'onEdit'> & InputProps<object>;
 
 const WrappedJSONInput = (props: JSONInputProps) => {
+  return null;
+
   const {
     disabled = false,
     endAdornment = null,

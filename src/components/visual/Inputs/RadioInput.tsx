@@ -23,6 +23,8 @@ export type RadioInputProps<O extends Option[] = []> = InputProps<O[number]['val
 };
 
 const WrappedRadioInput = <O extends Option[]>(props: RadioInputProps<O>) => {
+  return null;
+
   const {
     disabled,
     error = () => '',
@@ -67,7 +69,7 @@ const WrappedRadioInput = <O extends Option[]>(props: RadioInputProps<O>) => {
             >
               <StyledFormControlLabel
                 props={{ ...props, value: option.value, label: option.label, error: () => null }}
-                focused={focused}
+                focused={focused && option.value === value}
                 showPassword={showPassword}
               >
                 <Radio

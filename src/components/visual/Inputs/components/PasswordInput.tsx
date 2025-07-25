@@ -1,36 +1,25 @@
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import { IconButton, useTheme } from '@mui/material';
-import { getAriaLabel, usePreventPassword } from 'components/visual/Inputs/components/InputComponents';
+import type { useInputState } from 'components/visual/Inputs/components/InputComponents';
 import type { InputProps } from 'components/visual/Inputs/models/Input';
-import React from 'react';
 
-export type PasswordInputProps<T> = {
+export type PasswordInputProps<T, P> = {
   props: InputProps<T>;
-  showPassword: boolean;
-  onShowPassword: (event: React.SyntheticEvent) => void;
+  state: ReturnType<typeof useInputState<T, P>>;
 };
 
-export const PasswordInput = <T,>({
-  props,
-  showPassword = false,
-  onShowPassword = () => null
-}: PasswordInputProps<T>) => {
+export const PasswordInput = <T, P>({ props, state }: PasswordInputProps<T, P>) => {
   const theme = useTheme();
 
-  const preventRender = usePreventPassword(props);
-
+  const { id, preventPasswordRender, showPassword, togglePassword } = state;
   const { resetProps, tiny = false } = props;
 
-  return preventRender ? null : (
+  return preventPasswordRender ? null : (
     <IconButton
-      aria-label={`${getAriaLabel(props)}-password`}
+      aria-label={`${id}-password`}
       color="secondary"
-      onClick={event => {
-        event.preventDefault();
-        event.stopPropagation();
-        onShowPassword(event);
-      }}
+      onClick={event => togglePassword(event)}
       {...resetProps}
       sx={{
         padding: tiny ? theme.spacing(0.25) : theme.spacing(0.5),

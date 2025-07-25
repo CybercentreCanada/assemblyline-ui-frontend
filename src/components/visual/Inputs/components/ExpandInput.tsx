@@ -1,23 +1,23 @@
 import { ExpandMore } from '@mui/icons-material';
 import { IconButton, ListItemIcon, useTheme } from '@mui/material';
-import { getAriaLabel, usePreventExpand } from 'components/visual/Inputs/components/InputComponents';
+import type { useInputState } from 'components/visual/Inputs/components/InputComponents';
 import type { InputProps } from 'components/visual/Inputs/models/Input';
 
-export type ExpandInputProps<T> = {
+export type ExpandInputProps<T, P> = {
   props: InputProps<T>;
+  state: ReturnType<typeof useInputState<T, P>>;
 };
 
-export const ExpandInput = <T,>({ props }: ExpandInputProps<T>) => {
+export const ExpandInput = <T, P>({ props, state }: ExpandInputProps<T, P>) => {
   const theme = useTheme();
 
-  const preventRender = usePreventExpand(props);
+  const { id, preventExpandRender } = state;
+  const { expand = null, onExpand = () => null, expandProps } = props;
 
-  const { expand, onExpand, expandProps } = props;
-
-  return preventRender ? null : (
+  return preventExpandRender ? null : (
     <ListItemIcon sx={{ minWidth: 0 }}>
       <IconButton
-        aria-label={`${getAriaLabel(props)}-expand`}
+        aria-label={`${id}-expand`}
         type="button"
         onClick={event => {
           event.preventDefault();

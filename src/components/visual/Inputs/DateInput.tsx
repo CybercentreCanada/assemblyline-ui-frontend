@@ -27,6 +27,8 @@ export type DateInputProps = Omit<TextFieldProps, 'error' | 'value' | 'onChange'
   };
 
 const WrappedDateInput = (props: DateInputProps) => {
+  return null;
+
   const {
     defaultDateOffset = null,
     disabled,
