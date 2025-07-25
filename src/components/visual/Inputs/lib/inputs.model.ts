@@ -1,6 +1,7 @@
 import type { FormHelperTextProps, IconButtonProps, TooltipProps, TypographyProps } from '@mui/material';
-import type { useInputState } from 'components/visual/Inputs/components/InputComponents';
+import type { useInputState } from 'components/visual/Inputs/lib/inputs.hook';
 import type React from 'react';
+import type { ReactNode } from 'react';
 
 export type InputProps<Type> = {
   defaultValue?: Type;
@@ -43,3 +44,9 @@ export type InputProps<Type> = {
 };
 
 export type InputState<Type, P> = ReturnType<typeof useInputState<Type, P>>;
+
+export type ComponentProps<T, P> = {
+  props: Omit<InputProps<T>, 'onFocus' | 'onBlur' | 'onChange' | 'onError'>;
+  state: ReturnType<typeof useInputState<T, P>>;
+  children?: ReactNode;
+};
