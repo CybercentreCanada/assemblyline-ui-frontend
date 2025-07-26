@@ -1,4 +1,5 @@
-import type { InputProps } from 'components/visual/Inputs/lib/inputs.model';
+import type { createStoreContext } from 'components/core/store/createStoreContext';
+import type { InputData, InputProps } from 'components/visual/Inputs/lib/inputs.model';
 import type React from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -18,12 +19,6 @@ export const usePreventReset = <T,>({
 }: InputProps<T>) => useMemo(() => loading || disabled || readOnly || !reset, [disabled, loading, readOnly, reset]);
 
 export const usePreventExpand = <T,>({ expand = null }: InputProps<T>) => useMemo(() => expand === null, [expand]);
-
-export const isValidValue = (value: unknown): boolean =>
-  value !== null && value !== undefined && value !== '' && (typeof value !== 'number' || !isNaN(value));
-
-export const isValidNumber = (value: number, { min = null, max = null }: { min?: number; max?: number }): boolean =>
-  !isNaN(value) && (min === null || value >= min) && (max === null || value <= max);
 
 export const useInputState = <T, P = string>(
   {
@@ -127,4 +122,58 @@ export const useInputState = <T, P = string>(
     handleBlur,
     togglePassword
   };
+};
+
+export const useInputUpdater = <T,>(useStore: ReturnType<typeof createStoreContext<InputData<T>>>['useStore']) => {
+  const [, setStore] = useStore(s => s);
+
+  const [id] = useStore(s => s.label);
+  const [label] = useStore(s => s.label);
+  useEffect(() => {
+    setStore({ label: label ?? '\u00A0', id: (id || (label ?? '\u00A0')).replaceAll(' ', '-') });
+  }, [id, label, setStore]);
+
+  const [disabled] = useStore(s => s.disabled);
+  const [expand] = useStore(s => s.expand);
+  const [loading] = useStore(s => s.loading);
+  const [password] = useStore(s => s.password);
+  const [readOnly] = useStore(s => s.readOnly);
+  const [reset] = useStore(s => s.reset);
+
+  useEffect(() => {
+    setStore(s => ({
+      ...s,
+      preventExpandRender: s.expand === null,
+      preventPasswordRender: s.loading || s.disabled || s.readOnly || !s.password,
+      preventResetRender: s.loading || s.disabled || s.readOnly || !s.reset
+    }));
+  }, [disabled, expand, loading, password, readOnly, reset, setStore]);
+
+  const [onBlur] = useStore(s => s.onBlur);
+  const [onChange] = useStore(s => s.onChange);
+  const [onFocus] = useStore(s => s.onFocus);
+  useEffect(() => {
+    setStore({
+      handleFocus: (event: React.SyntheticEvent) => {
+        setStore(s => ({ focused: !s?.readOnly && !s?.disabled && document.activeElement === event.target }));
+        onFocus(event);
+        // setInputValue(encoder(value));
+      },
+      handleBlur: (event: React.SyntheticEvent) => {
+        setStore({ focused: false });
+        onBlur(event);
+        // setInputValue(encoder(value));
+      },
+      handleChange: (event: React.SyntheticEvent, value: T = null) => {
+        event.preventDefault();
+        event.stopPropagation();
+        onChange(event, value);
+
+        // setInputValue(value);
+        // const parsedValue = decoder(value);
+        // const err = validator(parsedValue);
+        // if (!err) onChange(event, parsedValue);
+      }
+    });
+  }, [onBlur, onChange, onFocus, setStore]);
 };

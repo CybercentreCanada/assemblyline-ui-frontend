@@ -1,55 +1,60 @@
 import type { ButtonProps } from '@mui/material';
 import { Checkbox } from '@mui/material';
-import { ExpandInput } from 'components/visual/Inputs/components/ExpandInput';
-import { HelperText } from 'components/visual/Inputs/components/HelperText';
+import { createStoreContext } from 'components/core/store/createStoreContext';
 import {
-  isValidValue,
+  ExpandInput,
+  HelperText,
+  PasswordInput,
+  ResetInput,
   StyledEndAdornmentBox,
   StyledFormButton,
   StyledFormControl,
-  StyledFormControlLabel,
-  useInputState
-} from 'components/visual/Inputs/components/InputComponents';
-import { PasswordInput } from 'components/visual/Inputs/components/PasswordInput';
-import { ResetInput } from 'components/visual/Inputs/components/ResetInput';
-import type { InputProps } from 'components/visual/Inputs/models/Input';
+  StyledFormControlLabel
+} from 'components/visual/Inputs/lib/inputs.components';
+import { useInputUpdater } from 'components/visual/Inputs/lib/inputs.hook';
+import type { InputProps, InputStates } from 'components/visual/Inputs/lib/inputs.model';
+import { DEFAULT_INPUT_DATA } from 'components/visual/Inputs/lib/inputs.model';
 import { Tooltip } from 'components/visual/Tooltip';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 export type CheckboxInputProps = Omit<
   ButtonProps,
-  'onChange' | 'onClick' | 'value' | 'error' | 'onBlur' | 'onFocus' | 'defaultValue'
+  'onChange' | 'onClick' | 'value' | 'error' | 'onBlur' | 'onFocus' | 'defaultValue' | 'onError'
 > &
   InputProps<boolean>;
 
-const WrappedCheckboxInput = (props: CheckboxInputProps) => {
+const { StoreProvider, useStore } = createStoreContext<CheckboxInputProps & InputStates<boolean>>({
+  ...DEFAULT_INPUT_DATA
+});
+
+const WrappedCheckboxInput = () => {
   const { t } = useTranslation('inputs');
 
-  const {
-    error = () => '',
-    indeterminate = false,
-    loading = false,
-    preventDisabledColor = false,
-    preventRender = false,
-    required = false,
-    readOnly = false,
-    tooltip = null,
-    tooltipProps = null,
-    value = false
-  } = props;
+  const [error, setStore] = useStore(s => s.error);
+  const [indeterminate] = useStore(s => s.indeterminate);
+  const [loading] = useStore(s => s.loading);
+  const [preventDisabledColor] = useStore(s => s.preventDisabledColor);
+  const [preventRender] = useStore(s => s.preventRender);
+  const [required] = useStore(s => s.required);
+  const [readOnly] = useStore(s => s.readOnly);
+  const [tooltip] = useStore(s => s.tooltip);
+  const [tooltipProps] = useStore(s => s.tooltipProps);
+  const [value] = useStore(s => s.value);
 
-  const state = useInputState<boolean, boolean>(props, v => {
-    if (error(v)) return error(v);
-    else if (required && !isValidValue(v)) return t('error.required');
-    else return null;
-  });
+  // useEffect(() => {
+  //   if (error(value)) setStore({ errorMsg: error(value) });
+  //   else if (required && !isValidValue(value)) setStore({ errorMsg: t('error.required') });
+  //   else setStore({ errorMsg: null });
+  // }, [error, required, setStore, t, value]);
+
+  useInputUpdater(useStore);
 
   return preventRender ? null : (
     <Tooltip title={loading ? null : tooltip} {...tooltipProps}>
-      <StyledFormControl props={props} state={state}>
-        <StyledFormButton props={props} state={state}>
-          <StyledFormControlLabel props={props} state={state}>
+      <StyledFormControl useStore={useStore}>
+        <StyledFormButton useStore={useStore}>
+          <StyledFormControlLabel useStore={useStore}>
             <Checkbox
               checked={value}
               indeterminate={indeterminate}
@@ -67,16 +72,20 @@ const WrappedCheckboxInput = (props: CheckboxInputProps) => {
           </StyledFormControlLabel>
         </StyledFormButton>
 
-        <HelperText props={props} state={state} />
+        <HelperText useStore={useStore} />
 
-        <StyledEndAdornmentBox props={props} state={state}>
-          <PasswordInput props={props} state={state} />
-          <ResetInput props={props} state={state} />
-          <ExpandInput props={props} state={state} />
+        <StyledEndAdornmentBox useStore={useStore}>
+          <PasswordInput useStore={useStore} />
+          <ResetInput useStore={useStore} />
+          <ExpandInput useStore={useStore} />
         </StyledEndAdornmentBox>
       </StyledFormControl>
     </Tooltip>
   );
 };
 
-export const CheckboxInput = React.memo(WrappedCheckboxInput);
+export const CheckboxInput: React.FC<CheckboxInputProps> = React.memo((props: CheckboxInputProps) => (
+  <StoreProvider data={props}>
+    <WrappedCheckboxInput />
+  </StoreProvider>
+));

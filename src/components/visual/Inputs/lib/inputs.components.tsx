@@ -26,10 +26,14 @@ import { Tooltip } from 'components/visual/Tooltip';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-export const StyledEndAdornmentBox = <T, P>({ children, state }: ComponentProps<T, P>) => {
+export const StyledEndAdornmentBox = React.memo(<T, P>({ children, useStore }: ComponentProps<T, P>) => {
   const theme = useTheme();
 
-  return state.preventResetRender && state.preventPasswordRender && state.preventExpandRender ? null : (
+  const [preventExpandRender] = useStore(s => s.preventExpandRender);
+  const [preventPasswordRender] = useStore(s => s.preventPasswordRender);
+  const [preventResetRender] = useStore(s => s.preventResetRender);
+
+  return preventResetRender && preventPasswordRender && preventExpandRender ? null : (
     <div
       style={{
         position: 'absolute',
@@ -43,19 +47,26 @@ export const StyledEndAdornmentBox = <T, P>({ children, state }: ComponentProps<
       {children}
     </div>
   );
-};
+});
 
-export const StyledEndAdornment = <T, P>({ children, state }: ComponentProps<T, P>) => {
-  return state.preventResetRender && state.preventPasswordRender && state.preventExpandRender ? null : (
+export const StyledEndAdornment = React.memo(<T, P>({ children, useStore }: ComponentProps<T, P>) => {
+  const [preventExpandRender] = useStore(s => s.preventExpandRender);
+  const [preventPasswordRender] = useStore(s => s.preventPasswordRender);
+  const [preventResetRender] = useStore(s => s.preventResetRender);
+
+  return preventResetRender && preventPasswordRender && preventExpandRender ? null : (
     <InputAdornment position="end">{children}</InputAdornment>
   );
-};
+});
 
-export const ExpandInput = <T, P>({ props, state }: ComponentProps<T, P>) => {
+export const ExpandInput = React.memo(<T, P>({ useStore }: ComponentProps<T, P>) => {
   const theme = useTheme();
 
-  const { id, preventExpandRender } = state;
-  const { expand = null, onExpand = () => null, expandProps } = props;
+  const [expand] = useStore(s => s.expand);
+  const [expandProps] = useStore(s => s.expandProps);
+  const [id] = useStore(s => s.id);
+  const [preventExpandRender] = useStore(s => s.preventExpandRender);
+  const [onExpand] = useStore(s => s.onExpand);
 
   return preventExpandRender ? null : (
     <ListItemIcon sx={{ minWidth: 0 }}>
@@ -82,19 +93,24 @@ export const ExpandInput = <T, P>({ props, state }: ComponentProps<T, P>) => {
       </IconButton>
     </ListItemIcon>
   );
-};
+});
 
-export const PasswordInput = <T, P>({ props, state }: ComponentProps<T, P>) => {
+export const PasswordInput = React.memo(<T, P>({ useStore }: ComponentProps<T, P>) => {
   const theme = useTheme();
 
-  const { id, preventPasswordRender, showPassword, togglePassword } = state;
-  const { resetProps, tiny = false } = props;
+  const [, setStore] = useStore(s => s);
+  const [id] = useStore(s => s.id);
+  const [label] = useStore(s => s.label);
+  const [preventPasswordRender] = useStore(s => s.preventPasswordRender);
+  const [resetProps] = useStore(s => s.resetProps);
+  const [showPassword] = useStore(s => s.showPassword);
+  const [tiny] = useStore(s => s.tiny);
 
   return preventPasswordRender ? null : (
     <IconButton
       aria-label={`${id}-password`}
       color="secondary"
-      onClick={event => togglePassword(event)}
+      onClick={() => setStore(s => ({ ...s, showPassword: !s.showPassword }))}
       {...resetProps}
       sx={{
         padding: tiny ? theme.spacing(0.25) : theme.spacing(0.5),
@@ -104,14 +120,19 @@ export const PasswordInput = <T, P>({ props, state }: ComponentProps<T, P>) => {
       {showPassword ? <VisibilityOff fontSize="small" /> : <Visibility fontSize="small" />}
     </IconButton>
   );
-};
+});
 
-export const ResetInput = <T, P>({ props, state }: ComponentProps<T, P>) => {
+export const ResetInput = React.memo(<T, P>({ useStore }: ComponentProps<T, P>) => {
   const { t } = useTranslation();
   const theme = useTheme();
 
-  const { id, preventResetRender, handleChange } = state;
-  const { defaultValue = undefined, tiny = false, resetProps, onReset = null } = props;
+  const [defaultValue] = useStore(s => s.defaultValue);
+  const [id] = useStore(s => s.id);
+  const [preventResetRender] = useStore(s => s.preventResetRender);
+  const [resetProps] = useStore(s => s.resetProps);
+  const [tiny] = useStore(s => s.tiny);
+  const [handleChange] = useStore(s => s.handleChange);
+  const [onReset] = useStore(s => s.onReset);
 
   return preventResetRender ? null : (
     <Tooltip
@@ -135,7 +156,7 @@ export const ResetInput = <T, P>({ props, state }: ComponentProps<T, P>) => {
         aria-label={`${id}-reset`}
         type="reset"
         color="secondary"
-        onClick={event => (onReset ? onReset(event) : handleChange(event, defaultValue as unknown as P))}
+        onClick={event => (onReset ? onReset(event) : handleChange(event, defaultValue as unknown as T))}
         {...resetProps}
         sx={{
           padding: tiny ? theme.spacing(0.25) : theme.spacing(0.5),
@@ -146,30 +167,28 @@ export const ResetInput = <T, P>({ props, state }: ComponentProps<T, P>) => {
       </IconButton>
     </Tooltip>
   );
-};
+});
 
-export const HelperText = <T, P>({ props, state }: ComponentProps<T, P>) => {
+export const HelperText = React.memo(<T, P>({ useStore }: ComponentProps<T, P>) => {
   const theme = useTheme();
 
-  const { error, id } = state;
+  const [disabled] = useStore(s => s.disabled);
+  const [errorMsg] = useStore(s => s.errorMsg);
+  const [errorProps] = useStore(s => s.errorProps);
+  const [helperText] = useStore(s => s.helperText);
+  const [helperTextProps] = useStore(s => s.helperTextProps);
+  const [id] = useStore(s => s.id);
+  const [loading] = useStore(s => s.loading);
+  const [readOnly] = useStore(s => s.readOnly);
 
-  const {
-    disabled = false,
-    errorProps = null,
-    helperText = '',
-    helperTextProps = null,
-    loading = false,
-    readOnly = false
-  } = props;
-
-  return disabled || loading || readOnly ? null : error ? (
+  return disabled || loading || readOnly ? null : errorMsg ? (
     <FormHelperText
       id={`${id}-helper-text`}
       variant="outlined"
       {...errorProps}
       sx={{ color: theme.palette.error.main, ...errorProps?.sx }}
     >
-      {error}
+      {errorMsg}
     </FormHelperText>
   ) : helperText ? (
     <FormHelperText
@@ -181,7 +200,7 @@ export const HelperText = <T, P>({ props, state }: ComponentProps<T, P>) => {
       {helperText}
     </FormHelperText>
   ) : null;
-};
+});
 
 export type ListInputProps = {
   button?: boolean;
@@ -203,20 +222,24 @@ export const ListInput: React.FC<ListInputProps> = React.memo(
   }
 );
 
-export const StyledCircularSkeleton = () => (
+export const StyledCircularSkeleton = React.memo(() => (
   <div style={{ minWidth: '40px', display: 'flex', justifyContent: 'center' }}>
     <Skeleton variant="circular" sx={{ height: '24px', width: '24px' }} />
   </div>
-);
+));
 
-export const StyledInputSkeleton = <T, P>({ props }: ComponentProps<T, P>) => (
-  <Skeleton sx={{ height: '40px', transform: 'unset', ...(props?.tiny && { height: '28px' }) }} />
-);
+export const StyledInputSkeleton = React.memo(<T, P>({ useStore }: ComponentProps<T, P>) => {
+  const [tiny] = useStore(s => s.tiny);
 
-export const StyledFormControl = <T, P>({ children, props }: ComponentProps<T, P>) => {
+  return <Skeleton sx={{ height: '40px', transform: 'unset', ...(tiny && { height: '28px' }) }} />;
+});
+
+export const StyledFormControl = React.memo(<T, P>({ children, useStore }: ComponentProps<T, P>) => {
   const theme = useTheme();
 
-  const { readOnly = false, disabled = false } = props;
+  const [disabled] = useStore(s => s.disabled);
+  const [divider] = useStore(s => s.divider);
+  const [readOnly] = useStore(s => s.readOnly);
 
   return (
     <FormControl
@@ -225,7 +248,7 @@ export const StyledFormControl = <T, P>({ children, props }: ComponentProps<T, P
       fullWidth
       {...(readOnly && !disabled && { focused: null })}
       sx={{
-        ...(props?.divider && { borderBottom: `1px solid ${theme.palette.divider}` }),
+        ...(divider && { borderBottom: `1px solid ${theme.palette.divider}` }),
         ...(readOnly &&
           !disabled && {
             '& .MuiInputBase-input': { cursor: 'default' },
@@ -238,26 +261,24 @@ export const StyledFormControl = <T, P>({ children, props }: ComponentProps<T, P
       {children}
     </FormControl>
   );
-};
+});
 
-export const StyledButtonLabel = <T, P>({ props, state }: ComponentProps<T, P>) => {
+export const StyledButtonLabel = React.memo(<T, P>({ useStore }: ComponentProps<T, P>) => {
   const theme = useTheme();
 
-  const { focused, showPassword } = state;
-
-  const {
-    disabled = false,
-    endAdornment = null,
-    error = () => '',
-    label = '\u00A0',
-    labelProps = null,
-    loading = false,
-    monospace = false,
-    password = false,
-    preventDisabledColor = false,
-    showOverflow = false,
-    value
-  } = props;
+  const [disabled] = useStore(s => s.disabled);
+  const [endAdornment] = useStore(s => s.endAdornment);
+  const [error] = useStore(s => s.error);
+  const [focused] = useStore(s => s.focused);
+  const [label] = useStore(s => s.label);
+  const [labelProps] = useStore(s => s.labelProps);
+  const [loading] = useStore(s => s.loading);
+  const [monospace] = useStore(s => s.monospace);
+  const [password] = useStore(s => s.password);
+  const [preventDisabledColor] = useStore(s => s.preventDisabledColor);
+  const [showOverflow] = useStore(s => s.showOverflow);
+  const [showPassword] = useStore(s => s.showPassword);
+  const [value] = useStore(s => s.value);
 
   return (
     <div
@@ -302,17 +323,24 @@ export const StyledButtonLabel = <T, P>({ props, state }: ComponentProps<T, P>) 
       {endAdornment}
     </div>
   );
-};
+});
 
-export const StyledFormControlLabel = <T, P>({ props, children = null, state }: ComponentProps<T, P>) => {
-  const { preventExpandRender, preventPasswordRender, preventResetRender } = state;
-  const { disabled = false, loading = false, readOnly = false, showOverflow = false, tiny = false, value } = props;
+export const StyledFormControlLabel = React.memo(<T, P>({ children, useStore }: ComponentProps<T, P>) => {
+  const [disabled] = useStore(s => s.disabled);
+  const [loading] = useStore(s => s.loading);
+  const [preventExpandRender] = useStore(s => s.preventExpandRender);
+  const [preventPasswordRender] = useStore(s => s.preventPasswordRender);
+  const [preventResetRender] = useStore(s => s.preventResetRender);
+  const [readOnly] = useStore(s => s.readOnly);
+  const [showOverflow] = useStore(s => s.showOverflow);
+  const [tiny] = useStore(s => s.tiny);
+  const [value] = useStore(s => s.value);
 
   return (
     <FormControlLabel
       control={loading ? <StyledCircularSkeleton /> : (children as React.ReactElement)}
       disabled={loading || disabled || readOnly}
-      label={<StyledButtonLabel props={props} state={state} />}
+      label={<StyledButtonLabel useStore={useStore} />}
       slotProps={{ typography: { width: '100%' } }}
       value={value}
       sx={{
@@ -323,18 +351,19 @@ export const StyledFormControlLabel = <T, P>({ props, children = null, state }: 
       }}
     />
   );
-};
+});
 
-export const StyledFormButton = ({ props, state, children = null }: ComponentProps<boolean, boolean>) => {
-  const { handleChange, handleFocus, handleBlur } = state;
-  const {
-    disabled = false,
-    loading = false,
-    preventDisabledColor = false,
-    readOnly = false,
-    tiny = false,
-    value = false
-  } = props;
+export const StyledFormButton = React.memo(({ children, useStore }: ComponentProps<boolean, boolean>) => {
+  const [label] = useStore(s => s.label);
+  const [disabled] = useStore(s => s.disabled);
+  const [loading] = useStore(s => s.loading);
+  const [preventDisabledColor] = useStore(s => s.preventDisabledColor);
+  const [readOnly] = useStore(s => s.readOnly);
+  const [tiny] = useStore(s => s.tiny);
+  const [value] = useStore(s => s.value);
+  const [handleBlur] = useStore(s => s.handleBlur);
+  const [handleChange] = useStore(s => s.handleChange);
+  const [handleFocus] = useStore(s => s.handleFocus);
 
   return (
     <Button
@@ -356,24 +385,22 @@ export const StyledFormButton = ({ props, state, children = null }: ComponentPro
       {children}
     </Button>
   );
-};
+});
 
-export const StyledFormLabel = <T, P>({ props, state }: ComponentProps<T, P>) => {
+export const StyledFormLabel = React.memo(<T, P>({ useStore }: ComponentProps<T, P>) => {
   const theme = useTheme();
 
-  const { id, focused } = state;
-
-  const {
-    disabled,
-    error = () => '',
-    label = null,
-    labelProps,
-    preventDisabledColor = false,
-    required = false,
-    tooltip = null,
-    tooltipProps = null,
-    value
-  } = props;
+  const [disabled] = useStore(s => s.disabled);
+  const [error] = useStore(s => s.error);
+  const [focused] = useStore(s => s.focused);
+  const [id] = useStore(s => s.id);
+  const [label] = useStore(s => s.label);
+  const [labelProps] = useStore(s => s.labelProps);
+  const [preventDisabledColor] = useStore(s => s.preventDisabledColor);
+  const [required] = useStore(s => s.required);
+  const [tooltip] = useStore(s => s.tooltip);
+  const [tooltipProps] = useStore(s => s.tooltipProps);
+  const [value] = useStore(s => s.value);
 
   return (
     <Tooltip title={tooltip} {...tooltipProps}>
@@ -399,25 +426,28 @@ export const StyledFormLabel = <T, P>({ props, state }: ComponentProps<T, P>) =>
       </Badge>
     </Tooltip>
   );
-};
+});
 
 export type StyledTextField<T, P> = TextFieldProps & ComponentProps<T, P>;
 
-export const StyledTextField = <T,>({ props, state, ...textFieldProps }: StyledTextField<T, string>) => {
+export const StyledTextField = React.memo(<T,>({ useStore, ...textFieldProps }: StyledTextField<T, string>) => {
   const theme = useTheme();
 
-  const { id, error, inputValue, showPassword, handleChange, handleFocus, handleBlur } = state;
-
-  const {
-    disabled,
-    monospace = false,
-    password = false,
-    placeholder = null,
-    readOnly = false,
-    startAdornment = null,
-    endAdornment = null,
-    tiny = false
-  } = props;
+  const [disabled] = useStore(s => s.disabled);
+  const [endAdornment] = useStore(s => s.endAdornment);
+  const [error] = useStore(s => s.error);
+  const [id] = useStore(s => s.id);
+  const [inputValue] = useStore(s => s.inputValue);
+  const [monospace] = useStore(s => s.monospace);
+  const [password] = useStore(s => s.password);
+  const [placeholder] = useStore(s => s.placeholder);
+  const [readOnly] = useStore(s => s.readOnly);
+  const [showPassword] = useStore(s => s.showPassword);
+  const [startAdornment] = useStore(s => s.startAdornment);
+  const [tiny] = useStore(s => s.tiny);
+  const [handleBlur] = useStore(s => s.handleBlur);
+  const [handleChange] = useStore(s => s.handleChange);
+  const [handleFocus] = useStore(s => s.handleFocus);
 
   return (
     <TextField
@@ -435,21 +465,21 @@ export const StyledTextField = <T,>({ props, state, ...textFieldProps }: StyledT
       slotProps={{
         ...textFieldProps?.slotProps,
         input: {
-          'aria-describedby': getAriaDescribedBy(props),
+          'aria-describedby': getAriaDescribedBy(null),
           placeholder: placeholder,
           readOnly: readOnly,
           startAdornment: startAdornment && <InputAdornment position="start">{startAdornment}</InputAdornment>,
           endAdornment: (
-            <StyledEndAdornment props={props} state={state}>
-              <PasswordInput props={props} state={state} />
-              <ResetInput props={props} state={state} />
+            <StyledEndAdornment useStore={useStore}>
+              <PasswordInput useStore={useStore} />
+              <ResetInput useStore={useStore} />
               {endAdornment}
             </StyledEndAdornment>
           ),
           ...textFieldProps?.slotProps?.input
         }
       }}
-      onChange={e => handleChange(e, e.target.value)}
+      onChange={e => handleChange(e, e.target.value as T)}
       onFocus={handleFocus}
       onBlur={handleBlur}
       sx={{
@@ -481,4 +511,4 @@ export const StyledTextField = <T,>({ props, state, ...textFieldProps }: StyledT
       }}
     />
   );
-};
+});

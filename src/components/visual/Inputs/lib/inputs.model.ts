@@ -1,7 +1,6 @@
 import type { FormHelperTextProps, IconButtonProps, TooltipProps, TypographyProps } from '@mui/material';
-import type { useInputState } from 'components/visual/Inputs/lib/inputs.hook';
+import { createStoreContext } from 'components/core/store/createStoreContext';
 import type React from 'react';
-import type { ReactNode } from 'react';
 
 export type InputProps<Type> = {
   defaultValue?: Type;
@@ -43,10 +42,83 @@ export type InputProps<Type> = {
   onReset?: IconButtonProps['onClick'];
 };
 
-export type InputState<Type, P> = ReturnType<typeof useInputState<Type, P>>;
+export type InputStates<Type> = {
+  ariaLabel?: string;
+  ariaDescribeBy?: string;
+  errorMsg?: string;
+  focused?: boolean;
+  inputValue?: Type;
+  label?: string;
+  preventExpandRender?: boolean;
+  preventPasswordRender?: boolean;
+  preventResetRender?: boolean;
+  showPassword?: boolean;
+
+  handleBlur?: (event: React.SyntheticEvent) => void;
+  handleChange?: (event: React.SyntheticEvent, value: Type) => void;
+  handleFocus?: (event: React.SyntheticEvent) => void;
+  togglePassword?: (event: React.SyntheticEvent) => void;
+};
+
+export type InputData<Type> = InputProps<Type> & InputStates<Type>;
 
 export type ComponentProps<T, P> = {
-  props: Omit<InputProps<T>, 'onFocus' | 'onBlur' | 'onChange' | 'onError'>;
-  state: ReturnType<typeof useInputState<T, P>>;
-  children?: ReactNode;
+  children?: React.ReactNode;
+  useStore: ReturnType<typeof createStoreContext<InputData<T>>>['useStore'];
+};
+
+export const DEFAULT_INPUT_DATA: InputData<undefined> = {
+  defaultValue: undefined,
+  disabled: false,
+  divider: false,
+  endAdornment: null,
+  error: () => '',
+  errorProps: null,
+  expand: null,
+  expandProps: null,
+  helperText: null,
+  helperTextProps: null,
+  id: '',
+  indeterminate: false,
+  label: '',
+  labelProps: null,
+  loading: false,
+  monospace: false,
+  password: false,
+  placeholder: null,
+  preventDisabledColor: false,
+  preventRender: false,
+  readOnly: false,
+  required: false,
+  reset: false,
+  resetProps: null,
+  rootProps: null,
+  showOverflow: false,
+  startAdornment: null,
+  tiny: false,
+  tooltip: null,
+  tooltipProps: null,
+  value: undefined,
+
+  onBlur: () => null,
+  onChange: () => null,
+  onError: () => null,
+  onExpand: () => null,
+  onFocus: () => null,
+  onReset: () => null
+
+  // ariaLabel: '',
+  // ariaDescribeBy: '',
+  // errorMsg: null,
+  // focused: false,
+  // inputValue: undefined,
+  // preventExpandRender: false,
+  // preventPasswordRender: false,
+  // preventResetRender: false,
+  // showPassword: false
+
+  // handleBlur: () => null,
+  // handleChange: () => null,
+  // handleFocus: () => null,
+  // togglePassword: () => null
 };
