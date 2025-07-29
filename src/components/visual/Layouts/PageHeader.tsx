@@ -5,19 +5,20 @@ import useALContext from 'components/hooks/useALContext';
 import type { ClassificationProps } from 'components/visual/Classification';
 import Classification from 'components/visual/Classification';
 import type { CSSProperties, DetailedHTMLProps, HTMLAttributes, ReactNode } from 'react';
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 
 export type PageHeaderProps = {
-  classification?: ClassificationProps['c12n'] | ((loading?: boolean) => ClassificationProps['c12n']);
-  primary: ReactNode | ((loading?: boolean) => ReactNode);
-  secondary?: ReactNode | ((loading?: boolean) => ReactNode);
   actions?: ReactNode;
-  startAdornment?: ReactNode;
+  classification?: ClassificationProps['c12n'] | (() => ClassificationProps['c12n']);
   endAdornment?: ReactNode;
-
-  loading?: boolean;
   isSticky?: boolean;
+  primary: ReactNode | (() => ReactNode);
+  primaryLoading?: boolean;
+  secondary?: ReactNode | (() => ReactNode);
+  secondaryLoading?: boolean;
+  startAdornment?: ReactNode;
   top?: CSSProperties['top'];
+  wrapStart?: boolean;
   onClassificationChange?: ClassificationProps['setClassification'];
 
   slotProps?: {
@@ -33,15 +34,16 @@ export const PageHeader: React.FC<PageHeaderProps> = React.memo(
   ({
     actions = null,
     classification = 'undefined',
-    startAdornment = null,
     endAdornment = null,
-    loading = false,
     isSticky = false,
     primary = null,
-    top = null,
+    primaryLoading = false,
     secondary = null,
-
+    secondaryLoading = false,
     slotProps = {},
+    startAdornment = null,
+    top = null,
+    wrapStart = false,
     onClassificationChange = null
   }: PageHeaderProps) => {
     const theme = useTheme();
@@ -49,6 +51,12 @@ export const PageHeader: React.FC<PageHeaderProps> = React.memo(
     const appbar = useAppBar();
     const appBarHeight = useAppBarHeight();
     const { c12nDef } = useALContext();
+
+    const [flexColumn, setFlexColumn] = useState<boolean>(false);
+
+    const containerRef = useRef<HTMLDivElement>(null);
+    const primaryRef = useRef<HTMLSpanElement>(null);
+    const actionsRef = useRef<HTMLDivElement>(null);
 
     const barWillHide = useMemo(
       () => (layout?.current !== 'top' ? appbar?.autoHide : null),
@@ -62,6 +70,28 @@ export const PageHeader: React.FC<PageHeaderProps> = React.memo(
       secondary: secondaryProps,
       actions: actionsProps
     } = useMemo<PageHeaderProps['slotProps']>(() => slotProps, [slotProps]);
+
+    useEffect(() => {
+      const element = containerRef.current;
+
+      if (!element) return;
+
+      const resizeObserver = new ResizeObserver(() => {
+        if (containerRef.current && primaryRef.current && actionsRef.current) {
+          setFlexColumn(
+            containerRef.current.getBoundingClientRect().width - actionsRef.current.getBoundingClientRect().width <
+              primaryRef.current.getBoundingClientRect().width + 10
+          );
+        }
+      });
+
+      resizeObserver.observe(element);
+
+      return () => {
+        resizeObserver.unobserve(element);
+        resizeObserver.disconnect();
+      };
+    }, []);
 
     return (
       <div
@@ -79,7 +109,13 @@ export const PageHeader: React.FC<PageHeaderProps> = React.memo(
             <Classification
               type={!onClassificationChange ? 'pill' : 'picker'}
               size="tiny"
-              c12n={loading ? null : typeof classification === 'function' ? classification(loading) : classification}
+              c12n={
+                primaryLoading || secondaryLoading
+                  ? null
+                  : typeof classification === 'function'
+                    ? classification()
+                    : classification
+              }
               setClassification={onClassificationChange}
               {...classificationProps}
             />
@@ -87,12 +123,17 @@ export const PageHeader: React.FC<PageHeaderProps> = React.memo(
         )}
 
         <div
+          ref={containerRef}
           style={{
             display: 'flex',
             flexDirection: 'row',
             flexWrap: 'wrap',
-            alignContent: 'flex-start',
-            gap: theme.spacing(1)
+            gap: theme.spacing(1),
+            ...(flexColumn && {
+              flexDirection: 'column',
+              alignItems: 'flex-end',
+              ...(wrapStart && { alignItems: 'flex-start' })
+            })
           }}
         >
           <div
@@ -100,35 +141,70 @@ export const PageHeader: React.FC<PageHeaderProps> = React.memo(
               flex: 1,
               width: '100%',
               display: 'flex',
-              flexWrap: 'wrap',
-              alignContent: 'center',
+              flexDirection: 'column',
+              alignItems: 'start',
               columnGap: theme.spacing(1),
               textAlign: 'left'
             }}
           >
-            <Typography
-              variant="h4"
-              width="100%"
-              flex={1}
-              {...primaryProps}
-              sx={{ overflowWrap: 'break-word', ...primaryProps?.sx }}
-            >
-              {typeof primary === 'function' ? primary(loading) : primary}
-            </Typography>
+            {(primary || primaryLoading) && (
+              <Typography
+                ref={primaryRef}
+                variant="h4"
+                {...primaryProps}
+                sx={{
+                  ...primaryProps?.sx,
+                  position: 'absolute',
+                  opacity: 0,
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis'
+                }}
+              >
+                {primaryLoading ? (
+                  <Skeleton style={{ width: '10rem' }} />
+                ) : typeof primary === 'function' ? (
+                  primary()
+                ) : (
+                  primary
+                )}
+              </Typography>
+            )}
 
-            {secondary && (
+            {(primary || primaryLoading) && (
+              <Typography
+                variant="h4"
+                {...primaryProps}
+                sx={{ overflowWrap: 'break-word', wordBreak: 'break-word', whiteSpace: 'normal', ...primaryProps?.sx }}
+              >
+                {primaryLoading ? (
+                  <Skeleton style={{ width: '10rem' }} />
+                ) : typeof primary === 'function' ? (
+                  primary()
+                ) : (
+                  primary
+                )}
+              </Typography>
+            )}
+
+            {(secondary || secondaryLoading) && (
               <Typography
                 variant="caption"
                 color="textSecondary"
                 width="100%"
                 minWidth={0}
                 {...secondaryProps}
-                sx={{ overflowWrap: 'break-word', ...secondaryProps?.sx }}
+                sx={{
+                  overflowWrap: 'break-word',
+                  wordBreak: 'break-word',
+                  whiteSpace: 'normal',
+                  ...secondaryProps?.sx
+                }}
               >
-                {loading ? (
+                {secondaryLoading ? (
                   <Skeleton style={{ width: '10rem' }} />
                 ) : typeof secondary === 'function' ? (
-                  secondary(loading)
+                  secondary()
                 ) : (
                   secondary
                 )}
@@ -139,12 +215,12 @@ export const PageHeader: React.FC<PageHeaderProps> = React.memo(
           </div>
 
           <div
+            ref={actionsRef}
             style={{
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'stretch',
-              rowGap: theme.spacing(1),
-              paddingTop: theme.spacing(0.5)
+              rowGap: theme.spacing(1)
             }}
           >
             {actions && (
