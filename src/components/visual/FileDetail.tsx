@@ -404,16 +404,14 @@ const WrappedFileDetail: React.FC<Props> = ({
       />
 
       <PageHeader
-        classification={file ? file.classification : null}
-        primary={!file ? null : file?.file_info?.type.startsWith('uri/') ? t('uri_title') : t('title')}
-        secondary={
-          !file
-            ? null
-            : file?.file_info?.type.startsWith('uri/') && file?.file_info?.uri_info?.uri
-              ? file?.file_info?.uri_info?.uri
-              : fileName
+        classification={() => file.classification}
+        primary={file?.file_info?.type.startsWith('uri/') ? t('uri_title') : t('title')}
+        secondary={() =>
+          file?.file_info?.type.startsWith('uri/') && file?.file_info?.uri_info?.uri
+            ? file?.file_info?.uri_info?.uri
+            : fileName
         }
-        loading={!file}
+        secondaryLoading={!file}
         slotProps={{ root: { style: { marginBottom: theme.spacing(2) } } }}
         actions={
           <>
@@ -430,7 +428,9 @@ const WrappedFileDetail: React.FC<Props> = ({
             >
               <ViewCarouselOutlinedIcon />
             </IconButton>
-            {currentUser.roles.includes('file_download') && (
+            {!currentUser.roles.includes('file_download') ? null : !file ? (
+              'load'
+            ) : (
               <FileDownloader
                 icon={<GetAppOutlinedIcon />}
                 link={

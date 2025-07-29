@@ -162,7 +162,7 @@ export const PageHeader: React.FC<PageHeaderProps> = React.memo(
                 }}
               >
                 {primaryLoading ? (
-                  <Skeleton style={{ width: '10rem' }} />
+                  <Skeleton style={{ width: '20rem' }} />
                 ) : typeof primary === 'function' ? (
                   primary()
                 ) : (

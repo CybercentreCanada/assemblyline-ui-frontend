@@ -1156,10 +1156,10 @@ function WrappedSubmissionDetail() {
       )}
 
       <PageHeader
-        classification={submission ? submission.classification : null}
+        classification={() => submission.classification}
         primary={t('title')}
-        secondary={submission ? submission.sid : null}
-        loading={!submission}
+        secondary={() => submission.sid}
+        secondaryLoading={!submission}
         actions={
           <>
             <IconButton
