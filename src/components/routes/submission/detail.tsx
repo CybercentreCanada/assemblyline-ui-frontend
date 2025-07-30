@@ -1182,10 +1182,13 @@ function WrappedSubmissionDetail() {
             </IconButton>
 
             <FileDownloader
-              link={`/api/v4/bundle/${submission.sid}/`}
-              loading={!submission}
-              preventRender={!currentUser.roles.includes('bundle_download') || submission.state !== 'completed'}
               tooltip={t('download')}
+              {...(!submission
+                ? { loading: true, link: null }
+                : {
+                    link: `/api/v4/bundle/${submission.sid}/`,
+                    preventRender: !currentUser.roles.includes('bundle_download') || submission.state !== 'completed'
+                  })}
             >
               <CloudDownloadOutlinedIcon />
             </FileDownloader>

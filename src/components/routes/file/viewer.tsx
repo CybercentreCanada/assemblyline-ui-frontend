@@ -155,9 +155,11 @@ const WrappedFileViewer = () => {
                 </IconButton>
               </Tooltip>
             )}
-            {currentUser.roles.includes('file_download') && (
-              <FileDownloader link={`/api/v4/file/download/${sha256}/`} tooltip={t('download')} />
-            )}
+            <FileDownloader
+              link={`/api/v4/file/download/${sha256}/`}
+              preventRender={!currentUser.roles.includes('file_download')}
+              tooltip={t('download')}
+            />
           </div>
         </Grid>
       </Grid>

@@ -145,7 +145,10 @@ export const ErrorDetail = ({ error_key = null }: ErrorDetailProps) => {
                     <DescriptionOutlinedIcon />
                   </IconButton>
                 </Tooltip>
-                <FileDownloader link={`/api/v4/file/download/${error.sha256}/`} tooltip={t('download')} />
+                <FileDownloader
+                  link={!error ? null : `/api/v4/file/download/${error.sha256}/`}
+                  tooltip={t('download')}
+                />
                 <Tooltip title={t('file_viewer')}>
                   <IconButton component={Link} to={fileViewerPath} size="large">
                     <PageviewOutlinedIcon />
