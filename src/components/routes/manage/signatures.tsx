@@ -1,5 +1,4 @@
 import BlockIcon from '@mui/icons-material/Block';
-import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
 import RecordVoiceOverOutlinedIcon from '@mui/icons-material/RecordVoiceOverOutlined';
 import { useMediaQuery, useTheme } from '@mui/material';
 import { useAppUser } from 'commons/components/app/hooks';
@@ -17,7 +16,7 @@ import type { SearchResult } from 'components/models/ui/search';
 import type { CustomUser } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
 import SignatureDetail from 'components/routes/manage/signature_detail';
-import FileDownloader from 'components/visual/FileDownloader';
+import { FileDownloader } from 'components/visual/Buttons/FileDownloader';
 import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import SearchHeader from 'components/visual/SearchBar/SearchHeader';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
@@ -159,13 +158,11 @@ const SignaturesSearch = () => {
           root: { style: { marginBottom: theme.spacing(2) } }
         }}
         actions={
-          currentUser.roles.includes('signature_download') && (
-            <FileDownloader
-              icon={<GetAppOutlinedIcon />}
-              link={`/api/v4/signature/download/?${downloadLink}`}
-              tooltip={t('download_desc')}
-            />
-          )
+          <FileDownloader
+            link={`/api/v4/signature/download/?${downloadLink}`}
+            preventRender={!currentUser.roles.includes('signature_download')}
+            tooltip={t('download_desc')}
+          />
         }
       />
 

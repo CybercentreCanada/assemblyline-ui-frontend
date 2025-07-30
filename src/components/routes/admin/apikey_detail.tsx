@@ -147,7 +147,6 @@ const ApikeyDetail = ({ key_id = null, onClose = () => null }: ApikeyDetailProps
 
       <PageHeader
         primary={t('apikey')}
-        loading={!apiKey}
         slotProps={{
           root: { style: { marginBottom: theme.spacing(4) } },
           actions: { spacing: 1 }

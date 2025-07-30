@@ -98,7 +98,7 @@ export default function Services() {
       <PageHeader
         primary={t('title')}
         secondary={() => `${services.length} ${t('count')}`}
-        loading={!services}
+        secondaryLoading={!services}
         slotProps={{
           root: { style: { marginBottom: theme.spacing(4) } }
         }}

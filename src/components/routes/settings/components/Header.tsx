@@ -106,7 +106,7 @@ export const HeaderSection = React.memo(() => {
                 )}
               </>
             }
-            loading={loading}
+            secondaryLoading={loading}
             slotProps={{ actions: { spacing: 1 } }}
             actions={
               <>

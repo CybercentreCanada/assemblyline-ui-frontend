@@ -447,7 +447,7 @@ const SignatureDetail = ({
         <PageHeader
           primary={t('title')}
           secondary={() => `${signature.type}_${signature.source}_${signature.signature_id}`}
-          loading={!signature}
+          secondaryLoading={!signature}
           slotProps={{
             root: { style: { marginBottom: theme.spacing(2) } }
           }}
