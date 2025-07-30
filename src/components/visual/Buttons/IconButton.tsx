@@ -3,6 +3,7 @@ import { IconButton as MuiIconButton, Skeleton } from '@mui/material';
 import type { CircularProgressProps } from 'components/visual/Buttons/CircularProgress';
 import { CircularProgress } from 'components/visual/Buttons/CircularProgress';
 import { Tooltip } from 'components/visual/Tooltip';
+import { getTextContent } from 'helpers/utils';
 import React, { useMemo } from 'react';
 import type { LinkProps } from 'react-router-dom';
 import { Link } from 'react-router-dom';
@@ -20,6 +21,7 @@ export const IconButton: React.FC<IconButtonProps> = React.memo(
   ({
     children = null,
     disabled = false,
+    id = null,
     loading = false,
     preventRender: preventRenderProp = false,
     progress = false,
@@ -47,7 +49,8 @@ export const IconButton: React.FC<IconButtonProps> = React.memo(
     ) : preventRender ? null : (
       <Tooltip title={tooltip} placement="bottom" {...tooltipProps}>
         <MuiIconButton
-          aria-label={!tooltip ? null : JSON.stringify(tooltip)}
+          id={id ?? getTextContent(tooltip)}
+          aria-label={id ?? getTextContent(tooltip)}
           disabled={loading || disabled || progress !== false}
           size={size}
           {...(!to || loading ? null : { component: Link, to: typeof to === 'function' ? to() : to })}
