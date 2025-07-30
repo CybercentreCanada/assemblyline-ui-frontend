@@ -1,7 +1,6 @@
 import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
 import MoodBadIcon from '@mui/icons-material/MoodBad';
 import OndemandVideoOutlinedIcon from '@mui/icons-material/OndemandVideoOutlined';
@@ -30,9 +29,9 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import type { LabelCategories } from 'components/models/base/file';
 import type { File } from 'components/models/ui/file';
+import { FileDownloader } from 'components/visual/Buttons/FileDownloader';
 import Classification from 'components/visual/Classification';
 import CustomChip from 'components/visual/CustomChip';
-import FileDownloader from 'components/visual/FileDownloader';
 import InputDialog from 'components/visual/InputDialog';
 import Moment from 'components/visual/Moment';
 import { bytesToSize } from 'helpers/utils';
@@ -492,15 +491,13 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
                     <ViewCarouselOutlinedIcon />
                   </IconButton>
                 </Tooltip>
-                {currentUser.roles.includes('archive_download') && (
-                  <FileDownloader
-                    icon={<GetAppOutlinedIcon />}
-                    link={`/api/v4/file/download/${file.file_info.sha256}/?${
-                      fileName && file.file_info.sha256 !== fileName ? `name=${fileName}&` : ''
-                    }${sid ? `sid=${sid}&` : ''}`}
-                    tooltip={t('download')}
-                  />
-                )}
+                <FileDownloader
+                  link={`/api/v4/file/download/${file.file_info.sha256}/?${
+                    fileName && file.file_info.sha256 !== fileName ? `name=${fileName}&` : ''
+                  }${sid ? `sid=${sid}&` : ''}`}
+                  tooltip={t('download')}
+                  preventRender={!currentUser.roles.includes('archive_download')}
+                />
                 {currentUser.roles.includes('submission_create') && (
                   <>
                     <Tooltip title={t('resubmit')}>

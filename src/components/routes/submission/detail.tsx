@@ -62,11 +62,11 @@ import FileTreeSection from 'components/routes/submission/detail/file_tree';
 import InfoSection from 'components/routes/submission/detail/info';
 import MetaSection from 'components/routes/submission/detail/meta';
 import TagSection from 'components/routes/submission/detail/tags';
+import { FileDownloader } from 'components/visual/Buttons/FileDownloader';
 import { IconButton } from 'components/visual/Buttons/IconButton';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import FileDetail from 'components/visual/FileDetail';
 import Detection from 'components/visual/FileDetail/detection';
-import FileDownloader from 'components/visual/FileDownloader';
 import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import MetadataInputField from 'components/visual/MetadataInputField';
 import VerdictBar from 'components/visual/VerdictBar';
@@ -1181,15 +1181,14 @@ function WrappedSubmissionDetail() {
               <RemoveCircleOutlineOutlinedIcon />
             </IconButton>
 
-            {!submission ? (
-              <IconButton loading size="large" />
-            ) : !currentUser.roles.includes('bundle_download') || submission.state !== 'completed' ? null : (
-              <FileDownloader
-                icon={<CloudDownloadOutlinedIcon />}
-                link={`/api/v4/bundle/${submission.sid}/`}
-                tooltip={t('download')}
-              />
-            )}
+            <FileDownloader
+              link={`/api/v4/bundle/${submission.sid}/`}
+              loading={!submission}
+              preventRender={!currentUser.roles.includes('bundle_download') || submission.state !== 'completed'}
+              tooltip={t('download')}
+            >
+              <CloudDownloadOutlinedIcon />
+            </FileDownloader>
 
             <IconButton
               loading={!submission}

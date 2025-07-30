@@ -1,5 +1,6 @@
 import type { IconButtonProps as MuiIconButtonProps, TooltipProps } from '@mui/material';
 import { IconButton as MuiIconButton, Skeleton } from '@mui/material';
+import type { CircularProgressProps } from 'components/visual/Buttons/CircularProgress';
 import { CircularProgress } from 'components/visual/Buttons/CircularProgress';
 import { Tooltip } from 'components/visual/Tooltip';
 import React from 'react';
@@ -9,7 +10,7 @@ import { Link } from 'react-router-dom';
 export type IconButtonProps = MuiIconButtonProps & {
   loading?: boolean;
   preventRender?: boolean;
-  progress?: boolean;
+  progress?: CircularProgressProps['progress'];
   to?: LinkProps['to'] | (() => LinkProps['to']);
   tooltip?: TooltipProps['title'];
   tooltipProps?: Omit<TooltipProps, 'children' | 'title'>;
@@ -42,7 +43,7 @@ export const IconButton: React.FC<IconButtonProps> = React.memo(
       <Tooltip title={tooltip} placement="bottom" {...tooltipProps}>
         <MuiIconButton
           aria-label={!tooltip ? null : JSON.stringify(tooltip)}
-          disabled={loading || disabled}
+          disabled={loading || disabled || progress !== false}
           size={size}
           {...(!to || loading ? null : { component: Link, to: typeof to === 'function' ? to() : to })}
           {...props}

@@ -1,7 +1,6 @@
 import { loader } from '@monaco-editor/react';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
-import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
 import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
 import WrapTextOutlinedIcon from '@mui/icons-material/WrapTextOutlined';
 import { Grid, IconButton, Skeleton, styled, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
@@ -13,7 +12,7 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import type { File } from 'components/models/base/file';
 import type { CustomUser } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
-import FileDownloader from 'components/visual/FileDownloader';
+import { FileDownloader } from 'components/visual/Buttons/FileDownloader';
 import { ASCIISection, HexSection, ImageSection, StringsSection } from 'components/visual/FileViewer';
 import CodeSection from 'components/visual/FileViewer/code_summary';
 import { TabContainer } from 'components/visual/TabContainer';
@@ -157,11 +156,7 @@ const WrappedFileViewer = () => {
               </Tooltip>
             )}
             {currentUser.roles.includes('file_download') && (
-              <FileDownloader
-                icon={<GetAppOutlinedIcon />}
-                link={`/api/v4/file/download/${sha256}/`}
-                tooltip={t('download')}
-              />
+              <FileDownloader link={`/api/v4/file/download/${sha256}/`} tooltip={t('download')} />
             )}
           </div>
         </Grid>
