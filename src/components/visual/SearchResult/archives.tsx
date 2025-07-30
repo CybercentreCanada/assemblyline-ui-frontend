@@ -214,7 +214,7 @@ const WrappedArchivesTable: React.FC<Props> = ({
                   }}
                 >
                   <FileDownloader
-                    link={`/api/v4/file/download/${file.sha256}/?`}
+                    link={() => `/api/v4/file/download/${file.sha256}/?`}
                     preventRender={!(currentUser.roles.includes('file_download') && 'sha256' in file)}
                     size="small"
                     tooltip={t('tooltip.download')}

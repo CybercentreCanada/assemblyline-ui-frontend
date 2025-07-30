@@ -2,14 +2,14 @@ import type { ButtonProps as MuiButtonProps, TooltipProps } from '@mui/material'
 import { Button as MuiButton, Skeleton } from '@mui/material';
 import { CircularProgress } from 'components/visual/Buttons/CircularProgress';
 import { Tooltip } from 'components/visual/Tooltip';
-import React from 'react';
+import React, { useMemo } from 'react';
 import type { LinkProps } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 
 export type ButtonProps = MuiButtonProps & {
   link?: boolean;
   loading?: boolean;
-  preventRender?: boolean;
+  preventRender?: boolean | (() => boolean);
   progress?: boolean;
   to?: LinkProps['to'] | (() => LinkProps['to']);
   tooltip?: TooltipProps['title'];
@@ -21,15 +21,20 @@ export const Button: React.FC<ButtonProps> = React.memo(
     children = null,
     disabled = false,
     loading = false,
-    preventRender = false,
+    preventRender: preventRenderProp = false,
     progress = false,
     size = 'medium',
     to = null,
     tooltip = null,
     tooltipProps = null,
     ...props
-  }: ButtonProps) =>
-    preventRender ? null : loading ? (
+  }: ButtonProps) => {
+    const preventRender = useMemo<boolean>(
+      () => (loading ? false : typeof preventRenderProp === 'function' ? preventRenderProp() : preventRenderProp),
+      [loading, preventRenderProp]
+    );
+
+    return loading ? (
       <MuiButton disabled size={size} sx={{ padding: 0 }}>
         <Skeleton
           variant="rounded"
@@ -42,7 +47,7 @@ export const Button: React.FC<ButtonProps> = React.memo(
           }}
         />
       </MuiButton>
-    ) : (
+    ) : preventRender ? null : (
       <Tooltip title={tooltip} placement="bottom" {...tooltipProps}>
         <MuiButton
           disabled={progress || disabled}
@@ -54,5 +59,6 @@ export const Button: React.FC<ButtonProps> = React.memo(
           <CircularProgress progress={progress} />
         </MuiButton>
       </Tooltip>
-    )
+    );
+  }
 );

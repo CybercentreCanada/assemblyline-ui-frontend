@@ -492,9 +492,11 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
                   </IconButton>
                 </Tooltip>
                 <FileDownloader
-                  link={`/api/v4/file/download/${file.file_info.sha256}/?${
-                    fileName && file.file_info.sha256 !== fileName ? `name=${fileName}&` : ''
-                  }${sid ? `sid=${sid}&` : ''}`}
+                  link={() =>
+                    `/api/v4/file/download/${file.file_info.sha256}/?${
+                      fileName && file.file_info.sha256 !== fileName ? `name=${fileName}&` : ''
+                    }${sid ? `sid=${sid}&` : ''}`
+                  }
                   tooltip={t('download')}
                   preventRender={!currentUser.roles.includes('archive_download')}
                 />

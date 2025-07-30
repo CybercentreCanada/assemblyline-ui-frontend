@@ -3,13 +3,13 @@ import { IconButton as MuiIconButton, Skeleton } from '@mui/material';
 import type { CircularProgressProps } from 'components/visual/Buttons/CircularProgress';
 import { CircularProgress } from 'components/visual/Buttons/CircularProgress';
 import { Tooltip } from 'components/visual/Tooltip';
-import React from 'react';
+import React, { useMemo } from 'react';
 import type { LinkProps } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 
 export type IconButtonProps = MuiIconButtonProps & {
   loading?: boolean;
-  preventRender?: boolean;
+  preventRender?: boolean | (() => boolean);
   progress?: CircularProgressProps['progress'];
   to?: LinkProps['to'] | (() => LinkProps['to']);
   tooltip?: TooltipProps['title'];
@@ -21,15 +21,20 @@ export const IconButton: React.FC<IconButtonProps> = React.memo(
     children = null,
     disabled = false,
     loading = false,
-    preventRender = false,
+    preventRender: preventRenderProp = false,
     progress = false,
     size = 'medium',
     to = null,
     tooltip = null,
     tooltipProps = null,
     ...props
-  }: IconButtonProps) =>
-    preventRender ? null : loading ? (
+  }: IconButtonProps) => {
+    const preventRender = useMemo<boolean>(
+      () => (loading ? false : typeof preventRenderProp === 'function' ? preventRenderProp() : preventRenderProp),
+      [loading, preventRenderProp]
+    );
+
+    return loading ? (
       <Skeleton
         variant="circular"
         sx={{
@@ -39,7 +44,7 @@ export const IconButton: React.FC<IconButtonProps> = React.memo(
           ...(size === 'large' && { height: '2.5rem', width: '2.5rem' })
         }}
       />
-    ) : (
+    ) : preventRender ? null : (
       <Tooltip title={tooltip} placement="bottom" {...tooltipProps}>
         <MuiIconButton
           aria-label={!tooltip ? null : JSON.stringify(tooltip)}
@@ -53,5 +58,6 @@ export const IconButton: React.FC<IconButtonProps> = React.memo(
           <CircularProgress progress={progress} />
         </MuiIconButton>
       </Tooltip>
-    )
+    );
+  }
 );

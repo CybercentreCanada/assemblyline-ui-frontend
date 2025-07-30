@@ -33,12 +33,12 @@ export type PageHeaderProps = {
 export const PageHeader: React.FC<PageHeaderProps> = React.memo(
   ({
     actions = null,
-    classification = 'undefined',
+    classification: classificationProp = 'undefined',
     endAdornment = null,
     isSticky = false,
-    primary = null,
+    primary: primaryProp = null,
     primaryLoading = false,
-    secondary = null,
+    secondary: secondaryProp = null,
     secondaryLoading = false,
     slotProps = {},
     startAdornment = null,
@@ -70,6 +70,40 @@ export const PageHeader: React.FC<PageHeaderProps> = React.memo(
       secondary: secondaryProps,
       actions: actionsProps
     } = useMemo<PageHeaderProps['slotProps']>(() => slotProps, [slotProps]);
+
+    const classification = useMemo<ClassificationProps['c12n']>(
+      () =>
+        primaryLoading || secondaryLoading
+          ? null
+          : typeof classificationProp === 'function'
+            ? classificationProp()
+            : classificationProp,
+      [classificationProp, primaryLoading, secondaryLoading]
+    );
+
+    const primary = useMemo<ReactNode>(
+      () =>
+        primaryLoading ? (
+          <Skeleton style={{ width: '20rem' }} />
+        ) : typeof primaryProp === 'function' ? (
+          primaryProp()
+        ) : (
+          primaryProp
+        ),
+      [primaryLoading, primaryProp]
+    );
+
+    const secondary = useMemo<ReactNode>(
+      () =>
+        secondaryLoading ? (
+          <Skeleton style={{ width: '10rem' }} />
+        ) : typeof secondaryProp === 'function' ? (
+          secondaryProp()
+        ) : (
+          secondaryProp
+        ),
+      [secondaryLoading, secondaryProp]
+    );
 
     useEffect(() => {
       const element = containerRef.current;
@@ -107,15 +141,9 @@ export const PageHeader: React.FC<PageHeaderProps> = React.memo(
         {!c12nDef.enforce || classification === 'undefined' ? null : (
           <div style={{ paddingBottom: theme.spacing(4) }}>
             <Classification
-              type={!onClassificationChange ? 'pill' : 'picker'}
+              c12n={classification}
               size="tiny"
-              c12n={
-                primaryLoading || secondaryLoading
-                  ? null
-                  : typeof classification === 'function'
-                    ? classification()
-                    : classification
-              }
+              type={!onClassificationChange ? 'pill' : 'picker'}
               setClassification={onClassificationChange}
               {...classificationProps}
             />
@@ -161,13 +189,7 @@ export const PageHeader: React.FC<PageHeaderProps> = React.memo(
                   textOverflow: 'ellipsis'
                 }}
               >
-                {primaryLoading ? (
-                  <Skeleton style={{ width: '20rem' }} />
-                ) : typeof primary === 'function' ? (
-                  primary()
-                ) : (
-                  primary
-                )}
+                {primary}
               </Typography>
             )}
 
@@ -177,13 +199,7 @@ export const PageHeader: React.FC<PageHeaderProps> = React.memo(
                 {...primaryProps}
                 sx={{ overflowWrap: 'break-word', wordBreak: 'break-word', whiteSpace: 'normal', ...primaryProps?.sx }}
               >
-                {primaryLoading ? (
-                  <Skeleton style={{ width: '10rem' }} />
-                ) : typeof primary === 'function' ? (
-                  primary()
-                ) : (
-                  primary
-                )}
+                {primary}
               </Typography>
             )}
 
@@ -201,13 +217,7 @@ export const PageHeader: React.FC<PageHeaderProps> = React.memo(
                   ...secondaryProps?.sx
                 }}
               >
-                {secondaryLoading ? (
-                  <Skeleton style={{ width: '10rem' }} />
-                ) : typeof secondary === 'function' ? (
-                  secondary()
-                ) : (
-                  secondary
-                )}
+                {secondary}
               </Typography>
             )}
 

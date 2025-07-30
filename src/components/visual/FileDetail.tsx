@@ -428,12 +428,10 @@ const WrappedFileDetail: React.FC<Props> = ({
               <ViewCarouselOutlinedIcon />
             </IconButton>
             <FileDownloader
-              link={
-                !file
-                  ? null
-                  : `/api/v4/file/download/${file.file_info.sha256}/?${
-                      fileName && file.file_info.sha256 !== fileName ? `name=${fileName}&` : ''
-                    }${sid ? `sid=${sid}&` : ''}`
+              link={() =>
+                `/api/v4/file/download/${file.file_info.sha256}/?${
+                  fileName && file.file_info.sha256 !== fileName ? `name=${fileName}&` : ''
+                }${sid ? `sid=${sid}&` : ''}`
               }
               loading={!file}
               preventRender={!currentUser.roles.includes('file_download')}

@@ -1,32 +1,36 @@
 import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
-import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import type { IconButtonProps } from 'components/visual/Buttons/IconButton';
 import { IconButton } from 'components/visual/Buttons/IconButton';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 
 export type FileDownloaderProps = IconButtonProps & {
-  link: string;
+  link: string | (() => string);
   successMessage?: string;
 };
 
 export const WrappedFileDownloader = ({
   children = <GetAppOutlinedIcon />,
   disabled = false,
-  link = null,
+  link: linkProp = null,
   size = 'large',
   successMessage = null,
+  loading = false,
   onClick = () => null,
   ...props
 }: FileDownloaderProps) => {
   const { downloadBlob } = useMyAPI();
   const { showSuccessMessage, showErrorMessage } = useMySnackbar();
-  const { user: currentUser } = useALContext();
 
   const [progress, setProgress] = useState<number>(null);
   const [total, setTotal] = useState<number>(null);
   const [waiting, setWaiting] = useState<boolean>(false);
+
+  const link = useMemo<string>(
+    () => (loading ? null : typeof linkProp === 'function' ? linkProp() : linkProp),
+    [linkProp, loading]
+  );
 
   const downloadFile = useCallback(() => {
     downloadBlob({
@@ -77,6 +81,7 @@ export const WrappedFileDownloader = ({
   return (
     <IconButton
       disabled={disabled || waiting || total !== null}
+      loading={loading}
       progress={total !== null && total !== 0 && progress !== null ? (progress / total) * 100 : waiting || total === 0}
       size={size}
       onClick={event => {
