@@ -3,6 +3,7 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import type { IconButtonProps } from 'components/visual/Buttons/IconButton';
 import { IconButton } from 'components/visual/Buttons/IconButton';
+import { getTextContent } from 'helpers/utils';
 import React, { useCallback, useMemo, useState } from 'react';
 
 export type FileDownloaderProps = IconButtonProps & {
@@ -13,10 +14,12 @@ export type FileDownloaderProps = IconButtonProps & {
 export const WrappedFileDownloader = ({
   children = <GetAppOutlinedIcon />,
   disabled = false,
+  id = null,
   link: linkProp = null,
+  loading = false,
   size = 'large',
   successMessage = null,
-  loading = false,
+  tooltip = null,
   onClick = () => null,
   ...props
 }: FileDownloaderProps) => {
@@ -80,10 +83,12 @@ export const WrappedFileDownloader = ({
 
   return (
     <IconButton
+      id={id ?? getTextContent(tooltip)}
       disabled={disabled || waiting || total !== null}
       loading={loading}
       progress={total !== null && total !== 0 && progress !== null ? (progress / total) * 100 : waiting || total === 0}
       size={size}
+      tooltip={tooltip}
       onClick={event => {
         downloadFile();
         onClick(event);
