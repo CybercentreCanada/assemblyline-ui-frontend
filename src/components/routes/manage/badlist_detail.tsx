@@ -257,7 +257,7 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
         <PageHeader
           primary={badlist ? t(`title.${badlist.type}`) : t('title')}
           secondary={badlist_id || id}
-          loading={!badlist}
+          secondaryLoading={!badlist}
           slotProps={{
             root: { style: { marginBottom: theme.spacing(4) } }
           }}
