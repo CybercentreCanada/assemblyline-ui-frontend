@@ -385,8 +385,6 @@ export const InputsSection = React.memo(() => {
                   value={value}
                   defaultValue={0}
                   reset
-                  min={5}
-                  max={10}
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.number', next)}
                   onReset={() => form.setFieldValue('components.inputs.values.number', 0)}
                 />

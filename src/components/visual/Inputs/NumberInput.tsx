@@ -1,15 +1,14 @@
 import type { TextFieldProps } from '@mui/material';
-import { HelperText } from 'components/visual/Inputs/components/HelperText';
 import {
-  isValidNumber,
-  isValidValue,
+  HelperText,
   StyledFormControl,
   StyledFormLabel,
   StyledInputSkeleton,
-  StyledTextField,
-  useInputState
-} from 'components/visual/Inputs/components/InputComponents';
-import type { InputProps } from 'components/visual/Inputs/models/Input';
+  StyledTextField
+} from 'components/visual/Inputs/lib/inputs.components';
+import { useInputState } from 'components/visual/Inputs/lib/inputs.hook';
+import type { InputProps } from 'components/visual/Inputs/lib/inputs.model';
+import { isValidNumber, isValidValue } from 'components/visual/Inputs/lib/inputs.utils';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -22,6 +21,8 @@ export type NumberInputProps = Omit<TextFieldProps, 'error' | 'value' | 'onChang
 
 const WrappedNumberInput = (props: NumberInputProps) => {
   const { t } = useTranslation('inputs');
+
+  return null;
 
   const {
     error = () => '',

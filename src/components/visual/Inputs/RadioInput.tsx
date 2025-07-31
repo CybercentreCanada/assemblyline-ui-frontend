@@ -1,16 +1,15 @@
 import type { FormControlLabelProps } from '@mui/material';
 import { Radio, RadioGroup } from '@mui/material';
-import { HelperText } from 'components/visual/Inputs/components/HelperText';
 import {
+  HelperText,
+  PasswordInput,
+  ResetInput,
   StyledEndAdornmentBox,
   StyledFormButton,
   StyledFormControl,
-  StyledFormControlLabel,
-  StyledFormLabel
-} from 'components/visual/Inputs/components/InputComponents';
-import { PasswordInput } from 'components/visual/Inputs/components/PasswordInput';
-import { ResetInput } from 'components/visual/Inputs/components/ResetInput';
-import type { InputProps } from 'components/visual/Inputs/models/Input';
+  StyledFormControlLabel
+} from 'components/visual/Inputs/lib/inputs.components';
+import type { InputProps } from 'components/visual/Inputs/lib/inputs.model';
 import React, { useState } from 'react';
 
 type Option = Omit<FormControlLabelProps, 'control' | 'label'> & {

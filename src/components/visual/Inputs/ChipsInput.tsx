@@ -1,19 +1,15 @@
 import type { AutocompleteProps } from '@mui/material';
 import { Autocomplete, InputAdornment, TextField, useTheme } from '@mui/material';
 import CustomChip from 'components/visual/CustomChip';
-import { HelperText } from 'components/visual/Inputs/components/HelperText';
 import {
-  getAriaDescribedBy,
-  getAriaLabel,
+  HelperText,
+  PasswordInput,
+  ResetInput,
   StyledFormControl,
   StyledFormLabel,
-  StyledInputSkeleton,
-  usePreventPassword,
-  usePreventReset
-} from 'components/visual/Inputs/components/InputComponents';
-import { PasswordInput } from 'components/visual/Inputs/components/PasswordInput';
-import { ResetInput } from 'components/visual/Inputs/components/ResetInput';
-import type { InputProps } from 'components/visual/Inputs/models/Input';
+  StyledInputSkeleton
+} from 'components/visual/Inputs/lib/inputs.components';
+import type { InputProps } from 'components/visual/Inputs/lib/inputs.model';
 import type { ElementType } from 'react';
 import React, { useMemo, useState } from 'react';
 

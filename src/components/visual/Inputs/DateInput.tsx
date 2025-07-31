@@ -2,18 +2,13 @@ import type { TextFieldProps } from '@mui/material';
 import { InputAdornment, useTheme } from '@mui/material';
 import { LocalizationProvider, DatePicker as MuiDatePicker } from '@mui/x-date-pickers';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
-import { HelperText } from 'components/visual/Inputs/components/HelperText';
 import {
-  getAriaLabel,
-  StyledFormControl,
-  StyledFormLabel,
-  StyledInputSkeleton,
-  usePreventPassword,
-  usePreventReset
-} from 'components/visual/Inputs/components/InputComponents';
-import { PasswordInput } from 'components/visual/Inputs/components/PasswordInput';
-import { ResetInput } from 'components/visual/Inputs/components/ResetInput';
-import type { InputProps } from 'components/visual/Inputs/models/Input';
+  HelperText,
+  PasswordInput,
+  ResetInput,
+  StyledFormControl
+} from 'components/visual/Inputs/lib/inputs.components';
+import type { InputProps } from 'components/visual/Inputs/lib/inputs.model';
 import type { Moment } from 'moment';
 import moment from 'moment';
 import React, { useEffect, useMemo, useState } from 'react';

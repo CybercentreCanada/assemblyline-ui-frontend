@@ -1,18 +1,12 @@
 import type { ListItemTextProps, MenuItemProps, SelectProps } from '@mui/material';
 import { InputAdornment, ListItemText, MenuItem, Select, useTheme } from '@mui/material';
-import { HelperText } from 'components/visual/Inputs/components/HelperText';
 import {
-  getAriaDescribedBy,
-  getAriaLabel,
-  StyledFormControl,
-  StyledFormLabel,
-  StyledInputSkeleton,
-  usePreventPassword,
-  usePreventReset
-} from 'components/visual/Inputs/components/InputComponents';
-import { PasswordInput } from 'components/visual/Inputs/components/PasswordInput';
-import { ResetInput } from 'components/visual/Inputs/components/ResetInput';
-import type { InputProps } from 'components/visual/Inputs/models/Input';
+  HelperText,
+  PasswordInput,
+  ResetInput,
+  StyledFormControl
+} from 'components/visual/Inputs/lib/inputs.components';
+import type { InputProps } from 'components/visual/Inputs/lib/inputs.model';
 import React, { useState } from 'react';
 
 export type Option = {

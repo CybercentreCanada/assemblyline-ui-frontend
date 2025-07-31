@@ -2,17 +2,15 @@ import type { ReactJsonViewProps, ThemeObject } from '@microlink/react-json-view
 import ReactJson from '@microlink/react-json-view';
 import { useTheme } from '@mui/material';
 import { useAppTheme } from 'commons/components/app/hooks';
-import { ExpandInput } from 'components/visual/Inputs/components/ExpandInput';
-import { HelperText } from 'components/visual/Inputs/components/HelperText';
 import {
+  ExpandInput,
+  HelperText,
+  PasswordInput,
+  ResetInput,
   StyledEndAdornmentBox,
-  StyledFormControl,
-  StyledFormLabel,
-  StyledInputSkeleton
-} from 'components/visual/Inputs/components/InputComponents';
-import { PasswordInput } from 'components/visual/Inputs/components/PasswordInput';
-import { ResetInput } from 'components/visual/Inputs/components/ResetInput';
-import type { InputProps } from 'components/visual/Inputs/models/Input';
+  StyledFormControl
+} from 'components/visual/Inputs/lib/inputs.components';
+import type { InputProps } from 'components/visual/Inputs/lib/inputs.model';
 import React, { useMemo, useState } from 'react';
 
 export type JSONInputProps = Omit<ReactJsonViewProps, 'src' | 'onAdd' | 'onDelete' | 'onEdit'> & InputProps<object>;

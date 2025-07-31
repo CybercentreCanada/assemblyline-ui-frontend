@@ -1,17 +1,16 @@
 import type { TextFieldProps } from '@mui/material';
-import { InputAdornment, Skeleton } from '@mui/material';
-import { HelperText } from 'components/visual/Inputs/components/HelperText';
+import { Skeleton } from '@mui/material';
 import {
+  HelperText,
   StyledFormControl,
   StyledFormLabel,
-  StyledTextField,
-  usePreventPassword,
-  usePreventReset
-} from 'components/visual/Inputs/components/InputComponents';
-import { PasswordInput } from 'components/visual/Inputs/components/PasswordInput';
-import { ResetInput } from 'components/visual/Inputs/components/ResetInput';
-import type { InputProps } from 'components/visual/Inputs/models/Input';
-import React, { useState } from 'react';
+  StyledTextField
+} from 'components/visual/Inputs/lib/inputs.components';
+import { useInputState } from 'components/visual/Inputs/lib/inputs.hook';
+import type { InputProps } from 'components/visual/Inputs/lib/inputs.model';
+import { isValidValue } from 'components/visual/Inputs/lib/inputs.utils';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 export type TextAreaInputProps = Omit<TextFieldProps, 'rows' | 'onChange' | 'error' | 'defaultValue'> &
   InputProps<string> & {
@@ -19,36 +18,32 @@ export type TextAreaInputProps = Omit<TextFieldProps, 'rows' | 'onChange' | 'err
   };
 
 const WrappedTextAreaInput = (props: TextAreaInputProps) => {
+  const { t } = useTranslation('inputs');
+
   return null;
 
   const {
-    disabled,
-    endAdornment = null,
     error = () => '',
     loading = false,
     password = false,
     preventRender = false,
-    readOnly = false,
+    required = false,
     rootProps = null,
     rows = 1,
     tiny = false,
-    value,
-    onBlur = () => null,
-    onChange = () => null,
-    onError = () => null,
-    onFocus = () => null
+    value
   } = props;
 
-  const [focused, setFocused] = useState<boolean>(false);
-  const [showPassword, setShowPassword] = useState<boolean>(true);
-
-  const preventPasswordRender = usePreventPassword(props);
-  const preventResetRender = usePreventReset(props);
+  const state = useInputState<string, string>(props, v => {
+    if (error(v)) return error(v);
+    else if (required && !isValidValue(v)) return t('error.required');
+    else return null;
+  });
 
   return preventRender ? null : (
     <div {...rootProps} style={{ textAlign: 'left', ...rootProps?.style }}>
-      <StyledFormLabel props={props} focused={focused} />
-      <StyledFormControl props={props}>
+      <StyledFormLabel props={props} state={state} />
+      <StyledFormControl props={props} state={state}>
         {loading ? (
           <Skeleton
             sx={{ height: `calc(23px * ${rows} + 17px)`, transform: 'unset', ...(tiny && { height: '28px' }) }}
@@ -57,8 +52,9 @@ const WrappedTextAreaInput = (props: TextAreaInputProps) => {
           <>
             <StyledTextField
               props={props}
+              state={state}
               multiline
-              rows={password && showPassword ? 1 : rows}
+              rows={password && state.showPassword ? 1 : rows}
               value={value}
               slotProps={{
                 input: {
@@ -66,44 +62,18 @@ const WrappedTextAreaInput = (props: TextAreaInputProps) => {
                     sx: {
                       ...(tiny && { padding: '2.5px 4px 2.5px 8px' }),
                       ...(password &&
-                        showPassword && {
+                        state.showPassword && {
                           fontFamily: 'password',
                           WebkitTextSecurity: 'disc',
                           MozTextSecurity: 'disc',
                           textSecurity: 'disc'
                         })
                     }
-                  },
-                  endAdornment:
-                    preventPasswordRender && preventResetRender && !endAdornment ? null : (
-                      <InputAdornment position="end">
-                        <PasswordInput
-                          props={props}
-                          showPassword={showPassword}
-                          onShowPassword={() => setShowPassword(p => !p)}
-                        />
-                        <ResetInput props={props} />
-                        {endAdornment}
-                      </InputAdornment>
-                    )
+                  }
                 }
               }}
-              onChange={event => {
-                onChange(event, event.target.value);
-
-                const err = error(event.target.value);
-                if (err) onError(err);
-              }}
-              onFocus={(event, ...other) => {
-                setFocused(!readOnly && !disabled && document.activeElement === event.target);
-                onFocus(event, ...other);
-              }}
-              onBlur={(event, ...other) => {
-                setFocused(false);
-                onBlur(event, ...other);
-              }}
             />
-            <HelperText props={props} />
+            <HelperText props={props} state={state} />
           </>
         )}
       </StyledFormControl>

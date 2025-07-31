@@ -1,13 +1,7 @@
 import type { SliderProps } from '@mui/material';
 import { FormControl, Slider } from '@mui/material';
-import { HelperText } from 'components/visual/Inputs/components/HelperText';
-import {
-  getAriaLabel,
-  StyledFormLabel,
-  StyledInputSkeleton
-} from 'components/visual/Inputs/components/InputComponents';
-import { ResetInput } from 'components/visual/Inputs/components/ResetInput';
-import type { InputProps } from 'components/visual/Inputs/models/Input';
+import { HelperText, ResetInput } from 'components/visual/Inputs/lib/inputs.components';
+import type { InputProps } from 'components/visual/Inputs/lib/inputs.model';
 import React, { useMemo, useState } from 'react';
 
 export type SliderInputProps = Omit<SliderProps, 'value' | 'onChange'> & InputProps<number>;

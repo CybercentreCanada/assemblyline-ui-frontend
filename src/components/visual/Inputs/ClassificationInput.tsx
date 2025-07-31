@@ -16,14 +16,8 @@ import useALContext from 'components/hooks/useALContext';
 import type { WhoAmI } from 'components/models/ui/user';
 import type { ClassificationProps } from 'components/visual/Classification';
 import CustomChip, { COLOR_MAP } from 'components/visual/CustomChip';
-import { HelperText } from 'components/visual/Inputs/components/HelperText';
-import {
-  StyledFormControl,
-  StyledFormLabel,
-  StyledInputSkeleton
-} from 'components/visual/Inputs/components/InputComponents';
-import { PasswordInput } from 'components/visual/Inputs/components/PasswordInput';
-import type { InputProps } from 'components/visual/Inputs/models/Input';
+import { HelperText, PasswordInput, StyledFormControl } from 'components/visual/Inputs/lib/inputs.components';
+import type { InputProps } from 'components/visual/Inputs/lib/inputs.model';
 import type { ClassificationParts, ClassificationValidator } from 'helpers/classificationParser';
 import {
   applyAliases,

@@ -1,5 +1,4 @@
 import type { FormHelperTextProps, IconButtonProps, TooltipProps, TypographyProps } from '@mui/material';
-import { createStoreContext } from 'components/core/store/createStoreContext';
 import type React from 'react';
 
 export type InputProps<Type> = {
@@ -14,7 +13,6 @@ export type InputProps<Type> = {
   helperText?: string;
   helperTextProps?: FormHelperTextProps;
   id?: string;
-  indeterminate?: boolean;
   label?: string;
   labelProps?: TypographyProps;
   loading?: boolean;
@@ -42,7 +40,7 @@ export type InputProps<Type> = {
   onReset?: IconButtonProps['onClick'];
 };
 
-export type InputStates<Type> = {
+export type InputState<Type> = {
   ariaLabel?: string;
   ariaDescribeBy?: string;
   errorMsg?: string;
@@ -57,17 +55,57 @@ export type InputStates<Type> = {
   handleBlur?: (event: React.SyntheticEvent) => void;
   handleChange?: (event: React.SyntheticEvent, value: Type) => void;
   handleFocus?: (event: React.SyntheticEvent) => void;
-  togglePassword?: (event: React.SyntheticEvent) => void;
+  setShowPassword?: (event: React.SyntheticEvent) => void;
+  setInputValue?: React.Dispatch<React.SetStateAction<Type>>;
 };
 
-export type InputData<Type> = InputProps<Type> & InputStates<Type>;
+// export type InputState<T, P> = InputProps<T> & InputData<P>;
 
-export type ComponentProps<T, P> = {
-  children?: React.ReactNode;
-  useStore: ReturnType<typeof createStoreContext<InputData<T>>>['useStore'];
+// export type ComponentProps<T, P> = {
+//   children?: React.ReactNode;
+// } & InputState<T, P>;
+
+export const DEFAULT_INPUT_PROPS: InputProps<undefined> = {
+  defaultValue: undefined,
+  disabled: false,
+  divider: false,
+  endAdornment: null,
+  error: () => '',
+  errorProps: null,
+  expand: null,
+  expandProps: null,
+  helperText: null,
+  helperTextProps: null,
+  id: '',
+  label: '',
+  labelProps: null,
+  loading: false,
+  monospace: false,
+  password: false,
+  placeholder: null,
+  preventDisabledColor: false,
+  preventRender: false,
+  readOnly: false,
+  required: false,
+  reset: false,
+  resetProps: null,
+  rootProps: null,
+  showOverflow: false,
+  startAdornment: null,
+  tiny: false,
+  tooltip: null,
+  tooltipProps: null,
+  value: undefined,
+
+  onBlur: () => null,
+  onChange: () => null,
+  onError: () => null,
+  onExpand: () => null,
+  onFocus: () => null,
+  onReset: null
 };
 
-export const DEFAULT_INPUT_DATA: InputData<undefined> = {
+export const DEFAULT_INPUT_DATA: InputState<undefined, undefined> = {
   defaultValue: undefined,
   disabled: false,
   divider: false,
@@ -105,20 +143,21 @@ export const DEFAULT_INPUT_DATA: InputData<undefined> = {
   onError: () => null,
   onExpand: () => null,
   onFocus: () => null,
-  onReset: () => null
+  onReset: null,
 
-  // ariaLabel: '',
-  // ariaDescribeBy: '',
-  // errorMsg: null,
-  // focused: false,
-  // inputValue: undefined,
-  // preventExpandRender: false,
-  // preventPasswordRender: false,
-  // preventResetRender: false,
-  // showPassword: false
+  ariaLabel: '',
+  ariaDescribeBy: '',
+  errorMsg: null,
+  focused: false,
+  inputValue: undefined,
+  preventExpandRender: false,
+  preventPasswordRender: false,
+  preventResetRender: false,
+  showPassword: false,
 
-  // handleBlur: () => null,
-  // handleChange: () => null,
-  // handleFocus: () => null,
-  // togglePassword: () => null
+  handleBlur: () => null,
+  handleChange: () => null,
+  handleFocus: () => null,
+  togglePassword: () => null,
+  setInputValue: () => null
 };
