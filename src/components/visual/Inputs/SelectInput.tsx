@@ -4,10 +4,16 @@ import {
   HelperText,
   PasswordInput,
   ResetInput,
-  StyledFormControl
+  StyledFormControl,
+  StyledFormLabel,
+  StyledInputSkeleton,
+  StyledRoot
 } from 'components/visual/Inputs/lib/inputs.components';
-import type { InputProps } from 'components/visual/Inputs/lib/inputs.model';
-import React, { useState } from 'react';
+import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
+import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
+import { isValidValue } from 'components/visual/Inputs/lib/inputs.utils';
+import React, { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export type Option = {
   primary: ListItemTextProps['primary'];
@@ -15,78 +21,86 @@ export type Option = {
   value: MenuItemProps['value'] | boolean;
 };
 
-export type SelectInputProps<O extends Option[] = []> = Omit<SelectProps, 'error' | 'options' | 'value' | 'onChange'> &
-  InputProps<O[number]['value']> & {
+export type SelectInputProps<O extends readonly Option[]> = InputValues<O[number]['value']> &
+  InputProps & {
     capitalize?: boolean;
-    options: O;
+    options?: O;
+    displayEmpty?: SelectProps['displayEmpty'];
   };
 
-const WrappedSelectInput = <O extends Option[]>({ ...props }: SelectInputProps<O>) => {
+const WrappedSelectInput = <O extends readonly Option[]>() => {
   const theme = useTheme();
 
-  return null;
+  const [get, setStore] = usePropStore<SelectInputProps<O>>();
 
-  const {
-    capitalize = false,
-    disabled,
-    displayEmpty = false,
-    endAdornment = null,
-    error = () => '',
-    loading = false,
-    monospace = false,
-    options = null,
-    password = false,
-    preventRender = false,
-    readOnly = false,
-    rootProps = null,
-    tiny = false,
-    value = null,
-    onBlur = () => null,
-    onChange = () => null,
-    onError = () => null,
-    onFocus = () => null
-  } = props;
+  const capitalize = get(s => s.capitalize);
+  const disabled = get(s => s.disabled);
+  const displayEmpty = get(s => s.displayEmpty);
+  const endAdornment = get(s => s.endAdornment);
+  const errorMsg = get(s => s.errorMsg);
+  const inputValue = get(s => s.inputValue);
+  const loading = get(s => s.loading);
+  const monospace = get(s => s.monospace);
+  const options = get(s => s.options);
+  const password = get(s => s.password);
+  const readOnly = get(s => s.readOnly);
+  const showPassword = get(s => s.showPassword);
+  const tiny = get(s => s.tiny);
+  const value = get(s => s.value);
 
-  const [focused, setFocused] = useState<boolean>(false);
-  const [showPassword, setShowPassword] = useState<boolean>(true);
+  const handleChange = useCallback(
+    (event: React.SyntheticEvent, newValue: O[number]['value']) => {
+      setStore(s => {
+        const err = s.error(newValue);
+        s.onError(err);
+        if (!err) s.onChange(event, newValue);
+        return { ...s, inputValue: newValue, errorMsg: err };
+      });
+    },
+    [setStore]
+  );
 
-  const preventPasswordRender = usePreventPassword(props);
-  const preventResetRender = usePreventReset(props);
+  const handleFocus = useCallback(
+    (event: React.FocusEvent) => {
+      setStore(s => {
+        s.onFocus(event);
+        return { ...s, focused: !s.readOnly && !s.disabled && document.activeElement === event.target };
+      });
+    },
+    [setStore]
+  );
 
-  return preventRender ? null : (
-    <div {...rootProps} style={{ textAlign: 'left', ...rootProps?.style }}>
-      <StyledFormLabel props={props} focused={focused} />
-      <StyledFormControl props={props}>
+  const handleBlur = useCallback(
+    (event: React.FocusEvent) => {
+      setStore(s => {
+        s.onBlur(event);
+        return { ...s, focused: false, inputValue: null };
+      });
+    },
+    [setStore]
+  );
+
+  return (
+    <StyledRoot>
+      <StyledFormLabel />
+      <StyledFormControl>
         {loading ? (
-          <StyledInputSkeleton props={props} />
+          <StyledInputSkeleton />
         ) : (
           <Select
-            aria-describedby={getAriaDescribedBy(props)}
-            disabled={disabled}
-            displayEmpty={displayEmpty}
             fullWidth
-            readOnly={readOnly}
             size="small"
-            value={options?.some(o => o.value === value) ? value : ''}
+            displayEmpty={displayEmpty}
+            disabled={disabled}
+            readOnly={readOnly}
+            value={options?.some(o => o.value === (inputValue ?? value)) ? (inputValue ?? value) : ''}
+            error={!!errorMsg}
+            onChange={event => handleChange(event as React.SyntheticEvent, event.target.value as O[number]['value'])}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
             variant="outlined"
-            onChange={event => {
-              const v = event.target.value as string;
-              onChange(event, v);
-
-              const err = error(v);
-              if (err) onError(err);
-            }}
-            onFocus={(event, ...other) => {
-              setFocused(!readOnly && !disabled && document.activeElement === event.target);
-              onFocus(event, ...other);
-            }}
-            onBlur={(event, ...other) => {
-              setFocused(false);
-              onBlur(event, ...other);
-            }}
             MenuProps={{ sx: { maxWidth: 'min-content' } }}
             inputProps={{
-              id: getAriaLabel(props),
               sx: {
                 display: 'flex',
                 alignItems: 'center',
@@ -107,52 +121,35 @@ const WrappedSelectInput = <O extends Option[]>({ ...props }: SelectInputProps<O
                       whiteSpace: 'nowrap',
                       overflow: 'hidden',
                       textOverflow: 'ellipsis',
-                      ...(readOnly && { cursor: 'default', userSelect: 'text' })
-                    },
-                    ...(tiny && { variant: 'body2' }),
-                    ...(monospace && { fontFamily: 'monospace' }),
-                    ...(password &&
-                      showPassword && {
-                        fontFamily: 'password',
-                        WebkitTextSecurity: 'disc',
-                        MozTextSecurity: 'disc',
-                        textSecurity: 'disc'
-                      })
+                      ...(readOnly && { cursor: 'default', userSelect: 'text' }),
+                      ...(tiny && { variant: 'body2' }),
+                      ...(monospace && { fontFamily: 'monospace' }),
+                      ...(password &&
+                        showPassword && {
+                          fontFamily: 'password',
+                          WebkitTextSecurity: 'disc',
+                          MozTextSecurity: 'disc',
+                          textSecurity: 'disc'
+                        })
+                    }
                   }
-                }}
-                sx={{
-                  margin: 0,
-                  ...(readOnly && { marginLeft: '6px' }),
-                  ...(monospace && { fontFamily: 'monospace' }),
-                  ...(password &&
-                    showPassword && {
-                      fontFamily: 'password',
-                      WebkitTextSecurity: 'disc',
-                      MozTextSecurity: 'disc',
-                      textSecurity: 'disc'
-                    })
                 }}
               />
             )}
             endAdornment={
-              preventPasswordRender && preventResetRender && !endAdornment ? null : (
+              !endAdornment && !password ? null : (
                 <InputAdornment position="end" style={{ marginRight: theme.spacing(2) }}>
-                  <PasswordInput
-                    props={props}
-                    showPassword={showPassword}
-                    onShowPassword={() => setShowPassword(p => !p)}
-                  />
-                  <ResetInput props={props} />
+                  <PasswordInput />
+                  <ResetInput onChange={handleChange} />
                   {endAdornment}
                 </InputAdornment>
               )
             }
           >
-            {/* {hasEmpty && <MenuItem value={null} sx={{ height: '36px' }}></MenuItem>} */}
-            {options?.map((option, i) => (
+            {options.map((option, i) => (
               <MenuItem
                 key={i}
-                value={option.value as unknown as MenuItemProps['value']}
+                value={option.value as MenuItemProps['value']}
                 sx={{
                   '&>div': { margin: 0, cursor: 'pointer !important' },
                   ...(capitalize && { textTransform: 'capitalize' })
@@ -185,11 +182,46 @@ const WrappedSelectInput = <O extends Option[]>({ ...props }: SelectInputProps<O
             ))}
           </Select>
         )}
-        <HelperText props={props} />
+        <HelperText />
       </StyledFormControl>
-    </div>
+    </StyledRoot>
   );
 };
 
-export const SelectInput: <O extends Option[]>(props: SelectInputProps<O>) => React.ReactNode =
-  React.memo(WrappedSelectInput);
+export const SelectInput: <O extends readonly Option[]>(props: SelectInputProps<O>) => React.ReactNode = React.memo(
+  <O extends readonly Option[]>({
+    error = () => '',
+    options = [] as unknown as O,
+    preventRender = false,
+    required = false,
+    value,
+    ...props
+  }: SelectInputProps<O>) => {
+    const { t } = useTranslation('inputs');
+
+    const newError = useCallback(
+      (val: O[number]['value']): string => {
+        const err = error(val);
+        if (err) return err;
+        if (required && !isValidValue(val)) return t('error.required');
+        return '';
+      },
+      [error, required, t]
+    );
+
+    return preventRender ? null : (
+      <PropProvider<SelectInputProps<O>>
+        data={{
+          ...props,
+          error: newError,
+          errorMsg: newError(value),
+          options,
+          required,
+          value
+        }}
+      >
+        <WrappedSelectInput<O> />
+      </PropProvider>
+    );
+  }
+);

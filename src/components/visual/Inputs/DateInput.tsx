@@ -1,124 +1,126 @@
 import type { TextFieldProps } from '@mui/material';
-import { InputAdornment, useTheme } from '@mui/material';
+import { useTheme } from '@mui/material';
 import { LocalizationProvider, DatePicker as MuiDatePicker } from '@mui/x-date-pickers';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import {
+  ExpandInput,
   HelperText,
   PasswordInput,
   ResetInput,
-  StyledFormControl
+  StyledEndAdornment,
+  StyledFormControl,
+  StyledFormLabel,
+  StyledInputSkeleton,
+  StyledRoot
 } from 'components/visual/Inputs/lib/inputs.components';
-import type { InputProps } from 'components/visual/Inputs/lib/inputs.model';
+import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
+import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
+import { isValidValue } from 'components/visual/Inputs/lib/inputs.utils';
 import type { Moment } from 'moment';
 import moment from 'moment';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export type DateInputProps = Omit<TextFieldProps, 'error' | 'value' | 'onChange'> &
-  InputProps<string> & {
+  InputValues<string, Moment> &
+  InputProps & {
     defaultDateOffset?: number | null;
     maxDateToday?: boolean;
     minDateTomorrow?: boolean;
   };
 
-const WrappedDateInput = (props: DateInputProps) => {
-  return null;
-
-  const {
-    defaultDateOffset = null,
-    disabled,
-    endAdornment = null,
-    error = () => '',
-    loading = false,
-    maxDateToday = false,
-    minDateTomorrow = false,
-    monospace = false,
-    placeholder = null,
-    preventRender = false,
-    readOnly = false,
-    rootProps = null,
-    tiny = false,
-    value = '',
-    onBlur = () => null,
-    onChange = () => null,
-    onError = () => null,
-    onFocus = () => null
-  } = props;
-
-  const { i18n } = useTranslation();
+const WrappedDateInput = () => {
   const theme = useTheme();
+  const { i18n } = useTranslation('inputs');
 
-  const [tempDate, setTempDate] = useState<Moment>(null);
-  const [tomorrow, setTomorrow] = useState<Moment>(null);
-  const [today, setToday] = useState<Moment>(null);
-  const [focused, setFocused] = useState<boolean>(false);
-  const [showPassword, setShowPassword] = useState<boolean>(true);
+  const [get, setStore] = usePropStore<DateInputProps>();
 
-  const errorValue = useMemo<string>(
-    () => error(tempDate && tempDate.isValid() ? `${tempDate.format('YYYY-MM-DDThh:mm:ss.SSSSSS')}Z` : null),
-    [error, tempDate]
-  );
+  const disabled = get(s => s.disabled);
+  const endAdornment = get(s => s.endAdornment);
+  const errorMsg = get(s => s.errorMsg);
+  const id = get(s => s.id);
+  const inputValue = get(s => s.inputValue);
+  const loading = get(s => s.loading);
+  const maxDateToday = get(s => s.maxDateToday);
+  const minDateTomorrow = get(s => s.minDateTomorrow);
+  const monospace = get(s => s.monospace);
+  const placeholder = get(s => s.placeholder);
+  const readOnly = get(s => s.readOnly);
+  const tiny = get(s => s.tiny);
 
-  const preventPasswordRender = usePreventPassword(props);
-  const preventResetRender = usePreventReset(props);
-
-  useEffect(() => {
-    const tempTomorrow = new Date();
-    tempTomorrow.setDate(tempTomorrow.getDate() + 1);
-    tempTomorrow.setHours(0, 0, 0, 0);
-    setTomorrow(moment(tempTomorrow));
-
-    const tempToday = new Date();
-    tempToday.setDate(tempToday.getDate() + 1);
-    tempToday.setHours(0, 0, 0, 0);
-    setToday(moment(tempToday));
+  const today = useMemo<Moment>(() => {
+    const d = new Date();
+    d.setHours(0, 0, 0, 0);
+    return moment(d);
   }, []);
 
-  useEffect(() => {
-    if (value === null && defaultDateOffset) {
-      const defaultDate = new Date();
-      defaultDate.setDate(defaultDate.getDate() + defaultDateOffset);
-      defaultDate.setHours(0, 0, 0, 0);
-      setTempDate(moment(defaultDate));
-    } else if (value) {
-      setTempDate(moment(value));
-    } else if (value === undefined || value === null) {
-      setTempDate(null);
-    }
-  }, [defaultDateOffset, value]);
+  const tomorrow = useMemo<Moment>(() => {
+    const d = new Date();
+    d.setDate(d.getDate() + 1);
+    d.setHours(0, 0, 0, 0);
+    return moment(d);
+  }, []);
 
-  return preventRender ? null : (
+  const handleChange = useCallback(
+    (event: React.SyntheticEvent, date: Moment) => {
+      const newValue = date && date.isValid() ? `${date.format('YYYY-MM-DDThh:mm:ss.SSSSSS')}Z` : null;
+      setStore(s => {
+        const err = s.error(newValue);
+        s.onError(err);
+        if (!err) s.onChange(event, newValue);
+        return { ...s, inputValue: date, errorMsg: err };
+      });
+    },
+    [setStore]
+  );
+
+  const handleFocus = useCallback(
+    (event: React.FocusEvent) => {
+      setStore(s => {
+        s.onFocus(event);
+        return {
+          ...s,
+          inputValue: moment(s.value),
+          focused: !s.readOnly && !s.disabled && document.activeElement === event.target
+        };
+      });
+    },
+    [setStore]
+  );
+
+  const handleBlur = useCallback(
+    (event: React.FocusEvent) => {
+      setStore(s => {
+        s.onBlur(event);
+        return { ...s, focused: false, inputValue: null };
+      });
+    },
+    [setStore]
+  );
+
+  return (
     <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale={i18n.language}>
-      <div {...rootProps} style={{ textAlign: 'left', ...rootProps?.style }}>
-        <StyledFormLabel props={props} focused={focused} />
-        <StyledFormControl props={props}>
+      <StyledRoot>
+        <StyledFormLabel />
+        <StyledFormControl>
           {loading ? (
-            <StyledInputSkeleton props={props} />
+            <StyledInputSkeleton />
           ) : (
             <>
               <MuiDatePicker
-                value={tempDate}
+                value={inputValue}
                 readOnly={readOnly}
                 minDate={minDateTomorrow ? tomorrow : null}
                 maxDate={maxDateToday ? today : null}
                 disabled={disabled}
-                onChange={newValue => {
-                  setTempDate(newValue);
-
-                  const parsedValue =
-                    newValue && newValue.isValid() ? `${newValue.format('YYYY-MM-DDThh:mm:ss.SSSSSS')}Z` : null;
-
-                  onChange(null, parsedValue);
-
-                  const err = error(parsedValue);
-                  if (err) onError(err);
-                }}
+                onChange={newValue => handleChange(null, newValue)}
+                // slots={{ textField: props => <TextField {...props} /> }}
                 slotProps={{
                   textField: {
-                    id: getAriaLabel(props),
+                    id: id,
                     size: 'small',
-                    error: !!errorValue && !disabled,
-                    disabled: disabled,
+                    error: !!errorMsg && !disabled,
+                    disabled,
                     ...(readOnly && !disabled && { focused: null }),
                     sx: {
                       '& .MuiInputBase-input': {
@@ -134,42 +136,71 @@ const WrappedDateInput = (props: DateInputProps) => {
                           })
                       }
                     },
-                    onFocus: (event, ...other) => {
-                      setFocused(!readOnly && !disabled && document.activeElement === event.target);
-                      onFocus(event, ...other);
-                    },
-                    onBlur: (event, ...other) => {
-                      setFocused(false);
-                      onBlur(event, ...other);
-                    },
+                    onFocus: handleFocus,
+                    onBlur: handleBlur,
                     inputProps: {
                       ...(tiny && { sx: { padding: '2.5px 4px 2.5px 8px' } })
                     },
                     InputProps: {
                       placeholder: placeholder,
-                      endAdornment:
-                        preventPasswordRender && preventResetRender && !endAdornment ? null : (
-                          <InputAdornment position="end">
-                            <PasswordInput
-                              props={props}
-                              showPassword={showPassword}
-                              onShowPassword={() => setShowPassword(p => !p)}
-                            />
-                            <ResetInput props={props} />
-                            {endAdornment}
-                          </InputAdornment>
-                        )
+                      endAdornment: (
+                        <StyledEndAdornment>
+                          <PasswordInput />
+                          <ResetInput onChange={handleChange} />
+                          <ExpandInput />
+                          {endAdornment}
+                        </StyledEndAdornment>
+                      )
                     }
                   }
                 }}
               />
-              <HelperText props={props} />
+              <HelperText />
             </>
           )}
         </StyledFormControl>
-      </div>
+      </StyledRoot>
     </LocalizationProvider>
   );
 };
 
-export const DateInput: React.FC<DateInputProps> = React.memo(WrappedDateInput);
+export const DateInput: React.FC<DateInputProps> = React.memo(
+  ({
+    defaultDateOffset = null,
+    maxDateToday = false,
+    minDateTomorrow = false,
+    error = () => '',
+    value,
+    preventRender = false,
+    ...props
+  }) => {
+    const { t } = useTranslation('inputs');
+
+    const newError = useCallback(
+      (val: string): string => {
+        const err = error(val);
+        if (err) return err;
+        if (props.required && !isValidValue(val)) return t('error.required');
+        return '';
+      },
+      [error, props.required, t]
+    );
+
+    return preventRender ? null : (
+      <PropProvider<DateInputProps>
+        data={{
+          ...props,
+          defaultDateOffset,
+          maxDateToday,
+          minDateTomorrow,
+          error: newError,
+          errorMsg: newError(value),
+          value,
+          inputValue: value ? moment(value) : null
+        }}
+      >
+        <WrappedDateInput />
+      </PropProvider>
+    );
+  }
+);

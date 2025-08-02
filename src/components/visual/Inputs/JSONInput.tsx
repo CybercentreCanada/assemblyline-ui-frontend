@@ -1,87 +1,79 @@
-import type { ReactJsonViewProps, ThemeObject } from '@microlink/react-json-view';
+import type { ThemeObject } from '@microlink/react-json-view';
 import ReactJson from '@microlink/react-json-view';
 import { useTheme } from '@mui/material';
 import { useAppTheme } from 'commons/components/app/hooks';
 import {
-  ExpandInput,
   HelperText,
   PasswordInput,
   ResetInput,
   StyledEndAdornmentBox,
-  StyledFormControl
+  StyledFormControl,
+  StyledFormLabel,
+  StyledInputSkeleton,
+  StyledRoot
 } from 'components/visual/Inputs/lib/inputs.components';
-import type { InputProps } from 'components/visual/Inputs/lib/inputs.model';
-import React, { useMemo, useState } from 'react';
+import { useDefaultError } from 'components/visual/Inputs/lib/inputs.hook';
+import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
+import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
+import React, { useCallback, useMemo } from 'react';
 
-export type JSONInputProps = Omit<ReactJsonViewProps, 'src' | 'onAdd' | 'onDelete' | 'onEdit'> & InputProps<object>;
+export type JSONInputProps = InputValues<object> & InputProps;
 
-const WrappedJSONInput = (props: JSONInputProps) => {
-  return null;
-
-  const {
-    disabled = false,
-    endAdornment = null,
-    error = () => '',
-    loading,
-    monospace = false,
-    password = false,
-    preventRender,
-    readOnly = false,
-    rootProps,
-    tiny = false,
-    value,
-    onChange = () => null,
-    onError = () => null
-  } = props;
-
+const WrappedJSONInput = () => {
   const theme = useTheme();
   const { isDark: isDarkTheme } = useAppTheme();
+  const [get, setStore] = usePropStore<JSONInputProps>();
 
-  const [showPassword, setShowPassword] = useState<boolean>(true);
-
-  const errorValue = useMemo<string>(() => error(value), [error, value]);
+  const disabled = get(s => s.disabled);
+  const errorMsg = get(s => s.errorMsg);
+  const inputValue = get(s => s.inputValue);
+  const loading = get(s => s.loading);
+  const monospace = get(s => s.monospace);
+  const password = get(s => s.password);
+  const readOnly = get(s => s.readOnly);
+  const showPassword = get(s => s.showPassword);
+  const tiny = get(s => s.tiny);
 
   const jsonTheme = useMemo<ThemeObject>(
     () => ({
-      base00: 'transparent', // Background
-      base01: theme.palette.grey[isDarkTheme ? 800 : 300], // Add key title + Edit value background
-      base02: theme.palette.grey[isDarkTheme ? 700 : 400], // Borders and DataType Background
-      base03: '#444', // Unused
-      base04: theme.palette.grey[isDarkTheme ? 700 : 400], // Object size and Add key border
-      base05: theme.palette.grey[isDarkTheme ? 400 : 600], // Undefined and Add key background
-      base06: '#444', // Unused
-      base07: theme.palette.text.primary, // Brace, Key and Borders
-      base08: theme.palette.text.secondary, // NaN
-      base09: isDarkTheme ? theme.palette.warning.light : theme.palette.warning.dark, // Strings and Icons
-      base0A: theme.palette.grey[isDarkTheme ? 300 : 800], // Null, Regex and edit text color
-      base0B: isDarkTheme ? theme.palette.error.light : theme.palette.error.dark, // Float
-      base0C: isDarkTheme ? theme.palette.secondary.light : theme.palette.secondary.dark, // Array Key
-      base0D: isDarkTheme ? theme.palette.info.light : theme.palette.info.dark, // Date, function, expand icon
-      base0E: isDarkTheme ? theme.palette.info.light : theme.palette.info.dark, // Boolean
-      base0F: isDarkTheme ? theme.palette.error.light : theme.palette.error.dark // Integer
+      base00: 'transparent',
+      base01: theme.palette.grey[isDarkTheme ? 800 : 300],
+      base02: theme.palette.grey[isDarkTheme ? 700 : 400],
+      base03: '#444',
+      base04: theme.palette.grey[isDarkTheme ? 700 : 400],
+      base05: theme.palette.grey[isDarkTheme ? 400 : 600],
+      base06: '#444',
+      base07: theme.palette.text.primary,
+      base08: theme.palette.text.secondary,
+      base09: isDarkTheme ? theme.palette.warning.light : theme.palette.warning.dark,
+      base0A: theme.palette.grey[isDarkTheme ? 300 : 800],
+      base0B: isDarkTheme ? theme.palette.error.light : theme.palette.error.dark,
+      base0C: isDarkTheme ? theme.palette.secondary.light : theme.palette.secondary.dark,
+      base0D: isDarkTheme ? theme.palette.info.light : theme.palette.info.dark,
+      base0E: isDarkTheme ? theme.palette.info.light : theme.palette.info.dark,
+      base0F: isDarkTheme ? theme.palette.error.light : theme.palette.error.dark
     }),
-    [
-      isDarkTheme,
-      theme.palette.error.dark,
-      theme.palette.error.light,
-      theme.palette.grey,
-      theme.palette.info.dark,
-      theme.palette.info.light,
-      theme.palette.secondary.dark,
-      theme.palette.secondary.light,
-      theme.palette.text.primary,
-      theme.palette.text.secondary,
-      theme.palette.warning.dark,
-      theme.palette.warning.light
-    ]
+    [theme, isDarkTheme]
   );
 
-  return preventRender ? null : (
-    <div {...rootProps} style={{ textAlign: 'left', ...rootProps?.style }}>
-      <StyledFormLabel props={props} />
-      <StyledFormControl props={props}>
+  const handleChange = useCallback(
+    (event: React.SyntheticEvent, newValue: object) => {
+      setStore(s => {
+        const err = s.error(newValue);
+        s.onError(err);
+        if (!err) s.onChange(event, newValue);
+        return { ...s, inputValue: newValue, errorMsg: err };
+      });
+    },
+    [setStore]
+  );
+
+  return (
+    <StyledRoot>
+      <StyledFormLabel />
+      <StyledFormControl>
         {loading ? (
-          <StyledInputSkeleton props={props} />
+          <StyledInputSkeleton />
         ) : (
           <>
             <div
@@ -90,7 +82,7 @@ const WrappedJSONInput = (props: JSONInputProps) => {
                 alignItems: 'flex-start',
                 border: `1px solid ${theme.palette.divider}`,
                 borderRadius: '4px',
-                ...(errorValue && { border: `1px solid ${theme.palette.error.main}` })
+                ...(errorMsg && { border: `1px solid ${theme.palette.error.main}` })
               }}
             >
               <ReactJson
@@ -100,36 +92,21 @@ const WrappedJSONInput = (props: JSONInputProps) => {
                 groupArraysAfterLength={10}
                 displayDataTypes={false}
                 displayObjectSize={false}
-                src={value}
+                src={inputValue}
                 onAdd={
                   disabled || readOnly
                     ? false
-                    : event => {
-                        onChange(event as unknown as Event, event.updated_src);
-
-                        const err = error(event.updated_src);
-                        if (err) onError(err);
-                      }
+                    : event => handleChange(event as unknown as React.SyntheticEvent, event.updated_src)
                 }
                 onDelete={
                   disabled || readOnly
                     ? false
-                    : event => {
-                        onChange(event as unknown as Event, event.updated_src);
-
-                        const err = error(event.updated_src);
-                        if (err) onError(err);
-                      }
+                    : event => handleChange(event as unknown as React.SyntheticEvent, event.updated_src)
                 }
                 onEdit={
                   disabled || readOnly
                     ? false
-                    : event => {
-                        onChange(event as unknown as Event, event.updated_src);
-
-                        const err = error(event.updated_src);
-                        if (err) onError(err);
-                      }
+                    : event => handleChange(event as unknown as React.SyntheticEvent, event.updated_src)
                 }
                 style={{
                   fontSize: '1rem',
@@ -137,14 +114,7 @@ const WrappedJSONInput = (props: JSONInputProps) => {
                   overflowX: 'auto',
                   width: '100%',
                   ...(monospace && { fontFamily: 'monospace' }),
-                  ...(!tiny
-                    ? {
-                        minHeight: theme.spacing(5)
-                      }
-                    : {
-                        paddingTop: '2px !important',
-                        paddingBottom: '2px !important'
-                      }),
+                  ...(!tiny ? { minHeight: theme.spacing(5) } : { paddingTop: '2px', paddingBottom: '2px' }),
                   ...(password &&
                     showPassword && {
                       fontFamily: 'password',
@@ -154,24 +124,25 @@ const WrappedJSONInput = (props: JSONInputProps) => {
                     })
                 }}
               />
-
-              <StyledEndAdornmentBox props={props}>
-                <PasswordInput
-                  props={props}
-                  showPassword={showPassword}
-                  onShowPassword={() => setShowPassword(p => !p)}
-                />
-                <ResetInput props={props} />
-                <ExpandInput props={props} />
-                {endAdornment}
+              <StyledEndAdornmentBox>
+                <PasswordInput />
+                <ResetInput onChange={handleChange} />
               </StyledEndAdornmentBox>
             </div>
-            <HelperText props={props} />
+            <HelperText />
           </>
         )}
       </StyledFormControl>
-    </div>
+    </StyledRoot>
   );
 };
 
-export const JSONInput: React.FC<JSONInputProps> = React.memo(WrappedJSONInput);
+export const JSONInput: React.FC<JSONInputProps> = React.memo(({ preventRender = false, value, ...props }) => {
+  const newError = useDefaultError(props);
+
+  return preventRender ? null : (
+    <PropProvider<JSONInputProps> data={{ ...props, error: newError, errorMsg: newError(value), value }}>
+      <WrappedJSONInput />
+    </PropProvider>
+  );
+});

@@ -4,72 +4,56 @@ import {
   HelperText,
   PasswordInput,
   ResetInput,
+  StyledButtonLabel,
   StyledEndAdornmentBox,
   StyledFormButton,
   StyledFormControl,
-  StyledFormControlLabel
+  StyledFormControlLabel,
+  StyledFormLabel,
+  StyledRoot
 } from 'components/visual/Inputs/lib/inputs.components';
-import type { InputProps } from 'components/visual/Inputs/lib/inputs.model';
-import React, { useState } from 'react';
+import { useDefaultError, useDefaultHandlers } from 'components/visual/Inputs/lib/inputs.hook';
+import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
+import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
+import React from 'react';
 
 type Option = Omit<FormControlLabelProps, 'control' | 'label'> & {
   control?: FormControlLabelProps['control'];
   label?: string;
 };
 
-export type RadioInputProps<O extends Option[] = []> = InputProps<O[number]['value']> & {
-  options: O;
-};
+export type RadioInputProps<O extends readonly Option[]> = InputValues<O[number]['value']> &
+  InputProps & {
+    options: O;
+  };
 
-const WrappedRadioInput = <O extends Option[]>(props: RadioInputProps<O>) => {
-  return null;
+const WrappedRadioInput = <O extends readonly Option[]>() => {
+  const [get] = usePropStore<RadioInputProps<O>>();
 
-  const {
-    disabled,
-    error = () => '',
-    options = null,
-    preventDisabledColor = false,
-    preventRender = false,
-    readOnly = false,
-    rootProps = null,
-    value,
-    onBlur = () => null,
-    onChange = () => null,
-    onError = () => null,
-    onFocus = () => null
-  } = props;
+  const focused = get(s => s.focused);
+  const inputValue = get(s => s.inputValue);
+  const options = get(s => s.options);
+  const preventDisabledColor = get(s => s.preventDisabledColor);
+  const readOnly = get(s => s.readOnly);
+  const value = get(s => s.value);
 
-  const [focused, setFocused] = useState<boolean>(false);
-  const [showPassword, setShowPassword] = useState<boolean>(true);
+  const { handleChange, handleFocus, handleBlur } = useDefaultHandlers();
 
-  return preventRender ? null : (
-    <div {...rootProps} style={{ textAlign: 'left', ...rootProps?.style }}>
-      <StyledFormLabel props={props} focused={focused} />
-      <StyledFormControl props={props}>
+  return (
+    <StyledRoot>
+      <StyledFormLabel />
+      <StyledFormControl>
         <RadioGroup value={value}>
-          {options.map((option, key) => (
+          {options.map((option, index) => (
             <StyledFormButton
-              key={`${key}-${option.label}`}
-              props={{ ...props, value: option.value, label: option.label, error: () => null }}
-              onChange={event => {
-                onChange(event, option.value);
-
-                const err = error(!option.value);
-                if (err) onError(err);
-              }}
-              onFocus={(event, ...other) => {
-                setFocused(!readOnly && !disabled && document.activeElement === event.target);
-                onFocus(event, ...other);
-              }}
-              onBlur={(event, ...other) => {
-                setFocused(false);
-                onBlur(event, ...other);
-              }}
+              key={`${index}-${option.label}`}
+              onFocus={handleFocus}
+              onBlur={handleBlur}
+              onClick={e => handleChange(e, option.value, option.value)}
             >
               <StyledFormControlLabel
-                props={{ ...props, value: option.value, label: option.label, error: () => null }}
-                focused={focused && option.value === value}
-                showPassword={showPassword}
+                label={<StyledButtonLabel label={option.label} focused={focused && inputValue === option.value} />}
+                value={option.value}
               >
                 <Radio
                   disableFocusRipple
@@ -88,15 +72,29 @@ const WrappedRadioInput = <O extends Option[]>(props: RadioInputProps<O>) => {
           ))}
         </RadioGroup>
 
-        <StyledEndAdornmentBox props={props}>
-          <PasswordInput props={props} showPassword={showPassword} onShowPassword={() => setShowPassword(p => !p)} />
-          <ResetInput props={props} />
+        <StyledEndAdornmentBox>
+          <PasswordInput />
+          <ResetInput />
         </StyledEndAdornmentBox>
       </StyledFormControl>
-      <HelperText props={props} />
-    </div>
+      <HelperText />
+    </StyledRoot>
   );
 };
 
-export const RadioInput: <O extends Option[]>(props: RadioInputProps<O>) => React.ReactNode =
-  React.memo(WrappedRadioInput);
+export const RadioInput: <O extends readonly Option[]>(props: RadioInputProps<O>) => React.ReactNode = React.memo(
+  <O extends readonly Option[]>({
+    options = [] as unknown as O,
+    preventRender = false,
+    value,
+    ...props
+  }: RadioInputProps<O>) => {
+    const newError = useDefaultError(props);
+
+    return preventRender ? null : (
+      <PropProvider<RadioInputProps<O>> data={{ ...props, errorMsg: newError(value), error: newError, options, value }}>
+        <WrappedRadioInput<O> />
+      </PropProvider>
+    );
+  }
+);

@@ -1,85 +1,125 @@
-import type { TextFieldProps } from '@mui/material';
 import {
   HelperText,
   StyledFormControl,
   StyledFormLabel,
   StyledInputSkeleton,
+  StyledRoot,
   StyledTextField
 } from 'components/visual/Inputs/lib/inputs.components';
-import { useInputState } from 'components/visual/Inputs/lib/inputs.hook';
-import type { InputProps } from 'components/visual/Inputs/lib/inputs.model';
+import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
+import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
 import { isValidNumber, isValidValue } from 'components/visual/Inputs/lib/inputs.utils';
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
-export type NumberInputProps = Omit<TextFieldProps, 'error' | 'value' | 'onChange'> &
-  InputProps<number> & {
+export type NumberInputProps = InputValues<number, string> &
+  InputProps & {
     max?: number;
     min?: number;
-    unnullable?: boolean;
   };
 
-const WrappedNumberInput = (props: NumberInputProps) => {
-  const { t } = useTranslation('inputs');
+const WrappedNumberInput = () => {
+  const [get, setStore] = usePropStore<NumberInputProps>();
 
-  return null;
+  const inputValue = get(s => s.inputValue);
+  const loading = get(s => s.loading);
+  const password = get(s => s.password);
+  const tiny = get(s => s.tiny);
+  const value = get(s => s.value);
 
-  const {
-    error = () => '',
-    loading = false,
-    max = null,
-    min = null,
-    password = false,
-    preventRender = false,
-    required = false,
-    rootProps = null,
-    tiny = false
-  } = props;
-
-  const state = useInputState<number, string>(
-    props,
-    v => {
-      const num = isValidValue(v) ? Number(v) : null;
-      if (error(num)) return error(num);
-      else if (required && !isValidValue(num)) return t('error.required');
-      else if (!isValidNumber(num, props)) {
-        if (typeof min === 'number' && typeof max === 'number') return t('error.minmax', { min, max });
-        else if (typeof min === 'number') return t('error.min', { min });
-        else if (typeof max === 'number') return t('error.max', { max });
-      } else return null;
+  const handleChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      setStore(s => {
+        const newValue = event.target.value;
+        const num = newValue !== '' ? Number(newValue) : null;
+        const err = s.error(num);
+        s.onError(err);
+        if (!err) s.onChange(event, num);
+        return { ...s, inputValue: newValue, errorMsg: err };
+      });
     },
-    v => (typeof v === 'object' ? '' : `${v}`),
-    v => (v !== null && v !== undefined && v !== '' ? Number(v) : null)
+    [setStore]
   );
 
-  return preventRender ? null : (
-    <div {...rootProps} style={{ textAlign: 'left', ...rootProps?.style }}>
-      <StyledFormLabel props={props} state={state} />
-      <StyledFormControl props={props} state={state}>
+  const handleFocus = useCallback(
+    (event: React.FocusEvent) => {
+      setStore(s => {
+        s.onFocus(event);
+        return {
+          ...s,
+          inputValue: s.value !== null && s.value !== undefined ? String(s.value) : '',
+          focused: !s.readOnly && !s.disabled && document.activeElement === event.target
+        };
+      });
+    },
+    [setStore]
+  );
+
+  const handleBlur = useCallback(
+    (event: React.FocusEvent) => {
+      setStore(s => {
+        s.onBlur(event);
+        return { ...s, focused: false, inputValue: null };
+      });
+    },
+    [setStore]
+  );
+
+  return (
+    <StyledRoot>
+      <StyledFormLabel />
+      <StyledFormControl>
         {loading ? (
-          <StyledInputSkeleton props={props} state={state} />
+          <StyledInputSkeleton />
         ) : (
           <>
             <StyledTextField
-              props={props}
-              state={state}
-              type={password && state.showPassword ? 'password' : 'number'}
+              type={password ? 'password' : 'number'}
+              value={inputValue ?? (value !== null ? String(value) : '')}
+              onChange={handleChange}
+              onFocus={handleFocus}
+              onBlur={handleBlur}
               slotProps={{
                 input: {
                   inputProps: {
-                    ...(min && { min: min }),
-                    ...(max && { max: max }),
+                    // ...(typeof min === 'number' && { min }),
+                    // ...(typeof max === 'number' && { max }),
                     ...(tiny && { sx: { padding: '2.5px 4px 2.5px 8px' } })
                   }
                 }
               }}
             />
-            <HelperText props={props} state={state} />
+            <HelperText />
           </>
         )}
       </StyledFormControl>
-    </div>
+    </StyledRoot>
   );
 };
 
-export const NumberInput: React.FC<NumberInputProps> = React.memo(WrappedNumberInput);
+export const NumberInput: React.FC<NumberInputProps> = React.memo(
+  ({ error = () => '', max = null, min = null, preventRender = false, value, ...props }) => {
+    const { t } = useTranslation('inputs');
+
+    const newError = useCallback(
+      (val: number): string => {
+        const err = error(val);
+        if (err) return err;
+        if (props.required && !isValidValue(val)) return t('error.required');
+        if (!isValidNumber(val, { min, max })) {
+          if (typeof min === 'number' && typeof max === 'number') return t('error.minmax', { min, max });
+          if (typeof min === 'number') return t('error.min', { min });
+          if (typeof max === 'number') return t('error.max', { max });
+        }
+        return '';
+      },
+      [error, props.required, t, min, max]
+    );
+
+    return preventRender ? null : (
+      <PropProvider<NumberInputProps> data={{ ...props, error: newError, errorMsg: newError(value), max, min, value }}>
+        <WrappedNumberInput />
+      </PropProvider>
+    );
+  }
+);

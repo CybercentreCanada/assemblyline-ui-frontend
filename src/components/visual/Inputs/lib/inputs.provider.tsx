@@ -1,71 +1,121 @@
-// import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useSyncExternalStore } from 'react';
+import type { InputProps, InputStates } from 'components/visual/Inputs/lib/inputs.model';
+import { DEFAULT_INPUT_PROPS } from 'components/visual/Inputs/lib/inputs.model';
+import { parseInputProps } from 'components/visual/Inputs/lib/inputs.utils';
+import { createContext, useContext, useEffect, useRef, useSyncExternalStore } from 'react';
 
-// export const createInputContext = <Store,>(initialState: Store) => {
-//   const useStoreData = (
-//     props: Store
-//   ): {
-//     get: () => Store;
-//     set: (value: Partial<Store>) => void;
-//     subscribe: (callback: () => void) => () => void;
-//   } => {
-//     const store = useRef<Store>({ ...initialState, ...props });
+function shallowEqual<T>(a: T, b: T): boolean {
+  if (Object.is(a, b)) return true;
+  if (!a || !b || typeof a !== 'object' || typeof b !== 'object') return false;
 
-//     const get = useCallback(() => store.current, []);
+  const keysA = Object.keys(a as object);
+  const keysB = Object.keys(b as object);
+  if (keysA.length !== keysB.length) return false;
 
-//     const subscribers = useRef<Set<() => void>>(new Set<() => void>());
+  return keysA.every(key => key in b && Object.is(a[key], b[key]));
+}
 
-//     const set = useCallback((dispatch: Partial<Store> | ((value: Partial<Store>) => Partial<Store>)) => {
-//       store.current =
-//         typeof dispatch === 'function'
-//           ? { ...store.current, ...dispatch(store.current) }
-//           : { ...store.current, ...dispatch };
-//       subscribers.current.forEach(callback => callback());
-//     }, []);
+export function deepReconcile<T extends Record<string, unknown>>(
+  incoming: Partial<T>,
+  existing: Partial<T>,
+  initial: Partial<T>
+): T {
+  const result: Record<string, unknown> = {};
 
-//     const subscribe = useCallback((callback: () => void) => {
-//       subscribers.current.add(callback);
-//       return () => subscribers.current.delete(callback);
-//     }, []);
+  for (const key of new Set([...Object.keys(initial), ...Object.keys(existing), ...Object.keys(incoming)])) {
+    if (key in incoming) {
+      result[key] = incoming[key];
+    } else if (key in existing && key in initial) {
+      result[key] = initial[key];
+    } else {
+      result[key] = existing[key] ?? initial[key];
+    }
+  }
 
-//     useEffect(() => {
-//       set(props);
-//     }, [props, set]);
+  return result as T;
+}
 
-//     return useMemo(() => ({ get, set, subscribe }), [get, set, subscribe]);
-//   };
+export const createPropContext = <Props extends object>(
+  initialProps: Props,
+  parser: (data: unknown) => Props = v => v as Props
+) => {
+  const createPropStore = () => {
+    const stateRef = { current: parser(initialProps) };
+    const subscribers = new Set<() => void>();
 
-//   type UseStoreDataReturnType = ReturnType<typeof useStoreData>;
+    const get = <Data,>() => stateRef.current as Data & Props;
 
-//   const StoreContext = createContext<UseStoreDataReturnType | null>(null);
+    const reset = <Data,>(incoming: Partial<Data & Props>) => {
+      const nextState = parser(deepReconcile(incoming, stateRef.current, initialProps));
+      if (shallowEqual(stateRef.current, nextState)) return;
+      stateRef.current = nextState;
+      subscribers.forEach(fn => fn());
+    };
 
-//   type InputProviderProps = {
-//     children: React.ReactNode;
-//     props: Store;
-//   };
+    const set = <Data,>(updater: Partial<Data & Props> | ((prev: Data & Props) => Partial<Data & Props>)) => {
+      const nextPartial = typeof updater === 'function' ? updater(stateRef.current as Data & Props) : updater;
+      const nextState = parser({ ...stateRef.current, ...nextPartial });
 
-//   const InputProvider = ({ children, props }: InputProviderProps) => {
-//     return <StoreContext.Provider value={useStoreData(props)}>{children}</StoreContext.Provider>;
-//   };
+      if (shallowEqual(stateRef.current, nextState)) return;
 
-//   const useInputStore = <SelectorOutput,>(
-//     selector: (store: Store) => SelectorOutput
-//   ): [SelectorOutput, (value: Partial<Store>) => void] => {
-//     const store = useContext(StoreContext);
-//     if (!store) {
-//       throw new Error('Store not found');
-//     }
+      stateRef.current = nextState;
+      subscribers.forEach(fn => fn());
+    };
 
-//     const state = useSyncExternalStore(
-//       store.subscribe,
-//       () => selector(store.get()) ?? selector(initialState),
-//       () => selector(initialState)
-//     );
+    const subscribe = (callback: () => void) => {
+      subscribers.add(callback);
+      return () => subscribers.delete(callback);
+    };
 
-//     return [state, store.set];
-//   };
+    return { get, reset, set, subscribe };
+  };
 
-//   return {
-//     InputProvider,
-//     useInputStore
-//   };
-// };
+  const PropContext = createContext<ReturnType<typeof createPropStore> | null>(null);
+
+  const PropProvider = <Data,>({ children, data }: { children: React.ReactNode; data: Data & Props }) => {
+    const storeRef = useRef<ReturnType<typeof createPropStore> | null>(null);
+
+    if (!storeRef.current) {
+      storeRef.current = createPropStore();
+      storeRef.current.reset<Data>(data);
+    }
+
+    useEffect(() => {
+      storeRef.current.reset<Data>(data);
+    }, [data]);
+
+    return <PropContext.Provider value={storeRef.current}>{children}</PropContext.Provider>;
+  };
+
+  const usePropStore = <Data,>() => {
+    const store = useContext(PropContext);
+    if (!store) throw new Error('Store not found');
+
+    const useStore = <T,>(selector: (state: Data & Props) => T, isEqual: (a: T, b: T) => boolean = shallowEqual): T => {
+      const store = useContext(PropContext);
+      if (!store) throw new Error('Store not found');
+
+      const lastValueRef = useRef<T>(selector(store.get<Data>()));
+
+      return useSyncExternalStore(
+        store.subscribe,
+        () => {
+          const newValue = selector(store.get<Data>());
+          if (!isEqual(lastValueRef.current, newValue)) {
+            lastValueRef.current = newValue;
+          }
+          return lastValueRef.current;
+        },
+        () => selector(initialProps as Data & Props)
+      );
+    };
+
+    return [useStore, store.set<Data & Props>] as const;
+  };
+
+  return { PropProvider, usePropStore };
+};
+
+export const { PropProvider, usePropStore } = createPropContext<InputProps & InputStates>(
+  DEFAULT_INPUT_PROPS,
+  parseInputProps
+);

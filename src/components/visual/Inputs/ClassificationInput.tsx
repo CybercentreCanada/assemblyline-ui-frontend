@@ -16,8 +16,17 @@ import useALContext from 'components/hooks/useALContext';
 import type { WhoAmI } from 'components/models/ui/user';
 import type { ClassificationProps } from 'components/visual/Classification';
 import CustomChip, { COLOR_MAP } from 'components/visual/CustomChip';
-import { HelperText, PasswordInput, StyledFormControl } from 'components/visual/Inputs/lib/inputs.components';
-import type { InputProps } from 'components/visual/Inputs/lib/inputs.model';
+import {
+  HelperText,
+  PasswordInput,
+  StyledFormControl,
+  StyledFormLabel,
+  StyledInputSkeleton,
+  StyledRoot
+} from 'components/visual/Inputs/lib/inputs.components';
+import { useDefaultError } from 'components/visual/Inputs/lib/inputs.hook';
+import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
+import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
 import type { ClassificationParts, ClassificationValidator } from 'helpers/classificationParser';
 import {
   applyAliases,
@@ -29,51 +38,55 @@ import {
   normalizedClassification
 } from 'helpers/classificationParser';
 import type { PossibleColor } from 'helpers/colors';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-export type ClassificationInputProps = Omit<ClassificationProps, 'c12n' | 'setClassification'> & InputProps<string>;
+export type ClassificationInputProps = Omit<ClassificationProps, 'c12n' | 'setClassification'> &
+  InputValues<ClassificationProps['c12n']> &
+  InputProps;
 
-const WrappedClassificationInput = (props: ClassificationInputProps) => {
-  return null;
+type ClassificationInputState = ClassificationInputProps & {
+  showPicker: boolean;
+  uParts: ClassificationParts;
+  validated: ClassificationValidator;
+};
 
-  const {
-    defaultValue = undefined,
-    disabled = false,
-    dynGroup = null,
-    error = () => '',
-    format = 'short',
-    fullWidth = true,
-    inline = false,
-    isUser = false,
-    loading = false,
-    monospace = false,
-    password = false,
-    preventRender: preventRenderProp = false,
-    readOnly = false,
-    rootProps = null,
-    tiny = false,
-    value = null,
-    onChange = () => null,
-    onError = () => null
-  } = props;
-
+const WrappedClassificationInput = () => {
   const { t } = useTranslation();
   const theme = useTheme();
   const { user: currentUser, c12nDef, classificationAliases } = useALContext();
-
-  const [showPicker, setShowPicker] = useState<boolean>(false);
-  const [uParts, setUserParts] = useState<ClassificationParts>(defaultParts);
-  const [validated, setValidated] = useState<ClassificationValidator>(defaultClassificationValidator);
-  const [showPassword, setShowPassword] = useState<boolean>(true);
 
   const isPhone = useMediaQuery(theme.breakpoints.only('xs'));
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const sp2 = theme.spacing(2);
 
+  const [get, setStore] = usePropStore<ClassificationInputState>();
+
+  const disabled = get(s => s.disabled);
+  const format = get(s => s.format);
+  const fullWidth = get(s => s.fullWidth);
+  const inline = get(s => s.inline);
+  const isUser = get(s => s.isUser);
+  const loading = get(s => s.loading);
+  const monospace = get(s => s.monospace);
+  const password = get(s => s.password);
+  const preventRenderStore = get(s => s.preventRender);
+  const readOnly = get(s => s.readOnly);
+  const reset = get(s => s.reset);
+  const showPassword = get(s => s.showPassword);
+  const tiny = get(s => s.tiny);
+  const value = get(s => s.value);
+
+  const dynGroup = get(s => s.dynGroup);
+  const showPicker = get(s => s?.showPicker ?? false);
+  const uParts = get(s => s?.uParts ?? defaultParts);
+  const validated = get(s => s?.validated ?? defaultClassificationValidator);
+
+  const onReset = get(s => s.onReset);
+
   const preventRender = useMemo(
-    () => preventRenderProp || !c12nDef?.enforce || !validated?.parts?.lvl,
-    [c12nDef?.enforce, preventRenderProp, validated?.parts?.lvl]
+    () => preventRenderStore || !c12nDef?.enforce || !validated?.parts?.lvl,
+    [c12nDef?.enforce, preventRenderStore, validated?.parts?.lvl]
   );
 
   const normalClassification = useMemo(
@@ -116,9 +129,12 @@ const WrappedClassificationInput = (props: ClassificationInputProps) => {
         }
       }
 
-      setValidated(applyClassificationRules({ ...validated.parts, groups: newGrp }, c12nDef, format, isMobile, isUser));
+      setStore(s => ({
+        ...s,
+        validated: applyClassificationRules({ ...validated.parts, groups: newGrp }, c12nDef, format, isMobile, isUser)
+      }));
     },
-    [c12nDef, format, isMobile, isUser, validated.parts]
+    [c12nDef, format, isMobile, isUser, setStore, validated.parts]
   );
 
   const handleSubGroupsChange = useCallback(
@@ -133,11 +149,18 @@ const WrappedClassificationInput = (props: ClassificationInputProps) => {
         newSGrp.splice(newSGrp.indexOf(sgrp.short_name), 1);
       }
 
-      setValidated(
-        applyClassificationRules({ ...validated.parts, subgroups: newSGrp }, c12nDef, format, isMobile, isUser)
-      );
+      setStore(s => ({
+        ...s,
+        validated: applyClassificationRules(
+          { ...validated.parts, subgroups: newSGrp },
+          c12nDef,
+          format,
+          isMobile,
+          isUser
+        )
+      }));
     },
-    [c12nDef, format, isMobile, isUser, validated.parts]
+    [c12nDef, format, isMobile, isUser, setStore, validated.parts]
   );
 
   const handleRequiredChange = useCallback(
@@ -152,74 +175,74 @@ const WrappedClassificationInput = (props: ClassificationInputProps) => {
         newReq.splice(newReq.indexOf(req.short_name), 1);
       }
 
-      setValidated(applyClassificationRules({ ...validated.parts, req: newReq }, c12nDef, format, isMobile, isUser));
+      setStore(s => ({
+        ...s,
+        validated: applyClassificationRules({ ...validated.parts, req: newReq }, c12nDef, format, isMobile, isUser)
+      }));
     },
-    [c12nDef, format, isMobile, isUser, validated.parts]
+    [c12nDef, format, isMobile, isUser, setStore, validated.parts]
   );
 
   const handleLevelChange = useCallback(
     (lvlIdx: number) =>
-      setValidated(
-        applyClassificationRules(
+      setStore(s => ({
+        ...s,
+        validated: applyClassificationRules(
           { ...validated.parts, lvlIdx, lvl: getLevelText(lvlIdx, c12nDef, format, isMobile) },
           c12nDef,
           format,
           isMobile,
           isUser
         )
-      ),
-    [c12nDef, format, isMobile, isUser, validated.parts]
+      })),
+    [c12nDef, format, isMobile, isUser, setStore, validated.parts]
   );
 
   const handleChange = useCallback(
-    (event: unknown) => {
+    (event: React.SyntheticEvent) => {
       const newC12n = normalizedClassification(validated.parts, c12nDef, format, isMobile, isUser);
-      setShowPicker(false);
-      onChange(event as Event, newC12n);
-
-      const err = error(newC12n);
-      if (err) onError(err);
+      setStore(s => {
+        const err = s.error(newC12n);
+        s.onError(err);
+        if (!err) s.onChange(event, newC12n);
+        return { ...s, inputValue: newC12n, errorMsg: err, showPicker: false };
+      });
     },
-    [c12nDef, error, format, isMobile, isUser, onChange, onError, validated.parts]
-  );
-
-  const handleReset = useCallback(
-    (event: unknown) => {
-      setShowPicker(false);
-      onChange(event as Event, defaultValue);
-    },
-    [defaultValue, onChange]
+    [c12nDef, format, isMobile, isUser, setStore, validated.parts]
   );
 
   useEffect(() => {
     if (c12nDef && c12nDef?.enforce && value) {
       const parts = getParts(value.toLocaleUpperCase(), c12nDef, format, isMobile);
-      setUserParts(getParts(currentUser.classification, c12nDef, format, isMobile));
-      setValidated(applyClassificationRules(parts, c12nDef, format, isMobile, isUser));
+      setStore(s => ({
+        ...s,
+        uParts: getParts(currentUser.classification, c12nDef, format, isMobile),
+        validated: applyClassificationRules(parts, c12nDef, format, isMobile, isUser)
+      }));
     }
-  }, [c12nDef, currentUser.classification, format, isMobile, isUser, value]);
+  }, [c12nDef, currentUser.classification, format, isMobile, isUser, setStore, value]);
 
-  return preventRender || !value ? null : (
-    <div {...rootProps} style={{ textAlign: 'left', ...rootProps?.style }}>
-      <StyledFormLabel props={props} />
-      <StyledFormControl props={props}>
+  return (
+    <StyledRoot>
+      <StyledFormLabel />
+      <StyledFormControl>
         {loading ? (
-          <StyledInputSkeleton props={props} />
+          <StyledInputSkeleton />
         ) : (
           <>
             <div style={{ display: inline ? 'inline-block' : null }}>
               <CustomChip
                 type="rounded"
                 variant="filled"
-                size="medium"
+                size={tiny ? 'tiny' : 'medium'}
                 color={computedColor}
                 label={normalClassification}
                 fullWidth={fullWidth}
                 disabled={disabled}
-                onClick={readOnly ? null : () => setShowPicker(true)}
+                onClick={readOnly ? null : () => setStore(s => ({ ...s, showPicker: true }))}
                 sx={{
                   fontWeight: 500,
-                  marginBottom: theme.spacing(0.75),
+                  mb: 0.75,
                   ...(monospace && { fontFamily: 'monospace' }),
                   ...(password &&
                     showPassword && {
@@ -229,7 +252,6 @@ const WrappedClassificationInput = (props: ClassificationInputProps) => {
                       textSecurity: 'disc'
                     })
                 }}
-                {...(tiny && { size: 'tiny' })}
               />
             </div>
 
@@ -238,7 +260,7 @@ const WrappedClassificationInput = (props: ClassificationInputProps) => {
               fullWidth
               maxWidth={isMobile ? 'xs' : 'md'}
               open={showPicker}
-              onClose={event => handleChange(event)}
+              onClose={event => handleChange(event as React.SyntheticEvent)}
             >
               <DialogTitle>
                 <CustomChip
@@ -420,13 +442,15 @@ const WrappedClassificationInput = (props: ClassificationInputProps) => {
                 </Grid>
               </DialogContent>
               <DialogActions>
-                <PasswordInput
-                  props={props}
-                  showPassword={showPassword}
-                  onShowPassword={() => setShowPassword(p => !p)}
-                />
-                {defaultValue !== undefined && value !== defaultValue && (
-                  <Button onClick={event => handleReset(event)} color="secondary">
+                <PasswordInput />
+                {reset && (
+                  <Button
+                    onClick={event => {
+                      onReset(event);
+                      setStore(s => ({ ...s, showPicker: false }));
+                    }}
+                    color="secondary"
+                  >
                     {t('classification.reset')}
                   </Button>
                 )}
@@ -437,10 +461,42 @@ const WrappedClassificationInput = (props: ClassificationInputProps) => {
             </Dialog>
           </>
         )}
-        <HelperText props={props} />
+
+        <HelperText />
       </StyledFormControl>
-    </div>
+    </StyledRoot>
   );
 };
 
-export const ClassificationInput: React.FC<ClassificationInputProps> = React.memo(WrappedClassificationInput);
+export const ClassificationInput: React.FC<ClassificationInputProps> = React.memo(
+  ({
+    dynGroup = null,
+    format = 'short',
+    fullWidth = true,
+    inline = false,
+    isUser = false,
+    preventRender = false,
+    value,
+    ...props
+  }) => {
+    const newError = useDefaultError(props);
+
+    return preventRender || !value ? null : (
+      <PropProvider<ClassificationInputProps>
+        data={{
+          ...props,
+          dynGroup,
+          error: newError,
+          errorMsg: newError(value),
+          format,
+          fullWidth,
+          inline,
+          isUser,
+          value
+        }}
+      >
+        <WrappedClassificationInput />
+      </PropProvider>
+    );
+  }
+);

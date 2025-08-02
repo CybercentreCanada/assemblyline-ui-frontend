@@ -1,200 +1,194 @@
 import type { AutocompleteProps } from '@mui/material';
-import { Autocomplete, InputAdornment, TextField, useTheme } from '@mui/material';
-import CustomChip from 'components/visual/CustomChip';
+import { Autocomplete, useTheme } from '@mui/material';
 import {
   HelperText,
-  PasswordInput,
-  ResetInput,
+  StyledCustomChip,
   StyledFormControl,
   StyledFormLabel,
-  StyledInputSkeleton
+  StyledInputSkeleton,
+  StyledRoot,
+  StyledTextField
 } from 'components/visual/Inputs/lib/inputs.components';
-import type { InputProps } from 'components/visual/Inputs/lib/inputs.model';
+import { useDefaultError, useDefaultHandlers } from 'components/visual/Inputs/lib/inputs.hook';
+import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
+import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
 import type { ElementType } from 'react';
-import React, { useMemo, useState } from 'react';
+import React from 'react';
 
-export type ChipsInputProps = Omit<
-  AutocompleteProps<string[], boolean, boolean, boolean, ElementType>,
-  'isOptionEqualToValue' | 'renderInput' | 'options' | 'onChange' | 'value' | 'defaultValue'
-> &
-  InputProps<string[]> & {
+export type ChipsInputProps = InputValues<string[]> &
+  InputProps & {
+    autoComplete?: AutocompleteProps<string, boolean, boolean, boolean, ElementType>['autoComplete'];
     isOptionEqualToValue?: (option: string, value: string) => boolean;
-    options?: AutocompleteProps<string, boolean, boolean, boolean, ElementType>['options'];
+    options?: string[];
   };
 
-const WrappedChipsInput = (props: ChipsInputProps) => {
+const WrappedChipsInput = () => {
   const theme = useTheme();
+  const [get] = usePropStore<ChipsInputProps>();
 
-  return null;
+  const autoComplete = get(s => s.autoComplete);
+  const disabled = get(s => s.disabled);
+  const endAdornment = get(s => s.endAdornment);
+  const error = get(s => s.errorMsg);
+  const focused = get(s => s.focused);
+  const id = get(s => s.id);
+  const inputValue = get(s => s.inputValue);
+  const isOptionEqualToValue = get(s => s.isOptionEqualToValue);
+  const loading = get(s => s.loading);
+  const monospace = get(s => s.monospace);
+  const options = get(s => s.options);
+  const password = get(s => s.password);
+  const placeholder = get(s => s.placeholder);
+  const preventPasswordRender = get(s => s.preventPasswordRender);
+  const preventResetRender = get(s => s.preventResetRender);
+  const readOnly = get(s => s.readOnly);
+  const showPassword = get(s => s.showPassword);
+  const startAdornment = get(s => s.startAdornment);
+  const tiny = get(s => s.tiny);
+  const value = get(s => s.value);
 
-  const {
-    autoComplete,
-    disabled,
-    endAdornment = null,
-    error = () => '',
-    isOptionEqualToValue = () => null,
-    loading = false,
-    monospace = false,
-    options = [],
-    password = false,
-    placeholder = null,
-    preventRender = false,
-    readOnly = false,
-    rootProps = null,
-    startAdornment = null,
-    tiny = false,
-    value,
-    onBlur = () => null,
-    onChange = () => null,
-    onError = () => null,
-    onFocus = () => null
-  } = props;
+  const { handleBlur, handleChange, handleFocus } = useDefaultHandlers();
 
-  const [focused, setFocused] = useState<boolean>(false);
-  const [showPassword, setShowPassword] = useState<boolean>(true);
+  // const handleChange = useCallback(
+  //   (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, newValue: string[]) => {
+  //     setStore(s => {
+  //       return s;
+  //       // const newValue = event.target.value;
+  //       // const num = newValue !== '' ? Number(newValue) : null;
+  //       // const err = s.error(num);
+  //       // s.onError(err);
+  //       // if (!err) s.onChange(event, num);
+  //       // return { ...s, inputValue: newValue, errorMsg: err };
+  //     });
+  //   },
+  //   [setStore]
+  // );
 
-  const errorValue = useMemo<string>(() => error(value), [error, value]);
-  const preventPasswordRender = usePreventPassword(props);
-  const preventResetRender = usePreventReset(props);
+  // const handleFocus = useCallback(
+  //   (event: React.FocusEvent) => {
+  //     setStore(s => {
+  //       s.onFocus(event);
+  //       return {
+  //         ...s,
+  //         inputValue: s.value,
+  //         focused: !s.readOnly && !s.disabled && document.activeElement === event.target
+  //       };
+  //     });
+  //   },
+  //   [setStore]
+  // );
 
-  return preventRender ? null : (
-    <div {...rootProps} style={{ textAlign: 'left', ...rootProps?.style }}>
-      <StyledFormLabel props={props} focused={focused} />
-      <StyledFormControl props={props}>
+  // const handleBlur = useCallback(
+  //   (event: React.FocusEvent) => {
+  //     setStore(s => {
+  //       s.onBlur(event);
+  //       return { ...s, focused: false, inputValue: null };
+  //     });
+  //   },
+  //   [setStore]
+  // );
+
+  return (
+    <StyledRoot>
+      <StyledFormLabel />
+      <StyledFormControl>
         {loading ? (
-          <StyledInputSkeleton props={props} />
+          <StyledInputSkeleton />
         ) : (
           <Autocomplete
             autoComplete={autoComplete}
-            id={getAriaLabel(props)}
-            freeSolo
-            multiple
-            size="small"
-            value={value}
-            options={options}
             disabled={disabled}
+            freeSolo
+            id={id}
+            multiple
+            options={options}
             readOnly={readOnly}
-            isOptionEqualToValue={isOptionEqualToValue ?? ((option, value) => option === value)}
-            onChange={(e, v: string[], p) => {
-              onChange(e, v, p);
-
-              const err = error(v);
-              if (err) onError(err);
-            }}
-            onFocus={(event, ...other) => {
-              setFocused(!readOnly && !disabled && document.activeElement === event.target);
-              onFocus(event, ...other);
-            }}
-            onBlur={(event, ...other) => {
-              setFocused(false);
-              onBlur(event, ...other);
-            }}
+            size="small"
+            value={inputValue ?? value ?? []}
+            isOptionEqualToValue={isOptionEqualToValue}
+            onChange={(e, v) => handleChange(e, v, v)}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+            renderValue={(values, getTagProps) =>
+              values.map((option, index) => {
+                const { key, ...tagProps } = getTagProps({ index });
+                return <StyledCustomChip key={key} label={option} {...tagProps} />;
+              })
+            }
             renderInput={params => (
-              <TextField
-                {...params}
-                id={getAriaLabel(props)}
-                variant="outlined"
-                error={!!errorValue}
-                type={password && showPassword ? 'password' : 'text'}
-                placeholder={placeholder}
-                {...(readOnly && !disabled && { focused: null })}
+              <StyledTextField
+                params={params}
                 slotProps={{
                   input: {
-                    ...params?.InputProps,
-                    ...(!preventResetRender && { style: { paddingRight: '85px' } }),
-                    'aria-describedby': getAriaDescribedBy(props),
-                    startAdornment: (
-                      <>
-                        {startAdornment && <InputAdornment position="start">{startAdornment}</InputAdornment>}
-                        {params?.InputProps?.startAdornment}
-                      </>
-                    ),
-                    endAdornment: (
-                      <>
-                        {preventPasswordRender && preventResetRender && !endAdornment ? null : (
-                          <InputAdornment
-                            position="end"
-                            sx={{
-                              position: 'absolute',
-                              right: '37px',
-                              top: '50%',
-                              transform: 'translate(0, -50%)',
-                              ...(!focused && { visibility: 'hidden' })
-                            }}
-                            style={{ display: 'hidden' }}
-                          >
-                            <PasswordInput
-                              props={props}
-                              showPassword={showPassword}
-                              onShowPassword={() => setShowPassword(p => !p)}
-                            />
-                            <ResetInput props={props} />
-                            {endAdornment}
-                          </InputAdornment>
-                        )}
-                        {params?.InputProps?.endAdornment}
-                      </>
-                    )
-                  }
-                }}
-                sx={{
-                  '& .MuiInputBase-root': {
-                    ...(tiny && {
-                      paddingTop: '2px !important',
-                      paddingBottom: '2px !important',
-                      fontSize: '14px'
-                    }),
-                    ...(readOnly && !disabled && { cursor: 'default' })
-                  },
+                    ...(!preventResetRender && { style: { paddingRight: '85px' } })
 
-                  '& .MuiInputBase-input': {
-                    ...(readOnly && !disabled && { cursor: 'default' }),
-                    ...(monospace && { fontFamily: 'monospace' })
-                  },
-
-                  '& .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline': {
-                    ...(readOnly &&
-                      !disabled && {
-                        borderColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.23)' : 'rgba(0, 0, 0, 0.23)'
-                      })
+                    //   ...params.InputProps,
+                    //   ...(!preventResetRender && { style: { paddingRight: '85px' } }),
+                    //   'aria-describedby': get(s => s['aria-describedby']),
+                    //   startAdornment: (
+                    //     <>
+                    //       {startAdornment && <InputAdornment position="start">{startAdornment}</InputAdornment>}
+                    //       {params.InputProps?.startAdornment}
+                    //     </>
+                    //   ),
+                    //   endAdornment: (
+                    //     <>
+                    //       {preventPasswordRender && preventResetRender && !endAdornment ? null : (
+                    //         <InputAdornment
+                    //           position="end"
+                    //           sx={{
+                    //             position: 'absolute',
+                    //             right: '37px',
+                    //             top: '50%',
+                    //             transform: 'translate(0, -50%)',
+                    //             ...(!focused && { visibility: 'hidden' })
+                    //           }}
+                    //         >
+                    //           <PasswordInput />
+                    //           <ResetInput onChange={(e, v) => handleChange(e, v, v)} />
+                    //           {endAdornment}
+                    //         </InputAdornment>
+                    //       )}
+                    //       {params.InputProps?.endAdornment}
+                    //     </>
+                    //   )
                   }
                 }}
               />
             )}
-            renderValue={(values: string[], getItemProps) =>
-              values.map((option: string, index: number) => {
-                const { key, ...itemProps } = getItemProps({ index });
-                return (
-                  <CustomChip
-                    key={key}
-                    label={option}
-                    wrap
-                    {...itemProps}
-                    onDelete={disabled ? undefined : itemProps.onDelete}
-                    sx={{
-                      ...(readOnly &&
-                        !disabled && {
-                          cursor: 'default'
-                        }),
-                      ...(monospace && { fontFamily: 'monospace' }),
-                      ...(password &&
-                        showPassword && {
-                          fontFamily: 'password',
-                          WebkitTextSecurity: 'disc',
-                          MozTextSecurity: 'disc',
-                          textSecurity: 'disc'
-                        })
-                    }}
-                  />
-                );
-              })
-            }
           />
         )}
-        <HelperText props={props} />
+        <HelperText />
       </StyledFormControl>
-    </div>
+    </StyledRoot>
   );
 };
 
-export const ChipsInput: (props: ChipsInputProps) => React.ReactNode = React.memo(WrappedChipsInput);
+export const ChipsInput: React.FC<ChipsInputProps> = React.memo(
+  ({
+    autoComplete = false,
+    isOptionEqualToValue = (option, value) => option === value,
+    options = [],
+    preventRender = false,
+    value = [],
+    ...props
+  }) => {
+    const newError = useDefaultError(props);
+
+    return preventRender ? null : (
+      <PropProvider<ChipsInputProps>
+        data={{
+          ...props,
+          autoComplete,
+          error: newError,
+          errorMsg: newError(value),
+          isOptionEqualToValue,
+          options,
+          value
+        }}
+      >
+        <WrappedChipsInput />
+      </PropProvider>
+    );
+  }
+);

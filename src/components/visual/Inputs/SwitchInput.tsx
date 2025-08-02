@@ -1,65 +1,54 @@
-import type { ButtonProps } from '@mui/material';
 import { Switch } from '@mui/material';
 import {
   ExpandInput,
   HelperText,
   PasswordInput,
   ResetInput,
+  StyledButtonLabel,
   StyledEndAdornmentBox,
   StyledFormButton,
   StyledFormControl,
   StyledFormControlLabel
 } from 'components/visual/Inputs/lib/inputs.components';
-import { useInputState } from 'components/visual/Inputs/lib/inputs.hook';
-import type { InputProps } from 'components/visual/Inputs/lib/inputs.model';
-import { isValidValue } from 'components/visual/Inputs/lib/inputs.utils';
+import { useDefaultError, useDefaultHandlers } from 'components/visual/Inputs/lib/inputs.hook';
+import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
+import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
 import { Tooltip } from 'components/visual/Tooltip';
-import React, { useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
+import React from 'react';
 
-export type SwitchInputProps = Omit<
-  ButtonProps,
-  'onChange' | 'onClick' | 'value' | 'error' | 'onBlur' | 'onFocus' | 'defaultValue'
-> &
-  InputProps<boolean>;
+export type SwitchInputProps = InputValues<boolean> & InputProps;
 
-export const SwitchInput: React.FC<SwitchInputProps> = React.memo((props: SwitchInputProps) => {
-  const { t } = useTranslation('inputs');
+const WrappedSwitchInput = () => {
+  const [get] = usePropStore<SwitchInputProps>();
 
-  return null;
+  const inputValue = get(s => s.inputValue);
+  const loading = get(s => s.loading);
+  const preventDisabledColor = get(s => s.preventDisabledColor);
+  const readOnly = get(s => s.readOnly);
+  const tooltip = get(s => s.tooltip);
+  const tooltipProps = get(s => s.tooltipProps);
+  const value = get(s => s.value);
 
-  const {
-    error = () => '',
-    loading = false,
-    preventDisabledColor = false,
-    preventRender = false,
-    readOnly = false,
-    required = false,
-    tooltip = null,
-    tooltipProps = null,
-    value = false
-  } = useMemo<SwitchInputProps>(() => props, [props]);
+  const { handleClick, handleFocus, handleBlur } = useDefaultHandlers();
 
-  const state = useInputState<boolean, boolean>(props, v => {
-    if (error(v)) return error(v);
-    else if (required && !isValidValue(v)) return t('error.required');
-    else return null;
-  });
-
-  return preventRender ? null : (
+  return (
     <Tooltip title={loading ? null : tooltip} {...tooltipProps}>
-      <StyledFormControl props={props} state={state}>
-        <StyledFormButton props={props} state={state}>
-          <StyledFormControlLabel props={props} state={state}>
+      <StyledFormControl>
+        <StyledFormButton
+          onFocus={handleFocus}
+          onBlur={handleBlur}
+          onClick={e => handleClick(e, !(inputValue ?? value), !(inputValue ?? value))}
+        >
+          <StyledFormControlLabel label={<StyledButtonLabel />}>
             <Switch
-              checked={value}
+              checked={Boolean(inputValue ?? value)}
               disableFocusRipple
               disableRipple
               disableTouchRipple
               size="small"
               sx={{
                 minWidth: '40px',
-                '&>.Mui-disabled': {
+                '& .Mui-disabled': {
                   ...((preventDisabledColor || readOnly) && { color: 'inherit !important' })
                 }
               }}
@@ -67,14 +56,24 @@ export const SwitchInput: React.FC<SwitchInputProps> = React.memo((props: Switch
           </StyledFormControlLabel>
         </StyledFormButton>
 
-        <HelperText props={props} state={state} />
+        <HelperText />
 
-        <StyledEndAdornmentBox props={props} state={state}>
-          <PasswordInput props={props} state={state} />
-          <ResetInput props={props} state={state} />
-          <ExpandInput props={props} state={state} />
+        <StyledEndAdornmentBox>
+          <PasswordInput />
+          <ResetInput />
+          <ExpandInput />
         </StyledEndAdornmentBox>
       </StyledFormControl>
     </Tooltip>
+  );
+};
+
+export const SwitchInput: React.FC<SwitchInputProps> = React.memo(({ value, preventRender = false, ...props }) => {
+  const newError = useDefaultError(props);
+
+  return preventRender ? null : (
+    <PropProvider<SwitchInputProps> data={{ ...props, error: newError, errorMsg: newError(value), value }}>
+      <WrappedSwitchInput />
+    </PropProvider>
   );
 });

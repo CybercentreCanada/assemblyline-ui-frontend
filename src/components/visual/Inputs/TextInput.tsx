@@ -2,177 +2,92 @@ import type { AutocompleteProps } from '@mui/material';
 import { Autocomplete, Typography } from '@mui/material';
 import {
   HelperText,
-  PasswordInput,
-  ResetInput,
-  StyledEndAdornment,
   StyledFormControl,
   StyledFormLabel,
   StyledInputSkeleton,
+  StyledRoot,
   StyledTextField
 } from 'components/visual/Inputs/lib/inputs.components';
-import { useInputState } from 'components/visual/Inputs/lib/inputs.hook';
-import type { InputProps } from 'components/visual/Inputs/lib/inputs.model';
-import { isValidValue } from 'components/visual/Inputs/lib/inputs.utils';
+import { useDefaultError, useDefaultHandlers } from 'components/visual/Inputs/lib/inputs.hook';
+import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
+import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
 import type { ElementType } from 'react';
-import React, { useCallback, useMemo, useState, useTransition } from 'react';
-import { useTranslation } from 'react-i18next';
+import React from 'react';
 
-export type TextInputProps = Omit<
-  AutocompleteProps<string, boolean, boolean, boolean, ElementType>,
-  'renderInput' | 'options' | 'onChange' | 'value' | 'defaultValue'
-> &
-  InputProps<string> & {
+export type TextInputProps = InputValues<string> &
+  InputProps & {
+    autoComplete?: AutocompleteProps<string, boolean, boolean, boolean, ElementType>['autoComplete'];
     options?: AutocompleteProps<string, boolean, boolean, boolean, ElementType>['options'];
   };
 
-const WrappedTextInput = ({
-  options = [],
-  error = () => '',
-  onBlur = () => null,
-  onChange = () => null,
-  onError = () => null,
-  onFocus = () => null,
-  onReset = null,
-  ...props
-}: TextInputProps) => {
-  const { t } = useTranslation('inputs');
+const WrappedTextInput = () => {
+  const [get] = usePropStore<TextInputProps>();
 
-  const { setFocused, setShowPassword, ...state } = useInputState<string, TextInputProps>(props);
+  const autoComplete = get(s => s.autoComplete);
+  const disabled = get(s => s.disabled);
+  const id = get(s => s.id);
+  const inputValue = get(s => s.inputValue);
+  const loading = get(s => s.loading);
+  const options = get(s => s.options);
+  const readOnly = get(s => s.readOnly);
+  const tiny = get(s => s.tiny);
+  const value = get(s => s.value);
 
-  const [inputValue, setInputValue] = useState<string>(null);
+  const { handleChange, handleFocus, handleBlur } = useDefaultHandlers();
 
-  const [, startTransition] = useTransition();
-
-  const validator = useCallback(
-    (value: string): string => {
-      if (error(value)) return error(value);
-      else if (state.required && !isValidValue(value)) return t('error.required');
-      else return null;
-    },
-    [error, state.required, t]
-  );
-
-  const errorMsg = useMemo<string>(() => validator(inputValue ?? state.value), [inputValue, validator, state.value]);
-
-  return state.preventRender ? null : (
-    <div {...state.rootProps} style={{ textAlign: 'left', ...state.rootProps?.style }}>
-      <StyledFormLabel
-        disabled={state.disabled}
-        errorMsg={errorMsg}
-        focused={state.focused}
-        id={state.id}
-        label={state.label}
-        labelProps={state.labelProps}
-        preventDisabledColor={state.preventDisabledColor}
-        tooltip={state.tooltip}
-        tooltipProps={state.tooltipProps}
-      />
-      <StyledFormControl disabled={state.disabled} divider={state.divider} readOnly={state.readOnly}>
-        {state.loading ? (
-          <StyledInputSkeleton tiny={state.tiny} />
+  return (
+    <StyledRoot>
+      <StyledFormLabel />
+      <StyledFormControl>
+        {loading ? (
+          <StyledInputSkeleton />
         ) : (
           <Autocomplete
-            id={state.id}
-            autoComplete={state.autoComplete}
+            id={id}
+            autoComplete={autoComplete}
             disableClearable
-            disabled={state.disabled}
+            disabled={disabled}
             freeSolo
             fullWidth
-            inputValue={inputValue ?? (state.value || '')}
-            options={options}
-            readOnly={state.readOnly}
+            readOnly={readOnly}
             size="small"
-            value={state.value || ''}
-            onInputChange={(event, value) => {
-              event.preventDefault();
-              event.stopPropagation();
-              setInputValue(value);
-
-              startTransition(() => {
-                const err = validator(value);
-                if (err) onError(err);
-                else onChange(event, value);
-              });
-            }}
-            onFocus={event => {
-              setFocused(!state.readOnly && !state.disabled && document.activeElement === event.target);
-              onFocus(event);
-              setInputValue(state.value);
-            }}
-            onBlur={event => {
-              setFocused(false);
-              onBlur(event);
-              setInputValue(null);
-            }}
-            renderOption={(props, option) => (
-              <Typography {...props} key={option} {...(state.tiny && { variant: 'body2' })}>
+            options={options ?? []}
+            value={value ?? ''}
+            inputValue={inputValue ?? value ?? ''}
+            onInputChange={(e, v) => handleChange(e, v, v)}
+            onFocus={handleFocus}
+            onBlur={handleBlur}
+            renderOption={(props, option, { index }) => (
+              <Typography {...props} key={`${option}-${index}`} variant={tiny ? 'body2' : 'body1'}>
                 {option}
               </Typography>
             )}
-            renderInput={params => (
-              <StyledTextField
-                params={params}
-                disabled={state.disabled}
-                errorMsg={errorMsg}
-                id={state.id}
-                monospace={state.monospace}
-                password={state.password}
-                placeholder={state.placeholder}
-                readOnly={state.readOnly}
-                showPassword={state.showPassword}
-                startAdornment={state.startAdornment}
-                tiny={state.tiny}
-                slotProps={{
-                  input: {
-                    endAdornment: (
-                      <StyledEndAdornment
-                        preventExpandRender={state.preventExpandRender}
-                        preventPasswordRender={state.preventPasswordRender}
-                        preventResetRender={state.preventResetRender}
-                      >
-                        <PasswordInput
-                          id={state.id}
-                          preventPasswordRender={state.preventPasswordRender}
-                          resetProps={state.resetProps}
-                          showPassword={state.showPassword}
-                          tiny={state.tiny}
-                          onClick={() => setShowPassword(p => !p)}
-                        />
-                        <ResetInput
-                          defaultValue={state.defaultValue}
-                          id={state.id}
-                          preventResetRender={state.preventResetRender}
-                          resetProps={state.resetProps}
-                          tiny={state.tiny}
-                          onReset={onReset}
-                          onChange={event => {
-                            event.preventDefault();
-                            event.stopPropagation();
-                            onChange(event, state.defaultValue);
-                          }}
-                        />
-                        {state.endAdornment}
-                      </StyledEndAdornment>
-                    )
-                  }
-                }}
-              />
-            )}
+            renderInput={params => <StyledTextField params={params} />}
           />
         )}
-        <HelperText
-          disabled={state.disabled}
-          errorMsg={errorMsg}
-          errorProps={state.errorProps}
-          helperText={state.helperText}
-          helperTextProps={state.helperTextProps}
-          id={state.id}
-          loading={state.loading}
-          readOnly={state.readOnly}
-        />
+        <HelperText />
       </StyledFormControl>
-    </div>
+    </StyledRoot>
   );
 };
 
-export const TextInput: (props: TextInputProps) => React.ReactNode = React.memo(WrappedTextInput);
+export const TextInput: React.FC<TextInputProps> = React.memo(
+  ({ autoComplete = false, options = [], preventRender = false, value, ...props }) => {
+    const newError = useDefaultError(props);
+
+    return preventRender ? null : (
+      <PropProvider<TextInputProps>
+        data={{
+          ...props,
+          autoComplete,
+          error: newError,
+          errorMsg: newError(value),
+          options,
+          value
+        }}
+      >
+        <WrappedTextInput />
+      </PropProvider>
+    );
+  }
+);

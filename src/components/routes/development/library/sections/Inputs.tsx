@@ -22,7 +22,13 @@ const SELECT_OPTIONS = [
   { primary: 'Options 1', value: 'option 1' },
   { primary: 'Options 2', value: 'option 2' },
   { primary: 'Options 3', value: 'option 3' }
-];
+] as const;
+
+const RADIO_OPTIONS = [
+  { value: null as null, label: 'Null' },
+  { value: 'first', label: 'First' },
+  { value: 'second', label: 'Second' }
+] as const;
 
 export type InputsLibraryState = {
   inputs: {
@@ -50,8 +56,8 @@ export type InputsLibraryState = {
       date: string;
       json: object;
       number: number;
-      radio: string;
-      select: string;
+      radio: (typeof RADIO_OPTIONS)[number]['value'];
+      select: (typeof SELECT_OPTIONS)[number]['value'];
       slider: number;
       switch: boolean;
       text: string;
@@ -87,7 +93,7 @@ export const INPUTS_LIBRARY_STATE: InputsLibraryState = {
       json: {},
       number: 0,
       radio: null,
-      select: '',
+      select: 'option 1',
       slider: 0,
       switch: false,
       text: '',
@@ -141,6 +147,8 @@ export const InputsSection = React.memo(() => {
                 <NumberInput
                   label="Number Input"
                   value={value}
+                  min={5}
+                  max={10}
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.number', next)}
                 />
               )}
@@ -153,7 +161,7 @@ export const InputsSection = React.memo(() => {
                   label="Select Input"
                   value={value}
                   options={SELECT_OPTIONS}
-                  onChange={(event, next: string) => form.setFieldValue('components.inputs.values.select', next)}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.select', next)}
                 />
               )}
             />
@@ -231,11 +239,7 @@ export const InputsSection = React.memo(() => {
                 <RadioInput
                   label="Radio Input"
                   value={value}
-                  options={[
-                    { value: null, label: 'Null' },
-                    { value: 'first', label: 'First' },
-                    { value: 'second', label: 'Second' }
-                  ]}
+                  options={RADIO_OPTIONS}
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.radio', next)}
                 />
               )}
@@ -414,7 +418,7 @@ export const InputsSection = React.memo(() => {
                   defaultValue={'option 1'}
                   reset
                   options={SELECT_OPTIONS}
-                  onChange={(event, next: string) => form.setFieldValue('components.inputs.values.select', next)}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.select', next)}
                   onReset={() => form.setFieldValue('components.inputs.values.select', null)}
                 />
               )}
@@ -611,11 +615,7 @@ export const InputsSection = React.memo(() => {
                   value={value}
                   defaultValue={null}
                   reset
-                  options={[
-                    { value: null, label: 'Null' },
-                    { value: 'first', label: 'First' },
-                    { value: 'second', label: 'Second' }
-                  ]}
+                  options={RADIO_OPTIONS}
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.radio', next)}
                   onReset={() => form.setFieldValue('components.inputs.values.switch', null)}
                 />
@@ -719,7 +719,7 @@ export const InputsSection = React.memo(() => {
                   value={value}
                   disabled
                   options={SELECT_OPTIONS}
-                  onChange={(event, next: string) => form.setFieldValue('components.inputs.values.select', next)}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.select', next)}
                 />
               )}
             />
@@ -804,11 +804,7 @@ export const InputsSection = React.memo(() => {
                   label="Disabled Radio Input"
                   value={value}
                   disabled
-                  options={[
-                    { value: null, label: 'Null' },
-                    { value: 'first', label: 'First' },
-                    { value: 'second', label: 'Second' }
-                  ]}
+                  options={RADIO_OPTIONS}
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.radio', next)}
                 />
               )}
@@ -951,7 +947,7 @@ export const InputsSection = React.memo(() => {
                   value={value}
                   loading
                   options={SELECT_OPTIONS}
-                  onChange={(event, next: string) => form.setFieldValue('components.inputs.values.select', next)}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.select', next)}
                 />
               )}
             />
@@ -1036,11 +1032,7 @@ export const InputsSection = React.memo(() => {
                   label="Loading Radio Input"
                   value={value}
                   loading
-                  options={[
-                    { value: null, label: 'Null' },
-                    { value: 'first', label: 'First' },
-                    { value: 'second', label: 'Second' }
-                  ]}
+                  options={RADIO_OPTIONS}
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.radio', next)}
                 />
               )}
@@ -1189,7 +1181,7 @@ export const InputsSection = React.memo(() => {
                   defaultValue={'option 1'}
                   reset
                   options={SELECT_OPTIONS}
-                  onChange={(event, next: string) => form.setFieldValue('components.inputs.values.select', next)}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.select', next)}
                   onReset={() => form.setFieldValue('components.inputs.values.select', 'option 1')}
                 />
               )}
@@ -1288,11 +1280,7 @@ export const InputsSection = React.memo(() => {
                   value={value}
                   defaultValue={null}
                   reset
-                  options={[
-                    { value: null, label: 'Null' },
-                    { value: 'first', label: 'First' },
-                    { value: 'second', label: 'Second' }
-                  ]}
+                  options={RADIO_OPTIONS}
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.radio', next)}
                   onReset={() => form.setFieldValue('components.inputs.values.radio', null)}
                 />
@@ -1441,7 +1429,7 @@ export const InputsSection = React.memo(() => {
                   tooltip="Tooltip Select Input"
                   value={value}
                   options={SELECT_OPTIONS}
-                  onChange={(event, next: string) => form.setFieldValue('components.inputs.values.select', next)}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.select', next)}
                 />
               )}
             />
@@ -1519,11 +1507,7 @@ export const InputsSection = React.memo(() => {
                   label="Tooltip Radio Input"
                   tooltip="Tooltip Radio Input"
                   value={value}
-                  options={[
-                    { value: null, label: 'Null' },
-                    { value: 'first', label: 'First' },
-                    { value: 'second', label: 'Second' }
-                  ]}
+                  options={RADIO_OPTIONS}
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.radio', next)}
                 />
               )}
@@ -1663,9 +1647,9 @@ export const InputsSection = React.memo(() => {
                 <SelectInput
                   label="Error Select Input"
                   value={value}
-                  error={v => (v !== '' ? null : 'Input field cannot be null')}
+                  error={v => (v !== 'option 1' ? null : 'Input field cannot be null')}
                   options={SELECT_OPTIONS}
-                  onChange={(event, next: string) => form.setFieldValue('components.inputs.values.select', next)}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.select', next)}
                 />
               )}
             />
@@ -1743,11 +1727,7 @@ export const InputsSection = React.memo(() => {
                   label="Error Radio Input"
                   value={value}
                   error={v => (v !== null ? null : 'Input field cannot be null')}
-                  options={[
-                    { value: null, label: 'Null' },
-                    { value: 'first', label: 'First' },
-                    { value: 'second', label: 'Second' }
-                  ]}
+                  options={RADIO_OPTIONS}
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.radio', next)}
                 />
               )}
@@ -1894,7 +1874,7 @@ export const InputsSection = React.memo(() => {
                   value={value}
                   helperText="Helper Text"
                   options={SELECT_OPTIONS}
-                  onChange={(event, next: string) => form.setFieldValue('components.inputs.values.select', next)}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.select', next)}
                 />
               )}
             />
@@ -1972,11 +1952,7 @@ export const InputsSection = React.memo(() => {
                   label="Helper Text Radio Input"
                   helperText="Helper Text"
                   value={value}
-                  options={[
-                    { value: null, label: 'Null' },
-                    { value: 'first', label: 'First' },
-                    { value: 'second', label: 'Second' }
-                  ]}
+                  options={RADIO_OPTIONS}
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.radio', next)}
                 />
               )}
@@ -2113,7 +2089,7 @@ export const InputsSection = React.memo(() => {
                   value={value}
                   placeholder="Placeholder"
                   options={SELECT_OPTIONS}
-                  onChange={(event, next: string) => form.setFieldValue('components.inputs.values.select', next)}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.select', next)}
                 />
               )}
             />
@@ -2148,11 +2124,7 @@ export const InputsSection = React.memo(() => {
                   label="Placeholder Radio Input"
                   value={value}
                   placeholder="Placeholder"
-                  options={[
-                    { value: null, label: 'Null' },
-                    { value: 'first', label: 'First' },
-                    { value: 'second', label: 'Second' }
-                  ]}
+                  options={RADIO_OPTIONS}
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.radio', next)}
                 />
               )}
@@ -2275,7 +2247,7 @@ export const InputsSection = React.memo(() => {
                   value={value}
                   readOnly
                   options={SELECT_OPTIONS}
-                  onChange={(event, next: string) => form.setFieldValue('components.inputs.values.select', next)}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.select', next)}
                 />
               )}
             />
@@ -2360,11 +2332,7 @@ export const InputsSection = React.memo(() => {
                   label="ReadOnly Radio Input"
                   value={value}
                   readOnly
-                  options={[
-                    { value: null, label: 'Null' },
-                    { value: 'first', label: 'First' },
-                    { value: 'second', label: 'Second' }
-                  ]}
+                  options={RADIO_OPTIONS}
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.radio', next)}
                 />
               )}
@@ -2502,7 +2470,7 @@ export const InputsSection = React.memo(() => {
                   value={value}
                   endAdornment={<Button variant="contained">Submit</Button>}
                   options={SELECT_OPTIONS}
-                  onChange={(event, next: string) => form.setFieldValue('components.inputs.values.select', next)}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.select', next)}
                 />
               )}
             />
@@ -2577,11 +2545,7 @@ export const InputsSection = React.memo(() => {
                 <RadioInput
                   label="End Adornment Radio Input"
                   value={value}
-                  options={[
-                    { value: null, label: 'Null' },
-                    { value: 'first', label: 'First' },
-                    { value: 'second', label: 'Second' }
-                  ]}
+                  options={RADIO_OPTIONS}
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.radio', next)}
                 />
               )}
@@ -2717,7 +2681,7 @@ export const InputsSection = React.memo(() => {
                   value={value}
                   tiny
                   options={SELECT_OPTIONS}
-                  onChange={(event, next: string) => form.setFieldValue('components.inputs.values.select', next)}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.select', next)}
                 />
               )}
             />
@@ -2795,11 +2759,7 @@ export const InputsSection = React.memo(() => {
                   label="Tiny Radio Input"
                   value={value}
                   tiny
-                  options={[
-                    { value: null, label: 'Null' },
-                    { value: 'first', label: 'First' },
-                    { value: 'second', label: 'Second' }
-                  ]}
+                  options={RADIO_OPTIONS}
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.radio', next)}
                 />
               )}
@@ -2928,7 +2888,7 @@ export const InputsSection = React.memo(() => {
                   value={value}
                   monospace
                   options={SELECT_OPTIONS}
-                  onChange={(event, next: string) => form.setFieldValue('components.inputs.values.select', next)}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.select', next)}
                 />
               )}
             />
@@ -3006,11 +2966,7 @@ export const InputsSection = React.memo(() => {
                   label="Monospace Radio Input"
                   value={value}
                   monospace
-                  options={[
-                    { value: null, label: 'Null' },
-                    { value: 'first', label: 'First' },
-                    { value: 'second', label: 'Second' }
-                  ]}
+                  options={RADIO_OPTIONS}
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.radio', next)}
                 />
               )}
@@ -3147,7 +3103,7 @@ export const InputsSection = React.memo(() => {
                   value={value}
                   password
                   options={SELECT_OPTIONS}
-                  onChange={(event, next: string) => form.setFieldValue('components.inputs.values.select', next)}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.select', next)}
                 />
               )}
             />
@@ -3225,11 +3181,7 @@ export const InputsSection = React.memo(() => {
                   label="Password Radio Input"
                   value={value}
                   password
-                  options={[
-                    { value: null, label: 'Null' },
-                    { value: 'first', label: 'First' },
-                    { value: 'second', label: 'Second' }
-                  ]}
+                  options={RADIO_OPTIONS}
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.radio', next)}
                 />
               )}
@@ -3461,7 +3413,7 @@ export const InputsSection = React.memo(() => {
                       label="Interaction Select Input"
                       value={value}
                       options={SELECT_OPTIONS}
-                      onChange={(event, next: string) => form.setFieldValue('components.inputs.values.select', next)}
+                      onChange={(event, next) => form.setFieldValue('components.inputs.values.select', next)}
                       {...(disabled && { disabled })}
                       {...(loading && { loading })}
                       {...(readOnly && { readOnly })}
@@ -3469,10 +3421,10 @@ export const InputsSection = React.memo(() => {
                       {...(reset && {
                         reset,
                         defaultValue: 'option 1',
-                        onReset: () => form.setFieldValue('components.inputs.values.select', '')
+                        onReset: () => form.setFieldValue('components.inputs.values.select', 'option 1')
                       })}
                       {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
-                      {...(error && { error: v => (v !== '' ? null : 'Input field cannot be null') })}
+                      {...(error && { error: (v: string) => (v !== '' ? null : 'Input field cannot be null') })}
                       {...(helperText && { helperText: 'Helper Text' })}
                       {...(placeholder && { placeholder: 'Placeholder' })}
                       {...(endAdornment && { endAdornment: <Button variant="contained">Submit</Button> })}
@@ -3686,23 +3638,19 @@ export const InputsSection = React.memo(() => {
                     <RadioInput
                       label="Interaction Radio Input"
                       value={value}
-                      options={[
-                        { value: null, label: 'Null' },
-                        { value: 'first', label: 'First' },
-                        { value: 'second', label: 'Second' }
-                      ]}
-                      onChange={(event, next: string) => form.setFieldValue('components.inputs.values.radio', next)}
+                      options={RADIO_OPTIONS}
+                      onChange={(event, next) => form.setFieldValue('components.inputs.values.radio', next)}
                       {...(disabled && { disabled })}
                       {...(loading && { loading })}
                       {...(readOnly && { readOnly })}
                       {...(tiny && { tiny })}
                       {...(reset && {
                         reset,
-                        defaultValue: false,
+                        defaultValue: null,
                         onReset: () => form.setFieldValue('components.inputs.values.radio', null)
                       })}
                       {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
-                      {...(error && { error: v => (v !== null ? null : 'Input field cannot be null') })}
+                      {...(error && { error: (v: string) => (v !== null ? null : 'Input field cannot be null') })}
                       {...(helperText && { helperText: 'Helper Text' })}
                       {...(placeholder && { placeholder: 'Placeholder' })}
                       {...(endAdornment && { endAdornment: <Button variant="contained">Submit</Button> })}
@@ -3948,7 +3896,7 @@ export const InputsSection = React.memo(() => {
                   label="Select Input: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc."
                   value={value}
                   options={SELECT_OPTIONS}
-                  onChange={(event, next: string) => form.setFieldValue('components.inputs.values.select', next)}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.select', next)}
                 />
               )}
             />
@@ -4029,23 +3977,25 @@ export const InputsSection = React.memo(() => {
                   label="Radio Input: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc."
                   value={value}
                   reset
-                  options={[
-                    {
-                      value: null,
-                      label:
-                        'Null: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc.'
-                    },
-                    {
-                      value: 'first',
-                      label:
-                        'First: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc.'
-                    },
-                    {
-                      value: 'second',
-                      label:
-                        'Second: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc.'
-                    }
-                  ]}
+                  options={
+                    [
+                      {
+                        value: null,
+                        label:
+                          'Null: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc.'
+                      },
+                      {
+                        value: 'first',
+                        label:
+                          'First: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc.'
+                      },
+                      {
+                        value: 'second',
+                        label:
+                          'Second: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc.'
+                      }
+                    ] as const
+                  }
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.radio', next)}
                 />
               )}
