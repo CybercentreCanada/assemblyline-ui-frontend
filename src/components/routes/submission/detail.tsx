@@ -1317,38 +1317,53 @@ function WrappedSubmissionDetail() {
           </>
         }
         startAdornment={
-          socket && (
-            <div
-              style={{
-                display: 'flex',
-                color: theme.palette.mode === 'dark' ? theme.palette.primary.light : theme.palette.primary.dark,
-                paddingBottom: theme.spacing(3),
-                paddingTop: theme.spacing(2)
-              }}
-            >
-              {liveStatus === 'processing' ? (
-                <PlayCircleOutlineIcon
-                  style={{
-                    height: theme.spacing(3),
-                    width: theme.spacing(3),
-                    marginRight: theme.spacing(1)
-                  }}
-                />
-              ) : (
-                <PauseCircleOutlineOutlinedIcon
-                  style={{
-                    height: theme.spacing(3),
-                    width: theme.spacing(3),
-                    marginRight: theme.spacing(1)
-                  }}
-                />
-              )}
-              <div style={{ width: '100%' }}>
-                {t(liveStatus)}
-                <LinearProgress />
+          <>
+            {submission && submission.params.psid && (
+              <Typography variant="caption" component={'div'}>
+                <i>
+                  <span>{t('psid')}: </span>
+                  <Link
+                    style={{ textDecoration: 'none', color: theme.palette.primary.main }}
+                    to={`/submission/detail/${submission.params.psid}`}
+                  >
+                    {submission.params.psid}
+                  </Link>
+                </i>
+              </Typography>
+            )}
+            {socket && (
+              <div
+                style={{
+                  display: 'flex',
+                  color: theme.palette.mode === 'dark' ? theme.palette.primary.light : theme.palette.primary.dark,
+                  paddingBottom: theme.spacing(3),
+                  paddingTop: theme.spacing(2)
+                }}
+              >
+                {liveStatus === 'processing' ? (
+                  <PlayCircleOutlineIcon
+                    style={{
+                      height: theme.spacing(3),
+                      width: theme.spacing(3),
+                      marginRight: theme.spacing(1)
+                    }}
+                  />
+                ) : (
+                  <PauseCircleOutlineOutlinedIcon
+                    style={{
+                      height: theme.spacing(3),
+                      width: theme.spacing(3),
+                      marginRight: theme.spacing(1)
+                    }}
+                  />
+                )}
+                <div style={{ width: '100%' }}>
+                  {t(liveStatus)}
+                  <LinearProgress />
+                </div>
               </div>
-            </div>
-          )
+            )}
+          </>
         }
         endAdornment={
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
