@@ -33,7 +33,7 @@ export type PageHeaderProps = {
 export const PageHeader: React.FC<PageHeaderProps> = React.memo(
   ({
     actions = null,
-    classification: classificationProp = 'undefined',
+    classification: classificationProp = undefined,
     endAdornment = null,
     isSticky = false,
     primary: primaryProp = null,
@@ -73,11 +73,13 @@ export const PageHeader: React.FC<PageHeaderProps> = React.memo(
 
     const classification = useMemo<ClassificationProps['c12n']>(
       () =>
-        primaryLoading || secondaryLoading
-          ? null
-          : typeof classificationProp === 'function'
-            ? classificationProp()
-            : classificationProp,
+        classificationProp === undefined
+          ? undefined
+          : primaryLoading || secondaryLoading
+            ? null
+            : typeof classificationProp === 'function'
+              ? classificationProp()
+              : classificationProp,
       [classificationProp, primaryLoading, secondaryLoading]
     );
 
@@ -138,7 +140,7 @@ export const PageHeader: React.FC<PageHeaderProps> = React.memo(
           ...rootProps?.style
         }}
       >
-        {!c12nDef.enforce || classification === 'undefined' ? null : (
+        {!c12nDef.enforce || classification === undefined ? null : (
           <div style={{ paddingBottom: theme.spacing(4) }}>
             <Classification
               c12n={classification}
