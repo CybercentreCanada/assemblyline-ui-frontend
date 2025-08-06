@@ -1,12 +1,14 @@
 import type { ListItemTextProps, MenuItemProps, SelectProps } from '@mui/material';
-import { InputAdornment, ListItemText, MenuItem, Select, useTheme } from '@mui/material';
+import { ListItemText, MenuItem, Select, useTheme } from '@mui/material';
 import {
   HelperText,
   PasswordInput,
   ResetInput,
+  StyledEndAdornment,
   StyledFormControl,
   StyledFormLabel,
   StyledInputSkeleton,
+  StyledListItemText,
   StyledRoot
 } from 'components/visual/Inputs/lib/inputs.components';
 import { useInputHandlers, useInputParsedProps } from 'components/visual/Inputs/lib/inputs.hook';
@@ -23,8 +25,8 @@ export type Option = {
 export type SelectInputProps<O extends readonly Option[]> = InputValues<O[number]['value']> &
   InputProps & {
     capitalize?: boolean;
-    options?: O;
     displayEmpty?: SelectProps['displayEmpty'];
+    options?: O;
   };
 
 const WrappedSelectInput = React.memo(<O extends readonly Option[]>() => {
@@ -41,43 +43,11 @@ const WrappedSelectInput = React.memo(<O extends readonly Option[]>() => {
   const loading = get('loading');
   const monospace = get('monospace');
   const options = get('options');
+  const overflowHidden = get('overflowHidden');
   const password = get('password');
   const readOnly = get('readOnly');
   const showPassword = get('showPassword');
   const tiny = get('tiny');
-  const value = get('value');
-
-  // const handleChange = useCallback(
-  //   (event: React.SyntheticEvent, newValue: O[number]['value']) => {
-  //     setStore(s => {
-  //       const err = s.error(newValue);
-  //       s.onError(err);
-  //       if (!err) s.onChange(event, newValue);
-  //       return { ...s, inputValue: newValue, errorMsg: err };
-  //     });
-  //   },
-  //   [setStore]
-  // );
-
-  // const handleFocus = useCallback(
-  //   (event: React.FocusEvent) => {
-  //     setStore(s => {
-  //       s.onFocus(event);
-  //       return { ...s, focused: !s.readOnly && !s.disabled && document.activeElement === event.target };
-  //     });
-  //   },
-  //   [setStore]
-  // );
-
-  // const handleBlur = useCallback(
-  //   (event: React.FocusEvent) => {
-  //     setStore(s => {
-  //       s.onBlur(event);
-  //       return { ...s, focused: false, inputValue: null };
-  //     });
-  //   },
-  //   [setStore]
-  // );
 
   const { handleChange, handleFocus, handleBlur } = useInputHandlers<SelectInputProps<O>>();
 
@@ -94,7 +64,7 @@ const WrappedSelectInput = React.memo(<O extends readonly Option[]>() => {
             displayEmpty={displayEmpty}
             disabled={disabled}
             readOnly={readOnly}
-            value={options?.some(o => o.value === (inputValue ?? value)) ? (inputValue ?? value) : ''}
+            value={options?.some(o => o.value === inputValue) ? inputValue : ''}
             error={!!errorMsg}
             onChange={event =>
               handleChange(
@@ -105,29 +75,21 @@ const WrappedSelectInput = React.memo(<O extends readonly Option[]>() => {
             }
             onFocus={handleFocus}
             onBlur={handleBlur}
-            variant="outlined"
-            MenuProps={{ sx: { maxWidth: 'min-content' } }}
-            inputProps={{
-              sx: {
-                display: 'flex',
-                alignItems: 'center',
-                ...(tiny && {
-                  paddingTop: theme.spacing(0.25),
-                  paddingBottom: theme.spacing(0.25)
-                })
-              }
-            }}
             renderValue={option => (
               <ListItemText
                 primary={options?.find(o => o.value === option)?.primary || ''}
+                sx={{ margin: 0 }}
                 slotProps={{
                   primary: {
                     sx: {
                       paddingRight: '0px',
                       cursor: 'pointer',
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
+                      ...(capitalize && { textTransform: 'capitalize' }),
+                      ...(!overflowHidden && {
+                        whiteSpace: 'wrap',
+                        overflow: 'auto',
+                        textOverflow: 'ellipsis'
+                      }),
                       ...(readOnly && { cursor: 'default', userSelect: 'text' }),
                       ...(tiny && { variant: 'body2' }),
                       ...(monospace && { fontFamily: 'monospace' }),
@@ -143,48 +105,27 @@ const WrappedSelectInput = React.memo(<O extends readonly Option[]>() => {
                 }}
               />
             )}
+            MenuProps={{ sx: { maxWidth: 'min-content' } }}
             endAdornment={
-              !endAdornment && !password ? null : (
-                <InputAdornment position="end" style={{ marginRight: theme.spacing(2) }}>
-                  <PasswordInput />
-                  <ResetInput />
-                  {endAdornment}
-                </InputAdornment>
-              )
+              <StyledEndAdornment sx={{ marginRight: theme.spacing(2) }}>
+                <PasswordInput />
+                <ResetInput />
+                {endAdornment}
+              </StyledEndAdornment>
             }
+            sx={{
+              '& .MuiSelect-select': {
+                ...(tiny && {
+                  paddingTop: '4px !important',
+                  paddingBottom: '4px !important',
+                  fontSize: '14px'
+                })
+              }
+            }}
           >
             {options.map((option, i) => (
-              <MenuItem
-                key={i}
-                value={option.value as MenuItemProps['value']}
-                sx={{
-                  '&>div': { margin: 0, cursor: 'pointer !important' },
-                  ...(capitalize && { textTransform: 'capitalize' })
-                }}
-              >
-                <ListItemText
-                  primary={option.primary}
-                  secondary={option.secondary}
-                  slotProps={{
-                    primary: {
-                      sx: {
-                        overflow: 'auto',
-                        textOverflow: 'initial',
-                        whiteSpace: 'normal',
-                        ...(tiny && { variant: 'body2' }),
-                        ...(capitalize && { textTransform: 'capitalize' })
-                      }
-                    },
-                    secondary: {
-                      sx: {
-                        overflow: 'auto',
-                        textOverflow: 'initial',
-                        whiteSpace: 'normal',
-                        ...(tiny && { variant: 'body2' })
-                      }
-                    }
-                  }}
-                />
+              <MenuItem key={i} value={option.value as MenuItemProps['value']}>
+                <StyledListItemText primary={option.primary} secondary={option.secondary} />
               </MenuItem>
             ))}
           </Select>
@@ -196,11 +137,13 @@ const WrappedSelectInput = React.memo(<O extends readonly Option[]>() => {
 });
 
 export const SelectInput = <O extends readonly Option[]>({
+  capitalize = false,
+  displayEmpty = false,
   options = [] as unknown as O,
   preventRender = false,
   ...props
 }: SelectInputProps<O>) => {
-  const parsedProps = useInputParsedProps({ ...props, options, preventRender });
+  const parsedProps = useInputParsedProps({ ...props, capitalize, displayEmpty, options, preventRender });
 
   return preventRender ? null : (
     <PropProvider<SelectInputProps<O>> props={parsedProps}>

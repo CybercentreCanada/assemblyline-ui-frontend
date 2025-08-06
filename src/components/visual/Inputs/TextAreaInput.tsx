@@ -22,6 +22,7 @@ const WrappedTextAreaInput = React.memo(() => {
 
   const inputValue = get('inputValue');
   const loading = get('loading');
+  const overflowHidden = get('overflowHidden');
   const password = get('password');
   const rows = get('rows');
   const showPassword = get('showPassword');
@@ -41,29 +42,12 @@ const WrappedTextAreaInput = React.memo(() => {
         ) : (
           <>
             <StyledTextField
-              multiline
-              rows={password && showPassword ? 1 : rows}
+              {...(!overflowHidden && { multiline: true, rows: rows })}
               type={password && showPassword ? 'password' : 'text'}
               value={inputValue ?? value ?? ''}
               onChange={e => handleChange(e, e.target.value, e.target.value)}
               onFocus={handleFocus}
               onBlur={handleBlur}
-              slotProps={{
-                input: {
-                  inputProps: {
-                    sx: {
-                      ...(tiny && { padding: '2.5px 4px 2.5px 8px' }),
-                      ...(password &&
-                        showPassword && {
-                          fontFamily: 'password',
-                          WebkitTextSecurity: 'disc',
-                          MozTextSecurity: 'disc',
-                          textSecurity: 'disc'
-                        })
-                    }
-                  }
-                }
-              }}
             />
             <HelperText />
           </>

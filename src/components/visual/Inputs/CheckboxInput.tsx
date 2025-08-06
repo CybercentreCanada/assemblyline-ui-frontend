@@ -32,7 +32,6 @@ const WrappedCheckboxInput = React.memo(() => {
   const readOnly = get('readOnly');
   const tooltip = get('tooltip');
   const tooltipProps = get('tooltipProps');
-  const value = get('value');
 
   const { handleClick, handleFocus, handleBlur } = useInputHandlers<CheckboxInputProps>();
 
@@ -42,11 +41,11 @@ const WrappedCheckboxInput = React.memo(() => {
         <StyledFormButton
           onBlur={handleBlur}
           onFocus={handleFocus}
-          onClick={e => handleClick(e, !(inputValue ?? value), !(inputValue ?? value))}
+          onClick={e => handleClick(e, !inputValue, !inputValue)}
         >
           <StyledFormControlLabel label={<StyledButtonLabel />}>
             <Checkbox
-              checked={Boolean(inputValue ?? value)}
+              checked={inputValue}
               indeterminate={indeterminate}
               disableFocusRipple
               disableRipple
@@ -78,7 +77,9 @@ export const CheckboxInput = ({ indeterminate = false, preventRender = false, ..
   const parsedProps = useInputParsedProps({ ...props, indeterminate, preventRender });
 
   return preventRender ? null : (
-    <PropProvider<CheckboxInputProps> props={parsedProps}>
+    <PropProvider<CheckboxInputProps>
+      props={{ ...parsedProps, inputValue: Boolean(parsedProps.inputValue ?? parsedProps.value) }}
+    >
       <WrappedCheckboxInput />
     </PropProvider>
   );

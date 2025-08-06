@@ -1,4 +1,5 @@
 import { ExpandMore } from '@mui/icons-material';
+import ClearIcon from '@mui/icons-material/Clear';
 import RefreshOutlinedIcon from '@mui/icons-material/RefreshOutlined';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
@@ -11,11 +12,11 @@ import type {
   InputAdornmentProps,
   ListItemButtonProps,
   ListItemProps,
+  ListItemTextProps,
   TextFieldProps
 } from '@mui/material';
 import {
   Autocomplete,
-  Badge,
   Button,
   FormControl,
   FormControlLabel,
@@ -26,6 +27,7 @@ import {
   ListItem,
   ListItemButton,
   ListItemIcon,
+  ListItemText,
   Skeleton,
   TextField,
   Typography,
@@ -52,18 +54,20 @@ export const StyledRoot = React.memo(({ children }: { children: React.ReactNode 
   );
 });
 
-export const StyledEndAdornmentBox = React.memo(({ children }: Pick<InputAdornmentProps, 'children'>) => {
+export const StyledEndAdornmentBox = React.memo(({ children, ...props }: Partial<InputAdornmentProps>) => {
   const theme = useTheme();
 
   const [get] = usePropStore();
 
+  const endAdornment = get('endAdornment');
   const preventExpandRender = get('preventExpandRender');
   const preventPasswordRender = get('preventPasswordRender');
   const preventResetRender = get('preventResetRender');
 
-  return preventResetRender && preventPasswordRender && preventExpandRender ? null : (
+  return preventResetRender && preventPasswordRender && preventExpandRender && !endAdornment ? null : (
     <InputAdornment
       position="end"
+      {...props}
       sx={{
         position: 'absolute',
         right: theme.spacing(0.75),
@@ -71,7 +75,8 @@ export const StyledEndAdornmentBox = React.memo(({ children }: Pick<InputAdornme
         bottom: 0,
         display: 'flex',
         alignItems: 'center',
-        maxHeight: 'initial'
+        maxHeight: 'initial',
+        ...props?.sx
       }}
     >
       {children}
@@ -79,15 +84,18 @@ export const StyledEndAdornmentBox = React.memo(({ children }: Pick<InputAdornme
   );
 });
 
-export const StyledEndAdornment = React.memo(({ children }: Pick<InputAdornmentProps, 'children'>) => {
+export const StyledEndAdornment = React.memo(({ children, ...props }: Partial<InputAdornmentProps>) => {
   const [get] = usePropStore();
 
+  const endAdornment = get('endAdornment');
   const preventExpandRender = get('preventExpandRender');
   const preventPasswordRender = get('preventPasswordRender');
   const preventResetRender = get('preventResetRender');
 
-  return preventResetRender && preventPasswordRender && preventExpandRender ? null : (
-    <InputAdornment position="end">{children}</InputAdornment>
+  return preventResetRender && preventPasswordRender && preventExpandRender && !endAdornment ? null : (
+    <InputAdornment position="end" {...props} sx={{ marginLeft: 0, ...props?.sx }}>
+      {children}
+    </InputAdornment>
   );
 });
 export const ExpandInput = React.memo(() => {
@@ -128,6 +136,43 @@ export const ExpandInput = React.memo(() => {
   );
 });
 
+export const ClearInput = React.memo(() => {
+  const theme = useTheme();
+
+  const [get] = usePropStore<{ inputValue: string[] }>();
+
+  const disabled = get('disabled');
+  const expandProps = get('expandProps');
+  const id = get('id');
+  const inputValue = get('inputValue');
+  const readOnly = get('readOnly');
+  const tiny = get('tiny');
+
+  const { handleChange } = useInputHandlers();
+
+  return disabled || readOnly || !inputValue?.length ? null : (
+    <ListItemIcon sx={{ minWidth: 0 }}>
+      <IconButton
+        aria-label={`${id}-clear`}
+        color="secondary"
+        type="button"
+        onClick={event => {
+          event.preventDefault();
+          event.stopPropagation();
+          handleChange(event, [], []);
+        }}
+        {...expandProps}
+        sx={{
+          padding: tiny ? theme.spacing(0.25) : theme.spacing(0.5),
+          ...expandProps?.sx
+        }}
+      >
+        <ClearIcon fontSize="small" />
+      </IconButton>
+    </ListItemIcon>
+  );
+});
+
 export const PasswordInput = React.memo(() => {
   const theme = useTheme();
 
@@ -143,6 +188,7 @@ export const PasswordInput = React.memo(() => {
     <IconButton
       aria-label={`${id}-password`}
       color="secondary"
+      type="button"
       onClick={() => setStore(s => ({ showPassword: !s.showPassword }))}
       {...resetProps}
       sx={{
@@ -329,8 +375,8 @@ export const StyledButtonLabel = React.memo(
     const monospace = get('monospace');
     const password = get('password');
     const preventDisabledColor = get('preventDisabledColor');
-    const required = get('required');
-    const showOverflow = get('showOverflow');
+    const readOnly = get('readOnly');
+    const overflowHidden = get('overflowHidden');
     const showPassword = get('showPassword');
 
     return (
@@ -343,38 +389,38 @@ export const StyledButtonLabel = React.memo(
           columnGap: theme.spacing(1)
         }}
       >
-        <Badge color="error" variant="dot" invisible={!required}>
-          <Typography
-            color={
-              !preventDisabledColor && (loading || disabled)
+        <Typography
+          color={
+            readOnly
+              ? 'textPrimary'
+              : !preventDisabledColor && (loading || disabled)
                 ? 'textDisabled'
                 : errorMsg
                   ? 'error'
                   : focused
                     ? 'primary'
                     : 'textPrimary'
-            }
-            variant="body2"
-            {...labelProps}
-            sx={{
-              ...labelProps?.sx,
-              marginLeft: theme.spacing(1),
-              textAlign: 'start',
-              width: '100%',
-              ...(!showOverflow && { textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden' }),
-              ...(monospace && { fontFamily: 'monospace' }),
-              ...(password &&
-                showPassword && {
-                  fontFamily: 'password',
-                  WebkitTextSecurity: 'disc',
-                  MozTextSecurity: 'disc',
-                  textSecurity: 'disc'
-                })
-            }}
-          >
-            {label}
-          </Typography>
-        </Badge>
+          }
+          variant="body2"
+          {...labelProps}
+          sx={{
+            ...labelProps?.sx,
+            marginLeft: theme.spacing(1),
+            textAlign: 'start',
+            width: '100%',
+            ...(overflowHidden && { textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden' }),
+            ...(monospace && { fontFamily: 'monospace' }),
+            ...(password &&
+              showPassword && {
+                fontFamily: 'password',
+                WebkitTextSecurity: 'disc',
+                MozTextSecurity: 'disc',
+                textSecurity: 'disc'
+              })
+          }}
+        >
+          {label}
+        </Typography>
         {endAdornment}
       </div>
     );
@@ -395,7 +441,7 @@ export const StyledFormControlLabel = React.memo(
     const preventPasswordRender = get('preventPasswordRender');
     const preventResetRender = get('preventResetRender');
     const readOnly = get('readOnly');
-    const showOverflow = get('showOverflow');
+    const overflowHidden = get('overflowHidden');
     const tiny = get('tiny');
 
     return (
@@ -409,7 +455,7 @@ export const StyledFormControlLabel = React.memo(
           marginLeft: 0,
           marginRight: 0,
           paddingRight: `calc(44px + ${[preventExpandRender, preventPasswordRender, preventResetRender].filter(value => value === false).length} * ${tiny ? '24px' : '28px'})`,
-          ...(!showOverflow && { textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden' }),
+          ...(overflowHidden && { textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden' }),
           ...props?.sx
         }}
       />
@@ -458,34 +504,83 @@ export const StyledFormLabel = React.memo(() => {
   const id = get('id');
   const label = get('label');
   const labelProps = get('labelProps');
+  const overflowHidden = get('overflowHidden');
   const preventDisabledColor = get('preventDisabledColor');
-  const required = get('required');
+  const readOnly = get('readOnly');
   const tooltip = get('tooltip');
   const tooltipProps = get('tooltipProps');
 
   return (
     <Tooltip title={tooltip} {...tooltipProps}>
-      <Badge color="error" variant="dot" invisible={!required}>
-        <Typography
-          color={!disabled && errorMsg ? 'error' : focused ? 'primary' : 'textSecondary'}
-          component={InputLabel}
-          gutterBottom
-          htmlFor={id}
-          variant="body2"
-          whiteSpace="nowrap"
-          {...labelProps}
-          sx={{
-            ...labelProps?.sx,
-            ...(disabled &&
-              !preventDisabledColor && {
-                WebkitTextFillColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.38)'
-              })
-          }}
-        >
-          {label}
-        </Typography>
-      </Badge>
+      <Typography
+        color={readOnly ? 'textSecondary' : !disabled && errorMsg ? 'error' : focused ? 'primary' : 'textSecondary'}
+        component={InputLabel}
+        gutterBottom
+        htmlFor={id}
+        variant="body2"
+        whiteSpace="nowrap"
+        {...labelProps}
+        sx={{
+          ...(!overflowHidden && { whiteSpace: 'normal' }),
+          ...(disabled &&
+            !preventDisabledColor && {
+              WebkitTextFillColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.38)'
+            }),
+          ...labelProps?.sx
+        }}
+      >
+        {label}
+      </Typography>
     </Tooltip>
+  );
+});
+
+export const StyledListItemText = React.memo(({ primary, secondary = null, ...props }: ListItemTextProps) => {
+  const [get] = usePropStore();
+
+  const capitalize = get('capitalize');
+  const overflowHidden = get('overflowHidden');
+  const password = get('password');
+  const showPassword = get('showPassword');
+  const tiny = get('tiny');
+
+  return (
+    <ListItemText
+      primary={primary}
+      secondary={secondary}
+      {...props}
+      slotProps={{
+        ...props?.slotProps,
+        primary: {
+          ...props?.slotProps?.primary,
+          sx: {
+            ...(capitalize && { textTransform: 'capitalize' }),
+            ...(!overflowHidden && { overflow: 'auto', textOverflow: 'initial', whiteSpace: 'normal' }),
+            ...(tiny && { variant: 'body2' })
+          }
+        },
+        secondary: {
+          ...props?.slotProps?.secondary,
+          sx: {
+            ...(!overflowHidden && { overflow: 'auto', textOverflow: 'initial', whiteSpace: 'normal' }),
+            ...(tiny && { variant: 'body2' })
+          }
+        }
+      }}
+      sx={{
+        marginTop: 'initial',
+        marginBottom: 'initial',
+        ...(password &&
+          showPassword && {
+            wordBreak: 'break-all',
+            fontFamily: 'password',
+            WebkitTextSecurity: 'disc',
+            MozTextSecurity: 'disc',
+            textSecurity: 'disc'
+          }),
+        ...props?.sx
+      }}
+    />
   );
 });
 
@@ -503,6 +598,7 @@ export const StyledTextField = ({ params, ...props }: StyledTextField) => {
   const errorMsg = get('errorMsg');
   const id = get('id');
   const monospace = get('monospace');
+  const overflowHidden = get('overflowHidden');
   const password = get('password');
   const placeholder = get('placeholder');
   const readOnly = get('readOnly');
@@ -533,22 +629,21 @@ export const StyledTextField = ({ params, ...props }: StyledTextField) => {
           // 'aria-describedby': getAriaDescribedBy(props),
           placeholder: placeholder,
           readOnly: readOnly,
-          // startAdornment: startAdornment && <InputAdornment position="start">{startAdornment}</InputAdornment>,
+          ...props?.slotProps?.input,
+          ...params?.InputProps,
           startAdornment: (
             <>
               {startAdornment && <InputAdornment position="start">{startAdornment}</InputAdornment>}
               {params?.InputProps?.startAdornment}
             </>
           ),
-          ...props?.slotProps?.input,
-          ...params?.InputProps,
           endAdornment: (
             <StyledEndAdornment>
-              <PasswordInput />
-              <ResetInput />
               {endAdornment}
               {props?.slotProps?.input?.['endAdornment']}
-              {params?.InputProps?.endAdornment}
+              {/* {params?.InputProps?.endAdornment} */}
+              <PasswordInput />
+              <ResetInput />
             </StyledEndAdornment>
           )
         }
@@ -557,6 +652,7 @@ export const StyledTextField = ({ params, ...props }: StyledTextField) => {
         ...props?.sx,
         margin: 0,
         '& .MuiInputBase-root': {
+          paddingRight: '9px !important',
           ...(tiny && {
             paddingTop: '2px !important',
             paddingBottom: '2px !important',
@@ -566,11 +662,21 @@ export const StyledTextField = ({ params, ...props }: StyledTextField) => {
         },
 
         '& .MuiInputBase-input': {
-          whiteSpace: 'nowrap',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
+          ...(overflowHidden && {
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis'
+          }),
           ...(readOnly && !disabled && { cursor: 'default' }),
-          ...(monospace && { fontFamily: 'monospace' })
+          ...(monospace && { fontFamily: 'monospace' }),
+          ...(tiny && { padding: '2.5px 4px 2.5px 8px' }),
+          ...(password &&
+            showPassword && {
+              fontFamily: 'password',
+              WebkitTextSecurity: 'disc',
+              MozTextSecurity: 'disc',
+              textSecurity: 'disc'
+            })
         },
 
         '& .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline': {
@@ -631,7 +737,7 @@ export const StyledCustomChip = React.memo(({ label, onDelete = () => null, sx, 
   const disabled = get('disabled');
   const monospace = get('monospace');
   const password = get('password');
-  const readOnly = get('disabled');
+  const readOnly = get('readOnly');
   const showPassword = get('showPassword');
 
   return (
@@ -639,12 +745,13 @@ export const StyledCustomChip = React.memo(({ label, onDelete = () => null, sx, 
       label={label}
       wrap
       {...props}
-      onDelete={disabled ? undefined : onDelete}
+      onDelete={disabled || readOnly ? undefined : onDelete}
       sx={{
         ...(readOnly && !disabled && { cursor: 'default' }),
         ...(monospace && { fontFamily: 'monospace' }),
         ...(password &&
           showPassword && {
+            wordBreak: 'break-all',
             fontFamily: 'password',
             WebkitTextSecurity: 'disc',
             MozTextSecurity: 'disc',

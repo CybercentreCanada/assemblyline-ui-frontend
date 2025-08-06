@@ -25,6 +25,7 @@ const WrappedNumberInput = React.memo(() => {
   const inputValue = get('inputValue');
   const loading = get('loading');
   const password = get('password');
+  const showPassword = get('showPassword');
   const tiny = get('tiny');
 
   const error = get('error');
@@ -76,17 +77,17 @@ const WrappedNumberInput = React.memo(() => {
         ) : (
           <>
             <StyledTextField
-              type={password ? 'password' : 'number'}
+              type={password && showPassword ? 'password' : 'number'}
               value={inputValue}
               onChange={handleChange}
               onFocus={handleFocus}
               onBlur={handleBlur}
               slotProps={{
                 input: {
-                  inputProps: {
+                  style: {
                     // ...(typeof min === 'number' && { min }),
                     // ...(typeof max === 'number' && { max }),
-                    ...(tiny && { sx: { padding: '2.5px 4px 2.5px 8px' } })
+                    ...(tiny && { padding: '2.5px 4px 2.5px 8px' })
                   }
                 }
               }}

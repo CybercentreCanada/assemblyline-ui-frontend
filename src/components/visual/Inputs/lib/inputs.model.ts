@@ -10,6 +10,7 @@ export type InputValues<Value, InputValue = Value, Event = React.SyntheticEvent>
 };
 
 export type InputProps = {
+  capitalize?: boolean;
   disabled?: boolean;
   divider?: boolean;
   endAdornment?: React.ReactNode;
@@ -24,6 +25,7 @@ export type InputProps = {
   labelProps?: TypographyProps;
   loading?: boolean;
   monospace?: boolean;
+  overflowHidden?: boolean;
   password?: boolean;
   placeholder?: string;
   preventDisabledColor?: boolean;
@@ -33,7 +35,6 @@ export type InputProps = {
   reset?: boolean;
   resetProps?: IconButtonProps;
   rootProps?: React.HTMLAttributes<HTMLDivElement>;
-  showOverflow?: boolean;
   startAdornment?: React.ReactNode;
   tiny?: boolean;
   tooltip?: TooltipProps['title'];
@@ -46,6 +47,7 @@ export type InputProps = {
 };
 
 export const DEFAULT_INPUT_PROPS: InputProps = {
+  capitalize: false,
   disabled: false,
   divider: false,
   endAdornment: null,
@@ -59,6 +61,7 @@ export const DEFAULT_INPUT_PROPS: InputProps = {
   labelProps: null,
   loading: false,
   monospace: false,
+  overflowHidden: false,
   password: false,
   placeholder: null,
   preventDisabledColor: false,
@@ -68,7 +71,6 @@ export const DEFAULT_INPUT_PROPS: InputProps = {
   reset: false,
   resetProps: null,
   rootProps: null,
-  showOverflow: false,
   startAdornment: null,
   tiny: false,
   tooltip: null,

@@ -1,6 +1,6 @@
 {
-  "error.max": "Must not exceed {{max}}.",
-  "error.min": "Must be at least {{min}}.",
-  "error.minmax": "Must be between {{min}} and {{max}}.",
-  "error.required": "Required."
+  "error.max": "Must not exceed {{max}}",
+  "error.min": "Must be at least {{min}}",
+  "error.minmax": "Must be between {{min}} and {{max}}",
+  "error.required": "Required"
 }

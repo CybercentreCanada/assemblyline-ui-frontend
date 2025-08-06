@@ -1,6 +1,7 @@
 import type { AutocompleteProps } from '@mui/material';
-import { Autocomplete, useTheme } from '@mui/material';
+import { Autocomplete } from '@mui/material';
 import {
+  ClearInput,
   HelperText,
   StyledCustomChip,
   StyledFormControl,
@@ -13,7 +14,8 @@ import { useInputHandlers, useInputParsedProps } from 'components/visual/Inputs/
 import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
 import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
 import type { ElementType } from 'react';
-import React from 'react';
+import React, { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export type ChipsInputProps = InputValues<string[]> &
   InputProps & {
@@ -23,72 +25,18 @@ export type ChipsInputProps = InputValues<string[]> &
   };
 
 const WrappedChipsInput = React.memo(() => {
-  const theme = useTheme();
   const [get] = usePropStore<ChipsInputProps>();
 
   const autoComplete = get('autoComplete');
   const disabled = get('disabled');
-  const endAdornment = get('endAdornment');
-  const error = get('errorMsg');
-  const focused = get('focused');
   const id = get('id');
   const inputValue = get('inputValue');
   const isOptionEqualToValue = get('isOptionEqualToValue');
   const loading = get('loading');
-  const monospace = get('monospace');
   const options = get('options');
-  const password = get('password');
-  const placeholder = get('placeholder');
-  const preventPasswordRender = get('preventPasswordRender');
-  const preventResetRender = get('preventResetRender');
   const readOnly = get('readOnly');
-  const showPassword = get('showPassword');
-  const startAdornment = get('startAdornment');
-  const tiny = get('tiny');
-  const value = get('value');
-
-  // const { handleBlur, handleChange, handleFocus } = useDefaultHandlers();
 
   const { handleChange, handleFocus, handleBlur } = useInputHandlers<ChipsInputProps>();
-
-  // const handleChange = useCallback(
-  //   (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, newValue: string[]) => {
-  //     setStore(s => {
-  //       return s;
-  //       // const newValue = event.target.value;
-  //       // const num = newValue !== '' ? Number(newValue) : null;
-  //       // const err = s.error(num);
-  //       // s.onError(err);
-  //       // if (!err) s.onChange(event, num);
-  //       // return { ...s, inputValue: newValue, errorMsg: err };
-  //     });
-  //   },
-  //   [setStore]
-  // );
-
-  // const handleFocus = useCallback(
-  //   (event: React.FocusEvent) => {
-  //     setStore(s => {
-  //       s.onFocus(event);
-  //       return {
-  //         ...s,
-  //         inputValue: s.value,
-  //         focused: !s.readOnly && !s.disabled && document.activeElement === event.target
-  //       };
-  //     });
-  //   },
-  //   [setStore]
-  // );
-
-  // const handleBlur = useCallback(
-  //   (event: React.FocusEvent) => {
-  //     setStore(s => {
-  //       s.onBlur(event);
-  //       return { ...s, focused: false, inputValue: null };
-  //     });
-  //   },
-  //   [setStore]
-  // );
 
   return (
     <StyledRoot>
@@ -106,7 +54,7 @@ const WrappedChipsInput = React.memo(() => {
             options={options}
             readOnly={readOnly}
             size="small"
-            value={inputValue ?? value ?? []}
+            value={inputValue}
             isOptionEqualToValue={isOptionEqualToValue}
             onChange={(e, v) => handleChange(e, v, v)}
             onFocus={handleFocus}
@@ -117,47 +65,7 @@ const WrappedChipsInput = React.memo(() => {
                 return <StyledCustomChip key={key} label={option} {...tagProps} />;
               })
             }
-            renderInput={params => (
-              <StyledTextField
-                params={params}
-                slotProps={{
-                  input: {
-                    ...(!preventResetRender && { style: { paddingRight: '85px' } })
-
-                    //   ...params.InputProps,
-                    //   ...(!preventResetRender && { style: { paddingRight: '85px' } }),
-                    //   'aria-describedby': get(s => s['aria-describedby']),
-                    //   startAdornment: (
-                    //     <>
-                    //       {startAdornment && <InputAdornment position="start">{startAdornment}</InputAdornment>}
-                    //       {params.InputProps?.startAdornment}
-                    //     </>
-                    //   ),
-                    //   endAdornment: (
-                    //     <>
-                    //       {preventPasswordRender && preventResetRender && !endAdornment ? null : (
-                    //         <InputAdornment
-                    //           position="end"
-                    //           sx={{
-                    //             position: 'absolute',
-                    //             right: '37px',
-                    //             top: '50%',
-                    //             transform: 'translate(0, -50%)',
-                    //             ...(!focused && { visibility: 'hidden' })
-                    //           }}
-                    //         >
-                    //           <PasswordInput />
-                    //           <ResetInput onChange={(e, v) => handleChange(e, v, v)} />
-                    //           {endAdornment}
-                    //         </InputAdornment>
-                    //       )}
-                    //       {params.InputProps?.endAdornment}
-                    //     </>
-                    //   )
-                  }
-                }}
-              />
-            )}
+            renderInput={params => <StyledTextField params={params} />}
           />
         )}
         <HelperText />
@@ -168,21 +76,50 @@ const WrappedChipsInput = React.memo(() => {
 
 export const ChipsInput = ({
   autoComplete = false,
+  error = () => '',
   isOptionEqualToValue = (option, value) => option === value,
   options = [],
   preventRender = false,
+  value = [],
+  endAdornment = null,
   ...props
 }: ChipsInputProps) => {
+  const { t } = useTranslation('inputs');
+
   const parsedProps = useInputParsedProps({
     ...props,
     autoComplete,
+    endAdornment,
+    isOptionEqualToValue,
     options,
     preventRender,
-    isOptionEqualToValue
+    value
   });
 
+  const newError = useCallback(
+    (val: string[]): string => {
+      const err = error(val);
+      if (err) return err;
+      else if (parsedProps.required && !val?.length) return t('error.required');
+      else return '';
+    },
+    [error, parsedProps.required, t]
+  );
+
   return preventRender ? null : (
-    <PropProvider<ChipsInputProps> props={parsedProps}>
+    <PropProvider<ChipsInputProps>
+      props={{
+        ...parsedProps,
+        error: newError,
+        errorMsg: newError(value),
+        endAdornment: (
+          <>
+            {endAdornment}
+            <ClearInput />
+          </>
+        )
+      }}
+    >
       <WrappedChipsInput />
     </PropProvider>
   );

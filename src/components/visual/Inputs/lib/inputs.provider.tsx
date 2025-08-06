@@ -2,8 +2,9 @@ import type { InputProps, InputStates } from 'components/visual/Inputs/lib/input
 import { DEFAULT_INPUT_PROPS, DEFAULT_INPUT_STATES } from 'components/visual/Inputs/lib/inputs.model';
 import { createContext, useContext, useEffect, useRef, useSyncExternalStore } from 'react';
 
-function shallowEqual<T>(a: T, b: T): boolean {
-  if (Object.is(a, b) || typeof a === 'function' || typeof b === 'function') return true;
+function shallowEqual<T>(a: T, b: T, func: boolean = true): boolean {
+  if (typeof a === 'function' || typeof b === 'function') return func;
+  if (Object.is(a, b)) return true;
   if (!a || !b || typeof a !== 'object' || typeof b !== 'object') return false;
 
   const keysA = Object.keys(a as object);
@@ -11,7 +12,9 @@ function shallowEqual<T>(a: T, b: T): boolean {
   return (
     keysA.length === keysB.length &&
     keysA.every(
-      key => key in b && (typeof a[key] === 'function' || typeof b[key] === 'function' || Object.is(a[key], b[key]))
+      key =>
+        key in b &&
+        ((typeof a[key] === 'function' || typeof b[key] === 'function' ? func : false) || Object.is(a[key], b[key]))
     )
   );
 }
@@ -66,7 +69,7 @@ export const createPropContext = <Props extends object>(initialProps: Props) => 
       (stateRef.current as Data & Props)?.[key] ?? (initialProps as Data & Props)?.[key] ?? null;
 
     const reset = <Data extends object>(current: Data & Props) => {
-      if (shallowEqual(current, prevPropsRef.current)) return;
+      if (shallowEqual(current, prevPropsRef.current, true)) return;
       stateRef.current = shallowReconcile(current, prevPropsRef.current, stateRef.current) as Data & Props;
       prevPropsRef.current = current;
       subscribers.forEach(fn => fn());
@@ -120,7 +123,7 @@ export const createPropContext = <Props extends object>(initialProps: Props) => 
 
     const useStore = <K extends keyof (Data & Props), V extends (Data & Props)[K]>(
       key: K,
-      isEqual: (a: V, b: V) => boolean = shallowEqual
+      isEqual: (a: V, b: V, func: boolean) => boolean = shallowEqual
     ): V => {
       const store = useContext(PropContext);
       if (!store) throw new Error('Store not found');
@@ -131,7 +134,7 @@ export const createPropContext = <Props extends object>(initialProps: Props) => 
         store.subscribe,
         () => {
           const newValue = store.get<Data & Props>(key) as V;
-          if (!isEqual(lastValueRef.current, newValue)) {
+          if (!isEqual(lastValueRef.current, newValue, false)) {
             lastValueRef.current = newValue;
           }
           return lastValueRef.current;

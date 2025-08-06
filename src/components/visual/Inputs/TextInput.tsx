@@ -17,7 +17,7 @@ import React from 'react';
 export type TextInputProps = InputValues<string> &
   InputProps & {
     autoComplete?: AutocompleteProps<string, boolean, boolean, boolean, ElementType>['autoComplete'];
-    options?: AutocompleteProps<string, boolean, boolean, boolean, ElementType>['options'];
+    options?: string[];
   };
 
 const WrappedTextInput = React.memo(() => {
@@ -51,9 +51,9 @@ const WrappedTextInput = React.memo(() => {
             fullWidth
             readOnly={readOnly}
             size="small"
-            options={options ?? []}
-            value={value ?? ''}
-            inputValue={inputValue ?? value ?? ''}
+            options={options}
+            value={value}
+            inputValue={inputValue}
             onInputChange={(e, v) => handleChange(e, v, v)}
             onFocus={handleFocus}
             onBlur={handleBlur}
@@ -71,8 +71,14 @@ const WrappedTextInput = React.memo(() => {
   );
 });
 
-export const TextInput = ({ autoComplete = false, options = [], preventRender = false, ...props }: TextInputProps) => {
-  const parsedProps = useInputParsedProps({ ...props, autoComplete, options, preventRender });
+export const TextInput = ({
+  autoComplete = false,
+  options = [],
+  preventRender = false,
+  value = '',
+  ...props
+}: TextInputProps) => {
+  const parsedProps = useInputParsedProps({ ...props, autoComplete, options, preventRender, value });
 
   return preventRender ? null : (
     <PropProvider<TextInputProps> props={parsedProps}>
