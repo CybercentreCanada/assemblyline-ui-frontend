@@ -1334,6 +1334,8 @@ function WrappedSubmissionDetail() {
             {socket && (
               <div
                 style={{
+                  width: '100%',
+                  maxWidth: theme.breakpoints.values.sm,
                   display: 'flex',
                   color: theme.palette.mode === 'dark' ? theme.palette.primary.light : theme.palette.primary.dark,
                   paddingBottom: theme.spacing(3),
