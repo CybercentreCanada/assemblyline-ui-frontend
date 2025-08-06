@@ -24,7 +24,7 @@ import {
   StyledInputSkeleton,
   StyledRoot
 } from 'components/visual/Inputs/lib/inputs.components';
-import { useDefaultError } from 'components/visual/Inputs/lib/inputs.hook';
+import { useInputParsedProps } from 'components/visual/Inputs/lib/inputs.hook';
 import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
 import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
 import type { ClassificationParts, ClassificationValidator } from 'helpers/classificationParser';
@@ -51,7 +51,7 @@ type ClassificationInputState = ClassificationInputProps & {
   validated: ClassificationValidator;
 };
 
-const WrappedClassificationInput = () => {
+const WrappedClassificationInput = React.memo(() => {
   const { t } = useTranslation();
   const theme = useTheme();
   const { user: currentUser, c12nDef, classificationAliases } = useALContext();
@@ -62,27 +62,30 @@ const WrappedClassificationInput = () => {
 
   const [get, setStore] = usePropStore<ClassificationInputState>();
 
-  const disabled = get(s => s.disabled);
-  const format = get(s => s.format);
-  const fullWidth = get(s => s.fullWidth);
-  const inline = get(s => s.inline);
-  const isUser = get(s => s.isUser);
-  const loading = get(s => s.loading);
-  const monospace = get(s => s.monospace);
-  const password = get(s => s.password);
-  const preventRenderStore = get(s => s.preventRender);
-  const readOnly = get(s => s.readOnly);
-  const reset = get(s => s.reset);
-  const showPassword = get(s => s.showPassword);
-  const tiny = get(s => s.tiny);
-  const value = get(s => s.value);
+  const disabled = get('disabled');
+  const format = get('format');
+  const fullWidth = get('fullWidth');
+  const inline = get('inline');
+  const isUser = get('isUser');
+  const loading = get('loading');
+  const monospace = get('monospace');
+  const password = get('password');
+  const preventRenderStore = get('preventRender');
+  const readOnly = get('readOnly');
+  const reset = get('reset');
+  const showPassword = get('showPassword');
+  const tiny = get('tiny');
+  const value = get('value');
 
-  const dynGroup = get(s => s.dynGroup);
-  const showPicker = get(s => s?.showPicker ?? false);
-  const uParts = get(s => s?.uParts ?? defaultParts);
-  const validated = get(s => s?.validated ?? defaultClassificationValidator);
+  const dynGroup = get('dynGroup');
+  const showPicker = get('showPicker') ?? false;
+  const uParts = get('uParts') ?? defaultParts;
+  const validated = get('validated') ?? defaultClassificationValidator;
 
-  const onReset = get(s => s.onReset);
+  const error = get('error');
+  const onChange = get('onChange');
+  const onError = get('onError');
+  const onReset = get('onReset');
 
   const preventRender = useMemo(
     () => preventRenderStore || !c12nDef?.enforce || !validated?.parts?.lvl,
@@ -201,14 +204,12 @@ const WrappedClassificationInput = () => {
   const handleChange = useCallback(
     (event: React.SyntheticEvent) => {
       const newC12n = normalizedClassification(validated.parts, c12nDef, format, isMobile, isUser);
-      setStore(s => {
-        const err = s.error(newC12n);
-        s.onError(err);
-        if (!err) s.onChange(event, newC12n);
-        return { ...s, inputValue: newC12n, errorMsg: err, showPicker: false };
-      });
+      const err = error(newC12n);
+      onError(err);
+      if (!err) onChange(event, newC12n);
+      setStore(() => ({ ...(!err && { value: newC12n }), inputValue: newC12n, errorMsg: err, showPicker: false }));
     },
-    [c12nDef, format, isMobile, isUser, setStore, validated.parts]
+    [c12nDef, error, format, isMobile, isUser, onChange, onError, setStore, validated.parts]
   );
 
   useEffect(() => {
@@ -466,37 +467,32 @@ const WrappedClassificationInput = () => {
       </StyledFormControl>
     </StyledRoot>
   );
+});
+
+export const ClassificationInput = ({
+  dynGroup = null,
+  format = 'short',
+  fullWidth = true,
+  inline = false,
+  isUser = false,
+  preventRender = false,
+  value,
+  ...props
+}: ClassificationInputProps) => {
+  const parsedProps = useInputParsedProps({
+    ...props,
+    dynGroup,
+    format,
+    fullWidth,
+    inline,
+    isUser,
+    preventRender,
+    value
+  });
+
+  return preventRender || !value ? null : (
+    <PropProvider<ClassificationInputProps> props={parsedProps}>
+      <WrappedClassificationInput />
+    </PropProvider>
+  );
 };
-
-export const ClassificationInput: React.FC<ClassificationInputProps> = React.memo(
-  ({
-    dynGroup = null,
-    format = 'short',
-    fullWidth = true,
-    inline = false,
-    isUser = false,
-    preventRender = false,
-    value,
-    ...props
-  }) => {
-    const newError = useDefaultError(props);
-
-    return preventRender || !value ? null : (
-      <PropProvider<ClassificationInputProps>
-        data={{
-          ...props,
-          dynGroup,
-          error: newError,
-          errorMsg: newError(value),
-          format,
-          fullWidth,
-          inline,
-          isUser,
-          value
-        }}
-      >
-        <WrappedClassificationInput />
-      </PropProvider>
-    );
-  }
-);

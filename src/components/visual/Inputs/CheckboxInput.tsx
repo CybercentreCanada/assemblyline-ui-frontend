@@ -11,7 +11,7 @@ import {
   StyledFormControl,
   StyledFormControlLabel
 } from 'components/visual/Inputs/lib/inputs.components';
-import { useDefaultError, useDefaultHandlers } from 'components/visual/Inputs/lib/inputs.hook';
+import { useInputHandlers, useInputParsedProps } from 'components/visual/Inputs/lib/inputs.hook';
 import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
 import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
 import { Tooltip } from 'components/visual/Tooltip';
@@ -22,19 +22,19 @@ export type CheckboxInputProps = InputValues<boolean> &
     indeterminate?: CheckboxProps['indeterminate'];
   };
 
-const WrappedCheckboxInput = () => {
+const WrappedCheckboxInput = React.memo(() => {
   const [get] = usePropStore<CheckboxInputProps>();
 
-  const indeterminate = get(s => s.indeterminate);
-  const inputValue = get(s => s.inputValue);
-  const loading = get(s => s.loading);
-  const preventDisabledColor = get(s => s.preventDisabledColor);
-  const readOnly = get(s => s.readOnly);
-  const tooltip = get(s => s.tooltip);
-  const tooltipProps = get(s => s.tooltipProps);
-  const value = get(s => s.value);
+  const indeterminate = get('indeterminate');
+  const inputValue = get('inputValue');
+  const loading = get('loading');
+  const preventDisabledColor = get('preventDisabledColor');
+  const readOnly = get('readOnly');
+  const tooltip = get('tooltip');
+  const tooltipProps = get('tooltipProps');
+  const value = get('value');
 
-  const { handleClick, handleFocus, handleBlur } = useDefaultHandlers();
+  const { handleClick, handleFocus, handleBlur } = useInputHandlers<CheckboxInputProps>();
 
   return (
     <Tooltip title={loading ? null : tooltip} {...tooltipProps}>
@@ -72,18 +72,14 @@ const WrappedCheckboxInput = () => {
       </StyledFormControl>
     </Tooltip>
   );
+});
+
+export const CheckboxInput = ({ indeterminate = false, preventRender = false, ...props }: CheckboxInputProps) => {
+  const parsedProps = useInputParsedProps({ ...props, indeterminate, preventRender });
+
+  return preventRender ? null : (
+    <PropProvider<CheckboxInputProps> props={parsedProps}>
+      <WrappedCheckboxInput />
+    </PropProvider>
+  );
 };
-
-export const CheckboxInput: React.FC<CheckboxInputProps> = React.memo(
-  ({ indeterminate = false, preventRender = false, value, ...props }) => {
-    const newError = useDefaultError(props);
-
-    return preventRender ? null : (
-      <PropProvider<CheckboxInputProps>
-        data={{ ...props, error: newError, errorMsg: newError(value), value, indeterminate }}
-      >
-        <WrappedCheckboxInput />
-      </PropProvider>
-    );
-  }
-);

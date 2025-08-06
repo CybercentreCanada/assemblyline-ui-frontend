@@ -12,7 +12,7 @@ import {
   StyledFormLabel,
   StyledRoot
 } from 'components/visual/Inputs/lib/inputs.components';
-import { useDefaultError, useDefaultHandlers } from 'components/visual/Inputs/lib/inputs.hook';
+import { useInputHandlers, useInputParsedProps } from 'components/visual/Inputs/lib/inputs.hook';
 import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
 import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
 import React from 'react';
@@ -27,23 +27,22 @@ export type RadioInputProps<O extends readonly Option[]> = InputValues<O[number]
     options: O;
   };
 
-const WrappedRadioInput = <O extends readonly Option[]>() => {
+const WrappedRadioInput = React.memo(<O extends readonly Option[]>() => {
   const [get] = usePropStore<RadioInputProps<O>>();
 
-  const focused = get(s => s.focused);
-  const inputValue = get(s => s.inputValue);
-  const options = get(s => s.options);
-  const preventDisabledColor = get(s => s.preventDisabledColor);
-  const readOnly = get(s => s.readOnly);
-  const value = get(s => s.value);
+  const focused = get('focused');
+  const inputValue = get('inputValue');
+  const options = get('options');
+  const preventDisabledColor = get('preventDisabledColor');
+  const readOnly = get('readOnly');
 
-  const { handleChange, handleFocus, handleBlur } = useDefaultHandlers();
+  const { handleChange, handleFocus, handleBlur } = useInputHandlers<RadioInputProps<O>>();
 
   return (
     <StyledRoot>
       <StyledFormLabel />
       <StyledFormControl>
-        <RadioGroup value={value}>
+        <RadioGroup value={inputValue}>
           {options.map((option, index) => (
             <StyledFormButton
               key={`${index}-${option.label}`}
@@ -80,21 +79,19 @@ const WrappedRadioInput = <O extends readonly Option[]>() => {
       <HelperText />
     </StyledRoot>
   );
+});
+
+export const RadioInput = <O extends readonly Option[]>({
+  options = [] as unknown as O,
+  preventRender = false,
+  value = null,
+  ...props
+}: RadioInputProps<O>) => {
+  const parsedProps = useInputParsedProps({ ...props, options, preventRender, value });
+
+  return preventRender ? null : (
+    <PropProvider<RadioInputProps<O>> props={parsedProps}>
+      <WrappedRadioInput />
+    </PropProvider>
+  );
 };
-
-export const RadioInput: <O extends readonly Option[]>(props: RadioInputProps<O>) => React.ReactNode = React.memo(
-  <O extends readonly Option[]>({
-    options = [] as unknown as O,
-    preventRender = false,
-    value,
-    ...props
-  }: RadioInputProps<O>) => {
-    const newError = useDefaultError(props);
-
-    return preventRender ? null : (
-      <PropProvider<RadioInputProps<O>> data={{ ...props, errorMsg: newError(value), error: newError, options, value }}>
-        <WrappedRadioInput<O> />
-      </PropProvider>
-    );
-  }
-);

@@ -8,7 +8,7 @@ import {
   StyledRoot,
   StyledTextField
 } from 'components/visual/Inputs/lib/inputs.components';
-import { useDefaultError, useDefaultHandlers } from 'components/visual/Inputs/lib/inputs.hook';
+import { useInputHandlers, useInputParsedProps } from 'components/visual/Inputs/lib/inputs.hook';
 import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
 import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
 import type { ElementType } from 'react';
@@ -20,20 +20,20 @@ export type TextInputProps = InputValues<string> &
     options?: AutocompleteProps<string, boolean, boolean, boolean, ElementType>['options'];
   };
 
-const WrappedTextInput = () => {
+const WrappedTextInput = React.memo(() => {
   const [get] = usePropStore<TextInputProps>();
 
-  const autoComplete = get(s => s.autoComplete);
-  const disabled = get(s => s.disabled);
-  const id = get(s => s.id);
-  const inputValue = get(s => s.inputValue);
-  const loading = get(s => s.loading);
-  const options = get(s => s.options);
-  const readOnly = get(s => s.readOnly);
-  const tiny = get(s => s.tiny);
-  const value = get(s => s.value);
+  const autoComplete = get('autoComplete');
+  const disabled = get('disabled');
+  const id = get('id');
+  const inputValue = get('inputValue');
+  const loading = get('loading');
+  const options = get('options');
+  const readOnly = get('readOnly');
+  const tiny = get('tiny');
+  const value = get('value');
 
-  const { handleChange, handleFocus, handleBlur } = useDefaultHandlers();
+  const { handleChange, handleFocus, handleBlur } = useInputHandlers<TextInputProps>();
 
   return (
     <StyledRoot>
@@ -69,25 +69,14 @@ const WrappedTextInput = () => {
       </StyledFormControl>
     </StyledRoot>
   );
+});
+
+export const TextInput = ({ autoComplete = false, options = [], preventRender = false, ...props }: TextInputProps) => {
+  const parsedProps = useInputParsedProps({ ...props, autoComplete, options, preventRender });
+
+  return preventRender ? null : (
+    <PropProvider<TextInputProps> props={parsedProps}>
+      <WrappedTextInput />
+    </PropProvider>
+  );
 };
-
-export const TextInput: React.FC<TextInputProps> = React.memo(
-  ({ autoComplete = false, options = [], preventRender = false, value, ...props }) => {
-    const newError = useDefaultError(props);
-
-    return preventRender ? null : (
-      <PropProvider<TextInputProps>
-        data={{
-          ...props,
-          autoComplete,
-          error: newError,
-          errorMsg: newError(value),
-          options,
-          value
-        }}
-      >
-        <WrappedTextInput />
-      </PropProvider>
-    );
-  }
-);

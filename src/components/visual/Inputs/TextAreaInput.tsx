@@ -7,7 +7,7 @@ import {
   StyledRoot,
   StyledTextField
 } from 'components/visual/Inputs/lib/inputs.components';
-import { useDefaultError, useDefaultHandlers } from 'components/visual/Inputs/lib/inputs.hook';
+import { useInputHandlers, useInputParsedProps } from 'components/visual/Inputs/lib/inputs.hook';
 import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
 import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
 import React from 'react';
@@ -17,18 +17,18 @@ export type TextAreaInputProps = InputValues<string> &
     rows?: TextFieldProps['rows'];
   };
 
-const WrappedTextAreaInput = () => {
+const WrappedTextAreaInput = React.memo(() => {
   const [get] = usePropStore<TextAreaInputProps>();
 
-  const inputValue = get(s => s.inputValue);
-  const loading = get(s => s.loading);
-  const password = get(s => s.password);
-  const rows = get(s => s.rows);
-  const showPassword = get(s => s.showPassword);
-  const tiny = get(s => s.tiny);
-  const value = get(s => s.value);
+  const inputValue = get('inputValue');
+  const loading = get('loading');
+  const password = get('password');
+  const rows = get('rows');
+  const showPassword = get('showPassword');
+  const tiny = get('tiny');
+  const value = get('value');
 
-  const { handleChange, handleFocus, handleBlur } = useDefaultHandlers();
+  const { handleChange, handleFocus, handleBlur } = useInputHandlers<TextAreaInputProps>();
 
   return (
     <StyledRoot>
@@ -71,24 +71,14 @@ const WrappedTextAreaInput = () => {
       </StyledFormControl>
     </StyledRoot>
   );
+});
+
+export const TextAreaInput = ({ rows = 1, preventRender = false, ...props }: TextAreaInputProps) => {
+  const parsedProps = useInputParsedProps({ ...props, rows, preventRender });
+
+  return preventRender ? null : (
+    <PropProvider<TextAreaInputProps> props={parsedProps}>
+      <WrappedTextAreaInput />
+    </PropProvider>
+  );
 };
-
-export const TextAreaInput: React.FC<TextAreaInputProps> = React.memo(
-  ({ rows = 1, preventRender = false, value, ...props }) => {
-    const newError = useDefaultError(props);
-
-    return preventRender ? null : (
-      <PropProvider<TextAreaInputProps>
-        data={{
-          ...props,
-          error: newError,
-          errorMsg: newError(value),
-          rows,
-          value
-        }}
-      >
-        <WrappedTextAreaInput />
-      </PropProvider>
-    );
-  }
-);

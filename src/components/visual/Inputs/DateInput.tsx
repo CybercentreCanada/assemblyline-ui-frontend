@@ -13,9 +13,9 @@ import {
   StyledInputSkeleton,
   StyledRoot
 } from 'components/visual/Inputs/lib/inputs.components';
+import { useInputParsedProps } from 'components/visual/Inputs/lib/inputs.hook';
 import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
 import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
-import { isValidValue } from 'components/visual/Inputs/lib/inputs.utils';
 import type { Moment } from 'moment';
 import moment from 'moment';
 import React, { useCallback, useMemo } from 'react';
@@ -29,24 +29,30 @@ export type DateInputProps = Omit<TextFieldProps, 'error' | 'value' | 'onChange'
     minDateTomorrow?: boolean;
   };
 
-const WrappedDateInput = () => {
+const WrappedDateInput = React.memo(() => {
   const theme = useTheme();
   const { i18n } = useTranslation('inputs');
 
   const [get, setStore] = usePropStore<DateInputProps>();
 
-  const disabled = get(s => s.disabled);
-  const endAdornment = get(s => s.endAdornment);
-  const errorMsg = get(s => s.errorMsg);
-  const id = get(s => s.id);
-  const inputValue = get(s => s.inputValue);
-  const loading = get(s => s.loading);
-  const maxDateToday = get(s => s.maxDateToday);
-  const minDateTomorrow = get(s => s.minDateTomorrow);
-  const monospace = get(s => s.monospace);
-  const placeholder = get(s => s.placeholder);
-  const readOnly = get(s => s.readOnly);
-  const tiny = get(s => s.tiny);
+  const disabled = get('disabled');
+  const endAdornment = get('endAdornment');
+  const errorMsg = get('errorMsg');
+  const id = get('id');
+  const inputValue = get('inputValue');
+  const loading = get('loading');
+  const maxDateToday = get('maxDateToday');
+  const minDateTomorrow = get('minDateTomorrow');
+  const monospace = get('monospace');
+  const placeholder = get('placeholder');
+  const readOnly = get('readOnly');
+  const tiny = get('tiny');
+
+  const error = get('error');
+  const onBlur = get('onBlur');
+  const onChange = get('onChange');
+  const onError = get('onError');
+  const onFocus = get('onFocus');
 
   const today = useMemo<Moment>(() => {
     const d = new Date();
@@ -64,38 +70,35 @@ const WrappedDateInput = () => {
   const handleChange = useCallback(
     (event: React.SyntheticEvent, date: Moment) => {
       const newValue = date && date.isValid() ? `${date.format('YYYY-MM-DDThh:mm:ss.SSSSSS')}Z` : null;
-      setStore(s => {
-        const err = s.error(newValue);
-        s.onError(err);
-        if (!err) s.onChange(event, newValue);
-        return { ...s, inputValue: date, errorMsg: err };
-      });
+      const err = error(newValue);
+      onError(err);
+      if (!err) onChange(event, newValue);
+      setStore(() => ({ ...(!err && { value: newValue }), inputValue: date, errorMsg: err }));
     },
-    [setStore]
+    [error, onChange, onError, setStore]
   );
 
   const handleFocus = useCallback(
     (event: React.FocusEvent) => {
-      setStore(s => {
-        s.onFocus(event);
-        return {
-          ...s,
-          inputValue: moment(s.value),
-          focused: !s.readOnly && !s.disabled && document.activeElement === event.target
-        };
-      });
+      onFocus(event);
+      setStore(s => ({
+        // inputValue: s.value,
+        focused: !s.readOnly && !s.disabled && document.activeElement === event.target
+      }));
     },
-    [setStore]
+    [onFocus, setStore]
   );
 
   const handleBlur = useCallback(
     (event: React.FocusEvent) => {
+      onBlur(event);
       setStore(s => {
-        s.onBlur(event);
-        return { ...s, focused: false, inputValue: null };
+        const newInputValue = s.value ? moment(s.value) : null;
+        const err = error(s.value);
+        return { focused: false, inputValue: newInputValue, errorMsg: err };
       });
     },
-    [setStore]
+    [error, onBlur, setStore]
   );
 
   return (
@@ -146,7 +149,7 @@ const WrappedDateInput = () => {
                       endAdornment: (
                         <StyledEndAdornment>
                           <PasswordInput />
-                          <ResetInput onChange={handleChange} />
+                          <ResetInput />
                           <ExpandInput />
                           {endAdornment}
                         </StyledEndAdornment>
@@ -162,45 +165,28 @@ const WrappedDateInput = () => {
       </StyledRoot>
     </LocalizationProvider>
   );
+});
+
+export const DateInput = ({
+  defaultDateOffset = null,
+  maxDateToday = false,
+  minDateTomorrow = false,
+  value,
+  preventRender = false,
+  ...props
+}: DateInputProps) => {
+  const parsedProps = useInputParsedProps({
+    ...props,
+    defaultDateOffset,
+    maxDateToday,
+    minDateTomorrow,
+    preventRender,
+    value
+  });
+
+  return preventRender ? null : (
+    <PropProvider<DateInputProps> props={{ ...parsedProps, inputValue: value ? moment(value) : null }}>
+      <WrappedDateInput />
+    </PropProvider>
+  );
 };
-
-export const DateInput: React.FC<DateInputProps> = React.memo(
-  ({
-    defaultDateOffset = null,
-    maxDateToday = false,
-    minDateTomorrow = false,
-    error = () => '',
-    value,
-    preventRender = false,
-    ...props
-  }) => {
-    const { t } = useTranslation('inputs');
-
-    const newError = useCallback(
-      (val: string): string => {
-        const err = error(val);
-        if (err) return err;
-        if (props.required && !isValidValue(val)) return t('error.required');
-        return '';
-      },
-      [error, props.required, t]
-    );
-
-    return preventRender ? null : (
-      <PropProvider<DateInputProps>
-        data={{
-          ...props,
-          defaultDateOffset,
-          maxDateToday,
-          minDateTomorrow,
-          error: newError,
-          errorMsg: newError(value),
-          value,
-          inputValue: value ? moment(value) : null
-        }}
-      >
-        <WrappedDateInput />
-      </PropProvider>
-    );
-  }
-);

@@ -1,12 +1,13 @@
-import { FormControl, Slider } from '@mui/material';
+import { Slider } from '@mui/material';
 import {
   HelperText,
   ResetInput,
+  StyledFormControl,
   StyledFormLabel,
   StyledInputSkeleton,
   StyledRoot
 } from 'components/visual/Inputs/lib/inputs.components';
-import { useDefaultHandlers } from 'components/visual/Inputs/lib/inputs.hook';
+import { useInputHandlers, useInputParsedProps } from 'components/visual/Inputs/lib/inputs.hook';
 import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
 import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
 import { isValidNumber, isValidValue } from 'components/visual/Inputs/lib/inputs.utils';
@@ -19,25 +20,24 @@ export type SliderInputProps = InputValues<number> &
     max?: number;
   };
 
-const WrappedSliderInput = () => {
+const WrappedSliderInput = React.memo(() => {
   const [get] = usePropStore<SliderInputProps>();
 
-  const disabled = get(s => s.disabled);
-  const errorMsg = get(s => s.errorMsg);
-  const id = get(s => s.id);
-  const inputValue = get(s => s.inputValue);
-  const loading = get(s => s.loading);
-  const max = get(s => s.max);
-  const min = get(s => s.min);
-  const readOnly = get(s => s.readOnly);
-  const value = get(s => s.value);
+  const disabled = get('disabled');
+  const errorMsg = get('errorMsg');
+  const id = get('id');
+  const inputValue = get('inputValue');
+  const loading = get('loading');
+  const max = get('max');
+  const min = get('min');
+  const readOnly = get('readOnly');
 
-  const { handleChange, handleFocus, handleBlur } = useDefaultHandlers();
+  const { handleChange, handleFocus, handleBlur } = useInputHandlers<SliderInputProps>();
 
   return (
     <StyledRoot>
       <StyledFormLabel />
-      <FormControl fullWidth error={!!errorMsg}>
+      <StyledFormControl>
         {loading ? (
           <StyledInputSkeleton />
         ) : (
@@ -45,10 +45,11 @@ const WrappedSliderInput = () => {
             <div style={{ minHeight: '40px', display: 'flex', alignItems: 'center' }}>
               <div style={{ flex: 1, marginLeft: '20px', marginRight: '20px' }}>
                 <Slider
+                  aria-label={id}
                   id={id}
-                  value={inputValue ?? value ?? 0}
-                  min={min}
-                  max={max}
+                  value={inputValue}
+                  {...(min && { min: min })}
+                  {...(max && { max: max })}
                   disabled={disabled || readOnly}
                   size="small"
                   valueLabelDisplay="auto"
@@ -58,49 +59,47 @@ const WrappedSliderInput = () => {
                   onChange={(e, v) => handleChange(e as unknown as React.SyntheticEvent, v, v)}
                 />
               </div>
-              <ResetInput onChange={(e, v) => handleChange(e, v, v)} />
+              <ResetInput />
             </div>
             <HelperText />
           </>
         )}
-      </FormControl>
+      </StyledFormControl>
     </StyledRoot>
   );
+});
+
+export const SliderInput = ({
+  error = () => '',
+  min = null,
+  max = null,
+  preventRender = false,
+  required = false,
+  value,
+  ...props
+}: SliderInputProps) => {
+  const { t } = useTranslation('inputs');
+
+  const parsedProps = useInputParsedProps({ ...props, error, max, min, preventRender, required, value });
+
+  const newError = useCallback(
+    (val: number): string => {
+      const err = error(val);
+      if (err) return err;
+      if (required && !isValidValue(val)) return t('error.required');
+      if (!isValidNumber(val, { min, max })) {
+        if (typeof min === 'number' && typeof max === 'number') return t('error.minmax', { min, max });
+        if (typeof min === 'number') return t('error.min', { min });
+        if (typeof max === 'number') return t('error.max', { max });
+      }
+      return '';
+    },
+    [error, required, min, max, t]
+  );
+
+  return preventRender ? null : (
+    <PropProvider<SliderInputProps> props={{ ...parsedProps, error: newError, errorMsg: newError(value) }}>
+      <WrappedSliderInput />
+    </PropProvider>
+  );
 };
-
-export const SliderInput: React.FC<SliderInputProps> = React.memo(
-  ({ error = () => '', min, max, preventRender = false, required = false, value, ...props }) => {
-    const { t } = useTranslation('inputs');
-
-    const newError = useCallback(
-      (val: number): string => {
-        const err = error(val);
-        if (err) return err;
-        if (required && !isValidValue(val)) return t('error.required');
-        if (!isValidNumber(val, { min, max })) {
-          if (typeof min === 'number' && typeof max === 'number') return t('error.minmax', { min, max });
-          if (typeof min === 'number') return t('error.min', { min });
-          if (typeof max === 'number') return t('error.max', { max });
-        }
-        return '';
-      },
-      [error, required, min, max, t]
-    );
-
-    return preventRender ? null : (
-      <PropProvider<SliderInputProps>
-        data={{
-          ...props,
-          error: newError,
-          errorMsg: newError(value),
-          max,
-          min,
-          required,
-          value
-        }}
-      >
-        <WrappedSliderInput />
-      </PropProvider>
-    );
-  }
-);

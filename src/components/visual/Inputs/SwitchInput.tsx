@@ -10,7 +10,7 @@ import {
   StyledFormControl,
   StyledFormControlLabel
 } from 'components/visual/Inputs/lib/inputs.components';
-import { useDefaultError, useDefaultHandlers } from 'components/visual/Inputs/lib/inputs.hook';
+import { useInputHandlers, useInputParsedProps } from 'components/visual/Inputs/lib/inputs.hook';
 import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
 import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
 import { Tooltip } from 'components/visual/Tooltip';
@@ -18,18 +18,18 @@ import React from 'react';
 
 export type SwitchInputProps = InputValues<boolean> & InputProps;
 
-const WrappedSwitchInput = () => {
+const WrappedSwitchInput = React.memo(() => {
   const [get] = usePropStore<SwitchInputProps>();
 
-  const inputValue = get(s => s.inputValue);
-  const loading = get(s => s.loading);
-  const preventDisabledColor = get(s => s.preventDisabledColor);
-  const readOnly = get(s => s.readOnly);
-  const tooltip = get(s => s.tooltip);
-  const tooltipProps = get(s => s.tooltipProps);
-  const value = get(s => s.value);
+  const inputValue = get('inputValue');
+  const loading = get('loading');
+  const preventDisabledColor = get('preventDisabledColor');
+  const readOnly = get('readOnly');
+  const tooltip = get('tooltip');
+  const tooltipProps = get('tooltipProps');
+  const value = get('value');
 
-  const { handleClick, handleFocus, handleBlur } = useDefaultHandlers();
+  const { handleClick, handleFocus, handleBlur } = useInputHandlers<SwitchInputProps>();
 
   return (
     <Tooltip title={loading ? null : tooltip} {...tooltipProps}>
@@ -66,14 +66,14 @@ const WrappedSwitchInput = () => {
       </StyledFormControl>
     </Tooltip>
   );
-};
+});
 
-export const SwitchInput: React.FC<SwitchInputProps> = React.memo(({ value, preventRender = false, ...props }) => {
-  const newError = useDefaultError(props);
+export const SwitchInput = ({ preventRender = false, ...props }: SwitchInputProps) => {
+  const parsedProps = useInputParsedProps({ ...props, preventRender });
 
   return preventRender ? null : (
-    <PropProvider<SwitchInputProps> data={{ ...props, error: newError, errorMsg: newError(value), value }}>
+    <PropProvider<SwitchInputProps> props={parsedProps}>
       <WrappedSwitchInput />
     </PropProvider>
   );
-});
+};

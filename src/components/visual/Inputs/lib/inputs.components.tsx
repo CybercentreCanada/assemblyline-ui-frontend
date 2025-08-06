@@ -33,7 +33,7 @@ import {
 } from '@mui/material';
 import type { CustomChipProps } from 'components/visual/CustomChip';
 import { CustomChip } from 'components/visual/CustomChip';
-import { useDefaultHandlers } from 'components/visual/Inputs/lib/inputs.hook';
+import { useInputHandlers } from 'components/visual/Inputs/lib/inputs.hook';
 import type { InputValues } from 'components/visual/Inputs/lib/inputs.model';
 import { usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
 import { Tooltip } from 'components/visual/Tooltip';
@@ -43,7 +43,7 @@ import { useTranslation } from 'react-i18next';
 export const StyledRoot = React.memo(({ children }: { children: React.ReactNode }) => {
   const [get] = usePropStore();
 
-  const rootProps = get(s => s.rootProps);
+  const rootProps = get('rootProps');
 
   return (
     <div {...rootProps} style={{ textAlign: 'left', ...rootProps?.style }}>
@@ -57,9 +57,9 @@ export const StyledEndAdornmentBox = React.memo(({ children }: Pick<InputAdornme
 
   const [get] = usePropStore();
 
-  const preventExpandRender = get(s => s.preventExpandRender);
-  const preventPasswordRender = get(s => s.preventPasswordRender);
-  const preventResetRender = get(s => s.preventResetRender);
+  const preventExpandRender = get('preventExpandRender');
+  const preventPasswordRender = get('preventPasswordRender');
+  const preventResetRender = get('preventResetRender');
 
   return preventResetRender && preventPasswordRender && preventExpandRender ? null : (
     <InputAdornment
@@ -82,25 +82,24 @@ export const StyledEndAdornmentBox = React.memo(({ children }: Pick<InputAdornme
 export const StyledEndAdornment = React.memo(({ children }: Pick<InputAdornmentProps, 'children'>) => {
   const [get] = usePropStore();
 
-  const preventExpandRender = get(s => s.preventExpandRender);
-  const preventPasswordRender = get(s => s.preventPasswordRender);
-  const preventResetRender = get(s => s.preventResetRender);
+  const preventExpandRender = get('preventExpandRender');
+  const preventPasswordRender = get('preventPasswordRender');
+  const preventResetRender = get('preventResetRender');
 
   return preventResetRender && preventPasswordRender && preventExpandRender ? null : (
     <InputAdornment position="end">{children}</InputAdornment>
   );
 });
-
 export const ExpandInput = React.memo(() => {
   const theme = useTheme();
 
   const [get] = usePropStore();
 
-  const expand = get(s => s.expand);
-  const expandProps = get(s => s.expandProps);
-  const id = get(s => s.id);
-  const preventExpandRender = get(s => s.preventExpandRender);
-  const onExpand = get(s => s.onExpand);
+  const expand = get('expand');
+  const expandProps = get('expandProps');
+  const id = get('id');
+  const preventExpandRender = get('preventExpandRender');
+  const onExpand = get('onExpand');
 
   return preventExpandRender ? null : (
     <ListItemIcon sx={{ minWidth: 0 }}>
@@ -134,17 +133,17 @@ export const PasswordInput = React.memo(() => {
 
   const [get, setStore] = usePropStore();
 
-  const id = get(s => s.id);
-  const preventPasswordRender = get(s => s.preventPasswordRender);
-  const resetProps = get(s => s.resetProps);
-  const showPassword = get(s => s.showPassword);
-  const tiny = get(s => s.tiny);
+  const id = get('id');
+  const preventPasswordRender = get('preventPasswordRender');
+  const resetProps = get('resetProps');
+  const showPassword = get('showPassword');
+  const tiny = get('tiny');
 
   return preventPasswordRender ? null : (
     <IconButton
       aria-label={`${id}-password`}
       color="secondary"
-      onClick={() => setStore(s => ({ ...s, showPassword: !s.showPassword }))}
+      onClick={() => setStore(s => ({ showPassword: !s.showPassword }))}
       {...resetProps}
       sx={{
         padding: tiny ? theme.spacing(0.25) : theme.spacing(0.5),
@@ -162,14 +161,14 @@ export const ResetInput = React.memo(<T, P extends InputValues<T>>() => {
 
   const [get] = usePropStore<P>();
 
-  const defaultValue = get(s => s.defaultValue);
-  const id = get(s => s.id);
-  const preventResetRender = get(s => s.preventResetRender);
-  const resetProps = get(s => s.resetProps);
-  const tiny = get(s => s.tiny);
-  const onReset = get(s => s.onReset);
+  const defaultValue = get('defaultValue');
+  const id = get('id');
+  const preventResetRender = get('preventResetRender');
+  const resetProps = get('resetProps');
+  const tiny = get('tiny');
+  const onReset = get('onReset');
 
-  const { handleChange } = useDefaultHandlers();
+  const { handleChange } = useInputHandlers();
 
   const title = useMemo<React.ReactNode>(
     () =>
@@ -212,14 +211,14 @@ export const HelperText = React.memo(() => {
 
   const [get] = usePropStore();
 
-  const disabled = get(s => s.disabled);
-  const errorMsg = get(s => s.errorMsg);
-  const errorProps = get(s => s.errorProps);
-  const helperText = get(s => s.helperText);
-  const helperTextProps = get(s => s.helperTextProps);
-  const id = get(s => s.id);
-  const loading = get(s => s.loading);
-  const readOnly = get(s => s.readOnly);
+  const disabled = get('disabled');
+  const errorMsg = get('errorMsg');
+  const errorProps = get('errorProps');
+  const helperText = get('helperText');
+  const helperTextProps = get('helperTextProps');
+  const id = get('id');
+  const loading = get('loading');
+  const readOnly = get('readOnly');
 
   return disabled || loading || readOnly ? null : errorMsg ? (
     <FormHelperText
@@ -271,7 +270,7 @@ export const StyledCircularSkeleton = () => (
 export const StyledInputSkeleton = React.memo(() => {
   const [get] = usePropStore();
 
-  const tiny = get(s => s.tiny);
+  const tiny = get('tiny');
 
   return <Skeleton sx={{ height: '40px', transform: 'unset', ...(tiny && { height: '28px' }) }} />;
 });
@@ -281,9 +280,9 @@ export const StyledFormControl = React.memo(({ children, ...props }: FormControl
 
   const [get] = usePropStore();
 
-  const disabled = get(s => s.disabled);
-  const divider = get(s => s.divider);
-  const readOnly = get(s => s.readOnly);
+  const disabled = get('disabled');
+  const divider = get('divider');
+  const readOnly = get('readOnly');
 
   return (
     <FormControl
@@ -320,19 +319,19 @@ export const StyledButtonLabel = React.memo(
 
     const [get] = usePropStore<P>();
 
-    const disabled = get(s => s.disabled);
-    const endAdornment = get(s => s.endAdornment);
-    const errorMsg = get(s => s.errorMsg);
-    const focused = focusedProp ?? get(s => s.focused);
-    const label = labelProp ?? get(s => s.label);
-    const labelProps = get(s => s.labelProps);
-    const loading = get(s => s.loading);
-    const monospace = get(s => s.monospace);
-    const password = get(s => s.password);
-    const preventDisabledColor = get(s => s.preventDisabledColor);
-    const required = get(s => s.required);
-    const showOverflow = get(s => s.showOverflow);
-    const showPassword = get(s => s.showPassword);
+    const disabled = get('disabled');
+    const endAdornment = get('endAdornment');
+    const errorMsg = get('errorMsg');
+    const focused = focusedProp ?? get('focused');
+    const label = labelProp ?? get('label');
+    const labelProps = get('labelProps');
+    const loading = get('loading');
+    const monospace = get('monospace');
+    const password = get('password');
+    const preventDisabledColor = get('preventDisabledColor');
+    const required = get('required');
+    const showOverflow = get('showOverflow');
+    const showPassword = get('showPassword');
 
     return (
       <div
@@ -390,14 +389,14 @@ export const StyledFormControlLabel = React.memo(
   <T, P extends InputValues<T>>({ children, label, ...props }: StyledFormControlLabel) => {
     const [get] = usePropStore<P>();
 
-    const disabled = get(s => s.disabled);
-    const loading = get(s => s.loading);
-    const preventExpandRender = get(s => s.preventExpandRender);
-    const preventPasswordRender = get(s => s.preventPasswordRender);
-    const preventResetRender = get(s => s.preventResetRender);
-    const readOnly = get(s => s.readOnly);
-    const showOverflow = get(s => s.showOverflow);
-    const tiny = get(s => s.tiny);
+    const disabled = get('disabled');
+    const loading = get('loading');
+    const preventExpandRender = get('preventExpandRender');
+    const preventPasswordRender = get('preventPasswordRender');
+    const preventResetRender = get('preventResetRender');
+    const readOnly = get('readOnly');
+    const showOverflow = get('showOverflow');
+    const tiny = get('tiny');
 
     return (
       <FormControlLabel
@@ -421,11 +420,11 @@ export const StyledFormControlLabel = React.memo(
 export const StyledFormButton = React.memo(({ children, ...props }: ButtonProps) => {
   const [get] = usePropStore();
 
-  const disabled = get(s => s.disabled);
-  const loading = get(s => s.loading);
-  const preventDisabledColor = get(s => s.preventDisabledColor);
-  const readOnly = get(s => s.readOnly);
-  const tiny = get(s => s.tiny);
+  const disabled = get('disabled');
+  const loading = get('loading');
+  const preventDisabledColor = get('preventDisabledColor');
+  const readOnly = get('readOnly');
+  const tiny = get('tiny');
 
   return (
     <Button
@@ -453,16 +452,16 @@ export const StyledFormLabel = React.memo(() => {
 
   const [get] = usePropStore();
 
-  const disabled = get(s => s.disabled);
-  const errorMsg = get(s => s.errorMsg);
-  const focused = get(s => s.focused);
-  const id = get(s => s.id);
-  const label = get(s => s.label);
-  const labelProps = get(s => s.labelProps);
-  const preventDisabledColor = get(s => s.preventDisabledColor);
-  const required = get(s => s.required);
-  const tooltip = get(s => s.tooltip);
-  const tooltipProps = get(s => s.tooltipProps);
+  const disabled = get('disabled');
+  const errorMsg = get('errorMsg');
+  const focused = get('focused');
+  const id = get('id');
+  const label = get('label');
+  const labelProps = get('labelProps');
+  const preventDisabledColor = get('preventDisabledColor');
+  const required = get('required');
+  const tooltip = get('tooltip');
+  const tooltipProps = get('tooltipProps');
 
   return (
     <Tooltip title={tooltip} {...tooltipProps}>
@@ -499,17 +498,17 @@ export const StyledTextField = ({ params, ...props }: StyledTextField) => {
 
   const [get] = usePropStore();
 
-  const disabled = get(s => s.disabled);
-  const endAdornment = get(s => s.endAdornment);
-  const errorMsg = get(s => s.errorMsg);
-  const id = get(s => s.id);
-  const monospace = get(s => s.monospace);
-  const password = get(s => s.password);
-  const placeholder = get(s => s.placeholder);
-  const readOnly = get(s => s.readOnly);
-  const showPassword = get(s => s.showPassword);
-  const startAdornment = get(s => s.startAdornment);
-  const tiny = get(s => s.tiny);
+  const disabled = get('disabled');
+  const endAdornment = get('endAdornment');
+  const errorMsg = get('errorMsg');
+  const id = get('id');
+  const monospace = get('monospace');
+  const password = get('password');
+  const placeholder = get('placeholder');
+  const readOnly = get('readOnly');
+  const showPassword = get('showPassword');
+  const startAdornment = get('startAdornment');
+  const tiny = get('tiny');
 
   return (
     <TextField
@@ -604,11 +603,11 @@ export const StyledAutocomplete = <
 }: StyledAutocompleteProps<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>) => {
   const [get] = usePropStore<StyledAutocompleteProps<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>>();
 
-  const autoComplete = get(s => s.autoComplete);
-  const disabled = get(s => s.disabled);
-  const id = get(s => s.id);
-  const options = get(s => s?.options ?? []);
-  const readOnly = get(s => s.readOnly);
+  const autoComplete = get('autoComplete');
+  const disabled = get('disabled');
+  const id = get('id');
+  const options = get('options');
+  const readOnly = get('readOnly');
 
   return (
     <Autocomplete
@@ -629,11 +628,11 @@ export const StyledAutocomplete = <
 export const StyledCustomChip = React.memo(({ label, onDelete = () => null, sx, ...props }: CustomChipProps) => {
   const [get] = usePropStore();
 
-  const disabled = get(s => s.disabled);
-  const monospace = get(s => s.monospace);
-  const password = get(s => s.password);
-  const readOnly = get(s => s.disabled);
-  const showPassword = get(s => s.showPassword);
+  const disabled = get('disabled');
+  const monospace = get('monospace');
+  const password = get('password');
+  const readOnly = get('disabled');
+  const showPassword = get('showPassword');
 
   return (
     <CustomChip

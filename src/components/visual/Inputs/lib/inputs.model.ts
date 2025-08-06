@@ -88,4 +88,12 @@ export type InputStates = {
   preventPasswordRender?: boolean;
   preventResetRender?: boolean;
   showPassword?: boolean;
+  inputValue?: unknown;
+};
+
+export const DEFAULT_INPUT_STATES: InputStates = {
+  errorMsg: null,
+  focused: false,
+  showPassword: true
+  // inputValue: null
 };

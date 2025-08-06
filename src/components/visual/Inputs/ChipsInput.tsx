@@ -9,7 +9,7 @@ import {
   StyledRoot,
   StyledTextField
 } from 'components/visual/Inputs/lib/inputs.components';
-import { useDefaultError, useDefaultHandlers } from 'components/visual/Inputs/lib/inputs.hook';
+import { useInputHandlers, useInputParsedProps } from 'components/visual/Inputs/lib/inputs.hook';
 import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
 import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
 import type { ElementType } from 'react';
@@ -22,32 +22,34 @@ export type ChipsInputProps = InputValues<string[]> &
     options?: string[];
   };
 
-const WrappedChipsInput = () => {
+const WrappedChipsInput = React.memo(() => {
   const theme = useTheme();
   const [get] = usePropStore<ChipsInputProps>();
 
-  const autoComplete = get(s => s.autoComplete);
-  const disabled = get(s => s.disabled);
-  const endAdornment = get(s => s.endAdornment);
-  const error = get(s => s.errorMsg);
-  const focused = get(s => s.focused);
-  const id = get(s => s.id);
-  const inputValue = get(s => s.inputValue);
-  const isOptionEqualToValue = get(s => s.isOptionEqualToValue);
-  const loading = get(s => s.loading);
-  const monospace = get(s => s.monospace);
-  const options = get(s => s.options);
-  const password = get(s => s.password);
-  const placeholder = get(s => s.placeholder);
-  const preventPasswordRender = get(s => s.preventPasswordRender);
-  const preventResetRender = get(s => s.preventResetRender);
-  const readOnly = get(s => s.readOnly);
-  const showPassword = get(s => s.showPassword);
-  const startAdornment = get(s => s.startAdornment);
-  const tiny = get(s => s.tiny);
-  const value = get(s => s.value);
+  const autoComplete = get('autoComplete');
+  const disabled = get('disabled');
+  const endAdornment = get('endAdornment');
+  const error = get('errorMsg');
+  const focused = get('focused');
+  const id = get('id');
+  const inputValue = get('inputValue');
+  const isOptionEqualToValue = get('isOptionEqualToValue');
+  const loading = get('loading');
+  const monospace = get('monospace');
+  const options = get('options');
+  const password = get('password');
+  const placeholder = get('placeholder');
+  const preventPasswordRender = get('preventPasswordRender');
+  const preventResetRender = get('preventResetRender');
+  const readOnly = get('readOnly');
+  const showPassword = get('showPassword');
+  const startAdornment = get('startAdornment');
+  const tiny = get('tiny');
+  const value = get('value');
 
-  const { handleBlur, handleChange, handleFocus } = useDefaultHandlers();
+  // const { handleBlur, handleChange, handleFocus } = useDefaultHandlers();
+
+  const { handleChange, handleFocus, handleBlur } = useInputHandlers<ChipsInputProps>();
 
   // const handleChange = useCallback(
   //   (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, newValue: string[]) => {
@@ -162,33 +164,26 @@ const WrappedChipsInput = () => {
       </StyledFormControl>
     </StyledRoot>
   );
+});
+
+export const ChipsInput = ({
+  autoComplete = false,
+  isOptionEqualToValue = (option, value) => option === value,
+  options = [],
+  preventRender = false,
+  ...props
+}: ChipsInputProps) => {
+  const parsedProps = useInputParsedProps({
+    ...props,
+    autoComplete,
+    options,
+    preventRender,
+    isOptionEqualToValue
+  });
+
+  return preventRender ? null : (
+    <PropProvider<ChipsInputProps> props={parsedProps}>
+      <WrappedChipsInput />
+    </PropProvider>
+  );
 };
-
-export const ChipsInput: React.FC<ChipsInputProps> = React.memo(
-  ({
-    autoComplete = false,
-    isOptionEqualToValue = (option, value) => option === value,
-    options = [],
-    preventRender = false,
-    value = [],
-    ...props
-  }) => {
-    const newError = useDefaultError(props);
-
-    return preventRender ? null : (
-      <PropProvider<ChipsInputProps>
-        data={{
-          ...props,
-          autoComplete,
-          error: newError,
-          errorMsg: newError(value),
-          isOptionEqualToValue,
-          options,
-          value
-        }}
-      >
-        <WrappedChipsInput />
-      </PropProvider>
-    );
-  }
-);

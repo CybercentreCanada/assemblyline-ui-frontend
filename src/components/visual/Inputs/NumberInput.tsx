@@ -6,6 +6,7 @@ import {
   StyledRoot,
   StyledTextField
 } from 'components/visual/Inputs/lib/inputs.components';
+import { useInputParsedProps } from 'components/visual/Inputs/lib/inputs.hook';
 import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
 import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
 import { isValidNumber, isValidValue } from 'components/visual/Inputs/lib/inputs.utils';
@@ -18,51 +19,52 @@ export type NumberInputProps = InputValues<number, string> &
     min?: number;
   };
 
-const WrappedNumberInput = () => {
+const WrappedNumberInput = React.memo(() => {
   const [get, setStore] = usePropStore<NumberInputProps>();
 
-  const inputValue = get(s => s.inputValue);
-  const loading = get(s => s.loading);
-  const password = get(s => s.password);
-  const tiny = get(s => s.tiny);
-  const value = get(s => s.value);
+  const inputValue = get('inputValue');
+  const loading = get('loading');
+  const password = get('password');
+  const tiny = get('tiny');
+
+  const error = get('error');
+  const onBlur = get('onBlur');
+  const onChange = get('onChange');
+  const onError = get('onError');
+  const onFocus = get('onFocus');
 
   const handleChange = useCallback(
     (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      setStore(s => {
-        const newValue = event.target.value;
-        const num = newValue !== '' ? Number(newValue) : null;
-        const err = s.error(num);
-        s.onError(err);
-        if (!err) s.onChange(event, num);
-        return { ...s, inputValue: newValue, errorMsg: err };
-      });
+      const newValue = event.target.value;
+      const num = newValue !== '' ? Number(newValue) : null;
+      const err = error(num);
+      onError(err);
+      if (!err) onChange(event, num);
+      setStore(() => ({ ...(!err && { value: num }), inputValue: newValue, errorMsg: err }));
     },
-    [setStore]
+    [error, onChange, onError, setStore]
   );
 
   const handleFocus = useCallback(
     (event: React.FocusEvent) => {
-      setStore(s => {
-        s.onFocus(event);
-        return {
-          ...s,
-          inputValue: s.value !== null && s.value !== undefined ? String(s.value) : '',
-          focused: !s.readOnly && !s.disabled && document.activeElement === event.target
-        };
-      });
+      onFocus(event);
+      setStore(s => ({
+        focused: !s.readOnly && !s.disabled && document.activeElement === event.target
+      }));
     },
-    [setStore]
+    [onFocus, setStore]
   );
 
   const handleBlur = useCallback(
     (event: React.FocusEvent) => {
+      onBlur(event);
       setStore(s => {
-        s.onBlur(event);
-        return { ...s, focused: false, inputValue: null };
+        const newInputValue = s.value !== null ? String(s.value) : '';
+        const err = error(s.value);
+        return { focused: false, inputValue: newInputValue, errorMsg: err };
       });
     },
-    [setStore]
+    [error, onBlur, setStore]
   );
 
   return (
@@ -75,7 +77,7 @@ const WrappedNumberInput = () => {
           <>
             <StyledTextField
               type={password ? 'password' : 'number'}
-              value={inputValue ?? (value !== null ? String(value) : '')}
+              value={inputValue}
               onChange={handleChange}
               onFocus={handleFocus}
               onBlur={handleBlur}
@@ -95,31 +97,45 @@ const WrappedNumberInput = () => {
       </StyledFormControl>
     </StyledRoot>
   );
+});
+
+export const NumberInput = ({
+  error = () => '',
+  max = null,
+  min = null,
+  preventRender = false,
+  value,
+  ...props
+}: NumberInputProps) => {
+  const { t } = useTranslation('inputs');
+
+  const parsedProps = useInputParsedProps({ ...props, error, max, min, preventRender, value });
+
+  const newError = useCallback(
+    (val: number): string => {
+      const err = error(val);
+      if (err) return err;
+      if (props.required && !isValidValue(val)) return t('error.required');
+      if (!isValidNumber(val, { min, max })) {
+        if (typeof min === 'number' && typeof max === 'number') return t('error.minmax', { min, max });
+        if (typeof min === 'number') return t('error.min', { min });
+        if (typeof max === 'number') return t('error.max', { max });
+      }
+      return '';
+    },
+    [error, props.required, t, min, max]
+  );
+
+  return preventRender ? null : (
+    <PropProvider<NumberInputProps>
+      props={{
+        ...parsedProps,
+        error: newError,
+        errorMsg: newError(value),
+        inputValue: value !== null ? String(value) : ''
+      }}
+    >
+      <WrappedNumberInput />
+    </PropProvider>
+  );
 };
-
-export const NumberInput: React.FC<NumberInputProps> = React.memo(
-  ({ error = () => '', max = null, min = null, preventRender = false, value, ...props }) => {
-    const { t } = useTranslation('inputs');
-
-    const newError = useCallback(
-      (val: number): string => {
-        const err = error(val);
-        if (err) return err;
-        if (props.required && !isValidValue(val)) return t('error.required');
-        if (!isValidNumber(val, { min, max })) {
-          if (typeof min === 'number' && typeof max === 'number') return t('error.minmax', { min, max });
-          if (typeof min === 'number') return t('error.min', { min });
-          if (typeof max === 'number') return t('error.max', { max });
-        }
-        return '';
-      },
-      [error, props.required, t, min, max]
-    );
-
-    return preventRender ? null : (
-      <PropProvider<NumberInputProps> data={{ ...props, error: newError, errorMsg: newError(value), max, min, value }}>
-        <WrappedNumberInput />
-      </PropProvider>
-    );
-  }
-);
