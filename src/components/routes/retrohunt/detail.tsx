@@ -264,10 +264,9 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
 
   const handleHitRowClick = useCallback(
     (file: FileIndexed) => {
-      if (isDrawer) navigate(`/file/detail/${file.sha256}${location.hash}`);
-      else navigate(`${location.pathname}${location.search}#${file.sha256}`);
+      navigate({ pathname: `/retrohunt/${searchKey}`, hash: file.sha256 });
     },
-    [isDrawer, location.hash, location.pathname, location.search, navigate]
+    [navigate, searchKey]
   );
 
   const handleRepeat = useCallback(
