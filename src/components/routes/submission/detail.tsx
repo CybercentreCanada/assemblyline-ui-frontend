@@ -1205,6 +1205,7 @@ function WrappedSubmissionDetail() {
                     preventRender:
                       submission.state !== 'completed' ||
                       !(systemConfig.datastore.archive.enabled && currentUser.roles.includes('archive_trigger')),
+                    disabled: submission.archived || submission.from_archive,
                     tooltip: t(submission.archived || submission.from_archive ? 'archived' : 'archive')
                   })}
             >
