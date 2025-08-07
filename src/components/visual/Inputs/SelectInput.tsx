@@ -48,6 +48,7 @@ const WrappedSelectInput = React.memo(<O extends readonly Option[]>() => {
   const readOnly = get('readOnly');
   const showPassword = get('showPassword');
   const tiny = get('tiny');
+  const value = get('value');
 
   const { handleChange, handleFocus, handleBlur } = useInputHandlers<SelectInputProps<O>>();
 
@@ -74,7 +75,7 @@ const WrappedSelectInput = React.memo(<O extends readonly Option[]>() => {
               )
             }
             onFocus={handleFocus}
-            onBlur={handleBlur}
+            onBlur={e => handleBlur(e, value)}
             renderValue={option => (
               <ListItemText
                 primary={options?.find(o => o.value === option)?.primary || ''}

@@ -14,8 +14,7 @@ import { useInputHandlers, useInputParsedProps } from 'components/visual/Inputs/
 import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
 import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
 import type { ElementType } from 'react';
-import React, { useCallback } from 'react';
-import { useTranslation } from 'react-i18next';
+import React from 'react';
 
 export type ChipsInputProps = InputValues<string[]> &
   InputProps & {
@@ -35,6 +34,7 @@ const WrappedChipsInput = React.memo(() => {
   const loading = get('loading');
   const options = get('options');
   const readOnly = get('readOnly');
+  const value = get('value');
 
   const { handleChange, handleFocus, handleBlur } = useInputHandlers<ChipsInputProps>();
 
@@ -58,7 +58,7 @@ const WrappedChipsInput = React.memo(() => {
             isOptionEqualToValue={isOptionEqualToValue}
             onChange={(e, v) => handleChange(e, v, v)}
             onFocus={handleFocus}
-            onBlur={handleBlur}
+            onBlur={e => handleBlur(e, value)}
             renderValue={(values, getTagProps) =>
               values.map((option, index) => {
                 const { key, ...tagProps } = getTagProps({ index });
@@ -76,16 +76,13 @@ const WrappedChipsInput = React.memo(() => {
 
 export const ChipsInput = ({
   autoComplete = false,
-  error = () => '',
+  endAdornment = null,
   isOptionEqualToValue = (option, value) => option === value,
   options = [],
   preventRender = false,
   value = [],
-  endAdornment = null,
   ...props
 }: ChipsInputProps) => {
-  const { t } = useTranslation('inputs');
-
   const parsedProps = useInputParsedProps({
     ...props,
     autoComplete,
@@ -96,22 +93,10 @@ export const ChipsInput = ({
     value
   });
 
-  const newError = useCallback(
-    (val: string[]): string => {
-      const err = error(val);
-      if (err) return err;
-      else if (parsedProps.required && !val?.length) return t('error.required');
-      else return '';
-    },
-    [error, parsedProps.required, t]
-  );
-
   return preventRender ? null : (
     <PropProvider<ChipsInputProps>
       props={{
         ...parsedProps,
-        error: newError,
-        errorMsg: newError(value),
         endAdornment: (
           <>
             {endAdornment}

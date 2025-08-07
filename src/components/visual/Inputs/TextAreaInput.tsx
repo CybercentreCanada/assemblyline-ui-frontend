@@ -47,7 +47,7 @@ const WrappedTextAreaInput = React.memo(() => {
               value={inputValue ?? value ?? ''}
               onChange={e => handleChange(e, e.target.value, e.target.value)}
               onFocus={handleFocus}
-              onBlur={handleBlur}
+              onBlur={e => handleBlur(e, value)}
             />
             <HelperText />
           </>

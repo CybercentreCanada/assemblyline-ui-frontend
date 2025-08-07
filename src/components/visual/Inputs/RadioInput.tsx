@@ -35,6 +35,7 @@ const WrappedRadioInput = React.memo(<O extends readonly Option[]>() => {
   const options = get('options');
   const preventDisabledColor = get('preventDisabledColor');
   const readOnly = get('readOnly');
+  const value = get('value');
 
   const { handleChange, handleFocus, handleBlur } = useInputHandlers<RadioInputProps<O>>();
 
@@ -47,7 +48,7 @@ const WrappedRadioInput = React.memo(<O extends readonly Option[]>() => {
             <StyledFormButton
               key={`${index}-${option.label}`}
               onFocus={handleFocus}
-              onBlur={handleBlur}
+              onBlur={e => handleBlur(e, value)}
               onClick={e => handleChange(e, option.value, option.value)}
             >
               <StyledFormControlLabel

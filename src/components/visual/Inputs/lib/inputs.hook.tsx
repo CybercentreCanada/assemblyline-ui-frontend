@@ -23,10 +23,15 @@ export const useInputParsedProps = <Value, InputValue, Props extends InputValues
   const parsedProps = { ...DEFAULT_INPUT_PROPS, ...DEFAULT_INPUT_STATES, ...props };
 
   const newError = useCallback(
-    (val: Value): string => {
+    (val: Value, min: number = null, max: number = null): string => {
       const err = error(val);
       if (err) return err;
       if (parsedProps.required && !isValidValue(val)) return t('error.required');
+      if (typeof val === 'number') {
+        if (typeof min === 'number' && typeof max === 'number') return t('error.minmax', { min, max });
+        if (typeof min === 'number') return t('error.min', { min });
+        if (typeof max === 'number') return t('error.max', { max });
+      }
       return '';
     },
     [error, parsedProps.required, t]
@@ -91,11 +96,11 @@ export const useInputHandlers = <
   );
 
   const handleBlur = useCallback(
-    (event: React.FocusEvent) => {
+    (event: React.FocusEvent, inputValue: Props['inputValue']) => {
       onBlur(event);
-      setStore(s => {
-        const err = error(s.value);
-        return { focused: false, inputValue: s.value, errorMsg: err };
+      setStore(() => {
+        const err = error(inputValue);
+        return { focused: false, inputValue: inputValue, errorMsg: err };
       });
     },
     [error, onBlur, setStore]

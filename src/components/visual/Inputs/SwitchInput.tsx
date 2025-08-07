@@ -36,7 +36,7 @@ const WrappedSwitchInput = React.memo(() => {
       <StyledFormControl>
         <StyledFormButton
           onFocus={handleFocus}
-          onBlur={handleBlur}
+          onBlur={e => handleBlur(e, value)}
           onClick={e => handleClick(e, !(inputValue ?? value), !(inputValue ?? value))}
         >
           <StyledFormControlLabel label={<StyledButtonLabel />}>

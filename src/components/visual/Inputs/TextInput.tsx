@@ -56,7 +56,7 @@ const WrappedTextInput = React.memo(() => {
             inputValue={inputValue}
             onInputChange={(e, v) => handleChange(e, v, v)}
             onFocus={handleFocus}
-            onBlur={handleBlur}
+            onBlur={e => handleBlur(e, value)}
             renderOption={(props, option, { index }) => (
               <Typography {...props} key={`${option}-${index}`} variant={tiny ? 'body2' : 'body1'}>
                 {option}

@@ -13,8 +13,14 @@ export const getAriaDescribedBy = <T>({
 }: InputValues<T> & InputProps) =>
   disabled || !(error(value) || helperText) ? null : (id || (label ?? '\u00A0')).replaceAll(' ', '-');
 
-export const isValidValue = <T>(value: T): boolean =>
-  value !== null && value !== undefined && value !== '' && (typeof value !== 'number' || !isNaN(value));
+export const isValidValue = <T>(value: T): boolean => {
+  if (value == null) return false;
+  if (typeof value === 'string') return value.trim() !== '';
+  if (typeof value === 'number') return !isNaN(value);
+  if (Array.isArray(value)) return value.length > 0;
+  if (typeof value === 'object') return Object.keys(value).length > 0;
+  return true;
+};
 
 export const isValidNumber = (value: number, { min = null, max = null }: { min?: number; max?: number }): boolean =>
   !isNaN(value) && (min === null || value >= min) && (max === null || value <= max);

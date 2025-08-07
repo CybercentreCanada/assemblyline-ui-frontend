@@ -32,6 +32,7 @@ const WrappedCheckboxInput = React.memo(() => {
   const readOnly = get('readOnly');
   const tooltip = get('tooltip');
   const tooltipProps = get('tooltipProps');
+  const value = get('value');
 
   const { handleClick, handleFocus, handleBlur } = useInputHandlers<CheckboxInputProps>();
 
@@ -39,7 +40,7 @@ const WrappedCheckboxInput = React.memo(() => {
     <Tooltip title={loading ? null : tooltip} {...tooltipProps}>
       <StyledFormControl>
         <StyledFormButton
-          onBlur={handleBlur}
+          onBlur={e => handleBlur(e, value)}
           onFocus={handleFocus}
           onClick={e => handleClick(e, !inputValue, !inputValue)}
         >
