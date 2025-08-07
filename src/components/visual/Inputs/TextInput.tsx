@@ -14,7 +14,7 @@ import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.
 import type { ElementType } from 'react';
 import React from 'react';
 
-export type TextInputProps = InputValues<string> &
+export type TextInputProps = InputValues<string, string, React.SyntheticEvent<Element, Event>> &
   InputProps & {
     autoComplete?: AutocompleteProps<string, boolean, boolean, boolean, ElementType>['autoComplete'];
     options?: string[];
@@ -78,7 +78,13 @@ export const TextInput = ({
   value = '',
   ...props
 }: TextInputProps) => {
-  const parsedProps = useInputParsedProps({ ...props, autoComplete, options, preventRender, value });
+  const parsedProps = useInputParsedProps<string, string, TextInputProps>({
+    ...props,
+    autoComplete,
+    options,
+    preventRender,
+    value
+  });
 
   return preventRender ? null : (
     <PropProvider<TextInputProps> props={parsedProps}>

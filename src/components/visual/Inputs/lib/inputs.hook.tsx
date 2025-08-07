@@ -51,7 +51,7 @@ export const useInputParsedProps = <Value, InputValue, Props extends InputValues
 };
 
 export const useInputHandlers = <
-  Props extends InputValues<unknown, unknown> & InputProps & InputStates & Record<string, unknown>
+  Props extends InputValues<unknown, unknown> & InputProps & InputStates & Record<string, unknown>,
 >() => {
   const [get, setStore] = usePropStore<InputValues<unknown, unknown>>();
 
@@ -62,7 +62,7 @@ export const useInputHandlers = <
   const onFocus = get('onFocus');
 
   const handleClick = useCallback(
-    (event: React.SyntheticEvent, inputValue: Props['inputValue'], value: Props['value']) => {
+    (event: Parameters<Props['onChange']>[0], inputValue: Props['inputValue'], value: Props['value']) => {
       event.preventDefault();
       event.stopPropagation();
 
@@ -75,7 +75,7 @@ export const useInputHandlers = <
   );
 
   const handleChange = useCallback(
-    (event: React.SyntheticEvent, inputValue: Props['inputValue'], value: Props['value']) => {
+    (event: Parameters<Props['onChange']>[0], inputValue: Props['inputValue'], value: Props['value']) => {
       const err = error(value);
       onError(err);
       if (!err) onChange(event, value);

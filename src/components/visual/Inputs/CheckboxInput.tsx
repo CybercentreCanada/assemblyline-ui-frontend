@@ -17,7 +17,7 @@ import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.
 import { Tooltip } from 'components/visual/Tooltip';
 import React from 'react';
 
-export type CheckboxInputProps = InputValues<boolean> &
+export type CheckboxInputProps = InputValues<boolean, boolean, React.MouseEvent<HTMLButtonElement, MouseEvent>> &
   InputProps & {
     indeterminate?: CheckboxProps['indeterminate'];
   };
@@ -75,7 +75,11 @@ const WrappedCheckboxInput = React.memo(() => {
 });
 
 export const CheckboxInput = ({ indeterminate = false, preventRender = false, ...props }: CheckboxInputProps) => {
-  const parsedProps = useInputParsedProps({ ...props, indeterminate, preventRender });
+  const parsedProps = useInputParsedProps<boolean, boolean, CheckboxInputProps>({
+    ...props,
+    indeterminate,
+    preventRender
+  });
 
   return preventRender ? null : (
     <PropProvider<CheckboxInputProps>

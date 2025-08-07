@@ -11,7 +11,7 @@ import type { InputProps, InputValues } from 'components/visual/Inputs/lib/input
 import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
 import React from 'react';
 
-export type NumberInputProps = InputValues<number, string> &
+export type NumberInputProps = InputValues<number, string, React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>> &
   InputProps & {
     max?: number;
     min?: number;

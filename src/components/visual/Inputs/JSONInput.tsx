@@ -140,7 +140,7 @@ const WrappedJSONInput = React.memo(() => {
 });
 
 export const JSONInput = ({ preventRender = false, ...props }: JSONInputProps) => {
-  const parsedProps = useInputParsedProps({ ...props, preventRender });
+  const parsedProps = useInputParsedProps<object, object, JSONInputProps>({ ...props, preventRender });
 
   return preventRender ? null : (
     <PropProvider<JSONInputProps> props={parsedProps}>

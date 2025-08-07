@@ -175,7 +175,7 @@ export const DateInput = ({
   preventRender = false,
   ...props
 }: DateInputProps) => {
-  const parsedProps = useInputParsedProps({
+  const parsedProps = useInputParsedProps<string, Moment, DateInputProps>({
     ...props,
     defaultDateOffset,
     maxDateToday,

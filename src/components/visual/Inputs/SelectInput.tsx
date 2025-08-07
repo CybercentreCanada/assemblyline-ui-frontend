@@ -22,7 +22,7 @@ export type Option = {
   value: MenuItemProps['value'] | boolean;
 };
 
-export type SelectInputProps<O extends readonly Option[]> = InputValues<O[number]['value']> &
+export type SelectInputProps<O extends readonly Option[]> = InputValues<O[number]['value'], O[number]['value']> &
   InputProps & {
     capitalize?: boolean;
     displayEmpty?: SelectProps['displayEmpty'];
@@ -67,13 +67,7 @@ const WrappedSelectInput = React.memo(<O extends readonly Option[]>() => {
             readOnly={readOnly}
             value={options?.some(o => o.value === inputValue) ? inputValue : ''}
             error={!!errorMsg}
-            onChange={event =>
-              handleChange(
-                event as React.SyntheticEvent,
-                event.target.value as O[number]['value'],
-                event.target.value as O[number]['value']
-              )
-            }
+            onChange={event => handleChange(event as React.SyntheticEvent, event.target.value, event.target.value)}
             onFocus={handleFocus}
             onBlur={e => handleBlur(e, value)}
             renderValue={option => (
@@ -144,7 +138,13 @@ export const SelectInput = <O extends readonly Option[]>({
   preventRender = false,
   ...props
 }: SelectInputProps<O>) => {
-  const parsedProps = useInputParsedProps({ ...props, capitalize, displayEmpty, options, preventRender });
+  const parsedProps = useInputParsedProps<O[number]['value'], O[number]['value'], SelectInputProps<O>>({
+    ...props,
+    capitalize,
+    displayEmpty,
+    options,
+    preventRender
+  });
 
   return preventRender ? null : (
     <PropProvider<SelectInputProps<O>> props={parsedProps}>

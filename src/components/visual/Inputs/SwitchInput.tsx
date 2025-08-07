@@ -16,7 +16,8 @@ import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.
 import { Tooltip } from 'components/visual/Tooltip';
 import React from 'react';
 
-export type SwitchInputProps = InputValues<boolean> & InputProps;
+export type SwitchInputProps = InputValues<boolean, boolean, React.MouseEvent<HTMLButtonElement, MouseEvent>> &
+  InputProps;
 
 const WrappedSwitchInput = React.memo(() => {
   const [get] = usePropStore<SwitchInputProps>();
@@ -69,7 +70,7 @@ const WrappedSwitchInput = React.memo(() => {
 });
 
 export const SwitchInput = ({ preventRender = false, ...props }: SwitchInputProps) => {
-  const parsedProps = useInputParsedProps({ ...props, preventRender });
+  const parsedProps = useInputParsedProps<boolean, boolean, SwitchInputProps>({ ...props, preventRender });
 
   return preventRender ? null : (
     <PropProvider<SwitchInputProps> props={parsedProps}>

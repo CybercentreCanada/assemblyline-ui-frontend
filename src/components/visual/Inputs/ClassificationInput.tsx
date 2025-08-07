@@ -479,7 +479,7 @@ export const ClassificationInput = ({
   value,
   ...props
 }: ClassificationInputProps) => {
-  const parsedProps = useInputParsedProps({
+  const parsedProps = useInputParsedProps<string, string, ClassificationInputProps>({
     ...props,
     dynGroup,
     format,

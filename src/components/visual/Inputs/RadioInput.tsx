@@ -22,7 +22,11 @@ type Option = Omit<FormControlLabelProps, 'control' | 'label'> & {
   label?: string;
 };
 
-export type RadioInputProps<O extends readonly Option[]> = InputValues<O[number]['value']> &
+export type RadioInputProps<O extends readonly Option[]> = InputValues<
+  O[number]['value'],
+  O[number]['value'],
+  React.MouseEvent<HTMLButtonElement, MouseEvent>
+> &
   InputProps & {
     options: O;
   };
@@ -88,7 +92,12 @@ export const RadioInput = <O extends readonly Option[]>({
   value = null,
   ...props
 }: RadioInputProps<O>) => {
-  const parsedProps = useInputParsedProps({ ...props, options, preventRender, value });
+  const parsedProps = useInputParsedProps<O[number]['value'], O[number]['value'], RadioInputProps<O>>({
+    ...props,
+    options,
+    preventRender,
+    value
+  });
 
   return preventRender ? null : (
     <PropProvider<RadioInputProps<O>> props={parsedProps}>

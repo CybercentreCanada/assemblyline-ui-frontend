@@ -12,7 +12,11 @@ import type { InputProps, InputValues } from 'components/visual/Inputs/lib/input
 import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
 import React from 'react';
 
-export type TextAreaInputProps = InputValues<string> &
+export type TextAreaInputProps = InputValues<
+  string,
+  string,
+  React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
+> &
   InputProps & {
     rows?: TextFieldProps['rows'];
   };
@@ -58,7 +62,7 @@ const WrappedTextAreaInput = React.memo(() => {
 });
 
 export const TextAreaInput = ({ rows = 1, preventRender = false, ...props }: TextAreaInputProps) => {
-  const parsedProps = useInputParsedProps({ ...props, rows, preventRender });
+  const parsedProps = useInputParsedProps<string, string, TextAreaInputProps>({ ...props, rows, preventRender });
 
   return preventRender ? null : (
     <PropProvider<TextAreaInputProps> props={parsedProps}>

@@ -12,7 +12,7 @@ import type { InputProps, InputValues } from 'components/visual/Inputs/lib/input
 import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
 import React from 'react';
 
-export type SliderInputProps = InputValues<number> &
+export type SliderInputProps = InputValues<number, number> &
   InputProps & {
     min?: number;
     max?: number;
@@ -69,7 +69,13 @@ const WrappedSliderInput = React.memo(() => {
 });
 
 export const SliderInput = ({ min = null, max = null, preventRender = false, value, ...props }: SliderInputProps) => {
-  const parsedProps = useInputParsedProps({ ...props, max, min, preventRender, value });
+  const parsedProps = useInputParsedProps<number, number, SliderInputProps>({
+    ...props,
+    max,
+    min,
+    preventRender,
+    value
+  });
 
   return preventRender ? null : (
     <PropProvider<SliderInputProps> props={{ ...parsedProps }}>
