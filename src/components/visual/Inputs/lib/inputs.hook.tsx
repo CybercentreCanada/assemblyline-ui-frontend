@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import type { InputProps, InputStates, InputValues } from 'components/visual/Inputs/lib/inputs.model';
 import { DEFAULT_INPUT_PROPS, DEFAULT_INPUT_STATES } from 'components/visual/Inputs/lib/inputs.model';
 import { usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
-import { isValidValue } from 'components/visual/Inputs/lib/inputs.utils';
+import { isValidNumber, isValidValue } from 'components/visual/Inputs/lib/inputs.utils';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -22,21 +23,27 @@ export const useInputParsedProps = <Value, InputValue, Props extends InputValues
 
   const parsedProps = { ...DEFAULT_INPUT_PROPS, ...DEFAULT_INPUT_STATES, ...props };
 
+  const min: number = parsedProps?.['min'];
+  const max: number = parsedProps?.['max'];
+  const required: boolean = parsedProps.required;
+
   const newError = useCallback(
-    (val: Value, min: number = null, max: number = null): string => {
+    (val: Value): string => {
       const err = error(val);
       if (err) return err;
-      if (parsedProps.required && !isValidValue(val)) return t('error.required');
-      if (typeof val === 'number') {
+
+      if (required && (min != null || max != null) && !isValidNumber(val as number, { min, max })) {
         if (typeof min === 'number' && typeof max === 'number') return t('error.minmax', { min, max });
         if (typeof min === 'number') return t('error.min', { min });
         if (typeof max === 'number') return t('error.max', { max });
       }
+
+      if (required && !isValidValue(val)) return t('error.required');
+
       return '';
     },
-    [error, parsedProps.required, t]
+    [error, min, max, required, t]
   );
-
   return {
     ...props,
     error: newError,
@@ -79,6 +86,9 @@ export const useInputHandlers = <
       const err = error(value);
       onError(err);
       if (!err) onChange(event, value);
+
+      console.log({ ...(!err && { value: value }), inputValue: inputValue, errorMsg: err }, error);
+
       setStore(() => ({ ...(!err && { value: value }), inputValue: inputValue, errorMsg: err }));
     },
     [error, onChange, onError, setStore]

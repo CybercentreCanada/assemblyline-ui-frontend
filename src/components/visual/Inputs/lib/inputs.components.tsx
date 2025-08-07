@@ -76,7 +76,10 @@ export const StyledEndAdornmentBox = React.memo(({ children, ...props }: Partial
         display: 'flex',
         alignItems: 'center',
         maxHeight: 'initial',
-        ...props?.sx
+        ...props?.sx,
+        '& .MuiTooltip-tooltip': {
+          whiteSpace: 'nowrap'
+        }
       }}
     >
       {children}
@@ -639,11 +642,11 @@ export const StyledTextField = ({ params, ...props }: StyledTextField) => {
           ),
           endAdornment: (
             <StyledEndAdornment>
-              {endAdornment}
               {props?.slotProps?.input?.['endAdornment']}
               {/* {params?.InputProps?.endAdornment} */}
               <PasswordInput />
               <ResetInput />
+              {endAdornment}
             </StyledEndAdornment>
           )
         }
@@ -744,6 +747,7 @@ export const StyledCustomChip = React.memo(({ label, onDelete = () => null, sx, 
     <CustomChip
       label={label}
       wrap
+      size="small"
       {...props}
       onDelete={disabled || readOnly ? undefined : onDelete}
       sx={{

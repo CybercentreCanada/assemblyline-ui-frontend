@@ -23,7 +23,7 @@ export const isValidValue = <T>(value: T): boolean => {
 };
 
 export const isValidNumber = (value: number, { min = null, max = null }: { min?: number; max?: number }): boolean =>
-  !isNaN(value) && (min === null || value >= min) && (max === null || value <= max);
+  value == null ? false : (min == null || value >= min) && (max == null || value <= max);
 
 export const parseInputProps = <Props extends InputProps>(props: Props): Props & InputStates => ({
   errorMsg: null,
