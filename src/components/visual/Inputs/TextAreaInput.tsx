@@ -18,12 +18,14 @@ export type TextAreaInputProps = InputValues<
   React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
 > &
   InputProps & {
+    autoComplete?: StyledTextField['autoComplete'];
     rows?: TextFieldProps['rows'];
   };
 
 const WrappedTextAreaInput = React.memo(() => {
   const [get] = usePropStore<TextAreaInputProps>();
 
+  const autoComplete = get('autoComplete');
   const inputValue = get('inputValue');
   const loading = get('loading');
   const overflowHidden = get('overflowHidden');
@@ -47,6 +49,7 @@ const WrappedTextAreaInput = React.memo(() => {
           <>
             <StyledTextField
               {...(!overflowHidden && { multiline: true, rows: rows })}
+              autoComplete={autoComplete}
               type={password && showPassword ? 'password' : 'text'}
               value={inputValue ?? value ?? ''}
               onChange={e => handleChange(e, e.target.value, e.target.value)}
@@ -61,8 +64,13 @@ const WrappedTextAreaInput = React.memo(() => {
   );
 });
 
-export const TextAreaInput = ({ rows = 1, preventRender = false, ...props }: TextAreaInputProps) => {
-  const parsedProps = useInputParsedProps<string, string, TextAreaInputProps>({ ...props, rows, preventRender });
+export const TextAreaInput = ({ autoComplete, rows = 1, preventRender = false, ...props }: TextAreaInputProps) => {
+  const parsedProps = useInputParsedProps<string, string, TextAreaInputProps>({
+    ...props,
+    autoComplete,
+    preventRender,
+    rows
+  });
 
   return preventRender ? null : (
     <PropProvider<TextAreaInputProps> props={parsedProps}>

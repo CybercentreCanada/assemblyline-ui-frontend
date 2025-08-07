@@ -267,7 +267,7 @@ const ServiceGeneral = ({
                   {option}
                 </li>
               )}
-              renderTags={(values, getTagProps) =>
+              renderValue={(values, getTagProps) =>
                 (values as unknown as string[]).map((value, index) => (
                   <Chip
                     {...getTagProps({ index })}

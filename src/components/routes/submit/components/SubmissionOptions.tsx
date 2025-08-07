@@ -85,7 +85,6 @@ export const SubmissionOptions = React.memo(() => {
                       label={t('options.submission.priority.label')}
                       value={value}
                       defaultValue={defaultValue}
-                      fullWidth
                       loading={loading}
                       disabled={disabled || !isEditing || (!customize && restricted)}
                       preventRender={!customize && restricted}

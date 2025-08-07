@@ -1,3 +1,4 @@
+import type { SliderProps } from '@mui/material';
 import { Slider } from '@mui/material';
 import {
   HelperText,
@@ -14,8 +15,12 @@ import React from 'react';
 
 export type SliderInputProps = InputValues<number, number> &
   InputProps & {
-    min?: number;
+    marks?: SliderProps['marks'];
     max?: number;
+    min?: number;
+    step?: SliderProps['step'];
+    valueLabelDisplay?: SliderProps['valueLabelDisplay'];
+    valueLabelFormat?: SliderProps['valueLabelFormat'];
   };
 
 const WrappedSliderInput = React.memo(() => {
@@ -26,10 +31,14 @@ const WrappedSliderInput = React.memo(() => {
   const id = get('id');
   const inputValue = get('inputValue');
   const loading = get('loading');
+  const marks = get('marks');
   const max = get('max');
   const min = get('min');
   const readOnly = get('readOnly');
+  const step = get('step');
   const value = get('value');
+  const valueLabelDisplay = get('valueLabelDisplay');
+  const valueLabelFormat = get('valueLabelFormat');
 
   const { handleChange, handleFocus, handleBlur } = useInputHandlers<SliderInputProps>();
 
@@ -45,14 +54,17 @@ const WrappedSliderInput = React.memo(() => {
               <div style={{ flex: 1, marginLeft: '20px', marginRight: '20px' }}>
                 <Slider
                   aria-label={id}
+                  color={!disabled && errorMsg ? 'error' : 'primary'}
+                  disabled={disabled || readOnly}
                   id={id}
+                  marks={marks}
+                  size="small"
+                  step={step}
                   value={inputValue}
+                  valueLabelDisplay={valueLabelDisplay}
+                  valueLabelFormat={valueLabelFormat}
                   {...(min && { min: min })}
                   {...(max && { max: max })}
-                  disabled={disabled || readOnly}
-                  size="small"
-                  valueLabelDisplay="auto"
-                  color={!disabled && errorMsg ? 'error' : 'primary'}
                   onFocus={handleFocus}
                   onBlur={e => handleBlur(e, value)}
                   onChange={(e, v) => handleChange(e as unknown as React.SyntheticEvent, v, v)}
@@ -68,13 +80,27 @@ const WrappedSliderInput = React.memo(() => {
   );
 });
 
-export const SliderInput = ({ min = null, max = null, preventRender = false, value, ...props }: SliderInputProps) => {
+export const SliderInput = ({
+  marks = false,
+  max = null,
+  min = null,
+  preventRender = false,
+  step = 1,
+  value,
+  valueLabelDisplay = 'auto',
+  valueLabelFormat = v => v,
+  ...props
+}: SliderInputProps) => {
   const parsedProps = useInputParsedProps<number, number, SliderInputProps>({
     ...props,
+    marks,
     max,
     min,
     preventRender,
-    value
+    step,
+    value,
+    valueLabelDisplay,
+    valueLabelFormat
   });
 
   return preventRender ? null : (

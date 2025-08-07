@@ -160,7 +160,6 @@ const WrappedSourceDetail = ({
                         endAdornment="sec"
                         min={60}
                         max={86400}
-                        unnullable
                         onChange={(e, v) => {
                           setModified(true);
                           setSource(s => ({ ...s, update_interval: v }));
@@ -191,7 +190,6 @@ const WrappedSourceDetail = ({
                           loading={!source}
                           value={!source ? null : source[field]}
                           reset={showReset(source, defaults, field)}
-                          showOverflow
                           onChange={(e, v) => {
                             setModified(true);
                             setSource(s => ({ ...s, [field]: v }));

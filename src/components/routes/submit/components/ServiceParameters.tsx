@@ -135,7 +135,7 @@ const Param: React.FC<ParamProps> = React.memo(({ param_id, spec_id, service }) 
                 options={list.map(key => ({ primary: key.replaceAll('_', ' '), value: key })).sort()}
                 reset={defaultValue !== null && value !== defaultValue}
                 rootProps={{ style: { padding: theme.spacing(1) } }}
-                sx={{ textTransform: 'capitalize' }}
+                capitalize
                 onChange={(e, v) =>
                   form.setFieldValue('settings.service_spec', s => {
                     s[spec_id].params[param_id].value = v;

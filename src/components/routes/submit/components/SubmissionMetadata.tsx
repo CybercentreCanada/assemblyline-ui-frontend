@@ -113,13 +113,13 @@ export const MetadataParam: React.FC<MetadataParamParam> = React.memo(
             case 'enum':
               return (
                 <SelectInput
-                  {...(props as SelectInputProps)}
+                  {...(props as SelectInputProps<{ primary: string; value: string }[]>)}
                   value={(value as string) || ''}
                   options={(metadata.validator_params.values as string[])
                     .map(v => ({ primary: v.replaceAll('_', ' '), value: v }))
                     .sort()}
                   reset={!!value}
-                  sx={{ textTransform: 'capitalize' }}
+                  capitalize
                 />
               );
             case 'integer':
