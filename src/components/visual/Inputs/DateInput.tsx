@@ -1,7 +1,10 @@
+import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined';
 import type { TextFieldProps } from '@mui/material';
-import { useTheme } from '@mui/material';
-import { LocalizationProvider, DatePicker as MuiDatePicker } from '@mui/x-date-pickers';
+import { Popover, useTheme } from '@mui/material';
+import { DigitalClock, LocalizationProvider, DatePicker as MuiDatePicker } from '@mui/x-date-pickers';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
+import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
+import { IconButton } from 'components/visual/Buttons/IconButton';
 import {
   ExpandInput,
   HelperText,
@@ -11,15 +14,25 @@ import {
   StyledFormControl,
   StyledFormLabel,
   StyledInputSkeleton,
-  StyledRoot
+  StyledRoot,
+  useTextInputSlot
 } from 'components/visual/Inputs/lib/inputs.components';
-import { useInputParsedProps } from 'components/visual/Inputs/lib/inputs.hook';
+import { useInputHandlers, useInputParsedProps } from 'components/visual/Inputs/lib/inputs.hook';
 import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
 import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
 import type { Moment } from 'moment';
 import moment from 'moment';
-import React, { useCallback, useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
+// This function updates the week start for the specified locale
+function configureMomentLocale(language: string) {
+  moment.updateLocale(language, {
+    week: {
+      dow: 0 // Week starts on Sunday (0 = Sunday, 1 = Monday, etc.)
+    }
+  });
+}
 
 export type DateInputProps = Omit<TextFieldProps, 'error' | 'value' | 'onChange'> &
   InputValues<string, Moment> &
@@ -29,30 +42,119 @@ export type DateInputProps = Omit<TextFieldProps, 'error' | 'value' | 'onChange'
     minDateTomorrow?: boolean;
   };
 
-const WrappedDateInput = React.memo(() => {
+type DateInputState = DateInputProps & {
+  showPopover: boolean;
+};
+
+const DatePopper = React.memo(() => {
   const theme = useTheme();
+
+  const [anchorEl, setAnchorEl] = useState<Element>(null);
+
+  const [get, setStore] = usePropStore<DateInputState>();
+
+  const id = get('id');
+  const inputValue = get('inputValue') ?? null;
+  const showPopover = get('showPopover') ?? false;
+  const tiny = get('tiny');
+
+  const { handleChange } = useInputHandlers<DateInputProps>();
+
+  return (
+    <>
+      <IconButton
+        aria-label={`${id}-date`}
+        color="secondary"
+        type="button"
+        onClick={event => {
+          event.preventDefault();
+          event.stopPropagation();
+          setStore(() => ({ showPopover: true }));
+          setAnchorEl(event.currentTarget);
+        }}
+        sx={{
+          padding: tiny ? theme.spacing(0.25) : theme.spacing(0.5)
+        }}
+      >
+        <CalendarMonthOutlinedIcon fontSize="small" />
+      </IconButton>
+      {anchorEl && (
+        <Popover
+          open={showPopover}
+          anchorEl={anchorEl}
+          onClose={() => setStore(() => ({ showPopover: false }))}
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+          transformOrigin={{ vertical: -20, horizontal: 'center' }}
+          transitionDuration={{
+            appear: theme.transitions.duration.shortest,
+            enter: theme.transitions.duration.shortest,
+            exit: theme.transitions.duration.shortest
+          }}
+          slotProps={{
+            transition: {
+              onExited: () => setAnchorEl(null)
+            },
+            paper: {
+              sx: {
+                width: '500px',
+                border: `1px solid ${theme.palette.divider}`,
+                display: 'flex',
+                flexDirection: 'column'
+              }
+            }
+          }}
+        >
+          <div
+            style={{
+              width: '100%',
+              padding: `${theme.spacing(1)} ${theme.spacing(2)}`,
+              display: 'grid',
+              gridTemplateColumns: 'auto auto',
+              justifyContent: 'content',
+              gap: theme.spacing(0.25)
+            }}
+          >
+            <DateCalendar
+              views={['month', 'day']}
+              // timezone="utc"
+              showDaysOutsideCurrentMonth
+              value={inputValue}
+              onChange={(v: Moment) => handleChange(null, v, v.toISOString())}
+              sx={{ height: '320px' }}
+              slotProps={{ calendarHeader: { sx: { marginTop: '0px', marginBottom: '0px' } } }}
+            />
+
+            <DigitalClock
+              // timezone="utc"
+              value={inputValue}
+              onChange={(v: Moment) => handleChange(null, v, v.toISOString())}
+              sx={{
+                maxHeight: '320px',
+                '& .MuiDigitalClock-item': {
+                  fontSize: '12px'
+                }
+              }}
+            />
+          </div>
+        </Popover>
+      )}
+    </>
+  );
+});
+
+const WrappedDateInput = React.memo(() => {
   const { i18n } = useTranslation('inputs');
 
-  const [get, setStore] = usePropStore<DateInputProps>();
+  const [get] = usePropStore<DateInputState>();
 
   const disabled = get('disabled');
   const endAdornment = get('endAdornment');
-  const errorMsg = get('errorMsg');
-  const id = get('id');
-  const inputValue = get('inputValue');
+  const inputValue = get('inputValue') ?? null;
   const loading = get('loading');
   const maxDateToday = get('maxDateToday');
   const minDateTomorrow = get('minDateTomorrow');
-  const monospace = get('monospace');
-  const placeholder = get('placeholder');
   const readOnly = get('readOnly');
-  const tiny = get('tiny');
-
-  const error = get('error');
-  const onBlur = get('onBlur');
-  const onChange = get('onChange');
-  const onError = get('onError');
-  const onFocus = get('onFocus');
+  const value = get('value');
 
   const today = useMemo<Moment>(() => {
     const d = new Date();
@@ -67,39 +169,13 @@ const WrappedDateInput = React.memo(() => {
     return moment(d);
   }, []);
 
-  const handleChange = useCallback(
-    (event: React.SyntheticEvent, date: Moment) => {
-      const newValue = date && date.isValid() ? `${date.format('YYYY-MM-DDThh:mm:ss.SSSSSS')}Z` : null;
-      const err = error(newValue);
-      onError(err);
-      if (!err) onChange(event, newValue);
-      setStore(() => ({ ...(!err && { value: newValue }), inputValue: date, errorMsg: err }));
-    },
-    [error, onChange, onError, setStore]
-  );
+  const { handleChange, handleFocus, handleBlur } = useInputHandlers<DateInputProps>();
 
-  const handleFocus = useCallback(
-    (event: React.FocusEvent) => {
-      onFocus(event);
-      setStore(s => ({
-        // inputValue: s.value,
-        focused: !s.readOnly && !s.disabled && document.activeElement === event.target
-      }));
-    },
-    [onFocus, setStore]
-  );
+  const textfieldSlot = useTextInputSlot();
 
-  const handleBlur = useCallback(
-    (event: React.FocusEvent) => {
-      onBlur(event);
-      setStore(s => {
-        const newInputValue = s.value ? moment(s.value) : null;
-        const err = error(s.value);
-        return { focused: false, inputValue: newInputValue, errorMsg: err };
-      });
-    },
-    [error, onBlur, setStore]
-  );
+  useEffect(() => {
+    configureMomentLocale(i18n.language);
+  }, [i18n.language]);
 
   return (
     <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale={i18n.language}>
@@ -111,43 +187,25 @@ const WrappedDateInput = React.memo(() => {
           ) : (
             <>
               <MuiDatePicker
-                value={inputValue}
-                readOnly={readOnly}
-                minDate={minDateTomorrow ? tomorrow : null}
-                maxDate={maxDateToday ? today : null}
                 disabled={disabled}
-                onChange={newValue => handleChange(null, newValue)}
-                // slots={{ textField: props => <TextField {...props} /> }}
+                disableOpenPicker
+                format={i18n.language === 'fr' ? 'Do MMMM YYYY, H[h]mm' : 'MMMM D YYYY, h:mm a'}
+                maxDate={maxDateToday ? today : null}
+                minDate={minDateTomorrow ? tomorrow : null}
+                readOnly={readOnly}
+                value={inputValue}
+                onChange={d =>
+                  handleChange(null, d, d && d.isValid() ? `${d.format('YYYY-MM-DDThh:mm:ss.SSSSSS')}Z` : null)
+                }
                 slotProps={{
                   textField: {
-                    id: id,
-                    size: 'small',
-                    error: !!errorMsg && !disabled,
-                    disabled,
-                    ...(readOnly && !disabled && { focused: null }),
-                    sx: {
-                      '& .MuiInputBase-input': {
-                        ...(tiny && { fontSize: '14px' }),
-                        ...(readOnly && !disabled && { cursor: 'default' }),
-                        ...(monospace && { fontFamily: 'monospace' })
-                      },
-                      '& .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline': {
-                        ...(readOnly &&
-                          !disabled && {
-                            borderColor:
-                              theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.23)' : 'rgba(0, 0, 0, 0.23)'
-                          })
-                      }
-                    },
+                    ...textfieldSlot,
                     onFocus: handleFocus,
-                    onBlur: handleBlur,
-                    inputProps: {
-                      ...(tiny && { sx: { padding: '2.5px 4px 2.5px 8px' } })
-                    },
+                    onBlur: e => handleBlur(e, moment(value)),
                     InputProps: {
-                      placeholder: placeholder,
                       endAdornment: (
-                        <StyledEndAdornment>
+                        <StyledEndAdornment preventRender={disabled || readOnly}>
+                          <DatePopper />
                           <PasswordInput />
                           <ResetInput />
                           <ExpandInput />

@@ -26,7 +26,7 @@ const WrappedJSONInput = React.memo(() => {
 
   const disabled = get('disabled');
   const errorMsg = get('errorMsg');
-  const inputValue = get('inputValue');
+  const inputValue = get('inputValue') ?? null;
   const loading = get('loading');
   const monospace = get('monospace');
   const password = get('password');

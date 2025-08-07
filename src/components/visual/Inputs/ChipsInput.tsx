@@ -35,7 +35,7 @@ const WrappedChipsInput = React.memo(() => {
   const disabled = get('disabled');
   const filterSelectedOptions = get('filterSelectedOptions');
   const id = get('id');
-  const inputValue = get('inputValue');
+  const inputValue = get('inputValue') ?? [];
   const isOptionEqualToValue = get('isOptionEqualToValue');
   const loading = get('loading');
   const options = get('options');
@@ -65,7 +65,7 @@ const WrappedChipsInput = React.memo(() => {
             options={options}
             readOnly={readOnly}
             size="small"
-            value={inputValue ?? []}
+            value={inputValue}
             onChange={(e, v) => handleChange(e, v as string[], v as string[])}
             onFocus={handleFocus}
             onBlur={e => handleBlur(e, value)}

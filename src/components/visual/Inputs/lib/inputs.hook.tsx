@@ -86,9 +86,6 @@ export const useInputHandlers = <
       const err = error(value);
       onError(err);
       if (!err) onChange(event, value);
-
-      console.log({ ...(!err && { value: value }), inputValue: inputValue, errorMsg: err }, error);
-
       setStore(() => ({ ...(!err && { value: value }), inputValue: inputValue, errorMsg: err }));
     },
     [error, onChange, onError, setStore]

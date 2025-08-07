@@ -62,7 +62,7 @@ function shallowReconcile<T extends Record<string, unknown>>(
 export const createPropContext = <Props extends object>(initialProps: Props) => {
   const createPropStore = () => {
     const prevPropsRef = { current: {} };
-    const stateRef = { current: initialProps };
+    const stateRef = { current: {} };
     const subscribers = new Set<() => void>();
 
     const get = <Data extends object, K extends keyof (Data & Props) = keyof (Data & Props)>(key: K) =>

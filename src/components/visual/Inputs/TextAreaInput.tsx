@@ -26,12 +26,10 @@ const WrappedTextAreaInput = React.memo(() => {
   const [get] = usePropStore<TextAreaInputProps>();
 
   const autoComplete = get('autoComplete');
-  const inputValue = get('inputValue');
+  const inputValue = get('inputValue') ?? '';
   const loading = get('loading');
   const overflowHidden = get('overflowHidden');
-  const password = get('password');
   const rows = get('rows');
-  const showPassword = get('showPassword');
   const tiny = get('tiny');
   const value = get('value');
 
@@ -50,8 +48,7 @@ const WrappedTextAreaInput = React.memo(() => {
             <StyledTextField
               {...(!overflowHidden && { multiline: true, rows: rows })}
               autoComplete={autoComplete}
-              type={password && showPassword ? 'password' : 'text'}
-              value={inputValue ?? ''}
+              value={inputValue}
               onChange={e => handleChange(e, e.target.value, e.target.value)}
               onFocus={handleFocus}
               onBlur={e => handleBlur(e, value)}

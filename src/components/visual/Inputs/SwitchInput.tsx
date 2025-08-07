@@ -22,7 +22,7 @@ export type SwitchInputProps = InputValues<boolean, boolean, React.MouseEvent<HT
 const WrappedSwitchInput = React.memo(() => {
   const [get] = usePropStore<SwitchInputProps>();
 
-  const inputValue = get('inputValue');
+  const inputValue = Boolean(get('inputValue'));
   const loading = get('loading');
   const preventDisabledColor = get('preventDisabledColor');
   const readOnly = get('readOnly');
@@ -38,11 +38,11 @@ const WrappedSwitchInput = React.memo(() => {
         <StyledFormButton
           onFocus={handleFocus}
           onBlur={e => handleBlur(e, value)}
-          onClick={e => handleClick(e, !(inputValue ?? value), !(inputValue ?? value))}
+          onClick={e => handleClick(e, !inputValue, !inputValue)}
         >
           <StyledFormControlLabel label={<StyledButtonLabel />}>
             <Switch
-              checked={Boolean(inputValue)}
+              checked={inputValue}
               disableFocusRipple
               disableRipple
               disableTouchRipple

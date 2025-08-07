@@ -20,11 +20,10 @@ export type NumberInputProps = InputValues<number, string, React.ChangeEvent<HTM
 const WrappedNumberInput = React.memo(() => {
   const [get] = usePropStore<NumberInputProps>();
 
-  const inputValue = get('inputValue');
+  const inputValue = get('inputValue') ?? '';
   const loading = get('loading');
   const password = get('password');
   const showPassword = get('showPassword');
-  const tiny = get('tiny');
   const value = get('value');
 
   const { handleChange, handleFocus, handleBlur } = useInputHandlers<NumberInputProps>();
@@ -43,15 +42,6 @@ const WrappedNumberInput = React.memo(() => {
               onChange={e => handleChange(e, e.target.value, e.target.value !== '' ? Number(e.target.value) : null)}
               onFocus={handleFocus}
               onBlur={e => handleBlur(e, value == null ? '' : String(value))}
-              slotProps={{
-                input: {
-                  style: {
-                    // ...(typeof min === 'number' && { min }),
-                    // ...(typeof max === 'number' && { max }),
-                    ...(tiny && { padding: '2.5px 4px 2.5px 8px' })
-                  }
-                }
-              }}
             />
             <HelperText />
           </>

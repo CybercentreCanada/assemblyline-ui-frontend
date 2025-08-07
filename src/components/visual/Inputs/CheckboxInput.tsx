@@ -26,7 +26,7 @@ const WrappedCheckboxInput = React.memo(() => {
   const [get] = usePropStore<CheckboxInputProps>();
 
   const indeterminate = get('indeterminate');
-  const inputValue = get('inputValue');
+  const inputValue = Boolean(get('inputValue'));
   const loading = get('loading');
   const preventDisabledColor = get('preventDisabledColor');
   const readOnly = get('readOnly');
@@ -46,7 +46,7 @@ const WrappedCheckboxInput = React.memo(() => {
         >
           <StyledFormControlLabel label={<StyledButtonLabel />}>
             <Checkbox
-              checked={Boolean(inputValue)}
+              checked={inputValue}
               indeterminate={indeterminate}
               disableFocusRipple
               disableRipple

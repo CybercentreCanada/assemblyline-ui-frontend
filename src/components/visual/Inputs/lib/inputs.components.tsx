@@ -54,53 +54,65 @@ export const StyledRoot = React.memo(({ children }: { children: React.ReactNode 
   );
 });
 
-export const StyledEndAdornmentBox = React.memo(({ children, ...props }: Partial<InputAdornmentProps>) => {
-  const theme = useTheme();
+export const StyledEndAdornmentBox = React.memo(
+  ({ children, preventRender = true, ...props }: Partial<InputAdornmentProps> & { preventRender?: boolean }) => {
+    const theme = useTheme();
 
-  const [get] = usePropStore();
+    const [get] = usePropStore();
 
-  const endAdornment = get('endAdornment');
-  const preventExpandRender = get('preventExpandRender');
-  const preventPasswordRender = get('preventPasswordRender');
-  const preventResetRender = get('preventResetRender');
+    const endAdornment = get('endAdornment');
+    const preventExpandRender = get('preventExpandRender');
+    const preventPasswordRender = get('preventPasswordRender');
+    const preventResetRender = get('preventResetRender');
 
-  return preventResetRender && preventPasswordRender && preventExpandRender && !endAdornment ? null : (
-    <InputAdornment
-      position="end"
-      {...props}
-      sx={{
-        position: 'absolute',
-        right: theme.spacing(0.75),
-        top: 0,
-        bottom: 0,
-        display: 'flex',
-        alignItems: 'center',
-        maxHeight: 'initial',
-        ...props?.sx,
-        '& .MuiTooltip-tooltip': {
-          whiteSpace: 'nowrap'
-        }
-      }}
-    >
-      {children}
-    </InputAdornment>
-  );
-});
+    return preventRender &&
+      preventResetRender &&
+      preventPasswordRender &&
+      preventExpandRender &&
+      !endAdornment ? null : (
+      <InputAdornment
+        position="end"
+        {...props}
+        sx={{
+          position: 'absolute',
+          right: theme.spacing(0.75),
+          top: 0,
+          bottom: 0,
+          display: 'flex',
+          alignItems: 'center',
+          maxHeight: 'initial',
+          ...props?.sx,
+          '& .MuiTooltip-tooltip': {
+            whiteSpace: 'nowrap'
+          }
+        }}
+      >
+        {children}
+      </InputAdornment>
+    );
+  }
+);
 
-export const StyledEndAdornment = React.memo(({ children, ...props }: Partial<InputAdornmentProps>) => {
-  const [get] = usePropStore();
+export const StyledEndAdornment = React.memo(
+  ({ children, preventRender = true, ...props }: Partial<InputAdornmentProps> & { preventRender?: boolean }) => {
+    const [get] = usePropStore();
 
-  const endAdornment = get('endAdornment');
-  const preventExpandRender = get('preventExpandRender');
-  const preventPasswordRender = get('preventPasswordRender');
-  const preventResetRender = get('preventResetRender');
+    const endAdornment = get('endAdornment');
+    const preventExpandRender = get('preventExpandRender');
+    const preventPasswordRender = get('preventPasswordRender');
+    const preventResetRender = get('preventResetRender');
 
-  return preventResetRender && preventPasswordRender && preventExpandRender && !endAdornment ? null : (
-    <InputAdornment position="end" {...props} sx={{ marginLeft: 0, ...props?.sx }}>
-      {children}
-    </InputAdornment>
-  );
-});
+    return preventRender &&
+      preventResetRender &&
+      preventPasswordRender &&
+      preventExpandRender &&
+      !endAdornment ? null : (
+      <InputAdornment position="end" {...props} sx={{ marginLeft: 0, ...props?.sx }}>
+        {children}
+      </InputAdornment>
+    );
+  }
+);
 export const ExpandInput = React.memo(() => {
   const theme = useTheme();
 
@@ -471,8 +483,10 @@ export const StyledFormButton = React.memo(({ children, ...props }: ButtonProps)
 
   const disabled = get('disabled');
   const loading = get('loading');
+  const password = get('password');
   const preventDisabledColor = get('preventDisabledColor');
   const readOnly = get('readOnly');
+  const showPassword = get('showPassword');
   const tiny = get('tiny');
 
   return (
@@ -488,6 +502,7 @@ export const StyledFormButton = React.memo(({ children, ...props }: ButtonProps)
         textTransform: 'none',
         minHeight: tiny ? '32px' : '40px',
         ...((preventDisabledColor || readOnly) && { color: 'inherit !important' }),
+        ...(password && showPassword && { wordBreak: 'break-all' }),
         ...props?.sx
       }}
     >
@@ -587,17 +602,11 @@ export const StyledListItemText = React.memo(({ primary, secondary = null, ...pr
   );
 });
 
-export type StyledTextField = TextFieldProps & {
-  params?: AutocompleteRenderInputParams;
-};
-
-export const StyledTextField = ({ params, ...props }: StyledTextField) => {
+export const useTextInputSlot = (overrides?: Partial<TextFieldProps>) => {
   const theme = useTheme();
-
   const [get] = usePropStore();
 
   const disabled = get('disabled');
-  const endAdornment = get('endAdornment');
   const errorMsg = get('errorMsg');
   const id = get('id');
   const monospace = get('monospace');
@@ -609,50 +618,34 @@ export const StyledTextField = ({ params, ...props }: StyledTextField) => {
   const startAdornment = get('startAdornment');
   const tiny = get('tiny');
 
-  return (
-    <TextField
-      id={id}
-      disabled={disabled}
-      error={!!errorMsg}
-      fullWidth
-      margin="dense"
-      size="small"
-      type={password && showPassword ? 'password' : 'text'}
-      variant="outlined"
-      {...(readOnly && !disabled && { focused: null })}
-      {...params}
-      {...props}
-      slotProps={{
-        ...props?.slotProps,
-        inputLabel: {
-          ...props?.slotProps?.inputLabel,
-          ...params?.InputLabelProps
-        },
+  return useMemo<TextFieldProps>(
+    () => ({
+      id,
+      disabled,
+      error: !!errorMsg,
+      fullWidth: true,
+      margin: 'dense',
+      size: 'small',
+      type: password && showPassword ? 'password' : 'text',
+      variant: 'outlined',
+      ...(readOnly && !disabled && { focused: null }),
+      ...overrides,
+      slotProps: {
+        ...overrides?.slotProps,
         input: {
-          // 'aria-describedby': getAriaDescribedBy(props),
-          placeholder: placeholder,
-          readOnly: readOnly,
-          ...props?.slotProps?.input,
-          ...params?.InputProps,
-          startAdornment: (
-            <>
-              {startAdornment && <InputAdornment position="start">{startAdornment}</InputAdornment>}
-              {params?.InputProps?.startAdornment}
-            </>
-          ),
-          endAdornment: (
-            <StyledEndAdornment>
-              {props?.slotProps?.input?.['endAdornment']}
-              {/* {params?.InputProps?.endAdornment} */}
-              <PasswordInput />
-              <ResetInput />
-              {endAdornment}
-            </StyledEndAdornment>
-          )
+          placeholder,
+          readOnly,
+          startAdornment: startAdornment && <InputAdornment position="start">{startAdornment}</InputAdornment>,
+          ...overrides?.slotProps?.input
         }
-      }}
-      sx={{
-        ...props?.sx,
+      },
+      InputProps: {
+        placeholder,
+        readOnly,
+        startAdornment: startAdornment && <InputAdornment position="start">{startAdornment}</InputAdornment>,
+        ...overrides?.InputProps
+      },
+      sx: {
         margin: 0,
         '& .MuiInputBase-root': {
           paddingRight: '9px !important',
@@ -663,7 +656,6 @@ export const StyledTextField = ({ params, ...props }: StyledTextField) => {
           }),
           ...(readOnly && !disabled && { cursor: 'default' })
         },
-
         '& .MuiInputBase-input': {
           ...(overflowHidden && {
             whiteSpace: 'nowrap',
@@ -681,17 +673,86 @@ export const StyledTextField = ({ params, ...props }: StyledTextField) => {
               textSecurity: 'disc'
             })
         },
-
         '& .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline': {
           ...(readOnly &&
             !disabled && {
               borderColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.23)' : 'rgba(0, 0, 0, 0.23)'
             })
+        },
+        ...overrides?.sx
+      }
+    }),
+    [
+      disabled,
+      errorMsg,
+      id,
+      monospace,
+      overflowHidden,
+      overrides,
+      password,
+      placeholder,
+      readOnly,
+      showPassword,
+      startAdornment,
+      theme.palette.mode,
+      tiny
+    ]
+  );
+};
+
+export type StyledTextField = TextFieldProps & {
+  params?: AutocompleteRenderInputParams;
+};
+
+export const StyledTextField = React.memo(({ params, ...props }: StyledTextField) => {
+  const [get] = usePropStore();
+
+  const endAdornment = get('endAdornment');
+  const placeholder = get('placeholder');
+  const readOnly = get('readOnly');
+  const startAdornment = get('startAdornment');
+
+  const textInputSlot = useTextInputSlot();
+
+  return (
+    <TextField
+      {...textInputSlot}
+      {...params}
+      {...props}
+      slotProps={{
+        ...textInputSlot?.slotProps,
+        ...props?.slotProps,
+        inputLabel: {
+          ...props?.slotProps?.inputLabel,
+          ...params?.InputLabelProps
+        },
+        input: {
+          // 'aria-describedby': getAriaDescribedBy(props),
+          ...textInputSlot?.slotProps?.input,
+          ...props?.slotProps?.input,
+          ...params?.InputProps,
+          placeholder: placeholder,
+          readOnly: readOnly,
+          startAdornment: (
+            <>
+              {startAdornment && <InputAdornment position="start">{startAdornment}</InputAdornment>}
+              {params?.InputProps?.startAdornment}
+            </>
+          ),
+          endAdornment: (
+            <StyledEndAdornment preventRender={!props?.slotProps?.input?.['endAdornment']}>
+              {props?.slotProps?.input?.['endAdornment']}
+              {/* {params?.InputProps?.endAdornment} */}
+              <PasswordInput />
+              <ResetInput />
+              {endAdornment}
+            </StyledEndAdornment>
+          )
         }
       }}
     />
   );
-};
+});
 
 export type StyledAutocompleteProps<
   Value,

@@ -26,12 +26,12 @@ const WrappedTextInput = React.memo(() => {
   const autoComplete = get('autoComplete');
   const disabled = get('disabled');
   const id = get('id');
-  const inputValue = get('inputValue');
+  const inputValue = get('inputValue') ?? '';
   const loading = get('loading');
   const options = get('options');
   const readOnly = get('readOnly');
   const tiny = get('tiny');
-  const value = get('value');
+  const value = get('value') ?? '';
 
   const { handleChange, handleFocus, handleBlur } = useInputHandlers<TextInputProps>();
 
@@ -49,11 +49,11 @@ const WrappedTextInput = React.memo(() => {
             freeSolo
             fullWidth
             id={id}
-            inputValue={inputValue ?? ''}
+            inputValue={inputValue}
             options={options}
             readOnly={readOnly}
             size="small"
-            value={value ?? ''}
+            value={value}
             onInputChange={(e, v) => handleChange(e, v, v)}
             onFocus={handleFocus}
             onBlur={e => handleBlur(e, value)}
