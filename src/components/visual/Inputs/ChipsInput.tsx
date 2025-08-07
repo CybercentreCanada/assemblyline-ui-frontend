@@ -65,7 +65,7 @@ const WrappedChipsInput = React.memo(() => {
             options={options}
             readOnly={readOnly}
             size="small"
-            value={inputValue}
+            value={inputValue ?? []}
             onChange={(e, v) => handleChange(e, v as string[], v as string[])}
             onFocus={handleFocus}
             onBlur={e => handleBlur(e, value)}

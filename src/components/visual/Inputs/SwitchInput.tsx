@@ -42,7 +42,7 @@ const WrappedSwitchInput = React.memo(() => {
         >
           <StyledFormControlLabel label={<StyledButtonLabel />}>
             <Switch
-              checked={Boolean(inputValue ?? value)}
+              checked={Boolean(inputValue)}
               disableFocusRipple
               disableRipple
               disableTouchRipple

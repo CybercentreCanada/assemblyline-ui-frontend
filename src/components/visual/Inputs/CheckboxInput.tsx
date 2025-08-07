@@ -46,7 +46,7 @@ const WrappedCheckboxInput = React.memo(() => {
         >
           <StyledFormControlLabel label={<StyledButtonLabel />}>
             <Checkbox
-              checked={inputValue}
+              checked={Boolean(inputValue)}
               indeterminate={indeterminate}
               disableFocusRipple
               disableRipple
@@ -82,9 +82,7 @@ export const CheckboxInput = ({ indeterminate = false, preventRender = false, ..
   });
 
   return preventRender ? null : (
-    <PropProvider<CheckboxInputProps>
-      props={{ ...parsedProps, inputValue: Boolean(parsedProps.inputValue ?? parsedProps.value) }}
-    >
+    <PropProvider<CheckboxInputProps> props={parsedProps}>
       <WrappedCheckboxInput />
     </PropProvider>
   );

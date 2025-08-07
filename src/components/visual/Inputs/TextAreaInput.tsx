@@ -51,7 +51,7 @@ const WrappedTextAreaInput = React.memo(() => {
               {...(!overflowHidden && { multiline: true, rows: rows })}
               autoComplete={autoComplete}
               type={password && showPassword ? 'password' : 'text'}
-              value={inputValue ?? value ?? ''}
+              value={inputValue ?? ''}
               onChange={e => handleChange(e, e.target.value, e.target.value)}
               onFocus={handleFocus}
               onBlur={e => handleBlur(e, value)}

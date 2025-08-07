@@ -66,7 +66,7 @@ export const createPropContext = <Props extends object>(initialProps: Props) => 
     const subscribers = new Set<() => void>();
 
     const get = <Data extends object, K extends keyof (Data & Props) = keyof (Data & Props)>(key: K) =>
-      (stateRef.current as Data & Props)?.[key] ?? (initialProps as Data & Props)?.[key] ?? null;
+      (stateRef.current as Data & Props)?.[key] ?? (initialProps as Data & Props)?.[key];
 
     const reset = <Data extends object>(current: Data & Props) => {
       if (shallowEqual(current, prevPropsRef.current, true)) return;

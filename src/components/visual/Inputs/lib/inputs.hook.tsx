@@ -51,7 +51,7 @@ export const useInputParsedProps = <Value, InputValue, Props extends InputValues
 };
 
 export const useInputHandlers = <
-  Props extends InputValues<unknown, unknown> & InputProps & InputStates & Record<string, unknown>,
+  Props extends InputValues<unknown, unknown> & InputProps & InputStates & Record<string, unknown>
 >() => {
   const [get, setStore] = usePropStore<InputValues<unknown, unknown>>();
 

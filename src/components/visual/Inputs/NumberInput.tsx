@@ -42,7 +42,7 @@ const WrappedNumberInput = React.memo(() => {
               value={inputValue}
               onChange={e => handleChange(e, e.target.value, e.target.value !== '' ? Number(e.target.value) : null)}
               onFocus={handleFocus}
-              onBlur={e => handleBlur(e, value !== null ? String(value) : '')}
+              onBlur={e => handleBlur(e, value == null ? '' : String(value))}
               slotProps={{
                 input: {
                   style: {
@@ -71,7 +71,7 @@ export const NumberInput = ({ max = null, min = null, preventRender = false, val
   });
 
   return preventRender ? null : (
-    <PropProvider<NumberInputProps> props={{ ...parsedProps, inputValue: value !== null ? String(value) : '' }}>
+    <PropProvider<NumberInputProps> props={{ ...parsedProps, inputValue: value == null ? '' : String(value) }}>
       <WrappedNumberInput />
     </PropProvider>
   );

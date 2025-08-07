@@ -43,17 +43,17 @@ const WrappedTextInput = React.memo(() => {
           <StyledInputSkeleton />
         ) : (
           <Autocomplete
-            id={id}
             autoComplete={autoComplete}
             disableClearable
             disabled={disabled}
             freeSolo
             fullWidth
+            id={id}
+            inputValue={inputValue ?? ''}
+            options={options}
             readOnly={readOnly}
             size="small"
-            options={options}
-            value={value}
-            inputValue={inputValue}
+            value={value ?? ''}
             onInputChange={(e, v) => handleChange(e, v, v)}
             onFocus={handleFocus}
             onBlur={e => handleBlur(e, value)}
@@ -75,7 +75,7 @@ export const TextInput = ({
   autoComplete = false,
   options = [],
   preventRender = false,
-  value = '',
+  value,
   ...props
 }: TextInputProps) => {
   const parsedProps = useInputParsedProps<string, string, TextInputProps>({
