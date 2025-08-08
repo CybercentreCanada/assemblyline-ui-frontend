@@ -66,6 +66,7 @@ const ServiceContainer = ({ service, defaults, setService, setModified }: Servic
           label={t('container.channel')}
           loading={!service}
           value={!service ? null : service.update_channel}
+          defaultValue={!service ? undefined : defaults?.update_channel}
           reset={showReset(service, defaults, 'update_channel')}
           options={
             [
@@ -77,10 +78,6 @@ const ServiceContainer = ({ service, defaults, setService, setModified }: Servic
             setModified(true);
             setService({ ...service, update_channel: v });
           }}
-          onReset={() => {
-            setModified(true);
-            setService({ ...service, update_channel: defaults.update_channel });
-          }}
         />
       </Grid>
 
@@ -89,6 +86,7 @@ const ServiceContainer = ({ service, defaults, setService, setModified }: Servic
           label={t('container.privileged')}
           loading={!service}
           value={!service ? null : service.privileged}
+          defaultValue={!service ? undefined : !!defaults?.privileged}
           reset={showReset(service, defaults, 'privileged')}
           options={
             [
@@ -99,10 +97,6 @@ const ServiceContainer = ({ service, defaults, setService, setModified }: Servic
           onChange={(e, v) => {
             setModified(true);
             setService({ ...service, privileged: v });
-          }}
-          onReset={() => {
-            setModified(true);
-            setService({ ...service, privileged: !!defaults.privileged });
           }}
         />
       </Grid>
