@@ -29,13 +29,13 @@ const WrappedSliderInput = React.memo(() => {
   const disabled = get('disabled');
   const errorMsg = get('errorMsg');
   const id = get('id');
-  const inputValue = get('inputValue');
+  const inputValue = get('inputValue') ?? null;
   const loading = get('loading');
   const marks = get('marks');
   const max = get('max');
   const min = get('min');
   const readOnly = get('readOnly');
-  const step = get('step');
+  const step = get('step') ?? null;
   const value = get('value');
   const valueLabelDisplay = get('valueLabelDisplay');
   const valueLabelFormat = get('valueLabelFormat');
@@ -85,7 +85,7 @@ export const SliderInput = ({
   max = null,
   min = null,
   preventRender = false,
-  step = 1,
+  step = null,
   value,
   valueLabelDisplay = 'auto',
   valueLabelFormat = v => v,

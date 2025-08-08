@@ -1,4 +1,4 @@
-import type { AutocompleteProps } from '@mui/material';
+import type { AutocompleteProps, TextFieldProps } from '@mui/material';
 import { Autocomplete } from '@mui/material';
 import {
   ClearInput,
@@ -18,11 +18,11 @@ import React from 'react';
 
 export type ChipsInputProps = InputValues<string[], string[], React.SyntheticEvent<Element, Event>> &
   InputProps & {
-    autoComplete?: AutocompleteProps<string, true, false, true, ElementType>['autoComplete'];
+    autoComplete?: TextFieldProps['autoComplete'];
     disableCloseOnSelect?: AutocompleteProps<string, true, false, true, ElementType>['disableCloseOnSelect'];
     filterSelectedOptions?: AutocompleteProps<string, true, false, true, ElementType>['filterSelectedOptions'];
     isOptionEqualToValue?: (option: string, value: string) => boolean;
-    options?: string[];
+    options?: string[] | readonly string[];
     renderOption?: AutocompleteProps<string, true, false, true, ElementType>['renderOption'];
     renderValue?: AutocompleteProps<string, true, false, true, ElementType>['renderValue'];
   };
@@ -30,7 +30,6 @@ export type ChipsInputProps = InputValues<string[], string[], React.SyntheticEve
 const WrappedChipsInput = React.memo(() => {
   const [get] = usePropStore<ChipsInputProps>();
 
-  const autoComplete = get('autoComplete');
   const disableCloseOnSelect = get('disableCloseOnSelect');
   const disabled = get('disabled');
   const filterSelectedOptions = get('filterSelectedOptions');
@@ -54,7 +53,6 @@ const WrappedChipsInput = React.memo(() => {
           <StyledInputSkeleton />
         ) : (
           <Autocomplete
-            autoComplete={autoComplete}
             disableCloseOnSelect={disableCloseOnSelect}
             disabled={disabled}
             filterSelectedOptions={filterSelectedOptions}
@@ -88,7 +86,7 @@ const WrappedChipsInput = React.memo(() => {
 });
 
 export const ChipsInput = ({
-  autoComplete = false,
+  autoComplete = 'off',
   disableCloseOnSelect = false,
   endAdornment = null,
   filterSelectedOptions = false,

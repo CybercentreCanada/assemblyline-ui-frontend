@@ -13,7 +13,7 @@ export const createPropContext = <Props extends object>(initialProps: Props) => 
       (stateRef.current as Data & Props)?.[key] ?? (initialProps as Data & Props)?.[key];
 
     const reset = <Data extends object>(current: Data & Props) => {
-      if (shallowEqual(current, prevPropsRef.current, true)) return;
+      if (shallowEqual(current, prevPropsRef.current)) return;
       stateRef.current = shallowReconcile(current, prevPropsRef.current, stateRef.current) as Data & Props;
       prevPropsRef.current = current;
       subscribers.forEach(fn => fn());
@@ -67,7 +67,7 @@ export const createPropContext = <Props extends object>(initialProps: Props) => 
 
     const useStore = <K extends keyof (Data & Props), V extends (Data & Props)[K]>(
       key: K,
-      isEqual: (a: V, b: V, func: boolean) => boolean = shallowEqual
+      isEqual: (a: V, b: V) => boolean = shallowEqual
     ): V => {
       const store = useContext(PropContext);
       if (!store) throw new Error('Store not found');
@@ -78,7 +78,7 @@ export const createPropContext = <Props extends object>(initialProps: Props) => 
         store.subscribe,
         () => {
           const newValue = store.get<Data & Props>(key) as V;
-          if (!isEqual(lastValueRef.current, newValue, false)) {
+          if (!isEqual(lastValueRef.current, newValue)) {
             lastValueRef.current = newValue;
           }
           return lastValueRef.current;

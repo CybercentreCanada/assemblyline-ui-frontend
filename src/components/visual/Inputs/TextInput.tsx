@@ -1,4 +1,4 @@
-import type { AutocompleteProps } from '@mui/material';
+import type { TextFieldProps } from '@mui/material';
 import { Autocomplete, Typography } from '@mui/material';
 import {
   HelperText,
@@ -11,19 +11,17 @@ import {
 import { useInputHandlers, useInputParsedProps } from 'components/visual/Inputs/lib/inputs.hook';
 import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
 import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
-import type { ElementType } from 'react';
 import React from 'react';
 
 export type TextInputProps = InputValues<string, string, React.SyntheticEvent<Element, Event>> &
   InputProps & {
-    autoComplete?: AutocompleteProps<string, boolean, boolean, boolean, ElementType>['autoComplete'];
-    options?: string[];
+    autoComplete?: TextFieldProps['autoComplete'];
+    options?: string[] | readonly string[];
   };
 
 const WrappedTextInput = React.memo(() => {
   const [get] = usePropStore<TextInputProps>();
 
-  const autoComplete = get('autoComplete');
   const disabled = get('disabled');
   const id = get('id');
   const inputValue = get('inputValue') ?? '';
@@ -43,7 +41,6 @@ const WrappedTextInput = React.memo(() => {
           <StyledInputSkeleton />
         ) : (
           <Autocomplete
-            autoComplete={autoComplete}
             disableClearable
             disabled={disabled}
             freeSolo
@@ -72,7 +69,7 @@ const WrappedTextInput = React.memo(() => {
 });
 
 export const TextInput = ({
-  autoComplete = false,
+  autoComplete = 'off',
   options = [],
   preventRender = false,
   value,

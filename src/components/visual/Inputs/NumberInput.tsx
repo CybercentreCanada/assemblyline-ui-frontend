@@ -1,3 +1,4 @@
+import type { TextFieldProps } from '@mui/material';
 import {
   HelperText,
   StyledFormControl,
@@ -13,6 +14,7 @@ import React from 'react';
 
 export type NumberInputProps = InputValues<number, string, React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>> &
   InputProps & {
+    autoComplete?: TextFieldProps['autoComplete'];
     max?: number;
     min?: number;
   };
@@ -24,8 +26,6 @@ const WrappedNumberInput = React.memo(() => {
   const loading = get('loading');
   const max = get('max');
   const min = get('min');
-  const password = get('password');
-  const showPassword = get('showPassword');
   const value = get('value');
 
   const { handleChange, handleFocus, handleBlur } = useInputHandlers<NumberInputProps>();
@@ -39,7 +39,7 @@ const WrappedNumberInput = React.memo(() => {
         ) : (
           <>
             <StyledTextField
-              type={password && showPassword ? 'password' : 'number'}
+              type="number"
               value={inputValue}
               onChange={e => handleChange(e, e.target.value, e.target.value !== '' ? Number(e.target.value) : null)}
               onFocus={handleFocus}
@@ -61,9 +61,17 @@ const WrappedNumberInput = React.memo(() => {
   );
 });
 
-export const NumberInput = ({ max = null, min = null, preventRender = false, value, ...props }: NumberInputProps) => {
+export const NumberInput = ({
+  autoComplete = 'off',
+  max = null,
+  min = null,
+  preventRender = false,
+  value,
+  ...props
+}: NumberInputProps) => {
   const parsedProps = useInputParsedProps<number, string, NumberInputProps>({
     ...props,
+    autoComplete,
     max,
     min,
     preventRender,

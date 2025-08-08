@@ -25,21 +25,13 @@ export const isValidValue = <T>(value: T): boolean => {
 export const isValidNumber = (value: number, { min = null, max = null }: { min?: number; max?: number }): boolean =>
   value == null ? false : (min == null || value >= min) && (max == null || value <= max);
 
-export function shallowEqual<T>(a: T, b: T, func: boolean = true): boolean {
-  if (typeof a === 'function' || typeof b === 'function') return func;
+export function shallowEqual<T>(a: T, b: T): boolean {
   if (Object.is(a, b)) return true;
   if (!a || !b || typeof a !== 'object' || typeof b !== 'object') return false;
 
   const keysA = Object.keys(a as object);
   const keysB = Object.keys(b as object);
-  return (
-    keysA.length === keysB.length &&
-    keysA.every(
-      key =>
-        key in b &&
-        ((typeof a[key] === 'function' || typeof b[key] === 'function' ? func : false) || Object.is(a[key], b[key]))
-    )
-  );
+  return keysA.length === keysB.length && keysA.every(key => key in b && Object.is(a[key], b[key]));
 }
 
 export function deepReconcile<T extends Record<string, unknown>>(

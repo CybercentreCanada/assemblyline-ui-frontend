@@ -123,7 +123,7 @@ const WrappedSelectInput = React.memo(<O extends readonly Option[]>() => {
           >
             {options.map((option, i) => (
               <MenuItem key={i} value={option.value as MenuItemProps['value']}>
-                <StyledListItemText primary={option.primary} secondary={option.secondary} />
+                <StyledListItemText primary={option.primary ? option.primary : '\u00A0'} secondary={option.secondary} />
               </MenuItem>
             ))}
           </Select>

@@ -226,6 +226,7 @@ const WrappedDateInput = React.memo(() => {
 });
 
 export const DateInput = ({
+  autoComplete = 'off',
   defaultDateOffset = null,
   maxDateToday = false,
   minDateTomorrow = false,
@@ -235,6 +236,7 @@ export const DateInput = ({
 }: DateInputProps) => {
   const parsedProps = useInputParsedProps<string, Moment, DateInputProps>({
     ...props,
+    autoComplete,
     defaultDateOffset,
     maxDateToday,
     minDateTomorrow,

@@ -612,12 +612,15 @@ export const StyledListItemText = React.memo(({ primary, secondary = null, ...pr
 
 export const useTextInputSlot = (overrides?: Partial<TextFieldProps>) => {
   const theme = useTheme();
-  const [get] = usePropStore();
+  const [get] = usePropStore<{ autoComplete?: TextFieldProps['autoComplete'] }>();
 
+  const autoComplete = get('autoComplete');
   const disabled = get('disabled');
   const errorMsg = get('errorMsg');
+  const helperText = get('helperText');
   const id = get('id');
   const label = get('label');
+  const loading = get('loading');
   const monospace = get('monospace');
   const overflowHidden = get('overflowHidden');
   const password = get('password');
@@ -630,13 +633,18 @@ export const useTextInputSlot = (overrides?: Partial<TextFieldProps>) => {
   return useMemo<TextFieldProps>(
     () => ({
       'aria-label': label,
-      id: id,
+      ...(disabled || loading || readOnly
+        ? null
+        : helperText || errorMsg
+          ? { 'aria-describedby': `${id}-helper-text` }
+          : null),
+      autoComplete: autoComplete,
       disabled: disabled,
       error: !!errorMsg,
       fullWidth: true,
+      id: id,
       margin: 'dense',
       size: 'small',
-      type: password && showPassword ? 'password' : 'text',
       variant: 'outlined',
       ...(readOnly && !disabled && { focused: null }),
       ...overrides,
@@ -694,10 +702,13 @@ export const useTextInputSlot = (overrides?: Partial<TextFieldProps>) => {
       }
     }),
     [
+      autoComplete,
       disabled,
       errorMsg,
+      helperText,
       id,
       label,
+      loading,
       monospace,
       overflowHidden,
       overrides,
@@ -719,12 +730,7 @@ export type StyledTextField = TextFieldProps & {
 export const StyledTextField = React.memo(({ params, ...props }: StyledTextField) => {
   const [get] = usePropStore();
 
-  const disabled = get('disabled');
   const endAdornment = get('endAdornment');
-  const errorMsg = get('errorMsg');
-  const helperText = get('helperText');
-  const id = get('id');
-  const loading = get('loading');
   const placeholder = get('placeholder');
   const readOnly = get('readOnly');
   const startAdornment = get('startAdornment');
@@ -744,11 +750,6 @@ export const StyledTextField = React.memo(({ params, ...props }: StyledTextField
           ...params?.InputLabelProps
         },
         input: {
-          ...(disabled || loading || readOnly
-            ? null
-            : helperText || errorMsg
-              ? { 'aria-describedby': `${id}-helper-text` }
-              : null),
           ...textInputSlot?.slotProps?.input,
           ...props?.slotProps?.input,
           ...params?.InputProps,
