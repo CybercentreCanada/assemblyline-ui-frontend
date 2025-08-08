@@ -497,7 +497,7 @@ const WrappedContainerDialog = ({
                 onChange={(e, v) => handleContainerValueChange('ram_mb_min', v)}
                 onReset={() => {
                   setModified(true);
-                  setTempContainer({ ...tempContainer, ram_mb_min: defaults.ram_mb_min, ram_mb: defaults.ram_mb });
+                  setTempContainer({ ...tempContainer, ram_mb_min: defaults?.ram_mb_min, ram_mb: defaults?.ram_mb });
                 }}
               />
             </Grid>
@@ -514,7 +514,7 @@ const WrappedContainerDialog = ({
                 onChange={(e, v) => handleContainerValueChange('ram_mb', v)}
                 onReset={() => {
                   setModified(true);
-                  setTempContainer({ ...tempContainer, ram_mb_min: defaults.ram_mb_min, ram_mb: defaults.ram_mb });
+                  setTempContainer({ ...tempContainer, ram_mb_min: defaults?.ram_mb_min, ram_mb: defaults?.ram_mb });
                 }}
               />
             </Grid>
@@ -537,6 +537,7 @@ const WrappedContainerDialog = ({
                 value={(!tempContainer ? null : (tempContainer.registry_password ?? '')) as string}
                 defaultValue={(!defaults ? undefined : (defaults?.registry_password ?? '')) as string}
                 reset={showReset(tempContainer, defaults, 'registry_password')}
+                password
                 onChange={(e, v) => handleContainerValueChange('registry_password', v || undefined)}
               />
             </Grid>
@@ -562,7 +563,7 @@ const WrappedContainerDialog = ({
                 onChange={(e, v) => handleContainerCommandChange(e)}
                 onReset={() => {
                   setModified(true);
-                  setTempContainer({ ...tempContainer, command: defaults.command });
+                  setTempContainer({ ...tempContainer, command: defaults?.command });
                 }}
               />
             </Grid>

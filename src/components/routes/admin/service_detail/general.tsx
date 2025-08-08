@@ -77,7 +77,7 @@ const ServiceGeneral = ({
               label={t('general.version')}
               loading={!service}
               value={!service ? null : service.version}
-              defaultValue={!service ? undefined : defaults.version}
+              defaultValue={!service ? undefined : defaults?.version}
               reset={showReset(service, defaults, 'version')}
               options={versions.map(v => ({ primary: v, value: v }))}
               onChange={(e, v) => {
@@ -90,7 +90,7 @@ const ServiceGeneral = ({
               tiny
               loading={!service}
               value={!service ? null : service.auto_update}
-              defaultValue={!service ? undefined : defaults.auto_update}
+              defaultValue={!service ? undefined : defaults?.auto_update}
               reset={showReset(service, defaults, 'auto_update')}
               onChange={() => {
                 setModified(true);
@@ -105,7 +105,7 @@ const ServiceGeneral = ({
                 label={t('general.classification')}
                 loading={!service}
                 value={!service ? null : service.classification}
-                defaultValue={!service ? undefined : defaults.classification}
+                defaultValue={!service ? undefined : defaults?.classification}
                 reset={showReset(service, defaults, 'classification')}
                 onChange={(e, v) => {
                   setModified(true);
@@ -121,7 +121,7 @@ const ServiceGeneral = ({
                 label={t('general.result_classification')}
                 loading={!service}
                 value={!service ? null : service.default_result_classification}
-                defaultValue={!service ? undefined : defaults.default_result_classification}
+                defaultValue={!service ? undefined : defaults?.default_result_classification}
                 reset={showReset(service, defaults, 'default_result_classification')}
                 onChange={(e, v) => {
                   setModified(true);
@@ -136,7 +136,7 @@ const ServiceGeneral = ({
               label={t('general.description')}
               loading={!service}
               value={!service ? null : service.description}
-              defaultValue={!service ? undefined : defaults.description}
+              defaultValue={!service ? undefined : defaults?.description}
               reset={showReset(service, defaults, 'description')}
               rows={6}
               onChange={(e, v) => {
@@ -151,7 +151,7 @@ const ServiceGeneral = ({
               label={t('general.stage')}
               loading={!service}
               value={!service ? null : service.stage}
-              defaultValue={!service ? undefined : defaults.stage}
+              defaultValue={!service ? undefined : defaults?.stage}
               reset={showReset(service, defaults, 'stage')}
               options={
                 !constants
@@ -170,7 +170,7 @@ const ServiceGeneral = ({
               label={t('general.category')}
               loading={!service}
               value={!service ? null : service.category}
-              defaultValue={!service ? undefined : defaults.category}
+              defaultValue={!service ? undefined : defaults?.category}
               reset={showReset(service, defaults, 'category')}
               options={
                 !constants
@@ -189,7 +189,7 @@ const ServiceGeneral = ({
               label={t('general.accept')}
               loading={!service}
               value={!service ? null : service.accepts}
-              defaultValue={!service ? undefined : defaults.accepts}
+              defaultValue={!service ? undefined : defaults?.accepts}
               reset={showReset(service, defaults, 'accepts')}
               onChange={(e, v) => {
                 setModified(true);
@@ -203,7 +203,7 @@ const ServiceGeneral = ({
               label={t('general.reject')}
               loading={!service}
               value={!service ? null : service.rejects}
-              defaultValue={!service ? undefined : defaults.rejects}
+              defaultValue={!service ? undefined : defaults?.rejects}
               reset={showReset(service, defaults, 'rejects')}
               onChange={(e, v) => {
                 setModified(true);
@@ -217,7 +217,7 @@ const ServiceGeneral = ({
               label={t('general.recursion_prevention')}
               loading={!service}
               value={!service ? null : service.recursion_prevention}
-              defaultValue={!service ? undefined : defaults.recursion_prevention}
+              defaultValue={!service ? undefined : defaults?.recursion_prevention}
               reset={showReset(service, defaults, 'recursion_prevention')}
               options={[...constants.categories, ...serviceNames]}
               isOptionEqualToValue={(option, value) => option.toUpperCase() === value.toUpperCase()}
@@ -258,7 +258,7 @@ const ServiceGeneral = ({
               min={5}
               required
               value={!service ? null : service.timeout}
-              defaultValue={!service ? undefined : defaults.timeout}
+              defaultValue={!service ? undefined : defaults?.timeout}
               reset={showReset(service, defaults, 'timeout')}
               onChange={(e, v) => {
                 setModified(true);
@@ -273,7 +273,7 @@ const ServiceGeneral = ({
               loading={!service}
               placeholder={t('limit.system_default')}
               value={!service ? null : service.min_instances > 0 ? service.min_instances : null}
-              defaultValue={!service ? undefined : defaults.min_instances || 0}
+              defaultValue={!service ? undefined : defaults?.min_instances || 0}
               reset={showReset(service, defaults, 'min_instances')}
               min={0}
               {...(service.licence_count && { max: service.licence_count })}
@@ -294,7 +294,7 @@ const ServiceGeneral = ({
               loading={!service}
               placeholder={t('limit.none')}
               value={!service ? null : service.licence_count > 0 ? service.licence_count : null}
-              defaultValue={!service ? undefined : defaults.licence_count || 0}
+              defaultValue={!service ? undefined : defaults?.licence_count || 0}
               reset={showReset(service, defaults, 'licence_count')}
               min={0}
               endAdornment={<InputAdornment position="end">{'↑'}</InputAdornment>}
@@ -317,7 +317,7 @@ const ServiceGeneral = ({
               placeholder={t('limit.none')}
               helperText={t('general.max_queue_length.desc')}
               value={!service ? null : service.max_queue_length > 0 ? service.max_queue_length : null}
-              defaultValue={!service ? undefined : defaults.max_queue_length}
+              defaultValue={!service ? undefined : defaults?.max_queue_length}
               reset={showReset(service, defaults, 'max_queue_length')}
               min={0}
               onChange={(e, v) => {
@@ -332,7 +332,7 @@ const ServiceGeneral = ({
               label={t('general.location')}
               loading={!service}
               value={!service ? null : service.is_external}
-              defaultValue={!service ? undefined : defaults.is_external}
+              defaultValue={!service ? undefined : defaults?.is_external}
               reset={showReset(service, defaults, 'is_external')}
               options={
                 [
@@ -352,7 +352,7 @@ const ServiceGeneral = ({
               label={t('general.caching')}
               loading={!service}
               value={!service ? null : service.disable_cache}
-              defaultValue={!service ? undefined : defaults.disable_cache}
+              defaultValue={!service ? undefined : defaults?.disable_cache}
               reset={showReset(service, defaults, 'disable_cache')}
               options={
                 [
