@@ -81,6 +81,7 @@ export const StyledEndAdornmentBox = React.memo(
           display: 'flex',
           alignItems: 'center',
           maxHeight: 'initial',
+          color: theme.palette.text.secondary,
           ...props?.sx,
           '& .MuiTooltip-tooltip': {
             whiteSpace: 'nowrap'
@@ -95,6 +96,8 @@ export const StyledEndAdornmentBox = React.memo(
 
 export const StyledEndAdornment = React.memo(
   ({ children, preventRender = true, ...props }: Partial<InputAdornmentProps> & { preventRender?: boolean }) => {
+    const theme = useTheme();
+
     const [get] = usePropStore();
 
     const endAdornment = get('endAdornment');
@@ -107,7 +110,11 @@ export const StyledEndAdornment = React.memo(
       preventPasswordRender &&
       preventExpandRender &&
       !endAdornment ? null : (
-      <InputAdornment position="end" {...props} sx={{ marginLeft: 0, ...props?.sx }}>
+      <InputAdornment
+        position="end"
+        {...props}
+        sx={{ marginLeft: 0, color: theme.palette.text.secondary, ...props?.sx }}
+      >
         {children}
       </InputAdornment>
     );
@@ -352,6 +359,7 @@ export const StyledFormControl = React.memo(({ children, ...props }: FormControl
       fullWidth
       {...(readOnly && !disabled && { focused: null })}
       {...props}
+      onSubmit={e => e.preventDefault()}
       sx={{
         ...props?.sx,
         ...(divider && { borderBottom: `1px solid ${theme.palette.divider}` }),
@@ -609,6 +617,7 @@ export const useTextInputSlot = (overrides?: Partial<TextFieldProps>) => {
   const disabled = get('disabled');
   const errorMsg = get('errorMsg');
   const id = get('id');
+  const label = get('label');
   const monospace = get('monospace');
   const overflowHidden = get('overflowHidden');
   const password = get('password');
@@ -620,8 +629,9 @@ export const useTextInputSlot = (overrides?: Partial<TextFieldProps>) => {
 
   return useMemo<TextFieldProps>(
     () => ({
-      id,
-      disabled,
+      'aria-label': label,
+      id: id,
+      disabled: disabled,
       error: !!errorMsg,
       fullWidth: true,
       margin: 'dense',
@@ -657,6 +667,7 @@ export const useTextInputSlot = (overrides?: Partial<TextFieldProps>) => {
           ...(readOnly && !disabled && { cursor: 'default' })
         },
         '& .MuiInputBase-input': {
+          paddingRight: '4px',
           ...(overflowHidden && {
             whiteSpace: 'nowrap',
             overflow: 'hidden',
@@ -686,6 +697,7 @@ export const useTextInputSlot = (overrides?: Partial<TextFieldProps>) => {
       disabled,
       errorMsg,
       id,
+      label,
       monospace,
       overflowHidden,
       overrides,
@@ -707,7 +719,12 @@ export type StyledTextField = TextFieldProps & {
 export const StyledTextField = React.memo(({ params, ...props }: StyledTextField) => {
   const [get] = usePropStore();
 
+  const disabled = get('disabled');
   const endAdornment = get('endAdornment');
+  const errorMsg = get('errorMsg');
+  const helperText = get('helperText');
+  const id = get('id');
+  const loading = get('loading');
   const placeholder = get('placeholder');
   const readOnly = get('readOnly');
   const startAdornment = get('startAdornment');
@@ -727,7 +744,11 @@ export const StyledTextField = React.memo(({ params, ...props }: StyledTextField
           ...params?.InputLabelProps
         },
         input: {
-          // 'aria-describedby': getAriaDescribedBy(props),
+          ...(disabled || loading || readOnly
+            ? null
+            : helperText || errorMsg
+              ? { 'aria-describedby': `${id}-helper-text` }
+              : null),
           ...textInputSlot?.slotProps?.input,
           ...props?.slotProps?.input,
           ...params?.InputProps,

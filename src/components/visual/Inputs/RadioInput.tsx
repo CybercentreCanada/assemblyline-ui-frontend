@@ -35,7 +35,7 @@ const WrappedRadioInput = React.memo(<O extends readonly Option[]>() => {
   const [get] = usePropStore<RadioInputProps<O>>();
 
   const focused = get('focused');
-  const inputValue = get('inputValue');
+  const inputValue = get('inputValue') ?? '';
   const options = get('options');
   const preventDisabledColor = get('preventDisabledColor');
   const readOnly = get('readOnly');
@@ -56,8 +56,10 @@ const WrappedRadioInput = React.memo(<O extends readonly Option[]>() => {
               onClick={e => handleChange(e, option.value, option.value)}
             >
               <StyledFormControlLabel
-                label={<StyledButtonLabel label={option.label} focused={focused && inputValue === option.value} />}
-                value={option.value}
+                label={
+                  <StyledButtonLabel label={option.label} focused={focused && inputValue === (option.value ?? '')} />
+                }
+                value={option.value ?? ''}
               >
                 <Radio
                   disableFocusRipple

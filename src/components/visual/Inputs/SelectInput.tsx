@@ -39,6 +39,7 @@ const WrappedSelectInput = React.memo(<O extends readonly Option[]>() => {
   const displayEmpty = get('displayEmpty');
   const endAdornment = get('endAdornment');
   const errorMsg = get('errorMsg');
+  const id = get('id');
   const inputValue = get('inputValue');
   const loading = get('loading');
   const monospace = get('monospace');
@@ -60,13 +61,14 @@ const WrappedSelectInput = React.memo(<O extends readonly Option[]>() => {
           <StyledInputSkeleton />
         ) : (
           <Select
-            fullWidth
-            size="small"
-            displayEmpty={displayEmpty}
             disabled={disabled}
-            readOnly={readOnly}
-            value={options?.some(o => o.value === inputValue) ? inputValue : ''}
+            displayEmpty={displayEmpty}
             error={!!errorMsg}
+            fullWidth
+            id={id}
+            readOnly={readOnly}
+            size="small"
+            value={options?.some(o => o.value === inputValue) ? inputValue : ''}
             onChange={event => handleChange(event as React.SyntheticEvent, event.target.value, event.target.value)}
             onFocus={handleFocus}
             onBlur={e => handleBlur(e, value)}
@@ -100,6 +102,7 @@ const WrappedSelectInput = React.memo(<O extends readonly Option[]>() => {
                 }}
               />
             )}
+            slotProps={{ input: { id: id } }}
             MenuProps={{ sx: { maxWidth: 'min-content' } }}
             endAdornment={
               <StyledEndAdornment sx={{ marginRight: theme.spacing(2) }}>

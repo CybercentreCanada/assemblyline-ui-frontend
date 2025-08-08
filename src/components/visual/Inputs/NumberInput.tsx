@@ -22,6 +22,8 @@ const WrappedNumberInput = React.memo(() => {
 
   const inputValue = get('inputValue') ?? '';
   const loading = get('loading');
+  const max = get('max');
+  const min = get('min');
   const password = get('password');
   const showPassword = get('showPassword');
   const value = get('value');
@@ -42,6 +44,14 @@ const WrappedNumberInput = React.memo(() => {
               onChange={e => handleChange(e, e.target.value, e.target.value !== '' ? Number(e.target.value) : null)}
               onFocus={handleFocus}
               onBlur={e => handleBlur(e, value == null ? '' : String(value))}
+              slotProps={{
+                input: {
+                  inputProps: {
+                    ...(typeof max === 'number' && { max }),
+                    ...(typeof min === 'number' && { min })
+                  }
+                }
+              }}
             />
             <HelperText />
           </>

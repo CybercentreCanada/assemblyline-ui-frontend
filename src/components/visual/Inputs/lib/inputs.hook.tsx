@@ -1,9 +1,8 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import type { InputProps, InputStates, InputValues } from 'components/visual/Inputs/lib/inputs.model';
 import { DEFAULT_INPUT_PROPS, DEFAULT_INPUT_STATES } from 'components/visual/Inputs/lib/inputs.model';
 import { usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
 import { isValidNumber, isValidValue } from 'components/visual/Inputs/lib/inputs.utils';
-import { useCallback } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export const useDefaultError = () => null;
@@ -15,58 +14,70 @@ export const useDefaultHandlers = () => ({
   handleBlur: () => null
 });
 
-export const useInputParsedProps = <Value, InputValue, Props extends InputValues<Value, InputValue> & InputProps>({
-  error = () => '',
-  ...props
-}: Props) => {
+export function useInputParsedProps<
+  Value,
+  InputValue,
+  Props extends InputValues<Value, InputValue> & InputProps & { min?: number; max?: number }
+>(props: Props) {
   const { t } = useTranslation('inputs');
 
-  const parsedProps = { ...DEFAULT_INPUT_PROPS, ...DEFAULT_INPUT_STATES, ...props };
+  const mergedProps = { ...DEFAULT_INPUT_PROPS, ...DEFAULT_INPUT_STATES, ...props };
+  const { min, max, required, error = () => '' } = mergedProps;
 
-  const min: number = parsedProps?.['min'];
-  const max: number = parsedProps?.['max'];
-  const required: boolean = parsedProps.required;
-
-  const newError = useCallback(
+  const validateError = useCallback(
     (val: Value): string => {
       const err = error(val);
       if (err) return err;
 
-      if (required && (min != null || max != null) && !isValidNumber(val as number, { min, max })) {
-        if (typeof min === 'number' && typeof max === 'number') return t('error.minmax', { min, max });
-        if (typeof min === 'number') return t('error.min', { min });
-        if (typeof max === 'number') return t('error.max', { max });
+      if (required && (min != null || max != null)) {
+        if (!isValidNumber(val as unknown as number, { min, max })) {
+          if (typeof min === 'number' && typeof max === 'number') return t('error.minmax', { min, max });
+          if (typeof min === 'number') return t('error.min', { min });
+          if (typeof max === 'number') return t('error.max', { max });
+        }
       }
 
-      if (required && !isValidValue(val)) return t('error.required');
+      if (required && !isValidValue(val)) {
+        return t('error.required');
+      }
 
       return '';
     },
     [error, min, max, required, t]
   );
+
   return {
     ...props,
-    error: newError,
-    errorMsg: newError(parsedProps.value),
-    id: (parsedProps.id || (parsedProps.label ?? '\u00A0')).toLowerCase().replaceAll(' ', '-'),
-    inputValue: parsedProps.value,
-    label: parsedProps.label ?? '\u00A0',
-    preventExpandRender: parsedProps.expand === null,
-    preventPasswordRender: parsedProps.loading || parsedProps.disabled || parsedProps.readOnly || !parsedProps.password,
-    preventResetRender: parsedProps.loading || parsedProps.disabled || parsedProps.readOnly || !parsedProps.reset
+    error: validateError,
+    errorMsg: validateError(mergedProps.value),
+    id:
+      mergedProps.id ??
+      (typeof mergedProps.label === 'string' ? mergedProps.label.toLowerCase().replaceAll(' ', '-') : '\u00A0'),
+    inputValue: mergedProps.value,
+    label: mergedProps.label ?? '\u00A0',
+    preventExpandRender: mergedProps.expand === null,
+    preventPasswordRender: mergedProps.loading || mergedProps.disabled || mergedProps.readOnly || !mergedProps.password,
+    preventResetRender: mergedProps.loading || mergedProps.disabled || mergedProps.readOnly || !mergedProps.reset
   };
-};
+}
 
-export const useInputHandlers = <
+export function useInputHandlers<
   Props extends InputValues<unknown, unknown> & InputProps & InputStates & Record<string, unknown>
->() => {
+>(debounceDelay = 100) {
   const [get, setStore] = usePropStore<InputValues<unknown, unknown>>();
+  const debounceTimer = useRef<NodeJS.Timeout | null>(null);
 
   const error = get('error');
   const onBlur = get('onBlur');
   const onChange = get('onChange');
   const onError = get('onError');
   const onFocus = get('onFocus');
+
+  useEffect(() => {
+    return () => {
+      if (debounceTimer.current) clearTimeout(debounceTimer.current);
+    };
+  }, []);
 
   const handleClick = useCallback(
     (event: Parameters<Props['onChange']>[0], inputValue: Props['inputValue'], value: Props['value']) => {
@@ -76,7 +87,7 @@ export const useInputHandlers = <
       const err = error(value);
       onError(err);
       if (!err) onChange(event, value);
-      setStore(() => ({ inputValue: inputValue, errorMsg: err }));
+      setStore(() => ({ inputValue, errorMsg: err }));
     },
     [error, onChange, onError, setStore]
   );
@@ -85,17 +96,22 @@ export const useInputHandlers = <
     (event: Parameters<Props['onChange']>[0], inputValue: Props['inputValue'], value: Props['value']) => {
       const err = error(value);
       onError(err);
-      if (!err) onChange(event, value);
-      setStore(() => ({ ...(!err && { value: value }), inputValue: inputValue, errorMsg: err }));
+
+      setStore(() => ({ ...(!err && { value }), inputValue, errorMsg: err }));
+
+      if (debounceTimer.current) clearTimeout(debounceTimer.current);
+
+      debounceTimer.current = setTimeout(() => {
+        if (!err) onChange(event, value);
+      }, debounceDelay);
     },
-    [error, onChange, onError, setStore]
+    [error, onChange, onError, setStore, debounceDelay]
   );
 
   const handleFocus = useCallback(
     (event: React.FocusEvent) => {
       onFocus(event);
       setStore(s => ({
-        // inputValue: s.value,
         focused: !s.readOnly && !s.disabled && document.activeElement === event.target
       }));
     },
@@ -107,11 +123,11 @@ export const useInputHandlers = <
       onBlur(event);
       setStore(() => {
         const err = error(inputValue);
-        return { focused: false, inputValue: inputValue, errorMsg: err };
+        return { focused: false, inputValue, errorMsg: err };
       });
     },
     [error, onBlur, setStore]
   );
 
   return { handleChange, handleClick, handleFocus, handleBlur };
-};
+}

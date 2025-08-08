@@ -27,6 +27,7 @@ import {
 import { useInputParsedProps } from 'components/visual/Inputs/lib/inputs.hook';
 import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
 import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
+import { Tooltip } from 'components/visual/Tooltip';
 import type { ClassificationParts, ClassificationValidator } from 'helpers/classificationParser';
 import {
   applyAliases,
@@ -62,6 +63,7 @@ const WrappedClassificationInput = React.memo(() => {
 
   const [get, setStore] = usePropStore<ClassificationInputState>();
 
+  const defaultValue = get('defaultValue');
   const disabled = get('disabled');
   const format = get('format');
   const fullWidth = get('fullWidth');
@@ -109,6 +111,23 @@ const WrappedClassificationInput = React.memo(() => {
     }
     return COLOR_MAP[levelStyles.color || levelStyles.label.replace('label-', '')] || ('default' as const);
   }, [c12nDef.levels_styles_map, preventRender, validated.parts.lvl]);
+
+  const title = useMemo<React.ReactNode>(
+    () =>
+      defaultValue === undefined ? null : (
+        <>
+          <span style={{ color: theme.palette.text.secondary }}>{t('reset_to')}</span>
+          <span>
+            {typeof defaultValue === 'object'
+              ? JSON.stringify(defaultValue)
+              : typeof defaultValue === 'string'
+                ? `"${defaultValue}"`
+                : `${defaultValue}`}
+          </span>
+        </>
+      ),
+    [defaultValue, t, theme.palette.text.secondary]
+  );
 
   const handleGroupsChange = useCallback(
     (grp: WhoAmI['classification_aliases'][keyof WhoAmI['classification_aliases']]) => {
@@ -210,6 +229,21 @@ const WrappedClassificationInput = React.memo(() => {
       setStore(() => ({ ...(!err && { value: newC12n }), inputValue: newC12n, errorMsg: err, showPicker: false }));
     },
     [c12nDef, error, format, isMobile, isUser, onChange, onError, setStore, validated.parts]
+  );
+
+  const handleReset = useCallback(
+    (event: React.SyntheticEvent) => {
+      const err = error(defaultValue);
+      onError(err);
+      if (!err) onChange(event, defaultValue);
+      setStore(() => ({
+        ...(!err && { value: defaultValue }),
+        inputValue: defaultValue,
+        errorMsg: err,
+        showPicker: false
+      }));
+    },
+    [defaultValue, error, onChange, onError, setStore]
   );
 
   useEffect(() => {
@@ -445,15 +479,11 @@ const WrappedClassificationInput = React.memo(() => {
               <DialogActions>
                 <PasswordInput />
                 {reset && (
-                  <Button
-                    onClick={event => {
-                      onReset(event);
-                      setStore(s => ({ ...s, showPicker: false }));
-                    }}
-                    color="secondary"
-                  >
-                    {t('classification.reset')}
-                  </Button>
+                  <Tooltip arrow title={title} placement="bottom">
+                    <Button onClick={onReset ? onReset : handleReset} color="secondary">
+                      {t('classification.reset')}
+                    </Button>
+                  </Tooltip>
                 )}
                 <Button onClick={event => handleChange(event)} color="primary" autoFocus>
                   {t('classification.done')}

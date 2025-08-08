@@ -1,7 +1,7 @@
 import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined';
 import type { TextFieldProps } from '@mui/material';
 import { Popover, useTheme } from '@mui/material';
-import { DigitalClock, LocalizationProvider, DatePicker as MuiDatePicker } from '@mui/x-date-pickers';
+import { DigitalClock, LocalizationProvider, DateTimePicker as MuiDateTimePicker } from '@mui/x-date-pickers';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
 import { IconButton } from 'components/visual/Buttons/IconButton';
@@ -186,7 +186,7 @@ const WrappedDateInput = React.memo(() => {
             <StyledInputSkeleton />
           ) : (
             <>
-              <MuiDatePicker
+              <MuiDateTimePicker
                 disabled={disabled}
                 disableOpenPicker
                 format={i18n.language === 'fr' ? 'Do MMMM YYYY, H[h]mm' : 'MMMM D YYYY, h:mm a'}

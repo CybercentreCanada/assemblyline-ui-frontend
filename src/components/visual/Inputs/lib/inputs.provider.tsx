@@ -1,63 +1,7 @@
 import type { InputProps, InputStates } from 'components/visual/Inputs/lib/inputs.model';
 import { DEFAULT_INPUT_PROPS, DEFAULT_INPUT_STATES } from 'components/visual/Inputs/lib/inputs.model';
+import { shallowEqual, shallowReconcile } from 'components/visual/Inputs/lib/inputs.utils';
 import { createContext, useContext, useEffect, useRef, useSyncExternalStore } from 'react';
-
-function shallowEqual<T>(a: T, b: T, func: boolean = true): boolean {
-  if (typeof a === 'function' || typeof b === 'function') return func;
-  if (Object.is(a, b)) return true;
-  if (!a || !b || typeof a !== 'object' || typeof b !== 'object') return false;
-
-  const keysA = Object.keys(a as object);
-  const keysB = Object.keys(b as object);
-  return (
-    keysA.length === keysB.length &&
-    keysA.every(
-      key =>
-        key in b &&
-        ((typeof a[key] === 'function' || typeof b[key] === 'function' ? func : false) || Object.is(a[key], b[key]))
-    )
-  );
-}
-
-function deepReconcile<T extends Record<string, unknown>>(
-  incoming: Partial<T>,
-  existing: Partial<T>,
-  initial: Partial<T>
-): T {
-  const result: Record<string, unknown> = {};
-
-  for (const key of new Set([...Object.keys(initial), ...Object.keys(existing), ...Object.keys(incoming)])) {
-    if (key in incoming) {
-      result[key] = incoming[key];
-    } else if (key in existing && key in initial) {
-      result[key] = initial[key];
-    } else {
-      result[key] = existing[key] ?? initial[key];
-    }
-  }
-
-  return result as T;
-}
-
-function shallowReconcile<T extends Record<string, unknown>>(
-  current: Partial<T>,
-  previous: Partial<T>,
-  result: Partial<T>
-): T {
-  const output: Record<string, unknown> = {};
-
-  for (const key of new Set([...Object.keys(result), ...Object.keys(current), ...Object.keys(previous)])) {
-    if (key in current) {
-      output[key] = current[key];
-    } else if (key in result && key in previous) {
-      continue;
-    } else if (key in result) {
-      output[key] = result[key];
-    }
-  }
-
-  return output as T;
-}
 
 export const createPropContext = <Props extends object>(initialProps: Props) => {
   const createPropStore = () => {
