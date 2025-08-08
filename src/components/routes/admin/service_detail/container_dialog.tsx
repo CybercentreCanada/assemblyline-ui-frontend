@@ -455,10 +455,6 @@ const WrappedContainerDialog = ({
                 defaultValue={!defaults ? undefined : defaults?.image}
                 reset={showReset(tempContainer, defaults, 'image')}
                 onChange={(e, v) => handleContainerValueChange('image', v)}
-                onReset={() => {
-                  setModified(true);
-                  setTempContainer({ ...tempContainer, image: defaults.image });
-                }}
               />
             </Grid>
 
@@ -474,10 +470,6 @@ const WrappedContainerDialog = ({
                   { value: 'harbor', primary: t('Harbor') }
                 ]}
                 onChange={(e, v: string) => handleContainerValueChange('registry_type', v)}
-                onReset={() => {
-                  setModified(true);
-                  setTempContainer({ ...tempContainer, registry_type: defaults.registry_type });
-                }}
               />
             </Grid>
 
@@ -487,12 +479,9 @@ const WrappedContainerDialog = ({
                 loading={!tempContainer}
                 value={!tempContainer ? null : tempContainer.cpu_cores}
                 defaultValue={!defaults ? undefined : defaults?.cpu_cores}
+                min={0}
                 reset={showReset(tempContainer, defaults, 'cpu_cores')}
                 onChange={(e, v) => handleContainerValueChange('cpu_cores', v)}
-                onReset={() => {
-                  setModified(true);
-                  setTempContainer({ ...tempContainer, cpu_cores: defaults.cpu_cores });
-                }}
               />
             </Grid>
 
@@ -504,6 +493,7 @@ const WrappedContainerDialog = ({
                 defaultValue={!defaults ? undefined : defaults?.ram_mb_min}
                 reset={showReset(tempContainer, defaults, 'ram_mb_min')}
                 endAdornment="MB"
+                min={0}
                 onChange={(e, v) => handleContainerValueChange('ram_mb_min', v)}
                 onReset={() => {
                   setModified(true);
@@ -520,6 +510,7 @@ const WrappedContainerDialog = ({
                 defaultValue={!defaults ? undefined : defaults?.ram_mb}
                 reset={showReset(tempContainer, defaults, 'ram_mb')}
                 endAdornment="MB"
+                min={0}
                 onChange={(e, v) => handleContainerValueChange('ram_mb', v)}
                 onReset={() => {
                   setModified(true);
@@ -533,13 +524,9 @@ const WrappedContainerDialog = ({
                 label={t('container.dialog.registry_username')}
                 loading={!tempContainer}
                 value={!tempContainer ? null : tempContainer.registry_username ? tempContainer.registry_username : ''}
-                defaultValue={!defaults ? undefined : defaults?.registry_username}
+                defaultValue={!defaults ? undefined : (defaults?.registry_username ?? '')}
                 reset={showReset(tempContainer, defaults, 'registry_username')}
                 onChange={(e, v) => handleContainerValueChange('registry_username', v || undefined)}
-                onReset={() => {
-                  setModified(true);
-                  setTempContainer({ ...tempContainer, registry_username: defaults.registry_username || '' });
-                }}
               />
             </Grid>
 
@@ -551,10 +538,6 @@ const WrappedContainerDialog = ({
                 defaultValue={(!defaults ? undefined : (defaults?.registry_password ?? '')) as string}
                 reset={showReset(tempContainer, defaults, 'registry_password')}
                 onChange={(e, v) => handleContainerValueChange('registry_password', v || undefined)}
-                onReset={() => {
-                  setModified(true);
-                  setTempContainer({ ...tempContainer, registry_password: defaults.registry_password || '' });
-                }}
               />
             </Grid>
 
@@ -566,10 +549,6 @@ const WrappedContainerDialog = ({
                 defaultValue={!defaults ? undefined : defaults?.service_account}
                 reset={showReset(tempContainer, defaults, 'service_account')}
                 onChange={(e, v) => handleContainerValueChange('service_account', v || undefined)}
-                onReset={() => {
-                  setModified(true);
-                  setTempContainer({ ...tempContainer, service_account: defaults.service_account });
-                }}
               />
             </Grid>
 
@@ -602,10 +581,6 @@ const WrappedContainerDialog = ({
                 onChange={(e, v) => {
                   setModified(true);
                   setTempContainer({ ...tempContainer, allow_internet_access: v });
-                }}
-                onReset={() => {
-                  setModified(true);
-                  setTempContainer({ ...tempContainer, allow_internet_access: defaults.allow_internet_access });
                 }}
               />
             </Grid>

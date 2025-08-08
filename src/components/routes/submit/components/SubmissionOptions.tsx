@@ -126,6 +126,7 @@ export const SubmissionOptions = React.memo(() => {
                       reset={defaultValue !== null && value !== defaultValue}
                       min={configuration.submission.max_dtl !== 0 ? 1 : 0}
                       max={configuration.submission.max_dtl !== 0 ? configuration.submission.max_dtl : 365}
+                      required
                       rootProps={{ style: { marginBottom: theme.spacing(1), flex: 1 } }}
                       onChange={(e, v) => form.setFieldValue('settings.ttl.value', v)}
                       onReset={() => form.setFieldValue('settings.ttl.value', defaultValue)}

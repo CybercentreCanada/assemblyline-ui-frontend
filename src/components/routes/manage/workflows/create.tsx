@@ -279,19 +279,20 @@ const WrappedWorkflowCreate = ({ id: propID = null, onClose = () => null }: Prop
         <Grid container spacing={2} textAlign="start">
           <Grid size={{ xs: 12 }}>
             <TextInput
-              label={`${t('name')} ${t('required')}`}
+              label={t('name')}
               loading={!workflow}
               value={!workflow ? null : workflow.name}
+              required
               onChange={(event, value) => setWorkflow(wf => ({ ...wf, name: value }))}
             />
           </Grid>
 
           <Grid size={{ xs: 12 }}>
             <TextInput
-              label={`${t('query')} ${t('required')}`}
+              label={t('query')}
               loading={!workflow}
               value={!workflow ? null : workflow.query}
-              error={() => (!badQuery ? '' : t('query.error'))}
+              required
               onChange={(event, value) => setWorkflow(wf => ({ ...wf, query: value }))}
             />
           </Grid>
@@ -301,7 +302,7 @@ const WrappedWorkflowCreate = ({ id: propID = null, onClose = () => null }: Prop
               label={t('labels')}
               loading={!workflow}
               value={!workflow ? null : workflow.labels}
-              options={LABELS.map(l => l)}
+              options={LABELS}
               onChange={(event, value) => setWorkflow(wf => ({ ...wf, labels: value.map(v => v.toUpperCase()) }))}
               isOptionEqualToValue={(option: string, value: string) => option.toUpperCase() === value.toUpperCase()}
             />
