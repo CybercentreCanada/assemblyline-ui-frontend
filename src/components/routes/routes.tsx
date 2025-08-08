@@ -66,6 +66,7 @@ import { resetFavicon } from 'helpers/utils';
 import { lazy, memo, Suspense, useEffect, useState } from 'react';
 import { matchPath, Navigate, Route, Routes, useLocation } from 'react-router';
 
+const DevelopmentAPI = lazy(() => import('components/routes/development/api/development_api.route'));
 const DevelopmentCustomize = lazy(() => import('components/routes/development/customize/customize'));
 const DevelopmentLibrary = lazy(() => import('components/routes/development/library'));
 const DevelopmentTheme = lazy(() => import('components/routes/development/theme'));
@@ -157,6 +158,7 @@ const WrappedRoutes = () => {
         <Route path="/authorize" element={<AppRegistration />} />
         <Route path="/crash" element={<CrashTest />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/development/api" element={<DevelopmentAPI />} />
         <Route path="/development/customize" element={<DevelopmentCustomize />} />
         <Route path="/development/library" element={<DevelopmentLibrary />} />
         <Route path="/development/theme" element={<DevelopmentTheme />} />

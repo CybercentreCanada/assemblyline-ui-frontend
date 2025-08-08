@@ -45,8 +45,13 @@ const WrappedUsersTable: React.FC<Props> = ({ userResults }) => {
             </DivTableRow>
           </DivTableHead>
           <DivTableBody>
-            {userResults.items.map(user => (
-              <LinkRow key={user.id} to={`/admin/users/${user.uname}`} hover style={{ textDecoration: 'none' }}>
+            {userResults.items.map((user, i) => (
+              <LinkRow
+                key={`${user.id}-${i}`}
+                to={`/admin/users/${user.uname}`}
+                hover
+                style={{ textDecoration: 'none' }}
+              >
                 <DivTableCell style={{ whiteSpace: 'nowrap' }}>{user.uname}</DivTableCell>
                 <DivTableCell>{user.name}</DivTableCell>
                 <DivTableCell>

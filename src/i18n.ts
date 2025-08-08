@@ -1,9 +1,13 @@
 import borealisEN from 'borealis-ui/dist/en/translation.json';
 import borealisFR from 'borealis-ui/dist/fr/translation.json';
+import developmentAPIEN from 'components/routes/development/api/development_api.i18n.en.json';
+import developmentAPIFR from 'components/routes/development/api/development_api.i18n.fr.json';
 import settingsEN from 'components/routes/settings/settings.i18n.en.json';
 import settingsFR from 'components/routes/settings/settings.i18n.fr.json';
 import submitEN from 'components/routes/submit/submit.i18n.en.json';
 import submitFR from 'components/routes/submit/submit.i18n.fr.json';
+import dateTimeEN from 'components/visual/DateTime/datetime.i18n.en.json';
+import dateTimeFR from 'components/visual/DateTime/datetime.i18n.fr.json';
 import inputsEN from 'components/visual/Inputs/lib/inputs.i18n.en.json';
 import inputsFR from 'components/visual/Inputs/lib/inputs.i18n.fr.json';
 import { default as i18n } from 'i18next';
@@ -137,6 +141,8 @@ const resources = {
     borealis: borealisEN,
     carousel: carouselEN,
     dashboard: dashboardEN,
+    dateTime: dateTimeEN,
+    developmentAPI: developmentAPIEN,
     error403: error403EN,
     error404: error404EN,
     favorites: favoritesEN,
@@ -197,6 +203,8 @@ const resources = {
     borealis: borealisFR,
     carousel: carouselFR,
     dashboard: dashboardFR,
+    dateTime: dateTimeFR,
+    developmentAPI: developmentAPIFR,
     error403: error403FR,
     error404: error404FR,
     favorites: favoritesFR,

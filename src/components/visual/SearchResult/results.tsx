@@ -27,9 +27,15 @@ type Props = {
   resultResults: SearchResult<ResultIndexed>;
   component?: React.ElementType;
   allowSort?: boolean;
+  allowHash?: boolean;
 };
 
-const WrappedResultsTable: React.FC<Props> = ({ resultResults, component = Paper, allowSort = true }) => {
+const WrappedResultsTable: React.FC<Props> = ({
+  resultResults,
+  component = Paper,
+  allowSort = true,
+  allowHash = false
+}) => {
   const { t } = useTranslation(['search']);
   const { c12nDef } = useALContext();
   const theme = useTheme();
@@ -67,9 +73,9 @@ const WrappedResultsTable: React.FC<Props> = ({ resultResults, component = Paper
           <DivTableBody>
             {resultResults.items.map((result, id) => (
               <LinkRow
-                key={id}
+                key={`${result.id}-${id}`}
                 component={Link}
-                to={`/file/detail/${result.id.substring(0, 64)}${location.hash}`}
+                to={`/file/detail/${result.id.substring(0, 64)}${!allowHash ? '' : location.hash}`}
                 hover
                 style={{ textDecoration: 'none' }}
               >

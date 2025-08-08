@@ -264,10 +264,9 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
 
   const handleHitRowClick = useCallback(
     (file: FileIndexed) => {
-      if (isDrawer) navigate(`/file/detail/${file.sha256}${location.hash}`);
-      else navigate(`${location.pathname}${location.search}#${file.sha256}`);
+      navigate({ pathname: `/retrohunt/${searchKey}`, hash: file.sha256 });
     },
-    [isDrawer, location.hash, location.pathname, location.search, navigate]
+    [navigate, searchKey]
   );
 
   const handleRepeat = useCallback(
@@ -391,7 +390,7 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
           <PageHeader
             primary={t('header.view')}
             secondary={() => retrohunt.key}
-            loading={!retrohunt}
+            secondaryLoading={!retrohunt}
             slotProps={{
               root: { style: { marginBottom: theme.spacing(2) } }
             }}
@@ -763,7 +762,7 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
                                 <DivTableBody id="hit-body">
                                   {hitResults.items.map((file, i) => (
                                     <LinkRow
-                                      key={i}
+                                      key={`${file.sha256}-${i}`}
                                       component={Link}
                                       to={`/file/detail/${file.sha256}`}
                                       hover

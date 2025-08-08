@@ -46,9 +46,9 @@ const WrappedServiceTable: React.FC<Props> = ({ serviceResults, updates, setServ
             </DivTableRow>
           </DivTableHead>
           <DivTableBody>
-            {serviceResults.map(result => (
+            {serviceResults.map((result, i) => (
               <LinkRow
-                key={result.name}
+                key={`${result.name}-${i}`}
                 component={Link}
                 to={`/admin/services/${result.name}`}
                 hover

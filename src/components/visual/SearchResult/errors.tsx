@@ -65,9 +65,9 @@ const WrappedErrorsTable: React.FC<Props> = ({ errorResults, setErrorKey = null,
             </DivTableRow>
           </DivTableHead>
           <DivTableBody>
-            {errorResults.items.map(error => (
+            {errorResults.items.map((error, i) => (
               <LinkRow
-                key={error.id}
+                key={`${error.id}-${i}`}
                 component={Link}
                 to={`/admin/errors/${error.id}`}
                 onClick={event => {

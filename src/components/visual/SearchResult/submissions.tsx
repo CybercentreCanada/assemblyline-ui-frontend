@@ -70,7 +70,7 @@ const WrappedSubmissionsTable: React.FC<Props> = ({ submissionResults, allowSort
           <DivTableBody>
             {submissionResults.items.map((submission, id) => (
               <LinkRow
-                key={id}
+                key={`${submission.id}-${id}`}
                 component={Link}
                 to={
                   submission.state === 'completed'

@@ -806,7 +806,7 @@ const FileSubmit = React.memo(({ onClick = () => null, ...props }: ButtonProps) 
           url: `/api/v4/ui/start/${uuid}/`,
           method: 'POST',
           body: {
-            ...parseSubmitProfile(params),
+            ui_params: parseSubmitProfile(params),
             submission_profile: profile,
             filename: file.path,
             metadata: metadata.data

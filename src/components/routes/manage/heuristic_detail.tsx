@@ -116,8 +116,8 @@ const HeuristicDetail = ({ heur_id = null }: HeuristicDetailProps) => {
       <div style={{ textAlign: 'left' }}>
         <PageHeader
           primary={t('title')}
-          secondary={heuristic?.heur_id}
-          loading={!heuristic}
+          secondary={() => heuristic.heur_id}
+          secondaryLoading={!heuristic}
           slotProps={{
             root: { style: { marginBottom: theme.spacing(4) } }
           }}
@@ -273,7 +273,7 @@ const HeuristicDetail = ({ heur_id = null }: HeuristicDetailProps) => {
                 <Typography variant="h6">{t('last10')}</Typography>
               </Grid>
               <Grid size={{ xs: 12 }}>
-                <ResultsTable resultResults={results} allowSort={false} />
+                <ResultsTable resultResults={results} allowSort={false} allowHash />
               </Grid>
             </>
           )}
