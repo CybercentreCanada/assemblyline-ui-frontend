@@ -1,246 +1,88 @@
-import type {
-  FormHelperTextProps,
-  IconButtonProps,
-  TextFieldProps,
-  TooltipProps,
-  TypographyProps
-} from '@mui/material';
-import { FormControl, InputAdornment, InputLabel, Skeleton, TextField, Typography, useTheme } from '@mui/material';
-import { PasswordInput } from 'components/visual/Inputs/components/PasswordInput';
-import type { ResetInputProps } from 'components/visual/Inputs/components/ResetInput';
-import { ResetInput } from 'components/visual/Inputs/components/ResetInput';
-import { Tooltip } from 'components/visual/Tooltip';
-import React, { useMemo, useState } from 'react';
+import type { TextFieldProps } from '@mui/material';
+import { Skeleton } from '@mui/material';
+import {
+  HelperText,
+  StyledFormControl,
+  StyledFormLabel,
+  StyledRoot,
+  StyledTextField
+} from 'components/visual/Inputs/lib/inputs.components';
+import { useInputHandlers, useInputParsedProps } from 'components/visual/Inputs/lib/inputs.hook';
+import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
+import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
+import React from 'react';
 
-export type TextAreaInputProps = Omit<TextFieldProps, 'rows' | 'onChange' | 'error'> & {
-  endAdornment?: TextFieldProps['InputProps']['endAdornment'];
-  error?: (value: string) => string;
-  errorProps?: FormHelperTextProps;
-  helperText?: string;
-  helperTextProps?: FormHelperTextProps;
-  label?: string;
-  labelProps?: TypographyProps;
-  loading?: boolean;
-  monospace?: boolean;
-  password?: boolean;
-  placeholder?: TextFieldProps['InputProps']['placeholder'];
-  preventDisabledColor?: boolean;
-  preventRender?: boolean;
-  readOnly?: boolean;
-  reset?: boolean;
-  resetProps?: ResetInputProps;
-  rootProps?: React.HTMLAttributes<HTMLDivElement>;
-  rows: TextFieldProps['rows'];
-  startAdornment?: TextFieldProps['InputProps']['startAdornment'];
-  tiny?: boolean;
-  tooltip?: TooltipProps['title'];
-  tooltipProps?: Omit<TooltipProps, 'children' | 'title'>;
-  value: string;
-  onChange?: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>, value: string) => void;
-  onReset?: IconButtonProps['onClick'];
-  onError?: (error: string) => void;
-};
+export type TextAreaInputProps = InputValues<
+  string,
+  string,
+  React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
+> &
+  InputProps & {
+    autoComplete?: StyledTextField['autoComplete'];
+    rows?: TextFieldProps['rows'];
+  };
 
-const WrappedTextAreaInput = ({
-  autoComplete,
-  disabled,
-  endAdornment = null,
-  error = () => null,
-  errorProps = null,
-  helperText = null,
-  helperTextProps = null,
-  id: idProp = null,
-  label: labelProp = null,
-  labelProps,
-  loading = false,
-  monospace = false,
-  password = false,
-  placeholder = null,
-  preventDisabledColor = false,
-  preventRender = false,
-  readOnly = false,
-  reset = false,
-  resetProps = null,
-  rootProps = null,
-  rows = 1,
-  startAdornment = null,
-  tiny = false,
-  tooltip = null,
-  tooltipProps = null,
-  value,
-  onBlur = () => null,
-  onChange = () => null,
-  onError = () => null,
-  onFocus = () => null,
-  onReset = () => null,
-  ...textFieldProps
-}: TextAreaInputProps) => {
-  const theme = useTheme();
+const WrappedTextAreaInput = React.memo(() => {
+  const [get] = usePropStore<TextAreaInputProps>();
 
-  const [focused, setFocused] = useState<boolean>(false);
-  const [showPassword, setShowPassword] = useState<boolean>(true);
+  const autoComplete = get('autoComplete');
+  const inputValue = get('inputValue') ?? '';
+  const loading = get('loading');
+  const overflowHidden = get('overflowHidden');
+  const password = get('password');
+  const rows = get('rows');
+  const showPassword = get('showPassword');
+  const tiny = get('tiny');
+  const value = get('value');
 
-  const label = useMemo<string>(() => labelProp ?? '\u00A0', [labelProp]);
-  const id = useMemo<string>(() => (idProp || label).replaceAll(' ', '-'), [idProp, label]);
-  const errorValue = useMemo<string>(() => error(value), [error, value]);
+  const { handleChange, handleFocus, handleBlur } = useInputHandlers<TextAreaInputProps>();
 
-  const preventResetRender = useMemo<boolean>(
-    () => loading || !reset || disabled || readOnly,
-    [disabled, loading, readOnly, reset]
-  );
-
-  const preventPasswordRender = useMemo<boolean>(
-    () => loading || !password || disabled || readOnly,
-    [disabled, loading, password, readOnly]
-  );
-
-  return preventRender ? null : (
-    <div {...rootProps} style={{ textAlign: 'left', ...rootProps?.style }}>
-      <Tooltip title={tooltip} {...tooltipProps}>
-        <Typography
-          color={!disabled && errorValue ? 'error' : focused ? 'primary' : 'textSecondary'}
-          component={InputLabel}
-          gutterBottom
-          htmlFor={id}
-          variant="body2"
-          whiteSpace="nowrap"
-          {...labelProps}
-          children={label}
-          sx={{
-            ...labelProps?.sx,
-            ...(disabled &&
-              !preventDisabledColor && {
-                WebkitTextFillColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.38)'
-              })
-          }}
-        />
-      </Tooltip>
-      <FormControl fullWidth>
+  return (
+    <StyledRoot>
+      <StyledFormLabel />
+      <StyledFormControl>
         {loading ? (
           <Skeleton
             sx={{ height: `calc(23px * ${rows} + 17px)`, transform: 'unset', ...(tiny && { height: '28px' }) }}
           />
         ) : (
-          <TextField
-            id={id}
-            autoComplete={autoComplete}
-            disabled={disabled}
-            error={!!errorValue}
-            fullWidth
-            helperText={disabled ? null : errorValue || helperText}
-            margin="dense"
-            multiline
-            rows={password && showPassword ? 1 : rows}
-            size="small"
-            value={value}
-            variant="outlined"
-            {...(readOnly && !disabled && { focused: null })}
-            slotProps={{
-              formHelperText: disabled
-                ? null
-                : errorValue
-                  ? {
-                      variant: 'outlined',
-                      sx: { color: theme.palette.error.main, ...errorProps?.sx },
-                      ...errorProps
-                    }
-                  : helperText
-                    ? {
-                        variant: 'outlined',
-                        sx: { color: theme.palette.text.secondary, ...helperTextProps?.sx },
-                        ...errorProps
-                      }
-                    : null,
-
-              input: {
-                inputProps: {
-                  sx: {
-                    ...(tiny && { padding: '2.5px 4px 2.5px 8px' }),
-                    ...(password &&
-                      showPassword && {
-                        fontFamily: 'password',
-                        WebkitTextSecurity: 'disc',
-                        MozTextSecurity: 'disc',
-                        textSecurity: 'disc'
-                      })
-                  }
-                },
-                placeholder: placeholder,
-                readOnly: readOnly,
-                sx: {
-                  '& .MuiInputBase-root': {
-                    ...(tiny && { padding: '2px !important', fontSize: '14px' })
-                  }
-                },
-                startAdornment: (
-                  <>{startAdornment && <InputAdornment position="start">{startAdornment}</InputAdornment>}</>
-                ),
-                endAdornment:
-                  preventPasswordRender && preventResetRender && !endAdornment ? null : (
-                    <InputAdornment position="end">
-                      <PasswordInput
-                        id={id}
-                        preventRender={preventPasswordRender}
-                        tiny={tiny}
-                        showPassword={showPassword}
-                        onShowPassword={() => setShowPassword(p => !p)}
-                      />
-
-                      <ResetInput
-                        id={id}
-                        preventRender={preventResetRender}
-                        tiny={tiny}
-                        onReset={onReset}
-                        {...resetProps}
-                      />
-                      {endAdornment}
-                    </InputAdornment>
-                  )
-              }
-            }}
-            onChange={event => {
-              onChange(event, event.target.value);
-
-              const err = error(event.target.value);
-              if (err) onError(err);
-            }}
-            onFocus={(event, ...other) => {
-              setFocused(!readOnly && !disabled && document.activeElement === event.target);
-              onFocus(event, ...other);
-            }}
-            onBlur={(event, ...other) => {
-              setFocused(false);
-              onBlur(event, ...other);
-            }}
-            sx={{
-              margin: 0,
-              '& .MuiInputBase-root': {
-                ...(tiny && {
-                  paddingTop: '2px !important',
-                  paddingBottom: '2px !important',
-                  fontSize: '14px'
-                }),
-                ...(readOnly && !disabled && { cursor: 'default' })
-              },
-
-              '& .MuiInputBase-input': {
-                ...(readOnly && !disabled && { cursor: 'default' }),
-                ...(monospace && { fontFamily: 'monospace' })
-              },
-
-              '& .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline': {
-                ...(readOnly &&
-                  !disabled && {
-                    borderColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.23)' : 'rgba(0, 0, 0, 0.23)'
-                  })
-              }
-            }}
-            {...textFieldProps}
-          />
+          <>
+            <StyledTextField
+              rows={1}
+              {...(!(overflowHidden || (password && showPassword)) && {
+                multiline: true,
+                rows: rows
+              })}
+              autoComplete={autoComplete}
+              value={inputValue}
+              onChange={e => handleChange(e, e.target.value, e.target.value)}
+              onFocus={handleFocus}
+              onBlur={e => handleBlur(e, value)}
+            />
+            <HelperText />
+          </>
         )}
-      </FormControl>
-    </div>
+      </StyledFormControl>
+    </StyledRoot>
+  );
+});
+
+export const TextAreaInput = ({
+  autoComplete = 'off',
+  rows = 1,
+  preventRender = false,
+  ...props
+}: TextAreaInputProps) => {
+  const parsedProps = useInputParsedProps<string, string, TextAreaInputProps>({
+    ...props,
+    autoComplete,
+    preventRender,
+    rows
+  });
+
+  return preventRender ? null : (
+    <PropProvider<TextAreaInputProps> props={parsedProps}>
+      <WrappedTextAreaInput />
+    </PropProvider>
   );
 };
-
-export const TextAreaInput: React.FC<TextAreaInputProps> = React.memo(WrappedTextAreaInput);

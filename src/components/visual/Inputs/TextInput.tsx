@@ -1,274 +1,91 @@
-import type {
-  AutocompleteProps,
-  AutocompleteValue,
-  FormHelperTextProps,
-  IconButtonProps,
-  TextFieldProps,
-  TooltipProps,
-  TypographyProps
-} from '@mui/material';
+import type { TextFieldProps } from '@mui/material';
+import { Autocomplete, Typography } from '@mui/material';
 import {
-  Autocomplete,
-  FormControl,
-  InputAdornment,
-  InputLabel,
-  Skeleton,
-  TextField,
-  Typography,
-  useTheme
-} from '@mui/material';
-import { HelperText } from 'components/visual/Inputs/components/HelperText';
-import { PasswordInput } from 'components/visual/Inputs/components/PasswordInput';
-import type { ResetInputProps } from 'components/visual/Inputs/components/ResetInput';
-import { ResetInput } from 'components/visual/Inputs/components/ResetInput';
-import { Tooltip } from 'components/visual/Tooltip';
-import type { ElementType } from 'react';
-import React, { useMemo, useState } from 'react';
+  HelperText,
+  StyledFormControl,
+  StyledFormLabel,
+  StyledInputSkeleton,
+  StyledRoot,
+  StyledTextField
+} from 'components/visual/Inputs/lib/inputs.components';
+import { useInputHandlers, useInputParsedProps } from 'components/visual/Inputs/lib/inputs.hook';
+import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
+import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
+import React from 'react';
 
-export type TextInputProps<
-  Value extends string = string,
-  Multiple extends boolean = boolean,
-  DisableClearable extends boolean = boolean,
-  FreeSolo extends boolean = boolean,
-  ChipComponent extends ElementType = ElementType
-> = Omit<
-  AutocompleteProps<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>,
-  'renderInput' | 'options' | 'onChange' | 'value'
-> & {
-  endAdornment?: TextFieldProps['InputProps']['endAdornment'];
-  error?: (value: string) => string;
-  errorProps?: FormHelperTextProps;
-  helperText?: string;
-  helperTextProps?: FormHelperTextProps;
-  label?: string;
-  labelProps?: TypographyProps;
-  loading?: boolean;
-  monospace?: boolean;
-  options?: AutocompleteProps<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>['options'];
-  password?: boolean;
-  placeholder?: TextFieldProps['InputProps']['placeholder'];
-  preventDisabledColor?: boolean;
-  preventRender?: boolean;
-  readOnly?: boolean;
-  reset?: boolean;
-  resetProps?: ResetInputProps;
-  rootProps?: React.HTMLAttributes<HTMLDivElement>;
-  startAdornment?: TextFieldProps['InputProps']['startAdornment'];
-  textfieldProps?: TextFieldProps;
-  tiny?: boolean;
-  tooltip?: TooltipProps['title'];
-  tooltipProps?: Omit<TooltipProps, 'children' | 'title'>;
-  value: string;
-  onChange?: AutocompleteProps<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>['onInputChange'];
-  onReset?: IconButtonProps['onClick'];
-  onError?: (error: string) => void;
-};
+export type TextInputProps = InputValues<string, string, React.SyntheticEvent<Element, Event>> &
+  InputProps & {
+    autoComplete?: TextFieldProps['autoComplete'];
+    options?: string[] | readonly string[];
+  };
 
-const WrappedTextInput = <
-  Value extends string = string,
-  Multiple extends boolean = boolean,
-  DisableClearable extends boolean = boolean,
-  FreeSolo extends boolean = boolean,
-  ChipComponent extends ElementType = ElementType
->({
-  autoComplete,
-  disabled,
-  endAdornment = null,
-  error = () => null,
-  errorProps = null,
-  helperText = null,
-  helperTextProps = null,
-  id: idProp = null,
-  label: labelProp = null,
-  labelProps,
-  loading = false,
-  monospace = false,
-  options = [],
-  password = false,
-  placeholder = null,
-  preventDisabledColor = false,
-  preventRender = false,
-  readOnly = false,
-  reset = false,
-  resetProps = null,
-  rootProps = null,
-  startAdornment = null,
-  textfieldProps = null,
-  tiny = false,
-  tooltip = null,
-  tooltipProps = null,
-  value = '',
-  onBlur = () => null,
-  onChange = () => null,
-  onError = () => null,
-  onFocus = () => null,
-  onReset = () => null,
-  ...autocompleteProps
-}: TextInputProps<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>) => {
-  const theme = useTheme();
+const WrappedTextInput = React.memo(() => {
+  const [get] = usePropStore<TextInputProps>();
 
-  const [_value, setValue] =
-    useState<AutocompleteValue<Value, Multiple, true | DisableClearable, true | FreeSolo>>(null);
-  const [focused, setFocused] = useState<boolean>(false);
-  const [showPassword, setShowPassword] = useState<boolean>(true);
+  const disabled = get('disabled');
+  const id = get('id');
+  const inputValue = get('inputValue') ?? '';
+  const loading = get('loading');
+  const options = get('options');
+  const readOnly = get('readOnly');
+  const tiny = get('tiny');
+  const value = get('value') ?? '';
 
-  const label = useMemo<string>(() => labelProp ?? '\u00A0', [labelProp]);
-  const id = useMemo<string>(() => (idProp || label).replaceAll(' ', '-'), [idProp, label]);
-  const errorValue = useMemo<string>(() => error(value), [error, value]);
+  const { handleChange, handleFocus, handleBlur } = useInputHandlers<TextInputProps>();
 
-  const preventResetRender = useMemo<boolean>(
-    () => loading || !reset || disabled || readOnly,
-    [disabled, loading, readOnly, reset]
-  );
-
-  const preventPasswordRender = useMemo<boolean>(
-    () => loading || !password || disabled || readOnly,
-    [disabled, loading, password, readOnly]
-  );
-
-  return preventRender ? null : (
-    <div {...rootProps} style={{ textAlign: 'left', ...rootProps?.style }}>
-      <Tooltip title={tooltip} {...tooltipProps}>
-        <Typography
-          color={!disabled && errorValue ? 'error' : focused ? 'primary' : 'textSecondary'}
-          component={InputLabel}
-          gutterBottom
-          htmlFor={id}
-          variant="body2"
-          whiteSpace="nowrap"
-          {...labelProps}
-          children={label}
-          sx={{
-            ...labelProps?.sx,
-            ...(disabled &&
-              !preventDisabledColor && {
-                WebkitTextFillColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.38)'
-              })
-          }}
-        />
-      </Tooltip>
-      <FormControl fullWidth>
+  return (
+    <StyledRoot>
+      <StyledFormLabel />
+      <StyledFormControl>
         {loading ? (
-          <Skeleton sx={{ height: '40px', transform: 'unset', ...(tiny && { height: '28px' }) }} />
+          <StyledInputSkeleton />
         ) : (
           <Autocomplete
-            id={id}
-            autoComplete={autoComplete}
             disableClearable
             disabled={disabled}
             freeSolo
             fullWidth
-            inputValue={value || ''}
+            id={id}
+            inputValue={inputValue}
             options={options}
             readOnly={readOnly}
             size="small"
-            value={_value}
-            onChange={(e, v) => setValue(v)}
-            onInputChange={(e, v, o) => {
-              setValue(v as AutocompleteValue<Value, Multiple, true | DisableClearable, true | FreeSolo>);
-              onChange(e, v, o);
-
-              const err = error(v);
-              if (err) onError(err);
-            }}
-            onFocus={(event, ...other) => {
-              setFocused(!readOnly && !disabled && document.activeElement === event.target);
-              onFocus(event, ...other);
-            }}
-            onBlur={(event, ...other) => {
-              setFocused(false);
-              onBlur(event, ...other);
-            }}
-            renderOption={(props, option) => (
-              <Typography {...props} key={option} {...(tiny && { variant: 'body2' })}>
+            value={value}
+            onInputChange={(e, v) => handleChange(e, v, v)}
+            onFocus={handleFocus}
+            onBlur={e => handleBlur(e, value)}
+            renderOption={(props, option, { index }) => (
+              <Typography {...props} key={`${option}-${index}`} variant={tiny ? 'body2' : 'body1'}>
                 {option}
               </Typography>
             )}
-            renderInput={params => (
-              <TextField
-                {...textfieldProps}
-                id={id}
-                variant="outlined"
-                error={!!errorValue}
-                type={password && showPassword ? 'password' : 'text'}
-                {...(readOnly && !disabled && { focused: null })}
-                {...params}
-                InputProps={{
-                  ...params?.InputProps,
-                  'aria-describedby': disabled || !(errorValue || helperText) ? null : `${id}-helper-text`,
-                  placeholder: placeholder,
-                  readOnly: readOnly,
-                  startAdornment: (
-                    <>{startAdornment && <InputAdornment position="start">{startAdornment}</InputAdornment>}</>
-                  ),
-                  endAdornment:
-                    preventPasswordRender && preventResetRender && !endAdornment ? null : (
-                      <InputAdornment position="end">
-                        <PasswordInput
-                          id={id}
-                          preventRender={preventPasswordRender}
-                          tiny={tiny}
-                          showPassword={showPassword}
-                          onShowPassword={() => setShowPassword(p => !p)}
-                        />
-                        <ResetInput
-                          id={id}
-                          preventRender={preventResetRender}
-                          tiny={tiny}
-                          onReset={onReset}
-                          {...resetProps}
-                        />
-                        {endAdornment}
-                      </InputAdornment>
-                    )
-                }}
-                sx={{
-                  '& .MuiInputBase-root': {
-                    ...(tiny && {
-                      paddingTop: '2px !important',
-                      paddingBottom: '2px !important',
-                      fontSize: '14px'
-                    }),
-                    ...(readOnly && !disabled && { cursor: 'default' })
-                  },
-
-                  '& .MuiInputBase-input': {
-                    ...(readOnly && !disabled && { cursor: 'default' }),
-                    ...(monospace && { fontFamily: 'monospace' })
-                  },
-
-                  '& .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline': {
-                    ...(readOnly &&
-                      !disabled && {
-                        borderColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.23)' : 'rgba(0, 0, 0, 0.23)'
-                      })
-                  }
-                }}
-              />
-            )}
-            {...autocompleteProps}
+            renderInput={params => <StyledTextField params={params} />}
           />
         )}
-        <HelperText
-          disabled={disabled}
-          errorProps={errorProps}
-          errorText={errorValue}
-          helperText={helperText}
-          helperTextProps={helperTextProps}
-          id={id}
-          label={label}
-        />
-      </FormControl>
-    </div>
+        <HelperText />
+      </StyledFormControl>
+    </StyledRoot>
+  );
+});
+
+export const TextInput = ({
+  autoComplete = 'off',
+  options = [],
+  preventRender = false,
+  value,
+  ...props
+}: TextInputProps) => {
+  const parsedProps = useInputParsedProps<string, string, TextInputProps>({
+    ...props,
+    autoComplete,
+    options,
+    preventRender,
+    value
+  });
+
+  return preventRender ? null : (
+    <PropProvider<TextInputProps> props={parsedProps}>
+      <WrappedTextInput />
+    </PropProvider>
   );
 };
-
-export const TextInput: <
-  Value extends string = string,
-  Multiple extends boolean = boolean,
-  DisableClearable extends boolean = boolean,
-  FreeSolo extends boolean = boolean,
-  ChipComponent extends ElementType = ElementType
->(
-  props: TextInputProps<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>
-) => React.ReactNode = React.memo(WrappedTextInput);

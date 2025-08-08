@@ -18,6 +18,7 @@ import React, { useMemo } from 'react';
 
 export type SelectListInputProps = Omit<SelectProps, 'defaultValue' | 'error' | 'onChange'> & {
   capitalize?: boolean;
+  defaultValue?: SelectProps['value'];
   disablePadding?: boolean;
   error?: (value: SelectProps['value']) => string;
   errorProps?: FormHelperTextProps;
@@ -47,6 +48,7 @@ export type SelectListInputProps = Omit<SelectProps, 'defaultValue' | 'error' | 
 
 const WrappedSelectListInput = ({
   capitalize = false,
+  defaultValue,
   disabled = false,
   disablePadding = false,
   error = () => null,
@@ -69,8 +71,8 @@ const WrappedSelectListInput = ({
   value,
   width = '30%',
   onChange = () => null,
-  onReset = () => null,
   onError = () => null,
+  onReset = null,
   ...selectProps
 }: SelectListInputProps) => {
   const theme = useTheme();
@@ -103,9 +105,10 @@ const WrappedSelectListInput = ({
       ) : (
         <>
           <ResetListInput
+            defaultValue={defaultValue}
             id={id || primary.toString()}
             preventRender={!reset || disabled || readOnly}
-            tiny={tiny}
+            onChange={event => onChange(event as SelectChangeEvent<unknown>, defaultValue as string)}
             onReset={onReset}
             {...resetProps}
           />

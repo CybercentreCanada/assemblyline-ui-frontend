@@ -1,31 +1,20 @@
-import type {
-  FormHelperTextProps,
-  IconButtonProps,
-  ListItemTextProps,
-  MenuItemProps,
-  SelectChangeEvent,
-  SelectProps,
-  TextFieldProps,
-  TooltipProps,
-  TypographyProps
-} from '@mui/material';
+import type { ListItemTextProps, MenuItemProps, SelectProps } from '@mui/material';
+import { ListItemText, MenuItem, Select, useTheme } from '@mui/material';
 import {
-  FormControl,
-  InputAdornment,
-  InputLabel,
-  ListItemText,
-  MenuItem,
-  Select,
-  Skeleton,
-  Typography,
-  useTheme
-} from '@mui/material';
-import { HelperText } from 'components/visual/Inputs/components/HelperText';
-import { PasswordInput } from 'components/visual/Inputs/components/PasswordInput';
-import type { ResetInputProps } from 'components/visual/Inputs/components/ResetInput';
-import { ResetInput } from 'components/visual/Inputs/components/ResetInput';
-import { Tooltip } from 'components/visual/Tooltip';
-import React, { useMemo, useState } from 'react';
+  HelperText,
+  PasswordInput,
+  ResetInput,
+  StyledEndAdornment,
+  StyledFormControl,
+  StyledFormLabel,
+  StyledInputSkeleton,
+  StyledListItemText,
+  StyledRoot
+} from 'components/visual/Inputs/lib/inputs.components';
+import { useInputHandlers, useInputParsedProps } from 'components/visual/Inputs/lib/inputs.hook';
+import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
+import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
+import React from 'react';
 
 export type Option = {
   primary: ListItemTextProps['primary'];
@@ -33,275 +22,136 @@ export type Option = {
   value: MenuItemProps['value'] | boolean;
 };
 
-export type SelectInputProps<O extends Option[] = []> = Omit<
-  SelectProps,
-  'error' | 'options' | 'value' | 'onChange'
-> & {
-  capitalize?: boolean;
-  endAdornment?: TextFieldProps['InputProps']['endAdornment'];
-  error?: (value: O[number]['value']) => string;
-  errorProps?: FormHelperTextProps;
-  helperText?: string;
-  helperTextProps?: FormHelperTextProps;
-  label?: string;
-  labelProps?: TypographyProps;
-  loading?: boolean;
-  monospace?: boolean;
-  options: O;
-  password?: boolean;
-  placeholder?: TextFieldProps['InputProps']['placeholder'];
-  preventDisabledColor?: boolean;
-  preventRender?: boolean;
-  readOnly?: boolean;
-  reset?: boolean;
-  resetProps?: ResetInputProps;
-  rootProps?: React.HTMLAttributes<HTMLDivElement>;
-  tiny?: boolean;
-  tooltip?: TooltipProps['title'];
-  tooltipProps?: Omit<TooltipProps, 'children' | 'title'>;
-  value: O[number]['value'];
-  onChange?: (event: SelectChangeEvent<unknown>, value: O[number]['value']) => void;
-  onReset?: IconButtonProps['onClick'];
-  onError?: (error: string) => void;
-};
+export type SelectInputProps<O extends readonly Option[]> = InputValues<O[number]['value'], O[number]['value']> &
+  InputProps & {
+    capitalize?: boolean;
+    displayEmpty?: SelectProps['displayEmpty'];
+    options?: O;
+  };
 
-const WrappedSelectInput = <O extends Option[]>({
-  capitalize = false,
-  disabled,
-  displayEmpty = false,
-  endAdornment = null,
-  error = () => null,
-  errorProps = null,
-  helperText = null,
-  helperTextProps = null,
-  id: idProp = null,
-  label: labelProp = null,
-  labelProps,
-  loading = false,
-  monospace = false,
-  options = null,
-  password = false,
-  preventDisabledColor = false,
-  preventRender = false,
-  readOnly = false,
-  reset = false,
-  resetProps = null,
-  rootProps = null,
-  tiny = false,
-  tooltip = null,
-  tooltipProps = null,
-  value = null,
-  onBlur = () => null,
-  onChange = () => null,
-  onError = () => null,
-  onFocus = () => null,
-  onReset = () => null,
-  ...selectProps
-}: SelectInputProps<O>) => {
+const WrappedSelectInput = React.memo(<O extends readonly Option[]>() => {
   const theme = useTheme();
 
-  const [focused, setFocused] = useState<boolean>(false);
-  const [showPassword, setShowPassword] = useState<boolean>(true);
+  const [get] = usePropStore<SelectInputProps<O>>();
 
-  const label = useMemo<string>(() => labelProp ?? '\u00A0', [labelProp]);
-  const id = useMemo<string>(() => (idProp || label).replaceAll(' ', '-'), [idProp, label]);
-  const errorValue = useMemo<string>(() => error(value), [error, value]);
+  const capitalize = get('capitalize');
+  const disabled = get('disabled');
+  const displayEmpty = get('displayEmpty');
+  const endAdornment = get('endAdornment');
+  const errorMsg = get('errorMsg');
+  const id = get('id');
+  const inputValue = get('inputValue');
+  const loading = get('loading');
+  const monospace = get('monospace');
+  const options = get('options');
+  const overflowHidden = get('overflowHidden');
+  const password = get('password');
+  const readOnly = get('readOnly');
+  const showPassword = get('showPassword');
+  const tiny = get('tiny');
+  const value = get('value');
 
-  const preventResetRender = useMemo<boolean>(
-    () => loading || !reset || disabled || readOnly,
-    [disabled, loading, readOnly, reset]
-  );
+  const { handleChange, handleFocus, handleBlur } = useInputHandlers<SelectInputProps<O>>();
 
-  const preventPasswordRender = useMemo<boolean>(
-    () => loading || !password || disabled || readOnly,
-    [disabled, loading, password, readOnly]
-  );
-
-  return preventRender ? null : (
-    <div {...rootProps} style={{ textAlign: 'left', ...rootProps?.style }}>
-      <Tooltip title={tooltip} {...tooltipProps}>
-        <Typography
-          component={InputLabel}
-          htmlFor={id}
-          color={!disabled && errorValue ? 'error' : focused ? 'primary' : 'textSecondary'}
-          variant="body2"
-          whiteSpace="nowrap"
-          gutterBottom
-          sx={{
-            ...(disabled &&
-              !preventDisabledColor && {
-                WebkitTextFillColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.38)'
-              })
-          }}
-          {...labelProps}
-          children={label}
-        />
-      </Tooltip>
-      <FormControl
-        fullWidth
-        error={!!errorValue}
-        {...(readOnly &&
-          !disabled && {
-            focused: null,
-            sx: {
-              '& .MuiInputBase-input': { cursor: 'default' },
-              '& .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline': {
-                borderColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.23)' : 'rgba(0, 0, 0, 0.23)'
-              }
-            }
-          })}
-      >
+  return (
+    <StyledRoot>
+      <StyledFormLabel />
+      <StyledFormControl>
         {loading ? (
-          <Skeleton sx={{ height: '40px', transform: 'unset', ...(tiny && { height: '28px' }) }} />
+          <StyledInputSkeleton />
         ) : (
           <Select
-            aria-describedby={disabled || !(errorValue || helperText) ? null : `${id}-helper-text`}
             disabled={disabled}
             displayEmpty={displayEmpty}
+            error={!!errorMsg}
             fullWidth
+            id={id}
             readOnly={readOnly}
             size="small"
-            value={options?.some(o => o.value === value) ? value : ''}
-            variant="outlined"
-            inputProps={{
-              id: id,
-              sx: {
-                display: 'flex',
-                alignItems: 'center',
-                ...(tiny && {
-                  paddingTop: theme.spacing(0.25),
-                  paddingBottom: theme.spacing(0.25)
-                })
-              }
-            }}
+            value={options?.some(o => o.value === inputValue) ? inputValue : ''}
+            onChange={event => handleChange(event as React.SyntheticEvent, event.target.value, event.target.value)}
+            onFocus={handleFocus}
+            onBlur={e => handleBlur(e, value)}
             renderValue={option => (
               <ListItemText
                 primary={options?.find(o => o.value === option)?.primary || ''}
+                sx={{ margin: 0 }}
                 slotProps={{
                   primary: {
                     sx: {
                       paddingRight: '0px',
                       cursor: 'pointer',
-                      whiteSpace: 'nowrap',
-                      overflow: 'hidden',
-                      textOverflow: 'ellipsis',
-                      ...(readOnly && { cursor: 'default', userSelect: 'text' })
-                    },
-                    ...(tiny && { variant: 'body2' }),
-                    ...(monospace && { fontFamily: 'monospace' }),
-                    ...(password &&
-                      showPassword && {
-                        fontFamily: 'password',
-                        WebkitTextSecurity: 'disc',
-                        MozTextSecurity: 'disc',
-                        textSecurity: 'disc'
-                      })
+                      ...(capitalize && { textTransform: 'capitalize' }),
+                      ...(!overflowHidden && {
+                        whiteSpace: 'wrap',
+                        overflow: 'auto',
+                        textOverflow: 'ellipsis'
+                      }),
+                      ...(readOnly && { cursor: 'default', userSelect: 'text' }),
+                      ...(tiny && { variant: 'body2' }),
+                      ...(monospace && { fontFamily: 'monospace' }),
+                      ...(password &&
+                        showPassword && {
+                          fontFamily: 'password',
+                          WebkitTextSecurity: 'disc',
+                          MozTextSecurity: 'disc',
+                          textSecurity: 'disc'
+                        })
+                    }
                   }
-                }}
-                sx={{
-                  margin: 0,
-                  ...(readOnly && { marginLeft: '6px' }),
-                  ...(monospace && { fontFamily: 'monospace' }),
-                  ...(password &&
-                    showPassword && {
-                      fontFamily: 'password',
-                      WebkitTextSecurity: 'disc',
-                      MozTextSecurity: 'disc',
-                      textSecurity: 'disc'
-                    })
                 }}
               />
             )}
-            onChange={event => {
-              const v = event.target.value as string;
-              onChange(event, v);
-
-              const err = error(v);
-              if (err) onError(err);
-            }}
-            onFocus={(event, ...other) => {
-              setFocused(!readOnly && !disabled && document.activeElement === event.target);
-              onFocus(event, ...other);
-            }}
-            onBlur={(event, ...other) => {
-              setFocused(false);
-              onBlur(event, ...other);
-            }}
-            endAdornment={
-              preventPasswordRender && preventResetRender && !endAdornment ? null : (
-                <InputAdornment position="end" style={{ marginRight: theme.spacing(2) }}>
-                  <PasswordInput
-                    id={id}
-                    preventRender={preventPasswordRender}
-                    tiny={tiny}
-                    showPassword={showPassword}
-                    onShowPassword={() => setShowPassword(p => !p)}
-                    {...resetProps}
-                  />
-                  <ResetInput
-                    id={id}
-                    preventRender={preventResetRender}
-                    tiny={tiny}
-                    onReset={onReset}
-                    {...resetProps}
-                  />
-                  {endAdornment}
-                </InputAdornment>
-              )
-            }
+            slotProps={{ input: { id: id } }}
             MenuProps={{ sx: { maxWidth: 'min-content' } }}
-            {...selectProps}
+            endAdornment={
+              <StyledEndAdornment sx={{ marginRight: theme.spacing(2) }}>
+                <PasswordInput />
+                <ResetInput />
+                {endAdornment}
+              </StyledEndAdornment>
+            }
+            sx={{
+              '& .MuiSelect-select': {
+                ...(tiny && {
+                  paddingTop: '4px !important',
+                  paddingBottom: '4px !important',
+                  fontSize: '14px'
+                })
+              }
+            }}
           >
-            {/* {hasEmpty && <MenuItem value={null} sx={{ height: '36px' }}></MenuItem>} */}
-            {options?.map((option, i) => (
-              <MenuItem
-                key={i}
-                value={option.value as unknown as MenuItemProps['value']}
-                sx={{
-                  '&>div': { margin: 0, cursor: 'pointer !important' },
-                  ...(capitalize && { textTransform: 'capitalize' })
-                }}
-              >
-                <ListItemText
-                  primary={option.primary}
-                  secondary={option.secondary}
-                  slotProps={{
-                    primary: {
-                      sx: {
-                        textTransform: 'capitalize',
-                        overflow: 'auto',
-                        textOverflow: 'initial',
-                        whiteSpace: 'normal',
-                        ...(tiny && { variant: 'body2' })
-                      }
-                    },
-                    secondary: {
-                      sx: {
-                        overflow: 'auto',
-                        textOverflow: 'initial',
-                        whiteSpace: 'normal',
-                        ...(tiny && { variant: 'body2' })
-                      }
-                    }
-                  }}
-                />
+            {options.map((option, i) => (
+              <MenuItem key={i} value={option.value as MenuItemProps['value']}>
+                <StyledListItemText primary={option.primary ? option.primary : '\u00A0'} secondary={option.secondary} />
               </MenuItem>
             ))}
           </Select>
         )}
-        <HelperText
-          id={id}
-          label={label}
-          disabled={disabled}
-          errorProps={errorProps}
-          errorText={errorValue}
-          helperText={helperText}
-          helperTextProps={helperTextProps}
-        />
-      </FormControl>
-    </div>
+        <HelperText />
+      </StyledFormControl>
+    </StyledRoot>
+  );
+});
+
+export const SelectInput = <O extends readonly Option[]>({
+  capitalize = false,
+  displayEmpty = false,
+  options = [] as unknown as O,
+  preventRender = false,
+  ...props
+}: SelectInputProps<O>) => {
+  const parsedProps = useInputParsedProps<O[number]['value'], O[number]['value'], SelectInputProps<O>>({
+    ...props,
+    capitalize,
+    displayEmpty,
+    options,
+    preventRender
+  });
+
+  return preventRender ? null : (
+    <PropProvider<SelectInputProps<O>> props={parsedProps}>
+      <WrappedSelectInput />
+    </PropProvider>
   );
 };
-
-export const SelectInput: <O extends Option[]>(props: SelectInputProps<O>) => React.ReactNode =
-  React.memo(WrappedSelectInput);

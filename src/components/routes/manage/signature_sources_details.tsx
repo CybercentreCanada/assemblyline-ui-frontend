@@ -59,14 +59,11 @@ const WrappedSourceDetail = ({
               label={t('classification')}
               loading={!source}
               value={!source ? null : source.default_classification}
+              defaultValue={!defaults ? undefined : defaults.default_classification}
               reset={showReset(source, defaults, 'default_classification')}
               onChange={(e, v) => {
                 setModified(true);
                 setSource(s => ({ ...s, default_classification: v }));
-              }}
-              onReset={() => {
-                setModified(true);
-                setSource(s => ({ ...s, default_classification: defaults.default_classification }));
               }}
             />
           </Grid>
@@ -95,6 +92,7 @@ const WrappedSourceDetail = ({
                         disabled={!addMode}
                         error={value => (value !== '' ? null : t('name.error'))}
                         value={!source ? null : source.name}
+                        defaultValue={!defaults ? undefined : defaults.name}
                         onChange={(e, v) => {
                           setModified(true);
                           setSource(s => ({ ...s, name: v }));
@@ -107,15 +105,12 @@ const WrappedSourceDetail = ({
                         label={t('pattern')}
                         loading={!source}
                         value={!source ? null : source.pattern}
+                        defaultValue={!defaults ? undefined : defaults.pattern}
                         reset={showReset(source, defaults, 'pattern')}
                         monospace
                         onChange={(e, v) => {
                           setModified(true);
                           setSource(s => ({ ...s, pattern: v }));
-                        }}
-                        onReset={() => {
-                          setModified(true);
-                          setSource(s => ({ ...s, pattern: defaults.pattern }));
                         }}
                       />
                     </Grid>
@@ -125,10 +120,10 @@ const WrappedSourceDetail = ({
                         label={t('update_interval')}
                         loading={!source}
                         value={!source ? null : source.update_interval}
+                        defaultValue={!defaults ? undefined : (defaults.update_interval ?? 3600)}
                         reset={showReset(source, defaults, 'update_interval')}
                         min={3600}
                         max={86400}
-                        defaultValue={3600}
                         valueLabelDisplay="off"
                         step={null}
                         marks={
@@ -144,10 +139,6 @@ const WrappedSourceDetail = ({
                           setModified(true);
                           setSource(s => ({ ...s, update_interval: v }));
                         }}
-                        onReset={() => {
-                          setModified(true);
-                          setSource(s => ({ ...s, update_interval: defaults.update_interval }));
-                        }}
                       />
                     </Grid>
 
@@ -156,18 +147,14 @@ const WrappedSourceDetail = ({
                         id="update-interval-time"
                         loading={!source}
                         value={!source ? null : source.update_interval}
+                        defaultValue={!defaults ? undefined : (defaults.update_interval ?? 3600)}
                         reset={showReset(source, defaults, 'update_interval')}
                         endAdornment="sec"
                         min={60}
                         max={86400}
-                        unnullable
                         onChange={(e, v) => {
                           setModified(true);
                           setSource(s => ({ ...s, update_interval: v }));
-                        }}
-                        onReset={() => {
-                          setModified(true);
-                          setSource(s => ({ ...s, update_interval: defaults.update_interval }));
                         }}
                       />
                     </Grid>
@@ -190,15 +177,11 @@ const WrappedSourceDetail = ({
                           label={t(field)}
                           loading={!source}
                           value={!source ? null : source[field]}
+                          defaultValue={!defaults ? undefined : defaults[field]}
                           reset={showReset(source, defaults, field)}
-                          showOverflow
                           onChange={(e, v) => {
                             setModified(true);
                             setSource(s => ({ ...s, [field]: v }));
-                          }}
-                          onReset={() => {
-                            setModified(true);
-                            setSource(s => ({ ...s, [field]: defaults[field] }));
                           }}
                         />
                       </Grid>
@@ -223,15 +206,12 @@ const WrappedSourceDetail = ({
                         label={t('fetch_method')}
                         loading={!source}
                         value={!source ? null : source.fetch_method}
+                        defaultValue={!defaults ? undefined : defaults.fetch_method}
                         reset={showReset(source, defaults, 'fetch_method')}
                         options={FETCH_METHODS.map(method => ({ value: method, primary: method }))}
                         onChange={(e, v) => {
                           setModified(true);
                           setSource(s => ({ ...s, fetch_method: v }));
-                        }}
-                        onReset={() => {
-                          setModified(true);
-                          setSource(s => ({ ...s, fetch_method: defaults.fetch_method }));
                         }}
                       />
                     </Grid>
@@ -242,14 +222,11 @@ const WrappedSourceDetail = ({
                         loading={!source}
                         error={value => (value !== '' ? null : t('uri.error'))}
                         value={!source ? null : source.uri}
+                        defaultValue={!defaults ? undefined : defaults.uri}
                         reset={showReset(source, defaults, 'uri')}
                         onChange={(e, v) => {
                           setModified(true);
                           setSource(s => ({ ...s, uri: v }));
-                        }}
-                        onReset={() => {
-                          setModified(true);
-                          setSource(s => ({ ...s, uri: defaults.uri }));
                         }}
                       />
                     </Grid>
@@ -274,14 +251,11 @@ const WrappedSourceDetail = ({
                           label={t('use_managed_identity')}
                           loading={!source}
                           value={!source ? null : source.use_managed_identity}
+                          defaultValue={!defaults ? undefined : defaults.use_managed_identity}
                           reset={showReset(source, defaults, 'use_managed_identity')}
                           onChange={(e, v) => {
                             setModified(true);
                             setSource(s => ({ ...s, use_managed_identity: v }));
-                          }}
-                          onReset={() => {
-                            setModified(true);
-                            setSource(s => ({ ...s, use_managed_identity: defaults.use_managed_identity }));
                           }}
                         />
                       </Grid>
@@ -294,14 +268,11 @@ const WrappedSourceDetail = ({
                             label={t('username')}
                             loading={!source}
                             value={!source ? null : source.username}
+                            defaultValue={!defaults ? undefined : defaults.username}
                             reset={showReset(source, defaults, 'username')}
                             onChange={(e, v) => {
                               setModified(true);
                               setSource(s => ({ ...s, username: v }));
-                            }}
-                            onReset={() => {
-                              setModified(true);
-                              setSource(s => ({ ...s, username: defaults.username }));
                             }}
                           />
                         </Grid>
@@ -311,15 +282,12 @@ const WrappedSourceDetail = ({
                             label={t('password')}
                             loading={!source}
                             value={!source ? null : source.password}
+                            defaultValue={!defaults ? undefined : defaults.password}
                             reset={showReset(source, defaults, 'password')}
                             password
                             onChange={(e, v) => {
                               setModified(true);
                               setSource(s => ({ ...s, password: v }));
-                            }}
-                            onReset={() => {
-                              setModified(true);
-                              setSource(s => ({ ...s, password: defaults.password }));
                             }}
                           />
                         </Grid>
@@ -331,6 +299,7 @@ const WrappedSourceDetail = ({
                         label={t('private_key')}
                         loading={!source}
                         value={!source ? null : source.private_key}
+                        defaultValue={!defaults ? undefined : defaults.private_key}
                         reset={showReset(source, defaults, 'private_key')}
                         autoComplete="new-password"
                         rows={6}
@@ -339,10 +308,6 @@ const WrappedSourceDetail = ({
                         onChange={(e, v) => {
                           setModified(true);
                           setSource(s => ({ ...s, private_key: v }));
-                        }}
-                        onReset={() => {
-                          setModified(true);
-                          setSource(s => ({ ...s, private_key: defaults.private_key }));
                         }}
                       />
                     </Grid>
@@ -385,15 +350,12 @@ const WrappedSourceDetail = ({
                         label={t('proxy')}
                         loading={!source}
                         value={!source ? null : source.proxy}
+                        defaultValue={!defaults ? undefined : defaults.proxy}
                         reset={showReset(source, defaults, 'proxy')}
                         placeholder={t('proxy.placeholder')}
                         onChange={(e, v) => {
                           setModified(true);
                           setSource(s => ({ ...s, proxy: v }));
-                        }}
-                        onReset={() => {
-                          setModified(true);
-                          setSource(s => ({ ...s, proxy: defaults.proxy }));
                         }}
                       />
                     </Grid>
@@ -403,16 +365,14 @@ const WrappedSourceDetail = ({
                         label={t('ca')}
                         loading={!source}
                         value={!source ? null : source.ca_cert}
+                        defaultValue={!defaults ? undefined : defaults.ca_cert}
                         reset={showReset(source, defaults, 'ca_cert')}
                         monospace
+                        password
                         rows={6}
                         onChange={(e, v) => {
                           setModified(true);
                           setSource(s => ({ ...s, ca_cert: v }));
-                        }}
-                        onReset={() => {
-                          setModified(true);
-                          setSource(s => ({ ...s, ca_cert: defaults.ca_cert }));
                         }}
                       />
                     </Grid>
@@ -422,14 +382,11 @@ const WrappedSourceDetail = ({
                         label={t('ignore_ssl')}
                         loading={!source}
                         value={!source ? null : source.ssl_ignore_errors}
+                        defaultValue={!defaults ? undefined : defaults.ssl_ignore_errors}
                         reset={showReset(source, defaults, 'ssl_ignore_errors')}
                         onChange={(e, v) => {
                           setModified(true);
                           setSource(s => ({ ...s, ssl_ignore_errors: v }));
-                        }}
-                        onReset={() => {
-                          setModified(true);
-                          setSource(s => ({ ...s, ssl_ignore_errors: defaults.ssl_ignore_errors }));
                         }}
                       />
                     </Grid>

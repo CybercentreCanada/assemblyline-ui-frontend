@@ -1,10 +1,3 @@
-import type {
-  FormHelperTextProps,
-  IconButtonProps,
-  TextFieldProps,
-  TooltipProps,
-  TypographyProps
-} from '@mui/material';
 import {
   Button,
   Card,
@@ -12,14 +5,10 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
-  FormControl,
   Grid,
-  InputLabel,
   List,
   ListItemButton,
   ListItemText,
-  Skeleton,
-  Typography,
   useMediaQuery,
   useTheme
 } from '@mui/material';
@@ -27,8 +16,17 @@ import useALContext from 'components/hooks/useALContext';
 import type { WhoAmI } from 'components/models/ui/user';
 import type { ClassificationProps } from 'components/visual/Classification';
 import CustomChip, { COLOR_MAP } from 'components/visual/CustomChip';
-import { HelperText } from 'components/visual/Inputs/components/HelperText';
-import { PasswordInput } from 'components/visual/Inputs/components/PasswordInput';
+import {
+  HelperText,
+  PasswordInput,
+  StyledFormControl,
+  StyledFormLabel,
+  StyledInputSkeleton,
+  StyledRoot
+} from 'components/visual/Inputs/lib/inputs.components';
+import { useInputParsedProps } from 'components/visual/Inputs/lib/inputs.hook';
+import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
+import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
 import { Tooltip } from 'components/visual/Tooltip';
 import type { ClassificationParts, ClassificationValidator } from 'helpers/classificationParser';
 import {
@@ -41,85 +39,59 @@ import {
   normalizedClassification
 } from 'helpers/classificationParser';
 import type { PossibleColor } from 'helpers/colors';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-export type ClassificationInputProps = Omit<ClassificationProps, 'c12n' | 'setClassification'> & {
-  endAdornment?: TextFieldProps['InputProps']['endAdornment'];
-  error?: (value: string) => string;
-  errorProps?: FormHelperTextProps;
-  helperText?: string;
-  helperTextProps?: FormHelperTextProps;
-  id?: string;
-  label?: string;
-  labelProps?: TypographyProps;
-  loading?: boolean;
-  monospace?: boolean;
-  password?: boolean;
-  placeholder?: TextFieldProps['InputProps']['placeholder'];
-  preventDisabledColor?: boolean;
-  preventRender?: boolean;
-  readOnly?: boolean;
-  reset?: boolean;
-  rootProps?: React.HTMLAttributes<HTMLDivElement>;
-  startAdornment?: TextFieldProps['InputProps']['startAdornment'];
-  tiny?: boolean;
-  tooltip?: TooltipProps['title'];
-  tooltipProps?: Omit<TooltipProps, 'children' | 'title'>;
-  value: ClassificationProps['c12n'];
-  onChange?: (event: unknown, classification: string) => void;
-  onReset?: IconButtonProps['onClick'];
-  onError?: (error: string) => void;
+export type ClassificationInputProps = Omit<ClassificationProps, 'c12n' | 'setClassification'> &
+  InputValues<ClassificationProps['c12n']> &
+  InputProps;
+
+type ClassificationInputState = ClassificationInputProps & {
+  showPicker: boolean;
+  uParts: ClassificationParts;
+  validated: ClassificationValidator;
 };
 
-const WrappedClassificationInput = ({
-  disabled = false,
-  dynGroup = null,
-  error = () => null,
-  errorProps = null,
-  format = 'short',
-  fullWidth = true,
-  helperText = null,
-  helperTextProps = null,
-  id: idProp = null,
-  inline = false,
-  isUser = false,
-  label: labelProp = null,
-  labelProps,
-  loading = false,
-  monospace = false,
-  password = false,
-  preventDisabledColor = false,
-  preventRender: preventRenderProp = false,
-  readOnly = false,
-  reset = false,
-  rootProps = null,
-  tiny = false,
-  tooltip = null,
-  tooltipProps = null,
-  value = null,
-  onChange = () => null,
-  onReset = () => null,
-  onError = () => null
-}: ClassificationInputProps) => {
+const WrappedClassificationInput = React.memo(() => {
   const { t } = useTranslation();
   const theme = useTheme();
   const { user: currentUser, c12nDef, classificationAliases } = useALContext();
-
-  const [showPicker, setShowPicker] = useState<boolean>(false);
-  const [uParts, setUserParts] = useState<ClassificationParts>(defaultParts);
-  const [validated, setValidated] = useState<ClassificationValidator>(defaultClassificationValidator);
-  const [showPassword, setShowPassword] = useState<boolean>(true);
 
   const isPhone = useMediaQuery(theme.breakpoints.only('xs'));
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const sp2 = theme.spacing(2);
 
-  const label = useMemo<string>(() => labelProp ?? '\u00A0', [labelProp]);
+  const [get, setStore] = usePropStore<ClassificationInputState>();
+
+  const defaultValue = get('defaultValue');
+  const disabled = get('disabled');
+  const format = get('format');
+  const fullWidth = get('fullWidth');
+  const inline = get('inline');
+  const isUser = get('isUser');
+  const loading = get('loading');
+  const monospace = get('monospace');
+  const password = get('password');
+  const preventRenderStore = get('preventRender');
+  const readOnly = get('readOnly');
+  const reset = get('reset');
+  const showPassword = get('showPassword');
+  const tiny = get('tiny');
+  const value = get('value');
+
+  const dynGroup = get('dynGroup');
+  const showPicker = get('showPicker') ?? false;
+  const uParts = get('uParts') ?? defaultParts;
+  const validated = get('validated') ?? defaultClassificationValidator;
+
+  const error = get('error');
+  const onChange = get('onChange');
+  const onError = get('onError');
+  const onReset = get('onReset');
 
   const preventRender = useMemo(
-    () => preventRenderProp || !c12nDef?.enforce || !validated?.parts?.lvl,
-    [c12nDef?.enforce, preventRenderProp, validated?.parts?.lvl]
+    () => preventRenderStore || !c12nDef?.enforce || !validated?.parts?.lvl,
+    [c12nDef?.enforce, preventRenderStore, validated?.parts?.lvl]
   );
 
   const normalClassification = useMemo(
@@ -140,9 +112,22 @@ const WrappedClassificationInput = ({
     return COLOR_MAP[levelStyles.color || levelStyles.label.replace('label-', '')] || ('default' as const);
   }, [c12nDef.levels_styles_map, preventRender, validated.parts.lvl]);
 
-  const id = useMemo<string>(() => (idProp || label).replaceAll(' ', '-'), [idProp, label]);
-
-  const errorValue = useMemo<string>(() => error(value), [error, value]);
+  const title = useMemo<React.ReactNode>(
+    () =>
+      defaultValue === undefined ? null : (
+        <>
+          <span style={{ color: theme.palette.text.secondary }}>{t('reset_to')}</span>
+          <span>
+            {typeof defaultValue === 'object'
+              ? JSON.stringify(defaultValue)
+              : typeof defaultValue === 'string'
+                ? `"${defaultValue}"`
+                : `${defaultValue}`}
+          </span>
+        </>
+      ),
+    [defaultValue, t, theme.palette.text.secondary]
+  );
 
   const handleGroupsChange = useCallback(
     (grp: WhoAmI['classification_aliases'][keyof WhoAmI['classification_aliases']]) => {
@@ -166,9 +151,12 @@ const WrappedClassificationInput = ({
         }
       }
 
-      setValidated(applyClassificationRules({ ...validated.parts, groups: newGrp }, c12nDef, format, isMobile, isUser));
+      setStore(s => ({
+        ...s,
+        validated: applyClassificationRules({ ...validated.parts, groups: newGrp }, c12nDef, format, isMobile, isUser)
+      }));
     },
-    [c12nDef, format, isMobile, isUser, validated.parts]
+    [c12nDef, format, isMobile, isUser, setStore, validated.parts]
   );
 
   const handleSubGroupsChange = useCallback(
@@ -183,11 +171,18 @@ const WrappedClassificationInput = ({
         newSGrp.splice(newSGrp.indexOf(sgrp.short_name), 1);
       }
 
-      setValidated(
-        applyClassificationRules({ ...validated.parts, subgroups: newSGrp }, c12nDef, format, isMobile, isUser)
-      );
+      setStore(s => ({
+        ...s,
+        validated: applyClassificationRules(
+          { ...validated.parts, subgroups: newSGrp },
+          c12nDef,
+          format,
+          isMobile,
+          isUser
+        )
+      }));
     },
-    [c12nDef, format, isMobile, isUser, validated.parts]
+    [c12nDef, format, isMobile, isUser, setStore, validated.parts]
   );
 
   const handleRequiredChange = useCallback(
@@ -202,92 +197,87 @@ const WrappedClassificationInput = ({
         newReq.splice(newReq.indexOf(req.short_name), 1);
       }
 
-      setValidated(applyClassificationRules({ ...validated.parts, req: newReq }, c12nDef, format, isMobile, isUser));
+      setStore(s => ({
+        ...s,
+        validated: applyClassificationRules({ ...validated.parts, req: newReq }, c12nDef, format, isMobile, isUser)
+      }));
     },
-    [c12nDef, format, isMobile, isUser, validated.parts]
+    [c12nDef, format, isMobile, isUser, setStore, validated.parts]
   );
 
   const handleLevelChange = useCallback(
     (lvlIdx: number) =>
-      setValidated(
-        applyClassificationRules(
+      setStore(s => ({
+        ...s,
+        validated: applyClassificationRules(
           { ...validated.parts, lvlIdx, lvl: getLevelText(lvlIdx, c12nDef, format, isMobile) },
           c12nDef,
           format,
           isMobile,
           isUser
         )
-      ),
-    [c12nDef, format, isMobile, isUser, validated.parts]
+      })),
+    [c12nDef, format, isMobile, isUser, setStore, validated.parts]
   );
 
   const handleChange = useCallback(
-    (event: unknown) => {
+    (event: React.SyntheticEvent) => {
       const newC12n = normalizedClassification(validated.parts, c12nDef, format, isMobile, isUser);
-      setShowPicker(false);
-      onChange(event, newC12n);
-
       const err = error(newC12n);
-      if (err) onError(err);
+      onError(err);
+      if (!err) onChange(event, newC12n);
+      setStore(() => ({ ...(!err && { value: newC12n }), inputValue: newC12n, errorMsg: err, showPicker: false }));
     },
-    [c12nDef, error, format, isMobile, isUser, onChange, onError, validated.parts]
+    [c12nDef, error, format, isMobile, isUser, onChange, onError, setStore, validated.parts]
   );
 
   const handleReset = useCallback(
-    (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-      setShowPicker(false);
-      onReset(event);
+    (event: React.SyntheticEvent) => {
+      const err = error(defaultValue);
+      onError(err);
+      if (!err) onChange(event, defaultValue);
+      setStore(() => ({
+        ...(!err && { value: defaultValue }),
+        inputValue: defaultValue,
+        errorMsg: err,
+        showPicker: false
+      }));
     },
-    [onReset]
+    [defaultValue, error, onChange, onError, setStore]
   );
 
   useEffect(() => {
     if (c12nDef && c12nDef?.enforce && value) {
       const parts = getParts(value.toLocaleUpperCase(), c12nDef, format, isMobile);
-      setUserParts(getParts(currentUser.classification, c12nDef, format, isMobile));
-      setValidated(applyClassificationRules(parts, c12nDef, format, isMobile, isUser));
+      setStore(s => ({
+        ...s,
+        uParts: getParts(currentUser.classification, c12nDef, format, isMobile),
+        validated: applyClassificationRules(parts, c12nDef, format, isMobile, isUser)
+      }));
     }
-  }, [c12nDef, currentUser.classification, format, isMobile, isUser, value]);
+  }, [c12nDef, currentUser.classification, format, isMobile, isUser, setStore, value]);
 
-  return preventRender || !value ? null : (
-    <div {...rootProps} style={{ textAlign: 'left', ...rootProps?.style }}>
-      <Tooltip title={tooltip} {...tooltipProps}>
-        <Typography
-          color={!disabled && errorValue ? 'error' : showPicker ? 'primary' : 'textSecondary'}
-          component={InputLabel}
-          gutterBottom
-          htmlFor={id}
-          variant="body2"
-          whiteSpace="nowrap"
-          {...labelProps}
-          children={label}
-          sx={{
-            ...labelProps?.sx,
-            ...(disabled &&
-              !preventDisabledColor && {
-                WebkitTextFillColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.38)'
-              })
-          }}
-        />
-      </Tooltip>
-      <FormControl fullWidth>
+  return (
+    <StyledRoot>
+      <StyledFormLabel />
+      <StyledFormControl>
         {loading ? (
-          <Skeleton sx={{ height: '40px', transform: 'unset', ...(tiny && { height: '28px' }) }} />
+          <StyledInputSkeleton />
         ) : (
           <>
             <div style={{ display: inline ? 'inline-block' : null }}>
               <CustomChip
                 type="rounded"
                 variant="filled"
-                size="medium"
+                size={tiny ? 'tiny' : 'medium'}
                 color={computedColor}
                 label={normalClassification}
                 fullWidth={fullWidth}
                 disabled={disabled}
-                onClick={readOnly ? null : () => setShowPicker(true)}
+                onClick={readOnly ? null : () => setStore(s => ({ ...s, showPicker: true }))}
                 sx={{
                   fontWeight: 500,
-                  marginBottom: theme.spacing(0.75),
+                  mb: 0.75,
                   ...(monospace && { fontFamily: 'monospace' }),
                   ...(password &&
                     showPassword && {
@@ -297,7 +287,6 @@ const WrappedClassificationInput = ({
                       textSecurity: 'disc'
                     })
                 }}
-                {...(tiny && { size: 'tiny' })}
               />
             </div>
 
@@ -306,7 +295,7 @@ const WrappedClassificationInput = ({
               fullWidth
               maxWidth={isMobile ? 'xs' : 'md'}
               open={showPicker}
-              onClose={event => handleChange(event)}
+              onClose={event => handleChange(event as React.SyntheticEvent)}
             >
               <DialogTitle>
                 <CustomChip
@@ -488,17 +477,13 @@ const WrappedClassificationInput = ({
                 </Grid>
               </DialogContent>
               <DialogActions>
-                <PasswordInput
-                  id={id}
-                  preventRender={loading || !password || disabled || readOnly}
-                  tiny={tiny}
-                  showPassword={showPassword}
-                  onShowPassword={() => setShowPassword(p => !p)}
-                />
+                <PasswordInput />
                 {reset && (
-                  <Button onClick={event => handleReset(event)} color="secondary">
-                    {t('classification.reset')}
-                  </Button>
+                  <Tooltip arrow title={title} placement="bottom">
+                    <Button onClick={onReset ? onReset : handleReset} color="secondary">
+                      {t('classification.reset')}
+                    </Button>
+                  </Tooltip>
                 )}
                 <Button onClick={event => handleChange(event)} color="primary" autoFocus>
                   {t('classification.done')}
@@ -507,18 +492,37 @@ const WrappedClassificationInput = ({
             </Dialog>
           </>
         )}
-        <HelperText
-          disabled={disabled}
-          errorProps={errorProps}
-          errorText={errorValue}
-          helperText={helperText}
-          helperTextProps={helperTextProps}
-          id={id}
-          label={label}
-        />
-      </FormControl>
-    </div>
+
+        <HelperText />
+      </StyledFormControl>
+    </StyledRoot>
+  );
+});
+
+export const ClassificationInput = ({
+  dynGroup = null,
+  format = 'short',
+  fullWidth = true,
+  inline = false,
+  isUser = false,
+  preventRender = false,
+  value,
+  ...props
+}: ClassificationInputProps) => {
+  const parsedProps = useInputParsedProps<string, string, ClassificationInputProps>({
+    ...props,
+    dynGroup,
+    format,
+    fullWidth,
+    inline,
+    isUser,
+    preventRender,
+    value
+  });
+
+  return preventRender || !value ? null : (
+    <PropProvider<ClassificationInputProps> props={parsedProps}>
+      <WrappedClassificationInput />
+    </PropProvider>
   );
 };
-
-export const ClassificationInput: React.FC<ClassificationInputProps> = React.memo(WrappedClassificationInput);

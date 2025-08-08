@@ -1,161 +1,111 @@
-import type {
-  FormHelperTextProps,
-  IconButtonProps,
-  SliderProps,
-  TextFieldProps,
-  TooltipProps,
-  TypographyProps
-} from '@mui/material';
-import { FormControl, FormHelperText, Skeleton, Slider, Typography, useTheme } from '@mui/material';
-import type { ResetInputProps } from 'components/visual/Inputs/components/ResetInput';
-import { ResetInput } from 'components/visual/Inputs/components/ResetInput';
-import { Tooltip } from 'components/visual/Tooltip';
-import React, { useMemo, useState } from 'react';
+import type { SliderProps } from '@mui/material';
+import { Slider } from '@mui/material';
+import {
+  HelperText,
+  ResetInput,
+  StyledFormControl,
+  StyledFormLabel,
+  StyledInputSkeleton,
+  StyledRoot
+} from 'components/visual/Inputs/lib/inputs.components';
+import { useInputHandlers, useInputParsedProps } from 'components/visual/Inputs/lib/inputs.hook';
+import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
+import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
+import React from 'react';
 
-export type SliderInputProps = Omit<SliderProps, 'value' | 'onChange'> & {
-  endAdornment?: TextFieldProps['InputProps']['endAdornment'];
-  error?: (value: number) => string;
-  errorProps?: FormHelperTextProps;
-  helperText?: string;
-  helperTextProps?: FormHelperTextProps;
-  label?: string;
-  labelProps?: TypographyProps;
-  loading?: boolean;
-  monospace?: boolean;
-  password?: boolean;
-  preventDisabledColor?: boolean;
-  preventRender?: boolean;
-  readOnly?: boolean;
-  reset?: boolean;
-  resetProps?: ResetInputProps;
-  tiny?: boolean;
-  tooltip?: TooltipProps['title'];
-  tooltipProps?: Omit<TooltipProps, 'children' | 'title'>;
-  value: number;
-  onChange?: (event: Event, value: number) => void;
-  onReset?: IconButtonProps['onClick'];
-  onError?: (error: string) => void;
-};
+export type SliderInputProps = InputValues<number, number> &
+  InputProps & {
+    marks?: SliderProps['marks'];
+    max?: number;
+    min?: number;
+    step?: SliderProps['step'];
+    valueLabelDisplay?: SliderProps['valueLabelDisplay'];
+    valueLabelFormat?: SliderProps['valueLabelFormat'];
+  };
 
-export const WrappedSliderInput = ({
-  disabled,
-  endAdornment = null,
-  error = () => null,
-  errorProps = null,
-  helperText = null,
-  helperTextProps = null,
-  id: idProp = null,
-  label: labelProp = null,
-  labelProps,
-  loading,
-  monospace = false,
-  password = false,
-  preventDisabledColor = false,
-  preventRender,
-  readOnly = false,
-  reset = false,
-  resetProps = null,
-  tiny = false,
-  tooltip = null,
-  tooltipProps = null,
-  value = null,
-  onBlur = () => null,
-  onChange = () => null,
-  onError = () => null,
-  onFocus = () => null,
-  onReset = () => null,
-  ...sliderProps
-}: SliderInputProps) => {
-  const theme = useTheme();
+const WrappedSliderInput = React.memo(() => {
+  const [get] = usePropStore<SliderInputProps>();
 
-  const [focused, setFocused] = useState<boolean>(false);
+  const disabled = get('disabled');
+  const errorMsg = get('errorMsg');
+  const id = get('id');
+  const inputValue = get('inputValue') ?? null;
+  const loading = get('loading');
+  const marks = get('marks');
+  const max = get('max');
+  const min = get('min');
+  const readOnly = get('readOnly');
+  const step = get('step') ?? null;
+  const value = get('value');
+  const valueLabelDisplay = get('valueLabelDisplay');
+  const valueLabelFormat = get('valueLabelFormat');
 
-  const label = useMemo<string>(() => labelProp ?? '\u00A0', [labelProp]);
-  const id = useMemo<string>(() => (idProp || label).replaceAll(' ', '-'), [idProp, label]);
-  const errorValue = useMemo<string>(() => error(value), [error, value]);
+  const { handleChange, handleFocus, handleBlur } = useInputHandlers<SliderInputProps>();
 
-  return preventRender ? null : (
-    <div style={{ textAlign: 'left' }}>
-      <Tooltip title={tooltip} {...tooltipProps}>
-        <Typography
-          color={!disabled && errorValue ? 'error' : focused ? 'primary' : 'textSecondary'}
-          gutterBottom
-          overflow="hidden"
-          textAlign="start"
-          textOverflow="ellipsis"
-          variant="body2"
-          whiteSpace="nowrap"
-          width="100%"
-          sx={{
-            ...(disabled &&
-              !preventDisabledColor && {
-                WebkitTextFillColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.38)'
-              })
-          }}
-          {...labelProps}
-          children={label}
-        />
-      </Tooltip>
-      <FormControl fullWidth error={!!errorValue}>
+  return (
+    <StyledRoot>
+      <StyledFormLabel />
+      <StyledFormControl>
         {loading ? (
-          <Skeleton sx={{ height: '40px', transform: 'unset', ...(tiny && { height: '28px' }) }} />
+          <StyledInputSkeleton />
         ) : (
           <>
-            <div style={{ display: 'flex', alignItems: 'flex-start' }}>
+            <div style={{ minHeight: '40px', display: 'flex', alignItems: 'center' }}>
               <div style={{ flex: 1, marginLeft: '20px', marginRight: '20px' }}>
                 <Slider
                   aria-label={id}
-                  id={id}
-                  color={!disabled && errorValue ? 'error' : 'primary'}
+                  color={!disabled && errorMsg ? 'error' : 'primary'}
                   disabled={disabled || readOnly}
-                  valueLabelDisplay="auto"
+                  id={id}
+                  marks={marks}
                   size="small"
-                  value={value}
-                  onChange={(e, v) => {
-                    onChange(e, v as number);
-
-                    const err = error(v as number);
-                    if (err) onError(err);
-                  }}
-                  onFocus={(event, ...other) => {
-                    setFocused(!readOnly && !disabled && document.activeElement === event.target);
-                    onFocus(event, ...other);
-                  }}
-                  onBlur={(event, ...other) => {
-                    setFocused(false);
-                    onBlur(event, ...other);
-                  }}
-                  {...sliderProps}
+                  step={step}
+                  value={inputValue}
+                  valueLabelDisplay={valueLabelDisplay}
+                  valueLabelFormat={valueLabelFormat}
+                  {...(min && { min: min })}
+                  {...(max && { max: max })}
+                  onFocus={handleFocus}
+                  onBlur={e => handleBlur(e, value)}
+                  onChange={(e, v) => handleChange(e as unknown as React.SyntheticEvent, v, v)}
                 />
               </div>
-              <ResetInput
-                id={id}
-                preventRender={loading || !reset || disabled || readOnly}
-                onReset={onReset}
-                {...resetProps}
-              />
+              <ResetInput />
             </div>
-            {disabled ? null : errorValue ? (
-              <FormHelperText
-                sx={{ color: theme.palette.error.main, ...errorProps?.sx }}
-                variant="outlined"
-                {...errorProps}
-              >
-                {errorValue}
-              </FormHelperText>
-            ) : helperText ? (
-              <FormHelperText
-                sx={{ color: theme.palette.text.secondary, ...helperTextProps?.sx }}
-                variant="outlined"
-                {...helperTextProps}
-              >
-                {helperText}
-              </FormHelperText>
-            ) : null}
+            <HelperText />
           </>
         )}
-      </FormControl>
-    </div>
+      </StyledFormControl>
+    </StyledRoot>
+  );
+});
+
+export const SliderInput = ({
+  marks = false,
+  max = null,
+  min = null,
+  preventRender = false,
+  step = null,
+  value,
+  valueLabelDisplay = 'auto',
+  valueLabelFormat = v => v,
+  ...props
+}: SliderInputProps) => {
+  const parsedProps = useInputParsedProps<number, number, SliderInputProps>({
+    ...props,
+    marks,
+    max,
+    min,
+    preventRender,
+    step,
+    value,
+    valueLabelDisplay,
+    valueLabelFormat
+  });
+
+  return preventRender ? null : (
+    <PropProvider<SliderInputProps> props={{ ...parsedProps }}>
+      <WrappedSliderInput />
+    </PropProvider>
   );
 };
-export const SliderInput: React.FC<SliderInputProps> = React.memo(WrappedSliderInput);

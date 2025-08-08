@@ -8,6 +8,8 @@ import submitEN from 'components/routes/submit/submit.i18n.en.json';
 import submitFR from 'components/routes/submit/submit.i18n.fr.json';
 import dateTimeEN from 'components/visual/DateTime/datetime.i18n.en.json';
 import dateTimeFR from 'components/visual/DateTime/datetime.i18n.fr.json';
+import inputsEN from 'components/visual/Inputs/lib/inputs.i18n.en.json';
+import inputsFR from 'components/visual/Inputs/lib/inputs.i18n.fr.json';
 import { default as i18n } from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import error403EN from 'locales/en/403.json';
@@ -152,6 +154,7 @@ const resources = {
     helpSearch: helpSearchEN,
     helpServices: helpServicesEN,
     hexViewer: hexViewerEN,
+    inputs: inputsEN,
     locked: lockedEN,
     login: loginEN,
     logout: logoutEN,
@@ -213,6 +216,7 @@ const resources = {
     helpSearch: helpSearchFR,
     helpServices: helpServicesFR,
     hexViewer: hexViewerFR,
+    inputs: inputsFR,
     locked: lockedFR,
     login: loginFR,
     logout: logoutFR,

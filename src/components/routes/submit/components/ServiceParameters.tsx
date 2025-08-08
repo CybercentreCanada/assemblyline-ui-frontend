@@ -51,6 +51,7 @@ const Param: React.FC<ParamProps> = React.memo(({ param_id, spec_id, service }) 
                 label={name.replaceAll('_', ' ')}
                 labelProps={{ textTransform: 'capitalize' }}
                 value={value as boolean}
+                defaultValue={defaultValue as boolean}
                 disabled={disabled || !isEditing || (!customize && restricted)}
                 preventRender={!customize && restricted}
                 reset={defaultValue !== null && value !== defaultValue}
@@ -75,6 +76,7 @@ const Param: React.FC<ParamProps> = React.memo(({ param_id, spec_id, service }) 
                 label={name.replaceAll('_', ' ')}
                 labelProps={{ textTransform: 'capitalize' }}
                 value={value as number}
+                defaultValue={defaultValue as number}
                 disabled={disabled || !isEditing || (!customize && restricted)}
                 preventRender={!customize && restricted}
                 reset={defaultValue !== null && value !== defaultValue}
@@ -100,6 +102,7 @@ const Param: React.FC<ParamProps> = React.memo(({ param_id, spec_id, service }) 
                 label={name.replaceAll('_', ' ')}
                 labelProps={{ textTransform: 'capitalize' }}
                 value={value as string}
+                defaultValue={defaultValue as string}
                 disabled={disabled || !isEditing || (!customize && restricted)}
                 preventRender={!customize && restricted}
                 options={list}
@@ -126,15 +129,16 @@ const Param: React.FC<ParamProps> = React.memo(({ param_id, spec_id, service }) 
                 label={name.replaceAll('_', ' ')}
                 labelProps={{ textTransform: 'capitalize' }}
                 value={value as string}
+                defaultValue={defaultValue as string}
                 disabled={disabled || !isEditing || (!customize && restricted)}
                 preventRender={!customize && restricted}
                 options={list.map(key => ({ primary: key.replaceAll('_', ' '), value: key })).sort()}
                 reset={defaultValue !== null && value !== defaultValue}
                 rootProps={{ style: { padding: theme.spacing(1) } }}
-                sx={{ textTransform: 'capitalize' }}
+                capitalize
                 onChange={(e, v) =>
                   form.setFieldValue('settings.service_spec', s => {
-                    s[spec_id].params[param_id].value = v as string;
+                    s[spec_id].params[param_id].value = v;
                     return s;
                   })
                 }
