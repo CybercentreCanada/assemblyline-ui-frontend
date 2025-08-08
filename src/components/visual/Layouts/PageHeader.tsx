@@ -5,7 +5,7 @@ import useALContext from 'components/hooks/useALContext';
 import type { ClassificationProps } from 'components/visual/Classification';
 import Classification from 'components/visual/Classification';
 import type { CSSProperties, DetailedHTMLProps, HTMLAttributes, ReactNode } from 'react';
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 export type PageHeaderProps = {
   actions?: ReactNode;
@@ -33,19 +33,19 @@ export type PageHeaderProps = {
 export const PageHeader: React.FC<PageHeaderProps> = React.memo(
   ({
     actions = null,
-    classification: classificationProp = undefined,
+    classification: classificationProp,
     endAdornment = null,
     isSticky = false,
-    primary: primaryProp = null,
+    primary: primaryProp,
     primaryLoading = false,
-    secondary: secondaryProp = null,
+    secondary: secondaryProp,
     secondaryLoading = false,
     slotProps = {},
     startAdornment = null,
     top = null,
     wrapStart = false,
     onClassificationChange = null
-  }: PageHeaderProps) => {
+  }) => {
     const theme = useTheme();
     const layout = useAppLayout();
     const appbar = useAppBar();
@@ -60,16 +60,26 @@ export const PageHeader: React.FC<PageHeaderProps> = React.memo(
 
     const barWillHide = useMemo(
       () => (layout?.current !== 'top' ? appbar?.autoHide : null),
-      [appbar?.autoHide, layout]
+      [layout?.current, appbar?.autoHide]
     );
 
     const {
-      root: rootProps,
-      classification: classificationProps,
-      primary: primaryProps,
-      secondary: secondaryProps,
-      actions: actionsProps
-    } = useMemo<PageHeaderProps['slotProps']>(() => slotProps, [slotProps]);
+      root = {},
+      classification: classificationProps = {},
+      primary: primaryProps = {},
+      secondary: secondaryProps = {},
+      actions: actionsProps = {}
+    } = slotProps;
+
+    const resolvedPrimary = useMemo<ReactNode>(() => {
+      if (primaryLoading) return <Skeleton width="20rem" />;
+      return typeof primaryProp === 'function' ? primaryProp() : primaryProp;
+    }, [primaryLoading, primaryProp]);
+
+    const resolvedSecondary = useMemo<ReactNode>(() => {
+      if (secondaryLoading) return <Skeleton width="10rem" />;
+      return typeof secondaryProp === 'function' ? secondaryProp() : secondaryProp;
+    }, [secondaryLoading, secondaryProp]);
 
     const classification = useMemo<ClassificationProps['c12n']>(
       () =>
@@ -83,89 +93,68 @@ export const PageHeader: React.FC<PageHeaderProps> = React.memo(
       [classificationProp, primaryLoading, secondaryLoading]
     );
 
-    const primary = useMemo<ReactNode>(
-      () =>
-        primaryLoading ? (
-          <Skeleton style={{ width: '20rem' }} />
-        ) : typeof primaryProp === 'function' ? (
-          primaryProp()
-        ) : (
-          primaryProp
-        ),
-      [primaryLoading, primaryProp]
-    );
+    useLayoutEffect(() => {
+      const measure = () => {
+        if (!containerRef.current || !primaryRef.current || !actionsRef.current) return;
 
-    const secondary = useMemo<ReactNode>(
-      () =>
-        secondaryLoading ? (
-          <Skeleton style={{ width: '10rem' }} />
-        ) : typeof secondaryProp === 'function' ? (
-          secondaryProp()
-        ) : (
-          secondaryProp
-        ),
-      [secondaryLoading, secondaryProp]
-    );
+        const containerWidth = containerRef.current.getBoundingClientRect().width;
+        const primaryIdealWidth = primaryRef.current.scrollWidth; // unwrapped width
+        const actionsWidth = actionsRef.current.getBoundingClientRect().width;
 
-    useEffect(() => {
-      const element = containerRef.current;
-
-      if (!element) return;
-
-      const resizeObserver = new ResizeObserver(() => {
-        if (containerRef.current && primaryRef.current && actionsRef.current) {
-          setFlexColumn(
-            containerRef.current.getBoundingClientRect().width - actionsRef.current.getBoundingClientRect().width <
-              primaryRef.current.getBoundingClientRect().width + 10
-          );
-        }
-      });
-
-      resizeObserver.observe(element);
-
-      return () => {
-        resizeObserver.unobserve(element);
-        resizeObserver.disconnect();
+        setFlexColumn(containerWidth - actionsWidth < primaryIdealWidth + 10);
       };
+
+      const resizeObserver = new ResizeObserver(measure);
+      if (containerRef.current) resizeObserver.observe(containerRef.current);
+      if (primaryRef.current) resizeObserver.observe(primaryRef.current);
+      if (actionsRef.current) resizeObserver.observe(actionsRef.current);
+
+      measure();
+
+      return () => resizeObserver.disconnect();
     }, []);
 
-    return (
-      <div
-        {...rootProps}
-        style={{
+    const rootStyle = useMemo(
+      () =>
+        ({
           display: 'flex',
           flexDirection: 'column',
           top: top !== null ? top : isSticky ? (barWillHide ? 0 : appBarHeight) : null,
           zIndex: !isSticky ? theme.zIndex.appBar - 100 : null,
-          ...rootProps?.style
-        }}
-      >
+          ...root.style
+        }) satisfies CSSProperties,
+      [top, isSticky, barWillHide, appBarHeight, theme.zIndex.appBar, root.style]
+    );
+
+    const containerStyle = useMemo(
+      () =>
+        ({
+          display: 'flex',
+          flexDirection: flexColumn ? 'column' : 'row',
+          flexWrap: 'wrap',
+          gap: theme.spacing(1),
+          ...(flexColumn && {
+            alignItems: wrapStart ? 'flex-start' : 'flex-end'
+          })
+        }) satisfies CSSProperties,
+      [flexColumn, wrapStart, theme]
+    );
+
+    return (
+      <div {...root} style={rootStyle}>
         {!c12nDef.enforce || classification === undefined ? null : (
           <div style={{ paddingBottom: theme.spacing(4) }}>
             <Classification
               c12n={classification}
               size="tiny"
-              type={!onClassificationChange ? 'pill' : 'picker'}
+              type={onClassificationChange ? 'picker' : 'pill'}
               setClassification={onClassificationChange}
               {...classificationProps}
             />
           </div>
         )}
 
-        <div
-          ref={containerRef}
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            gap: theme.spacing(1),
-            ...(flexColumn && {
-              flexDirection: 'column',
-              alignItems: 'flex-end',
-              ...(wrapStart && { alignItems: 'flex-start' })
-            })
-          }}
-        >
+        <div ref={containerRef} style={containerStyle}>
           <div
             style={{
               flex: 1,
@@ -177,35 +166,23 @@ export const PageHeader: React.FC<PageHeaderProps> = React.memo(
               textAlign: 'left'
             }}
           >
-            {(primary || primaryLoading) && (
+            {resolvedPrimary && (
               <Typography
-                ref={primaryRef}
                 variant="h4"
                 {...primaryProps}
+                ref={primaryRef}
                 sx={{
-                  ...primaryProps?.sx,
-                  position: 'absolute',
-                  opacity: 0,
-                  whiteSpace: 'nowrap',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis'
+                  overflowWrap: 'break-word',
+                  wordBreak: 'break-word',
+                  whiteSpace: 'normal',
+                  ...primaryProps.sx
                 }}
               >
-                {primary}
+                {resolvedPrimary}
               </Typography>
             )}
 
-            {(primary || primaryLoading) && (
-              <Typography
-                variant="h4"
-                {...primaryProps}
-                sx={{ overflowWrap: 'break-word', wordBreak: 'break-word', whiteSpace: 'normal', ...primaryProps?.sx }}
-              >
-                {primary}
-              </Typography>
-            )}
-
-            {(secondary || secondaryLoading) && (
+            {resolvedSecondary && (
               <Typography
                 variant="caption"
                 color="textSecondary"
@@ -216,10 +193,10 @@ export const PageHeader: React.FC<PageHeaderProps> = React.memo(
                   overflowWrap: 'break-word',
                   wordBreak: 'break-word',
                   whiteSpace: 'normal',
-                  ...secondaryProps?.sx
+                  ...secondaryProps.sx
                 }}
               >
-                {secondary}
+                {resolvedSecondary}
               </Typography>
             )}
 
@@ -243,7 +220,7 @@ export const PageHeader: React.FC<PageHeaderProps> = React.memo(
                   flexDirection: 'row',
                   flexWrap: 'wrap',
                   ...actionsProps?.style,
-                  ...(actionsProps?.spacing && { gap: theme.spacing(actionsProps?.spacing) })
+                  ...(actionsProps?.spacing && { gap: theme.spacing(actionsProps.spacing) })
                 }}
               >
                 {actions}
