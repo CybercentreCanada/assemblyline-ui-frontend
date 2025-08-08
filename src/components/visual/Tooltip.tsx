@@ -24,7 +24,8 @@ export const Tooltip: React.FC<TooltipProps> = React.memo(
             disablePortal: true,
             // modifiers: [{ name: 'offset', options: { offset: [0, 0] } }],
             onMouseOver: () => setOpen(false)
-          }
+          },
+          tooltip: { sx: { whiteSpace: 'normal' } }
         }}
         {...tooltipProps}
       >

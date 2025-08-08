@@ -145,7 +145,6 @@ export const HashInput = React.memo(() => {
           value={value}
           loading={loading}
           disabled={disabled || !isEditing}
-          sx={{ flex: 1 }}
           onChange={(e, v) => {
             closeSnackbar();
             const [nextType, nextValue] = getSubmitType(v, configuration);

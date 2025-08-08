@@ -8,6 +8,7 @@ import React, { useMemo } from 'react';
 
 export type BooleanListInputProps = Omit<ListItemButtonProps, 'defaultValue' | 'onChange' | 'onClick' | 'value'> & {
   capitalize?: boolean;
+  defaultValue?: boolean;
   error?: (value: boolean) => string;
   errorProps?: FormHelperTextProps;
   inset?: boolean;
@@ -28,6 +29,7 @@ export type BooleanListInputProps = Omit<ListItemButtonProps, 'defaultValue' | '
 
 const WrappedBooleanListInput = ({
   capitalize = false,
+  defaultValue,
   disabled = false,
   error = () => null,
   errorProps = null,
@@ -44,8 +46,8 @@ const WrappedBooleanListInput = ({
   secondaryProps = null,
   value,
   onChange = () => null,
-  onReset = () => null,
   onError = () => null,
+  onReset = null,
   ...buttonProps
 }: BooleanListInputProps) => {
   const theme = useTheme();
@@ -87,8 +89,10 @@ const WrappedBooleanListInput = ({
           ) : (
             <>
               <ResetListInput
+                defaultValue={defaultValue}
                 id={id || primary.toString()}
                 preventRender={!reset || disabled || readOnly}
+                onChange={event => onChange(event as React.FormEvent<HTMLDivElement>, defaultValue)}
                 onReset={onReset}
                 {...resetProps}
               />

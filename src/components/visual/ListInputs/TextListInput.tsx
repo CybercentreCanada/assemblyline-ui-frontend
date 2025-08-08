@@ -18,6 +18,7 @@ export type TextListInputProps<
   'value' | 'renderInput' | 'options' | 'onChange'
 > & {
   capitalize?: boolean;
+  defaultValue?: AutocompleteProps<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>['inputValue'];
   error?: (value: string) => string;
   errorProps?: FormHelperTextProps;
   inset?: boolean;
@@ -46,6 +47,7 @@ const WrappedTextListInput = <
   ChipComponent extends ElementType = ElementType
 >({
   capitalize = false,
+  defaultValue,
   disabled = false,
   error = () => null,
   errorProps = null,
@@ -63,8 +65,8 @@ const WrappedTextListInput = <
   secondaryProps = null,
   value,
   onChange = () => null,
-  onReset = () => null,
   onError = () => null,
+  onReset = null,
   ...autocompleteProps
 }: TextListInputProps<Value, Multiple, DisableClearable, FreeSolo, ChipComponent>) => {
   const theme = useTheme();
@@ -96,8 +98,10 @@ const WrappedTextListInput = <
       ) : (
         <>
           <ResetListInput
+            defaultValue={defaultValue}
             id={id || primary.toString()}
             preventRender={!reset || disabled || readOnly}
+            onChange={event => onChange(event, defaultValue)}
             onReset={onReset}
             {...resetProps}
           />

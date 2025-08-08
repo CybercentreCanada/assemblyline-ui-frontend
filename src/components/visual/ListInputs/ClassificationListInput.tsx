@@ -10,6 +10,7 @@ import React, { useMemo } from 'react';
 
 type Props = Omit<ClassificationProps, 'c12n' | 'setClassification'> & {
   capitalize?: boolean;
+  defaultValue?: ClassificationProps['c12n'];
   error?: (value: string) => string;
   errorProps?: FormHelperTextProps;
   id?: string;
@@ -31,6 +32,7 @@ type Props = Omit<ClassificationProps, 'c12n' | 'setClassification'> & {
 
 const WrappedClassificationListInput = ({
   capitalize = false,
+  defaultValue,
   disabled = false,
   error = () => null,
   errorProps = null,
@@ -47,8 +49,8 @@ const WrappedClassificationListInput = ({
   secondaryProps = null,
   value,
   onChange = () => null,
-  onReset = () => null,
   onError = () => null,
+  onReset = null,
   ...classificationProps
 }: Props) => {
   const theme = useTheme();
@@ -80,8 +82,10 @@ const WrappedClassificationListInput = ({
       ) : (
         <>
           <ResetListInput
-            id={id || primary}
+            defaultValue={defaultValue}
+            id={id || primary.toString()}
             preventRender={!reset || disabled || readOnly}
+            onChange={() => onChange(defaultValue)}
             onReset={onReset}
             {...resetProps}
           />

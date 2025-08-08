@@ -10,6 +10,7 @@ import React, { useMemo } from 'react';
 
 export type NumberListInputProps = Omit<TextFieldProps, 'error' | 'value' | 'onChange'> & {
   capitalize?: boolean;
+  defaultValue?: number;
   endAdornment?: ReactNode;
   error?: (value: number) => string;
   errorProps?: FormHelperTextProps;
@@ -34,6 +35,7 @@ export type NumberListInputProps = Omit<TextFieldProps, 'error' | 'value' | 'onC
 
 const WrappedNumberListInput = ({
   capitalize = false,
+  defaultValue,
   disabled = false,
   endAdornment,
   error = () => null,
@@ -54,8 +56,8 @@ const WrappedNumberListInput = ({
   unnullable = false,
   value,
   onChange = () => null,
-  onReset = () => null,
   onError = () => null,
+  onReset = null,
   ...textFieldProps
 }: NumberListInputProps) => {
   const theme = useTheme();
@@ -87,8 +89,12 @@ const WrappedNumberListInput = ({
       ) : (
         <>
           <ResetListInput
+            defaultValue={defaultValue}
             id={id || primary.toString()}
             preventRender={!reset || disabled || readOnly}
+            onChange={event =>
+              onChange(event as React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>, defaultValue)
+            }
             onReset={onReset}
             {...resetProps}
           />
