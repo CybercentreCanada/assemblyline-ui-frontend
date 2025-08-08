@@ -1,6 +1,7 @@
 import type { Configuration, FileSource, HashPatternMap } from 'components/models/base/config';
 import type { PossibleColor } from 'helpers/colors';
 import { LOWERCASE_HASH, URL_REGEX } from 'helpers/constants';
+import React from 'react';
 
 /**
  *
@@ -488,3 +489,32 @@ export const getSHA256 = (value: string) =>
       console.error(`Hashing of value "${value}" failed: ${error}`);
     }
   });
+
+/**
+ * Recursively extracts text content from ReactNode, including nested elements.
+ *
+ * This function processes a `ReactNode` (which can be text, numbers, React elements,
+ * fragments, or arrays of nodes) and concatenates all the text content found,
+ * even in deeply nested structures.
+ *
+ * @param children - The ReactNode to extract text content from.
+ * @returns A string containing all the concatenated text content from the children.
+ */
+export const getTextContent = (children: React.ReactNode): string => {
+  let textContent = '';
+
+  // React.Children.forEach is used to safely iterate over `children`, even if it's an array, null, or other types.
+  React.Children.forEach(children, child => {
+    if (typeof child === 'string' || typeof child === 'number') {
+      // If the child is a simple string or number, add it to the textContent
+      textContent += child;
+    } else if (React.isValidElement(child)) {
+      // If the child is a valid React element, recursively process its `props.children`
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      textContent += getTextContent(child.props?.['children']);
+    }
+    // Other types like `null`, `undefined`, or `boolean` are ignored as they don't contribute to text content
+  });
+
+  return textContent.toLowerCase().replaceAll(' ', '-'); // Return the concatenated text content
+};

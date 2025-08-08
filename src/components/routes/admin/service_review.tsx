@@ -11,7 +11,6 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import type { Service as ServiceData } from 'components/models/base/service';
 import type { ServiceStats as ServiceStatsData } from 'components/models/ui/service';
 import type { CustomUser } from 'components/models/ui/user';
-import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import LineGraph from 'components/visual/LineGraph';
 import { getVersionQuery } from 'helpers/utils';
 import type { Dispatch, SetStateAction } from 'react';
@@ -269,48 +268,51 @@ export default function ServiceReview() {
 
   return currentUser.is_admin ? (
     <PageFullWidth margin={4}>
-      <PageHeader
-        primary={t('title')}
-        secondary={t('subtitle')}
-        slotProps={{
-          root: { style: { marginBottom: theme.spacing(2) } },
-          actions: { spacing: 1 }
-        }}
-        actions={
-          services ? (
-            <div
-              key="selection"
-              style={{ display: 'flex', marginBottom: theme.spacing(1), justifyContent: 'flex-end' }}
-            >
-              <FormControl size="small" fullWidth>
-                <Select
-                  id="channel"
-                  fullWidth
-                  value={selectedService}
-                  onChange={handleServiceChange}
-                  displayEmpty
-                  variant="outlined"
-                  style={{
-                    minWidth: theme.spacing(30),
-                    color: selectedService === '' ? theme.palette.text.disabled : null
-                  }}
-                >
-                  <MenuItem value="" disabled>
-                    {t('service.selection')}
-                  </MenuItem>
-                  {services.map((srv, id) => (
-                    <MenuItem key={id} value={srv}>
-                      {srv}
+      <Grid
+        container
+        alignItems="center"
+        justifyContent="space-between"
+        spacing={3}
+        style={{ paddingBottom: theme.spacing(2) }}
+      >
+        <Grid size={{ xs: 12, md: 'grow' }}>
+          <Typography variant="h4">{t('title')}</Typography>
+          <Typography variant="subtitle1">{t('subtitle')}</Typography>
+        </Grid>
+        <Grid size={{ xs: 12, md: 'auto' }} style={{ flexGrow: 0 }}>
+          {services ? (
+            <>
+              <div style={{ display: 'flex', marginBottom: theme.spacing(1), justifyContent: 'flex-end' }}>
+                <FormControl size="small" fullWidth>
+                  <Select
+                    id="channel"
+                    fullWidth
+                    value={selectedService}
+                    onChange={handleServiceChange}
+                    displayEmpty
+                    variant="outlined"
+                    style={{
+                      minWidth: theme.spacing(30),
+                      color: selectedService === '' ? theme.palette.text.disabled : null
+                    }}
+                  >
+                    <MenuItem value="" disabled>
+                      {t('service.selection')}
                     </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </div>
+                    {services.map((srv, id) => (
+                      <MenuItem key={id} value={srv}>
+                        {srv}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </div>
+            </>
           ) : (
-            <Skeleton key="selection" variant="rectangular" height={theme.spacing(5)} width={theme.spacing(30)} />
-          )
-        }
-      />
+            <Skeleton variant="rectangular" height={theme.spacing(5)} width={theme.spacing(30)} />
+          )}
+        </Grid>
+      </Grid>
 
       {selectedService && selectedService !== '' && (
         <>

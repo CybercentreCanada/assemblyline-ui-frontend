@@ -108,7 +108,7 @@ export default function SiteMapPage() {
       <PageHeader
         primary={t('title')}
         secondary={() => `${siteMap.length} ${t('caption')}`}
-        loading={!siteMap}
+        secondaryLoading={!siteMap}
         slotProps={{
           root: { style: { marginBottom: theme.spacing(2) } }
         }}

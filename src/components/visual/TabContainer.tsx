@@ -112,10 +112,11 @@ const WrappedTabContainer = <T extends TabElements>({
       >
         <Tabs
           value={tab}
+          allowScrollButtonsMobile
           indicatorColor="primary"
+          scrollButtons="auto"
           textColor="primary"
           variant="scrollable"
-          scrollButtons="auto"
           onChange={handleChange(tab)}
           sx={{
             backgroundColor: theme.palette.background.default,

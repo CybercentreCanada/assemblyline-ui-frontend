@@ -62,11 +62,11 @@ import FileTreeSection from 'components/routes/submission/detail/file_tree';
 import InfoSection from 'components/routes/submission/detail/info';
 import MetaSection from 'components/routes/submission/detail/meta';
 import TagSection from 'components/routes/submission/detail/tags';
+import { FileDownloader } from 'components/visual/Buttons/FileDownloader';
 import { IconButton } from 'components/visual/Buttons/IconButton';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import FileDetail from 'components/visual/FileDetail';
 import Detection from 'components/visual/FileDetail/detection';
-import FileDownloader from 'components/visual/FileDownloader';
 import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import MetadataInputField from 'components/visual/MetadataInputField';
 import VerdictBar from 'components/visual/VerdictBar';
@@ -1156,10 +1156,10 @@ function WrappedSubmissionDetail() {
       )}
 
       <PageHeader
-        classification={submission ? submission.classification : null}
+        classification={() => submission.classification}
         primary={t('title')}
-        secondary={submission ? submission.sid : null}
-        loading={!submission}
+        secondary={() => submission.sid}
+        secondaryLoading={!submission}
         actions={
           <>
             <IconButton
@@ -1181,15 +1181,14 @@ function WrappedSubmissionDetail() {
               <RemoveCircleOutlineOutlinedIcon />
             </IconButton>
 
-            {!submission ? (
-              <IconButton loading size="large" />
-            ) : !currentUser.roles.includes('bundle_download') || submission.state !== 'completed' ? null : (
-              <FileDownloader
-                icon={<CloudDownloadOutlinedIcon />}
-                link={`/api/v4/bundle/${submission.sid}/`}
-                tooltip={t('download')}
-              />
-            )}
+            <FileDownloader
+              link={() => `/api/v4/bundle/${submission.sid}/`}
+              loading={!submission}
+              preventRender={() => !currentUser.roles.includes('bundle_download') || submission.state !== 'completed'}
+              tooltip={t('download')}
+            >
+              <CloudDownloadOutlinedIcon />
+            </FileDownloader>
 
             <IconButton
               loading={!submission}
@@ -1206,6 +1205,7 @@ function WrappedSubmissionDetail() {
                     preventRender:
                       submission.state !== 'completed' ||
                       !(systemConfig.datastore.archive.enabled && currentUser.roles.includes('archive_trigger')),
+                    disabled: submission.archived || submission.from_archive,
                     tooltip: t(submission.archived || submission.from_archive ? 'archived' : 'archive')
                   })}
             >
@@ -1318,38 +1318,55 @@ function WrappedSubmissionDetail() {
           </>
         }
         startAdornment={
-          socket && (
-            <div
-              style={{
-                display: 'flex',
-                color: theme.palette.mode === 'dark' ? theme.palette.primary.light : theme.palette.primary.dark,
-                paddingBottom: theme.spacing(3),
-                paddingTop: theme.spacing(2)
-              }}
-            >
-              {liveStatus === 'processing' ? (
-                <PlayCircleOutlineIcon
-                  style={{
-                    height: theme.spacing(3),
-                    width: theme.spacing(3),
-                    marginRight: theme.spacing(1)
-                  }}
-                />
-              ) : (
-                <PauseCircleOutlineOutlinedIcon
-                  style={{
-                    height: theme.spacing(3),
-                    width: theme.spacing(3),
-                    marginRight: theme.spacing(1)
-                  }}
-                />
-              )}
-              <div style={{ width: '100%' }}>
-                {t(liveStatus)}
-                <LinearProgress />
+          <>
+            {submission && submission.params.psid && (
+              <Typography variant="caption" component={'div'}>
+                <i>
+                  <span>{t('psid')}: </span>
+                  <Link
+                    style={{ textDecoration: 'none', color: theme.palette.primary.main }}
+                    to={`/submission/detail/${submission.params.psid}`}
+                  >
+                    {submission.params.psid}
+                  </Link>
+                </i>
+              </Typography>
+            )}
+            {socket && (
+              <div
+                style={{
+                  width: '100%',
+                  maxWidth: theme.breakpoints.values.sm,
+                  display: 'flex',
+                  color: theme.palette.mode === 'dark' ? theme.palette.primary.light : theme.palette.primary.dark,
+                  paddingBottom: theme.spacing(3),
+                  paddingTop: theme.spacing(2)
+                }}
+              >
+                {liveStatus === 'processing' ? (
+                  <PlayCircleOutlineIcon
+                    style={{
+                      height: theme.spacing(3),
+                      width: theme.spacing(3),
+                      marginRight: theme.spacing(1)
+                    }}
+                  />
+                ) : (
+                  <PauseCircleOutlineOutlinedIcon
+                    style={{
+                      height: theme.spacing(3),
+                      width: theme.spacing(3),
+                      marginRight: theme.spacing(1)
+                    }}
+                  />
+                )}
+                <div style={{ width: '100%' }}>
+                  {t(liveStatus)}
+                  <LinearProgress />
+                </div>
               </div>
-            </div>
-          )
+            )}
+          </>
         }
         endAdornment={
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>

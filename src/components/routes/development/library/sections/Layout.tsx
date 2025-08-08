@@ -151,7 +151,7 @@ export const LayoutSection = React.memo(() => {
                 primary="Page Header"
                 secondary="Description of the Page Header"
                 classification={value}
-                loading
+                secondaryLoading
                 actions={
                   <>
                     <IconButton size="large" tooltip="Information" loading>
