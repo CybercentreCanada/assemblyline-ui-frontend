@@ -34,17 +34,11 @@ jobs:
           pnpm --version
         displayName: 'Install PNPM'
 
-      - task: Cache@2
-        inputs:
-          key: 'pnpm | "$(Agent.OS)" | pnpm-lock.yaml'
-          restoreKeys: |
-            pnpm | "$(Agent.OS)"
-          path: |
-            ~/.pnpm-store
-            node_modules/.pnpm
-        displayName: 'Cache pnpm store & pnpm modules'
-
       - script: |
+          # Try to checkout the matching branch, if the command fails, don't care.
+          export BRANCH_NAME=$(basename -- "$SYSTEM_PULLREQUEST_SOURCEBRANCH")
+          export BRANCH_NAME=${BRANCH_NAME:-"$BUILD_SOURCEBRANCHNAME"}
+          git checkout -b $BRANCH_NAME -t origin/$BRANCH_NAME || true
           pnpm install
         displayName: 'Install dependencies (pnpm)'
 
