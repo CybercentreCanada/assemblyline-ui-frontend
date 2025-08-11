@@ -1,58 +1,62 @@
 name: tests
 
-trigger: ['*']
-pr: ['*']
+trigger:
+  branches:
+    include:
+      - '*'
+pr:
+  branches:
+    include:
+      - '*'
 
 pool:
   vmImage: 'ubuntu-latest'
 
-jobs:
-  - job: run_test
-    strategy:
-      matrix:
-        node_22:
-          node.version: '22.x'
+variables:
+  NODE_VERSION: '22.x'
 
+jobs:
+  - job: run_tests
     timeoutInMinutes: 15
 
     steps:
+      - checkout: self
+        displayName: 'Checkout Repository'
+
       - task: NodeTool@0
         inputs:
-          versionSpec: $(node.version)
-        displayName: 'Install Node.js'
+          versionSpec: $(NODE_VERSION)
+        displayName: 'Install Node.js $(NODE_VERSION)'
 
-      - checkout: self
-        displayName: Checkout assemblyline-ui-frontend
+      - uses: pnpm/action-setup@v2
+        with:
+          version: latest
+          run_install: false
+        displayName: 'Setup PNPM'
 
-      - script: |
-          npm install -g pnpm
-        displayName: 'Install PNPM'
+      - task: Cache@2
+        inputs:
+          key: 'pnpm | "$(Agent.OS)" | pnpm-lock.yaml'
+          restoreKeys: |
+            pnpm | "$(Agent.OS)"
+          path: ~/.pnpm-store
+        displayName: 'Cache PNPM Store'
 
-      - script: |
-          # Try to checkout the matching branch, if the command fails, don't care.
-          export BRANCH_NAME=$(basename -- "$SYSTEM_PULLREQUEST_SOURCEBRANCH")
-          export BRANCH_NAME=${BRANCH_NAME:-"$BUILD_SOURCEBRANCHNAME"}
-          git checkout -b $BRANCH_NAME -t origin/$BRANCH_NAME || true
+      - script: pnpm install --frozen-lockfile
+        displayName: 'Install Dependencies'
 
-          pnpm install
-        displayName: Install assemblyline-ui-frontend
+      - script: pnpm run typecheck
+        displayName: 'TypeScript Check'
 
-      - script: |
-          set -xv  # Echo commands before they are run
-          pnpm run tsc
-        displayName: TypeScript
+      - script: pnpm run test:ci
+        displayName: 'Run Tests with Coverage'
 
-      - script: |
-          set -xv  # Echo commands before they are run
-          pnpm run ci-test
-        displayName: Test
-
-      - script: |
-          set -xv  # Echo commands before they are run
-          pnpm run ci-lint
-        displayName: ESLint
+      - script: pnpm run lint:ci
+        displayName: 'Lint Codebase'
 
       - task: PublishCodeCoverageResults@2
         inputs:
           codeCoverageTool: Cobertura
           summaryFileLocation: $(System.DefaultWorkingDirectory)/coverage/cobertura-coverage.xml
+        condition: succeededOrFailed()
+        displayName: 'Publish Coverage Report'

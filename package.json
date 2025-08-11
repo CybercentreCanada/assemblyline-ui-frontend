@@ -78,20 +78,20 @@
     "web-vitals": "^3.1.1"
   },
   "scripts": {
-    "build-all": "tsc && vite build",
-    "build-lint": "TIMING=all eslint --color --exit-on-fatal-error --quiet --no-warn-ignored .",
-    "build-test": "CI=true vitest run",
-    "build": "vite build",
-    "ci-lint": "TIMING=all eslint --color --exit-on-fatal-error --quiet --no-warn-ignored .",
-    "ci-test": "CI=true vitest run --coverage",
     "dev": "VITE_CJS_TRACE=true vite dev",
-    "lint": "TIMING=all eslint --cache --max-warnings=0 --color --quiet --exit-on-fatal-error .",
     "serve": "vite preview --port 3000",
     "start": "vite",
-    "test:e2e:ui": "playwright test --ui",
-    "test:e2e": "playwright test",
+    "build": "vite build",
+    "build:all": "tsc && vite build",
+    "build:lint": "TIMING=all eslint --color --exit-on-fatal-error --quiet --no-warn-ignored .",
+    "build:test": "CI=true vitest run",
+    "lint": "TIMING=all eslint --cache --max-warnings=0 --color --quiet --exit-on-fatal-error .",
+    "lint:ci": "TIMING=all eslint --color --exit-on-fatal-error --quiet --no-warn-ignored .",
     "test": "vitest run",
-    "tsc": "tsc --pretty --noemit"
+    "test:ci": "CI=true vitest run --coverage",
+    "e2e": "playwright test",
+    "e2e:ui": "playwright test --ui",
+    "typecheck": "tsc --pretty --noemit"
   },
   "browserslist": {
     "production": [
