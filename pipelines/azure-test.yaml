@@ -14,6 +14,7 @@ pool:
 
 variables:
   NODE_VERSION: '22.x'
+  PNPM_VERSION: '8'   # adjust if you want a specific pnpm major version
 
 jobs:
   - job: run_tests
@@ -21,42 +22,50 @@ jobs:
 
     steps:
       - checkout: self
-        displayName: 'Checkout Repository'
+        displayName: 'Checkout repository'
 
       - task: NodeTool@0
         inputs:
           versionSpec: $(NODE_VERSION)
         displayName: 'Install Node.js $(NODE_VERSION)'
 
-      - uses: pnpm/action-setup@v2
-        with:
-          version: latest
-          run_install: false
-        displayName: 'Setup PNPM'
+      - script: |
+          npm i -g pnpm@$(PNPM_VERSION)
+          pnpm --version
+        displayName: 'Install pnpm'
 
       - task: Cache@2
         inputs:
           key: 'pnpm | "$(Agent.OS)" | pnpm-lock.yaml'
           restoreKeys: |
             pnpm | "$(Agent.OS)"
-          path: ~/.pnpm-store
-        displayName: 'Cache PNPM Store'
+          path: |
+            ~/.pnpm-store
+            node_modules/.pnpm
+        displayName: 'Cache pnpm store & pnpm modules'
 
-      - script: pnpm install --frozen-lockfile
-        displayName: 'Install Dependencies'
+      - script: |
+          pnpm install --frozen-lockfile
+        displayName: 'Install dependencies (pnpm)'
 
-      - script: pnpm run typecheck
-        displayName: 'TypeScript Check'
+      - script: |
+          set -x
+          pnpm run typecheck
+        displayName: 'TypeScript check'
 
-      - script: pnpm run test:ci
-        displayName: 'Run Tests with Coverage'
+      - script: |
+          set -x
+          pnpm run test:ci
+        displayName: 'Run tests with coverage'
 
-      - script: pnpm run lint:ci
-        displayName: 'Lint Codebase'
+      - script: |
+          set -x
+          pnpm run lint:ci
+        displayName: 'ESLint'
 
       - task: PublishCodeCoverageResults@2
         inputs:
           codeCoverageTool: Cobertura
           summaryFileLocation: $(System.DefaultWorkingDirectory)/coverage/cobertura-coverage.xml
         condition: succeededOrFailed()
-        displayName: 'Publish Coverage Report'
+        displayName: 'Publish code coverage results'
