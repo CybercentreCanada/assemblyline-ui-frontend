@@ -8,9 +8,9 @@ export function logStep(
   status: 'success' | 'failure' = 'success'
 ) {
   console.log(
-    colorFn(browserLabel),
+    colorFn(browserLabel.padStart(8)),
     '::',
-    status === 'failure' ? chalk.redBright('error') : chalk.greenBright('success'),
+    status === 'failure' ? chalk.redBright('error').padStart(8) : chalk.greenBright('success').padStart(8),
     '::',
     message
   );
