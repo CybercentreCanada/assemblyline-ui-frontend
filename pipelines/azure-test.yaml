@@ -49,17 +49,17 @@ jobs:
         displayName: 'Install dependencies (pnpm)'
 
       - script: |
-          set -x
+          set -xv  # Echo commands before they are run
           pnpm run typecheck
         displayName: 'TypeScript check'
 
       - script: |
-          set -x
+          set -xv  # Echo commands before they are run
           pnpm run test:ci
         displayName: 'Run tests with coverage'
 
       - script: |
-          set -x
+          set -xv  # Echo commands before they are run
           pnpm run lint:ci
         displayName: 'ESLint'
 
