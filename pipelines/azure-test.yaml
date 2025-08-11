@@ -32,7 +32,7 @@ jobs:
       - script: |
           npm i -g pnpm@$(PNPM_VERSION)
           pnpm --version
-        displayName: 'Install pnpm'
+        displayName: 'Install PNPM'
 
       - task: Cache@2
         inputs:
@@ -45,7 +45,7 @@ jobs:
         displayName: 'Cache pnpm store & pnpm modules'
 
       - script: |
-          pnpm install --frozen-lockfile
+          pnpm install
         displayName: 'Install dependencies (pnpm)'
 
       - script: |
