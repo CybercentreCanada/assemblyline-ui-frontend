@@ -28,21 +28,21 @@ export const BROWSERS = [
   {
     name: 'chromium',
     label: 'chrome',
-    color: chalk.yellowBright,
+    color: chalk.yellow,
     device: devices['Desktop Chrome'],
     browserType: chromium
   },
   {
     name: 'firefox',
     label: 'firefox',
-    color: chalk.redBright,
+    color: chalk.red,
     device: devices['Desktop Firefox'],
     browserType: firefox
   },
   {
     name: 'webkit',
     label: 'safari',
-    color: chalk.blueBright,
+    color: chalk.blue,
     device: devices['Desktop Safari'],
     browserType: webkit
   }
@@ -70,7 +70,7 @@ export default defineConfig({
   ],
   retries: process.env.CI ? 2 : 0,
   testDir: './src',
-  testMatch: /.*\.e2e\.tsx?$/,
+  testMatch: /.*\.spec\.tsx?$/,
   timeout: 120_000,
   use: baseUseConfig,
   projects: BROWSERS.flatMap(({ name, device }) => [
