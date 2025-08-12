@@ -8,8 +8,8 @@ import type {
   TestInfo
 } from '@playwright/test';
 import { test as base } from '@playwright/test';
-import { Logger } from 'tests/playwright.logger';
-import { BROWSERS } from '../../../playwright.config';
+import { Logger } from 'e2e/utils/playwright.logger';
+import { BROWSERS } from '../../../../playwright.config';
 
 class PlainMessageError extends Error {
   constructor(message: string) {

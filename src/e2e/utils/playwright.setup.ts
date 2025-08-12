@@ -1,8 +1,8 @@
 import { test } from '@playwright/test';
+import { testWithErrorFallback } from 'e2e/components/error_boundary/error_fallback.pom';
+import { Logger } from 'e2e/utils/playwright.logger';
 import path from 'path';
-import { testWithErrorFallback } from 'tests/pages/error_fallback.pom';
-import { Logger } from 'tests/playwright.logger';
-import { BASE_URL, BROWSERS, RESULTS_DIR, TEST_PASSWORD, TEST_USER } from '../../playwright.config';
+import { BASE_URL, BROWSERS, RESULTS_DIR, TEST_PASSWORD, TEST_USER } from '../../../playwright.config';
 
 test.describe('Setup', () => {
   testWithErrorFallback('Create session tokens', async ({ browserName, context, page }, testInfo) => {

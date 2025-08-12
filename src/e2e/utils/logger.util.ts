@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import chalk from 'chalk';
-import type { BROWSERS } from '../../playwright.config';
+import type { BROWSERS } from '../../../playwright.config';
 
 type LogStatus = 'success' | 'info' | 'warning' | 'error' | 'exception';
 

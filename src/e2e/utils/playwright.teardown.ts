@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import fs from 'fs';
 import path from 'path';
-import { RESULTS_DIR } from '../../playwright.config';
+import { RESULTS_DIR } from '../../../playwright.config';
 
 export default async function globalTeardown() {
   console.log('🧹 Cleaning up session storage files...');
