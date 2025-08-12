@@ -12,16 +12,6 @@ const STATUS_STYLES: Record<LogStatus, (text: string) => string> = {
   exception: chalk.magentaBright
 };
 
-function padMiddle(str: string, targetLength: number, padChar: string = ' '): string {
-  if (str.length >= targetLength) return str;
-
-  const totalPadding = targetLength - str.length;
-  const leftPadding = Math.floor(totalPadding / 2);
-  const rightPadding = totalPadding - leftPadding;
-
-  return padChar.repeat(leftPadding) + str + padChar.repeat(rightPadding);
-}
-
 export class Logger {
   private browserLabel: string;
   private browserColor: typeof chalk;
@@ -36,33 +26,30 @@ export class Logger {
   log(message: string, status: LogStatus = 'info') {
     const color = STATUS_STYLES[status] || chalk.white;
 
-    const parts = [
-      this.browserColor(padMiddle(this.browserLabel, 8)),
-      color(padMiddle(status, 10)),
-      ...this.titles.map(t => chalk.white(t)),
-      message
-    ];
+    const browserCol = this.browserColor(this.browserLabel.padStart(8));
+    const statusCol = color(status.toUpperCase().padEnd(10));
+    const titlesCol = chalk.gray(this.titles.join(' > '));
 
-    console.log(parts.join(' :: '));
+    console.log(`${browserCol} | ${statusCol}${titlesCol} :: ${message}`);
   }
 
-  success(message: string) {
-    this.log(message, 'success');
+  success(msg: string) {
+    this.log(msg, 'success');
   }
 
-  info(message: string) {
-    this.log(message, 'info');
+  info(msg: string) {
+    this.log(msg, 'info');
   }
 
-  warning(message: string) {
-    this.log(message, 'warning');
+  warning(msg: string) {
+    this.log(msg, 'warning');
   }
 
-  error(message: string) {
-    this.log(message, 'error');
+  error(msg: string) {
+    this.log(msg, 'error');
   }
 
-  exception(message: string) {
-    this.log(message, 'exception');
+  exception(msg: string) {
+    this.log(msg, 'exception');
   }
 }
