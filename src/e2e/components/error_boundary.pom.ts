@@ -9,7 +9,7 @@ import type {
 } from '@playwright/test';
 import { test as base } from '@playwright/test';
 import { Logger } from 'e2e/utils/playwright.logger';
-import { BROWSERS } from '../../../../playwright.config';
+import { BROWSERS } from '../../../playwright.config';
 
 class PlainMessageError extends Error {
   constructor(message: string) {
