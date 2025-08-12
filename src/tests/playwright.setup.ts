@@ -1,45 +1,29 @@
 import { test } from '@playwright/test';
 import path from 'path';
-import { ErrorFallback } from 'tests/pages/error_fallback.pom';
-import { logStep } from 'tests/playwright.utils';
+import { testWithErrorFallback } from 'tests/pages/error_fallback.pom';
+import { Logger } from 'tests/playwright.logger';
 import { BASE_URL, BROWSERS, RESULTS_DIR, TEST_PASSWORD, TEST_USER } from '../../playwright.config';
 
 test.describe('Setup', () => {
-  test('Create session tokens', async ({ browserName, browser, context, page }, testInfo) => {
+  testWithErrorFallback('Create session tokens', async ({ browserName, context, page }, testInfo) => {
     const browserConfig = BROWSERS.find(b => b.name === browserName);
-    if (!browserConfig) {
-      throw new Error(`No browser config found for browserName: ${browserName}`);
-    }
-
-    const { label, color } = browserConfig;
+    const logger = new Logger(browserConfig, testInfo.titlePath);
     const storageFile = `session-${browserConfig.name}.json`;
 
-    try {
-      const errorFallback = new ErrorFallback(page, testInfo);
+    logger.info('Navigating to login page...');
+    await page.goto(BASE_URL);
 
-      await errorFallback.runWithCheck(async () => {
-        logStep(label, color, 'Navigating to login page...');
-        await page.goto(BASE_URL);
+    logger.info('Filling in login credentials...');
+    await page.getByLabel('Username').fill(TEST_USER);
+    await page.getByLabel('Password').fill(TEST_PASSWORD);
 
-        logStep(label, color, 'Filling in login credentials...');
-        await page.getByLabel('Username').fill(TEST_USER);
-        await page.getByLabel('Password').fill(TEST_PASSWORD);
+    logger.info('Clicking sign in button...');
+    await page.getByRole('button', { name: 'Sign in' }).click();
 
-        logStep(label, color, 'Clicking sign in button...');
-        await page.getByRole('button', { name: 'Sign in' }).click();
+    logger.info('Waiting for authenticated element...');
+    await page.locator('img[src="/images/banner_dark.svg"]').waitFor();
 
-        logStep(label, color, 'Waiting for authenticated element...');
-        await page.locator('img[src="/images/banner_dark.svg"]').waitFor();
-
-        logStep(label, color, `Saving storage state to ${storageFile}...`);
-        await context.storageState({ path: path.join(RESULTS_DIR, storageFile) });
-      });
-    } catch (error) {
-      logStep(label, color, `Error during authentication - ${error}`, 'failure');
-      throw error;
-    } finally {
-      logStep(label, color, 'Closing browser...');
-      await browser.close();
-    }
+    logger.info(`Saving storage state to ${storageFile}...`);
+    await context.storageState({ path: path.join(RESULTS_DIR, storageFile) });
   });
 });

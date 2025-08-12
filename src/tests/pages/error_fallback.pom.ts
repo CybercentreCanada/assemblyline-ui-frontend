@@ -1,4 +1,15 @@
-import type { Locator, Page, TestInfo } from '@playwright/test';
+import type {
+  Locator,
+  Page,
+  PlaywrightTestArgs,
+  PlaywrightTestOptions,
+  PlaywrightWorkerArgs,
+  PlaywrightWorkerOptions,
+  TestInfo
+} from '@playwright/test';
+import { test as base } from '@playwright/test';
+import { Logger } from 'tests/playwright.logger';
+import { BROWSERS } from '../../../playwright.config';
 
 class PlainMessageError extends Error {
   constructor(message: string) {
@@ -53,3 +64,25 @@ export class ErrorFallback {
     return Promise.race([testStepPromise, errorFallbackPromise]);
   }
 }
+
+type Fixtures = PlaywrightTestArgs & PlaywrightTestOptions & PlaywrightWorkerArgs & PlaywrightWorkerOptions;
+
+export const testWithErrorFallback = (title: string, fn: (fixtures: Fixtures, testInfo: TestInfo) => Promise<void>) =>
+  base(title, async ({ browserName, browser, context, page }: Fixtures, testInfo: TestInfo) => {
+    const browserConfig = BROWSERS.find(b => b.name === browserName);
+    if (!browserConfig) throw new Error(`No browser config found for browserName: ${browserName}`);
+    const logger = new Logger(browserConfig, testInfo.titlePath);
+
+    try {
+      const errorFallback = new ErrorFallback(page, testInfo);
+      await errorFallback.runWithCheck(async () => {
+        await fn({ browserName, browser, context, page } as Fixtures, testInfo);
+      });
+    } catch (error) {
+      logger.error(`Error during test - ${error}`);
+      throw error;
+    } finally {
+      logger.info('Closing browser...');
+      await browser.close();
+    }
+  });
