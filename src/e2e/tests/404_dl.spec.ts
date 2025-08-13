@@ -1,7 +1,7 @@
 import { test as base } from '@playwright/test';
 import { ErrorBoundary } from 'e2e/components/error_boundary.pom';
-import { NotFoundPage } from 'e2e/routes/404_dl.pom';
-import { CrashPage } from 'e2e/routes/crash.pom';
+import { NotFoundPage } from 'e2e/pages/404_dl.pom';
+import { CrashPage } from 'e2e/pages/crash.pom';
 import { Logger } from 'e2e/utils/playwright.logger';
 import { tryCatchRace } from 'e2e/utils/playwright.utils';
 

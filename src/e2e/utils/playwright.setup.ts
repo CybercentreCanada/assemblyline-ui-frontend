@@ -1,7 +1,7 @@
 import { test as base } from '@playwright/test';
 import { ErrorBoundary } from 'e2e/components/error_boundary.pom';
-import { LoginPage } from 'e2e/routes/login.pom';
-import { SubmitPage } from 'e2e/routes/submit.pom';
+import { LoginPage } from 'e2e/pages/login.pom';
+import { SubmitPage } from 'e2e/pages/submit.pom';
 import { Logger } from 'e2e/utils/playwright.logger';
 import { tryCatchRace } from 'e2e/utils/playwright.utils';
 import path from 'path';
