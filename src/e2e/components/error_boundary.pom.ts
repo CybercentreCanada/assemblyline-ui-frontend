@@ -1,4 +1,5 @@
 import type { Locator, Page, TestInfo } from '@playwright/test';
+import { expect } from '@playwright/test';
 import type { Logger } from 'e2e/utils/playwright.logger';
 import type { PlaywrightArgs } from 'e2e/utils/playwright.models';
 import { tryCatch } from 'e2e/utils/playwright.utils';
@@ -23,7 +24,7 @@ export class ErrorBoundary {
     private logger: Logger,
     private testInfo: TestInfo
   ) {
-    this.logger.info('Submit Page: Initializing locators');
+    this.logger.info('Error Boundary: Initializing locators');
     this.errorFallback = page.locator('[data-testid="error-fallback"]');
     this.errorMessage = this.errorFallback.locator('[data-testid="error-message"]');
     this.showStackButton = this.errorFallback.getByRole('button', { name: 'Show Stack' });
@@ -63,10 +64,15 @@ export class ErrorBoundary {
     throw new ErrorBoundaryError(message ?? 'Unknown error boundary message');
   }
 
-  async handleIfError(error: unknown): Promise<void> {
-    if (this.isError(error)) {
-      const stack = await this.getErrorStack();
-      this.logger.error(stack ?? 'No stack trace available');
-    }
+  async expectVisible(): Promise<void> {
+    const stack = await this.getErrorStack();
+    this.logger.success(`Error Boundary visible at URL: ${this.page.url()}`);
+    expect(stack).toBeTruthy();
+  }
+
+  async expectNotVisible(): Promise<void> {
+    const message = await this.getErrorMessage();
+    this.logger.error(`Error Boundary NOT to be visible at ${this.page.url()}`);
+    expect(message).toBeNull();
   }
 }

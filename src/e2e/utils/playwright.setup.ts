@@ -1,25 +1,7 @@
-import { test as base } from '@playwright/test';
-import { ErrorBoundary } from 'e2e/components/error_boundary.pom';
-import { LoginPage } from 'e2e/pages/login.pom';
-import { SubmitPage } from 'e2e/pages/submit.pom';
-import { Logger } from 'e2e/utils/playwright.logger';
+import { test } from 'e2e/utils/playwright.fixtures';
 import { tryCatchRace } from 'e2e/utils/playwright.utils';
 import path from 'path';
 import { RESULTS_DIR, TEST_PASSWORD, TEST_USER } from '../../../playwright.config';
-
-type Fixtures = {
-  logger: Logger;
-  errorBoundary: ErrorBoundary;
-  loginPage: LoginPage;
-  submitPage: SubmitPage;
-};
-
-export const test = base.extend<Fixtures>({
-  logger: Logger.fixture(),
-  errorBoundary: ErrorBoundary.fixture(),
-  loginPage: LoginPage.fixture(),
-  submitPage: SubmitPage.fixture()
-});
 
 test.describe('Setup', () => {
   test('should create session tokens', async ({
@@ -28,7 +10,9 @@ test.describe('Setup', () => {
     logger,
     errorBoundary,
     loginPage,
-    submitPage
+    submitPage,
+    forbiddenPage,
+    notFoundPage
   }) => {
     const storageFile = `session-${browserName}.json`;
 
@@ -42,7 +26,15 @@ test.describe('Setup', () => {
       await context.storageState({ path: path.join(RESULTS_DIR, storageFile) });
     };
 
-    const { error } = await tryCatchRace([loginAndSaveSession(), errorBoundary.waitFor()]);
-    await errorBoundary.handleIfError(error);
+    const { error } = await tryCatchRace([
+      loginAndSaveSession(),
+      errorBoundary.waitFor(),
+      forbiddenPage.waitFor(),
+      notFoundPage.waitFor()
+    ]);
+
+    if (errorBoundary.isError(error)) await errorBoundary.expectNotVisible();
+    if (forbiddenPage.isError(error)) await forbiddenPage.expectNotVisible();
+    if (notFoundPage.isError(error)) await notFoundPage.expectNotVisible();
   });
 });

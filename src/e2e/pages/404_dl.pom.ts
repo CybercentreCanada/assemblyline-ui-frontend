@@ -1,6 +1,7 @@
 import type { Locator, Page, TestInfo } from '@playwright/test';
+import { BasePage } from 'e2e/pages/base.pom';
 import type { Logger } from 'e2e/utils/playwright.logger';
-import type { PlaywrightArgs } from 'e2e/utils/playwright.models';
+import type { PlaywrightArgs, WaitForOptions } from 'e2e/utils/playwright.models';
 import { tryCatch } from 'e2e/utils/playwright.utils';
 
 type NotFoundPageFixture = (r: NotFoundPage) => Promise<void>;
@@ -12,17 +13,15 @@ export class PageNotFoundError extends Error {
   }
 }
 
-export class NotFoundPage {
+export class NotFoundPage extends BasePage {
   readonly deadLinkImage: Locator;
   readonly deadLinkText: Locator;
 
-  constructor(
-    private page: Page,
-    private logger: Logger,
-    private testInfo: TestInfo
-  ) {
-    this.deadLinkImage = page.locator('img[src="/images/dead_link.png"]');
-    this.deadLinkText = page.getByText(`Looks like this 'Link' is dead...`);
+  constructor(page: Page, logger: Logger, testInfo: TestInfo) {
+    super(page, logger, testInfo, 'NotFoundPage', '*');
+
+    this.deadLinkImage = page.locator(`img[src="/images/dead_link.png"]`);
+    this.deadLinkText = page.getByText(`Looks like this 'Link' is dead...`, { exact: true });
   }
 
   static fixture =
@@ -32,38 +31,40 @@ export class NotFoundPage {
       await use(notFoundPage);
     };
 
-  async waitForAppearance(timeout = 0): Promise<void> {
-    await Promise.all([
-      this.deadLinkImage.waitFor({ state: 'visible', timeout }),
-      this.deadLinkText.waitFor({ state: 'visible', timeout })
-    ]);
+  async waitForAppearance({ state = 'visible', timeout = 0 }: WaitForOptions = {}): Promise<void> {
+    await Promise.all([this.deadLinkImage.waitFor({ state, timeout }), this.deadLinkText.waitFor({ state, timeout })]);
+  }
+
+  async waitFor({ state = 'visible', timeout = 0 }: WaitForOptions = {}): Promise<void> {
+    await tryCatch(this.waitForAppearance({ state, timeout }));
+    const visible = await this.isVisible();
+    expect(visible, `Expected NotFound page to be visible at ${this.page.url()}`).toBeTruthy();
   }
 
   async isVisible(): Promise<boolean> {
     return (await this.deadLinkImage.isVisible()) && (await this.deadLinkText.isVisible());
   }
 
-  async throwIfVisible(logger?: Logger): Promise<void> {
-    if (await this.isVisible()) {
-      const url = this.page.url();
-      logger.error(`NotFoundPage is visible at URL: ${url}`);
-      throw new PageNotFoundError(`Dead link: ${url}`);
-    }
-  }
-
   isError(error: unknown): error is PageNotFoundError {
     return error instanceof PageNotFoundError;
   }
 
-  async waitFor(timeout = 0): Promise<void> {
-    await tryCatch(this.waitForAppearance(timeout));
-    const url = this.page.url();
-    throw new PageNotFoundError(`Dead link: ${url}`);
+  async expectNotVisible(): Promise<void> {
+    const visible = await this.isVisible();
+    this.logger.info(`NotFoundPage visibility check at URL: ${this.page.url()} → ${visible}`);
+    expect(visible, `Expected NotFound page NOT to be visible at ${this.page.url()}`).toBeFalsy();
   }
 
-  async handleIfError(error: unknown): Promise<void> {
-    if (this.isError(error)) {
-      this.logger.error(`Dead link: ${this.page.url()}`);
+  async expectVisible({ state = 'visible', timeout = 0 }: WaitForOptions = {}): Promise<void> {
+    await this.waitForAppearance({ state, timeout });
+    const visible = await this.isVisible();
+    this.logger.info(`NotFound page visible at URL: ${this.page.url()}`);
+    expect(visible, `Expected NotFound page to be visible at ${this.page.url()}`).toBeTruthy();
+  }
+
+  async handleIfError(error: Error): Promise<void> {
+    if (error) {
+      this.logger.error(`Error detected at ${this.page.url()}: ${error}`);
     }
   }
 }

@@ -1,6 +1,7 @@
 import type { Locator, Page, TestInfo } from '@playwright/test';
+import { BasePage } from 'e2e/pages/base.pom';
 import type { Logger } from 'e2e/utils/playwright.logger';
-import type { PlaywrightArgs } from 'e2e/utils/playwright.models';
+import type { PlaywrightArgs, WaitForOptions } from 'e2e/utils/playwright.models';
 import { tryCatch } from 'e2e/utils/playwright.utils';
 
 type ForbiddenPageFixture = (r: ForbiddenPage) => Promise<void>;
@@ -12,15 +13,13 @@ export class PageForbiddenError extends Error {
   }
 }
 
-export class ForbiddenPage {
+export class ForbiddenPage extends BasePage {
   readonly forbiddenTitle: Locator;
   readonly forbiddenMessage: Locator;
 
-  constructor(
-    private page: Page,
-    private logger: Logger,
-    private testInfo: TestInfo
-  ) {
+  constructor(page: Page, logger: Logger, testInfo: TestInfo) {
+    super(page, logger, testInfo, 'Forbidden Page', '/forbidden');
+
     this.forbiddenTitle = page.getByText('403: Forbidden', { exact: true });
     this.forbiddenMessage = page.getByText('You are not allowed to view this page...', { exact: true });
   }
@@ -32,10 +31,16 @@ export class ForbiddenPage {
       await use(forbiddenPage);
     };
 
-  async waitForAppearance(timeout = 0): Promise<void> {
+  async waitFor({ state = 'visible', timeout = 0 }: WaitForOptions = {}): Promise<void> {
+    await tryCatch(this.waitForAppearance({ state, timeout }));
+    const visible = await this.isVisible();
+    expect(visible, `Expected forbidden page to be visible at ${this.page.url()}`).toBeTruthy();
+  }
+
+  async waitForAppearance({ state = 'visible', timeout = 0 }: WaitForOptions = {}): Promise<void> {
     await Promise.all([
-      this.forbiddenTitle.waitFor({ state: 'visible', timeout }),
-      this.forbiddenMessage.waitFor({ state: 'visible', timeout })
+      this.forbiddenTitle.waitFor({ state, timeout }),
+      this.forbiddenMessage.waitFor({ state, timeout })
     ]);
   }
 
@@ -43,27 +48,26 @@ export class ForbiddenPage {
     return (await this.forbiddenTitle.isVisible()) && (await this.forbiddenMessage.isVisible());
   }
 
-  async throwIfVisible(logger?: Logger): Promise<void> {
-    if (await this.isVisible()) {
-      const url = this.page.url();
-      logger?.error?.(`ForbiddenPage is visible at URL: ${url}`);
-      throw new PageForbiddenError(`Forbidden page: ${url}`);
-    }
-  }
-
   isError(error: unknown): error is PageForbiddenError {
     return error instanceof PageForbiddenError;
   }
 
-  async waitFor(timeout = 0): Promise<void> {
-    await tryCatch(this.waitForAppearance(timeout));
-    const url = this.page.url();
-    throw new PageForbiddenError(`Forbidden page: ${url}`);
+  async expectNotVisible(): Promise<void> {
+    const visible = await this.isVisible();
+    this.logger.info(`ForbiddenPage visibility check at URL: ${this.page.url()} → ${visible}`);
+    expect(visible, `Expected forbidden page NOT to be visible at ${this.page.url()}`).toBeFalsy();
   }
 
-  async handleIfError(error: unknown): Promise<void> {
-    if (this.isError(error)) {
-      this.logger.error(`Forbidden page: ${this.page.url()}`);
+  async expectVisible({ state = 'visible', timeout = 0 }: WaitForOptions = {}): Promise<void> {
+    await this.waitForAppearance({ state, timeout });
+    const visible = await this.isVisible();
+    this.logger.info(`Forbidden page visible at URL: ${this.page.url()}`);
+    expect(visible, `Expected forbidden page to be visible at ${this.page.url()}`).toBeTruthy();
+  }
+
+  async handleIfError(error: Error): Promise<void> {
+    if (error) {
+      this.logger.error(`Error detected at ${this.page.url()}: ${error}`);
     }
   }
 }

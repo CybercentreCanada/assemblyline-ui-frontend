@@ -1,19 +1,18 @@
-import type { Locator, Page } from '@playwright/test';
+import type { Locator, Page, TestInfo } from '@playwright/test';
+import { BasePage } from 'e2e/pages/base.pom';
 import type { Logger } from 'e2e/utils/playwright.logger';
 import type { PlaywrightArgs, WaitForOptions } from 'e2e/utils/playwright.models';
 
 type LoginFixture = (r: LoginPage) => Promise<void>;
 
-export class LoginPage {
+export class LoginPage extends BasePage {
   private readonly usernameInput: Locator;
   private readonly passwordInput: Locator;
   private readonly signInButton: Locator;
 
-  constructor(
-    private page: Page,
-    private logger: Logger
-  ) {
-    this.logger.info('Login Page: Initializing locators');
+  constructor(page: Page, logger: Logger, testInfo: TestInfo) {
+    super(page, logger, testInfo, 'Login Page', '/');
+
     this.usernameInput = this.page.getByLabel('Username');
     this.passwordInput = this.page.getByLabel('Password');
     this.signInButton = this.page.getByRole('button', { name: 'Sign in' });
@@ -21,8 +20,8 @@ export class LoginPage {
 
   static fixture =
     () =>
-    async ({ page, logger }: PlaywrightArgs, use: LoginFixture) => {
-      const loginPage = new LoginPage(page, logger);
+    async ({ page, logger }: PlaywrightArgs, use: LoginFixture, testInfo: TestInfo) => {
+      const loginPage = new LoginPage(page, logger, testInfo);
       await use(loginPage);
     };
 
@@ -36,7 +35,7 @@ export class LoginPage {
   }
 
   async waitFor({ state = 'visible', timeout = 0 }: WaitForOptions = {}) {
-    this.logger.info(`Login Page: waiting for the login form to be ${state}`);
+    await super.waitFor({ state, timeout });
     await Promise.all([
       this.usernameInput.waitFor({ state, timeout }),
       this.passwordInput.waitFor({ state, timeout }),
@@ -45,7 +44,7 @@ export class LoginPage {
   }
 
   async isVisible() {
-    this.logger.info('Login Page: checking if login form elements are visible');
+    await super.isVisible();
     const results = await Promise.all([
       this.usernameInput.isVisible(),
       this.passwordInput.isVisible(),
