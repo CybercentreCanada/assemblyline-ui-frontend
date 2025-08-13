@@ -27,14 +27,23 @@ export class Logger {
     this.titles = titles;
   }
 
+  static fixture =
+    () =>
+    async ({ browserName }: PlaywrightArgs, use: LoggerFixture, testInfo: TestInfo) => {
+      const browserConfig = BROWSERS.find(b => b.name === browserName);
+      if (!browserConfig) throw new Error(`No browser config found for ${browserName}`);
+      const logger = new Logger(browserConfig, testInfo.titlePath);
+      await use(logger);
+    };
+
   log(message: string, status: LogStatus = 'info') {
     const color = STATUS_STYLES[status] || chalk.white;
 
     const browserCol = this.browserColor(this.browserLabel.padStart(8));
     const statusCol = color(status.toUpperCase().padEnd(10));
-    const titlesCol = chalk.gray(this.titles.join(' > '));
+    const titlesCol = chalk.gray(this.titles.join(' > ').padEnd(100));
 
-    console.log(`${browserCol} | ${statusCol}${titlesCol} | ${message}`);
+    console.log(`${browserCol} | ${statusCol}${titlesCol} | ${message.padEnd(50)}`);
   }
 
   success(msg: string) {
@@ -56,13 +65,4 @@ export class Logger {
   exception(msg: string) {
     this.log(msg, 'exception');
   }
-
-  static fixture =
-    () =>
-    async ({ browserName }: PlaywrightArgs, use: LoggerFixture, testInfo: TestInfo) => {
-      const browserConfig = BROWSERS.find(b => b.name === browserName);
-      if (!browserConfig) throw new Error(`No browser config found for ${browserName}`);
-      const logger = new Logger(browserConfig, testInfo.titlePath);
-      await use(logger);
-    };
 }

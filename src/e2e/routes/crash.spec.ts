@@ -17,14 +17,14 @@ export const test = base.extend<Fixtures>({
 });
 
 test.describe('Crash Page', () => {
-  test('Testing the ErrorBoundary', async ({ crashPage, errorBoundary, logger, page }) => {
-    const crashPromise = async () => {
+  test('should trigger the ErrorBoundary when crashing', async ({ crashPage, errorBoundary, logger, page }) => {
+    const triggerCrashFlow = async () => {
       await crashPage.goto();
       await crashPage.waitFor();
       await page.waitForTimeout(5_000);
     };
 
-    const { error } = await tryCatchRace([crashPromise(), errorBoundary.failIfVisible()]);
+    const { error } = await tryCatchRace([triggerCrashFlow(), errorBoundary.waitFor()]);
 
     if (errorBoundary.isError(error)) {
       const message = await errorBoundary.getErrorStack();

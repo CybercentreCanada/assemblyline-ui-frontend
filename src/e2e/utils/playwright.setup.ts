@@ -22,10 +22,17 @@ export const test = base.extend<Fixtures>({
 });
 
 test.describe('Setup', () => {
-  test('Create session tokens', async ({ browserName, context, logger, errorBoundary, loginPage, submitPage }) => {
+  test('should create session tokens', async ({
+    browserName,
+    context,
+    logger,
+    errorBoundary,
+    loginPage,
+    submitPage
+  }) => {
     const storageFile = `session-${browserName}.json`;
 
-    const promise = async () => {
+    const loginAndSaveSession = async () => {
       await submitPage.goto();
       await loginPage.waitFor();
       await loginPage.login(TEST_USER, TEST_PASSWORD);
@@ -35,12 +42,7 @@ test.describe('Setup', () => {
       await context.storageState({ path: path.join(RESULTS_DIR, storageFile) });
     };
 
-    const { error } = await tryCatchRace([promise(), errorBoundary.failIfVisible()]);
-
-    if (errorBoundary.isError(error)) {
-      const message = await errorBoundary.getErrorStack();
-      logger.error(message);
-      throw new Error(error.message);
-    }
+    const { error } = await tryCatchRace([loginAndSaveSession(), errorBoundary.waitFor()]);
+    await errorBoundary.handleIfError(error);
   });
 });
