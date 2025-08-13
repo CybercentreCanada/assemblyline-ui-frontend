@@ -6,7 +6,7 @@ import fs from 'fs';
 import path from 'path';
 
 // Load env from project root
-dotenv.config({ path: path.resolve(__dirname, '.env') });
+dotenv.config({ path: path.resolve(__dirname, '.env'), quiet: true });
 
 // Validate env vars
 export const EXTERNAL_IP = process.env.EXTERNAL_IP;
