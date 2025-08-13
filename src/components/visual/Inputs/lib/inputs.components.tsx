@@ -17,6 +17,7 @@ import type {
 } from '@mui/material';
 import {
   Autocomplete,
+  Badge,
   Button,
   FormControl,
   FormControlLabel,
@@ -377,6 +378,34 @@ export const StyledFormControl = React.memo(({ children, ...props }: FormControl
   );
 });
 
+export const RequiredBadge = React.memo(<T, P extends InputValues<T>>({ children }: { children: React.ReactNode }) => {
+  const theme = useTheme();
+
+  const [get] = usePropStore<P>();
+
+  const required = get('required');
+
+  return (
+    <Badge
+      color="error"
+      variant="dot"
+      invisible={!required}
+      anchorOrigin={{
+        vertical: 'top',
+        horizontal: 'right'
+      }}
+      sx={{
+        '& .MuiBadge-badge': {
+          right: theme.spacing(-1),
+          top: theme.spacing(0.5)
+        }
+      }}
+    >
+      {children}
+    </Badge>
+  );
+});
+
 type StyledButtonLabelProps = {
   label?: string;
   focused?: boolean;
@@ -412,38 +441,40 @@ export const StyledButtonLabel = React.memo(
           columnGap: theme.spacing(1)
         }}
       >
-        <Typography
-          color={
-            readOnly
-              ? 'textPrimary'
-              : !preventDisabledColor && (loading || disabled)
-                ? 'textDisabled'
-                : errorMsg
-                  ? 'error'
-                  : focused
-                    ? 'primary'
-                    : 'textPrimary'
-          }
-          variant="body2"
-          {...labelProps}
-          sx={{
-            ...labelProps?.sx,
-            marginLeft: theme.spacing(1),
-            textAlign: 'start',
-            width: '100%',
-            ...(overflowHidden && { textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden' }),
-            ...(monospace && { fontFamily: 'monospace' }),
-            ...(password &&
-              showPassword && {
-                fontFamily: 'password',
-                WebkitTextSecurity: 'disc',
-                MozTextSecurity: 'disc',
-                textSecurity: 'disc'
-              })
-          }}
-        >
-          {label}
-        </Typography>
+        <RequiredBadge>
+          <Typography
+            color={
+              readOnly
+                ? 'textPrimary'
+                : !preventDisabledColor && (loading || disabled)
+                  ? 'textDisabled'
+                  : errorMsg
+                    ? 'error'
+                    : focused
+                      ? 'primary'
+                      : 'textPrimary'
+            }
+            variant="body2"
+            {...labelProps}
+            sx={{
+              ...labelProps?.sx,
+              marginLeft: theme.spacing(1),
+              textAlign: 'start',
+              width: '100%',
+              ...(overflowHidden && { textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden' }),
+              ...(monospace && { fontFamily: 'monospace' }),
+              ...(password &&
+                showPassword && {
+                  fontFamily: 'password',
+                  WebkitTextSecurity: 'disc',
+                  MozTextSecurity: 'disc',
+                  textSecurity: 'disc'
+                })
+            }}
+          >
+            {label}
+          </Typography>
+        </RequiredBadge>
         {endAdornment}
       </div>
     );
@@ -538,25 +569,27 @@ export const StyledFormLabel = React.memo(() => {
 
   return (
     <Tooltip title={tooltip} {...tooltipProps}>
-      <Typography
-        color={readOnly ? 'textSecondary' : !disabled && errorMsg ? 'error' : focused ? 'primary' : 'textSecondary'}
-        component={InputLabel}
-        gutterBottom
-        htmlFor={id}
-        variant="body2"
-        whiteSpace="nowrap"
-        {...labelProps}
-        sx={{
-          ...(!overflowHidden && { whiteSpace: 'normal' }),
-          ...(disabled &&
-            !preventDisabledColor && {
-              WebkitTextFillColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.38)'
-            }),
-          ...labelProps?.sx
-        }}
-      >
-        {label}
-      </Typography>
+      <RequiredBadge>
+        <Typography
+          color={readOnly ? 'textSecondary' : !disabled && errorMsg ? 'error' : focused ? 'primary' : 'textSecondary'}
+          component={InputLabel}
+          gutterBottom
+          htmlFor={id}
+          variant="body2"
+          whiteSpace="nowrap"
+          {...labelProps}
+          sx={{
+            ...(!overflowHidden && { whiteSpace: 'normal' }),
+            ...(disabled &&
+              !preventDisabledColor && {
+                WebkitTextFillColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.38)'
+              }),
+            ...labelProps?.sx
+          }}
+        >
+          {label}
+        </Typography>
+      </RequiredBadge>
     </Tooltip>
   );
 });
