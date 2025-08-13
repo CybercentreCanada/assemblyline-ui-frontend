@@ -378,41 +378,53 @@ export const StyledFormControl = React.memo(({ children, ...props }: FormControl
   );
 });
 
-export const RequiredBadge = React.memo(<T, P extends InputValues<T>>({ children }: { children: React.ReactNode }) => {
-  const theme = useTheme();
+type RequiredBadgeProps = {
+  children?: React.ReactNode;
+  ignoreRequired?: boolean;
+};
 
-  const [get] = usePropStore<P>();
+export const RequiredBadge = React.memo(
+  <T, P extends InputValues<T>>({ children, ignoreRequired = false }: RequiredBadgeProps) => {
+    const theme = useTheme();
 
-  const required = get('required');
+    const [get] = usePropStore<P>();
 
-  return (
-    <Badge
-      color="error"
-      variant="dot"
-      invisible={!required}
-      anchorOrigin={{
-        vertical: 'top',
-        horizontal: 'right'
-      }}
-      sx={{
-        '& .MuiBadge-badge': {
-          right: theme.spacing(-1),
-          top: theme.spacing(0.5)
-        }
-      }}
-    >
-      {children}
-    </Badge>
-  );
-});
+    const required = get('required');
+
+    return (
+      <Badge
+        color="error"
+        variant="dot"
+        invisible={!required || ignoreRequired}
+        anchorOrigin={{
+          vertical: 'top',
+          horizontal: 'right'
+        }}
+        sx={{
+          '& .MuiBadge-badge': {
+            right: theme.spacing(-1),
+            top: theme.spacing(0.5)
+          }
+        }}
+      >
+        {children}
+      </Badge>
+    );
+  }
+);
 
 type StyledButtonLabelProps = {
   label?: string;
   focused?: boolean;
+  ignoreRequired?: boolean;
 };
 
 export const StyledButtonLabel = React.memo(
-  <T, P extends InputValues<T>>({ label: labelProp, focused: focusedProp }: StyledButtonLabelProps) => {
+  <T, P extends InputValues<T>>({
+    label: labelProp,
+    focused: focusedProp,
+    ignoreRequired = false
+  }: StyledButtonLabelProps) => {
     const theme = useTheme();
 
     const [get] = usePropStore<P>();
@@ -425,10 +437,11 @@ export const StyledButtonLabel = React.memo(
     const labelProps = get('labelProps');
     const loading = get('loading');
     const monospace = get('monospace');
+    const overflowHidden = get('overflowHidden');
     const password = get('password');
     const preventDisabledColor = get('preventDisabledColor');
     const readOnly = get('readOnly');
-    const overflowHidden = get('overflowHidden');
+    const required = get('required');
     const showPassword = get('showPassword');
 
     return (
@@ -441,40 +454,39 @@ export const StyledButtonLabel = React.memo(
           columnGap: theme.spacing(1)
         }}
       >
-        <RequiredBadge>
-          <Typography
-            color={
-              readOnly
-                ? 'textPrimary'
-                : !preventDisabledColor && (loading || disabled)
-                  ? 'textDisabled'
-                  : errorMsg
-                    ? 'error'
-                    : focused
-                      ? 'primary'
-                      : 'textPrimary'
-            }
-            variant="body2"
-            {...labelProps}
-            sx={{
-              ...labelProps?.sx,
-              marginLeft: theme.spacing(1),
-              textAlign: 'start',
-              width: '100%',
-              ...(overflowHidden && { textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden' }),
-              ...(monospace && { fontFamily: 'monospace' }),
-              ...(password &&
-                showPassword && {
-                  fontFamily: 'password',
-                  WebkitTextSecurity: 'disc',
-                  MozTextSecurity: 'disc',
-                  textSecurity: 'disc'
-                })
-            }}
-          >
-            {label}
-          </Typography>
-        </RequiredBadge>
+        <Typography
+          color={
+            readOnly
+              ? 'textPrimary'
+              : !preventDisabledColor && (loading || disabled)
+                ? 'textDisabled'
+                : errorMsg
+                  ? 'error'
+                  : focused
+                    ? 'primary'
+                    : 'textPrimary'
+          }
+          variant="body2"
+          {...labelProps}
+          sx={{
+            ...labelProps?.sx,
+            marginLeft: theme.spacing(1),
+            textAlign: 'start',
+            width: '100%',
+            ...(overflowHidden && { textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden' }),
+            ...(monospace && { fontFamily: 'monospace' }),
+            ...(password &&
+              showPassword && {
+                fontFamily: 'password',
+                WebkitTextSecurity: 'disc',
+                MozTextSecurity: 'disc',
+                textSecurity: 'disc'
+              })
+          }}
+        >
+          <RequiredBadge ignoreRequired={ignoreRequired}>{label}</RequiredBadge>
+        </Typography>
+
         {endAdornment}
       </div>
     );
@@ -569,27 +581,25 @@ export const StyledFormLabel = React.memo(() => {
 
   return (
     <Tooltip title={tooltip} {...tooltipProps}>
-      <RequiredBadge>
-        <Typography
-          color={readOnly ? 'textSecondary' : !disabled && errorMsg ? 'error' : focused ? 'primary' : 'textSecondary'}
-          component={InputLabel}
-          gutterBottom
-          htmlFor={id}
-          variant="body2"
-          whiteSpace="nowrap"
-          {...labelProps}
-          sx={{
-            ...(!overflowHidden && { whiteSpace: 'normal' }),
-            ...(disabled &&
-              !preventDisabledColor && {
-                WebkitTextFillColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.38)'
-              }),
-            ...labelProps?.sx
-          }}
-        >
-          {label}
-        </Typography>
-      </RequiredBadge>
+      <Typography
+        color={readOnly ? 'textSecondary' : !disabled && errorMsg ? 'error' : focused ? 'primary' : 'textSecondary'}
+        component={InputLabel}
+        gutterBottom
+        htmlFor={id}
+        variant="body2"
+        whiteSpace="nowrap"
+        {...labelProps}
+        sx={{
+          ...(!overflowHidden && { whiteSpace: 'normal' }),
+          ...(disabled &&
+            !preventDisabledColor && {
+              WebkitTextFillColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.38)'
+            }),
+          ...labelProps?.sx
+        }}
+      >
+        <RequiredBadge>{label}</RequiredBadge>
+      </Typography>
     </Tooltip>
   );
 });
