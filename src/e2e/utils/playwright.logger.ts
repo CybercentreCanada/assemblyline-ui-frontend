@@ -1,8 +1,12 @@
 /* eslint-disable no-console */
+import type { TestInfo } from '@playwright/test';
 import chalk from 'chalk';
-import type { BROWSERS } from '../../../playwright.config';
+import type { PlaywrightArgs } from 'e2e/utils/playwright.models';
+import { BROWSERS } from '../../../playwright.config';
 
 type LogStatus = 'success' | 'info' | 'warning' | 'error' | 'exception';
+
+type LoggerFixture = (r: Logger) => Promise<void>;
 
 const STATUS_STYLES: Record<LogStatus, (text: string) => string> = {
   success: chalk.greenBright,
@@ -30,7 +34,7 @@ export class Logger {
     const statusCol = color(status.toUpperCase().padEnd(10));
     const titlesCol = chalk.gray(this.titles.join(' > '));
 
-    console.log(`${browserCol} | ${statusCol}${titlesCol} :: ${message}`);
+    console.log(`${browserCol} | ${statusCol}${titlesCol} | ${message}`);
   }
 
   success(msg: string) {
@@ -52,4 +56,13 @@ export class Logger {
   exception(msg: string) {
     this.log(msg, 'exception');
   }
+
+  static fixture =
+    () =>
+    async ({ browserName }: PlaywrightArgs, use: LoggerFixture, testInfo: TestInfo) => {
+      const browserConfig = BROWSERS.find(b => b.name === browserName);
+      if (!browserConfig) throw new Error(`No browser config found for ${browserName}`);
+      const logger = new Logger(browserConfig, testInfo.titlePath);
+      await use(logger);
+    };
 }

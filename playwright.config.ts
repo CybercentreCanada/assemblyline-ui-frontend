@@ -61,7 +61,7 @@ const baseUseConfig: PlaywrightTestConfig['use'] = {
 export default defineConfig({
   forbidOnly: !!process.env.CI,
   fullyParallel: true,
-  globalTeardown: path.resolve(__dirname, './src/tests/playwright.teardown.ts'),
+  globalTeardown: path.resolve(__dirname, './src/e2e/utils/playwright.teardown.ts'),
   outputDir: `${RESULTS_DIR}/results`,
   reporter: [
     ['list'],
@@ -81,7 +81,7 @@ export default defineConfig({
         ...device,
         ...baseUseConfig
       },
-      testDir: path.resolve(__dirname, './src/tests'),
+      testDir: path.resolve(__dirname, './src/e2e'),
       testMatch: /.*\.setup\.ts$/
     },
     // Main test projects

@@ -1,29 +1,46 @@
-import { test } from '@playwright/test';
-import { testWithErrorFallback } from 'e2e/components/error_boundary/error_fallback.pom';
+import { test as base } from '@playwright/test';
+import { ErrorBoundary } from 'e2e/components/error_boundary.pom';
+import { LoginPage } from 'e2e/routes/login.pom';
+import { SubmitPage } from 'e2e/routes/submit.pom';
 import { Logger } from 'e2e/utils/playwright.logger';
+import { tryCatchRace } from 'e2e/utils/playwright.utils';
 import path from 'path';
-import { BASE_URL, BROWSERS, RESULTS_DIR, TEST_PASSWORD, TEST_USER } from '../../../playwright.config';
+import { RESULTS_DIR, TEST_PASSWORD, TEST_USER } from '../../../playwright.config';
+
+type Fixtures = {
+  logger: Logger;
+  errorBoundary: ErrorBoundary;
+  loginPage: LoginPage;
+  submitPage: SubmitPage;
+};
+
+export const test = base.extend<Fixtures>({
+  logger: Logger.fixture(),
+  errorBoundary: ErrorBoundary.fixture(),
+  loginPage: LoginPage.fixture(),
+  submitPage: SubmitPage.fixture()
+});
 
 test.describe('Setup', () => {
-  testWithErrorFallback('Create session tokens', async ({ browserName, context, page }, testInfo) => {
-    const browserConfig = BROWSERS.find(b => b.name === browserName);
-    const logger = new Logger(browserConfig, testInfo.titlePath);
-    const storageFile = `session-${browserConfig.name}.json`;
+  test('Create session tokens', async ({ browserName, context, logger, errorBoundary, loginPage, submitPage }) => {
+    const storageFile = `session-${browserName}.json`;
 
-    logger.info('Navigating to login page...');
-    await page.goto(BASE_URL);
+    const promise = async () => {
+      await submitPage.goto();
+      await loginPage.waitFor();
+      await loginPage.login(TEST_USER, TEST_PASSWORD);
+      await submitPage.waitFor();
 
-    logger.info('Filling in login credentials...');
-    await page.getByLabel('Username').fill(TEST_USER);
-    await page.getByLabel('Password').fill(TEST_PASSWORD);
+      logger.info(`Saving storage state to ${storageFile}`);
+      await context.storageState({ path: path.join(RESULTS_DIR, storageFile) });
+    };
 
-    logger.info('Clicking sign in button...');
-    await page.getByRole('button', { name: 'Sign in' }).click();
+    const { error } = await tryCatchRace([promise(), errorBoundary.failIfVisible()]);
 
-    logger.info('Waiting for authenticated element...');
-    await page.locator('img[src="/images/banner_dark.svg"]').waitFor();
-
-    logger.info(`Saving storage state to ${storageFile}...`);
-    await context.storageState({ path: path.join(RESULTS_DIR, storageFile) });
+    if (errorBoundary.isError(error)) {
+      const message = await errorBoundary.getErrorStack();
+      logger.error(message);
+      throw new Error(error.message);
+    }
   });
 });

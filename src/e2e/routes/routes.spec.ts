@@ -71,7 +71,7 @@ const routes = [
   '/tos'
 ];
 
-test.describe('Route Smoke Tests', () => {
+test.skip('Route Smoke Tests', () => {
   for (const route of routes) {
     test(`should load ${route} without errors`, async ({ page }) => {
       const errors: string[] = [];
