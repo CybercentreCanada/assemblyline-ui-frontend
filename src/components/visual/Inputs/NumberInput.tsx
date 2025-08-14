@@ -10,13 +10,14 @@ import {
 import { useInputHandlers, useInputParsedProps } from 'components/visual/Inputs/lib/inputs.hook';
 import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
 import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 
 export type NumberInputProps = InputValues<number, string, React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>> &
   InputProps & {
     autoComplete?: TextFieldProps['autoComplete'];
     max?: number;
     min?: number;
+    step?: number;
   };
 
 const WrappedNumberInput = React.memo(() => {
@@ -26,9 +27,28 @@ const WrappedNumberInput = React.memo(() => {
   const loading = get('loading');
   const max = get('max');
   const min = get('min');
+  const step = get('step');
   const value = get('value');
 
+  const inputRef = useRef<HTMLInputElement>(null);
+
   const { handleChange, handleFocus, handleBlur } = useInputHandlers<NumberInputProps>();
+
+  useEffect(() => {
+    const el = inputRef.current;
+    if (!el) return;
+
+    const onWheel = (e: WheelEvent) => {
+      if (document.activeElement === el) {
+        e.preventDefault();
+      }
+    };
+
+    el.addEventListener('wheel', onWheel, { passive: false });
+    return () => {
+      el.removeEventListener('wheel', onWheel);
+    };
+  }, []);
 
   return (
     <StyledRoot>
@@ -39,6 +59,7 @@ const WrappedNumberInput = React.memo(() => {
         ) : (
           <>
             <StyledTextField
+              ref={inputRef}
               type="number"
               value={inputValue}
               onChange={e => handleChange(e, e.target.value, e.target.value !== '' ? Number(e.target.value) : null)}
@@ -48,7 +69,8 @@ const WrappedNumberInput = React.memo(() => {
                 input: {
                   inputProps: {
                     ...(typeof max === 'number' && { max }),
-                    ...(typeof min === 'number' && { min })
+                    ...(typeof min === 'number' && { min }),
+                    ...(typeof step === 'number' && { step })
                   }
                 }
               }}
@@ -65,6 +87,7 @@ export const NumberInput = ({
   autoComplete = 'off',
   max = null,
   min = null,
+  step = 1,
   preventRender = false,
   value,
   ...props
@@ -75,11 +98,14 @@ export const NumberInput = ({
     max,
     min,
     preventRender,
+    step,
     value
   });
 
   return preventRender ? null : (
-    <PropProvider<NumberInputProps> props={{ ...parsedProps, inputValue: value == null ? '' : String(value) }}>
+    <PropProvider<NumberInputProps>
+      props={{ ...parsedProps, inputValue: value == null ? '' : String(value), preventSpinnerRender: false }}
+    >
       <WrappedNumberInput />
     </PropProvider>
   );

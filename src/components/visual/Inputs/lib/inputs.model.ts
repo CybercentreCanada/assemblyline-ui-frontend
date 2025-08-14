@@ -86,16 +86,18 @@ export const DEFAULT_INPUT_PROPS: InputProps = {
 export type InputStates = {
   errorMsg?: string;
   focused?: boolean;
+  inputValue?: unknown;
   preventExpandRender?: boolean;
   preventPasswordRender?: boolean;
   preventResetRender?: boolean;
+  preventSpinnerRender?: boolean;
   showPassword?: boolean;
-  inputValue?: unknown;
 };
 
 export const DEFAULT_INPUT_STATES: InputStates = {
   errorMsg: null,
   focused: false,
+  preventSpinnerRender: true,
   showPassword: true
   // inputValue: null
 };

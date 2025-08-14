@@ -17,6 +17,7 @@ import type {
 } from '@mui/material';
 import {
   Autocomplete,
+  Badge,
   Button,
   FormControl,
   FormControlLabel,
@@ -39,7 +40,7 @@ import { useInputHandlers } from 'components/visual/Inputs/lib/inputs.hook';
 import type { InputValues } from 'components/visual/Inputs/lib/inputs.model';
 import { usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
 import { Tooltip } from 'components/visual/Tooltip';
-import React, { useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export const StyledRoot = React.memo(({ children }: { children: React.ReactNode }) => {
@@ -64,11 +65,13 @@ export const StyledEndAdornmentBox = React.memo(
     const preventExpandRender = get('preventExpandRender');
     const preventPasswordRender = get('preventPasswordRender');
     const preventResetRender = get('preventResetRender');
+    const preventSpinnerRender = get('preventSpinnerRender');
 
     return preventRender &&
       preventResetRender &&
       preventPasswordRender &&
       preventExpandRender &&
+      preventSpinnerRender &&
       !endAdornment ? null : (
       <InputAdornment
         position="end"
@@ -104,11 +107,13 @@ export const StyledEndAdornment = React.memo(
     const preventExpandRender = get('preventExpandRender');
     const preventPasswordRender = get('preventPasswordRender');
     const preventResetRender = get('preventResetRender');
+    const preventSpinnerRender = get('preventSpinnerRender');
 
     return preventRender &&
       preventResetRender &&
       preventPasswordRender &&
       preventExpandRender &&
+      preventSpinnerRender &&
       !endAdornment ? null : (
       <InputAdornment
         position="end"
@@ -259,8 +264,8 @@ export const ResetInput = React.memo(<T, P extends InputValues<T>>() => {
     <Tooltip arrow title={title} placement="bottom">
       <IconButton
         aria-label={`${id}-reset`}
-        type="reset"
         color="secondary"
+        type="reset"
         onClick={event => (onReset ? onReset(event) : handleChange(event, defaultValue, defaultValue))}
         {...resetProps}
         sx={{
@@ -273,6 +278,144 @@ export const ResetInput = React.memo(<T, P extends InputValues<T>>() => {
     </Tooltip>
   );
 });
+
+export const SpinnerInput = <T, P extends InputValues<T>>() => {
+  const theme = useTheme();
+  const [get] = usePropStore<P & { max?: number; min?: number; step?: number }>();
+
+  const disabled = get('disabled');
+  const focused = get('focused');
+  const id = get('id');
+  const inputValue = Number(get('inputValue') ?? 0);
+  const max = get('max');
+  const min = get('min');
+  const preventSpinnerRender = get('preventSpinnerRender');
+  const readOnly = get('readOnly');
+  const step = get('step') ?? 1;
+  const tiny = get('tiny');
+
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const boxRef = useRef<HTMLDivElement | null>(null);
+  const mouseYRef = useRef<number>(null);
+  const timeoutRef = useRef<NodeJS.Timeout>(null);
+  const intervalRef = useRef<NodeJS.Timeout>(null);
+  const { handleChange } = useInputHandlers();
+
+  const clamp = useCallback(
+    (val: number) => Math.min(max ?? Number.POSITIVE_INFINITY, Math.max(min ?? Number.NEGATIVE_INFINITY, val)),
+    [max, min]
+  );
+
+  const focusInputIfNeeded = useCallback(() => {
+    if (!inputRef.current) {
+      const el = document.getElementById(id) as HTMLInputElement | null;
+      if (el) inputRef.current = el;
+    }
+    if (!focused) inputRef.current?.focus();
+  }, [focused, id]);
+
+  const handleMouseDown = useCallback(
+    (event: React.MouseEvent | React.TouchEvent, initialValue: number, delta: number) => {
+      event.stopPropagation();
+      event.preventDefault();
+      focusInputIfNeeded();
+      let nextValue = clamp(initialValue + delta);
+      handleChange(event, nextValue ? String(nextValue) : null, nextValue);
+
+      timeoutRef.current = setTimeout(() => {
+        if (timeoutRef.current) {
+          intervalRef.current = setInterval(() => {
+            const rect = boxRef.current.getBoundingClientRect();
+            const centerY = rect.top + rect.height / 2;
+            const stepDir = centerY > mouseYRef.current ? delta : -delta;
+            nextValue = clamp(nextValue + stepDir);
+            handleChange(event, nextValue ? String(nextValue) : null, nextValue);
+          }, 50);
+        }
+      }, 150);
+    },
+    [clamp, focusInputIfNeeded, handleChange]
+  );
+
+  useEffect(() => {
+    const handleMouseUp = () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        timeoutRef.current = null;
+      }
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
+
+    const handleMouseMove = (event: MouseEvent) => {
+      mouseYRef.current = event.clientY;
+    };
+
+    document.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener('mousemove', handleMouseMove);
+    return () => {
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener('mousemove', handleMouseMove);
+    };
+  }, []);
+
+  return preventSpinnerRender || disabled || readOnly ? null : (
+    <div
+      ref={boxRef}
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: tiny ? '30px' : '38px',
+        width: '24px'
+      }}
+    >
+      <Button
+        color="secondary"
+        size="small"
+        tabIndex={-1}
+        onMouseDown={e => handleMouseDown(e, inputValue, step)}
+        onTouchStart={e => handleMouseDown(e, inputValue, step)}
+        sx={{
+          flex: 1,
+          minWidth: 'initial',
+          minHeight: 0,
+          p: 0,
+          borderRadius: 0,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}
+      >
+        <svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor" style={{ marginBottom: theme.spacing(-1) }}>
+          <path d="M0 16 L12 4 L24 16 Z" />
+        </svg>
+      </Button>
+      <Button
+        color="secondary"
+        size="small"
+        tabIndex={-1}
+        onMouseDown={e => handleMouseDown(e, inputValue, -step)}
+        onTouchStart={e => handleMouseDown(e, inputValue, -step)}
+        sx={{
+          flex: 1,
+          minWidth: 'initial',
+          minHeight: 0,
+          p: 0,
+          borderRadius: 0,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}
+      >
+        <svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor" style={{ marginTop: theme.spacing(-1) }}>
+          <path d="M0 8 L12 20 L24 8 Z" />
+        </svg>
+      </Button>
+    </div>
+  );
+};
 
 export const HelperText = React.memo(() => {
   const theme = useTheme();
@@ -377,13 +520,53 @@ export const StyledFormControl = React.memo(({ children, ...props }: FormControl
   );
 });
 
+type RequiredBadgeProps = {
+  children?: React.ReactNode;
+  ignoreRequired?: boolean;
+};
+
+export const RequiredBadge = React.memo(
+  <T, P extends InputValues<T>>({ children, ignoreRequired = false }: RequiredBadgeProps) => {
+    const theme = useTheme();
+
+    const [get] = usePropStore<P>();
+
+    const required = get('required');
+
+    return (
+      <Badge
+        color="error"
+        variant="dot"
+        invisible={!required || ignoreRequired}
+        anchorOrigin={{
+          vertical: 'top',
+          horizontal: 'right'
+        }}
+        sx={{
+          '& .MuiBadge-badge': {
+            right: theme.spacing(-1),
+            top: theme.spacing(0.5)
+          }
+        }}
+      >
+        {children}
+      </Badge>
+    );
+  }
+);
+
 type StyledButtonLabelProps = {
   label?: string;
   focused?: boolean;
+  ignoreRequired?: boolean;
 };
 
 export const StyledButtonLabel = React.memo(
-  <T, P extends InputValues<T>>({ label: labelProp, focused: focusedProp }: StyledButtonLabelProps) => {
+  <T, P extends InputValues<T>>({
+    label: labelProp,
+    focused: focusedProp,
+    ignoreRequired = false
+  }: StyledButtonLabelProps) => {
     const theme = useTheme();
 
     const [get] = usePropStore<P>();
@@ -396,10 +579,11 @@ export const StyledButtonLabel = React.memo(
     const labelProps = get('labelProps');
     const loading = get('loading');
     const monospace = get('monospace');
+    const overflowHidden = get('overflowHidden');
     const password = get('password');
     const preventDisabledColor = get('preventDisabledColor');
     const readOnly = get('readOnly');
-    const overflowHidden = get('overflowHidden');
+    const required = get('required');
     const showPassword = get('showPassword');
 
     return (
@@ -442,8 +626,9 @@ export const StyledButtonLabel = React.memo(
               })
           }}
         >
-          {label}
+          <RequiredBadge ignoreRequired={ignoreRequired}>{label}</RequiredBadge>
         </Typography>
+
         {endAdornment}
       </div>
     );
@@ -555,7 +740,7 @@ export const StyledFormLabel = React.memo(() => {
           ...labelProps?.sx
         }}
       >
-        {label}
+        <RequiredBadge>{label}</RequiredBadge>
       </Typography>
     </Tooltip>
   );
@@ -579,17 +764,17 @@ export const StyledListItemText = React.memo(({ primary, secondary = null, ...pr
         ...props?.slotProps,
         primary: {
           ...props?.slotProps?.primary,
+          ...(tiny && { variant: 'body2' }),
           sx: {
             ...(capitalize && { textTransform: 'capitalize' }),
-            ...(!overflowHidden && { overflow: 'auto', textOverflow: 'initial', whiteSpace: 'normal' }),
-            ...(tiny && { variant: 'body2' })
+            ...(!overflowHidden && { overflow: 'auto', textOverflow: 'initial', whiteSpace: 'normal' })
           }
         },
         secondary: {
           ...props?.slotProps?.secondary,
+          ...(tiny && { variant: 'body2' }),
           sx: {
-            ...(!overflowHidden && { overflow: 'auto', textOverflow: 'initial', whiteSpace: 'normal' }),
-            ...(tiny && { variant: 'body2' })
+            ...(!overflowHidden && { overflow: 'auto', textOverflow: 'initial', whiteSpace: 'normal' })
           }
         }
       }}
@@ -666,6 +851,7 @@ export const useTextInputSlot = (overrides?: Partial<TextFieldProps>) => {
       sx: {
         margin: 0,
         '& .MuiInputBase-root': {
+          minHeight: '32px',
           paddingRight: '9px !important',
           ...(tiny && {
             paddingTop: '2px !important',
@@ -683,7 +869,10 @@ export const useTextInputSlot = (overrides?: Partial<TextFieldProps>) => {
           }),
           ...(readOnly && !disabled && { cursor: 'default' }),
           ...(monospace && { fontFamily: 'monospace' }),
-          ...(tiny && { padding: '2.5px 4px 2.5px 8px' }),
+          ...(tiny && {
+            paddingTop: '2.5px ',
+            paddingBottom: '2.5px '
+          }),
           ...(password &&
             showPassword && {
               fontFamily: 'password',
@@ -697,6 +886,13 @@ export const useTextInputSlot = (overrides?: Partial<TextFieldProps>) => {
             !disabled && {
               borderColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.23)' : 'rgba(0, 0, 0, 0.23)'
             })
+        },
+        '& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button': {
+          WebkitAppearance: 'none',
+          margin: 0
+        },
+        '& input[type=number]': {
+          MozAppearance: 'textfield'
         },
         ...overrides?.sx
       }
@@ -765,9 +961,10 @@ export const StyledTextField = React.memo(({ params, ...props }: StyledTextField
             <StyledEndAdornment preventRender={!props?.slotProps?.input?.['endAdornment']}>
               {props?.slotProps?.input?.['endAdornment']}
               {/* {params?.InputProps?.endAdornment} */}
+              {endAdornment}
               <PasswordInput />
               <ResetInput />
-              {endAdornment}
+              <SpinnerInput />
             </StyledEndAdornment>
           )
         }

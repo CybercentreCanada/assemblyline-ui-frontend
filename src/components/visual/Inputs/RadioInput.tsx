@@ -57,7 +57,11 @@ const WrappedRadioInput = React.memo(<O extends readonly Option[]>() => {
             >
               <StyledFormControlLabel
                 label={
-                  <StyledButtonLabel label={option.label} focused={focused && inputValue === (option.value ?? '')} />
+                  <StyledButtonLabel
+                    label={option.label}
+                    focused={focused && inputValue === (option.value ?? '')}
+                    ignoreRequired
+                  />
                 }
                 value={option.value ?? ''}
               >
