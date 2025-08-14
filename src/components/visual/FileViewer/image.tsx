@@ -8,7 +8,7 @@ import ForbiddenPage from 'components/routes/403';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 const MIN = 100;
-const MAX = 900;
+const MAX = 3000;
 
 const Wrapper = styled('div')(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#FAFAFA',
