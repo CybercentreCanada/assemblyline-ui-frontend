@@ -205,11 +205,11 @@ const WrappedDateInput = React.memo(() => {
                     InputProps: {
                       endAdornment: (
                         <StyledEndAdornment preventRender={disabled || readOnly}>
-                          <DatePopper />
                           <PasswordInput />
                           <ResetInput />
                           <ExpandInput />
                           {endAdornment}
+                          <DatePopper />
                         </StyledEndAdornment>
                       )
                     }

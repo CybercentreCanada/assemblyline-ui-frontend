@@ -1,5 +1,5 @@
 import type { ListItemTextProps, MenuItemProps, SelectProps } from '@mui/material';
-import { ListItemText, MenuItem, Select, useTheme } from '@mui/material';
+import { IconButton, ListItemText, MenuItem, Select, useTheme } from '@mui/material';
 import {
   HelperText,
   PasswordInput,
@@ -14,7 +14,7 @@ import {
 import { useInputHandlers, useInputParsedProps } from 'components/visual/Inputs/lib/inputs.hook';
 import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
 import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
-import React from 'react';
+import React, { useState } from 'react';
 
 export type Option = {
   primary: ListItemTextProps['primary'];
@@ -47,9 +47,12 @@ const WrappedSelectInput = React.memo(<O extends readonly Option[]>() => {
   const overflowHidden = get('overflowHidden');
   const password = get('password');
   const readOnly = get('readOnly');
+  const resetProps = get('resetProps');
   const showPassword = get('showPassword');
   const tiny = get('tiny');
   const value = get('value');
+
+  const [open, setOpen] = useState<boolean>(false);
 
   const { handleChange, handleFocus, handleBlur } = useInputHandlers<SelectInputProps<O>>();
 
@@ -68,19 +71,24 @@ const WrappedSelectInput = React.memo(<O extends readonly Option[]>() => {
             id={id}
             readOnly={readOnly}
             size="small"
+            open={open}
             value={options?.some(o => o.value === inputValue) ? inputValue : ''}
             onChange={event => handleChange(event as React.SyntheticEvent, event.target.value, event.target.value)}
             onFocus={handleFocus}
             onBlur={e => handleBlur(e, value)}
+            onClose={() => setOpen(false)}
+            onOpen={() => setOpen(true)}
             renderValue={option => (
               <ListItemText
                 primary={options?.find(o => o.value === option)?.primary || ''}
                 sx={{ margin: 0 }}
                 slotProps={{
                   primary: {
+                    ...(tiny && { variant: 'body2' }),
                     sx: {
                       paddingRight: '0px',
                       cursor: 'pointer',
+                      ...(disabled && { cursor: 'default', userSelect: 'text' }),
                       ...(capitalize && { textTransform: 'capitalize' }),
                       ...(!overflowHidden && {
                         whiteSpace: 'wrap',
@@ -88,7 +96,6 @@ const WrappedSelectInput = React.memo(<O extends readonly Option[]>() => {
                         textOverflow: 'ellipsis'
                       }),
                       ...(readOnly && { cursor: 'default', userSelect: 'text' }),
-                      ...(tiny && { variant: 'body2' }),
                       ...(monospace && { fontFamily: 'monospace' }),
                       ...(password &&
                         showPassword && {
@@ -104,19 +111,42 @@ const WrappedSelectInput = React.memo(<O extends readonly Option[]>() => {
             )}
             slotProps={{ input: { id: id } }}
             MenuProps={{ sx: { maxWidth: 'min-content' } }}
+            IconComponent={() => null}
             endAdornment={
-              <StyledEndAdornment sx={{ marginRight: theme.spacing(2) }}>
+              <StyledEndAdornment preventRender={false}>
                 <PasswordInput />
                 <ResetInput />
                 {endAdornment}
+
+                <IconButton
+                  aria-label={`${id}-select-menu`}
+                  color="secondary"
+                  type="button"
+                  onClick={() => setOpen(true)}
+                  {...resetProps}
+                  sx={{
+                    padding: tiny ? theme.spacing(0.75) : theme.spacing(1),
+                    transition: theme.transitions.create('transform', {
+                      duration: theme.transitions.duration.shortest
+                    }),
+                    transform: open ? 'rotate(180deg)' : 'rotate(0deg)',
+                    ...resetProps?.sx
+                  }}
+                >
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M0 8 L12 20 L24 8 Z" />
+                  </svg>
+                </IconButton>
               </StyledEndAdornment>
             }
             sx={{
+              '&.MuiInputBase-root': {
+                paddingRight: '9px'
+              },
               '& .MuiSelect-select': {
+                padding: '8px 8px 8px 14px !important',
                 ...(tiny && {
-                  paddingTop: '4px !important',
-                  paddingBottom: '4px !important',
-                  fontSize: '14px'
+                  padding: '4.5px 8px 4.5px 14px !important'
                 })
               }
             }}

@@ -260,7 +260,7 @@ export const InputsSection = React.memo(() => {
                   label="Number Input"
                   value={value}
                   min={5}
-                  max={10}
+                  max={1000}
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.number', next)}
                 />
               )}
