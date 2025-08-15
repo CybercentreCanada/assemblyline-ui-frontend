@@ -449,10 +449,10 @@ const SafelistDetail = ({ safelist_id = null, close = () => null }: SafelistDeta
           </Grid>
           <Grid size={{ xs: 12 }}>
             <Grid container alignItems="end">
-              <Grid size={{ xs: 11 }}>
+              <Grid size="grow">
                 <Typography variant="h6">{t('timing')}</Typography>
               </Grid>
-              <Grid size={{ xs: 11 }} style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
+              <Grid size="auto">
                 {currentUser.roles.includes('safelist_manage') &&
                   (safelist ? (
                     <DatePicker
