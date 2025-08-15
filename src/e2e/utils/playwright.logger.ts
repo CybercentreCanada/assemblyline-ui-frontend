@@ -4,17 +4,24 @@ import chalk from 'chalk';
 import type { PlaywrightArgs } from 'e2e/utils/playwright.models';
 import { BROWSERS } from '../../../playwright.config';
 
-type LogStatus = 'success' | 'info' | 'warning' | 'error' | 'exception';
-
 type LoggerFixture = (r: Logger) => Promise<void>;
 
-const STATUS_STYLES: Record<LogStatus, (text: string) => string> = {
+const STATUS_STYLES = {
   success: chalk.greenBright,
   info: chalk.cyanBright,
   warning: chalk.yellowBright,
   error: chalk.redBright,
   exception: chalk.magentaBright
-};
+} as const;
+
+const CONTEXT_STYLES = {
+  test: chalk.magentaBright.bold,
+  page: chalk.cyanBright.bold,
+  component: chalk.yellowBright.bold
+} as const;
+
+type LogStatus = keyof typeof STATUS_STYLES;
+type LogContext = keyof typeof CONTEXT_STYLES;
 
 export class Logger {
   private browserLabel: string;

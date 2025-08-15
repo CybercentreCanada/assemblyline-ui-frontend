@@ -1,14 +1,16 @@
 import { test as base } from '@playwright/test';
-import { ErrorBoundary } from 'e2e/components/error_boundary.pom';
+import { ErrorBoundary } from 'e2e/components/ErrorBoundary.pom';
 import { ForbiddenPage } from 'e2e/pages/403.pom';
 import { NotFoundPage } from 'e2e/pages/404_dl.pom';
 import { CrashPage } from 'e2e/pages/crash.pom';
 import { LoginPage } from 'e2e/pages/login.pom';
 import { SubmitPage } from 'e2e/pages/submit.pom';
+import { API } from 'e2e/utils/playwright.api';
 import { Logger } from 'e2e/utils/playwright.logger';
 
 type Fixtures = {
   // Utilities
+  api: API;
   logger: Logger;
 
   // Error detection
@@ -24,6 +26,7 @@ type Fixtures = {
 
 export const test = base.extend<Fixtures>({
   // Utilities
+  api: API.fixture(),
   logger: Logger.fixture(),
 
   // Error detection

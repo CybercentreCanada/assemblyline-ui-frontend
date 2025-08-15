@@ -2,7 +2,6 @@ import type { Locator, Page, TestInfo } from '@playwright/test';
 import { expect } from '@playwright/test';
 import type { Logger } from 'e2e/utils/playwright.logger';
 import type { PlaywrightArgs } from 'e2e/utils/playwright.models';
-import { tryCatch } from 'e2e/utils/playwright.utils';
 
 type ErrorBoundaryFixture = (r: ErrorBoundary) => Promise<void>;
 
@@ -24,7 +23,7 @@ export class ErrorBoundary {
     private logger: Logger,
     private testInfo: TestInfo
   ) {
-    this.logger.info('Error Boundary: Initializing locators');
+    this.logger.info('ErrorBoundary: Initializing locators');
     this.errorFallback = page.locator('[data-testid="error-fallback"]');
     this.errorMessage = this.errorFallback.locator('[data-testid="error-message"]');
     this.showStackButton = this.errorFallback.getByRole('button', { name: 'Show Stack' });
@@ -39,7 +38,7 @@ export class ErrorBoundary {
     };
 
   async isVisible(): Promise<boolean> {
-    return await this.errorFallback.isVisible();
+    return this.errorFallback.isVisible();
   }
 
   async getErrorMessage(): Promise<string | null> {
@@ -51,7 +50,7 @@ export class ErrorBoundary {
   async getErrorStack(): Promise<string | null> {
     if (!(await this.isVisible())) return null;
     await this.showStackButton.click();
-    return await this.errorStack.textContent();
+    return this.errorStack.textContent();
   }
 
   isError(error: unknown): error is ErrorBoundaryError {
@@ -59,20 +58,19 @@ export class ErrorBoundary {
   }
 
   async waitFor(timeout = 0): Promise<void> {
-    await tryCatch(this.errorFallback.waitFor({ state: 'visible', timeout }));
-    const message = await this.errorMessage.textContent();
-    throw new ErrorBoundaryError(message ?? 'Unknown error boundary message');
+    await this.errorFallback.waitFor({ state: 'visible', timeout });
+    const message = (await this.getErrorMessage()) ?? 'Unknown error boundary message';
+    throw new ErrorBoundaryError(message);
   }
 
   async expectVisible(): Promise<void> {
+    await expect(this.errorFallback).toBeVisible();
     const stack = await this.getErrorStack();
-    this.logger.success(`Error Boundary visible at URL: ${this.page.url()}`);
+    this.logger.success(`ErrorBoundary visible at URL: ${this.page.url()}`);
     expect(stack).toBeTruthy();
   }
 
   async expectNotVisible(): Promise<void> {
-    const message = await this.getErrorMessage();
-    this.logger.error(`Error Boundary NOT to be visible at ${this.page.url()}`);
-    expect(message).toBeNull();
+    await expect(this.errorFallback).not.toBeVisible();
   }
 }
