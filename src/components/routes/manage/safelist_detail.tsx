@@ -240,7 +240,7 @@ const SafelistDetail = ({ safelist_id = null, close = () => null }: SafelistDeta
       )}
       <div style={{ textAlign: 'left' }}>
         <PageHeader
-          primary={t('title')}
+          primary={safelist ? t(`title.${safelist.type}`) : t('title')}
           secondary={safelist_id || id}
           secondaryLoading={!safelist}
           slotProps={{
