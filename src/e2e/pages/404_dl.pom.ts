@@ -46,12 +46,6 @@ export class NotFoundPage extends PageObjectModel {
     });
   }
 
-  // async waitForFallback({ state = 'visible', timeout = 0 }: WaitForOptions = {}): Promise<PageNotFoundError> {
-  //   return await this.waitForPage({ state, timeout })
-  //     .then(() => new PageNotFoundError(true))
-  //     .catch(() => new PageNotFoundError(false));
-  // }
-
   async expectErrors({ state = 'visible', timeout = 0 }: WaitForOptions = {}) {
     const { visible } = await this.waitForFallback({ state, timeout });
     expect(visible, `Expected ${this.name} to be ${state} at ${this.page.url()}`).toBeTruthy();
@@ -62,52 +56,4 @@ export class NotFoundPage extends PageObjectModel {
       expect(visible, `Unexpected ${this.name} to be ${state} at ${this.page.url()}`).toBeFalsy();
     });
   }
-
-  // async waitForPage({ state = 'visible', timeout = 0 }: WaitForOptions = {}) {
-  //   await Promise.all([this.deadLinkImage.waitFor({ state, timeout }), this.deadLinkText.waitFor({ state, timeout })]);
-  // }
-
-  // static fixture =
-  //   () =>
-  //   async ({ page, logger }: PlaywrightArgs, use: NotFoundPageFixture, testInfo: TestInfo) => {
-  //     const notFoundPage = new NotFoundPage(page, logger, testInfo);
-  //     await use(notFoundPage);
-  //   };
-
-  // async waitForAppearance({ state = 'visible', timeout = 0 }: WaitForOptions = {}): Promise<void> {
-  //   await Promise.all([this.deadLinkImage.waitFor({ state, timeout }), this.deadLinkText.waitFor({ state, timeout })]);
-  // }
-
-  // async waitFor({ state = 'visible', timeout = 0 }: WaitForOptions = {}): Promise<void> {
-  //   await tryCatch(this.waitForAppearance({ state, timeout }));
-  //   const visible = await this.isVisible();
-  //   expect(visible, `Expected NotFound page to be visible at ${this.page.url()}`).toBeTruthy();
-  // }
-
-  // async isVisible(): Promise<boolean> {
-  //   return (await this.deadLinkImage.isVisible()) && (await this.deadLinkText.isVisible());
-  // }
-
-  // isError(error: unknown): error is PageNotFoundError {
-  //   return error instanceof PageNotFoundError;
-  // }
-
-  // async expectNotVisible(): Promise<void> {
-  //   const visible = await this.isVisible();
-  //   this.logger.info(`NotFoundPage visibility check at URL: ${this.page.url()} → ${visible}`);
-  //   expect(visible, `Expected NotFound page NOT to be visible at ${this.page.url()}`).toBeFalsy();
-  // }
-
-  // async expectVisible({ state = 'visible', timeout = 0 }: WaitForOptions = {}): Promise<void> {
-  //   await this.waitForAppearance({ state, timeout });
-  //   const visible = await this.isVisible();
-  //   this.logger.info(`NotFound page visible at URL: ${this.page.url()}`);
-  //   expect(visible, `Expected NotFound page to be visible at ${this.page.url()}`).toBeTruthy();
-  // }
-
-  // async handleIfError(error: Error): Promise<void> {
-  //   if (error) {
-  //     this.logger.error(`Error detected at ${this.page.url()}: ${error}`);
-  //   }
-  // }
 }

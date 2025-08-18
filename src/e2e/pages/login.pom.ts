@@ -3,8 +3,6 @@ import { test } from 'e2e/configs/playwright.fixtures';
 import type { WaitForOptions } from 'e2e/configs/playwright.models';
 import { PageObjectModel } from 'e2e/utils/PageObjectModel';
 
-// type LoginFixture = (r: LoginPage) => Promise<void>;
-
 export class LoginPage extends PageObjectModel {
   private readonly usernameInput: Locator;
   private readonly passwordInput: Locator;
@@ -36,23 +34,4 @@ export class LoginPage extends PageObjectModel {
       this.signInButton.waitFor({ state, timeout })
     ]);
   }
-
-  // async waitFor({ state = 'visible', timeout = 0 }: WaitForOptions = {}) {
-  //   await test.step(`Waiting for the login page to be ${state}`, async () => {
-  //     await Promise.all([
-  //       this.usernameInput.waitFor({ state, timeout }),
-  //       this.passwordInput.waitFor({ state, timeout }),
-  //       this.signInButton.waitFor({ state, timeout })
-  //     ]);
-  //   });
-  // }
-
-  // async isVisible() {
-  //   const results = await Promise.all([
-  //     this.usernameInput.isVisible(),
-  //     this.passwordInput.isVisible(),
-  //     this.signInButton.isVisible()
-  //   ]);
-  //   return results.every(Boolean);
-  // }
 }

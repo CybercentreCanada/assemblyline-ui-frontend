@@ -51,19 +51,6 @@ export class ErrorBoundary extends ComponentObjectModel {
     });
   }
 
-  // async waitForFallback({ state = 'visible', timeout = 0 }: WaitForOptions = {}): Promise<ErrorBoundaryError> {
-  //   return await test.step(`Waiting for ${this.name} fallback to become ${state}`, async () => {
-  //     try {
-  //       await this.waitForError({ state, timeout });
-  //     } catch (err) {
-  //       if (err instanceof ErrorBoundaryError) {
-  //         return err;
-  //       }
-  //     }
-  //     return new ErrorBoundaryError(null, null);
-  //   });
-  // }
-
   async expectErrors({ state = 'visible', timeout = 0 }: WaitForOptions = {}) {
     const { stack } = await this.waitForFallback({ state, timeout });
     expect(stack, `Expected ${this.name} to be visible!`).toBeFalsy();

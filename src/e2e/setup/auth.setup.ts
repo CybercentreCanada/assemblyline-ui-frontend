@@ -18,14 +18,6 @@ test.describe('Authentication setup', () => {
     void forbiddenPage.expectNoErrors();
     void notFoundPage.expectNoErrors();
 
-    // void errorBoundary.waitForFallback().then(({ stack }) => {
-    //   expect(stack, `Unexpected ErrorBoundary appeared!`).toBeFalsy();
-    // });
-
-    // void forbiddenPage.waitForFallback().then(({ visible }) => {
-    //   expect(visible, `Unexpected Forbidden page appeared`).toBeFalsy();
-    // });
-
     await submitPage.goto();
     await loginPage.waitFor({ state: 'visible' });
     await loginPage.login(TEST_USER, TEST_PASSWORD);
