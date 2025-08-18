@@ -1,16 +1,13 @@
-import { test } from 'e2e/utils/playwright.fixtures';
-import { tryCatchRace } from 'e2e/utils/playwright.utils';
+import { test } from 'e2e/configs/playwright.fixtures';
 
 test.describe('Forbidden Page', () => {
-  test('should detect the forbidden page', async ({ forbiddenPage, errorBoundary, page }) => {
-    const navigateToForbidden = async () => {
-      await forbiddenPage.goto();
-      await page.waitForTimeout(5_000);
-    };
+  test('should detect the forbidden page', async ({ forbiddenPage, errorBoundary, page, notFoundPage }) => {
+    void errorBoundary.expectNoErrors();
+    void notFoundPage.expectNoErrors();
 
-    const { error } = await tryCatchRace([navigateToForbidden(), errorBoundary.waitFor(), forbiddenPage.waitFor()]);
+    void forbiddenPage.expectErrors();
 
-    if (errorBoundary.isError(error)) await errorBoundary.expectNotVisible();
-    if (forbiddenPage.isError(error)) await forbiddenPage.expectVisible();
+    await forbiddenPage.goto();
+    await page.waitForTimeout(2_000);
   });
 });

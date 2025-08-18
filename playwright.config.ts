@@ -61,7 +61,7 @@ const baseUseConfig: PlaywrightTestConfig['use'] = {
 export default defineConfig({
   forbidOnly: !!process.env.CI,
   fullyParallel: true,
-  globalTeardown: path.resolve(__dirname, './src/e2e/utils/playwright.teardown.ts'),
+  globalTeardown: path.resolve(__dirname, './src/e2e/configs/playwright.teardown.ts'),
   outputDir: `${RESULTS_DIR}/results`,
   reporter: [
     ['list'],
@@ -69,7 +69,7 @@ export default defineConfig({
     ['junit', { outputFile: `${RESULTS_DIR}/junit-results.xml` }]
   ],
   retries: process.env.CI ? 2 : 0,
-  testDir: './src',
+  testDir: './src/e2e',
   testMatch: /.*\.spec\.tsx?$/,
   timeout: 120_000,
   use: baseUseConfig,

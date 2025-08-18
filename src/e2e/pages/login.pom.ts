@@ -1,41 +1,35 @@
-import type { Locator, Page, TestInfo } from '@playwright/test';
-import { BasePage } from 'e2e/pages/base.pom';
-import type { Logger } from 'e2e/utils/playwright.logger';
-import type { PlaywrightArgs, WaitForOptions } from 'e2e/utils/playwright.models';
+import type { Locator, Page } from '@playwright/test';
+import { test } from 'e2e/configs/playwright.fixtures';
+import type { WaitForOptions } from 'e2e/configs/playwright.models';
+import { PageObjectModel } from 'e2e/utils/PageObjectModel';
 
-type LoginFixture = (r: LoginPage) => Promise<void>;
+// type LoginFixture = (r: LoginPage) => Promise<void>;
 
-export class LoginPage extends BasePage {
+export class LoginPage extends PageObjectModel {
   private readonly usernameInput: Locator;
   private readonly passwordInput: Locator;
   private readonly signInButton: Locator;
 
-  constructor(page: Page, logger: Logger, testInfo: TestInfo) {
-    super(page, logger, testInfo, 'Login Page', '/');
-
+  constructor(page: Page) {
+    super(page, 'Login page', '/');
     this.usernameInput = this.page.getByLabel('Username');
     this.passwordInput = this.page.getByLabel('Password');
     this.signInButton = this.page.getByRole('button', { name: 'Sign in' });
   }
 
-  static fixture =
-    () =>
-    async ({ page, logger }: PlaywrightArgs, use: LoginFixture, testInfo: TestInfo) => {
-      const loginPage = new LoginPage(page, logger, testInfo);
-      await use(loginPage);
-    };
-
   async login(username: string, password: string) {
-    this.logger.info(`Login Page: filling in ${username} credentials`);
-    await this.usernameInput.fill(username);
-    await this.passwordInput.fill(password);
+    test.info().project.use.baseURL;
+    await test.step(`Filling in the "${username}" credentials`, async () => {
+      await this.usernameInput.fill(username);
+      await this.passwordInput.fill(password);
+    });
 
-    this.logger.info('Login Page: clicking the sign in button');
-    await this.signInButton.click();
+    await test.step('Clicking the sign in button', async () => {
+      await this.signInButton.click();
+    });
   }
 
-  async waitFor({ state = 'visible', timeout = 0 }: WaitForOptions = {}) {
-    await super.waitFor({ state, timeout });
+  async waitForPage({ state = 'visible', timeout = 0 }: WaitForOptions = {}) {
     await Promise.all([
       this.usernameInput.waitFor({ state, timeout }),
       this.passwordInput.waitFor({ state, timeout }),
@@ -43,13 +37,22 @@ export class LoginPage extends BasePage {
     ]);
   }
 
-  async isVisible() {
-    await super.isVisible();
-    const results = await Promise.all([
-      this.usernameInput.isVisible(),
-      this.passwordInput.isVisible(),
-      this.signInButton.isVisible()
-    ]);
-    return results.every(Boolean);
-  }
+  // async waitFor({ state = 'visible', timeout = 0 }: WaitForOptions = {}) {
+  //   await test.step(`Waiting for the login page to be ${state}`, async () => {
+  //     await Promise.all([
+  //       this.usernameInput.waitFor({ state, timeout }),
+  //       this.passwordInput.waitFor({ state, timeout }),
+  //       this.signInButton.waitFor({ state, timeout })
+  //     ]);
+  //   });
+  // }
+
+  // async isVisible() {
+  //   const results = await Promise.all([
+  //     this.usernameInput.isVisible(),
+  //     this.passwordInput.isVisible(),
+  //     this.signInButton.isVisible()
+  //   ]);
+  //   return results.every(Boolean);
+  // }
 }

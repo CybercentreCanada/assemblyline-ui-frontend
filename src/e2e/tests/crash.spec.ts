@@ -1,18 +1,20 @@
-import { expect } from '@playwright/test';
-import { test } from 'e2e/utils/playwright.fixtures';
-import { tryCatchRace } from 'e2e/utils/playwright.utils';
+import { expect, test } from 'e2e/configs/playwright.fixtures';
 
 test.describe('Crash Page', () => {
-  test('should trigger the ErrorBoundary when crashing', async ({ crashPage, errorBoundary, page }) => {
-    const triggerCrashFlow = async () => {
-      await crashPage.goto();
-      await crashPage.waitFor();
-      await page.waitForTimeout(5_000);
-    };
+  test('should trigger the ErrorBoundary when crashing', async ({
+    crashPage,
+    errorBoundary,
+    forbiddenPage,
+    notFoundPage
+  }) => {
+    void forbiddenPage.expectNoErrors();
+    void notFoundPage.expectNoErrors();
 
-    const { error } = await tryCatchRace([triggerCrashFlow(), errorBoundary.waitFor()]);
+    void errorBoundary.waitForFallback().then(({ message }) => {
+      expect(message).toBe('This is a test crash !');
+    });
 
-    if (errorBoundary.isError(error)) await errorBoundary.expectVisible();
-    else expect(false, 'Expected the ErrorBoundary to be shown').toBeTruthy();
+    await crashPage.goto();
+    await crashPage.waitFor();
   });
 });
