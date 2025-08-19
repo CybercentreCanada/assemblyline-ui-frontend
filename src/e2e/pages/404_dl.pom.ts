@@ -47,13 +47,17 @@ export class NotFoundPage extends PageObjectModel {
   }
 
   async expectErrors({ state = 'visible', timeout = 0 }: WaitForOptions = {}) {
-    const { visible } = await this.waitForFallback({ state, timeout });
-    expect(visible, `Expected ${this.name} to be ${state} at ${this.page.url()}`).toBeTruthy();
+    return await test.step(`Expecting the ${this.name} to be ${state}`, async () => {
+      const { visible } = await this.waitForFallback({ state, timeout });
+      expect(visible, `Expected ${this.name} to be ${state} at ${this.page.url()}`).toBeTruthy();
+    });
   }
 
   async expectNoErrors({ state = 'visible', timeout = 0 }: WaitForOptions = {}) {
-    await this.waitForFallback({ state, timeout }).then(({ visible }) => {
-      expect(visible, `Unexpected ${this.name} to be ${state} at ${this.page.url()}`).toBeFalsy();
+    return await test.step(`Expecting the ${this.name} to not be ${state}`, async () => {
+      await this.waitForFallback({ state, timeout }).then(({ visible }) => {
+        expect(visible, `Unexpected ${this.name} to be ${state} at ${this.page.url()}`).toBeFalsy();
+      });
     });
   }
 }

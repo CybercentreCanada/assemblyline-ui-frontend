@@ -1,6 +1,6 @@
 import { test } from 'e2e/configs/playwright.fixtures';
 
-test.describe('Not Found Page', () => {
+test.describe('Not Found page', () => {
   test('should detect the dead link page', async ({ notFoundPage, errorBoundary, page, forbiddenPage }) => {
     void errorBoundary.expectNoErrors();
     void forbiddenPage.expectNoErrors();

@@ -1,6 +1,6 @@
 import { test } from 'e2e/configs/playwright.fixtures';
 
-test.describe('Forbidden Page', () => {
+test.describe('Forbidden page', () => {
   test('should detect the forbidden page', async ({ forbiddenPage, errorBoundary, page, notFoundPage }) => {
     void errorBoundary.expectNoErrors();
     void notFoundPage.expectNoErrors();
