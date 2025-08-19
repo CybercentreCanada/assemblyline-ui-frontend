@@ -1,13 +1,13 @@
 import { test } from 'e2e/configs/playwright.fixtures';
 
 test.describe('Not Found page', () => {
-  test('should detect the dead link page', async ({ notFoundPage, errorBoundary, page, forbiddenPage }) => {
-    void errorBoundary.expectNoErrors();
-    void forbiddenPage.expectNoErrors();
+  test('should detect the dead link page', async ({ user }) => {
+    void user.crashPage.expectNoErrors();
+    void user.forbiddenPage.expectNoErrors();
 
-    void notFoundPage.expectErrors();
+    void user.notFoundPage.expectErrors();
 
-    await page.goto('/doesnt_exist');
-    await page.waitForTimeout(2_000);
+    await user.page.goto('/doesnt_exist');
+    await user.page.waitForTimeout(2_000);
   });
 });

@@ -6,7 +6,7 @@ test.describe('Login and Logout page', () => {
   let context: BrowserContext;
   let page: Page;
 
-  test.beforeEach(async ({ browser }) => {
+  test.beforeEach(async ({ browser, context }) => {
     context = await browser.newContext({
       storageState: undefined
       // recordVideo: { dir: `${RESULTS_DIR}/videos`, size: { width: 1280, height: 720 } }
@@ -18,7 +18,7 @@ test.describe('Login and Logout page', () => {
     await context.close();
   });
 
-  test.only('should login and logout the user', async () => {
+  test('should login and logout the user', async () => {
     await test.step(`Navigating to "/" and waiting for the login page to be visible`, async () => {
       await page.goto('/');
       await page.getByLabel('Username').waitFor({ state: 'visible', timeout: 20_000 });

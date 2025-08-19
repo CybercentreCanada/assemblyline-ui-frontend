@@ -12,11 +12,18 @@ dotenv.config({ path: path.resolve(__dirname, '.env'), quiet: true });
 export const EXTERNAL_IP = process.env.EXTERNAL_IP;
 if (!EXTERNAL_IP) throw new Error('❌ EXTERNAL_IP is not defined in .env');
 
-export const TEST_USER = process.env.TEST_USER ?? 'admin';
-export const TEST_PASSWORD = process.env.TEST_PASSWORD ?? 'admin';
+export const TEST_USER: string = process.env.TEST_USER ?? 'user';
+export const TEST_PASSWORD: string = process.env.TEST_PASSWORD ?? 'user';
+
+export const ADMIN_USER: string = process.env.ADMIN_USER ?? 'admin';
+export const ADMIN_PASSWORD: string = process.env.ADMIN_PASSWORD ?? 'admin';
 
 export const BASE_URL = `https://${EXTERNAL_IP}.nip.io`;
 export const RESULTS_DIR = path.resolve(__dirname, 'playwright-results');
+
+export const SHORT_TIMEOUT: number = 1_000;
+export const MEDIUM_TIMEOUT: number = 5_000;
+export const LONG_TIMEOUT: number = 30_000;
 
 // Ensure storage dir exists
 if (!fs.existsSync(RESULTS_DIR)) {
@@ -90,7 +97,7 @@ export default defineConfig({
       use: {
         ...device,
         ...baseUseConfig,
-        storageState: path.join(RESULTS_DIR, `session-${name}.json`)
+        storageState: path.join(RESULTS_DIR, `${name}-admin-session.json`)
       },
       dependencies: [`${name}-setup`]
     }

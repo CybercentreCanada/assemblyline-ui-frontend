@@ -1,10 +1,11 @@
 import type { Page } from '@playwright/test';
 import { test } from 'e2e/configs/playwright.fixtures';
 import type { PlaywrightArgs, WaitForOptions } from 'e2e/configs/playwright.models';
+import { LONG_TIMEOUT, MEDIUM_TIMEOUT } from '../../../playwright.config';
 
 export abstract class PageObjectModel {
   constructor(
-    protected readonly page: Page,
+    protected page: Page,
     protected readonly name: string = null,
     protected readonly route: string = null
   ) {}
@@ -16,17 +17,31 @@ export abstract class PageObjectModel {
     };
   }
 
+  async usePage(page: Page) {
+    this.page = page;
+    return this;
+  }
+
   async goto() {
     await test.step(`Navigating to the ${this.name}`, async () => {
-      await this.page.goto(this.route);
+      await this.page.goto(this.route, { timeout: LONG_TIMEOUT });
     });
   }
 
   protected abstract waitForPage(options: WaitForOptions): Promise<void>;
 
-  async waitFor({ state = 'visible', timeout = 0 }: WaitForOptions = {}) {
+  async waitFor({ state = 'visible', timeout = LONG_TIMEOUT }: WaitForOptions = {}) {
     await test.step(`Waiting for the ${this.name} to become ${state}`, async () => {
       await this.waitForPage({ state, timeout });
     });
+  }
+
+  async isVisible({ state = 'visible', timeout = MEDIUM_TIMEOUT }: WaitForOptions = {}): Promise<boolean> {
+    try {
+      await this.waitForPage({ state, timeout });
+      return true;
+    } catch {
+      return false;
+    }
   }
 }
