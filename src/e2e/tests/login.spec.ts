@@ -1,21 +1,16 @@
-import type { BrowserContext, Page } from '@playwright/test';
+import type { Page } from '@playwright/test';
 import { expect, test } from 'e2e/configs/playwright.fixtures';
 import { TEST_PASSWORD, TEST_USER } from '../../../playwright.config';
 
 test.describe('Login and Logout page', () => {
-  let context: BrowserContext;
   let page: Page;
 
-  test.beforeEach(async ({ browser, context }) => {
-    context = await browser.newContext({
+  test.beforeEach(async ({ browser }) => {
+    const context = await browser.newContext({
       storageState: undefined
       // recordVideo: { dir: `${RESULTS_DIR}/videos`, size: { width: 1280, height: 720 } }
     });
     page = await context.newPage();
-  });
-
-  test.afterEach(async () => {
-    await context.close();
   });
 
   test('should login and logout the user', async () => {

@@ -1,13 +1,12 @@
 import { test } from 'e2e/configs/playwright.fixtures';
 
 test.describe('Forbidden page', () => {
-  test('should detect the forbidden page', async ({ user }) => {
-    void user.crashPage.expectNoErrors();
-    void user.notFoundPage.expectNoErrors();
+  test('should detect the forbidden page', async ({ userUI }) => {
+    void userUI.crashPage.monitorForNoError();
+    void userUI.notFoundPage.monitorForNoError();
+    void userUI.forbiddenPage.monitorForError();
 
-    void user.forbiddenPage.expectErrors();
-
-    await user.forbiddenPage.goto();
-    await user.page.waitForTimeout(2_000);
+    await userUI.forbiddenPage.goto();
+    await userUI.page.waitForTimeout(2_000);
   });
 });

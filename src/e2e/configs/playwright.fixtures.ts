@@ -10,7 +10,8 @@ import { SubmitPage } from 'e2e/pages/submit.pom';
 import path from 'path';
 import { RESULTS_DIR } from '../../../playwright.config';
 
-type UserPage = {
+type UserInterface = {
+  // Fixtures
   context: BrowserContext;
   page: Page;
 
@@ -30,22 +31,7 @@ type SetupBundle = {
   user: 'admin' | 'user';
 };
 
-type POMBundle = {
-  // Fixtures
-  context: BrowserContext;
-  page: Page;
-
-  // Error detection
-  crashPage: CrashPage;
-  forbiddenPage: ForbiddenPage;
-  notFoundPage: NotFoundPage;
-
-  // Pages
-  loginPage: LoginPage;
-  submitPage: SubmitPage;
-};
-
-async function setupBundle({ browser, browserName, user }: SetupBundle): Promise<POMBundle> {
+async function setupBundle({ browser, browserName, user }: SetupBundle): Promise<UserInterface> {
   const context = await browser.newContext({
     storageState: path.join(RESULTS_DIR, `${browserName}-${user}-session.json`)
   });
@@ -63,88 +49,23 @@ async function setupBundle({ browser, browserName, user }: SetupBundle): Promise
 }
 
 type Fixtures = {
-  // Utilities
-  // api: API;
-  // logger: Logger;
-
-  // // Error detection
-  // crashPage: CrashPage;
-  // forbiddenPage: ForbiddenPage;
-  // notFoundPage: NotFoundPage;
-
-  // // Pages
-  // loginPage: LoginPage;
-  // submitPage: SubmitPage;
-
   // Users
-  admin: POMBundle;
-  user: POMBundle;
+  adminUI: UserInterface;
+  userUI: UserInterface;
 };
 
 export const test = base.extend<Fixtures>({
-  // // Utilities
-  // api: API.fixture(),
-  // logger: Logger.fixture(),
-
-  // // Error detection
-  // crashPage: CrashPage.fixture(),
-  // forbiddenPage: ForbiddenPage.fixture(),
-  // notFoundPage: NotFoundPage.fixture(),
-
-  // // Pages
-  // loginPage: LoginPage.fixture(),
-  // submitPage: SubmitPage.fixture(),
-
-  // Users
-  admin: async ({ browser, browserName }: PlaywrightArgs, use: (r: POMBundle) => Promise<void>) => {
+  adminUI: async ({ browser, browserName }: PlaywrightArgs, use: (r: UserInterface) => Promise<void>) => {
     const bundle = await setupBundle({ browser, browserName, user: 'admin' });
     await use(bundle);
     await bundle.context.close();
   },
 
-  user: async ({ browser, browserName }: PlaywrightArgs, use: (r: POMBundle) => Promise<void>) => {
+  userUI: async ({ browser, browserName }: PlaywrightArgs, use: (r: UserInterface) => Promise<void>) => {
     const bundle = await setupBundle({ browser, browserName, user: 'user' });
     await use(bundle);
     await bundle.context.close();
   }
-
-  // admin: async ({ browser }: PlaywrightArgs, use: (r: AuthBundle) => Promise<void>) => {
-  //   const context = await browser.newContext();
-  //   const page = await context.newPage();
-
-  //   // login as admin
-  //   await page.goto('/');
-  //   await page.getByLabel('Username').fill('admin');
-  //   await page.getByLabel('Password').fill('admin');
-  //   await page.getByRole('button', { name: 'Sign in' }).click();
-  //   await page.getByText('Welcome').waitFor();
-
-  //   await context.storageState({
-  //     path: path.join(RESULTS_DIR, 'admin-session.json')
-  //   });
-
-  //   await use({ context, page });
-  //   await context.close();
-  // },
-
-  // user: async ({ browser }: PlaywrightArgs, use: (r: AuthBundle) => Promise<void>) => {
-  //   const context = await browser.newContext();
-  //   const page = await context.newPage();
-
-  //   // login as user
-  //   await page.goto('/');
-  //   await page.getByLabel('Username').fill('user');
-  //   await page.getByLabel('Password').fill('user');
-  //   await page.getByRole('button', { name: 'Sign in' }).click();
-  //   await page.getByText('Welcome').waitFor();
-
-  //   await context.storageState({
-  //     path: path.join(RESULTS_DIR, 'user-session.json')
-  //   });
-
-  //   await use({ context, page });
-  //   await context.close();
-  // }
 });
 
 export { expect } from '@playwright/test';

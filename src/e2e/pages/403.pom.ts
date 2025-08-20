@@ -45,14 +45,14 @@ export class ForbiddenPage extends PageObjectModel {
     });
   }
 
-  async expectErrors({ state = 'visible', timeout = 0 }: WaitForOptions = {}) {
+  async monitorForError({ state = 'visible', timeout = 0 }: WaitForOptions = {}) {
     return await test.step(`Expecting the ${this.name} to be ${state}`, async () => {
       const { visible } = await this.waitForFallback({ state, timeout });
       expect(visible, `Expected ${this.name} to be visible!`).toBeTruthy();
     });
   }
 
-  async expectNoErrors({ state = 'visible', timeout = 0 }: WaitForOptions = {}) {
+  async monitorForNoError({ state = 'visible', timeout = 0 }: WaitForOptions = {}) {
     return await test.step(`Expecting the ${this.name} to not be ${state}`, async () => {
       await this.waitForFallback({ state, timeout }).then(({ visible }) => {
         expect(visible, `Unexpected ${this.name} appeared!`).toBeFalsy();
