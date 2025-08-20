@@ -45,34 +45,32 @@ const WrappedSearchCount: FC<SearchCountProps> = memo(
         onOpen={() => setOpen(true)}
         onClose={() => setOpen(false)}
       >
-        <div>
-          <Button
-            disableElevation={disabled}
-            disableRipple={disabled}
-            size="small"
-            style={{ padding: '0px', ...(disabled && { backgroundColor: 'transparent', cursor: 'default' }) }}
-            onClick={disabled ? null : onClick}
-          >
-            {children}
-            <Typography
-              children={
-                loading ? (
-                  <>{t('searching')}</>
-                ) : (
-                  <>
-                    {formattedTotal}
-                    {isLimited ? '+' : ''} {suffix}
-                  </>
-                )
-              }
-              color="secondary"
-              fontStyle="italic"
-              textTransform="none"
-              variant="subtitle1"
-              whiteSpace="nowrap"
-            />
-          </Button>
-        </div>
+        <Button
+          disableElevation={disabled}
+          disableRipple={disabled}
+          size="small"
+          style={{ padding: '0px', ...(disabled && { backgroundColor: 'transparent', cursor: 'default' }) }}
+          onClick={disabled ? null : onClick}
+        >
+          {children}
+          <Typography
+            children={
+              loading ? (
+                <>{t('searching')}</>
+              ) : (
+                <>
+                  {formattedTotal}
+                  {isLimited ? '+' : ''} {suffix}
+                </>
+              )
+            }
+            color="secondary"
+            fontStyle="italic"
+            textTransform="none"
+            variant="subtitle1"
+            whiteSpace="nowrap"
+          />
+        </Button>
       </Tooltip>
     );
   }
