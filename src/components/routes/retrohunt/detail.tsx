@@ -82,7 +82,7 @@ type Props = {
 
 const PAGE_SIZE = 10;
 
-const MAX_TRACKED_RECORDS = 1_000_000_000;
+const MAX_TRACKED_RECORDS = 10_000;
 
 const SOCKETIO_NAMESPACE = '/retrohunt';
 
@@ -90,8 +90,7 @@ const DEFAULT_PARAMS = {
   query: '*',
   offset: 0,
   rows: PAGE_SIZE,
-  sort: 'seen.last+desc',
-  track_total_hits: 10_000
+  sort: 'seen.last+desc'
 };
 
 const DEFAULT_QUERY: string = Object.keys(DEFAULT_PARAMS)
@@ -629,23 +628,12 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
                                       <SearchCount
                                         loading={isReloading}
                                         total={hitResults?.total}
-                                        currentMax={Number(
-                                          query?.get('track_total_hits', DEFAULT_PARAMS.track_total_hits)
-                                        )}
-                                        defaultMax={DEFAULT_PARAMS.track_total_hits}
+                                        currentMax={MAX_TRACKED_RECORDS}
+                                        defaultMax={MAX_TRACKED_RECORDS}
                                         suffix={
                                           query.get('query') || query.get('filters')
                                             ? t(`hits.filtered${hitResults.total === 1 ? '' : 's'}`)
                                             : t(`hits.total${hitResults.total === 1 ? '' : 's'}`)
-                                        }
-                                        onClick={() =>
-                                          handleQueryChange(
-                                            'track_total_hits',
-                                            Number(query?.get('track_total_hits', DEFAULT_PARAMS.track_total_hits)) !==
-                                              MAX_TRACKED_RECORDS
-                                              ? MAX_TRACKED_RECORDS
-                                              : DEFAULT_PARAMS.track_total_hits
-                                          )
                                         }
                                       />
                                     </span>
