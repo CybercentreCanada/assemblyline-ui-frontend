@@ -10,6 +10,7 @@ export type InputValues<Value, InputValue = Value, Event = React.SyntheticEvent>
 };
 
 export type InputProps = {
+  badge?: boolean;
   capitalize?: boolean;
   disabled?: boolean;
   divider?: boolean;
@@ -47,6 +48,7 @@ export type InputProps = {
 };
 
 export const DEFAULT_INPUT_PROPS: InputProps = {
+  badge: false,
   capitalize: false,
   disabled: false,
   divider: false,

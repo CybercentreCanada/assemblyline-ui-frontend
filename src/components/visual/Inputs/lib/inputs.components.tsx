@@ -531,13 +531,13 @@ export const RequiredBadge = React.memo(
 
     const [get] = usePropStore<P>();
 
-    const required = get('required');
+    const badge = get('badge');
 
     return (
       <Badge
         color="error"
         variant="dot"
-        invisible={!required || ignoreRequired}
+        invisible={!badge || ignoreRequired}
         anchorOrigin={{
           vertical: 'top',
           horizontal: 'right'
