@@ -1,6 +1,6 @@
 import type { Locator, Page } from '@playwright/test';
-import { expect, test } from 'e2e/configs/playwright.fixtures';
-import type { WaitForOptions } from 'e2e/configs/playwright.models';
+import { expect, test } from 'e2e/shared/fixtures';
+import type { WaitForOptions } from 'e2e/shared/models';
 import { PageObjectModel } from 'e2e/utils/PageObjectModel';
 
 export class CrashError extends Error {

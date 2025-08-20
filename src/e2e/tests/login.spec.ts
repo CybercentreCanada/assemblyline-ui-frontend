@@ -1,6 +1,6 @@
 import type { Page } from '@playwright/test';
-import { expect, test } from 'e2e/configs/playwright.fixtures';
-import { TEST_PASSWORD, TEST_USER } from '../../../playwright.config';
+import { TEST_PASSWORD, TEST_USER } from 'e2e/shared/constants';
+import { expect, test } from 'e2e/shared/fixtures';
 
 test.describe('Login and Logout page', () => {
   let page: Page;

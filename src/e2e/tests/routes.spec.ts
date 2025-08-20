@@ -1,4 +1,4 @@
-import { expect, test } from 'e2e/configs/playwright.fixtures';
+import { expect, test } from 'e2e/shared/fixtures';
 
 // Replace route parameters with dummy test values
 const routes = [

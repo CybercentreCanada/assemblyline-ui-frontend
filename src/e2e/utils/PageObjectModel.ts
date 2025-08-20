@@ -1,7 +1,7 @@
 import type { Page } from '@playwright/test';
-import { test } from 'e2e/configs/playwright.fixtures';
-import type { PlaywrightArgs, WaitForOptions } from 'e2e/configs/playwright.models';
-import { LONG_TIMEOUT, MEDIUM_TIMEOUT } from '../../../playwright.config';
+import { LONG_TIMEOUT, MEDIUM_TIMEOUT } from 'e2e/shared/constants';
+import { test } from 'e2e/shared/fixtures';
+import type { PlaywrightArgs, WaitForOptions } from 'e2e/shared/models';
 
 export abstract class PageObjectModel {
   constructor(

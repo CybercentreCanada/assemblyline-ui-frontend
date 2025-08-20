@@ -1,13 +1,13 @@
 import type { Browser, BrowserContext } from '@playwright/test';
-import { test } from 'e2e/configs/playwright.fixtures';
 import { ForbiddenPage } from 'e2e/pages/403.pom';
 import { NotFoundPage } from 'e2e/pages/404_dl.pom';
 import { CrashPage } from 'e2e/pages/crash.pom';
 import { LoginPage } from 'e2e/pages/login.pom';
 import { SubmitPage } from 'e2e/pages/submit.pom';
+import { ADMIN_PASSWORD, ADMIN_USER, RESULTS_DIR, TEST_PASSWORD, TEST_USER } from 'e2e/shared/constants';
+import { test } from 'e2e/shared/fixtures';
 import fs from 'fs';
 import path from 'path';
-import { ADMIN_PASSWORD, ADMIN_USER, RESULTS_DIR, TEST_PASSWORD, TEST_USER } from '../../../playwright.config';
 
 type LoginAndSaveProps = {
   browser: Browser;

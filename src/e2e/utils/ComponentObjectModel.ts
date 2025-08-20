@@ -1,6 +1,6 @@
 import type { Page } from '@playwright/test';
-import { test } from 'e2e/configs/playwright.fixtures';
-import type { PlaywrightArgs, WaitForOptions } from 'e2e/configs/playwright.models';
+import { test } from 'e2e/shared/fixtures';
+import type { PlaywrightArgs, WaitForOptions } from 'e2e/shared/models';
 
 export abstract class ComponentObjectModel {
   constructor(

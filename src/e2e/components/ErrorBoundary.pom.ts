@@ -1,6 +1,6 @@
 import type { Locator, Page } from '@playwright/test';
-import { expect, test } from 'e2e/configs/playwright.fixtures';
-import type { WaitForOptions } from 'e2e/configs/playwright.models';
+import { expect, test } from 'e2e/shared/fixtures';
+import type { WaitForOptions } from 'e2e/shared/models';
 import { ComponentObjectModel } from 'e2e/utils/ComponentObjectModel';
 
 export class ErrorBoundaryError extends Error {

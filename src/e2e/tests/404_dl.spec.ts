@@ -1,4 +1,4 @@
-import { test } from 'e2e/configs/playwright.fixtures';
+import { test } from 'e2e/shared/fixtures';
 
 test.describe('Not Found page', () => {
   test('should detect the dead link page', async ({ userUI }) => {

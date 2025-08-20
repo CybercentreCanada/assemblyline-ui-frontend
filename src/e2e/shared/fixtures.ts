@@ -1,14 +1,14 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import type { Browser, BrowserContext, Page } from '@playwright/test';
 import { test as base } from '@playwright/test';
-import type { PlaywrightArgs } from 'e2e/configs/playwright.models';
 import { ForbiddenPage } from 'e2e/pages/403.pom';
 import { NotFoundPage } from 'e2e/pages/404_dl.pom';
 import { CrashPage } from 'e2e/pages/crash.pom';
 import { LoginPage } from 'e2e/pages/login.pom';
 import { SubmitPage } from 'e2e/pages/submit.pom';
+import { RESULTS_DIR } from 'e2e/shared/constants';
+import type { PlaywrightArgs } from 'e2e/shared/models';
 import path from 'path';
-import { RESULTS_DIR } from '../../../playwright.config';
 
 type UserInterface = {
   // Fixtures
@@ -49,7 +49,6 @@ async function setupBundle({ browser, browserName, user }: SetupBundle): Promise
 }
 
 type Fixtures = {
-  // Users
   adminUI: UserInterface;
   userUI: UserInterface;
 };

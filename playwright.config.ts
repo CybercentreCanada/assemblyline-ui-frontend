@@ -9,29 +9,17 @@ import path from 'path';
 dotenv.config({ path: path.resolve(__dirname, '.env'), quiet: true });
 
 // Validate env vars
-export const EXTERNAL_IP = process.env.EXTERNAL_IP;
+const EXTERNAL_IP = process.env.EXTERNAL_IP;
 if (!EXTERNAL_IP) throw new Error('❌ EXTERNAL_IP is not defined in .env');
 
-export const TEST_USER: string = process.env.TEST_USER ?? 'user';
-export const TEST_PASSWORD: string = process.env.TEST_PASSWORD ?? 'user';
+const BASE_URL = `https://${EXTERNAL_IP}.nip.io`;
+const RESULTS_DIR = path.resolve(__dirname, 'playwright-results');
 
-export const ADMIN_USER: string = process.env.ADMIN_USER ?? 'admin';
-export const ADMIN_PASSWORD: string = process.env.ADMIN_PASSWORD ?? 'admin';
-
-export const BASE_URL = `https://${EXTERNAL_IP}.nip.io`;
-export const RESULTS_DIR = path.resolve(__dirname, 'playwright-results');
-
-export const SHORT_TIMEOUT: number = 1_000;
-export const MEDIUM_TIMEOUT: number = 5_000;
-export const LONG_TIMEOUT: number = 30_000;
-
-// Ensure storage dir exists
 if (!fs.existsSync(RESULTS_DIR)) {
   fs.mkdirSync(RESULTS_DIR, { recursive: true });
 }
 
-// Browser configuration
-export const BROWSERS = [
+const BROWSERS = [
   {
     name: 'chromium',
     label: 'chrome',
@@ -68,7 +56,7 @@ const baseUseConfig: PlaywrightTestConfig['use'] = {
 export default defineConfig({
   forbidOnly: !!process.env.CI,
   fullyParallel: true,
-  globalTeardown: path.resolve(__dirname, './src/e2e/configs/playwright.teardown.ts'),
+  globalTeardown: path.resolve(__dirname, './src/e2e/shared/teardown.ts'),
   outputDir: `${RESULTS_DIR}/results`,
   reporter: [
     ['list'],
@@ -89,7 +77,7 @@ export default defineConfig({
         ...baseUseConfig
       },
       testDir: path.resolve(__dirname, './src/e2e'),
-      testMatch: /.*\.setup\.ts$/
+      testMatch: /setup\.ts$/
     },
     // Main test projects
     {

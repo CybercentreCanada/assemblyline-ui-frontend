@@ -1,5 +1,5 @@
 import type { Locator, Page } from '@playwright/test';
-import type { WaitForOptions } from 'e2e/configs/playwright.models';
+import type { WaitForOptions } from 'e2e/shared/models';
 import { PageObjectModel } from 'e2e/utils/PageObjectModel';
 
 // type SubmitFixture = (r: SubmitPage) => Promise<void>;

@@ -1,4 +1,4 @@
-import { test } from 'e2e/configs/playwright.fixtures';
+import { test } from 'e2e/shared/fixtures';
 
 test.describe('Forbidden page', () => {
   test('should detect the forbidden page', async ({ userUI }) => {

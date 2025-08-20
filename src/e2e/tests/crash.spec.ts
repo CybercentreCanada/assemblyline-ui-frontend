@@ -1,4 +1,4 @@
-import { expect, test } from 'e2e/configs/playwright.fixtures';
+import { expect, test } from 'e2e/shared/fixtures';
 
 test.describe('Crash page', () => {
   test('should trigger the ErrorBoundary when crashing', async ({ userUI }) => {

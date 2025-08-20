@@ -3,19 +3,19 @@ import { test } from 'e2e/shared/fixtures';
 import type { WaitForOptions } from 'e2e/shared/models';
 import { PageObjectModel } from 'e2e/utils/PageObjectModel';
 
-export class LoginPage extends PageObjectModel {
+export class LogoutPage extends PageObjectModel {
   private readonly usernameInput: Locator;
   private readonly passwordInput: Locator;
   private readonly signInButton: Locator;
 
   constructor(page: Page) {
-    super(page, 'Login page', '/');
+    super(page, 'Logout page', '/logout');
     this.usernameInput = this.page.getByLabel('Username');
     this.passwordInput = this.page.getByLabel('Password');
     this.signInButton = this.page.getByRole('button', { name: 'Sign in' });
   }
 
-  async login(username: string, password: string) {
+  async logout(username: string, password: string) {
     test.info().project.use.baseURL;
     await test.step(`Filling in the "${username}" credentials`, async () => {
       await this.usernameInput.fill(username);
