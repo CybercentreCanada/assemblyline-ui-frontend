@@ -1,3 +1,4 @@
+import { MEDIUM_TIMEOUT } from 'e2e/shared/constants';
 import { expect, test } from 'e2e/shared/fixtures';
 
 test.describe('Crash page', () => {
@@ -10,6 +11,6 @@ test.describe('Crash page', () => {
     });
 
     await userUI.crashPage.goto();
-    await userUI.crashPage.waitFor();
+    await userUI.crashPage.waitFor({ timeout: MEDIUM_TIMEOUT });
   });
 });

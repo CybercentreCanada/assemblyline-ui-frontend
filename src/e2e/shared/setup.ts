@@ -39,7 +39,7 @@ test.describe('Authentication setup', () => {
     await test.step(`Check if ${username} is already authenticated`, async () => {
       await submitPage.goto();
 
-      if (await loginPage.isVisible({ timeout: 3_000 })) {
+      if (await loginPage.isVisible()) {
         // Not logged in → perform login
         await loginPage.login(username, password);
         await submitPage.waitFor({ state: 'visible' });

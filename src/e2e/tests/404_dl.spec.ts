@@ -1,3 +1,4 @@
+import { MEDIUM_TIMEOUT } from 'e2e/shared/constants';
 import { test } from 'e2e/shared/fixtures';
 
 test.describe('Not Found page', () => {
@@ -7,6 +8,6 @@ test.describe('Not Found page', () => {
     void userUI.notFoundPage.monitorForError();
 
     await userUI.page.goto('/doesnt_exist');
-    await userUI.page.waitForTimeout(2_000);
+    await userUI.page.waitForTimeout(MEDIUM_TIMEOUT);
   });
 });

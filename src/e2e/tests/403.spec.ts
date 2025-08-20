@@ -1,3 +1,4 @@
+import { MEDIUM_TIMEOUT } from 'e2e/shared/constants';
 import { test } from 'e2e/shared/fixtures';
 
 test.describe('Forbidden page', () => {
@@ -7,6 +8,6 @@ test.describe('Forbidden page', () => {
     void userUI.forbiddenPage.monitorForError();
 
     await userUI.forbiddenPage.goto();
-    await userUI.page.waitForTimeout(2_000);
+    await userUI.page.waitForTimeout(MEDIUM_TIMEOUT);
   });
 });
