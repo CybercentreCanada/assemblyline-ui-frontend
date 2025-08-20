@@ -320,6 +320,7 @@ export const SpinnerInput = <T, P extends InputValues<T>>() => {
       event.preventDefault();
       focusInputIfNeeded();
       let nextValue = clamp(initialValue + delta);
+      const absDelta = Math.abs(delta);
       handleChange(event, nextValue ? String(nextValue) : null, nextValue);
 
       timeoutRef.current = setTimeout(() => {
@@ -327,7 +328,7 @@ export const SpinnerInput = <T, P extends InputValues<T>>() => {
           intervalRef.current = setInterval(() => {
             const rect = boxRef.current.getBoundingClientRect();
             const centerY = rect.top + rect.height / 2;
-            const stepDir = centerY > mouseYRef.current ? delta : -delta;
+            const stepDir = centerY > mouseYRef.current ? absDelta : -absDelta;
             nextValue = clamp(nextValue + stepDir);
             handleChange(event, nextValue ? String(nextValue) : null, nextValue);
           }, 50);
@@ -531,13 +532,13 @@ export const RequiredBadge = React.memo(
 
     const [get] = usePropStore<P>();
 
-    const required = get('required');
+    const badge = get('badge');
 
     return (
       <Badge
         color="error"
         variant="dot"
-        invisible={!required || ignoreRequired}
+        invisible={!badge || ignoreRequired}
         anchorOrigin={{
           vertical: 'top',
           horizontal: 'right'

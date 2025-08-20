@@ -1,6 +1,5 @@
 import StarIcon from '@mui/icons-material/Star';
 import { Chip, Grid, LinearProgress, useTheme } from '@mui/material';
-import InputAdornment from '@mui/material/InputAdornment';
 import useALContext from 'components/hooks/useALContext';
 import type { Service, ServiceConstants } from 'components/models/base/service';
 import { showReset } from 'components/routes/admin/service_detail/service.utils';
@@ -277,7 +276,7 @@ const ServiceGeneral = ({
               reset={showReset(service, defaults, 'min_instances')}
               min={0}
               {...(service.licence_count && { max: service.licence_count })}
-              endAdornment={<InputAdornment position="end">{'↓'}</InputAdornment>}
+              endAdornment="↓"
               error={val =>
                 val < 1 ? null : val >= 0 && val > service.licence_count ? t('general.instances.error') : null
               }
@@ -297,12 +296,12 @@ const ServiceGeneral = ({
               defaultValue={!service ? undefined : defaults?.licence_count || 0}
               reset={showReset(service, defaults, 'licence_count')}
               min={0}
-              endAdornment={<InputAdornment position="end">{'↑'}</InputAdornment>}
+              endAdornment="↑"
               onChange={(e, v) => {
                 setModified(true);
                 setService(s => ({
                   ...s,
-                  ...(!e.target.value
+                  ...(!v
                     ? { min_instances: 0, licence_count: 0 }
                     : { min_instances: Math.min(s.min_instances, v), licence_count: v })
                 }));
