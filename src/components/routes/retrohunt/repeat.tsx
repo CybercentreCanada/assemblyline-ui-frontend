@@ -53,7 +53,7 @@ function WrappedRetrohuntRepeat({ retrohunt = null, onRepeat = () => null }: Pro
 
   const handleRepeat = useCallback(
     () => {
-      if (!currentUser.roles.includes('retrohunt_run') && configuration?.retrohunt?.enabled) return;
+      if (!currentUser.roles.includes('retrohunt_run') || !configuration?.retrohunt?.enabled) return;
       apiCall({
         method: 'POST',
         url: `/api/v4/retrohunt/repeat/`,
