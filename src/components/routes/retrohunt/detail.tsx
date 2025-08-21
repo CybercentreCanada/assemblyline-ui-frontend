@@ -625,10 +625,11 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
                                   ) : (
                                     <span>
                                       <SearchCount
-                                        loading={isReloading}
-                                        total={hitResults?.total}
                                         currentMax={MAX_TRACKED_RECORDS}
                                         defaultMax={MAX_TRACKED_RECORDS}
+                                        disabled
+                                        loading={isReloading}
+                                        total={hitResults?.total}
                                         suffix={
                                           query.get('query') || query.get('filters')
                                             ? t(`hits.filtered${hitResults.total === 1 ? '' : 's'}`)
