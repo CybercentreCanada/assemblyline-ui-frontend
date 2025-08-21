@@ -28,6 +28,10 @@ export class NotFoundPage extends PageObjectModel {
     this.deadLinkText = page.getByText(`Looks like this 'Link' is dead...`, { exact: true });
   }
 
+  locators(): Locator[] {
+    return [this.deadLinkImage, this.deadLinkText];
+  }
+
   async waitForPage({ state = 'visible', timeout = 0 }: WaitForOptions = {}) {
     await Promise.all([this.deadLinkImage.waitFor({ state, timeout }), this.deadLinkText.waitFor({ state, timeout })]);
   }

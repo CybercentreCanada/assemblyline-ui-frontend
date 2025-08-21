@@ -1,6 +1,6 @@
-import type { Page } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
 import { LONG_TIMEOUT, MEDIUM_TIMEOUT } from 'e2e/shared/constants';
-import { test } from 'e2e/shared/fixtures';
+import { expect, test } from 'e2e/shared/fixtures';
 import type { PlaywrightArgs, WaitForOptions } from 'e2e/shared/models';
 
 export abstract class PageObjectModel {
@@ -16,6 +16,8 @@ export abstract class PageObjectModel {
       await use(instance);
     };
   }
+
+  protected abstract locators(): Locator[];
 
   async usePage(page: Page) {
     this.page = page;
@@ -43,5 +45,11 @@ export abstract class PageObjectModel {
     } catch {
       return false;
     }
+  }
+
+  async expectToBeVisible({ timeout = MEDIUM_TIMEOUT }: WaitForOptions = {}) {
+    await test.step(`Expect the ${this.name} to become visible`, async () => {
+      await Promise.all(this.locators().map(locator => expect(locator).toBeVisible({ timeout })));
+    });
   }
 }

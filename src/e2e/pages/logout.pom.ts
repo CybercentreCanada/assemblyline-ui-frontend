@@ -15,6 +15,10 @@ export class LogoutPage extends PageObjectModel {
     this.signInButton = this.page.getByRole('button', { name: 'Sign in' });
   }
 
+  locators(): Locator[] {
+    return [this.usernameInput, this.passwordInput, this.signInButton];
+  }
+
   async logout(username: string, password: string) {
     test.info().project.use.baseURL;
     await test.step(`Filling in the "${username}" credentials`, async () => {

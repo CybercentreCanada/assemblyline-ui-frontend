@@ -20,6 +20,10 @@ export class SubmitPage extends PageObjectModel {
   //   };
   // };
 
+  locators(): Locator[] {
+    return [this.bannerImage];
+  }
+
   async waitForPage({ state = 'visible', timeout = 0 }: WaitForOptions = {}) {
     await this.bannerImage.waitFor({ state, timeout });
   }

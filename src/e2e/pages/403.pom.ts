@@ -24,6 +24,10 @@ export class ForbiddenPage extends PageObjectModel {
     this.forbiddenMessage = page.getByText('You are not allowed to view this page...', { exact: true });
   }
 
+  locators(): Locator[] {
+    return [this.forbiddenTitle, this.forbiddenMessage];
+  }
+
   async waitForPage({ state = 'visible', timeout = 0 }: WaitForOptions = {}) {
     await Promise.all([
       this.forbiddenTitle.waitFor({ state, timeout }),

@@ -27,6 +27,10 @@ export class TermsOfServicePage extends PageObjectModel {
     this.logoutButton = page.getByRole('button', { name: 'Logout', exact: true });
   }
 
+  locators(): Locator[] {
+    return [this.header];
+  }
+
   async waitForPage({ state = 'visible', timeout = 0 }: WaitForOptions = {}) {
     await Promise.all([this.header.waitFor({ state, timeout })]);
   }
@@ -35,7 +39,6 @@ export class TermsOfServicePage extends PageObjectModel {
     return await test.step(`Waiting for ${this.name} fallback to become ${state}`, async () => {
       try {
         await this.waitForPage({ state, timeout });
-        console.log('we saw it');
         throw new TermsOfServicesError(true);
       } catch (err) {
         if (err instanceof TermsOfServicesError) {

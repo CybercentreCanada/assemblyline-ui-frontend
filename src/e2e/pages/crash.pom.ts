@@ -25,6 +25,10 @@ export class CrashPage extends PageObjectModel {
     this.errorStack = this.errorFallback.locator('[data-testid="error-stack"]');
   }
 
+  locators(): Locator[] {
+    return [this.errorFallback, this.errorMessage];
+  }
+
   async waitForPage({ state = 'visible', timeout = 0 }: WaitForOptions = {}) {
     await this.errorFallback.waitFor({ state, timeout });
   }
