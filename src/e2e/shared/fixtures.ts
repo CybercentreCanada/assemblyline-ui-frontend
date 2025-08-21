@@ -6,6 +6,7 @@ import { NotFoundPage } from 'e2e/pages/404_dl.pom';
 import { CrashPage } from 'e2e/pages/crash.pom';
 import { LoginPage } from 'e2e/pages/login.pom';
 import { SubmitPage } from 'e2e/pages/submit.pom';
+import { TermsOfServicePage } from 'e2e/pages/tos.pom';
 import { RESULTS_DIR } from 'e2e/shared/constants';
 import type { PlaywrightArgs } from 'e2e/shared/models';
 import path from 'path';
@@ -19,6 +20,7 @@ type UserInterface = {
   crashPage: CrashPage;
   forbiddenPage: ForbiddenPage;
   notFoundPage: NotFoundPage;
+  tosPage: TermsOfServicePage;
 
   // Pages
   loginPage: LoginPage;
@@ -44,7 +46,8 @@ async function setupBundle({ browser, browserName, user }: SetupBundle): Promise
     forbiddenPage: new ForbiddenPage(page),
     notFoundPage: new NotFoundPage(page),
     loginPage: new LoginPage(page),
-    submitPage: new SubmitPage(page)
+    submitPage: new SubmitPage(page),
+    tosPage: new TermsOfServicePage(page)
   };
 }
 
