@@ -30,7 +30,7 @@ const WrappedSwitchInput = React.memo(() => {
   const tooltipProps = get('tooltipProps');
   const value = get('value');
 
-  const { handleClick, handleFocus, handleBlur } = useInputHandlers<SwitchInputProps>();
+  const { handleClick, handleFocus, handleBlur } = useInputHandlers<SwitchInputProps>(0);
 
   return (
     <Tooltip title={loading ? null : tooltip} {...tooltipProps}>

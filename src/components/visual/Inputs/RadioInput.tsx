@@ -41,7 +41,7 @@ const WrappedRadioInput = React.memo(<O extends readonly Option[]>() => {
   const readOnly = get('readOnly');
   const value = get('value');
 
-  const { handleChange, handleFocus, handleBlur } = useInputHandlers<RadioInputProps<O>>();
+  const { handleChange, handleFocus, handleBlur } = useInputHandlers<RadioInputProps<O>>(0);
 
   return (
     <StyledRoot>

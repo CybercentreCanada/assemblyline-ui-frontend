@@ -34,7 +34,7 @@ const WrappedCheckboxInput = React.memo(() => {
   const tooltipProps = get('tooltipProps');
   const value = get('value');
 
-  const { handleClick, handleFocus, handleBlur } = useInputHandlers<CheckboxInputProps>();
+  const { handleClick, handleFocus, handleBlur } = useInputHandlers<CheckboxInputProps>(0);
 
   return (
     <Tooltip title={loading ? null : tooltip} {...tooltipProps}>

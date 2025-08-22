@@ -54,7 +54,7 @@ const WrappedSelectInput = React.memo(<O extends readonly Option[]>() => {
 
   const [open, setOpen] = useState<boolean>(false);
 
-  const { handleChange, handleFocus, handleBlur } = useInputHandlers<SelectInputProps<O>>();
+  const { handleChange, handleFocus, handleBlur } = useInputHandlers<SelectInputProps<O>>(0);
 
   return (
     <StyledRoot>
