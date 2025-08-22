@@ -122,6 +122,7 @@ const WrappedSelectInput = React.memo(<O extends readonly Option[]>() => {
                   aria-label={`${id}-select-menu`}
                   color="secondary"
                   type="button"
+                  tabIndex={-1}
                   onClick={() => setOpen(true)}
                   {...resetProps}
                   sx={{
