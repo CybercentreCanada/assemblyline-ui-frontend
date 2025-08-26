@@ -1,7 +1,11 @@
 import type { InputProps, InputStates } from 'components/visual/Inputs/lib/inputs.model';
-import { DEFAULT_INPUT_PROPS, DEFAULT_INPUT_STATES } from 'components/visual/Inputs/lib/inputs.model';
+import {
+  DEFAULT_INPUT_PROPS,
+  DEFAULT_INPUT_STATES,
+  DEFAULT_INPUT_VALUES
+} from 'components/visual/Inputs/lib/inputs.model';
 import { shallowEqual, shallowReconcile } from 'components/visual/Inputs/lib/inputs.utils';
-import { createContext, useContext, useEffect, useRef, useSyncExternalStore } from 'react';
+import React, { createContext, useContext, useEffect, useRef, useSyncExternalStore } from 'react';
 
 export const createPropContext = <Props extends object>(initialProps: Props) => {
   const createPropStore = () => {
@@ -40,26 +44,22 @@ export const createPropContext = <Props extends object>(initialProps: Props) => 
 
   const PropContext = createContext<ReturnType<typeof createPropStore> | null>(null);
 
-  const PropProvider = <Data extends object>({
-    children,
-    props
-  }: {
-    children: React.ReactNode;
-    props: Data & Props;
-  }) => {
-    const storeRef = useRef<ReturnType<typeof createPropStore> | null>(null);
+  const PropProvider = React.memo(
+    <Data extends object>({ children, props }: { children: React.ReactNode; props: Data & Props }) => {
+      const storeRef = useRef<ReturnType<typeof createPropStore> | null>(null);
 
-    if (!storeRef.current) {
-      storeRef.current = createPropStore();
-      storeRef.current.reset<Data>(props);
+      if (!storeRef.current) {
+        storeRef.current = createPropStore();
+        storeRef.current.reset<Data>(props);
+      }
+
+      useEffect(() => {
+        storeRef.current.reset<Data>(props);
+      }, [props]);
+
+      return <PropContext.Provider value={storeRef.current}>{children}</PropContext.Provider>;
     }
-
-    useEffect(() => {
-      storeRef.current.reset<Data>(props);
-    }, [props]);
-
-    return <PropContext.Provider value={storeRef.current}>{children}</PropContext.Provider>;
-  };
+  ) as <Data extends object>(props: { children: React.ReactNode; props: Data & Props }) => React.ReactNode;
 
   const usePropStore = <Data extends object>() => {
     const store = useContext(PropContext);
@@ -94,6 +94,7 @@ export const createPropContext = <Props extends object>(initialProps: Props) => 
 };
 
 export const { PropProvider, usePropStore } = createPropContext<InputProps & InputStates>({
+  ...DEFAULT_INPUT_VALUES,
   ...DEFAULT_INPUT_PROPS,
   ...DEFAULT_INPUT_STATES
 });

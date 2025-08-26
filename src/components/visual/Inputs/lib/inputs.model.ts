@@ -17,6 +17,14 @@ export type InputValues<Value, InputValue = Value, Event = React.SyntheticEvent>
    */
   inputValue?: InputValue;
 
+  // parser?: (inputValue: InputValue) => InputValue;
+
+  /**
+   * If `true`, shows a reset/clear button
+   * @default false
+   */
+  reset?: boolean | ((value: Value, inputValue: InputValue) => boolean);
+
   /**
    * Validation function that returns an error message string
    * when the value is invalid
@@ -31,6 +39,21 @@ export type InputValues<Value, InputValue = Value, Event = React.SyntheticEvent>
    * @param other Additional arguments
    */
   onChange?: (event: Event, value: Value, ...other: unknown[]) => void;
+
+  /**
+   * Callback fired when the reset button is clicked
+   */
+  onReset?: IconButtonProps['onClick'];
+};
+
+export const DEFAULT_INPUT_VALUES: InputValues<unknown, unknown> = {
+  defaultValue: null,
+  error: () => null,
+  inputValue: null,
+  reset: () => false,
+  value: null,
+  onChange: () => null,
+  onReset: () => null
 };
 
 export type InputProps = {
@@ -158,12 +181,6 @@ export type InputProps = {
   required?: boolean;
 
   /**
-   * If `true`, shows a reset/clear button
-   * @default false
-   */
-  reset?: boolean;
-
-  /**
    * Props applied to the reset button
    */
   resetProps?: IconButtonProps;
@@ -213,11 +230,6 @@ export type InputProps = {
    * Callback fired when the input gains focus
    */
   onFocus?: (event: React.SyntheticEvent | Event) => void;
-
-  /**
-   * Callback fired when the reset button is clicked
-   */
-  onReset?: IconButtonProps['onClick'];
 };
 
 export const DEFAULT_INPUT_PROPS: InputProps = {
@@ -243,7 +255,6 @@ export const DEFAULT_INPUT_PROPS: InputProps = {
   preventRender: false,
   readOnly: false,
   required: false,
-  reset: false,
   resetProps: null,
   rootProps: null,
   startAdornment: null,
@@ -254,15 +265,15 @@ export const DEFAULT_INPUT_PROPS: InputProps = {
   onBlur: () => null,
   onError: () => null,
   onExpand: () => null,
-  onFocus: () => null,
-  onReset: null
+  onFocus: () => null
 };
 
 export type InputStates = {
   /**
-   * The current error message, if any
+   * If `true`, the clear adornment is visible
+   * @default false
    */
-  errorMsg?: string;
+  clearAdornment?: boolean;
 
   /**
    * If `true`, the input is focused
@@ -271,44 +282,21 @@ export type InputStates = {
   focused?: boolean;
 
   /**
-   * The current raw input value
-   */
-  inputValue?: unknown;
-
-  /**
-   * If `true`, prevents the expand button from rendering
-   * @default false
-   */
-  preventExpandRender?: boolean;
-
-  /**
-   * If `true`, prevents the password toggle button from rendering
-   * @default false
-   */
-  preventPasswordRender?: boolean;
-
-  /**
-   * If `true`, prevents the reset button from rendering
-   * @default false
-   */
-  preventResetRender?: boolean;
-
-  /**
-   * If `true`, prevents the loading spinner from rendering
-   * @default true
-   */
-  preventSpinnerRender?: boolean;
-
-  /**
    * If `true`, the password is visible
    * @default true
    */
   showPassword?: boolean;
+
+  /**
+   * If `true`, the spinner adornment is visible
+   * @default false
+   */
+  spinnerAdornment?: boolean;
 };
+
 export const DEFAULT_INPUT_STATES: InputStates = {
-  errorMsg: null,
+  clearAdornment: false,
   focused: false,
-  preventSpinnerRender: true,
-  showPassword: true
-  // inputValue: null
+  showPassword: true,
+  spinnerAdornment: false
 };

@@ -4,28 +4,28 @@ import { useTheme } from '@mui/material';
 import { useAppTheme } from 'commons/components/app/hooks';
 import {
   HelperText,
-  PasswordInput,
-  ResetInput,
+  PasswordAdornment,
+  ResetAdornment,
   StyledEndAdornmentBox,
   StyledFormControl,
   StyledFormLabel,
   StyledInputSkeleton,
   StyledRoot
 } from 'components/visual/Inputs/lib/inputs.components';
-import { useInputParsedProps } from 'components/visual/Inputs/lib/inputs.hook';
+import { useErrorMessage, useInputChange } from 'components/visual/Inputs/lib/inputs.hook';
 import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
 import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
-import React, { useCallback, useMemo } from 'react';
+import React, { useMemo } from 'react';
 
 export type JSONInputProps = InputValues<object> & InputProps;
 
-const WrappedJSONInput = React.memo(() => {
+const WrappedJSONInput = () => {
   const theme = useTheme();
   const { isDark: isDarkTheme } = useAppTheme();
-  const [get, setStore] = usePropStore<JSONInputProps>();
+  const [get] = usePropStore<JSONInputProps>();
 
   const disabled = get('disabled');
-  const errorMsg = get('errorMsg');
+  const errorMsg = useErrorMessage();
   const inputValue = get('inputValue') ?? null;
   const loading = get('loading');
   const monospace = get('monospace');
@@ -33,10 +33,6 @@ const WrappedJSONInput = React.memo(() => {
   const readOnly = get('readOnly');
   const showPassword = get('showPassword');
   const tiny = get('tiny');
-
-  const error = get('error');
-  const onChange = get('onChange');
-  const onError = get('onError');
 
   const jsonTheme = useMemo<ThemeObject>(
     () => ({
@@ -60,15 +56,7 @@ const WrappedJSONInput = React.memo(() => {
     [theme, isDarkTheme]
   );
 
-  const handleChange = useCallback(
-    (event: React.SyntheticEvent, newValue: object) => {
-      const err = error(newValue);
-      onError(err);
-      if (!err) onChange(event, newValue);
-      setStore(() => ({ ...(!err && { value: newValue }), inputValue: newValue, errorMsg: err }));
-    },
-    [error, onChange, onError, setStore]
-  );
+  const handleChange = useInputChange<JSONInputProps>();
 
   return (
     <StyledRoot>
@@ -98,17 +86,20 @@ const WrappedJSONInput = React.memo(() => {
                 onAdd={
                   disabled || readOnly
                     ? false
-                    : event => handleChange(event as unknown as React.SyntheticEvent, event.updated_src)
+                    : event =>
+                        handleChange(event as unknown as React.SyntheticEvent, event.updated_src, event.updated_src)
                 }
                 onDelete={
                   disabled || readOnly
                     ? false
-                    : event => handleChange(event as unknown as React.SyntheticEvent, event.updated_src)
+                    : event =>
+                        handleChange(event as unknown as React.SyntheticEvent, event.updated_src, event.updated_src)
                 }
                 onEdit={
                   disabled || readOnly
                     ? false
-                    : event => handleChange(event as unknown as React.SyntheticEvent, event.updated_src)
+                    : event =>
+                        handleChange(event as unknown as React.SyntheticEvent, event.updated_src, event.updated_src)
                 }
                 style={{
                   fontSize: '1rem',
@@ -127,8 +118,8 @@ const WrappedJSONInput = React.memo(() => {
                 }}
               />
               <StyledEndAdornmentBox>
-                <PasswordInput />
-                <ResetInput />
+                <PasswordAdornment />
+                <ResetAdornment />
               </StyledEndAdornmentBox>
             </div>
             <HelperText />
@@ -137,14 +128,11 @@ const WrappedJSONInput = React.memo(() => {
       </StyledFormControl>
     </StyledRoot>
   );
-});
+};
 
-export const JSONInput = ({ preventRender = false, ...props }: JSONInputProps) => {
-  const parsedProps = useInputParsedProps<object, object, JSONInputProps>({ ...props, preventRender });
-
-  return preventRender ? null : (
-    <PropProvider<JSONInputProps> props={parsedProps}>
+export const JSONInput = ({ preventRender = false, value, ...props }: JSONInputProps) =>
+  preventRender ? null : (
+    <PropProvider<JSONInputProps> props={{ preventRender, value, inputValue: value, ...props }}>
       <WrappedJSONInput />
     </PropProvider>
   );
-};

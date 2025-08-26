@@ -7,7 +7,7 @@ import {
   StyledRoot,
   StyledTextField
 } from 'components/visual/Inputs/lib/inputs.components';
-import { useInputHandlers, useInputParsedProps } from 'components/visual/Inputs/lib/inputs.hook';
+import { useInputBlur, useInputChange, useInputFocus } from 'components/visual/Inputs/lib/inputs.hook';
 import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
 import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
 import React, { useEffect, useRef } from 'react';
@@ -20,7 +20,7 @@ export type NumberInputProps = InputValues<number, string, React.ChangeEvent<HTM
     step?: number;
   };
 
-const WrappedNumberInput = React.memo(() => {
+const WrappedNumberInput = () => {
   const [get] = usePropStore<NumberInputProps>();
 
   const inputValue = get('inputValue') ?? '';
@@ -28,27 +28,29 @@ const WrappedNumberInput = React.memo(() => {
   const max = get('max');
   const min = get('min');
   const step = get('step');
-  const value = get('value');
 
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const { handleChange, handleFocus, handleBlur } = useInputHandlers<NumberInputProps>();
+  const handleBlur = useInputBlur<NumberInputProps>();
+  const handleChange = useInputChange<NumberInputProps>();
+  const handleFocus = useInputFocus<NumberInputProps>();
 
   useEffect(() => {
     const el = inputRef.current;
     if (!el) return;
 
-    const onWheel = (e: WheelEvent) => {
+    const handleWheel = (e: WheelEvent) => {
       if (document.activeElement === el) {
         e.preventDefault();
       }
     };
 
-    el.addEventListener('wheel', onWheel, { passive: false });
+    el.addEventListener('wheel', handleWheel, { passive: false });
+
     return () => {
-      el.removeEventListener('wheel', onWheel);
+      el.removeEventListener('wheel', handleWheel);
     };
-  }, []);
+  }, [inputRef]);
 
   return (
     <StyledRoot>
@@ -64,7 +66,7 @@ const WrappedNumberInput = React.memo(() => {
               value={inputValue}
               onChange={e => handleChange(e, e.target.value, e.target.value !== '' ? Number(e.target.value) : null)}
               onFocus={handleFocus}
-              onBlur={e => handleBlur(e, value == null ? '' : String(value))}
+              onBlur={e => handleBlur(e)}
               slotProps={{
                 input: {
                   inputProps: {
@@ -81,32 +83,23 @@ const WrappedNumberInput = React.memo(() => {
       </StyledFormControl>
     </StyledRoot>
   );
-});
+};
 
-export const NumberInput = ({
-  autoComplete = 'off',
-  max = null,
-  min = null,
-  step = 1,
-  preventRender = false,
-  value,
-  ...props
-}: NumberInputProps) => {
-  const parsedProps = useInputParsedProps<number, string, NumberInputProps>({
-    ...props,
-    autoComplete,
-    max,
-    min,
-    preventRender,
-    step,
-    value
-  });
-
-  return preventRender ? null : (
+export const NumberInput = ({ preventRender = false, value, ...props }: NumberInputProps) =>
+  preventRender ? null : (
     <PropProvider<NumberInputProps>
-      props={{ ...parsedProps, inputValue: value == null ? '' : String(value), preventSpinnerRender: false }}
+      props={{
+        autoComplete: 'off',
+        inputValue: value == null ? '' : String(value),
+        max: null,
+        min: null,
+        preventRender,
+        spinnerAdornment: true,
+        step: 1,
+        value,
+        ...props
+      }}
     >
       <WrappedNumberInput />
     </PropProvider>
   );
-};

@@ -143,6 +143,7 @@ export type InputsLibraryState = {
   inputs: {
     name: string;
     state: {
+      badge: boolean;
       disabled: boolean;
       endAdornment: boolean;
       error: boolean;
@@ -180,6 +181,7 @@ export const INPUTS_LIBRARY_STATE: InputsLibraryState = {
   inputs: {
     name: 'Inputs',
     state: {
+      badge: false,
       disabled: false,
       endAdornment: false,
       error: false,
@@ -3407,7 +3409,8 @@ export const InputsSection = React.memo(() => {
               state.values.components.inputs.state.password,
               state.values.components.inputs.state.longname,
               state.values.components.inputs.state.overflowHidden,
-              state.values.components.inputs.state.required
+              state.values.components.inputs.state.required,
+              state.values.components.inputs.state.badge
             ]}
             children={([
               disabled,
@@ -3424,7 +3427,8 @@ export const InputsSection = React.memo(() => {
               password,
               longname,
               overflowHidden,
-              required
+              required,
+              badge
             ]) => (
               <>
                 <form.Subscribe
@@ -3457,6 +3461,7 @@ export const InputsSection = React.memo(() => {
                         label:
                           'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc.'
                       })}
+                      {...(badge && { badge: true })}
                     />
                   )}
                 />
@@ -3490,6 +3495,7 @@ export const InputsSection = React.memo(() => {
                         label:
                           'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc.'
                       })}
+                      {...(badge && { badge: true })}
                     />
                   )}
                 />
@@ -3523,6 +3529,7 @@ export const InputsSection = React.memo(() => {
                         label:
                           'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc.'
                       })}
+                      {...(badge && { badge: true })}
                     />
                   )}
                 />
@@ -3557,6 +3564,7 @@ export const InputsSection = React.memo(() => {
                         label:
                           'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc.'
                       })}
+                      {...(badge && { badge: true })}
                     />
                   )}
                 />
@@ -3590,6 +3598,7 @@ export const InputsSection = React.memo(() => {
                         label:
                           'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc.'
                       })}
+                      {...(badge && { badge: true })}
                     />
                   )}
                 />
@@ -3623,6 +3632,7 @@ export const InputsSection = React.memo(() => {
                         label:
                           'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc.'
                       })}
+                      {...(badge && { badge: true })}
                     />
                   )}
                 />
@@ -3657,6 +3667,7 @@ export const InputsSection = React.memo(() => {
                         label:
                           'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc.'
                       })}
+                      {...(badge && { badge: true })}
                     />
                   )}
                 />
@@ -3690,6 +3701,7 @@ export const InputsSection = React.memo(() => {
                         label:
                           'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc.'
                       })}
+                      {...(badge && { badge: true })}
                     />
                   )}
                 />
@@ -3723,6 +3735,7 @@ export const InputsSection = React.memo(() => {
                         label:
                           'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc.'
                       })}
+                      {...(badge && { badge: true })}
                     />
                   )}
                 />
@@ -3756,6 +3769,7 @@ export const InputsSection = React.memo(() => {
                         label:
                           'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc.'
                       })}
+                      {...(badge && { badge: true })}
                     />
                   )}
                 />
@@ -3790,6 +3804,7 @@ export const InputsSection = React.memo(() => {
                         label:
                           'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc.'
                       })}
+                      {...(badge && { badge: true })}
                     />
                   )}
                 />
@@ -3823,6 +3838,7 @@ export const InputsSection = React.memo(() => {
                         label:
                           'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc.'
                       })}
+                      {...(badge && { badge: true })}
                     />
                   )}
                 />
@@ -3979,6 +3995,16 @@ export const InputsSection = React.memo(() => {
                   label="Required"
                   value={value}
                   onChange={(event, next) => form.setFieldValue('components.inputs.state.required', next)}
+                />
+              )}
+            />
+            <form.Subscribe
+              selector={state => state.values.components.inputs.state.badge}
+              children={value => (
+                <CheckboxInput
+                  label="Badge"
+                  value={value}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.state.badge', next)}
                 />
               )}
             />

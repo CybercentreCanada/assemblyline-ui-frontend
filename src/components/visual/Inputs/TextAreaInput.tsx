@@ -7,7 +7,7 @@ import {
   StyledRoot,
   StyledTextField
 } from 'components/visual/Inputs/lib/inputs.components';
-import { useInputHandlers, useInputParsedProps } from 'components/visual/Inputs/lib/inputs.hook';
+import { useInputBlur, useInputChange, useInputFocus } from 'components/visual/Inputs/lib/inputs.hook';
 import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
 import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
 import React from 'react';
@@ -22,7 +22,7 @@ export type TextAreaInputProps = InputValues<
     rows?: TextFieldProps['rows'];
   };
 
-const WrappedTextAreaInput = React.memo(() => {
+const WrappedTextAreaInput = () => {
   const [get] = usePropStore<TextAreaInputProps>();
 
   const autoComplete = get('autoComplete');
@@ -33,9 +33,10 @@ const WrappedTextAreaInput = React.memo(() => {
   const rows = get('rows');
   const showPassword = get('showPassword');
   const tiny = get('tiny');
-  const value = get('value');
 
-  const { handleChange, handleFocus, handleBlur } = useInputHandlers<TextAreaInputProps>();
+  const handleBlur = useInputBlur<TextAreaInputProps>();
+  const handleChange = useInputChange<TextAreaInputProps>();
+  const handleFocus = useInputFocus<TextAreaInputProps>();
 
   return (
     <StyledRoot>
@@ -57,7 +58,7 @@ const WrappedTextAreaInput = React.memo(() => {
               value={inputValue}
               onChange={e => handleChange(e, e.target.value, e.target.value)}
               onFocus={handleFocus}
-              onBlur={e => handleBlur(e, value)}
+              onBlur={e => handleBlur(e)}
             />
             <HelperText />
           </>
@@ -65,23 +66,13 @@ const WrappedTextAreaInput = React.memo(() => {
       </StyledFormControl>
     </StyledRoot>
   );
-});
+};
 
-export const TextAreaInput = ({
-  autoComplete = 'off',
-  rows = 1,
-  preventRender = false,
-  ...props
-}: TextAreaInputProps) => {
-  const parsedProps = useInputParsedProps<string, string, TextAreaInputProps>({
-    ...props,
-    autoComplete,
-    preventRender,
-    rows
-  });
-
+export const TextAreaInput = ({ preventRender = false, value, ...props }: TextAreaInputProps) => {
   return preventRender ? null : (
-    <PropProvider<TextAreaInputProps> props={parsedProps}>
+    <PropProvider<TextAreaInputProps>
+      props={{ autoComplete: 'off', rows: 1, preventRender, value, inputValue: value, ...props }}
+    >
       <WrappedTextAreaInput />
     </PropProvider>
   );

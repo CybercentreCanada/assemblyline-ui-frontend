@@ -1,30 +1,68 @@
 import type { InputProps, InputStates, InputValues } from 'components/visual/Inputs/lib/inputs.model';
-import { DEFAULT_INPUT_PROPS, DEFAULT_INPUT_STATES } from 'components/visual/Inputs/lib/inputs.model';
 import { usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
 import { isValidNumber, isValidValue } from 'components/visual/Inputs/lib/inputs.utils';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useRef, useTransition } from 'react';
 import { useTranslation } from 'react-i18next';
 
-export const useDefaultError = () => null;
+export const usePropLabel = () => {
+  const [get] = usePropStore();
 
-export const useDefaultHandlers = () => ({
-  handleClick: () => null,
-  handleChange: () => null,
-  handleFocus: () => null,
-  handleBlur: () => null
-});
+  const label = get('label');
 
-export function useInputParsedProps<
-  Value,
-  InputValue,
-  Props extends InputValues<Value, InputValue> & InputProps & { min?: number; max?: number }
->(props: Props) {
+  return label ?? '\u00A0';
+};
+
+export const usePropID = () => {
+  const [get] = usePropStore();
+
+  const id = get('id');
+  const label = get('label');
+
+  return (id ?? typeof label === 'string') ? label.toLowerCase().replaceAll(' ', '-') : '\u00A0';
+};
+
+export const usePreventExpandRender = () => {
+  const [get] = usePropStore();
+
+  const expand = get('expand');
+
+  return expand === null;
+};
+
+export const usePreventPasswordRender = () => {
+  const [get] = usePropStore();
+
+  const disabled = get('disabled');
+  const loading = get('loading');
+  const readOnly = get('readOnly');
+  const password = get('password');
+
+  return loading || disabled || readOnly || !password;
+};
+
+export const usePreventResetRender = () => {
+  const [get] = usePropStore<InputValues<unknown, unknown>>();
+
+  const disabled = get('disabled');
+  const inputValue = get('inputValue');
+  const loading = get('loading');
+  const readOnly = get('readOnly');
+  const reset = get('reset');
+  const value = get('value');
+
+  return loading || disabled || readOnly || !(typeof reset === 'function' ? reset(value, inputValue) : reset);
+};
+
+export const useError = <Value extends unknown = unknown>() => {
   const { t } = useTranslation('inputs');
+  const [get] = usePropStore<InputValues<unknown, unknown> & { min?: number; max?: number }>();
 
-  const mergedProps = { ...DEFAULT_INPUT_PROPS, ...DEFAULT_INPUT_STATES, ...props };
-  const { min, max, required, error = () => '' } = mergedProps;
+  const error = get('error');
+  const max = get('max');
+  const min = get('min');
+  const required = get('required');
 
-  const validateError = useCallback(
+  return useCallback(
     (val: Value): string => {
       const err = error(val);
       if (err) return err;
@@ -45,89 +83,109 @@ export function useInputParsedProps<
     },
     [error, min, max, required, t]
   );
+};
 
-  return {
-    ...props,
-    error: validateError,
-    errorMsg: validateError(mergedProps.value),
-    id:
-      mergedProps.id ??
-      (typeof mergedProps.label === 'string' ? mergedProps.label.toLowerCase().replaceAll(' ', '-') : '\u00A0'),
-    inputValue: mergedProps.value,
-    label: mergedProps.label ?? '\u00A0',
-    preventExpandRender: mergedProps.expand === null,
-    preventPasswordRender: mergedProps.loading || mergedProps.disabled || mergedProps.readOnly || !mergedProps.password,
-    preventResetRender: mergedProps.loading || mergedProps.disabled || mergedProps.readOnly || !mergedProps.reset
-  };
-}
+export const useErrorMessage = () => {
+  const [get] = usePropStore<InputValues<unknown, unknown>>();
 
-export function useInputHandlers<
+  const error = useError();
+  const value = get('value');
+
+  return error(value);
+};
+
+export const useInputClick = <
   Props extends InputValues<unknown, unknown> & InputProps & InputStates & Record<string, unknown>
->(debounceDelay = 100) {
+>() => {
   const [get, setStore] = usePropStore<InputValues<unknown, unknown>>();
-  const debounceTimer = useRef<NodeJS.Timeout | null>(null);
+
+  const [, startTransition] = useTransition();
+  const latestId = useRef<number>(0);
 
   const error = get('error');
-  const onBlur = get('onBlur');
   const onChange = get('onChange');
   const onError = get('onError');
-  const onFocus = get('onFocus');
 
-  useEffect(() => {
-    return () => {
-      if (debounceTimer.current) clearTimeout(debounceTimer.current);
-    };
-  }, []);
-
-  const handleClick = useCallback(
+  return useCallback(
     (event: Parameters<Props['onChange']>[0], inputValue: Props['inputValue'], value: Props['value']) => {
       event.preventDefault();
       event.stopPropagation();
 
       const err = error(value);
       onError(err);
-      if (!err) onChange(event, value);
-      setStore(() => ({ inputValue, errorMsg: err }));
+      onChange(event, value);
+      setStore({ inputValue, value });
+
+      const id = ++latestId.current;
+
+      startTransition(() => {
+        if (id === latestId.current) {
+          onChange(event, value);
+        }
+      });
     },
     [error, onChange, onError, setStore]
   );
+};
 
-  const handleChange = useCallback(
+export const useInputChange = <
+  Props extends InputValues<unknown, unknown> & InputProps & InputStates & Record<string, unknown>
+>() => {
+  const [get, setStore] = usePropStore<InputValues<unknown, unknown>>();
+
+  const [, startTransition] = useTransition();
+  const latestId = useRef<number>(0);
+
+  const error = useError();
+  const onChange = get('onChange');
+  const onError = get('onError');
+
+  return useCallback(
     (event: Parameters<Props['onChange']>[0], inputValue: Props['inputValue'], value: Props['value']) => {
       const err = error(value);
       onError(err);
+      setStore({ inputValue, value });
 
-      setStore(() => ({ ...(!err && { value }), inputValue, errorMsg: err }));
+      const id = ++latestId.current;
 
-      if (debounceTimer.current) clearTimeout(debounceTimer.current);
-
-      debounceTimer.current = setTimeout(() => {
-        if (!err) onChange(event, value);
-      }, debounceDelay);
+      startTransition(() => {
+        if (id === latestId.current) {
+          onChange(event, value);
+        }
+      });
     },
-    [error, onChange, onError, setStore, debounceDelay]
+    [error, onChange, onError, setStore]
   );
+};
 
-  const handleFocus = useCallback(
+export const useInputFocus = <
+  Props extends InputValues<unknown, unknown> & InputProps & InputStates & Record<string, unknown>
+>() => {
+  const [get, setStore] = usePropStore<InputValues<unknown, unknown>>();
+
+  const onFocus = get('onFocus');
+
+  return useCallback(
     (event: React.FocusEvent) => {
       onFocus(event);
-      setStore(s => ({
-        focused: !s.readOnly && !s.disabled && document.activeElement === event.target
-      }));
+      setStore(s => ({ focused: !s.readOnly && !s.disabled && document.activeElement === event.target }));
     },
     [onFocus, setStore]
   );
+};
 
-  const handleBlur = useCallback(
-    (event: React.FocusEvent, inputValue: Props['inputValue']) => {
+export const useInputBlur = <
+  Props extends InputValues<unknown, unknown> & InputProps & InputStates & Record<string, unknown>
+>() => {
+  const [get, setStore] = usePropStore();
+
+  const onBlur = get('onBlur');
+
+  return useCallback(
+    (event: React.FocusEvent) => {
       onBlur(event);
-      setStore(() => {
-        const err = error(inputValue);
-        return { focused: false, inputValue, errorMsg: err };
-      });
+      setStore(() => ({ focused: false }));
     },
-    [error, onBlur, setStore]
+    [onBlur, setStore]
   );
-
-  return { handleChange, handleClick, handleFocus, handleBlur };
-}
+};
