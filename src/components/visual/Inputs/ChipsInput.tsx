@@ -17,6 +17,7 @@ import React from 'react';
 
 export type ChipsInputProps = InputValues<string[], string[], React.SyntheticEvent<Element, Event>> &
   InputProps & {
+    allowEmptyStrings?: boolean;
     autoComplete?: TextFieldProps['autoComplete'];
     disableCloseOnSelect?: AutocompleteProps<string, true, false, true, ElementType>['disableCloseOnSelect'];
     filterSelectedOptions?: AutocompleteProps<string, true, false, true, ElementType>['filterSelectedOptions'];
@@ -29,6 +30,7 @@ export type ChipsInputProps = InputValues<string[], string[], React.SyntheticEve
 const WrappedChipsInput = () => {
   const [get] = usePropStore<ChipsInputProps>();
 
+  const allowEmptyStrings = get('allowEmptyStrings');
   const disableCloseOnSelect = get('disableCloseOnSelect');
   const disabled = get('disabled');
   const filterSelectedOptions = get('filterSelectedOptions');
@@ -72,10 +74,31 @@ const WrappedChipsInput = () => {
               ((values, getTagProps) =>
                 values.map((option, index) => {
                   const { key, ...tagProps } = getTagProps({ index });
-                  return <StyledCustomChip key={key} label={option} {...tagProps} />;
+                  return <StyledCustomChip key={key} label={option ? option : '\u00A0'} {...tagProps} />;
                 }))
             }
-            renderInput={params => <StyledTextField params={params} />}
+            renderInput={params => (
+              <StyledTextField
+                params={{
+                  ...params,
+                  inputProps: {
+                    ...params.inputProps,
+                    ...(allowEmptyStrings && {
+                      onKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => {
+                        if (event.key === 'Enter') {
+                          const current = (event.currentTarget as HTMLInputElement).value;
+                          if (current === '') {
+                            event.preventDefault();
+                            const next = Array.from(new Set([...(inputValue ?? []), '']));
+                            handleChange(event as any, next, next);
+                          }
+                        }
+                      }
+                    })
+                  }
+                }}
+              />
+            )}
             renderOption={renderOption}
             sx={{
               ...(readOnly &&
@@ -98,7 +121,9 @@ export const ChipsInput = ({ preventRender = false, value = [], ...props }: Chip
   preventRender ? null : (
     <PropProvider<ChipsInputProps>
       props={{
+        allowEmptyStrings: true,
         autoComplete: 'off',
+        clearAdornment: true,
         disableCloseOnSelect: false,
         filterSelectedOptions: false,
         inputValue: value,
@@ -107,7 +132,6 @@ export const ChipsInput = ({ preventRender = false, value = [], ...props }: Chip
         preventRender,
         renderOption: null,
         renderValue: null,
-        clearAdornment: true,
         value,
         ...props
       }}
