@@ -8,7 +8,7 @@ import {
   StyledRoot,
   StyledTextField
 } from 'components/visual/Inputs/lib/inputs.components';
-import { useInputBlur, useInputChange, useInputFocus } from 'components/visual/Inputs/lib/inputs.hook';
+import { useInputBlur, useInputChange, useInputFocus, usePropID } from 'components/visual/Inputs/lib/inputs.hook';
 import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
 import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
 import React from 'react';
@@ -23,10 +23,10 @@ const WrappedTextInput = () => {
   const [get] = usePropStore<TextInputProps>();
 
   const disabled = get('disabled');
-  const id = get('id');
+  const id = usePropID();
   const inputValue = get('inputValue') ?? '';
   const loading = get('loading');
-  const options = get('options');
+  const options = get('options') ?? [];
   const readOnly = get('readOnly');
   const tiny = get('tiny');
   const value = get('value') ?? '';

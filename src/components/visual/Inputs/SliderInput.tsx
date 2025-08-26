@@ -8,7 +8,13 @@ import {
   StyledInputSkeleton,
   StyledRoot
 } from 'components/visual/Inputs/lib/inputs.components';
-import { useErrorMessage, useInputBlur, useInputChange, useInputFocus } from 'components/visual/Inputs/lib/inputs.hook';
+import {
+  useErrorMessage,
+  useInputBlur,
+  useInputChange,
+  useInputFocus,
+  usePropID
+} from 'components/visual/Inputs/lib/inputs.hook';
 import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
 import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
 import React from 'react';
@@ -28,7 +34,7 @@ const WrappedSliderInput = () => {
 
   const disabled = get('disabled');
   const errorMsg = useErrorMessage();
-  const id = get('id');
+  const id = usePropID();
   const inputValue = get('inputValue') ?? null;
   const loading = get('loading');
   const marks = get('marks');

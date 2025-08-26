@@ -18,7 +18,7 @@ export const usePropID = () => {
   const id = get('id');
   const label = get('label');
 
-  return (id ?? typeof label === 'string') ? label.toLowerCase().replaceAll(' ', '-') : '\u00A0';
+  return id ?? (typeof label === 'string' ? label.toLowerCase().replaceAll(' ', '-') : '\u00A0');
 };
 
 export const usePreventExpandRender = () => {

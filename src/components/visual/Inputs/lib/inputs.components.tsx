@@ -41,7 +41,9 @@ import {
   useInputChange,
   usePreventExpandRender,
   usePreventPasswordRender,
-  usePreventResetRender
+  usePreventResetRender,
+  usePropID,
+  usePropLabel
 } from 'components/visual/Inputs/lib/inputs.hook';
 import type { InputValues } from 'components/visual/Inputs/lib/inputs.model';
 import { usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
@@ -145,7 +147,7 @@ export const ExpandAdornment = React.memo(() => {
 
   const expand = get('expand');
   const expandProps = get('expandProps');
-  const id = get('id');
+  const id = usePropID();
   const preventExpandRender = usePreventExpandRender();
   const onExpand = get('onExpand');
 
@@ -184,7 +186,7 @@ export const ClearAdornment = React.memo(() => {
   const clearAdornment = get('clearAdornment');
   const disabled = get('disabled');
   const expandProps = get('expandProps');
-  const id = get('id');
+  const id = usePropID();
   const inputValue = get('inputValue');
   const readOnly = get('readOnly');
   const tiny = get('tiny');
@@ -219,7 +221,7 @@ export const PasswordAdornment = React.memo(() => {
 
   const [get, setStore] = usePropStore();
 
-  const id = get('id');
+  const id = usePropID();
   const preventPasswordRender = usePreventPasswordRender();
   const resetProps = get('resetProps');
   const showPassword = get('showPassword');
@@ -249,7 +251,7 @@ export const ResetAdornment = React.memo(<T, P extends InputValues<T>>() => {
   const [get] = usePropStore<P>();
 
   const defaultValue = get('defaultValue');
-  const id = get('id');
+  const id = usePropID();
   const preventResetRender = usePreventResetRender();
   const resetProps = get('resetProps');
   const tiny = get('tiny');
@@ -299,7 +301,7 @@ export const SpinnerAdornment = <T, P extends InputValues<T>>() => {
 
   const disabled = get('disabled');
   const focused = get('focused');
-  const id = get('id');
+  const id = usePropID();
   const inputValue = Number(get('inputValue') ?? 0);
   const max = get('max');
   const min = get('min');
@@ -442,7 +444,7 @@ export const HelperText = React.memo(() => {
   const errorProps = get('errorProps');
   const helperText = get('helperText');
   const helperTextProps = get('helperTextProps');
-  const id = get('id');
+  const id = usePropID();
   const loading = get('loading');
   const readOnly = get('readOnly');
 
@@ -748,8 +750,8 @@ export const StyledFormLabel = React.memo(() => {
   const disabled = get('disabled');
   const errorMsg = useErrorMessage();
   const focused = get('focused');
-  const id = get('id');
-  const label = get('label');
+  const id = usePropID();
+  const label = usePropLabel();
   const labelProps = get('labelProps');
   const overflowHidden = get('overflowHidden');
   const preventDisabledColor = get('preventDisabledColor');
@@ -839,8 +841,8 @@ export const useTextInputSlot = (overrides?: Partial<TextFieldProps>) => {
   const disabled = get('disabled');
   const errorMsg = useErrorMessage();
   const helperText = get('helperText');
-  const id = get('id');
-  const label = get('label');
+  const id = usePropID();
+  const label = usePropLabel();
   const loading = get('loading');
   const monospace = get('monospace');
   const overflowHidden = get('overflowHidden');
@@ -1030,8 +1032,8 @@ export const StyledAutocomplete = <
 
   const autoComplete = get('autoComplete');
   const disabled = get('disabled');
-  const id = get('id');
-  const options = get('options');
+  const id = usePropID();
+  const options = get('options') ?? [];
   const readOnly = get('readOnly');
 
   return (

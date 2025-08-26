@@ -11,7 +11,13 @@ import {
   StyledListItemText,
   StyledRoot
 } from 'components/visual/Inputs/lib/inputs.components';
-import { useErrorMessage, useInputBlur, useInputChange, useInputFocus } from 'components/visual/Inputs/lib/inputs.hook';
+import {
+  useErrorMessage,
+  useInputBlur,
+  useInputChange,
+  useInputFocus,
+  usePropID
+} from 'components/visual/Inputs/lib/inputs.hook';
 import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
 import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
 import React, { useState } from 'react';
@@ -39,11 +45,11 @@ const WrappedSelectInput = <O extends readonly Option[]>() => {
   const displayEmpty = get('displayEmpty');
   const endAdornment = get('endAdornment');
   const errorMsg = useErrorMessage();
-  const id = get('id');
+  const id = usePropID();
   const inputValue = get('inputValue');
   const loading = get('loading');
   const monospace = get('monospace');
-  const options = get('options');
+  const options = get('options') ?? [];
   const overflowHidden = get('overflowHidden');
   const password = get('password');
   const readOnly = get('readOnly');

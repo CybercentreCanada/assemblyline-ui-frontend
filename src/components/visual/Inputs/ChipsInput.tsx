@@ -9,7 +9,7 @@ import {
   StyledRoot,
   StyledTextField
 } from 'components/visual/Inputs/lib/inputs.components';
-import { useInputBlur, useInputChange, useInputFocus } from 'components/visual/Inputs/lib/inputs.hook';
+import { useInputBlur, useInputChange, useInputFocus, usePropID } from 'components/visual/Inputs/lib/inputs.hook';
 import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
 import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
 import type { ElementType } from 'react';
@@ -32,11 +32,11 @@ const WrappedChipsInput = () => {
   const disableCloseOnSelect = get('disableCloseOnSelect');
   const disabled = get('disabled');
   const filterSelectedOptions = get('filterSelectedOptions');
-  const id = get('id');
+  const id = usePropID();
   const inputValue = get('inputValue') ?? [];
   const isOptionEqualToValue = get('isOptionEqualToValue');
   const loading = get('loading');
-  const options = get('options');
+  const options = get('options') ?? [];
   const readOnly = get('readOnly');
   const renderOption = get('renderOption');
   const renderValue = get('renderValue');
