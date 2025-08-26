@@ -64,13 +64,13 @@ export const SubmissionSection = React.memo(() => {
                   secondary={t('settings:submissions.ttl_desc')}
                   endAdornment={t('settings:submissions.ttl_days')}
                   value={value}
+                  defaultValue={defaultValue}
                   loading={loading}
                   disabled={disabled || (!customize && restricted)}
                   reset={defaultValue !== null && value !== defaultValue}
                   min={configuration.submission.max_dtl !== 0 ? 1 : 0}
                   max={configuration.submission.max_dtl !== 0 ? configuration.submission.max_dtl : 365}
                   onChange={(event, v) => form.setFieldValue(`settings.ttl.value`, v)}
-                  onReset={() => form.setFieldValue(`settings.ttl.value`, defaultValue)}
                   onBlur={() => {
                     if (value === null) {
                       form.setFieldValue(`settings.ttl.value`, defaultValue);
@@ -91,11 +91,11 @@ export const SubmissionSection = React.memo(() => {
                   primary={t('settings:submissions.deep_scan')}
                   secondary={t('settings:submissions.deep_scan_desc')}
                   value={value}
+                  defaultValue={defaultValue}
                   loading={loading}
                   disabled={disabled || (!customize && restricted)}
                   reset={defaultValue !== null && value !== defaultValue}
                   onChange={(event, v) => form.setFieldValue(`settings.deep_scan.value`, v)}
-                  onReset={() => form.setFieldValue(`settings.deep_scan.value`, defaultValue)}
                 />
               )}
             />
@@ -111,11 +111,11 @@ export const SubmissionSection = React.memo(() => {
                   primary={t('settings:submissions.ignore_recursion_prevention')}
                   secondary={t('settings:submissions.ignore_recursion_prevention_desc')}
                   value={value}
+                  defaultValue={defaultValue}
                   loading={loading}
                   disabled={disabled || (!customize && restricted)}
                   reset={defaultValue !== null && value !== defaultValue}
                   onChange={(event, v) => form.setFieldValue(`settings.ignore_recursion_prevention.value`, v)}
-                  onReset={() => form.setFieldValue(`settings.ignore_recursion_prevention.value`, defaultValue)}
                 />
               )}
             />
@@ -131,11 +131,11 @@ export const SubmissionSection = React.memo(() => {
                   primary={t('settings:submissions.ignore_filtering')}
                   secondary={t('settings:submissions.ignore_filtering_desc')}
                   value={value}
+                  defaultValue={defaultValue}
                   loading={loading}
                   disabled={disabled || (!customize && restricted)}
                   reset={defaultValue !== null && value !== defaultValue}
                   onChange={(event, v) => form.setFieldValue(`settings.ignore_filtering.value`, v)}
-                  onReset={() => form.setFieldValue(`settings.ignore_filtering.value`, defaultValue)}
                 />
               )}
             />
@@ -151,11 +151,11 @@ export const SubmissionSection = React.memo(() => {
                   primary={t('settings:submissions.generate_alert')}
                   secondary={t('settings:submissions.generate_alert_desc')}
                   value={value}
+                  defaultValue={defaultValue}
                   loading={loading}
                   disabled={disabled || (!customize && restricted)}
                   reset={defaultValue !== null && value !== defaultValue}
                   onChange={(event, v) => form.setFieldValue(`settings.generate_alert.value`, v)}
-                  onReset={() => form.setFieldValue(`settings.generate_alert.value`, defaultValue)}
                 />
               )}
             />
@@ -171,11 +171,11 @@ export const SubmissionSection = React.memo(() => {
                   primary={t('settings:submissions.ignore_cache')}
                   secondary={t('settings:submissions.ignore_cache_desc')}
                   value={value}
+                  defaultValue={defaultValue}
                   loading={loading}
                   disabled={disabled || (!customize && restricted)}
                   reset={defaultValue !== null && value !== defaultValue}
                   onChange={(event, v) => form.setFieldValue(`settings.ignore_cache.value`, v)}
-                  onReset={() => form.setFieldValue(`settings.ignore_cache.value`, defaultValue)}
                 />
               )}
             />
