@@ -149,7 +149,8 @@ const WrappedSelectInput = <O extends readonly Option[]>() => {
             }
             sx={{
               '&.MuiInputBase-root': {
-                paddingRight: '9px'
+                paddingRight: '9px',
+                ...(!tiny && { minHeight: '40px' })
               },
               '& .MuiSelect-select': {
                 padding: '8px 8px 8px 14px !important',
