@@ -3,7 +3,7 @@ import PageCenter from 'commons/components/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import type { Workflow } from 'components/models/base/workflow';
+import { PRIORITIES, STATUSES, type Workflow } from 'components/models/base/workflow';
 import ForbiddenPage from 'components/routes/403';
 import {
   DeleteWorkflowAction,
@@ -15,24 +15,14 @@ import {
 } from 'components/routes/manage/workflows/components/Actions';
 import { AlertHistogram, AlertResults } from 'components/routes/manage/workflows/components/Data';
 import Classification from 'components/visual/Classification';
-import CustomChip from 'components/visual/CustomChip';
+import { ChipsInput } from 'components/visual/Inputs/ChipsInput';
+import { SelectInput } from 'components/visual/Inputs/SelectInput';
+import { TextInput } from 'components/visual/Inputs/TextInput';
 import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import Moment from 'components/visual/Moment';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
-
-const CUSTOMCHIP_STYLES = {
-  borderRadius: '4px',
-  height: 'auto',
-  justifyContent: 'flex-start',
-  marginBottom: '4px',
-  marginTop: '8px',
-  minHeight: '40px',
-  overflow: 'auto',
-  textOverflow: 'initial',
-  whiteSpace: 'wrap'
-};
 
 type Params = {
   id: string;
@@ -116,85 +106,35 @@ const WrappedWorkflowDetail = ({ id: propID = null, onClose = null }: Props) => 
 
           <Grid container spacing={2}>
             <Grid size={{ xs: 12 }}>
-              <Typography variant="subtitle2">{t('name')}</Typography>
-              {!workflow ? (
-                <Skeleton style={{ height: '2.5rem' }} />
-              ) : (
-                <CustomChip
-                  label={<Typography variant="subtitle1">{workflow.name}</Typography>}
-                  fullWidth
-                  size="medium"
-                  type="rounded"
-                  variant="outlined"
-                  style={CUSTOMCHIP_STYLES}
-                />
-              )}
+              <TextInput label={t('name')} readOnly loading={!workflow} value={!workflow ? null : workflow.name} />
             </Grid>
+
             <Grid size={{ xs: 12 }}>
-              <Typography variant="subtitle2">{t('query')}</Typography>
-              {!workflow ? (
-                <Skeleton style={{ height: '2.5rem' }} />
-              ) : (
-                <CustomChip
-                  label={<Typography variant="subtitle1">{workflow.query}</Typography>}
-                  fullWidth
-                  size="medium"
-                  type="rounded"
-                  variant="outlined"
-                  style={CUSTOMCHIP_STYLES}
-                />
-              )}
+              <TextInput label={t('query')} readOnly loading={!workflow} value={!workflow ? null : workflow.query} />
             </Grid>
+
             <Grid size={{ xs: 12 }}>
-              <Typography variant="subtitle2">{t('labels')}</Typography>
-              {!workflow ? (
-                <Skeleton style={{ height: '2.5rem' }} />
-              ) : (
-                <CustomChip
-                  label={
-                    <div style={{ display: 'flex', gap: theme.spacing(1), padding: '9px 0px' }}>
-                      {workflow.labels.map((label, i) => (
-                        <CustomChip key={i} label={label} />
-                      ))}
-                    </div>
-                  }
-                  fullWidth
-                  size="medium"
-                  type="rounded"
-                  variant="outlined"
-                  style={CUSTOMCHIP_STYLES}
-                />
-              )}
+              <ChipsInput label={t('labels')} readOnly loading={!workflow} value={!workflow ? null : workflow.labels} />
             </Grid>
+
             <Grid size={{ xs: 12, sm: 6 }}>
-              <Typography variant="subtitle2">{t('priority')}</Typography>
-              {!workflow ? (
-                <Skeleton style={{ height: '2.5rem' }} />
-              ) : (
-                <CustomChip
-                  label={<Typography variant="subtitle1">{workflow.priority}</Typography>}
-                  fullWidth
-                  size="medium"
-                  type="rounded"
-                  variant="outlined"
-                  style={CUSTOMCHIP_STYLES}
-                />
-              )}
+              <SelectInput
+                label={t('priority')}
+                readOnly
+                loading={!workflow}
+                value={!workflow ? null : workflow.priority}
+                options={PRIORITIES.map(v => ({ primary: v, value: v }))}
+              />
             </Grid>
+
             <Grid size={{ xs: 12, sm: 6 }}>
-              <Typography variant="subtitle2">{t('status')}</Typography>
-              {!workflow ? (
-                <Skeleton style={{ height: '2.5rem' }} />
-              ) : (
-                <CustomChip
-                  label={<Typography variant="subtitle1">{workflow.status}</Typography>}
-                  fullWidth
-                  size="medium"
-                  type="rounded"
-                  variant="outlined"
-                  style={CUSTOMCHIP_STYLES}
-                />
-              )}
+              <SelectInput
+                label={t('status')}
+                readOnly
+                loading={!workflow}
+                value={!workflow ? null : workflow.status}
+                options={STATUSES.map(v => ({ primary: v, value: v }))}
+              />
             </Grid>
           </Grid>
 
