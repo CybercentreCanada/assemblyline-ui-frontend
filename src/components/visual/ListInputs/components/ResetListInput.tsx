@@ -24,7 +24,7 @@ export const ResetListInput: FC<ResetListInputProps> = ({
   onReset = null,
   ...buttonProps
 }) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation('inputs');
   const theme = useTheme();
 
   const title = useMemo<React.ReactNode>(

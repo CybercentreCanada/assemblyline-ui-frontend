@@ -199,7 +199,6 @@
   "related_external.error.maxClassification": "La classification dépasse le maximum autorisé pour cette source externe",
   "related_external.notfound": "Aucun lien externe trouvé",
   "related_external.title": "Résultats de recherche externes",
-  "reset_to": "réinitialiser à : ",
   "result": "résultat",
   "results": "résultats",
   "router_prompt_accept": "Annuler les modifications",
