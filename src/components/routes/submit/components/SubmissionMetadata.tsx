@@ -13,7 +13,6 @@ import { useForm } from 'components/routes/submit/submit.form';
 import { isValidMetadata } from 'components/routes/submit/submit.utils';
 import { Button } from 'components/visual/Buttons/Button';
 import { IconButton } from 'components/visual/Buttons/IconButton';
-import type { DateInputProps } from 'components/visual/Inputs/DateInput';
 import { DateInput } from 'components/visual/Inputs/DateInput';
 import type { NumberInputProps } from 'components/visual/Inputs/NumberInput';
 import { NumberInput } from 'components/visual/Inputs/NumberInput';
@@ -44,7 +43,7 @@ export const MetadataParam: React.FC<MetadataParamParam> = React.memo(
     const form = useForm();
     const { apiCall } = useMyAPI();
 
-    const [options, setOptions] = useState<string[]>([...new Set(metadata.suggestions)].sort());
+    const [options, setOptions] = useState([...new Set(metadata.suggestions)].sort());
 
     const handleValid = useCallback(
       (value: unknown): string => {
@@ -86,8 +85,8 @@ export const MetadataParam: React.FC<MetadataParamParam> = React.memo(
 
     const props = useMemo<unknown>(
       () => ({
-        id: `metadata-${name.replaceAll('_', ' ')}`,
-        label: `${name.replaceAll('_', ' ')}  [ ${metadata.validator_type.toUpperCase()} ]`,
+        id: `metadata-${name.replace('_', ' ')}`,
+        label: `${name.replace('_', ' ')}  [ ${metadata.validator_type.toUpperCase()} ]`,
         labelProps: { textTransform: 'capitalize' },
         disabled: disabled || !editing,
         loading: loading,
@@ -109,17 +108,28 @@ export const MetadataParam: React.FC<MetadataParamParam> = React.memo(
                 <SwitchInput {...(props as SwitchInputProps)} value={(value as boolean) || false} reset={!!value} />
               );
             case 'date':
-              return <DateInput {...(props as DateInputProps)} value={value as string} reset={!!value} />;
+              return (
+                <DateInput
+                  id={`metadata-${name.replace('_', ' ')}`}
+                  label={`${name.replace('_', ' ')}  [ ${metadata.validator_type.toUpperCase()} ]`}
+                  labelProps={{ textTransform: 'capitalize' }}
+                  value={value as string}
+                  loading={loading}
+                  disabled={disabled}
+                  reset={!!value}
+                  onChange={(event, v) => handleChange(v)}
+                  onReset={() => handleReset()}
+                />
+              );
             case 'enum':
               return (
                 <SelectInput
-                  {...(props as SelectInputProps<{ primary: string; value: string }[]>)}
+                  {...(props as SelectInputProps)}
                   value={(value as string) || ''}
                   options={(metadata.validator_params.values as string[])
                     .map(v => ({ primary: v.replaceAll('_', ' '), value: v }))
                     .sort()}
                   reset={!!value}
-                  capitalize
                 />
               );
             case 'integer':

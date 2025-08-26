@@ -1,16 +1,26 @@
 import StarIcon from '@mui/icons-material/Star';
-import { Chip, Grid, LinearProgress, useTheme } from '@mui/material';
+import {
+  Checkbox,
+  Chip,
+  FormControlLabel,
+  Grid,
+  LinearProgress,
+  MenuItem,
+  Radio,
+  RadioGroup,
+  Select,
+  Skeleton,
+  TextField,
+  Typography,
+  useTheme
+} from '@mui/material';
+import Autocomplete from '@mui/material/Autocomplete';
+import FormControl from '@mui/material/FormControl';
+import InputAdornment from '@mui/material/InputAdornment';
 import useALContext from 'components/hooks/useALContext';
 import type { Service, ServiceConstants } from 'components/models/base/service';
-import { showReset } from 'components/routes/admin/service_detail/service.utils';
-import { CheckboxInput } from 'components/visual/Inputs/CheckboxInput';
-import { ChipsInput } from 'components/visual/Inputs/ChipsInput';
-import { ClassificationInput } from 'components/visual/Inputs/ClassificationInput';
-import { NumberInput } from 'components/visual/Inputs/NumberInput';
-import { RadioInput } from 'components/visual/Inputs/RadioInput';
-import { SelectInput } from 'components/visual/Inputs/SelectInput';
-import { TextAreaInput } from 'components/visual/Inputs/TextAreaInput';
-import { TextInput } from 'components/visual/Inputs/TextInput';
+import ResetButton from 'components/routes/admin/service_detail/reset_button';
+import Classification from 'components/visual/Classification';
 import type { Dispatch, SetStateAction } from 'react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -68,302 +78,541 @@ const ServiceGeneral = ({
       <div>
         <Grid container spacing={2}>
           <Grid size={{ xs: 12, sm: 6 }}>
-            <TextInput label={t('general.name')} disabled loading={!service} value={!service ? null : service.name} />
+            <Typography variant="subtitle2">{t('general.name')}</Typography>
+            {service ? (
+              <TextField fullWidth size="small" margin="dense" variant="outlined" disabled value={service.name} />
+            ) : (
+              <Skeleton style={{ height: '2.5rem' }} />
+            )}
           </Grid>
-
           <Grid size={{ xs: 12, sm: 6 }}>
-            <SelectInput
-              label={t('general.version')}
-              loading={!service}
-              value={!service ? null : service.version}
-              defaultValue={!service ? undefined : defaults?.version}
-              reset={showReset(service, defaults, 'version')}
-              options={versions.map(v => ({ primary: v, value: v }))}
-              onChange={(e, v) => {
-                setModified(true);
-                setService(s => ({ ...s, version: v }));
-              }}
-            />
-            <CheckboxInput
-              label={t('general.auto_update')}
-              tiny
-              loading={!service}
-              value={!service ? null : service.auto_update}
-              defaultValue={!service ? undefined : defaults?.auto_update}
-              reset={showReset(service, defaults, 'auto_update')}
-              onChange={() => {
-                setModified(true);
-                setService(s => ({ ...s, auto_update: !s.auto_update }));
-              }}
-            />
-          </Grid>
-
-          {c12nDef.enforce && (
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <ClassificationInput
-                label={t('general.classification')}
-                loading={!service}
-                value={!service ? null : service.classification}
-                defaultValue={!service ? undefined : defaults?.classification}
-                reset={showReset(service, defaults, 'classification')}
-                onChange={(e, v) => {
+            <Typography variant="subtitle2">
+              {t('general.version')}
+              <ResetButton
+                service={service}
+                defaults={defaults}
+                field="version"
+                reset={() => {
                   setModified(true);
-                  setService(s => ({ ...s, classification: v }));
+                  setService(s => ({ ...s, version: defaults.version }));
                 }}
               />
-            </Grid>
-          )}
+            </Typography>
 
-          {c12nDef.enforce && (
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <ClassificationInput
-                label={t('general.result_classification')}
-                loading={!service}
-                value={!service ? null : service.default_result_classification}
-                defaultValue={!service ? undefined : defaults?.default_result_classification}
-                reset={showReset(service, defaults, 'default_result_classification')}
-                onChange={(e, v) => {
-                  setModified(true);
-                  setService(s => ({ ...s, default_result_classification: v }));
-                }}
-              />
-            </Grid>
-          )}
-
-          <Grid size={{ xs: 12 }}>
-            <TextAreaInput
-              label={t('general.description')}
-              loading={!service}
-              value={!service ? null : service.description}
-              defaultValue={!service ? undefined : defaults?.description}
-              reset={showReset(service, defaults, 'description')}
-              rows={6}
-              onChange={(e, v) => {
-                setModified(true);
-                setService(s => ({ ...s, description: v }));
-              }}
-            />
-          </Grid>
-
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <SelectInput
-              label={t('general.stage')}
-              loading={!service}
-              value={!service ? null : service.stage}
-              defaultValue={!service ? undefined : defaults?.stage}
-              reset={showReset(service, defaults, 'stage')}
-              options={
-                !constants
-                  ? [{ primary: service.stage, value: service.stage }]
-                  : constants.stages.map(s => ({ primary: s, value: s }))
-              }
-              onChange={(e, v) => {
-                setModified(true);
-                setService(s => ({ ...s, stage: v }));
-              }}
-            />
-          </Grid>
-
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <SelectInput
-              label={t('general.category')}
-              loading={!service}
-              value={!service ? null : service.category}
-              defaultValue={!service ? undefined : defaults?.category}
-              reset={showReset(service, defaults, 'category')}
-              options={
-                !constants
-                  ? [{ primary: service.category, value: service.category }]
-                  : constants.categories.map(s => ({ primary: s, value: s }))
-              }
-              onChange={(e, v) => {
-                setModified(true);
-                setService(s => ({ ...s, category: v }));
-              }}
-            />
-          </Grid>
-
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <TextInput
-              label={t('general.accept')}
-              loading={!service}
-              value={!service ? null : service.accepts}
-              defaultValue={!service ? undefined : defaults?.accepts}
-              reset={showReset(service, defaults, 'accepts')}
-              onChange={(e, v) => {
-                setModified(true);
-                setService(s => ({ ...s, accepts: v }));
-              }}
-            />
-          </Grid>
-
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <TextInput
-              label={t('general.reject')}
-              loading={!service}
-              value={!service ? null : service.rejects}
-              defaultValue={!service ? undefined : defaults?.rejects}
-              reset={showReset(service, defaults, 'rejects')}
-              onChange={(e, v) => {
-                setModified(true);
-                setService(s => ({ ...s, rejects: v }));
-              }}
-            />
-          </Grid>
-
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <ChipsInput
-              label={t('general.recursion_prevention')}
-              loading={!service}
-              value={!service ? null : service.recursion_prevention}
-              defaultValue={!service ? undefined : defaults?.recursion_prevention}
-              reset={showReset(service, defaults, 'recursion_prevention')}
-              options={[...constants.categories, ...serviceNames]}
-              isOptionEqualToValue={(option, value) => option.toUpperCase() === value.toUpperCase()}
-              disableCloseOnSelect
-              filterSelectedOptions
-              onChange={(e, v) => {
-                setModified(true);
-                setService(s => ({ ...s, recursion_prevention: v }));
-              }}
-              renderOption={(props, option, state) => (
-                <li {...props} key={`${option}-${state.index}`} style={{ columnGap: theme.spacing(1) }}>
-                  {constants.categories.includes(option as unknown as string) ? (
-                    <StarIcon fontSize="small" />
+            {service ? (
+              <FormControl size="small" fullWidth>
+                <Select
+                  id="version"
+                  fullWidth
+                  variant="outlined"
+                  style={{ marginTop: theme.spacing(1), marginBottom: theme.spacing(0.5) }}
+                  value={service.version}
+                  onChange={e => {
+                    setModified(true);
+                    setService(s => ({ ...s, version: e.target.value }));
+                  }}
+                >
+                  {versions ? (
+                    versions.map((v, i) => (
+                      <MenuItem key={i} value={v}>
+                        {v}
+                      </MenuItem>
+                    ))
                   ) : (
-                    <div style={{ width: '20px' }} />
+                    <MenuItem value={service.version}>{service.version}</MenuItem>
                   )}
-                  {option}
-                </li>
-              )}
-              renderValue={(values, getTagProps) =>
-                (values as unknown as string[]).map((value, index) => (
-                  <Chip
-                    {...getTagProps({ index })}
-                    key={index}
+                </Select>
+              </FormControl>
+            ) : (
+              <Skeleton style={{ height: '2.5rem' }} />
+            )}
+            <FormControlLabel
+              control={
+                <Checkbox
+                  size="small"
+                  checked={service.auto_update}
+                  name="label"
+                  onChange={e => {
+                    setModified(true);
+                    setService(s => ({ ...s, auto_update: !s.auto_update }));
+                  }}
+                />
+              }
+              label={<Typography variant="subtitle2">{t('general.auto_update')}</Typography>}
+            />
+          </Grid>
+          {c12nDef.enforce && (
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <Typography variant="subtitle2">
+                {t('general.classification')}
+                <ResetButton
+                  service={service}
+                  defaults={defaults}
+                  field="classification"
+                  reset={() => {
+                    setModified(true);
+                    setService(s => ({ ...s, classification: defaults.classification }));
+                  }}
+                />
+              </Typography>
+              <Classification
+                type="picker"
+                c12n={service ? service.classification : null}
+                setClassification={classification => {
+                  setModified(true);
+                  setService(s => ({ ...s, classification }));
+                }}
+              />
+            </Grid>
+          )}
+          {c12nDef.enforce && (
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <Typography variant="subtitle2">
+                {t('general.result_classification')}
+                <ResetButton
+                  service={service}
+                  defaults={defaults}
+                  field="default_result_classification"
+                  reset={() => {
+                    setModified(true);
+                    setService(s => ({ ...s, default_result_classification: defaults.default_result_classification }));
+                  }}
+                />
+              </Typography>
+              <Classification
+                type="picker"
+                c12n={service ? service.default_result_classification : null}
+                setClassification={c => {
+                  setModified(true);
+                  setService(s => ({ ...s, default_result_classification: c }));
+                }}
+              />
+            </Grid>
+          )}
+          <Grid size={{ xs: 12 }}>
+            <Typography variant="subtitle2">
+              {t('general.description')}
+              <ResetButton
+                service={service}
+                defaults={defaults}
+                field="description"
+                reset={() => {
+                  setModified(true);
+                  setService(s => ({ ...s, description: defaults.description }));
+                }}
+              />
+            </Typography>
+            {service ? (
+              <TextField
+                fullWidth
+                size="small"
+                multiline
+                rows={6}
+                margin="dense"
+                variant="outlined"
+                value={service.description}
+                onChange={e => {
+                  setModified(true);
+                  setService(s => ({ ...s, description: e.target.value }));
+                }}
+              />
+            ) : (
+              <Skeleton style={{ height: '2.5rem' }} />
+            )}
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <Typography variant="subtitle2">
+              {t('general.stage')}
+              <ResetButton
+                service={service}
+                defaults={defaults}
+                field="stage"
+                reset={() => {
+                  setModified(true);
+                  setService(s => ({ ...s, stage: defaults.stage }));
+                }}
+              />
+            </Typography>
+            {service ? (
+              <FormControl size="small" fullWidth>
+                <Select
+                  id="stage"
+                  fullWidth
+                  value={service.stage}
+                  variant="outlined"
+                  style={{ marginTop: theme.spacing(1), marginBottom: theme.spacing(0.5) }}
+                  onChange={e => {
+                    setModified(true);
+                    setService(s => ({ ...s, stage: e.target.value }));
+                  }}
+                >
+                  {constants ? (
+                    constants.stages.map((s, i) => (
+                      <MenuItem key={i} value={s}>
+                        {s}
+                      </MenuItem>
+                    ))
+                  ) : (
+                    <MenuItem value={service.stage}>{service.stage}</MenuItem>
+                  )}
+                </Select>
+              </FormControl>
+            ) : (
+              <Skeleton style={{ height: '2.5rem' }} />
+            )}
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <Typography variant="subtitle2">
+              {t('general.category')}
+              <ResetButton
+                service={service}
+                defaults={defaults}
+                field="category"
+                reset={() => {
+                  setModified(true);
+                  setService(s => ({ ...s, category: defaults.category }));
+                }}
+              />
+            </Typography>
+            {service ? (
+              <FormControl size="small" fullWidth>
+                <Select
+                  id="category"
+                  fullWidth
+                  value={service.category}
+                  variant="outlined"
+                  style={{ marginTop: theme.spacing(1), marginBottom: theme.spacing(0.5) }}
+                  onChange={e => {
+                    setModified(true);
+                    setService(s => ({ ...s, category: e.target.value }));
+                  }}
+                >
+                  {constants?.categories ? (
+                    constants.categories.map((c, i) => (
+                      <MenuItem key={i} value={c}>
+                        {c}
+                      </MenuItem>
+                    ))
+                  ) : (
+                    <MenuItem value={service.category}>{service.category}</MenuItem>
+                  )}
+                </Select>
+              </FormControl>
+            ) : (
+              <Skeleton style={{ height: '2.5rem' }} />
+            )}
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <Typography variant="subtitle2">
+              {t('general.accept')}
+              <ResetButton
+                service={service}
+                defaults={defaults}
+                field="accepts"
+                reset={() => {
+                  setModified(true);
+                  setService(s => ({ ...s, accepts: defaults.accepts }));
+                }}
+              />
+            </Typography>
+            {service ? (
+              <TextField
+                fullWidth
+                size="small"
+                margin="dense"
+                variant="outlined"
+                value={service.accepts}
+                onChange={e => {
+                  setModified(true);
+                  setService(s => ({ ...s, accepts: e.target.value }));
+                }}
+              />
+            ) : (
+              <Skeleton style={{ height: '2.5rem' }} />
+            )}
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <Typography variant="subtitle2">
+              {t('general.reject')}
+              <ResetButton
+                service={service}
+                defaults={defaults}
+                field="rejects"
+                reset={() => {
+                  setModified(true);
+                  setService(s => ({ ...s, rejects: defaults.rejects }));
+                }}
+              />
+            </Typography>
+            {service ? (
+              <TextField
+                fullWidth
+                size="small"
+                margin="dense"
+                variant="outlined"
+                onChange={e => {
+                  setModified(true);
+                  setService(s => ({ ...s, rejects: e.target.value }));
+                }}
+                value={service.rejects}
+              />
+            ) : (
+              <Skeleton style={{ height: '2.5rem' }} />
+            )}
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <Typography variant="subtitle2">
+              {t('general.recursion_prevention')}
+              <ResetButton
+                service={service}
+                defaults={{ recursion_prevention: [], ...defaults }}
+                field="recursion_prevention"
+                reset={() => {
+                  setModified(true);
+                  setService(s => ({ ...s, recursion_prevention: defaults?.recursion_prevention || [] }));
+                }}
+              />
+            </Typography>
+            {service ? (
+              <Autocomplete
+                fullWidth
+                multiple
+                freeSolo
+                size="small"
+                disableCloseOnSelect
+                filterSelectedOptions={true}
+                value={service.recursion_prevention}
+                options={[...constants.categories, ...serviceNames]}
+                isOptionEqualToValue={(option, value) => option.toUpperCase() === value.toUpperCase()}
+                onChange={(_e, values) => {
+                  setModified(true);
+                  setService(s => ({ ...s, recursion_prevention: [...values].sort() }));
+                }}
+                renderInput={params => <TextField size="small" margin="dense" {...params} variant="outlined" />}
+                renderOption={(props, option, state) => (
+                  <li {...props} key={`${option}-${state.index}`} style={{ columnGap: theme.spacing(1) }}>
+                    {constants.categories.includes(option) ? (
+                      <StarIcon fontSize="small" />
+                    ) : (
+                      <div style={{ width: '20px' }} />
+                    )}
+                    {option}
+                  </li>
+                )}
+                renderTags={(values, getTagProps) =>
+                  values.map((value, index) => (
+                    <Chip
+                      {...getTagProps({ index })}
+                      key={index}
+                      size="small"
+                      label={value}
+                      avatar={constants.categories.includes(value) ? <StarIcon fontSize="small" /> : null}
+                    />
+                  ))
+                }
+              />
+            ) : (
+              <Skeleton style={{ height: '2.5rem' }} />
+            )}
+          </Grid>
+
+          <Grid size={{ xs: 12, sm: 4 }}>
+            <Typography variant="subtitle2" noWrap>
+              {t('general.timeout')}
+              <ResetButton
+                service={service}
+                defaults={defaults}
+                field="timeout"
+                reset={() => {
+                  setModified(true);
+                  setService(s => ({ ...s, timeout: defaults.timeout }));
+                }}
+              />
+            </Typography>
+            {service ? (
+              <TextField
+                fullWidth
+                type="number"
+                margin="dense"
+                size="small"
+                variant="outlined"
+                InputProps={{ inputProps: { min: 5 } }}
+                value={service.timeout}
+                onChange={e => {
+                  setModified(true);
+                  setService(s => ({ ...s, timeout: Number(e.target.value) }));
+                }}
+              />
+            ) : (
+              <Skeleton style={{ height: '2.5rem' }} />
+            )}
+          </Grid>
+          <Grid size={{ xs: 12, sm: 4 }}>
+            <Typography variant="subtitle2" noWrap>
+              {t('general.instances')}
+              <ResetButton
+                service={service}
+                defaults={defaults}
+                field={['licence_count', 'min_instances']}
+                reset={() => {
+                  setModified(true);
+                  setService(s => ({
+                    ...s,
+                    licence_count: defaults.licence_count || 0,
+                    min_instances: defaults.min_instances || 0
+                  }));
+                }}
+              />
+            </Typography>
+            <Grid container spacing={theme.spacing(1)}>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                {service ? (
+                  <TextField
+                    fullWidth
+                    type="number"
+                    margin="dense"
                     size="small"
-                    label={value}
-                    avatar={constants.categories.includes(value) ? <StarIcon fontSize="small" /> : null}
+                    variant="outlined"
+                    placeholder={t('limit.system_default')}
+                    value={service.min_instances > 0 ? service.min_instances : ''}
+                    error={instancesError}
+                    InputProps={{
+                      inputProps: { min: 0, ...(service.licence_count && { max: service.licence_count }) },
+                      endAdornment: <InputAdornment position="end">↓</InputAdornment>
+                    }}
+                    onChange={e => {
+                      const value = Number(e.target.value);
+                      setModified(true);
+                      setService(s => ({
+                        ...s,
+                        min_instances: !e.target.value ? 0 : s.licence_count ? Math.min(s.licence_count, value) : value
+                      }));
+                    }}
                   />
-                ))
-              }
-            />
+                ) : (
+                  <Skeleton style={{ height: '2.5rem' }} />
+                )}
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                {service ? (
+                  <TextField
+                    fullWidth
+                    type="number"
+                    margin="dense"
+                    size="small"
+                    variant="outlined"
+                    value={service.licence_count > 0 ? service.licence_count : ''}
+                    placeholder={t('limit.none')}
+                    error={instancesError}
+                    InputProps={{
+                      inputProps: { min: 0 },
+                      endAdornment: <InputAdornment position="end">↑</InputAdornment>
+                    }}
+                    onChange={e => {
+                      const value = Number(e.target.value);
+                      setModified(true);
+                      setService(s => ({
+                        ...s,
+                        ...(!e.target.value
+                          ? { min_instances: 0, licence_count: 0 }
+                          : { min_instances: Math.min(s.min_instances, value), licence_count: value })
+                      }));
+                    }}
+                  />
+                ) : (
+                  <Skeleton style={{ height: '2.5rem' }} />
+                )}
+              </Grid>
+            </Grid>
           </Grid>
-
+          <Grid size={{ xs: 12, sm: 4 }}>
+            <Typography variant="subtitle2" noWrap>
+              {t('general.max_queue_length')}
+              <ResetButton
+                service={service}
+                defaults={defaults}
+                field="max_queue_length"
+                reset={() => {
+                  setModified(true);
+                  setService(s => ({ ...s, max_queue_length: defaults.max_queue_length }));
+                }}
+              />
+            </Typography>
+            {service ? (
+              <TextField
+                fullWidth
+                type="number"
+                margin="dense"
+                size="small"
+                variant="outlined"
+                placeholder={t('limit.none')}
+                value={service.max_queue_length > 0 ? service.max_queue_length : ''}
+                InputProps={{ inputProps: { min: 0 } }}
+                onChange={e => {
+                  setModified(true);
+                  setService(s => ({ ...s, max_queue_length: Number(e.target.value) }));
+                }}
+              />
+            ) : (
+              <Skeleton style={{ height: '2.5rem' }} />
+            )}
+            <Typography variant="caption">{t('general.max_queue_length.desc')}</Typography>
+          </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>
-            <NumberInput
-              label={t('general.timeout')}
-              loading={!service}
-              min={5}
-              required
-              value={!service ? null : service.timeout}
-              defaultValue={!service ? undefined : defaults?.timeout}
-              reset={showReset(service, defaults, 'timeout')}
-              onChange={(e, v) => {
-                setModified(true);
-                setService(s => ({ ...s, timeout: v }));
-              }}
-            />
+            <Typography variant="subtitle2">
+              {t('general.location')}
+              <ResetButton
+                service={service}
+                defaults={defaults}
+                field="is_external"
+                reset={() => {
+                  setModified(true);
+                  setService(s => ({ ...s, is_external: defaults.is_external }));
+                }}
+              />
+            </Typography>
+            {service ? (
+              <RadioGroup
+                value={service.is_external}
+                onChange={() => {
+                  setModified(true);
+                  setService(s => ({ ...s, is_external: !s.is_external }));
+                }}
+              >
+                <FormControlLabel value control={<Radio />} label={t('general.location.external')} />
+                <FormControlLabel value={false} control={<Radio />} label={t('general.location.internal')} />
+              </RadioGroup>
+            ) : (
+              <Skeleton style={{ height: '2.5rem' }} />
+            )}
           </Grid>
-
-          <Grid size={{ xs: 6, sm: 3 }}>
-            <NumberInput
-              label={t('general.instances')}
-              loading={!service}
-              placeholder={t('limit.system_default')}
-              value={!service ? null : service.min_instances > 0 ? service.min_instances : null}
-              defaultValue={!service ? undefined : defaults?.min_instances || 0}
-              reset={showReset(service, defaults, 'min_instances')}
-              min={0}
-              {...(service.licence_count && { max: service.licence_count })}
-              endAdornment="↓"
-              error={val =>
-                val < 1 ? null : val >= 0 && val > service.licence_count ? t('general.instances.error') : null
-              }
-              onChange={(e, v) => {
-                setModified(true);
-                setService(s => ({ ...s, min_instances: !v ? 0 : s.licence_count ? Math.min(s.licence_count, v) : v }));
-              }}
-            />
-          </Grid>
-
-          <Grid size={{ xs: 6, sm: 3 }}>
-            <NumberInput
-              id="licence_count"
-              loading={!service}
-              placeholder={t('limit.none')}
-              value={!service ? null : service.licence_count > 0 ? service.licence_count : null}
-              defaultValue={!service ? undefined : defaults?.licence_count || 0}
-              reset={showReset(service, defaults, 'licence_count')}
-              min={0}
-              endAdornment="↑"
-              onChange={(e, v) => {
-                setModified(true);
-                setService(s => ({
-                  ...s,
-                  ...(!v
-                    ? { min_instances: 0, licence_count: 0 }
-                    : { min_instances: Math.min(s.min_instances, v), licence_count: v })
-                }));
-              }}
-            />
-          </Grid>
-
           <Grid size={{ xs: 12, sm: 6 }}>
-            <NumberInput
-              label={t('general.max_queue_length')}
-              loading={!service}
-              placeholder={t('limit.none')}
-              helperText={t('general.max_queue_length.desc')}
-              value={!service ? null : service.max_queue_length > 0 ? service.max_queue_length : null}
-              defaultValue={!service ? undefined : defaults?.max_queue_length}
-              reset={showReset(service, defaults, 'max_queue_length')}
-              min={0}
-              onChange={(e, v) => {
-                setModified(true);
-                setService(s => ({ ...s, max_queue_length: v }));
-              }}
-            />
-          </Grid>
-
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <RadioInput
-              label={t('general.location')}
-              loading={!service}
-              value={!service ? null : service.is_external}
-              defaultValue={!service ? undefined : defaults?.is_external}
-              reset={showReset(service, defaults, 'is_external')}
-              options={
-                [
-                  { value: true, label: t('general.location.external') },
-                  { value: false, label: t('general.location.internal') }
-                ] as const
-              }
-              onChange={(e, v) => {
-                setModified(true);
-                setService(s => ({ ...s, is_external: v }));
-              }}
-            />
-          </Grid>
-
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <RadioInput
-              label={t('general.caching')}
-              loading={!service}
-              value={!service ? null : service.disable_cache}
-              defaultValue={!service ? undefined : defaults?.disable_cache}
-              reset={showReset(service, defaults, 'disable_cache')}
-              options={
-                [
-                  { value: false, label: t('general.caching.enabled') },
-                  { value: true, label: t('general.caching.disabled') }
-                ] as const
-              }
-              onChange={(e, v) => {
-                setModified(true);
-                setService(s => ({ ...s, disable_cache: v }));
-              }}
-            />
+            <Typography variant="subtitle2">
+              {t('general.caching')}
+              <ResetButton
+                service={service}
+                defaults={defaults}
+                field="disable_cache"
+                reset={() => {
+                  setModified(true);
+                  setService(s => ({ ...s, disable_cache: defaults.disable_cache }));
+                }}
+              />
+            </Typography>
+            {service ? (
+              <RadioGroup
+                value={service.disable_cache}
+                onChange={() => {
+                  setModified(true);
+                  setService(s => ({ ...s, disable_cache: !s.disable_cache }));
+                }}
+              >
+                <FormControlLabel value={false} control={<Radio />} label={t('general.caching.enabled')} />
+                <FormControlLabel value control={<Radio />} label={t('general.caching.disabled')} />
+              </RadioGroup>
+            ) : (
+              <Skeleton style={{ height: '2.5rem' }} />
+            )}
           </Grid>
         </Grid>
       </div>

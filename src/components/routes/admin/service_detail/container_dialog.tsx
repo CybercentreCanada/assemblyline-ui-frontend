@@ -6,9 +6,12 @@ import {
   DialogActions,
   DialogContent,
   DialogTitle,
+  FormControlLabel,
   Grid,
   IconButton,
   MenuItem,
+  Radio,
+  RadioGroup,
   Select,
   TextField,
   Tooltip,
@@ -22,20 +25,15 @@ import {
   DEFAULT_ENVIRONMENT_VARIABLE,
   DEFAULT_PERSISTENT_VOLUME
 } from 'components/models/base/service';
-import { showReset } from 'components/routes/admin/service_detail/service.utils';
-import { NumberInput } from 'components/visual/Inputs/NumberInput';
-import { RadioInput } from 'components/visual/Inputs/RadioInput';
-import { SelectInput } from 'components/visual/Inputs/SelectInput';
-import { TextInput } from 'components/visual/Inputs/TextInput';
-import type { Dispatch, SetStateAction } from 'react';
-import React, { useCallback, useState } from 'react';
+import ResetButton from 'components/routes/admin/service_detail/reset_button';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 type EnvironmentProps = {
   envVar?: EnvironmentVariable;
-  onAdd?: Dispatch<SetStateAction<EnvironmentVariable>>;
-  onUpdate?: Dispatch<SetStateAction<EnvironmentVariable>>;
-  onDelete?: Dispatch<SetStateAction<EnvironmentVariable>>;
+  onAdd?: (envVar: EnvironmentVariable) => void;
+  onUpdate?: (envVar: EnvironmentVariable) => void;
+  onDelete?: (envVar: EnvironmentVariable) => void;
 };
 
 const WrappedEnvironment = ({
@@ -48,34 +46,25 @@ const WrappedEnvironment = ({
   onDelete = value => console.log('DELETE', value)
 }: EnvironmentProps) => {
   const { t } = useTranslation(['adminServices']);
+  const [tempEnvVar, setTempEnvVar] = useState(DEFAULT_ENVIRONMENT_VARIABLE);
   const theme = useTheme();
 
-  const [tempEnvVar, setTempEnvVar] = useState<EnvironmentVariable>(DEFAULT_ENVIRONMENT_VARIABLE);
+  const handleValueUpdate = event => {
+    onUpdate({ ...envVar, value: event.target.value });
+  };
 
-  const handleValueUpdate = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
-      onUpdate({ ...envVar, value: event.target.value }),
-    [envVar, onUpdate]
-  );
-
-  const addEnvironment = useCallback(() => {
+  const addEnvironment = () => {
     onAdd(tempEnvVar);
     setTempEnvVar(DEFAULT_ENVIRONMENT_VARIABLE);
-  }, [onAdd, tempEnvVar]);
+  };
 
-  const handleNameChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      setTempEnvVar({ ...tempEnvVar, name: event.target.value });
-    },
-    [tempEnvVar]
-  );
+  const handleNameChange = event => {
+    setTempEnvVar({ ...tempEnvVar, name: event.target.value });
+  };
 
-  const handleValueChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      setTempEnvVar({ ...tempEnvVar, value: event.target.value });
-    },
-    [tempEnvVar]
-  );
+  const handleValueChange = event => {
+    setTempEnvVar({ ...tempEnvVar, value: event.target.value });
+  };
 
   return envVar ? (
     <Grid container spacing={1} alignItems="center">
@@ -170,23 +159,23 @@ const WrappedVolumeControl = ({
   onDelete = n => console.log('DELETE', n)
 }: VolumeControlProps) => {
   const { t } = useTranslation(['adminServices']);
+  const [tempVol, setTempVol] = useState(DEFAULT_PERSISTENT_VOLUME);
+  const [tempName, setTempName] = useState('');
   const theme = useTheme();
 
-  const [tempVol, setTempVol] = useState<PersistentVolume>(DEFAULT_PERSISTENT_VOLUME);
-  const [tempName, setTempName] = useState<string>('');
-
-  const addVolume = useCallback(() => {
+  const addVolume = () => {
     onAdd(tempName, tempVol);
     setTempVol(DEFAULT_PERSISTENT_VOLUME);
     setTempName('');
-  }, [onAdd, tempName, tempVol]);
+  };
 
-  const handleNameChange = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setTempName(event.target.value),
-    []
-  );
+  const handleNameChange = event => {
+    setTempName(event.target.value);
+  };
 
-  const handleValueChange = useCallback((field, value) => setTempVol({ ...tempVol, [field]: value }), [tempVol]);
+  const handleValueChange = (field, value) => {
+    setTempVol({ ...tempVol, [field]: value });
+  };
 
   return name && vol ? (
     <Grid container spacing={1} alignItems="center">
@@ -311,12 +300,11 @@ const WrappedContainerDialog = ({
   onSave
 }: ContainerDialogProps) => {
   const { t } = useTranslation(['adminServices']);
+  const [modified, setModified] = useState(false);
+  const [tempContainer, setTempContainer] = useState(container || DEFAULT_DOCKER_CONFIG);
+  const [tempName, setTempName] = useState(name);
+  const [tempVolumes, setTempVolumes] = useState(volumes);
   const theme = useTheme();
-
-  const [tempContainer, setTempContainer] = useState<DockerConfig>(container || DEFAULT_DOCKER_CONFIG);
-  const [tempName, setTempName] = useState<string>(name);
-  const [tempVolumes, setTempVolumes] = useState<Record<string, PersistentVolume>>(volumes);
-  const [modified, setModified] = useState<boolean>(true);
 
   const handleSave = () => {
     setModified(false);
@@ -443,175 +431,251 @@ const WrappedContainerDialog = ({
           <Grid container spacing={2}>
             {name !== null && (
               <Grid size={{ xs: 12 }}>
-                <TextInput label={t('container.dialog.name')} value={tempName} onChange={(e, v) => setTempName(v)} />
+                <Typography variant="subtitle2">{t('container.dialog.name')}</Typography>
+                <TextField
+                  fullWidth
+                  size="small"
+                  margin="dense"
+                  variant="outlined"
+                  onChange={event => setTempName(event.target.value)}
+                  value={tempName}
+                />
               </Grid>
             )}
-
             <Grid size={{ xs: 8 }}>
-              <TextInput
-                label={t('container.dialog.image')}
-                loading={!tempContainer}
-                value={!tempContainer ? null : tempContainer.image}
-                defaultValue={!defaults ? undefined : defaults?.image}
-                reset={showReset(tempContainer, defaults, 'image')}
-                onChange={(e, v) => handleContainerValueChange('image', v)}
-              />
-            </Grid>
-
-            <Grid size={{ xs: 4 }}>
-              <SelectInput
-                label={t('container.dialog.registry_type')}
-                loading={!tempContainer}
-                value={!tempContainer ? null : tempContainer.registry_type}
-                defaultValue={!defaults ? undefined : defaults?.registry_type}
-                reset={showReset(tempContainer, defaults, 'registry_type')}
-                options={[
-                  { value: 'docker', primary: t('Docker') },
-                  { value: 'harbor', primary: t('Harbor') }
-                ]}
-                onChange={(e, v: string) => handleContainerValueChange('registry_type', v)}
-              />
-            </Grid>
-
-            <Grid size={{ xs: 12, md: 6 }}>
-              <NumberInput
-                label={t('container.dialog.cpu')}
-                loading={!tempContainer}
-                value={!tempContainer ? null : tempContainer.cpu_cores}
-                defaultValue={!defaults ? undefined : defaults?.cpu_cores}
-                min={0}
-                reset={showReset(tempContainer, defaults, 'cpu_cores')}
-                onChange={(e, v) => handleContainerValueChange('cpu_cores', v)}
-              />
-            </Grid>
-
-            <Grid size={{ xs: 6, md: 3 }}>
-              <NumberInput
-                label={t('container.dialog.ram')}
-                loading={!tempContainer}
-                value={!tempContainer ? null : tempContainer.ram_mb_min}
-                defaultValue={!defaults ? undefined : defaults?.ram_mb_min}
-                reset={showReset(tempContainer, defaults, 'ram_mb_min')}
-                endAdornment="MB"
-                min={0}
-                onChange={(e, v) => handleContainerValueChange('ram_mb_min', v)}
-                onReset={() => {
-                  setModified(true);
-                  setTempContainer({ ...tempContainer, ram_mb_min: defaults?.ram_mb_min, ram_mb: defaults?.ram_mb });
-                }}
-              />
-            </Grid>
-
-            <Grid size={{ xs: 6, md: 3 }}>
-              <NumberInput
-                id="ram_mb_min"
-                loading={!tempContainer}
-                value={!tempContainer ? null : tempContainer.ram_mb}
-                defaultValue={!defaults ? undefined : defaults?.ram_mb}
-                reset={showReset(tempContainer, defaults, 'ram_mb')}
-                endAdornment="MB"
-                min={0}
-                onChange={(e, v) => handleContainerValueChange('ram_mb', v)}
-                onReset={() => {
-                  setModified(true);
-                  setTempContainer({ ...tempContainer, ram_mb_min: defaults?.ram_mb_min, ram_mb: defaults?.ram_mb });
-                }}
-              />
-            </Grid>
-
-            <Grid size={{ xs: 12, md: 6 }}>
-              <TextInput
-                label={t('container.dialog.registry_username')}
-                loading={!tempContainer}
-                value={!tempContainer ? null : tempContainer.registry_username ? tempContainer.registry_username : ''}
-                defaultValue={!defaults ? undefined : (defaults?.registry_username ?? '')}
-                reset={showReset(tempContainer, defaults, 'registry_username')}
-                onChange={(e, v) => handleContainerValueChange('registry_username', v || undefined)}
-              />
-            </Grid>
-
-            <Grid size={{ xs: 12, md: 6 }}>
-              <TextInput
-                label={t('container.dialog.registry_password')}
-                loading={!tempContainer}
-                value={(!tempContainer ? null : (tempContainer.registry_password ?? '')) as string}
-                defaultValue={(!defaults ? undefined : (defaults?.registry_password ?? '')) as string}
-                reset={showReset(tempContainer, defaults, 'registry_password')}
-                password
-                onChange={(e, v) => handleContainerValueChange('registry_password', v || undefined)}
-              />
-            </Grid>
-
-            <Grid size={{ xs: 12 }}>
-              <TextInput
-                label={t('container.dialog.service_account')}
-                loading={!tempContainer}
-                value={!tempContainer ? null : tempContainer.service_account ? tempContainer.service_account : ''}
-                defaultValue={!defaults ? undefined : defaults?.service_account}
-                reset={showReset(tempContainer, defaults, 'service_account')}
-                onChange={(e, v) => handleContainerValueChange('service_account', v || undefined)}
-              />
-            </Grid>
-
-            <Grid size={{ xs: 12 }}>
-              <TextInput
-                label={t('container.dialog.command')}
-                loading={!tempContainer}
-                value={!tempContainer ? null : tempContainer.command ? tempContainer.command.join(' ') : ''}
-                defaultValue={!defaults ? undefined : defaults?.command ? defaults.command.join(' ') : ''}
-                reset={showReset(tempContainer, defaults, 'command')}
-                onChange={(e, v) => handleContainerCommandChange(e)}
-                onReset={() => {
-                  setModified(true);
-                  setTempContainer({ ...tempContainer, command: defaults?.command });
-                }}
-              />
-            </Grid>
-
-            <Grid size={{ xs: 12 }}>
-              <RadioInput
-                label={t('container.dialog.allow_internet')}
-                loading={!tempContainer}
-                value={!tempContainer ? null : tempContainer.allow_internet_access}
-                defaultValue={!defaults ? undefined : defaults?.allow_internet_access}
-                reset={showReset(tempContainer, defaults, 'allow_internet_access')}
-                options={[
-                  { value: true, label: t('container.dialog.allow_internet.yes') },
-                  { value: false, label: t('container.dialog.allow_internet.no') }
-                ]}
-                onChange={(e, v) => {
-                  setModified(true);
-                  setTempContainer({ ...tempContainer, allow_internet_access: v });
-                }}
-              />
-            </Grid>
-
-            <Grid size={{ xs: 12 }}>
-              <Typography color="textSecondary" variant="subtitle2">
-                {t('container.dialog.environment')}
+              <Typography variant="subtitle2">
+                {t('container.dialog.image')}
+                <ResetButton
+                  service={tempContainer}
+                  defaults={defaults}
+                  field="image"
+                  reset={() => {
+                    setModified(true);
+                    setTempContainer({ ...tempContainer, image: defaults.image });
+                  }}
+                />
               </Typography>
+              <TextField
+                fullWidth
+                size="small"
+                margin="dense"
+                variant="outlined"
+                onChange={event => handleContainerValueChange('image', event.target.value)}
+                value={tempContainer.image}
+              />
+            </Grid>
+            <Grid size={{ xs: 4 }}>
+              <Typography variant="subtitle2">
+                {t('container.dialog.registry_type')}
+                <ResetButton
+                  service={tempContainer}
+                  defaults={defaults}
+                  field="registry_type"
+                  reset={() => {
+                    setModified(true);
+                    setTempContainer({ ...tempContainer, registry_type: defaults.registry_type });
+                  }}
+                />
+              </Typography>
+              <FormControl size="small" fullWidth>
+                <Select
+                  fullWidth
+                  id="registry_type"
+                  variant="outlined"
+                  value={tempContainer.registry_type}
+                  style={{ marginTop: theme.spacing(1), marginBottom: theme.spacing(0.5) }}
+                  onChange={event => handleContainerValueChange('registry_type', event.target.value)}
+                >
+                  <MenuItem value="docker">{t('Docker')}</MenuItem>
+                  <MenuItem value="harbor">{t('Harbor')}</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <Typography variant="subtitle2">
+                {t('container.dialog.cpu')}
+                <ResetButton
+                  service={tempContainer}
+                  defaults={defaults}
+                  field="cpu_cores"
+                  reset={() => {
+                    setModified(true);
+                    setTempContainer({ ...tempContainer, cpu_cores: defaults.cpu_cores });
+                  }}
+                />
+              </Typography>
+              <TextField
+                fullWidth
+                type="number"
+                margin="dense"
+                size="small"
+                variant="outlined"
+                onChange={event => handleContainerValueChange('cpu_cores', event.target.value)}
+                value={tempContainer.cpu_cores}
+              />
+            </Grid>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <Typography variant="subtitle2">
+                {t('container.dialog.ram')}
+                <ResetButton
+                  service={tempContainer}
+                  defaults={defaults}
+                  field={['ram_mb_min', 'ram_mb']}
+                  reset={() => {
+                    setModified(true);
+                    setTempContainer({ ...tempContainer, ram_mb_min: defaults.ram_mb_min, ram_mb: defaults.ram_mb });
+                  }}
+                />
+              </Typography>
+              <Grid container spacing={1}>
+                <Grid size={{ xs: 12, sm: 6, md: 6 }}>
+                  <TextField
+                    fullWidth
+                    type="number"
+                    margin="dense"
+                    size="small"
+                    variant="outlined"
+                    onChange={event => handleContainerValueChange('ram_mb_min', event.target.value)}
+                    value={tempContainer.ram_mb_min}
+                  />
+                </Grid>
+                <Grid size={{ xs: 12, sm: 6, md: 6 }}>
+                  <TextField
+                    fullWidth
+                    type="number"
+                    margin="dense"
+                    size="small"
+                    variant="outlined"
+                    onChange={event => handleContainerValueChange('ram_mb', event.target.value)}
+                    value={tempContainer.ram_mb}
+                  />
+                </Grid>
+              </Grid>
+            </Grid>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <Typography variant="subtitle2">
+                {t('container.dialog.registry_username')}
+                <ResetButton
+                  service={tempContainer}
+                  defaults={defaults}
+                  field="registry_username"
+                  reset={() => {
+                    setModified(true);
+                    setTempContainer({ ...tempContainer, registry_username: defaults.registry_username || '' });
+                  }}
+                />
+              </Typography>
+              <TextField
+                fullWidth
+                size="small"
+                margin="dense"
+                variant="outlined"
+                onChange={event => handleContainerValueChange('registry_username', event.target.value || undefined)}
+                value={tempContainer.registry_username ? tempContainer.registry_username : ''}
+              />
+            </Grid>
+            <Grid size={{ xs: 12, md: 6 }}>
+              <Typography variant="subtitle2">
+                {t('container.dialog.registry_password')}
+                <ResetButton
+                  service={tempContainer}
+                  defaults={defaults}
+                  field="registry_password"
+                  reset={() => {
+                    setModified(true);
+                    setTempContainer({ ...tempContainer, registry_password: defaults.registry_password || '' });
+                  }}
+                />
+              </Typography>
+              <TextField
+                fullWidth
+                size="small"
+                margin="dense"
+                variant="outlined"
+                onChange={event => handleContainerValueChange('registry_password', event.target.value || undefined)}
+                value={tempContainer.registry_password ? tempContainer.registry_password : ''}
+              />
+            </Grid>
+            <Grid size={{ xs: 12 }}>
+              <Typography variant="subtitle2">
+                {t('container.dialog.service_account')}
+                <ResetButton
+                  service={tempContainer}
+                  defaults={defaults}
+                  field="service_account"
+                  reset={() => {
+                    setModified(true);
+                    setTempContainer({ ...tempContainer, service_account: defaults.service_account });
+                  }}
+                />
+              </Typography>
+              <TextField
+                fullWidth
+                size="small"
+                margin="dense"
+                variant="outlined"
+                onChange={event => handleContainerValueChange('service_account', event.target.value || undefined)}
+                value={tempContainer.service_account ? tempContainer.service_account : ''}
+              />
+            </Grid>
+            <Grid size={{ xs: 12 }}>
+              <Typography variant="subtitle2">
+                {t('container.dialog.command')}
+                <ResetButton
+                  service={tempContainer}
+                  defaults={defaults}
+                  field="command"
+                  reset={() => {
+                    setModified(true);
+                    setTempContainer({ ...tempContainer, command: defaults.command });
+                  }}
+                />
+              </Typography>
+              <TextField
+                fullWidth
+                size="small"
+                margin="dense"
+                variant="outlined"
+                onChange={handleContainerCommandChange}
+                value={tempContainer.command ? tempContainer.command.join(' ') : ''}
+              />
+            </Grid>
+            <Grid size={{ xs: 12 }}>
+              <Typography variant="subtitle2">
+                {t('container.dialog.allow_internet')}
+                <ResetButton
+                  service={tempContainer}
+                  defaults={defaults}
+                  field="allow_internet_access"
+                  reset={() => {
+                    setModified(true);
+                    setTempContainer({ ...tempContainer, allow_internet_access: defaults.allow_internet_access });
+                  }}
+                />
+              </Typography>
+              <RadioGroup value={tempContainer.allow_internet_access} onChange={handleInternetToggle}>
+                <FormControlLabel value control={<Radio />} label={t('container.dialog.allow_internet.yes')} />
+                <FormControlLabel value={false} control={<Radio />} label={t('container.dialog.allow_internet.no')} />
+              </RadioGroup>
+            </Grid>
+            <Grid size={{ xs: 12 }}>
+              <Typography variant="subtitle2">{t('container.dialog.environment')}</Typography>
               {tempContainer.environment.map((env, i) => (
                 <Environment key={i} envVar={env} onUpdate={handleEnvAddUpdate} onDelete={handleEnvDelete} />
               ))}
             </Grid>
-
             <Grid size={{ xs: 12 }}>
               <Environment onAdd={handleEnvAddUpdate} />
             </Grid>
-
             <Grid size={{ xs: 12 }}>
-              <Typography color="textSecondary" variant="subtitle2">
-                {t('container.dialog.labels')}
-              </Typography>
+              <Typography variant="subtitle2">{t('container.dialog.labels')}</Typography>
               {(tempContainer.labels || []).map((env, i) => (
                 <Environment key={i} envVar={env} onUpdate={handleLabelAddUpdate} onDelete={handleLabelDelete} />
               ))}
             </Grid>
-
             <Grid size={{ xs: 12 }}>
               <Environment onAdd={handleLabelAddUpdate} />
             </Grid>
-
             {name !== null && (
               <>
                 <Grid size={{ xs: 12 }}>
