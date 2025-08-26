@@ -116,8 +116,8 @@ const HeuristicDetail = ({ heur_id = null }: HeuristicDetailProps) => {
       <div style={{ textAlign: 'left' }}>
         <PageHeader
           primary={t('title')}
-          secondary={heuristic?.heur_id}
-          loading={!heuristic}
+          secondary={() => heuristic.heur_id}
+          secondaryLoading={!heuristic}
           slotProps={{
             root: { style: { marginBottom: theme.spacing(4) } }
           }}

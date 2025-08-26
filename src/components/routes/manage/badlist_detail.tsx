@@ -257,7 +257,7 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
         <PageHeader
           primary={badlist ? t(`title.${badlist.type}`) : t('title')}
           secondary={badlist_id || id}
-          loading={!badlist}
+          secondaryLoading={!badlist}
           slotProps={{
             root: { style: { marginBottom: theme.spacing(4) } }
           }}
@@ -429,7 +429,7 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
               <Grid size="grow">
                 <Typography variant="h6">{t('attribution.title')}</Typography>
               </Grid>
-              <Grid size="auto" style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
+              <Grid size="auto">
                 {currentUser.roles.includes('badlist_manage') &&
                   (badlist ? (
                     <Tooltip title={t('add.attribution')}>
@@ -541,7 +541,7 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
               <Grid size="grow">
                 <Typography variant="h6">{t('timing')}</Typography>
               </Grid>
-              <Grid size="auto" style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
+              <Grid size="auto">
                 {currentUser.roles.includes('badlist_manage') &&
                   (badlist ? (
                     <DatePicker
