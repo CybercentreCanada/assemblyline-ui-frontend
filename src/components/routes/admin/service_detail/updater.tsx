@@ -1,17 +1,30 @@
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
-import { Button, Grid, IconButton, Tooltip, Typography, useTheme } from '@mui/material';
+import {
+  Button,
+  FormControlLabel,
+  Grid,
+  IconButton,
+  InputAdornment,
+  MenuItem,
+  OutlinedInput,
+  Radio,
+  RadioGroup,
+  Select,
+  Skeleton,
+  Slider,
+  TextField,
+  Tooltip,
+  Typography,
+  useTheme
+} from '@mui/material';
+import FormControl from '@mui/material/FormControl';
 import useALContext from 'components/hooks/useALContext';
 import type { Service, UpdateSource } from 'components/models/base/service';
 import { DEFAULT_SOURCE } from 'components/models/base/service';
-import { showReset } from 'components/routes/admin/service_detail/service.utils';
+import ResetButton from 'components/routes/admin/service_detail/reset_button';
 import SourceDialog from 'components/routes/admin/service_detail/source_dialog';
 import { SourceCard } from 'components/routes/manage/signature_sources';
-import { NumberInput } from 'components/visual/Inputs/NumberInput';
-import { RadioInput } from 'components/visual/Inputs/RadioInput';
-import { SelectInput } from 'components/visual/Inputs/SelectInput';
-import { SliderInput } from 'components/visual/Inputs/SliderInput';
-import { TextInput } from 'components/visual/Inputs/TextInput';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 type ServiceUpdaterProps = {
@@ -21,67 +34,122 @@ type ServiceUpdaterProps = {
   setModified: (value: boolean) => void;
 };
 
+const marks = [
+  {
+    value: 3600,
+    label: '1h'
+  },
+  {
+    value: 14400,
+    label: '4h'
+  },
+  {
+    value: 21600,
+    label: '6h'
+  },
+  {
+    value: 43200,
+    label: '12h'
+  },
+  {
+    value: 86400,
+    label: '24h'
+  }
+];
+
 const ServiceUpdater = ({ service, defaults, setService, setModified }: ServiceUpdaterProps) => {
   const { t } = useTranslation(['adminServices']);
-  const theme = useTheme();
   const { c12nDef } = useALContext();
-
   const [dialog, setDialog] = useState<boolean>(false);
   const [editDialog, setEditDialog] = useState<boolean>(false);
-  const [editedSourceID, setEditedSourceID] = useState<number>(-1);
+  const [editedSourceID, setEditedSourceID] = useState(-1);
+  const theme = useTheme();
 
-  const handleDeleteSource = useCallback(
-    (source_id: number) => {
-      const newSources = service.update_config.sources;
-      newSources.splice(source_id, 1);
-      setModified(true);
-      setService({
-        ...service,
-        update_config: { ...service.update_config, sources: newSources }
-      });
-    },
-    [service, setModified, setService]
-  );
+  const toggleSignatures = () => {
+    setModified(true);
+    setService({
+      ...service,
+      update_config: { ...service.update_config, generates_signatures: !service.update_config.generates_signatures }
+    });
+  };
 
-  const handleEditSource = useCallback((source_id: number) => {
+  const toggleWaitForUpdate = () => {
+    setModified(true);
+    setService({
+      ...service,
+      update_config: { ...service.update_config, wait_for_update: !service.update_config.wait_for_update }
+    });
+  };
+
+  const handleDelimiterChange = event => {
+    setModified(true);
+    setService({ ...service, update_config: { ...service.update_config, signature_delimiter: event.target.value } });
+  };
+
+  const handleCustomDelimiterChange = event => {
+    setModified(true);
+    setService({ ...service, update_config: { ...service.update_config, custom_delimiter: event.target.value } });
+  };
+
+  const handleIntervalChange = event => {
+    setModified(true);
+    setService({
+      ...service,
+      update_config: { ...service.update_config, update_interval_seconds: event.target.value }
+    });
+  };
+
+  const handleSliderChange = (event, number) => {
+    setModified(true);
+    setService({
+      ...service,
+      update_config: { ...service.update_config, update_interval_seconds: number }
+    });
+  };
+
+  const handleDeleteSource = source_id => {
+    const newSources = service.update_config.sources;
+    newSources.splice(source_id, 1);
+    setModified(true);
+    setService({
+      ...service,
+      update_config: { ...service.update_config, sources: newSources }
+    });
+  };
+
+  const handleEditSource = source_id => {
     setEditDialog(true);
     setEditedSourceID(source_id);
-  }, []);
+  };
 
-  const handleSaveSource = useCallback(
-    (newSource: UpdateSource) => {
-      const newSources = [...service.update_config.sources];
+  const handleSaveSource = newSource => {
+    const newSources = [...service.update_config.sources];
 
-      if (editedSourceID === -1) {
-        newSources.push(newSource);
-      } else {
-        newSources[editedSourceID] = newSource;
-      }
+    if (editedSourceID === -1) {
+      newSources.push(newSource);
+    } else {
+      newSources[editedSourceID] = newSource;
+    }
 
-      setModified(true);
-      setService({
-        ...service,
-        update_config: { ...service.update_config, sources: newSources }
+    setModified(true);
+    setService({
+      ...service,
+      update_config: { ...service.update_config, sources: newSources }
+    });
+  };
+
+  const findDefaults = (curSource: UpdateSource) => {
+    if (defaults && defaults.update_config && defaults.update_config.sources) {
+      return defaults.update_config.sources.find(element => {
+        if (curSource.name === element.name) {
+          return element;
+        }
+        return null;
       });
-    },
-    [editedSourceID, service, setModified, setService]
-  );
+    }
 
-  const findDefaults = useCallback(
-    (curSource: UpdateSource) => {
-      if (defaults && defaults.update_config && defaults.update_config.sources) {
-        return defaults.update_config.sources.find(element => {
-          if (curSource.name === element.name) {
-            return element;
-          }
-          return null;
-        });
-      }
-
-      return null;
-    },
-    [defaults]
-  );
+    return null;
+  };
 
   useEffect(() => {
     if (!editDialog && editedSourceID !== -1) {
@@ -95,137 +163,111 @@ const ServiceUpdater = ({ service, defaults, setService, setModified }: ServiceU
       <Grid size={{ xs: 12 }}>
         <Typography variant="h6">{t('updater')}</Typography>
       </Grid>
-
-      <Grid size={{ xs: 12, sm: 9 }}>
-        <SliderInput
-          label={t('updater.interval')}
-          value={!service ? null : service.update_config.update_interval_seconds}
-          defaultValue={!defaults ? undefined : (defaults?.update_config?.update_interval_seconds ?? 3600)}
-          loading={!service}
-          reset={showReset(service.update_config, defaults.update_config, 'update_interval_seconds')}
-          min={3600}
-          max={86400}
-          valueLabelDisplay="off"
-          marks={[
-            { value: 3600, label: '1h' },
-            { value: 14400, label: '4h' },
-            { value: 21600, label: '6h' },
-            { value: 43200, label: '12h' },
-            { value: 86400, label: '24h' }
-          ]}
-          valueLabelFormat={x => x / 3600}
-          onChange={(e, v) => {
-            setModified(true);
-            setService({
-              ...service,
-              update_config: {
-                ...service.update_config,
-                update_interval_seconds: v
-              }
-            });
-          }}
-        />
-      </Grid>
-
-      <Grid size={{ xs: 12, sm: 3 }}>
-        <NumberInput
-          id="update_interval_seconds"
-          value={!service ? null : service.update_config.update_interval_seconds}
-          loading={!service}
-          endAdornment="sec"
-          min={60}
-          max={86400}
-          onChange={(e, v) => {
-            setModified(true);
-            setService({
-              ...service,
-              update_config: { ...service.update_config, update_interval_seconds: v }
-            });
-          }}
-        />
+      <Grid size={{ xs: 12 }}>
+        <Typography variant="subtitle2">
+          {t('updater.interval')}
+          <ResetButton
+            service={service.update_config}
+            defaults={defaults.update_config}
+            field="update_interval_seconds"
+            reset={() => handleSliderChange(null, defaults.update_config.update_interval_seconds)}
+          />
+        </Typography>
+        <Grid container spacing={2}>
+          <Grid size={{ xs: 12, sm: 9 }}>
+            <div style={{ marginLeft: theme.spacing(1), marginRight: theme.spacing(1) }}>
+              <Slider
+                min={3600}
+                max={86400}
+                defaultValue={3600}
+                valueLabelDisplay="off"
+                // getAriaValueText={valuetext}
+                aria-labelledby="discrete-slider-custom"
+                step={null}
+                value={service.update_config.update_interval_seconds}
+                marks={marks}
+                // marks={true}
+                onChange={handleSliderChange}
+                valueLabelFormat={x => x / 3600}
+              />
+            </div>
+          </Grid>
+          <Grid size={{ xs: 12, sm: 3 }}>
+            {service ? (
+              <OutlinedInput
+                fullWidth
+                type="number"
+                margin="dense"
+                size="small"
+                value={service.update_config.update_interval_seconds}
+                onChange={handleIntervalChange}
+                endAdornment={<InputAdornment position="end">sec</InputAdornment>}
+              />
+            ) : (
+              <Skeleton style={{ height: '2.5rem' }} />
+            )}
+          </Grid>
+        </Grid>
       </Grid>
 
       <Grid size={{ xs: 12, sm: 6 }}>
-        <RadioInput
-          label={t('updater.signatures')}
-          loading={!service}
-          value={!service ? null : service.update_config.generates_signatures}
-          defaultValue={!defaults ? undefined : defaults?.update_config?.generates_signatures}
-          reset={showReset(service.update_config, defaults.update_config, 'generates_signatures')}
-          options={
-            [
-              { value: true, label: t('updater.signatures.yes') },
-              { value: false, label: t('updater.signatures.no') }
-            ] as const
-          }
-          onChange={(e, v) => {
-            setModified(true);
-            setService({
-              ...service,
-              update_config: {
-                ...service.update_config,
-                generates_signatures: v
-              }
-            });
-          }}
-        />
+        <Typography variant="subtitle2">
+          {t('updater.signatures')}
+          <ResetButton
+            service={service.update_config}
+            defaults={defaults.update_config}
+            field="generates_signatures"
+            reset={() => {
+              setModified(true);
+              setService({
+                ...service,
+                update_config: {
+                  ...service.update_config,
+                  generates_signatures: defaults.update_config.generates_signatures
+                }
+              });
+            }}
+          />
+        </Typography>
+        <RadioGroup value={service.update_config.generates_signatures} onChange={toggleSignatures}>
+          <FormControlLabel value control={<Radio />} label={t('updater.signatures.yes')} />
+          <FormControlLabel value={false} control={<Radio />} label={t('updater.signatures.no')} />
+        </RadioGroup>
       </Grid>
-
       <Grid size={{ xs: 12, sm: 6 }}>
-        <RadioInput
-          label={t('updater.wait')}
-          loading={!service}
-          value={!service ? null : service.update_config.wait_for_update}
-          defaultValue={!defaults ? undefined : defaults?.update_config?.wait_for_update}
-          reset={showReset(service.update_config, defaults.update_config, 'wait_for_update')}
-          options={
-            [
-              { value: true, label: t('updater.wait.yes') },
-              { value: false, label: t('updater.wait.no') }
-            ] as const
-          }
-          onChange={(e, v) => {
-            setModified(true);
-            setService({
-              ...service,
-              update_config: {
-                ...service.update_config,
-                wait_for_update: v
-              }
-            });
-          }}
-        />
+        <Typography variant="subtitle2">
+          {t('updater.wait')}
+          <ResetButton
+            service={service.update_config}
+            defaults={defaults.update_config}
+            field="wait_for_update"
+            reset={() => {
+              setModified(true);
+              setService({
+                ...service,
+                update_config: {
+                  ...service.update_config,
+                  wait_for_update: defaults.update_config.wait_for_update
+                }
+              });
+            }}
+          />
+        </Typography>
+        <RadioGroup value={service.update_config.wait_for_update} onChange={toggleWaitForUpdate}>
+          <FormControlLabel value control={<Radio />} label={t('updater.wait.yes')} />
+          <FormControlLabel value={false} control={<Radio />} label={t('updater.wait.no')} />
+        </RadioGroup>
       </Grid>
 
-      {service?.update_config?.generates_signatures && (
-        <>
-          <Grid size={{ xs: 12, ...(service.update_config.signature_delimiter === 'custom' && { sm: 7, md: 8 }) }}>
-            <SelectInput
-              label={t('updater.signature_delimiter')}
-              loading={!service}
-              value={!service ? null : service.update_config.signature_delimiter}
-              defaultValue={!defaults ? undefined : defaults?.update_config?.signature_delimiter}
-              reset={showReset(service.update_config, defaults.update_config, [
-                'signature_delimiter',
-                'custom_delimiter'
-              ])}
-              options={
-                [
-                  { value: 'new_line', primary: t('updater.signature_delimiter.new_line') },
-                  { value: 'double_new_line', primary: t('updater.signature_delimiter.double_new_line') },
-                  { value: 'pipe', primary: t('updater.signature_delimiter.pipe') },
-                  { value: 'comma', primary: t('updater.signature_delimiter.comma') },
-                  { value: 'space', primary: t('updater.signature_delimiter.space') },
-                  { value: 'none', primary: t('updater.signature_delimiter.none') },
-                  { value: 'file', primary: t('updater.signature_delimiter.file') },
-                  { value: 'custom', primary: t('updater.signature_delimiter.custom') }
-                ] as const
-              }
-              onChange={(e, v) => {
-                setModified(true);
-                setService({ ...service, update_config: { ...service.update_config, signature_delimiter: v } });
-              }}
-              onReset={() => {
+      {service && service.update_config.generates_signatures && (
+        <Grid size={{ xs: 12 }}>
+          <Typography variant="subtitle2">
+            {t('updater.signature_delimiter')}
+            <ResetButton
+              service={service.update_config}
+              defaults={defaults.update_config}
+              field={['signature_delimiter', 'custom_delimiter']}
+              reset={() => {
                 setModified(true);
                 setService({
                   ...service,
@@ -237,29 +279,53 @@ const ServiceUpdater = ({ service, defaults, setService, setModified }: ServiceU
                 });
               }}
             />
-          </Grid>
-          {service.update_config.signature_delimiter === 'custom' && (
-            <Grid size={{ xs: 12, sm: 5, md: 4 }}>
-              <TextInput
-                id="custom_delimiter"
-                loading={!service}
-                value={
-                  !service ? null : service.update_config.custom_delimiter ? service.update_config.custom_delimiter : ''
-                }
-                onChange={(e, v) => {
-                  setModified(true);
-                  setService({ ...service, update_config: { ...service.update_config, custom_delimiter: v } });
-                }}
-              />
+          </Typography>
+          <Grid container spacing={1}>
+            <Grid
+              size={{
+                xs: 12,
+                sm: service.update_config.signature_delimiter === 'custom' ? 7 : 12,
+                md: service.update_config.signature_delimiter === 'custom' ? 8 : 12
+              }}
+            >
+              <FormControl size="small" fullWidth>
+                <Select
+                  id="delimiter"
+                  fullWidth
+                  value={service.update_config.signature_delimiter}
+                  onChange={handleDelimiterChange}
+                  variant="outlined"
+                  style={{ marginTop: theme.spacing(1), marginBottom: theme.spacing(0.5) }}
+                >
+                  <MenuItem value="new_line">{t('updater.signature_delimiter.new_line')}</MenuItem>
+                  <MenuItem value="double_new_line">{t('updater.signature_delimiter.double_new_line')}</MenuItem>
+                  <MenuItem value="pipe">{t('updater.signature_delimiter.pipe')}</MenuItem>
+                  <MenuItem value="comma">{t('updater.signature_delimiter.comma')}</MenuItem>
+                  <MenuItem value="space">{t('updater.signature_delimiter.space')}</MenuItem>
+                  <MenuItem value="none">{t('updater.signature_delimiter.none')}</MenuItem>
+                  <MenuItem value="file">{t('updater.signature_delimiter.file')}</MenuItem>
+                  <MenuItem value="custom">{t('updater.signature_delimiter.custom')}</MenuItem>
+                </Select>
+              </FormControl>
             </Grid>
-          )}
-        </>
+            {service.update_config.signature_delimiter === 'custom' && (
+              <Grid size={{ xs: 12, sm: 5, md: 4 }}>
+                <TextField
+                  fullWidth
+                  size="small"
+                  margin="dense"
+                  variant="outlined"
+                  value={service.update_config.custom_delimiter ? service.update_config.custom_delimiter : ''}
+                  onChange={handleCustomDelimiterChange}
+                />
+              </Grid>
+            )}
+          </Grid>
+        </Grid>
       )}
 
       <Grid size={{ xs: 12 }}>
-        <Typography color="textSecondary" variant="subtitle2">
-          {t('updater.sources')}
-        </Typography>
+        <Typography variant="subtitle2">{t('updater.sources')}</Typography>
         <SourceDialog
           open={editDialog}
           source={editedSourceID !== -1 ? service.update_config.sources[editedSourceID] : null}

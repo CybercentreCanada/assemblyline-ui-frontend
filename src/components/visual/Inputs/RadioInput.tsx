@@ -2,8 +2,8 @@ import type { FormControlLabelProps } from '@mui/material';
 import { Radio, RadioGroup } from '@mui/material';
 import {
   HelperText,
-  PasswordInput,
-  ResetInput,
+  PasswordAdornment,
+  ResetAdornment,
   StyledButtonLabel,
   StyledEndAdornmentBox,
   StyledFormButton,
@@ -12,7 +12,7 @@ import {
   StyledFormLabel,
   StyledRoot
 } from 'components/visual/Inputs/lib/inputs.components';
-import { useInputHandlers, useInputParsedProps } from 'components/visual/Inputs/lib/inputs.hook';
+import { useInputBlur, useInputChange, useInputFocus } from 'components/visual/Inputs/lib/inputs.hook';
 import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
 import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
 import React from 'react';
@@ -31,17 +31,18 @@ export type RadioInputProps<O extends readonly Option[]> = InputValues<
     options: O;
   };
 
-const WrappedRadioInput = React.memo(<O extends readonly Option[]>() => {
+const WrappedRadioInput = <O extends readonly Option[]>() => {
   const [get] = usePropStore<RadioInputProps<O>>();
 
   const focused = get('focused');
   const inputValue = get('inputValue') ?? '';
-  const options = get('options');
+  const options = get('options') ?? [];
   const preventDisabledColor = get('preventDisabledColor');
   const readOnly = get('readOnly');
-  const value = get('value');
 
-  const { handleChange, handleFocus, handleBlur } = useInputHandlers<RadioInputProps<O>>();
+  const handleBlur = useInputBlur<RadioInputProps<O>>();
+  const handleChange = useInputChange<RadioInputProps<O>>();
+  const handleFocus = useInputFocus<RadioInputProps<O>>();
 
   return (
     <StyledRoot>
@@ -52,7 +53,7 @@ const WrappedRadioInput = React.memo(<O extends readonly Option[]>() => {
             <StyledFormButton
               key={`${index}-${option.label}`}
               onFocus={handleFocus}
-              onBlur={e => handleBlur(e, value)}
+              onBlur={e => handleBlur(e)}
               onClick={e => handleChange(e, option.value, option.value)}
             >
               <StyledFormControlLabel
@@ -83,31 +84,24 @@ const WrappedRadioInput = React.memo(<O extends readonly Option[]>() => {
         </RadioGroup>
 
         <StyledEndAdornmentBox>
-          <PasswordInput />
-          <ResetInput />
+          <PasswordAdornment />
+          <ResetAdornment />
         </StyledEndAdornmentBox>
       </StyledFormControl>
       <HelperText />
     </StyledRoot>
   );
-});
+};
 
 export const RadioInput = <O extends readonly Option[]>({
-  options = [] as unknown as O,
   preventRender = false,
   value = null,
   ...props
-}: RadioInputProps<O>) => {
-  const parsedProps = useInputParsedProps<O[number]['value'], O[number]['value'], RadioInputProps<O>>({
-    ...props,
-    options,
-    preventRender,
-    value
-  });
-
-  return preventRender ? null : (
-    <PropProvider<RadioInputProps<O>> props={parsedProps}>
+}: RadioInputProps<O>) =>
+  preventRender ? null : (
+    <PropProvider<RadioInputProps<O>>
+      props={{ options: [] as unknown as O, preventRender, value, inputValue: value, ...props }}
+    >
       <WrappedRadioInput />
     </PropProvider>
   );
-};

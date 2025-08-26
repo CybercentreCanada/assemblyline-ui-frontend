@@ -181,6 +181,7 @@ export const EditWorkflowAction: React.FC<EditWorkflowActionProps> = React.memo(
   const { user: currentUser, configuration } = useALContext();
   // Editing of workflows aren't allowed if it wasn't created on the current instance
   const editingDisabled = workflow?.origin !== configuration.ui.fqdn;
+  console.log(location);
 
   if (!id || !currentUser.roles.includes('workflow_manage')) return null;
   else if (!workflow)

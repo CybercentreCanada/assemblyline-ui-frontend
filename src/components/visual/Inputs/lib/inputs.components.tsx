@@ -36,7 +36,15 @@ import {
 } from '@mui/material';
 import type { CustomChipProps } from 'components/visual/CustomChip';
 import { CustomChip } from 'components/visual/CustomChip';
-import { useInputHandlers } from 'components/visual/Inputs/lib/inputs.hook';
+import {
+  useErrorMessage,
+  useInputChange,
+  usePreventExpandRender,
+  usePreventPasswordRender,
+  usePreventResetRender,
+  usePropID,
+  usePropLabel
+} from 'components/visual/Inputs/lib/inputs.hook';
 import type { InputValues } from 'components/visual/Inputs/lib/inputs.model';
 import { usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
 import { Tooltip } from 'components/visual/Tooltip';
@@ -61,17 +69,20 @@ export const StyledEndAdornmentBox = React.memo(
 
     const [get] = usePropStore();
 
+    const clearAdornment = get('clearAdornment');
     const endAdornment = get('endAdornment');
-    const preventExpandRender = get('preventExpandRender');
-    const preventPasswordRender = get('preventPasswordRender');
-    const preventResetRender = get('preventResetRender');
-    const preventSpinnerRender = get('preventSpinnerRender');
+    const spinnerAdornment = get('spinnerAdornment');
+
+    const preventExpandRender = usePreventExpandRender();
+    const preventPasswordRender = usePreventPasswordRender();
+    const preventResetRender = usePreventResetRender();
 
     return preventRender &&
       preventResetRender &&
       preventPasswordRender &&
       preventExpandRender &&
-      preventSpinnerRender &&
+      !spinnerAdornment &&
+      !clearAdornment &&
       !endAdornment ? null : (
       <InputAdornment
         position="end"
@@ -103,17 +114,20 @@ export const StyledEndAdornment = React.memo(
 
     const [get] = usePropStore();
 
+    const clearAdornment = get('clearAdornment');
     const endAdornment = get('endAdornment');
-    const preventExpandRender = get('preventExpandRender');
-    const preventPasswordRender = get('preventPasswordRender');
-    const preventResetRender = get('preventResetRender');
-    const preventSpinnerRender = get('preventSpinnerRender');
+    const spinnerAdornment = get('spinnerAdornment');
+
+    const preventExpandRender = usePreventExpandRender();
+    const preventPasswordRender = usePreventPasswordRender();
+    const preventResetRender = usePreventResetRender();
 
     return preventRender &&
       preventResetRender &&
       preventPasswordRender &&
       preventExpandRender &&
-      preventSpinnerRender &&
+      !spinnerAdornment &&
+      !clearAdornment &&
       !endAdornment ? null : (
       <InputAdornment
         position="end"
@@ -125,15 +139,16 @@ export const StyledEndAdornment = React.memo(
     );
   }
 );
-export const ExpandInput = React.memo(() => {
+
+export const ExpandAdornment = React.memo(() => {
   const theme = useTheme();
 
   const [get] = usePropStore();
 
   const expand = get('expand');
   const expandProps = get('expandProps');
-  const id = get('id');
-  const preventExpandRender = get('preventExpandRender');
+  const id = usePropID();
+  const preventExpandRender = usePreventExpandRender();
   const onExpand = get('onExpand');
 
   return preventExpandRender ? null : (
@@ -163,21 +178,22 @@ export const ExpandInput = React.memo(() => {
   );
 });
 
-export const ClearInput = React.memo(() => {
+export const ClearAdornment = React.memo(() => {
   const theme = useTheme();
 
   const [get] = usePropStore<{ inputValue: string[] }>();
 
+  const clearAdornment = get('clearAdornment');
   const disabled = get('disabled');
   const expandProps = get('expandProps');
-  const id = get('id');
+  const id = usePropID();
   const inputValue = get('inputValue');
   const readOnly = get('readOnly');
   const tiny = get('tiny');
 
-  const { handleChange } = useInputHandlers();
+  const handleChange = useInputChange();
 
-  return disabled || readOnly || !inputValue?.length ? null : (
+  return !clearAdornment || disabled || readOnly || !inputValue?.length ? null : (
     <ListItemIcon sx={{ minWidth: 0 }}>
       <IconButton
         aria-label={`${id}-clear`}
@@ -200,13 +216,13 @@ export const ClearInput = React.memo(() => {
   );
 });
 
-export const PasswordInput = React.memo(() => {
+export const PasswordAdornment = React.memo(() => {
   const theme = useTheme();
 
   const [get, setStore] = usePropStore();
 
-  const id = get('id');
-  const preventPasswordRender = get('preventPasswordRender');
+  const id = usePropID();
+  const preventPasswordRender = usePreventPasswordRender();
   const resetProps = get('resetProps');
   const showPassword = get('showPassword');
   const tiny = get('tiny');
@@ -228,20 +244,20 @@ export const PasswordInput = React.memo(() => {
   );
 });
 
-export const ResetInput = React.memo(<T, P extends InputValues<T>>() => {
+export const ResetAdornment = React.memo(<T, P extends InputValues<T>>() => {
   const { t } = useTranslation();
   const theme = useTheme();
 
   const [get] = usePropStore<P>();
 
   const defaultValue = get('defaultValue');
-  const id = get('id');
-  const preventResetRender = get('preventResetRender');
+  const id = usePropID();
+  const preventResetRender = usePreventResetRender();
   const resetProps = get('resetProps');
   const tiny = get('tiny');
   const onReset = get('onReset');
 
-  const { handleChange } = useInputHandlers();
+  const handleChange = useInputChange();
 
   const title = useMemo<React.ReactNode>(
     () =>
@@ -279,18 +295,18 @@ export const ResetInput = React.memo(<T, P extends InputValues<T>>() => {
   );
 });
 
-export const SpinnerInput = <T, P extends InputValues<T>>() => {
+export const SpinnerAdornment = <T, P extends InputValues<T>>() => {
   const theme = useTheme();
   const [get] = usePropStore<P & { max?: number; min?: number; step?: number }>();
 
   const disabled = get('disabled');
   const focused = get('focused');
-  const id = get('id');
+  const id = usePropID();
   const inputValue = Number(get('inputValue') ?? 0);
   const max = get('max');
   const min = get('min');
-  const preventSpinnerRender = get('preventSpinnerRender');
   const readOnly = get('readOnly');
+  const spinnerAdornment = get('spinnerAdornment');
   const step = get('step') ?? 1;
   const tiny = get('tiny');
 
@@ -299,7 +315,7 @@ export const SpinnerInput = <T, P extends InputValues<T>>() => {
   const mouseYRef = useRef<number>(null);
   const timeoutRef = useRef<NodeJS.Timeout>(null);
   const intervalRef = useRef<NodeJS.Timeout>(null);
-  const { handleChange } = useInputHandlers();
+  const handleChange = useInputChange();
 
   const clamp = useCallback(
     (val: number) => Math.min(max ?? Number.POSITIVE_INFINITY, Math.max(min ?? Number.NEGATIVE_INFINITY, val)),
@@ -362,7 +378,7 @@ export const SpinnerInput = <T, P extends InputValues<T>>() => {
     };
   }, []);
 
-  return preventSpinnerRender || disabled || readOnly ? null : (
+  return !spinnerAdornment || disabled || readOnly ? null : (
     <div
       ref={boxRef}
       style={{
@@ -424,11 +440,11 @@ export const HelperText = React.memo(() => {
   const [get] = usePropStore();
 
   const disabled = get('disabled');
-  const errorMsg = get('errorMsg');
+  const errorMsg = useErrorMessage();
   const errorProps = get('errorProps');
   const helperText = get('helperText');
   const helperTextProps = get('helperTextProps');
-  const id = get('id');
+  const id = usePropID();
   const loading = get('loading');
   const readOnly = get('readOnly');
 
@@ -533,6 +549,7 @@ export const RequiredBadge = React.memo(
     const [get] = usePropStore<P>();
 
     const badge = get('badge');
+    const overflowHidden = get('overflowHidden');
 
     return (
       <Badge
@@ -544,13 +561,35 @@ export const RequiredBadge = React.memo(
           horizontal: 'right'
         }}
         sx={{
+          ...(overflowHidden && {
+            display: 'inline-flex',
+            alignItems: 'center',
+            minWidth: 0,
+            maxWidth: '100%',
+            overflow: 'hidden'
+          }),
           '& .MuiBadge-badge': {
             right: theme.spacing(-1),
             top: theme.spacing(0.5)
           }
         }}
       >
-        {children}
+        <span
+          style={
+            !overflowHidden
+              ? null
+              : {
+                  display: 'inline-block',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  minWidth: 0,
+                  maxWidth: '100%'
+                }
+          }
+        >
+          {children}
+        </span>
       </Badge>
     );
   }
@@ -574,17 +613,15 @@ export const StyledButtonLabel = React.memo(
 
     const disabled = get('disabled');
     const endAdornment = get('endAdornment');
-    const errorMsg = get('errorMsg');
+    const errorMsg = useErrorMessage();
     const focused = focusedProp ?? get('focused');
     const label = labelProp ?? get('label');
     const labelProps = get('labelProps');
     const loading = get('loading');
     const monospace = get('monospace');
-    const overflowHidden = get('overflowHidden');
     const password = get('password');
     const preventDisabledColor = get('preventDisabledColor');
     const readOnly = get('readOnly');
-    const required = get('required');
     const showPassword = get('showPassword');
 
     return (
@@ -599,10 +636,10 @@ export const StyledButtonLabel = React.memo(
       >
         <Typography
           color={
-            readOnly
-              ? 'textPrimary'
-              : !preventDisabledColor && (loading || disabled)
-                ? 'textDisabled'
+            !preventDisabledColor && (loading || disabled)
+              ? 'textDisabled'
+              : readOnly
+                ? 'textPrimary'
                 : errorMsg
                   ? 'error'
                   : focused
@@ -616,7 +653,6 @@ export const StyledButtonLabel = React.memo(
             marginLeft: theme.spacing(1),
             textAlign: 'start',
             width: '100%',
-            ...(overflowHidden && { textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden' }),
             ...(monospace && { fontFamily: 'monospace' }),
             ...(password &&
               showPassword && {
@@ -646,9 +682,9 @@ export const StyledFormControlLabel = React.memo(
 
     const disabled = get('disabled');
     const loading = get('loading');
-    const preventExpandRender = get('preventExpandRender');
-    const preventPasswordRender = get('preventPasswordRender');
-    const preventResetRender = get('preventResetRender');
+    const preventExpandRender = usePreventExpandRender();
+    const preventPasswordRender = usePreventPasswordRender();
+    const preventResetRender = usePreventResetRender();
     const readOnly = get('readOnly');
     const overflowHidden = get('overflowHidden');
     const tiny = get('tiny');
@@ -695,7 +731,8 @@ export const StyledFormButton = React.memo(({ children, ...props }: ButtonProps)
         color: 'inherit',
         textTransform: 'none',
         minHeight: tiny ? '32px' : '40px',
-        ...((preventDisabledColor || readOnly) && { color: 'inherit !important' }),
+        ...(disabled && preventDisabledColor && { color: 'inherit !important' }),
+        ...(readOnly && !disabled && { color: 'inherit !important', pointerEvents: 'none', userSelect: 'text' }),
         ...(password && showPassword && { wordBreak: 'break-all' }),
         ...props?.sx
       }}
@@ -711,10 +748,10 @@ export const StyledFormLabel = React.memo(() => {
   const [get] = usePropStore();
 
   const disabled = get('disabled');
-  const errorMsg = get('errorMsg');
+  const errorMsg = useErrorMessage();
   const focused = get('focused');
-  const id = get('id');
-  const label = get('label');
+  const id = usePropID();
+  const label = usePropLabel();
   const labelProps = get('labelProps');
   const overflowHidden = get('overflowHidden');
   const preventDisabledColor = get('preventDisabledColor');
@@ -802,10 +839,10 @@ export const useTextInputSlot = (overrides?: Partial<TextFieldProps>) => {
 
   const autoComplete = get('autoComplete');
   const disabled = get('disabled');
-  const errorMsg = get('errorMsg');
+  const errorMsg = useErrorMessage();
   const helperText = get('helperText');
-  const id = get('id');
-  const label = get('label');
+  const id = usePropID();
+  const label = usePropLabel();
   const loading = get('loading');
   const monospace = get('monospace');
   const overflowHidden = get('overflowHidden');
@@ -961,11 +998,11 @@ export const StyledTextField = React.memo(({ params, ...props }: StyledTextField
           endAdornment: (
             <StyledEndAdornment preventRender={!props?.slotProps?.input?.['endAdornment']}>
               {props?.slotProps?.input?.['endAdornment']}
-              {/* {params?.InputProps?.endAdornment} */}
               {endAdornment}
-              <PasswordInput />
-              <ResetInput />
-              <SpinnerInput />
+              <PasswordAdornment />
+              <ResetAdornment />
+              <SpinnerAdornment />
+              <ClearAdornment />
             </StyledEndAdornment>
           )
         }
@@ -995,8 +1032,8 @@ export const StyledAutocomplete = <
 
   const autoComplete = get('autoComplete');
   const disabled = get('disabled');
-  const id = get('id');
-  const options = get('options');
+  const id = usePropID();
+  const options = get('options') ?? [];
   const readOnly = get('readOnly');
 
   return (
@@ -1032,7 +1069,7 @@ export const StyledCustomChip = React.memo(({ label, onDelete = () => null, sx, 
       {...props}
       onDelete={disabled || readOnly ? undefined : onDelete}
       sx={{
-        ...(readOnly && !disabled && { cursor: 'default' }),
+        ...(readOnly && !disabled && { cursor: 'default', userSelect: 'text' }),
         ...(monospace && { fontFamily: 'monospace' }),
         ...(password &&
           showPassword && {

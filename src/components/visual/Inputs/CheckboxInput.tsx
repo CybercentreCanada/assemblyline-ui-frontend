@@ -1,17 +1,17 @@
 import type { CheckboxProps } from '@mui/material';
 import { Checkbox } from '@mui/material';
 import {
-  ExpandInput,
+  ExpandAdornment,
   HelperText,
-  PasswordInput,
-  ResetInput,
+  PasswordAdornment,
+  ResetAdornment,
   StyledButtonLabel,
   StyledEndAdornmentBox,
   StyledFormButton,
   StyledFormControl,
   StyledFormControlLabel
 } from 'components/visual/Inputs/lib/inputs.components';
-import { useInputHandlers, useInputParsedProps } from 'components/visual/Inputs/lib/inputs.hook';
+import { useInputBlur, useInputClick, useInputFocus } from 'components/visual/Inputs/lib/inputs.hook';
 import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
 import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
 import { Tooltip } from 'components/visual/Tooltip';
@@ -22,7 +22,7 @@ export type CheckboxInputProps = InputValues<boolean, boolean, React.MouseEvent<
     indeterminate?: CheckboxProps['indeterminate'];
   };
 
-const WrappedCheckboxInput = React.memo(() => {
+const WrappedCheckboxInput = () => {
   const [get] = usePropStore<CheckboxInputProps>();
 
   const indeterminate = get('indeterminate');
@@ -32,15 +32,16 @@ const WrappedCheckboxInput = React.memo(() => {
   const readOnly = get('readOnly');
   const tooltip = get('tooltip');
   const tooltipProps = get('tooltipProps');
-  const value = get('value');
 
-  const { handleClick, handleFocus, handleBlur } = useInputHandlers<CheckboxInputProps>();
+  const handleBlur = useInputBlur<CheckboxInputProps>();
+  const handleClick = useInputClick<CheckboxInputProps>();
+  const handleFocus = useInputFocus<CheckboxInputProps>();
 
   return (
     <Tooltip title={loading ? null : tooltip} {...tooltipProps}>
       <StyledFormControl>
         <StyledFormButton
-          onBlur={e => handleBlur(e, value)}
+          onBlur={e => handleBlur(e)}
           onFocus={handleFocus}
           onClick={e => handleClick(e, !inputValue, !inputValue)}
         >
@@ -65,25 +66,18 @@ const WrappedCheckboxInput = React.memo(() => {
         <HelperText />
 
         <StyledEndAdornmentBox>
-          <PasswordInput />
-          <ResetInput />
-          <ExpandInput />
+          <PasswordAdornment />
+          <ResetAdornment />
+          <ExpandAdornment />
         </StyledEndAdornmentBox>
       </StyledFormControl>
     </Tooltip>
   );
-});
+};
 
-export const CheckboxInput = ({ indeterminate = false, preventRender = false, ...props }: CheckboxInputProps) => {
-  const parsedProps = useInputParsedProps<boolean, boolean, CheckboxInputProps>({
-    ...props,
-    indeterminate,
-    preventRender
-  });
-
-  return preventRender ? null : (
-    <PropProvider<CheckboxInputProps> props={parsedProps}>
+export const CheckboxInput = ({ preventRender = false, value, ...props }: CheckboxInputProps) =>
+  preventRender ? null : (
+    <PropProvider<CheckboxInputProps> props={{ indeterminate: false, inputValue: value, value, ...props }}>
       <WrappedCheckboxInput />
     </PropProvider>
   );
-};

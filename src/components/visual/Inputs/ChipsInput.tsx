@@ -1,7 +1,6 @@
 import type { AutocompleteProps, TextFieldProps } from '@mui/material';
 import { Autocomplete } from '@mui/material';
 import {
-  ClearInput,
   HelperText,
   StyledCustomChip,
   StyledFormControl,
@@ -10,7 +9,7 @@ import {
   StyledRoot,
   StyledTextField
 } from 'components/visual/Inputs/lib/inputs.components';
-import { useInputHandlers, useInputParsedProps } from 'components/visual/Inputs/lib/inputs.hook';
+import { useInputBlur, useInputChange, useInputFocus, usePropID } from 'components/visual/Inputs/lib/inputs.hook';
 import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
 import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
 import type { ElementType } from 'react';
@@ -18,6 +17,7 @@ import React from 'react';
 
 export type ChipsInputProps = InputValues<string[], string[], React.SyntheticEvent<Element, Event>> &
   InputProps & {
+    allowEmptyStrings?: boolean;
     autoComplete?: TextFieldProps['autoComplete'];
     disableCloseOnSelect?: AutocompleteProps<string, true, false, true, ElementType>['disableCloseOnSelect'];
     filterSelectedOptions?: AutocompleteProps<string, true, false, true, ElementType>['filterSelectedOptions'];
@@ -27,23 +27,25 @@ export type ChipsInputProps = InputValues<string[], string[], React.SyntheticEve
     renderValue?: AutocompleteProps<string, true, false, true, ElementType>['renderValue'];
   };
 
-const WrappedChipsInput = React.memo(() => {
+const WrappedChipsInput = () => {
   const [get] = usePropStore<ChipsInputProps>();
 
+  const allowEmptyStrings = get('allowEmptyStrings');
   const disableCloseOnSelect = get('disableCloseOnSelect');
   const disabled = get('disabled');
   const filterSelectedOptions = get('filterSelectedOptions');
-  const id = get('id');
+  const id = usePropID();
   const inputValue = get('inputValue') ?? [];
   const isOptionEqualToValue = get('isOptionEqualToValue');
   const loading = get('loading');
-  const options = get('options');
+  const options = get('options') ?? [];
   const readOnly = get('readOnly');
   const renderOption = get('renderOption');
   const renderValue = get('renderValue');
-  const value = get('value');
 
-  const { handleChange, handleFocus, handleBlur } = useInputHandlers<ChipsInputProps>();
+  const handleBlur = useInputBlur<ChipsInputProps>();
+  const handleChange = useInputChange<ChipsInputProps>();
+  const handleFocus = useInputFocus<ChipsInputProps>();
 
   return (
     <StyledRoot>
@@ -66,65 +68,74 @@ const WrappedChipsInput = React.memo(() => {
             value={inputValue}
             onChange={(e, v) => handleChange(e, v as string[], v as string[])}
             onFocus={handleFocus}
-            onBlur={e => handleBlur(e, value)}
+            onBlur={e => handleBlur(e)}
             renderValue={
               renderValue ??
               ((values, getTagProps) =>
                 values.map((option, index) => {
                   const { key, ...tagProps } = getTagProps({ index });
-                  return <StyledCustomChip key={key} label={option} {...tagProps} />;
+                  return <StyledCustomChip key={key} label={option ? option : '\u00A0'} {...tagProps} />;
                 }))
             }
-            renderInput={params => <StyledTextField params={params} />}
+            renderInput={params => (
+              <StyledTextField
+                params={{
+                  ...params,
+                  inputProps: {
+                    ...params.inputProps,
+                    ...(allowEmptyStrings && {
+                      onKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => {
+                        if (event.key === 'Enter') {
+                          const current = (event.currentTarget as HTMLInputElement).value;
+                          if (current === '') {
+                            event.preventDefault();
+                            const next = Array.from(new Set([...(inputValue ?? []), '']));
+                            handleChange(event as any, next, next);
+                          }
+                        }
+                      }
+                    })
+                  }
+                }}
+              />
+            )}
             renderOption={renderOption}
+            sx={{
+              ...(readOnly &&
+                !disabled && {
+                  pointerEvents: 'none',
+                  '& .MuiAutocomplete-input': {
+                    pointerEvents: 'none'
+                  }
+                })
+            }}
           />
         )}
         <HelperText />
       </StyledFormControl>
     </StyledRoot>
   );
-});
+};
 
-export const ChipsInput = ({
-  autoComplete = 'off',
-  disableCloseOnSelect = false,
-  endAdornment = null,
-  filterSelectedOptions = false,
-  isOptionEqualToValue = (option, value) => option === value,
-  options = [],
-  preventRender = false,
-  renderOption = null,
-  renderValue = null,
-  value = [],
-  ...props
-}: ChipsInputProps) => {
-  const parsedProps = useInputParsedProps<string[], string[], ChipsInputProps>({
-    ...props,
-    autoComplete,
-    disableCloseOnSelect,
-    endAdornment,
-    filterSelectedOptions,
-    isOptionEqualToValue,
-    options,
-    preventRender,
-    renderOption,
-    renderValue,
-    value
-  });
-
-  return preventRender ? null : (
+export const ChipsInput = ({ preventRender = false, value = [], ...props }: ChipsInputProps) =>
+  preventRender ? null : (
     <PropProvider<ChipsInputProps>
       props={{
-        ...parsedProps,
-        endAdornment: (
-          <>
-            {endAdornment}
-            <ClearInput />
-          </>
-        )
+        allowEmptyStrings: false,
+        autoComplete: 'off',
+        clearAdornment: true,
+        disableCloseOnSelect: false,
+        filterSelectedOptions: false,
+        inputValue: value,
+        isOptionEqualToValue: (option, value) => option === value,
+        options: [],
+        preventRender,
+        renderOption: null,
+        renderValue: null,
+        value,
+        ...props
       }}
     >
       <WrappedChipsInput />
     </PropProvider>
   );
-};

@@ -18,13 +18,12 @@ import type { ClassificationProps } from 'components/visual/Classification';
 import CustomChip, { COLOR_MAP } from 'components/visual/CustomChip';
 import {
   HelperText,
-  PasswordInput,
+  PasswordAdornment,
   StyledFormControl,
   StyledFormLabel,
   StyledInputSkeleton,
   StyledRoot
 } from 'components/visual/Inputs/lib/inputs.components';
-import { useInputParsedProps } from 'components/visual/Inputs/lib/inputs.hook';
 import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
 import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
 import { Tooltip } from 'components/visual/Tooltip';
@@ -52,7 +51,7 @@ type ClassificationInputState = ClassificationInputProps & {
   validated: ClassificationValidator;
 };
 
-const WrappedClassificationInput = React.memo(() => {
+const WrappedClassificationInput = () => {
   const { t } = useTranslation();
   const theme = useTheme();
   const { user: currentUser, c12nDef, classificationAliases } = useALContext();
@@ -477,7 +476,7 @@ const WrappedClassificationInput = React.memo(() => {
                 </Grid>
               </DialogContent>
               <DialogActions>
-                <PasswordInput />
+                <PasswordAdornment />
                 {reset && (
                   <Tooltip arrow title={title} placement="bottom">
                     <Button onClick={onReset ? onReset : handleReset} color="secondary">
@@ -497,31 +496,23 @@ const WrappedClassificationInput = React.memo(() => {
       </StyledFormControl>
     </StyledRoot>
   );
-});
+};
 
-export const ClassificationInput = ({
-  dynGroup = null,
-  format = 'short',
-  fullWidth = true,
-  inline = false,
-  isUser = false,
-  preventRender = false,
-  value,
-  ...props
-}: ClassificationInputProps) => {
-  const parsedProps = useInputParsedProps<string, string, ClassificationInputProps>({
-    ...props,
-    dynGroup,
-    format,
-    fullWidth,
-    inline,
-    isUser,
-    preventRender,
-    value
-  });
-
+export const ClassificationInput = ({ preventRender = false, value, ...props }: ClassificationInputProps) => {
   return preventRender || !value ? null : (
-    <PropProvider<ClassificationInputProps> props={parsedProps}>
+    <PropProvider<ClassificationInputProps>
+      props={{
+        dynGroup: null,
+        format: 'short',
+        fullWidth: true,
+        inline: false,
+        inputValue: value,
+        isUser: false,
+        preventRender,
+        value,
+        ...props
+      }}
+    >
       <WrappedClassificationInput />
     </PropProvider>
   );

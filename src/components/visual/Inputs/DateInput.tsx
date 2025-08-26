@@ -6,10 +6,10 @@ import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
 import { IconButton } from 'components/visual/Buttons/IconButton';
 import {
-  ExpandInput,
+  ExpandAdornment,
   HelperText,
-  PasswordInput,
-  ResetInput,
+  PasswordAdornment,
+  ResetAdornment,
   StyledEndAdornment,
   StyledFormControl,
   StyledFormLabel,
@@ -17,7 +17,7 @@ import {
   StyledRoot,
   useTextInputSlot
 } from 'components/visual/Inputs/lib/inputs.components';
-import { useInputHandlers, useInputParsedProps } from 'components/visual/Inputs/lib/inputs.hook';
+import { useInputBlur, useInputChange, useInputFocus, usePropID } from 'components/visual/Inputs/lib/inputs.hook';
 import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
 import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
 import type { Moment } from 'moment';
@@ -53,12 +53,12 @@ const DatePopper = React.memo(() => {
 
   const [get, setStore] = usePropStore<DateInputState>();
 
-  const id = get('id');
+  const id = usePropID();
   const inputValue = get('inputValue') ?? null;
   const showPopover = get('showPopover') ?? false;
   const tiny = get('tiny');
 
-  const { handleChange } = useInputHandlers<DateInputProps>();
+  const handleChange = useInputChange<DateInputProps>();
 
   return (
     <>
@@ -142,7 +142,7 @@ const DatePopper = React.memo(() => {
   );
 });
 
-const WrappedDateInput = React.memo(() => {
+const WrappedDateInput = () => {
   const { i18n } = useTranslation('inputs');
 
   const [get] = usePropStore<DateInputState>();
@@ -154,7 +154,6 @@ const WrappedDateInput = React.memo(() => {
   const maxDateToday = get('maxDateToday');
   const minDateTomorrow = get('minDateTomorrow');
   const readOnly = get('readOnly');
-  const value = get('value');
 
   const today = useMemo<Moment>(() => {
     const d = new Date();
@@ -169,7 +168,9 @@ const WrappedDateInput = React.memo(() => {
     return moment(d);
   }, []);
 
-  const { handleChange, handleFocus, handleBlur } = useInputHandlers<DateInputProps>();
+  const handleBlur = useInputBlur<DateInputProps>();
+  const handleChange = useInputChange<DateInputProps>();
+  const handleFocus = useInputFocus<DateInputProps>();
 
   const textfieldSlot = useTextInputSlot();
 
@@ -201,13 +202,13 @@ const WrappedDateInput = React.memo(() => {
                   textField: {
                     ...textfieldSlot,
                     onFocus: handleFocus,
-                    onBlur: e => handleBlur(e, moment(value)),
+                    onBlur: e => handleBlur(e),
                     InputProps: {
                       endAdornment: (
                         <StyledEndAdornment preventRender={disabled || readOnly}>
-                          <PasswordInput />
-                          <ResetInput />
-                          <ExpandInput />
+                          <PasswordAdornment />
+                          <ResetAdornment />
+                          <ExpandAdornment />
                           {endAdornment}
                           <DatePopper />
                         </StyledEndAdornment>
@@ -223,30 +224,22 @@ const WrappedDateInput = React.memo(() => {
       </StyledRoot>
     </LocalizationProvider>
   );
-});
+};
 
-export const DateInput = ({
-  autoComplete = 'off',
-  defaultDateOffset = null,
-  maxDateToday = false,
-  minDateTomorrow = false,
-  value,
-  preventRender = false,
-  ...props
-}: DateInputProps) => {
-  const parsedProps = useInputParsedProps<string, Moment, DateInputProps>({
-    ...props,
-    autoComplete,
-    defaultDateOffset,
-    maxDateToday,
-    minDateTomorrow,
-    preventRender,
-    value
-  });
-
-  return preventRender ? null : (
-    <PropProvider<DateInputProps> props={{ ...parsedProps, inputValue: value ? moment(value) : null }}>
+export const DateInput = ({ value, preventRender = false, ...props }: DateInputProps) =>
+  preventRender ? null : (
+    <PropProvider<DateInputProps>
+      props={{
+        autoComplete: 'off',
+        defaultDateOffset: null,
+        inputValue: value ? moment(value) : null,
+        maxDateToday: false,
+        minDateTomorrow: false,
+        preventRender,
+        value,
+        ...props
+      }}
+    >
       <WrappedDateInput />
     </PropProvider>
   );
-};

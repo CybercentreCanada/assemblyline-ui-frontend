@@ -2,8 +2,8 @@ import type { ListItemTextProps, MenuItemProps, SelectProps } from '@mui/materia
 import { IconButton, ListItemText, MenuItem, Select, useTheme } from '@mui/material';
 import {
   HelperText,
-  PasswordInput,
-  ResetInput,
+  PasswordAdornment,
+  ResetAdornment,
   StyledEndAdornment,
   StyledFormControl,
   StyledFormLabel,
@@ -11,7 +11,13 @@ import {
   StyledListItemText,
   StyledRoot
 } from 'components/visual/Inputs/lib/inputs.components';
-import { useInputHandlers, useInputParsedProps } from 'components/visual/Inputs/lib/inputs.hook';
+import {
+  useErrorMessage,
+  useInputBlur,
+  useInputChange,
+  useInputFocus,
+  usePropID
+} from 'components/visual/Inputs/lib/inputs.hook';
 import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
 import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
 import React, { useState } from 'react';
@@ -29,7 +35,7 @@ export type SelectInputProps<O extends readonly Option[]> = InputValues<O[number
     options?: O;
   };
 
-const WrappedSelectInput = React.memo(<O extends readonly Option[]>() => {
+const WrappedSelectInput = <O extends readonly Option[]>() => {
   const theme = useTheme();
 
   const [get] = usePropStore<SelectInputProps<O>>();
@@ -38,23 +44,24 @@ const WrappedSelectInput = React.memo(<O extends readonly Option[]>() => {
   const disabled = get('disabled');
   const displayEmpty = get('displayEmpty');
   const endAdornment = get('endAdornment');
-  const errorMsg = get('errorMsg');
-  const id = get('id');
+  const errorMsg = useErrorMessage();
+  const id = usePropID();
   const inputValue = get('inputValue');
   const loading = get('loading');
   const monospace = get('monospace');
-  const options = get('options');
+  const options = get('options') ?? [];
   const overflowHidden = get('overflowHidden');
   const password = get('password');
   const readOnly = get('readOnly');
   const resetProps = get('resetProps');
   const showPassword = get('showPassword');
   const tiny = get('tiny');
-  const value = get('value');
 
   const [open, setOpen] = useState<boolean>(false);
 
-  const { handleChange, handleFocus, handleBlur } = useInputHandlers<SelectInputProps<O>>();
+  const handleBlur = useInputBlur<SelectInputProps<O>>();
+  const handleChange = useInputChange<SelectInputProps<O>>();
+  const handleFocus = useInputFocus<SelectInputProps<O>>();
 
   return (
     <StyledRoot>
@@ -75,7 +82,7 @@ const WrappedSelectInput = React.memo(<O extends readonly Option[]>() => {
             value={options?.some(o => o.value === inputValue) ? inputValue : ''}
             onChange={event => handleChange(event as React.SyntheticEvent, event.target.value, event.target.value)}
             onFocus={handleFocus}
-            onBlur={e => handleBlur(e, value)}
+            onBlur={e => handleBlur(e)}
             onClose={() => setOpen(false)}
             onOpen={() => setOpen(true)}
             renderValue={option => (
@@ -114,14 +121,15 @@ const WrappedSelectInput = React.memo(<O extends readonly Option[]>() => {
             IconComponent={() => null}
             endAdornment={
               <StyledEndAdornment preventRender={false}>
-                <PasswordInput />
-                <ResetInput />
+                <PasswordAdornment />
+                <ResetAdornment />
                 {endAdornment}
 
                 <IconButton
                   aria-label={`${id}-select-menu`}
                   color="secondary"
                   type="button"
+                  tabIndex={-1}
                   onClick={() => setOpen(true)}
                   {...resetProps}
                   sx={{
@@ -151,7 +159,7 @@ const WrappedSelectInput = React.memo(<O extends readonly Option[]>() => {
               }
             }}
           >
-            {options.map((option, i) => (
+            {options?.map((option, i) => (
               <MenuItem key={i} value={option.value as MenuItemProps['value']}>
                 <StyledListItemText primary={option.primary ? option.primary : '\u00A0'} secondary={option.secondary} />
               </MenuItem>
@@ -162,25 +170,13 @@ const WrappedSelectInput = React.memo(<O extends readonly Option[]>() => {
       </StyledFormControl>
     </StyledRoot>
   );
-});
+};
 
-export const SelectInput = <O extends readonly Option[]>({
-  capitalize = false,
-  displayEmpty = false,
-  options = [] as unknown as O,
-  preventRender = false,
-  ...props
-}: SelectInputProps<O>) => {
-  const parsedProps = useInputParsedProps<O[number]['value'], O[number]['value'], SelectInputProps<O>>({
-    ...props,
-    capitalize,
-    displayEmpty,
-    options,
-    preventRender
-  });
-
+export const SelectInput = <O extends readonly Option[]>({ preventRender = false, ...props }: SelectInputProps<O>) => {
   return preventRender ? null : (
-    <PropProvider<SelectInputProps<O>> props={parsedProps}>
+    <PropProvider<SelectInputProps<O>>
+      props={{ capitalize: false, displayEmpty: false, options: [] as unknown as O, preventRender, ...props }}
+    >
       <WrappedSelectInput />
     </PropProvider>
   );

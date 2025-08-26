@@ -26,7 +26,6 @@
   "ignore_ssl": "Ignorer les erreurs SSL",
   "ignore_ssl_used": "Les erreurs SSL seront ignorées lors de la connexion à cette source",
   "name": "Nom de la source",
-  "name.error": "Le nom de la source ne peut pas être null",
   "network": "Réseau",
   "no_sources": "Il n'y a actuellement aucune source de signature pour ce service.",
   "override_classification": "Override signature-defined classification with source classificationRemplacer la classification définie par la signature par la classification de la source",
@@ -50,7 +49,6 @@
   "update_all.response.success": "Toutes les sources du service suivant ont été déclenchées pour la mise à jour",
   "update_interval": "Intervalle de mise à jour",
   "uri": "URI",
-  "uri.error": "L'URI ne peut pas être null",
   "use_managed_identity": "Utiliser managed identity",
   "username": "Nom d'utilisateur",
   "view_signatures": "Afficher les signatures"
