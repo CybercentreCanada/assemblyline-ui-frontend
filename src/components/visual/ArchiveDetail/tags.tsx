@@ -607,7 +607,7 @@ const WrappedRow: React.FC<RowProps> = ({
           <Collapse in={open && resultResults?.total > 0} timeout="auto" onEnter={() => setRender(true)}>
             {render && (
               <div style={{ paddingTop: theme.spacing(2), paddingBottom: theme.spacing(2) }}>
-                <ResultsTable resultResults={resultResults} allowSort={false} />
+                <ResultsTable resultResults={resultResults} allowSort={false} allowHash />
               </div>
             )}
           </Collapse>

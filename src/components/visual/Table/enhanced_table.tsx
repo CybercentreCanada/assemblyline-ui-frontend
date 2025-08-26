@@ -333,6 +333,7 @@ const WrappedEnhancedTableBody: React.FC<EnhancedTableBodyProps> = ({
                 .map((row, index) =>
                   linkField && linkPrefix ? (
                     <LinkRow
+                      key={index}
                       hover
                       component={Link}
                       to={`${linkPrefix}${row[linkField]}`}
@@ -345,7 +346,6 @@ const WrappedEnhancedTableBody: React.FC<EnhancedTableBodyProps> = ({
                           : null
                       }
                       tabIndex={-1}
-                      key={index}
                     >
                       {cells.map(head => (
                         <DivTableCell

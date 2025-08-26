@@ -59,9 +59,9 @@ const WrappedAlertsTable: React.FC<Props> = ({ alertResults, allowSort = true })
             </DivTableRow>
           </DivTableHead>
           <DivTableBody>
-            {alertResults.items.map(alert => (
+            {alertResults.items.map((alert, i) => (
               <LinkRow
-                key={alert.id}
+                key={`${alert.id}-${i}`}
                 component={Link}
                 to={`/alerts/${alert.id}`}
                 hover
