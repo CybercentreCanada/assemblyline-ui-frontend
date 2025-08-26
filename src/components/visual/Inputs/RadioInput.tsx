@@ -36,7 +36,7 @@ const WrappedRadioInput = <O extends readonly Option[]>() => {
 
   const focused = get('focused');
   const inputValue = get('inputValue') ?? '';
-  const options = get('options') ?? [];
+  const options = get('options');
   const preventDisabledColor = get('preventDisabledColor');
   const readOnly = get('readOnly');
 

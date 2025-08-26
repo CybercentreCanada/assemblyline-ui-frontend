@@ -73,7 +73,7 @@ const WrappedTextInput = () => {
 export const TextInput = ({ preventRender = false, value, ...props }: TextInputProps) =>
   preventRender ? null : (
     <PropProvider<TextInputProps>
-      props={{ autoComplete: 'off', options: [], preventRender, value, inputValue: value, ...props }}
+      props={{ autoComplete: 'off', options: [], preventRender, inputValue: value, value, ...props }}
     >
       <WrappedTextInput />
     </PropProvider>
