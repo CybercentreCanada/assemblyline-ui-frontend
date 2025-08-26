@@ -121,7 +121,7 @@ export const ChipsInput = ({ preventRender = false, value = [], ...props }: Chip
   preventRender ? null : (
     <PropProvider<ChipsInputProps>
       props={{
-        allowEmptyStrings: true,
+        allowEmptyStrings: false,
         autoComplete: 'off',
         clearAdornment: true,
         disableCloseOnSelect: false,
