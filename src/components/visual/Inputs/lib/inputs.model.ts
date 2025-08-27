@@ -53,7 +53,7 @@ export const DEFAULT_INPUT_VALUES: InputValues<unknown, unknown> = {
   reset: () => false,
   value: null,
   onChange: () => null,
-  onReset: () => null
+  onReset: null
 };
 
 export type InputProps = {
