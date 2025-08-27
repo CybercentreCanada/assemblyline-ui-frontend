@@ -1,3 +1,4 @@
+import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import BlockIcon from '@mui/icons-material/Block';
@@ -14,6 +15,7 @@ import {
   DialogTitle,
   IconButton,
   Skeleton,
+  SvgIcon,
   TableContainer,
   Tooltip,
   Typography,
@@ -39,6 +41,7 @@ import { verdictToColor } from 'helpers/utils';
 import type { ReactNode } from 'react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { BiNetworkChart } from 'react-icons/bi';
 import { HiOutlineExternalLink } from 'react-icons/hi';
 
 type PossibleColors = 'info' | 'default' | 'error' | 'success' | 'primary' | 'secondary' | 'warning';
@@ -428,9 +431,14 @@ export const AlertEventsTable: React.FC<AlertEventsTableProps> = React.memo(
                               </Tooltip>
                             </GridTableCell>
                             <GridTableCell style={{ borderColor: theme.palette.divider }}>
-                              <Tooltip title={event.entity_type} style={{ textTransform: 'capitalize' }}>
+                              <div style={{ display: 'flex', alignItems: 'center', columnGap: theme.spacing(0.5) }}>
+                                {event.entity_type === 'workflow' && <SvgIcon children={<BiNetworkChart />} />}
+                                {event.entity_type === 'user' && <AccountCircleOutlinedIcon />}
                                 <span>{event.entity_name}</span>
-                              </Tooltip>
+                                {event.entity_type !== 'user' ? null : (
+                                  <span style={{ color: theme.palette.text.secondary }}>{`(${event.entity_id})`}</span>
+                                )}
+                              </div>
                             </GridTableCell>
                             <GridTableCell style={{ borderColor: theme.palette.divider }}>
                               {event.priority ? <AlertPriority name={event.priority} withChip /> : null}

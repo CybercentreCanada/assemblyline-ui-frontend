@@ -200,9 +200,7 @@ export default function LoginScreen({ allowUserPass, allowSAML, allowSignup, oAu
 
   return (
     <PageCardCentered>
-      <Box sx={{ cursor: 'pointer', marginBottom: theme.spacing(2) }} onClick={reset}>
-        {shownControls === 'login' ? bannerVert : banner}
-      </Box>
+      <Box>{shownControls === 'login' ? bannerVert : banner}</Box>
       {
         {
           login: (
