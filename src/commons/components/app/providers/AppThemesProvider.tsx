@@ -5,23 +5,27 @@ import { AppStorageKeys } from 'commons/components/app/AppConstants';
 import { AppDefaultsPreferencesConfigs } from 'commons/components/app/AppDefaults';
 import useLocalStorageItem from 'commons/components/utils/hooks/useLocalStorageItem';
 import useThemeBuilder from 'commons/components/utils/hooks/useThemeBuilder';
-import { createContext, useCallback, useMemo, type FC, type PropsWithChildren } from 'react';
+import { createContext, useCallback, useMemo, useEffect, type FC, type PropsWithChildren } from 'react';
 
-const { LS_KEY_THEME, LS_KEY_DARK_MODE } = AppStorageKeys;
+const { LS_KEY_AUTO_DETECT_COLOR_SCHEME, LS_KEY_THEME, LS_KEY_DARK_MODE } = AppStorageKeys;
 
 export type AppThemeContextProps = {
   current: AppThemeConfigs;
   mode: PaletteMode;
+  autoDetectColorScheme?: boolean;
   themes?: AppTheme[];
   setTheme: (id: string) => void;
   toggleMode: () => void;
+  toggleAutoDetectColorScheme: () => void;
 };
 
 export const AppThemesContext = createContext<AppThemeContextProps>({
   current: {},
   mode: 'dark',
+  autoDetectColorScheme: true,
   setTheme: () => null,
-  toggleMode: () => null
+  toggleMode: () => null,
+  toggleAutoDetectColorScheme: () => null,
 });
 
 export const AppThemesProvider: FC<
@@ -29,7 +33,7 @@ export const AppThemesProvider: FC<
 > = ({ initTheme, themes, preferences, children }) => {
   // Since we can't useAppConfig yet, we explicitly merge default and preferences config
   //  to help figure the default theme mode.
-  const { allowThemeSelection, defaultTheme } = { ...AppDefaultsPreferencesConfigs, ...(preferences || {}) };
+  const { allowThemeSelection, autoDetectColorScheme, defaultTheme } = { ...AppDefaultsPreferencesConfigs, ...(preferences || {}) };
 
   // Store theme state in local storage.
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
@@ -37,13 +41,24 @@ export const AppThemesProvider: FC<
     LS_KEY_DARK_MODE,
     ((defaultTheme ?? prefersDarkMode) ? 'dark' : 'light') as PaletteMode
   );
+  const [autoDetectCS, setAutoDetectCS] = useLocalStorageItem(LS_KEY_AUTO_DETECT_COLOR_SCHEME, !!autoDetectColorScheme);
 
-  // Enforce default theme if selection isn't alloweed.
+  // Effect to update darkMode based on system preference
+  useEffect(() => {
+    if (autoDetectCS && allowThemeSelection) {
+      setMode(prefersDarkMode ? 'dark' : 'light');
+    }
+  }, [autoDetectCS, prefersDarkMode, allowThemeSelection]);
+
+  // Enforce default theme if selection isn't allowed.
   const _darkMode = allowThemeSelection ? mode === 'dark' : defaultTheme === 'dark';
 
+  // Callback to toggle theme auto detecting
+  const toggleAutoDetectColorScheme = useCallback(() => setAutoDetectCS(!autoDetectCS), [autoDetectCS, setAutoDetectCS]);
   const toggleMode = useCallback(() => {
     setMode(mode === 'dark' ? 'light' : 'dark');
-  }, [mode, setMode]);
+    if (autoDetectCS) setAutoDetectCS(false);
+  }, [autoDetectCS, mode, setMode, setAutoDetectCS]);
 
   const [current, setCurrent] = useLocalStorageItem<string>(
     LS_KEY_THEME,
@@ -51,7 +66,7 @@ export const AppThemesProvider: FC<
     // 1: If a list of theme is provided:
     //  1.1: pick the default's id.
     //  1.2: no default, pick the first's id.
-    // 2: Else don't set a value in local strorage.
+    // 2: Else don't set a value in local storage.
     themes?.length > 0 ? themes?.find(_theme => _theme.default)?.id || themes[0].id : null
   );
 
@@ -98,14 +113,16 @@ export const AppThemesProvider: FC<
   const context = useMemo(
     () => ({
       current: currentTheme,
+      autoDetectColorScheme: autoDetectCS,
       themes,
       mode,
       toggleMode,
+      toggleAutoDetectColorScheme,
       setTheme: (id: string) => {
         setCurrent(id);
       }
     }),
-    [currentTheme, themes, mode, toggleMode, setCurrent]
+    [currentTheme, autoDetectCS, themes, mode, toggleAutoDetectColorScheme, toggleMode, setCurrent]
   );
 
   return (

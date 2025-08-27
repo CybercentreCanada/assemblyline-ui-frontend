@@ -161,6 +161,7 @@
   "pager.of": "sur",
   "pager.rows": "Items par page:",
   "personalization": "Personnalisation",
+  "personalization.autoDetectColorScheme": "Synchroniser avec l'ordinateur",
   "personalization.autohideappbar": "Masquer la barre supérieure",
   "personalization.dark": "Mode Sombre",
   "personalization.focus.mode.label": "Mode Focus",
