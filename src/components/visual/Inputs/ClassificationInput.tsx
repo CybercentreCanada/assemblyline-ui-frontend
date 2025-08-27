@@ -52,7 +52,7 @@ type ClassificationInputState = ClassificationInputProps & {
 };
 
 const WrappedClassificationInput = () => {
-  const { t } = useTranslation();
+  const { t } = useTranslation('inputs');
   const theme = useTheme();
   const { user: currentUser, c12nDef, classificationAliases } = useALContext();
 

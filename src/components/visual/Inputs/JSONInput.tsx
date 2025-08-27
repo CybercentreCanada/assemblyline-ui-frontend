@@ -132,7 +132,7 @@ const WrappedJSONInput = () => {
 
 export const JSONInput = ({ preventRender = false, value, ...props }: JSONInputProps) =>
   preventRender ? null : (
-    <PropProvider<JSONInputProps> props={{ preventRender, value, inputValue: value, ...props }}>
+    <PropProvider<JSONInputProps> props={{ preventRender, inputValue: value, value, ...props }}>
       <WrappedJSONInput />
     </PropProvider>
   );

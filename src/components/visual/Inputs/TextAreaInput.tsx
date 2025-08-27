@@ -68,12 +68,11 @@ const WrappedTextAreaInput = () => {
   );
 };
 
-export const TextAreaInput = ({ preventRender = false, value, ...props }: TextAreaInputProps) => {
-  return preventRender ? null : (
+export const TextAreaInput = ({ preventRender = false, value, ...props }: TextAreaInputProps) =>
+  preventRender ? null : (
     <PropProvider<TextAreaInputProps>
-      props={{ autoComplete: 'off', rows: 1, preventRender, value, inputValue: value, ...props }}
+      props={{ autoComplete: 'off', rows: 1, preventRender, inputValue: value, value, ...props }}
     >
       <WrappedTextAreaInput />
     </PropProvider>
   );
-};

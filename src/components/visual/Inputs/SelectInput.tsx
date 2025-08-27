@@ -49,7 +49,7 @@ const WrappedSelectInput = <O extends readonly Option[]>() => {
   const inputValue = get('inputValue');
   const loading = get('loading');
   const monospace = get('monospace');
-  const options = get('options') ?? [];
+  const options = get('options');
   const overflowHidden = get('overflowHidden');
   const password = get('password');
   const readOnly = get('readOnly');
@@ -149,7 +149,8 @@ const WrappedSelectInput = <O extends readonly Option[]>() => {
             }
             sx={{
               '&.MuiInputBase-root': {
-                paddingRight: '9px'
+                paddingRight: '9px',
+                ...(!tiny && { minHeight: '40px' })
               },
               '& .MuiSelect-select': {
                 padding: '8px 8px 8px 14px !important',
@@ -159,7 +160,7 @@ const WrappedSelectInput = <O extends readonly Option[]>() => {
               }
             }}
           >
-            {options?.map((option, i) => (
+            {options.map((option, i) => (
               <MenuItem key={i} value={option.value as MenuItemProps['value']}>
                 <StyledListItemText primary={option.primary ? option.primary : '\u00A0'} secondary={option.secondary} />
               </MenuItem>
@@ -172,12 +173,23 @@ const WrappedSelectInput = <O extends readonly Option[]>() => {
   );
 };
 
-export const SelectInput = <O extends readonly Option[]>({ preventRender = false, ...props }: SelectInputProps<O>) => {
-  return preventRender ? null : (
+export const SelectInput = <O extends readonly Option[]>({
+  preventRender = false,
+  value,
+  ...props
+}: SelectInputProps<O>) =>
+  preventRender ? null : (
     <PropProvider<SelectInputProps<O>>
-      props={{ capitalize: false, displayEmpty: false, options: [] as unknown as O, preventRender, ...props }}
+      props={{
+        capitalize: false,
+        displayEmpty: false,
+        inputValue: value,
+        options: [] as unknown as O,
+        preventRender,
+        value,
+        ...props
+      }}
     >
       <WrappedSelectInput />
     </PropProvider>
   );
-};

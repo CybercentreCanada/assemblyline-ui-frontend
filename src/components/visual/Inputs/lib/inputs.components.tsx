@@ -245,7 +245,7 @@ export const PasswordAdornment = React.memo(() => {
 });
 
 export const ResetAdornment = React.memo(<T, P extends InputValues<T>>() => {
-  const { t } = useTranslation();
+  const { t } = useTranslation('inputs');
   const theme = useTheme();
 
   const [get] = usePropStore<P>();

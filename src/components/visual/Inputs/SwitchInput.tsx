@@ -72,7 +72,7 @@ const WrappedSwitchInput = () => {
 
 export const SwitchInput = ({ preventRender = false, value, ...props }: SwitchInputProps) =>
   preventRender ? null : (
-    <PropProvider<SwitchInputProps> props={{ preventRender, value, inputValue: value, ...props }}>
+    <PropProvider<SwitchInputProps> props={{ preventRender, inputValue: value, value, ...props }}>
       <WrappedSwitchInput />
     </PropProvider>
   );
