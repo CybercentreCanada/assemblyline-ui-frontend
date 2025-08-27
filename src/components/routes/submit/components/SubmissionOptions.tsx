@@ -16,9 +16,9 @@ export const SubmissionOptions = React.memo(() => {
 
   const priorityOptions = useMemo(
     () => [
-      { primary: t('options.submission.priority.low'), value: 500 },
+      { primary: t('options.submission.priority.high'), value: 1500 },
       { primary: t('options.submission.priority.medium'), value: 1000 },
-      { primary: t('options.submission.priority.high'), value: 1500 }
+      { primary: t('options.submission.priority.low'), value: 500 }
     ],
     [t]
   );
