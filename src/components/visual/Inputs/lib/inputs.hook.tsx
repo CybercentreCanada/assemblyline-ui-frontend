@@ -1,7 +1,7 @@
 import type { InputProps, InputStates, InputValues } from 'components/visual/Inputs/lib/inputs.model';
 import { usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
 import { isValidNumber, isValidValue } from 'components/visual/Inputs/lib/inputs.utils';
-import { useCallback, useRef, useTransition } from 'react';
+import { useCallback, useEffect, useRef, useTransition } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export const usePropLabel = () => {
@@ -86,12 +86,16 @@ export const useError = <Value extends unknown = unknown>() => {
 };
 
 export const useErrorMessage = () => {
-  const [get] = usePropStore<InputValues<unknown, unknown>>();
+  const [get, setStore] = usePropStore<InputValues<unknown, unknown>>();
 
   const error = useError();
   const value = get('value');
 
-  return error(value);
+  useEffect(() => {
+    const errorMessage = error(value);
+    setStore({ errorMessage });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 };
 
 export const useInputClick = <
@@ -102,7 +106,8 @@ export const useInputClick = <
   const [, startTransition] = useTransition();
   const latestId = useRef<number>(0);
 
-  const error = get('error');
+  const error = useError();
+  const enforceValidValue = get('enforceValidValue');
   const onChange = get('onChange');
   const onError = get('onError');
 
@@ -111,20 +116,20 @@ export const useInputClick = <
       event.preventDefault();
       event.stopPropagation();
 
-      const err = error(value);
-      onError(err);
-      onChange(event, value);
-      setStore({ inputValue, value });
+      const errorMessage = error(value);
+      onError(errorMessage);
+      setStore({ inputValue, errorMessage });
 
       const id = ++latestId.current;
 
       startTransition(() => {
-        if (id === latestId.current) {
+        if (id === latestId.current && (!enforceValidValue || !errorMessage)) {
+          setStore({ value });
           onChange(event, value);
         }
       });
     },
-    [error, onChange, onError, setStore]
+    [enforceValidValue, error, onChange, onError, setStore]
   );
 };
 
@@ -137,24 +142,26 @@ export const useInputChange = <
   const latestId = useRef<number>(0);
 
   const error = useError();
+  const enforceValidValue = get('enforceValidValue');
   const onChange = get('onChange');
   const onError = get('onError');
 
   return useCallback(
     (event: Parameters<Props['onChange']>[0], inputValue: Props['inputValue'], value: Props['value']) => {
-      const err = error(value);
-      onError(err);
-      setStore({ inputValue, value });
+      const errorMessage = error(value);
+      onError(errorMessage);
+      setStore({ inputValue, errorMessage });
 
       const id = ++latestId.current;
 
       startTransition(() => {
-        if (id === latestId.current) {
+        if (id === latestId.current && (!enforceValidValue || !errorMessage)) {
+          setStore({ value });
           onChange(event, value);
         }
       });
     },
-    [error, onChange, onError, setStore]
+    [enforceValidValue, error, onChange, onError, setStore]
   );
 };
 
@@ -179,13 +186,16 @@ export const useInputBlur = <
 >() => {
   const [get, setStore] = usePropStore();
 
+  const error = useError();
   const onBlur = get('onBlur');
 
   return useCallback(
-    (event: React.FocusEvent) => {
+    (event: React.FocusEvent, inputValue: Props['inputValue'], value: Props['value']) => {
       onBlur(event);
-      setStore(() => ({ focused: false }));
+
+      const errorMessage = error(value);
+      setStore(() => ({ focused: false, errorMessage, inputValue, value }));
     },
-    [onBlur, setStore]
+    [error, onBlur, setStore]
   );
 };

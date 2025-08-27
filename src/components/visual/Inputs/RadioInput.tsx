@@ -12,7 +12,7 @@ import {
   StyledFormLabel,
   StyledRoot
 } from 'components/visual/Inputs/lib/inputs.components';
-import { useInputBlur, useInputChange, useInputFocus } from 'components/visual/Inputs/lib/inputs.hook';
+import { useErrorMessage, useInputBlur, useInputChange, useInputFocus } from 'components/visual/Inputs/lib/inputs.hook';
 import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
 import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
 import React from 'react';
@@ -39,10 +39,13 @@ const WrappedRadioInput = <O extends readonly Option[]>() => {
   const options = get('options');
   const preventDisabledColor = get('preventDisabledColor');
   const readOnly = get('readOnly');
+  const value = get('value');
 
   const handleBlur = useInputBlur<RadioInputProps<O>>();
   const handleChange = useInputChange<RadioInputProps<O>>();
   const handleFocus = useInputFocus<RadioInputProps<O>>();
+
+  useErrorMessage();
 
   return (
     <StyledRoot>
@@ -53,7 +56,7 @@ const WrappedRadioInput = <O extends readonly Option[]>() => {
             <StyledFormButton
               key={`${index}-${option.label}`}
               onFocus={handleFocus}
-              onBlur={e => handleBlur(e)}
+              onBlur={e => handleBlur(e, value, value)}
               onClick={e => handleChange(e, option.value, option.value)}
             >
               <StyledFormControlLabel

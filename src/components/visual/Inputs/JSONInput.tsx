@@ -25,7 +25,7 @@ const WrappedJSONInput = () => {
   const [get] = usePropStore<JSONInputProps>();
 
   const disabled = get('disabled');
-  const errorMsg = useErrorMessage();
+  const errorMessage = get('errorMessage');
   const inputValue = get('inputValue') ?? null;
   const loading = get('loading');
   const monospace = get('monospace');
@@ -58,6 +58,8 @@ const WrappedJSONInput = () => {
 
   const handleChange = useInputChange<JSONInputProps>();
 
+  useErrorMessage();
+
   return (
     <StyledRoot>
       <StyledFormLabel />
@@ -72,7 +74,7 @@ const WrappedJSONInput = () => {
                 alignItems: 'flex-start',
                 border: `1px solid ${theme.palette.divider}`,
                 borderRadius: '4px',
-                ...(errorMsg && { border: `1px solid ${theme.palette.error.main}` })
+                ...(errorMessage && { border: `1px solid ${theme.palette.error.main}` })
               }}
             >
               <ReactJson

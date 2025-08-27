@@ -11,7 +11,7 @@ import {
   StyledFormControl,
   StyledFormControlLabel
 } from 'components/visual/Inputs/lib/inputs.components';
-import { useInputBlur, useInputClick, useInputFocus } from 'components/visual/Inputs/lib/inputs.hook';
+import { useErrorMessage, useInputBlur, useInputClick, useInputFocus } from 'components/visual/Inputs/lib/inputs.hook';
 import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
 import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
 import { Tooltip } from 'components/visual/Tooltip';
@@ -32,16 +32,19 @@ const WrappedCheckboxInput = () => {
   const readOnly = get('readOnly');
   const tooltip = get('tooltip');
   const tooltipProps = get('tooltipProps');
+  const value = get('value');
 
   const handleBlur = useInputBlur<CheckboxInputProps>();
   const handleClick = useInputClick<CheckboxInputProps>();
   const handleFocus = useInputFocus<CheckboxInputProps>();
 
+  useErrorMessage();
+
   return (
     <Tooltip title={loading ? null : tooltip} {...tooltipProps}>
       <StyledFormControl>
         <StyledFormButton
-          onBlur={e => handleBlur(e)}
+          onBlur={e => handleBlur(e, value, value)}
           onFocus={handleFocus}
           onClick={e => handleClick(e, !inputValue, !inputValue)}
         >

@@ -24,6 +24,7 @@ import {
   StyledInputSkeleton,
   StyledRoot
 } from 'components/visual/Inputs/lib/inputs.components';
+import { useError, useErrorMessage } from 'components/visual/Inputs/lib/inputs.hook';
 import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
 import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
 import { Tooltip } from 'components/visual/Tooltip';
@@ -83,10 +84,12 @@ const WrappedClassificationInput = () => {
   const uParts = get('uParts') ?? defaultParts;
   const validated = get('validated') ?? defaultClassificationValidator;
 
-  const error = get('error');
+  const error = useError();
   const onChange = get('onChange');
   const onError = get('onError');
   const onReset = get('onReset');
+
+  useErrorMessage();
 
   const preventRender = useMemo(
     () => preventRenderStore || !c12nDef?.enforce || !validated?.parts?.lvl,
