@@ -148,7 +148,7 @@ const WrappedMetaSection: React.FC<Props> = ({ metadata, classification }) => {
           <div>
             <Fetcher
               fetcherId="eml-preview.preview"
-              type="eml_id"
+              type="email_id"
               value={metadata?.eml_path}
               classification={currentUser.classification}
               slotProps={{
