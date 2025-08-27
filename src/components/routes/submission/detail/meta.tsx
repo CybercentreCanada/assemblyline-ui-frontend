@@ -151,7 +151,10 @@ const WrappedMetaSection: React.FC<Props> = ({ metadata, classification }) => {
               type="eml_id"
               value={metadata?.eml_path}
               classification={currentUser.classification}
-              slotProps={{ paper: { style: { maxWidth: '128px', minWidth: '128px', maxHeight: '128px' } } }}
+              slotProps={{
+                skeleton: { sx: { maxWidth: '128px', minWidth: '128px', maxHeight: '128px' } },
+                paper: { style: { maxWidth: '128px', minWidth: '128px', maxHeight: '128px' } }
+              }}
             />
           </div>
         )}
