@@ -33,7 +33,7 @@ const WrappedSliderInput = () => {
   const [get] = usePropStore<SliderInputProps>();
 
   const disabled = get('disabled');
-  const errorMsg = useErrorMessage();
+  const errorMessage = get('errorMessage');
   const id = usePropID();
   const inputValue = get('inputValue') ?? null;
   const loading = get('loading');
@@ -42,12 +42,15 @@ const WrappedSliderInput = () => {
   const min = get('min');
   const readOnly = get('readOnly');
   const step = get('step') ?? null;
+  const value = get('value');
   const valueLabelDisplay = get('valueLabelDisplay');
   const valueLabelFormat = get('valueLabelFormat');
 
   const handleBlur = useInputBlur<SliderInputProps>();
   const handleChange = useInputChange<SliderInputProps>();
   const handleFocus = useInputFocus<SliderInputProps>();
+
+  useErrorMessage();
 
   return (
     <StyledRoot>
@@ -61,7 +64,7 @@ const WrappedSliderInput = () => {
               <div style={{ flex: 1, marginLeft: '20px', marginRight: '20px' }}>
                 <Slider
                   aria-label={id}
-                  color={!disabled && errorMsg ? 'error' : 'primary'}
+                  color={!disabled && errorMessage ? 'error' : 'primary'}
                   disabled={disabled || readOnly}
                   id={id}
                   marks={marks}
@@ -73,7 +76,7 @@ const WrappedSliderInput = () => {
                   {...(min && { min: min })}
                   {...(max && { max: max })}
                   onFocus={handleFocus}
-                  onBlur={e => handleBlur(e)}
+                  onBlur={e => handleBlur(e, value, value)}
                   onChange={(e, v) => handleChange(e as unknown as React.SyntheticEvent, v, v)}
                 />
               </div>

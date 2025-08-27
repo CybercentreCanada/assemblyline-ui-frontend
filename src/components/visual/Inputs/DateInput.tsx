@@ -17,7 +17,13 @@ import {
   StyledRoot,
   useTextInputSlot
 } from 'components/visual/Inputs/lib/inputs.components';
-import { useInputBlur, useInputChange, useInputFocus, usePropID } from 'components/visual/Inputs/lib/inputs.hook';
+import {
+  useErrorMessage,
+  useInputBlur,
+  useInputChange,
+  useInputFocus,
+  usePropID
+} from 'components/visual/Inputs/lib/inputs.hook';
 import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
 import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
 import type { Moment } from 'moment';
@@ -154,6 +160,7 @@ const WrappedDateInput = () => {
   const maxDateToday = get('maxDateToday');
   const minDateTomorrow = get('minDateTomorrow');
   const readOnly = get('readOnly');
+  const value = get('value');
 
   const today = useMemo<Moment>(() => {
     const d = new Date();
@@ -177,6 +184,8 @@ const WrappedDateInput = () => {
   useEffect(() => {
     configureMomentLocale(i18n.language);
   }, [i18n.language]);
+
+  useErrorMessage();
 
   return (
     <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale={i18n.language}>
@@ -202,7 +211,7 @@ const WrappedDateInput = () => {
                   textField: {
                     ...textfieldSlot,
                     onFocus: handleFocus,
-                    onBlur: e => handleBlur(e),
+                    onBlur: e => handleBlur(e, value ? moment(value) : null, value),
                     InputProps: {
                       endAdornment: (
                         <StyledEndAdornment preventRender={disabled || readOnly}>

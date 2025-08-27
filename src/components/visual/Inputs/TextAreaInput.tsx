@@ -7,7 +7,7 @@ import {
   StyledRoot,
   StyledTextField
 } from 'components/visual/Inputs/lib/inputs.components';
-import { useInputBlur, useInputChange, useInputFocus } from 'components/visual/Inputs/lib/inputs.hook';
+import { useErrorMessage, useInputBlur, useInputChange, useInputFocus } from 'components/visual/Inputs/lib/inputs.hook';
 import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
 import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
 import React from 'react';
@@ -33,10 +33,13 @@ const WrappedTextAreaInput = () => {
   const rows = get('rows');
   const showPassword = get('showPassword');
   const tiny = get('tiny');
+  const value = get('value');
 
   const handleBlur = useInputBlur<TextAreaInputProps>();
   const handleChange = useInputChange<TextAreaInputProps>();
   const handleFocus = useInputFocus<TextAreaInputProps>();
+
+  useErrorMessage();
 
   return (
     <StyledRoot>
@@ -58,7 +61,7 @@ const WrappedTextAreaInput = () => {
               value={inputValue}
               onChange={e => handleChange(e, e.target.value, e.target.value)}
               onFocus={handleFocus}
-              onBlur={e => handleBlur(e)}
+              onBlur={e => handleBlur(e, value, value)}
             />
             <HelperText />
           </>

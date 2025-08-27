@@ -9,7 +9,13 @@ import {
   StyledRoot,
   StyledTextField
 } from 'components/visual/Inputs/lib/inputs.components';
-import { useInputBlur, useInputChange, useInputFocus, usePropID } from 'components/visual/Inputs/lib/inputs.hook';
+import {
+  useErrorMessage,
+  useInputBlur,
+  useInputChange,
+  useInputFocus,
+  usePropID
+} from 'components/visual/Inputs/lib/inputs.hook';
 import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
 import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
 import type { ElementType } from 'react';
@@ -42,10 +48,13 @@ const WrappedChipsInput = () => {
   const readOnly = get('readOnly');
   const renderOption = get('renderOption');
   const renderValue = get('renderValue');
+  const value = get('value');
 
   const handleBlur = useInputBlur<ChipsInputProps>();
   const handleChange = useInputChange<ChipsInputProps>();
   const handleFocus = useInputFocus<ChipsInputProps>();
+
+  useErrorMessage();
 
   return (
     <StyledRoot>
@@ -68,7 +77,7 @@ const WrappedChipsInput = () => {
             value={inputValue}
             onChange={(e, v) => handleChange(e, v as string[], v as string[])}
             onFocus={handleFocus}
-            onBlur={e => handleBlur(e)}
+            onBlur={e => handleBlur(e, value, value)}
             renderValue={
               renderValue ??
               ((values, getTagProps) =>

@@ -44,7 +44,7 @@ const WrappedSelectInput = <O extends readonly Option[]>() => {
   const disabled = get('disabled');
   const displayEmpty = get('displayEmpty');
   const endAdornment = get('endAdornment');
-  const errorMsg = useErrorMessage();
+  const errorMessage = get('errorMessage');
   const id = usePropID();
   const inputValue = get('inputValue');
   const loading = get('loading');
@@ -56,12 +56,15 @@ const WrappedSelectInput = <O extends readonly Option[]>() => {
   const resetProps = get('resetProps');
   const showPassword = get('showPassword');
   const tiny = get('tiny');
+  const value = get('value');
 
   const [open, setOpen] = useState<boolean>(false);
 
   const handleBlur = useInputBlur<SelectInputProps<O>>();
   const handleChange = useInputChange<SelectInputProps<O>>();
   const handleFocus = useInputFocus<SelectInputProps<O>>();
+
+  useErrorMessage();
 
   return (
     <StyledRoot>
@@ -73,7 +76,7 @@ const WrappedSelectInput = <O extends readonly Option[]>() => {
           <Select
             disabled={disabled}
             displayEmpty={displayEmpty}
-            error={!!errorMsg}
+            error={!!errorMessage}
             fullWidth
             id={id}
             readOnly={readOnly}
@@ -82,7 +85,7 @@ const WrappedSelectInput = <O extends readonly Option[]>() => {
             value={options?.some(o => o.value === inputValue) ? inputValue : ''}
             onChange={event => handleChange(event as React.SyntheticEvent, event.target.value, event.target.value)}
             onFocus={handleFocus}
-            onBlur={e => handleBlur(e)}
+            onBlur={e => handleBlur(e, value, value)}
             onClose={() => setOpen(false)}
             onOpen={() => setOpen(true)}
             renderValue={option => (

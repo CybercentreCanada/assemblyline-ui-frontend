@@ -7,7 +7,7 @@ import {
   StyledRoot,
   StyledTextField
 } from 'components/visual/Inputs/lib/inputs.components';
-import { useInputBlur, useInputChange, useInputFocus } from 'components/visual/Inputs/lib/inputs.hook';
+import { useErrorMessage, useInputBlur, useInputChange, useInputFocus } from 'components/visual/Inputs/lib/inputs.hook';
 import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
 import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
 import React, { useEffect, useRef } from 'react';
@@ -28,12 +28,15 @@ const WrappedNumberInput = () => {
   const max = get('max');
   const min = get('min');
   const step = get('step');
+  const value = get('value');
 
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleBlur = useInputBlur<NumberInputProps>();
   const handleChange = useInputChange<NumberInputProps>();
   const handleFocus = useInputFocus<NumberInputProps>();
+
+  useErrorMessage();
 
   useEffect(() => {
     const el = inputRef.current;
@@ -66,7 +69,7 @@ const WrappedNumberInput = () => {
               value={inputValue}
               onChange={e => handleChange(e, e.target.value, e.target.value !== '' ? Number(e.target.value) : null)}
               onFocus={handleFocus}
-              onBlur={e => handleBlur(e)}
+              onBlur={e => handleBlur(e, value == null ? '' : String(value), value)}
               slotProps={{
                 input: {
                   inputProps: {
@@ -90,6 +93,7 @@ export const NumberInput = ({ preventRender = false, value, ...props }: NumberIn
     <PropProvider<NumberInputProps>
       props={{
         autoComplete: 'off',
+        enforceValidValue: true,
         inputValue: value == null ? '' : String(value),
         max: null,
         min: null,

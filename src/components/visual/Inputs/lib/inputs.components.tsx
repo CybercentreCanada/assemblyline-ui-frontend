@@ -37,7 +37,6 @@ import {
 import type { CustomChipProps } from 'components/visual/CustomChip';
 import { CustomChip } from 'components/visual/CustomChip';
 import {
-  useErrorMessage,
   useInputChange,
   usePreventExpandRender,
   usePreventPasswordRender,
@@ -440,7 +439,7 @@ export const HelperText = React.memo(() => {
   const [get] = usePropStore();
 
   const disabled = get('disabled');
-  const errorMsg = useErrorMessage();
+  const errorMessage = get('errorMessage');
   const errorProps = get('errorProps');
   const helperText = get('helperText');
   const helperTextProps = get('helperTextProps');
@@ -448,14 +447,14 @@ export const HelperText = React.memo(() => {
   const loading = get('loading');
   const readOnly = get('readOnly');
 
-  return disabled || loading || readOnly ? null : errorMsg ? (
+  return disabled || loading || readOnly ? null : errorMessage ? (
     <FormHelperText
       id={`${id}-helper-text`}
       variant="outlined"
       {...errorProps}
       sx={{ color: theme.palette.error.main, ...errorProps?.sx }}
     >
-      {errorMsg}
+      {errorMessage}
     </FormHelperText>
   ) : helperText ? (
     <FormHelperText
@@ -613,7 +612,7 @@ export const StyledButtonLabel = React.memo(
 
     const disabled = get('disabled');
     const endAdornment = get('endAdornment');
-    const errorMsg = useErrorMessage();
+    const errorMessage = get('errorMessage');
     const focused = focusedProp ?? get('focused');
     const label = labelProp ?? get('label');
     const labelProps = get('labelProps');
@@ -640,7 +639,7 @@ export const StyledButtonLabel = React.memo(
               ? 'textDisabled'
               : readOnly
                 ? 'textPrimary'
-                : errorMsg
+                : errorMessage
                   ? 'error'
                   : focused
                     ? 'primary'
@@ -748,7 +747,7 @@ export const StyledFormLabel = React.memo(() => {
   const [get] = usePropStore();
 
   const disabled = get('disabled');
-  const errorMsg = useErrorMessage();
+  const errorMessage = get('errorMessage');
   const focused = get('focused');
   const id = usePropID();
   const label = usePropLabel();
@@ -762,7 +761,7 @@ export const StyledFormLabel = React.memo(() => {
   return (
     <Tooltip title={tooltip} {...tooltipProps}>
       <Typography
-        color={readOnly ? 'textSecondary' : !disabled && errorMsg ? 'error' : focused ? 'primary' : 'textSecondary'}
+        color={readOnly ? 'textSecondary' : !disabled && errorMessage ? 'error' : focused ? 'primary' : 'textSecondary'}
         component={InputLabel}
         gutterBottom
         htmlFor={id}
@@ -839,7 +838,7 @@ export const useTextInputSlot = (overrides?: Partial<TextFieldProps>) => {
 
   const autoComplete = get('autoComplete');
   const disabled = get('disabled');
-  const errorMsg = useErrorMessage();
+  const errorMessage = get('errorMessage');
   const helperText = get('helperText');
   const id = usePropID();
   const label = usePropLabel();
@@ -858,12 +857,12 @@ export const useTextInputSlot = (overrides?: Partial<TextFieldProps>) => {
       'aria-label': label,
       ...(disabled || loading || readOnly
         ? null
-        : helperText || errorMsg
+        : helperText || errorMessage
           ? { 'aria-describedby': `${id}-helper-text` }
           : null),
       autoComplete: autoComplete,
       disabled: disabled,
-      error: !!errorMsg,
+      error: !!errorMessage,
       fullWidth: true,
       id: id,
       margin: 'dense',
@@ -938,7 +937,7 @@ export const useTextInputSlot = (overrides?: Partial<TextFieldProps>) => {
     [
       autoComplete,
       disabled,
-      errorMsg,
+      errorMessage,
       helperText,
       id,
       label,

@@ -8,7 +8,13 @@ import {
   StyledRoot,
   StyledTextField
 } from 'components/visual/Inputs/lib/inputs.components';
-import { useInputBlur, useInputChange, useInputFocus, usePropID } from 'components/visual/Inputs/lib/inputs.hook';
+import {
+  useErrorMessage,
+  useInputBlur,
+  useInputChange,
+  useInputFocus,
+  usePropID
+} from 'components/visual/Inputs/lib/inputs.hook';
 import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
 import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
 import React from 'react';
@@ -35,6 +41,8 @@ const WrappedTextInput = () => {
   const handleChange = useInputChange<TextInputProps>();
   const handleFocus = useInputFocus<TextInputProps>();
 
+  useErrorMessage();
+
   return (
     <StyledRoot>
       <StyledFormLabel />
@@ -55,7 +63,7 @@ const WrappedTextInput = () => {
             value={value}
             onInputChange={(e, v) => handleChange(e, v, v)}
             onFocus={handleFocus}
-            onBlur={e => handleBlur(e)}
+            onBlur={e => handleBlur(e, value, value)}
             renderOption={(props, option, { index }) => (
               <Typography {...props} key={`${option}-${index}`} variant={tiny ? 'body2' : 'body1'}>
                 {option}

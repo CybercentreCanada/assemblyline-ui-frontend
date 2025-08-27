@@ -53,7 +53,7 @@ export const DEFAULT_INPUT_VALUES: InputValues<unknown, unknown> = {
   reset: () => false,
   value: null,
   onChange: () => null,
-  onReset: () => null
+  onReset: null
 };
 
 export type InputProps = {
@@ -85,6 +85,11 @@ export type InputProps = {
    * Element rendered at the end (e.g. icon, button)
    */
   endAdornment?: React.ReactNode;
+
+  /**
+   * When enabled, the input will only propagate valid values.
+   */
+  enforceValidValue?: boolean;
 
   /**
    * Props applied to the error helper text
@@ -238,6 +243,7 @@ export const DEFAULT_INPUT_PROPS: InputProps = {
   disabled: false,
   divider: false,
   endAdornment: null,
+  enforceValidValue: false,
   errorProps: null,
   expand: null,
   expandProps: null,
@@ -276,6 +282,11 @@ export type InputStates = {
   clearAdornment?: boolean;
 
   /**
+   * The current error message to display below the input.
+   */
+  errorMessage?: string;
+
+  /**
    * If `true`, the input is focused
    * @default false
    */
@@ -296,6 +307,7 @@ export type InputStates = {
 
 export const DEFAULT_INPUT_STATES: InputStates = {
   clearAdornment: false,
+  errorMessage: null,
   focused: false,
   showPassword: true,
   spinnerAdornment: false
