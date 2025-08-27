@@ -278,7 +278,7 @@ const ServiceGeneral = ({
               {...(service.licence_count && { max: service.licence_count })}
               endAdornment="↓"
               error={val =>
-                val < 1 ? null : val >= 0 && val > service.licence_count ? t('general.instances.error') : null
+                service.licence_count > 0 && val > service.licence_count ? t('general.instances.error') : null
               }
               onChange={(e, v) => {
                 setModified(true);
