@@ -81,6 +81,7 @@ export default function AdminActions() {
           root: { style: { marginBottom: theme.spacing(4) } },
           actions: { spacing: 1 }
         }}
+        wrapStart
         actions={
           <>
             <Button variant="outlined" onClick={() => reload(true)}>

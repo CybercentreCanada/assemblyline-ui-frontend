@@ -1,4 +1,4 @@
-import { Box, Button, CircularProgress, Link, Stack, Typography } from '@mui/material';
+import { Box, Button, CircularProgress, Link, Stack, Typography, useTheme } from '@mui/material';
 import { useAppBanner, useAppLayout } from 'commons/components/app/hooks';
 import useAppBannerVert from 'commons/components/app/hooks/useAppBannerVert';
 import PageCardCentered from 'commons/components/pages/PageCardCentered';
@@ -24,6 +24,7 @@ type LoginScreenProps = {
 };
 
 export default function LoginScreen({ allowUserPass, allowSAML, allowSignup, oAuthProviders }: LoginScreenProps) {
+  const theme = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
   const params = new URLSearchParams(location.search);
@@ -199,9 +200,7 @@ export default function LoginScreen({ allowUserPass, allowSAML, allowSignup, oAu
 
   return (
     <PageCardCentered>
-      <Box sx={{ cursor: 'pointer' }} onClick={reset}>
-        {shownControls === 'login' ? bannerVert : banner}
-      </Box>
+      <Box>{shownControls === 'login' ? bannerVert : banner}</Box>
       {
         {
           login: (

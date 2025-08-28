@@ -193,9 +193,9 @@ function Service({ name = null, onDeleted = () => null, onUpdated = () => null }
       />
 
       <PageHeader
-        primary={service ? service.name : <Skeleton style={{ width: '20rem' }} />}
+        primary={() => service.name}
         secondary={t('title.detail')}
-        loading={!service}
+        primaryLoading={!service}
         slotProps={{
           root: { style: { marginBottom: theme.spacing(2) } }
         }}

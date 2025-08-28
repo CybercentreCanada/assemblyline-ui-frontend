@@ -221,7 +221,7 @@ const WrappedWorkflowCreate = ({ id: propID = null, onClose = () => null }: Prop
         <PageHeader
           primary={t(id ? 'edit.title' : 'add.title')}
           secondary={id}
-          loading={!workflow}
+          secondaryLoading={!workflow}
           slotProps={{
             root: { style: { marginBottom: theme.spacing(2) } }
           }}

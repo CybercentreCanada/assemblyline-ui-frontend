@@ -7,6 +7,7 @@ import TableContainer from '@mui/material/TableContainer';
 import useALContext from 'components/hooks/useALContext';
 import { LABELS_COLOR_MAP, type FileIndexed, type LabelCategories } from 'components/models/base/file';
 import type { SearchResult } from 'components/models/ui/search';
+import { FileDownloader } from 'components/visual/Buttons/FileDownloader';
 import Classification from 'components/visual/Classification';
 import CustomChip from 'components/visual/CustomChip';
 import {
@@ -18,7 +19,6 @@ import {
   LinkRow,
   SortableHeaderCell
 } from 'components/visual/DivTable';
-import FileDownloader from 'components/visual/FileDownloader';
 import InformativeAlert from 'components/visual/InformativeAlert';
 import Moment from 'components/visual/Moment';
 import React, { useMemo, useState } from 'react';
@@ -213,21 +213,18 @@ const WrappedArchivesTable: React.FC<Props> = ({
                     paddingRight: theme.spacing(1)
                   }}
                 >
-                  {currentUser.roles.includes('file_download') && 'sha256' in file && (
-                    <Tooltip title={t('tooltip.download')}>
-                      <span>
-                        <FileDownloader
-                          icon={<GetAppOutlinedIcon fontSize="small" />}
-                          link={`/api/v4/file/download/${file.sha256}/?`}
-                          size="small"
-                          onClick={e => {
-                            e.stopPropagation();
-                            e.preventDefault();
-                          }}
-                        />
-                      </span>
-                    </Tooltip>
-                  )}
+                  <FileDownloader
+                    link={() => `/api/v4/file/download/${file.sha256}/?`}
+                    preventRender={!(currentUser.roles.includes('file_download') && 'sha256' in file)}
+                    size="small"
+                    tooltip={t('tooltip.download')}
+                    onClick={e => {
+                      e.stopPropagation();
+                      e.preventDefault();
+                    }}
+                  >
+                    <GetAppOutlinedIcon fontSize="small" />
+                  </FileDownloader>
                 </DivTableCell>
               </LinkRow>
             ))}
