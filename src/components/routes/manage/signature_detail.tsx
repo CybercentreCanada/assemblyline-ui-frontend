@@ -447,7 +447,7 @@ const SignatureDetail = ({
         <PageHeader
           primary={t('title')}
           secondary={() => `${signature.type}_${signature.source}_${signature.signature_id}`}
-          loading={!signature}
+          secondaryLoading={!signature}
           slotProps={{
             root: { style: { marginBottom: theme.spacing(2) } }
           }}
@@ -623,7 +623,7 @@ const SignatureDetail = ({
                 <Typography variant="h6">{t('last10')}</Typography>
               </Grid>
               <Grid size={{ xs: 12 }}>
-                <ResultsTable resultResults={results} allowSort={false} />
+                <ResultsTable resultResults={results} allowSort={false} allowHash />
               </Grid>
             </>
           )}

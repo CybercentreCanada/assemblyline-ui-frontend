@@ -58,7 +58,7 @@
   "params.ignore_filtering": "Ignorer le filtrage",
   "params.ignore_recursion_prevention": "Ignorer la prévention de la récursivité",
   "params.priority": "Priorité",
-  "params.services.selected": "Services sélectionnés",
+  "params.services.executed": "Services exécutés",
   "params.services.service_spec": "Paramètres de service",
   "params.submitter": "Soumis par",
   "powered_by_ai": "Propulsé par l'IA",

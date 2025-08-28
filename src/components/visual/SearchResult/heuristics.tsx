@@ -62,9 +62,9 @@ const WrappedHeuristicsTable: React.FC<Props> = ({ heuristicResults, setHeuristi
             </DivTableRow>
           </DivTableHead>
           <DivTableBody>
-            {heuristicResults.items.map(heuristic => (
+            {heuristicResults.items.map((heuristic, i) => (
               <LinkRow
-                key={heuristic.heur_id}
+                key={`${heuristic.heur_id}-${i}`}
                 component={Link}
                 to={`/manage/heuristic/${heuristic.heur_id}`}
                 onClick={event => {

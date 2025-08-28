@@ -1,7 +1,6 @@
 import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
 import OndemandVideoOutlinedIcon from '@mui/icons-material/OndemandVideoOutlined';
 import PageviewOutlinedIcon from '@mui/icons-material/PageviewOutlined';
 import ReplayOutlinedIcon from '@mui/icons-material/ReplayOutlined';
@@ -24,6 +23,7 @@ import { DEFAULT_TAB, TAB_OPTIONS } from 'components/routes/file/viewer';
 import HeuristicDetail from 'components/routes/manage/heuristic_detail';
 import SignatureDetail from 'components/routes/manage/signature_detail';
 import AISummarySection from 'components/routes/submission/detail/ai_summary';
+import { FileDownloader } from 'components/visual/Buttons/FileDownloader';
 import { IconButton } from 'components/visual/Buttons/IconButton';
 import Classification from 'components/visual/Classification';
 import AttackSection from 'components/visual/FileDetail/attacks';
@@ -38,7 +38,6 @@ import ParentSection from 'components/visual/FileDetail/parents';
 import ResultSection from 'components/visual/FileDetail/results';
 import TagSection from 'components/visual/FileDetail/tags';
 import URIIdentificationSection from 'components/visual/FileDetail/uriIdent';
-import FileDownloader from 'components/visual/FileDownloader';
 import InputDialog from 'components/visual/InputDialog';
 import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import { emptyResult } from 'components/visual/ResultCard';
@@ -404,16 +403,14 @@ const WrappedFileDetail: React.FC<Props> = ({
       />
 
       <PageHeader
-        classification={file ? file.classification : null}
-        primary={!file ? null : file?.file_info?.type.startsWith('uri/') ? t('uri_title') : t('title')}
-        secondary={
-          !file
-            ? null
-            : file?.file_info?.type.startsWith('uri/') && file?.file_info?.uri_info?.uri
-              ? file?.file_info?.uri_info?.uri
-              : fileName
+        classification={() => file.classification}
+        primary={file?.file_info?.type.startsWith('uri/') ? t('uri_title') : t('title')}
+        secondary={() =>
+          file?.file_info?.type.startsWith('uri/') && file?.file_info?.uri_info?.uri
+            ? file?.file_info?.uri_info?.uri
+            : fileName
         }
-        loading={!file}
+        secondaryLoading={!file}
         slotProps={{ root: { style: { marginBottom: theme.spacing(2) } } }}
         actions={
           <>
@@ -430,19 +427,16 @@ const WrappedFileDetail: React.FC<Props> = ({
             >
               <ViewCarouselOutlinedIcon />
             </IconButton>
-            {currentUser.roles.includes('file_download') && (
-              <FileDownloader
-                icon={<GetAppOutlinedIcon />}
-                link={
-                  !file
-                    ? null
-                    : `/api/v4/file/download/${file.file_info.sha256}/?${
-                        fileName && file.file_info.sha256 !== fileName ? `name=${fileName}&` : ''
-                      }${sid ? `sid=${sid}&` : ''}`
-                }
-                tooltip={t('download')}
-              />
-            )}
+            <FileDownloader
+              link={() =>
+                `/api/v4/file/download/${file.file_info.sha256}/?${
+                  fileName && file.file_info.sha256 !== fileName ? `name=${fileName}&` : ''
+                }${sid ? `sid=${sid}&` : ''}`
+              }
+              loading={!file}
+              preventRender={!currentUser.roles.includes('file_download')}
+              tooltip={t('download')}
+            />
             <IconButton
               component={Link}
               loading={!file}
@@ -453,7 +447,6 @@ const WrappedFileDetail: React.FC<Props> = ({
             >
               <PageviewOutlinedIcon />
             </IconButton>
-
             <IconButton
               loading={!file}
               size="large"
@@ -515,7 +508,6 @@ const WrappedFileDetail: React.FC<Props> = ({
                 </List>
               </Popover>
             )}
-
             <IconButton
               loading={!file}
               size="large"
@@ -525,7 +517,6 @@ const WrappedFileDetail: React.FC<Props> = ({
             >
               <VerifiedUserOutlinedIcon />
             </IconButton>
-
             <IconButton
               loading={!file}
               size="large"

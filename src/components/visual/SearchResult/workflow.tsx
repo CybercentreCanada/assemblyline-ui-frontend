@@ -50,9 +50,9 @@ const WrappedWorflowTable: React.FC<Props> = ({ workflowResults, setWorkflowID =
             </DivTableRow>
           </DivTableHead>
           <DivTableBody>
-            {workflowResults.items.map(workflow => (
+            {workflowResults.items.map((workflow, i) => (
               <LinkRow
-                key={workflow.workflow_id}
+                key={`${workflow.workflow_id}-${i}`}
                 component={Link}
                 to={`/manage/workflow/detail/${workflow.workflow_id}`}
                 onClick={event => {
