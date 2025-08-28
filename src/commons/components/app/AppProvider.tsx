@@ -48,11 +48,13 @@ export const AppProviderInner = <U extends AppUser>({
   children
 }: Omit<AppProviderProps<U>, 'theme'>) => {
   const {
+    autoDetectColorScheme,
     current: theme,
     mode: themeMode,
-    toggleMode,
-    autoDetectColorScheme,
-    toggleAutoDetectColorScheme
+    setAutoDetectColorScheme,
+    setMode,
+    toggleAutoDetectColorScheme,
+    toggleMode
   } = useContext(overrides?.providers?.themesProvider?.context ?? AppThemesContext);
 
   // Callback to toggle language.
@@ -61,14 +63,28 @@ export const AppProviderInner = <U extends AppUser>({
   // Memoize context value to prevent extraneous renders on components that use it.
   const contextValue = useMemo(() => {
     return {
-      theme: themeMode,
-      configs: { overrides, preferences, theme, sitemap },
-      toggleTheme: toggleMode,
-      toggleLanguage,
       autoDetectColorScheme,
-      toggleAutoDetectColorScheme
+      configs: { overrides, preferences, theme, sitemap },
+      theme: themeMode,
+      setAutoDetectColorScheme,
+      setMode,
+      toggleAutoDetectColorScheme,
+      toggleLanguage,
+      toggleTheme: toggleMode
     };
-  }, [themeMode, overrides, preferences, theme, autoDetectColorScheme, toggleAutoDetectColorScheme, sitemap, toggleMode, toggleLanguage]);
+  }, [
+    autoDetectColorScheme,
+    overrides,
+    preferences,
+    setAutoDetectColorScheme,
+    setMode,
+    sitemap,
+    theme,
+    themeMode,
+    toggleAutoDetectColorScheme,
+    toggleLanguage,
+    toggleMode
+  ]);
 
   return (
     <AppContext.Provider value={contextValue}>

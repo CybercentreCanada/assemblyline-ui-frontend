@@ -5,27 +5,31 @@ import { AppStorageKeys } from 'commons/components/app/AppConstants';
 import { AppDefaultsPreferencesConfigs } from 'commons/components/app/AppDefaults';
 import useLocalStorageItem from 'commons/components/utils/hooks/useLocalStorageItem';
 import useThemeBuilder from 'commons/components/utils/hooks/useThemeBuilder';
-import { createContext, useCallback, useMemo, useEffect, type FC, type PropsWithChildren } from 'react';
+import { createContext, useCallback, useEffect, useMemo, type FC, type PropsWithChildren } from 'react';
 
 const { LS_KEY_AUTO_DETECT_COLOR_SCHEME, LS_KEY_THEME, LS_KEY_DARK_MODE } = AppStorageKeys;
 
 export type AppThemeContextProps = {
+  autoDetectColorScheme?: boolean;
   current: AppThemeConfigs;
   mode: PaletteMode;
-  autoDetectColorScheme?: boolean;
   themes?: AppTheme[];
+  setAutoDetectColorScheme: (value: boolean) => void;
+  setMode: (value: PaletteMode) => void;
   setTheme: (id: string) => void;
-  toggleMode: () => void;
   toggleAutoDetectColorScheme: () => void;
+  toggleMode: () => void;
 };
 
 export const AppThemesContext = createContext<AppThemeContextProps>({
+  autoDetectColorScheme: true,
   current: {},
   mode: 'dark',
-  autoDetectColorScheme: true,
+  setAutoDetectColorScheme: () => null,
+  setMode: () => null,
   setTheme: () => null,
-  toggleMode: () => null,
   toggleAutoDetectColorScheme: () => null,
+  toggleMode: () => null
 });
 
 export const AppThemesProvider: FC<
@@ -33,7 +37,10 @@ export const AppThemesProvider: FC<
 > = ({ initTheme, themes, preferences, children }) => {
   // Since we can't useAppConfig yet, we explicitly merge default and preferences config
   //  to help figure the default theme mode.
-  const { allowThemeSelection, autoDetectColorScheme, defaultTheme } = { ...AppDefaultsPreferencesConfigs, ...(preferences || {}) };
+  const { allowThemeSelection, autoDetectColorScheme, defaultTheme } = {
+    ...AppDefaultsPreferencesConfigs,
+    ...(preferences || {})
+  };
 
   // Store theme state in local storage.
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
@@ -54,7 +61,10 @@ export const AppThemesProvider: FC<
   const _darkMode = allowThemeSelection ? mode === 'dark' : defaultTheme === 'dark';
 
   // Callback to toggle theme auto detecting
-  const toggleAutoDetectColorScheme = useCallback(() => setAutoDetectCS(!autoDetectCS), [autoDetectCS, setAutoDetectCS]);
+  const toggleAutoDetectColorScheme = useCallback(
+    () => setAutoDetectCS(!autoDetectCS),
+    [autoDetectCS, setAutoDetectCS]
+  );
   const toggleMode = useCallback(() => {
     setMode(mode === 'dark' ? 'light' : 'dark');
     if (autoDetectCS) setAutoDetectCS(false);
@@ -112,17 +122,27 @@ export const AppThemesProvider: FC<
 
   const context = useMemo(
     () => ({
-      current: currentTheme,
       autoDetectColorScheme: autoDetectCS,
-      themes,
+      current: currentTheme,
       mode,
-      toggleMode,
+      themes,
+      setAutoDetectColorScheme: setAutoDetectCS,
+      setMode,
+      setTheme: (id: string) => setCurrent(id),
       toggleAutoDetectColorScheme,
-      setTheme: (id: string) => {
-        setCurrent(id);
-      }
+      toggleMode
     }),
-    [currentTheme, autoDetectCS, themes, mode, toggleAutoDetectColorScheme, toggleMode, setCurrent]
+    [
+      autoDetectCS,
+      currentTheme,
+      mode,
+      setAutoDetectCS,
+      setCurrent,
+      setMode,
+      themes,
+      toggleAutoDetectColorScheme,
+      toggleMode
+    ]
   );
 
   return (
