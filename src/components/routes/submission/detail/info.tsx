@@ -154,8 +154,8 @@ const WrappedInfoSection: React.FC<Props> = ({ submission }) => {
                         ...(isDownMD && { gridTemplateColumns: '1fr' })
                       }}
                     >
-                      {groupedServices.map(([cat, included, excluded]) => (
-                        <>
+                      {groupedServices.map(([cat, included, excluded], i) => (
+                        <div key={`${cat}-${i}`} style={{ display: 'contents' }}>
                           <i {...(included.length === 0 && { style: { color: theme.palette.text.disabled } })}>
                             {`${cat}:`}
                           </i>
@@ -164,7 +164,7 @@ const WrappedInfoSection: React.FC<Props> = ({ submission }) => {
                             {included.length > 0 && excluded.length > 0 && <span>{' | '}</span>}
                             <span style={{ color: theme.palette.text.disabled }}>{excluded.join(' | ')}</span>
                           </div>
-                        </>
+                        </div>
                       ))}
                     </div>
                   </Collapse>

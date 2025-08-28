@@ -469,8 +469,11 @@ const WrappedExternalLinks: React.FC<ExternalLookupProps> = ({ category, type, v
               value={tabState}
               onChange={handleTabChange}
               aria-label="external source names"
-              variant="scrollable"
+              allowScrollButtonsMobile
+              indicatorColor="primary"
               scrollButtons="auto"
+              textColor="primary"
+              variant="scrollable"
             >
               {sources.map((source, i) => (
                 <Tab key={i} label={source} {...a11yProps(i)} />
