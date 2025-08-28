@@ -6,10 +6,14 @@ import { createContext, type Dispatch, type ReactElement, type SetStateAction } 
 
 export type AppContextType = {
   // configs as provided by client application.
+  autoDetectColorScheme: boolean; // Using the system's theme
   configs: AppConfigs; // app specific configurations.
   theme: PaletteMode; // provided theme config.
-  toggleTheme: () => void; // toggle between light/dark theme mode.
+  setAutoDetectColorScheme: (value: boolean) => void; // set the auto detect color scheme
+  setMode: (value: PaletteMode) => void; // set a theme mode of dark or light
+  toggleAutoDetectColorScheme: () => void;
   toggleLanguage: () => void; // toggle between french/english language.
+  toggleTheme: () => void; // toggle between light/dark theme mode.
 };
 
 export type AppSwitcherContextType = {
@@ -123,9 +127,13 @@ export type AppDrawerMode = 'float' | 'pin';
 // React Context for the AppProvider (Root Context).
 export const AppContext = createContext<AppContextType>({
   configs: {},
+  autoDetectColorScheme: true,
   theme: 'dark',
   toggleTheme: () => {},
-  toggleLanguage: () => {}
+  toggleAutoDetectColorScheme: () => {},
+  toggleLanguage: () => {},
+  setMode: () => null,
+  setAutoDetectColorScheme: () => null
 });
 
 // React Context for the AppLayoutProvider.

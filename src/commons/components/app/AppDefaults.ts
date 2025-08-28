@@ -17,6 +17,7 @@ export const AppDefaultsPreferencesConfigs: AppPreferenceConfigs = {
   bannerVertDark: null,
   bannerVertLight: null,
   defaultLayout: 'side',
+  autoDetectColorScheme: true,
   defaultTheme: 'dark',
   defaultShowBreadcrumbs: true,
   allowAutoHideTopbar: true,

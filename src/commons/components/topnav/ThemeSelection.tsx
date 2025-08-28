@@ -5,6 +5,8 @@ import {
   ListItemButton,
   ListItemText,
   ListSubheader,
+  MenuItem,
+  Select,
   Switch,
   Typography,
   useMediaQuery,
@@ -154,13 +156,30 @@ const ThemeSelection = () => {
                 <AppThemePicker />
               </ListItem>
             )}
+
             <ListItem
-              disablePadding
-              secondaryAction={<Switch edge="end" onChange={appTheme.toggle} checked={theme.palette.mode === 'dark'} />}
+              sx={{ justifyContent: 'space-between' }}
+              secondaryAction={
+                <Select
+                  size="small"
+                  value={appTheme.autoDetectColorScheme ? 'system' : theme.palette.mode}
+                  onChange={e => {
+                    const v = e.target.value as 'system' | 'light' | 'dark';
+                    if (v === 'system') {
+                      appTheme.setAutoDetectColorScheme(true);
+                    } else {
+                      appTheme.setMode(v);
+                      appTheme.setAutoDetectColorScheme(false);
+                    }
+                  }}
+                >
+                  <MenuItem value="system">{t('personalization.theme.mode.system')}</MenuItem>
+                  <MenuItem value="light">{t('personalization.theme.mode.light')}</MenuItem>
+                  <MenuItem value="dark">{t('personalization.theme.mode.dark')}</MenuItem>
+                </Select>
+              }
             >
-              <ListItemButton onClick={appTheme.toggle} id="personalization -dark">
-                <ListItemText>{t('personalization.dark')}</ListItemText>
-              </ListItemButton>
+              <ListItemText primary={t('personalization.theme.mode')} />
             </ListItem>
           </List>
         </>
