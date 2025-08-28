@@ -1,0 +1,7 @@
+{
+  "error.max": "La valeur ne doit pas dépasser {{max}}",
+  "error.min": "La valeur doit être au minimum {{min}}",
+  "error.minmax": "La valeur doit être comprise entre {{min}} et {{max}}",
+  "error.required": "La valeur est obligatoire",
+  "reset_to": "réinitialiser à : "
+}
