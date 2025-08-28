@@ -1,6 +1,5 @@
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
-import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
 import PageviewOutlinedIcon from '@mui/icons-material/PageviewOutlined';
 import PanToolOutlinedIcon from '@mui/icons-material/PanToolOutlined';
 import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
@@ -13,7 +12,7 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import type { Error as ErrorModel } from 'components/models/base/error';
 import type { CustomUser } from 'components/models/ui/user';
 import { DEFAULT_TAB, TAB_OPTIONS } from 'components/routes/file/viewer';
-import FileDownloader from 'components/visual/FileDownloader';
+import { FileDownloader } from 'components/visual/Buttons/FileDownloader';
 import Moment from 'components/visual/Moment';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -147,8 +146,7 @@ export const ErrorDetail = ({ error_key = null }: ErrorDetailProps) => {
                   </IconButton>
                 </Tooltip>
                 <FileDownloader
-                  icon={<GetAppOutlinedIcon />}
-                  link={`/api/v4/file/download/${error.sha256}/`}
+                  link={!error ? null : `/api/v4/file/download/${error.sha256}/`}
                   tooltip={t('download')}
                 />
                 <Tooltip title={t('file_viewer')}>

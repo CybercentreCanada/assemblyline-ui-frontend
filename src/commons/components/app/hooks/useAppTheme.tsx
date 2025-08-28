@@ -1,23 +1,32 @@
 import { type PaletteMode } from '@mui/material';
-import { useMemo } from 'react';
 import { useApp } from 'commons/components/app/hooks';
+import { useMemo } from 'react';
 
 export type AppThemeType = {
-  theme: PaletteMode;
+  autoDetectColorScheme: boolean;
   isDark: boolean;
   isLight: boolean;
+  theme: PaletteMode;
+  setAutoDetectColorScheme: (value: boolean) => void;
+  setMode: (value: PaletteMode) => void;
   toggle: () => void;
+  toggleAutoDetectColorScheme: () => void;
 };
 
 export function useAppTheme(): AppThemeType {
-  const { theme, toggleTheme } = useApp();
+  const { autoDetectColorScheme, toggleAutoDetectColorScheme, theme, toggleTheme, setMode, setAutoDetectColorScheme } =
+    useApp();
   return useMemo(
     () => ({
-      theme,
+      autoDetectColorScheme,
       isDark: theme === 'dark',
       isLight: theme === 'light',
-      toggle: toggleTheme
+      theme,
+      setAutoDetectColorScheme,
+      setMode,
+      toggle: toggleTheme,
+      toggleAutoDetectColorScheme
     }),
-    [theme, toggleTheme]
+    [autoDetectColorScheme, theme, toggleTheme, toggleAutoDetectColorScheme, setMode, setAutoDetectColorScheme]
   );
 }
