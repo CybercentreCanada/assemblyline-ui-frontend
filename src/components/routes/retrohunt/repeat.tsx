@@ -52,15 +52,15 @@ function WrappedRetrohuntRepeat({ retrohunt = null, onRepeat = () => null }: Pro
   );
 
   const handleRepeat = useCallback(
-    () => {
-      if (!currentUser.roles.includes('retrohunt_run') && configuration?.retrohunt?.enabled) return;
+    (body: RetrohuntData) => {
+      if (!currentUser.roles.includes('retrohunt_run') || !configuration?.retrohunt?.enabled) return;
       apiCall({
         method: 'POST',
         url: `/api/v4/retrohunt/repeat/`,
         body: {
-          key: data.key,
-          search_classification: data.search_classification,
-          ttl: data.ttl
+          key: body.key,
+          search_classification: body.search_classification,
+          ttl: body.ttl
         },
         onSuccess: ({ api_response }) => {
           showSuccessMessage(t('repeat.success'));
@@ -74,7 +74,7 @@ function WrappedRetrohuntRepeat({ retrohunt = null, onRepeat = () => null }: Pro
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [configuration?.retrohunt?.enabled, currentUser.roles, retrohunt, showErrorMessage, showSuccessMessage, t]
+    [configuration?.retrohunt?.enabled, currentUser.roles, onRepeat, showErrorMessage, showSuccessMessage, t]
   );
 
   useEffect(() => {
@@ -168,7 +168,7 @@ function WrappedRetrohuntRepeat({ retrohunt = null, onRepeat = () => null }: Pro
               {t('cancel')}
               {loading && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
             </Button>
-            <Button color="primary" disabled={loading} onClick={() => handleRepeat()}>
+            <Button color="primary" disabled={loading} onClick={() => handleRepeat(data)}>
               {t('repeat.ok')}
               {loading && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
             </Button>

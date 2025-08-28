@@ -50,8 +50,8 @@ import Moment from 'components/visual/Moment';
 import MonacoEditor from 'components/visual/MonacoEditor';
 import SearchBar from 'components/visual/SearchBar/search-bar';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
+import SearchCount from 'components/visual/SearchBar/SearchCount';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
-import SearchResultCount from 'components/visual/SearchResultCount';
 import SteppedProgress from 'components/visual/SteppedProgress';
 import { TabContainer } from 'components/visual/TabContainer';
 import { safeFieldValue } from 'helpers/utils';
@@ -82,7 +82,7 @@ type Props = {
 
 const PAGE_SIZE = 10;
 
-const MAX_TRACKED_RECORDS = 10000;
+const MAX_TRACKED_RECORDS = 10_000;
 
 const SOCKETIO_NAMESPACE = '/retrohunt';
 
@@ -624,10 +624,18 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
                                     <span>{t('searching')}</span>
                                   ) : (
                                     <span>
-                                      <SearchResultCount count={hitResults.total} />
-                                      {query.get('query') || query.get('filters')
-                                        ? t(`hits.filtered${hitResults.total === 1 ? '' : 's'}`)
-                                        : t(`hits.total${hitResults.total === 1 ? '' : 's'}`)}
+                                      <SearchCount
+                                        currentMax={MAX_TRACKED_RECORDS}
+                                        defaultMax={MAX_TRACKED_RECORDS}
+                                        disabled
+                                        loading={isReloading}
+                                        total={hitResults?.total}
+                                        suffix={
+                                          query.get('query') || query.get('filters')
+                                            ? t(`hits.filtered${hitResults.total === 1 ? '' : 's'}`)
+                                            : t(`hits.total${hitResults.total === 1 ? '' : 's'}`)
+                                        }
+                                      />
                                     </span>
                                   )}
                                 </Typography>
