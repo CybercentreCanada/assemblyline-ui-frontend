@@ -13,7 +13,7 @@ type AddUpdateBadlistPostRequest = RequestBuilder<`/api/v4/badlist/`, 'POST', Ba
 
 type AddUpdateBadlistPutRequest = RequestBuilder<`/api/v4/badlist/`, 'PUT', Badlist>;
 
-type AddUpdateBadlistRequest = {
+type AddUpdateBadlistResponse = {
   // Was the hash successfully added
   success: boolean;
 
@@ -34,7 +34,7 @@ type AddUpdateManyBadlistPostRequest = RequestBuilder<`/api/v4/badlist/add_updat
 
 type AddUpdateManyBadlistPutRequest = RequestBuilder<`/api/v4/badlist/add_update_many/`, 'PUT', Badlist[]>;
 
-type AddUpdateManyBadlistRequest = {
+type AddUpdateManyBadlistResponse = {
   // Number of hashes that succeeded
   success: number;
 
@@ -172,10 +172,10 @@ export type BadlistRequests =
 
 // prettier-ignore
 export type BadlistResponses<Request extends BadlistRequests> =
-  Request extends AddUpdateBadlistPostRequest ? AddUpdateBadlistRequest :
-  Request extends AddUpdateBadlistPutRequest ? AddUpdateBadlistRequest :
-  Request extends AddUpdateManyBadlistPostRequest ? AddUpdateManyBadlistRequest :
-  Request extends AddUpdateManyBadlistPutRequest ? AddUpdateManyBadlistRequest :
+  Request extends AddUpdateBadlistPostRequest ? AddUpdateBadlistResponse :
+  Request extends AddUpdateBadlistPutRequest ? AddUpdateBadlistResponse :
+  Request extends AddUpdateManyBadlistPostRequest ? AddUpdateManyBadlistResponse :
+  Request extends AddUpdateManyBadlistPutRequest ? AddUpdateManyBadlistResponse :
   Request extends CheckBadlistGetRequest ? CheckBadlistGetResponse :
   Request extends CheckTagBadlistGetRequest ? CheckTagBadlistGetResponse :
   Request extends BadlistDeleteRequest ? SuccessResponse :

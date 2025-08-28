@@ -1,6 +1,7 @@
 import type { Submission, SubmissionProfileParams } from 'components/models/base/config';
 import type { UserSettings } from 'components/models/base/user_settings';
 import type { CustomUser } from 'components/models/ui/user';
+import _ from 'lodash';
 
 export const INTERFACE_KEYS = [
   'default_external_sources',
@@ -68,6 +69,15 @@ export type ProfileSettings = {
   initial_data: { prev: Record<string, unknown>; value: Record<string, unknown> };
 };
 
+export const getValidValue = <T>(...values: (T | null | undefined)[]): T | null => {
+  for (const value of values) {
+    if (value !== null && value !== undefined) {
+      return value;
+    }
+  }
+  return null;
+};
+
 export const getProfileNames = (settings: UserSettings) => Object.keys(settings?.submission_profiles || {});
 
 export const initializeSettings = (settings: UserSettings): ProfileSettings => {
@@ -128,14 +138,17 @@ export const loadDefaultProfile = (out: ProfileSettings, settings: UserSettings,
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       out[key].value = settings.submission_profiles.default?.[key];
       out[key].restricted = !customize;
-      out[key].default = settings.submission_profiles.default?.[key];
+      out[key].default = null;
       out[key].prev = out[key].value;
     }
   });
 
   // Applying the services parameter
   out.services.forEach((cat, i) => {
-    out.services[i].selected = settings.submission_profiles?.default?.services?.selected?.includes(cat?.name) || false;
+    out.services[i].selected = getValidValue(
+      settings.submission_profiles?.default?.services?.selected?.includes(cat?.name),
+      false
+    );
     out.services[i].restricted = !customize;
     out.services[i].default = out.services[i].selected;
     out.services[i].prev = out.services[i].selected;
@@ -159,13 +172,17 @@ export const loadDefaultProfile = (out: ProfileSettings, settings: UserSettings,
         ?.find(s => s.name === svr.name)
         ?.params?.find(p => p.name === param.name);
 
-      out.service_spec[i].params[j].value =
-        (settings?.submission_profiles?.default?.service_spec?.[svr.name]?.[param.name] as string | number | boolean) ||
-        settingsSpec?.value ||
-        out.service_spec[i].params[j].value;
+      out.service_spec[i].params[j].value = getValidValue(
+        settings?.submission_profiles?.default?.service_spec?.[svr.name]?.[param.name] as string | number | boolean,
+        settingsSpec?.value,
+        out.service_spec[i].params[j].value
+      );
 
       out.service_spec[i].params[j].restricted = !customize;
-      out.service_spec[i].params[j].default = settingsSpec?.default || out.service_spec[i].params[j].default;
+      out.service_spec[i].params[j].default = getValidValue(
+        settingsSpec?.default,
+        out.service_spec[i].params[j].default
+      );
       out.service_spec[i].params[j].prev = out.service_spec[i].params[j].value;
     });
   });
@@ -203,7 +220,7 @@ export const loadSubmissionProfile = (
       out[key].value = settings?.submission_profiles?.[name]?.[key];
       out[key].restricted = !customize && profiles?.[name]?.restricted_params?.submission?.includes(key);
       // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-      out[key].default = profiles?.[name]?.params?.[key] || out[key].value;
+      out[key].default = getValidValue(profiles?.[name]?.params?.[key]);
       out[key].prev = out[key].value;
     }
   });
@@ -234,15 +251,17 @@ export const loadSubmissionProfile = (
         ?.find(s => s.name === svr.name)
         ?.params?.find(p => p.name === param.name);
 
-      out.service_spec[i].params[j].value =
-        (settings?.submission_profiles?.[name]?.service_spec?.[svr.name]?.[param.name] as string | number | boolean) ||
-        settingsSpec?.value ||
-        out.service_spec[i].params[j].value;
+      out.service_spec[i].params[j].value = getValidValue(
+        settings?.submission_profiles?.[name]?.service_spec?.[svr.name]?.[param.name] as string | number | boolean,
+        settingsSpec?.value,
+        out.service_spec[i].params[j].value
+      );
 
-      out.service_spec[i].params[j].default =
-        (profiles?.[name]?.params?.service_spec?.[svr.name]?.[param.name] as string | number | boolean) ||
-        settingsSpec?.default ||
-        out.service_spec[i].params[j].default;
+      out.service_spec[i].params[j].default = getValidValue(
+        profiles?.[name]?.params?.service_spec?.[svr.name]?.[param.name] as string | number | boolean,
+        settingsSpec?.default,
+        out.service_spec[i].params[j].default
+      );
 
       out.service_spec[i].params[j].restricted =
         !customize && profiles?.[name].restricted_params?.[svr.name]?.includes(param.name);
@@ -320,8 +339,12 @@ export const hasDifferentPreviousSubmissionValues = (out: ProfileSettings): bool
 
   // Applying interface parameters
   Object.keys(out).forEach((key: InterfaceKey) => {
-    if (INTERFACE_KEYS.includes(key) && out[key].value !== out[key].prev) {
-      res = true;
+    if (INTERFACE_KEYS.includes(key)) {
+      if (Array.isArray(out[key].value) && Array.isArray(out[key].prev)) {
+        if (!_.isEqual([...out[key].value].sort(), [...out[key].prev].sort())) res = true;
+      } else {
+        if (out[key].value !== out[key].prev) res = true;
+      }
     }
   });
 
@@ -434,19 +457,22 @@ export const hasDifferentDefaultSubmissionValues = (out: ProfileSettings): boole
 
   // Applying the profile parameters
   Object.keys(out).forEach((key: ProfileKey) => {
-    if (PROFILE_KEYS.includes(key) && out[key].value !== out[key].default) {
+    if (PROFILE_KEYS.includes(key) && out[key].default !== null && out[key].value !== out[key].default) {
       res = true;
     }
   });
 
   // Applying the services parameter
   out.services.forEach((cat, i) => {
-    if (out.services[i].selected !== out.services[i].default) {
+    if (out.services[i].default !== null && out.services[i].selected !== out.services[i].default) {
       res = true;
     }
 
     cat.services.forEach((svr, j) => {
-      if (out.services[i].services[j].selected !== out.services[i].services[j].default) {
+      if (
+        out.services[i].services[j].default !== null &&
+        out.services[i].services[j].selected !== out.services[i].services[j].default
+      ) {
         res = true;
       }
     });
@@ -455,7 +481,10 @@ export const hasDifferentDefaultSubmissionValues = (out: ProfileSettings): boole
   // Applying the service spec parameters
   out.service_spec.forEach((svr, i) => {
     out.service_spec[i].params.forEach((param, j) => {
-      if (out.service_spec[i].params[j].value !== out.service_spec[i].params[j].default) {
+      if (
+        out.service_spec[i].params[j].default !== null &&
+        out.service_spec[i].params[j].value !== out.service_spec[i].params[j].default
+      ) {
         res = true;
       }
     });
@@ -467,21 +496,27 @@ export const hasDifferentDefaultSubmissionValues = (out: ProfileSettings): boole
 export const resetDefaultSubmissionValues = (out: ProfileSettings): ProfileSettings => {
   // Applying the profile parameters
   Object.keys(out).forEach((key: ProfileKey) => {
-    if (PROFILE_KEYS.includes(key)) out[key].value = out[key].default;
+    if (PROFILE_KEYS.includes(key) && out[key].default !== null) out[key].value = out[key].default;
   });
 
   // Applying the services parameter
   out.services.forEach((cat, i) => {
-    out.services[i].selected = out.services[i].default;
+    if (out.services[i].default !== null) {
+      out.services[i].selected = out.services[i].default;
+    }
     cat.services.forEach((svr, j) => {
-      out.services[i].services[j].selected = out.services[i].services[j].default;
+      if (out.services[i].services[j].default !== null) {
+        out.services[i].services[j].selected = out.services[i].services[j].default;
+      }
     });
   });
 
   // Applying the service spec parameters
   out.service_spec.forEach((svr, i) => {
     out.service_spec[i].params.forEach((param, j) => {
-      out.service_spec[i].params[j].value = out.service_spec[i].params[j].default;
+      if (out.service_spec[i].params[j].default !== null) {
+        out.service_spec[i].params[j].value = out.service_spec[i].params[j].default;
+      }
     });
   });
 

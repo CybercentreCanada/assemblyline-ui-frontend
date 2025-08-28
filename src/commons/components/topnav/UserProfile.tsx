@@ -185,7 +185,7 @@ const UserProfile = () => {
   );
 
   return (
-    <ClickAwayListener onClickAway={onClickAway} mouseEvent="onMouseUp">
+    <ClickAwayListener mouseEvent="onMouseUp" onClickAway={onClickAway}>
       <div>
         <Tooltip title={t('usermenu')}>
           <IconButton

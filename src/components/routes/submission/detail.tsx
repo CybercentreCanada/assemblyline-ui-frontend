@@ -20,7 +20,6 @@ import {
   FormControl,
   FormControlLabel,
   Grid,
-  IconButton,
   LinearProgress,
   List,
   ListItemButton,
@@ -43,13 +42,17 @@ import useDrawer from 'components/hooks/useDrawer';
 import useHighlighter from 'components/hooks/useHighlighter';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import type { ArchiverMetadata } from 'components/models/base/config';
+import type { Verdict } from 'components/models/base/alert';
+import type { ArchiverMetadata, TagTypes } from 'components/models/base/config';
 import type { ParsedErrors } from 'components/models/base/error';
+import type { Result } from 'components/models/base/result';
 import type { ParsedSubmission, Submission } from 'components/models/base/submission';
+import type { Attack, Tag } from 'components/models/base/tagging';
 import type { Configuration } from 'components/models/ui/help';
 import type { LiveStatus, OutstandingServices, WatchQueue } from 'components/models/ui/live';
 import type { MultipleKeys } from 'components/models/ui/result';
-import type { SubmissionSummary, SubmissionTags, SubmissionTree } from 'components/models/ui/submission';
+import type { SubmissionSummary, SubmissionTags, SubmissionTree, Tree } from 'components/models/ui/submission';
+import type { HighlighMapProps } from 'components/providers/HighlightProvider';
 import ForbiddenPage from 'components/routes/403';
 import HeuristicDetail from 'components/routes/manage/heuristic_detail';
 import AISummarySection from 'components/routes/submission/detail/ai_summary';
@@ -59,11 +62,12 @@ import FileTreeSection from 'components/routes/submission/detail/file_tree';
 import InfoSection from 'components/routes/submission/detail/info';
 import MetaSection from 'components/routes/submission/detail/meta';
 import TagSection from 'components/routes/submission/detail/tags';
-import Classification from 'components/visual/Classification';
+import { FileDownloader } from 'components/visual/Buttons/FileDownloader';
+import { IconButton } from 'components/visual/Buttons/IconButton';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import FileDetail from 'components/visual/FileDetail';
 import Detection from 'components/visual/FileDetail/detection';
-import FileDownloader from 'components/visual/FileDownloader';
+import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import MetadataInputField from 'components/visual/MetadataInputField';
 import VerdictBar from 'components/visual/VerdictBar';
 import { getErrorIDFromKey, getServiceFromKey } from 'helpers/errors';
@@ -85,7 +89,7 @@ type ParamProps = {
   fid?: string;
 };
 
-const resultReducer = (currentResults, newResults) => {
+const resultReducer = (currentResults: MultipleKeys, newResults: MultipleKeys) => {
   if (newResults === null) return null;
   if (currentResults === null) return newResults;
 
@@ -118,7 +122,7 @@ function WrappedSubmissionDetail() {
   const { apiCall } = useMyAPI();
   const { addInsight, removeInsight } = useAssistant();
   const { showSuccessMessage, showErrorMessage } = useMySnackbar();
-  const { user: currentUser, c12nDef, configuration: systemConfig, settings } = useALContext();
+  const { user: currentUser, configuration: systemConfig, settings } = useALContext();
   const { setHighlightMap } = useHighlighter();
   const { setGlobalDrawer, globalDrawerOpened } = useDrawer();
   const { id, fid } = useParams<ParamProps>();
@@ -135,7 +139,7 @@ function WrappedSubmissionDetail() {
   const [outstanding, setOutstanding] = useState<OutstandingServices>(null);
   const [liveStatus, setLiveStatus] = useState<LiveStatus>('queued');
   const [socket, setSocket] = useState<Socket>(null);
-  const [loadInterval, setLoadInterval] = useState<any>(null);
+  const [loadInterval, setLoadInterval] = useState<NodeJS.Timeout>(null);
   const [lastSuccessfulTrigger, setLastSuccessfulTrigger] = useState<number>(0);
   const [archiveDialog, setArchiveDialog] = useState<boolean>(false);
   const [deleteDialog, setDeleteDialog] = useState<boolean>(false);
@@ -143,7 +147,7 @@ function WrappedSubmissionDetail() {
   const [resubmitAnchor, setResubmitAnchor] = useState<Element>(null);
   const [baseFiles, setBaseFiles] = useState<string[]>([]);
   const [archivingMetadata, setArchivingMetadata] = useState<Record<string, ArchiverMetadata>>({});
-  const [archivingUseAlternateDtl, setArchivingUseAlternateDtl] = useState<string>('false');
+  const [archivingUseAlternateDtl, setArchivingUseAlternateDtl] = useState<'true' | 'false'>('false');
 
   const [liveResultKeys, setLiveResultKeys] = useReducer(messageReducer, []);
   const [liveErrorKeys, setLiveErrorKeys] = useReducer(messageReducer, []);
@@ -151,11 +155,9 @@ function WrappedSubmissionDetail() {
   const [liveResults, setLiveResults] = useReducer(resultReducer, null);
   const [loadTrigger, incrementLoadTrigger] = useReducer(incrementReducer, 0);
 
-  const sp4 = theme.spacing(4);
-
   const popoverOpen = Boolean(resubmitAnchor);
 
-  const submissionProfiles: Record<string, string> = useMemo<Record<string, string>>(() => {
+  const submissionProfiles = useMemo<Record<string, string>>(() => {
     let profileMap = {};
     Object.entries(systemConfig.submission.profiles).map(([name, config]) => {
       profileMap = { ...profileMap, [name]: config.display_name };
@@ -163,242 +165,250 @@ function WrappedSubmissionDetail() {
     return profileMap;
   }, [systemConfig]);
 
-  const updateLiveSumary = (results: object) => {
-    const tempSummary: any = summary !== null ? { ...summary } : { tags: {}, heuristics: {}, attack_matrix: {} };
-    const tempTagMap = liveTagMap !== null ? { ...liveTagMap } : {};
+  const updateLiveSumary = useCallback(
+    (results: Record<string, Result>) => {
+      const tempSummary = (
+        summary !== null ? { ...summary } : { tags: {}, heuristics: {}, attack_matrix: {} }
+      ) as SubmissionSummary;
+      const tempTagMap = (liveTagMap !== null ? { ...liveTagMap } : {}) as Record<string, string[]>;
 
-    Object.entries(results).forEach(([resultKey, result]) => {
-      const key = resultKey.substr(0, 64);
+      Object.entries(results).forEach(([resultKey, result]) => {
+        const key = resultKey.substr(0, 64);
 
-      if (!Object.hasOwnProperty.call(tempTagMap, key)) {
-        tempTagMap[key] = [];
-      }
-
-      for (const sectionID in result.result.sections) {
-        const section = result.result.sections[sectionID];
-        let hType = 'info';
-        if (section.heuristic !== null && section.heuristic !== undefined) {
-          // #1: Get heuristic score
-          if (section.heuristic.score < 0) {
-            hType = 'safe';
-          } else if (section.heuristic.score < 300) {
-            hType = 'info';
-          } else if (section.heuristic.score < 1000) {
-            hType = 'suspicious';
-          } else {
-            hType = 'malicious';
-          }
-
-          // #2: Parse heuristics
-          if (!Object.hasOwnProperty.call(tempSummary.heuristics, hType)) {
-            tempSummary.heuristics[hType] = [];
-          }
-
-          let heurExists = false;
-          const heurItem = [section.heuristic.heur_id, section.heuristic.name];
-          for (const i in tempSummary.heuristics[hType]) {
-            if (
-              tempSummary.heuristics[hType][i][0] === heurItem[0] &&
-              tempSummary.heuristics[hType][i][1] === heurItem[1]
-            ) {
-              heurExists = true;
-              break;
-            }
-          }
-
-          if (!heurExists) {
-            tempSummary.heuristics[hType].push(heurItem);
-
-            const heurKey = `heuristic__${section.heuristic.heur_id}`;
-            tempTagMap[key].push(heurKey);
-            if (!Object.hasOwnProperty.call(tempTagMap, heurKey)) {
-              tempTagMap[heurKey] = [];
-            }
-            tempTagMap[heurKey].push(key);
-          }
-
-          // #3: Parse Att&cks
-          if (section.heuristic.attack) {
-            for (const i in section.heuristic.attack) {
-              const attack = section.heuristic.attack[i];
-
-              for (const j in attack.categories) {
-                const cat = attack.categories[j];
-                if (!Object.hasOwnProperty.call(tempSummary.attack_matrix, cat)) {
-                  tempSummary.attack_matrix[cat] = [];
-                }
-
-                let attExists = false;
-                const attackItem = [attack.attack_id, attack.pattern, hType];
-                for (const k in tempSummary.attack_matrix[cat]) {
-                  if (
-                    tempSummary.attack_matrix[cat][k][0] === attackItem[0] &&
-                    tempSummary.attack_matrix[cat][k][1] === attackItem[1] &&
-                    tempSummary.attack_matrix[cat][k][2] === attackItem[2]
-                  ) {
-                    attExists = true;
-                    break;
-                  }
-                }
-                if (!attExists) {
-                  tempSummary.attack_matrix[cat].push(attackItem);
-
-                  const attKey = `attack_pattern__${attack.attack_id}`;
-                  tempTagMap[key].push(attKey);
-                  if (!Object.hasOwnProperty.call(tempTagMap, attKey)) {
-                    tempTagMap[attKey] = [];
-                  }
-                  tempTagMap[attKey].push(key);
-                }
-              }
-            }
-          }
+        if (!Object.hasOwnProperty.call(tempTagMap, key)) {
+          tempTagMap[key] = [];
         }
 
-        // #3: Parse Tags
-
-        for (const tagID in section.tags) {
-          const tag = section.tags[tagID];
-          let summaryType = null;
-          if (configuration['submission.tag_types.attribution'].indexOf(tag.type) !== -1) {
-            summaryType = 'attribution';
-          } else if (configuration['submission.tag_types.behavior'].indexOf(tag.type) !== -1) {
-            summaryType = 'behavior';
-          } else if (configuration['submission.tag_types.ioc'].indexOf(tag.type) !== -1) {
-            summaryType = 'ioc';
-          }
-
-          if (summaryType !== null) {
-            if (!Object.hasOwnProperty.call(tempSummary.tags, summaryType)) {
-              tempSummary.tags[summaryType] = {};
+        for (const sectionID in result.result.sections) {
+          const section = result.result.sections[sectionID];
+          let hType = 'info';
+          if (section.heuristic !== null && section.heuristic !== undefined) {
+            // #1: Get heuristic score
+            if (section.heuristic.score < 0) {
+              hType = 'safe';
+            } else if (section.heuristic.score < 300) {
+              hType = 'info';
+            } else if (section.heuristic.score < 1000) {
+              hType = 'suspicious';
+            } else {
+              hType = 'malicious';
             }
 
-            if (!Object.hasOwnProperty.call(tempSummary.tags[summaryType], tag.type)) {
-              tempSummary.tags[summaryType][tag.type] = [];
+            // #2: Parse heuristics
+            if (!Object.hasOwnProperty.call(tempSummary.heuristics, hType)) {
+              tempSummary.heuristics[hType] = [];
             }
 
-            let exists = false;
-            const tagVal = [tag.value, hType];
-            for (const i in tempSummary.tags[summaryType][tag.type]) {
+            let heurExists = false;
+            const heurItem = [section.heuristic.heur_id, section.heuristic.name];
+            for (const i in tempSummary.heuristics[hType]) {
               if (
-                tempSummary.tags[summaryType][tag.type][i][0] === tagVal[0] &&
-                tempSummary.tags[summaryType][tag.type][i][1] === tagVal[1]
+                tempSummary.heuristics[hType][i][0] === heurItem[0] &&
+                tempSummary.heuristics[hType][i][1] === heurItem[1]
               ) {
-                exists = true;
+                heurExists = true;
                 break;
               }
             }
 
-            if (!exists) {
-              tempSummary.tags[summaryType][tag.type].push(tagVal);
+            if (!heurExists) {
+              tempSummary.heuristics[hType].push(heurItem);
 
-              const tagKey = `${tag.type}__${tag.value}`;
-              tempTagMap[key].push(tagKey);
-              if (!Object.hasOwnProperty.call(tempTagMap, tagKey)) {
-                tempTagMap[tagKey] = [];
+              const heurKey = `heuristic__${section.heuristic.heur_id}`;
+              tempTagMap[key].push(heurKey);
+              if (!Object.hasOwnProperty.call(tempTagMap, heurKey)) {
+                tempTagMap[heurKey] = [];
               }
-              tempTagMap[tagKey].push(key);
+              tempTagMap[heurKey].push(key);
+            }
+
+            // #3: Parse Att&cks
+            if (section.heuristic.attack) {
+              for (const i in section.heuristic.attack) {
+                const attack = section.heuristic.attack[i];
+
+                for (const j in attack.categories) {
+                  const cat = attack.categories[j];
+                  if (!Object.hasOwnProperty.call(tempSummary.attack_matrix, cat)) {
+                    tempSummary.attack_matrix[cat] = [];
+                  }
+
+                  let attExists = false;
+                  const attackItem: Attack = [attack.attack_id, attack.pattern, hType as Verdict];
+                  for (const k in tempSummary.attack_matrix[cat]) {
+                    if (
+                      tempSummary.attack_matrix[cat][k][0] === attackItem[0] &&
+                      tempSummary.attack_matrix[cat][k][1] === attackItem[1] &&
+                      tempSummary.attack_matrix[cat][k][2] === attackItem[2]
+                    ) {
+                      attExists = true;
+                      break;
+                    }
+                  }
+                  if (!attExists) {
+                    tempSummary.attack_matrix[cat].push(attackItem);
+
+                    const attKey = `attack_pattern__${attack.attack_id}`;
+                    tempTagMap[key].push(attKey);
+                    if (!Object.hasOwnProperty.call(tempTagMap, attKey)) {
+                      tempTagMap[attKey] = [];
+                    }
+                    tempTagMap[attKey].push(key);
+                  }
+                }
+              }
             }
           }
-        }
-      }
-    });
-    setLiveTagMap(tempTagMap as any);
-    setHighlightMap(tempTagMap as any);
-    setSummary(tempSummary);
-  };
 
-  const updateLiveFileTree = (results: object) => {
-    const tempTree = tree !== null ? { ...tree } : {};
+          // #3: Parse Tags
 
-    const searchFileTree = (sha256: string, currentTree: object) => {
-      let output = [];
-      Object.entries(currentTree).forEach(([key, val]) => {
-        if (Object.keys(val.children).length !== 0) {
-          output = [...output, ...searchFileTree(sha256, val.children)];
-        }
-        if (key === sha256) {
-          output.push(val);
+          for (const tagID in section.tags) {
+            const tag = section.tags[tagID];
+            let summaryType: keyof TagTypes = null;
+            if (configuration['submission.tag_types.attribution'].indexOf(tag.type) !== -1) {
+              summaryType = 'attribution';
+            } else if (configuration['submission.tag_types.behavior'].indexOf(tag.type) !== -1) {
+              summaryType = 'behavior';
+            } else if (configuration['submission.tag_types.ioc'].indexOf(tag.type) !== -1) {
+              summaryType = 'ioc';
+            }
+
+            if (summaryType !== null) {
+              if (!Object.hasOwnProperty.call(tempSummary.tags, summaryType)) {
+                tempSummary.tags[summaryType] = {};
+              }
+
+              if (!Object.hasOwnProperty.call(tempSummary.tags[summaryType], tag.type)) {
+                tempSummary.tags[summaryType][tag.type] = [];
+              }
+
+              let exists = false;
+              const tagVal: Tag = [tag.value, hType as Verdict];
+              for (const i in tempSummary.tags[summaryType][tag.type]) {
+                if (
+                  tempSummary.tags[summaryType][tag.type][i][0] === tagVal[0] &&
+                  tempSummary.tags[summaryType][tag.type][i][1] === tagVal[1]
+                ) {
+                  exists = true;
+                  break;
+                }
+              }
+
+              if (!exists) {
+                tempSummary.tags[summaryType][tag.type].push(tagVal);
+
+                const tagKey = `${tag.type}__${tag.value}`;
+                tempTagMap[key].push(tagKey);
+                if (!Object.hasOwnProperty.call(tempTagMap, tagKey)) {
+                  tempTagMap[tagKey] = [];
+                }
+                tempTagMap[tagKey].push(key);
+              }
+            }
+          }
         }
       });
-      return output;
-    };
+      setLiveTagMap(tempTagMap as unknown as SubmissionTags);
+      setHighlightMap(tempTagMap as unknown as HighlighMapProps);
+      setSummary(tempSummary);
+    },
+    [configuration, liveTagMap, setHighlightMap, summary]
+  );
 
-    const getFilenameFromSHA256 = sha256 => {
-      if (submission !== null) {
-        for (const i in submission.files) {
-          if (submission.files[i].sha256 === sha256) {
-            return submission.files[i].name;
+  const updateLiveFileTree = useCallback(
+    (results: Record<string, Result>) => {
+      const tempTree = tree !== null ? { ...tree } : {};
+
+      const searchFileTree = (sha256: string, currentTree: SubmissionTree['tree']): Tree[] => {
+        let output: Tree[] = [];
+        Object.entries(currentTree).forEach(([key, val]) => {
+          if (Object.keys(val.children).length !== 0) {
+            output = [...output, ...searchFileTree(sha256, val.children)];
+          }
+          if (key === sha256) {
+            output.push(val);
+          }
+        });
+        return output;
+      };
+
+      const getFilenameFromSHA256 = (sha256: string) => {
+        if (submission !== null) {
+          for (const i in submission.files) {
+            if (submission.files[i].sha256 === sha256) {
+              return submission.files[i].name;
+            }
           }
         }
-      }
 
-      return null;
-    };
-    Object.entries(results).forEach(([resultKey, result]) => {
-      const key = resultKey.substr(0, 64);
+        return null;
+      };
+      Object.entries(results).forEach(([resultKey, result]) => {
+        const key = resultKey.substr(0, 64);
 
-      const toUpdate = searchFileTree(key, tempTree);
+        const toUpdate = searchFileTree(key, tempTree);
 
-      if (toUpdate.length === 0) {
-        const fname = getFilenameFromSHA256(key);
+        if (toUpdate.length === 0) {
+          const fname = getFilenameFromSHA256(key);
 
-        if (fname != null) {
-          tempTree[key] = { children: {}, name: [fname], score: 0, sha256: key, type: 'N/A' };
-          toUpdate.push(tempTree[key]);
-        } else {
-          if (!Object.hasOwnProperty.call(tempTree, 'TBD')) {
-            tempTree.TBD = { children: {}, name: ['Undetermined Parent'], score: 0, type: 'N/A' };
+          if (fname != null) {
+            tempTree[key] = { children: {}, name: [fname], score: 0, sha256: key, type: 'N/A' };
+            toUpdate.push(tempTree[key]);
+          } else {
+            if (!Object.hasOwnProperty.call(tempTree, 'TBD')) {
+              tempTree.TBD = { children: {}, name: ['Undetermined Parent'], score: 0, type: 'N/A' };
+            }
+
+            tempTree.TBD.children[key] = { children: {}, name: [key], score: 0, sha256: key, type: 'N/A' };
+            toUpdate.push(tempTree.TBD.children[key]);
           }
-
-          tempTree.TBD.children[key] = { children: {}, name: [key], score: 0, sha256: key, type: 'N/A' };
-          toUpdate.push(tempTree.TBD.children[key]);
         }
-      }
-      const toDelTDB = [];
-      for (const idx in toUpdate) {
-        if (Object.hasOwnProperty.call(toUpdate, idx)) {
-          const item = toUpdate[idx];
-          if (result.result.score !== undefined) {
-            item.score += result.result.score;
-          }
+        const toDelTDB = [];
+        for (const idx in toUpdate) {
+          if (Object.hasOwnProperty.call(toUpdate, idx)) {
+            const item = toUpdate[idx];
+            if (result.result.score !== undefined) {
+              item.score += result.result.score;
+            }
 
-          for (const i in result.response.extracted) {
-            if (Object.hasOwnProperty.call(result.response.extracted, i)) {
-              const { sha256, name } = result.response.extracted[i];
+            for (const i in result.response.extracted) {
+              if (Object.hasOwnProperty.call(result.response.extracted, i)) {
+                const { sha256, name } = result.response.extracted[i];
 
-              if (!Object.hasOwnProperty.call(item.children, sha256)) {
-                if (
-                  Object.hasOwnProperty.call(tempTree, 'TBD') &&
-                  Object.hasOwnProperty.call(tempTree.TBD.children, sha256)
-                ) {
-                  item.children[sha256] = tempTree.TBD.children[sha256];
-                  item.children[sha256].name = [name];
-                  if (toDelTDB.indexOf(sha256) === -1) toDelTDB.push(sha256);
+                if (!Object.hasOwnProperty.call(item.children, sha256)) {
+                  if (
+                    Object.hasOwnProperty.call(tempTree, 'TBD') &&
+                    Object.hasOwnProperty.call(tempTree.TBD.children, sha256)
+                  ) {
+                    item.children[sha256] = tempTree.TBD.children[sha256];
+                    item.children[sha256].name = [name];
+                    if (toDelTDB.indexOf(sha256) === -1) toDelTDB.push(sha256);
+                  } else {
+                    item.children[sha256] = { children: {}, name: [name], score: 0, sha256, type: 'N/A' };
+                  }
                 } else {
-                  item.children[sha256] = { children: {}, name: [name], score: 0, sha256, type: 'N/A' };
+                  item.children[sha256].name.push(name);
                 }
-              } else {
-                item.children[sha256].name.push(name);
               }
             }
           }
         }
-      }
 
-      for (const idxDel in toDelTDB) {
-        if (Object.hasOwnProperty.call(toDelTDB, idxDel)) {
-          delete tempTree.TBD.children[toDelTDB[idxDel]];
+        for (const idxDel in toDelTDB) {
+          if (Object.hasOwnProperty.call(toDelTDB, idxDel)) {
+            delete tempTree.TBD.children[toDelTDB[idxDel]];
+          }
         }
-      }
-    });
+      });
 
-    if (tempTree.TBD && Object.keys(tempTree.TBD.children).length === 0) delete tempTree.TBD;
-    setTree(tempTree);
-  };
+      if (tempTree.TBD && Object.keys(tempTree.TBD.children).length === 0) delete tempTree.TBD;
+      setTree(tempTree);
+    },
+    [submission, tree]
+  );
 
   const getParsedErrors = useCallback((errorList: string[]): ParsedErrors => {
-    const aggregated = errors => {
+    const aggregated = (errors: string[]) => {
       const out = {
         depth: [],
         files: [],
@@ -495,33 +505,40 @@ function WrappedSubmissionDetail() {
     }
   }, [socket]);
 
-  const archive = useCallback(() => {
-    if (submission != null) {
-      apiCall<{ success: boolean; action: 'archive' | 'resubmit'; sid: string }>({
-        method: 'PUT',
-        url: `/api/v4/archive/${submission.sid}/${archivingUseAlternateDtl === 'true' ? '?use_alternate_dtl' : ''}`,
-        body: archivingMetadata,
-        onSuccess: api_data => {
-          if (api_data.api_response.success) {
-            showSuccessMessage(
-              t(
-                ['archive', 'hooked'].includes(api_data.api_response.action)
-                  ? 'archive.success'
-                  : 'archive.success.resubmit'
-              )
-            );
-            setSubmission({ ...submission, archived: true });
-          } else {
-            showErrorMessage(t('archive.failed'));
-          }
-          setArchiveDialog(false);
-        },
-        onEnter: () => setWaitingDialog(true),
-        onExit: () => setWaitingDialog(false)
-      });
-    }
+  const archive = useCallback(
+    (
+      _submission: Submission,
+      _archivingUseAlternateDtl: 'true' | 'false',
+      _archivingMetadata: Record<string, ArchiverMetadata>
+    ) => {
+      if (_submission !== null) {
+        apiCall<{ success: boolean; action: 'archive' | 'resubmit'; sid: string }>({
+          method: 'PUT',
+          url: `/api/v4/archive/${_submission.sid}/${_archivingUseAlternateDtl === 'true' ? '?use_alternate_dtl' : ''}`,
+          body: _archivingMetadata,
+          onSuccess: api_data => {
+            if (api_data.api_response.success) {
+              showSuccessMessage(
+                t(
+                  ['archive', 'hooked'].includes(api_data.api_response.action)
+                    ? 'archive.success'
+                    : 'archive.success.resubmit'
+                )
+              );
+              setSubmission(s => ({ ...s, archived: true }));
+            } else {
+              showErrorMessage(t('archive.failed'));
+            }
+            setArchiveDialog(false);
+          },
+          onEnter: () => setWaitingDialog(true),
+          onExit: () => setWaitingDialog(false)
+        });
+      }
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showSuccessMessage, submission, t]);
+    [showErrorMessage, showSuccessMessage, t]
+  );
 
   const resubmit = useCallback(() => {
     if (submission != null) {
@@ -563,6 +580,7 @@ function WrappedSubmissionDetail() {
       }
       setResubmitAnchor(null);
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [showSuccessMessage, submission, t]
   );
 
@@ -570,7 +588,7 @@ function WrappedSubmissionDetail() {
     if (submission != null && systemConfig.ui.allow_replay) {
       apiCall({
         url: `/api/v4/replay/submission/${submission.sid}/`,
-        onSuccess: api_data => {
+        onSuccess: () => {
           showSuccessMessage(t('replay.success'));
           const metadata = { ...submission.metadata, replay: 'requested' };
           setSubmission({ ...submission, metadata });
@@ -585,7 +603,7 @@ function WrappedSubmissionDetail() {
       apiCall({
         method: 'DELETE',
         url: `/api/v4/submission/${submission.sid}/`,
-        onSuccess: api_data => {
+        onSuccess: () => {
           showSuccessMessage(t('delete.success'));
           setDeleteDialog(false);
           setTimeout(() => {
@@ -599,7 +617,7 @@ function WrappedSubmissionDetail() {
   };
 
   const setVerdict = useCallback(
-    verdict => {
+    (verdict: keyof ParsedSubmission['verdict']) => {
       if (submission != null && submission.verdict[verdict].indexOf(currentUser.username) === -1) {
         apiCall<{ success: boolean }>({
           method: 'PUT',
@@ -765,7 +783,7 @@ function WrappedSubmissionDetail() {
   }, [liveStatus]);
 
   const handleErrorMessage = useCallback(
-    data => {
+    (data: { status_code: number; msg: string }) => {
       // eslint-disable-next-line no-console
       console.debug(`SocketIO :: onError => ${data.msg}`);
       apiCall<{ wq_id: string }>({
@@ -782,14 +800,14 @@ function WrappedSubmissionDetail() {
     [id]
   );
 
-  const handleStartMessage = data => {
+  const handleStartMessage = useCallback((data: { status_code: number; msg: string }) => {
     // eslint-disable-next-line no-console
     console.debug(`SocketIO :: onStart => ${data.msg}`);
     setTimeout(() => incrementLoadTrigger(1), 500);
-  };
+  }, []);
 
   const handleStopMessage = useCallback(
-    data => {
+    (data: { status_code: number; msg: string }) => {
       // eslint-disable-next-line no-console
       console.debug(`SocketIO :: onStop => ${data.msg}`);
 
@@ -810,22 +828,22 @@ function WrappedSubmissionDetail() {
     [id]
   );
 
-  const handleCacheKeyMessage = data => {
+  const handleCacheKeyMessage = useCallback((data: { status_code: number; msg: string }) => {
     // eslint-disable-next-line no-console
     console.debug(`SocketIO :: onCacheKey => ${data.msg}`);
     setLiveResultKeys([data.msg]);
-  };
+  }, []);
 
-  const handleCacheKeyErrrorMessage = data => {
+  const handleCacheKeyErrorMessage = useCallback((data: { status_code: number; msg: string }) => {
     // eslint-disable-next-line no-console
     console.debug(`SocketIO :: onCacheKeyError => ${data.msg}`);
     setLiveErrorKeys([data.msg]);
-  };
+  }, []);
 
-  const resetOutstanding = () => {
+  const resetOutstanding = useCallback(() => {
     setLastSuccessfulTrigger(loadTrigger);
     setOutstanding(null);
-  };
+  }, [loadTrigger]);
 
   useEffect(
     () => () => {
@@ -842,12 +860,13 @@ function WrappedSubmissionDetail() {
       socket.on('start', handleStartMessage);
       socket.on('stop', handleStopMessage);
       socket.on('cachekey', handleCacheKeyMessage);
-      socket.on('cachekeyerr', handleCacheKeyErrrorMessage);
+      socket.on('cachekeyerr', handleCacheKeyErrorMessage);
     }
 
     return () => {
       if (socket) socket.disconnect();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socket, handleErrorMessage, handleStopMessage]);
 
   useEffect(() => {
@@ -1022,7 +1041,7 @@ function WrappedSubmissionDetail() {
           setArchiveDialog(false);
           setTimeout(() => loadDefaultArchivingMetadata(), 250);
         }}
-        handleAccept={archive}
+        handleAccept={() => archive(submission, archivingUseAlternateDtl, archivingMetadata)}
         title={t('archive.title')}
         cancelText={t('archive.cancelText')}
         acceptText={t('archive.acceptText')}
@@ -1037,7 +1056,7 @@ function WrappedSubmissionDetail() {
                     <RadioGroup
                       value={archivingUseAlternateDtl}
                       name="alternate-expiry"
-                      onChange={event => setArchivingUseAlternateDtl(event.target.value)}
+                      onChange={event => setArchivingUseAlternateDtl(event.target.value as 'true' | 'false')}
                       row
                     >
                       <FormControlLabel value="false" control={<Radio />} label={t('archive.alternate_expiry.never')} />
@@ -1135,308 +1154,302 @@ function WrappedSubmissionDetail() {
           </Alert>
         </Snackbar>
       )}
-      <div style={{ textAlign: 'left' }}>
-        {c12nDef.enforce && (
-          <div style={{ paddingBottom: sp4 }}>
-            <Classification size="tiny" c12n={submission ? submission.classification : null} />
-          </div>
-        )}
-        <div style={{ paddingBottom: sp4 }}>
-          <Grid container size="grow">
-            <Grid flex={1}>
-              <div>
-                <Typography variant="h4">{t('title')}</Typography>
-                <Typography variant="caption" component="div">
-                  {submission ? submission.sid : <Skeleton style={{ width: '10rem' }} />}
-                </Typography>
-                {submission && submission.params.psid && (
-                  <Typography variant="caption" component="div">
-                    <i>
-                      <span>{t('psid')}: </span>
-                      <Link
-                        style={{ textDecoration: 'none', color: theme.palette.primary.main }}
-                        to={`/submission/detail/${submission.params.psid}`}
-                      >
-                        {submission.params.psid}
-                      </Link>
-                    </i>
-                  </Typography>
-                )}
-              </div>
-              {socket && (
-                <div
-                  style={{
-                    display: 'flex',
-                    color: theme.palette.mode === 'dark' ? theme.palette.primary.light : theme.palette.primary.dark,
-                    paddingBottom: theme.spacing(3),
-                    paddingTop: theme.spacing(2)
-                  }}
-                >
-                  {liveStatus === 'processing' ? (
-                    <PlayCircleOutlineIcon
-                      style={{
-                        height: theme.spacing(3),
-                        width: theme.spacing(3),
-                        marginRight: theme.spacing(1)
-                      }}
-                    />
-                  ) : (
-                    <PauseCircleOutlineOutlinedIcon
-                      style={{
-                        height: theme.spacing(3),
-                        width: theme.spacing(3),
-                        marginRight: theme.spacing(1)
-                      }}
-                    />
-                  )}
-                  <div style={{ width: '100%' }}>
-                    {t(liveStatus)}
-                    <LinearProgress />
-                  </div>
-                </div>
-              )}
-            </Grid>
-            <Grid size={{ xs: 12, sm: 12, md: 4 }} style={{ display: 'flex', justifyContent: 'flex-end', flexGrow: 0 }}>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                {submission ? (
-                  submission.state === 'completed' ? (
-                    <div style={{ display: 'flex' }}>
-                      {(currentUser.roles.includes('administration') ||
-                        (currentUser.roles.includes('submission_delete') &&
-                          submission.params.submitter === currentUser.username)) && (
-                        <Tooltip title={t('delete')}>
-                          <IconButton
-                            onClick={() => setDeleteDialog(true)}
-                            style={{
-                              color:
-                                theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
-                            }}
-                            size="large"
-                          >
-                            <RemoveCircleOutlineOutlinedIcon />
-                          </IconButton>
-                        </Tooltip>
-                      )}
-                      {currentUser.roles.includes('bundle_download') && (
-                        <FileDownloader
-                          icon={<CloudDownloadOutlinedIcon />}
-                          link={`/api/v4/bundle/${submission.sid}/`}
-                          tooltip={t('download')}
-                        />
-                      )}
-                      {systemConfig.datastore.archive.enabled && currentUser.roles.includes('archive_trigger') && (
-                        <Tooltip title={t(submission.archived || submission.from_archive ? 'archived' : 'archive')}>
-                          <div>
-                            <IconButton
-                              onClick={() => setArchiveDialog(true)}
-                              disabled={submission.archived || submission.from_archive}
-                              size="large"
-                            >
-                              <ArchiveOutlinedIcon />
-                            </IconButton>
-                          </div>
-                        </Tooltip>
-                      )}
-                      {currentUser.roles.includes('submission_create') && (
-                        <>
-                          <Tooltip title={t('resubmit')}>
-                            <IconButton onClick={event => setResubmitAnchor(event.currentTarget)} size="large">
-                              <ReplayOutlinedIcon />
-                              {popoverOpen ? (
-                                <ExpandLessIcon
-                                  style={{ position: 'absolute', right: 0, bottom: 10, fontSize: 'medium' }}
-                                />
-                              ) : (
-                                <ExpandMoreIcon
-                                  style={{ position: 'absolute', right: 0, bottom: 10, fontSize: 'medium' }}
-                                />
-                              )}
-                            </IconButton>
-                          </Tooltip>
-                          <Popover
-                            open={popoverOpen}
-                            anchorEl={resubmitAnchor}
-                            onClose={() => setResubmitAnchor(null)}
-                            anchorOrigin={{
-                              vertical: 'bottom',
-                              horizontal: 'right'
-                            }}
-                            transformOrigin={{
-                              vertical: 'top',
-                              horizontal: 'right'
-                            }}
-                          >
-                            <List disablePadding>
-                              <ListItemButton
-                                component={Link}
-                                to={`/submit?hash=${submission.files[0].sha256}`}
-                                state={{
-                                  c12n: submission.classification,
-                                  metadata: submission.metadata
-                                }}
-                                dense
-                                onClick={() => setResubmitAnchor(null)}
-                              >
-                                <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
-                                  <TuneOutlinedIcon />
-                                </ListItemIcon>
-                                <ListItemText primary={t('resubmit.modify')} />
-                              </ListItemButton>
-                              <ListItemButton dense onClick={() => resubmitWithType('dynamic', false)}>
-                                <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
-                                  <OndemandVideoOutlinedIcon />
-                                </ListItemIcon>
-                                <ListItemText primary={t('resubmit.dynamic')} />
-                              </ListItemButton>
-                              {submissionProfiles &&
-                                Object.entries(submissionProfiles).map(([name, display]) => (
-                                  <ListItemButton key={name} dense onClick={() => resubmitWithType(name, true)}>
-                                    <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
-                                      <OndemandVideoOutlinedIcon />
-                                    </ListItemIcon>
-                                    <ListItemText primary={`${t('resubmit.with')} "${display}"`} />
-                                  </ListItemButton>
-                                ))}
-                              <ListItemButton dense onClick={resubmit}>
-                                <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
-                                  <RepeatOutlinedIcon />
-                                </ListItemIcon>
-                                <ListItemText primary={t('resubmit.carbon_copy')} />
-                              </ListItemButton>
-                            </List>
-                          </Popover>
-                        </>
-                      )}
-                      {systemConfig.ui.allow_replay && currentUser.roles.includes('replay_trigger') && (
-                        <Tooltip title={t('replay')}>
-                          <IconButton onClick={replay} disabled={!!submission.metadata.replay} size="large">
-                            <PublishOutlinedIcon />
-                          </IconButton>
-                        </Tooltip>
-                      )}
-                      <Tooltip title={t('report_view')}>
-                        <IconButton component={Link} to={`/submission/report/${submission.sid}`} size="large">
-                          <ChromeReaderModeOutlinedIcon />
-                        </IconButton>
-                      </Tooltip>
-                    </div>
-                  ) : (
-                    currentUser.roles.includes('submission_delete') && (
-                      <Tooltip title={t('delete')}>
-                        <IconButton
-                          onClick={() => setDeleteDialog(true)}
-                          style={{
-                            color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
-                          }}
-                          size="large"
-                        >
-                          <RemoveCircleOutlineOutlinedIcon />
-                        </IconButton>
-                      </Tooltip>
+
+      <PageHeader
+        classification={() => submission.classification}
+        primary={t('title')}
+        secondary={() => submission.sid}
+        secondaryLoading={!submission}
+        actions={
+          <>
+            <IconButton
+              size="large"
+              tooltip={t('delete')}
+              onClick={() => setDeleteDialog(true)}
+              style={{
+                color: theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark
+              }}
+              {...(!submission
+                ? { loading: true }
+                : {
+                    preventRender:
+                      !currentUser.roles.includes('administration') &&
+                      (!currentUser.roles.includes('submission_delete') ||
+                        submission.params.submitter !== currentUser.username)
+                  })}
+            >
+              <RemoveCircleOutlineOutlinedIcon />
+            </IconButton>
+
+            <FileDownloader
+              link={() => `/api/v4/bundle/${submission.sid}/`}
+              loading={!submission}
+              preventRender={() => !currentUser.roles.includes('bundle_download') || submission.state !== 'completed'}
+              tooltip={t('download')}
+            >
+              <CloudDownloadOutlinedIcon />
+            </FileDownloader>
+
+            <IconButton
+              loading={!submission}
+              size="large"
+              onClick={() => setArchiveDialog(true)}
+              {...(!submission
+                ? {
+                    loading: true,
+                    preventRender: !(
+                      systemConfig.datastore.archive.enabled && currentUser.roles.includes('archive_trigger')
                     )
+                  }
+                : {
+                    preventRender:
+                      submission.state !== 'completed' ||
+                      !(systemConfig.datastore.archive.enabled && currentUser.roles.includes('archive_trigger')),
+                    disabled: submission.archived || submission.from_archive,
+                    tooltip: t(submission.archived || submission.from_archive ? 'archived' : 'archive')
+                  })}
+            >
+              <ArchiveOutlinedIcon />
+            </IconButton>
+
+            {currentUser.roles.includes('submission_create') && (
+              <>
+                <IconButton
+                  size="large"
+                  tooltip={t('resubmit')}
+                  onClick={event => setResubmitAnchor(event.currentTarget)}
+                  {...(!submission
+                    ? { loading: true, preventRender: !currentUser.roles.includes('submission_create') }
+                    : {
+                        preventRender:
+                          submission.state !== 'completed' || !currentUser.roles.includes('submission_create')
+                      })}
+                >
+                  <ReplayOutlinedIcon />
+                  {popoverOpen ? (
+                    <ExpandLessIcon style={{ position: 'absolute', right: 0, bottom: 10, fontSize: 'medium' }} />
+                  ) : (
+                    <ExpandMoreIcon style={{ position: 'absolute', right: 0, bottom: 10, fontSize: 'medium' }} />
+                  )}
+                </IconButton>
+                {!submission ? null : (
+                  <Popover
+                    open={popoverOpen}
+                    anchorEl={resubmitAnchor}
+                    onClose={() => setResubmitAnchor(null)}
+                    anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+                    transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+                  >
+                    <List disablePadding>
+                      <ListItemButton
+                        component={Link}
+                        to={`/submit?hash=${submission.files[0].sha256}`}
+                        state={{
+                          c12n: submission.classification,
+                          metadata: submission.metadata
+                        }}
+                        dense
+                        onClick={() => setResubmitAnchor(null)}
+                      >
+                        <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
+                          <TuneOutlinedIcon />
+                        </ListItemIcon>
+                        <ListItemText primary={t('resubmit.modify')} />
+                      </ListItemButton>
+                      <ListItemButton dense onClick={() => resubmitWithType('dynamic', false)}>
+                        <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
+                          <OndemandVideoOutlinedIcon />
+                        </ListItemIcon>
+                        <ListItemText primary={t('resubmit.dynamic')} />
+                      </ListItemButton>
+                      {submissionProfiles &&
+                        Object.entries(submissionProfiles).map(([name, display]) => (
+                          <ListItemButton key={name} dense onClick={() => resubmitWithType(name, true)}>
+                            <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
+                              <OndemandVideoOutlinedIcon />
+                            </ListItemIcon>
+                            <ListItemText primary={`${t('resubmit.with')} "${display}"`} />
+                          </ListItemButton>
+                        ))}
+                      <ListItemButton dense onClick={resubmit}>
+                        <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
+                          <RepeatOutlinedIcon />
+                        </ListItemIcon>
+                        <ListItemText primary={t('resubmit.carbon_copy')} />
+                      </ListItemButton>
+                    </List>
+                  </Popover>
+                )}
+              </>
+            )}
+
+            <IconButton
+              size="large"
+              tooltip={t('replay')}
+              onClick={replay}
+              {...(!submission
+                ? {
+                    loading: true,
+                    preventRender: !(systemConfig.ui.allow_replay && currentUser.roles.includes('replay_trigger'))
+                  }
+                : {
+                    disabled: !!submission.metadata.replay,
+                    preventRender:
+                      submission.state !== 'completed' ||
+                      !(systemConfig.ui.allow_replay && currentUser.roles.includes('replay_trigger'))
+                  })}
+            >
+              <PublishOutlinedIcon />
+            </IconButton>
+
+            <IconButton
+              component={Link}
+              size="large"
+              tooltip={t('report_view')}
+              {...(!submission
+                ? { loading: true }
+                : {
+                    preventRender: submission.state !== 'completed',
+                    to: `/submission/report/${submission.sid}`
+                  })}
+            >
+              <ChromeReaderModeOutlinedIcon />
+            </IconButton>
+          </>
+        }
+        startAdornment={
+          <>
+            {submission && submission.params.psid && (
+              <Typography variant="caption" component={'div'}>
+                <i>
+                  <span>{t('psid')}: </span>
+                  <Link
+                    style={{ textDecoration: 'none', color: theme.palette.primary.main }}
+                    to={`/submission/detail/${submission.params.psid}`}
+                  >
+                    {submission.params.psid}
+                  </Link>
+                </i>
+              </Typography>
+            )}
+            {socket && (
+              <div
+                style={{
+                  width: '100%',
+                  maxWidth: theme.breakpoints.values.sm,
+                  display: 'flex',
+                  color: theme.palette.mode === 'dark' ? theme.palette.primary.light : theme.palette.primary.dark,
+                  paddingBottom: theme.spacing(3),
+                  paddingTop: theme.spacing(2)
+                }}
+              >
+                {liveStatus === 'processing' ? (
+                  <PlayCircleOutlineIcon
+                    style={{
+                      height: theme.spacing(3),
+                      width: theme.spacing(3),
+                      marginRight: theme.spacing(1)
+                    }}
+                  />
+                ) : (
+                  <PauseCircleOutlineOutlinedIcon
+                    style={{
+                      height: theme.spacing(3),
+                      width: theme.spacing(3),
+                      marginRight: theme.spacing(1)
+                    }}
+                  />
+                )}
+                <div style={{ width: '100%' }}>
+                  {t(liveStatus)}
+                  <LinearProgress />
+                </div>
+              </div>
+            )}
+          </>
+        }
+        endAdornment={
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            {!(submission && submission.state !== 'completed') && (
+              <div style={{ width: '164px', marginTop: '8px' }}>
+                {submission ? (
+                  submission.state === 'completed' && (
+                    <>
+                      <VerdictBar verdicts={submission.verdict} />
+                      {currentUser.roles.includes('submission_manage') && (
+                        <Grid container size="grow">
+                          <Grid size={{ xs: 5 }} style={{ textAlign: 'left' }}>
+                            <Tooltip
+                              title={t(
+                                `verdict.${
+                                  submission.verdict.malicious.indexOf(currentUser.username) !== -1 ? 'is' : 'set'
+                                }.malicious`
+                              )}
+                            >
+                              <IconButton size="small" onClick={() => setVerdict('malicious')}>
+                                <BugReportOutlinedIcon
+                                  style={{
+                                    color:
+                                      submission.verdict.malicious.indexOf(currentUser.username) !== -1
+                                        ? theme.palette.error.dark
+                                        : null
+                                  }}
+                                />
+                              </IconButton>
+                            </Tooltip>
+                          </Grid>
+                          <Grid size={{ xs: 2 }} />
+                          <Grid size={{ xs: 5 }} style={{ textAlign: 'right' }}>
+                            <Tooltip
+                              title={t(
+                                `verdict.${
+                                  submission.verdict.non_malicious.indexOf(currentUser.username) !== -1 ? 'is' : 'set'
+                                }.non_malicious`
+                              )}
+                            >
+                              <IconButton size="small" onClick={() => setVerdict('non_malicious')}>
+                                <VerifiedUserOutlinedIcon
+                                  style={{
+                                    color:
+                                      submission.verdict.non_malicious.indexOf(currentUser.username) !== -1
+                                        ? theme.palette.success.dark
+                                        : null
+                                  }}
+                                />
+                              </IconButton>
+                            </Tooltip>
+                          </Grid>
+                        </Grid>
+                      )}
+                    </>
                   )
                 ) : (
-                  <div style={{ display: 'inline-flex' }}>
-                    {[...Array(systemConfig.ui.allow_replay ? 6 : 5)].map((_, i) => (
+                  <>
+                    <Skeleton variant="rectangular" style={{ height: '15px', width: '100%' }} />
+                    <div style={{ display: 'inline-flex', width: '100%', justifyContent: 'space-between' }}>
                       <Skeleton
-                        key={i}
                         variant="circular"
-                        height="2.5rem"
-                        width="2.5rem"
+                        height="1.5rem"
+                        width="1.5rem"
                         style={{ margin: theme.spacing(0.5) }}
                       />
-                    ))}
-                  </div>
-                )}
-
-                {!(submission && submission.state !== 'completed') && (
-                  <div
-                    style={{
-                      width: '164px',
-                      marginTop: '8px'
-                    }}
-                  >
-                    {submission ? (
-                      submission.state === 'completed' && (
-                        <>
-                          <VerdictBar verdicts={submission.verdict} />
-                          {currentUser.roles.includes('submission_manage') && (
-                            <Grid container size="grow">
-                              <Grid size={{ xs: 5 }} style={{ textAlign: 'left' }}>
-                                <Tooltip
-                                  title={t(
-                                    `verdict.${
-                                      submission.verdict.malicious.indexOf(currentUser.username) !== -1 ? 'is' : 'set'
-                                    }.malicious`
-                                  )}
-                                >
-                                  <IconButton size="small" onClick={() => setVerdict('malicious')}>
-                                    <BugReportOutlinedIcon
-                                      style={{
-                                        color:
-                                          submission.verdict.malicious.indexOf(currentUser.username) !== -1
-                                            ? theme.palette.error.dark
-                                            : null
-                                      }}
-                                    />
-                                  </IconButton>
-                                </Tooltip>
-                              </Grid>
-                              <Grid size={{ xs: 2 }} />
-                              <Grid size={{ xs: 5 }} style={{ textAlign: 'right' }}>
-                                <Tooltip
-                                  title={t(
-                                    `verdict.${
-                                      submission.verdict.non_malicious.indexOf(currentUser.username) !== -1
-                                        ? 'is'
-                                        : 'set'
-                                    }.non_malicious`
-                                  )}
-                                >
-                                  <IconButton size="small" onClick={() => setVerdict('non_malicious')}>
-                                    <VerifiedUserOutlinedIcon
-                                      style={{
-                                        color:
-                                          submission.verdict.non_malicious.indexOf(currentUser.username) !== -1
-                                            ? theme.palette.success.dark
-                                            : null
-                                      }}
-                                    />
-                                  </IconButton>
-                                </Tooltip>
-                              </Grid>
-                            </Grid>
-                          )}
-                        </>
-                      )
-                    ) : (
-                      <>
-                        <Skeleton variant="rectangular" style={{ height: '15px', width: '100%' }} />
-                        <div style={{ display: 'inline-flex', width: '100%', justifyContent: 'space-between' }}>
-                          <Skeleton
-                            variant="circular"
-                            height="1.5rem"
-                            width="1.5rem"
-                            style={{ margin: theme.spacing(0.5) }}
-                          />
-                          <Skeleton
-                            variant="circular"
-                            height="1.5rem"
-                            width="1.5rem"
-                            style={{ margin: theme.spacing(0.5) }}
-                          />
-                        </div>
-                      </>
-                    )}
-                  </div>
+                      <Skeleton
+                        variant="circular"
+                        height="1.5rem"
+                        width="1.5rem"
+                        style={{ margin: theme.spacing(0.5) }}
+                      />
+                    </div>
+                  </>
                 )}
               </div>
-            </Grid>
-          </Grid>
-        </div>
+            )}
+          </div>
+        }
+      />
 
+      <div style={{ textAlign: 'left' }}>
         <InfoSection submission={submission} />
-
         {filtered && (
           <div style={{ paddingBottom: theme.spacing(2), paddingTop: theme.spacing(2) }}>
             <Typography variant="subtitle1">
@@ -1444,7 +1457,6 @@ function WrappedSubmissionDetail() {
             </Typography>
           </div>
         )}
-
         {partial && (
           <div style={{ paddingBottom: theme.spacing(2), paddingTop: theme.spacing(2) }}>
             <Typography variant="subtitle1">
@@ -1452,7 +1464,6 @@ function WrappedSubmissionDetail() {
             </Typography>
           </div>
         )}
-
         <MetaSection
           metadata={submission ? submission.metadata : null}
           classification={submission ? submission.classification : null}
@@ -1469,7 +1480,6 @@ function WrappedSubmissionDetail() {
           attack_matrix={summary ? summary.attack_matrix : null}
           force={submission && submission.max_score < 0}
         />
-
         {summary &&
           Object.keys(summary.tags).length !== 0 &&
           Object.keys(summary.tags).map(
@@ -1483,15 +1493,12 @@ function WrappedSubmissionDetail() {
                 />
               )
           )}
-
         {submission && submission.state === 'completed' && Object.keys(submission.errors).length !== 0 && (
           <ErrorSection sid={id} errors={submission.errors} />
         )}
-
         {submission && submission.state !== 'completed' && liveErrorKeys.length !== 0 && liveErrors !== null && (
           <ErrorSection sid={id} errors={liveErrors} />
         )}
-
         <FileTreeSection tree={tree} sid={id} baseFiles={baseFiles} force={submission && submission.max_score < 0} />
       </div>
     </PageCenter>

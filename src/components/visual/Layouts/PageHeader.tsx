@@ -5,18 +5,20 @@ import useALContext from 'components/hooks/useALContext';
 import type { ClassificationProps } from 'components/visual/Classification';
 import Classification from 'components/visual/Classification';
 import type { CSSProperties, DetailedHTMLProps, HTMLAttributes, ReactNode } from 'react';
-import React, { useMemo } from 'react';
+import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
 
 export type PageHeaderProps = {
-  classification?: ClassificationProps['c12n'] | ((loading?: boolean) => ClassificationProps['c12n']);
-  primary: ReactNode | ((loading?: boolean) => ReactNode);
-  secondary?: ReactNode | ((loading?: boolean) => ReactNode);
   actions?: ReactNode;
+  classification?: ClassificationProps['c12n'] | (() => ClassificationProps['c12n']);
   endAdornment?: ReactNode;
-
-  loading?: boolean;
   isSticky?: boolean;
+  primary: ReactNode | (() => ReactNode);
+  primaryLoading?: boolean;
+  secondary?: ReactNode | (() => ReactNode);
+  secondaryLoading?: boolean;
+  startAdornment?: ReactNode;
   top?: CSSProperties['top'];
+  wrapStart?: boolean;
   onClassificationChange?: ClassificationProps['setClassification'];
 
   slotProps?: {
@@ -31,116 +33,183 @@ export type PageHeaderProps = {
 export const PageHeader: React.FC<PageHeaderProps> = React.memo(
   ({
     actions = null,
-    classification = 'undefined',
+    classification: classificationProp,
     endAdornment = null,
-    loading = false,
     isSticky = false,
-    primary = null,
-    top = null,
-    secondary = null,
-
+    primary: primaryProp,
+    primaryLoading = false,
+    secondary: secondaryProp,
+    secondaryLoading = false,
     slotProps = {},
+    startAdornment = null,
+    top = null,
+    wrapStart = false,
     onClassificationChange = null
-  }: PageHeaderProps) => {
+  }) => {
     const theme = useTheme();
     const layout = useAppLayout();
     const appbar = useAppBar();
     const appBarHeight = useAppBarHeight();
     const { c12nDef } = useALContext();
 
+    const [flexColumn, setFlexColumn] = useState<boolean>(false);
+
+    const containerRef = useRef<HTMLDivElement>(null);
+    const primaryRef = useRef<HTMLSpanElement>(null);
+    const actionsRef = useRef<HTMLDivElement>(null);
+
     const barWillHide = useMemo(
       () => (layout?.current !== 'top' ? appbar?.autoHide : null),
-      [appbar?.autoHide, layout]
+      [layout?.current, appbar?.autoHide]
     );
 
     const {
-      root: rootProps,
-      classification: classificationProps,
-      primary: primaryProps,
-      secondary: secondaryProps,
-      actions: actionsProps
-    } = useMemo<PageHeaderProps['slotProps']>(() => slotProps, [slotProps]);
+      root = {},
+      classification: classificationProps = {},
+      primary: primaryProps = {},
+      secondary: secondaryProps = {},
+      actions: actionsProps = {}
+    } = slotProps;
 
-    return (
-      <div
-        {...rootProps}
-        style={{
+    const resolvedPrimary = useMemo<ReactNode>(() => {
+      if (primaryLoading) return <Skeleton width="20rem" />;
+      return typeof primaryProp === 'function' ? primaryProp() : primaryProp;
+    }, [primaryLoading, primaryProp]);
+
+    const resolvedSecondary = useMemo<ReactNode>(() => {
+      if (secondaryLoading) return <Skeleton width="10rem" />;
+      return typeof secondaryProp === 'function' ? secondaryProp() : secondaryProp;
+    }, [secondaryLoading, secondaryProp]);
+
+    const classification = useMemo<ClassificationProps['c12n']>(
+      () =>
+        classificationProp === undefined
+          ? undefined
+          : primaryLoading || secondaryLoading
+            ? null
+            : typeof classificationProp === 'function'
+              ? classificationProp()
+              : classificationProp,
+      [classificationProp, primaryLoading, secondaryLoading]
+    );
+
+    useLayoutEffect(() => {
+      const measure = () => {
+        if (!containerRef.current || !primaryRef.current || !actionsRef.current) return;
+
+        const containerWidth = containerRef.current.getBoundingClientRect().width;
+        const primaryIdealWidth = primaryRef.current.scrollWidth; // unwrapped width
+        const actionsWidth = actionsRef.current.getBoundingClientRect().width;
+
+        setFlexColumn(containerWidth - actionsWidth < primaryIdealWidth + 10);
+      };
+
+      const resizeObserver = new ResizeObserver(measure);
+      if (containerRef.current) resizeObserver.observe(containerRef.current);
+      if (primaryRef.current) resizeObserver.observe(primaryRef.current);
+      if (actionsRef.current) resizeObserver.observe(actionsRef.current);
+
+      measure();
+
+      return () => resizeObserver.disconnect();
+    }, []);
+
+    const rootStyle = useMemo(
+      () =>
+        ({
           display: 'flex',
           flexDirection: 'column',
           top: top !== null ? top : isSticky ? (barWillHide ? 0 : appBarHeight) : null,
           zIndex: !isSticky ? theme.zIndex.appBar - 100 : null,
-          ...rootProps?.style
-        }}
-      >
-        {!c12nDef.enforce || classification === 'undefined' ? null : (
+          ...root.style
+        }) satisfies CSSProperties,
+      [top, isSticky, barWillHide, appBarHeight, theme.zIndex.appBar, root.style]
+    );
+
+    const containerStyle = useMemo(
+      () =>
+        ({
+          display: 'flex',
+          flexDirection: flexColumn ? 'column' : 'row',
+          flexWrap: 'wrap',
+          gap: theme.spacing(1),
+          ...(flexColumn && {
+            alignItems: wrapStart ? 'flex-start' : 'flex-end'
+          })
+        }) satisfies CSSProperties,
+      [flexColumn, wrapStart, theme]
+    );
+
+    return (
+      <div {...root} style={rootStyle}>
+        {!c12nDef.enforce || classification === undefined ? null : (
           <div style={{ paddingBottom: theme.spacing(4) }}>
             <Classification
-              type={!onClassificationChange ? 'pill' : 'picker'}
+              c12n={classification}
               size="tiny"
-              c12n={loading ? null : typeof classification === 'function' ? classification(loading) : classification}
+              type={onClassificationChange ? 'picker' : 'pill'}
               setClassification={onClassificationChange}
               {...classificationProps}
             />
           </div>
         )}
 
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'row',
-            flexWrap: 'wrap',
-            alignContent: 'flex-start',
-            gap: theme.spacing(1)
-          }}
-        >
+        <div ref={containerRef} style={containerStyle}>
           <div
             style={{
               flex: 1,
               width: '100%',
               display: 'flex',
-              flexWrap: 'wrap',
-              alignContent: 'center',
+              flexDirection: 'column',
+              alignItems: 'start',
               columnGap: theme.spacing(1),
               textAlign: 'left'
             }}
           >
-            <Typography
-              variant="h4"
-              width="100%"
-              flex={1}
-              {...primaryProps}
-              sx={{ overflowWrap: 'break-word', ...primaryProps?.sx }}
-            >
-              {typeof primary === 'function' ? primary(loading) : primary}
-            </Typography>
+            {resolvedPrimary && (
+              <Typography
+                variant="h4"
+                {...primaryProps}
+                ref={primaryRef}
+                sx={{
+                  overflowWrap: 'break-word',
+                  wordBreak: 'break-word',
+                  whiteSpace: 'normal',
+                  ...primaryProps.sx
+                }}
+              >
+                {resolvedPrimary}
+              </Typography>
+            )}
 
-            {secondary && (
+            {resolvedSecondary && (
               <Typography
                 variant="caption"
                 color="textSecondary"
                 width="100%"
                 minWidth={0}
                 {...secondaryProps}
-                sx={{ overflowWrap: 'break-word', ...secondaryProps?.sx }}
+                sx={{
+                  overflowWrap: 'break-word',
+                  wordBreak: 'break-word',
+                  whiteSpace: 'normal',
+                  ...secondaryProps.sx
+                }}
               >
-                {loading ? (
-                  <Skeleton style={{ width: '10rem' }} />
-                ) : typeof secondary === 'function' ? (
-                  secondary(loading)
-                ) : (
-                  secondary
-                )}
+                {resolvedSecondary}
               </Typography>
             )}
+
+            {startAdornment}
           </div>
 
           <div
+            ref={actionsRef}
             style={{
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'stretch',
-              rowGap: theme.spacing(1),
-              paddingTop: theme.spacing(0.5)
+              rowGap: theme.spacing(1)
             }}
           >
             {actions && (
@@ -151,7 +220,7 @@ export const PageHeader: React.FC<PageHeaderProps> = React.memo(
                   flexDirection: 'row',
                   flexWrap: 'wrap',
                   ...actionsProps?.style,
-                  ...(actionsProps?.spacing && { gap: theme.spacing(actionsProps?.spacing) })
+                  ...(actionsProps?.spacing && { gap: theme.spacing(actionsProps.spacing) })
                 }}
               >
                 {actions}

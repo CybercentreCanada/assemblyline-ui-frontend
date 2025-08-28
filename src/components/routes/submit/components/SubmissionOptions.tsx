@@ -3,7 +3,6 @@ import useALContext from 'components/hooks/useALContext';
 import { useForm } from 'components/routes/submit/submit.form';
 import { CheckboxInput } from 'components/visual/Inputs/CheckboxInput';
 import { NumberInput } from 'components/visual/Inputs/NumberInput';
-import type { SelectInputProps } from 'components/visual/Inputs/SelectInput';
 import { SelectInput } from 'components/visual/Inputs/SelectInput';
 import { TextInput } from 'components/visual/Inputs/TextInput';
 import React, { useMemo } from 'react';
@@ -15,11 +14,11 @@ export const SubmissionOptions = React.memo(() => {
   const { configuration } = useALContext();
   const form = useForm();
 
-  const priorityOptions = useMemo<SelectInputProps['options']>(
+  const priorityOptions = useMemo(
     () => [
-      { primary: t('options.submission.priority.low'), value: 500 },
+      { primary: t('options.submission.priority.high'), value: 1500 },
       { primary: t('options.submission.priority.medium'), value: 1000 },
-      { primary: t('options.submission.priority.high'), value: 1500 }
+      { primary: t('options.submission.priority.low'), value: 500 }
     ],
     [t]
   );
@@ -56,16 +55,17 @@ export const SubmissionOptions = React.memo(() => {
                   <TextInput
                     label={t('options.submission.description.label')}
                     value={value}
+                    defaultValue={defaultValue}
                     loading={loading}
                     disabled={disabled || !isEditing || (!customize && restricted)}
                     preventRender={!customize && restricted}
-                    reset={value !== defaultValue}
+                    reset={defaultValue !== null && value !== defaultValue}
                     placeholder={
                       tab === 'file' && file
                         ? `Inspection of file: ${file?.name}`
                         : tab === 'hash' && hashType
-                        ? `Inspection of ${hashType.toUpperCase()}: ${hashValue}`
-                        : null
+                          ? `Inspection of ${hashType.toUpperCase()}: ${hashValue}`
+                          : null
                     }
                     rootProps={{ style: { marginBottom: theme.spacing(1) } }}
                     onChange={(e, v) => form.setFieldValue('settings.description.value', v)}
@@ -84,21 +84,21 @@ export const SubmissionOptions = React.memo(() => {
                     <SelectInput
                       label={t('options.submission.priority.label')}
                       value={value}
-                      fullWidth
+                      defaultValue={defaultValue}
                       loading={loading}
                       disabled={disabled || !isEditing || (!customize && restricted)}
                       preventRender={!customize && restricted}
-                      reset={value !== defaultValue}
+                      reset={defaultValue !== null && value !== defaultValue}
                       options={priorityOptions}
                       error={v =>
                         !v
                           ? t('options.submission.priority.error.empty')
                           : !priorityOptions.some(o => o.value === v)
-                          ? t('options.submission.priority.error.invalid')
-                          : null
+                            ? t('options.submission.priority.error.invalid')
+                            : null
                       }
                       rootProps={{ style: { marginBottom: theme.spacing(1), flex: 1 } }}
-                      onChange={(e, v) => form.setFieldValue('settings.priority.value', v as number)}
+                      onChange={(e, v) => form.setFieldValue('settings.priority.value', v)}
                       onReset={() => form.setFieldValue('settings.priority.value', defaultValue)}
                     />
                   )}
@@ -119,12 +119,14 @@ export const SubmissionOptions = React.memo(() => {
                       tooltip={t('options.submission.ttl.tooltip')}
                       endAdornment={t('options.submission.ttl.endAdornment')}
                       value={value}
+                      defaultValue={defaultValue}
                       loading={loading}
                       disabled={disabled || !isEditing || (!customize && restricted)}
                       preventRender={!customize && restricted}
-                      reset={value !== defaultValue}
+                      reset={defaultValue !== null && value !== defaultValue}
                       min={configuration.submission.max_dtl !== 0 ? 1 : 0}
                       max={configuration.submission.max_dtl !== 0 ? configuration.submission.max_dtl : 365}
+                      required
                       rootProps={{ style: { marginBottom: theme.spacing(1), flex: 1 } }}
                       onChange={(e, v) => form.setFieldValue('settings.ttl.value', v)}
                       onReset={() => form.setFieldValue('settings.ttl.value', defaultValue)}
@@ -143,10 +145,11 @@ export const SubmissionOptions = React.memo(() => {
                     label={t('options.submission.generate_alert.label')}
                     tooltip={t('options.submission.generate_alert.tooltip')}
                     value={value}
+                    defaultValue={defaultValue}
                     loading={loading}
                     disabled={disabled || !isEditing || (!customize && restricted)}
                     preventRender={!customize && restricted}
-                    reset={value !== defaultValue}
+                    reset={defaultValue !== null && value !== defaultValue}
                     labelProps={{ color: 'textPrimary' }}
                     onChange={(e, v) => form.setFieldValue('settings.generate_alert.value', v)}
                     onReset={() => form.setFieldValue('settings.generate_alert.value', defaultValue)}
@@ -164,10 +167,11 @@ export const SubmissionOptions = React.memo(() => {
                     label={t('options.submission.ignore_filtering.label')}
                     tooltip={t('options.submission.ignore_filtering.tooltip')}
                     value={value}
+                    defaultValue={defaultValue}
                     loading={loading}
                     disabled={disabled || !isEditing || (!customize && restricted)}
                     preventRender={!customize && restricted}
-                    reset={value !== defaultValue}
+                    reset={defaultValue !== null && value !== defaultValue}
                     labelProps={{ color: 'textPrimary' }}
                     onChange={(e, v) => form.setFieldValue('settings.ignore_filtering.value', v)}
                     onReset={() => form.setFieldValue('settings.ignore_filtering.value', defaultValue)}
@@ -185,10 +189,11 @@ export const SubmissionOptions = React.memo(() => {
                     label={t('options.submission.ignore_cache.label')}
                     tooltip={t('options.submission.ignore_cache.tooltip')}
                     value={value}
+                    defaultValue={defaultValue}
                     loading={loading}
                     disabled={disabled || !isEditing || (!customize && restricted)}
                     preventRender={!customize && restricted}
-                    reset={value !== defaultValue}
+                    reset={defaultValue !== null && value !== defaultValue}
                     labelProps={{ color: 'textPrimary' }}
                     onChange={(e, v) => form.setFieldValue('settings.ignore_cache.value', v)}
                     onReset={() => form.setFieldValue('settings.ignore_cache.value', defaultValue)}
@@ -206,10 +211,11 @@ export const SubmissionOptions = React.memo(() => {
                     label={t('options.submission.ignore_recursion_prevention.label')}
                     tooltip={t('options.submission.ignore_recursion_prevention.tooltip')}
                     value={value}
+                    defaultValue={defaultValue}
                     loading={loading}
                     disabled={disabled || !isEditing || (!customize && restricted)}
                     preventRender={!customize && restricted}
-                    reset={value !== defaultValue}
+                    reset={defaultValue !== null && value !== defaultValue}
                     labelProps={{ color: 'textPrimary' }}
                     onChange={(e, v) => form.setFieldValue('settings.ignore_recursion_prevention.value', v)}
                     onReset={() => form.setFieldValue('settings.ignore_recursion_prevention.value', defaultValue)}
@@ -227,10 +233,11 @@ export const SubmissionOptions = React.memo(() => {
                     label={t('options.submission.deep_scan.label')}
                     tooltip={t('options.submission.deep_scan.tooltip')}
                     value={value}
+                    defaultValue={defaultValue}
                     loading={loading}
                     disabled={disabled || !isEditing || (!customize && restricted)}
                     preventRender={!customize && restricted}
-                    reset={value !== defaultValue}
+                    reset={defaultValue !== null && value !== defaultValue}
                     labelProps={{ color: 'textPrimary' }}
                     onChange={(e, v) => form.setFieldValue('settings.deep_scan.value', v)}
                     onReset={() => form.setFieldValue('settings.deep_scan.value', defaultValue)}

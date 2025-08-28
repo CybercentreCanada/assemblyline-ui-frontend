@@ -116,7 +116,7 @@ const WrappedRetrohuntTable: React.FC<Props> = ({
           <DivTableBody>
             {retrohuntResults.items.map((retrohunt, id) => (
               <LinkRow
-                key={id}
+                key={`${retrohunt.id}-${id}`}
                 component={Link}
                 to={`/retrohunt/${retrohunt.key}`}
                 onClick={event => {

@@ -117,7 +117,7 @@ export default function AdminIdentify() {
             <Typography variant="h4">{t('title')}</Typography>
           </Grid>
           <Grid size={{ xs: 12 }}>
-            <Box sx={{ display: { xs: 'block', lg: 'none' } }}>
+            <Box sx={{ display: { xs: 'none', lg: 'block' } }}>
               <Alert severity="warning">{t('warning')}</Alert>
             </Box>
           </Grid>
@@ -135,10 +135,11 @@ export default function AdminIdentify() {
           <Tabs
             value={value}
             onChange={handleChange}
+            allowScrollButtonsMobile
             indicatorColor="primary"
+            scrollButtons="auto"
             textColor="primary"
             variant="scrollable"
-            scrollButtons="auto"
           >
             <Tab label={t('magic')} value="magic" />
             <Tab label={t('mimes')} value="mimes" />

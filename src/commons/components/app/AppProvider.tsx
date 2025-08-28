@@ -48,8 +48,12 @@ export const AppProviderInner = <U extends AppUser>({
   children
 }: Omit<AppProviderProps<U>, 'theme'>) => {
   const {
+    autoDetectColorScheme,
     current: theme,
     mode: themeMode,
+    setAutoDetectColorScheme,
+    setMode,
+    toggleAutoDetectColorScheme,
     toggleMode
   } = useContext(overrides?.providers?.themesProvider?.context ?? AppThemesContext);
 
@@ -59,12 +63,28 @@ export const AppProviderInner = <U extends AppUser>({
   // Memoize context value to prevent extraneous renders on components that use it.
   const contextValue = useMemo(() => {
     return {
-      theme: themeMode,
+      autoDetectColorScheme,
       configs: { overrides, preferences, theme, sitemap },
-      toggleTheme: toggleMode,
-      toggleLanguage
+      theme: themeMode,
+      setAutoDetectColorScheme,
+      setMode,
+      toggleAutoDetectColorScheme,
+      toggleLanguage,
+      toggleTheme: toggleMode
     };
-  }, [themeMode, overrides, preferences, theme, sitemap, toggleMode, toggleLanguage]);
+  }, [
+    autoDetectColorScheme,
+    overrides,
+    preferences,
+    setAutoDetectColorScheme,
+    setMode,
+    sitemap,
+    theme,
+    themeMode,
+    toggleAutoDetectColorScheme,
+    toggleLanguage,
+    toggleMode
+  ]);
 
   return (
     <AppContext.Provider value={contextValue}>
@@ -72,7 +92,14 @@ export const AppProviderInner = <U extends AppUser>({
         <AppErrorProvider>
           <AppUserProvider service={user}>
             <AppSnackbarProvider>
-              <BorealisProvider baseURL={location.origin + '/api/v4/proxy/borealis'} getToken={() => null}>
+              <BorealisProvider
+                baseURL={location.origin + '/api/v4/proxy/borealis'}
+                getToken={() => null}
+                chunkSize={200}
+                maxRequestCount={3}
+                defaultTimeout={60}
+                debugLogging={false}
+              >
                 <AppUserProvider service={user}>
                   <AssistantProvider>
                     <HighlightProvider>

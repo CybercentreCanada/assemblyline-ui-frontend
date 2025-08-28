@@ -193,9 +193,9 @@ function Service({ name = null, onDeleted = () => null, onUpdated = () => null }
       />
 
       <PageHeader
-        primary={service ? service.name : <Skeleton style={{ width: '20rem' }} />}
+        primary={() => service.name}
         secondary={t('title.detail')}
-        loading={!service}
+        primaryLoading={!service}
         slotProps={{
           root: { style: { marginBottom: theme.spacing(2) } }
         }}
@@ -259,7 +259,13 @@ function Service({ name = null, onDeleted = () => null, onUpdated = () => null }
             square
             style={{ backgroundColor: name ? theme.palette.background.default : theme.palette.background.paper }}
           >
-            <TabList onChange={onChangeTab} indicatorColor="primary" textColor="primary">
+            <TabList
+              onChange={onChangeTab}
+              indicatorColor="primary"
+              textColor="primary"
+              variant="scrollable"
+              scrollButtons="auto"
+            >
               <Tab label={t('tab.general')} value="general" />
               <Tab label={t('tab.docker')} value="docker" />
               {service.update_config ? <Tab label={t('tab.updater')} value="updater" /> : <Empty />}

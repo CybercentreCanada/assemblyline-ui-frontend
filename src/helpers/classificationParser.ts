@@ -449,12 +449,15 @@ export function canSeeGroups(user_groups: string[], groups: string[]) {
   return false;
 }
 
-export function applyAliases(c12n: string, classificationAliases: ClassificationAliases) {
+export function applyAliases(c12n: string, classificationAliases: ClassificationAliases, format: string) {
   let out = c12n;
   for (const alias in classificationAliases) {
     if ({}.hasOwnProperty.call(classificationAliases, alias)) {
       const aliasData = classificationAliases[alias];
-      out = out.replaceAll(alias, aliasData.short_name);
+      out = out.replaceAll(
+        alias,
+        format === 'long' ? aliasData.name || aliasData.short_name : aliasData.short_name || aliasData.name
+      );
     }
   }
   return out;
@@ -617,7 +620,7 @@ export function normalizedClassification(
     }
     out += tempSubGroups.sort().join('/');
   }
-  return applyAliases(out, classificationAliases);
+  return applyAliases(out, classificationAliases, format);
 }
 
 function levelList(c12nDef: ClassificationDefinition) {
@@ -630,7 +633,7 @@ function levelList(c12nDef: ClassificationDefinition) {
   return out;
 }
 
-type ClassificationValidator = {
+export type ClassificationValidator = {
   disabled: DisabledControls;
   parts: ClassificationParts;
 };
