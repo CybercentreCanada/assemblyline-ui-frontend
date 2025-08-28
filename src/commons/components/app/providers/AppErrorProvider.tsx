@@ -153,6 +153,7 @@ export const ErrorFallback: React.FC<FallbackProps> = ({ error, resetErrorBounda
 
   return error.name === 'ChunkLoadError' ? (
     <div
+      data-testid="error-fallback"
       role="alert"
       style={{
         textAlign: 'center',
@@ -166,7 +167,7 @@ export const ErrorFallback: React.FC<FallbackProps> = ({ error, resetErrorBounda
       <LinearProgress />
     </div>
   ) : (
-    <div role="alert">
+    <div data-testid="error-fallback" role="alert">
       <PageCenter margin={4}>
         <BugContainer>
           <Bug fontSize="inherit" />
@@ -186,6 +187,7 @@ export const ErrorFallback: React.FC<FallbackProps> = ({ error, resetErrorBounda
           }}
         >
           <Typography
+            data-testid="error-message"
             children={error.message}
             variant="inherit"
             component="pre"
@@ -207,6 +209,7 @@ export const ErrorFallback: React.FC<FallbackProps> = ({ error, resetErrorBounda
           </Button>
           <Collapse in={expanded} timeout="auto" unmountOnExit>
             <Typography
+              data-testid="error-stack"
               children={error.stack}
               variant="inherit"
               component="pre"
