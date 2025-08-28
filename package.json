@@ -10,6 +10,7 @@
   "license": "MIT",
   "private": true,
   "dependencies": {
+    "@date-io/date-fns": "^3.2.1",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@flowjs/flow.js": "^2.14.1",
@@ -38,7 +39,7 @@
     "clsx": "^1.2.1",
     "d3-scale": "^4.0.2",
     "d3-shape": "^3.2.0",
-    "date-fns": "^3.3.1",
+    "date-fns": "^3.6.0",
     "dayjs": "^1.11.13",
     "dompurify": "^3.2.5",
     "eslint-plugin-vitest": "^0.5.4",
