@@ -546,10 +546,13 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                   <div>
                     <Fetcher
                       fetcherId="eml-preview.preview"
-                      type="eml_id"
+                      type="email_id"
                       value={alert?.metadata?.eml_path}
                       classification={currentUser.classification}
-                      slotProps={{ paper: { style: { maxWidth: '128px', minWidth: '128px', maxHeight: '128px' } } }}
+                      slotProps={{
+                        skeleton: { sx: { maxWidth: '128px', minWidth: '128px', maxHeight: '128px' } },
+                        paper: { style: { maxWidth: '128px', minWidth: '128px', maxHeight: '128px' } }
+                      }}
                     />
                   </div>
                 )}
