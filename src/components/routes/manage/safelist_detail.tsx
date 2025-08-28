@@ -242,7 +242,7 @@ const SafelistDetail = ({ safelist_id = null, close = () => null }: SafelistDeta
         <PageHeader
           primary={safelist ? t(`title.${safelist.type}`) : t('title')}
           secondary={safelist_id || id}
-          loading={!safelist}
+          secondaryLoading={!safelist}
           slotProps={{
             root: { style: { marginBottom: theme.spacing(4) } }
           }}

@@ -390,7 +390,7 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
           <PageHeader
             primary={t('header.view')}
             secondary={() => retrohunt.key}
-            loading={!retrohunt}
+            secondaryLoading={!retrohunt}
             slotProps={{
               root: { style: { marginBottom: theme.spacing(2) } }
             }}

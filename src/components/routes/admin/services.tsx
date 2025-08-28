@@ -1,6 +1,5 @@
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import CloudDownloadOutlinedIcon from '@mui/icons-material/CloudDownloadOutlined';
-import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
 import RestoreOutlinedIcon from '@mui/icons-material/RestoreOutlined';
 import SystemUpdateAltIcon from '@mui/icons-material/SystemUpdateAlt';
 import {
@@ -29,8 +28,8 @@ import useMySnackbar from 'components/hooks/useMySnackbar';
 import type { ServiceIndexed, ServiceUpdateData, ServiceUpdates } from 'components/models/base/service';
 import type { CustomUser } from 'components/models/ui/user';
 import ServiceDetail from 'components/routes/admin/service_detail';
+import { FileDownloader } from 'components/visual/Buttons/FileDownloader';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
-import FileDownloader from 'components/visual/FileDownloader';
 import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import type { JSONFeedItem } from 'components/visual/Notification/useNotificationFeed';
 import { useNotificationFeed } from 'components/visual/Notification/useNotificationFeed';
@@ -474,7 +473,7 @@ export default function Services() {
                 </IconButton>
               </span>
             </Tooltip>
-            <FileDownloader icon={<GetAppOutlinedIcon />} link="/api/v4/service/backup/" tooltip={t('backup')} />
+            <FileDownloader link="/api/v4/service/backup/" tooltip={t('backup')} />
             <Tooltip
               PopperProps={{
                 disablePortal: true
