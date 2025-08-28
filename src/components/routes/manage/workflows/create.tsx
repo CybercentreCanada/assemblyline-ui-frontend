@@ -1,22 +1,6 @@
 import CheckIcon from '@mui/icons-material/Check';
 import DoDisturbAltOutlinedIcon from '@mui/icons-material/DoDisturbAltOutlined';
-import {
-  Autocomplete,
-  Checkbox,
-  Chip,
-  FormControlLabel,
-  Grid,
-  IconButton,
-  MenuItem,
-  Select,
-  Skeleton,
-  styled,
-  TextField,
-  Tooltip,
-  Typography,
-  useTheme
-} from '@mui/material';
-import FormControl from '@mui/material/FormControl';
+import { Grid, IconButton, MenuItem, styled, Tooltip, useTheme } from '@mui/material';
 import Throttler from 'commons/addons/utils/throttler';
 import PageCenter from 'commons/components/pages/PageCenter';
 import useALContext from 'components/hooks/useALContext';
@@ -28,9 +12,13 @@ import { LABELS, PRIORITIES, STATUSES } from 'components/models/base/workflow';
 import type { SearchResult } from 'components/models/ui/search';
 import ForbiddenPage from 'components/routes/403';
 import Classification from 'components/visual/Classification';
+import { CheckboxInput } from 'components/visual/Inputs/CheckboxInput';
+import { ChipsInput } from 'components/visual/Inputs/ChipsInput';
+import { SelectInput } from 'components/visual/Inputs/SelectInput';
+import { TextInput } from 'components/visual/Inputs/TextInput';
 import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import _ from 'lodash';
-import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useParams } from 'react-router';
 
@@ -70,8 +58,6 @@ const WrappedWorkflowCreate = ({ id: propID = null, onClose = () => null }: Prop
   const [results, setResults] = useState<SearchResult<Alert>>(null);
   const [runWorkflow, setRunWorkflow] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
-
-  const inputRef = useRef(null);
 
   const defaultWorkflow = useMemo<Workflow>(
     () => ({
@@ -235,7 +221,7 @@ const WrappedWorkflowCreate = ({ id: propID = null, onClose = () => null }: Prop
         <PageHeader
           primary={t(id ? 'edit.title' : 'add.title')}
           secondary={id}
-          loading={!workflow}
+          secondaryLoading={!workflow}
           slotProps={{
             root: { style: { marginBottom: theme.spacing(2) } }
           }}
@@ -292,119 +278,65 @@ const WrappedWorkflowCreate = ({ id: propID = null, onClose = () => null }: Prop
 
         <Grid container spacing={2} textAlign="start">
           <Grid size={{ xs: 12 }}>
-            <Typography variant="subtitle2">{`${t('name')} ${t('required')}`}</Typography>
-            {!workflow ? (
-              <Skeleton style={{ height: '2.5rem' }} />
-            ) : (
-              <TextField
-                inputRef={inputRef}
-                fullWidth
-                size="small"
-                margin="dense"
-                variant="outlined"
-                value={workflow.name}
-                onChange={event => setWorkflow(wf => ({ ...wf, name: event.target.value }))}
-              />
-            )}
-          </Grid>
-          <Grid size={{ xs: 12 }}>
-            <Typography variant="subtitle2">{`${t('query')} ${t('required')}`}</Typography>
-            {!workflow ? (
-              <Skeleton style={{ height: '2.5rem' }} />
-            ) : (
-              <TextField
-                inputRef={inputRef}
-                fullWidth
-                size="small"
-                margin="dense"
-                variant="outlined"
-                error={badQuery}
-                value={workflow.query}
-                onChange={event => setWorkflow(wf => ({ ...wf, query: event.target.value }))}
-              />
-            )}
-          </Grid>
-          <Grid size={{ xs: 12 }}>
-            <Typography variant="subtitle2">{t('labels')}</Typography>
-            {!workflow ? (
-              <Skeleton style={{ height: '2.5rem' }} />
-            ) : (
-              <Autocomplete
-                fullWidth
-                multiple
-                freeSolo
-                options={LABELS}
-                value={workflow.labels}
-                renderInput={params => <TextField {...params} variant="outlined" />}
-                renderTags={(value, getTagProps) =>
-                  value.map((option, index) => <Chip label={option} {...getTagProps({ index })} key={index} />)
-                }
-                onChange={(event, value) => setWorkflow(wf => ({ ...wf, labels: value.map(v => v.toUpperCase()) }))}
-                isOptionEqualToValue={(option, value) => option.toUpperCase() === value.toUpperCase()}
-              />
-            )}
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <Typography variant="subtitle2">{t('priority')}</Typography>
-            {workflow ? (
-              <FormControl size="small" fullWidth>
-                <Select
-                  id="priority"
-                  fullWidth
-                  value={workflow.priority}
-                  onChange={event => setWorkflow(wf => ({ ...wf, priority: event.target.value as Priority }))}
-                  variant="outlined"
-                >
-                  <MyMenuItem value="">{t('priority.null')}</MyMenuItem>
-                  <MyMenuItem value="LOW">{t('priority.LOW')}</MyMenuItem>
-                  <MyMenuItem value="MEDIUM">{t('priority.MEDIUM')}</MyMenuItem>
-                  <MyMenuItem value="HIGH">{t('priority.HIGH')}</MyMenuItem>
-                  <MyMenuItem value="CRITICAL">{t('priority.CRITICAL')}</MyMenuItem>
-                </Select>
-              </FormControl>
-            ) : (
-              <Skeleton style={{ height: '2.5rem' }} />
-            )}
-          </Grid>
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <Typography variant="subtitle2">{t('status')}</Typography>
-            {workflow ? (
-              <FormControl size="small" fullWidth>
-                <Select
-                  id="priority"
-                  fullWidth
-                  value={workflow.status}
-                  onChange={event => setWorkflow(wf => ({ ...wf, status: event.target.value as Status }))}
-                  variant="outlined"
-                >
-                  <MyMenuItem value="">{t('status.null')}</MyMenuItem>
-                  <MyMenuItem value="MALICIOUS">{t('status.MALICIOUS')}</MyMenuItem>
-                  <MyMenuItem value="NON-MALICIOUS">{t('status.NON-MALICIOUS')}</MyMenuItem>
-                  <MyMenuItem value="ASSESS">{t('status.ASSESS')}</MyMenuItem>
-                  <MyMenuItem value="TRIAGE">{t('status.TRIAGE')}</MyMenuItem>
-                </Select>
-              </FormControl>
-            ) : (
-              <Skeleton style={{ height: '2.5rem' }} />
-            )}
+            <TextInput
+              label={t('name')}
+              loading={!workflow}
+              value={!workflow ? null : workflow.name}
+              required
+              onChange={(event, value) => setWorkflow(wf => ({ ...wf, name: value }))}
+            />
           </Grid>
 
-          {!id && (
-            <Grid size={{ xs: 12 }}>
-              {!workflow ? (
-                <Skeleton style={{ height: '2.5rem' }} />
-              ) : (
-                <FormControlLabel
-                  control={<Checkbox onChange={() => setRunWorkflow(o => !o)} checked={runWorkflow}></Checkbox>}
-                  label={
-                    <Typography variant="body2">
-                      {t('backport_workflow_prompt')} ({results?.total || 0} {t('backport_workflow_matching')})
-                    </Typography>
-                  }
-                />
-              )}
-            </Grid>
-          )}
+          <Grid size={{ xs: 12 }}>
+            <TextInput
+              label={t('query')}
+              loading={!workflow}
+              value={!workflow ? null : workflow.query}
+              required
+              onChange={(event, value) => setWorkflow(wf => ({ ...wf, query: value }))}
+            />
+          </Grid>
+
+          <Grid size={{ xs: 12 }}>
+            <ChipsInput
+              label={t('labels')}
+              loading={!workflow}
+              value={!workflow ? null : workflow.labels}
+              options={LABELS}
+              onChange={(event, value) => setWorkflow(wf => ({ ...wf, labels: value.map(v => v.toUpperCase()) }))}
+              isOptionEqualToValue={(option: string, value: string) => option.toUpperCase() === value.toUpperCase()}
+            />
+          </Grid>
+
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <SelectInput
+              label={t('priority')}
+              loading={!workflow}
+              value={!workflow ? null : workflow.priority}
+              options={PRIORITIES.map(v => ({ primary: t(`priority.${v || 'null'}`), value: v }))}
+              onChange={(event, value: Priority) => setWorkflow(wf => ({ ...wf, priority: value }))}
+            />
+          </Grid>
+
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <SelectInput
+              label={t('status')}
+              loading={!workflow}
+              value={!workflow ? null : workflow.status}
+              options={STATUSES.map(v => ({ primary: t(`status.${v || 'null'}`), value: v }))}
+              onChange={(event, value: Status) => setWorkflow(wf => ({ ...wf, status: value }))}
+            />
+          </Grid>
+
+          <Grid size={{ xs: 12 }}>
+            <CheckboxInput
+              label={`${t('backport_workflow_prompt')} ${results?.total || 0} ${t('backport_workflow_matching')}`}
+              loading={!workflow}
+              preventRender={!!id}
+              value={runWorkflow}
+              onChange={(event, value) => setRunWorkflow(() => value)}
+            />
+          </Grid>
         </Grid>
       </PageCenter>
     );

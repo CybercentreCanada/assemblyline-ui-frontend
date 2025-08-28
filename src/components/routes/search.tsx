@@ -294,9 +294,10 @@ function Search({ index = null }: Props) {
               <Tabs
                 value={tab}
                 onChange={handleChangeTab}
+                allowScrollButtonsMobile
                 indicatorColor="primary"
-                textColor="primary"
                 scrollButtons="auto"
+                textColor="primary"
                 variant="scrollable"
                 sx={{
                   minHeight: 'unset',

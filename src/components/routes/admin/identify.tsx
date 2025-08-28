@@ -135,10 +135,11 @@ export default function AdminIdentify() {
           <Tabs
             value={value}
             onChange={handleChange}
+            allowScrollButtonsMobile
             indicatorColor="primary"
+            scrollButtons="auto"
             textColor="primary"
             variant="scrollable"
-            scrollButtons="auto"
           >
             <Tab label={t('magic')} value="magic" />
             <Tab label={t('mimes')} value="mimes" />

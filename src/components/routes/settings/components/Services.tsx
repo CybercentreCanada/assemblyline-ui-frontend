@@ -52,8 +52,8 @@ const Parameter = React.memo(
                   loading={loading}
                   reset={defaultValue !== null && value !== defaultValue}
                   value={value as string}
+                  defaultValue={defaultValue as string}
                   onChange={(event, v) => handleChange(v)}
-                  onReset={() => handleChange(defaultValue)}
                 />
               );
             case 'int':
@@ -66,6 +66,7 @@ const Parameter = React.memo(
                   loading={loading}
                   reset={defaultValue !== null && value !== defaultValue}
                   value={value as number}
+                  defaultValue={defaultValue as number}
                   onChange={(event, v) => handleChange(v)}
                   onBlur={() => {
                     if (value === null) {
@@ -75,7 +76,6 @@ const Parameter = React.memo(
                       });
                     }
                   }}
-                  onReset={() => handleChange(defaultValue)}
                 />
               );
             case 'bool':
@@ -88,8 +88,8 @@ const Parameter = React.memo(
                   loading={loading}
                   reset={defaultValue !== null && value !== defaultValue}
                   value={value as boolean}
+                  defaultValue={defaultValue as boolean}
                   onChange={(event, v) => handleChange(v)}
-                  onReset={() => handleChange(defaultValue)}
                 />
               );
             case 'list':
@@ -102,9 +102,9 @@ const Parameter = React.memo(
                   loading={loading}
                   reset={defaultValue !== null && value !== defaultValue}
                   value={value as string}
+                  defaultValue={defaultValue as string}
                   options={list.map(item => ({ value: item, primary: item.replaceAll('_', ' ') }))}
                   onChange={(event, v) => handleChange(v)}
-                  onReset={() => handleChange(defaultValue)}
                 />
               );
           }

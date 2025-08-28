@@ -663,8 +663,8 @@ export default function SignatureSources() {
       <div style={{ textAlign: 'left' }}>
         <PageHeader
           primary={t('title')}
-          secondary={`${Object.keys(sources || {}).length} ${t('caption')}`}
-          loading={!sources}
+          secondary={() => `${Object.keys(sources || {}).length} ${t('caption')}`}
+          secondaryLoading={!sources}
           slotProps={{
             root: { style: { marginBottom: theme.spacing(2) } }
           }}

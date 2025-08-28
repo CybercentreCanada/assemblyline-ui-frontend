@@ -3,23 +3,12 @@ import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOut
 import StarIcon from '@mui/icons-material/Star';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
-import {
-  Autocomplete,
-  Checkbox,
-  FormControlLabel,
-  Grid,
-  IconButton,
-  MenuItem,
-  Select,
-  TextField,
-  Tooltip,
-  Typography,
-  useTheme
-} from '@mui/material';
+import { Autocomplete, Grid, IconButton, MenuItem, Select, TextField, Tooltip, useTheme } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
 import type { ServiceParameter } from 'components/models/base/service';
 import { DEFAULT_SERVICE_PARAMETER } from 'components/models/base/service';
 import CustomChip from 'components/visual/CustomChip';
+import { CheckboxInput } from 'components/visual/Inputs/CheckboxInput';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -336,16 +325,10 @@ const WrappedMultiTypeParam = <T extends 'bool' | 'int' | 'str' | 'list'>({
         )}
       </Grid>
       <Grid size={{ xs: 12 }}>
-        <FormControlLabel
-          control={
-            <Checkbox
-              size="small"
-              checked={tempUserParams.hide === 'true'}
-              name="label"
-              onChange={handleSPAdvancedChange}
-            />
-          }
-          label={<Typography variant="subtitle2">{t('params.user.hide')}</Typography>}
+        <CheckboxInput
+          label={t('params.user.hide')}
+          value={tempUserParams.hide === 'true'}
+          onChange={handleSPAdvancedChange}
         />
       </Grid>
     </Grid>
