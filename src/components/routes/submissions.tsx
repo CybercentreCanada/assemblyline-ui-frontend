@@ -12,6 +12,7 @@ import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import type { SubmissionIndexed } from 'components/models/base/submission';
 import ForbiddenPage from 'components/routes/403';
+import { DateTimeRangePicker } from 'components/visual/DateTime/DateTimeRangePicker';
 import SearchHeader from 'components/visual/SearchBar/SearchHeader';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
 import SubmissionsTable from 'components/visual/SearchResult/submissions';
@@ -31,6 +32,8 @@ const SUBMISSION_PARAMS = createSearchParams(p => ({
   offset: p.number(0).min(0).hidden().ignored(),
   rows: p.number(25).enforced().hidden().ignored(),
   sort: p.string('times.submitted desc').ignored(),
+  start: p.string('now-4d'),
+  end: p.string('now'),
   filters: p.filters([]),
   track_total_hits: p.number(10000).nullable().ignored()
 }));
@@ -69,7 +72,12 @@ const SubmissionSearch = () => {
       url: '/api/v4/search/submission/',
       method: 'POST',
       body: search
-        .set(o => ({ ...o, query: o.query || '*', filters: [...o.filters, 'NOT(to_be_deleted:true)'] }))
+        .set(o => ({
+          ...o,
+          query: o.query || '*',
+          filters: [...o.filters, 'NOT(to_be_deleted:true)', `times.submitted:[${o.start} TO ${o.end}]`]
+        }))
+        .omit(['start', 'end'])
         .toObject(),
       onSuccess: ({ api_response }) => setSubmissionResults(api_response as SearchResults),
       onEnter: () => setSearching(true),
@@ -81,8 +89,25 @@ const SubmissionSearch = () => {
 
   return currentUser.roles.includes('submission_view') ? (
     <PageFullWidth margin={4}>
-      <div style={{ paddingBottom: theme.spacing(2) }}>
-        <Typography variant="h4">{t('title')}</Typography>
+      <div
+        style={{
+          width: '100%',
+          display: 'flex',
+          flexDirection: 'row',
+          flexWrap: 'wrap',
+          gap: theme.spacing(2),
+          paddingBottom: theme.spacing(2)
+        }}
+      >
+        <Typography variant="h4" sx={{ flex: 1 }}>
+          {t('title')}
+        </Typography>
+
+        <DateTimeRangePicker
+          value={{ start: search.get('start'), end: search.get('end') }}
+          disabled={searching}
+          onChange={(e, { start, end }) => setSearchObject(o => ({ ...o, offset: 0, start, end }))}
+        />
       </div>
 
       <PageContainer isSticky>
