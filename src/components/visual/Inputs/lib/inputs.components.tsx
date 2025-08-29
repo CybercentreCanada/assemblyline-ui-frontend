@@ -38,9 +38,12 @@ import type { CustomChipProps } from 'components/visual/CustomChip';
 import { CustomChip } from 'components/visual/CustomChip';
 import {
   useInputChange,
+  usePreventClearRender,
   usePreventExpandRender,
+  usePreventMenuRender,
   usePreventPasswordRender,
   usePreventResetRender,
+  usePreventSpinnerRender,
   usePropID,
   usePropLabel
 } from 'components/visual/Inputs/lib/inputs.hook';
@@ -68,21 +71,23 @@ export const StyledEndAdornmentBox = React.memo(
 
     const [get] = usePropStore();
 
-    const clearAdornment = get('clearAdornment');
     const endAdornment = get('endAdornment');
-    const spinnerAdornment = get('spinnerAdornment');
 
+    const preventClearRender = usePreventClearRender();
     const preventExpandRender = usePreventExpandRender();
+    const preventMenuRender = usePreventMenuRender();
     const preventPasswordRender = usePreventPasswordRender();
     const preventResetRender = usePreventResetRender();
+    const preventSpinnerRender = usePreventSpinnerRender();
 
     return preventRender &&
-      preventResetRender &&
-      preventPasswordRender &&
+      !endAdornment &&
+      preventClearRender &&
       preventExpandRender &&
-      !spinnerAdornment &&
-      !clearAdornment &&
-      !endAdornment ? null : (
+      preventMenuRender &&
+      preventPasswordRender &&
+      preventResetRender &&
+      preventSpinnerRender ? null : (
       <InputAdornment
         position="end"
         {...props}
@@ -113,21 +118,23 @@ export const StyledEndAdornment = React.memo(
 
     const [get] = usePropStore();
 
-    const clearAdornment = get('clearAdornment');
     const endAdornment = get('endAdornment');
-    const spinnerAdornment = get('spinnerAdornment');
 
+    const preventClearRender = usePreventClearRender();
     const preventExpandRender = usePreventExpandRender();
+    const preventMenuRender = usePreventMenuRender();
     const preventPasswordRender = usePreventPasswordRender();
     const preventResetRender = usePreventResetRender();
+    const preventSpinnerRender = usePreventSpinnerRender();
 
     return preventRender &&
-      preventResetRender &&
-      preventPasswordRender &&
+      !endAdornment &&
+      preventClearRender &&
       preventExpandRender &&
-      !spinnerAdornment &&
-      !clearAdornment &&
-      !endAdornment ? null : (
+      preventMenuRender &&
+      preventPasswordRender &&
+      preventResetRender &&
+      preventSpinnerRender ? null : (
       <InputAdornment
         position="end"
         {...props}
@@ -146,9 +153,10 @@ export const ExpandAdornment = React.memo(() => {
 
   const expand = get('expand');
   const expandProps = get('expandProps');
+  const onExpand = get('onExpand');
+
   const id = usePropID();
   const preventExpandRender = usePreventExpandRender();
-  const onExpand = get('onExpand');
 
   return preventExpandRender ? null : (
     <ListItemIcon sx={{ minWidth: 0 }}>
@@ -182,21 +190,21 @@ export const ClearAdornment = React.memo(() => {
 
   const [get] = usePropStore<{ inputValue: string[] }>();
 
-  const clearAdornment = get('clearAdornment');
   const disabled = get('disabled');
   const expandProps = get('expandProps');
   const id = usePropID();
   const inputValue = get('inputValue');
-  const readOnly = get('readOnly');
   const tiny = get('tiny');
 
+  const preventClearRender = usePreventClearRender();
   const handleChange = useInputChange();
 
-  return !clearAdornment || disabled || readOnly || !inputValue?.length ? null : (
+  return preventClearRender ? null : (
     <ListItemIcon sx={{ minWidth: 0 }}>
       <IconButton
         aria-label={`${id}-clear`}
         color="secondary"
+        disabled={disabled || !inputValue?.length}
         type="button"
         onClick={event => {
           event.preventDefault();
@@ -220,16 +228,19 @@ export const PasswordAdornment = React.memo(() => {
 
   const [get, setStore] = usePropStore();
 
-  const id = usePropID();
-  const preventPasswordRender = usePreventPasswordRender();
+  const disabled = get('disabled');
   const resetProps = get('resetProps');
   const showPassword = get('showPassword');
   const tiny = get('tiny');
+
+  const id = usePropID();
+  const preventPasswordRender = usePreventPasswordRender();
 
   return preventPasswordRender ? null : (
     <IconButton
       aria-label={`${id}-password`}
       color="secondary"
+      disabled={disabled}
       type="button"
       onClick={() => setStore(s => ({ showPassword: !s.showPassword }))}
       {...resetProps}
@@ -250,12 +261,13 @@ export const ResetAdornment = React.memo(<T, P extends InputValues<T>>() => {
   const [get] = usePropStore<P>();
 
   const defaultValue = get('defaultValue');
-  const id = usePropID();
-  const preventResetRender = usePreventResetRender();
+  const disabled = get('disabled');
   const resetProps = get('resetProps');
   const tiny = get('tiny');
   const onReset = get('onReset');
 
+  const id = usePropID();
+  const preventResetRender = usePreventResetRender();
   const handleChange = useInputChange();
 
   const title = useMemo<React.ReactNode>(
@@ -280,6 +292,7 @@ export const ResetAdornment = React.memo(<T, P extends InputValues<T>>() => {
       <IconButton
         aria-label={`${id}-reset`}
         color="secondary"
+        disabled={disabled}
         type="reset"
         onClick={event => (onReset ? onReset(event) : handleChange(event, defaultValue, defaultValue))}
         {...resetProps}
@@ -294,27 +307,65 @@ export const ResetAdornment = React.memo(<T, P extends InputValues<T>>() => {
   );
 });
 
+export const MenuAdornment = React.memo(() => {
+  const theme = useTheme();
+
+  const [get, setStore] = usePropStore();
+
+  const disabled = get('disabled');
+  const resetProps = get('resetProps');
+  const showMenu = get('showMenu');
+  const tiny = get('tiny');
+
+  const id = usePropID();
+  const preventMenuRender = usePreventMenuRender();
+
+  return preventMenuRender ? null : (
+    <IconButton
+      aria-label={`${id}-select-menu`}
+      color="secondary"
+      disabled={disabled}
+      type="button"
+      tabIndex={-1}
+      onClick={() => setStore({ showMenu: true })}
+      {...resetProps}
+      sx={{
+        padding: tiny ? theme.spacing(0.75) : theme.spacing(1),
+        transition: theme.transitions.create('transform', {
+          duration: theme.transitions.duration.shortest
+        }),
+        transform: showMenu ? 'rotate(180deg)' : 'rotate(0deg)',
+        ...resetProps?.sx
+      }}
+    >
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M0 8 L12 20 L24 8 Z" />
+      </svg>
+    </IconButton>
+  );
+});
+
 export const SpinnerAdornment = <T, P extends InputValues<T>>() => {
   const theme = useTheme();
   const [get] = usePropStore<P & { max?: number; min?: number; step?: number }>();
 
   const disabled = get('disabled');
   const focused = get('focused');
-  const id = usePropID();
   const inputValue = Number(get('inputValue') ?? 0);
   const max = get('max');
   const min = get('min');
-  const readOnly = get('readOnly');
-  const spinnerAdornment = get('spinnerAdornment');
   const step = get('step') ?? 1;
   const tiny = get('tiny');
+
+  const id = usePropID();
+  const preventSpinnerRender = usePreventSpinnerRender();
+  const handleChange = useInputChange();
 
   const inputRef = useRef<HTMLInputElement | null>(null);
   const boxRef = useRef<HTMLDivElement | null>(null);
   const mouseYRef = useRef<number>(null);
   const timeoutRef = useRef<NodeJS.Timeout>(null);
   const intervalRef = useRef<NodeJS.Timeout>(null);
-  const handleChange = useInputChange();
 
   const clamp = useCallback(
     (val: number) => Math.min(max ?? Number.POSITIVE_INFINITY, Math.max(min ?? Number.NEGATIVE_INFINITY, val)),
@@ -377,7 +428,7 @@ export const SpinnerAdornment = <T, P extends InputValues<T>>() => {
     };
   }, []);
 
-  return !spinnerAdornment || disabled || readOnly ? null : (
+  return preventSpinnerRender ? null : (
     <div
       ref={boxRef}
       style={{
@@ -389,6 +440,7 @@ export const SpinnerAdornment = <T, P extends InputValues<T>>() => {
     >
       <Button
         color="secondary"
+        disabled={disabled}
         size="small"
         tabIndex={-1}
         onMouseDown={e => handleMouseDown(e, inputValue, step)}
@@ -410,6 +462,7 @@ export const SpinnerAdornment = <T, P extends InputValues<T>>() => {
       </Button>
       <Button
         color="secondary"
+        disabled={disabled}
         size="small"
         tabIndex={-1}
         onMouseDown={e => handleMouseDown(e, inputValue, -step)}
