@@ -2,17 +2,25 @@ import useALContext from 'components/hooks/useALContext';
 import type { Role } from 'components/models/base/user';
 import ForbiddenPage from 'components/routes/403';
 import React from 'react';
+import { Navigate } from 'react-router';
 
 export type ForbiddenRedirectProps = {
   children?: React.ReactNode;
   enabled?: boolean;
+  redirect?: boolean;
   roles?: Role[];
 };
 
 export const ForbiddenRedirect: React.FC<ForbiddenRedirectProps> = React.memo(
-  ({ children = null, enabled = true, roles = [] }: ForbiddenRedirectProps) => {
+  ({ children = null, enabled = true, redirect = false, roles = [] }: ForbiddenRedirectProps) => {
     const { user: currentUser } = useALContext();
 
-    return enabled || roles.every(r => currentUser.roles.includes(r)) ? children : <ForbiddenPage />;
+    return enabled || roles.every(r => currentUser.roles.includes(r)) ? (
+      children
+    ) : redirect ? (
+      <Navigate to="/forbidden" replace />
+    ) : (
+      <ForbiddenPage />
+    );
   }
 );
