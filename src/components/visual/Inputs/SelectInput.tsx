@@ -1,7 +1,8 @@
 import type { ListItemTextProps, MenuItemProps, SelectProps } from '@mui/material';
-import { IconButton, ListItemText, MenuItem, Select, useTheme } from '@mui/material';
+import { ListItemText, MenuItem, Select } from '@mui/material';
 import {
   HelperText,
+  MenuAdornment,
   PasswordAdornment,
   ResetAdornment,
   StyledEndAdornment,
@@ -20,7 +21,7 @@ import {
 } from 'components/visual/Inputs/lib/inputs.hook';
 import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
 import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
-import React, { useState } from 'react';
+import React from 'react';
 
 export type Option = {
   primary: ListItemTextProps['primary'];
@@ -36,9 +37,7 @@ export type SelectInputProps<O extends readonly Option[]> = InputValues<O[number
   };
 
 const WrappedSelectInput = <O extends readonly Option[]>() => {
-  const theme = useTheme();
-
-  const [get] = usePropStore<SelectInputProps<O>>();
+  const [get, setStore] = usePropStore<SelectInputProps<O>>();
 
   const capitalize = get('capitalize');
   const disabled = get('disabled');
@@ -53,12 +52,10 @@ const WrappedSelectInput = <O extends readonly Option[]>() => {
   const overflowHidden = get('overflowHidden');
   const password = get('password');
   const readOnly = get('readOnly');
-  const resetProps = get('resetProps');
+  const showMenu = get('showMenu');
   const showPassword = get('showPassword');
   const tiny = get('tiny');
   const value = get('value');
-
-  const [open, setOpen] = useState<boolean>(false);
 
   const handleBlur = useInputBlur<SelectInputProps<O>>();
   const handleChange = useInputChange<SelectInputProps<O>>();
@@ -81,13 +78,13 @@ const WrappedSelectInput = <O extends readonly Option[]>() => {
             id={id}
             readOnly={readOnly}
             size="small"
-            open={open}
+            open={showMenu}
             value={options?.some(o => o.value === inputValue) ? inputValue : ''}
             onChange={event => handleChange(event as React.SyntheticEvent, event.target.value, event.target.value)}
             onFocus={handleFocus}
             onBlur={e => handleBlur(e, value, value)}
-            onClose={() => setOpen(false)}
-            onOpen={() => setOpen(true)}
+            onClose={() => setStore({ showMenu: false })}
+            onOpen={() => setStore({ showMenu: true })}
             renderValue={option => (
               <ListItemText
                 primary={options?.find(o => o.value === option)?.primary || ''}
@@ -123,31 +120,11 @@ const WrappedSelectInput = <O extends readonly Option[]>() => {
             MenuProps={{ sx: { maxWidth: 'min-content' } }}
             IconComponent={() => null}
             endAdornment={
-              <StyledEndAdornment preventRender={false}>
+              <StyledEndAdornment>
+                {endAdornment}
                 <PasswordAdornment />
                 <ResetAdornment />
-                {endAdornment}
-
-                <IconButton
-                  aria-label={`${id}-select-menu`}
-                  color="secondary"
-                  type="button"
-                  tabIndex={-1}
-                  onClick={() => setOpen(true)}
-                  {...resetProps}
-                  sx={{
-                    padding: tiny ? theme.spacing(0.75) : theme.spacing(1),
-                    transition: theme.transitions.create('transform', {
-                      duration: theme.transitions.duration.shortest
-                    }),
-                    transform: open ? 'rotate(180deg)' : 'rotate(0deg)',
-                    ...resetProps?.sx
-                  }}
-                >
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M0 8 L12 20 L24 8 Z" />
-                  </svg>
-                </IconButton>
+                <MenuAdornment />
               </StyledEndAdornment>
             }
             sx={{
@@ -186,6 +163,7 @@ export const SelectInput = <O extends readonly Option[]>({
       props={{
         capitalize: false,
         displayEmpty: false,
+        hasMenu: true,
         inputValue: value,
         options: [] as unknown as O,
         preventRender,

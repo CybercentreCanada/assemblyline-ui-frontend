@@ -29,6 +29,15 @@ export const usePreventExpandRender = () => {
   return expand === null;
 };
 
+export const usePreventMenuRender = () => {
+  const [get] = usePropStore();
+
+  const hasMenu = get('hasMenu');
+  const readOnly = get('readOnly');
+
+  return !hasMenu || readOnly;
+};
+
 export const usePreventPasswordRender = () => {
   const [get] = usePropStore();
 

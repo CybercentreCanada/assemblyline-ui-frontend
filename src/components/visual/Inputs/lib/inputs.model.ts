@@ -293,6 +293,18 @@ export type InputStates = {
   focused?: boolean;
 
   /**
+   * If `true`, this input has a menu
+   * @default false
+   */
+  hasMenu?: boolean;
+
+  /**
+   * If `true`, the menu is opened
+   * @default false
+   */
+  showMenu?: boolean;
+
+  /**
    * If `true`, the password is visible
    * @default true
    */
@@ -309,6 +321,8 @@ export const DEFAULT_INPUT_STATES: InputStates = {
   clearAdornment: false,
   errorMessage: null,
   focused: false,
+  hasMenu: false,
+  showMenu: false,
   showPassword: true,
   spinnerAdornment: false
 };

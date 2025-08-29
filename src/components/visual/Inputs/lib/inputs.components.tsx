@@ -39,6 +39,7 @@ import { CustomChip } from 'components/visual/CustomChip';
 import {
   useInputChange,
   usePreventExpandRender,
+  usePreventMenuRender,
   usePreventPasswordRender,
   usePreventResetRender,
   usePropID,
@@ -73,6 +74,7 @@ export const StyledEndAdornmentBox = React.memo(
     const spinnerAdornment = get('spinnerAdornment');
 
     const preventExpandRender = usePreventExpandRender();
+    const preventMenuRender = usePreventMenuRender();
     const preventPasswordRender = usePreventPasswordRender();
     const preventResetRender = usePreventResetRender();
 
@@ -80,6 +82,7 @@ export const StyledEndAdornmentBox = React.memo(
       preventResetRender &&
       preventPasswordRender &&
       preventExpandRender &&
+      preventMenuRender &&
       !spinnerAdornment &&
       !clearAdornment &&
       !endAdornment ? null : (
@@ -118,6 +121,7 @@ export const StyledEndAdornment = React.memo(
     const spinnerAdornment = get('spinnerAdornment');
 
     const preventExpandRender = usePreventExpandRender();
+    const preventMenuRender = usePreventMenuRender();
     const preventPasswordRender = usePreventPasswordRender();
     const preventResetRender = usePreventResetRender();
 
@@ -125,6 +129,7 @@ export const StyledEndAdornment = React.memo(
       preventResetRender &&
       preventPasswordRender &&
       preventExpandRender &&
+      preventMenuRender &&
       !spinnerAdornment &&
       !clearAdornment &&
       !endAdornment ? null : (
@@ -291,6 +296,44 @@ export const ResetAdornment = React.memo(<T, P extends InputValues<T>>() => {
         <RefreshOutlinedIcon fontSize="small" />
       </IconButton>
     </Tooltip>
+  );
+});
+
+export const MenuAdornment = React.memo(() => {
+  const theme = useTheme();
+
+  const [get, setStore] = usePropStore();
+
+  const disabled = get('disabled');
+  const id = usePropID();
+  const resetProps = get('resetProps');
+  const showMenu = get('showMenu');
+  const tiny = get('tiny');
+
+  const preventMenuRender = usePreventMenuRender();
+
+  return preventMenuRender ? null : (
+    <IconButton
+      aria-label={`${id}-select-menu`}
+      color="secondary"
+      disabled={disabled}
+      type="button"
+      tabIndex={-1}
+      onClick={() => setStore({ showMenu: true })}
+      {...resetProps}
+      sx={{
+        padding: tiny ? theme.spacing(0.75) : theme.spacing(1),
+        transition: theme.transitions.create('transform', {
+          duration: theme.transitions.duration.shortest
+        }),
+        transform: showMenu ? 'rotate(180deg)' : 'rotate(0deg)',
+        ...resetProps?.sx
+      }}
+    >
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M0 8 L12 20 L24 8 Z" />
+      </svg>
+    </IconButton>
   );
 });
 
