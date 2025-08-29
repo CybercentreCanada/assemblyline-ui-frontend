@@ -293,10 +293,10 @@ export type InputStates = {
   focused?: boolean;
 
   /**
-   * If `true`, this input has a menu
+   * If `true`, this input has a menu end adornment
    * @default false
    */
-  hasMenu?: boolean;
+  menuAdornment?: boolean;
 
   /**
    * If `true`, the menu is opened
@@ -321,7 +321,7 @@ export const DEFAULT_INPUT_STATES: InputStates = {
   clearAdornment: false,
   errorMessage: null,
   focused: false,
-  hasMenu: false,
+  menuAdornment: false,
   showMenu: false,
   showPassword: true,
   spinnerAdornment: false

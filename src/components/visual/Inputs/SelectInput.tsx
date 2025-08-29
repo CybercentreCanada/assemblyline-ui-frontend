@@ -163,8 +163,8 @@ export const SelectInput = <O extends readonly Option[]>({
       props={{
         capitalize: false,
         displayEmpty: false,
-        hasMenu: true,
         inputValue: value,
+        menuAdornment: true,
         options: [] as unknown as O,
         preventRender,
         value,
