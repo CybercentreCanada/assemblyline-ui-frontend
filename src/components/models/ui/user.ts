@@ -12,6 +12,7 @@ export type Field = {
   type: string;
   default: boolean;
   list: boolean;
+  description?: string;
 };
 
 export type IndexDefinition = Record<string, Field>;
