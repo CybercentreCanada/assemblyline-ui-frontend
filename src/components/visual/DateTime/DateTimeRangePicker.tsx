@@ -826,12 +826,11 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = React.mem
               width: '100%',
               minHeight: '40px',
               display: 'grid',
-              flexDirection: 'row',
               justifyContent: 'space-between',
               border: `1px solid ${theme.palette.divider}`,
               borderRadius: '4px',
               gridTemplateColumns: 'auto 1fr auto 1fr',
-              ...(hasGap && { gridTemplateColumns: 'auto 1fr auto 1fr auto' }),
+              ...(hasGap && { gridTemplateColumns: 'auto 1fr auto 1fr auto auto' }),
               ...(error && { border: `1px solid ${theme.palette.error.main}` })
             }}
           >
