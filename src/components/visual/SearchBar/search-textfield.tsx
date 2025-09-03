@@ -1,14 +1,106 @@
-import { Box, ClickAwayListener, InputBase, useMediaQuery, useTheme } from '@mui/material';
+import { Box, ClickAwayListener, InputBase, Typography, useMediaQuery, useTheme } from '@mui/material';
 import { insertText } from 'commons/addons/utils/browser';
 import { parseEvent } from 'commons/components/utils/keyboard';
-import React, { useEffect, useRef, useState } from 'react';
+import type { Field, IndexDefinition } from 'components/models/ui/user';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-export const DEFAULT_SUGGESTION = ['OR', 'AND', 'NOT', 'TO', 'now', 'd', 'M', 'y', 'h', 'm'];
+export const DEFAULT_SUGGESTION: IndexDefinition = {
+  OR: {
+    name: 'OR',
+    indexed: true,
+    stored: false,
+    type: 'keyword',
+    default: false,
+    list: false,
+    description: 'Logical OR operator'
+  },
+  AND: {
+    name: 'AND',
+    indexed: true,
+    stored: false,
+    type: 'keyword',
+    default: false,
+    list: false,
+    description: 'Logical AND operator'
+  },
+  NOT: {
+    name: 'NOT',
+    indexed: true,
+    stored: false,
+    type: 'keyword',
+    default: false,
+    list: false,
+    description: 'Logical NOT operator'
+  },
+  TO: {
+    name: 'TO',
+    indexed: true,
+    stored: false,
+    type: 'keyword',
+    default: false,
+    list: false,
+    description: 'Range operator'
+  },
+  now: {
+    name: 'now',
+    indexed: true,
+    stored: false,
+    type: 'date',
+    default: false,
+    list: false,
+    description: 'Current datetime'
+  },
+  d: {
+    name: 'd',
+    indexed: true,
+    stored: false,
+    type: 'date',
+    default: false,
+    list: false,
+    description: 'Day offset'
+  },
+  M: {
+    name: 'M',
+    indexed: true,
+    stored: false,
+    type: 'date',
+    default: false,
+    list: false,
+    description: 'Month offset'
+  },
+  y: {
+    name: 'y',
+    indexed: true,
+    stored: false,
+    type: 'date',
+    default: false,
+    list: false,
+    description: 'Year offset'
+  },
+  h: {
+    name: 'h',
+    indexed: true,
+    stored: false,
+    type: 'date',
+    default: false,
+    list: false,
+    description: 'Hour offset'
+  },
+  m: {
+    name: 'm',
+    indexed: true,
+    stored: false,
+    type: 'date',
+    default: false,
+    list: false,
+    description: 'Minute offset'
+  }
+};
 
 export interface SearchTextFieldProps {
   value: string;
-  options: string[];
+  options: IndexDefinition;
   placeholder?: string;
   disabled?: boolean;
   onChange: (value: string) => void;
@@ -19,7 +111,7 @@ export interface SearchTextFieldProps {
 
 const SearchTextField: React.FC<SearchTextFieldProps> = ({
   value,
-  options,
+  options = {},
   placeholder = null,
   disabled = false,
   onSearch,
@@ -32,7 +124,7 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
   const [filteredOptions, setFilteredOptions] = useState<{ start: number; end: number; items: string[] }>({
     start: 0,
     end: 0,
-    items: options
+    items: Object.keys(options || {}).filter(o => options?.[o]?.indexed)
   });
   const { t } = useTranslation();
   const [open, setOpen] = useState<boolean>(false);
@@ -41,7 +133,11 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
   const isLTEMedium = useMediaQuery(theme.breakpoints.up('md'));
 
   // Ensure we update options if a new list is provided.
-  useEffect(() => setFilteredOptions({ start: 0, end: 0, items: options }), [options]);
+  useEffect(
+    () =>
+      setFilteredOptions({ start: 0, end: 0, items: Object.keys(options || {}).filter(o => options?.[o]?.indexed) }),
+    [options]
+  );
 
   // Get the the text input element.
   const getInputEl = () => element.current.querySelector('input');
@@ -123,7 +219,7 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
   const onOptionSelection = (startIndex: number, endIndex: number, option: string) => {
     if (option) {
       const inputEl = getInputEl();
-      insertText(inputEl, startIndex, endIndex + 1, `${option}${DEFAULT_SUGGESTION.indexOf(option) === -1 ? ':' : ''}`);
+      insertText(inputEl, startIndex, endIndex + 1, `${option}${option in DEFAULT_SUGGESTION ? '' : ':'}`);
       onOptionsClose();
       onChange(inputEl.value);
       if (onSelection) {
@@ -156,8 +252,15 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
     // Filter options.
     const _options =
       filterValue.length > 0
-        ? options.filter(option => option.toLowerCase().includes(filterValue.toLowerCase()))
-        : options;
+        ? Object.entries(options)
+            .filter(
+              ([name, field]) =>
+                field?.indexed ||
+                name.toLowerCase().includes(filterValue.toLowerCase()) ||
+                field?.description?.toLowerCase().includes(filterValue.toLowerCase())
+            )
+            .map(([name]) => name)
+        : Object.keys(options);
 
     // If filtered options is empty, then we return all options..
     setFilteredOptions({
@@ -224,6 +327,23 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
     };
   };
 
+  const [maxWidth, setMaxWidth] = useState<number>(0);
+
+  useLayoutEffect(() => {
+    const measure = () => {
+      if (!element.current) return;
+
+      setMaxWidth(element.current.getBoundingClientRect().width);
+    };
+
+    const resizeObserver = new ResizeObserver(measure);
+    if (element.current) resizeObserver.observe(element.current);
+
+    measure();
+
+    return () => resizeObserver.disconnect();
+  }, []);
+
   return (
     <ClickAwayListener onClickAway={() => setOpen(false)}>
       <div ref={element}>
@@ -246,13 +366,15 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
           >
             <div
               style={{
-                display: 'inline-block',
+                display: 'grid',
+                gridTemplateColumns: 'auto 1fr',
                 position: 'absolute',
-                overflow: 'auto',
+                overflowY: 'auto',
                 zIndex: 1,
                 top: theme.spacing(1),
                 minWidth: '100%',
-                maxHeight: 250,
+                maxWidth: `${maxWidth}px`,
+                maxHeight: '400px',
                 backgroundColor: theme.palette.background.default,
                 boxShadow: theme.shadows[4],
                 borderRadius: '0 0 4px 4px'
@@ -261,7 +383,8 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
               {filteredOptions.items.map((item, index) => (
                 <SearchTextOption
                   key={`SearchTextField-item-${index}`}
-                  text={item}
+                  name={item}
+                  field={options?.[item]}
                   position={index}
                   onSelection={() => onOptionSelection(filteredOptions.start, filteredOptions.end, item)}
                   selected={index === cursor}
@@ -276,11 +399,12 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
 };
 
 const SearchTextOption: React.FC<{
-  text: string;
+  name: string;
+  field: Field;
   position: number;
   selected: boolean;
   onSelection: () => void;
-}> = ({ text, position, selected = false, onSelection }) => {
+}> = ({ name, field, position, selected = false, onSelection }) => {
   const theme = useTheme();
 
   return (
@@ -289,17 +413,38 @@ const SearchTextOption: React.FC<{
       data-searchtextfieldoption-selected={selected}
       onClick={() => onSelection()}
       sx={{
-        padding: theme.spacing(1),
-        '&:hover': {
+        display: 'contents',
+        '&>div': {
+          display: 'grid',
+          alignItems: 'center',
+          padding: theme.spacing(1)
+        },
+        '&:hover>div': {
           cursor: 'pointer',
           backgroundColor: theme.palette.action.hover
         },
-        '&[data-searchtextfieldoption-selected="true"]': {
+        '&[data-searchtextfieldoption-selected="true"]>div': {
           backgroundColor: theme.palette.action.selected
         }
       }}
     >
-      {text}
+      <div>{name}</div>
+      <Typography
+        component="div"
+        color="textSecondary"
+        variant="caption"
+        sx={{
+          textAlign: 'right',
+          padding: theme.spacing(1),
+          ...(!selected && {
+            overflow: 'hidden',
+            whiteSpace: 'nowrap',
+            textOverflow: 'ellipsis'
+          })
+        }}
+      >
+        {field?.description}
+      </Typography>
     </Box>
   );
 };

@@ -11,6 +11,7 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
+import type { IndexDefinition } from 'components/models/ui/user';
 import SearchTextField from 'components/visual/SearchBar/search-textfield';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -34,7 +35,7 @@ interface SearchBarProps {
   searching?: boolean;
   buttons?: SearchBarButton[];
   extras?: React.ReactNode;
-  suggestions?: string[];
+  suggestions?: IndexDefinition;
   onValueChange?: (filterValue: string) => void;
   onSearch: (filterValue: string, inputElement: HTMLInputElement) => void;
   onClear: (inputElement: HTMLInputElement) => void;
@@ -45,7 +46,7 @@ const SearchBar: React.FC<SearchBarProps> = ({
   children,
   placeholder,
   searching = false,
-  suggestions = [],
+  suggestions = {},
   buttons = [],
   extras,
   onValueChange,

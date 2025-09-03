@@ -12,7 +12,7 @@ import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import type { Error } from 'components/models/base/error';
 import type { FacetResult, HistogramResult, SearchResult } from 'components/models/ui/search';
-import type { CustomUser } from 'components/models/ui/user';
+import type { CustomUser, IndexDefinition } from 'components/models/ui/user';
 import { ErrorDetail } from 'components/routes/admin/error_detail';
 import { DateTimeRangePicker } from 'components/visual/DateTime/DateTimeRangePicker';
 import { LuceneDateTime, LuceneDateTimeGap } from 'components/visual/DateTime/LuceneDateTime';
@@ -59,7 +59,7 @@ const ErrorViewer = () => {
   const [types, setTypes] = useState<FacetResult>(null);
   const [names, setNames] = useState<FacetResult>(null);
   const [searching, setSearching] = useState<boolean>(false);
-  const [suggestions, setSuggestions] = useState<string[]>(DEFAULT_SUGGESTION);
+  const [suggestions, setSuggestions] = useState<IndexDefinition>(DEFAULT_SUGGESTION);
 
   const setErrorKey = useCallback(
     (error_key: string) => navigate(`${location.pathname}${location.search || ''}#${error_key}`),
@@ -157,12 +157,9 @@ const ErrorViewer = () => {
   }, [currentUser.is_admin, search]);
 
   useEffect(() => {
-    apiCall({
+    apiCall<IndexDefinition>({
       url: '/api/v4/search/fields/error/',
-      onSuccess: ({ api_response }) => {
-        const values = Object.keys(api_response).filter(name => api_response[name].indexed);
-        setSuggestions([...values, ...DEFAULT_SUGGESTION]);
-      }
+      onSuccess: ({ api_response }) => setSuggestions({ ...api_response, ...DEFAULT_SUGGESTION })
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
