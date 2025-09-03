@@ -675,8 +675,8 @@ const DateTimeInput = ({
             id="timeSpan-input"
             size="small"
             fullWidth
-            value={value.rounding}
-            defaultValue={'h'}
+            value={value.rounding || ''}
+            defaultValue="h"
             displayEmpty
             onChange={e => {
               value.rounding = e.target.value as TimeSpan;
@@ -758,21 +758,23 @@ const DateTimeInput = ({
 };
 
 export type DateTimeRangePickerProps = {
-  value?: { start: string; end: string; gap?: string };
-  disabled?: boolean;
-  interval?: number;
   defaultGap?: `${number}${TimeSpan}`;
+  disabled?: boolean;
+  fullWidth?: boolean;
   hasGap?: boolean;
+  interval?: number;
+  value?: { start: string; end: string; gap?: string };
   onChange?: (event: unknown, values: { start: string; end: string; gap?: string }) => void;
 };
 
 export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = React.memo(
   ({
-    value,
-    disabled = false,
-    interval = 50,
     defaultGap = '4h',
+    disabled = false,
+    fullWidth = false,
     hasGap = false,
+    interval = 50,
+    value,
     onChange = () => null
   }: DateTimeRangePickerProps) => {
     const { i18n } = useTranslation('dateTime');
@@ -817,17 +819,19 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = React.mem
 
     return (
       <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale={i18n.language}>
-        <div style={{ flex: 0, width: '100%', display: 'flex', flexDirection: 'column' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', ...(fullWidth && { width: '100%' }) }}>
           <div
             style={{
               position: 'relative',
               width: '100%',
               minHeight: '40px',
-              display: 'flex',
+              display: 'grid',
               flexDirection: 'row',
               justifyContent: 'space-between',
               border: `1px solid ${theme.palette.divider}`,
               borderRadius: '4px',
+              gridTemplateColumns: 'auto 1fr auto 1fr',
+              ...(hasGap && { gridTemplateColumns: 'auto 1fr auto 1fr auto' }),
               ...(error && { border: `1px solid ${theme.palette.error.main}` })
             }}
           >
@@ -838,6 +842,9 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = React.mem
               disabled={disabled}
               onChange={(e, v) => {
                 setError(null);
+                setStart(new LuceneDateTime(v.start, 'start', i18n.language));
+                setEnd(new LuceneDateTime(v.end, 'end', i18n.language));
+                setGap(new LuceneDateTimeGap(v.gap, v.start, v.end, interval, defaultGap, hasGap, i18n.language));
                 onChange(e, v);
               }}
             />

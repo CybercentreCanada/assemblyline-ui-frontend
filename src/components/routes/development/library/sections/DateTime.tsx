@@ -108,10 +108,11 @@ export const DateTimeSection = React.memo(() => {
           <Grid size={{ xs: 12, md: 6 }} alignItems="flex-end" paddingBottom={2} paddingLeft={2}>
             <form.Subscribe
               selector={state => state.values.components.datetime.values.datetime}
-              children={value => (
+              children={({ start, end, gap }) => (
                 <div>
-                  <Typography variant="body2">{`Type: ${typeof value}`}</Typography>
-                  <Typography variant="body2">{`Value: ${value}`}</Typography>
+                  <Typography variant="body2">{`Start: ${start}`}</Typography>
+                  <Typography variant="body2">{`End: ${end}`}</Typography>
+                  <Typography variant="body2">{`Gap: ${gap}`}</Typography>
                 </div>
               )}
             />
