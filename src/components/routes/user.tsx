@@ -802,7 +802,7 @@ function User({ username = null }: UserProps) {
                       <div
                         style={{
                           color:
-                            user.api_quota === 0 || user.api_quota === '0' ? theme.palette.action.disabled : 'inherit'
+                            user.api_quota === 0 || user.api_quota === '0' ? theme.palette.text.disabled : 'inherit'
                         }}
                       >
                         {user.api_quota === 0 || user.api_quota === '0' ? t('no_quota') : user.api_quota}
@@ -827,7 +827,7 @@ function User({ username = null }: UserProps) {
                         style={{
                           color:
                             user.api_daily_quota === 0 || user.api_daily_quota === '0'
-                              ? theme.palette.action.disabled
+                              ? theme.palette.text.disabled
                               : 'inherit'
                         }}
                       >
@@ -837,7 +837,7 @@ function User({ username = null }: UserProps) {
                           <>
                             <span>{user.api_daily_quota}</span>
                             {quotas && (
-                              <span style={{ paddingLeft: theme.spacing(2), color: theme.palette.action.disabled }}>
+                              <span style={{ paddingLeft: theme.spacing(2), color: theme.palette.text.secondary }}>
                                 ({quotas.daily_api} {t('remaining')})
                               </span>
                             )}
@@ -864,7 +864,7 @@ function User({ username = null }: UserProps) {
                         style={{
                           color:
                             user.submission_quota === 0 || user.submission_quota === '0'
-                              ? theme.palette.action.disabled
+                              ? theme.palette.text.disabled
                               : 'inherit'
                         }}
                       >
@@ -892,7 +892,7 @@ function User({ username = null }: UserProps) {
                         style={{
                           color:
                             user.submission_async_quota === 0 || user.submission_async_quota === '0'
-                              ? theme.palette.action.disabled
+                              ? theme.palette.text.disabled
                               : 'inherit'
                         }}
                       >
@@ -920,7 +920,7 @@ function User({ username = null }: UserProps) {
                         style={{
                           color:
                             user.submission_daily_quota === 0 || user.submission_daily_quota === '0'
-                              ? theme.palette.action.disabled
+                              ? theme.palette.text.disabled
                               : 'inherit'
                         }}
                       >
@@ -930,7 +930,7 @@ function User({ username = null }: UserProps) {
                           <>
                             <span>{user.submission_daily_quota}</span>
                             {quotas && (
-                              <span style={{ paddingLeft: theme.spacing(2), color: theme.palette.action.disabled }}>
+                              <span style={{ paddingLeft: theme.spacing(2), color: theme.palette.text.secondary }}>
                                 ({quotas.daily_submission} {t('remaining')})
                               </span>
                             )}
