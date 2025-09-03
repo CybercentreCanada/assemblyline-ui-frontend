@@ -15,7 +15,7 @@ import type { SignatureIndexed } from 'components/models/base/signature';
 import type { SubmissionIndexed } from 'components/models/base/submission';
 import type { Role } from 'components/models/base/user';
 import type { SearchResult } from 'components/models/ui/search';
-import type { Indexes } from 'components/models/ui/user';
+import type { IndexDefinition, Indexes } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
 import Empty from 'components/visual/Empty';
 import SearchBar from 'components/visual/SearchBar/search-bar';
@@ -59,7 +59,7 @@ function Search({ index = null }: Props) {
   const theme = useTheme();
   const { apiCall } = useMyAPI();
   const [query, setQuery] = useState<SimpleSearchQuery>(null);
-  const [searchSuggestion, setSearchSuggestion] = useState<string[]>(null);
+  const [searchSuggestion, setSearchSuggestion] = useState<IndexDefinition>(null);
   const [tab, setTab] = useState(null);
   const { showErrorMessage } = useMySnackbar();
   const downSM = useMediaQuery(theme.breakpoints.down('md'));
@@ -149,24 +149,20 @@ function Search({ index = null }: Props) {
 
   useEffect(() => {
     // On index change we need to update the search suggestion
-    let indexFields: string[] = [];
+    let indexFields: IndexDefinition = {};
     if (index || id) {
       // Retrieve the fields specific to the index of interest
-      indexFields = Object.keys(indexes[index || id] || {}).filter(name => indexes[index || id][name].indexed);
+      indexFields = indexes?.[(index || id) as keyof Indexes] || {};
     } else {
-      // Retrieve all fields across indices
-      Object.keys(permissionMap)
-        // Ensure the user has permission to access those indices
-        .filter(searchableIndex => currentUser.roles.includes(permissionMap[searchableIndex]))
-        .forEach(searchableIndex => {
-          indexFields.push(
-            ...Object.keys(indexes[searchableIndex] || {}).filter(name => indexes[searchableIndex][name].indexed)
-          );
-        });
-      // De-dup fields shared across indices and re-sort them
-      indexFields = Array.from(new Set<string>(indexFields)).sort();
+      indexFields = Object.values(indexes).reduce(
+        (prev, current) => ({
+          ...prev,
+          ...Object.fromEntries(Object.entries(current).filter(([, value]) => value?.indexed))
+        }),
+        {}
+      );
     }
-    setSearchSuggestion([...indexFields, ...DEFAULT_SUGGESTION]);
+    setSearchSuggestion({ ...indexFields, ...DEFAULT_SUGGESTION });
   }, [index, id, indexes, permissionMap, currentUser.roles]);
 
   useEffect(() => {

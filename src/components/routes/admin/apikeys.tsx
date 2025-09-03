@@ -11,7 +11,8 @@ import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import type { ApiKey } from 'components/models/base/user';
-import type { FieldsResult, SearchResult } from 'components/models/ui/search';
+import type { SearchResult } from 'components/models/ui/search';
+import type { IndexDefinition } from 'components/models/ui/user';
 import ApikeyDetail from 'components/routes/admin/apikey_detail';
 import SearchHeader from 'components/visual/SearchBar/SearchHeader';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
@@ -45,7 +46,7 @@ const APIKeysSearch = () => {
 
   const [apikeySearchResults, setApikeySearchResults] = useState<SearchResult<ApiKey>>(null);
   const [searching, setSearching] = useState<boolean>(false);
-  const [suggestions, setSuggestions] = useState<string[]>(DEFAULT_SUGGESTION);
+  const [suggestions, setSuggestions] = useState<IndexDefinition>(DEFAULT_SUGGESTION);
 
   const setApikeyID = useCallback(
     (key_id: string) => {
@@ -110,10 +111,9 @@ const APIKeysSearch = () => {
 
   useEffect(() => {
     if (!currentUser.is_admin) return;
-    apiCall<FieldsResult>({
+    apiCall<IndexDefinition>({
       url: '/api/v4/search/fields/apikey/',
-      onSuccess: ({ api_response }) =>
-        setSuggestions([...Object.keys(api_response).filter(name => api_response[name].indexed), ...DEFAULT_SUGGESTION])
+      onSuccess: ({ api_response }) => setSuggestions({ ...api_response, ...DEFAULT_SUGGESTION })
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser.is_admin]);
