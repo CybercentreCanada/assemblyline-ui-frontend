@@ -255,9 +255,9 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
         ? Object.entries(options)
             .filter(
               ([name, field]) =>
-                field?.indexed ||
-                name.toLowerCase().includes(filterValue.toLowerCase()) ||
-                field?.description?.toLowerCase().includes(filterValue.toLowerCase())
+                field?.indexed &&
+                (name.toLowerCase().includes(filterValue.toLowerCase()) ||
+                  field?.description?.toLowerCase().includes(filterValue.toLowerCase()))
             )
             .map(([name]) => name)
         : Object.keys(options);
