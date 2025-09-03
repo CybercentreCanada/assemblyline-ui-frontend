@@ -64,7 +64,7 @@ export const ALERT_DEFAULT_PARAMS = {
   rows: PAGE_SIZE,
   sort: 'reporting_ts desc',
   tc_start: '',
-  tc: '4d',
+  tc: '[now-4d TO now]',
   track_total_hits: 10000,
   refresh: false
 };
@@ -104,7 +104,7 @@ const WrappedAlertsContent = () => {
     (body: SearchResult<AlertSearchParams>) => {
       if (!currentUser.roles.includes('alert_view')) return;
 
-      const query = body.filter((k, v) => !['tc_start'].includes(k)).toParams();
+      const query = body.filter(k => !['tc_start'].includes(k)).toParams();
       query.sort();
       if (query.toString() === prevSearch.current) return;
       prevSearch.current = query.toString();
@@ -112,14 +112,23 @@ const WrappedAlertsContent = () => {
       const groupBy = query.get('group_by');
       const pathname = groupBy !== '' ? `/api/v4/alert/grouped/${groupBy}/` : `/api/v4/alert/list/`;
 
-      let query2 = body.filter((k, v) => !['refresh'].includes(k));
+      let query2 = body.filter(k => !['refresh'].includes(k));
       if (Number(query2.get('offset') || 0) === 0) {
         query2 = query2.set(o => ({ ...o, tc_start: '' }));
         setScrollReset(true);
       }
 
+      const query3 = query2.toParams();
+      if (query3.has('tc')) {
+        const tcValue = query3.get('tc');
+        if (tcValue) {
+          query3.delete('tc');
+          query3.append('fq', `reporting_ts:${tcValue}`);
+        }
+      }
+
       apiCall<ListResponse | GroupedResponse>({
-        url: `${pathname}?${query2.toString()}`,
+        url: `${pathname}?${query3.toString()}`,
         method: 'GET',
         onSuccess: ({ api_response }) => {
           if ('tc_start' in api_response) {
@@ -137,10 +146,7 @@ const WrappedAlertsContent = () => {
           setCountedTotal('counted_total' in api_response ? api_response.counted_total : api_response.items.length);
           setTotal(api_response.total);
         },
-
-        onEnter: () => {
-          setLoading(true);
-        },
+        onEnter: () => setLoading(true),
         onExit: () => {
           setLoading(false);
           setScrollReset(false);

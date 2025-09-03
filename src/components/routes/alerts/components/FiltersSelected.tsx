@@ -9,7 +9,7 @@ import { ListItemIcon, ListItemText, Menu, MenuItem, useTheme } from '@mui/mater
 import type { AlertSearchParams } from 'components/routes/alerts';
 import type { Favorite } from 'components/routes/alerts/components/Favorites';
 import type { Option } from 'components/routes/alerts/components/Filters';
-import { GROUPBY_OPTIONS, SORT_OPTIONS, TC_OPTIONS } from 'components/routes/alerts/components/Filters';
+import { GROUPBY_OPTIONS, SORT_OPTIONS } from 'components/routes/alerts/components/Filters';
 import { useAlerts } from 'components/routes/alerts/contexts/AlertsContext';
 import CustomChip from 'components/visual/CustomChip';
 import Moment from 'components/visual/Moment';
@@ -327,7 +327,7 @@ const WrappedAlertFiltersSelected = ({
         }}
       />
 
-      <MenuFilter
+      {/* <MenuFilter
         getLabel={() => {
           const option = TC_OPTIONS.find(o => o.value === search.tc);
           return option && option.value !== '' ? `${t('tc')}: ${t(option.label)}` : `${t('tc')}: ${t('none')}`;
@@ -346,7 +346,7 @@ const WrappedAlertFiltersSelected = ({
             marginLeft: `${theme.spacing(0.5)} !important`
           }
         }}
-      />
+      /> */}
 
       {visible.includes('tc_start') && search.tc_start && (
         <CustomChip

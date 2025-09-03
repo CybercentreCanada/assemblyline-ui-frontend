@@ -29,6 +29,7 @@ import type { Favorite } from 'components/routes/alerts/components/Favorites';
 import { useAlerts } from 'components/routes/alerts/contexts/AlertsContext';
 import { useSearchParams } from 'components/routes/alerts/contexts/SearchParamsContext';
 import CustomChip from 'components/visual/CustomChip';
+import { DateTimeRangePicker } from 'components/visual/DateTime/DateTimeRangePicker';
 import { humanReadableNumber, safeFieldValue } from 'helpers/utils';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -728,18 +729,42 @@ const WrappedAlertFilters = () => {
                 </Tooltip>
               </div>
               <div style={{ marginBottom: theme.spacing(2), marginTop: theme.spacing(2) }}>
+                <div style={{ marginBottom: theme.spacing(2), width: '100%' }}>
+                  <label>{t('tc')}</label>
+                  <DateTimeRangePicker
+                    value={(() => {
+                      try {
+                        if (query.has('tc')) {
+                          const raw = query.get('tc');
+                          const match = raw.match(/^\[(.+) TO (.+)\]$/);
+                          if (match) {
+                            return { start: match[1], end: match[2] };
+                          }
+                        }
+                      } catch (err) {
+                        console.error('Failed to parse tc value:', err);
+                      }
+
+                      const def = ALERT_DEFAULT_PARAMS.tc.toString();
+                      const match = def.match(/^\[(.+) TO (.+)\]$/);
+                      return { start: match[1], end: match[2] };
+                    })()}
+                    onChange={(e, { start, end }) => handleQueryChange('tc', `[${start} TO ${end}]`)}
+                  />
+                </div>
+
                 <AlertSort
                   value={query.has('sort') ? query.get('sort') : ALERT_DEFAULT_PARAMS.sort.toString()}
                   onChange={value => handleQueryChange('sort', value)}
                 />
 
-                <AlertSelect
+                {/* <AlertSelect
                   label="tc"
                   value={query.has('tc') ? query.get('tc') : ALERT_DEFAULT_PARAMS.tc.toString()}
                   defaultValue={ALERT_DEFAULT_PARAMS.tc.toString()}
                   options={TC_OPTIONS}
                   onChange={value => handleQueryChange('tc', value)}
-                />
+                /> */}
 
                 <AlertSelect
                   label="groupBy"
