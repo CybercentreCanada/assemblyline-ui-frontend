@@ -819,7 +819,14 @@ export const DateTimeRangePicker: React.FC<DateTimeRangePickerProps> = React.mem
 
     return (
       <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale={i18n.language}>
-        <div style={{ display: 'flex', flexDirection: 'column', ...(fullWidth && { width: '100%' }) }}>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            ...(fullWidth && { width: '100%' })
+          }}
+        >
           <div
             style={{
               position: 'relative',

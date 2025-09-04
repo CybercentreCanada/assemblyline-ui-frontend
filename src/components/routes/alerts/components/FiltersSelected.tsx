@@ -6,7 +6,7 @@ import SourceIcon from '@mui/icons-material/Source';
 import StarIcon from '@mui/icons-material/Star';
 import type { ChipProps, MenuItemProps } from '@mui/material';
 import { ListItemIcon, ListItemText, Menu, MenuItem, useTheme } from '@mui/material';
-import type { AlertSearchParams } from 'components/routes/alerts';
+import { type AlertSearchParams } from 'components/routes/alerts';
 import type { Favorite } from 'components/routes/alerts/components/Favorites';
 import type { Option } from 'components/routes/alerts/components/Filters';
 import { GROUPBY_OPTIONS, SORT_OPTIONS } from 'components/routes/alerts/components/Filters';
@@ -136,7 +136,7 @@ const WrappedAlertFiltersSelected = ({
   visible = [],
   disabled = false
 }: Props) => {
-  const { t } = useTranslation('alerts');
+  const { t, i18n } = useTranslation('alerts');
   const theme = useTheme();
   const alertValues = useAlerts();
 
@@ -326,27 +326,6 @@ const WrappedAlertFiltersSelected = ({
           }
         }}
       />
-
-      {/* <MenuFilter
-        getLabel={() => {
-          const option = TC_OPTIONS.find(o => o.value === search.tc);
-          return option && option.value !== '' ? `${t('tc')}: ${t(option.label)}` : `${t('tc')}: ${t('none')}`;
-        }}
-        param={search.tc}
-        visible={visible.includes('tc')}
-        disabled={disabled}
-        getSelected={option => search.tc === option.value}
-        icon={<DateRangeIcon fontSize="small" />}
-        title={t('tc')}
-        options={TC_OPTIONS}
-        style={{ minHeight: '25px' }}
-        onClick={(_, option) => handleChange(v => ({ ...v, tc: option.value }))}
-        sx={{
-          '&>.MuiChip-icon': {
-            marginLeft: `${theme.spacing(0.5)} !important`
-          }
-        }}
-      /> */}
 
       {visible.includes('tc_start') && search.tc_start && (
         <CustomChip

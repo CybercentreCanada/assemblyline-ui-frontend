@@ -25,6 +25,7 @@ import type { SearchParams } from 'components/routes/alerts/utils/SearchParams';
 import type { SearchResult } from 'components/routes/alerts/utils/SearchParser';
 import { WorkflowCreate } from 'components/routes/manage/workflows/create';
 import { IconButton } from 'components/visual/Buttons/IconButton';
+import { DateTimeRangePicker } from 'components/visual/DateTime/DateTimeRangePicker';
 import InformativeAlert from 'components/visual/InformativeAlert';
 import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
@@ -253,6 +254,26 @@ const WrappedAlertsContent = () => {
           }}
           actions={
             <>
+              <DateTimeRangePicker
+                value={(() => {
+                  try {
+                    if (search.has('tc')) {
+                      const raw = search.get('tc');
+                      const match = raw.match(/^\[(.+) TO (.+)\]$/);
+                      if (match) {
+                        return { start: match[1], end: match[2] };
+                      }
+                    }
+                  } catch (err) {
+                    console.error('Failed to parse tc value:', err);
+                  }
+
+                  const def = ALERT_DEFAULT_PARAMS.tc.toString();
+                  const match = def.match(/^\[(.+) TO (.+)\]$/);
+                  return { start: match[1], end: match[2] };
+                })()}
+                onChange={(e, { start, end }) => setSearchObject(o => ({ ...o, tc: `[${start} TO ${end}]` }))}
+              />
               <AlertDefaultSearchParameters key="default-search-parameters" />
               <IconButton
                 preventRender={!currentUser.roles.includes('workflow_manage')}
