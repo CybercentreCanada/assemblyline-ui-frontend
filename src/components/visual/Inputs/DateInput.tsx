@@ -18,7 +18,7 @@ import {
   useTextInputSlot
 } from 'components/visual/Inputs/lib/inputs.components';
 import {
-  useErrorMessage,
+  useErrorCallback,
   useInputBlur,
   useInputChange,
   useInputFocus,
@@ -187,8 +187,6 @@ const WrappedDateInput = () => {
     configureMomentLocale(i18n.language);
   }, [i18n.language]);
 
-  useErrorMessage();
-
   return (
     <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale={i18n.language}>
       <StyledRoot>
@@ -237,12 +235,15 @@ const WrappedDateInput = () => {
   );
 };
 
-export const DateInput = ({ value, preventRender = false, ...props }: DateInputProps) =>
-  preventRender ? null : (
+export const DateInput = ({ preventRender = false, value, ...props }: DateInputProps) => {
+  const errorMessage = useErrorCallback({ preventRender, value, ...props });
+
+  return preventRender ? null : (
     <PropProvider<DateInputProps>
       props={{
         autoComplete: 'off',
         defaultDateOffset: null,
+        errorMessage,
         inputValue: value ? moment(value) : null,
         maxDateToday: false,
         minDateTomorrow: false,
@@ -254,3 +255,4 @@ export const DateInput = ({ value, preventRender = false, ...props }: DateInputP
       <WrappedDateInput />
     </PropProvider>
   );
+};

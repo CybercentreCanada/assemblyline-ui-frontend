@@ -805,6 +805,7 @@ export const StyledFormLabel = React.memo(() => {
   const id = usePropID();
   const label = usePropLabel();
   const labelProps = get('labelProps');
+  const loading = get('loading');
   const overflowHidden = get('overflowHidden');
   const preventDisabledColor = get('preventDisabledColor');
   const readOnly = get('readOnly');
@@ -814,7 +815,17 @@ export const StyledFormLabel = React.memo(() => {
   return (
     <Tooltip title={tooltip} {...tooltipProps}>
       <Typography
-        color={readOnly ? 'textSecondary' : !disabled && errorMessage ? 'error' : focused ? 'primary' : 'textSecondary'}
+        color={
+          !preventDisabledColor && (loading || disabled)
+            ? 'textDisabled'
+            : readOnly
+              ? 'textSecondary'
+              : errorMessage
+                ? 'error'
+                : focused
+                  ? 'primary'
+                  : 'textSecondary'
+        }
         component={InputLabel}
         gutterBottom
         htmlFor={id}
