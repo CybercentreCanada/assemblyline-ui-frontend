@@ -12,20 +12,20 @@ export type UseAPIQueryProps<Response = unknown, Request extends APIRequest = AP
     UndefinedInitialDataOptions<Promise<unknown>, APIResponse<Error>, APIResponse<Response>, [unknown]>,
     'queryKey' | 'queryFn'
   >;
-  enabled?: boolean;
-  retryAfter?: number;
   delay?: number;
-} & Omit<UseAPICallFnProps<APIResponse<Response>, Request, APIResponse<Error>>, 'signal' | 'enabled' | 'retryAfter'>;
+  disabled?: boolean;
+  retryAfter?: number;
+} & Omit<UseAPICallFnProps<APIResponse<Response>, Request, APIResponse<Error>>, 'signal' | 'disabled' | 'retryAfter'>;
 
 export const useAPIQuery = <
   Response = unknown,
   Request extends APIRequest = APIRequest,
   Error extends string = string
 >({
-  enabled = true,
+  delay = null,
+  disabled = false,
   queryProps = null,
   retryAfter = DEFAULT_RETRY_MS,
-  delay = null,
   ...params
 }: UseAPIQueryProps<Response, Request, Error>) => {
   const queryClient = useQueryClient();
@@ -48,9 +48,9 @@ export const useAPIQuery = <
   const query = useQuery<unknown, APIResponse<Error>, APIResponse<Response>, [unknown]>(
     {
       ...queryProps,
-      enabled: !!enabled && !debouncing,
-      queryKey: [{ ...params, enabled }],
-      queryFn: async ({ signal }) => apiCallFn({ signal, enabled, ...params }),
+      enabled: !disabled && !debouncing,
+      queryKey: [{ ...params, disabled }],
+      queryFn: async ({ signal }) => apiCallFn({ signal, enabled: !disabled, ...params }),
       retry: (failureCount, error) => failureCount < 1 || error?.api_status_code === 502,
       retryDelay: failureCount => (failureCount < 1 ? 1000 : Math.min(retryAfter, 10000))
     },
