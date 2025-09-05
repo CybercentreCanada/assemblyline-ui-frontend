@@ -11,6 +11,7 @@ import { SearchParamsProvider, useSearchParams } from 'components/core/SearchPar
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import type { SubmissionIndexed } from 'components/models/base/submission';
+import type { IndexDefinition } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
 import SearchHeader from 'components/visual/SearchBar/SearchHeader';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
@@ -47,8 +48,8 @@ const SubmissionSearch = () => {
   const [submissionResults, setSubmissionResults] = useState<SearchResults>(null);
   const [searching, setSearching] = useState<boolean>(false);
 
-  const suggestions = useMemo<string[]>(
-    () => [...Object.keys(indexes.submission).filter(name => indexes.submission[name].indexed), ...DEFAULT_SUGGESTION],
+  const suggestions = useMemo<IndexDefinition>(
+    () => ({ ...indexes.submission, ...DEFAULT_SUGGESTION }),
     [indexes.submission]
   );
 

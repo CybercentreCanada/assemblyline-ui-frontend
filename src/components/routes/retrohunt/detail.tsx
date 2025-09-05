@@ -24,7 +24,7 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import type { FileIndexed } from 'components/models/base/file';
 import type { Retrohunt, RetrohuntProgress } from 'components/models/base/retrohunt';
 import type { SearchResult } from 'components/models/ui/search';
-import type { CustomUser } from 'components/models/ui/user';
+import type { CustomUser, IndexDefinition } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
 import NotFoundPage from 'components/routes/404';
 import RetrohuntErrors from 'components/routes/retrohunt/errors';
@@ -148,10 +148,7 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
 
   const searchKey = useMemo<string>(() => (isDrawer ? propKey.split('?')[0] : paramKey), [isDrawer, paramKey, propKey]);
 
-  const suggestions = useMemo<string[]>(
-    () => [...Object.keys(indexes.file).filter(name => indexes.file[name].indexed), ...DEFAULT_SUGGESTION],
-    [indexes.file]
-  );
+  const suggestions = useMemo<IndexDefinition>(() => ({ ...indexes.file, ...DEFAULT_SUGGESTION }), [indexes.file]);
 
   const hitPageCount = useMemo<number>(
     () =>

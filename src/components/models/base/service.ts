@@ -297,7 +297,7 @@ export type UpdateSource = UpdateSourceCommon &
   (
     | {
         use_managed_identity: true;
-        fetch_method: 'GIT';
+        fetch_method: FetchMethod;
       }
     | {
         use_managed_identity: false;

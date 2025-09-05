@@ -1,7 +1,7 @@
 import { Card, Grid, Tooltip, useTheme } from '@mui/material';
 import type { DockerConfig, PersistentVolume } from 'components/models/base/service';
 import ContainerDialog from 'components/routes/admin/service_detail/container_dialog';
-import React, { useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CgSmartphoneChip, CgSmartphoneRam } from 'react-icons/cg';
 
@@ -15,14 +15,25 @@ type ContainerCardProps = {
 
 const WrappedContainerCard = ({ container, defaults, name = null, volumes = null, onChange }: ContainerCardProps) => {
   const { t } = useTranslation(['adminServices']);
-  const [dialog, setDialog] = useState(false);
   const theme = useTheme();
-  const yesColor = theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark;
-  const noColor = theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark;
 
-  const handleContainerChange = (tempContainer, tempName, tempVolumes) => {
-    onChange(tempContainer, tempName, tempVolumes);
-  };
+  const [dialog, setDialog] = useState<boolean>(false);
+
+  const yesColor = useMemo(
+    () => (theme.palette.mode === 'dark' ? theme.palette.success.light : theme.palette.success.dark),
+    [theme.palette.mode, theme.palette.success.dark, theme.palette.success.light]
+  );
+  const noColor = useMemo(
+    () => (theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark),
+    [theme.palette.error.dark, theme.palette.error.light, theme.palette.mode]
+  );
+
+  const handleContainerChange = useCallback(
+    (tempContainer: DockerConfig, tempName: string, tempVolumes: Record<string, PersistentVolume>) => {
+      onChange(tempContainer, tempName, tempVolumes);
+    },
+    [onChange]
+  );
 
   return container ? (
     <div style={{ paddingTop: theme.spacing(1) }}>
