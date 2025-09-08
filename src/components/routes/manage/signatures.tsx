@@ -4,10 +4,7 @@ import { useMediaQuery, useTheme } from '@mui/material';
 import { useAppUser } from 'commons/components/app/hooks';
 import PageContainer from 'commons/components/pages/PageContainer';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
-import type { SearchParams } from 'components/core/SearchParams/SearchParams';
-import { createSearchParams } from 'components/core/SearchParams/SearchParams';
-import { SearchParamsProvider, useSearchParams } from 'components/core/SearchParams/SearchParamsContext';
-import type { SearchParamsResult } from 'components/core/SearchParams/SearchParser';
+import { createSearchParams } from 'components/core/SearchParams2/createSearchParams';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -25,17 +22,15 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
 
-const SIGNATURES_PARAMS = createSearchParams(p => ({
+export const { SearchParamsProvider, useSearchParams } = createSearchParams(p => ({
   query: p.string(''),
-  offset: p.number(0).min(0).hidden().ignored(),
-  rows: p.number(25).enforced().hidden().ignored(),
+  offset: p.number(0).min(0).source('state').ignored(),
+  rows: p.number(25).enforced().source('state').ignored(),
   sort: p.string('type asc').ignored(),
   filters: p.filters([]),
   track_total_hits: p.number(10000).nullable().ignored(),
-  refresh: p.boolean(false).hidden().ignored()
+  refresh: p.boolean(false).source('ref').ignored()
 }));
-
-type SignaturesParams = SearchParams<typeof SIGNATURES_PARAMS>;
 
 const SignaturesSearch = () => {
   const { t } = useTranslation(['manageSignatures']);
@@ -47,7 +42,7 @@ const SignaturesSearch = () => {
   const { indexes } = useALContext();
   const { user: currentUser } = useAppUser<CustomUser>();
   const { globalDrawerOpened, setGlobalDrawer, closeGlobalDrawer } = useDrawer();
-  const { search, setSearchParams, setSearchObject } = useSearchParams<SignaturesParams>();
+  const search = useSearchParams();
 
   const [signatureResults, setSignatureResults] = useState<SearchResult<Signature>>(null);
   const [searching, setSearching] = useState<boolean>(false);
@@ -61,7 +56,7 @@ const SignaturesSearch = () => {
 
   const downloadLink = useMemo<string>(
     () =>
-      search
+      search.snapshot
         .set(o => ({ ...o, query: [o.query || '*', ...o.filters].join(' && ') }))
         .pick(['query'])
         .toString(),
@@ -70,16 +65,16 @@ const SignaturesSearch = () => {
 
   const handleToggleFilter = useCallback(
     (filter: string) => {
-      setSearchObject(o => {
+      search.setObject(o => {
         const filters = o.filters.includes(filter) ? o.filters.filter(f => f !== filter) : [...o.filters, filter];
         return { ...o, offset: 0, filters };
       });
     },
-    [setSearchObject]
+    [search]
   );
 
   const handleReload = useCallback(
-    (body: SearchParamsResult<SignaturesParams>) => {
+    body => {
       if (!currentUser.roles.includes('signature_view')) return;
 
       apiCall<SearchResult<Signature>>({
@@ -136,19 +131,21 @@ const SignaturesSearch = () => {
   }, [location.hash]);
 
   useEffect(() => {
-    handleReload(search);
-  }, [handleReload, search]);
+    handleReload(search.snapshot);
+  }, [handleReload, search.snapshot]);
 
   useEffect(() => {
     function reload() {
-      setSearchObject(o => ({ ...o, offset: 0, refresh: !o.refresh }));
+      search.setObject(o => ({ ...o, offset: 0, refresh: !o.refresh }));
     }
 
     window.addEventListener('reloadSignatures', reload);
     return () => {
       window.removeEventListener('reloadSignatures', reload);
     };
-  }, [setSearchObject]);
+  }, []);
+
+  console.log(location);
 
   return currentUser.roles.includes('signature_view') ? (
     <PageFullWidth margin={4}>
@@ -169,37 +166,39 @@ const SignaturesSearch = () => {
       <PageContainer isSticky>
         <div style={{ paddingTop: theme.spacing(1) }}>
           <SearchHeader
-            params={search.toParams()}
+            params={search.snapshot.toParams()}
             loading={searching}
             results={signatureResults}
             resultLabel={
-              search.get('query')
+              search.snapshot.get('query')
                 ? t(`filtered${signatureResults?.total === 1 ? '' : 's'}`)
                 : t(`total${signatureResults?.total === 1 ? '' : 's'}`)
             }
-            onChange={v => setSearchParams(v)}
-            paramDefaults={search.defaults().toObject()}
+            onChange={v => search.setParams(v)}
+            paramDefaults={search.snapshot.defaults().toObject()}
             searchInputProps={{ placeholder: t('filter'), options: suggestions }}
             actionProps={[
               {
                 tooltip: {
-                  title: search.has('filters', 'status:NOISY') ? t('filter.noisy.remove') : t('filter.noisy.add')
+                  title: search.snapshot.has('filters', 'status:NOISY')
+                    ? t('filter.noisy.remove')
+                    : t('filter.noisy.add')
                 },
                 icon: { children: <RecordVoiceOverOutlinedIcon /> },
                 button: {
-                  color: search.has('filters', 'status:NOISY') ? 'primary' : 'default',
+                  color: search.snapshot.has('filters', 'status:NOISY') ? 'primary' : 'default',
                   onClick: () => handleToggleFilter('status:NOISY')
                 }
               },
               {
                 tooltip: {
-                  title: search.has('filters', 'status:DISABLED')
+                  title: search.snapshot.has('filters', 'status:DISABLED')
                     ? t('filter.disabled.remove')
                     : t('filter.disabled.add')
                 },
                 icon: { children: <BlockIcon /> },
                 button: {
-                  color: search.has('filters', 'status:DISABLED') ? 'primary' : 'default',
+                  color: search.snapshot.has('filters', 'status:DISABLED') ? 'primary' : 'default',
                   onClick: () => handleToggleFilter('status:DISABLED')
                 }
               }
@@ -218,7 +217,7 @@ const SignaturesSearch = () => {
 };
 
 const WrappedSignaturesPage = () => (
-  <SearchParamsProvider params={SIGNATURES_PARAMS}>
+  <SearchParamsProvider>
     <SignaturesSearch />
   </SearchParamsProvider>
 );
