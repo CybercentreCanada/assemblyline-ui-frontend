@@ -27,9 +27,6 @@ export const createSearchParams = <Blueprints extends Record<string, ParamBluepr
 
     return {
       get snapshot(): SearchParamSnapshot<Blueprints> {
-        if (!snapshotRef.current) {
-          throw new Error('Snapshot has not been initialized');
-        }
         return snapshotRef.current;
       },
       refresh,
@@ -63,10 +60,6 @@ export const createSearchParams = <Blueprints extends Record<string, ParamBluepr
     const navigate = useNavigate();
     const store = useContext(SearchParamsContext);
 
-    if (!store) {
-      throw new Error('SearchParamsContext not found');
-    }
-
     const setSearchParams = useCallback(
       (
         input: URLSearchParams | ((params: URLSearchParams) => URLSearchParams),
@@ -93,7 +86,8 @@ export const createSearchParams = <Blueprints extends Record<string, ParamBluepr
       [navigate, store]
     );
 
-    return { search: store.snapshot, setSearchParams, setSearchObject };
+    if (!store) return { search: null, setSearchParams: () => null, setSearchObject: () => null };
+    else return { search: store.snapshot, setSearchParams, setSearchObject };
   };
 
   return { SearchParamsProvider, useSearchParams };
