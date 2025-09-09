@@ -7,49 +7,43 @@ import {
   NumberBlueprint,
   StringBlueprint
 } from 'components/core/SearchParams2/lib/search_params.blueprint';
-import type {
-  ParamBlueprints,
-  ParamValues,
-  SearchParamValues
-} from 'components/core/SearchParams2/lib/search_params.model';
-import type { SearchParamSnapshot } from 'components/core/SearchParams2/lib/search_params.snapshot';
-import type { Location } from 'react-router';
+import type { ParamValues } from 'components/core/SearchParams2/lib/search_params.model';
 
-type AnyFunction<A = any> = (...input: unknown[]) => A;
+/**
+ * Factory that wraps a blueprint class and re-exposes its
+ * protected methods as public runtime utilities.
+ */
+export function Runtime<T extends ParamValues, B extends abstract new (...args: any[]) => BaseBlueprint<T>>(Base: B) {
+  abstract class Accessor extends Base {
+    // Getters
+    public override getDefaultValue = super.getDefaultValue;
+    public override isEphemeral = super.isEphemeral;
+    public override isIgnored = super.isIgnored;
+    public override isLocked = super.isLocked;
+    public override isNullable = super.isNullable;
+    public override getOrigin = super.getOrigin;
 
-type Mixin<T extends AnyFunction> = InstanceType<ReturnType<T>>;
+    // Helpers
+    public override has = super.has;
+    public override get = super.get;
 
-export type ParamRuntime = Mixin<typeof Runtime>;
+    // Parsers
+    public override full = super.full;
+    public override delta = super.delta;
+    public override fromLocation = super.fromLocation;
 
-export function Runtime<T extends ParamValues, B extends new (...args: any[]) => BaseBlueprint<T>>(Base: B) {
-  return class Accessor extends Base {
-    public defaultValue = (value: T) => {
-      super.defaultValue(value);
-      return this;
-    };
+    // Resolvers
+    public override toParams = super.toParams;
+  }
 
-    public getDefault = () => super.getDefaultValue();
-
-    public fromLocation = <Blueprints extends Record<string, ParamBlueprints>>(
-      prev: SearchParamValues<Blueprints>,
-      location: Location,
-      snapshot: SearchParamSnapshot<Blueprints>
-    ) => super.fromLocation(prev, location, snapshot);
-
-    public fromParams = <Blueprints extends Record<string, ParamBlueprints>>(
-      prev: SearchParamValues<Blueprints>,
-      value: URLSearchParams,
-      snapshot: SearchParamSnapshot<Blueprints>
-    ) => super.fromParams(prev, value, snapshot);
-
-    public fromObject = <Blueprints extends Record<string, ParamBlueprints>>(
-      prev: SearchParamValues<Blueprints>,
-      value: SearchParamValues<Blueprints>,
-      snapshot: SearchParamSnapshot<Blueprints>
-    ) => super.fromObject(prev, value, snapshot);
-  };
+  return Accessor;
 }
 
+export type ParamRuntime = InstanceType<ReturnType<typeof Runtime>>;
+
+/**
+ * Collection of runtime wrappers for each blueprint type.
+ */
 export const PARAM_RUNTIMES = {
   boolean: Runtime(BooleanBlueprint),
   number: Runtime(NumberBlueprint),

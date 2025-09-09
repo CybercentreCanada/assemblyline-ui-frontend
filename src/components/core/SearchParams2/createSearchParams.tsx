@@ -2,6 +2,7 @@ import { PARAM_BLUEPRINTS } from 'components/core/SearchParams2/lib/search_param
 import { SearchParamEngine } from 'components/core/SearchParams2/lib/search_params.engine';
 import type { ParamBlueprints, SearchParamValues } from 'components/core/SearchParams2/lib/search_params.model';
 import type { SearchParamSnapshot } from 'components/core/SearchParams2/lib/search_params.snapshot';
+import { shallowEqual } from 'components/visual/Inputs/lib/inputs.utils';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef } from 'react';
 import type { Location, NavigateOptions } from 'react-router';
 import { useLocation, useNavigate } from 'react-router';
@@ -13,16 +14,15 @@ export const createSearchParams = <Blueprints extends Record<string, ParamBluepr
     const snapshotRef = { current: null as SearchParamSnapshot<Blueprints> | null };
 
     const refresh = (location: Location) => {
-      snapshotRef.current = engine.fromLocation(location, snapshotRef.current);
+      const newSnapshot = engine.fromLocation(location, snapshotRef.current);
+
+      if (!shallowEqual(snapshotRef?.current?.values || {}, newSnapshot?.values || {})) {
+        snapshotRef.current = newSnapshot;
+      }
     };
 
-    const setParams = (value: URLSearchParams) => {
-      snapshotRef.current = engine.fromParams(value, snapshotRef.current);
-      return snapshotRef.current;
-    };
-
-    const setObject = (value: SearchParamValues<Blueprints>) => {
-      snapshotRef.current = engine.fromObject(value, snapshotRef.current);
+    const from = (value: URLSearchParams | SearchParamValues<Blueprints>) => {
+      snapshotRef.current = engine.full(value);
       return snapshotRef.current;
     };
 
@@ -31,8 +31,7 @@ export const createSearchParams = <Blueprints extends Record<string, ParamBluepr
         return snapshotRef.current;
       },
       refresh,
-      setParams,
-      setObject
+      from
     };
   };
 
@@ -51,7 +50,8 @@ export const createSearchParams = <Blueprints extends Record<string, ParamBluepr
 
     useEffect(() => {
       storeRef.current?.refresh(location);
-    }, [location]);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [engine.fromLocation(location).omit(engine.getIgnoredKeys()).toString()]);
 
     return <SearchParamsContext.Provider value={storeRef.current}>{children}</SearchParamsContext.Provider>;
   });
@@ -62,19 +62,19 @@ export const createSearchParams = <Blueprints extends Record<string, ParamBluepr
 
     if (!store) throw new Error('SearchParamsContext not found');
 
-    const setParams = useCallback(
+    const setSearchParams = useCallback(
       (
         input: URLSearchParams | ((params: URLSearchParams) => URLSearchParams),
         replace: NavigateOptions['replace'] = false
       ) => {
         const values = typeof input === 'function' ? input(store.snapshot.toParams()) : input;
-        const snapshot = store.setParams(values);
+        const snapshot = store.from(values);
         navigate({ search: snapshot.getSearch() }, { replace, state: snapshot.getState() });
       },
       [navigate, store]
     );
 
-    const setObject = useCallback(
+    const setSearchObject = useCallback(
       (
         input:
           | SearchParamValues<Blueprints>
@@ -82,13 +82,13 @@ export const createSearchParams = <Blueprints extends Record<string, ParamBluepr
         replace: NavigateOptions['replace'] = false
       ) => {
         const values = typeof input === 'function' ? input(store.snapshot.toObject()) : input;
-        const snapshot = store.setObject(values);
+        const snapshot = store.from(values);
         navigate({ search: snapshot.getSearch() }, { replace, state: snapshot.getState() });
       },
       [navigate, store]
     );
 
-    return { snapshot: store.snapshot, setParams, setObject };
+    return { search: store.snapshot, setSearchParams, setSearchObject };
   };
 
   return { SearchParamsProvider, useSearchParams };

@@ -13,7 +13,7 @@ export type ParamValues = null | boolean | number | string | string[];
 /**
  * Sources from which a param can be resolved.
  */
-export type ParamSource = 'search' | 'state' | 'ref';
+export type ParamSource = 'search' | 'state' | 'snapshot';
 
 /**
  * Supported blueprint types.

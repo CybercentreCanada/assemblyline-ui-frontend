@@ -9,52 +9,71 @@ import type { Location } from 'react-router';
 
 export abstract class BaseBlueprint<T extends ParamValues> {
   /**
-   * Key of the search param
+   * Unique identifier for this parameter in `location.search` or `location.state`.
+   * Example: `?page=2` → key = "page".
    */
   protected _key: string;
 
   /**
-   * Default value of the param
+   * The default value that will be used when no valid value is provided,
+   * or when this param is locked to always fall back.
    */
   protected _defaultValue: T;
 
   /**
-   * Source of the param
+   * If true, this param will be excluded from persistence mechanisms
+   * (e.g. localStorage). Useful for ephemeral, session-only values.
    */
-  protected _source: ParamSource = 'search';
+  protected _ephemeral: boolean = false;
 
   /**
-   * Parameter changes will not cause rerenders
+   * If true, changes to this parameter will be ignored when detecting
+   * differences between snapshots. This prevents unnecessary re-renders
+   * when only this param changes in the location.
    */
-  protected _ignored: boolean;
+  protected _ignored: boolean = false;
 
   /**
-   * Null is a valid value
+   * If true, this param is locked and will always resolve
+   * to its default value regardless of external input.
    */
-  protected _nullable: boolean;
+  protected _locked: boolean = false;
 
   /**
-   * Enforce the defaultValues when no value is provided
+   * If true, `null` is considered a valid value for this param.
    */
-  protected _enforced: boolean;
+  protected _nullable: boolean = false;
+
+  /**
+   * Where this parameter should be resolved from:
+   * - "search" → URL query string
+   * - "state"  → location.state
+   * - "ref"    → a React.ref value
+   */
+  protected _origin: ParamSource = 'search';
 
   constructor(key: string = null, param: BaseBlueprint<T> = null) {
     this._key = key;
     if (!param) return;
     this._defaultValue = param._defaultValue;
-    this._enforced = param._enforced;
+    this._ephemeral = param._ephemeral;
     this._ignored = param._ignored;
+    this._locked = param._locked;
     this._nullable = param._nullable;
-    this._source = param._source;
+    this._origin = param._origin;
   }
+
+  // -------------------------
+  // Builder methods
+  // -------------------------
 
   public defaultValue(defaultValue: T) {
     this._defaultValue = defaultValue;
     return this;
   }
 
-  public enforced(enforced: boolean = true) {
-    this._enforced = enforced;
+  public ephemeral(ephemeral: boolean = true) {
+    this._ephemeral = ephemeral;
     return this;
   }
 
@@ -63,37 +82,54 @@ export abstract class BaseBlueprint<T extends ParamValues> {
     return this;
   }
 
+  public locked(locked: boolean = true) {
+    this._locked = locked;
+    return this;
+  }
+
   public nullable(nullable: boolean = true) {
     this._nullable = nullable;
     return this;
   }
 
-  public source(source: ParamSource) {
-    this._source = source;
+  public origin(origin: ParamSource) {
+    this._origin = origin;
     return this;
   }
 
-  public getDefaultValue() {
+  // -------------------------
+  // Getters
+  // -------------------------
+
+  protected getDefaultValue(): T {
     return this._defaultValue;
   }
 
-  public getEnforced() {
-    return this._enforced;
+  protected isEphemeral() {
+    return this._ephemeral;
   }
 
-  public getIgnored() {
+  protected isIgnored() {
     return this._ignored;
   }
 
-  public getNullable() {
+  protected isLocked() {
+    return this._locked;
+  }
+
+  protected isNullable() {
     return this._nullable;
   }
 
-  public getSource() {
-    return this._source;
+  protected getOrigin() {
+    return this._origin;
   }
 
-  public has(origin: T = null, value: unknown = undefined): boolean {
+  // -------------------------
+  // Helpers
+  // -------------------------
+
+  protected has(origin: T = null, value: unknown = undefined): boolean {
     return value === undefined ? true : origin === value;
   }
 
@@ -102,7 +138,7 @@ export abstract class BaseBlueprint<T extends ParamValues> {
   }
 
   protected valid(value: unknown): value is T {
-    return this._nullable && value === null ? true : !!value;
+    return this._nullable && (value === null || value === undefined) ? true : !!value;
   }
 
   protected get<P extends Record<string, ParamValues>>(search: P | URLSearchParams): T {
@@ -116,6 +152,29 @@ export abstract class BaseBlueprint<T extends ParamValues> {
     return undefined;
   }
 
+  // -------------------------
+  // Parsers
+  // -------------------------
+
+  protected full<Blueprints extends Record<string, ParamBlueprints>>(
+    prev: SearchParamValues<Blueprints>,
+    params: URLSearchParams | SearchParamValues<Blueprints>
+  ): SearchParamValues<Blueprints> {
+    const value = this.get(params);
+    if (!this._locked && this.valid(value)) return { ...prev, [this._key]: value };
+    else if (this.valid(this._defaultValue)) return { ...prev, [this._key]: this._defaultValue };
+    else return prev;
+  }
+
+  protected delta<Blueprints extends Record<string, ParamBlueprints>>(
+    prev: SearchParamValues<Blueprints>,
+    params: URLSearchParams | SearchParamValues<Blueprints>
+  ): SearchParamValues<Blueprints> {
+    const value = this.get(params);
+    if (!this._locked && this.valid(value) && value !== this._defaultValue) return { ...prev, [this._key]: value };
+    else return prev;
+  }
+
   protected fromLocation<Blueprints extends Record<string, ParamBlueprints>>(
     prev: SearchParamValues<Blueprints>,
     location: Location,
@@ -123,8 +182,8 @@ export abstract class BaseBlueprint<T extends ParamValues> {
   ): SearchParamValues<Blueprints> {
     let raw: T | undefined;
 
-    // 1. Resolve raw value from the correct source
-    switch (this._source) {
+    // 1. Resolve raw value from the correct origin
+    switch (this._origin) {
       case 'search': {
         const params = new URLSearchParams(location.search);
         raw = params.get(this._key) as T;
@@ -135,7 +194,7 @@ export abstract class BaseBlueprint<T extends ParamValues> {
         raw = state[this._key] as T;
         break;
       }
-      case 'ref': {
+      case 'snapshot': {
         raw = snapshot?.values?.[this._key as keyof SearchParamValues<Blueprints>] as T;
         break;
       }
@@ -151,8 +210,8 @@ export abstract class BaseBlueprint<T extends ParamValues> {
       return parsed !== prev[this._key] ? { ...prev, [this._key]: parsed } : prev;
     }
 
-    // 4. If enforced → always fall back to default
-    if (this._enforced) {
+    // 4. If locked → always fall back to default
+    if (this._locked) {
       return prev[this._key] !== this._defaultValue ? { ...prev, [this._key]: this._defaultValue } : prev;
     }
 
@@ -166,57 +225,13 @@ export abstract class BaseBlueprint<T extends ParamValues> {
     return { ...prev, [this._key]: this._defaultValue };
   }
 
-  protected fromParams<Blueprints extends Record<string, ParamBlueprints>>(
-    prev: SearchParamValues<Blueprints>,
-    params: URLSearchParams,
-    snapshot: SearchParamSnapshot<Blueprints> | null = null
-  ): SearchParamValues<Blueprints> {
-    const raw = params.get(this._key) as T;
-    const parsed = this.parse(raw);
-
-    if (this.valid(parsed)) {
-      return parsed !== prev[this._key] ? { ...prev, [this._key]: parsed } : prev;
-    }
-
-    if (this._enforced) {
-      return prev[this._key] !== this._defaultValue ? { ...prev, [this._key]: this._defaultValue } : prev;
-    }
-
-    const fallback = snapshot?.values?.[this._key as keyof SearchParamValues<Blueprints>];
-    if (fallback !== undefined && fallback !== prev[this._key]) {
-      return { ...prev, [this._key]: fallback };
-    }
-
-    return { ...prev, [this._key]: this._defaultValue };
-  }
-
-  protected fromObject<Blueprints extends Record<string, ParamBlueprints>>(
-    prev: SearchParamValues<Blueprints>,
-    value: SearchParamValues<Blueprints>,
-    snapshot: SearchParamSnapshot<Blueprints> | null = null
-  ): SearchParamValues<Blueprints> {
-    const raw = value[this._key as keyof SearchParamValues<Blueprints>] as T;
-    const parsed = this.parse(raw);
-
-    if (this.valid(parsed)) {
-      return parsed !== prev[this._key] ? { ...prev, [this._key]: parsed } : prev;
-    }
-
-    if (this._enforced) {
-      return prev[this._key] !== this._defaultValue ? { ...prev, [this._key]: this._defaultValue } : prev;
-    }
-
-    const fallback = snapshot?.values?.[this._key as keyof SearchParamValues<Blueprints>];
-    if (fallback !== undefined && fallback !== prev[this._key]) {
-      return { ...prev, [this._key]: fallback };
-    }
-
-    return { ...prev, [this._key]: this._defaultValue };
-  }
+  // -------------------------
+  // Resolvers
+  // -------------------------
 
   protected toParams<Blueprints extends Record<string, ParamBlueprints>>(
     prev: string[][],
-    snapshot: SearchParamSnapshot<Blueprints>
+    snapshot: SearchParamValues<Blueprints>
   ): string[][] {
     return this._key in snapshot && snapshot?.[this._key] !== null && snapshot?.[this._key] !== undefined
       ? [...prev, [this._key, String(snapshot?.[this._key])]]
@@ -354,6 +369,10 @@ export class FiltersBlueprint extends BaseBlueprint<string[]> {
     this._omit = param._omit;
   }
 
+  // -------------------------
+  // Builder methods
+  // -------------------------
+
   public not(value: string = 'NOT') {
     this._not = value;
     return this;
@@ -364,9 +383,9 @@ export class FiltersBlueprint extends BaseBlueprint<string[]> {
     return this;
   }
 
-  public has(origin: string[] = null, value: string = undefined): boolean {
-    return value === undefined ? true : origin.includes(value);
-  }
+  // -------------------------
+  // Utility
+  // -------------------------
 
   private check(value: unknown): value is string[] {
     return Array.isArray(value) && value.every(v => typeof v === 'string');
@@ -401,6 +420,14 @@ export class FiltersBlueprint extends BaseBlueprint<string[]> {
     return { ...prev, [this._key]: res };
   }
 
+  // -------------------------
+  // Helpers
+  // -------------------------
+
+  protected has(origin: string[] = null, value: string = undefined): boolean {
+    return value === undefined ? true : origin.includes(value);
+  }
+
   protected override parse(value: unknown): string[] {
     return this.check(value) ? value : super.parse(value);
   }
@@ -422,53 +449,57 @@ export class FiltersBlueprint extends BaseBlueprint<string[]> {
     return [];
   }
 
-  // protected override from<Blueprints extends Record<string, ParamBlueprints>>(prev: P, search: P | URLSearchParams): P {
-  //   const value = this.get(search);
-  //   return this.append(prev, this.clean(value));
-  // }
+  // -------------------------
+  // Parsers
+  // -------------------------
 
-  // protected override full<Blueprints extends Record<string, ParamBlueprints>>(prev: P, search: P | URLSearchParams): P {
-  //   const data = this.get(search);
-  //   return this.append(prev, this.clean([...this._default, ...(!this._enforced && data)]));
-  // }
+  protected override full<Blueprints extends Record<string, ParamBlueprints>>(
+    prev: SearchParamValues<Blueprints>,
+    params: URLSearchParams | SearchParamValues<Blueprints>
+  ): SearchParamValues<Blueprints> {
+    const data = this.get(params);
+    return this.append(prev, this.clean([...this._defaultValue, ...(!this._locked && data)]));
+  }
 
-  // protected override delta<Blueprints extends Record<string, ParamBlueprints>>(prev: P, search: P | URLSearchParams): P {
-  //   const data = this.get(search);
-  //   if (this._enforced || !Array.isArray(data)) return prev;
+  protected override delta<Blueprints extends Record<string, ParamBlueprints>>(
+    prev: SearchParamValues<Blueprints>,
+    params: URLSearchParams | SearchParamValues<Blueprints>
+  ): SearchParamValues<Blueprints> {
+    const data = this.get(params);
+    if (this._locked || !Array.isArray(data)) return prev;
 
-  //   const left = this.clean(data);
-  //   const right = this.clean(this._default);
-  //   let values: string[][] = [];
+    const left = this.clean(data);
+    const right = this.clean(this._defaultValue);
+    let values: string[][] = [];
 
-  //   values = left.reduceRight(
-  //     (p, l) => (right.some(r => this.fromPrefix(l) === this.fromPrefix(r)) ? p : [...p, l]),
-  //     values
-  //   );
+    values = left.reduceRight(
+      (p, l) => (right.some(r => this.fromPrefix(l) === this.fromPrefix(r)) ? p : [...p, l]),
+      values
+    );
 
-  //   values = right.reduceRight(
-  //     (p, r) => (left.some(l => l.at(-1) === r.at(-1)) ? p : [...p, [this._omit, ...r]]),
-  //     values
-  //   );
+    values = right.reduceRight(
+      (p, r) => (left.some(l => l.at(-1) === r.at(-1)) ? p : [...p, [this._omit, ...r]]),
+      values
+    );
 
-  //   return this.append(prev, values);
-  // }
+    return this.append(prev, values);
+  }
 
-  // protected override merge<Blueprints extends Record<string, ParamBlueprints>>(
-  //   prev: P,
-  //   left: P | URLSearchParams,
-  //   right: P | URLSearchParams,
-  //   keys: (keyof P)[]
-  // ): P {
-  //   const value1 = this.get(left);
-  //   const value2 = this.get(right);
-  //   const res = !keys.includes(this._key);
-  //   const data = res === true ? value1 : res === false ? value2 : [];
-  //   return this.append(prev, this.clean([...this._default, ...(!this._enforced && data)]));
-  // }
+  protected override fromLocation<Blueprints extends Record<string, ParamBlueprints>>(
+    prev: SearchParamValues<Blueprints>,
+    location: Location,
+    snapshot: SearchParamSnapshot<Blueprints> | null = null
+  ): SearchParamValues<Blueprints> {
+    return prev;
+  }
+
+  // -------------------------
+  // Resolvers
+  // -------------------------
 
   protected override toParams<Blueprints extends Record<string, ParamBlueprints>>(
     prev: string[][],
-    snapshot: SearchParamSnapshot<Blueprints>
+    snapshot: SearchParamValues<Blueprints>
   ): string[][] {
     if (!(this._key in snapshot) || !this.check(snapshot?.[this._key])) return prev;
     return (snapshot[this._key] as string[]).reduce((p, f) => [...p, [this._key, String(f)]], prev);
