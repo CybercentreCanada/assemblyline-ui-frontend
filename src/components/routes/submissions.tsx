@@ -5,9 +5,7 @@ import { useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import PageContainer from 'commons/components/pages/PageContainer';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
-import type { SearchParams } from 'components/core/SearchParams/SearchParams';
-import { createSearchParams } from 'components/core/SearchParams/SearchParams';
-import { SearchParamsProvider, useSearchParams } from 'components/core/SearchParams/SearchParamsContext';
+import { createSearchParams } from 'components/core/SearchParams/createSearchParams';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import type { SubmissionIndexed } from 'components/models/base/submission';
@@ -27,23 +25,21 @@ type SearchResults = {
   total: number;
 };
 
-const SUBMISSION_PARAMS = createSearchParams(p => ({
+export const { SearchParamsProvider, useSearchParams } = createSearchParams(p => ({
   query: p.string(''),
-  offset: p.number(0).min(0).hidden().ignored(),
-  rows: p.number(25).enforced().hidden().ignored(),
-  sort: p.string('times.submitted desc').ignored(),
+  offset: p.number(0).min(0).origin('state').ephemeral(),
+  rows: p.number(25).locked().origin('snapshot').ephemeral(),
+  sort: p.string('times.submitted desc').ephemeral(),
   filters: p.filters([]),
-  track_total_hits: p.number(10000).nullable().ignored()
+  track_total_hits: p.number(null).origin('state').nullable().ephemeral()
 }));
-
-export type SubmissionParams = SearchParams<typeof SUBMISSION_PARAMS>;
 
 const SubmissionSearch = () => {
   const { t } = useTranslation(['submissions']);
   const theme = useTheme();
   const { apiCall } = useMyAPI();
   const { user: currentUser, indexes } = useALContext();
-  const { search, setSearchParams, setSearchObject } = useSearchParams<SubmissionParams>();
+  const { search, setSearchParams, setSearchObject } = useSearchParams();
 
   const [submissionResults, setSubmissionResults] = useState<SearchResults>(null);
   const [searching, setSearching] = useState<boolean>(false);
@@ -166,7 +162,7 @@ const SubmissionSearch = () => {
 };
 
 const WrappedSubmissionPage = () => (
-  <SearchParamsProvider params={SUBMISSION_PARAMS}>
+  <SearchParamsProvider>
     <SubmissionSearch />
   </SearchParamsProvider>
 );

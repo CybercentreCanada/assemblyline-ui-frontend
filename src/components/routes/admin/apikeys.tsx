@@ -3,10 +3,7 @@ import { Grid, useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import PageContainer from 'commons/components/pages/PageContainer';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
-import type { SearchParams } from 'components/core/SearchParams/SearchParams';
-import { createSearchParams } from 'components/core/SearchParams/SearchParams';
-import { SearchParamsProvider, useSearchParams } from 'components/core/SearchParams/SearchParamsContext';
-import type { SearchParamsResult } from 'components/core/SearchParams/SearchParser';
+import { createSearchParams } from 'components/core/SearchParams/createSearchParams';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -22,17 +19,15 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useLocation, useNavigate } from 'react-router';
 
-const API_KEYS_PARAMS = createSearchParams(p => ({
+export const { SearchParamsProvider, useSearchParams } = createSearchParams(p => ({
   query: p.string(''),
-  offset: p.number(0).min(0).hidden().ignored(),
-  rows: p.number(25).enforced().hidden().ignored(),
-  sort: p.string(null).ignored(),
+  offset: p.number(0).min(0).origin('state').ephemeral(),
+  rows: p.number(25).locked().origin('state').ephemeral(),
+  sort: p.string(null).ephemeral(),
   filters: p.filters([]),
-  track_total_hits: p.number(10000).nullable().ignored(),
-  refresh: p.boolean(false).hidden().ignored()
+  track_total_hits: p.number(10000).nullable().ephemeral(),
+  refresh: p.boolean(false).origin('state').ephemeral()
 }));
-
-export type APIKeysParams = SearchParams<typeof API_KEYS_PARAMS>;
 
 const APIKeysSearch = () => {
   const { t } = useTranslation(['adminAPIkeys']);
@@ -42,7 +37,7 @@ const APIKeysSearch = () => {
   const { apiCall } = useMyAPI();
   const { globalDrawerOpened, setGlobalDrawer, closeGlobalDrawer } = useDrawer();
   const { user: currentUser } = useALContext();
-  const { search, setSearchParams, setSearchObject } = useSearchParams<APIKeysParams>();
+  const { search, setSearchParams, setSearchObject } = useSearchParams();
 
   const [apikeySearchResults, setApikeySearchResults] = useState<SearchResult<ApiKey>>(null);
   const [searching, setSearching] = useState<boolean>(false);
@@ -66,7 +61,7 @@ const APIKeysSearch = () => {
   );
 
   const handleReload = useCallback(
-    (body: SearchParamsResult<APIKeysParams>) => {
+    (body: typeof search) => {
       if (!currentUser.is_admin) return;
 
       const param = body
@@ -181,7 +176,7 @@ const APIKeysSearch = () => {
 };
 
 const WrappedAPIKeysPage = () => (
-  <SearchParamsProvider params={API_KEYS_PARAMS}>
+  <SearchParamsProvider>
     <APIKeysSearch />
   </SearchParamsProvider>
 );
