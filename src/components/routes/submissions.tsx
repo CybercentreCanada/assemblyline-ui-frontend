@@ -30,7 +30,7 @@ export const { SearchParamsProvider, useSearchParams } = createSearchParams(p =>
   rows: p.number(25).locked().origin('snapshot').ephemeral(),
   sort: p.string('times.submitted desc').ephemeral(),
   filters: p.filters([]),
-  track_total_hits: p.number(10000).origin('state').nullable().ephemeral()
+  track_total_hits: p.number(null).origin('state').nullable().ephemeral()
 }));
 
 const SubmissionSearch = () => {

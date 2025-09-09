@@ -53,16 +53,16 @@ const GAP_MAP: Record<TimeContraint, string> = {
 
 export const { SearchParamsProvider, useSearchParams } = createSearchParams(p => ({
   query: p.string(''),
-  offset: p.number(0).min(0).origin('state').ignored(),
-  rows: p.number(25).locked().origin('state').ignored(),
-  sort: p.string('created desc').ignored(),
+  offset: p.number(0).min(0).origin('state').ephemeral(),
+  rows: p.number(25).locked().origin('state').ephemeral(),
+  sort: p.string('created desc').ephemeral(),
   tc: p.enum('4d', TIME_CONTRAINTS),
   filters: p.filters([]),
-  track_total_hits: p.number(10000).nullable().ignored(),
-  mincount: p.number(0).min(0).origin('state').ignored(),
+  track_total_hits: p.number(10000).nullable().ephemeral(),
+  mincount: p.number(0).min(0).origin('state').ephemeral(),
   use_archive: p.boolean(false),
   archive_only: p.boolean(false),
-  timeout: p.string('').origin('state').ignored()
+  timeout: p.string('').origin('state').ephemeral()
 }));
 
 const ErrorViewer = () => {

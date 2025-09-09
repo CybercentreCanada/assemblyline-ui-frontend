@@ -49,7 +49,7 @@ export class SearchParamSnapshot<Blueprints extends Record<string, ParamBlueprin
 
   public omit<K extends keyof SearchParamValues<Blueprints>>(keys: K[]) {
     const values = this.valuesEntries(this.values).reduce(
-      (prev, [k, v]) => (keys.includes(k as K) ? { ...prev, [k as K]: v } : prev),
+      (prev, [k, v]) => (!keys.includes(k as K) ? { ...prev, [k as K]: v } : prev),
       {} as SearchParamValues<Blueprints>
     );
     return new SearchParamSnapshot(this.runtimes, values);

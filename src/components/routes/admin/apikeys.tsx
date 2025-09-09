@@ -20,12 +20,12 @@ import { Navigate, useLocation, useNavigate } from 'react-router';
 
 export const { SearchParamsProvider, useSearchParams } = createSearchParams(p => ({
   query: p.string(''),
-  offset: p.number(0).min(0).origin('state').ignored(),
-  rows: p.number(25).locked().origin('state').ignored(),
-  sort: p.string(null).ignored(),
+  offset: p.number(0).min(0).origin('state').ephemeral(),
+  rows: p.number(25).locked().origin('state').ephemeral(),
+  sort: p.string(null).ephemeral(),
   filters: p.filters([]),
-  track_total_hits: p.number(10000).nullable().ignored(),
-  refresh: p.boolean(false).origin('state').ignored()
+  track_total_hits: p.number(10000).nullable().ephemeral(),
+  refresh: p.boolean(false).origin('state').ephemeral()
 }));
 
 const APIKeysSearch = () => {

@@ -149,7 +149,7 @@ export abstract class BaseBlueprint<T extends ParamValues> {
       const value = search?.[this._key];
       if (this.valid(value)) return value;
     }
-    return undefined;
+    return null;
   }
 
   // -------------------------
@@ -180,49 +180,28 @@ export abstract class BaseBlueprint<T extends ParamValues> {
     location: Location,
     snapshot: SearchParamSnapshot<Blueprints> | null = null
   ): SearchParamValues<Blueprints> {
-    let raw: T | undefined;
+    let value: T | undefined;
 
-    // 1. Resolve raw value from the correct origin
     switch (this._origin) {
       case 'search': {
-        const params = new URLSearchParams(location.search);
-        raw = params.get(this._key) as T;
+        value = this.get(new URLSearchParams(location.search));
         break;
       }
       case 'state': {
-        const state = (location.state ?? {}) as Record<string, unknown>;
-        raw = state[this._key] as T;
+        value = this.get((location.state ?? {}) as Record<string, ParamValues>);
         break;
       }
       case 'snapshot': {
-        raw = snapshot?.values?.[this._key as keyof SearchParamValues<Blueprints>] as T;
+        value = this.get(snapshot?.values);
         break;
       }
       default:
-        raw = undefined;
+        value = null;
     }
 
-    // 2. Parse into expected type
-    const parsed = this.parse(raw);
-
-    // 3. If valid → keep it
-    if (this.valid(parsed)) {
-      return parsed !== prev[this._key] ? { ...prev, [this._key]: parsed } : prev;
-    }
-
-    // 4. If locked → always fall back to default
-    if (this._locked) {
-      return prev[this._key] !== this._defaultValue ? { ...prev, [this._key]: this._defaultValue } : prev;
-    }
-
-    // 5. Otherwise → keep previous snapshot value (if any)
-    const fallback = snapshot?.values?.[this._key as keyof SearchParamValues<Blueprints>];
-    if (fallback !== undefined && fallback !== prev[this._key]) {
-      return { ...prev, [this._key]: fallback };
-    }
-
-    // 6. Nothing changed
-    return { ...prev, [this._key]: this._defaultValue };
+    if (!this._locked && this.valid(value)) return { ...prev, [this._key]: value };
+    else if (this.valid(this._defaultValue)) return { ...prev, [this._key]: this._defaultValue };
+    else return prev;
   }
 
   // -------------------------
@@ -294,7 +273,7 @@ export class NumberBlueprint extends BaseBlueprint<number> {
       const value = search?.[this._key];
       if (this.valid(value)) return this.clamp(value);
     }
-    return undefined;
+    return null;
   }
 
   protected override parse(value: unknown): number {
@@ -424,8 +403,8 @@ export class FiltersBlueprint extends BaseBlueprint<string[]> {
   // Helpers
   // -------------------------
 
-  protected has(origin: string[] = null, value: string = undefined): boolean {
-    return value === undefined ? true : origin.includes(value);
+  protected has(origin: string[] = [], value: string = undefined): boolean {
+    return value === undefined ? true : origin?.includes(value);
   }
 
   protected override parse(value: unknown): string[] {
@@ -490,7 +469,26 @@ export class FiltersBlueprint extends BaseBlueprint<string[]> {
     location: Location,
     snapshot: SearchParamSnapshot<Blueprints> | null = null
   ): SearchParamValues<Blueprints> {
-    return prev;
+    let value: string[] | undefined;
+
+    switch (this._origin) {
+      case 'search': {
+        value = this.get(new URLSearchParams(location.search));
+        break;
+      }
+      case 'state': {
+        value = this.get((location.state ?? {}) as Record<string, ParamValues>);
+        break;
+      }
+      case 'snapshot': {
+        value = this.get(snapshot?.values);
+        break;
+      }
+      default:
+        value = null;
+    }
+
+    return this.append(prev, this.clean([...this._defaultValue, ...(!this._locked && value)]));
   }
 
   // -------------------------
