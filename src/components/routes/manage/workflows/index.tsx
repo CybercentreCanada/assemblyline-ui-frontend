@@ -5,10 +5,7 @@ import { Grid, IconButton, Tooltip, useTheme } from '@mui/material';
 import { useAppUser } from 'commons/components/app/hooks';
 import PageContainer from 'commons/components/pages/PageContainer';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
-import type { SearchParams } from 'components/core/SearchParams/SearchParams';
-import { createSearchParams } from 'components/core/SearchParams/SearchParams';
-import { SearchParamsProvider, useSearchParams } from 'components/core/SearchParams/SearchParamsContext';
-import type { SearchParamsResult } from 'components/core/SearchParams/SearchParser';
+import { createSearchParams } from 'components/core/SearchParams2/createSearchParams';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -32,17 +29,15 @@ type SearchResults = {
   total: number;
 };
 
-const WORKFLOWS_PARAMS = createSearchParams(p => ({
+export const { SearchParamsProvider, useSearchParams } = createSearchParams(p => ({
   query: p.string(''),
-  offset: p.number(0).min(0).hidden().ignored(),
-  rows: p.number(25).enforced().hidden().ignored(),
+  offset: p.number(0).min(0).origin('state').ignored(),
+  rows: p.number(25).locked().origin('state').ignored(),
   sort: p.string('last_seen desc').ignored(),
   filters: p.filters([]),
   track_total_hits: p.number(10000).nullable().ignored(),
-  refresh: p.boolean(false).hidden().ignored()
+  refresh: p.boolean(false).origin('state').ignored()
 }));
-
-type WorkflowsParams = SearchParams<typeof WORKFLOWS_PARAMS>;
 
 const WorkflowsSearch = () => {
   const { t } = useTranslation(['manageWorkflows']);
@@ -53,7 +48,7 @@ const WorkflowsSearch = () => {
   const { indexes } = useALContext();
   const { user: currentUser } = useAppUser<CustomUser>();
   const { globalDrawerOpened, setGlobalDrawer, closeGlobalDrawer } = useDrawer();
-  const { search, setSearchParams, setSearchObject } = useSearchParams<WorkflowsParams>();
+  const { search, setSearchParams, setSearchObject } = useSearchParams();
 
   const [workflowResults, setWorkflowResults] = useState<SearchResults>(null);
   const [searching, setSearching] = useState<boolean>(false);
@@ -74,7 +69,7 @@ const WorkflowsSearch = () => {
   );
 
   const handleReload = useCallback(
-    (body: SearchParamsResult<WorkflowsParams>) => {
+    (body: typeof search) => {
       if (!currentUser.roles.includes('workflow_view')) return;
 
       apiCall({
@@ -224,7 +219,7 @@ const WorkflowsSearch = () => {
 };
 
 const WrappedWorkflowsPage = () => (
-  <SearchParamsProvider params={WORKFLOWS_PARAMS}>
+  <SearchParamsProvider>
     <WorkflowsSearch />
   </SearchParamsProvider>
 );

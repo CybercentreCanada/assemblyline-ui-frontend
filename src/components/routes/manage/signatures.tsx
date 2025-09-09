@@ -24,12 +24,12 @@ import { useLocation, useNavigate } from 'react-router';
 
 export const { SearchParamsProvider, useSearchParams } = createSearchParams(p => ({
   query: p.string(''),
-  offset: p.number(0).min(0).source('state').ignored(),
-  rows: p.number(25).enforced().source('state').ignored(),
-  sort: p.string('type asc').ignored(),
+  offset: p.number(0).min(0).origin('state').ephemeral(),
+  rows: p.number(25).locked().origin('state').ephemeral(),
+  sort: p.string('type asc').ephemeral(),
   filters: p.filters([]),
-  track_total_hits: p.number(10000).nullable().ignored(),
-  refresh: p.boolean(false).source('ref').ignored()
+  track_total_hits: p.number(10000).nullable().ephemeral(),
+  refresh: p.boolean(false).origin('snapshot').ephemeral()
 }));
 
 const SignaturesSearch = () => {
@@ -42,7 +42,7 @@ const SignaturesSearch = () => {
   const { indexes } = useALContext();
   const { user: currentUser } = useAppUser<CustomUser>();
   const { globalDrawerOpened, setGlobalDrawer, closeGlobalDrawer } = useDrawer();
-  const search = useSearchParams();
+  const { search, setSearchParams, setSearchObject } = useSearchParams();
 
   const [signatureResults, setSignatureResults] = useState<SearchResult<Signature>>(null);
   const [searching, setSearching] = useState<boolean>(false);
@@ -56,7 +56,7 @@ const SignaturesSearch = () => {
 
   const downloadLink = useMemo<string>(
     () =>
-      search.snapshot
+      search
         .set(o => ({ ...o, query: [o.query || '*', ...o.filters].join(' && ') }))
         .pick(['query'])
         .toString(),
@@ -65,16 +65,16 @@ const SignaturesSearch = () => {
 
   const handleToggleFilter = useCallback(
     (filter: string) => {
-      search.setObject(o => {
+      setSearchObject(o => {
         const filters = o.filters.includes(filter) ? o.filters.filter(f => f !== filter) : [...o.filters, filter];
         return { ...o, offset: 0, filters };
       });
     },
-    [search]
+    [setSearchObject]
   );
 
   const handleReload = useCallback(
-    body => {
+    (body: typeof search) => {
       if (!currentUser.roles.includes('signature_view')) return;
 
       apiCall<SearchResult<Signature>>({
@@ -131,21 +131,19 @@ const SignaturesSearch = () => {
   }, [location.hash]);
 
   useEffect(() => {
-    handleReload(search.snapshot);
-  }, [handleReload, search.snapshot]);
+    handleReload(search);
+  }, [handleReload, search]);
 
   useEffect(() => {
     function reload() {
-      search.setObject(o => ({ ...o, offset: 0, refresh: !o.refresh }));
+      setSearchObject(o => ({ ...o, offset: 0, refresh: !o.refresh }));
     }
 
     window.addEventListener('reloadSignatures', reload);
     return () => {
       window.removeEventListener('reloadSignatures', reload);
     };
-  }, []);
-
-  console.log(location);
+  }, [setSearchObject]);
 
   return currentUser.roles.includes('signature_view') ? (
     <PageFullWidth margin={4}>
@@ -166,39 +164,37 @@ const SignaturesSearch = () => {
       <PageContainer isSticky>
         <div style={{ paddingTop: theme.spacing(1) }}>
           <SearchHeader
-            params={search.snapshot.toParams()}
+            params={search.toParams()}
             loading={searching}
             results={signatureResults}
             resultLabel={
-              search.snapshot.get('query')
+              search.get('query')
                 ? t(`filtered${signatureResults?.total === 1 ? '' : 's'}`)
                 : t(`total${signatureResults?.total === 1 ? '' : 's'}`)
             }
-            onChange={v => search.setParams(v)}
-            paramDefaults={search.snapshot.defaults().toObject()}
+            onChange={v => setSearchParams(v)}
+            paramDefaults={search.defaults().toObject()}
             searchInputProps={{ placeholder: t('filter'), options: suggestions }}
             actionProps={[
               {
                 tooltip: {
-                  title: search.snapshot.has('filters', 'status:NOISY')
-                    ? t('filter.noisy.remove')
-                    : t('filter.noisy.add')
+                  title: search.has('filters', 'status:NOISY') ? t('filter.noisy.remove') : t('filter.noisy.add')
                 },
                 icon: { children: <RecordVoiceOverOutlinedIcon /> },
                 button: {
-                  color: search.snapshot.has('filters', 'status:NOISY') ? 'primary' : 'default',
+                  color: search.has('filters', 'status:NOISY') ? 'primary' : 'default',
                   onClick: () => handleToggleFilter('status:NOISY')
                 }
               },
               {
                 tooltip: {
-                  title: search.snapshot.has('filters', 'status:DISABLED')
+                  title: search.has('filters', 'status:DISABLED')
                     ? t('filter.disabled.remove')
                     : t('filter.disabled.add')
                 },
                 icon: { children: <BlockIcon /> },
                 button: {
-                  color: search.snapshot.has('filters', 'status:DISABLED') ? 'primary' : 'default',
+                  color: search.has('filters', 'status:DISABLED') ? 'primary' : 'default',
                   onClick: () => handleToggleFilter('status:DISABLED')
                 }
               }

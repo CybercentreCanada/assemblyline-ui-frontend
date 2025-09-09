@@ -26,11 +26,11 @@ type SearchResults = {
 
 export const { SearchParamsProvider, useSearchParams } = createSearchParams(p => ({
   query: p.string(''),
-  offset: p.number(0).min(0).source('state').ignored(),
-  rows: p.number(25).enforced().source('ref').ignored(),
-  sort: p.string('times.submitted desc').ignored(),
+  offset: p.number(0).min(0).origin('state').ephemeral(),
+  rows: p.number(25).locked().origin('snapshot').ephemeral(),
+  sort: p.string('times.submitted desc').ephemeral(),
   filters: p.filters([]),
-  track_total_hits: p.number(10000).source('state').nullable().ignored()
+  track_total_hits: p.number(10000).origin('state').nullable().ephemeral()
 }));
 
 const SubmissionSearch = () => {
@@ -38,7 +38,7 @@ const SubmissionSearch = () => {
   const theme = useTheme();
   const { apiCall } = useMyAPI();
   const { user: currentUser, indexes } = useALContext();
-  const search = useSearchParams();
+  const { search, setSearchParams, setSearchObject } = useSearchParams();
 
   const [submissionResults, setSubmissionResults] = useState<SearchResults>(null);
   const [searching, setSearching] = useState<boolean>(false);
@@ -50,23 +50,21 @@ const SubmissionSearch = () => {
 
   const handleToggleFilter = useCallback(
     (filter: string) => {
-      search.setObject(o => {
+      setSearchObject(o => {
         const filters = o.filters.includes(filter) ? o.filters.filter(f => f !== filter) : [...o.filters, filter];
         return { ...o, offset: 0, filters };
       });
     },
-    [search]
+    [setSearchObject]
   );
 
   useEffect(() => {
     if (!search || !currentUser.roles.includes('submission_view')) return;
 
-    console.log(search.snapshot);
-
     apiCall({
       url: '/api/v4/search/submission/',
       method: 'POST',
-      body: search.snapshot
+      body: search
         .set(o => ({ ...o, query: o.query || '*', filters: [...o.filters, 'NOT(to_be_deleted:true)'] }))
         .toObject(),
       onSuccess: ({ api_response }) => setSubmissionResults(api_response as SearchResults),
@@ -75,7 +73,7 @@ const SubmissionSearch = () => {
     });
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentUser.roles, search.snapshot]);
+  }, [currentUser.roles, search]);
 
   return currentUser.roles.includes('submission_view') ? (
     <PageFullWidth margin={4}>
@@ -86,27 +84,27 @@ const SubmissionSearch = () => {
       <PageContainer isSticky>
         <div style={{ paddingTop: theme.spacing(1) }}>
           <SearchHeader
-            params={search.snapshot.toParams()}
+            params={search.toParams()}
             loading={searching}
             results={submissionResults}
             resultLabel={
-              search.snapshot.get('query')
+              search.get('query')
                 ? t(`filtered${submissionResults?.total === 1 ? '' : 's'}`)
                 : t(`total${submissionResults?.total === 1 ? '' : 's'}`)
             }
-            onChange={v => search.setParams(v)}
-            paramDefaults={search.snapshot.defaults().toObject()}
+            onChange={v => setSearchParams(v)}
+            paramDefaults={search.defaults().toObject()}
             searchInputProps={{ placeholder: t('filter'), options: suggestions }}
             actionProps={[
               {
                 tooltip: {
-                  title: search.snapshot.has('filters', `params.submitter:${safeFieldValue(currentUser.username)}`)
+                  title: search.has('filters', `params.submitter:${safeFieldValue(currentUser.username)}`)
                     ? t('filter.personal.remove')
                     : t('filter.personal.add')
                 },
                 icon: { children: <PersonIcon /> },
                 button: {
-                  color: search.snapshot.has('filters', `params.submitter:${safeFieldValue(currentUser.username)}`)
+                  color: search.has('filters', `params.submitter:${safeFieldValue(currentUser.username)}`)
                     ? 'primary'
                     : 'default',
                   onClick: () => handleToggleFilter(`params.submitter:${safeFieldValue(currentUser.username)}`)
@@ -114,14 +112,14 @@ const SubmissionSearch = () => {
               },
               {
                 tooltip: {
-                  title: search.snapshot.has('filters', 'state:completed')
+                  title: search.has('filters', 'state:completed')
                     ? t('filter.completed.remove')
                     : t('filter.completed.add')
                 },
                 icon: { children: <AssignmentTurnedInIcon /> },
                 button: {
                   sx: {
-                    color: !search.snapshot.has('filters', 'state:completed')
+                    color: !search.has('filters', 'state:completed')
                       ? 'default'
                       : theme.palette.mode === 'dark'
                         ? theme.palette.success.light
@@ -132,14 +130,14 @@ const SubmissionSearch = () => {
               },
               {
                 tooltip: {
-                  title: search.snapshot.has('filters', 'max_score:>=1000')
+                  title: search.has('filters', 'max_score:>=1000')
                     ? t('filter.malicious.remove')
                     : t('filter.malicious.add')
                 },
                 icon: { children: <BugReportOutlinedIcon /> },
                 button: {
                   sx: {
-                    color: !search.snapshot.has('filters', 'max_score:>=1000')
+                    color: !search.has('filters', 'max_score:>=1000')
                       ? 'default'
                       : theme.palette.mode === 'dark'
                         ? theme.palette.error.light

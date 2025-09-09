@@ -3,10 +3,7 @@ import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount';
 import { useTheme } from '@mui/material';
 import PageContainer from 'commons/components/pages/PageContainer';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
-import type { SearchParams } from 'components/core/SearchParams/SearchParams';
-import { createSearchParams } from 'components/core/SearchParams/SearchParams';
-import { SearchParamsProvider, useSearchParams } from 'components/core/SearchParams/SearchParamsContext';
-import type { SearchParamsResult } from 'components/core/SearchParams/SearchParser';
+import { createSearchParams } from 'components/core/SearchParams2/createSearchParams';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import type { UserIndexed } from 'components/models/base/user';
@@ -20,24 +17,22 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate } from 'react-router';
 
-const USERS_PARAMS = createSearchParams(p => ({
+export const { SearchParamsProvider, useSearchParams } = createSearchParams(p => ({
   query: p.string(''),
-  offset: p.number(0).min(0).hidden().ignored(),
-  rows: p.number(25).enforced().hidden().ignored(),
+  offset: p.number(0).min(0).origin('state').ignored(),
+  rows: p.number(25).locked().origin('state').ignored(),
   sort: p.string(null).nullable().ignored(),
   filters: p.filters([]),
   track_total_hits: p.number(10000).nullable().ignored(),
-  refresh: p.boolean(false).hidden().ignored()
+  refresh: p.boolean(false).origin('state').ignored()
 }));
-
-type UsersParams = SearchParams<typeof USERS_PARAMS>;
 
 const UsersSearch = () => {
   const { t } = useTranslation(['adminUsers']);
   const theme = useTheme();
   const { apiCall } = useMyAPI();
   const { user: currentUser } = useALContext();
-  const { search, setSearchParams, setSearchObject } = useSearchParams<UsersParams>();
+  const { search, setSearchParams, setSearchObject } = useSearchParams();
 
   const [userResults, setUserResults] = useState<SearchResult<UserIndexed>>(null);
   const [searching, setSearching] = useState<boolean>(false);
@@ -54,7 +49,7 @@ const UsersSearch = () => {
   );
 
   const handleReload = useCallback(
-    (body: SearchParamsResult<UsersParams>) => {
+    (body: typeof search) => {
       if (!currentUser.is_admin) return;
 
       const param = body
@@ -161,7 +156,7 @@ const UsersSearch = () => {
 };
 
 const WrappedUsersPage = () => (
-  <SearchParamsProvider params={USERS_PARAMS}>
+  <SearchParamsProvider>
     <UsersSearch />
   </SearchParamsProvider>
 );

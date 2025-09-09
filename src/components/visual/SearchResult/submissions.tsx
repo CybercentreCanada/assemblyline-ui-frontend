@@ -34,7 +34,7 @@ type Props = {
 const WrappedSubmissionsTable: React.FC<Props> = ({ submissionResults, allowSort = true }) => {
   const { t } = useTranslation(['search']);
   const { c12nDef } = useALContext();
-  const search = useSearchParams();
+  const { search, setSearchObject } = useSearchParams();
 
   return submissionResults ? (
     submissionResults.total !== 0 ? (
@@ -102,7 +102,7 @@ const WrappedSubmissionsTable: React.FC<Props> = ({ submissionResults, allowSort
                       onClick={event => {
                         event.preventDefault();
                         event.stopPropagation();
-                        search?.setObject(o => ({
+                        setSearchObject(o => ({
                           ...o,
                           offset: 0,
                           filters: [...o.filters, `params.submitter:"${submission.params.submitter}"`]

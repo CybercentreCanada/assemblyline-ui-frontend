@@ -7,9 +7,7 @@ import { useAppUser } from 'commons/components/app/hooks';
 import PageContainer from 'commons/components/pages/PageContainer';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import { useALQuery } from 'components/core/Query/AL/useALQuery';
-import type { SearchParams } from 'components/core/SearchParams/SearchParams';
-import { createSearchParams } from 'components/core/SearchParams/SearchParams';
-import { SearchParamsProvider, useSearchParams } from 'components/core/SearchParams/SearchParamsContext';
+import { createSearchParams } from 'components/core/SearchParams2/createSearchParams';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import type { CustomUser } from 'components/models/ui/user';
@@ -25,17 +23,15 @@ import React, { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
 
-const BADLIST_PARAMS = createSearchParams(p => ({
+export const { SearchParamsProvider, useSearchParams } = createSearchParams(p => ({
   query: p.string(''),
-  offset: p.number(0).min(0).hidden().ignored(),
-  rows: p.number(25).enforced().hidden().ignored(),
+  offset: p.number(0).min(0).origin('state').ignored(),
+  rows: p.number(25).locked().origin('state').ignored(),
   sort: p.string('added desc').ignored(),
   filters: p.filters([]),
   track_total_hits: p.number(10000).nullable().ignored(),
-  refresh: p.boolean(false).hidden().ignored()
+  refresh: p.boolean(false).origin('state').ignored()
 }));
-
-export type BadlistParams = SearchParams<typeof BADLIST_PARAMS>;
 
 const BadlistSearch = () => {
   const { t } = useTranslation(['manageBadlist']);
@@ -45,7 +41,7 @@ const BadlistSearch = () => {
   const { indexes } = useALContext();
   const { user: currentUser } = useAppUser<CustomUser>();
   const { globalDrawerOpened, setGlobalDrawer, closeGlobalDrawer } = useDrawer();
-  const { search, setSearchParams, setSearchObject } = useSearchParams<BadlistParams>();
+  const { search, setSearchParams, setSearchObject } = useSearchParams();
 
   const suggestions = useMemo<string[]>(
     () =>
@@ -177,7 +173,7 @@ const BadlistSearch = () => {
 };
 
 const WrappedBadlistPage = () => (
-  <SearchParamsProvider params={BADLIST_PARAMS}>
+  <SearchParamsProvider>
     <BadlistSearch />
   </SearchParamsProvider>
 );
