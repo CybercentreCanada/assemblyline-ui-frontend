@@ -366,10 +366,9 @@ const SearchTextField: React.FC<SearchTextFieldProps> = ({
           >
             <div
               style={{
-                display: 'grid',
-                gridTemplateColumns: 'auto 1fr',
+                display: 'inline-block',
                 position: 'absolute',
-                overflowY: 'auto',
+                overflow: 'auto',
                 zIndex: 1,
                 top: theme.spacing(1),
                 minWidth: '100%',
@@ -413,17 +412,15 @@ const SearchTextOption: React.FC<{
       data-searchtextfieldoption-selected={selected}
       onClick={() => onSelection()}
       sx={{
-        display: 'contents',
-        '&>div': {
-          display: 'grid',
-          alignItems: 'center',
-          padding: theme.spacing(1)
-        },
-        '&:hover>div': {
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr',
+        alignItems: 'center',
+        padding: theme.spacing(1),
+        '&:hover': {
           cursor: 'pointer',
           backgroundColor: theme.palette.action.hover
         },
-        '&[data-searchtextfieldoption-selected="true"]>div': {
+        '&[data-searchtextfieldoption-selected="true"]': {
           backgroundColor: theme.palette.action.selected
         }
       }}
