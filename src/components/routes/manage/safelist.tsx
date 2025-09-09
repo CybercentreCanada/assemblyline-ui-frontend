@@ -12,7 +12,7 @@ import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import type { Safelist } from 'components/models/base/safelist';
 import type { SearchResult } from 'components/models/ui/search';
-import type { CustomUser } from 'components/models/ui/user';
+import type { CustomUser, IndexDefinition } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
 import SafelistNew from 'components/routes/manage/safelist_add';
 import SafelistDetail from 'components/routes/manage/safelist_detail';
@@ -49,11 +49,8 @@ const SafelistSearch = () => {
   const [safelistResults, setSafelistResults] = useState<SearchResult<Safelist>>(null);
   const [searching, setSearching] = useState<boolean>(false);
 
-  const suggestions = useMemo<string[]>(
-    () =>
-      indexes.safelist
-        ? [...Object.keys(indexes.safelist).filter(name => indexes.safelist[name].indexed), ...DEFAULT_SUGGESTION]
-        : [...DEFAULT_SUGGESTION],
+  const suggestions = useMemo<IndexDefinition>(
+    () => ({ ...indexes.safelist, ...DEFAULT_SUGGESTION }),
     [indexes.safelist]
   );
 

@@ -1,9 +1,9 @@
 import { Grid, Skeleton, Typography, useTheme } from '@mui/material';
 import PageCenter from 'commons/components/pages/PageCenter';
+import { useAPIQuery } from 'components/core/Query/API/useAPIQuery';
 import useALContext from 'components/hooks/useALContext';
-import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
-import type { Workflow } from 'components/models/base/workflow';
+import { PRIORITIES, STATUSES, type Workflow } from 'components/models/base/workflow';
 import ForbiddenPage from 'components/routes/403';
 import {
   DeleteWorkflowAction,
@@ -15,24 +15,14 @@ import {
 } from 'components/routes/manage/workflows/components/Actions';
 import { AlertHistogram, AlertResults } from 'components/routes/manage/workflows/components/Data';
 import Classification from 'components/visual/Classification';
-import CustomChip from 'components/visual/CustomChip';
+import { ChipsInput } from 'components/visual/Inputs/ChipsInput';
+import { SelectInput } from 'components/visual/Inputs/SelectInput';
+import { TextInput } from 'components/visual/Inputs/TextInput';
 import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import Moment from 'components/visual/Moment';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useParams } from 'react-router';
-
-const CUSTOMCHIP_STYLES = {
-  borderRadius: '4px',
-  height: 'auto',
-  justifyContent: 'flex-start',
-  marginBottom: '4px',
-  marginTop: '8px',
-  minHeight: '40px',
-  overflow: 'auto',
-  textOverflow: 'initial',
-  whiteSpace: 'wrap'
-};
 
 type Params = {
   id: string;
@@ -47,38 +37,19 @@ const WrappedWorkflowDetail = ({ id: propID = null, onClose = null }: Props) => 
   const { t } = useTranslation(['manageWorkflowDetail']);
   const { id: paramID } = useParams<Params>();
   const theme = useTheme();
-  const { apiCall } = useMyAPI();
   const { c12nDef, user: currentUser } = useALContext();
   const { showErrorMessage } = useMySnackbar();
 
-  const [workflow, setWorkflow] = useState<Workflow>(null);
-
   const id = useMemo<string>(() => propID || paramID, [paramID, propID]);
 
-  const handleReload = useCallback(() => {
-    if (!id || !currentUser.roles.includes('workflow_view')) return;
-
-    apiCall<Workflow>({
-      url: `/api/v4/workflow/${id}/`,
-      onSuccess: ({ api_response }) => {
-        setWorkflow({
-          ...api_response,
-          status: api_response.status || '',
-          priority: api_response.priority || '',
-          enabled: api_response.enabled === undefined ? true : api_response.enabled
-        });
-      },
-      onFailure: api_data => {
-        showErrorMessage(api_data.api_error_message);
-        !onClose ? null : onClose();
-      }
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentUser.roles, id, onClose]);
-
-  useEffect(() => {
-    handleReload();
-  }, [handleReload]);
+  const workflow = useAPIQuery<Workflow>({
+    url: `/api/v4/workflow/${id}/`,
+    disabled: !id || !currentUser.roles.includes('workflow_view'),
+    onFailure: ({ api_error_message }) => {
+      showErrorMessage(api_error_message);
+      !onClose ? null : onClose();
+    }
+  });
 
   if (!currentUser.roles.includes('workflow_view')) return <ForbiddenPage />;
   else
@@ -86,7 +57,7 @@ const WrappedWorkflowDetail = ({ id: propID = null, onClose = null }: Props) => 
       <PageCenter margin={2} width="100%">
         {c12nDef.enforce && (
           <div style={{ paddingBottom: theme.spacing(2) }}>
-            <Classification type="outlined" c12n={!workflow ? null : workflow.classification} />
+            <Classification type="outlined" c12n={workflow.isFetching ? null : workflow.data.classification} />
           </div>
         )}
 
@@ -100,106 +71,67 @@ const WrappedWorkflowDetail = ({ id: propID = null, onClose = null }: Props) => 
             }}
             actions={
               <>
-                <RunWorkflowAction id={id} workflow={workflow} />
-                <ShowRelatedAlertsAction id={id} workflow={workflow} />
-                <DuplicateWorkflowAction id={id} workflow={workflow} />
-                <EditWorkflowAction id={id} workflow={workflow} />
-                <EnableWorkflowAction
-                  id={id}
-                  workflow={workflow}
-                  onChange={enabled => setWorkflow(wf => ({ ...wf, enabled: enabled }))}
-                />
-                <DeleteWorkflowAction id={id} workflow={workflow} />
+                <RunWorkflowAction id={id} workflow={workflow.data} />
+                <ShowRelatedAlertsAction id={id} workflow={workflow.data} />
+                <DuplicateWorkflowAction id={id} workflow={workflow.data} />
+                <EditWorkflowAction id={id} workflow={workflow.data} />
+                <EnableWorkflowAction id={id} workflow={workflow.data} onChange={() => workflow.refetch()} />
+                <DeleteWorkflowAction id={id} workflow={workflow.data} />
               </>
             }
           />
 
           <Grid container spacing={2}>
             <Grid size={{ xs: 12 }}>
-              <Typography variant="subtitle2">{t('name')}</Typography>
-              {!workflow ? (
-                <Skeleton style={{ height: '2.5rem' }} />
-              ) : (
-                <CustomChip
-                  label={<Typography variant="subtitle1">{workflow.name}</Typography>}
-                  fullWidth
-                  size="medium"
-                  type="rounded"
-                  variant="outlined"
-                  style={CUSTOMCHIP_STYLES}
-                />
-              )}
+              <TextInput
+                label={t('name')}
+                readOnly
+                loading={workflow.isFetching}
+                value={workflow.isFetching ? null : workflow.data.name}
+              />
             </Grid>
+
             <Grid size={{ xs: 12 }}>
-              <Typography variant="subtitle2">{t('query')}</Typography>
-              {!workflow ? (
-                <Skeleton style={{ height: '2.5rem' }} />
-              ) : (
-                <CustomChip
-                  label={<Typography variant="subtitle1">{workflow.query}</Typography>}
-                  fullWidth
-                  size="medium"
-                  type="rounded"
-                  variant="outlined"
-                  style={CUSTOMCHIP_STYLES}
-                />
-              )}
+              <TextInput
+                label={t('query')}
+                readOnly
+                loading={workflow.isFetching}
+                value={workflow.isFetching ? null : workflow.data.query}
+              />
             </Grid>
+
             <Grid size={{ xs: 12 }}>
-              <Typography variant="subtitle2">{t('labels')}</Typography>
-              {!workflow ? (
-                <Skeleton style={{ height: '2.5rem' }} />
-              ) : (
-                <CustomChip
-                  label={
-                    <div style={{ display: 'flex', gap: theme.spacing(1), padding: '9px 0px' }}>
-                      {workflow.labels.map((label, i) => (
-                        <CustomChip key={i} label={label} />
-                      ))}
-                    </div>
-                  }
-                  fullWidth
-                  size="medium"
-                  type="rounded"
-                  variant="outlined"
-                  style={CUSTOMCHIP_STYLES}
-                />
-              )}
+              <ChipsInput
+                label={t('labels')}
+                readOnly
+                loading={workflow.isFetching}
+                value={workflow.isFetching ? null : workflow.data.labels}
+              />
             </Grid>
+
             <Grid size={{ xs: 12, sm: 6 }}>
-              <Typography variant="subtitle2">{t('priority')}</Typography>
-              {!workflow ? (
-                <Skeleton style={{ height: '2.5rem' }} />
-              ) : (
-                <CustomChip
-                  label={<Typography variant="subtitle1">{workflow.priority}</Typography>}
-                  fullWidth
-                  size="medium"
-                  type="rounded"
-                  variant="outlined"
-                  style={CUSTOMCHIP_STYLES}
-                />
-              )}
+              <SelectInput
+                label={t('priority')}
+                readOnly
+                loading={workflow.isFetching}
+                value={workflow.isFetching ? null : workflow.data.priority}
+                options={PRIORITIES.map(v => ({ primary: v, value: v }))}
+              />
             </Grid>
+
             <Grid size={{ xs: 12, sm: 6 }}>
-              <Typography variant="subtitle2">{t('status')}</Typography>
-              {!workflow ? (
-                <Skeleton style={{ height: '2.5rem' }} />
-              ) : (
-                <CustomChip
-                  label={<Typography variant="subtitle1">{workflow.status}</Typography>}
-                  fullWidth
-                  size="medium"
-                  type="rounded"
-                  variant="outlined"
-                  style={CUSTOMCHIP_STYLES}
-                />
-              )}
+              <SelectInput
+                label={t('status')}
+                readOnly
+                loading={workflow.isFetching}
+                value={workflow.isFetching ? null : workflow.data.status}
+                options={STATUSES.map(v => ({ primary: v, value: v }))}
+              />
             </Grid>
           </Grid>
 
           <Grid style={{ paddingTop: theme.spacing(4) }}>
-            <Grid container size="grow">
+            <Grid container size="grow" columnSpacing={2}>
               <Grid size={{ xs: 12 }}>
                 <Typography variant="h6">{t('statistics')}</Typography>
               </Grid>
@@ -211,13 +143,17 @@ const WrappedWorkflowDetail = ({ id: propID = null, onClose = null }: Props) => 
                   <Grid size={{ xs: 3, sm: 4, md: 3, lg: 3 }}>
                     <span style={{ fontWeight: 500 }}>{t('hit.count')}</span>
                   </Grid>
-                  <Grid size={{ xs: 9, sm: 8, md: 9, lg: 9 }}>{workflow ? workflow.hit_count : 0}</Grid>
+                  <Grid size={{ xs: 9, sm: 8, md: 9, lg: 9 }}>
+                    {workflow.isFetching ? <Skeleton /> : workflow.data?.hit_count ? workflow.data.hit_count : 0}
+                  </Grid>
                   <Grid size={{ xs: 3, sm: 4, md: 3, lg: 3 }}>
                     <span style={{ fontWeight: 500 }}>{t('hit.first')}</span>
                   </Grid>
                   <Grid size={{ xs: 9, sm: 8, md: 9, lg: 9 }}>
-                    {workflow && workflow.first_seen ? (
-                      <Moment variant="fromNow">{workflow.first_seen}</Moment>
+                    {workflow.isFetching ? (
+                      <Skeleton />
+                    ) : workflow.data?.first_seen ? (
+                      <Moment variant="fromNow">{workflow.data.first_seen}</Moment>
                     ) : (
                       t('hit.none')
                     )}
@@ -226,8 +162,10 @@ const WrappedWorkflowDetail = ({ id: propID = null, onClose = null }: Props) => 
                     <span style={{ fontWeight: 500 }}>{t('hit.last')}</span>
                   </Grid>
                   <Grid size={{ xs: 9, sm: 8, md: 9, lg: 9 }}>
-                    {workflow && workflow.last_seen ? (
-                      <Moment variant="fromNow">{workflow.last_seen}</Moment>
+                    {workflow.isFetching ? (
+                      <Skeleton />
+                    ) : workflow.data?.last_seen ? (
+                      <Moment variant="fromNow">{workflow.data.last_seen}</Moment>
                     ) : (
                       t('hit.none')
                     )}
@@ -243,31 +181,31 @@ const WrappedWorkflowDetail = ({ id: propID = null, onClose = null }: Props) => 
                     <span style={{ fontWeight: 500 }}>{t('created_by')}:</span>
                   </Grid>
                   <Grid size={{ xs: 9, sm: 8, md: 9, lg: 9 }}>
-                    {workflow && workflow.creator ? (
-                      <>
-                        {workflow.creator} [<Moment variant="fromNow">{workflow.creation_date}</Moment>]
-                      </>
-                    ) : (
+                    {workflow.isFetching ? (
                       <Skeleton />
+                    ) : !workflow.data?.creator ? null : (
+                      <>
+                        {workflow.data.creator} [<Moment variant="fromNow">{workflow.data.creation_date}</Moment>]
+                      </>
                     )}
                   </Grid>
                   <Grid size={{ xs: 3, sm: 4, md: 3, lg: 3 }}>
                     <span style={{ fontWeight: 500 }}>{t('edited_by')}:</span>
                   </Grid>
                   <Grid size={{ xs: 9, sm: 8, md: 9, lg: 9 }}>
-                    {workflow && workflow.edited_by ? (
-                      <>
-                        {workflow.edited_by} [<Moment variant="fromNow">{workflow.last_edit}</Moment>]
-                      </>
-                    ) : (
+                    {workflow.isFetching ? (
                       <Skeleton />
+                    ) : !workflow.data?.edited_by ? null : (
+                      <>
+                        {workflow.data.edited_by} [<Moment variant="fromNow">{workflow.data.last_edit}</Moment>]
+                      </>
                     )}
                   </Grid>
                   <Grid size={{ xs: 3, sm: 4, md: 3, lg: 3 }}>
                     <span style={{ fontWeight: 500 }}>{t('origin')}:</span>
                   </Grid>
                   <Grid size={{ xs: 9, sm: 8, md: 9, lg: 9 }}>
-                    {workflow && workflow ? workflow.origin : <Skeleton />}
+                    {workflow.isFetching ? <Skeleton /> : workflow.data.origin}
                   </Grid>
                 </Grid>
               </Grid>

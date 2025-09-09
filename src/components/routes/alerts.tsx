@@ -8,7 +8,7 @@ import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import type { Alert, AlertIndexed, AlertItem } from 'components/models/base/alert';
 import type { Workflow } from 'components/models/base/workflow';
-import type { CustomUser } from 'components/models/ui/user';
+import type { CustomUser, IndexDefinition } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
 import AlertActions from 'components/routes/alerts/components/Actions';
 import AlertDefaultSearchParameters from 'components/routes/alerts/components/DefaultSearchParameters';
@@ -25,6 +25,7 @@ import type { SearchParams } from 'components/routes/alerts/utils/SearchParams';
 import type { SearchResult } from 'components/routes/alerts/utils/SearchParser';
 import { WorkflowCreate } from 'components/routes/manage/workflows/create';
 import { IconButton } from 'components/visual/Buttons/IconButton';
+import { DateTimeRangePicker } from 'components/visual/DateTime/DateTimeRangePicker';
 import InformativeAlert from 'components/visual/InformativeAlert';
 import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import { DEFAULT_SUGGESTION } from 'components/visual/SearchBar/search-textfield';
@@ -64,7 +65,7 @@ export const ALERT_DEFAULT_PARAMS = {
   rows: PAGE_SIZE,
   sort: 'reporting_ts desc',
   tc_start: '',
-  tc: '4d',
+  tc: '[now-4d TO now]',
   track_total_hits: 10000,
   refresh: false
 };
@@ -92,19 +93,13 @@ const WrappedAlertsContent = () => {
 
   const isLGDown = useMediaQuery(theme.breakpoints.down('lg'));
 
-  const suggestions = useMemo<string[]>(
-    () =>
-      'alert' in indexes
-        ? [...Object.keys(indexes.alert).map(name => name), ...DEFAULT_SUGGESTION]
-        : DEFAULT_SUGGESTION,
-    [indexes]
-  );
+  const suggestions = useMemo<IndexDefinition>(() => ({ ...indexes.alert, ...DEFAULT_SUGGESTION }), [indexes]);
 
   const handleFetch = useCallback(
     (body: SearchResult<AlertSearchParams>) => {
       if (!currentUser.roles.includes('alert_view')) return;
 
-      const query = body.filter((k, v) => !['tc_start'].includes(k)).toParams();
+      const query = body.filter(k => !['tc_start'].includes(k)).toParams();
       query.sort();
       if (query.toString() === prevSearch.current) return;
       prevSearch.current = query.toString();
@@ -112,14 +107,23 @@ const WrappedAlertsContent = () => {
       const groupBy = query.get('group_by');
       const pathname = groupBy !== '' ? `/api/v4/alert/grouped/${groupBy}/` : `/api/v4/alert/list/`;
 
-      let query2 = body.filter((k, v) => !['refresh'].includes(k));
+      let query2 = body.filter(k => !['refresh'].includes(k));
       if (Number(query2.get('offset') || 0) === 0) {
         query2 = query2.set(o => ({ ...o, tc_start: '' }));
         setScrollReset(true);
       }
 
+      const query3 = query2.toParams();
+      if (query3.has('tc')) {
+        const tcValue = query3.get('tc');
+        if (tcValue) {
+          query3.delete('tc');
+          query3.append('fq', `reporting_ts:${tcValue}`);
+        }
+      }
+
       apiCall<ListResponse | GroupedResponse>({
-        url: `${pathname}?${query2.toString()}`,
+        url: `${pathname}?${query3.toString()}`,
         method: 'GET',
         onSuccess: ({ api_response }) => {
           if ('tc_start' in api_response) {
@@ -137,10 +141,7 @@ const WrappedAlertsContent = () => {
           setCountedTotal('counted_total' in api_response ? api_response.counted_total : api_response.items.length);
           setTotal(api_response.total);
         },
-
-        onEnter: () => {
-          setLoading(true);
-        },
+        onEnter: () => setLoading(true),
         onExit: () => {
           setLoading(false);
           setScrollReset(false);
@@ -247,6 +248,26 @@ const WrappedAlertsContent = () => {
           }}
           actions={
             <>
+              <DateTimeRangePicker
+                value={(() => {
+                  try {
+                    if (search.has('tc')) {
+                      const raw = search.get('tc');
+                      const match = raw.match(/^\[(.+) TO (.+)\]$/);
+                      if (match) {
+                        return { start: match[1], end: match[2] };
+                      }
+                    }
+                  } catch (err) {
+                    console.error('Failed to parse tc value:', err);
+                  }
+
+                  const def = ALERT_DEFAULT_PARAMS.tc.toString();
+                  const match = def.match(/^\[(.+) TO (.+)\]$/);
+                  return { start: match[1], end: match[2] };
+                })()}
+                onChange={(e, { start, end }) => setSearchObject(o => ({ ...o, tc: `[${start} TO ${end}]` }))}
+              />
               <AlertDefaultSearchParameters key="default-search-parameters" />
               <IconButton
                 preventRender={!currentUser.roles.includes('workflow_manage')}

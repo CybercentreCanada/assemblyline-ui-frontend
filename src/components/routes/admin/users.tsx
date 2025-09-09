@@ -8,6 +8,7 @@ import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import type { UserIndexed } from 'components/models/base/user';
 import type { SearchResult } from 'components/models/ui/search';
+import type { IndexDefinition } from 'components/models/ui/user';
 import { AddUserPage } from 'components/routes/admin/users_add';
 import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import { SearchHeader } from 'components/visual/SearchBar/SearchHeader';
@@ -36,7 +37,7 @@ const UsersSearch = () => {
 
   const [userResults, setUserResults] = useState<SearchResult<UserIndexed>>(null);
   const [searching, setSearching] = useState<boolean>(false);
-  const [suggestions, setSuggestions] = useState<string[]>(DEFAULT_SUGGESTION);
+  const [suggestions, setSuggestions] = useState<IndexDefinition>(DEFAULT_SUGGESTION);
 
   const handleToggleFilter = useCallback(
     (filter: string) => {
@@ -74,10 +75,9 @@ const UsersSearch = () => {
 
   useEffect(() => {
     if (!currentUser.is_admin) return;
-    apiCall({
+    apiCall<IndexDefinition>({
       url: '/api/v4/search/fields/user/',
-      onSuccess: ({ api_response }) =>
-        setSuggestions([...Object.keys(api_response).filter(name => api_response[name].indexed), ...DEFAULT_SUGGESTION])
+      onSuccess: ({ api_response }) => setSuggestions({ ...api_response, ...DEFAULT_SUGGESTION })
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser.is_admin]);

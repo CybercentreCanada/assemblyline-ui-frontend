@@ -10,7 +10,7 @@ import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import type { WorkflowIndexed } from 'components/models/base/workflow';
-import type { CustomUser } from 'components/models/ui/user';
+import type { CustomUser, IndexDefinition } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
 import WorkflowCreate from 'components/routes/manage/workflows/create';
 import WorkflowDetail from 'components/routes/manage/workflows/detail';
@@ -53,8 +53,8 @@ const WorkflowsSearch = () => {
   const [workflowResults, setWorkflowResults] = useState<SearchResults>(null);
   const [searching, setSearching] = useState<boolean>(false);
 
-  const suggestions = useMemo<string[]>(
-    () => [...Object.keys(indexes.workflow).filter(name => indexes.workflow[name].indexed), ...DEFAULT_SUGGESTION],
+  const suggestions = useMemo<IndexDefinition>(
+    () => ({ ...indexes.workflow, ...DEFAULT_SUGGESTION }),
     [indexes.workflow]
   );
 

@@ -9,7 +9,7 @@ import {
   StyledRoot
 } from 'components/visual/Inputs/lib/inputs.components';
 import {
-  useErrorMessage,
+  useErrorCallback,
   useInputBlur,
   useInputChange,
   useInputFocus,
@@ -50,8 +50,6 @@ const WrappedSliderInput = () => {
   const handleChange = useInputChange<SliderInputProps>();
   const handleFocus = useInputFocus<SliderInputProps>();
 
-  useErrorMessage();
-
   return (
     <StyledRoot>
       <StyledFormLabel />
@@ -90,10 +88,13 @@ const WrappedSliderInput = () => {
   );
 };
 
-export const SliderInput = ({ preventRender = false, value, ...props }: SliderInputProps) =>
-  preventRender ? null : (
+export const SliderInput = ({ preventRender = false, value, ...props }: SliderInputProps) => {
+  const errorMessage = useErrorCallback({ preventRender, value, ...props });
+
+  return preventRender ? null : (
     <PropProvider<SliderInputProps>
       props={{
+        errorMessage,
         inputValue: value,
         marks: false,
         max: null,
@@ -109,3 +110,4 @@ export const SliderInput = ({ preventRender = false, value, ...props }: SliderIn
       <WrappedSliderInput />
     </PropProvider>
   );
+};

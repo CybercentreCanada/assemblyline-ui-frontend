@@ -10,7 +10,7 @@ import {
   StyledFormControl,
   StyledFormControlLabel
 } from 'components/visual/Inputs/lib/inputs.components';
-import { useErrorMessage, useInputBlur, useInputClick, useInputFocus } from 'components/visual/Inputs/lib/inputs.hook';
+import { useErrorCallback, useInputBlur, useInputClick, useInputFocus } from 'components/visual/Inputs/lib/inputs.hook';
 import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
 import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
 import { Tooltip } from 'components/visual/Tooltip';
@@ -33,8 +33,6 @@ const WrappedSwitchInput = () => {
   const handleBlur = useInputBlur<SwitchInputProps>();
   const handleClick = useInputClick<SwitchInputProps>();
   const handleFocus = useInputFocus<SwitchInputProps>();
-
-  useErrorMessage();
 
   return (
     <Tooltip title={loading ? null : tooltip} {...tooltipProps}>
@@ -73,9 +71,12 @@ const WrappedSwitchInput = () => {
   );
 };
 
-export const SwitchInput = ({ preventRender = false, value, ...props }: SwitchInputProps) =>
-  preventRender ? null : (
-    <PropProvider<SwitchInputProps> props={{ preventRender, inputValue: value, value, ...props }}>
+export const SwitchInput = ({ preventRender = false, value, ...props }: SwitchInputProps) => {
+  const errorMessage = useErrorCallback({ preventRender, value, ...props });
+
+  return preventRender ? null : (
+    <PropProvider<SwitchInputProps> props={{ preventRender, inputValue: value, value, errorMessage, ...props }}>
       <WrappedSwitchInput />
     </PropProvider>
   );
+};
