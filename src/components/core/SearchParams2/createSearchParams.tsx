@@ -14,20 +14,22 @@ export const createSearchParams = <Blueprints extends Record<string, ParamBluepr
     const snapshotRef = { current: null as SearchParamSnapshot<Blueprints> | null };
 
     const refresh = (location: Location) => {
-      const newSnapshot = engine.fromLocation(location, snapshotRef.current);
-
-      if (!shallowEqual(snapshotRef?.current?.values || {}, newSnapshot?.values || {})) {
-        snapshotRef.current = newSnapshot;
+      const next = engine.fromLocation(location, snapshotRef.current);
+      if (!shallowEqual(snapshotRef.current?.values ?? {}, next?.values ?? {})) {
+        snapshotRef.current = next;
       }
     };
 
-    const from = (value: URLSearchParams | SearchParamValues<Blueprints>) => {
+    const from = (value: URLSearchParams | SearchParamValues<Blueprints>): SearchParamSnapshot<Blueprints> => {
       snapshotRef.current = engine.full(value);
       return snapshotRef.current;
     };
 
     return {
-      get snapshot() {
+      get snapshot(): SearchParamSnapshot<Blueprints> {
+        if (!snapshotRef.current) {
+          throw new Error('Snapshot has not been initialized');
+        }
         return snapshotRef.current;
       },
       refresh,
@@ -43,6 +45,7 @@ export const createSearchParams = <Blueprints extends Record<string, ParamBluepr
     const engine = useMemo(() => new SearchParamEngine(blueprints(PARAM_BLUEPRINTS)), []);
 
     const storeRef = useRef<ReturnType<typeof createStore> | null>(null);
+
     if (!storeRef.current) {
       storeRef.current = createStore(engine);
       storeRef.current.refresh(location);
@@ -60,7 +63,9 @@ export const createSearchParams = <Blueprints extends Record<string, ParamBluepr
     const navigate = useNavigate();
     const store = useContext(SearchParamsContext);
 
-    if (!store) throw new Error('SearchParamsContext not found');
+    if (!store) {
+      throw new Error('SearchParamsContext not found');
+    }
 
     const setSearchParams = useCallback(
       (
@@ -69,7 +74,7 @@ export const createSearchParams = <Blueprints extends Record<string, ParamBluepr
       ) => {
         const values = typeof input === 'function' ? input(store.snapshot.toParams()) : input;
         const snapshot = store.from(values);
-        navigate({ search: snapshot.getSearch() }, { replace, state: snapshot.getState() });
+        navigate({ search: snapshot.toLocationSearch() }, { replace, state: snapshot.toLocationState() });
       },
       [navigate, store]
     );
@@ -83,7 +88,7 @@ export const createSearchParams = <Blueprints extends Record<string, ParamBluepr
       ) => {
         const values = typeof input === 'function' ? input(store.snapshot.toObject()) : input;
         const snapshot = store.from(values);
-        navigate({ search: snapshot.getSearch() }, { replace, state: snapshot.getState() });
+        navigate({ search: snapshot.toLocationSearch() }, { replace, state: snapshot.toLocationState() });
       },
       [navigate, store]
     );

@@ -62,7 +62,7 @@ export class SearchParamSnapshot<Blueprints extends Record<string, ParamBlueprin
     return new SearchParamSnapshot(this.runtimes, structuredClone(newValues));
   }
 
-  public getSearch(): Location['search'] {
+  public toLocationSearch(): Location['search'] {
     const values = this.runtimeEntries().reduce((prev, [, runtime]) => {
       if (runtime.getOrigin() !== 'search') return prev;
       return runtime.delta(prev, this.values);
@@ -71,7 +71,7 @@ export class SearchParamSnapshot<Blueprints extends Record<string, ParamBlueprin
     return new SearchParamSnapshot(this.runtimes, values).toString();
   }
 
-  public getState(): Location['state'] {
+  public toLocationState(): Location['state'] {
     const values = this.runtimeEntries().reduce((prev, [, runtime]) => {
       if (runtime.getOrigin() !== 'state') return prev;
       return runtime.delta(prev, this.values);
