@@ -6,7 +6,7 @@ import FormControl from '@mui/material/FormControl';
 import { useAppUser } from 'commons/components/app/hooks';
 import PageContainer from 'commons/components/pages/PageContainer';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
-import { createSearchParams } from 'components/core/SearchParams2/createSearchParams';
+import { createSearchParams } from 'components/core/SearchParams/createSearchParams';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import type { Error } from 'components/models/base/error';

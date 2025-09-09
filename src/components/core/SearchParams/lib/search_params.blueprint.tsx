@@ -3,8 +3,8 @@ import type {
   ParamSource,
   ParamValues,
   SearchParamValues
-} from 'components/core/SearchParams2/lib/search_params.model';
-import type { SearchParamSnapshot } from 'components/core/SearchParams2/lib/search_params.snapshot';
+} from 'components/core/SearchParams/lib/search_params.model';
+import type { SearchParamSnapshot } from 'components/core/SearchParams/lib/search_params.snapshot';
 import type { Location } from 'react-router';
 
 export abstract class BaseBlueprint<T extends ParamValues> {

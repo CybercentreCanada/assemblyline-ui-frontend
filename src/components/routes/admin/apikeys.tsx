@@ -3,7 +3,7 @@ import { Grid, useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import PageContainer from 'commons/components/pages/PageContainer';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
-import { createSearchParams } from 'components/core/SearchParams2/createSearchParams';
+import { createSearchParams } from 'components/core/SearchParams/createSearchParams';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';

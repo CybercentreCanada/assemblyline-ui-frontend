@@ -1,7 +1,7 @@
-import { PARAM_BLUEPRINTS } from 'components/core/SearchParams2/lib/search_params.blueprint';
-import { SearchParamEngine } from 'components/core/SearchParams2/lib/search_params.engine';
-import type { ParamBlueprints, SearchParamValues } from 'components/core/SearchParams2/lib/search_params.model';
-import type { SearchParamSnapshot } from 'components/core/SearchParams2/lib/search_params.snapshot';
+import { PARAM_BLUEPRINTS } from 'components/core/SearchParams/lib/search_params.blueprint';
+import { SearchParamEngine } from 'components/core/SearchParams/lib/search_params.engine';
+import type { ParamBlueprints, SearchParamValues } from 'components/core/SearchParams/lib/search_params.model';
+import type { SearchParamSnapshot } from 'components/core/SearchParams/lib/search_params.snapshot';
 import { shallowEqual } from 'components/visual/Inputs/lib/inputs.utils';
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef } from 'react';
 import type { Location, NavigateOptions } from 'react-router';

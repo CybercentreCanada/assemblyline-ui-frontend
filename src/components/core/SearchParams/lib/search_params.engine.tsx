@@ -4,15 +4,15 @@ import {
   FiltersBlueprint,
   NumberBlueprint,
   StringBlueprint
-} from 'components/core/SearchParams2/lib/search_params.blueprint';
+} from 'components/core/SearchParams/lib/search_params.blueprint';
 import type {
   ParamBlueprints,
   SearchParamRuntimes,
   SearchParamValues
-} from 'components/core/SearchParams2/lib/search_params.model';
-import type { ParamRuntime } from 'components/core/SearchParams2/lib/search_params.runtime';
-import { PARAM_RUNTIMES } from 'components/core/SearchParams2/lib/search_params.runtime';
-import { SearchParamSnapshot } from 'components/core/SearchParams2/lib/search_params.snapshot';
+} from 'components/core/SearchParams/lib/search_params.model';
+import type { ParamRuntime } from 'components/core/SearchParams/lib/search_params.runtime';
+import { PARAM_RUNTIMES } from 'components/core/SearchParams/lib/search_params.runtime';
+import { SearchParamSnapshot } from 'components/core/SearchParams/lib/search_params.snapshot';
 import type { Location } from 'react-router';
 
 export class SearchParamEngine<Blueprints extends Record<string, ParamBlueprints>> {

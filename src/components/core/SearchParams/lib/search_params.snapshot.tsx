@@ -3,8 +3,8 @@ import type {
   ParamValues,
   SearchParamRuntimes,
   SearchParamValues
-} from 'components/core/SearchParams2/lib/search_params.model';
-import type { ParamRuntime } from 'components/core/SearchParams2/lib/search_params.runtime';
+} from 'components/core/SearchParams/lib/search_params.model';
+import type { ParamRuntime } from 'components/core/SearchParams/lib/search_params.runtime';
 import type { Location } from 'react-router';
 
 export class SearchParamSnapshot<Blueprints extends Record<string, ParamBlueprints>> {

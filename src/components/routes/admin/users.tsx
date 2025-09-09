@@ -3,7 +3,7 @@ import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount';
 import { useTheme } from '@mui/material';
 import PageContainer from 'commons/components/pages/PageContainer';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
-import { createSearchParams } from 'components/core/SearchParams2/createSearchParams';
+import { createSearchParams } from 'components/core/SearchParams/createSearchParams';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import type { UserIndexed } from 'components/models/base/user';

@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { BaseBlueprint } from 'components/core/SearchParams2/lib/search_params.blueprint';
+import type { BaseBlueprint } from 'components/core/SearchParams/lib/search_params.blueprint';
 import {
   BooleanBlueprint,
   EnumBlueprint,
   FiltersBlueprint,
   NumberBlueprint,
   StringBlueprint
-} from 'components/core/SearchParams2/lib/search_params.blueprint';
-import type { ParamValues } from 'components/core/SearchParams2/lib/search_params.model';
+} from 'components/core/SearchParams/lib/search_params.blueprint';
+import type { ParamValues } from 'components/core/SearchParams/lib/search_params.model';
 
 /**
  * Factory that wraps a blueprint class and re-exposes its
