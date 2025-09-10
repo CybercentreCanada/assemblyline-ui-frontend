@@ -42,6 +42,7 @@ export class SearchParamEngine<Blueprints extends Record<string, ParamBlueprints
   }
 
   public setDefaultValues(values: URLSearchParams = new URLSearchParams()) {
+    if (!values) return this;
     this.runtimes = this.runtimeEntries().reduce(
       (prev, [key, runtime]) => ({ ...prev, [key]: runtime.setDefaultValue(values) }),
       {} as SearchParamRuntimes<Blueprints>
