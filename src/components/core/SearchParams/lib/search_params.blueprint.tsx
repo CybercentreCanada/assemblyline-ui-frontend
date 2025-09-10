@@ -130,7 +130,10 @@ export abstract class BaseBlueprint<T extends ParamValues> {
   // -------------------------
 
   protected setDefaultValue(values: URLSearchParams) {
-    this._defaultValue = this.get(values);
+    const next = this.get(values);
+    if (next !== null || this._nullable) {
+      this._defaultValue = next;
+    }
     return this;
   }
 

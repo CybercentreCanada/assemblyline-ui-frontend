@@ -61,14 +61,14 @@ export const createSearchParams = <Blueprints extends Record<string, ParamBluepr
     const navigate = useNavigate();
 
     const [defaultParams, setDefaultParams] = useState<URLSearchParams>(
-      new URLSearchParams(localStorage.getItem(storageKey) || '')
+      !storageKey ? null : new URLSearchParams(localStorage.getItem(storageKey) || '')
     );
 
     const storeRef = useRef<ReturnType<typeof createStore> | null>(null);
 
     const engine = useMemo(
-      () => new SearchParamEngine(blueprints(PARAM_BLUEPRINTS)).setDefaultValues(defaultParams),
-      [defaultParams]
+      () => new SearchParamEngine(blueprints(PARAM_BLUEPRINTS)).setDefaultValues(!storageKey ? null : defaultParams),
+      [defaultParams, storageKey]
     );
 
     if (!storeRef.current) {
