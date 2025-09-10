@@ -39,11 +39,11 @@ export const createSearchParams = <Blueprints extends Record<string, ParamBluepr
     search: SearchParamSnapshot<Blueprints>;
     setSearchParams: (
       input: URLSearchParams | ((params: URLSearchParams) => URLSearchParams),
-      replace: NavigateOptions['replace']
+      replace?: NavigateOptions['replace']
     ) => void;
     setSearchObject: (
       input: SearchParamValues<Blueprints> | ((params: SearchParamValues<Blueprints>) => SearchParamValues<Blueprints>),
-      replace: NavigateOptions['replace']
+      replace?: NavigateOptions['replace']
     ) => void;
     changeDefaults: (value: URLSearchParams) => void;
     clearDefaults: () => void;
