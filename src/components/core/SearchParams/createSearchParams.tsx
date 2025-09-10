@@ -34,10 +34,28 @@ export const createSearchParams = <Blueprints extends Record<string, ParamBluepr
     };
   };
 
-  const SearchParamsContext = createContext<ReturnType<typeof createStore> | null>(null);
+  type SearchParamsContextProps = {
+    search: SearchParamSnapshot<Blueprints>;
+    setSearchParams: (
+      input: URLSearchParams | ((params: URLSearchParams) => URLSearchParams),
+      replace: NavigateOptions['replace']
+    ) => void;
+    setSearchObject: (
+      input: SearchParamValues<Blueprints> | ((params: SearchParamValues<Blueprints>) => SearchParamValues<Blueprints>),
+      replace: NavigateOptions['replace']
+    ) => void;
+  };
 
-  const SearchParamsProvider = React.memo(({ children }: { children: React.ReactNode }) => {
+  type SearchParamsProviderProps = {
+    children: React.ReactNode;
+    storageKey?: string;
+  };
+
+  const SearchParamsContext = createContext<SearchParamsContextProps>(null);
+
+  const SearchParamsProvider = React.memo(({ children }: SearchParamsProviderProps) => {
     const location = useLocation();
+    const navigate = useNavigate();
 
     const engine = useMemo(() => new SearchParamEngine(blueprints(PARAM_BLUEPRINTS)), []);
 
@@ -48,46 +66,41 @@ export const createSearchParams = <Blueprints extends Record<string, ParamBluepr
       storeRef.current.refresh(location);
     }
 
+    const setSearchParams = useCallback<SearchParamsContextProps['setSearchParams']>(
+      (input, replace = false) => {
+        const values = typeof input === 'function' ? input(storeRef.current.snapshot.toParams()) : input;
+        const snapshot = storeRef.current.from(values);
+        navigate({ search: snapshot.toLocationSearch() }, { replace, state: snapshot.toLocationState() });
+      },
+      [navigate]
+    );
+
+    const setSearchObject = useCallback<SearchParamsContextProps['setSearchObject']>(
+      (input, replace = false) => {
+        const values = typeof input === 'function' ? input(storeRef.current.snapshot.toObject()) : input;
+        const snapshot = storeRef.current.from(values);
+        navigate({ search: snapshot.toLocationSearch() }, { replace, state: snapshot.toLocationState() });
+      },
+      [navigate]
+    );
+
     useEffect(() => {
-      storeRef.current?.refresh(location);
+      storeRef.current.refresh(location);
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [engine.fromLocation(location).omit(engine.getIgnoredKeys()).toString()]);
 
-    return <SearchParamsContext.Provider value={storeRef.current}>{children}</SearchParamsContext.Provider>;
+    return (
+      <SearchParamsContext.Provider value={{ search: storeRef.current.snapshot, setSearchParams, setSearchObject }}>
+        {children}
+      </SearchParamsContext.Provider>
+    );
   });
 
-  const useSearchParams = () => {
-    const navigate = useNavigate();
+  const useSearchParams = (): SearchParamsContextProps => {
     const store = useContext(SearchParamsContext);
 
-    const setSearchParams = useCallback(
-      (
-        input: URLSearchParams | ((params: URLSearchParams) => URLSearchParams),
-        replace: NavigateOptions['replace'] = false
-      ) => {
-        const values = typeof input === 'function' ? input(store.snapshot.toParams()) : input;
-        const snapshot = store.from(values);
-        navigate({ search: snapshot.toLocationSearch() }, { replace, state: snapshot.toLocationState() });
-      },
-      [navigate, store]
-    );
-
-    const setSearchObject = useCallback(
-      (
-        input:
-          | SearchParamValues<Blueprints>
-          | ((params: SearchParamValues<Blueprints>) => SearchParamValues<Blueprints>),
-        replace: NavigateOptions['replace'] = false
-      ) => {
-        const values = typeof input === 'function' ? input(store.snapshot.toObject()) : input;
-        const snapshot = store.from(values);
-        navigate({ search: snapshot.toLocationSearch() }, { replace, state: snapshot.toLocationState() });
-      },
-      [navigate, store]
-    );
-
     if (!store) return { search: null, setSearchParams: () => null, setSearchObject: () => null };
-    else return { search: store.snapshot, setSearchParams, setSearchObject };
+    else return store;
   };
 
   return { SearchParamsProvider, useSearchParams };
