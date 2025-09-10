@@ -3,7 +3,7 @@ import { SearchParamEngine } from 'components/core/SearchParams/lib/search_param
 import type { ParamBlueprints, SearchParamValues } from 'components/core/SearchParams/lib/search_params.model';
 import type { SearchParamSnapshot } from 'components/core/SearchParams/lib/search_params.snapshot';
 import { shallowEqual } from 'components/visual/Inputs/lib/inputs.utils';
-import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import type { Location, NavigateOptions } from 'react-router';
 import { useLocation, useNavigate } from 'react-router';
 
@@ -29,6 +29,7 @@ export const createSearchParams = <Blueprints extends Record<string, ParamBluepr
       get snapshot(): SearchParamSnapshot<Blueprints> {
         return snapshotRef.current;
       },
+
       refresh,
       from
     };
@@ -44,6 +45,8 @@ export const createSearchParams = <Blueprints extends Record<string, ParamBluepr
       input: SearchParamValues<Blueprints> | ((params: SearchParamValues<Blueprints>) => SearchParamValues<Blueprints>),
       replace: NavigateOptions['replace']
     ) => void;
+    changeDefaults: (value: URLSearchParams) => void;
+    clearDefaults: () => void;
   };
 
   type SearchParamsProviderProps = {
@@ -53,13 +56,20 @@ export const createSearchParams = <Blueprints extends Record<string, ParamBluepr
 
   const SearchParamsContext = createContext<SearchParamsContextProps>(null);
 
-  const SearchParamsProvider = React.memo(({ children }: SearchParamsProviderProps) => {
+  const SearchParamsProvider = React.memo(({ children, storageKey = null }: SearchParamsProviderProps) => {
     const location = useLocation();
     const navigate = useNavigate();
 
-    const engine = useMemo(() => new SearchParamEngine(blueprints(PARAM_BLUEPRINTS)), []);
+    const [defaultParams, setDefaultParams] = useState<URLSearchParams>(
+      new URLSearchParams(localStorage.getItem(storageKey) || '')
+    );
 
     const storeRef = useRef<ReturnType<typeof createStore> | null>(null);
+
+    const engine = useMemo(
+      () => new SearchParamEngine(blueprints(PARAM_BLUEPRINTS)).setDefaultValues(defaultParams),
+      [defaultParams]
+    );
 
     if (!storeRef.current) {
       storeRef.current = createStore(engine);
@@ -84,13 +94,33 @@ export const createSearchParams = <Blueprints extends Record<string, ParamBluepr
       [navigate]
     );
 
+    const changeDefaults = useCallback<SearchParamsContextProps['changeDefaults']>(
+      value => {
+        const search = engine.delta(value).omit(engine.getIgnoredKeys()).toParams();
+        localStorage.setItem(storageKey, search.toString());
+        setDefaultParams(search);
+      },
+      [engine, storageKey]
+    );
+
+    const clearDefaults = useCallback<SearchParamsContextProps['clearDefaults']>(() => {
+      localStorage.removeItem(storageKey);
+      setDefaultParams(new URLSearchParams());
+    }, [storageKey]);
+
     useEffect(() => {
       storeRef.current.refresh(location);
       // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [engine.fromLocation(location).omit(engine.getIgnoredKeys()).toString()]);
 
+    useEffect(() => {
+      setDefaultParams(new URLSearchParams(localStorage.getItem(storageKey) || ''));
+    }, [storageKey]);
+
     return (
-      <SearchParamsContext.Provider value={{ search: storeRef.current.snapshot, setSearchParams, setSearchObject }}>
+      <SearchParamsContext.Provider
+        value={{ search: storeRef.current.snapshot, setSearchParams, setSearchObject, changeDefaults, clearDefaults }}
+      >
         {children}
       </SearchParamsContext.Provider>
     );
@@ -99,7 +129,14 @@ export const createSearchParams = <Blueprints extends Record<string, ParamBluepr
   const useSearchParams = (): SearchParamsContextProps => {
     const store = useContext(SearchParamsContext);
 
-    if (!store) return { search: null, setSearchParams: () => null, setSearchObject: () => null };
+    if (!store)
+      return {
+        search: null,
+        setSearchParams: () => null,
+        setSearchObject: () => null,
+        changeDefaults: () => null,
+        clearDefaults: () => null
+      };
     else return store;
   };
 
