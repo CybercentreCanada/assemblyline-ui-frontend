@@ -25,6 +25,8 @@ export type TextAreaInputProps = InputValues<
   InputProps & {
     autoComplete?: StyledTextField['autoComplete'];
     rows?: TextFieldProps['rows'];
+    minRows?: TextFieldProps['minRows'];
+    maxRows?: TextFieldProps['maxRows'];
   };
 
 const WrappedTextAreaInput = () => {
@@ -33,6 +35,8 @@ const WrappedTextAreaInput = () => {
   const autoComplete = get('autoComplete');
   const inputValue = get('inputValue') ?? '';
   const loading = get('loading');
+  const maxRows = get('maxRows');
+  const minRows = get('minRows');
   const overflowHidden = get('overflowHidden');
   const password = get('password');
   const rows = get('rows');
@@ -55,10 +59,9 @@ const WrappedTextAreaInput = () => {
         ) : (
           <>
             <StyledTextField
-              rows={1}
               {...(!(overflowHidden || (password && showPassword)) && {
                 multiline: true,
-                rows: rows
+                ...(minRows || maxRows ? { minRows, maxRows } : { rows: rows || 1 })
               })}
               autoComplete={autoComplete}
               value={inputValue}
@@ -79,7 +82,17 @@ export const TextAreaInput = ({ preventRender = false, value, ...props }: TextAr
 
   return preventRender ? null : (
     <PropProvider<TextAreaInputProps>
-      props={{ autoComplete: 'off', rows: 1, preventRender, inputValue: value, value, errorMessage, ...props }}
+      props={{
+        autoComplete: 'off',
+        errorMessage,
+        inputValue: value,
+        maxRows: null,
+        minRows: null,
+        preventRender,
+        rows: null,
+        value,
+        ...props
+      }}
     >
       <WrappedTextAreaInput />
     </PropProvider>

@@ -16,6 +16,7 @@ import Classification from 'components/visual/Classification';
 import { CheckboxInput } from 'components/visual/Inputs/CheckboxInput';
 import { ChipsInput } from 'components/visual/Inputs/ChipsInput';
 import { SelectInput } from 'components/visual/Inputs/SelectInput';
+import { TextAreaInput } from 'components/visual/Inputs/TextAreaInput';
 import { TextInput } from 'components/visual/Inputs/TextInput';
 import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import _ from 'lodash';
@@ -224,10 +225,12 @@ const WrappedWorkflowCreate = ({ id: propID = null, onClose = () => null }: Prop
           </Grid>
 
           <Grid size={{ xs: 12 }}>
-            <TextInput
+            <TextAreaInput
               label={t('query')}
               loading={!workflow || handleFetch.isFetching}
               value={!workflow ? null : workflow.query}
+              minRows={1}
+              maxRows={5}
               required
               onChange={(event, value) => setWorkflow(wf => ({ ...wf, query: value }))}
             />
