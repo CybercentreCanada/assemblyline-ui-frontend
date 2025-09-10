@@ -126,6 +126,15 @@ export abstract class BaseBlueprint<T extends ParamValues> {
   }
 
   // -------------------------
+  // Setters
+  // -------------------------
+
+  protected setDefaultValue(values: URLSearchParams) {
+    this._defaultValue = this.get(values);
+    return this;
+  }
+
+  // -------------------------
   // Helpers
   // -------------------------
 

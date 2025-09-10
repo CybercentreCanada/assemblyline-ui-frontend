@@ -16,7 +16,7 @@ import { SearchParamSnapshot } from 'components/core/SearchParams/lib/search_par
 import type { Location } from 'react-router';
 
 export class SearchParamEngine<Blueprints extends Record<string, ParamBlueprints>> {
-  private readonly runtimes: SearchParamRuntimes<Blueprints>;
+  private runtimes: SearchParamRuntimes<Blueprints>;
 
   constructor(blueprints: Blueprints) {
     this.runtimes = Object.entries(blueprints).reduce((prev, [key, bp]) => {
@@ -39,6 +39,14 @@ export class SearchParamEngine<Blueprints extends Record<string, ParamBlueprints
       {} as SearchParamValues<Blueprints>
     );
     return new SearchParamSnapshot<Blueprints>(this.runtimes, values);
+  }
+
+  public setDefaultValues(values: URLSearchParams = new URLSearchParams()) {
+    this.runtimes = this.runtimeEntries().reduce(
+      (prev, [key, runtime]) => ({ ...prev, [key]: runtime.setDefaultValue(values) }),
+      {} as SearchParamRuntimes<Blueprints>
+    );
+    return this;
   }
 
   public getEphemeralKeys() {

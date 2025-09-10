@@ -23,6 +23,9 @@ export function Runtime<T extends ParamValues, B extends abstract new (...args: 
     public override isNullable = super.isNullable;
     public override getOrigin = super.getOrigin;
 
+    // Setters
+    public override setDefaultValue = super.setDefaultValue;
+
     // Helpers
     public override has = super.has;
     public override get = super.get;
