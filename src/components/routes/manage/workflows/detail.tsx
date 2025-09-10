@@ -17,6 +17,7 @@ import { AlertHistogram, AlertResults } from 'components/routes/manage/workflows
 import Classification from 'components/visual/Classification';
 import { ChipsInput } from 'components/visual/Inputs/ChipsInput';
 import { SelectInput } from 'components/visual/Inputs/SelectInput';
+import { TextAreaInput } from 'components/visual/Inputs/TextAreaInput';
 import { TextInput } from 'components/visual/Inputs/TextInput';
 import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import Moment from 'components/visual/Moment';
@@ -92,9 +93,11 @@ const WrappedWorkflowDetail = ({ id: propID = null, onClose = null }: Props) => 
             </Grid>
 
             <Grid size={{ xs: 12 }}>
-              <TextInput
+              <TextAreaInput
                 label={t('query')}
                 readOnly
+                minRows={1}
+                maxRows={5}
                 loading={workflow.isFetching}
                 value={workflow.isFetching ? null : workflow.data.query}
               />
