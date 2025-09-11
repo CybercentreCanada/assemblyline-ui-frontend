@@ -6,7 +6,11 @@ import FormControl from '@mui/material/FormControl';
 import { useAppUser } from 'commons/components/app/hooks';
 import PageContainer from 'commons/components/pages/PageContainer';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
-import { createSearchParams } from 'components/core/SearchParams/createSearchParams';
+import {
+  createSearchParams,
+  SearchParamsProvider,
+  useSearchParams
+} from 'components/core/SearchParams/createSearchParams';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import type { Error } from 'components/models/base/error';
@@ -51,7 +55,7 @@ const GAP_MAP: Record<TimeContraint, string> = {
   '1y': '15d'
 };
 
-export const { SearchParamsProvider, useSearchParams } = createSearchParams(p => ({
+const ERROR_VIEWER_PARAMS = createSearchParams(p => ({
   query: p.string(''),
   offset: p.number(0).min(0).origin('state').ephemeral(),
   rows: p.number(25).locked().origin('state').ephemeral(),
@@ -65,6 +69,8 @@ export const { SearchParamsProvider, useSearchParams } = createSearchParams(p =>
   timeout: p.string('').origin('state').ephemeral()
 }));
 
+type ErrorViewerParams = typeof ERROR_VIEWER_PARAMS;
+
 const ErrorViewer = () => {
   const { t } = useTranslation(['adminErrorViewer']);
   const theme = useTheme();
@@ -73,7 +79,7 @@ const ErrorViewer = () => {
   const { apiCall } = useMyAPI();
   const { user: currentUser } = useAppUser<CustomUser>();
   const { globalDrawerOpened, setGlobalDrawer, closeGlobalDrawer } = useDrawer();
-  const { search, setSearchParams, setSearchObject } = useSearchParams();
+  const { search, setSearchParams, setSearchObject } = useSearchParams<ErrorViewerParams>();
 
   const [errorResults, setErrorResults] = useState<SearchResult<Error>>(null);
   const [histogram, setHistogram] = useState<HistogramResult>(null);
@@ -323,7 +329,7 @@ const ErrorViewer = () => {
 };
 
 const WrappedErrorViewerPage = () => (
-  <SearchParamsProvider>
+  <SearchParamsProvider params={ERROR_VIEWER_PARAMS}>
     <ErrorViewer />
   </SearchParamsProvider>
 );

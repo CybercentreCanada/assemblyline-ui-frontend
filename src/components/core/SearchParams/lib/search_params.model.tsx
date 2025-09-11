@@ -51,6 +51,11 @@ export type InferRuntime<B> =
   unknown;
 
 /**
+ * Map of search param blueprints.
+ */
+export type SearchParamBlueprints = Record<string, ParamBlueprints>;
+
+/**
  * Map of search param names → resolved values.
  */
 export type SearchParamValues<Blueprints extends Record<string, ParamBlueprints>> = {

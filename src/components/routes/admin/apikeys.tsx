@@ -3,7 +3,11 @@ import { Grid, useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import PageContainer from 'commons/components/pages/PageContainer';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
-import { createSearchParams } from 'components/core/SearchParams/createSearchParams';
+import {
+  createSearchParams,
+  SearchParamsProvider,
+  useSearchParams
+} from 'components/core/SearchParams/createSearchParams';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -18,7 +22,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useLocation, useNavigate } from 'react-router';
 
-export const { SearchParamsProvider, useSearchParams } = createSearchParams(p => ({
+const API_KEYS_PARAMS = createSearchParams(p => ({
   query: p.string(''),
   offset: p.number(0).min(0).origin('state').ephemeral(),
   rows: p.number(25).locked().origin('state').ephemeral(),
@@ -28,6 +32,8 @@ export const { SearchParamsProvider, useSearchParams } = createSearchParams(p =>
   refresh: p.boolean(false).origin('state').ephemeral()
 }));
 
+export type APIKeysParams = typeof API_KEYS_PARAMS;
+
 const APIKeysSearch = () => {
   const { t } = useTranslation(['adminAPIkeys']);
   const location = useLocation();
@@ -36,7 +42,7 @@ const APIKeysSearch = () => {
   const { apiCall } = useMyAPI();
   const { globalDrawerOpened, setGlobalDrawer, closeGlobalDrawer } = useDrawer();
   const { user: currentUser } = useALContext();
-  const { search, setSearchParams, setSearchObject } = useSearchParams();
+  const { search, setSearchParams, setSearchObject } = useSearchParams<APIKeysParams>();
 
   const [apikeySearchResults, setApikeySearchResults] = useState<SearchResult<ApiKey>>(null);
   const [searching, setSearching] = useState<boolean>(false);
@@ -176,7 +182,7 @@ const APIKeysSearch = () => {
 };
 
 const WrappedAPIKeysPage = () => (
-  <SearchParamsProvider>
+  <SearchParamsProvider params={API_KEYS_PARAMS}>
     <APIKeysSearch />
   </SearchParamsProvider>
 );

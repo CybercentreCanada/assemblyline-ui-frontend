@@ -4,7 +4,11 @@ import { useMediaQuery, useTheme } from '@mui/material';
 import { useAppUser } from 'commons/components/app/hooks';
 import PageContainer from 'commons/components/pages/PageContainer';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
-import { createSearchParams } from 'components/core/SearchParams/createSearchParams';
+import {
+  createSearchParams,
+  SearchParamsProvider,
+  useSearchParams
+} from 'components/core/SearchParams/createSearchParams';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -22,7 +26,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
 
-export const { SearchParamsProvider, useSearchParams } = createSearchParams(p => ({
+export const SIGNATURES_PARAMS = createSearchParams(p => ({
   query: p.string(''),
   offset: p.number(0).min(0).origin('state').ephemeral(),
   rows: p.number(25).locked().origin('state').ephemeral(),
@@ -31,6 +35,8 @@ export const { SearchParamsProvider, useSearchParams } = createSearchParams(p =>
   track_total_hits: p.number(10000).nullable().ephemeral(),
   refresh: p.boolean(false).origin('snapshot').ephemeral()
 }));
+
+export type SignaturesParams = typeof SIGNATURES_PARAMS;
 
 const SignaturesSearch = () => {
   const { t } = useTranslation(['manageSignatures']);
@@ -42,7 +48,7 @@ const SignaturesSearch = () => {
   const { indexes } = useALContext();
   const { user: currentUser } = useAppUser<CustomUser>();
   const { globalDrawerOpened, setGlobalDrawer, closeGlobalDrawer } = useDrawer();
-  const { search, setSearchParams, setSearchObject } = useSearchParams();
+  const { search, setSearchParams, setSearchObject } = useSearchParams<SignaturesParams>();
 
   const [signatureResults, setSignatureResults] = useState<SearchResult<Signature>>(null);
   const [searching, setSearching] = useState<boolean>(false);
@@ -213,7 +219,7 @@ const SignaturesSearch = () => {
 };
 
 const WrappedSignaturesPage = () => (
-  <SearchParamsProvider>
+  <SearchParamsProvider params={SIGNATURES_PARAMS}>
     <SignaturesSearch />
   </SearchParamsProvider>
 );

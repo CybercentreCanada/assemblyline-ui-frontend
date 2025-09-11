@@ -5,7 +5,11 @@ import { useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import PageContainer from 'commons/components/pages/PageContainer';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
-import { createSearchParams } from 'components/core/SearchParams/createSearchParams';
+import {
+  createSearchParams,
+  SearchParamsProvider,
+  useSearchParams
+} from 'components/core/SearchParams/createSearchParams';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import type { SubmissionIndexed } from 'components/models/base/submission';
@@ -24,7 +28,7 @@ type SearchResults = {
   total: number;
 };
 
-export const { SearchParamsProvider, useSearchParams } = createSearchParams(p => ({
+export const SUBMISSION_PARAMS = createSearchParams(p => ({
   query: p.string(''),
   offset: p.number(0).min(0).origin('state').ephemeral(),
   rows: p.number(25).locked().origin('snapshot').ephemeral(),
@@ -33,12 +37,14 @@ export const { SearchParamsProvider, useSearchParams } = createSearchParams(p =>
   track_total_hits: p.number(null).origin('state').nullable().ephemeral()
 }));
 
+export type SubmissionParams = typeof SUBMISSION_PARAMS;
+
 const SubmissionSearch = () => {
   const { t } = useTranslation(['submissions']);
   const theme = useTheme();
   const { apiCall } = useMyAPI();
   const { user: currentUser, indexes } = useALContext();
-  const { search, setSearchParams, setSearchObject } = useSearchParams();
+  const { search, setSearchObject, setSearchParams } = useSearchParams<SubmissionParams>();
 
   const [submissionResults, setSubmissionResults] = useState<SearchResults>(null);
   const [searching, setSearching] = useState<boolean>(false);
@@ -161,7 +167,7 @@ const SubmissionSearch = () => {
 };
 
 const WrappedSubmissionPage = () => (
-  <SearchParamsProvider>
+  <SearchParamsProvider params={SUBMISSION_PARAMS}>
     <SubmissionSearch />
   </SearchParamsProvider>
 );
