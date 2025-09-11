@@ -2,10 +2,11 @@ import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
 import { AlertTitle, Skeleton, Tooltip } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
+import { useSearchParams } from 'components/core/SearchParams/createSearchParams';
 import useALContext from 'components/hooks/useALContext';
 import type { SubmissionIndexed } from 'components/models/base/submission';
 import type { SearchResult } from 'components/models/ui/search';
-import { useSearchParams } from 'components/routes/submissions';
+import type { SubmissionParams } from 'components/routes/submissions';
 import Classification from 'components/visual/Classification';
 import CustomChip from 'components/visual/CustomChip';
 import {
@@ -34,7 +35,7 @@ type Props = {
 const WrappedSubmissionsTable: React.FC<Props> = ({ submissionResults, allowSort = true }) => {
   const { t } = useTranslation(['search']);
   const { c12nDef } = useALContext();
-  const { search, setSearchObject } = useSearchParams();
+  const { search, setSearchObject } = useSearchParams<SubmissionParams>();
 
   return submissionResults ? (
     submissionResults.total !== 0 ? (

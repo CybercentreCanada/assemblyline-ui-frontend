@@ -3,7 +3,11 @@ import Typography from '@mui/material/Typography';
 import { useAppUser } from 'commons/components/app/hooks';
 import PageContainer from 'commons/components/pages/PageContainer';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
-import { createSearchParams } from 'components/core/SearchParams/createSearchParams';
+import {
+  createSearchParams,
+  SearchParamsProvider,
+  useSearchParams
+} from 'components/core/SearchParams/createSearchParams';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -19,7 +23,7 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
 
-export const { SearchParamsProvider, useSearchParams } = createSearchParams(p => ({
+const HEURISTICS_PARAMS = createSearchParams(p => ({
   query: p.string(''),
   offset: p.number(0).min(0).origin('state').ephemeral(),
   rows: p.number(25).locked().origin('state').ephemeral(),
@@ -27,6 +31,8 @@ export const { SearchParamsProvider, useSearchParams } = createSearchParams(p =>
   filters: p.filters([]),
   track_total_hits: p.number(10000).nullable().ephemeral()
 }));
+
+type HeuristicsParams = typeof HEURISTICS_PARAMS;
 
 const HeuristicsSearch = () => {
   const { t } = useTranslation(['manageHeuristics']);
@@ -37,7 +43,7 @@ const HeuristicsSearch = () => {
   const { indexes } = useALContext();
   const { user: currentUser } = useAppUser<CustomUser>();
   const { globalDrawerOpened, setGlobalDrawer, closeGlobalDrawer } = useDrawer();
-  const { search, setSearchParams } = useSearchParams();
+  const { search, setSearchParams } = useSearchParams<HeuristicsParams>();
 
   const [heuristicResults, setHeuristicResults] = useState<SearchResult<Heuristic>>(null);
   const [searching, setSearching] = useState<boolean>(false);
@@ -121,7 +127,7 @@ const HeuristicsSearch = () => {
 };
 
 const WrappedHeuristicsPage = () => (
-  <SearchParamsProvider>
+  <SearchParamsProvider params={HEURISTICS_PARAMS}>
     <HeuristicsSearch />
   </SearchParamsProvider>
 );
