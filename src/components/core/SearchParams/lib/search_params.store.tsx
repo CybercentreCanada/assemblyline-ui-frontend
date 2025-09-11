@@ -32,6 +32,11 @@ export const createSearchParamsStore = () => {
 
     const engine = useMemo(() => new SearchParamEngine(params).setDefaultValues(defaults ?? null), [params, defaults]);
 
+    const locationKey = useMemo<string>(
+      () => engine.fromLocation(location).omit(engine.getIgnoredKeys()).toString(),
+      [engine, location]
+    );
+
     const snapshotRef = useRef<SearchParamSnapshot<Blueprints>>(engine.fromLocation(location));
     const subscribers = useRef<Set<() => void>>(new Set());
     const notify = useRef<boolean>(false);
@@ -95,7 +100,7 @@ export const createSearchParamsStore = () => {
     const setDefaultParams = useCallback(
       (value: SearchParamValues<Blueprints>) => {
         if (!storageKey) return;
-        const search = engine.delta(value).omit(engine.getIgnoredKeys()).toParams();
+        const search = engine.delta(value).omit(engine.getEphemeralKeys()).toParams();
         localStorage.setItem(storageKey, search.toString());
         setDefaults(prev => {
           if (prev?.toString() === search.toString()) return prev;
@@ -115,7 +120,7 @@ export const createSearchParamsStore = () => {
       const next = engine.fromLocation(location, snapshotRef.current);
       set(next);
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [engine, location]);
+    }, [locationKey]);
 
     useEffect(() => {
       setDefaults(!storageKey ? null : new URLSearchParams(localStorage.getItem(storageKey) || ''));

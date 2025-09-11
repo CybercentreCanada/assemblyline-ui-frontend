@@ -146,7 +146,7 @@ export abstract class BaseBlueprint<T extends ParamValues> {
   }
 
   protected parse(value: unknown): T {
-    return value === 'null' ? null : value === 'undefined' ? undefined : undefined;
+    return value === 'undefined' ? undefined : null;
   }
 
   protected valid(value: unknown): value is T {
