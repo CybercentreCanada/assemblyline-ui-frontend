@@ -5,7 +5,11 @@ import { Grid, IconButton, Tooltip, useTheme } from '@mui/material';
 import { useAppUser } from 'commons/components/app/hooks';
 import PageContainer from 'commons/components/pages/PageContainer';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
-import { createSearchParams } from 'components/core/SearchParams/createSearchParams';
+import {
+  createSearchParams,
+  SearchParamsProvider,
+  useSearchParams
+} from 'components/core/SearchParams/createSearchParams';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -29,7 +33,7 @@ type SearchResults = {
   total: number;
 };
 
-export const { SearchParamsProvider, useSearchParams } = createSearchParams(p => ({
+const WORKFLOWS_PARAMS = createSearchParams(p => ({
   query: p.string(''),
   offset: p.number(0).min(0).origin('state').ephemeral(),
   rows: p.number(25).locked().origin('state').ephemeral(),
@@ -38,6 +42,8 @@ export const { SearchParamsProvider, useSearchParams } = createSearchParams(p =>
   track_total_hits: p.number(10000).nullable().ephemeral(),
   refresh: p.boolean(false).origin('state').ephemeral()
 }));
+
+type WorkflowsParams = typeof WORKFLOWS_PARAMS;
 
 const WorkflowsSearch = () => {
   const { t } = useTranslation(['manageWorkflows']);
@@ -48,7 +54,7 @@ const WorkflowsSearch = () => {
   const { indexes } = useALContext();
   const { user: currentUser } = useAppUser<CustomUser>();
   const { globalDrawerOpened, setGlobalDrawer, closeGlobalDrawer } = useDrawer();
-  const { search, setSearchParams, setSearchObject } = useSearchParams();
+  const { search, setSearchParams, setSearchObject } = useSearchParams<WorkflowsParams>();
 
   const [workflowResults, setWorkflowResults] = useState<SearchResults>(null);
   const [searching, setSearching] = useState<boolean>(false);
@@ -219,7 +225,7 @@ const WorkflowsSearch = () => {
 };
 
 const WrappedWorkflowsPage = () => (
-  <SearchParamsProvider>
+  <SearchParamsProvider params={WORKFLOWS_PARAMS}>
     <WorkflowsSearch />
   </SearchParamsProvider>
 );

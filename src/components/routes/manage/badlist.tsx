@@ -7,7 +7,11 @@ import { useAppUser } from 'commons/components/app/hooks';
 import PageContainer from 'commons/components/pages/PageContainer';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import { useALQuery } from 'components/core/Query/AL/useALQuery';
-import { createSearchParams } from 'components/core/SearchParams/createSearchParams';
+import {
+  createSearchParams,
+  SearchParamsProvider,
+  useSearchParams
+} from 'components/core/SearchParams/createSearchParams';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import type { CustomUser, IndexDefinition } from 'components/models/ui/user';
@@ -23,7 +27,7 @@ import React, { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
 
-export const { SearchParamsProvider, useSearchParams } = createSearchParams(p => ({
+const BADLIST_PARAMS = createSearchParams(p => ({
   query: p.string(''),
   offset: p.number(0).min(0).origin('state').ephemeral(),
   rows: p.number(25).locked().origin('state').ephemeral(),
@@ -33,6 +37,8 @@ export const { SearchParamsProvider, useSearchParams } = createSearchParams(p =>
   refresh: p.boolean(false).origin('state').ephemeral()
 }));
 
+export type BadlistParams = typeof BADLIST_PARAMS;
+
 const BadlistSearch = () => {
   const { t } = useTranslation(['manageBadlist']);
   const theme = useTheme();
@@ -41,7 +47,7 @@ const BadlistSearch = () => {
   const { indexes } = useALContext();
   const { user: currentUser } = useAppUser<CustomUser>();
   const { globalDrawerOpened, setGlobalDrawer, closeGlobalDrawer } = useDrawer();
-  const { search, setSearchParams, setSearchObject } = useSearchParams();
+  const { search, setSearchParams, setSearchObject } = useSearchParams<BadlistParams>();
 
   const suggestions = useMemo<IndexDefinition>(
     () => ({ ...indexes.badlist, ...DEFAULT_SUGGESTION }),
@@ -170,7 +176,7 @@ const BadlistSearch = () => {
 };
 
 const WrappedBadlistPage = () => (
-  <SearchParamsProvider>
+  <SearchParamsProvider params={BADLIST_PARAMS}>
     <BadlistSearch />
   </SearchParamsProvider>
 );
