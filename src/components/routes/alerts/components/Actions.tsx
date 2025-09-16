@@ -391,7 +391,7 @@ export const AlertSubmission: React.FC<AlertActionProps> = React.memo(
     return (
       <AlertActionButton
         tooltipTitle={t('submission')}
-        to={`/submission/detail/${alert?.sid}/${alert?.file?.sha256}?name=${encodeURIComponent(alert?.file?.name)}`}
+        to={`/submission/${alert?.sid}`}
         open={open}
         vertical={vertical}
         permanent={permanent}
