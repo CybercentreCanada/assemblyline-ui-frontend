@@ -73,7 +73,11 @@ export const createSearchParamsStore = () => {
         const values = typeof input === 'function' ? input(snapshotRef.current.toParams()) : input;
         set(engine.full(values));
         navigate(
-          { search: snapshotRef.current.toLocationSearch() },
+          {
+            pathname: window.location.pathname,
+            search: snapshotRef.current.toLocationSearch(),
+            hash: window.location.hash
+          },
           { replace, state: snapshotRef.current.toLocationState() }
         );
       },
@@ -90,7 +94,11 @@ export const createSearchParamsStore = () => {
         const values = typeof input === 'function' ? input(snapshotRef.current.toObject()) : input;
         set(engine.full(values));
         navigate(
-          { search: snapshotRef.current.toLocationSearch() },
+          {
+            pathname: window.location.pathname,
+            search: snapshotRef.current.toLocationSearch(),
+            hash: window.location.hash
+          },
           { replace, state: snapshotRef.current.toLocationState() }
         );
       },
