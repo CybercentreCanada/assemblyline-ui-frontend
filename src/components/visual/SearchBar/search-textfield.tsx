@@ -432,7 +432,6 @@ const SearchTextOption: React.FC<{
         variant="caption"
         sx={{
           textAlign: 'right',
-          padding: theme.spacing(1),
           ...(!selected && {
             overflow: 'hidden',
             whiteSpace: 'nowrap',
