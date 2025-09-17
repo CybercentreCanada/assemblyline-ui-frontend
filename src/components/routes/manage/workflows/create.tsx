@@ -149,7 +149,8 @@ const WrappedWorkflowCreate = ({ id: propID = null, onClose = () => null }: Prop
   const handleResults = useAPIQuery<SearchResult<Alert>>({
     url: `/api/v4/search/alert/?query=${encodeURIComponent(workflow?.query)}&rows=10&track_total_hits=true`,
     disabled: !workflow?.query || !currentUser.roles.includes('alert_view'),
-    delay: 1000
+    delay: 400,
+    onFailure: () => null
   });
 
   const disabled = useMemo<boolean>(
@@ -159,8 +160,21 @@ const WrappedWorkflowCreate = ({ id: propID = null, onClose = () => null }: Prop
       handleFetch.isFetching ||
       handleUpdate.isPending ||
       workflow?.name === '' ||
-      workflow?.query === '',
-    [modified, handleAdd.isPending, handleFetch.isFetching, handleUpdate.isPending, workflow?.name, workflow?.query]
+      workflow?.query === '' ||
+      handleResults.isDebouncing ||
+      handleResults.isFetching ||
+      !!handleResults.error,
+    [
+      modified,
+      handleAdd.isPending,
+      handleFetch.isFetching,
+      handleUpdate.isPending,
+      workflow?.name,
+      workflow?.query,
+      handleResults.isDebouncing,
+      handleResults.isFetching,
+      handleResults.error
+    ]
   );
 
   if (!currentUser.roles.includes('workflow_manage')) return <ForbiddenPage />;
@@ -229,6 +243,9 @@ const WrappedWorkflowCreate = ({ id: propID = null, onClose = () => null }: Prop
               label={t('query')}
               loading={!workflow || handleFetch.isFetching}
               value={!workflow ? null : workflow.query}
+              error={() =>
+                handleResults.isDebouncing || handleResults.isFetching ? t('query.validating') : handleResults.error
+              }
               minRows={1}
               maxRows={5}
               required
