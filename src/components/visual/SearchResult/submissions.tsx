@@ -38,7 +38,7 @@ const WrappedSubmissionsTable: React.FC<Props> = ({ submissionResults, allowSort
   const { search, setSearchObject } = useSearchParams<SubmissionParams>();
 
   return submissionResults ? (
-    !submissionResults?.total ? (
+    !!submissionResults?.total ? (
       <TableContainer component={Paper}>
         <DivTable>
           <DivTableHead>
