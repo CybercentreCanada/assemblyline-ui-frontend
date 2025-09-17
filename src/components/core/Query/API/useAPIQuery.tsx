@@ -33,7 +33,7 @@ export const useAPIQuery = <
 
   const [debouncedParams, setDebouncedParams] = useState<unknown>(null);
 
-  const debouncing = useMemo<boolean>(
+  const isDebouncing = useMemo<boolean>(
     () => (delay === null ? false : JSON.stringify(params) !== JSON.stringify(debouncedParams)),
     [debouncedParams, delay, params]
   );
@@ -48,7 +48,7 @@ export const useAPIQuery = <
   const query = useQuery<unknown, APIResponse<Error>, APIResponse<Response>, [unknown]>(
     {
       ...queryProps,
-      enabled: !disabled && !debouncing,
+      enabled: !disabled && !isDebouncing,
       queryKey: [{ ...params, disabled }],
       queryFn: async ({ signal }) => apiCallFn({ signal, enabled: !disabled, ...params }),
       retry: (failureCount, error) => failureCount < 0 || error?.api_status_code === 502,
@@ -68,6 +68,7 @@ export const useAPIQuery = <
       error: error,
       serverVersion: serverVersion,
       statusCode: statusCode,
+      isDebouncing,
       dataUpdatedAt: query?.dataUpdatedAt,
       errorUpdatedAt: query?.errorUpdatedAt,
       failureCount: query?.failureCount,
@@ -94,6 +95,7 @@ export const useAPIQuery = <
     [
       data,
       error,
+      isDebouncing,
       query?.dataUpdatedAt,
       query?.errorUpdatedAt,
       query?.failureCount,
