@@ -189,17 +189,19 @@ export const createSearchParamsStore = () => {
   const useSearchParams = <Blueprints extends SearchParamBlueprints>() => {
     const ctx = useContext(SearchParamsContext);
 
+    const emptySnapshot = useMemo(() => new SearchParamSnapshot<Blueprints>(), []);
+
     const store = useMemo(
       () =>
         ctx ?? {
-          get: () => new SearchParamSnapshot<Blueprints>(),
+          get: () => emptySnapshot,
           subscribe: () => () => null,
           setSearchParams: () => null,
           setSearchObject: () => null,
           setDefaultParams: () => null,
           clearDefaultParams: () => null
         },
-      [ctx]
+      [ctx, emptySnapshot]
     );
 
     const search = useSyncExternalStore(store.subscribe, store.get, store.get);
