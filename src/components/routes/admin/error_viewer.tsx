@@ -1,20 +1,23 @@
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import PanToolOutlinedIcon from '@mui/icons-material/PanToolOutlined';
 import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
-import { Grid, MenuItem, Select, Typography, useTheme } from '@mui/material';
-import FormControl from '@mui/material/FormControl';
+import { Grid, Typography, useTheme } from '@mui/material';
 import { useAppUser } from 'commons/components/app/hooks';
 import PageContainer from 'commons/components/pages/PageContainer';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
-import type { SearchParams } from 'components/core/SearchParams/SearchParams';
-import { createSearchParams } from 'components/core/SearchParams/SearchParams';
-import { SearchParamsProvider, useSearchParams } from 'components/core/SearchParams/SearchParamsContext';
+import {
+  createSearchParams,
+  SearchParamsProvider,
+  useSearchParams
+} from 'components/core/SearchParams/createSearchParams';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import type { Error } from 'components/models/base/error';
 import type { FacetResult, HistogramResult, SearchResult } from 'components/models/ui/search';
 import type { CustomUser } from 'components/models/ui/user';
 import { ErrorDetail } from 'components/routes/admin/error_detail';
+import { DateTimeRangePicker } from 'components/visual/DateTime/DateTimeRangePicker';
+import { LuceneDateTime, LuceneDateTimeGap } from 'components/visual/DateTime/LuceneDateTime';
 import Histogram from 'components/visual/Histogram';
 import LineGraph from 'components/visual/LineGraph';
 import SearchHeader from 'components/visual/SearchBar/SearchHeader';
@@ -25,52 +28,26 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useLocation, useNavigate } from 'react-router';
 
-const TIME_CONTRAINTS = ['24h', '4d', '7d', '1m', '1y'] as const;
-
-type TimeContraint = (typeof TIME_CONTRAINTS)[number];
-
-const TC_MAP: Record<TimeContraint, string> = {
-  '24h': 'created:[now-24h TO now]',
-  '4d': 'created:[now-4d TO now]',
-  '7d': 'created:[now-7d TO now]',
-  '1m': 'created:[now-1M TO now]',
-  '1y': null
-};
-
-const START_MAP: Record<TimeContraint, string> = {
-  '24h': 'now-1d',
-  '4d': 'now-4d',
-  '7d': 'now-7d',
-  '1m': 'now-1M',
-  '1y': 'now-1y'
-};
-
-const GAP_MAP: Record<TimeContraint, string> = {
-  '24h': '1h',
-  '4d': '2h',
-  '7d': '4h',
-  '1m': '1d',
-  '1y': '15d'
-};
-
 const ERROR_VIEWER_PARAMS = createSearchParams(p => ({
   query: p.string(''),
-  offset: p.number(0).min(0).hidden().ignored(),
-  rows: p.number(25).enforced().hidden().ignored(),
-  sort: p.string('created desc').ignored(),
-  tc: p.enum('4d', TIME_CONTRAINTS),
+  offset: p.number(0).min(0).origin('state').ephemeral(),
+  rows: p.number(25).locked().origin('state').ephemeral(),
+  sort: p.string('created desc').ephemeral(),
+  start: p.string('now-4d'),
+  end: p.string('now'),
+  gap: p.string('4h'),
   filters: p.filters([]),
-  track_total_hits: p.number(10000).nullable().ignored(),
-  mincount: p.number(0).min(0).hidden().ignored(),
+  track_total_hits: p.number(10000).nullable().ephemeral(),
+  mincount: p.number(0).min(0).origin('state').ephemeral(),
   use_archive: p.boolean(false),
   archive_only: p.boolean(false),
-  timeout: p.string('').hidden().ignored()
+  timeout: p.string('').origin('state').ephemeral()
 }));
 
-type ErrorViewerParams = SearchParams<typeof ERROR_VIEWER_PARAMS>;
+type ErrorViewerParams = typeof ERROR_VIEWER_PARAMS;
 
 const ErrorViewer = () => {
-  const { t } = useTranslation(['adminErrorViewer']);
+  const { t, i18n } = useTranslation(['adminErrorViewer']);
   const theme = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
@@ -105,11 +82,20 @@ const ErrorViewer = () => {
   useEffect(() => {
     if (!search || !currentUser.is_admin) return;
 
-    const body = search.set(o => ({
-      ...o,
-      query: o.query || '*',
-      filters: o.tc in TC_MAP && o.tc !== '1y' ? [...o.filters, TC_MAP[o.tc]] : o.filters
-    }));
+    const body = search.set(o => {
+      const start = new LuceneDateTime(o.start, 'start', i18n.language).toLucene();
+      const end = new LuceneDateTime(o.end, 'end', i18n.language).toLucene();
+      const gap = new LuceneDateTimeGap(o.gap, start, end, 50, '4h', true, i18n.language).toString();
+
+      return {
+        ...o,
+        query: o.query || '*',
+        start,
+        end,
+        gap,
+        filters: [...o.filters, `created:[${start} TO ${end}]`]
+      };
+    });
 
     apiCall<SearchResult<Error>>({
       url: `/api/v4/error/list/?${body
@@ -123,12 +109,9 @@ const ErrorViewer = () => {
     apiCall<HistogramResult>({
       url: '/api/v4/search/histogram/error/created/',
       method: 'POST',
-      body: {
-        ...body.pick(['query', 'mincount', 'filters', 'timeout', 'use_archive', 'archive_only']).toObject(),
-        start: START_MAP[body.get('tc')],
-        end: 'now',
-        gap: GAP_MAP[body.get('tc')]
-      },
+      body: body
+        .pick(['query', 'mincount', 'filters', 'timeout', 'use_archive', 'archive_only', 'start', 'end', 'gap'])
+        .toObject(),
       onSuccess: ({ api_response }) => setHistogram(api_response)
     });
 
@@ -200,26 +183,27 @@ const ErrorViewer = () => {
 
   return currentUser.is_admin ? (
     <PageFullWidth margin={4}>
-      <Grid container spacing={2} style={{ paddingBottom: theme.spacing(2) }}>
-        <Grid size={{ xs: 12, sm: 7, md: 9, xl: 10 }}>
-          <Typography variant="h4">{t('title')}</Typography>
-        </Grid>
-        <Grid size={{ xs: 12, sm: 5, md: 3, xl: 2 }}>
-          <FormControl size="small" fullWidth>
-            <Select
-              disabled={searching}
-              value={search.get('tc')}
-              variant="outlined"
-              onChange={event => setSearchObject(o => ({ ...o, offset: 0, tc: event.target.value as TimeContraint }))}
-              fullWidth
-            >
-              {TIME_CONTRAINTS.map((time, i) => (
-                <MenuItem key={i} value={time} children={t(`tc.${time}`)} />
-              ))}
-            </Select>
-          </FormControl>
-        </Grid>
-      </Grid>
+      <div
+        style={{
+          width: '100%',
+          display: 'flex',
+          flexDirection: 'row',
+          flexWrap: 'wrap',
+          gap: theme.spacing(2),
+          paddingBottom: theme.spacing(2)
+        }}
+      >
+        <Typography variant="h4" sx={{ flex: 1 }}>
+          {t('title')}
+        </Typography>
+
+        <DateTimeRangePicker
+          value={{ start: search.get('start'), end: search.get('end'), gap: search.get('gap') }}
+          disabled={searching}
+          hasGap
+          onChange={(e, { start, end, gap }) => setSearchObject(o => ({ ...o, offset: 0, start, end, gap }))}
+        />
+      </div>
 
       <PageContainer isSticky>
         <div style={{ paddingTop: theme.spacing(1) }}>
@@ -280,7 +264,7 @@ const ErrorViewer = () => {
             <Histogram
               dataset={histogram}
               height="200px"
-              title={t(`graph.histogram.title.${search.get('tc')}`)}
+              title={t('graph.histogram.title')}
               datatype={t('graph.datatype')}
               isDate
               verticalLine

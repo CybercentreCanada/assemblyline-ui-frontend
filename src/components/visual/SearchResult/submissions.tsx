@@ -2,7 +2,7 @@ import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
 import { AlertTitle, Skeleton, Tooltip } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
-import { useSearchParams } from 'components/core/SearchParams/SearchParamsContext';
+import { useSearchParams } from 'components/core/SearchParams/createSearchParams';
 import useALContext from 'components/hooks/useALContext';
 import type { SubmissionIndexed } from 'components/models/base/submission';
 import type { SearchResult } from 'components/models/ui/search';
@@ -35,10 +35,10 @@ type Props = {
 const WrappedSubmissionsTable: React.FC<Props> = ({ submissionResults, allowSort = true }) => {
   const { t } = useTranslation(['search']);
   const { c12nDef } = useALContext();
-  const searchParams = useSearchParams<SubmissionParams>();
+  const { search, setSearchObject } = useSearchParams<SubmissionParams>();
 
   return submissionResults ? (
-    submissionResults.total !== 0 ? (
+    !!submissionResults?.total ? (
       <TableContainer component={Paper}>
         <DivTable>
           <DivTableHead>
@@ -92,7 +92,7 @@ const WrappedSubmissionsTable: React.FC<Props> = ({ submissionResults, allowSort
                 </DivTableCell>
                 <DivTableCell breakable>{maxLenStr(submission.params.description, 150)}</DivTableCell>
                 <DivTableCell style={{ whiteSpace: 'nowrap' }}>
-                  {!searchParams ? (
+                  {!search ? (
                     submission.params.submitter
                   ) : (
                     <CustomChip
@@ -103,7 +103,7 @@ const WrappedSubmissionsTable: React.FC<Props> = ({ submissionResults, allowSort
                       onClick={event => {
                         event.preventDefault();
                         event.stopPropagation();
-                        searchParams?.setSearchObject(o => ({
+                        setSearchObject(o => ({
                           ...o,
                           offset: 0,
                           filters: [...o.filters, `params.submitter:"${submission.params.submitter}"`]

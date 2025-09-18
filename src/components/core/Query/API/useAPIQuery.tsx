@@ -12,20 +12,20 @@ export type UseAPIQueryProps<Response = unknown, Request extends APIRequest = AP
     UndefinedInitialDataOptions<Promise<unknown>, APIResponse<Error>, APIResponse<Response>, [unknown]>,
     'queryKey' | 'queryFn'
   >;
-  enabled?: boolean;
-  retryAfter?: number;
   delay?: number;
-} & Omit<UseAPICallFnProps<APIResponse<Response>, Request, APIResponse<Error>>, 'signal' | 'enabled' | 'retryAfter'>;
+  disabled?: boolean;
+  retryAfter?: number;
+} & Omit<UseAPICallFnProps<APIResponse<Response>, Request, APIResponse<Error>>, 'signal' | 'disabled' | 'retryAfter'>;
 
 export const useAPIQuery = <
   Response = unknown,
   Request extends APIRequest = APIRequest,
   Error extends string = string
 >({
-  enabled = true,
+  delay = null,
+  disabled = false,
   queryProps = null,
   retryAfter = DEFAULT_RETRY_MS,
-  delay = null,
   ...params
 }: UseAPIQueryProps<Response, Request, Error>) => {
   const queryClient = useQueryClient();
@@ -33,7 +33,7 @@ export const useAPIQuery = <
 
   const [debouncedParams, setDebouncedParams] = useState<unknown>(null);
 
-  const debouncing = useMemo<boolean>(
+  const isDebouncing = useMemo<boolean>(
     () => (delay === null ? false : JSON.stringify(params) !== JSON.stringify(debouncedParams)),
     [debouncedParams, delay, params]
   );
@@ -48,11 +48,11 @@ export const useAPIQuery = <
   const query = useQuery<unknown, APIResponse<Error>, APIResponse<Response>, [unknown]>(
     {
       ...queryProps,
-      enabled: !!enabled && !debouncing,
-      queryKey: [{ ...params, enabled }],
-      queryFn: async ({ signal }) => apiCallFn({ signal, enabled, ...params }),
-      retry: (failureCount, error) => failureCount < 1 || error?.api_status_code === 502,
-      retryDelay: failureCount => (failureCount < 1 ? 1000 : Math.min(retryAfter, 10000))
+      enabled: !disabled && !isDebouncing,
+      queryKey: [{ ...params, disabled }],
+      queryFn: async ({ signal }) => apiCallFn({ signal, enabled: !disabled, ...params }),
+      retry: (failureCount, error) => failureCount < 0 || error?.api_status_code === 502,
+      retryDelay: failureCount => (failureCount < 0 ? 1000 : Math.min(retryAfter, 10000))
     },
     queryClient
   );
@@ -68,6 +68,7 @@ export const useAPIQuery = <
       error: error,
       serverVersion: serverVersion,
       statusCode: statusCode,
+      isDebouncing,
       dataUpdatedAt: query?.dataUpdatedAt,
       errorUpdatedAt: query?.errorUpdatedAt,
       failureCount: query?.failureCount,
@@ -94,6 +95,7 @@ export const useAPIQuery = <
     [
       data,
       error,
+      isDebouncing,
       query?.dataUpdatedAt,
       query?.errorUpdatedAt,
       query?.failureCount,
