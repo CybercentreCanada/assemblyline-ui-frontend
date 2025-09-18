@@ -511,7 +511,7 @@ const SafelistDetail = ({ safelist_id = null, close = () => null }: SafelistDeta
                       <Moment variant="fromNow">{safelist.expiry_ts}</Moment>)
                     </div>
                   ) : (
-                    <span style={{ color: theme.palette.action.disabled }}>{t('expiry.forever')}</span>
+                    <span style={{ color: theme.palette.text.disabled }}>{t('expiry.forever')}</span>
                   )
                 ) : (
                   <Skeleton />
