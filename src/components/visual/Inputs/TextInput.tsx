@@ -9,7 +9,7 @@ import {
   StyledTextField
 } from 'components/visual/Inputs/lib/inputs.components';
 import {
-  useErrorMessage,
+  useErrorCallback,
   useInputBlur,
   useInputChange,
   useInputFocus,
@@ -40,8 +40,6 @@ const WrappedTextInput = () => {
   const handleBlur = useInputBlur<TextInputProps>();
   const handleChange = useInputChange<TextInputProps>();
   const handleFocus = useInputFocus<TextInputProps>();
-
-  useErrorMessage();
 
   return (
     <StyledRoot>
@@ -78,11 +76,14 @@ const WrappedTextInput = () => {
   );
 };
 
-export const TextInput = ({ preventRender = false, value, ...props }: TextInputProps) =>
-  preventRender ? null : (
+export const TextInput = ({ preventRender = false, value, ...props }: TextInputProps) => {
+  const errorMessage = useErrorCallback({ preventRender, value, ...props });
+
+  return preventRender ? null : (
     <PropProvider<TextInputProps>
-      props={{ autoComplete: 'off', options: [], preventRender, inputValue: value, value, ...props }}
+      props={{ autoComplete: 'off', options: [], preventRender, inputValue: value, value, errorMessage, ...props }}
     >
       <WrappedTextInput />
     </PropProvider>
   );
+};

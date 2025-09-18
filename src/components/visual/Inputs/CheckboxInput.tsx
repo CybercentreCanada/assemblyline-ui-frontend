@@ -11,7 +11,7 @@ import {
   StyledFormControl,
   StyledFormControlLabel
 } from 'components/visual/Inputs/lib/inputs.components';
-import { useErrorMessage, useInputBlur, useInputClick, useInputFocus } from 'components/visual/Inputs/lib/inputs.hook';
+import { useErrorCallback, useInputBlur, useInputClick, useInputFocus } from 'components/visual/Inputs/lib/inputs.hook';
 import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
 import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
 import { Tooltip } from 'components/visual/Tooltip';
@@ -37,8 +37,6 @@ const WrappedCheckboxInput = () => {
   const handleBlur = useInputBlur<CheckboxInputProps>();
   const handleClick = useInputClick<CheckboxInputProps>();
   const handleFocus = useInputFocus<CheckboxInputProps>();
-
-  useErrorMessage();
 
   return (
     <Tooltip title={loading ? null : tooltip} {...tooltipProps}>
@@ -78,9 +76,14 @@ const WrappedCheckboxInput = () => {
   );
 };
 
-export const CheckboxInput = ({ preventRender = false, value, ...props }: CheckboxInputProps) =>
-  preventRender ? null : (
-    <PropProvider<CheckboxInputProps> props={{ indeterminate: false, inputValue: value, value, ...props }}>
+export const CheckboxInput = ({ preventRender = false, value, ...props }: CheckboxInputProps) => {
+  const errorMessage = useErrorCallback({ preventRender, value, ...props });
+
+  return preventRender ? null : (
+    <PropProvider<CheckboxInputProps>
+      props={{ indeterminate: false, inputValue: value, value, errorMessage, ...props }}
+    >
       <WrappedCheckboxInput />
     </PropProvider>
   );
+};

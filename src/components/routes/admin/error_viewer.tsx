@@ -5,9 +5,11 @@ import { Grid, Typography, useTheme } from '@mui/material';
 import { useAppUser } from 'commons/components/app/hooks';
 import PageContainer from 'commons/components/pages/PageContainer';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
-import type { SearchParams } from 'components/core/SearchParams/SearchParams';
-import { createSearchParams } from 'components/core/SearchParams/SearchParams';
-import { SearchParamsProvider, useSearchParams } from 'components/core/SearchParams/SearchParamsContext';
+import {
+  createSearchParams,
+  SearchParamsProvider,
+  useSearchParams
+} from 'components/core/SearchParams/createSearchParams';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import type { Error } from 'components/models/base/error';
@@ -28,21 +30,21 @@ import { Navigate, useLocation, useNavigate } from 'react-router';
 
 const ERROR_VIEWER_PARAMS = createSearchParams(p => ({
   query: p.string(''),
-  offset: p.number(0).min(0).hidden().ignored(),
-  rows: p.number(25).enforced().hidden().ignored(),
-  sort: p.string('created desc').ignored(),
+  offset: p.number(0).min(0).origin('state').ephemeral(),
+  rows: p.number(25).locked().origin('state').ephemeral(),
+  sort: p.string('created desc').ephemeral(),
   start: p.string('now-4d'),
   end: p.string('now'),
   gap: p.string('4h'),
   filters: p.filters([]),
-  track_total_hits: p.number(10000).nullable().ignored(),
-  mincount: p.number(0).min(0).hidden().ignored(),
+  track_total_hits: p.number(10000).nullable().ephemeral(),
+  mincount: p.number(0).min(0).origin('state').ephemeral(),
   use_archive: p.boolean(false),
   archive_only: p.boolean(false),
-  timeout: p.string('').hidden().ignored()
+  timeout: p.string('').origin('state').ephemeral()
 }));
 
-type ErrorViewerParams = SearchParams<typeof ERROR_VIEWER_PARAMS>;
+type ErrorViewerParams = typeof ERROR_VIEWER_PARAMS;
 
 const ErrorViewer = () => {
   const { t, i18n } = useTranslation(['adminErrorViewer']);
