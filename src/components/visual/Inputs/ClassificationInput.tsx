@@ -24,7 +24,7 @@ import {
   StyledInputSkeleton,
   StyledRoot
 } from 'components/visual/Inputs/lib/inputs.components';
-import { useError, useErrorMessage } from 'components/visual/Inputs/lib/inputs.hook';
+import { useError, useErrorCallback } from 'components/visual/Inputs/lib/inputs.hook';
 import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
 import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
 import { Tooltip } from 'components/visual/Tooltip';
@@ -88,8 +88,6 @@ const WrappedClassificationInput = () => {
   const onChange = get('onChange');
   const onError = get('onError');
   const onReset = get('onReset');
-
-  useErrorMessage();
 
   const preventRender = useMemo(
     () => preventRenderStore || !c12nDef?.enforce || !validated?.parts?.lvl,
@@ -502,10 +500,13 @@ const WrappedClassificationInput = () => {
 };
 
 export const ClassificationInput = ({ preventRender = false, value, ...props }: ClassificationInputProps) => {
+  const errorMessage = useErrorCallback({ preventRender, value, ...props });
+
   return preventRender || !value ? null : (
     <PropProvider<ClassificationInputProps>
       props={{
         dynGroup: null,
+        errorMessage,
         format: 'short',
         fullWidth: true,
         inline: false,

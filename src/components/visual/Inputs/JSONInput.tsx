@@ -12,7 +12,7 @@ import {
   StyledInputSkeleton,
   StyledRoot
 } from 'components/visual/Inputs/lib/inputs.components';
-import { useErrorMessage, useInputChange } from 'components/visual/Inputs/lib/inputs.hook';
+import { useErrorCallback, useInputChange } from 'components/visual/Inputs/lib/inputs.hook';
 import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
 import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
 import React, { useMemo } from 'react';
@@ -57,8 +57,6 @@ const WrappedJSONInput = () => {
   );
 
   const handleChange = useInputChange<JSONInputProps>();
-
-  useErrorMessage();
 
   return (
     <StyledRoot>
@@ -132,9 +130,12 @@ const WrappedJSONInput = () => {
   );
 };
 
-export const JSONInput = ({ preventRender = false, value, ...props }: JSONInputProps) =>
-  preventRender ? null : (
-    <PropProvider<JSONInputProps> props={{ preventRender, inputValue: value, value, ...props }}>
+export const JSONInput = ({ preventRender = false, value, ...props }: JSONInputProps) => {
+  const errorMessage = useErrorCallback({ preventRender, value, ...props });
+
+  return preventRender ? null : (
+    <PropProvider<JSONInputProps> props={{ preventRender, inputValue: value, value, errorMessage, ...props }}>
       <WrappedJSONInput />
     </PropProvider>
   );
+};
