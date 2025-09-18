@@ -10,7 +10,8 @@ import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import type { FileIndexed } from 'components/models/base/file';
-import type { FacetResult, FieldsResult, HistogramResult, SearchResult } from 'components/models/ui/search';
+import type { FacetResult, HistogramResult, SearchResult } from 'components/models/ui/search';
+import type { IndexDefinition } from 'components/models/ui/user';
 import ArchiveDetail from 'components/routes/archive/detail';
 import { ChipList } from 'components/visual/ChipList';
 import Histogram from 'components/visual/Histogram';
@@ -86,7 +87,7 @@ export default function MalwareArchive() {
   const [types, setTypes] = useState<Record<string, number>>(null);
   const [labels, setLabels] = useState<Record<string, number>>(null);
   const [searching, setSearching] = useState<boolean>(false);
-  const [suggestions, setSuggestions] = useState<string[]>();
+  const [suggestions, setSuggestions] = useState<IndexDefinition>();
 
   const filterValue = useRef<string>('');
 
@@ -234,14 +235,9 @@ export default function MalwareArchive() {
   }, [location.hash]);
 
   useEffect(() => {
-    apiCall<FieldsResult>({
+    apiCall<IndexDefinition>({
       url: '/api/v4/search/fields/file/',
-      onSuccess: api_data => {
-        setSuggestions([
-          ...Object.keys(api_data.api_response).filter(name => api_data.api_response[name].indexed),
-          ...DEFAULT_SUGGESTION
-        ]);
-      }
+      onSuccess: ({ api_response }) => setSuggestions({ ...api_response, ...DEFAULT_SUGGESTION })
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

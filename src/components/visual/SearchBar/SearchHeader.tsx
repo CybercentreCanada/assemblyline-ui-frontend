@@ -324,7 +324,7 @@ const WrappedSearchHeader = ({
           <SearchContainer>
             <div ref={inputRef} style={{ flex: 1 }}>
               <SearchTextField
-                options={[]}
+                options={{}}
                 {...searchInputProps}
                 value={queryValue}
                 disabled={loading}

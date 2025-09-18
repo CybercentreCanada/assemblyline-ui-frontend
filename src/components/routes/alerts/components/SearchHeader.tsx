@@ -13,6 +13,7 @@ import {
   useTheme
 } from '@mui/material';
 import PageContainer from 'commons/components/pages/PageContainer';
+import type { IndexDefinition } from 'components/models/ui/user';
 import { ChipList } from 'components/visual/ChipList';
 import SearchTextField from 'components/visual/SearchBar/search-textfield';
 import SearchResultCount from 'components/visual/SearchResultCount';
@@ -42,7 +43,7 @@ type Props = {
   searchResultContent?: string;
   loading?: boolean;
   extras?: ReactNode;
-  suggestions?: string[];
+  suggestions?: IndexDefinition;
   pageSize?: number;
   paramKeys?: Partial<Record<keyof SearchParam, string>>;
   total?: number;
@@ -72,7 +73,7 @@ const WrappedSearchHeader = ({
   value = '',
   placeholder,
   loading = false,
-  suggestions = [],
+  suggestions = {},
   defaultValue: {
     query: queryDefaultValue = '*',
     offset: offsetDefaultValue = 0,

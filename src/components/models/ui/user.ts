@@ -5,13 +5,39 @@ import type { UserSettings } from 'components/models/base/user_settings';
 import type { RequestBuilder } from 'components/models/utils/request';
 import type { ClassificationDefinition } from 'helpers/classificationParser';
 
+/** Data Types based on the elastic definitions */
+export const FIELD_TYPES = [
+  'binary',
+  'boolean',
+  'byte',
+  'date',
+  'double',
+  'float',
+  'half_float',
+  'integer',
+  'ip',
+  'keyword',
+  'long',
+  'nested',
+  'null',
+  'object',
+  'scaled_float',
+  'short',
+  'text',
+  'unsigned_long',
+  'version'
+] as const;
+
+export type FieldType = (typeof FIELD_TYPES)[number];
+
 export type Field = {
   name: string;
   indexed: boolean;
   stored: boolean;
-  type: string;
+  type: FieldType;
   default: boolean;
   list: boolean;
+  description?: string;
 };
 
 export type IndexDefinition = Record<string, Field>;

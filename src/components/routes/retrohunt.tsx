@@ -9,6 +9,7 @@ import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import type { Retrohunt, RetrohuntIndexed, RetrohuntProgress } from 'components/models/base/retrohunt';
 import type { SearchResult } from 'components/models/ui/search';
+import type { IndexDefinition } from 'components/models/ui/user';
 import { RetrohuntCreate } from 'components/routes/retrohunt/create';
 import RetrohuntDetail from 'components/routes/retrohunt/detail';
 import { IconButton } from 'components/visual/Buttons/IconButton';
@@ -59,8 +60,8 @@ export default function RetrohuntPage() {
   const sio = useRef<Socket<any, any>>(null);
   const resultListeners = useRef<string[]>([]);
 
-  const suggestions = useMemo<string[]>(
-    () => [...Object.keys(indexes.retrohunt).filter(name => indexes.retrohunt[name].indexed), ...DEFAULT_SUGGESTION],
+  const suggestions = useMemo<IndexDefinition>(
+    () => ({ ...indexes.retrohunt, ...DEFAULT_SUGGESTION }),
     [indexes.retrohunt]
   );
 
