@@ -2,6 +2,7 @@ import { TableOfContentProvider, useTableOfContent } from 'components/core/Table
 import useALContext from 'components/hooks/useALContext';
 import type { LibraryFormStore } from 'components/routes/development/library/contexts/form';
 import { FormProvider, useForm } from 'components/routes/development/library/contexts/form';
+import { ActionableSection } from 'components/routes/development/library/sections/Actionable';
 import { InputsSection } from 'components/routes/development/library/sections/Inputs';
 import { LayoutSection } from 'components/routes/development/library/sections/Layout';
 import { ListSection } from 'components/routes/development/library/sections/List';
@@ -101,6 +102,8 @@ const LibraryContent = () => {
           >
             {(() => {
               switch (tab) {
+                case 'actionable':
+                  return <ActionableSection />;
                 case 'inputs':
                   return <InputsSection />;
                 case 'layout':
