@@ -7,7 +7,12 @@ import {
   StyledRoot,
   StyledTextField
 } from 'components/visual/Inputs/lib/inputs.components';
-import { useErrorMessage, useInputBlur, useInputChange, useInputFocus } from 'components/visual/Inputs/lib/inputs.hook';
+import {
+  useErrorCallback,
+  useInputBlur,
+  useInputChange,
+  useInputFocus
+} from 'components/visual/Inputs/lib/inputs.hook';
 import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
 import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
 import React, { useEffect, useRef } from 'react';
@@ -35,8 +40,6 @@ const WrappedNumberInput = () => {
   const handleBlur = useInputBlur<NumberInputProps>();
   const handleChange = useInputChange<NumberInputProps>();
   const handleFocus = useInputFocus<NumberInputProps>();
-
-  useErrorMessage();
 
   useEffect(() => {
     const el = inputRef.current;
@@ -88,12 +91,15 @@ const WrappedNumberInput = () => {
   );
 };
 
-export const NumberInput = ({ preventRender = false, value, ...props }: NumberInputProps) =>
-  preventRender ? null : (
+export const NumberInput = ({ preventRender = false, value, ...props }: NumberInputProps) => {
+  const errorMessage = useErrorCallback({ preventRender, value, ...props });
+
+  return preventRender ? null : (
     <PropProvider<NumberInputProps>
       props={{
         autoComplete: 'off',
         enforceValidValue: true,
+        errorMessage,
         inputValue: value == null ? '' : String(value),
         max: null,
         min: null,
@@ -107,3 +113,4 @@ export const NumberInput = ({ preventRender = false, value, ...props }: NumberIn
       <WrappedNumberInput />
     </PropProvider>
   );
+};

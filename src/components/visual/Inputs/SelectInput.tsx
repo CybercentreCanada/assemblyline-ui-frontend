@@ -13,7 +13,7 @@ import {
   StyledRoot
 } from 'components/visual/Inputs/lib/inputs.components';
 import {
-  useErrorMessage,
+  useErrorCallback,
   useInputBlur,
   useInputChange,
   useInputFocus,
@@ -60,8 +60,6 @@ const WrappedSelectInput = <O extends readonly Option[]>() => {
   const handleBlur = useInputBlur<SelectInputProps<O>>();
   const handleChange = useInputChange<SelectInputProps<O>>();
   const handleFocus = useInputFocus<SelectInputProps<O>>();
-
-  useErrorMessage();
 
   return (
     <StyledRoot>
@@ -157,12 +155,15 @@ export const SelectInput = <O extends readonly Option[]>({
   preventRender = false,
   value,
   ...props
-}: SelectInputProps<O>) =>
-  preventRender ? null : (
+}: SelectInputProps<O>) => {
+  const errorMessage = useErrorCallback({ preventRender, value, ...props });
+
+  return preventRender ? null : (
     <PropProvider<SelectInputProps<O>>
       props={{
         capitalize: false,
         displayEmpty: false,
+        errorMessage,
         inputValue: value,
         menuAdornment: true,
         options: [] as unknown as O,
@@ -174,3 +175,4 @@ export const SelectInput = <O extends readonly Option[]>({
       <WrappedSelectInput />
     </PropProvider>
   );
+};

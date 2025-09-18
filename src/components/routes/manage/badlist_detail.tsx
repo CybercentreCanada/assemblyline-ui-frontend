@@ -458,7 +458,7 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
               (!badlist.attribution ||
                 Object.keys(badlist.attribution).every(
                   (k: keyof Badlist['attribution']) => !badlist.attribution[k] || badlist.attribution[k].length === 0
-                )) && <span style={{ color: theme.palette.action.disabled }}>{t('attribution.empty')}</span>}
+                )) && <span style={{ color: theme.palette.text.disabled }}>{t('attribution.empty')}</span>}
             {badlist &&
               badlist.attribution &&
               Object.keys(badlist.attribution)
@@ -600,7 +600,7 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
                       <Moment variant="fromNow">{badlist.expiry_ts}</Moment>)
                     </div>
                   ) : (
-                    <span style={{ color: theme.palette.action.disabled }}>{t('expiry.forever')}</span>
+                    <span style={{ color: theme.palette.text.disabled }}>{t('expiry.forever')}</span>
                   )
                 ) : (
                   <Skeleton />

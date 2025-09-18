@@ -1,10 +1,10 @@
 import type { IconButtonProps as MuiIconButtonProps, TooltipProps } from '@mui/material';
-import { IconButton as MuiIconButton, Skeleton } from '@mui/material';
+import { IconButton as MuiIconButton, Skeleton, useTheme } from '@mui/material';
 import type { CircularProgressProps } from 'components/visual/Buttons/CircularProgress';
 import { CircularProgress } from 'components/visual/Buttons/CircularProgress';
 import { Tooltip } from 'components/visual/Tooltip';
 import { getTextContent } from 'helpers/utils';
-import React, { useMemo } from 'react';
+import React, { CSSProperties, useMemo } from 'react';
 import type { LinkProps } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 
@@ -20,6 +20,7 @@ export type IconButtonProps = MuiIconButtonProps & {
 export const IconButton: React.FC<IconButtonProps> = React.memo(
   ({
     children = null,
+    color = null,
     disabled = false,
     id = null,
     loading = false,
@@ -31,10 +32,30 @@ export const IconButton: React.FC<IconButtonProps> = React.memo(
     tooltipProps = null,
     ...props
   }: IconButtonProps) => {
+    const theme = useTheme();
+
     const preventRender = useMemo<boolean>(
       () => (loading ? false : typeof preventRenderProp === 'function' ? preventRenderProp() : preventRenderProp),
       [loading, preventRenderProp]
     );
+
+    const resolvedColor = useMemo<CSSProperties['color']>(() => {
+      if (!color) return;
+      if (disabled || progress !== false) return theme.palette.grey[750];
+
+      switch (color) {
+        case 'primary':
+        case 'secondary':
+          return theme.palette[color].main;
+        case 'error':
+        case 'success':
+        case 'warning':
+        case 'info':
+          return theme.palette.mode === 'dark' ? theme.palette[color].light : theme.palette[color].dark;
+        default:
+          return color;
+      }
+    }, [color, disabled, progress, theme.palette]);
 
     return loading ? (
       <Skeleton
@@ -51,11 +72,11 @@ export const IconButton: React.FC<IconButtonProps> = React.memo(
         <MuiIconButton
           id={id ?? getTextContent(tooltip)}
           aria-label={id ?? getTextContent(tooltip)}
-          disabled={loading || disabled || progress !== false}
+          disabled={disabled || progress !== false}
           size={size}
-          {...(!to || loading ? null : { component: Link, to: typeof to === 'function' ? to() : to })}
+          {...(!to ? null : { component: Link, to: typeof to === 'function' ? to() : to })}
           {...props}
-          sx={{ height: 'fit-content', ...props?.sx }}
+          sx={{ height: 'fit-content', color: resolvedColor, ...props?.sx }}
         >
           {children}
           <CircularProgress progress={progress} />

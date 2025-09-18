@@ -12,7 +12,12 @@ import {
   StyledFormLabel,
   StyledRoot
 } from 'components/visual/Inputs/lib/inputs.components';
-import { useErrorMessage, useInputBlur, useInputChange, useInputFocus } from 'components/visual/Inputs/lib/inputs.hook';
+import {
+  useErrorCallback,
+  useInputBlur,
+  useInputChange,
+  useInputFocus
+} from 'components/visual/Inputs/lib/inputs.hook';
 import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
 import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
 import React from 'react';
@@ -44,8 +49,6 @@ const WrappedRadioInput = <O extends readonly Option[]>() => {
   const handleBlur = useInputBlur<RadioInputProps<O>>();
   const handleChange = useInputChange<RadioInputProps<O>>();
   const handleFocus = useInputFocus<RadioInputProps<O>>();
-
-  useErrorMessage();
 
   return (
     <StyledRoot>
@@ -100,11 +103,14 @@ export const RadioInput = <O extends readonly Option[]>({
   preventRender = false,
   value = null,
   ...props
-}: RadioInputProps<O>) =>
-  preventRender ? null : (
+}: RadioInputProps<O>) => {
+  const errorMessage = useErrorCallback({ preventRender, value, ...props });
+
+  return preventRender ? null : (
     <PropProvider<RadioInputProps<O>>
-      props={{ options: [] as unknown as O, preventRender, value, inputValue: value, ...props }}
+      props={{ options: [] as unknown as O, preventRender, value, inputValue: value, errorMessage, ...props }}
     >
       <WrappedRadioInput />
     </PropProvider>
   );
+};
