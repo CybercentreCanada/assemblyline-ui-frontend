@@ -60,7 +60,7 @@ const BadlistSearch = () => {
   const badlists = useALQuery({
     url: '/api/v4/search/badlist/',
     method: 'POST',
-    enabled: currentUser.roles.includes('badlist_view'),
+    disabled: !currentUser.roles.includes('badlist_view'),
     body: search
       .set(o => ({ ...o, query: o.query || '*' }))
       .omit(['refresh'])
