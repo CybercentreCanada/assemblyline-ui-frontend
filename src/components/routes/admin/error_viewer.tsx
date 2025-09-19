@@ -30,18 +30,18 @@ import { Navigate, useLocation, useNavigate } from 'react-router';
 
 const ERROR_VIEWER_PARAMS = createSearchParams(p => ({
   query: p.string(''),
-  offset: p.number(0).min(0).origin('state').ephemeral(),
-  rows: p.number(25).locked().origin('state').ephemeral(),
+  offset: p.number(0).min(0).origin('snapshot').ephemeral(),
+  rows: p.number(25).locked().origin('snapshot').ephemeral(),
   sort: p.string('created desc').ephemeral(),
   start: p.string('now-4d'),
   end: p.string('now'),
   gap: p.string('4h'),
   filters: p.filters([]),
   track_total_hits: p.number(10000).nullable().ephemeral(),
-  mincount: p.number(0).min(0).origin('state').ephemeral(),
+  mincount: p.number(0).min(0).origin('snapshot').ephemeral(),
   use_archive: p.boolean(false),
   archive_only: p.boolean(false),
-  timeout: p.string('').origin('state').ephemeral()
+  timeout: p.string('').origin('snapshot').ephemeral()
 }));
 
 type ErrorViewerParams = typeof ERROR_VIEWER_PARAMS;
