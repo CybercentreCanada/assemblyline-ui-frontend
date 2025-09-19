@@ -24,12 +24,12 @@ import { Navigate, useLocation, useNavigate } from 'react-router';
 
 const API_KEYS_PARAMS = createSearchParams(p => ({
   query: p.string(''),
-  offset: p.number(0).min(0).origin('state').ephemeral(),
-  rows: p.number(25).locked().origin('state').ephemeral(),
+  offset: p.number(0).min(0).origin('snapshot').ephemeral(),
+  rows: p.number(25).locked().origin('snapshot').ephemeral(),
   sort: p.string(null).ephemeral(),
   filters: p.filters([]),
   track_total_hits: p.number(10000).nullable().ephemeral(),
-  refresh: p.boolean(false).origin('state').ephemeral()
+  refresh: p.boolean(false).origin('snapshot').ephemeral()
 }));
 
 export type APIKeysParams = typeof API_KEYS_PARAMS;
