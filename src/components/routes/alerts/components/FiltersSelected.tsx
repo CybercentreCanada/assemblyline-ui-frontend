@@ -6,10 +6,10 @@ import SourceIcon from '@mui/icons-material/Source';
 import StarIcon from '@mui/icons-material/Star';
 import type { ChipProps, MenuItemProps } from '@mui/material';
 import { ListItemIcon, ListItemText, Menu, MenuItem, useTheme } from '@mui/material';
-import { type AlertSearchParams } from 'components/routes/alerts';
+import type { AlertSearchParams } from 'components/routes/alerts';
 import type { Favorite } from 'components/routes/alerts/components/Favorites';
 import type { Option } from 'components/routes/alerts/components/Filters';
-import { GROUPBY_OPTIONS, SORT_OPTIONS } from 'components/routes/alerts/components/Filters';
+import { GROUPBY_OPTIONS, SORT_OPTIONS, TC_OPTIONS } from 'components/routes/alerts/components/Filters';
 import { useAlerts } from 'components/routes/alerts/contexts/AlertsContext';
 import CustomChip from 'components/visual/CustomChip';
 import Moment from 'components/visual/Moment';
@@ -136,7 +136,7 @@ const WrappedAlertFiltersSelected = ({
   visible = [],
   disabled = false
 }: Props) => {
-  const { t, i18n } = useTranslation('alerts');
+  const { t } = useTranslation('alerts');
   const theme = useTheme();
   const alertValues = useAlerts();
 
@@ -320,6 +320,27 @@ const WrappedAlertFiltersSelected = ({
         options={GROUPBY_OPTIONS}
         style={{ minHeight: '25px' }}
         onClick={(_, option) => handleChange(v => ({ ...v, group_by: option.value }))}
+        sx={{
+          '&>.MuiChip-icon': {
+            marginLeft: `${theme.spacing(0.5)} !important`
+          }
+        }}
+      />
+
+      <MenuFilter
+        getLabel={() => {
+          const option = TC_OPTIONS.find(o => o.value === search.tc);
+          return option && option.value !== '' ? `${t('tc')}: ${t(option.label)}` : `${t('tc')}: ${t('none')}`;
+        }}
+        param={search.tc}
+        visible={visible.includes('tc')}
+        disabled={disabled}
+        getSelected={option => search.tc === option.value}
+        icon={<DateRangeIcon fontSize="small" />}
+        title={t('tc')}
+        options={TC_OPTIONS}
+        style={{ minHeight: '25px' }}
+        onClick={(_, option) => handleChange(v => ({ ...v, tc: option.value }))}
         sx={{
           '&>.MuiChip-icon': {
             marginLeft: `${theme.spacing(0.5)} !important`
