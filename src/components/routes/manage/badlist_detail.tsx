@@ -58,14 +58,14 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
 
   const { data: badlist } = useALQuery({
     url: `/api/v4/badlist/${badlist_id || id}/`,
-    enabled: (badlist_id || id) && currentUser.roles.includes('badlist_view'),
+    disabled: !(badlist_id || id) || !currentUser.roles.includes('badlist_view'),
     body: null
   });
 
   const { data: histogram } = useALQuery({
     url: '/api/v4/search/histogram/result/created/',
     method: 'POST',
-    enabled: badlist && currentUser.roles.includes('badlist_view'),
+    disabled: !badlist || !currentUser.roles.includes('badlist_view'),
     body: !badlist
       ? null
       : {

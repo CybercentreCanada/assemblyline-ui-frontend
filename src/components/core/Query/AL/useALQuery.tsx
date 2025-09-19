@@ -10,16 +10,16 @@ export type UseALQueryProps<Request extends ALRequests> = {
     UndefinedInitialDataOptions<Promise<undefined>, APIResponse<string>, APIResponse<ALResponses<Request>>, [unknown]>,
     'queryKey' | 'queryFn'
   >;
-  enabled?: boolean;
-  retryAfter?: number;
   delay?: number;
+  disabled?: boolean;
+  retryAfter?: number;
 } & UseAPICallFnProps<APIResponse<ALResponses<Request>>, Request>;
 
 export const useALQuery = <Request extends ALRequests>({
   url,
   method = 'GET',
   body = null,
-  enabled = true,
+  disabled = false,
   ...props
 }: UseALQueryProps<Request>) =>
   useAPIQuery<ALResponses<Request>, Request, string>({
@@ -31,6 +31,6 @@ export const useALQuery = <Request extends ALRequests>({
             .join('&')}`,
     method,
     body: method !== 'GET' ? body : null,
-    enabled: !!enabled,
+    disabled,
     ...props
   } as UseAPIQueryProps<ALResponses<Request>, Request, string>);
