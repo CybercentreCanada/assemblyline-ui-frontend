@@ -734,6 +734,14 @@ const WrappedAlertFilters = () => {
                 />
 
                 <AlertSelect
+                  label="tc"
+                  value={query.has('tc') ? query.get('tc') : ALERT_DEFAULT_PARAMS.tc.toString()}
+                  defaultValue={ALERT_DEFAULT_PARAMS.tc.toString()}
+                  options={TC_OPTIONS}
+                  onChange={value => handleQueryChange('tc', value)}
+                />
+
+                <AlertSelect
                   label="groupBy"
                   value={query.has('group_by') ? query.get('group_by') : ALERT_DEFAULT_PARAMS.group_by.toString()}
                   defaultValue={ALERT_DEFAULT_PARAMS.group_by.toString()}
