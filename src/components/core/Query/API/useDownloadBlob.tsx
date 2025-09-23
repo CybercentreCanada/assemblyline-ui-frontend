@@ -16,20 +16,20 @@ export type UseDownloadBlobProps = {
     UndefinedInitialDataOptions<Promise<unknown>, APIResponse<Error>, BlobResponse, [unknown]>,
     'queryKey' | 'queryFn'
   >;
-  url: string;
   allowCache?: boolean;
-  enabled?: boolean;
+  disabled?: boolean;
   reloadOnUnauthorize?: boolean;
   retryAfter?: number;
+  url: string;
 };
 
 export const useDownloadBlob = ({
+  allowCache = false,
+  disabled,
   queryProps = null,
-  url,
   reloadOnUnauthorize = true,
   retryAfter = DEFAULT_RETRY_MS,
-  allowCache = false,
-  enabled
+  url
 }: UseDownloadBlobProps) => {
   const queryClient = useQueryClient();
   const { t } = useTranslation();
@@ -45,7 +45,7 @@ export const useDownloadBlob = ({
           url,
           method: 'GET',
           allowCache,
-          enabled,
+          disabled,
           reloadOnUnauthorize,
           retryAfter,
           systemVersion: systemConfig.system.version
@@ -55,7 +55,7 @@ export const useDownloadBlob = ({
       retryDelay: failureCount => (failureCount < 1 ? 1000 : Math.min(retryAfter, 10000)),
       queryFn: async ({ signal }) => {
         // Reject if the query is not enabled
-        if (!enabled) return Promise.reject(null);
+        if (disabled) return Promise.reject(null);
 
         // fetching the API's data
         const res = await fetch(url, {

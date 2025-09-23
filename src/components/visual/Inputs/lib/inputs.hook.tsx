@@ -1,7 +1,7 @@
 import type { InputProps, InputStates, InputValues } from 'components/visual/Inputs/lib/inputs.model';
 import { usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
 import { isValidNumber, isValidValue } from 'components/visual/Inputs/lib/inputs.utils';
-import { useCallback, useEffect, useRef, useTransition } from 'react';
+import { useCallback, useRef, useTransition } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export const usePropLabel = () => {
@@ -21,12 +21,32 @@ export const usePropID = () => {
   return id ?? (typeof label === 'string' ? label.toLowerCase().replaceAll(' ', '-') : '\u00A0');
 };
 
+export const usePreventClearRender = () => {
+  const [get] = usePropStore();
+
+  const clearAdornment = get('clearAdornment');
+  const disabled = get('disabled');
+  const readOnly = get('readOnly');
+
+  return !clearAdornment || (readOnly && !disabled);
+};
+
 export const usePreventExpandRender = () => {
   const [get] = usePropStore();
 
   const expand = get('expand');
 
   return expand === null;
+};
+
+export const usePreventMenuRender = () => {
+  const [get] = usePropStore();
+
+  const disabled = get('disabled');
+  const menuAdornment = get('menuAdornment');
+  const readOnly = get('readOnly');
+
+  return !menuAdornment || (readOnly && !disabled);
 };
 
 export const usePreventPasswordRender = () => {
@@ -51,6 +71,45 @@ export const usePreventResetRender = () => {
   const value = get('value');
 
   return loading || disabled || readOnly || !(typeof reset === 'function' ? reset(value, inputValue) : reset);
+};
+
+export const usePreventSpinnerRender = () => {
+  const [get] = usePropStore();
+
+  const disabled = get('disabled');
+  const spinnerAdornment = get('spinnerAdornment');
+  const readOnly = get('readOnly');
+
+  return !spinnerAdornment || (readOnly && !disabled);
+};
+
+export const useErrorCallback = <
+  Props extends InputValues<unknown, unknown> & InputProps & InputStates & Record<string, unknown>
+>({
+  error = () => null,
+  value = null,
+  min = null,
+  max = null,
+  required = false
+}: Props & { min?: number; max?: number }) => {
+  const { t } = useTranslation('inputs');
+
+  const err = error(value);
+  if (err) return err;
+
+  if (required && (min != null || max != null)) {
+    if (!isValidNumber(value as unknown as number, { min, max })) {
+      if (typeof min === 'number' && typeof max === 'number') return t('error.minmax', { min, max });
+      if (typeof min === 'number') return t('error.min', { min });
+      if (typeof max === 'number') return t('error.max', { max });
+    }
+  }
+
+  if (required && !isValidValue(value)) {
+    return t('error.required');
+  }
+
+  return '';
 };
 
 export const useError = <Value extends unknown = unknown>() => {
@@ -83,19 +142,6 @@ export const useError = <Value extends unknown = unknown>() => {
     },
     [error, min, max, required, t]
   );
-};
-
-export const useErrorMessage = () => {
-  const [get, setStore] = usePropStore<InputValues<unknown, unknown>>();
-
-  const error = useError();
-  const value = get('value');
-
-  useEffect(() => {
-    const errorMessage = error(value);
-    setStore({ errorMessage });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 };
 
 export const useInputClick = <

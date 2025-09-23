@@ -1,4 +1,11 @@
 {
+  "classification.acceptText": "Procéder",
+  "classification.cancelText": "Annuler",
+  "classification.done": "Terminé",
+  "classification.reset": "Réinitialiser",
+  "classification.text": "La classification de cet élément est supérieure à la classification maximale prise en charge par la source externe.",
+  "classification.text.accept": "Êtes-vous sûr de vouloir continuer?",
+  "classification.title": "Avertissement d'accessibilité de classification",
   "error.max": "La valeur ne doit pas dépasser {{max}}",
   "error.min": "La valeur doit être au minimum {{min}}",
   "error.minmax": "La valeur doit être comprise entre {{min}} et {{max}}",

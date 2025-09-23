@@ -28,7 +28,7 @@ export type UseBootstrapQueryProps = {
   setLoginParams: (params: LoginParamsProps) => void;
   setUser: (user: WhoAmIProps | CustomUser) => void;
   setReady: (layout: boolean, borealis: boolean, iconifyUrl: string) => void;
-  enabled?: boolean;
+  disabled?: boolean;
   retryAfter?: number;
 };
 
@@ -39,7 +39,7 @@ export const useBootstrapQuery = ({
   setLoginParams = () => null,
   setUser = () => null,
   setReady = () => null,
-  enabled = true,
+  disabled = false,
   retryAfter = DEFAULT_RETRY_MS
 }: UseBootstrapQueryProps) => {
   const queryClient = useQueryClient();
@@ -56,20 +56,20 @@ export const useBootstrapQuery = ({
   >(
     {
       ...queryProps,
-      enabled: !!enabled,
+      enabled: !disabled,
       queryKey: [
         {
           url: '/api/v4/user/whoami/',
           method: 'GET',
           body: null,
-          enabled: !!enabled
+          disabled: disabled
         }
       ],
       retry: (failureCount, error) => failureCount < 1 || error?.api_status_code === 502,
       retryDelay: failureCount => (failureCount < 1 ? 1000 : Math.min(retryAfter, 10000)),
       queryFn: async ({ signal }) => {
         // Reject if the query is not enabled
-        if (!enabled) {
+        if (disabled) {
           return Promise.reject(null);
         }
 

@@ -6,10 +6,11 @@ import { useTheme } from '@mui/material';
 import { useAppUser } from 'commons/components/app/hooks';
 import PageContainer from 'commons/components/pages/PageContainer';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
-import type { SearchParams } from 'components/core/SearchParams/SearchParams';
-import { createSearchParams } from 'components/core/SearchParams/SearchParams';
-import { SearchParamsProvider, useSearchParams } from 'components/core/SearchParams/SearchParamsContext';
-import type { SearchParamsResult } from 'components/core/SearchParams/SearchParser';
+import {
+  createSearchParams,
+  SearchParamsProvider,
+  useSearchParams
+} from 'components/core/SearchParams/createSearchParams';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -30,15 +31,15 @@ import { useLocation, useNavigate } from 'react-router';
 
 const SAFELIST_PARAMS = createSearchParams(p => ({
   query: p.string(''),
-  offset: p.number(0).min(0).hidden().ignored(),
-  rows: p.number(25).enforced().hidden().ignored(),
-  sort: p.string('added desc').ignored(),
+  offset: p.number(0).min(0).origin('snapshot').ephemeral(),
+  rows: p.number(25).locked().origin('snapshot').ephemeral(),
+  sort: p.string('added desc').ephemeral(),
   filters: p.filters([]),
-  track_total_hits: p.number(10000).nullable().ignored(),
-  refresh: p.boolean(false).hidden().ignored()
+  track_total_hits: p.number(10000).nullable().ephemeral(),
+  refresh: p.boolean(false).origin('snapshot').ephemeral()
 }));
 
-type SafelistParams = SearchParams<typeof SAFELIST_PARAMS>;
+type SafelistParams = typeof SAFELIST_PARAMS;
 
 const SafelistSearch = () => {
   const { t } = useTranslation(['manageSafelist']);
@@ -73,7 +74,7 @@ const SafelistSearch = () => {
   );
 
   const handleReload = useCallback(
-    (body: SearchParamsResult<SafelistParams>) => {
+    (body: typeof search) => {
       if (!currentUser.roles.includes('safelist_view')) return;
 
       apiCall<SearchResult<Safelist>>({

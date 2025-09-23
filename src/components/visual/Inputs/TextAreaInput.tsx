@@ -7,7 +7,12 @@ import {
   StyledRoot,
   StyledTextField
 } from 'components/visual/Inputs/lib/inputs.components';
-import { useErrorMessage, useInputBlur, useInputChange, useInputFocus } from 'components/visual/Inputs/lib/inputs.hook';
+import {
+  useErrorCallback,
+  useInputBlur,
+  useInputChange,
+  useInputFocus
+} from 'components/visual/Inputs/lib/inputs.hook';
 import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
 import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
 import React from 'react';
@@ -20,6 +25,8 @@ export type TextAreaInputProps = InputValues<
   InputProps & {
     autoComplete?: StyledTextField['autoComplete'];
     rows?: TextFieldProps['rows'];
+    minRows?: TextFieldProps['minRows'];
+    maxRows?: TextFieldProps['maxRows'];
   };
 
 const WrappedTextAreaInput = () => {
@@ -28,6 +35,8 @@ const WrappedTextAreaInput = () => {
   const autoComplete = get('autoComplete');
   const inputValue = get('inputValue') ?? '';
   const loading = get('loading');
+  const maxRows = get('maxRows');
+  const minRows = get('minRows');
   const overflowHidden = get('overflowHidden');
   const password = get('password');
   const rows = get('rows');
@@ -38,8 +47,6 @@ const WrappedTextAreaInput = () => {
   const handleBlur = useInputBlur<TextAreaInputProps>();
   const handleChange = useInputChange<TextAreaInputProps>();
   const handleFocus = useInputFocus<TextAreaInputProps>();
-
-  useErrorMessage();
 
   return (
     <StyledRoot>
@@ -52,10 +59,9 @@ const WrappedTextAreaInput = () => {
         ) : (
           <>
             <StyledTextField
-              rows={1}
               {...(!(overflowHidden || (password && showPassword)) && {
                 multiline: true,
-                rows: rows
+                ...(minRows || maxRows ? { minRows, maxRows } : { rows: rows || 1 })
               })}
               autoComplete={autoComplete}
               value={inputValue}
@@ -71,11 +77,24 @@ const WrappedTextAreaInput = () => {
   );
 };
 
-export const TextAreaInput = ({ preventRender = false, value, ...props }: TextAreaInputProps) =>
-  preventRender ? null : (
+export const TextAreaInput = ({ preventRender = false, value, ...props }: TextAreaInputProps) => {
+  const errorMessage = useErrorCallback({ preventRender, value, ...props });
+
+  return preventRender ? null : (
     <PropProvider<TextAreaInputProps>
-      props={{ autoComplete: 'off', rows: 1, preventRender, inputValue: value, value, ...props }}
+      props={{
+        autoComplete: 'off',
+        errorMessage,
+        inputValue: value,
+        maxRows: null,
+        minRows: null,
+        preventRender,
+        rows: null,
+        value,
+        ...props
+      }}
     >
       <WrappedTextAreaInput />
     </PropProvider>
   );
+};

@@ -18,7 +18,7 @@ import {
   useTextInputSlot
 } from 'components/visual/Inputs/lib/inputs.components';
 import {
-  useErrorMessage,
+  useErrorCallback,
   useInputBlur,
   useInputChange,
   useInputFocus,
@@ -59,11 +59,12 @@ const DatePopper = React.memo(() => {
 
   const [get, setStore] = usePropStore<DateInputState>();
 
-  const id = usePropID();
+  const disabled = get('disabled');
   const inputValue = get('inputValue') ?? null;
   const showPopover = get('showPopover') ?? false;
   const tiny = get('tiny');
 
+  const id = usePropID();
   const handleChange = useInputChange<DateInputProps>();
 
   return (
@@ -71,6 +72,7 @@ const DatePopper = React.memo(() => {
       <IconButton
         aria-label={`${id}-date`}
         color="secondary"
+        disabled={disabled}
         type="button"
         onClick={event => {
           event.preventDefault();
@@ -185,8 +187,6 @@ const WrappedDateInput = () => {
     configureMomentLocale(i18n.language);
   }, [i18n.language]);
 
-  useErrorMessage();
-
   return (
     <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale={i18n.language}>
       <StyledRoot>
@@ -214,7 +214,7 @@ const WrappedDateInput = () => {
                     onBlur: e => handleBlur(e, value ? moment(value) : null, value),
                     InputProps: {
                       endAdornment: (
-                        <StyledEndAdornment preventRender={disabled || readOnly}>
+                        <StyledEndAdornment preventRender={readOnly && !disabled}>
                           <PasswordAdornment />
                           <ResetAdornment />
                           <ExpandAdornment />
@@ -235,12 +235,15 @@ const WrappedDateInput = () => {
   );
 };
 
-export const DateInput = ({ value, preventRender = false, ...props }: DateInputProps) =>
-  preventRender ? null : (
+export const DateInput = ({ preventRender = false, value, ...props }: DateInputProps) => {
+  const errorMessage = useErrorCallback({ preventRender, value, ...props });
+
+  return preventRender ? null : (
     <PropProvider<DateInputProps>
       props={{
         autoComplete: 'off',
         defaultDateOffset: null,
+        errorMessage,
         inputValue: value ? moment(value) : null,
         maxDateToday: false,
         minDateTomorrow: false,
@@ -252,3 +255,4 @@ export const DateInput = ({ value, preventRender = false, ...props }: DateInputP
       <WrappedDateInput />
     </PropProvider>
   );
+};
