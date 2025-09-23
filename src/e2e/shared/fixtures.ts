@@ -1,11 +1,14 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import type { Browser, BrowserContext, Page } from '@playwright/test';
 import { test as base } from '@playwright/test';
+import { SnackbarContext } from 'e2e/contexts/Snackbar.pom';
 import { ForbiddenPage } from 'e2e/pages/403.pom';
 import { NotFoundPage } from 'e2e/pages/404_dl.pom';
 import { AccountPage } from 'e2e/pages/account.pom';
 import { CrashPage } from 'e2e/pages/crash.pom';
 import { LoginPage } from 'e2e/pages/login.pom';
+import { SubmissionDetailPage } from 'e2e/pages/submission/submission_detail.pom';
+import { SubmissionReportPage } from 'e2e/pages/submission/submission_report.pom';
 import { SubmitPage } from 'e2e/pages/submit.pom';
 import { TermsOfServicePage } from 'e2e/pages/tos.pom';
 import { RESULTS_DIR } from 'e2e/shared/constants';
@@ -19,6 +22,9 @@ type UserSession = {
   context: BrowserContext;
   page: Page;
 
+  // Context
+  snackbarContext: SnackbarContext;
+
   // Error detection
   crashPage: CrashPage;
   forbiddenPage: ForbiddenPage;
@@ -29,6 +35,8 @@ type UserSession = {
   accountPage: AccountPage;
   loginPage: LoginPage;
   submitPage: SubmitPage;
+  submissionDetailPage: SubmissionDetailPage;
+  submissionReportPage: SubmissionReportPage;
 };
 
 type SetupBundle = {
@@ -49,6 +57,9 @@ async function setupBundle({ browser, browserName, user }: SetupBundle): Promise
     context,
     page,
 
+    // Contexts
+    snackbarContext: new SnackbarContext(page),
+
     // Error detection
     crashPage: new CrashPage(page),
     forbiddenPage: new ForbiddenPage(page),
@@ -58,6 +69,8 @@ async function setupBundle({ browser, browserName, user }: SetupBundle): Promise
     // Pages
     accountPage: new AccountPage(page),
     loginPage: new LoginPage(page),
+    submissionDetailPage: new SubmissionDetailPage(page),
+    submissionReportPage: new SubmissionReportPage(page),
     submitPage: new SubmitPage(page)
   };
 }

@@ -1,24 +1,46 @@
 import type { Locator, Page } from '@playwright/test';
+import { SHORT_TIMEOUT } from 'e2e/shared/constants';
+import { test } from 'e2e/shared/fixtures';
 import type { WaitForOptions } from 'e2e/shared/models';
 import { PageObjectModel } from 'e2e/utils/PageObjectModel';
+import { SelectInput } from 'e2e/visual/Inputs/SelectInput.pom';
+import { TextInput } from 'e2e/visual/Inputs/TextInput.pom';
+import { TabContainer } from 'e2e/visual/TabContainer.pom';
+import path from 'path';
 
-// type SubmitFixture = (r: SubmitPage) => Promise<void>;
+type SubmitTab = 'File' | 'Hash/URL';
+
+const SUBMISSION_PROFILES = [
+  { label: 'Custom Analysis', value: 'default' },
+  { label: '[OFFLINE] Static Analysis', value: 'static' },
+  { label: '[ONLINE] Static + Dynamic Analysis', value: 'static_and_dynamic_with_internet' },
+  { label: '[OFFLINE] Static + Dynamic Analysis', value: 'static_with_dynamic' },
+  { label: '[ONLINE] Static Analysis', value: 'static_with_internet' }
+] as const;
 
 export class SubmitPage extends PageObjectModel {
   private readonly bannerImage: Locator;
+  private readonly fileDropper: Locator;
+  private readonly cancelButton: Locator;
+  private readonly submitButton: Locator;
+  private readonly searchButton: Locator;
+  private readonly adjustButton: Locator;
+  private readonly submissionProfileInput: SelectInput<typeof SUBMISSION_PROFILES>;
+  private readonly tab: TabContainer<SubmitTab>;
+  private readonly hashInput: TextInput;
 
   constructor(page: Page) {
     super(page, 'Submit page', '/submit');
     this.bannerImage = this.page.locator('img[src="/images/banner.svg"], img[src="/images/banner_dark.svg"]');
-    // this.bannerAlert = new MuiAlert(this.page.locator('[data-testid="banner"]'));
+    this.fileDropper = this.page.locator('#file_dropper');
+    this.cancelButton = this.page.locator('button#cancel');
+    this.submitButton = this.page.locator('button#submit');
+    this.searchButton = this.page.locator('button#check-if-a-file-matching-your-input-exist-in-the-system');
+    this.adjustButton = this.page.locator('button#open-the-panel-to-adjust-the-submit-parameters');
+    this.submissionProfileInput = new SelectInput(page, 'submission profile name');
+    this.tab = new TabContainer(page);
+    this.hashInput = new TextInput(page, 'Hash/URL to Analyze');
   }
-
-  // static fixture = () => {
-  //   return async ({ page }: PlaywrightArgs, use: SubmitFixture) => {
-  //     const submitPage = new SubmitPage(page);
-  //     await use(submitPage);
-  //   };
-  // };
 
   locators(): Locator[] {
     return [this.bannerImage];
@@ -28,34 +50,37 @@ export class SubmitPage extends PageObjectModel {
     await this.bannerImage.waitFor({ state, timeout });
   }
 
-  // async goto() {
-  //   await test.step(`Navigating to the ${this.name}`, async () => {
-  //     await this.page.goto(this.route);
-  //   });
-  // }
+  async switchTab(tabLabel: 'File' | 'Hash/URL') {
+    await test.step(`Switching to tab: "${tabLabel}"`, async () => {
+      await this.tab.selectTab(tabLabel);
+    });
+  }
 
-  // async waitFor({ state = 'visible', timeout = 0 }: WaitForOptions = {}) {
-  //   await test.step(`Waiting for the ${this.name} to be ${state}`, async () => {
-  //     await this.bannerImage.waitFor({ state, timeout });
-  //   });
-  // }
+  async uploadFile(filePath: string) {
+    const fileName = path.basename(filePath);
+    await test.step(`Uploading file: ${fileName}`, async () => {
+      await this.fileDropper.setInputFiles(filePath, { timeout: SHORT_TIMEOUT });
+    });
+  }
 
-  // async isVisible() {
-  //   this.logger.info('[SubmitPage.isVisible] Checking visibility');
-  //   const pageVisible = await super.isVisible();
-  //   const bannerVisible = await this.bannerImage.isVisible();
-  //   this.logger.info(`[SubmitPage.isVisible] Page visible=${pageVisible}, Banner visible=${bannerVisible}`);
-  //   return bannerVisible;
-  // }
+  async uploadHash(hash: string) {
+    await test.step(`Entering Hash/URL: ${hash}`, async () => {
+      await this.hashInput.inputByValue(hash);
+      await this.hashInput.expectValue(hash);
+    });
+  }
 
-  // async getBanner({ state = 'visible', timeout = 0 }: WaitForOptions = {}): Promise<{
-  //   level: AlertSeverity;
-  //   textContent: string;
-  // }> {
-  //   this.logger.info(`[SubmitPage.getBanner] Waiting for banner alert. state="${state}", timeout=${timeout}`);
-  //   await this.bannerAlert.waitFor({ state, timeout });
-  //   const alertData = await this.bannerAlert.getAlertData();
-  //   this.logger.info(`[SubmitPage.getBanner] Banner data: level="${alertData.level}", text="${alertData.textContent}"`);
-  //   return alertData;
-  // }
+  async selectSubmissionProfile(option: (typeof SUBMISSION_PROFILES)[number]['value']) {
+    const label = SUBMISSION_PROFILES.find(o => o.value === option)?.label;
+    await test.step(`Selecting analysis type: "${label}"`, async () => {
+      await this.submissionProfileInput.inputByValue(option);
+      await this.submissionProfileInput.expectSelected(label);
+    });
+  }
+
+  async clickSubmit() {
+    await test.step('Clicking the submit button', async () => {
+      await this.submitButton.click({ timeout: SHORT_TIMEOUT });
+    });
+  }
 }

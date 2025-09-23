@@ -1,72 +1,53 @@
-// import { expect, test } from 'e2e/configs/playwright.fixtures';
+import { LONG_TIMEOUT, MOCKS_DIR } from 'e2e/shared/constants';
+import { test } from 'e2e/shared/fixtures';
+import path from 'path';
 
-// test.describe('Submit page', () => {
-//   test.only('should use the admin and user contexts', async ({ admin, user }) => {
-//     test.setTimeout(10_000);
+test.describe('Submit Page', () => {
+  test('should submit a file successfully', async ({ userSession }) => {
+    void userSession.crashPage.monitorForNoError();
+    void userSession.notFoundPage.monitorForNoError();
+    void userSession.forbiddenPage.monitorForNoError();
+    void userSession.snackbarContext.monitorForNoError();
 
-//     const { page: adminPage } = admin;
-//     const { page: userPage } = user;
+    await userSession.submitPage.goto();
+    await userSession.submitPage.expectToBeVisible();
+    await userSession.submitPage.switchTab('File');
 
-//     await adminPage.goto('/');
-//     await expect(adminPage.locator('h1')).toHaveText('Admin Dashboard', { timeout: 2_000 });
+    const testFilePath = path.join(MOCKS_DIR, 'samples', 'test.txt');
+    await userSession.submitPage.uploadFile(testFilePath);
+    await userSession.submitPage.selectSubmissionProfile('static');
+    await userSession.submitPage.clickSubmit();
 
-//     await userPage.goto('/');
-//     await expect(userPage.locator('h1')).toHaveText('User Dashboard', { timeout: 2_000 });
-//   });
-// });
+    await userSession.snackbarContext.expect('success', /Successfully submitted, redirecting you to submission ID:.*/i);
+    await test.step('Waiting for submission detail or report page', async () => {
+      await Promise.race([
+        userSession.submissionDetailPage.waitForPage({ timeout: LONG_TIMEOUT }),
+        userSession.submissionReportPage.waitForPage({ timeout: LONG_TIMEOUT })
+      ]);
+    });
+  });
 
-// import { test } from 'e2e/configs/playwright.fixtures';
-// import { MOCK_ADMIN_WHOAMI } from 'e2e/mocks/users/admin';
+  test('should submit a hash successfully', async ({ userSession }) => {
+    void userSession.crashPage.monitorForNoError();
+    void userSession.notFoundPage.monitorForNoError();
+    void userSession.forbiddenPage.monitorForNoError();
+    void userSession.snackbarContext.monitorForNoError();
 
-// test.describe('Submit Page', () => {
-//   test('should load successfully', async ({ forbiddenPage, errorBoundary, notFoundPage, submitPage }) => {
-//     const navigateToSubmitPage = async () => {
-//       await submitPage.goto();
-//       await submitPage.waitFor({ timeout: 10_000 });
-//       expect(await submitPage.isVisible()).toBe(true);
-//     };
+    await userSession.submitPage.goto();
+    await userSession.submitPage.expectToBeVisible();
+    await userSession.submitPage.switchTab('Hash/URL');
 
-//     const { error } = await tryCatchRace([
-//       navigateToSubmitPage(),
-//       errorBoundary.waitFor(), // rejects if ErrorBoundary shows
-//       forbiddenPage.waitFor(), // rejects if 403 page shows
-//       notFoundPage.waitFor() // rejects if 404 page shows
-//     ]);
+    const testFileHash = 'b6668cf8c46c7075e18215d922e7812ca082fa6cc34668d00a6c20aee4551fb6';
+    await userSession.submitPage.uploadHash(testFileHash);
+    await userSession.submitPage.selectSubmissionProfile('static');
+    await userSession.submitPage.clickSubmit();
 
-//     if (errorBoundary.isError?.(error)) await errorBoundary.expectNotVisible?.();
-//     if (forbiddenPage.isError?.(error)) await forbiddenPage.expectNotVisible?.();
-//     if (notFoundPage.isError?.(error)) await notFoundPage.expectNotVisible?.();
-//   });
-
-//   test.skip('should load as admin', async ({ forbiddenPage, errorBoundary, notFoundPage, submitPage, api }) => {
-//     const admin = structuredClone(MOCK_ADMIN_WHOAMI);
-//     admin.configuration.ui.banner = { en: 'This is a test for the banner', fr: null };
-//     admin.configuration.ui.banner_level = 'warning';
-
-//     await api.get('/api/v4/user/whoami/', admin);
-
-//     const navigateToSubmitPage = async () => {
-//       await submitPage.goto();
-//       await submitPage.waitFor({ timeout: 10_000 });
-//       expect(await submitPage.isVisible()).toBe(true);
-
-//       console.log(await submitPage.getBanner());
-
-//       // Poll until the banner renders with the expected content/level
-//       await expect
-//         .poll(async () => submitPage.getBanner(), { timeout: 5000, message: 'Waiting for banner to match' })
-//         .toEqual({ level: 'warning', textContent: 'This is a test for the banner' });
-//     };
-
-//     const { error } = await tryCatchRace([
-//       navigateToSubmitPage(),
-//       errorBoundary.waitFor(),
-//       forbiddenPage.waitFor(),
-//       notFoundPage.waitFor()
-//     ]);
-
-//     if (errorBoundary.isError?.(error)) await errorBoundary.expectNotVisible?.();
-//     if (forbiddenPage.isError?.(error)) await forbiddenPage.expectNotVisible?.();
-//     if (notFoundPage.isError?.(error)) await notFoundPage.expectNotVisible?.();
-//   });
-// });
+    await userSession.snackbarContext.expect('success', /Successfully submitted, redirecting you to submission ID:.*/i);
+    await test.step('Waiting for submission detail or report page', async () => {
+      await Promise.race([
+        userSession.submissionDetailPage.waitForPage({ timeout: LONG_TIMEOUT }),
+        userSession.submissionReportPage.waitForPage({ timeout: LONG_TIMEOUT })
+      ]);
+    });
+  });
+});

@@ -9,6 +9,7 @@ export const TEST_ADMIN_USERNAME: string = process.env.ADMIN_USER ?? 'admin';
 export const TEST_ADMIN_PASSWORD: string = process.env.ADMIN_PASSWORD ?? 'admin';
 
 export const RESULTS_DIR = path.resolve(__dirname, '../../../playwright-results');
+export const MOCKS_DIR = path.resolve(__dirname, '../mocks');
 
 export const SHORT_TIMEOUT: number = 1_000;
 export const MEDIUM_TIMEOUT: number = 5_000;
