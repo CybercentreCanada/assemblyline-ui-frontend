@@ -6,6 +6,7 @@ test.describe('Not Found page', () => {
     void userSession.crashPage.monitorForNoError();
     void userSession.forbiddenPage.monitorForNoError();
     void userSession.notFoundPage.monitorForError();
+    void userSession.snackbarContext.monitorForNoError();
 
     await userSession.page.goto('/doesnt_exist');
     await userSession.page.waitForTimeout(MEDIUM_TIMEOUT);

@@ -13,6 +13,7 @@ test.describe('Account page', () => {
     void userSession.crashPage.monitorForNoError();
     void userSession.notFoundPage.monitorForNoError();
     void userSession.forbiddenPage.monitorForNoError();
+    void userSession.snackbarContext.monitorForNoError();
 
     await userSession.accountPage.goto();
     await userSession.page.waitForTimeout(MEDIUM_TIMEOUT);

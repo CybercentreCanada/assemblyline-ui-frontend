@@ -6,6 +6,7 @@ test.describe('Terms of Service page', () => {
     void userSession.notFoundPage.monitorForNoError();
     void userSession.forbiddenPage.monitorForNoError();
     void userSession.tosPage.monitorForError();
+    void userSession.snackbarContext.monitorForNoError();
 
     await userSession.tosPage.goto();
     await userSession.tosPage.expectToBeVisible();
