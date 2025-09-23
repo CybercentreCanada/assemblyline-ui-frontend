@@ -1,15 +1,15 @@
 import { expect, test } from 'e2e/shared/fixtures';
 
 test.describe('Crash page', () => {
-  test('should trigger the ErrorBoundary when crashing', async ({ userUI }) => {
-    void userUI.forbiddenPage.monitorForNoError();
-    void userUI.notFoundPage.monitorForNoError();
+  test('should trigger the ErrorBoundary when crashing', async ({ userSession }) => {
+    void userSession.forbiddenPage.monitorForNoError();
+    void userSession.notFoundPage.monitorForNoError();
 
-    void userUI.crashPage.waitForFallback().then(({ message }) => {
+    void userSession.crashPage.waitForFallback().then(({ message }) => {
       expect(message).toBe('This is a test crash !');
     });
 
-    await userUI.crashPage.goto();
-    await userUI.crashPage.expectToBeVisible();
+    await userSession.crashPage.goto();
+    await userSession.crashPage.expectToBeVisible();
   });
 });

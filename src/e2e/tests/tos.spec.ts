@@ -1,13 +1,13 @@
 import { test } from 'e2e/shared/fixtures';
 
 test.describe('Terms of Service page', () => {
-  test('should detect the Terms of Service page', async ({ userUI }) => {
-    void userUI.crashPage.monitorForNoError();
-    void userUI.notFoundPage.monitorForNoError();
-    void userUI.forbiddenPage.monitorForNoError();
-    void userUI.tosPage.monitorForError();
+  test('should detect the Terms of Service page', async ({ userSession }) => {
+    void userSession.crashPage.monitorForNoError();
+    void userSession.notFoundPage.monitorForNoError();
+    void userSession.forbiddenPage.monitorForNoError();
+    void userSession.tosPage.monitorForError();
 
-    await userUI.tosPage.goto();
-    await userUI.tosPage.expectToBeVisible();
+    await userSession.tosPage.goto();
+    await userSession.tosPage.expectToBeVisible();
   });
 });

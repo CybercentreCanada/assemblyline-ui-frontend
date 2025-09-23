@@ -1,12 +1,12 @@
 import { test } from 'e2e/shared/fixtures';
 
 test.describe('Forbidden page', () => {
-  test('should detect the forbidden page', async ({ userUI }) => {
-    void userUI.crashPage.monitorForNoError();
-    void userUI.notFoundPage.monitorForNoError();
-    void userUI.forbiddenPage.monitorForError();
+  test('should detect the forbidden page', async ({ userSession }) => {
+    void userSession.crashPage.monitorForNoError();
+    void userSession.notFoundPage.monitorForNoError();
+    void userSession.forbiddenPage.monitorForError();
 
-    await userUI.forbiddenPage.goto();
-    await userUI.forbiddenPage.expectToBeVisible();
+    await userSession.forbiddenPage.goto();
+    await userSession.forbiddenPage.expectToBeVisible();
   });
 });

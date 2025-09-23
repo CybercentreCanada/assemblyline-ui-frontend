@@ -9,7 +9,7 @@ export class SubmitPage extends PageObjectModel {
 
   constructor(page: Page) {
     super(page, 'Submit page', '/submit');
-    this.bannerImage = this.page.locator('img[src="/images/banner_dark.svg"]');
+    this.bannerImage = this.page.locator('img[alt="Assemblyline Banner"]');
     // this.bannerAlert = new MuiAlert(this.page.locator('[data-testid="banner"]'));
   }
 

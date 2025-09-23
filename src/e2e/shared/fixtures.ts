@@ -13,7 +13,7 @@ import type { PlaywrightArgs } from 'e2e/shared/models';
 import { APIFixture } from 'e2e/utils/APIFixture';
 import path from 'path';
 
-type UserInterface = {
+type UserSession = {
   // Fixture
   api: APIFixture;
   context: BrowserContext;
@@ -37,7 +37,7 @@ type SetupBundle = {
   user: 'admin' | 'user';
 };
 
-async function setupBundle({ browser, browserName, user }: SetupBundle): Promise<UserInterface> {
+async function setupBundle({ browser, browserName, user }: SetupBundle): Promise<UserSession> {
   const context = await browser.newContext({
     storageState: path.join(RESULTS_DIR, `${browserName}-${user}-session.json`)
   });
@@ -63,18 +63,18 @@ async function setupBundle({ browser, browserName, user }: SetupBundle): Promise
 }
 
 type Fixtures = {
-  adminUI: UserInterface;
-  userUI: UserInterface;
+  adminSession: UserSession;
+  userSession: UserSession;
 };
 
 export const test = base.extend<Fixtures>({
-  adminUI: async ({ browser, browserName }: PlaywrightArgs, use: (r: UserInterface) => Promise<void>) => {
+  adminSession: async ({ browser, browserName }: PlaywrightArgs, use: (r: UserSession) => Promise<void>) => {
     const bundle = await setupBundle({ browser, browserName, user: 'admin' });
     await use(bundle);
     await bundle.context.close();
   },
 
-  userUI: async ({ browser, browserName }: PlaywrightArgs, use: (r: UserInterface) => Promise<void>) => {
+  userSession: async ({ browser, browserName }: PlaywrightArgs, use: (r: UserSession) => Promise<void>) => {
     const bundle = await setupBundle({ browser, browserName, user: 'user' });
     await use(bundle);
     await bundle.context.close();
