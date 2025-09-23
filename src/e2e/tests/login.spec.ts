@@ -1,5 +1,5 @@
 import type { Page } from '@playwright/test';
-import { LONG_TIMEOUT, SHORT_TIMEOUT, TEST_PASSWORD, TEST_USER } from 'e2e/shared/constants';
+import { LONG_TIMEOUT, SHORT_TIMEOUT, TEST_USER_PASSWORD, TEST_USER_USERNAME } from 'e2e/shared/constants';
 import { expect, test } from 'e2e/shared/fixtures';
 
 test.describe('Login and Logout page', () => {
@@ -20,8 +20,8 @@ test.describe('Login and Logout page', () => {
     });
 
     await test.step(`Filling in a user's credentials`, async () => {
-      await page.getByLabel('Username').fill(TEST_USER);
-      await page.getByLabel('Password').fill(TEST_PASSWORD);
+      await page.getByLabel('Username').fill(TEST_USER_USERNAME);
+      await page.getByLabel('Password').fill(TEST_USER_PASSWORD);
     });
 
     await test.step('Clicking the sign in button', async () => {
@@ -29,7 +29,9 @@ test.describe('Login and Logout page', () => {
     });
 
     await test.step('Waiting for the Submit page to become visible', async () => {
-      await page.locator('img[src="/images/banner_dark.svg"]').waitFor({ state: 'visible', timeout: LONG_TIMEOUT });
+      await page
+        .locator('img[src="/images/banner.svg"], img[src="/images/banner_dark.svg"]')
+        .waitFor({ state: 'visible', timeout: LONG_TIMEOUT });
     });
 
     await test.step('Opening the User Menu', async () => {

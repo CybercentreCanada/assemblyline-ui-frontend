@@ -5,7 +5,13 @@ import { CrashPage } from 'e2e/pages/crash.pom';
 import { LoginPage } from 'e2e/pages/login.pom';
 import { SubmitPage } from 'e2e/pages/submit.pom';
 import { TermsOfServicePage } from 'e2e/pages/tos.pom';
-import { ADMIN_PASSWORD, ADMIN_USER, RESULTS_DIR, TEST_PASSWORD, TEST_USER } from 'e2e/shared/constants';
+import {
+  RESULTS_DIR,
+  TEST_ADMIN_PASSWORD,
+  TEST_ADMIN_USERNAME,
+  TEST_USER_PASSWORD,
+  TEST_USER_USERNAME
+} from 'e2e/shared/constants';
 import { test } from 'e2e/shared/fixtures';
 import fs from 'fs';
 import path from 'path';
@@ -63,8 +69,8 @@ test.describe('Authentication setup', () => {
   test('create user session', async ({ browser, browserName }) => {
     await loginAndSave({
       browser,
-      username: TEST_USER,
-      password: TEST_PASSWORD,
+      username: TEST_USER_USERNAME,
+      password: TEST_USER_PASSWORD,
       storageFile: `${browserName}-user-session.json`
     });
   });
@@ -72,8 +78,8 @@ test.describe('Authentication setup', () => {
   test('create admin session', async ({ browser, browserName }) => {
     await loginAndSave({
       browser,
-      username: ADMIN_USER,
-      password: ADMIN_PASSWORD,
+      username: TEST_ADMIN_USERNAME,
+      password: TEST_ADMIN_PASSWORD,
       storageFile: `${browserName}-admin-session.json`
     });
   });
