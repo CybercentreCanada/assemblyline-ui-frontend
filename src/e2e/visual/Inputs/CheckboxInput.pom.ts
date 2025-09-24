@@ -1,5 +1,5 @@
 import type { Locator, Page } from '@playwright/test';
-import { MEDIUM_TIMEOUT } from 'e2e/shared/constants';
+import { MEDIUM_TIMEOUT, SHORT_TIMEOUT } from 'e2e/shared/constants';
 import { expect, test } from 'e2e/shared/fixtures';
 import { BaseInput } from 'e2e/visual/Inputs/lib/Input.pom';
 
@@ -34,6 +34,7 @@ export class CheckboxInput extends BaseInput {
 
   async expectValue(value: boolean) {
     await test.step(`Expect CheckboxInput "${this.id}" to have value: ${value}`, async () => {
+      await this.page.waitForTimeout(SHORT_TIMEOUT);
       const visible = await this.checked.isVisible({ timeout: MEDIUM_TIMEOUT });
       expect(visible).toBe(value);
     });

@@ -1,5 +1,5 @@
 import type { Page } from '@playwright/test';
-import { MEDIUM_TIMEOUT } from 'e2e/shared/constants';
+import { MEDIUM_TIMEOUT, SHORT_TIMEOUT } from 'e2e/shared/constants';
 import { expect, test } from 'e2e/shared/fixtures';
 import { BaseInput } from 'e2e/visual/Inputs/lib/Input.pom';
 
@@ -16,6 +16,7 @@ export class TextInput extends BaseInput {
   async inputValue(value: string) {
     await test.step(`Type into TextInput "${this.id}": ${value}`, async () => {
       await this.input.fill(value, { timeout: MEDIUM_TIMEOUT });
+      await this.input.press('Tab');
     });
   }
 
@@ -27,6 +28,7 @@ export class TextInput extends BaseInput {
 
   override async expectValue(value: string | RegExp, { timeout = MEDIUM_TIMEOUT } = {}) {
     await test.step(`Expect TextInput "${this.id}" to have value: ${value}`, async () => {
+      await this.page.waitForTimeout(SHORT_TIMEOUT);
       await expect(this.input).toHaveValue(value, { timeout });
     });
   }

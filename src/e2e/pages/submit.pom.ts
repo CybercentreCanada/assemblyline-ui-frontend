@@ -80,6 +80,7 @@ export class SubmitPage extends PageObjectModel {
 
   async clickSubmit() {
     await test.step('Clicking the submit button', async () => {
+      await this.page.waitForTimeout(SHORT_TIMEOUT);
       await this.submitButton.click({ timeout: SHORT_TIMEOUT });
     });
   }

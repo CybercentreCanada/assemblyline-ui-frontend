@@ -1,5 +1,5 @@
 import type { Locator, Page } from '@playwright/test';
-import { MEDIUM_TIMEOUT } from 'e2e/shared/constants';
+import { MEDIUM_TIMEOUT, SHORT_TIMEOUT } from 'e2e/shared/constants';
 import { expect, test } from 'e2e/shared/fixtures';
 import { BaseInput } from 'e2e/visual/Inputs/lib/Input.pom';
 
@@ -52,6 +52,7 @@ export class ChipsInput extends BaseInput {
 
   async expectValue(expected: string[]) {
     await test.step(`Expect ChipsInput "${this.id}" to have value "${expected}"`, async () => {
+      await this.page.waitForTimeout(SHORT_TIMEOUT);
       const chips = await this.chipElements.allTextContents();
       expect(chips, `Chips in "${this.id}" did not match expected`).toEqual(expected);
     });

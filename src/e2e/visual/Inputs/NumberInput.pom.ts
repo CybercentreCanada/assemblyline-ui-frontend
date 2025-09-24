@@ -1,5 +1,5 @@
 import type { Page } from '@playwright/test';
-import { MEDIUM_TIMEOUT } from 'e2e/shared/constants';
+import { MEDIUM_TIMEOUT, SHORT_TIMEOUT } from 'e2e/shared/constants';
 import { expect, test } from 'e2e/shared/fixtures';
 import { BaseInput } from 'e2e/visual/Inputs/lib/Input.pom';
 
@@ -17,6 +17,7 @@ export class NumberInput extends BaseInput {
     const strValue = value === null || value === undefined ? '' : value.toString();
     await test.step(`Set NumberInput "${this.id}" to "${strValue}"`, async () => {
       await this.input.fill(strValue, { timeout: MEDIUM_TIMEOUT });
+      await this.input.press('Tab');
     });
   }
 
@@ -29,6 +30,7 @@ export class NumberInput extends BaseInput {
   async expectValue(expected: number | null | undefined) {
     const strValue = expected === null || expected === undefined ? '' : expected.toString();
     await test.step(`Expect NumberInput "${this.id}" to have value "${strValue}"`, async () => {
+      await this.page.waitForTimeout(SHORT_TIMEOUT);
       await expect(this.input).toHaveValue(strValue, { timeout: MEDIUM_TIMEOUT });
     });
   }
