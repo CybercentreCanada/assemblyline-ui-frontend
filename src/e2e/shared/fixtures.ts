@@ -6,6 +6,7 @@ import { ForbiddenPage } from 'e2e/pages/403.pom';
 import { NotFoundPage } from 'e2e/pages/404_dl.pom';
 import { AccountPage } from 'e2e/pages/account.pom';
 import { CrashPage } from 'e2e/pages/crash.pom';
+import { DevelopmentLibraryInputsPage } from 'e2e/pages/development/development_library_inputs.pom';
 import { LoginPage } from 'e2e/pages/login.pom';
 import { SubmissionDetailPage } from 'e2e/pages/submission/submission_detail.pom';
 import { SubmissionReportPage } from 'e2e/pages/submission/submission_report.pom';
@@ -33,10 +34,11 @@ type UserSession = {
 
   // Pages
   accountPage: AccountPage;
+  developmentLibraryInputs: DevelopmentLibraryInputsPage;
   loginPage: LoginPage;
-  submitPage: SubmitPage;
   submissionDetailPage: SubmissionDetailPage;
   submissionReportPage: SubmissionReportPage;
+  submitPage: SubmitPage;
 };
 
 type SetupBundle = {
@@ -68,6 +70,7 @@ async function setupBundle({ browser, browserName, user }: SetupBundle): Promise
 
     // Pages
     accountPage: new AccountPage(page),
+    developmentLibraryInputs: new DevelopmentLibraryInputsPage(page),
     loginPage: new LoginPage(page),
     submissionDetailPage: new SubmissionDetailPage(page),
     submissionReportPage: new SubmissionReportPage(page),
