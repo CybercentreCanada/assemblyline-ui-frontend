@@ -1,6 +1,5 @@
 /* eslint-disable no-console */
 import { chromium, defineConfig, devices, PlaywrightTestConfig } from '@playwright/test';
-import chalk from 'chalk';
 import dotenv from 'dotenv';
 import fs from 'fs';
 import path from 'path';
@@ -23,21 +22,18 @@ const BROWSERS = [
   {
     name: 'chromium',
     label: 'chrome',
-    color: chalk.yellow,
     device: devices['Desktop Chrome'],
     browserType: chromium
   }
   // {
   //   name: 'firefox',
   //   label: 'firefox',
-  //   color: chalk.red,
   //   device: devices['Desktop Firefox'],
   //   browserType: firefox
   // },
   // {
   //   name: 'webkit',
   //   label: 'safari',
-  //   color: chalk.blue,
   //   device: devices['Desktop Safari'],
   //   browserType: webkit
   // }
