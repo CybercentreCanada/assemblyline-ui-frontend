@@ -1,6 +1,7 @@
+import { LONG_TIMEOUT } from 'e2e/shared/constants';
 import { test } from 'e2e/shared/fixtures';
 
-test.describe.only('Development Library Inputs page', () => {
+test.describe('Development Library Inputs page', () => {
   test.beforeAll(async ({ adminSession }) => {
     void adminSession.crashPage.monitorForNoError();
     void adminSession.notFoundPage.monitorForNoError();
@@ -17,7 +18,7 @@ test.describe.only('Development Library Inputs page', () => {
   test('TextInput tests', async ({ adminSession }) => {
     const inputs = adminSession.developmentLibraryInputs;
 
-    await inputs.textInput.expectVisible();
+    await inputs.textInput.expectVisible({ timeout: LONG_TIMEOUT });
 
     // Testing the input value
     await inputs.textInput.inputValue('Hello world');
@@ -58,7 +59,7 @@ test.describe.only('Development Library Inputs page', () => {
   test('NumberInput tests', async ({ adminSession }) => {
     const inputs = adminSession.developmentLibraryInputs;
 
-    await inputs.numberInput.expectVisible();
+    await inputs.numberInput.expectVisible({ timeout: LONG_TIMEOUT });
 
     // Testing the input value
     await inputs.numberInput.inputValue(123);
@@ -99,7 +100,7 @@ test.describe.only('Development Library Inputs page', () => {
   test('CheckboxInput tests', async ({ adminSession }) => {
     const inputs = adminSession.developmentLibraryInputs;
 
-    await inputs.checkboxInput.expectVisible();
+    await inputs.checkboxInput.expectVisible({ timeout: LONG_TIMEOUT });
 
     // Testing the input value
     await inputs.checkboxInput.inputValue(true);

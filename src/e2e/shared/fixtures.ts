@@ -8,6 +8,9 @@ import { AccountPage } from 'e2e/pages/account.pom';
 import { CrashPage } from 'e2e/pages/crash.pom';
 import { DevelopmentLibraryInputsPage } from 'e2e/pages/development/development_library_inputs.pom';
 import { LoginPage } from 'e2e/pages/login.pom';
+import { WorkflowCreatePage } from 'e2e/pages/manage/workflow/workflow_create.pom';
+import { WorkflowDetailPage } from 'e2e/pages/manage/workflow/workflow_detail.pom';
+import { WorkflowsPage } from 'e2e/pages/manage/workflow/workflows.pom';
 import { SubmissionDetailPage } from 'e2e/pages/submission/submission_detail.pom';
 import { SubmissionReportPage } from 'e2e/pages/submission/submission_report.pom';
 import { SubmitPage } from 'e2e/pages/submit.pom';
@@ -39,6 +42,9 @@ type UserSession = {
   submissionDetailPage: SubmissionDetailPage;
   submissionReportPage: SubmissionReportPage;
   submitPage: SubmitPage;
+  workflowCreatePage: WorkflowCreatePage;
+  workflowDetailPage: WorkflowDetailPage;
+  workflowsPage: WorkflowsPage;
 };
 
 type SetupBundle = {
@@ -74,7 +80,10 @@ async function setupBundle({ browser, browserName, user }: SetupBundle): Promise
     loginPage: new LoginPage(page),
     submissionDetailPage: new SubmissionDetailPage(page),
     submissionReportPage: new SubmissionReportPage(page),
-    submitPage: new SubmitPage(page)
+    submitPage: new SubmitPage(page),
+    workflowCreatePage: new WorkflowCreatePage(page),
+    workflowDetailPage: new WorkflowDetailPage(page),
+    workflowsPage: new WorkflowsPage(page)
   };
 }
 

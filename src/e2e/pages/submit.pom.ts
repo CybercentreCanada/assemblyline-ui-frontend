@@ -39,7 +39,7 @@ export class SubmitPage extends PageObjectModel {
     this.adjustButton = this.page.locator('button#open-the-panel-to-adjust-the-submit-parameters');
     this.submissionProfileInput = new SelectInput(page, 'submission profile name');
     this.tab = new TabContainer(page);
-    this.hashInput = new TextInput(page, 'Hash/URL to Analyze');
+    this.hashInput = new TextInput(page, 'Hash Input');
   }
 
   locators(): Locator[] {
@@ -65,7 +65,7 @@ export class SubmitPage extends PageObjectModel {
 
   async uploadHash(hash: string) {
     await test.step(`Entering Hash/URL: ${hash}`, async () => {
-      await this.hashInput.inputByValue(hash);
+      await this.hashInput.inputValue(hash);
       await this.hashInput.expectValue(hash);
     });
   }

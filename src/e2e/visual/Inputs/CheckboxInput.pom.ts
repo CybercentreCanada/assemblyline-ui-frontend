@@ -47,7 +47,7 @@ export class CheckboxInput extends BaseInput {
 
   override async expectToBeReadonly({ timeout = MEDIUM_TIMEOUT } = {}) {
     await test.step(`Expect ${this.type} "${this.id}" to be readonly`, async () => {
-      await expect(this.input).toBeDisabled();
+      await expect(this.input).toBeDisabled({ timeout });
     });
   }
 }

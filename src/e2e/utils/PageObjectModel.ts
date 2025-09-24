@@ -24,7 +24,7 @@ export abstract class PageObjectModel {
     return this;
   }
 
-  async goto() {
+  async goto(...params: string[]) {
     await test.step(`Navigating to the ${this.name}`, async () => {
       await this.page.goto(this.route, { timeout: LONG_TIMEOUT });
     });

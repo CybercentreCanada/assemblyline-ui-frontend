@@ -1,18 +1,33 @@
-import type { Locator, Page } from '@playwright/test';
-import { expect } from 'e2e/shared/fixtures';
+import type { Page } from '@playwright/test';
+import { MEDIUM_TIMEOUT } from 'e2e/shared/constants';
+import { expect, test } from 'e2e/shared/fixtures';
+import { BaseInput } from 'e2e/visual/Inputs/lib/Input.pom';
 
-export class TextAreaInput {
-  private input: Locator;
-
-  constructor(page: Page, ariaLabel: string) {
-    this.input = page.locator(`[aria-label="${ariaLabel}"] textarea`);
+export class TextAreaInput extends BaseInput {
+  constructor(
+    protected readonly page: Page,
+    protected readonly id: string
+  ) {
+    super(page, 'TextAreaInput', id);
+    this.root = page.locator(`div[id="${id}-root"]`);
+    this.input = this.root.locator(`textarea#${id}:not([aria-hidden="true"])`);
   }
 
-  async inputByValue(value: string) {
-    await this.input.fill(value);
+  async inputValue(value: string) {
+    await test.step(`Set TextAreaInput "${this.id}" to "${value}"`, async () => {
+      await this.input.fill(value, { timeout: MEDIUM_TIMEOUT });
+    });
+  }
+
+  async clearValue() {
+    await test.step(`Clear TextAreaInput "${this.id}"`, async () => {
+      await this.input.fill('', { timeout: MEDIUM_TIMEOUT });
+    });
   }
 
   async expectValue(expected: string) {
-    await expect(this.input).toHaveValue(expected);
+    await test.step(`Expect TextAreaInput "${this.id}" to have value "${expected}"`, async () => {
+      await expect(this.input).toHaveValue(expected, { timeout: MEDIUM_TIMEOUT });
+    });
   }
 }
