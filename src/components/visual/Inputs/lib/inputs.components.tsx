@@ -56,10 +56,11 @@ import { useTranslation } from 'react-i18next';
 export const StyledRoot = React.memo(({ children }: { children: React.ReactNode }) => {
   const [get] = usePropStore();
 
+  const id = usePropID();
   const rootProps = get('rootProps');
 
   return (
-    <div {...rootProps} style={{ textAlign: 'left', ...rootProps?.style }}>
+    <div {...rootProps} id={`${id}-root`} style={{ textAlign: 'left', ...rootProps?.style }}>
       {children}
     </div>
   );
@@ -562,10 +563,12 @@ export const StyledFormControl = React.memo(({ children, ...props }: FormControl
 
   const disabled = get('disabled');
   const divider = get('divider');
+  const id = usePropID();
   const readOnly = get('readOnly');
 
   return (
     <FormControl
+      id={`${id}-form`}
       component="form"
       size="small"
       fullWidth
