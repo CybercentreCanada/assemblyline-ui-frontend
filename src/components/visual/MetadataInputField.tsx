@@ -208,7 +208,16 @@ const MetadataInputField: React.FC<MetadataInputFieldProps> = ({
           date={value}
           setDate={onChange}
           type="input"
-          textFieldProps={{ ...defaultTextFieldProps }}
+          textFieldProps={{
+            id: `metadata.${name}`,
+            margin: 'dense' as const,
+            size: 'small' as const,
+            variant: 'outlined' as const,
+            required: configuration.required,
+            fullWidth: true,
+            error: !isValid(value, configuration),
+            autoFocus: !isValid(value, configuration)
+          }}
           disabled={disabled}
         />
       </div>
