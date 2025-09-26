@@ -1,10 +1,11 @@
-.vscode
 .env.local
 .eslintrc
-.gitignore
 .git
+.gitignore
 .prettierrc
+.vscode
 docker
 node_modules
 npm-debug.log
 pipelines
+playwright-results
