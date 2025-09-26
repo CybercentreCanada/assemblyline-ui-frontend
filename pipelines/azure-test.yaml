@@ -22,7 +22,7 @@ variables:
 jobs:
   - job: run_tests
     timeoutInMinutes: 20
-    env:
+    variables:
       PLAYWRIGHT_BROWSERS_PATH: $(Pipeline.Workspace)/.pw-browsers
 
     steps:
