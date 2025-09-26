@@ -4,20 +4,30 @@ import dotenv from 'dotenv';
 import fs from 'fs';
 import path from 'path';
 
-// Load env from project root
+// Load environment variables from .env (quietly if missing)
 dotenv.config({ path: path.resolve(__dirname, '.env'), quiet: true });
 
-// Validate env vars
+// Determine base URL
+const TEST_BASE_URL = process.env.TEST_BASE_URL;
 const EXTERNAL_IP = process.env.EXTERNAL_IP;
-if (!EXTERNAL_IP) throw new Error('❌ EXTERNAL_IP is not defined in .env');
 
-const BASE_URL = process.env.TEST_BASE_URL ?? `https://${EXTERNAL_IP}.nip.io`;
-const RESULTS_DIR = path.resolve(__dirname, 'playwright-results');
+let BASE_URL: string;
 
-if (!fs.existsSync(RESULTS_DIR)) {
-  fs.mkdirSync(RESULTS_DIR, { recursive: true });
+if (TEST_BASE_URL) {
+  BASE_URL = TEST_BASE_URL;
+} else if (EXTERNAL_IP) {
+  BASE_URL = `https://${EXTERNAL_IP}.nip.io`;
+  console.warn(`⚠️ TEST_BASE_URL not defined, using EXTERNAL_IP fallback: ${BASE_URL}`);
+} else {
+  BASE_URL = 'http://localhost';
+  console.warn('⚠️ Neither TEST_BASE_URL nor EXTERNAL_IP defined, using default: http://localhost');
 }
 
+// Prepare results directory
+const RESULTS_DIR = path.resolve(__dirname, 'playwright-results');
+fs.mkdirSync(RESULTS_DIR, { recursive: true });
+
+// Define browsers
 const BROWSERS = [
   {
     name: 'chromium',
@@ -39,6 +49,7 @@ const BROWSERS = [
   // }
 ] as const;
 
+// Base use configuration
 const baseUseConfig: PlaywrightTestConfig['use'] = {
   baseURL: BASE_URL,
   headless: true,
@@ -49,6 +60,7 @@ const baseUseConfig: PlaywrightTestConfig['use'] = {
   video: process.env.CI ? 'retain-on-failure' : 'on'
 };
 
+// Export Playwright configuration
 export default defineConfig({
   forbidOnly: !!process.env.CI,
   fullyParallel: true,
@@ -66,7 +78,7 @@ export default defineConfig({
   use: baseUseConfig,
   workers: 4,
   projects: BROWSERS.flatMap(({ name, device }) => [
-    // Setup projects (auth)
+    // Setup project (for authentication, etc.)
     {
       name: `${name}-setup`,
       use: {

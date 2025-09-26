@@ -83,10 +83,17 @@ jobs:
 
       - task: PublishPipelineArtifact@1
         inputs:
-          targetPath: $(System.DefaultWorkingDirectory)/playwright-report
+          targetPath: $(System.DefaultWorkingDirectory)/playwright-results/html-report
           artifactName: playwright-report
         condition: succeededOrFailed()
         displayName: 'Publish Playwright HTML report'
+
+      - task: PublishTestResults@2
+        inputs:
+          testResultsFormat: JUnit
+          testResultsFiles: $(System.DefaultWorkingDirectory)/playwright-results/junit-results.xml
+        condition: succeededOrFailed()
+        displayName: 'Publish Playwright JUnit test results'
 
       - task: PublishCodeCoverageResults@2
         inputs:
