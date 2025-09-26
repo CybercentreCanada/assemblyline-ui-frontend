@@ -13,12 +13,15 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  NODE_VERSION: '22.x'
-  PNPM_VERSION: '10.8.1'
+  - group: Playwright E2E Tests
+  - name: NODE_VERSION
+    value: '22.x'
+  - name: PNPM_VERSION
+    value: '10.8.1'
 
 jobs:
   - job: run_tests
-    timeoutInMinutes: 15
+    timeoutInMinutes: 20
 
     steps:
       - checkout: self
@@ -50,12 +53,28 @@ jobs:
       - script: |
           set -xv  # Echo commands before they are run
           pnpm run test:ci
-        displayName: 'Run tests with coverage'
+        displayName: 'Run unit tests with coverage'
 
       - script: |
           set -xv  # Echo commands before they are run
           pnpm run lint:ci
         displayName: 'ESLint'
+
+      - script: |
+          npx playwright install --with-deps
+        displayName: 'Install Playwright browsers'
+
+      - script: |
+          set -xv
+          pnpm run e2e:ci
+        displayName: 'Run Playwright E2E tests'
+
+      - task: PublishPipelineArtifact@1
+        inputs:
+          targetPath: $(System.DefaultWorkingDirectory)/playwright-report
+          artifactName: playwright-report
+        condition: succeededOrFailed()
+        displayName: 'Publish Playwright HTML report'
 
       - task: PublishCodeCoverageResults@2
         inputs:
