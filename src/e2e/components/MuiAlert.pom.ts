@@ -60,4 +60,4 @@
 //   }
 // }
 
-export const test2 = null;
+export const test = null;
