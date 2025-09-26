@@ -22,6 +22,8 @@ variables:
 jobs:
   - job: run_tests
     timeoutInMinutes: 20
+    env:
+      PLAYWRIGHT_BROWSERS_PATH: $(Pipeline.Workspace)/.pw-browsers
 
     steps:
       - checkout: self
@@ -60,14 +62,15 @@ jobs:
           pnpm run lint:ci
         displayName: 'ESLint'
 
-      - script: mkdir -p $(HOME)/.cache/ms-playwright
+      - script: mkdir -p $(Pipeline.Workspace)/.pw-browsers
         displayName: 'Prepare Playwright cache folder'
 
       - task: Cache@2
         inputs:
           key: 'playwright-browsers-$(Agent.OS)-$(NODE_VERSION)'
-          path: $(HOME)/.cache/ms-playwright
+          path: $(Pipeline.Workspace)/.pw-browsers
         displayName: 'Cache Playwright browsers'
+        continueOnError: true
 
       - script: |
           npx playwright install --with-deps
