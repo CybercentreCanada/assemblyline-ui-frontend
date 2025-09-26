@@ -60,7 +60,6 @@ jobs:
           pnpm run lint:ci
         displayName: 'ESLint'
 
-      # 🔹 Cache Playwright browsers
       - task: Cache@2
         inputs:
           key: 'playwright-browsers-$(Agent.OS)-$(NODE_VERSION)'
