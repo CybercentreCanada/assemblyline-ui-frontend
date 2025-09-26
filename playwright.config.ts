@@ -11,7 +11,7 @@ dotenv.config({ path: path.resolve(__dirname, '.env'), quiet: true });
 const EXTERNAL_IP = process.env.EXTERNAL_IP;
 if (!EXTERNAL_IP) throw new Error('❌ EXTERNAL_IP is not defined in .env');
 
-const BASE_URL = `https://${EXTERNAL_IP}.nip.io`;
+const BASE_URL = process.env.TEST_BASE_URL ?? `https://${EXTERNAL_IP}.nip.io`;
 const RESULTS_DIR = path.resolve(__dirname, 'playwright-results');
 
 if (!fs.existsSync(RESULTS_DIR)) {

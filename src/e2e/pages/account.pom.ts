@@ -25,9 +25,9 @@ export class AccountPage extends PageObjectModel {
     // await Promise.all([this.header.waitFor({ state, timeout })]);
   }
 
-  override async expectToBeVisible({ timeout = MEDIUM_TIMEOUT }: WaitForOptions = {}, email: string = null) {
+  override async expectToBeVisible({ timeout = MEDIUM_TIMEOUT }: WaitForOptions = {}, name: string = null) {
     await test.step(`Expect the ${this.name} to become visible`, async () => {
-      await expect(this.page.getByText(email)).toBeVisible({ timeout });
+      await expect(this.page.getByText(name).first()).toBeVisible({ timeout });
     });
   }
 }

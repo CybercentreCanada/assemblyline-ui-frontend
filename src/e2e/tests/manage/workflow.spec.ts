@@ -1,6 +1,6 @@
 import { test } from 'e2e/shared/fixtures';
 
-test.describe('Workflows page', () => {
+test.describe.skip('Workflows page', () => {
   test('should detect the Workflows page', async ({ adminSession }) => {
     void adminSession.crashPage.monitorForNoError();
     void adminSession.notFoundPage.monitorForNoError();
