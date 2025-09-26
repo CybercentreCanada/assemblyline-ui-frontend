@@ -60,6 +60,13 @@ jobs:
           pnpm run lint:ci
         displayName: 'ESLint'
 
+      # 🔹 Cache Playwright browsers
+      - task: Cache@2
+        inputs:
+          key: 'playwright-browsers-$(Agent.OS)-$(NODE_VERSION)'
+          path: $(HOME)/.cache/ms-playwright
+        displayName: 'Cache Playwright browsers'
+
       - script: |
           npx playwright install --with-deps
         displayName: 'Install Playwright browsers'

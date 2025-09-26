@@ -91,7 +91,7 @@
     "test": "vitest run",
     "test:ci": "CI=true vitest run --coverage",
     "e2e": "playwright test",
-    "e2e:ci": "CI=true playwright test --headless",
+    "e2e:ci": "CI=true playwright test",
     "typecheck": "tsc --pretty --noemit"
   },
   "browserslist": {
