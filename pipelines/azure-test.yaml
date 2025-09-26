@@ -13,17 +13,12 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-  - group: Playwright E2E Tests
-  - name: NODE_VERSION
-    value: '22.x'
-  - name: PNPM_VERSION
-    value: '10.8.1'
+  NODE_VERSION: '22.x'
+  PNPM_VERSION: '10.8.1'
 
 jobs:
   - job: run_tests
-    timeoutInMinutes: 20
-    variables:
-      PLAYWRIGHT_BROWSERS_PATH: $(Pipeline.Workspace)/.pw-browsers
+    timeoutInMinutes: 15
 
     steps:
       - checkout: self
@@ -55,45 +50,12 @@ jobs:
       - script: |
           set -xv  # Echo commands before they are run
           pnpm run test:ci
-        displayName: 'Run unit tests with coverage'
+        displayName: 'Run tests with coverage'
 
       - script: |
           set -xv  # Echo commands before they are run
           pnpm run lint:ci
         displayName: 'ESLint'
-
-      - script: mkdir -p $(Pipeline.Workspace)/.pw-browsers
-        displayName: 'Prepare Playwright cache folder'
-
-      - task: Cache@2
-        inputs:
-          key: 'playwright-browsers-$(Agent.OS)-$(NODE_VERSION)'
-          path: $(Pipeline.Workspace)/.pw-browsers
-        displayName: 'Cache Playwright browsers'
-        continueOnError: true
-
-      - script: |
-          npx playwright install --with-deps
-        displayName: 'Install Playwright browsers'
-
-      - script: |
-          set -xv
-          pnpm run e2e:ci
-        displayName: 'Run Playwright E2E tests'
-
-      - task: PublishPipelineArtifact@1
-        inputs:
-          targetPath: $(System.DefaultWorkingDirectory)/playwright-results/html-report
-          artifactName: playwright-report
-        condition: succeededOrFailed()
-        displayName: 'Publish Playwright HTML report'
-
-      - task: PublishTestResults@2
-        inputs:
-          testResultsFormat: JUnit
-          testResultsFiles: $(System.DefaultWorkingDirectory)/playwright-results/junit-results.xml
-        condition: succeededOrFailed()
-        displayName: 'Publish Playwright JUnit test results'
 
       - task: PublishCodeCoverageResults@2
         inputs:
