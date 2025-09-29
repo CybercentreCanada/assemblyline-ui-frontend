@@ -29,12 +29,12 @@ import { useLocation, useNavigate } from 'react-router';
 
 const BADLIST_PARAMS = createSearchParams(p => ({
   query: p.string(''),
-  offset: p.number(0).min(0).origin('state').ephemeral(),
-  rows: p.number(25).locked().origin('state').ephemeral(),
+  offset: p.number(0).min(0).origin('snapshot').ephemeral(),
+  rows: p.number(25).locked().origin('snapshot').ephemeral(),
   sort: p.string('added desc').ephemeral(),
   filters: p.filters([]),
   track_total_hits: p.number(10000).nullable().ephemeral(),
-  refresh: p.boolean(false).origin('state').ephemeral()
+  refresh: p.boolean(false).origin('snapshot').ephemeral()
 }));
 
 export type BadlistParams = typeof BADLIST_PARAMS;
@@ -60,7 +60,7 @@ const BadlistSearch = () => {
   const badlists = useALQuery({
     url: '/api/v4/search/badlist/',
     method: 'POST',
-    enabled: currentUser.roles.includes('badlist_view'),
+    disabled: !currentUser.roles.includes('badlist_view'),
     body: search
       .set(o => ({ ...o, query: o.query || '*' }))
       .omit(['refresh'])
