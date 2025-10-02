@@ -212,7 +212,7 @@ export const BadlistMenuItem = React.memo(() => {
   const { data: badlist } = useAPIQuery<Badlist>({
     url: `/api/v4/badlist/${type}/${encodeURIComponent(encodeURIComponent(value))}/`,
     method: 'GET',
-    enabled: !!type && !!value,
+    disabled: !type || !value,
     onFailure: () => null
   });
 
@@ -288,7 +288,7 @@ export const SafelistMenuItem = React.memo(() => {
   const { data: safelisted } = useAPIQuery<Safelist>({
     url: `/api/v4/safelist/${qhash}/${encodeURIComponent(encodeURIComponent(value))}/`,
     method: 'GET',
-    enabled: !!qhash && !!value,
+    disabled: !qhash || !value,
     onFailure: () => null
   });
 
