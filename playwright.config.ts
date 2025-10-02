@@ -71,7 +71,7 @@ export default defineConfig({
     ['html', { open: 'always', outputFolder: `${RESULTS_DIR}/html-report` }],
     ['junit', { outputFile: `${RESULTS_DIR}/junit-results.xml` }]
   ],
-  retries: process.env.CI ? 2 : 0,
+  retries: process.env.CI ? 0 : 0,
   testDir: './src/e2e',
   testMatch: /.*\.spec\.tsx?$/,
   timeout: 120_000,
