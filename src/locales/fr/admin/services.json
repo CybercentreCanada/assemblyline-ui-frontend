@@ -111,6 +111,7 @@
   "params.user.none": "Il n'y a aucun paramètre spécifié par l'utilisateur pour le moment",
   "params.user.remove": "Supprimer le paramètre utilisateur",
   "params.user.show": "Afficher le paramètre par défaut",
+  "params.user.unused": "Ce paramètre n'est pas utilisé dans la version de service sélectionnée",
   "remove": "Supprimer le service",
   "reset": "Réinitialiser",
   "reset.tooltip": "Réinitialiser le paramètre à sa valeur d'origine",

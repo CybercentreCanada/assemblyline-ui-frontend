@@ -6,16 +6,19 @@ import type { Service } from 'components/models/base/service';
 import JSONEditor from 'components/visual/JSONEditor';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 
 type ServiceConfig = {
   name: keyof Service['config'];
   value: Service['config'][any];
+  warn?: boolean;
 };
 
 type ExtendedServiceConfig = {
   name: keyof Service['config'];
   type: 'bool' | 'int' | 'list' | 'str' | 'json';
   value: Service['config'][any];
+  warn?: boolean;
 };
 
 type MultiTypeConfigProps = {
@@ -28,7 +31,8 @@ type MultiTypeConfigProps = {
 const DEFAULT_CONFIG: ExtendedServiceConfig = {
   name: '',
   type: 'bool',
-  value: 'false'
+  value: 'false',
+  warn: false
 };
 
 const WrappedMultiTypeConfig = ({
@@ -126,6 +130,14 @@ const WrappedMultiTypeConfig = ({
   return config ? (
     <Grid container spacing={1} alignItems="center">
       <Grid size={{ xs: 10, sm: 3 }} style={{ wordBreak: 'break-word' }}>
+        {parsedConfig.warn && (
+          <Tooltip title={t('params.user.unused')} placement="top">
+            <span>
+              <WarningAmberIcon fontSize="small" style={{ float: 'inline-start' }} />
+              &nbsp;
+            </span>
+          </Tooltip>
+        )}
         {`${parsedConfig.name} [${parsedConfig.type}]:`}
       </Grid>
       <Grid size={{ xs: 10, sm: 8 }}>
