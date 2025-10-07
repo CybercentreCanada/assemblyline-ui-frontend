@@ -487,7 +487,8 @@ const WrappedContainerDialog = ({
 
             <Grid size={{ xs: 6, md: 3 }}>
               <NumberInput
-                label={t('container.dialog.ram')}
+                label={t('container.dialog.ram_mb_min')}
+                tooltip={t('container.dialog.ram_mb_min.desc')}
                 loading={!tempContainer}
                 value={!tempContainer ? null : tempContainer.ram_mb_min}
                 defaultValue={!defaults ? undefined : defaults?.ram_mb_min}
@@ -504,7 +505,8 @@ const WrappedContainerDialog = ({
 
             <Grid size={{ xs: 6, md: 3 }}>
               <NumberInput
-                id="ram_mb_min"
+                label={t('container.dialog.ram_mb')}
+                tooltip={t('container.dialog.ram_mb.desc')}
                 loading={!tempContainer}
                 value={!tempContainer ? null : tempContainer.ram_mb}
                 defaultValue={!defaults ? undefined : defaults?.ram_mb}
