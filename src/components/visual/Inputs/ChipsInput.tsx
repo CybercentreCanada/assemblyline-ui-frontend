@@ -10,7 +10,7 @@ import {
   StyledTextField
 } from 'components/visual/Inputs/lib/inputs.components';
 import {
-  useErrorMessage,
+  useErrorCallback,
   useInputBlur,
   useInputChange,
   useInputFocus,
@@ -53,8 +53,6 @@ const WrappedChipsInput = () => {
   const handleBlur = useInputBlur<ChipsInputProps>();
   const handleChange = useInputChange<ChipsInputProps>();
   const handleFocus = useInputFocus<ChipsInputProps>();
-
-  useErrorMessage();
 
   return (
     <StyledRoot>
@@ -126,14 +124,17 @@ const WrappedChipsInput = () => {
   );
 };
 
-export const ChipsInput = ({ preventRender = false, value = [], ...props }: ChipsInputProps) =>
-  preventRender ? null : (
+export const ChipsInput = ({ preventRender = false, value = [], ...props }: ChipsInputProps) => {
+  const errorMessage = useErrorCallback({ preventRender, value, ...props });
+
+  return preventRender ? null : (
     <PropProvider<ChipsInputProps>
       props={{
         allowEmptyStrings: false,
         autoComplete: 'off',
         clearAdornment: true,
         disableCloseOnSelect: false,
+        errorMessage,
         filterSelectedOptions: false,
         inputValue: value,
         isOptionEqualToValue: (option, value) => option === value,
@@ -148,3 +149,4 @@ export const ChipsInput = ({ preventRender = false, value = [], ...props }: Chip
       <WrappedChipsInput />
     </PropProvider>
   );
+};

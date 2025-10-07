@@ -4,10 +4,11 @@ import { useMediaQuery, useTheme } from '@mui/material';
 import { useAppUser } from 'commons/components/app/hooks';
 import PageContainer from 'commons/components/pages/PageContainer';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
-import type { SearchParams } from 'components/core/SearchParams/SearchParams';
-import { createSearchParams } from 'components/core/SearchParams/SearchParams';
-import { SearchParamsProvider, useSearchParams } from 'components/core/SearchParams/SearchParamsContext';
-import type { SearchParamsResult } from 'components/core/SearchParams/SearchParser';
+import {
+  createSearchParams,
+  SearchParamsProvider,
+  useSearchParams
+} from 'components/core/SearchParams/createSearchParams';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -25,17 +26,17 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
 
-const SIGNATURES_PARAMS = createSearchParams(p => ({
+export const SIGNATURES_PARAMS = createSearchParams(p => ({
   query: p.string(''),
-  offset: p.number(0).min(0).hidden().ignored(),
-  rows: p.number(25).enforced().hidden().ignored(),
-  sort: p.string('type asc').ignored(),
+  offset: p.number(0).min(0).origin('snapshot').ephemeral(),
+  rows: p.number(25).locked().origin('snapshot').ephemeral(),
+  sort: p.string('type asc').ephemeral(),
   filters: p.filters([]),
-  track_total_hits: p.number(10000).nullable().ignored(),
-  refresh: p.boolean(false).hidden().ignored()
+  track_total_hits: p.number(10000).nullable().ephemeral(),
+  refresh: p.boolean(false).origin('snapshot').ephemeral()
 }));
 
-type SignaturesParams = SearchParams<typeof SIGNATURES_PARAMS>;
+export type SignaturesParams = typeof SIGNATURES_PARAMS;
 
 const SignaturesSearch = () => {
   const { t } = useTranslation(['manageSignatures']);
@@ -79,7 +80,7 @@ const SignaturesSearch = () => {
   );
 
   const handleReload = useCallback(
-    (body: SearchParamsResult<SignaturesParams>) => {
+    (body: typeof search) => {
       if (!currentUser.roles.includes('signature_view')) return;
 
       apiCall<SearchResult<Signature>>({

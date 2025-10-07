@@ -7,9 +7,11 @@ import { useAppUser } from 'commons/components/app/hooks';
 import PageContainer from 'commons/components/pages/PageContainer';
 import PageFullWidth from 'commons/components/pages/PageFullWidth';
 import { useALQuery } from 'components/core/Query/AL/useALQuery';
-import type { SearchParams } from 'components/core/SearchParams/SearchParams';
-import { createSearchParams } from 'components/core/SearchParams/SearchParams';
-import { SearchParamsProvider, useSearchParams } from 'components/core/SearchParams/SearchParamsContext';
+import {
+  createSearchParams,
+  SearchParamsProvider,
+  useSearchParams
+} from 'components/core/SearchParams/createSearchParams';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
 import type { CustomUser } from 'components/models/ui/user';
@@ -27,15 +29,15 @@ import { useLocation, useNavigate } from 'react-router';
 
 const BADLIST_PARAMS = createSearchParams(p => ({
   query: p.string(''),
-  offset: p.number(0).min(0).hidden().ignored(),
-  rows: p.number(25).enforced().hidden().ignored(),
-  sort: p.string('added desc').ignored(),
+  offset: p.number(0).min(0).origin('snapshot').ephemeral(),
+  rows: p.number(25).locked().origin('snapshot').ephemeral(),
+  sort: p.string('added desc').ephemeral(),
   filters: p.filters([]),
-  track_total_hits: p.number(10000).nullable().ignored(),
-  refresh: p.boolean(false).hidden().ignored()
+  track_total_hits: p.number(10000).nullable().ephemeral(),
+  refresh: p.boolean(false).origin('snapshot').ephemeral()
 }));
 
-export type BadlistParams = SearchParams<typeof BADLIST_PARAMS>;
+export type BadlistParams = typeof BADLIST_PARAMS;
 
 const BadlistSearch = () => {
   const { t } = useTranslation(['manageBadlist']);
@@ -58,7 +60,7 @@ const BadlistSearch = () => {
   const badlists = useALQuery({
     url: '/api/v4/search/badlist/',
     method: 'POST',
-    enabled: currentUser.roles.includes('badlist_view'),
+    disabled: !currentUser.roles.includes('badlist_view'),
     body: search
       .set(o => ({ ...o, query: o.query || '*' }))
       .omit(['refresh'])

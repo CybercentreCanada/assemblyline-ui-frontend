@@ -58,14 +58,14 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
 
   const { data: badlist } = useALQuery({
     url: `/api/v4/badlist/${badlist_id || id}/`,
-    enabled: (badlist_id || id) && currentUser.roles.includes('badlist_view'),
+    disabled: !(badlist_id || id) || !currentUser.roles.includes('badlist_view'),
     body: null
   });
 
   const { data: histogram } = useALQuery({
     url: '/api/v4/search/histogram/result/created/',
     method: 'POST',
-    enabled: badlist && currentUser.roles.includes('badlist_view'),
+    disabled: !badlist || !currentUser.roles.includes('badlist_view'),
     body: !badlist
       ? null
       : {
@@ -458,7 +458,7 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
               (!badlist.attribution ||
                 Object.keys(badlist.attribution).every(
                   (k: keyof Badlist['attribution']) => !badlist.attribution[k] || badlist.attribution[k].length === 0
-                )) && <span style={{ color: theme.palette.action.disabled }}>{t('attribution.empty')}</span>}
+                )) && <span style={{ color: theme.palette.text.disabled }}>{t('attribution.empty')}</span>}
             {badlist &&
               badlist.attribution &&
               Object.keys(badlist.attribution)
@@ -600,7 +600,7 @@ const BadlistDetail = ({ badlist_id = null, close = () => null }: BadlistDetailP
                       <Moment variant="fromNow">{badlist.expiry_ts}</Moment>)
                     </div>
                   ) : (
-                    <span style={{ color: theme.palette.action.disabled }}>{t('expiry.forever')}</span>
+                    <span style={{ color: theme.palette.text.disabled }}>{t('expiry.forever')}</span>
                   )
                 ) : (
                   <Skeleton />

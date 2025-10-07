@@ -37,7 +37,7 @@ const WrappedBadlistTable: React.FC<Props> = ({ badlistResults, allowSort = true
 
   return isLoading ? (
     <Skeleton variant="rectangular" style={{ height: '6rem', borderRadius: '4px' }} />
-  ) : badlistResults?.total === 0 ? (
+  ) : !badlistResults?.total ? (
     <div style={{ width: '100%' }}>
       <InformativeAlert>
         <AlertTitle>{t('no_badlist_title')}</AlertTitle>
