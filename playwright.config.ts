@@ -76,7 +76,7 @@ export default defineConfig({
   testMatch: /.*\.spec\.tsx?$/,
   timeout: 120_000,
   use: baseUseConfig,
-  workers: 4,
+  workers: process.env.CI ? 1 : 4,
   projects: BROWSERS.flatMap(({ name, device }) => [
     // Setup project (for authentication, etc.)
     {
