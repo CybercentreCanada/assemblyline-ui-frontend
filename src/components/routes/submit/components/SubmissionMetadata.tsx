@@ -313,7 +313,7 @@ export const SubmissionMetadata = React.memo(() => {
   const { configuration } = useALContext();
   const form = useForm();
 
-  return (
+  return !Object.entries(configuration.submission.metadata.submit)?.length ? null : (
     <div>
       <Typography variant="h6">{t('metadata.title')}</Typography>
       <div style={{ display: 'flex', flexDirection: 'column' }}>

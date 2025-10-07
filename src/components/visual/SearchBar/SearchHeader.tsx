@@ -234,9 +234,9 @@ const WrappedSearchHeader = ({
   }, [defaultRows, params, rowsKey]);
 
   const trackTotalHits = useMemo(() => {
-    const val = Number(params.get(trackTotalHitsKey));
-    return isNaN(val) ? defaultTrackTotalHits : val;
-  }, [defaultTrackTotalHits, params, trackTotalHitsKey]);
+    const val = Number(params.get(trackTotalHitsKey) ?? undefined);
+    return !val ? TOTAL_TRACKED_RECORDS : val;
+  }, [params, trackTotalHitsKey]);
 
   const page = useMemo<number>(
     () => (!params ? null : Math.ceil(Math.min(offset, TOTAL_TRACKED_RECORDS) / rows) + 1),
@@ -324,7 +324,7 @@ const WrappedSearchHeader = ({
           <SearchContainer>
             <div ref={inputRef} style={{ flex: 1 }}>
               <SearchTextField
-                options={[]}
+                options={{}}
                 {...searchInputProps}
                 value={queryValue}
                 disabled={loading}
