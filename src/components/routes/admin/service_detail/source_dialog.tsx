@@ -3,7 +3,7 @@ import useALContext from 'components/hooks/useALContext';
 import type { UpdateSource } from 'components/models/base/service';
 import { DEFAULT_SOURCE } from 'components/models/base/service';
 import { SourceDetail } from 'components/routes/manage/signature_sources_details';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 type Props = {
@@ -22,18 +22,18 @@ const WrappedSourceDialog = ({ open, setOpen, source = null, defaults, onSave }:
   const [tempSource, setTempSource] = useState<UpdateSource>(null);
   const [modified, setModified] = useState<boolean>(false);
 
-  const handleSave = () => {
+  const handleSave = useCallback(() => {
     setModified(false);
     setOpen(false);
     onSave(tempSource);
     if (!source) setTempSource(DEFAULT_SOURCE);
-  };
+  }, [onSave, setOpen, source, tempSource]);
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     setOpen(false);
     setModified(false);
     setTempSource(source || DEFAULT_SOURCE);
-  };
+  }, [setOpen, source]);
 
   useEffect(() => {
     if (source) {
