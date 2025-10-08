@@ -84,7 +84,7 @@ const ServiceGeneral = ({
               onChange={(e, v) => {
                 setModified(true);
                 setService(s => ({ ...s, version: v }));
-                setServiceVersion(e.target.value);
+                setServiceVersion(v);
               }}
             />
             <CheckboxInput
