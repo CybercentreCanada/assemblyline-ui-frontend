@@ -115,6 +115,7 @@
   "params.user.none": "There are no user specified parameter right now",
   "params.user.remove": "Remove user parameter",
   "params.user.show": "Show the parameter by default",
+  "params.user.unused": "This parameter is not used in the selected service version",
   "remove": "Remove service",
   "reset": "Reset",
   "reset.tooltip": "Reset parameter to it's original value",
