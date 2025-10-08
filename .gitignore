@@ -7,7 +7,7 @@
 
 # testing
 /coverage
-/playwright-results
+/playwright-report
 .idea
 venv
 __pycache__

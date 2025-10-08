@@ -8,4 +8,4 @@ docker
 node_modules
 npm-debug.log
 pipelines
-playwright-results
+playwright-report
