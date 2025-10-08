@@ -1,3 +1,4 @@
+import { SHORT_TIMEOUT } from 'e2e/shared/constants';
 import { expect, test } from 'e2e/shared/fixtures';
 
 test.describe('Crash page', () => {
@@ -12,5 +13,6 @@ test.describe('Crash page', () => {
 
     await userSession.crashPage.goto();
     await userSession.crashPage.expectToBeVisible();
+    await userSession.page.waitForTimeout(SHORT_TIMEOUT);
   });
 });

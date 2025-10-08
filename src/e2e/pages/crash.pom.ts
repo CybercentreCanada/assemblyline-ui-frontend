@@ -1,4 +1,5 @@
 import type { Locator, Page } from '@playwright/test';
+import { SHORT_TIMEOUT } from 'e2e/shared/constants';
 import { expect, test } from 'e2e/shared/fixtures';
 import type { WaitForOptions } from 'e2e/shared/models';
 import { PageObjectModel } from 'e2e/utils/PageObjectModel';
@@ -37,6 +38,7 @@ export class CrashPage extends PageObjectModel {
     return await test.step(`Waiting for ${this.name} fallback to become ${state}`, async () => {
       try {
         await this.errorFallback.waitFor({ state, timeout });
+        await this.errorMessage.waitFor({ state, timeout: SHORT_TIMEOUT });
 
         const message = (await this.errorMessage.textContent())?.trim() || null;
 
@@ -44,6 +46,7 @@ export class CrashPage extends PageObjectModel {
           await this.showStackButton.click();
         }
 
+        await this.errorStack.waitFor({ state, timeout: SHORT_TIMEOUT });
         const stack = (await this.errorStack.textContent())?.trim() || null;
         throw new CrashError(message, stack);
       } catch (err) {
