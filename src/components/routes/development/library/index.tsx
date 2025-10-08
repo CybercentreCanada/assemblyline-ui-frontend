@@ -13,6 +13,7 @@ import { PageNavigation } from 'components/visual/Layouts/PageNavigation';
 import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import React, { useEffect } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router';
+import { SandboxResultSection } from './sections/SandboxResultSection';
 
 const LibraryContent = () => {
   const { rootRef, headerRef, Anchors, ActiveAnchor, scrollTo } = useTableOfContent();
@@ -112,6 +113,8 @@ const LibraryContent = () => {
                   return <ListSection />;
                 case 'list_inputs':
                   return <ListInputsSection />;
+                case 'sandbox_result':
+                  return <SandboxResultSection />;
               }
             })()}
           </PageLayout>
