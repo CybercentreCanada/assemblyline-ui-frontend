@@ -3,7 +3,6 @@ import react from '@vitejs/plugin-react';
 import { defineConfig, loadEnv } from 'vite';
 import mkcert from 'vite-plugin-mkcert';
 import tsconfigPaths from 'vite-tsconfig-paths';
-import { configDefaults } from 'vitest/config';
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
@@ -41,27 +40,6 @@ export default defineConfig(({ mode }) => {
         path: '/ws',
         protocol: 'wss',
         ...(env?.EXTERNAL_IP && { host: `${env.EXTERNAL_IP}.nip.io` })
-      }
-    },
-    test: {
-      globals: true,
-      environment: 'jsdom',
-      setupFiles: ['./src/tests/setupTests.ts'],
-      exclude: [...configDefaults.exclude],
-      testTimeout: 30000,
-      clearMocks: true,
-      coverage: {
-        all: true,
-        include: ['src/**/*.tsx'],
-        provider: 'v8',
-        reporter: ['cobertura', 'clover', 'lcov'],
-        reportsDirectory: './coverage'
-      },
-      poolOptions: {
-        threads: {
-          maxThreads: 6,
-          minThreads: 3
-        }
       }
     }
   };

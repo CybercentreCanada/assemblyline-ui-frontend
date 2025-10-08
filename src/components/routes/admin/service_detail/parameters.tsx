@@ -106,7 +106,9 @@ const ServiceParams = ({ service, defaults, setService, setModified }: ServicePa
           <Typography variant="h6">{t('params.user')}</Typography>
         </Grid>
         <Grid size={{ xs: 12 }}>
-          <Typography variant="subtitle2">{t('params.user.current')}</Typography>
+          <Typography color="textSecondary" variant="subtitle2">
+            {t('params.user.current')}
+          </Typography>
         </Grid>
         {service.submission_params.length !== 0 ? (
           service.submission_params.map((param, i) => (
@@ -122,13 +124,15 @@ const ServiceParams = ({ service, defaults, setService, setModified }: ServicePa
           ))
         ) : (
           <Grid size={{ xs: 12 }}>
-            <Typography variant="caption" color="textSecondary">
+            <Typography color="textPrimary" variant="caption">
               {t('params.user.none')}
             </Typography>
           </Grid>
         )}
         <Grid size={{ xs: 12 }} style={{ marginTop: theme.spacing(2) }}>
-          <Typography variant="subtitle2">{t('params.user.new')}</Typography>
+          <Typography color="textSecondary" variant="subtitle2">
+            {t('params.user.new')}
+          </Typography>
         </Grid>
         <Grid size={{ xs: 12 }}>
           <MultiTypeParam onAdd={onParamAdd} />
@@ -138,7 +142,9 @@ const ServiceParams = ({ service, defaults, setService, setModified }: ServicePa
           <Typography variant="h6">{t('params.config')}</Typography>
         </Grid>
         <Grid size={{ xs: 12 }}>
-          <Typography variant="subtitle2">{t('params.config.current')}</Typography>
+          <Typography color="textSecondary" variant="subtitle2">
+            {t('params.config.current')}
+          </Typography>
         </Grid>
         {Object.keys(service.config).length !== 0 ? (
           Object.keys(service.config).map((name, i) => (
@@ -158,7 +164,9 @@ const ServiceParams = ({ service, defaults, setService, setModified }: ServicePa
           </Grid>
         )}
         <Grid size={{ xs: 12 }} style={{ marginTop: theme.spacing(2) }}>
-          <Typography variant="subtitle2">{t('params.config.new')}</Typography>
+          <Typography color="textSecondary" variant="subtitle2">
+            {t('params.config.new')}
+          </Typography>
         </Grid>
         <Grid size={{ xs: 12 }}>
           <MultiTypeConfig onAdd={onConfigAddUpdate} />

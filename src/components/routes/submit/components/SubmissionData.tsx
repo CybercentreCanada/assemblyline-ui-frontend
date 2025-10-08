@@ -23,6 +23,7 @@ export const PasswordInput = React.memo(() => {
         <ChipsInput
           label={t('data.password.label')}
           tooltip={t('data.password.tooltip')}
+          helperText={t('data.password.helperText')}
           value={passwords}
           loading={loading}
           disabled={disabled || !isEditing}
