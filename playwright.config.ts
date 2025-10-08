@@ -24,7 +24,7 @@ if (TEST_BASE_URL) {
 }
 
 // Prepare results directory
-const RESULTS_DIR = path.resolve(__dirname, 'playwright-results');
+const RESULTS_DIR = path.resolve(__dirname, 'playwright-report');
 fs.mkdirSync(RESULTS_DIR, { recursive: true });
 
 // Define browsers
