@@ -1,12 +1,12 @@
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOutlineOutlined';
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import { Autocomplete, Grid, IconButton, MenuItem, Select, TextField, Tooltip, useTheme } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
 import type { Service } from 'components/models/base/service';
 import JSONEditor from 'components/visual/JSONEditor';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 
 type ServiceConfig = {
   name: keyof Service['config'];
@@ -131,7 +131,7 @@ const WrappedMultiTypeConfig = ({
     <Grid container spacing={1} alignItems="center">
       <Grid size={{ xs: 10, sm: 3 }} style={{ wordBreak: 'break-word' }}>
         {parsedConfig.warn && (
-          <Tooltip title={t('params.user.unused')} placement="top">
+          <Tooltip title={t('params.user.unused')} placement="top-start">
             <span>
               <WarningAmberIcon fontSize="small" style={{ float: 'inline-start' }} />
               &nbsp;

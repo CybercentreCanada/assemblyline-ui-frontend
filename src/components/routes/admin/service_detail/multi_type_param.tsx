@@ -184,7 +184,7 @@ const WrappedMultiTypeParam = <T extends 'bool' | 'int' | 'str' | 'list'>({
     <Grid container spacing={1} alignItems="center">
       <Grid size={{ xs: 10, sm: 3 }} style={{ wordBreak: 'break-word' }}>
         {warn && (
-          <Tooltip title={t('params.user.unused')} placement="top">
+          <Tooltip title={t('params.user.unused')} placement="top-start">
             <span>
               <WarningAmberIcon fontSize="small" style={{ float: 'inline-start' }} />
               &nbsp;
