@@ -59,6 +59,7 @@
   "params.ignore_filtering": "Ignore Filtering",
   "params.ignore_recursion_prevention": "Ignore Recursion Prevention",
   "params.initial_data": "Initial data",
+  "params.initial_data.passwords": "Passwords",
   "params.priority": "Priority",
   "params.services.executed": "Executed services",
   "params.services.service_spec": "Service parameters",
