@@ -261,6 +261,7 @@ function WrappedSubmissionDetail() {
           }
 
           // #3: Parse Tags
+
           for (const tagID in section.tags) {
             const tag = section.tags[tagID];
             let summaryType: keyof TagTypes = null;
@@ -282,12 +283,7 @@ function WrappedSubmissionDetail() {
               }
 
               let exists = false;
-              const tagVal: Tag = [
-                tag.value,
-                hType as Verdict,
-                tag.safelisted ?? false,
-                tag.classification ?? section.classification ?? null
-              ];
+              const tagVal: Tag = [tag.value, hType as Verdict];
               for (const i in tempSummary.tags[summaryType][tag.type]) {
                 if (
                   tempSummary.tags[summaryType][tag.type][i][0] === tagVal[0] &&
