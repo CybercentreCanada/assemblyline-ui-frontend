@@ -194,6 +194,63 @@ const WrappedInfoSection: React.FC<Props> = ({ submission }) => {
               </>
             )}
 
+            {submission?.params?.initial_data &&
+              (() => {
+                let data: object | null = null;
+                try {
+                  data = JSON.parse(submission.params.initial_data) as object;
+                } catch {
+                  return null;
+                }
+
+                const entries = Object.entries(data ?? {});
+                if (!entries.length) {
+                  return null;
+                }
+
+                return (
+                  <>
+                    <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
+                      <strong>{t('params.initial_data')}</strong>
+                    </Grid>
+
+                    <Grid size={{ xs: 8, sm: 9, lg: 10 }} sx={{ wordBreak: 'break-word' }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'auto 1fr', columnGap: theme.spacing(1) }}>
+                        {entries.map(([k, v], i) => {
+                          const label = k
+                            .replace(/[_-]+/g, ' ')
+                            .replace(/([a-z])([A-Z])/g, '$1 $2')
+                            .trim();
+                          const emptyObj = v && typeof v === 'object' && !Array.isArray(v) && !Object.keys(v).length;
+                          const emptyArr = Array.isArray(v) && !v.length;
+
+                          const display = (
+                            emptyObj || emptyArr || v == null || v === '' ? (
+                              <span style={{ color: theme.palette.text.disabled }}>{t('none')}</span>
+                            ) : Array.isArray(v) ? (
+                              v.join(' | ')
+                            ) : typeof v === 'boolean' ? (
+                              String(v)
+                            ) : typeof v === 'object' ? (
+                              JSON.stringify(v)
+                            ) : (
+                              v
+                            )
+                          ) as React.ReactNode;
+
+                          return (
+                            <React.Fragment key={i}>
+                              <span style={{ textTransform: 'capitalize', fontStyle: 'italic' }}>{label}:</span>
+                              <span>{display}</span>
+                            </React.Fragment>
+                          );
+                        })}
+                      </div>
+                    </Grid>
+                  </>
+                );
+              })()}
+
             {['generate_alert', 'deep_scan', 'ignore_cache', 'ignore_recursion_prevention', 'ignore_filtering'].map(
               (k, i) => (
                 <Fragment key={i}>
