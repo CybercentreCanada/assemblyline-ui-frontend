@@ -36,7 +36,7 @@ const WrappedSearchCount: FC<SearchCountProps> = memo(
       [total]
     );
 
-    const isLimited = useMemo<boolean>(() => total > currentMax, [currentMax, total]);
+    const isLimited = useMemo<boolean>(() => total >= currentMax, [currentMax, total]);
 
     const disabled = useMemo<boolean>(
       () => loading || disabledProp || total < defaultMax,
