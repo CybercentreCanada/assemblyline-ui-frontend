@@ -1,16 +1,19 @@
+import type { Results } from 'components/models/ontology/ontology';
+
 export const BODY_FORMAT = [
-  'TEXT',
-  'MEMORY_DUMP',
   'GRAPH_DATA',
-  'URL',
+  'IMAGE',
   'JSON',
   'KEY_VALUE',
+  'MEMORY_DUMP',
+  'MULTI',
   'ORDERED_KEY_VALUE',
   'PROCESS_TREE',
+  'SANDBOX',
   'TABLE',
-  'IMAGE',
-  'MULTI',
-  'TIMELINE'
+  'TEXT',
+  'TIMELINE',
+  'URL'
 ] as const;
 
 /**
@@ -102,48 +105,56 @@ export type TimelineBody = {
   opposite_content: string | null;
 };
 
+/** Sandbox Body */
+export type SandboxBody = Results;
+
+export type SandboxBodyConfig = {};
+
 /** Multi Body */
 export type MultiBody = (
-  | ['TEXT', TextBody]
-  | ['MEMORY_DUMP', MemDumpBody]
+  | ['DIVIDER', null]
   | ['GRAPH_DATA', GraphBody]
-  | ['URL', URLBody]
+  | ['IMAGE', ImageBody]
   | ['JSON', JSONBody]
   | ['KEY_VALUE', KeyValueBody]
+  | ['MEMORY_DUMP', MemDumpBody]
+  | ['MULTI', MultiBody]
   | ['ORDERED_KEY_VALUE', OrderedKeyValueBody]
   | ['PROCESS_TREE', ProcessTreeBody[]]
-  | ['TABLE', TableBody]
+  | ['SANDBOX', SandboxBody]
   | ['TABLE', TableBody, { column_order?: string[] }]
-  | ['IMAGE', ImageBody]
+  | ['TABLE', TableBody]
+  | ['TEXT', TextBody]
   | ['TIMELINE', TimelineBody[]]
-  | ['MULTI', MultiBody]
-  | ['DIVIDER', null]
+  | ['URL', URLBody]
 )[];
 
-export type TextBodyItem = { body_format: 'TEXT'; body: TextBody };
-export type MemDumpItem = { body_format: 'MEMORY_DUMP'; body: MemDumpBody };
 export type GraphItem = { body_format: 'GRAPH_DATA'; body: GraphBody };
-export type URLItem = { body_format: 'URL'; body: URLBody };
+export type ImageItem = { body_format: 'IMAGE'; body: ImageBody };
 export type JSONItem = { body_format: 'JSON'; body: JSONBody };
 export type KeyValueItem = { body_format: 'KEY_VALUE'; body: KeyValueBody };
+export type MemDumpItem = { body_format: 'MEMORY_DUMP'; body: MemDumpBody };
+export type MultiItem = { body_format: 'MULTI'; body: MultiBody };
 export type OrderedKeyValueItem = { body_format: 'ORDERED_KEY_VALUE'; body: OrderedKeyValueBody };
 export type ProcessTreeItem = { body_format: 'PROCESS_TREE'; body: ProcessTreeBody[] };
+export type SandboxItem = { body_format: 'SANDBOX'; body: SandboxBody };
 export type TableItem = { body_format: 'TABLE'; body: TableBody };
-export type ImageItem = { body_format: 'IMAGE'; body: ImageBody };
+export type TextBodyItem = { body_format: 'TEXT'; body: TextBody };
 export type TimelineItem = { body_format: 'TIMELINE'; body: TimelineBody[] };
-export type MultiItem = { body_format: 'MULTI'; body: MultiBody };
+export type URLItem = { body_format: 'URL'; body: URLBody };
 
 /** Type of body in this section */
 export type SectionBody =
-  | TextBodyItem
-  | MemDumpItem
   | GraphItem
-  | URLItem
+  | ImageItem
   | JSONItem
   | KeyValueItem
+  | MemDumpItem
+  | MultiItem
   | OrderedKeyValueItem
   | ProcessTreeItem
+  | SandboxItem
   | TableItem
-  | ImageItem
+  | TextBodyItem
   | TimelineItem
-  | MultiItem;
+  | URLItem;
