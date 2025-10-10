@@ -87,8 +87,8 @@ const WrappedChipsInput = () => {
               setStore(s => ({ ...s, currentValue: '' }));
               handleBlur(
                 e,
-                currentValue ? [...value, currentValue] : value,
-                currentValue ? [...value, currentValue] : value
+                currentValue && !value.includes(currentValue) ? [...value, currentValue] : value,
+                currentValue && !value.includes(currentValue) ? [...value, currentValue] : value
               );
             }}
             renderValue={
