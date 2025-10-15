@@ -13,6 +13,7 @@ import type { ColumnDef, RowData, SortingState } from '@tanstack/react-table';
 import {
   flexRender,
   getCoreRowModel,
+  getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable
@@ -108,6 +109,8 @@ export type TableContainerProps<T extends object> = {
   initialSorting: SortingState;
   printable?: boolean;
   rowSpanning?: string[];
+  filterValue?: Partial<T>;
+  onFilter?: (row: T, filterValue: Partial<T>) => boolean;
 };
 
 export const TableContainer = memo(
@@ -116,32 +119,38 @@ export const TableContainer = memo(
     data,
     initialSorting,
     rowSpanning = [],
-    printable = false
+    printable = false,
+    filterValue = null,
+    onFilter = () => null
   }: TableContainerProps<T>) => {
     const [sorting, setSorting] = useState<SortingState>(initialSorting);
-    const [scrolled, setScrolled] = useState(false);
+    const [scrolled, setScrolled] = useState<boolean>(false);
+
     const containerRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
       const container = containerRef.current;
       if (!container) return;
-
       const onScroll = () => setScrolled(container.scrollTop > 0);
       container.addEventListener('scroll', onScroll);
       return () => container.removeEventListener('scroll', onScroll);
     }, []);
 
     const table = useReactTable({
-      data,
+      data: data,
       columns,
       state: {
         pagination: { pageIndex: 0, pageSize: 1000 },
-        sorting
+        sorting,
+        globalFilter: filterValue
       },
       onSortingChange: setSorting,
       getCoreRowModel: getCoreRowModel(),
       getPaginationRowModel: getPaginationRowModel(),
-      getSortedRowModel: getSortedRowModel()
+      getSortedRowModel: getSortedRowModel(),
+      getFilteredRowModel: getFilteredRowModel(),
+      globalFilterFn: (row, columnId, _filterValue: Partial<T>) => onFilter(row.original, _filterValue)
+      // onGlobalFilterChange: setGlobalFilter
     });
 
     const handleSort = useCallback((columnId: string) => {
@@ -153,7 +162,6 @@ export const TableContainer = memo(
 
     const rowSpanMap = useMemo<Record<string, number>>(() => {
       if (rowSpanning.length === 0) return {};
-
       const map: Record<string, number> = {};
       const rows = table.getPrePaginationRowModel().rows;
       const n = rows.length;
@@ -204,7 +212,7 @@ export const TableContainer = memo(
       }
 
       return map;
-    }, [rowSpanning, table.getPrePaginationRowModel().rows]);
+    }, [rowSpanning, table, table.getPrePaginationRowModel().rows]);
 
     return (
       <StyledTableContainer ref={containerRef} printable={printable}>
