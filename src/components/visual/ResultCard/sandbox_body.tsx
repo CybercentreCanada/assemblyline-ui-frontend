@@ -4,7 +4,7 @@ import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutl
 import SettingsEthernetOutlinedIcon from '@mui/icons-material/SettingsEthernetOutlined';
 import WidgetsOutlinedIcon from '@mui/icons-material/WidgetsOutlined';
 import type { SvgIconProps } from '@mui/material';
-import { Collapse, IconButton, List, ListItem, styled, Tooltip, useTheme } from '@mui/material';
+import { alpha, Collapse, IconButton, List, ListItem, styled, Tooltip, useTheme } from '@mui/material';
 import type { ColumnDef } from '@tanstack/react-table';
 import { createColumnHelper } from '@tanstack/react-table';
 import useALContext from 'components/hooks/useALContext';
@@ -57,255 +57,294 @@ type ProcessTreeItemProps = {
   item: ProcessItem;
   depth?: number;
   printable?: boolean;
+  filterValue: Process;
+  onClick: (event: React.MouseEvent<HTMLDivElement, MouseEvent>, item: ProcessItem) => void;
 };
 
-const ProcessTreeItem = React.memo(({ body, item, depth = 0, printable }: ProcessTreeItemProps) => {
-  const theme = useTheme();
-  const { showSafeResults } = useSafeResults();
-  const { scoreToVerdict } = useALContext();
+const ProcessTreeItem = React.memo(
+  ({ body, item, depth = 0, printable = false, filterValue, onClick = () => null }: ProcessTreeItemProps) => {
+    const theme = useTheme();
+    const { showSafeResults } = useSafeResults();
+    const { scoreToVerdict } = useALContext();
 
-  const [open, setOpen] = useState<boolean>(false);
+    const [open, setOpen] = useState<boolean>(false);
 
-  const hasChildren = useMemo<boolean>(() => !!item.children?.length, [item.children?.length]);
+    const hasChildren = useMemo<boolean>(() => !!item.children?.length, [item.children?.length]);
 
-  const networks = useMemo<NetworkConnection[]>(
-    () => body?.netflow?.filter(x => x?.objectid?.guid === item?.pobjectid?.guid) ?? [],
-    [body.netflow, item?.pobjectid?.guid]
-  );
+    const networks = useMemo<NetworkConnection[]>(
+      () => body?.netflow?.filter(x => x?.objectid?.guid === item?.pobjectid?.guid) ?? [],
+      [body.netflow, item?.pobjectid?.guid]
+    );
 
-  const signatures = useMemo<Signature[]>(
-    () => body?.signature?.filter(x => x?.attributes?.some(a => a?.source?.guid === item?.objectid?.guid)) ?? [],
-    [body?.signature, item?.objectid?.guid]
-  );
+    const signatures = useMemo<Signature[]>(
+      () => body?.signature?.filter(x => x?.attributes?.some(a => a?.source?.guid === item?.objectid?.guid)) ?? [],
+      [body?.signature, item?.objectid?.guid]
+    );
 
-  const networkCount = useMemo<number>(() => 0, []);
+    const networkCount = useMemo<number>(() => 0, []);
 
-  const fileCount = useMemo<number>(() => 0, []);
+    const fileCount = useMemo<number>(() => 0, []);
 
-  const registryCount = useMemo<number>(() => 0, []);
+    const registryCount = useMemo<number>(() => 0, []);
 
-  const hasValues = useMemo<boolean>(
-    () => networks.length > 0 || signatures.length > 0 || networkCount > 0 || fileCount > 0 || registryCount > 0,
-    [fileCount, networkCount, networks.length, registryCount, signatures.length]
-  );
+    const hasValues = useMemo<boolean>(
+      () => networks.length > 0 || signatures.length > 0 || networkCount > 0 || fileCount > 0 || registryCount > 0,
+      [fileCount, networkCount, networks.length, registryCount, signatures.length]
+    );
 
-  const backgroundStyle = useMemo(() => {
-    const dark = theme.palette.mode === 'dark';
+    const backgroundStyle = useMemo(() => {
+      const dark = theme.palette.mode === 'dark';
 
-    if (item.integrity_level === 'system') {
-      return {
-        backgroundColor: dark ? '#254e25' : '#d0ffd0',
-        hover: dark ? '#355e35' : '#c0efc0',
-        print: '#d0ffd0'
-      };
-    }
-
-    const score = Object.keys(signatures ?? {}).reduce((sum, key) => sum + parseFloat(signatures?.[key] || '0'), 0);
-    const verdict = scoreToVerdict(score);
-
-    switch (verdict) {
-      case 'malicious':
+      if (filterValue?.objectid?.guid === item?.objectid?.guid) {
         return {
-          backgroundColor: dark ? '#4e2525' : '#ffd0d0',
-          hover: dark ? '#5e3535' : '#efc0c0',
-          print: '#ffd0d0'
+          backgroundColor: dark ? theme.palette.primary.dark : theme.palette.primary.light,
+          hover: dark ? alpha(theme.palette.primary.light, 0.25) : alpha(theme.palette.primary.main, 0.15),
+          print: theme.palette.primary.light
         };
-      case 'highly_suspicious':
-      case 'suspicious':
+      }
+
+      if (item.integrity_level === 'system') {
         return {
-          backgroundColor: dark ? '#654312' : '#ffedd4',
-          hover: dark ? '#755322' : '#efddc4',
-          print: '#ffedd4'
+          backgroundColor: dark ? '#254e25' : '#d0ffd0',
+          hover: dark ? '#355e35' : '#c0efc0',
+          print: '#d0ffd0'
         };
-      default:
-        return {
-          backgroundColor: dark ? '#FFFFFF10' : '#00000010',
-          hover: dark ? '#FFFFFF20' : '#00000020',
-          print: '#FFFFFF10'
-        };
-    }
-  }, [theme.palette.mode, item.integrity_level, signatures, scoreToVerdict]);
+      }
 
-  const handleToggle = useCallback(() => setOpen(o => !o), []);
+      const score = Object.keys(signatures ?? {}).reduce((sum, key) => sum + parseFloat(signatures?.[key] || '0'), 0);
+      const verdict = scoreToVerdict(score);
 
-  return (
-    <>
-      <ListItem
-        sx={{
-          pl: depth * 2,
-          py: 0.3,
-          display: 'flex',
-          alignItems: 'center'
-        }}
-      >
-        {hasChildren ? (
-          <IconButton
-            size="small"
-            onClick={handleToggle}
-            sx={{
-              transition: `transform ${theme.transitions.duration.shortest}ms ${theme.transitions.easing.sharp}`,
-              transform: open ? 'rotate(90deg)' : 'rotate(0deg)',
-              mt: '4px'
-            }}
-          >
-            <ChevronRightIcon fontSize="small" />
-          </IconButton>
-        ) : (
-          <div style={{ width: theme.spacing(4) }} />
-        )}
+      switch (verdict) {
+        case 'malicious':
+          return {
+            backgroundColor: dark ? '#4e2525' : '#ffd0d0',
+            hover: dark ? '#5e3535' : '#efc0c0',
+            print: '#ffd0d0'
+          };
+        case 'highly_suspicious':
+        case 'suspicious':
+          return {
+            backgroundColor: dark ? '#654312' : '#ffedd4',
+            hover: dark ? '#755322' : '#efddc4',
+            print: '#ffedd4'
+          };
+        default:
+          return {
+            backgroundColor: dark ? '#FFFFFF10' : '#00000010',
+            hover: dark ? '#FFFFFF20' : '#00000020',
+            print: '#FFFFFF10'
+          };
+      }
+    }, [
+      theme.palette.mode,
+      theme.palette.primary.dark,
+      theme.palette.primary.light,
+      theme.palette.primary.main,
+      filterValue?.objectid?.guid,
+      item?.objectid?.guid,
+      item.integrity_level,
+      signatures,
+      scoreToVerdict
+    ]);
 
-        {/* === Custom Label Container === */}
-        <div
-          style={{
-            border: `1px solid ${theme.palette.divider}`,
-            borderRadius: 4,
-            margin: '0.2em 0',
+    const handleToggle = useCallback(() => setOpen(o => !o), []);
+
+    return (
+      <>
+        <ListItem
+          sx={{
+            pl: depth * 2,
+            py: 0.3,
             display: 'flex',
-            // maxWidth: '50rem',
-            minWidth: '30rem',
-            width: '100%',
-            backgroundColor: backgroundStyle.backgroundColor,
-            transition: `background-color ${theme.transitions.duration.shortest}ms ${theme.transitions.easing.sharp}`
+            alignItems: 'center'
           }}
-          onMouseEnter={e => (e.currentTarget.style.backgroundColor = backgroundStyle.hover)}
-          onMouseLeave={e => (e.currentTarget.style.backgroundColor = backgroundStyle.backgroundColor)}
         >
-          {/* Left PID column */}
-          <div
-            style={{
-              padding: 5,
-              backgroundColor: theme.palette.mode === 'dark' ? '#FFFFFF10' : '#00000010',
-              borderRadius: '4px 0 0 4px',
-              minWidth: 50,
-              textAlign: 'center'
-            }}
-          >
-            {item.pid}
-          </div>
-
-          {/* Middle section: process name + command line */}
-          <div style={{ padding: 5, flexGrow: 1, wordBreak: 'break-word' }}>
-            <div style={{ paddingBottom: 4 }}>
-              <b>{item.image?.split(/[/\\]/).pop() ?? ''}</b>
-            </div>
-            {item.command_line && (
-              <samp>
-                <small>{item.image ?? item.command_line}</small>
-              </samp>
-            )}
-          </div>
-
-          {/* Right side counters */}
-          {hasValues ? (
-            <div
-              style={{
-                backgroundColor: theme.palette.mode === 'dark' ? '#FFFFFF10' : '#00000010',
-                color: theme.palette.text.secondary,
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'flex-end',
-                justifyContent: 'center',
-                padding: '5px 8px',
-                fontSize: '90%',
-                gap: 4,
-                minWidth: theme.spacing(6)
+          {hasChildren ? (
+            <IconButton
+              size="small"
+              onClick={handleToggle}
+              sx={{
+                transition: `transform ${theme.transitions.duration.shortest}ms ${theme.transitions.easing.sharp}`,
+                transform: open ? 'rotate(90deg)' : 'rotate(0deg)',
+                mt: '4px'
               }}
             >
-              {signatures && Object.keys(signatures).length > 0 && (
-                <Tooltip
-                  placement="left"
-                  title={`${Object.keys(signatures).length} signatures (${signatures.map(x => x.name).join(' | ')})`}
-                >
-                  <CounterItem>
-                    <CounterImg component={FingerprintOutlinedIcon} />
-                    <span>{humanReadableNumber(Object.keys(signatures).length)}</span>
-                  </CounterItem>
-                </Tooltip>
-              )}
-              {networkCount ? (
-                <Tooltip placement="left" title={`${networkCount} network events`}>
-                  <CounterItem>
-                    <CounterImg component={SettingsEthernetOutlinedIcon} />
-                    <span>{humanReadableNumber(networkCount)}</span>
-                  </CounterItem>
-                </Tooltip>
-              ) : null}
-              {fileCount ? (
-                <Tooltip placement="left" title={`${fileCount} file operations`}>
-                  <CounterItem>
-                    <CounterImg component={InsertDriveFileOutlinedIcon} />
-                    <span>{humanReadableNumber(fileCount)}</span>
-                  </CounterItem>
-                </Tooltip>
-              ) : null}
-              {registryCount ? (
-                <Tooltip placement="left" title={`${registryCount} registry changes`}>
-                  <CounterItem>
-                    <CounterImg component={WidgetsOutlinedIcon} />
-                    <span>{humanReadableNumber(registryCount)}</span>
-                  </CounterItem>
-                </Tooltip>
-              ) : null}
-            </div>
-          ) : null}
-        </div>
-      </ListItem>
+              <ChevronRightIcon fontSize="small" />
+            </IconButton>
+          ) : (
+            <div style={{ width: theme.spacing(4) }} />
+          )}
 
-      {hasChildren && (
-        <Collapse
-          in={open}
-          timeout={theme.transitions.duration.shortest}
-          easing={theme.transitions.easing.sharp}
-          unmountOnExit
-        >
-          <List disablePadding>
-            {item.children.map(child => (
-              <ProcessTreeItem key={child.pid} body={body} item={child} depth={depth + 1} printable={printable} />
-            ))}
-          </List>
-        </Collapse>
-      )}
-    </>
-  );
-});
+          {/* === Custom Label Container === */}
+          <div
+            style={{
+              border: `1px solid ${theme.palette.divider}`,
+              borderRadius: 4,
+              margin: '0.2em 0',
+              display: 'flex',
+              // maxWidth: '50rem',
+              minWidth: '30rem',
+              width: '100%',
+              backgroundColor: backgroundStyle.backgroundColor,
+              transition: `background-color ${theme.transitions.duration.shortest}ms ${theme.transitions.easing.sharp}`
+            }}
+            onMouseEnter={e => (e.currentTarget.style.backgroundColor = backgroundStyle.hover)}
+            onMouseLeave={e => (e.currentTarget.style.backgroundColor = backgroundStyle.backgroundColor)}
+            onClick={e => onClick(e, item)}
+          >
+            {/* Left PID column */}
+            <div
+              style={{
+                padding: 5,
+                backgroundColor: theme.palette.mode === 'dark' ? '#FFFFFF10' : '#00000010',
+                borderRadius: '4px 0 0 4px',
+                minWidth: 50,
+                textAlign: 'center'
+              }}
+            >
+              {item.pid}
+            </div>
+
+            {/* Middle section: process name + command line */}
+            <div style={{ padding: 5, flexGrow: 1, wordBreak: 'break-word' }}>
+              <div style={{ paddingBottom: 4 }}>
+                <b>{item.image?.split(/[/\\]/).pop() ?? ''}</b>
+              </div>
+              {item.command_line && (
+                <samp>
+                  <small>{item.image ?? item.command_line}</small>
+                </samp>
+              )}
+            </div>
+
+            {/* Right side counters */}
+            {hasValues ? (
+              <div
+                style={{
+                  backgroundColor: theme.palette.mode === 'dark' ? '#FFFFFF10' : '#00000010',
+                  color: theme.palette.text.secondary,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'flex-end',
+                  justifyContent: 'center',
+                  padding: '5px 8px',
+                  fontSize: '90%',
+                  gap: 4,
+                  minWidth: theme.spacing(6)
+                }}
+              >
+                {signatures && Object.keys(signatures).length > 0 && (
+                  <Tooltip
+                    placement="left"
+                    title={`${Object.keys(signatures).length} signatures (${signatures.map(x => x.name).join(' | ')})`}
+                  >
+                    <CounterItem>
+                      <CounterImg component={FingerprintOutlinedIcon} />
+                      <span>{humanReadableNumber(Object.keys(signatures).length)}</span>
+                    </CounterItem>
+                  </Tooltip>
+                )}
+                {networkCount ? (
+                  <Tooltip placement="left" title={`${networkCount} network events`}>
+                    <CounterItem>
+                      <CounterImg component={SettingsEthernetOutlinedIcon} />
+                      <span>{humanReadableNumber(networkCount)}</span>
+                    </CounterItem>
+                  </Tooltip>
+                ) : null}
+                {fileCount ? (
+                  <Tooltip placement="left" title={`${fileCount} file operations`}>
+                    <CounterItem>
+                      <CounterImg component={InsertDriveFileOutlinedIcon} />
+                      <span>{humanReadableNumber(fileCount)}</span>
+                    </CounterItem>
+                  </Tooltip>
+                ) : null}
+                {registryCount ? (
+                  <Tooltip placement="left" title={`${registryCount} registry changes`}>
+                    <CounterItem>
+                      <CounterImg component={WidgetsOutlinedIcon} />
+                      <span>{humanReadableNumber(registryCount)}</span>
+                    </CounterItem>
+                  </Tooltip>
+                ) : null}
+              </div>
+            ) : null}
+          </div>
+        </ListItem>
+
+        {hasChildren && (
+          <Collapse
+            in={open}
+            timeout={theme.transitions.duration.shortest}
+            easing={theme.transitions.easing.sharp}
+            unmountOnExit
+          >
+            <List disablePadding>
+              {item.children.map(child => (
+                <ProcessTreeItem
+                  key={child.pid}
+                  body={body}
+                  item={child}
+                  depth={depth + 1}
+                  printable={printable}
+                  filterValue={filterValue}
+                  onClick={onClick}
+                />
+              ))}
+            </List>
+          </Collapse>
+        )}
+      </>
+    );
+  }
+);
 
 type ProcessGraphProps = {
   body: SandboxData;
   processes: Process[];
   printable?: boolean;
   force?: boolean;
+  filterValue: Process;
+  onClick: (event: React.MouseEvent<HTMLDivElement, MouseEvent>, item: ProcessItem) => void;
 };
 
-const ProcessGraph = React.memo(({ body, processes = [], printable = false }: ProcessGraphProps) => {
-  const theme = useTheme();
+const ProcessGraph = React.memo(
+  ({ body, processes = [], printable = false, filterValue, onClick = () => null }: ProcessGraphProps) => {
+    const theme = useTheme();
 
-  const buildProcessTree = useCallback((processes: ProcessItem[]): ProcessItem[] => {
-    const map = new Map<number, ProcessItem>();
-    for (const proc of processes) map.set(proc.pid, { ...proc, children: [] });
+    const buildProcessTree = useCallback((processes: ProcessItem[]): ProcessItem[] => {
+      const map = new Map<number, ProcessItem>();
+      for (const proc of processes) map.set(proc.pid, { ...proc, children: [] });
 
-    const roots: ProcessItem[] = [];
-    for (const proc of map.values()) {
-      if (proc.ppid === 0 || !map.has(proc.ppid)) roots.push(proc);
-      else map.get(proc.ppid).children.push(proc);
-    }
-    return roots;
-  }, []);
+      const roots: ProcessItem[] = [];
+      for (const proc of map.values()) {
+        if (proc.ppid === 0 || !map.has(proc.ppid)) roots.push(proc);
+        else map.get(proc.ppid).children.push(proc);
+      }
+      return roots;
+    }, []);
 
-  const processTree = useMemo(() => (processes ? buildProcessTree(processes) : []), [buildProcessTree, processes]);
+    const processTree = useMemo(() => (processes ? buildProcessTree(processes) : []), [buildProcessTree, processes]);
 
-  return (
-    <div
-      style={{
-        overflowX: 'auto',
-        maxHeight: printable ? 'auto' : 750,
-        borderRadius: theme.spacing(1),
-        padding: theme.spacing(1)
-      }}
-    >
-      <List disablePadding>{processTree?.map(item => <ProcessTreeItem key={item.pid} body={body} item={item} />)}</List>
-    </div>
-  );
-});
+    return (
+      <div
+        style={{
+          overflowX: 'auto',
+          maxHeight: printable ? 'auto' : 750,
+          borderRadius: theme.spacing(1),
+          padding: theme.spacing(1)
+        }}
+      >
+        <List disablePadding>
+          {processTree?.map(item => (
+            <ProcessTreeItem key={item.pid} body={body} item={item} filterValue={filterValue} onClick={onClick} />
+          ))}
+        </List>
+      </div>
+    );
+  }
+);
 
 /***
  * Process Table
@@ -314,9 +353,10 @@ type ProcessTableProps = {
   data?: Process[];
   printable?: boolean;
   startTime?: number;
+  filterValue?: Process;
 };
 
-const ProcessTable = React.memo(({ data = [], printable = false, startTime }: ProcessTableProps) => {
+const ProcessTable = React.memo(({ data = [], printable = false, startTime, filterValue }: ProcessTableProps) => {
   const { t } = useTranslation('resultCard');
   const theme = useTheme();
   const columnHelper = createColumnHelper<Process>();
@@ -403,8 +443,8 @@ const ProcessTable = React.memo(({ data = [], printable = false, startTime }: Pr
       data={data}
       initialSorting={[{ id: 'start_time', desc: false }]}
       printable={printable}
-      // filterValue={{ pid: 524 }}
-      // onFilter={(row, value) => row.pid === value.pid}
+      filterValue={filterValue}
+      onFilter={(row, value) => row.pid === value.pid}
     />
   );
 });
@@ -621,9 +661,10 @@ type SignatureTableProps = {
   data?: Signature[];
   printable?: boolean;
   force?: boolean;
+  filterValue?: Process;
 };
 
-const SignatureTable = React.memo(({ data = [], printable = false, force }: SignatureTableProps) => {
+const SignatureTable = React.memo(({ data = [], printable = false, force, filterValue }: SignatureTableProps) => {
   const { t } = useTranslation('resultCard');
   const theme = useTheme();
   const columnHelper = createColumnHelper<FlatSignatures>();
@@ -734,6 +775,8 @@ const SignatureTable = React.memo(({ data = [], printable = false, force }: Sign
       initialSorting={[{ id: 'start_time', desc: false }]}
       printable={printable}
       rowSpanning={['name', 'type', 'classification', 'actors']}
+      filterValue={filterValue}
+      onFilter={(row, value) => row?.attributes?.some(a => a?.source?.guid === filterValue?.objectid?.guid)}
     />
   );
 });
@@ -747,6 +790,8 @@ export type SandboxBodyProps = {
 export const SandboxBody = React.memo(({ body, force = false, printable = false }: SandboxBodyProps) => {
   const theme = useTheme();
   const { t } = useTranslation('resultCard');
+
+  const [filterValue, setFilterValue] = useState<Process>(null);
 
   const startTime = useMemo<number>(
     () => (!body ? null : new Date(body.sandbox?.[0].analysis_metadata.start_time).getTime()),
@@ -789,9 +834,15 @@ export const SandboxBody = React.memo(({ body, force = false, printable = false 
 
   console.log(body);
 
+  const handleProcessGraphClick = useCallback(
+    (event: React.MouseEvent<HTMLDivElement, MouseEvent>, item: ProcessItem) =>
+      setFilterValue(prev => (prev && prev.objectid.guid === item.objectid.guid ? null : item)),
+    []
+  );
+
   return !body ? null : (
     <>
-      <ProcessGraph body={body} processes={processes} />
+      <ProcessGraph body={body} processes={processes} filterValue={filterValue} onClick={handleProcessGraphClick} />
 
       <TabContainer
         paper
@@ -805,7 +856,9 @@ export const SandboxBody = React.memo(({ body, force = false, printable = false 
                   <CustomChip label={processes?.length} color="secondary" size="tiny" />
                 </div>
               ),
-              inner: <ProcessTable data={processes} startTime={startTime} printable={printable} />
+              inner: (
+                <ProcessTable data={processes} startTime={startTime} printable={printable} filterValue={filterValue} />
+              )
             }
           }),
           ...(body?.netflow?.length && {
@@ -838,7 +891,7 @@ export const SandboxBody = React.memo(({ body, force = false, printable = false 
                   <CustomChip label={body?.signature?.length} color="secondary" size="tiny" />
                 </div>
               ),
-              inner: <SignatureTable data={body?.signature} printable={printable} />
+              inner: <SignatureTable data={body?.signature} printable={printable} filterValue={filterValue} />
             }
           })
         }}
