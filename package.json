@@ -110,7 +110,6 @@
     "@eslint/compat": "^1.2.8",
     "@eslint/eslintrc": "^3.3.1",
     "@eslint/js": "^9.24.0",
-    "@faker-js/faker": "^10.0.0",
     "@iconify/icons-logos": "^1.2.36",
     "@iconify/icons-simple-icons": "^1.2.74",
     "@iconify/react": "^5.2.1",
