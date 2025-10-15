@@ -36,9 +36,9 @@ const ServiceParams = ({ service, defaults, setService, setModified }: ServicePa
     window.dispatchEvent(new CustomEvent('configDelete', { detail: config }));
   }, []);
 
-  const unusedParams = useMemo(() => {
-    const defs = new Set(defaults.submission_params.map(p => p.name));
-    return service.submission_params.filter(p => !defs.has(p.name)).map(p => p.name);
+  const unusedParams = useMemo<string[]>(() => {
+    const defaultParams = new Set(defaults.submission_params?.map(p => p.name) ?? []);
+    return (service.submission_params ?? []).filter(({ name }) => !defaultParams.has(name)).map(({ name }) => name);
   }, [service.submission_params, defaults.submission_params]);
 
   useEffect(() => {

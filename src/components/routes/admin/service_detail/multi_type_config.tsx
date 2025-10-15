@@ -133,7 +133,7 @@ const WrappedMultiTypeConfig = ({
         {parsedConfig.warn && (
           <Tooltip title={t('params.user.unused')} placement="top-start">
             <span>
-              <WarningAmberIcon fontSize="small" style={{ float: 'inline-start' }} />
+              <WarningAmberIcon color="warning" fontSize="small" style={{ float: 'inline-start' }} />
               &nbsp;
             </span>
           </Tooltip>
