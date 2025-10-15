@@ -18,7 +18,7 @@ export const Sandbox = React.memo(() => {
 
   const ontology = useMemo(() => (!file?.data ? null : JSON.parse(file.data.content)) as ResultOntology, [file.data]);
 
-  return (
+  return !ontology ? null : (
     <PageCenter margin={4} width="100%">
       <div style={{ textAlign: 'left' }}>
         <SandboxBody body={ontology.results} />

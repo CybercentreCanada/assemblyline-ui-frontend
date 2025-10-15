@@ -1,1 +1,8 @@
-{}
+{
+  "sandbox-body.process.start_time": "",
+  "sandbox-body.process.end_time": "",
+  "sandbox-body.process.pid": "",
+  "sandbox-body.process.ppid": "",
+  "sandbox-body.process.image": "",
+  "sandbox-body.process.command_line": ""
+}
