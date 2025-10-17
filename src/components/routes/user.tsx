@@ -680,6 +680,25 @@ function User({ username = null }: UserProps) {
                     {user ? <div>{user.name}</div> : <Skeleton />}
                   </TableCell>
                 </ClickRow>
+                {user?.organization && (
+                  <TableRow sx={{ height: '62px' }}>
+                    {isXS ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('organization')}</TableCell>}
+                    <TableCell width="100%">
+                      {!isXS ? null : <Typography variant="caption">{t('organization')}</Typography>}
+                      {user ? (
+                        <div>
+                          {user.organization in classificationAliases
+                            ? classificationAliases?.[user.organization]?.name ||
+                              classificationAliases?.[user.organization]?.short_name ||
+                              user.organization
+                            : user.organization}
+                        </div>
+                      ) : (
+                        <Skeleton />
+                      )}
+                    </TableCell>
+                  </TableRow>
+                )}
                 <ClickRow enabled={currentUser.is_admin} chevron onClick={() => toggleDrawer('groups')}>
                   {isXS ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('groups')}</TableCell>}
                   <TableCell width="100%">
@@ -702,15 +721,17 @@ function User({ username = null }: UserProps) {
                     )}
                   </TableCell>
                 </ClickRow>
-                <TableRow sx={{ height: '62px' }}>
-                  {isXS ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('email')}</TableCell>}
-                  <TableCell width="100%">
-                    {!isXS ? null : <Typography variant="caption">{t('email')}</Typography>}
-                    {user ? <div>{user.email}</div> : <Skeleton />}
-                  </TableCell>
-                  <TableCell align="right" />
-                </TableRow>
-                {currentUser.is_admin && (
+                {user?.email && (
+                  <TableRow sx={{ height: '62px' }}>
+                    {isXS ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('email')}</TableCell>}
+                    <TableCell width="100%">
+                      {!isXS ? null : <Typography variant="caption">{t('email')}</Typography>}
+                      {user ? <div>{user.email}</div> : <Skeleton />}
+                    </TableCell>
+                    <TableCell align="right" />
+                  </TableRow>
+                )}
+                {currentUser.is_admin && user?.identity_id && (
                   <TableRow sx={{ height: '62px' }}>
                     {isXS ? null : <TableCell style={{ whiteSpace: 'nowrap' }}>{t('identity_id')}</TableCell>}
                     <TableCell width="100%">
