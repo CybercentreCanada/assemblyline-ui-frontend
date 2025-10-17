@@ -17,6 +17,9 @@ export type UserSettings = {
   /** List of sha256 sources to check by default */
   default_external_sources: string[];
 
+  /** Default metadata for submissions */
+  default_metadata: Record<string, string>;
+
   /** Default user-defined password for creating password protected ZIPs when downloading files */
   default_zip_password: string;
 

@@ -1,6 +1,7 @@
 import { useTableOfContent } from 'components/core/TableOfContent/TableOfContent';
 import useALContext from 'components/hooks/useALContext';
 import ForbiddenPage from 'components/routes/403';
+import { DefaultMetadataSection } from 'components/routes/settings/components/DefaultMetadata';
 import { ExternalSourcesSection } from 'components/routes/settings/components/ExternalSources';
 import { HeaderSection } from 'components/routes/settings/components/Header';
 import { InterfaceSection } from 'components/routes/settings/components/Interface';
@@ -75,11 +76,14 @@ const WrappedSettingsRoute = () => {
             {!hasSettings ? null : tab in settings.submission_profiles ? (
               <>
                 <SubmissionSection />
-                <ExternalSourcesSection />
                 <ServicesSection />
               </>
             ) : (
-              <InterfaceSection />
+              <>
+                <InterfaceSection />
+                <ExternalSourcesSection />
+                <DefaultMetadataSection />
+              </>
             )}
           </PageLayout>
         )}
