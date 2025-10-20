@@ -54,7 +54,6 @@ import WorkflowDetail from 'components/routes/manage/workflows/detail';
 import ManageWorkflows from 'components/routes/manage/workflows/index';
 import RetroHunt from 'components/routes/retrohunt';
 import RetroHuntDetail from 'components/routes/retrohunt/detail';
-import Sandbox from 'components/routes/sandbox';
 import Search from 'components/routes/search';
 import Settings from 'components/routes/settings/settings';
 import SubmissionDetail from 'components/routes/submission/detail';
@@ -191,7 +190,6 @@ const WrappedRoutes = () => {
         <Route path="/notfound" element={<NotFoundPage />} />
         <Route path="/retrohunt" element={<RetroHunt />} />
         <Route path="/retrohunt/:key" element={<RetroHuntDetail />} />
-        <Route path="/sandbox/:id" element={<Sandbox />} />
         <Route path="/search" element={<Search />} />
         <Route path="/search/:id" element={<Search />} />
         <Route path="/settings" element={<Settings />} />

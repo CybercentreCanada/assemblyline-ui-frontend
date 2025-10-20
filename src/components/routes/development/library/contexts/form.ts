@@ -8,15 +8,12 @@ import {
   LIST_INPUTS_LIBRARY_STATE,
   type ListInputsLibraryState
 } from 'components/routes/development/library/sections/ListInputs';
-import type { SandboxResultLibraryState } from 'components/routes/development/library/sections/SandboxResultSection';
-import { SANDBOX_RESULT_LIBRARY_STATE } from 'components/routes/development/library/sections/SandboxResultSection';
 
 type LibraryComponents = DateTimeLibraryState &
   InputsLibraryState &
   LayoutLibraryState &
   ListInputsLibraryState &
-  ListLibraryState &
-  SandboxResultLibraryState;
+  ListLibraryState;
 
 export type LibraryFormStore = {
   state: {
@@ -34,8 +31,7 @@ const LIBRARY_FORM_STORE: LibraryFormStore = Object.freeze({
     ...INPUTS_LIBRARY_STATE,
     ...LAYOUT_LIBRARY_STATE,
     ...LIST_INPUTS_LIBRARY_STATE,
-    ...LIST_LIBRARY_STATE,
-    ...SANDBOX_RESULT_LIBRARY_STATE
+    ...LIST_LIBRARY_STATE
   }
 });
 
