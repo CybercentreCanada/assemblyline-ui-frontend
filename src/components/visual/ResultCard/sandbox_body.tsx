@@ -613,11 +613,6 @@ const HeuristicsTable = React.memo(({ data = [], printable = false, force }: Heu
         cell: info => info.getValue(),
         meta: {}
       }),
-      // columnHelper.accessor('times_raised', {
-      //   header: () => t('sandbox_body.heuristics.times_raised'),
-      //   cell: info => info.getValue(),
-      //   meta: {}
-      // }),
       columnHelper.group({
         id: 'tags',
         header: () => t('tags'),
@@ -639,8 +634,7 @@ const HeuristicsTable = React.memo(({ data = [], printable = false, force }: Heu
                   force={force}
                 />
               );
-            },
-            meta: { cellSx: {} }
+            }
           })
         ]
       })
@@ -673,49 +667,35 @@ type SignatureTableProps = {
 
 const SignatureTable = React.memo(({ data = [], printable = false, force, filterValue }: SignatureTableProps) => {
   const { t } = useTranslation('resultCard');
-  const theme = useTheme();
   const columnHelper = createColumnHelper<FlatSignatures>();
 
   const flatData = useMemo<FlatSignatures[]>(() => {
-    const n = data.length;
-    if (n === 0) return [];
+    if (data.length === 0) return [];
 
     const out: FlatSignatures[] = [];
 
-    for (let i = 0; i < n; i++) {
-      const sig = data[i];
+    for (const sig of data) {
       const attacks = sig.attacks;
       if (!attacks || attacks.length === 0) {
         out.push({ ...sig, attackKey: '', attackValues: [] });
         continue;
       }
 
-      const grouped = Object.create(null) as Record<string, string[]>;
+      const grouped: Record<string, string[]> = {};
 
-      for (let j = 0, m = attacks.length; j < m; j++) {
-        const attack = attacks[j];
-        const cats = attack.categories;
-        if (!cats || cats.length === 0) continue;
-
-        const pattern = attack.pattern;
-        for (let k = 0, c = cats.length; k < c; k++) {
-          const cat = cats[k];
-          const existing = grouped[cat];
-          if (existing) existing.push(pattern);
-          else grouped[cat] = [pattern];
+      for (const attack of attacks) {
+        if (!attack.categories || attack.categories.length === 0) continue;
+        for (const cat of attack.categories) {
+          grouped[cat] ? grouped[cat].push(attack.pattern) : (grouped[cat] = [attack.pattern]);
         }
       }
 
       const keys = Object.keys(grouped);
-      const len = keys.length;
-
-      if (len === 0) {
+      if (keys.length === 0) {
         out.push({ ...sig, attackKey: '', attackValues: [] });
       } else {
-        for (let j = 0; j < len; j++) {
-          const key = keys[j];
-          const values = grouped[key];
-          out.push({ ...sig, attackKey: key, attackValues: values });
+        for (const key of keys) {
+          out.push({ ...sig, attackKey: key, attackValues: grouped[key] });
         }
       }
     }
@@ -723,7 +703,7 @@ const SignatureTable = React.memo(({ data = [], printable = false, force, filter
     return out;
   }, [data]);
 
-  const columns = useMemo<ColumnDef<SandboxSignatureItem>[]>(
+  const columns = useMemo<ColumnDef<FlatSignatures>[]>(
     () => [
       columnHelper.accessor('type', {
         header: () => t('sandbox_body.signature.type'),
@@ -758,7 +738,6 @@ const SignatureTable = React.memo(({ data = [], printable = false, force, filter
             cell: info => {
               const values = (info.getValue() ?? []) as string[];
               if (!values.length) return null;
-
               return (
                 <AutoHideTagList
                   tag_type={info.row.original.attackKey || ''}
@@ -813,7 +792,6 @@ export const SandboxBody = React.memo(({ body, force = false, printable = false 
   );
 
   if (!body) return null;
-
   return (
     <>
       <ProcessGraph
