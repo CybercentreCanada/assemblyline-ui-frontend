@@ -9,11 +9,13 @@ import type { ColumnDef } from '@tanstack/react-table';
 import { createColumnHelper } from '@tanstack/react-table';
 import useALContext from 'components/hooks/useALContext';
 import useSafeResults from 'components/hooks/useSafeResults';
-import type { SandboxBody as SandboxData } from 'components/models/base/result_body';
-import type { Heuristics } from 'components/models/ontology/ontology';
-import type { NetworkConnection } from 'components/models/ontology/results/network';
-import type { Process } from 'components/models/ontology/results/process';
-import type { Signature } from 'components/models/ontology/results/signature';
+import type {
+  SandboxBody as SandboxData,
+  SandboxHeuristicItem,
+  SandboxNetflowItem,
+  SandboxProcessItem,
+  SandboxSignatureItem
+} from 'components/models/base/result_body';
 import AutoHideTagList from 'components/visual/AutoHideTagList';
 import Classification from 'components/visual/Classification';
 import { CustomChip } from 'components/visual/CustomChip';
@@ -48,7 +50,7 @@ const CounterImg = memo(
   }))
 );
 
-type ProcessItem = Process & {
+type ProcessItem = SandboxProcessItem & {
   children?: ProcessItem[];
 };
 
@@ -57,7 +59,7 @@ type ProcessTreeItemProps = {
   item: ProcessItem;
   depth?: number;
   printable?: boolean;
-  filterValue: Process;
+  filterValue: SandboxProcessItem;
   onClick: (event: React.MouseEvent<HTMLDivElement, MouseEvent>, item: ProcessItem) => void;
 };
 
@@ -71,14 +73,14 @@ const ProcessTreeItem = React.memo(
 
     const hasChildren = useMemo<boolean>(() => !!item.children?.length, [item.children?.length]);
 
-    const networks = useMemo<NetworkConnection[]>(
-      () => body?.netflow?.filter(x => x?.objectid?.guid === item?.pobjectid?.guid) ?? [],
-      [body.netflow, item?.pobjectid?.guid]
+    const networks = useMemo<SandboxNetflowItem[]>(
+      () => body?.netflows?.filter(x => x?.pid === item?.pid) ?? [],
+      [body?.netflows, item?.pid]
     );
 
-    const signatures = useMemo<Signature[]>(
-      () => body?.signature?.filter(x => x?.attributes?.some(a => a?.source?.guid === item?.objectid?.guid)) ?? [],
-      [body?.signature, item?.objectid?.guid]
+    const signatures = useMemo<SandboxSignatureItem[]>(
+      () => body?.signatures?.filter(x => x?.pid === item?.pid) ?? [],
+      [body?.signatures, item?.pid]
     );
 
     const networkCount = useMemo<number>(() => 0, []);
@@ -95,7 +97,7 @@ const ProcessTreeItem = React.memo(
     const backgroundStyle = useMemo(() => {
       const dark = theme.palette.mode === 'dark';
 
-      if (filterValue?.objectid?.guid === item?.objectid?.guid) {
+      if (filterValue?.pid === item?.pid) {
         return {
           backgroundColor: dark ? theme.palette.primary.dark : theme.palette.primary.light,
           hover: dark ? alpha(theme.palette.primary.light, 0.25) : alpha(theme.palette.primary.main, 0.15),
@@ -140,8 +142,8 @@ const ProcessTreeItem = React.memo(
       theme.palette.primary.dark,
       theme.palette.primary.light,
       theme.palette.primary.main,
-      filterValue?.objectid?.guid,
-      item?.objectid?.guid,
+      filterValue?.pid,
+      item?.pid,
       item.integrity_level,
       signatures,
       scoreToVerdict
@@ -302,10 +304,10 @@ const ProcessTreeItem = React.memo(
 
 type ProcessGraphProps = {
   body: SandboxData;
-  processes: Process[];
+  processes: SandboxProcessItem[];
   printable?: boolean;
   force?: boolean;
-  filterValue: Process;
+  filterValue: SandboxProcessItem;
   onClick: (event: React.MouseEvent<HTMLDivElement, MouseEvent>, item: ProcessItem) => void;
 };
 
@@ -350,18 +352,18 @@ const ProcessGraph = React.memo(
  * Process Table
  */
 type ProcessTableProps = {
-  data?: Process[];
+  data?: SandboxProcessItem[];
   printable?: boolean;
   startTime?: number;
-  filterValue?: Process;
+  filterValue?: SandboxProcessItem;
 };
 
 const ProcessTable = React.memo(({ data = [], printable = false, startTime, filterValue }: ProcessTableProps) => {
   const { t } = useTranslation('resultCard');
   const theme = useTheme();
-  const columnHelper = createColumnHelper<Process>();
+  const columnHelper = createColumnHelper<SandboxProcessItem>();
 
-  const columns = useMemo<ColumnDef<Process>[]>(
+  const columns = useMemo<ColumnDef<SandboxProcessItem>[]>(
     () => [
       columnHelper.accessor('start_time', {
         header: () => t('timeshift'),
@@ -453,7 +455,7 @@ const ProcessTable = React.memo(({ data = [], printable = false, startTime, filt
  * Netflow Table
  */
 type NetflowTableProps = {
-  data?: NetworkConnection[];
+  data?: SandboxNetflowItem[];
   printable?: boolean;
   startTime?: number;
 };
@@ -461,11 +463,11 @@ type NetflowTableProps = {
 const NetflowTable = React.memo(({ data = [], printable = false, startTime }: NetflowTableProps) => {
   const { t } = useTranslation('resultCard');
   const theme = useTheme();
-  const columnHelper = createColumnHelper<NetworkConnection>();
+  const columnHelper = createColumnHelper<SandboxNetflowItem>();
 
-  const columns = useMemo<ColumnDef<NetworkConnection>[]>(
+  const columns = useMemo<ColumnDef<SandboxNetflowItem>[]>(
     () => [
-      columnHelper.accessor(row => row.objectid?.time_observed, {
+      columnHelper.accessor(row => row.time_observed, {
         id: 'time_observed',
         header: () => t('timeshift'),
         cell: info => {
@@ -534,18 +536,18 @@ const NetflowTable = React.memo(({ data = [], printable = false, startTime }: Ne
         ]
       }),
 
-      columnHelper.accessor(row => row.process?.pid, {
+      columnHelper.accessor(row => row.pid, {
         id: 'pid',
         header: () => t('pid'),
         cell: info => info.getValue() ?? '',
         meta: { cellSx: { color: theme.palette.text.secondary } }
-      }),
-      columnHelper.accessor(row => row.process?.image, {
-        id: 'process_name',
-        header: () => t('process_name'),
-        cell: info => info.getValue()?.split(/[/\\]/).pop() ?? '',
-        meta: { cellSx: {} }
       })
+      // columnHelper.accessor(row => row.process?.image, {
+      //   id: 'process_name',
+      //   header: () => t('process_name'),
+      //   cell: info => info.getValue()?.split(/[/\\]/).pop() ?? '',
+      //   meta: { cellSx: {} }
+      // })
     ],
     [columnHelper, t, theme, startTime]
   );
@@ -563,10 +565,10 @@ const NetflowTable = React.memo(({ data = [], printable = false, startTime }: Ne
 /***
  * Heuristic Table
  */
-type FlatHeuristics = Heuristics & { tagKey?: string; tagValues?: string[] };
+type FlatHeuristics = SandboxHeuristicItem & { tagKey?: string; tagValues?: string[] };
 
 type HeuristicsTableProps = {
-  data?: Heuristics[];
+  data?: SandboxHeuristicItem[];
   printable?: boolean;
   force?: boolean;
 };
@@ -611,6 +613,11 @@ const HeuristicsTable = React.memo(({ data = [], printable = false, force }: Heu
         cell: info => info.getValue(),
         meta: {}
       }),
+      // columnHelper.accessor('times_raised', {
+      //   header: () => t('sandbox_body.heuristics.times_raised'),
+      //   cell: info => info.getValue(),
+      //   meta: {}
+      // }),
       columnHelper.group({
         id: 'tags',
         header: () => t('tags'),
@@ -655,13 +662,13 @@ const HeuristicsTable = React.memo(({ data = [], printable = false, force }: Heu
 /***
  * Signature Table
  */
-type FlatSignatures = Signature & { attackKey?: string; attackValues?: string[] };
+type FlatSignatures = SandboxSignatureItem & { attackKey?: string; attackValues?: string[] };
 
 type SignatureTableProps = {
-  data?: Signature[];
+  data?: SandboxSignatureItem[];
   printable?: boolean;
   force?: boolean;
-  filterValue?: Process;
+  filterValue?: SandboxProcessItem;
 };
 
 const SignatureTable = React.memo(({ data = [], printable = false, force, filterValue }: SignatureTableProps) => {
@@ -716,7 +723,7 @@ const SignatureTable = React.memo(({ data = [], printable = false, force, filter
     return out;
   }, [data]);
 
-  const columns = useMemo<ColumnDef<Signature>[]>(
+  const columns = useMemo<ColumnDef<SandboxSignatureItem>[]>(
     () => [
       columnHelper.accessor('type', {
         header: () => t('sandbox_body.signature.type'),
@@ -776,7 +783,7 @@ const SignatureTable = React.memo(({ data = [], printable = false, force, filter
       printable={printable}
       rowSpanning={['name', 'type', 'classification', 'actors']}
       filterValue={filterValue}
-      onFilter={(row, value) => row?.attributes?.some(a => a?.source?.guid === filterValue?.objectid?.guid)}
+      onFilter={(row, value) => row.pid === filterValue?.pid}
     />
   );
 });
@@ -791,107 +798,84 @@ export const SandboxBody = React.memo(({ body, force = false, printable = false 
   const theme = useTheme();
   const { t } = useTranslation('resultCard');
 
-  const [filterValue, setFilterValue] = useState<Process>(null);
+  const [filterValue, setFilterValue] = useState<SandboxProcessItem | undefined>(undefined);
 
-  const startTime = useMemo<number>(
-    () => (!body ? null : new Date(body.sandbox?.[0].analysis_metadata.start_time).getTime()),
-    [body]
-  );
-
-  const processes = useMemo<Process[]>(() => {
-    const list = body?.process ?? [];
-    if (list.length === 0) return [];
-
-    const seen = new Set<number>();
-    const result: Process[] = [];
-
-    for (const proc of list) {
-      if (proc.pid != null && seen.has(proc.pid)) continue;
-      if (proc.pid != null) seen.add(proc.pid);
-
-      result.push(proc);
-      if (proc.pobjectid && proc.ppid != null && !seen.has(proc.ppid)) {
-        seen.add(proc.ppid);
-        result.push({
-          ...proc,
-          objectid: proc.pobjectid,
-          pid: proc.ppid,
-          ppid: null,
-          pobjectid: null,
-          image: proc.pimage ?? null,
-          command_line: proc.pcommand_line ?? '',
-          pimage: null,
-          pcommand_line: null,
-          start_time: proc.start_time,
-          end_time: proc.end_time,
-          integrity_level: null
-        });
-      }
-    }
-
-    return result.sort((a, b) => a.pid - b.pid).sort((a, b) => a.start_time.localeCompare(b.start_time));
+  const startTime = useMemo<number | undefined>(() => {
+    const time = body?.analysis_metadata?.start_time;
+    return time ? new Date(time).getTime() : undefined;
   }, [body]);
 
-  console.log(body);
-
   const handleProcessGraphClick = useCallback(
-    (event: React.MouseEvent<HTMLDivElement, MouseEvent>, item: ProcessItem) =>
-      setFilterValue(prev => (prev && prev.objectid.guid === item.objectid.guid ? null : item)),
+    (event: React.MouseEvent<HTMLDivElement, MouseEvent>, item: ProcessItem) => {
+      setFilterValue(prev => (prev && prev.pid === item.pid ? undefined : item));
+    },
     []
   );
 
-  return !body ? null : (
+  if (!body) return null;
+
+  return (
     <>
-      <ProcessGraph body={body} processes={processes} filterValue={filterValue} onClick={handleProcessGraphClick} />
+      <ProcessGraph
+        body={body}
+        processes={body.processes}
+        filterValue={filterValue}
+        onClick={handleProcessGraphClick}
+      />
 
       <TabContainer
         paper
         selectionFollowsFocus
         tabs={{
-          ...(processes?.length && {
+          ...(body.processes.length && {
             process: {
               label: (
                 <div style={{ display: 'flex', alignItems: 'center', columnGap: theme.spacing(1) }}>
                   {t('sandbox_body.tab.process')}
-                  <CustomChip label={processes?.length} color="secondary" size="tiny" />
+                  <CustomChip label={body.processes.length} color="secondary" size="tiny" />
                 </div>
               ),
               inner: (
-                <ProcessTable data={processes} startTime={startTime} printable={printable} filterValue={filterValue} />
+                <ProcessTable
+                  data={body.processes}
+                  startTime={startTime}
+                  printable={printable}
+                  filterValue={filterValue}
+                />
               )
             }
           }),
-          ...(body?.netflow?.length && {
+          ...(body.netflows.length && {
             netflow: {
               label: (
                 <div style={{ display: 'flex', alignItems: 'center', columnGap: theme.spacing(1) }}>
                   {t('sandbox_body.tab.netflow')}
-                  <CustomChip label={body?.netflow?.length} color="secondary" size="tiny" />
+                  <CustomChip label={body.netflows.length} color="secondary" size="tiny" />
                 </div>
               ),
-              inner: <NetflowTable data={body?.netflow} startTime={startTime} printable={printable} />
+              inner: <NetflowTable data={body.netflows} startTime={startTime} printable={printable} />
             }
           }),
-          ...(body?.heuristics?.length && {
+          ...(body.heuristics?.length && {
             heuristics: {
               label: (
                 <div style={{ display: 'flex', alignItems: 'center', columnGap: theme.spacing(1) }}>
                   {t('sandbox_body.tab.heuristics')}
-                  <CustomChip label={body?.heuristics?.length} color="secondary" size="tiny" />
+                  <CustomChip label={body.heuristics.length} color="secondary" size="tiny" />
                 </div>
               ),
-              inner: <HeuristicsTable data={body?.heuristics} printable={printable} />
+              inner: <HeuristicsTable data={body.heuristics} printable={printable} />
             }
           }),
-          ...(body?.signature?.length && {
+          ...(body.signatures.length && {
             signature: {
               label: (
                 <div style={{ display: 'flex', alignItems: 'center', columnGap: theme.spacing(1) }}>
                   {t('sandbox_body.tab.signature')}
-                  <CustomChip label={body?.signature?.length} color="secondary" size="tiny" />
+                  <CustomChip label={body.signatures.length} color="secondary" size="tiny" />
                 </div>
               ),
-              inner: <SignatureTable data={body?.signature} printable={printable} filterValue={filterValue} />
+              inner: <SignatureTable data={body.signatures} printable={printable} filterValue={filterValue} />
             }
           })
         }}
