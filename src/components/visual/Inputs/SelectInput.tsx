@@ -73,7 +73,6 @@ const WrappedSelectInput = <O extends readonly Option[]>() => {
             displayEmpty={displayEmpty}
             error={!!errorMessage}
             fullWidth
-            id={id}
             readOnly={readOnly}
             size="small"
             open={showMenu}
