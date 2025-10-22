@@ -480,7 +480,8 @@ const WrappedFileDetail: React.FC<Props> = ({
                     component={Link}
                     to={`/submit?hash=${file.file_info.sha256}`}
                     state={{
-                      c12n: file.file_info.classification
+                      c12n: file.file_info.classification,
+                      metadata: metadata
                     }}
                     dense
                     onClick={() => setResubmitAnchor(null)}

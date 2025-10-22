@@ -232,16 +232,15 @@ export const useInputBlur = <
 >() => {
   const [get, setStore] = usePropStore();
 
-  const error = useError();
+  const handleChange = useInputChange();
   const onBlur = get('onBlur');
 
   return useCallback(
     (event: React.FocusEvent, inputValue: Props['inputValue'], value: Props['value']) => {
       onBlur(event);
-
-      const errorMessage = error(value);
-      setStore(() => ({ focused: false, errorMessage, inputValue, value }));
+      setStore(() => ({ focused: false }));
+      handleChange(event, inputValue, value);
     },
-    [error, onBlur, setStore]
+    [handleChange, onBlur, setStore]
   );
 };
