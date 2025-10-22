@@ -282,6 +282,7 @@ function Service({ name = null, onDeleted = () => null, onUpdated = () => null }
               setError={setServiceGeneralError}
               setModified={setModified}
               setService={setService}
+              setServiceVersion={setServiceVersion}
             />
           </TabPanel>
           <TabPanel value="docker" style={{ paddingLeft: 0, paddingRight: 0 }}>
@@ -303,7 +304,12 @@ function Service({ name = null, onDeleted = () => null, onUpdated = () => null }
             </TabPanel>
           )}
           <TabPanel value="params" style={{ paddingLeft: 0, paddingRight: 0 }}>
-            <ServiceParams service={service} setService={setService} setModified={setModified} />
+            <ServiceParams
+              service={service}
+              defaults={serviceDefault}
+              setService={setService}
+              setModified={setModified}
+            />
           </TabPanel>
         </TabContext>
       ) : (

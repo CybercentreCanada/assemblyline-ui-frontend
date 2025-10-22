@@ -6,6 +6,7 @@ import type { Verdict } from 'components/models/base/alert';
 import CustomChip from 'components/visual/CustomChip';
 import Heuristic from 'components/visual/Heuristic';
 import Tag from 'components/visual/Tag';
+import { SECOND_LEVEL_DOMAINS } from 'helpers/2LD';
 import { verdictRank, verdictToColor } from 'helpers/utils';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -45,75 +46,100 @@ const ShowMore: React.FC<ShowMoreProps> = React.memo(
   }
 );
 
-const compareTags = (a: TagProps, b: TagProps): number => {
-  const aVerdict = a.safelisted ? 4 : verdictRank(a.lvl);
-  const bVerdict = b.safelisted ? 4 : verdictRank(b.lvl);
+const getVerdict = (t: TagProps) => (t.safelisted ? 4 : verdictRank(t.lvl));
 
-  const verdictComparison = aVerdict - bVerdict;
-  if (verdictComparison !== 0) return verdictComparison;
-  else return a.value < b.value ? -1 : 1;
+export const compareTags = (a: TagProps, b: TagProps): number => {
+  const diff = getVerdict(a) - getVerdict(b);
+  return diff || (a.value < b.value ? -1 : a.value > b.value ? 1 : 0);
 };
 
-const compareIPs = (a: TagProps, b: TagProps): number => {
-  const aVerdict = a.safelisted ? 4 : verdictRank(a.lvl);
-  const bVerdict = b.safelisted ? 4 : verdictRank(b.lvl);
+export const compareIPs = (a: TagProps, b: TagProps): number => {
+  const diff = getVerdict(a) - getVerdict(b);
+  if (diff) return diff;
 
-  const verdictComparison = aVerdict - bVerdict;
-  if (verdictComparison !== 0) return verdictComparison;
-
-  const ipA = a.value.split('.').map(v => Number(v));
-  const ipB = b.value.split('.').map(v => Number(v));
-
-  for (let i = 0; i < ipA.length; i++) {
-    if (ipA[i] !== ipB[i]) return ipA[i] - ipB[i];
+  const aParts = a.value.split('.');
+  const bParts = b.value.split('.');
+  for (let i = 0; i < 4; i++) {
+    const pa = +aParts[i];
+    const pb = +bParts[i];
+    if (pa !== pb) return pa - pb;
   }
+  return 0;
 };
 
-const compareDomains = (a: TagProps, b: TagProps): number => {
-  const aVerdict = a.safelisted ? 4 : verdictRank(a.lvl);
-  const bVerdict = b.safelisted ? 4 : verdictRank(b.lvl);
+export const compareDomains = (a: TagProps, b: TagProps): number => {
+  const diff = getVerdict(a) - getVerdict(b);
+  if (diff) return diff;
 
-  const verdictComparison = aVerdict - bVerdict;
-  if (verdictComparison !== 0) return verdictComparison;
-
-  const reversedA = a.value.split('.').reverse().join('.');
-  const reversedB = b.value.split('.').reverse().join('.');
-  return reversedA.localeCompare(reversedB);
+  const aParts = a.value.split('.');
+  const bParts = b.value.split('.');
+  const len = Math.max(aParts.length, bParts.length);
+  for (let i = 1; i <= len; i++) {
+    const pa = aParts[aParts.length - i] ?? '';
+    const pb = bParts[bParts.length - i] ?? '';
+    if (pa !== pb) return pa.localeCompare(pb);
+  }
+  return 0;
 };
 
-const compareURLs = (a: TagProps, b: TagProps): number => {
-  const aVerdict = a.safelisted ? 4 : verdictRank(a.lvl);
-  const bVerdict = b.safelisted ? 4 : verdictRank(b.lvl);
-
-  const verdictComparison = aVerdict - bVerdict;
-  if (verdictComparison !== 0) return verdictComparison;
+export const compareURLs = (a: TagProps, b: TagProps): number => {
+  const diff = getVerdict(a) - getVerdict(b);
+  if (diff) return diff;
 
   try {
     const urlA = new URL(a.value);
     const urlB = new URL(b.value);
 
-    const keyA = urlA.hostname.split('.').slice(-2).join('.');
-    const keyB = urlB.hostname.split('.').slice(-2).join('.');
+    const hostA = urlA.hostname.split('.');
+    const hostB = urlB.hostname.split('.');
+
+    const keyA = hostA.slice(-2).join('.');
+    const keyB = hostB.slice(-2).join('.');
     if (keyA !== keyB) return keyA.localeCompare(keyB);
 
-    urlA.hostname = urlA.hostname.split('.').reverse().join('.');
-    urlB.hostname = urlB.hostname.split('.').reverse().join('.');
+    const len = Math.max(hostA.length, hostB.length);
+    for (let i = 1; i <= len; i++) {
+      const pa = hostA[hostA.length - i] ?? '';
+      const pb = hostB[hostB.length - i] ?? '';
+      if (pa !== pb) return pa.localeCompare(pb);
+    }
+
     return urlA.href.localeCompare(urlB.href);
-  } catch (e) {
+  } catch {
     return a.value.localeCompare(b.value);
   }
 };
 
-const groupDomains = (prev: Record<number, Record<string, TagProps[]>>, current: TagProps) => {
-  const verdict = current.safelisted ? 4 : verdictRank(current.lvl);
-  const key = current.value.split('.').pop();
-  return { ...prev, [verdict]: { ...prev?.[verdict], [key]: [...(prev?.[verdict]?.[key] || []), current] } };
+const getDomainKey = (parts: string[], isURL = false) => {
+  const tld = parts[parts.length - 1];
+  const sld = parts[parts.length - 2];
+
+  if (sld && `${sld}.${tld}` in SECOND_LEVEL_DOMAINS) {
+    return isURL ? parts.slice(-3).join('.') : `${sld}.${tld}`;
+  }
+  return isURL ? parts.slice(-2).join('.') : tld;
 };
 
-const groupURLs = (prev: Record<number, Record<string, TagProps[]>>, current: TagProps) => {
+export const groupDomains = (prev: Record<number, Record<string, TagProps[]>>, current: TagProps) => {
   const verdict = current.safelisted ? 4 : verdictRank(current.lvl);
-  const key = new URL(current.value).hostname.split('.').slice(-2).join('.');
-  return { ...prev, [verdict]: { ...prev?.[verdict], [key]: [...(prev?.[verdict]?.[key] || []), current] } };
+  const parts = current.value.split('.');
+  const key = getDomainKey(parts);
+
+  prev[verdict] ??= {};
+  (prev[verdict][key] ??= []).push(current);
+
+  return prev;
+};
+
+export const groupURLs = (prev: Record<number, Record<string, TagProps[]>>, current: TagProps) => {
+  const verdict = current.safelisted ? 4 : verdictRank(current.lvl);
+  const parts = new URL(current.value).hostname.split('.');
+  const key = getDomainKey(parts, true);
+
+  prev[verdict] ??= {};
+  (prev[verdict][key] ??= []).push(current);
+
+  return prev;
 };
 
 type TagListProps = {

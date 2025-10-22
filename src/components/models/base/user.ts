@@ -127,7 +127,7 @@ export type Apps = {
 /** Model of User */
 export type User = AppUser & {
   /** Date the user agree with terms of service */
-  agrees_with_tos?: string & Date;
+  agrees_with_tos?: string;
 
   /** Maximum number of API calls a user can do daily (0: No Quota) */
   api_daily_quota?: number;

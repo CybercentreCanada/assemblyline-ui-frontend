@@ -460,7 +460,7 @@ const WrappedActionMenu = ({
             {t('highlight')}
           </MenuItem>
         )}
-        {category === 'tag' && currentUser.roles.includes('badlist_manage') && (
+        {category === 'tag' && !!classification && currentUser.roles.includes('badlist_manage') && (
           <Tooltip title={badlisted ? <SafeBadItem item={badlisted} /> : ''} placement="right" arrow>
             <div>
               <MenuItem dense onClick={handleMenuBadlist} disabled={badlisted !== null}>
@@ -470,16 +470,18 @@ const WrappedActionMenu = ({
             </div>
           </Tooltip>
         )}
-        {(category === 'tag' || category === 'signature') && currentUser.roles.includes('safelist_manage') && (
-          <Tooltip title={safelisted ? <SafeBadItem item={safelisted} /> : ''} placement="right" arrow>
-            <div>
-              <MenuItem dense onClick={handleMenuSafelist} disabled={safelisted !== null}>
-                {SAFELIST_ICON}
-                {t(`${safelisted !== null ? 'already_' : ''}safelist`)}
-              </MenuItem>
-            </div>
-          </Tooltip>
-        )}
+        {(category === 'tag' || category === 'signature') &&
+          !!classification &&
+          currentUser.roles.includes('safelist_manage') && (
+            <Tooltip title={safelisted ? <SafeBadItem item={safelisted} /> : ''} placement="right" arrow>
+              <div>
+                <MenuItem dense onClick={handleMenuSafelist} disabled={safelisted !== null}>
+                  {SAFELIST_ICON}
+                  {t(`${safelisted !== null ? 'already_' : ''}safelist`)}
+                </MenuItem>
+              </div>
+            </Tooltip>
+          )}
         {submitType &&
           (submitType !== 'url' || (submitType === 'url' && !!currentUserConfig?.ui?.allow_url_submissions)) && (
             <MenuItem

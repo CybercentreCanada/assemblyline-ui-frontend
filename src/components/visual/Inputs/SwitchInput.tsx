@@ -10,7 +10,13 @@ import {
   StyledFormControl,
   StyledFormControlLabel
 } from 'components/visual/Inputs/lib/inputs.components';
-import { useErrorCallback, useInputBlur, useInputClick, useInputFocus } from 'components/visual/Inputs/lib/inputs.hook';
+import {
+  useErrorCallback,
+  useInputBlur,
+  useInputClick,
+  useInputFocus,
+  usePropID
+} from 'components/visual/Inputs/lib/inputs.hook';
 import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
 import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
 import { Tooltip } from 'components/visual/Tooltip';
@@ -22,6 +28,7 @@ export type SwitchInputProps = InputValues<boolean, boolean, React.MouseEvent<HT
 const WrappedSwitchInput = () => {
   const [get] = usePropStore<SwitchInputProps>();
 
+  const id = usePropID();
   const inputValue = Boolean(get('inputValue'));
   const loading = get('loading');
   const preventDisabledColor = get('preventDisabledColor');
@@ -44,6 +51,7 @@ const WrappedSwitchInput = () => {
         >
           <StyledFormControlLabel label={<StyledButtonLabel />}>
             <Switch
+              name={id}
               checked={inputValue}
               disableFocusRipple
               disableRipple

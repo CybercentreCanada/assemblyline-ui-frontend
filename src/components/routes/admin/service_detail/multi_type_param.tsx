@@ -3,6 +3,7 @@ import RemoveCircleOutlineOutlinedIcon from '@mui/icons-material/RemoveCircleOut
 import StarIcon from '@mui/icons-material/Star';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import {
   Autocomplete,
   Checkbox,
@@ -26,6 +27,7 @@ import { useTranslation } from 'react-i18next';
 type MultiTypeParamProps<T extends 'bool' | 'int' | 'str' | 'list'> = {
   param?: ServiceParameter;
   id?: number;
+  warn?: boolean;
   onAdd?: (param: ServiceParameter) => void;
   onUpdate?: (param: ServiceParameter, id: number) => void;
   onDelete?: (id: number) => void;
@@ -34,6 +36,7 @@ type MultiTypeParamProps<T extends 'bool' | 'int' | 'str' | 'list'> = {
 const WrappedMultiTypeParam = <T extends 'bool' | 'int' | 'str' | 'list'>({
   param = null,
   id = null,
+  warn = false,
   onAdd = () => null,
   onUpdate = () => null,
   onDelete = () => null
@@ -180,6 +183,14 @@ const WrappedMultiTypeParam = <T extends 'bool' | 'int' | 'str' | 'list'>({
   return param ? (
     <Grid container spacing={1} alignItems="center">
       <Grid size={{ xs: 10, sm: 3 }} style={{ wordBreak: 'break-word' }}>
+        {warn && (
+          <Tooltip title={t('params.user.unused')} placement="bottom-start">
+            <span>
+              <WarningAmberIcon color="warning" fontSize="small" style={{ float: 'inline-start' }} />
+              &nbsp;
+            </span>
+          </Tooltip>
+        )}
         {`${param.name} [${param.type}]:`}
       </Grid>
       <Grid size={{ xs: 2, sm: 1 }}>
