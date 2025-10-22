@@ -49,6 +49,8 @@
   "submissions.deep_scan_desc": "Perform deeper analysis of the file by turning on more checks. Slower and not recommended for bulk analysis.",
   "submissions.default_external_sources": "Default File Sources",
   "submissions.default_external_sources_desc": "List of source that will be used by default when starting a submission with a certain hash or URL",
+  "submissions.default_metadata": "Default Metadata",
+  "submissions.default_metadata_desc": "Key-value pairs that will be added to every submission by default.",
   "submissions.description": "Set the default values of the submission options for this profile.",
   "submissions.generate_alert": "Generate alert",
   "submissions.generate_alert_desc": "Submission will trigger an alert on completion of analysis.",

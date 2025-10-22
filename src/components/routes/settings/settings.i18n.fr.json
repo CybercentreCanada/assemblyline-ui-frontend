@@ -49,6 +49,8 @@
   "submissions.deep_scan_desc": "Effectuez une analyse plus approfondie du fichier en activant davantage de vérifications. Plus lent et non recommandé pour l'analyse en vrac.",
   "submissions.default_external_sources": "Sources de Fichiers par Défaut",
   "submissions.default_external_sources_desc": "Liste des sources qui seront utilisées par défaut lors du démarrage d'une soumission avec un certain hachage ou URL",
+  "submissions.default_metadata": "Métadonnées par défaut",
+  "submissions.default_metadata_desc": "Paires clé-valeur qui seront ajoutées à chaque soumission par défaut.",
   "submissions.description": "Sélectionnez les valeurs par défaut des options de soumission pour ce profil.",
   "submissions.generate_alert": "Générer une alerte",
   "submissions.generate_alert_desc": "La soumission déclenchera une alerte à la fin de l'analyse.",
