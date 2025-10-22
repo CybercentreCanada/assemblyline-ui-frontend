@@ -34,6 +34,7 @@ type ServiceGeneralProps = {
   setError: Dispatch<SetStateAction<boolean>>;
   setModified: Dispatch<SetStateAction<boolean>>;
   setService: Dispatch<SetStateAction<Service>>;
+  setServiceVersion: Dispatch<SetStateAction<string>>;
 };
 
 const ServiceGeneral = ({
@@ -44,7 +45,8 @@ const ServiceGeneral = ({
   versions,
   setError,
   setModified,
-  setService
+  setService,
+  setServiceVersion
 }: ServiceGeneralProps) => {
   const { t } = useTranslation(['adminServices']);
   const theme = useTheme();
@@ -110,6 +112,7 @@ const ServiceGeneral = ({
                   onChange={e => {
                     setModified(true);
                     setService(s => ({ ...s, version: e.target.value }));
+                    setServiceVersion(e.target.value);
                   }}
                 >
                   {versions ? (
