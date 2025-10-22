@@ -114,7 +114,7 @@
     "@iconify/icons-simple-icons": "^1.2.74",
     "@iconify/react": "^5.2.1",
     "@jest/globals": "^29.6.4",
-    "@playwright/test": "^1.54.2",
+    "@playwright/test": "^1.55.1",
     "@tanstack/eslint-plugin-query": "^5.72.0",
     "@tanstack/react-query-devtools": "^5.74.3",
     "@testing-library/dom": "^10.4.0",
