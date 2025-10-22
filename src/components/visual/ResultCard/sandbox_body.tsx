@@ -25,6 +25,22 @@ import type { FC } from 'react';
 import React, { memo, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+type DetailTableCellValueProps = {
+  value?: unknown;
+};
+
+const DetailTableCellValue = React.memo(({ value = null }: DetailTableCellValueProps) => {
+  if (Array.isArray(value)) {
+    return value.length > 0 ? <>{value.join(' | ')}</> : null;
+  }
+
+  if (value && typeof value === 'object') {
+    return Object.keys(value).length > 0 ? <KVBody body={value} /> : null;
+  }
+
+  return value ? <>{value}</> : null;
+});
+
 type DetailTableRowProps = {
   label?: string;
   value?: unknown;
@@ -57,13 +73,7 @@ const DetailTableRow = React.memo(({ label, value, isHeader = false }: DetailTab
           <TitleKey title={label || ''} />
         </td>
         <td>
-          {Array.isArray(value) ? (
-            value.join(' | ')
-          ) : typeof value === 'object' && value !== null ? (
-            <KVBody body={value} />
-          ) : (
-            value
-          )}
+          <DetailTableCellValue value={value} />
         </td>
       </tr>
     );
