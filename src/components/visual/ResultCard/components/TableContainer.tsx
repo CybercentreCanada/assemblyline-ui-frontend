@@ -22,6 +22,7 @@ import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from '
 
 declare module '@tanstack/react-table' {
   interface ColumnMeta<TData extends RowData = RowData, TValue = unknown> {
+    colStyle?: React.CSSProperties;
     headerSx?: SxProps<Theme>;
     cellSx?: SxProps<Theme>;
   }
@@ -217,6 +218,11 @@ export const TableContainer = memo(
     return (
       <StyledTableContainer ref={containerRef} printable={printable}>
         <StyledTable stickyHeader size="small" printable={printable}>
+          <colgroup>
+            {table.getAllColumns().map(column => (
+              <col key={column.id} style={column.columnDef.meta?.colStyle} />
+            ))}
+          </colgroup>
           <StyledTableHead className={scrolled ? 'scrolled' : ''}>
             {table.getHeaderGroups().map(headerGroup => (
               <TableRow key={headerGroup.id}>
@@ -235,7 +241,7 @@ export const TableContainer = memo(
                       onClick={canSort ? () => handleSort(header.column.id) : undefined}
                     >
                       {canSort ? (
-                        <TableSortLabel active={isActive} direction={direction}>
+                        <TableSortLabel active={isActive} direction={direction} sx={{ whiteSpace: 'nowrap' }}>
                           {flexRender(header.column.columnDef.header, header.getContext())}
                         </TableSortLabel>
                       ) : (

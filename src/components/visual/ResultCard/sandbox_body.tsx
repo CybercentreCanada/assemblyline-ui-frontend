@@ -1,10 +1,6 @@
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import FingerprintOutlinedIcon from '@mui/icons-material/FingerprintOutlined';
-import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
-import SettingsEthernetOutlinedIcon from '@mui/icons-material/SettingsEthernetOutlined';
-import WidgetsOutlinedIcon from '@mui/icons-material/WidgetsOutlined';
 import type { SvgIconProps } from '@mui/material';
-import { alpha, Collapse, IconButton, List, ListItem, styled, Tooltip, useTheme } from '@mui/material';
+import { alpha, Button, Collapse, List, ListItem, styled, Typography, useTheme } from '@mui/material';
 import type { ColumnDef } from '@tanstack/react-table';
 import { createColumnHelper } from '@tanstack/react-table';
 import useALContext from 'components/hooks/useALContext';
@@ -20,12 +16,58 @@ import AutoHideTagList from 'components/visual/AutoHideTagList';
 import Classification from 'components/visual/Classification';
 import { CustomChip } from 'components/visual/CustomChip';
 import { TableContainer } from 'components/visual/ResultCard/components/TableContainer';
+import { KVBody } from 'components/visual/ResultCard/kv_body';
 import { TabContainer } from 'components/visual/TabContainer';
+import TitleKey from 'components/visual/TitleKey';
 import Verdict from 'components/visual/Verdict';
-import { humanReadableNumber } from 'helpers/utils';
+import type { PossibleColor } from 'helpers/colors';
 import type { FC } from 'react';
 import React, { memo, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
+type DetailTableRowProps = {
+  label?: string;
+  value?: unknown;
+  isHeader?: boolean;
+};
+
+const DetailTableRow = React.memo(({ label, value, isHeader = false }: DetailTableRowProps) => {
+  const theme = useTheme();
+
+  const showValue = useMemo(() => {
+    if (Array.isArray(value)) return value.length > 0;
+    if (value && typeof value === 'object') return Object.keys(value).length > 0;
+    return !!value;
+  }, [value]);
+
+  if (isHeader) {
+    return (
+      <tr>
+        <td colSpan={2} style={{ paddingRight: '16px', wordBreak: 'normal', color: theme.palette.text.secondary }}>
+          <TitleKey title={label || ''} />
+        </td>
+      </tr>
+    );
+  }
+
+  if (showValue)
+    return (
+      <tr>
+        <td style={{ paddingRight: '16px', wordBreak: 'normal' }}>
+          <TitleKey title={label || ''} />
+        </td>
+        <td>
+          {Array.isArray(value) ? (
+            value.join(' | ')
+          ) : typeof value === 'object' && value !== null ? (
+            <KVBody body={value} />
+          ) : (
+            value
+          )}
+        </td>
+      </tr>
+    );
+});
 
 /***
  * Process Graph
@@ -60,7 +102,7 @@ type ProcessTreeItemProps = {
   depth?: number;
   printable?: boolean;
   filterValue: SandboxProcessItem;
-  onClick: (event: React.MouseEvent<HTMLDivElement, MouseEvent>, item: ProcessItem) => void;
+  onClick: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>, item: ProcessItem) => void;
 };
 
 const ProcessTreeItem = React.memo(
@@ -155,47 +197,74 @@ const ProcessTreeItem = React.memo(
       <>
         <ListItem
           sx={{
-            pl: depth * 2,
-            py: 0.3,
-            display: 'flex',
+            pl: depth * 3,
+            pr: 0,
+            py: 0.25,
+            display: 'grid',
+            gridTemplateColumns: 'auto 1fr',
             alignItems: 'center'
           }}
         >
           {hasChildren ? (
-            <IconButton
+            <Button
+              color="inherit"
               size="small"
               onClick={handleToggle}
               sx={{
-                transition: `transform ${theme.transitions.duration.shortest}ms ${theme.transitions.easing.sharp}`,
-                transform: open ? 'rotate(90deg)' : 'rotate(0deg)',
-                mt: '4px'
+                height: '100%',
+                padding: '0px',
+                minWidth: theme.spacing(3)
               }}
             >
-              <ChevronRightIcon fontSize="small" />
-            </IconButton>
+              <ChevronRightIcon
+                fontSize="small"
+                sx={{
+                  transition: `transform ${theme.transitions.duration.shortest}ms ${theme.transitions.easing.sharp}`,
+                  transform: open ? 'rotate(90deg)' : 'rotate(0deg)'
+                }}
+              />
+            </Button>
           ) : (
             <div style={{ width: theme.spacing(4) }} />
           )}
 
-          {/* === Custom Label Container === */}
-          <div
-            style={{
-              border: `1px solid ${theme.palette.divider}`,
-              borderRadius: 4,
-              margin: '0.2em 0',
-              display: 'flex',
-              // maxWidth: '50rem',
-              minWidth: '30rem',
-              width: '100%',
-              backgroundColor: backgroundStyle.backgroundColor,
-              transition: `background-color ${theme.transitions.duration.shortest}ms ${theme.transitions.easing.sharp}`
-            }}
-            onMouseEnter={e => (e.currentTarget.style.backgroundColor = backgroundStyle.hover)}
-            onMouseLeave={e => (e.currentTarget.style.backgroundColor = backgroundStyle.backgroundColor)}
+          <Button
+            color="inherit"
             onClick={e => onClick(e, item)}
+            sx={{
+              // alignSelf: 'stretch',
+              alignItems: 'center',
+              justifyContent: 'start',
+              width: '100%',
+              padding: '0px',
+              textTransform: 'none',
+              border: `1px solid ${theme.palette.divider}`,
+              backgroundColor: theme.palette.background.paper,
+              '&:hover': {
+                backgroundColor: alpha(theme.palette.text.primary, 0.15)
+              }
+            }}
           >
-            {/* Left PID column */}
-            <div
+            <Typography
+              variant="body1"
+              sx={{
+                backgroundColor: alpha(theme.palette.text.primary, 0.15),
+                borderRadius: theme.spacing(0.4),
+                minWidth: theme.spacing(6)
+              }}
+            >
+              {item.pid}
+            </Typography>
+
+            <Typography fontStyle="bold" variant="body1" sx={{ margin: `0 ${theme.spacing(1)}` }}>
+              {item.image?.split(/[/\\]/).pop() ?? ''}
+            </Typography>
+
+            <Typography color="textSecondary" fontFamily="monospace" variant="body2">
+              {item.command_line}
+            </Typography>
+
+            {/* <div
               style={{
                 padding: 5,
                 backgroundColor: theme.palette.mode === 'dark' ? '#FFFFFF10' : '#00000010',
@@ -207,7 +276,7 @@ const ProcessTreeItem = React.memo(
               {item.pid}
             </div>
 
-            {/* Middle section: process name + command line */}
+
             <div style={{ padding: 5, flexGrow: 1, wordBreak: 'break-word' }}>
               <div style={{ paddingBottom: 4 }}>
                 <b>{item.image?.split(/[/\\]/).pop() ?? ''}</b>
@@ -219,7 +288,7 @@ const ProcessTreeItem = React.memo(
               )}
             </div>
 
-            {/* Right side counters */}
+
             {hasValues ? (
               <div
                 style={{
@@ -271,8 +340,8 @@ const ProcessTreeItem = React.memo(
                   </Tooltip>
                 ) : null}
               </div>
-            ) : null}
-          </div>
+            ) : null} */}
+          </Button>
         </ListItem>
 
         {hasChildren && (
@@ -308,7 +377,7 @@ type ProcessGraphProps = {
   printable?: boolean;
   force?: boolean;
   filterValue: SandboxProcessItem;
-  onClick: (event: React.MouseEvent<HTMLDivElement, MouseEvent>, item: ProcessItem) => void;
+  onClick: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>, item: ProcessItem) => void;
 };
 
 const ProcessGraph = React.memo(
@@ -356,100 +425,130 @@ type ProcessTableProps = {
   printable?: boolean;
   startTime?: number;
   filterValue?: SandboxProcessItem;
+  onFilter?: () => void;
 };
 
-const ProcessTable = React.memo(({ data = [], printable = false, startTime, filterValue }: ProcessTableProps) => {
-  const { t } = useTranslation('resultCard');
-  const theme = useTheme();
-  const columnHelper = createColumnHelper<SandboxProcessItem>();
+const ProcessTable = React.memo(
+  ({ data = [], printable = false, startTime, filterValue, onFilter = () => null }: ProcessTableProps) => {
+    const { t } = useTranslation('resultCard');
+    const theme = useTheme();
+    const columnHelper = createColumnHelper<SandboxProcessItem>();
 
-  const columns = useMemo<ColumnDef<SandboxProcessItem>[]>(
-    () => [
-      columnHelper.accessor('start_time', {
-        header: () => t('timeshift'),
-        cell: info => {
-          const cur = info.getValue();
-          if (!startTime || !cur) return '-';
-          const delta = ((new Date(cur).getTime() - startTime) / 1000).toFixed(2);
-          return `${delta} s`;
-        },
-        meta: {
-          cellSx: {
-            whiteSpace: 'nowrap',
-            textAlign: 'right',
-            color: theme.palette.text.secondary
-          }
-        }
+    const integrityLevelColorMap = useMemo<Record<string, PossibleColor>>(
+      () => ({
+        system: 'primary',
+        high: 'success',
+        medium: 'warning',
+        low: 'error'
       }),
-      columnHelper.accessor('pid', {
-        header: () => t('pid'),
-        cell: info => info.getValue(),
-        meta: {
-          cellSx: {
-            wordBreak: 'inherit !important',
-            color: theme.palette.text.secondary
-          }
-        }
-      }),
-      columnHelper.accessor('image', {
-        header: () => t('process_name'),
-        cell: info => info.getValue()?.split(/[/\\]/).pop() ?? '',
-        meta: {
-          cellSx: {
-            wordBreak: 'inherit !important'
-          }
-        }
-      }),
-      columnHelper.accessor('command_line', {
-        header: () => t('command_line'),
-        cell: info => info.getValue() ?? info.row.original.image,
-        meta: { cellSx: { wordBreak: 'inherit !important', color: theme.palette.text.secondary } }
-      }),
-      columnHelper.accessor('integrity_level', {
-        header: () => t('integrity_level'),
-        cell: info => info.getValue() ?? '-',
-        meta: {
-          cellSx: {
-            wordBreak: 'inherit !important',
-            color: theme.palette.text.secondary
-          }
-        }
-      }),
-      columnHelper.accessor('original_file_name', {
-        header: () => t('original_file_name'),
-        cell: info => info.getValue() ?? '-',
-        meta: {
-          cellSx: {
-            wordBreak: 'inherit !important',
-            color: theme.palette.text.secondary
-          }
-        }
-      }),
-      columnHelper.accessor('ppid', {
-        header: () => t('ppid'),
-        cell: info => info.getValue() ?? '-',
-        meta: {
-          cellSx: {
-            wordBreak: 'inherit !important',
-            color: theme.palette.text.secondary
-          }
-        }
-      })
-    ],
-    [columnHelper, t, theme, startTime]
-  );
+      []
+    );
 
-  return (
-    <TableContainer
-      columns={columns}
-      data={data}
-      initialSorting={[{ id: 'start_time', desc: false }]}
-      printable={printable}
-      filterValue={filterValue}
-      onFilter={(row, value) => row.pid === value.pid}
-    />
-  );
-});
+    const columns = useMemo<ColumnDef<SandboxProcessItem>[]>(
+      () => [
+        columnHelper.accessor('start_time', {
+          header: () => t('timeshift'),
+          cell: info => {
+            const cur = info.getValue();
+            if (!startTime || !cur) return '-';
+            const delta = ((new Date(cur).getTime() - startTime) / 1000).toFixed(2);
+            return `${delta} s`;
+          },
+          meta: {
+            cellSx: {
+              whiteSpace: 'nowrap',
+              textAlign: 'right',
+              color: theme.palette.text.secondary
+            }
+          }
+        }),
+        columnHelper.accessor('pid', {
+          header: () => t('pid'),
+          cell: info => info.getValue(),
+          meta: {
+            cellSx: {
+              wordBreak: 'inherit !important',
+              color: theme.palette.text.secondary
+            }
+          }
+        }),
+        columnHelper.accessor('image', {
+          header: () => t('process_name'),
+          cell: info => info.getValue()?.split(/[/\\]/).pop() ?? '',
+          meta: {
+            cellSx: {
+              wordBreak: 'inherit !important'
+            }
+          }
+        }),
+        columnHelper.accessor('command_line', {
+          header: () => t('command_line'),
+          cell: info => info.getValue() ?? info.row.original.image,
+          meta: {
+            colStyle: { width: '100%' },
+            cellSx: { wordBreak: 'inherit !important', color: theme.palette.text.secondary }
+          }
+        }),
+        columnHelper.accessor('integrity_level', {
+          header: () => t('integrity_level'),
+          cell: info => {
+            const level = info.getValue();
+            if (!level) return '-';
+
+            return (
+              <CustomChip
+                label={level}
+                fullWidth
+                size="tiny"
+                color={integrityLevelColorMap[level] ?? undefined}
+                variant="outlined"
+                sx={{ textTransform: 'capitalize' }}
+              />
+            );
+          },
+          meta: {
+            cellSx: {
+              wordBreak: 'inherit !important',
+              color: theme.palette.text.secondary
+            }
+          }
+        }),
+        columnHelper.accessor('original_file_name', {
+          header: () => t('original_file_name'),
+          cell: info => info.getValue(),
+          meta: {
+            cellSx: {
+              wordBreak: 'inherit !important',
+              color: theme.palette.text.secondary
+            }
+          }
+        }),
+        columnHelper.accessor('ppid', {
+          header: () => t('ppid'),
+          cell: info => info.getValue() ?? '-',
+          meta: {
+            cellSx: {
+              wordBreak: 'inherit !important',
+              color: theme.palette.text.secondary
+            }
+          }
+        })
+      ],
+      [columnHelper, t, theme, startTime]
+    );
+
+    return (
+      <TableContainer
+        columns={columns}
+        data={data}
+        initialSorting={[{ id: 'start_time', desc: false }]}
+        printable={printable}
+        filterValue={filterValue}
+        onFilter={(row, value) => row.pid === value.pid}
+      />
+    );
+  }
+);
 
 /***
  * Netflow Table
@@ -484,64 +583,158 @@ const NetflowTable = React.memo(({ data = [], printable = false, startTime }: Ne
           }
         }
       }),
-      columnHelper.accessor('connection_type', {
-        header: () => t('type'),
-        cell: info => info.getValue()?.toUpperCase() ?? '',
-        meta: { cellSx: { textTransform: 'uppercase' } }
-      }),
       columnHelper.accessor('transport_layer_protocol', {
         header: () => t('protocol'),
-        cell: info => info.getValue()?.toUpperCase() ?? '',
+        cell: info => info.getValue(),
         meta: { cellSx: { textTransform: 'uppercase' } }
       }),
-      columnHelper.accessor(row => row.dns_details?.domain, {
-        id: 'domain',
-        header: () => t('sandbox_body.netflow.domain'),
-        cell: info => info.getValue() ?? '',
-        meta: { cellSx: {} }
-      }),
-      columnHelper.accessor(row => row.dns_details?.lookup_type, {
-        id: 'lookup_type',
-        header: () => t('sandbox_body.netflow.lookup_type'),
-        cell: info => info.getValue() ?? '',
-        meta: { cellSx: {} }
-      }),
+      // columnHelper.accessor('direction', {
+      //   header: () => t('direction'),
+      //   cell: info => info.getValue(),
+      //   meta: { cellSx: { textTransform: 'capitalize' } }
+      // }),
+      // columnHelper.accessor(row => row.dns_details?.domain, {
+      //   id: 'domain',
+      //   header: () => t('sandbox_body.netflow.domain'),
+      //   cell: info => info.getValue() ?? '',
+      //   meta: { cellSx: {} }
+      // }),
+      // columnHelper.accessor(row => row.dns_details?.lookup_type, {
+      //   id: 'lookup_type',
+      //   header: () => t('sandbox_body.netflow.lookup_type'),
+      //   cell: info => info.getValue() ?? '',
+      //   meta: { cellSx: {} }
+      // }),
 
-      columnHelper.group({
-        id: 'source',
-        header: () => t('source'),
-        columns: [
-          columnHelper.accessor('source_ip', {
-            header: () => t('ip'),
-            meta: { cellSx: {} }
-          }),
-          columnHelper.accessor('source_port', {
-            header: () => t('port'),
-            meta: { cellSx: {} }
-          })
-        ]
-      }),
-      columnHelper.group({
-        id: 'destination',
-        header: () => t('destination'),
-        columns: [
-          columnHelper.accessor('destination_ip', {
-            header: () => t('ip'),
-            meta: { cellSx: {} }
-          }),
-          columnHelper.accessor('destination_port', {
-            header: () => t('port'),
-            meta: { cellSx: {} }
-          })
-        ]
-      }),
+      // info.row.original.image,
 
-      columnHelper.accessor(row => row.pid, {
-        id: 'pid',
-        header: () => t('pid'),
-        cell: info => info.getValue() ?? '',
-        meta: { cellSx: { color: theme.palette.text.secondary } }
+      columnHelper.accessor('source_ip', {
+        header: () => t('source_ip'),
+        cell: info => (
+          <span style={{ wordBreak: 'inherit', whiteSpace: 'no-wrap' }}>
+            <span>{info.getValue() ?? ''}</span>
+            {info.row.original?.source_port && (
+              <span style={{ color: theme.palette.text.secondary }}>{` : ${info.row.original?.source_port}`}</span>
+            )}
+          </span>
+        ),
+        meta: { cellSx: { wordBreak: 'inherit', whiteSpace: 'no-wrap' } }
+      }),
+      columnHelper.accessor('destination_ip', {
+        header: () => t('destination_ip'),
+        cell: info => (
+          <span style={{ wordBreak: 'inherit', whiteSpace: 'no-wrap' }}>
+            <span>{info.getValue() ?? ''}</span>
+            {info.row.original?.source_port && (
+              <span style={{ color: theme.palette.text.secondary }}>{` : ${info.row.original?.destination_port}`}</span>
+            )}
+          </span>
+        ),
+        meta: { cellSx: { wordBreak: 'inherit', whiteSpace: 'no-wrap' } }
+      }),
+      columnHelper.accessor('connection_type', {
+        header: () => t('type'),
+        cell: info => info.getValue(),
+        meta: { cellSx: { textTransform: 'uppercase' } }
+      }),
+      columnHelper.accessor('connection_details', {
+        header: () => t('details'),
+        cell: info => {
+          const original = info.row.original;
+
+          const details =
+            (original.connection_type === 'dns' && original.dns_details) ||
+            (original.connection_type === 'smtp' && original.smtp_details) ||
+            (original.connection_type === 'http' && original.http_details) ||
+            original.dns_details ||
+            original.smtp_details ||
+            original.http_details ||
+            {};
+
+          switch (original.connection_type) {
+            case 'http':
+              return (
+                <table cellSpacing={0}>
+                  <tbody>
+                    <DetailTableRow isHeader label={t('request')} />
+                    <DetailTableRow label={t('uri')} value={original.http_details?.request_uri} />
+                    <DetailTableRow label={t('method')} value={original.http_details?.request_method} />
+                    <DetailTableRow label={t('headers')} value={original.http_details?.request_headers} />
+                    <DetailTableRow label={t('body')} value={original.http_details?.request_body} />
+                    <DetailTableRow isHeader label={t('response')} />
+                    <DetailTableRow label={t('status_code')} value={original.http_details?.response_status_code} />
+                    <DetailTableRow label={t('mimetype')} value={original.http_details?.response_content_mimetype} />
+                    <DetailTableRow label={t('fileinfo')} value={original.http_details?.response_content_fileinfo} />
+                    <DetailTableRow label={t('headers')} value={original.http_details?.response_headers} />
+                    <DetailTableRow label={t('body')} value={original.http_details?.response_body} />
+                  </tbody>
+                </table>
+              );
+
+            case 'smtp':
+              return (
+                <table cellSpacing={0}>
+                  <tbody>
+                    <DetailTableRow label={t('mail_from')} value={original.smtp_details?.mail_from} />
+                    <DetailTableRow label={t('mail_to')} value={original.smtp_details?.mail_to} />
+                    <DetailTableRow label={t('attachments')} value={original.smtp_details?.attachments} />
+                  </tbody>
+                </table>
+              );
+
+            case 'dns':
+              return (
+                <table cellSpacing={0}>
+                  <tbody>
+                    <DetailTableRow label={t('domain')} value={original.dns_details?.domain} />
+                    <DetailTableRow label={t('lookup_type')} value={original.dns_details?.lookup_type} />
+                    <DetailTableRow label={t('resolved_domains')} value={original.dns_details?.resolved_domains} />
+                    <DetailTableRow label={t('resolved_ips')} value={original.dns_details?.resolved_ips} />
+                  </tbody>
+                </table>
+              );
+          }
+
+          return <KVBody body={details} />;
+        },
+        meta: { colStyle: { width: '100%' }, cellSx: {} }
       })
+
+      // columnHelper.group({
+      //   id: 'source',
+      //   header: () => t('source'),
+      //   columns: [
+      //     columnHelper.accessor('source_ip', {
+      //       header: () => t('ip'),
+      //       meta: { cellSx: {} }
+      //     }),
+      //     columnHelper.accessor('source_port', {
+      //       header: () => t('port'),
+      //       meta: { cellSx: {} }
+      //     })
+      //   ]
+      // }),
+      // columnHelper.group({
+      //   id: 'destination',
+      //   header: () => t('destination'),
+      //   columns: [
+      //     columnHelper.accessor('destination_ip', {
+      //       header: () => t('ip'),
+      //       meta: { cellSx: {} }
+      //     }),
+      //     columnHelper.accessor('destination_port', {
+      //       header: () => t('port'),
+      //       meta: { cellSx: {} }
+      //     })
+      //   ]
+      // })
+
+      // columnHelper.accessor(row => row.pid, {
+      //   id: 'pid',
+      //   header: () => t('pid'),
+      //   cell: info => info.getValue() ?? '',
+      //   meta: { cellSx: { color: theme.palette.text.secondary } }
+      // })
       // columnHelper.accessor(row => row.process?.image, {
       //   id: 'process_name',
       //   header: () => t('process_name'),
@@ -785,7 +978,7 @@ export const SandboxBody = React.memo(({ body, force = false, printable = false 
   }, [body]);
 
   const handleProcessGraphClick = useCallback(
-    (event: React.MouseEvent<HTMLDivElement, MouseEvent>, item: ProcessItem) => {
+    (event: React.MouseEvent<HTMLButtonElement, MouseEvent>, item: ProcessItem) => {
       setFilterValue(prev => (prev && prev.pid === item.pid ? undefined : item));
     },
     []
