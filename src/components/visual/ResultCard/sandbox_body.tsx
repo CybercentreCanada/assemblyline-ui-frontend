@@ -1,6 +1,5 @@
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import type { SvgIconProps } from '@mui/material';
-import { alpha, Button, Collapse, List, ListItem, styled, Typography, useTheme } from '@mui/material';
+import { alpha, Button, Collapse, List, ListItem, Typography, useTheme } from '@mui/material';
 import type { ColumnDef } from '@tanstack/react-table';
 import { createColumnHelper } from '@tanstack/react-table';
 import useALContext from 'components/hooks/useALContext';
@@ -21,8 +20,7 @@ import { TabContainer } from 'components/visual/TabContainer';
 import TitleKey from 'components/visual/TitleKey';
 import Verdict from 'components/visual/Verdict';
 import type { PossibleColor } from 'helpers/colors';
-import type { FC } from 'react';
-import React, { memo, useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 type DetailTableCellValueProps = {
@@ -30,15 +28,17 @@ type DetailTableCellValueProps = {
 };
 
 const DetailTableCellValue = React.memo(({ value = null }: DetailTableCellValueProps) => {
-  if (Array.isArray(value)) {
-    return value.length > 0 ? <>{value.join(' | ')}</> : null;
-  }
-
-  if (value && typeof value === 'object') {
-    return Object.keys(value).length > 0 ? <KVBody body={value} /> : null;
-  }
-
-  return value ? <>{value}</> : null;
+  if (Array.isArray(value))
+    return (
+      <>
+        {value.map((v, i) => (
+          <DetailTableCellValue key={i} value={v} />
+        ))}
+      </>
+    );
+  if (value && typeof value === 'object') return Object.keys(value).length > 0 ? <KVBody body={value} /> : null;
+  if (value === null || value === undefined) return null;
+  return <>{String(value)}</>;
 });
 
 type DetailTableRowProps = {
@@ -82,26 +82,6 @@ const DetailTableRow = React.memo(({ label, value, isHeader = false }: DetailTab
 /***
  * Process Graph
  */
-const CounterItem = memo(
-  styled('div')(({ theme }) => ({
-    display: 'flex',
-    justifyContent: 'space-between',
-    padding: theme.spacing(0.25),
-    width: '100%',
-    alignItems: 'center'
-  }))
-);
-
-type CounterImgProps = SvgIconProps & {
-  component: FC<SvgIconProps>;
-};
-
-const CounterImg = memo(
-  styled(({ component: Component, ...props }: CounterImgProps) => <Component {...props} />)(({ theme }) => ({
-    height: theme.spacing(2.25)
-  }))
-);
-
 type ProcessItem = SandboxProcessItem & {
   children?: ProcessItem[];
 };
@@ -598,25 +578,6 @@ const NetflowTable = React.memo(({ data = [], printable = false, startTime }: Ne
         cell: info => info.getValue(),
         meta: { cellSx: { textTransform: 'uppercase' } }
       }),
-      // columnHelper.accessor('direction', {
-      //   header: () => t('direction'),
-      //   cell: info => info.getValue(),
-      //   meta: { cellSx: { textTransform: 'capitalize' } }
-      // }),
-      // columnHelper.accessor(row => row.dns_details?.domain, {
-      //   id: 'domain',
-      //   header: () => t('sandbox_body.netflow.domain'),
-      //   cell: info => info.getValue() ?? '',
-      //   meta: { cellSx: {} }
-      // }),
-      // columnHelper.accessor(row => row.dns_details?.lookup_type, {
-      //   id: 'lookup_type',
-      //   header: () => t('sandbox_body.netflow.lookup_type'),
-      //   cell: info => info.getValue() ?? '',
-      //   meta: { cellSx: {} }
-      // }),
-
-      // info.row.original.image,
 
       columnHelper.accessor('source_ip', {
         header: () => t('source_ip'),
@@ -709,48 +670,6 @@ const NetflowTable = React.memo(({ data = [], printable = false, startTime }: Ne
         },
         meta: { colStyle: { width: '100%' }, cellSx: {} }
       })
-
-      // columnHelper.group({
-      //   id: 'source',
-      //   header: () => t('source'),
-      //   columns: [
-      //     columnHelper.accessor('source_ip', {
-      //       header: () => t('ip'),
-      //       meta: { cellSx: {} }
-      //     }),
-      //     columnHelper.accessor('source_port', {
-      //       header: () => t('port'),
-      //       meta: { cellSx: {} }
-      //     })
-      //   ]
-      // }),
-      // columnHelper.group({
-      //   id: 'destination',
-      //   header: () => t('destination'),
-      //   columns: [
-      //     columnHelper.accessor('destination_ip', {
-      //       header: () => t('ip'),
-      //       meta: { cellSx: {} }
-      //     }),
-      //     columnHelper.accessor('destination_port', {
-      //       header: () => t('port'),
-      //       meta: { cellSx: {} }
-      //     })
-      //   ]
-      // })
-
-      // columnHelper.accessor(row => row.pid, {
-      //   id: 'pid',
-      //   header: () => t('pid'),
-      //   cell: info => info.getValue() ?? '',
-      //   meta: { cellSx: { color: theme.palette.text.secondary } }
-      // })
-      // columnHelper.accessor(row => row.process?.image, {
-      //   id: 'process_name',
-      //   header: () => t('process_name'),
-      //   cell: info => info.getValue()?.split(/[/\\]/).pop() ?? '',
-      //   meta: { cellSx: {} }
-      // })
     ],
     [columnHelper, t, theme, startTime]
   );
