@@ -12,8 +12,8 @@ import {
 } from 'components/visual/Inputs/lib/inputs.components';
 import {
   useErrorCallback,
-  useInputBlur,
   useInputClick,
+  useInputClickBlur,
   useInputFocus,
   usePropID
 } from 'components/visual/Inputs/lib/inputs.hook';
@@ -37,7 +37,7 @@ const WrappedSwitchInput = () => {
   const tooltipProps = get('tooltipProps');
   const value = get('value');
 
-  const handleBlur = useInputBlur<SwitchInputProps>();
+  const handleBlur = useInputClickBlur<SwitchInputProps>();
   const handleClick = useInputClick<SwitchInputProps>();
   const handleFocus = useInputFocus<SwitchInputProps>();
 

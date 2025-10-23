@@ -244,3 +244,22 @@ export const useInputBlur = <
     [handleChange, onBlur, setStore]
   );
 };
+
+export const useInputClickBlur = <
+  Props extends InputValues<unknown, unknown> & InputProps & InputStates & Record<string, unknown>
+>() => {
+  const [get, setStore] = usePropStore();
+
+  const error = useError();
+  const onBlur = get('onBlur');
+
+  return useCallback(
+    (event: React.FocusEvent, inputValue: Props['inputValue'], value: Props['value']) => {
+      onBlur(event);
+
+      const errorMessage = error(value);
+      setStore(() => ({ focused: false, errorMessage, inputValue, value }));
+    },
+    [error, onBlur, setStore]
+  );
+};

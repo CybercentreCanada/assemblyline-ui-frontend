@@ -13,8 +13,8 @@ import {
 } from 'components/visual/Inputs/lib/inputs.components';
 import {
   useErrorCallback,
-  useInputBlur,
   useInputClick,
+  useInputClickBlur,
   useInputFocus,
   usePropID
 } from 'components/visual/Inputs/lib/inputs.hook';
@@ -41,7 +41,7 @@ const WrappedCheckboxInput = () => {
   const tooltipProps = get('tooltipProps');
   const value = get('value');
 
-  const handleBlur = useInputBlur<CheckboxInputProps>();
+  const handleBlur = useInputClickBlur<CheckboxInputProps>();
   const handleClick = useInputClick<CheckboxInputProps>();
   const handleFocus = useInputFocus<CheckboxInputProps>();
 
