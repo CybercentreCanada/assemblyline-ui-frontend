@@ -14,8 +14,8 @@ import {
 } from 'components/visual/Inputs/lib/inputs.components';
 import {
   useErrorCallback,
-  useInputBlur,
   useInputChange,
+  useInputClickBlur,
   useInputFocus
 } from 'components/visual/Inputs/lib/inputs.hook';
 import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
@@ -46,7 +46,7 @@ const WrappedRadioInput = <O extends readonly Option[]>() => {
   const readOnly = get('readOnly');
   const value = get('value');
 
-  const handleBlur = useInputBlur<RadioInputProps<O>>();
+  const handleBlur = useInputClickBlur<RadioInputProps<O>>();
   const handleChange = useInputChange<RadioInputProps<O>>();
   const handleFocus = useInputFocus<RadioInputProps<O>>();
 
