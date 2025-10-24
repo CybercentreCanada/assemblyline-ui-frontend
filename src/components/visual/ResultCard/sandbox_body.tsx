@@ -1,5 +1,20 @@
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import { alpha, Button, Collapse, List, ListItem, Typography, useTheme } from '@mui/material';
+import FingerprintOutlinedIcon from '@mui/icons-material/FingerprintOutlined';
+import InsertDriveFileOutlinedIcon from '@mui/icons-material/InsertDriveFileOutlined';
+import SettingsEthernetOutlinedIcon from '@mui/icons-material/SettingsEthernetOutlined';
+import WidgetsOutlinedIcon from '@mui/icons-material/WidgetsOutlined';
+import {
+  alpha,
+  Button,
+  Card,
+  CardContent,
+  Collapse,
+  List,
+  ListItem,
+  Tooltip,
+  Typography,
+  useTheme
+} from '@mui/material';
 import type { ColumnDef } from '@tanstack/react-table';
 import { createColumnHelper } from '@tanstack/react-table';
 import useALContext from 'components/hooks/useALContext';
@@ -73,7 +88,7 @@ const DetailTableRow = React.memo(({ label, value, isHeader = false, children = 
     return (
       <tr>
         <td style={{ paddingRight: '16px', wordBreak: 'normal' }}>
-          <TitleKey title={label || ''} />{' '}
+          <TitleKey title={label || ''} />
         </td>
         <td>{children ?? <DetailTableCellValue value={value} />}</td>
       </tr>
@@ -98,6 +113,7 @@ type ProcessTreeItemProps = {
 
 const ProcessTreeItem = React.memo(
   ({ body, item, depth = 0, printable = false, filterValue, onClick = () => null }: ProcessTreeItemProps) => {
+    const { t } = useTranslation('resultCard');
     const theme = useTheme();
     const { showSafeResults } = useSafeResults();
     const { scoreToVerdict } = useALContext();
@@ -182,13 +198,50 @@ const ProcessTreeItem = React.memo(
       scoreToVerdict
     ]);
 
+    const integrityLevelColorMap = useMemo<Record<string, PossibleColor>>(
+      () => ({
+        system: 'primary',
+        high: 'success',
+        medium: 'warning',
+        low: 'error'
+      }),
+      []
+    );
+
     const handleToggle = useCallback(() => setOpen(o => !o), []);
+
+    const rows = [
+      {
+        label: 'Signature count',
+        icon: <FingerprintOutlinedIcon fontSize="small" />,
+        count: body.signatures?.filter(v => v.pid === item.pid)?.length || 0,
+        tooltip: `${body.signatures?.filter(v => v.pid === item.pid)?.length || 0} ${t('process_signatures')}`
+      },
+      {
+        label: 'Network flow count',
+        icon: <SettingsEthernetOutlinedIcon fontSize="small" />,
+        count: body.netflows?.filter(v => v.pid === item.pid)?.length || 0,
+        tooltip: `${body.netflows?.filter(v => v.pid === item.pid)?.length || 0} ${t('process_network')}`
+      },
+      {
+        label: 'File count',
+        icon: <InsertDriveFileOutlinedIcon fontSize="small" />,
+        count: item.file_count || 0,
+        tooltip: `${item.file_count} ${t('process_file')}`
+      },
+      {
+        label: 'Registry count',
+        icon: <WidgetsOutlinedIcon fontSize="small" />,
+        count: item.registry_count || 0,
+        tooltip: `${item.registry_count} ${t('process_registry')}`
+      }
+    ];
 
     return (
       <>
         <ListItem
           sx={{
-            pl: depth * 3,
+            // pl: depth * 3,
             pr: 0,
             py: 0.5,
             display: 'grid',
@@ -204,7 +257,8 @@ const ProcessTreeItem = React.memo(
               sx={{
                 height: '100%',
                 padding: '0px',
-                minWidth: theme.spacing(3)
+                minWidth: theme.spacing((depth + 1) * 3),
+                justifyContent: 'flex-end'
               }}
             >
               <ChevronRightIcon
@@ -216,54 +270,71 @@ const ProcessTreeItem = React.memo(
               />
             </Button>
           ) : (
-            <div style={{ width: theme.spacing(4) }} />
+            <div style={{ width: theme.spacing((depth + 1) * 3) }} />
           )}
 
-          <Button
-            color="inherit"
-            onClick={e => onClick(e, item)}
-            sx={{
-              // alignSelf: 'stretch',
-              alignItems: 'center',
-              justifyContent: 'start',
-              width: '100%',
-              padding: '0px',
-              textTransform: 'none'
-              // border: `1px solid ${theme.palette.divider}`,
-              // backgroundColor: theme.palette.background.paper,
-              // '&:hover': {
-              //   backgroundColor: alpha(theme.palette.text.primary, 0.15)
-              // }
-            }}
-          >
-            <Typography
-              variant="body1"
-              sx={{
-                // backgroundColor: alpha(theme.palette.text.primary, 0.15),
-                borderRadius: theme.spacing(0.4),
-                minWidth: theme.spacing(6)
+          <Card>
+            <CardContent
+              component={Button}
+              color="inherit"
+              style={{
+                textTransform: 'none',
+                width: '100%',
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'stretch',
+                justifyContent: 'flex-start',
+                columnGap: theme.spacing(1),
+                padding: 'inherit'
               }}
             >
-              {item.pid}
-            </Typography>
+              <div style={{ backgroundColor: theme.palette.grey[800], minWidth: theme.spacing(5) }}>{item.pid}</div>
 
-            <Typography fontStyle="bold" variant="body1" sx={{ margin: `0 ${theme.spacing(1)}` }}>
-              {item.image?.split(/[/\\]/).pop() ?? ''}
-            </Typography>
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+                <Typography component="div" variant="body2">
+                  {item.image?.split(/[/\\]/).pop() ?? ''}
+                </Typography>
+                <Typography
+                  component="div"
+                  color="textSecondary"
+                  fontFamily="monospace"
+                  variant="body2"
+                  textAlign="start"
+                >
+                  {item.command_line}
+                </Typography>
+              </div>
 
-            <Typography color="textSecondary" fontFamily="monospace" variant="body2">
-              {item.command_line}
-            </Typography>
-          </Button>
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'flex-start',
+                  columnGap: theme.spacing(0.5),
+                  paddingTop: theme.spacing(0.5),
+                  paddingRight: theme.spacing(0.5)
+                }}
+              >
+                {rows
+                  .filter(row => row.count > 0)
+                  .map((row, idx) => (
+                    <Tooltip key={idx} title={row.tooltip}>
+                      <CustomChip
+                        label={row.count}
+                        icon={row.icon}
+                        size="tiny"
+                        variant="outlined"
+                        sx={{ columnGap: theme.spacing(1) }}
+                      />
+                    </Tooltip>
+                  ))}
+              </div>
+            </CardContent>
+          </Card>
         </ListItem>
 
         {hasChildren && (
-          <Collapse
-            in={open}
-            timeout={theme.transitions.duration.shortest}
-            easing={theme.transitions.easing.sharp}
-            unmountOnExit
-          >
+          <Collapse in={open} timeout={theme.transitions.duration.shortest} easing={theme.transitions.easing.sharp}>
             <List disablePadding>
               {item.children.map(child => (
                 <ProcessTreeItem
