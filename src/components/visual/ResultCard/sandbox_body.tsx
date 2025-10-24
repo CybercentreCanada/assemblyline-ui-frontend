@@ -11,6 +11,7 @@ import type {
   SandboxProcessItem,
   SandboxSignatureItem
 } from 'components/models/base/result_body';
+import ActionableCustomChip from 'components/visual/ActionableCustomChip';
 import AutoHideTagList from 'components/visual/AutoHideTagList';
 import Classification from 'components/visual/Classification';
 import { CustomChip } from 'components/visual/CustomChip';
@@ -45,16 +46,18 @@ type DetailTableRowProps = {
   label?: string;
   value?: unknown;
   isHeader?: boolean;
+  children?: React.ReactNode;
 };
 
-const DetailTableRow = React.memo(({ label, value, isHeader = false }: DetailTableRowProps) => {
+const DetailTableRow = React.memo(({ label, value, isHeader = false, children = null }: DetailTableRowProps) => {
   const theme = useTheme();
 
   const showValue = useMemo(() => {
+    if (children) return true;
     if (Array.isArray(value)) return value.length > 0;
     if (value && typeof value === 'object') return Object.keys(value).length > 0;
     return !!value;
-  }, [value]);
+  }, [children, value]);
 
   if (isHeader) {
     return (
@@ -70,11 +73,9 @@ const DetailTableRow = React.memo(({ label, value, isHeader = false }: DetailTab
     return (
       <tr>
         <td style={{ paddingRight: '16px', wordBreak: 'normal' }}>
-          <TitleKey title={label || ''} />
+          <TitleKey title={label || ''} />{' '}
         </td>
-        <td>
-          <DetailTableCellValue value={value} />
-        </td>
+        <td>{children ?? <DetailTableCellValue value={value} />}</td>
       </tr>
     );
 });
@@ -189,7 +190,7 @@ const ProcessTreeItem = React.memo(
           sx={{
             pl: depth * 3,
             pr: 0,
-            py: 0.25,
+            py: 0.5,
             display: 'grid',
             gridTemplateColumns: 'auto 1fr',
             alignItems: 'center'
@@ -227,18 +228,18 @@ const ProcessTreeItem = React.memo(
               justifyContent: 'start',
               width: '100%',
               padding: '0px',
-              textTransform: 'none',
-              border: `1px solid ${theme.palette.divider}`,
-              backgroundColor: theme.palette.background.paper,
-              '&:hover': {
-                backgroundColor: alpha(theme.palette.text.primary, 0.15)
-              }
+              textTransform: 'none'
+              // border: `1px solid ${theme.palette.divider}`,
+              // backgroundColor: theme.palette.background.paper,
+              // '&:hover': {
+              //   backgroundColor: alpha(theme.palette.text.primary, 0.15)
+              // }
             }}
           >
             <Typography
               variant="body1"
               sx={{
-                backgroundColor: alpha(theme.palette.text.primary, 0.15),
+                // backgroundColor: alpha(theme.palette.text.primary, 0.15),
                 borderRadius: theme.spacing(0.4),
                 minWidth: theme.spacing(6)
               }}
@@ -253,84 +254,6 @@ const ProcessTreeItem = React.memo(
             <Typography color="textSecondary" fontFamily="monospace" variant="body2">
               {item.command_line}
             </Typography>
-
-            {/* <div
-              style={{
-                padding: 5,
-                backgroundColor: theme.palette.mode === 'dark' ? '#FFFFFF10' : '#00000010',
-                borderRadius: '4px 0 0 4px',
-                minWidth: 50,
-                textAlign: 'center'
-              }}
-            >
-              {item.pid}
-            </div>
-
-
-            <div style={{ padding: 5, flexGrow: 1, wordBreak: 'break-word' }}>
-              <div style={{ paddingBottom: 4 }}>
-                <b>{item.image?.split(/[/\\]/).pop() ?? ''}</b>
-              </div>
-              {item.command_line && (
-                <samp>
-                  <small>{item.image ?? item.command_line}</small>
-                </samp>
-              )}
-            </div>
-
-
-            {hasValues ? (
-              <div
-                style={{
-                  backgroundColor: theme.palette.mode === 'dark' ? '#FFFFFF10' : '#00000010',
-                  color: theme.palette.text.secondary,
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'flex-end',
-                  justifyContent: 'center',
-                  padding: '5px 8px',
-                  fontSize: '90%',
-                  gap: 4,
-                  minWidth: theme.spacing(6)
-                }}
-              >
-                {signatures && Object.keys(signatures).length > 0 && (
-                  <Tooltip
-                    placement="left"
-                    title={`${Object.keys(signatures).length} signatures (${signatures.map(x => x.name).join(' | ')})`}
-                  >
-                    <CounterItem>
-                      <CounterImg component={FingerprintOutlinedIcon} />
-                      <span>{humanReadableNumber(Object.keys(signatures).length)}</span>
-                    </CounterItem>
-                  </Tooltip>
-                )}
-                {networkCount ? (
-                  <Tooltip placement="left" title={`${networkCount} network events`}>
-                    <CounterItem>
-                      <CounterImg component={SettingsEthernetOutlinedIcon} />
-                      <span>{humanReadableNumber(networkCount)}</span>
-                    </CounterItem>
-                  </Tooltip>
-                ) : null}
-                {fileCount ? (
-                  <Tooltip placement="left" title={`${fileCount} file operations`}>
-                    <CounterItem>
-                      <CounterImg component={InsertDriveFileOutlinedIcon} />
-                      <span>{humanReadableNumber(fileCount)}</span>
-                    </CounterItem>
-                  </Tooltip>
-                ) : null}
-                {registryCount ? (
-                  <Tooltip placement="left" title={`${registryCount} registry changes`}>
-                    <CounterItem>
-                      <CounterImg component={WidgetsOutlinedIcon} />
-                      <span>{humanReadableNumber(registryCount)}</span>
-                    </CounterItem>
-                  </Tooltip>
-                ) : null}
-              </div>
-            ) : null} */}
           </Button>
         </ListItem>
 
@@ -389,15 +312,8 @@ const ProcessGraph = React.memo(
     const processTree = useMemo(() => (processes ? buildProcessTree(processes) : []), [buildProcessTree, processes]);
 
     return (
-      <div
-        style={{
-          overflowX: 'auto',
-          maxHeight: printable ? 'auto' : 750,
-          borderRadius: theme.spacing(1),
-          padding: theme.spacing(1)
-        }}
-      >
-        <List disablePadding>
+      <div style={{ overflowX: 'auto', maxHeight: printable ? 'auto' : 750 }}>
+        <List disablePadding dense>
           {processTree?.map(item => (
             <ProcessTreeItem key={item.pid} body={body} item={item} filterValue={filterValue} onClick={onClick} />
           ))}
@@ -580,28 +496,42 @@ const NetflowTable = React.memo(({ data = [], printable = false, startTime }: Ne
       }),
 
       columnHelper.accessor('source_ip', {
-        header: () => t('source_ip'),
-        cell: info => (
-          <span style={{ wordBreak: 'inherit', whiteSpace: 'no-wrap' }}>
-            <span>{info.getValue() ?? ''}</span>
-            {info.row.original?.source_port && (
-              <span style={{ color: theme.palette.text.secondary }}>{` : ${info.row.original?.source_port}`}</span>
-            )}
-          </span>
-        ),
-        meta: { cellSx: { wordBreak: 'inherit', whiteSpace: 'no-wrap' } }
+        header: () => t('source'),
+        cell: info =>
+          info.getValue() && (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <ActionableCustomChip
+                category="tag"
+                data_type="network.static.ip"
+                label={info.getValue()}
+                size="tiny"
+                variant="outlined"
+              />
+              {info.row.original?.source_port && (
+                <div style={{ color: theme.palette.text.secondary }}>{` : ${info.row.original?.source_port}`}</div>
+              )}
+            </div>
+          ),
+        meta: { cellSx: {} }
       }),
       columnHelper.accessor('destination_ip', {
-        header: () => t('destination_ip'),
-        cell: info => (
-          <span style={{ wordBreak: 'inherit', whiteSpace: 'no-wrap' }}>
-            <span>{info.getValue() ?? ''}</span>
-            {info.row.original?.source_port && (
-              <span style={{ color: theme.palette.text.secondary }}>{` : ${info.row.original?.destination_port}`}</span>
-            )}
-          </span>
-        ),
-        meta: { cellSx: { wordBreak: 'inherit', whiteSpace: 'no-wrap' } }
+        header: () => t('destination'),
+        cell: info =>
+          info.getValue() && (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <ActionableCustomChip
+                category="tag"
+                data_type="network.static.ip"
+                label={info.getValue()}
+                size="tiny"
+                variant="outlined"
+              />
+              {info.row.original?.source_port && (
+                <div style={{ color: theme.palette.text.secondary }}>{` : ${info.row.original?.destination_port}`}</div>
+              )}
+            </div>
+          ),
+        meta: { cellSx: {} }
       }),
       columnHelper.accessor('connection_type', {
         header: () => t('type'),
@@ -907,9 +837,8 @@ export const SandboxBody = React.memo(({ body, force = false, printable = false 
   }, [body]);
 
   const handleProcessGraphClick = useCallback(
-    (event: React.MouseEvent<HTMLButtonElement, MouseEvent>, item: ProcessItem) => {
-      setFilterValue(prev => (prev && prev.pid === item.pid ? undefined : item));
-    },
+    (event: React.MouseEvent<HTMLButtonElement, MouseEvent>, item: ProcessItem) =>
+      setFilterValue(prev => (prev && prev.pid === item.pid ? undefined : item)),
     []
   );
 
@@ -956,17 +885,17 @@ export const SandboxBody = React.memo(({ body, force = false, printable = false 
               inner: <NetflowTable data={body.netflows} startTime={startTime} printable={printable} />
             }
           }),
-          ...(body.heuristics?.length && {
-            heuristics: {
-              label: (
-                <div style={{ display: 'flex', alignItems: 'center', columnGap: theme.spacing(1) }}>
-                  {t('sandbox_body.tab.heuristics')}
-                  <CustomChip label={body.heuristics.length} color="secondary" size="tiny" />
-                </div>
-              ),
-              inner: <HeuristicsTable data={body.heuristics} printable={printable} />
-            }
-          }),
+          // ...(body.heuristics?.length && {
+          //   heuristics: {
+          //     label: (
+          //       <div style={{ display: 'flex', alignItems: 'center', columnGap: theme.spacing(1) }}>
+          //         {t('sandbox_body.tab.heuristics')}
+          //         <CustomChip label={body.heuristics.length} color="secondary" size="tiny" />
+          //       </div>
+          //     ),
+          //     inner: <HeuristicsTable data={body.heuristics} printable={printable} />
+          //   }
+          // }),
           ...(body.signatures.length && {
             signature: {
               label: (
