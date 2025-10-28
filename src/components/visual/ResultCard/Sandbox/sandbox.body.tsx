@@ -30,7 +30,7 @@ import ActionableCustomChip from 'components/visual/ActionableCustomChip';
 import AutoHideTagList from 'components/visual/AutoHideTagList';
 import Classification from 'components/visual/Classification';
 import { CustomChip } from 'components/visual/CustomChip';
-import { TableContainer } from 'components/visual/ResultCard/components/TableContainer';
+import { TableContainer } from 'components/visual/ResultCard/Sandbox/components/TableContainer';
 import { KVBody } from 'components/visual/ResultCard/kv_body';
 import { TabContainer } from 'components/visual/TabContainer';
 import TitleKey from 'components/visual/TitleKey';
@@ -114,7 +114,7 @@ type ProcessTreeItemProps = {
 
 const ProcessTreeItem = React.memo(
   ({ body, item, depth = 0, printable = false, filterValue, onClick = () => null }: ProcessTreeItemProps) => {
-    const { t } = useTranslation('resultCard');
+    const { t } = useTranslation('sandboxResult');
     const theme = useTheme();
     const { showSafeResults } = useSafeResults();
     const { scoreToVerdict } = useALContext();
@@ -467,7 +467,7 @@ type ProcessTableProps = {
 
 const ProcessTable = React.memo(
   ({ data = [], printable = false, startTime, filterValue, onFilter = () => null }: ProcessTableProps) => {
-    const { t } = useTranslation('resultCard');
+    const { t } = useTranslation('sandboxResult');
     const theme = useTheme();
     const columnHelper = createColumnHelper<SandboxProcessItem>();
 
@@ -597,7 +597,7 @@ type NetflowTableProps = {
 };
 
 const NetflowTable = React.memo(({ data = [], printable = false, startTime }: NetflowTableProps) => {
-  const { t } = useTranslation('resultCard');
+  const { t } = useTranslation('sandboxResult');
   const theme = useTheme();
   const columnHelper = createColumnHelper<SandboxNetflowItem>();
 
@@ -757,7 +757,7 @@ type HeuristicsTableProps = {
 };
 
 const HeuristicsTable = React.memo(({ data = [], printable = false, force }: HeuristicsTableProps) => {
-  const { t } = useTranslation('resultCard');
+  const { t } = useTranslation('sandboxResult');
   const columnHelper = createColumnHelper<FlatHeuristics>();
 
   const flatData = useMemo<FlatHeuristics[]>(
@@ -851,7 +851,7 @@ type SignatureTableProps = {
 
 const SignatureTable = React.memo(
   ({ data = [], heuristics = [], printable = false, force, filterValue }: SignatureTableProps) => {
-    const { t } = useTranslation('resultCard');
+    const { t } = useTranslation('sandboxResult');
     const theme = useTheme();
     const columnHelper = createColumnHelper<FlatSignatures>();
 
@@ -989,7 +989,7 @@ export type SandboxBodyProps = {
 
 export const SandboxBody = React.memo(({ body, force = false, printable = false }: SandboxBodyProps) => {
   const theme = useTheme();
-  const { t } = useTranslation('resultCard');
+  const { t } = useTranslation('sandboxResult');
 
   const [filterValue, setFilterValue] = useState<SandboxProcessItem | undefined>(undefined);
 

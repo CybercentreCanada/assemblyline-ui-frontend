@@ -34,7 +34,7 @@ import { MemDumpBody } from 'components/visual/ResultCard/memdump_body';
 import { MultiBody } from 'components/visual/ResultCard/multi_body';
 import { OrderedKVBody } from 'components/visual/ResultCard/ordered_kv_body';
 import { ProcessTreeBody } from 'components/visual/ResultCard/process_tree_body';
-import { SandboxBody } from 'components/visual/ResultCard/sandbox_body';
+import { SandboxBody } from 'components/visual/ResultCard/Sandbox/sandbox.body';
 import { TblBody } from 'components/visual/ResultCard/table_body';
 import { TextBody } from 'components/visual/ResultCard/text_body';
 import { TimelineBody } from 'components/visual/ResultCard/timeline_body';
