@@ -36,6 +36,7 @@ import { TabContainer } from 'components/visual/TabContainer';
 import TitleKey from 'components/visual/TitleKey';
 import Verdict from 'components/visual/Verdict';
 import type { PossibleColor } from 'helpers/colors';
+import { humanReadableNumber } from 'helpers/utils';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -119,84 +120,9 @@ const ProcessTreeItem = React.memo(
     const { scoreToVerdict } = useALContext();
 
     const [open, setOpen] = useState<boolean>(false);
+    const [detailsOpen, setDetailsOpen] = useState<boolean>(false);
 
     const hasChildren = useMemo<boolean>(() => !!item.children?.length, [item.children?.length]);
-
-    const networks = useMemo<SandboxNetflowItem[]>(
-      () => body?.netflows?.filter(x => x?.pid === item?.pid) ?? [],
-      [body?.netflows, item?.pid]
-    );
-
-    const signatures = useMemo<SandboxSignatureItem[]>(
-      () => body?.signatures?.filter(x => x?.pid === item?.pid) ?? [],
-      [body?.signatures, item?.pid]
-    );
-
-    const networkCount = useMemo<number>(() => 0, []);
-
-    const fileCount = useMemo<number>(() => 0, []);
-
-    const registryCount = useMemo<number>(() => 0, []);
-
-    const hasValues = useMemo<boolean>(
-      () => networks.length > 0 || signatures.length > 0 || networkCount > 0 || fileCount > 0 || registryCount > 0,
-      [fileCount, networkCount, networks.length, registryCount, signatures.length]
-    );
-
-    const backgroundStyle = useMemo(() => {
-      const dark = theme.palette.mode === 'dark';
-
-      if (filterValue?.pid === item?.pid) {
-        return {
-          backgroundColor: dark ? theme.palette.primary.dark : theme.palette.primary.light,
-          hover: dark ? alpha(theme.palette.primary.light, 0.25) : alpha(theme.palette.primary.main, 0.15),
-          print: theme.palette.primary.light
-        };
-      }
-
-      if (item.integrity_level === 'system') {
-        return {
-          backgroundColor: dark ? '#254e25' : '#d0ffd0',
-          hover: dark ? '#355e35' : '#c0efc0',
-          print: '#d0ffd0'
-        };
-      }
-
-      const score = Object.keys(signatures ?? {}).reduce((sum, key) => sum + parseFloat(signatures?.[key] || '0'), 0);
-      const verdict = scoreToVerdict(score);
-
-      switch (verdict) {
-        case 'malicious':
-          return {
-            backgroundColor: dark ? '#4e2525' : '#ffd0d0',
-            hover: dark ? '#5e3535' : '#efc0c0',
-            print: '#ffd0d0'
-          };
-        case 'highly_suspicious':
-        case 'suspicious':
-          return {
-            backgroundColor: dark ? '#654312' : '#ffedd4',
-            hover: dark ? '#755322' : '#efddc4',
-            print: '#ffedd4'
-          };
-        default:
-          return {
-            backgroundColor: dark ? '#FFFFFF10' : '#00000010',
-            hover: dark ? '#FFFFFF20' : '#00000020',
-            print: '#FFFFFF10'
-          };
-      }
-    }, [
-      theme.palette.mode,
-      theme.palette.primary.dark,
-      theme.palette.primary.light,
-      theme.palette.primary.main,
-      filterValue?.pid,
-      item?.pid,
-      item.integrity_level,
-      signatures,
-      scoreToVerdict
-    ]);
 
     const integrityLevelColorMap = useMemo<Record<string, PossibleColor>>(
       () => ({
@@ -210,32 +136,137 @@ const ProcessTreeItem = React.memo(
 
     const handleToggle = useCallback(() => setOpen(o => !o), []);
 
-    const rows = [
-      {
-        label: 'Signature count',
-        icon: <FingerprintOutlinedIcon fontSize="small" />,
-        count: body.signatures?.filter(v => v.pid === item.pid)?.length || 0,
-        tooltip: `${body.signatures?.filter(v => v.pid === item.pid)?.length || 0} ${t('process_signatures')}`
+    const rows = useMemo(
+      () => [
+        {
+          label: 'Signature count',
+          icon: <FingerprintOutlinedIcon style={{ fontSize: 'large' }} />,
+          count: body.signatures?.filter(v => v.pid === item.pid)?.length || 0,
+          tooltip: `${body.signatures?.filter(v => v.pid === item.pid)?.length || 0} ${t('process_signatures')}`
+        },
+        {
+          label: 'Network flow count',
+          icon: <SettingsEthernetOutlinedIcon style={{ fontSize: 'large' }} />,
+          count: body.netflows?.filter(v => v.pid === item.pid)?.length || 0,
+          tooltip: `${body.netflows?.filter(v => v.pid === item.pid)?.length || 0} ${t('process_network')}`
+        },
+        {
+          label: 'File count',
+          icon: <InsertDriveFileOutlinedIcon style={{ fontSize: 'large' }} />,
+          count: item.file_count || 0,
+          tooltip: `${item.file_count} ${t('process_file')}`
+        },
+        {
+          label: 'Registry count',
+          icon: <WidgetsOutlinedIcon style={{ fontSize: 'large' }} />,
+          count: item.registry_count || 0,
+          tooltip: `${item.registry_count} ${t('process_registry')}`
+        }
+      ],
+      [body.netflows, body.signatures, item.file_count, item.pid, item.registry_count, t]
+    );
+
+    const getProcessHeuristicScore = useCallback(
+      (
+        process: ProcessItem,
+        signatures: SandboxSignatureItem[],
+        heuristics: SandboxHeuristicItem[] = []
+      ): number | null => {
+        if (!process.pid) return null;
+        if (process.safelisted) return 0;
+
+        const matching = signatures.filter(sig => sig.pid === process.pid && sig.heuristic);
+        if (matching.length === 0) return null;
+
+        let maxScore = -Infinity;
+
+        for (const sig of matching) {
+          const heur = heuristics.find(h => h.heur_id === sig.heuristic);
+          if (heur && heur.score > maxScore) maxScore = heur.score;
+        }
+
+        return maxScore === -Infinity ? null : maxScore;
       },
-      {
-        label: 'Network flow count',
-        icon: <SettingsEthernetOutlinedIcon fontSize="small" />,
-        count: body.netflows?.filter(v => v.pid === item.pid)?.length || 0,
-        tooltip: `${body.netflows?.filter(v => v.pid === item.pid)?.length || 0} ${t('process_network')}`
-      },
-      {
-        label: 'File count',
-        icon: <InsertDriveFileOutlinedIcon fontSize="small" />,
-        count: item.file_count || 0,
-        tooltip: `${item.file_count} ${t('process_file')}`
-      },
-      {
-        label: 'Registry count',
-        icon: <WidgetsOutlinedIcon fontSize="small" />,
-        count: item.registry_count || 0,
-        tooltip: `${item.registry_count} ${t('process_registry')}`
+      []
+    );
+
+    const getDescendantPids = useCallback((rootProcess: ProcessItem, processes: SandboxProcessItem[]): number[] => {
+      if (!rootProcess.pid) return [];
+
+      const stack = [rootProcess.pid];
+      const descendants: number[] = [];
+
+      while (stack.length) {
+        const parentPid = stack.pop();
+        const children = processes.filter(p => p.ppid === parentPid);
+        for (const child of children) {
+          descendants.push(child.pid);
+          stack.push(child.pid);
+        }
       }
-    ];
+
+      return descendants;
+    }, []);
+
+    const processScore = useMemo<number | undefined>(() => {
+      if (item.safelisted) return undefined;
+      return getProcessHeuristicScore(item, body.signatures, body.heuristics) ?? undefined;
+    }, [item, body.signatures, body.heuristics, getProcessHeuristicScore]);
+
+    const highestScore = useMemo<number | undefined>(() => {
+      if (!item.pid) return processScore;
+
+      const descendantPids = getDescendantPids(item, body.processes);
+      const relevantProcesses = body.processes.filter(p => p.pid === item.pid || descendantPids.includes(p.pid));
+
+      let maxScore = -Infinity;
+
+      for (const proc of relevantProcesses) {
+        if (proc.safelisted) continue;
+        const score = getProcessHeuristicScore(proc, body.signatures, body.heuristics);
+        if (typeof score === 'number' && score > maxScore) {
+          maxScore = score;
+        }
+      }
+
+      return maxScore === -Infinity ? undefined : maxScore;
+    }, [
+      item,
+      processScore,
+      getDescendantPids,
+      body.processes,
+      body.signatures,
+      body.heuristics,
+      getProcessHeuristicScore
+    ]);
+
+    const getBackgroundColor = useCallback(
+      (score: number | undefined, opacity: number) => {
+        if (score === undefined) {
+          return alpha(theme.palette.success[theme.palette.mode === 'dark' ? 'dark' : 'light'], opacity);
+        }
+
+        const verdict = scoreToVerdict(score);
+        const colorMap: Record<string, string | null> = {
+          malicious: theme.palette.error[theme.palette.mode === 'dark' ? 'dark' : 'light'],
+          highly_suspicious: theme.palette.warning[theme.palette.mode === 'dark' ? 'dark' : 'light'],
+          suspicious: theme.palette.warning[theme.palette.mode === 'dark' ? 'dark' : 'light'],
+          info: theme.palette.grey[800],
+          safe: theme.palette.success[theme.palette.mode === 'dark' ? 'dark' : 'light']
+        };
+
+        const baseColor = colorMap[verdict] ?? null;
+        return baseColor ? alpha(baseColor, opacity) : null;
+      },
+      [
+        scoreToVerdict,
+        theme.palette.error,
+        theme.palette.grey,
+        theme.palette.mode,
+        theme.palette.success,
+        theme.palette.warning
+      ]
+    );
 
     return (
       <>
@@ -284,13 +315,25 @@ const ProcessTreeItem = React.memo(
                 flexDirection: 'row',
                 alignItems: 'stretch',
                 justifyContent: 'flex-start',
-                columnGap: theme.spacing(1),
                 padding: 'inherit'
               }}
+              onClick={() => setDetailsOpen(o => !o)}
             >
-              <div style={{ backgroundColor: theme.palette.grey[800], minWidth: theme.spacing(5) }}>{item.pid}</div>
+              <div style={{ minWidth: theme.spacing(0.5), backgroundColor: getBackgroundColor(highestScore, 1) }} />
 
-              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+              <div style={{ backgroundColor: getBackgroundColor(processScore, 0.25), minWidth: theme.spacing(5) }}>
+                {item.pid}
+              </div>
+
+              <div
+                style={{
+                  flex: 1,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'flex-start',
+                  marginLeft: theme.spacing(1)
+                }}
+              >
                 <Typography component="div" variant="body2">
                   {item.image?.split(/[/\\]/).pop() ?? ''}
                 </Typography>
@@ -303,28 +346,45 @@ const ProcessTreeItem = React.memo(
                 >
                   {item.command_line}
                 </Typography>
+
+                <Collapse
+                  in={detailsOpen}
+                  timeout={theme.transitions.duration.shortest}
+                  easing={theme.transitions.easing.sharp}
+                >
+                  Details
+                </Collapse>
               </div>
 
               <div
                 style={{
+                  alignSelf: 'flex-start',
                   display: 'flex',
                   flexDirection: 'row',
-                  alignItems: 'flex-start',
+                  alignItems: 'center',
                   columnGap: theme.spacing(0.5),
                   paddingTop: theme.spacing(0.5),
                   paddingRight: theme.spacing(0.5)
                 }}
               >
+                <CustomChip
+                  label={item.integrity_level}
+                  size="tiny"
+                  color={integrityLevelColorMap[item.integrity_level] ?? undefined}
+                  variant="outlined"
+                  sx={{ textTransform: 'capitalize', fontWeight: 'normal' }}
+                />
                 {rows
                   .filter(row => row.count > 0)
                   .map((row, idx) => (
                     <Tooltip key={idx} title={row.tooltip}>
                       <CustomChip
-                        label={row.count}
+                        label={humanReadableNumber(row.count)}
                         icon={row.icon}
                         size="tiny"
                         variant="outlined"
-                        sx={{ columnGap: theme.spacing(1) }}
+                        type="rounded"
+                        sx={{ columnGap: theme.spacing(0.5) }}
                       />
                     </Tooltip>
                   ))}
@@ -479,7 +539,7 @@ const ProcessTable = React.memo(
                 size="tiny"
                 color={integrityLevelColorMap[level] ?? undefined}
                 variant="outlined"
-                sx={{ textTransform: 'capitalize' }}
+                sx={{ textTransform: 'capitalize', fontWeight: 'normal' }}
               />
             );
           },
