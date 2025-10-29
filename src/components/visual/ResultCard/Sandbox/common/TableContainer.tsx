@@ -114,6 +114,7 @@ export type TableContainerProps<T extends object> = {
   printable?: boolean;
   rowSpanning?: string[];
   filterValue?: Partial<T>;
+  preventRender?: boolean;
   onFilter?: (row: T, filterValue: Partial<T>) => boolean;
   onQuantityChange?: (value: number) => void;
 };
@@ -126,6 +127,7 @@ export const TableContainer = memo(
     rowSpanning = [],
     printable = false,
     filterValue = null,
+    preventRender = false,
     onFilter = () => null,
     onQuantityChange = () => null
   }: TableContainerProps<T>) => {
@@ -230,7 +232,7 @@ export const TableContainer = memo(
       onQuantityChange(rowCount);
     }, [rowCount]);
 
-    return !table.getRowModel().rows.length ? (
+    return preventRender ? null : !table.getRowModel().rows.length ? (
       <div style={{ width: '100%' }}>
         <InformativeAlert sx={{ fontSize: 'inherit' }} slotProps={{ message: { sx: { padding: '0px' } } }}>
           <AlertTitle variant="body1" sx={{ fontSize: 'inherit' }}>

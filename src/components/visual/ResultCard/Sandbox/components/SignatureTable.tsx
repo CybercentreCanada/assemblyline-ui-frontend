@@ -28,6 +28,7 @@ type SignatureTableProps = {
   printable?: boolean;
   force?: boolean;
   filterValue?: SandboxProcessItem;
+  preventRender?: boolean;
   onFilter?: () => void;
   onQuantityChange?: (quantity: number) => void;
 };
@@ -39,6 +40,7 @@ export const SignatureTable = React.memo(
     printable = false,
     force,
     filterValue,
+    preventRender,
     onFilter = () => null,
     onQuantityChange = () => null
   }: SignatureTableProps) => {
@@ -184,6 +186,7 @@ export const SignatureTable = React.memo(
         printable={printable}
         // rowSpanning={['name', 'type', 'classification', 'actors']}
         filterValue={filterValue}
+        preventRender={preventRender}
         onFilter={(row, value) => row.pid === filterValue?.pid}
         onQuantityChange={onQuantityChange}
       />

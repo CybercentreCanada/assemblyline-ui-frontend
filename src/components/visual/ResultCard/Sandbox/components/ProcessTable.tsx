@@ -13,6 +13,7 @@ type ProcessTableProps = {
   printable?: boolean;
   startTime?: number;
   filterValue?: SandboxProcessItem;
+  preventRender?: boolean;
   onFilter?: () => void;
   onQuantityChange?: (quantity: number) => void;
 };
@@ -23,6 +24,7 @@ export const ProcessTable = React.memo(
     printable = false,
     startTime,
     filterValue,
+    preventRender,
     onFilter = () => null,
     onQuantityChange = () => null
   }: ProcessTableProps) => {
@@ -140,6 +142,7 @@ export const ProcessTable = React.memo(
         initialSorting={[{ id: 'start_time', desc: false }]}
         printable={printable}
         filterValue={filterValue}
+        preventRender={preventRender}
         onFilter={(row, value) => row.pid === value.pid}
         onQuantityChange={onQuantityChange}
       />

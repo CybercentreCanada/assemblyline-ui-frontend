@@ -14,6 +14,7 @@ type NetflowTableProps = {
   printable?: boolean;
   startTime?: number;
   filterValue?: SandboxProcessItem;
+  preventRender?: boolean;
   onFilter?: () => void;
   onQuantityChange?: (quantity: number) => void;
 };
@@ -24,6 +25,7 @@ export const NetflowTable = React.memo(
     printable = false,
     startTime,
     filterValue,
+    preventRender,
     onFilter = () => null,
     onQuantityChange = () => null
   }: NetflowTableProps) => {
@@ -174,6 +176,7 @@ export const NetflowTable = React.memo(
         initialSorting={[{ id: 'time_observed', desc: false }]}
         printable={printable}
         filterValue={filterValue}
+        preventRender={preventRender}
         onFilter={(row, value) => row.pid === value?.pid}
         onQuantityChange={onQuantityChange}
       />

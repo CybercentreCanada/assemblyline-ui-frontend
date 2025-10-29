@@ -2,10 +2,10 @@ import { useTheme } from '@mui/material';
 import type { SandboxBody as SandboxData, SandboxProcessItem } from 'components/models/base/result_body';
 import { CustomChip } from 'components/visual/CustomChip';
 import { NetflowTable } from 'components/visual/ResultCard/Sandbox/components/NetflowTable';
-import type { ProcessItem } from 'components/visual/ResultCard/Sandbox/components/ProcessGraph';
 import { ProcessGraph } from 'components/visual/ResultCard/Sandbox/components/ProcessGraph';
 import { ProcessTable } from 'components/visual/ResultCard/Sandbox/components/ProcessTable';
 import { SignatureTable } from 'components/visual/ResultCard/Sandbox/components/SignatureTable';
+import type { ProcessItem } from 'components/visual/ResultCard/Sandbox/sandbox.utils';
 import { TabContainer } from 'components/visual/TabContainer';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -50,6 +50,7 @@ export type SandboxBodyProps = {
 export const SandboxBody = React.memo(({ body, force = false, printable = false }: SandboxBodyProps) => {
   const { t } = useTranslation('sandboxResult');
 
+  const [tab, setTab] = useState<'process' | 'netflow' | 'signature'>('process');
   const [filterValue, setFilterValue] = useState<SandboxProcessItem | undefined>(undefined);
   const [quantities, setQuantities] = useState<{ processes: number; netflows: number; signatures: number }>({
     processes: null,
@@ -86,6 +87,8 @@ export const SandboxBody = React.memo(({ body, force = false, printable = false 
         allowRender
         paper
         selectionFollowsFocus
+        value={tab}
+        onChange={(e, v) => setTab(v)}
         tabs={{
           ...(body.processes.length && {
             process: {
@@ -102,6 +105,7 @@ export const SandboxBody = React.memo(({ body, force = false, printable = false 
                   startTime={startTime}
                   printable={printable}
                   filterValue={filterValue}
+                  preventRender={tab !== 'process'}
                   onQuantityChange={handleQuantityChange('processes')}
                 />
               )
@@ -122,6 +126,7 @@ export const SandboxBody = React.memo(({ body, force = false, printable = false 
                   startTime={startTime}
                   printable={printable}
                   filterValue={filterValue}
+                  preventRender={tab !== 'netflow'}
                   onQuantityChange={handleQuantityChange('netflows')}
                 />
               )
@@ -142,6 +147,7 @@ export const SandboxBody = React.memo(({ body, force = false, printable = false 
                   heuristics={body.heuristics}
                   printable={printable}
                   filterValue={filterValue}
+                  preventRender={tab !== 'signature'}
                   onQuantityChange={handleQuantityChange('signatures')}
                 />
               )
