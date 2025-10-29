@@ -28,10 +28,20 @@ type SignatureTableProps = {
   printable?: boolean;
   force?: boolean;
   filterValue?: SandboxProcessItem;
+  onFilter?: () => void;
+  onQuantityChange?: (quantity: number) => void;
 };
 
 export const SignatureTable = React.memo(
-  ({ data = [], heuristics = [], printable = false, force, filterValue }: SignatureTableProps) => {
+  ({
+    data = [],
+    heuristics = [],
+    printable = false,
+    force,
+    filterValue,
+    onFilter = () => null,
+    onQuantityChange = () => null
+  }: SignatureTableProps) => {
     const { t } = useTranslation('sandboxResult');
     const theme = useTheme();
     const { scoreToVerdict } = useALContext();
@@ -175,6 +185,7 @@ export const SignatureTable = React.memo(
         // rowSpanning={['name', 'type', 'classification', 'actors']}
         filterValue={filterValue}
         onFilter={(row, value) => row.pid === filterValue?.pid}
+        onQuantityChange={onQuantityChange}
       />
     );
   }

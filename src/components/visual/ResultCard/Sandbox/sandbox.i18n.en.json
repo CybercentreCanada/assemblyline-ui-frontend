@@ -22,6 +22,8 @@
   "method": "Method",
   "mimetype": "MIME type",
   "name": "Name",
+  "no_results_desc": "The query that you ran did not return any results.",
+  "no_results_title": "No results found!",
   "original_file_name": "File name",
   "pid": "PID",
   "port": "Port",

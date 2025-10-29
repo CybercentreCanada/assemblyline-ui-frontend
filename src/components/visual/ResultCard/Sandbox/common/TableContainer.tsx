@@ -1,5 +1,6 @@
 import type { SxProps, Theme } from '@mui/material';
 import {
+  AlertTitle,
   TableContainer as MuiTableContainer,
   Table,
   TableBody,
@@ -18,6 +19,8 @@ import {
   getSortedRowModel,
   useReactTable
 } from '@tanstack/react-table';
+import InformativeAlert from 'components/visual/InformativeAlert';
+import { t } from 'i18next';
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 declare module '@tanstack/react-table' {
@@ -112,6 +115,7 @@ export type TableContainerProps<T extends object> = {
   rowSpanning?: string[];
   filterValue?: Partial<T>;
   onFilter?: (row: T, filterValue: Partial<T>) => boolean;
+  onQuantityChange?: (value: number) => void;
 };
 
 export const TableContainer = memo(
@@ -122,7 +126,8 @@ export const TableContainer = memo(
     rowSpanning = [],
     printable = false,
     filterValue = null,
-    onFilter = () => null
+    onFilter = () => null,
+    onQuantityChange = () => null
   }: TableContainerProps<T>) => {
     const [sorting, setSorting] = useState<SortingState>(initialSorting);
     const [scrolled, setScrolled] = useState<boolean>(false);
@@ -138,7 +143,7 @@ export const TableContainer = memo(
     }, []);
 
     const table = useReactTable({
-      data: data,
+      data,
       columns,
       state: {
         pagination: { pageIndex: 0, pageSize: 1000 },
@@ -151,8 +156,14 @@ export const TableContainer = memo(
       getSortedRowModel: getSortedRowModel(),
       getFilteredRowModel: getFilteredRowModel(),
       globalFilterFn: (row, columnId, _filterValue: Partial<T>) => onFilter(row.original, _filterValue)
-      // onGlobalFilterChange: setGlobalFilter
+      // onGlobalFilterChange: data => console.log(data)
     });
+
+    const rowCount = useMemo<number>(
+      () => table.getFilteredRowModel().rows.length,
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      [table.getFilteredRowModel().rows.length]
+    );
 
     const handleSort = useCallback((columnId: string) => {
       setSorting(prev => {
@@ -215,7 +226,20 @@ export const TableContainer = memo(
       return map;
     }, [rowSpanning, table, table.getPrePaginationRowModel().rows]);
 
-    return (
+    useEffect(() => {
+      onQuantityChange(rowCount);
+    }, [rowCount]);
+
+    return !table.getRowModel().rows.length ? (
+      <div style={{ width: '100%' }}>
+        <InformativeAlert sx={{ fontSize: 'inherit' }} slotProps={{ message: { sx: { padding: '0px' } } }}>
+          <AlertTitle variant="body1" sx={{ fontSize: 'inherit' }}>
+            {t('no_results_title', { ns: 'sandboxResult' })}
+          </AlertTitle>
+          {t('no_results_desc', { ns: 'sandboxResult' })}
+        </InformativeAlert>
+      </div>
+    ) : (
       <StyledTableContainer ref={containerRef} printable={printable}>
         <StyledTable stickyHeader size="small" printable={printable}>
           <colgroup>

@@ -14,10 +14,18 @@ type ProcessTableProps = {
   startTime?: number;
   filterValue?: SandboxProcessItem;
   onFilter?: () => void;
+  onQuantityChange?: (quantity: number) => void;
 };
 
 export const ProcessTable = React.memo(
-  ({ data = [], printable = false, startTime, filterValue, onFilter = () => null }: ProcessTableProps) => {
+  ({
+    data = [],
+    printable = false,
+    startTime,
+    filterValue,
+    onFilter = () => null,
+    onQuantityChange = () => null
+  }: ProcessTableProps) => {
     const { t } = useTranslation('sandboxResult');
     const theme = useTheme();
     const columnHelper = createColumnHelper<SandboxProcessItem>();
@@ -133,6 +141,7 @@ export const ProcessTable = React.memo(
         printable={printable}
         filterValue={filterValue}
         onFilter={(row, value) => row.pid === value.pid}
+        onQuantityChange={onQuantityChange}
       />
     );
   }

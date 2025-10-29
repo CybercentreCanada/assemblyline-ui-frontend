@@ -51,7 +51,6 @@ const ProcessTreeItem = React.memo(
     const { scoreToVerdict } = useALContext();
 
     const [open, setOpen] = useState<boolean>(false);
-    const [detailsOpen, setDetailsOpen] = useState<boolean>(false);
 
     const hasChildren = useMemo<boolean>(() => !!item.children?.length, [item.children?.length]);
 
@@ -249,9 +248,11 @@ const ProcessTreeItem = React.memo(
                 flexDirection: 'row',
                 alignItems: 'stretch',
                 justifyContent: 'flex-start',
-                padding: 'inherit'
+                padding: 'inherit',
+                ...(filterValue &&
+                  item.pid === filterValue?.pid && { backgroundColor: alpha(theme.palette.primary.dark, 0.25) })
               }}
-              onClick={() => setDetailsOpen(o => !o)}
+              onClick={e => onClick(e, item)}
             >
               <div style={{ minWidth: theme.spacing(0.5), backgroundColor: getBackgroundColor(highestScore, 1) }} />
 
@@ -280,14 +281,6 @@ const ProcessTreeItem = React.memo(
                 >
                   {item.command_line}
                 </Typography>
-
-                <Collapse
-                  in={detailsOpen}
-                  timeout={theme.transitions.duration.shortest}
-                  easing={theme.transitions.easing.sharp}
-                >
-                  Details
-                </Collapse>
               </div>
 
               <div
