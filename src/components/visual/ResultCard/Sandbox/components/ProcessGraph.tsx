@@ -24,6 +24,7 @@ import type {
   SandboxSignatureItem
 } from 'components/models/base/result_body';
 import { CustomChip } from 'components/visual/CustomChip';
+import { buildProcessTree } from 'components/visual/ResultCard/Sandbox/sandbox.utils';
 import type { PossibleColor } from 'helpers/colors';
 import { humanReadableNumber } from 'helpers/utils';
 import React, { useCallback, useMemo, useState } from 'react';
@@ -201,6 +202,9 @@ const ProcessTreeItem = React.memo(
     return (
       <>
         <ListItem
+          dense
+          disableGutters
+          disablePadding
           sx={{
             // pl: depth * 3,
             pr: 0,
@@ -356,21 +360,7 @@ type ProcessGraphProps = {
 
 export const ProcessGraph = React.memo(
   ({ body, processes = [], printable = false, filterValue, onClick = () => null }: ProcessGraphProps) => {
-    const theme = useTheme();
-
-    const buildProcessTree = useCallback((processes: ProcessItem[]): ProcessItem[] => {
-      const map = new Map<number, ProcessItem>();
-      for (const proc of processes) map.set(proc.pid, { ...proc, children: [] });
-
-      const roots: ProcessItem[] = [];
-      for (const proc of map.values()) {
-        if (proc.ppid === 0 || !map.has(proc.ppid)) roots.push(proc);
-        else map.get(proc.ppid).children.push(proc);
-      }
-      return roots;
-    }, []);
-
-    const processTree = useMemo(() => (processes ? buildProcessTree(processes) : []), [buildProcessTree, processes]);
+    const processTree = useMemo<ProcessItem[]>(() => (processes ? buildProcessTree(processes) : []), [processes]);
 
     return (
       <div style={{ overflowX: 'auto', maxHeight: printable ? 'auto' : 750 }}>

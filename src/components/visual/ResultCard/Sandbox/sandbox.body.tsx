@@ -10,6 +10,23 @@ import { TabContainer } from 'components/visual/TabContainer';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+type LabelProps = {
+  label?: string;
+  quantity?: number;
+  total?: number;
+};
+
+const Label = React.memo(({ label, quantity, total }: LabelProps) => {
+  const theme = useTheme();
+
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', columnGap: theme.spacing(1) }}>
+      {label}
+      {!total ? null : <CustomChip label={quantity ? `${quantity}/${total}` : total} color="secondary" size="tiny" />}
+    </div>
+  );
+});
+
 export type SandboxBodyProps = {
   body: SandboxData;
   force?: boolean;
@@ -17,7 +34,6 @@ export type SandboxBodyProps = {
 };
 
 export const SandboxBody = React.memo(({ body, force = false, printable = false }: SandboxBodyProps) => {
-  const theme = useTheme();
   const { t } = useTranslation('sandboxResult');
 
   const [filterValue, setFilterValue] = useState<SandboxProcessItem | undefined>(undefined);
@@ -33,8 +49,7 @@ export const SandboxBody = React.memo(({ body, force = false, printable = false 
     []
   );
 
-  if (!body) return null;
-  return (
+  return !body ? null : (
     <>
       <ProcessGraph
         body={body}
@@ -49,12 +64,7 @@ export const SandboxBody = React.memo(({ body, force = false, printable = false 
         tabs={{
           ...(body.processes.length && {
             process: {
-              label: (
-                <div style={{ display: 'flex', alignItems: 'center', columnGap: theme.spacing(1) }}>
-                  {t('sandbox_body.tab.process')}
-                  <CustomChip label={body.processes.length} color="secondary" size="tiny" />
-                </div>
-              ),
+              label: <Label label={t('sandbox_body.tab.process')} total={body.processes.length} />,
               inner: (
                 <ProcessTable
                   data={body.processes}
@@ -67,23 +77,13 @@ export const SandboxBody = React.memo(({ body, force = false, printable = false 
           }),
           ...(body.netflows.length && {
             netflow: {
-              label: (
-                <div style={{ display: 'flex', alignItems: 'center', columnGap: theme.spacing(1) }}>
-                  {t('sandbox_body.tab.netflow')}
-                  <CustomChip label={body.netflows.length} color="secondary" size="tiny" />
-                </div>
-              ),
+              label: <Label label={t('sandbox_body.tab.netflow')} total={body.netflows.length} />,
               inner: <NetflowTable data={body.netflows} startTime={startTime} printable={printable} />
             }
           }),
           ...(body.signatures.length && {
             signature: {
-              label: (
-                <div style={{ display: 'flex', alignItems: 'center', columnGap: theme.spacing(1) }}>
-                  {t('sandbox_body.tab.signature')}
-                  <CustomChip label={body.signatures.length} color="secondary" size="tiny" />
-                </div>
-              ),
+              label: <Label label={t('sandbox_body.tab.signature')} total={body.signatures.length} />,
               inner: (
                 <SignatureTable
                   data={body.signatures}

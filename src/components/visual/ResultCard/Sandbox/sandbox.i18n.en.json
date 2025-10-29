@@ -1,7 +1,7 @@
 {
   "actors": "Actors",
   "attachments": "Attachments",
-  "attacks": "Attacks",
+  "attacks": "Att&ck Matrix",
   "body": "Body",
   "classification": "Classification",
   "command_line": "Command line",
@@ -17,7 +17,7 @@
   "lookup_type": "Lookup type",
   "mail_from": "Mail from",
   "mail_to": "Mail to",
-  "malware_families": "Malware families",
+  "malware_families": "Malware Families",
   "message": "Message",
   "method": "Method",
   "mimetype": "MIME type",
