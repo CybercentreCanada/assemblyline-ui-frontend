@@ -34,6 +34,7 @@ import { MemDumpBody } from 'components/visual/ResultCard/memdump_body';
 import { MultiBody } from 'components/visual/ResultCard/multi_body';
 import { OrderedKVBody } from 'components/visual/ResultCard/ordered_kv_body';
 import { ProcessTreeBody } from 'components/visual/ResultCard/process_tree_body';
+import { SandboxBody } from 'components/visual/ResultCard/Sandbox/sandbox.body';
 import { TblBody } from 'components/visual/ResultCard/table_body';
 import { TextBody } from 'components/visual/ResultCard/text_body';
 import { TimelineBody } from 'components/visual/ResultCard/timeline_body';
@@ -406,22 +407,24 @@ const WrappedResultSection: React.FC<Props> = ({
                     {section.body &&
                       (() => {
                         switch (section.body_format) {
-                          case 'TEXT':
-                            return <TextBody body={section.body} />;
-                          case 'MEMORY_DUMP':
-                            return <MemDumpBody body={section.body} />;
                           case 'GRAPH_DATA':
                             return <GraphBody body={section.body} />;
-                          case 'URL':
-                            return <URLBody body={section.body} />;
+                          case 'IMAGE':
+                            return <ImageBody body={section.body} printable={printable} />;
                           case 'JSON':
                             return <JSONBody body={section.body} printable={printable} />;
                           case 'KEY_VALUE':
                             return <KVBody body={section.body} />;
+                          case 'MEMORY_DUMP':
+                            return <MemDumpBody body={section.body} />;
+                          case 'MULTI':
+                            return <MultiBody body={section.body} printable={printable} />;
                           case 'ORDERED_KEY_VALUE':
                             return <OrderedKVBody body={section.body} />;
                           case 'PROCESS_TREE':
                             return <ProcessTreeBody body={section.body} force={force} />;
+                          case 'SANDBOX':
+                            return <SandboxBody body={section.body} printable={printable} force={force} />;
                           case 'TABLE':
                             return (
                               <TblBody
@@ -430,12 +433,12 @@ const WrappedResultSection: React.FC<Props> = ({
                                 order={section.body_config ? section.body_config.column_order : []}
                               />
                             );
-                          case 'IMAGE':
-                            return <ImageBody body={section.body} printable={printable} />;
-                          case 'MULTI':
-                            return <MultiBody body={section.body} printable={printable} />;
+                          case 'TEXT':
+                            return <TextBody body={section.body} />;
                           case 'TIMELINE':
                             return <TimelineBody body={section.body} />;
+                          case 'URL':
+                            return <URLBody body={section.body} />;
                           default:
                             return <InvalidBody />;
                         }
