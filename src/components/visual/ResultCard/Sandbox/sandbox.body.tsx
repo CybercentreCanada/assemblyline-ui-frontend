@@ -4,6 +4,7 @@ import { CustomChip } from 'components/visual/CustomChip';
 import { NetflowTable } from 'components/visual/ResultCard/Sandbox/components/NetflowTable';
 import { ProcessGraph } from 'components/visual/ResultCard/Sandbox/components/ProcessGraph';
 import { ProcessTable } from 'components/visual/ResultCard/Sandbox/components/ProcessTable';
+import { ProcessTimeline } from 'components/visual/ResultCard/Sandbox/components/ProcessTimeline';
 import { SignatureTable } from 'components/visual/ResultCard/Sandbox/components/SignatureTable';
 import type { ProcessItem } from 'components/visual/ResultCard/Sandbox/sandbox.utils';
 import { TabContainer } from 'components/visual/TabContainer';
@@ -76,6 +77,13 @@ export const SandboxBody = React.memo(({ body, force = false, printable = false 
 
   return !body ? null : (
     <>
+      <ProcessTimeline
+        body={body}
+        processes={body.processes}
+        // startTime={body?.analysis_metadata?.start_time}
+        // endTime={body?.analysis_metadata?.end_time}
+      />
+
       <ProcessGraph
         body={body}
         processes={body.processes}

@@ -44,7 +44,7 @@ const ProcessStats = React.memo(({ body, item }: ProcessStatsProps) => {
     let signatureCount = 0;
 
     for (const n of body.netflows ?? []) if (n.pid === item.pid) netflowCount++;
-    for (const s of body.signatures ?? []) if (s.pid === item.pid) signatureCount++;
+    for (const s of body.signatures ?? []) if (s.pids.includes(item.pid)) signatureCount++;
 
     return { netflowCount, signatureCount };
   }, [body.netflows, body.signatures, item.pid]);

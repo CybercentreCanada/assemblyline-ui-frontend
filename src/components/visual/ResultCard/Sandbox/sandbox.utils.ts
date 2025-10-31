@@ -44,7 +44,7 @@ export const getProcessHeuristicScore = (
   if (!process.pid) return null;
   if (process.safelisted) return 0;
 
-  const matching = signatures.filter(sig => sig.pid === process.pid && sig.heuristic);
+  const matching = signatures.filter(sig => sig.pids.includes(process.pid) && sig.heuristic);
   if (matching.length === 0) return null;
 
   let maxScore = -Infinity;

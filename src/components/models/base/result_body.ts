@@ -315,8 +315,8 @@ export type SandboxSignatureItem = {
   /** Optional human-readable message. */
   message?: string;
 
-  /** PID of the process that generated the signature. */
-  pid?: number;
+  /** PIDs of the processes that generated the signature. */
+  pids?: number[];
 
   /** ID of the heuristic this signature belongs to (optional). */
   heuristic?: string;

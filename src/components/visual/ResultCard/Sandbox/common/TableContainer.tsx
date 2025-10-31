@@ -107,20 +107,20 @@ const StyledTableRow = memo(
   }))
 );
 
-export type TableContainerProps<T extends object> = {
+export type TableContainerProps<T extends object, F extends object> = {
   columns: ColumnDef<T, { sx: unknown }>[];
   data: T[];
   initialSorting: SortingState;
   printable?: boolean;
   rowSpanning?: string[];
-  filterValue?: Partial<T>;
+  filterValue?: F;
   preventRender?: boolean;
   onFilter?: (row: T, filterValue: Partial<T>) => boolean;
   onQuantityChange?: (value: number) => void;
 };
 
 export const TableContainer = memo(
-  <T extends object>({
+  <T extends object, F extends object>({
     columns,
     data,
     initialSorting,
@@ -130,7 +130,7 @@ export const TableContainer = memo(
     preventRender = false,
     onFilter = () => null,
     onQuantityChange = () => null
-  }: TableContainerProps<T>) => {
+  }: TableContainerProps<T, F>) => {
     const [sorting, setSorting] = useState<SortingState>(initialSorting);
     const [scrolled, setScrolled] = useState<boolean>(false);
 
@@ -301,4 +301,4 @@ export const TableContainer = memo(
       </StyledTableContainer>
     );
   }
-) as <T extends object>(props: TableContainerProps<T>) => React.ReactNode;
+) as <T extends object, F extends object>(props: TableContainerProps<T, F>) => React.ReactNode;

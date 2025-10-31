@@ -187,7 +187,7 @@ export const SignatureTable = React.memo(
         // rowSpanning={['name', 'type', 'classification', 'actors']}
         filterValue={filterValue}
         preventRender={preventRender}
-        onFilter={(row, value) => row.pid === filterValue?.pid}
+        onFilter={(row, value) => row.pids.includes(filterValue?.pid)}
         onQuantityChange={onQuantityChange}
       />
     );
