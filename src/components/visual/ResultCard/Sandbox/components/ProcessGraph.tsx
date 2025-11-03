@@ -16,7 +16,6 @@ import {
   useTheme
 } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
-import useSafeResults from 'components/hooks/useSafeResults';
 import type { SandboxBody as SandboxData, SandboxProcessItem } from 'components/models/base/result_body';
 import { CustomChip } from 'components/visual/CustomChip';
 import type { ProcessItem } from 'components/visual/ResultCard/Sandbox/sandbox.utils';
@@ -24,7 +23,7 @@ import {
   buildProcessTree,
   getBackgroundColor,
   getDescendantPids,
-  getProcessHeuristicScore,
+  getProcessScore,
   INTEGRITY_LEVEL_COLOR_MAP
 } from 'components/visual/ResultCard/Sandbox/sandbox.utils';
 import { humanReadableNumber } from 'helpers/utils';
@@ -83,7 +82,7 @@ const ProcessStats = React.memo(({ body, item }: ProcessStatsProps) => {
         flexDirection: 'row',
         alignItems: 'center',
         columnGap: theme.spacing(0.5),
-        paddingTop: theme.spacing(0.5),
+        paddingTop: theme.spacing(1.5),
         paddingRight: theme.spacing(0.5)
       }}
     >
@@ -117,26 +116,37 @@ type ProcessTreeItemProps = {
   depth?: number;
   printable?: boolean;
   filterValue: SandboxProcessItem;
+  forceOpen?: boolean | null;
   onClick: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>, item: ProcessItem) => void;
 };
 
 const ProcessTreeItem = React.memo(
-  ({ body, item, depth = 0, printable = false, filterValue, onClick = () => null }: ProcessTreeItemProps) => {
-    const { t } = useTranslation('sandboxResult');
+  ({
+    body,
+    item,
+    depth = 0,
+    printable = false,
+    filterValue,
+    onClick = () => null,
+    forceOpen = null
+  }: ProcessTreeItemProps) => {
     const theme = useTheme();
-    const { showSafeResults } = useSafeResults();
     const { scoreToVerdict } = useALContext();
 
-    const [open, setOpen] = useState<boolean>(false);
-
-    const hasChildren = useMemo<boolean>(() => !!item.children?.length, [item.children?.length]);
+    const [open, setOpen] = useState(false);
+    const hasChildren = !!item.children?.length;
 
     const handleToggle = useCallback(() => setOpen(o => !o), []);
 
+    // Sync with forced open/close signal
+    React.useEffect(() => {
+      if (forceOpen !== null) setOpen(forceOpen);
+    }, [forceOpen]);
+
     const processScore = useMemo<number | undefined>(() => {
       if (item.safelisted) return undefined;
-      return getProcessHeuristicScore(item, body.signatures, body.heuristics) ?? undefined;
-    }, [item, body.signatures, body.heuristics]);
+      return getProcessScore(item, body.signatures) ?? undefined;
+    }, [item, body.signatures]);
 
     const highestScore = useMemo<number | undefined>(() => {
       if (!item.pid) return processScore;
@@ -148,14 +158,12 @@ const ProcessTreeItem = React.memo(
 
       for (const proc of relevantProcesses) {
         if (proc.safelisted) continue;
-        const score = getProcessHeuristicScore(proc, body.signatures, body.heuristics);
-        if (typeof score === 'number' && score > maxScore) {
-          maxScore = score;
-        }
+        const score = getProcessScore(proc, body.signatures);
+        if (typeof score === 'number' && score > maxScore) maxScore = score;
       }
 
       return maxScore === -Infinity ? undefined : maxScore;
-    }, [item, processScore, body.processes, body.signatures, body.heuristics]);
+    }, [item, processScore, body.processes, body.signatures]);
 
     return (
       <>
@@ -164,7 +172,6 @@ const ProcessTreeItem = React.memo(
           disableGutters
           disablePadding
           sx={{
-            // pl: depth * 3,
             pr: 0,
             py: 0.5,
             display: 'grid',
@@ -223,7 +230,8 @@ const ProcessTreeItem = React.memo(
               <div
                 style={{
                   backgroundColor: getBackgroundColor(theme, scoreToVerdict, processScore, 0.25),
-                  minWidth: theme.spacing(5)
+                  minWidth: theme.spacing(5),
+                  padding: `${theme.spacing(1)} 0`
                 }}
               >
                 {item.pid}
@@ -235,10 +243,11 @@ const ProcessTreeItem = React.memo(
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'flex-start',
-                  marginLeft: theme.spacing(1)
+                  marginLeft: theme.spacing(1),
+                  padding: `${theme.spacing(1)} 0`
                 }}
               >
-                <Typography component="div" variant="body2">
+                <Typography component="div" fontWeight={500} variant="body2">
                   {item.image?.split(/[/\\]/).pop() ?? ''}
                 </Typography>
                 <Typography
@@ -269,6 +278,7 @@ const ProcessTreeItem = React.memo(
                   printable={printable}
                   filterValue={filterValue}
                   onClick={onClick}
+                  forceOpen={forceOpen} // propagate forced state
                 />
               ))}
             </List>
@@ -290,13 +300,30 @@ type ProcessGraphProps = {
 
 export const ProcessGraph = React.memo(
   ({ body, processes = [], printable = false, filterValue, onClick = () => null }: ProcessGraphProps) => {
+    const { t } = useTranslation('sandboxResult');
+
+    const [forceOpen, setForceOpen] = useState<boolean | null>(null);
+
     const processTree = useMemo<ProcessItem[]>(() => (processes ? buildProcessTree(processes) : []), [processes]);
+
+    const handleToggleAll = useCallback(() => setForceOpen(prev => (prev === true ? false : true)), []);
 
     return (
       <div style={{ overflowX: 'auto', maxHeight: printable ? 'auto' : 750 }}>
+        <Button variant="outlined" size="small" onClick={handleToggleAll} sx={{ mb: 1 }}>
+          {forceOpen ? t('collapse_all') : t('expand_all')}
+        </Button>
+
         <List disablePadding dense>
           {processTree?.map(item => (
-            <ProcessTreeItem key={item.pid} body={body} item={item} filterValue={filterValue} onClick={onClick} />
+            <ProcessTreeItem
+              key={item.pid}
+              body={body}
+              item={item}
+              filterValue={filterValue}
+              onClick={onClick}
+              forceOpen={forceOpen}
+            />
           ))}
         </List>
       </div>

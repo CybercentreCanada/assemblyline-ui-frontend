@@ -318,26 +318,8 @@ export type SandboxSignatureItem = {
   /** PIDs of the processes that generated the signature. */
   pids?: number[];
 
-  /** ID of the heuristic this signature belongs to (optional). */
-  heuristic?: string;
-};
-
-/**
- * Heuristics raised
- * Mirrors the original TypeScript "Heuristics" shape you provided earlier.
- */
-export type SandboxHeuristicItem = {
-  /** Heuristic ID */
-  heur_id: string;
-
-  /** Score associated to heuristic */
-  score: number;
-
-  /** Name of the heuristic raised */
-  name: string;
-
-  /** Tags associated to heuristic. Each tag is an array of values. */
-  tags?: Record<string, unknown[]>;
+  /** Score of the heuristic this signature belongs to. */
+  score?: number;
 };
 
 export type SandboxBody = {
@@ -348,7 +330,6 @@ export type SandboxBody = {
   processes: SandboxProcessItem[];
   netflows: SandboxNetflowItem[];
   signatures: SandboxSignatureItem[];
-  heuristics?: SandboxHeuristicItem[];
 };
 
 export type SandboxBodyConfig = null;

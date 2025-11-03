@@ -1,7 +1,7 @@
 import { alpha, useTheme } from '@mui/material/styles';
 import useALContext from 'components/hooks/useALContext';
 import type { SandboxBody as SandboxData, SandboxProcessItem } from 'components/models/base/result_body';
-import { getBackgroundColor, getProcessHeuristicScore } from 'components/visual/ResultCard/Sandbox/sandbox.utils';
+import { getBackgroundColor, getProcessScore } from 'components/visual/ResultCard/Sandbox/sandbox.utils';
 import * as d3 from 'd3';
 import React, { useEffect, useRef, useState } from 'react';
 
@@ -62,9 +62,7 @@ export const ProcessTimeline: React.FC<ProcessTimelineProps> = ({
     const flatData = processes.map(d => {
       const _start = parseDate(d.start_time) ?? machineStart;
       const _end = parseDate(d.end_time) ?? machineEnd ?? _start;
-      const processScore = d.safelisted
-        ? undefined
-        : (getProcessHeuristicScore(d, body?.signatures, body?.heuristics) ?? undefined);
+      const processScore = d.safelisted ? undefined : (getProcessScore(d, body?.signatures) ?? undefined);
 
       const color =
         getBackgroundColor(theme, scoreToVerdict, processScore, opacity) ?? alpha(theme.palette.grey[500], opacity);

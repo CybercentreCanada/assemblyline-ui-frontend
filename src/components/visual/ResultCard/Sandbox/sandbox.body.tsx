@@ -48,10 +48,10 @@ export type SandboxBodyProps = {
   printable?: boolean;
 };
 
-export const SandboxBody = React.memo(({ body, force = false, printable = false }: SandboxBodyProps) => {
+export const SandboxBody = React.memo(({ body, printable = false }: SandboxBodyProps) => {
   const { t } = useTranslation('sandboxResult');
 
-  const [tab, setTab] = useState<'process' | 'netflow' | 'signature'>('process');
+  const [tab, setTab] = useState<'processes' | 'netflows' | 'signatures'>('processes');
   const [filterValue, setFilterValue] = useState<SandboxProcessItem | undefined>(undefined);
   const [quantities, setQuantities] = useState<{ processes: number; netflows: number; signatures: number }>({
     processes: null,
@@ -74,6 +74,8 @@ export const SandboxBody = React.memo(({ body, force = false, printable = false 
     (k: string) => (v: number) => setQuantities(q => ({ ...q, [k]: v || 0 })),
     []
   );
+
+  console.log(body);
 
   return !body ? null : (
     <>
@@ -99,63 +101,44 @@ export const SandboxBody = React.memo(({ body, force = false, printable = false 
         onChange={(e, v) => setTab(v)}
         tabs={{
           ...(body.processes.length && {
-            process: {
-              label: (
-                <Label
-                  label={t('sandbox_body.tab.process')}
-                  quantity={quantities.processes}
-                  total={body.processes.length}
-                />
-              ),
+            processes: {
+              label: <Label label={t('processes')} quantity={quantities.processes} total={body.processes.length} />,
               inner: (
                 <ProcessTable
                   data={body.processes}
                   startTime={startTime}
                   printable={printable}
                   filterValue={filterValue}
-                  preventRender={tab !== 'process'}
+                  preventRender={tab !== 'processes'}
                   onQuantityChange={handleQuantityChange('processes')}
                 />
               )
             }
           }),
           ...(body.netflows.length && {
-            netflow: {
-              label: (
-                <Label
-                  label={t('sandbox_body.tab.netflow')}
-                  quantity={quantities.netflows}
-                  total={body.netflows.length}
-                />
-              ),
+            netflows: {
+              label: <Label label={t('netflows')} quantity={quantities.netflows} total={body.netflows.length} />,
               inner: (
                 <NetflowTable
                   data={body.netflows}
                   startTime={startTime}
                   printable={printable}
                   filterValue={filterValue}
-                  preventRender={tab !== 'netflow'}
+                  preventRender={tab !== 'netflows'}
                   onQuantityChange={handleQuantityChange('netflows')}
                 />
               )
             }
           }),
           ...(body.signatures.length && {
-            signature: {
-              label: (
-                <Label
-                  label={t('sandbox_body.tab.signature')}
-                  quantity={quantities.signatures}
-                  total={body.signatures.length}
-                />
-              ),
+            signatures: {
+              label: <Label label={t('signatures')} quantity={quantities.signatures} total={body.signatures.length} />,
               inner: (
                 <SignatureTable
                   data={body.signatures}
-                  heuristics={body.heuristics}
                   printable={printable}
                   filterValue={filterValue}
-                  preventRender={tab !== 'signature'}
+                  preventRender={tab !== 'signatures'}
                   onQuantityChange={handleQuantityChange('signatures')}
                 />
               )

@@ -3,11 +3,7 @@ import type { ColumnDef } from '@tanstack/react-table';
 import { createColumnHelper } from '@tanstack/react-table';
 import useALContext from 'components/hooks/useALContext';
 import useHighlighter from 'components/hooks/useHighlighter';
-import type {
-  SandboxHeuristicItem,
-  SandboxProcessItem,
-  SandboxSignatureItem
-} from 'components/models/base/result_body';
+import type { SandboxProcessItem, SandboxSignatureItem } from 'components/models/base/result_body';
 import Attack from 'components/visual/Attack';
 import Classification from 'components/visual/Classification';
 import CustomChip from 'components/visual/CustomChip';
@@ -24,7 +20,6 @@ type FlatSignatures = SandboxSignatureItem & { flatAttacks?: Record<string, stri
 
 type SignatureTableProps = {
   data?: SandboxSignatureItem[];
-  heuristics?: SandboxHeuristicItem[];
   printable?: boolean;
   force?: boolean;
   filterValue?: SandboxProcessItem;
@@ -36,7 +31,6 @@ type SignatureTableProps = {
 export const SignatureTable = React.memo(
   ({
     data = [],
-    heuristics = [],
     printable = false,
     force,
     filterValue,
@@ -51,28 +45,6 @@ export const SignatureTable = React.memo(
 
     const columnHelper = createColumnHelper<FlatSignatures>();
 
-    const flatData = useMemo<FlatSignatures[]>(() => {
-      if (!data?.length) return [];
-
-      return data.map(sig => {
-        const grouped: Record<string, string[]> = {};
-
-        const attacks = sig.attacks ?? [];
-        for (const attack of attacks) {
-          if (!attack.categories?.length) continue;
-          for (const category of attack.categories) {
-            if (!grouped[category]) grouped[category] = [];
-            grouped[category].push(attack.pattern);
-          }
-        }
-
-        return {
-          ...sig,
-          flatAttacks: Object.keys(grouped).length > 0 ? grouped : undefined
-        };
-      });
-    }, [data]);
-
     const columns = useMemo<ColumnDef<FlatSignatures>[]>(
       () => [
         columnHelper.accessor('classification', {
@@ -85,8 +57,7 @@ export const SignatureTable = React.memo(
           cell: info => info.getValue(),
           meta: { cellSx: { wordBreak: 'inherit !important', whiteSpace: 'no-wrap' } }
         }),
-        columnHelper.accessor(row => heuristics?.find(h => h.heur_id === row.heuristic).score, {
-          id: 'heuristic',
+        columnHelper.accessor('score', {
           sortDescFirst: true,
           header: () => t('verdict'),
           cell: info => <Verdict fullWidth short score={info.getValue()} />,
@@ -132,7 +103,7 @@ export const SignatureTable = React.memo(
                           <Attack
                             key={`${i}`}
                             text={attack.pattern}
-                            lvl={scoreToVerdict(heuristics?.find(h => h.heur_id === info.getValue().heuristic).score)}
+                            lvl={scoreToVerdict(info.getValue().score)}
                             highlight_key={getKey('attack_pattern', attack.attack_id)}
                             force={force}
                           />
@@ -158,24 +129,8 @@ export const SignatureTable = React.memo(
           ),
           meta: { cellSx: { textTransform: 'capitalize' } }
         })
-
-        // ...(flatData.some(v => Object.keys(v.flatAttacks)?.length) && [
-        //   columnHelper.accessor('flatAttacks', {
-        //     header: () => t('attacks'),
-        //     cell: info => (
-        //       <table cellSpacing={0}>
-        //         <tbody>
-        //           {Object.entries(info.getValue() || {}).map(([k, v], i) => (
-        //             <DetailTableRow key={`${k}-${i}`} label={k} value={v} />
-        //           ))}
-        //         </tbody>
-        //       </table>
-        //     ),
-        //     meta: {}
-        //   })
-        // ])
       ],
-      [columnHelper, t, heuristics, theme.palette.text.secondary, scoreToVerdict, getKey, force]
+      [columnHelper, t, theme.palette.text.secondary, scoreToVerdict, getKey, force]
     );
 
     return (
@@ -187,7 +142,7 @@ export const SignatureTable = React.memo(
         // rowSpanning={['name', 'type', 'classification', 'actors']}
         filterValue={filterValue}
         preventRender={preventRender}
-        onFilter={(row, value) => row.pids.includes(filterValue?.pid)}
+        onFilter={row => row.pids.includes(filterValue?.pid)}
         onQuantityChange={onQuantityChange}
       />
     );

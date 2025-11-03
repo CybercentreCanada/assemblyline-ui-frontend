@@ -2,7 +2,6 @@ import type { Theme } from '@mui/material';
 import { alpha } from '@mui/material';
 import type {
   SandboxBody as SandboxData,
-  SandboxHeuristicItem,
   SandboxProcessItem,
   SandboxSignatureItem
 } from 'components/models/base/result_body';
@@ -34,27 +33,27 @@ export const buildProcessTree = (processes: ProcessItem[]): ProcessItem[] => {
 };
 
 /* ----------------------------------------------------------------------------
- * Compute heuristic score for a process
+ * Compute score for a process
  * -------------------------------------------------------------------------- */
-export const getProcessHeuristicScore = (
-  process: SandboxProcessItem,
-  signatures: SandboxSignatureItem[],
-  heuristics: SandboxHeuristicItem[] = []
-): number | null => {
-  if (!process.pid) return null;
+export const getProcessScore = (process: SandboxProcessItem, signatures: SandboxSignatureItem[]): number | null => {
+  const pid = process.pid;
+  if (!pid) return null;
   if (process.safelisted) return 0;
 
-  const matching = signatures.filter(sig => sig.pids.includes(process.pid) && sig.heuristic);
-  if (matching.length === 0) return null;
+  let total = 0;
+  let matched = false;
 
-  let maxScore = -Infinity;
+  for (const sig of signatures) {
+    const pids = sig.pids;
+    if (!pids || !pids.includes(pid)) continue;
 
-  for (const sig of matching) {
-    const heur = heuristics.find(h => h.heur_id === sig.heuristic);
-    if (heur && heur.score > maxScore) maxScore = heur.score;
+    matched = true;
+    if (typeof sig.score === 'number') {
+      total += sig.score;
+    }
   }
 
-  return maxScore === -Infinity ? null : maxScore;
+  return matched ? total : 0;
 };
 
 /* ----------------------------------------------------------------------------
@@ -80,7 +79,7 @@ export const getDescendantPids = (root: SandboxProcessItem, processes: SandboxPr
  * Compute highest heuristic score among process and descendants
  * -------------------------------------------------------------------------- */
 export const getHighestProcessScore = (item: SandboxProcessItem, body: SandboxData): number | undefined => {
-  const processScore = getProcessHeuristicScore(item, body.signatures, body.heuristics);
+  const processScore = getProcessScore(item, body.signatures);
   if (!item.pid) return processScore ?? undefined;
 
   const descendantPids = getDescendantPids(item, body.processes);
@@ -90,7 +89,7 @@ export const getHighestProcessScore = (item: SandboxProcessItem, body: SandboxDa
 
   for (const proc of relevant) {
     if (proc.safelisted) continue;
-    const score = getProcessHeuristicScore(proc, body.signatures, body.heuristics);
+    const score = getProcessScore(proc, body.signatures);
     if (typeof score === 'number' && score > maxScore) maxScore = score;
   }
 
