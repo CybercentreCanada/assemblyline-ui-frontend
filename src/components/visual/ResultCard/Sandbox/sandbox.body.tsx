@@ -75,77 +75,84 @@ export const SandboxBody = React.memo(({ body, printable = false }: SandboxBodyP
     []
   );
 
-  console.log(body);
+  try {
+    return !body ? null : (
+      <>
+        <ProcessTimeline
+          body={body}
+          processes={body.processes}
+          // startTime={body?.analysis_metadata?.start_time}
+          // endTime={body?.analysis_metadata?.end_time}
+        />
 
-  return !body ? null : (
-    <>
-      <ProcessTimeline
-        body={body}
-        processes={body.processes}
-        // startTime={body?.analysis_metadata?.start_time}
-        // endTime={body?.analysis_metadata?.end_time}
-      />
+        <ProcessGraph
+          body={body}
+          processes={body.processes}
+          filterValue={filterValue}
+          onClick={handleProcessGraphClick}
+        />
 
-      <ProcessGraph
-        body={body}
-        processes={body.processes}
-        filterValue={filterValue}
-        onClick={handleProcessGraphClick}
-      />
+        <TabContainer
+          allowRender
+          paper
+          selectionFollowsFocus
+          value={tab}
+          onChange={(e, v) => setTab(v)}
+          tabs={{
+            ...(body.processes.length && {
+              processes: {
+                label: <Label label={t('processes')} quantity={quantities.processes} total={body.processes.length} />,
+                inner: (
+                  <ProcessTable
+                    data={body.processes}
+                    startTime={startTime}
+                    printable={printable}
+                    filterValue={filterValue}
+                    preventRender={tab !== 'processes'}
+                    onQuantityChange={handleQuantityChange('processes')}
+                  />
+                )
+              }
+            }),
+            ...(body.netflows.length && {
+              netflows: {
+                label: <Label label={t('netflows')} quantity={quantities.netflows} total={body.netflows.length} />,
+                inner: (
+                  <NetflowTable
+                    data={body.netflows}
+                    startTime={startTime}
+                    printable={printable}
+                    filterValue={filterValue}
+                    preventRender={tab !== 'netflows'}
+                    onQuantityChange={handleQuantityChange('netflows')}
+                  />
+                )
+              }
+            }),
+            ...(body.signatures.length && {
+              signatures: {
+                label: (
+                  <Label label={t('signatures')} quantity={quantities.signatures} total={body.signatures.length} />
+                ),
+                inner: (
+                  <SignatureTable
+                    data={body.signatures}
+                    printable={printable}
+                    filterValue={filterValue}
+                    preventRender={tab !== 'signatures'}
+                    onQuantityChange={handleQuantityChange('signatures')}
+                  />
+                )
+              }
+            })
+          }}
+        />
+      </>
+    );
+  } catch (ex) {
+    // eslint-disable-next-line no-console
+    console.log('[WARNING] Could not parse Sandbox body. The section will be skipped...');
+  }
 
-      <TabContainer
-        allowRender
-        paper
-        selectionFollowsFocus
-        value={tab}
-        onChange={(e, v) => setTab(v)}
-        tabs={{
-          ...(body.processes.length && {
-            processes: {
-              label: <Label label={t('processes')} quantity={quantities.processes} total={body.processes.length} />,
-              inner: (
-                <ProcessTable
-                  data={body.processes}
-                  startTime={startTime}
-                  printable={printable}
-                  filterValue={filterValue}
-                  preventRender={tab !== 'processes'}
-                  onQuantityChange={handleQuantityChange('processes')}
-                />
-              )
-            }
-          }),
-          ...(body.netflows.length && {
-            netflows: {
-              label: <Label label={t('netflows')} quantity={quantities.netflows} total={body.netflows.length} />,
-              inner: (
-                <NetflowTable
-                  data={body.netflows}
-                  startTime={startTime}
-                  printable={printable}
-                  filterValue={filterValue}
-                  preventRender={tab !== 'netflows'}
-                  onQuantityChange={handleQuantityChange('netflows')}
-                />
-              )
-            }
-          }),
-          ...(body.signatures.length && {
-            signatures: {
-              label: <Label label={t('signatures')} quantity={quantities.signatures} total={body.signatures.length} />,
-              inner: (
-                <SignatureTable
-                  data={body.signatures}
-                  printable={printable}
-                  filterValue={filterValue}
-                  preventRender={tab !== 'signatures'}
-                  onQuantityChange={handleQuantityChange('signatures')}
-                />
-              )
-            }
-          })
-        }}
-      />
-    </>
-  );
+  return null;
 });
