@@ -1,32 +1,36 @@
 import { useTheme } from '@mui/material';
 import type { ColumnDef } from '@tanstack/react-table';
 import { createColumnHelper } from '@tanstack/react-table';
-import type { SandboxProcessItem } from 'components/models/base/result_body';
+import type { SandboxBody, SandboxProcessItem } from 'components/models/base/result_body';
 import { CustomChip } from 'components/visual/CustomChip';
 import { TableContainer } from 'components/visual/ResultCard/Sandbox/common/TableContainer';
+import type { SandboxFilter } from 'components/visual/ResultCard/Sandbox/sandbox.utils';
 import type { PossibleColor } from 'helpers/colors';
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 type ProcessTableProps = {
-  data?: SandboxProcessItem[];
+  body?: SandboxBody;
   printable?: boolean;
   startTime?: number;
-  filterValue?: SandboxProcessItem;
+  activeValue?: SandboxFilter;
+  filterValue?: SandboxFilter;
   preventRender?: boolean;
-  onFilter?: () => void;
-  onQuantityChange?: (quantity: number) => void;
+  getRowCount?: (count: number) => void;
+  onActiveChange?: React.Dispatch<React.SetStateAction<SandboxFilter>>;
+  onFilterChange?: React.Dispatch<React.SetStateAction<SandboxFilter>>;
 };
 
 export const ProcessTable = React.memo(
   ({
-    data = [],
+    body = null,
     printable = false,
     startTime,
     filterValue,
+    activeValue,
     preventRender,
-    onFilter = () => null,
-    onQuantityChange = () => null
+    getRowCount = () => null,
+    onActiveChange = () => null
   }: ProcessTableProps) => {
     const { t } = useTranslation('sandboxResult');
     const theme = useTheme();
@@ -135,16 +139,40 @@ export const ProcessTable = React.memo(
       [columnHelper, theme.palette.text.secondary, t, startTime, integrityLevelColorMap]
     );
 
+    const isRowActive = useCallback((row: SandboxProcessItem, activeValue?: SandboxFilter) => {
+      if (!activeValue) return false;
+
+      // Check for process match
+      if (activeValue?.process && row.pid === activeValue.process.pid) return true;
+
+      // Check for signature match (if row has a signature property or related field)
+      if (activeValue?.signature && activeValue.signature.pids.includes(row.pid)) return true;
+
+      // Check for netflow match (assuming you want to match against command_line or similar)
+      if (activeValue?.netflow && row.pid === activeValue?.netflow?.pid) return true;
+
+      return false;
+    }, []);
+
+    const handleRowClick = useCallback(
+      (row: SandboxProcessItem) => {
+        onActiveChange(prev => (prev?.process?.pid === row.pid ? undefined : { process: structuredClone(row) }));
+      },
+      [onActiveChange]
+    );
+
     return (
       <TableContainer
         columns={columns}
-        data={data}
+        data={body.processes}
         initialSorting={[{ id: 'start_time', desc: false }]}
         printable={printable}
         filterValue={filterValue}
+        activeValue={activeValue}
         preventRender={preventRender}
-        onFilter={(row, value) => row.pid === value.pid}
-        onQuantityChange={onQuantityChange}
+        isRowActive={isRowActive}
+        getRowCount={getRowCount}
+        onRowClick={handleRowClick}
       />
     );
   }

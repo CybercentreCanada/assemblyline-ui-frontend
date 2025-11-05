@@ -1,33 +1,38 @@
-import { useTheme } from '@mui/material';
+import { Tooltip, useTheme } from '@mui/material';
 import type { ColumnDef } from '@tanstack/react-table';
 import { createColumnHelper } from '@tanstack/react-table';
-import type { SandboxNetflowItem, SandboxProcessItem } from 'components/models/base/result_body';
-import ActionableCustomChip from 'components/visual/ActionableCustomChip';
+import type { SandboxBody, SandboxNetflowItem } from 'components/models/base/result_body';
+import { DNS_RECORD_TYPES } from 'components/models/ontology/results/network';
+import CustomChip from 'components/visual/CustomChip';
 import { TableContainer } from 'components/visual/ResultCard/Sandbox/common/TableContainer';
 import { DetailTableRow } from 'components/visual/ResultCard/Sandbox/common/Tables';
+import type { SandboxFilter } from 'components/visual/ResultCard/Sandbox/sandbox.utils';
 import { KVBody } from 'components/visual/ResultCard/kv_body';
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 type NetflowTableProps = {
-  data?: SandboxNetflowItem[];
+  body?: SandboxBody;
   printable?: boolean;
   startTime?: number;
-  filterValue?: SandboxProcessItem;
+  filterValue?: SandboxFilter;
+  activeValue?: SandboxFilter;
   preventRender?: boolean;
-  onFilter?: () => void;
-  onQuantityChange?: (quantity: number) => void;
+  getRowCount?: (count: number) => void;
+  onActiveChange?: React.Dispatch<React.SetStateAction<SandboxFilter>>;
+  onFilterChange?: React.Dispatch<React.SetStateAction<SandboxFilter>>;
 };
 
 export const NetflowTable = React.memo(
   ({
-    data = [],
+    body = null,
     printable = false,
     startTime,
     filterValue,
+    activeValue,
     preventRender,
-    onFilter = () => null,
-    onQuantityChange = () => null
+    getRowCount = () => null,
+    onActiveChange = () => null
   }: NetflowTableProps) => {
     const { t } = useTranslation('sandboxResult');
     const theme = useTheme();
@@ -63,13 +68,7 @@ export const NetflowTable = React.memo(
           cell: info =>
             info.getValue() && (
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <ActionableCustomChip
-                  category="tag"
-                  data_type="network.static.ip"
-                  label={info.getValue()}
-                  size="tiny"
-                  variant="outlined"
-                />
+                <div style={{ whiteSpace: 'nowrap' }}>{info.getValue()}</div>
                 {info.row.original?.source_port && (
                   <div style={{ color: theme.palette.text.secondary }}>{` : ${info.row.original?.source_port}`}</div>
                 )}
@@ -82,13 +81,7 @@ export const NetflowTable = React.memo(
           cell: info =>
             info.getValue() && (
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <ActionableCustomChip
-                  category="tag"
-                  data_type="network.static.ip"
-                  label={info.getValue()}
-                  size="tiny"
-                  variant="outlined"
-                />
+                <div style={{ whiteSpace: 'nowrap' }}>{info.getValue()}</div>
                 {info.row.original?.source_port && (
                   <div
                     style={{ color: theme.palette.text.secondary }}
@@ -153,7 +146,22 @@ export const NetflowTable = React.memo(
                   <table cellSpacing={0}>
                     <tbody>
                       <DetailTableRow label={t('domain')} value={original.dns_details?.domain} />
-                      <DetailTableRow label={t('lookup_type')} value={original.dns_details?.lookup_type} />
+                      <DetailTableRow
+                        label={t('lookup_type')}
+                        value={original.dns_details?.lookup_type}
+                        {...(original.dns_details?.lookup_type in DNS_RECORD_TYPES && {
+                          children: (
+                            <Tooltip title={DNS_RECORD_TYPES?.[original.dns_details?.lookup_type]}>
+                              <CustomChip
+                                label={original.dns_details?.lookup_type}
+                                size="tiny"
+                                variant="outlined"
+                                type="rounded"
+                              />
+                            </Tooltip>
+                          )
+                        })}
+                      />
                       <DetailTableRow label={t('resolved_domains')} value={original.dns_details?.resolved_domains} />
                       <DetailTableRow label={t('resolved_ips')} value={original.dns_details?.resolved_ips} />
                     </tbody>
@@ -169,16 +177,57 @@ export const NetflowTable = React.memo(
       [columnHelper, t, theme, startTime]
     );
 
+    // const isRowActive = useCallback((row: SandboxNetflowItem, activeValue?: SandboxFilter) => {
+    //   if (!activeValue) return false;
+
+    //   // Check for process match
+    //   if (activeValue?.process && row.pid === activeValue.process.pid) return true;
+
+    //   // Check for signature match (if row has a signature property or related field)
+    //   if (activeValue?.signature && row.image?.includes(activeValue.signature)) return true;
+
+    //   // Check for netflow match (assuming you want to match against command_line or similar)
+    //   if (activeValue?.netflow && row.command_line?.includes(activeValue.netflow)) return true;
+
+    //   return false;
+    // }, []);
+
+    const isRowActive = useCallback((row: SandboxNetflowItem, activeValue?: SandboxFilter) => {
+      if (!activeValue) return false;
+
+      // Check for process match
+      if (activeValue?.process && row?.pid === activeValue.process.pid) return true;
+
+      // Check for signature match (if row has a signature property or related field)
+      if (activeValue?.signature && activeValue.signature.pids.includes(row?.pid)) return true;
+
+      // Check for netflow match (assuming you want to match against command_line or similar)
+      if (activeValue?.netflow && JSON.stringify(row) === JSON.stringify(activeValue?.netflow)) return true;
+
+      return false;
+    }, []);
+
+    const handleRowClick = useCallback(
+      (row: SandboxNetflowItem) => {
+        onActiveChange(prev =>
+          JSON.stringify(row) === JSON.stringify(prev?.netflow) ? undefined : { netflow: structuredClone(row) }
+        );
+      },
+      [onActiveChange]
+    );
+
     return (
       <TableContainer
         columns={columns}
-        data={data}
+        data={body.netflows}
         initialSorting={[{ id: 'time_observed', desc: false }]}
         printable={printable}
         filterValue={filterValue}
+        activeValue={activeValue}
         preventRender={preventRender}
-        onFilter={(row, value) => row.pid === value?.pid}
-        onQuantityChange={onQuantityChange}
+        isRowActive={isRowActive}
+        getRowCount={getRowCount}
+        onRowClick={handleRowClick}
       />
     );
   }

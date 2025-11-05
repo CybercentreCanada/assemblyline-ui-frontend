@@ -5,7 +5,7 @@ import type { ObjectID, Process } from 'components/models/ontology/results/proce
  * List of supported DNS lookup types.
  * @see https://en.wikipedia.org/wiki/List_of_DNS_record_types
  */
-const DNS_RECORD_TYPES = {
+export const DNS_RECORD_TYPES = {
   A: 'Returns a 32-bit IPv4 address; maps hostnames to an IP address of the host; also used for DNSBLs and subnet masks.',
   AAAA: 'Returns a 128-bit IPv6 address; maps hostnames to an IPv6 address of the host.',
   AFSDB: 'Specifies AFS database servers for an AFS cell; used by AFS clients to locate remote cells.',

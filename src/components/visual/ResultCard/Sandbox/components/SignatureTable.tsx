@@ -3,40 +3,39 @@ import type { ColumnDef } from '@tanstack/react-table';
 import { createColumnHelper } from '@tanstack/react-table';
 import useALContext from 'components/hooks/useALContext';
 import useHighlighter from 'components/hooks/useHighlighter';
-import type { SandboxProcessItem, SandboxSignatureItem } from 'components/models/base/result_body';
-import Attack from 'components/visual/Attack';
+import type { SandboxBody, SandboxSignatureItem } from 'components/models/base/result_body';
 import Classification from 'components/visual/Classification';
 import CustomChip from 'components/visual/CustomChip';
 import { TableContainer } from 'components/visual/ResultCard/Sandbox/common/TableContainer';
 import { DetailTableRow } from 'components/visual/ResultCard/Sandbox/common/Tables';
+import type { SandboxFilter } from 'components/visual/ResultCard/Sandbox/sandbox.utils';
 import Verdict from 'components/visual/Verdict';
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-/***
- * Signature Table
- */
 type FlatSignatures = SandboxSignatureItem & { flatAttacks?: Record<string, string[]> };
 
 type SignatureTableProps = {
-  data?: SandboxSignatureItem[];
+  body?: SandboxBody;
   printable?: boolean;
   force?: boolean;
-  filterValue?: SandboxProcessItem;
+  filterValue?: SandboxFilter;
+  activeValue?: SandboxFilter;
   preventRender?: boolean;
-  onFilter?: () => void;
-  onQuantityChange?: (quantity: number) => void;
+  getRowCount?: (count: number) => void;
+  onActiveChange?: React.Dispatch<React.SetStateAction<SandboxFilter>>;
+  onFilterChange?: React.Dispatch<React.SetStateAction<SandboxFilter>>;
 };
 
 export const SignatureTable = React.memo(
   ({
-    data = [],
+    body = null,
     printable = false,
-    force,
     filterValue,
+    activeValue,
     preventRender,
-    onFilter = () => null,
-    onQuantityChange = () => null
+    getRowCount = () => null,
+    onActiveChange = () => null
   }: SignatureTableProps) => {
     const { t } = useTranslation('sandboxResult');
     const theme = useTheme();
@@ -60,7 +59,7 @@ export const SignatureTable = React.memo(
         columnHelper.accessor('score', {
           sortDescFirst: true,
           header: () => t('verdict'),
-          cell: info => <Verdict fullWidth short score={info.getValue()} />,
+          cell: info => <Verdict fullWidth score={info.getValue()} />,
           meta: { cellSx: {} }
         }),
         columnHelper.accessor('name', {
@@ -100,12 +99,12 @@ export const SignatureTable = React.memo(
                       children={info
                         .getValue()
                         ?.attacks.map((attack, i) => (
-                          <Attack
+                          <CustomChip
                             key={`${i}`}
-                            text={attack.pattern}
-                            lvl={scoreToVerdict(info.getValue().score)}
-                            highlight_key={getKey('attack_pattern', attack.attack_id)}
-                            force={force}
+                            label={attack.pattern}
+                            size="tiny"
+                            variant="outlined"
+                            type="rounded"
                           />
                         ))}
                     />
@@ -130,20 +129,46 @@ export const SignatureTable = React.memo(
           meta: { cellSx: { textTransform: 'capitalize' } }
         })
       ],
-      [columnHelper, t, theme.palette.text.secondary, scoreToVerdict, getKey, force]
+      [columnHelper, t, theme.palette.text.secondary]
+    );
+
+    const isRowActive = useCallback((row: SandboxSignatureItem, activeValue?: SandboxFilter) => {
+      if (!activeValue) return false;
+
+      // Check for process match
+      if (activeValue?.process && row?.pids?.includes(activeValue.process.pid)) return true;
+
+      // Check for signature match (if row has a signature property or related field)
+      if (activeValue?.signature && row?.signature_id === activeValue.signature.signature_id) return true;
+
+      // Check for netflow match (assuming you want to match against command_line or similar)
+      if (activeValue?.netflow && row.pids.includes(activeValue?.netflow?.pid)) return true;
+
+      return false;
+    }, []);
+
+    const handleRowClick = useCallback(
+      (row: SandboxSignatureItem) => {
+        onActiveChange(prev =>
+          prev?.signature?.signature_id === row.signature_id ? undefined : { signature: structuredClone(row) }
+        );
+      },
+      [onActiveChange]
     );
 
     return (
       <TableContainer
         columns={columns}
-        data={data}
+        data={body.signatures}
         initialSorting={[{ id: 'name', desc: false }]}
         printable={printable}
         // rowSpanning={['name', 'type', 'classification', 'actors']}
         filterValue={filterValue}
+        activeValue={activeValue}
         preventRender={preventRender}
-        onFilter={row => row.pids.includes(filterValue?.pid)}
-        onQuantityChange={onQuantityChange}
+        isRowActive={isRowActive}
+        getRowCount={getRowCount}
+        onRowClick={handleRowClick}
       />
     );
   }

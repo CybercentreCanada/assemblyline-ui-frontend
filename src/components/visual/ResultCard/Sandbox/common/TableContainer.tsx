@@ -1,4 +1,4 @@
-import type { SxProps, Theme } from '@mui/material';
+import type { SxProps, TableRowProps, Theme } from '@mui/material';
 import {
   AlertTitle,
   TableContainer as MuiTableContainer,
@@ -8,6 +8,7 @@ import {
   TableHead,
   TableRow,
   TableSortLabel,
+  alpha,
   styled
 } from '@mui/material';
 import type { ColumnDef, RowData, SortingState } from '@tanstack/react-table';
@@ -78,12 +79,13 @@ const StyledTableHead = memo(
 );
 
 const StyledTableCell = memo(
-  styled(TableCell, { shouldForwardProp: prop => prop !== 'sortable' })<{ sortable?: boolean }>(
-    ({ theme, sortable }) => ({
+  styled(TableCell, { shouldForwardProp: prop => prop !== 'sortable' })<{ active?: boolean; sortable?: boolean }>(
+    ({ theme, sortable, active }) => ({
       '&.MuiTableCell-root': {
         '@media print': { color: 'black' },
         fontSize: 'inherit',
-        lineHeight: 'inherit'
+        lineHeight: 'inherit',
+        ...(active && { backgroundColor: alpha(theme.palette.primary.main, 0.25) })
       },
       '&.MuiTableCell-head': {
         '@media print': { color: 'black', backgroundColor: '#DDD !important' },
@@ -99,7 +101,10 @@ const StyledTableCell = memo(
 );
 
 const StyledTableRow = memo(
-  styled(TableRow)(({ theme }) => ({
+  styled(TableRow)<TableRowProps & { active?: boolean }>(({ theme, hover, active }) => ({
+    ...(hover && {
+      cursor: 'pointer'
+    }),
     '&:nth-of-type(odd)': {
       '@media print': { backgroundColor: '#EEE !important' },
       backgroundColor: theme.palette.mode === 'dark' ? '#ffffff08' : '#00000008'
@@ -107,30 +112,36 @@ const StyledTableRow = memo(
   }))
 );
 
-export type TableContainerProps<T extends object, F extends object> = {
+export type TableContainerProps<T extends object, F extends object, A> = {
   columns: ColumnDef<T, { sx: unknown }>[];
   data: T[];
   initialSorting: SortingState;
   printable?: boolean;
   rowSpanning?: string[];
   filterValue?: F;
+  activeValue?: A;
   preventRender?: boolean;
-  onFilter?: (row: T, filterValue: Partial<T>) => boolean;
-  onQuantityChange?: (value: number) => void;
+  getRowCount?: (value: number) => void;
+  isRowFiltered?: (row: T, filterValue: F) => boolean;
+  isRowActive?: (row: T, activeValue: A) => boolean;
+  onRowClick?: (row: T, rowIndex: number) => void;
 };
 
 export const TableContainer = memo(
-  <T extends object, F extends object>({
+  <T extends object, F extends object, A>({
     columns,
     data,
     initialSorting,
     rowSpanning = [],
     printable = false,
     filterValue = null,
+    activeValue = null,
     preventRender = false,
-    onFilter = () => null,
-    onQuantityChange = () => null
-  }: TableContainerProps<T, F>) => {
+    getRowCount = () => null,
+    isRowFiltered = () => null,
+    isRowActive = () => null,
+    onRowClick
+  }: TableContainerProps<T, F, A>) => {
     const [sorting, setSorting] = useState<SortingState>(initialSorting);
     const [scrolled, setScrolled] = useState<boolean>(false);
 
@@ -157,7 +168,7 @@ export const TableContainer = memo(
       getPaginationRowModel: getPaginationRowModel(),
       getSortedRowModel: getSortedRowModel(),
       getFilteredRowModel: getFilteredRowModel(),
-      globalFilterFn: (row, columnId, _filterValue: Partial<T>) => onFilter(row.original, _filterValue)
+      globalFilterFn: (row, columnId, _filterValue: F) => isRowFiltered(row.original, _filterValue)
       // onGlobalFilterChange: data => console.log(data)
     });
 
@@ -173,6 +184,13 @@ export const TableContainer = memo(
         return [{ id: columnId, desc: existing ? !existing.desc : false }];
       });
     }, []);
+
+    const handleRowClick = useCallback(
+      (row: T, index: number) => {
+        if (onRowClick) onRowClick(row, index);
+      },
+      [onRowClick]
+    );
 
     const rowSpanMap = useMemo<Record<string, number>>(() => {
       if (rowSpanning.length === 0) return {};
@@ -229,7 +247,7 @@ export const TableContainer = memo(
     }, [rowSpanning, table, table.getPrePaginationRowModel().rows]);
 
     useEffect(() => {
-      onQuantityChange(rowCount);
+      getRowCount(rowCount);
     }, [rowCount]);
 
     return preventRender ? null : !table.getRowModel().rows.length ? (
@@ -282,14 +300,24 @@ export const TableContainer = memo(
 
           <TableBody>
             {table.getRowModel().rows.map((row, rowIndex) => (
-              <StyledTableRow key={row.id}>
+              <StyledTableRow
+                key={row.id}
+                hover={!!onRowClick}
+                active={isRowActive(row.original, activeValue)}
+                onClick={() => handleRowClick(row.original, rowIndex)}
+              >
                 {row.getVisibleCells().map(cell => {
                   const key = `${cell.column.id}-${rowIndex}`;
                   const span = rowSpanMap[key] ?? 1;
                   if (span === 0) return null;
 
                   return (
-                    <StyledTableCell key={cell.id} rowSpan={span} sx={cell.column.columnDef.meta?.cellSx}>
+                    <StyledTableCell
+                      key={cell.id}
+                      rowSpan={span}
+                      active={isRowActive(row.original, activeValue)}
+                      sx={cell.column.columnDef.meta?.cellSx}
+                    >
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </StyledTableCell>
                   );
@@ -301,4 +329,4 @@ export const TableContainer = memo(
       </StyledTableContainer>
     );
   }
-) as <T extends object, F extends object>(props: TableContainerProps<T, F>) => React.ReactNode;
+) as <T extends object, F extends object, A>(props: TableContainerProps<T, F, A>) => React.ReactNode;
