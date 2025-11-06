@@ -51,7 +51,6 @@ export const SandboxBody = React.memo(({ body, printable = false }: SandboxBodyP
   const { t } = useTranslation('sandboxResult');
 
   const [tab, setTab] = useState<'processes' | 'netflows' | 'signatures'>('processes');
-  const [activeValue, setActiveValue] = useState<SandboxFilter | undefined>(undefined);
   const [filterValue, setFilterValue] = useState<SandboxFilter | undefined>(undefined);
   const [rowCounts, setRowCounts] = useState<{ processes: number; netflows: number; signatures: number }>({
     processes: null,
@@ -79,13 +78,7 @@ export const SandboxBody = React.memo(({ body, printable = false }: SandboxBodyP
           // endTime={body?.analysis_metadata?.end_time}
         /> */}
 
-        <ProcessGraph
-          body={body}
-          activeValue={activeValue}
-          filterValue={filterValue}
-          onActiveChange={setActiveValue}
-          onFilterChange={setFilterValue}
-        />
+        <ProcessGraph body={body} activeValue={filterValue} onActiveChange={setFilterValue} />
 
         <TabContainer
           allowRender
@@ -103,10 +96,8 @@ export const SandboxBody = React.memo(({ body, printable = false }: SandboxBodyP
                     preventRender={tab !== 'processes'}
                     printable={printable}
                     startTime={startTime}
-                    activeValue={activeValue}
                     filterValue={filterValue}
                     getRowCount={handleRowCountChange('processes')}
-                    onActiveChange={setActiveValue}
                     onFilterChange={setFilterValue}
                   />
                 )
@@ -121,10 +112,8 @@ export const SandboxBody = React.memo(({ body, printable = false }: SandboxBodyP
                     preventRender={tab !== 'netflows'}
                     printable={printable}
                     startTime={startTime}
-                    activeValue={activeValue}
                     filterValue={filterValue}
                     getRowCount={handleRowCountChange('netflows')}
-                    onActiveChange={setActiveValue}
                     onFilterChange={setFilterValue}
                   />
                 )
@@ -138,10 +127,8 @@ export const SandboxBody = React.memo(({ body, printable = false }: SandboxBodyP
                     body={body}
                     preventRender={tab !== 'signatures'}
                     printable={printable}
-                    activeValue={activeValue}
                     filterValue={filterValue}
                     getRowCount={handleRowCountChange('signatures')}
-                    onActiveChange={setActiveValue}
                     onFilterChange={setFilterValue}
                   />
                 )
@@ -151,6 +138,7 @@ export const SandboxBody = React.memo(({ body, printable = false }: SandboxBodyP
         />
       </>
     );
+    // eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
   } catch (ex) {
     // eslint-disable-next-line no-console
     console.log('[WARNING] Could not parse Sandbox body. The section will be skipped...');

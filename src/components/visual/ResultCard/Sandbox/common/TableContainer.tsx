@@ -85,7 +85,12 @@ const StyledTableCell = memo(
         '@media print': { color: 'black' },
         fontSize: 'inherit',
         lineHeight: 'inherit',
-        ...(active && { backgroundColor: alpha(theme.palette.primary.main, 0.25) })
+        ...(active && {
+          backgroundColor: alpha(
+            theme.palette.mode === 'dark' ? theme.palette.primary.light : theme.palette.primary.dark,
+            theme.palette.action.activatedOpacity
+          )
+        })
       },
       '&.MuiTableCell-head': {
         '@media print': { color: 'black', backgroundColor: '#DDD !important' },
@@ -101,10 +106,8 @@ const StyledTableCell = memo(
 );
 
 const StyledTableRow = memo(
-  styled(TableRow)<TableRowProps & { active?: boolean }>(({ theme, hover, active }) => ({
-    ...(hover && {
-      cursor: 'pointer'
-    }),
+  styled(TableRow)<TableRowProps & { active?: boolean }>(({ theme, hover }) => ({
+    ...(hover && { cursor: 'pointer' }),
     '&:nth-of-type(odd)': {
       '@media print': { backgroundColor: '#EEE !important' },
       backgroundColor: theme.palette.mode === 'dark' ? '#ffffff08' : '#00000008'
@@ -113,7 +116,7 @@ const StyledTableRow = memo(
 );
 
 export type TableContainerProps<T extends object, F extends object, A> = {
-  columns: ColumnDef<T, { sx: unknown }>[];
+  columns: ColumnDef<T, unknown>[];
   data: T[];
   initialSorting: SortingState;
   printable?: boolean;
@@ -138,8 +141,8 @@ export const TableContainer = memo(
     activeValue = null,
     preventRender = false,
     getRowCount = () => null,
-    isRowFiltered = () => null,
-    isRowActive = () => null,
+    isRowFiltered = () => false,
+    isRowActive = () => false,
     onRowClick
   }: TableContainerProps<T, F, A>) => {
     const [sorting, setSorting] = useState<SortingState>(initialSorting);
@@ -151,7 +154,7 @@ export const TableContainer = memo(
       const container = containerRef.current;
       if (!container) return;
       const onScroll = () => setScrolled(container.scrollTop > 0);
-      container.addEventListener('scroll', onScroll);
+      container.addEventListener('scroll', onScroll, { passive: true });
       return () => container.removeEventListener('scroll', onScroll);
     }, []);
 
@@ -168,32 +171,20 @@ export const TableContainer = memo(
       getPaginationRowModel: getPaginationRowModel(),
       getSortedRowModel: getSortedRowModel(),
       getFilteredRowModel: getFilteredRowModel(),
-      globalFilterFn: (row, columnId, _filterValue: F) => isRowFiltered(row.original, _filterValue)
-      // onGlobalFilterChange: data => console.log(data)
+      globalFilterFn: (row, _columnId, _filterValue: F) => isRowFiltered(row.original, _filterValue)
     });
 
-    const rowCount = useMemo<number>(
-      () => table.getFilteredRowModel().rows.length,
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-      [table.getFilteredRowModel().rows.length]
-    );
-
-    const handleSort = useCallback((columnId: string) => {
-      setSorting(prev => {
-        const existing = prev.find(s => s.id === columnId);
-        return [{ id: columnId, desc: existing ? !existing.desc : false }];
-      });
-    }, []);
+    const rowCount = table.getFilteredRowModel().rows.length;
 
     const handleRowClick = useCallback(
       (row: T, index: number) => {
-        if (onRowClick) onRowClick(row, index);
+        onRowClick?.(row, index);
       },
       [onRowClick]
     );
 
     const rowSpanMap = useMemo<Record<string, number>>(() => {
-      if (rowSpanning.length === 0) return {};
+      if (rowSpanning.length === 0 || data.length === 0) return {};
       const map: Record<string, number> = {};
       const rows = table.getPrePaginationRowModel().rows;
       const n = rows.length;
@@ -239,7 +230,6 @@ export const TableContainer = memo(
             prev = curr;
           }
         }
-
         prevHashes.set(hashes);
       }
 
@@ -250,16 +240,22 @@ export const TableContainer = memo(
       getRowCount(rowCount);
     }, [rowCount]);
 
-    return preventRender ? null : !table.getRowModel().rows.length ? (
-      <div style={{ width: '100%' }}>
-        <InformativeAlert sx={{ fontSize: 'inherit' }} slotProps={{ message: { sx: { padding: '0px' } } }}>
-          <AlertTitle variant="body1" sx={{ fontSize: 'inherit' }}>
-            {t('no_results_title', { ns: 'sandboxResult' })}
-          </AlertTitle>
-          {t('no_results_desc', { ns: 'sandboxResult' })}
-        </InformativeAlert>
-      </div>
-    ) : (
+    if (preventRender) return null;
+
+    if (!table.getRowModel().rows.length) {
+      return (
+        <div style={{ width: '100%' }}>
+          <InformativeAlert sx={{ fontSize: 'inherit' }} slotProps={{ message: { sx: { padding: '0px' } } }}>
+            <AlertTitle variant="body1" sx={{ fontSize: 'inherit' }}>
+              {t('no_results_title', { ns: 'sandboxResult' })}
+            </AlertTitle>
+            {t('no_results_desc', { ns: 'sandboxResult' })}
+          </InformativeAlert>
+        </div>
+      );
+    }
+
+    return (
       <StyledTableContainer ref={containerRef} printable={printable}>
         <StyledTable stickyHeader size="small" printable={printable}>
           <colgroup>
@@ -273,8 +269,6 @@ export const TableContainer = memo(
                 {headerGroup.headers.map(header => {
                   if (header.isPlaceholder) return <StyledTableCell key={header.id} />;
                   const canSort = header.column.getCanSort();
-                  const isActive = sorting.some(s => s.id === header.column.id);
-                  const direction = header.column.getIsSorted() === 'desc' ? 'desc' : 'asc';
 
                   return (
                     <StyledTableCell
@@ -282,10 +276,20 @@ export const TableContainer = memo(
                       colSpan={header.colSpan}
                       sortable={canSort}
                       sx={header.column.columnDef.meta?.headerSx}
-                      onClick={canSort ? () => handleSort(header.column.id) : undefined}
+                      onClick={canSort ? header.column.getToggleSortingHandler() : undefined}
                     >
                       {canSort ? (
-                        <TableSortLabel active={isActive} direction={direction} sx={{ whiteSpace: 'nowrap' }}>
+                        <TableSortLabel
+                          active={!!header.column.getIsSorted()}
+                          direction={
+                            header.column.getIsSorted()
+                              ? (header.column.getIsSorted() as 'asc' | 'desc')
+                              : header.column.columnDef.sortDescFirst
+                                ? 'desc'
+                                : 'asc'
+                          }
+                          sx={{ whiteSpace: 'nowrap' }}
+                        >
                           {flexRender(header.column.columnDef.header, header.getContext())}
                         </TableSortLabel>
                       ) : (
@@ -329,4 +333,4 @@ export const TableContainer = memo(
       </StyledTableContainer>
     );
   }
-) as <T extends object, F extends object, A>(props: TableContainerProps<T, F, A>) => React.ReactNode;
+) as <T extends object, F extends object, A>(props: TableContainerProps<T, F, A>) => React.JSX.Element | null;

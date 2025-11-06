@@ -1,16 +1,15 @@
 import { useTheme } from '@mui/material';
 import type { ColumnDef } from '@tanstack/react-table';
 import { createColumnHelper } from '@tanstack/react-table';
-import useALContext from 'components/hooks/useALContext';
-import useHighlighter from 'components/hooks/useHighlighter';
 import type { SandboxBody, SandboxSignatureItem } from 'components/models/base/result_body';
 import Classification from 'components/visual/Classification';
 import CustomChip from 'components/visual/CustomChip';
+import { ProcessChip } from 'components/visual/ResultCard/Sandbox/common/ProcessChip';
 import { TableContainer } from 'components/visual/ResultCard/Sandbox/common/TableContainer';
 import { DetailTableRow } from 'components/visual/ResultCard/Sandbox/common/Tables';
 import type { SandboxFilter } from 'components/visual/ResultCard/Sandbox/sandbox.utils';
 import Verdict from 'components/visual/Verdict';
-import React, { useCallback, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 type FlatSignatures = SandboxSignatureItem & { flatAttacks?: Record<string, string[]> };
@@ -34,13 +33,10 @@ export const SignatureTable = React.memo(
     filterValue,
     activeValue,
     preventRender,
-    getRowCount = () => null,
-    onActiveChange = () => null
+    getRowCount = () => null
   }: SignatureTableProps) => {
     const { t } = useTranslation('sandboxResult');
     const theme = useTheme();
-    const { scoreToVerdict } = useALContext();
-    const { getKey } = useHighlighter();
 
     const columnHelper = createColumnHelper<FlatSignatures>();
 
@@ -50,6 +46,19 @@ export const SignatureTable = React.memo(
           header: () => t('classification'),
           cell: info => <Classification c12n={info.getValue()} size="tiny" type="text" />,
           meta: {}
+        }),
+        columnHelper.accessor('pids', {
+          id: 'processes',
+          enableSorting: false,
+          header: () => t('processes'),
+          cell: info =>
+            info
+              .getValue()
+              ?.map((pid, i) => <ProcessChip key={i} short process={body.processes.find(p => p.pid === pid)} />),
+          meta: {
+            colStyle: { width: '1%' },
+            cellSx: { wordBreak: 'inherit !important', whiteSpace: 'nowrap' }
+          }
         }),
         columnHelper.accessor('type', {
           header: () => t('type'),
@@ -129,31 +138,7 @@ export const SignatureTable = React.memo(
           meta: { cellSx: { textTransform: 'capitalize' } }
         })
       ],
-      [columnHelper, t, theme.palette.text.secondary]
-    );
-
-    const isRowActive = useCallback((row: SandboxSignatureItem, activeValue?: SandboxFilter) => {
-      if (!activeValue) return false;
-
-      // Check for process match
-      if (activeValue?.process && row?.pids?.includes(activeValue.process.pid)) return true;
-
-      // Check for signature match (if row has a signature property or related field)
-      if (activeValue?.signature && row?.signature_id === activeValue.signature.signature_id) return true;
-
-      // Check for netflow match (assuming you want to match against command_line or similar)
-      if (activeValue?.netflow && row.pids.includes(activeValue?.netflow?.pid)) return true;
-
-      return false;
-    }, []);
-
-    const handleRowClick = useCallback(
-      (row: SandboxSignatureItem) => {
-        onActiveChange(prev =>
-          prev?.signature?.signature_id === row.signature_id ? undefined : { signature: structuredClone(row) }
-        );
-      },
-      [onActiveChange]
+      [body.processes, columnHelper, t, theme.palette.text.secondary]
     );
 
     return (
@@ -162,13 +147,11 @@ export const SignatureTable = React.memo(
         data={body.signatures}
         initialSorting={[{ id: 'name', desc: false }]}
         printable={printable}
-        // rowSpanning={['name', 'type', 'classification', 'actors']}
         filterValue={filterValue}
         activeValue={activeValue}
         preventRender={preventRender}
-        isRowActive={isRowActive}
         getRowCount={getRowCount}
-        onRowClick={handleRowClick}
+        isRowFiltered={(row, value) => row.pids.includes(value.process.pid)}
       />
     );
   }

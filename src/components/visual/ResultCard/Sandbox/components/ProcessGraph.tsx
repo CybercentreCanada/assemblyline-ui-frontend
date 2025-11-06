@@ -22,9 +22,7 @@ import type { ProcessItem, SandboxFilter } from 'components/visual/ResultCard/Sa
 import {
   buildProcessTree,
   getBackgroundColor,
-  getDescendantPids,
-  getProcessScore,
-  INTEGRITY_LEVEL_COLOR_MAP
+  getProcessScore
 } from 'components/visual/ResultCard/Sandbox/sandbox.utils';
 import { humanReadableNumber } from 'helpers/utils';
 import React, { useCallback, useMemo, useState } from 'react';
@@ -89,7 +87,6 @@ const ProcessStats = React.memo(({ body, item }: ProcessStatsProps) => {
       <CustomChip
         label={item.integrity_level}
         size="tiny"
-        color={INTEGRITY_LEVEL_COLOR_MAP[item.integrity_level] ?? undefined}
         variant="outlined"
         sx={{ textTransform: 'capitalize', fontWeight: 'normal', marginRight: theme.spacing(0.5) }}
       />
@@ -115,7 +112,6 @@ type ProcessTreeItemProps = {
   item: ProcessItem;
   depth?: number;
   printable?: boolean;
-  forceOpen?: boolean | null;
   activeValue: SandboxFilter;
   filterValue: SandboxFilter;
   onActiveChange?: React.Dispatch<React.SetStateAction<SandboxFilter>>;
@@ -128,7 +124,6 @@ const ProcessTreeItem = React.memo(
     item,
     depth = 0,
     printable = false,
-    forceOpen = null,
     activeValue,
     filterValue,
     onActiveChange = () => null,
@@ -142,32 +137,10 @@ const ProcessTreeItem = React.memo(
 
     const handleToggle = useCallback(() => setOpen(o => !o), []);
 
-    // Sync with forced open/close signal
-    React.useEffect(() => {
-      if (forceOpen !== null) setOpen(forceOpen);
-    }, [forceOpen]);
-
     const processScore = useMemo<number | undefined>(() => {
       if (item.safelisted) return undefined;
       return getProcessScore(item, body.signatures) ?? undefined;
     }, [item, body.signatures]);
-
-    const highestScore = useMemo<number | undefined>(() => {
-      if (!item.pid) return processScore;
-
-      const descendantPids = getDescendantPids(item, body.processes);
-      const relevantProcesses = body.processes.filter(p => p.pid === item.pid || descendantPids.includes(p.pid));
-
-      let maxScore = -Infinity;
-
-      for (const proc of relevantProcesses) {
-        if (proc.safelisted) continue;
-        const score = getProcessScore(proc, body.signatures);
-        if (typeof score === 'number' && score > maxScore) maxScore = score;
-      }
-
-      return maxScore === -Infinity ? undefined : maxScore;
-    }, [item, processScore, body.processes, body.signatures]);
 
     const isActive = useMemo(() => {
       if (!activeValue) return false;
@@ -242,18 +215,14 @@ const ProcessTreeItem = React.memo(
                 justifyContent: 'flex-start',
                 padding: 'inherit',
                 ...(isActive && {
-                  backgroundColor: alpha(theme.palette.primary.dark, 0.25)
+                  backgroundColor: alpha(
+                    theme.palette.mode === 'dark' ? theme.palette.primary.light : theme.palette.primary.dark,
+                    theme.palette.action.activatedOpacity
+                  )
                 })
               }}
               onClick={() => handleClick(item)}
             >
-              <div
-                style={{
-                  minWidth: theme.spacing(0.5),
-                  backgroundColor: getBackgroundColor(theme, scoreToVerdict, highestScore, 1)
-                }}
-              />
-
               <div
                 style={{
                   backgroundColor: getBackgroundColor(theme, scoreToVerdict, processScore, 0.25),
@@ -303,7 +272,6 @@ const ProcessTreeItem = React.memo(
                   item={child}
                   depth={depth + 1}
                   printable={printable}
-                  forceOpen={forceOpen}
                   activeValue={activeValue}
                   filterValue={filterValue}
                   onActiveChange={onActiveChange}
@@ -322,8 +290,8 @@ type ProcessGraphProps = {
   body: SandboxData;
   printable?: boolean;
   force?: boolean;
-  activeValue: SandboxFilter;
-  filterValue: SandboxFilter;
+  activeValue?: SandboxFilter;
+  filterValue?: SandboxFilter;
   onActiveChange?: React.Dispatch<React.SetStateAction<SandboxFilter>>;
   onFilterChange?: React.Dispatch<React.SetStateAction<SandboxFilter>>;
 };
@@ -337,46 +305,19 @@ export const ProcessGraph = React.memo(
     onActiveChange = () => null,
     onFilterChange = () => null
   }: ProcessGraphProps) => {
-    const theme = useTheme();
-    const { t } = useTranslation('sandboxResult');
-
-    const [forceOpen, setForceOpen] = useState<boolean | null>(null);
-
     const processTree = useMemo<ProcessItem[]>(
       () => (body?.processes ? buildProcessTree(body?.processes) : []),
       [body?.processes]
     );
 
-    const handleToggleAll = useCallback(() => setForceOpen(prev => (prev === true ? false : true)), []);
-
     return (
       <div style={{ overflowX: 'auto', maxHeight: printable ? 'auto' : 750 }}>
-        <ListItem dense disableGutters disablePadding sx={{ py: 0.5 }}>
-          <Button
-            fullWidth
-            size="small"
-            onClick={handleToggleAll}
-            sx={{ justifyContent: 'flex-start', textTransform: 'none' }}
-          >
-            <ChevronRightIcon
-              fontSize="small"
-              sx={{
-                transition: `transform ${theme.transitions.duration.shortest}ms ${theme.transitions.easing.sharp}`,
-                transform: forceOpen ? 'rotate(90deg)' : 'rotate(0deg)'
-              }}
-            />
-
-            <Typography>{forceOpen ? t('collapse_all') : t('expand_all')}</Typography>
-          </Button>
-        </ListItem>
-
         <List disablePadding dense>
           {processTree?.map(item => (
             <ProcessTreeItem
               key={item.pid}
               body={body}
               item={item}
-              forceOpen={forceOpen}
               activeValue={activeValue}
               filterValue={filterValue}
               onActiveChange={onActiveChange}

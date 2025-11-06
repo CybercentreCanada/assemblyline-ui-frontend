@@ -4,12 +4,27 @@ import { createColumnHelper } from '@tanstack/react-table';
 import type { SandboxBody, SandboxNetflowItem } from 'components/models/base/result_body';
 import { DNS_RECORD_TYPES } from 'components/models/ontology/results/network';
 import CustomChip from 'components/visual/CustomChip';
+import { ProcessChip } from 'components/visual/ResultCard/Sandbox/common/ProcessChip';
 import { TableContainer } from 'components/visual/ResultCard/Sandbox/common/TableContainer';
 import { DetailTableRow } from 'components/visual/ResultCard/Sandbox/common/Tables';
 import type { SandboxFilter } from 'components/visual/ResultCard/Sandbox/sandbox.utils';
 import { KVBody } from 'components/visual/ResultCard/kv_body';
-import React, { useCallback, useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+
+export const compareIPs = (ipA: string, ipB: string): number => {
+  const aParts = ipA.split(/[.:]/).map(Number);
+  const bParts = ipB.split(/[.:]/).map(Number);
+
+  const maxLen = Math.max(aParts.length, bParts.length);
+  for (let i = 0; i < maxLen; i++) {
+    const pa = aParts[i] || 0;
+    const pb = bParts[i] || 0;
+    if (pa !== pb) return pa - pb;
+  }
+
+  return 0;
+};
 
 type NetflowTableProps = {
   body?: SandboxBody;
@@ -29,10 +44,8 @@ export const NetflowTable = React.memo(
     printable = false,
     startTime,
     filterValue,
-    activeValue,
     preventRender,
-    getRowCount = () => null,
-    onActiveChange = () => null
+    getRowCount = () => null
   }: NetflowTableProps) => {
     const { t } = useTranslation('sandboxResult');
     const theme = useTheme();
@@ -57,6 +70,20 @@ export const NetflowTable = React.memo(
             }
           }
         }),
+        columnHelper.accessor(
+          row => {
+            const process = body.processes.find(p => p.pid === row.pid);
+            return !process ? null : [process?.image?.split(/[/\\]/).pop() ?? '', process.pid];
+          },
+          {
+            id: 'process',
+            header: () => t('process'),
+            cell: info => <ProcessChip short process={body.processes?.find(p => p.pid === info.getValue()?.[1])} />,
+            meta: {
+              cellSx: { wordBreak: 'inherit !important' }
+            }
+          }
+        ),
         columnHelper.accessor('transport_layer_protocol', {
           header: () => t('protocol'),
           cell: info => info.getValue(),
@@ -65,6 +92,11 @@ export const NetflowTable = React.memo(
 
         columnHelper.accessor('source_ip', {
           header: () => t('source'),
+          sortingFn: (a, b) =>
+            compareIPs(
+              `${a.original.source_ip || '999.999.999.999'}:${a.original.source_port || '999999'}`,
+              `${b.original.source_ip || '999.999.999.999'}:${b.original.source_port || '999999'}`
+            ),
           cell: info =>
             info.getValue() && (
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -78,6 +110,11 @@ export const NetflowTable = React.memo(
         }),
         columnHelper.accessor('destination_ip', {
           header: () => t('destination'),
+          sortingFn: (a, b) =>
+            compareIPs(
+              `${a.original.destination_ip || '999.999.999.999'}:${a.original.destination_port || '999999'}`,
+              `${b.original.destination_ip || '999.999.999.999'}:${b.original.destination_port || '999999'}`
+            ),
           cell: info =>
             info.getValue() && (
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
@@ -98,6 +135,7 @@ export const NetflowTable = React.memo(
         }),
         columnHelper.accessor('connection_details', {
           header: () => t('details'),
+          enableSorting: false,
           cell: info => {
             const original = info.row.original;
 
@@ -174,46 +212,7 @@ export const NetflowTable = React.memo(
           meta: { colStyle: { width: '100%' }, cellSx: {} }
         })
       ],
-      [columnHelper, t, theme, startTime]
-    );
-
-    // const isRowActive = useCallback((row: SandboxNetflowItem, activeValue?: SandboxFilter) => {
-    //   if (!activeValue) return false;
-
-    //   // Check for process match
-    //   if (activeValue?.process && row.pid === activeValue.process.pid) return true;
-
-    //   // Check for signature match (if row has a signature property or related field)
-    //   if (activeValue?.signature && row.image?.includes(activeValue.signature)) return true;
-
-    //   // Check for netflow match (assuming you want to match against command_line or similar)
-    //   if (activeValue?.netflow && row.command_line?.includes(activeValue.netflow)) return true;
-
-    //   return false;
-    // }, []);
-
-    const isRowActive = useCallback((row: SandboxNetflowItem, activeValue?: SandboxFilter) => {
-      if (!activeValue) return false;
-
-      // Check for process match
-      if (activeValue?.process && row?.pid === activeValue.process.pid) return true;
-
-      // Check for signature match (if row has a signature property or related field)
-      if (activeValue?.signature && activeValue.signature.pids.includes(row?.pid)) return true;
-
-      // Check for netflow match (assuming you want to match against command_line or similar)
-      if (activeValue?.netflow && JSON.stringify(row) === JSON.stringify(activeValue?.netflow)) return true;
-
-      return false;
-    }, []);
-
-    const handleRowClick = useCallback(
-      (row: SandboxNetflowItem) => {
-        onActiveChange(prev =>
-          JSON.stringify(row) === JSON.stringify(prev?.netflow) ? undefined : { netflow: structuredClone(row) }
-        );
-      },
-      [onActiveChange]
+      [columnHelper, theme.palette.text.secondary, t, startTime, body.processes]
     );
 
     return (
@@ -223,11 +222,9 @@ export const NetflowTable = React.memo(
         initialSorting={[{ id: 'time_observed', desc: false }]}
         printable={printable}
         filterValue={filterValue}
-        activeValue={activeValue}
         preventRender={preventRender}
-        isRowActive={isRowActive}
         getRowCount={getRowCount}
-        onRowClick={handleRowClick}
+        isRowFiltered={(row, value) => row.pid === value.process.pid}
       />
     );
   }
