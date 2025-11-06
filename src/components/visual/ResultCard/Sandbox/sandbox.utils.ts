@@ -127,8 +127,8 @@ export const getBackgroundColor = (
   const colorMap: Record<string, string | null> = {
     malicious: theme.palette.error[paletteMode === 'dark' ? 'dark' : 'light'],
     highly_suspicious: theme.palette.warning[paletteMode === 'dark' ? 'dark' : 'light'],
-    suspicious: theme.palette.warning[paletteMode === 'dark' ? 'main' : 'light'],
-    info: theme.palette.grey[paletteMode === 'dark' ? 700 : 300],
+    suspicious: theme.palette.warning[paletteMode === 'dark' ? 'dark' : 'light'],
+    info: theme.palette.grey[800],
     safe: theme.palette.success[paletteMode === 'dark' ? 'dark' : 'light']
   };
 
