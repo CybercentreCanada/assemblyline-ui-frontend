@@ -145,7 +145,7 @@ export const SignatureTable = React.memo(
       <TableContainer
         columns={columns}
         data={body.signatures}
-        initialSorting={[{ id: 'name', desc: false }]}
+        initialSorting={[{ id: 'score', desc: true }]}
         printable={printable}
         filterValue={filterValue}
         activeValue={activeValue}

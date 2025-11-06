@@ -131,7 +131,7 @@ const ProcessTreeItem = React.memo(
     onFilterChange = () => null
   }: ProcessTreeItemProps) => {
     const theme = useTheme();
-    const { settings, scoreToVerdict } = useALContext();
+    const { configuration, scoreToVerdict } = useALContext();
 
     const hasChildren = useMemo(() => !!item.children?.length, [item.children?.length]);
 
@@ -165,7 +165,7 @@ const ProcessTreeItem = React.memo(
       return false;
     }, [activeValue, item.pid]);
 
-    const [open, setOpen] = useState<boolean>(exclusiveDescendantScore >= settings.expand_min_score);
+    const [open, setOpen] = useState<boolean>(exclusiveDescendantScore >= configuration.submission.verdicts.suspicious);
 
     const handleToggle = useCallback(() => setOpen(o => !o), []);
 
