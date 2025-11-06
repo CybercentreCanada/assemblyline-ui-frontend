@@ -79,6 +79,7 @@ export const NetflowTable = React.memo(
             id: 'process',
             header: () => t('process'),
             cell: info => <ProcessChip short process={body.processes?.find(p => p.pid === info.getValue()?.[1])} />,
+            sortDescFirst: false,
             meta: {
               cellSx: { wordBreak: 'inherit !important' }
             }
@@ -87,6 +88,16 @@ export const NetflowTable = React.memo(
         columnHelper.accessor('transport_layer_protocol', {
           header: () => t('protocol'),
           cell: info => info.getValue(),
+          sortingFn: (a, b) => {
+            const nameA = a.original?.transport_layer_protocol?.toLowerCase();
+            const nameB = b.original?.transport_layer_protocol?.toLowerCase();
+
+            if (nameA == null && nameB == null) return 0;
+            if (nameA == null) return 1;
+            if (nameB == null) return -1;
+
+            return nameA.localeCompare(nameB);
+          },
           meta: { cellSx: { textTransform: 'uppercase' } }
         }),
 

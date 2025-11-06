@@ -63,6 +63,16 @@ export const ProcessTable = React.memo(
         columnHelper.accessor('original_file_name', {
           header: () => t('original_file_name'),
           cell: info => info.getValue(),
+          sortingFn: (a, b) => {
+            const nameA = a.original?.original_file_name?.toLowerCase();
+            const nameB = b.original?.original_file_name?.toLowerCase();
+
+            if (nameA == null && nameB == null) return 0;
+            if (nameA == null) return 1;
+            if (nameB == null) return -1;
+
+            return nameA.localeCompare(nameB);
+          },
           meta: {
             cellSx: {
               wordBreak: 'inherit !important',
@@ -104,7 +114,7 @@ export const ProcessTable = React.memo(
             cell: info => (
               <ProcessChip fullWidth process={body.processes?.find(p => p.pid === info.getValue()?.[1] || null)} />
             ),
-
+            sortDescFirst: false,
             meta: {
               cellSx: { wordBreak: 'inherit !important', whiteSpace: 'nowrap' }
             }
