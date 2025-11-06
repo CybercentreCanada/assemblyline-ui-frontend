@@ -2,7 +2,6 @@ import type { Theme } from '@mui/material';
 import { alpha } from '@mui/material';
 import type {
   SandboxBody as SandboxData,
-  SandboxNetflowItem,
   SandboxProcessItem,
   SandboxSignatureItem
 } from 'components/models/base/result_body';
@@ -19,11 +18,13 @@ export type ProcessItem = SandboxProcessItem & {
   children?: ProcessItem[];
 };
 
-export type SandboxFilter = {
-  process?: SandboxProcessItem;
-  netflow?: SandboxNetflowItem;
-  signature?: SandboxSignatureItem;
-};
+// export type SandboxFilter = {
+//   process?: SandboxProcessItem;
+//   netflow?: SandboxNetflowItem;
+//   signature?: SandboxSignatureItem;
+// };
+
+export type SandboxFilter = SandboxProcessItem;
 
 /* ----------------------------------------------------------------------------
  * Build hierarchical process tree from a flat process list

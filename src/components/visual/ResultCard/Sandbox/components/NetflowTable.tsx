@@ -224,7 +224,7 @@ export const NetflowTable = React.memo(
         filterValue={filterValue}
         preventRender={preventRender}
         getRowCount={getRowCount}
-        isRowFiltered={(row, value) => row.pid === value.process.pid}
+        isRowFiltered={(row, value) => row.pid === value.pid}
       />
     );
   }

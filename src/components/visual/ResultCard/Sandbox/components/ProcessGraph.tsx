@@ -22,6 +22,7 @@ import type { ProcessItem, SandboxFilter } from 'components/visual/ResultCard/Sa
 import {
   buildProcessTree,
   getBackgroundColor,
+  getDescendantPids,
   getProcessScore
 } from 'components/visual/ResultCard/Sandbox/sandbox.utils';
 import { humanReadableNumber } from 'helpers/utils';
@@ -130,37 +131,46 @@ const ProcessTreeItem = React.memo(
     onFilterChange = () => null
   }: ProcessTreeItemProps) => {
     const theme = useTheme();
-    const { scoreToVerdict } = useALContext();
+    const { settings, scoreToVerdict } = useALContext();
 
-    const [open, setOpen] = useState<boolean>(false);
-    const hasChildren = !!item.children?.length;
-
-    const handleToggle = useCallback(() => setOpen(o => !o), []);
+    const hasChildren = useMemo(() => !!item.children?.length, [item.children?.length]);
 
     const processScore = useMemo<number | undefined>(() => {
       if (item.safelisted) return undefined;
       return getProcessScore(item, body.signatures) ?? undefined;
     }, [item, body.signatures]);
 
+    const exclusiveDescendantScore = useMemo<number | undefined>(() => {
+      if (!item.pid) return processScore;
+
+      const descendantPids = getDescendantPids(item, body.processes);
+      const relevantProcesses = body.processes.filter(p => descendantPids.includes(p.pid) && p.pid !== item.pid);
+
+      let maxScore = -Infinity;
+
+      for (const proc of relevantProcesses) {
+        if (proc.safelisted) continue;
+        const score = getProcessScore(proc, body.signatures);
+        if (typeof score === 'number' && score > maxScore) maxScore = score;
+      }
+
+      return maxScore === -Infinity ? undefined : maxScore;
+    }, [item, processScore, body.processes, body.signatures]);
+
     const isActive = useMemo(() => {
       if (!activeValue) return false;
 
-      // Check for process match
-      if (activeValue?.process && item.pid === activeValue.process.pid) return true;
-
-      // Check for signature match (if row has a signature property or related field)
-      if (activeValue?.signature && activeValue.signature.pids.includes(item.pid)) return true;
-
-      // Check for netflow match (assuming you want to match against command_line or similar)
-      if (activeValue?.netflow && item.pid === activeValue?.netflow?.pid) return true;
+      if (activeValue && item.pid === activeValue.pid) return true;
 
       return false;
     }, [activeValue, item.pid]);
 
+    const [open, setOpen] = useState<boolean>(exclusiveDescendantScore >= settings.expand_min_score);
+
+    const handleToggle = useCallback(() => setOpen(o => !o), []);
+
     const handleClick = useCallback(
-      (row: SandboxProcessItem) => {
-        onActiveChange(prev => (prev?.process?.pid === row.pid ? undefined : { process: structuredClone(row) }));
-      },
+      (row: SandboxProcessItem) => onActiveChange(prev => (prev?.pid === row.pid ? undefined : structuredClone(row))),
       [onActiveChange]
     );
 

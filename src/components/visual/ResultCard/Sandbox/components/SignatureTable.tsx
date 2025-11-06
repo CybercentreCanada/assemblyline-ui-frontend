@@ -151,7 +151,7 @@ export const SignatureTable = React.memo(
         activeValue={activeValue}
         preventRender={preventRender}
         getRowCount={getRowCount}
-        isRowFiltered={(row, value) => row.pids.includes(value.process.pid)}
+        isRowFiltered={(row, value) => row.pids.includes(value.pid)}
       />
     );
   }
