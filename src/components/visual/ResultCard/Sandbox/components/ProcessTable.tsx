@@ -10,7 +10,7 @@ import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 type ProcessTableProps = {
-  body?: SandboxBody;
+  body?: SandboxBody | null;
   printable?: boolean;
   startTime?: number;
   filterValue?: SandboxFilter;
@@ -36,11 +36,11 @@ export const ProcessTable = React.memo(
       () => [
         columnHelper.accessor('start_time', {
           header: () => t('timeshift'),
-          cell: info => {
-            const cur = info.getValue();
+          cell: ({ getValue }) => {
+            const cur = getValue();
             if (!startTime || !cur) return '-';
-            const delta = ((new Date(cur).getTime() - startTime) / 1000).toFixed(2);
-            return `${delta} s`;
+            const deltaSec = (new Date(cur).getTime() - startTime) / 1000;
+            return `${deltaSec.toFixed(2)} s`;
           },
           meta: {
             cellSx: {
@@ -50,19 +50,15 @@ export const ProcessTable = React.memo(
             }
           }
         }),
-        columnHelper.accessor(row => row.image.split(/[/\\]/).pop() ?? '', {
+        columnHelper.accessor(row => row.image?.split(/[/\\]/).pop() ?? '', {
           id: 'process_name',
           header: () => t('process_name'),
-          cell: info => <ProcessChip fullWidth process={info.row.original} />,
-          meta: {
-            cellSx: {
-              wordBreak: 'inherit !important'
-            }
-          }
+          cell: ({ row }) => <ProcessChip fullWidth process={row.original} />,
+          meta: { cellSx: { wordBreak: 'inherit !important' } }
         }),
         columnHelper.accessor('original_file_name', {
           header: () => t('original_file_name'),
-          cell: info => info.getValue(),
+          cell: ({ getValue }) => getValue() || '-',
           sortingFn: (a, b) => {
             const nameA = a.original?.original_file_name?.toLowerCase();
             const nameB = b.original?.original_file_name?.toLowerCase();
@@ -70,8 +66,7 @@ export const ProcessTable = React.memo(
             if (nameA == null && nameB == null) return 0;
             if (nameA == null) return 1;
             if (nameB == null) return -1;
-
-            return nameA.localeCompare(nameB);
+            return (nameA ?? '').localeCompare(nameB ?? '');
           },
           meta: {
             cellSx: {
@@ -82,10 +77,9 @@ export const ProcessTable = React.memo(
         }),
         columnHelper.accessor('integrity_level', {
           header: () => t('integrity_level'),
-          cell: info => {
-            const level = info.getValue();
+          cell: ({ getValue }) => {
+            const level = getValue();
             if (!level) return '-';
-
             return (
               <CustomChip
                 label={level}
@@ -105,15 +99,17 @@ export const ProcessTable = React.memo(
         }),
         columnHelper.accessor(
           row => {
-            const process = body.processes.find(p => p.pid === row.ppid);
-            return !process ? null : [process?.image?.split(/[/\\]/).pop() ?? '', process.pid];
+            const parent = body?.processes?.find(p => p.pid === row.ppid);
+            return parent ? [parent.image?.split(/[/\\]/).pop() ?? '', parent.pid] : null;
           },
           {
             id: 'parent_process',
             header: () => t('parent_process'),
-            cell: info => (
-              <ProcessChip fullWidth process={body.processes?.find(p => p.pid === info.getValue()?.[1] || null)} />
-            ),
+            cell: ({ getValue }) => {
+              const parentPid = getValue()?.[1];
+              const parent = body?.processes?.find(p => p.pid === parentPid);
+              return parent ? <ProcessChip fullWidth process={parent} /> : '-';
+            },
             sortDescFirst: false,
             meta: {
               cellSx: { wordBreak: 'inherit !important', whiteSpace: 'nowrap' }
@@ -121,13 +117,13 @@ export const ProcessTable = React.memo(
           }
         )
       ],
-      [columnHelper, theme.palette.text.secondary, t, startTime, body.processes]
+      [t, theme.palette.text.secondary, startTime, body?.processes, columnHelper]
     );
 
     return (
       <TableContainer
         columns={columns}
-        data={body.processes}
+        data={body?.processes ?? []}
         initialSorting={[{ id: 'start_time', desc: false }]}
         printable={printable}
         filterValue={filterValue}

@@ -12,7 +12,9 @@ import Verdict from 'components/visual/Verdict';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-type FlatSignatures = SandboxSignatureItem & { flatAttacks?: Record<string, string[]> };
+type FlatSignatures = SandboxSignatureItem & {
+  flatAttacks?: Record<string, string[]>;
+};
 
 type SignatureTableProps = {
   body?: SandboxBody;
@@ -37,104 +39,94 @@ export const SignatureTable = React.memo(
   }: SignatureTableProps) => {
     const { t } = useTranslation('sandboxResult');
     const theme = useTheme();
-
     const columnHelper = createColumnHelper<FlatSignatures>();
+
+    const renderChipList = (items?: string[], type?: 'rounded' | 'round' | 'square') =>
+      items?.map((label, i) => <CustomChip key={i} label={label} size="tiny" variant="outlined" type={type} />);
 
     const columns = useMemo<ColumnDef<FlatSignatures>[]>(
       () => [
         columnHelper.accessor('classification', {
           header: () => t('classification'),
-          cell: info => <Classification c12n={info.getValue()} size="tiny" type="text" />,
-          meta: {}
+          cell: info => <Classification c12n={info.getValue()} size="tiny" type="text" />
         }),
         columnHelper.accessor('pids', {
           id: 'processes',
           enableSorting: false,
           header: () => t('processes'),
-          cell: info =>
-            info
-              .getValue()
-              ?.map((pid, i) => <ProcessChip key={i} short process={body.processes.find(p => p.pid === pid)} />),
+          cell: info => (
+            <>
+              {info
+                .getValue()
+                ?.map(pid => <ProcessChip key={pid} short process={body.processes.find(p => p.pid === pid)} />)}
+            </>
+          ),
           meta: {
             colStyle: { width: '1%' },
-            cellSx: { wordBreak: 'inherit !important', whiteSpace: 'nowrap' }
+            cellSx: { whiteSpace: 'nowrap', wordBreak: 'inherit !important' }
           }
         }),
         columnHelper.accessor('type', {
           header: () => t('type'),
           cell: info => info.getValue(),
-          meta: { cellSx: { wordBreak: 'inherit !important', whiteSpace: 'no-wrap' } }
+          meta: { cellSx: { whiteSpace: 'nowrap', wordBreak: 'inherit !important' } }
         }),
         columnHelper.accessor('score', {
-          sortDescFirst: true,
           header: () => t('verdict'),
-          cell: info => <Verdict fullWidth score={info.getValue()} />,
-          meta: { cellSx: {} }
+          sortDescFirst: true,
+          cell: info => <Verdict fullWidth score={info.getValue()} />
         }),
         columnHelper.accessor('name', {
           header: () => t('name'),
-          cell: info => (
-            <div>
-              <div>{info.getValue()?.replaceAll('_', ' ')}</div>
-              <div style={{ color: theme.palette.text.secondary }}>{info.row.original.message}</div>
-            </div>
-          ),
+          cell: info => {
+            const { message } = info.row.original;
+            return (
+              <div>
+                <div>{info.getValue()?.replaceAll('_', ' ')}</div>
+                {message && <div style={{ color: theme.palette.text.secondary }}>{message}</div>}
+              </div>
+            );
+          },
           meta: { cellSx: { textTransform: 'capitalize' } }
         }),
         columnHelper.accessor(row => row, {
           id: 'details',
-          enableSorting: false,
           header: () => t('details'),
-          cell: info => (
-            <table cellSpacing={0}>
-              <tbody>
-                {!info.getValue()?.actors?.length ? null : (
-                  <>
-                    <DetailTableRow label={t('actors')} isHeader />
-                    <DetailTableRow
-                      children={info
-                        .getValue()
-                        ?.actors.map((actor, i) => (
-                          <CustomChip key={`${i}`} label={actor} size="tiny" variant="outlined" />
-                        ))}
-                    />
-                  </>
-                )}
+          enableSorting: false,
+          cell: info => {
+            const { actors, attacks, malware_families: malwareFamilies } = info.getValue();
 
-                {!info.getValue()?.attacks?.length ? null : (
-                  <>
-                    <DetailTableRow label={t('attacks')} isHeader />
-                    <DetailTableRow
-                      children={info
-                        .getValue()
-                        ?.attacks.map((attack, i) => (
-                          <CustomChip
-                            key={`${i}`}
-                            label={attack.pattern}
-                            size="tiny"
-                            variant="outlined"
-                            type="rounded"
-                          />
-                        ))}
-                    />
-                  </>
-                )}
+            return (
+              <table cellSpacing={0}>
+                <tbody>
+                  {actors?.length > 0 && (
+                    <>
+                      <DetailTableRow label={t('actors')} isHeader />
+                      <DetailTableRow>{renderChipList(info.getValue()?.actors)}</DetailTableRow>
+                    </>
+                  )}
 
-                {!info.getValue()?.malware_families?.length ? null : (
-                  <>
-                    <DetailTableRow label={t('malware_families')} isHeader />
-                    <DetailTableRow
-                      children={info
-                        .getValue()
-                        ?.malware_families.map((actor, i) => (
-                          <CustomChip key={`${i}`} label={actor} size="tiny" variant="outlined" />
+                  {attacks?.length > 0 && (
+                    <>
+                      <DetailTableRow label={t('attacks')} isHeader />
+                      <DetailTableRow>
+                        {attacks.map(({ pattern }, i) => (
+                          <CustomChip key={i} label={pattern} size="tiny" variant="outlined" type="rounded" />
                         ))}
-                    />
-                  </>
-                )}
-              </tbody>
-            </table>
-          ),
+                      </DetailTableRow>
+                    </>
+                  )}
+
+                  {malwareFamilies?.length > 0 && (
+                    <>
+                      <DetailTableRow label={t('malware_families')} isHeader />
+                      <DetailTableRow>{renderChipList(malwareFamilies)}</DetailTableRow>
+                    </>
+                  )}
+                </tbody>
+              </table>
+            );
+          },
           meta: { cellSx: { textTransform: 'capitalize' } }
         })
       ],

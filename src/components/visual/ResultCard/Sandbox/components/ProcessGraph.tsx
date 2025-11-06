@@ -29,71 +29,75 @@ import { humanReadableNumber } from 'helpers/utils';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
+/* ----------------------------------------------------------------------------
+ * ProcessStats
+ * -------------------------------------------------------------------------- */
+
 type ProcessStatsProps = {
   body: SandboxData;
   item: ProcessItem;
 };
+
 const ProcessStats = React.memo(({ body, item }: ProcessStatsProps) => {
   const { t } = useTranslation('sandboxResult');
   const theme = useTheme();
 
   const { netflowCount, signatureCount } = useMemo(() => {
-    let netflowCount = 0;
-    let signatureCount = 0;
-
-    for (const n of body.netflows ?? []) if (n.pid === item.pid) netflowCount++;
-    for (const s of body.signatures ?? []) if (s.pids.includes(item.pid)) signatureCount++;
-
+    const netflowCount = body.netflows?.filter(n => n.pid === item.pid).length ?? 0;
+    const signatureCount = body.signatures?.filter(s => s.pids.includes(item.pid)).length ?? 0;
     return { netflowCount, signatureCount };
   }, [body.netflows, body.signatures, item.pid]);
 
-  const fileCount = item.file_count ?? 0;
-  const registryCount = item.registry_count ?? 0;
-
-  const chips = [
-    {
-      count: netflowCount,
-      icon: <SettingsEthernetOutlinedIcon fontSize="small" />,
-      tooltip: t('process_network')
-    },
-    {
-      count: signatureCount,
-      icon: <FingerprintOutlinedIcon fontSize="small" />,
-      tooltip: t('process_signatures')
-    },
-    {
-      count: fileCount,
-      icon: <InsertDriveFileOutlinedIcon fontSize="small" />,
-      tooltip: t('process_file')
-    },
-    {
-      count: registryCount,
-      icon: <WidgetsOutlinedIcon fontSize="small" />,
-      tooltip: t('process_registry')
-    }
-  ].filter(({ count }) => count > 0);
+  const chipData = useMemo(
+    () =>
+      [
+        {
+          count: netflowCount,
+          icon: <SettingsEthernetOutlinedIcon fontSize="small" />,
+          tooltip: t('process_network')
+        },
+        {
+          count: signatureCount,
+          icon: <FingerprintOutlinedIcon fontSize="small" />,
+          tooltip: t('process_signatures')
+        },
+        {
+          count: item.file_count ?? 0,
+          icon: <InsertDriveFileOutlinedIcon fontSize="small" />,
+          tooltip: t('process_file')
+        },
+        {
+          count: item.registry_count ?? 0,
+          icon: <WidgetsOutlinedIcon fontSize="small" />,
+          tooltip: t('process_registry')
+        }
+      ].filter(c => c.count > 0),
+    [t, netflowCount, signatureCount, item.file_count, item.registry_count]
+  );
 
   return (
     <div
       style={{
-        alignSelf: 'flex-start',
         display: 'flex',
-        flexDirection: 'row',
+        flexWrap: 'wrap',
+        gap: theme.spacing(0.5),
         alignItems: 'center',
-        columnGap: theme.spacing(0.5),
+        alignSelf: 'flex-start',
         paddingTop: theme.spacing(1),
         paddingRight: theme.spacing(0.5)
       }}
     >
-      <CustomChip
-        label={item.integrity_level}
-        size="tiny"
-        variant="outlined"
-        sx={{ textTransform: 'capitalize', fontWeight: 'normal', marginRight: theme.spacing(0.5) }}
-      />
+      {item.integrity_level && (
+        <CustomChip
+          label={item.integrity_level}
+          size="tiny"
+          variant="outlined"
+          sx={{ textTransform: 'capitalize', fontWeight: 400, mr: 0.5 }}
+        />
+      )}
 
-      {chips.map(({ count, icon, tooltip }, idx) => (
-        <Tooltip key={idx} title={`${count} ${tooltip}`}>
+      {chipData.map(({ count, icon, tooltip }, i) => (
+        <Tooltip key={i} title={`${count} ${tooltip}`}>
           <CustomChip
             label={humanReadableNumber(count)}
             icon={icon}
@@ -107,6 +111,10 @@ const ProcessStats = React.memo(({ body, item }: ProcessStatsProps) => {
     </div>
   );
 });
+
+/* ----------------------------------------------------------------------------
+ * ProcessTreeItem
+ * -------------------------------------------------------------------------- */
 
 type ProcessTreeItemProps = {
   body: SandboxData;
@@ -133,39 +141,28 @@ const ProcessTreeItem = React.memo(
     const theme = useTheme();
     const { configuration, scoreToVerdict } = useALContext();
 
-    const hasChildren = useMemo(() => !!item.children?.length, [item.children?.length]);
+    const hasChildren = item.children?.length > 0;
+    const isActive = activeValue?.pid === item.pid;
+    const indent = theme.spacing((depth + 1) * 3);
 
-    const processScore = useMemo<number | undefined>(() => {
-      if (item.safelisted) return undefined;
-      return getProcessScore(item, body.signatures) ?? undefined;
-    }, [item, body.signatures]);
+    const processScore = useMemo(
+      () => (!item.safelisted ? (getProcessScore(item, body.signatures) ?? undefined) : undefined),
+      [item, body.signatures]
+    );
 
-    const exclusiveDescendantScore = useMemo<number | undefined>(() => {
+    const descendantMaxScore = useMemo(() => {
       if (!item.pid) return processScore;
-
       const descendantPids = getDescendantPids(item, body.processes);
-      const relevantProcesses = body.processes.filter(p => descendantPids.includes(p.pid) && p.pid !== item.pid);
-
-      let maxScore = -Infinity;
-
-      for (const proc of relevantProcesses) {
-        if (proc.safelisted) continue;
-        const score = getProcessScore(proc, body.signatures);
-        if (typeof score === 'number' && score > maxScore) maxScore = score;
-      }
-
-      return maxScore === -Infinity ? undefined : maxScore;
+      const scores = body.processes
+        .filter(p => descendantPids.includes(p.pid) && !p.safelisted)
+        .map(p => getProcessScore(p, body.signatures))
+        .filter((s): s is number => typeof s === 'number');
+      return scores.length ? Math.max(...scores) : processScore;
     }, [item, processScore, body.processes, body.signatures]);
 
-    const isActive = useMemo(() => {
-      if (!activeValue) return false;
-
-      if (activeValue && item.pid === activeValue.pid) return true;
-
-      return false;
-    }, [activeValue, item.pid]);
-
-    const [open, setOpen] = useState<boolean>(exclusiveDescendantScore >= configuration.submission.verdicts.suspicious);
+    const [open, setOpen] = useState<boolean>(
+      descendantMaxScore !== undefined && descendantMaxScore >= configuration.submission.verdicts.suspicious
+    );
 
     const handleToggle = useCallback(() => setOpen(o => !o), []);
 
@@ -181,11 +178,11 @@ const ProcessTreeItem = React.memo(
           disableGutters
           disablePadding
           sx={{
-            pr: 0,
-            py: 0.5,
             display: 'grid',
             gridTemplateColumns: 'auto 1fr',
-            alignItems: 'center'
+            alignItems: 'center',
+            py: 0.5,
+            pr: 0
           }}
         >
           {hasChildren ? (
@@ -195,21 +192,23 @@ const ProcessTreeItem = React.memo(
               onClick={handleToggle}
               sx={{
                 height: '100%',
-                padding: '0px',
-                minWidth: theme.spacing((depth + 1) * 3),
+                padding: 0,
+                minWidth: indent,
                 justifyContent: 'flex-end'
               }}
             >
               <ChevronRightIcon
                 fontSize="small"
                 sx={{
-                  transition: `transform ${theme.transitions.duration.shortest}ms ${theme.transitions.easing.sharp}`,
+                  transition: theme.transitions.create('transform', {
+                    duration: theme.transitions.duration.shortest
+                  }),
                   transform: open ? 'rotate(90deg)' : 'rotate(0deg)'
                 }}
               />
             </Button>
           ) : (
-            <div style={{ width: theme.spacing((depth + 1) * 3) }} />
+            <div style={{ width: indent }} />
           )}
 
           <Card>
@@ -233,15 +232,18 @@ const ProcessTreeItem = React.memo(
               }}
               onClick={() => handleClick(item)}
             >
-              <div
-                style={{
+              <Typography
+                variant="body2"
+                sx={{
                   backgroundColor: getBackgroundColor(theme, scoreToVerdict, processScore, 0.25),
                   minWidth: theme.spacing(5),
-                  padding: `${theme.spacing(1)} 0`
+                  py: 1,
+                  textAlign: 'center',
+                  fontFamily: 'monospace'
                 }}
               >
                 {item.pid}
-              </div>
+              </Typography>
 
               <div
                 style={{
@@ -273,7 +275,7 @@ const ProcessTreeItem = React.memo(
         </ListItem>
 
         {hasChildren && (
-          <Collapse in={open} timeout={theme.transitions.duration.shortest} easing={theme.transitions.easing.sharp}>
+          <Collapse in={open} timeout={theme.transitions.duration.shortest}>
             <List disablePadding>
               {item.children.map(child => (
                 <ProcessTreeItem
@@ -296,6 +298,10 @@ const ProcessTreeItem = React.memo(
   }
 );
 
+/* ----------------------------------------------------------------------------
+ * ProcessGraph
+ * -------------------------------------------------------------------------- */
+
 type ProcessGraphProps = {
   body: SandboxData;
   printable?: boolean;
@@ -315,15 +321,12 @@ export const ProcessGraph = React.memo(
     onActiveChange = () => null,
     onFilterChange = () => null
   }: ProcessGraphProps) => {
-    const processTree = useMemo<ProcessItem[]>(
-      () => (body?.processes ? buildProcessTree(body?.processes) : []),
-      [body?.processes]
-    );
+    const processTree = useMemo(() => buildProcessTree(body?.processes ?? []), [body.processes]);
 
     return (
       <div style={{ overflowX: 'auto', maxHeight: printable ? 'auto' : 750 }}>
         <List disablePadding dense>
-          {processTree?.map(item => (
+          {processTree.map(item => (
             <ProcessTreeItem
               key={item.pid}
               body={body}

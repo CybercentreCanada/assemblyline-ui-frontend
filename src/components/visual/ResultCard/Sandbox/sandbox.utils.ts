@@ -1,5 +1,4 @@
-import type { Theme } from '@mui/material';
-import { alpha } from '@mui/material';
+import { alpha, type Theme } from '@mui/material';
 import type {
   SandboxBody as SandboxData,
   SandboxProcessItem,
@@ -18,46 +17,45 @@ export type ProcessItem = SandboxProcessItem & {
   children?: ProcessItem[];
 };
 
-// export type SandboxFilter = {
-//   process?: SandboxProcessItem;
-//   netflow?: SandboxNetflowItem;
-//   signature?: SandboxSignatureItem;
-// };
-
 export type SandboxFilter = SandboxProcessItem;
 
 /* ----------------------------------------------------------------------------
  * Build hierarchical process tree from a flat process list
  * -------------------------------------------------------------------------- */
-export const buildProcessTree = (processes: ProcessItem[]): ProcessItem[] => {
+export const buildProcessTree = (processes: SandboxProcessItem[]): ProcessItem[] => {
   const map = new Map<number, ProcessItem>();
-  for (const proc of processes) map.set(proc.pid, { ...proc, children: [] });
   const roots: ProcessItem[] = [];
-  for (const proc of map.values()) {
-    if (proc.ppid === 0 || !map.has(proc.ppid)) roots.push(proc);
-    else map.get(proc.ppid).children.push(proc);
+
+  for (const proc of processes) {
+    map.set(proc.pid, { ...proc, children: [] });
   }
+
+  for (const proc of map.values()) {
+    const parent = map.get(proc.ppid);
+    if (parent) parent.children.push(proc);
+    else roots.push(proc);
+  }
+
   return roots;
 };
 
 /* ----------------------------------------------------------------------------
  * Compute score for a process
  * -------------------------------------------------------------------------- */
-export const getProcessScore = (process: SandboxProcessItem, signatures: SandboxSignatureItem[]): number | null => {
-  const pid = process.pid;
-  if (!pid) return null;
+export const getProcessScore = (
+  process: SandboxProcessItem,
+  signatures: readonly SandboxSignatureItem[]
+): number | null => {
+  if (!process?.pid) return null;
   if (process.safelisted) return 0;
 
   let total = 0;
   let matched = false;
 
   for (const sig of signatures) {
-    const pids = sig.pids;
-    if (!pids || !pids.includes(pid)) continue;
-
-    matched = true;
-    if (typeof sig.score === 'number') {
-      total += sig.score;
+    if (sig.pids?.includes(process.pid)) {
+      matched = true;
+      total += typeof sig.score === 'number' ? sig.score : 0;
     }
   }
 
@@ -67,19 +65,22 @@ export const getProcessScore = (process: SandboxProcessItem, signatures: Sandbox
 /* ----------------------------------------------------------------------------
  * Collect all descendant PIDs recursively
  * -------------------------------------------------------------------------- */
-export const getDescendantPids = (root: SandboxProcessItem, processes: SandboxProcessItem[]): number[] => {
-  if (!root.pid) return [];
-  const stack = [root.pid];
+export const getDescendantPids = (root: SandboxProcessItem, processes: readonly SandboxProcessItem[]): number[] => {
+  if (!root?.pid) return [];
+
   const descendants: number[] = [];
+  const stack: number[] = [root.pid];
 
   while (stack.length) {
-    const parent = stack.pop();
-    const children = processes.filter(p => p.ppid === parent);
-    for (const child of children) {
-      descendants.push(child.pid);
-      stack.push(child.pid);
+    const parentPid = stack.pop();
+    for (const child of processes) {
+      if (child.ppid === parentPid) {
+        descendants.push(child.pid);
+        stack.push(child.pid);
+      }
     }
   }
+
   return descendants;
 };
 
@@ -87,21 +88,23 @@ export const getDescendantPids = (root: SandboxProcessItem, processes: SandboxPr
  * Compute highest heuristic score among process and descendants
  * -------------------------------------------------------------------------- */
 export const getHighestProcessScore = (item: SandboxProcessItem, body: SandboxData): number | undefined => {
-  const processScore = getProcessScore(item, body.signatures);
-  if (!item.pid) return processScore ?? undefined;
+  const initialScore = getProcessScore(item, body.signatures);
+  if (!item.pid) return initialScore ?? undefined;
 
   const descendantPids = getDescendantPids(item, body.processes);
   const relevant = body.processes.filter(p => p.pid === item.pid || descendantPids.includes(p.pid));
 
-  let maxScore = -Infinity;
+  let maxScore: number | undefined = initialScore ?? undefined;
 
   for (const proc of relevant) {
     if (proc.safelisted) continue;
     const score = getProcessScore(proc, body.signatures);
-    if (typeof score === 'number' && score > maxScore) maxScore = score;
+    if (typeof score === 'number') {
+      maxScore = maxScore === undefined ? score : Math.max(maxScore, score);
+    }
   }
 
-  return maxScore === -Infinity ? undefined : maxScore;
+  return maxScore;
 };
 
 /* ----------------------------------------------------------------------------
@@ -111,21 +114,39 @@ export const getBackgroundColor = (
   theme: Theme,
   scoreToVerdict: (score: number) => string,
   score: number | undefined,
-  opacity: number
+  opacity = 0.2
 ): string | null => {
+  const paletteMode = theme.palette.mode;
+
   if (score === undefined) {
-    return alpha(theme.palette.success[theme.palette.mode === 'dark' ? 'dark' : 'light'], opacity);
+    const base = theme.palette.success[paletteMode === 'dark' ? 'dark' : 'light'];
+    return alpha(base, opacity);
   }
 
   const verdict = scoreToVerdict(score);
   const colorMap: Record<string, string | null> = {
-    malicious: theme.palette.error[theme.palette.mode === 'dark' ? 'dark' : 'light'],
-    highly_suspicious: theme.palette.warning[theme.palette.mode === 'dark' ? 'dark' : 'light'],
-    suspicious: theme.palette.warning[theme.palette.mode === 'dark' ? 'dark' : 'light'],
-    info: theme.palette.grey[800],
-    safe: theme.palette.success[theme.palette.mode === 'dark' ? 'dark' : 'light']
+    malicious: theme.palette.error[paletteMode === 'dark' ? 'dark' : 'light'],
+    highly_suspicious: theme.palette.warning[paletteMode === 'dark' ? 'dark' : 'light'],
+    suspicious: theme.palette.warning[paletteMode === 'dark' ? 'main' : 'light'],
+    info: theme.palette.grey[paletteMode === 'dark' ? 700 : 300],
+    safe: theme.palette.success[paletteMode === 'dark' ? 'dark' : 'light']
   };
 
   const baseColor = colorMap[verdict] ?? null;
   return baseColor ? alpha(baseColor, opacity) : null;
+};
+
+// ──────────────────────────────────────────────────────────────
+// IP comparison helper
+// ──────────────────────────────────────────────────────────────
+export const compareIPs = (ipA: string, ipB: string): number => {
+  const aParts = ipA.split(/[.:]/).map(Number);
+  const bParts = ipB.split(/[.:]/).map(Number);
+  const len = Math.max(aParts.length, bParts.length);
+
+  for (let i = 0; i < len; i++) {
+    const diff = (aParts[i] || 0) - (bParts[i] || 0);
+    if (diff !== 0) return diff;
+  }
+  return 0;
 };

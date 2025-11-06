@@ -12,29 +12,34 @@ import { useTranslation } from 'react-i18next';
 
 type LabelProps = {
   label?: string;
-  quantity?: number;
+  quantity?: number | null;
   total?: number;
 };
 
 const Label = React.memo(({ label, quantity, total }: LabelProps) => {
   const theme = useTheme();
 
+  if (!label) return null;
+
+  const showCount = total && total > 0;
+  const hasPartial = quantity != null && quantity !== total;
+
   return (
     <div style={{ display: 'flex', alignItems: 'center', columnGap: theme.spacing(1) }}>
       {label}
-      {!total ? null : (
+      {showCount && (
         <CustomChip
+          size="tiny"
           label={
-            quantity != null && quantity !== total ? (
-              <span>
+            hasPartial ? (
+              <>
                 <span style={{ color: theme.palette.text.primary }}>{quantity}</span>
                 <span style={{ color: theme.palette.text.disabled }}>{`/${total}`}</span>
-              </span>
+              </>
             ) : (
               <span style={{ color: theme.palette.text.primary }}>{total}</span>
             )
           }
-          size="tiny"
         />
       )}
     </div>
@@ -51,20 +56,20 @@ export const SandboxBody = React.memo(({ body, printable = false }: SandboxBodyP
   const { t } = useTranslation('sandboxResult');
 
   const [tab, setTab] = useState<'processes' | 'netflows' | 'signatures'>('processes');
-  const [filterValue, setFilterValue] = useState<SandboxFilter | undefined>(undefined);
+  const [filterValue, setFilterValue] = useState<SandboxFilter>();
   const [rowCounts, setRowCounts] = useState<{ processes: number; netflows: number; signatures: number }>({
-    processes: null,
-    netflows: null,
-    signatures: null
+    processes: 0,
+    netflows: 0,
+    signatures: 0
   });
 
-  const startTime = useMemo<number | undefined>(() => {
+  const startTime = useMemo(() => {
     const time = body?.analysis_metadata?.start_time;
     return time ? new Date(time).getTime() : undefined;
   }, [body]);
 
   const handleRowCountChange = useCallback(
-    (k: string) => (v: number) => setRowCounts(q => ({ ...q, [k]: v || 0 })),
+    (key: keyof typeof rowCounts) => (count: number) => setRowCounts(prev => ({ ...prev, [key]: count || 0 })),
     []
   );
 
@@ -98,7 +103,6 @@ export const SandboxBody = React.memo(({ body, printable = false }: SandboxBodyP
                     startTime={startTime}
                     filterValue={filterValue}
                     getRowCount={handleRowCountChange('processes')}
-                    onFilterChange={setFilterValue}
                   />
                 )
               }
@@ -114,7 +118,6 @@ export const SandboxBody = React.memo(({ body, printable = false }: SandboxBodyP
                     startTime={startTime}
                     filterValue={filterValue}
                     getRowCount={handleRowCountChange('netflows')}
-                    onFilterChange={setFilterValue}
                   />
                 )
               }
@@ -129,7 +132,6 @@ export const SandboxBody = React.memo(({ body, printable = false }: SandboxBodyP
                     printable={printable}
                     filterValue={filterValue}
                     getRowCount={handleRowCountChange('signatures')}
-                    onFilterChange={setFilterValue}
                   />
                 )
               }
