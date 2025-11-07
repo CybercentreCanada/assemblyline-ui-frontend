@@ -57,11 +57,6 @@ const ServiceContainer = ({ service, defaults, setService, setModified }: Servic
     setService({ ...service, dependencies: depList });
   };
 
-  const handlePrivilegedToggle = () => {
-    setModified(true);
-    setService({ ...service, privileged: !service.privileged });
-  };
-
   return (
     <Grid container spacing={2}>
       <Grid size={{ xs: 12 }}>
