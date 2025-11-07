@@ -57,11 +57,6 @@ const ServiceContainer = ({ service, defaults, setService, setModified }: Servic
     setService({ ...service, dependencies: depList });
   };
 
-  const handlePrivilegedToggle = () => {
-    setModified(true);
-    setService({ ...service, privileged: !service.privileged });
-  };
-
   return (
     <Grid container spacing={2}>
       <Grid size={{ xs: 12 }}>
@@ -96,28 +91,6 @@ const ServiceContainer = ({ service, defaults, setService, setModified }: Servic
               <MenuItem value="dev">{t('container.channel.dev')}</MenuItem>
             </Select>
           </FormControl>
-        ) : (
-          <Skeleton style={{ height: '2.5rem' }} />
-        )}
-      </Grid>
-      <Grid size={{ xs: 12 }}>
-        <Typography variant="subtitle2">
-          {t('container.privileged')}
-          <ResetButton
-            service={service}
-            defaults={defaults}
-            field="privileged"
-            reset={() => {
-              setModified(true);
-              setService({ ...service, privileged: !!defaults.privileged });
-            }}
-          />
-        </Typography>
-        {service ? (
-          <RadioGroup value={service.privileged} onChange={handlePrivilegedToggle}>
-            <FormControlLabel value control={<Radio />} label={t('container.privileged.true')} />
-            <FormControlLabel value={false} control={<Radio />} label={t('container.privileged.false')} />
-          </RadioGroup>
         ) : (
           <Skeleton style={{ height: '2.5rem' }} />
         )}

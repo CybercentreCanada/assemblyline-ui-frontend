@@ -39,7 +39,6 @@ const WrappedServiceTable: React.FC<Props> = ({ serviceResults, updates, setServ
               <DivTableCell>{t('header.stage')}</DivTableCell>
               <DivTableCell>{t('header.accepts')}</DivTableCell>
               <DivTableCell>{t('header.external')}</DivTableCell>
-              <DivTableCell>{t('header.mode')}</DivTableCell>
               {c12nDef.enforce ? <DivTableCell>{t('header.classification')}</DivTableCell> : null}
               <DivTableCell>{t('header.enabled')}</DivTableCell>
               <DivTableCell />
@@ -92,17 +91,6 @@ const WrappedServiceTable: React.FC<Props> = ({ serviceResults, updates, setServ
                       <div>&nbsp;</div>
                     </Tooltip>
                   )}
-                </DivTableCell>
-                <DivTableCell>
-                  <CustomChip
-                    size="tiny"
-                    type="rounded"
-                    mono
-                    label={result.privileged ? 'P' : 'S'}
-                    color={result.privileged ? 'primary' : 'default'}
-                    tooltip={result.privileged ? t('mode.privileged') : t('mode.service')}
-                    tooltipPlacement="left"
-                  />
                 </DivTableCell>
                 {c12nDef.enforce ? (
                   <DivTableCell>
