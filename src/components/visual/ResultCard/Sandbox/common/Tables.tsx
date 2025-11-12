@@ -8,14 +8,14 @@ type DetailTableCellValueProps = {
 };
 
 const DetailTableCellValue = React.memo(({ value = null }: DetailTableCellValueProps) => {
-  if (Array.isArray(value))
-    return (
-      <>
-        {value.map((v, i) => (
-          <DetailTableCellValue key={i} value={v} />
-        ))}
-      </>
-    );
+  if (Array.isArray(value)) return <DetailTableCellValue value={value.join(' | ')} />;
+  // return (
+  //   <>
+  //     {value.join(" | ").map((v, i) => (
+  //       <DetailTableCellValue key={i} value={v} />
+  //     ))}
+  //   </>
+  // );
   if (value && typeof value === 'object') return Object.keys(value).length > 0 ? <KVBody body={value} /> : null;
   if (value === null || value === undefined) return null;
   return <>{String(value)}</>;

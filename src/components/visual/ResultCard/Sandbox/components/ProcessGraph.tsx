@@ -44,7 +44,7 @@ const ProcessStats = React.memo(({ body, item }: ProcessStatsProps) => {
 
   const { netflowCount, signatureCount } = useMemo(() => {
     const netflowCount = body.network_connections?.filter(n => n.process === item.pid).length ?? 0;
-    const signatureCount = body.signatures?.filter(s => s.pid.includes(item.pid)).length ?? 0;
+    const signatureCount = body.signatures?.filter(s => s?.pid?.includes(item.pid)).length ?? 0;
     return { netflowCount, signatureCount };
   }, [body.network_connections, body.signatures, item.pid]);
 
