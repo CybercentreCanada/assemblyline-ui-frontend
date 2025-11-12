@@ -255,7 +255,7 @@ const ProcessTreeItem = React.memo(
                   padding: `${theme.spacing(1)} 0`
                 }}
               >
-                <Typography component="div" fontWeight={500} variant="body2">
+                <Typography component="div" fontWeight={500} variant="body2" sx={{ wordBreak: 'break-all' }}>
                   {item.image?.split(/[/\\]/).pop() ?? ''}
                 </Typography>
                 <Typography
@@ -264,6 +264,7 @@ const ProcessTreeItem = React.memo(
                   fontFamily="monospace"
                   variant="body2"
                   textAlign="start"
+                  sx={{ wordBreak: 'break-all' }}
                 >
                   {item.command_line}
                 </Typography>
