@@ -134,7 +134,7 @@ export type SandboxMachineMetadata = {
 
 export type SandboxAnalysisMetadata = {
   /** The ID used for identifying the analysis task. */
-  task_id?: string;
+  task_id?: number;
 
   /** The start time of the analysis (ISO format). */
   start_time: string;
@@ -147,6 +147,8 @@ export type SandboxAnalysisMetadata = {
 
   /** The resolution used for the analysis. */
   window_size?: string;
+
+  machine_metadata?: SandboxMachineMetadata;
 };
 
 export type SandboxProcessItem = {
@@ -255,7 +257,7 @@ export type SandboxNetflowItem = {
   direction?: ConnectionDirection;
 
   /** PID of the process that spawned the network connection. */
-  pid?: number;
+  process?: number;
 
   /** The source IP of the connection. */
   source_ip?: string;
@@ -309,26 +311,24 @@ export type SandboxSignatureItem = {
   /** List of malware families of the signature. */
   malware_families?: string[];
 
-  /** ID of the signature. */
-  signature_id?: string;
-
   /** Optional human-readable message. */
-  message?: string;
+  description?: string;
 
   /** PIDs of the processes that generated the signature. */
-  pids?: number[];
+  pid?: number[];
 
   /** Score of the heuristic this signature belongs to. */
   score?: number;
 };
 
 export type SandboxBody = {
-  sandbox_name?: string;
-  sandbox_version?: string;
-  machine_metadata?: SandboxMachineMetadata;
-  analysis_metadata?: SandboxAnalysisMetadata;
+  analysis_information: {
+    sandbox_name: string;
+    sandbox_version: string;
+    analysis_metadata: SandboxAnalysisMetadata;
+  };
   processes: SandboxProcessItem[];
-  netflows: SandboxNetflowItem[];
+  network_connections: SandboxNetflowItem[];
   signatures: SandboxSignatureItem[];
 };
 

@@ -64,7 +64,7 @@ export const SandboxBody = React.memo(({ body, printable = false }: SandboxBodyP
   });
 
   const startTime = useMemo(() => {
-    const time = body?.analysis_metadata?.start_time;
+    const time = body?.analysis_information?.analysis_metadata?.start_time;
     return time ? new Date(time).getTime() : undefined;
   }, [body]);
 
@@ -107,9 +107,11 @@ export const SandboxBody = React.memo(({ body, printable = false }: SandboxBodyP
                 )
               }
             }),
-            ...(body.netflows.length && {
+            ...(body.network_connections.length && {
               netflows: {
-                label: <Label label={t('netflows')} quantity={rowCounts.netflows} total={body.netflows.length} />,
+                label: (
+                  <Label label={t('netflows')} quantity={rowCounts.netflows} total={body.network_connections.length} />
+                ),
                 inner: (
                   <NetflowTable
                     body={body}

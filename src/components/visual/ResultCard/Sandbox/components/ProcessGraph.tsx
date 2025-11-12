@@ -43,10 +43,10 @@ const ProcessStats = React.memo(({ body, item }: ProcessStatsProps) => {
   const theme = useTheme();
 
   const { netflowCount, signatureCount } = useMemo(() => {
-    const netflowCount = body.netflows?.filter(n => n.pid === item.pid).length ?? 0;
-    const signatureCount = body.signatures?.filter(s => s.pids.includes(item.pid)).length ?? 0;
+    const netflowCount = body.network_connections?.filter(n => n.process === item.pid).length ?? 0;
+    const signatureCount = body.signatures?.filter(s => s.pid.includes(item.pid)).length ?? 0;
     return { netflowCount, signatureCount };
-  }, [body.netflows, body.signatures, item.pid]);
+  }, [body.network_connections, body.signatures, item.pid]);
 
   const chipData = useMemo(
     () =>

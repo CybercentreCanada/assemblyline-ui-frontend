@@ -53,7 +53,7 @@ export const NetflowTable = React.memo(
         }),
         columnHelper.accessor(
           row => {
-            const process = body?.processes?.find(p => p.pid === row.pid);
+            const process = body?.processes?.find(p => p.pid === row.process);
             return process ? [process.image?.split(/[/\\]/).pop() ?? '', process.pid] : null;
           },
           {
@@ -205,13 +205,13 @@ export const NetflowTable = React.memo(
     return (
       <TableContainer
         columns={columns}
-        data={body?.netflows ?? []}
+        data={body?.network_connections ?? []}
         initialSorting={[{ id: 'time_observed', desc: false }]}
         printable={printable}
         filterValue={filterValue}
         preventRender={preventRender}
         getRowCount={getRowCount}
-        isRowFiltered={(row, value) => row.pid === value.pid}
+        isRowFiltered={(row, value) => row.process === value.pid}
       />
     );
   }
