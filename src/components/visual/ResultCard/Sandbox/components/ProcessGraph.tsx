@@ -84,7 +84,8 @@ const ProcessStats = React.memo(({ body, item }: ProcessStatsProps) => {
         alignItems: 'center',
         alignSelf: 'flex-start',
         paddingTop: theme.spacing(1),
-        paddingRight: theme.spacing(0.5)
+        paddingRight: theme.spacing(0.5),
+        paddingLeft: theme.spacing(0.5)
       }}
     >
       {item.integrity_level && (
