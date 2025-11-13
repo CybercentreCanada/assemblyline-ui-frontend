@@ -43,10 +43,10 @@ const ProcessStats = React.memo(({ body, item }: ProcessStatsProps) => {
   const theme = useTheme();
 
   const { netflowCount, signatureCount } = useMemo(() => {
-    const netflowCount = body.netflows?.filter(n => n.pid === item.pid).length ?? 0;
-    const signatureCount = body.signatures?.filter(s => s.pids.includes(item.pid)).length ?? 0;
+    const netflowCount = body.network_connections?.filter(n => n.process === item.pid).length ?? 0;
+    const signatureCount = body.signatures?.filter(s => s?.pid?.includes(item.pid)).length ?? 0;
     return { netflowCount, signatureCount };
-  }, [body.netflows, body.signatures, item.pid]);
+  }, [body.network_connections, body.signatures, item.pid]);
 
   const chipData = useMemo(
     () =>
@@ -84,7 +84,8 @@ const ProcessStats = React.memo(({ body, item }: ProcessStatsProps) => {
         alignItems: 'center',
         alignSelf: 'flex-start',
         paddingTop: theme.spacing(1),
-        paddingRight: theme.spacing(0.5)
+        paddingRight: theme.spacing(0.5),
+        paddingLeft: theme.spacing(0.5)
       }}
     >
       {item.integrity_level && (
@@ -255,7 +256,7 @@ const ProcessTreeItem = React.memo(
                   padding: `${theme.spacing(1)} 0`
                 }}
               >
-                <Typography component="div" fontWeight={500} variant="body2">
+                <Typography component="div" fontWeight={500} variant="body2" sx={{ wordBreak: 'break-all' }}>
                   {item.image?.split(/[/\\]/).pop() ?? ''}
                 </Typography>
                 <Typography
@@ -264,6 +265,7 @@ const ProcessTreeItem = React.memo(
                   fontFamily="monospace"
                   variant="body2"
                   textAlign="start"
+                  sx={{ wordBreak: 'break-all' }}
                 >
                   {item.command_line}
                 </Typography>

@@ -24,6 +24,7 @@ export const ProcessChip = React.memo(({ process, short = false, fullWidth = fal
         alignItems: 'start',
         border: `1px solid ${theme.palette.divider}`,
         borderRadius: theme.shape.borderRadius,
+        margin: theme.spacing(0.5),
         ...(!fullWidth && { width: 'max-content' })
       }}
     >

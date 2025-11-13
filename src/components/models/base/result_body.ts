@@ -111,224 +111,246 @@ export type TimelineBody = {
   opposite_content: string | null;
 };
 
-/** Sandbox Body */
+/** Information about the sandbox machine used during analysis. */
 export type SandboxMachineMetadata = {
-  /** The IP of the machine used for analysis. */
+  /** The IP address of the machine used for analysis. */
   ip?: string;
 
-  /** The hypervisor of the machine used for analysis. */
+  /** The hypervisor type of the machine used for analysis. */
   hypervisor?: string;
 
-  /** The name of the machine used for analysis. */
+  /** The hostname of the machine used for analysis. */
   hostname?: string;
 
-  /** The platform of the machine used for analysis. */
+  /** The operating system platform of the machine (e.g., "Windows", "Linux"). */
   platform?: string;
 
-  /** The version of the operating system of the machine used for analysis. */
+  /** The version of the operating system. */
   version?: string;
 
-  /** The architecture of the machine used for analysis. */
+  /** The system architecture of the machine (e.g., "x64", "arm64"). */
   architecture?: string;
 };
 
+/** Metadata describing the context and configuration of a sandbox analysis. */
 export type SandboxAnalysisMetadata = {
-  /** The ID used for identifying the analysis task. */
-  task_id?: string;
+  /** The unique identifier of the analysis task. */
+  task_id?: number;
 
-  /** The start time of the analysis (ISO format). */
+  /** The timestamp when the analysis started (ISO 8601 format). */
   start_time: string;
 
-  /** The end time of the analysis (ISO format). */
+  /** The timestamp when the analysis ended (ISO 8601 format). */
   end_time?: string;
 
-  /** The routing used in the sandbox setup. (e.g., Spoofed, Internet, Tor, VPN) */
+  /** The network routing used during analysis (e.g., "Spoofed", "Internet", "Tor", "VPN"). */
   routing?: string;
 
-  /** The resolution used for the analysis. */
+  /** The screen resolution or window size used for the sandbox environment. */
   window_size?: string;
+
+  /** Metadata describing the machine on which the analysis ran. */
+  machine_metadata?: SandboxMachineMetadata;
 };
 
+/** Information about a process observed during sandbox execution. */
 export type SandboxProcessItem = {
-  /** The image of the process. Default: "<unknown_image>". */
+  /** The executable image name of the process. Default: "<unknown_image>". */
   image: string;
 
-  /** The time of creation for the process. (ISO date format) */
+  /** The timestamp when the process started (ISO 8601 format). */
   start_time: string;
 
-  /** The process ID of the parent process. */
+  /** The parent process ID (PPID). */
   ppid?: number;
 
-  /** The process ID. */
+  /** The process ID (PID). */
   pid?: number;
 
-  /** The command line that the process ran. */
+  /** The full command line used to start the process. */
   command_line?: string;
 
-  /** The time of termination for the process. (ISO date format) */
+  /** The timestamp when the process terminated (ISO 8601 format). */
   end_time?: string;
 
-  /** The integrity level of the process. */
+  /** The integrity level of the process (e.g., "High", "Medium", "Low"). */
   integrity_level?: string;
 
-  /** The hash of the file run. */
+  /** The hash of the executable file for the process (e.g., SHA256). */
   image_hash?: string;
 
-  /** The original name of the file. */
+  /** The original file name as embedded in the binary metadata. */
   original_file_name?: string;
 
-  /** Whether this process was safelisted. */
+  /** Indicates whether this process was safelisted (whitelisted). */
   safelisted?: boolean;
 
-  /** Number of file events associated to the process. */
+  /** The number of file I/O events associated with this process. */
   file_count?: number;
 
-  /** Number of registry events associated to the process. */
+  /** The number of registry modification events associated with this process. */
   registry_count?: number;
 };
 
+/** Details of a DNS query observed during sandbox execution. */
 export type SandboxNetworkDNS = {
-  /** The domain requested. */
+  /** The domain name requested (queried). */
   domain: string;
 
-  /** The type of DNS request. */
+  /** The DNS lookup type (e.g., "A", "AAAA", "MX"). */
   lookup_type: LookupType;
 
-  /** A list of IPs that were resolved. */
+  /** A list of IP addresses returned in the DNS response. */
   resolved_ips?: string[];
 
-  /** A list of domains that were resolved. */
+  /** A list of domain names returned in the DNS response (for CNAMEs, etc.). */
   resolved_domains?: string[];
 };
 
+/** Details of an HTTP request/response observed during sandbox execution. */
 export type SandboxNetworkHTTP = {
-  /** The URI requested. */
+  /** The URI requested by the process. */
   request_uri: string;
 
-  /** Headers included in the request. */
+  /** Headers included in the HTTP request. */
   request_headers?: Record<string, unknown>;
 
-  /** The method of the request. */
+  /** The HTTP request method (e.g., "GET", "POST"). */
   request_method?: RequestMethod;
 
-  /** Headers included in the response. */
+  /** Headers included in the HTTP response. */
   response_headers?: Record<string, unknown>;
 
-  /** The body of the request. */
+  /** The raw body content of the HTTP request. */
   request_body?: string;
 
-  /** The status code of the response. */
+  /** The HTTP status code of the response (e.g., 200, 404). */
   response_status_code?: number;
 
-  /** The body of the response. */
+  /** The raw body content of the HTTP response. */
   response_body?: string;
 
-  /** File information of the response content. (JSON-friendly representation) */
+  /** Metadata about any file contained in the HTTP response body. */
   response_content_fileinfo?: Record<string, unknown>;
 
-  /** MIME type returned by the server. */
+  /** The MIME type of the HTTP response content. */
   response_content_mimetype?: string;
 };
 
+/** Details of an SMTP email transaction observed during sandbox execution. */
 export type SandboxNetworkSMTP = {
-  /** Sender of the email. */
+  /** The sender email address in the SMTP transaction. */
   mail_from: string;
 
-  /** Recipients of the email. */
+  /** A list of recipient email addresses in the SMTP transaction. */
   mail_to: string[];
 
-  /** File information about the attachments. */
+  /** Information about any attachments transmitted via SMTP. */
   attachments?: Record<string, unknown>[];
 };
 
+/** Details of a network flow (connection) observed during sandbox execution. */
 export type SandboxNetflowItem = {
-  /** The destination IP of the connection. */
+  /** The destination IP address of the network connection. */
   destination_ip?: string;
 
-  /** The destination port of the connection. */
+  /** The destination port number of the connection. */
   destination_port?: number;
 
-  /** The transport layer protocol (e.g., tcp, udp). */
+  /** The transport layer protocol used (e.g., "tcp", "udp"). */
   transport_layer_protocol?: 'tcp' | 'udp';
 
-  /** The direction of the network connection. */
+  /** The direction of the network connection (e.g., "inbound", "outbound"). */
   direction?: ConnectionDirection;
 
-  /** PID of the process that spawned the network connection. */
-  pid?: number;
+  /** The process ID that initiated or owned the network connection. */
+  process?: number;
 
-  /** The source IP of the connection. */
+  /** The source IP address of the connection. */
   source_ip?: string;
 
-  /** The source port of the connection. */
+  /** The source port number of the connection. */
   source_port?: number;
 
-  /** The time at which the netflow item was observed. */
-  time_observed?: string; // ISO date format
+  /** The timestamp when the network event was observed (ISO 8601 format). */
+  time_observed?: string;
 
-  /** HTTP-specific details of the request. Only present when relevant. */
+  /** Detailed HTTP request/response data, if the flow is HTTP-related. */
   http_details?: SandboxNetworkHTTP;
 
-  /** DNS-specific details of the request. Only present when relevant. */
+  /** Detailed DNS query/response data, if the flow is DNS-related. */
   dns_details?: SandboxNetworkDNS;
 
-  /** SMTP-specific details of the request. Only present when relevant. */
+  /** Detailed SMTP email data, if the flow is SMTP-related. */
   smtp_details?: SandboxNetworkSMTP;
 
-  /** Type of connection being made. */
+  /** The type or category of the connection (e.g., "download", "upload"). */
   connection_type?: ConnectionType;
 };
 
+/** Describes an ATT&CK technique or tactic detected during sandbox execution. */
 export type SandboxAttackItem = {
-  /** ATT&CK technique id (e.g. "T1059.001"). */
+  /** The MITRE ATT&CK technique ID (e.g., "T1059.001"). */
   attack_id: string;
 
-  /** Pattern Name */
+  /** The name or pattern describing the attack behavior. */
   pattern: string;
 
-  /** Categories */
+  /** The list of categories or tactics associated with this attack. */
   categories: string[];
 };
 
+/** Represents a detection signature triggered during analysis. */
 export type SandboxSignatureItem = {
-  /** The name of the signature. */
+  /** The name of the detection signature. */
   name: string;
 
-  /** Type of signature. One of: "CUCKOO", "YARA", "SIGMA", "SURICATA". */
+  /** The source type of the signature (e.g., "CUCKOO", "YARA", "SIGMA", "SURICATA"). */
   type: SignatureType;
 
-  /** Classification of signature (e.g., "malicious", "benign"). */
+  /** The classification of the signature (e.g., "malicious", "benign"). */
   classification: string;
 
-  /** Attributes about the signature (converted to attack objects here). */
+  /** The list of ATT&CK patterns or related attack metadata linked to this signature. */
   attacks?: SandboxAttackItem[];
 
-  /** List of actors of the signature. */
+  /** The list of threat actors associated with this signature. */
   actors?: string[];
 
-  /** List of malware families of the signature. */
+  /** The list of malware families linked to this signature. */
   malware_families?: string[];
 
-  /** ID of the signature. */
-  signature_id?: string;
+  /** A human-readable description of what the signature represents. */
+  description?: string;
 
-  /** Optional human-readable message. */
-  message?: string;
+  /** The list of process IDs (PIDs) that triggered the signature. */
+  pid?: number[];
 
-  /** PIDs of the processes that generated the signature. */
-  pids?: number[];
-
-  /** Score of the heuristic this signature belongs to. */
+  /** The score or weight associated with the heuristic signature. */
   score?: number;
 };
 
+/** The main sandbox analysis body containing all observed data and metadata. */
 export type SandboxBody = {
-  sandbox_name?: string;
-  sandbox_version?: string;
-  machine_metadata?: SandboxMachineMetadata;
-  analysis_metadata?: SandboxAnalysisMetadata;
+  /** General information about the sandbox and analysis environment. */
+  analysis_information: {
+    /** The name of the sandbox used to perform the analysis. */
+    sandbox_name: string;
+
+    /** The version of the sandbox software. */
+    sandbox_version: string;
+
+    /** Metadata about when and how the analysis was executed. */
+    analysis_metadata: SandboxAnalysisMetadata;
+  };
+
+  /** The list of processes observed during the sandbox execution. */
   processes: SandboxProcessItem[];
-  netflows: SandboxNetflowItem[];
+
+  /** The list of network connections observed during the sandbox execution. */
+  network_connections: SandboxNetflowItem[];
+
+  /** The list of detection signatures triggered during the sandbox execution. */
   signatures: SandboxSignatureItem[];
 };
 

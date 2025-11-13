@@ -50,7 +50,7 @@ export const SignatureTable = React.memo(
           header: () => t('classification'),
           cell: info => <Classification c12n={info.getValue()} size="tiny" type="text" />
         }),
-        columnHelper.accessor('pids', {
+        columnHelper.accessor('pid', {
           id: 'processes',
           enableSorting: false,
           header: () => t('processes'),
@@ -79,11 +79,11 @@ export const SignatureTable = React.memo(
         columnHelper.accessor('name', {
           header: () => t('name'),
           cell: info => {
-            const { message } = info.row.original;
+            const { description } = info.row.original;
             return (
               <div>
                 <div>{info.getValue()?.replaceAll('_', ' ')}</div>
-                {message && <div style={{ color: theme.palette.text.secondary }}>{message}</div>}
+                {description && <div style={{ color: theme.palette.text.secondary }}>{description}</div>}
               </div>
             );
           },
@@ -143,7 +143,7 @@ export const SignatureTable = React.memo(
         activeValue={activeValue}
         preventRender={preventRender}
         getRowCount={getRowCount}
-        isRowFiltered={(row, value) => row.pids.includes(value.pid)}
+        isRowFiltered={(row, value) => row.pid?.includes(value.pid)}
       />
     );
   }

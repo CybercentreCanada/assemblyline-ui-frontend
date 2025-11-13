@@ -79,40 +79,43 @@ const StyledTableHead = memo(
 );
 
 const StyledTableCell = memo(
-  styled(TableCell, { shouldForwardProp: prop => prop !== 'sortable' })<{ active?: boolean; sortable?: boolean }>(
-    ({ theme, sortable, active }) => ({
-      '&.MuiTableCell-root': {
-        '@media print': { color: 'black' },
-        fontSize: 'inherit',
-        lineHeight: 'inherit',
-        ...(active && {
-          backgroundColor: alpha(
-            theme.palette.mode === 'dark' ? theme.palette.primary.light : theme.palette.primary.dark,
-            theme.palette.action.activatedOpacity
-          )
-        })
-      },
-      '&.MuiTableCell-head': {
-        '@media print': { color: 'black', backgroundColor: '#DDD !important' },
-        backgroundColor: theme.palette.mode === 'dark' ? '#404040' : '#EEE',
-        cursor: sortable ? 'pointer' : 'default',
-        userSelect: 'none'
-      },
-      '&.MuiTableCell-body': {
-        [theme.breakpoints.up('md')]: { wordBreak: 'break-word' }
-      }
-    })
-  )
+  styled(TableCell, { shouldForwardProp: prop => prop !== 'sortable' && prop !== 'active' })<{
+    active?: boolean;
+    sortable?: boolean;
+  }>(({ theme, sortable, active }) => ({
+    '&.MuiTableCell-root': {
+      '@media print': { color: 'black' },
+      fontSize: 'inherit',
+      lineHeight: 'inherit',
+      ...(active && {
+        backgroundColor: alpha(
+          theme.palette.mode === 'dark' ? theme.palette.primary.light : theme.palette.primary.dark,
+          theme.palette.action.activatedOpacity
+        )
+      })
+    },
+    '&.MuiTableCell-head': {
+      '@media print': { color: 'black', backgroundColor: '#DDD !important' },
+      backgroundColor: theme.palette.mode === 'dark' ? '#404040' : '#EEE',
+      cursor: sortable ? 'pointer' : 'default',
+      userSelect: 'none'
+    },
+    '&.MuiTableCell-body': {
+      [theme.breakpoints.up('md')]: { wordBreak: 'break-word' }
+    }
+  }))
 );
 
 const StyledTableRow = memo(
-  styled(TableRow)<TableRowProps & { active?: boolean }>(({ theme, hover }) => ({
-    ...(hover && { cursor: 'pointer' }),
-    '&:nth-of-type(odd)': {
-      '@media print': { backgroundColor: '#EEE !important' },
-      backgroundColor: theme.palette.mode === 'dark' ? '#ffffff08' : '#00000008'
-    }
-  }))
+  styled(TableRow, { shouldForwardProp: prop => prop !== 'active' })<TableRowProps & { active?: boolean }>(
+    ({ theme, hover }) => ({
+      ...(hover && { cursor: 'pointer' }),
+      '&:nth-of-type(odd)': {
+        '@media print': { backgroundColor: '#EEE !important' },
+        backgroundColor: theme.palette.mode === 'dark' ? '#ffffff08' : '#00000008'
+      }
+    })
+  )
 );
 
 export type TableContainerProps<T extends object, F extends object, A> = {

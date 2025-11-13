@@ -53,7 +53,7 @@ export const getProcessScore = (
   let matched = false;
 
   for (const sig of signatures) {
-    if (sig.pids?.includes(process.pid)) {
+    if (sig.pid?.includes(process.pid)) {
       matched = true;
       total += typeof sig.score === 'number' ? sig.score : 0;
     }
