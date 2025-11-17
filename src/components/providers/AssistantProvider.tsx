@@ -564,7 +564,7 @@ function AssistantProvider({ children }: AssistantProviderProps) {
                 backgroundColor: theme.palette.mode === 'dark' ? '#616161' : '#888'
               }}
             >
-              <ContactSupportIcon />
+              <ContactSupportIcon fontSize="large" />
             </Fab>
           </Tooltip>
         )}
