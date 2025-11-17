@@ -682,6 +682,7 @@ export const CONFIGURATION: Configuration = {
   system: {
     organisation: '',
     type: 'development',
+    support_link: 'https://cybercentrecanada.github.io/assemblyline4_docs/',
     version: ''
   },
   ui: {
