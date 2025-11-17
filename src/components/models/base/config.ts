@@ -219,6 +219,9 @@ export type System = {
   /** Organisation acronym used for signatures */
   organisation: string;
 
+  /** Support link for the system */
+  support_link: string;
+
   /** Type of system */
   type: SystemType;
 
