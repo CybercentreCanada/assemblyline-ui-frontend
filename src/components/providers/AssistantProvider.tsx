@@ -1,5 +1,6 @@
 import AssistantIcon from '@mui/icons-material/Assistant';
 import ClearAllIcon from '@mui/icons-material/ClearAll';
+import ContactSupportIcon from '@mui/icons-material/ContactSupport';
 import RestartAltOutlinedIcon from '@mui/icons-material/RestartAltOutlined';
 import SendOutlinedIcon from '@mui/icons-material/SendOutlined';
 import SmartToyOutlinedIcon from '@mui/icons-material/SmartToyOutlined';
@@ -311,237 +312,263 @@ function AssistantProvider({ children }: AssistantProviderProps) {
       }}
     >
       {children}
-      {assistantAllowed && (
-        <div
-          className="no-print"
-          style={{
-            display: 'flex',
-            position: 'fixed',
-            bottom: theme.spacing(upSM ? 2 : 1.5),
-            right: theme.spacing(upSM ? 3 : 1.5),
-            zIndex: 1300
-          }}
-        >
-          <Backdrop open={open} onClick={() => setOpen(false)}>
-            <Popper
-              sx={{
-                zIndex: 1301,
-                width: upSM ? '65%' : '90%',
-                maxWidth: '1024px',
-                height: upSM ? '75%' : '85%',
-                display: 'flex'
-              }}
-              open={open}
-              anchorEl={anchorEl}
-              placement="top-end"
-              transition
-              onClick={event => event.stopPropagation()}
-            >
-              {({ TransitionProps }) => (
-                <Fade {...TransitionProps} timeout={350}>
-                  <div style={{ flexGrow: 1, width: '100%' }}>
-                    <Paper style={{ height: '100%', display: 'flex', overflow: 'hidden' }} elevation={3}>
-                      <div style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', width: '100%' }}>
-                        <div style={{ display: 'flex', padding: `${theme.spacing(0.25)} ${theme.spacing(1)}` }}>
-                          <div style={{ flexGrow: 1, alignSelf: 'center' }}>
-                            <Tooltip title={t('caveat')} placement="right">
-                              <Typography variant="caption" style={{ color: theme.palette.text.disabled }}>
-                                {t('watermark')}
-                              </Typography>
+      <div
+        className="no-print"
+        style={{
+          display: 'flex',
+          position: 'fixed',
+          bottom: theme.spacing(upSM ? 2 : 1.5),
+          right: theme.spacing(upSM ? 3 : 1.5),
+          zIndex: 1300
+        }}
+      >
+        {assistantAllowed ? (
+          <>
+            <Backdrop open={open} onClick={() => setOpen(false)}>
+              <Popper
+                sx={{
+                  zIndex: 1301,
+                  width: upSM ? '65%' : '90%',
+                  maxWidth: '1024px',
+                  height: upSM ? '75%' : '85%',
+                  display: 'flex'
+                }}
+                open={open}
+                anchorEl={anchorEl}
+                placement="top-end"
+                transition
+                onClick={event => event.stopPropagation()}
+              >
+                {({ TransitionProps }) => (
+                  <Fade {...TransitionProps} timeout={350}>
+                    <div style={{ flexGrow: 1, width: '100%' }}>
+                      <Paper style={{ height: '100%', display: 'flex', overflow: 'hidden' }} elevation={3}>
+                        <div style={{ flexGrow: 1, display: 'flex', flexDirection: 'column', width: '100%' }}>
+                          <div style={{ display: 'flex', padding: `${theme.spacing(0.25)} ${theme.spacing(1)}` }}>
+                            <div style={{ flexGrow: 1, alignSelf: 'center' }}>
+                              <Tooltip title={t('caveat')} placement="right">
+                                <Typography variant="caption" style={{ color: theme.palette.text.disabled }}>
+                                  {t('watermark')}
+                                </Typography>
+                              </Tooltip>
+                            </div>
+                            <Tooltip title={t('reset')} placement="top">
+                              <IconButton onClick={resetAssistant} color="inherit">
+                                <RestartAltOutlinedIcon />
+                              </IconButton>
+                            </Tooltip>
+                            <Tooltip title={t('clear')} placement="top">
+                              <IconButton onClick={clearAssistant} color="inherit">
+                                <ClearAllIcon />
+                              </IconButton>
                             </Tooltip>
                           </div>
-                          <Tooltip title={t('reset')} placement="top">
-                            <IconButton onClick={resetAssistant} color="inherit">
-                              <RestartAltOutlinedIcon />
-                            </IconButton>
-                          </Tooltip>
-                          <Tooltip title={t('clear')} placement="top">
-                            <IconButton onClick={clearAssistant} color="inherit">
-                              <ClearAllIcon />
-                            </IconButton>
-                          </Tooltip>
-                        </div>
-                        <div
-                          ref={chatRef}
-                          style={{
-                            backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#fafafa',
-                            flexGrow: 1,
-                            border: `1px solid ${theme.palette.divider}`,
-                            borderRadius: theme.spacing(0.5),
-                            marginLeft: theme.spacing(1),
-                            marginRight: theme.spacing(1),
-                            overflow: 'auto'
-                          }}
-                        >
-                          {currentHistory
-                            .filter(message => message.content !== '')
-                            .map((message, id) =>
-                              message.role === 'system' ? (
-                                id !== 0 ? (
-                                  <div
-                                    key={id}
-                                    style={{
-                                      display: 'flex',
-                                      justifyContent: 'center',
-                                      marginTop: theme.spacing(2),
-                                      marginBottom: theme.spacing(1)
-                                    }}
-                                  >
+                          <div
+                            ref={chatRef}
+                            style={{
+                              backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#fafafa',
+                              flexGrow: 1,
+                              border: `1px solid ${theme.palette.divider}`,
+                              borderRadius: theme.spacing(0.5),
+                              marginLeft: theme.spacing(1),
+                              marginRight: theme.spacing(1),
+                              overflow: 'auto'
+                            }}
+                          >
+                            {currentHistory
+                              .filter(message => message.content !== '')
+                              .map((message, id) =>
+                                message.role === 'system' ? (
+                                  id !== 0 ? (
                                     <div
+                                      key={id}
                                       style={{
-                                        minWidth: '10rem',
-                                        maxWidth: '25rem',
-                                        textAlign: 'center',
-                                        flexGrow: 1,
-                                        color: theme.palette.text.disabled,
                                         display: 'flex',
-                                        alignItems: 'center',
-                                        flexDirection: 'column'
+                                        justifyContent: 'center',
+                                        marginTop: theme.spacing(2),
+                                        marginBottom: theme.spacing(1)
                                       }}
                                     >
-                                      <Divider style={{ width: '100%' }} />
-                                      <span
+                                      <div
                                         style={{
-                                          marginTop: theme.spacing(-1.25),
-                                          backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#fafafa'
+                                          minWidth: '10rem',
+                                          maxWidth: '25rem',
+                                          textAlign: 'center',
+                                          flexGrow: 1,
+                                          color: theme.palette.text.disabled,
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          flexDirection: 'column'
                                         }}
                                       >
-                                        &nbsp;&nbsp;&nbsp;{t('new_chat')}&nbsp;&nbsp;&nbsp;
-                                      </span>
+                                        <Divider style={{ width: '100%' }} />
+                                        <span
+                                          style={{
+                                            marginTop: theme.spacing(-1.25),
+                                            backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#fafafa'
+                                          }}
+                                        >
+                                          &nbsp;&nbsp;&nbsp;{t('new_chat')}&nbsp;&nbsp;&nbsp;
+                                        </span>
+                                      </div>
                                     </div>
-                                  </div>
-                                ) : null
-                              ) : (
-                                <Stack
-                                  key={id}
-                                  direction={isXS ? 'column' : message.role === 'assistant' ? 'row' : 'row-reverse'}
-                                  p={1}
-                                  spacing={1}
-                                  style={{ wordBreak: 'break-word' }}
-                                >
-                                  {message.role === 'assistant' ? (
-                                    <Avatar>
-                                      <SmartToyOutlinedIcon />
-                                    </Avatar>
-                                  ) : (
-                                    <AppAvatar url={appUser.user.avatar} email={appUser.user.email} />
-                                  )}
-                                  <Paper
-                                    sx={{
-                                      p: 0,
-                                      backgroundColor: message.isInsight
-                                        ? theme.palette.mode === 'dark'
-                                          ? '#414f65'
-                                          : '#BADDFB'
-                                        : message.isError
-                                          ? theme.palette.mode === 'dark'
-                                            ? '#4f1717'
-                                            : '#ffe2e2'
-                                          : theme.palette.background.paper
-                                    }}
+                                  ) : null
+                                ) : (
+                                  <Stack
+                                    key={id}
+                                    direction={isXS ? 'column' : message.role === 'assistant' ? 'row' : 'row-reverse'}
+                                    p={1}
+                                    spacing={1}
+                                    style={{ wordBreak: 'break-word' }}
                                   >
-                                    <AIMarkdown markdown={message.content} truncated={false} dense />
-                                  </Paper>
-                                </Stack>
-                              )
+                                    {message.role === 'assistant' ? (
+                                      <Avatar>
+                                        <SmartToyOutlinedIcon />
+                                      </Avatar>
+                                    ) : (
+                                      <AppAvatar url={appUser.user.avatar} email={appUser.user.email} />
+                                    )}
+                                    <Paper
+                                      sx={{
+                                        p: 0,
+                                        backgroundColor: message.isInsight
+                                          ? theme.palette.mode === 'dark'
+                                            ? '#414f65'
+                                            : '#BADDFB'
+                                          : message.isError
+                                            ? theme.palette.mode === 'dark'
+                                              ? '#4f1717'
+                                              : '#ffe2e2'
+                                            : theme.palette.background.paper
+                                      }}
+                                    >
+                                      <AIMarkdown markdown={message.content} truncated={false} dense />
+                                    </Paper>
+                                  </Stack>
+                                )
+                              )}
+                            {thinking && (
+                              <Stack direction="row" p={1} spacing={1} style={{ wordBreak: 'break-word' }}>
+                                <Avatar>
+                                  <SmartToyOutlinedIcon />
+                                </Avatar>
+                                <Paper
+                                  sx={{
+                                    p: 1,
+                                    backgroundColor: theme.palette.background.paper
+                                  }}
+                                >
+                                  <ThinkingBadge />
+                                </Paper>
+                              </Stack>
                             )}
-                          {thinking && (
-                            <Stack direction="row" p={1} spacing={1} style={{ wordBreak: 'break-word' }}>
-                              <Avatar>
-                                <SmartToyOutlinedIcon />
-                              </Avatar>
-                              <Paper
-                                sx={{
-                                  p: 1,
-                                  backgroundColor: theme.palette.background.paper
-                                }}
-                              >
-                                <ThinkingBadge />
-                              </Paper>
-                            </Stack>
-                          )}
-                        </div>
-                        {currentInsights.length > 0 && (
+                          </div>
+
                           <Stack direction="row-reverse" mt={0.75} ml={1} mr={1} spacing={1}>
-                            {currentInsights.map((insight, id) => (
-                              <CustomChip
-                                key={id}
-                                variant="outlined"
-                                color="primary"
-                                label={t(`insight.${insight.type}`)}
-                                tooltip={insight.value}
-                                tooltipPlacement="top-end"
-                                size="small"
-                                onClick={() => askAssistantWithInsight(insight)}
-                              />
-                            ))}
+                            <CustomChip
+                              key={'get-help'}
+                              variant="outlined"
+                              color="primary"
+                              label={t('help.label')}
+                              tooltip={t('help.tooltip')}
+                              tooltipPlacement="top-end"
+                              size="small"
+                              onClick={() => window.open(configuration?.system?.support_link, '_blank')}
+                            />
+                            {currentInsights.length > 0 &&
+                              currentInsights.map((insight, id) => (
+                                <CustomChip
+                                  key={id}
+                                  variant="outlined"
+                                  color="primary"
+                                  label={t(`insight.${insight.type}`)}
+                                  tooltip={insight.value}
+                                  tooltipPlacement="top-end"
+                                  size="small"
+                                  onClick={() => askAssistantWithInsight(insight)}
+                                />
+                              ))}
                           </Stack>
-                        )}
-                        <div
-                          style={{
-                            display: 'flex',
-                            margin: `${theme.spacing(0)} ${theme.spacing(1)} ${theme.spacing(1)} ${theme.spacing(1)} `
-                          }}
-                        >
-                          <TextField
-                            inputRef={inputRef}
-                            value={currentInput}
-                            onChange={handleInputChange}
-                            onKeyDown={onKeyDown}
-                            fullWidth
-                            size="small"
-                            disabled={thinking}
-                            sx={{}}
-                            margin="dense"
-                            InputProps={{
-                              endAdornment: (
-                                <>
-                                  <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
-                                  <Tooltip title={t('send')} placement="left">
-                                    <span>
-                                      <Button
-                                        onClick={askAssistant}
-                                        disabled={thinking || currentInput === ''}
-                                        size="small"
-                                        sx={{
-                                          minWidth: 0,
-                                          padding: `${theme.spacing(0.5)} ${theme.spacing(1.5)}`,
-                                          marginRight: theme.spacing(-1)
-                                        }}
-                                      >
-                                        <SendOutlinedIcon />
-                                      </Button>
-                                    </span>
-                                  </Tooltip>
-                                </>
-                              )
+
+                          <div
+                            style={{
+                              display: 'flex',
+                              margin: `${theme.spacing(0)} ${theme.spacing(1)} ${theme.spacing(1)} ${theme.spacing(1)} `
                             }}
-                          />
+                          >
+                            <TextField
+                              inputRef={inputRef}
+                              value={currentInput}
+                              onChange={handleInputChange}
+                              onKeyDown={onKeyDown}
+                              fullWidth
+                              size="small"
+                              disabled={thinking}
+                              sx={{}}
+                              margin="dense"
+                              InputProps={{
+                                endAdornment: (
+                                  <>
+                                    <Divider sx={{ height: 28, m: 0.5 }} orientation="vertical" />
+                                    <Tooltip title={t('send')} placement="left">
+                                      <span>
+                                        <Button
+                                          onClick={askAssistant}
+                                          disabled={thinking || currentInput === ''}
+                                          size="small"
+                                          sx={{
+                                            minWidth: 0,
+                                            padding: `${theme.spacing(0.5)} ${theme.spacing(1.5)}`,
+                                            marginRight: theme.spacing(-1)
+                                          }}
+                                        >
+                                          <SendOutlinedIcon />
+                                        </Button>
+                                      </span>
+                                    </Tooltip>
+                                  </>
+                                )
+                              }}
+                            />
+                          </div>
                         </div>
-                      </div>
-                    </Paper>
-                    <Arrow className="MuiPopper-arrow" />
-                  </div>
-                </Fade>
-              )}
-            </Popper>
-          </Backdrop>
-          <Tooltip title={t('title')} placement="left">
+                      </Paper>
+                      <Arrow className="MuiPopper-arrow" />
+                    </div>
+                  </Fade>
+                )}
+              </Popper>
+            </Backdrop>
+            <Tooltip title={t('title')} placement="left">
+              <Fab
+                color="primary"
+                onClick={event => toggleAssistant(event.currentTarget)}
+                size="medium"
+                sx={{
+                  backgroundColor: theme.palette.mode === 'dark' ? '#616161' : '#888'
+                }}
+              >
+                <Badge variant="dot" invisible={!hasInsights} color="primary">
+                  <AssistantIcon />
+                </Badge>
+              </Fab>
+            </Tooltip>
+          </>
+        ) : (
+          <Tooltip title={t('help.tooltip')} placement="left">
             <Fab
               color="primary"
-              onClick={event => toggleAssistant(event.currentTarget)}
+              href={configuration?.system?.support_link}
               size="medium"
               sx={{
                 backgroundColor: theme.palette.mode === 'dark' ? '#616161' : '#888'
               }}
             >
-              <Badge variant="dot" invisible={!hasInsights} color="primary">
-                <AssistantIcon />
-              </Badge>
+              <ContactSupportIcon fontSize="large" />
             </Fab>
           </Tooltip>
-        </div>
-      )}
+        )}
+      </div>
     </AssistantContext.Provider>
   );
 }

@@ -219,6 +219,9 @@ export type System = {
   /** Organisation acronym used for signatures */
   organisation: string;
 
+  /** Support link for the system */
+  support_link: string;
+
   /** Type of system */
   type: SystemType;
 
@@ -679,6 +682,7 @@ export const CONFIGURATION: Configuration = {
   system: {
     organisation: '',
     type: 'development',
+    support_link: 'https://cybercentrecanada.github.io/assemblyline4_docs/',
     version: ''
   },
   ui: {
