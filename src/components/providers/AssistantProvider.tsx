@@ -108,6 +108,7 @@ function AssistantProvider({ children }: AssistantProviderProps) {
   const isXS = useMediaQuery(theme.breakpoints.only('xs'));
   const inputRef = useRef(null);
   const chatRef = useRef(null);
+  const [lastInsight, setLastInsight] = useState<string>(null);
 
   const assistantAllowed =
     currentUser && currentUser.roles.includes('assistant_use') && configuration && configuration.ui.ai.enabled;
@@ -353,13 +354,27 @@ function AssistantProvider({ children }: AssistantProviderProps) {
                               </Tooltip>
                             </div>
                             <Tooltip title={t('reset')} placement="top">
-                              <IconButton onClick={resetAssistant} color="inherit">
+                              <IconButton
+                                onClick={() => {
+                                  setLastInsight(null);
+                                  resetAssistant();
+                                }}
+                                color="inherit"
+                              >
                                 <RestartAltOutlinedIcon />
                               </IconButton>
                             </Tooltip>
                             <Tooltip title={t('clear')} placement="top">
                               <IconButton onClick={clearAssistant} color="inherit">
                                 <ClearAllIcon />
+                              </IconButton>
+                            </Tooltip>
+                            <Tooltip title={t('help')} placement="top">
+                              <IconButton
+                                onClick={() => window.open(configuration?.system?.support_link, '_blank')}
+                                color="inherit"
+                              >
+                                <ContactSupportIcon />
                               </IconButton>
                             </Tooltip>
                           </div>
@@ -462,33 +477,35 @@ function AssistantProvider({ children }: AssistantProviderProps) {
                                 </Paper>
                               </Stack>
                             )}
+                            <Stack
+                              direction="column"
+                              mt={0.75}
+                              ml={1}
+                              mr={1}
+                              spacing={1}
+                              style={{ justifySelf: 'right' }}
+                            >
+                              {currentInsights.length > 0 &&
+                                currentInsights
+                                  .filter(insight => `${insight.type}-${insight.value}` !== lastInsight)
+                                  .map((insight, id) => (
+                                    <CustomChip
+                                      key={id}
+                                      variant="outlined"
+                                      color="primary"
+                                      label={t(`insight.${insight.type}`)}
+                                      tooltip={`${t(`insight.${insight.type}`)}: ${insight.value}`}
+                                      tooltipPlacement="top-end"
+                                      size="small"
+                                      onClick={() => {
+                                        setLastInsight(`${insight.type}-${insight.value}`);
+                                        askAssistantWithInsight(insight);
+                                      }}
+                                      style={{ width: 'fit-content', alignSelf: 'end' }}
+                                    />
+                                  ))}
+                            </Stack>
                           </div>
-
-                          <Stack direction="row-reverse" mt={0.75} ml={1} mr={1} spacing={1}>
-                            <CustomChip
-                              key={'get-help'}
-                              variant="outlined"
-                              color="primary"
-                              label={t('help.label')}
-                              tooltip={t('help.tooltip')}
-                              tooltipPlacement="top-end"
-                              size="small"
-                              onClick={() => window.open(configuration?.system?.support_link, '_blank')}
-                            />
-                            {currentInsights.length > 0 &&
-                              currentInsights.map((insight, id) => (
-                                <CustomChip
-                                  key={id}
-                                  variant="outlined"
-                                  color="primary"
-                                  label={t(`insight.${insight.type}`)}
-                                  tooltip={insight.value}
-                                  tooltipPlacement="top-end"
-                                  size="small"
-                                  onClick={() => askAssistantWithInsight(insight)}
-                                />
-                              ))}
-                          </Stack>
 
                           <div
                             style={{
@@ -513,7 +530,10 @@ function AssistantProvider({ children }: AssistantProviderProps) {
                                     <Tooltip title={t('send')} placement="left">
                                       <span>
                                         <Button
-                                          onClick={askAssistant}
+                                          onClick={() => {
+                                            setLastInsight(null);
+                                            askAssistant();
+                                          }}
                                           disabled={thinking || currentInput === ''}
                                           size="small"
                                           sx={{
@@ -555,7 +575,7 @@ function AssistantProvider({ children }: AssistantProviderProps) {
             </Tooltip>
           </>
         ) : (
-          <Tooltip title={t('help.tooltip')} placement="left">
+          <Tooltip title={t('help')} placement="left">
             <Fab
               color="primary"
               href={configuration?.system?.support_link}
