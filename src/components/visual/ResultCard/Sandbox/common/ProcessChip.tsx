@@ -51,7 +51,7 @@ export const ProcessChip = React.memo(({ process, short = false, fullWidth = fal
         fontSize="inherit"
         fontWeight={500}
         sx={{
-          px: 0.5,
+          px: 1,
           whiteSpace: 'nowrap',
           wordBreak: 'inherit'
         }}
@@ -64,7 +64,7 @@ export const ProcessChip = React.memo(({ process, short = false, fullWidth = fal
           color="textSecondary"
           fontSize="inherit"
           sx={{
-            px: 0.5,
+            px: 1,
             whiteSpace: 'normal',
             wordBreak: 'break-word',
             overflowWrap: 'anywhere'
