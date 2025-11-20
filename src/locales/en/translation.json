@@ -224,6 +224,7 @@
   "submission.state.completed": "Completed",
   "submission.state.error": "Completed with errors",
   "submission.state.submitted": "Scanning...",
+  "support.title": "Contact Support",
   "submit": "Submit",
   "theme": "Theme settings",
   "thememenu": "Theme",

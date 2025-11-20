@@ -323,7 +323,7 @@ function AssistantProvider({ children }: AssistantProviderProps) {
           zIndex: 1300
         }}
       >
-        {assistantAllowed ? (
+        {assistantAllowed && (
           <>
             <Backdrop open={open} onClick={() => setOpen(false)}>
               <Popper
@@ -477,36 +477,35 @@ function AssistantProvider({ children }: AssistantProviderProps) {
                                 </Paper>
                               </Stack>
                             )}
-                            <Stack
-                              direction="column"
-                              mt={0.75}
-                              ml={1}
-                              mr={1}
-                              spacing={1}
-                              style={{ justifySelf: 'right' }}
-                            >
-                              {currentInsights.length > 0 &&
-                                currentInsights
-                                  .filter(insight => `${insight.type}-${insight.value}` !== lastInsight)
-                                  .map((insight, id) => (
-                                    <CustomChip
-                                      key={id}
-                                      variant="outlined"
-                                      color="primary"
-                                      label={t(`insight.${insight.type}`)}
-                                      tooltip={`${t(`insight.${insight.type}`)}: ${insight.value}`}
-                                      tooltipPlacement="top-end"
-                                      size="small"
-                                      onClick={() => {
-                                        setLastInsight(`${insight.type}-${insight.value}`);
-                                        askAssistantWithInsight(insight);
-                                      }}
-                                      style={{ width: 'fit-content', alignSelf: 'end' }}
-                                    />
-                                  ))}
-                            </Stack>
                           </div>
-
+                          <Stack
+                            direction="row-reverse"
+                            mt={0.75}
+                            ml={1}
+                            mr={1}
+                            spacing={1}
+                            style={{ justifySelf: 'right' }}
+                          >
+                            {currentInsights.length > 0 &&
+                              currentInsights
+                                .filter(insight => `${insight.type}-${insight.value}` !== lastInsight)
+                                .map((insight, id) => (
+                                  <CustomChip
+                                    key={id}
+                                    variant="outlined"
+                                    color="primary"
+                                    label={t(`insight.${insight.type}`)}
+                                    tooltip={`${t(`insight.${insight.type}`)}: ${insight.value}`}
+                                    tooltipPlacement="top-end"
+                                    size="small"
+                                    onClick={() => {
+                                      setLastInsight(`${insight.type}-${insight.value}`);
+                                      askAssistantWithInsight(insight);
+                                    }}
+                                    style={{ width: 'fit-content', alignSelf: 'end' }}
+                                  />
+                                ))}
+                          </Stack>
                           <div
                             style={{
                               display: 'flex',
@@ -574,19 +573,6 @@ function AssistantProvider({ children }: AssistantProviderProps) {
               </Fab>
             </Tooltip>
           </>
-        ) : (
-          <Tooltip title={t('help')} placement="left">
-            <Fab
-              color="primary"
-              href={configuration?.system?.support_link}
-              size="medium"
-              sx={{
-                backgroundColor: theme.palette.mode === 'dark' ? '#616161' : '#888'
-              }}
-            >
-              <ContactSupportIcon fontSize="large" />
-            </Fab>
-          </Tooltip>
         )}
       </div>
     </AssistantContext.Provider>

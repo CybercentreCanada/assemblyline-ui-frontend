@@ -1,7 +1,6 @@
 {
   "caveat": "Ce chatbot utilise un grand modèle de langage pour fournir des réponses à vos questions. Les réponses sont imprévisibles et ne reflètent pas toujours la réalité.",
   "clear": "Effacer tout l'historique des discussions",
-  "help": "Contacter le support",
   "insight.code": "Analyser le code",
   "insight.file": "Résumer l'analyse du fichier",
   "insight.report": "Résumer le rapport",
