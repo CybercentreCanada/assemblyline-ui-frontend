@@ -1,3 +1,4 @@
+import SupportOutlinedIcon from '@mui/icons-material/SupportOutlined';
 import { Box, AppBar as MuiAppBar, Toolbar, useMediaQuery, useTheme } from '@mui/material';
 import {
   useAppBar,
@@ -13,7 +14,10 @@ import AppName from 'commons/components/topnav/AppName';
 import AppSwitcher from 'commons/components/topnav/AppSwitcher';
 import ThemeSelectionIcon from 'commons/components/topnav/ThemeSelectionIcon';
 import UserProfile from 'commons/components/topnav/UserProfile';
+import useALContext from 'components/hooks/useALContext';
+import { IconButton } from 'components/visual/Buttons/IconButton';
 import { memo, useCallback, useLayoutEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export const AppBarBase = ({ children }) => {
   const layout = useAppLayout();
@@ -67,6 +71,9 @@ const AppBar = () => {
   const breadcrumbs = useAppBreadcrumbs();
   const quicksearch = useAppQuickSearch();
   const { left, leftAfterBreadcrumbs, right, rightBeforeSearch, themeSelectionMode } = configs.preferences.topnav;
+
+  const { t } = useTranslation();
+  const { configuration } = useALContext();
 
   // media queries.
   const isXs = useMediaQuery(muiTheme.breakpoints.only('xs'));
@@ -127,6 +134,15 @@ const AppBar = () => {
         {showSpacer && <div style={{ flex: 1 }} />}
         {rightBeforeSearch}
         {quicksearch.show && <AppSearch />}
+        {configuration.system.support_link && (
+          <IconButton
+            onClick={() => window.open(configuration.system.support_link, '_blank')}
+            tooltip={t('support.title')}
+            color="inherit"
+          >
+            <SupportOutlinedIcon />
+          </IconButton>
+        )}
         {right}
         {themeSelectionMode === 'icon' && <ThemeSelectionIcon />}
         <AppSwitcher />

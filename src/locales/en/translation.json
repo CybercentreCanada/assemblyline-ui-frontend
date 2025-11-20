@@ -225,6 +225,7 @@
   "submission.state.error": "Completed with errors",
   "submission.state.submitted": "Scanning...",
   "submit": "Submit",
+  "support.title": "Contact Support",
   "theme": "Theme settings",
   "thememenu": "Theme",
   "thememenu.option.mui": "MaterialUI",
