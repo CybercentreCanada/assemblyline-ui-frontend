@@ -15,7 +15,7 @@ import {
 import { Button } from 'components/visual/Buttons/Button';
 import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export const HeaderSection = React.memo(() => {
@@ -35,16 +35,16 @@ export const HeaderSection = React.memo(() => {
     return {
       url: `/api/v4/user/settings/${currentUser.username}/`,
       method: 'POST',
-      body: body,
+      body,
       onSuccess: () => {
         showSuccessMessage(t('success_save'));
         form.setFieldValue('settings', s => updatePreviousSubmissionValues(s));
         form.setFieldValue('user', body);
-        invalidateAPIQuery(({ url }) => '/api/v4/user/whoami/' === url);
+        invalidateAPIQuery(({ url }) => url === '/api/v4/user/whoami/');
       },
       onFailure: ({ api_status_code, api_error_message }) => {
         showErrorMessage(api_error_message);
-        if (api_status_code === 403 || api_status_code === 401) {
+        if (api_status_code === 401 || api_status_code === 403) {
           showErrorMessage(api_error_message);
         }
       },
@@ -52,6 +52,17 @@ export const HeaderSection = React.memo(() => {
       onExit: () => form.setFieldValue('state.submitting', false)
     };
   });
+
+  const [profileName, profileDescription] = useMemo<[string, string]>(() => {
+    const tab = form.getFieldValue('state.tab');
+    if (!tab || tab === 'interface') return [t('profile.interface'), null];
+    if (tab === 'default') return [t('profile.custom'), t('profile.custom_desc')];
+
+    const profile = configuration?.submission?.profiles?.[tab];
+    if (!profile) return [t('profile.unknown'), null];
+
+    return [profile.display_name, profile.description];
+  }, [form, configuration, t]);
 
   return (
     <form.Subscribe
@@ -66,7 +77,7 @@ export const HeaderSection = React.memo(() => {
       }
       children={([tab, loading, submitting, modified, hasReset]) => (
         <>
-          {!modified ? null : (
+          {modified && (
             <RouterPrompt
               when={modified}
               onAccept={() => {
@@ -75,36 +86,21 @@ export const HeaderSection = React.memo(() => {
               }}
             />
           )}
+
           <PageHeader
-            primary={
-              !tab
-                ? t('profile.interface')
-                : tab === 'interface'
-                  ? t('profile.interface')
-                  : tab === 'default'
-                    ? t('profile.custom')
-                    : configuration.submission.profiles[tab].display_name
-            }
+            primary={profileName}
             secondary={
-              <>
-                {!tab ? null : tab === 'interface' ? null : tab === 'default' ? (
-                  <>
-                    <Typography
-                      color="secondary"
-                      style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}
-                    >{`{"submission_profile": "default"}`}</Typography>
-                    {t('profile.custom_desc')}
-                  </>
-                ) : (
-                  <>
-                    <Typography
-                      color="secondary"
-                      style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}
-                    >{`{"submission_profile": "${tab}"}`}</Typography>
-                    {configuration.submission.profiles[tab].description}
-                  </>
-                )}
-              </>
+              !profileDescription ? null : (
+                <>
+                  <Typography
+                    color="secondary"
+                    sx={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}
+                  >
+                    {`{"submission_profile": "${tab}"}`}
+                  </Typography>
+                  {profileDescription}
+                </>
+              )
             }
             secondaryLoading={loading}
             slotProps={{ actions: { spacing: 1 } }}
@@ -121,6 +117,7 @@ export const HeaderSection = React.memo(() => {
                 >
                   {t('button.cancel.label')}
                 </Button>
+
                 <Button
                   color="secondary"
                   disabled={submitting || !hasReset}
@@ -132,6 +129,7 @@ export const HeaderSection = React.memo(() => {
                 >
                   {t('button.reset.label')}
                 </Button>
+
                 <Button
                   color="primary"
                   disabled={submitting || !modified}
@@ -154,14 +152,15 @@ export const HeaderSection = React.memo(() => {
                     title={customize ? t('submit:customize.full.tooltip') : t('submit:customize.limited.tooltip')}
                     slotProps={{ tooltip: { sx: { backgroundColor: 'rgba(97, 97, 97, 1)' } } }}
                   >
-                    <div>
-                      <Alert
-                        severity={customize ? 'info' : 'warning'}
-                        sx={{ paddingTop: theme.spacing(0.25), paddingBottom: theme.spacing(0.25), width: '100%' }}
-                      >
-                        {customize ? t('submit:customize.full.label') : t('submit:customize.limited.label')}
-                      </Alert>
-                    </div>
+                    <Alert
+                      severity={customize ? 'info' : 'warning'}
+                      sx={{
+                        paddingY: theme.spacing(0.25),
+                        width: '100%'
+                      }}
+                    >
+                      {customize ? t('submit:customize.full.label') : t('submit:customize.limited.label')}
+                    </Alert>
                   </Tooltip>
                 )}
               />
@@ -172,3 +171,5 @@ export const HeaderSection = React.memo(() => {
     />
   );
 });
+
+HeaderSection.displayName = 'HeaderSection';
