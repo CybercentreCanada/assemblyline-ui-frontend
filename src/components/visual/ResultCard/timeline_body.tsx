@@ -1,3 +1,11 @@
+import { Tooltip, useTheme } from '@mui/material';
+import Typography from '@mui/material/Typography';
+import useALContext from 'components/hooks/useALContext';
+import type { TimelineBody as TimelineData } from 'components/models/base/result_body';
+import { verdictToColor } from 'helpers/utils';
+import { AiOutlineFile, AiOutlineFileImage, AiOutlineFileUnknown, AiOutlineFileZip } from 'react-icons/ai';
+import { BsFileEarmarkCode, BsFileLock, BsFileText, BsGlobe2, BsHddNetwork, BsTerminal } from 'react-icons/bs';
+
 import {
   Timeline,
   TimelineConnector,
@@ -7,128 +15,81 @@ import {
   TimelineOppositeContent,
   TimelineSeparator
 } from '@mui/lab';
-import { Tooltip, Typography, useTheme } from '@mui/material';
-import useALContext from 'components/hooks/useALContext';
-import type { TimelineBody as TimelineData } from 'components/models/base/result_body';
-import type { PossibleColor } from 'helpers/colors';
-import { verdictToColor } from 'helpers/utils';
-import React, { useMemo } from 'react';
-import { AiOutlineFile, AiOutlineFileImage, AiOutlineFileUnknown, AiOutlineFileZip } from 'react-icons/ai';
-import { BsFileEarmarkCode, BsFileLock, BsFileText, BsGlobe2, BsHddNetwork, BsTerminal } from 'react-icons/bs';
 
-const TYPE_ICON: Record<string, React.ReactNode> = {
-  CODE: <BsFileEarmarkCode />,
-  DOCUMENT: <AiOutlineFile />,
-  EXECUTABLE: <BsTerminal />,
+import { default as React } from 'react';
+
+const AL_TYPE_ICON = {
   HTML: <BsGlobe2 />,
-  IMAGE: <AiOutlineFileImage />,
-  NETWORK: <BsHddNetwork />,
-  PROTECTED: <BsFileLock />,
+  EXECUTABLE: <BsTerminal />,
   TEXT: <BsFileText />,
+  ZIP: <AiOutlineFileZip />,
+  CODE: <BsFileEarmarkCode />,
+  IMAGE: <AiOutlineFileImage />,
+  DOCUMENT: <AiOutlineFile />,
   UNKNOWN: <AiOutlineFileUnknown />,
-  ZIP: <AiOutlineFileZip />
+  PROTECTED: <BsFileLock />,
+  NETWORK: <BsHddNetwork />
 };
 
 type Props = {
-  body?: TimelineData[];
+  body: TimelineData[];
 };
 
-const TimelineBodyComponent: React.FC<Props> = ({ body }) => {
-  const theme = useTheme();
+const WrappedTimelineBody = ({ body }: Props) => {
   const { scoreToVerdict } = useALContext();
-
-  const colorMap = useMemo<Partial<Record<PossibleColor, string>>>(
-    () => ({
-      primary: theme.palette.primary.main,
-      secondary: theme.palette.secondary.main,
-      success: theme.palette.success.main,
-      info: theme.palette.info.main,
-      warning: theme.palette.warning.main,
-      error: theme.palette.error.main
-    }),
-    [theme.palette]
-  );
-
-  const data = useMemo<TimelineData[]>(() => {
-    if (!body) return [];
-
-    if (typeof body === 'string') {
-      try {
-        const parsed = JSON.parse(body) as TimelineData[];
-        return Array.isArray(parsed) ? parsed : [];
-      } catch {
-        return [];
-      }
-    }
-
-    return Array.isArray(body) ? body : [];
-  }, [body]);
-
+  const theme = useTheme();
+  const COLOR_MAP = {
+    primary: theme.palette.primary.main,
+    secondary: theme.palette.secondary.main,
+    success: theme.palette.success.main,
+    info: theme.palette.info.main,
+    warning: theme.palette.warning.main,
+    error: theme.palette.error.main
+  };
   return (
     <div style={{ overflowX: 'auto' }}>
-      <Timeline sx={{ minWidth: 460 }}>
-        {data.map((item, idx) => {
-          const score = Number.isFinite(item?.score) ? item.score : 0;
-          const verdict = verdictToColor(scoreToVerdict(score));
-          const borderColor = colorMap[verdict] ?? theme.palette.text.primary;
-          const icon = TYPE_ICON[item?.icon ?? 'UNKNOWN'] ?? TYPE_ICON.UNKNOWN;
-
-          const tooltip = Array.isArray(item?.signatures) ? item.signatures.filter(Boolean).join(' | ') : '';
-
-          const title = item?.title || '(Untitled)';
-          const content = item?.content || '';
-          const opposite = item?.opposite_content;
-
+      <Timeline style={{ minWidth: '460px' }}>
+        {body.map((element, key) => {
           return (
-            <TimelineItem key={title + idx}>
-              {opposite && (
+            <TimelineItem key={key}>
+              {element.opposite_content ? (
                 <TimelineOppositeContent
+                  alignSelf="center"
                   variant="body2"
-                  sx={{
-                    alignSelf: 'center',
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis'
-                  }}
+                  textOverflow="ellipsis"
+                  whiteSpace="nowrap"
+                  overflow={{ overflowX: 'hidden' }}
                 >
-                  {opposite}
+                  {element.opposite_content}
                 </TimelineOppositeContent>
-              )}
-
+              ) : null}
               <TimelineSeparator>
-                {idx > 0 && <TimelineConnector />}
-
-                <Tooltip title={tooltip} disableHoverListener={!tooltip}>
+                <TimelineConnector />
+                <Tooltip title={element.signatures.join(' | ')} placement="top">
                   <TimelineDot
                     variant="outlined"
                     sx={{
-                      borderColor,
-                      borderWidth: 2,
                       fontSize: 'large',
-                      p: 0.6
+                      borderWidth: 'medium',
+                      borderColor: COLOR_MAP[verdictToColor(scoreToVerdict(element.score))],
+                      padding: '5px'
                     }}
                   >
-                    {icon}
+                    {AL_TYPE_ICON[element.icon]}
                   </TimelineDot>
                 </Tooltip>
-
-                {idx < data.length - 1 && <TimelineConnector />}
+                <TimelineConnector />
               </TimelineSeparator>
-
               <TimelineContent
-                sx={{
-                  alignSelf: 'center',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap'
-                }}
+                alignSelf="center"
+                textOverflow="ellipsis"
+                whiteSpace="nowrap"
+                overflow={{ overflowX: 'hidden' }}
               >
-                <Typography variant="button">{title}</Typography>
-                {content && (
-                  <Typography variant="caption" color="text.secondary">
-                    {content}
-                  </Typography>
-                )}
+                <Typography variant="button" display="block">
+                  {element.title}
+                </Typography>
+                {element.content ? <Typography variant="caption">{element.content}</Typography> : null}
               </TimelineContent>
             </TimelineItem>
           );
@@ -138,6 +99,4 @@ const TimelineBodyComponent: React.FC<Props> = ({ body }) => {
   );
 };
 
-TimelineBodyComponent.displayName = 'TimelineBody';
-
-export const TimelineBody = React.memo(TimelineBodyComponent);
+export const TimelineBody = React.memo(WrappedTimelineBody);
