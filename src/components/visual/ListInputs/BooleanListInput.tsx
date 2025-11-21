@@ -54,15 +54,16 @@ const WrappedSwitchListInput = React.memo(() => {
             <>
               <StyledPasswordAdornment />
               <StyledResetAdornment />
-              <div style={{ minHeight: '40px' }}>
+              <div style={{ minHeight: '41px' }}>
                 <Switch
+                  id={id}
+                  name={id}
                   checked={inputValue}
                   disabled={disabled}
                   disableFocusRipple
                   disableRipple
                   disableTouchRipple
                   edge="end"
-                  name={id}
                   sx={{
                     minWidth: '40px',
                     '& .Mui-disabled': {

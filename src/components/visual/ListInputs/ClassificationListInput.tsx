@@ -35,7 +35,7 @@ const WrappedClassificationListInput = React.memo(() => {
     <StyledListItemRoot>
       <StyledListInputWrapper>
         <StyledListInputInner>
-          <StyledListInputText />
+          <StyledListInputText noLabel />
 
           {loading ? (
             <StyledListInputLoading />

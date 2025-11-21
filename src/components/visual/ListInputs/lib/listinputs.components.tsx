@@ -9,6 +9,7 @@ import type {
   TextFieldProps
 } from '@mui/material';
 import {
+  Box,
   FormHelperText,
   IconButton,
   InputAdornment,
@@ -186,17 +187,6 @@ StyledResetAdornment.displayName = 'StyledResetAdornment';
 // ------------------------------------------------------------
 // Text Label
 // ------------------------------------------------------------
-const Label = styled('label')(({ theme }) => ({
-  flex: 1,
-  minWidth: 0,
-  margin: `${theme.spacing(0.75)} 0`,
-  '&:hover>*': {
-    overflow: 'auto',
-    whiteSpace: 'wrap'
-  }
-}));
-Label.displayName = 'Label';
-
 export type StyledListInputTextProps = React.LabelHTMLAttributes<HTMLLabelElement> & {
   noLabel?: boolean;
 };
@@ -215,20 +205,24 @@ export const StyledListInputText = React.memo(({ noLabel = false, ...props }: St
   const secondary = get('secondary');
   const secondaryTypographyProps = get('secondaryProps');
 
-  const Component: any = noLabel ? 'div' : Label;
-
   return (
-    <Component
+    <Box
+      component={noLabel ? 'div' : 'label'}
       {...(!noLabel && { htmlFor: id })}
       sx={{
+        flex: 1,
+        minWidth: 0,
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
-        minHeight: '44px',
         cursor: 'inherit',
         mr: 2,
         m: `${theme.spacing(0.25)} 0`,
-        ...(inset && { ml: '42px' })
+        ...(inset && { ml: '42px' }),
+        '&:hover>*': {
+          overflow: 'auto',
+          whiteSpace: 'wrap'
+        }
       }}
       {...props}
     >
@@ -257,7 +251,7 @@ export const StyledListInputText = React.memo(({ noLabel = false, ...props }: St
       >
         {secondary}
       </Typography>
-    </Component>
+    </Box>
   );
 });
 StyledListInputText.displayName = 'StyledListInputText';
@@ -342,7 +336,7 @@ export const StyledListInputButtonRoot = React.memo(({ children, sx, ...props }:
       disabled={disabled || readOnly || loading}
       role={undefined}
       sx={{
-        gap: theme.spacing(0.5),
+        // gap: theme.spacing(0.5),
         py: 0.5,
         ...(divider && { borderBottom: `1px solid ${theme.palette.divider}` }),
         // ...(((readOnly && !disabled) || loading) && {
