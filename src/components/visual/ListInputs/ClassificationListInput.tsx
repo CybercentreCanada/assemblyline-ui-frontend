@@ -1,112 +1,88 @@
-import type { FormHelperTextProps, IconButtonProps, ListItemTextProps } from '@mui/material';
-import { useTheme } from '@mui/material';
 import type { ClassificationProps } from 'components/visual/Classification';
 import Classification from 'components/visual/Classification';
-import { ListItemText } from 'components/visual/List/ListItemText';
-import { BaseListItem } from 'components/visual/ListInputs/components/BaseListInput';
-import { ResetListInput, type ResetListInputProps } from 'components/visual/ListInputs/components/ResetListInput';
-import { SkeletonListInput } from 'components/visual/ListInputs/components/SkeletonListInput';
-import React, { useMemo } from 'react';
+import { useErrorCallback } from 'components/visual/Inputs/lib/inputs.hook';
+import {
+  StyledHelperText,
+  StyledListInputInner,
+  StyledListInputLoading,
+  StyledListInputText,
+  StyledListInputWrapper,
+  StyledListItemRoot,
+  StyledPasswordAdornment,
+  StyledResetAdornment
+} from 'components/visual/ListInputs/lib/listinputs.components';
+import { useInputChange } from 'components/visual/ListInputs/lib/listinputs.hook';
+import type { ListInputProps, ListInputValues } from 'components/visual/ListInputs/lib/listinputs.model';
+import { PropProvider, usePropStore } from 'components/visual/ListInputs/lib/listinputs.provider';
+import React from 'react';
 
-type Props = Omit<ClassificationProps, 'c12n' | 'setClassification'> & {
-  capitalize?: boolean;
-  defaultValue?: ClassificationProps['c12n'];
-  error?: (value: string) => string;
-  errorProps?: FormHelperTextProps;
-  id?: string;
-  inset?: boolean;
-  loading?: boolean;
-  preventRender?: boolean;
-  primary?: React.ReactNode;
-  primaryProps?: ListItemTextProps<'span', 'p'>['primaryTypographyProps'];
-  readOnly?: boolean;
-  reset?: boolean;
-  resetProps?: ResetListInputProps;
-  secondary?: React.ReactNode;
-  secondaryProps?: ListItemTextProps<'span', 'p'>['secondaryTypographyProps'];
-  value: ClassificationProps['c12n'];
-  onChange: ClassificationProps['setClassification'];
-  onReset?: IconButtonProps['onClick'];
-  onError?: (error: string) => void;
-};
+export type ClassificationListInputProps = ListInputValues<ClassificationProps['c12n']> &
+  ListInputProps &
+  Omit<ClassificationProps, 'c12n' | 'setClassification'>;
 
-const WrappedClassificationListInput = ({
-  capitalize = false,
-  defaultValue,
-  disabled = false,
-  error = () => null,
-  errorProps = null,
-  id = null,
-  inset = false,
-  loading = false,
-  preventRender = false,
-  primary,
-  primaryProps = null,
-  readOnly = false,
-  reset = false,
-  resetProps = null,
-  secondary,
-  secondaryProps = null,
-  value,
-  onChange = () => null,
-  onError = () => null,
-  onReset = null,
-  ...classificationProps
-}: Props) => {
-  const theme = useTheme();
+const WrappedClassificationListInput = React.memo(() => {
+  const [get] = usePropStore<ClassificationListInputProps>();
 
-  const errorValue = useMemo<string>(() => error(value), [error, value]);
+  const disabled = get('disabled') ?? false;
+  const loading = get('loading') ?? false;
+  const readOnly = get('readOnly') ?? false;
+  const value = get('value');
+  const width = get('width');
+
+  const handleChange = useInputChange<ClassificationListInputProps>();
+
+  return (
+    <StyledListItemRoot>
+      <StyledListInputWrapper>
+        <StyledListInputInner>
+          <StyledListInputText />
+
+          {loading ? (
+            <StyledListInputLoading />
+          ) : (
+            <>
+              <StyledPasswordAdornment />
+              <StyledResetAdornment />
+              <div style={{ maxWidth: width, minWidth: width, width: '100%' }}>
+                <Classification
+                  type={!disabled && !readOnly ? 'picker' : 'pill'}
+                  size="small"
+                  c12n={value}
+                  disabled={disabled}
+                  setClassification={c => handleChange(null, c, c)}
+                />
+              </div>
+            </>
+          )}
+        </StyledListInputInner>
+
+        <StyledHelperText />
+      </StyledListInputWrapper>
+    </StyledListItemRoot>
+  );
+});
+
+export const ClassificationListInput = ({ preventRender = false, value, ...props }: ClassificationListInputProps) => {
+  const errorMessage = useErrorCallback({ preventRender, value, ...props });
 
   return preventRender ? null : (
-    <BaseListItem
-      disabled={disabled && !loading}
-      error={errorValue && !disabled && !loading && !readOnly}
-      helperText={errorValue}
-      FormHelperTextProps={errorProps}
+    <PropProvider<ClassificationListInputProps>
+      props={{
+        dynGroup: null,
+        errorMessage,
+        format: 'short',
+        fullWidth: true,
+        inline: false,
+        inputValue: value,
+        isUser: false,
+        preventRender,
+        value,
+        ...props
+      }}
     >
-      <ListItemText
-        id={id}
-        primary={primary}
-        secondary={secondary}
-        primaryTypographyProps={primaryProps}
-        secondaryTypographyProps={secondaryProps}
-        capitalize={capitalize}
-        style={{
-          marginRight: theme.spacing(2),
-          margin: `${theme.spacing(0.25)} 0`,
-          ...(inset && { marginLeft: '42px' })
-        }}
-      />
-      {loading ? (
-        <SkeletonListInput />
-      ) : (
-        <>
-          <ResetListInput
-            defaultValue={defaultValue}
-            id={id || primary.toString()}
-            preventRender={!reset || disabled || readOnly}
-            onChange={() => onChange(defaultValue)}
-            onReset={onReset}
-            {...resetProps}
-          />
-          <div style={{ maxWidth: '30%', minWidth: '30%', width: '100%' }}>
-            <Classification
-              type={!disabled && !readOnly ? 'picker' : 'pill'}
-              size="small"
-              c12n={value}
-              setClassification={c => {
-                onChange(c);
-
-                const err = error(c);
-                if (err) onError(err);
-              }}
-              {...classificationProps}
-            />
-          </div>
-        </>
-      )}
-    </BaseListItem>
+      <WrappedClassificationListInput />
+    </PropProvider>
   );
 };
 
-export const ClassificationListInput = React.memo(WrappedClassificationListInput);
+ClassificationListInput.displayName = 'ClassificationListInput';
