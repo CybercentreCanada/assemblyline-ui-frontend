@@ -545,7 +545,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                 {alert?.metadata?.eml_path && (
                   <div>
                     <Fetcher
-                      fetcherId="eml-preview.preview"
+                      fetcherId="email-preview.preview"
                       type="email_id"
                       value={alert?.metadata?.eml_path}
                       classification={currentUser.classification}
