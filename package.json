@@ -54,7 +54,7 @@
     "moment-timezone": "^0.5.40",
     "monaco-editor": "^0.35.0",
     "node-fetch": "^3.3.0",
-    "node-forge": "^1.3.1",
+    "node-forge": "^1.3.2",
     "notistack": "^3.0.2",
     "react": "^19.1.0",
     "react-chartjs-2": "^5.2.0",
