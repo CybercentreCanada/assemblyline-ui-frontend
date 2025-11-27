@@ -1,4 +1,5 @@
-import SupportOutlinedIcon from '@mui/icons-material/SupportOutlined';
+import EmailOutlinedIcon from '@mui/icons-material/EmailOutlined';
+import MenuBookOutlinedIcon from '@mui/icons-material/MenuBookOutlined';
 import { Box, AppBar as MuiAppBar, Toolbar, useMediaQuery, useTheme } from '@mui/material';
 import {
   useAppBar,
@@ -134,13 +135,22 @@ const AppBar = () => {
         {showSpacer && <div style={{ flex: 1 }} />}
         {rightBeforeSearch}
         {quicksearch.show && <AppSearch />}
-        {configuration.system.support_link && (
+        {configuration.system.support?.documentation && (
           <IconButton
-            onClick={() => window.open(configuration.system.support_link, '_blank')}
-            tooltip={t('support.title')}
+            onClick={() => window.open(configuration.system.support.documentation, '_blank')}
+            tooltip={t('support.documentation')}
             color="inherit"
           >
-            <SupportOutlinedIcon />
+            <MenuBookOutlinedIcon />
+          </IconButton>
+        )}
+        {configuration.system.support?.email && (
+          <IconButton
+            onClick={() => window.open(configuration.system.support.email, '_blank')}
+            tooltip={t('support.email')}
+            color="inherit"
+          >
+            <EmailOutlinedIcon />
           </IconButton>
         )}
         {right}
