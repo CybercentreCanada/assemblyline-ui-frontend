@@ -800,13 +800,14 @@ export const registerYaraCompletionItemProvider = monaco => ({
         prefix: 'rule',
         description: '',
         insert: [
-          'rule ${1:my_rule} {',
+          'rule ${1:yara_template} {',
           '\tmeta:',
-          '\t\t${2:KEY} = ${3:"VALUE"}',
+          '\t\t${2:description} = ${3:"VALUE"}',
           '\tstrings:',
-          '\t\t$${4:name} = ${5|"string",/regex/,{ HEX }|}',
+          '\t\t$${4:a} = ${5:"First string"}',
+          '\t\t$${6:b} = ${7|/some_regex_with_a_string.{,10}/}',
           '\tcondition:',
-          '\t\t${6:any of them}',
+          '\t\t${8:all of them}',
           '}'
         ],
         detail: 'Generate a rule skeleton (YARA)',
@@ -819,8 +820,8 @@ export const registerYaraCompletionItemProvider = monaco => ({
         ? typeof snippet.insert === 'string'
           ? snippet.insert
           : Array.isArray(snippet.insert)
-          ? snippet.insert.join('\n')
-          : `${JSON.stringify(snippet.insert)}`
+            ? snippet.insert.join('\n')
+            : `${JSON.stringify(snippet.insert)}`
         : '';
 
     const suggestions: CompletionItem[] = snippets.map(snippet => ({
