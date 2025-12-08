@@ -15,7 +15,7 @@ import {
 import { Button } from 'components/visual/Buttons/Button';
 import { PageHeader } from 'components/visual/Layouts/PageHeader';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
-import React, { useMemo } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 
 export const HeaderSection = React.memo(() => {
@@ -53,17 +53,6 @@ export const HeaderSection = React.memo(() => {
     };
   });
 
-  const [profileName, profileDescription] = useMemo<[string, string]>(() => {
-    const tab = form.getFieldValue('state.tab');
-    if (!tab || tab === 'interface') return [t('profile.interface'), null];
-    if (tab === 'default') return [t('profile.custom'), t('profile.custom_desc')];
-
-    const profile = configuration?.submission?.profiles?.[tab];
-    if (!profile) return [t('profile.unknown'), null];
-
-    return [profile.display_name, profile.description];
-  }, [form, configuration, t]);
-
   return (
     <form.Subscribe
       selector={state =>
@@ -88,19 +77,35 @@ export const HeaderSection = React.memo(() => {
           )}
 
           <PageHeader
-            primary={profileName}
+            primary={
+              !tab
+                ? t('profile.interface')
+                : tab === 'interface'
+                  ? t('profile.interface')
+                  : tab === 'default'
+                    ? t('profile.custom')
+                    : configuration.submission.profiles[tab].display_name
+            }
             secondary={
-              !profileDescription ? null : (
-                <>
-                  <Typography
-                    color="secondary"
-                    sx={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}
-                  >
-                    {`{"submission_profile": "${tab}"}`}
-                  </Typography>
-                  {profileDescription}
-                </>
-              )
+              <>
+                {!tab ? null : tab === 'interface' ? null : tab === 'default' ? (
+                  <>
+                    <Typography
+                      color="secondary"
+                      style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}
+                    >{`{"submission_profile": "default"}`}</Typography>
+                    {t('profile.custom_desc')}
+                  </>
+                ) : (
+                  <>
+                    <Typography
+                      color="secondary"
+                      style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}
+                    >{`{"submission_profile": "${tab}"}`}</Typography>
+                    {configuration.submission.profiles[tab].description}
+                  </>
+                )}
+              </>
             }
             secondaryLoading={loading}
             slotProps={{ actions: { spacing: 1 } }}
