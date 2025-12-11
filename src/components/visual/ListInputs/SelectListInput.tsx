@@ -1,200 +1,185 @@
-import type {
-  FormHelperTextProps,
-  IconButtonProps,
-  ListItemTextProps,
-  MenuItemProps,
-  SelectChangeEvent,
-  SelectProps,
-  TypographyProps
-} from '@mui/material';
-import { MenuItem, Select, useTheme } from '@mui/material';
-import { ListItemText } from 'components/visual/List/ListItemText';
-import { BaseListItem } from 'components/visual/ListInputs/components/BaseListInput';
-import type { ResetListInputProps } from 'components/visual/ListInputs/components/ResetListInput';
-import { ResetListInput } from 'components/visual/ListInputs/components/ResetListInput';
-import { SkeletonListInput } from 'components/visual/ListInputs/components/SkeletonListInput';
-import type { CSSProperties } from 'react';
-import React, { useMemo } from 'react';
+import type { ListItemTextProps, MenuItemProps, SelectProps } from '@mui/material';
+import { ListItemText, MenuItem, Select } from '@mui/material';
+import {
+  StyledHelperText,
+  StyledListInputInner,
+  StyledListInputLoading,
+  StyledListInputText,
+  StyledListInputWrapper,
+  StyledListItemRoot,
+  StyledListItemText,
+  StyledPasswordAdornment,
+  StyledResetAdornment
+} from 'components/visual/ListInputs/lib/listinputs.components';
+import {
+  useErrorCallback,
+  useInputBlur,
+  useInputChange,
+  useInputFocus,
+  usePropID
+} from 'components/visual/ListInputs/lib/listinputs.hook';
+import type { ListInputProps, ListInputValues } from 'components/visual/ListInputs/lib/listinputs.model';
+import { PropProvider, usePropStore } from 'components/visual/ListInputs/lib/listinputs.provider';
+import React from 'react';
 
-export type SelectListInputProps = Omit<SelectProps, 'defaultValue' | 'error' | 'onChange'> & {
-  capitalize?: boolean;
-  defaultValue?: SelectProps['value'];
-  disablePadding?: boolean;
-  error?: (value: SelectProps['value']) => string;
-  errorProps?: FormHelperTextProps;
-  hasEmpty?: boolean;
-  inset?: boolean;
-  loading?: boolean;
-  options: {
-    primary: ListItemTextProps['primary'];
-    secondary?: ListItemTextProps['secondary'];
-    value: MenuItemProps['value'];
-  }[];
-  preventRender?: boolean;
-  primary?: React.ReactNode;
-  primaryProps?: ListItemTextProps<'span', 'p'>['primaryTypographyProps'];
-  primaryVariant?: TypographyProps['variant'];
-  readOnly?: boolean;
-  reset?: boolean;
-  resetProps?: ResetListInputProps;
-  secondary?: React.ReactNode;
-  secondaryProps?: ListItemTextProps<'span', 'p'>['secondaryTypographyProps'];
-  tiny?: boolean;
-  width?: CSSProperties['width'];
-  onChange?: (event: SelectChangeEvent<unknown>, value: string) => void;
-  onReset?: IconButtonProps['onClick'];
-  onError?: (error: string) => void;
+export type Option = {
+  primary: ListItemTextProps['primary'];
+  secondary?: ListItemTextProps['secondary'];
+  value: MenuItemProps['value'] | boolean;
 };
 
-const WrappedSelectListInput = ({
-  capitalize = false,
-  defaultValue,
-  disabled = false,
-  disablePadding = false,
-  error = () => null,
-  errorProps = null,
-  hasEmpty = false,
-  id = null,
-  inset = false,
-  loading = false,
-  options = [],
-  preventRender = false,
-  primary,
-  primaryProps = null,
-  primaryVariant = 'body1',
-  readOnly = false,
-  reset = false,
-  resetProps = null,
-  secondary,
-  secondaryProps = null,
-  tiny = false,
-  value,
-  width = '30%',
-  onChange = () => null,
-  onError = () => null,
-  onReset = null,
-  ...selectProps
-}: SelectListInputProps) => {
-  const theme = useTheme();
+export type SelectListInputProps<O extends readonly Option[]> = ListInputValues<
+  O[number]['value'],
+  O[number]['value']
+> &
+  ListInputProps & {
+    displayEmpty?: SelectProps['displayEmpty'];
+    options?: O;
+  };
 
-  const errorValue = useMemo<string>(() => error(value), [error, value]);
+const WrappedSelectListInput = <O extends readonly Option[]>() => {
+  const [get, setStore] = usePropStore<SelectListInputProps<O>>();
 
-  return preventRender ? null : (
-    <BaseListItem
-      disabled={disabled && !loading}
-      error={errorValue && !disabled && !loading && !readOnly}
-      helperText={errorValue}
-      FormHelperTextProps={errorProps}
-      sx={{ ...(disablePadding && { padding: ` 0px ${theme.spacing(1)}` }) }}
-    >
-      <ListItemText
-        id={id}
-        primary={primary}
-        secondary={secondary}
-        primaryTypographyProps={{ variant: primaryVariant, ...primaryProps }}
-        secondaryTypographyProps={secondaryProps}
-        capitalize={capitalize}
-        style={{
-          marginRight: theme.spacing(2),
-          margin: `${theme.spacing(0.25)} 0`,
-          ...(inset && { marginLeft: '42px' })
-        }}
-      />
-      {loading ? (
-        <SkeletonListInput />
-      ) : (
-        <>
-          <ResetListInput
-            defaultValue={defaultValue}
-            id={id || primary.toString()}
-            preventRender={!reset || disabled || readOnly}
-            onChange={event => onChange(event as SelectChangeEvent<unknown>, defaultValue as string)}
-            onReset={onReset}
-            {...resetProps}
-          />
-          <Select
-            variant="outlined"
-            size="small"
-            fullWidth
-            disabled={disabled || readOnly}
-            readOnly={readOnly}
-            error={!!errorValue && !readOnly}
-            value={value}
-            inputProps={{
-              id: id || primary.toString(),
-              style: { color: 'textPrimary' }
-            }}
-            slotProps={{
-              input: {
-                sx: {
-                  display: 'flex',
-                  alignItems: 'center',
-                  ...(tiny && {
-                    paddingTop: theme.spacing(0.5),
-                    paddingBottom: theme.spacing(0.5)
-                  })
-                }
-              }
-            }}
-            renderValue={option => (
-              <ListItemText
-                primary={options.find(o => o.value === option)?.primary || ''}
-                primaryTypographyProps={{
-                  ...(!(disabled || readOnly) && { sx: { cursor: 'pointer' } }),
-                  ...(tiny && { variant: 'body2' })
-                }}
-                style={{ margin: 0 }}
-              />
-            )}
-            onChange={event => {
-              onChange(event, event.target.value as string);
+  const capitalize = get('capitalize');
+  const disabled = get('disabled');
+  const displayEmpty = get('displayEmpty');
+  const errorMessage = get('errorMessage');
+  const id = usePropID();
+  const inputValue = get('inputValue');
+  const loading = get('loading');
+  const monospace = get('monospace');
+  const options = get('options');
+  const overflowHidden = get('overflowHidden');
+  const password = get('password');
+  const readOnly = get('readOnly');
+  const showMenu = get('showMenu');
+  const showPassword = get('showPassword');
+  const tiny = get('tiny');
+  const value = get('value');
+  const width = get('width');
 
-              const err = error(event.target.value as string);
-              if (err) onError(err);
-            }}
-            {...selectProps}
-            sx={{
-              maxWidth: width,
-              minWidth: width,
-              ...(capitalize && { textTransform: 'capitalize' }),
-              ...(readOnly &&
-                !disabled && {
-                  '& .MuiInputBase-input': { cursor: 'default', color: theme.palette.text.primary },
-                  '& .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline': {
-                    borderColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.23)' : 'rgba(0, 0, 0, 0.23)'
-                  }
-                }),
-              ...selectProps?.sx
-            }}
-          >
-            {hasEmpty && <MenuItem value="" sx={{ height: '36px' }}></MenuItem>}
-            {options.map((option, i) => (
-              <MenuItem
-                key={i}
-                value={option.value}
+  const handleBlur = useInputBlur<SelectListInputProps<O>>();
+  const handleChange = useInputChange<SelectListInputProps<O>>();
+  const handleFocus = useInputFocus<SelectListInputProps<O>>();
+
+  return (
+    <StyledListItemRoot>
+      <StyledListInputWrapper>
+        <StyledListInputInner>
+          <StyledListInputText />
+
+          {loading ? (
+            <StyledListInputLoading />
+          ) : (
+            <>
+              <StyledPasswordAdornment />
+              <StyledResetAdornment />
+              <Select
+                disabled={disabled}
+                displayEmpty={displayEmpty}
+                error={!!errorMessage}
+                fullWidth
+                id={id}
+                readOnly={readOnly}
+                size="small"
+                open={showMenu}
+                value={options?.some(o => o.value === inputValue) ? inputValue : ''}
+                onChange={event => handleChange(event as React.SyntheticEvent, event.target.value, event.target.value)}
+                onFocus={handleFocus}
+                onBlur={e => handleBlur(e, value, value)}
+                onClose={() => setStore({ showMenu: false })}
+                onOpen={() => setStore({ showMenu: true })}
+                renderValue={option => (
+                  <ListItemText
+                    primary={options?.find(o => o.value === option)?.primary || ''}
+                    sx={{ margin: 0 }}
+                    slotProps={{
+                      primary: {
+                        ...(tiny && { variant: 'body2' }),
+                        sx: {
+                          paddingRight: '0px',
+                          cursor: 'pointer',
+                          ...(disabled && { cursor: 'default', userSelect: 'text' }),
+                          ...(capitalize && { textTransform: 'capitalize' }),
+                          ...(!overflowHidden && {
+                            whiteSpace: 'wrap',
+                            overflow: 'auto',
+                            textOverflow: 'ellipsis'
+                          }),
+                          ...(readOnly && { cursor: 'default', userSelect: 'text' }),
+                          ...(monospace && { fontFamily: 'monospace' }),
+                          ...(password &&
+                            showPassword && {
+                              fontFamily: 'password',
+                              WebkitTextSecurity: 'disc',
+                              MozTextSecurity: 'disc',
+                              textSecurity: 'disc'
+                            })
+                        }
+                      }
+                    }}
+                  />
+                )}
+                slotProps={{ input: { id: id } }}
+                MenuProps={{ sx: { maxWidth: 'min-content' } }}
+                IconComponent={() => null}
                 sx={{
-                  '&>label': { margin: 0, cursor: 'pointer !important', maxWidth: theme.breakpoints.values.sm },
-                  ...(capitalize && { textTransform: 'capitalize' })
+                  maxWidth: width,
+                  minWidth: width,
+                  '&.MuiInputBase-root': {
+                    paddingRight: '9px',
+                    ...(!tiny && { minHeight: '40px' })
+                  },
+                  '& .MuiSelect-select': {
+                    padding: '8px 8px 8px 14px !important',
+                    ...(tiny && {
+                      padding: '4.5px 8px 4.5px 14px !important'
+                    })
+                  }
                 }}
               >
-                <ListItemText
-                  primary={option.primary}
-                  secondary={option.secondary}
-                  primaryTypographyProps={{
-                    overflow: 'auto',
-                    textOverflow: 'initial',
-                    whiteSpace: 'normal',
-                    variant: primaryVariant
-                  }}
-                  secondaryTypographyProps={{ overflow: 'auto', textOverflow: 'initial', whiteSpace: 'normal' }}
-                />
-              </MenuItem>
-            ))}
-          </Select>
-        </>
-      )}
-    </BaseListItem>
+                {options.map((option, i) => (
+                  <MenuItem key={i} value={option.value as MenuItemProps['value']}>
+                    <StyledListItemText
+                      primary={option.primary ? option.primary : '\u00A0'}
+                      secondary={option.secondary}
+                    />
+                  </MenuItem>
+                ))}
+              </Select>
+            </>
+          )}
+        </StyledListInputInner>
+
+        <StyledHelperText />
+      </StyledListInputWrapper>
+    </StyledListItemRoot>
   );
 };
 
-export const SelectListInput = React.memo(WrappedSelectListInput);
+export const SelectListInput = <O extends readonly Option[]>({
+  preventRender = false,
+  value,
+  ...props
+}: SelectListInputProps<O>) => {
+  const errorMessage = useErrorCallback({ preventRender, value, ...props });
+
+  return preventRender ? null : (
+    <PropProvider<SelectListInputProps<O>>
+      props={{
+        capitalize: false,
+        displayEmpty: false,
+        errorMessage,
+        inputValue: value,
+        options: [] as unknown as O,
+        preventRender,
+        value,
+        ...props
+      }}
+    >
+      <WrappedSelectListInput<O> />
+    </PropProvider>
+  );
+};
+
+SelectListInput.displayName = 'SelectListInput';

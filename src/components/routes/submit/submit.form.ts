@@ -5,23 +5,65 @@ import type { Metadata } from 'components/models/base/submission';
 import type { ProfileSettings } from 'components/routes/settings/settings.utils';
 import generateUUID from 'helpers/uuid';
 
+/**
+ * State used when submitting to the backend.
+ * Includes classification and server-side metadata.
+ */
 export type SubmitState = {
   hash: string;
   c12n: string;
   metadata?: Metadata;
 };
 
+/**
+ * Metadata collected from the user on the Submit page.
+ */
 export type SubmitMetadata = {
   data: Record<string, unknown>;
-  edit: string;
+  edit: string | null;
 };
 
+/**
+ * Phases the Submit flow goes through:
+ * - loading: initial fetches / setup
+ * - editing: user is modifying parameters or metadata
+ * - uploading: Flow.js is uploading a file
+ * - redirecting: backend accepted submission and UI is navigating away
+ */
 export type SubmitPhase = 'loading' | 'editing' | 'uploading' | 'redirecting';
 
-// [Category Index, Service Index, Previous Value]
+/**
+ * [Category Index, Service Index] representing a previous service selection.
+ * Used when restoring auto-selected services.
+ */
 export type AutoURLServiceIndices = [number, number][];
 
-export const FLOW = new Flow({
+/**
+ * File input with additional Flow.js or UI-related properties.
+ * Nullable because initial state has no file selected.
+ */
+export type SubmitFile =
+  | (File & {
+      relativePath: string;
+      fileName: string;
+      path: string;
+      hash: string;
+    })
+  | null;
+
+/**
+ * Hash submission data (used when submitting via hash instead of file).
+ */
+export type SubmitHash = {
+  type: HashPatternMap | null;
+  value: string | null;
+};
+
+/**
+ * Global Flow.js instance configured for file uploads.
+ * Handles chunk uploads, retries, and connection behavior.
+ */
+export const FLOW: Flow = new Flow({
   target: '/api/v4/ui/flowjs/',
   permanentErrors: [412, 500, 501],
   maxChunkRetries: 1,
@@ -29,23 +71,27 @@ export const FLOW = new Flow({
   simultaneousUploads: 4
 });
 
+/**
+ * Full form-state representation for the Submit page.
+ * This is used by React Hook Form and the Submit UI.
+ */
 export type SubmitStore = {
   /** State related to the interface of the Submit page */
   state: {
-    /** adjust the service selection and parameters */
+    /** Adjust the service selection and parameters */
     adjust: boolean;
 
     /** The user is able to customize the values */
     customize: boolean;
 
-    /** disable the inputs */
+    /** Disable the inputs */
     disabled: boolean;
 
     /** Phase of the submit process */
     phase: SubmitPhase;
 
     /** Selected profile for the submission */
-    profile: string;
+    profile: string | null;
 
     /** Type of submission being made */
     tab: 'file' | 'hash';
@@ -53,11 +99,11 @@ export type SubmitStore = {
     /** Upload progress of a file submission */
     progress: number;
 
-    /** UUID of the submission */
+    /** UUID of the submission (generated once per form initialization) */
     uuid: string;
   };
 
-  /** adjust the service selection and parameters */
+  /** Adjust the service selection and parameters */
   autoURLServiceSelection: {
     /** Is the URLServiceSelection dialog open? */
     open: boolean;
@@ -66,27 +112,35 @@ export type SubmitStore = {
     prev: AutoURLServiceIndices;
   };
 
-  /** Details of the file input  */
-  file: File & { relativePath: string; fileName: string; path: string; hash: string };
+  /** Details of the file input */
+  file: SubmitFile;
 
   /** Details of the hash input */
-  hash: { type: HashPatternMap; value: string };
+  hash: SubmitHash;
 
   /** Selected metadata of the submission */
   metadata: SubmitMetadata;
 
   /** All the user's settings */
-  settings: ProfileSettings;
+  settings: ProfileSettings | null;
 };
 
-export const DEFAULT_SUBMIT_FORM: SubmitStore = Object.freeze({
+/**
+ * Default form state used when initializing a new Submit form.
+ * Matches the expected UX:
+ * - no file
+ * - no hash
+ * - no settings yet
+ * - initial phase set to 'loading'
+ */
+export const DEFAULT_SUBMIT_FORM: SubmitStore = {
   state: {
     adjust: false,
     customize: false,
     disabled: false,
     phase: 'loading',
     profile: null,
-    tab: 'file' as const,
+    tab: 'file',
     progress: 0,
     uuid: generateUUID()
   },
@@ -104,8 +158,12 @@ export const DEFAULT_SUBMIT_FORM: SubmitStore = Object.freeze({
     data: {}
   },
   settings: null
-});
+};
 
+/**
+ * Creates a strongly-typed form context for SubmitStore.
+ * Uses structuredClone to avoid mutating default objects.
+ */
 export const { FormProvider, useForm } = createFormContext<SubmitStore>({
   defaultValues: structuredClone(DEFAULT_SUBMIT_FORM)
 });

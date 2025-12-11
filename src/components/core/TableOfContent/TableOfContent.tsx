@@ -1,9 +1,24 @@
 import { createFormContext } from 'components/core/form/createFormContext';
 import React, { useCallback, useContext, useEffect, useMemo, useRef } from 'react';
 
+export type TableOfContentAnchor = {
+  id: string;
+  label: string;
+  subheader: boolean;
+};
+
 export type TableOfContentStore = {
-  activeID: string;
-  anchors: { id: string; label: string; subheader: boolean }[];
+  activeID: string | null;
+  anchors: TableOfContentAnchor[];
+};
+
+export type TableOfContentContextProps = {
+  rootRef: React.MutableRefObject<HTMLDivElement | null>;
+  headerRef: React.MutableRefObject<HTMLDivElement | null>;
+  loadAnchors: (props?: Partial<TableOfContentAnchor>) => void;
+  scrollTo: (event: React.SyntheticEvent, id: string) => void;
+  Anchors: React.FC<{ children: (anchors: TableOfContentAnchor[]) => React.ReactNode }>;
+  ActiveAnchor: React.FC<{ activeID: string | null; children: (active: boolean) => React.ReactNode }>;
 };
 
 const TABLE_OF_CONTENT_STORE: TableOfContentStore = Object.freeze({
@@ -15,115 +30,142 @@ const { FormProvider, useForm } = createFormContext<TableOfContentStore>({
   defaultValues: structuredClone(TABLE_OF_CONTENT_STORE)
 });
 
-export type TableOfContentContextProps = {
-  rootRef: React.MutableRefObject<HTMLDivElement>;
-  headerRef: React.MutableRefObject<HTMLDivElement>;
-  loadAnchors: (props?: { id?: string; label?: string; subheader?: boolean }) => void;
-  scrollTo: (event: React.SyntheticEvent, activeAnchor: string) => void;
-  Anchors: React.FC<{ children: (anchors: TableOfContentStore['anchors']) => React.ReactNode }>;
-  ActiveAnchor: React.FC<{
-    activeID: TableOfContentStore['activeID'];
-    children: (active: boolean) => React.ReactNode;
-  }>;
+export const TableOfContentContext = React.createContext<TableOfContentContextProps | null>(null);
+
+export const useTableOfContent = (): TableOfContentContextProps => {
+  const ctx = useContext(TableOfContentContext);
+  if (!ctx) {
+    throw new Error('useTableOfContent must be used inside <TableOfContentProvider>');
+  }
+  return ctx;
 };
-
-export const TableOfContentContext = React.createContext<TableOfContentContextProps>(null);
-
-export function useTableOfContent(): TableOfContentContextProps {
-  return useContext(TableOfContentContext);
-}
 
 export type TableOfContentProps = {
   behavior?: ScrollOptions['behavior'];
   children?: React.ReactNode;
 };
 
-export const TableOfContent: React.FC<TableOfContentProps> = React.memo(
-  ({ behavior = 'smooth', children = null }: TableOfContentProps) => {
-    const form = useForm();
+export const TableOfContent: React.FC<TableOfContentProps> = React.memo(({ behavior = 'smooth', children }) => {
+  const form = useForm();
 
-    const rootRef = useRef<HTMLDivElement>(null);
-    const headerRef = useRef<HTMLDivElement>(null);
+  const rootRef = useRef<HTMLDivElement | null>(null);
+  const headerRef = useRef<HTMLDivElement | null>(null);
 
-    const Anchors = useMemo<TableOfContentContextProps['Anchors']>(
-      () =>
-        ({ children: render }) => (
-          <form.Subscribe selector={state => state.values.anchors} children={anchors => render(anchors)} />
-        ),
-      [form]
-    );
+  const Anchors = useMemo<TableOfContentContextProps['Anchors']>(
+    () =>
+      ({ children: render }) => (
+        <form.Subscribe selector={s => s.values.anchors} children={anchors => render(anchors)} />
+      ),
+    [form]
+  );
 
-    const ActiveAnchor = useMemo<TableOfContentContextProps['ActiveAnchor']>(
-      () =>
-        ({ activeID, children: render }) => (
-          <form.Subscribe selector={state => activeID === state.values.activeID} children={active => render(active)} />
-        ),
-      [form]
-    );
+  const ActiveAnchor = useMemo<TableOfContentContextProps['ActiveAnchor']>(
+    () =>
+      ({ activeID, children: render }) => (
+        <form.Subscribe selector={s => s.values.activeID === activeID} children={isActive => render(isActive)} />
+      ),
+    [form]
+  );
 
-    const findActive = useCallback(() => {
-      const elements = rootRef.current?.querySelectorAll('[data-anchor]');
-      for (let i = elements.length - 1; i >= 0; i--) {
-        if (
-          elements.item(i).getBoundingClientRect().top - 2 <=
-          rootRef.current.getBoundingClientRect().top + headerRef.current.getBoundingClientRect().height
-        ) {
-          form.setFieldValue('activeID', elements.item(i).getAttribute('data-anchor'));
-          break;
-        }
+  const findActive = useCallback(() => {
+    const root = rootRef.current;
+    const header = headerRef.current;
+    if (!root || !header) return;
+
+    const headerOffset = header.getBoundingClientRect().height;
+    const rootTop = root.getBoundingClientRect().top;
+
+    const elements = root.querySelectorAll('[data-anchor]');
+    for (let i = elements.length - 1; i >= 0; i--) {
+      const el = elements.item(i);
+      if (!el) continue;
+
+      if (el.getBoundingClientRect().top - 2 <= rootTop + headerOffset) {
+        const id = el.getAttribute('data-anchor');
+        if (id) form.setFieldValue('activeID', id);
+        break;
       }
-    }, [form]);
+    }
+  }, [form]);
 
-    const loadAnchors = useCallback<TableOfContentContextProps['loadAnchors']>(
-      ({ id = null, label = null, subheader = false }) => {
-        const elements = rootRef.current?.querySelectorAll('[data-anchor]');
-        const prevAnchors = form.getFieldValue('anchors');
-        const nextAnchors: TableOfContentStore['anchors'] = [];
+  const loadAnchors = useCallback<TableOfContentContextProps['loadAnchors']>(
+    ({ id, label, subheader = false } = {}) => {
+      const root = rootRef.current;
+      if (!root) return;
 
-        (elements || []).forEach((element: Element) => {
-          const anchorID = element.getAttribute('data-anchor');
-          const index = prevAnchors.findIndex(a => a.id === anchorID);
-          if (id === anchorID) nextAnchors.push({ id, label, subheader });
-          else if (index >= 0) nextAnchors.push(prevAnchors[index]);
-        });
+      const elements = root.querySelectorAll('[data-anchor]');
+      const previous = form.getFieldValue('anchors');
+      const next: TableOfContentAnchor[] = [];
 
-        form.setFieldValue('activeID', null);
-        form.setFieldValue('anchors', nextAnchors);
-      },
-      [form]
-    );
+      elements.forEach(el => {
+        const anchorID = el.getAttribute('data-anchor');
+        if (!anchorID) return;
 
-    const scrollTo = useCallback<TableOfContentContextProps['scrollTo']>(
-      (event, activeAnchor) => {
-        event.preventDefault();
-        event.stopPropagation();
+        if (id === anchorID) {
+          // Updated anchor
+          next.push({
+            id,
+            label: label ?? '',
+            subheader
+          });
+        } else {
+          // Existing anchor
+          const previousIndex = previous.findIndex(a => a.id === anchorID);
+          if (previousIndex >= 0) next.push(previous[previousIndex]);
+        }
+      });
 
-        const element: HTMLDivElement = rootRef.current.querySelector("[data-anchor='" + activeAnchor + "']");
-        rootRef.current.scrollTo({
-          top: element.offsetTop - rootRef.current.offsetTop - headerRef.current.getBoundingClientRect().height,
-          behavior: behavior
-        });
-      },
-      [behavior]
-    );
+      form.setFieldValue('activeID', null);
+      form.setFieldValue('anchors', next);
+    },
+    [form]
+  );
 
-    useEffect(() => {
-      const rootElement = rootRef.current;
-      if (!rootElement) return;
+  const scrollTo = useCallback<TableOfContentContextProps['scrollTo']>(
+    (event, id) => {
+      event.preventDefault();
+      event.stopPropagation();
 
-      rootElement.addEventListener('scroll', findActive, false);
-      return () => {
-        rootElement.removeEventListener('scroll', findActive, false);
-      };
-    }, [findActive]);
+      const root = rootRef.current;
+      const header = headerRef.current;
+      if (!root || !header) return;
 
-    return (
-      <TableOfContentContext.Provider value={{ rootRef, headerRef, loadAnchors, scrollTo, Anchors, ActiveAnchor }}>
-        {children}
-      </TableOfContentContext.Provider>
-    );
-  }
-);
+      const el = root.querySelector<HTMLDivElement>(`[data-anchor='${id}']`);
+      if (!el) return;
+
+      const headerOffset = header.getBoundingClientRect().height;
+
+      root.scrollTo({
+        top: el.offsetTop - root.offsetTop - headerOffset,
+        behavior
+      });
+    },
+    [behavior]
+  );
+
+  useEffect(() => {
+    const root = rootRef.current;
+    if (!root) return;
+
+    root.addEventListener('scroll', findActive, { passive: true });
+    return () => root.removeEventListener('scroll', findActive);
+  }, [findActive]);
+
+  return (
+    <TableOfContentContext.Provider
+      value={{
+        rootRef,
+        headerRef,
+        loadAnchors,
+        scrollTo,
+        Anchors,
+        ActiveAnchor
+      }}
+    >
+      {children}
+    </TableOfContentContext.Provider>
+  );
+});
 
 export const TableOfContentProvider = React.memo((props: TableOfContentProps) => (
   <FormProvider>

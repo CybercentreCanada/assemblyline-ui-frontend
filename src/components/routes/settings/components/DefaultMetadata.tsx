@@ -10,8 +10,17 @@ export const DefaultMetadataSection = React.memo(() => {
   const theme = useTheme();
   const { settings } = useALContext();
 
-  return Object.keys(settings.default_metadata).length === 0 ? null : (
-    <div style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(1) }}>
+  const metadata = settings?.default_metadata;
+  if (!metadata || Object.keys(metadata || {}).length === 0) return null;
+
+  return (
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        rowGap: theme.spacing(1)
+      }}
+    >
       <PageSection
         id="default_metadata"
         primary={t('submissions.default_metadata')}
@@ -24,17 +33,19 @@ export const DefaultMetadataSection = React.memo(() => {
         disablePadding
         sx={{
           bgcolor: 'background.paper',
-          '&>:not(:last-child)': {
+          '& > :not(:last-child)': {
             borderBottom: `thin solid ${theme.palette.divider}`
           }
         }}
       >
-        {Object.entries(settings.default_metadata).map(([key, value]) => (
-          <TextListInput id={key} primary={key} key={key} value={value} disabled={true} />
+        {Object.entries(metadata).map(([key, value]) => (
+          <TextListInput key={key} id={key} primary={key} value={value} disabled />
         ))}
       </List>
     </div>
   );
 });
+
+DefaultMetadataSection.displayName = 'DefaultMetadataSection';
 
 export default DefaultMetadataSection;
