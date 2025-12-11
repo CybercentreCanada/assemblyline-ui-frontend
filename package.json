@@ -29,7 +29,7 @@
     "@tanstack/react-query": "^5.69.0",
     "@tanstack/react-query-persist-client": "^5.69.0",
     "@vitejs/plugin-react": "^4.3.4",
-    "@vitejs/plugin-react-swc": "^3.5.0",
+    "@vitejs/plugin-react-swc": "^3.8.1",
     "autosuggest-highlight": "^3.3.4",
     "borealis-ui": "^0.14.9",
     "browser-detect": "^0.2.28",
@@ -74,6 +74,7 @@
     "styled-components": "^6.1.17",
     "vite": "^6.4.1",
     "vite-plugin-mkcert": "^1.17.8",
+    "vite-plugin-swc": "^0.0.2",
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^3.1.1",
     "web-vitals": "^3.1.1"
