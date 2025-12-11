@@ -61,7 +61,7 @@ const WrappedChildrenSection: React.FC<ChildrenSectionProps> = ({
             <Box
               key={i}
               component={Link}
-              to={`/file/detail/${fileItem.sha256}?name=${encodeURI(fileItem.name)}`}
+              to={`/file/detail/${fileItem.sha256}?name=${encodeURIComponent(fileItem.name)}`}
               sx={{
                 wordBreak: 'break-word',
                 color: 'inherit',
