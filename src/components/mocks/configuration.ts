@@ -161,7 +161,6 @@ export const MOCK_CONFIGURATION: Configuration = {
     default_max_supplementary: 0,
     max_extraction_depth: 0,
     max_metadata_length: 0,
-    sha256_sources: [],
     tag_types: {
       attribution: [],
       behavior: [],
@@ -171,7 +170,11 @@ export const MOCK_CONFIGURATION: Configuration = {
   system: {
     organisation: 'ACME',
     type: 'development',
-    version: '4.6.0.dev0'
+    version: '4.6.0.dev0',
+    support: {
+      documentation: 'https://cybercentrecanada.github.io/assemblyline4_docs/',
+      email: null
+    }
   },
   ui: {
     ai: {
