@@ -229,7 +229,7 @@ const WrappedInfoSection: React.FC<Props> = ({ submission }) => {
                 return (
                   <>
                     <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
-                      <strong>{t('params.initial_data.passwords')}</strong>
+                      <span style={{ fontWeight: 500 }}>{t('params.initial_data.passwords')}</span>
                     </Grid>
                     <Grid size={{ xs: 8, sm: 9, lg: 10 }} sx={{ wordBreak: 'break-word' }}>
                       <span>{display}</span>
