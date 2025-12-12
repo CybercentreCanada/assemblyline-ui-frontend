@@ -32,6 +32,7 @@ const WrappedNumberListInput = React.memo(() => {
   const max = get('max');
   const min = get('min');
   const step = get('step');
+  const tiny = get('tiny');
   const value = get('value');
   const width = get('width');
 
@@ -80,7 +81,17 @@ const WrappedNumberListInput = React.memo(() => {
                 sx={{
                   maxWidth: width,
                   minWidth: width,
-                  margin: 0
+                  margin: 0,
+                  '&.MuiInputBase-root': {
+                    // paddingRight: '9px',
+                    ...(!tiny && { minHeight: '40px' })
+                  },
+                  '& .MuiSelect-select': {
+                    // padding: '8px 8px 8px 14px !important',
+                    ...(tiny && {
+                      padding: '4.5px 8px 4.5px 14px !important'
+                    })
+                  }
                 }}
                 slotProps={{
                   input: {

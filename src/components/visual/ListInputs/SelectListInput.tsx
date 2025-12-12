@@ -1,5 +1,5 @@
 import type { ListItemTextProps, MenuItemProps, SelectProps } from '@mui/material';
-import { ListItemText, MenuItem, Select } from '@mui/material';
+import { ListItemText, MenuItem, Select, useTheme } from '@mui/material';
 import {
   StyledHelperText,
   StyledListInputInner,
@@ -38,6 +38,8 @@ export type SelectListInputProps<O extends readonly Option[]> = ListInputValues<
   };
 
 const WrappedSelectListInput = <O extends readonly Option[]>() => {
+  const theme = useTheme();
+
   const [get, setStore] = usePropStore<SelectListInputProps<O>>();
 
   const capitalize = get('capitalize');
@@ -92,20 +94,34 @@ const WrappedSelectListInput = <O extends readonly Option[]>() => {
                 renderValue={option => (
                   <ListItemText
                     primary={options?.find(o => o.value === option)?.primary || ''}
-                    sx={{ margin: 0 }}
+                    sx={{
+                      margin: 0,
+                      '&:hover>*': {
+                        overflow: 'auto',
+                        whiteSpace: 'wrap'
+                      }
+                    }}
                     slotProps={{
                       primary: {
                         ...(tiny && { variant: 'body2' }),
                         sx: {
+                          ...(overflowHidden
+                            ? {
+                                whiteSpace: 'nowrap',
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis'
+                              }
+                            : {
+                                whiteSpace: 'wrap',
+                                overflow: 'auto',
+                                textOverflow: 'ellipsis'
+                              })
+                        },
+                        style: {
                           paddingRight: '0px',
                           cursor: 'pointer',
                           ...(disabled && { cursor: 'default', userSelect: 'text' }),
                           ...(capitalize && { textTransform: 'capitalize' }),
-                          ...(!overflowHidden && {
-                            whiteSpace: 'wrap',
-                            overflow: 'auto',
-                            textOverflow: 'ellipsis'
-                          }),
                           ...(readOnly && { cursor: 'default', userSelect: 'text' }),
                           ...(monospace && { fontFamily: 'monospace' }),
                           ...(password &&
@@ -121,17 +137,13 @@ const WrappedSelectListInput = <O extends readonly Option[]>() => {
                   />
                 )}
                 slotProps={{ input: { id: id } }}
-                MenuProps={{ sx: { maxWidth: 'min-content' } }}
-                IconComponent={() => null}
                 sx={{
                   maxWidth: width,
                   minWidth: width,
                   '&.MuiInputBase-root': {
-                    paddingRight: '9px',
                     ...(!tiny && { minHeight: '40px' })
                   },
                   '& .MuiSelect-select': {
-                    padding: '8px 8px 8px 14px !important',
                     ...(tiny && {
                       padding: '4.5px 8px 4.5px 14px !important'
                     })
@@ -139,10 +151,31 @@ const WrappedSelectListInput = <O extends readonly Option[]>() => {
                 }}
               >
                 {options.map((option, i) => (
-                  <MenuItem key={i} value={option.value as MenuItemProps['value']}>
+                  <MenuItem
+                    key={i}
+                    value={option.value as MenuItemProps['value']}
+                    sx={{
+                      '&>label': { margin: 0, cursor: 'pointer !important', maxWidth: theme.breakpoints.values.sm },
+                      ...(capitalize && { textTransform: 'capitalize' })
+                    }}
+                  >
                     <StyledListItemText
                       primary={option.primary ? option.primary : '\u00A0'}
                       secondary={option.secondary}
+                      slotProps={{
+                        primary: {
+                          overflow: 'auto',
+                          textOverflow: 'initial',
+                          whiteSpace: 'normal',
+                          maxWidth: theme.breakpoints.values.sm
+                        },
+                        secondary: {
+                          overflow: 'auto',
+                          textOverflow: 'initial',
+                          whiteSpace: 'normal',
+                          maxWidth: theme.breakpoints.values.sm
+                        }
+                      }}
                     />
                   </MenuItem>
                 ))}
@@ -172,6 +205,7 @@ export const SelectListInput = <O extends readonly Option[]>({
         errorMessage,
         inputValue: value,
         options: [] as unknown as O,
+        overflowHidden: true,
         preventRender,
         value,
         ...props
