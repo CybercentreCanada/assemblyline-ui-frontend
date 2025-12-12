@@ -215,56 +215,72 @@ export const loadDefaultProfile = (
   const defaultProfile = settings.submission_profiles.default;
   const canCustomize = user.is_admin || user.roles.includes('submission_customize');
 
-  // Apply profile-level parameters
   for (const key of PROFILE_KEYS) {
     if (key in defaultProfile) {
       const target = out[key];
-      target.value = defaultProfile[key];
-      target.prev = target.value;
+      const val = defaultProfile[key];
+
+      target.value = val;
+      target.prev = val;
       target.default = null;
       target.restricted = !canCustomize;
     }
   }
 
-  // Services: update selected, default, restricted, prev
-  out.services.forEach(cat => {
+  for (let i = 0; i < out.services.length; i++) {
+    const cat = out.services[i];
     const catSelected = !!defaultProfile.services?.selected?.includes(cat.name);
+
     cat.selected = catSelected;
     cat.default = catSelected;
     cat.prev = catSelected;
     cat.restricted = !canCustomize;
 
-    cat.services.forEach(svr => {
-      const byCategory = defaultProfile.services?.selected?.includes(svr.category);
-      const byName = defaultProfile.services?.selected?.includes(svr.name);
-      const selected = !!(byCategory || byName);
+    for (let j = 0; j < cat.services.length; j++) {
+      const svr = cat.services[j];
+      const selected =
+        defaultProfile.services?.selected?.includes(svr.category) ||
+        defaultProfile.services?.selected?.includes(svr.name) ||
+        false;
+
       svr.selected = selected;
       svr.default = selected;
       svr.prev = selected;
       svr.restricted = !canCustomize;
-    });
-  });
+    }
+  }
 
-  // Service spec: update params based on profile > settings > current
-  out.service_spec.forEach(svr => {
+  for (let i = 0; i < out.service_spec.length; i++) {
+    const svr = out.service_spec[i];
     const profileSpecParams = defaultProfile.service_spec?.[svr.name] ?? {};
+
     const settingsSpec = settings.service_spec?.find(s => s.name === svr.name);
 
-    svr.params.forEach(param => {
+    for (let j = 0; j < svr.params.length; j++) {
+      const param = svr.params[j];
       const profileValue = profileSpecParams[param.name] as string | number | boolean;
-      const settingsValue = settingsSpec?.params?.find(p => p.name === param.name)?.value;
 
-      param.value = profileValue ?? settingsValue ?? param.value;
-      param.default = settingsSpec?.params?.find(p => p.name === param.name)?.default ?? param.default;
-      param.prev = param.value;
+      const settingsParam = settingsSpec?.params?.find(p => p.name === param.name);
+
+      const finalValue = profileValue ?? settingsParam?.value ?? param.value;
+
+      param.value = finalValue;
+      param.prev = finalValue;
+      param.default = settingsParam?.default ?? param.default;
       param.restricted = !canCustomize;
-    });
-  });
+    }
+  }
 
-  // Reset top-level fields
-  out.initial_data = { value: { passwords: [] }, prev: { passwords: [] } };
-  out.description = { value: null, prev: null, default: null, restricted: false };
-  out.malicious = { value: false, prev: false };
+  out.initial_data.value = { passwords: [] };
+  out.initial_data.prev = { passwords: [] };
+
+  out.description.value = null;
+  out.description.prev = null;
+  out.description.default = null;
+  out.description.restricted = false;
+
+  out.malicious.value = false;
+  out.malicious.prev = false;
 
   return out;
 };
@@ -310,87 +326,96 @@ export const loadSubmissionProfile = (
   const profileDef = settings.submission_profiles[name];
   const profileMeta = profiles?.[name];
 
-  // Interface keys — clone from global settings
   for (const k of INTERFACE_KEYS) {
-    // Type assertion needed for dynamic indexing
-    (out as unknown)[k] = { value: settings[k as keyof UserSettings], prev: settings[k as keyof UserSettings] };
+    const val = settings[k as keyof UserSettings];
+    (out as any)[k].value = val;
+    (out as any)[k].prev = val;
   }
 
-  // Profile keys — assign value/default/restricted/prev
   for (const key of PROFILE_KEYS) {
-    const value = profileDef[key as keyof typeof profileDef];
+    const val = profileDef[key as keyof typeof profileDef];
     const defaultVal = profileMeta?.params?.[key as keyof typeof profileMeta.params];
-    const restricted = !customize && !!profileMeta?.restricted_params?.submission?.includes(key);
+    const restricted = !customize && profileMeta?.restricted_params?.submission?.includes(key);
 
-    (out as unknown)[key] = {
-      value,
-      prev: value,
-      default: getValidValue(defaultVal),
-      restricted
-    };
+    const target = out[key];
+
+    (target as any).value = val;
+    (target as any).prev = val;
+    (target as any).default = getValidValue(defaultVal);
+    (target as any).restricted = restricted;
   }
 
-  // Precompute services info from profile
-  const excludedServices: string[] = profileMeta?.params?.services?.excluded || [];
-  const defaultServices: string[] = profileMeta?.params?.services?.selected || [];
-  const selectedServices: string[] = profileDef.services?.selected || [];
+  const excluded = profileMeta?.params?.services?.excluded || [];
+  const defaults = profileMeta?.params?.services?.selected || [];
+  const selected = profileDef.services?.selected || [];
 
-  // Services and nested services
-  out.services.forEach((cat, i) => {
-    const catName = cat?.name || '';
-    const catSelected = selectedServices.includes(catName);
-    const catRestricted = !customize && excludedServices.includes(catName);
-    const catDefault = defaultServices.includes(catName);
+  for (let i = 0; i < out.services.length; i++) {
+    const cat = out.services[i];
+    const name = cat.name;
 
-    out.services[i] = {
-      ...cat,
-      selected: catSelected,
-      restricted: catRestricted,
-      default: catDefault,
-      prev: catSelected,
-      services: cat.services.map(svr => {
-        const svrName = svr?.name || '';
-        const svrCategory = svr?.category || '';
-        const sel = selectedServices.includes(svrName) || selectedServices.includes(svrCategory);
-        const restr = !customize && (excludedServices.includes(svrName) || excludedServices.includes(svrCategory));
-        const def = defaultServices.includes(svrName) || defaultServices.includes(svrCategory);
+    const sel = selected.includes(name);
+    const restr = !customize && excluded.includes(name);
+    const def = defaults.includes(name);
 
-        return {
-          ...svr,
-          selected: sel,
-          restricted: restr,
-          default: def,
-          prev: sel
-        };
-      })
-    };
-  });
+    cat.selected = sel;
+    cat.restricted = restr;
+    cat.default = def;
+    cat.prev = sel;
 
-  // Service spec parameters
-  out.service_spec.forEach((svr, i) => {
-    svr.params.forEach((param, j) => {
-      const settingsSpec = settings.service_spec
-        ?.find(s => s.name === svr.name)
-        ?.params?.find(p => p.name === param.name);
+    for (let j = 0; j < cat.services.length; j++) {
+      const svr = cat.services[j];
+      const n = svr.name;
+      const c = svr.category;
 
-      const profileValue = settings.submission_profiles?.[name]?.service_spec?.[svr.name]?.[param.name];
+      const s = selected.includes(n) || selected.includes(c);
+
+      const r = !customize && (excluded.includes(n) || excluded.includes(c));
+
+      const d = defaults.includes(n) || defaults.includes(c);
+
+      svr.selected = s;
+      svr.restricted = r;
+      svr.default = d;
+      svr.prev = s;
+    }
+  }
+
+  for (let i = 0; i < out.service_spec.length; i++) {
+    const svr = out.service_spec[i];
+    const settingsSpec = settings.service_spec?.find(s => s.name === svr.name);
+
+    for (let j = 0; j < svr.params.length; j++) {
+      const param = svr.params[j];
+
+      const profileValue = profileDef.service_spec?.[svr.name]?.[param.name];
+
+      const settingsParam = settingsSpec?.params?.find(p => p.name === param.name);
+
       const profileDefault = profileMeta?.params?.service_spec?.[svr.name]?.[param.name];
-      const paramRestricted = !customize && !!profileMeta?.restricted_params?.[svr.name]?.includes(param.name);
 
-      out.service_spec[i].params[j] = {
-        ...param,
-        value: getValidValue(profileValue, settingsSpec?.value, param.value),
-        default: getValidValue(profileDefault, settingsSpec?.default, param.default),
-        restricted: paramRestricted,
-        prev: getValidValue(profileValue, settingsSpec?.value, param.value)
-      };
-    });
-  });
+      const isRestricted = !customize && profileMeta?.restricted_params?.[svr.name]?.includes(param.name);
 
-  // Reset shared fields
-  out.initial_data = { value: { passwords: [] }, prev: { passwords: [] } };
-  out.description = { value: null, prev: null, default: null, restricted: false };
-  out.malicious = { value: false, prev: false };
+      const newValue = getValidValue(profileValue, settingsParam?.value, param.value);
+
+      param.value = newValue;
+      param.prev = newValue;
+
+      param.default = getValidValue(profileDefault, settingsParam?.default, param.default);
+
+      param.restricted = isRestricted;
+    }
+  }
+
+  out.initial_data.value = { passwords: [] };
+  out.initial_data.prev = { passwords: [] };
+
+  out.description.value = null;
+  out.description.prev = null;
+  out.description.default = null;
+  out.description.restricted = false;
+
+  out.malicious.value = false;
+  out.malicious.prev = false;
 
   return out;
 };
