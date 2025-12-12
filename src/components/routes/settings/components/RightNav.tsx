@@ -2,43 +2,31 @@ import { useTableOfContent } from 'components/core/TableOfContent/TableOfContent
 import useALContext from 'components/hooks/useALContext';
 import { useForm } from 'components/routes/settings/settings.form';
 import { PageNavigation, PageNavigationItem } from 'components/visual/Layouts/PageNavigation';
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export const RightNav = React.memo(() => {
   const { t } = useTranslation(['settings']);
   const form = useForm();
-  const { configuration, settings } = useALContext();
+  const { settings } = useALContext();
   const { ActiveAnchor, scrollTo } = useTableOfContent();
-
-  const fileSources = useMemo<string[]>(() => {
-    const sourcesObj = configuration?.submission?.file_sources;
-    if (!sourcesObj) return [];
-
-    const sourcesSet = new Set<string>();
-    Object.values(sourcesObj).forEach(file => {
-      file?.sources?.forEach(src => {
-        if (src) sourcesSet.add(src);
-      });
-    });
-
-    return Array.from(sourcesSet).sort();
-  }, [configuration]);
 
   const handleCategoryChange = useCallback(
     (selected: boolean, cat_id: number) => {
       form.setFieldValue('settings', s => {
-        const category = s.services[cat_id];
-        if (!category) return s;
+        if (selected) {
+          s.services[cat_id].selected = false;
+          s.services[cat_id].services.forEach((svr, i) => {
+            s.services[cat_id].services[i].selected = false;
+          });
+        } else {
+          s.services[cat_id].selected = true;
+          s.services[cat_id].services.forEach((svr, i) => {
+            s.services[cat_id].services[i].selected = true;
+          });
+        }
 
-        return {
-          ...s,
-          services: s.services.map((cat, idx) =>
-            idx !== cat_id
-              ? cat
-              : { ...cat, selected: !selected, services: cat.services.map(svr => ({ ...svr, selected: !selected })) }
-          )
-        };
+        return s;
       });
     },
     [form]
@@ -47,18 +35,14 @@ export const RightNav = React.memo(() => {
   const handleServiceChange = useCallback(
     (selected: boolean, cat_id: number, svr_id: number) => {
       form.setFieldValue('settings', s => {
-        const category = s.services[cat_id];
-        if (!category) return s;
-
-        const services = category.services.map((svr, idx) => (idx === svr_id ? { ...svr, selected: !selected } : svr));
-        const categorySelected = services.every(s => s.selected);
-
-        return {
-          ...s,
-          services: s.services.map((cat, idx) =>
-            idx === cat_id ? { ...cat, selected: categorySelected, services } : cat
-          )
-        };
+        if (selected) {
+          s.services[cat_id].selected = false;
+          s.services[cat_id].services[svr_id].selected = false;
+        } else {
+          s.services[cat_id].services[svr_id].selected = true;
+          s.services[cat_id].selected = s.services[cat_id].services.every(srv => srv.selected);
+        }
+        return s;
       });
     },
     [form]
@@ -88,21 +72,6 @@ export const RightNav = React.memo(() => {
               />
             )}
           </ActiveAnchor>
-
-          {/* Default external sources */}
-          {fileSources.length > 0 && (
-            <ActiveAnchor activeID="default_external_sources">
-              {active => (
-                <PageNavigationItem
-                  primary={t('submissions.default_external_sources')}
-                  variant="right"
-                  active={active}
-                  subheader
-                  onPageNavigation={event => scrollTo(event, 'default_external_sources')}
-                />
-              )}
-            </ActiveAnchor>
-          )}
 
           {/* Services main section */}
           <ActiveAnchor activeID="services">
@@ -159,11 +128,10 @@ export const RightNav = React.memo(() => {
                           {active => (
                             <form.Subscribe
                               selector={state => [
-                                state.values.settings.services[cat_id]?.services[svr_id]?.selected ?? false,
-                                state.values.settings.service_spec.some(spec => spec.name === service.name)
+                                state.values.settings.services[cat_id]?.services[svr_id]?.selected ?? false
                               ]}
                             >
-                              {([checked, hasSpec]) => (
+                              {([checked]) => (
                                 <PageNavigationItem
                                   id={`${service.category}-${service.name}`}
                                   primary={service.name}
