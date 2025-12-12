@@ -91,7 +91,12 @@ export const FileInput = React.memo(() => {
     (file: SubmitStore['file']) => {
       form.setFieldValue('file', file);
       calculateFileHash(file)
-        .then(hash => form.setFieldValue('file', f => ({ ...f, hash })))
+        .then(hash =>
+          form.setFieldValue('file', f => {
+            f.hash = hash;
+            return f;
+          })
+        )
         // eslint-disable-next-line no-console
         .catch(console.error);
     },
