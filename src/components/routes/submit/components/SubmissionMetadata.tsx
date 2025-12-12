@@ -114,7 +114,7 @@ export const MetadataParam: React.FC<MetadataParamParam> = React.memo(
               return (
                 <SelectInput
                   {...(props as SelectInputProps<{ primary: string; value: string }[]>)}
-                  value={(value as string) || ''}
+                  value={(value as string) || (metadata.default as string) || ''}
                   options={(metadata.validator_params.values as string[])
                     .map(v => ({ primary: v.replaceAll('_', ' '), value: v }))
                     .sort()}
@@ -126,7 +126,7 @@ export const MetadataParam: React.FC<MetadataParamParam> = React.memo(
               return (
                 <NumberInput
                   {...(props as NumberInputProps)}
-                  value={value as number}
+                  value={(value as number) || (metadata.default as number) || null}
                   min={metadata?.validator_params?.min as number}
                   max={metadata?.validator_params?.max as number}
                   reset={!!value}
@@ -136,7 +136,7 @@ export const MetadataParam: React.FC<MetadataParamParam> = React.memo(
               return (
                 <TextInput
                   {...(props as TextInputProps)}
-                  value={(value as string) || ''}
+                  value={(value as string) || (metadata.default as string) || ''}
                   options={options}
                   reset={!!value}
                   error={v => handleValid(v)}
@@ -148,7 +148,7 @@ export const MetadataParam: React.FC<MetadataParamParam> = React.memo(
               return (
                 <TextInput
                   {...(props as TextInputProps)}
-                  value={(value as string) || ''}
+                  value={(value as string) || (metadata.default as string) || ''}
                   options={options}
                   reset={!!value}
                   error={v => handleValid(v)}
@@ -313,7 +313,7 @@ export const SubmissionMetadata = React.memo(() => {
   const { configuration } = useALContext();
   const form = useForm();
 
-  return (
+  return !Object.entries(configuration.submission.metadata.submit)?.length ? null : (
     <div>
       <Typography variant="h6">{t('metadata.title')}</Typography>
       <div style={{ display: 'flex', flexDirection: 'column' }}>

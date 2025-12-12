@@ -11,8 +11,9 @@ export function createFormContext<
   TOnBlurAsync extends FormAsyncValidateOrFn<TFormData> = FormAsyncValidateOrFn<TFormData>,
   TOnSubmit extends FormValidateOrFn<TFormData> = FormValidateOrFn<TFormData>,
   TOnSubmitAsync extends FormAsyncValidateOrFn<TFormData> = FormAsyncValidateOrFn<TFormData>,
-  TOnServer extends FormAsyncValidateOrFn<TFormData> = FormAsyncValidateOrFn<TFormData>,
-  TSubmitMeta = unknown
+  TOnDynamic extends FormValidateOrFn<TFormData> = FormValidateOrFn<TFormData>,
+  TOnDynamicAsync extends FormAsyncValidateOrFn<TFormData> = FormAsyncValidateOrFn<TFormData>,
+  TOnServer extends FormAsyncValidateOrFn<TFormData> = FormAsyncValidateOrFn<TFormData>
 >(
   options: FormOptions<
     TFormData,
@@ -23,8 +24,9 @@ export function createFormContext<
     TOnBlurAsync,
     TOnSubmit,
     TOnSubmitAsync,
-    TOnServer,
-    TSubmitMeta
+    TOnDynamic,
+    TOnDynamicAsync,
+    TOnServer
   >
 ) {
   type FormContextProps = ReactFormExtendedApi<
@@ -36,8 +38,10 @@ export function createFormContext<
     TOnBlurAsync,
     TOnSubmit,
     TOnSubmitAsync,
+    TOnDynamic,
+    TOnDynamicAsync,
     TOnServer,
-    TSubmitMeta
+    never
   > | null;
 
   const FormContext = createContext<FormContextProps>(null);

@@ -194,6 +194,50 @@ const WrappedInfoSection: React.FC<Props> = ({ submission }) => {
               </>
             )}
 
+            {submission?.params?.initial_data &&
+              (() => {
+                type InitialData = {
+                  passwords?: string[] | string | boolean | Record<string, unknown> | null;
+                  [key: string]: unknown;
+                };
+
+                let data: InitialData | null = null;
+
+                try {
+                  data = JSON.parse(submission.params.initial_data) as InitialData;
+                } catch {
+                  return null;
+                }
+
+                const passwords = data?.passwords;
+                const isEmpty =
+                  passwords == null ||
+                  passwords === '' ||
+                  (Array.isArray(passwords) && passwords.length === 0) ||
+                  (typeof passwords === 'object' && !Array.isArray(passwords) && Object.keys(passwords).length === 0);
+
+                if (isEmpty) return null;
+
+                const display: React.ReactNode = Array.isArray(passwords)
+                  ? passwords.join(' | ')
+                  : typeof passwords === 'boolean'
+                    ? String(passwords)
+                    : typeof passwords === 'object'
+                      ? JSON.stringify(passwords)
+                      : (passwords ?? <span style={{ color: theme.palette.text.disabled }}>{t('none')}</span>);
+
+                return (
+                  <>
+                    <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
+                      <strong>{t('params.initial_data.passwords')}</strong>
+                    </Grid>
+                    <Grid size={{ xs: 8, sm: 9, lg: 10 }} sx={{ wordBreak: 'break-word' }}>
+                      <span>{display}</span>
+                    </Grid>
+                  </>
+                );
+              })()}
+
             {['generate_alert', 'deep_scan', 'ignore_cache', 'ignore_recursion_prevention', 'ignore_filtering'].map(
               (k, i) => (
                 <Fragment key={i}>

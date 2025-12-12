@@ -2,16 +2,17 @@ import { Grid, Typography, useTheme } from '@mui/material';
 import type { Service } from 'components/models/base/service';
 import MultiTypeConfig from 'components/routes/admin/service_detail/multi_type_config';
 import MultiTypeParam from 'components/routes/admin/service_detail/multi_type_param';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 type ServiceParamsProps = {
   service: Service;
+  defaults: Service;
   setService: (value: Service) => void;
   setModified: (value: boolean) => void;
 };
 
-const ServiceParams = ({ service, setService, setModified }: ServiceParamsProps) => {
+const ServiceParams = ({ service, defaults, setService, setModified }: ServiceParamsProps) => {
   const { t } = useTranslation(['adminServices']);
   const theme = useTheme();
 
@@ -34,6 +35,11 @@ const ServiceParams = ({ service, setService, setModified }: ServiceParamsProps)
   const onConfigDelete = useCallback(config => {
     window.dispatchEvent(new CustomEvent('configDelete', { detail: config }));
   }, []);
+
+  const unusedParams = useMemo<string[]>(() => {
+    const defaultParams = new Set(defaults.submission_params?.map(p => p.name) ?? []);
+    return (service.submission_params ?? []).filter(({ name }) => !defaultParams.has(name)).map(({ name }) => name);
+  }, [service.submission_params, defaults.submission_params]);
 
   useEffect(() => {
     function handleSPAdd(event: CustomEvent) {
@@ -107,7 +113,13 @@ const ServiceParams = ({ service, setService, setModified }: ServiceParamsProps)
         {service.submission_params.length !== 0 ? (
           service.submission_params.map((param, i) => (
             <Grid key={i} size={{ xs: 12 }}>
-              <MultiTypeParam param={param} id={i} onUpdate={onParamUpdate} onDelete={onParamDelete} />
+              <MultiTypeParam
+                param={param}
+                id={i}
+                warn={unusedParams.includes(param.name)}
+                onUpdate={onParamUpdate}
+                onDelete={onParamDelete}
+              />
             </Grid>
           ))
         ) : (
@@ -138,7 +150,7 @@ const ServiceParams = ({ service, setService, setModified }: ServiceParamsProps)
           Object.keys(service.config).map((name, i) => (
             <Grid key={i} size={{ xs: 12 }}>
               <MultiTypeConfig
-                config={{ name, value: service.config[name] }}
+                config={{ name, value: service.config[name], warn: defaults.config[name] === undefined }}
                 onUpdate={onConfigAddUpdate}
                 onDelete={onConfigDelete}
               />

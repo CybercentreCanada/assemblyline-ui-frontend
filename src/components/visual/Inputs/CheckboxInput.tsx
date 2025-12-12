@@ -11,7 +11,13 @@ import {
   StyledFormControl,
   StyledFormControlLabel
 } from 'components/visual/Inputs/lib/inputs.components';
-import { useErrorCallback, useInputBlur, useInputClick, useInputFocus } from 'components/visual/Inputs/lib/inputs.hook';
+import {
+  useErrorCallback,
+  useInputClick,
+  useInputClickBlur,
+  useInputFocus,
+  usePropID
+} from 'components/visual/Inputs/lib/inputs.hook';
 import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
 import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
 import { Tooltip } from 'components/visual/Tooltip';
@@ -25,6 +31,7 @@ export type CheckboxInputProps = InputValues<boolean, boolean, React.MouseEvent<
 const WrappedCheckboxInput = () => {
   const [get] = usePropStore<CheckboxInputProps>();
 
+  const id = usePropID();
   const indeterminate = get('indeterminate');
   const inputValue = Boolean(get('inputValue'));
   const loading = get('loading');
@@ -34,7 +41,7 @@ const WrappedCheckboxInput = () => {
   const tooltipProps = get('tooltipProps');
   const value = get('value');
 
-  const handleBlur = useInputBlur<CheckboxInputProps>();
+  const handleBlur = useInputClickBlur<CheckboxInputProps>();
   const handleClick = useInputClick<CheckboxInputProps>();
   const handleFocus = useInputFocus<CheckboxInputProps>();
 
@@ -48,6 +55,7 @@ const WrappedCheckboxInput = () => {
         >
           <StyledFormControlLabel label={<StyledButtonLabel />}>
             <Checkbox
+              name={id}
               checked={inputValue}
               indeterminate={indeterminate}
               disableFocusRipple

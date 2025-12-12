@@ -1,4 +1,5 @@
 {
+  "chips-input.placeholder": "Type a value and press enter",
   "classification.acceptText": "Proceed",
   "classification.cancelText": "Cancel",
   "classification.done": "Done",

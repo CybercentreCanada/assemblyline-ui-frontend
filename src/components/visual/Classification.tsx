@@ -11,6 +11,7 @@ import {
   ListItemText,
   Skeleton,
   styled,
+  Tooltip,
   useMediaQuery,
   useTheme
 } from '@mui/material';
@@ -206,30 +207,40 @@ function WrappedClassification({
     (!!validated?.parts?.lvl && c12n ? (
       <>
         {type === 'text' ? (
-          <ClassificationText color={computeColor()}>
-            {normalizedClassification(validated.parts, c12nDef, format, isMobile, isUser, classificationAliases)}
-          </ClassificationText>
+          <Tooltip
+            title={normalizedClassification(validated.parts, c12nDef, format, isMobile, isUser)}
+            placement="bottom"
+          >
+            <ClassificationText color={computeColor()}>
+              {normalizedClassification(validated.parts, c12nDef, format, isMobile, isUser, classificationAliases)}
+            </ClassificationText>
+          </Tooltip>
         ) : (
-          <div style={{ display: inline ? 'inline-block' : null }}>
-            <CustomChip
-              type="rounded"
-              variant={type === 'outlined' ? 'outlined' : 'filled'}
-              size={size}
-              color={computeColor()}
-              label={normalizedClassification(
-                validated.parts,
-                c12nDef,
-                format,
-                isMobile,
-                isUser,
-                classificationAliases
-              )}
-              onClick={type === 'picker' ? () => setShowPicker(true) : null}
-              fullWidth={fullWidth}
-              disabled={disabled}
-              sx={{ fontWeight: 500 }}
-            />
-          </div>
+          <Tooltip
+            title={normalizedClassification(validated.parts, c12nDef, format, isMobile, isUser)}
+            placement="bottom"
+          >
+            <div style={{ display: inline ? 'inline-block' : null }}>
+              <CustomChip
+                type="rounded"
+                variant={type === 'outlined' ? 'outlined' : 'filled'}
+                size={size}
+                color={computeColor()}
+                label={normalizedClassification(
+                  validated.parts,
+                  c12nDef,
+                  format,
+                  isMobile,
+                  isUser,
+                  classificationAliases
+                )}
+                onClick={type === 'picker' ? () => setShowPicker(true) : null}
+                fullWidth={fullWidth}
+                disabled={disabled}
+                sx={{ fontWeight: 500 }}
+              />
+            </div>
+          </Tooltip>
         )}
         {type === 'picker' ? (
           <Dialog
