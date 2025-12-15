@@ -8,7 +8,7 @@ import { KVBody } from 'components/visual/ResultCard/kv_body';
 import { ProcessChip } from 'components/visual/ResultCard/Sandbox/common/ProcessChip';
 import { TableContainer } from 'components/visual/ResultCard/Sandbox/common/TableContainer';
 import { DetailTableRow } from 'components/visual/ResultCard/Sandbox/common/Tables';
-import { compareIPs, type SandboxFilter } from 'components/visual/ResultCard/Sandbox/sandbox.utils';
+import { compareIPs, hasObjectData, type SandboxFilter } from 'components/visual/ResultCard/Sandbox/sandbox.utils';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -127,78 +127,91 @@ export const NetflowTable = React.memo(
           meta: { cellSx: { textTransform: 'uppercase' } }
         }),
 
-        columnHelper.accessor(row => row, {
-          id: 'details',
-          header: () => t('details'),
-          enableSorting: false,
-          meta: { colStyle: { width: '100%', minWidth: '350px' } },
-          cell: ({ row }) => {
-            const original = row.original;
+        columnHelper.accessor(
+          row =>
+            hasObjectData(row.http_details) ||
+            hasObjectData(row.smtp_details) ||
+            hasObjectData(row.dns_details) ||
+            null,
+          {
+            id: 'details',
+            header: () => t('details'),
+            enableSorting: false,
+            meta: { colStyle: { width: '100%', minWidth: '350px' } },
+            cell: ({ row }) => {
+              const original = row.original;
 
-            switch (original.connection_type) {
-              case 'http':
-                return (
-                  <table cellSpacing={0}>
-                    <tbody>
-                      <DetailTableRow isHeader label={t('request')} />
-                      <DetailTableRow label={t('uri')} value={original.http_details?.request_uri} />
-                      <DetailTableRow label={t('method')} value={original.http_details?.request_method} />
-                      <DetailTableRow label={t('headers')} value={original.http_details?.request_headers} />
-                      <DetailTableRow label={t('body')} value={original.http_details?.request_body} />
-                      <DetailTableRow isHeader label={t('response')} />
-                      <DetailTableRow label={t('status_code')} value={original.http_details?.response_status_code} />
-                      <DetailTableRow label={t('mimetype')} value={original.http_details?.response_content_mimetype} />
-                      <DetailTableRow label={t('fileinfo')} value={original.http_details?.response_content_fileinfo} />
-                      <DetailTableRow label={t('headers')} value={original.http_details?.response_headers} />
-                      <DetailTableRow label={t('body')} value={original.http_details?.response_body} />
-                    </tbody>
-                  </table>
-                );
+              switch (original.connection_type) {
+                case 'http':
+                  return (
+                    <table cellSpacing={0}>
+                      <tbody>
+                        <DetailTableRow isHeader label={t('request')} />
+                        <DetailTableRow label={t('uri')} value={original.http_details?.request_uri} />
+                        <DetailTableRow label={t('method')} value={original.http_details?.request_method} />
+                        <DetailTableRow label={t('headers')} value={original.http_details?.request_headers} />
+                        <DetailTableRow label={t('body')} value={original.http_details?.request_body} />
+                        <DetailTableRow isHeader label={t('response')} />
+                        <DetailTableRow label={t('status_code')} value={original.http_details?.response_status_code} />
+                        <DetailTableRow
+                          label={t('mimetype')}
+                          value={original.http_details?.response_content_mimetype}
+                        />
+                        <DetailTableRow
+                          label={t('fileinfo')}
+                          value={original.http_details?.response_content_fileinfo}
+                        />
+                        <DetailTableRow label={t('headers')} value={original.http_details?.response_headers} />
+                        <DetailTableRow label={t('body')} value={original.http_details?.response_body} />
+                      </tbody>
+                    </table>
+                  );
 
-              case 'smtp':
-                return (
-                  <table cellSpacing={0}>
-                    <tbody>
-                      <DetailTableRow label={t('mail_from')} value={original.smtp_details?.mail_from} />
-                      <DetailTableRow label={t('mail_to')} value={original.smtp_details?.mail_to} />
-                      <DetailTableRow label={t('attachments')} value={original.smtp_details?.attachments} />
-                    </tbody>
-                  </table>
-                );
+                case 'smtp':
+                  return (
+                    <table cellSpacing={0}>
+                      <tbody>
+                        <DetailTableRow label={t('mail_from')} value={original.smtp_details?.mail_from} />
+                        <DetailTableRow label={t('mail_to')} value={original.smtp_details?.mail_to} />
+                        <DetailTableRow label={t('attachments')} value={original.smtp_details?.attachments} />
+                      </tbody>
+                    </table>
+                  );
 
-              case 'dns':
-                return (
-                  <table cellSpacing={0}>
-                    <tbody>
-                      <DetailTableRow label={t('domain')} value={original.dns_details?.domain} />
-                      <DetailTableRow
-                        label={t('lookup_type')}
-                        value={original.dns_details?.lookup_type}
-                        {...(original.dns_details?.lookup_type &&
-                          DNS_RECORD_TYPES[original.dns_details.lookup_type] && {
-                            children: (
-                              <Tooltip title={DNS_RECORD_TYPES[original.dns_details.lookup_type]}>
-                                <CustomChip
-                                  label={original.dns_details.lookup_type}
-                                  size="tiny"
-                                  variant="outlined"
-                                  type="rounded"
-                                />
-                              </Tooltip>
-                            )
-                          })}
-                      />
-                      <DetailTableRow label={t('resolved_domains')} value={original.dns_details?.resolved_domains} />
-                      <DetailTableRow label={t('resolved_ips')} value={original.dns_details?.resolved_ips} />
-                    </tbody>
-                  </table>
-                );
-              default:
-                const details = original.dns_details || original.smtp_details || original.http_details || {};
-                return <KVBody body={details} />;
+                case 'dns':
+                  return (
+                    <table cellSpacing={0}>
+                      <tbody>
+                        <DetailTableRow label={t('domain')} value={original.dns_details?.domain} />
+                        <DetailTableRow
+                          label={t('lookup_type')}
+                          value={original.dns_details?.lookup_type}
+                          {...(original.dns_details?.lookup_type &&
+                            DNS_RECORD_TYPES[original.dns_details.lookup_type] && {
+                              children: (
+                                <Tooltip title={DNS_RECORD_TYPES[original.dns_details.lookup_type]}>
+                                  <CustomChip
+                                    label={original.dns_details.lookup_type}
+                                    size="tiny"
+                                    variant="outlined"
+                                    type="rounded"
+                                  />
+                                </Tooltip>
+                              )
+                            })}
+                        />
+                        <DetailTableRow label={t('resolved_domains')} value={original.dns_details?.resolved_domains} />
+                        <DetailTableRow label={t('resolved_ips')} value={original.dns_details?.resolved_ips} />
+                      </tbody>
+                    </table>
+                  );
+                default:
+                  const details = original.dns_details || original.smtp_details || original.http_details || {};
+                  return <KVBody body={details} />;
+              }
             }
           }
-        })
+        )
       ],
       [columnHelper, theme.palette.text.secondary, t, startTime, body?.processes]
     );

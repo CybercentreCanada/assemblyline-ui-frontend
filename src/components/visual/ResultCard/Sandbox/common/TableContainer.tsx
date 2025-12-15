@@ -196,6 +196,7 @@ export const TableContainer = memo(
           return value !== null && value !== undefined && value !== '';
         });
       });
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [table, table.getFilteredRowModel().rows]);
 
     const rowSpanMap = useMemo<Record<string, number>>(() => {
@@ -249,10 +250,12 @@ export const TableContainer = memo(
       }
 
       return map;
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [rowSpanning, table, table.getPrePaginationRowModel().rows]);
 
     useEffect(() => {
       getRowCount(rowCount);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [rowCount]);
 
     if (preventRender) return null;
