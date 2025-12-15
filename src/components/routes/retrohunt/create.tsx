@@ -64,8 +64,7 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = () => nu
       started_time: null,
       truncated: false,
       ttl: !configuration?.retrohunt?.dtl ? 30 : configuration?.retrohunt?.dtl,
-      yara_signature: `
-rule yara_template {
+      yara_signature: `rule yara_template {
   meta:
     description = ""
   strings:
