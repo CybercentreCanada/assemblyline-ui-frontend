@@ -197,8 +197,7 @@ export const NetflowTable = React.memo(
                 const details = original.dns_details || original.smtp_details || original.http_details || {};
                 return <KVBody body={details} />;
             }
-          },
-          meta: { colStyle: { width: '100%' } }
+          }
         })
       ],
       [columnHelper, theme.palette.text.secondary, t, startTime, body?.processes]
