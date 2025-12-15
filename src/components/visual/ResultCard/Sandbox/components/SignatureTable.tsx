@@ -89,12 +89,13 @@ export const SignatureTable = React.memo(
           },
           meta: { cellSx: { textTransform: 'capitalize' } }
         }),
-        columnHelper.accessor(row => row, {
+        columnHelper.accessor(row => !!(row?.actors?.length || row?.attacks?.length || row?.malware_families?.length), {
           id: 'details',
           header: () => t('details'),
           enableSorting: false,
-          cell: info => {
-            const { actors, attacks, malware_families: malwareFamilies } = info.getValue();
+          meta: { cellSx: { textTransform: 'capitalize' }, colStyle: { minWidth: '350px' } },
+          cell: ({ row }) => {
+            const { actors, attacks, malware_families: malwareFamilies } = row.original;
 
             return (
               <table cellSpacing={0}>
@@ -102,7 +103,7 @@ export const SignatureTable = React.memo(
                   {actors?.length > 0 && (
                     <>
                       <DetailTableRow label={t('actors')} isHeader />
-                      <DetailTableRow>{renderChipList(info.getValue()?.actors)}</DetailTableRow>
+                      <DetailTableRow>{renderChipList(actors)}</DetailTableRow>
                     </>
                   )}
 
@@ -126,8 +127,7 @@ export const SignatureTable = React.memo(
                 </tbody>
               </table>
             );
-          },
-          meta: { cellSx: { textTransform: 'capitalize' } }
+          }
         })
       ],
       [body.processes, columnHelper, t, theme.palette.text.secondary]

@@ -20,6 +20,22 @@ export type ProcessItem = SandboxProcessItem & {
 export type SandboxFilter = SandboxProcessItem;
 
 /* ----------------------------------------------------------------------------
+ * Checks if an object has any meaningful data.
+ * Returns true if any property contains a non-empty value,
+ * including nested objects or non-empty arrays.
+ * -------------------------------------------------------------------------- */
+export const hasObjectData = (obj?: Record<string, unknown>): boolean => {
+  if (!obj || typeof obj !== 'object') return false;
+
+  return Object.values(obj).some(value => {
+    if (value == null || value === '') return false;
+    if (Array.isArray(value)) return value.length > 0;
+    if (typeof value === 'object') return hasObjectData(value as Record<string, unknown>);
+    return true;
+  });
+};
+
+/* ----------------------------------------------------------------------------
  * Build hierarchical process tree from a flat process list
  * -------------------------------------------------------------------------- */
 export const buildProcessTree = (processes: SandboxProcessItem[]): ProcessItem[] => {
