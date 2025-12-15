@@ -2144,6 +2144,9 @@ packages:
   '@types/flowjs__flow.js@2.13.3':
     resolution: {integrity: sha512-pzRg7E+TVtsaaU8nBHBzg4q53feYTwbusYzEeK8XFu1CW89/0+CcGp7ohbWctPLh3U4F+w84NM5pybnIPbzrDA==}
 
+  '@types/geojson@7946.0.16':
+    resolution: {integrity: sha512-6C8nqWur3j98U6+lXDfTUWIfgvZU+EumvpHKcYjujKH7woYyLj2sUmff0tRhrqM7BohUw7Pz3ZB1jj2gW9Fvmg==}
+
   '@types/hast@2.3.10':
     resolution: {integrity: sha512-McWspRw8xx8J9HurkVBfYj0xKoE25tOFlHGdx4MJ5xORQrMGZNqJhVQWaIbm6Oyla5kYOXtDiopzKRJzEOkwJw==}
 
@@ -7797,6 +7800,8 @@ snapshots:
   '@types/flowjs__flow.js@2.13.3':
     dependencies:
       '@types/flowjs': 2.13.14
+
+  '@types/geojson@7946.0.16': {}
 
   '@types/hast@2.3.10':
     dependencies:
