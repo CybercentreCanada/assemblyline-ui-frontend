@@ -38,7 +38,7 @@ export const ProcessTable = React.memo(
           header: () => t('timeshift'),
           cell: ({ getValue }) => {
             const cur = getValue();
-            if (!startTime || !cur) return <div style={{ textAlign: 'center' }}>{'-'}</div>;
+            if (!startTime || !cur) return null;
             const deltaSec = (new Date(cur).getTime() - startTime) / 1000;
             return `${deltaSec.toFixed(2)} s`;
           },
@@ -58,7 +58,7 @@ export const ProcessTable = React.memo(
         }),
         columnHelper.accessor('original_file_name', {
           header: () => t('original_file_name'),
-          cell: ({ getValue }) => getValue() || <div style={{ textAlign: 'center' }}>{'-'}</div>,
+          cell: ({ getValue }) => getValue() || null,
           sortingFn: (a, b) => {
             const nameA = a.original?.original_file_name?.toLowerCase();
             const nameB = b.original?.original_file_name?.toLowerCase();
@@ -79,7 +79,7 @@ export const ProcessTable = React.memo(
           header: () => t('integrity_level'),
           cell: ({ getValue }) => {
             const level = getValue();
-            if (!level) return <div style={{ textAlign: 'center' }}>{'-'}</div>;
+            if (!level) return null;
             return (
               <CustomChip
                 label={level}
@@ -108,11 +108,7 @@ export const ProcessTable = React.memo(
             cell: ({ getValue }) => {
               const parentPid = getValue()?.[1];
               const parent = body?.processes?.find(p => p.pid === parentPid);
-              return parent ? (
-                <ProcessChip fullWidth process={parent} />
-              ) : (
-                <div style={{ textAlign: 'center' }}>{'-'}</div>
-              );
+              return parent ? <ProcessChip fullWidth process={parent} /> : null;
             },
             sortDescFirst: false,
             meta: {
