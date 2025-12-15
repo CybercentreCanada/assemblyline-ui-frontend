@@ -240,7 +240,6 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
           onEnter: () => setIsReloading(true),
           onExit: () => {
             setIsReloading(false);
-            setIsInitialized(true);
           }
         });
         apiCall({
@@ -279,6 +278,14 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
     },
     [DEFAULT_RETROHUNT]
   );
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      setIsInitialized(true);
+    }, theme.transitions.duration.complex);
+
+    return () => clearTimeout(timeoutId);
+  }, [theme.transitions.duration.complex]);
 
   useEffect(() => {
     if (isDrawer) {
