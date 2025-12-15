@@ -70,7 +70,7 @@ rule yara_template {
     description = ""
   strings:
     $a = "First string"
-    $b = /some_regex_with_a_string.{,10}/
+    $b = /some_regex_with_a_string/
   condition:
     all of them
 }

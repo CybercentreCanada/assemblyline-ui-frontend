@@ -805,11 +805,11 @@ export const registerYaraCompletionItemProvider = monaco => ({
           '\t\t${2:description} = ${3:"VALUE"}',
           '\tstrings:',
           '\t\t$${4:a} = ${5:"First string"}',
-          '\t\t$${6:b} = ${7:/some_regex_with_a_string.{,10}/}',
+          '\t\t$${6:b} = ${7:/some_regex_with_a_string/}',
           '\tcondition:',
           '\t\t${8:all of them}',
           '}'
-        ],
+        ].join('\n'),
         detail: 'Generate a rule skeleton (YARA)',
         kind: CompletionItemKind.Snippet
       }
