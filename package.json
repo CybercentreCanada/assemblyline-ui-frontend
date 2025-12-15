@@ -77,7 +77,6 @@
     "styled-components": "^6.1.17",
     "vite": "^6.4.1",
     "vite-plugin-mkcert": "^1.17.8",
-    "vite-plugin-swc": "^0.0.2",
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^3.1.1",
     "web-vitals": "^3.1.1"
