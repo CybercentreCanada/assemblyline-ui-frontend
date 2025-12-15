@@ -85,8 +85,9 @@ describe('buildProcessTree', () => {
  * -------------------------------------------------------------------------- */
 describe('getProcessScore', () => {
   it('should return null for invalid process', () => {
+    expect(getProcessScore({} as SandboxProcessItem, [])).toBeNull();
     expect(getProcessScore(null as unknown as SandboxProcessItem, [])).toBeNull();
-    expect(getProcessScore({} as SandboxProcessItem, [])).toBe(0);
+    expect(getProcessScore(undefined as unknown as SandboxProcessItem, [])).toBeNull();
   });
 
   it('should return 0 for safelisted process', () => {
@@ -229,9 +230,9 @@ describe('Network-related objects', () => {
   });
 
   it('should return false if network objects are empty', () => {
-    const http: SandboxNetworkHTTP = { request_uri: '' };
-    const dns: SandboxNetworkDNS = { domain: '', lookup_type: 'A' };
-    const smtp: SandboxNetworkSMTP = { mail_from: '', mail_to: [] };
+    const http: SandboxNetworkHTTP = {} as SandboxNetworkHTTP;
+    const dns: SandboxNetworkDNS = {} as SandboxNetworkDNS;
+    const smtp: SandboxNetworkSMTP = {} as SandboxNetworkSMTP;
     expect(hasObjectData(http)).toBe(false);
     expect(hasObjectData(dns)).toBe(false);
     expect(hasObjectData(smtp)).toBe(false);
