@@ -37,7 +37,7 @@ const StyledTableContainer = memo(
     shouldForwardProp: prop => prop !== 'printable'
   })<{ printable?: boolean }>(({ printable }) => ({
     fontSize: '90%',
-    maxHeight: printable ? undefined : 500,
+    maxHeight: printable ? undefined : 480,
     maxWidth: printable ? '100%' : undefined,
     position: 'relative',
     '@media print': {
@@ -186,6 +186,18 @@ export const TableContainer = memo(
       [onRowClick]
     );
 
+    const nonEmptyColumns = useMemo(() => {
+      const rows = table.getFilteredRowModel().rows;
+
+      return table.getAllLeafColumns().filter(col => {
+        return rows.some(row => {
+          const value = row.getValue(col.id);
+          // console.log(value);
+          return value !== null && value !== undefined && value !== '';
+        });
+      });
+    }, [table, table.getFilteredRowModel().rows]);
+
     const rowSpanMap = useMemo<Record<string, number>>(() => {
       if (rowSpanning.length === 0 || data.length === 0) return {};
       const map: Record<string, number> = {};
@@ -262,45 +274,48 @@ export const TableContainer = memo(
       <StyledTableContainer ref={containerRef} printable={printable}>
         <StyledTable stickyHeader size="small" printable={printable}>
           <colgroup>
-            {table.getAllColumns().map(column => (
+            {nonEmptyColumns.map(column => (
               <col key={column.id} style={column.columnDef.meta?.colStyle} />
             ))}
           </colgroup>
+
           <StyledTableHead className={scrolled ? 'scrolled' : ''}>
             {table.getHeaderGroups().map(headerGroup => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map(header => {
-                  if (header.isPlaceholder) return <StyledTableCell key={header.id} />;
-                  const canSort = header.column.getCanSort();
+                {headerGroup.headers
+                  .filter(header => nonEmptyColumns.some(c => c.id === header.column.id))
+                  .map(header => {
+                    if (header.isPlaceholder) return <StyledTableCell key={header.id} />;
+                    const canSort = header.column.getCanSort();
 
-                  return (
-                    <StyledTableCell
-                      key={header.id}
-                      colSpan={header.colSpan}
-                      sortable={canSort}
-                      sx={header.column.columnDef.meta?.headerSx}
-                      onClick={canSort ? header.column.getToggleSortingHandler() : undefined}
-                    >
-                      {canSort ? (
-                        <TableSortLabel
-                          active={!!header.column.getIsSorted()}
-                          direction={
-                            header.column.getIsSorted()
-                              ? (header.column.getIsSorted() as 'asc' | 'desc')
-                              : header.column.columnDef.sortDescFirst
-                                ? 'desc'
-                                : 'asc'
-                          }
-                          sx={{ whiteSpace: 'nowrap' }}
-                        >
-                          {flexRender(header.column.columnDef.header, header.getContext())}
-                        </TableSortLabel>
-                      ) : (
-                        flexRender(header.column.columnDef.header, header.getContext())
-                      )}
-                    </StyledTableCell>
-                  );
-                })}
+                    return (
+                      <StyledTableCell
+                        key={header.id}
+                        colSpan={header.colSpan}
+                        sortable={canSort}
+                        sx={header.column.columnDef.meta?.headerSx}
+                        onClick={canSort ? header.column.getToggleSortingHandler() : undefined}
+                      >
+                        {canSort ? (
+                          <TableSortLabel
+                            active={!!header.column.getIsSorted()}
+                            direction={
+                              header.column.getIsSorted()
+                                ? (header.column.getIsSorted() as 'asc' | 'desc')
+                                : header.column.columnDef.sortDescFirst
+                                  ? 'desc'
+                                  : 'asc'
+                            }
+                            sx={{ whiteSpace: 'nowrap' }}
+                          >
+                            {flexRender(header.column.columnDef.header, header.getContext())}
+                          </TableSortLabel>
+                        ) : (
+                          flexRender(header.column.columnDef.header, header.getContext())
+                        )}
+                      </StyledTableCell>
+                    );
+                  })}
               </TableRow>
             ))}
           </StyledTableHead>
@@ -313,22 +328,25 @@ export const TableContainer = memo(
                 active={isRowActive(row.original, activeValue)}
                 onClick={() => handleRowClick(row.original, rowIndex)}
               >
-                {row.getVisibleCells().map(cell => {
-                  const key = `${cell.column.id}-${rowIndex}`;
-                  const span = rowSpanMap[key] ?? 1;
-                  if (span === 0) return null;
+                {row
+                  .getVisibleCells()
+                  .filter(cell => nonEmptyColumns.some(c => c.id === cell.column.id))
+                  .map(cell => {
+                    const key = `${cell.column.id}-${rowIndex}`;
+                    const span = rowSpanMap[key] ?? 1;
+                    if (span === 0) return null;
 
-                  return (
-                    <StyledTableCell
-                      key={cell.id}
-                      rowSpan={span}
-                      active={isRowActive(row.original, activeValue)}
-                      sx={cell.column.columnDef.meta?.cellSx}
-                    >
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                    </StyledTableCell>
-                  );
-                })}
+                    return (
+                      <StyledTableCell
+                        key={cell.id}
+                        rowSpan={span}
+                        active={isRowActive(row.original, activeValue)}
+                        sx={cell.column.columnDef.meta?.cellSx}
+                      >
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </StyledTableCell>
+                    );
+                  })}
               </StyledTableRow>
             ))}
           </TableBody>

@@ -39,7 +39,7 @@ export const NetflowTable = React.memo(
         columnHelper.accessor('time_observed', {
           header: () => t('timeshift'),
           cell: ({ getValue }) => {
-            if (!getValue() || !startTime) return <div style={{ textAlign: 'center' }}>{'-'}</div>;
+            if (!getValue() || !startTime) return null;
             const deltaSec = (new Date(getValue()).getTime() - startTime) / 1000;
             return `${deltaSec.toFixed(2)} s`;
           },
@@ -63,18 +63,14 @@ export const NetflowTable = React.memo(
             cell: ({ getValue }) => {
               const pid = getValue()?.[1];
               const process = body?.processes?.find(p => p.pid === pid);
-              return process ? (
-                <ProcessChip short process={process} />
-              ) : (
-                <div style={{ textAlign: 'center' }}>{'-'}</div>
-              );
+              return process ? <ProcessChip short process={process} /> : null;
             },
             meta: { cellSx: { wordBreak: 'inherit !important' } }
           }
         ),
         columnHelper.accessor('transport_layer_protocol', {
           header: () => t('protocol'),
-          cell: ({ getValue }) => getValue()?.toUpperCase() ?? <div style={{ textAlign: 'center' }}>{'-'}</div>,
+          cell: ({ getValue }) => getValue()?.toUpperCase() ?? null,
           sortingFn: (a, b) => {
             const nameA = a.original?.transport_layer_protocol?.toLowerCase() || '';
             const nameB = b.original?.transport_layer_protocol?.toLowerCase() || '';
@@ -95,7 +91,7 @@ export const NetflowTable = React.memo(
               `${b.original.source_ip ?? '999.999.999.999'}:${b.original.source_port ?? '999999'}`
             ),
           cell: ({ getValue, row }) => {
-            if (!getValue()) return <div style={{ textAlign: 'center' }}>{'-'}</div>;
+            if (!getValue()) return null;
             return (
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <div style={{ whiteSpace: 'nowrap' }}>{getValue()}</div>
@@ -114,7 +110,7 @@ export const NetflowTable = React.memo(
               `${b.original.destination_ip ?? '999.999.999.999'}:${b.original.destination_port ?? '999999'}`
             ),
           cell: ({ getValue, row }) => {
-            if (!getValue()) return <div style={{ textAlign: 'center' }}>{'-'}</div>;
+            if (!getValue()) return null;
             return (
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <div style={{ whiteSpace: 'nowrap' }}>{getValue()}</div>
@@ -127,13 +123,15 @@ export const NetflowTable = React.memo(
         }),
         columnHelper.accessor('connection_type', {
           header: () => t('type'),
-          cell: ({ getValue }) => getValue()?.toUpperCase() ?? <div style={{ textAlign: 'center' }}>{'-'}</div>,
+          cell: ({ getValue }) => getValue()?.toUpperCase() ?? null,
           meta: { cellSx: { textTransform: 'uppercase' } }
         }),
 
-        columnHelper.accessor('connection_details', {
+        columnHelper.accessor(row => row, {
+          id: 'details',
           header: () => t('details'),
           enableSorting: false,
+          meta: { colStyle: { width: '100%', minWidth: '350px' } },
           cell: ({ row }) => {
             const original = row.original;
 
