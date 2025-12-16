@@ -559,9 +559,6 @@ export type Submission = {
   /** Submission profiles with preset submission parameters */
   profiles: Record<string, SubmissionProfile>;
 
-  /** List of external source to fetch file via their SHA256 hashes */
-  sha256_sources: string[];
-
   /** Tag types that show up in the submission summary */
   tag_types: TagTypes;
 
@@ -674,7 +671,6 @@ export const CONFIGURATION: Configuration = {
       submit: {}
     },
     profiles: {},
-    sha256_sources: [],
     tag_types: {
       attribution: [],
       behavior: [],
