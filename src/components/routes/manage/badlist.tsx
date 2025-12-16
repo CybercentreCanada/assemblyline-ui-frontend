@@ -14,7 +14,7 @@ import {
 } from 'components/core/SearchParams/createSearchParams';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
-import type { CustomUser } from 'components/models/ui/user';
+import type { CustomUser, IndexDefinition } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
 import BadlistNew from 'components/routes/manage/badlist_add';
 import BadlistDetail from 'components/routes/manage/badlist_detail';
@@ -49,11 +49,8 @@ const BadlistSearch = () => {
   const { globalDrawerOpened, setGlobalDrawer, closeGlobalDrawer } = useDrawer();
   const { search, setSearchParams, setSearchObject } = useSearchParams<BadlistParams>();
 
-  const suggestions = useMemo<string[]>(
-    () =>
-      indexes.badlist
-        ? [...Object.keys(indexes.badlist).filter(name => indexes.badlist[name].indexed), ...DEFAULT_SUGGESTION]
-        : [...DEFAULT_SUGGESTION],
+  const suggestions = useMemo<IndexDefinition>(
+    () => ({ ...indexes.badlist, ...DEFAULT_SUGGESTION }),
     [indexes.badlist]
   );
 
