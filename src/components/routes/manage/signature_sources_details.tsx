@@ -152,6 +152,7 @@ const WrappedSourceDetail = ({
                         endAdornment="sec"
                         min={60}
                         max={86400}
+                        required
                         onChange={(e, v) => {
                           setModified(true);
                           setSource(s => ({ ...s, update_interval: v }));

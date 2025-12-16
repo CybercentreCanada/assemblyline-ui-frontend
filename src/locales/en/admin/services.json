@@ -27,6 +27,7 @@
   "container.dependencies.add": "Add dependency",
   "container.dependencies.none": "This service has no dependencies",
   "container.dependencies.remove": "Remove dependency",
+  "container.dialog.acceptText": "Save",
   "container.dialog.allow_internet": "Allow outside access",
   "container.dialog.allow_internet.no": "No - Confined to the container",
   "container.dialog.allow_internet.yes": "Yes - Allowed to access resources outside of the Assemblyline cluster",

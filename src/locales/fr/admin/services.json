@@ -27,6 +27,7 @@
   "container.dependencies.add": "Ajouter une dépendance",
   "container.dependencies.none": "Ce service n'a pas de dépendances",
   "container.dependencies.remove": "Supprimer la dépendance",
+  "container.dialog.acceptText": "Sauvegarder",
   "container.dialog.allow_internet": "Autoriser l'accès extérieur",
   "container.dialog.allow_internet.no": "Non - Confiné au conteneur",
   "container.dialog.allow_internet.yes": "Oui - Autorisé à accéder aux ressources en dehors du cluster Assemblyline",

@@ -135,6 +135,7 @@ const ServiceUpdater = ({ service, defaults, setService, setModified }: ServiceU
           endAdornment="sec"
           min={60}
           max={86400}
+          required
           onChange={(e, v) => {
             setModified(true);
             setService({
