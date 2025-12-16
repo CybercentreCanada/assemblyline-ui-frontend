@@ -1,163 +1,119 @@
-import type {
-  CheckboxProps,
-  IconButtonProps,
-  ListItemButtonProps,
-  ListItemProps,
-  ListItemTextProps
-} from '@mui/material';
-import { Checkbox, ListItem, ListItemButton, ListItemIcon, useTheme } from '@mui/material';
+import type { CheckboxProps } from '@mui/material';
+import { Checkbox, ListItemIcon } from '@mui/material';
 import type { AnchorProps } from 'components/core/TableOfContent/Anchor';
 import { Anchor } from 'components/core/TableOfContent/Anchor';
-import { ListItemText } from 'components/visual/List/ListItemText';
-import type { ResetListInputProps } from 'components/visual/ListInputs/components/ResetListInput';
-import { ResetListInput } from 'components/visual/ListInputs/components/ResetListInput';
-import React, { type FC, type MouseEvent } from 'react';
+import { StyledCircularSkeleton } from 'components/visual/Inputs/lib/inputs.components';
+import {
+  StyledListInputButtonRoot,
+  StyledListInputText,
+  StyledListItemRoot,
+  StyledResetAdornment
+} from 'components/visual/ListInputs/lib/listinputs.components';
+import { usePropID, usePropLabel } from 'components/visual/ListInputs/lib/listinputs.hook';
+import type { ListInputProps, ListInputValues } from 'components/visual/ListInputs/lib/listinputs.model';
+import { PropProvider, usePropStore } from 'components/visual/ListInputs/lib/listinputs.provider';
+import React from 'react';
 
-export type ListHeaderProps = Omit<ListItemProps, 'onChange'> & {
-  anchor?: boolean;
-  anchorProps?: AnchorProps;
-  buttonProps?: ListItemButtonProps;
-  checkboxProps?: CheckboxProps;
-  checked?: CheckboxProps['checked'];
-  disabled?: boolean;
-  divider?: boolean;
-  edge?: CheckboxProps['edge'];
-  indeterminate?: CheckboxProps['indeterminate'];
-  preventRender?: boolean;
-  primary: React.ReactNode;
-  primaryProps?: ListItemTextProps['primaryTypographyProps'];
-  reset?: boolean;
-  resetProps?: ResetListInputProps;
-  secondary?: React.ReactNode;
-  secondaryProps?: ListItemTextProps['secondaryTypographyProps'];
-  onChange?: (
-    event: MouseEvent<HTMLDivElement, globalThis.MouseEvent>,
-    checked: boolean,
-    indeterminate: boolean
-  ) => void;
-  onReset?: IconButtonProps['onClick'];
-};
+export type ListHeaderProps = Omit<
+  ListInputValues<boolean, boolean, React.MouseEvent<HTMLDivElement, globalThis.MouseEvent>>,
+  'value'
+> &
+  ListInputProps & {
+    anchor?: boolean;
+    anchorProps?: AnchorProps;
+    checked?: boolean;
+    edge?: CheckboxProps['edge'];
+    indeterminate?: CheckboxProps['indeterminate'];
+  };
 
-export const ListHeader: FC<ListHeaderProps> = ({
-  anchor = false,
-  anchorProps = null,
-  buttonProps,
-  checkboxProps,
-  checked = null,
-  disabled = false,
-  divider = false,
-  edge = 'end',
-  id = null,
-  indeterminate = null,
-  preventRender = false,
-  primary = null,
-  primaryProps = null,
-  reset = null,
-  resetProps = null,
-  secondary = null,
-  secondaryProps = null,
-  onChange = null,
-  onReset = () => null,
-  ...listItemProps
-}) => {
-  const theme = useTheme();
+const WrappedListHeader = React.memo(() => {
+  const [get] = usePropStore<ListHeaderProps>();
 
-  return preventRender ? null : (
-    <Anchor anchor={id} label={primary.toString()} disabled={!anchor} {...anchorProps}>
-      {onChange === null ? (
-        <ListItem
-          key={id || primary.toString()}
-          disableGutters
-          disablePadding
-          {...listItemProps}
-          sx={{ ...(divider && { borderBottom: `1px solid ${theme.palette.divider}` }), ...listItemProps?.sx }}
-        >
-          {checked !== null && (
+  const anchor = get('anchor');
+  const anchorProps = get('anchorProps');
+  const checked = get('checked');
+  const disabled = get('disabled');
+  const edge = get('edge');
+  const id = usePropID();
+  const indeterminate = get('indeterminate');
+  const loading = get('loading');
+  const primary = usePropLabel();
+
+  const onChange = get('onChange');
+
+  return (
+    <Anchor anchor={id} label={primary} disabled={!anchor} {...anchorProps}>
+      {!onChange ? (
+        <StyledListItemRoot dense disableGutters disablePadding sx={{ padding: 0 }}>
+          {checked !== null && checked !== undefined && (
             <ListItemIcon>
-              <Checkbox
-                checked={checked}
-                disabled
-                disableRipple
-                edge={edge}
-                indeterminate={indeterminate}
-                inputProps={{ id: id || primary.toString(), ...checkboxProps?.inputProps }}
-                sx={{ cursor: 'initial', ...checkboxProps?.sx }}
-                tabIndex={-1}
-                {...checkboxProps}
-              />
+              {loading ? (
+                <StyledCircularSkeleton />
+              ) : (
+                <Checkbox
+                  checked={checked}
+                  disabled={disabled}
+                  disableRipple
+                  edge={edge}
+                  indeterminate={indeterminate}
+                  inputProps={{ id }}
+                  tabIndex={-1}
+                />
+              )}
             </ListItemIcon>
           )}
-          <ListItemText
-            id={id}
-            primary={primary}
-            primaryTypographyProps={{
-              variant: 'body1',
-              sx: { ...(checked !== null && !checked && !indeterminate && { opacity: 0.38 }), ...primaryProps?.sx },
-              ...primaryProps
-            }}
-            secondary={secondary}
-            secondaryTypographyProps={{
-              sx: {
-                ...(checked !== null && !checked && !indeterminate && { opacity: 0.38 }),
-                ...secondaryProps?.sx
-              },
-              ...secondaryProps
-            }}
-          />
-        </ListItem>
+          <StyledListInputText />
+        </StyledListItemRoot>
       ) : (
-        <ListItemButton
-          role={undefined}
+        <StyledListInputButtonRoot
           dense
           disableGutters
-          disabled={disabled}
           onClick={event => {
             event.preventDefault();
             event.stopPropagation();
             onChange(event, checked, indeterminate);
           }}
-          {...buttonProps}
-          sx={{ padding: 0, ...buttonProps?.sx }}
+          sx={{ padding: 0 }}
         >
-          {checked !== null && (
+          {checked !== null && checked !== undefined && (
             <ListItemIcon>
-              <Checkbox
-                checked={checked}
-                disabled={disabled}
-                disableRipple
-                edge={edge}
-                indeterminate={indeterminate}
-                inputProps={{ id: id || primary.toString(), ...checkboxProps?.inputProps }}
-                sx={{ ...checkboxProps?.sx }}
-                tabIndex={-1}
-                {...checkboxProps}
-              />
+              {loading ? (
+                <StyledCircularSkeleton />
+              ) : (
+                <Checkbox
+                  checked={checked}
+                  disabled={disabled}
+                  disableRipple
+                  edge={edge}
+                  indeterminate={indeterminate}
+                  inputProps={{ id }}
+                  tabIndex={-1}
+                />
+              )}
             </ListItemIcon>
           )}
-          <ListItemText
-            id={id}
-            primary={primary}
-            primaryTypographyProps={{
-              variant: 'body1',
-              sx: { ...(checked !== null && !checked && !indeterminate && { opacity: 0.38 }), ...primaryProps?.sx },
-              ...primaryProps
-            }}
-            secondary={secondary}
-            secondaryTypographyProps={{
-              sx: { ...(checked !== null && !checked && !indeterminate && { opacity: 0.38 }), ...secondaryProps?.sx },
-              ...secondaryProps
-            }}
-            cursor="pointer"
-          />
-          <ResetListInput
-            id={id || primary.toString()}
-            preventRender={!reset || disabled}
-            onReset={onReset}
-            sx={{ opacity: '1 !important' }}
-            {...resetProps}
-          />
-        </ListItemButton>
+
+          <StyledListInputText />
+
+          <StyledResetAdornment />
+        </StyledListInputButtonRoot>
       )}
     </Anchor>
   );
+});
+
+export const ListHeader = ({
+  anchor = false,
+  anchorProps = null,
+  edge = 'end',
+  preventRender = false,
+  ...props
+}: ListHeaderProps) => {
+  return preventRender ? null : (
+    <PropProvider<ListHeaderProps> props={{ anchor, anchorProps, edge, preventRender, onChange: null, ...props }}>
+      <WrappedListHeader />
+    </PropProvider>
+  );
 };
+
+ListHeader.displayName = 'ListHeader';

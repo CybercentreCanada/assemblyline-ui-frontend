@@ -18,25 +18,25 @@ import { PageSection } from 'components/visual/Layouts/PageSection';
 import MonacoEditor from 'components/visual/MonacoEditor';
 import React from 'react';
 
-const long =
+export const LONG_STRING =
   'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Fusce iaculis consectetur elit. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Aenean nec ante nec sapien vulputate rhoncus ac quis leo. Aenean erat erat, lacinia nec nulla sit amet, egestas rutrum neque. Quisque et eleifend lorem, id vehicula lectus. Integer rhoncus rutrum ante id tempus. Donec non libero non justo vehicula finibus. Maecenas scelerisque lectus euismod neque aliquam, eget dictum mauris aliquet. Fusce at massa quis felis pulvinar egestas. Donec in libero sed sem scelerisque iaculis. Fusce placerat, eros eu gravida sollicitudin, massa sapien luctus massa, id ullamcorper tellus risus eget lorem. Praesent a nisi massa. Nulla mollis dictum sagittis. Donec vestibulum nulla magna, vitae volutpat dui blandit et.';
 
-const SELECT_OPTIONS = [
+export const SELECT_OPTIONS = [
   { primary: 'Options 1', value: 'option 1' },
   { primary: 'Options 2', value: 'option 2' },
   { primary: 'Options 3', value: 'option 3' },
-  { primary: long, value: long }
+  { primary: LONG_STRING, value: LONG_STRING }
 ] as const;
 
-const RADIO_OPTIONS = [
+export const RADIO_OPTIONS = [
   { value: null as null, label: 'Null' },
   { value: 'first', label: 'First' },
   { value: 'second', label: 'Second' },
-  { value: long, label: long }
+  { value: LONG_STRING, label: LONG_STRING }
 ] as const;
 
 // Top 100 films as rated by IMDb users. http://www.imdb.com/chart/top
-const TEXTFIELD_OPTIONS = [
+export const TEXTFIELD_OPTIONS = [
   '12 Angry Men',
   '2001: A Space Odyssey',
   '3 Idiots',
@@ -200,17 +200,17 @@ export const INPUTS_LIBRARY_STATE: InputsLibraryState = {
     },
     values: {
       checkbox: false,
-      chips: [long, long],
+      chips: [LONG_STRING, LONG_STRING],
       classification: 'TLP:CLEAR',
       date: '',
-      json: { [long]: long },
+      json: { [LONG_STRING]: LONG_STRING },
       number: 0,
-      radio: long,
+      radio: LONG_STRING,
       select: 'option 1',
       slider: 0,
       switch: false,
-      text: long,
-      textarea: long
+      text: LONG_STRING,
+      textarea: LONG_STRING
     }
   }
 };

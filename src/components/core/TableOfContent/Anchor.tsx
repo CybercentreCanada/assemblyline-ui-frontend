@@ -1,5 +1,5 @@
 import { useTableOfContent } from 'components/core/TableOfContent/TableOfContent';
-import React, { useEffect, useId } from 'react';
+import React, { useEffect, useId, useMemo } from 'react';
 
 export type AnchorProps = React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> & {
   anchor?: string;
@@ -9,21 +9,33 @@ export type AnchorProps = React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivEl
 };
 
 export const Anchor: React.FC<AnchorProps> = React.memo(
-  ({ anchor = null, label = '', subheader = false, children = null, disabled = false, ...props }: AnchorProps) => {
-    const id = useId();
+  ({ anchor = null, label = '', subheader = false, disabled = false, children = null, ...props }: AnchorProps) => {
+    const autoID = useId();
+    const actualID = useMemo(() => anchor || autoID, [anchor, autoID]);
 
-    const loadAnchors = useTableOfContent()?.loadAnchors;
+    const toc = useTableOfContent();
+    const loadAnchors = toc?.loadAnchors;
 
     useEffect(() => {
-      if (disabled) return;
-      loadAnchors({ id: anchor || id, label: label.toString(), subheader });
-      return () => loadAnchors({});
-    }, [anchor, disabled, id, label, loadAnchors, subheader]);
+      if (!loadAnchors || disabled) return;
 
-    return disabled ? (
-      children
-    ) : (
-      <div data-anchor={anchor || id} {...props}>
+      const labelText = typeof label === 'string' || typeof label === 'number' ? String(label) : '';
+
+      loadAnchors({
+        id: actualID,
+        label: labelText,
+        subheader
+      });
+
+      return () => {
+        loadAnchors({});
+      };
+    }, [actualID, disabled, label, subheader, loadAnchors]);
+
+    if (disabled) return <>{children}</>;
+
+    return (
+      <div data-anchor={actualID} {...props}>
         {children}
       </div>
     );

@@ -1023,11 +1023,11 @@ export const useTextInputSlot = (overrides?: Partial<TextFieldProps>) => {
   );
 };
 
-export type StyledTextField = TextFieldProps & {
+export type StyledTextFieldProps = TextFieldProps & {
   params?: AutocompleteRenderInputParams;
 };
 
-export const StyledTextField = React.memo(({ params, ...props }: StyledTextField) => {
+export const StyledTextField = React.memo(({ params, ...props }: StyledTextFieldProps) => {
   const [get] = usePropStore();
 
   const endAdornment = get('endAdornment');

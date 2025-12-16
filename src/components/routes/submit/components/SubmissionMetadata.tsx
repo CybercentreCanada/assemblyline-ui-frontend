@@ -7,7 +7,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
-import type { Metadata } from 'components/models/base/config';
+import type { Metadata, MetadataFieldTypeMap } from 'components/models/base/config';
 import type { SubmitMetadata } from 'components/routes/submit/submit.form';
 import { useForm } from 'components/routes/submit/submit.form';
 import { isValidMetadata } from 'components/routes/submit/submit.utils';
@@ -29,7 +29,11 @@ import _ from 'lodash';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-type MetadataParamParam = {
+const STATIC_VALIDATOR_TYPES_SET = new Set<MetadataFieldTypeMap>(['enum', 'boolean', 'integer', 'date']);
+
+const safeString = (v: unknown): string => (v == null ? '' : String(v));
+
+type MetadataParamProps = {
   name: string;
   metadata: Metadata;
   loading: boolean;
@@ -37,126 +41,163 @@ type MetadataParamParam = {
   editing: boolean;
 };
 
-export const MetadataParam: React.FC<MetadataParamParam> = React.memo(
-  ({ name, metadata, loading = false, disabled = false, editing = false }) => {
+export const MetadataParam: React.FC<MetadataParamProps> = React.memo(
+  ({ name, metadata, loading, disabled, editing }) => {
     const { t } = useTranslation(['submit', 'settings']);
     const theme = useTheme();
     const form = useForm();
     const { apiCall } = useMyAPI();
 
-    const [options, setOptions] = useState<string[]>([...new Set(metadata.suggestions)].sort());
+    const [options, setOptions] = useState<string[]>(
+      [...new Set(Array.isArray(metadata?.suggestions) ? metadata.suggestions : [])].sort()
+    );
+
+    const validatorType = useMemo<MetadataFieldTypeMap>(
+      () => (metadata?.validator_type ?? 'string') as MetadataFieldTypeMap,
+      [metadata?.validator_type]
+    );
+
+    const validatorParams = useMemo<Record<string, unknown>>(
+      () => metadata?.validator_params ?? {},
+      [metadata?.validator_params]
+    );
+
+    const compiledRegex = useMemo<RegExp>(() => {
+      if (validatorType !== 'regex') return null;
+      const pattern = safeString(validatorParams.validation_regex);
+      if (!pattern) return null;
+      try {
+        return new RegExp(pattern);
+      } catch {
+        return null;
+      }
+    }, [validatorParams, validatorType]);
 
     const handleValid = useCallback(
-      (value: unknown): string => {
+      (value: unknown): string | null => {
         if (!value) return metadata.required ? t('required') : null;
-
-        if (metadata.validator_type === 'uri' && !isURL((value || '') as string)) return t('invalid_url');
-
-        if (
-          metadata.validator_type === 'regex' &&
-          !((value || '') as string).match(new RegExp(metadata.validator_params.validation_regex as string))
-        )
-          return t('invalid_regex');
-
+        const strValue = safeString(value);
+        if (validatorType === 'uri') return isURL(strValue) ? null : t('invalid_url');
+        if (validatorType === 'regex') {
+          if (!compiledRegex) return t('invalid_regex');
+          return compiledRegex.test(strValue) ? null : t('invalid_regex');
+        }
         return null;
       },
-      [metadata.required, metadata.validator_params.validation_regex, metadata.validator_type, t]
+      [metadata.required, t, validatorType, compiledRegex]
     );
 
     const handleChange = useCallback(
       (value: unknown) => {
-        form.setFieldValue(`metadata.data`, m => (!value ? _.omit(m || {}, name) : { ...m, [name]: value }));
+        form.setFieldValue('metadata.data', m => {
+          const prev = m ?? {};
+          return value == null || value === '' ? _.omit(prev, name) : { ...prev, [name]: value };
+        });
       },
       [form, name]
     );
 
     const handleReset = useCallback(() => {
-      form.setFieldValue(`metadata.data`, m => _.omit(m || {}, name));
+      form.setFieldValue('metadata.data', m => _.omit(m ?? {}, name));
     }, [form, name]);
 
     useEffect(() => {
-      if (disabled || metadata.validator_type in ['enum', 'boolean', 'integer', 'date']) return;
+      if (disabled) return;
+      if (STATIC_VALIDATOR_TYPES_SET.has(validatorType)) return;
+      let mounted = true;
       apiCall<string[]>({
         url: `/api/v4/search/facet/submission/metadata.${name}/`,
-        onSuccess: api_data => setOptions(o => [...new Set([...o, ...Object.keys(api_data.api_response)])].sort()),
+        onSuccess: apiData => {
+          if (!mounted) return;
+          const apiResponse = apiData?.api_response ?? {};
+          const keys = Object.keys(apiResponse);
+          if (!keys.length) return;
+          setOptions(prev => {
+            const merged = [...new Set([...prev, ...keys])].sort();
+            return merged;
+          });
+        },
         onFailure: () => null
       });
+      return () => {
+        mounted = false;
+      };
       // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [metadata.validator_type, name, disabled]);
+    }, [disabled, name, validatorType]);
 
-    const props = useMemo<unknown>(
-      () => ({
-        id: `metadata-${name.replaceAll('_', ' ')}`,
-        label: `${name.replaceAll('_', ' ')}  [ ${metadata.validator_type.toUpperCase()} ]`,
-        labelProps: { textTransform: 'capitalize' },
-        disabled: disabled || !editing,
-        loading: loading,
-        width: '60%',
-        rootProps: { style: { margin: theme.spacing(1) } },
-        onChange: (e, v) => handleChange(v),
-        onReset: () => handleReset()
-      }),
-      [disabled, handleChange, handleReset, loading, metadata.validator_type, name, theme, editing]
+    const baseProps = useMemo<unknown>(
+      () =>
+        ({
+          id: `metadata-${name.replaceAll('_', ' ')}`,
+          label: `${name.replaceAll('_', ' ')}  [ ${validatorType.toUpperCase()} ]`,
+          labelProps: { textTransform: 'capitalize' as const },
+          disabled: disabled || !editing,
+          loading,
+          width: '60%',
+          rootProps: { style: { margin: theme.spacing(1) } },
+          onChange: (e, v) => handleChange(v),
+          onReset: () => handleReset()
+        }) as const,
+      [disabled, editing, handleChange, handleReset, loading, name, theme, validatorType]
     );
 
     return (
-      <form.Subscribe
-        selector={state => state.values?.metadata?.data?.[name]}
-        children={value => {
-          switch (metadata.validator_type) {
+      <form.Subscribe selector={state => state.values?.metadata?.data?.[name]}>
+        {value => {
+          const val = value ?? metadata.default;
+          switch (validatorType) {
             case 'boolean':
-              return (
-                <SwitchInput {...(props as SwitchInputProps)} value={(value as boolean) || false} reset={!!value} />
-              );
+              return <SwitchInput {...(baseProps as SwitchInputProps)} value={Boolean(val)} reset={Boolean(val)} />;
             case 'date':
-              return <DateInput {...(props as DateInputProps)} value={value as string} reset={!!value} />;
-            case 'enum':
+              return <DateInput {...(baseProps as DateInputProps)} value={safeString(val)} reset={!!val} />;
+            case 'enum': {
               return (
                 <SelectInput
-                  {...(props as SelectInputProps<{ primary: string; value: string }[]>)}
-                  value={(value as string) || (metadata.default as string) || ''}
-                  options={(metadata.validator_params.values as string[])
+                  {...(baseProps as SelectInputProps<{ primary: string; value: string }[]>)}
+                  value={safeString(val)}
+                  options={((validatorParams?.values as string[]) ?? [])
                     .map(v => ({ primary: v.replaceAll('_', ' '), value: v }))
-                    .sort()}
-                  reset={!!value}
+                    .sort((a, b) => a.primary.localeCompare(b.primary))}
+                  reset={!!val}
                   capitalize
                 />
               );
+            }
             case 'integer':
               return (
                 <NumberInput
-                  {...(props as NumberInputProps)}
-                  value={(value as number) || (metadata.default as number) || null}
-                  min={metadata?.validator_params?.min as number}
-                  max={metadata?.validator_params?.max as number}
-                  reset={!!value}
+                  {...(baseProps as NumberInputProps)}
+                  value={typeof val === 'number' ? val : null}
+                  min={Number(validatorParams?.min ?? 0)}
+                  max={Number(validatorParams?.max ?? Number.MAX_SAFE_INTEGER)}
+                  reset={!!val}
                 />
               );
             case 'regex':
               return (
                 <TextInput
-                  {...(props as TextInputProps)}
-                  value={(value as string) || (metadata.default as string) || ''}
+                  {...(baseProps as TextInputProps)}
+                  value={safeString(val)}
                   options={options}
-                  reset={!!value}
-                  error={v => handleValid(v)}
-                  tooltip={(metadata?.validator_params?.validation_regex || null) as string}
+                  reset={!!val}
+                  error={handleValid}
+                  tooltip={safeString(validatorParams?.validation_regex)}
                   tooltipProps={{ placement: 'right' }}
                 />
               );
             default:
               return (
                 <TextInput
-                  {...(props as TextInputProps)}
-                  value={(value as string) || (metadata.default as string) || ''}
+                  {...(baseProps as TextInputProps)}
+                  value={safeString(val)}
                   options={options}
-                  reset={!!value}
-                  error={v => handleValid(v)}
+                  reset={!!val}
+                  error={handleValid}
                 />
               );
           }
         }}
-      />
+      </form.Subscribe>
     );
   }
 );
@@ -167,23 +208,28 @@ const ExtraMetadata = React.memo(() => {
   const { configuration } = useALContext();
   const form = useForm();
 
+  const submitKeys = useMemo(
+    () => configuration.submission.metadata.submit,
+    [configuration.submission.metadata.submit]
+  );
+
   const handleApply = useCallback(() => {
     try {
       form.setFieldValue('metadata', m => {
-        const data = JSON.parse(m.edit) as SubmitMetadata['data'];
-        return { edit: null, data: { ...data, ...m.data } };
+        const parsed = JSON.parse(m.edit ?? '{}') as SubmitMetadata['data'];
+        return { edit: null, data: { ...(m.data ?? {}), ...parsed } };
       });
-    } catch (e) {
+    } catch (err) {
       // eslint-disable-next-line no-console
-      console.error(e);
+      console.error(err);
     }
   }, [form]);
 
   const handleClear = useCallback(() => {
     form.setFieldValue('metadata.data', m =>
-      Object.fromEntries(Object.entries(m).filter(([key]) => key in configuration.submission.metadata.submit))
+      Object.fromEntries(Object.entries(m ?? {}).filter(([k]) => k in submitKeys))
     );
-  }, [configuration.submission.metadata.submit, form]);
+  }, [form, submitKeys]);
 
   return (
     <>
@@ -196,35 +242,27 @@ const ExtraMetadata = React.memo(() => {
             state.values.metadata.edit
           ] as const
         }
-        children={([disabled, customize, isEditing, data]) => {
-          const error = isValidMetadata(data, configuration);
-
+      >
+        {([disabled, customize, isEditing, edit]) => {
+          const open = !!edit && !disabled && customize && isEditing;
+          const error = open ? isValidMetadata(edit, configuration) : null;
           return (
-            <Dialog
-              open={!(data === null || disabled || !customize || !isEditing)}
-              maxWidth="lg"
-              fullWidth
-              onClose={() => form.setFieldValue('metadata.edit', null)}
-            >
+            <Dialog open={open} maxWidth="lg" fullWidth onClose={() => form.setFieldValue('metadata.edit', null)}>
               <DialogTitle>
                 <ListItemText primary={t('metadata.editor.title')} />
               </DialogTitle>
               <DialogContent sx={{ display: 'flex', flexDirection: 'column', height: 'min(600px, 80vh)' }}>
                 <MonacoEditor
                   language="json"
-                  value={data}
-                  error={!!error}
+                  value={edit ?? ''}
+                  error={Boolean(error)}
                   options={{ wordWrap: 'on' }}
                   onChange={v => form.setFieldValue('metadata.edit', v)}
                 />
-                {error && (
-                  <FormHelperText variant="outlined" sx={{ color: theme.palette.error.main }}>
-                    {error}
-                  </FormHelperText>
-                )}
+                {error && <FormHelperText sx={{ color: theme.palette.error.main }}>{error}</FormHelperText>}
               </DialogContent>
               <DialogActions>
-                <Button onClick={() => form.setFieldValue('metadata.edit', null)}> {t('metadata.cancel.title')}</Button>
+                <Button onClick={() => form.setFieldValue('metadata.edit', null)}>{t('metadata.cancel.title')}</Button>
                 <Button disabled={!!error} variant="contained" onClick={handleApply}>
                   {t('metadata.apply.title')}
                 </Button>
@@ -232,7 +270,7 @@ const ExtraMetadata = React.memo(() => {
             </Dialog>
           );
         }}
-      />
+      </form.Subscribe>
 
       <form.Subscribe
         selector={state =>
@@ -243,25 +281,24 @@ const ExtraMetadata = React.memo(() => {
             state.values.metadata.data
           ] as const
         }
-        children={([disabled, customize, isEditing, data]) => {
-          const metadata = Object.entries(data).filter(
-            ([key]) => !(key in configuration.submission.metadata.submit)
-          ) as [string, string][];
-
-          return !metadata.length ? null : (
+      >
+        {([disabled, customize, isEditing, data]) => {
+          const entries = Object.entries(data ?? {});
+          const extra = entries.filter(([k]) => !(k in submitKeys));
+          if (!extra.length) return null;
+          return (
             <div style={{ margin: theme.spacing(1) }}>
-              <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', columnGap: theme.spacing(1) }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: theme.spacing(1) }}>
                 <Typography color="textSecondary" variant="body2" sx={{ flex: 1 }}>
                   {t('metadata.extra.label')}
                 </Typography>
-
                 <IconButton
                   tooltip={t('metadata.edit.tooltip')}
                   disabled={disabled || !isEditing}
                   preventRender={!customize}
                   size="small"
                   onClick={() =>
-                    form.setFieldValue('metadata.edit', JSON.stringify(Object.fromEntries(metadata), undefined, 2))
+                    form.setFieldValue('metadata.edit', JSON.stringify(Object.fromEntries(extra), null, 2))
                   }
                 >
                   <EditIcon fontSize="small" />
@@ -275,17 +312,16 @@ const ExtraMetadata = React.memo(() => {
                   <ClearIcon fontSize="small" />
                 </IconButton>
               </div>
-
               <div
                 style={{
                   padding: theme.spacing(1),
                   display: 'grid',
                   gridTemplateColumns: 'minmax(auto, 100px) 1fr',
-                  gap: theme.spacing(0.25)
+                  gap: theme.spacing(0.5)
                 }}
               >
-                {metadata.map(([k, v]) => (
-                  <div key={`${k}-${v}`} style={{ display: 'contents' }}>
+                {extra.map(([k, v]) => (
+                  <React.Fragment key={k}>
                     <Typography
                       color="textSecondary"
                       variant="body2"
@@ -295,15 +331,15 @@ const ExtraMetadata = React.memo(() => {
                       {k.replaceAll('_', ' ')}
                     </Typography>
                     <Typography variant="body2" sx={{ wordBreak: 'break-word' }}>
-                      {v}
+                      {safeString(v)}
                     </Typography>
-                  </div>
+                  </React.Fragment>
                 ))}
               </div>
             </div>
           );
         }}
-      />
+      </form.Subscribe>
     </>
   );
 });
@@ -313,14 +349,20 @@ export const SubmissionMetadata = React.memo(() => {
   const { configuration } = useALContext();
   const form = useForm();
 
-  return !Object.entries(configuration.submission.metadata.submit)?.length ? null : (
+  const entries = useMemo(
+    () => Object.entries(configuration.submission.metadata.submit),
+    [configuration.submission.metadata.submit]
+  );
+
+  if (!entries.length) return null;
+
+  return (
     <div>
       <Typography variant="h6">{t('metadata.title')}</Typography>
       <div style={{ display: 'flex', flexDirection: 'column' }}>
-        <form.Subscribe
-          selector={state => [state.values.state.phase, state.values.state.disabled] as const}
-          children={([phase, disabled]) =>
-            Object.entries(configuration.submission.metadata.submit).map(([name, metadata]) => (
+        <form.Subscribe selector={state => [state.values.state.phase, state.values.state.disabled] as const}>
+          {([phase, disabled]) =>
+            entries.map(([name, metadata]) => (
               <MetadataParam
                 key={name}
                 name={name}
@@ -331,8 +373,7 @@ export const SubmissionMetadata = React.memo(() => {
               />
             ))
           }
-        />
-
+        </form.Subscribe>
         <ExtraMetadata />
       </div>
     </div>

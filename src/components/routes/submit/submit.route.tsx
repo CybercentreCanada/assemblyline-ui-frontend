@@ -38,13 +38,11 @@ import {
 import { TabContainer } from 'components/visual/TabContainer';
 import { getSubmitType } from 'helpers/utils';
 import generateUUID from 'helpers/uuid';
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router';
 
-type AdjustProps = {
-  adjust: boolean;
-};
+type AdjustProps = { adjust: boolean };
 
 const Container = styled('div')<AdjustProps>(({ theme }) => ({
   marginTop: theme.spacing(3),
@@ -57,20 +55,15 @@ const Container = styled('div')<AdjustProps>(({ theme }) => ({
 }));
 
 const LeftPanel = styled('div')<AdjustProps>(({ theme, adjust }) => ({
-  paddingRight: '0px',
-  width: '100%',
+  paddingRight: 0,
+  width: adjust ? '50%' : '100%',
   transition: theme.transitions.create(['width', 'padding-left'], {
     duration: theme.transitions.duration.shortest
   }),
-  ...(adjust && {
-    width: '50%',
-    paddingRight: theme.spacing(1)
-  }),
+  ...(adjust && { paddingRight: theme.spacing(1) }),
   [theme.breakpoints.down('md')]: {
     display: 'contents',
-    ...(adjust && {
-      width: '100%'
-    })
+    width: '100%'
   }
 }));
 
@@ -103,33 +96,69 @@ const LeftPanelAction = styled('div')<AdjustProps>(({ theme }) => ({
 }));
 
 const RightPanel = styled('div')<AdjustProps>(({ theme, adjust }) => ({
-  paddingLeft: '0px',
+  paddingLeft: 0,
   overflow: 'hidden',
-  width: '0%',
+  width: adjust ? '50%' : '0%',
   transition: theme.transitions.create(['width', 'max-height', 'padding-left'], {
     duration: theme.transitions.duration.shortest
   }),
-  ...(adjust && {
-    width: '50%',
-    paddingLeft: theme.spacing(1)
-  }),
+  ...(adjust && { paddingLeft: theme.spacing(1) }),
   [theme.breakpoints.down('md')]: {
     width: '100%',
-    paddingLeft: theme.spacing(0)
+    paddingLeft: 0
   }
 }));
 
 const WrappedSubmitRoute = () => {
   const { t, i18n } = useTranslation(['submit']);
   const theme = useTheme();
+  const downMD = useMediaQuery(theme.breakpoints.down('md'));
   const banner = useAppBanner();
   const location = useLocation();
   const { closeSnackbar } = useMySnackbar();
   const { user: currentUser, configuration, settings } = useALContext();
-
   const form = useForm();
 
-  const downMD = useMediaQuery(theme.breakpoints.down('md'));
+  const setClassificationFromURL = useCallback(
+    (state: SubmitState, search: URLSearchParams) => {
+      if (state?.c12n) {
+        form.setFieldValue('settings.classification.value', state.c12n);
+      } else {
+        const c12 = search.get('classification');
+        if (c12) form.setFieldValue('settings.classification.value', c12);
+      }
+    },
+    [form]
+  );
+
+  const setHashFromURL = useCallback(
+    (state: SubmitState, search: URLSearchParams) => {
+      const raw = state?.hash || search.get('hash');
+      if (!raw) return;
+
+      const [type, value] = getSubmitType(raw, configuration);
+      form.setFieldValue('state.tab', 'hash');
+      form.setFieldValue('hash.type', type);
+      form.setFieldValue('hash.value', value);
+    },
+    [configuration, form]
+  );
+
+  const setMetadataFromURL = useCallback(
+    (state: SubmitState, search: URLSearchParams) => {
+      if (state?.metadata && typeof state.metadata === 'object' && Object.keys(state.metadata).length > 0) {
+        form.setFieldValue('metadata.data', state.metadata);
+        return;
+      }
+
+      const raw = search.get('metadata');
+      if (isValidJSON(raw)) {
+        const metadata = JSON.parse(raw) as Metadata;
+        form.setFieldValue('metadata.data', metadata);
+      }
+    },
+    [form]
+  );
 
   useEffect(() => {
     closeSnackbar();
@@ -144,44 +173,22 @@ const WrappedSubmitRoute = () => {
 
     form.setFieldValue('state.disabled', !currentUser.is_admin && !currentUser.roles.includes('submission_create'));
     form.setFieldValue('state.customize', currentUser.is_admin || currentUser.roles.includes('submission_customize'));
-
     form.setFieldValue('settings', initializeSettings(settings));
     const profile = getPreferredSubmissionProfile(settings);
     form.setFieldValue('state.profile', profile);
-    if (profile === 'default') form.setFieldValue('settings', s => loadDefaultProfile(s, settings, currentUser));
-    else
-      form.setFieldValue('settings', s =>
-        loadSubmissionProfile(s, settings, configuration.submission.profiles, currentUser, profile)
-      );
+    form.setFieldValue('settings', s =>
+      profile === 'default'
+        ? loadDefaultProfile(s, settings, currentUser)
+        : loadSubmissionProfile(s, settings, configuration.submission?.profiles, currentUser, profile)
+    );
     form.setFieldValue('settings.default_external_sources', getDefaultExternalSources(settings, configuration));
 
     const search = new URLSearchParams(location.search);
     const state = location.state as SubmitState;
 
-    if (state?.c12n) {
-      form.setFieldValue('settings.classification.value', state.c12n);
-    } else if (search.get('classification')) {
-      form.setFieldValue('settings.classification.value', search.get('classification'));
-    }
-
-    if (state?.hash) {
-      const [type, value] = getSubmitType(state?.hash || '', configuration);
-      form.setFieldValue('state.tab', 'hash');
-      form.setFieldValue('hash.type', type);
-      form.setFieldValue('hash.value', value);
-    } else if (search.get('hash')) {
-      const [type, value] = getSubmitType(search.get('hash'), configuration);
-      form.setFieldValue('state.tab', 'hash');
-      form.setFieldValue('hash.type', type);
-      form.setFieldValue('hash.value', value);
-    }
-
-    if (state?.metadata && typeof state.metadata === 'object' && Object.keys(state.metadata).length > 0) {
-      form.setFieldValue('metadata.data', state.metadata);
-    } else if (isValidJSON(search.get('metadata'))) {
-      const metadata = JSON.parse(search.get('metadata')) as Metadata;
-      form.setFieldValue('metadata.data', metadata);
-    }
+    setClassificationFromURL(state, search);
+    setHashFromURL(state, search);
+    setMetadataFromURL(state, search);
 
     form.setFieldValue('state.phase', 'editing');
 
@@ -194,7 +201,7 @@ const WrappedSubmitRoute = () => {
 
       {configuration.ui.banner && (
         <Alert severity={configuration.ui.banner_level}>
-          {configuration.ui.banner[i18n.language] ? configuration.ui.banner[i18n.language] : configuration.ui.banner.en}
+          {configuration.ui.banner[i18n.language] ?? configuration.ui.banner.en}
         </Alert>
       )}
 
@@ -209,14 +216,14 @@ const WrappedSubmitRoute = () => {
                 <ClassificationInput />
 
                 <form.Subscribe
-                  selector={state => [state.values.state.tab, state.values.state.phase === 'editing'] as const}
-                  children={([type, editing]) => (
+                  selector={s => [s.values.state.tab, s.values.state.phase === 'editing'] as const}
+                  children={([tab, editing]) => (
                     <TabContainer
                       paper
                       centered
                       variant="standard"
-                      style={{ margin: '0px' }}
-                      value={type}
+                      style={{ margin: 0 }}
+                      value={tab}
                       onChange={(e, v: SubmitStore['state']['tab']) => form.setFieldValue('state.tab', v)}
                       tabs={{
                         file: {
@@ -229,9 +236,7 @@ const WrappedSubmitRoute = () => {
                         }
                       }}
                       sx={{
-                        '.MuiTabs-indicator': {
-                          display: 'none'
-                        }
+                        '.MuiTabs-indicator': { display: 'none' }
                       }}
                     />
                   )}
@@ -252,7 +257,7 @@ const WrappedSubmitRoute = () => {
                   <AnalyzeSubmission />
                 </LeftPanelAction>
 
-                {loading ? null : (
+                {!loading && (
                   <>
                     <MaliciousInput />
                     <ExternalSources />
@@ -265,7 +270,7 @@ const WrappedSubmitRoute = () => {
             </LeftPanel>
 
             <RightPanel adjust={adjust}>
-              {loading ? null : (
+              {!loading && (
                 <Collapse
                   in={adjust}
                   sx={{

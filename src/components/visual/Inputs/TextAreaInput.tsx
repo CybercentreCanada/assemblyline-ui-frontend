@@ -1,5 +1,6 @@
 import type { TextFieldProps } from '@mui/material';
 import { Skeleton } from '@mui/material';
+import type { StyledTextFieldProps } from 'components/visual/Inputs/lib/inputs.components';
 import {
   HelperText,
   StyledFormControl,
@@ -23,7 +24,7 @@ export type TextAreaInputProps = InputValues<
   React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
 > &
   InputProps & {
-    autoComplete?: StyledTextField['autoComplete'];
+    autoComplete?: StyledTextFieldProps['autoComplete'];
     rows?: TextFieldProps['rows'];
     minRows?: TextFieldProps['minRows'];
     maxRows?: TextFieldProps['maxRows'];
