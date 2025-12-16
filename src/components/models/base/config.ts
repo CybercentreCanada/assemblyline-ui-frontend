@@ -214,10 +214,21 @@ export type Services = {
   stages: ServiceStage;
 };
 
+export type SystemSupport = {
+  /** Documentation link for the system */
+  documentation?: string;
+
+  /** Support email for the system */
+  email?: string;
+}
+
 /** System Configuration */
 export type System = {
   /** Organisation acronym used for signatures */
   organisation: string;
+
+  /** Support link for the system */
+  support: SystemSupport;
 
   /** Type of system */
   type: SystemType;
@@ -679,6 +690,10 @@ export const CONFIGURATION: Configuration = {
   system: {
     organisation: '',
     type: 'development',
+    support: {
+      documentation: 'https://cybercentrecanada.github.io/assemblyline4_docs/',
+      email: '',
+    },
     version: ''
   },
   ui: {
