@@ -479,7 +479,8 @@ const WrappedContainerDialog = ({
                 loading={!tempContainer}
                 value={!tempContainer ? null : tempContainer.cpu_cores}
                 defaultValue={!defaults ? undefined : defaults?.cpu_cores}
-                min={0}
+                min={1}
+                required
                 reset={showReset(tempContainer, defaults, 'cpu_cores')}
                 onChange={(e, v) => handleContainerValueChange('cpu_cores', v)}
               />
@@ -495,6 +496,7 @@ const WrappedContainerDialog = ({
                 reset={showReset(tempContainer, defaults, 'ram_mb_min')}
                 endAdornment="MB"
                 min={0}
+                required
                 onChange={(e, v) => handleContainerValueChange('ram_mb_min', v)}
                 onReset={() => {
                   setModified(true);
@@ -513,6 +515,7 @@ const WrappedContainerDialog = ({
                 reset={showReset(tempContainer, defaults, 'ram_mb')}
                 endAdornment="MB"
                 min={0}
+                required
                 onChange={(e, v) => handleContainerValueChange('ram_mb', v)}
                 onReset={() => {
                   setModified(true);
