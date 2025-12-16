@@ -12,10 +12,10 @@ type SubmitTab = 'File' | 'Hash/URL';
 
 const SUBMISSION_PROFILES = [
   { label: 'Custom Analysis', value: 'default' },
-  { label: '[OFFLINE] Static Analysis', value: 'static' },
-  { label: '[ONLINE] Static + Dynamic Analysis', value: 'static_and_dynamic_with_internet' },
-  { label: '[OFFLINE] Static + Dynamic Analysis', value: 'static_with_dynamic' },
-  { label: '[ONLINE] Static Analysis', value: 'static_with_internet' }
+  { label: 'Static Analysis [OFFLINE]', value: 'static' },
+  { label: 'Static + Dynamic Analysis [ONLINE]', value: 'static_and_dynamic_with_internet' },
+  { label: 'Static + Dynamic Analysis [OFFLINE]', value: 'static_with_dynamic' },
+  { label: 'Static Analysis [ONLINE]', value: 'static_with_internet' }
 ] as const;
 
 export class SubmitPage extends PageObjectModel {
@@ -37,9 +37,9 @@ export class SubmitPage extends PageObjectModel {
     this.submitButton = this.page.locator('button#submit');
     this.searchButton = this.page.locator('button#check-if-a-file-matching-your-input-exist-in-the-system');
     this.adjustButton = this.page.locator('button#open-the-panel-to-adjust-the-submit-parameters');
-    this.submissionProfileInput = new SelectInput(page, 'submission profile name');
+    this.submissionProfileInput = new SelectInput(page, 'submission-profile');
     this.tab = new TabContainer(page);
-    this.hashInput = new TextInput(page, 'Hash Input');
+    this.hashInput = new TextInput(page, 'HashInput');
   }
 
   locators(): Locator[] {
@@ -81,7 +81,7 @@ export class SubmitPage extends PageObjectModel {
   async clickSubmit() {
     await test.step('Clicking the submit button', async () => {
       await this.page.waitForTimeout(SHORT_TIMEOUT);
-      await this.submitButton.click({ timeout: SHORT_TIMEOUT });
+      await this.submitButton.click();
     });
   }
 }

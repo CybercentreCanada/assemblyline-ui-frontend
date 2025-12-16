@@ -31,7 +31,7 @@ const WrappedExtractedFile: React.FC<Props> = ({ file, download = false, sid = n
         <div style={{ marginRight: theme.spacing(1) }}>
           {download ? (
             <Link
-              href={`/api/v4/file/download/${file.sha256}/?${sid ? `sid=${sid}&` : ''}name=${encodeURI(file.name)}`}
+              href={`/api/v4/file/download/${file.sha256}/?${sid ? `sid=${sid}&` : ''}name=${encodeURIComponent(file.name)}`}
             >
               {file.name}
             </Link>
@@ -40,8 +40,8 @@ const WrappedExtractedFile: React.FC<Props> = ({ file, download = false, sid = n
               component={RouterLink}
               to={
                 sid
-                  ? `/submission/detail/${sid}/${file.sha256}?name=${encodeURI(file.name)}`
-                  : `/file/detail/${file.sha256}?name=${encodeURI(file.name)}`
+                  ? `/submission/detail/${sid}/${file.sha256}?name=${encodeURIComponent(file.name)}`
+                  : `/file/detail/${file.sha256}?name=${encodeURIComponent(file.name)}`
               }
             >
               {file.name}
