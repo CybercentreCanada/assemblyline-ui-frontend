@@ -1,157 +1,140 @@
-import type { FormHelperTextProps, IconButtonProps, ListItemTextProps, TextFieldProps } from '@mui/material';
-import { InputAdornment, TextField, useTheme } from '@mui/material';
-import { ListItemText } from 'components/visual/List/ListItemText';
-import { BaseListItem } from 'components/visual/ListInputs/components/BaseListInput';
-import type { ResetListInputProps } from 'components/visual/ListInputs/components/ResetListInput';
-import { ResetListInput } from 'components/visual/ListInputs/components/ResetListInput';
-import { SkeletonListInput } from 'components/visual/ListInputs/components/SkeletonListInput';
-import type { ReactNode } from 'react';
-import React, { useMemo } from 'react';
+import type { TextFieldProps } from '@mui/material';
+import { useErrorCallback } from 'components/visual/Inputs/lib/inputs.hook';
+import {
+  StyledHelperText,
+  StyledListInputInner,
+  StyledListInputLoading,
+  StyledListInputText,
+  StyledListInputWrapper,
+  StyledListItemRoot,
+  StyledPasswordAdornment,
+  StyledResetAdornment,
+  StyledTextField
+} from 'components/visual/ListInputs/lib/listinputs.components';
+import { useInputBlur, useInputChange, useInputFocus } from 'components/visual/ListInputs/lib/listinputs.hook';
+import type { ListInputProps, ListInputValues } from 'components/visual/ListInputs/lib/listinputs.model';
+import { PropProvider, usePropStore } from 'components/visual/ListInputs/lib/listinputs.provider';
+import React, { useEffect, useRef } from 'react';
 
-export type NumberListInputProps = Omit<TextFieldProps, 'error' | 'value' | 'onChange'> & {
-  capitalize?: boolean;
-  defaultValue?: number;
-  endAdornment?: ReactNode;
-  error?: (value: number) => string;
-  errorProps?: FormHelperTextProps;
-  inset?: boolean;
-  loading?: boolean;
-  max?: number;
-  min?: number;
-  preventRender?: boolean;
-  primary?: React.ReactNode;
-  primaryProps?: ListItemTextProps<'span', 'p'>['primaryTypographyProps'];
-  readOnly?: boolean;
-  reset?: boolean;
-  resetProps?: ResetListInputProps;
-  secondary?: React.ReactNode;
-  secondaryProps?: ListItemTextProps<'span', 'p'>['secondaryTypographyProps'];
-  unnullable?: boolean;
-  value: number;
-  onChange?: (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>, value: number) => void;
-  onReset?: IconButtonProps['onClick'];
-  onError?: (error: string) => void;
-};
+export type NumberListInputProps = ListInputValues<number, string> &
+  ListInputProps & {
+    autoComplete?: TextFieldProps['autoComplete'];
+    max?: number;
+    min?: number;
+    step?: number;
+  };
 
-const WrappedNumberListInput = ({
-  capitalize = false,
-  defaultValue,
-  disabled = false,
-  endAdornment,
-  error = () => null,
-  errorProps = null,
-  id = null,
-  inset = false,
-  loading = false,
-  max,
-  min,
-  preventRender = false,
-  primary,
-  primaryProps = null,
-  readOnly = false,
-  reset = false,
-  resetProps = null,
-  secondary,
-  secondaryProps = null,
-  unnullable = false,
-  value,
-  onChange = () => null,
-  onError = () => null,
-  onReset = null,
-  ...textFieldProps
-}: NumberListInputProps) => {
-  const theme = useTheme();
+const WrappedNumberListInput = React.memo(() => {
+  const [get] = usePropStore<NumberListInputProps>();
 
-  const errorValue = useMemo<string>(() => error(value), [error, value]);
+  const inputValue = get('inputValue') ?? '';
+  const loading = get('loading');
+  const max = get('max');
+  const min = get('min');
+  const step = get('step');
+  const tiny = get('tiny');
+  const value = get('value');
+  const width = get('width');
+
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const handleBlur = useInputBlur<NumberListInputProps>();
+  const handleChange = useInputChange<NumberListInputProps>();
+  const handleFocus = useInputFocus<NumberListInputProps>();
+
+  useEffect(() => {
+    const el = inputRef.current;
+    if (!el) return;
+
+    const handleWheel = (e: WheelEvent) => {
+      if (document.activeElement === el) {
+        e.preventDefault();
+      }
+    };
+
+    el.addEventListener('wheel', handleWheel, { passive: false });
+
+    return () => {
+      el.removeEventListener('wheel', handleWheel);
+    };
+  }, [inputRef]);
+
+  return (
+    <StyledListItemRoot>
+      <StyledListInputWrapper>
+        <StyledListInputInner>
+          <StyledListInputText />
+
+          {loading ? (
+            <StyledListInputLoading />
+          ) : (
+            <>
+              <StyledPasswordAdornment />
+              <StyledResetAdornment />
+              <StyledTextField
+                ref={inputRef}
+                type="number"
+                value={inputValue}
+                onChange={e => handleChange(e, e.target.value, e.target.value !== '' ? Number(e.target.value) : null)}
+                onFocus={handleFocus}
+                onBlur={e => handleBlur(e, value == null ? '' : String(value), value)}
+                sx={{
+                  maxWidth: width,
+                  minWidth: width,
+                  margin: 0,
+                  '&.MuiInputBase-root': {
+                    // paddingRight: '9px',
+                    ...(!tiny && { minHeight: '40px' })
+                  },
+                  '& .MuiSelect-select': {
+                    // padding: '8px 8px 8px 14px !important',
+                    ...(tiny && {
+                      padding: '4.5px 8px 4.5px 14px !important'
+                    })
+                  }
+                }}
+                slotProps={{
+                  input: {
+                    inputProps: {
+                      ...(typeof max === 'number' && { max }),
+                      ...(typeof min === 'number' && { min }),
+                      ...(typeof step === 'number' && { step })
+                    }
+                  }
+                }}
+              />
+            </>
+          )}
+        </StyledListInputInner>
+
+        <StyledHelperText />
+      </StyledListInputWrapper>
+    </StyledListItemRoot>
+  );
+});
+
+export const NumberListInput = ({ preventRender = false, value, ...props }: NumberListInputProps) => {
+  const errorMessage = useErrorCallback({ preventRender, value, ...props });
 
   return preventRender ? null : (
-    <BaseListItem
-      disabled={disabled && !loading}
-      error={errorValue && !disabled && !loading && !readOnly}
-      helperText={errorValue}
-      FormHelperTextProps={errorProps}
+    <PropProvider<NumberListInputProps>
+      props={{
+        autoComplete: 'off',
+        enforceValidValue: true,
+        errorMessage,
+        inputValue: value == null ? '' : String(value),
+        max: null,
+        min: null,
+        preventRender,
+        spinnerAdornment: true,
+        step: 1,
+        value,
+        ...props
+      }}
     >
-      <ListItemText
-        id={id}
-        primary={primary}
-        secondary={secondary}
-        primaryTypographyProps={primaryProps}
-        secondaryTypographyProps={secondaryProps}
-        capitalize={capitalize}
-        style={{
-          marginRight: theme.spacing(2),
-          margin: `${theme.spacing(0.25)} 0`,
-          ...(inset && { marginLeft: '42px' })
-        }}
-      />
-      {loading ? (
-        <SkeletonListInput />
-      ) : (
-        <>
-          <ResetListInput
-            defaultValue={defaultValue}
-            id={id || primary.toString()}
-            preventRender={!reset || disabled || readOnly}
-            onChange={event =>
-              onChange(event as React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>, defaultValue)
-            }
-            onReset={onReset}
-            {...resetProps}
-          />
-          <TextField
-            id={id || primary.toString()}
-            type="number"
-            size="small"
-            fullWidth
-            value={[null, undefined, '', NaN].includes(value) ? '' : `${value}`}
-            disabled={disabled}
-            error={!!errorValue && !readOnly}
-            {...(readOnly && !disabled && { focused: null })}
-            slotProps={{
-              input: {
-                inputProps: {
-                  id: id || primary.toString(),
-                  min: min,
-                  max: max
-                },
-                readOnly: readOnly,
-                endAdornment: endAdornment && <InputAdornment position="end">{endAdornment}</InputAdornment>
-              }
-            }}
-            sx={{
-              maxWidth: '30%',
-              minWidth: '30%',
-              ...(readOnly &&
-                !disabled && {
-                  '& .MuiInputBase-input': { cursor: 'default' },
-                  '& .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline': {
-                    borderColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.23)' : 'rgba(0, 0, 0, 0.23)'
-                  }
-                })
-            }}
-            onChange={event => {
-              const value = event.target.value;
-
-              if (!unnullable && [null, undefined, '', NaN].includes(value)) {
-                onChange(event, null);
-
-                const err = error(null);
-                if (err) onError(null);
-              } else {
-                let num = Number(event.target.value);
-                num = max ? Math.min(num, max) : num;
-                num = min ? Math.max(num, min) : num;
-                onChange(event, num);
-
-                const err = error(num);
-                if (err) onError(err);
-              }
-            }}
-            {...textFieldProps}
-          />
-        </>
-      )}
-    </BaseListItem>
+      <WrappedNumberListInput />
+    </PropProvider>
   );
 };
-export const NumberListInput = React.memo(WrappedNumberListInput);
+
+NumberListInput.displayName = 'NumberListInput';

@@ -28,7 +28,7 @@
   "name": "Nom de la source",
   "network": "Réseau",
   "no_sources": "Il n'y a actuellement aucune source de signature pour ce service.",
-  "override_classification": "Override signature-defined classification with source classificationRemplacer la classification définie par la signature par la classification de la source",
+  "override_classification": "Remplacer la classification définie par la signature par la classification de la source",
   "password": "Mot de passe",
   "pattern": "Modèle Regex",
   "post_data": "Données POST",

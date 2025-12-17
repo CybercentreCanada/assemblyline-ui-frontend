@@ -30,124 +30,80 @@ const Param: React.FC<ParamProps> = React.memo(({ param_id, spec_id, service }) 
     <form.Subscribe
       selector={state => {
         const p = state.values.settings.service_spec[spec_id].params[param_id];
+
         return [
           p.type,
           p.name,
           p.value,
           p.default,
           p.restricted,
-          p?.list,
+          p.list,
           state.values.state.disabled,
           state.values.state.customize,
           state.values.state.phase === 'editing'
         ] as const;
       }}
       children={([type, name, value, defaultValue, restricted, list, disabled, customize, isEditing]) => {
+        const common = {
+          id: `${service.category} ${service.name} ${name.replaceAll('_', ' ')}`,
+          label: name.replaceAll('_', ' '),
+          labelProps: { textTransform: 'capitalize' },
+          disabled: disabled || !isEditing || (!customize && restricted),
+          preventRender: !customize && restricted,
+          reset: defaultValue !== null && value !== defaultValue,
+          rootProps: { style: { padding: theme.spacing(1) } },
+          onChange: (e, v) =>
+            form.setFieldValue('settings.service_spec', s => {
+              s[spec_id].params[param_id].value = v;
+              return s;
+            }),
+          onReset: () =>
+            form.setFieldValue('settings.service_spec', s => {
+              s[spec_id].params[param_id].value = defaultValue;
+              return s;
+            })
+        } as const;
+
         switch (type) {
           case 'bool':
-            return (
-              <CheckboxInput
-                id={`${service.category} ${service.name} ${name.replaceAll('_', ' ')}`}
-                label={name.replaceAll('_', ' ')}
-                labelProps={{ textTransform: 'capitalize' }}
-                value={value as boolean}
-                defaultValue={defaultValue as boolean}
-                disabled={disabled || !isEditing || (!customize && restricted)}
-                preventRender={!customize && restricted}
-                reset={defaultValue !== null && value !== defaultValue}
-                onChange={(e, v) =>
-                  form.setFieldValue('settings.service_spec', s => {
-                    s[spec_id].params[param_id].value = v;
-                    return s;
-                  })
-                }
-                onReset={() =>
-                  form.setFieldValue('settings.service_spec', s => {
-                    s[spec_id].params[param_id].value = defaultValue as boolean;
-                    return s;
-                  })
-                }
-              />
-            );
+            return <CheckboxInput {...common} value={Boolean(value)} defaultValue={Boolean(defaultValue)} />;
+
           case 'int':
             return (
               <NumberInput
-                id={`${service.category} ${service.name} ${name.replaceAll('_', ' ')}`}
-                label={name.replaceAll('_', ' ')}
-                labelProps={{ textTransform: 'capitalize' }}
+                {...common}
                 value={value as number}
                 defaultValue={defaultValue as number}
-                disabled={disabled || !isEditing || (!customize && restricted)}
-                preventRender={!customize && restricted}
-                reset={defaultValue !== null && value !== defaultValue}
                 rootProps={{ style: { padding: theme.spacing(1) } }}
-                onChange={(e, v) =>
-                  form.setFieldValue('settings.service_spec', s => {
-                    s[spec_id].params[param_id].value = v;
-                    return s;
-                  })
-                }
-                onReset={() =>
-                  form.setFieldValue('settings.service_spec', s => {
-                    s[spec_id].params[param_id].value = defaultValue as number;
-                    return s;
-                  })
-                }
               />
             );
+
           case 'str':
             return (
               <TextInput
-                id={`${service.category} ${service.name} ${name.replaceAll('_', ' ')}`}
-                label={name.replaceAll('_', ' ')}
-                labelProps={{ textTransform: 'capitalize' }}
+                {...common}
                 value={value as string}
                 defaultValue={defaultValue as string}
-                disabled={disabled || !isEditing || (!customize && restricted)}
-                preventRender={!customize && restricted}
                 options={list}
-                reset={defaultValue !== null && value !== defaultValue}
                 rootProps={{ style: { padding: theme.spacing(1) } }}
-                onChange={(e, v) =>
-                  form.setFieldValue('settings.service_spec', s => {
-                    s[spec_id].params[param_id].value = v;
-                    return s;
-                  })
-                }
-                onReset={() =>
-                  form.setFieldValue('settings.service_spec', s => {
-                    s[spec_id].params[param_id].value = defaultValue as string;
-                    return s;
-                  })
-                }
               />
             );
+
           case 'list':
             return (
               <SelectInput
-                id={`${service.category} ${service.name} ${name.replaceAll('_', ' ')}`}
-                label={name.replaceAll('_', ' ')}
-                labelProps={{ textTransform: 'capitalize' }}
+                {...common}
                 value={value as string}
                 defaultValue={defaultValue as string}
-                disabled={disabled || !isEditing || (!customize && restricted)}
-                preventRender={!customize && restricted}
-                options={list.map(key => ({ primary: key.replaceAll('_', ' '), value: key })).sort()}
-                reset={defaultValue !== null && value !== defaultValue}
+                options={
+                  Array.isArray(list)
+                    ? list
+                        .map((key: string) => ({ primary: key.replaceAll('_', ' '), value: key }))
+                        .sort((a, b) => a.primary.localeCompare(b.primary))
+                    : []
+                }
                 rootProps={{ style: { padding: theme.spacing(1) } }}
                 capitalize
-                onChange={(e, v) =>
-                  form.setFieldValue('settings.service_spec', s => {
-                    s[spec_id].params[param_id].value = v;
-                    return s;
-                  })
-                }
-                onReset={() =>
-                  form.setFieldValue('settings.service_spec', s => {
-                    s[spec_id].params[param_id].value = defaultValue as string;
-                    return s;
-                  })
-                }
               />
             );
         }
@@ -166,7 +122,7 @@ const Service: React.FC<ServiceProps> = React.memo(({ cat_id, svr_id, service })
   const form = useForm();
 
   const handleHasParams = useCallback(
-    (spec: ProfileSettings['service_spec'][number], customize: boolean) =>
+    (spec: ProfileSettings['service_spec'][number] | null, customize: boolean) =>
       !spec ? false : spec.params.some(p => !p.restricted || customize),
     []
   );
@@ -174,31 +130,35 @@ const Service: React.FC<ServiceProps> = React.memo(({ cat_id, svr_id, service })
   const handleChange = useCallback(
     (selected: boolean) => {
       form.setFieldValue('settings.services', categories => {
+        const category = categories[cat_id];
+
         if (selected) {
-          categories[cat_id].services[svr_id].selected = true;
-          categories[cat_id].selected = categories[cat_id].services.every(srv => srv.selected);
+          category.services[svr_id].selected = true;
+          category.selected = category.services.every(srv => srv.selected);
         } else {
-          categories[cat_id].selected = false;
-          categories[cat_id].services[svr_id].selected = false;
+          category.selected = false;
+          category.services[svr_id].selected = false;
         }
         return categories;
       });
     },
-    [cat_id, form, svr_id]
+    [cat_id, svr_id, form]
   );
 
   const calculateParams = useCallback(
-    (service_spec: ProfileSettings['service_spec'][number], customize: boolean): SpecParamList => {
-      if (!service_spec?.params) return { show: [], hidden: [] };
+    (spec: ProfileSettings['service_spec'][number] | null, customize: boolean): SpecParamList => {
+      if (!spec?.params) return { show: [], hidden: [] };
 
-      return service_spec.params.reduce(
-        (prev, current, i) => {
-          if (!customize && current.restricted) return prev;
-          else if (current.hide) return { ...prev, hidden: [...prev.hidden, i] };
-          else return { ...prev, show: [...prev.show, i] };
-        },
-        { show: [], hidden: [] } as SpecParamList
-      );
+      const show: number[] = [];
+      const hidden: number[] = [];
+
+      spec.params.forEach((p, i) => {
+        if (!customize && p.restricted) return;
+        if (p.hide) hidden.push(i);
+        else show.push(i);
+      });
+
+      return { show, hidden };
     },
     []
   );
@@ -206,10 +166,14 @@ const Service: React.FC<ServiceProps> = React.memo(({ cat_id, svr_id, service })
   return (
     <form.Subscribe
       selector={state => {
-        const svr = state.values.settings.services[cat_id].services[svr_id];
+        const category = state.values.settings.services[cat_id];
+        const svr = category.services[svr_id];
+
         const specID = state.values.settings.service_spec.findIndex(spec => spec.name === service.name);
         const spec = specID >= 0 ? state.values.settings.service_spec[specID] : null;
+
         const hasParams = handleHasParams(spec, state.values.state.customize);
+
         return [
           svr.selected,
           svr.default,
@@ -254,37 +218,36 @@ const Service: React.FC<ServiceProps> = React.memo(({ cat_id, svr_id, service })
           closed
           preventRender={!customize && restricted && !selected}
         >
-          {!hasParams ? null : (
-            <>
-              <div style={{ display: 'flex', flexDirection: 'column', marginLeft: '48px' }}>
-                {(() => {
-                  const params = calculateParams(spec, customize);
+          {hasParams && (
+            <div style={{ display: 'flex', flexDirection: 'column', marginLeft: '48px' }}>
+              {(() => {
+                const params = calculateParams(spec, customize);
 
-                  return (
-                    <>
-                      {params.show.map(param_id => (
+                return (
+                  <>
+                    {params.show.map(param_id => (
+                      <Param
+                        key={`${spec.params[param_id].name}-${param_id}`}
+                        param_id={param_id}
+                        spec_id={specID}
+                        service={service}
+                      />
+                    ))}
+
+                    <ShowMore variant="tiny" preventRender={!params.hidden.length}>
+                      {params.hidden.map(param_id => (
                         <Param
                           key={`${spec.params[param_id].name}-${param_id}`}
                           param_id={param_id}
-                          service={service}
                           spec_id={specID}
+                          service={service}
                         />
                       ))}
-                      <ShowMore variant="tiny" preventRender={!params.hidden.length}>
-                        {params.hidden.map(param_id => (
-                          <Param
-                            key={`${spec.params[param_id].name}-${param_id}`}
-                            param_id={param_id}
-                            service={service}
-                            spec_id={specID}
-                          />
-                        ))}
-                      </ShowMore>
-                    </>
-                  );
-                })()}
-              </div>
-            </>
+                    </ShowMore>
+                  </>
+                );
+              })()}
+            </div>
           )}
         </CollapseSection>
       )}
@@ -303,36 +266,27 @@ const Category = React.memo(({ cat_id, category }: CategoryProps) => {
   const handleChange = useCallback(
     (selected: boolean) => {
       form.setFieldValue('settings', s => {
-        if (selected) {
-          s.services[cat_id].selected = true;
-          s.services[cat_id].services = s.services[cat_id].services.map(srv => ({
-            ...srv,
-            selected: true
-          }));
-        } else {
-          s.services[cat_id].selected = false;
-          s.services[cat_id].services = s.services[cat_id].services.map(srv => ({
-            ...srv,
-            selected: false
-          }));
-        }
-
+        const cat = s.services[cat_id];
+        cat.selected = selected;
+        cat.services = cat.services.map(srv => ({ ...srv, selected }));
         return s;
       });
     },
-    [cat_id, form]
+    [form, cat_id]
   );
 
   return (
     <form.Subscribe
       selector={state => {
         const cat = state.values.settings.services[cat_id];
-        const list = state.values.settings.services[cat_id].services.map(svr => svr.selected);
+        const list = cat.services.map(svr => svr.selected);
+        const indeterminate = !list.every(Boolean) && list.some(Boolean);
+
         return [
           cat.selected,
           cat.default,
           cat.restricted,
-          !list.every(i => i) && list.some(i => i),
+          indeterminate,
           state.values.state.customize,
           state.values.state.disabled,
           state.values.state.phase === 'editing'

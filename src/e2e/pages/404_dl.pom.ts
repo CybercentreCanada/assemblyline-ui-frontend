@@ -18,22 +18,25 @@ export class PageNotFoundError extends Error {
 }
 
 export class NotFoundPage extends PageObjectModel {
-  readonly deadLinkImage: Locator;
-  readonly deadLinkText: Locator;
+  readonly deadLinkTitle: Locator;
+  readonly deadLinkDescription: Locator;
 
   constructor(page: Page) {
     super(page, 'Not Found page', '*');
 
-    this.deadLinkImage = page.locator(`img[src="/images/dead_link.png"]`);
-    this.deadLinkText = page.getByText(`Looks like this 'Link' is dead...`, { exact: true });
+    this.deadLinkTitle = page.getByText(`404: Not found`);
+    this.deadLinkDescription = page.getByText(`The page you are looking for cannot be found...`, { exact: true });
   }
 
   locators(): Locator[] {
-    return [this.deadLinkImage, this.deadLinkText];
+    return [this.deadLinkTitle, this.deadLinkDescription];
   }
 
   async waitForPage({ state = 'visible', timeout = 0 }: WaitForOptions = {}) {
-    await Promise.all([this.deadLinkImage.waitFor({ state, timeout }), this.deadLinkText.waitFor({ state, timeout })]);
+    await Promise.all([
+      this.deadLinkTitle.waitFor({ state, timeout }),
+      this.deadLinkDescription.waitFor({ state, timeout })
+    ]);
   }
 
   async waitForFallback({ state = 'visible', timeout = 0 }: WaitForOptions = {}): Promise<PageNotFoundError> {

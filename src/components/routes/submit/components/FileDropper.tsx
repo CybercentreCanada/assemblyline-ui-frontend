@@ -1,9 +1,9 @@
 import BlockIcon from '@mui/icons-material/Block';
-import { styled } from '@mui/material';
+import { styled } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import useALContext from 'components/hooks/useALContext';
 import { ByteNumber } from 'components/visual/ByteNumber';
-import React, { memo, useEffect } from 'react';
+import { memo, useCallback, useMemo } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useTranslation } from 'react-i18next';
 import { AiOutlineSecurityScan } from 'react-icons/ai';
@@ -16,74 +16,78 @@ type DropZoneProps = {
 const DropZone = styled('div', {
   shouldForwardProp: prop => prop !== 'enter' && prop !== 'hover'
 })<DropZoneProps>(({ theme, enter = false, hover = false }) => ({
-  flex: '1',
+  flex: 1,
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
-  padding: theme.spacing(3),
+  padding: `${theme.spacing(3)}`,
   backgroundColor: theme.palette.action.hover,
   outline: 'none',
-  border: `2px ${theme.palette.action.disabled} dashed`,
   borderRadius: '6px',
+  border: `2px dashed ${theme.palette.action.disabled}`,
   color: theme.palette.action.disabled,
+  transition: '150ms cubic-bezier(0.4, 0, 0.2, 1)',
 
   ...(enter && {
-    border: `2px ${theme.palette.text.disabled} dashed`,
+    border: `2px dashed ${theme.palette.text.disabled}`,
     backgroundColor: theme.palette.action.selected,
     color: theme.palette.text.disabled
   }),
 
   ...(hover && {
-    transition: '150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
-    // '-webkit-transition': '150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
     '&:hover': {
-      border: `2px ${theme.palette.text.disabled} dashed`,
+      cursor: 'pointer',
+      border: `2px dashed ${theme.palette.text.disabled}`,
       backgroundColor: theme.palette.action.selected,
-      color: theme.palette.text.disabled,
-      cursor: 'pointer'
+      color: theme.palette.text.disabled
     }
   })
 }));
 
 type FileDropperProps = {
-  file: File;
-  setFile: (file: File) => void;
+  file: File | null;
+  setFile: (file: File | null) => void;
   disabled: boolean;
 };
 
-const FileDropper: React.FC<FileDropperProps> = ({ file, setFile, disabled }) => {
+const FileDropper = ({ file, setFile, disabled }: FileDropperProps) => {
   const { t } = useTranslation(['submit']);
-  const { acceptedFiles, getRootProps, getInputProps, isDragActive } = useDropzone({ disabled });
-  const { user: currentUser, configuration } = useALContext();
+  const { user, configuration } = useALContext();
 
-  useEffect(() => {
-    if (acceptedFiles.length !== 0) {
-      setFile(acceptedFiles[0]);
-    }
-    // eslint-disable-next-line
-  }, [acceptedFiles]);
+  const canSubmit = useMemo(() => user.roles.includes('submission_create'), [user.roles]);
+
+  const handleDrop = useCallback(
+    (files: File[]) => {
+      if (files.length > 0) setFile(files[0]);
+    },
+    [setFile]
+  );
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    disabled,
+    multiple: false,
+    onDrop: handleDrop
+  });
+
+  const isDropping = isDragActive && !disabled;
+
+  const labelText = useMemo(() => {
+    if (isDropping) return t('file_dropper.drophere');
+    if (file) return file.name;
+    return t(canSubmit ? 'file_dropper.dragzone' : 'file_dropper.disabled');
+  }, [isDropping, file, canSubmit, t]);
 
   return (
-    <DropZone {...getRootProps()} enter={isDragActive && !disabled} hover={!disabled}>
+    <DropZone {...getRootProps()} enter={isDropping} hover={!disabled}>
       <input id="file_dropper" {...getInputProps()} />
-      {currentUser.roles.includes('submission_create') ? (
-        <AiOutlineSecurityScan style={{ fontSize: '140px' }} />
-      ) : (
-        <BlockIcon style={{ fontSize: '140px' }} />
-      )}
+
+      {canSubmit ? <AiOutlineSecurityScan style={{ fontSize: '140px' }} /> : <BlockIcon sx={{ fontSize: '140px' }} />}
+
       <div style={{ minHeight: '44px', textAlign: 'center' }}>
-        <Typography htmlFor="file_dropper" component="label" variant="body1" style={{ wordBreak: 'break-word' }}>
-          <b>
-            {isDragActive && !disabled
-              ? t('file_dropper.drophere')
-              : file
-                ? file.name
-                : t(
-                    currentUser.roles.includes('submission_create') ? 'file_dropper.dragzone' : 'file_dropper.disabled'
-                  )}
-          </b>
+        <Typography htmlFor="file_dropper" component="label" variant="body1" sx={{ wordBreak: 'break-word' }}>
+          <b>{labelText}</b>
         </Typography>
-        {file && (!isDragActive || disabled) ? (
+        {file && !isDropping ? (
           <ByteNumber bytes={file.size} variant="body2" align="center" />
         ) : (
           <ByteNumber bytes={configuration.submission.max_file_size} variant="body2" align="center">

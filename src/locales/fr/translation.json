@@ -225,6 +225,8 @@
   "submission.state.error": "Terminé avec des erreurs",
   "submission.state.submitted": "Examine...",
   "submit": "Soumettre",
+  "support.documentation": "Documentation",
+  "support.email": "Contacter le support",
   "theme": "Paramètres du thème",
   "thememenu": "Thème",
   "thememenu.option.mui": "MaterialUI",

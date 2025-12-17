@@ -155,7 +155,8 @@ const WrappedFileTree: React.FC<FileTreeProps> = ({ tree, sid, defaultForceShown
               to={`/file/detail/${item.sha256}`}
               onClick={e => {
                 e.preventDefault();
-                if (item.sha256) navigate(`/submission/detail/${sid}/${item.sha256}?name=${encodeURI(item.name[0])}`);
+                if (item.sha256)
+                  navigate(`/submission/detail/${sid}/${item.sha256}?name=${encodeURIComponent(item.name[0])}`);
               }}
               sx={{
                 cursor: 'pointer',

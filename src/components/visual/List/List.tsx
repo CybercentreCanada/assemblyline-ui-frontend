@@ -11,13 +11,13 @@ export const List: FC<ListProps> = ({ children, inset = false, ...listProps }) =
 
   return (
     <MuiList
-      component={props => <Paper {...props} component="ul" />}
+      component={Paper}
       disablePadding
       sx={{
         marginBottom: theme.spacing(1),
-        ...(inset && { marginLeft: '56px' }),
-        '&>:not(:last-child)': {
-          borderBottom: `thin solid ${theme.palette.divider}`
+        ...(inset && { marginLeft: theme.spacing(7) }),
+        '& > :not(:last-child)': {
+          borderBottom: `1px solid ${theme.palette.divider}`
         },
         ...listProps?.sx
       }}

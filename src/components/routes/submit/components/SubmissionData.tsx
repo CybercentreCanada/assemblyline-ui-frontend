@@ -16,10 +16,11 @@ export const PasswordInput = React.memo(() => {
           state.values.state.phase === 'loading',
           state.values.state.disabled,
           state.values.state.phase === 'editing',
-          (state.values.settings.initial_data.value?.passwords || []) as string[]
+          (state.values.settings.initial_data.value?.passwords ?? []) as string[]
         ] as const
       }
-      children={([loading, disabled, isEditing, passwords]) => (
+    >
+      {([loading, disabled, isEditing, passwords]) => (
         <ChipsInput
           label={t('data.password.label')}
           tooltip={t('data.password.tooltip')}
@@ -36,7 +37,7 @@ export const PasswordInput = React.memo(() => {
           rootProps={{ style: { margin: theme.spacing(1) } }}
         />
       )}
-    />
+    </form.Subscribe>
   );
 });
 

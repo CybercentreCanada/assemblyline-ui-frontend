@@ -24,7 +24,7 @@ import useMyAPI from 'components/hooks/useMyAPI';
 import type { FileIndexed } from 'components/models/base/file';
 import type { Retrohunt, RetrohuntProgress } from 'components/models/base/retrohunt';
 import type { SearchResult } from 'components/models/ui/search';
-import type { CustomUser } from 'components/models/ui/user';
+import type { CustomUser, IndexDefinition } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
 import NotFoundPage from 'components/routes/404';
 import RetrohuntErrors from 'components/routes/retrohunt/errors';
@@ -113,6 +113,7 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
   const [hitResults, setHitResults] = useState<SearchResult<FileIndexed>>(null);
   const [typeDataSet, setTypeDataSet] = useState<Record<string, number>>(null);
   const [isReloading, setIsReloading] = useState<boolean>(true);
+  const [isInitialized, setIsInitialized] = useState<boolean>(false);
   const [query, setQuery] = useState<SimpleSearchQuery>(null);
 
   const filterValue = useRef<string>('');
@@ -148,10 +149,7 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
 
   const searchKey = useMemo<string>(() => (isDrawer ? propKey.split('?')[0] : paramKey), [isDrawer, paramKey, propKey]);
 
-  const suggestions = useMemo<string[]>(
-    () => [...Object.keys(indexes.file).filter(name => indexes.file[name].indexed), ...DEFAULT_SUGGESTION],
-    [indexes.file]
-  );
+  const suggestions = useMemo<IndexDefinition>(() => ({ ...indexes.file, ...DEFAULT_SUGGESTION }), [indexes.file]);
 
   const hitPageCount = useMemo<number>(
     () =>
@@ -237,7 +235,9 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
             }
           },
           onEnter: () => setIsReloading(true),
-          onExit: () => setIsReloading(false)
+          onExit: () => {
+            setIsReloading(false);
+          }
         });
         apiCall({
           method: 'POST',
@@ -275,6 +275,14 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
     },
     [DEFAULT_RETROHUNT]
   );
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      setIsInitialized(true);
+    }, theme.transitions.duration.complex);
+
+    return () => clearTimeout(timeoutId);
+  }, [theme.transitions.duration.complex]);
 
   useEffect(() => {
     if (isDrawer) {
@@ -593,90 +601,92 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
                     ) : (
                       <>
                         <Grid>
-                          <SearchBar
-                            initValue={query ? query.get('query', '') : ''}
-                            placeholder={t('hits.filter')}
-                            searching={isReloading}
-                            suggestions={suggestions}
-                            onValueChange={value => {
-                              filterValue.current = value;
-                            }}
-                            onClear={() => handleQueryRemove(['query', 'rows', 'offset'])}
-                            onSearch={() => {
-                              if (filterValue.current !== '') {
-                                handleQueryChange('query', filterValue.current);
-                                handleQueryChange('offset', 0);
-                              } else handleQueryRemove(['query', 'rows', 'offset']);
-                            }}
-                          >
-                            <div
-                              style={{
-                                fontStyle: 'italic',
-                                paddingTop: theme.spacing(0.5),
-                                display: 'flex',
-                                justifyContent: 'flex-end',
-                                flexWrap: 'wrap'
+                          {isInitialized && (
+                            <SearchBar
+                              initValue={query ? query.get('query', '') : ''}
+                              placeholder={t('hits.filter')}
+                              searching={isReloading}
+                              suggestions={suggestions}
+                              onValueChange={value => {
+                                filterValue.current = value;
+                              }}
+                              onClear={() => handleQueryRemove(['query', 'rows', 'offset'])}
+                              onSearch={() => {
+                                if (filterValue.current !== '') {
+                                  handleQueryChange('query', filterValue.current);
+                                  handleQueryChange('offset', 0);
+                                } else handleQueryRemove(['query', 'rows', 'offset']);
                               }}
                             >
-                              {hitResults && hitResults.total !== 0 && (
-                                <Typography variant="subtitle1" color="secondary" style={{ flexGrow: 1 }}>
-                                  {isReloading ? (
-                                    <span>{t('searching')}</span>
-                                  ) : (
-                                    <span>
-                                      <SearchCount
-                                        currentMax={MAX_TRACKED_RECORDS}
-                                        defaultMax={MAX_TRACKED_RECORDS}
-                                        disabled
-                                        loading={isReloading}
-                                        total={hitResults?.total}
-                                        suffix={
-                                          query.get('query') || query.get('filters')
-                                            ? t(`hits.filtered${hitResults.total === 1 ? '' : 's'}`)
-                                            : t(`hits.total${hitResults.total === 1 ? '' : 's'}`)
-                                        }
-                                      />
-                                    </span>
-                                  )}
-                                </Typography>
-                              )}
-                              {hitPageCount > 1 && (
-                                <Pagination
-                                  page={Math.ceil(1 + query.get('offset') / PAGE_SIZE)}
-                                  onChange={(e, value) => handleQueryChange('offset', (value - 1) * PAGE_SIZE)}
-                                  count={hitPageCount}
-                                  shape="rounded"
-                                  size="small"
-                                />
-                              )}
-                            </div>
-                            {query && (
-                              <div>
-                                <ChipList
-                                  items={query.getAll('filters', []).map(
-                                    f =>
-                                      ({
-                                        color: f.indexOf('NOT ') === 0 ? 'error' : null,
-                                        label: `${f}`,
-                                        variant: 'outlined',
-                                        onClick: () => {
-                                          query.replace(
-                                            'filters',
-                                            f,
-                                            f.indexOf('NOT ') === 0 ? f.substring(5, f.length - 1) : `NOT (${f})`
-                                          );
-                                          handleNavigate(query);
-                                        },
-                                        onDelete: () => {
-                                          query.remove('filters', f);
-                                          handleNavigate(query);
-                                        }
-                                      }) as CustomChipProps
-                                  )}
-                                />
+                              <div
+                                style={{
+                                  fontStyle: 'italic',
+                                  paddingTop: theme.spacing(0.5),
+                                  display: 'flex',
+                                  justifyContent: 'flex-end',
+                                  flexWrap: 'wrap'
+                                }}
+                              >
+                                {hitResults && hitResults.total !== 0 && (
+                                  <Typography variant="subtitle1" color="secondary" style={{ flexGrow: 1 }}>
+                                    {isReloading ? (
+                                      <span>{t('searching')}</span>
+                                    ) : (
+                                      <span>
+                                        <SearchCount
+                                          currentMax={MAX_TRACKED_RECORDS}
+                                          defaultMax={MAX_TRACKED_RECORDS}
+                                          disabled
+                                          loading={isReloading}
+                                          total={hitResults?.total}
+                                          suffix={
+                                            query.get('query') || query.get('filters')
+                                              ? t(`hits.filtered${hitResults.total === 1 ? '' : 's'}`)
+                                              : t(`hits.total${hitResults.total === 1 ? '' : 's'}`)
+                                          }
+                                        />
+                                      </span>
+                                    )}
+                                  </Typography>
+                                )}
+                                {hitPageCount > 1 && (
+                                  <Pagination
+                                    page={Math.ceil(1 + query.get('offset') / PAGE_SIZE)}
+                                    onChange={(e, value) => handleQueryChange('offset', (value - 1) * PAGE_SIZE)}
+                                    count={hitPageCount}
+                                    shape="rounded"
+                                    size="small"
+                                  />
+                                )}
                               </div>
-                            )}
-                          </SearchBar>
+                              {query && (
+                                <div>
+                                  <ChipList
+                                    items={query.getAll('filters', []).map(
+                                      f =>
+                                        ({
+                                          color: f.indexOf('NOT ') === 0 ? 'error' : null,
+                                          label: `${f}`,
+                                          variant: 'outlined',
+                                          onClick: () => {
+                                            query.replace(
+                                              'filters',
+                                              f,
+                                              f.indexOf('NOT ') === 0 ? f.substring(5, f.length - 1) : `NOT (${f})`
+                                            );
+                                            handleNavigate(query);
+                                          },
+                                          onDelete: () => {
+                                            query.remove('filters', f);
+                                            handleNavigate(query);
+                                          }
+                                        }) as CustomChipProps
+                                    )}
+                                  />
+                                </div>
+                              )}
+                            </SearchBar>
+                          )}
                         </Grid>
 
                         <Grid>
