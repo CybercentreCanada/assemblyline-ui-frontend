@@ -1,8 +1,9 @@
 import TableOfContentProvider from 'components/core/TableOfContent/TableOfContent';
 import { FormProvider } from 'components/routes/settings/settings.form';
 import { SettingsRoute } from 'components/routes/settings/settings.route';
+import React from 'react';
 
-const Settings = () => (
+const SettingsPage: React.FC = () => (
   <TableOfContentProvider>
     <FormProvider>
       <SettingsRoute />
@@ -10,4 +11,4 @@ const Settings = () => (
   </TableOfContentProvider>
 );
 
-export default Settings;
+export default SettingsPage;

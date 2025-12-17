@@ -1,4 +1,5 @@
 {
+  "chips-input.placeholder": "Saisissez une valeur et appuyez sur Entrée",
   "classification.acceptText": "Procéder",
   "classification.cancelText": "Annuler",
   "classification.done": "Terminé",

@@ -20,11 +20,13 @@ import type { InputProps, InputValues } from 'components/visual/Inputs/lib/input
 import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
 import type { ElementType } from 'react';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 export type ChipsInputProps = InputValues<string[], string[], React.SyntheticEvent<Element, Event>> &
   InputProps & {
     allowEmptyStrings?: boolean;
     autoComplete?: TextFieldProps['autoComplete'];
+    currentValue?: string;
     disableCloseOnSelect?: AutocompleteProps<string, true, false, true, ElementType>['disableCloseOnSelect'];
     filterSelectedOptions?: AutocompleteProps<string, true, false, true, ElementType>['filterSelectedOptions'];
     isOptionEqualToValue?: (option: string, value: string) => boolean;
@@ -34,12 +36,16 @@ export type ChipsInputProps = InputValues<string[], string[], React.SyntheticEve
   };
 
 const WrappedChipsInput = () => {
-  const [get] = usePropStore<ChipsInputProps>();
+  const { t } = useTranslation('inputs');
+
+  const [get, setStore] = usePropStore<ChipsInputProps>();
 
   const allowEmptyStrings = get('allowEmptyStrings');
+  const currentValue = get('currentValue') ?? '';
   const disableCloseOnSelect = get('disableCloseOnSelect');
   const disabled = get('disabled');
   const filterSelectedOptions = get('filterSelectedOptions');
+  const focused = get('focused');
   const id = usePropID();
   const inputValue = get('inputValue') ?? [];
   const isOptionEqualToValue = get('isOptionEqualToValue');
@@ -67,15 +73,24 @@ const WrappedChipsInput = () => {
             filterSelectedOptions={filterSelectedOptions}
             freeSolo
             id={id}
+            inputValue={currentValue}
             isOptionEqualToValue={isOptionEqualToValue}
             multiple
             options={options}
             readOnly={readOnly}
             size="small"
             value={inputValue}
+            onInputChange={(e, v) => setStore(s => ({ ...s, currentValue: v }))}
             onChange={(e, v) => handleChange(e, v as string[], v as string[])}
             onFocus={handleFocus}
-            onBlur={e => handleBlur(e, value, value)}
+            onBlur={e => {
+              setStore(s => ({ ...s, currentValue: '' }));
+              handleBlur(
+                e,
+                currentValue && !value.includes(currentValue) ? [...value, currentValue] : value,
+                currentValue && !value.includes(currentValue) ? [...value, currentValue] : value
+              );
+            }}
             renderValue={
               renderValue ??
               ((values, getTagProps) =>
@@ -89,6 +104,8 @@ const WrappedChipsInput = () => {
                 params={{
                   ...params,
                   inputProps: {
+                    placeholder:
+                      !focused || currentValue || inputValue?.length ? undefined : t('chips-input.placeholder'),
                     ...params.inputProps,
                     ...(allowEmptyStrings && {
                       onKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -133,6 +150,7 @@ export const ChipsInput = ({ preventRender = false, value = [], ...props }: Chip
         allowEmptyStrings: false,
         autoComplete: 'off',
         clearAdornment: true,
+        currentValue: '',
         disableCloseOnSelect: false,
         errorMessage,
         filterSelectedOptions: false,

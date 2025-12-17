@@ -21,7 +21,7 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import React, { useMemo, useState } from 'react';
+import React, { memo, useCallback, useMemo, useState } from 'react';
 import type { LinkProps } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 
@@ -33,29 +33,23 @@ type PageNavigationDrawerProps = {
   onClose: DrawerProps['onClose'];
 };
 
-const PageNavigationDrawer = React.memo(
-  ({
-    open = false,
-    children = null,
-    variant = 'left',
-    onOpen = () => null,
-    onClose = () => null
-  }: PageNavigationDrawerProps) => {
+const PageNavigationDrawer = memo(
+  ({ open = false, children = null, variant = 'left', onOpen, onClose }: PageNavigationDrawerProps) => {
     const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('lg'));
+    const anchor = variant === 'left' ? 'left' : 'right';
 
-    const isDownLG = useMediaQuery(theme.breakpoints.down('lg'));
+    if (!isMobile) return <>{children}</>;
 
-    return isDownLG ? (
+    return (
       <>
         <IconButton onClick={onOpen}>
           <MenuIcon />
         </IconButton>
-        <Drawer open={open} anchor={variant === 'left' ? 'left' : 'right'} onClose={onClose}>
+        <Drawer open={open} anchor={anchor} onClose={onClose}>
           {children}
         </Drawer>
       </>
-    ) : (
-      <>{children}</>
     );
   }
 );
@@ -70,109 +64,119 @@ export type PageNavigationItemProp = ListItemProps & {
   subheader?: boolean;
   to?: LinkProps['to'];
   variant?: DrawerProps['anchor'];
-  onPageNavigation?: (event: React.MouseEvent<HTMLElement, MouseEvent>, props: PageNavigationItemProp) => void;
+  onPageNavigation?: (e: React.MouseEvent<HTMLElement>, props: PageNavigationItemProp) => void;
 };
 
-export const PageNavigationItem: React.FC<PageNavigationItemProp> = React.memo((props: PageNavigationItemProp) => {
+export const PageNavigationItem = React.memo((props: PageNavigationItemProp) => {
   const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('lg'));
 
   const {
     active = false,
-    checkboxProps = null,
-    id = null,
+    checkboxProps,
+    id,
     preventRender = false,
     primary,
-    primaryProps = null,
+    primaryProps,
     readOnly = false,
     subheader = false,
-    to = null,
+    to,
     variant = 'left',
-    onPageNavigation = null,
+    onPageNavigation,
     ...listItemProps
-  } = useMemo<PageNavigationItemProp>(() => props, [props]);
+  } = props;
 
-  const isDownLG = useMediaQuery(theme.breakpoints.down('lg'));
+  const computedId = id || primary.toString();
 
-  return preventRender ? null : readOnly ? (
-    <ListItem
-      disablePadding
-      {...listItemProps}
-      sx={{
-        padding: `${theme.spacing(0.5)} ${theme.spacing(2)} ${theme.spacing(0.5)} ${theme.spacing(1.5)}`,
-        ...listItemProps?.sx
-      }}
-    >
-      <Typography
-        color={active ? 'primary' : subheader ? 'textSecondary' : 'textPrimary'}
-        margin={`${theme.spacing(0.25)} 0px`}
-        variant="body2"
-        {...primaryProps}
-      >
-        {primary}
-      </Typography>
-    </ListItem>
-  ) : (
+  const activeStyles = useMemo(
+    () => ({
+      color: theme.palette.primary.main,
+      backgroundColor: alpha(theme.palette.primary.main, 0.1)
+    }),
+    [theme.palette.primary.main]
+  );
+
+  const leftVariantStyles = useMemo(
+    () => ({
+      borderRadius: '0 18px 18px 0',
+      '&.Active': activeStyles
+    }),
+    [activeStyles]
+  );
+
+  const rightVariantStyles = useMemo(
+    () => ({
+      '&.Active': {
+        color: theme.palette.primary.main,
+        borderLeft: `1px solid ${theme.palette.primary.main}`
+      }
+    }),
+    [theme.palette.primary.main]
+  );
+
+  const handleClick = useCallback(
+    (e: React.MouseEvent<HTMLElement>) => {
+      onPageNavigation?.(e, props);
+    },
+    [onPageNavigation, props]
+  );
+
+  if (preventRender) return null;
+
+  if (readOnly) {
+    return (
+      <ListItem disablePadding {...listItemProps} sx={{ px: 2, py: 0.5, ...listItemProps.sx }}>
+        <Typography
+          variant="body2"
+          color={active ? 'primary' : subheader ? 'textSecondary' : 'textPrimary'}
+          sx={{ my: 0.25 }}
+          {...primaryProps}
+        >
+          {primary}
+        </Typography>
+      </ListItem>
+    );
+  }
+
+  return (
     <ListItem
       disablePadding
       secondaryAction={
-        !checkboxProps ? null : (
+        checkboxProps && (
           <Checkbox
             edge="end"
             size="small"
-            inputProps={{ id: id || primary.toString(), ...checkboxProps?.inputProps }}
+            inputProps={{ id: computedId, ...checkboxProps.inputProps }}
             {...checkboxProps}
-            sx={{
-              padding: theme.spacing(0.75)
-            }}
+            sx={{ p: 0.75 }}
           />
         )
       }
       {...listItemProps}
     >
       <ListItemButton
-        id={id || primary.toString()}
+        id={computedId}
         className={active ? 'Active' : ''}
+        onClick={handleClick}
+        component={to ? Link : 'div'}
+        to={to || undefined}
         sx={{
-          paddingLeft: theme.spacing(3),
-          '&:not(.Active)': {
-            marginLeft: '1px'
-          },
-          ...(subheader && {
-            paddingLeft: theme.spacing(1.5)
-          }),
-          ...(variant === 'left'
-            ? {
-                borderRadius: '0 18px 18px  0',
-                '&.Active': {
-                  color: theme.palette.primary.main,
-                  backgroundColor: alpha(theme.palette.primary.main, 0.1)
-                }
-              }
-            : {
-                '&.Active': {
-                  color: theme.palette.primary.main,
-                  borderLeft: `1px solid ${theme.palette.primary.main}`
-                }
-              }),
-          ...(isDownLG && {
-            '&.Active': {
-              color: theme.palette.primary.main,
-              backgroundColor: alpha(theme.palette.primary.main, 0.1)
-            }
-          })
+          pl: subheader ? 1.5 : 3,
+          ...(active ? {} : { ml: '1px' }),
+          ...(variant === 'left' ? leftVariantStyles : rightVariantStyles),
+          ...(isMobile && { '&.Active': activeStyles }),
+          ...listItemProps.sx
         }}
-        {...(onPageNavigation && { onClick: event => onPageNavigation(event, props) })}
-        {...(to !== null && { component: Link, to: to })}
       >
         <Typography
-          color={active ? 'primary' : subheader ? 'textSecondary' : 'textPrimary'}
-          margin={`${theme.spacing(0.25)} 0px`}
           variant="body2"
-          {...primaryProps}
+          color={active ? 'primary' : subheader ? 'textSecondary' : 'textPrimary'}
           sx={{
-            ...(checkboxProps && !checkboxProps?.checked && !checkboxProps?.indeterminate && { opacity: 0.38 }),
+            my: 0.25,
+            ...(checkboxProps && !checkboxProps.checked && !checkboxProps.indeterminate && { opacity: 0.38 }),
             ...primaryProps?.sx
           }}
+          {...primaryProps}
         >
           {primary}
         </Typography>
@@ -190,34 +194,46 @@ export type PageNavigationProps = Omit<ListProps, 'subheader'> & {
   subheaderProps?: ListSubheaderProps;
   variant?: DrawerProps['anchor'];
   renderItem?: (
-    params: PageNavigationItemProp,
-    index?: number,
-    NavItem?: React.FC<PageNavigationItemProp>
+    opt: PageNavigationItemProp,
+    index: number,
+    NavItem: React.FC<PageNavigationItemProp>
   ) => React.ReactNode;
   onPageNavigation?: PageNavigationItemProp['onPageNavigation'];
 };
 
-export const PageNavigation: React.FC<PageNavigationProps> = React.memo(
+export const PageNavigation = memo(
   ({
-    children = null,
+    children,
     loading = false,
-    options = null,
+    options,
     preventRender = false,
-    subheader = null,
-    subheaderProps = null,
+    subheader,
+    subheaderProps,
     variant = 'left',
-    renderItem = null,
+    renderItem,
     onPageNavigation = () => null,
     ...listProps
   }: PageNavigationProps) => {
     const [open, setOpen] = useState<boolean>(false);
 
-    return preventRender ? null : (
+    const handleNavigate = useCallback(
+      (e: React.MouseEvent<HTMLElement>, p: PageNavigationItemProp) => {
+        setOpen(false);
+        onPageNavigation(e, p);
+      },
+      [onPageNavigation]
+    );
+
+    if (preventRender) return null;
+
+    return (
       <PageNavigationDrawer open={open} variant={variant} onOpen={() => setOpen(true)} onClose={() => setOpen(false)}>
         <List
           component="nav"
+          dense
+          sx={{ '& ul': { p: 0 }, ...listProps.sx }}
           subheader={
-            !subheader || loading ? null : (
+            subheader && !loading ? (
               <ListSubheader
                 {...subheaderProps}
                 sx={{
@@ -228,41 +244,22 @@ export const PageNavigation: React.FC<PageNavigationProps> = React.memo(
               >
                 {subheader}
               </ListSubheader>
-            )
+            ) : null
           }
-          dense
-          sx={{ '& ul': { padding: 0 }, ...listProps?.sx }}
           {...listProps}
         >
-          {loading
-            ? null
-            : !Array.isArray(options)
-              ? children
-              : options.map((option, i) =>
-                  !renderItem ? (
-                    <PageNavigationItem
-                      key={i}
-                      variant={variant}
-                      onPageNavigation={(event, props) => {
-                        setOpen(false);
-                        onPageNavigation(event, props);
-                      }}
-                      {...option}
-                    />
-                  ) : (
-                    renderItem(option, i, props => (
-                      <PageNavigationItem
-                        key={i}
-                        variant={variant}
-                        onPageNavigation={(event, props) => {
-                          setOpen(false);
-                          onPageNavigation(event, props);
-                        }}
-                        {...props}
-                      />
+          {!loading &&
+            (Array.isArray(options)
+              ? options.map((opt, i) =>
+                  renderItem ? (
+                    renderItem(opt, i, p => (
+                      <PageNavigationItem key={i} variant={variant} onPageNavigation={handleNavigate} {...p} />
                     ))
+                  ) : (
+                    <PageNavigationItem key={i} variant={variant} onPageNavigation={handleNavigate} {...opt} />
                   )
-                )}
+                )
+              : children)}
         </List>
       </PageNavigationDrawer>
     );

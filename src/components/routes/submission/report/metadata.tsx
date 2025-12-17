@@ -178,7 +178,7 @@ function WrappedMetadata({ report }: Props) {
           {report?.metadata?.eml_path && (
             <div>
               <Fetcher
-                fetcherId="eml-preview.preview"
+                fetcherId="email-preview.preview"
                 type="email_id"
                 value={report?.metadata?.eml_path}
                 classification={currentUser.classification}

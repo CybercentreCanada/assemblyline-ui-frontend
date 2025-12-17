@@ -56,10 +56,11 @@ import { useTranslation } from 'react-i18next';
 export const StyledRoot = React.memo(({ children }: { children: React.ReactNode }) => {
   const [get] = usePropStore();
 
+  const id = usePropID();
   const rootProps = get('rootProps');
 
   return (
-    <div {...rootProps} style={{ textAlign: 'left', ...rootProps?.style }}>
+    <div {...rootProps} id={`${id}-root`} style={{ textAlign: 'left', ...rootProps?.style }}>
       {children}
     </div>
   );
@@ -562,10 +563,12 @@ export const StyledFormControl = React.memo(({ children, ...props }: FormControl
 
   const disabled = get('disabled');
   const divider = get('divider');
+  const id = usePropID();
   const readOnly = get('readOnly');
 
   return (
     <FormControl
+      id={`${id}-form`}
       component="form"
       size="small"
       fullWidth
@@ -751,7 +754,7 @@ export const StyledFormControlLabel = React.memo(
         sx={{
           marginLeft: 0,
           marginRight: 0,
-          paddingRight: `calc(44px + ${[preventExpandRender, preventPasswordRender, preventResetRender].filter(value => value === false).length} * ${tiny ? '24px' : '28px'})`,
+          paddingRight: `calc(8px + ${[preventExpandRender, preventPasswordRender, preventResetRender].filter(value => value === false).length} * ${tiny ? '24px' : '28px'})`,
           ...(overflowHidden && { textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden' }),
           ...props?.sx
         }}
@@ -1020,11 +1023,11 @@ export const useTextInputSlot = (overrides?: Partial<TextFieldProps>) => {
   );
 };
 
-export type StyledTextField = TextFieldProps & {
+export type StyledTextFieldProps = TextFieldProps & {
   params?: AutocompleteRenderInputParams;
 };
 
-export const StyledTextField = React.memo(({ params, ...props }: StyledTextField) => {
+export const StyledTextField = React.memo(({ params, ...props }: StyledTextFieldProps) => {
   const [get] = usePropStore();
 
   const endAdornment = get('endAdornment');

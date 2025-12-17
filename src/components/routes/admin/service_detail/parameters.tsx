@@ -2,16 +2,17 @@ import { Grid, Typography, useTheme } from '@mui/material';
 import type { Service } from 'components/models/base/service';
 import MultiTypeConfig from 'components/routes/admin/service_detail/multi_type_config';
 import MultiTypeParam from 'components/routes/admin/service_detail/multi_type_param';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 type ServiceParamsProps = {
   service: Service;
+  defaults: Service;
   setService: (value: Service) => void;
   setModified: (value: boolean) => void;
 };
 
-const ServiceParams = ({ service, setService, setModified }: ServiceParamsProps) => {
+const ServiceParams = ({ service, defaults, setService, setModified }: ServiceParamsProps) => {
   const { t } = useTranslation(['adminServices']);
   const theme = useTheme();
 
@@ -34,6 +35,11 @@ const ServiceParams = ({ service, setService, setModified }: ServiceParamsProps)
   const onConfigDelete = useCallback(config => {
     window.dispatchEvent(new CustomEvent('configDelete', { detail: config }));
   }, []);
+
+  const unusedParams = useMemo<string[]>(() => {
+    const defaultParams = new Set(defaults.submission_params?.map(p => p.name) ?? []);
+    return (service.submission_params ?? []).filter(({ name }) => !defaultParams.has(name)).map(({ name }) => name);
+  }, [service.submission_params, defaults.submission_params]);
 
   useEffect(() => {
     function handleSPAdd(event: CustomEvent) {
@@ -100,23 +106,33 @@ const ServiceParams = ({ service, setService, setModified }: ServiceParamsProps)
           <Typography variant="h6">{t('params.user')}</Typography>
         </Grid>
         <Grid size={{ xs: 12 }}>
-          <Typography variant="subtitle2">{t('params.user.current')}</Typography>
+          <Typography color="textSecondary" variant="subtitle2">
+            {t('params.user.current')}
+          </Typography>
         </Grid>
         {service.submission_params.length !== 0 ? (
           service.submission_params.map((param, i) => (
             <Grid key={i} size={{ xs: 12 }}>
-              <MultiTypeParam param={param} id={i} onUpdate={onParamUpdate} onDelete={onParamDelete} />
+              <MultiTypeParam
+                param={param}
+                id={i}
+                warn={unusedParams.includes(param.name)}
+                onUpdate={onParamUpdate}
+                onDelete={onParamDelete}
+              />
             </Grid>
           ))
         ) : (
           <Grid size={{ xs: 12 }}>
-            <Typography variant="caption" color="textSecondary">
+            <Typography color="textPrimary" variant="caption">
               {t('params.user.none')}
             </Typography>
           </Grid>
         )}
         <Grid size={{ xs: 12 }} style={{ marginTop: theme.spacing(2) }}>
-          <Typography variant="subtitle2">{t('params.user.new')}</Typography>
+          <Typography color="textSecondary" variant="subtitle2">
+            {t('params.user.new')}
+          </Typography>
         </Grid>
         <Grid size={{ xs: 12 }}>
           <MultiTypeParam onAdd={onParamAdd} />
@@ -126,13 +142,15 @@ const ServiceParams = ({ service, setService, setModified }: ServiceParamsProps)
           <Typography variant="h6">{t('params.config')}</Typography>
         </Grid>
         <Grid size={{ xs: 12 }}>
-          <Typography variant="subtitle2">{t('params.config.current')}</Typography>
+          <Typography color="textSecondary" variant="subtitle2">
+            {t('params.config.current')}
+          </Typography>
         </Grid>
         {Object.keys(service.config).length !== 0 ? (
           Object.keys(service.config).map((name, i) => (
             <Grid key={i} size={{ xs: 12 }}>
               <MultiTypeConfig
-                config={{ name, value: service.config[name] }}
+                config={{ name, value: service.config[name], warn: defaults.config[name] === undefined }}
                 onUpdate={onConfigAddUpdate}
                 onDelete={onConfigDelete}
               />
@@ -146,7 +164,9 @@ const ServiceParams = ({ service, setService, setModified }: ServiceParamsProps)
           </Grid>
         )}
         <Grid size={{ xs: 12 }} style={{ marginTop: theme.spacing(2) }}>
-          <Typography variant="subtitle2">{t('params.config.new')}</Typography>
+          <Typography color="textSecondary" variant="subtitle2">
+            {t('params.config.new')}
+          </Typography>
         </Grid>
         <Grid size={{ xs: 12 }}>
           <MultiTypeConfig onAdd={onConfigAddUpdate} />

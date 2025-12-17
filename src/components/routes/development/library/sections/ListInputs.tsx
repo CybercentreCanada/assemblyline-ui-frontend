@@ -2,6 +2,7 @@ import { Grid, Typography, useTheme } from '@mui/material';
 import { DemoContainer } from 'components/routes/development/library/components/DemoContainer';
 import { DemoSection } from 'components/routes/development/library/components/DemoSection';
 import { useForm } from 'components/routes/development/library/contexts/form';
+import { SELECT_OPTIONS, TEXTFIELD_OPTIONS } from 'components/routes/development/library/sections/Inputs';
 import { CheckboxInput } from 'components/visual/Inputs/CheckboxInput';
 import { List } from 'components/visual/List/List';
 import { ListHeader } from 'components/visual/List/ListHeader';
@@ -17,12 +18,27 @@ export type ListInputsLibraryState = {
   list_inputs: {
     name: string;
     state: {
+      badge: boolean;
+      capitalize: boolean;
       disabled: boolean;
-      loading: boolean;
-      reset: boolean;
-      tooltip: boolean;
+      endAdornment: boolean;
       error: boolean;
+      helperText: boolean;
+      inset: boolean;
+      loading: boolean;
+      longNames: boolean;
+      monospace: boolean;
+      noSecondary: boolean;
+      overflowHidden: boolean;
+      password: boolean;
+      placeholder: boolean;
+      preventRender: boolean;
       readOnly: boolean;
+      required: boolean;
+      reset: boolean;
+      startAdornment: boolean;
+      tiny: boolean;
+      tooltip: boolean;
     };
     values: {
       boolean: boolean;
@@ -30,7 +46,7 @@ export type ListInputsLibraryState = {
       classification: string;
       date: string;
       number: number;
-      select: string;
+      select: (typeof SELECT_OPTIONS)[number]['value'];
       slider: number;
       switch: boolean;
       text: string;
@@ -41,12 +57,27 @@ export const LIST_INPUTS_LIBRARY_STATE: ListInputsLibraryState = {
   list_inputs: {
     name: 'List Inputs',
     state: {
+      badge: false,
+      capitalize: false,
       disabled: false,
-      loading: false,
-      reset: false,
-      tooltip: false,
+      endAdornment: false,
       error: false,
-      readOnly: false
+      helperText: false,
+      inset: false,
+      loading: false,
+      longNames: false,
+      monospace: false,
+      noSecondary: false,
+      overflowHidden: false,
+      password: false,
+      placeholder: false,
+      preventRender: false,
+      readOnly: false,
+      required: false,
+      reset: false,
+      startAdornment: false,
+      tiny: false,
+      tooltip: false
     },
     values: {
       boolean: false,
@@ -54,7 +85,7 @@ export const LIST_INPUTS_LIBRARY_STATE: ListInputsLibraryState = {
       classification: 'TLP:C',
       date: '',
       number: 0,
-      select: '',
+      select: 'option 1',
       slider: 0,
       switch: false,
       text: ''
@@ -68,6 +99,514 @@ export const ListInputsSection = React.memo(() => {
 
   return (
     <DemoContainer>
+      <DemoSection
+        primary="Interactions"
+        secondary={
+          <>
+            <span>{'Use this to test the different interaction with the different props. '}</span>
+          </>
+        }
+        left={
+          <form.Subscribe
+            selector={state =>
+              [
+                state.values.components.list_inputs.state.badge,
+                state.values.components.list_inputs.state.capitalize,
+                state.values.components.list_inputs.state.disabled,
+                state.values.components.list_inputs.state.endAdornment,
+                state.values.components.list_inputs.state.error,
+                state.values.components.list_inputs.state.helperText,
+                state.values.components.list_inputs.state.inset,
+                state.values.components.list_inputs.state.loading,
+                state.values.components.list_inputs.state.longNames,
+                state.values.components.list_inputs.state.monospace,
+                state.values.components.list_inputs.state.noSecondary,
+                state.values.components.list_inputs.state.overflowHidden,
+                state.values.components.list_inputs.state.password,
+                state.values.components.list_inputs.state.placeholder,
+                state.values.components.list_inputs.state.preventRender,
+                state.values.components.list_inputs.state.readOnly,
+                state.values.components.list_inputs.state.required,
+                state.values.components.list_inputs.state.reset,
+                state.values.components.list_inputs.state.startAdornment,
+                state.values.components.list_inputs.state.tiny,
+                state.values.components.list_inputs.state.tooltip
+              ] as const
+            }
+            children={([
+              badge,
+              capitalize,
+              disabled,
+              endAdornment,
+              error,
+              helperText,
+              inset,
+              loading,
+              longNames,
+              monospace,
+              noSecondary,
+              overflowHidden,
+              password,
+              placeholder,
+              preventRender,
+              readOnly,
+              required,
+              reset,
+              startAdornment,
+              tiny,
+              tooltip
+            ]) => (
+              <div>
+                <ListHeader
+                  primary="Interactions List Inputs"
+                  secondary="Description of the interactions list inputs"
+                />
+                <List>
+                  <form.Subscribe
+                    selector={state => state.values.components.list_inputs.values.text}
+                    children={value => (
+                      <TextListInput
+                        primary="interactions Text List Input"
+                        secondary="interactions Text List Input Description"
+                        value={value}
+                        options={TEXTFIELD_OPTIONS}
+                        onChange={(event, next) => form.setFieldValue('components.list_inputs.values.text', next)}
+                        {...(badge && { badge })}
+                        {...(capitalize && { capitalize })}
+                        {...(disabled && { disabled })}
+                        {...(endAdornment && { endAdornment: 'end' })}
+                        {...(error && { error: v => (v !== '' ? null : 'Input field cannot be empty') })}
+                        {...(helperText && { helperText: 'Helper Text' })}
+                        {...(inset && { inset })}
+                        {...(loading && { loading })}
+                        {...(monospace && { monospace })}
+                        {...(overflowHidden && { overflowHidden })}
+                        {...(password && { password })}
+                        {...(placeholder && { placeholder: 'Placeholder' })}
+                        {...(preventRender && { preventRender })}
+                        {...(readOnly && { readOnly })}
+                        {...(required && { required })}
+                        {...(startAdornment && { startAdornment: 'start' })}
+                        {...(tiny && { tiny })}
+                        {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
+                        {...(longNames && {
+                          primary:
+                            'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc.',
+                          secondary:
+                            'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc.'
+                        })}
+                        {...(noSecondary && { secondary: null })}
+                        {...(reset && {
+                          reset,
+                          defaultValue: '',
+                          onReset: () => form.setFieldValue('components.list_inputs.values.text', '')
+                        })}
+                      />
+                    )}
+                  />
+
+                  <form.Subscribe
+                    selector={state => state.values.components.list_inputs.values.number}
+                    children={value => (
+                      <NumberListInput
+                        primary="interactions Number List Input"
+                        secondary="interactions Number List Input Description"
+                        value={value}
+                        onChange={(event, next) => form.setFieldValue('components.list_inputs.values.number', next)}
+                        {...(badge && { badge })}
+                        {...(capitalize && { capitalize })}
+                        {...(disabled && { disabled })}
+                        {...(endAdornment && { endAdornment: 'end' })}
+                        {...(error && { error: v => (v !== 0 ? null : 'Input field cannot be 0') })}
+                        {...(helperText && { helperText: 'Helper Text' })}
+                        {...(inset && { inset })}
+                        {...(loading && { loading })}
+                        {...(monospace && { monospace })}
+                        {...(overflowHidden && { overflowHidden })}
+                        {...(password && { password })}
+                        {...(placeholder && { placeholder: 'Placeholder' })}
+                        {...(preventRender && { preventRender })}
+                        {...(readOnly && { readOnly })}
+                        {...(required && { required })}
+                        {...(startAdornment && { startAdornment: 'start' })}
+                        {...(tiny && { tiny })}
+                        {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
+                        {...(longNames && {
+                          primary:
+                            'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc.',
+                          secondary:
+                            'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc.'
+                        })}
+                        {...(noSecondary && { secondary: null })}
+                        {...(reset && {
+                          reset,
+                          defaultValue: 0,
+                          onReset: () => form.setFieldValue('components.list_inputs.values.number', 0)
+                        })}
+                      />
+                    )}
+                  />
+
+                  <form.Subscribe
+                    selector={state => state.values.components.list_inputs.values.select}
+                    children={value => (
+                      <SelectListInput
+                        primary="interactions Select List Input"
+                        secondary="interactions Select List Input Description"
+                        value={value}
+                        options={SELECT_OPTIONS}
+                        onChange={(event, next: (typeof SELECT_OPTIONS)[number]['value']) =>
+                          form.setFieldValue('components.list_inputs.values.select', next)
+                        }
+                        {...(badge && { badge })}
+                        {...(capitalize && { capitalize })}
+                        {...(disabled && { disabled })}
+                        {...(endAdornment && { endAdornment: 'end' })}
+                        {...(error && { error: v => (v !== 'option 1' ? null : 'Input field cannot be option 1') })}
+                        {...(helperText && { helperText: 'Helper Text' })}
+                        {...(inset && { inset })}
+                        {...(loading && { loading })}
+                        {...(monospace && { monospace })}
+                        {...(overflowHidden && { overflowHidden })}
+                        {...(password && { password })}
+                        {...(placeholder && { placeholder: 'Placeholder' })}
+                        {...(preventRender && { preventRender })}
+                        {...(readOnly && { readOnly })}
+                        {...(required && { required })}
+                        {...(startAdornment && { startAdornment: 'start' })}
+                        {...(tiny && { tiny })}
+                        {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
+                        {...(longNames && {
+                          primary:
+                            'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc.',
+                          secondary:
+                            'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc.'
+                        })}
+                        {...(noSecondary && { secondary: null })}
+                        {...(reset && {
+                          reset,
+                          defaultValue: null,
+                          onReset: () => form.setFieldValue('components.list_inputs.values.select', null)
+                        })}
+                      />
+                    )}
+                  />
+
+                  <form.Subscribe
+                    selector={state => state.values.components.list_inputs.values.classification}
+                    children={value => (
+                      <ClassificationListInput
+                        primary="interactions Classification List Input"
+                        secondary="interactions Classification List Input Description"
+                        value={value}
+                        onChange={(event, next) =>
+                          form.setFieldValue('components.list_inputs.values.classification', next)
+                        }
+                        {...(badge && { badge })}
+                        {...(capitalize && { capitalize })}
+                        {...(disabled && { disabled })}
+                        {...(endAdornment && { endAdornment: 'end' })}
+                        {...(error && { error: v => (v !== 'TLP:C' ? null : 'Input field cannot be TLP:C') })}
+                        {...(helperText && { helperText: 'Helper Text' })}
+                        {...(inset && { inset })}
+                        {...(loading && { loading })}
+                        {...(monospace && { monospace })}
+                        {...(overflowHidden && { overflowHidden })}
+                        {...(password && { password })}
+                        {...(placeholder && { placeholder: 'Placeholder' })}
+                        {...(preventRender && { preventRender })}
+                        {...(readOnly && { readOnly })}
+                        {...(required && { required })}
+                        {...(startAdornment && { startAdornment: 'start' })}
+                        {...(tiny && { tiny })}
+                        {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
+                        {...(longNames && {
+                          primary:
+                            'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc.',
+                          secondary:
+                            'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc.'
+                        })}
+                        {...(noSecondary && { secondary: null })}
+                        {...(reset && {
+                          reset,
+                          defaultValue: null,
+                          onReset: () => form.setFieldValue('components.list_inputs.values.classification', 'TLP:C')
+                        })}
+                      />
+                    )}
+                  />
+
+                  <form.Subscribe
+                    selector={state => state.values.components.list_inputs.values.boolean}
+                    children={value => (
+                      <BooleanListInput
+                        primary="interactions Boolean List Input"
+                        secondary="interactions Boolean List Input Description"
+                        value={value}
+                        onChange={(event, next) => form.setFieldValue('components.list_inputs.values.boolean', next)}
+                        {...(badge && { badge })}
+                        {...(capitalize && { capitalize })}
+                        {...(disabled && { disabled })}
+                        {...(endAdornment && { endAdornment: 'end' })}
+                        {...(error && { error: v => (v !== false ? null : 'Input field cannot be false') })}
+                        {...(helperText && { helperText: 'Helper Text' })}
+                        {...(inset && { inset })}
+                        {...(loading && { loading })}
+                        {...(monospace && { monospace })}
+                        {...(overflowHidden && { overflowHidden })}
+                        {...(password && { password })}
+                        {...(placeholder && { placeholder: 'Placeholder' })}
+                        {...(preventRender && { preventRender })}
+                        {...(readOnly && { readOnly })}
+                        {...(required && { required })}
+                        {...(startAdornment && { startAdornment: 'start' })}
+                        {...(tiny && { tiny })}
+                        {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
+                        {...(longNames && {
+                          primary:
+                            'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc.',
+                          secondary:
+                            'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc.'
+                        })}
+                        {...(noSecondary && { secondary: null })}
+                        {...(reset && {
+                          reset,
+                          defaultValue: null,
+                          onReset: () => form.setFieldValue('components.list_inputs.values.boolean', false)
+                        })}
+                      />
+                    )}
+                  />
+                </List>
+              </div>
+            )}
+          />
+        }
+        right={
+          <div style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(1) }}>
+            <form.Subscribe
+              selector={state => state.values.components.list_inputs.state.capitalize}
+              children={value => (
+                <CheckboxInput
+                  label="Capitalize"
+                  value={value}
+                  onChange={(event, next) => form.setFieldValue('components.list_inputs.state.capitalize', next)}
+                />
+              )}
+            />
+
+            <form.Subscribe
+              selector={state => state.values.components.list_inputs.state.disabled}
+              children={value => (
+                <CheckboxInput
+                  label="Disabled"
+                  value={value}
+                  onChange={(event, next) => form.setFieldValue('components.list_inputs.state.disabled', next)}
+                />
+              )}
+            />
+
+            <form.Subscribe
+              selector={state => state.values.components.list_inputs.state.endAdornment}
+              children={value => (
+                <CheckboxInput
+                  label="End Adornment"
+                  value={value}
+                  onChange={(event, next) => form.setFieldValue('components.list_inputs.state.endAdornment', next)}
+                />
+              )}
+            />
+
+            <form.Subscribe
+              selector={state => state.values.components.list_inputs.state.error}
+              children={value => (
+                <CheckboxInput
+                  label="Error"
+                  value={value}
+                  onChange={(event, next) => form.setFieldValue('components.list_inputs.state.error', next)}
+                />
+              )}
+            />
+
+            <form.Subscribe
+              selector={state => state.values.components.list_inputs.state.helperText}
+              children={value => (
+                <CheckboxInput
+                  label="Helper Text"
+                  value={value}
+                  onChange={(event, next) => form.setFieldValue('components.list_inputs.state.helperText', next)}
+                />
+              )}
+            />
+
+            <form.Subscribe
+              selector={state => state.values.components.list_inputs.state.inset}
+              children={value => (
+                <CheckboxInput
+                  label="Inset"
+                  value={value}
+                  onChange={(event, next) => form.setFieldValue('components.list_inputs.state.inset', next)}
+                />
+              )}
+            />
+
+            <form.Subscribe
+              selector={state => state.values.components.list_inputs.state.loading}
+              children={value => (
+                <CheckboxInput
+                  label="Loading"
+                  value={value}
+                  onChange={(event, next) => form.setFieldValue('components.list_inputs.state.loading', next)}
+                />
+              )}
+            />
+
+            <form.Subscribe
+              selector={state => state.values.components.list_inputs.state.longNames}
+              children={value => (
+                <CheckboxInput
+                  label="Long Names"
+                  value={value}
+                  onChange={(event, next) => form.setFieldValue('components.list_inputs.state.longNames', next)}
+                />
+              )}
+            />
+
+            <form.Subscribe
+              selector={state => state.values.components.list_inputs.state.monospace}
+              children={value => (
+                <CheckboxInput
+                  label="Monospace"
+                  value={value}
+                  onChange={(event, next) => form.setFieldValue('components.list_inputs.state.monospace', next)}
+                />
+              )}
+            />
+
+            <form.Subscribe
+              selector={state => state.values.components.list_inputs.state.noSecondary}
+              children={value => (
+                <CheckboxInput
+                  label="No Secondary"
+                  value={value}
+                  onChange={(event, next) => form.setFieldValue('components.list_inputs.state.noSecondary', next)}
+                />
+              )}
+            />
+
+            <form.Subscribe
+              selector={state => state.values.components.list_inputs.state.overflowHidden}
+              children={value => (
+                <CheckboxInput
+                  label="Overflow Hidden"
+                  value={value}
+                  onChange={(event, next) => form.setFieldValue('components.list_inputs.state.overflowHidden', next)}
+                />
+              )}
+            />
+
+            <form.Subscribe
+              selector={state => state.values.components.list_inputs.state.password}
+              children={value => (
+                <CheckboxInput
+                  label="Password"
+                  value={value}
+                  onChange={(event, next) => form.setFieldValue('components.list_inputs.state.password', next)}
+                />
+              )}
+            />
+
+            <form.Subscribe
+              selector={state => state.values.components.list_inputs.state.placeholder}
+              children={value => (
+                <CheckboxInput
+                  label="Placeholder"
+                  value={value}
+                  onChange={(event, next) => form.setFieldValue('components.list_inputs.state.placeholder', next)}
+                />
+              )}
+            />
+
+            <form.Subscribe
+              selector={state => state.values.components.list_inputs.state.preventRender}
+              children={value => (
+                <CheckboxInput
+                  label="Prevent Render"
+                  value={value}
+                  onChange={(event, next) => form.setFieldValue('components.list_inputs.state.preventRender', next)}
+                />
+              )}
+            />
+
+            <form.Subscribe
+              selector={state => state.values.components.list_inputs.state.readOnly}
+              children={value => (
+                <CheckboxInput
+                  label="ReadOnly"
+                  value={value}
+                  onChange={(event, next) => form.setFieldValue('components.list_inputs.state.readOnly', next)}
+                />
+              )}
+            />
+
+            <form.Subscribe
+              selector={state => state.values.components.list_inputs.state.reset}
+              children={value => (
+                <CheckboxInput
+                  label="Reset"
+                  value={value}
+                  onChange={(event, next) => form.setFieldValue('components.list_inputs.state.reset', next)}
+                />
+              )}
+            />
+
+            <form.Subscribe
+              selector={state => state.values.components.list_inputs.state.required}
+              children={value => (
+                <CheckboxInput
+                  label="Required"
+                  value={value}
+                  onChange={(event, next) => form.setFieldValue('components.list_inputs.state.required', next)}
+                />
+              )}
+            />
+
+            <form.Subscribe
+              selector={state => state.values.components.list_inputs.state.startAdornment}
+              children={value => (
+                <CheckboxInput
+                  label="Start Adornment"
+                  value={value}
+                  onChange={(event, next) => form.setFieldValue('components.list_inputs.state.startAdornment', next)}
+                />
+              )}
+            />
+
+            <form.Subscribe
+              selector={state => state.values.components.list_inputs.state.tiny}
+              children={value => (
+                <CheckboxInput
+                  label="Tiny"
+                  value={value}
+                  onChange={(event, next) => form.setFieldValue('components.list_inputs.state.tiny', next)}
+                />
+              )}
+            />
+
+            <form.Subscribe
+              selector={state => state.values.components.list_inputs.state.tooltip}
+              children={value => (
+                <CheckboxInput
+                  label="Tooltip"
+                  value={value}
+                  onChange={(event, next) => form.setFieldValue('components.list_inputs.state.tooltip', next)}
+                />
+              )}
+            />
+          </div>
+        }
+      />
+
       <DemoSection
         primary="Basic List Inputs"
         secondary={
@@ -111,12 +650,10 @@ export const ListInputsSection = React.memo(() => {
                     primary="Select List Input"
                     secondary="Select List Input Description"
                     value={value}
-                    options={[
-                      { primary: 'Options 1', value: 'option 1' },
-                      { primary: 'Options 2', value: 'option 2' },
-                      { primary: 'Options 3', value: 'option 3' }
-                    ]}
-                    onChange={(event, next) => form.setFieldValue('components.list_inputs.values.select', next)}
+                    options={SELECT_OPTIONS}
+                    onChange={(event, next: (typeof SELECT_OPTIONS)[number]['value']) =>
+                      form.setFieldValue('components.list_inputs.values.select', next)
+                    }
                   />
                 )}
               />
@@ -128,7 +665,7 @@ export const ListInputsSection = React.memo(() => {
                     primary="Classification List Input"
                     secondary="Classification List Input Description"
                     value={value}
-                    onChange={next => form.setFieldValue('components.list_inputs.values.classification', next)}
+                    onChange={(event, next) => form.setFieldValue('components.list_inputs.values.classification', next)}
                   />
                 )}
               />
@@ -276,12 +813,10 @@ export const ListInputsSection = React.memo(() => {
                   primary="Controlled Select List Input"
                   secondary="Controlled Select List Input Description"
                   value={value}
-                  options={[
-                    { primary: 'Options 1', value: 'option 1' },
-                    { primary: 'Options 2', value: 'option 2' },
-                    { primary: 'Options 3', value: 'option 3' }
-                  ]}
-                  onChange={(event, next) => form.setFieldValue('components.list_inputs.values.select', next)}
+                  options={SELECT_OPTIONS}
+                  onChange={(event, next: (typeof SELECT_OPTIONS)[number]['value']) =>
+                    form.setFieldValue('components.list_inputs.values.select', next)
+                  }
                 />
               )}
             />
@@ -307,7 +842,7 @@ export const ListInputsSection = React.memo(() => {
                   primary="Controlled Classification List Input"
                   secondary="Controlled Classification List Input Description"
                   value={value}
-                  onChange={next => form.setFieldValue('components.list_inputs.values.classification', next)}
+                  onChange={(event, next) => form.setFieldValue('components.list_inputs.values.classification', next)}
                 />
               )}
             />
@@ -399,12 +934,10 @@ export const ListInputsSection = React.memo(() => {
                     secondary="Disabled Select List Input Description"
                     value={value}
                     disabled
-                    options={[
-                      { primary: 'Options 1', value: 'option 1' },
-                      { primary: 'Options 2', value: 'option 2' },
-                      { primary: 'Options 3', value: 'option 3' }
-                    ]}
-                    onChange={(event, next) => form.setFieldValue('components.list_inputs.values.select', next)}
+                    options={SELECT_OPTIONS}
+                    onChange={(event, next: (typeof SELECT_OPTIONS)[number]['value']) =>
+                      form.setFieldValue('components.list_inputs.values.select', next)
+                    }
                   />
                 )}
               />
@@ -417,7 +950,7 @@ export const ListInputsSection = React.memo(() => {
                     secondary="Disabled Classification List Input Description"
                     value={value}
                     disabled
-                    onChange={next => form.setFieldValue('components.list_inputs.values.classification', next)}
+                    onChange={(event, next) => form.setFieldValue('components.list_inputs.values.classification', next)}
                   />
                 )}
               />
@@ -543,12 +1076,10 @@ export const ListInputsSection = React.memo(() => {
                     secondary="Loading Select List Input Description"
                     value={value}
                     loading
-                    options={[
-                      { primary: 'Options 1', value: 'option 1' },
-                      { primary: 'Options 2', value: 'option 2' },
-                      { primary: 'Options 3', value: 'option 3' }
-                    ]}
-                    onChange={(event, next) => form.setFieldValue('components.list_inputs.values.select', next)}
+                    options={SELECT_OPTIONS}
+                    onChange={(event, next: (typeof SELECT_OPTIONS)[number]['value']) =>
+                      form.setFieldValue('components.list_inputs.values.select', next)
+                    }
                   />
                 )}
               />
@@ -561,7 +1092,7 @@ export const ListInputsSection = React.memo(() => {
                     secondary="Loading Classification List Input Description"
                     value={value}
                     loading
-                    onChange={next => form.setFieldValue('components.list_inputs.values.classification', next)}
+                    onChange={(event, next) => form.setFieldValue('components.list_inputs.values.classification', next)}
                   />
                 )}
               />
@@ -690,13 +1221,11 @@ export const ListInputsSection = React.memo(() => {
                     secondary="Reset Select List Input Description"
                     value={value}
                     reset
-                    options={[
-                      { primary: 'Options 1', value: 'option 1' },
-                      { primary: 'Options 2', value: 'option 2' },
-                      { primary: 'Options 3', value: 'option 3' }
-                    ]}
-                    onChange={(event, next) => form.setFieldValue('components.list_inputs.values.select', next)}
-                    onReset={() => form.setFieldValue('components.list_inputs.values.select', '')}
+                    options={SELECT_OPTIONS}
+                    onChange={(event, next: (typeof SELECT_OPTIONS)[number]['value']) =>
+                      form.setFieldValue('components.list_inputs.values.select', next)
+                    }
+                    onReset={() => form.setFieldValue('components.list_inputs.values.select', 'option 1')}
                   />
                 )}
               />
@@ -709,7 +1238,7 @@ export const ListInputsSection = React.memo(() => {
                     secondary="Reset Classification List Input Description"
                     value={value}
                     reset
-                    onChange={next => form.setFieldValue('components.list_inputs.values.classification', next)}
+                    onChange={(event, next) => form.setFieldValue('components.list_inputs.values.classification', next)}
                     onReset={() => form.setFieldValue('components.list_inputs.values.classification', 'TLP:C')}
                   />
                 )}
@@ -843,13 +1372,11 @@ export const ListInputsSection = React.memo(() => {
                     primary="Error Select List Input"
                     secondary="Error Select List Input Description"
                     value={value}
-                    error={v => (v !== '' ? null : 'Input field cannot be null')}
-                    options={[
-                      { primary: 'Options 1', value: 'option 1' },
-                      { primary: 'Options 2', value: 'option 2' },
-                      { primary: 'Options 3', value: 'option 3' }
-                    ]}
-                    onChange={(event, next) => form.setFieldValue('components.list_inputs.values.select', next)}
+                    error={v => (v !== 'option 1' ? null : 'Input field cannot be null')}
+                    options={SELECT_OPTIONS}
+                    onChange={(event, next: (typeof SELECT_OPTIONS)[number]['value']) =>
+                      form.setFieldValue('components.list_inputs.values.select', next)
+                    }
                   />
                 )}
               />
@@ -862,7 +1389,7 @@ export const ListInputsSection = React.memo(() => {
                     secondary="Error Classification List Input Description"
                     value={value}
                     error={v => (v !== 'TLP:C' ? null : 'Input field cannot be TLP:C')}
-                    onChange={next => form.setFieldValue('components.list_inputs.values.classification', next)}
+                    onChange={(event, next) => form.setFieldValue('components.list_inputs.values.classification', next)}
                   />
                 )}
               />
@@ -993,12 +1520,10 @@ export const ListInputsSection = React.memo(() => {
                     secondary="Read Only Select List Input Description"
                     value={value}
                     readOnly
-                    options={[
-                      { primary: 'Options 1', value: 'option 1' },
-                      { primary: 'Options 2', value: 'option 2' },
-                      { primary: 'Options 3', value: 'option 3' }
-                    ]}
-                    onChange={(event, next) => form.setFieldValue('components.list_inputs.values.select', next)}
+                    options={SELECT_OPTIONS}
+                    onChange={(event, next: (typeof SELECT_OPTIONS)[number]['value']) =>
+                      form.setFieldValue('components.list_inputs.values.select', next)
+                    }
                   />
                 )}
               />
@@ -1011,7 +1536,7 @@ export const ListInputsSection = React.memo(() => {
                     secondary="Read Only Classification List Input Description"
                     value={value}
                     readOnly
-                    onChange={next => form.setFieldValue('components.list_inputs.values.classification', next)}
+                    onChange={(event, next) => form.setFieldValue('components.list_inputs.values.classification', next)}
                   />
                 )}
               />
@@ -1091,198 +1616,6 @@ export const ListInputsSection = React.memo(() => {
       />
 
       <DemoSection
-        primary="Interactions"
-        secondary={
-          <>
-            <span>{'Use this to test the different interaction with the different props. '}</span>
-          </>
-        }
-        left={
-          <form.Subscribe
-            selector={state => [
-              state.values.components.list_inputs.state.disabled,
-              state.values.components.list_inputs.state.loading,
-              state.values.components.list_inputs.state.reset,
-              state.values.components.list_inputs.state.error,
-              state.values.components.list_inputs.state.readOnly
-            ]}
-            children={([disabled, loading, reset, error, readOnly]) => (
-              <div>
-                <ListHeader
-                  primary="Interactions List Inputs"
-                  secondary="Description of the interactions list inputs"
-                />
-                <List>
-                  <form.Subscribe
-                    selector={state => state.values.components.list_inputs.values.text}
-                    children={value => (
-                      <TextListInput
-                        primary="Interactions Text List Input"
-                        secondary="Interactions Text List Input Description"
-                        value={value}
-                        onChange={(event, next) => form.setFieldValue('components.list_inputs.values.text', next)}
-                        {...(disabled && { disabled })}
-                        {...(loading && { loading })}
-                        {...(readOnly && { readOnly })}
-                        {...(reset && {
-                          reset,
-                          onReset: () => form.setFieldValue('components.list_inputs.values.text', '')
-                        })}
-                        {...(error && { error: v => (v !== '' ? null : 'Input field cannot be null') })}
-                      />
-                    )}
-                  />
-
-                  <form.Subscribe
-                    selector={state => state.values.components.list_inputs.values.number}
-                    children={value => (
-                      <NumberListInput
-                        primary="Interactions Number List Input"
-                        secondary="Interactions Number List Input Description"
-                        value={value}
-                        onChange={(event, next) => form.setFieldValue('components.list_inputs.values.number', next)}
-                        {...(disabled && { disabled })}
-                        {...(loading && { loading })}
-                        {...(readOnly && { readOnly })}
-                        {...(reset && {
-                          reset,
-                          onReset: () => form.setFieldValue('components.list_inputs.values.number', 0)
-                        })}
-                        {...(error && { error: v => (v !== 0 ? null : 'Input field cannot be 0') })}
-                      />
-                    )}
-                  />
-
-                  <form.Subscribe
-                    selector={state => state.values.components.list_inputs.values.select}
-                    children={value => (
-                      <SelectListInput
-                        primary="Interactions Select List Input"
-                        secondary="Interactions Select List Input Description"
-                        value={value}
-                        options={[
-                          { primary: 'Options 1', value: 'option 1' },
-                          { primary: 'Options 2', value: 'option 2' },
-                          { primary: 'Options 3', value: 'option 3' }
-                        ]}
-                        onChange={(event, next) => form.setFieldValue('components.list_inputs.values.select', next)}
-                        {...(disabled && { disabled })}
-                        {...(loading && { loading })}
-                        {...(readOnly && { readOnly })}
-                        {...(reset && {
-                          reset,
-                          onReset: () => form.setFieldValue('components.list_inputs.values.select', '')
-                        })}
-                        {...(error && { error: v => (v !== '' ? null : 'Input field cannot be null') })}
-                      />
-                    )}
-                  />
-
-                  <form.Subscribe
-                    selector={state => state.values.components.list_inputs.values.classification}
-                    children={value => (
-                      <ClassificationListInput
-                        primary="Interactions Classification List Input"
-                        secondary="Interactions Classification List Input Description"
-                        value={value}
-                        onChange={next => form.setFieldValue('components.list_inputs.values.classification', next)}
-                        {...(disabled && { disabled })}
-                        {...(loading && { loading })}
-                        {...(readOnly && { readOnly })}
-                        {...(reset && {
-                          reset,
-                          onReset: () => form.setFieldValue('components.list_inputs.values.classification', 'TLP:C')
-                        })}
-                        {...(error && { error: v => (v !== 'TLP:C' ? null : 'Input field cannot be TLP:C') })}
-                      />
-                    )}
-                  />
-
-                  <form.Subscribe
-                    selector={state => state.values.components.list_inputs.values.boolean}
-                    children={value => (
-                      <BooleanListInput
-                        primary="Interactions Boolean List Input"
-                        secondary="Interactions Boolean List Input Description"
-                        value={value}
-                        onChange={(event, next) => form.setFieldValue('components.list_inputs.values.boolean', next)}
-                        {...(disabled && { disabled })}
-                        {...(loading && { loading })}
-                        {...(readOnly && { readOnly })}
-                        {...(reset && {
-                          reset,
-                          onReset: () => form.setFieldValue('components.list_inputs.values.boolean', false)
-                        })}
-                        {...(error && { error: v => (v !== false ? null : 'Input field cannot be TLP:C') })}
-                      />
-                    )}
-                  />
-                </List>
-              </div>
-            )}
-          />
-        }
-        right={
-          <div style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(1) }}>
-            <form.Subscribe
-              selector={state => state.values.components.list_inputs.state.disabled}
-              children={value => (
-                <CheckboxInput
-                  label="Disabled"
-                  value={value}
-                  onChange={(event, next) => form.setFieldValue('components.list_inputs.state.disabled', next)}
-                />
-              )}
-            />
-
-            <form.Subscribe
-              selector={state => state.values.components.list_inputs.state.loading}
-              children={value => (
-                <CheckboxInput
-                  label="Loading"
-                  value={value}
-                  onChange={(event, next) => form.setFieldValue('components.list_inputs.state.loading', next)}
-                />
-              )}
-            />
-
-            <form.Subscribe
-              selector={state => state.values.components.list_inputs.state.reset}
-              children={value => (
-                <CheckboxInput
-                  label="Reset"
-                  value={value}
-                  onChange={(event, next) => form.setFieldValue('components.list_inputs.state.reset', next)}
-                />
-              )}
-            />
-
-            <form.Subscribe
-              selector={state => state.values.components.list_inputs.state.error}
-              children={value => (
-                <CheckboxInput
-                  label="Error"
-                  value={value}
-                  onChange={(event, next) => form.setFieldValue('components.list_inputs.state.error', next)}
-                />
-              )}
-            />
-
-            <form.Subscribe
-              selector={state => state.values.components.list_inputs.state.readOnly}
-              children={value => (
-                <CheckboxInput
-                  label="ReadOnly"
-                  value={value}
-                  onChange={(event, next) => form.setFieldValue('components.list_inputs.state.readOnly', next)}
-                />
-              )}
-            />
-          </div>
-        }
-      />
-
-      <DemoSection
         primary="Edge Case: Long label names"
         secondary={
           <>
@@ -1325,12 +1658,10 @@ export const ListInputsSection = React.memo(() => {
                     primary="Select List Input: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc."
                     secondary="Select List Input Description: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc."
                     value={value}
-                    options={[
-                      { primary: 'Options 1', value: 'option 1' },
-                      { primary: 'Options 2', value: 'option 2' },
-                      { primary: 'Options 3', value: 'option 3' }
-                    ]}
-                    onChange={(event, next) => form.setFieldValue('components.list_inputs.values.select', next)}
+                    options={SELECT_OPTIONS}
+                    onChange={(event, next: (typeof SELECT_OPTIONS)[number]['value']) =>
+                      form.setFieldValue('components.list_inputs.values.select', next)
+                    }
                   />
                 )}
               />
@@ -1342,7 +1673,7 @@ export const ListInputsSection = React.memo(() => {
                     primary="Classification List Input: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc."
                     secondary="Classification List Input Description: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc."
                     value={value}
-                    onChange={next => form.setFieldValue('components.list_inputs.values.classification', next)}
+                    onChange={(event, next) => form.setFieldValue('components.list_inputs.values.classification', next)}
                   />
                 )}
               />

@@ -1,5 +1,5 @@
 import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOutlined';
-import PersonOutlinedIcon from '@mui/icons-material/PersonOutlined';
+import PersonIcon from '@mui/icons-material/Person';
 import TimerOutlinedIcon from '@mui/icons-material/TimerOutlined';
 import { Pagination, Typography, useMediaQuery, useTheme } from '@mui/material';
 import PageContainer from 'commons/components/pages/PageContainer';
@@ -9,6 +9,7 @@ import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import type { Retrohunt, RetrohuntIndexed, RetrohuntProgress } from 'components/models/base/retrohunt';
 import type { SearchResult } from 'components/models/ui/search';
+import type { IndexDefinition } from 'components/models/ui/user';
 import { RetrohuntCreate } from 'components/routes/retrohunt/create';
 import RetrohuntDetail from 'components/routes/retrohunt/detail';
 import { IconButton } from 'components/visual/Buttons/IconButton';
@@ -59,8 +60,8 @@ export default function RetrohuntPage() {
   const sio = useRef<Socket<any, any>>(null);
   const resultListeners = useRef<string[]>([]);
 
-  const suggestions = useMemo<string[]>(
-    () => [...Object.keys(indexes.retrohunt).filter(name => indexes.retrohunt[name].indexed), ...DEFAULT_SUGGESTION],
+  const suggestions = useMemo<IndexDefinition>(
+    () => ({ ...indexes.retrohunt, ...DEFAULT_SUGGESTION }),
     [indexes.retrohunt]
   );
 
@@ -306,6 +307,16 @@ export default function RetrohuntPage() {
               }}
               buttons={[
                 {
+                  icon: <PersonIcon fontSize={downSM ? 'small' : 'medium'} />,
+                  tooltip: hasFilter(`creator:${currentUser.username}`)
+                    ? t('filter.creator_self.remove')
+                    : t('filter.creator_self.add'),
+                  props: {
+                    color: hasFilter(`creator:${currentUser.username}`) ? 'primary' : 'default',
+                    onClick: () => handleToggleFilter(`creator:${currentUser.username}`)
+                  }
+                },
+                {
                   icon: <TimerOutlinedIcon fontSize={downSM ? 'small' : 'medium'} />,
                   tooltip: hasFilter(`completed_time:>=${last24hDate}`)
                     ? t('filter.completed_last_24.remove')
@@ -313,16 +324,6 @@ export default function RetrohuntPage() {
                   props: {
                     color: hasFilter(`completed_time:>=${last24hDate}`) ? 'primary' : 'default',
                     onClick: () => handleToggleFilter(`completed_time:>=${last24hDate}`)
-                  }
-                },
-                {
-                  icon: <PersonOutlinedIcon fontSize={downSM ? 'small' : 'medium'} />,
-                  tooltip: hasFilter(`creator:${currentUser.username}`)
-                    ? t('filter.creator_self.remove')
-                    : t('filter.creator_self.add'),
-                  props: {
-                    color: hasFilter(`creator:${currentUser.username}`) ? 'primary' : 'default',
-                    onClick: () => handleToggleFilter(`creator:${currentUser.username}`)
                   }
                 }
               ]}
