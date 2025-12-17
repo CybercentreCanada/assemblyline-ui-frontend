@@ -64,7 +64,16 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = () => nu
       started_time: null,
       truncated: false,
       ttl: !configuration?.retrohunt?.dtl ? 30 : configuration?.retrohunt?.dtl,
-      yara_signature: ''
+      yara_signature: `rule yara_template {
+  meta:
+    description = ""
+  strings:
+    $a = "First string"
+    $b = /some_regex_with_a_string/
+  condition:
+    all of them
+}
+      `
     }),
     [
       c12nDef?.UNRESTRICTED,
@@ -87,6 +96,7 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = () => nu
 
   const handleCreateRetrohunt = useCallback(
     (result: RetrohuntData) => {
+      setIsConfirmationOpen(false);
       if (!currentUser.roles.includes('retrohunt_run') && configuration?.retrohunt?.enabled) return;
       apiCall({
         method: 'PUT',
@@ -104,12 +114,10 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = () => nu
           setRetrohunt({ ...DEFAULT_RETROHUNT, ...api_data.api_response });
           setIsModified(false);
           setIsDisabled(true);
-          setIsConfirmationOpen(false);
           setTimeout(() => window.dispatchEvent(new CustomEvent('reloadRetrohunts')), 1000);
         },
         onFailure: api_data => {
           showErrorMessage(api_data.api_error_message);
-          setIsConfirmationOpen(false);
         },
         onEnter: () => setIsButtonLoading(true),
         onExit: () => setIsButtonLoading(false)
@@ -153,6 +161,7 @@ function WrappedRetrohuntCreate({ isDrawer = false, onCreateRetrohunt = () => nu
             cancelText={t('validate.cancelText')}
             acceptText={t('validate.acceptText')}
             text={t('validate.text')}
+            waiting={isButtonLoading}
           />
 
           <Grid container flexDirection="column" flexWrap="nowrap" flex={1} rowGap={1}>

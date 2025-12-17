@@ -12,19 +12,24 @@ export const ExternalSourcesSection = React.memo(() => {
   const form = useForm();
   const { configuration } = useALContext();
 
-  const fileSources = useMemo<string[]>(
-    () =>
-      Object.values(configuration?.submission?.file_sources || {})
-        .flatMap(file => file?.sources)
-        .filter((value, index, array) => value && array.indexOf(value) === index)
-        .sort(),
-    [configuration]
-  );
+  const fileSources = useMemo<string[]>(() => {
+    if (!configuration?.submission?.file_sources) return [];
 
-  return fileSources.length === 0 ? null : (
-    <form.Subscribe
-      selector={state => [state.values.state.disabled, state.values.state.loading] as const}
-      children={([disabled, loading]) => (
+    const sourcesSet = new Set<string>();
+    Object.values(configuration.submission.file_sources).forEach(file => {
+      file?.sources?.forEach(src => {
+        if (src) sourcesSet.add(src);
+      });
+    });
+
+    return Array.from(sourcesSet).sort((a, b) => a.localeCompare(b));
+  }, [configuration]);
+
+  if (fileSources.length === 0) return null;
+
+  return (
+    <form.Subscribe selector={state => [state.values.state.disabled, state.values.state.loading] as const}>
+      {([disabled, loading]) => (
         <div style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(1) }}>
           <PageSection
             id="default_external_sources"
@@ -38,39 +43,50 @@ export const ExternalSourcesSection = React.memo(() => {
             disablePadding
             sx={{
               bgcolor: 'background.paper',
-              '&>:not(:last-child)': {
+              '& > :not(:last-child)': {
                 borderBottom: `thin solid ${theme.palette.divider}`
               }
             }}
           >
-            {fileSources.map((source, i) => (
-              <form.Subscribe
-                key={`${source}-${i}`}
-                selector={state => [state.values.settings.default_external_sources.value.includes(source)] as const}
-                children={([value]) => (
-                  <BooleanListInput
-                    primary={source}
-                    value={value}
-                    loading={loading}
-                    disabled={disabled}
-                    onChange={(e, v) => {
-                      form.setFieldValue('settings', s => {
-                        if (v) s.default_external_sources.value = s.default_external_sources.value.concat([source]);
-                        else
-                          s.default_external_sources.value = s.default_external_sources.value.filter(
-                            item => item !== source
-                          );
+            {fileSources.map(source => {
+              if (!source) return null;
 
-                        return s;
-                      });
-                    }}
-                  />
-                )}
-              />
-            ))}
+              return (
+                <form.Subscribe
+                  key={source}
+                  selector={state => [state.values.settings.default_external_sources.value.includes(source)] as const}
+                >
+                  {([value]) => (
+                    <BooleanListInput
+                      primary={source}
+                      value={value}
+                      loading={loading}
+                      disabled={disabled}
+                      onChange={(_, checked) => {
+                        form.setFieldValue('settings', settings => {
+                          if (!settings.default_external_sources?.value) {
+                            settings.default_external_sources.value = [];
+                          }
+
+                          const current = settings.default_external_sources.value;
+
+                          settings.default_external_sources.value = checked
+                            ? Array.from(new Set([...current, source]))
+                            : current.filter(item => item !== source);
+
+                          return settings;
+                        });
+                      }}
+                    />
+                  )}
+                </form.Subscribe>
+              );
+            })}
           </List>
         </div>
       )}
-    />
+    </form.Subscribe>
   );
 });
+
+ExternalSourcesSection.displayName = 'ExternalSourcesSection';

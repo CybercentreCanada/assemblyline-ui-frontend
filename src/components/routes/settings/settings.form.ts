@@ -2,30 +2,33 @@ import { createFormContext } from 'components/core/form/createFormContext';
 import type { UserSettings } from 'components/models/base/user_settings';
 import type { ProfileSettings } from 'components/routes/settings/settings.utils';
 
+/**
+ * Store structure for the Settings page form.
+ */
 export type SettingsStore = {
-  /** State related to the interface of the Settings page */
+  /** UI state for the settings page */
   state: {
-    /** User is allowed to customize all service-specific parameters. Otherwise, they may only change the parameters that are editable */
+    /** Whether the user can customize all parameters */
     customize: boolean;
 
-    /** Disable all the component */
+    /** Disable all UI components */
     disabled: boolean;
 
-    /** Fetching the settings values */
+    /** Whether settings are currently being fetched */
     loading: boolean;
 
-    /** Submitting the new settings values */
+    /** Whether settings are being submitted */
     submitting: boolean;
 
-    /** Key of the selected profile */
+    /** Selected settings tab */
     tab: string;
   };
 
-  /** Aggregate user settings */
-  settings: ProfileSettings;
+  /** Combined settings for the active profile */
+  settings: ProfileSettings | null;
 
-  /** Aggregate user settings */
-  user: UserSettings;
+  /** General user settings */
+  user: UserSettings | null;
 };
 
 export const { FormProvider, useForm } = createFormContext<SettingsStore>({
@@ -39,5 +42,5 @@ export const { FormProvider, useForm } = createFormContext<SettingsStore>({
     },
     settings: null,
     user: null
-  }
+  } as const
 });

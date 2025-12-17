@@ -8,7 +8,7 @@ import useDrawer from 'components/hooks/useDrawer';
 import useMyAPI from 'components/hooks/useMyAPI';
 import type { Alert, AlertIndexed, AlertItem } from 'components/models/base/alert';
 import type { Workflow } from 'components/models/base/workflow';
-import type { CustomUser } from 'components/models/ui/user';
+import type { CustomUser, IndexDefinition } from 'components/models/ui/user';
 import ForbiddenPage from 'components/routes/403';
 import AlertActions from 'components/routes/alerts/components/Actions';
 import AlertDefaultSearchParameters from 'components/routes/alerts/components/DefaultSearchParameters';
@@ -92,13 +92,7 @@ const WrappedAlertsContent = () => {
 
   const isLGDown = useMediaQuery(theme.breakpoints.down('lg'));
 
-  const suggestions = useMemo<string[]>(
-    () =>
-      'alert' in indexes
-        ? [...Object.keys(indexes.alert).map(name => name), ...DEFAULT_SUGGESTION]
-        : DEFAULT_SUGGESTION,
-    [indexes]
-  );
+  const suggestions = useMemo<IndexDefinition>(() => ({ ...indexes.alert, ...DEFAULT_SUGGESTION }), [indexes]);
 
   const handleFetch = useCallback(
     (body: SearchResult<AlertSearchParams>) => {

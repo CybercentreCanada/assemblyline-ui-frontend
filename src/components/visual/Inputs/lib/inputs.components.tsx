@@ -754,7 +754,7 @@ export const StyledFormControlLabel = React.memo(
         sx={{
           marginLeft: 0,
           marginRight: 0,
-          paddingRight: `calc(44px + ${[preventExpandRender, preventPasswordRender, preventResetRender].filter(value => value === false).length} * ${tiny ? '24px' : '28px'})`,
+          paddingRight: `calc(8px + ${[preventExpandRender, preventPasswordRender, preventResetRender].filter(value => value === false).length} * ${tiny ? '24px' : '28px'})`,
           ...(overflowHidden && { textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden' }),
           ...props?.sx
         }}
@@ -1023,11 +1023,11 @@ export const useTextInputSlot = (overrides?: Partial<TextFieldProps>) => {
   );
 };
 
-export type StyledTextField = TextFieldProps & {
+export type StyledTextFieldProps = TextFieldProps & {
   params?: AutocompleteRenderInputParams;
 };
 
-export const StyledTextField = React.memo(({ params, ...props }: StyledTextField) => {
+export const StyledTextField = React.memo(({ params, ...props }: StyledTextFieldProps) => {
   const [get] = usePropStore();
 
   const endAdornment = get('endAdornment');
