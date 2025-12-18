@@ -47,6 +47,7 @@
   "response": "Response",
   "signatures": "Signatures",
   "source": "Source",
+  "sources": "Sources",
   "status_code": "Status code",
   "timeshift": "Timeshift",
   "type": "Type",

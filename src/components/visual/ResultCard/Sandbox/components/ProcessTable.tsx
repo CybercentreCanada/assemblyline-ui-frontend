@@ -5,6 +5,7 @@ import type { SandboxBody, SandboxProcessItem } from 'components/models/base/res
 import CustomChip from 'components/visual/CustomChip';
 import { ProcessChip } from 'components/visual/ResultCard/Sandbox/common/ProcessChip';
 import { TableContainer } from 'components/visual/ResultCard/Sandbox/common/TableContainer';
+import { DetailTableCellValue } from 'components/visual/ResultCard/Sandbox/common/Tables';
 import type { SandboxFilter } from 'components/visual/ResultCard/Sandbox/sandbox.utils';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -51,8 +52,8 @@ export const ProcessTable = React.memo(
           }
         }),
         columnHelper.accessor(row => row.image?.split(/[/\\]/).pop() ?? '', {
-          id: 'process_name',
-          header: () => t('process_name'),
+          id: 'process',
+          header: () => t('process'),
           cell: ({ row }) => <ProcessChip fullWidth process={row.original} />,
           meta: { cellSx: { wordBreak: 'inherit !important' } }
         }),
@@ -96,6 +97,11 @@ export const ProcessTable = React.memo(
               color: theme.palette.text.secondary
             }
           }
+        }),
+        columnHelper.accessor(row => (row.sources?.length ? row.sources : null), {
+          id: 'sources',
+          header: () => t('sources'),
+          cell: ({ getValue }) => <DetailTableCellValue value={getValue()} />
         }),
         columnHelper.accessor(
           row => {

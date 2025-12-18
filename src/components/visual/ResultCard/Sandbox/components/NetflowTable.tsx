@@ -7,7 +7,7 @@ import CustomChip from 'components/visual/CustomChip';
 import { KVBody } from 'components/visual/ResultCard/kv_body';
 import { ProcessChip } from 'components/visual/ResultCard/Sandbox/common/ProcessChip';
 import { TableContainer } from 'components/visual/ResultCard/Sandbox/common/TableContainer';
-import { DetailTableRow } from 'components/visual/ResultCard/Sandbox/common/Tables';
+import { DetailTableCellValue, DetailTableRow } from 'components/visual/ResultCard/Sandbox/common/Tables';
 import { compareIPs, hasObjectData, type SandboxFilter } from 'components/visual/ResultCard/Sandbox/sandbox.utils';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -50,6 +50,11 @@ export const NetflowTable = React.memo(
               color: theme.palette.text.secondary
             }
           }
+        }),
+        columnHelper.accessor(row => (row.sources?.length ? row.sources : null), {
+          id: 'sources',
+          header: () => t('sources'),
+          cell: ({ getValue }) => <DetailTableCellValue value={getValue()} />
         }),
         columnHelper.accessor(
           row => {

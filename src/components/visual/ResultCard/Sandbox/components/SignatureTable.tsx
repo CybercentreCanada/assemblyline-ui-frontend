@@ -6,7 +6,7 @@ import Classification from 'components/visual/Classification';
 import CustomChip from 'components/visual/CustomChip';
 import { ProcessChip } from 'components/visual/ResultCard/Sandbox/common/ProcessChip';
 import { TableContainer } from 'components/visual/ResultCard/Sandbox/common/TableContainer';
-import { DetailTableRow } from 'components/visual/ResultCard/Sandbox/common/Tables';
+import { DetailTableCellValue, DetailTableRow } from 'components/visual/ResultCard/Sandbox/common/Tables';
 import type { SandboxFilter } from 'components/visual/ResultCard/Sandbox/sandbox.utils';
 import Verdict from 'components/visual/Verdict';
 import React, { useMemo } from 'react';
@@ -50,6 +50,11 @@ export const SignatureTable = React.memo(
           header: () => t('classification'),
           cell: info => <Classification c12n={info.getValue()} size="tiny" type="text" />
         }),
+        columnHelper.accessor(row => (row.sources?.length ? row.sources : null), {
+          id: 'sources',
+          header: () => t('sources'),
+          cell: ({ getValue }) => <DetailTableCellValue value={getValue()} />
+        }),
         columnHelper.accessor('pid', {
           id: 'processes',
           enableSorting: false,
@@ -87,7 +92,7 @@ export const SignatureTable = React.memo(
               </div>
             );
           },
-          meta: { cellSx: { textTransform: 'capitalize' } }
+          meta: { colStyle: { minWidth: '250px' }, cellSx: { textTransform: 'capitalize' } }
         }),
         columnHelper.accessor(row => !!(row?.actors?.length || row?.attacks?.length || row?.malware_families?.length), {
           id: 'details',
