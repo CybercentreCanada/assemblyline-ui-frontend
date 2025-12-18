@@ -10,6 +10,8 @@ import dateTimeEN from 'components/visual/DateTime/datetime.i18n.en.json';
 import dateTimeFR from 'components/visual/DateTime/datetime.i18n.fr.json';
 import inputsEN from 'components/visual/Inputs/lib/inputs.i18n.en.json';
 import inputsFR from 'components/visual/Inputs/lib/inputs.i18n.fr.json';
+import sandboxResultEN from 'components/visual/ResultCard/Sandbox/sandbox.i18n.en.json';
+import sandboxResultFR from 'components/visual/ResultCard/Sandbox/sandbox.i18n.fr.json';
 import { default as i18n } from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import error403EN from 'locales/en/403.json';
@@ -172,6 +174,7 @@ const resources = {
     manageWorkflowDetail: manageWorkflowDetailEN,
     manageWorkflows: manageWorkflowsEN,
     notification: notificationEN,
+    sandboxResult: sandboxResultEN,
     retrohunt: retrohuntEN,
     search: searchEN,
     settings: settingsEN,
@@ -234,6 +237,7 @@ const resources = {
     manageWorkflowDetail: manageWorkflowDetailFR,
     manageWorkflows: manageWorkflowsFR,
     notification: notificationFR,
+    sandboxResult: sandboxResultFR,
     retrohunt: retrohuntFR,
     search: searchFR,
     settings: settingsFR,
