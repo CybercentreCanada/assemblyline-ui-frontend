@@ -7,7 +7,7 @@ type DetailTableCellValueProps = {
   value?: unknown;
 };
 
-const DetailTableCellValue = React.memo(({ value = null }: DetailTableCellValueProps) => {
+export const DetailTableCellValue = React.memo(({ value = null }: DetailTableCellValueProps) => {
   if (Array.isArray(value)) return <DetailTableCellValue value={value.join(' | ')} />;
   // return (
   //   <>

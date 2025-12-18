@@ -161,6 +161,9 @@ export type SandboxProcessItem = {
   /** The timestamp when the process started (ISO 8601 format). */
   start_time: string;
 
+  /** Name of the sources who identified this information */
+  sources?: string[];
+
   /** The parent process ID (PPID). */
   ppid?: number;
 
@@ -266,6 +269,9 @@ export type SandboxNetflowItem = {
   /** The process ID that initiated or owned the network connection. */
   process?: number;
 
+  /** Name of the sources who identified this information */
+  sources?: string[];
+
   /** The source IP address of the connection. */
   source_ip?: string;
 
@@ -305,8 +311,11 @@ export type SandboxSignatureItem = {
   /** The name of the detection signature. */
   name: string;
 
-  /** The source type of the signature (e.g., "CUCKOO", "YARA", "SIGMA", "SURICATA"). */
+  /** The source type of the signature (e.g., "CAPE", "CUCKOO"). */
   type: SignatureType;
+
+  /** Name of the sources who identified this information */
+  sources?: string[];
 
   /** The classification of the signature (e.g., "malicious", "benign"). */
   classification: string;
