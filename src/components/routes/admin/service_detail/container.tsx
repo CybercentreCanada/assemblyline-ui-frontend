@@ -75,7 +75,7 @@ const ServiceContainer = ({ service, defaults, setService, setModified }: Servic
             ] as { value: Service['update_channel']; primary: string }[]
           }
           onChange={(e, v) => {
-            setModified(true);
+            if (service?.update_channel !== v) setModified(true);
             setService({ ...service, update_channel: v });
           }}
         />
@@ -95,7 +95,7 @@ const ServiceContainer = ({ service, defaults, setService, setModified }: Servic
             ] as const
           }
           onChange={(e, v) => {
-            setModified(true);
+            if (service?.privileged !== v) setModified(true);
             setService({ ...service, privileged: v });
           }}
         />
