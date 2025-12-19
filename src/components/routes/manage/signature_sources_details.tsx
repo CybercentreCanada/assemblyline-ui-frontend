@@ -62,7 +62,7 @@ const WrappedSourceDetail = ({
               defaultValue={!defaults ? undefined : defaults?.default_classification}
               reset={showReset(source, defaults, 'default_classification')}
               onChange={(e, v) => {
-                setModified(true);
+                if (source?.default_classification !== v) setModified(true);
                 setSource(s => ({ ...s, default_classification: v }));
               }}
             />
@@ -94,7 +94,7 @@ const WrappedSourceDetail = ({
                         value={!source ? null : source.name}
                         defaultValue={!defaults ? undefined : defaults?.name}
                         onChange={(e, v) => {
-                          setModified(true);
+                          if (source?.name !== v) setModified(true);
                           setSource(s => ({ ...s, name: v }));
                         }}
                       />
@@ -109,7 +109,7 @@ const WrappedSourceDetail = ({
                         reset={showReset(source, defaults, 'pattern')}
                         monospace
                         onChange={(e, v) => {
-                          setModified(true);
+                          if (source?.pattern !== v) setModified(true);
                           setSource(s => ({ ...s, pattern: v }));
                         }}
                       />
@@ -136,7 +136,7 @@ const WrappedSourceDetail = ({
                           ] as const
                         }
                         onChange={(e, v) => {
-                          setModified(true);
+                          if (source?.update_interval !== v) setModified(true);
                           setSource(s => ({ ...s, update_interval: v }));
                         }}
                       />
@@ -154,7 +154,7 @@ const WrappedSourceDetail = ({
                         max={86400}
                         required
                         onChange={(e, v) => {
-                          setModified(true);
+                          if (source?.update_interval !== v) setModified(true);
                           setSource(s => ({ ...s, update_interval: v }));
                         }}
                       />
@@ -166,7 +166,7 @@ const WrappedSourceDetail = ({
                         loading={!source}
                         value={!source ? null : source.configuration}
                         onChange={(e, v) => {
-                          setModified(true);
+                          if (source?.configuration !== v) setModified(true);
                           setSource(s => ({ ...s, configuration: v }));
                         }}
                       />
@@ -181,7 +181,7 @@ const WrappedSourceDetail = ({
                           defaultValue={!defaults ? undefined : defaults?.[field]}
                           reset={showReset(source, defaults, field)}
                           onChange={(e, v) => {
-                            setModified(true);
+                            if (source?.[field] !== v) setModified(true);
                             setSource(s => ({ ...s, [field]: v }));
                           }}
                         />
@@ -211,7 +211,7 @@ const WrappedSourceDetail = ({
                         reset={showReset(source, defaults, 'fetch_method')}
                         options={FETCH_METHODS.map(method => ({ value: method, primary: method }))}
                         onChange={(e, v) => {
-                          setModified(true);
+                          if (source?.fetch_method !== v) setModified(true);
                           setSource(s => ({ ...s, fetch_method: v }));
                         }}
                       />
@@ -226,7 +226,7 @@ const WrappedSourceDetail = ({
                         defaultValue={!defaults ? undefined : defaults?.uri}
                         reset={showReset(source, defaults, 'uri')}
                         onChange={(e, v) => {
-                          setModified(true);
+                          if (source?.uri !== v) setModified(true);
                           setSource(s => ({ ...s, uri: v }));
                         }}
                       />
@@ -239,7 +239,7 @@ const WrappedSourceDetail = ({
                           loading={!source}
                           value={!source ? null : source.git_branch}
                           onChange={(e, v) => {
-                            setModified(true);
+                            if (source?.git_branch !== v) setModified(true);
                             setSource(s => ({ ...s, git_branch: v }));
                           }}
                         />
@@ -255,7 +255,7 @@ const WrappedSourceDetail = ({
                           defaultValue={!defaults ? undefined : defaults?.use_managed_identity}
                           reset={showReset(source, defaults, 'use_managed_identity')}
                           onChange={(e, v) => {
-                            setModified(true);
+                            if (source?.use_managed_identity !== v) setModified(true);
                             setSource(s => ({ ...s, use_managed_identity: v }));
                           }}
                         />
@@ -272,7 +272,7 @@ const WrappedSourceDetail = ({
                             defaultValue={!defaults ? undefined : defaults?.username}
                             reset={showReset(source, defaults, 'username')}
                             onChange={(e, v) => {
-                              setModified(true);
+                              if (source?.username !== v) setModified(true);
                               setSource(s => ({ ...s, username: v }));
                             }}
                           />
@@ -287,7 +287,7 @@ const WrappedSourceDetail = ({
                             reset={showReset(source, defaults, 'password')}
                             password
                             onChange={(e, v) => {
-                              setModified(true);
+                              if (source?.password !== v) setModified(true);
                               setSource(s => ({ ...s, password: v }));
                             }}
                           />
@@ -307,7 +307,7 @@ const WrappedSourceDetail = ({
                         password
                         monospace
                         onChange={(e, v) => {
-                          setModified(true);
+                          if (source?.private_key !== v) setModified(true);
                           setSource(s => ({ ...s, private_key: v }));
                         }}
                       />
@@ -319,7 +319,7 @@ const WrappedSourceDetail = ({
                         loading={!source}
                         value={!source ? null : Object.fromEntries(source.headers.map(x => [x.name, x.value]))}
                         onChange={(e, v) => {
-                          setModified(true);
+                          if (source?.headers !== v) setModified(true);
                           setSource(s => ({
                             ...s,
                             headers: Object.entries(v).map(
@@ -339,7 +339,7 @@ const WrappedSourceDetail = ({
                           monospace
                           rows={6}
                           onChange={(e, v) => {
-                            setModified(true);
+                            if (source?.data !== v) setModified(true);
                             setSource(s => ({ ...s, data: v }));
                           }}
                         />
@@ -355,7 +355,7 @@ const WrappedSourceDetail = ({
                         reset={showReset(source, defaults, 'proxy')}
                         placeholder={t('proxy.placeholder')}
                         onChange={(e, v) => {
-                          setModified(true);
+                          if (source?.proxy !== v) setModified(true);
                           setSource(s => ({ ...s, proxy: v }));
                         }}
                       />
@@ -372,7 +372,7 @@ const WrappedSourceDetail = ({
                         password
                         rows={6}
                         onChange={(e, v) => {
-                          setModified(true);
+                          if (source?.ca_cert !== v) setModified(true);
                           setSource(s => ({ ...s, ca_cert: v }));
                         }}
                       />
@@ -386,7 +386,7 @@ const WrappedSourceDetail = ({
                         defaultValue={!defaults ? undefined : defaults?.ssl_ignore_errors}
                         reset={showReset(source, defaults, 'ssl_ignore_errors')}
                         onChange={(e, v) => {
-                          setModified(true);
+                          if (source?.ssl_ignore_errors !== v) setModified(true);
                           setSource(s => ({ ...s, ssl_ignore_errors: v }));
                         }}
                       />
