@@ -115,7 +115,7 @@ const ServiceUpdater = ({ service, defaults, setService, setModified }: ServiceU
           ]}
           valueLabelFormat={x => x / 3600}
           onChange={(e, v) => {
-            setModified(true);
+            if (service?.update_config?.update_interval_seconds !== v) setModified(true);
             setService({
               ...service,
               update_config: {
@@ -137,7 +137,7 @@ const ServiceUpdater = ({ service, defaults, setService, setModified }: ServiceU
           max={86400}
           required
           onChange={(e, v) => {
-            setModified(true);
+            if (service?.update_config?.update_interval_seconds !== v) setModified(true);
             setService({
               ...service,
               update_config: { ...service.update_config, update_interval_seconds: v }
@@ -160,7 +160,7 @@ const ServiceUpdater = ({ service, defaults, setService, setModified }: ServiceU
             ] as const
           }
           onChange={(e, v) => {
-            setModified(true);
+            if (service?.update_config?.generates_signatures !== v) setModified(true);
             setService({
               ...service,
               update_config: {
@@ -186,7 +186,7 @@ const ServiceUpdater = ({ service, defaults, setService, setModified }: ServiceU
             ] as const
           }
           onChange={(e, v) => {
-            setModified(true);
+            if (service?.update_config?.wait_for_update !== v) setModified(true);
             setService({
               ...service,
               update_config: {
@@ -223,7 +223,7 @@ const ServiceUpdater = ({ service, defaults, setService, setModified }: ServiceU
                 ] as const
               }
               onChange={(e, v) => {
-                setModified(true);
+                if (service?.update_config?.signature_delimiter !== v) setModified(true);
                 setService({ ...service, update_config: { ...service.update_config, signature_delimiter: v } });
               }}
               onReset={() => {
@@ -248,7 +248,7 @@ const ServiceUpdater = ({ service, defaults, setService, setModified }: ServiceU
                   !service ? null : service.update_config.custom_delimiter ? service.update_config.custom_delimiter : ''
                 }
                 onChange={(e, v) => {
-                  setModified(true);
+                  if (service?.update_config?.custom_delimiter !== v) setModified(true);
                   setService({ ...service, update_config: { ...service.update_config, custom_delimiter: v } });
                 }}
               />
