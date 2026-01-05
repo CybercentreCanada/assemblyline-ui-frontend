@@ -48,8 +48,8 @@ export const useAPIMutation = <
     failureReason: mutation.failureReason,
 
     /** execution */
-    mutate: (props: Props) => mutation.mutate(props),
-    mutateAsync: (props: Props) => mutation.mutateAsync(props),
+    mutate: (...props: Props) => mutation.mutate(props),
+    mutateAsync: (...props: Props) => mutation.mutateAsync(props),
 
     /** misc */
     reset: mutation.reset,
