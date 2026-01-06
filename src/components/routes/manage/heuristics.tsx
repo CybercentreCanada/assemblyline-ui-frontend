@@ -91,7 +91,8 @@ const HeuristicsSearch = () => {
 
   useEffect(() => {
     handleReload(search);
-  }, [handleReload, search]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [handleReload, search.toString()]);
 
   return currentUser.roles.includes('heuristic_view') ? (
     <PageFullWidth margin={4}>
