@@ -1,3 +1,4 @@
+import type { UseMutationOptions } from '@tanstack/react-query';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type { APIRequest, APIResponse } from 'components/core/Query/components/api.models';
 import type { UseAPICallFnProps } from 'components/core/Query/components/useAPICallFn';
@@ -10,15 +11,17 @@ export const useAPIMutation = <
   Request extends APIRequest = APIRequest,
   Error extends string = string
 >(
-  mutationFn: (...props: Props) => UseAPICallFnProps<APIResponse<Response>, Request, APIResponse<Error>>
+  mutationFn: (...props: Props) => UseAPICallFnProps<APIResponse<Response>, Request, APIResponse<Error>>,
+  mutationProps?: Omit<UseMutationOptions<APIResponse<Response>, APIResponse<Error>, Props, unknown>, 'mutationFn'>
 ) => {
   const queryClient = useQueryClient();
   const apiCallFn = useAPICallFn<APIResponse<Response>>();
 
   const mutation = useMutation<APIResponse<Response>, APIResponse<Error>, Props>(
     {
+      ...mutationProps,
       mutationFn: (props: Props) => apiCallFn(mutationFn(...props)),
-      retry: false
+      retry: mutationProps?.retry ?? false
     },
     queryClient
   );
@@ -30,31 +33,16 @@ export const useAPIMutation = <
   );
 
   return {
+    ...mutation,
+
     /** normalized API response */
     data,
     error,
     serverVersion,
     statusCode,
 
-    /** mutation state */
-    isError: mutation.isError,
-    isIdle: mutation.isIdle,
-    isPending: mutation.isPending,
-    isPaused: mutation.isPaused,
-    isSuccess: mutation.isSuccess,
-
-    /** failure info */
-    failureCount: mutation.failureCount,
-    failureReason: mutation.failureReason,
-
     /** execution */
     mutate: (...props: Props) => mutation.mutate(props),
-    mutateAsync: (...props: Props) => mutation.mutateAsync(props),
-
-    /** misc */
-    reset: mutation.reset,
-    status: mutation.status,
-    submittedAt: mutation.submittedAt,
-    variables: mutation.variables
+    mutateAsync: (...props: Props) => mutation.mutateAsync(props)
   };
 };
