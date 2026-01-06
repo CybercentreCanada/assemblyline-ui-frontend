@@ -47,6 +47,10 @@ export const stableStringify = (value: unknown): string => {
     return JSON.stringify(value);
   }
 
+  if (value instanceof Date) {
+    return JSON.stringify(value.toISOString());
+  }
+
   if (Array.isArray(value)) {
     return `[${value.map(stableStringify).join(',')}]`;
   }
