@@ -27,3 +27,36 @@ export const getBlobResponse = <R, E>(data: BlobResponse, error: APIResponse<E>,
   size: getValue('size', data, error, failureReason) as number,
   type: getValue('type', data, error, failureReason) as string
 });
+
+/**
+ * Recursively serializes a JSON-serializable value into a **deterministic string**.
+ *
+ * Unlike `JSON.stringify`, this function ensures that object keys are sorted alphabetically,
+ * producing a stable string output for the same content. This is useful for caching, query keys,
+ * and other scenarios where object reference equality cannot be relied upon.
+ *
+ * Constraints:
+ * - Only works with JSON-serializable values (no functions, Symbols, circular references).
+ * - Dates will be converted to ISO strings automatically.
+ *
+ * @param value - Any JSON-serializable value (object, array, primitive)
+ * @returns A deterministic string representation of the value
+ */
+export const stableStringify = (value: unknown): string => {
+  if (value === null || typeof value !== 'object') {
+    return JSON.stringify(value);
+  }
+
+  if (value instanceof Date) {
+    return JSON.stringify(value.toISOString());
+  }
+
+  if (Array.isArray(value)) {
+    return `[${value.map(stableStringify).join(',')}]`;
+  }
+
+  const obj = value as Record<string, unknown>;
+  const keys = Object.keys(obj).sort();
+
+  return `{${keys.map(key => `${JSON.stringify(key)}:${stableStringify(obj[key])}`).join(',')}}`;
+};

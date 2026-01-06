@@ -1,8 +1,8 @@
 import type { UndefinedInitialDataOptions } from '@tanstack/react-query';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import type { APIResponse, BlobResponse } from 'components/core/Query/components/api.models';
+import type { APIQueryKey, APIResponse, BlobResponse } from 'components/core/Query/components/api.models';
 import { DEFAULT_RETRY_MS } from 'components/core/Query/components/constants';
-import { getBlobResponse, isAPIData } from 'components/core/Query/components/utils';
+import { getBlobResponse, isAPIData, stableStringify } from 'components/core/Query/components/utils';
 import useALContext from 'components/hooks/useALContext';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import useQuota from 'components/hooks/useQuota';
@@ -13,7 +13,7 @@ import { useTranslation } from 'react-i18next';
 
 export type UseDownloadBlobProps = {
   queryProps?: Omit<
-    UndefinedInitialDataOptions<Promise<unknown>, APIResponse<Error>, BlobResponse, [unknown]>,
+    UndefinedInitialDataOptions<BlobResponse, APIResponse<Error>, BlobResponse, APIQueryKey>,
     'queryKey' | 'queryFn'
   >;
   allowCache?: boolean;
@@ -37,22 +37,12 @@ export const useDownloadBlob = ({
   const { configuration: systemConfig } = useALContext();
   const { setApiQuotaremaining, setSubmissionQuotaremaining } = useQuota();
 
-  const query = useQuery<Promise<unknown>, APIResponse<Error>, BlobResponse, [unknown]>(
+  const query = useQuery<BlobResponse, APIResponse<Error>, BlobResponse, APIQueryKey>(
     {
       ...queryProps,
-      queryKey: [
-        {
-          url,
-          method: 'GET',
-          allowCache,
-          disabled,
-          reloadOnUnauthorize,
-          retryAfter,
-          systemVersion: systemConfig.system.version
-        }
-      ],
-      retry: (failureCount, error) => failureCount < 1 || error?.api_status_code === 502,
-      retryDelay: failureCount => (failureCount < 1 ? 1000 : Math.min(retryAfter, 10000)),
+      queryKey: [url, 'GET', stableStringify(null), allowCache],
+      retry: (failureCount, error) => failureCount < 3 && error?.api_status_code === 502,
+      retryDelay: failureCount => Math.min(retryAfter * (failureCount + 1), 10000),
       queryFn: async ({ signal }) => {
         // Reject if the query is not enabled
         if (disabled) return Promise.reject(null);

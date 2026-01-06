@@ -88,8 +88,10 @@ const APIKeysSearch = () => {
 
   useEffect(() => {
     if (!search) return;
+
     handleReload(search);
-  }, [handleReload, search]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [handleReload, search.toString()]);
 
   useEffect(() => {
     if (!location.hash || globalDrawerOpened || !apikeySearchResults) return;
