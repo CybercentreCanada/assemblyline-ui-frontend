@@ -1,22 +1,22 @@
-import { describe, it, expect } from 'vitest';
 import type { Theme } from '@mui/material';
 import type {
   SandboxBody,
-  SandboxProcessItem,
-  SandboxSignatureItem,
-  SandboxNetworkHTTP,
   SandboxNetworkDNS,
-  SandboxNetworkSMTP
+  SandboxNetworkHTTP,
+  SandboxNetworkSMTP,
+  SandboxProcessItem,
+  SandboxSignatureItem
 } from 'components/models/base/result_body';
 import {
-  hasObjectData,
   buildProcessTree,
-  getProcessScore,
+  compareIPs,
+  getBackgroundColor,
   getDescendantPids,
   getHighestProcessScore,
-  getBackgroundColor,
-  compareIPs
+  getProcessScore,
+  hasObjectData
 } from 'components/visual/ResultCard/Sandbox/sandbox.utils';
+import { describe, expect, it } from 'vitest';
 
 const mockTheme: Theme = {
   palette: {
@@ -92,16 +92,16 @@ describe('getProcessScore', () => {
 
   it('should return 0 for safelisted process', () => {
     const process: SandboxProcessItem = { pid: 1, safelisted: true, image: '', start_time: '' };
-    const sigs: SandboxSignatureItem[] = [{ pid: [1], score: 5, name: '', type: 'YARA', classification: '' }];
+    const sigs: SandboxSignatureItem[] = [{ pid: [1], score: 5, name: '', type: 'CUCKOO', classification: '' }];
     expect(getProcessScore(process, sigs)).toBe(0);
   });
 
   it('should sum scores for matching signatures', () => {
     const process: SandboxProcessItem = { pid: 1, image: '', start_time: '' };
     const sigs: SandboxSignatureItem[] = [
-      { pid: [1], score: 5, name: '', type: 'YARA', classification: '' },
-      { pid: [1], score: 3, name: '', type: 'YARA', classification: '' },
-      { pid: [2], score: 10, name: '', type: 'YARA', classification: '' }
+      { pid: [1], score: 5, name: '', type: 'CUCKOO', classification: '' },
+      { pid: [1], score: 3, name: '', type: 'CUCKOO', classification: '' },
+      { pid: [2], score: 10, name: '', type: 'CUCKOO', classification: '' }
     ];
     expect(getProcessScore(process, sigs)).toBe(8);
   });
