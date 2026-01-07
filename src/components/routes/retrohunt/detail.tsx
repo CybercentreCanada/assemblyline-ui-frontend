@@ -264,8 +264,7 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
 
   const handleHitRowClick = useCallback(
     (file: FileIndexed, queryString: string) => {
-      const hash = `${file.sha256}${queryString ? `?${queryString}` : ''}`;
-      navigate({ pathname: `/retrohunt/${searchKey}`, hash });
+      navigate({ pathname: `/retrohunt/${searchKey}${queryString ? `?${queryString}` : ''}`, hash: file.sha256 });
     },
     [navigate, searchKey]
   );
