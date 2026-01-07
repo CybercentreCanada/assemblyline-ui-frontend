@@ -144,7 +144,7 @@ export const getBackgroundColor = (
     malicious: theme.palette.error[paletteMode === 'dark' ? 'dark' : 'light'],
     highly_suspicious: theme.palette.warning[paletteMode === 'dark' ? 'dark' : 'light'],
     suspicious: theme.palette.warning[paletteMode === 'dark' ? 'dark' : 'light'],
-    info: theme.palette.grey[800],
+    info: paletteMode === 'dark' ? theme.palette.grey[700] : theme.palette.grey[400],
     safe: theme.palette.success[paletteMode === 'dark' ? 'dark' : 'light']
   };
 

@@ -4,7 +4,7 @@ import type { ObjectID } from 'components/models/ontology/results/process';
 /**
  * Possible signature types.
  */
-export const SIGNATURE_TYPES = ['CUCKOO', 'YARA', 'SIGMA', 'SURICATA'] as const;
+export const SIGNATURE_TYPES = ['CAPE', 'CUCKOO'] as const;
 export type SignatureType = (typeof SIGNATURE_TYPES)[number];
 
 /**
