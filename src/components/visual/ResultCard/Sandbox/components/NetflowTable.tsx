@@ -46,8 +46,7 @@ export const NetflowTable = React.memo(
           meta: {
             cellSx: {
               whiteSpace: 'nowrap',
-              textAlign: 'right',
-              color: theme.palette.text.secondary
+              textAlign: 'right'
             }
           }
         }),

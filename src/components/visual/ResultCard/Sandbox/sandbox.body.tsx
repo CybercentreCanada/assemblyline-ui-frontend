@@ -40,6 +40,7 @@ const Label = React.memo(({ label, quantity, total }: LabelProps) => {
               <span style={{ color: theme.palette.text.primary }}>{total}</span>
             )
           }
+          sx={{ backgroundColor: theme.palette.action.selected }}
         />
       )}
     </div>

@@ -39,7 +39,10 @@ export const ProcessChip = React.memo(({ process, short = false, fullWidth = fal
           alignItems: 'center',
           justifyContent: 'center',
           px: 0.5,
-          backgroundColor: alpha(theme.palette.grey[800], 0.5),
+          backgroundColor: alpha(
+            theme.palette.mode === 'dark' ? theme.palette.grey[800] : theme.palette.grey[300],
+            0.5
+          ),
           whiteSpace: 'nowrap',
           borderRadius: `${theme.shape.borderRadius}px 0 0 ${theme.shape.borderRadius}px`
         }}

@@ -46,8 +46,7 @@ export const ProcessTable = React.memo(
           meta: {
             cellSx: {
               whiteSpace: 'nowrap',
-              textAlign: 'right',
-              color: theme.palette.text.secondary
+              textAlign: 'right'
             }
           }
         }),
@@ -71,8 +70,7 @@ export const ProcessTable = React.memo(
           },
           meta: {
             cellSx: {
-              wordBreak: 'inherit !important',
-              color: theme.palette.text.secondary
+              wordBreak: 'inherit !important'
             }
           }
         }),
