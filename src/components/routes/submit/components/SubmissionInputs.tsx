@@ -40,6 +40,7 @@ import { CheckboxInput } from 'components/visual/Inputs/CheckboxInput';
 import { SelectInput } from 'components/visual/Inputs/SelectInput';
 import { SwitchInput } from 'components/visual/Inputs/SwitchInput';
 import { TextInput } from 'components/visual/Inputs/TextInput';
+import { TextAreaInput } from 'components/visual/Inputs/TextAreaInput';
 import { getSubmitType } from 'helpers/utils';
 import generateUUID from 'helpers/uuid';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -228,6 +229,41 @@ export const SubmissionProfileInput = React.memo(() => {
   );
 });
 
+export const RawInput = React.memo(() => {
+  const { t } = useTranslation(['submit']);
+  const form = useForm();
+
+  return (
+    <form.Subscribe
+      selector={state =>
+        [
+          state.values.state.phase === 'loading',
+          state.values.state.disabled,
+          state.values.state.phase === 'editing',
+          state.values.raw
+        ] as const
+      }
+    >
+      {([loading, disabled, isEditing, value]) => (
+        <TextAreaInput
+          id="raw-textarea"
+          label={t('raw.input.label')}
+          tooltip={t('raw.input.tooltip')}
+          placeholder={t('raw.input.placeholder')}
+          value={value ?? ''}
+          maxRows={13}
+          minRows={6}
+          loading={loading}
+          disabled={disabled || !isEditing}
+          onChange={(_, v) => form.setFieldValue('raw', v)}
+          tiny
+          monospace
+        />
+      )}
+    </form.Subscribe>
+  );
+});
+
 export const MaliciousInput = React.memo(() => {
   const { t } = useTranslation(['submit']);
   const form = useForm();
@@ -409,22 +445,26 @@ export const CancelButton = React.memo(() => {
           state.values.state.disabled,
           state.values.state.tab,
           !state.values.file,
-          !state.values.hash.type
+          !state.values.hash.type,
+          !(state.values.raw && state.values.raw.length > 0)
         ] as const
       }
     >
-      {([loading, disabled, tab, file, hash]) => (
+      {([loading, disabled, tab, file, hash, noRaw]) => (
         <Button
           tooltip={t('cancel.button.tooltip')}
           tooltipProps={{ placement: 'bottom' }}
           color="primary"
           loading={loading}
-          disabled={disabled || (tab === 'file' ? file : tab === 'hash' ? hash : false)}
+          disabled={
+            disabled || (tab === 'file' ? file : tab === 'hash' ? hash : tab === 'raw' ? noRaw : false)
+          }
           variant="outlined"
           onClick={() => {
             form.setFieldValue('file', null);
             form.setFieldValue('hash.type', null);
             form.setFieldValue('hash.value', '');
+            form.setFieldValue('raw', '');
             form.setFieldValue('state.phase', 'editing');
             form.setFieldValue('state.progress', null);
             form.setFieldValue('state.uuid', generateUUID());
@@ -604,13 +644,14 @@ const AnalyzeButton = React.memo(({ children, ...props }: ButtonProps) => {
           state.values.state.tab,
           !state.values.file,
           !state.values.hash.type,
+          !(state.values.raw && state.values.raw.length > 0),
           state.values.state.progress
         ] as const
       }
     >
-      {([phase, disabled, tab, file, hash, progress]) => (
+      {([phase, disabled, tab, file, hash, noRaw, progress]) => (
         <Button
-          disabled={disabled || (tab === 'file' ? file : tab === 'hash' ? hash : false)}
+          disabled={disabled || (tab === 'file' ? file : tab === 'hash' ? hash : tab === 'raw' ? noRaw : false)}
           loading={phase === 'loading'}
           progress={phase !== 'editing'}
           tooltip={t('submit.button.tooltip')}
@@ -752,6 +793,62 @@ export const FileSubmit = React.memo(({ onClick = () => null, ...props }: Button
   );
 });
 
+const RawSubmit = React.memo(({ onClick = () => null, ...props }: ButtonProps) => {
+  const { t } = useTranslation(['submit']);
+  const form = useForm();
+  const navigate = useNavigate();
+  const { apiCall } = useMyAPI();
+  const { closeSnackbar, showErrorMessage, showSuccessMessage } = useMySnackbar();
+
+  const handleSubmit = useCallback(
+    () => {
+      closeSnackbar();
+
+      const raw = form.getFieldValue('raw');
+      const params = form.getFieldValue('settings');
+      const metadata = form.getFieldValue('metadata');
+      const profile = form.getFieldValue('state.profile');
+
+      apiCall<Submission>({
+        url: '/api/v4/submit/',
+        method: 'POST',
+        body: {
+          ui_params: parseSubmitProfile(params),
+          submission_profile: profile,
+          plaintext: raw,
+          name: 'raw.txt',
+          metadata: metadata.data
+        },
+        onEnter: () => {
+          form.setFieldValue('state.phase', 'uploading');
+          form.setFieldValue('autoURLServiceSelection.open', false);
+        },
+        onSuccess: ({ api_response }) => {
+          showSuccessMessage(`${t('upload.snackbar.success')} ${api_response.sid}`);
+          form.setFieldValue('state.phase', 'redirecting');
+          setTimeout(() => navigate(`/submission/detail/${api_response.sid}`), 1000);
+        },
+        onFailure: ({ api_error_message }) => {
+          showErrorMessage(api_error_message);
+          form.setFieldValue('state.phase', 'editing');
+        }
+      });
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [form, navigate, showErrorMessage, showSuccessMessage, t]
+  );
+
+  return (
+    <AnalyzeButton
+      {...props}
+      onClick={e => {
+        onClick(e);
+        handleSubmit();
+      }}
+    />
+  );
+});
+
 const HashSubmit = React.memo(({ onClick = () => null, ...props }: ButtonProps) => {
   const { t } = useTranslation(['submit']);
   const form = useForm();
@@ -834,11 +931,12 @@ const ExternalServicesDialog = React.memo(() => {
           [
             state.values.state.tab === 'file' && !!state.values.file,
             state.values.state.tab === 'hash' && !!state.values.hash.type,
+            state.values.state.tab === 'raw' && !!state.values.raw && state.values.raw.length > 0,
             state.values.autoURLServiceSelection.open
           ] as const
         }
       >
-        {([isFile, isHash, confirmation]) => (
+        {([isFile, isHash, isRaw, confirmation]) => (
           <Dialog
             aria-labelledby={t('external_services.dialog.title')}
             aria-describedby={t('external_services.dialog.content')}
@@ -865,6 +963,13 @@ const ExternalServicesDialog = React.memo(() => {
                   </HashSubmit>
                   <HashSubmit variant="text">{t('external_services.dialog.action.continue')}</HashSubmit>
                 </>
+              ) : isRaw ? (
+                <>
+                  <RawSubmit color="secondary" variant="text" onClick={() => handleDeselectExternalServices()}>
+                    {t('external_services.dialog.action.deselect')}
+                  </RawSubmit>
+                  <RawSubmit variant="text">{t('external_services.dialog.action.continue')}</RawSubmit>
+                </>
               ) : null}
             </DialogActions>
           </Dialog>
@@ -885,17 +990,20 @@ export const AnalyzeSubmission = React.memo(() => {
         [
           state.values.state.tab === 'file' && !!state.values.file,
           state.values.state.tab === 'hash' && !!state.values.hash.type,
+          state.values.state.tab === 'raw' && !!state.values.raw && state.values.raw.length > 0,
           state.values.state.phase === 'loading' ? false : isUsingExternalServices(state.values.settings, configuration)
         ] as const
       }
     >
-      {([isFile, isHash, isExternal]) =>
+      {([isFile, isHash, isRaw, isExternal]) =>
         isExternal ? (
           <ExternalServicesDialog />
         ) : isFile ? (
           <FileSubmit />
         ) : isHash ? (
           <HashSubmit />
+        ) : isRaw ? (
+          <RawSubmit />
         ) : (
           <AnalyzeButton disabled />
         )

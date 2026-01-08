@@ -16,6 +16,7 @@ import {
   AnalyzeSubmission,
   CancelButton,
   ClassificationInput,
+  RawInput,
   CustomizabilityAlert,
   ExternalServices,
   ExternalSources,
@@ -233,6 +234,10 @@ const WrappedSubmitRoute = () => {
                         hash: {
                           label: configuration.ui.allow_url_submissions ? t('tab.label.url') : t('tab.label.hash'),
                           disabled: disabled || !editing
+                        },
+                        raw: {
+                          label: t('tab.label.raw'),
+                          disabled: disabled || !editing
                         }
                       }}
                       sx={{
@@ -244,7 +249,9 @@ const WrappedSubmitRoute = () => {
 
                 <form.Subscribe
                   selector={state => [state.values.state.tab] as const}
-                  children={([tab]) => (tab === 'file' ? <FileInput /> : tab === 'hash' ? <HashInput /> : null)}
+                  children={([tab]) =>
+                    tab === 'file' ? <FileInput /> : tab === 'hash' ? <HashInput /> : tab === 'raw' ? <RawInput /> : null
+                  }
                 />
 
                 <SubmissionProfileInput />
