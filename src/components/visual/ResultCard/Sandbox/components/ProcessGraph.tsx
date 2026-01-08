@@ -323,10 +323,12 @@ export const ProcessGraph = React.memo(
     onActiveChange = () => null,
     onFilterChange = () => null
   }: ProcessGraphProps) => {
+    const theme = useTheme();
+
     const processTree = useMemo(() => buildProcessTree(body?.processes ?? []), [body.processes]);
 
     return (
-      <div style={{ overflowX: 'auto', maxHeight: printable ? 'auto' : 480 }}>
+      <div style={{ overflowX: 'auto', maxHeight: printable ? 'auto' : 480, paddingRight: theme.spacing(2) }}>
         <List disablePadding dense>
           {processTree.map(item => (
             <ProcessTreeItem
