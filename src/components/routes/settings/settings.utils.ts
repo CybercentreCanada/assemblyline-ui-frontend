@@ -8,6 +8,7 @@ import _ from 'lodash';
  * Keys that belong to the "interface" part of user settings.
  */
 export const INTERFACE_KEYS = [
+  'classification',
   'default_external_sources',
   'default_zip_password',
   'download_encoding',
@@ -22,7 +23,6 @@ export const INTERFACE_KEYS = [
  * Profile-related keys that can be overridden by submission profiles.
  */
 export const PROFILE_KEYS = [
-  'classification',
   'deep_scan',
   'description',
   'generate_alert',

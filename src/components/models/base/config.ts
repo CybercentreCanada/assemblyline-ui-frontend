@@ -220,7 +220,7 @@ export type SystemSupport = {
 
   /** Support email for the system */
   email?: string;
-}
+};
 
 /** System Configuration */
 export type System = {
@@ -444,9 +444,6 @@ export type SubmissionProfileParams = {
 
   /** When the submission is archived, should we delete it from hot storage right away? */
   delete_after_archive?: boolean;
-
-  /** Default submission classification */
-  classification?: string;
 
   /** Should this submission generate an alert? */
   generate_alert?: boolean;
@@ -688,7 +685,7 @@ export const CONFIGURATION: Configuration = {
     type: 'development',
     support: {
       documentation: 'https://cybercentrecanada.github.io/assemblyline4_docs/',
-      email: '',
+      email: ''
     },
     version: ''
   },
