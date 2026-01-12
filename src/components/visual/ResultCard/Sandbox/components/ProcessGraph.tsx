@@ -217,6 +217,8 @@ const ProcessTreeItem = React.memo(
               component={Button}
               color="inherit"
               style={{
+                userSelect: 'text',
+                WebkitUserSelect: 'text',
                 textTransform: 'none',
                 width: '100%',
                 display: 'flex',

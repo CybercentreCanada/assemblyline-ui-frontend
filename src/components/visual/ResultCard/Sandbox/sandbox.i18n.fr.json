@@ -26,7 +26,7 @@
   "mimetype": "Type MIME",
   "name": "Nom",
   "netflows": "Flux réseau",
-  "no_results_desc": "La requête que vous avez exécutée n’a retourné aucun résultat.",
+  "no_results_desc": "La requête de recherche n’a retourné aucun résultat.",
   "no_results_title": "Aucun résultat trouvé !",
   "original_file_name": "Nom du fichier",
   "parent_process": "Processus parent",
