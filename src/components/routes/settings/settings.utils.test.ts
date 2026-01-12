@@ -223,7 +223,7 @@ describe('loadSubmissionProfile', () => {
   it('applies restrictions for non-admins', () => {
     const restricted = {
       static: deepMerge(MOCK_PROFILES.static, {
-        restricted_params: { submission: ['priority', 'classification'] }
+        restricted_params: { submission: ['priority'] }
       })
     };
 
@@ -231,7 +231,6 @@ describe('loadSubmissionProfile', () => {
     loadSubmissionProfile(out, MOCK_SETTINGS, restricted, MOCK_USER, 'static');
 
     expect(out.priority.restricted).toBe(true);
-    expect(out.classification.restricted).toBe(true);
   });
 
   it('applies nested service selections', () => {

@@ -4,7 +4,6 @@ import { useForm } from 'components/routes/settings/settings.form';
 import { PageSection } from 'components/visual/Layouts/PageSection';
 import { List } from 'components/visual/List/List';
 import { BooleanListInput } from 'components/visual/ListInputs/BooleanListInput';
-import { ClassificationListInput } from 'components/visual/ListInputs/ClassificationListInput';
 import { NumberListInput } from 'components/visual/ListInputs/NumberListInput';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -13,14 +12,14 @@ export const SubmissionSection = React.memo(() => {
   const { t } = useTranslation(['settings']);
   const theme = useTheme();
   const form = useForm();
-  const { configuration, c12nDef } = useALContext();
+  const { configuration } = useALContext();
 
   const maxTTL = useMemo<number>(() => {
     if (!configuration?.submission) return 365;
     return configuration.submission.max_dtl !== 0 ? configuration.submission.max_dtl : 365;
   }, [configuration]);
 
-  if (!configuration || !c12nDef) return null;
+  if (!configuration) return null;
 
   return (
     <form.Subscribe
@@ -40,27 +39,6 @@ export const SubmissionSection = React.memo(() => {
           />
 
           <List>
-            {c12nDef.enforce && (
-              <form.Subscribe
-                selector={state => {
-                  const param = state.values.settings.classification;
-                  return [param.value, param.default, param.restricted] as const;
-                }}
-              >
-                {([value, defaultValue, restricted]) => (
-                  <ClassificationListInput
-                    id="settings:submissions.classification"
-                    primary={t('settings:submissions.classification')}
-                    secondary={t('settings:submissions.classification_desc')}
-                    value={value ?? defaultValue}
-                    loading={loading}
-                    disabled={disabled || !(customize || !restricted)}
-                    onChange={(e, v) => form.setFieldValue(`settings.classification.value`, v)}
-                  />
-                )}
-              </form.Subscribe>
-            )}
-
             {/* TTL */}
             <form.Subscribe
               selector={state => {
