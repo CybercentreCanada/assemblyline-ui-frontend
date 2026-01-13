@@ -82,7 +82,7 @@ const ServiceGeneral = ({
               reset={showReset(service, defaults, 'version')}
               options={versions.map(v => ({ primary: v, value: v }))}
               onChange={(e, v) => {
-                setModified(true);
+                if (service?.version !== v) setModified(true);
                 setService(s => ({ ...s, version: v }));
                 setServiceVersion(v);
               }}
@@ -110,7 +110,7 @@ const ServiceGeneral = ({
                 defaultValue={!service ? undefined : defaults?.classification}
                 reset={showReset(service, defaults, 'classification')}
                 onChange={(e, v) => {
-                  setModified(true);
+                  if (service?.classification !== v) setModified(true);
                   setService(s => ({ ...s, classification: v }));
                 }}
               />
@@ -126,7 +126,7 @@ const ServiceGeneral = ({
                 defaultValue={!service ? undefined : defaults?.default_result_classification}
                 reset={showReset(service, defaults, 'default_result_classification')}
                 onChange={(e, v) => {
-                  setModified(true);
+                  if (service?.default_result_classification !== v) setModified(true);
                   setService(s => ({ ...s, default_result_classification: v }));
                 }}
               />
@@ -142,7 +142,7 @@ const ServiceGeneral = ({
               reset={showReset(service, defaults, 'description')}
               rows={6}
               onChange={(e, v) => {
-                setModified(true);
+                if (service?.description !== v) setModified(true);
                 setService(s => ({ ...s, description: v }));
               }}
             />
@@ -161,7 +161,7 @@ const ServiceGeneral = ({
                   : constants.stages.map(s => ({ primary: s, value: s }))
               }
               onChange={(e, v) => {
-                setModified(true);
+                if (service?.stage !== v) setModified(true);
                 setService(s => ({ ...s, stage: v }));
               }}
             />
@@ -180,7 +180,7 @@ const ServiceGeneral = ({
                   : constants.categories.map(s => ({ primary: s, value: s }))
               }
               onChange={(e, v) => {
-                setModified(true);
+                if (service?.category !== v) setModified(true);
                 setService(s => ({ ...s, category: v }));
               }}
             />
@@ -194,7 +194,7 @@ const ServiceGeneral = ({
               defaultValue={!service ? undefined : defaults?.accepts}
               reset={showReset(service, defaults, 'accepts')}
               onChange={(e, v) => {
-                setModified(true);
+                if (service?.accepts !== v) setModified(true);
                 setService(s => ({ ...s, accepts: v }));
               }}
             />
@@ -208,7 +208,7 @@ const ServiceGeneral = ({
               defaultValue={!service ? undefined : defaults?.rejects}
               reset={showReset(service, defaults, 'rejects')}
               onChange={(e, v) => {
-                setModified(true);
+                if (service?.rejects !== v) setModified(true);
                 setService(s => ({ ...s, rejects: v }));
               }}
             />
@@ -226,7 +226,7 @@ const ServiceGeneral = ({
               disableCloseOnSelect
               filterSelectedOptions
               onChange={(e, v) => {
-                setModified(true);
+                if (service?.recursion_prevention !== v) setModified(true);
                 setService(s => ({ ...s, recursion_prevention: v }));
               }}
               renderOption={(props, option, state) => (
@@ -263,7 +263,7 @@ const ServiceGeneral = ({
               defaultValue={!service ? undefined : defaults?.timeout}
               reset={showReset(service, defaults, 'timeout')}
               onChange={(e, v) => {
-                setModified(true);
+                if (service?.timeout !== v) setModified(true);
                 setService(s => ({ ...s, timeout: v }));
               }}
             />
@@ -284,7 +284,7 @@ const ServiceGeneral = ({
                 service.licence_count > 0 && val > service.licence_count ? t('general.instances.error') : null
               }
               onChange={(e, v) => {
-                setModified(true);
+                if (service?.min_instances !== v) setModified(true);
                 setService(s => ({ ...s, min_instances: !v ? 0 : s.licence_count ? Math.min(s.licence_count, v) : v }));
               }}
             />
@@ -301,7 +301,7 @@ const ServiceGeneral = ({
               min={0}
               endAdornment="↑"
               onChange={(e, v) => {
-                setModified(true);
+                if (service?.licence_count !== v) setModified(true);
                 setService(s => ({
                   ...s,
                   ...(!v
@@ -323,7 +323,7 @@ const ServiceGeneral = ({
               reset={showReset(service, defaults, 'max_queue_length')}
               min={0}
               onChange={(e, v) => {
-                setModified(true);
+                if (service?.max_queue_length !== v) setModified(true);
                 setService(s => ({ ...s, max_queue_length: v }));
               }}
             />
@@ -343,7 +343,7 @@ const ServiceGeneral = ({
                 ] as const
               }
               onChange={(e, v) => {
-                setModified(true);
+                if (service?.is_external !== v) setModified(true);
                 setService(s => ({ ...s, is_external: v }));
               }}
             />
@@ -363,7 +363,7 @@ const ServiceGeneral = ({
                 ] as const
               }
               onChange={(e, v) => {
-                setModified(true);
+                if (service?.disable_cache !== v) setModified(true);
                 setService(s => ({ ...s, disable_cache: v }));
               }}
             />
