@@ -122,10 +122,10 @@ const WrappedSubmitRoute = () => {
   const setClassificationFromURL = useCallback(
     (state: SubmitState, search: URLSearchParams) => {
       if (state?.c12n) {
-        form.setFieldValue('settings.classification.value', state.c12n);
+        form.setFieldValue('settings.default_classification.value', state.c12n);
       } else {
         const c12 = search.get('classification');
-        if (c12) form.setFieldValue('settings.classification.value', c12);
+        if (c12) form.setFieldValue('settings.default_classification.value', c12);
       }
     },
     [form]

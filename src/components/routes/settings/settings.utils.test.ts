@@ -299,21 +299,21 @@ describe('hasDifferentPreviousSubmissionValues', () => {
 describe('resetPreviousSubmissionValues / updatePreviousSubmissionValues', () => {
   it('resets values', () => {
     const p = init();
-    p.classification.value = 'TEMP';
+    p.default_classification.value = 'TEMP';
     p.service_spec[0].params[0].value = 'TEMP';
 
     const r = resetPreviousSubmissionValues(p);
-    expect(r.classification.value).toBe(r.classification.prev);
+    expect(r.default_classification.value).toBe(r.default_classification.prev);
     expect(r.service_spec[0].params[0].value).toBe(r.service_spec[0].params[0].prev);
   });
 
   it('updates prev values', () => {
     const p = init();
-    p.classification.value = 'NEW';
+    p.default_classification.value = 'NEW';
     p.service_spec[0].params[0].value = 'X';
 
     const r = updatePreviousSubmissionValues(p);
-    expect(r.classification.prev).toBe('NEW');
+    expect(r.default_classification.prev).toBe('NEW');
     expect(r.service_spec[0].params[0].prev).toBe('X');
   });
 });

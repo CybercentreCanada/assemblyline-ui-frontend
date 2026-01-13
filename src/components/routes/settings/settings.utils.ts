@@ -8,7 +8,7 @@ import _ from 'lodash';
  * Keys that belong to the "interface" part of user settings.
  */
 export const INTERFACE_KEYS = [
-  'classification',
+  'default_classification',
   'default_external_sources',
   'default_zip_password',
   'download_encoding',

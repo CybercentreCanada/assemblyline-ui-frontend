@@ -8,11 +8,11 @@ export type Encoding = (typeof ENCODINGS)[number];
 export type View = (typeof VIEWS)[number];
 
 export type UserSettings = {
-  /** Default submission classification */
-  classification: string;
-
   /** Should a deep scan be performed? */
   deep_scan: boolean;
+
+  /** Default classification for submissions */
+  default_classification: string;
 
   /** List of sha256 sources to check by default */
   default_external_sources: string[];

@@ -63,7 +63,7 @@ export const ClassificationInput = React.memo(() => {
           state.values.state.disabled,
           state.values.state.customize,
           state.values.state.phase === 'editing',
-          state.values.settings?.classification?.value
+          state.values.settings?.default_classification?.value
         ] as const
       }
     >
@@ -75,7 +75,7 @@ export const ClassificationInput = React.memo(() => {
             type="picker"
             c12n={loading ? null : value}
             disabled={disabled || !isEditing || !customize}
-            setClassification={v => form.setFieldValue('settings.classification.value', v)}
+            setClassification={v => form.setFieldValue('settings.default_classification.value', v)}
           />
         </div>
       )}

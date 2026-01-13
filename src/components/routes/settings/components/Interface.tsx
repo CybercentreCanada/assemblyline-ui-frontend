@@ -179,7 +179,7 @@ export const InterfaceSection = React.memo(() => {
               {c12nDef.enforce && (
                 <form.Subscribe
                   selector={state => {
-                    const param = state.values.settings.classification;
+                    const param = state.values.settings.default_classification;
                     return [param.value] as const;
                   }}
                 >
@@ -191,7 +191,7 @@ export const InterfaceSection = React.memo(() => {
                       value={value}
                       loading={loading}
                       disabled={disabled || !customize}
-                      onChange={(e, v) => form.setFieldValue(`settings.classification.value`, v)}
+                      onChange={(e, v) => form.setFieldValue(`settings.default_classification.value`, v)}
                     />
                   )}
                 </form.Subscribe>

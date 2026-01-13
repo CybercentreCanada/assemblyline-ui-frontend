@@ -1,7 +1,7 @@
 import type { UserSettings } from 'components/models/base/user_settings';
 
 export const MOCK_SETTINGS: UserSettings = {
-  classification: 'TLP:CLEAR',
+  default_classification: 'TLP:CLEAR',
   default_external_sources: [],
   default_zip_password: 'infected',
   download_encoding: 'cart',
