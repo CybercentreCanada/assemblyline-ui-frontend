@@ -39,6 +39,7 @@ const MOCK_SUBMIT_STORE: SubmitStore = {
     hash: '01020304'
   },
   hash: { type: null, value: '' },
+  raw: null,
   settings: initializeSettings(MOCK_SETTINGS),
   metadata: { data: {}, edit: '' },
   autoURLServiceSelection: { open: false, prev: [] }
