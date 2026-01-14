@@ -94,7 +94,7 @@ export type SubmitStore = {
     profile: string | null;
 
     /** Type of submission being made */
-    tab: 'file' | 'hash';
+    tab: 'file' | 'hash' | 'raw';
 
     /** Upload progress of a file submission */
     progress: number;
@@ -120,6 +120,9 @@ export type SubmitStore = {
 
   /** Selected metadata of the submission */
   metadata: SubmitMetadata;
+
+  /** Raw plaintext input for direct text submissions */
+  raw: string | null;
 
   /** All the user's settings */
   settings: ProfileSettings | null;
@@ -153,6 +156,7 @@ export const DEFAULT_SUBMIT_FORM: SubmitStore = {
     type: null,
     value: null
   },
+  raw: null,
   metadata: {
     edit: null,
     data: {}
