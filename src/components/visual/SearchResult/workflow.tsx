@@ -6,6 +6,7 @@ import TableContainer from '@mui/material/TableContainer';
 import useALContext from 'components/hooks/useALContext';
 import type { WorkflowIndexed } from 'components/models/base/workflow';
 import type { SearchResult } from 'components/models/ui/search';
+import { AlertPriority, AlertStatus } from 'components/routes/alerts/components/Components';
 import Classification from 'components/visual/Classification';
 import {
   DivTable,
@@ -70,8 +71,12 @@ const WrappedWorflowTable: React.FC<Props> = ({ workflowResults, setWorkflowID =
                   {workflow.last_seen && <Moment variant="fromNow">{workflow.last_seen}</Moment>}
                 </DivTableCell>
                 <DivTableCell>{workflow.name}</DivTableCell>
-                <DivTableCell>{workflow.priority}</DivTableCell>
-                <DivTableCell>{workflow.status}</DivTableCell>
+                <DivTableCell>
+                  <AlertPriority name={workflow.priority} withChip />
+                </DivTableCell>
+                <DivTableCell>
+                  <AlertStatus name={workflow.status} />
+                </DivTableCell>
                 <DivTableCell>{workflow.hit_count}</DivTableCell>
                 {c12nDef.enforce && (
                   <DivTableCell>
