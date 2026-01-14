@@ -2,14 +2,20 @@ import type { UndefinedInitialDataOptions } from '@tanstack/react-query';
 import type { UseAPIQueryProps } from 'components/core/Query/API/useAPIQuery';
 import { useAPIQuery } from 'components/core/Query/API/useAPIQuery';
 import type { ALRequests, ALResponses } from 'components/core/Query/components/al.models';
-import type { APIResponse } from 'components/core/Query/components/api.models';
+import type { APIQueryKey, APIResponse } from 'components/core/Query/components/api.models';
 import type { UseAPICallFnProps } from 'components/core/Query/components/useAPICallFn';
 
 export type UseALQueryProps<Request extends ALRequests> = {
   queryProps?: Omit<
-    UndefinedInitialDataOptions<Promise<undefined>, APIResponse<string>, APIResponse<ALResponses<Request>>, [unknown]>,
+    UndefinedInitialDataOptions<
+      APIResponse<ALResponses<Request>>,
+      APIResponse<string>,
+      APIResponse<ALResponses<Request>>,
+      APIQueryKey
+    >,
     'queryKey' | 'queryFn'
   >;
+  allowCache?: boolean;
   delay?: number;
   disabled?: boolean;
   retryAfter?: number;
@@ -19,6 +25,7 @@ export const useALQuery = <Request extends ALRequests>({
   url,
   method = 'GET',
   body = null,
+  allowCache = false,
   disabled = false,
   ...props
 }: UseALQueryProps<Request>) =>
@@ -32,5 +39,6 @@ export const useALQuery = <Request extends ALRequests>({
     method,
     body: method !== 'GET' ? body : null,
     disabled,
+    allowCache,
     ...props
   } as UseAPIQueryProps<ALResponses<Request>, Request, string>);

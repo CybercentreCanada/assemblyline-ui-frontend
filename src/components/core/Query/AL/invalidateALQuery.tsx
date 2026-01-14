@@ -1,6 +1,6 @@
-import type { Query } from '@tanstack/react-query';
 import { queryClient } from 'components/core/Query/components/APIProvider';
 import type { ALRequests } from 'components/core/Query/components/al.models';
+import type { APIQueryKey, APIRequest } from 'components/core/Query/components/api.models';
 import { DEFAULT_INVALIDATE_DELAY } from 'components/core/Query/components/constants';
 
 function isObject(variable) {
@@ -13,18 +13,30 @@ export const invalidateALQuery = <Request extends ALRequests>(
 ) =>
   setTimeout(async () => {
     await queryClient.invalidateQueries({
-      predicate: ({ queryKey }: Query<unknown, Error, unknown, [ALRequests]>) => {
+      predicate: ({ queryKey }) => {
         try {
+          const [url, method, bodyStr] = queryKey as unknown as APIQueryKey;
+          let body: APIRequest['body'] = null;
+          if (typeof bodyStr === 'string') {
+            try {
+              body = JSON.parse(bodyStr);
+            } catch {
+              body = bodyStr;
+            }
+          }
+          const req: APIRequest = { url, method, body };
+
           return (
-            typeof queryKey[0] === 'object' &&
-            queryKey[0] &&
-            (!('url' in request) ? true : queryKey[0].url.startsWith(request?.url)) &&
-            (!('method' in request) ? true : (request?.method || 'GET') === queryKey[0].method) &&
+            (!('url' in request) ? true : req.url.startsWith(request?.url as string)) &&
+            (!('method' in request) ? true : (request?.method || 'GET') === req.method) &&
             (!('body' in request)
               ? true
               : !isObject(request?.body)
-              ? (request?.body || null) === queryKey[0].body
-              : Object.keys(request?.body).every(key => Object.prototype.hasOwnProperty.call(queryKey[0].body, key)))
+                ? (request?.body ?? null) === req.body
+                : isObject(req.body) &&
+                  Object.keys(request?.body as object).every(key =>
+                    Object.prototype.hasOwnProperty.call(req.body as object, key)
+                  ))
           );
         } catch (err) {
           return false;

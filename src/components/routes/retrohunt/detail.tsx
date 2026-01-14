@@ -263,8 +263,8 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
   );
 
   const handleHitRowClick = useCallback(
-    (file: FileIndexed) => {
-      navigate({ pathname: `/retrohunt/${searchKey}`, hash: file.sha256 });
+    (file: FileIndexed, queryString: string) => {
+      navigate({ pathname: `/retrohunt/${searchKey}${queryString ? `?${queryString}` : ''}`, hash: file.sha256 });
     },
     [navigate, searchKey]
   );
@@ -787,7 +787,7 @@ function WrappedRetrohuntDetailPage({ search_key: propKey = null, isDrawer = fal
                                       style={{ textDecoration: 'none' }}
                                       onClick={event => {
                                         event.preventDefault();
-                                        handleHitRowClick(file);
+                                        handleHitRowClick(file, query?.toString());
                                       }}
                                       selected={
                                         isDrawer
