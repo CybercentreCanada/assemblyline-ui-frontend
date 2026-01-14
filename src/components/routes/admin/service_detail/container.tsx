@@ -4,7 +4,6 @@ import type { DockerConfig, PersistentVolume, Service } from 'components/models/
 import ContainerCard from 'components/routes/admin/service_detail/container_card';
 import ContainerDialog from 'components/routes/admin/service_detail/container_dialog';
 import { showReset } from 'components/routes/admin/service_detail/service.utils';
-import { RadioInput } from 'components/visual/Inputs/RadioInput';
 import { SelectInput } from 'components/visual/Inputs/SelectInput';
 import type { Dispatch, SetStateAction } from 'react';
 import { useCallback, useState } from 'react';
@@ -77,26 +76,6 @@ const ServiceContainer = ({ service, defaults, setService, setModified }: Servic
           onChange={(e, v) => {
             if (service?.update_channel !== v) setModified(true);
             setService({ ...service, update_channel: v });
-          }}
-        />
-      </Grid>
-
-      <Grid size={{ xs: 12 }}>
-        <RadioInput
-          label={t('container.privileged')}
-          loading={!service}
-          value={!service ? null : service.privileged}
-          defaultValue={!service ? undefined : !!defaults?.privileged}
-          reset={showReset(service, defaults, 'privileged')}
-          options={
-            [
-              { value: true, label: t('container.privileged.true') },
-              { value: false, label: t('container.privileged.false') }
-            ] as const
-          }
-          onChange={(e, v) => {
-            if (service?.privileged !== v) setModified(true);
-            setService({ ...service, privileged: v });
           }}
         />
       </Grid>
