@@ -21,7 +21,7 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
     paddingLeft: theme.spacing(1)
   },
   ['&.MuiTableCell-head']: {
-    backgroundColor: 'rgba(0, 0, 0, 5%)',
+    backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 5%)' : 'rgba(0, 0, 0, 5%)',
     whiteSpace: 'nowrap'
   }
 }));
@@ -35,7 +35,7 @@ const BreakableTableCell = styled(TableCell)(({ theme }) => ({
     }
   },
   ['&.MuiTableCell-head']: {
-    backgroundColor: 'rgba(0, 0, 0, 5%)',
+    backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 5%)' : 'rgba(0, 0, 0, 5%)',
     whiteSpace: 'nowrap'
   }
 }));

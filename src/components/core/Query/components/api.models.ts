@@ -31,12 +31,19 @@ export type APIReturn<Response = unknown> = {
   statusCode: number;
 };
 
-export type APIQueryKey<Body extends object = object> = {
-  body: Body;
-  contentType: string;
-  enabled: boolean;
-  method: string;
-  reloadOnUnauthorize: boolean;
-  url: string;
-  [key: string]: unknown;
-};
+export type APIQueryKey = [
+  string, // URL
+  Method, // Method
+  string, // Stringified Body
+  boolean // allowCache
+];
+
+// export type APIQueryKey<Body extends object = object> = {
+//   body: Body;
+//   contentType: string;
+//   enabled: boolean;
+//   method: string;
+//   reloadOnUnauthorize: boolean;
+//   url: string;
+//   [key: string]: unknown;
+// };

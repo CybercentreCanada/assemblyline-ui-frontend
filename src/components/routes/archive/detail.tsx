@@ -40,7 +40,7 @@ import { Navigate, useLocation, useNavigate, useParams } from 'react-router';
 
 type Params = {
   id?: string;
-  tab?: string;
+  tab?: 'details' | 'detection' | 'tags' | 'relations' | 'ascii' | 'code' | 'hex' | 'image' | 'community';
 };
 
 type Props = {
