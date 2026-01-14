@@ -1,8 +1,8 @@
 import type { UndefinedInitialDataOptions } from '@tanstack/react-query';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import type { APIResponse } from 'components/core/Query/components/api.models';
+import type { APIQueryKey, APIResponse } from 'components/core/Query/components/api.models';
 import { DEFAULT_RETRY_MS } from 'components/core/Query/components/constants';
-import { getAPIResponse, isAPIData } from 'components/core/Query/components/utils';
+import { getAPIResponse, isAPIData, stableStringify } from 'components/core/Query/components/utils';
 import useALContext from 'components/hooks/useALContext';
 import type { LoginParamsProps } from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
@@ -10,16 +10,15 @@ import useQuota from 'components/hooks/useQuota';
 import type { Configuration } from 'components/models/base/config';
 import type { CustomUser, WhoAmIProps } from 'components/models/ui/user';
 import getXSRFCookie from 'helpers/xsrf';
-import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export type UseBootstrapQueryProps = {
   queryProps?: Omit<
     UndefinedInitialDataOptions<
-      Promise<unknown>,
+      APIResponse<Configuration | LoginParamsProps | WhoAmIProps>,
       APIResponse<Error>,
       APIResponse<Configuration | LoginParamsProps | WhoAmIProps>,
-      [unknown]
+      APIQueryKey
     >,
     'queryKey' | 'queryFn'
   >;
@@ -30,6 +29,7 @@ export type UseBootstrapQueryProps = {
   setReady: (layout: boolean, borealis: boolean, iconifyUrl: string) => void;
   disabled?: boolean;
   retryAfter?: number;
+  allowCache?: boolean;
 };
 
 export const useBootstrapQuery = ({
@@ -40,7 +40,8 @@ export const useBootstrapQuery = ({
   setUser = () => null,
   setReady = () => null,
   disabled = false,
-  retryAfter = DEFAULT_RETRY_MS
+  retryAfter = DEFAULT_RETRY_MS,
+  allowCache = false
 }: UseBootstrapQueryProps) => {
   const queryClient = useQueryClient();
   const { t } = useTranslation();
@@ -49,24 +50,17 @@ export const useBootstrapQuery = ({
   const { setApiQuotaremaining, setSubmissionQuotaremaining } = useQuota();
 
   const query = useQuery<
-    Promise<unknown>,
+    APIResponse<Configuration | LoginParamsProps | WhoAmIProps>,
     APIResponse<Error>,
     APIResponse<Configuration | LoginParamsProps | WhoAmIProps>,
-    [unknown]
+    APIQueryKey
   >(
     {
       ...queryProps,
       enabled: !disabled,
-      queryKey: [
-        {
-          url: '/api/v4/user/whoami/',
-          method: 'GET',
-          body: null,
-          disabled: disabled
-        }
-      ],
+      queryKey: ['/api/v4/user/whoami/', 'GET', stableStringify(null), allowCache],
       retry: (failureCount, error) => failureCount < 1 || error?.api_status_code === 502,
-      retryDelay: failureCount => (failureCount < 1 ? 1000 : Math.min(retryAfter, 10000)),
+      retryDelay: failureCount => Math.min(retryAfter * (failureCount + 1), 10000),
       queryFn: async ({ signal }) => {
         // Reject if the query is not enabled
         if (disabled) {
@@ -175,67 +169,13 @@ export const useBootstrapQuery = ({
     queryClient
   );
 
-  const { data, error, serverVersion, statusCode } = useMemo(
-    () => getAPIResponse(query.data, query.error, query.failureReason),
-    [query.data, query.error, query.failureReason]
-  );
+  const { data, error, serverVersion, statusCode } = getAPIResponse(query.data, query.error, query.failureReason);
 
-  return useMemo(
-    () => ({
-      data: data,
-      error: error,
-      serverVersion: serverVersion,
-      statusCode: statusCode,
-      dataUpdatedAt: query?.dataUpdatedAt,
-      errorUpdatedAt: query?.errorUpdatedAt,
-      failureCount: query?.failureCount,
-      failureReason: query?.failureReason,
-      fetchStatus: query?.fetchStatus,
-      isError: query?.isError,
-      isFetched: query?.isFetched,
-      isFetchedAfterMount: query?.isFetchedAfterMount,
-      isFetching: query?.isFetching,
-      isInitialLoading: query?.isInitialLoading,
-      isLoading: query?.isLoading,
-      isLoadingError: query?.isLoadingError,
-      isPaused: query?.isPaused,
-      isPending: query?.isPending,
-      isPlaceholderData: query?.isPlaceholderData,
-      isRefetchError: query?.isRefetchError,
-      isRefetching: query?.isRefetching,
-      isStale: query?.isStale,
-      isSuccess: query?.isSuccess,
-      promise: query?.promise,
-      refetch: query?.refetch,
-      status: query?.status
-    }),
-    [
-      data,
-      error,
-      query?.dataUpdatedAt,
-      query?.errorUpdatedAt,
-      query?.failureCount,
-      query?.failureReason,
-      query?.fetchStatus,
-      query?.isError,
-      query?.isFetched,
-      query?.isFetchedAfterMount,
-      query?.isFetching,
-      query?.isInitialLoading,
-      query?.isLoading,
-      query?.isLoadingError,
-      query?.isPaused,
-      query?.isPending,
-      query?.isPlaceholderData,
-      query?.isRefetchError,
-      query?.isRefetching,
-      query?.isStale,
-      query?.isSuccess,
-      query?.promise,
-      query?.refetch,
-      query?.status,
-      serverVersion,
-      statusCode
-    ]
-  );
+  return {
+    ...query,
+    data,
+    error,
+    serverVersion,
+    statusCode
+  };
 };

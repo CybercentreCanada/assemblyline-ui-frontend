@@ -1,17 +1,18 @@
 import type { UndefinedInitialDataOptions } from '@tanstack/react-query';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import type { APIRequest, APIResponse } from 'components/core/Query/components/api.models';
+import type { APIQueryKey, APIRequest, APIResponse } from 'components/core/Query/components/api.models';
 import { DEFAULT_RETRY_MS } from 'components/core/Query/components/constants';
 import type { UseAPICallFnProps } from 'components/core/Query/components/useAPICallFn';
 import { useAPICallFn } from 'components/core/Query/components/useAPICallFn';
-import { getAPIResponse } from 'components/core/Query/components/utils';
-import { useEffect, useMemo, useState } from 'react';
+import { useIsDebouncing } from 'components/core/Query/components/useIsDebouncing';
+import { getAPIResponse, stableStringify } from 'components/core/Query/components/utils';
 
 export type UseAPIQueryProps<Response = unknown, Request extends APIRequest = APIRequest, Error = string> = {
   queryProps?: Omit<
-    UndefinedInitialDataOptions<Promise<unknown>, APIResponse<Error>, APIResponse<Response>, [unknown]>,
+    UndefinedInitialDataOptions<APIResponse<Response>, APIResponse<Error>, APIResponse<Response>, APIQueryKey>,
     'queryKey' | 'queryFn'
   >;
+  allowCache?: boolean;
   delay?: number;
   disabled?: boolean;
   retryAfter?: number;
@@ -22,104 +23,41 @@ export const useAPIQuery = <
   Request extends APIRequest = APIRequest,
   Error extends string = string
 >({
+  allowCache = false,
+  body = null,
   delay = null,
   disabled = false,
+  method,
   queryProps = null,
   retryAfter = DEFAULT_RETRY_MS,
+  url,
   ...params
 }: UseAPIQueryProps<Response, Request, Error>) => {
   const queryClient = useQueryClient();
   const apiCallFn = useAPICallFn<APIResponse<Response>>();
 
-  const [debouncedParams, setDebouncedParams] = useState<unknown>(null);
+  const isDebouncing = useIsDebouncing(delay, [url, method ?? 'GET', stableStringify(body), allowCache]);
 
-  const isDebouncing = useMemo<boolean>(
-    () => (delay === null ? false : JSON.stringify(params) !== JSON.stringify(debouncedParams)),
-    [debouncedParams, delay, params]
-  );
-
-  useEffect(() => {
-    if (delay === null) return;
-    const handler = setTimeout(() => setDebouncedParams(params), delay);
-    return () => clearTimeout(handler);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [delay, JSON.stringify(params)]);
-
-  const query = useQuery<unknown, APIResponse<Error>, APIResponse<Response>, [unknown]>(
+  const query = useQuery<APIResponse<Response>, APIResponse<Error>, APIResponse<Response>, APIQueryKey>(
     {
       ...queryProps,
       enabled: !disabled && !isDebouncing,
-      queryKey: [{ ...params, disabled }],
-      queryFn: async ({ signal }) => apiCallFn({ signal, enabled: !disabled, ...params }),
-      retry: (failureCount, error) => failureCount < 0 || error?.api_status_code === 502,
-      retryDelay: failureCount => (failureCount < 0 ? 1000 : Math.min(retryAfter, 10000))
+      queryKey: [url, method ?? 'GET', stableStringify(body), allowCache],
+      queryFn: async ({ signal }) => apiCallFn({ url, method, body, signal, enabled: !disabled, ...params }),
+      retry: (failureCount, error) => failureCount < 3 && error?.api_status_code === 502,
+      retryDelay: failureCount => Math.min(retryAfter * (failureCount + 1), 10000)
     },
     queryClient
   );
 
-  const { data, error, serverVersion, statusCode } = useMemo(
-    () => getAPIResponse(query.data, query.error, query.failureReason),
-    [query.data, query.error, query.failureReason]
-  );
+  const { data, error, serverVersion, statusCode } = getAPIResponse(query.data, query.error, query.failureReason);
 
-  return useMemo(
-    () => ({
-      data: data,
-      error: error,
-      serverVersion: serverVersion,
-      statusCode: statusCode,
-      isDebouncing,
-      dataUpdatedAt: query?.dataUpdatedAt,
-      errorUpdatedAt: query?.errorUpdatedAt,
-      failureCount: query?.failureCount,
-      failureReason: query?.failureReason,
-      fetchStatus: query?.fetchStatus,
-      isError: query?.isError,
-      isFetched: query?.isFetched,
-      isFetchedAfterMount: query?.isFetchedAfterMount,
-      isFetching: query?.isFetching,
-      isInitialLoading: query?.isInitialLoading,
-      isLoading: query?.isLoading,
-      isLoadingError: query?.isLoadingError,
-      isPaused: query?.isPaused,
-      isPending: query?.isPending,
-      isPlaceholderData: query?.isPlaceholderData,
-      isRefetchError: query?.isRefetchError,
-      isRefetching: query?.isRefetching,
-      isStale: query?.isStale,
-      isSuccess: query?.isSuccess,
-      promise: query?.promise,
-      refetch: query?.refetch,
-      status: query?.status
-    }),
-    [
-      data,
-      error,
-      isDebouncing,
-      query?.dataUpdatedAt,
-      query?.errorUpdatedAt,
-      query?.failureCount,
-      query?.failureReason,
-      query?.fetchStatus,
-      query?.isError,
-      query?.isFetched,
-      query?.isFetchedAfterMount,
-      query?.isFetching,
-      query?.isInitialLoading,
-      query?.isLoading,
-      query?.isLoadingError,
-      query?.isPaused,
-      query?.isPending,
-      query?.isPlaceholderData,
-      query?.isRefetchError,
-      query?.isRefetching,
-      query?.isStale,
-      query?.isSuccess,
-      query?.promise,
-      query?.refetch,
-      query?.status,
-      serverVersion,
-      statusCode
-    ]
-  );
+  return {
+    ...query,
+    isDebouncing,
+    data,
+    error,
+    serverVersion,
+    statusCode
+  };
 };
