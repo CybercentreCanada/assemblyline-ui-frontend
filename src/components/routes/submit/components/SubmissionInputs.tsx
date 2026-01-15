@@ -63,19 +63,20 @@ export const ClassificationInput = React.memo(() => {
           state.values.state.disabled,
           state.values.state.customize,
           state.values.state.phase === 'editing',
-          state.values.settings?.default_classification?.value
+          state.values.settings?.classification?.value,
+          state.values.settings?.classification?.restricted
         ] as const
       }
     >
-      {([loading, disabled, customize, isEditing, value]) => (
+      {([loading, disabled, customize, isEditing, value, restricted]) => (
         <div style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(1) }}>
           <Typography>{t('classification.input.label')}</Typography>
           <Classification
             format="long"
             type="picker"
             c12n={loading ? null : value}
-            disabled={disabled || !isEditing || !customize}
-            setClassification={v => form.setFieldValue('settings.default_classification.value', v)}
+            disabled={disabled || !isEditing || (!customize && restricted)}
+            setClassification={v => form.setFieldValue('settings.classification.value', v)}
           />
         </div>
       )}

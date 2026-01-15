@@ -1,7 +1,6 @@
 import type { UserSettings } from 'components/models/base/user_settings';
 
 export const MOCK_SETTINGS: UserSettings = {
-  default_classification: 'TLP:CLEAR',
   default_external_sources: [],
   default_zip_password: 'infected',
   download_encoding: 'cart',
@@ -348,6 +347,7 @@ export const MOCK_SETTINGS: UserSettings = {
   ],
   submission_profiles: {
     default: {
+      classification: 'TLP:CLEAR',
       deep_scan: false,
       generate_alert: false,
       ignore_cache: false,
@@ -364,6 +364,7 @@ export const MOCK_SETTINGS: UserSettings = {
       ttl: 30
     },
     static: {
+      classification: 'TLP:CLEAR',
       deep_scan: false,
       generate_alert: false,
       ignore_cache: false,
@@ -380,6 +381,7 @@ export const MOCK_SETTINGS: UserSettings = {
       ttl: 30
     },
     static_and_dynamic_with_internet: {
+      classification: 'TLP:CLEAR',
       deep_scan: false,
       generate_alert: false,
       ignore_cache: false,
@@ -411,6 +413,7 @@ export const MOCK_SETTINGS: UserSettings = {
       ttl: 30
     },
     static_with_dynamic: {
+      classification: 'TLP:CLEAR',
       deep_scan: false,
       generate_alert: false,
       ignore_cache: false,
@@ -427,6 +430,7 @@ export const MOCK_SETTINGS: UserSettings = {
       ttl: 30
     },
     static_with_internet: {
+      classification: 'TLP:CLEAR',
       deep_scan: false,
       generate_alert: false,
       ignore_cache: false,
@@ -444,6 +448,7 @@ export const MOCK_SETTINGS: UserSettings = {
     }
   },
   submission_view: 'report',
+  classification: '',
   deep_scan: false,
   default_metadata: undefined,
   description: '',

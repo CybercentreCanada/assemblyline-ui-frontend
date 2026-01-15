@@ -223,7 +223,7 @@ describe('loadSubmissionProfile', () => {
   it('applies restrictions for non-admins', () => {
     const restricted = {
       static: deepMerge(MOCK_PROFILES.static, {
-        restricted_params: { submission: ['priority'] }
+        restricted_params: { submission: ['priority', 'classification'] }
       })
     };
 
@@ -231,6 +231,7 @@ describe('loadSubmissionProfile', () => {
     loadSubmissionProfile(out, MOCK_SETTINGS, restricted, MOCK_USER, 'static');
 
     expect(out.priority.restricted).toBe(true);
+    expect(out.classification.restricted).toBe(true);
   });
 
   it('applies nested service selections', () => {
@@ -299,21 +300,21 @@ describe('hasDifferentPreviousSubmissionValues', () => {
 describe('resetPreviousSubmissionValues / updatePreviousSubmissionValues', () => {
   it('resets values', () => {
     const p = init();
-    p.default_classification.value = 'TEMP';
+    p.classification.value = 'TEMP';
     p.service_spec[0].params[0].value = 'TEMP';
 
     const r = resetPreviousSubmissionValues(p);
-    expect(r.default_classification.value).toBe(r.default_classification.prev);
+    expect(r.classification.value).toBe(r.classification.prev);
     expect(r.service_spec[0].params[0].value).toBe(r.service_spec[0].params[0].prev);
   });
 
   it('updates prev values', () => {
     const p = init();
-    p.default_classification.value = 'NEW';
+    p.classification.value = 'NEW';
     p.service_spec[0].params[0].value = 'X';
 
     const r = updatePreviousSubmissionValues(p);
-    expect(r.default_classification.prev).toBe('NEW');
+    expect(r.classification.prev).toBe('NEW');
     expect(r.service_spec[0].params[0].prev).toBe('X');
   });
 });

@@ -445,6 +445,9 @@ export type SubmissionProfileParams = {
   /** When the submission is archived, should we delete it from hot storage right away? */
   delete_after_archive?: boolean;
 
+  /** Default submission classification */
+  classification?: string;
+
   /** Should this submission generate an alert? */
   generate_alert?: boolean;
 
