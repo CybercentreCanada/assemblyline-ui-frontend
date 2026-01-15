@@ -16,10 +16,14 @@ import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router';
 import { Link } from 'react-router-dom';
 
+type BackgroundMode = 'transparent' | 'white' | 'black';
+
 const ZOOM_CLASS = 'zooming';
 const MIN_IMAGE_SIZE_REM = 4;
 const NAV_BAR_HEIGHT = 'min(128px, 30vw, 30vh)';
 const IMAGE_SIZE = `min(${MIN_IMAGE_SIZE_REM}rem, 30vw, 30vh)`;
+
+const BACKGROUND_ORDER: BackgroundMode[] = ['transparent', 'white', 'black'];
 
 const ImageContainer = styled('div')(({ theme }) => ({
   position: 'absolute',
@@ -138,7 +142,7 @@ const MenuPane = styled('div')(({ theme }) => ({
   position: 'absolute',
   maxWidth: 'calc(100% - 128px)',
   display: 'grid',
-  gridTemplateColumns: '1fr auto',
+  gridTemplateColumns: '1fr auto auto',
   alignItems: 'center',
   borderRadius: '0px 0px 4px 4px',
   padding: theme.spacing(1),
@@ -243,6 +247,7 @@ const WrappedCarouselContainer = ({
   const [isZooming, setIsZooming] = useState<boolean>(false);
   const [zoom, setZoom] = useState<number>(100);
   const [imageRendering, setImageRendering] = useState<'auto' | 'pixelated'>('auto' as const);
+  const [backgroundMode, setBackgroundMode] = useState<BackgroundMode>('transparent');
 
   const navbarRef = useRef<HTMLDivElement>(null);
   const navbarScroll = useRef<Dragging>({ isDown: false, isDragging: false, scrollLeft: 0, startX: 0 });
@@ -398,6 +403,28 @@ const WrappedCarouselContainer = ({
     zoomTimer.current = now;
   }, []);
 
+  const handleBackgroundColorChange = useCallback(() => {
+    setBackgroundMode(prev => {
+      const index = BACKGROUND_ORDER.indexOf(prev);
+      return BACKGROUND_ORDER[(index + 1) % BACKGROUND_ORDER.length];
+    });
+  }, []);
+
+  const getBackgroundColor = useCallback(
+    (mode: BackgroundMode) => {
+      switch (mode) {
+        case 'white':
+          return theme.palette.grey[100];
+        case 'black':
+          return theme.palette.grey[900];
+        case 'transparent':
+        default:
+          return 'transparent';
+      }
+    },
+    [theme.palette.grey]
+  );
+
   useEffect(() => {
     if (!currentImage) return;
     apiCall({
@@ -497,6 +524,8 @@ const WrappedCarouselContainer = ({
                   alt={currentImage?.name}
                   draggable={false}
                   style={{
+                    backgroundColor:
+                      backgroundMode === 'transparent' ? 'transparent' : getBackgroundColor(backgroundMode),
                     imageRendering: imageRendering,
                     ...(isZooming && {
                       width:
@@ -618,6 +647,26 @@ const WrappedCarouselContainer = ({
                     }}
                   >
                     <PageviewOutlinedIcon />
+                  </IconButton>
+                </Tooltip>
+                <Tooltip title={t('change_background_color')} placement="bottom">
+                  <IconButton
+                    color="inherit"
+                    // size="small"
+                    style={{ marginLeft: '8px' }}
+                    onClick={handleBackgroundColorChange}
+                  >
+                    <div
+                      style={{
+                        height: theme.spacing(2),
+                        width: theme.spacing(2),
+                        borderRadius: theme.spacing(0.5),
+                        backgroundColor:
+                          backgroundMode === 'transparent'
+                            ? theme.palette.grey[500]
+                            : getBackgroundColor(backgroundMode)
+                      }}
+                    />
                   </IconButton>
                 </Tooltip>
               </MenuPane>
