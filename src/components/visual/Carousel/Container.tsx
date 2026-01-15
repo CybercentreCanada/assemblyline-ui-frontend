@@ -16,14 +16,14 @@ import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router';
 import { Link } from 'react-router-dom';
 
-type BackgroundMode = 'transparent' | 'light' | 'dark';
+export type BackgroundMode = 'transparent' | 'light' | 'dark';
 
 const ZOOM_CLASS = 'zooming';
 const MIN_IMAGE_SIZE_REM = 4;
 const NAV_BAR_HEIGHT = 'min(128px, 30vw, 30vh)';
 const IMAGE_SIZE = `min(${MIN_IMAGE_SIZE_REM}rem, 30vw, 30vh)`;
 
-const BACKGROUND_ORDER: BackgroundMode[] = ['transparent', 'light', 'dark'];
+export const BACKGROUND_ORDER: BackgroundMode[] = ['transparent', 'light', 'dark'];
 
 const ImageContainer = styled('div')(({ theme }) => ({
   position: 'absolute',
@@ -688,6 +688,7 @@ const WrappedCarouselContainer = ({
                     alt={image.name}
                     src={image.thumb}
                     selected={index === i}
+                    backgroundMode={backgroundMode}
                     onClick={() => !navbarScroll.current.isDragging && setIndex(i)}
                   />
                 ))}
