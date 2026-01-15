@@ -27,7 +27,7 @@ export type DownloadResponseProps<APIResponse> = {
 };
 
 export type LoginParamsProps = {
-  oauth_providers: string[];
+  oauth_providers?: string[];
   allow_userpass_login: boolean;
   allow_signup: boolean;
   allow_saml_login: boolean;
