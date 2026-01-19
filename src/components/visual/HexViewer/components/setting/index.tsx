@@ -58,11 +58,11 @@ export const WrappedHexSettings = ({ store }: StoreProps) => {
             {t('settings.reset')}
           </Button>
           <div style={{ flex: 1 }} />
+          <Button onClick={() => onSettingClose()} color="secondary">
+            {t('settings.cancel')}
+          </Button>
           <Button onClick={() => onSettingSave()} color="primary">
             {t('settings.save')}
-          </Button>
-          <Button onClick={() => onSettingClose()} color="primary">
-            {t('settings.cancel')}
           </Button>
         </DialogActions>
       </Dialog>

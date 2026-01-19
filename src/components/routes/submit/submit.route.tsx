@@ -33,7 +33,8 @@ import { FLOW, useForm } from 'components/routes/submit/submit.form';
 import {
   getDefaultExternalSources,
   getPreferredSubmissionProfile,
-  isValidJSON
+  isValidJSON,
+  useAutoURLServicesSelection
 } from 'components/routes/submit/submit.utils';
 import { TabContainer } from 'components/visual/TabContainer';
 import { getSubmitType } from 'helpers/utils';
@@ -119,6 +120,8 @@ const WrappedSubmitRoute = () => {
   const { user: currentUser, configuration, settings } = useALContext();
   const form = useForm();
 
+  const applyAutoURLServicesSelection = useAutoURLServicesSelection();
+
   const setClassificationFromURL = useCallback(
     (state: SubmitState, search: URLSearchParams) => {
       if (state?.c12n) {
@@ -191,6 +194,8 @@ const WrappedSubmitRoute = () => {
     setMetadataFromURL(state, search);
 
     form.setFieldValue('state.phase', 'editing');
+
+    applyAutoURLServicesSelection();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [configuration, currentUser, settings]);
