@@ -1,15 +1,11 @@
+/* eslint-disable @typescript-eslint/prefer-for-of */
 import useALContext from 'components/hooks/useALContext';
-import type { Configuration } from 'components/models/base/config';
+import type { Configuration, Submission } from 'components/models/base/config';
 import type { ServiceSpecification } from 'components/models/base/service';
 import type { UserSettings } from 'components/models/base/user_settings';
 import type { CustomUser } from 'components/models/ui/user';
 import type { InterfaceKey, ProfileKey, ProfileSettings } from 'components/routes/settings/settings.utils';
-import {
-  INTERFACE_KEYS,
-  loadDefaultProfile,
-  loadSubmissionProfile,
-  PROFILE_KEYS
-} from 'components/routes/settings/settings.utils';
+import { getValidValue, INTERFACE_KEYS, PROFILE_KEYS } from 'components/routes/settings/settings.utils';
 import type { AutoURLServiceIndices, SubmitStore } from 'components/routes/submit/submit.form';
 import { useForm } from 'components/routes/submit/submit.form';
 import { isURL } from 'helpers/utils';
@@ -51,6 +47,246 @@ export const getDefaultExternalSources = (
 
   const sources = Array.from(result).sort();
   return { prev: sources, value: sources };
+};
+
+/**
+ * Applies the "default" submission profile onto an existing ProfileSettings model.
+ *
+ * This function mutates the provided `out` object and:
+ * - Loads profile-level keys from the default profile (classification, deep_scan, etc.).
+ * - Determines which fields are restricted based on user roles and permissions.
+ * - Applies default service selections and nested service settings.
+ * - Hydrates service specification parameters following precedence:
+ *     1. explicit value in default profile
+ *     2. value from service_spec definition
+ *     3. existing value already present in `out`
+ * - Resets initial_data, description, and malicious fields to baseline values.
+ *
+ * @param {ProfileSettings} out
+ *   The target ProfileSettings object to mutate.
+ * @param {UserSettings | null} settings
+ *   The full user settings data, including submission profiles.
+ * @param {CustomUser} user
+ *   Authenticated user with role and permission data used to determine restrictions.
+ *
+ * @returns {ProfileSettings}
+ *   The same `out` object after being updated.
+ */
+export const loadDefaultProfile = (
+  out: ProfileSettings,
+  settings: UserSettings | null,
+  user: CustomUser
+): ProfileSettings => {
+  if (!settings?.submission_profiles?.default) return out;
+
+  const defaultProfile = settings.submission_profiles.default;
+  const canCustomize = user.is_admin || user.roles.includes('submission_customize');
+
+  for (const key of PROFILE_KEYS) {
+    if (key === 'classification') continue;
+    if (key in defaultProfile) {
+      const target = out[key];
+      const val = defaultProfile[key];
+
+      target.value = val;
+      target.prev = val;
+      target.default = null;
+      target.restricted = !canCustomize;
+    }
+  }
+
+  for (let i = 0; i < out.services.length; i++) {
+    const cat = out.services[i];
+    const catSelected = !!defaultProfile.services?.selected?.includes(cat.name);
+
+    cat.selected = catSelected;
+    cat.default = catSelected;
+    cat.prev = catSelected;
+    cat.restricted = !canCustomize;
+
+    for (let j = 0; j < cat.services.length; j++) {
+      const svr = cat.services[j];
+      const selected =
+        defaultProfile.services?.selected?.includes(svr.category) ||
+        defaultProfile.services?.selected?.includes(svr.name) ||
+        false;
+
+      svr.selected = selected;
+      svr.default = selected;
+      svr.prev = selected;
+      svr.restricted = !canCustomize;
+    }
+  }
+
+  for (let i = 0; i < out.service_spec.length; i++) {
+    const svr = out.service_spec[i];
+    const profileSpecParams = defaultProfile.service_spec?.[svr.name] ?? {};
+
+    const settingsSpec = settings.service_spec?.find(s => s.name === svr.name);
+
+    for (let j = 0; j < svr.params.length; j++) {
+      const param = svr.params[j];
+      const profileValue = profileSpecParams[param.name] as string | number | boolean;
+
+      const settingsParam = settingsSpec?.params?.find(p => p.name === param.name);
+
+      const finalValue = profileValue ?? settingsParam?.value ?? param.value;
+
+      param.value = finalValue;
+      param.prev = finalValue;
+      param.default = settingsParam?.default ?? param.default;
+      param.restricted = !canCustomize;
+    }
+  }
+
+  out.initial_data.value = { passwords: [] };
+  out.initial_data.prev = { passwords: [] };
+
+  out.description.value = null;
+  out.description.prev = null;
+  out.description.default = null;
+  out.description.restricted = false;
+
+  out.malicious.value = false;
+  out.malicious.prev = false;
+
+  return out;
+};
+
+/**
+ * Loads a named submission profile (non-default) into an existing ProfileSettings model.
+ *
+ * This mutates the provided `out` object and:
+ * - Rehydrates interface keys using values from global UserSettings.
+ * - Applies profile-specific parameters (classification, description, ttl, etc.).
+ * - Marks fields as restricted when configured as non-editable for this profile.
+ * - Applies selected/default/restricted states to services and nested services.
+ * - Populates service_spec parameters with correct precedence:
+ *     1. explicit value from the selected submission profile
+ *     2. value from the global service_spec definition
+ *     3. retained value already in `out`
+ * - Updates prev fields so subsequent diff checks work correctly.
+ *
+ * @param {ProfileSettings} out
+ *   The target ProfileSettings object to mutate.
+ * @param {UserSettings | null} settings
+ *   The global user settings including submission_profiles.
+ * @param {Submission['profiles']} profiles
+ *   The full profile metadata model used to obtain restrictions/defaults.
+ * @param {CustomUser} user
+ *   Authenticated user used to test whether restricted fields can be edited.
+ * @param {string} name
+ *   The name of the submission profile to load.
+ *
+ * @returns {ProfileSettings}
+ *   The modified `out` object after loading the profile data.
+ */
+export const loadSubmissionProfile = (
+  out: ProfileSettings,
+  settings: UserSettings | null,
+  profiles: Submission['profiles'],
+  user: CustomUser,
+  name: string
+): ProfileSettings => {
+  if (!settings || !settings.submission_profiles?.[name]) return out;
+
+  const customize = user.is_admin || user.roles.includes('submission_customize');
+  const profileDef = settings.submission_profiles[name];
+  const profileMeta = profiles?.[name];
+
+  for (const k of INTERFACE_KEYS) {
+    const val = settings[k as keyof UserSettings];
+    (out as any)[k].value = val;
+    (out as any)[k].prev = val;
+  }
+
+  for (const key of PROFILE_KEYS) {
+    if (key === 'classification') continue;
+    const val = profileDef[key as keyof typeof profileDef];
+    const defaultVal = profileMeta?.params?.[key as keyof typeof profileMeta.params];
+    const restricted = !customize && profileMeta?.restricted_params?.submission?.includes(key);
+
+    const target = out[key];
+
+    (target as any).value = val;
+    (target as any).prev = val;
+    (target as any).default = getValidValue(defaultVal);
+    (target as any).restricted = restricted;
+  }
+
+  const excluded = profileMeta?.params?.services?.excluded || [];
+  const defaults = profileMeta?.params?.services?.selected || [];
+  const selected = profileDef.services?.selected || [];
+
+  for (let i = 0; i < out.services.length; i++) {
+    const cat = out.services[i];
+    const name = cat.name;
+
+    const sel = selected.includes(name);
+    const restr = !customize && excluded.includes(name);
+    const def = defaults.includes(name);
+
+    cat.selected = sel;
+    cat.restricted = restr;
+    cat.default = def;
+    cat.prev = sel;
+
+    for (let j = 0; j < cat.services.length; j++) {
+      const svr = cat.services[j];
+      const n = svr.name;
+      const c = svr.category;
+
+      const s = selected.includes(n) || selected.includes(c);
+
+      const r = !customize && (excluded.includes(n) || excluded.includes(c));
+
+      const d = defaults.includes(n) || defaults.includes(c);
+
+      svr.selected = s;
+      svr.restricted = r;
+      svr.default = d;
+      svr.prev = s;
+    }
+  }
+
+  for (let i = 0; i < out.service_spec.length; i++) {
+    const svr = out.service_spec[i];
+    const settingsSpec = settings.service_spec?.find(s => s.name === svr.name);
+
+    for (let j = 0; j < svr.params.length; j++) {
+      const param = svr.params[j];
+
+      const profileValue = profileDef.service_spec?.[svr.name]?.[param.name];
+
+      const settingsParam = settingsSpec?.params?.find(p => p.name === param.name);
+
+      const profileDefault = profileMeta?.params?.service_spec?.[svr.name]?.[param.name];
+
+      const isRestricted = !customize && profileMeta?.restricted_params?.[svr.name]?.includes(param.name);
+
+      const newValue = getValidValue(profileValue, settingsParam?.value, param.value);
+
+      param.value = newValue;
+      param.prev = newValue;
+
+      param.default = getValidValue(profileDefault, settingsParam?.default, param.default);
+
+      param.restricted = isRestricted;
+    }
+  }
+
+  out.initial_data.value = { passwords: [] };
+  out.initial_data.prev = { passwords: [] };
+
+  out.description.value = null;
+  out.description.prev = null;
+  out.description.default = null;
+  out.description.restricted = false;
+
+  out.malicious.value = false;
+  out.malicious.prev = false;
+
+  return out;
 };
 
 /**
