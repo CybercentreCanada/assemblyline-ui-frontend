@@ -132,8 +132,8 @@ importers:
         specifier: ^8.0.4
         version: 8.0.4
       lodash:
-        specifier: ^4.17.21
-        version: 4.17.21
+        specifier: ^4.17.23
+        version: 4.17.23
       lz-string:
         specifier: ^1.5.0
         version: 1.5.0
@@ -4187,8 +4187,8 @@ packages:
   lodash.merge@4.6.2:
     resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==}
 
-  lodash@4.17.21:
-    resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
+  lodash@4.17.23:
+    resolution: {integrity: sha512-LgVTMpQtIopCi79SJeDiP0TfWi5CNEc/L/aRdTh3yIvmZXTnheWpKjSZhnvMl8iXbC1tFg9gdHHDMLoV7CnG+w==}
 
   long@5.3.2:
     resolution: {integrity: sha512-mNAgZ1GmyNhD7AuqnTG3/VQ26o760+ZYBPKjPvugO8+nLbYfX6TVpJPseBvopbdY+qpZ/lKUnmEc1LeZYS3QAA==}
@@ -6756,7 +6756,7 @@ snapshots:
       '@types/json-schema': 7.0.15
       ajv: 8.17.1
       ajv-formats: 2.1.1(ajv@8.17.1)
-      lodash: 4.17.21
+      lodash: 4.17.23
 
   '@jsonforms/material-renderers@3.5.1(cbb6f64d4ae63b1c09b044077e38f6fd)':
     dependencies:
@@ -6769,13 +6769,13 @@ snapshots:
       '@mui/material': 7.0.2(@emotion/react@11.14.0(@types/react@19.1.2)(react@19.2.3))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.1.2)(react@19.2.3))(@types/react@19.1.2)(react@19.2.3))(@types/react@19.1.2)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       '@mui/x-date-pickers': 7.28.3(@emotion/react@11.14.0(@types/react@19.1.2)(react@19.2.3))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.1.2)(react@19.2.3))(@types/react@19.1.2)(react@19.2.3))(@mui/material@7.0.2(@emotion/react@11.14.0(@types/react@19.1.2)(react@19.2.3))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.1.2)(react@19.2.3))(@types/react@19.1.2)(react@19.2.3))(@types/react@19.1.2)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(@mui/system@7.0.2(@emotion/react@11.14.0(@types/react@19.1.2)(react@19.2.3))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.1.2)(react@19.2.3))(@types/react@19.1.2)(react@19.2.3))(@types/react@19.1.2)(react@19.2.3))(@types/react@19.1.2)(date-fns@3.6.0)(dayjs@1.11.13)(moment@2.30.1)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
       dayjs: 1.10.7
-      lodash: 4.17.21
+      lodash: 4.17.23
       react: 19.2.3
 
   '@jsonforms/react@3.5.1(@jsonforms/core@3.5.1)(react@19.2.3)':
     dependencies:
       '@jsonforms/core': 3.5.1
-      lodash: 4.17.21
+      lodash: 4.17.23
       react: 19.2.3
 
   '@kurkle/color@0.3.4': {}
@@ -7307,7 +7307,7 @@ snapshots:
       chalk: 3.0.0
       css.escape: 1.5.1
       dom-accessibility-api: 0.6.3
-      lodash: 4.17.21
+      lodash: 4.17.23
       redent: 3.0.0
 
   '@testing-library/react@16.3.0(@testing-library/dom@10.4.0)(@types/react-dom@19.1.2(@types/react@19.1.2))(@types/react@19.1.2)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)':
@@ -10092,7 +10092,7 @@ snapshots:
 
   lodash.merge@4.6.2: {}
 
-  lodash@4.17.21: {}
+  lodash@4.17.23: {}
 
   long@5.3.2: {}
 
@@ -10919,7 +10919,7 @@ snapshots:
 
   react-resize-detector@8.1.0(react-dom@19.2.3(react@19.2.3))(react@19.2.3):
     dependencies:
-      lodash: 4.17.21
+      lodash: 4.17.23
       react: 19.2.3
       react-dom: 19.2.3(react@19.2.3)
 
