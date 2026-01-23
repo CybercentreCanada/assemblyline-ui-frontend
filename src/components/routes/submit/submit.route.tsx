@@ -23,6 +23,7 @@ import {
   FindButton,
   HashInput,
   MaliciousInput,
+  RawInput,
   SubmissionProfileInput,
   ToS
 } from 'components/routes/submit/components/SubmissionInputs';
@@ -31,9 +32,11 @@ import { SubmissionOptions } from 'components/routes/submit/components/Submissio
 import type { SubmitState, SubmitStore } from 'components/routes/submit/submit.form';
 import { FLOW, useForm } from 'components/routes/submit/submit.form';
 import {
+  calculateFileHash,
   getDefaultExternalSources,
   getPreferredSubmissionProfile,
-  isValidJSON
+  isValidJSON,
+  switchProfile
 } from 'components/routes/submit/submit.utils';
 import { TabContainer } from 'components/visual/TabContainer';
 import { getSubmitType } from 'helpers/utils';
@@ -160,6 +163,75 @@ const WrappedSubmitRoute = () => {
     [form]
   );
 
+  const setProfileFromURL = useCallback(
+    (state: SubmitState, search: URLSearchParams) => {
+      const name = state?.profile || search.get('profile');
+      if (!name || !(name in settings.submission_profiles)) return;
+
+      form.setFieldValue('state.profile', name);
+      form.setFieldValue('settings', s => switchProfile(s, configuration, settings, currentUser, name));
+    },
+    [configuration, settings, currentUser, form]
+  );
+
+  const setRawFromURL = useCallback(
+    (state: SubmitState, search: URLSearchParams) => {
+      const raw = state?.raw || search.get('raw');
+      if (!raw) return;
+
+      const encoder = new TextEncoder();
+      const tempFile = new File([encoder.encode(raw)], 'file.txt', { type: 'text/plain;charset=utf-8' });
+
+      form.setFieldValue('state.tab', 'raw');
+      form.setFieldValue('raw.value', raw);
+      calculateFileHash(tempFile)
+        .then(hash => form.setFieldValue('raw.hash', hash))
+        // eslint-disable-next-line no-console
+        .catch(console.error);
+    },
+    [form]
+  );
+
+  const setDescriptionFromURL = useCallback(
+    (state: SubmitState, search: URLSearchParams) => {
+      const desc = state?.description || search.get('description');
+      if (!desc) return;
+      form.setFieldValue('settings.description.value', desc);
+    },
+    [form]
+  );
+
+  const setPriorityFromURL = useCallback(
+    (state: SubmitState, search: URLSearchParams) => {
+      const priority = state?.priority || search.get('priority');
+      if (!priority) return;
+      const val = Number.parseInt(priority, 10);
+      if (val === 500 || val === 1000 || val === 1500) {
+        form.setFieldValue('settings.priority.value', val);
+      }
+    },
+    [form]
+  );
+
+  const setTTLFromURL = useCallback(
+    (state: SubmitState, search: URLSearchParams) => {
+      const ttl = state?.ttl || search.get('ttl');
+      if (!ttl) return;
+
+      const val = Number.parseInt(ttl, 10);
+      if (Number.isNaN(val)) return;
+
+      const maxDTL = configuration.submission.max_dtl;
+      const max = maxDTL !== 0 ? maxDTL : 365;
+      const min = maxDTL !== 0 ? 1 : 0;
+
+      if (val >= min && val <= max) {
+        form.setFieldValue('settings.ttl.value', val);
+      }
+    },
+    [configuration, form]
+  );
+
   useEffect(() => {
     closeSnackbar();
 
@@ -189,6 +261,11 @@ const WrappedSubmitRoute = () => {
     setClassificationFromURL(state, search);
     setHashFromURL(state, search);
     setMetadataFromURL(state, search);
+    setProfileFromURL(state, search);
+    setRawFromURL(state, search);
+    setDescriptionFromURL(state, search);
+    setPriorityFromURL(state, search);
+    setTTLFromURL(state, search);
 
     form.setFieldValue('state.phase', 'editing');
 
@@ -233,6 +310,10 @@ const WrappedSubmitRoute = () => {
                         hash: {
                           label: configuration.ui.allow_url_submissions ? t('tab.label.url') : t('tab.label.hash'),
                           disabled: disabled || !editing
+                        },
+                        raw: {
+                          label: t('tab.label.raw'),
+                          disabled: disabled || !editing
                         }
                       }}
                       sx={{
@@ -244,7 +325,15 @@ const WrappedSubmitRoute = () => {
 
                 <form.Subscribe
                   selector={state => [state.values.state.tab] as const}
-                  children={([tab]) => (tab === 'file' ? <FileInput /> : tab === 'hash' ? <HashInput /> : null)}
+                  children={([tab]) =>
+                    tab === 'file' ? (
+                      <FileInput />
+                    ) : tab === 'hash' ? (
+                      <HashInput />
+                    ) : tab === 'raw' ? (
+                      <RawInput />
+                    ) : null
+                  }
                 />
 
                 <SubmissionProfileInput />
