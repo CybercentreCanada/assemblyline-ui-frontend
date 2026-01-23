@@ -10,9 +10,14 @@ import generateUUID from 'helpers/uuid';
  * Includes classification and server-side metadata.
  */
 export type SubmitState = {
-  hash: string;
   c12n: string;
+  description?: string | null;
+  hash: string;
   metadata?: Metadata;
+  priority?: string | null;
+  profile?: string | null;
+  raw?: string | null;
+  ttl?: string | null;
 };
 
 /**
@@ -56,6 +61,14 @@ export type SubmitFile =
  */
 export type SubmitHash = {
   type: HashPatternMap | null;
+  value: string | null;
+};
+
+/**
+ * Raw submission data (used when submitting via the raw input instead of file).
+ */
+export type SubmitRaw = {
+  hash: string | null;
   value: string | null;
 };
 
@@ -122,7 +135,7 @@ export type SubmitStore = {
   metadata: SubmitMetadata;
 
   /** Raw plaintext input for direct text submissions */
-  raw: string | null;
+  raw: SubmitRaw;
 
   /** All the user's settings */
   settings: ProfileSettings | null;
@@ -156,7 +169,10 @@ export const DEFAULT_SUBMIT_FORM: SubmitStore = {
     type: null,
     value: null
   },
-  raw: null,
+  raw: {
+    hash: null,
+    value: null
+  },
   metadata: {
     edit: null,
     data: {}

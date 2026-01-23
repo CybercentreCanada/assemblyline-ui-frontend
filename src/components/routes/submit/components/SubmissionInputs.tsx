@@ -39,8 +39,8 @@ import Classification from 'components/visual/Classification';
 import { CheckboxInput } from 'components/visual/Inputs/CheckboxInput';
 import { SelectInput } from 'components/visual/Inputs/SelectInput';
 import { SwitchInput } from 'components/visual/Inputs/SwitchInput';
-import { TextInput } from 'components/visual/Inputs/TextInput';
 import { TextAreaInput } from 'components/visual/Inputs/TextAreaInput';
+import { TextInput } from 'components/visual/Inputs/TextInput';
 import { getSubmitType } from 'helpers/utils';
 import generateUUID from 'helpers/uuid';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -233,6 +233,25 @@ export const RawInput = React.memo(() => {
   const { t } = useTranslation(['submit']);
   const form = useForm();
 
+  const handleRawChange = useCallback(
+    (event: unknown, value: string) => {
+      if (!value) {
+        form.setFieldValue('raw.hash', null);
+        form.setFieldValue('raw.value', null);
+      } else {
+        const encoder = new TextEncoder();
+        const tempFile = new File([encoder.encode(value)], 'file.txt', { type: 'text/plain;charset=utf-8' });
+
+        form.setFieldValue('raw.value', value);
+        calculateFileHash(tempFile)
+          .then(hash => form.setFieldValue('raw.hash', hash))
+          // eslint-disable-next-line no-console
+          .catch(console.error);
+      }
+    },
+    [form]
+  );
+
   return (
     <form.Subscribe
       selector={state =>
@@ -240,7 +259,7 @@ export const RawInput = React.memo(() => {
           state.values.state.phase === 'loading',
           state.values.state.disabled,
           state.values.state.phase === 'editing',
-          state.values.raw
+          state.values.raw.value
         ] as const
       }
     >
@@ -255,7 +274,7 @@ export const RawInput = React.memo(() => {
           minRows={6}
           loading={loading}
           disabled={disabled || !isEditing}
-          onChange={(_, v) => form.setFieldValue('raw', v)}
+          onChange={handleRawChange}
           tiny
           monospace
         />
@@ -446,25 +465,24 @@ export const CancelButton = React.memo(() => {
           state.values.state.tab,
           !state.values.file,
           !state.values.hash.type,
-          !(state.values.raw && state.values.raw.length > 0)
+          !(state.values.raw.value && state.values.raw.value.length > 0)
         ] as const
       }
     >
-      {([loading, disabled, tab, file, hash, noRaw]) => (
+      {([loading, disabled, tab, file, hash, raw]) => (
         <Button
           tooltip={t('cancel.button.tooltip')}
           tooltipProps={{ placement: 'bottom' }}
           color="primary"
           loading={loading}
-          disabled={
-            disabled || (tab === 'file' ? file : tab === 'hash' ? hash : tab === 'raw' ? noRaw : false)
-          }
+          disabled={disabled || (tab === 'file' ? file : tab === 'hash' ? hash : tab === 'raw' ? raw : false)}
           variant="outlined"
           onClick={() => {
             form.setFieldValue('file', null);
             form.setFieldValue('hash.type', null);
             form.setFieldValue('hash.value', '');
-            form.setFieldValue('raw', '');
+            form.setFieldValue('raw.hash', null);
+            form.setFieldValue('raw.value', null);
             form.setFieldValue('state.phase', 'editing');
             form.setFieldValue('state.progress', null);
             form.setFieldValue('state.uuid', generateUUID());
@@ -644,7 +662,7 @@ const AnalyzeButton = React.memo(({ children, ...props }: ButtonProps) => {
           state.values.state.tab,
           !state.values.file,
           !state.values.hash.type,
-          !(state.values.raw && state.values.raw.length > 0),
+          !(state.values.raw.value && state.values.raw.value.length > 0),
           state.values.state.progress
         ] as const
       }
@@ -804,7 +822,7 @@ const RawSubmit = React.memo(({ onClick = () => null, ...props }: ButtonProps) =
     () => {
       closeSnackbar();
 
-      const raw = form.getFieldValue('raw');
+      const raw = form.getFieldValue('raw.value');
       const params = form.getFieldValue('settings');
       const metadata = form.getFieldValue('metadata');
       const profile = form.getFieldValue('state.profile');
@@ -931,7 +949,7 @@ const ExternalServicesDialog = React.memo(() => {
           [
             state.values.state.tab === 'file' && !!state.values.file,
             state.values.state.tab === 'hash' && !!state.values.hash.type,
-            state.values.state.tab === 'raw' && !!state.values.raw && state.values.raw.length > 0,
+            state.values.state.tab === 'raw' && !!state.values.raw.value && state.values.raw.value.length > 0,
             state.values.autoURLServiceSelection.open
           ] as const
         }
@@ -990,7 +1008,7 @@ export const AnalyzeSubmission = React.memo(() => {
         [
           state.values.state.tab === 'file' && !!state.values.file,
           state.values.state.tab === 'hash' && !!state.values.hash.type,
-          state.values.state.tab === 'raw' && !!state.values.raw && state.values.raw.length > 0,
+          state.values.state.tab === 'raw' && !!state.values.raw.value && state.values.raw.value.length > 0,
           state.values.state.phase === 'loading' ? false : isUsingExternalServices(state.values.settings, configuration)
         ] as const
       }
