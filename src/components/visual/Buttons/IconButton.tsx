@@ -4,7 +4,8 @@ import type { CircularProgressProps } from 'components/visual/Buttons/CircularPr
 import { CircularProgress } from 'components/visual/Buttons/CircularProgress';
 import { Tooltip } from 'components/visual/Tooltip';
 import { getTextContent } from 'helpers/utils';
-import React, { CSSProperties, useMemo } from 'react';
+import type { CSSProperties } from 'react';
+import React, { useMemo } from 'react';
 import type { LinkProps } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 
