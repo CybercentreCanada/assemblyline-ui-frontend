@@ -11,9 +11,12 @@ import WrapTextOutlinedIcon from '@mui/icons-material/WrapTextOutlined';
 import {
   Grid,
   List,
+  ListItem,
   ListItemButton,
   ListItemIcon,
   ListItemText,
+  ListSubheader,
+  Paper,
   Popover,
   Skeleton,
   styled,
@@ -75,7 +78,7 @@ const WrappedFileViewer = () => {
   const { configuration } = useALContext();
   const { id: sha256, tab: paramTab } = useParams<ParamProps>();
   const { user: currentUser } = useAppUser<CustomUser>();
-  const { showSuccessMessage } = useMySnackbar();
+  const { closeSnackbar, showSuccessMessage } = useMySnackbar();
 
   const [type, setType] = useState<string>('unknown');
   const [codeAllowed, setCodeAllowed] = useState<boolean>(false);
@@ -100,7 +103,7 @@ const WrappedFileViewer = () => {
     return map;
   }, [configuration?.submission?.profiles]);
 
-  const submit = useCallback(
+  const handleFileSubmit = useCallback(
     (submitType: string, isProfile: boolean) => {
       apiCall<Submission>({
         method: isProfile ? 'PUT' : 'GET',
@@ -116,6 +119,31 @@ const WrappedFileViewer = () => {
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [sha256, t]
+  );
+
+  const handleSelectionSubmit = useCallback(
+    (profile: string) => {
+      closeSnackbar();
+
+      const plaintext = selection?.getSelection();
+
+      apiCall<Submission>({
+        url: '/api/v4/submit/',
+        method: 'POST',
+        body: {
+          submission_profile: profile,
+          plaintext
+        },
+        onSuccess: api_data => {
+          showSuccessMessage(t('submit.success'));
+          setTimeout(() => {
+            navigate(`/submission/detail/${api_data.api_response.sid}`);
+          }, 500);
+        }
+      });
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [selection, t]
   );
 
   useEffect(() => {
@@ -187,7 +215,7 @@ const WrappedFileViewer = () => {
               <>
                 <IconButton
                   size="large"
-                  tooltip={`${t('submit_file')}: ${selection?.getSelection()?.length > 0 ? 'selection' : 'file'}`}
+                  tooltip={t('submit_content')}
                   preventRender={!sha256 || !currentUser.roles.includes('submission_create')}
                   onClick={event => {
                     setSubmitAnchor(event.currentTarget);
@@ -208,7 +236,55 @@ const WrappedFileViewer = () => {
                   anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                   transformOrigin={{ vertical: 'top', horizontal: 'right' }}
                 >
-                  <List disablePadding>
+                  <List dense>
+                    <ListSubheader
+                      component="div"
+                      disableSticky
+                      sx={{ lineHeight: 'initial', marginTop: theme.spacing(1) }}
+                    >
+                      {isSelection ? t('submit.selection') : t('submit.file')}
+                    </ListSubheader>
+
+                    <ListItem dense>
+                      <Paper
+                        component="pre"
+                        variant="outlined"
+                        sx={{
+                          position: 'relative',
+                          backgroundColor: theme.palette.background.default,
+                          margin: 0,
+                          height: theme.spacing(4),
+                          width: '100%'
+                        }}
+                      >
+                        <div
+                          style={{
+                            position: 'absolute',
+                            top: 0,
+                            bottom: 0,
+                            left: 0,
+                            right: 0,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            marginLeft: theme.spacing(1),
+                            marginRight: theme.spacing(1)
+                          }}
+                        >
+                          <div
+                            style={{
+                              maxWidth: '100%',
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap'
+                            }}
+                          >
+                            {isSelection ? selection?.getSelection() : sha256}
+                          </div>
+                        </div>
+                      </Paper>
+                    </ListItem>
+
                     <ListItemButton
                       component={Link}
                       to="/submit"
@@ -219,17 +295,23 @@ const WrappedFileViewer = () => {
                       <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
                         <TuneOutlinedIcon />
                       </ListItemIcon>
-                      <ListItemText primary={t('submit.modify')} />
+                      <ListItemText primary={t(`submit.modify`)} />
                     </ListItemButton>
-                    <ListItemButton dense onClick={() => submit('dynamic', false)}>
-                      <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
-                        <OndemandVideoOutlinedIcon />
-                      </ListItemIcon>
-                      <ListItemText primary={t('submit.dynamic')} />
-                    </ListItemButton>
+                    {!isSelection && (
+                      <ListItemButton dense onClick={() => handleFileSubmit('dynamic', false)}>
+                        <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
+                          <OndemandVideoOutlinedIcon />
+                        </ListItemIcon>
+                        <ListItemText primary={t(`submit.dynamic`)} />
+                      </ListItemButton>
+                    )}
                     {submissionProfiles &&
                       Object.entries(submissionProfiles).map(([name, display]) => (
-                        <ListItemButton key={name} dense onClick={() => submit(name, true)}>
+                        <ListItemButton
+                          key={name}
+                          dense
+                          onClick={() => (isSelection ? handleSelectionSubmit(name) : handleFileSubmit(name, true))}
+                        >
                           <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
                             <OndemandVideoOutlinedIcon />
                           </ListItemIcon>
