@@ -11,5 +11,11 @@
   "powered_by_ai.tooltip": "Le résumé du code a été généré automatiquement par un modèle LLM, les résultats sont imprévisibles. Cliquez pour obtenir les nouveaux résultats du LLM...",
   "related": "Soumissions connexes",
   "show_analyse_code": "Afficher l'analyse du code par l'IA",
+  "submit": "Submit the current file",
+  "submit.dynamic": "Submit for Dynamic analysis",
+  "submit.modify": "Adjust parameters before submission",
+  "submit.success": "File successfully submitted for dynamic analysis. You will be redirected...",
+  "submit.with": "Submit with",
+  "submit_file": "Submit file",
   "title": "Visualisateur de Fichiers"
 }
