@@ -30,7 +30,7 @@ export const useSelectReducer: UseReducer = () => {
     const { startIndex, endIndex } = orderSelectIndexes(mouseDownIndex, mouseEnterIndex);
 
     const parts: string[] = [];
-    for (let i = startIndex; i < endIndex; i++) {
+    for (let i = startIndex; i <= endIndex; i++) {
       parts.push(String(getTextValue(store, store.hex.codes, i)));
     }
     const data = parts.join('');
