@@ -38,6 +38,7 @@
   "errors.type.preempted": "TASK PREEMPTED",
   "errors.type.retry": "MAX RETRY REACHED",
   "errors.type.unknown": "UNKNOWN",
+  "files": "files",
   "heuristics": "Heuristics",
   "information": "Submission Information",
   "ioc": "Indicators of Compromise",

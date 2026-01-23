@@ -1,3 +1,4 @@
+import { getTextValue } from 'components/visual/HexViewer/handlers/HexHandler';
 import { useCallback } from 'react';
 import type { ReducerHandler, Reducers, RenderHandler, Store, UseReducer } from '..';
 import {
@@ -23,10 +24,19 @@ export const useSelectReducer: UseReducer = () => {
     []
   );
 
-  const selectMouseEnter: Reducers['cellMouseEnter'] = useCallback(store => {
+  const selectMouseEnter: Reducers['cellMouseEnter'] = useCallback((store, { onSelectionChange }) => {
     if (!isCellMouseDown(store)) return { ...store };
     const { mouseEnterIndex, mouseDownIndex } = store.cell;
-    return { ...store, select: { ...store.select, ...orderSelectIndexes(mouseDownIndex, mouseEnterIndex) } };
+    const { startIndex, endIndex } = orderSelectIndexes(mouseDownIndex, mouseEnterIndex);
+
+    const parts: string[] = [];
+    for (let i = startIndex; i < endIndex; i++) {
+      parts.push(String(getTextValue(store, store.hex.codes, i)));
+    }
+    const data = parts.join('');
+    onSelectionChange(data);
+
+    return { ...store, select: { ...store.select, startIndex, endIndex } };
   }, []);
 
   const selectMouseDown: Reducers['cellMouseDown'] = useCallback(

@@ -25,6 +25,7 @@ export type TextAreaInputProps = InputValues<
 > &
   InputProps & {
     autoComplete?: StyledTextFieldProps['autoComplete'];
+    placeholder?: StyledTextFieldProps['placeholder'];
     rows?: TextFieldProps['rows'];
     minRows?: TextFieldProps['minRows'];
     maxRows?: TextFieldProps['maxRows'];
@@ -36,6 +37,7 @@ const WrappedTextAreaInput = () => {
   const autoComplete = get('autoComplete');
   const inputValue = get('inputValue') ?? '';
   const loading = get('loading');
+  const placeholder = get('placeholder');
   const maxRows = get('maxRows');
   const minRows = get('minRows');
   const overflowHidden = get('overflowHidden');
@@ -65,6 +67,7 @@ const WrappedTextAreaInput = () => {
                 ...(minRows || maxRows ? { minRows, maxRows } : { rows: rows || 1 })
               })}
               autoComplete={autoComplete}
+              placeholder={placeholder}
               value={inputValue}
               onChange={e => handleChange(e, e.target.value, e.target.value)}
               onFocus={handleFocus}
@@ -87,6 +90,7 @@ export const TextAreaInput = ({ preventRender = false, value, ...props }: TextAr
         autoComplete: 'off',
         errorMessage,
         inputValue: value,
+        placeholder: undefined,
         maxRows: null,
         minRows: null,
         preventRender,
