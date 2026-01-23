@@ -287,10 +287,16 @@ const WrappedFileViewer = () => {
 
                     <ListItemButton
                       component={Link}
-                      to="/submit"
-                      state={{ raw: selection?.getSelection() }}
                       dense
                       onClick={() => setSubmitAnchor(null)}
+                      {...(isSelection
+                        ? {
+                            to: '/submit',
+                            state: { raw: selection?.getSelection() }
+                          }
+                        : {
+                            to: `/submit?hash=${sha256}`
+                          })}
                     >
                       <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
                         <TuneOutlinedIcon />
