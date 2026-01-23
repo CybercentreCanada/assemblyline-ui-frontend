@@ -1,53 +1,54 @@
-export const getErrorTypeFromKey = key => {
-  let eID = key.substr(65, key.length);
-
-  if (eID.indexOf('.e') !== -1) {
-    eID = eID.substr(eID.indexOf('.e') + 2, eID.length);
-  }
-
-  if (eID === '21') {
-    return 'down';
-  }
-  if (eID === '12') {
-    return 'retry';
-  }
-  if (eID === '10') {
-    return 'depth';
-  }
-  if (eID === '30') {
-    return 'preempted';
-  }
-  if (eID === '20') {
-    return 'busy';
-  }
-  if (eID === '11') {
-    return 'files';
-  }
-  if (eID === '1') {
-    return 'exception';
-  }
-
-  return 'unknown';
+export type ParsedErrorKey = {
+  hash: string;
+  service: string;
+  version: string;
+  context: string;
+  errorId: string;
+  extra?: string;
 };
 
-export const getServiceFromKey = (key: string): string => {
-  let srv = key.substr(65, key.length);
-
-  if (srv.indexOf('.') !== -1) {
-    srv = srv.substr(0, srv.indexOf('.'));
-  }
-
-  return srv;
+export const ERROR_TYPE_MAP: Record<string, string> = {
+  '1': 'exception',
+  '10': 'depth',
+  '11': 'files',
+  '12': 'retry',
+  '20': 'busy',
+  '21': 'down',
+  '30': 'preempted'
 };
 
-export const getErrorIDFromKey = (key: string): string => {
-  let eID = key.substr(65, key.length);
+export function parseErrorKey(key: string): ParsedErrorKey | null {
+  const parts = key.split('.');
 
-  if (eID.indexOf('.e') !== -1) {
-    eID = eID.substr(eID.indexOf('.e') + 2, eID.length);
-  }
+  if (parts.length < 5) return null;
 
-  return eID;
-};
+  const [hash, service, version, context, errorPart, extra] = parts;
 
-export const getHashFromKey = (key: string): string => key.substr(0, 64);
+  if (!errorPart.startsWith('e')) return null;
+
+  return {
+    hash,
+    service,
+    version,
+    context,
+    errorId: errorPart.slice(1),
+    extra
+  };
+}
+
+export function getHashFromKey(key: string): string {
+  return parseErrorKey(key)?.hash ?? '';
+}
+
+export function getServiceFromKey(key: string): string {
+  return parseErrorKey(key)?.service ?? '';
+}
+
+export function getErrorIDFromKey(key: string): string {
+  return parseErrorKey(key)?.errorId ?? '';
+}
+
+export function getErrorTypeFromKey(key: string): string {
+  const errorId = parseErrorKey(key)?.errorId;
+  return errorId ? (ERROR_TYPE_MAP[errorId] ?? 'unknown') : 'unknown';
+}

@@ -1,6 +1,6 @@
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
-import type { ButtonProps, SvgIconProps } from '@mui/material';
+import type { ButtonProps } from '@mui/material';
 import {
   Box,
   Button,
@@ -34,21 +34,14 @@ export const ERROR_TYPE_MAP = {
 
 export type ErrorTypeValues = (typeof ERROR_TYPE_MAP)[keyof typeof ERROR_TYPE_MAP];
 
-interface ExpandMoreProps extends SvgIconProps {
-  expand: boolean;
-}
-
-const ExpandMore = styled(({ expand, ...other }: ExpandMoreProps) => {
-  return <KeyboardArrowDownIcon {...other} />;
-})(({ theme }) => ({
+const ExpandMore = styled(KeyboardArrowDownIcon, {
+  shouldForwardProp: prop => prop !== 'expand'
+})<{ expand: boolean }>(({ theme, expand }) => ({
   marginLeft: 'auto',
   transition: theme.transitions.create('transform', {
     duration: theme.transitions.duration.shortest
   }),
-  variants: [
-    { props: ({ expand }) => !expand, style: { transform: 'rotate(-90deg)' } },
-    { props: ({ expand }) => !!expand, style: { transform: 'rotate(0deg)' } }
-  ]
+  transform: expand ? 'rotate(0deg)' : 'rotate(-90deg)'
 }));
 
 interface ExpandButtonProps extends ButtonProps {
@@ -56,65 +49,52 @@ interface ExpandButtonProps extends ButtonProps {
   hideIcon?: boolean;
 }
 
-const ExpandButton = styled((props: ExpandButtonProps) => {
-  const { expand, hideIcon = false, ...other } = props;
-  return (
-    <Button
-      {...other}
-      startIcon={<ExpandMore expand={expand} style={{ visibility: hideIcon ? 'hidden' : 'inherit' }} />}
-    />
-  );
-})(() => ({
-  '&.MuiButton-root': {
-    textTransform: 'none',
-    paddingTop: 0,
-    paddingBottom: 0
-  }
-}));
+const ExpandButton = styled(({ expand, hideIcon, ...other }: ExpandButtonProps) => (
+  <Button {...other} startIcon={<ExpandMore expand={expand} sx={{ visibility: hideIcon ? 'hidden' : 'visible' }} />} />
+))({
+  textTransform: 'none',
+  paddingTop: 0,
+  paddingBottom: 0,
+  marginLeft: '-7px'
+});
+
+const ERROR_ID_TO_TYPE: Record<string, ErrorTypeValues> = {
+  '20': 'busy',
+  '21': 'down',
+  '12': 'retry',
+  '10': 'depth',
+  '11': 'files',
+  '30': 'preempted',
+  '1': 'exception'
+};
 
 type ParsedErrors = Record<ErrorTypeValues, Record<string, string[]>>;
 
-const parseErrors = (errors: string[]): ParsedErrors =>
-  errors.reduce((prev, error) => {
+const parseErrors = (errors: string[]) => {
+  const result = {} as ParsedErrors;
+
+  for (const error of errors) {
     const service = getServiceFromKey(error);
     const errorID = getErrorIDFromKey(error);
+    const type = ERROR_ID_TO_TYPE?.[errorID] ?? 'unknown';
 
-    let type: ErrorTypeValues = null;
-    switch (errorID) {
-      case '20':
-        type = 'busy';
-        break;
-      case '21':
-        type = 'down';
-        break;
-      case '12':
-        type = 'retry';
-        break;
-      case '10':
-        type = 'depth';
-        break;
-      case '11':
-        type = 'files';
-        break;
-      case '30':
-        type = 'preempted';
-        break;
-      case '0':
-        type = 'unknown';
-        break;
-      case '1':
-        type = 'exception';
-        break;
+    let typeBucket = result[type];
+    if (!typeBucket) {
+      typeBucket = {};
+      result[type] = typeBucket;
     }
 
-    if (!(type in prev)) {
-      return { ...prev, [type]: { [service]: [error] } } as ParsedErrors;
-    } else if (!(service in prev[type])) {
-      return { ...prev, [type]: { ...prev[type], [service]: [error] } } as ParsedErrors;
-    } else {
-      return { ...prev, [type]: { ...prev[type], [service]: [...prev[type][service], error] } } as ParsedErrors;
+    let serviceBucket = typeBucket[service];
+    if (!serviceBucket) {
+      serviceBucket = [];
+      typeBucket[service] = serviceBucket;
     }
-  }, {} as ParsedErrors);
+
+    serviceBucket.push(error);
+  }
+
+  return result;
+};
 
 type ErrorsProps = {
   sid: string;
@@ -171,7 +151,7 @@ const Errors = ({ sid = null, service = null, errors = [] }: ErrorsProps) => {
             <span>{service}</span>
             <span>{' :: '}</span>
             <span>{errors.length.toLocaleString(i18n.language === 'fr' ? 'fr-FR' : 'en-US')}</span>
-            <span>{' files'}</span>
+            <span>{` ${t('files')}`}</span>
           </div>
         </ExpandButton>
 
