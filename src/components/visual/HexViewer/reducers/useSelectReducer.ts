@@ -1,4 +1,4 @@
-import { getTextValue } from 'components/visual/HexViewer/handlers/HexHandler';
+import { getASCIICharacter, getHexValue } from 'components/visual/HexViewer/handlers/HexHandler';
 import { useCallback } from 'react';
 import type { ReducerHandler, Reducers, RenderHandler, Store, UseReducer } from '..';
 import {
@@ -31,7 +31,7 @@ export const useSelectReducer: UseReducer = () => {
 
     const parts: string[] = [];
     for (let i = startIndex; i <= endIndex; i++) {
-      parts.push(String(getTextValue(store, store.hex.codes, i)));
+      parts.push(getASCIICharacter(getHexValue(store.hex.codes, i)));
     }
     const data = parts.join('');
     onSelectionChange(data);
