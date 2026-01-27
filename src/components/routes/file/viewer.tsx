@@ -385,9 +385,10 @@ const WrappedFileViewer = () => {
             value={paramTab}
             defaultTab={DEFAULT_TAB}
             paper
-            onChange={(_event, value) =>
-              navigate(`/file/viewer/${sha256}/${value}/${location.search}${location.hash}`, { replace: true })
-            }
+            onChange={(_event, value) => {
+              navigate(`/file/viewer/${sha256}/${value}/${location.search}${location.hash}`, { replace: true });
+              selection?.setSelection?.(null);
+            }}
             tabs={{
               ascii: {
                 label: t('ascii'),
