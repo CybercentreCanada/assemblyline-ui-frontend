@@ -2,9 +2,10 @@ import type { Monaco } from '@monaco-editor/react';
 import Editor, { DiffEditor, loader } from '@monaco-editor/react';
 import { useTheme } from '@mui/material';
 import { useAppTheme } from 'commons/components/app/hooks';
+import { useSelection } from 'components/visual/FileViewer/components/SelectionProvider';
 import { registerYaraCompletionItemProvider, yaraConfig, yaraDef } from 'helpers/yara';
-import type { editor } from 'monaco-editor';
-import React, { useCallback, useEffect } from 'react';
+import type { editor as MonacoEditorType } from 'monaco-editor';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import AutoSizer from 'react-virtualized-auto-sizer';
 
@@ -146,7 +147,7 @@ type EditorProps = {
   diff?: boolean;
   value?: string;
   language?: Language;
-  options?: editor.IStandaloneEditorConstructionOptions;
+  options?: MonacoEditorType.IStandaloneEditorConstructionOptions;
   beautify?: boolean;
   onChange?: (value: string) => void;
   reload?: () => void;
@@ -157,7 +158,7 @@ type DiffEditorProps = {
   original?: string;
   modified?: string;
   language?: Language;
-  options?: editor.IStandaloneEditorConstructionOptions;
+  options?: MonacoEditorType.IStandaloneEditorConstructionOptions;
   beautify?: boolean;
   error?: boolean;
   onChange?: (value: string) => void;
@@ -178,7 +179,10 @@ const WrappedMonacoEditor: React.FC<EditorProps | DiffEditorProps> = ({
 }: EditorProps & DiffEditorProps) => {
   const { t, i18n } = useTranslation();
   const theme = useTheme();
+  const selection = useSelection();
   const { isDark: isDarkTheme } = useAppTheme();
+
+  const editorRef = useRef<MonacoEditorType.IStandaloneCodeEditor | null>(null);
 
   useEffect(() => {
     if (!value) reload();
@@ -204,9 +208,26 @@ const WrappedMonacoEditor: React.FC<EditorProps | DiffEditorProps> = ({
     }
   }, []);
 
-  const onMount = useCallback((editor: editor.IStandaloneCodeEditor) => {
-    editor.focus();
-  }, []);
+  const onMount = useCallback(
+    (editorInstance: MonacoEditorType.IStandaloneCodeEditor) => {
+      editorRef.current = editorInstance;
+      editorInstance.focus();
+
+      const disposable = editorInstance.onDidChangeCursorSelection(e => {
+        const model = editorInstance.getModel();
+        if (!model) return;
+        const selectionRange = e.selection;
+        const selectedText = model.getValueInRange(selectionRange);
+        selection?.setSelection(selectedText);
+      });
+
+      // Cleanup
+      return () => {
+        disposable.dispose();
+      };
+    },
+    [selection]
+  );
 
   const beautifyJSON = useCallback((inputData: string) => {
     try {

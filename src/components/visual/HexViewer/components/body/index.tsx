@@ -1,3 +1,4 @@
+import { useSelection } from 'components/visual/FileViewer/components/SelectionProvider';
 import type { StoreProps } from 'components/visual/HexViewer';
 import {
   HexRow,
@@ -39,11 +40,14 @@ const HexTableBody = memo(({ store }: StoreProps) => {
     onScrollTouchEnd
   } = useDispatch();
   const bodyRef = useRef<HTMLDivElement>(null);
+  const selection = useSelection();
 
   useEventListener('resize', () => onBodyResize(bodyRef?.current?.getBoundingClientRect()));
   useEventListener('keydown', (event: KeyboardEvent) => onCursorKeyDown({ event }, { store }));
   useEventListener('keydown', (event: KeyboardEvent) => onCopyKeyDown(undefined, { event, store }));
-  useEventListener('mouseup', (event: MouseEvent) => onBodyMouseUp(undefined, { store, event }));
+  useEventListener('mouseup', (event: MouseEvent) =>
+    onBodyMouseUp({ onSelectionChange: selection?.setSelection }, { store, event })
+  );
 
   React.useLayoutEffect(() => {
     if (bodyRef.current !== null && store.loading.conditions.hasBodyRefInit === false) onBodyRefInit({ ready: true });
@@ -111,13 +115,16 @@ const HexWindowBody = memo(({ store }: StoreProps) => {
     onBodyMouseLeave
   } = useDispatch();
   const { dispatch } = useStore();
+  const selection = useSelection();
 
   const listRef = useRef<FixedSizeListProps<unknown>>(null);
   const bodyRef = useRef<HTMLDivElement>(null);
 
   useEventListener('keydown', (event: KeyboardEvent) => onCursorKeyDown({ event }, { store }));
   useEventListener('keydown', (event: KeyboardEvent) => onCopyKeyDown(undefined, { event, store }));
-  useEventListener('mouseup', (event: MouseEvent) => onBodyMouseUp(undefined, { store, event }));
+  useEventListener('mouseup', (event: MouseEvent) =>
+    onBodyMouseUp({ onSelectionChange: selection?.setSelection }, { store, event })
+  );
 
   React.useLayoutEffect(() => {
     if (listRef.current !== null && bodyRef.current !== null && store.loading.conditions.hasBodyRefInit === false)

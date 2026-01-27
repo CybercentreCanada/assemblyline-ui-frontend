@@ -37,10 +37,13 @@ export const useCursorReducer: UseReducer = () => {
   );
 
   const cursorMouseUp: Reducers['bodyMouseUp'] = useCallback(
-    store => {
+    (store, { onSelectionChange }) => {
       if (store.cell.mouseEnterIndex === null) return { ...store };
       else if (!isSameCellClick(store)) return handleCursorIndex(store, null);
-      else return handleCursorIndex(store, store.cell.mouseEnterIndex);
+      else {
+        onSelectionChange(null);
+        return handleCursorIndex(store, store.cell.mouseEnterIndex);
+      }
     },
     [handleCursorIndex]
   );
@@ -82,7 +85,7 @@ export const useCursorReducer: UseReducer = () => {
 
   const reducer: ReducerHandler = useCallback(
     ({ store, action: { type, payload } }) => {
-      if (isAction.bodyMouseUp(type)) return cursorMouseUp(store);
+      if (isAction.bodyMouseUp(type)) return cursorMouseUp(store, payload);
       else if (isAction.cursorIndexChange(type)) return cursorIndexChange(store, payload);
       else if (isAction.appClickAway(type)) return cursorClickAway(store);
       else if (isAction.cursorClear(type)) return cursorClear(store);

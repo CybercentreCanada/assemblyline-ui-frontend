@@ -10,9 +10,14 @@ import generateUUID from 'helpers/uuid';
  * Includes classification and server-side metadata.
  */
 export type SubmitState = {
-  hash: string;
   c12n: string;
+  description?: string | null;
+  hash: string;
   metadata?: Metadata;
+  priority?: string | null;
+  profile?: string | null;
+  raw?: string | null;
+  ttl?: string | null;
 };
 
 /**
@@ -60,6 +65,14 @@ export type SubmitHash = {
 };
 
 /**
+ * Raw submission data (used when submitting via the raw input instead of file).
+ */
+export type SubmitRaw = {
+  hash: string | null;
+  value: string | null;
+};
+
+/**
  * Global Flow.js instance configured for file uploads.
  * Handles chunk uploads, retries, and connection behavior.
  */
@@ -94,7 +107,7 @@ export type SubmitStore = {
     profile: string | null;
 
     /** Type of submission being made */
-    tab: 'file' | 'hash';
+    tab: 'file' | 'hash' | 'raw';
 
     /** Upload progress of a file submission */
     progress: number;
@@ -120,6 +133,9 @@ export type SubmitStore = {
 
   /** Selected metadata of the submission */
   metadata: SubmitMetadata;
+
+  /** Raw plaintext input for direct text submissions */
+  raw: SubmitRaw;
 
   /** All the user's settings */
   settings: ProfileSettings | null;
@@ -151,6 +167,10 @@ export const DEFAULT_SUBMIT_FORM: SubmitStore = {
   file: null,
   hash: {
     type: null,
+    value: null
+  },
+  raw: {
+    hash: null,
     value: null
   },
   metadata: {

@@ -3,7 +3,11 @@ import type { ActionTypesConfig, CellType, Dispatch, DispatchersConfig } from '.
 import { ACTIONS } from '..';
 
 export type CellAction =
-  | { type: 'cellMouseEnter'; payload: { index: number; type: CellType }; tracked: false }
+  | {
+      type: 'cellMouseEnter';
+      payload: { index: number; type: CellType; onSelectionChange: (value: string) => void };
+      tracked: false;
+    }
   | {
       type: 'cellMouseDown';
       payload: { index: number; type: CellType };

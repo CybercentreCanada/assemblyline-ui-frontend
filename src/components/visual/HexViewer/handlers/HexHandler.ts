@@ -29,40 +29,50 @@ export const ASCII: HexASCII[] = [
 
 export const NON_PRINTABLE_ASCII_TABLE = new Map<
   number,
-  { dec: number; hex: string; html: string; code: string; CP437: string; caret: string; text: string; copy: string }
+  {
+    dec: number;
+    hex: string;
+    html: string;
+    code: string;
+    CP437: string;
+    caret: string;
+    text: string;
+    copy: string;
+    ascii: string;
+  }
 >([
-  [1, { dec: 1, hex: '01', html: '&#1;', code: 'SOH', CP437: '☺', caret: 'A', text: '^A', copy: ' ' }],
-  [0, { dec: 0, hex: '00', html: '&#0;', code: 'NUL', CP437: ' ', caret: '@', text: '^@', copy: ' ' }],
-  [2, { dec: 2, hex: '02', html: '&#2;', code: 'STX', CP437: '☻', caret: 'B', text: '^B', copy: ' ' }],
-  [3, { dec: 3, hex: '03', html: '&#3;', code: 'ETX', CP437: '♥', caret: 'C', text: '^C', copy: ' ' }],
-  [4, { dec: 4, hex: '04', html: '&#4;', code: 'EOT', CP437: '♦', caret: 'D', text: '^D', copy: ' ' }],
-  [5, { dec: 5, hex: '05', html: '&#5;', code: 'ENQ', CP437: '♣', caret: 'E', text: '^E', copy: ' ' }],
-  [6, { dec: 6, hex: '06', html: '&#6;', code: 'ACK', CP437: '♠', caret: 'F', text: '^F', copy: ' ' }],
-  [7, { dec: 7, hex: '07', html: '&#7;', code: 'BEL', CP437: '•', caret: 'G', text: '^G', copy: ' ' }],
-  [8, { dec: 8, hex: '08', html: '&#8;', code: 'BS', CP437: '◘', caret: 'H', text: '^H', copy: '\b' }],
-  [9, { dec: 9, hex: '09', html: '&#9;', code: 'HT', CP437: '○', caret: 't', text: '^I', copy: '\t' }],
-  [10, { dec: 10, hex: '0A', html: '&#10;', code: 'LF', CP437: '◙', caret: 'n', text: '^J', copy: '\n' }],
-  [11, { dec: 11, hex: '0B', html: '&#11;', code: 'VT', CP437: '♂', caret: 'v', text: '^K', copy: '\v' }],
-  [12, { dec: 12, hex: '0C', html: '&#12;', code: 'FF', CP437: '♀', caret: 'f', text: '^L', copy: '\f' }],
-  [13, { dec: 13, hex: '0D', html: '&#13;', code: 'CR', CP437: '♪', caret: 'r', text: '^M', copy: '\r' }],
-  [14, { dec: 14, hex: '0E', html: '&#14;', code: 'SO', CP437: '♫', caret: 'N', text: '^N', copy: ' ' }],
-  [15, { dec: 15, hex: '0F', html: '&#15;', code: 'SI', CP437: '☼', caret: 'O', text: '^O', copy: ' ' }],
-  [16, { dec: 16, hex: '10', html: '&#16;', code: 'DLE', CP437: '►', caret: 'P', text: '^P', copy: ' ' }],
-  [17, { dec: 17, hex: '11', html: '&#17;', code: 'DC1', CP437: '◄', caret: 'Q', text: '^Q', copy: ' ' }],
-  [18, { dec: 18, hex: '12', html: '&#18;', code: 'DC2', CP437: '↕', caret: 'R', text: '^R', copy: ' ' }],
-  [19, { dec: 19, hex: '13', html: '&#19;', code: 'DC3', CP437: '‼', caret: 'S', text: '^S', copy: ' ' }],
-  [20, { dec: 20, hex: '14', html: '&#20;', code: 'DC4', CP437: '¶', caret: 'T', text: '^T', copy: ' ' }],
-  [21, { dec: 21, hex: '15', html: '&#21;', code: 'NAK', CP437: '§', caret: 'U', text: '^U', copy: ' ' }],
-  [22, { dec: 22, hex: '16', html: '&#22;', code: 'SYN', CP437: '▬', caret: 'V', text: '^V', copy: ' ' }],
-  [23, { dec: 23, hex: '17', html: '&#23;', code: 'ETB', CP437: '↨', caret: 'W', text: '^W', copy: ' ' }],
-  [24, { dec: 24, hex: '18', html: '&#24;', code: 'CAN', CP437: '↑', caret: 'X', text: '^X', copy: ' ' }],
-  [25, { dec: 25, hex: '19', html: '&#25;', code: 'EM', CP437: '↓', caret: 'Y', text: '^Y', copy: ' ' }],
-  [26, { dec: 26, hex: '1A', html: '&#26;', code: 'SUB', CP437: '→', caret: 'Z', text: '^Z', copy: ' ' }],
-  [27, { dec: 27, hex: '1B', html: '&#27;', code: 'ESC', CP437: '←', caret: '[', text: '^[', copy: ' ' }],
-  [28, { dec: 28, hex: '1C', html: '&#28;', code: 'FS', CP437: '∟', caret: '\\', text: '^\\', copy: ' ' }],
-  [29, { dec: 29, hex: '1D', html: '&#29;', code: 'GS', CP437: '↔', caret: ']', text: '^]', copy: ' ' }],
-  [30, { dec: 30, hex: '1E', html: '&#30;', code: 'RS', CP437: '▲', caret: '^', text: '^^', copy: ' ' }],
-  [31, { dec: 31, hex: '1F', html: '&#31;', code: 'US', CP437: '▼', caret: '_', text: '^_', copy: ' ' }]
+  [1, { dec: 1, hex: '01', html: '&#1;', code: 'SOH', CP437: '☺', caret: 'A', text: '^A', copy: ' ', ascii: '␁' }],
+  [0, { dec: 0, hex: '00', html: '&#0;', code: 'NUL', CP437: ' ', caret: '@', text: '^@', copy: ' ', ascii: '␀' }],
+  [2, { dec: 2, hex: '02', html: '&#2;', code: 'STX', CP437: '☻', caret: 'B', text: '^B', copy: ' ', ascii: '␂' }],
+  [3, { dec: 3, hex: '03', html: '&#3;', code: 'ETX', CP437: '♥', caret: 'C', text: '^C', copy: ' ', ascii: '␃' }],
+  [4, { dec: 4, hex: '04', html: '&#4;', code: 'EOT', CP437: '♦', caret: 'D', text: '^D', copy: ' ', ascii: '␄' }],
+  [5, { dec: 5, hex: '05', html: '&#5;', code: 'ENQ', CP437: '♣', caret: 'E', text: '^E', copy: ' ', ascii: '␅' }],
+  [6, { dec: 6, hex: '06', html: '&#6;', code: 'ACK', CP437: '♠', caret: 'F', text: '^F', copy: ' ', ascii: '␆' }],
+  [7, { dec: 7, hex: '07', html: '&#7;', code: 'BEL', CP437: '•', caret: 'G', text: '^G', copy: ' ', ascii: '␇' }],
+  [8, { dec: 8, hex: '08', html: '&#8;', code: 'BS', CP437: '◘', caret: 'H', text: '^H', copy: '\b', ascii: '␈' }],
+  [9, { dec: 9, hex: '09', html: '&#9;', code: 'HT', CP437: '○', caret: 't', text: '^I', copy: '\t', ascii: '␉' }],
+  [10, { dec: 10, hex: '0A', html: '&#10;', code: 'LF', CP437: '◙', caret: 'n', text: '^J', copy: '\n', ascii: '␊' }],
+  [11, { dec: 11, hex: '0B', html: '&#11;', code: 'VT', CP437: '♂', caret: 'v', text: '^K', copy: '\v', ascii: '␋' }],
+  [12, { dec: 12, hex: '0C', html: '&#12;', code: 'FF', CP437: '♀', caret: 'f', text: '^L', copy: '\f', ascii: '␌' }],
+  [13, { dec: 13, hex: '0D', html: '&#13;', code: 'CR', CP437: '♪', caret: 'r', text: '^M', copy: '\r', ascii: '␍' }],
+  [14, { dec: 14, hex: '0E', html: '&#14;', code: 'SO', CP437: '♫', caret: 'N', text: '^N', copy: ' ', ascii: '␎' }],
+  [15, { dec: 15, hex: '0F', html: '&#15;', code: 'SI', CP437: '☼', caret: 'O', text: '^O', copy: ' ', ascii: '␏' }],
+  [16, { dec: 16, hex: '10', html: '&#16;', code: 'DLE', CP437: '►', caret: 'P', text: '^P', copy: ' ', ascii: '␐' }],
+  [17, { dec: 17, hex: '11', html: '&#17;', code: 'DC1', CP437: '◄', caret: 'Q', text: '^Q', copy: ' ', ascii: '␑' }],
+  [18, { dec: 18, hex: '12', html: '&#18;', code: 'DC2', CP437: '↕', caret: 'R', text: '^R', copy: ' ', ascii: '␒' }],
+  [19, { dec: 19, hex: '13', html: '&#19;', code: 'DC3', CP437: '‼', caret: 'S', text: '^S', copy: ' ', ascii: '␓' }],
+  [20, { dec: 20, hex: '14', html: '&#20;', code: 'DC4', CP437: '¶', caret: 'T', text: '^T', copy: ' ', ascii: '␔' }],
+  [21, { dec: 21, hex: '15', html: '&#21;', code: 'NAK', CP437: '§', caret: 'U', text: '^U', copy: ' ', ascii: '␕' }],
+  [22, { dec: 22, hex: '16', html: '&#22;', code: 'SYN', CP437: '▬', caret: 'V', text: '^V', copy: ' ', ascii: '␖' }],
+  [23, { dec: 23, hex: '17', html: '&#23;', code: 'ETB', CP437: '↨', caret: 'W', text: '^W', copy: ' ', ascii: '␗' }],
+  [24, { dec: 24, hex: '18', html: '&#24;', code: 'CAN', CP437: '↑', caret: 'X', text: '^X', copy: ' ', ascii: '␘' }],
+  [25, { dec: 25, hex: '19', html: '&#25;', code: 'EM', CP437: '↓', caret: 'Y', text: '^Y', copy: ' ', ascii: '␙' }],
+  [26, { dec: 26, hex: '1A', html: '&#26;', code: 'SUB', CP437: '→', caret: 'Z', text: '^Z', copy: ' ', ascii: '␚' }],
+  [27, { dec: 27, hex: '1B', html: '&#27;', code: 'ESC', CP437: '←', caret: '[', text: '^[', copy: ' ', ascii: '␛' }],
+  [28, { dec: 28, hex: '1C', html: '&#28;', code: 'FS', CP437: '∟', caret: '\\', text: '^\\', copy: ' ', ascii: '␜' }],
+  [29, { dec: 29, hex: '1D', html: '&#29;', code: 'GS', CP437: '↔', caret: ']', text: '^]', copy: ' ', ascii: '␝' }],
+  [30, { dec: 30, hex: '1E', html: '&#30;', code: 'RS', CP437: '▲', caret: '^', text: '^^', copy: ' ', ascii: '␞' }],
+  [31, { dec: 31, hex: '1F', html: '&#31;', code: 'US', CP437: '▼', caret: '_', text: '^_', copy: ' ', ascii: '␟' }]
 ]);
 
 export const HIGHER_ASCII_TABLE = new Map<
@@ -367,3 +377,32 @@ export const clampHexIndex = (hexcodes: Map<number, string>, index: number): num
 
 export const singleCharacterString = (value: any, base: string = undefined) =>
   value === undefined || value === null || typeof value !== 'string' || value === '' ? base : value.slice(-1);
+
+export const getASCIICharacter = (code: string): string => {
+  const byte = parseInt(code, 16);
+
+  // Lower-ASCII characters
+  if (byte >= 0x00 && byte <= 0x1f) {
+    return NON_PRINTABLE_ASCII_TABLE.get(byte).ascii;
+  }
+
+  // Printable ASCII Characters
+  if (byte >= 0x20 && byte <= 0x7e) {
+    return String.fromCharCode(byte);
+  }
+
+  // DEL 0x7F
+  if (byte === 0x7f) {
+    return '␡';
+  }
+
+  // Extended Control Characters
+  if (byte >= 0x80 && byte <= 0x9f) {
+    return '•';
+  }
+
+  // Higher-ASCII characters
+  if (byte >= 0xa0 && byte <= 0xff) {
+    return Buffer.from(code, 'hex').toString('latin1');
+  }
+};

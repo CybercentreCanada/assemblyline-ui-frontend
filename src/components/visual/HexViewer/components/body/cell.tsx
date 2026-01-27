@@ -1,5 +1,6 @@
 import { useTheme } from '@mui/material';
 import clsx from 'clsx';
+import { useSelection } from 'components/visual/FileViewer/components/SelectionProvider';
 import type { CellType, StoreProps } from 'components/visual/HexViewer';
 import { getCellClasses, getHexValue, getTextValue, LAYOUT_SIZE, useDispatch } from 'components/visual/HexViewer';
 import type { CSSProperties } from 'react';
@@ -22,6 +23,7 @@ export const WrappedHexCell = ({
   style = null
 }: HexCellProps) => {
   const theme = useTheme();
+  const selection = useSelection();
   const { onCellMouseEnter, onCellMouseDown } = useDispatch();
 
   const { codes: hexcodes } = store.hex;
@@ -32,7 +34,7 @@ export const WrappedHexCell = ({
       data-index={index}
       data-theme={theme.palette.mode}
       className={clsx('cell', getCellClasses(store, type, columnIndex, index))}
-      onMouseEnter={() => onCellMouseEnter({ index, type })}
+      onMouseEnter={() => onCellMouseEnter({ index, type, onSelectionChange: selection?.setSelection })}
       onMouseDown={event => onCellMouseDown({ index, type }, { event })}
       style={{
         width: type === 'hex' ? LAYOUT_SIZE.hexWidth : LAYOUT_SIZE.textWidth,

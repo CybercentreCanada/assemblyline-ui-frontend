@@ -46,12 +46,13 @@ export const SubmissionOptions = React.memo(() => {
                     state.values.file,
                     state.values.hash.type,
                     state.values.hash.value,
+                    state.values.raw.hash,
                     param.value,
                     param.default,
                     param.restricted
                   ] as const;
                 }}
-                children={([tab, file, hashType, hashValue, value, defaultValue, restricted]) => (
+                children={([tab, file, hashType, hashValue, rawHash, value, defaultValue, restricted]) => (
                   <TextInput
                     label={t('options.submission.description.label')}
                     value={value}
@@ -65,7 +66,9 @@ export const SubmissionOptions = React.memo(() => {
                         ? `Inspection of file: ${file?.name}`
                         : tab === 'hash' && hashType
                           ? `Inspection of ${hashType.toUpperCase()}: ${hashValue}`
-                          : null
+                          : tab === 'raw' && rawHash
+                            ? `Inspection of file: ${rawHash}`
+                            : null
                     }
                     rootProps={{ style: { marginBottom: theme.spacing(1) } }}
                     onChange={(e, v) => form.setFieldValue('settings.description.value', v)}
