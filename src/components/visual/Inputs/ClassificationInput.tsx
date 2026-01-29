@@ -12,6 +12,7 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
+import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
 import useALContext from 'components/hooks/useALContext';
 import type { WhoAmI } from 'components/models/ui/user';
 import type { ClassificationProps } from 'components/visual/Classification';
@@ -24,9 +25,9 @@ import {
   StyledInputSkeleton,
   StyledRoot
 } from 'components/visual/Inputs/lib/inputs.components';
-import { useError, useErrorCallback } from 'components/visual/Inputs/lib/inputs.hook';
-import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
-import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
+import { useValidation } from 'components/visual/Inputs/lib/inputs.hook';
+import type { InputOptions, InputRuntimeState, InputValueModel } from 'components/visual/Inputs/lib/inputs.model';
+import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/lib/inputs.model';
 import { Tooltip } from 'components/visual/Tooltip';
 import type { ClassificationParts, ClassificationValidator } from 'helpers/classificationParser';
 import {
@@ -43,14 +44,15 @@ import React, { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export type ClassificationInputProps = Omit<ClassificationProps, 'c12n' | 'setClassification'> &
-  InputValues<ClassificationProps['c12n']> &
-  InputProps;
+  InputValueModel<ClassificationProps['c12n']> &
+  InputOptions;
 
-type ClassificationInputState = ClassificationInputProps & {
-  showPicker: boolean;
-  uParts: ClassificationParts;
-  validated: ClassificationValidator;
-};
+type ClassificationInputController = ClassificationInputProps &
+  InputRuntimeState & {
+    showPicker: boolean;
+    uParts: ClassificationParts;
+    validated: ClassificationValidator;
+  };
 
 const WrappedClassificationInput = () => {
   const { t } = useTranslation('inputs');
@@ -61,7 +63,7 @@ const WrappedClassificationInput = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const sp2 = theme.spacing(2);
 
-  const [get, setStore] = usePropStore<ClassificationInputState>();
+  const [get, setStore] = usePropStore<ClassificationInputController>();
 
   const defaultValue = get('defaultValue');
   const disabled = get('disabled');
@@ -84,7 +86,7 @@ const WrappedClassificationInput = () => {
   const uParts = get('uParts') ?? defaultParts;
   const validated = get('validated') ?? defaultClassificationValidator;
 
-  const error = useError();
+  const error = () => null; // fix
   const onChange = get('onChange');
   const onError = get('onError');
   const onReset = get('onReset');
@@ -500,10 +502,15 @@ const WrappedClassificationInput = () => {
 };
 
 export const ClassificationInput = ({ preventRender = false, value, ...props }: ClassificationInputProps) => {
-  const errorMessage = useErrorCallback({ preventRender, value, ...props });
+  const { status: validationStatus, message: validationMessage } = useValidation<string>({
+    value: value ?? '',
+    rawValue: value ?? '',
+    ...props
+  });
 
   return preventRender || !value ? null : (
-    <PropProvider<ClassificationInputProps>
+    <PropProvider<ClassificationInputController>
+      initialProps={DEFAULT_INPUT_CONTROLLER_PROPS as ClassificationInputController}
       props={{
         dynGroup: null,
         errorMessage,
@@ -513,6 +520,8 @@ export const ClassificationInput = ({ preventRender = false, value, ...props }: 
         inputValue: value,
         isUser: false,
         preventRender,
+        validationStatus,
+        validationMessage,
         value,
         ...props
       }}

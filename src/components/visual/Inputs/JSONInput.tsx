@@ -2,6 +2,7 @@ import type { ThemeObject } from '@microlink/react-json-view';
 import ReactJson from '@microlink/react-json-view';
 import { useTheme } from '@mui/material';
 import { useAppTheme } from 'commons/components/app/hooks';
+import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
 import {
   HelperText,
   PasswordAdornment,
@@ -12,17 +13,19 @@ import {
   StyledInputSkeleton,
   StyledRoot
 } from 'components/visual/Inputs/lib/inputs.components';
-import { useErrorCallback, useInputChange } from 'components/visual/Inputs/lib/inputs.hook';
-import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
-import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
+import { useInputChange, useValidation } from 'components/visual/Inputs/lib/inputs.hook';
+import type { InputOptions, InputRuntimeState, InputValueModel } from 'components/visual/Inputs/lib/inputs.model';
+import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/lib/inputs.model';
 import React, { useMemo } from 'react';
 
-export type JSONInputProps = InputValues<object> & InputProps;
+export type JSONInputProps = InputValueModel<object> & InputOptions;
+
+type JSONInputController = JSONInputProps & InputRuntimeState;
 
 const WrappedJSONInput = () => {
   const theme = useTheme();
   const { isDark: isDarkTheme } = useAppTheme();
-  const [get] = usePropStore<JSONInputProps>();
+  const [get] = usePropStore<JSONInputController>();
 
   const disabled = get('disabled');
   const errorMessage = get('errorMessage');
@@ -56,7 +59,7 @@ const WrappedJSONInput = () => {
     [theme, isDarkTheme]
   );
 
-  const handleChange = useInputChange<JSONInputProps>();
+  const handleChange = useInputChange<object>();
 
   return (
     <StyledRoot>
@@ -131,10 +134,17 @@ const WrappedJSONInput = () => {
 };
 
 export const JSONInput = ({ preventRender = false, value, ...props }: JSONInputProps) => {
-  const errorMessage = useErrorCallback({ preventRender, value, ...props });
+  const { status: validationStatus, message: validationMessage } = useValidation<object>({
+    value: value ?? null,
+    rawValue: value ?? null,
+    ...props
+  });
 
   return preventRender ? null : (
-    <PropProvider<JSONInputProps> props={{ preventRender, inputValue: value, value, errorMessage, ...props }}>
+    <PropProvider<JSONInputController>
+      initialProps={DEFAULT_INPUT_CONTROLLER_PROPS as JSONInputController}
+      props={{ preventRender, inputValue: value, value, errorMessage, validationStatus, validationMessage, ...props }}
+    >
       <WrappedJSONInput />
     </PropProvider>
   );

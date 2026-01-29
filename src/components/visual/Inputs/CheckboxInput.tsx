@@ -1,5 +1,6 @@
 import type { CheckboxProps } from '@mui/material';
 import { Checkbox } from '@mui/material';
+import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
 import {
   ExpandAdornment,
   HelperText,
@@ -12,28 +13,30 @@ import {
   StyledFormControlLabel
 } from 'components/visual/Inputs/lib/inputs.components';
 import {
-  useErrorCallback,
   useInputClick,
   useInputClickBlur,
   useInputFocus,
-  usePropID
+  usePropID,
+  useValidation
 } from 'components/visual/Inputs/lib/inputs.hook';
-import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
-import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
+import type { InputOptions, InputRuntimeState, InputValueModel } from 'components/visual/Inputs/lib/inputs.model';
+import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/lib/inputs.model';
 import { Tooltip } from 'components/visual/Tooltip';
 import React from 'react';
 
-export type CheckboxInputProps = InputValues<boolean, boolean, React.MouseEvent<HTMLButtonElement, MouseEvent>> &
-  InputProps & {
+export type CheckboxInputProps = InputValueModel<boolean, boolean, React.MouseEvent<HTMLButtonElement, MouseEvent>> &
+  InputOptions & {
     indeterminate?: CheckboxProps['indeterminate'];
   };
 
+type CheckboxInputController = CheckboxInputProps & InputRuntimeState;
+
 const WrappedCheckboxInput = () => {
-  const [get] = usePropStore<CheckboxInputProps>();
+  const [get] = usePropStore<CheckboxInputController>();
 
   const id = usePropID();
   const indeterminate = get('indeterminate');
-  const inputValue = Boolean(get('inputValue'));
+  const rawValue = Boolean(get('rawValue'));
   const loading = get('loading');
   const preventDisabledColor = get('preventDisabledColor');
   const readOnly = get('readOnly');
@@ -41,9 +44,9 @@ const WrappedCheckboxInput = () => {
   const tooltipProps = get('tooltipProps');
   const value = get('value');
 
-  const handleBlur = useInputClickBlur<CheckboxInputProps>();
-  const handleClick = useInputClick<CheckboxInputProps>();
-  const handleFocus = useInputFocus<CheckboxInputProps>();
+  const handleBlur = useInputClickBlur<boolean>();
+  const handleClick = useInputClick<boolean>();
+  const handleFocus = useInputFocus<boolean>();
 
   return (
     <Tooltip title={loading ? null : tooltip} {...tooltipProps}>
@@ -51,12 +54,12 @@ const WrappedCheckboxInput = () => {
         <StyledFormButton
           onBlur={e => handleBlur(e, value, value)}
           onFocus={handleFocus}
-          onClick={e => handleClick(e, !inputValue, !inputValue)}
+          onClick={e => handleClick(e, !rawValue, !rawValue)}
         >
           <StyledFormControlLabel label={<StyledButtonLabel />}>
             <Checkbox
               name={id}
-              checked={inputValue}
+              checked={rawValue}
               indeterminate={indeterminate}
               disableFocusRipple
               disableRipple
@@ -85,11 +88,23 @@ const WrappedCheckboxInput = () => {
 };
 
 export const CheckboxInput = ({ preventRender = false, value, ...props }: CheckboxInputProps) => {
-  const errorMessage = useErrorCallback({ preventRender, value, ...props });
+  const { status: validationStatus, message: validationMessage } = useValidation<boolean>({
+    value: Boolean(value),
+    rawValue: Boolean(value),
+    ...props
+  });
 
   return preventRender ? null : (
-    <PropProvider<CheckboxInputProps>
-      props={{ indeterminate: false, inputValue: value, value, errorMessage, ...props }}
+    <PropProvider<CheckboxInputController>
+      initialProps={DEFAULT_INPUT_CONTROLLER_PROPS as CheckboxInputController}
+      props={{
+        indeterminate: false,
+        rawValue: value,
+        value,
+        validationMessage,
+        validationStatus,
+        ...props
+      }}
     >
       <WrappedCheckboxInput />
     </PropProvider>

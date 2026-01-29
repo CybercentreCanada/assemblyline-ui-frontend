@@ -1,4 +1,5 @@
 import type { TextFieldProps } from '@mui/material';
+import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
 import {
   HelperText,
   StyledFormControl,
@@ -7,28 +8,29 @@ import {
   StyledRoot,
   StyledTextField
 } from 'components/visual/Inputs/lib/inputs.components';
-import {
-  useErrorCallback,
-  useInputBlur,
-  useInputChange,
-  useInputFocus
-} from 'components/visual/Inputs/lib/inputs.hook';
-import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
-import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
+import { useInputBlur, useInputChange, useInputFocus, useValidation } from 'components/visual/Inputs/lib/inputs.hook';
+import type { InputOptions, InputRuntimeState, InputValueModel } from 'components/visual/Inputs/lib/inputs.model';
+import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/lib/inputs.model';
 import React, { useEffect, useRef } from 'react';
 
-export type NumberInputProps = InputValues<number, string, React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>> &
-  InputProps & {
+export type NumberInputProps = InputValueModel<
+  number,
+  string,
+  React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
+> &
+  InputOptions & {
     autoComplete?: TextFieldProps['autoComplete'];
     max?: number;
     min?: number;
     step?: number;
   };
 
-const WrappedNumberInput = () => {
-  const [get] = usePropStore<NumberInputProps>();
+type NumberInputController = NumberInputProps & InputRuntimeState;
 
-  const inputValue = get('inputValue') ?? '';
+const WrappedNumberInput = () => {
+  const [get] = usePropStore<NumberInputController>();
+
+  const rawValue = get('rawValue') ?? '';
   const loading = get('loading');
   const max = get('max');
   const min = get('min');
@@ -37,9 +39,9 @@ const WrappedNumberInput = () => {
 
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const handleBlur = useInputBlur<NumberInputProps>();
-  const handleChange = useInputChange<NumberInputProps>();
-  const handleFocus = useInputFocus<NumberInputProps>();
+  const handleBlur = useInputBlur<number, string>();
+  const handleChange = useInputChange<number, string>();
+  const handleFocus = useInputFocus<number, string>();
 
   useEffect(() => {
     const el = inputRef.current;
@@ -69,10 +71,10 @@ const WrappedNumberInput = () => {
             <StyledTextField
               ref={inputRef}
               type="number"
-              value={inputValue}
-              onChange={e => handleChange(e, e.target.value, e.target.value !== '' ? Number(e.target.value) : null)}
+              value={rawValue}
+              onChange={e => handleChange(e, e.target.value !== '' ? Number(e.target.value) : null, e.target.value)}
               onFocus={handleFocus}
-              onBlur={e => handleBlur(e, value == null ? '' : String(value), value)}
+              onBlur={e => handleBlur(e, value, value == null ? '' : String(value))}
               slotProps={{
                 input: {
                   inputProps: {
@@ -92,19 +94,25 @@ const WrappedNumberInput = () => {
 };
 
 export const NumberInput = ({ preventRender = false, value, ...props }: NumberInputProps) => {
-  const errorMessage = useErrorCallback({ preventRender, value, ...props });
+  const { status: validationStatus, message: validationMessage } = useValidation<number, string>({
+    value: value,
+    rawValue: String(value),
+    ...props
+  });
 
   return preventRender ? null : (
-    <PropProvider<NumberInputProps>
+    <PropProvider<NumberInputController>
+      initialProps={DEFAULT_INPUT_CONTROLLER_PROPS as NumberInputController}
       props={{
         autoComplete: 'off',
         enforceValidValue: true,
-        errorMessage,
-        inputValue: value == null ? '' : String(value),
+        rawValue: value == null ? '' : String(value),
         max: null,
         min: null,
         preventRender,
-        spinnerAdornment: true,
+        showSpinner: true,
+        validationStatus,
+        validationMessage,
         step: 1,
         value,
         ...props

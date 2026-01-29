@@ -1,5 +1,6 @@
 import type { TextFieldProps } from '@mui/material';
 import { Skeleton } from '@mui/material';
+import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
 import type { StyledTextFieldProps } from 'components/visual/Inputs/lib/inputs.components';
 import {
   HelperText,
@@ -8,46 +9,43 @@ import {
   StyledRoot,
   StyledTextField
 } from 'components/visual/Inputs/lib/inputs.components';
-import {
-  useErrorCallback,
-  useInputBlur,
-  useInputChange,
-  useInputFocus
-} from 'components/visual/Inputs/lib/inputs.hook';
-import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
-import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
+import { useInputBlur, useInputChange, useInputFocus, useValidation } from 'components/visual/Inputs/lib/inputs.hook';
+import type { InputOptions, InputRuntimeState, InputValueModel } from 'components/visual/Inputs/lib/inputs.model';
+import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/lib/inputs.model';
 import React from 'react';
 
-export type TextAreaInputProps = InputValues<
+export type TextAreaInputProps = InputValueModel<
   string,
   string,
   React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
 > &
-  InputProps & {
+  InputOptions & {
     autoComplete?: StyledTextFieldProps['autoComplete'];
     rows?: TextFieldProps['rows'];
     minRows?: TextFieldProps['minRows'];
     maxRows?: TextFieldProps['maxRows'];
   };
 
+type TextAreaInputController = TextAreaInputProps & InputRuntimeState;
+
 const WrappedTextAreaInput = () => {
-  const [get] = usePropStore<TextAreaInputProps>();
+  const [get] = usePropStore<TextAreaInputController>();
 
   const autoComplete = get('autoComplete');
-  const inputValue = get('inputValue') ?? '';
+  const rawValue = get('rawValue') ?? '';
   const loading = get('loading');
   const maxRows = get('maxRows');
   const minRows = get('minRows');
   const overflowHidden = get('overflowHidden');
   const password = get('password');
   const rows = get('rows');
-  const showPassword = get('showPassword');
+  const isPasswordVisible = get('isPasswordVisible');
   const tiny = get('tiny');
   const value = get('value');
 
-  const handleBlur = useInputBlur<TextAreaInputProps>();
-  const handleChange = useInputChange<TextAreaInputProps>();
-  const handleFocus = useInputFocus<TextAreaInputProps>();
+  const handleBlur = useInputBlur<string>();
+  const handleChange = useInputChange<string>();
+  const handleFocus = useInputFocus<string>();
 
   return (
     <StyledRoot>
@@ -60,12 +58,12 @@ const WrappedTextAreaInput = () => {
         ) : (
           <>
             <StyledTextField
-              {...(!(overflowHidden || (password && showPassword)) && {
+              {...(!(overflowHidden || (password && isPasswordVisible)) && {
                 multiline: true,
                 ...(minRows || maxRows ? { minRows, maxRows } : { rows: rows || 1 })
               })}
               autoComplete={autoComplete}
-              value={inputValue}
+              value={rawValue}
               onChange={e => handleChange(e, e.target.value, e.target.value)}
               onFocus={handleFocus}
               onBlur={e => handleBlur(e, value, value)}
@@ -79,17 +77,23 @@ const WrappedTextAreaInput = () => {
 };
 
 export const TextAreaInput = ({ preventRender = false, value, ...props }: TextAreaInputProps) => {
-  const errorMessage = useErrorCallback({ preventRender, value, ...props });
+  const { status: validationStatus, message: validationMessage } = useValidation<string>({
+    value: value ?? '',
+    rawValue: value ?? '',
+    ...props
+  });
 
   return preventRender ? null : (
-    <PropProvider<TextAreaInputProps>
+    <PropProvider<TextAreaInputController>
+      initialProps={DEFAULT_INPUT_CONTROLLER_PROPS as TextAreaInputController}
       props={{
         autoComplete: 'off',
-        errorMessage,
-        inputValue: value,
+        rawValue: value,
         maxRows: null,
         minRows: null,
         preventRender,
+        validationMessage,
+        validationStatus,
         rows: null,
         value,
         ...props

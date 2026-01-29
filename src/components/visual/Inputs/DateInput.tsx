@@ -4,6 +4,7 @@ import { Popover, useTheme } from '@mui/material';
 import { DigitalClock, LocalizationProvider, DateTimePicker as MuiDateTimePicker } from '@mui/x-date-pickers';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
+import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
 import { IconButton } from 'components/visual/Buttons/IconButton';
 import {
   ExpandAdornment,
@@ -18,14 +19,14 @@ import {
   useTextInputSlot
 } from 'components/visual/Inputs/lib/inputs.components';
 import {
-  useErrorCallback,
   useInputBlur,
   useInputChange,
   useInputFocus,
-  usePropID
+  usePropID,
+  useValidation
 } from 'components/visual/Inputs/lib/inputs.hook';
-import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
-import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
+import type { InputOptions, InputRuntimeState, InputValueModel } from 'components/visual/Inputs/lib/inputs.model';
+import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/lib/inputs.model';
 import type { Moment } from 'moment';
 import moment from 'moment';
 import React, { useEffect, useMemo, useState } from 'react';
@@ -41,31 +42,32 @@ function configureMomentLocale(language: string) {
 }
 
 export type DateInputProps = Omit<TextFieldProps, 'error' | 'value' | 'onChange'> &
-  InputValues<string, Moment> &
-  InputProps & {
+  InputValueModel<string, Moment> &
+  InputOptions & {
     defaultDateOffset?: number | null;
     maxDateToday?: boolean;
     minDateTomorrow?: boolean;
   };
 
-type DateInputState = DateInputProps & {
-  showPopover: boolean;
-};
+type DateInputController = DateInputProps &
+  InputRuntimeState & {
+    showPopover: boolean;
+  };
 
 const DatePopper = React.memo(() => {
   const theme = useTheme();
 
   const [anchorEl, setAnchorEl] = useState<Element>(null);
 
-  const [get, setStore] = usePropStore<DateInputState>();
+  const [get, setStore] = usePropStore<DateInputController>();
 
   const disabled = get('disabled');
-  const inputValue = get('inputValue') ?? null;
+  const rawValue = get('rawValue') ?? null;
   const showPopover = get('showPopover') ?? false;
   const tiny = get('tiny');
 
   const id = usePropID();
-  const handleChange = useInputChange<DateInputProps>();
+  const handleChange = useInputChange<Moment, string>();
 
   return (
     <>
@@ -126,7 +128,7 @@ const DatePopper = React.memo(() => {
               views={['month', 'day']}
               // timezone="utc"
               showDaysOutsideCurrentMonth
-              value={inputValue}
+              value={rawValue}
               onChange={(v: Moment) => handleChange(null, v, v.toISOString())}
               sx={{ height: '320px' }}
               slotProps={{ calendarHeader: { sx: { marginTop: '0px', marginBottom: '0px' } } }}
@@ -134,7 +136,7 @@ const DatePopper = React.memo(() => {
 
             <DigitalClock
               // timezone="utc"
-              value={inputValue}
+              value={rawValue}
               onChange={(v: Moment) => handleChange(null, v, v.toISOString())}
               sx={{
                 maxHeight: '320px',
@@ -157,7 +159,7 @@ const WrappedDateInput = () => {
 
   const disabled = get('disabled');
   const endAdornment = get('endAdornment');
-  const inputValue = get('inputValue') ?? null;
+  const rawValue = get('rawValue') ?? null;
   const loading = get('loading');
   const maxDateToday = get('maxDateToday');
   const minDateTomorrow = get('minDateTomorrow');
@@ -203,7 +205,7 @@ const WrappedDateInput = () => {
                 maxDate={maxDateToday ? today : null}
                 minDate={minDateTomorrow ? tomorrow : null}
                 readOnly={readOnly}
-                value={inputValue}
+                value={rawValue}
                 onChange={d =>
                   handleChange(null, d, d && d.isValid() ? `${d.format('YYYY-MM-DDThh:mm:ss.SSSSSS')}Z` : null)
                 }
@@ -236,18 +238,25 @@ const WrappedDateInput = () => {
 };
 
 export const DateInput = ({ preventRender = false, value, ...props }: DateInputProps) => {
-  const errorMessage = useErrorCallback({ preventRender, value, ...props });
+  const { status: validationStatus, message: validationMessage } = useValidation<string, Moment>({
+    value: value ?? '',
+    rawValue: value ? moment(value) : null,
+    ...props
+  });
 
   return preventRender ? null : (
-    <PropProvider<DateInputProps>
+    <PropProvider<DateInputController>
+      initialProps={DEFAULT_INPUT_CONTROLLER_PROPS as DateInputController}
       props={{
         autoComplete: 'off',
         defaultDateOffset: null,
         errorMessage,
-        inputValue: value ? moment(value) : null,
+        rawValue: value ? moment(value) : null,
         maxDateToday: false,
         minDateTomorrow: false,
         preventRender,
+        validationStatus,
+        validationMessage,
         value,
         ...props
       }}

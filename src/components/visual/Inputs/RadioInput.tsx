@@ -1,5 +1,6 @@
 import type { FormControlLabelProps } from '@mui/material';
 import { Radio, RadioGroup } from '@mui/material';
+import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
 import {
   HelperText,
   PasswordAdornment,
@@ -13,13 +14,13 @@ import {
   StyledRoot
 } from 'components/visual/Inputs/lib/inputs.components';
 import {
-  useErrorCallback,
   useInputChange,
   useInputClickBlur,
-  useInputFocus
+  useInputFocus,
+  useValidation
 } from 'components/visual/Inputs/lib/inputs.hook';
-import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
-import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
+import type { InputOptions, InputRuntimeState, InputValueModel } from 'components/visual/Inputs/lib/inputs.model';
+import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/lib/inputs.model';
 import React from 'react';
 
 type Option = Omit<FormControlLabelProps, 'control' | 'label'> & {
@@ -27,34 +28,36 @@ type Option = Omit<FormControlLabelProps, 'control' | 'label'> & {
   label?: string;
 };
 
-export type RadioInputProps<O extends readonly Option[]> = InputValues<
+export type RadioInputProps<O extends readonly Option[]> = InputValueModel<
   O[number]['value'],
   O[number]['value'],
   React.MouseEvent<HTMLButtonElement, MouseEvent>
 > &
-  InputProps & {
+  InputOptions & {
     options: O;
   };
 
-const WrappedRadioInput = <O extends readonly Option[]>() => {
-  const [get] = usePropStore<RadioInputProps<O>>();
+type RadioInputController<O extends readonly Option[]> = RadioInputProps<O> & InputRuntimeState;
 
-  const focused = get('focused');
-  const inputValue = get('inputValue') ?? '';
+const WrappedRadioInput = <O extends readonly Option[]>() => {
+  const [get] = usePropStore<RadioInputController<O>>();
+
+  const isFocused = get('isFocused');
+  const rawValue = get('rawValue') ?? '';
   const options = get('options');
   const preventDisabledColor = get('preventDisabledColor');
   const readOnly = get('readOnly');
   const value = get('value');
 
-  const handleBlur = useInputClickBlur<RadioInputProps<O>>();
-  const handleChange = useInputChange<RadioInputProps<O>>();
-  const handleFocus = useInputFocus<RadioInputProps<O>>();
+  const handleBlur = useInputClickBlur<O[number]['value']>();
+  const handleChange = useInputChange<O[number]['value']>();
+  const handleFocus = useInputFocus<O[number]['value']>();
 
   return (
     <StyledRoot>
       <StyledFormLabel />
       <StyledFormControl>
-        <RadioGroup value={inputValue}>
+        <RadioGroup value={rawValue}>
           {options.map((option, index) => (
             <StyledFormButton
               key={`${index}-${option.label}`}
@@ -66,7 +69,7 @@ const WrappedRadioInput = <O extends readonly Option[]>() => {
                 label={
                   <StyledButtonLabel
                     label={option.label}
-                    focused={focused && inputValue === (option.value ?? '')}
+                    isFocused={isFocused && rawValue === (option.value ?? '')}
                     ignoreRequired
                   />
                 }
@@ -104,11 +107,24 @@ export const RadioInput = <O extends readonly Option[]>({
   value = null,
   ...props
 }: RadioInputProps<O>) => {
-  const errorMessage = useErrorCallback({ preventRender, value, ...props });
+  const { status: validationStatus, message: validationMessage } = useValidation<O[number]['value']>({
+    value: value ?? '',
+    rawValue: value ?? '',
+    ...props
+  });
 
   return preventRender ? null : (
-    <PropProvider<RadioInputProps<O>>
-      props={{ options: [] as unknown as O, preventRender, value, inputValue: value, errorMessage, ...props }}
+    <PropProvider<RadioInputController<O>>
+      initialProps={DEFAULT_INPUT_CONTROLLER_PROPS as RadioInputController<O>}
+      props={{
+        options: [] as unknown as O,
+        preventRender,
+        value,
+        rawValue: value,
+        validationStatus,
+        validationMessage,
+        ...props
+      }}
     >
       <WrappedRadioInput />
     </PropProvider>

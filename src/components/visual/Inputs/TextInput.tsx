@@ -1,5 +1,6 @@
 import type { TextFieldProps } from '@mui/material';
 import { Autocomplete, Typography } from '@mui/material';
+import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
 import {
   HelperText,
   StyledFormControl,
@@ -9,37 +10,39 @@ import {
   StyledTextField
 } from 'components/visual/Inputs/lib/inputs.components';
 import {
-  useErrorCallback,
   useInputBlur,
   useInputChange,
   useInputFocus,
-  usePropID
+  usePropID,
+  useValidation
 } from 'components/visual/Inputs/lib/inputs.hook';
-import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
-import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
+import type { InputOptions, InputRuntimeState, InputValueModel } from 'components/visual/Inputs/lib/inputs.model';
+import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/lib/inputs.model';
 import React from 'react';
 
-export type TextInputProps = InputValues<string, string, React.SyntheticEvent<Element, Event>> &
-  InputProps & {
+export type TextInputProps = InputValueModel<string, string, React.SyntheticEvent<Element, Event>> &
+  InputOptions & {
     autoComplete?: TextFieldProps['autoComplete'];
     options?: string[] | readonly string[];
   };
 
+type TextInputController = TextInputProps & InputRuntimeState;
+
 const WrappedTextInput = () => {
-  const [get] = usePropStore<TextInputProps>();
+  const [get] = usePropStore<TextInputController>();
 
   const disabled = get('disabled');
   const id = usePropID();
-  const inputValue = get('inputValue') ?? '';
+  const rawValue = get('rawValue') ?? '';
   const loading = get('loading');
   const options = get('options') ?? [];
   const readOnly = get('readOnly');
   const tiny = get('tiny');
   const value = get('value') ?? '';
 
-  const handleBlur = useInputBlur<TextInputProps>();
-  const handleChange = useInputChange<TextInputProps>();
-  const handleFocus = useInputFocus<TextInputProps>();
+  const handleBlur = useInputBlur<string>();
+  const handleChange = useInputChange<string>();
+  const handleFocus = useInputFocus<string>();
 
   return (
     <StyledRoot>
@@ -54,7 +57,7 @@ const WrappedTextInput = () => {
             freeSolo
             fullWidth
             id={id}
-            inputValue={inputValue}
+            inputValue={rawValue}
             options={options}
             readOnly={readOnly}
             size="small"
@@ -77,11 +80,25 @@ const WrappedTextInput = () => {
 };
 
 export const TextInput = ({ preventRender = false, value, ...props }: TextInputProps) => {
-  const errorMessage = useErrorCallback({ preventRender, value, ...props });
+  const { status: validationStatus, message: validationMessage } = useValidation<string>({
+    value: value ?? '',
+    rawValue: value ?? '',
+    ...props
+  });
 
   return preventRender ? null : (
-    <PropProvider<TextInputProps>
-      props={{ autoComplete: 'off', options: [], preventRender, inputValue: value, value, errorMessage, ...props }}
+    <PropProvider<TextInputController>
+      initialProps={DEFAULT_INPUT_CONTROLLER_PROPS as TextInputController}
+      props={{
+        autoComplete: 'off',
+        rawValue: value,
+        options: [],
+        preventRender,
+        validationMessage,
+        validationStatus,
+        value,
+        ...props
+      }}
     >
       <WrappedTextInput />
     </PropProvider>

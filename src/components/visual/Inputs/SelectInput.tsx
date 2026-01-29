@@ -1,5 +1,6 @@
 import type { ListItemTextProps, MenuItemProps, SelectProps } from '@mui/material';
 import { ListItemText, MenuItem, Select } from '@mui/material';
+import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
 import {
   HelperText,
   MenuAdornment,
@@ -13,14 +14,14 @@ import {
   StyledRoot
 } from 'components/visual/Inputs/lib/inputs.components';
 import {
-  useErrorCallback,
   useInputBlur,
   useInputChange,
   useInputFocus,
-  usePropID
+  usePropID,
+  useValidation
 } from 'components/visual/Inputs/lib/inputs.hook';
-import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
-import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
+import type { InputOptions, InputRuntimeState, InputValueModel } from 'components/visual/Inputs/lib/inputs.model';
+import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/lib/inputs.model';
 import React from 'react';
 
 export type Option = {
@@ -29,15 +30,17 @@ export type Option = {
   value: MenuItemProps['value'] | boolean;
 };
 
-export type SelectInputProps<O extends readonly Option[]> = InputValues<O[number]['value'], O[number]['value']> &
-  InputProps & {
+export type SelectInputProps<O extends readonly Option[]> = InputValueModel<O[number]['value'], O[number]['value']> &
+  InputOptions & {
     capitalize?: boolean;
     displayEmpty?: SelectProps['displayEmpty'];
     options?: O;
   };
 
+type SelectInputController<O extends readonly Option[]> = SelectInputProps<O> & InputRuntimeState;
+
 const WrappedSelectInput = <O extends readonly Option[]>() => {
-  const [get, setStore] = usePropStore<SelectInputProps<O>>();
+  const [get, setStore] = usePropStore<SelectInputController<O>>();
 
   const capitalize = get('capitalize');
   const disabled = get('disabled');
@@ -45,21 +48,21 @@ const WrappedSelectInput = <O extends readonly Option[]>() => {
   const endAdornment = get('endAdornment');
   const errorMessage = get('errorMessage');
   const id = usePropID();
-  const inputValue = get('inputValue');
+  const rawValue = get('rawValue');
   const loading = get('loading');
   const monospace = get('monospace');
   const options = get('options');
   const overflowHidden = get('overflowHidden');
   const password = get('password');
   const readOnly = get('readOnly');
-  const showMenu = get('showMenu');
-  const showPassword = get('showPassword');
+  const hasMenuAdornment = get('hasMenuAdornment');
+  const isPasswordVisible = get('isPasswordVisible');
   const tiny = get('tiny');
   const value = get('value');
 
-  const handleBlur = useInputBlur<SelectInputProps<O>>();
-  const handleChange = useInputChange<SelectInputProps<O>>();
-  const handleFocus = useInputFocus<SelectInputProps<O>>();
+  const handleBlur = useInputBlur<O[number]['value']>();
+  const handleChange = useInputChange<O[number]['value']>();
+  const handleFocus = useInputFocus<O[number]['value']>();
 
   return (
     <StyledRoot>
@@ -76,13 +79,13 @@ const WrappedSelectInput = <O extends readonly Option[]>() => {
             id={id}
             readOnly={readOnly}
             size="small"
-            open={showMenu}
-            value={options?.some(o => o.value === inputValue) ? inputValue : ''}
+            open={hasMenuAdornment}
+            value={options?.some(o => o.value === rawValue) ? rawValue : ''}
             onChange={event => handleChange(event as React.SyntheticEvent, event.target.value, event.target.value)}
             onFocus={handleFocus}
             onBlur={e => handleBlur(e, value, value)}
-            onClose={() => setStore({ showMenu: false })}
-            onOpen={() => setStore({ showMenu: true })}
+            onClose={() => setStore({ hasMenuAdornment: false })}
+            onOpen={() => setStore({ hasMenuAdornment: true })}
             renderValue={option => (
               <ListItemText
                 primary={options?.find(o => o.value === option)?.primary || ''}
@@ -103,7 +106,7 @@ const WrappedSelectInput = <O extends readonly Option[]>() => {
                       ...(readOnly && { cursor: 'default', userSelect: 'text' }),
                       ...(monospace && { fontFamily: 'monospace' }),
                       ...(password &&
-                        showPassword && {
+                        isPasswordVisible && {
                           fontFamily: 'password',
                           WebkitTextSecurity: 'disc',
                           MozTextSecurity: 'disc',
@@ -156,17 +159,23 @@ export const SelectInput = <O extends readonly Option[]>({
   value,
   ...props
 }: SelectInputProps<O>) => {
-  const errorMessage = useErrorCallback({ preventRender, value, ...props });
+  const { status: validationStatus, message: validationMessage } = useValidation<O[number]['value']>({
+    value: value ?? '',
+    rawValue: value ?? '',
+    ...props
+  });
 
   return preventRender ? null : (
-    <PropProvider<SelectInputProps<O>>
+    <PropProvider<SelectInputController<O>>
+      initialProps={DEFAULT_INPUT_CONTROLLER_PROPS as SelectInputController<O>}
       props={{
         capitalize: false,
         displayEmpty: false,
-        errorMessage,
-        inputValue: value,
-        menuAdornment: true,
+        rawValue: value,
+        hasMenuAdornment: true,
         options: [] as unknown as O,
+        validationStatus,
+        validationMessage,
         preventRender,
         value,
         ...props
