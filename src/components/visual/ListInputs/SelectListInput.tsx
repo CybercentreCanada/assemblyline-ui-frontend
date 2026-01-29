@@ -1,5 +1,7 @@
 import type { ListItemTextProps, MenuItemProps, SelectProps } from '@mui/material';
 import { ListItemText, MenuItem, Select, useTheme } from '@mui/material';
+import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
+import { useValidation } from 'components/visual/Inputs/lib/inputs.hook';
 import {
   StyledHelperText,
   StyledListInputInner,
@@ -12,14 +14,17 @@ import {
   StyledResetAdornment
 } from 'components/visual/ListInputs/lib/listinputs.components';
 import {
-  useErrorCallback,
   useInputBlur,
   useInputChange,
   useInputFocus,
   usePropID
 } from 'components/visual/ListInputs/lib/listinputs.hook';
-import type { ListInputProps, ListInputValues } from 'components/visual/ListInputs/lib/listinputs.model';
-import { PropProvider, usePropStore } from 'components/visual/ListInputs/lib/listinputs.provider';
+import type {
+  ListInputOptions,
+  ListInputRuntimeState,
+  ListInputValueModel
+} from 'components/visual/ListInputs/lib/listinputs.model';
+import { DEFAULT_LIST_INPUT_CONTROLLER_PROPS } from 'components/visual/ListInputs/lib/listinputs.model';
 import React from 'react';
 
 export type Option = {
@@ -28,14 +33,16 @@ export type Option = {
   value: MenuItemProps['value'] | boolean;
 };
 
-export type SelectListInputProps<O extends readonly Option[]> = ListInputValues<
+export type SelectListInputProps<O extends readonly Option[]> = ListInputValueModel<
   O[number]['value'],
   O[number]['value']
 > &
-  ListInputProps & {
+  ListInputOptions & {
     displayEmpty?: SelectProps['displayEmpty'];
     options?: O;
   };
+
+type SelectListInputController<O extends readonly Option[]> = SelectListInputProps<O> & ListInputRuntimeState;
 
 const WrappedSelectListInput = <O extends readonly Option[]>() => {
   const theme = useTheme();
@@ -47,7 +54,7 @@ const WrappedSelectListInput = <O extends readonly Option[]>() => {
   const displayEmpty = get('displayEmpty');
   const errorMessage = get('errorMessage');
   const id = usePropID();
-  const inputValue = get('inputValue');
+  const rawValue = get('rawValue');
   const loading = get('loading');
   const monospace = get('monospace');
   const options = get('options');
@@ -85,7 +92,7 @@ const WrappedSelectListInput = <O extends readonly Option[]>() => {
                 readOnly={readOnly}
                 size="small"
                 open={showMenu}
-                value={options?.some(o => o.value === inputValue) ? inputValue : ''}
+                value={options?.some(o => o.value === rawValue) ? rawValue : ''}
                 onChange={event => handleChange(event as React.SyntheticEvent, event.target.value, event.target.value)}
                 onFocus={handleFocus}
                 onBlur={e => handleBlur(e, value, value)}
@@ -195,18 +202,25 @@ export const SelectListInput = <O extends readonly Option[]>({
   value,
   ...props
 }: SelectListInputProps<O>) => {
-  const errorMessage = useErrorCallback({ preventRender, value, ...props });
+  const { status: validationStatus, message: validationMessage } = useValidation<O[number]['value']>({
+    value: value ?? '',
+    rawValue: value ?? '',
+    ...props
+  });
 
   return preventRender ? null : (
-    <PropProvider<SelectListInputProps<O>>
+    <PropProvider<SelectListInputController<O>>
+      initialProps={DEFAULT_LIST_INPUT_CONTROLLER_PROPS as SelectListInputController}
       props={{
         capitalize: false,
         displayEmpty: false,
         errorMessage,
-        inputValue: value,
+        rawValue: value,
         options: [] as unknown as O,
         overflowHidden: true,
         preventRender,
+        validationStatus,
+        validationMessage,
         value,
         ...props
       }}
