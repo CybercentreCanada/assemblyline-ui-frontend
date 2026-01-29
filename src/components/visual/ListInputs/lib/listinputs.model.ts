@@ -1,36 +1,57 @@
 import type { FormHelperTextProps, IconButtonProps, ListItemTextProps, TypographyProps } from '@mui/material';
+import type {
+  CoercersSchema,
+  ValidationSchema,
+  ValidationStatus
+} from 'components/visual/Inputs/lib/inputs.validation';
 import type React from 'react';
 import type { CSSProperties } from 'react';
 
-export type ListInputValues<Value, InputValue = Value, Event = React.SyntheticEvent> = {
+/**********************************************************************************************************************
+ * List Input Value Model (controlled data + validation behavior)
+ *********************************************************************************************************************/
+export type ListInputValueModel<Value, RawValue = Value, Event = React.SyntheticEvent> = {
   /**
-   * The current value of the input
+   * Optional coercion function used to normalize raw values
+   * (e.g. trimming strings, clamping numbers, etc.)
    */
-  value: Value;
+  coerce?: (event: React.SyntheticEvent, value: Value, rawValue: RawValue) => Value;
 
   /**
-   * The default value of the input
+   * Schema extension hook for coercion pipeline
+   */
+  coercers?: (schema: CoercersSchema<Value, RawValue>) => CoercersSchema<Value, RawValue>;
+
+  /**
+   * The default value used when the input is reset
    */
   defaultValue?: Value;
 
   /**
    * The raw user-entered value (may differ from `value`)
    */
-  inputValue?: InputValue;
-
-  // parser?: (inputValue: InputValue) => InputValue;
+  rawValue?: RawValue;
 
   /**
-   * If `true`, shows a reset/clear button
+   * Controls whether the reset / clear button should be visible
    * @default false
    */
-  reset?: boolean | ((value: Value, inputValue: InputValue) => boolean);
+  reset?: boolean | ((value: Value, rawValue: RawValue) => boolean);
 
   /**
-   * Validation function that returns an error message string
-   * when the value is invalid
+   * Validation function returning a validation result
    */
-  error?: (value: Value) => string;
+  validate?: (value: Value, rawValue: RawValue) => { status: ValidationStatus; message: string };
+
+  /**
+   * Schema extension hook for validation pipeline
+   */
+  validators?: (schema: ValidationSchema<Value, RawValue>) => ValidationSchema<Value, RawValue>;
+
+  /**
+   * The current parsed / committed value of the input
+   */
+  value: Value;
 
   /**
    * Callback fired when the value changes
@@ -47,188 +68,194 @@ export type ListInputValues<Value, InputValue = Value, Event = React.SyntheticEv
   onReset?: IconButtonProps['onClick'];
 };
 
-export const DEFAULT_LIST_INPUT_VALUES: ListInputValues<unknown, unknown> = {
+export const DEFAULT_LIST_INPUT_VALUE_MODEL: ListInputValueModel<unknown, unknown> = {
+  coerce: v => v,
+  coercers: s => s,
   defaultValue: null,
-  error: null,
-  inputValue: null,
-  reset: false,
+  rawValue: null,
+  reset: () => false,
+  validate: () => ({ status: 'default', message: null }),
+  validators: s => s,
   value: null,
   onChange: null,
   onReset: null
 };
 
-export type ListInputProps = {
+/**********************************************************************************************************************
+ * List Input Options (visual + behavioral configuration)
+ *********************************************************************************************************************/
+export type ListInputOptions = {
   /**
-   * If `true`, a small badge indicator is shown
+   * If `true`, a small badge indicator is shown.
    * @default false
    */
   badge?: boolean;
 
   /**
-   * If `true`, text will be automatically capitalized
+   * If `true`, text will be automatically capitalized.
    * @default false
    */
   capitalize?: boolean;
+
   /**
-   * If `true`, the input will be disabled
+   * If `true`, the input will be disabled.
    * @default false
    */
   disabled?: boolean;
+
   /**
-   * If `true`, renders a divider under/around the input
+   * If `true`, renders a divider under/around the input.
    * @default false
    */
   divider?: boolean;
+
   /**
-   * Element rendered at the end (e.g. icon, button)
+   * Element rendered at the end (e.g. icon, button).
    */
   endAdornment?: React.ReactNode;
+
   /**
-   * When enabled, the input will only propagate valid values.
-   */
-  enforceValidValue?: boolean;
-  /**
-   * Props applied to the error helper text
-   */
-  errorProps?: FormHelperTextProps;
-  /**
-   * If `true`, shows an expand/collapse button
+   * If `true`, shows an expand/collapse button.
    * @default false
    */
   expand?: boolean;
-  // /**
-  //  * Props applied to the expand/collapse button
-  //  */
-  // expandProps?: IconButtonProps;
+
   /**
-   * The helper/description text displayed under the input
+   * Props applied to the expand/collapse button.
+   */
+  expandProps?: IconButtonProps;
+
+  /**
+   * The helper/description text displayed under the input.
    */
   helperText?: string;
+
   /**
-   * Props applied to the helper text component
+   * Props applied to the helper text component.
    */
   helperTextProps?: FormHelperTextProps;
+
   /**
-   * The id of the input element
+   * The id of the input element.
    */
   id?: string;
-  // /**
-  //  * The label content
-  //  */
-  // label?: string;
-  // /**
-  //  * Props applied to the label typography
-  //  */
-  // labelProps?: TypographyProps;
+
   /**
-   * If `true`, shows a loading spinner
+   * If `true`, applies an inset layout to the list item content.
+   * @default false
+   */
+  inset?: boolean;
+
+  /**
+   * If `true`, shows a loading spinner.
    * @default false
    */
   loading?: boolean;
+
   /**
-   * If `true`, renders input text in monospace font
+   * If `true`, renders input text in monospace font.
    * @default false
    */
   monospace?: boolean;
+
   /**
-   * If `true`, hides text overflow
+   * If `true`, hides text overflow.
    * @default false
    */
   overflowHidden?: boolean;
+
   /**
-   * If `true`, the input behaves as a password field
+   * If `true`, the input behaves as a password field.
    * @default false
    */
   password?: boolean;
+
   /**
-   * The short hint displayed in the input before the user enters a value
+   * Placeholder text shown when the input is empty.
    */
   placeholder?: string;
+
   /**
-   * If `true`, disables the default greyed-out style when disabled
+   * The primary text content of the list item.
+   */
+  primary?: ListItemTextProps['primary'];
+
+  /**
+   * Props applied to the primary text typography.
+   */
+  primaryProps?: TypographyProps;
+
+  /**
+   * If `true`, disables the default greyed-out style when disabled.
    * @default false
    */
   preventDisabledColor?: boolean;
+
   /**
-   * If `true`, prevents the input from rendering
+   * If `true`, prevents the input from rendering.
    * @default false
    */
   preventRender?: boolean;
+
   /**
-   * If `true`, the input is read-only
+   * If `true`, the input is read-only.
    * @default false
    */
   readOnly?: boolean;
+
   /**
-   * If `true`, marks the input as required
-   * @default false
-   */
-  required?: boolean;
-  /**
-   * Props applied to the reset button
+   * Props applied to the reset button.
    */
   resetProps?: IconButtonProps;
-  // /**
-  //  * Props applied to the root container element
-  //  */
-  // rootProps?: React.HTMLAttributes<HTMLDivElement>;
+
   /**
-   * Element rendered at the start (e.g. icon)
+   * The secondary text content of the list item.
+   */
+  secondary?: ListItemTextProps['secondary'];
+
+  /**
+   * Props applied to the secondary text typography.
+   */
+  secondaryProps?: TypographyProps;
+
+  /**
+   * Element rendered at the start (e.g. icon).
    */
   startAdornment?: React.ReactNode;
+
   /**
-   * If `true`, applies a compact "tiny" style
+   * If `true`, applies a compact "tiny" style.
    * @default false
    */
   tiny?: boolean;
-  // /**
-  //  * Tooltip content to display on hover
-  //  */
-  // tooltip?: TooltipProps['title'];
-  // /**
-  //  * Props applied to the tooltip component
-  //  */
-  // tooltipProps?: Omit<TooltipProps, 'children' | 'title'>;
-  inset?: boolean;
-  primary?: ListItemTextProps['primary'];
-  secondary?: ListItemTextProps['secondary'];
-  primaryProps?: TypographyProps;
-  secondaryProps?: TypographyProps;
 
-  width?: CSSProperties['maxWidth'];
   /**
-   * Callback fired when the input loses focus
+   * Maximum width of the list item.
+   */
+  width?: CSSProperties['maxWidth'];
+
+  /**
+   * Callback fired when the input loses focus.
    */
   onBlur?: (event: React.SyntheticEvent | Event) => void;
+
   /**
-   * Callback fired when validation fails
-   */
-  onError?: (error: string) => void;
-  // /**
-  //  * Callback fired when the expand button is clicked
-  //  */
-  // onExpand?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
-  /**
-   * Callback fired when the input gains focus
+   * Callback fired when the input gains focus.
    */
   onFocus?: (event: React.SyntheticEvent | Event) => void;
 };
 
-export const DEFAULT_LIST_INPUT_PROPS: ListInputProps = {
+export const DEFAULT_LIST_INPUT_OPTIONS: ListInputOptions = {
   badge: false,
   capitalize: false,
   disabled: false,
   divider: false,
   endAdornment: null,
-  enforceValidValue: false,
-  errorProps: null,
   expand: null,
-  // expandProps: null,
   helperText: null,
   helperTextProps: null,
   id: null,
-  // label: null,
-  // labelProps: null,
+  inset: false,
   loading: false,
   monospace: false,
   overflowHidden: false,
@@ -236,65 +263,97 @@ export const DEFAULT_LIST_INPUT_PROPS: ListInputProps = {
   placeholder: null,
   preventDisabledColor: false,
   preventRender: false,
+  primary: null,
+  primaryProps: null,
   readOnly: false,
-  required: false,
   resetProps: null,
-  // rootProps: null,
+  secondary: null,
+  secondaryProps: null,
   startAdornment: null,
   tiny: false,
-  // tooltip: null,
-  // tooltipProps: null,
   width: '30%',
 
   onBlur: () => null,
-  onError: () => null,
-  // onExpand: () => null,
   onFocus: () => null
 };
 
-export type ListInputStates = {
+/**********************************************************************************************************************
+ * List Input Runtime State (UI state managed internally)
+ *********************************************************************************************************************/
+export type ListInputRuntimeState = {
   /**
    * If `true`, the clear adornment is visible
    * @default false
    */
-  clearAdornment?: boolean;
+  hasClearAdornment?: boolean;
+
   /**
-   * The current error message to display below the input.
-   */
-  errorMessage?: string;
-  /**
-   * If `true`, the input is focused
+   * If `true`, the menu adornment is visible
    * @default false
    */
-  focused?: boolean;
+  hasMenuAdornment?: boolean;
+
   /**
-   * If `true`, this input has a menu end adornment
+   * Whether the input currently has focus
    * @default false
    */
-  menuAdornment?: boolean;
+  isFocused?: boolean;
+
   /**
-   * If `true`, the menu is opened
+   * Whether the dropdown / menu is open
    * @default false
    */
-  showMenu?: boolean;
+  isMenuOpen?: boolean;
+
   /**
-   * If `true`, the password is visible
+   * Whether the password is currently visible
    * @default true
    */
-  showPassword?: boolean;
+  isPasswordVisible?: boolean;
+
   /**
-   * If `true`, the spinner adornment is visible
+   * Whether the clear/reset button is visible
    * @default false
    */
-  spinnerAdornment?: boolean;
+  showClearButton?: boolean;
+
+  /**
+   * Whether the spinner adornment is visible
+   * @default false
+   */
+  showSpinner?: boolean;
+
+  /**
+   * Current validation message
+   */
+  validationMessage: string | null;
+
+  /**
+   * Current validation status
+   */
+  validationStatus: ValidationStatus;
 };
 
-export const DEFAULT_LIST_INPUT_STATES: ListInputStates = {
-  clearAdornment: false,
-  errorMessage: null,
-  focused: false,
-  menuAdornment: false,
-  showMenu: false,
-  showPassword: true,
-  spinnerAdornment: false
+export const DEFAULT_LIST_INPUT_RUNTIME_STATE: ListInputRuntimeState = {
+  hasMenuAdornment: false,
+  isFocused: false,
+  isMenuOpen: false,
+  isPasswordVisible: true,
+  showClearButton: false,
+  showSpinner: false,
+  validationMessage: null,
+  validationStatus: 'default'
+};
+
+/**********************************************************************************************************************
+ * Combined Internal Controller Props
+ *********************************************************************************************************************/
+export type ListInputControllerProps<Value = unknown, RawValue = Value> = ListInputValueModel<Value, RawValue> &
+  ListInputOptions &
+  ListInputRuntimeState;
+
+export const DEFAULT_LIST_INPUT_CONTROLLER_PROPS: ListInputControllerProps = {
+  ...DEFAULT_LIST_INPUT_VALUE_MODEL,
+  ...DEFAULT_LIST_INPUT_OPTIONS,
+  ...DEFAULT_LIST_INPUT_RUNTIME_STATE
 };

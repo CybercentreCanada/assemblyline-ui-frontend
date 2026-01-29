@@ -1,38 +1,59 @@
 import type { FormHelperTextProps, IconButtonProps, TooltipProps, TypographyProps } from '@mui/material';
+import type {
+  CoercersSchema,
+  ValidationSchema,
+  ValidationStatus
+} from 'components/visual/Inputs/lib/inputs.validation';
 import type React from 'react';
 
-export type InputValues<Value, InputValue = Value, Event = React.SyntheticEvent> = {
+/**********************************************************************************************************************
+ * Input Value Model (controlled data + validation behavior)
+ *********************************************************************************************************************/
+export type InputValueModel<Value, RawValue = Value, Event = React.SyntheticEvent> = {
   /**
-   * The current value of the input
+   * Optional coercion function used to normalize raw values
+   * (e.g. trimming strings, clamping numbers, etc.)
    */
-  value: Value;
+  coerce?: (event: React.SyntheticEvent, value: Value, rawValue: RawValue) => Value;
 
   /**
-   * The default value of the input
+   * Schema extension hook for coercion pipeline
+   */
+  coercers?: (schema: CoercersSchema<Value, RawValue>) => CoercersSchema<Value, RawValue>;
+
+  /**
+   * The default value used when the input is reset
    */
   defaultValue?: Value;
 
   /**
    * The raw user-entered value (may differ from `value`)
    */
-  inputValue?: InputValue;
-
-  // parser?: (inputValue: InputValue) => InputValue;
+  rawValue?: RawValue;
 
   /**
-   * If `true`, shows a reset/clear button
+   * Controls whether the reset / clear button should be visible
    * @default false
    */
-  reset?: boolean | ((value: Value, inputValue: InputValue) => boolean);
+  reset?: boolean | ((value: Value, rawValue: RawValue) => boolean);
 
   /**
-   * Validation function that returns an error message string
-   * when the value is invalid
+   * Validation function returning a validation result
    */
-  error?: (value: Value) => string;
+  validate?: (value: Value, rawValue: RawValue) => { status: ValidationStatus; message: string };
 
   /**
-   * Callback fired when the value changes
+   * Schema extension hook for validation pipeline
+   */
+  validators?: (schema: ValidationSchema<Value, RawValue>) => ValidationSchema<Value, RawValue>;
+
+  /**
+   * The current parsed / committed value of the input
+   */
+  value: Value;
+
+  /**
+   * Callback fired when the parsed value changes
    *
    * @param event The React event
    * @param value The new value
@@ -46,17 +67,23 @@ export type InputValues<Value, InputValue = Value, Event = React.SyntheticEvent>
   onReset?: IconButtonProps['onClick'];
 };
 
-export const DEFAULT_INPUT_VALUES: InputValues<unknown, unknown> = {
+export const DEFAULT_INPUT_VALUE_MODEL: InputValueModel<unknown, unknown> = {
+  coerce: v => v,
+  coercers: s => s,
   defaultValue: null,
-  error: () => null,
-  inputValue: null,
+  rawValue: null,
   reset: () => false,
+  validate: () => ({ status: 'default', message: null }),
+  validators: s => s,
   value: null,
   onChange: () => null,
   onReset: null
 };
 
-export type InputProps = {
+/**********************************************************************************************************************
+ * Input Options (visual + behavioral configuration)
+ *********************************************************************************************************************/
+export type InputOptions = {
   /**
    * If `true`, a small badge indicator is shown
    * @default false
@@ -87,16 +114,6 @@ export type InputProps = {
   endAdornment?: React.ReactNode;
 
   /**
-   * When enabled, the input will only propagate valid values.
-   */
-  enforceValidValue?: boolean;
-
-  /**
-   * Props applied to the error helper text
-   */
-  errorProps?: FormHelperTextProps;
-
-  /**
    * If `true`, shows an expand/collapse button
    * @default false
    */
@@ -108,7 +125,7 @@ export type InputProps = {
   expandProps?: IconButtonProps;
 
   /**
-   * The helper/description text displayed under the input
+   * Helper / description text displayed under the input
    */
   helperText?: string;
 
@@ -157,7 +174,7 @@ export type InputProps = {
   password?: boolean;
 
   /**
-   * The short hint displayed in the input before the user enters a value
+   * Placeholder text shown when the input is empty
    */
   placeholder?: string;
 
@@ -178,12 +195,6 @@ export type InputProps = {
    * @default false
    */
   readOnly?: boolean;
-
-  /**
-   * If `true`, marks the input as required
-   * @default false
-   */
-  required?: boolean;
 
   /**
    * Props applied to the reset button
@@ -222,14 +233,9 @@ export type InputProps = {
   onBlur?: (event: React.SyntheticEvent | Event) => void;
 
   /**
-   * Callback fired when validation fails
-   */
-  onError?: (error: string) => void;
-
-  /**
    * Callback fired when the expand button is clicked
    */
-  onExpand?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
+  onExpand?: (event: React.MouseEvent<HTMLButtonElement>) => void;
 
   /**
    * Callback fired when the input gains focus
@@ -237,14 +243,12 @@ export type InputProps = {
   onFocus?: (event: React.SyntheticEvent | Event) => void;
 };
 
-export const DEFAULT_INPUT_PROPS: InputProps = {
+export const DEFAULT_INPUT_OPTIONS: InputOptions = {
   badge: false,
   capitalize: false,
   disabled: false,
   divider: false,
   endAdornment: null,
-  enforceValidValue: false,
-  errorProps: null,
   expand: null,
   expandProps: null,
   helperText: null,
@@ -260,7 +264,6 @@ export const DEFAULT_INPUT_PROPS: InputProps = {
   preventDisabledColor: false,
   preventRender: false,
   readOnly: false,
-  required: false,
   resetProps: null,
   rootProps: null,
   startAdornment: null,
@@ -269,60 +272,81 @@ export const DEFAULT_INPUT_PROPS: InputProps = {
   tooltipProps: null,
 
   onBlur: () => null,
-  onError: () => null,
   onExpand: () => null,
   onFocus: () => null
 };
 
-export type InputStates = {
+/**********************************************************************************************************************
+ * Input Runtime State (UI state managed internally)
+ *********************************************************************************************************************/
+export type InputRuntimeState = {
   /**
-   * If `true`, the clear adornment is visible
+   * Whether a menu adornment exists
    * @default false
    */
-  clearAdornment?: boolean;
+  hasMenuAdornment?: boolean;
 
   /**
-   * The current error message to display below the input.
-   */
-  errorMessage?: string;
-
-  /**
-   * If `true`, the input is focused
+   * Whether the input currently has focus
    * @default false
    */
-  focused?: boolean;
+  isFocused?: boolean;
 
   /**
-   * If `true`, this input has a menu end adornment
+   * Whether the dropdown / menu is open
    * @default false
    */
-  menuAdornment?: boolean;
+  isMenuOpen?: boolean;
 
   /**
-   * If `true`, the menu is opened
-   * @default false
-   */
-  showMenu?: boolean;
-
-  /**
-   * If `true`, the password is visible
+   * Whether the password is currently visible
    * @default true
    */
-  showPassword?: boolean;
+  isPasswordVisible?: boolean;
 
   /**
-   * If `true`, the spinner adornment is visible
+   * Whether the clear/reset button is visible
    * @default false
    */
-  spinnerAdornment?: boolean;
+  showClearButton?: boolean;
+
+  /**
+   * Whether the spinner adornment is visible
+   * @default false
+   */
+  showSpinner?: boolean;
+
+  /**
+   * Current validation message
+   */
+  validationMessage: string | null;
+
+  /**
+   * Current validation status
+   */
+  validationStatus: ValidationStatus;
 };
 
-export const DEFAULT_INPUT_STATES: InputStates = {
-  clearAdornment: false,
-  errorMessage: null,
-  focused: false,
-  menuAdornment: false,
-  showMenu: false,
-  showPassword: true,
-  spinnerAdornment: false
+export const DEFAULT_RUNTIME_STATE: InputRuntimeState = {
+  hasMenuAdornment: false,
+  isFocused: false,
+  isMenuOpen: false,
+  isPasswordVisible: true,
+  showClearButton: false,
+  showSpinner: false,
+  validationMessage: null,
+  validationStatus: 'default'
+};
+
+/**********************************************************************************************************************
+ * Combined Internal Controller Props
+ *********************************************************************************************************************/
+export type InputControllerProps<Value = unknown, RawValue = Value> = InputValueModel<Value, RawValue> &
+  InputOptions &
+  InputRuntimeState;
+
+export const DEFAULT_INPUT_CONTROLLER_PROPS: InputControllerProps = {
+  ...DEFAULT_INPUT_VALUE_MODEL,
+  ...DEFAULT_INPUT_OPTIONS,
+  ...DEFAULT_RUNTIME_STATE
 };
