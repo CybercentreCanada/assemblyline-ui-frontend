@@ -1,8 +1,10 @@
 import type { FormHelperTextProps, IconButtonProps, ListItemTextProps, TypographyProps } from '@mui/material';
 import type {
+  Coercer,
   CoercersSchema,
   ValidationSchema,
-  ValidationStatus
+  ValidationStatus,
+  Validator
 } from 'components/visual/Inputs/lib/inputs.validation';
 import type React from 'react';
 import type { CSSProperties } from 'react';
@@ -15,7 +17,7 @@ export type ListInputValueModel<Value, RawValue = Value, Event = React.Synthetic
    * Optional coercion function used to normalize raw values
    * (e.g. trimming strings, clamping numbers, etc.)
    */
-  coerce?: (event: React.SyntheticEvent, value: Value, rawValue: RawValue) => Value;
+  coerce?: Coercer<Value, RawValue>;
 
   /**
    * Schema extension hook for coercion pipeline
@@ -41,7 +43,7 @@ export type ListInputValueModel<Value, RawValue = Value, Event = React.Synthetic
   /**
    * Validation function returning a validation result
    */
-  validate?: (value: Value, rawValue: RawValue) => { status: ValidationStatus; message: string };
+  validate?: Validator<Value, RawValue>;
 
   /**
    * Schema extension hook for validation pipeline
@@ -69,7 +71,7 @@ export type ListInputValueModel<Value, RawValue = Value, Event = React.Synthetic
 };
 
 export const DEFAULT_LIST_INPUT_VALUE_MODEL: ListInputValueModel<unknown, unknown> = {
-  coerce: v => v,
+  coerce: v => ({ value: v, revert: false }),
   coercers: s => s,
   defaultValue: null,
   rawValue: null,
