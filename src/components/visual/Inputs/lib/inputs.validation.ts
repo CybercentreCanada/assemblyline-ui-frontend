@@ -123,13 +123,13 @@ export class ValidationResolver<Value, RawValue = Value> extends ValidationSchem
  * @param event - React synthetic event
  * @param value - Current parsed value
  * @param rawValue - Raw user input
- * @returns Object with coerced value and whether the input should revert
+ * @returns Object with coerced value and whether the changes to the value should be ignored
  */
 export type Coercer<Value, RawValue> = (
   event: React.SyntheticEvent,
   value: Value,
   rawValue: RawValue
-) => { value: Value; revert: boolean };
+) => { value: Value; ignore: boolean };
 
 /**
  * Builder for coercing (transforming) input values before validation
@@ -153,11 +153,23 @@ export class CoercersSchema<Value, RawValue = Value> {
   }
 
   /**
+   * Ensures the value is not empty
+   */
+  required() {
+    this.coercers.push((event, value, rawValue) => {
+      if (value === null || value === undefined || value === '') {
+        return { value, ignore: true };
+      }
+    });
+    return this;
+  }
+
+  /**
    * Trim whitespace from string values
    */
   trim() {
     this.coercers.push((event, value, rawValue) =>
-      typeof value === 'string' ? { value: value.trim() as Value, revert: false } : { value, revert: false }
+      typeof value === 'string' ? { value: value.trim() as Value, ignore: false } : { value, ignore: false }
     );
     return this;
   }
@@ -167,7 +179,7 @@ export class CoercersSchema<Value, RawValue = Value> {
    */
   toLowerCase() {
     this.coercers.push((event, value, rawValue) =>
-      typeof value === 'string' ? { value: value.toLowerCase() as Value, revert: false } : { value, revert: false }
+      typeof value === 'string' ? { value: value.toLowerCase() as Value, ignore: false } : { value, ignore: false }
     );
     return this;
   }
@@ -181,14 +193,14 @@ export class CoercersResolver<Value, RawValue = Value> extends CoercersSchema<Va
 
   public resolve(event: React.SyntheticEvent, value: Value, rawValue: RawValue) {
     let nextValue = value;
-    let revert = false;
+    let ignore = false;
 
     for (const coercer of this.coercers) {
-      const { value: v, revert: r } = coercer(event, nextValue, rawValue);
+      const { value: v, ignore: i } = coercer(event, nextValue, rawValue);
       nextValue = v;
-      revert = revert || r;
+      ignore = ignore || i;
     }
 
-    return { value: nextValue, revert };
+    return { value: nextValue, ignore };
   }
 }

@@ -1,265 +1,343 @@
-import type { InputProps, InputStates, InputValues } from 'components/visual/Inputs/lib/inputs.model';
-import { usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
-import { isValidNumber, isValidValue } from 'components/visual/Inputs/lib/inputs.utils';
+/* eslint-disable @typescript-eslint/no-unnecessary-type-constraint */
+import { usePropStore } from 'components/core/PropProvider/PropProvider';
+import type { InputControllerProps, InputOptions, InputValueModel } from 'components/visual/Inputs/lib/inputs.model';
+import type {
+  Coercer,
+  CoercersSchema,
+  ValidationSchema,
+  ValidationStatus,
+  Validator
+} from 'components/visual/Inputs/lib/inputs.validation';
+import { CoercersResolver, ValidationResolver } from 'components/visual/Inputs/lib/inputs.validation';
+import type { SyntheticEvent } from 'react';
 import { useCallback, useRef, useTransition } from 'react';
 import { useTranslation } from 'react-i18next';
 
-export const usePropLabel = () => {
-  const [get] = usePropStore();
+/**********************************************************************************************************************
+ * Simple Props Hooks
+ *********************************************************************************************************************/
 
-  const label = get('label');
-
-  return label ?? '\u00A0';
+/**
+ * Returns the label for an input, or a non-breaking space if not defined
+ */
+export const useInputLabel = <Value extends unknown = unknown, RawValue = Value>() => {
+  const [get] = usePropStore<InputControllerProps<Value, RawValue>>();
+  return get('label') ?? '\u00A0';
 };
 
-export const usePropID = () => {
-  const [get] = usePropStore();
-
+/**
+ * Returns a deterministic input ID, using label if ID not defined
+ */
+export const useInputId = <Value extends unknown = unknown, RawValue = Value>() => {
+  const [get] = usePropStore<InputControllerProps<Value, RawValue>>();
   const id = get('id');
   const label = get('label');
-
   return id ?? (typeof label === 'string' ? label.toLowerCase().replaceAll(' ', '-') : '\u00A0');
 };
 
-export const usePreventClearRender = () => {
-  const [get] = usePropStore();
-
-  const clearAdornment = get('clearAdornment');
+/**
+ * Returns whether the clear/reset button should be rendered
+ */
+export const useShouldRenderClear = <Value extends unknown = unknown, RawValue = Value>() => {
+  const [get] = usePropStore<InputControllerProps<Value, RawValue>>();
   const disabled = get('disabled');
   const readOnly = get('readOnly');
-
-  return !clearAdornment || (readOnly && !disabled);
+  const showClearButton = get('showClearButton');
+  return Boolean(showClearButton) && !readOnly && !disabled;
 };
 
-export const usePreventExpandRender = () => {
-  const [get] = usePropStore();
-
+/**
+ * Returns whether the expand button should be rendered
+ */
+export const useShouldRenderExpand = <Value extends unknown = unknown, RawValue = Value>() => {
+  const [get] = usePropStore<InputControllerProps<Value, RawValue>>();
   const expand = get('expand');
-
-  return expand === null;
+  return Boolean(expand);
 };
 
-export const usePreventMenuRender = () => {
-  const [get] = usePropStore();
-
+/**
+ * Returns whether the menu adornment should be rendered
+ */
+export const useShouldRenderMenu = <Value extends unknown = unknown, RawValue = Value>() => {
+  const [get] = usePropStore<InputControllerProps<Value, RawValue>>();
   const disabled = get('disabled');
-  const menuAdornment = get('menuAdornment');
   const readOnly = get('readOnly');
-
-  return !menuAdornment || (readOnly && !disabled);
+  const hasMenuAdornment = get('hasMenuAdornment');
+  return Boolean(hasMenuAdornment) && !readOnly && !disabled;
 };
 
-export const usePreventPasswordRender = () => {
-  const [get] = usePropStore();
-
+/**
+ * Returns whether the password toggle should be rendered
+ */
+export const useShouldRenderPassword = <Value extends unknown = unknown, RawValue = Value>() => {
+  const [get] = usePropStore<InputControllerProps<Value, RawValue>>();
   const disabled = get('disabled');
   const loading = get('loading');
-  const readOnly = get('readOnly');
   const password = get('password');
-
-  return loading || disabled || readOnly || !password;
+  const readOnly = get('readOnly');
+  return Boolean(password) && !loading && !disabled && !readOnly;
 };
 
-export const usePreventResetRender = () => {
-  const [get] = usePropStore<InputValues<unknown, unknown>>();
-
+/**
+ * Returns whether the reset button should be rendered
+ */
+export const useShouldRenderReset = <Value extends unknown = unknown, RawValue = Value>() => {
+  const [get] = usePropStore<InputControllerProps<Value, RawValue>>();
   const disabled = get('disabled');
-  const inputValue = get('inputValue');
   const loading = get('loading');
   const readOnly = get('readOnly');
   const reset = get('reset');
+  const rawValue = get('rawValue');
   const value = get('value');
 
-  return loading || disabled || readOnly || !(typeof reset === 'function' ? reset(value, inputValue) : reset);
+  const canReset = typeof reset === 'function' ? reset(value, rawValue) : reset;
+  return Boolean(canReset) && !disabled && !readOnly && !loading;
 };
 
-export const usePreventSpinnerRender = () => {
-  const [get] = usePropStore();
-
+/**
+ * Returns whether the spinner should be rendered
+ */
+export const useShouldRenderSpinner = <Value extends unknown = unknown, RawValue = Value>() => {
+  const [get] = usePropStore<InputControllerProps<Value, RawValue>>();
   const disabled = get('disabled');
-  const spinnerAdornment = get('spinnerAdornment');
   const readOnly = get('readOnly');
-
-  return !spinnerAdornment || (readOnly && !disabled);
+  const showSpinner = get('showSpinner');
+  return Boolean(showSpinner) && !readOnly && !disabled;
 };
 
-export const useErrorCallback = <
-  Props extends InputValues<unknown, unknown> & InputProps & InputStates & Record<string, unknown>
->({
-  error = () => null,
-  value = null,
-  min = null,
-  max = null,
-  required = false
-}: Props & { min?: number; max?: number }) => {
-  const { t } = useTranslation('inputs');
+/**********************************************************************************************************************
+ * Validation Hooks
+ *********************************************************************************************************************/
 
-  const err = error(value);
-  if (err) return err;
-
-  if (required && (min != null || max != null)) {
-    if (!isValidNumber(value as unknown as number, { min, max })) {
-      if (typeof min === 'number' && typeof max === 'number') return t('error.minmax', { min, max });
-      if (typeof min === 'number') return t('error.min', { min });
-      if (typeof max === 'number') return t('error.max', { max });
-    }
-  }
-
-  if (required && !isValidValue(value)) {
-    return t('error.required');
-  }
-
-  return '';
+/**
+ * Returns the validation status and message for a given value
+ */
+export const useValidation = <Value extends unknown = unknown, RawValue = Value>({
+  max,
+  min,
+  rawValue,
+  validate,
+  validators = (schema: ValidationSchema<Value, RawValue>) => schema,
+  value
+}: InputValueModel<Value, RawValue> & InputOptions & { max?: number; min?: number }): ReturnType<
+  Validator<Value, RawValue>
+> => {
+  const { t } = useTranslation(['inputs']);
+  const schema = new ValidationResolver<Value, RawValue>({ max, min, validate });
+  const resolver = validators(schema) as ValidationResolver<Value, RawValue>;
+  return resolver.resolve(t, value, rawValue);
 };
 
-export const useError = <Value extends unknown = unknown>() => {
-  const { t } = useTranslation('inputs');
-  const [get] = usePropStore<InputValues<unknown, unknown> & { min?: number; max?: number }>();
+/**
+ * Returns a callback that resolves validation for a value/rawValue pair
+ */
+export const useValidationResolver = <Value extends unknown = unknown, RawValue = Value>(): ((
+  value: Value,
+  rawValue: RawValue
+) => [ValidationStatus, string]) => {
+  const { t } = useTranslation(['inputs']);
+  const [get] = usePropStore<InputControllerProps<Value, RawValue> & { min?: number; max?: number }>();
 
-  const error = get('error');
-  const max = get('max');
   const min = get('min');
-  const required = get('required');
+  const max = get('max');
+  const validate = get('validate');
+  const validators = get('validators');
 
   return useCallback(
-    (val: Value): string => {
-      const err = error(val);
-      if (err) return err;
-
-      if (required && (min != null || max != null)) {
-        if (!isValidNumber(val as unknown as number, { min, max })) {
-          if (typeof min === 'number' && typeof max === 'number') return t('error.minmax', { min, max });
-          if (typeof min === 'number') return t('error.min', { min });
-          if (typeof max === 'number') return t('error.max', { max });
-        }
-      }
-
-      if (required && !isValidValue(val)) {
-        return t('error.required');
-      }
-
-      return '';
+    (value: Value, rawValue: RawValue) => {
+      const schema = new ValidationResolver<Value, RawValue>({ max, min, validate });
+      const resolver = validators(schema) as ValidationResolver<Value, RawValue>;
+      const { status, message } = resolver.resolve(t, value, rawValue);
+      return [status, message];
     },
-    [error, min, max, required, t]
+    [max, min, t, validate, validators]
   );
 };
 
-export const useInputClick = <
-  Props extends InputValues<unknown, unknown> & InputProps & InputStates & Record<string, unknown>
->() => {
-  const [get, setStore] = usePropStore<InputValues<unknown, unknown>>();
+/**********************************************************************************************************************
+ * Coercing Hooks
+ *********************************************************************************************************************/
 
+/**
+ * Returns the coerced value for a given input
+ */
+export const useCoerceValue = <Value extends unknown = unknown, RawValue = Value>({
+  coerce,
+  coercers = (schema: CoercersSchema<Value, RawValue>) => schema,
+  max,
+  min,
+  rawValue,
+  value
+}: InputControllerProps<Value, RawValue> & { max?: number; min?: number }): ReturnType<Coercer<Value, RawValue>> => {
+  const schema = new CoercersResolver<Value, RawValue>({ coerce, max, min });
+  const resolver = coercers(schema) as CoercersResolver<Value, RawValue>;
+  return resolver.resolve(undefined, value, rawValue);
+};
+
+/**
+ * Returns a callback to resolve coercion on user input
+ */
+export const useCoercingResolver = <Value extends unknown = unknown, RawValue = Value>(): ((
+  event: SyntheticEvent,
+  value: Value,
+  rawValue: RawValue
+) => ReturnType<Coercer<Value, RawValue>>) => {
+  const [get] = usePropStore<InputControllerProps<Value, RawValue> & { min?: number; max?: number }>();
+
+  const coerce = get('coerce');
+  const coercers = get('coercers');
+  const max = get('max');
+  const min = get('min');
+
+  return useCallback(
+    (event: SyntheticEvent, value: Value, rawValue: RawValue) => {
+      const schema = new CoercersResolver<Value, RawValue>({ coerce, max, min });
+      const resolver = coercers(schema) as CoercersResolver<Value, RawValue>;
+      return resolver.resolve(event, value, rawValue);
+    },
+    [coerce, coercers, max, min]
+  );
+};
+
+/**********************************************************************************************************************
+ * Input Event Hooks
+ *********************************************************************************************************************/
+
+/**
+ * Handles input click with validation and optional enforcement
+ */
+export const useInputClick = <Value extends unknown = unknown, RawValue = Value>() => {
+  const [get, setStore] = usePropStore<InputControllerProps<Value, RawValue>>();
   const [, startTransition] = useTransition();
   const latestId = useRef<number>(0);
 
-  const error = useError();
-  const enforceValidValue = get('enforceValidValue');
+  const resolveCoercing = useCoercingResolver<Value, RawValue>();
+  const resolveValidation = useValidationResolver<Value, RawValue>();
+
   const onChange = get('onChange');
-  const onError = get('onError');
 
   return useCallback(
-    (event: Parameters<Props['onChange']>[0], inputValue: Props['inputValue'], value: Props['value']) => {
+    (event: SyntheticEvent<Element, Event>, value: Value, rawValue: RawValue) => {
       event.preventDefault();
       event.stopPropagation();
 
-      const errorMessage = error(value);
-      onError(errorMessage);
-      setStore({ inputValue, errorMessage });
+      const { value: coercedValue, ignore } = resolveCoercing(event, value, rawValue);
+      const [validationStatus, validationMessage] = resolveValidation(coercedValue, rawValue);
+      setStore({ rawValue, validationStatus, validationMessage });
 
       const id = ++latestId.current;
-
       startTransition(() => {
-        if (id === latestId.current && (!enforceValidValue || !errorMessage)) {
-          setStore({ value });
+        if (id === latestId.current && !ignore) {
+          setStore({ value: coercedValue });
           onChange(event, value);
         }
       });
     },
-    [enforceValidValue, error, onChange, onError, setStore]
+    [onChange, resolveCoercing, resolveValidation, setStore]
   );
 };
 
-export const useInputChange = <
-  Props extends InputValues<unknown, unknown> & InputProps & InputStates & Record<string, unknown>
->() => {
-  const [get, setStore] = usePropStore<InputValues<unknown, unknown>>();
+/**
+ * Handles input change events with validation and optional enforcement
+ */
+export const useInputChange = <Value extends unknown = unknown, RawValue = Value>() => {
+  const [get, setStore] = usePropStore<InputControllerProps<Value, RawValue>>();
 
   const [, startTransition] = useTransition();
   const latestId = useRef<number>(0);
 
-  const error = useError();
-  const enforceValidValue = get('enforceValidValue');
+  const resolveCoercing = useCoercingResolver<Value, RawValue>();
+  const resolveValidation = useValidationResolver<Value, RawValue>();
+
   const onChange = get('onChange');
-  const onError = get('onError');
 
   return useCallback(
-    (event: Parameters<Props['onChange']>[0], inputValue: Props['inputValue'], value: Props['value']) => {
-      const errorMessage = error(value);
-      onError(errorMessage);
-      setStore({ inputValue, errorMessage });
+    (event: SyntheticEvent<Element, Event>, value: Value, rawValue: RawValue) => {
+      const { value: coercedValue, ignore } = resolveCoercing(event, value, rawValue);
+      const [validationStatus, validationMessage] = resolveValidation(coercedValue, rawValue);
+      setStore({ rawValue, validationStatus, validationMessage });
 
       const id = ++latestId.current;
-
       startTransition(() => {
-        if (id === latestId.current && (!enforceValidValue || !errorMessage)) {
-          setStore({ value });
+        if (id === latestId.current && !ignore) {
+          setStore({ value: coercedValue });
           onChange(event, value);
         }
       });
     },
-    [enforceValidValue, error, onChange, onError, setStore]
+    [onChange, resolveCoercing, resolveValidation, setStore]
   );
 };
 
-export const useInputFocus = <
-  Props extends InputValues<unknown, unknown> & InputProps & InputStates & Record<string, unknown>
->() => {
-  const [get, setStore] = usePropStore<InputValues<unknown, unknown>>();
-
+/**
+ * Handles input focus events
+ */
+export const useInputFocus = <Value extends unknown = unknown, RawValue = Value>() => {
+  const [get, setStore] = usePropStore<InputControllerProps<Value, RawValue>>();
   const onFocus = get('onFocus');
 
   return useCallback(
     (event: React.FocusEvent) => {
       onFocus(event);
-      setStore(s => ({ focused: !s.readOnly && !s.disabled && document.activeElement === event.target }));
+      setStore(s => ({ isFocused: !s.readOnly && !s.disabled && document.activeElement === event.target }));
     },
     [onFocus, setStore]
   );
 };
 
-export const useInputBlur = <
-  Props extends InputValues<unknown, unknown> & InputProps & InputStates & Record<string, unknown>
->() => {
-  const [get, setStore] = usePropStore();
-
-  const handleChange = useInputChange();
+/**
+ * Handles input blur events
+ */
+export const useInputBlur = <Value extends unknown = unknown, RawValue = Value>() => {
+  const [get, setStore] = usePropStore<InputControllerProps<Value, RawValue>>();
   const onBlur = get('onBlur');
 
+  const handleChange = useInputChange<Value, RawValue>();
+
   return useCallback(
-    (event: React.FocusEvent, inputValue: Props['inputValue'], value: Props['value']) => {
+    (event: React.FocusEvent, value: Value, rawValue: RawValue) => {
       onBlur(event);
-      setStore(() => ({ focused: false }));
-      handleChange(event, inputValue, value);
+      setStore({ isFocused: false });
+      handleChange(event, value, rawValue);
     },
-    [handleChange, onBlur, setStore]
+    [onBlur, handleChange, setStore]
   );
 };
 
-export const useInputClickBlur = <
-  Props extends InputValues<unknown, unknown> & InputProps & InputStates & Record<string, unknown>
->() => {
-  const [get, setStore] = usePropStore();
-
-  const error = useError();
+/**
+ * Handles input click/blur combined, with coercion and validation
+ */
+export const useInputClickBlur = <Value extends unknown = unknown, RawValue = Value>() => {
+  const [get, setStore] = usePropStore<InputControllerProps<Value, RawValue>>();
+  const resolveCoercing = useCoercingResolver<Value, RawValue>();
+  const resolveValidation = useValidationResolver<Value, RawValue>();
   const onBlur = get('onBlur');
 
   return useCallback(
-    (event: React.FocusEvent, inputValue: Props['inputValue'], value: Props['value']) => {
+    (event: React.FocusEvent, value: Value, rawValue: RawValue) => {
       onBlur(event);
+      const { value: coercedValue, ignore } = resolveCoercing(event, value, rawValue);
 
-      const errorMessage = error(value);
-      setStore(() => ({ focused: false, errorMessage, inputValue, value }));
+      if (ignore) {
+        const [validationStatus, validationMessage] = resolveValidation(value, rawValue);
+        setStore({
+          isFocused: false,
+          rawValue,
+          value,
+          validationStatus,
+          validationMessage
+        });
+      } else {
+        const [validationStatus, validationMessage] = resolveValidation(coercedValue, rawValue);
+        setStore({
+          isFocused: false,
+          rawValue,
+          value: coercedValue,
+          validationStatus,
+          validationMessage
+        });
+      }
     },
-    [error, onBlur, setStore]
+    [onBlur, resolveCoercing, resolveValidation, setStore]
   );
 };

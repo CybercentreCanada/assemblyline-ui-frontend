@@ -70,7 +70,7 @@ export type InputValueModel<Value, RawValue = Value, Event = React.SyntheticEven
 };
 
 export const DEFAULT_INPUT_VALUE_MODEL: InputValueModel<unknown, unknown> = {
-  coerce: v => ({ value: v, revert: false }),
+  coerce: v => ({ value: v, ignore: false }),
   coercers: s => s,
   defaultValue: null,
   rawValue: null,
