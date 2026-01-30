@@ -1,6 +1,13 @@
 import { Switch } from '@mui/material';
 import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
-import { useInputId, useValidation } from 'components/visual/Inputs/lib/inputs.hook';
+import {
+  useInputClick,
+  useInputClickBlur,
+  useInputFocus,
+  useInputId,
+  useValidation
+} from 'components/visual/Inputs/lib/inputs.hook';
+import type { InputRuntimeState, InputValueModel } from 'components/visual/Inputs/lib/inputs.model';
 import {
   StyledHelperText,
   StyledListInputButtonRoot,
@@ -11,19 +18,14 @@ import {
   StyledPasswordAdornment,
   StyledResetAdornment
 } from 'components/visual/ListInputs/lib/listinputs.components';
-import { useInputClick, useInputClickBlur, useInputFocus } from 'components/visual/ListInputs/lib/listinputs.hook';
-import type {
-  ListInputOptions,
-  ListInputRuntimeState,
-  ListInputValueModel
-} from 'components/visual/ListInputs/lib/listinputs.model';
+import type { ListInputOptions } from 'components/visual/ListInputs/lib/listinputs.model';
 import { DEFAULT_LIST_INPUT_CONTROLLER_PROPS } from 'components/visual/ListInputs/lib/listinputs.model';
 import React from 'react';
 
-export type SwitchListInputProps = ListInputValueModel<boolean, boolean, React.MouseEvent<HTMLDivElement, MouseEvent>> &
+export type SwitchListInputProps = InputValueModel<boolean, boolean, React.MouseEvent<HTMLDivElement, MouseEvent>> &
   ListInputOptions;
 
-type SwitchListInputController = SwitchListInputProps & ListInputRuntimeState;
+type SwitchListInputController = SwitchListInputProps & InputRuntimeState;
 
 const WrappedSwitchListInput = React.memo(() => {
   const [get] = usePropStore<SwitchListInputController>();

@@ -1,7 +1,8 @@
 import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
 import type { ClassificationProps } from 'components/visual/Classification';
 import Classification from 'components/visual/Classification';
-import { useValidation } from 'components/visual/Inputs/lib/inputs.hook';
+import { useInputChange, useValidation } from 'components/visual/Inputs/lib/inputs.hook';
+import type { InputRuntimeState, InputValueModel } from 'components/visual/Inputs/lib/inputs.model';
 import {
   StyledHelperText,
   StyledListInputInner,
@@ -12,20 +13,15 @@ import {
   StyledPasswordAdornment,
   StyledResetAdornment
 } from 'components/visual/ListInputs/lib/listinputs.components';
-import { useInputChange } from 'components/visual/ListInputs/lib/listinputs.hook';
-import type {
-  ListInputOptions,
-  ListInputRuntimeState,
-  ListInputValueModel
-} from 'components/visual/ListInputs/lib/listinputs.model';
+import type { ListInputOptions } from 'components/visual/ListInputs/lib/listinputs.model';
 import { DEFAULT_LIST_INPUT_CONTROLLER_PROPS } from 'components/visual/ListInputs/lib/listinputs.model';
 import React from 'react';
 
-export type ClassificationListInputProps = ListInputValueModel<ClassificationProps['c12n']> &
+export type ClassificationListInputProps = InputValueModel<ClassificationProps['c12n']> &
   ListInputOptions &
   Omit<ClassificationProps, 'c12n' | 'setClassification'>;
 
-type ClassificationListInputController = ClassificationListInputProps & ListInputRuntimeState;
+type ClassificationListInputController = ClassificationListInputProps & InputRuntimeState;
 
 const WrappedClassificationListInput = React.memo(() => {
   const [get] = usePropStore<ClassificationListInputController>();

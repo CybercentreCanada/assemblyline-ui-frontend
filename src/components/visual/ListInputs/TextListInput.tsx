@@ -1,7 +1,14 @@
 import type { TextFieldProps } from '@mui/material';
 import { Autocomplete, Typography } from '@mui/material';
 import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
-import { useValidation } from 'components/visual/Inputs/lib/inputs.hook';
+import {
+  useInputBlur,
+  useInputChange,
+  useInputFocus,
+  useInputId,
+  useValidation
+} from 'components/visual/Inputs/lib/inputs.hook';
+import type { InputRuntimeState, InputValueModel } from 'components/visual/Inputs/lib/inputs.model';
 import {
   StyledHelperText,
   StyledListInputInner,
@@ -13,26 +20,17 @@ import {
   StyledResetAdornment,
   StyledTextField
 } from 'components/visual/ListInputs/lib/listinputs.components';
-import {
-  useInputBlur,
-  useInputChange,
-  useInputFocus
-} from 'components/visual/ListInputs/lib/listinputs.hook';
-import type {
-  ListInputOptions,
-  ListInputRuntimeState,
-  ListInputValueModel
-} from 'components/visual/ListInputs/lib/listinputs.model';
+import type { ListInputOptions } from 'components/visual/ListInputs/lib/listinputs.model';
 import { DEFAULT_LIST_INPUT_CONTROLLER_PROPS } from 'components/visual/ListInputs/lib/listinputs.model';
 import React from 'react';
 
-export type TextListInputProps = ListInputValueModel<string, string, React.SyntheticEvent<Element, Event>> &
+export type TextListInputProps = InputValueModel<string, string, React.SyntheticEvent<Element, Event>> &
   ListInputOptions & {
     autoComplete?: TextFieldProps['autoComplete'];
     options?: string[] | readonly string[];
   };
 
-type TextListInputController = TextListInputProps & ListInputRuntimeState;
+type TextListInputController = TextListInputProps & InputRuntimeState;
 
 const WrappedTextListInput = React.memo(() => {
   const [get] = usePropStore<TextListInputController>();
@@ -110,10 +108,9 @@ export const TextListInput = ({ preventRender = false, value, ...props }: TextLi
         options: [],
         preventRender,
         rawValue: value,
-        value,
-        errorMessage,
-        validationStatus,
         validationMessage,
+        validationStatus,
+        value,
         ...props
       }}
     >

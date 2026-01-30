@@ -1,6 +1,7 @@
 import type { TextFieldProps } from '@mui/material';
 import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
-import { useValidation } from 'components/visual/Inputs/lib/inputs.hook';
+import { useInputBlur, useInputChange, useInputFocus, useValidation } from 'components/visual/Inputs/lib/inputs.hook';
+import type { InputRuntimeState, InputValueModel } from 'components/visual/Inputs/lib/inputs.model';
 import {
   StyledHelperText,
   StyledListInputInner,
@@ -12,16 +13,11 @@ import {
   StyledResetAdornment,
   StyledTextField
 } from 'components/visual/ListInputs/lib/listinputs.components';
-import { useInputBlur, useInputChange, useInputFocus } from 'components/visual/ListInputs/lib/listinputs.hook';
-import type {
-  ListInputOptions,
-  ListInputRuntimeState,
-  ListInputValueModel
-} from 'components/visual/ListInputs/lib/listinputs.model';
+import type { ListInputOptions } from 'components/visual/ListInputs/lib/listinputs.model';
 import { DEFAULT_LIST_INPUT_CONTROLLER_PROPS } from 'components/visual/ListInputs/lib/listinputs.model';
 import React, { useEffect, useRef } from 'react';
 
-export type NumberListInputProps = ListInputValueModel<number, string> &
+export type NumberListInputProps = InputValueModel<number, string> &
   ListInputOptions & {
     autoComplete?: TextFieldProps['autoComplete'];
     max?: number;
@@ -29,7 +25,7 @@ export type NumberListInputProps = ListInputValueModel<number, string> &
     step?: number;
   };
 
-type NumberListInputController = NumberListInputProps & ListInputRuntimeState;
+type NumberListInputController = NumberListInputProps & InputRuntimeState;
 
 const WrappedNumberListInput = React.memo(() => {
   const [get] = usePropStore<NumberListInputController>();
@@ -82,9 +78,9 @@ const WrappedNumberListInput = React.memo(() => {
                 ref={inputRef}
                 type="number"
                 value={rawValue}
-                onChange={e => handleChange(e, e.target.value, e.target.value !== '' ? Number(e.target.value) : null)}
+                onChange={e => handleChange(e, e.target.value !== '' ? Number(e.target.value) : null, e.target.value)}
                 onFocus={handleFocus}
-                onBlur={e => handleBlur(e, value == null ? '' : String(value), value)}
+                onBlur={e => handleBlur(e, value, value == null ? '' : String(value))}
                 sx={{
                   maxWidth: width,
                   minWidth: width,
@@ -132,13 +128,14 @@ export const NumberListInput = ({ preventRender = false, value, ...props }: Numb
       initialProps={DEFAULT_LIST_INPUT_CONTROLLER_PROPS as NumberListInputController}
       props={{
         autoComplete: 'off',
-        enforceValidValue: true,
-        rawValue: value == null ? '' : String(value),
         max: null,
         min: null,
         preventRender,
-        spinnerAdornment: true,
+        rawValue: value == null ? '' : String(value),
+        showSpinner: true,
         step: 1,
+        validationMessage,
+        validationStatus,
         value,
         ...props
       }}
