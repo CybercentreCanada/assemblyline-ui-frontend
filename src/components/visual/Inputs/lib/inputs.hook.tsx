@@ -253,14 +253,14 @@ export const useInputChange = <Value extends unknown = unknown, RawValue = Value
 
   return useCallback(
     (event: SyntheticEvent<Element, Event>, value: Value, rawValue: RawValue) => {
-      const { value: coercedValue, ignore } = resolveCoercing(event, value, rawValue);
-      const [validationStatus, validationMessage] = resolveValidation(coercedValue, rawValue);
+      const { ignore } = resolveCoercing(event, value, rawValue);
+      const [validationStatus, validationMessage] = resolveValidation(value, rawValue);
       setStore({ rawValue, validationStatus, validationMessage });
 
       const id = ++latestId.current;
       startTransition(() => {
         if (id === latestId.current && !ignore) {
-          setStore({ value: coercedValue });
+          setStore({ value });
           onChange(event, value);
         }
       });
@@ -292,15 +292,35 @@ export const useInputBlur = <Value extends unknown = unknown, RawValue = Value>(
   const [get, setStore] = usePropStore<InputControllerProps<Value, RawValue>>();
   const onBlur = get('onBlur');
 
-  const handleChange = useInputChange<Value, RawValue>();
+  const resolveCoercing = useCoercingResolver<Value, RawValue>();
+  const resolveValidation = useValidationResolver<Value, RawValue>();
 
   return useCallback(
     (event: React.FocusEvent, value: Value, rawValue: RawValue) => {
       onBlur(event);
-      setStore({ isFocused: false });
-      handleChange(event, value, rawValue);
+      const { value: coercedValue, ignore } = resolveCoercing(event, value, rawValue);
+
+      if (ignore) {
+        const [validationStatus, validationMessage] = resolveValidation(value, rawValue);
+        setStore({
+          isFocused: false,
+          rawValue,
+          value,
+          validationStatus,
+          validationMessage
+        });
+      } else {
+        const [validationStatus, validationMessage] = resolveValidation(coercedValue, rawValue);
+        setStore({
+          isFocused: false,
+          rawValue,
+          value: coercedValue,
+          validationStatus,
+          validationMessage
+        });
+      }
     },
-    [onBlur, handleChange, setStore]
+    [onBlur, resolveCoercing, resolveValidation, setStore]
   );
 };
 
