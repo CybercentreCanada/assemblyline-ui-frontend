@@ -1,5 +1,4 @@
 import {
-  Button,
   Card,
   Dialog,
   DialogActions,
@@ -9,12 +8,14 @@ import {
   List,
   ListItemButton,
   ListItemText,
+  Typography,
   useMediaQuery,
   useTheme
 } from '@mui/material';
 import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
 import useALContext from 'components/hooks/useALContext';
 import type { WhoAmI } from 'components/models/ui/user';
+import { Button } from 'components/visual/Buttons/Button';
 import type { ClassificationProps } from 'components/visual/Classification';
 import CustomChip, { COLOR_MAP } from 'components/visual/CustomChip';
 import {
@@ -324,6 +325,9 @@ const WrappedClassificationInput = () => {
               <DialogContent>
                 <Grid container spacing={2}>
                   <Grid size={{ xs: 12, md: 'grow' }}>
+                    <Typography color="textSecondary" variant="body2">
+                      {t('classification.level')}
+                    </Typography>
                     <Card variant="outlined">
                       <List disablePadding style={{ borderRadius: '6px' }}>
                         {c12nDef.original_definition.levels.map(
@@ -349,6 +353,9 @@ const WrappedClassificationInput = () => {
                     (uParts.req.length !== 0 &&
                       c12nDef.original_definition.required.filter(r => !r.is_hidden).length !== 0)) && (
                     <Grid size={{ xs: 12, md: 'grow' }}>
+                      <Typography color="textSecondary" variant="body2">
+                        {t('classification.required_tokens')}
+                      </Typography>
                       <Card variant="outlined">
                         <List disablePadding>
                           {c12nDef.original_definition.required.map(
@@ -383,6 +390,9 @@ const WrappedClassificationInput = () => {
                         (uParts.groups.length !== 0 &&
                           c12nDef.original_definition.groups.filter(g => !g.is_hidden).length !== 0)) && (
                         <div style={{ paddingBottom: sp2 }}>
+                          <Typography color="textSecondary" variant="body2">
+                            {t('classification.groups_releasability')}
+                          </Typography>
                           <Card variant="outlined">
                             <List disablePadding>
                               {c12nDef.original_definition.groups
@@ -466,30 +476,42 @@ const WrappedClassificationInput = () => {
                       {((isUser && c12nDef.original_definition.subgroups.length !== 0) ||
                         (uParts.subgroups.length !== 0 &&
                           c12nDef.original_definition.subgroups.filter(sg => !sg.is_hidden).length !== 0)) && (
-                        <Card variant="outlined">
-                          <List disablePadding>
-                            {c12nDef.original_definition.subgroups
-                              .filter(sgrp => isUser || !sgrp.is_hidden)
-                              .map((sgrp, idx) => (
-                                <ListItemButton
-                                  key={idx}
-                                  selected={
-                                    validated.parts.subgroups.includes(sgrp.name) ||
-                                    validated.parts.subgroups.includes(sgrp.short_name)
-                                  }
-                                  onClick={() => handleSubGroupsChange(sgrp)}
-                                >
-                                  <ListItemText style={{ textAlign: 'center' }} primary={sgrp.name} />
-                                </ListItemButton>
-                              ))}
-                          </List>
-                        </Card>
+                        <>
+                          <Typography color="textSecondary" variant="body2">
+                            {t('classification.sub-groups_releasability')}
+                          </Typography>
+                          <Card variant="outlined">
+                            <List disablePadding>
+                              {c12nDef.original_definition.subgroups
+                                .filter(sgrp => isUser || !sgrp.is_hidden)
+                                .map((sgrp, idx) => (
+                                  <ListItemButton
+                                    key={idx}
+                                    selected={
+                                      validated.parts.subgroups.includes(sgrp.name) ||
+                                      validated.parts.subgroups.includes(sgrp.short_name)
+                                    }
+                                    onClick={() => handleSubGroupsChange(sgrp)}
+                                  >
+                                    <ListItemText style={{ textAlign: 'center' }} primary={sgrp.name} />
+                                  </ListItemButton>
+                                ))}
+                            </List>
+                          </Card>
+                        </>
                       )}
                     </Grid>
                   )}
                 </Grid>
               </DialogContent>
               <DialogActions>
+                <Button
+                  color="secondary"
+                  to="/help/classification"
+                  onClick={() => setStore(() => ({ showPicker: false }))}
+                >
+                  {t('classification.help')}
+                </Button>
                 <PasswordAdornment />
                 {reset && (
                   <Tooltip arrow title={title} placement="bottom">
@@ -498,6 +520,7 @@ const WrappedClassificationInput = () => {
                     </Button>
                   </Tooltip>
                 )}
+                <div style={{ flex: 1 }} />
                 <Button onClick={event => handleChange(event)} color="primary" autoFocus>
                   {t('classification.done')}
                 </Button>
