@@ -4,19 +4,20 @@ import { PropProvider, usePropStore } from 'components/core/PropProvider/PropPro
 import type { AnchorProps } from 'components/core/TableOfContent/Anchor';
 import { Anchor } from 'components/core/TableOfContent/Anchor';
 import { StyledCircularSkeleton } from 'components/visual/Inputs/lib/inputs.components';
+import { useInputId, useInputLabel } from 'components/visual/Inputs/lib/inputs.hook';
+import type { InputValueModel } from 'components/visual/Inputs/lib/inputs.model';
 import {
   StyledListInputButtonRoot,
   StyledListInputText,
   StyledListItemRoot,
   StyledResetAdornment
 } from 'components/visual/ListInputs/lib/listinputs.components';
-import { usePropID, usePropLabel } from 'components/visual/ListInputs/lib/listinputs.hook';
-import type { ListInputOptions, ListInputValueModel } from 'components/visual/ListInputs/lib/listinputs.model';
+import type { ListInputOptions } from 'components/visual/ListInputs/lib/listinputs.model';
 import { DEFAULT_LIST_INPUT_CONTROLLER_PROPS } from 'components/visual/ListInputs/lib/listinputs.model';
 import React from 'react';
 
 export type ListHeaderProps = Omit<
-  ListInputValueModel<boolean, boolean, React.MouseEvent<HTMLDivElement, globalThis.MouseEvent>>,
+  InputValueModel<boolean, boolean, React.MouseEvent<HTMLDivElement, globalThis.MouseEvent>>,
   'value'
 > &
   ListInputOptions & {
@@ -37,10 +38,10 @@ const WrappedListHeader = React.memo(() => {
   const checked = get('checked');
   const disabled = get('disabled');
   const edge = get('edge');
-  const id = usePropID();
+  const id = useInputId();
   const indeterminate = get('indeterminate');
   const loading = get('loading');
-  const primary = usePropLabel();
+  const primary = useInputLabel();
 
   const onChange = get('onChange');
 
