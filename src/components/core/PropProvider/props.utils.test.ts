@@ -44,8 +44,8 @@ describe('isValidValue', () => {
 
 describe('isValidNumber', () => {
   it('returns false for null or undefined', () => {
-    expect(isValidNumber(null as any, {})).toBe(false);
-    expect(isValidNumber(undefined as any, {})).toBe(false);
+    expect(isValidNumber(null, {})).toBe(false);
+    expect(isValidNumber(undefined, {})).toBe(false);
   });
 
   it('checks min constraint', () => {
@@ -135,9 +135,9 @@ describe('shallowReconcile', () => {
   });
 
   it('includes keys only in current', () => {
-    const current = { c: 3 };
-    const previous = { a: 0 };
-    const result = { a: 1, b: 2 };
+    const current = { c: 3 } as object;
+    const previous = { a: 0 } as object;
+    const result = { a: 1, b: 2 } as object;
     expect(shallowReconcile(current, previous, result)).toEqual({ b: 2, c: 3 });
   });
 });
