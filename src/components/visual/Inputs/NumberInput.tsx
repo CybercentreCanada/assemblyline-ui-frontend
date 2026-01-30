@@ -105,7 +105,6 @@ export const NumberInput = ({ preventRender = false, value, ...props }: NumberIn
       initialProps={DEFAULT_INPUT_CONTROLLER_PROPS as NumberInputController}
       props={{
         autoComplete: 'off',
-        enforceValidValue: true,
         rawValue: value == null ? '' : String(value),
         max: null,
         min: null,

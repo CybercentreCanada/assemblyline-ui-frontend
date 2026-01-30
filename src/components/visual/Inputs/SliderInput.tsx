@@ -36,7 +36,6 @@ const WrappedSliderInput = () => {
   const [get] = usePropStore<SliderInputController>();
 
   const disabled = get('disabled');
-  const errorMessage = get('errorMessage');
   const id = useInputId();
   const rawValue = get('rawValue') ?? null;
   const loading = get('loading');
@@ -48,6 +47,7 @@ const WrappedSliderInput = () => {
   const value = get('value');
   const valueLabelDisplay = get('valueLabelDisplay');
   const valueLabelFormat = get('valueLabelFormat');
+  const validationStatus = get('validationStatus');
 
   const handleBlur = useInputBlur<number>();
   const handleChange = useInputChange<number>();
@@ -65,7 +65,7 @@ const WrappedSliderInput = () => {
               <div style={{ flex: 1, marginLeft: '20px', marginRight: '20px' }}>
                 <Slider
                   aria-label={id}
-                  color={!disabled && errorMessage ? 'error' : 'primary'}
+                  color={!disabled && validationStatus === 'error' ? 'error' : 'primary'}
                   disabled={disabled || readOnly}
                   id={id}
                   marks={marks}

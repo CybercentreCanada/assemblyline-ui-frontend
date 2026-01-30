@@ -46,18 +46,18 @@ const WrappedSelectInput = <O extends readonly Option[]>() => {
   const disabled = get('disabled');
   const displayEmpty = get('displayEmpty');
   const endAdornment = get('endAdornment');
-  const errorMessage = get('errorMessage');
   const id = useInputId();
-  const rawValue = get('rawValue');
+  const isMenuOpen = get('isMenuOpen');
+  const isPasswordVisible = get('isPasswordVisible');
   const loading = get('loading');
   const monospace = get('monospace');
   const options = get('options');
   const overflowHidden = get('overflowHidden');
   const password = get('password');
+  const rawValue = get('rawValue');
   const readOnly = get('readOnly');
-  const hasMenuAdornment = get('hasMenuAdornment');
-  const isPasswordVisible = get('isPasswordVisible');
   const tiny = get('tiny');
+  const validationStatus = get('validationStatus');
   const value = get('value');
 
   const handleBlur = useInputBlur<O[number]['value']>();
@@ -74,18 +74,18 @@ const WrappedSelectInput = <O extends readonly Option[]>() => {
           <Select
             disabled={disabled}
             displayEmpty={displayEmpty}
-            error={!!errorMessage}
+            error={validationStatus === 'error'}
             fullWidth
             id={id}
             readOnly={readOnly}
             size="small"
-            open={hasMenuAdornment}
+            open={isMenuOpen}
             value={options?.some(o => o.value === rawValue) ? rawValue : ''}
             onChange={event => handleChange(event as React.SyntheticEvent, event.target.value, event.target.value)}
             onFocus={handleFocus}
             onBlur={e => handleBlur(e, value, value)}
-            onClose={() => setStore({ hasMenuAdornment: false })}
-            onOpen={() => setStore({ hasMenuAdornment: true })}
+            onClose={() => setStore({ isMenuOpen: false })}
+            onOpen={() => setStore({ isMenuOpen: true })}
             renderValue={option => (
               <ListItemText
                 primary={options?.find(o => o.value === option)?.primary || ''}

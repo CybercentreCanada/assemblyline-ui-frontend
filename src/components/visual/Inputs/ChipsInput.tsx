@@ -76,7 +76,7 @@ const WrappedChipsInput = () => {
             filterSelectedOptions={filterSelectedOptions}
             freeSolo
             id={id}
-            rawValue={currentValue}
+            inputValue={currentValue}
             isOptionEqualToValue={isOptionEqualToValue}
             multiple
             options={options}
