@@ -1,5 +1,5 @@
+import { isValidNumber } from 'components/core/PropProvider/props.utils';
 import type { InputControllerProps } from 'components/visual/Inputs/lib/inputs.model';
-import { isValidNumber } from 'components/visual/Inputs/lib/inputs.utils';
 import type { TFunction } from 'i18next';
 
 /**********************************************************************************************************************
