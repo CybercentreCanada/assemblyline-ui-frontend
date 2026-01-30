@@ -1,5 +1,4 @@
 {
-  "chips-input.placeholder": "Type a value and press enter",
   "classification.acceptText": "Proceed",
   "classification.cancelText": "Cancel",
   "classification.done": "Done",
@@ -7,9 +6,11 @@
   "classification.text": "The classification of this item is higher than the maximum classification that the external source supports.",
   "classification.text.accept": "Are you sure that you want to proceed?",
   "classification.title": "Classification accessibility warning",
-  "error.max": "Value must be less than or equal to {{max}}",
-  "error.min": "Value must be greater than or equal to {{min}}",
-  "error.minmax": "Value be between {{min}} and {{max}}",
-  "error.required": "Value is required",
-  "reset_to": "Reset to: "
+  "input.chips.placeholder": "Type a value and press enter",
+  "reset_to": "Reset to: ",
+  "validation.max": "Value must be less than or equal to {{max}}",
+  "validation.min": "Value must be greater than or equal to {{min}}",
+  "validation.minmax": "Value be between {{min}} and {{max}}",
+  "validation.noWhitespace": "Value includes a whitespace",
+  "validation.required": "Value is required"
 }

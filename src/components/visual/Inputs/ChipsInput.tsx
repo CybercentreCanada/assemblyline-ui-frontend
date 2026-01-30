@@ -108,7 +108,7 @@ const WrappedChipsInput = () => {
                   ...params,
                   inputProps: {
                     placeholder:
-                      !isFocused || currentValue || rawValue?.length ? undefined : t('chips-input.placeholder'),
+                      !isFocused || currentValue || rawValue?.length ? undefined : t('input.chips.placeholder'),
                     ...params.inputProps,
                     ...(allowEmptyStrings && {
                       onKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => {
