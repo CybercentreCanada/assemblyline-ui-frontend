@@ -25,7 +25,7 @@ import {
   StyledInputSkeleton,
   StyledRoot
 } from 'components/visual/Inputs/lib/inputs.components';
-import { useValidation } from 'components/visual/Inputs/lib/inputs.hook';
+import { useCoercingResolver, useValidation, useValidationResolver } from 'components/visual/Inputs/lib/inputs.hook';
 import type { InputOptions, InputRuntimeState, InputValueModel } from 'components/visual/Inputs/lib/inputs.model';
 import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/lib/inputs.model';
 import { Tooltip } from 'components/visual/Tooltip';
@@ -77,18 +77,19 @@ const WrappedClassificationInput = () => {
   const preventRenderStore = get('preventRender');
   const readOnly = get('readOnly');
   const reset = get('reset');
-  const showPassword = get('showPassword');
+  const isPasswordVisible = get('isPasswordVisible');
   const tiny = get('tiny');
   const value = get('value');
 
   const dynGroup = get('dynGroup');
-  const showPicker = get('showPicker') ?? false;
-  const uParts = get('uParts') ?? defaultParts;
-  const validated = get('validated') ?? defaultClassificationValidator;
+  const showPicker = get('showPicker');
+  const uParts = get('uParts');
+  const validated = get('validated');
 
-  const error = () => null; // fix
+  const resolveCoercing = useCoercingResolver<string>();
+  const resolveValidation = useValidationResolver<string>();
+
   const onChange = get('onChange');
-  const onError = get('onError');
   const onReset = get('onReset');
 
   const preventRender = useMemo(
@@ -225,27 +226,37 @@ const WrappedClassificationInput = () => {
   const handleChange = useCallback(
     (event: React.SyntheticEvent) => {
       const newC12n = normalizedClassification(validated.parts, c12nDef, format, isMobile, isUser);
-      const err = error(newC12n);
-      onError(err);
-      if (!err) onChange(event, newC12n);
-      setStore(() => ({ ...(!err && { value: newC12n }), inputValue: newC12n, errorMsg: err, showPicker: false }));
+
+      const { ignore } = resolveCoercing(event, newC12n, newC12n);
+      const [validationStatus, validationMessage] = resolveValidation(newC12n, newC12n);
+
+      if (!ignore) onChange(event, newC12n);
+      setStore(() => ({
+        ...(!ignore && { value: newC12n }),
+        rawValue: newC12n,
+        validationStatus,
+        validationMessage,
+        showPicker: false
+      }));
     },
-    [c12nDef, error, format, isMobile, isUser, onChange, onError, setStore, validated.parts]
+    [c12nDef, format, isMobile, isUser, onChange, resolveCoercing, resolveValidation, setStore, validated.parts]
   );
 
   const handleReset = useCallback(
     (event: React.SyntheticEvent) => {
-      const err = error(defaultValue);
-      onError(err);
-      if (!err) onChange(event, defaultValue);
+      const { ignore } = resolveCoercing(event, defaultValue, defaultValue);
+      const [validationStatus, validationMessage] = resolveValidation(defaultValue, defaultValue);
+
+      if (!ignore) onChange(event, defaultValue);
       setStore(() => ({
-        ...(!err && { value: defaultValue }),
-        inputValue: defaultValue,
-        errorMsg: err,
-        showPicker: false
+        ...(!ignore && { value: defaultValue }),
+        rawValue: defaultValue,
+        showPicker: false,
+        validationMessage,
+        validationStatus
       }));
     },
-    [defaultValue, error, onChange, onError, setStore]
+    [defaultValue, onChange, resolveCoercing, resolveValidation, setStore]
   );
 
   useEffect(() => {
@@ -282,7 +293,7 @@ const WrappedClassificationInput = () => {
                   mb: 0.75,
                   ...(monospace && { fontFamily: 'monospace' }),
                   ...(password &&
-                    showPassword && {
+                    isPasswordVisible && {
                       fontFamily: 'password',
                       WebkitTextSecurity: 'disc',
                       MozTextSecurity: 'disc',
@@ -513,15 +524,17 @@ export const ClassificationInput = ({ preventRender = false, value, ...props }: 
       initialProps={DEFAULT_INPUT_CONTROLLER_PROPS as ClassificationInputController}
       props={{
         dynGroup: null,
-        errorMessage,
         format: 'short',
         fullWidth: true,
         inline: false,
-        inputValue: value,
         isUser: false,
         preventRender,
-        validationStatus,
+        rawValue: value,
+        showPicker: false,
+        uParts: defaultParts,
+        validated: defaultClassificationValidator,
         validationMessage,
+        validationStatus,
         value,
         ...props
       }}

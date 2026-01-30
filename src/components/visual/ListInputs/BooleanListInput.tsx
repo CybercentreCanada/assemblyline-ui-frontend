@@ -1,6 +1,6 @@
 import { Switch } from '@mui/material';
 import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
-import { useValidation } from 'components/visual/Inputs/lib/inputs.hook';
+import { useInputId, useValidation } from 'components/visual/Inputs/lib/inputs.hook';
 import {
   StyledHelperText,
   StyledListInputButtonRoot,
@@ -11,12 +11,7 @@ import {
   StyledPasswordAdornment,
   StyledResetAdornment
 } from 'components/visual/ListInputs/lib/listinputs.components';
-import {
-  useInputClick,
-  useInputClickBlur,
-  useInputFocus,
-  usePropID
-} from 'components/visual/ListInputs/lib/listinputs.hook';
+import { useInputClick, useInputClickBlur, useInputFocus } from 'components/visual/ListInputs/lib/listinputs.hook';
 import type {
   ListInputOptions,
   ListInputRuntimeState,
@@ -33,7 +28,7 @@ type SwitchListInputController = SwitchListInputProps & ListInputRuntimeState;
 const WrappedSwitchListInput = React.memo(() => {
   const [get] = usePropStore<SwitchListInputController>();
 
-  const id = usePropID();
+  const id = useInputId();
   const rawValue = Boolean(get('rawValue'));
   const loading = get('loading');
   const preventDisabledColor = get('preventDisabledColor');

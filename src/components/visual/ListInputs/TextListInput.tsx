@@ -16,8 +16,7 @@ import {
 import {
   useInputBlur,
   useInputChange,
-  useInputFocus,
-  usePropID
+  useInputFocus
 } from 'components/visual/ListInputs/lib/listinputs.hook';
 import type {
   ListInputOptions,
@@ -39,7 +38,7 @@ const WrappedTextListInput = React.memo(() => {
   const [get] = usePropStore<TextListInputController>();
 
   const disabled = get('disabled');
-  const id = usePropID();
+  const id = useInputId();
   const rawValue = get('rawValue') ?? '';
   const loading = get('loading');
   const options = get('options') ?? [];

@@ -28,14 +28,14 @@ const WrappedJSONInput = () => {
   const [get] = usePropStore<JSONInputController>();
 
   const disabled = get('disabled');
-  const errorMessage = get('errorMessage');
-  const inputValue = get('inputValue') ?? null;
+  const isPasswordVisible = get('isPasswordVisible');
   const loading = get('loading');
   const monospace = get('monospace');
   const password = get('password');
+  const rawValue = get('rawValue');
   const readOnly = get('readOnly');
-  const showPassword = get('showPassword');
   const tiny = get('tiny');
+  const validationStatus = get('validationStatus');
 
   const jsonTheme = useMemo<ThemeObject>(
     () => ({
@@ -75,7 +75,7 @@ const WrappedJSONInput = () => {
                 alignItems: 'flex-start',
                 border: `1px solid ${theme.palette.divider}`,
                 borderRadius: '4px',
-                ...(errorMessage && { border: `1px solid ${theme.palette.error.main}` })
+                ...(validationStatus === 'error' && { border: `1px solid ${theme.palette.error.main}` })
               }}
             >
               <ReactJson
@@ -85,7 +85,7 @@ const WrappedJSONInput = () => {
                 groupArraysAfterLength={10}
                 displayDataTypes={false}
                 displayObjectSize={false}
-                src={inputValue}
+                src={rawValue}
                 onAdd={
                   disabled || readOnly
                     ? false
@@ -112,7 +112,7 @@ const WrappedJSONInput = () => {
                   ...(monospace && { fontFamily: 'monospace' }),
                   ...(!tiny ? { minHeight: theme.spacing(5) } : { paddingTop: '2px', paddingBottom: '2px' }),
                   ...(password &&
-                    showPassword && {
+                    isPasswordVisible && {
                       fontFamily: 'password',
                       WebkitTextSecurity: 'disc',
                       MozTextSecurity: 'disc',
@@ -143,7 +143,7 @@ export const JSONInput = ({ preventRender = false, value, ...props }: JSONInputP
   return preventRender ? null : (
     <PropProvider<JSONInputController>
       initialProps={DEFAULT_INPUT_CONTROLLER_PROPS as JSONInputController}
-      props={{ preventRender, inputValue: value, value, errorMessage, validationStatus, validationMessage, ...props }}
+      props={{ preventRender, rawValue: value, value, validationStatus, validationMessage, ...props }}
     >
       <WrappedJSONInput />
     </PropProvider>

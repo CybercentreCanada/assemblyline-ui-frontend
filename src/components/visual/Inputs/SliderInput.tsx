@@ -13,7 +13,7 @@ import {
   useInputBlur,
   useInputChange,
   useInputFocus,
-  usePropID,
+  useInputId,
   useValidation
 } from 'components/visual/Inputs/lib/inputs.hook';
 import type { InputOptions, InputRuntimeState, InputValueModel } from 'components/visual/Inputs/lib/inputs.model';
@@ -37,7 +37,7 @@ const WrappedSliderInput = () => {
 
   const disabled = get('disabled');
   const errorMessage = get('errorMessage');
-  const id = usePropID();
+  const id = useInputId();
   const rawValue = get('rawValue') ?? null;
   const loading = get('loading');
   const marks = get('marks');

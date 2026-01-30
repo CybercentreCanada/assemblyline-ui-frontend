@@ -14,7 +14,7 @@ import {
   useInputBlur,
   useInputChange,
   useInputFocus,
-  usePropID,
+  useInputId,
   useValidation
 } from 'components/visual/Inputs/lib/inputs.hook';
 import type { InputOptions, InputRuntimeState, InputValueModel } from 'components/visual/Inputs/lib/inputs.model';
@@ -49,7 +49,7 @@ const WrappedChipsInput = () => {
   const disabled = get('disabled');
   const filterSelectedOptions = get('filterSelectedOptions');
   const isFocused = get('isFocused');
-  const id = usePropID();
+  const id = useInputId();
   const rawValue = get('rawValue') ?? [];
   const isOptionEqualToValue = get('isOptionEqualToValue');
   const loading = get('loading');

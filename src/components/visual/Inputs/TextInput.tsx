@@ -13,7 +13,7 @@ import {
   useInputBlur,
   useInputChange,
   useInputFocus,
-  usePropID,
+  useInputId,
   useValidation
 } from 'components/visual/Inputs/lib/inputs.hook';
 import type { InputOptions, InputRuntimeState, InputValueModel } from 'components/visual/Inputs/lib/inputs.model';
@@ -32,7 +32,7 @@ const WrappedTextInput = () => {
   const [get] = usePropStore<TextInputController>();
 
   const disabled = get('disabled');
-  const id = usePropID();
+  const id = useInputId();
   const rawValue = get('rawValue') ?? '';
   const loading = get('loading');
   const options = get('options') ?? [];

@@ -15,7 +15,7 @@ import {
   useInputClick,
   useInputClickBlur,
   useInputFocus,
-  usePropID,
+  useInputId,
   useValidation
 } from 'components/visual/Inputs/lib/inputs.hook';
 import type { InputOptions, InputRuntimeState, InputValueModel } from 'components/visual/Inputs/lib/inputs.model';
@@ -31,10 +31,10 @@ type SwitchInputController = SwitchInputProps & InputRuntimeState;
 const WrappedSwitchInput = () => {
   const [get] = usePropStore<SwitchInputController>();
 
-  const id = usePropID();
-  const rawValue = Boolean(get('rawValue'));
+  const id = useInputId();
   const loading = get('loading');
   const preventDisabledColor = get('preventDisabledColor');
+  const rawValue = Boolean(get('rawValue'));
   const readOnly = get('readOnly');
   const tooltip = get('tooltip');
   const tooltipProps = get('tooltipProps');

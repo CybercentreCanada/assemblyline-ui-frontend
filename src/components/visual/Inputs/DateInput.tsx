@@ -22,7 +22,7 @@ import {
   useInputBlur,
   useInputChange,
   useInputFocus,
-  usePropID,
+  useInputId,
   useValidation
 } from 'components/visual/Inputs/lib/inputs.hook';
 import type { InputOptions, InputRuntimeState, InputValueModel } from 'components/visual/Inputs/lib/inputs.model';
@@ -51,7 +51,7 @@ export type DateInputProps = Omit<TextFieldProps, 'error' | 'value' | 'onChange'
 
 type DateInputController = DateInputProps &
   InputRuntimeState & {
-    showPopover: boolean;
+    showPopover?: boolean;
   };
 
 const DatePopper = React.memo(() => {
@@ -62,11 +62,11 @@ const DatePopper = React.memo(() => {
   const [get, setStore] = usePropStore<DateInputController>();
 
   const disabled = get('disabled');
+  const id = useInputId();
   const rawValue = get('rawValue') ?? null;
   const showPopover = get('showPopover') ?? false;
   const tiny = get('tiny');
 
-  const id = usePropID();
   const handleChange = useInputChange<Moment, string>();
 
   return (
@@ -155,7 +155,7 @@ const DatePopper = React.memo(() => {
 const WrappedDateInput = () => {
   const { i18n } = useTranslation('inputs');
 
-  const [get] = usePropStore<DateInputState>();
+  const [get] = usePropStore<DateInputController>();
 
   const disabled = get('disabled');
   const endAdornment = get('endAdornment');
@@ -179,9 +179,9 @@ const WrappedDateInput = () => {
     return moment(d);
   }, []);
 
-  const handleBlur = useInputBlur<DateInputProps>();
-  const handleChange = useInputChange<DateInputProps>();
-  const handleFocus = useInputFocus<DateInputProps>();
+  const handleBlur = useInputBlur<string, Moment>();
+  const handleChange = useInputChange<string, Moment>();
+  const handleFocus = useInputFocus<string, Moment>();
 
   const textfieldSlot = useTextInputSlot();
 
@@ -207,13 +207,13 @@ const WrappedDateInput = () => {
                 readOnly={readOnly}
                 value={rawValue}
                 onChange={d =>
-                  handleChange(null, d, d && d.isValid() ? `${d.format('YYYY-MM-DDThh:mm:ss.SSSSSS')}Z` : null)
+                  handleChange(null, d && d.isValid() ? `${d.format('YYYY-MM-DDThh:mm:ss.SSSSSS')}Z` : null, d)
                 }
                 slotProps={{
                   textField: {
                     ...textfieldSlot,
                     onFocus: handleFocus,
-                    onBlur: e => handleBlur(e, value ? moment(value) : null, value),
+                    onBlur: e => handleBlur(e, value, value ? moment(value) : null),
                     InputProps: {
                       endAdornment: (
                         <StyledEndAdornment preventRender={readOnly && !disabled}>
@@ -246,11 +246,13 @@ export const DateInput = ({ preventRender = false, value, ...props }: DateInputP
 
   return preventRender ? null : (
     <PropProvider<DateInputController>
-      initialProps={DEFAULT_INPUT_CONTROLLER_PROPS as DateInputController}
+      initialProps={{
+        ...(DEFAULT_INPUT_CONTROLLER_PROPS as DateInputController),
+        showPopover: false
+      }}
       props={{
         autoComplete: 'off',
         defaultDateOffset: null,
-        errorMessage,
         rawValue: value ? moment(value) : null,
         maxDateToday: false,
         minDateTomorrow: false,

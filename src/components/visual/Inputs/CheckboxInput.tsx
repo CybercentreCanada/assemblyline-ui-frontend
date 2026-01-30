@@ -16,7 +16,7 @@ import {
   useInputClick,
   useInputClickBlur,
   useInputFocus,
-  usePropID,
+  useInputId,
   useValidation
 } from 'components/visual/Inputs/lib/inputs.hook';
 import type { InputOptions, InputRuntimeState, InputValueModel } from 'components/visual/Inputs/lib/inputs.model';
@@ -34,7 +34,7 @@ type CheckboxInputController = CheckboxInputProps & InputRuntimeState;
 const WrappedCheckboxInput = () => {
   const [get] = usePropStore<CheckboxInputController>();
 
-  const id = usePropID();
+  const id = useInputId();
   const indeterminate = get('indeterminate');
   const rawValue = Boolean(get('rawValue'));
   const loading = get('loading');

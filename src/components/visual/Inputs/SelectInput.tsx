@@ -17,7 +17,7 @@ import {
   useInputBlur,
   useInputChange,
   useInputFocus,
-  usePropID,
+  useInputId,
   useValidation
 } from 'components/visual/Inputs/lib/inputs.hook';
 import type { InputOptions, InputRuntimeState, InputValueModel } from 'components/visual/Inputs/lib/inputs.model';
@@ -47,7 +47,7 @@ const WrappedSelectInput = <O extends readonly Option[]>() => {
   const displayEmpty = get('displayEmpty');
   const endAdornment = get('endAdornment');
   const errorMessage = get('errorMessage');
-  const id = usePropID();
+  const id = useInputId();
   const rawValue = get('rawValue');
   const loading = get('loading');
   const monospace = get('monospace');

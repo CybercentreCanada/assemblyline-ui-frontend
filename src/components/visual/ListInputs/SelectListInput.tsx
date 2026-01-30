@@ -1,7 +1,7 @@
 import type { ListItemTextProps, MenuItemProps, SelectProps } from '@mui/material';
 import { ListItemText, MenuItem, Select, useTheme } from '@mui/material';
 import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
-import { useValidation } from 'components/visual/Inputs/lib/inputs.hook';
+import { useInputId, useValidation } from 'components/visual/Inputs/lib/inputs.hook';
 import {
   StyledHelperText,
   StyledListInputInner,
@@ -13,12 +13,7 @@ import {
   StyledPasswordAdornment,
   StyledResetAdornment
 } from 'components/visual/ListInputs/lib/listinputs.components';
-import {
-  useInputBlur,
-  useInputChange,
-  useInputFocus,
-  usePropID
-} from 'components/visual/ListInputs/lib/listinputs.hook';
+import { useInputBlur, useInputChange, useInputFocus } from 'components/visual/ListInputs/lib/listinputs.hook';
 import type {
   ListInputOptions,
   ListInputRuntimeState,
@@ -53,7 +48,7 @@ const WrappedSelectListInput = <O extends readonly Option[]>() => {
   const disabled = get('disabled');
   const displayEmpty = get('displayEmpty');
   const errorMessage = get('errorMessage');
-  const id = usePropID();
+  const id = useInputId();
   const rawValue = get('rawValue');
   const loading = get('loading');
   const monospace = get('monospace');
