@@ -1,4 +1,4 @@
-import { shallowEqual, shallowReconcile } from 'components/visual/Inputs/lib/inputs.utils';
+import { shallowEqual, shallowReconcile } from 'components/core/PropProvider/props.utils';
 import React, { createContext, useContext, useEffect, useRef, useSyncExternalStore } from 'react';
 
 //**************************************************************
