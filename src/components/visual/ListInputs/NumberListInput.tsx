@@ -1,5 +1,7 @@
 import type { TextFieldProps } from '@mui/material';
-import { useErrorCallback } from 'components/visual/Inputs/lib/inputs.hook';
+import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
+import { useInputBlur, useInputChange, useInputFocus, useValidation } from 'components/visual/Inputs/lib/inputs.hook';
+import type { InputRuntimeState, InputValueModel } from 'components/visual/Inputs/lib/inputs.model';
 import {
   StyledHelperText,
   StyledListInputInner,
@@ -11,23 +13,24 @@ import {
   StyledResetAdornment,
   StyledTextField
 } from 'components/visual/ListInputs/lib/listinputs.components';
-import { useInputBlur, useInputChange, useInputFocus } from 'components/visual/ListInputs/lib/listinputs.hook';
-import type { ListInputProps, ListInputValues } from 'components/visual/ListInputs/lib/listinputs.model';
-import { PropProvider, usePropStore } from 'components/visual/ListInputs/lib/listinputs.provider';
+import type { ListInputOptions } from 'components/visual/ListInputs/lib/listinputs.model';
+import { DEFAULT_LIST_INPUT_CONTROLLER_PROPS } from 'components/visual/ListInputs/lib/listinputs.model';
 import React, { useEffect, useRef } from 'react';
 
-export type NumberListInputProps = ListInputValues<number, string> &
-  ListInputProps & {
+export type NumberListInputProps = InputValueModel<number, string> &
+  ListInputOptions & {
     autoComplete?: TextFieldProps['autoComplete'];
     max?: number;
     min?: number;
     step?: number;
   };
 
-const WrappedNumberListInput = React.memo(() => {
-  const [get] = usePropStore<NumberListInputProps>();
+type NumberListInputController = NumberListInputProps & InputRuntimeState;
 
-  const inputValue = get('inputValue') ?? '';
+const WrappedNumberListInput = React.memo(() => {
+  const [get] = usePropStore<NumberListInputController>();
+
+  const rawValue = get('rawValue') ?? '';
   const loading = get('loading');
   const max = get('max');
   const min = get('min');
@@ -38,9 +41,9 @@ const WrappedNumberListInput = React.memo(() => {
 
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const handleBlur = useInputBlur<NumberListInputProps>();
-  const handleChange = useInputChange<NumberListInputProps>();
-  const handleFocus = useInputFocus<NumberListInputProps>();
+  const handleBlur = useInputBlur<number, string>();
+  const handleChange = useInputChange<number, string>();
+  const handleFocus = useInputFocus<number, string>();
 
   useEffect(() => {
     const el = inputRef.current;
@@ -74,10 +77,10 @@ const WrappedNumberListInput = React.memo(() => {
               <StyledTextField
                 ref={inputRef}
                 type="number"
-                value={inputValue}
-                onChange={e => handleChange(e, e.target.value, e.target.value !== '' ? Number(e.target.value) : null)}
+                value={rawValue}
+                onChange={e => handleChange(e, e.target.value !== '' ? Number(e.target.value) : null, e.target.value)}
                 onFocus={handleFocus}
-                onBlur={e => handleBlur(e, value == null ? '' : String(value), value)}
+                onBlur={e => handleBlur(e, value, value == null ? '' : String(value))}
                 sx={{
                   maxWidth: width,
                   minWidth: width,
@@ -114,20 +117,25 @@ const WrappedNumberListInput = React.memo(() => {
 });
 
 export const NumberListInput = ({ preventRender = false, value, ...props }: NumberListInputProps) => {
-  const errorMessage = useErrorCallback({ preventRender, value, ...props });
+  const { status: validationStatus, message: validationMessage } = useValidation<number, string>({
+    value: value,
+    rawValue: value == null ? '' : String(value),
+    ...props
+  });
 
   return preventRender ? null : (
-    <PropProvider<NumberListInputProps>
+    <PropProvider<NumberListInputController>
+      initialProps={DEFAULT_LIST_INPUT_CONTROLLER_PROPS as NumberListInputController}
       props={{
         autoComplete: 'off',
-        enforceValidValue: true,
-        errorMessage,
-        inputValue: value == null ? '' : String(value),
         max: null,
         min: null,
         preventRender,
-        spinnerAdornment: true,
+        rawValue: value == null ? '' : String(value),
+        showSpinner: true,
         step: 1,
+        validationMessage,
+        validationStatus,
         value,
         ...props
       }}

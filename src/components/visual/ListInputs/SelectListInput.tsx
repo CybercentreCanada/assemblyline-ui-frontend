@@ -1,5 +1,14 @@
 import type { ListItemTextProps, MenuItemProps, SelectProps } from '@mui/material';
 import { ListItemText, MenuItem, Select, useTheme } from '@mui/material';
+import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
+import {
+  useInputBlur,
+  useInputChange,
+  useInputFocus,
+  useInputId,
+  useValidation
+} from 'components/visual/Inputs/lib/inputs.hook';
+import type { InputRuntimeState, InputValueModel } from 'components/visual/Inputs/lib/inputs.model';
 import {
   StyledHelperText,
   StyledListInputInner,
@@ -11,15 +20,8 @@ import {
   StyledPasswordAdornment,
   StyledResetAdornment
 } from 'components/visual/ListInputs/lib/listinputs.components';
-import {
-  useErrorCallback,
-  useInputBlur,
-  useInputChange,
-  useInputFocus,
-  usePropID
-} from 'components/visual/ListInputs/lib/listinputs.hook';
-import type { ListInputProps, ListInputValues } from 'components/visual/ListInputs/lib/listinputs.model';
-import { PropProvider, usePropStore } from 'components/visual/ListInputs/lib/listinputs.provider';
+import type { ListInputOptions } from 'components/visual/ListInputs/lib/listinputs.model';
+import { DEFAULT_LIST_INPUT_CONTROLLER_PROPS } from 'components/visual/ListInputs/lib/listinputs.model';
 import React from 'react';
 
 export type Option = {
@@ -28,41 +30,43 @@ export type Option = {
   value: MenuItemProps['value'] | boolean;
 };
 
-export type SelectListInputProps<O extends readonly Option[]> = ListInputValues<
+export type SelectListInputProps<O extends readonly Option[]> = InputValueModel<
   O[number]['value'],
   O[number]['value']
 > &
-  ListInputProps & {
+  ListInputOptions & {
     displayEmpty?: SelectProps['displayEmpty'];
     options?: O;
   };
 
+type SelectListInputController<O extends readonly Option[]> = SelectListInputProps<O> & InputRuntimeState;
+
 const WrappedSelectListInput = <O extends readonly Option[]>() => {
   const theme = useTheme();
 
-  const [get, setStore] = usePropStore<SelectListInputProps<O>>();
+  const [get, setStore] = usePropStore<SelectListInputController<O>>();
 
   const capitalize = get('capitalize');
   const disabled = get('disabled');
   const displayEmpty = get('displayEmpty');
-  const errorMessage = get('errorMessage');
-  const id = usePropID();
-  const inputValue = get('inputValue');
+  const id = useInputId();
+  const isMenuOpen = get('isMenuOpen');
+  const isPasswordVisible = get('isPasswordVisible');
   const loading = get('loading');
   const monospace = get('monospace');
   const options = get('options');
   const overflowHidden = get('overflowHidden');
   const password = get('password');
+  const rawValue = get('rawValue');
   const readOnly = get('readOnly');
-  const showMenu = get('showMenu');
-  const showPassword = get('showPassword');
   const tiny = get('tiny');
+  const validationStatus = get('validationStatus');
   const value = get('value');
   const width = get('width');
 
-  const handleBlur = useInputBlur<SelectListInputProps<O>>();
-  const handleChange = useInputChange<SelectListInputProps<O>>();
-  const handleFocus = useInputFocus<SelectListInputProps<O>>();
+  const handleBlur = useInputBlur<O[number]['value']>();
+  const handleChange = useInputChange<O[number]['value']>();
+  const handleFocus = useInputFocus<O[number]['value']>();
 
   return (
     <StyledListItemRoot>
@@ -79,18 +83,18 @@ const WrappedSelectListInput = <O extends readonly Option[]>() => {
               <Select
                 disabled={disabled}
                 displayEmpty={displayEmpty}
-                error={!!errorMessage}
+                error={validationStatus === 'error'}
                 fullWidth
                 id={id}
                 readOnly={readOnly}
                 size="small"
-                open={showMenu}
-                value={options?.some(o => o.value === inputValue) ? inputValue : ''}
+                open={isMenuOpen}
+                value={options?.some(o => o.value === rawValue) ? rawValue : ''}
                 onChange={event => handleChange(event as React.SyntheticEvent, event.target.value, event.target.value)}
                 onFocus={handleFocus}
                 onBlur={e => handleBlur(e, value, value)}
-                onClose={() => setStore({ showMenu: false })}
-                onOpen={() => setStore({ showMenu: true })}
+                onClose={() => setStore({ isMenuOpen: false })}
+                onOpen={() => setStore({ isMenuOpen: true })}
                 renderValue={option => (
                   <ListItemText
                     primary={options?.find(o => o.value === option)?.primary || ''}
@@ -125,7 +129,7 @@ const WrappedSelectListInput = <O extends readonly Option[]>() => {
                           ...(readOnly && { cursor: 'default', userSelect: 'text' }),
                           ...(monospace && { fontFamily: 'monospace' }),
                           ...(password &&
-                            showPassword && {
+                            isPasswordVisible && {
                               fontFamily: 'password',
                               WebkitTextSecurity: 'disc',
                               MozTextSecurity: 'disc',
@@ -195,18 +199,24 @@ export const SelectListInput = <O extends readonly Option[]>({
   value,
   ...props
 }: SelectListInputProps<O>) => {
-  const errorMessage = useErrorCallback({ preventRender, value, ...props });
+  const { status: validationStatus, message: validationMessage } = useValidation<O[number]['value']>({
+    value: value ?? '',
+    rawValue: value ?? '',
+    ...props
+  });
 
   return preventRender ? null : (
-    <PropProvider<SelectListInputProps<O>>
+    <PropProvider<SelectListInputController<O>>
+      initialProps={DEFAULT_LIST_INPUT_CONTROLLER_PROPS as SelectListInputController<O>}
       props={{
         capitalize: false,
         displayEmpty: false,
-        errorMessage,
-        inputValue: value,
+        rawValue: value,
         options: [] as unknown as O,
         overflowHidden: true,
         preventRender,
+        validationStatus,
+        validationMessage,
         value,
         ...props
       }}

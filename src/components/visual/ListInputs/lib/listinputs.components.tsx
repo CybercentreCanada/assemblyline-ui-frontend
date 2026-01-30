@@ -22,15 +22,15 @@ import {
   styled,
   useTheme
 } from '@mui/material';
+import { usePropStore } from 'components/core/PropProvider/PropProvider';
+import { useTextInputSlot } from 'components/visual/Inputs/lib/inputs.components';
 import {
   useInputChange,
-  usePreventPasswordRender,
-  usePreventResetRender,
-  usePropID,
-  useTextInputSlot
-} from 'components/visual/ListInputs/lib/listinputs.hook';
-import type { ListInputValues } from 'components/visual/ListInputs/lib/listinputs.model';
-import { usePropStore } from 'components/visual/ListInputs/lib/listinputs.provider';
+  useInputId,
+  useShouldRenderPassword,
+  useShouldRenderReset
+} from 'components/visual/Inputs/lib/inputs.hook';
+import type { ListInputControllerProps } from 'components/visual/ListInputs/lib/listinputs.model';
 import { Tooltip } from 'components/visual/Tooltip';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -60,7 +60,7 @@ StyledListInputInner.displayName = 'StyledListInputInner';
 export const StyledListItemRoot = React.memo(({ sx, ...props }: ListItemProps) => {
   const theme = useTheme();
 
-  const [get] = usePropStore();
+  const [get] = usePropStore<ListInputControllerProps>();
 
   const divider = get('divider');
 
@@ -94,30 +94,29 @@ StyledListInputLoading.displayName = 'StyledListInputLoading';
 export const StyledPasswordAdornment = React.memo(() => {
   const theme = useTheme();
 
-  const [get, setStore] = usePropStore();
+  const [get, setStore] = usePropStore<ListInputControllerProps>();
 
   const disabled = get('disabled');
+  const id = useInputId();
+  const isPasswordVisible = get('isPasswordVisible');
   const resetProps = get('resetProps');
-  const showPassword = get('showPassword');
+  const shouldRenderPassword = useShouldRenderPassword();
   const tiny = get('tiny');
 
-  const id = usePropID();
-  const preventPasswordRender = usePreventPasswordRender();
-
-  return preventPasswordRender ? null : (
+  return !shouldRenderPassword ? null : (
     <IconButton
       aria-label={`${id}-password`}
       color="secondary"
       disabled={disabled}
       type="button"
-      onClick={() => setStore(s => ({ showPassword: !s.showPassword }))}
+      onClick={() => setStore(s => ({ isPasswordVisible: !s.isPasswordVisible }))}
       {...resetProps}
       sx={{
         padding: tiny ? theme.spacing(0.25) : theme.spacing(0.5),
         ...resetProps?.sx
       }}
     >
-      {showPassword ? <VisibilityOff fontSize="small" /> : <Visibility fontSize="small" />}
+      {isPasswordVisible ? <VisibilityOff fontSize="small" /> : <Visibility fontSize="small" />}
     </IconButton>
   );
 });
@@ -125,20 +124,21 @@ export const StyledPasswordAdornment = React.memo(() => {
 // ------------------------------------------------------------
 // Reset Button
 // ------------------------------------------------------------
-export const StyledResetAdornment = React.memo(<T, P extends ListInputValues<T>>() => {
+export const StyledResetAdornment = React.memo(() => {
   const { t } = useTranslation('inputs');
   const theme = useTheme();
 
-  const [get] = usePropStore<P>();
-  const id = usePropID();
-  const preventResetRender = usePreventResetRender();
-  const handleChange = useInputChange();
+  const [get] = usePropStore<ListInputControllerProps>();
 
   const defaultValue = get('defaultValue');
   const disabled = get('disabled');
-  const resetProps = get('resetProps');
-  const tiny = get('tiny');
+  const id = useInputId();
   const onReset = get('onReset');
+  const resetProps = get('resetProps');
+  const shouldRenderReset = useShouldRenderReset();
+  const tiny = get('tiny');
+
+  const handleChange = useInputChange();
 
   const title = useMemo<React.ReactNode>(
     () =>
@@ -157,7 +157,7 @@ export const StyledResetAdornment = React.memo(<T, P extends ListInputValues<T>>
     [defaultValue, t, theme.palette.text.secondary]
   );
 
-  if (preventResetRender) return null;
+  if (!shouldRenderReset) return null;
 
   return (
     <Tooltip arrow title={title} placement="bottom">
@@ -193,11 +193,11 @@ export type StyledListInputTextProps = React.LabelHTMLAttributes<HTMLLabelElemen
 
 export const StyledListInputText = React.memo(({ noLabel = false, ...props }: StyledListInputTextProps) => {
   const theme = useTheme();
-  const [get] = usePropStore();
+  const [get] = usePropStore<ListInputControllerProps>();
 
   const capitalize = get('capitalize');
   const disabled = get('disabled');
-  const id = usePropID();
+  const id = useInputId();
   const inset = get('inset');
   const monospace = get('monospace');
   const primary = get('primary');
@@ -261,16 +261,16 @@ StyledListInputText.displayName = 'StyledListInputText';
 // ------------------------------------------------------------
 export const StyledHelperText = React.memo(() => {
   const theme = useTheme();
-  const [get] = usePropStore();
+  const [get] = usePropStore<ListInputControllerProps>();
 
-  const id = usePropID();
   const disabled = get('disabled');
-  const errorMessage = get('errorMessage');
-  const errorProps = get('errorProps');
   const helperText = get('helperText');
   const helperTextProps = get('helperTextProps');
+  const id = useInputId();
   const loading = get('loading');
   const readOnly = get('readOnly');
+  const validationMessage = get('validationMessage');
+  const validationStatus = get('validationStatus');
 
   if (disabled || loading || readOnly) return null;
 
@@ -287,16 +287,16 @@ export const StyledHelperText = React.memo(() => {
     </div>
   );
 
-  if (errorMessage)
+  if (validationStatus === 'error')
     return (
       <Wrapper>
         <FormHelperText
           id={`${id}-helper-text`}
           variant="outlined"
-          {...errorProps}
-          sx={{ color: theme.palette.error.main, ...errorProps?.sx }}
+          {...helperTextProps}
+          sx={{ color: theme.palette.error.main, ...helperTextProps?.sx }}
         >
-          {errorMessage}
+          {validationMessage}
         </FormHelperText>
       </Wrapper>
     );
@@ -324,7 +324,7 @@ StyledHelperText.displayName = 'StyledHelperText';
 // ------------------------------------------------------------
 export const StyledListInputButtonRoot = React.memo(({ children, sx, ...props }: ListItemButtonProps) => {
   const theme = useTheme();
-  const [get] = usePropStore();
+  const [get] = usePropStore<ListInputControllerProps>();
 
   const disabled = get('disabled');
   const loading = get('loading');
@@ -361,7 +361,7 @@ export type StyledTextFieldProps = TextFieldProps & {
 };
 
 export const StyledTextField = React.memo(({ params, ...props }: StyledTextFieldProps) => {
-  const [get] = usePropStore();
+  const [get] = usePropStore<ListInputControllerProps>();
 
   const endAdornment = get('endAdornment');
   const placeholder = get('placeholder');
@@ -408,12 +408,12 @@ export const StyledTextField = React.memo(({ params, ...props }: StyledTextField
 StyledTextField.displayName = 'StyledTextField';
 
 export const StyledListItemText = React.memo(({ primary, secondary = null, ...props }: ListItemTextProps) => {
-  const [get] = usePropStore();
+  const [get] = usePropStore<ListInputControllerProps>();
 
   const capitalize = get('capitalize');
+  const isPasswordVisible = get('isPasswordVisible');
   const overflowHidden = get('overflowHidden');
   const password = get('password');
-  const showPassword = get('showPassword');
   const tiny = get('tiny');
 
   return (
@@ -443,7 +443,7 @@ export const StyledListItemText = React.memo(({ primary, secondary = null, ...pr
         marginTop: 'initial',
         marginBottom: 'initial',
         ...(password &&
-          showPassword && {
+          isPasswordVisible && {
             wordBreak: 'break-all',
             fontFamily: 'password',
             WebkitTextSecurity: 'disc',

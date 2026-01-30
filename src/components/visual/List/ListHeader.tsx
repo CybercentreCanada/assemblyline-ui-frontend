@@ -1,24 +1,26 @@
 import type { CheckboxProps } from '@mui/material';
 import { Checkbox, ListItemIcon } from '@mui/material';
+import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
 import type { AnchorProps } from 'components/core/TableOfContent/Anchor';
 import { Anchor } from 'components/core/TableOfContent/Anchor';
 import { StyledCircularSkeleton } from 'components/visual/Inputs/lib/inputs.components';
+import { useInputId, useInputLabel } from 'components/visual/Inputs/lib/inputs.hook';
+import type { InputValueModel } from 'components/visual/Inputs/lib/inputs.model';
 import {
   StyledListInputButtonRoot,
   StyledListInputText,
   StyledListItemRoot,
   StyledResetAdornment
 } from 'components/visual/ListInputs/lib/listinputs.components';
-import { usePropID, usePropLabel } from 'components/visual/ListInputs/lib/listinputs.hook';
-import type { ListInputProps, ListInputValues } from 'components/visual/ListInputs/lib/listinputs.model';
-import { PropProvider, usePropStore } from 'components/visual/ListInputs/lib/listinputs.provider';
+import type { ListInputOptions } from 'components/visual/ListInputs/lib/listinputs.model';
+import { DEFAULT_LIST_INPUT_CONTROLLER_PROPS } from 'components/visual/ListInputs/lib/listinputs.model';
 import React from 'react';
 
 export type ListHeaderProps = Omit<
-  ListInputValues<boolean, boolean, React.MouseEvent<HTMLDivElement, globalThis.MouseEvent>>,
+  InputValueModel<boolean, boolean, React.MouseEvent<HTMLDivElement, globalThis.MouseEvent>>,
   'value'
 > &
-  ListInputProps & {
+  ListInputOptions & {
     anchor?: boolean;
     anchorProps?: AnchorProps;
     checked?: boolean;
@@ -26,18 +28,20 @@ export type ListHeaderProps = Omit<
     indeterminate?: CheckboxProps['indeterminate'];
   };
 
+type ListHeaderController = ListHeaderProps & {};
+
 const WrappedListHeader = React.memo(() => {
-  const [get] = usePropStore<ListHeaderProps>();
+  const [get] = usePropStore<ListHeaderController>();
 
   const anchor = get('anchor');
   const anchorProps = get('anchorProps');
   const checked = get('checked');
   const disabled = get('disabled');
   const edge = get('edge');
-  const id = usePropID();
+  const id = useInputId();
   const indeterminate = get('indeterminate');
   const loading = get('loading');
-  const primary = usePropLabel();
+  const primary = useInputLabel();
 
   const onChange = get('onChange');
 
@@ -110,7 +114,10 @@ export const ListHeader = ({
   ...props
 }: ListHeaderProps) => {
   return preventRender ? null : (
-    <PropProvider<ListHeaderProps> props={{ anchor, anchorProps, edge, preventRender, onChange: null, ...props }}>
+    <PropProvider<ListHeaderController>
+      initialProps={DEFAULT_LIST_INPUT_CONTROLLER_PROPS as ListHeaderController}
+      props={{ anchor, anchorProps, edge, preventRender, onChange: null, ...props }}
+    >
       <WrappedListHeader />
     </PropProvider>
   );

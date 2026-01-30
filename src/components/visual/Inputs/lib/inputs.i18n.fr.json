@@ -1,15 +1,16 @@
 {
-  "chips-input.placeholder": "Saisissez une valeur et appuyez sur Entrée",
   "classification.acceptText": "Procéder",
   "classification.cancelText": "Annuler",
   "classification.done": "Terminé",
   "classification.reset": "Réinitialiser",
-  "classification.text": "La classification de cet élément est supérieure à la classification maximale prise en charge par la source externe.",
-  "classification.text.accept": "Êtes-vous sûr de vouloir continuer?",
-  "classification.title": "Avertissement d'accessibilité de classification",
-  "error.max": "La valeur ne doit pas dépasser {{max}}",
-  "error.min": "La valeur doit être au minimum {{min}}",
-  "error.minmax": "La valeur doit être comprise entre {{min}} et {{max}}",
-  "error.required": "La valeur est obligatoire",
-  "reset_to": "réinitialiser à : "
+  "classification.text": "La classification de cet élément est supérieure à la classification maximale que la source externe prend en charge.",
+  "classification.text.accept": "Êtes-vous sûr de vouloir continuer ?",
+  "classification.title": "Avertissement d'accessibilité de la classification",
+  "input.chips.placeholder": "Saisissez une valeur et appuyez sur Entrée",
+  "reset_to": "Réinitialiser à : ",
+  "validation.max": "La valeur ne doit pas dépasser {{max}}",
+  "validation.min": "La valeur doit être au minimum {{min}}",
+  "validation.minmax": "La valeur doit être comprise entre {{min}} et {{max}}",
+  "validation.noWhitespace": "La valeur contient un espace",
+  "validation.required": "La valeur est obligatoire"
 }

@@ -1,6 +1,14 @@
 import type { TextFieldProps } from '@mui/material';
 import { Autocomplete, Typography } from '@mui/material';
-import { useErrorCallback } from 'components/visual/Inputs/lib/inputs.hook';
+import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
+import {
+  useInputBlur,
+  useInputChange,
+  useInputFocus,
+  useInputId,
+  useValidation
+} from 'components/visual/Inputs/lib/inputs.hook';
+import type { InputRuntimeState, InputValueModel } from 'components/visual/Inputs/lib/inputs.model';
 import {
   StyledHelperText,
   StyledListInputInner,
@@ -12,28 +20,24 @@ import {
   StyledResetAdornment,
   StyledTextField
 } from 'components/visual/ListInputs/lib/listinputs.components';
-import {
-  useInputBlur,
-  useInputChange,
-  useInputFocus,
-  usePropID
-} from 'components/visual/ListInputs/lib/listinputs.hook';
-import type { ListInputProps, ListInputValues } from 'components/visual/ListInputs/lib/listinputs.model';
-import { PropProvider, usePropStore } from 'components/visual/ListInputs/lib/listinputs.provider';
+import type { ListInputOptions } from 'components/visual/ListInputs/lib/listinputs.model';
+import { DEFAULT_LIST_INPUT_CONTROLLER_PROPS } from 'components/visual/ListInputs/lib/listinputs.model';
 import React from 'react';
 
-export type TextListInputProps = ListInputValues<string, string, React.SyntheticEvent<Element, Event>> &
-  ListInputProps & {
+export type TextListInputProps = InputValueModel<string, string, React.SyntheticEvent<Element, Event>> &
+  ListInputOptions & {
     autoComplete?: TextFieldProps['autoComplete'];
     options?: string[] | readonly string[];
   };
 
+type TextListInputController = TextListInputProps & InputRuntimeState;
+
 const WrappedTextListInput = React.memo(() => {
-  const [get] = usePropStore<TextListInputProps>();
+  const [get] = usePropStore<TextListInputController>();
 
   const disabled = get('disabled');
-  const id = usePropID();
-  const inputValue = get('inputValue') ?? '';
+  const id = useInputId();
+  const rawValue = get('rawValue') ?? '';
   const loading = get('loading');
   const options = get('options') ?? [];
   const readOnly = get('readOnly');
@@ -41,9 +45,9 @@ const WrappedTextListInput = React.memo(() => {
   const value = get('value') ?? '';
   const width = get('width');
 
-  const handleBlur = useInputBlur<TextListInputProps>();
-  const handleChange = useInputChange<TextListInputProps>();
-  const handleFocus = useInputFocus<TextListInputProps>();
+  const handleBlur = useInputBlur<string>();
+  const handleChange = useInputChange<string>();
+  const handleFocus = useInputFocus<string>();
 
   return (
     <StyledListItemRoot>
@@ -63,7 +67,7 @@ const WrappedTextListInput = React.memo(() => {
                 freeSolo
                 fullWidth
                 id={id}
-                inputValue={inputValue}
+                inputValue={rawValue}
                 options={options}
                 readOnly={readOnly}
                 size="small"
@@ -90,11 +94,25 @@ const WrappedTextListInput = React.memo(() => {
 });
 
 export const TextListInput = ({ preventRender = false, value, ...props }: TextListInputProps) => {
-  const errorMessage = useErrorCallback({ preventRender, value, ...props });
+  const { status: validationStatus, message: validationMessage } = useValidation<string>({
+    value: value ?? '',
+    rawValue: value ?? '',
+    ...props
+  });
 
   return preventRender ? null : (
-    <PropProvider<TextListInputProps>
-      props={{ autoComplete: 'off', options: [], preventRender, inputValue: value, value, errorMessage, ...props }}
+    <PropProvider<TextListInputController>
+      initialProps={DEFAULT_LIST_INPUT_CONTROLLER_PROPS as TextListInputController}
+      props={{
+        autoComplete: 'off',
+        options: [],
+        preventRender,
+        rawValue: value,
+        validationMessage,
+        validationStatus,
+        value,
+        ...props
+      }}
     >
       <WrappedTextListInput />
     </PropProvider>

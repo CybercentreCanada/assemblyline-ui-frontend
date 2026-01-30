@@ -1,5 +1,6 @@
 import type { SliderProps } from '@mui/material';
 import { Slider } from '@mui/material';
+import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
 import {
   HelperText,
   ResetAdornment,
@@ -9,18 +10,18 @@ import {
   StyledRoot
 } from 'components/visual/Inputs/lib/inputs.components';
 import {
-  useErrorCallback,
   useInputBlur,
   useInputChange,
   useInputFocus,
-  usePropID
+  useInputId,
+  useValidation
 } from 'components/visual/Inputs/lib/inputs.hook';
-import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
-import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
+import type { InputOptions, InputRuntimeState, InputValueModel } from 'components/visual/Inputs/lib/inputs.model';
+import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/lib/inputs.model';
 import React from 'react';
 
-export type SliderInputProps = InputValues<number, number> &
-  InputProps & {
+export type SliderInputProps = InputValueModel<number, number> &
+  InputOptions & {
     marks?: SliderProps['marks'];
     max?: number;
     min?: number;
@@ -29,13 +30,14 @@ export type SliderInputProps = InputValues<number, number> &
     valueLabelFormat?: SliderProps['valueLabelFormat'];
   };
 
+type SliderInputController = SliderInputProps & InputRuntimeState;
+
 const WrappedSliderInput = () => {
-  const [get] = usePropStore<SliderInputProps>();
+  const [get] = usePropStore<SliderInputController>();
 
   const disabled = get('disabled');
-  const errorMessage = get('errorMessage');
-  const id = usePropID();
-  const inputValue = get('inputValue') ?? null;
+  const id = useInputId();
+  const rawValue = get('rawValue') ?? null;
   const loading = get('loading');
   const marks = get('marks');
   const max = get('max');
@@ -45,10 +47,11 @@ const WrappedSliderInput = () => {
   const value = get('value');
   const valueLabelDisplay = get('valueLabelDisplay');
   const valueLabelFormat = get('valueLabelFormat');
+  const validationStatus = get('validationStatus');
 
-  const handleBlur = useInputBlur<SliderInputProps>();
-  const handleChange = useInputChange<SliderInputProps>();
-  const handleFocus = useInputFocus<SliderInputProps>();
+  const handleBlur = useInputBlur<number>();
+  const handleChange = useInputChange<number>();
+  const handleFocus = useInputFocus<number>();
 
   return (
     <StyledRoot>
@@ -62,13 +65,13 @@ const WrappedSliderInput = () => {
               <div style={{ flex: 1, marginLeft: '20px', marginRight: '20px' }}>
                 <Slider
                   aria-label={id}
-                  color={!disabled && errorMessage ? 'error' : 'primary'}
+                  color={!disabled && validationStatus === 'error' ? 'error' : 'primary'}
                   disabled={disabled || readOnly}
                   id={id}
                   marks={marks}
                   size="small"
                   step={step}
-                  value={inputValue}
+                  value={rawValue}
                   valueLabelDisplay={valueLabelDisplay}
                   valueLabelFormat={valueLabelFormat}
                   {...(min && { min: min })}
@@ -89,18 +92,24 @@ const WrappedSliderInput = () => {
 };
 
 export const SliderInput = ({ preventRender = false, value, ...props }: SliderInputProps) => {
-  const errorMessage = useErrorCallback({ preventRender, value, ...props });
-
+  const { status: validationStatus, message: validationMessage } = useValidation<number>({
+    value: value ?? null,
+    rawValue: value ?? null,
+    ...props
+  });
   return preventRender ? null : (
-    <PropProvider<SliderInputProps>
+    <PropProvider<SliderInputController>
+      initialProps={DEFAULT_INPUT_CONTROLLER_PROPS as SliderInputController}
       props={{
-        errorMessage,
-        inputValue: value,
+        // errorMessage,
+        rawValue: value,
         marks: false,
         max: null,
         min: null,
         preventRender: false,
         step: null,
+        validationStatus,
+        validationMessage,
         value,
         valueLabelDisplay: 'auto',
         valueLabelFormat: v => v,

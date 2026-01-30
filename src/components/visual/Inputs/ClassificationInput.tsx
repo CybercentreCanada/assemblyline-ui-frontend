@@ -1,5 +1,4 @@
 import {
-  Button,
   Card,
   Dialog,
   DialogActions,
@@ -9,11 +8,14 @@ import {
   List,
   ListItemButton,
   ListItemText,
+  Typography,
   useMediaQuery,
   useTheme
 } from '@mui/material';
+import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
 import useALContext from 'components/hooks/useALContext';
 import type { WhoAmI } from 'components/models/ui/user';
+import { Button } from 'components/visual/Buttons/Button';
 import type { ClassificationProps } from 'components/visual/Classification';
 import CustomChip, { COLOR_MAP } from 'components/visual/CustomChip';
 import {
@@ -24,9 +26,9 @@ import {
   StyledInputSkeleton,
   StyledRoot
 } from 'components/visual/Inputs/lib/inputs.components';
-import { useError, useErrorCallback } from 'components/visual/Inputs/lib/inputs.hook';
-import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
-import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
+import { useCoercingResolver, useValidation, useValidationResolver } from 'components/visual/Inputs/lib/inputs.hook';
+import type { InputOptions, InputRuntimeState, InputValueModel } from 'components/visual/Inputs/lib/inputs.model';
+import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/lib/inputs.model';
 import { Tooltip } from 'components/visual/Tooltip';
 import type { ClassificationParts, ClassificationValidator } from 'helpers/classificationParser';
 import {
@@ -43,14 +45,15 @@ import React, { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export type ClassificationInputProps = Omit<ClassificationProps, 'c12n' | 'setClassification'> &
-  InputValues<ClassificationProps['c12n']> &
-  InputProps;
+  InputValueModel<ClassificationProps['c12n']> &
+  InputOptions;
 
-type ClassificationInputState = ClassificationInputProps & {
-  showPicker: boolean;
-  uParts: ClassificationParts;
-  validated: ClassificationValidator;
-};
+type ClassificationInputController = ClassificationInputProps &
+  InputRuntimeState & {
+    showPicker: boolean;
+    uParts: ClassificationParts;
+    validated: ClassificationValidator;
+  };
 
 const WrappedClassificationInput = () => {
   const { t } = useTranslation('inputs');
@@ -61,7 +64,7 @@ const WrappedClassificationInput = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const sp2 = theme.spacing(2);
 
-  const [get, setStore] = usePropStore<ClassificationInputState>();
+  const [get, setStore] = usePropStore<ClassificationInputController>();
 
   const defaultValue = get('defaultValue');
   const disabled = get('disabled');
@@ -75,18 +78,19 @@ const WrappedClassificationInput = () => {
   const preventRenderStore = get('preventRender');
   const readOnly = get('readOnly');
   const reset = get('reset');
-  const showPassword = get('showPassword');
+  const isPasswordVisible = get('isPasswordVisible');
   const tiny = get('tiny');
   const value = get('value');
 
   const dynGroup = get('dynGroup');
-  const showPicker = get('showPicker') ?? false;
-  const uParts = get('uParts') ?? defaultParts;
-  const validated = get('validated') ?? defaultClassificationValidator;
+  const showPicker = get('showPicker');
+  const uParts = get('uParts');
+  const validated = get('validated');
 
-  const error = useError();
+  const resolveCoercing = useCoercingResolver<string>();
+  const resolveValidation = useValidationResolver<string>();
+
   const onChange = get('onChange');
-  const onError = get('onError');
   const onReset = get('onReset');
 
   const preventRender = useMemo(
@@ -223,27 +227,37 @@ const WrappedClassificationInput = () => {
   const handleChange = useCallback(
     (event: React.SyntheticEvent) => {
       const newC12n = normalizedClassification(validated.parts, c12nDef, format, isMobile, isUser);
-      const err = error(newC12n);
-      onError(err);
-      if (!err) onChange(event, newC12n);
-      setStore(() => ({ ...(!err && { value: newC12n }), inputValue: newC12n, errorMsg: err, showPicker: false }));
+
+      const { ignore } = resolveCoercing(event, newC12n, newC12n);
+      const [validationStatus, validationMessage] = resolveValidation(newC12n, newC12n);
+
+      if (!ignore) onChange(event, newC12n);
+      setStore(() => ({
+        ...(!ignore && { value: newC12n }),
+        rawValue: newC12n,
+        validationStatus,
+        validationMessage,
+        showPicker: false
+      }));
     },
-    [c12nDef, error, format, isMobile, isUser, onChange, onError, setStore, validated.parts]
+    [c12nDef, format, isMobile, isUser, onChange, resolveCoercing, resolveValidation, setStore, validated.parts]
   );
 
   const handleReset = useCallback(
     (event: React.SyntheticEvent) => {
-      const err = error(defaultValue);
-      onError(err);
-      if (!err) onChange(event, defaultValue);
+      const { ignore } = resolveCoercing(event, defaultValue, defaultValue);
+      const [validationStatus, validationMessage] = resolveValidation(defaultValue, defaultValue);
+
+      if (!ignore) onChange(event, defaultValue);
       setStore(() => ({
-        ...(!err && { value: defaultValue }),
-        inputValue: defaultValue,
-        errorMsg: err,
-        showPicker: false
+        ...(!ignore && { value: defaultValue }),
+        rawValue: defaultValue,
+        showPicker: false,
+        validationMessage,
+        validationStatus
       }));
     },
-    [defaultValue, error, onChange, onError, setStore]
+    [defaultValue, onChange, resolveCoercing, resolveValidation, setStore]
   );
 
   useEffect(() => {
@@ -280,7 +294,7 @@ const WrappedClassificationInput = () => {
                   mb: 0.75,
                   ...(monospace && { fontFamily: 'monospace' }),
                   ...(password &&
-                    showPassword && {
+                    isPasswordVisible && {
                       fontFamily: 'password',
                       WebkitTextSecurity: 'disc',
                       MozTextSecurity: 'disc',
@@ -311,6 +325,9 @@ const WrappedClassificationInput = () => {
               <DialogContent>
                 <Grid container spacing={2}>
                   <Grid size={{ xs: 12, md: 'grow' }}>
+                    <Typography color="textSecondary" variant="body2">
+                      {t('classification.level')}
+                    </Typography>
                     <Card variant="outlined">
                       <List disablePadding style={{ borderRadius: '6px' }}>
                         {c12nDef.original_definition.levels.map(
@@ -336,6 +353,9 @@ const WrappedClassificationInput = () => {
                     (uParts.req.length !== 0 &&
                       c12nDef.original_definition.required.filter(r => !r.is_hidden).length !== 0)) && (
                     <Grid size={{ xs: 12, md: 'grow' }}>
+                      <Typography color="textSecondary" variant="body2">
+                        {t('classification.required_tokens')}
+                      </Typography>
                       <Card variant="outlined">
                         <List disablePadding>
                           {c12nDef.original_definition.required.map(
@@ -370,6 +390,9 @@ const WrappedClassificationInput = () => {
                         (uParts.groups.length !== 0 &&
                           c12nDef.original_definition.groups.filter(g => !g.is_hidden).length !== 0)) && (
                         <div style={{ paddingBottom: sp2 }}>
+                          <Typography color="textSecondary" variant="body2">
+                            {t('classification.groups_releasability')}
+                          </Typography>
                           <Card variant="outlined">
                             <List disablePadding>
                               {c12nDef.original_definition.groups
@@ -453,30 +476,42 @@ const WrappedClassificationInput = () => {
                       {((isUser && c12nDef.original_definition.subgroups.length !== 0) ||
                         (uParts.subgroups.length !== 0 &&
                           c12nDef.original_definition.subgroups.filter(sg => !sg.is_hidden).length !== 0)) && (
-                        <Card variant="outlined">
-                          <List disablePadding>
-                            {c12nDef.original_definition.subgroups
-                              .filter(sgrp => isUser || !sgrp.is_hidden)
-                              .map((sgrp, idx) => (
-                                <ListItemButton
-                                  key={idx}
-                                  selected={
-                                    validated.parts.subgroups.includes(sgrp.name) ||
-                                    validated.parts.subgroups.includes(sgrp.short_name)
-                                  }
-                                  onClick={() => handleSubGroupsChange(sgrp)}
-                                >
-                                  <ListItemText style={{ textAlign: 'center' }} primary={sgrp.name} />
-                                </ListItemButton>
-                              ))}
-                          </List>
-                        </Card>
+                        <>
+                          <Typography color="textSecondary" variant="body2">
+                            {t('classification.sub-groups_releasability')}
+                          </Typography>
+                          <Card variant="outlined">
+                            <List disablePadding>
+                              {c12nDef.original_definition.subgroups
+                                .filter(sgrp => isUser || !sgrp.is_hidden)
+                                .map((sgrp, idx) => (
+                                  <ListItemButton
+                                    key={idx}
+                                    selected={
+                                      validated.parts.subgroups.includes(sgrp.name) ||
+                                      validated.parts.subgroups.includes(sgrp.short_name)
+                                    }
+                                    onClick={() => handleSubGroupsChange(sgrp)}
+                                  >
+                                    <ListItemText style={{ textAlign: 'center' }} primary={sgrp.name} />
+                                  </ListItemButton>
+                                ))}
+                            </List>
+                          </Card>
+                        </>
                       )}
                     </Grid>
                   )}
                 </Grid>
               </DialogContent>
               <DialogActions>
+                <Button
+                  color="secondary"
+                  to="/help/classification"
+                  onClick={() => setStore(() => ({ showPicker: false }))}
+                >
+                  {t('classification.help')}
+                </Button>
                 <PasswordAdornment />
                 {reset && (
                   <Tooltip arrow title={title} placement="bottom">
@@ -485,6 +520,7 @@ const WrappedClassificationInput = () => {
                     </Button>
                   </Tooltip>
                 )}
+                <div style={{ flex: 1 }} />
                 <Button onClick={event => handleChange(event)} color="primary" autoFocus>
                   {t('classification.done')}
                 </Button>
@@ -500,19 +536,28 @@ const WrappedClassificationInput = () => {
 };
 
 export const ClassificationInput = ({ preventRender = false, value, ...props }: ClassificationInputProps) => {
-  const errorMessage = useErrorCallback({ preventRender, value, ...props });
+  const { status: validationStatus, message: validationMessage } = useValidation<string>({
+    value: value ?? '',
+    rawValue: value ?? '',
+    ...props
+  });
 
   return preventRender || !value ? null : (
-    <PropProvider<ClassificationInputProps>
+    <PropProvider<ClassificationInputController>
+      initialProps={DEFAULT_INPUT_CONTROLLER_PROPS as ClassificationInputController}
       props={{
         dynGroup: null,
-        errorMessage,
         format: 'short',
         fullWidth: true,
         inline: false,
-        inputValue: value,
         isUser: false,
         preventRender,
+        rawValue: value,
+        showPicker: false,
+        uParts: defaultParts,
+        validated: defaultClassificationValidator,
+        validationMessage,
+        validationStatus,
         value,
         ...props
       }}
