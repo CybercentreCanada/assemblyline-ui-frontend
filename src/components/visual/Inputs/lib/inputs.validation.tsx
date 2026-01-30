@@ -156,7 +156,7 @@ export class CoercersSchema<Value, RawValue = Value> {
    * Ensures the value is not empty
    */
   required() {
-    this.coercers.push((event, value, rawValue) => {
+    this.coercers.push((event, value) => {
       if (value === null || value === undefined || value === '') {
         return { value, ignore: true };
       }
@@ -168,7 +168,7 @@ export class CoercersSchema<Value, RawValue = Value> {
    * Trim whitespace from string values
    */
   trim() {
-    this.coercers.push((event, value, rawValue) =>
+    this.coercers.push((event, value) =>
       typeof value === 'string' ? { value: value.trim() as Value, ignore: false } : { value, ignore: false }
     );
     return this;
@@ -178,7 +178,7 @@ export class CoercersSchema<Value, RawValue = Value> {
    * Convert string values to lowercase
    */
   toLowerCase() {
-    this.coercers.push((event, value, rawValue) =>
+    this.coercers.push((event, value) =>
       typeof value === 'string' ? { value: value.toLowerCase() as Value, ignore: false } : { value, ignore: false }
     );
     return this;

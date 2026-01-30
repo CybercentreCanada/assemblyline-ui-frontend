@@ -49,42 +49,42 @@ describe('CoercersResolver', () => {
   it('trim coercer removes whitespace', () => {
     const schema = new CoercersSchema({}).trim();
     const parser = schema as CoercersResolver<string>;
-    const result = parser.resolve({} as any, '  hello  ', '  hello  ');
+    const result = parser.resolve({} as never, '  hello  ', '  hello  ');
     expect(result).toEqual({ value: 'hello', ignore: false });
   });
 
   it('toLowerCase coercer converts string to lowercase', () => {
     const schema = new CoercersSchema({}).toLowerCase();
     const parser = schema as CoercersResolver<string>;
-    const result = parser.resolve({} as any, 'HeLLo', 'HeLLo');
+    const result = parser.resolve({} as never, 'HeLLo', 'HeLLo');
     expect(result).toEqual({ value: 'hello', ignore: false });
   });
 
   it('required coercer sets ignore to true for empty values', () => {
     const schema = new CoercersSchema({}).required();
     const parser = schema as CoercersResolver<string>;
-    const result = parser.resolve({} as any, '', '');
+    const result = parser.resolve({} as never, '', '');
     expect(result).toEqual({ value: '', ignore: true });
   });
 
   it('applies multiple coercers in order', () => {
     const schema = new CoercersSchema({}).trim().toLowerCase();
     const parser = schema as CoercersResolver<string>;
-    const result = parser.resolve({} as any, '  HeLLo  ', '  HeLLo  ');
+    const result = parser.resolve({} as never, '  HeLLo  ', '  HeLLo  ');
     expect(result).toEqual({ value: 'hello', ignore: false });
   });
 
   it('respects ignore flags from coercers', () => {
     const schema = new CoercersSchema({}).required().trim();
     const parser = schema as CoercersResolver<string>;
-    const result = parser.resolve({} as any, '', '');
+    const result = parser.resolve({} as never, '', '');
     expect(result).toEqual({ value: '', ignore: true });
   });
 
   it('works with no coercers', () => {
     const schema = new CoercersSchema({});
     const parser = schema as CoercersResolver<string>;
-    const result = parser.resolve({} as any, 'value', 'value');
+    const result = parser.resolve({} as never, 'value', 'value');
     expect(result).toEqual({ value: 'value', ignore: false });
   });
 });
