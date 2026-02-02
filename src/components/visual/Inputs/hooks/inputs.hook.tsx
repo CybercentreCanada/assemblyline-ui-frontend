@@ -1,14 +1,14 @@
 /* eslint-disable @typescript-eslint/no-unnecessary-type-constraint */
 import { usePropStore } from 'components/core/PropProvider/PropProvider';
-import type { InputControllerProps, InputOptions, InputValueModel } from 'components/visual/Inputs/lib/inputs.model';
+import type { InputControllerProps, InputOptions, InputValueModel } from 'components/visual/Inputs/models/inputs.model';
 import type {
   Coercer,
   CoercersSchema,
   ValidationSchema,
   ValidationStatus,
   Validator
-} from 'components/visual/Inputs/lib/inputs.validation';
-import { CoercersResolver, ValidationResolver } from 'components/visual/Inputs/lib/inputs.validation';
+} from 'components/visual/Inputs/utils/inputs.validation';
+import { CoercersResolver, ValidationResolver } from 'components/visual/Inputs/utils/inputs.validation';
 import type { SyntheticEvent } from 'react';
 import { useCallback, useRef, useTransition } from 'react';
 import { useTranslation } from 'react-i18next';

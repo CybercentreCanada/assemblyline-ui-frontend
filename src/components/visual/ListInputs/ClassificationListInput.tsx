@@ -1,8 +1,8 @@
 import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
 import type { ClassificationProps } from 'components/visual/Classification';
 import Classification from 'components/visual/Classification';
-import { useInputChange, useValidation } from 'components/visual/Inputs/lib/inputs.hook';
-import type { InputRuntimeState, InputValueModel } from 'components/visual/Inputs/lib/inputs.model';
+import { useInputChange, useValidation } from 'components/visual/Inputs/hooks/inputs.hook';
+import type { InputRuntimeState, InputValueModel } from 'components/visual/Inputs/models/inputs.model';
 import {
   StyledHelperText,
   StyledListInputInner,

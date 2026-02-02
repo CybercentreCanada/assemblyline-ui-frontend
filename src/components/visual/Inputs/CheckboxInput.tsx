@@ -2,9 +2,16 @@ import type { CheckboxProps } from '@mui/material';
 import { Checkbox } from '@mui/material';
 import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
 import {
+  useInputClick,
+  useInputClickBlur,
+  useInputFocus,
+  useInputId,
+  useValidation
+} from 'components/visual/Inputs/hooks/inputs.hook';
+import {
   ExpandAdornment,
   HelperText,
-  PasswordAdornment,
+  Passwocomponents/visual/Inputs/components/inputs.components
   ResetAdornment,
   StyledButtonLabel,
   StyledEndAdornmentBox,
@@ -12,15 +19,8 @@ import {
   StyledFormControl,
   StyledFormControlLabel
 } from 'components/visual/Inputs/lib/inputs.components';
-import {
-  useInputClick,
-  useInputClickBlur,
-  useInputFocus,
-  useInputId,
-  useValidation
-} from 'components/visual/Inputs/lib/inputs.hook';
-import type { InputOptions, InputRuntimeState, InputValueModel } from 'components/visual/Inputs/lib/inputs.model';
-import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/lib/inputs.model';
+import type { InputOptions, InputRuntimeState, InputValueModel } from 'components/visual/Inputs/models/inputs.model';
+import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/models/inputs.model';
 import { Tooltip } from 'components/visual/Tooltip';
 import React from 'react';
 

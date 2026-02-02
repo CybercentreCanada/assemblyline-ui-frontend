@@ -1,8 +1,12 @@
 import { ExpandMore } from '@mui/icons-material';
+import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
 import ClearIcon from '@mui/icons-material/Clear';
+import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import RefreshOutlinedIcon from '@mui/icons-material/RefreshOutlined';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import WarningAmberOutlinedIcon from '@mui/icons-material/WarningAmberOutlined';
 import type {
   AutocompleteProps,
   AutocompleteRenderInputParams,
@@ -48,12 +52,13 @@ import {
   useShouldRenderPassword,
   useShouldRenderReset,
   useShouldRenderSpinner
-} from 'components/visual/Inputs/lib/inputs.hook';
-import type { InputControllerProps } from 'components/visual/Inputs/lib/inputs.model';
-import type { ValidationStatus } from 'components/visual/Inputs/lib/inputs.validation';
+} from 'components/visual/Inputs/hooks/inputs.hook';
+import type { InputControllerProps } from 'components/visual/Inputs/models/inputs.model';
+import type { ValidationStatus } from 'components/visual/Inputs/utils/inputs.validation';
 import { Tooltip } from 'components/visual/Tooltip';
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import type { LinkProps } from 'react-router-dom';
 
 export const StyledRoot = React.memo(({ children }: { children: React.ReactNode }) => {
   const [get] = usePropStore<InputControllerProps>();
@@ -223,6 +228,41 @@ export const ClearAdornment = React.memo(() => {
       </IconButton>
     </ListItemIcon>
   );
+});
+
+export type HelpAdornmentProps = {
+  to?: LinkProps['to'] | (() => LinkProps['to']);
+  variant?: 'icon' | 'text';
+  onClick?: () => void;
+};
+export const HelpAdornment = React.memo(({ to = null, variant = 'icon', onClick = () => null }: HelpAdornmentProps) => {
+  const theme = useTheme();
+
+  const [get, setStore] = usePropStore<InputControllerProps>();
+
+  const disabled = get('disabled');
+  const id = useInputId();
+  const isPasswordVisible = get('isPasswordVisible');
+  const resetProps = get('resetProps');
+  const shouldRenderPassword = useShouldRenderPassword();
+  const tiny = get('tiny');
+
+  return variant === 'icon' ? (
+    <IconButton
+      aria-label={`${id}-help`}
+      color="secondary"
+      type="button"
+      onClick={event => {
+        event.preventDefault();
+        event.stopPropagation();
+      }}
+      sx={{
+        padding: tiny ? theme.spacing(0.25) : theme.spacing(0.5)
+      }}
+    >
+      <ClearIcon fontSize="small" />
+    </IconButton>
+  ) : null;
 });
 
 export const PasswordAdornment = React.memo(() => {
@@ -488,7 +528,6 @@ export const SpinnerAdornment = () => {
 
 export const HelperText = React.memo(() => {
   const theme = useTheme();
-
   const [get] = usePropStore<InputControllerProps>();
 
   const disabled = get('disabled');
@@ -522,9 +561,39 @@ export const HelperText = React.memo(() => {
     }
   })();
 
+  const Icon = (() => {
+    switch (validationStatus) {
+      case 'success':
+        return CheckCircleOutlinedIcon;
+      case 'info':
+        return InfoOutlinedIcon;
+      case 'warning':
+        return WarningAmberOutlinedIcon;
+      case 'error':
+        return ErrorOutlineOutlinedIcon;
+      default:
+        return null;
+    }
+  })();
+
   return (
-    <FormHelperText id={`${id}-helper-text`} variant="outlined" sx={{ color }}>
-      {validationMessage ?? helperText}
+    <FormHelperText
+      id={`${id}-helper-text`}
+      component="div"
+      variant="outlined"
+      {...helperTextProps}
+      sx={{
+        color,
+        marginLeft: 0,
+        display: 'flex',
+        flexDirection: 'row',
+        gap: 0.5,
+        ...helperTextProps?.sx
+      }}
+    >
+      {Icon && <Icon fontSize="small" />}
+
+      <span>{validationMessage ?? helperText}</span>
     </FormHelperText>
   );
 });
@@ -963,54 +1032,56 @@ export const useTextInputSlot = (overrides?: Partial<TextFieldProps>) => {
         startAdornment: startAdornment && <InputAdornment position="start">{startAdornment}</InputAdornment>,
         ...overrides?.InputProps
       },
-      sx: {
-        margin: 0,
-        '& .MuiInputBase-root': {
-          minHeight: '32px',
-          paddingRight: '9px !important',
-          ...(tiny && {
-            paddingTop: '2px !important',
-            paddingBottom: '2px !important',
-            fontSize: '14px'
-          }),
-          ...(readOnly && !disabled && { cursor: 'default' })
+      sx: [
+        {
+          margin: 0,
+          '& .MuiInputBase-root': {
+            minHeight: '32px',
+            paddingRight: '9px !important',
+            ...(tiny && {
+              paddingTop: '2px !important',
+              paddingBottom: '2px !important',
+              fontSize: '14px'
+            }),
+            ...(readOnly && !disabled && { cursor: 'default' })
+          },
+          '& .MuiInputBase-input': {
+            paddingRight: '4px',
+            ...(overflowHidden && {
+              whiteSpace: 'nowrap',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis'
+            }),
+            ...(readOnly && !disabled && { cursor: 'default' }),
+            ...(monospace && { fontFamily: 'monospace' }),
+            ...(tiny && {
+              paddingTop: '2.5px ',
+              paddingBottom: '2.5px '
+            }),
+            ...(password &&
+              isPasswordVisible && {
+                fontFamily: 'password',
+                WebkitTextSecurity: 'disc',
+                MozTextSecurity: 'disc',
+                textSecurity: 'disc'
+              })
+          },
+          '& .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline': {
+            ...(readOnly &&
+              !disabled && {
+                borderColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.23)' : 'rgba(0, 0, 0, 0.23)'
+              })
+          },
+          '& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button': {
+            WebkitAppearance: 'none',
+            margin: 0
+          },
+          '& input[type=number]': {
+            MozAppearance: 'textfield'
+          }
         },
-        '& .MuiInputBase-input': {
-          paddingRight: '4px',
-          ...(overflowHidden && {
-            whiteSpace: 'nowrap',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis'
-          }),
-          ...(readOnly && !disabled && { cursor: 'default' }),
-          ...(monospace && { fontFamily: 'monospace' }),
-          ...(tiny && {
-            paddingTop: '2.5px ',
-            paddingBottom: '2.5px '
-          }),
-          ...(password &&
-            isPasswordVisible && {
-              fontFamily: 'password',
-              WebkitTextSecurity: 'disc',
-              MozTextSecurity: 'disc',
-              textSecurity: 'disc'
-            })
-        },
-        '& .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline': {
-          ...(readOnly &&
-            !disabled && {
-              borderColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.23)' : 'rgba(0, 0, 0, 0.23)'
-            })
-        },
-        '& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button': {
-          WebkitAppearance: 'none',
-          margin: 0
-        },
-        '& input[type=number]': {
-          MozAppearance: 'textfield'
-        },
-        ...overrides?.sx
-      }
+        ...(Array.isArray(overrides?.sx) ? overrides.sx : overrides?.sx ? [overrides.sx] : [])
+      ]
     }),
     [
       label,
@@ -1039,6 +1110,8 @@ export type StyledTextFieldProps = TextFieldProps & {
 };
 
 export const StyledTextField = React.memo(({ params, ...props }: StyledTextFieldProps) => {
+  const theme = useTheme();
+
   const [get] = usePropStore<InputControllerProps>();
 
   const endAdornment = get('endAdornment');
@@ -1049,13 +1122,16 @@ export const StyledTextField = React.memo(({ params, ...props }: StyledTextField
 
   const textInputSlot = useTextInputSlot();
 
-  const validationColorMap: Record<ValidationStatus, { main: string; contrast?: string }> = {
-    error: { main: 'error.main' },
-    warning: { main: 'warning.main' },
-    success: { main: 'success.main' },
-    info: { main: 'info.main' },
-    default: { main: 'text.secondary' }
-  };
+  const validationColorMap = useMemo<Record<ValidationStatus, { main: string; contrast?: string }>>(
+    () => ({
+      error: { main: theme.palette.error.main },
+      warning: { main: theme.palette.warning.main },
+      success: { main: theme.palette.success.main },
+      info: { main: theme.palette.info.main },
+      default: { main: theme.palette.text.secondary }
+    }),
+    []
+  );
 
   const getValidationSx = (status?: ValidationStatus) => {
     if (!status || status === 'default') return {};
@@ -1074,13 +1150,13 @@ export const StyledTextField = React.memo(({ params, ...props }: StyledTextField
       // Outline (outlined variant)
       '& .MuiOutlinedInput-root': {
         '& fieldset': {
-          borderColor: color
+          borderColor: `${color} !important`
         },
         '&:hover fieldset': {
-          borderColor: color
+          borderColor: `${color} !important`
         },
         '&.Mui-isFocused fieldset': {
-          borderColor: color
+          borderColor: `${color} !important`
         }
       },
 
@@ -1101,11 +1177,15 @@ export const StyledTextField = React.memo(({ params, ...props }: StyledTextField
       {...textInputSlot}
       {...params}
       {...props}
-      // sx={{
-      //   ...getValidationSx(validationStatus),
-      //   ...textInputSlot?.sx,
-      //   ...props?.sx
-      // }}
+      sx={[
+        getValidationSx(validationStatus),
+        ...(Array.isArray(textInputSlot?.sx)
+          ? (textInputSlot.sx as unknown[])
+          : textInputSlot?.sx
+            ? [textInputSlot.sx as unknown]
+            : []),
+        ...(Array.isArray(props?.sx) ? (props.sx as unknown[]) : props?.sx ? [props.sx as unknown] : [])
+      ]}
       slotProps={{
         ...textInputSlot?.slotProps,
         ...props?.slotProps,

@@ -1,10 +1,10 @@
 import type { ListItemTextProps, TypographyProps } from '@mui/material';
-import type { InputOptions, InputRuntimeState, InputValueModel } from 'components/visual/Inputs/lib/inputs.model';
+import type { InputOptions, InputRuntimeState, InputValueModel } from 'components/visual/Inputs/models/inputs.model';
 import {
   DEFAULT_INPUT_OPTIONS,
   DEFAULT_INPUT_VALUE_MODEL,
   DEFAULT_RUNTIME_STATE
-} from 'components/visual/Inputs/lib/inputs.model';
+} from 'components/visual/Inputs/models/inputs.model';
 import type { CSSProperties } from 'react';
 
 /**********************************************************************************************************************

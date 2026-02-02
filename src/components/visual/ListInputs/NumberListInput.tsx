@@ -1,7 +1,7 @@
 import type { TextFieldProps } from '@mui/material';
 import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
-import { useInputBlur, useInputChange, useInputFocus, useValidation } from 'components/visual/Inputs/lib/inputs.hook';
-import type { InputRuntimeState, InputValueModel } from 'components/visual/Inputs/lib/inputs.model';
+import { useInputBlur, useInputChange, useInputFocus, useValidation } from 'components/visual/Inputs/hooks/inputs.hook';
+import type { InputRuntimeState, InputValueModel } from 'components/visual/Inputs/models/inputs.model';
 import {
   StyledHelperText,
   StyledListInputInner,

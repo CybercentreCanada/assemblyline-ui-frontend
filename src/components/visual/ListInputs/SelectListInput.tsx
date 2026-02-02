@@ -7,8 +7,8 @@ import {
   useInputFocus,
   useInputId,
   useValidation
-} from 'components/visual/Inputs/lib/inputs.hook';
-import type { InputRuntimeState, InputValueModel } from 'components/visual/Inputs/lib/inputs.model';
+} from 'components/visual/Inputs/hooks/inputs.hook';
+import type { InputRuntimeState, InputValueModel } from 'components/visual/Inputs/models/inputs.model';
 import {
   StyledHelperText,
   StyledListInputInner,

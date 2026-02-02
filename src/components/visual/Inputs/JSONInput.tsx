@@ -3,6 +3,7 @@ import ReactJson from '@microlink/react-json-view';
 import { useTheme } from '@mui/material';
 import { useAppTheme } from 'commons/components/app/hooks';
 import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
+import { useInputChange, useValidation } from 'components/visual/Inputs/hooks/inputs.hook';
 import {
   HelperText,
   PasswordAdornment,
@@ -11,11 +12,10 @@ import {
   StyledFormControl,
   StyledFormLabel,
   StyledInputSkeleton,
-  StyledRoot
+  Styledcomponents/visual/Inputs/components/inputs.components
 } from 'components/visual/Inputs/lib/inputs.components';
-import { useInputChange, useValidation } from 'components/visual/Inputs/lib/inputs.hook';
-import type { InputOptions, InputRuntimeState, InputValueModel } from 'components/visual/Inputs/lib/inputs.model';
-import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/lib/inputs.model';
+import type { InputOptions, InputRuntimeState, InputValueModel } from 'components/visual/Inputs/models/inputs.model';
+import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/models/inputs.model';
 import React, { useMemo } from 'react';
 
 export type JSONInputProps = InputValueModel<object> & InputOptions;

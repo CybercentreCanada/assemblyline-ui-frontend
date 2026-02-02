@@ -18,17 +18,17 @@ import type { WhoAmI } from 'components/models/ui/user';
 import { Button } from 'components/visual/Buttons/Button';
 import type { ClassificationProps } from 'components/visual/Classification';
 import CustomChip, { COLOR_MAP } from 'components/visual/CustomChip';
+import { useCoercingResolver, useValidation, useValidationResolver } from 'components/visual/Inputs/hooks/inputs.hook';
 import {
   HelperText,
   PasswordAdornment,
   StyledFormControl,
   StyledFormLabel,
   StyledInputSkeleton,
-  StyledRoot
+  Styledcomponents/visual/Inputs/components/inputs.components
 } from 'components/visual/Inputs/lib/inputs.components';
-import { useCoercingResolver, useValidation, useValidationResolver } from 'components/visual/Inputs/lib/inputs.hook';
-import type { InputOptions, InputRuntimeState, InputValueModel } from 'components/visual/Inputs/lib/inputs.model';
-import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/lib/inputs.model';
+import type { InputOptions, InputRuntimeState, InputValueModel } from 'components/visual/Inputs/models/inputs.model';
+import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/models/inputs.model';
 import { Tooltip } from 'components/visual/Tooltip';
 import type { ClassificationParts, ClassificationValidator } from 'helpers/classificationParser';
 import {

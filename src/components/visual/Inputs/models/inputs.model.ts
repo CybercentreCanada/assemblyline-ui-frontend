@@ -5,7 +5,7 @@ import type {
   ValidationSchema,
   ValidationStatus,
   Validator
-} from 'components/visual/Inputs/lib/inputs.validation';
+} from 'components/visual/Inputs/utils/inputs.validation';
 import type React from 'react';
 
 /**********************************************************************************************************************

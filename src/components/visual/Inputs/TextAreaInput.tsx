@@ -1,17 +1,17 @@
 import type { TextFieldProps } from '@mui/material';
 import { Skeleton } from '@mui/material';
 import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
+import { useInputBlur, useInputChange, useIcomponents/visual/Inputs/components/inputs.componentssual/Inputs/hooks/inputs.hook';
 import type { StyledTextFieldProps } from 'components/visual/Inputs/lib/inputs.components';
 import {
   HelperText,
   StyledFormControl,
   StyledFormLabel,
   StyledRoot,
-  StyledTextField
+  Styledcomponents/visual/Inputs/components/inputs.components
 } from 'components/visual/Inputs/lib/inputs.components';
-import { useInputBlur, useInputChange, useInputFocus, useValidation } from 'components/visual/Inputs/lib/inputs.hook';
-import type { InputOptions, InputRuntimeState, InputValueModel } from 'components/visual/Inputs/lib/inputs.model';
-import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/lib/inputs.model';
+import type { InputOptions, InputRuntimeState, InputValueModel } from 'components/visual/Inputs/models/inputs.model';
+import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/models/inputs.model';
 import React from 'react';
 
 export type TextAreaInputProps = InputValueModel<

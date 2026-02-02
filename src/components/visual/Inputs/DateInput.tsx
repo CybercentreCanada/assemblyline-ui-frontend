@@ -7,10 +7,17 @@ import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
 import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
 import { IconButton } from 'components/visual/Buttons/IconButton';
 import {
+  useInputBlur,
+  useInputChange,
+  useInputFocus,
+  useInputId,
+  useValidation
+} from 'components/visual/Inputs/hooks/inputs.hook';
+import {
   ExpandAdornment,
   HelperText,
   PasswordAdornment,
-  ResetAdornment,
+  ResetAcomponents/visual/Inputs/components/inputs.components
   StyledEndAdornment,
   StyledFormControl,
   StyledFormLabel,
@@ -18,15 +25,8 @@ import {
   StyledRoot,
   useTextInputSlot
 } from 'components/visual/Inputs/lib/inputs.components';
-import {
-  useInputBlur,
-  useInputChange,
-  useInputFocus,
-  useInputId,
-  useValidation
-} from 'components/visual/Inputs/lib/inputs.hook';
-import type { InputOptions, InputRuntimeState, InputValueModel } from 'components/visual/Inputs/lib/inputs.model';
-import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/lib/inputs.model';
+import type { InputOptions, InputRuntimeState, InputValueModel } from 'components/visual/Inputs/models/inputs.model';
+import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/models/inputs.model';
 import type { Moment } from 'moment';
 import moment from 'moment';
 import React, { useEffect, useMemo, useState } from 'react';

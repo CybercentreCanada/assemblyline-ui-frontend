@@ -2,7 +2,14 @@ import type { AutocompleteProps, TextFieldProps } from '@mui/material';
 import { Autocomplete } from '@mui/material';
 import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
 import {
-  HelperText,
+  useInputBlur,
+  useInputChange,
+  useInputFocus,
+  useInputId,
+  useValidation
+} from 'components/visual/Inputs/hooks/inputs.hook';
+import {
+  Helpercomponents/visual/Inputs/components/inputs.components
   StyledCustomChip,
   StyledFormControl,
   StyledFormLabel,
@@ -10,15 +17,8 @@ import {
   StyledRoot,
   StyledTextField
 } from 'components/visual/Inputs/lib/inputs.components';
-import {
-  useInputBlur,
-  useInputChange,
-  useInputFocus,
-  useInputId,
-  useValidation
-} from 'components/visual/Inputs/lib/inputs.hook';
-import type { InputOptions, InputRuntimeState, InputValueModel } from 'components/visual/Inputs/lib/inputs.model';
-import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/lib/inputs.model';
+import type { InputOptions, InputRuntimeState, InputValueModel } from 'components/visual/Inputs/models/inputs.model';
+import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/models/inputs.model';
 import type { ElementType } from 'react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';

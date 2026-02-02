@@ -3,9 +3,9 @@ import { Checkbox, ListItemIcon } from '@mui/material';
 import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
 import type { AnchorProps } from 'components/core/TableOfContent/Anchor';
 import { Anchor } from 'components/core/TableOfContent/Anchor';
+import { useInputId, useInputLabel } frocomponents/visual/Inputs/components/inputs.components;
 import { StyledCircularSkeleton } from 'components/visual/Inputs/lib/inputs.components';
-import { useInputId, useInputLabel } from 'components/visual/Inputs/lib/inputs.hook';
-import type { InputValueModel } from 'components/visual/Inputs/lib/inputs.model';
+import type { InputValueModel } from 'components/visual/Inputs/models/inputs.model';
 import {
   StyledListInputButtonRoot,
   StyledListInputText,

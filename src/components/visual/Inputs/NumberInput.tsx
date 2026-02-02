@@ -1,16 +1,16 @@
 import type { TextFieldProps } from '@mui/material';
 import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
+import { useInputBlur, useInputChange, useInputFocus, useValidation } from 'components/visual/Inputs/hooks/inputs.hook';
 import {
   HelperText,
   StyledFormControl,
   StyledFormLabel,
   StyledInputSkeleton,
   StyledRoot,
-  StyledTextField
+  Styledcomponents/visual/Inputs/components/inputs.components
 } from 'components/visual/Inputs/lib/inputs.components';
-import { useInputBlur, useInputChange, useInputFocus, useValidation } from 'components/visual/Inputs/lib/inputs.hook';
-import type { InputOptions, InputRuntimeState, InputValueModel } from 'components/visual/Inputs/lib/inputs.model';
-import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/lib/inputs.model';
+import type { InputOptions, InputRuntimeState, InputValueModel } from 'components/visual/Inputs/models/inputs.model';
+import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/models/inputs.model';
 import React, { useEffect, useRef } from 'react';
 
 export type NumberInputProps = InputValueModel<
