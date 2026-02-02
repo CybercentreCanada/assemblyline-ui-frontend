@@ -160,6 +160,7 @@ export class CoercersSchema<Value, RawValue = Value> {
       if (value === null || value === undefined || value === '') {
         return { value, ignore: true };
       }
+      return { value, ignore: false };
     });
     return this;
   }
@@ -196,8 +197,8 @@ export class CoercersResolver<Value, RawValue = Value> extends CoercersSchema<Va
     let ignore = false;
 
     for (const coercer of this.coercers) {
-      const { value: v, ignore: i } = coercer(event, nextValue, rawValue);
-      nextValue = v;
+      const { value: v = undefined, ignore: i = false } = coercer(event, nextValue, rawValue);
+      nextValue = v === undefined ? value : v;
       ignore = ignore || i;
     }
 
