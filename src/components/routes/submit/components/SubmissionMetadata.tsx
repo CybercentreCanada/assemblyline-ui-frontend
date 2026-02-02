@@ -15,6 +15,7 @@ import { Button } from 'components/visual/Buttons/Button';
 import { IconButton } from 'components/visual/Buttons/IconButton';
 import type { DateInputProps } from 'components/visual/Inputs/DateInput';
 import { DateInput } from 'components/visual/Inputs/DateInput';
+import type { Validator } from 'components/visual/Inputs/lib/inputs.validation';
 import type { NumberInputProps } from 'components/visual/Inputs/NumberInput';
 import { NumberInput } from 'components/visual/Inputs/NumberInput';
 import type { SelectInputProps } from 'components/visual/Inputs/SelectInput';
@@ -73,14 +74,14 @@ export const MetadataParam: React.FC<MetadataParamProps> = React.memo(
       }
     }, [validatorParams, validatorType]);
 
-    const handleValid = useCallback(
-      (value: unknown): string | null => {
-        if (!value) return metadata.required ? t('required') : null;
+    const handleValidate = useCallback<Validator<unknown, unknown>>(
+      value => {
+        if (!value) return metadata.required ? { status: 'error', message: t('required') } : null;
         const strValue = safeString(value);
-        if (validatorType === 'uri') return isURL(strValue) ? null : t('invalid_url');
+        if (validatorType === 'uri') return isURL(strValue) ? null : { status: 'error', message: t('invalid_url') };
         if (validatorType === 'regex') {
-          if (!compiledRegex) return t('invalid_regex');
-          return compiledRegex.test(strValue) ? null : t('invalid_regex');
+          if (!compiledRegex) return { status: 'error', message: t('invalid_regex') };
+          return compiledRegex.test(strValue) ? null : { status: 'error', message: t('invalid_regex') };
         }
         return null;
       },
@@ -180,7 +181,7 @@ export const MetadataParam: React.FC<MetadataParamProps> = React.memo(
                   value={safeString(val)}
                   options={options}
                   reset={!!val}
-                  error={handleValid}
+                  validate={handleValidate}
                   tooltip={safeString(validatorParams?.validation_regex)}
                   tooltipProps={{ placement: 'right' }}
                 />
@@ -192,7 +193,7 @@ export const MetadataParam: React.FC<MetadataParamProps> = React.memo(
                   value={safeString(val)}
                   options={options}
                   reset={!!val}
-                  error={handleValid}
+                  validate={handleValidate}
                 />
               );
           }

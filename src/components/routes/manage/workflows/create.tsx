@@ -233,7 +233,8 @@ const WrappedWorkflowCreate = ({ id: propID = null, onClose = () => null }: Prop
               label={t('name')}
               loading={!workflow || handleFetch.isFetching}
               value={!workflow ? null : workflow.name}
-              required
+              coercers={c => c.required()}
+              validators={v => v.required()}
               onChange={(event, value) => setWorkflow(wf => ({ ...wf, name: value }))}
             />
           </Grid>
@@ -243,12 +244,17 @@ const WrappedWorkflowCreate = ({ id: propID = null, onClose = () => null }: Prop
               label={t('query')}
               loading={!workflow || handleFetch.isFetching}
               value={!workflow ? null : workflow.query}
-              error={() =>
-                handleResults.isDebouncing || handleResults.isFetching ? t('query.validating') : handleResults.error
+              validate={() =>
+                handleResults.isDebouncing || handleResults.isFetching
+                  ? { status: 'error', message: t('query.validating') }
+                  : handleResults.error
+                    ? { status: 'error', message: handleResults.error }
+                    : null
               }
               minRows={1}
               maxRows={5}
-              required
+              coercers={c => c.required()}
+              validators={v => v.required()}
               onChange={(event, value) => setWorkflow(wf => ({ ...wf, query: value }))}
             />
           </Grid>

@@ -68,6 +68,8 @@ export const SubmissionOptions = React.memo(() => {
                           : null
                     }
                     rootProps={{ style: { marginBottom: theme.spacing(1) } }}
+                    validators={v => v.required()}
+                    coercers={c => c.required()}
                     onChange={(e, v) => form.setFieldValue('settings.description.value', v)}
                     onReset={() => form.setFieldValue('settings.description.value', defaultValue)}
                   />
@@ -90,11 +92,11 @@ export const SubmissionOptions = React.memo(() => {
                       preventRender={!customize && restricted}
                       reset={defaultValue !== null && value !== defaultValue}
                       options={priorityOptions}
-                      error={v =>
+                      validate={v =>
                         !v
-                          ? t('options.submission.priority.error.empty')
+                          ? { status: 'error', message: t('options.submission.priority.error.empty') }
                           : !priorityOptions.some(o => o.value === v)
-                            ? t('options.submission.priority.error.invalid')
+                            ? { status: 'error', message: t('options.submission.priority.error.invalid') }
                             : null
                       }
                       rootProps={{ style: { marginBottom: theme.spacing(1), flex: 1 } }}
@@ -126,7 +128,7 @@ export const SubmissionOptions = React.memo(() => {
                       reset={defaultValue !== null && value !== defaultValue}
                       min={configuration.submission.max_dtl !== 0 ? 1 : 0}
                       max={configuration.submission.max_dtl !== 0 ? configuration.submission.max_dtl : 365}
-                      required
+                      validators={v => v.required()}
                       rootProps={{ style: { marginBottom: theme.spacing(1), flex: 1 } }}
                       onChange={(e, v) => form.setFieldValue('settings.ttl.value', v)}
                       onReset={() => form.setFieldValue('settings.ttl.value', defaultValue)}

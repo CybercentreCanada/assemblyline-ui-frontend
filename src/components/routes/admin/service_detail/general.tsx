@@ -258,7 +258,8 @@ const ServiceGeneral = ({
               label={t('general.timeout')}
               loading={!service}
               min={5}
-              required
+              coercers={c => c.required()}
+              validators={v => v.required()}
               value={!service ? null : service.timeout}
               defaultValue={!service ? undefined : defaults?.timeout}
               reset={showReset(service, defaults, 'timeout')}
@@ -280,8 +281,10 @@ const ServiceGeneral = ({
               min={0}
               {...(service.licence_count && { max: service.licence_count })}
               endAdornment="↓"
-              error={val =>
-                service.licence_count > 0 && val > service.licence_count ? t('general.instances.error') : null
+              validate={val =>
+                service.licence_count > 0 && val > service.licence_count
+                  ? { status: 'error', message: t('general.instances.error') }
+                  : null
               }
               onChange={(e, v) => {
                 if (service?.min_instances !== v) setModified(true);

@@ -135,7 +135,8 @@ const ServiceUpdater = ({ service, defaults, setService, setModified }: ServiceU
           endAdornment="sec"
           min={60}
           max={86400}
-          required
+          coercers={c => c.required()}
+          validators={v => v.required()}
           onChange={(e, v) => {
             if (service?.update_config?.update_interval_seconds !== v) setModified(true);
             setService({

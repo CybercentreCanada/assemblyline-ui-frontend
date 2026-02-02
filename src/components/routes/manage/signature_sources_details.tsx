@@ -90,7 +90,7 @@ const WrappedSourceDetail = ({
                         label={t('name')}
                         loading={!source}
                         disabled={!addMode}
-                        error={value => (value !== '' ? null : t('name.error'))}
+                        validate={value => (value !== '' ? null : { status: 'error', message: t('name.error') })}
                         value={!source ? null : source.name}
                         defaultValue={!defaults ? undefined : defaults?.name}
                         onChange={(e, v) => {
@@ -152,7 +152,8 @@ const WrappedSourceDetail = ({
                         endAdornment="sec"
                         min={60}
                         max={86400}
-                        required
+                        coercers={c => c.required()}
+                        validators={v => v.required()}
                         onChange={(e, v) => {
                           if (source?.update_interval !== v) setModified(true);
                           setSource(s => ({ ...s, update_interval: v }));
@@ -221,7 +222,7 @@ const WrappedSourceDetail = ({
                       <TextInput
                         label={t('uri')}
                         loading={!source}
-                        error={value => (value !== '' ? null : t('uri.error'))}
+                        validate={value => (value !== '' ? null : { status: 'error', message: t('uri.error') })}
                         value={!source ? null : source.uri}
                         defaultValue={!defaults ? undefined : defaults?.uri}
                         reset={showReset(source, defaults, 'uri')}
