@@ -220,7 +220,7 @@ export type SystemSupport = {
 
   /** Support email for the system */
   email?: string;
-}
+};
 
 /** System Configuration */
 export type System = {
@@ -688,7 +688,7 @@ export const CONFIGURATION: Configuration = {
     type: 'development',
     support: {
       documentation: 'https://cybercentrecanada.github.io/assemblyline4_docs/',
-      email: '',
+      email: ''
     },
     version: ''
   },

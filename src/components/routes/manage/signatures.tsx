@@ -138,7 +138,8 @@ const SignaturesSearch = () => {
 
   useEffect(() => {
     handleReload(search);
-  }, [handleReload, search]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [handleReload, search.toString()]);
 
   useEffect(() => {
     function reload() {

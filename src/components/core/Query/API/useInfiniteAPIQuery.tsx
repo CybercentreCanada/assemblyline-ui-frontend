@@ -1,23 +1,29 @@
-import type { DefinedInitialDataInfiniteOptions, InfiniteData } from '@tanstack/react-query';
+import type { InfiniteData } from '@tanstack/react-query';
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
-import type { APIRequest, APIResponse } from 'components/core/Query/components/api.models';
+import type { APIQueryKey, APIRequest, APIResponse } from 'components/core/Query/components/api.models';
+import { DEFAULT_RETRY_MS } from 'components/core/Query/components/constants';
 import type { UseAPICallFnProps } from 'components/core/Query/components/useAPICallFn';
 import { useAPICallFn } from 'components/core/Query/components/useAPICallFn';
+import { stableStringify } from 'components/core/Query/components/utils';
 import { useMemo } from 'react';
-
-type Options = DefinedInitialDataInfiniteOptions<
-  unknown,
-  Error,
-  InfiniteData<unknown, unknown>,
-  readonly unknown[],
-  unknown
->;
 
 export type UseInfiniteAPIQueryProps<Response = unknown, Request extends APIRequest = APIRequest, Error = string> = {
   initialOffset?: number;
   getParams: (offset: number) => UseAPICallFnProps<APIResponse<Response>, Request, APIResponse<Error>>;
-  getPreviousOffset?: Options['getPreviousPageParam'];
-  getNextOffset?: Options['getNextPageParam'];
+  getPreviousOffset?: (
+    firstPage: APIResponse<Response>,
+    allPages: Array<APIResponse<Response>>,
+    firstPageParam: number,
+    allPageParams: Array<number>
+  ) => number | undefined;
+  getNextOffset?: (
+    lastPage: APIResponse<Response>,
+    allPages: Array<APIResponse<Response>>,
+    lastPageParam: number,
+    allPageParams: Array<number>
+  ) => number | undefined;
+  allowCache?: boolean;
+  retryAfter?: number;
 };
 
 export const useInfiniteAPIQuery = <
@@ -28,26 +34,32 @@ export const useInfiniteAPIQuery = <
   initialOffset = 0,
   getParams = () => null,
   getPreviousOffset = () => null,
-  getNextOffset = () => null
+  getNextOffset = () => null,
+  allowCache = false,
+  retryAfter = DEFAULT_RETRY_MS
 }: UseInfiniteAPIQueryProps<Response, Request, Error>) => {
   const queryClient = useQueryClient();
   const apiCallFn = useAPICallFn<APIResponse<Response>>();
 
+  const base = getParams(initialOffset);
+
   const query = useInfiniteQuery<
-    unknown,
+    APIResponse<Response>,
     APIResponse<Error>,
-    InfiniteData<APIResponse<Response>, unknown>,
-    UseAPICallFnProps<APIResponse<Response>, Request, APIResponse<Error>>[],
-    unknown
+    InfiniteData<APIResponse<Response>, number>,
+    APIQueryKey,
+    number
   >(
     {
-      queryKey: [{ ...getParams(initialOffset) }],
+      queryKey: [base?.url, base?.method ?? 'GET', stableStringify(base?.body ?? null), allowCache],
       queryFn: async ({ signal, pageParam }) => apiCallFn({ ...getParams(pageParam as number), signal }),
       initialPageParam: initialOffset,
       getPreviousPageParam: (firstPage, allPages, firstPageParam, allPageParams) =>
         getPreviousOffset(firstPage, allPages, firstPageParam, allPageParams),
       getNextPageParam: (lastPage, allPages, lastPageParam, allPageParams) =>
-        getNextOffset(lastPage, allPages, lastPageParam, allPageParams)
+        getNextOffset(lastPage, allPages, lastPageParam, allPageParams),
+      retry: (failureCount, error) => failureCount < 3 && error?.api_status_code === 502,
+      retryDelay: failureCount => Math.min(retryAfter * (failureCount + 1), 10000)
     },
     queryClient
   );

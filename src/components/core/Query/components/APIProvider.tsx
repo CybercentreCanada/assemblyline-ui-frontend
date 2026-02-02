@@ -29,7 +29,7 @@ const persister = createSyncStoragePersister({
         ...data,
         clientState: {
           mutations: [],
-          queries: data.clientState.queries.filter(q => (q.queryKey[0] as APIQueryKey).allowCache)
+          queries: data.clientState.queries.filter(q => (q.queryKey as APIQueryKey)[3])
         }
       })
     ),
