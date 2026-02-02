@@ -239,6 +239,47 @@ export const InputsSection = React.memo(() => {
                   label="Text Input"
                   value={value}
                   options={TEXTFIELD_OPTIONS}
+                  coercers={s => s.trim()}
+                  validators={s => s.required().noLeadingTrailingWhitespace()}
+                  onChange={(event, next) => form.setFieldValue('components.inputs.values.text', next)}
+                  coerce={(e, v) => ({ value: v, ignore: false })}
+                  validate={(e, v) => ({ status: 'error', message: 'asdfasdf' })}
+                />
+              )}
+            />
+          </div>
+        }
+        right={
+          <form.Subscribe
+            selector={state => state.values.components.inputs.values.text}
+            children={value => (
+              <div>
+                <Typography variant="body2">{`Type: ${typeof value}`}</Typography>
+                <Typography variant="body2">{`Value: ${value}`}</Typography>
+              </div>
+            )}
+          />
+        }
+      />
+
+      <DemoSection
+        id="Basic Example"
+        primary="Basic Example"
+        secondary={
+          <>
+            <span>{'The following components are all of the inputs used in Assemblyline. '}</span>
+            <span>{"Compared to their MUI counterpart, their label doesn't fold into the input."}</span>
+          </>
+        }
+        left={
+          <div style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(2) }}>
+            <form.Subscribe
+              selector={state => state.values.components.inputs.values.text}
+              children={value => (
+                <TextInput
+                  label="Text Input"
+                  value={value}
+                  options={TEXTFIELD_OPTIONS}
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.text', next)}
                 />
               )}
@@ -1731,7 +1772,7 @@ export const InputsSection = React.memo(() => {
                 <TextInput
                   label="Error Text Input"
                   value={value}
-                  error={v => (v !== '' ? null : 'Input field cannot be empty')}
+                  validate={v => (v !== '' ? null : { status: 'error', message: 'Input field cannot be empty' })}
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.text', next)}
                 />
               )}
@@ -1742,7 +1783,7 @@ export const InputsSection = React.memo(() => {
                 <ChipsInput
                   label="Error Chips Input"
                   value={value}
-                  error={v => (v.length !== 0 ? null : 'Input field cannot be empty')}
+                  validate={v => (v.length !== 0 ? null : { status: 'error', message: 'Input field cannot be empty' })}
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.chips', next)}
                 />
               )}
@@ -1753,7 +1794,7 @@ export const InputsSection = React.memo(() => {
                 <NumberInput
                   label="Error Number Input"
                   value={value}
-                  error={v => (v !== null ? null : 'Input field cannot be null')}
+                  validate={v => (v !== null ? null : { status: 'error', message: 'Input field cannot be null' })}
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.number', next)}
                 />
               )}
@@ -1764,7 +1805,7 @@ export const InputsSection = React.memo(() => {
                 <SelectInput
                   label="Error Select Input"
                   value={value}
-                  error={v => (v !== 'option 1' ? null : 'Input field cannot be null')}
+                  validate={v => (v !== 'option 1' ? null : { status: 'error', message: 'Input field cannot be null' })}
                   options={SELECT_OPTIONS}
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.select', next)}
                 />
@@ -1776,7 +1817,7 @@ export const InputsSection = React.memo(() => {
                 <DateInput
                   label="Error Date Input"
                   value={value}
-                  error={v => (v !== null ? null : 'Input field cannot be null')}
+                  validate={v => (v !== null ? null : { status: 'error', message: 'Input field cannot be null' })}
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.date', next)}
                 />
               )}
@@ -1787,7 +1828,9 @@ export const InputsSection = React.memo(() => {
                 <ClassificationInput
                   label="Error Classification Input"
                   value={value}
-                  error={v => (v !== 'TLP:CLEAR' ? null : 'Input field cannot be TLP:CLEAR')}
+                  validate={v =>
+                    v !== 'TLP:CLEAR' ? null : { status: 'error', message: 'Input field cannot be TLP:CLEAR' }
+                  }
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.classification', next)}
                 />
               )}
@@ -1799,7 +1842,7 @@ export const InputsSection = React.memo(() => {
                   label="Error Text Area Input"
                   value={value}
                   rows={3}
-                  error={v => (v !== '' ? null : 'Input field cannot be empty')}
+                  validate={v => (v !== '' ? null : { status: 'error', message: 'Input field cannot be empty' })}
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.textarea', next)}
                 />
               )}
@@ -1810,7 +1853,7 @@ export const InputsSection = React.memo(() => {
                 <SliderInput
                   label="Error Slider Input"
                   value={value}
-                  error={v => (v !== 0 ? null : 'Input field cannot be 0')}
+                  validate={v => (v !== 0 ? null : { status: 'error', message: 'Input field cannot be 0' })}
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.slider', next)}
                 />
               )}
@@ -1821,7 +1864,7 @@ export const InputsSection = React.memo(() => {
                 <CheckboxInput
                   label="Error Checkbox Input"
                   value={value}
-                  error={v => (v !== false ? null : 'Input field cannot be false')}
+                  validate={v => (v !== false ? null : { status: 'error', message: 'Input field cannot be false' })}
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.checkbox', next)}
                 />
               )}
@@ -1832,7 +1875,7 @@ export const InputsSection = React.memo(() => {
                 <SwitchInput
                   label="Error Switch Input"
                   value={value}
-                  error={v => (v !== false ? null : 'Input field cannot be false')}
+                  validate={v => (v !== false ? null : { status: 'error', message: 'Input field cannot be false' })}
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.switch', next)}
                 />
               )}
@@ -1843,7 +1886,7 @@ export const InputsSection = React.memo(() => {
                 <RadioInput
                   label="Error Radio Input"
                   value={value}
-                  error={v => (v !== null ? null : 'Input field cannot be null')}
+                  validate={v => (v !== null ? null : { status: 'error', message: 'Input field cannot be null' })}
                   options={RADIO_OPTIONS}
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.radio', next)}
                 />
@@ -1855,7 +1898,9 @@ export const InputsSection = React.memo(() => {
                 <JSONInput
                   label="Error JSON Input"
                   value={value}
-                  error={v => (JSON.stringify(v) !== '{}' ? null : 'Input field cannot be {}')}
+                  validate={v =>
+                    JSON.stringify(v) !== '{}' ? null : { status: 'error', message: 'Input field cannot be {}' }
+                  }
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.json', next)}
                 />
               )}
@@ -1869,7 +1914,7 @@ export const InputsSection = React.memo(() => {
   <TextInput
   label="Error Text Input"
   value={value}
-  error={v => (v !== '' ? null : 'Input field cannot be empty')}
+  validate={v => (v !== '' ? null : 'Input field cannot be empty')}
   onChange={(event, next) => {}}
   onError={error => {}}
   />
@@ -1877,7 +1922,7 @@ export const InputsSection = React.memo(() => {
   <ChipsInput
   label="Error Chips Input"
   value={value}
-  error={v => (v !== '' ? null : 'Input field cannot be empty')}
+  validate={v => (v !== '' ? null : 'Input field cannot be empty')}
   onChange={(event, next) => {}}
   onError={error => {}}
   />
@@ -1885,7 +1930,7 @@ export const InputsSection = React.memo(() => {
   <NumberInput
   label="Error Number Input"
   value={value}
-  error={v => (v !== 0 ? null : 'Input field cannot be 0')}
+  validate={v => (v !== 0 ? null : 'Input field cannot be 0')}
   onChange={(event, next) => {}}
   onError={error => {}}
   />
@@ -1898,7 +1943,7 @@ export const InputsSection = React.memo(() => {
     { primary: 'Options 2', value: 'option 2' },
     { primary: 'Options 3', value: 'option 3' }
   ]}
-  error={v => (v !== '' ? null : 'Input field cannot be null')}
+  validate={v => (v !== '' ? null : 'Input field cannot be null')}
   onChange={(event, next) => {}}
   onError={error => {}}
   />
@@ -1906,7 +1951,7 @@ export const InputsSection = React.memo(() => {
   <DateInput
   label="Error Date Input"
   value={value}
-  error={v => (v !== null ? null : 'Input field cannot be null')}
+  validate={v => (v !== null ? null : 'Input field cannot be null')}
   onChange={next => {}}
   onError={error => {}}
   />
@@ -1914,7 +1959,7 @@ export const InputsSection = React.memo(() => {
   <SliderInput
   label="Error Slider Input"
   value={value}
-  error={v => (v !== 0 ? null : 'Input field cannot be 0')}
+  validate={v => (v !== 0 ? null : 'Input field cannot be 0')}
   onChange={(event, next) => {}}
   onError={error => {}}
   />
@@ -1922,7 +1967,7 @@ export const InputsSection = React.memo(() => {
   <CheckboxInput
   label="Error Checkbox Input"
   value={value}
-  error={v => (v !== false ? null : 'Input field cannot be false')}
+  validate={v => (v !== false ? null : 'Input field cannot be false')}
   onChange={(event, next) => {}}
   onError={error => {}}
   />
@@ -1930,7 +1975,7 @@ export const InputsSection = React.memo(() => {
   <SwitchInput
   label="Error Switch Input"
   value={value}
-  error={v => (v !== false ? null : 'Input field cannot be false')}
+  validate={v => (v !== false ? null : 'Input field cannot be false')}
   onChange={(event, next) => {}}
   onError={error => {}}
   />

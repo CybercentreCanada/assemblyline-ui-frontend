@@ -1346,7 +1346,7 @@ export const ListInputsSection = React.memo(() => {
                     primary="Error Text List Input"
                     secondary="Error Text List Input Description"
                     value={value}
-                    error={v => (v !== '' ? null : 'Input field cannot be empty')}
+                    validate={v => (v !== '' ? null : { status: 'error', message: 'Input field cannot be empty' })}
                     onChange={(event, next) => form.setFieldValue('components.list_inputs.values.text', next)}
                   />
                 )}
@@ -1359,7 +1359,7 @@ export const ListInputsSection = React.memo(() => {
                     primary="Error Number List Input"
                     secondary="Error Number List Input Description"
                     value={value}
-                    error={v => (v !== 0 ? null : 'Input field cannot be 0')}
+                    validate={v => (v !== 0 ? null : { status: 'error', message: 'Input field cannot be 0' })}
                     onChange={(event, next) => form.setFieldValue('components.list_inputs.values.number', next)}
                   />
                 )}
@@ -1372,7 +1372,9 @@ export const ListInputsSection = React.memo(() => {
                     primary="Error Select List Input"
                     secondary="Error Select List Input Description"
                     value={value}
-                    error={v => (v !== 'option 1' ? null : 'Input field cannot be null')}
+                    validate={v =>
+                      v !== 'option 1' ? null : { status: 'error', message: 'Input field cannot be null' }
+                    }
                     options={SELECT_OPTIONS}
                     onChange={(event, next: (typeof SELECT_OPTIONS)[number]['value']) =>
                       form.setFieldValue('components.list_inputs.values.select', next)
@@ -1388,7 +1390,7 @@ export const ListInputsSection = React.memo(() => {
                     primary="Error Classification List Input"
                     secondary="Error Classification List Input Description"
                     value={value}
-                    error={v => (v !== 'TLP:C' ? null : 'Input field cannot be TLP:C')}
+                    validate={v => (v !== 'TLP:C' ? null : { status: 'error', message: 'Input field cannot be TLP:C' })}
                     onChange={(event, next) => form.setFieldValue('components.list_inputs.values.classification', next)}
                   />
                 )}
@@ -1401,7 +1403,7 @@ export const ListInputsSection = React.memo(() => {
                     primary="Error Boolean List Input"
                     secondary="Error Boolean List Input Description"
                     value={value}
-                    error={v => (v !== false ? null : 'Input field cannot be false')}
+                    validate={v => (v !== false ? null : { status: 'error', message: 'Input field cannot be false' })}
                     onChange={(event, next) => form.setFieldValue('components.list_inputs.values.boolean', next)}
                   />
                 )}
@@ -1422,7 +1424,7 @@ export const ListInputsSection = React.memo(() => {
       primary="Error Text List Input"
       secondary="Error Text List Input Description"
       value={value}
-      error={v => (v !== '' ? null : 'Input field cannot be empty')}
+      validate={v => (v !== '' ? null : 'Input field cannot be empty')}
       onChange={(event, next) => {}}
       onError={() => {}}
     />
@@ -1431,7 +1433,7 @@ export const ListInputsSection = React.memo(() => {
       primary="Error Number List Input"
       secondary="Error Number List Input Description"
       value={value}
-      error={v => (v !== 0 ? null : 'Input field cannot be 0')}
+      validate={v => (v !== 0 ? null : 'Input field cannot be 0')}
       onChange={(event, next) => {}}
       onError={() => {}}
     />
@@ -1440,7 +1442,7 @@ export const ListInputsSection = React.memo(() => {
       primary="Error Select List Input"
       secondary="Error Select List Input Description"
       value={value}
-      error={v => (v !== '' ? null : 'Input field cannot be null')}
+      validate={v => (v !== '' ? null : 'Input field cannot be null')}
       options={[
         { primary: 'Options 1', value: 'option 1' },
         { primary: 'Options 2', value: 'option 2' },
@@ -1454,7 +1456,7 @@ export const ListInputsSection = React.memo(() => {
       primary="Error Classification List Input"
       secondary="Error Classification List Input Description"
       value={value}
-      error={v => (v !== 'TLP:C' ? null : 'Input field cannot be TLP:C')}
+      validate={v => (v !== 'TLP:C' ? null : 'Input field cannot be TLP:C')}
       onChange={next => {}}
       onError={() => {}}
     />
@@ -1463,7 +1465,7 @@ export const ListInputsSection = React.memo(() => {
       primary="Error Boolean List Input"
       secondary="Error Boolean List Input Description"
       value={value}
-      error={v => (v !== false ? null : 'Input field cannot be false')}
+      validate={v => (v !== false ? null : 'Input field cannot be false')}
       onChange={(event, next) => {}}
       onError={() => {}}
     />
