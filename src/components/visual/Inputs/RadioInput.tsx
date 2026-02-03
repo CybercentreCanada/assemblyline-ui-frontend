@@ -2,23 +2,27 @@ import type { FormControlLabelProps } from '@mui/material';
 import { Radio, RadioGroup } from '@mui/material';
 import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
 import {
+  InputButtonEndAdornment,
+  PasswordInputAdornment,
+  ResetInputAdornment
+} from 'components/visual/Inputs/components/inputs.component.adornment';
+import {
+  InputButtonFormControlLabel,
+  InputButtonLabel,
+  InputFormButton
+} from 'components/visual/Inputs/components/inputs.component.buttons';
+import {
+  InputFormControl,
+  InputFormLabel,
+  InputHelperText,
+  InputRoot
+} from 'components/visual/Inputs/components/inputs.component.form';
+import {
   useInputChange,
   useInputClickBlur,
-  useInputFocus,
-  useValidation
-} from 'components/visual/Inputs/hooks/inputs.hook';
-import {
-  HelperText,
-  PasswordAdornment,
-  ResetAdornment,
-  StyledButtonLabel,
-  Styledcomponents/visual/Inputs/components/inputs.components
-  StyledFormButton,
-  StyledFormControl,
-  StyledFormControlLabel,
-  StyledFormLabel,
-  StyledRoot
-} from 'components/visual/Inputs/lib/inputs.components';
+  useInputFocus
+} from 'components/visual/Inputs/hooks/inputs.hook.event_handlers';
+import { useInputValidation } from 'components/visual/Inputs/hooks/inputs.hook.validation';
 import type { InputOptions, InputRuntimeState, InputValueModel } from 'components/visual/Inputs/models/inputs.model';
 import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/models/inputs.model';
 import React from 'react';
@@ -54,20 +58,20 @@ const WrappedRadioInput = <O extends readonly Option[]>() => {
   const handleFocus = useInputFocus<O[number]['value']>();
 
   return (
-    <StyledRoot>
-      <StyledFormLabel />
-      <StyledFormControl>
+    <InputRoot>
+      <InputFormLabel />
+      <InputFormControl>
         <RadioGroup value={rawValue}>
           {options.map((option, index) => (
-            <StyledFormButton
+            <InputFormButton
               key={`${index}-${option.label}`}
               onFocus={handleFocus}
               onBlur={e => handleBlur(e, value, value)}
               onClick={e => handleChange(e, option.value, option.value)}
             >
-              <StyledFormControlLabel
+              <InputButtonFormControlLabel
                 label={
-                  <StyledButtonLabel
+                  <InputButtonLabel
                     label={option.label}
                     isFocused={isFocused && rawValue === (option.value ?? '')}
                     ignoreRequired
@@ -87,18 +91,18 @@ const WrappedRadioInput = <O extends readonly Option[]>() => {
                     ...((preventDisabledColor || readOnly) && { color: 'inherit !important' })
                   }}
                 />
-              </StyledFormControlLabel>
-            </StyledFormButton>
+              </InputButtonFormControlLabel>
+            </InputFormButton>
           ))}
         </RadioGroup>
 
-        <StyledEndAdornmentBox>
-          <PasswordAdornment />
-          <ResetAdornment />
-        </StyledEndAdornmentBox>
-      </StyledFormControl>
-      <HelperText />
-    </StyledRoot>
+        <InputButtonEndAdornment>
+          <PasswordInputAdornment />
+          <ResetInputAdornment />
+        </InputButtonEndAdornment>
+      </InputFormControl>
+      <InputHelperText />
+    </InputRoot>
   );
 };
 
@@ -107,7 +111,7 @@ export const RadioInput = <O extends readonly Option[]>({
   value = null,
   ...props
 }: RadioInputProps<O>) => {
-  const { status: validationStatus, message: validationMessage } = useValidation<O[number]['value']>({
+  const { status: validationStatus, message: validationMessage } = useInputValidation<O[number]['value']>({
     value: value ?? '',
     rawValue: value ?? '',
     ...props

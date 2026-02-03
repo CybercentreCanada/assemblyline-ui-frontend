@@ -3,17 +3,20 @@ import ReactJson from '@microlink/react-json-view';
 import { useTheme } from '@mui/material';
 import { useAppTheme } from 'commons/components/app/hooks';
 import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
-import { useInputChange, useValidation } from 'components/visual/Inputs/hooks/inputs.hook';
 import {
-  HelperText,
-  PasswordAdornment,
-  ResetAdornment,
-  StyledEndAdornmentBox,
-  StyledFormControl,
-  StyledFormLabel,
-  StyledInputSkeleton,
-  Styledcomponents/visual/Inputs/components/inputs.components
-} from 'components/visual/Inputs/lib/inputs.components';
+  InputEndAdornment,
+  PasswordInputAdornment,
+  ResetInputAdornment
+} from 'components/visual/Inputs/components/inputs.component.adornment';
+import {
+  InputFormControl,
+  InputFormLabel,
+  InputHelperText,
+  InputRoot,
+  InputSkeleton
+} from 'components/visual/Inputs/components/inputs.component.form';
+import { useInputChange } from 'components/visual/Inputs/hooks/inputs.hook.event_handlers';
+import { useInputValidation } from 'components/visual/Inputs/hooks/inputs.hook.validation';
 import type { InputOptions, InputRuntimeState, InputValueModel } from 'components/visual/Inputs/models/inputs.model';
 import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/models/inputs.model';
 import React, { useMemo } from 'react';
@@ -62,11 +65,11 @@ const WrappedJSONInput = () => {
   const handleChange = useInputChange<object>();
 
   return (
-    <StyledRoot>
-      <StyledFormLabel />
-      <StyledFormControl>
+    <InputRoot>
+      <InputFormLabel />
+      <InputFormControl>
         {loading ? (
-          <StyledInputSkeleton />
+          <InputSkeleton />
         ) : (
           <>
             <div
@@ -120,21 +123,21 @@ const WrappedJSONInput = () => {
                     })
                 }}
               />
-              <StyledEndAdornmentBox>
-                <PasswordAdornment />
-                <ResetAdornment />
-              </StyledEndAdornmentBox>
+              <InputEndAdornment>
+                <PasswordInputAdornment />
+                <ResetInputAdornment />
+              </InputEndAdornment>
             </div>
-            <HelperText />
+            <InputHelperText />
           </>
         )}
-      </StyledFormControl>
-    </StyledRoot>
+      </InputFormControl>
+    </InputRoot>
   );
 };
 
 export const JSONInput = ({ preventRender = false, value, ...props }: JSONInputProps) => {
-  const { status: validationStatus, message: validationMessage } = useValidation<object>({
+  const { status: validationStatus, message: validationMessage } = useInputValidation<object>({
     value: value ?? null,
     rawValue: value ?? null,
     ...props

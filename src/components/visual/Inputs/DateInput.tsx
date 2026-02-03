@@ -7,24 +7,22 @@ import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
 import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
 import { IconButton } from 'components/visual/Buttons/IconButton';
 import {
-  useInputBlur,
-  useInputChange,
-  useInputFocus,
-  useInputId,
-  useValidation
-} from 'components/visual/Inputs/hooks/inputs.hook';
+  ExpandInputAdornment,
+  InputEndAdornment,
+  PasswordInputAdornment,
+  ResetInputAdornment
+} from 'components/visual/Inputs/components/inputs.component.adornment';
 import {
-  ExpandAdornment,
-  HelperText,
-  PasswordAdornment,
-  ResetAcomponents/visual/Inputs/components/inputs.components
-  StyledEndAdornment,
-  StyledFormControl,
-  StyledFormLabel,
-  StyledInputSkeleton,
-  StyledRoot,
-  useTextInputSlot
-} from 'components/visual/Inputs/lib/inputs.components';
+  InputFormControl,
+  InputFormLabel,
+  InputHelperText,
+  InputRoot,
+  InputSkeleton
+} from 'components/visual/Inputs/components/inputs.component.form';
+import { useInputTextFieldSlots } from 'components/visual/Inputs/components/inputs.component.textfield';
+import { useInputBlur, useInputChange, useInputFocus } from 'components/visual/Inputs/hooks/inputs.hook.event_handlers';
+import { useInputId } from 'components/visual/Inputs/hooks/inputs.hook.renderer';
+import { useInputValidation } from 'components/visual/Inputs/hooks/inputs.hook.validation';
 import type { InputOptions, InputRuntimeState, InputValueModel } from 'components/visual/Inputs/models/inputs.model';
 import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/models/inputs.model';
 import type { Moment } from 'moment';
@@ -183,7 +181,7 @@ const WrappedDateInput = () => {
   const handleChange = useInputChange<string, Moment>();
   const handleFocus = useInputFocus<string, Moment>();
 
-  const textfieldSlot = useTextInputSlot();
+  const inputTextFieldSlots = useInputTextFieldSlots();
 
   useEffect(() => {
     configureMomentLocale(i18n.language);
@@ -191,11 +189,11 @@ const WrappedDateInput = () => {
 
   return (
     <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale={i18n.language}>
-      <StyledRoot>
-        <StyledFormLabel />
-        <StyledFormControl>
+      <InputRoot>
+        <InputFormLabel />
+        <InputFormControl>
           {loading ? (
-            <StyledInputSkeleton />
+            <InputSkeleton />
           ) : (
             <>
               <MuiDateTimePicker
@@ -211,34 +209,34 @@ const WrappedDateInput = () => {
                 }
                 slotProps={{
                   textField: {
-                    ...textfieldSlot,
+                    ...inputTextFieldSlots,
                     onFocus: handleFocus,
                     onBlur: e => handleBlur(e, value, value ? moment(value) : null),
                     InputProps: {
                       endAdornment: (
-                        <StyledEndAdornment preventRender={readOnly && !disabled}>
-                          <PasswordAdornment />
-                          <ResetAdornment />
-                          <ExpandAdornment />
+                        <InputEndAdornment preventRender={readOnly && !disabled}>
+                          <PasswordInputAdornment />
+                          <ResetInputAdornment />
+                          <ExpandInputAdornment />
                           {endAdornment}
                           <DatePopper />
-                        </StyledEndAdornment>
+                        </InputEndAdornment>
                       )
                     }
                   }
                 }}
               />
-              <HelperText />
+              <InputHelperText />
             </>
           )}
-        </StyledFormControl>
-      </StyledRoot>
+        </InputFormControl>
+      </InputRoot>
     </LocalizationProvider>
   );
 };
 
 export const DateInput = ({ preventRender = false, value, ...props }: DateInputProps) => {
-  const { status: validationStatus, message: validationMessage } = useValidation<string, Moment>({
+  const { status: validationStatus, message: validationMessage } = useInputValidation<string, Moment>({
     value: value ?? '',
     rawValue: value ? moment(value) : null,
     ...props

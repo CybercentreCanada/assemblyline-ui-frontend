@@ -1,22 +1,24 @@
 import { Switch } from '@mui/material';
 import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
 import {
+  PasswordInputAdornment,
+  ResetInputAdornment
+} from 'components/visual/Inputs/components/inputs.component.adornment';
+import {
   useInputClick,
   useInputClickBlur,
-  useInputFocus,
-  useInputId,
-  useValidation
-} from 'components/visual/Inputs/hooks/inputs.hook';
+  useInputFocus
+} from 'components/visual/Inputs/hooks/inputs.hook.event_handlers';
+import { useInputId } from 'components/visual/Inputs/hooks/inputs.hook.renderer';
+import { useInputValidation } from 'components/visual/Inputs/hooks/inputs.hook.validation';
 import type { InputRuntimeState, InputValueModel } from 'components/visual/Inputs/models/inputs.model';
 import {
-  StyledHelperText,
-  StyledListInputButtonRoot,
-  StyledListInputInner,
-  StyledListInputLoading,
-  StyledListInputText,
-  StyledListInputWrapper,
-  StyledPasswordAdornment,
-  StyledResetAdornment
+  ListInputButtonRoot,
+  ListInputHelperText,
+  ListInputInner,
+  ListInputLoading,
+  ListInputText,
+  ListInputWrapper
 } from 'components/visual/ListInputs/lib/listinputs.components';
 import type { ListInputOptions } from 'components/visual/ListInputs/lib/listinputs.model';
 import { DEFAULT_LIST_INPUT_CONTROLLER_PROPS } from 'components/visual/ListInputs/lib/listinputs.model';
@@ -43,21 +45,21 @@ const WrappedSwitchListInput = React.memo(() => {
   const handleFocus = useInputFocus<boolean>();
 
   return (
-    <StyledListInputButtonRoot
+    <ListInputButtonRoot
       onFocus={handleFocus}
       onBlur={e => handleBlur(e, value, value)}
       onClick={event => handleClick(event, !value, !value)}
     >
-      <StyledListInputWrapper>
-        <StyledListInputInner>
-          <StyledListInputText />
+      <ListInputWrapper>
+        <ListInputInner>
+          <ListInputText />
 
           {loading ? (
-            <StyledListInputLoading />
+            <ListInputLoading />
           ) : (
             <>
-              <StyledPasswordAdornment />
-              <StyledResetAdornment />
+              <PasswordInputAdornment />
+              <ResetInputAdornment />
               <div style={{ minHeight: '41px' }}>
                 <Switch
                   id={id}
@@ -78,16 +80,16 @@ const WrappedSwitchListInput = React.memo(() => {
               </div>
             </>
           )}
-        </StyledListInputInner>
+        </ListInputInner>
 
-        <StyledHelperText />
-      </StyledListInputWrapper>
-    </StyledListInputButtonRoot>
+        <ListInputHelperText />
+      </ListInputWrapper>
+    </ListInputButtonRoot>
   );
 });
 
 export const SwitchListInput = ({ preventRender = false, value, ...props }: SwitchListInputProps) => {
-  const { status: validationStatus, message: validationMessage } = useValidation<boolean>({
+  const { status: validationStatus, message: validationMessage } = useInputValidation<boolean>({
     value: Boolean(value),
     rawValue: Boolean(value),
     ...props

@@ -1,63 +1,39 @@
-import RefreshOutlinedIcon from '@mui/icons-material/RefreshOutlined';
-import Visibility from '@mui/icons-material/Visibility';
-import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import type {
-  AutocompleteRenderInputParams,
-  ListItemButtonProps,
-  ListItemProps,
-  ListItemTextProps,
-  TextFieldProps
-} from '@mui/material';
+import type { AutocompleteRenderInputParams, ListItemButtonProps, ListItemProps, TextFieldProps } from '@mui/material';
 import {
   Box,
   FormHelperText,
-  IconButton,
   InputAdornment,
   ListItem,
   ListItemButton,
-  ListItemText,
   Skeleton,
+  styled,
   TextField,
   Typography,
-  styled,
   useTheme
 } from '@mui/material';
 import { usePropStore } from 'components/core/PropProvider/PropProvider';
-import { useTextInputSlot } from 'components/visual/Inputs/lib/inputs.components';
-import {
-  useInputChange,
-  useInputId,
-  useShouldRenderPassword,
-  useShouldRenderReset
-} from 'components/visual/Inputs/lib/inputs.hook';
+import { useInputTextFieldSlots } from 'components/visual/Inputs/components/inputs.component.textfield';
+import { useInputId } from 'components/visual/Inputs/hooks/inputs.hook.renderer';
 import type { ListInputControllerProps } from 'components/visual/ListInputs/lib/listinputs.model';
-import { Tooltip } from 'components/visual/Tooltip';
-import React, { useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
+import React from 'react';
 
-export const StyledListInputWrapper = React.memo(
-  styled('div')({
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    width: '100%',
-    minWidth: 0
-  })
-);
-StyledListInputWrapper.displayName = 'StyledListInputWrapper';
-
-export const StyledListInputInner = React.memo(
-  styled('div')(({ theme }) => ({
-    display: 'flex',
-    alignItems: 'center',
-    width: '100%',
-    minWidth: 0,
-    columnGap: theme.spacing(1)
+/**********************************************************************************************************************
+ * Skeletons
+ *********************************************************************************************************************/
+export const ListInputLoading = React.memo(
+  styled(Skeleton)(({ theme }) => ({
+    height: '2rem',
+    width: '30%',
+    marginRight: theme.spacing(0.5)
   }))
 );
-StyledListInputInner.displayName = 'StyledListInputInner';
+ListInputLoading.displayName = 'ListInputLoading';
 
-export const StyledListItemRoot = React.memo(({ sx, ...props }: ListItemProps) => {
+/**********************************************************************************************************************
+ * Forms
+ *********************************************************************************************************************/
+
+export const ListInputRoot = React.memo(({ sx, ...props }: ListItemProps) => {
   const theme = useTheme();
 
   const [get] = usePropStore<ListInputControllerProps>();
@@ -77,121 +53,66 @@ export const StyledListItemRoot = React.memo(({ sx, ...props }: ListItemProps) =
     />
   );
 });
-StyledListItemRoot.displayName = 'StyledListItemRoot';
+ListInputRoot.displayName = 'ListInputRoot';
 
-export const StyledListInputLoading = React.memo(
-  styled(Skeleton)(({ theme }) => ({
-    height: '2rem',
-    width: '30%',
-    marginRight: theme.spacing(0.5)
+export const ListInputWrapper = React.memo(
+  styled('div')({
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    width: '100%',
+    minWidth: 0
+  })
+);
+ListInputWrapper.displayName = 'ListInputWrapper';
+
+export const ListInputInner = React.memo(
+  styled('div')(({ theme }) => ({
+    display: 'flex',
+    alignItems: 'center',
+    width: '100%',
+    minWidth: 0,
+    columnGap: theme.spacing(1)
   }))
 );
-StyledListInputLoading.displayName = 'StyledListInputLoading';
+ListInputInner.displayName = 'ListInputInner';
 
-// ------------------------------------------------------------
-// Password Adornment
-// ------------------------------------------------------------
-export const StyledPasswordAdornment = React.memo(() => {
+export const ListInputButtonRoot = React.memo(({ children, sx, ...props }: ListItemButtonProps) => {
   const theme = useTheme();
-
-  const [get, setStore] = usePropStore<ListInputControllerProps>();
-
-  const disabled = get('disabled');
-  const id = useInputId();
-  const isPasswordVisible = get('isPasswordVisible');
-  const resetProps = get('resetProps');
-  const shouldRenderPassword = useShouldRenderPassword();
-  const tiny = get('tiny');
-
-  return !shouldRenderPassword ? null : (
-    <IconButton
-      aria-label={`${id}-password`}
-      color="secondary"
-      disabled={disabled}
-      type="button"
-      onClick={() => setStore(s => ({ isPasswordVisible: !s.isPasswordVisible }))}
-      {...resetProps}
-      sx={{
-        padding: tiny ? theme.spacing(0.25) : theme.spacing(0.5),
-        ...resetProps?.sx
-      }}
-    >
-      {isPasswordVisible ? <VisibilityOff fontSize="small" /> : <Visibility fontSize="small" />}
-    </IconButton>
-  );
-});
-
-// ------------------------------------------------------------
-// Reset Button
-// ------------------------------------------------------------
-export const StyledResetAdornment = React.memo(() => {
-  const { t } = useTranslation('inputs');
-  const theme = useTheme();
-
   const [get] = usePropStore<ListInputControllerProps>();
 
-  const defaultValue = get('defaultValue');
   const disabled = get('disabled');
-  const id = useInputId();
-  const onReset = get('onReset');
-  const resetProps = get('resetProps');
-  const shouldRenderReset = useShouldRenderReset();
-  const tiny = get('tiny');
-
-  const handleChange = useInputChange();
-
-  const title = useMemo<React.ReactNode>(
-    () =>
-      defaultValue === undefined ? null : (
-        <>
-          <span style={{ color: theme.palette.text.secondary }}>{t('reset_to')}</span>{' '}
-          <span>
-            {typeof defaultValue === 'object'
-              ? JSON.stringify(defaultValue)
-              : typeof defaultValue === 'string'
-                ? `"${defaultValue}"`
-                : `${defaultValue}`}
-          </span>
-        </>
-      ),
-    [defaultValue, t, theme.palette.text.secondary]
-  );
-
-  if (!shouldRenderReset) return null;
+  const loading = get('loading');
+  const readOnly = get('readOnly');
+  const divider = get('divider');
 
   return (
-    <Tooltip arrow title={title} placement="bottom">
-      <IconButton
-        aria-label={`${id}-reset`}
-        color="secondary"
-        disabled={disabled}
-        type="reset"
-        onClick={event => {
-          event.preventDefault();
-          event.stopPropagation();
-          onReset ? onReset(event) : handleChange(event, defaultValue, defaultValue);
-        }}
-        {...resetProps}
-        sx={{
-          ...(tiny && { p: theme.spacing(0.5) }),
-          ...resetProps?.sx
-        }}
-      >
-        <RefreshOutlinedIcon fontSize="small" />
-      </IconButton>
-    </Tooltip>
+    <ListItemButton
+      disabled={disabled || readOnly || loading}
+      role={undefined}
+      sx={{
+        // gap: theme.spacing(0.5),
+        py: 0.5,
+        ...(divider && { borderBottom: `1px solid ${theme.palette.divider}` }),
+        // ...(((readOnly && !disabled) || loading) && {
+        //   '&.Mui-disabled': { opacity: 1 }
+        // }),
+        '&.Mui-disabled': { opacity: 1 },
+        ...sx
+      }}
+      {...props}
+    >
+      {children}
+    </ListItemButton>
   );
 });
-StyledResetAdornment.displayName = 'StyledResetAdornment';
+ListInputButtonRoot.displayName = 'ListInputButtonRoot';
 
-// ------------------------------------------------------------
-// Text Label
-// ------------------------------------------------------------
-export type StyledListInputTextProps = React.LabelHTMLAttributes<HTMLLabelElement> & {
+export type ListInputTextProps = React.LabelHTMLAttributes<HTMLLabelElement> & {
   noLabel?: boolean;
 };
 
-export const StyledListInputText = React.memo(({ noLabel = false, ...props }: StyledListInputTextProps) => {
+export const ListInputText = React.memo(({ noLabel = false, ...props }: ListInputTextProps) => {
   const theme = useTheme();
   const [get] = usePropStore<ListInputControllerProps>();
 
@@ -254,12 +175,9 @@ export const StyledListInputText = React.memo(({ noLabel = false, ...props }: St
     </Box>
   );
 });
-StyledListInputText.displayName = 'StyledListInputText';
+ListInputText.displayName = 'ListInputText';
 
-// ------------------------------------------------------------
-// Helper / Error Text
-// ------------------------------------------------------------
-export const StyledHelperText = React.memo(() => {
+export const ListInputHelperText = React.memo(() => {
   const theme = useTheme();
   const [get] = usePropStore<ListInputControllerProps>();
 
@@ -317,50 +235,13 @@ export const StyledHelperText = React.memo(() => {
 
   return null;
 });
-StyledHelperText.displayName = 'StyledHelperText';
+ListInputHelperText.displayName = 'ListInputHelperText';
 
-// ------------------------------------------------------------
-// Structural Layout Elements
-// ------------------------------------------------------------
-export const StyledListInputButtonRoot = React.memo(({ children, sx, ...props }: ListItemButtonProps) => {
-  const theme = useTheme();
-  const [get] = usePropStore<ListInputControllerProps>();
-
-  const disabled = get('disabled');
-  const loading = get('loading');
-  const readOnly = get('readOnly');
-  const divider = get('divider');
-
-  return (
-    <ListItemButton
-      disabled={disabled || readOnly || loading}
-      role={undefined}
-      sx={{
-        // gap: theme.spacing(0.5),
-        py: 0.5,
-        ...(divider && { borderBottom: `1px solid ${theme.palette.divider}` }),
-        // ...(((readOnly && !disabled) || loading) && {
-        //   '&.Mui-disabled': { opacity: 1 }
-        // }),
-        '&.Mui-disabled': { opacity: 1 },
-        ...sx
-      }}
-      {...props}
-    >
-      {children}
-    </ListItemButton>
-  );
-});
-StyledListInputButtonRoot.displayName = 'StyledListInputButtonRoot';
-
-// ------------------------------------------------------------
-// StyledTextField
-// ------------------------------------------------------------
-export type StyledTextFieldProps = TextFieldProps & {
+export type ListInputTextFieldProps = TextFieldProps & {
   params?: AutocompleteRenderInputParams;
 };
 
-export const StyledTextField = React.memo(({ params, ...props }: StyledTextFieldProps) => {
+export const ListInputTextField = React.memo(({ params, ...props }: ListInputTextFieldProps) => {
   const [get] = usePropStore<ListInputControllerProps>();
 
   const endAdornment = get('endAdornment');
@@ -368,22 +249,22 @@ export const StyledTextField = React.memo(({ params, ...props }: StyledTextField
   const readOnly = get('readOnly');
   const startAdornment = get('startAdornment');
 
-  const textInputSlot = useTextInputSlot();
+  const inputTextFieldSlots = useInputTextFieldSlots();
 
   return (
     <TextField
-      {...textInputSlot}
+      {...inputTextFieldSlots}
       {...params}
       {...props}
       slotProps={{
-        ...textInputSlot?.slotProps,
+        ...inputTextFieldSlots?.slotProps,
         ...props?.slotProps,
         inputLabel: {
           ...props?.slotProps?.inputLabel,
           ...params?.InputLabelProps
         },
         input: {
-          ...textInputSlot?.slotProps?.input,
+          ...inputTextFieldSlots?.slotProps?.input,
           ...props?.slotProps?.input,
           ...params?.InputProps,
           placeholder: placeholder,
@@ -405,54 +286,4 @@ export const StyledTextField = React.memo(({ params, ...props }: StyledTextField
     />
   );
 });
-StyledTextField.displayName = 'StyledTextField';
-
-export const StyledListItemText = React.memo(({ primary, secondary = null, ...props }: ListItemTextProps) => {
-  const [get] = usePropStore<ListInputControllerProps>();
-
-  const capitalize = get('capitalize');
-  const isPasswordVisible = get('isPasswordVisible');
-  const overflowHidden = get('overflowHidden');
-  const password = get('password');
-  const tiny = get('tiny');
-
-  return (
-    <ListItemText
-      primary={primary}
-      secondary={secondary}
-      {...props}
-      slotProps={{
-        ...props?.slotProps,
-        primary: {
-          ...props?.slotProps?.primary,
-          ...(tiny && { variant: 'body2' }),
-          sx: {
-            ...(capitalize && { textTransform: 'capitalize' }),
-            ...(!overflowHidden && { overflow: 'auto', textOverflow: 'initial', whiteSpace: 'normal' })
-          }
-        },
-        secondary: {
-          ...props?.slotProps?.secondary,
-          ...(tiny && { variant: 'body2' }),
-          sx: {
-            ...(!overflowHidden && { overflow: 'auto', textOverflow: 'initial', whiteSpace: 'normal' })
-          }
-        }
-      }}
-      sx={{
-        marginTop: 'initial',
-        marginBottom: 'initial',
-        ...(password &&
-          isPasswordVisible && {
-            wordBreak: 'break-all',
-            fontFamily: 'password',
-            WebkitTextSecurity: 'disc',
-            MozTextSecurity: 'disc',
-            textSecurity: 'disc'
-          }),
-        ...props?.sx
-      }}
-    />
-  );
-});
-StyledListItemText.displayName = 'StyledListItemText';
+ListInputTextField.displayName = 'ListInputTextField';

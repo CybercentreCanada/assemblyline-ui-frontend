@@ -5,7 +5,7 @@ import type {
   ValidationSchema,
   ValidationStatus,
   Validator
-} from 'components/visual/Inputs/utils/inputs.validation';
+} from 'components/visual/Inputs/utils/inputs.util.validation';
 import type React from 'react';
 
 /**********************************************************************************************************************
@@ -316,7 +316,7 @@ export type InputRuntimeState = {
    * Whether the spinner adornment is visible
    * @default false
    */
-  showSpinner?: boolean;
+  showNumericalSpinner?: boolean;
 
   /**
    * Current validation message
@@ -335,7 +335,7 @@ export const DEFAULT_RUNTIME_STATE: InputRuntimeState = {
   isMenuOpen: false,
   isPasswordVisible: true,
   showClearButton: false,
-  showSpinner: false,
+  showNumericalSpinner: false,
   validationMessage: null,
   validationStatus: 'default'
 };

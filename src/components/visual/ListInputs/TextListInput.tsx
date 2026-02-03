@@ -2,23 +2,21 @@ import type { TextFieldProps } from '@mui/material';
 import { Autocomplete, Typography } from '@mui/material';
 import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
 import {
-  useInputBlur,
-  useInputChange,
-  useInputFocus,
-  useInputId,
-  useValidation
-} from 'components/visual/Inputs/hooks/inputs.hook';
+  PasswordInputAdornment,
+  ResetInputAdornment
+} from 'components/visual/Inputs/components/inputs.component.adornment';
+import { useInputBlur, useInputChange, useInputFocus } from 'components/visual/Inputs/hooks/inputs.hook.event_handlers';
+import { useInputId } from 'components/visual/Inputs/hooks/inputs.hook.renderer';
+import { useInputValidation } from 'components/visual/Inputs/hooks/inputs.hook.validation';
 import type { InputRuntimeState, InputValueModel } from 'components/visual/Inputs/models/inputs.model';
 import {
-  StyledHelperText,
-  StyledListInputInner,
-  StyledListInputLoading,
-  StyledListInputText,
-  StyledListInputWrapper,
-  StyledListItemRoot,
-  StyledPasswordAdornment,
-  StyledResetAdornment,
-  StyledTextField
+  ListInputHelperText,
+  ListInputInner,
+  ListInputLoading,
+  ListInputRoot,
+  ListInputText,
+  ListInputTextField,
+  ListInputWrapper
 } from 'components/visual/ListInputs/lib/listinputs.components';
 import type { ListInputOptions } from 'components/visual/ListInputs/lib/listinputs.model';
 import { DEFAULT_LIST_INPUT_CONTROLLER_PROPS } from 'components/visual/ListInputs/lib/listinputs.model';
@@ -50,17 +48,17 @@ const WrappedTextListInput = React.memo(() => {
   const handleFocus = useInputFocus<string>();
 
   return (
-    <StyledListItemRoot>
-      <StyledListInputWrapper>
-        <StyledListInputInner>
-          <StyledListInputText />
+    <ListInputRoot>
+      <ListInputWrapper>
+        <ListInputInner>
+          <ListInputText />
 
           {loading ? (
-            <StyledListInputLoading />
+            <ListInputLoading />
           ) : (
             <>
-              <StyledPasswordAdornment />
-              <StyledResetAdornment />
+              <PasswordInputAdornment />
+              <ResetInputAdornment />
               <Autocomplete
                 disableClearable
                 disabled={disabled}
@@ -81,20 +79,20 @@ const WrappedTextListInput = React.memo(() => {
                     {option}
                   </Typography>
                 )}
-                renderInput={params => <StyledTextField params={params} />}
+                renderInput={params => <ListInputTextField params={params} />}
               />
             </>
           )}
-        </StyledListInputInner>
+        </ListInputInner>
 
-        <StyledHelperText />
-      </StyledListInputWrapper>
-    </StyledListItemRoot>
+        <ListInputHelperText />
+      </ListInputWrapper>
+    </ListInputRoot>
   );
 });
 
 export const TextListInput = ({ preventRender = false, value, ...props }: TextListInputProps) => {
-  const { status: validationStatus, message: validationMessage } = useValidation<string>({
+  const { status: validationStatus, message: validationMessage } = useInputValidation<string>({
     value: value ?? '',
     rawValue: value ?? '',
     ...props

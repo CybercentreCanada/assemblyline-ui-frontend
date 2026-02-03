@@ -23,7 +23,7 @@ import type { SwitchInputProps } from 'components/visual/Inputs/SwitchInput';
 import { SwitchInput } from 'components/visual/Inputs/SwitchInput';
 import type { TextInputProps } from 'components/visual/Inputs/TextInput';
 import { TextInput } from 'components/visual/Inputs/TextInput';
-import type { Validator } from 'components/visual/Inputs/utils/inputs.validation';
+import type { Validator } from 'components/visual/Inputs/utils/inputs.util.validation';
 import MonacoEditor from 'components/visual/MonacoEditor';
 import { isURL } from 'helpers/utils';
 import _ from 'lodash';

@@ -1,15 +1,16 @@
 import type { TextFieldProps } from '@mui/material';
 import { Skeleton } from '@mui/material';
 import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
-import { useInputBlur, useInputChange, useIcomponents/visual/Inputs/components/inputs.componentssual/Inputs/hooks/inputs.hook';
-import type { StyledTextFieldProps } from 'components/visual/Inputs/lib/inputs.components';
 import {
-  HelperText,
-  StyledFormControl,
-  StyledFormLabel,
-  StyledRoot,
-  Styledcomponents/visual/Inputs/components/inputs.components
-} from 'components/visual/Inputs/lib/inputs.components';
+  InputFormControl,
+  InputFormLabel,
+  InputHelperText,
+  InputRoot
+} from 'components/visual/Inputs/components/inputs.component.form';
+import type { InputTextFieldProps } from 'components/visual/Inputs/components/inputs.component.textfield';
+import { InputTextField } from 'components/visual/Inputs/components/inputs.component.textfield';
+import { useInputBlur, useInputChange, useInputFocus } from 'components/visual/Inputs/hooks/inputs.hook.event_handlers';
+import { useInputValidation } from 'components/visual/Inputs/hooks/inputs.hook.validation';
 import type { InputOptions, InputRuntimeState, InputValueModel } from 'components/visual/Inputs/models/inputs.model';
 import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/models/inputs.model';
 import React from 'react';
@@ -20,7 +21,7 @@ export type TextAreaInputProps = InputValueModel<
   React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
 > &
   InputOptions & {
-    autoComplete?: StyledTextFieldProps['autoComplete'];
+    autoComplete?: InputTextFieldProps['autoComplete'];
     rows?: TextFieldProps['rows'];
     minRows?: TextFieldProps['minRows'];
     maxRows?: TextFieldProps['maxRows'];
@@ -48,16 +49,16 @@ const WrappedTextAreaInput = () => {
   const handleFocus = useInputFocus<string>();
 
   return (
-    <StyledRoot>
-      <StyledFormLabel />
-      <StyledFormControl>
+    <InputRoot>
+      <InputFormLabel />
+      <InputFormControl>
         {loading ? (
           <Skeleton
             sx={{ height: `calc(23px * ${rows} + 17px)`, transform: 'unset', ...(tiny && { height: '28px' }) }}
           />
         ) : (
           <>
-            <StyledTextField
+            <InputTextField
               {...(!(overflowHidden || (password && isPasswordVisible)) && {
                 multiline: true,
                 ...(minRows || maxRows ? { minRows, maxRows } : { rows: rows || 1 })
@@ -68,16 +69,16 @@ const WrappedTextAreaInput = () => {
               onFocus={handleFocus}
               onBlur={e => handleBlur(e, value, value)}
             />
-            <HelperText />
+            <InputHelperText />
           </>
         )}
-      </StyledFormControl>
-    </StyledRoot>
+      </InputFormControl>
+    </InputRoot>
   );
 };
 
 export const TextAreaInput = ({ preventRender = false, value, ...props }: TextAreaInputProps) => {
-  const { status: validationStatus, message: validationMessage } = useValidation<string>({
+  const { status: validationStatus, message: validationMessage } = useInputValidation<string>({
     value: value ?? '',
     rawValue: value ?? '',
     ...props

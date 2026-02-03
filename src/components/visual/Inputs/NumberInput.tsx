@@ -1,14 +1,15 @@
 import type { TextFieldProps } from '@mui/material';
 import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
-import { useInputBlur, useInputChange, useInputFocus, useValidation } from 'components/visual/Inputs/hooks/inputs.hook';
 import {
-  HelperText,
-  StyledFormControl,
-  StyledFormLabel,
-  StyledInputSkeleton,
-  StyledRoot,
-  Styledcomponents/visual/Inputs/components/inputs.components
-} from 'components/visual/Inputs/lib/inputs.components';
+  InputFormControl,
+  InputFormLabel,
+  InputHelperText,
+  InputRoot,
+  InputSkeleton
+} from 'components/visual/Inputs/components/inputs.component.form';
+import { InputTextField } from 'components/visual/Inputs/components/inputs.component.textfield';
+import { useInputBlur, useInputChange, useInputFocus } from 'components/visual/Inputs/hooks/inputs.hook.event_handlers';
+import { useInputValidation } from 'components/visual/Inputs/hooks/inputs.hook.validation';
 import type { InputOptions, InputRuntimeState, InputValueModel } from 'components/visual/Inputs/models/inputs.model';
 import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/models/inputs.model';
 import React, { useEffect, useRef } from 'react';
@@ -61,14 +62,14 @@ const WrappedNumberInput = () => {
   }, [inputRef]);
 
   return (
-    <StyledRoot>
-      <StyledFormLabel />
-      <StyledFormControl>
+    <InputRoot>
+      <InputFormLabel />
+      <InputFormControl>
         {loading ? (
-          <StyledInputSkeleton />
+          <InputSkeleton />
         ) : (
           <>
-            <StyledTextField
+            <InputTextField
               ref={inputRef}
               type="number"
               value={rawValue}
@@ -85,16 +86,16 @@ const WrappedNumberInput = () => {
                 }
               }}
             />
-            <HelperText />
+            <InputHelperText />
           </>
         )}
-      </StyledFormControl>
-    </StyledRoot>
+      </InputFormControl>
+    </InputRoot>
   );
 };
 
 export const NumberInput = ({ preventRender = false, value, ...props }: NumberInputProps) => {
-  const { status: validationStatus, message: validationMessage } = useValidation<number, string>({
+  const { status: validationStatus, message: validationMessage } = useInputValidation<number, string>({
     value: value,
     rawValue: String(value),
     ...props
@@ -109,7 +110,7 @@ export const NumberInput = ({ preventRender = false, value, ...props }: NumberIn
         max: null,
         min: null,
         preventRender,
-        showSpinner: true,
+        showNumericalSpinner: true,
         validationStatus,
         validationMessage,
         step: 1,

@@ -1,4 +1,4 @@
-import { CoercersResolver, ValidationResolver } from 'components/visual/Inputs/lib/inputs.validation';
+import { CoercersResolver, ValidationResolver } from 'components/visual/Inputs/utils/inputs.util.validation';
 import type { TFunction } from 'i18next';
 import { describe, expect, it } from 'vitest';
 

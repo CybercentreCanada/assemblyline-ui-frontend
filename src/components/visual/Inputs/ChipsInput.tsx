@@ -2,21 +2,16 @@ import type { AutocompleteProps, TextFieldProps } from '@mui/material';
 import { Autocomplete } from '@mui/material';
 import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
 import {
-  useInputBlur,
-  useInputChange,
-  useInputFocus,
-  useInputId,
-  useValidation
-} from 'components/visual/Inputs/hooks/inputs.hook';
-import {
-  Helpercomponents/visual/Inputs/components/inputs.components
-  StyledCustomChip,
-  StyledFormControl,
-  StyledFormLabel,
-  StyledInputSkeleton,
-  StyledRoot,
-  StyledTextField
-} from 'components/visual/Inputs/lib/inputs.components';
+  InputFormControl,
+  InputFormLabel,
+  InputHelperText,
+  InputRoot,
+  InputSkeleton
+} from 'components/visual/Inputs/components/inputs.component.form';
+import { InputCustomChip, InputTextField } from 'components/visual/Inputs/components/inputs.component.textfield';
+import { useInputBlur, useInputChange, useInputFocus } from 'components/visual/Inputs/hooks/inputs.hook.event_handlers';
+import { useInputId } from 'components/visual/Inputs/hooks/inputs.hook.renderer';
+import { useInputValidation } from 'components/visual/Inputs/hooks/inputs.hook.validation';
 import type { InputOptions, InputRuntimeState, InputValueModel } from 'components/visual/Inputs/models/inputs.model';
 import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/models/inputs.model';
 import type { ElementType } from 'react';
@@ -64,11 +59,11 @@ const WrappedChipsInput = () => {
   const handleFocus = useInputFocus<string[]>();
 
   return (
-    <StyledRoot>
-      <StyledFormLabel />
-      <StyledFormControl>
+    <InputRoot>
+      <InputFormLabel />
+      <InputFormControl>
         {loading ? (
-          <StyledInputSkeleton />
+          <InputSkeleton />
         ) : (
           <Autocomplete
             disableCloseOnSelect={disableCloseOnSelect}
@@ -99,11 +94,11 @@ const WrappedChipsInput = () => {
               ((values, getTagProps) =>
                 values.map((option, index) => {
                   const { key, ...tagProps } = getTagProps({ index });
-                  return <StyledCustomChip key={key} label={option ? option : '\u00A0'} {...tagProps} />;
+                  return <InputCustomChip key={key} label={option ? option : '\u00A0'} {...tagProps} />;
                 }))
             }
             renderInput={params => (
-              <StyledTextField
+              <InputTextField
                 params={{
                   ...params,
                   inputProps: {
@@ -138,14 +133,14 @@ const WrappedChipsInput = () => {
             }}
           />
         )}
-        <HelperText />
-      </StyledFormControl>
-    </StyledRoot>
+        <InputHelperText />
+      </InputFormControl>
+    </InputRoot>
   );
 };
 
 export const ChipsInput = ({ preventRender = false, value = [], ...props }: ChipsInputProps) => {
-  const { status: validationStatus, message: validationMessage } = useValidation<string[]>({
+  const { status: validationStatus, message: validationMessage } = useInputValidation<string[]>({
     value: value ?? [],
     rawValue: value ?? [],
     ...props

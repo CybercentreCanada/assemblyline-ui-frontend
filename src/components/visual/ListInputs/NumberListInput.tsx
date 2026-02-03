@@ -1,17 +1,20 @@
 import type { TextFieldProps } from '@mui/material';
 import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
-import { useInputBlur, useInputChange, useInputFocus, useValidation } from 'components/visual/Inputs/hooks/inputs.hook';
+import {
+  PasswordInputAdornment,
+  ResetInputAdornment
+} from 'components/visual/Inputs/components/inputs.component.adornment';
+import { useInputBlur, useInputChange, useInputFocus } from 'components/visual/Inputs/hooks/inputs.hook.event_handlers';
+import { useInputValidation } from 'components/visual/Inputs/hooks/inputs.hook.validation';
 import type { InputRuntimeState, InputValueModel } from 'components/visual/Inputs/models/inputs.model';
 import {
-  StyledHelperText,
-  StyledListInputInner,
-  StyledListInputLoading,
-  StyledListInputText,
-  StyledListInputWrapper,
-  StyledListItemRoot,
-  StyledPasswordAdornment,
-  StyledResetAdornment,
-  StyledTextField
+  ListInputHelperText,
+  ListInputInner,
+  ListInputLoading,
+  ListInputRoot,
+  ListInputText,
+  ListInputTextField,
+  ListInputWrapper
 } from 'components/visual/ListInputs/lib/listinputs.components';
 import type { ListInputOptions } from 'components/visual/ListInputs/lib/listinputs.model';
 import { DEFAULT_LIST_INPUT_CONTROLLER_PROPS } from 'components/visual/ListInputs/lib/listinputs.model';
@@ -63,18 +66,18 @@ const WrappedNumberListInput = React.memo(() => {
   }, [inputRef]);
 
   return (
-    <StyledListItemRoot>
-      <StyledListInputWrapper>
-        <StyledListInputInner>
-          <StyledListInputText />
+    <ListInputRoot>
+      <ListInputWrapper>
+        <ListInputInner>
+          <ListInputText />
 
           {loading ? (
-            <StyledListInputLoading />
+            <ListInputLoading />
           ) : (
             <>
-              <StyledPasswordAdornment />
-              <StyledResetAdornment />
-              <StyledTextField
+              <PasswordInputAdornment />
+              <ResetInputAdornment />
+              <ListInputTextField
                 ref={inputRef}
                 type="number"
                 value={rawValue}
@@ -108,16 +111,16 @@ const WrappedNumberListInput = React.memo(() => {
               />
             </>
           )}
-        </StyledListInputInner>
+        </ListInputInner>
 
-        <StyledHelperText />
-      </StyledListInputWrapper>
-    </StyledListItemRoot>
+        <ListInputHelperText />
+      </ListInputWrapper>
+    </ListInputRoot>
   );
 });
 
 export const NumberListInput = ({ preventRender = false, value, ...props }: NumberListInputProps) => {
-  const { status: validationStatus, message: validationMessage } = useValidation<number, string>({
+  const { status: validationStatus, message: validationMessage } = useInputValidation<number, string>({
     value: value,
     rawValue: value == null ? '' : String(value),
     ...props
@@ -132,7 +135,7 @@ export const NumberListInput = ({ preventRender = false, value, ...props }: Numb
         min: null,
         preventRender,
         rawValue: value == null ? '' : String(value),
-        showSpinner: true,
+        showNumericalSpinner: true,
         step: 1,
         validationMessage,
         validationStatus,

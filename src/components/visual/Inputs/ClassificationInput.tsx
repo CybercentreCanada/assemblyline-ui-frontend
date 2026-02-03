@@ -18,15 +18,19 @@ import type { WhoAmI } from 'components/models/ui/user';
 import { Button } from 'components/visual/Buttons/Button';
 import type { ClassificationProps } from 'components/visual/Classification';
 import CustomChip, { COLOR_MAP } from 'components/visual/CustomChip';
-import { useCoercingResolver, useValidation, useValidationResolver } from 'components/visual/Inputs/hooks/inputs.hook';
+import { PasswordInputAdornment } from 'components/visual/Inputs/components/inputs.component.adornment';
 import {
-  HelperText,
-  PasswordAdornment,
-  StyledFormControl,
-  StyledFormLabel,
-  StyledInputSkeleton,
-  Styledcomponents/visual/Inputs/components/inputs.components
-} from 'components/visual/Inputs/lib/inputs.components';
+  InputFormControl,
+  InputFormLabel,
+  InputHelperText,
+  InputRoot,
+  InputSkeleton
+} from 'components/visual/Inputs/components/inputs.component.form';
+import {
+  useInputCoercingResolver,
+  useInputValidation,
+  useInputValidationResolver
+} from 'components/visual/Inputs/hooks/inputs.hook.validation';
 import type { InputOptions, InputRuntimeState, InputValueModel } from 'components/visual/Inputs/models/inputs.model';
 import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/models/inputs.model';
 import { Tooltip } from 'components/visual/Tooltip';
@@ -87,8 +91,8 @@ const WrappedClassificationInput = () => {
   const uParts = get('uParts');
   const validated = get('validated');
 
-  const resolveCoercing = useCoercingResolver<string>();
-  const resolveValidation = useValidationResolver<string>();
+  const resolveCoercing = useInputCoercingResolver<string>();
+  const resolveValidation = useInputValidationResolver<string>();
 
   const onChange = get('onChange');
   const onReset = get('onReset');
@@ -272,11 +276,11 @@ const WrappedClassificationInput = () => {
   }, [c12nDef, currentUser.classification, format, isMobile, isUser, setStore, value]);
 
   return (
-    <StyledRoot>
-      <StyledFormLabel />
-      <StyledFormControl>
+    <InputRoot>
+      <InputFormLabel />
+      <InputFormControl>
         {loading ? (
-          <StyledInputSkeleton />
+          <InputSkeleton />
         ) : (
           <>
             <div style={{ display: inline ? 'inline-block' : null }}>
@@ -512,7 +516,7 @@ const WrappedClassificationInput = () => {
                 >
                   {t('classification.help')}
                 </Button>
-                <PasswordAdornment />
+                <PasswordInputAdornment />
                 {reset && (
                   <Tooltip arrow title={title} placement="bottom">
                     <Button onClick={onReset ? onReset : handleReset} color="secondary">
@@ -529,14 +533,14 @@ const WrappedClassificationInput = () => {
           </>
         )}
 
-        <HelperText />
-      </StyledFormControl>
-    </StyledRoot>
+        <InputHelperText />
+      </InputFormControl>
+    </InputRoot>
   );
 };
 
 export const ClassificationInput = ({ preventRender = false, value, ...props }: ClassificationInputProps) => {
-  const { status: validationStatus, message: validationMessage } = useValidation<string>({
+  const { status: validationStatus, message: validationMessage } = useInputValidation<string>({
     value: value ?? '',
     rawValue: value ?? '',
     ...props

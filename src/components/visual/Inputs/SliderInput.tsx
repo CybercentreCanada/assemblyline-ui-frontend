@@ -1,21 +1,17 @@
 import type { SliderProps } from '@mui/material';
 import { Slider } from '@mui/material';
 import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
+import { ResetInputAdornment } from 'components/visual/Inputs/components/inputs.component.adornment';
 import {
-  useInputBlur,
-  useInputChange,
-  useInputFocus,
-  useInputId,
-  useValidation
-} from 'components/visual/Inputs/hooks/inputs.hook';
-import {components/visual/Inputs/components/inputs.components
-  HelperText,
-  ResetAdornment,
-  StyledFormControl,
-  StyledFormLabel,
-  StyledInputSkeleton,
-  StyledRoot
-} from 'components/visual/Inputs/lib/inputs.components';
+  InputFormControl,
+  InputFormLabel,
+  InputHelperText,
+  InputRoot,
+  InputSkeleton
+} from 'components/visual/Inputs/components/inputs.component.form';
+import { useInputBlur, useInputChange, useInputFocus } from 'components/visual/Inputs/hooks/inputs.hook.event_handlers';
+import { useInputId } from 'components/visual/Inputs/hooks/inputs.hook.renderer';
+import { useInputValidation } from 'components/visual/Inputs/hooks/inputs.hook.validation';
 import type { InputOptions, InputRuntimeState, InputValueModel } from 'components/visual/Inputs/models/inputs.model';
 import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/models/inputs.model';
 import React from 'react';
@@ -54,11 +50,11 @@ const WrappedSliderInput = () => {
   const handleFocus = useInputFocus<number>();
 
   return (
-    <StyledRoot>
-      <StyledFormLabel />
-      <StyledFormControl>
+    <InputRoot>
+      <InputFormLabel />
+      <InputFormControl>
         {loading ? (
-          <StyledInputSkeleton />
+          <InputSkeleton />
         ) : (
           <>
             <div style={{ minHeight: '40px', display: 'flex', alignItems: 'center' }}>
@@ -81,18 +77,18 @@ const WrappedSliderInput = () => {
                   onChange={(e, v) => handleChange(e as unknown as React.SyntheticEvent, v, v)}
                 />
               </div>
-              <ResetAdornment />
+              <ResetInputAdornment />
             </div>
-            <HelperText />
+            <InputHelperText />
           </>
         )}
-      </StyledFormControl>
-    </StyledRoot>
+      </InputFormControl>
+    </InputRoot>
   );
 };
 
 export const SliderInput = ({ preventRender = false, value, ...props }: SliderInputProps) => {
-  const { status: validationStatus, message: validationMessage } = useValidation<number>({
+  const { status: validationStatus, message: validationMessage } = useInputValidation<number>({
     value: value ?? null,
     rawValue: value ?? null,
     ...props

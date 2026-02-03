@@ -3,14 +3,14 @@ import { Checkbox, ListItemIcon } from '@mui/material';
 import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
 import type { AnchorProps } from 'components/core/TableOfContent/Anchor';
 import { Anchor } from 'components/core/TableOfContent/Anchor';
-import { useInputId, useInputLabel } frocomponents/visual/Inputs/components/inputs.components;
-import { StyledCircularSkeleton } from 'components/visual/Inputs/lib/inputs.components';
+import { ResetInputAdornment } from 'components/visual/Inputs/components/inputs.component.adornment';
+import { InputCircularSkeleton } from 'components/visual/Inputs/components/inputs.component.form';
+import { useInputId, useInputLabel } from 'components/visual/Inputs/hooks/inputs.hook.renderer';
 import type { InputValueModel } from 'components/visual/Inputs/models/inputs.model';
 import {
-  StyledListInputButtonRoot,
-  StyledListInputText,
-  StyledListItemRoot,
-  StyledResetAdornment
+  ListInputButtonRoot,
+  ListInputRoot,
+  ListInputText
 } from 'components/visual/ListInputs/lib/listinputs.components';
 import type { ListInputOptions } from 'components/visual/ListInputs/lib/listinputs.model';
 import { DEFAULT_LIST_INPUT_CONTROLLER_PROPS } from 'components/visual/ListInputs/lib/listinputs.model';
@@ -48,11 +48,11 @@ const WrappedListHeader = React.memo(() => {
   return (
     <Anchor anchor={id} label={primary} disabled={!anchor} {...anchorProps}>
       {!onChange ? (
-        <StyledListItemRoot dense disableGutters disablePadding sx={{ padding: 0 }}>
+        <ListInputRoot dense disableGutters disablePadding sx={{ padding: 0 }}>
           {checked !== null && checked !== undefined && (
             <ListItemIcon>
               {loading ? (
-                <StyledCircularSkeleton />
+                <InputCircularSkeleton />
               ) : (
                 <Checkbox
                   checked={checked}
@@ -66,10 +66,10 @@ const WrappedListHeader = React.memo(() => {
               )}
             </ListItemIcon>
           )}
-          <StyledListInputText />
-        </StyledListItemRoot>
+          <ListInputText />
+        </ListInputRoot>
       ) : (
-        <StyledListInputButtonRoot
+        <ListInputButtonRoot
           dense
           disableGutters
           onClick={event => {
@@ -82,7 +82,7 @@ const WrappedListHeader = React.memo(() => {
           {checked !== null && checked !== undefined && (
             <ListItemIcon>
               {loading ? (
-                <StyledCircularSkeleton />
+                <InputCircularSkeleton />
               ) : (
                 <Checkbox
                   checked={checked}
@@ -97,10 +97,10 @@ const WrappedListHeader = React.memo(() => {
             </ListItemIcon>
           )}
 
-          <StyledListInputText />
+          <ListInputText />
 
-          <StyledResetAdornment />
-        </StyledListInputButtonRoot>
+          <ResetInputAdornment />
+        </ListInputButtonRoot>
       )}
     </Anchor>
   );

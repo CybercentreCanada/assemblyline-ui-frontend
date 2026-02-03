@@ -2,24 +2,22 @@ import type { ListItemTextProps, MenuItemProps, SelectProps } from '@mui/materia
 import { ListItemText, MenuItem, Select } from '@mui/material';
 import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
 import {
-  useInputBlur,
-  useInputChange,
-  useInputFocus,
-  useInputId,
-  useValidation
-} from 'components/visual/Inputs/hooks/inputs.hook';
+  InputEndAdornment,
+  MenuInputAdornment,
+  PasswordInputAdornment,
+  ResetInputAdornment
+} from 'components/visual/Inputs/components/inputs.component.adornment';
 import {
-  HelperText,
-  MenuAdornment,
-  PasswordAdornment,
-  ResetAcomponents/visual/Inputs/components/inputs.components
-  StyledEndAdornment,
-  StyledFormControl,
-  StyledFormLabel,
-  StyledInputSkeleton,
-  StyledListItemText,
-  StyledRoot
-} from 'components/visual/Inputs/lib/inputs.components';
+  InputFormControl,
+  InputFormLabel,
+  InputHelperText,
+  InputListItemText,
+  InputRoot,
+  InputSkeleton
+} from 'components/visual/Inputs/components/inputs.component.form';
+import { useInputBlur, useInputChange, useInputFocus } from 'components/visual/Inputs/hooks/inputs.hook.event_handlers';
+import { useInputId } from 'components/visual/Inputs/hooks/inputs.hook.renderer';
+import { useInputValidation } from 'components/visual/Inputs/hooks/inputs.hook.validation';
 import type { InputOptions, InputRuntimeState, InputValueModel } from 'components/visual/Inputs/models/inputs.model';
 import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/models/inputs.model';
 import React from 'react';
@@ -65,11 +63,11 @@ const WrappedSelectInput = <O extends readonly Option[]>() => {
   const handleFocus = useInputFocus<O[number]['value']>();
 
   return (
-    <StyledRoot>
-      <StyledFormLabel />
-      <StyledFormControl>
+    <InputRoot>
+      <InputFormLabel />
+      <InputFormControl>
         {loading ? (
-          <StyledInputSkeleton />
+          <InputSkeleton />
         ) : (
           <Select
             disabled={disabled}
@@ -121,12 +119,12 @@ const WrappedSelectInput = <O extends readonly Option[]>() => {
             MenuProps={{ sx: { maxWidth: 'min-content' } }}
             IconComponent={() => null}
             endAdornment={
-              <StyledEndAdornment>
+              <InputEndAdornment>
                 {endAdornment}
-                <PasswordAdornment />
-                <ResetAdornment />
-                <MenuAdornment />
-              </StyledEndAdornment>
+                <PasswordInputAdornment />
+                <ResetInputAdornment />
+                <MenuInputAdornment />
+              </InputEndAdornment>
             }
             sx={{
               '&.MuiInputBase-root': {
@@ -143,14 +141,14 @@ const WrappedSelectInput = <O extends readonly Option[]>() => {
           >
             {options.map((option, i) => (
               <MenuItem key={i} value={option.value as MenuItemProps['value']}>
-                <StyledListItemText primary={option.primary ? option.primary : '\u00A0'} secondary={option.secondary} />
+                <InputListItemText primary={option.primary ? option.primary : '\u00A0'} secondary={option.secondary} />
               </MenuItem>
             ))}
           </Select>
         )}
-        <HelperText />
-      </StyledFormControl>
-    </StyledRoot>
+        <InputHelperText />
+      </InputFormControl>
+    </InputRoot>
   );
 };
 
@@ -159,7 +157,7 @@ export const SelectInput = <O extends readonly Option[]>({
   value,
   ...props
 }: SelectInputProps<O>) => {
-  const { status: validationStatus, message: validationMessage } = useValidation<O[number]['value']>({
+  const { status: validationStatus, message: validationMessage } = useInputValidation<O[number]['value']>({
     value: value ?? '',
     rawValue: value ?? '',
     ...props

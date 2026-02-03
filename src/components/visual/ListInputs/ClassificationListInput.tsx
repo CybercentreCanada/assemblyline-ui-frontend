@@ -1,17 +1,20 @@
 import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
 import type { ClassificationProps } from 'components/visual/Classification';
 import Classification from 'components/visual/Classification';
-import { useInputChange, useValidation } from 'components/visual/Inputs/hooks/inputs.hook';
+import {
+  PasswordInputAdornment,
+  ResetInputAdornment
+} from 'components/visual/Inputs/components/inputs.component.adornment';
+import { useInputChange } from 'components/visual/Inputs/hooks/inputs.hook.event_handlers';
+import { useInputValidation } from 'components/visual/Inputs/hooks/inputs.hook.validation';
 import type { InputRuntimeState, InputValueModel } from 'components/visual/Inputs/models/inputs.model';
 import {
-  StyledHelperText,
-  StyledListInputInner,
-  StyledListInputLoading,
-  StyledListInputText,
-  StyledListInputWrapper,
-  StyledListItemRoot,
-  StyledPasswordAdornment,
-  StyledResetAdornment
+  ListInputHelperText,
+  ListInputInner,
+  ListInputLoading,
+  ListInputRoot,
+  ListInputText,
+  ListInputWrapper
 } from 'components/visual/ListInputs/lib/listinputs.components';
 import type { ListInputOptions } from 'components/visual/ListInputs/lib/listinputs.model';
 import { DEFAULT_LIST_INPUT_CONTROLLER_PROPS } from 'components/visual/ListInputs/lib/listinputs.model';
@@ -35,17 +38,17 @@ const WrappedClassificationListInput = React.memo(() => {
   const handleChange = useInputChange<ClassificationProps['c12n']>();
 
   return (
-    <StyledListItemRoot>
-      <StyledListInputWrapper>
-        <StyledListInputInner>
-          <StyledListInputText noLabel />
+    <ListInputRoot>
+      <ListInputWrapper>
+        <ListInputInner>
+          <ListInputText noLabel />
 
           {loading ? (
-            <StyledListInputLoading />
+            <ListInputLoading />
           ) : (
             <>
-              <StyledPasswordAdornment />
-              <StyledResetAdornment />
+              <PasswordInputAdornment />
+              <ResetInputAdornment />
               <div style={{ maxWidth: width, minWidth: width, width: '100%' }}>
                 <Classification
                   type={!disabled && !readOnly ? 'picker' : 'pill'}
@@ -57,16 +60,16 @@ const WrappedClassificationListInput = React.memo(() => {
               </div>
             </>
           )}
-        </StyledListInputInner>
+        </ListInputInner>
 
-        <StyledHelperText />
-      </StyledListInputWrapper>
-    </StyledListItemRoot>
+        <ListInputHelperText />
+      </ListInputWrapper>
+    </ListInputRoot>
   );
 });
 
 export const ClassificationListInput = ({ preventRender = false, value, ...props }: ClassificationListInputProps) => {
-  const { status: validationStatus, message: validationMessage } = useValidation<ClassificationProps['c12n']>({
+  const { status: validationStatus, message: validationMessage } = useInputValidation<ClassificationProps['c12n']>({
     value: value,
     rawValue: value,
     ...props

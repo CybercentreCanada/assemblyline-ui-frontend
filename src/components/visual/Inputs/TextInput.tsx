@@ -2,20 +2,16 @@ import type { TextFieldProps } from '@mui/material';
 import { Autocomplete, Typography } from '@mui/material';
 import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
 import {
-  useInputBlur,
-  useInputChange,
-  useInputFocus,
-  useInputId,
-  useValidation
-} from 'components/visual/Inputs/hooks/inputs.hook';
-import {components/visual/Inputs/components/inputs.components
-  HelperText,
-  StyledFormControl,
-  StyledFormLabel,
-  StyledInputSkeleton,
-  StyledRoot,
-  StyledTextField
-} from 'components/visual/Inputs/lib/inputs.components';
+  InputFormControl,
+  InputFormLabel,
+  InputHelperText,
+  InputRoot,
+  InputSkeleton
+} from 'components/visual/Inputs/components/inputs.component.form';
+import { InputTextField } from 'components/visual/Inputs/components/inputs.component.textfield';
+import { useInputBlur, useInputChange, useInputFocus } from 'components/visual/Inputs/hooks/inputs.hook.event_handlers';
+import { useInputId } from 'components/visual/Inputs/hooks/inputs.hook.renderer';
+import { useInputValidation } from 'components/visual/Inputs/hooks/inputs.hook.validation';
 import type { InputOptions, InputRuntimeState, InputValueModel } from 'components/visual/Inputs/models/inputs.model';
 import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/models/inputs.model';
 import React from 'react';
@@ -45,11 +41,11 @@ const WrappedTextInput = () => {
   const handleFocus = useInputFocus<string>();
 
   return (
-    <StyledRoot>
-      <StyledFormLabel />
-      <StyledFormControl>
+    <InputRoot>
+      <InputFormLabel />
+      <InputFormControl>
         {loading ? (
-          <StyledInputSkeleton />
+          <InputSkeleton />
         ) : (
           <Autocomplete
             disableClearable
@@ -70,17 +66,17 @@ const WrappedTextInput = () => {
                 {option}
               </Typography>
             )}
-            renderInput={params => <StyledTextField params={params} />}
+            renderInput={params => <InputTextField params={params} />}
           />
         )}
-        <HelperText />
-      </StyledFormControl>
-    </StyledRoot>
+        <InputHelperText />
+      </InputFormControl>
+    </InputRoot>
   );
 };
 
 export const TextInput = ({ preventRender = false, value, ...props }: TextInputProps) => {
-  const { status: validationStatus, message: validationMessage } = useValidation<string>({
+  const { status: validationStatus, message: validationMessage } = useInputValidation<string>({
     value: value ?? '',
     rawValue: value ?? '',
     ...props

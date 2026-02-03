@@ -2,23 +2,24 @@ import type { CheckboxProps } from '@mui/material';
 import { Checkbox } from '@mui/material';
 import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
 import {
+  ExpandInputAdornment,
+  InputButtonEndAdornment,
+  PasswordInputAdornment,
+  ResetInputAdornment
+} from 'components/visual/Inputs/components/inputs.component.adornment';
+import {
+  InputButtonFormControlLabel,
+  InputButtonLabel,
+  InputFormButton
+} from 'components/visual/Inputs/components/inputs.component.buttons';
+import { InputFormControl, InputHelperText } from 'components/visual/Inputs/components/inputs.component.form';
+import {
   useInputClick,
   useInputClickBlur,
-  useInputFocus,
-  useInputId,
-  useValidation
-} from 'components/visual/Inputs/hooks/inputs.hook';
-import {
-  ExpandAdornment,
-  HelperText,
-  Passwocomponents/visual/Inputs/components/inputs.components
-  ResetAdornment,
-  StyledButtonLabel,
-  StyledEndAdornmentBox,
-  StyledFormButton,
-  StyledFormControl,
-  StyledFormControlLabel
-} from 'components/visual/Inputs/lib/inputs.components';
+  useInputFocus
+} from 'components/visual/Inputs/hooks/inputs.hook.event_handlers';
+import { useInputId } from 'components/visual/Inputs/hooks/inputs.hook.renderer';
+import { useInputValidation } from 'components/visual/Inputs/hooks/inputs.hook.validation';
 import type { InputOptions, InputRuntimeState, InputValueModel } from 'components/visual/Inputs/models/inputs.model';
 import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/models/inputs.model';
 import { Tooltip } from 'components/visual/Tooltip';
@@ -50,13 +51,13 @@ const WrappedCheckboxInput = () => {
 
   return (
     <Tooltip title={loading ? null : tooltip} {...tooltipProps}>
-      <StyledFormControl>
-        <StyledFormButton
+      <InputFormControl>
+        <InputFormButton
           onBlur={e => handleBlur(e, value, value)}
           onFocus={handleFocus}
           onClick={e => handleClick(e, !rawValue, !rawValue)}
         >
-          <StyledFormControlLabel label={<StyledButtonLabel />}>
+          <InputButtonFormControlLabel label={<InputButtonLabel />}>
             <Checkbox
               name={id}
               checked={rawValue}
@@ -72,23 +73,23 @@ const WrappedCheckboxInput = () => {
                 ...((preventDisabledColor || readOnly) && { color: 'inherit !important' })
               }}
             />
-          </StyledFormControlLabel>
-        </StyledFormButton>
+          </InputButtonFormControlLabel>
+        </InputFormButton>
 
-        <HelperText />
+        <InputHelperText />
 
-        <StyledEndAdornmentBox>
-          <PasswordAdornment />
-          <ResetAdornment />
-          <ExpandAdornment />
-        </StyledEndAdornmentBox>
-      </StyledFormControl>
+        <InputButtonEndAdornment>
+          <PasswordInputAdornment />
+          <ResetInputAdornment />
+          <ExpandInputAdornment />
+        </InputButtonEndAdornment>
+      </InputFormControl>
     </Tooltip>
   );
 };
 
 export const CheckboxInput = ({ preventRender = false, value, ...props }: CheckboxInputProps) => {
-  const { status: validationStatus, message: validationMessage } = useValidation<boolean>({
+  const { status: validationStatus, message: validationMessage } = useInputValidation<boolean>({
     value: Boolean(value),
     rawValue: Boolean(value),
     ...props

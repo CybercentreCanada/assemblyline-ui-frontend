@@ -2,23 +2,21 @@ import type { ListItemTextProps, MenuItemProps, SelectProps } from '@mui/materia
 import { ListItemText, MenuItem, Select, useTheme } from '@mui/material';
 import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
 import {
-  useInputBlur,
-  useInputChange,
-  useInputFocus,
-  useInputId,
-  useValidation
-} from 'components/visual/Inputs/hooks/inputs.hook';
+  PasswordInputAdornment,
+  ResetInputAdornment
+} from 'components/visual/Inputs/components/inputs.component.adornment';
+import { InputListItemText } from 'components/visual/Inputs/components/inputs.component.form';
+import { useInputBlur, useInputChange, useInputFocus } from 'components/visual/Inputs/hooks/inputs.hook.event_handlers';
+import { useInputId } from 'components/visual/Inputs/hooks/inputs.hook.renderer';
+import { useInputValidation } from 'components/visual/Inputs/hooks/inputs.hook.validation';
 import type { InputRuntimeState, InputValueModel } from 'components/visual/Inputs/models/inputs.model';
 import {
-  StyledHelperText,
-  StyledListInputInner,
-  StyledListInputLoading,
-  StyledListInputText,
-  StyledListInputWrapper,
-  StyledListItemRoot,
-  StyledListItemText,
-  StyledPasswordAdornment,
-  StyledResetAdornment
+  ListInputHelperText,
+  ListInputInner,
+  ListInputLoading,
+  ListInputRoot,
+  ListInputText,
+  ListInputWrapper
 } from 'components/visual/ListInputs/lib/listinputs.components';
 import type { ListInputOptions } from 'components/visual/ListInputs/lib/listinputs.model';
 import { DEFAULT_LIST_INPUT_CONTROLLER_PROPS } from 'components/visual/ListInputs/lib/listinputs.model';
@@ -69,17 +67,17 @@ const WrappedSelectListInput = <O extends readonly Option[]>() => {
   const handleFocus = useInputFocus<O[number]['value']>();
 
   return (
-    <StyledListItemRoot>
-      <StyledListInputWrapper>
-        <StyledListInputInner>
-          <StyledListInputText />
+    <ListInputRoot>
+      <ListInputWrapper>
+        <ListInputInner>
+          <ListInputText />
 
           {loading ? (
-            <StyledListInputLoading />
+            <ListInputLoading />
           ) : (
             <>
-              <StyledPasswordAdornment />
-              <StyledResetAdornment />
+              <PasswordInputAdornment />
+              <ResetInputAdornment />
               <Select
                 disabled={disabled}
                 displayEmpty={displayEmpty}
@@ -163,7 +161,7 @@ const WrappedSelectListInput = <O extends readonly Option[]>() => {
                       ...(capitalize && { textTransform: 'capitalize' })
                     }}
                   >
-                    <StyledListItemText
+                    <InputListItemText
                       primary={option.primary ? option.primary : '\u00A0'}
                       secondary={option.secondary}
                       slotProps={{
@@ -186,11 +184,11 @@ const WrappedSelectListInput = <O extends readonly Option[]>() => {
               </Select>
             </>
           )}
-        </StyledListInputInner>
+        </ListInputInner>
 
-        <StyledHelperText />
-      </StyledListInputWrapper>
-    </StyledListItemRoot>
+        <ListInputHelperText />
+      </ListInputWrapper>
+    </ListInputRoot>
   );
 };
 
@@ -199,7 +197,7 @@ export const SelectListInput = <O extends readonly Option[]>({
   value,
   ...props
 }: SelectListInputProps<O>) => {
-  const { status: validationStatus, message: validationMessage } = useValidation<O[number]['value']>({
+  const { status: validationStatus, message: validationMessage } = useInputValidation<O[number]['value']>({
     value: value ?? '',
     rawValue: value ?? '',
     ...props
