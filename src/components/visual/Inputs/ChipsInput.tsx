@@ -43,12 +43,13 @@ const WrappedChipsInput = () => {
   const disableCloseOnSelect = get('disableCloseOnSelect');
   const disabled = get('disabled');
   const filterSelectedOptions = get('filterSelectedOptions');
-  const isFocused = get('isFocused');
   const id = useInputId();
-  const rawValue = get('rawValue') ?? [];
+  const isFocused = get('isFocused');
   const isOptionEqualToValue = get('isOptionEqualToValue');
   const loading = get('loading');
   const options = get('options') ?? [];
+  const placeholder = get('placeholder');
+  const rawValue = get('rawValue') ?? [];
   const readOnly = get('readOnly');
   const renderOption = get('renderOption');
   const renderValue = get('renderValue');
@@ -103,7 +104,8 @@ const WrappedChipsInput = () => {
                   ...params,
                   inputProps: {
                     placeholder:
-                      !isFocused || currentValue || rawValue?.length ? undefined : t('input.chips.placeholder'),
+                      placeholder ??
+                      (!isFocused || currentValue || rawValue?.length ? undefined : t('input.chips.placeholder')),
                     ...params.inputProps,
                     ...(allowEmptyStrings && {
                       onKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => {

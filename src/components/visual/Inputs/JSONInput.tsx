@@ -64,6 +64,22 @@ const WrappedJSONInput = () => {
     [theme, isDarkTheme]
   );
 
+  const color = (() => {
+    switch (validationStatus) {
+      case 'error':
+        return theme.palette.error.main;
+      case 'warning':
+        return theme.palette.warning.main;
+      case 'success':
+        return theme.palette.success.main;
+      case 'info':
+        return theme.palette.info.main;
+      case 'default':
+      default:
+        return theme.palette.divider;
+    }
+  })();
+
   const handleChange = useInputChange<object>();
 
   return (
@@ -78,9 +94,8 @@ const WrappedJSONInput = () => {
               style={{
                 display: 'flex',
                 alignItems: 'flex-start',
-                border: `1px solid ${theme.palette.divider}`,
-                borderRadius: '4px',
-                ...(validationStatus === 'error' && { border: `1px solid ${theme.palette.error.main}` })
+                border: `1px solid ${color}`,
+                borderRadius: '4px'
               }}
             >
               <ReactJson

@@ -61,7 +61,6 @@ InputRoot.displayName = 'InputRoot';
 
 export const InputFormControl = React.memo(({ children }: { children: React.ReactNode }) => {
   const theme = useTheme();
-
   const [get] = usePropStore<InputControllerProps>();
 
   const disabled = get('disabled');
@@ -69,6 +68,14 @@ export const InputFormControl = React.memo(({ children }: { children: React.Reac
   const formControlProps = get('slotProps')?.formControl;
   const id = useInputId();
   const readOnly = get('readOnly');
+  const validationStatus = get('validationStatus');
+
+  const isError = validationStatus === 'error';
+
+  const color =
+    !disabled && !readOnly && validationStatus && validationStatus !== 'default' && validationStatus !== 'error'
+      ? validationStatus
+      : undefined;
 
   return (
     <FormControl
@@ -76,18 +83,42 @@ export const InputFormControl = React.memo(({ children }: { children: React.Reac
       component="form"
       size="small"
       fullWidth
+      disabled={disabled}
+      error={isError}
+      color={color}
       onSubmit={(e: React.SyntheticEvent) => e.preventDefault()}
       {...(readOnly && !disabled && { isFocused: null })}
       {...formControlProps}
       sx={{
-        ...(divider && { borderBottom: `1px solid ${theme.palette.divider}` }),
+        ...(color && {
+          '& .MuiOutlinedInput-root': {
+            '& fieldset': {
+              borderColor: theme.palette[color].main
+            },
+            '&:hover fieldset': {
+              borderColor: theme.palette[color].dark
+            },
+            '&.Mui-focused fieldset': {
+              borderColor: theme.palette[color].main,
+              borderWidth: 2
+            }
+          }
+        }),
+
+        ...(divider && {
+          borderBottom: `1px solid ${theme.palette.divider}`
+        }),
+
         ...(readOnly &&
           !disabled && {
-            '& .MuiInputBase-input': { cursor: 'default' },
-            '& .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline': {
+            '& .MuiInputBase-input': {
+              cursor: 'default'
+            },
+            '& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline': {
               borderColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.23)' : 'rgba(0, 0, 0, 0.23)'
             }
           }),
+
         ...formControlProps?.sx
       }}
     >

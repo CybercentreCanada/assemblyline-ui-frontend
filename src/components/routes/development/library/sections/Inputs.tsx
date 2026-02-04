@@ -454,6 +454,8 @@ export const InputsSection = React.memo(() => {
                         <NumberInput
                           label="Interaction Number Input"
                           value={value}
+                          min={0}
+                          max={100}
                           onChange={(event, next) => form.setFieldValue('components.inputs.values.number', next)}
                           {...inputProps}
                           //
@@ -596,6 +598,7 @@ export const InputsSection = React.memo(() => {
                         <TextAreaInput
                           label="Interaction TextArea Input"
                           value={value}
+                          rows={3}
                           onChange={(event, next) => form.setFieldValue('components.inputs.values.textarea', next)}
                           {...inputProps}
                           //

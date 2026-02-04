@@ -35,25 +35,34 @@ export const useInputTextFieldSlots = (overrides?: Partial<TextFieldProps>) => {
   const readOnly = get('readOnly');
   const startAdornment = get('startAdornment');
   const tiny = get('tiny');
+  const validationMessage = get('validationMessage');
   const validationStatus = get('validationStatus');
+
+  const isError = validationStatus === 'error';
+
+  const color =
+    !disabled && !readOnly && validationStatus && validationStatus !== 'default' && validationStatus !== 'error'
+      ? validationStatus
+      : undefined;
 
   return useMemo<TextFieldProps>(
     () => ({
       'aria-label': label,
       ...(disabled || loading || readOnly
         ? null
-        : helperText || validationStatus === 'error'
+        : helperText || validationMessage
           ? { 'aria-describedby': `${id}-helper-text` }
           : null),
       autoComplete: autoComplete,
+      color: color,
       disabled: disabled,
-      error: validationStatus === 'error',
+      error: isError,
       fullWidth: true,
       id: id,
       margin: 'dense',
       size: 'small',
       variant: 'outlined',
-      ...(readOnly && !disabled && { isFocused: null }),
+      // ...(readOnly && !disabled && { isFocused: null }),
       ...overrides,
       slotProps: {
         ...overrides?.slotProps,
@@ -152,6 +161,7 @@ export const InputTextField = React.memo(({ params, ...props }: InputTextFieldPr
 
   const [get] = usePropStore<InputControllerProps>();
 
+  const disabled = get('disabled');
   const endAdornment = get('endAdornment');
   const placeholder = get('placeholder');
   const readOnly = get('readOnly');
@@ -178,7 +188,7 @@ export const InputTextField = React.memo(({ params, ...props }: InputTextFieldPr
   );
 
   const getValidationSx = (status?: ValidationStatus) => {
-    if (!status || status === 'default') return {};
+    if (readOnly || disabled || !status || status === 'default') return {};
 
     const color = validationColorMap[status].main;
 
