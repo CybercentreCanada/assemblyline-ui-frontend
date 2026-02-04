@@ -379,282 +379,416 @@ export const InputsSection = React.memo(() => {
 
               return (
                 <>
-                  <form.Subscribe
-                    selector={state => state.values.components.inputs.values.text}
-                    children={value => (
-                      <TextInput
-                        label="Interaction Text Input"
-                        value={value}
-                        options={TEXTFIELD_OPTIONS}
-                        onChange={(event, next) => form.setFieldValue('components.inputs.values.text', next)}
-                        {...inputProps}
-                        //
-                        // Adornment
-                        {...(reset && {
-                          reset,
-                          defaultValue: '',
-                          onReset: () => form.setFieldValue('components.inputs.values.text', '')
-                        })}
-                        //
-                        // Coercing
-                        {...(coerce && { coerce: (e, v) => ({ value: v + ' test', ignore: false }) })}
-                      />
-                    )}
-                  />
+                  <div>
+                    <form.Subscribe
+                      selector={state => state.values.components.inputs.values.text}
+                      children={value => (
+                        <TextInput
+                          label="Interaction Text Input"
+                          value={value}
+                          options={TEXTFIELD_OPTIONS}
+                          onChange={(event, next) => form.setFieldValue('components.inputs.values.text', next)}
+                          {...inputProps}
+                          //
+                          // Adornment
+                          {...(reset && {
+                            reset,
+                            defaultValue: '',
+                            onReset: () => form.setFieldValue('components.inputs.values.text', '')
+                          })}
+                          //
+                          // Coercing
+                          {...(coerce && { coerce: (e, v) => ({ value: v + ' test', ignore: false }) })}
+                        />
+                      )}
+                    />
+                    <form.Subscribe
+                      selector={state => state.values.components.inputs.values.text}
+                      children={value => (
+                        <div>
+                          <Typography color="textSecondary" variant="caption">{`${typeof value}: `}</Typography>
+                          <Typography variant="caption">{JSON.stringify(value)}</Typography>
+                        </div>
+                      )}
+                    />
+                  </div>
 
-                  <form.Subscribe
-                    selector={state => state.values.components.inputs.values.chips}
-                    children={value => (
-                      <ChipsInput
-                        label="Interaction Chips Input"
-                        value={value}
-                        options={TEXTFIELD_OPTIONS}
-                        onChange={(event, next) => form.setFieldValue('components.inputs.values.chips', next)}
-                        {...inputProps}
-                        //
-                        // Adornment
-                        {...(reset && {
-                          reset,
-                          defaultValue: [],
-                          onReset: () => form.setFieldValue('components.inputs.values.chips', [])
-                        })}
-                        //
-                        // Coercing
-                        {...(coerce && { coerce: (e, v) => ({ value: [...v, 'test'], ignore: false }) })}
-                      />
-                    )}
-                  />
+                  <div>
+                    <form.Subscribe
+                      selector={state => state.values.components.inputs.values.chips}
+                      children={value => (
+                        <ChipsInput
+                          label="Interaction Chips Input"
+                          value={value}
+                          options={TEXTFIELD_OPTIONS}
+                          onChange={(event, next) => form.setFieldValue('components.inputs.values.chips', next)}
+                          {...inputProps}
+                          //
+                          // Adornment
+                          {...(reset && {
+                            reset,
+                            defaultValue: [],
+                            onReset: () => form.setFieldValue('components.inputs.values.chips', [])
+                          })}
+                          //
+                          // Coercing
+                          {...(coerce && { coerce: (e, v) => ({ value: [...v, 'test'], ignore: false }) })}
+                        />
+                      )}
+                    />
+                    <form.Subscribe
+                      selector={state => state.values.components.inputs.values.chips}
+                      children={value => (
+                        <div>
+                          <Typography color="textSecondary" variant="caption">{`${typeof value}: `}</Typography>
+                          <Typography variant="caption">{JSON.stringify(value)}</Typography>
+                        </div>
+                      )}
+                    />
+                  </div>
 
-                  <form.Subscribe
-                    selector={state => state.values.components.inputs.values.number}
-                    children={value => (
-                      <NumberInput
-                        label="Interaction Number Input"
-                        value={value}
-                        onChange={(event, next) => form.setFieldValue('components.inputs.values.number', next)}
-                        {...inputProps}
-                        //
-                        // Adornment
-                        {...(reset && {
-                          reset,
-                          defaultValue: null,
-                          onReset: () => form.setFieldValue('components.inputs.values.number', null)
-                        })}
-                        //
-                        // Coercing
-                        {...(coerce && {
-                          coerce: (e, v) => ({ value: typeof v === 'number' ? v++ : v, ignore: false })
-                        })}
-                      />
-                    )}
-                  />
+                  <div>
+                    <form.Subscribe
+                      selector={state => state.values.components.inputs.values.number}
+                      children={value => (
+                        <NumberInput
+                          label="Interaction Number Input"
+                          value={value}
+                          onChange={(event, next) => form.setFieldValue('components.inputs.values.number', next)}
+                          {...inputProps}
+                          //
+                          // Adornment
+                          {...(reset && {
+                            reset,
+                            defaultValue: null,
+                            onReset: () => form.setFieldValue('components.inputs.values.number', null)
+                          })}
+                          //
+                          // Coercing
+                          {...(coerce && {
+                            coerce: (e, v) => ({ value: typeof v === 'number' ? v++ : v, ignore: false })
+                          })}
+                        />
+                      )}
+                    />
+                    <form.Subscribe
+                      selector={state => state.values.components.inputs.values.number}
+                      children={value => (
+                        <div>
+                          <Typography color="textSecondary" variant="caption">{`${typeof value}: `}</Typography>
+                          <Typography variant="caption">{JSON.stringify(value)}</Typography>
+                        </div>
+                      )}
+                    />
+                  </div>
 
-                  <form.Subscribe
-                    selector={state => state.values.components.inputs.values.select}
-                    children={value => (
-                      <SelectInput
-                        label="Interaction Select Input"
-                        value={value}
-                        options={SELECT_OPTIONS}
-                        onChange={(event, next) => form.setFieldValue('components.inputs.values.select', next)}
-                        {...(inputProps as SelectInputProps<typeof SELECT_OPTIONS>)}
-                        //
-                        // Adornment
-                        {...(!reset && {
-                          reset,
-                          defaultValue: null,
-                          onReset: () => form.setFieldValue('components.inputs.values.select', null)
-                        })}
-                        //
-                        // Coercing
-                        {...(coerce && {
-                          coerce: (e, v: SelectInputProps<typeof SELECT_OPTIONS>['value']) => ({
-                            value: v,
-                            ignore: false
-                          })
-                        })}
-                      />
-                    )}
-                  />
+                  <div>
+                    <form.Subscribe
+                      selector={state => state.values.components.inputs.values.select}
+                      children={value => (
+                        <SelectInput
+                          label="Interaction Select Input"
+                          value={value}
+                          options={SELECT_OPTIONS}
+                          onChange={(event, next) => form.setFieldValue('components.inputs.values.select', next)}
+                          {...(inputProps as SelectInputProps<typeof SELECT_OPTIONS>)}
+                          //
+                          // Adornment
+                          {...(!reset && {
+                            reset,
+                            defaultValue: null,
+                            onReset: () => form.setFieldValue('components.inputs.values.select', null)
+                          })}
+                          //
+                          // Coercing
+                          {...(coerce && {
+                            coerce: (e, v: SelectInputProps<typeof SELECT_OPTIONS>['value']) => ({
+                              value: v,
+                              ignore: false
+                            })
+                          })}
+                        />
+                      )}
+                    />
+                    <form.Subscribe
+                      selector={state => state.values.components.inputs.values.select}
+                      children={value => (
+                        <div>
+                          <Typography color="textSecondary" variant="caption">{`${typeof value}: `}</Typography>
+                          <Typography variant="caption">{JSON.stringify(value)}</Typography>
+                        </div>
+                      )}
+                    />
+                  </div>
 
-                  <form.Subscribe
-                    selector={state => state.values.components.inputs.values.date}
-                    children={value => (
-                      <DateInput
-                        label="Interaction Date Input"
-                        value={value}
-                        onChange={(event, next) => form.setFieldValue('components.inputs.values.date', next)}
-                        {...inputProps}
-                        //
-                        // Adornment
-                        {...(reset && {
-                          reset,
-                          defaultValue: null,
-                          onReset: () => form.setFieldValue('components.inputs.values.date', null)
-                        })}
-                        //
-                        // Coercing
-                        {...(coerce && { coerce: (e, v) => ({ value: v + ' test', ignore: false }) })}
-                      />
-                    )}
-                  />
+                  <div>
+                    <form.Subscribe
+                      selector={state => state.values.components.inputs.values.date}
+                      children={value => (
+                        <DateInput
+                          label="Interaction Date Input"
+                          value={value}
+                          onChange={(event, next) => form.setFieldValue('components.inputs.values.date', next)}
+                          {...inputProps}
+                          //
+                          // Adornment
+                          {...(reset && {
+                            reset,
+                            defaultValue: null,
+                            onReset: () => form.setFieldValue('components.inputs.values.date', null)
+                          })}
+                          //
+                          // Coercing
+                          {...(coerce && { coerce: (e, v) => ({ value: v + ' test', ignore: false }) })}
+                        />
+                      )}
+                    />
+                    <form.Subscribe
+                      selector={state => state.values.components.inputs.values.date}
+                      children={value => (
+                        <div>
+                          <Typography color="textSecondary" variant="caption">{`${typeof value}: `}</Typography>
+                          <Typography variant="caption">{JSON.stringify(value)}</Typography>
+                        </div>
+                      )}
+                    />
+                  </div>
 
-                  <form.Subscribe
-                    selector={state => state.values.components.inputs.values.classification}
-                    children={value => (
-                      <ClassificationInput
-                        label="Interaction Classification Input"
-                        value={value}
-                        onChange={(event, next) => form.setFieldValue('components.inputs.values.classification', next)}
-                        {...inputProps}
-                        //
-                        // Adornment
-                        {...(reset && {
-                          reset,
-                          defaultValue: null,
-                          onReset: () => form.setFieldValue('components.inputs.values.classification', null)
-                        })}
-                        //
-                        // Coercing
-                        {...(coerce && { coerce: (e, v) => ({ value: v + ' test', ignore: false }) })}
-                      />
-                    )}
-                  />
+                  <div>
+                    <form.Subscribe
+                      selector={state => state.values.components.inputs.values.classification}
+                      children={value => (
+                        <ClassificationInput
+                          label="Interaction Classification Input"
+                          value={value}
+                          onChange={(event, next) =>
+                            form.setFieldValue('components.inputs.values.classification', next)
+                          }
+                          {...inputProps}
+                          //
+                          // Adornment
+                          {...(reset && {
+                            reset,
+                            defaultValue: null,
+                            onReset: () => form.setFieldValue('components.inputs.values.classification', null)
+                          })}
+                          //
+                          // Coercing
+                          {...(coerce && { coerce: (e, v) => ({ value: v + ' test', ignore: false }) })}
+                        />
+                      )}
+                    />
+                    <form.Subscribe
+                      selector={state => state.values.components.inputs.values.classification}
+                      children={value => (
+                        <div>
+                          <Typography color="textSecondary" variant="caption">{`${typeof value}: `}</Typography>
+                          <Typography variant="caption">{JSON.stringify(value)}</Typography>
+                        </div>
+                      )}
+                    />
+                  </div>
 
-                  <form.Subscribe
-                    selector={state => state.values.components.inputs.values.textarea}
-                    children={value => (
-                      <TextAreaInput
-                        label="Interaction TextArea Input"
-                        value={value}
-                        onChange={(event, next) => form.setFieldValue('components.inputs.values.textarea', next)}
-                        {...inputProps}
-                        //
-                        // Adornment
-                        {...(reset && {
-                          reset,
-                          defaultValue: null,
-                          onReset: () => form.setFieldValue('components.inputs.values.textarea', null)
-                        })}
-                        //
-                        // Coercing
-                        {...(coerce && { coerce: (e, v) => ({ value: v + ' test', ignore: false }) })}
-                      />
-                    )}
-                  />
+                  <div>
+                    <form.Subscribe
+                      selector={state => state.values.components.inputs.values.textarea}
+                      children={value => (
+                        <TextAreaInput
+                          label="Interaction TextArea Input"
+                          value={value}
+                          onChange={(event, next) => form.setFieldValue('components.inputs.values.textarea', next)}
+                          {...inputProps}
+                          //
+                          // Adornment
+                          {...(reset && {
+                            reset,
+                            defaultValue: null,
+                            onReset: () => form.setFieldValue('components.inputs.values.textarea', null)
+                          })}
+                          //
+                          // Coercing
+                          {...(coerce && { coerce: (e, v) => ({ value: v + ' test', ignore: false }) })}
+                        />
+                      )}
+                    />
+                    <form.Subscribe
+                      selector={state => state.values.components.inputs.values.textarea}
+                      children={value => (
+                        <div>
+                          <Typography color="textSecondary" variant="caption">{`${typeof value}: `}</Typography>
+                          <Typography variant="caption">{JSON.stringify(value)}</Typography>
+                        </div>
+                      )}
+                    />
+                  </div>
 
-                  <form.Subscribe
-                    selector={state => state.values.components.inputs.values.slider}
-                    children={value => (
-                      <SliderInput
-                        label="Interaction Slider Input"
-                        value={value}
-                        onChange={(event, next) => form.setFieldValue('components.inputs.values.slider', next)}
-                        {...inputProps}
-                        //
-                        // Adornment
-                        {...(reset && {
-                          reset,
-                          defaultValue: null,
-                          onReset: () => form.setFieldValue('components.inputs.values.slider', null)
-                        })}
-                        //
-                        // Coercing
-                        {...(coerce && {
-                          coerce: (e, v) => ({ value: typeof v === 'number' ? v++ : v, ignore: false })
-                        })}
-                      />
-                    )}
-                  />
+                  <div>
+                    <form.Subscribe
+                      selector={state => state.values.components.inputs.values.slider}
+                      children={value => (
+                        <SliderInput
+                          label="Interaction Slider Input"
+                          value={value}
+                          onChange={(event, next) => form.setFieldValue('components.inputs.values.slider', next)}
+                          {...inputProps}
+                          //
+                          // Adornment
+                          {...(reset && {
+                            reset,
+                            defaultValue: null,
+                            onReset: () => form.setFieldValue('components.inputs.values.slider', null)
+                          })}
+                          //
+                          // Coercing
+                          {...(coerce && {
+                            coerce: (e, v) => ({ value: typeof v === 'number' ? v++ : v, ignore: false })
+                          })}
+                        />
+                      )}
+                    />
+                    <form.Subscribe
+                      selector={state => state.values.components.inputs.values.slider}
+                      children={value => (
+                        <div>
+                          <Typography color="textSecondary" variant="caption">{`${typeof value}: `}</Typography>
+                          <Typography variant="caption">{JSON.stringify(value)}</Typography>
+                        </div>
+                      )}
+                    />
+                  </div>
 
-                  <form.Subscribe
-                    selector={state => state.values.components.inputs.values.checkbox}
-                    children={value => (
-                      <CheckboxInput
-                        label="Interaction Check Input"
-                        value={value}
-                        onChange={(event, next) => form.setFieldValue('components.inputs.values.checkbox', next)}
-                        {...inputProps}
-                        //
-                        // Adornment
-                        {...(reset && {
-                          reset,
-                          defaultValue: false,
-                          onReset: () => form.setFieldValue('components.inputs.values.checkbox', false)
-                        })}
-                        //
-                        // Coercing
-                        {...(coerce && { coerce: (e, v) => ({ value: true, ignore: false }) })}
-                      />
-                    )}
-                  />
+                  <div>
+                    <form.Subscribe
+                      selector={state => state.values.components.inputs.values.checkbox}
+                      children={value => (
+                        <CheckboxInput
+                          label="Interaction Check Input"
+                          value={value}
+                          onChange={(event, next) => form.setFieldValue('components.inputs.values.checkbox', next)}
+                          {...inputProps}
+                          //
+                          // Adornment
+                          {...(reset && {
+                            reset,
+                            defaultValue: false,
+                            onReset: () => form.setFieldValue('components.inputs.values.checkbox', false)
+                          })}
+                          //
+                          // Coercing
+                          {...(coerce && { coerce: (e, v) => ({ value: true, ignore: false }) })}
+                        />
+                      )}
+                    />
+                    <form.Subscribe
+                      selector={state => state.values.components.inputs.values.checkbox}
+                      children={value => (
+                        <div>
+                          <Typography color="textSecondary" variant="caption">{`${typeof value}: `}</Typography>
+                          <Typography variant="caption">{JSON.stringify(value)}</Typography>
+                        </div>
+                      )}
+                    />
+                  </div>
 
-                  <form.Subscribe
-                    selector={state => state.values.components.inputs.values.switch}
-                    children={value => (
-                      <SwitchInput
-                        label="Interaction Switch Input"
-                        value={value}
-                        onChange={(event, next) => form.setFieldValue('components.inputs.values.switch', next)}
-                        {...inputProps}
-                        //
-                        // Adornment
-                        {...(reset && {
-                          reset,
-                          defaultValue: false,
-                          onReset: () => form.setFieldValue('components.inputs.values.switch', false)
-                        })}
-                        //
-                        // Coercing
-                        {...(coerce && { coerce: (e, v) => ({ value: true, ignore: false }) })}
-                      />
-                    )}
-                  />
+                  <div>
+                    <form.Subscribe
+                      selector={state => state.values.components.inputs.values.switch}
+                      children={value => (
+                        <SwitchInput
+                          label="Interaction Switch Input"
+                          value={value}
+                          onChange={(event, next) => form.setFieldValue('components.inputs.values.switch', next)}
+                          {...inputProps}
+                          //
+                          // Adornment
+                          {...(reset && {
+                            reset,
+                            defaultValue: false,
+                            onReset: () => form.setFieldValue('components.inputs.values.switch', false)
+                          })}
+                          //
+                          // Coercing
+                          {...(coerce && { coerce: (e, v) => ({ value: true, ignore: false }) })}
+                        />
+                      )}
+                    />
+                    <form.Subscribe
+                      selector={state => state.values.components.inputs.values.switch}
+                      children={value => (
+                        <div>
+                          <Typography color="textSecondary" variant="caption">{`${typeof value}: `}</Typography>
+                          <Typography variant="caption">{JSON.stringify(value)}</Typography>
+                        </div>
+                      )}
+                    />
+                  </div>
 
-                  <form.Subscribe
-                    selector={state => state.values.components.inputs.values.radio}
-                    children={value => (
-                      <RadioInput
-                        label="Interaction Radio Input"
-                        value={value}
-                        options={RADIO_OPTIONS}
-                        onChange={(event, next) => form.setFieldValue('components.inputs.values.radio', next)}
-                        {...(inputProps as RadioInputProps<typeof RADIO_OPTIONS>)}
-                        //
-                        // Adornment
-                        {...(reset && {
-                          reset,
-                          defaultValue: RADIO_OPTIONS[0].value,
-                          onReset: () => form.setFieldValue('components.inputs.values.radio', RADIO_OPTIONS[0].value)
-                        })}
-                        //
-                        // Coercing
-                        {...(coerce && { coerce: () => ({ value: RADIO_OPTIONS[1].value, ignore: false }) })}
-                      />
-                    )}
-                  />
+                  <div>
+                    <form.Subscribe
+                      selector={state => state.values.components.inputs.values.radio}
+                      children={value => (
+                        <RadioInput
+                          label="Interaction Radio Input"
+                          value={value}
+                          options={RADIO_OPTIONS}
+                          onChange={(event, next) => form.setFieldValue('components.inputs.values.radio', next)}
+                          {...(inputProps as RadioInputProps<typeof RADIO_OPTIONS>)}
+                          //
+                          // Adornment
+                          {...(reset && {
+                            reset,
+                            defaultValue: RADIO_OPTIONS[0].value,
+                            onReset: () => form.setFieldValue('components.inputs.values.radio', RADIO_OPTIONS[0].value)
+                          })}
+                          //
+                          // Coercing
+                          {...(coerce && { coerce: () => ({ value: RADIO_OPTIONS[1].value, ignore: false }) })}
+                        />
+                      )}
+                    />
+                    <form.Subscribe
+                      selector={state => state.values.components.inputs.values.radio}
+                      children={value => (
+                        <div>
+                          <Typography color="textSecondary" variant="caption">{`${typeof value}: `}</Typography>
+                          <Typography variant="caption">{JSON.stringify(value)}</Typography>
+                        </div>
+                      )}
+                    />
+                  </div>
 
-                  <form.Subscribe
-                    selector={state => state.values.components.inputs.values.json}
-                    children={value => (
-                      <JSONInput
-                        label="Interaction JSON Input"
-                        value={value}
-                        onChange={(event, next) => form.setFieldValue('components.inputs.values.json', next)}
-                        {...inputProps}
-                        //
-                        // Adornment
-                        {...(reset && {
-                          reset,
-                          defaultValue: {},
-                          onReset: () => form.setFieldValue('components.inputs.values.json', {})
-                        })}
-                        //
-                        // Coercing
-                        {...(coerce && { coerce: (e, v) => ({ value: { coerced: 'coerced' }, ignore: false }) })}
-                      />
-                    )}
-                  />
+                  <div>
+                    <form.Subscribe
+                      selector={state => state.values.components.inputs.values.json}
+                      children={value => (
+                        <JSONInput
+                          label="Interaction JSON Input"
+                          value={value}
+                          onChange={(event, next) => form.setFieldValue('components.inputs.values.json', next)}
+                          {...inputProps}
+                          //
+                          // Adornment
+                          {...(reset && {
+                            reset,
+                            defaultValue: {},
+                            onReset: () => form.setFieldValue('components.inputs.values.json', {})
+                          })}
+                          //
+                          // Coercing
+                          {...(coerce && { coerce: (e, v) => ({ value: { coerced: 'coerced' }, ignore: false }) })}
+                        />
+                      )}
+                    />
+                    <form.Subscribe
+                      selector={state => state.values.components.inputs.values.json}
+                      children={value => (
+                        <div>
+                          <Typography color="textSecondary" variant="caption">{`${typeof value}: `}</Typography>
+                          <Typography variant="caption">{JSON.stringify(value)}</Typography>
+                        </div>
+                      )}
+                    />
+                  </div>
                 </>
               );
             }}
