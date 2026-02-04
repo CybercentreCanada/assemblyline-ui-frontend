@@ -5,9 +5,11 @@ import type { CustomChipProps } from 'components/visual/CustomChip';
 import { CustomChip } from 'components/visual/CustomChip';
 import {
   ClearInputAdornment,
+  HelpInputAdornment,
   InputEndAdornment,
   NumericalSpinnerInputAdornment,
   PasswordInputAdornment,
+  ProgressInputAdornment,
   ResetInputAdornment
 } from 'components/visual/Inputs/components/inputs.component.adornment';
 import { useInputId, useInputLabel } from 'components/visual/Inputs/hooks/inputs.hook.renderer';
@@ -166,7 +168,13 @@ export const InputTextField = React.memo(({ params, ...props }: InputTextFieldPr
       info: { main: theme.palette.info.main },
       default: { main: theme.palette.text.secondary }
     }),
-    []
+    [
+      theme.palette.error.main,
+      theme.palette.info.main,
+      theme.palette.success.main,
+      theme.palette.text.secondary,
+      theme.palette.warning.main
+    ]
   );
 
   const getValidationSx = (status?: ValidationStatus) => {
@@ -245,7 +253,9 @@ export const InputTextField = React.memo(({ params, ...props }: InputTextFieldPr
             <InputEndAdornment preventRender={!props?.slotProps?.input?.['endAdornment']}>
               {props?.slotProps?.input?.['endAdornment']}
               {endAdornment}
+              <HelpInputAdornment />
               <PasswordInputAdornment />
+              <ProgressInputAdornment />
               <ResetInputAdornment />
               <NumericalSpinnerInputAdornment />
               <ClearInputAdornment />

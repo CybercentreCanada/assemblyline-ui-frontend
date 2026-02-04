@@ -4,7 +4,7 @@ import { PropProvider, usePropStore } from 'components/core/PropProvider/PropPro
 import type { AnchorProps } from 'components/core/TableOfContent/Anchor';
 import { Anchor } from 'components/core/TableOfContent/Anchor';
 import { ResetInputAdornment } from 'components/visual/Inputs/components/inputs.component.adornment';
-import { InputCircularSkeleton } from 'components/visual/Inputs/components/inputs.component.form';
+import { InputCircularSkeleton } from 'components/visual/Inputs/components/inputs.component.buttons';
 import { useInputId, useInputLabel } from 'components/visual/Inputs/hooks/inputs.hook.renderer';
 import type { InputValueModel } from 'components/visual/Inputs/models/inputs.model';
 import {

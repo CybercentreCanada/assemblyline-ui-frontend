@@ -1,7 +1,9 @@
 import type { TextFieldProps } from '@mui/material';
 import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
 import {
+  HelpInputAdornment,
   PasswordInputAdornment,
+  ProgressInputAdornment,
   ResetInputAdornment
 } from 'components/visual/Inputs/components/inputs.component.adornment';
 import { useInputBlur, useInputChange, useInputFocus } from 'components/visual/Inputs/hooks/inputs.hook.event_handlers';
@@ -75,7 +77,9 @@ const WrappedNumberListInput = React.memo(() => {
             <ListInputLoading />
           ) : (
             <>
+              <HelpInputAdornment />
               <PasswordInputAdornment />
+              <ProgressInputAdornment />
               <ResetInputAdornment />
               <ListInputTextField
                 ref={inputRef}

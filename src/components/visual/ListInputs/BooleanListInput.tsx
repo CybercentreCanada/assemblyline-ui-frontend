@@ -1,7 +1,9 @@
 import { Switch } from '@mui/material';
 import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
 import {
+  HelpInputAdornment,
   PasswordInputAdornment,
+  ProgressInputAdornment,
   ResetInputAdornment
 } from 'components/visual/Inputs/components/inputs.component.adornment';
 import {
@@ -58,7 +60,9 @@ const WrappedSwitchListInput = React.memo(() => {
             <ListInputLoading />
           ) : (
             <>
+              <HelpInputAdornment />
               <PasswordInputAdornment />
+              <ProgressInputAdornment />
               <ResetInputAdornment />
               <div style={{ minHeight: '41px' }}>
                 <Switch

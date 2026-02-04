@@ -27,6 +27,7 @@ export const ListInputLoading = React.memo(
     marginRight: theme.spacing(0.5)
   }))
 );
+
 ListInputLoading.displayName = 'ListInputLoading';
 
 /**********************************************************************************************************************
@@ -53,6 +54,7 @@ export const ListInputRoot = React.memo(({ sx, ...props }: ListItemProps) => {
     />
   );
 });
+
 ListInputRoot.displayName = 'ListInputRoot';
 
 export const ListInputWrapper = React.memo(
@@ -64,6 +66,7 @@ export const ListInputWrapper = React.memo(
     minWidth: 0
   })
 );
+
 ListInputWrapper.displayName = 'ListInputWrapper';
 
 export const ListInputInner = React.memo(
@@ -75,6 +78,7 @@ export const ListInputInner = React.memo(
     columnGap: theme.spacing(1)
   }))
 );
+
 ListInputInner.displayName = 'ListInputInner';
 
 export const ListInputButtonRoot = React.memo(({ children, sx, ...props }: ListItemButtonProps) => {
@@ -106,6 +110,7 @@ export const ListInputButtonRoot = React.memo(({ children, sx, ...props }: ListI
     </ListItemButton>
   );
 });
+
 ListInputButtonRoot.displayName = 'ListInputButtonRoot';
 
 export type ListInputTextProps = React.LabelHTMLAttributes<HTMLLabelElement> & {
@@ -175,6 +180,7 @@ export const ListInputText = React.memo(({ noLabel = false, ...props }: ListInpu
     </Box>
   );
 });
+
 ListInputText.displayName = 'ListInputText';
 
 export const ListInputHelperText = React.memo(() => {
@@ -183,7 +189,7 @@ export const ListInputHelperText = React.memo(() => {
 
   const disabled = get('disabled');
   const helperText = get('helperText');
-  const helperTextProps = get('helperTextProps');
+  const helperTextProps = get('slotProps')?.helperText;
   const id = useInputId();
   const loading = get('loading');
   const readOnly = get('readOnly');
@@ -235,6 +241,7 @@ export const ListInputHelperText = React.memo(() => {
 
   return null;
 });
+
 ListInputHelperText.displayName = 'ListInputHelperText';
 
 export type ListInputTextFieldProps = TextFieldProps & {
@@ -286,4 +293,5 @@ export const ListInputTextField = React.memo(({ params, ...props }: ListInputTex
     />
   );
 });
+
 ListInputTextField.displayName = 'ListInputTextField';

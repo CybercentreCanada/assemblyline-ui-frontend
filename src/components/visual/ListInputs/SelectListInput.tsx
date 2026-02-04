@@ -2,7 +2,9 @@ import type { ListItemTextProps, MenuItemProps, SelectProps } from '@mui/materia
 import { ListItemText, MenuItem, Select, useTheme } from '@mui/material';
 import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
 import {
+  HelpInputAdornment,
   PasswordInputAdornment,
+  ProgressInputAdornment,
   ResetInputAdornment
 } from 'components/visual/Inputs/components/inputs.component.adornment';
 import { InputListItemText } from 'components/visual/Inputs/components/inputs.component.form';
@@ -76,7 +78,9 @@ const WrappedSelectListInput = <O extends readonly Option[]>() => {
             <ListInputLoading />
           ) : (
             <>
+              <HelpInputAdornment />
               <PasswordInputAdornment />
+              <ProgressInputAdornment />
               <ResetInputAdornment />
               <Select
                 disabled={disabled}

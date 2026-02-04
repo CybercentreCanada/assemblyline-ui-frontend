@@ -2,20 +2,12 @@ import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
 import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import WarningAmberOutlinedIcon from '@mui/icons-material/WarningAmberOutlined';
-import type {
-  FormControlProps,
-  ListItemButtonProps,
-  ListItemProps,
-  ListItemTextProps,
-  TypographyProps
-} from '@mui/material';
+import type { ListItemTextProps, TypographyProps } from '@mui/material';
 import {
   Badge,
   FormControl,
   FormHelperText,
   InputLabel,
-  ListItem,
-  ListItemButton,
   ListItemText,
   Skeleton,
   Typography,
@@ -33,20 +25,20 @@ import React, { useMemo } from 'react';
 export const InputSkeleton = React.memo(() => {
   const [get] = usePropStore<InputControllerProps>();
 
+  const id = useInputId();
+  const skeletonProps = get('slotProps')?.skeleton;
   const tiny = get('tiny');
 
-  return <Skeleton sx={{ height: '40px', transform: 'unset', ...(tiny && { height: '28px' }) }} />;
+  return (
+    <Skeleton
+      id={`${id}-skeleton`}
+      {...skeletonProps}
+      sx={{ height: '40px', transform: 'unset', ...(tiny && { height: '28px' }), ...skeletonProps?.sx }}
+    />
+  );
 });
 
 InputSkeleton.displayName = 'InputSkeleton';
-
-export const InputCircularSkeleton = () => (
-  <div style={{ minWidth: '40px', display: 'flex', justifyContent: 'center' }}>
-    <Skeleton variant="circular" sx={{ height: '24px', width: '24px' }} />
-  </div>
-);
-
-InputCircularSkeleton.displayName = 'InputCircularSkeleton';
 
 /**********************************************************************************************************************
  * Forms
@@ -56,10 +48,10 @@ export const InputRoot = React.memo(({ children }: { children: React.ReactNode }
   const [get] = usePropStore<InputControllerProps>();
 
   const id = useInputId();
-  const rootProps = get('rootProps');
+  const rootProps = get('slotProps')?.root;
 
   return (
-    <div {...rootProps} id={`${id}-root`} style={{ textAlign: 'left', ...rootProps?.style }}>
+    <div id={`${id}-root`} {...rootProps} style={{ textAlign: 'left', ...rootProps?.style }}>
       {children}
     </div>
   );
@@ -67,27 +59,27 @@ export const InputRoot = React.memo(({ children }: { children: React.ReactNode }
 
 InputRoot.displayName = 'InputRoot';
 
-export const InputFormControl = React.memo(({ children, ...props }: FormControlProps) => {
+export const InputFormControl = React.memo(({ children }: { children: React.ReactNode }) => {
   const theme = useTheme();
 
   const [get] = usePropStore<InputControllerProps>();
 
   const disabled = get('disabled');
   const divider = get('divider');
+  const formControlProps = get('slotProps')?.formControl;
   const id = useInputId();
   const readOnly = get('readOnly');
 
   return (
     <FormControl
-      id={`${id}-form`}
+      id={`${id}-form-control`}
       component="form"
       size="small"
       fullWidth
+      onSubmit={(e: React.SyntheticEvent) => e.preventDefault()}
       {...(readOnly && !disabled && { isFocused: null })}
-      {...props}
-      onSubmit={e => e.preventDefault()}
+      {...formControlProps}
       sx={{
-        ...props?.sx,
         ...(divider && { borderBottom: `1px solid ${theme.palette.divider}` }),
         ...(readOnly &&
           !disabled && {
@@ -95,7 +87,8 @@ export const InputFormControl = React.memo(({ children, ...props }: FormControlP
             '& .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline': {
               borderColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.23)' : 'rgba(0, 0, 0, 0.23)'
             }
-          })
+          }),
+        ...formControlProps?.sx
       }}
     >
       {children}
@@ -172,22 +165,24 @@ export const InputFormLabel = React.memo(() => {
   const [get] = usePropStore<InputControllerProps>();
 
   const disabled = get('disabled');
+  const formLabelProps = get('slotProps')?.formLabel;
+  const formLabelTooltipProps = get('slotProps')?.formLabelTooltip;
   const id = useInputId();
   const isFocused = get('isFocused');
   const label = useInputLabel();
-  const labelProps = get('labelProps');
   const loading = get('loading');
   const overflowHidden = get('overflowHidden');
   const preventDisabledColor = get('preventDisabledColor');
   const readOnly = get('readOnly');
   const tooltip = get('tooltip');
-  const tooltipProps = get('tooltipProps');
   const validationStatus = get('validationStatus');
 
   const color = useMemo<TypographyProps['color']>(() => {
     if (!preventDisabledColor && (disabled || loading)) {
       return 'textDisabled';
     }
+
+    if (readOnly) return 'textSecondary';
 
     switch (validationStatus) {
       case 'error':
@@ -201,28 +196,38 @@ export const InputFormLabel = React.memo(() => {
       case 'default':
       default:
         if (isFocused) return 'primary';
-        if (readOnly) return 'textSecondary';
         return 'textSecondary';
     }
   }, [disabled, isFocused, loading, preventDisabledColor, readOnly, validationStatus]);
 
   return (
-    <Tooltip title={tooltip} {...tooltipProps}>
+    <Tooltip
+      title={tooltip}
+      {...formLabelTooltipProps}
+      slotProps={{
+        ...formLabelTooltipProps?.slotProps,
+        tooltip: {
+          ...formLabelTooltipProps?.slotProps?.tooltip,
+          style: { whiteSpace: 'normal', ...(formLabelTooltipProps?.slotProps?.tooltip as any)?.style }
+        }
+      }}
+    >
       <Typography
+        id={`${id}-form-label`}
         color={color}
         component={InputLabel}
         gutterBottom
         htmlFor={id}
         variant="body2"
         whiteSpace="nowrap"
-        {...labelProps}
+        {...formLabelProps}
         sx={{
           ...(!overflowHidden && { whiteSpace: 'normal' }),
           ...(disabled &&
             !preventDisabledColor && {
               WebkitTextFillColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.38)'
             }),
-          ...labelProps?.sx
+          ...formLabelProps?.sx
         }}
       >
         <InputRequiredBadge>{label}</InputRequiredBadge>
@@ -239,18 +244,16 @@ export const InputHelperText = React.memo(() => {
 
   const disabled = get('disabled');
   const helperText = get('helperText');
-  const helperTextProps = get('helperTextProps');
+  const helperTextProps = get('slotProps')?.helperText;
   const id = useInputId();
   const loading = get('loading');
   const readOnly = get('readOnly');
   const validationMessage = get('validationMessage');
   const validationStatus = get('validationStatus');
 
-  // Do not render helper text in non-interactive states
   if (disabled || loading || readOnly) return null;
 
-  // No validation feedback to display
-  if (!validationStatus || !helperText) return null;
+  if (!(validationMessage || helperText)) return null;
 
   const color = (() => {
     switch (validationStatus) {
@@ -278,6 +281,7 @@ export const InputHelperText = React.memo(() => {
         return WarningAmberOutlinedIcon;
       case 'error':
         return ErrorOutlineOutlinedIcon;
+      case 'default':
       default:
         return null;
     }
@@ -291,15 +295,14 @@ export const InputHelperText = React.memo(() => {
       {...helperTextProps}
       sx={{
         color,
-        marginLeft: 0,
         display: 'flex',
         flexDirection: 'row',
         gap: 0.5,
+        ...(validationMessage && validationStatus !== 'default' && { marginLeft: 0 }),
         ...helperTextProps?.sx
       }}
     >
       {Icon && <Icon fontSize="small" />}
-
       <span>{validationMessage ?? helperText}</span>
     </FormHelperText>
   );
@@ -310,29 +313,6 @@ InputHelperText.displayName = 'InputHelperText';
 /**********************************************************************************************************************
  * List
  *********************************************************************************************************************/
-
-export type InputListItemProps = {
-  button?: boolean;
-  children?: React.ReactNode;
-  buttonProps?: ListItemButtonProps;
-  itemProps?: ListItemProps;
-};
-
-export const InputListItem: React.FC<InputListItemProps> = React.memo(
-  ({ button = false, children = null, buttonProps = null, itemProps = null }: InputListItemProps) => {
-    switch (button) {
-      case true:
-        return <ListItemButton role={undefined} {...buttonProps} children={children} />;
-      case false:
-        return <ListItem {...itemProps} children={children} />;
-      default:
-        return null;
-    }
-  }
-);
-
-InputListItem.displayName = 'InputListItem';
-
 export const InputListItemText = React.memo(({ primary, secondary = null, ...props }: ListItemTextProps) => {
   const [get] = usePropStore<InputControllerProps>();
 

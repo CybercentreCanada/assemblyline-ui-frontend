@@ -2,8 +2,10 @@ import type { FormControlLabelProps } from '@mui/material';
 import { Radio, RadioGroup } from '@mui/material';
 import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
 import {
+  HelpInputAdornment,
   InputButtonEndAdornment,
   PasswordInputAdornment,
+  ProgressInputAdornment,
   ResetInputAdornment
 } from 'components/visual/Inputs/components/inputs.component.adornment';
 import {
@@ -97,7 +99,9 @@ const WrappedRadioInput = <O extends readonly Option[]>() => {
         </RadioGroup>
 
         <InputButtonEndAdornment>
+          <HelpInputAdornment />
           <PasswordInputAdornment />
+          <ProgressInputAdornment />
           <ResetInputAdornment />
         </InputButtonEndAdornment>
       </InputFormControl>
@@ -130,7 +134,7 @@ export const RadioInput = <O extends readonly Option[]>({
         ...props
       }}
     >
-      <WrappedRadioInput />
+      <WrappedRadioInput<O> />
     </PropProvider>
   );
 };

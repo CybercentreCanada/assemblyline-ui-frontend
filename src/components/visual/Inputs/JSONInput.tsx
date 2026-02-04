@@ -4,8 +4,10 @@ import { useTheme } from '@mui/material';
 import { useAppTheme } from 'commons/components/app/hooks';
 import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
 import {
+  HelpInputAdornment,
   InputEndAdornment,
   PasswordInputAdornment,
+  ProgressInputAdornment,
   ResetInputAdornment
 } from 'components/visual/Inputs/components/inputs.component.adornment';
 import {
@@ -124,7 +126,9 @@ const WrappedJSONInput = () => {
                 }}
               />
               <InputEndAdornment>
+                <HelpInputAdornment />
                 <PasswordInputAdornment />
+                <ProgressInputAdornment />
                 <ResetInputAdornment />
               </InputEndAdornment>
             </div>

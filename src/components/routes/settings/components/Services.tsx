@@ -123,6 +123,7 @@ const Parameter = React.memo(({ customize, disabled, loading, param_id, spec_id 
     />
   );
 });
+
 Parameter.displayName = 'Parameter';
 
 type ServiceProps = {
@@ -213,6 +214,7 @@ const Service = React.memo(({ cat_id, svr_id, customize, disabled, loading }: Se
     </div>
   );
 });
+
 Service.displayName = 'Service';
 
 type CategoryProps = {
@@ -291,6 +293,7 @@ const Category = React.memo(
     );
   }
 );
+
 Category.displayName = 'Category';
 
 export const ServicesSection = React.memo(() => {
@@ -333,4 +336,5 @@ export const ServicesSection = React.memo(() => {
     />
   );
 });
+
 ServicesSection.displayName = 'ServicesSection';

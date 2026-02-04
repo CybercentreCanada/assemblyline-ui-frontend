@@ -3,14 +3,17 @@ import { Checkbox } from '@mui/material';
 import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
 import {
   ExpandInputAdornment,
+  HelpInputAdornment,
   InputButtonEndAdornment,
   PasswordInputAdornment,
+  ProgressInputAdornment,
   ResetInputAdornment
 } from 'components/visual/Inputs/components/inputs.component.adornment';
 import {
   InputButtonFormControlLabel,
   InputButtonLabel,
-  InputFormButton
+  InputFormButton,
+  InputFormButtonTooltip
 } from 'components/visual/Inputs/components/inputs.component.buttons';
 import { InputFormControl, InputHelperText } from 'components/visual/Inputs/components/inputs.component.form';
 import {
@@ -20,13 +23,18 @@ import {
 } from 'components/visual/Inputs/hooks/inputs.hook.event_handlers';
 import { useInputId } from 'components/visual/Inputs/hooks/inputs.hook.renderer';
 import { useInputValidation } from 'components/visual/Inputs/hooks/inputs.hook.validation';
-import type { InputOptions, InputRuntimeState, InputValueModel } from 'components/visual/Inputs/models/inputs.model';
+import type {
+  InputOptions,
+  InputRuntimeState,
+  InputSlotProps,
+  InputValueModel
+} from 'components/visual/Inputs/models/inputs.model';
 import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/models/inputs.model';
-import { Tooltip } from 'components/visual/Tooltip';
 import React from 'react';
 
 export type CheckboxInputProps = InputValueModel<boolean, boolean, React.MouseEvent<HTMLButtonElement, MouseEvent>> &
-  InputOptions & {
+  InputOptions &
+  InputSlotProps & {
     indeterminate?: CheckboxProps['indeterminate'];
   };
 
@@ -35,14 +43,12 @@ type CheckboxInputController = CheckboxInputProps & InputRuntimeState;
 const WrappedCheckboxInput = () => {
   const [get] = usePropStore<CheckboxInputController>();
 
+  const endAdornment = get('endAdornment');
   const id = useInputId();
   const indeterminate = get('indeterminate');
-  const rawValue = Boolean(get('rawValue'));
-  const loading = get('loading');
   const preventDisabledColor = get('preventDisabledColor');
+  const rawValue = Boolean(get('rawValue'));
   const readOnly = get('readOnly');
-  const tooltip = get('tooltip');
-  const tooltipProps = get('tooltipProps');
   const value = get('value');
 
   const handleBlur = useInputClickBlur<boolean>();
@@ -50,7 +56,7 @@ const WrappedCheckboxInput = () => {
   const handleFocus = useInputFocus<boolean>();
 
   return (
-    <Tooltip title={loading ? null : tooltip} {...tooltipProps}>
+    <InputFormButtonTooltip>
       <InputFormControl>
         <InputFormButton
           onBlur={e => handleBlur(e, value, value)}
@@ -79,12 +85,15 @@ const WrappedCheckboxInput = () => {
         <InputHelperText />
 
         <InputButtonEndAdornment>
+          {endAdornment}
+          <HelpInputAdornment />
           <PasswordInputAdornment />
+          <ProgressInputAdornment />
           <ResetInputAdornment />
           <ExpandInputAdornment />
         </InputButtonEndAdornment>
       </InputFormControl>
-    </Tooltip>
+    </InputFormButtonTooltip>
   );
 };
 

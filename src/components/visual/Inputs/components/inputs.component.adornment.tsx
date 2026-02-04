@@ -1,25 +1,28 @@
 import { ExpandMore } from '@mui/icons-material';
 import ClearIcon from '@mui/icons-material/Clear';
+import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 import RefreshOutlinedIcon from '@mui/icons-material/RefreshOutlined';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import type { InputAdornmentProps } from '@mui/material';
-import { Button, IconButton, InputAdornment, ListItemIcon, useTheme } from '@mui/material';
+import { Button, CircularProgress, InputAdornment, ListItemIcon, useTheme } from '@mui/material';
 import { usePropStore } from 'components/core/PropProvider/PropProvider';
 import type { IconButtonProps } from 'components/visual/Buttons/IconButton';
+import { IconButton } from 'components/visual/Buttons/IconButton';
 import { useInputChange } from 'components/visual/Inputs/hooks/inputs.hook.event_handlers';
 import {
   useInputId,
   useShouldRenderAdornments,
   useShouldRenderClear,
   useShouldRenderExpand,
+  useShouldRenderHelp,
   useShouldRenderMenu,
   useShouldRenderNumericalSpinner,
   useShouldRenderPassword,
+  useShouldRenderProgress,
   useShouldRenderReset
 } from 'components/visual/Inputs/hooks/inputs.hook.renderer';
 import type { InputControllerProps } from 'components/visual/Inputs/models/inputs.model';
-import { Tooltip } from 'components/visual/Tooltip';
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { LinkProps } from 'react-router-dom';
@@ -30,7 +33,7 @@ export const ClearInputAdornment = React.memo(() => {
   const [get] = usePropStore<InputControllerProps<string[], string[]>>();
 
   const disabled = get('disabled');
-  const expandProps = get('expandProps');
+  const clearAdornmentProps = get('slotProps')?.clearAdornment;
   const id = useInputId();
   const rawValue = get('rawValue');
   const shouldRenderClear = useShouldRenderClear();
@@ -41,7 +44,7 @@ export const ClearInputAdornment = React.memo(() => {
   return !shouldRenderClear ? null : (
     <ListItemIcon sx={{ minWidth: 0 }}>
       <IconButton
-        aria-label={`${id}-clear`}
+        id={`${id}-clear-adornment`}
         color="secondary"
         disabled={disabled || !rawValue?.length}
         type="button"
@@ -50,10 +53,10 @@ export const ClearInputAdornment = React.memo(() => {
           event.stopPropagation();
           handleChange(event, [], []);
         }}
-        {...expandProps}
+        {...clearAdornmentProps}
         sx={{
           padding: tiny ? theme.spacing(0.25) : theme.spacing(0.5),
-          ...expandProps?.sx
+          ...clearAdornmentProps?.sx
         }}
       >
         <ClearIcon fontSize="small" />
@@ -70,7 +73,7 @@ export const ExpandInputAdornment = React.memo(() => {
   const [get] = usePropStore<InputControllerProps>();
 
   const expand = get('expand');
-  const expandProps = get('expandProps');
+  const expandAdornmentProps = get('slotProps')?.expandAdornment;
   const id = useInputId();
   const onExpand = get('onExpand');
   const shouldRenderExpand = useShouldRenderExpand();
@@ -78,14 +81,14 @@ export const ExpandInputAdornment = React.memo(() => {
   return !shouldRenderExpand ? null : (
     <ListItemIcon sx={{ minWidth: 0 }}>
       <IconButton
-        aria-label={`${id}-expand`}
+        id={`${id}-expand-adornment`}
         type="button"
         onClick={event => {
           event.preventDefault();
           event.stopPropagation();
           onExpand(event);
         }}
-        {...expandProps}
+        {...expandAdornmentProps}
       >
         <ExpandMore
           fontSize="small"
@@ -114,18 +117,18 @@ export const HelpInputAdornment = React.memo(
   ({ to = null, variant = 'icon', onClick = () => null }: HelpInputAdornmentProps) => {
     const theme = useTheme();
 
-    const [get, setStore] = usePropStore<InputControllerProps>();
+    const [get] = usePropStore<InputControllerProps>();
 
-    const disabled = get('disabled');
+    const helpAdornmentProps = get('slotProps')?.helpAdornment;
     const id = useInputId();
-    const isPasswordVisible = get('isPasswordVisible');
-    const resetProps = get('resetProps');
-    const shouldRenderPassword = useShouldRenderPassword();
+    const shouldRenderHelp = useShouldRenderHelp();
     const tiny = get('tiny');
+
+    if (!shouldRenderHelp) return null;
 
     return variant === 'icon' ? (
       <IconButton
-        aria-label={`${id}-help`}
+        id={`${id}-help-adornment`}
         color="secondary"
         type="button"
         onClick={event => {
@@ -133,11 +136,13 @@ export const HelpInputAdornment = React.memo(
           event.stopPropagation();
           onClick(event);
         }}
+        {...helpAdornmentProps}
         sx={{
-          padding: tiny ? theme.spacing(0.25) : theme.spacing(0.5)
+          padding: tiny ? theme.spacing(0.25) : theme.spacing(0.5),
+          ...helpAdornmentProps?.sx
         }}
       >
-        <ClearIcon fontSize="small" />
+        <HelpOutlineOutlinedIcon fontSize="small" />
       </IconButton>
     ) : null;
   }
@@ -153,7 +158,7 @@ export const MenuInputAdornment = React.memo(() => {
   const disabled = get('disabled');
   const id = useInputId();
   const isMenuOpen = get('isMenuOpen');
-  const resetProps = get('resetProps');
+  const resetAdornmentProps = get('slotProps')?.resetAdornment;
   const shouldRenderMenu = useShouldRenderMenu();
   const tiny = get('tiny');
 
@@ -165,14 +170,14 @@ export const MenuInputAdornment = React.memo(() => {
       type="button"
       tabIndex={-1}
       onClick={() => setStore({ isMenuOpen: true })}
-      {...resetProps}
+      {...resetAdornmentProps}
       sx={{
         padding: tiny ? theme.spacing(0.75) : theme.spacing(1),
         transition: theme.transitions.create('transform', {
           duration: theme.transitions.duration.shortest
         }),
         transform: isMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-        ...resetProps?.sx
+        ...resetAdornmentProps?.sx
       }}
     >
       <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
@@ -328,28 +333,31 @@ export const NumericalSpinnerInputAdornment = () => {
 NumericalSpinnerInputAdornment.displayName = 'NumericalSpinnerInputAdornment';
 
 export const PasswordInputAdornment = React.memo(() => {
+  const { t } = useTranslation('inputs');
   const theme = useTheme();
 
   const [get, setStore] = usePropStore<InputControllerProps>();
 
-  const disabled = get('disabled');
   const id = useInputId();
   const isPasswordVisible = get('isPasswordVisible');
-  const resetProps = get('resetProps');
+  const resetAdornmentProps = get('slotProps')?.resetAdornment;
   const shouldRenderPassword = useShouldRenderPassword();
   const tiny = get('tiny');
 
-  return !shouldRenderPassword ? null : (
+  if (!shouldRenderPassword) return null;
+
+  return (
     <IconButton
-      aria-label={`${id}-password`}
+      id={`${id}-password-adornment`}
       color="secondary"
-      disabled={disabled}
       type="button"
-      onClick={() => setStore(s => ({ isPasswordVisible: !s.isPasswordVisible }))}
-      {...resetProps}
+      tooltip={isPasswordVisible ? t('adornment.password.show') : t('adornment.password.hide')}
+      tooltipProps={{ arrow: true }}
+      onClick={() => setStore({ isPasswordVisible: !isPasswordVisible })}
+      {...resetAdornmentProps}
       sx={{
         padding: tiny ? theme.spacing(0.25) : theme.spacing(0.5),
-        ...resetProps?.sx
+        ...resetAdornmentProps?.sx
       }}
     >
       {isPasswordVisible ? <VisibilityOff fontSize="small" /> : <Visibility fontSize="small" />}
@@ -359,6 +367,29 @@ export const PasswordInputAdornment = React.memo(() => {
 
 PasswordInputAdornment.displayName = 'PasswordInputAdornment';
 
+export const ProgressInputAdornment = React.memo(() => {
+  const [get] = usePropStore<InputControllerProps>();
+
+  const id = useInputId();
+  const progressAdornmentProps = get('slotProps')?.progressAdornment;
+  const shouldRenderProgress = useShouldRenderProgress();
+  const tiny = get('tiny');
+
+  if (!shouldRenderProgress) return null;
+
+  return (
+    <CircularProgress
+      id={`${id}-password-adornment`}
+      color="secondary"
+      size={tiny ? '24px' : '28px'}
+      {...progressAdornmentProps}
+      sx={{ padding: tiny ? '2px' : '4px', ...progressAdornmentProps?.sx }}
+    />
+  );
+});
+
+ProgressInputAdornment.displayName = 'ProgressInputAdornment';
+
 export const ResetInputAdornment = React.memo(() => {
   const { t } = useTranslation('inputs');
   const theme = useTheme();
@@ -366,16 +397,15 @@ export const ResetInputAdornment = React.memo(() => {
   const [get] = usePropStore<InputControllerProps>();
 
   const defaultValue = get('defaultValue');
-  const disabled = get('disabled');
   const id = useInputId();
   const onReset = get('onReset');
-  const resetProps = get('resetProps');
+  const resetAdornmentProps = get('slotProps')?.resetAdornment;
   const shouldRenderReset = useShouldRenderReset();
   const tiny = get('tiny');
 
   const handleChange = useInputChange();
 
-  const title = useMemo<React.ReactNode>(
+  const tooltip = useMemo<React.ReactNode>(
     () =>
       defaultValue === undefined ? null : (
         <>
@@ -392,23 +422,24 @@ export const ResetInputAdornment = React.memo(() => {
     [defaultValue, t, theme.palette.text.secondary]
   );
 
-  return !shouldRenderReset ? null : (
-    <Tooltip arrow title={title} placement="bottom">
-      <IconButton
-        aria-label={`${id}-reset`}
-        color="secondary"
-        disabled={disabled}
-        type="reset"
-        onClick={event => (onReset ? onReset(event) : handleChange(event, defaultValue, defaultValue))}
-        {...resetProps}
-        sx={{
-          padding: tiny ? theme.spacing(0.25) : theme.spacing(0.5),
-          ...resetProps?.sx
-        }}
-      >
-        <RefreshOutlinedIcon fontSize="small" />
-      </IconButton>
-    </Tooltip>
+  if (!shouldRenderReset) return null;
+
+  return (
+    <IconButton
+      id={`${id}-reset-adornment`}
+      color="secondary"
+      type="reset"
+      tooltip={tooltip}
+      tooltipProps={{ arrow: true }}
+      onClick={event => (onReset ? onReset(event) : handleChange(event, defaultValue, defaultValue))}
+      {...resetAdornmentProps}
+      sx={{
+        padding: tiny ? theme.spacing(0.25) : theme.spacing(0.5),
+        ...resetAdornmentProps?.sx
+      }}
+    >
+      <RefreshOutlinedIcon fontSize="small" />
+    </IconButton>
   );
 });
 

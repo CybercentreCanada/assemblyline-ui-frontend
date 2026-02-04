@@ -125,7 +125,7 @@ export class ValidationResolver<Value, RawValue = Value> extends ValidationSchem
  * @param rawValue - Raw user input
  * @returns Object with coerced value and whether the changes to the value should be ignored
  */
-export type Coercer<Value, RawValue> = (
+export type Coercer<Value, RawValue = Value> = (
   event: React.SyntheticEvent,
   value: Value,
   rawValue: RawValue
@@ -166,21 +166,21 @@ export class CoercersSchema<Value, RawValue = Value> {
   }
 
   /**
-   * Trim whitespace from string values
-   */
-  trim() {
-    this.coercers.push((event, value) =>
-      typeof value === 'string' ? { value: value.trim() as Value, ignore: false } : { value, ignore: false }
-    );
-    return this;
-  }
-
-  /**
    * Convert string values to lowercase
    */
   toLowerCase() {
     this.coercers.push((event, value) =>
       typeof value === 'string' ? { value: value.toLowerCase() as Value, ignore: false } : { value, ignore: false }
+    );
+    return this;
+  }
+
+  /**
+   * Trim whitespace from string values
+   */
+  trim() {
+    this.coercers.push((event, value) =>
+      typeof value === 'string' ? { value: value.trim() as Value, ignore: false } : { value, ignore: false }
     );
     return this;
   }

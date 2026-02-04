@@ -1,4 +1,12 @@
-import type { FormHelperTextProps, IconButtonProps, TooltipProps, TypographyProps } from '@mui/material';
+import type {
+  CircularProgressProps,
+  FormControlProps,
+  FormHelperTextProps,
+  SkeletonProps,
+  TooltipProps,
+  TypographyProps
+} from '@mui/material';
+import type { IconButtonProps } from 'components/visual/Buttons/IconButton';
 import type {
   Coercer,
   CoercersSchema,
@@ -122,19 +130,15 @@ export type InputOptions = {
   expand?: boolean;
 
   /**
-   * Props applied to the expand/collapse button
+   * If `true`, shows the help button
+   * @default false
    */
-  expandProps?: IconButtonProps;
+  help?: boolean;
 
   /**
    * Helper / description text displayed under the input
    */
   helperText?: string;
-
-  /**
-   * Props applied to the helper text component
-   */
-  helperTextProps?: FormHelperTextProps;
 
   /**
    * The id of the input element
@@ -145,11 +149,6 @@ export type InputOptions = {
    * The label content
    */
   label?: string;
-
-  /**
-   * Props applied to the label typography
-   */
-  labelProps?: TypographyProps;
 
   /**
    * If `true`, shows a loading spinner
@@ -193,20 +192,16 @@ export type InputOptions = {
   preventRender?: boolean;
 
   /**
+   * If `true`, shows the progress spinner
+   * @default false
+   */
+  progress?: boolean;
+
+  /**
    * If `true`, the input is read-only
    * @default false
    */
   readOnly?: boolean;
-
-  /**
-   * Props applied to the reset button
-   */
-  resetProps?: IconButtonProps;
-
-  /**
-   * Props applied to the root container element
-   */
-  rootProps?: React.HTMLAttributes<HTMLDivElement>;
 
   /**
    * Element rendered at the start (e.g. icon)
@@ -223,11 +218,6 @@ export type InputOptions = {
    * Tooltip content to display on hover
    */
   tooltip?: TooltipProps['title'];
-
-  /**
-   * Props applied to the tooltip component
-   */
-  tooltipProps?: Omit<TooltipProps, 'children' | 'title'>;
 
   /**
    * Callback fired when the input loses focus
@@ -252,12 +242,10 @@ export const DEFAULT_INPUT_OPTIONS: InputOptions = {
   divider: false,
   endAdornment: null,
   expand: null,
-  expandProps: null,
+  help: false,
   helperText: null,
-  helperTextProps: null,
   id: null,
   label: null,
-  labelProps: null,
   loading: false,
   monospace: false,
   overflowHidden: false,
@@ -265,13 +253,11 @@ export const DEFAULT_INPUT_OPTIONS: InputOptions = {
   placeholder: null,
   preventDisabledColor: false,
   preventRender: false,
+  progress: false,
   readOnly: false,
-  resetProps: null,
-  rootProps: null,
   startAdornment: null,
   tiny: false,
   tooltip: null,
-  tooltipProps: null,
 
   onBlur: () => null,
   onExpand: () => null,
@@ -329,7 +315,7 @@ export type InputRuntimeState = {
   validationStatus: ValidationStatus;
 };
 
-export const DEFAULT_RUNTIME_STATE: InputRuntimeState = {
+export const DEFAULT_INPUT_RUNTIME_STATE: InputRuntimeState = {
   hasMenuAdornment: false,
   isFocused: false,
   isMenuOpen: false,
@@ -337,7 +323,42 @@ export const DEFAULT_RUNTIME_STATE: InputRuntimeState = {
   showClearButton: false,
   showNumericalSpinner: false,
   validationMessage: null,
-  validationStatus: 'default'
+  validationStatus: null
+};
+
+/**********************************************************************************************************************
+ * Slot Props
+ *********************************************************************************************************************/
+export type InputSlotProps = {
+  slotProps?: {
+    clearAdornment?: IconButtonProps;
+    expandAdornment?: IconButtonProps;
+    formControl?: FormControlProps;
+    formLabel?: TypographyProps;
+    formLabelTooltip?: Omit<TooltipProps, 'children' | 'title'>;
+    helpAdornment?: IconButtonProps;
+    helperText?: FormHelperTextProps;
+    progressAdornment?: CircularProgressProps;
+    resetAdornment?: IconButtonProps;
+    root?: React.HTMLAttributes<HTMLDivElement>;
+    skeleton?: SkeletonProps;
+  };
+};
+
+export const DEFAULT_INPUT_SLOT_PROPS: InputSlotProps = {
+  slotProps: {
+    clearAdornment: null,
+    expandAdornment: null,
+    formControl: null,
+    formLabel: null,
+    formLabelTooltip: null,
+    helpAdornment: null,
+    helperText: null,
+    progressAdornment: null,
+    resetAdornment: null,
+    root: null,
+    skeleton: null
+  }
 };
 
 /**********************************************************************************************************************
@@ -345,10 +366,12 @@ export const DEFAULT_RUNTIME_STATE: InputRuntimeState = {
  *********************************************************************************************************************/
 export type InputControllerProps<Value = unknown, RawValue = Value> = InputValueModel<Value, RawValue> &
   InputOptions &
-  InputRuntimeState;
+  InputRuntimeState &
+  InputSlotProps;
 
 export const DEFAULT_INPUT_CONTROLLER_PROPS: InputControllerProps = {
   ...DEFAULT_INPUT_VALUE_MODEL,
   ...DEFAULT_INPUT_OPTIONS,
-  ...DEFAULT_RUNTIME_STATE
+  ...DEFAULT_INPUT_RUNTIME_STATE,
+  ...DEFAULT_INPUT_SLOT_PROPS
 };

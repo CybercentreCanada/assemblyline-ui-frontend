@@ -37,7 +37,18 @@ export const useShouldRenderClear = <Value extends unknown = unknown, RawValue =
 export const useShouldRenderExpand = <Value extends unknown = unknown, RawValue = Value>() => {
   const [get] = usePropStore<InputControllerProps<Value, RawValue>>();
   const expand = get('expand');
-  return Boolean(expand);
+  return expand !== null;
+};
+
+/**
+ * Returns whether the help button should be rendered
+ */
+export const useShouldRenderHelp = <Value extends unknown = unknown, RawValue = Value>() => {
+  const [get] = usePropStore<InputControllerProps<Value, RawValue>>();
+  const disabled = get('disabled');
+  const readOnly = get('readOnly');
+  const showHelpButton = get('help');
+  return Boolean(showHelpButton) && !readOnly && !disabled;
 };
 
 /**
@@ -75,6 +86,17 @@ export const useShouldRenderPassword = <Value extends unknown = unknown, RawValu
 };
 
 /**
+ * Returns whether the help button should be rendered
+ */
+export const useShouldRenderProgress = <Value extends unknown = unknown, RawValue = Value>() => {
+  const [get] = usePropStore<InputControllerProps<Value, RawValue>>();
+  const disabled = get('disabled');
+  const readOnly = get('readOnly');
+  const showProgressButton = get('progress');
+  return Boolean(showProgressButton) && !readOnly && !disabled;
+};
+
+/**
  * Returns whether the reset button should be rendered
  */
 export const useShouldRenderReset = <Value extends unknown = unknown, RawValue = Value>() => {
@@ -100,18 +122,22 @@ export const useShouldRenderAdornments = <Value extends unknown = unknown, RawVa
 
   const shouldRenderClear = useShouldRenderClear<Value, RawValue>();
   const shouldRenderExpand = useShouldRenderExpand<Value, RawValue>();
+  const shouldRenderHelp = useShouldRenderHelp<Value, RawValue>();
   const shouldRenderMenu = useShouldRenderMenu<Value, RawValue>();
-  const shouldRenderSpinner = useShouldRenderNumericalSpinner<Value, RawValue>();
   const shouldRenderPassword = useShouldRenderPassword<Value, RawValue>();
+  const shouldRenderProgress = useShouldRenderProgress<Value, RawValue>();
   const shouldRenderReset = useShouldRenderReset<Value, RawValue>();
+  const shouldRenderSpinner = useShouldRenderNumericalSpinner<Value, RawValue>();
 
   return (
     endAdornment ||
     shouldRenderClear ||
     shouldRenderExpand ||
+    shouldRenderHelp ||
     shouldRenderMenu ||
-    shouldRenderSpinner ||
     shouldRenderPassword ||
-    shouldRenderReset
+    shouldRenderProgress ||
+    shouldRenderReset ||
+    shouldRenderSpinner
   );
 };

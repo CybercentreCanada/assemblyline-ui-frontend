@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import type { TooltipProps as MuiTooltipProps } from '@mui/material';
 import { Tooltip as MuiTooltip } from '@mui/material';
 import React, { useState } from 'react';
@@ -19,15 +20,19 @@ export const Tooltip: React.FC<TooltipProps> = React.memo(
         open={open}
         onOpen={() => setOpen(true)}
         onClose={() => setOpen(false)}
+        {...tooltipProps}
         slotProps={{
+          ...tooltipProps?.slotProps,
           popper: {
+            ...tooltipProps?.slotProps?.popper,
             disablePortal: true,
             // modifiers: [{ name: 'offset', options: { offset: [0, 0] } }],
             onMouseOver: () => setOpen(false)
           },
-          tooltip: { sx: { whiteSpace: 'normal' } }
+          tooltip: {
+            ...tooltipProps?.slotProps?.tooltip
+          }
         }}
-        {...tooltipProps}
       >
         <div>{children}</div>
       </MuiTooltip>

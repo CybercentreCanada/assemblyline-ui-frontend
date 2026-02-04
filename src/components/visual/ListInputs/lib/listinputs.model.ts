@@ -1,9 +1,9 @@
-import type { ListItemTextProps, TypographyProps } from '@mui/material';
+import type { FormHelperTextProps, ListItemTextProps, TypographyProps } from '@mui/material';
 import type { InputOptions, InputRuntimeState, InputValueModel } from 'components/visual/Inputs/models/inputs.model';
 import {
   DEFAULT_INPUT_OPTIONS,
-  DEFAULT_INPUT_VALUE_MODEL,
-  DEFAULT_RUNTIME_STATE
+  DEFAULT_INPUT_RUNTIME_STATE,
+  DEFAULT_INPUT_VALUE_MODEL
 } from 'components/visual/Inputs/models/inputs.model';
 import type { CSSProperties } from 'react';
 
@@ -54,14 +54,43 @@ export const DEFAULT_LIST_INPUT_OPTIONS: ListInputOptions = {
 };
 
 /**********************************************************************************************************************
+ * Slot Props
+ *********************************************************************************************************************/
+export type ListInputSlotProps = {
+  slotProps?: {
+    // formControl?: FormControlProps;
+    // formLabel?: TypographyProps;
+    // formLabelTooltip?: Omit<TooltipProps, 'children' | 'title'>;
+    helperText?: FormHelperTextProps;
+    // root?: React.HTMLAttributes<HTMLDivElement>;
+    // skeleton?: SkeletonProps;
+    // resetAdornment?: IconButtonProps;
+  };
+};
+
+export const DEFAULT_LIST_INPUT_SLOT_PROPS: ListInputSlotProps = {
+  slotProps: {
+    // formControl: null,
+    // formLabel: null,
+    // formLabelTooltip: null,
+    helperText: null
+    // root: null,
+    // skeleton: null,
+    // resetAdornment: null
+  }
+};
+
+/**********************************************************************************************************************
  * Combined Internal Controller Props
  *********************************************************************************************************************/
 export type ListInputControllerProps<Value = unknown, RawValue = Value> = InputValueModel<Value, RawValue> &
   ListInputOptions &
-  InputRuntimeState;
+  InputRuntimeState &
+  ListInputSlotProps;
 
 export const DEFAULT_LIST_INPUT_CONTROLLER_PROPS: ListInputControllerProps = {
   ...DEFAULT_INPUT_VALUE_MODEL,
-  ...DEFAULT_RUNTIME_STATE,
-  ...DEFAULT_LIST_INPUT_OPTIONS
+  ...DEFAULT_INPUT_RUNTIME_STATE,
+  ...DEFAULT_LIST_INPUT_OPTIONS,
+  ...DEFAULT_LIST_INPUT_SLOT_PROPS
 };

@@ -1,4 +1,4 @@
-import { Button, Grid, Typography, useTheme } from '@mui/material';
+import { Button, Typography, useTheme } from '@mui/material';
 import { DemoContainer } from 'components/routes/development/library/components/DemoContainer';
 import { DemoSection } from 'components/routes/development/library/components/DemoSection';
 import { useForm } from 'components/routes/development/library/contexts/form';
@@ -7,15 +7,15 @@ import { ChipsInput } from 'components/visual/Inputs/ChipsInput';
 import { ClassificationInput } from 'components/visual/Inputs/ClassificationInput';
 import { DateInput } from 'components/visual/Inputs/DateInput';
 import { JSONInput } from 'components/visual/Inputs/JSONInput';
+import type { InputOptions } from 'components/visual/Inputs/models/inputs.model';
 import { NumberInput } from 'components/visual/Inputs/NumberInput';
-import { RadioInput } from 'components/visual/Inputs/RadioInput';
-import { SelectInput } from 'components/visual/Inputs/SelectInput';
+import { RadioInput, RadioInputProps } from 'components/visual/Inputs/RadioInput';
+import { SelectInput, SelectInputProps } from 'components/visual/Inputs/SelectInput';
 import { SliderInput } from 'components/visual/Inputs/SliderInput';
 import { SwitchInput } from 'components/visual/Inputs/SwitchInput';
 import { TextAreaInput } from 'components/visual/Inputs/TextAreaInput';
 import { TextInput } from 'components/visual/Inputs/TextInput';
-import { PageSection } from 'components/visual/Layouts/PageSection';
-import MonacoEditor from 'components/visual/MonacoEditor';
+import type { CoercersSchema, ValidationSchema } from 'components/visual/Inputs/utils/inputs.util.validation';
 import React from 'react';
 
 export const LONG_STRING =
@@ -144,9 +144,17 @@ export type InputsLibraryState = {
     name: string;
     state: {
       badge: boolean;
+      capitalize: boolean;
+      coercers: {
+        required: boolean;
+        toLowerCase: boolean;
+        trim: boolean;
+      };
+      coerce: boolean;
       disabled: boolean;
       endAdornment: boolean;
-      error: boolean;
+      expand: boolean;
+      help: boolean;
       helperText: boolean;
       loading: boolean;
       longname: boolean;
@@ -154,11 +162,19 @@ export type InputsLibraryState = {
       overflowHidden: boolean;
       password: boolean;
       placeholder: boolean;
+      preventRender: boolean;
+      progress: boolean;
       readOnly: boolean;
-      required: boolean;
       reset: boolean;
+      startAdornment: boolean;
       tiny: boolean;
       tooltip: boolean;
+      validators: {
+        required: boolean;
+        inRange: boolean;
+        noLeadingTrailingWhitespace: boolean;
+      };
+      validate: null | 'success' | 'info' | 'warning' | 'error';
     };
     values: {
       checkbox: boolean;
@@ -182,9 +198,17 @@ export const INPUTS_LIBRARY_STATE: InputsLibraryState = {
     name: 'Inputs',
     state: {
       badge: false,
+      capitalize: false,
+      coercers: {
+        required: false,
+        toLowerCase: false,
+        trim: false
+      },
+      coerce: false,
       disabled: false,
       endAdornment: false,
-      error: false,
+      expand: null,
+      help: false,
       helperText: false,
       loading: false,
       longname: false,
@@ -192,25 +216,33 @@ export const INPUTS_LIBRARY_STATE: InputsLibraryState = {
       overflowHidden: false,
       password: false,
       placeholder: false,
+      preventRender: false,
+      progress: false,
       readOnly: false,
-      required: false,
       reset: false,
+      startAdornment: false,
       tiny: false,
-      tooltip: false
+      tooltip: false,
+      validators: {
+        required: false,
+        inRange: false,
+        noLeadingTrailingWhitespace: false
+      },
+      validate: null
     },
     values: {
       checkbox: false,
-      chips: [LONG_STRING, LONG_STRING],
+      chips: [],
       classification: 'TLP:CLEAR',
       date: '',
-      json: { [LONG_STRING]: LONG_STRING },
+      json: {},
       number: 0,
-      radio: LONG_STRING,
-      select: 'option 1',
+      radio: null,
+      select: null,
       slider: 0,
       switch: false,
-      text: LONG_STRING,
-      textarea: LONG_STRING
+      text: '',
+      textarea: ''
     }
   }
 };
@@ -222,8 +254,8 @@ export const InputsSection = React.memo(() => {
   return (
     <DemoContainer>
       <DemoSection
-        id="Basic Example"
-        primary="Basic Example"
+        id="Interaction Example"
+        primary="Interaction Example"
         secondary={
           <>
             <span>{'The following components are all of the inputs used in Assemblyline. '}</span>
@@ -231,38 +263,871 @@ export const InputsSection = React.memo(() => {
           </>
         }
         left={
-          <div style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(2) }}>
-            <form.Subscribe
-              selector={state => state.values.components.inputs.values.text}
-              children={value => (
-                <TextInput
-                  label="Text Input"
-                  value={value}
-                  options={TEXTFIELD_OPTIONS}
-                  coercers={s => s.trim()}
-                  validators={s => s.required().noLeadingTrailingWhitespace()}
-                  onChange={(event, next) => form.setFieldValue('components.inputs.values.text', next)}
-                  coerce={(e, v) => ({ value: v, ignore: false })}
-                  validate={(e, v) => ({ status: 'error', message: 'asdfasdf' })}
-                />
-              )}
-            />
-          </div>
+          <form.Subscribe
+            selector={state =>
+              [
+                state.values.components.inputs.state.badge,
+                state.values.components.inputs.state.capitalize,
+                state.values.components.inputs.state.coerce,
+                state.values.components.inputs.state.coercers,
+                state.values.components.inputs.state.disabled,
+                state.values.components.inputs.state.endAdornment,
+                state.values.components.inputs.state.expand,
+                state.values.components.inputs.state.help,
+                state.values.components.inputs.state.helperText,
+                state.values.components.inputs.state.loading,
+                state.values.components.inputs.state.longname,
+                state.values.components.inputs.state.monospace,
+                state.values.components.inputs.state.overflowHidden,
+                state.values.components.inputs.state.password,
+                state.values.components.inputs.state.placeholder,
+                state.values.components.inputs.state.preventRender,
+                state.values.components.inputs.state.progress,
+                state.values.components.inputs.state.readOnly,
+                state.values.components.inputs.state.reset,
+                state.values.components.inputs.state.startAdornment,
+                state.values.components.inputs.state.tiny,
+                state.values.components.inputs.state.tooltip,
+                state.values.components.inputs.state.validate,
+                state.values.components.inputs.state.validators
+              ] as const
+            }
+            children={([
+              badge,
+              capitalize,
+              coerce,
+              coercers,
+              disabled,
+              endAdornment,
+              expand,
+              help,
+              helperText,
+              loading,
+              longname,
+              monospace,
+              overflowHidden,
+              password,
+              placeholder,
+              preventRender,
+              progress,
+              readOnly,
+              reset,
+              startAdornment,
+              tiny,
+              tooltip,
+              validate,
+              validators
+            ]) => {
+              const inputProps: InputOptions = {
+                // Info
+                ...(badge && { badge }),
+                ...(helperText && { helperText: 'Helper Text' }),
+                ...(longname && { label: LONG_STRING }),
+                ...(overflowHidden && { overflowHidden }),
+                ...(tooltip && { tooltip: 'This is an example of a tooltip' }),
+
+                // State
+                ...(capitalize && { capitalize }),
+                ...(disabled && { disabled }),
+                ...(loading && { loading }),
+                ...(monospace && { monospace }),
+                ...(placeholder && { placeholder: 'Placeholder' }),
+                ...(preventRender && { preventRender }),
+                ...(readOnly && { readOnly }),
+                ...(tiny && { tiny }),
+
+                // Adornment
+                ...(expand !== null && {
+                  expand: expand,
+                  onExpand: () => form.setFieldValue('components.inputs.state.expand', !expand)
+                }),
+                ...(help && { help }),
+                ...(password && { password }),
+                ...(progress && { progress }),
+                ...(startAdornment && { startAdornment: <Button variant="contained">Start</Button> }),
+                ...(endAdornment && { endAdornment: <Button variant="contained">End</Button> }),
+
+                // Validation
+                ...((validators.required || validators.noLeadingTrailingWhitespace) && {
+                  validators: (v: ValidationSchema<unknown>) => {
+                    if (validators.required) v.required();
+                    if (validators.noLeadingTrailingWhitespace) v.noLeadingTrailingWhitespace();
+                    if (validators.inRange) v.inRange();
+                    return v;
+                  }
+                }),
+                ...(validate === 'success'
+                  ? { validate: () => ({ status: 'success', message: 'Success' }) }
+                  : validate === 'info'
+                    ? { validate: () => ({ status: 'info', message: 'Info' }) }
+                    : validate === 'warning'
+                      ? { validate: () => ({ status: 'warning', message: 'Warning' }) }
+                      : validate === 'error'
+                        ? { validate: () => ({ status: 'error', message: 'Error' }) }
+                        : null),
+
+                // Coercing
+                ...((coercers.required || coercers.trim || coercers.toLowerCase) && {
+                  coercers: (c: CoercersSchema<unknown>) => {
+                    if (coercers.required) c.required();
+                    if (coercers.trim) c.trim();
+                    if (coercers.toLowerCase) c.toLowerCase();
+                    return c;
+                  }
+                })
+              };
+
+              return (
+                <>
+                  <form.Subscribe
+                    selector={state => state.values.components.inputs.values.text}
+                    children={value => (
+                      <TextInput
+                        label="Interaction Text Input"
+                        value={value}
+                        options={TEXTFIELD_OPTIONS}
+                        onChange={(event, next) => form.setFieldValue('components.inputs.values.text', next)}
+                        {...inputProps}
+                        //
+                        // Adornment
+                        {...(reset && {
+                          reset,
+                          defaultValue: '',
+                          onReset: () => form.setFieldValue('components.inputs.values.text', '')
+                        })}
+                        //
+                        // Coercing
+                        {...(coerce && { coerce: (e, v) => ({ value: v + ' test', ignore: false }) })}
+                      />
+                    )}
+                  />
+
+                  <form.Subscribe
+                    selector={state => state.values.components.inputs.values.chips}
+                    children={value => (
+                      <ChipsInput
+                        label="Interaction Chips Input"
+                        value={value}
+                        options={TEXTFIELD_OPTIONS}
+                        onChange={(event, next) => form.setFieldValue('components.inputs.values.chips', next)}
+                        {...inputProps}
+                        //
+                        // Adornment
+                        {...(reset && {
+                          reset,
+                          defaultValue: [],
+                          onReset: () => form.setFieldValue('components.inputs.values.chips', [])
+                        })}
+                        //
+                        // Coercing
+                        {...(coerce && { coerce: (e, v) => ({ value: [...v, 'test'], ignore: false }) })}
+                      />
+                    )}
+                  />
+
+                  <form.Subscribe
+                    selector={state => state.values.components.inputs.values.number}
+                    children={value => (
+                      <NumberInput
+                        label="Interaction Number Input"
+                        value={value}
+                        onChange={(event, next) => form.setFieldValue('components.inputs.values.number', next)}
+                        {...inputProps}
+                        //
+                        // Adornment
+                        {...(reset && {
+                          reset,
+                          defaultValue: null,
+                          onReset: () => form.setFieldValue('components.inputs.values.number', null)
+                        })}
+                        //
+                        // Coercing
+                        {...(coerce && {
+                          coerce: (e, v) => ({ value: typeof v === 'number' ? v++ : v, ignore: false })
+                        })}
+                      />
+                    )}
+                  />
+
+                  <form.Subscribe
+                    selector={state => state.values.components.inputs.values.select}
+                    children={value => (
+                      <SelectInput
+                        label="Interaction Select Input"
+                        value={value}
+                        options={SELECT_OPTIONS}
+                        onChange={(event, next) => form.setFieldValue('components.inputs.values.select', next)}
+                        {...(inputProps as SelectInputProps<typeof SELECT_OPTIONS>)}
+                        //
+                        // Adornment
+                        {...(!reset && {
+                          reset,
+                          defaultValue: null,
+                          onReset: () => form.setFieldValue('components.inputs.values.select', null)
+                        })}
+                        //
+                        // Coercing
+                        {...(coerce && {
+                          coerce: (e, v: SelectInputProps<typeof SELECT_OPTIONS>['value']) => ({
+                            value: v,
+                            ignore: false
+                          })
+                        })}
+                      />
+                    )}
+                  />
+
+                  <form.Subscribe
+                    selector={state => state.values.components.inputs.values.date}
+                    children={value => (
+                      <DateInput
+                        label="Interaction Date Input"
+                        value={value}
+                        onChange={(event, next) => form.setFieldValue('components.inputs.values.date', next)}
+                        {...inputProps}
+                        //
+                        // Adornment
+                        {...(reset && {
+                          reset,
+                          defaultValue: null,
+                          onReset: () => form.setFieldValue('components.inputs.values.date', null)
+                        })}
+                        //
+                        // Coercing
+                        {...(coerce && { coerce: (e, v) => ({ value: v + ' test', ignore: false }) })}
+                      />
+                    )}
+                  />
+
+                  <form.Subscribe
+                    selector={state => state.values.components.inputs.values.classification}
+                    children={value => (
+                      <ClassificationInput
+                        label="Interaction Classification Input"
+                        value={value}
+                        onChange={(event, next) => form.setFieldValue('components.inputs.values.classification', next)}
+                        {...inputProps}
+                        //
+                        // Adornment
+                        {...(reset && {
+                          reset,
+                          defaultValue: null,
+                          onReset: () => form.setFieldValue('components.inputs.values.classification', null)
+                        })}
+                        //
+                        // Coercing
+                        {...(coerce && { coerce: (e, v) => ({ value: v + ' test', ignore: false }) })}
+                      />
+                    )}
+                  />
+
+                  <form.Subscribe
+                    selector={state => state.values.components.inputs.values.textarea}
+                    children={value => (
+                      <TextAreaInput
+                        label="Interaction TextArea Input"
+                        value={value}
+                        onChange={(event, next) => form.setFieldValue('components.inputs.values.textarea', next)}
+                        {...inputProps}
+                        //
+                        // Adornment
+                        {...(reset && {
+                          reset,
+                          defaultValue: null,
+                          onReset: () => form.setFieldValue('components.inputs.values.textarea', null)
+                        })}
+                        //
+                        // Coercing
+                        {...(coerce && { coerce: (e, v) => ({ value: v + ' test', ignore: false }) })}
+                      />
+                    )}
+                  />
+
+                  <form.Subscribe
+                    selector={state => state.values.components.inputs.values.slider}
+                    children={value => (
+                      <SliderInput
+                        label="Interaction Slider Input"
+                        value={value}
+                        onChange={(event, next) => form.setFieldValue('components.inputs.values.slider', next)}
+                        {...inputProps}
+                        //
+                        // Adornment
+                        {...(reset && {
+                          reset,
+                          defaultValue: null,
+                          onReset: () => form.setFieldValue('components.inputs.values.slider', null)
+                        })}
+                        //
+                        // Coercing
+                        {...(coerce && {
+                          coerce: (e, v) => ({ value: typeof v === 'number' ? v++ : v, ignore: false })
+                        })}
+                      />
+                    )}
+                  />
+
+                  <form.Subscribe
+                    selector={state => state.values.components.inputs.values.checkbox}
+                    children={value => (
+                      <CheckboxInput
+                        label="Interaction Check Input"
+                        value={value}
+                        onChange={(event, next) => form.setFieldValue('components.inputs.values.checkbox', next)}
+                        {...inputProps}
+                        //
+                        // Adornment
+                        {...(reset && {
+                          reset,
+                          defaultValue: false,
+                          onReset: () => form.setFieldValue('components.inputs.values.checkbox', false)
+                        })}
+                        //
+                        // Coercing
+                        {...(coerce && { coerce: (e, v) => ({ value: true, ignore: false }) })}
+                      />
+                    )}
+                  />
+
+                  <form.Subscribe
+                    selector={state => state.values.components.inputs.values.switch}
+                    children={value => (
+                      <SwitchInput
+                        label="Interaction Switch Input"
+                        value={value}
+                        onChange={(event, next) => form.setFieldValue('components.inputs.values.switch', next)}
+                        {...inputProps}
+                        //
+                        // Adornment
+                        {...(reset && {
+                          reset,
+                          defaultValue: false,
+                          onReset: () => form.setFieldValue('components.inputs.values.switch', false)
+                        })}
+                        //
+                        // Coercing
+                        {...(coerce && { coerce: (e, v) => ({ value: true, ignore: false }) })}
+                      />
+                    )}
+                  />
+
+                  <form.Subscribe
+                    selector={state => state.values.components.inputs.values.radio}
+                    children={value => (
+                      <RadioInput
+                        label="Interaction Radio Input"
+                        value={value}
+                        options={RADIO_OPTIONS}
+                        onChange={(event, next) => form.setFieldValue('components.inputs.values.radio', next)}
+                        {...(inputProps as RadioInputProps<typeof RADIO_OPTIONS>)}
+                        //
+                        // Adornment
+                        {...(reset && {
+                          reset,
+                          defaultValue: RADIO_OPTIONS[0].value,
+                          onReset: () => form.setFieldValue('components.inputs.values.radio', RADIO_OPTIONS[0].value)
+                        })}
+                        //
+                        // Coercing
+                        {...(coerce && { coerce: () => ({ value: RADIO_OPTIONS[1].value, ignore: false }) })}
+                      />
+                    )}
+                  />
+
+                  <form.Subscribe
+                    selector={state => state.values.components.inputs.values.json}
+                    children={value => (
+                      <JSONInput
+                        label="Interaction JSON Input"
+                        value={value}
+                        onChange={(event, next) => form.setFieldValue('components.inputs.values.json', next)}
+                        {...inputProps}
+                        //
+                        // Adornment
+                        {...(reset && {
+                          reset,
+                          defaultValue: {},
+                          onReset: () => form.setFieldValue('components.inputs.values.json', {})
+                        })}
+                        //
+                        // Coercing
+                        {...(coerce && { coerce: (e, v) => ({ value: { coerced: 'coerced' }, ignore: false }) })}
+                      />
+                    )}
+                  />
+                </>
+              );
+            }}
+          />
         }
         right={
-          <form.Subscribe
-            selector={state => state.values.components.inputs.values.text}
-            children={value => (
-              <div>
-                <Typography variant="body2">{`Type: ${typeof value}`}</Typography>
-                <Typography variant="body2">{`Value: ${value}`}</Typography>
+          <div style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(1) }}>
+            <div>
+              <Typography color="textSecondary" variant="body2">
+                Data
+              </Typography>
+              <div style={{ display: 'flex', flexDirection: 'row', gap: theme.spacing(1) }}>
+                <Button
+                  variant="contained"
+                  size="small"
+                  onClick={() => {
+                    form.setFieldValue('components.inputs.values', s => ({
+                      ...s,
+                      checkbox: false,
+                      chips: ['test'],
+                      classification: 'TLP:CLEAR',
+                      date: '',
+                      json: { test: 'test' },
+                      number: 0,
+                      radio: RADIO_OPTIONS[1].value,
+                      select: SELECT_OPTIONS[1].value,
+                      slider: 20,
+                      switch: false,
+                      text: 'test',
+                      textarea: 'test'
+                    }));
+                  }}
+                >
+                  Mock Data
+                </Button>
+                <Button
+                  color="secondary"
+                  size="small"
+                  variant="contained"
+                  onClick={() => {
+                    form.setFieldValue('components.inputs.values', s => ({
+                      ...s,
+                      checkbox: false,
+                      chips: [LONG_STRING, LONG_STRING],
+                      classification: 'TLP:CLEAR',
+                      date: '',
+                      json: { [LONG_STRING]: LONG_STRING },
+                      number: 100000000,
+                      radio: RADIO_OPTIONS[3].value,
+                      select: SELECT_OPTIONS[3].value,
+                      slider: 0,
+                      switch: false,
+                      text: LONG_STRING,
+                      textarea: LONG_STRING
+                    }));
+                  }}
+                >
+                  Long Data
+                </Button>
+                <Button
+                  color="secondary"
+                  size="small"
+                  variant="outlined"
+                  onClick={() => {
+                    form.setFieldValue('components.inputs.values', s => ({
+                      ...s,
+                      checkbox: false,
+                      chips: [],
+                      classification: 'TLP:CLEAR',
+                      date: null,
+                      json: null,
+                      number: null,
+                      radio: RADIO_OPTIONS[0].value,
+                      select: SELECT_OPTIONS[0].value,
+                      slider: null,
+                      switch: false,
+                      text: '',
+                      textarea: ''
+                    }));
+                  }}
+                >
+                  Reset
+                </Button>
               </div>
-            )}
-          />
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <Typography color="textSecondary" variant="body2">
+                Info
+              </Typography>
+
+              <form.Subscribe
+                selector={state => state.values.components.inputs.state.badge}
+                children={value => (
+                  <CheckboxInput
+                    label="Badge"
+                    value={value}
+                    tiny
+                    onChange={(event, next) => form.setFieldValue('components.inputs.state.badge', next)}
+                  />
+                )}
+              />
+
+              <form.Subscribe
+                selector={state => state.values.components.inputs.state.helperText}
+                children={value => (
+                  <CheckboxInput
+                    label="Helper text"
+                    value={value}
+                    tiny
+                    onChange={(event, next) => form.setFieldValue('components.inputs.state.helperText', next)}
+                  />
+                )}
+              />
+
+              <form.Subscribe
+                selector={state => state.values.components.inputs.state.longname}
+                children={value => (
+                  <CheckboxInput
+                    label="Long name"
+                    value={value}
+                    tiny
+                    onChange={(event, next) => form.setFieldValue('components.inputs.state.longname', next)}
+                  />
+                )}
+              />
+
+              <form.Subscribe
+                selector={state => state.values.components.inputs.state.overflowHidden}
+                children={value => (
+                  <CheckboxInput
+                    label="Overflow hidden"
+                    value={value}
+                    tiny
+                    onChange={(event, next) => form.setFieldValue('components.inputs.state.overflowHidden', next)}
+                  />
+                )}
+              />
+
+              <form.Subscribe
+                selector={state => state.values.components.inputs.state.tooltip}
+                children={value => (
+                  <CheckboxInput
+                    label="Tooltip"
+                    value={value}
+                    tiny
+                    onChange={(event, next) => form.setFieldValue('components.inputs.state.tooltip', next)}
+                  />
+                )}
+              />
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <Typography color="textSecondary" variant="body2">
+                State
+              </Typography>
+
+              <form.Subscribe
+                selector={state => state.values.components.inputs.state.capitalize}
+                children={value => (
+                  <CheckboxInput
+                    label="Capitalize"
+                    value={value}
+                    tiny
+                    onChange={(event, next) => form.setFieldValue('components.inputs.state.capitalize', next)}
+                  />
+                )}
+              />
+
+              <form.Subscribe
+                selector={state => state.values.components.inputs.state.disabled}
+                children={value => (
+                  <CheckboxInput
+                    label="Disabled"
+                    value={value}
+                    tiny
+                    onChange={(event, next) => form.setFieldValue('components.inputs.state.disabled', next)}
+                  />
+                )}
+              />
+
+              <form.Subscribe
+                selector={state => state.values.components.inputs.state.loading}
+                children={value => (
+                  <CheckboxInput
+                    label="Loading"
+                    value={value}
+                    tiny
+                    onChange={(event, next) => form.setFieldValue('components.inputs.state.loading', next)}
+                  />
+                )}
+              />
+
+              <form.Subscribe
+                selector={state => state.values.components.inputs.state.monospace}
+                children={value => (
+                  <CheckboxInput
+                    label="Monospace"
+                    value={value}
+                    tiny
+                    onChange={(event, next) => form.setFieldValue('components.inputs.state.monospace', next)}
+                  />
+                )}
+              />
+
+              <form.Subscribe
+                selector={state => state.values.components.inputs.state.placeholder}
+                children={value => (
+                  <CheckboxInput
+                    label="Placeholder"
+                    value={value}
+                    tiny
+                    onChange={(event, next) => form.setFieldValue('components.inputs.state.placeholder', next)}
+                  />
+                )}
+              />
+
+              <form.Subscribe
+                selector={state => state.values.components.inputs.state.preventRender}
+                children={value => (
+                  <CheckboxInput
+                    label="Prevent render"
+                    value={value}
+                    tiny
+                    onChange={(event, next) => form.setFieldValue('components.inputs.state.preventRender', next)}
+                  />
+                )}
+              />
+
+              <form.Subscribe
+                selector={state => state.values.components.inputs.state.readOnly}
+                children={value => (
+                  <CheckboxInput
+                    label="Readonly"
+                    value={value}
+                    tiny
+                    onChange={(event, next) => form.setFieldValue('components.inputs.state.readOnly', next)}
+                  />
+                )}
+              />
+
+              <form.Subscribe
+                selector={state => state.values.components.inputs.state.tiny}
+                children={value => (
+                  <CheckboxInput
+                    label="Tiny"
+                    value={value}
+                    tiny
+                    onChange={(event, next) => form.setFieldValue('components.inputs.state.tiny', next)}
+                  />
+                )}
+              />
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <Typography color="textSecondary" variant="body2">
+                Adornment
+              </Typography>
+
+              <form.Subscribe
+                selector={state => state.values.components.inputs.state.startAdornment}
+                children={value => (
+                  <CheckboxInput
+                    label="Start Adornment"
+                    value={value}
+                    tiny
+                    onChange={(event, next) => form.setFieldValue('components.inputs.state.startAdornment', next)}
+                  />
+                )}
+              />
+
+              <form.Subscribe
+                selector={state => state.values.components.inputs.state.endAdornment}
+                children={value => (
+                  <CheckboxInput
+                    label="End Adornment"
+                    value={value}
+                    tiny
+                    onChange={(event, next) => form.setFieldValue('components.inputs.state.endAdornment', next)}
+                  />
+                )}
+              />
+
+              <form.Subscribe
+                selector={state => state.values.components.inputs.state.expand}
+                children={value => (
+                  <CheckboxInput
+                    label="Expand"
+                    value={value !== null}
+                    tiny
+                    onChange={() => form.setFieldValue('components.inputs.state.expand', value !== null ? null : false)}
+                  />
+                )}
+              />
+
+              <form.Subscribe
+                selector={state => state.values.components.inputs.state.help}
+                children={value => (
+                  <CheckboxInput
+                    label="Help"
+                    value={value}
+                    tiny
+                    onChange={(event, next) => form.setFieldValue('components.inputs.state.help', next)}
+                  />
+                )}
+              />
+
+              <form.Subscribe
+                selector={state => state.values.components.inputs.state.password}
+                children={value => (
+                  <CheckboxInput
+                    label="Password"
+                    value={value}
+                    tiny
+                    onChange={(event, next) => form.setFieldValue('components.inputs.state.password', next)}
+                  />
+                )}
+              />
+
+              <form.Subscribe
+                selector={state => state.values.components.inputs.state.progress}
+                children={value => (
+                  <CheckboxInput
+                    label="Progress"
+                    value={value}
+                    tiny
+                    onChange={(event, next) => form.setFieldValue('components.inputs.state.progress', next)}
+                  />
+                )}
+              />
+
+              <form.Subscribe
+                selector={state => state.values.components.inputs.state.reset}
+                children={value => (
+                  <CheckboxInput
+                    label="Reset"
+                    value={value}
+                    tiny
+                    onChange={(event, next) => form.setFieldValue('components.inputs.state.reset', next)}
+                  />
+                )}
+              />
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <Typography color="textSecondary" variant="body2">
+                Validation
+              </Typography>
+
+              <form.Subscribe
+                selector={state => state.values.components.inputs.state.validators.inRange}
+                children={value => (
+                  <CheckboxInput
+                    label="In range"
+                    value={value}
+                    tiny
+                    onChange={(event, next) => form.setFieldValue('components.inputs.state.validators.inRange', next)}
+                  />
+                )}
+              />
+
+              <form.Subscribe
+                selector={state => state.values.components.inputs.state.validators.noLeadingTrailingWhitespace}
+                children={value => (
+                  <CheckboxInput
+                    label="No leading trailing whitespace"
+                    value={value}
+                    tiny
+                    onChange={(event, next) =>
+                      form.setFieldValue('components.inputs.state.validators.noLeadingTrailingWhitespace', next)
+                    }
+                  />
+                )}
+              />
+
+              <form.Subscribe
+                selector={state => state.values.components.inputs.state.validators.required}
+                children={value => (
+                  <CheckboxInput
+                    label="Required"
+                    value={value}
+                    tiny
+                    onChange={(event, next) => form.setFieldValue('components.inputs.state.validators.required', next)}
+                  />
+                )}
+              />
+
+              <form.Subscribe
+                selector={state => state.values.components.inputs.state.validate}
+                children={value => (
+                  <RadioInput
+                    label="Validate"
+                    value={value}
+                    options={
+                      [
+                        { label: 'None', value: null },
+                        { label: 'Success', value: 'success' },
+                        { label: 'Info', value: 'info' },
+                        { label: 'Warning', value: 'warning' },
+                        { label: 'Error', value: 'error' }
+                      ] as const
+                    }
+                    tiny
+                    onChange={(event, next) => form.setFieldValue('components.inputs.state.validate', next)}
+                  />
+                )}
+              />
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <Typography color="textSecondary" variant="body2">
+                Coerce
+              </Typography>
+
+              <form.Subscribe
+                selector={state => state.values.components.inputs.state.coerce}
+                children={value => (
+                  <CheckboxInput
+                    label="Coerce"
+                    value={value}
+                    tiny
+                    onChange={(event, next) => form.setFieldValue('components.inputs.state.coerce', next)}
+                  />
+                )}
+              />
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <Typography color="textSecondary" variant="body2">
+                Coercing
+              </Typography>
+
+              <form.Subscribe
+                selector={state => state.values.components.inputs.state.coercers.required}
+                children={value => (
+                  <CheckboxInput
+                    label="Required"
+                    value={value}
+                    tiny
+                    onChange={(event, next) => form.setFieldValue('components.inputs.state.coercers.required', next)}
+                  />
+                )}
+              />
+
+              <form.Subscribe
+                selector={state => state.values.components.inputs.state.coercers.toLowerCase}
+                children={value => (
+                  <CheckboxInput
+                    label="to Lowercase"
+                    value={value}
+                    tiny
+                    onChange={(event, next) => form.setFieldValue('components.inputs.state.coercers.toLowerCase', next)}
+                  />
+                )}
+              />
+
+              <form.Subscribe
+                selector={state => state.values.components.inputs.state.coercers.trim}
+                children={value => (
+                  <CheckboxInput
+                    label="Trim"
+                    value={value}
+                    tiny
+                    onChange={(event, next) => form.setFieldValue('components.inputs.state.coercers.trim', next)}
+                  />
+                )}
+              />
+            </div>
+          </div>
         }
       />
 
-      <DemoSection
+      {/* <DemoSection
         id="Basic Example"
         primary="Basic Example"
         secondary={
@@ -4284,7 +5149,7 @@ export const InputsSection = React.memo(() => {
 </>`}
           />
         }
-      />
+      /> */}
     </DemoContainer>
   );
 });

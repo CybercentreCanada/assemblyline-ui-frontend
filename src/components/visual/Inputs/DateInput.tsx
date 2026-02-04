@@ -8,8 +8,10 @@ import { PropProvider, usePropStore } from 'components/core/PropProvider/PropPro
 import { IconButton } from 'components/visual/Buttons/IconButton';
 import {
   ExpandInputAdornment,
+  HelpInputAdornment,
   InputEndAdornment,
   PasswordInputAdornment,
+  ProgressInputAdornment,
   ResetInputAdornment
 } from 'components/visual/Inputs/components/inputs.component.adornment';
 import {
@@ -215,7 +217,9 @@ const WrappedDateInput = () => {
                     InputProps: {
                       endAdornment: (
                         <InputEndAdornment preventRender={readOnly && !disabled}>
+                          <HelpInputAdornment />
                           <PasswordInputAdornment />
+                          <ProgressInputAdornment />
                           <ResetInputAdornment />
                           <ExpandInputAdornment />
                           {endAdornment}

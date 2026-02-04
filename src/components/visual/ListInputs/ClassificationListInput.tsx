@@ -2,7 +2,9 @@ import { PropProvider, usePropStore } from 'components/core/PropProvider/PropPro
 import type { ClassificationProps } from 'components/visual/Classification';
 import Classification from 'components/visual/Classification';
 import {
+  HelpInputAdornment,
   PasswordInputAdornment,
+  ProgressInputAdornment,
   ResetInputAdornment
 } from 'components/visual/Inputs/components/inputs.component.adornment';
 import { useInputChange } from 'components/visual/Inputs/hooks/inputs.hook.event_handlers';
@@ -47,7 +49,9 @@ const WrappedClassificationListInput = React.memo(() => {
             <ListInputLoading />
           ) : (
             <>
+              <HelpInputAdornment />
               <PasswordInputAdornment />
+              <ProgressInputAdornment />
               <ResetInputAdornment />
               <div style={{ maxWidth: width, minWidth: width, width: '100%' }}>
                 <Classification

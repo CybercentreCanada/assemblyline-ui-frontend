@@ -1,4 +1,6 @@
 {
+  "adornment.password.hide": "Hide value",
+  "adornment.password.show": "Show value",
   "classification.acceptText": "Proceed",
   "classification.cancelText": "Cancel",
   "classification.done": "Done",

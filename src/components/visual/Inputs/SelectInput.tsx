@@ -2,9 +2,11 @@ import type { ListItemTextProps, MenuItemProps, SelectProps } from '@mui/materia
 import { ListItemText, MenuItem, Select } from '@mui/material';
 import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
 import {
+  HelpInputAdornment,
   InputEndAdornment,
   MenuInputAdornment,
   PasswordInputAdornment,
+  ProgressInputAdornment,
   ResetInputAdornment
 } from 'components/visual/Inputs/components/inputs.component.adornment';
 import {
@@ -20,7 +22,6 @@ import { useInputId } from 'components/visual/Inputs/hooks/inputs.hook.renderer'
 import { useInputValidation } from 'components/visual/Inputs/hooks/inputs.hook.validation';
 import type { InputOptions, InputRuntimeState, InputValueModel } from 'components/visual/Inputs/models/inputs.model';
 import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/models/inputs.model';
-import React from 'react';
 
 export type Option = {
   primary: ListItemTextProps['primary'];
@@ -79,7 +80,13 @@ const WrappedSelectInput = <O extends readonly Option[]>() => {
             size="small"
             open={isMenuOpen}
             value={options?.some(o => o.value === rawValue) ? rawValue : ''}
-            onChange={event => handleChange(event as React.SyntheticEvent, event.target.value, event.target.value)}
+            onChange={event =>
+              handleChange(
+                event as React.SyntheticEvent,
+                event.target.value as O[number]['value'],
+                event.target.value as O[number]['value']
+              )
+            }
             onFocus={handleFocus}
             onBlur={e => handleBlur(e, value, value)}
             onClose={() => setStore({ isMenuOpen: false })}
@@ -121,7 +128,9 @@ const WrappedSelectInput = <O extends readonly Option[]>() => {
             endAdornment={
               <InputEndAdornment>
                 {endAdornment}
+                <HelpInputAdornment />
                 <PasswordInputAdornment />
+                <ProgressInputAdornment />
                 <ResetInputAdornment />
                 <MenuInputAdornment />
               </InputEndAdornment>
@@ -179,7 +188,7 @@ export const SelectInput = <O extends readonly Option[]>({
         ...props
       }}
     >
-      <WrappedSelectInput />
+      <WrappedSelectInput<O> />
     </PropProvider>
   );
 };
