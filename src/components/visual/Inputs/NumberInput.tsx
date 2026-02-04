@@ -10,7 +10,7 @@ import {
 import { InputTextField } from 'components/visual/Inputs/components/inputs.component.textfield';
 import { useInputBlur, useInputChange, useInputFocus } from 'components/visual/Inputs/hooks/inputs.hook.event_handlers';
 import { useInputValidation } from 'components/visual/Inputs/hooks/inputs.hook.validation';
-import type { InputOptions, InputRuntimeState, InputValueModel } from 'components/visual/Inputs/models/inputs.model';
+import type { InputOptions, InputRuntimeState, InputSlotProps, InputValueModel } from 'components/visual/Inputs/models/inputs.model';
 import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/models/inputs.model';
 import React, { useEffect, useRef } from 'react';
 
@@ -19,7 +19,8 @@ export type NumberInputProps = InputValueModel<
   string,
   React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
 > &
-  InputOptions & {
+  InputOptions &
+  InputSlotProps & {
     autoComplete?: TextFieldProps['autoComplete'];
     max?: number;
     min?: number;

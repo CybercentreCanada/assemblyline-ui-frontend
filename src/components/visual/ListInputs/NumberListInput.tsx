@@ -18,12 +18,13 @@ import {
   ListInputTextField,
   ListInputWrapper
 } from 'components/visual/ListInputs/lib/listinputs.components';
-import type { ListInputOptions } from 'components/visual/ListInputs/lib/listinputs.model';
+import type { ListInputOptions, ListInputSlotProps } from 'components/visual/ListInputs/lib/listinputs.model';
 import { DEFAULT_LIST_INPUT_CONTROLLER_PROPS } from 'components/visual/ListInputs/lib/listinputs.model';
 import React, { useEffect, useRef } from 'react';
 
 export type NumberListInputProps = InputValueModel<number, string> &
-  ListInputOptions & {
+  ListInputOptions &
+  ListInputSlotProps & {
     autoComplete?: TextFieldProps['autoComplete'];
     max?: number;
     min?: number;

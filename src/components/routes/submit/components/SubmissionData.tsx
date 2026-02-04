@@ -34,7 +34,7 @@ export const PasswordInput = React.memo(() => {
               return s;
             });
           }}
-          rootProps={{ style: { margin: theme.spacing(1) } }}
+          slotProps={{ root: { style: { margin: theme.spacing(1) } } }}
         />
       )}
     </form.Subscribe>

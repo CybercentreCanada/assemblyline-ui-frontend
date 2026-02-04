@@ -31,7 +31,12 @@ import {
   useInputValidation,
   useInputValidationResolver
 } from 'components/visual/Inputs/hooks/inputs.hook.validation';
-import type { InputOptions, InputRuntimeState, InputValueModel } from 'components/visual/Inputs/models/inputs.model';
+import type {
+  InputOptions,
+  InputRuntimeState,
+  InputSlotProps,
+  InputValueModel
+} from 'components/visual/Inputs/models/inputs.model';
 import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/models/inputs.model';
 import { Tooltip } from 'components/visual/Tooltip';
 import type { ClassificationParts, ClassificationValidator } from 'helpers/classificationParser';
@@ -50,13 +55,14 @@ import { useTranslation } from 'react-i18next';
 
 export type ClassificationInputProps = Omit<ClassificationProps, 'c12n' | 'setClassification'> &
   InputValueModel<ClassificationProps['c12n']> &
-  InputOptions;
+  InputOptions &
+  InputSlotProps;
 
 type ClassificationInputController = ClassificationInputProps &
   InputRuntimeState & {
-    showPicker: boolean;
-    uParts: ClassificationParts;
-    validated: ClassificationValidator;
+    showPicker?: boolean;
+    uParts?: ClassificationParts;
+    validated?: ClassificationValidator;
   };
 
 const WrappedClassificationInput = () => {
@@ -87,15 +93,17 @@ const WrappedClassificationInput = () => {
   const value = get('value');
 
   const dynGroup = get('dynGroup');
-  const showPicker = get('showPicker');
-  const uParts = get('uParts');
-  const validated = get('validated');
+  const showPicker = get('showPicker') ?? false;
+  const uParts = get('uParts') ?? defaultParts;
+  const validated = get('validated') ?? defaultClassificationValidator;
 
   const resolveCoercing = useInputCoercingResolver<string>();
   const resolveValidation = useInputValidationResolver<string>();
 
   const onChange = get('onChange');
   const onReset = get('onReset');
+
+  console.log(showPicker, uParts, validated);
 
   const preventRender = useMemo(
     () => preventRenderStore || !c12nDef?.enforce || !validated?.parts?.lvl,
@@ -557,9 +565,6 @@ export const ClassificationInput = ({ preventRender = false, value, ...props }: 
         isUser: false,
         preventRender,
         rawValue: value,
-        showPicker: false,
-        uParts: defaultParts,
-        validated: defaultClassificationValidator,
         validationMessage,
         validationStatus,
         value,

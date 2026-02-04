@@ -74,7 +74,7 @@ const Param: React.FC<ParamProps> = React.memo(({ param_id, spec_id, service }) 
                 {...common}
                 value={value as number}
                 defaultValue={defaultValue as number}
-                rootProps={{ style: { padding: theme.spacing(1) } }}
+                slotProps={{ root: { style: { padding: theme.spacing(1) } } }}
               />
             );
 
@@ -85,7 +85,7 @@ const Param: React.FC<ParamProps> = React.memo(({ param_id, spec_id, service }) 
                 value={value as string}
                 defaultValue={defaultValue as string}
                 options={list}
-                rootProps={{ style: { padding: theme.spacing(1) } }}
+                slotProps={{ root: { style: { padding: theme.spacing(1) } } }}
               />
             );
 
@@ -102,7 +102,7 @@ const Param: React.FC<ParamProps> = React.memo(({ param_id, spec_id, service }) 
                         .sort((a, b) => a.primary.localeCompare(b.primary))
                     : []
                 }
-                rootProps={{ style: { padding: theme.spacing(1) } }}
+                slotProps={{ root: { style: { padding: theme.spacing(1) } } }}
                 capitalize
               />
             );
@@ -297,7 +297,6 @@ const Category = React.memo(({ cat_id, category }: CategoryProps) => {
           header={({ open, setOpen }) => (
             <CheckboxInput
               label={category.name}
-              labelProps={{ color: 'textSecondary' }}
               disabled={disabled || !isEditing || (!customize && restricted)}
               divider
               expand={open}
@@ -308,6 +307,7 @@ const Category = React.memo(({ cat_id, category }: CategoryProps) => {
               onChange={!customize && restricted ? null : (e, v) => handleChange(v)}
               onExpand={() => setOpen(o => !o)}
               onReset={!customize && restricted ? null : () => handleChange(defaultValue)}
+              slotProps={{ formLabel: { color: 'textSecondary' } }}
             />
           )}
           preventRender={!customize && restricted && !(selected || indeterminate)}

@@ -20,7 +20,12 @@ import {
 import { useInputBlur, useInputChange, useInputFocus } from 'components/visual/Inputs/hooks/inputs.hook.event_handlers';
 import { useInputId } from 'components/visual/Inputs/hooks/inputs.hook.renderer';
 import { useInputValidation } from 'components/visual/Inputs/hooks/inputs.hook.validation';
-import type { InputOptions, InputRuntimeState, InputValueModel } from 'components/visual/Inputs/models/inputs.model';
+import type {
+  InputOptions,
+  InputRuntimeState,
+  InputSlotProps,
+  InputValueModel
+} from 'components/visual/Inputs/models/inputs.model';
 import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/models/inputs.model';
 
 export type Option = {
@@ -30,7 +35,8 @@ export type Option = {
 };
 
 export type SelectInputProps<O extends readonly Option[]> = InputValueModel<O[number]['value'], O[number]['value']> &
-  InputOptions & {
+  InputOptions &
+  InputSlotProps & {
     capitalize?: boolean;
     displayEmpty?: SelectProps['displayEmpty'];
     options?: O;

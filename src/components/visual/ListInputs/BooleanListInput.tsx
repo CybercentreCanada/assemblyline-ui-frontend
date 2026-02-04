@@ -22,12 +22,13 @@ import {
   ListInputText,
   ListInputWrapper
 } from 'components/visual/ListInputs/lib/listinputs.components';
-import type { ListInputOptions } from 'components/visual/ListInputs/lib/listinputs.model';
+import type { ListInputOptions, ListInputSlotProps } from 'components/visual/ListInputs/lib/listinputs.model';
 import { DEFAULT_LIST_INPUT_CONTROLLER_PROPS } from 'components/visual/ListInputs/lib/listinputs.model';
 import React from 'react';
 
 export type SwitchListInputProps = InputValueModel<boolean, boolean, React.MouseEvent<HTMLDivElement, MouseEvent>> &
-  ListInputOptions;
+  ListInputOptions &
+  ListInputSlotProps;
 
 type SwitchListInputController = SwitchListInputProps & InputRuntimeState;
 

@@ -20,7 +20,7 @@ import {
   ListInputText,
   ListInputWrapper
 } from 'components/visual/ListInputs/lib/listinputs.components';
-import type { ListInputOptions } from 'components/visual/ListInputs/lib/listinputs.model';
+import type { ListInputOptions, ListInputSlotProps } from 'components/visual/ListInputs/lib/listinputs.model';
 import { DEFAULT_LIST_INPUT_CONTROLLER_PROPS } from 'components/visual/ListInputs/lib/listinputs.model';
 import React from 'react';
 
@@ -34,7 +34,8 @@ export type SelectListInputProps<O extends readonly Option[]> = InputValueModel<
   O[number]['value'],
   O[number]['value']
 > &
-  ListInputOptions & {
+  ListInputOptions &
+  ListInputSlotProps & {
     displayEmpty?: SelectProps['displayEmpty'];
     options?: O;
   };

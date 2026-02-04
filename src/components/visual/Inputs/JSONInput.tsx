@@ -19,11 +19,16 @@ import {
 } from 'components/visual/Inputs/components/inputs.component.form';
 import { useInputChange } from 'components/visual/Inputs/hooks/inputs.hook.event_handlers';
 import { useInputValidation } from 'components/visual/Inputs/hooks/inputs.hook.validation';
-import type { InputOptions, InputRuntimeState, InputValueModel } from 'components/visual/Inputs/models/inputs.model';
+import type {
+  InputOptions,
+  InputRuntimeState,
+  InputSlotProps,
+  InputValueModel
+} from 'components/visual/Inputs/models/inputs.model';
 import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/models/inputs.model';
 import React, { useMemo } from 'react';
 
-export type JSONInputProps = InputValueModel<object> & InputOptions;
+export type JSONInputProps = InputValueModel<object> & InputOptions & InputSlotProps;
 
 type JSONInputController = JSONInputProps & InputRuntimeState;
 

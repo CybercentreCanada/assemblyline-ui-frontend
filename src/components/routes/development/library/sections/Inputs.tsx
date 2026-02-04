@@ -233,7 +233,7 @@ export const INPUTS_LIBRARY_STATE: InputsLibraryState = {
     values: {
       checkbox: false,
       chips: [],
-      classification: 'TLP:CLEAR',
+      classification: 'TLP:C',
       date: '',
       json: {},
       number: 0,
@@ -812,7 +812,7 @@ export const InputsSection = React.memo(() => {
                       ...s,
                       checkbox: false,
                       chips: ['test'],
-                      classification: 'TLP:CLEAR',
+                      classification: 'TLP:C',
                       date: '',
                       json: { test: 'test' },
                       number: 0,
@@ -836,7 +836,7 @@ export const InputsSection = React.memo(() => {
                       ...s,
                       checkbox: false,
                       chips: [LONG_STRING, LONG_STRING],
-                      classification: 'TLP:CLEAR',
+                      classification: 'TLP:C',
                       date: '',
                       json: { [LONG_STRING]: LONG_STRING },
                       number: 100000000,
@@ -860,7 +860,7 @@ export const InputsSection = React.memo(() => {
                       ...s,
                       checkbox: false,
                       chips: [],
-                      classification: 'TLP:CLEAR',
+                      classification: 'TLP:C',
                       date: null,
                       json: null,
                       number: null,
@@ -1630,7 +1630,7 @@ export const InputsSection = React.memo(() => {
                 <ClassificationInput
                   label="Controlled Classification Input"
                   value={value}
-                  defaultValue={'TLP:CLEAR'}
+                  defaultValue={'TLP:C'}
                   reset
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.classification', next)}
                   onReset={() => form.setFieldValue('components.inputs.values.classification', null)}
@@ -2367,10 +2367,10 @@ export const InputsSection = React.memo(() => {
                 <ClassificationInput
                   label="Reset Classification Input"
                   value={value}
-                  defaultValue={'TLP:CLEAR'}
+                  defaultValue={'TLP:C'}
                   reset
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.classification', next)}
-                  onReset={() => form.setFieldValue('components.inputs.values.classification', 'TLP:CLEAR')}
+                  onReset={() => form.setFieldValue('components.inputs.values.classification', 'TLP:C')}
                 />
               )}
             />
@@ -2831,7 +2831,7 @@ export const InputsSection = React.memo(() => {
                   label="Error Classification Input"
                   value={value}
                   validate={v =>
-                    v !== 'TLP:CLEAR' ? null : { status: 'error', message: 'Input field cannot be TLP:CLEAR' }
+                    v !== 'TLP:C' ? null : { status: 'error', message: 'Input field cannot be TLP:C' }
                   }
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.classification', next)}
                 />
@@ -4667,7 +4667,7 @@ export const InputsSection = React.memo(() => {
                         onReset: () => form.setFieldValue('components.inputs.values.classification', null)
                       })}
                       {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
-                      {...(error && { error: v => (v !== 'TLP:CLEAR' ? null : 'Input field cannot be TLP:CLEAR') })}
+                      {...(error && { error: v => (v !== 'TLP:C' ? null : 'Input field cannot be TLP:C') })}
                       {...(helperText && { helperText: 'Helper Text' })}
                       {...(placeholder && { placeholder: 'Placeholder' })}
                       {...(endAdornment && { endAdornment: <Button variant="contained">Submit</Button> })}

@@ -183,7 +183,7 @@ export const MetadataParam: React.FC<MetadataParamProps> = React.memo(
                   reset={!!val}
                   validate={handleValidate}
                   tooltip={safeString(validatorParams?.validation_regex)}
-                  tooltipProps={{ placement: 'right' }}
+                  slotProps={{ formLabelTooltip: { placement: 'right' } }}
                 />
               );
             default:

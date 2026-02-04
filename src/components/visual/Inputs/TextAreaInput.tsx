@@ -11,7 +11,12 @@ import type { InputTextFieldProps } from 'components/visual/Inputs/components/in
 import { InputTextField } from 'components/visual/Inputs/components/inputs.component.textfield';
 import { useInputBlur, useInputChange, useInputFocus } from 'components/visual/Inputs/hooks/inputs.hook.event_handlers';
 import { useInputValidation } from 'components/visual/Inputs/hooks/inputs.hook.validation';
-import type { InputOptions, InputRuntimeState, InputValueModel } from 'components/visual/Inputs/models/inputs.model';
+import type {
+  InputOptions,
+  InputRuntimeState,
+  InputSlotProps,
+  InputValueModel
+} from 'components/visual/Inputs/models/inputs.model';
 import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/models/inputs.model';
 import React from 'react';
 
@@ -20,7 +25,8 @@ export type TextAreaInputProps = InputValueModel<
   string,
   React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
 > &
-  InputOptions & {
+  InputOptions &
+  InputSlotProps & {
     autoComplete?: InputTextFieldProps['autoComplete'];
     rows?: TextFieldProps['rows'];
     minRows?: TextFieldProps['minRows'];
