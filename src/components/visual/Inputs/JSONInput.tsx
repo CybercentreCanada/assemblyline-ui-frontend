@@ -38,6 +38,7 @@ const WrappedJSONInput = () => {
   const [get] = usePropStore<JSONInputController>();
 
   const disabled = get('disabled');
+  const endAdornment = get('endAdornment');
   const isPasswordVisible = get('isPasswordVisible');
   const loading = get('loading');
   const monospace = get('monospace');
@@ -146,6 +147,7 @@ const WrappedJSONInput = () => {
                 }}
               />
               <InputEndAdornment>
+                {endAdornment}
                 <HelpInputAdornment />
                 <PasswordInputAdornment />
                 <ProgressInputAdornment />

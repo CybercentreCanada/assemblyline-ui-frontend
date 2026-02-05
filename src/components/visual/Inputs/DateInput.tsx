@@ -7,7 +7,6 @@ import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
 import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
 import { IconButton } from 'components/visual/Buttons/IconButton';
 import {
-  ExpandInputAdornment,
   HelpInputAdornment,
   InputEndAdornment,
   PasswordInputAdornment,
@@ -165,11 +164,12 @@ const WrappedDateInput = () => {
 
   const disabled = get('disabled');
   const endAdornment = get('endAdornment');
-  const rawValue = get('rawValue') ?? null;
   const loading = get('loading');
   const maxDateToday = get('maxDateToday');
   const minDateTomorrow = get('minDateTomorrow');
+  const rawValue = get('rawValue') ?? null;
   const readOnly = get('readOnly');
+  const startAdornment = get('startAdornment');
   const value = get('value');
 
   const today = useMemo<Moment>(() => {
@@ -221,14 +221,14 @@ const WrappedDateInput = () => {
                     onFocus: handleFocus,
                     onBlur: e => handleBlur(e, value, value ? moment(value) : null),
                     InputProps: {
+                      ...(startAdornment && { startAdornment }),
                       endAdornment: (
-                        <InputEndAdornment preventRender={readOnly && !disabled}>
+                        <InputEndAdornment>
+                          {endAdornment}
                           <HelpInputAdornment />
                           <PasswordInputAdornment />
                           <ProgressInputAdornment />
                           <ResetInputAdornment />
-                          <ExpandInputAdornment />
-                          {endAdornment}
                           <DatePopper />
                         </InputEndAdornment>
                       )

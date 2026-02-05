@@ -231,7 +231,7 @@ export const NumericalSpinnerInputAdornment = () => {
       focusInputIfNeeded();
       let nextValue = clamp(initialValue + delta);
       const absDelta = Math.abs(delta);
-      handleChange(event, nextValue ? String(nextValue) : null, nextValue);
+      handleChange(event, nextValue, nextValue ? String(nextValue) : null);
 
       timeoutRef.current = setTimeout(() => {
         if (timeoutRef.current) {
@@ -240,7 +240,7 @@ export const NumericalSpinnerInputAdornment = () => {
             const centerY = rect.top + rect.height / 2;
             const stepDir = centerY > mouseYRef.current ? absDelta : -absDelta;
             nextValue = clamp(nextValue + stepDir);
-            handleChange(event, nextValue ? String(nextValue) : null, nextValue);
+            handleChange(event, nextValue, nextValue ? String(nextValue) : null);
           }, 50);
         }
       }, 150);

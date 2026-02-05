@@ -14,7 +14,6 @@ import {
 } from 'components/visual/Inputs/components/inputs.component.adornment';
 import { useInputId, useInputLabel } from 'components/visual/Inputs/hooks/inputs.hook.renderer';
 import type { InputControllerProps } from 'components/visual/Inputs/models/inputs.model';
-import type { ValidationStatus } from 'components/visual/Inputs/utils/inputs.util.validation';
 import React, { useMemo } from 'react';
 
 export const useInputTextFieldSlots = (overrides?: Partial<TextFieldProps>) => {
@@ -40,11 +39,6 @@ export const useInputTextFieldSlots = (overrides?: Partial<TextFieldProps>) => {
 
   const isError = validationStatus === 'error';
 
-  const color =
-    !disabled && !readOnly && validationStatus && validationStatus !== 'default' && validationStatus !== 'error'
-      ? validationStatus
-      : undefined;
-
   return useMemo<TextFieldProps>(
     () => ({
       'aria-label': label,
@@ -54,7 +48,6 @@ export const useInputTextFieldSlots = (overrides?: Partial<TextFieldProps>) => {
           ? { 'aria-describedby': `${id}-helper-text` }
           : null),
       autoComplete: autoComplete,
-      color: color,
       disabled: disabled,
       error: isError,
       fullWidth: true,
@@ -62,7 +55,7 @@ export const useInputTextFieldSlots = (overrides?: Partial<TextFieldProps>) => {
       margin: 'dense',
       size: 'small',
       variant: 'outlined',
-      // ...(readOnly && !disabled && { isFocused: null }),
+      ...(readOnly && !disabled && { focused: null }),
       ...overrides,
       slotProps: {
         ...overrides?.slotProps,
@@ -79,75 +72,74 @@ export const useInputTextFieldSlots = (overrides?: Partial<TextFieldProps>) => {
         startAdornment: startAdornment && <InputAdornment position="start">{startAdornment}</InputAdornment>,
         ...overrides?.InputProps
       },
-      sx: [
-        {
-          margin: 0,
-          '& .MuiInputBase-root': {
-            minHeight: '32px',
-            paddingRight: '9px !important',
-            ...(tiny && {
-              paddingTop: '2px !important',
-              paddingBottom: '2px !important',
-              fontSize: '14px'
-            }),
-            ...(readOnly && !disabled && { cursor: 'default' })
-          },
-          '& .MuiInputBase-input': {
-            paddingRight: '4px',
-            ...(overflowHidden && {
-              whiteSpace: 'nowrap',
-              overflow: 'hidden',
-              textOverflow: 'ellipsis'
-            }),
-            ...(readOnly && !disabled && { cursor: 'default' }),
-            ...(monospace && { fontFamily: 'monospace' }),
-            ...(tiny && {
-              paddingTop: '2.5px ',
-              paddingBottom: '2.5px '
-            }),
-            ...(password &&
-              isPasswordVisible && {
-                fontFamily: 'password',
-                WebkitTextSecurity: 'disc',
-                MozTextSecurity: 'disc',
-                textSecurity: 'disc'
-              })
-          },
-          '& .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline': {
-            ...(readOnly &&
-              !disabled && {
-                borderColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.23)' : 'rgba(0, 0, 0, 0.23)'
-              })
-          },
-          '& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button': {
-            WebkitAppearance: 'none',
-            margin: 0
-          },
-          '& input[type=number]': {
-            MozAppearance: 'textfield'
-          }
+      sx: {
+        margin: 0,
+        '& .MuiInputBase-root': {
+          minHeight: '32px',
+          paddingRight: '9px !important',
+          ...(tiny && {
+            paddingTop: '2px !important',
+            paddingBottom: '2px !important',
+            fontSize: '14px'
+          }),
+          ...(readOnly && !disabled && { cursor: 'default' })
         },
-        ...(Array.isArray(overrides?.sx) ? overrides.sx : overrides?.sx ? [overrides.sx] : [])
-      ]
+        '& .MuiInputBase-input': {
+          paddingRight: '4px',
+          ...(overflowHidden && {
+            whiteSpace: 'nowrap',
+            overflow: 'hidden',
+            textOverflow: 'ellipsis'
+          }),
+          ...(readOnly && !disabled && { cursor: 'default' }),
+          ...(monospace && { fontFamily: 'monospace' }),
+          ...(tiny && {
+            paddingTop: '2.5px ',
+            paddingBottom: '2.5px '
+          }),
+          ...(password &&
+            isPasswordVisible && {
+              fontFamily: 'password',
+              WebkitTextSecurity: 'disc',
+              MozTextSecurity: 'disc',
+              textSecurity: 'disc'
+            })
+        },
+        '& .MuiInputBase-root:hover .MuiOutlinedInput-notchedOutline': {
+          ...(readOnly &&
+            !disabled && {
+              borderColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.23)' : 'rgba(0, 0, 0, 0.23)'
+            })
+        },
+        '& input[type=number]::-webkit-outer-spin-button, & input[type=number]::-webkit-inner-spin-button': {
+          WebkitAppearance: 'none',
+          margin: 0
+        },
+        '& input[type=number]': {
+          MozAppearance: 'textfield'
+        },
+        ...overrides?.sx
+      }
     }),
     [
-      label,
-      disabled,
-      loading,
-      readOnly,
-      helperText,
-      validationStatus,
-      id,
       autoComplete,
-      overrides,
-      placeholder,
-      startAdornment,
-      tiny,
-      overflowHidden,
-      monospace,
-      password,
+      disabled,
+      helperText,
+      id,
+      isError,
       isPasswordVisible,
-      theme.palette.mode
+      label,
+      loading,
+      monospace,
+      overflowHidden,
+      overrides,
+      password,
+      placeholder,
+      readOnly,
+      startAdornment,
+      theme.palette.mode,
+      tiny,
+      validationMessage
     ]
   );
 };
@@ -157,100 +149,31 @@ export type InputTextFieldProps = TextFieldProps & {
 };
 
 export const InputTextField = React.memo(({ params, ...props }: InputTextFieldProps) => {
-  const theme = useTheme();
-
   const [get] = usePropStore<InputControllerProps>();
 
-  const disabled = get('disabled');
   const endAdornment = get('endAdornment');
   const placeholder = get('placeholder');
   const readOnly = get('readOnly');
   const startAdornment = get('startAdornment');
-  const validationStatus = get('validationStatus');
 
   const inputTextFieldSlots = useInputTextFieldSlots();
 
-  const validationColorMap = useMemo<Record<ValidationStatus, { main: string; contrast?: string }>>(
-    () => ({
-      error: { main: theme.palette.error.main },
-      warning: { main: theme.palette.warning.main },
-      success: { main: theme.palette.success.main },
-      info: { main: theme.palette.info.main },
-      default: { main: theme.palette.text.secondary }
-    }),
-    [
-      theme.palette.error.main,
-      theme.palette.info.main,
-      theme.palette.success.main,
-      theme.palette.text.secondary,
-      theme.palette.warning.main
-    ]
-  );
-
-  const getValidationSx = (status?: ValidationStatus) => {
-    if (readOnly || disabled || !status || status === 'default') return {};
-
-    const color = validationColorMap[status].main;
-
-    return {
-      // Label
-      '& .MuiInputLabel-root': {
-        color
-      },
-      '& .MuiInputLabel-root.Mui-isFocused': {
-        color
-      },
-
-      // Outline (outlined variant)
-      '& .MuiOutlinedInput-root': {
-        '& fieldset': {
-          borderColor: `${color} !important`
-        },
-        '&:hover fieldset': {
-          borderColor: `${color} !important`
-        },
-        '&.Mui-isFocused fieldset': {
-          borderColor: `${color} !important`
-        }
-      },
-
-      // Input text (optional)
-      '& .MuiInputBase-input': {
-        color: status === 'error' ? undefined : 'text.primary'
-      },
-
-      // Helper text
-      '& .MuiFormHelperText-root': {
-        color
-      }
-    };
-  };
-
   return (
     <TextField
-      {...inputTextFieldSlots}
-      {...params}
       {...props}
-      sx={[
-        getValidationSx(validationStatus),
-        ...(Array.isArray(inputTextFieldSlots?.sx)
-          ? (inputTextFieldSlots.sx as unknown[])
-          : inputTextFieldSlots?.sx
-            ? [inputTextFieldSlots.sx as unknown]
-            : []),
-        ...(Array.isArray(props?.sx) ? (props.sx as unknown[]) : props?.sx ? [props.sx as unknown] : [])
-      ]}
+      {...params}
+      {...inputTextFieldSlots}
       slotProps={{
-        ...inputTextFieldSlots?.slotProps,
         ...props?.slotProps,
+        ...inputTextFieldSlots?.slotProps,
         inputLabel: {
           ...props?.slotProps?.inputLabel,
           ...params?.InputLabelProps
         },
         input: {
-          ...inputTextFieldSlots?.slotProps?.input,
           ...props?.slotProps?.input,
           ...params?.InputProps,
+          ...inputTextFieldSlots?.slotProps?.input,
           placeholder: placeholder,
           readOnly: readOnly,
           startAdornment: (

@@ -40,6 +40,7 @@ type SwitchInputController = SwitchInputProps & InputRuntimeState;
 const WrappedSwitchInput = () => {
   const [get] = usePropStore<SwitchInputController>();
 
+  const endAdornment = get('endAdornment');
   const id = useInputId();
   const preventDisabledColor = get('preventDisabledColor');
   const rawValue = Boolean(get('rawValue'));
@@ -79,6 +80,7 @@ const WrappedSwitchInput = () => {
         <InputHelperText />
 
         <InputButtonEndAdornment>
+          {endAdornment}
           <HelpInputAdornment />
           <PasswordInputAdornment />
           <ProgressInputAdornment />

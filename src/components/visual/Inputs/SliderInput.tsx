@@ -25,9 +25,9 @@ export type SliderInputProps = InputValueModel<number, number> &
   InputOptions &
   InputSlotProps & {
     marks?: SliderProps['marks'];
-    max?: number;
-    min?: number;
-    step?: SliderProps['step'];
+    max: number;
+    min: number;
+    step: SliderProps['step'];
     valueLabelDisplay?: SliderProps['valueLabelDisplay'];
     valueLabelFormat?: SliderProps['valueLabelFormat'];
   };
@@ -67,7 +67,7 @@ const WrappedSliderInput = () => {
               <div style={{ flex: 1, marginLeft: '20px', marginRight: '20px' }}>
                 <Slider
                   aria-label={id}
-                  color={!disabled && validationStatus === 'error' ? 'error' : 'primary'}
+                  color={!disabled && validationStatus !== 'default' ? validationStatus : 'primary'}
                   disabled={disabled || readOnly}
                   id={id}
                   marks={marks}
@@ -103,15 +103,14 @@ export const SliderInput = ({ preventRender = false, value, ...props }: SliderIn
     <PropProvider<SliderInputController>
       initialProps={DEFAULT_INPUT_CONTROLLER_PROPS as SliderInputController}
       props={{
-        // errorMessage,
-        rawValue: value,
         marks: false,
         max: null,
         min: null,
         preventRender: false,
+        rawValue: value,
         step: null,
-        validationStatus,
         validationMessage,
+        validationStatus,
         value,
         valueLabelDisplay: 'auto',
         valueLabelFormat: v => v,

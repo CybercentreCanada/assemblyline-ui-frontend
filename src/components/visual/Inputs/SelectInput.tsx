@@ -61,6 +61,7 @@ const WrappedSelectInput = <O extends readonly Option[]>() => {
   const password = get('password');
   const rawValue = get('rawValue');
   const readOnly = get('readOnly');
+  const startAdornment = get('startAdornment');
   const tiny = get('tiny');
   const validationStatus = get('validationStatus');
   const value = get('value');
@@ -131,6 +132,7 @@ const WrappedSelectInput = <O extends readonly Option[]>() => {
             slotProps={{ input: { id: id } }}
             MenuProps={{ sx: { maxWidth: 'min-content' } }}
             IconComponent={() => null}
+            {...(startAdornment && { startAdornment })}
             endAdornment={
               <InputEndAdornment>
                 {endAdornment}

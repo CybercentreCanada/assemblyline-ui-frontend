@@ -632,6 +632,9 @@ export const InputsSection = React.memo(() => {
                         <SliderInput
                           label="Interaction Slider Input"
                           value={value}
+                          min={0}
+                          max={100}
+                          step={1}
                           onChange={(event, next) => form.setFieldValue('components.inputs.values.slider', next)}
                           {...inputProps}
                           //

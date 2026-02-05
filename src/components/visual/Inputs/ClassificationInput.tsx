@@ -78,9 +78,11 @@ const WrappedClassificationInput = () => {
 
   const defaultValue = get('defaultValue');
   const disabled = get('disabled');
+  const endAdornment = get('endAdornment');
   const format = get('format');
   const fullWidth = get('fullWidth');
   const inline = get('inline');
+  const isPasswordVisible = get('isPasswordVisible');
   const isUser = get('isUser');
   const loading = get('loading');
   const monospace = get('monospace');
@@ -88,7 +90,7 @@ const WrappedClassificationInput = () => {
   const preventRenderStore = get('preventRender');
   const readOnly = get('readOnly');
   const reset = get('reset');
-  const isPasswordVisible = get('isPasswordVisible');
+  const startAdornment = get('startAdornment');
   const tiny = get('tiny');
   const value = get('value');
 
@@ -102,8 +104,6 @@ const WrappedClassificationInput = () => {
 
   const onChange = get('onChange');
   const onReset = get('onReset');
-
-  console.log(showPicker, uParts, validated);
 
   const preventRender = useMemo(
     () => preventRenderStore || !c12nDef?.enforce || !validated?.parts?.lvl,
@@ -532,7 +532,9 @@ const WrappedClassificationInput = () => {
                     </Button>
                   </Tooltip>
                 )}
+                {endAdornment}
                 <div style={{ flex: 1 }} />
+                {startAdornment}
                 <Button onClick={event => handleChange(event)} color="primary" autoFocus>
                   {t('classification.done')}
                 </Button>

@@ -99,8 +99,7 @@ export const InputFormControl = React.memo(({ children }: { children: React.Reac
               borderColor: theme.palette[color].dark
             },
             '&.Mui-focused fieldset': {
-              borderColor: theme.palette[color].main,
-              borderWidth: 2
+              borderColor: theme.palette[color].main
             }
           }
         }),
