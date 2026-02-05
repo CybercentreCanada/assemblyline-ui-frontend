@@ -5,9 +5,10 @@ import RefreshOutlinedIcon from '@mui/icons-material/RefreshOutlined';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import type { InputAdornmentProps } from '@mui/material';
-import { Button, CircularProgress, InputAdornment, ListItemIcon, useTheme } from '@mui/material';
+import { CircularProgress, InputAdornment, Tooltip, useTheme } from '@mui/material';
 import { usePropStore } from 'components/core/PropProvider/PropProvider';
-import type { IconButtonProps } from 'components/visual/Buttons/IconButton';
+import type { ButtonProps } from 'components/visual/Buttons/Button';
+import { Button } from 'components/visual/Buttons/Button';
 import { IconButton } from 'components/visual/Buttons/IconButton';
 import { useInputChange } from 'components/visual/Inputs/hooks/inputs.hook.event_handlers';
 import {
@@ -25,15 +26,19 @@ import {
 import type { InputControllerProps } from 'components/visual/Inputs/models/inputs.model';
 import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { LinkProps } from 'react-router-dom';
 
-export const ClearInputAdornment = React.memo(() => {
+export type InputButtonAdornmentProps = {
+  variant?: 'icon' | 'text';
+};
+
+export const ClearInputAdornment = React.memo(({ variant = 'icon' }: InputButtonAdornmentProps) => {
+  const { t } = useTranslation('inputs');
   const theme = useTheme();
 
   const [get] = usePropStore<InputControllerProps<string[], string[]>>();
 
-  const disabled = get('disabled');
   const clearAdornmentProps = get('slotProps')?.clearAdornment;
+  const disabled = get('disabled');
   const id = useInputId();
   const rawValue = get('rawValue');
   const shouldRenderClear = useShouldRenderClear();
@@ -41,12 +46,16 @@ export const ClearInputAdornment = React.memo(() => {
 
   const handleChange = useInputChange();
 
-  return !shouldRenderClear ? null : (
-    <ListItemIcon sx={{ minWidth: 0 }}>
+  if (!shouldRenderClear) return null;
+  else if (variant === 'icon')
+    return (
       <IconButton
         id={`${id}-clear-adornment`}
         color="secondary"
         disabled={disabled || !rawValue?.length}
+        tabIndex={-1}
+        tooltip={t('adornment.clear.tooltip')}
+        tooltipProps={{ arrow: true }}
         type="button"
         onClick={event => {
           event.preventDefault();
@@ -61,27 +70,60 @@ export const ClearInputAdornment = React.memo(() => {
       >
         <ClearIcon fontSize="small" />
       </IconButton>
-    </ListItemIcon>
-  );
+    );
+  else if (variant === 'text')
+    return (
+      <Button
+        id={`${id}-clear-adornment`}
+        color="secondary"
+        disabled={disabled || !rawValue?.length}
+        size="small"
+        tabIndex={-1}
+        type="button"
+        variant="outlined"
+        onClick={event => {
+          event.preventDefault();
+          event.stopPropagation();
+          handleChange(event, [], []);
+        }}
+        {...(clearAdornmentProps as ButtonProps)}
+        sx={{
+          ...(tiny && { padding: 0 }),
+          ...clearAdornmentProps?.sx
+        }}
+      >
+        {t('adornment.clear.text')}
+      </Button>
+    );
+  else return null;
 });
 
 ClearInputAdornment.displayName = 'ClearInputAdornment';
 
-export const ExpandInputAdornment = React.memo(() => {
+export const ExpandInputAdornment = React.memo(({ variant = 'icon' }: InputButtonAdornmentProps) => {
+  const { t } = useTranslation('inputs');
   const theme = useTheme();
 
   const [get] = usePropStore<InputControllerProps>();
 
+  const disabled = get('disabled');
   const expand = get('expand');
   const expandAdornmentProps = get('slotProps')?.expandAdornment;
   const id = useInputId();
   const onExpand = get('onExpand');
   const shouldRenderExpand = useShouldRenderExpand();
+  const tiny = get('tiny');
 
-  return !shouldRenderExpand ? null : (
-    <ListItemIcon sx={{ minWidth: 0 }}>
+  if (!shouldRenderExpand) return null;
+  else if (variant === 'icon')
+    return (
       <IconButton
         id={`${id}-expand-adornment`}
+        color="secondary"
+        disabled={disabled}
+        tabIndex={-1}
+        tooltip={expand ? t('adornment.collapse.tooltip') : t('adornment.expand.tooltip')}
+        tooltipProps={{ arrow: true }}
         type="button"
         onClick={event => {
           event.preventDefault();
@@ -89,6 +131,10 @@ export const ExpandInputAdornment = React.memo(() => {
           onExpand(event);
         }}
         {...expandAdornmentProps}
+        sx={{
+          padding: tiny ? theme.spacing(0.25) : theme.spacing(0.5),
+          ...expandAdornmentProps?.sx
+        }}
       >
         <ExpandMore
           fontSize="small"
@@ -96,46 +142,73 @@ export const ExpandInputAdornment = React.memo(() => {
             transition: theme.transitions.create('transform', {
               duration: theme.transitions.duration.shortest
             }),
-            transform: 'rotate(0deg)',
-            ...(expand && { transform: 'rotate(180deg)' })
+            transform: expand ? 'rotate(180deg)' : 'rotate(0deg)'
           }}
         />
       </IconButton>
-    </ListItemIcon>
-  );
+    );
+  else if (variant === 'text')
+    return (
+      <Button
+        id={`${id}-expand-adornment`}
+        color="secondary"
+        disabled={disabled}
+        size="small"
+        tabIndex={-1}
+        type="button"
+        variant="outlined"
+        onClick={event => {
+          event.preventDefault();
+          event.stopPropagation();
+          onExpand(event);
+        }}
+        {...(expandAdornmentProps as ButtonProps)}
+        sx={{
+          ...(tiny && { padding: 0 }),
+          ...expandAdornmentProps?.sx
+        }}
+      >
+        {expand ? t('adornment.collapse.text') : t('adornment.expand.text')}
+      </Button>
+    );
+  else return null;
 });
 
 ExpandInputAdornment.displayName = 'ExpandInputAdornment';
 
-export type HelpInputAdornmentProps = {
-  to?: LinkProps['to'] | (() => LinkProps['to']);
-  variant?: 'icon' | 'text';
-  onClick?: IconButtonProps['onClick'];
-};
+export const HelpInputAdornment = React.memo(({ variant = 'icon' }: InputButtonAdornmentProps) => {
+  const { t } = useTranslation('inputs');
+  const theme = useTheme();
 
-export const HelpInputAdornment = React.memo(
-  ({ to = null, variant = 'icon', onClick = () => null }: HelpInputAdornmentProps) => {
-    const theme = useTheme();
+  const [get] = usePropStore<InputControllerProps>();
 
-    const [get] = usePropStore<InputControllerProps>();
+  const disabled = get('disabled');
+  const help = get('help');
+  const helpAdornmentProps = get('slotProps')?.helpAdornment;
+  const id = useInputId();
+  const shouldRenderHelp = useShouldRenderHelp();
+  const tiny = get('tiny');
 
-    const helpAdornmentProps = get('slotProps')?.helpAdornment;
-    const id = useInputId();
-    const shouldRenderHelp = useShouldRenderHelp();
-    const tiny = get('tiny');
+  const isExternal = help?.startsWith('http');
 
-    if (!shouldRenderHelp) return null;
-
-    return variant === 'icon' ? (
+  if (!shouldRenderHelp) return null;
+  else if (variant === 'icon')
+    return (
       <IconButton
         id={`${id}-help-adornment`}
         color="secondary"
+        disabled={disabled}
+        tabIndex={-1}
+        to={help}
+        tooltip={
+          <>
+            <span style={{ color: theme.palette.text.secondary }}>{t('adornment.help.tooltip')}</span>
+            <span>{help}</span>
+          </>
+        }
+        tooltipProps={{ arrow: true }}
         type="button"
-        onClick={event => {
-          event.preventDefault();
-          event.stopPropagation();
-          onClick(event);
-        }}
+        {...(isExternal && { target: '_blank', rel: 'noopener noreferrer' })}
         {...helpAdornmentProps}
         sx={{
           padding: tiny ? theme.spacing(0.25) : theme.spacing(0.5),
@@ -144,13 +217,42 @@ export const HelpInputAdornment = React.memo(
       >
         <HelpOutlineOutlinedIcon fontSize="small" />
       </IconButton>
-    ) : null;
-  }
-);
+    );
+  else if (variant === 'text')
+    return (
+      <Button
+        id={`${id}-help-adornment`}
+        color="secondary"
+        disabled={disabled}
+        size="small"
+        tabIndex={-1}
+        to={help}
+        tooltip={
+          <>
+            <span style={{ color: theme.palette.text.secondary }}>{t('adornment.help.tooltip')}</span>
+            <span>{help}</span>
+          </>
+        }
+        tooltipProps={{ arrow: true }}
+        type="button"
+        variant="outlined"
+        {...(isExternal && { target: '_blank', rel: 'noopener noreferrer' })}
+        {...(helpAdornmentProps as ButtonProps)}
+        sx={{
+          ...(tiny && { padding: 0 }),
+          ...helpAdornmentProps?.sx
+        }}
+      >
+        {t('adornment.help.text')}
+      </Button>
+    );
+  else return null;
+});
 
 HelpInputAdornment.displayName = 'HelpInputAdornment';
 
-export const MenuInputAdornment = React.memo(() => {
+export const MenuInputAdornment = React.memo(({ variant = 'icon' }: InputButtonAdornmentProps) => {
+  const { t } = useTranslation('inputs');
   const theme = useTheme();
 
   const [get, setStore] = usePropStore<InputControllerProps>();
@@ -158,33 +260,58 @@ export const MenuInputAdornment = React.memo(() => {
   const disabled = get('disabled');
   const id = useInputId();
   const isMenuOpen = get('isMenuOpen');
-  const resetAdornmentProps = get('slotProps')?.resetAdornment;
+  const menuAdornmentProps = get('slotProps')?.menuAdornment;
   const shouldRenderMenu = useShouldRenderMenu();
   const tiny = get('tiny');
 
-  return !shouldRenderMenu ? null : (
-    <IconButton
-      aria-label={`${id}-select-menu`}
-      color="secondary"
-      disabled={disabled}
-      type="button"
-      tabIndex={-1}
-      onClick={() => setStore({ isMenuOpen: true })}
-      {...resetAdornmentProps}
-      sx={{
-        padding: tiny ? theme.spacing(0.75) : theme.spacing(1),
-        transition: theme.transitions.create('transform', {
-          duration: theme.transitions.duration.shortest
-        }),
-        transform: isMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-        ...resetAdornmentProps?.sx
-      }}
-    >
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
-        <path d="M0 8 L12 20 L24 8 Z" />
-      </svg>
-    </IconButton>
-  );
+  if (!shouldRenderMenu) return null;
+  else if (variant === 'icon')
+    return (
+      <IconButton
+        id={`${id}-menu-adornment`}
+        color="secondary"
+        disabled={disabled}
+        tabIndex={-1}
+        tooltip={t('adornment.menu.tooltip')}
+        tooltipProps={{ arrow: true }}
+        type="button"
+        onClick={() => setStore({ isMenuOpen: true })}
+        {...menuAdornmentProps}
+        sx={{
+          padding: tiny ? theme.spacing(0.75) : theme.spacing(1),
+          transition: theme.transitions.create('transform', {
+            duration: theme.transitions.duration.shortest
+          }),
+          transform: isMenuOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+          ...menuAdornmentProps?.sx
+        }}
+      >
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+          <path d="M0 8 L12 20 L24 8 Z" />
+        </svg>
+      </IconButton>
+    );
+  else if (variant === 'text')
+    return (
+      <Button
+        id={`${id}-menu-adornment`}
+        color="secondary"
+        disabled={disabled}
+        size="small"
+        tabIndex={-1}
+        type="button"
+        variant="outlined"
+        onClick={() => setStore({ isMenuOpen: true })}
+        {...(menuAdornmentProps as ButtonProps)}
+        sx={{
+          ...(tiny && { padding: 0 }),
+          ...menuAdornmentProps?.sx
+        }}
+      >
+        {t('adornment.menu.text')}
+      </Button>
+    );
+  else return null;
 });
 
 MenuInputAdornment.displayName = 'MenuInputAdornment';
@@ -332,45 +459,72 @@ export const NumericalSpinnerInputAdornment = () => {
 
 NumericalSpinnerInputAdornment.displayName = 'NumericalSpinnerInputAdornment';
 
-export const PasswordInputAdornment = React.memo(() => {
+export const PasswordInputAdornment = React.memo(({ variant = 'icon' }: InputButtonAdornmentProps) => {
   const { t } = useTranslation('inputs');
   const theme = useTheme();
 
   const [get, setStore] = usePropStore<InputControllerProps>();
 
+  const disabled = get('disabled');
   const id = useInputId();
   const isPasswordVisible = get('isPasswordVisible');
-  const resetAdornmentProps = get('slotProps')?.resetAdornment;
+  const passwordAdornmentProps = get('slotProps')?.passwordAdornment;
   const shouldRenderPassword = useShouldRenderPassword();
   const tiny = get('tiny');
 
   if (!shouldRenderPassword) return null;
-
-  return (
-    <IconButton
-      id={`${id}-password-adornment`}
-      color="secondary"
-      type="button"
-      tooltip={isPasswordVisible ? t('adornment.password.show') : t('adornment.password.hide')}
-      tooltipProps={{ arrow: true }}
-      onClick={() => setStore({ isPasswordVisible: !isPasswordVisible })}
-      {...resetAdornmentProps}
-      sx={{
-        padding: tiny ? theme.spacing(0.25) : theme.spacing(0.5),
-        ...resetAdornmentProps?.sx
-      }}
-    >
-      {isPasswordVisible ? <VisibilityOff fontSize="small" /> : <Visibility fontSize="small" />}
-    </IconButton>
-  );
+  else if (variant === 'icon')
+    return (
+      <IconButton
+        id={`${id}-password-adornment`}
+        color="secondary"
+        disabled={disabled}
+        tabIndex={-1}
+        tooltip={isPasswordVisible ? t('adornment.showPassword.tooltip') : t('adornment.hidePassword.tooltip')}
+        tooltipProps={{ arrow: true }}
+        type="button"
+        onClick={() => setStore({ isPasswordVisible: !isPasswordVisible })}
+        {...passwordAdornmentProps}
+        sx={{
+          padding: tiny ? theme.spacing(0.25) : theme.spacing(0.5),
+          ...passwordAdornmentProps?.sx
+        }}
+      >
+        {isPasswordVisible ? <VisibilityOff fontSize="small" /> : <Visibility fontSize="small" />}
+      </IconButton>
+    );
+  else if (variant === 'text')
+    return (
+      <Button
+        id={`${id}-password-adornment`}
+        color="secondary"
+        disabled={disabled}
+        size="small"
+        tabIndex={-1}
+        type="button"
+        variant="outlined"
+        onClick={() => setStore({ isPasswordVisible: !isPasswordVisible })}
+        {...(passwordAdornmentProps as ButtonProps)}
+        sx={{
+          ...(tiny && { padding: 0 }),
+          ...passwordAdornmentProps?.sx
+        }}
+      >
+        {isPasswordVisible ? t('adornment.showPassword.text') : t('adornment.hidePassword.text')}
+      </Button>
+    );
+  else return null;
 });
 
 PasswordInputAdornment.displayName = 'PasswordInputAdornment';
 
 export const ProgressInputAdornment = React.memo(() => {
+  const theme = useTheme();
+
   const [get] = usePropStore<InputControllerProps>();
 
   const id = useInputId();
+  const progress = get('progress');
   const progressAdornmentProps = get('slotProps')?.progressAdornment;
   const shouldRenderProgress = useShouldRenderProgress();
   const tiny = get('tiny');
@@ -378,25 +532,28 @@ export const ProgressInputAdornment = React.memo(() => {
   if (!shouldRenderProgress) return null;
 
   return (
-    <CircularProgress
-      id={`${id}-password-adornment`}
-      color="secondary"
-      size={tiny ? '24px' : '28px'}
-      {...progressAdornmentProps}
-      sx={{ padding: tiny ? '2px' : '4px', ...progressAdornmentProps?.sx }}
-    />
+    <Tooltip arrow title={progress}>
+      <CircularProgress
+        id={`${id}-password-adornment`}
+        color="secondary"
+        size={tiny ? '24px' : '28px'}
+        {...progressAdornmentProps}
+        sx={{ padding: tiny ? theme.spacing(0.25) : theme.spacing(0.5), ...progressAdornmentProps?.sx }}
+      />
+    </Tooltip>
   );
 });
 
 ProgressInputAdornment.displayName = 'ProgressInputAdornment';
 
-export const ResetInputAdornment = React.memo(() => {
+export const ResetInputAdornment = React.memo(({ variant = 'icon' }: InputButtonAdornmentProps) => {
   const { t } = useTranslation('inputs');
   const theme = useTheme();
 
   const [get] = usePropStore<InputControllerProps>();
 
   const defaultValue = get('defaultValue');
+  const disabled = get('disabled');
   const id = useInputId();
   const onReset = get('onReset');
   const resetAdornmentProps = get('slotProps')?.resetAdornment;
@@ -407,40 +564,66 @@ export const ResetInputAdornment = React.memo(() => {
 
   const tooltip = useMemo<React.ReactNode>(
     () =>
-      defaultValue === undefined ? null : (
+      defaultValue === undefined ? null : defaultValue === null ? (
         <>
-          <span style={{ color: theme.palette.text.secondary }}>{t('reset_to')}</span>
-          <span>
-            {typeof defaultValue === 'object'
-              ? JSON.stringify(defaultValue)
-              : typeof defaultValue === 'string'
-                ? `"${defaultValue}"`
-                : `${defaultValue}`}
+          <span style={{ color: theme.palette.text.secondary }}>{t('adornment.reset.tooltip', { type: 'value' })}</span>
+          <span>{'null'}</span>
+        </>
+      ) : (
+        <>
+          <span style={{ color: theme.palette.text.secondary }}>
+            {t('adornment.reset.tooltip', { type: typeof defaultValue })}
           </span>
+          <span>{JSON.stringify(defaultValue)}</span>
         </>
       ),
     [defaultValue, t, theme.palette.text.secondary]
   );
 
   if (!shouldRenderReset) return null;
-
-  return (
-    <IconButton
-      id={`${id}-reset-adornment`}
-      color="secondary"
-      type="reset"
-      tooltip={tooltip}
-      tooltipProps={{ arrow: true }}
-      onClick={event => (onReset ? onReset(event) : handleChange(event, defaultValue, defaultValue))}
-      {...resetAdornmentProps}
-      sx={{
-        padding: tiny ? theme.spacing(0.25) : theme.spacing(0.5),
-        ...resetAdornmentProps?.sx
-      }}
-    >
-      <RefreshOutlinedIcon fontSize="small" />
-    </IconButton>
-  );
+  else if (variant === 'icon')
+    return (
+      <IconButton
+        id={`${id}-reset-adornment`}
+        color="secondary"
+        disabled={disabled}
+        tabIndex={-1}
+        tooltip={tooltip}
+        tooltipProps={{ arrow: true }}
+        type="button"
+        onClick={event => (onReset ? onReset(event) : handleChange(event, defaultValue, defaultValue))}
+        {...resetAdornmentProps}
+        sx={{
+          padding: tiny ? theme.spacing(0.25) : theme.spacing(0.5),
+          ...resetAdornmentProps?.sx
+        }}
+      >
+        <RefreshOutlinedIcon fontSize="small" />
+      </IconButton>
+    );
+  else if (variant === 'text')
+    return (
+      <Button
+        id={`${id}-reset-adornment`}
+        color="secondary"
+        disabled={disabled}
+        size="small"
+        tabIndex={-1}
+        type="button"
+        tooltip={tooltip}
+        tooltipProps={{ arrow: true }}
+        variant="outlined"
+        onClick={event => (onReset ? onReset(event) : handleChange(event, defaultValue, defaultValue))}
+        {...(resetAdornmentProps as ButtonProps)}
+        sx={{
+          ...(tiny && { padding: 0 }),
+          ...resetAdornmentProps?.sx
+        }}
+      >
+        {t('adornment.reset.text')}
+      </Button>
+    );
+  else return null;
 });
 
 ResetInputAdornment.displayName = 'ResetInputAdornment';

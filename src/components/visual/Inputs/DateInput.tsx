@@ -60,6 +60,7 @@ type DateInputController = DateInputProps &
   };
 
 const DatePopper = React.memo(() => {
+  const { t } = useTranslation('inputs');
   const theme = useTheme();
 
   const [anchorEl, setAnchorEl] = useState<Element>(null);
@@ -77,9 +78,11 @@ const DatePopper = React.memo(() => {
   return (
     <>
       <IconButton
-        aria-label={`${id}-date`}
+        id={`${id}-date-adornment`}
         color="secondary"
         disabled={disabled}
+        tooltip={t('adornment.date.tooltip')}
+        tooltipProps={{ arrow: true }}
         type="button"
         onClick={event => {
           event.preventDefault();
@@ -223,7 +226,7 @@ const WrappedDateInput = () => {
                     InputProps: {
                       ...(startAdornment && { startAdornment }),
                       endAdornment: (
-                        <InputEndAdornment>
+                        <InputEndAdornment preventRender={false}>
                           {endAdornment}
                           <HelpInputAdornment />
                           <PasswordInputAdornment />

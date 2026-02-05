@@ -133,7 +133,7 @@ export type InputOptions = {
    * If `true`, shows the help button
    * @default false
    */
-  help?: boolean;
+  help?: `/${string}` | `${'http' | 'https'}://${string}`;
 
   /**
    * Helper / description text displayed under the input
@@ -192,10 +192,9 @@ export type InputOptions = {
   preventRender?: boolean;
 
   /**
-   * If `true`, shows the progress spinner
-   * @default false
+   * shows the progress spinner with a tooltip of the progress value
    */
-  progress?: boolean;
+  progress?: string;
 
   /**
    * If `true`, the input is read-only
@@ -242,7 +241,7 @@ export const DEFAULT_INPUT_OPTIONS: InputOptions = {
   divider: false,
   endAdornment: null,
   expand: null,
-  help: false,
+  help: null,
   helperText: null,
   id: null,
   label: null,
@@ -253,7 +252,7 @@ export const DEFAULT_INPUT_OPTIONS: InputOptions = {
   placeholder: null,
   preventDisabledColor: false,
   preventRender: false,
-  progress: false,
+  progress: null,
   readOnly: false,
   startAdornment: null,
   tiny: false,
@@ -338,6 +337,8 @@ export type InputSlotProps = {
     formLabelTooltip?: Omit<TooltipProps, 'children' | 'title'>;
     helpAdornment?: IconButtonProps;
     helperText?: FormHelperTextProps;
+    menuAdornment?: IconButtonProps;
+    passwordAdornment?: IconButtonProps;
     progressAdornment?: CircularProgressProps;
     resetAdornment?: IconButtonProps;
     root?: React.HTMLAttributes<HTMLDivElement>;
@@ -354,6 +355,8 @@ export const DEFAULT_INPUT_SLOT_PROPS: InputSlotProps = {
     formLabelTooltip: null,
     helpAdornment: null,
     helperText: null,
+    menuAdornment: null,
+    passwordAdornment: null,
     progressAdornment: null,
     resetAdornment: null,
     root: null,

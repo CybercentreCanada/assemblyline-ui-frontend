@@ -18,7 +18,12 @@ import type { WhoAmI } from 'components/models/ui/user';
 import { Button } from 'components/visual/Buttons/Button';
 import type { ClassificationProps } from 'components/visual/Classification';
 import CustomChip, { COLOR_MAP } from 'components/visual/CustomChip';
-import { PasswordInputAdornment } from 'components/visual/Inputs/components/inputs.component.adornment';
+import {
+  HelpInputAdornment,
+  PasswordInputAdornment,
+  ProgressInputAdornment,
+  ResetInputAdornment
+} from 'components/visual/Inputs/components/inputs.component.adornment';
 import {
   InputFormControl,
   InputFormLabel,
@@ -38,7 +43,6 @@ import type {
   InputValueModel
 } from 'components/visual/Inputs/models/inputs.model';
 import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/models/inputs.model';
-import { Tooltip } from 'components/visual/Tooltip';
 import type { ClassificationParts, ClassificationValidator } from 'helpers/classificationParser';
 import {
   applyAliases,
@@ -76,7 +80,6 @@ const WrappedClassificationInput = () => {
 
   const [get, setStore] = usePropStore<ClassificationInputController>();
 
-  const defaultValue = get('defaultValue');
   const disabled = get('disabled');
   const endAdornment = get('endAdornment');
   const format = get('format');
@@ -89,7 +92,6 @@ const WrappedClassificationInput = () => {
   const password = get('password');
   const preventRenderStore = get('preventRender');
   const readOnly = get('readOnly');
-  const reset = get('reset');
   const startAdornment = get('startAdornment');
   const tiny = get('tiny');
   const value = get('value');
@@ -103,7 +105,6 @@ const WrappedClassificationInput = () => {
   const resolveValidation = useInputValidationResolver<string>();
 
   const onChange = get('onChange');
-  const onReset = get('onReset');
 
   const preventRender = useMemo(
     () => preventRenderStore || !c12nDef?.enforce || !validated?.parts?.lvl,
@@ -127,23 +128,6 @@ const WrappedClassificationInput = () => {
     }
     return COLOR_MAP[levelStyles.color || levelStyles.label.replace('label-', '')] || ('default' as const);
   }, [c12nDef.levels_styles_map, preventRender, validated.parts.lvl]);
-
-  const title = useMemo<React.ReactNode>(
-    () =>
-      defaultValue === undefined ? null : (
-        <>
-          <span style={{ color: theme.palette.text.secondary }}>{t('reset_to')}</span>
-          <span>
-            {typeof defaultValue === 'object'
-              ? JSON.stringify(defaultValue)
-              : typeof defaultValue === 'string'
-                ? `"${defaultValue}"`
-                : `${defaultValue}`}
-          </span>
-        </>
-      ),
-    [defaultValue, t, theme.palette.text.secondary]
-  );
 
   const handleGroupsChange = useCallback(
     (grp: WhoAmI['classification_aliases'][keyof WhoAmI['classification_aliases']]) => {
@@ -253,23 +237,6 @@ const WrappedClassificationInput = () => {
       }));
     },
     [c12nDef, format, isMobile, isUser, onChange, resolveCoercing, resolveValidation, setStore, validated.parts]
-  );
-
-  const handleReset = useCallback(
-    (event: React.SyntheticEvent) => {
-      const { ignore } = resolveCoercing(event, defaultValue, defaultValue);
-      const [validationStatus, validationMessage] = resolveValidation(defaultValue, defaultValue);
-
-      if (!ignore) onChange(event, defaultValue);
-      setStore(() => ({
-        ...(!ignore && { value: defaultValue }),
-        rawValue: defaultValue,
-        showPicker: false,
-        validationMessage,
-        validationStatus
-      }));
-    },
-    [defaultValue, onChange, resolveCoercing, resolveValidation, setStore]
   );
 
   useEffect(() => {
@@ -517,25 +484,14 @@ const WrappedClassificationInput = () => {
                 </Grid>
               </DialogContent>
               <DialogActions>
-                <Button
-                  color="secondary"
-                  to="/help/classification"
-                  onClick={() => setStore(() => ({ showPicker: false }))}
-                >
-                  {t('classification.help')}
-                </Button>
-                <PasswordInputAdornment />
-                {reset && (
-                  <Tooltip arrow title={title} placement="bottom">
-                    <Button onClick={onReset ? onReset : handleReset} color="secondary">
-                      {t('classification.reset')}
-                    </Button>
-                  </Tooltip>
-                )}
+                <HelpInputAdornment variant="text" />
+                <PasswordInputAdornment variant="text" />
+                <ResetInputAdornment variant="text" />
                 {endAdornment}
                 <div style={{ flex: 1 }} />
                 {startAdornment}
-                <Button onClick={event => handleChange(event)} color="primary" autoFocus>
+                <ProgressInputAdornment />
+                <Button onClick={event => handleChange(event)} color="primary" variant="contained" autoFocus>
                   {t('classification.done')}
                 </Button>
               </DialogActions>
@@ -569,6 +525,7 @@ export const ClassificationInput = ({ preventRender = false, value, ...props }: 
         rawValue: value,
         validationMessage,
         validationStatus,
+        help: '/help/classification',
         value,
         ...props
       }}
