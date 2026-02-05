@@ -10,6 +10,7 @@ import {
 import type { InputTextFieldProps } from 'components/visual/Inputs/components/inputs.component.textfield';
 import { InputTextField } from 'components/visual/Inputs/components/inputs.component.textfield';
 import { useInputBlur, useInputChange, useInputFocus } from 'components/visual/Inputs/hooks/inputs.hook.event_handlers';
+import { useInputId } from 'components/visual/Inputs/hooks/inputs.hook.renderer';
 import { useInputValidation } from 'components/visual/Inputs/hooks/inputs.hook.validation';
 import type {
   InputOptions,
@@ -39,14 +40,15 @@ const WrappedTextAreaInput = () => {
   const [get] = usePropStore<TextAreaInputController>();
 
   const autoComplete = get('autoComplete');
-  const rawValue = get('rawValue') ?? '';
+  const id = useInputId();
+  const isPasswordVisible = get('isPasswordVisible');
   const loading = get('loading');
   const maxRows = get('maxRows');
   const minRows = get('minRows');
   const overflowHidden = get('overflowHidden');
   const password = get('password');
+  const rawValue = get('rawValue') ?? '';
   const rows = get('rows');
-  const isPasswordVisible = get('isPasswordVisible');
   const tiny = get('tiny');
   const value = get('value');
 
@@ -54,13 +56,15 @@ const WrappedTextAreaInput = () => {
   const handleChange = useInputChange<string>();
   const handleFocus = useInputFocus<string>();
 
+  const skeletonRows = rows ?? minRows ?? maxRows ?? 1;
+
   return (
     <InputRoot>
       <InputFormLabel />
       <InputFormControl>
         {loading ? (
           <Skeleton
-            sx={{ height: `calc(23px * ${rows} + 17px)`, transform: 'unset', ...(tiny && { height: '28px' }) }}
+            sx={{ height: `calc(23px * ${skeletonRows} + 17px)`, transform: 'unset', ...(tiny && { height: '28px' }) }}
           />
         ) : (
           <>
@@ -70,6 +74,7 @@ const WrappedTextAreaInput = () => {
                 ...(minRows || maxRows ? { minRows, maxRows } : { rows: rows || 1 })
               })}
               autoComplete={autoComplete}
+              id={id}
               value={rawValue}
               onChange={e => handleChange(e, e.target.value, e.target.value)}
               onFocus={handleFocus}

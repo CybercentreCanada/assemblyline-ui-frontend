@@ -7,7 +7,7 @@
   "adornment.expand.text": " Expand",
   "adornment.expand.tooltip": " Expand the section",
   "adornment.help.text": " Help",
-  "adornment.help.tooltip": " View documentation at: ",
+  "adornment.help.tooltip": " View field documentation at: ",
   "adornment.hidePassword.text": "Hide",
   "adornment.hidePassword.tooltip": "Hide value",
   "adornment.menu.text": " Menu",
@@ -27,9 +27,10 @@
   "classification.text.accept": "Are you sure that you want to proceed?",
   "classification.title": "Classification accessibility warning",
   "input.chips.placeholder": "Type a value and press enter",
+  "validation.integer": "Value should be an integer",
   "validation.max": "Value must be less than or equal to {{max}}",
   "validation.min": "Value must be greater than or equal to {{min}}",
-  "validation.minmax": "Value be between {{min}} and {{max}}",
+  "validation.minmax": "Value must be between {{min}} and {{max}}",
   "validation.noWhitespace": "Value includes a whitespace",
   "validation.required": "Value is required"
 }

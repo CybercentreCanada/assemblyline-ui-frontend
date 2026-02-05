@@ -31,9 +31,9 @@ export const useInputValidation = <Value extends unknown = unknown, RawValue = V
   Validator<Value, RawValue>
 > => {
   const { t } = useTranslation(['inputs']);
-  const schema = new ValidationResolver<Value, RawValue>({ max, min, validate });
+  const schema = new ValidationResolver<Value, RawValue>({ max, min, validate }, t);
   const resolver = validators(schema) as ValidationResolver<Value, RawValue>;
-  return resolver.resolve(t, value, rawValue);
+  return resolver.resolve(value, rawValue);
 };
 
 /**
@@ -53,9 +53,9 @@ export const useInputValidationResolver = <Value extends unknown = unknown, RawV
 
   return useCallback(
     (value: Value, rawValue: RawValue) => {
-      const schema = new ValidationResolver<Value, RawValue>({ max, min, validate });
+      const schema = new ValidationResolver<Value, RawValue>({ max, min, validate }, t);
       const resolver = validators(schema) as ValidationResolver<Value, RawValue>;
-      const { status, message } = resolver.resolve(t, value, rawValue);
+      const { status, message } = resolver.resolve(value, rawValue);
       return [status, message];
     },
     [max, min, t, validate, validators]
