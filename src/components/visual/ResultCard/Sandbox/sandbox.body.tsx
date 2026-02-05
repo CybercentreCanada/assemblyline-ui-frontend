@@ -7,7 +7,7 @@ import { ProcessTable } from 'components/visual/ResultCard/Sandbox/components/Pr
 import { SignatureTable } from 'components/visual/ResultCard/Sandbox/components/SignatureTable';
 import type { SandboxFilter } from 'components/visual/ResultCard/Sandbox/sandbox.utils';
 import { TabContainer } from 'components/visual/TabContainer';
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 type LabelProps = {
@@ -47,6 +47,10 @@ const Label = React.memo(({ label, quantity, total }: LabelProps) => {
   );
 });
 
+type TabKey = 'processes' | 'netflows' | 'signatures';
+
+type RowCounts = Record<TabKey, number>;
+
 export type SandboxBodyProps = {
   body: SandboxData;
   force?: boolean;
@@ -56,13 +60,9 @@ export type SandboxBodyProps = {
 export const SandboxBody = React.memo(({ body, printable = false }: SandboxBodyProps) => {
   const { t } = useTranslation('sandboxResult');
 
-  const [tab, setTab] = useState<'processes' | 'netflows' | 'signatures'>('processes');
+  const [tab, setTab] = useState<TabKey | undefined>();
   const [filterValue, setFilterValue] = useState<SandboxFilter>();
-  const [rowCounts, setRowCounts] = useState<{ processes: number; netflows: number; signatures: number }>({
-    processes: 0,
-    netflows: 0,
-    signatures: 0
-  });
+  const [rowCounts, setRowCounts] = useState<RowCounts>({ processes: 0, netflows: 0, signatures: 0 });
 
   const startTime = useMemo(() => {
     const time = body?.analysis_information?.analysis_metadata?.start_time;
@@ -70,12 +70,28 @@ export const SandboxBody = React.memo(({ body, printable = false }: SandboxBodyP
   }, [body]);
 
   const handleRowCountChange = useCallback(
-    (key: keyof typeof rowCounts) => (count: number) => setRowCounts(prev => ({ ...prev, [key]: count || 0 })),
+    (key: TabKey) => (count: number) => setRowCounts(prev => ({ ...prev, [key]: count || 0 })),
     []
   );
 
+  const availableTabs = useMemo(() => {
+    const tabs: TabKey[] = [];
+
+    if (body.processes.length) tabs.push('processes');
+    if (body.network_connections.length) tabs.push('netflows');
+    if (body.signatures.length) tabs.push('signatures');
+
+    return tabs;
+  }, [body]);
+
+  useEffect(() => {
+    setTab(availableTabs[0]);
+  }, [availableTabs]);
+
+  if (!body || !tab) return null;
+
   try {
-    return !body ? null : (
+    return (
       <>
         {/* <ProcessTimeline
           body={body}
@@ -91,7 +107,7 @@ export const SandboxBody = React.memo(({ body, printable = false }: SandboxBodyP
           paper
           selectionFollowsFocus
           value={tab}
-          onChange={(e, v: 'processes' | 'netflows' | 'signatures') => setTab(v)}
+          onChange={(_, v: TabKey) => setTab(v)}
           tabs={{
             ...(body.processes.length && {
               processes: {
@@ -148,6 +164,4 @@ export const SandboxBody = React.memo(({ body, printable = false }: SandboxBodyP
     // eslint-disable-next-line no-console
     console.log('[WARNING] Could not parse Sandbox body. The section will be skipped...');
   }
-
-  return null;
 });
