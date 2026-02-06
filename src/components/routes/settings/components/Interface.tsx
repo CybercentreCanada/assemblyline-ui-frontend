@@ -47,7 +47,7 @@ export const InterfaceSection = React.memo(() => {
             id="interface"
             data-anchor="interface"
             primary={t('interface')}
-            primaryProps={{ className: 'Anchor', variant: 'h6' }}
+            slotProps={{ primary: { className: 'Anchor', variant: 'h6' } }}
           />
 
           <List>

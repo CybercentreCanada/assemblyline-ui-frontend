@@ -206,9 +206,9 @@ export const ListInputText = React.memo(({ noLabel = false, ...props }: ListInpu
   const monospace = get('monospace');
   const overflowHidden = get('overflowHidden');
   const primary = get('primary');
-  const primaryTypographyProps = get('slotProps')?.primaryProps;
+  const primaryTypographyProps = get('slotProps')?.primary;
   const secondary = get('secondary');
-  const secondaryTypographyProps = get('slotProps')?.secondaryProps;
+  const secondaryTypographyProps = get('slotProps')?.secondary;
 
   return (
     <Box

@@ -165,13 +165,13 @@ const Service = React.memo(({ cat_id, svr_id, customize, disabled, loading }: Se
           <ListHeader
             id={`${category}-${name}`}
             primary={name}
-            primaryProps={{ className: 'Anchor' }}
             secondary={description}
             checked={selected}
             anchor
             reset={defaultValue !== null && selected !== defaultValue}
             onChange={!customize && restricted ? undefined : () => handleChange(!selected)}
             onReset={!customize && restricted ? undefined : () => handleChange(defaultValue)}
+            slotProps={{ primary: { className: 'Anchor' } }}
           />
         )}
       />
@@ -262,7 +262,6 @@ const Category = React.memo(
               id={name}
               anchorProps={{ subheader: true }}
               primary={name}
-              primaryProps={{ color: theme.palette.text.secondary }}
               checked={selected}
               indeterminate={indeterminate}
               divider
@@ -270,6 +269,7 @@ const Category = React.memo(
               reset={defaultValue !== null && selected !== defaultValue}
               onChange={!customize && restricted ? undefined : () => handleChange(!selected)}
               onReset={!customize && restricted ? undefined : () => handleChange(defaultValue)}
+              slotProps={{ primary: { color: theme.palette.text.secondary } }}
             />
           )}
         />

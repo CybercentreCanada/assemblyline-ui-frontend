@@ -2,7 +2,6 @@ import { useTheme } from '@mui/material';
 import { DemoContainer } from 'components/routes/development/library/components/DemoContainer';
 import { DemoSection } from 'components/routes/development/library/components/DemoSection';
 import { useForm } from 'components/routes/development/library/contexts/form';
-import { CheckboxInput } from 'components/visual/Inputs/CheckboxInput';
 import { List } from 'components/visual/List/List';
 import { ListHeader } from 'components/visual/List/ListHeader';
 import { TextListInput } from 'components/visual/ListInputs/TextListInput';
@@ -49,7 +48,7 @@ export const ListSection = React.memo(() => {
 
   return (
     <DemoContainer>
-      <DemoSection
+      {/* <DemoSection
         primary="Interactions"
         secondary={
           <>
@@ -62,25 +61,30 @@ export const ListSection = React.memo(() => {
               [
                 state.values.components.list_inputs.state.badge,
                 state.values.components.list_inputs.state.capitalize,
+                state.values.components.list_inputs.state.coerce,
+                state.values.components.list_inputs.state.coercers,
                 state.values.components.list_inputs.state.disabled,
                 state.values.components.list_inputs.state.endAdornment,
-                state.values.components.list_inputs.state.error,
+                state.values.components.list_inputs.state.expand,
+                state.values.components.list_inputs.state.help,
                 state.values.components.list_inputs.state.helperText,
                 state.values.components.list_inputs.state.inset,
                 state.values.components.list_inputs.state.loading,
-                state.values.components.list_inputs.state.longNames,
+                state.values.components.list_inputs.state.longname,
                 state.values.components.list_inputs.state.monospace,
                 state.values.components.list_inputs.state.noSecondary,
                 state.values.components.list_inputs.state.overflowHidden,
                 state.values.components.list_inputs.state.password,
                 state.values.components.list_inputs.state.placeholder,
                 state.values.components.list_inputs.state.preventRender,
+                state.values.components.list_inputs.state.progress,
                 state.values.components.list_inputs.state.readOnly,
-                state.values.components.list_inputs.state.required,
                 state.values.components.list_inputs.state.reset,
                 state.values.components.list_inputs.state.startAdornment,
                 state.values.components.list_inputs.state.tiny,
                 state.values.components.list_inputs.state.tooltip,
+                state.values.components.list_inputs.state.validate,
+                state.values.components.list_inputs.state.validators,
                 state.values.components.list.state.button,
                 state.values.components.list.values.checked1
               ] as const
@@ -88,25 +92,30 @@ export const ListSection = React.memo(() => {
             children={([
               badge,
               capitalize,
+              coerce,
+              coercers,
               disabled,
               endAdornment,
-              error,
+              expand,
+              help,
               helperText,
               inset,
               loading,
-              longNames,
+              longname,
               monospace,
               noSecondary,
               overflowHidden,
               password,
               placeholder,
               preventRender,
+              progress,
               readOnly,
-              required,
               reset,
               startAdornment,
               tiny,
               tooltip,
+              validate,
+              validators,
               button,
               checked1
             ]) => (
@@ -244,12 +253,12 @@ export const ListSection = React.memo(() => {
             />
 
             <form.Subscribe
-              selector={state => state.values.components.list_inputs.state.longNames}
+              selector={state => state.values.components.list_inputs.state.longname}
               children={value => (
                 <CheckboxInput
                   label="Long Names"
                   value={value}
-                  onChange={(event, next) => form.setFieldValue('components.list_inputs.state.longNames', next)}
+                  onChange={(event, next) => form.setFieldValue('components.list_inputs.state.longname', next)}
                 />
               )}
             />
@@ -387,7 +396,7 @@ export const ListSection = React.memo(() => {
             />
           </div>
         }
-      />
+      /> */}
       <DemoSection
         primary="Basics"
         secondary={null}
@@ -396,8 +405,8 @@ export const ListSection = React.memo(() => {
             <ListHeader
               primary="Subheader List"
               secondary="Subheader List description"
-              primaryProps={{ color: 'primary' }}
               divider
+              slotProps={{ primary: { color: 'primary' } }}
             />
             <ListHeader primary="List" secondary="List description" />
             <List>
@@ -478,10 +487,10 @@ export const ListSection = React.memo(() => {
                 <ListHeader
                   primary="Checkbox Subheader List"
                   secondary="Checkbox Subheader List description"
-                  primaryProps={{ color: 'primary' }}
                   divider
                   checked={checked}
                   onChange={(event, c, i) => form.setFieldValue('components.list.values.checked1', !c)}
+                  slotProps={{ primary: { color: 'primary' } }}
                 />
               )}
             />
@@ -583,9 +592,9 @@ export const ListSection = React.memo(() => {
                 <ListHeader
                   primary="Uncontrolled Subheader List"
                   secondary="Uncontrolled Subheader List description"
-                  primaryProps={{ color: 'primary' }}
                   divider
                   checked={checked}
+                  slotProps={{ primary: { color: 'primary' } }}
                 />
               )}
             />
@@ -669,11 +678,11 @@ export const ListSection = React.memo(() => {
                 <ListHeader
                   primary="Disabled Subheader List"
                   secondary="Disabled Subheader List description"
-                  primaryProps={{ color: 'primary' }}
                   divider
                   disabled
                   checked={checked}
                   onChange={(event, c, i) => form.setFieldValue('components.list.values.checked1', !c)}
+                  slotProps={{ primary: { color: 'primary' } }}
                 />
               )}
             />
@@ -774,10 +783,10 @@ export const ListSection = React.memo(() => {
                 <ListHeader
                   primary="Subheader List: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc."
                   secondary="Subheader List description: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc."
-                  primaryProps={{ color: 'primary' }}
                   divider
                   checked={checked}
                   onChange={(event, c, i) => form.setFieldValue('components.list.values.checked1', !c)}
+                  slotProps={{ primary: { color: 'primary' } }}
                 />
               )}
             />

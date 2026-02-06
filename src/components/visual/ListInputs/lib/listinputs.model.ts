@@ -56,9 +56,9 @@ export type ListInputSlotProps = {
     buttonRoot?: Omit<ListItemButtonBaseProps, 'children'>;
     helperText?: FormHelperTextProps;
     inner?: Omit<React.HTMLAttributes<HTMLDivElement>, 'children'>;
-    primaryProps?: TypographyProps;
+    primary?: TypographyProps;
     root?: Omit<ListItemProps, 'children'>;
-    secondaryProps?: TypographyProps;
+    secondary?: TypographyProps;
     skeleton?: SkeletonProps;
     wrapper?: Omit<React.HTMLAttributes<HTMLDivElement>, 'children'>;
   };
@@ -69,9 +69,9 @@ export const DEFAULT_LIST_INPUT_SLOT_PROPS: ListInputSlotProps = {
     buttonRoot: null,
     helperText: null,
     inner: null,
-    primaryProps: null,
+    primary: null,
     root: null,
-    secondaryProps: null,
+    secondary: null,
     skeleton: null,
     wrapper: null
   }
