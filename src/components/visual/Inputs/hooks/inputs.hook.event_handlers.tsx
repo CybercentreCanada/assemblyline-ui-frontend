@@ -22,19 +22,23 @@ export const useInputClick = <Value extends unknown = unknown, RawValue = Value>
   const onChange = get('onChange');
 
   return useCallback(
-    (event: SyntheticEvent<Element, Event>, value: Value, rawValue: RawValue) => {
+    (
+      event: SyntheticEvent<Element, Event>,
+      rawValue: RawValue,
+      toValue: (value: RawValue) => Value = v => v as unknown as Value
+    ) => {
       event.preventDefault();
       event.stopPropagation();
 
-      const { value: coercedValue, ignore } = resolveCoercing(event, value, rawValue);
-      const [validationStatus, validationMessage] = resolveValidation(coercedValue, rawValue);
+      const { value: coercedValue, ignore } = resolveCoercing(event, toValue(rawValue));
+      const [validationStatus, validationMessage] = resolveValidation(coercedValue);
       setStore({ rawValue, validationStatus, validationMessage });
 
       const id = ++latestId.current;
       startTransition(() => {
         if (id === latestId.current && !ignore) {
           setStore({ value: coercedValue });
-          onChange(event, value);
+          onChange(event, toValue(rawValue));
         }
       });
     },
@@ -57,16 +61,20 @@ export const useInputChange = <Value extends unknown = unknown, RawValue = Value
   const onChange = get('onChange');
 
   return useCallback(
-    (event: SyntheticEvent<Element, Event>, value: Value, rawValue: RawValue) => {
-      const { ignore } = resolveCoercing(event, value, rawValue);
-      const [validationStatus, validationMessage] = resolveValidation(value, rawValue);
+    (
+      event: SyntheticEvent<Element, Event>,
+      rawValue: RawValue,
+      toValue: (value: RawValue) => Value = v => v as unknown as Value
+    ) => {
+      const { ignore } = resolveCoercing(event, toValue(rawValue));
+      const [validationStatus, validationMessage] = resolveValidation(toValue(rawValue));
       setStore({ rawValue, validationStatus, validationMessage });
 
       const id = ++latestId.current;
       startTransition(() => {
         if (id === latestId.current && !ignore) {
-          setStore({ value });
-          onChange(event, value);
+          setStore({ value: toValue(rawValue) });
+          onChange(event, toValue(rawValue));
         }
       });
     },
@@ -98,34 +106,22 @@ export const useInputBlur = <Value extends unknown = unknown, RawValue = Value>(
   const onBlur = get('onBlur');
 
   const resolveCoercing = useInputCoercingResolver<Value, RawValue>();
-  const resolveValidation = useInputValidationResolver<Value, RawValue>();
+  const handleChange = useInputChange<Value, RawValue>();
 
   return useCallback(
-    (event: React.FocusEvent, value: Value, rawValue: RawValue) => {
+    (
+      event: React.FocusEvent,
+      rawValue: RawValue,
+      toValue: (value: RawValue) => Value = v => v as unknown as Value,
+      toRawValue: (value: Value) => RawValue = v => v as unknown as RawValue
+    ) => {
       onBlur(event);
-      const { value: coercedValue, ignore } = resolveCoercing(event, value, rawValue);
-
-      if (ignore) {
-        const [validationStatus, validationMessage] = resolveValidation(value, rawValue);
-        setStore({
-          isFocused: false,
-          rawValue,
-          value,
-          validationStatus,
-          validationMessage
-        });
-      } else {
-        const [validationStatus, validationMessage] = resolveValidation(coercedValue, rawValue);
-        setStore({
-          isFocused: false,
-          rawValue,
-          value: coercedValue,
-          validationStatus,
-          validationMessage
-        });
-      }
+      setStore({ isFocused: false });
+      const { value: coercedValue, ignore } = resolveCoercing(event, toValue(rawValue));
+      if (ignore) handleChange(event, rawValue, toValue);
+      else handleChange(event, toRawValue(coercedValue), toValue);
     },
-    [onBlur, resolveCoercing, resolveValidation, setStore]
+    [handleChange, onBlur, resolveCoercing, setStore]
   );
 };
 
@@ -134,35 +130,25 @@ export const useInputBlur = <Value extends unknown = unknown, RawValue = Value>(
  */
 export const useInputClickBlur = <Value extends unknown = unknown, RawValue = Value>() => {
   const [get, setStore] = usePropStore<InputControllerProps<Value, RawValue>>();
-  const resolveCoercing = useInputCoercingResolver<Value, RawValue>();
-  const resolveValidation = useInputValidationResolver<Value, RawValue>();
+
   const onBlur = get('onBlur');
 
-  return useCallback(
-    (event: React.FocusEvent, value: Value, rawValue: RawValue) => {
-      onBlur(event);
-      const { value: coercedValue, ignore } = resolveCoercing(event, value, rawValue);
+  const resolveCoercing = useInputCoercingResolver<Value, RawValue>();
+  const handleClick = useInputClick<Value, RawValue>();
 
-      if (ignore) {
-        const [validationStatus, validationMessage] = resolveValidation(value, rawValue);
-        setStore({
-          isFocused: false,
-          rawValue,
-          value,
-          validationStatus,
-          validationMessage
-        });
-      } else {
-        const [validationStatus, validationMessage] = resolveValidation(coercedValue, rawValue);
-        setStore({
-          isFocused: false,
-          rawValue,
-          value: coercedValue,
-          validationStatus,
-          validationMessage
-        });
-      }
+  return useCallback(
+    (
+      event: React.FocusEvent,
+      rawValue: RawValue,
+      toValue: (value: RawValue) => Value = v => v as unknown as Value,
+      toRawValue: (value: Value) => RawValue = v => v as unknown as RawValue
+    ) => {
+      onBlur(event);
+      setStore({ isFocused: false });
+      const { value: coercedValue, ignore } = resolveCoercing(event, toValue(rawValue));
+      if (ignore) handleClick(event, rawValue, toValue);
+      else handleClick(event, toRawValue(coercedValue), toValue);
     },
-    [onBlur, resolveCoercing, resolveValidation, setStore]
+    [handleClick, onBlur, resolveCoercing, setStore]
   );
 };

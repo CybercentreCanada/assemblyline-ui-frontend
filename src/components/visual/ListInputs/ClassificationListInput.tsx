@@ -27,7 +27,7 @@ export type ClassificationListInputProps = InputValueModel<ClassificationProps['
   ListInputSlotProps &
   Omit<ClassificationProps, 'c12n' | 'setClassification'>;
 
-type ClassificationListInputController = ClassificationListInputProps & InputRuntimeState;
+type ClassificationListInputController = ClassificationListInputProps & InputRuntimeState<ClassificationProps['c12n']>;
 
 const WrappedClassificationListInput = React.memo(() => {
   const [get] = usePropStore<ClassificationListInputController>();
@@ -60,7 +60,7 @@ const WrappedClassificationListInput = React.memo(() => {
                   size="small"
                   c12n={value}
                   disabled={disabled}
-                  setClassification={c => handleChange(null, c, c)}
+                  setClassification={c => handleChange(null, c)}
                 />
               </div>
             </>
@@ -76,7 +76,6 @@ const WrappedClassificationListInput = React.memo(() => {
 export const ClassificationListInput = ({ preventRender = false, value, ...props }: ClassificationListInputProps) => {
   const { status: validationStatus, message: validationMessage } = useInputValidation<ClassificationProps['c12n']>({
     value: value,
-    rawValue: value,
     ...props
   });
 

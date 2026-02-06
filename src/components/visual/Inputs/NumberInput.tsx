@@ -10,15 +10,16 @@ import {
 import { InputTextField } from 'components/visual/Inputs/components/inputs.component.textfield';
 import { useInputBlur, useInputChange, useInputFocus } from 'components/visual/Inputs/hooks/inputs.hook.event_handlers';
 import { useInputValidation } from 'components/visual/Inputs/hooks/inputs.hook.validation';
-import type { InputOptions, InputRuntimeState, InputSlotProps, InputValueModel } from 'components/visual/Inputs/models/inputs.model';
+import type {
+  InputOptions,
+  InputRuntimeState,
+  InputSlotProps,
+  InputValueModel
+} from 'components/visual/Inputs/models/inputs.model';
 import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/models/inputs.model';
-import React, { useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 
-export type NumberInputProps = InputValueModel<
-  number,
-  string,
-  React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
-> &
+export type NumberInputProps = InputValueModel<number, React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>> &
   InputOptions &
   InputSlotProps & {
     autoComplete?: TextFieldProps['autoComplete'];
@@ -27,7 +28,7 @@ export type NumberInputProps = InputValueModel<
     step?: number;
   };
 
-type NumberInputController = NumberInputProps & InputRuntimeState;
+type NumberInputController = NumberInputProps & InputRuntimeState<string>;
 
 const WrappedNumberInput = () => {
   const [get] = usePropStore<NumberInputController>();
@@ -44,6 +45,9 @@ const WrappedNumberInput = () => {
   const handleBlur = useInputBlur<number, string>();
   const handleChange = useInputChange<number, string>();
   const handleFocus = useInputFocus<number, string>();
+
+  const toRawValue = useCallback((v: number) => (v == null ? '' : String(v)), []);
+  const toValue = useCallback((v: string): number => (v !== '' ? Number(v) : null), []);
 
   useEffect(() => {
     const el = inputRef.current;
@@ -74,9 +78,9 @@ const WrappedNumberInput = () => {
               ref={inputRef}
               type="number"
               value={rawValue}
-              onChange={e => handleChange(e, e.target.value !== '' ? Number(e.target.value) : null, e.target.value)}
+              onChange={e => handleChange(e, e.target.value, toValue)}
               onFocus={handleFocus}
-              onBlur={e => handleBlur(e, value, value == null ? '' : String(value))}
+              onBlur={e => handleBlur(e, toRawValue(value), toValue, toRawValue)}
               slotProps={{
                 input: {
                   inputProps: {
@@ -98,7 +102,6 @@ const WrappedNumberInput = () => {
 export const NumberInput = ({ preventRender = false, value, ...props }: NumberInputProps) => {
   const { status: validationStatus, message: validationMessage } = useInputValidation<number, string>({
     value: value,
-    rawValue: String(value),
     ...props
   });
 

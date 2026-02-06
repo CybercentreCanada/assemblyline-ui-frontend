@@ -74,7 +74,7 @@ export const MetadataParam: React.FC<MetadataParamProps> = React.memo(
       }
     }, [validatorParams, validatorType]);
 
-    const handleValidate = useCallback<Validator<unknown, unknown>>(
+    const handleValidate = useCallback<Validator<unknown>>(
       value => {
         if (!value) return metadata.required ? { status: 'error', message: t('required') } : null;
         const strValue = safeString(value);

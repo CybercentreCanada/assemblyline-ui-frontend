@@ -105,10 +105,9 @@ export const useShouldRenderReset = <Value extends unknown = unknown, RawValue =
   const loading = get('loading');
   const readOnly = get('readOnly');
   const reset = get('reset');
-  const rawValue = get('rawValue');
   const value = get('value');
 
-  const canReset = typeof reset === 'function' ? reset(value, rawValue) : reset;
+  const canReset = typeof reset === 'function' ? reset(value) : reset;
   return Boolean(canReset) && !disabled && !readOnly && !loading;
 };
 

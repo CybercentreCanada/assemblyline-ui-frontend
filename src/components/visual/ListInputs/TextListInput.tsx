@@ -24,14 +24,14 @@ import type { ListInputOptions, ListInputSlotProps } from 'components/visual/Lis
 import { DEFAULT_LIST_INPUT_CONTROLLER_PROPS } from 'components/visual/ListInputs/lib/listinputs.model';
 import React from 'react';
 
-export type TextListInputProps = InputValueModel<string, string, React.SyntheticEvent<Element, Event>> &
+export type TextListInputProps = InputValueModel<string, React.SyntheticEvent<Element, Event>> &
   ListInputOptions &
   ListInputSlotProps & {
     autoComplete?: TextFieldProps['autoComplete'];
     options?: string[] | readonly string[];
   };
 
-type TextListInputController = TextListInputProps & InputRuntimeState;
+type TextListInputController = TextListInputProps & InputRuntimeState<string>;
 
 const WrappedTextListInput = React.memo(() => {
   const [get] = usePropStore<TextListInputController>();
@@ -76,9 +76,9 @@ const WrappedTextListInput = React.memo(() => {
                 size="small"
                 sx={{ maxWidth: width, minWidth: width }}
                 value={value}
-                onInputChange={(e, v) => handleChange(e, v, v)}
+                onInputChange={(e, v) => handleChange(e, v)}
                 onFocus={handleFocus}
-                onBlur={e => handleBlur(e, value, value)}
+                onBlur={e => handleBlur(e, value)}
                 renderOption={(props, option, { index }) => (
                   <Typography {...props} key={`${option}-${index}`} variant={tiny ? 'body2' : 'body1'}>
                     {option}
@@ -99,7 +99,6 @@ const WrappedTextListInput = React.memo(() => {
 export const TextListInput = ({ preventRender = false, value, ...props }: TextListInputProps) => {
   const { status: validationStatus, message: validationMessage } = useInputValidation<string>({
     value: value ?? '',
-    rawValue: value ?? '',
     ...props
   });
 
@@ -110,7 +109,7 @@ export const TextListInput = ({ preventRender = false, value, ...props }: TextLi
         autoComplete: 'off',
         options: [],
         preventRender,
-        rawValue: value,
+        rawValue: value ?? '',
         validationMessage,
         validationStatus,
         value,

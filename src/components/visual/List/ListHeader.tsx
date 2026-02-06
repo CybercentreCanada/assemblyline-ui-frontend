@@ -17,7 +17,7 @@ import { DEFAULT_LIST_INPUT_CONTROLLER_PROPS } from 'components/visual/ListInput
 import React from 'react';
 
 export type ListHeaderProps = Omit<
-  InputValueModel<boolean, boolean, React.MouseEvent<HTMLDivElement, globalThis.MouseEvent>>,
+  InputValueModel<boolean, React.MouseEvent<HTMLDivElement, globalThis.MouseEvent>>,
   'value'
 > &
   ListInputOptions & {

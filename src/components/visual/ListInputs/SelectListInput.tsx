@@ -30,17 +30,15 @@ export type Option = {
   value: MenuItemProps['value'] | boolean;
 };
 
-export type SelectListInputProps<O extends readonly Option[]> = InputValueModel<
-  O[number]['value'],
-  O[number]['value']
-> &
+export type SelectListInputProps<O extends readonly Option[]> = InputValueModel<O[number]['value']> &
   ListInputOptions &
   ListInputSlotProps & {
     displayEmpty?: SelectProps['displayEmpty'];
     options?: O;
   };
 
-type SelectListInputController<O extends readonly Option[]> = SelectListInputProps<O> & InputRuntimeState;
+type SelectListInputController<O extends readonly Option[]> = SelectListInputProps<O> &
+  InputRuntimeState<O[number]['value']>;
 
 const WrappedSelectListInput = <O extends readonly Option[]>() => {
   const theme = useTheme();
@@ -93,9 +91,9 @@ const WrappedSelectListInput = <O extends readonly Option[]>() => {
                 size="small"
                 open={isMenuOpen}
                 value={options?.some(o => o.value === rawValue) ? rawValue : ''}
-                onChange={event => handleChange(event as React.SyntheticEvent, event.target.value, event.target.value)}
+                onChange={event => handleChange(event as React.SyntheticEvent, event.target.value)}
                 onFocus={handleFocus}
-                onBlur={e => handleBlur(e, value, value)}
+                onBlur={e => handleBlur(e, value)}
                 onClose={() => setStore({ isMenuOpen: false })}
                 onOpen={() => setStore({ isMenuOpen: true })}
                 renderValue={option => (
@@ -204,7 +202,6 @@ export const SelectListInput = <O extends readonly Option[]>({
 }: SelectListInputProps<O>) => {
   const { status: validationStatus, message: validationMessage } = useInputValidation<O[number]['value']>({
     value: value ?? '',
-    rawValue: value ?? '',
     ...props
   });
 

@@ -18,18 +18,14 @@ export const VALIDATION_PRIORITY: ValidationStatus[] = ['error', 'warning', 'suc
 /**
  * Validation function signature
  * @param value - Current parsed value
- * @param rawValue - Raw user-entered input
  */
-export type Validator<Value, RawValue> = (
-  value: Value,
-  rawValue: RawValue
-) => { status: ValidationStatus; message: string | null } | null;
+export type Validator<Value> = (value: Value) => { status: ValidationStatus; message: string | null } | null;
 
 /**
  * Builder for input validation rules
  */
-export class ValidationSchema<Value, RawValue = Value> {
-  protected validators: Validator<Value, RawValue>[] = [];
+export class ValidationSchema<Value> {
+  protected validators: Validator<Value>[] = [];
   protected t: TFunction<'translation', undefined> = null;
   protected min?: number = undefined;
   protected max?: number = undefined;
@@ -43,7 +39,7 @@ export class ValidationSchema<Value, RawValue = Value> {
     this.max = max;
 
     if (validate) {
-      this.validators.push((value, rawValue) => validate(value, rawValue));
+      this.validators.push(value => validate(value));
     }
   }
 
@@ -51,7 +47,7 @@ export class ValidationSchema<Value, RawValue = Value> {
    * Ensures the value is not empty
    */
   required(status: ValidationStatus = 'error', message: string | null = null) {
-    this.validators.push((value, rawValue) =>
+    this.validators.push(value =>
       value === null || value === undefined || value === ''
         ? { status, message: message || this.t?.('validation.required') || 'This field is required' }
         : null
@@ -63,18 +59,22 @@ export class ValidationSchema<Value, RawValue = Value> {
    * Ensures the value is within min/max bounds (numbers only)
    */
   inRange(status: ValidationStatus = 'error', message: string | null = null) {
-    this.validators.push((value, rawValue) => {
+    this.validators.push(value => {
       if (typeof value !== 'number' || Number.isNaN(value)) return null;
 
       const minDefined = typeof this.min === 'number';
       const maxDefined = typeof this.max === 'number';
       if (!minDefined && !maxDefined) return null;
 
-      if (minDefined && maxDefined)
-        return { status, message: message || this.t?.('validation.minmax', { min: this.min, max: this.max }) };
-      else if (minDefined) return { status, message: message || this.t?.('validation.min', { min: this.min }) };
-      else if (maxDefined) return { status, message: message || this.t?.('validation.max', { max: this.max }) };
-      else return null;
+      if ((minDefined && value < this.min) || (maxDefined && value > this.max)) {
+        if (minDefined && maxDefined) {
+          return { status, message: message || this.t?.('validation.minmax', { min: this.min, max: this.max }) };
+        } else if (minDefined) {
+          return { status, message: message || this.t?.('validation.min', { min: this.min }) };
+        } else {
+          return { status, message: message || this.t?.('validation.max', { max: this.max }) };
+        }
+      }
     });
     return this;
   }
@@ -83,7 +83,7 @@ export class ValidationSchema<Value, RawValue = Value> {
    * Ensures the value is an integer (numbers only)
    */
   isInteger(status: ValidationStatus = 'warning', message: string | null = null) {
-    this.validators.push((value, rawValue) => {
+    this.validators.push(value => {
       if (typeof value !== 'number' || Number.isNaN(value)) return null;
 
       if (!Number.isInteger(value)) {
@@ -99,7 +99,7 @@ export class ValidationSchema<Value, RawValue = Value> {
    * Ensures string values have no leading/trailing whitespace
    */
   noLeadingTrailingWhitespace(status: ValidationStatus = 'warning', message: string | null = null) {
-    this.validators.push((value, rawValue) => {
+    this.validators.push(value => {
       if (typeof value !== 'string') return null;
       return value.trim() === value ? null : { status, message: message || this.t?.('validation.noWhitespace') };
     });
@@ -110,16 +110,16 @@ export class ValidationSchema<Value, RawValue = Value> {
 /**
  * Resolves all validators and returns the highest priority validation result
  */
-export class ValidationResolver<Value, RawValue = Value> extends ValidationSchema<Value, RawValue> {
-  declare public validators: Validator<Value, RawValue>[];
+export class ValidationResolver<Value> extends ValidationSchema<Value> {
+  declare public validators: Validator<Value>[];
 
   /**
    * Evaluate all validators and return the most severe validation result
    */
-  public resolve(value: Value, rawValue: RawValue) {
+  public resolve(value: Value) {
     return (
       this.validators
-        .map(v => v(value, rawValue))
+        .map(v => v(value))
         .sort(
           (a, b) =>
             VALIDATION_PRIORITY.indexOf(a?.status ?? 'default') - VALIDATION_PRIORITY.indexOf(b?.status ?? 'default')
@@ -136,20 +136,15 @@ export class ValidationResolver<Value, RawValue = Value> extends ValidationSchem
  * Coercer function signature
  * @param event - React synthetic event
  * @param value - Current parsed value
- * @param rawValue - Raw user input
  * @returns Object with coerced value and whether the changes to the value should be ignored
  */
-export type Coercer<Value, RawValue = Value> = (
-  event: React.SyntheticEvent,
-  value: Value,
-  rawValue: RawValue
-) => { value: Value; ignore: boolean };
+export type Coercer<Value> = (event: React.SyntheticEvent, value: Value) => { value: Value; ignore: boolean };
 
 /**
  * Builder for coercing (transforming) input values before validation
  */
-export class CoercersSchema<Value, RawValue = Value> {
-  protected coercers: Coercer<Value, RawValue>[] = [];
+export class CoercersSchema<Value> {
+  protected coercers: Coercer<Value>[] = [];
   protected min?: number = undefined;
   protected max?: number = undefined;
 
@@ -157,12 +152,12 @@ export class CoercersSchema<Value, RawValue = Value> {
     min,
     max,
     coerce
-  }: Pick<InputControllerProps<Value, RawValue> & { min?: number; max?: number }, 'min' | 'max' | 'coerce'>) {
+  }: Pick<InputControllerProps<Value> & { min?: number; max?: number }, 'min' | 'max' | 'coerce'>) {
     this.min = min;
     this.max = max;
 
     if (coerce) {
-      this.coercers.push((event, value, rawValue) => coerce(event, value, rawValue));
+      this.coercers.push((event, value) => coerce(event, value));
     }
   }
 
@@ -218,7 +213,7 @@ export class CoercersSchema<Value, RawValue = Value> {
         next = Math.min(this.max, next);
       }
 
-      return { value: next, ignore: false } as { value: Value; ignore: boolean };
+      return { value: next as Value, ignore: false };
     });
 
     return this;
@@ -233,7 +228,7 @@ export class CoercersSchema<Value, RawValue = Value> {
         return { value, ignore: false };
       }
 
-      return { value: Math.round(value), ignore: false } as { value: Value; ignore: boolean };
+      return { value: Math.round(value) as Value, ignore: false };
     });
 
     return this;
@@ -248,7 +243,7 @@ export class CoercersSchema<Value, RawValue = Value> {
         return { value, ignore: false };
       }
 
-      return { value: Math.floor(value), ignore: false } as { value: Value; ignore: boolean };
+      return { value: Math.floor(value) as Value, ignore: false };
     });
 
     return this;
@@ -263,7 +258,7 @@ export class CoercersSchema<Value, RawValue = Value> {
         return { value, ignore: false };
       }
 
-      return { value: Math.ceil(value), ignore: false } as { value: Value; ignore: boolean };
+      return { value: Math.ceil(value) as Value, ignore: false };
     });
 
     return this;
@@ -280,7 +275,7 @@ export class CoercersSchema<Value, RawValue = Value> {
         return { value, ignore: false };
       }
 
-      return { value: Math.round(value * factor) / factor, ignore: false } as { value: Value; ignore: boolean };
+      return { value: (Math.round(value * factor) / factor) as Value, ignore: false };
     });
 
     return this;
@@ -300,15 +295,15 @@ export class CoercersSchema<Value, RawValue = Value> {
 /**
  * Resolves all coercers and returns the final value and revert status
  */
-export class CoercersResolver<Value, RawValue = Value> extends CoercersSchema<Value, RawValue> {
-  declare public coercers: Coercer<Value, RawValue>[];
+export class CoercersResolver<Value> extends CoercersSchema<Value> {
+  declare public coercers: Coercer<Value>[];
 
-  public resolve(event: React.SyntheticEvent, value: Value, rawValue: RawValue) {
+  public resolve(event: React.SyntheticEvent, value: Value) {
     let nextValue = value;
     let ignore = false;
 
     for (const coercer of this.coercers) {
-      const { value: v = undefined, ignore: i = false } = coercer(event, nextValue, rawValue);
+      const { value: v = undefined, ignore: i = false } = coercer(event, nextValue);
       nextValue = v === undefined ? value : v;
       ignore = ignore || i;
     }

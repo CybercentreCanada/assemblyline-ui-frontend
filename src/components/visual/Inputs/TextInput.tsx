@@ -21,14 +21,14 @@ import type {
 import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/models/inputs.model';
 import React from 'react';
 
-export type TextInputProps = InputValueModel<string, string, React.SyntheticEvent<Element, Event>> &
+export type TextInputProps = InputValueModel<string, React.SyntheticEvent<Element, Event>> &
   InputOptions &
   InputSlotProps & {
     autoComplete?: TextFieldProps['autoComplete'];
     options?: string[] | readonly string[];
   };
 
-type TextInputController = TextInputProps & InputRuntimeState;
+type TextInputController = TextInputProps & InputRuntimeState<string>;
 
 const WrappedTextInput = () => {
   const [get] = usePropStore<TextInputController>();
@@ -64,9 +64,9 @@ const WrappedTextInput = () => {
             readOnly={readOnly}
             size="small"
             value={value}
-            onInputChange={(e, v) => handleChange(e, v, v)}
+            onInputChange={(e, v) => handleChange(e, v)}
             onFocus={handleFocus}
-            onBlur={e => handleBlur(e, value, value)}
+            onBlur={e => handleBlur(e, value)}
             renderOption={(props, option, { index }) => (
               <Typography {...props} key={`${option}-${index}`} variant={tiny ? 'body2' : 'body1'}>
                 {option}
@@ -84,7 +84,6 @@ const WrappedTextInput = () => {
 export const TextInput = ({ preventRender = false, value, ...props }: TextInputProps) => {
   const { status: validationStatus, message: validationMessage } = useInputValidation<string>({
     value: value ?? '',
-    rawValue: value ?? '',
     ...props
   });
 
@@ -93,9 +92,9 @@ export const TextInput = ({ preventRender = false, value, ...props }: TextInputP
       initialProps={DEFAULT_INPUT_CONTROLLER_PROPS as TextInputController}
       props={{
         autoComplete: 'off',
-        rawValue: value,
         options: [],
         preventRender,
+        rawValue: value ?? '',
         validationMessage,
         validationStatus,
         value,

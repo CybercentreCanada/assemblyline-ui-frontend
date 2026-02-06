@@ -31,11 +31,11 @@ import type {
 import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/models/inputs.model';
 import React from 'react';
 
-export type SwitchInputProps = InputValueModel<boolean, boolean, React.MouseEvent<HTMLButtonElement, MouseEvent>> &
+export type SwitchInputProps = InputValueModel<boolean, React.MouseEvent<HTMLButtonElement, MouseEvent>> &
   InputOptions &
   InputSlotProps;
 
-type SwitchInputController = SwitchInputProps & InputRuntimeState;
+type SwitchInputController = SwitchInputProps & InputRuntimeState<boolean>;
 
 const WrappedSwitchInput = () => {
   const [get] = usePropStore<SwitchInputController>();
@@ -56,8 +56,8 @@ const WrappedSwitchInput = () => {
       <InputFormControl>
         <InputFormButton
           onFocus={handleFocus}
-          onBlur={e => handleBlur(e, value, value)}
-          onClick={e => handleClick(e, !rawValue, !rawValue)}
+          onBlur={e => handleBlur(e, value)}
+          onClick={e => handleClick(e, !rawValue)}
         >
           <InputButtonFormControlLabel label={<InputButtonLabel />}>
             <Switch
@@ -95,14 +95,13 @@ const WrappedSwitchInput = () => {
 export const SwitchInput = ({ preventRender = false, value, ...props }: SwitchInputProps) => {
   const { status: validationStatus, message: validationMessage } = useInputValidation<boolean>({
     value: Boolean(value),
-    rawValue: Boolean(value),
     ...props
   });
 
   return preventRender ? null : (
     <PropProvider<SwitchInputController>
       initialProps={DEFAULT_INPUT_CONTROLLER_PROPS as SwitchInputController}
-      props={{ preventRender, rawValue: value, value, validationStatus, validationMessage, ...props }}
+      props={{ preventRender, rawValue: Boolean(value), value, validationStatus, validationMessage, ...props }}
     >
       <WrappedSwitchInput />
     </PropProvider>

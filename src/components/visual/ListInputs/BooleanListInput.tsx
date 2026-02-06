@@ -26,11 +26,11 @@ import type { ListInputOptions, ListInputSlotProps } from 'components/visual/Lis
 import { DEFAULT_LIST_INPUT_CONTROLLER_PROPS } from 'components/visual/ListInputs/lib/listinputs.model';
 import React from 'react';
 
-export type SwitchListInputProps = InputValueModel<boolean, boolean, React.MouseEvent<HTMLDivElement, MouseEvent>> &
+export type SwitchListInputProps = InputValueModel<boolean, React.MouseEvent<HTMLDivElement, MouseEvent>> &
   ListInputOptions &
   ListInputSlotProps;
 
-type SwitchListInputController = SwitchListInputProps & InputRuntimeState;
+type SwitchListInputController = SwitchListInputProps & InputRuntimeState<boolean>;
 
 const WrappedSwitchListInput = React.memo(() => {
   const [get] = usePropStore<SwitchListInputController>();
@@ -50,8 +50,8 @@ const WrappedSwitchListInput = React.memo(() => {
   return (
     <ListInputButtonRoot
       onFocus={handleFocus}
-      onBlur={e => handleBlur(e, value, value)}
-      onClick={event => handleClick(event, !value, !value)}
+      onBlur={e => handleBlur(e, value)}
+      onClick={event => handleClick(event, !value)}
     >
       <ListInputWrapper>
         <ListInputInner>
@@ -96,14 +96,14 @@ const WrappedSwitchListInput = React.memo(() => {
 export const SwitchListInput = ({ preventRender = false, value, ...props }: SwitchListInputProps) => {
   const { status: validationStatus, message: validationMessage } = useInputValidation<boolean>({
     value: Boolean(value),
-    rawValue: Boolean(value),
+
     ...props
   });
 
   return preventRender ? null : (
     <PropProvider<SwitchListInputController>
       initialProps={DEFAULT_LIST_INPUT_CONTROLLER_PROPS as SwitchListInputController}
-      props={{ preventRender, rawValue: value, value, validationStatus, validationMessage, ...props }}
+      props={{ preventRender, rawValue: Boolean(value), value, validationStatus, validationMessage, ...props }}
     >
       <WrappedSwitchListInput />
     </PropProvider>

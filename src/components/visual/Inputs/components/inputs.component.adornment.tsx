@@ -60,7 +60,7 @@ export const ClearInputAdornment = React.memo(({ variant = 'icon' }: InputButton
         onClick={event => {
           event.preventDefault();
           event.stopPropagation();
-          handleChange(event, [], []);
+          handleChange(event, []);
         }}
         {...clearAdornmentProps}
         sx={{
@@ -84,7 +84,7 @@ export const ClearInputAdornment = React.memo(({ variant = 'icon' }: InputButton
         onClick={event => {
           event.preventDefault();
           event.stopPropagation();
-          handleChange(event, [], []);
+          handleChange(event, []);
         }}
         {...(clearAdornmentProps as ButtonProps)}
         sx={{
@@ -338,6 +338,8 @@ export const NumericalSpinnerInputAdornment = () => {
   const timeoutRef = useRef<NodeJS.Timeout>(null);
   const intervalRef = useRef<NodeJS.Timeout>(null);
 
+  const toRawValue = useCallback((v: number) => (v == null ? '' : String(v)), []);
+
   const clamp = useCallback(
     (val: number) => Math.min(max ?? Number.POSITIVE_INFINITY, Math.max(min ?? Number.NEGATIVE_INFINITY, val)),
     [max, min]
@@ -358,7 +360,7 @@ export const NumericalSpinnerInputAdornment = () => {
       focusInputIfNeeded();
       let nextValue = clamp(initialValue + delta);
       const absDelta = Math.abs(delta);
-      handleChange(event, nextValue, nextValue ? String(nextValue) : null);
+      handleChange(event, nextValue, toRawValue);
 
       timeoutRef.current = setTimeout(() => {
         if (timeoutRef.current) {
@@ -367,12 +369,12 @@ export const NumericalSpinnerInputAdornment = () => {
             const centerY = rect.top + rect.height / 2;
             const stepDir = centerY > mouseYRef.current ? absDelta : -absDelta;
             nextValue = clamp(nextValue + stepDir);
-            handleChange(event, nextValue, nextValue ? String(nextValue) : null);
+            handleChange(event, nextValue, toRawValue);
           }, 50);
         }
       }, 150);
     },
-    [clamp, focusInputIfNeeded, handleChange]
+    [clamp, focusInputIfNeeded, handleChange, toRawValue]
   );
 
   useEffect(() => {
@@ -591,7 +593,7 @@ export const ResetInputAdornment = React.memo(({ variant = 'icon' }: InputButton
         tooltip={tooltip}
         tooltipProps={{ arrow: true }}
         type="button"
-        onClick={event => (onReset ? onReset(event) : handleChange(event, defaultValue, defaultValue))}
+        onClick={event => (onReset ? onReset(event) : handleChange(event, defaultValue))}
         {...resetAdornmentProps}
         sx={{
           padding: tiny ? theme.spacing(0.25) : theme.spacing(0.5),
@@ -613,7 +615,7 @@ export const ResetInputAdornment = React.memo(({ variant = 'icon' }: InputButton
         tooltip={tooltip}
         tooltipProps={{ arrow: true }}
         variant="outlined"
-        onClick={event => (onReset ? onReset(event) : handleChange(event, defaultValue, defaultValue))}
+        onClick={event => (onReset ? onReset(event) : handleChange(event, defaultValue))}
         {...(resetAdornmentProps as ButtonProps)}
         sx={{
           ...(tiny && { padding: 0 }),

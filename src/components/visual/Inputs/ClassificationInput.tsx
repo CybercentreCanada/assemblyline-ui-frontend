@@ -63,7 +63,7 @@ export type ClassificationInputProps = Omit<ClassificationProps, 'c12n' | 'setCl
   InputSlotProps;
 
 type ClassificationInputController = ClassificationInputProps &
-  InputRuntimeState & {
+  InputRuntimeState<ClassificationProps['c12n']> & {
     showPicker?: boolean;
     uParts?: ClassificationParts;
     validated?: ClassificationValidator;
@@ -224,8 +224,8 @@ const WrappedClassificationInput = () => {
     (event: React.SyntheticEvent) => {
       const newC12n = normalizedClassification(validated.parts, c12nDef, format, isMobile, isUser);
 
-      const { ignore } = resolveCoercing(event, newC12n, newC12n);
-      const [validationStatus, validationMessage] = resolveValidation(newC12n, newC12n);
+      const { ignore } = resolveCoercing(event, newC12n);
+      const [validationStatus, validationMessage] = resolveValidation(newC12n);
 
       if (!ignore) onChange(event, newC12n);
       setStore(() => ({
@@ -508,7 +508,6 @@ const WrappedClassificationInput = () => {
 export const ClassificationInput = ({ preventRender = false, value, ...props }: ClassificationInputProps) => {
   const { status: validationStatus, message: validationMessage } = useInputValidation<string>({
     value: value ?? '',
-    rawValue: value ?? '',
     ...props
   });
 
@@ -522,7 +521,7 @@ export const ClassificationInput = ({ preventRender = false, value, ...props }: 
         inline: false,
         isUser: false,
         preventRender,
-        rawValue: value,
+        rawValue: value ?? '',
         validationMessage,
         validationStatus,
         help: '/help/classification',

@@ -19,17 +19,17 @@ import type React from 'react';
 /**********************************************************************************************************************
  * Input Value Model (controlled data + validation behavior)
  *********************************************************************************************************************/
-export type InputValueModel<Value, RawValue = Value, Event = React.SyntheticEvent> = {
+export type InputValueModel<Value, Event = React.SyntheticEvent> = {
   /**
    * Optional coercion function used to normalize raw values
    * (e.g. trimming strings, clamping numbers, etc.)
    */
-  coerce?: Coercer<Value, RawValue>;
+  coerce?: Coercer<Value>;
 
   /**
    * Schema extension hook for coercion pipeline
    */
-  coercers?: (schema: CoercersSchema<Value, RawValue>) => CoercersSchema<Value, RawValue>;
+  coercers?: (schema: CoercersSchema<Value>) => CoercersSchema<Value>;
 
   /**
    * The default value used when the input is reset
@@ -37,25 +37,20 @@ export type InputValueModel<Value, RawValue = Value, Event = React.SyntheticEven
   defaultValue?: Value;
 
   /**
-   * The raw user-entered value (may differ from `value`)
-   */
-  rawValue?: RawValue;
-
-  /**
    * Controls whether the reset / clear button should be visible
    * @default false
    */
-  reset?: boolean | ((value: Value, rawValue: RawValue) => boolean);
+  reset?: boolean | ((value: Value) => boolean);
 
   /**
    * Validation function returning a validation result
    */
-  validate?: Validator<Value, RawValue>;
+  validate?: Validator<Value>;
 
   /**
    * Schema extension hook for validation pipeline
    */
-  validators?: (schema: ValidationSchema<Value, RawValue>) => ValidationSchema<Value, RawValue>;
+  validators?: (schema: ValidationSchema<Value>) => ValidationSchema<Value>;
 
   /**
    * The current parsed / committed value of the input
@@ -77,11 +72,10 @@ export type InputValueModel<Value, RawValue = Value, Event = React.SyntheticEven
   onReset?: IconButtonProps['onClick'];
 };
 
-export const DEFAULT_INPUT_VALUE_MODEL: InputValueModel<unknown, unknown> = {
+export const DEFAULT_INPUT_VALUE_MODEL: InputValueModel<unknown> = {
   coerce: (event, value) => ({ value, ignore: false }),
   coercers: s => s,
   defaultValue: null,
-  rawValue: null,
   reset: () => false,
   validate: () => ({ status: 'default', message: null }),
   validators: s => s,
@@ -266,7 +260,12 @@ export const DEFAULT_INPUT_OPTIONS: InputOptions = {
 /**********************************************************************************************************************
  * Input Runtime State (UI state managed internally)
  *********************************************************************************************************************/
-export type InputRuntimeState = {
+export type InputRuntimeState<RawValue> = {
+  /**
+   * The raw user-entered value (may differ from `value`)
+   */
+  rawValue?: RawValue;
+
   /**
    * Whether a menu adornment exists
    * @default false
@@ -314,7 +313,8 @@ export type InputRuntimeState = {
   validationStatus: ValidationStatus;
 };
 
-export const DEFAULT_INPUT_RUNTIME_STATE: InputRuntimeState = {
+export const DEFAULT_INPUT_RUNTIME_STATE: InputRuntimeState<unknown> = {
+  rawValue: null,
   hasMenuAdornment: false,
   isFocused: false,
   isMenuOpen: false,
@@ -367,9 +367,9 @@ export const DEFAULT_INPUT_SLOT_PROPS: InputSlotProps = {
 /**********************************************************************************************************************
  * Combined Internal Controller Props
  *********************************************************************************************************************/
-export type InputControllerProps<Value = unknown, RawValue = Value> = InputValueModel<Value, RawValue> &
+export type InputControllerProps<Value = unknown, RawValue = Value> = InputValueModel<Value> &
   InputOptions &
-  InputRuntimeState &
+  InputRuntimeState<RawValue> &
   InputSlotProps;
 
 export const DEFAULT_INPUT_CONTROLLER_PROPS: InputControllerProps = {

@@ -34,7 +34,7 @@ export type Option = {
   value: MenuItemProps['value'] | boolean;
 };
 
-export type SelectInputProps<O extends readonly Option[]> = InputValueModel<O[number]['value'], O[number]['value']> &
+export type SelectInputProps<O extends readonly Option[]> = InputValueModel<O[number]['value']> &
   InputOptions &
   InputSlotProps & {
     capitalize?: boolean;
@@ -42,7 +42,7 @@ export type SelectInputProps<O extends readonly Option[]> = InputValueModel<O[nu
     options?: O;
   };
 
-type SelectInputController<O extends readonly Option[]> = SelectInputProps<O> & InputRuntimeState;
+type SelectInputController<O extends readonly Option[]> = SelectInputProps<O> & InputRuntimeState<O[number]['value']>;
 
 const WrappedSelectInput = <O extends readonly Option[]>() => {
   const [get, setStore] = usePropStore<SelectInputController<O>>();
@@ -87,15 +87,9 @@ const WrappedSelectInput = <O extends readonly Option[]>() => {
             size="small"
             open={isMenuOpen}
             value={options?.some(o => o.value === rawValue) ? rawValue : ''}
-            onChange={event =>
-              handleChange(
-                event as React.SyntheticEvent,
-                event.target.value as O[number]['value'],
-                event.target.value as O[number]['value']
-              )
-            }
+            onChange={event => handleChange(event as React.SyntheticEvent, event.target.value as O[number]['value'])}
             onFocus={handleFocus}
-            onBlur={e => handleBlur(e, value, value)}
+            onBlur={e => handleBlur(e, value)}
             onClose={() => setStore({ isMenuOpen: false })}
             onOpen={() => setStore({ isMenuOpen: true })}
             renderValue={option => (
@@ -176,7 +170,6 @@ export const SelectInput = <O extends readonly Option[]>({
 }: SelectInputProps<O>) => {
   const { status: validationStatus, message: validationMessage } = useInputValidation<O[number]['value']>({
     value: value ?? '',
-    rawValue: value ?? '',
     ...props
   });
 
@@ -186,7 +179,7 @@ export const SelectInput = <O extends readonly Option[]>({
       props={{
         capitalize: false,
         displayEmpty: false,
-        rawValue: value,
+        rawValue: value ?? '',
         hasMenuAdornment: true,
         options: [] as unknown as O,
         validationStatus,

@@ -83,9 +83,9 @@ export const DEFAULT_LIST_INPUT_SLOT_PROPS: ListInputSlotProps = {
 /**********************************************************************************************************************
  * Combined Internal Controller Props
  *********************************************************************************************************************/
-export type ListInputControllerProps<Value = unknown, RawValue = Value> = InputValueModel<Value, RawValue> &
+export type ListInputControllerProps<Value = unknown, RawValue = Value> = InputValueModel<Value> &
   ListInputOptions &
-  InputRuntimeState &
+  InputRuntimeState<RawValue> &
   ListInputSlotProps;
 
 export const DEFAULT_LIST_INPUT_CONTROLLER_PROPS: ListInputControllerProps = {

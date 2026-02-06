@@ -21,11 +21,7 @@ import type {
 import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/models/inputs.model';
 import React from 'react';
 
-export type TextAreaInputProps = InputValueModel<
-  string,
-  string,
-  React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
-> &
+export type TextAreaInputProps = InputValueModel<string, React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>> &
   InputOptions &
   InputSlotProps & {
     autoComplete?: InputTextFieldProps['autoComplete'];
@@ -34,7 +30,7 @@ export type TextAreaInputProps = InputValueModel<
     maxRows?: TextFieldProps['maxRows'];
   };
 
-type TextAreaInputController = TextAreaInputProps & InputRuntimeState;
+type TextAreaInputController = TextAreaInputProps & InputRuntimeState<string>;
 
 const WrappedTextAreaInput = () => {
   const [get] = usePropStore<TextAreaInputController>();
@@ -76,9 +72,9 @@ const WrappedTextAreaInput = () => {
               autoComplete={autoComplete}
               id={id}
               value={rawValue}
-              onChange={e => handleChange(e, e.target.value, e.target.value)}
+              onChange={e => handleChange(e, e.target.value)}
               onFocus={handleFocus}
-              onBlur={e => handleBlur(e, value, value)}
+              onBlur={e => handleBlur(e, value)}
             />
             <InputHelperText />
           </>
@@ -91,7 +87,6 @@ const WrappedTextAreaInput = () => {
 export const TextAreaInput = ({ preventRender = false, value, ...props }: TextAreaInputProps) => {
   const { status: validationStatus, message: validationMessage } = useInputValidation<string>({
     value: value ?? '',
-    rawValue: value ?? '',
     ...props
   });
 
@@ -100,13 +95,13 @@ export const TextAreaInput = ({ preventRender = false, value, ...props }: TextAr
       initialProps={DEFAULT_INPUT_CONTROLLER_PROPS as TextAreaInputController}
       props={{
         autoComplete: 'off',
-        rawValue: value,
         maxRows: null,
         minRows: null,
         preventRender,
+        rawValue: value ?? '',
+        rows: null,
         validationMessage,
         validationStatus,
-        rows: null,
         value,
         ...props
       }}

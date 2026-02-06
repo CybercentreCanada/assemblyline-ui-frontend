@@ -23,7 +23,7 @@ import type { ElementType } from 'react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-export type ChipsInputProps = InputValueModel<string[], string[], React.SyntheticEvent<Element, Event>> &
+export type ChipsInputProps = InputValueModel<string[], React.SyntheticEvent<Element, Event>> &
   InputOptions &
   InputSlotProps & {
     allowEmptyStrings?: boolean;
@@ -37,7 +37,7 @@ export type ChipsInputProps = InputValueModel<string[], string[], React.Syntheti
     renderValue?: AutocompleteProps<string, true, false, true, ElementType>['renderValue'];
   };
 
-type ChipsInputController = ChipsInputProps & InputRuntimeState;
+type ChipsInputController = ChipsInputProps & InputRuntimeState<string[]>;
 
 const WrappedChipsInput = () => {
   const { t } = useTranslation('inputs');
@@ -86,15 +86,11 @@ const WrappedChipsInput = () => {
             size="small"
             value={rawValue}
             onInputChange={(e, v) => setStore(s => ({ ...s, currentValue: v }))}
-            onChange={(e, v) => handleChange(e, v as string[], v as string[])}
+            onChange={(e, v) => handleChange(e, v as string[])}
             onFocus={handleFocus}
             onBlur={e => {
               setStore(s => ({ ...s, currentValue: '' }));
-              handleBlur(
-                e,
-                currentValue && !value.includes(currentValue) ? [...value, currentValue] : value,
-                currentValue && !value.includes(currentValue) ? [...value, currentValue] : value
-              );
+              handleBlur(e, currentValue && !value.includes(currentValue) ? [...value, currentValue] : value);
             }}
             renderValue={
               renderValue ??
@@ -120,7 +116,7 @@ const WrappedChipsInput = () => {
                           if (current === '') {
                             event.preventDefault();
                             const next = Array.from(new Set([...(rawValue ?? []), '']));
-                            handleChange(event as any, next, next);
+                            handleChange(event as any, next);
                           }
                         }
                       }
@@ -150,7 +146,6 @@ const WrappedChipsInput = () => {
 export const ChipsInput = ({ preventRender = false, value = [], ...props }: ChipsInputProps) => {
   const { status: validationStatus, message: validationMessage } = useInputValidation<string[]>({
     value: value ?? [],
-    rawValue: value ?? [],
     ...props
   });
 
@@ -164,7 +159,7 @@ export const ChipsInput = ({ preventRender = false, value = [], ...props }: Chip
         currentValue: '',
         disableCloseOnSelect: false,
         filterSelectedOptions: false,
-        rawValue: value,
+        rawValue: value ?? [],
         isOptionEqualToValue: (option, value) => option === value,
         options: [],
         preventRender,

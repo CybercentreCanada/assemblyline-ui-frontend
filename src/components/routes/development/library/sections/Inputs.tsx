@@ -9,8 +9,10 @@ import { DateInput } from 'components/visual/Inputs/DateInput';
 import { JSONInput } from 'components/visual/Inputs/JSONInput';
 import type { InputOptions } from 'components/visual/Inputs/models/inputs.model';
 import { NumberInput } from 'components/visual/Inputs/NumberInput';
-import { RadioInput, RadioInputProps } from 'components/visual/Inputs/RadioInput';
-import { SelectInput, SelectInputProps } from 'components/visual/Inputs/SelectInput';
+import type { RadioInputProps } from 'components/visual/Inputs/RadioInput';
+import { RadioInput } from 'components/visual/Inputs/RadioInput';
+import type { SelectInputProps } from 'components/visual/Inputs/SelectInput';
+import { SelectInput } from 'components/visual/Inputs/SelectInput';
 import { SliderInput } from 'components/visual/Inputs/SliderInput';
 import { SwitchInput } from 'components/visual/Inputs/SwitchInput';
 import { TextAreaInput } from 'components/visual/Inputs/TextAreaInput';
@@ -29,7 +31,7 @@ export const SELECT_OPTIONS = [
 ] as const;
 
 export const RADIO_OPTIONS = [
-  { value: null as null, label: 'Null' },
+  { value: null, label: 'Null' },
   { value: 'first', label: 'First' },
   { value: 'second', label: 'Second' },
   { value: LONG_STRING, label: LONG_STRING }
@@ -146,8 +148,14 @@ export type InputsLibraryState = {
       badge: boolean;
       capitalize: boolean;
       coercers: {
+        ceil: boolean;
+        floor: boolean;
+        inRange: boolean;
         required: boolean;
+        round: boolean;
+        roundTo: boolean;
         toLowerCase: boolean;
+        toUpperCase: boolean;
         trim: boolean;
       };
       coerce: boolean;
@@ -170,9 +178,10 @@ export type InputsLibraryState = {
       tiny: boolean;
       tooltip: boolean;
       validators: {
-        required: boolean;
         inRange: boolean;
+        isInteger: boolean;
         noLeadingTrailingWhitespace: boolean;
+        required: boolean;
       };
       validate: null | 'success' | 'info' | 'warning' | 'error';
     };
@@ -200,8 +209,14 @@ export const INPUTS_LIBRARY_STATE: InputsLibraryState = {
       badge: false,
       capitalize: false,
       coercers: {
+        ceil: false,
+        floor: false,
+        inRange: false,
         required: false,
+        round: false,
+        roundTo: false,
         toLowerCase: false,
+        toUpperCase: false,
         trim: false
       },
       coerce: false,
@@ -224,9 +239,10 @@ export const INPUTS_LIBRARY_STATE: InputsLibraryState = {
       tiny: false,
       tooltip: false,
       validators: {
-        required: false,
         inRange: false,
-        noLeadingTrailingWhitespace: false
+        isInteger: false,
+        noLeadingTrailingWhitespace: false,
+        required: false
       },
       validate: null
     },
@@ -348,11 +364,15 @@ export const InputsSection = React.memo(() => {
                 ...(endAdornment && { endAdornment: <Button variant="contained">End</Button> }),
 
                 // Validation
-                ...((validators.required || validators.noLeadingTrailingWhitespace) && {
+                ...((validators.inRange ||
+                  validators.isInteger ||
+                  validators.noLeadingTrailingWhitespace ||
+                  validators.required) && {
                   validators: (v: ValidationSchema<unknown>) => {
-                    if (validators.required) v.required();
-                    if (validators.noLeadingTrailingWhitespace) v.noLeadingTrailingWhitespace();
                     if (validators.inRange) v.inRange();
+                    if (validators.isInteger) v.isInteger();
+                    if (validators.noLeadingTrailingWhitespace) v.noLeadingTrailingWhitespace();
+                    if (validators.required) v.required();
                     return v;
                   }
                 }),
@@ -367,11 +387,26 @@ export const InputsSection = React.memo(() => {
                         : null),
 
                 // Coercing
-                ...((coercers.required || coercers.trim || coercers.toLowerCase) && {
+                ...((coercers.ceil ||
+                  coercers.floor ||
+                  coercers.inRange ||
+                  coercers.required ||
+                  coercers.round ||
+                  coercers.roundTo ||
+                  coercers.toLowerCase ||
+                  coercers.toUpperCase ||
+                  coercers.trim) && {
                   coercers: (c: CoercersSchema<unknown>) => {
+                    if (coercers.ceil) c.ceil();
+                    if (coercers.floor) c.floor();
+                    if (coercers.inRange) c.inRange();
                     if (coercers.required) c.required();
-                    if (coercers.trim) c.trim();
+                    if (coercers.round) c.round();
+                    if (coercers.roundTo) c.roundTo(2);
                     if (coercers.toLowerCase) c.toLowerCase();
+                    if (coercers.toUpperCase) c.toUpperCase();
+                    if (coercers.trim) c.trim();
+
                     return c;
                   }
                 })
@@ -1145,13 +1180,13 @@ export const InputsSection = React.memo(() => {
               </Typography>
 
               <form.Subscribe
-                selector={state => state.values.components.inputs.state.validators.inRange}
+                selector={state => state.values.components.inputs.state.validators.required}
                 children={value => (
                   <CheckboxInput
-                    label="In range"
+                    label="Required"
                     value={value}
                     tiny
-                    onChange={(event, next) => form.setFieldValue('components.inputs.state.validators.inRange', next)}
+                    onChange={(event, next) => form.setFieldValue('components.inputs.state.validators.required', next)}
                   />
                 )}
               />
@@ -1171,13 +1206,25 @@ export const InputsSection = React.memo(() => {
               />
 
               <form.Subscribe
-                selector={state => state.values.components.inputs.state.validators.required}
+                selector={state => state.values.components.inputs.state.validators.inRange}
                 children={value => (
                   <CheckboxInput
-                    label="Required"
+                    label="In range"
                     value={value}
                     tiny
-                    onChange={(event, next) => form.setFieldValue('components.inputs.state.validators.required', next)}
+                    onChange={(event, next) => form.setFieldValue('components.inputs.state.validators.inRange', next)}
+                  />
+                )}
+              />
+
+              <form.Subscribe
+                selector={state => state.values.components.inputs.state.validators.isInteger}
+                children={value => (
+                  <CheckboxInput
+                    label="Is integer"
+                    value={value}
+                    tiny
+                    onChange={(event, next) => form.setFieldValue('components.inputs.state.validators.isInteger', next)}
                   />
                 )}
               />
@@ -1252,6 +1299,18 @@ export const InputsSection = React.memo(() => {
               />
 
               <form.Subscribe
+                selector={state => state.values.components.inputs.state.coercers.toUpperCase}
+                children={value => (
+                  <CheckboxInput
+                    label="to Uppercase"
+                    value={value}
+                    tiny
+                    onChange={(event, next) => form.setFieldValue('components.inputs.state.coercers.toUpperCase', next)}
+                  />
+                )}
+              />
+
+              <form.Subscribe
                 selector={state => state.values.components.inputs.state.coercers.trim}
                 children={value => (
                   <CheckboxInput
@@ -1259,6 +1318,66 @@ export const InputsSection = React.memo(() => {
                     value={value}
                     tiny
                     onChange={(event, next) => form.setFieldValue('components.inputs.state.coercers.trim', next)}
+                  />
+                )}
+              />
+
+              <form.Subscribe
+                selector={state => state.values.components.inputs.state.coercers.inRange}
+                children={value => (
+                  <CheckboxInput
+                    label="In Range"
+                    value={value}
+                    tiny
+                    onChange={(event, next) => form.setFieldValue('components.inputs.state.coercers.inRange', next)}
+                  />
+                )}
+              />
+
+              <form.Subscribe
+                selector={state => state.values.components.inputs.state.coercers.round}
+                children={value => (
+                  <CheckboxInput
+                    label="Round"
+                    value={value}
+                    tiny
+                    onChange={(event, next) => form.setFieldValue('components.inputs.state.coercers.round', next)}
+                  />
+                )}
+              />
+
+              <form.Subscribe
+                selector={state => state.values.components.inputs.state.coercers.floor}
+                children={value => (
+                  <CheckboxInput
+                    label="Floor"
+                    value={value}
+                    tiny
+                    onChange={(event, next) => form.setFieldValue('components.inputs.state.coercers.floor', next)}
+                  />
+                )}
+              />
+
+              <form.Subscribe
+                selector={state => state.values.components.inputs.state.coercers.ceil}
+                children={value => (
+                  <CheckboxInput
+                    label="Ceil"
+                    value={value}
+                    tiny
+                    onChange={(event, next) => form.setFieldValue('components.inputs.state.coercers.ceil', next)}
+                  />
+                )}
+              />
+
+              <form.Subscribe
+                selector={state => state.values.components.inputs.state.coercers.roundTo}
+                children={value => (
+                  <CheckboxInput
+                    label="Round to"
+                    value={value}
+                    tiny
+                    onChange={(event, next) => form.setFieldValue('components.inputs.state.coercers.roundTo', next)}
                   />
                 )}
               />

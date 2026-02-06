@@ -20,9 +20,9 @@ import {
 } from 'components/visual/ListInputs/lib/listinputs.components';
 import type { ListInputOptions, ListInputSlotProps } from 'components/visual/ListInputs/lib/listinputs.model';
 import { DEFAULT_LIST_INPUT_CONTROLLER_PROPS } from 'components/visual/ListInputs/lib/listinputs.model';
-import React, { useEffect, useRef } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 
-export type NumberListInputProps = InputValueModel<number, string> &
+export type NumberListInputProps = InputValueModel<number> &
   ListInputOptions &
   ListInputSlotProps & {
     autoComplete?: TextFieldProps['autoComplete'];
@@ -31,7 +31,7 @@ export type NumberListInputProps = InputValueModel<number, string> &
     step?: number;
   };
 
-type NumberListInputController = NumberListInputProps & InputRuntimeState;
+type NumberListInputController = NumberListInputProps & InputRuntimeState<string>;
 
 const WrappedNumberListInput = React.memo(() => {
   const [get] = usePropStore<NumberListInputController>();
@@ -50,6 +50,9 @@ const WrappedNumberListInput = React.memo(() => {
   const handleBlur = useInputBlur<number, string>();
   const handleChange = useInputChange<number, string>();
   const handleFocus = useInputFocus<number, string>();
+
+  const toRawValue = useCallback((v: number) => (v == null ? '' : String(v)), []);
+  const toValue = useCallback((v: string): number => (v !== '' ? Number(v) : null), []);
 
   useEffect(() => {
     const el = inputRef.current;
@@ -86,9 +89,9 @@ const WrappedNumberListInput = React.memo(() => {
                 ref={inputRef}
                 type="number"
                 value={rawValue}
-                onChange={e => handleChange(e, e.target.value !== '' ? Number(e.target.value) : null, e.target.value)}
+                onChange={e => handleChange(e, e.target.value, toValue)}
                 onFocus={handleFocus}
-                onBlur={e => handleBlur(e, value, value == null ? '' : String(value))}
+                onBlur={e => handleBlur(e, toRawValue(value), toValue, toRawValue)}
                 sx={{
                   maxWidth: width,
                   minWidth: width,
@@ -127,7 +130,6 @@ const WrappedNumberListInput = React.memo(() => {
 export const NumberListInput = ({ preventRender = false, value, ...props }: NumberListInputProps) => {
   const { status: validationStatus, message: validationMessage } = useInputValidation<number, string>({
     value: value,
-    rawValue: value == null ? '' : String(value),
     ...props
   });
 

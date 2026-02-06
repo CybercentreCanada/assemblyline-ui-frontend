@@ -32,13 +32,13 @@ import type {
 import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/models/inputs.model';
 import React from 'react';
 
-export type CheckboxInputProps = InputValueModel<boolean, boolean, React.MouseEvent<HTMLButtonElement, MouseEvent>> &
+export type CheckboxInputProps = InputValueModel<boolean, React.MouseEvent<HTMLButtonElement, MouseEvent>> &
   InputOptions &
   InputSlotProps & {
     indeterminate?: CheckboxProps['indeterminate'];
   };
 
-type CheckboxInputController = CheckboxInputProps & InputRuntimeState;
+type CheckboxInputController = CheckboxInputProps & InputRuntimeState<boolean>;
 
 const WrappedCheckboxInput = () => {
   const [get] = usePropStore<CheckboxInputController>();
@@ -59,9 +59,9 @@ const WrappedCheckboxInput = () => {
     <InputFormButtonTooltip>
       <InputFormControl>
         <InputFormButton
-          onBlur={e => handleBlur(e, value, value)}
+          onBlur={e => handleBlur(e, value)}
           onFocus={handleFocus}
-          onClick={e => handleClick(e, !rawValue, !rawValue)}
+          onClick={e => handleClick(e, !rawValue)}
         >
           <InputButtonFormControlLabel label={<InputButtonLabel />}>
             <Checkbox
@@ -100,8 +100,7 @@ const WrappedCheckboxInput = () => {
 export const CheckboxInput = ({ preventRender = false, value, ...props }: CheckboxInputProps) => {
   const { status: validationStatus, message: validationMessage } = useInputValidation<boolean>({
     value: Boolean(value),
-    rawValue: Boolean(value),
-    ...props
+    ...props,
   });
 
   return preventRender ? null : (

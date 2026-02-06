@@ -41,7 +41,6 @@ type Option = Omit<FormControlLabelProps, 'control' | 'label'> & {
 
 export type RadioInputProps<O extends readonly Option[]> = InputValueModel<
   O[number]['value'],
-  O[number]['value'],
   React.MouseEvent<HTMLButtonElement, MouseEvent>
 > &
   InputOptions &
@@ -49,7 +48,7 @@ export type RadioInputProps<O extends readonly Option[]> = InputValueModel<
     options: O;
   };
 
-type RadioInputController<O extends readonly Option[]> = RadioInputProps<O> & InputRuntimeState;
+type RadioInputController<O extends readonly Option[]> = RadioInputProps<O> & InputRuntimeState<O[number]['value']>;
 
 const WrappedRadioInput = <O extends readonly Option[]>() => {
   const [get] = usePropStore<RadioInputController<O>>();
@@ -74,8 +73,8 @@ const WrappedRadioInput = <O extends readonly Option[]>() => {
             <InputFormButton
               key={`${index}-${option.label}`}
               onFocus={handleFocus}
-              onBlur={e => handleBlur(e, value, value)}
-              onClick={e => handleChange(e, option.value, option.value)}
+              onBlur={e => handleBlur(e, value)}
+              onClick={e => handleChange(e, option.value)}
             >
               <InputButtonFormControlLabel
                 label={
@@ -123,7 +122,6 @@ export const RadioInput = <O extends readonly Option[]>({
 }: RadioInputProps<O>) => {
   const { status: validationStatus, message: validationMessage } = useInputValidation<O[number]['value']>({
     value: value ?? '',
-    rawValue: value ?? '',
     ...props
   });
 
@@ -134,7 +132,7 @@ export const RadioInput = <O extends readonly Option[]>({
         options: [] as unknown as O,
         preventRender,
         value,
-        rawValue: value,
+        rawValue: value ?? '',
         validationStatus,
         validationMessage,
         ...props

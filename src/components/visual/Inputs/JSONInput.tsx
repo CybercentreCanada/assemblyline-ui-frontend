@@ -30,7 +30,7 @@ import React, { useMemo } from 'react';
 
 export type JSONInputProps = InputValueModel<object> & InputOptions & InputSlotProps;
 
-type JSONInputController = JSONInputProps & InputRuntimeState;
+type JSONInputController = JSONInputProps & InputRuntimeState<object>;
 
 const WrappedJSONInput = () => {
   const theme = useTheme();
@@ -115,20 +115,17 @@ const WrappedJSONInput = () => {
                 onAdd={
                   disabled || readOnly
                     ? false
-                    : event =>
-                        handleChange(event as unknown as React.SyntheticEvent, event.updated_src, event.updated_src)
+                    : event => handleChange(event as unknown as React.SyntheticEvent, event.updated_src)
                 }
                 onDelete={
                   disabled || readOnly
                     ? false
-                    : event =>
-                        handleChange(event as unknown as React.SyntheticEvent, event.updated_src, event.updated_src)
+                    : event => handleChange(event as unknown as React.SyntheticEvent, event.updated_src)
                 }
                 onEdit={
                   disabled || readOnly
                     ? false
-                    : event =>
-                        handleChange(event as unknown as React.SyntheticEvent, event.updated_src, event.updated_src)
+                    : event => handleChange(event as unknown as React.SyntheticEvent, event.updated_src)
                 }
                 style={{
                   fontSize: '1rem',
@@ -165,14 +162,13 @@ const WrappedJSONInput = () => {
 export const JSONInput = ({ preventRender = false, value, ...props }: JSONInputProps) => {
   const { status: validationStatus, message: validationMessage } = useInputValidation<object>({
     value: value ?? null,
-    rawValue: value ?? null,
     ...props
   });
 
   return preventRender ? null : (
     <PropProvider<JSONInputController>
       initialProps={DEFAULT_INPUT_CONTROLLER_PROPS as JSONInputController}
-      props={{ preventRender, rawValue: value, value, validationStatus, validationMessage, ...props }}
+      props={{ preventRender, rawValue: value ?? null, value, validationStatus, validationMessage, ...props }}
     >
       <WrappedJSONInput />
     </PropProvider>

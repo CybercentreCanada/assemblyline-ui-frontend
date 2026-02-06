@@ -33,7 +33,7 @@ import type {
 import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/models/inputs.model';
 import type { Moment } from 'moment';
 import moment from 'moment';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 // This function updates the week start for the specified locale
@@ -46,7 +46,7 @@ function configureMomentLocale(language: string) {
 }
 
 export type DateInputProps = Omit<TextFieldProps, 'error' | 'value' | 'onChange'> &
-  InputValueModel<string, Moment> &
+  InputValueModel<string> &
   InputOptions &
   InputSlotProps & {
     defaultDateOffset?: number | null;
@@ -55,7 +55,7 @@ export type DateInputProps = Omit<TextFieldProps, 'error' | 'value' | 'onChange'
   };
 
 type DateInputController = DateInputProps &
-  InputRuntimeState & {
+  InputRuntimeState<Moment> & {
     showPopover?: boolean;
   };
 
@@ -73,7 +73,9 @@ const DatePopper = React.memo(() => {
   const showPopover = get('showPopover') ?? false;
   const tiny = get('tiny');
 
-  const handleChange = useInputChange<Moment, string>();
+  const handleChange = useInputChange<string, Moment>();
+
+  const toValue = useCallback((v: Moment): string => v.toISOString(), []);
 
   return (
     <>
@@ -137,7 +139,7 @@ const DatePopper = React.memo(() => {
               // timezone="utc"
               showDaysOutsideCurrentMonth
               value={rawValue}
-              onChange={(v: Moment) => handleChange(null, v, v.toISOString())}
+              onChange={(v: Moment) => handleChange(null, v, toValue)}
               sx={{ height: '320px' }}
               slotProps={{ calendarHeader: { sx: { marginTop: '0px', marginBottom: '0px' } } }}
             />
@@ -145,7 +147,7 @@ const DatePopper = React.memo(() => {
             <DigitalClock
               // timezone="utc"
               value={rawValue}
-              onChange={(v: Moment) => handleChange(null, v, v.toISOString())}
+              onChange={(v: Moment) => handleChange(null, v, toValue)}
               sx={{
                 maxHeight: '320px',
                 '& .MuiDigitalClock-item': {
@@ -188,6 +190,12 @@ const WrappedDateInput = () => {
     return moment(d);
   }, []);
 
+  const toRawValue = useCallback((v: string): Moment => (v ? moment(v) : null), []);
+  const toValue = useCallback(
+    (d: Moment): string => (d.isValid() ? `${d.format('YYYY-MM-DDThh:mm:ss.SSSSSS')}Z` : null),
+    []
+  );
+
   const handleBlur = useInputBlur<string, Moment>();
   const handleChange = useInputChange<string, Moment>();
   const handleFocus = useInputFocus<string, Moment>();
@@ -215,14 +223,12 @@ const WrappedDateInput = () => {
                 minDate={minDateTomorrow ? tomorrow : null}
                 readOnly={readOnly}
                 value={rawValue}
-                onChange={d =>
-                  handleChange(null, d && d.isValid() ? `${d.format('YYYY-MM-DDThh:mm:ss.SSSSSS')}Z` : null, d)
-                }
+                onChange={d => handleChange(null, d, toValue)}
                 slotProps={{
                   textField: {
                     ...inputTextFieldSlots,
                     onFocus: handleFocus,
-                    onBlur: e => handleBlur(e, value, value ? moment(value) : null),
+                    onBlur: e => handleBlur(e, toRawValue(value), toValue, toRawValue),
                     InputProps: {
                       ...(startAdornment && { startAdornment }),
                       endAdornment: (
@@ -251,7 +257,6 @@ const WrappedDateInput = () => {
 export const DateInput = ({ preventRender = false, value, ...props }: DateInputProps) => {
   const { status: validationStatus, message: validationMessage } = useInputValidation<string, Moment>({
     value: value ?? '',
-    rawValue: value ? moment(value) : null,
     ...props
   });
 

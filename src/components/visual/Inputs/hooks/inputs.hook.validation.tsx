@@ -23,25 +23,21 @@ import { useTranslation } from 'react-i18next';
 export const useInputValidation = <Value extends unknown = unknown, RawValue = Value>({
   max,
   min,
-  rawValue,
   validate,
-  validators = (schema: ValidationSchema<Value, RawValue>) => schema,
+  validators = (schema: ValidationSchema<Value>) => schema,
   value
-}: InputValueModel<Value, RawValue> & InputOptions & { max?: number; min?: number }): ReturnType<
-  Validator<Value, RawValue>
-> => {
+}: InputValueModel<Value> & InputOptions & { max?: number; min?: number }): ReturnType<Validator<Value>> => {
   const { t } = useTranslation(['inputs']);
-  const schema = new ValidationResolver<Value, RawValue>({ max, min, validate }, t);
-  const resolver = validators(schema) as ValidationResolver<Value, RawValue>;
-  return resolver.resolve(value, rawValue);
+  const schema = new ValidationResolver<Value>({ max, min, validate }, t);
+  const resolver = validators(schema) as ValidationResolver<Value>;
+  return resolver.resolve(value);
 };
 
 /**
  * Returns a callback that resolves validation for a value/rawValue pair
  */
 export const useInputValidationResolver = <Value extends unknown = unknown, RawValue = Value>(): ((
-  value: Value,
-  rawValue: RawValue
+  value: Value
 ) => [ValidationStatus, string]) => {
   const { t } = useTranslation(['inputs']);
   const [get] = usePropStore<InputControllerProps<Value, RawValue> & { min?: number; max?: number }>();
@@ -52,10 +48,10 @@ export const useInputValidationResolver = <Value extends unknown = unknown, RawV
   const validators = get('validators');
 
   return useCallback(
-    (value: Value, rawValue: RawValue) => {
-      const schema = new ValidationResolver<Value, RawValue>({ max, min, validate }, t);
-      const resolver = validators(schema) as ValidationResolver<Value, RawValue>;
-      const { status, message } = resolver.resolve(value, rawValue);
+    (value: Value) => {
+      const schema = new ValidationResolver<Value>({ max, min, validate }, t);
+      const resolver = validators(schema) as ValidationResolver<Value>;
+      const { status, message } = resolver.resolve(value);
       return [status, message];
     },
     [max, min, t, validate, validators]
@@ -71,15 +67,14 @@ export const useInputValidationResolver = <Value extends unknown = unknown, RawV
  */
 export const useInputCoerceValue = <Value extends unknown = unknown, RawValue = Value>({
   coerce,
-  coercers = (schema: CoercersSchema<Value, RawValue>) => schema,
+  coercers = (schema: CoercersSchema<Value>) => schema,
   max,
   min,
-  rawValue,
   value
-}: InputControllerProps<Value, RawValue> & { max?: number; min?: number }): ReturnType<Coercer<Value, RawValue>> => {
-  const schema = new CoercersResolver<Value, RawValue>({ coerce, max, min });
-  const resolver = coercers(schema) as CoercersResolver<Value, RawValue>;
-  return resolver.resolve(undefined, value, rawValue);
+}: InputControllerProps<Value, RawValue> & { max?: number; min?: number }): ReturnType<Coercer<Value>> => {
+  const schema = new CoercersResolver<Value>({ coerce, max, min });
+  const resolver = coercers(schema) as CoercersResolver<Value>;
+  return resolver.resolve(undefined, value);
 };
 
 /**
@@ -87,9 +82,8 @@ export const useInputCoerceValue = <Value extends unknown = unknown, RawValue = 
  */
 export const useInputCoercingResolver = <Value extends unknown = unknown, RawValue = Value>(): ((
   event: SyntheticEvent,
-  value: Value,
-  rawValue: RawValue
-) => ReturnType<Coercer<Value, RawValue>>) => {
+  value: Value
+) => ReturnType<Coercer<Value>>) => {
   const [get] = usePropStore<InputControllerProps<Value, RawValue> & { min?: number; max?: number }>();
 
   const coerce = get('coerce');
@@ -98,10 +92,10 @@ export const useInputCoercingResolver = <Value extends unknown = unknown, RawVal
   const min = get('min');
 
   return useCallback(
-    (event: SyntheticEvent, value: Value, rawValue: RawValue) => {
-      const schema = new CoercersResolver<Value, RawValue>({ coerce, max, min });
-      const resolver = coercers(schema) as CoercersResolver<Value, RawValue>;
-      return resolver.resolve(event, value, rawValue);
+    (event: SyntheticEvent, value: Value) => {
+      const schema = new CoercersResolver<Value>({ coerce, max, min });
+      const resolver = coercers(schema) as CoercersResolver<Value>;
+      return resolver.resolve(event, value);
     },
     [coerce, coercers, max, min]
   );

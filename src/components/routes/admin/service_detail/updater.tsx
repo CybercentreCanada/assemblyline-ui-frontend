@@ -105,6 +105,7 @@ const ServiceUpdater = ({ service, defaults, setService, setModified }: ServiceU
           reset={showReset(service.update_config, defaults.update_config, 'update_interval_seconds')}
           min={3600}
           max={86400}
+          step={1}
           valueLabelDisplay="off"
           marks={[
             { value: 3600, label: '1h' },

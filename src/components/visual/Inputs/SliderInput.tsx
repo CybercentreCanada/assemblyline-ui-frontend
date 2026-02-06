@@ -21,7 +21,7 @@ import type {
 import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/models/inputs.model';
 import React from 'react';
 
-export type SliderInputProps = InputValueModel<number, number> &
+export type SliderInputProps = InputValueModel<number> &
   InputOptions &
   InputSlotProps & {
     marks?: SliderProps['marks'];
@@ -32,7 +32,7 @@ export type SliderInputProps = InputValueModel<number, number> &
     valueLabelFormat?: SliderProps['valueLabelFormat'];
   };
 
-type SliderInputController = SliderInputProps & InputRuntimeState;
+type SliderInputController = SliderInputProps & InputRuntimeState<number>;
 
 const WrappedSliderInput = () => {
   const [get] = usePropStore<SliderInputController>();
@@ -79,8 +79,8 @@ const WrappedSliderInput = () => {
                   {...(min && { min: min })}
                   {...(max && { max: max })}
                   onFocus={handleFocus}
-                  onBlur={e => handleBlur(e, value, value)}
-                  onChange={(e, v) => handleChange(e as unknown as React.SyntheticEvent, v, v)}
+                  onBlur={e => handleBlur(e, value)}
+                  onChange={(e, v) => handleChange(e as unknown as React.SyntheticEvent, v)}
                 />
               </div>
               <ResetInputAdornment />
@@ -96,7 +96,6 @@ const WrappedSliderInput = () => {
 export const SliderInput = ({ preventRender = false, value, ...props }: SliderInputProps) => {
   const { status: validationStatus, message: validationMessage } = useInputValidation<number>({
     value: value ?? null,
-    rawValue: value ?? null,
     ...props
   });
   return preventRender ? null : (
@@ -107,7 +106,7 @@ export const SliderInput = ({ preventRender = false, value, ...props }: SliderIn
         max: null,
         min: null,
         preventRender: false,
-        rawValue: value,
+        rawValue: value ?? null,
         step: null,
         validationMessage,
         validationStatus,
