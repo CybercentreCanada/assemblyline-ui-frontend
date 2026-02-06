@@ -1,4 +1,4 @@
-import { Button, Typography, useTheme } from '@mui/material';
+import { Button, Grid, Typography, useTheme } from '@mui/material';
 import { DemoContainer } from 'components/routes/development/library/components/DemoContainer';
 import { DemoSection } from 'components/routes/development/library/components/DemoSection';
 import { useForm } from 'components/routes/development/library/contexts/form';
@@ -18,6 +18,8 @@ import { SwitchInput } from 'components/visual/Inputs/SwitchInput';
 import { TextAreaInput } from 'components/visual/Inputs/TextAreaInput';
 import { TextInput } from 'components/visual/Inputs/TextInput';
 import type { CoercersSchema, ValidationSchema } from 'components/visual/Inputs/utils/inputs.util.validation';
+import { PageSection } from 'components/visual/Layouts/PageSection';
+import MonacoEditor from 'components/visual/MonacoEditor';
 import React from 'react';
 
 export const LONG_STRING =
@@ -1386,7 +1388,7 @@ export const InputsSection = React.memo(() => {
         }
       />
 
-      {/* <DemoSection
+      <DemoSection
         id="Basic Example"
         primary="Basic Example"
         secondary={
@@ -1485,6 +1487,9 @@ export const InputsSection = React.memo(() => {
                 <SliderInput
                   label="Slider Input"
                   value={value}
+                  max={1000}
+                  min={0}
+                  step={1}
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.slider', next)}
                 />
               )}
@@ -1813,6 +1818,9 @@ export const InputsSection = React.memo(() => {
                   reset
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.slider', next)}
                   onReset={() => form.setFieldValue('components.inputs.values.slider', 0)}
+                  max={0}
+                  min={0}
+                  step={0}
                 />
               )}
             />
@@ -2050,6 +2058,9 @@ export const InputsSection = React.memo(() => {
                   value={value}
                   disabled
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.slider', next)}
+                  max={0}
+                  min={0}
+                  step={0}
                 />
               )}
             />
@@ -2279,6 +2290,9 @@ export const InputsSection = React.memo(() => {
                   value={value}
                   loading
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.slider', next)}
+                  max={0}
+                  min={0}
+                  step={0}
                 />
               )}
             />
@@ -2522,6 +2536,9 @@ export const InputsSection = React.memo(() => {
                   reset
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.slider', next)}
                   onReset={() => form.setFieldValue('components.inputs.values.slider', 0)}
+                  max={0}
+                  min={0}
+                  step={0}
                 />
               )}
             />
@@ -2757,6 +2774,9 @@ export const InputsSection = React.memo(() => {
                   tooltip="Tooltip Slider Input"
                   value={value}
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.slider', next)}
+                  max={0}
+                  min={0}
+                  step={0}
                 />
               )}
             />
@@ -2952,9 +2972,7 @@ export const InputsSection = React.memo(() => {
                 <ClassificationInput
                   label="Error Classification Input"
                   value={value}
-                  validate={v =>
-                    v !== 'TLP:C' ? null : { status: 'error', message: 'Input field cannot be TLP:C' }
-                  }
+                  validate={v => (v !== 'TLP:C' ? null : { status: 'error', message: 'Input field cannot be TLP:C' })}
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.classification', next)}
                 />
               )}
@@ -2979,6 +2997,9 @@ export const InputsSection = React.memo(() => {
                   value={value}
                   validate={v => (v !== 0 ? null : { status: 'error', message: 'Input field cannot be 0' })}
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.slider', next)}
+                  max={0}
+                  min={0}
+                  step={0}
                 />
               )}
             />
@@ -3206,6 +3227,9 @@ export const InputsSection = React.memo(() => {
                   value={value}
                   helperText="Helper Text"
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.slider', next)}
+                  max={0}
+                  min={0}
+                  step={0}
                 />
               )}
             />
@@ -3583,6 +3607,9 @@ export const InputsSection = React.memo(() => {
                   value={value}
                   readOnly
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.slider', next)}
+                  max={0}
+                  min={0}
+                  step={0}
                 />
               )}
             />
@@ -3802,6 +3829,9 @@ export const InputsSection = React.memo(() => {
                   value={value}
                   endAdornment={<Button variant="contained">Submit</Button>}
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.slider', next)}
+                  max={0}
+                  min={0}
+                  step={0}
                 />
               )}
             />
@@ -4013,6 +4043,9 @@ export const InputsSection = React.memo(() => {
                   value={value}
                   tiny
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.slider', next)}
+                  max={0}
+                  min={0}
+                  step={0}
                 />
               )}
             />
@@ -4220,6 +4253,9 @@ export const InputsSection = React.memo(() => {
                   value={value}
                   monospace
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.slider', next)}
+                  max={0}
+                  min={0}
+                  step={0}
                 />
               )}
             />
@@ -4435,6 +4471,9 @@ export const InputsSection = React.memo(() => {
                   value={value}
                   password
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.slider', next)}
+                  max={0}
+                  min={0}
+                  step={0}
                 />
               )}
             />
@@ -4555,633 +4594,6 @@ export const InputsSection = React.memo(() => {
       />
 
       <DemoSection
-        primary="Interactions"
-        secondary={
-          <>
-            <span>{'Use this to test the different interaction with the different props. '}</span>
-          </>
-        }
-        left={
-          <form.Subscribe
-            selector={state => [
-              state.values.components.inputs.state.disabled,
-              state.values.components.inputs.state.loading,
-              state.values.components.inputs.state.reset,
-              state.values.components.inputs.state.tooltip,
-              state.values.components.inputs.state.error,
-              state.values.components.inputs.state.readOnly,
-              state.values.components.inputs.state.helperText,
-              state.values.components.inputs.state.placeholder,
-              state.values.components.inputs.state.endAdornment,
-              state.values.components.inputs.state.tiny,
-              state.values.components.inputs.state.monospace,
-              state.values.components.inputs.state.password,
-              state.values.components.inputs.state.longname,
-              state.values.components.inputs.state.overflowHidden,
-              state.values.components.inputs.state.required,
-              state.values.components.inputs.state.badge
-            ]}
-            children={([
-              disabled,
-              loading,
-              reset,
-              tooltip,
-              error,
-              readOnly,
-              helperText,
-              placeholder,
-              endAdornment,
-              tiny,
-              monospace,
-              password,
-              longname,
-              overflowHidden,
-              required,
-              badge
-            ]) => (
-              <>
-                <form.Subscribe
-                  selector={state => state.values.components.inputs.values.text}
-                  children={value => (
-                    <TextInput
-                      label="Interaction Text Input"
-                      value={value}
-                      options={TEXTFIELD_OPTIONS}
-                      onChange={(event, next) => form.setFieldValue('components.inputs.values.text', next)}
-                      {...(disabled && { disabled })}
-                      {...(loading && { loading })}
-                      {...(readOnly && { readOnly })}
-                      {...(tiny && { tiny })}
-                      {...(reset && {
-                        reset,
-                        defaultValue: '',
-                        onReset: () => form.setFieldValue('components.inputs.values.text', '')
-                      })}
-                      {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
-                      {...(error && { error: v => (v !== '' ? null : 'Input field cannot be null') })}
-                      {...(helperText && { helperText: 'Helper Text' })}
-                      {...(placeholder && { placeholder: 'Placeholder' })}
-                      {...(endAdornment && { endAdornment: <Button variant="contained">Submit</Button> })}
-                      {...(monospace && { monospace: true })}
-                      {...(password && { password: true })}
-                      {...(overflowHidden && { overflowHidden: true })}
-                      {...(required && { required: true })}
-                      {...(longname && {
-                        label:
-                          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc.'
-                      })}
-                      {...(badge && { badge: true })}
-                    />
-                  )}
-                />
-
-                <form.Subscribe
-                  selector={state => state.values.components.inputs.values.chips}
-                  children={value => (
-                    <ChipsInput
-                      label="Interaction Chips Input"
-                      value={value}
-                      onChange={(event, next) => form.setFieldValue('components.inputs.values.chips', next)}
-                      {...(disabled && { disabled })}
-                      {...(loading && { loading })}
-                      {...(readOnly && { readOnly })}
-                      {...(tiny && { tiny })}
-                      {...(reset && {
-                        reset,
-                        defaultValue: [],
-                        onReset: () => form.setFieldValue('components.inputs.values.chips', [])
-                      })}
-                      {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
-                      {...(error && { error: v => (v.length !== 0 ? null : 'Input field cannot be null') })}
-                      {...(helperText && { helperText: 'Helper Text' })}
-                      {...(placeholder && { placeholder: 'Placeholder' })}
-                      {...(endAdornment && { endAdornment: <Button variant="contained">Submit</Button> })}
-                      {...(monospace && { monospace: true })}
-                      {...(password && { password: true })}
-                      {...(overflowHidden && { overflowHidden: true })}
-                      {...(required && { required: true })}
-                      {...(longname && {
-                        label:
-                          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc.'
-                      })}
-                      {...(badge && { badge: true })}
-                    />
-                  )}
-                />
-
-                <form.Subscribe
-                  selector={state => state.values.components.inputs.values.number}
-                  children={value => (
-                    <NumberInput
-                      label="Interaction Number Input"
-                      value={value}
-                      onChange={(event, next) => form.setFieldValue('components.inputs.values.number', next)}
-                      {...(disabled && { disabled })}
-                      {...(loading && { loading })}
-                      {...(readOnly && { readOnly })}
-                      {...(tiny && { tiny })}
-                      {...(reset && {
-                        reset,
-                        defaultValue: 0,
-                        onReset: () => form.setFieldValue('components.inputs.values.number', 0)
-                      })}
-                      {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
-                      {...(error && { error: v => (v !== 0 ? null : 'Input field cannot be 0'), min: 5, max: 10 })}
-                      {...(helperText && { helperText: 'Helper Text' })}
-                      {...(placeholder && { placeholder: 'Placeholder' })}
-                      {...(endAdornment && { endAdornment: <Button variant="contained">Submit</Button> })}
-                      {...(monospace && { monospace: true })}
-                      {...(password && { password: true })}
-                      {...(overflowHidden && { overflowHidden: true })}
-                      {...(required && { required: true })}
-                      {...(longname && {
-                        label:
-                          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc.'
-                      })}
-                      {...(badge && { badge: true })}
-                    />
-                  )}
-                />
-
-                <form.Subscribe
-                  selector={state => state.values.components.inputs.values.select}
-                  children={value => (
-                    <SelectInput
-                      label="Interaction Select Input"
-                      value={value}
-                      options={SELECT_OPTIONS}
-                      onChange={(event, next) => form.setFieldValue('components.inputs.values.select', next)}
-                      {...(disabled && { disabled })}
-                      {...(loading && { loading })}
-                      {...(readOnly && { readOnly })}
-                      {...(tiny && { tiny })}
-                      {...(reset && {
-                        reset,
-                        defaultValue: 'option 1',
-                        onReset: () => form.setFieldValue('components.inputs.values.select', 'option 1')
-                      })}
-                      {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
-                      {...(error && { error: (v: string) => (v !== '' ? null : 'Input field cannot be null') })}
-                      {...(helperText && { helperText: 'Helper Text' })}
-                      {...(placeholder && { placeholder: 'Placeholder' })}
-                      {...(endAdornment && { endAdornment: <Button variant="contained">Submit</Button> })}
-                      {...(monospace && { monospace: true })}
-                      {...(password && { password: true })}
-                      {...(overflowHidden && { overflowHidden: true })}
-                      {...(required && { required: true })}
-                      {...(longname && {
-                        label:
-                          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc.'
-                      })}
-                      {...(badge && { badge: true })}
-                    />
-                  )}
-                />
-
-                <form.Subscribe
-                  selector={state => state.values.components.inputs.values.date}
-                  children={value => (
-                    <DateInput
-                      label="Interaction Date Input"
-                      value={value}
-                      onChange={(event, next) => form.setFieldValue('components.inputs.values.date', next)}
-                      {...(disabled && { disabled })}
-                      {...(loading && { loading })}
-                      {...(readOnly && { readOnly })}
-                      {...(tiny && { tiny })}
-                      {...(reset && {
-                        reset,
-                        defaultValue: null,
-                        onReset: () => form.setFieldValue('components.inputs.values.date', null)
-                      })}
-                      {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
-                      {...(error && { error: v => (v !== null ? null : 'Input field cannot be null') })}
-                      {...(helperText && { helperText: 'Helper Text' })}
-                      {...(placeholder && { placeholder: 'Placeholder' })}
-                      {...(endAdornment && { endAdornment: <Button variant="contained">Submit</Button> })}
-                      {...(monospace && { monospace: true })}
-                      {...(password && { password: true })}
-                      {...(overflowHidden && { overflowHidden: true })}
-                      {...(required && { required: true })}
-                      {...(longname && {
-                        label:
-                          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc.'
-                      })}
-                      {...(badge && { badge: true })}
-                    />
-                  )}
-                />
-
-                <form.Subscribe
-                  selector={state => state.values.components.inputs.values.classification}
-                  children={value => (
-                    <ClassificationInput
-                      label="Interaction Classification Input"
-                      value={value}
-                      onChange={(event, next) => form.setFieldValue('components.inputs.values.classification', next)}
-                      {...(disabled && { disabled })}
-                      {...(loading && { loading })}
-                      {...(readOnly && { readOnly })}
-                      {...(tiny && { tiny })}
-                      {...(reset && {
-                        reset,
-                        defaultValue: null,
-                        onReset: () => form.setFieldValue('components.inputs.values.classification', null)
-                      })}
-                      {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
-                      {...(error && { error: v => (v !== 'TLP:C' ? null : 'Input field cannot be TLP:C') })}
-                      {...(helperText && { helperText: 'Helper Text' })}
-                      {...(placeholder && { placeholder: 'Placeholder' })}
-                      {...(endAdornment && { endAdornment: <Button variant="contained">Submit</Button> })}
-                      {...(monospace && { monospace: true })}
-                      {...(password && { password: true })}
-                      {...(overflowHidden && { overflowHidden: true })}
-                      {...(required && { required: true })}
-                      {...(longname && {
-                        label:
-                          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc.'
-                      })}
-                      {...(badge && { badge: true })}
-                    />
-                  )}
-                />
-
-                <form.Subscribe
-                  selector={state => state.values.components.inputs.values.textarea}
-                  children={value => (
-                    <TextAreaInput
-                      label="Interaction Text Area Input"
-                      value={value}
-                      rows={3}
-                      onChange={(event, next) => form.setFieldValue('components.inputs.values.textarea', next)}
-                      {...(disabled && { disabled })}
-                      {...(loading && { loading })}
-                      {...(readOnly && { readOnly })}
-                      {...(tiny && { tiny })}
-                      {...(reset && {
-                        reset,
-                        defaultValue: '',
-                        onReset: () => form.setFieldValue('components.inputs.values.textarea', '')
-                      })}
-                      {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
-                      {...(error && { error: v => (v !== '' ? null : "Input field cannot be''") })}
-                      {...(helperText && { helperText: 'Helper Text' })}
-                      {...(placeholder && { placeholder: 'Placeholder' })}
-                      {...(endAdornment && { endAdornment: <Button variant="contained">Submit</Button> })}
-                      {...(monospace && { monospace: true })}
-                      {...(password && { password: true })}
-                      {...(overflowHidden && { overflowHidden: true })}
-                      {...(required && { required: true })}
-                      {...(longname && {
-                        label:
-                          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc.'
-                      })}
-                      {...(badge && { badge: true })}
-                    />
-                  )}
-                />
-
-                <form.Subscribe
-                  selector={state => state.values.components.inputs.values.slider}
-                  children={value => (
-                    <SliderInput
-                      label="Interaction Slider Input"
-                      value={value}
-                      onChange={(event, next) => form.setFieldValue('components.inputs.values.slider', next)}
-                      {...(disabled && { disabled })}
-                      {...(loading && { loading })}
-                      {...(readOnly && { readOnly })}
-                      {...(tiny && { tiny })}
-                      {...(reset && {
-                        reset,
-                        defaultValue: 0,
-                        onReset: () => form.setFieldValue('components.inputs.values.slider', 0)
-                      })}
-                      {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
-                      {...(error && { error: v => (v !== 0 ? null : 'Input field cannot be 0') })}
-                      {...(helperText && { helperText: 'Helper Text' })}
-                      {...(placeholder && { placeholder: 'Placeholder' })}
-                      {...(endAdornment && { endAdornment: <Button variant="contained">Submit</Button> })}
-                      {...(monospace && { monospace: true })}
-                      {...(password && { password: true })}
-                      {...(overflowHidden && { overflowHidden: true })}
-                      {...(required && { required: true })}
-                      {...(longname && {
-                        label:
-                          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc.'
-                      })}
-                      {...(badge && { badge: true })}
-                    />
-                  )}
-                />
-
-                <form.Subscribe
-                  selector={state => state.values.components.inputs.values.checkbox}
-                  children={value => (
-                    <CheckboxInput
-                      label="Interaction Checkbox Input"
-                      value={value}
-                      onChange={(event, next) => form.setFieldValue('components.inputs.values.checkbox', next)}
-                      {...(disabled && { disabled })}
-                      {...(loading && { loading })}
-                      {...(readOnly && { readOnly })}
-                      {...(tiny && { tiny })}
-                      {...(reset && {
-                        reset,
-                        defaultValue: false,
-                        onReset: () => form.setFieldValue('components.inputs.values.checkbox', false)
-                      })}
-                      {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
-                      {...(error && { error: v => (v !== false ? null : 'Input field cannot be null') })}
-                      {...(helperText && { helperText: 'Helper Text' })}
-                      {...(placeholder && { placeholder: 'Placeholder' })}
-                      {...(endAdornment && { endAdornment: <Button variant="contained">Submit</Button> })}
-                      {...(monospace && { monospace: true })}
-                      {...(password && { password: true })}
-                      {...(overflowHidden && { overflowHidden: true })}
-                      {...(required && { required: true })}
-                      {...(longname && {
-                        label:
-                          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc.'
-                      })}
-                      {...(badge && { badge: true })}
-                    />
-                  )}
-                />
-
-                <form.Subscribe
-                  selector={state => state.values.components.inputs.values.switch}
-                  children={value => (
-                    <SwitchInput
-                      label="Interaction Switch Input"
-                      value={value}
-                      onChange={(event, next) => form.setFieldValue('components.inputs.values.switch', next)}
-                      {...(disabled && { disabled })}
-                      {...(loading && { loading })}
-                      {...(readOnly && { readOnly })}
-                      {...(tiny && { tiny })}
-                      {...(reset && {
-                        reset,
-                        defaultValue: false,
-                        onReset: () => form.setFieldValue('components.inputs.values.switch', false)
-                      })}
-                      {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
-                      {...(error && { error: v => (v !== false ? null : 'Input field cannot be null') })}
-                      {...(helperText && { helperText: 'Helper Text' })}
-                      {...(placeholder && { placeholder: 'Placeholder' })}
-                      {...(endAdornment && { endAdornment: <Button variant="contained">Submit</Button> })}
-                      {...(monospace && { monospace: true })}
-                      {...(password && { password: true })}
-                      {...(overflowHidden && { overflowHidden: true })}
-                      {...(required && { required: true })}
-                      {...(longname && {
-                        label:
-                          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc.'
-                      })}
-                      {...(badge && { badge: true })}
-                    />
-                  )}
-                />
-
-                <form.Subscribe
-                  selector={state => state.values.components.inputs.values.radio}
-                  children={value => (
-                    <RadioInput
-                      label="Interaction Radio Input"
-                      value={value}
-                      options={RADIO_OPTIONS}
-                      onChange={(event, next) => form.setFieldValue('components.inputs.values.radio', next)}
-                      {...(disabled && { disabled })}
-                      {...(loading && { loading })}
-                      {...(readOnly && { readOnly })}
-                      {...(tiny && { tiny })}
-                      {...(reset && {
-                        reset,
-                        defaultValue: null,
-                        onReset: () => form.setFieldValue('components.inputs.values.radio', null)
-                      })}
-                      {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
-                      {...(error && { error: (v: string) => (v !== null ? null : 'Input field cannot be null') })}
-                      {...(helperText && { helperText: 'Helper Text' })}
-                      {...(placeholder && { placeholder: 'Placeholder' })}
-                      {...(endAdornment && { endAdornment: <Button variant="contained">Submit</Button> })}
-                      {...(monospace && { monospace: true })}
-                      {...(password && { password: true })}
-                      {...(overflowHidden && { overflowHidden: true })}
-                      {...(required && { required: true })}
-                      {...(longname && {
-                        label:
-                          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc.'
-                      })}
-                      {...(badge && { badge: true })}
-                    />
-                  )}
-                />
-
-                <form.Subscribe
-                  selector={state => state.values.components.inputs.values.json}
-                  children={value => (
-                    <JSONInput
-                      label="Interaction JSON Input"
-                      value={value}
-                      onChange={(event, next) => form.setFieldValue('components.inputs.values.json', next)}
-                      {...(disabled && { disabled })}
-                      {...(loading && { loading })}
-                      {...(readOnly && { readOnly })}
-                      {...(tiny && { tiny })}
-                      {...(reset && {
-                        reset,
-                        defaultValue: {},
-                        onReset: () => form.setFieldValue('components.inputs.values.radio', null)
-                      })}
-                      {...(tooltip && { tooltip: 'This is an example of a tooltip' })}
-                      {...(error && { error: v => (JSON.stringify(v) !== '{}' ? null : 'Input field cannot be {}') })}
-                      {...(helperText && { helperText: 'Helper Text' })}
-                      {...(placeholder && { placeholder: 'Placeholder' })}
-                      {...(endAdornment && { endAdornment: <Button variant="contained">Submit</Button> })}
-                      {...(monospace && { monospace: true })}
-                      {...(password && { password: true })}
-                      {...(overflowHidden && { overflowHidden: true })}
-                      {...(required && { required: true })}
-                      {...(longname && {
-                        label:
-                          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc.'
-                      })}
-                      {...(badge && { badge: true })}
-                    />
-                  )}
-                />
-              </>
-            )}
-          />
-        }
-        right={
-          <div style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(1) }}>
-            <form.Subscribe
-              selector={state => state.values.components.inputs.state.disabled}
-              children={value => (
-                <CheckboxInput
-                  label="Disabled"
-                  value={value}
-                  onChange={(event, next) => form.setFieldValue('components.inputs.state.disabled', next)}
-                />
-              )}
-            />
-            <form.Subscribe
-              selector={state => state.values.components.inputs.state.loading}
-              children={value => (
-                <CheckboxInput
-                  label="Loading"
-                  value={value}
-                  onChange={(event, next) => form.setFieldValue('components.inputs.state.loading', next)}
-                />
-              )}
-            />
-            <form.Subscribe
-              selector={state => state.values.components.inputs.state.reset}
-              children={value => (
-                <CheckboxInput
-                  label="Reset"
-                  value={value}
-                  onChange={(event, next) => form.setFieldValue('components.inputs.state.reset', next)}
-                />
-              )}
-            />
-            <form.Subscribe
-              selector={state => state.values.components.inputs.state.tooltip}
-              children={value => (
-                <CheckboxInput
-                  label="Tooltip"
-                  value={value}
-                  onChange={(event, next) => form.setFieldValue('components.inputs.state.tooltip', next)}
-                />
-              )}
-            />
-            <form.Subscribe
-              selector={state => state.values.components.inputs.state.error}
-              children={value => (
-                <CheckboxInput
-                  label="Error"
-                  value={value}
-                  onChange={(event, next) => form.setFieldValue('components.inputs.state.error', next)}
-                />
-              )}
-            />
-            <form.Subscribe
-              selector={state => state.values.components.inputs.state.readOnly}
-              children={value => (
-                <CheckboxInput
-                  label="ReadOnly"
-                  value={value}
-                  onChange={(event, next) => form.setFieldValue('components.inputs.state.readOnly', next)}
-                />
-              )}
-            />
-            <form.Subscribe
-              selector={state => state.values.components.inputs.state.helperText}
-              children={value => (
-                <CheckboxInput
-                  label="Helper Text"
-                  value={value}
-                  onChange={(event, next) => form.setFieldValue('components.inputs.state.helperText', next)}
-                />
-              )}
-            />
-            <form.Subscribe
-              selector={state => state.values.components.inputs.state.placeholder}
-              children={value => (
-                <CheckboxInput
-                  label="Placeholder"
-                  value={value}
-                  onChange={(event, next) => form.setFieldValue('components.inputs.state.placeholder', next)}
-                />
-              )}
-            />
-            <form.Subscribe
-              selector={state => state.values.components.inputs.state.endAdornment}
-              children={value => (
-                <CheckboxInput
-                  label="End Adornment"
-                  value={value}
-                  onChange={(event, next) => form.setFieldValue('components.inputs.state.endAdornment', next)}
-                />
-              )}
-            />
-            <form.Subscribe
-              selector={state => state.values.components.inputs.state.tiny}
-              children={value => (
-                <CheckboxInput
-                  label="Tiny"
-                  value={value}
-                  onChange={(event, next) => form.setFieldValue('components.inputs.state.tiny', next)}
-                />
-              )}
-            />
-            <form.Subscribe
-              selector={state => state.values.components.inputs.state.monospace}
-              children={value => (
-                <CheckboxInput
-                  label="Monospace"
-                  value={value}
-                  onChange={(event, next) => form.setFieldValue('components.inputs.state.monospace', next)}
-                />
-              )}
-            />
-            <form.Subscribe
-              selector={state => state.values.components.inputs.state.password}
-              children={value => (
-                <CheckboxInput
-                  label="Password"
-                  value={value}
-                  onChange={(event, next) => form.setFieldValue('components.inputs.state.password', next)}
-                />
-              )}
-            />
-            <form.Subscribe
-              selector={state => state.values.components.inputs.state.longname}
-              children={value => (
-                <CheckboxInput
-                  label="Long Name"
-                  value={value}
-                  onChange={(event, next) => form.setFieldValue('components.inputs.state.longname', next)}
-                />
-              )}
-            />
-            <form.Subscribe
-              selector={state => state.values.components.inputs.state.overflowHidden}
-              children={value => (
-                <CheckboxInput
-                  label="Overflow Hidden"
-                  value={value}
-                  onChange={(event, next) => form.setFieldValue('components.inputs.state.overflowHidden', next)}
-                />
-              )}
-            />
-            <form.Subscribe
-              selector={state => state.values.components.inputs.state.required}
-              children={value => (
-                <CheckboxInput
-                  label="Required"
-                  value={value}
-                  onChange={(event, next) => form.setFieldValue('components.inputs.state.required', next)}
-                />
-              )}
-            />
-            <form.Subscribe
-              selector={state => state.values.components.inputs.state.badge}
-              children={value => (
-                <CheckboxInput
-                  label="Badge"
-                  value={value}
-                  onChange={(event, next) => form.setFieldValue('components.inputs.state.badge', next)}
-                />
-              )}
-            />
-          </div>
-        }
-      />
-
-      <DemoSection
         primary="Edge Case: Long label names"
         secondary={
           <>
@@ -5277,6 +4689,9 @@ export const InputsSection = React.memo(() => {
                   label="Slider Input: Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris at pellentesque massa. Vivamus sagittis venenatis auctor. Suspendisse venenatis sollicitudin sollicitudin. Nulla dui nibh, volutpat non ipsum viverra, tristique iaculis diam. Sed efficitur tellus leo. Curabitur ut tincidunt turpis. Phasellus quis urna at turpis pharetra volutpat luctus eu nunc."
                   value={value}
                   onChange={(event, next) => form.setFieldValue('components.inputs.values.slider', next)}
+                  max={0}
+                  min={0}
+                  step={0}
                 />
               )}
             />
@@ -5408,7 +4823,7 @@ export const InputsSection = React.memo(() => {
 </>`}
           />
         }
-      /> */}
+      />
     </DemoContainer>
   );
 });
