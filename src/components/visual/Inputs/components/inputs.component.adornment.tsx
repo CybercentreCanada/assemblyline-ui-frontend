@@ -10,7 +10,7 @@ import { usePropStore } from 'components/core/PropProvider/PropProvider';
 import type { ButtonProps } from 'components/visual/Buttons/Button';
 import { Button } from 'components/visual/Buttons/Button';
 import { IconButton } from 'components/visual/Buttons/IconButton';
-import { useInputChange } from 'components/visual/Inputs/hooks/inputs.hook.event_handlers';
+import { useInputBlur, useInputChange } from 'components/visual/Inputs/hooks/inputs.hook.event_handlers';
 import {
   useInputId,
   useShouldRenderAdornments,
@@ -44,7 +44,7 @@ export const ClearInputAdornment = React.memo(({ variant = 'icon' }: InputButton
   const shouldRenderClear = useShouldRenderClear();
   const tiny = get('tiny');
 
-  const handleChange = useInputChange();
+  const handleBlur = useInputBlur();
 
   if (!shouldRenderClear) return null;
   else if (variant === 'icon')
@@ -60,7 +60,7 @@ export const ClearInputAdornment = React.memo(({ variant = 'icon' }: InputButton
         onClick={event => {
           event.preventDefault();
           event.stopPropagation();
-          handleChange(event, []);
+          handleBlur(event as any, []);
         }}
         {...clearAdornmentProps}
         sx={{
@@ -84,7 +84,7 @@ export const ClearInputAdornment = React.memo(({ variant = 'icon' }: InputButton
         onClick={event => {
           event.preventDefault();
           event.stopPropagation();
-          handleChange(event, []);
+          handleBlur(event as any, []);
         }}
         {...(clearAdornmentProps as ButtonProps)}
         sx={{

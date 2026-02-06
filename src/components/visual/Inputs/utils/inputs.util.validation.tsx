@@ -48,8 +48,12 @@ export class ValidationSchema<Value> {
    */
   required(status: ValidationStatus = 'error', message: string | null = null) {
     this.validators.push(value =>
-      value === null || value === undefined || value === ''
-        ? { status, message: message || this.t?.('validation.required') || 'This field is required' }
+      value === null ||
+      value === undefined ||
+      value === '' ||
+      (Array.isArray(value) && value.length === 0) ||
+      (typeof value === 'object' && !Array.isArray(value) && Object.keys(value).length === 0)
+        ? { status, message: message || this.t?.('validation.required') }
         : null
     );
     return this;
@@ -166,7 +170,13 @@ export class CoercersSchema<Value> {
    */
   required() {
     this.coercers.push((event, value) => {
-      if (value === null || value === undefined || value === '') {
+      if (
+        value === null ||
+        value === undefined ||
+        value === '' ||
+        (Array.isArray(value) && value.length === 0) ||
+        (typeof value === 'object' && !Array.isArray(value) && Object.keys(value).length === 0)
+      ) {
         return { value, ignore: true };
       }
       return { value, ignore: false };
