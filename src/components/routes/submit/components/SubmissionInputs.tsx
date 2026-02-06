@@ -247,13 +247,13 @@ export const MaliciousInput = React.memo(() => {
       {([isFile, value, loading, disabled, isEditing]) => (
         <SwitchInput
           label={t('malicious.switch.label')}
-          labelProps={{ color: 'textPrimary' }}
           tooltip={t('malicious.switch.tooltip')}
           value={value}
           loading={loading}
           disabled={disabled || !isEditing}
           preventRender={!isFile}
           onChange={(_, v) => form.setFieldValue('settings.malicious.value', v)}
+          slotProps={{ formLabel: { color: 'textPrimary' } }}
         />
       )}
     </form.Subscribe>
@@ -293,7 +293,6 @@ export const ExternalSources = React.memo(() => {
                     key={i}
                     id={`source-${source.replace('_', ' ')}`}
                     label={source.replace('_', ' ')}
-                    labelProps={{ color: 'textPrimary' }}
                     value={value}
                     loading={loading}
                     disabled={disabled || !isEditing}
@@ -303,6 +302,7 @@ export const ExternalSources = React.memo(() => {
                         return s;
                       });
                     }}
+                    slotProps={{ formLabel: { color: 'textPrimary' } }}
                   />
                 )}
               />
@@ -348,7 +348,6 @@ export const ExternalServices = React.memo(() => {
                   <CheckboxInput
                     id={`url_submission_auto_service_selection-${name.replace('_', ' ')}`}
                     label={name.replace('_', ' ')}
-                    labelProps={{ textTransform: 'capitalize', color: 'textPrimary' }}
                     value={selected}
                     loading={loading}
                     disabled={disabled || !isEditing || (!customize && restricted)}
@@ -359,6 +358,7 @@ export const ExternalServices = React.memo(() => {
                         return s;
                       });
                     }}
+                    slotProps={{ formLabel: { color: 'textPrimary', textTransform: 'capitalize' } }}
                   />
                 )}
               </form.Subscribe>
