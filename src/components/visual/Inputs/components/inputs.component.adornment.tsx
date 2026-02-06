@@ -183,13 +183,14 @@ export const HelpInputAdornment = React.memo(({ variant = 'icon' }: InputButtonA
   const [get] = usePropStore<InputControllerProps>();
 
   const disabled = get('disabled');
-  const help = get('help');
   const helpAdornmentProps = get('slotProps')?.helpAdornment;
+  const helpLink = get('helpLink');
+  const helpName = get('helpName');
   const id = useInputId();
   const shouldRenderHelp = useShouldRenderHelp();
   const tiny = get('tiny');
 
-  const isExternal = help?.startsWith('http');
+  const isExternal = helpLink?.startsWith('http');
 
   if (!shouldRenderHelp) return null;
   else if (variant === 'icon')
@@ -199,11 +200,11 @@ export const HelpInputAdornment = React.memo(({ variant = 'icon' }: InputButtonA
         color="secondary"
         disabled={disabled}
         tabIndex={-1}
-        to={help}
+        to={helpLink}
         tooltip={
           <>
             <span style={{ color: theme.palette.text.secondary }}>{t('adornment.help.tooltip')}</span>
-            <span>{help}</span>
+            <span>{helpName ?? helpLink}</span>
           </>
         }
         tooltipProps={{ arrow: true }}
@@ -226,11 +227,11 @@ export const HelpInputAdornment = React.memo(({ variant = 'icon' }: InputButtonA
         disabled={disabled}
         size="small"
         tabIndex={-1}
-        to={help}
+        to={helpLink}
         tooltip={
           <>
             <span style={{ color: theme.palette.text.secondary }}>{t('adornment.help.tooltip')}</span>
-            <span>{help}</span>
+            <span>{helpName ?? helpLink}</span>
           </>
         }
         tooltipProps={{ arrow: true }}

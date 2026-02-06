@@ -524,7 +524,7 @@ export const ClassificationInput = ({ preventRender = false, value, ...props }: 
         rawValue: value ?? '',
         validationMessage,
         validationStatus,
-        help: '/help/classification',
+        helpLink: '/help/classification',
         value,
         ...props
       }}

@@ -47,8 +47,8 @@ export const useShouldRenderHelp = <Value extends unknown = unknown, RawValue = 
   const [get] = usePropStore<InputControllerProps<Value, RawValue>>();
   const disabled = get('disabled');
   const readOnly = get('readOnly');
-  const showHelpButton = get('help');
-  return Boolean(showHelpButton) && !readOnly && !disabled;
+  const hasHelpLink = get('helpLink');
+  return Boolean(hasHelpLink) && !readOnly && !disabled;
 };
 
 /**

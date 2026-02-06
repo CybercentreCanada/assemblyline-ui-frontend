@@ -124,10 +124,15 @@ export type InputOptions = {
   expand?: boolean;
 
   /**
-   * If `true`, shows the help button
-   * @default false
+   * shows the help button with a link to its documentation page
+   * @default null
    */
-  help?: `/${string}` | `${'http' | 'https'}://${string}`;
+  helpLink?: `/${string}` | `${'http' | 'https'}://${string}`;
+
+  /**
+   * If any values, will overwrite the helpLink text
+   */
+  helpName?: string;
 
   /**
    * Helper / description text displayed under the input
@@ -235,7 +240,8 @@ export const DEFAULT_INPUT_OPTIONS: InputOptions = {
   divider: false,
   endAdornment: null,
   expand: null,
-  help: null,
+  helpLink: null,
+  helpName: null,
   helperText: null,
   id: null,
   label: null,

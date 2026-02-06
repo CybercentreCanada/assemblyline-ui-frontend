@@ -30,7 +30,11 @@ export const Tooltip: React.FC<TooltipProps> = React.memo(
             onMouseOver: () => setOpen(false)
           },
           tooltip: {
-            ...tooltipProps?.slotProps?.tooltip
+            ...tooltipProps?.slotProps?.tooltip,
+            sx: {
+              textWrap: 'pretty',
+              ...tooltipProps?.slotProps?.tooltip?.['sx']
+            }
           }
         }}
       >

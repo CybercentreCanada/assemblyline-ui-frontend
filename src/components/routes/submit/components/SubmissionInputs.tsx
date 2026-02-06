@@ -215,6 +215,8 @@ export const SubmissionProfileInput = React.memo(() => {
           loading={loading}
           disabled={disabled || !isEditing}
           options={options}
+          helpLink="https://cybercentrecanada.github.io/assemblyline4_docs/"
+          helpName="Assemblyline Docs"
           onChange={(_, profile) => {
             const prevProfile = form.store.state.values.state.profile;
             if (prevProfile === profile) return;
