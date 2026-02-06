@@ -77,6 +77,7 @@ export const ClearInputAdornment = React.memo(({ variant = 'icon' }: InputButton
         id={`${id}-clear-adornment`}
         color="secondary"
         disabled={disabled || !rawValue?.length}
+        disableElevation
         size="small"
         tabIndex={-1}
         type="button"
@@ -153,6 +154,7 @@ export const ExpandInputAdornment = React.memo(({ variant = 'icon' }: InputButto
         id={`${id}-expand-adornment`}
         color="secondary"
         disabled={disabled}
+        disableElevation
         size="small"
         tabIndex={-1}
         type="button"
@@ -225,6 +227,7 @@ export const HelpInputAdornment = React.memo(({ variant = 'icon' }: InputButtonA
         id={`${id}-help-adornment`}
         color="secondary"
         disabled={disabled}
+        disableElevation
         size="small"
         tabIndex={-1}
         to={helpLink}
@@ -298,6 +301,7 @@ export const MenuInputAdornment = React.memo(({ variant = 'icon' }: InputButtonA
         id={`${id}-menu-adornment`}
         color="secondary"
         disabled={disabled}
+        disableElevation
         size="small"
         tabIndex={-1}
         type="button"
@@ -415,6 +419,7 @@ export const NumericalSpinnerInputAdornment = () => {
       <Button
         color="secondary"
         disabled={disabled}
+        disableElevation
         size="small"
         tabIndex={-1}
         onMouseDown={e => handleMouseDown(e, rawValue, step)}
@@ -437,6 +442,7 @@ export const NumericalSpinnerInputAdornment = () => {
       <Button
         color="secondary"
         disabled={disabled}
+        disableElevation
         size="small"
         tabIndex={-1}
         onMouseDown={e => handleMouseDown(e, rawValue, -step)}
@@ -502,6 +508,7 @@ export const PasswordInputAdornment = React.memo(({ variant = 'icon' }: InputBut
         id={`${id}-password-adornment`}
         color="secondary"
         disabled={disabled}
+        disableElevation
         size="small"
         tabIndex={-1}
         type="button"
@@ -610,6 +617,7 @@ export const ResetInputAdornment = React.memo(({ variant = 'icon' }: InputButton
         id={`${id}-reset-adornment`}
         color="secondary"
         disabled={disabled}
+        disableElevation
         size="small"
         tabIndex={-1}
         type="button"

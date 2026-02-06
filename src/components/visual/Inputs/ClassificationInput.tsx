@@ -491,7 +491,13 @@ const WrappedClassificationInput = () => {
                 <div style={{ flex: 1 }} />
                 {startAdornment}
                 <ProgressInputAdornment />
-                <Button onClick={event => handleChange(event)} color="primary" variant="contained" autoFocus>
+                <Button
+                  autoFocus
+                  color="primary"
+                  disableElevation
+                  variant="contained"
+                  onClick={event => handleChange(event)}
+                >
                   {t('classification.done')}
                 </Button>
               </DialogActions>

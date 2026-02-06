@@ -451,11 +451,16 @@ function WrappedClassification({
               </Grid>
             </DialogContent>
             <DialogActions>
-              <Button color="secondary" to="/help/classification" onClick={() => setShowPicker(false)}>
+              <Button
+                color="secondary"
+                to="/help/classification"
+                variant="outlined"
+                onClick={() => setShowPicker(false)}
+              >
                 {t('classification.help')}
               </Button>
               <div style={{ flex: 1 }} />
-              <Button onClick={useClassification} color="primary" autoFocus>
+              <Button autoFocus color="primary" disableElevation variant="contained" onClick={useClassification}>
                 {t('classification.done')}
               </Button>
             </DialogActions>
