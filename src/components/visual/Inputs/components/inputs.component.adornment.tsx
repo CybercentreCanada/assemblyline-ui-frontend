@@ -212,6 +212,9 @@ export const HelpInputAdornment = React.memo(({ variant = 'icon' }: InputButtonA
         tooltipProps={{ arrow: true }}
         type="button"
         {...(isExternal && { target: '_blank', rel: 'noopener noreferrer' })}
+        onClick={event => {
+          event.stopPropagation();
+        }}
         {...helpAdornmentProps}
         sx={{
           padding: tiny ? theme.spacing(0.25) : theme.spacing(0.5),
@@ -241,6 +244,9 @@ export const HelpInputAdornment = React.memo(({ variant = 'icon' }: InputButtonA
         type="button"
         variant="outlined"
         {...(isExternal && { target: '_blank', rel: 'noopener noreferrer' })}
+        onClick={event => {
+          event.stopPropagation();
+        }}
         {...(helpAdornmentProps as ButtonProps)}
         sx={{
           ...(tiny && { padding: 0 }),
@@ -279,7 +285,11 @@ export const MenuInputAdornment = React.memo(({ variant = 'icon' }: InputButtonA
         tooltip={t('adornment.menu.tooltip')}
         tooltipProps={{ arrow: true }}
         type="button"
-        onClick={() => setStore({ isMenuOpen: true })}
+        onClick={event => {
+          event.preventDefault();
+          event.stopPropagation();
+          setStore({ isMenuOpen: true });
+        }}
         {...menuAdornmentProps}
         sx={{
           padding: tiny ? theme.spacing(0.75) : theme.spacing(1),
@@ -306,7 +316,11 @@ export const MenuInputAdornment = React.memo(({ variant = 'icon' }: InputButtonA
         tabIndex={-1}
         type="button"
         variant="outlined"
-        onClick={() => setStore({ isMenuOpen: true })}
+        onClick={event => {
+          event.preventDefault();
+          event.stopPropagation();
+          setStore({ isMenuOpen: true });
+        }}
         {...(menuAdornmentProps as ButtonProps)}
         sx={{
           ...(tiny && { padding: 0 }),
@@ -492,7 +506,11 @@ export const PasswordInputAdornment = React.memo(({ variant = 'icon' }: InputBut
         tooltip={isPasswordVisible ? t('adornment.showPassword.tooltip') : t('adornment.hidePassword.tooltip')}
         tooltipProps={{ arrow: true }}
         type="button"
-        onClick={() => setStore({ isPasswordVisible: !isPasswordVisible })}
+        onClick={event => {
+          event.preventDefault();
+          event.stopPropagation();
+          setStore({ isPasswordVisible: !isPasswordVisible });
+        }}
         {...passwordAdornmentProps}
         sx={{
           padding: tiny ? theme.spacing(0.25) : theme.spacing(0.5),
@@ -513,7 +531,11 @@ export const PasswordInputAdornment = React.memo(({ variant = 'icon' }: InputBut
         tabIndex={-1}
         type="button"
         variant="outlined"
-        onClick={() => setStore({ isPasswordVisible: !isPasswordVisible })}
+        onClick={event => {
+          event.preventDefault();
+          event.stopPropagation();
+          setStore({ isPasswordVisible: !isPasswordVisible });
+        }}
         {...(passwordAdornmentProps as ButtonProps)}
         sx={{
           ...(tiny && { padding: 0 }),
@@ -601,7 +623,11 @@ export const ResetInputAdornment = React.memo(({ variant = 'icon' }: InputButton
         tooltip={tooltip}
         tooltipProps={{ arrow: true }}
         type="button"
-        onClick={event => (onReset ? onReset(event) : handleChange(event, defaultValue))}
+        onClick={event => {
+          event.preventDefault();
+          event.stopPropagation();
+          onReset ? onReset(event) : handleChange(event, defaultValue);
+        }}
         {...resetAdornmentProps}
         sx={{
           padding: tiny ? theme.spacing(0.25) : theme.spacing(0.5),
@@ -624,7 +650,11 @@ export const ResetInputAdornment = React.memo(({ variant = 'icon' }: InputButton
         tooltip={tooltip}
         tooltipProps={{ arrow: true }}
         variant="outlined"
-        onClick={event => (onReset ? onReset(event) : handleChange(event, defaultValue))}
+        onClick={event => {
+          event.preventDefault();
+          event.stopPropagation();
+          onReset ? onReset(event) : handleChange(event, defaultValue);
+        }}
         {...(resetAdornmentProps as ButtonProps)}
         sx={{
           ...(tiny && { padding: 0 }),

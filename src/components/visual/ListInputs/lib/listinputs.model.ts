@@ -1,4 +1,11 @@
-import type { FormHelperTextProps, ListItemTextProps, TypographyProps } from '@mui/material';
+import type {
+  FormHelperTextProps,
+  ListItemButtonBaseProps,
+  ListItemProps,
+  ListItemTextProps,
+  SkeletonProps,
+  TypographyProps
+} from '@mui/material';
 import type { InputOptions, InputRuntimeState, InputValueModel } from 'components/visual/Inputs/models/inputs.model';
 import {
   DEFAULT_INPUT_OPTIONS,
@@ -23,19 +30,9 @@ export type ListInputOptions = Omit<InputOptions, 'label' | 'labelProps'> & {
   primary?: ListItemTextProps['primary'];
 
   /**
-   * Props applied to the primary text typography.
-   */
-  primaryProps?: TypographyProps;
-
-  /**
    * The secondary text content of the list item.
    */
   secondary?: ListItemTextProps['secondary'];
-
-  /**
-   * Props applied to the secondary text typography.
-   */
-  secondaryProps?: TypographyProps;
 
   /**
    * Maximum width of the list item.
@@ -47,9 +44,7 @@ export const DEFAULT_LIST_INPUT_OPTIONS: ListInputOptions = {
   ...DEFAULT_INPUT_OPTIONS,
   inset: false,
   primary: null,
-  primaryProps: null,
   secondary: null,
-  secondaryProps: null,
   width: '30%'
 };
 
@@ -58,25 +53,27 @@ export const DEFAULT_LIST_INPUT_OPTIONS: ListInputOptions = {
  *********************************************************************************************************************/
 export type ListInputSlotProps = {
   slotProps?: {
-    // formControl?: FormControlProps;
-    // formLabel?: TypographyProps;
-    // formLabelTooltip?: Omit<TooltipProps, 'children' | 'title'>;
+    buttonRoot?: Omit<ListItemButtonBaseProps, 'children'>;
     helperText?: FormHelperTextProps;
-    // root?: React.HTMLAttributes<HTMLDivElement>;
-    // skeleton?: SkeletonProps;
-    // resetAdornment?: IconButtonProps;
+    inner?: Omit<React.HTMLAttributes<HTMLDivElement>, 'children'>;
+    primaryProps?: TypographyProps;
+    root?: Omit<ListItemProps, 'children'>;
+    secondaryProps?: TypographyProps;
+    skeleton?: SkeletonProps;
+    wrapper?: Omit<React.HTMLAttributes<HTMLDivElement>, 'children'>;
   };
 };
 
 export const DEFAULT_LIST_INPUT_SLOT_PROPS: ListInputSlotProps = {
   slotProps: {
-    // formControl: null,
-    // formLabel: null,
-    // formLabelTooltip: null,
-    helperText: null
-    // root: null,
-    // skeleton: null,
-    // resetAdornment: null
+    buttonRoot: null,
+    helperText: null,
+    inner: null,
+    primaryProps: null,
+    root: null,
+    secondaryProps: null,
+    skeleton: null,
+    wrapper: null
   }
 };
 

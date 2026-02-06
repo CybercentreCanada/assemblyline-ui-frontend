@@ -6,13 +6,14 @@ import { Anchor } from 'components/core/TableOfContent/Anchor';
 import { ResetInputAdornment } from 'components/visual/Inputs/components/inputs.component.adornment';
 import { InputCircularSkeleton } from 'components/visual/Inputs/components/inputs.component.buttons';
 import { useInputId, useInputLabel } from 'components/visual/Inputs/hooks/inputs.hook.renderer';
-import type { InputValueModel } from 'components/visual/Inputs/models/inputs.model';
+import { useInputValidation } from 'components/visual/Inputs/hooks/inputs.hook.validation';
+import type { InputRuntimeState, InputValueModel } from 'components/visual/Inputs/models/inputs.model';
 import {
   ListInputButtonRoot,
   ListInputRoot,
   ListInputText
 } from 'components/visual/ListInputs/lib/listinputs.components';
-import type { ListInputOptions } from 'components/visual/ListInputs/lib/listinputs.model';
+import type { ListInputOptions, ListInputSlotProps } from 'components/visual/ListInputs/lib/listinputs.model';
 import { DEFAULT_LIST_INPUT_CONTROLLER_PROPS } from 'components/visual/ListInputs/lib/listinputs.model';
 import React from 'react';
 
@@ -20,7 +21,8 @@ export type ListHeaderProps = Omit<
   InputValueModel<boolean, React.MouseEvent<HTMLDivElement, globalThis.MouseEvent>>,
   'value'
 > &
-  ListInputOptions & {
+  ListInputOptions &
+  ListInputSlotProps & {
     anchor?: boolean;
     anchorProps?: AnchorProps;
     checked?: boolean;
@@ -28,7 +30,7 @@ export type ListHeaderProps = Omit<
     indeterminate?: CheckboxProps['indeterminate'];
   };
 
-type ListHeaderController = ListHeaderProps & {};
+type ListHeaderController = ListHeaderProps & InputRuntimeState<boolean>;
 
 const WrappedListHeader = React.memo(() => {
   const [get] = usePropStore<ListHeaderController>();
@@ -109,14 +111,30 @@ const WrappedListHeader = React.memo(() => {
 export const ListHeader = ({
   anchor = false,
   anchorProps = null,
+  checked = null,
   edge = 'end',
   preventRender = false,
   ...props
 }: ListHeaderProps) => {
+  const { status: validationStatus, message: validationMessage } = useInputValidation<boolean>({
+    value: Boolean(checked),
+    ...props
+  });
+
   return preventRender ? null : (
     <PropProvider<ListHeaderController>
-      initialProps={DEFAULT_LIST_INPUT_CONTROLLER_PROPS as ListHeaderController}
-      props={{ anchor, anchorProps, edge, preventRender, onChange: null, ...props }}
+      initialProps={{ ...DEFAULT_LIST_INPUT_CONTROLLER_PROPS, onChange: null } as ListHeaderController}
+      props={{
+        anchor,
+        anchorProps,
+        checked,
+        edge,
+        onChange: null,
+        preventRender,
+        validationMessage,
+        validationStatus,
+        ...props
+      }}
     >
       <WrappedListHeader />
     </PropProvider>

@@ -6,11 +6,11 @@ import {
   ProgressInputAdornment,
   ResetInputAdornment
 } from 'components/visual/Inputs/components/inputs.component.adornment';
+import { InputHelperText } from 'components/visual/Inputs/components/inputs.component.form';
 import { useInputBlur, useInputChange, useInputFocus } from 'components/visual/Inputs/hooks/inputs.hook.event_handlers';
 import { useInputValidation } from 'components/visual/Inputs/hooks/inputs.hook.validation';
 import type { InputRuntimeState, InputValueModel } from 'components/visual/Inputs/models/inputs.model';
 import {
-  ListInputHelperText,
   ListInputInner,
   ListInputLoading,
   ListInputRoot,
@@ -95,21 +95,14 @@ const WrappedNumberListInput = React.memo(() => {
                 sx={{
                   maxWidth: width,
                   minWidth: width,
-                  margin: 0,
-                  '&.MuiInputBase-root': {
-                    // paddingRight: '9px',
-                    ...(!tiny && { minHeight: '40px' })
-                  },
-                  '& .MuiSelect-select': {
-                    // padding: '8px 8px 8px 14px !important',
-                    ...(tiny && {
-                      padding: '4.5px 8px 4.5px 14px !important'
-                    })
-                  }
+                  margin: 0
                 }}
                 slotProps={{
                   input: {
                     inputProps: {
+                      sx: {
+                        ...(tiny && { padding: '4.5px 0px 4.5px 0px !important' })
+                      },
                       ...(typeof max === 'number' && { max }),
                       ...(typeof min === 'number' && { min }),
                       ...(typeof step === 'number' && { step })
@@ -121,7 +114,7 @@ const WrappedNumberListInput = React.memo(() => {
           )}
         </ListInputInner>
 
-        <ListInputHelperText />
+        <InputHelperText sx={{ width: '100%', justifyContent: 'flex-end', margin: 0 }} />
       </ListInputWrapper>
     </ListInputRoot>
   );

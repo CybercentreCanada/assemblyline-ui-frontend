@@ -7,12 +7,12 @@ import {
   ProgressInputAdornment,
   ResetInputAdornment
 } from 'components/visual/Inputs/components/inputs.component.adornment';
+import { InputHelperText } from 'components/visual/Inputs/components/inputs.component.form';
 import { useInputBlur, useInputChange, useInputFocus } from 'components/visual/Inputs/hooks/inputs.hook.event_handlers';
 import { useInputId } from 'components/visual/Inputs/hooks/inputs.hook.renderer';
 import { useInputValidation } from 'components/visual/Inputs/hooks/inputs.hook.validation';
 import type { InputRuntimeState, InputValueModel } from 'components/visual/Inputs/models/inputs.model';
 import {
-  ListInputHelperText,
   ListInputInner,
   ListInputLoading,
   ListInputRoot,
@@ -90,7 +90,7 @@ const WrappedTextListInput = React.memo(() => {
           )}
         </ListInputInner>
 
-        <ListInputHelperText />
+        <InputHelperText sx={{ width: '100%', justifyContent: 'flex-end', margin: 0 }} />
       </ListInputWrapper>
     </ListInputRoot>
   );

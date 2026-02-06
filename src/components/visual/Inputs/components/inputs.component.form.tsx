@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
 import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import WarningAmberOutlinedIcon from '@mui/icons-material/WarningAmberOutlined';
-import type { ListItemTextProps, TypographyProps } from '@mui/material';
+import type { FormHelperTextProps, ListItemTextProps, TypographyProps } from '@mui/material';
 import {
   Badge,
   FormControl,
@@ -268,7 +270,7 @@ export const InputFormLabel = React.memo(() => {
 
 InputFormLabel.displayName = 'InputFormLabel';
 
-export const InputHelperText = React.memo(() => {
+export const InputHelperText = React.memo((props: FormHelperTextProps) => {
   const theme = useTheme();
   const [get] = usePropStore<InputControllerProps>();
 
@@ -322,6 +324,7 @@ export const InputHelperText = React.memo(() => {
       id={`${id}-helper-text`}
       component="div"
       variant="outlined"
+      {...props}
       {...helperTextProps}
       sx={{
         color,
@@ -329,7 +332,8 @@ export const InputHelperText = React.memo(() => {
         flexDirection: 'row',
         gap: 0.5,
         ...(validationMessage && validationStatus !== 'default' && { marginLeft: 0 }),
-        ...helperTextProps?.sx
+        ...(props?.sx as any),
+        ...(helperTextProps?.sx as any)
       }}
     >
       {Icon && <Icon fontSize="small" />}

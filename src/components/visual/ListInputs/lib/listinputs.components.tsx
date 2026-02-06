@@ -1,12 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import type { AutocompleteRenderInputParams, ListItemButtonProps, ListItemProps, TextFieldProps } from '@mui/material';
 import {
   Box,
-  FormHelperText,
   InputAdornment,
   ListItem,
   ListItemButton,
   Skeleton,
-  styled,
   TextField,
   Typography,
   useTheme
@@ -20,91 +20,169 @@ import React from 'react';
 /**********************************************************************************************************************
  * Skeletons
  *********************************************************************************************************************/
-export const ListInputLoading = React.memo(
-  styled(Skeleton)(({ theme }) => ({
-    height: '2rem',
-    width: '30%',
-    marginRight: theme.spacing(0.5)
-  }))
-);
+export const ListInputLoading = React.memo(() => {
+  const [get] = usePropStore<ListInputControllerProps>();
+
+  const id = useInputId();
+  const skeletonProps = get('slotProps')?.skeleton;
+  const tiny = get('tiny');
+  const width = get('width');
+
+  return (
+    <Skeleton
+      id={`${id}-skeleton`}
+      {...skeletonProps}
+      sx={{
+        height: '40px',
+        transform: 'unset',
+        width: width,
+        ...(tiny && { height: '28px' }),
+        ...skeletonProps?.sx
+      }}
+    />
+  );
+});
 
 ListInputLoading.displayName = 'ListInputLoading';
 
 /**********************************************************************************************************************
  * Forms
  *********************************************************************************************************************/
-
-export const ListInputRoot = React.memo(({ sx, ...props }: ListItemProps) => {
+export const ListInputRoot = React.memo(({ children, ...props }: ListItemProps) => {
   const theme = useTheme();
-
   const [get] = usePropStore<ListInputControllerProps>();
 
+  const disabled = get('disabled');
   const divider = get('divider');
+  const readOnly = get('readOnly');
+  const rootProps = get('slotProps')?.root;
+  const validationStatus = get('validationStatus');
+
+  const showValidationColor =
+    !disabled && !readOnly && validationStatus && validationStatus !== 'default' && validationStatus !== 'error';
+
+  const color = showValidationColor ? validationStatus : undefined;
 
   return (
     <ListItem
+      {...props}
+      {...rootProps}
       sx={{
         minHeight: '50px',
         paddingTop: theme.spacing(0.5),
         paddingBottom: theme.spacing(0.5),
         ...(divider && { borderBottom: `1px solid ${theme.palette.divider}` }),
-        ...sx
+        ...(color && {
+          '& .MuiOutlinedInput-root': {
+            '& fieldset': {
+              borderColor: theme.palette[color].main
+            },
+            '&:hover fieldset': {
+              borderColor: theme.palette[color].dark
+            },
+            '&.Mui-focused fieldset': {
+              borderColor: theme.palette[color].main
+            }
+          }
+        }),
+
+        ...(readOnly &&
+          !disabled && {
+            '& .MuiInputBase-input': {
+              cursor: 'default'
+            },
+            '& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline': {
+              borderColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.23)' : 'rgba(0, 0, 0, 0.23)'
+            }
+          }),
+
+        ...(props?.sx as any),
+        ...(rootProps?.sx as any)
       }}
-      {...props}
-    />
+    >
+      {children}
+    </ListItem>
   );
 });
 
 ListInputRoot.displayName = 'ListInputRoot';
 
-export const ListInputWrapper = React.memo(
-  styled('div')({
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    width: '100%',
-    minWidth: 0
-  })
-);
+export const ListInputWrapper = React.memo((props: React.HTMLAttributes<HTMLDivElement>) => {
+  const [get] = usePropStore<ListInputControllerProps>();
+
+  const wrapperProps = get('slotProps')?.wrapper;
+
+  return (
+    <div
+      {...props}
+      {...wrapperProps}
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        width: '100%',
+        minWidth: 0,
+        ...props?.style,
+        ...wrapperProps?.style
+      }}
+    />
+  );
+});
 
 ListInputWrapper.displayName = 'ListInputWrapper';
 
-export const ListInputInner = React.memo(
-  styled('div')(({ theme }) => ({
-    display: 'flex',
-    alignItems: 'center',
-    width: '100%',
-    minWidth: 0,
-    columnGap: theme.spacing(1)
-  }))
-);
-
-ListInputInner.displayName = 'ListInputInner';
-
-export const ListInputButtonRoot = React.memo(({ children, sx, ...props }: ListItemButtonProps) => {
+export const ListInputInner = React.memo((props: React.HTMLAttributes<HTMLDivElement>) => {
   const theme = useTheme();
   const [get] = usePropStore<ListInputControllerProps>();
 
+  const innerProps = get('slotProps')?.inner;
+
+  return (
+    <div
+      {...props}
+      {...innerProps}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        width: '100%',
+        minWidth: 0,
+        columnGap: theme.spacing(1),
+        ...props?.style,
+        ...innerProps?.style
+      }}
+    />
+  );
+});
+
+ListInputInner.displayName = 'ListInputInner';
+
+export const ListInputButtonRoot = React.memo(({ children, ...props }: ListItemButtonProps) => {
+  const theme = useTheme();
+  const [get] = usePropStore<ListInputControllerProps>();
+
+  const buttonRootProps = get('slotProps')?.buttonRoot;
   const disabled = get('disabled');
+  const divider = get('divider');
   const loading = get('loading');
   const readOnly = get('readOnly');
-  const divider = get('divider');
 
   return (
     <ListItemButton
       disabled={disabled || readOnly || loading}
       role={undefined}
+      {...props}
+      {...buttonRootProps}
       sx={{
         // gap: theme.spacing(0.5),
-        py: 0.5,
+        py: theme.spacing(0.5),
         ...(divider && { borderBottom: `1px solid ${theme.palette.divider}` }),
         // ...(((readOnly && !disabled) || loading) && {
         //   '&.Mui-disabled': { opacity: 1 }
         // }),
         '&.Mui-disabled': { opacity: 1 },
-        ...sx
+        ...(props?.sx as any),
+        ...(buttonRootProps?.sx as any)
       }}
-      {...props}
     >
       {children}
     </ListItemButton>
@@ -126,10 +204,11 @@ export const ListInputText = React.memo(({ noLabel = false, ...props }: ListInpu
   const id = useInputId();
   const inset = get('inset');
   const monospace = get('monospace');
+  const overflowHidden = get('overflowHidden');
   const primary = get('primary');
-  const primaryTypographyProps = get('primaryProps');
+  const primaryTypographyProps = get('slotProps')?.primaryProps;
   const secondary = get('secondary');
-  const secondaryTypographyProps = get('secondaryProps');
+  const secondaryTypographyProps = get('slotProps')?.secondaryProps;
 
   return (
     <Box
@@ -153,10 +232,8 @@ export const ListInputText = React.memo(({ noLabel = false, ...props }: ListInpu
       {...props}
     >
       <Typography
-        overflow="hidden"
-        textOverflow="ellipsis"
         variant="body1"
-        whiteSpace="nowrap"
+        {...(overflowHidden && { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' })}
         {...(capitalize && { textTransform: 'capitalize' })}
         {...(monospace && { fontFamily: 'monospace' })}
         sx={{ ...(disabled && { color: theme.palette.text.disabled }) }}
@@ -166,11 +243,9 @@ export const ListInputText = React.memo(({ noLabel = false, ...props }: ListInpu
       </Typography>
       <Typography
         color="textSecondary"
-        overflow="hidden"
-        textOverflow="ellipsis"
         variant="body2"
-        whiteSpace="nowrap"
         sx={{ ...(disabled && { color: theme.palette.text.disabled }) }}
+        {...(overflowHidden && { overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' })}
         {...(capitalize && { textTransform: 'capitalize' })}
         {...(monospace && { fontFamily: 'monospace' })}
         {...secondaryTypographyProps}
@@ -182,67 +257,6 @@ export const ListInputText = React.memo(({ noLabel = false, ...props }: ListInpu
 });
 
 ListInputText.displayName = 'ListInputText';
-
-export const ListInputHelperText = React.memo(() => {
-  const theme = useTheme();
-  const [get] = usePropStore<ListInputControllerProps>();
-
-  const disabled = get('disabled');
-  const helperText = get('helperText');
-  const helperTextProps = get('slotProps')?.helperText;
-  const id = useInputId();
-  const loading = get('loading');
-  const readOnly = get('readOnly');
-  const validationMessage = get('validationMessage');
-  const validationStatus = get('validationStatus');
-
-  if (disabled || loading || readOnly) return null;
-
-  const Wrapper = ({ children }: { children: React.ReactNode }) => (
-    <div
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'flex-end',
-        width: '100%'
-      }}
-    >
-      {children}
-    </div>
-  );
-
-  if (validationStatus === 'error')
-    return (
-      <Wrapper>
-        <FormHelperText
-          id={`${id}-helper-text`}
-          variant="outlined"
-          {...helperTextProps}
-          sx={{ color: theme.palette.error.main, ...helperTextProps?.sx }}
-        >
-          {validationMessage}
-        </FormHelperText>
-      </Wrapper>
-    );
-
-  if (helperText)
-    return (
-      <Wrapper>
-        <FormHelperText
-          id={`${id}-helper-text`}
-          variant="outlined"
-          {...helperTextProps}
-          sx={{ color: theme.palette.text.secondary, ...helperTextProps?.sx }}
-        >
-          {helperText}
-        </FormHelperText>
-      </Wrapper>
-    );
-
-  return null;
-});
-
-ListInputHelperText.displayName = 'ListInputHelperText';
 
 export type ListInputTextFieldProps = TextFieldProps & {
   params?: AutocompleteRenderInputParams;

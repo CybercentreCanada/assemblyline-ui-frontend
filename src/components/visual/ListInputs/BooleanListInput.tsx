@@ -6,6 +6,7 @@ import {
   ProgressInputAdornment,
   ResetInputAdornment
 } from 'components/visual/Inputs/components/inputs.component.adornment';
+import { InputHelperText } from 'components/visual/Inputs/components/inputs.component.form';
 import {
   useInputClick,
   useInputClickBlur,
@@ -16,7 +17,6 @@ import { useInputValidation } from 'components/visual/Inputs/hooks/inputs.hook.v
 import type { InputRuntimeState, InputValueModel } from 'components/visual/Inputs/models/inputs.model';
 import {
   ListInputButtonRoot,
-  ListInputHelperText,
   ListInputInner,
   ListInputLoading,
   ListInputText,
@@ -87,7 +87,7 @@ const WrappedSwitchListInput = React.memo(() => {
           )}
         </ListInputInner>
 
-        <ListInputHelperText />
+        <InputHelperText sx={{ width: '100%', justifyContent: 'flex-end', margin: 0 }} />
       </ListInputWrapper>
     </ListInputButtonRoot>
   );
@@ -96,7 +96,6 @@ const WrappedSwitchListInput = React.memo(() => {
 export const SwitchListInput = ({ preventRender = false, value, ...props }: SwitchListInputProps) => {
   const { status: validationStatus, message: validationMessage } = useInputValidation<boolean>({
     value: Boolean(value),
-
     ...props
   });
 
