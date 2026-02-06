@@ -81,7 +81,8 @@ export const SubmissionSection = React.memo(() => {
                   reset={defaultValue !== null && value !== defaultValue}
                   min={maxTTL !== 0 ? 1 : 0}
                   max={maxTTL}
-                  validators={v => v.required()}
+                  validators={v => v.required().inRange().isInteger()}
+                  coercers={c => c.required().inRange().floor()}
                   onChange={(event, v) => form.setFieldValue(`settings.ttl.value`, v)}
                   onBlur={() => {
                     if (value === null) form.setFieldValue(`settings.ttl.value`, defaultValue);

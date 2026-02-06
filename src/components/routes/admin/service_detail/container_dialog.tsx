@@ -480,7 +480,8 @@ const WrappedContainerDialog = ({
                 value={!tempContainer ? null : tempContainer.cpu_cores}
                 defaultValue={!defaults ? undefined : defaults?.cpu_cores}
                 min={1}
-                validators={v => v.required()}
+                validators={v => v.required().inRange()}
+                coercers={c => c.required().inRange()}
                 reset={showReset(tempContainer, defaults, 'cpu_cores')}
                 onChange={(e, v) => handleContainerValueChange('cpu_cores', v)}
               />
@@ -496,7 +497,8 @@ const WrappedContainerDialog = ({
                 reset={showReset(tempContainer, defaults, 'ram_mb_min')}
                 endAdornment="MB"
                 min={0}
-                validators={v => v.required()}
+                validators={v => v.required().inRange().isInteger()}
+                coercers={c => c.required().inRange().floor()}
                 onChange={(e, v) => handleContainerValueChange('ram_mb_min', v)}
                 onReset={() => {
                   setModified(true);
@@ -515,7 +517,8 @@ const WrappedContainerDialog = ({
                 reset={showReset(tempContainer, defaults, 'ram_mb')}
                 endAdornment="MB"
                 min={0}
-                validators={v => v.required()}
+                validators={v => v.required().inRange().isInteger()}
+                coercers={c => c.required().inRange().floor()}
                 onChange={(e, v) => handleContainerValueChange('ram_mb', v)}
                 onReset={() => {
                   setModified(true);

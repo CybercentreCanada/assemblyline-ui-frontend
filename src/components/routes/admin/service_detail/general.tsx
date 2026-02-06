@@ -258,8 +258,8 @@ const ServiceGeneral = ({
               label={t('general.timeout')}
               loading={!service}
               min={5}
-              coercers={c => c.required()}
-              validators={v => v.required()}
+              validators={v => v.required().inRange().isInteger()}
+              coercers={c => c.required().inRange().floor()}
               value={!service ? null : service.timeout}
               defaultValue={!service ? undefined : defaults?.timeout}
               reset={showReset(service, defaults, 'timeout')}
@@ -281,6 +281,8 @@ const ServiceGeneral = ({
               min={0}
               {...(service.licence_count && { max: service.licence_count })}
               endAdornment="↓"
+              validators={v => v.inRange().isInteger()}
+              coercers={c => c.inRange().floor()}
               validate={val =>
                 service.licence_count > 0 && val > service.licence_count
                   ? { status: 'error', message: t('general.instances.error') }
@@ -302,6 +304,8 @@ const ServiceGeneral = ({
               defaultValue={!service ? undefined : defaults?.licence_count || 0}
               reset={showReset(service, defaults, 'licence_count')}
               min={0}
+              validators={v => v.required().inRange().isInteger()}
+              coercers={c => c.required().inRange().floor()}
               endAdornment="↑"
               onChange={(e, v) => {
                 if (service?.licence_count !== v) setModified(true);
@@ -324,6 +328,8 @@ const ServiceGeneral = ({
               value={!service ? null : service.max_queue_length > 0 ? service.max_queue_length : null}
               defaultValue={!service ? undefined : defaults?.max_queue_length}
               reset={showReset(service, defaults, 'max_queue_length')}
+              validators={v => v.required().inRange().isInteger()}
+              coercers={c => c.required().inRange().floor()}
               min={0}
               onChange={(e, v) => {
                 if (service?.max_queue_length !== v) setModified(true);

@@ -67,8 +67,6 @@ export const SubmissionOptions = React.memo(() => {
                           ? `Inspection of ${hashType.toUpperCase()}: ${hashValue}`
                           : null
                     }
-                    validators={v => v.required()}
-                    coercers={c => c.required()}
                     onChange={(e, v) => form.setFieldValue('settings.description.value', v)}
                     onReset={() => form.setFieldValue('settings.description.value', defaultValue)}
                     slotProps={{ root: { style: { marginBottom: theme.spacing(1) } } }}
@@ -128,7 +126,8 @@ export const SubmissionOptions = React.memo(() => {
                       reset={defaultValue !== null && value !== defaultValue}
                       min={configuration.submission.max_dtl !== 0 ? 1 : 0}
                       max={configuration.submission.max_dtl !== 0 ? configuration.submission.max_dtl : 365}
-                      validators={v => v.required()}
+                      validators={v => v.required().inRange().isInteger()}
+                      coercers={c => c.required().inRange().floor()}
                       onChange={(e, v) => form.setFieldValue('settings.ttl.value', v)}
                       onReset={() => form.setFieldValue('settings.ttl.value', defaultValue)}
                       slotProps={{ root: { style: { marginBottom: theme.spacing(1), flex: 1 } } }}
