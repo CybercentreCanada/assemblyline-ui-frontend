@@ -1,58 +1,68 @@
 import { Switch } from '@mui/material';
+import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
 import {
-  ExpandAdornment,
-  HelperText,
-  PasswordAdornment,
-  ResetAdornment,
-  StyledButtonLabel,
-  StyledEndAdornmentBox,
-  StyledFormButton,
-  StyledFormControl,
-  StyledFormControlLabel
-} from 'components/visual/Inputs/lib/inputs.components';
+  ExpandInputAdornment,
+  HelpInputAdornment,
+  InputButtonEndAdornment,
+  PasswordInputAdornment,
+  ProgressInputAdornment,
+  ResetInputAdornment
+} from 'components/visual/Inputs/components/inputs.component.adornment';
 import {
-  useErrorCallback,
+  InputButtonFormControlLabel,
+  InputButtonLabel,
+  InputFormButton,
+  InputFormButtonTooltip
+} from 'components/visual/Inputs/components/inputs.component.buttons';
+import { InputFormControl, InputHelperText } from 'components/visual/Inputs/components/inputs.component.form';
+import {
   useInputClick,
   useInputClickBlur,
-  useInputFocus,
-  usePropID
-} from 'components/visual/Inputs/lib/inputs.hook';
-import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
-import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
-import { Tooltip } from 'components/visual/Tooltip';
+  useInputFocus
+} from 'components/visual/Inputs/hooks/inputs.hook.event_handlers';
+import { useInputId } from 'components/visual/Inputs/hooks/inputs.hook.renderer';
+import { useInputValidation } from 'components/visual/Inputs/hooks/inputs.hook.validation';
+import type {
+  InputOptions,
+  InputRuntimeState,
+  InputSlotProps,
+  InputValueModel
+} from 'components/visual/Inputs/models/inputs.model';
+import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/models/inputs.model';
 import React from 'react';
 
-export type SwitchInputProps = InputValues<boolean, boolean, React.MouseEvent<HTMLButtonElement, MouseEvent>> &
-  InputProps;
+export type SwitchInputProps = InputValueModel<boolean, React.MouseEvent<HTMLButtonElement, MouseEvent>> &
+  InputOptions &
+  InputSlotProps;
+
+type SwitchInputController = SwitchInputProps & InputRuntimeState<boolean>;
 
 const WrappedSwitchInput = () => {
-  const [get] = usePropStore<SwitchInputProps>();
+  const [get] = usePropStore<SwitchInputController>();
 
-  const id = usePropID();
-  const inputValue = Boolean(get('inputValue'));
-  const loading = get('loading');
+  const endAdornment = get('endAdornment');
+  const id = useInputId();
   const preventDisabledColor = get('preventDisabledColor');
+  const rawValue = Boolean(get('rawValue'));
   const readOnly = get('readOnly');
-  const tooltip = get('tooltip');
-  const tooltipProps = get('tooltipProps');
   const value = get('value');
 
-  const handleBlur = useInputClickBlur<SwitchInputProps>();
-  const handleClick = useInputClick<SwitchInputProps>();
-  const handleFocus = useInputFocus<SwitchInputProps>();
+  const handleBlur = useInputClickBlur<boolean>();
+  const handleClick = useInputClick<boolean>();
+  const handleFocus = useInputFocus<boolean>();
 
   return (
-    <Tooltip title={loading ? null : tooltip} {...tooltipProps}>
-      <StyledFormControl>
-        <StyledFormButton
+    <InputFormButtonTooltip>
+      <InputFormControl>
+        <InputFormButton
           onFocus={handleFocus}
-          onBlur={e => handleBlur(e, value, value)}
-          onClick={e => handleClick(e, !inputValue, !inputValue)}
+          onBlur={e => handleBlur(e, value, rawValue)}
+          onClick={e => handleClick(e, !rawValue)}
         >
-          <StyledFormControlLabel label={<StyledButtonLabel />}>
+          <InputButtonFormControlLabel label={<InputButtonLabel />}>
             <Switch
               name={id}
-              checked={inputValue}
+              checked={rawValue}
               disableFocusRipple
               disableRipple
               disableTouchRipple
@@ -64,26 +74,35 @@ const WrappedSwitchInput = () => {
                 }
               }}
             />
-          </StyledFormControlLabel>
-        </StyledFormButton>
+          </InputButtonFormControlLabel>
+        </InputFormButton>
 
-        <HelperText />
+        <InputHelperText />
 
-        <StyledEndAdornmentBox>
-          <PasswordAdornment />
-          <ResetAdornment />
-          <ExpandAdornment />
-        </StyledEndAdornmentBox>
-      </StyledFormControl>
-    </Tooltip>
+        <InputButtonEndAdornment>
+          {endAdornment}
+          <HelpInputAdornment />
+          <PasswordInputAdornment />
+          <ProgressInputAdornment />
+          <ResetInputAdornment />
+          <ExpandInputAdornment />
+        </InputButtonEndAdornment>
+      </InputFormControl>
+    </InputFormButtonTooltip>
   );
 };
 
 export const SwitchInput = ({ preventRender = false, value, ...props }: SwitchInputProps) => {
-  const errorMessage = useErrorCallback({ preventRender, value, ...props });
+  const { status: validationStatus, message: validationMessage } = useInputValidation<boolean>({
+    value: Boolean(value),
+    ...props
+  });
 
   return preventRender ? null : (
-    <PropProvider<SwitchInputProps> props={{ preventRender, inputValue: value, value, errorMessage, ...props }}>
+    <PropProvider<SwitchInputController>
+      initialProps={DEFAULT_INPUT_CONTROLLER_PROPS as SwitchInputController}
+      props={{ preventRender, rawValue: Boolean(value), value, validationStatus, validationMessage, ...props }}
+    >
       <WrappedSwitchInput />
     </PropProvider>
   );

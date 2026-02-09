@@ -4,31 +4,36 @@ import { Popover, useTheme } from '@mui/material';
 import { DigitalClock, LocalizationProvider, DateTimePicker as MuiDateTimePicker } from '@mui/x-date-pickers';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
+import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
 import { IconButton } from 'components/visual/Buttons/IconButton';
 import {
-  ExpandAdornment,
-  HelperText,
-  PasswordAdornment,
-  ResetAdornment,
-  StyledEndAdornment,
-  StyledFormControl,
-  StyledFormLabel,
-  StyledInputSkeleton,
-  StyledRoot,
-  useTextInputSlot
-} from 'components/visual/Inputs/lib/inputs.components';
+  HelpInputAdornment,
+  InputEndAdornment,
+  PasswordInputAdornment,
+  ProgressInputAdornment,
+  ResetInputAdornment
+} from 'components/visual/Inputs/components/inputs.component.adornment';
 import {
-  useErrorCallback,
-  useInputBlur,
-  useInputChange,
-  useInputFocus,
-  usePropID
-} from 'components/visual/Inputs/lib/inputs.hook';
-import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
-import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
+  InputFormControl,
+  InputFormLabel,
+  InputHelperText,
+  InputRoot,
+  InputSkeleton
+} from 'components/visual/Inputs/components/inputs.component.form';
+import { useInputTextFieldSlots } from 'components/visual/Inputs/components/inputs.component.textfield';
+import { useInputBlur, useInputChange, useInputFocus } from 'components/visual/Inputs/hooks/inputs.hook.event_handlers';
+import { useInputId } from 'components/visual/Inputs/hooks/inputs.hook.renderer';
+import { useInputValidation } from 'components/visual/Inputs/hooks/inputs.hook.validation';
+import type {
+  InputOptions,
+  InputRuntimeState,
+  InputSlotProps,
+  InputValueModel
+} from 'components/visual/Inputs/models/inputs.model';
+import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/models/inputs.model';
 import type { Moment } from 'moment';
 import moment from 'moment';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 // This function updates the week start for the specified locale
@@ -41,38 +46,45 @@ function configureMomentLocale(language: string) {
 }
 
 export type DateInputProps = Omit<TextFieldProps, 'error' | 'value' | 'onChange'> &
-  InputValues<string, Moment> &
-  InputProps & {
+  InputValueModel<string> &
+  InputOptions &
+  InputSlotProps & {
     defaultDateOffset?: number | null;
     maxDateToday?: boolean;
     minDateTomorrow?: boolean;
   };
 
-type DateInputState = DateInputProps & {
-  showPopover: boolean;
-};
+type DateInputController = DateInputProps &
+  InputRuntimeState<Moment> & {
+    showPopover?: boolean;
+  };
 
 const DatePopper = React.memo(() => {
+  const { t } = useTranslation('inputs');
   const theme = useTheme();
 
   const [anchorEl, setAnchorEl] = useState<Element>(null);
 
-  const [get, setStore] = usePropStore<DateInputState>();
+  const [get, setStore] = usePropStore<DateInputController>();
 
   const disabled = get('disabled');
-  const inputValue = get('inputValue') ?? null;
+  const id = useInputId();
+  const rawValue = get('rawValue') ?? null;
   const showPopover = get('showPopover') ?? false;
   const tiny = get('tiny');
 
-  const id = usePropID();
-  const handleChange = useInputChange<DateInputProps>();
+  const handleChange = useInputChange<string, Moment>();
+
+  const toValue = useCallback((v: Moment): string => v.toISOString(), []);
 
   return (
     <>
       <IconButton
-        aria-label={`${id}-date`}
+        id={`${id}-date-adornment`}
         color="secondary"
         disabled={disabled}
+        tooltip={t('adornment.date.tooltip')}
+        tooltipProps={{ arrow: true }}
         type="button"
         onClick={event => {
           event.preventDefault();
@@ -126,16 +138,16 @@ const DatePopper = React.memo(() => {
               views={['month', 'day']}
               // timezone="utc"
               showDaysOutsideCurrentMonth
-              value={inputValue}
-              onChange={(v: Moment) => handleChange(null, v, v.toISOString())}
+              value={rawValue}
+              onChange={(v: Moment) => handleChange(null, v, rawValue, toValue)}
               sx={{ height: '320px' }}
               slotProps={{ calendarHeader: { sx: { marginTop: '0px', marginBottom: '0px' } } }}
             />
 
             <DigitalClock
               // timezone="utc"
-              value={inputValue}
-              onChange={(v: Moment) => handleChange(null, v, v.toISOString())}
+              value={rawValue}
+              onChange={(v: Moment) => handleChange(null, v, rawValue, toValue)}
               sx={{
                 maxHeight: '320px',
                 '& .MuiDigitalClock-item': {
@@ -153,15 +165,16 @@ const DatePopper = React.memo(() => {
 const WrappedDateInput = () => {
   const { i18n } = useTranslation('inputs');
 
-  const [get] = usePropStore<DateInputState>();
+  const [get] = usePropStore<DateInputController>();
 
   const disabled = get('disabled');
   const endAdornment = get('endAdornment');
-  const inputValue = get('inputValue') ?? null;
   const loading = get('loading');
   const maxDateToday = get('maxDateToday');
   const minDateTomorrow = get('minDateTomorrow');
+  const rawValue = get('rawValue') ?? null;
   const readOnly = get('readOnly');
+  const startAdornment = get('startAdornment');
   const value = get('value');
 
   const today = useMemo<Moment>(() => {
@@ -177,11 +190,17 @@ const WrappedDateInput = () => {
     return moment(d);
   }, []);
 
-  const handleBlur = useInputBlur<DateInputProps>();
-  const handleChange = useInputChange<DateInputProps>();
-  const handleFocus = useInputFocus<DateInputProps>();
+  const toRawValue = useCallback((v: string): Moment => (v ? moment(v) : null), []);
+  const toValue = useCallback(
+    (d: Moment): string => (d.isValid() ? `${d.format('YYYY-MM-DDThh:mm:ss.SSSSSS')}Z` : null),
+    []
+  );
 
-  const textfieldSlot = useTextInputSlot();
+  const handleBlur = useInputBlur<string, Moment>();
+  const handleChange = useInputChange<string, Moment>();
+  const handleFocus = useInputFocus<string, Moment>();
+
+  const inputTextFieldSlots = useInputTextFieldSlots();
 
   useEffect(() => {
     configureMomentLocale(i18n.language);
@@ -189,11 +208,11 @@ const WrappedDateInput = () => {
 
   return (
     <LocalizationProvider dateAdapter={AdapterMoment} adapterLocale={i18n.language}>
-      <StyledRoot>
-        <StyledFormLabel />
-        <StyledFormControl>
+      <InputRoot>
+        <InputFormLabel />
+        <InputFormControl>
           {loading ? (
-            <StyledInputSkeleton />
+            <InputSkeleton />
           ) : (
             <>
               <MuiDateTimePicker
@@ -203,51 +222,59 @@ const WrappedDateInput = () => {
                 maxDate={maxDateToday ? today : null}
                 minDate={minDateTomorrow ? tomorrow : null}
                 readOnly={readOnly}
-                value={inputValue}
-                onChange={d =>
-                  handleChange(null, d, d && d.isValid() ? `${d.format('YYYY-MM-DDThh:mm:ss.SSSSSS')}Z` : null)
-                }
+                value={rawValue}
+                onChange={d => handleChange(null, d, rawValue, toValue)}
                 slotProps={{
                   textField: {
-                    ...textfieldSlot,
+                    ...inputTextFieldSlots,
                     onFocus: handleFocus,
-                    onBlur: e => handleBlur(e, value ? moment(value) : null, value),
+                    onBlur: e => handleBlur(e, toRawValue(value), rawValue, toValue, toRawValue),
                     InputProps: {
+                      ...(startAdornment && { startAdornment }),
                       endAdornment: (
-                        <StyledEndAdornment preventRender={readOnly && !disabled}>
-                          <PasswordAdornment />
-                          <ResetAdornment />
-                          <ExpandAdornment />
+                        <InputEndAdornment preventRender={false}>
                           {endAdornment}
+                          <HelpInputAdornment />
+                          <PasswordInputAdornment />
+                          <ProgressInputAdornment />
+                          <ResetInputAdornment />
                           <DatePopper />
-                        </StyledEndAdornment>
+                        </InputEndAdornment>
                       )
                     }
                   }
                 }}
               />
-              <HelperText />
+              <InputHelperText />
             </>
           )}
-        </StyledFormControl>
-      </StyledRoot>
+        </InputFormControl>
+      </InputRoot>
     </LocalizationProvider>
   );
 };
 
 export const DateInput = ({ preventRender = false, value, ...props }: DateInputProps) => {
-  const errorMessage = useErrorCallback({ preventRender, value, ...props });
+  const { status: validationStatus, message: validationMessage } = useInputValidation<string, Moment>({
+    value: value ?? '',
+    ...props
+  });
 
   return preventRender ? null : (
-    <PropProvider<DateInputProps>
+    <PropProvider<DateInputController>
+      initialProps={{
+        ...(DEFAULT_INPUT_CONTROLLER_PROPS as DateInputController),
+        showPopover: false
+      }}
       props={{
         autoComplete: 'off',
         defaultDateOffset: null,
-        errorMessage,
-        inputValue: value ? moment(value) : null,
+        rawValue: value ? moment(value) : null,
         maxDateToday: false,
         minDateTomorrow: false,
         preventRender,
+        validationStatus,
+        validationMessage,
         value,
         ...props
       }}

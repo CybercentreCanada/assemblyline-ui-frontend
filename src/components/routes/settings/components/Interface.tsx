@@ -47,7 +47,7 @@ export const InterfaceSection = React.memo(() => {
             id="interface"
             data-anchor="interface"
             primary={t('interface')}
-            primaryProps={{ className: 'Anchor', variant: 'h6' }}
+            slotProps={{ primary: { className: 'Anchor', variant: 'h6' } }}
           />
 
           <List>
@@ -61,6 +61,7 @@ export const InterfaceSection = React.memo(() => {
                   loading={loading}
                   disabled={disabled}
                   options={profileOptions}
+                  overflowHidden
                   onChange={(_, v) => form.setFieldValue('settings.preferred_submission_profile.value', v)}
                 />
               )}
@@ -75,6 +76,7 @@ export const InterfaceSection = React.memo(() => {
                   value={value}
                   loading={loading}
                   disabled={disabled}
+                  overflowHidden
                   options={[
                     { value: 'report', primary: t('interface.view_report') },
                     { value: 'details', primary: t('interface.view_details') }
@@ -94,6 +96,7 @@ export const InterfaceSection = React.memo(() => {
                   loading={loading}
                   disabled={disabled}
                   options={downloadEncodingOptions}
+                  overflowHidden
                   onChange={(_, v) =>
                     form.setFieldValue('settings.download_encoding.value', v as 'raw' | 'cart' | 'zip')
                   }
@@ -117,6 +120,7 @@ export const InterfaceSection = React.memo(() => {
                   loading={loading}
                   disabled={disabled}
                   preventRender={preventRender}
+                  overflowHidden
                   onChange={(_, v) => form.setFieldValue('settings.default_zip_password.value', v)}
                 />
               )}
@@ -131,6 +135,7 @@ export const InterfaceSection = React.memo(() => {
                   value={value}
                   loading={loading}
                   disabled={disabled}
+                  overflowHidden
                   options={[
                     { value: -1000000, primary: t('interface.score_-1000000') },
                     { value: 0, primary: t('interface.score_0') },
@@ -154,6 +159,7 @@ export const InterfaceSection = React.memo(() => {
                     value={value}
                     loading={loading}
                     disabled={disabled}
+                    overflowHidden
                     onChange={(_, v) => form.setFieldValue('settings.executive_summary.value', v)}
                   />
                 )}

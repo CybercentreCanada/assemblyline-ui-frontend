@@ -1,34 +1,39 @@
 import type { TextFieldProps } from '@mui/material';
+import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
 import {
-  HelperText,
-  StyledFormControl,
-  StyledFormLabel,
-  StyledInputSkeleton,
-  StyledRoot,
-  StyledTextField
-} from 'components/visual/Inputs/lib/inputs.components';
-import {
-  useErrorCallback,
-  useInputBlur,
-  useInputChange,
-  useInputFocus
-} from 'components/visual/Inputs/lib/inputs.hook';
-import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
-import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
-import React, { useEffect, useRef } from 'react';
+  InputFormControl,
+  InputFormLabel,
+  InputHelperText,
+  InputRoot,
+  InputSkeleton
+} from 'components/visual/Inputs/components/inputs.component.form';
+import { InputTextField } from 'components/visual/Inputs/components/inputs.component.textfield';
+import { useInputBlur, useInputChange, useInputFocus } from 'components/visual/Inputs/hooks/inputs.hook.event_handlers';
+import { useInputValidation } from 'components/visual/Inputs/hooks/inputs.hook.validation';
+import type {
+  InputOptions,
+  InputRuntimeState,
+  InputSlotProps,
+  InputValueModel
+} from 'components/visual/Inputs/models/inputs.model';
+import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/models/inputs.model';
+import React, { useCallback, useEffect, useRef } from 'react';
 
-export type NumberInputProps = InputValues<number, string, React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>> &
-  InputProps & {
+export type NumberInputProps = InputValueModel<number, React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>> &
+  InputOptions &
+  InputSlotProps & {
     autoComplete?: TextFieldProps['autoComplete'];
     max?: number;
     min?: number;
     step?: number;
   };
 
-const WrappedNumberInput = () => {
-  const [get] = usePropStore<NumberInputProps>();
+type NumberInputController = NumberInputProps & InputRuntimeState<string>;
 
-  const inputValue = get('inputValue') ?? '';
+const WrappedNumberInput = () => {
+  const [get] = usePropStore<NumberInputController>();
+
+  const rawValue = get('rawValue') ?? '';
   const loading = get('loading');
   const max = get('max');
   const min = get('min');
@@ -37,9 +42,12 @@ const WrappedNumberInput = () => {
 
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const handleBlur = useInputBlur<NumberInputProps>();
-  const handleChange = useInputChange<NumberInputProps>();
-  const handleFocus = useInputFocus<NumberInputProps>();
+  const handleBlur = useInputBlur<number, string>();
+  const handleChange = useInputChange<number, string>();
+  const handleFocus = useInputFocus<number, string>();
+
+  const toRawValue = useCallback((v: number) => (v == null ? '' : String(v)), []);
+  const toValue = useCallback((v: string): number => (v !== '' ? Number(v) : null), []);
 
   useEffect(() => {
     const el = inputRef.current;
@@ -59,20 +67,20 @@ const WrappedNumberInput = () => {
   }, [inputRef]);
 
   return (
-    <StyledRoot>
-      <StyledFormLabel />
-      <StyledFormControl>
+    <InputRoot>
+      <InputFormLabel />
+      <InputFormControl>
         {loading ? (
-          <StyledInputSkeleton />
+          <InputSkeleton />
         ) : (
           <>
-            <StyledTextField
+            <InputTextField
               ref={inputRef}
               type="number"
-              value={inputValue}
-              onChange={e => handleChange(e, e.target.value, e.target.value !== '' ? Number(e.target.value) : null)}
+              value={rawValue}
+              onChange={e => handleChange(e, e.target.value, rawValue, toValue)}
               onFocus={handleFocus}
-              onBlur={e => handleBlur(e, value == null ? '' : String(value), value)}
+              onBlur={e => handleBlur(e, toRawValue(value), rawValue, toValue, toRawValue)}
               slotProps={{
                 input: {
                   inputProps: {
@@ -83,28 +91,32 @@ const WrappedNumberInput = () => {
                 }
               }}
             />
-            <HelperText />
+            <InputHelperText />
           </>
         )}
-      </StyledFormControl>
-    </StyledRoot>
+      </InputFormControl>
+    </InputRoot>
   );
 };
 
 export const NumberInput = ({ preventRender = false, value, ...props }: NumberInputProps) => {
-  const errorMessage = useErrorCallback({ preventRender, value, ...props });
+  const { status: validationStatus, message: validationMessage } = useInputValidation<number, string>({
+    value: value,
+    ...props
+  });
 
   return preventRender ? null : (
-    <PropProvider<NumberInputProps>
+    <PropProvider<NumberInputController>
+      initialProps={DEFAULT_INPUT_CONTROLLER_PROPS as NumberInputController}
       props={{
         autoComplete: 'off',
-        enforceValidValue: true,
-        errorMessage,
-        inputValue: value == null ? '' : String(value),
+        rawValue: value == null ? '' : String(value),
         max: null,
         min: null,
         preventRender,
-        spinnerAdornment: true,
+        showNumericalSpinner: true,
+        validationStatus,
+        validationMessage,
         step: 1,
         value,
         ...props

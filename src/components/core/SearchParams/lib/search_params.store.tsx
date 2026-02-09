@@ -1,7 +1,7 @@
+import { shallowEqual } from 'components/core/PropProvider/props.utils';
 import { SearchParamEngine } from 'components/core/SearchParams/lib/search_params.engine';
 import type { SearchParamBlueprints, SearchParamValues } from 'components/core/SearchParams/lib/search_params.model';
 import { SearchParamSnapshot } from 'components/core/SearchParams/lib/search_params.snapshot';
-import { shallowEqual } from 'components/visual/Inputs/lib/inputs.utils';
 import React, {
   createContext,
   useCallback,

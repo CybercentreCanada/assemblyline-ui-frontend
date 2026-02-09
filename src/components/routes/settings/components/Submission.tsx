@@ -55,6 +55,7 @@ export const SubmissionSection = React.memo(() => {
                     value={value ?? defaultValue}
                     loading={loading}
                     disabled={disabled || !(customize || !restricted)}
+                    overflowHidden
                     onChange={(e, v) => form.setFieldValue(`settings.classification.value`, v)}
                   />
                 )}
@@ -81,7 +82,9 @@ export const SubmissionSection = React.memo(() => {
                   reset={defaultValue !== null && value !== defaultValue}
                   min={maxTTL !== 0 ? 1 : 0}
                   max={maxTTL}
-                  required
+                  overflowHidden
+                  validators={v => v.required().inRange().isInteger()}
+                  coercers={c => c.required().inRange().floor()}
                   onChange={(event, v) => form.setFieldValue(`settings.ttl.value`, v)}
                   onBlur={() => {
                     if (value === null) form.setFieldValue(`settings.ttl.value`, defaultValue);
@@ -106,6 +109,7 @@ export const SubmissionSection = React.memo(() => {
                   defaultValue={defaultValue}
                   loading={loading}
                   disabled={disabled || (!customize && restricted)}
+                  overflowHidden
                   reset={defaultValue !== null && value !== defaultValue}
                   onChange={(event, v) => form.setFieldValue(`settings.deep_scan.value`, v)}
                 />
@@ -129,6 +133,7 @@ export const SubmissionSection = React.memo(() => {
                   loading={loading}
                   disabled={disabled || (!customize && restricted)}
                   reset={defaultValue !== null && value !== defaultValue}
+                  overflowHidden
                   onChange={(event, v) => form.setFieldValue(`settings.ignore_recursion_prevention.value`, v)}
                 />
               )}
@@ -151,6 +156,7 @@ export const SubmissionSection = React.memo(() => {
                   loading={loading}
                   disabled={disabled || (!customize && restricted)}
                   reset={defaultValue !== null && value !== defaultValue}
+                  overflowHidden
                   onChange={(event, v) => form.setFieldValue(`settings.ignore_filtering.value`, v)}
                 />
               )}
@@ -173,6 +179,7 @@ export const SubmissionSection = React.memo(() => {
                   loading={loading}
                   disabled={disabled || (!customize && restricted)}
                   reset={defaultValue !== null && value !== defaultValue}
+                  overflowHidden
                   onChange={(event, v) => form.setFieldValue(`settings.generate_alert.value`, v)}
                 />
               )}
@@ -195,6 +202,7 @@ export const SubmissionSection = React.memo(() => {
                   loading={loading}
                   disabled={disabled || (!customize && restricted)}
                   reset={defaultValue !== null && value !== defaultValue}
+                  overflowHidden
                   onChange={(event, v) => form.setFieldValue(`settings.ignore_cache.value`, v)}
                 />
               )}

@@ -1,100 +1,108 @@
 import type { TextFieldProps } from '@mui/material';
 import { Skeleton } from '@mui/material';
-import type { StyledTextFieldProps } from 'components/visual/Inputs/lib/inputs.components';
+import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
 import {
-  HelperText,
-  StyledFormControl,
-  StyledFormLabel,
-  StyledRoot,
-  StyledTextField
-} from 'components/visual/Inputs/lib/inputs.components';
-import {
-  useErrorCallback,
-  useInputBlur,
-  useInputChange,
-  useInputFocus
-} from 'components/visual/Inputs/lib/inputs.hook';
-import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
-import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
+  InputFormControl,
+  InputFormLabel,
+  InputHelperText,
+  InputRoot
+} from 'components/visual/Inputs/components/inputs.component.form';
+import type { InputTextFieldProps } from 'components/visual/Inputs/components/inputs.component.textfield';
+import { InputTextField } from 'components/visual/Inputs/components/inputs.component.textfield';
+import { useInputBlur, useInputChange, useInputFocus } from 'components/visual/Inputs/hooks/inputs.hook.event_handlers';
+import { useInputId } from 'components/visual/Inputs/hooks/inputs.hook.renderer';
+import { useInputValidation } from 'components/visual/Inputs/hooks/inputs.hook.validation';
+import type {
+  InputOptions,
+  InputRuntimeState,
+  InputSlotProps,
+  InputValueModel
+} from 'components/visual/Inputs/models/inputs.model';
+import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/models/inputs.model';
 import React from 'react';
 
-export type TextAreaInputProps = InputValues<
-  string,
-  string,
-  React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
-> &
-  InputProps & {
-    autoComplete?: StyledTextFieldProps['autoComplete'];
-    placeholder?: StyledTextFieldProps['placeholder'];
+export type TextAreaInputProps = InputValueModel<string, React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>> &
+  InputOptions &
+  InputSlotProps & {
+    autoComplete?: InputTextFieldProps['autoComplete'];
     rows?: TextFieldProps['rows'];
     minRows?: TextFieldProps['minRows'];
     maxRows?: TextFieldProps['maxRows'];
   };
 
+type TextAreaInputController = TextAreaInputProps & InputRuntimeState<string>;
+
 const WrappedTextAreaInput = () => {
-  const [get] = usePropStore<TextAreaInputProps>();
+  const [get] = usePropStore<TextAreaInputController>();
 
   const autoComplete = get('autoComplete');
-  const inputValue = get('inputValue') ?? '';
+  const id = useInputId();
+  const isPasswordVisible = get('isPasswordVisible');
   const loading = get('loading');
   const placeholder = get('placeholder');
   const maxRows = get('maxRows');
   const minRows = get('minRows');
   const overflowHidden = get('overflowHidden');
   const password = get('password');
+  const rawValue = get('rawValue') ?? '';
   const rows = get('rows');
-  const showPassword = get('showPassword');
   const tiny = get('tiny');
   const value = get('value');
 
-  const handleBlur = useInputBlur<TextAreaInputProps>();
-  const handleChange = useInputChange<TextAreaInputProps>();
-  const handleFocus = useInputFocus<TextAreaInputProps>();
+  const handleBlur = useInputBlur<string>();
+  const handleChange = useInputChange<string>();
+  const handleFocus = useInputFocus<string>();
+
+  const skeletonRows = rows ?? minRows ?? maxRows ?? 1;
 
   return (
-    <StyledRoot>
-      <StyledFormLabel />
-      <StyledFormControl>
+    <InputRoot>
+      <InputFormLabel />
+      <InputFormControl>
         {loading ? (
           <Skeleton
-            sx={{ height: `calc(23px * ${rows} + 17px)`, transform: 'unset', ...(tiny && { height: '28px' }) }}
+            sx={{ height: `calc(23px * ${skeletonRows} + 17px)`, transform: 'unset', ...(tiny && { height: '28px' }) }}
           />
         ) : (
           <>
-            <StyledTextField
-              {...(!(overflowHidden || (password && showPassword)) && {
+            <InputTextField
+              {...(!(overflowHidden || (password && isPasswordVisible)) && {
                 multiline: true,
                 ...(minRows || maxRows ? { minRows, maxRows } : { rows: rows || 1 })
               })}
               autoComplete={autoComplete}
-              placeholder={placeholder}
-              value={inputValue}
-              onChange={e => handleChange(e, e.target.value, e.target.value)}
+              id={id}
+              value={rawValue}
+              onChange={e => handleChange(e, e.target.value, rawValue)}
               onFocus={handleFocus}
-              onBlur={e => handleBlur(e, value, value)}
+              onBlur={e => handleBlur(e, value, rawValue)}
             />
-            <HelperText />
+            <InputHelperText />
           </>
         )}
-      </StyledFormControl>
-    </StyledRoot>
+      </InputFormControl>
+    </InputRoot>
   );
 };
 
 export const TextAreaInput = ({ preventRender = false, value, ...props }: TextAreaInputProps) => {
-  const errorMessage = useErrorCallback({ preventRender, value, ...props });
+  const { status: validationStatus, message: validationMessage } = useInputValidation<string>({
+    value: value ?? '',
+    ...props
+  });
 
   return preventRender ? null : (
-    <PropProvider<TextAreaInputProps>
+    <PropProvider<TextAreaInputController>
+      initialProps={DEFAULT_INPUT_CONTROLLER_PROPS as TextAreaInputController}
       props={{
         autoComplete: 'off',
-        errorMessage,
-        inputValue: value,
-        placeholder: undefined,
         maxRows: null,
         minRows: null,
         preventRender,
+        rawValue: value ?? '',
         rows: null,
+        validationMessage,
+        validationStatus,
         value,
         ...props
       }}

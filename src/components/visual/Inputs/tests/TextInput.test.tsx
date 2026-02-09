@@ -72,14 +72,14 @@ describe('<TextInput />', () => {
   });
 
   it.skip('shows required error when value is empty', () => {
-    setup({ value: '', required: true });
+    setup({ value: '', validators: v => v.required() });
     expect(screen.getByText(/error.required/i)).toBeVisible();
   });
 
   it.skip("shows custom error when value is 'asd'", () => {
     setup({
       value: 'asd',
-      error: value => (value === 'asd' ? "Value cannot be 'asd'" : null)
+      validate: value => (value === 'asd' ? { status: 'error', message: "Value cannot be 'asd'" } : null)
     });
     expect(screen.getByText("Value cannot be 'asd'")).toBeVisible();
   });
@@ -115,7 +115,7 @@ describe('<TextInput />', () => {
   });
 
   it.skip('renders badge when required + badge=true', () => {
-    setup({ required: true, badge: true });
+    setup({ badge: true, validators: v => v.required() });
     expect(document.querySelector('.MuiBadge-badge')).toBeVisible();
   });
 

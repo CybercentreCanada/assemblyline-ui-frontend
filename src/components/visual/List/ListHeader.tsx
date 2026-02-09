@@ -1,24 +1,28 @@
 import type { CheckboxProps } from '@mui/material';
 import { Checkbox, ListItemIcon } from '@mui/material';
+import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
 import type { AnchorProps } from 'components/core/TableOfContent/Anchor';
 import { Anchor } from 'components/core/TableOfContent/Anchor';
-import { StyledCircularSkeleton } from 'components/visual/Inputs/lib/inputs.components';
+import { ResetInputAdornment } from 'components/visual/Inputs/components/inputs.component.adornment';
+import { InputCircularSkeleton } from 'components/visual/Inputs/components/inputs.component.buttons';
+import { useInputId, useInputLabel } from 'components/visual/Inputs/hooks/inputs.hook.renderer';
+import { useInputValidation } from 'components/visual/Inputs/hooks/inputs.hook.validation';
+import type { InputRuntimeState, InputValueModel } from 'components/visual/Inputs/models/inputs.model';
 import {
-  StyledListInputButtonRoot,
-  StyledListInputText,
-  StyledListItemRoot,
-  StyledResetAdornment
+  ListInputButtonRoot,
+  ListInputRoot,
+  ListInputText
 } from 'components/visual/ListInputs/lib/listinputs.components';
-import { usePropID, usePropLabel } from 'components/visual/ListInputs/lib/listinputs.hook';
-import type { ListInputProps, ListInputValues } from 'components/visual/ListInputs/lib/listinputs.model';
-import { PropProvider, usePropStore } from 'components/visual/ListInputs/lib/listinputs.provider';
+import type { ListInputOptions, ListInputSlotProps } from 'components/visual/ListInputs/lib/listinputs.model';
+import { DEFAULT_LIST_INPUT_CONTROLLER_PROPS } from 'components/visual/ListInputs/lib/listinputs.model';
 import React from 'react';
 
 export type ListHeaderProps = Omit<
-  ListInputValues<boolean, boolean, React.MouseEvent<HTMLDivElement, globalThis.MouseEvent>>,
+  InputValueModel<boolean, React.MouseEvent<HTMLDivElement, globalThis.MouseEvent>>,
   'value'
 > &
-  ListInputProps & {
+  ListInputOptions &
+  ListInputSlotProps & {
     anchor?: boolean;
     anchorProps?: AnchorProps;
     checked?: boolean;
@@ -26,29 +30,31 @@ export type ListHeaderProps = Omit<
     indeterminate?: CheckboxProps['indeterminate'];
   };
 
+type ListHeaderController = ListHeaderProps & InputRuntimeState<boolean>;
+
 const WrappedListHeader = React.memo(() => {
-  const [get] = usePropStore<ListHeaderProps>();
+  const [get] = usePropStore<ListHeaderController>();
 
   const anchor = get('anchor');
   const anchorProps = get('anchorProps');
   const checked = get('checked');
   const disabled = get('disabled');
   const edge = get('edge');
-  const id = usePropID();
+  const id = useInputId();
   const indeterminate = get('indeterminate');
   const loading = get('loading');
-  const primary = usePropLabel();
+  const primary = useInputLabel();
 
   const onChange = get('onChange');
 
   return (
     <Anchor anchor={id} label={primary} disabled={!anchor} {...anchorProps}>
       {!onChange ? (
-        <StyledListItemRoot dense disableGutters disablePadding sx={{ padding: 0 }}>
+        <ListInputRoot dense disableGutters disablePadding sx={{ padding: 0 }}>
           {checked !== null && checked !== undefined && (
             <ListItemIcon>
               {loading ? (
-                <StyledCircularSkeleton />
+                <InputCircularSkeleton />
               ) : (
                 <Checkbox
                   checked={checked}
@@ -62,10 +68,10 @@ const WrappedListHeader = React.memo(() => {
               )}
             </ListItemIcon>
           )}
-          <StyledListInputText />
-        </StyledListItemRoot>
+          <ListInputText />
+        </ListInputRoot>
       ) : (
-        <StyledListInputButtonRoot
+        <ListInputButtonRoot
           dense
           disableGutters
           onClick={event => {
@@ -78,7 +84,7 @@ const WrappedListHeader = React.memo(() => {
           {checked !== null && checked !== undefined && (
             <ListItemIcon>
               {loading ? (
-                <StyledCircularSkeleton />
+                <InputCircularSkeleton />
               ) : (
                 <Checkbox
                   checked={checked}
@@ -93,10 +99,10 @@ const WrappedListHeader = React.memo(() => {
             </ListItemIcon>
           )}
 
-          <StyledListInputText />
+          <ListInputText />
 
-          <StyledResetAdornment />
-        </StyledListInputButtonRoot>
+          <ResetInputAdornment />
+        </ListInputButtonRoot>
       )}
     </Anchor>
   );
@@ -105,12 +111,31 @@ const WrappedListHeader = React.memo(() => {
 export const ListHeader = ({
   anchor = false,
   anchorProps = null,
+  checked = null,
   edge = 'end',
   preventRender = false,
   ...props
 }: ListHeaderProps) => {
+  const { status: validationStatus, message: validationMessage } = useInputValidation<boolean>({
+    value: Boolean(checked),
+    ...props
+  });
+
   return preventRender ? null : (
-    <PropProvider<ListHeaderProps> props={{ anchor, anchorProps, edge, preventRender, onChange: null, ...props }}>
+    <PropProvider<ListHeaderController>
+      initialProps={{ ...DEFAULT_LIST_INPUT_CONTROLLER_PROPS, onChange: null } as ListHeaderController}
+      props={{
+        anchor,
+        anchorProps,
+        checked,
+        edge,
+        onChange: null,
+        preventRender,
+        validationMessage,
+        validationStatus,
+        ...props
+      }}
+    >
       <WrappedListHeader />
     </PropProvider>
   );

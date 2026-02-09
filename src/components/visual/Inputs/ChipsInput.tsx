@@ -1,29 +1,31 @@
 import type { AutocompleteProps, TextFieldProps } from '@mui/material';
 import { Autocomplete } from '@mui/material';
+import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
 import {
-  HelperText,
-  StyledCustomChip,
-  StyledFormControl,
-  StyledFormLabel,
-  StyledInputSkeleton,
-  StyledRoot,
-  StyledTextField
-} from 'components/visual/Inputs/lib/inputs.components';
-import {
-  useErrorCallback,
-  useInputBlur,
-  useInputChange,
-  useInputFocus,
-  usePropID
-} from 'components/visual/Inputs/lib/inputs.hook';
-import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
-import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
+  InputFormControl,
+  InputFormLabel,
+  InputHelperText,
+  InputRoot,
+  InputSkeleton
+} from 'components/visual/Inputs/components/inputs.component.form';
+import { InputCustomChip, InputTextField } from 'components/visual/Inputs/components/inputs.component.textfield';
+import { useInputBlur, useInputChange, useInputFocus } from 'components/visual/Inputs/hooks/inputs.hook.event_handlers';
+import { useInputId } from 'components/visual/Inputs/hooks/inputs.hook.renderer';
+import { useInputValidation } from 'components/visual/Inputs/hooks/inputs.hook.validation';
+import type {
+  InputOptions,
+  InputRuntimeState,
+  InputSlotProps,
+  InputValueModel
+} from 'components/visual/Inputs/models/inputs.model';
+import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/models/inputs.model';
 import type { ElementType } from 'react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-export type ChipsInputProps = InputValues<string[], string[], React.SyntheticEvent<Element, Event>> &
-  InputProps & {
+export type ChipsInputProps = InputValueModel<string[], React.SyntheticEvent<Element, Event>> &
+  InputOptions &
+  InputSlotProps & {
     allowEmptyStrings?: boolean;
     autoComplete?: TextFieldProps['autoComplete'];
     currentValue?: string;
@@ -35,37 +37,40 @@ export type ChipsInputProps = InputValues<string[], string[], React.SyntheticEve
     renderValue?: AutocompleteProps<string, true, false, true, ElementType>['renderValue'];
   };
 
+type ChipsInputController = ChipsInputProps & InputRuntimeState<string[]>;
+
 const WrappedChipsInput = () => {
   const { t } = useTranslation('inputs');
 
-  const [get, setStore] = usePropStore<ChipsInputProps>();
+  const [get, setStore] = usePropStore<ChipsInputController>();
 
   const allowEmptyStrings = get('allowEmptyStrings');
   const currentValue = get('currentValue') ?? '';
   const disableCloseOnSelect = get('disableCloseOnSelect');
   const disabled = get('disabled');
   const filterSelectedOptions = get('filterSelectedOptions');
-  const focused = get('focused');
-  const id = usePropID();
-  const inputValue = get('inputValue') ?? [];
+  const id = useInputId();
+  const isFocused = get('isFocused');
   const isOptionEqualToValue = get('isOptionEqualToValue');
   const loading = get('loading');
   const options = get('options') ?? [];
+  const placeholder = get('placeholder');
+  const rawValue = get('rawValue') ?? [];
   const readOnly = get('readOnly');
   const renderOption = get('renderOption');
   const renderValue = get('renderValue');
   const value = get('value');
 
-  const handleBlur = useInputBlur<ChipsInputProps>();
-  const handleChange = useInputChange<ChipsInputProps>();
-  const handleFocus = useInputFocus<ChipsInputProps>();
+  const handleBlur = useInputBlur<string[]>();
+  const handleChange = useInputChange<string[]>();
+  const handleFocus = useInputFocus<string[]>();
 
   return (
-    <StyledRoot>
-      <StyledFormLabel />
-      <StyledFormControl>
+    <InputRoot>
+      <InputFormLabel />
+      <InputFormControl>
         {loading ? (
-          <StyledInputSkeleton />
+          <InputSkeleton />
         ) : (
           <Autocomplete
             disableCloseOnSelect={disableCloseOnSelect}
@@ -79,33 +84,30 @@ const WrappedChipsInput = () => {
             options={options}
             readOnly={readOnly}
             size="small"
-            value={inputValue}
+            value={rawValue}
             onInputChange={(e, v) => setStore(s => ({ ...s, currentValue: v }))}
-            onChange={(e, v) => handleChange(e, v as string[], v as string[])}
+            onChange={(e, v) => handleChange(e, v as string[], rawValue)}
             onFocus={handleFocus}
             onBlur={e => {
               setStore(s => ({ ...s, currentValue: '' }));
-              handleBlur(
-                e,
-                currentValue && !value.includes(currentValue) ? [...value, currentValue] : value,
-                currentValue && !value.includes(currentValue) ? [...value, currentValue] : value
-              );
+              handleBlur(e, currentValue && !value.includes(currentValue) ? [...value, currentValue] : value, rawValue);
             }}
             renderValue={
               renderValue ??
               ((values, getTagProps) =>
                 values.map((option, index) => {
                   const { key, ...tagProps } = getTagProps({ index });
-                  return <StyledCustomChip key={key} label={option ? option : '\u00A0'} {...tagProps} />;
+                  return <InputCustomChip key={key} label={option ? option : '\u00A0'} {...tagProps} />;
                 }))
             }
             renderInput={params => (
-              <StyledTextField
+              <InputTextField
                 params={{
                   ...params,
                   inputProps: {
                     placeholder:
-                      !focused || currentValue || inputValue?.length ? undefined : t('chips-input.placeholder'),
+                      placeholder ??
+                      (!isFocused || currentValue || rawValue?.length ? undefined : t('input.chips.placeholder')),
                     ...params.inputProps,
                     ...(allowEmptyStrings && {
                       onKeyDown: (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -113,8 +115,8 @@ const WrappedChipsInput = () => {
                           const current = (event.currentTarget as HTMLInputElement).value;
                           if (current === '') {
                             event.preventDefault();
-                            const next = Array.from(new Set([...(inputValue ?? []), '']));
-                            handleChange(event as any, next, next);
+                            const next = Array.from(new Set([...(rawValue ?? []), '']));
+                            handleChange(event as any, next);
                           }
                         }
                       }
@@ -135,31 +137,36 @@ const WrappedChipsInput = () => {
             }}
           />
         )}
-        <HelperText />
-      </StyledFormControl>
-    </StyledRoot>
+        <InputHelperText />
+      </InputFormControl>
+    </InputRoot>
   );
 };
 
 export const ChipsInput = ({ preventRender = false, value = [], ...props }: ChipsInputProps) => {
-  const errorMessage = useErrorCallback({ preventRender, value, ...props });
+  const { status: validationStatus, message: validationMessage } = useInputValidation<string[]>({
+    value: value ?? [],
+    ...props
+  });
 
   return preventRender ? null : (
-    <PropProvider<ChipsInputProps>
+    <PropProvider<ChipsInputController>
+      initialProps={DEFAULT_INPUT_CONTROLLER_PROPS as ChipsInputController}
       props={{
         allowEmptyStrings: false,
         autoComplete: 'off',
-        clearAdornment: true,
+        showClearButton: true,
         currentValue: '',
         disableCloseOnSelect: false,
-        errorMessage,
         filterSelectedOptions: false,
-        inputValue: value,
+        rawValue: value ?? [],
         isOptionEqualToValue: (option, value) => option === value,
         options: [],
         preventRender,
         renderOption: null,
         renderValue: null,
+        validationStatus,
+        validationMessage,
         value,
         ...props
       }}
