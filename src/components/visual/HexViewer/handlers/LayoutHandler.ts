@@ -69,26 +69,25 @@ export const getRowFoldingMap = (
   store: Store,
   columnSize: number
 ): Map<number, { index: number; type: FoldingType }> => {
-  const data = store.hex.data.replaceAll(' ', '').match(new RegExp(`.{1,${2 * columnSize}}`, 'g'));
+  const data = store.hex.data.replaceAll(' ', '').match(new RegExp(`.{1,${2 * columnSize}}`, 'g')) ?? [];
   const map = new Map<number, { index: number; type: FoldingType }>();
-  const zeroes = '0'.repeat(2 * columnSize);
 
-  let i: number = 1; // data
-  let j: number = 1; // map
+  let i: number = 1; // data index
+  let j: number = 1; // map index
   let hiddenSection: boolean = false;
 
-  if (data.length === null || data.length === 0) return map;
+  if (data.length === 0) return map;
 
   map.set(0, { index: 0, type: FoldingType.SHOW });
   if (data.length === 1) return map;
 
   while (i < data.length - 1) {
-    const allZeroes = data[i - 1] === zeroes && data[i] === zeroes && data[i + 1] === zeroes;
-    if (!allZeroes) {
+    const isRepeatedRow = data[i - 1] === data[i] && data[i] === data[i + 1];
+    if (!isRepeatedRow) {
       map.set(j, { index: i, type: FoldingType.SHOW });
       hiddenSection = false;
       j++;
-    } else if (allZeroes && !hiddenSection) {
+    } else if (!hiddenSection) {
       map.set(j, { index: i, type: FoldingType.HIDE });
       hiddenSection = true;
       j++;
