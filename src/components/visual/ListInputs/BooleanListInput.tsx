@@ -50,8 +50,8 @@ const WrappedSwitchListInput = React.memo(() => {
   return (
     <ListInputButtonRoot
       onFocus={handleFocus}
-      onBlur={e => handleBlur(e, value)}
-      onClick={event => handleClick(event, !value)}
+      onBlur={e => handleBlur(e, value, rawValue)}
+      onClick={event => handleClick(event, !rawValue)}
     >
       <ListInputWrapper>
         <ListInputInner>
