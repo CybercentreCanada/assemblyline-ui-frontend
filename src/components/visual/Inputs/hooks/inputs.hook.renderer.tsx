@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unnecessary-type-constraint */
 import { usePropStore } from 'components/core/PropProvider/PropProvider';
 import type { InputControllerProps } from 'components/visual/Inputs/models/inputs.model';
+import type { ListInputControllerProps } from 'components/visual/ListInputs/lib/listinputs.model';
 
 /**
  * Returns the label for an input, or a non-breaking space if not defined
@@ -14,10 +15,25 @@ export const useInputLabel = <Value extends unknown = unknown, RawValue = Value>
  * Returns a deterministic input ID, using label if ID not defined
  */
 export const useInputId = <Value extends unknown = unknown, RawValue = Value>() => {
-  const [get] = usePropStore<InputControllerProps<Value, RawValue>>();
+  const [get] = usePropStore<InputControllerProps<Value, RawValue> & ListInputControllerProps<Value, RawValue>>();
+
   const id = get('id');
   const label = get('label');
-  return id ?? (typeof label === 'string' ? label.toLowerCase().replaceAll(' ', '-') : '\u00A0');
+  const primary = get('primary');
+
+  if (id) return id;
+
+  const fallback = typeof label === 'string' ? label : typeof primary === 'string' ? primary : '';
+
+  if (fallback && fallback.trim().length > 0) {
+    return fallback
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, '-')
+      .replace(/[^\w-]/g, '');
+  }
+
+  return '\u00A0';
 };
 
 /**
