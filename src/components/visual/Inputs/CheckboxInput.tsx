@@ -59,7 +59,7 @@ const WrappedCheckboxInput = () => {
     <InputFormButtonTooltip>
       <InputFormControl>
         <InputFormButton
-          onBlur={e => handleBlur(e, value)}
+          onBlur={e => handleBlur(e, value, rawValue)}
           onFocus={handleFocus}
           onClick={e => handleClick(e, !rawValue)}
         >
@@ -100,7 +100,7 @@ const WrappedCheckboxInput = () => {
 export const CheckboxInput = ({ preventRender = false, value, ...props }: CheckboxInputProps) => {
   const { status: validationStatus, message: validationMessage } = useInputValidation<boolean>({
     value: Boolean(value),
-    ...props,
+    ...props
   });
 
   return preventRender ? null : (

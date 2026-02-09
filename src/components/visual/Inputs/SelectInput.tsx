@@ -87,9 +87,11 @@ const WrappedSelectInput = <O extends readonly Option[]>() => {
             size="small"
             open={isMenuOpen}
             value={options?.some(o => o.value === rawValue) ? rawValue : ''}
-            onChange={event => handleChange(event as React.SyntheticEvent, event.target.value as O[number]['value'])}
+            onChange={event =>
+              handleChange(event as React.SyntheticEvent, event.target.value as O[number]['value'], rawValue)
+            }
             onFocus={handleFocus}
-            onBlur={e => handleBlur(e, value)}
+            onBlur={e => handleBlur(e, value, rawValue)}
             onClose={() => setStore({ isMenuOpen: false })}
             onOpen={() => setStore({ isMenuOpen: true })}
             renderValue={option => (

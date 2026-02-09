@@ -139,7 +139,7 @@ const DatePopper = React.memo(() => {
               // timezone="utc"
               showDaysOutsideCurrentMonth
               value={rawValue}
-              onChange={(v: Moment) => handleChange(null, v, toValue)}
+              onChange={(v: Moment) => handleChange(null, v, rawValue, toValue)}
               sx={{ height: '320px' }}
               slotProps={{ calendarHeader: { sx: { marginTop: '0px', marginBottom: '0px' } } }}
             />
@@ -147,7 +147,7 @@ const DatePopper = React.memo(() => {
             <DigitalClock
               // timezone="utc"
               value={rawValue}
-              onChange={(v: Moment) => handleChange(null, v, toValue)}
+              onChange={(v: Moment) => handleChange(null, v, rawValue, toValue)}
               sx={{
                 maxHeight: '320px',
                 '& .MuiDigitalClock-item': {
@@ -223,12 +223,12 @@ const WrappedDateInput = () => {
                 minDate={minDateTomorrow ? tomorrow : null}
                 readOnly={readOnly}
                 value={rawValue}
-                onChange={d => handleChange(null, d, toValue)}
+                onChange={d => handleChange(null, d, rawValue, toValue)}
                 slotProps={{
                   textField: {
                     ...inputTextFieldSlots,
                     onFocus: handleFocus,
-                    onBlur: e => handleBlur(e, toRawValue(value), toValue, toRawValue),
+                    onBlur: e => handleBlur(e, toRawValue(value), rawValue, toValue, toRawValue),
                     InputProps: {
                       ...(startAdornment && { startAdornment }),
                       endAdornment: (
