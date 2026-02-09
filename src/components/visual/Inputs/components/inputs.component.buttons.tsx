@@ -1,3 +1,4 @@
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import type { ButtonProps, FormControlLabelProps, TypographyProps } from '@mui/material';
 import { Button, FormControlLabel, Skeleton, Typography, useTheme } from '@mui/material';
 import { usePropStore } from 'components/core/PropProvider/PropProvider';
@@ -6,6 +7,7 @@ import {
   useInputId,
   useShouldRenderExpand,
   useShouldRenderPassword,
+  useShouldRenderProgress,
   useShouldRenderReset
 } from 'components/visual/Inputs/hooks/inputs.hook.renderer';
 import type { InputControllerProps } from 'components/visual/Inputs/models/inputs.model';
@@ -46,7 +48,15 @@ export const InputFormButtonTooltip = React.memo(({ children }: { children?: Too
     <Tooltip
       title={loading ? null : tooltip}
       {...tooltipProps}
-      slotProps={{ tooltip: { style: { marginTop: theme.spacing(0.5) } } }}
+      slotProps={{
+        tooltip: {
+          ...tooltipProps?.slotProps?.tooltip,
+          style: {
+            marginTop: theme.spacing(0.5),
+            ...(tooltipProps?.slotProps?.tooltip as any)?.style
+          }
+        }
+      }}
       sx={{ ...tooltipProps?.sx }}
     >
       {children}
@@ -108,6 +118,7 @@ export const InputButtonFormControlLabel = React.memo(
     const readOnly = get('readOnly');
     const shouldRenderExpand = useShouldRenderExpand();
     const shouldRenderPassword = useShouldRenderPassword();
+    const shouldRenderProgress = useShouldRenderProgress();
     const shouldRenderReset = useShouldRenderReset();
     const tiny = get('tiny');
 
@@ -128,7 +139,7 @@ export const InputButtonFormControlLabel = React.memo(
         sx={{
           marginLeft: 0,
           marginRight: 0,
-          paddingRight: `calc(8px + ${[!shouldRenderExpand, !shouldRenderPassword, !shouldRenderReset].filter(value => value === false).length} * ${tiny ? '24px' : '28px'})`,
+          paddingRight: `calc(${[!shouldRenderExpand, !shouldRenderPassword, !shouldRenderProgress, !shouldRenderReset].filter(value => value === false).length} * ${tiny ? '24px' : '28px'})`,
           ...(overflowHidden && { textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden' }),
           ...props?.sx
         }}
@@ -140,13 +151,19 @@ export const InputButtonFormControlLabel = React.memo(
 InputButtonFormControlLabel.displayName = 'InputButtonFormControlLabel';
 
 type InputButtonLabelProps = {
-  label?: string;
-  isFocused?: boolean;
   ignoreRequired?: boolean;
+  ignoreTooltipIcon?: boolean;
+  isFocused?: boolean;
+  label?: string;
 };
 
 export const InputButtonLabel = React.memo(
-  ({ label: labelProp, isFocused: isFocusedProp, ignoreRequired = false }: InputButtonLabelProps) => {
+  ({
+    ignoreRequired = false,
+    ignoreTooltipIcon = false,
+    isFocused: isFocusedProp,
+    label: labelProp
+  }: InputButtonLabelProps) => {
     const theme = useTheme();
 
     const [get] = usePropStore<InputControllerProps>();
@@ -162,6 +179,7 @@ export const InputButtonLabel = React.memo(
     const password = get('password');
     const preventDisabledColor = get('preventDisabledColor');
     const readOnly = get('readOnly');
+    const tooltip = get('tooltip');
     const validationStatus = get('validationStatus');
 
     const color = useMemo<TypographyProps['color']>(() => {
@@ -173,19 +191,32 @@ export const InputButtonLabel = React.memo(
 
       switch (validationStatus) {
         case 'error':
-          return 'error';
+          return theme.palette.error.main;
         case 'warning':
-          return 'warning';
+          return theme.palette.warning.main;
         case 'success':
-          return 'success';
+          return theme.palette.success.main;
         case 'info':
-          return 'info';
+          return theme.palette.info.main;
         case 'default':
         default:
-          if (isFocused) return 'primary';
-          return 'textPrimary';
+          if (isFocused) return theme.palette.primary.main;
+          return theme.palette.text.primary;
       }
-    }, [disabled, isFocused, loading, preventDisabledColor, readOnly, validationStatus]);
+    }, [
+      disabled,
+      isFocused,
+      loading,
+      preventDisabledColor,
+      readOnly,
+      theme.palette.error.main,
+      theme.palette.info.main,
+      theme.palette.primary.main,
+      theme.palette.success.main,
+      theme.palette.text.primary,
+      theme.palette.warning.main,
+      validationStatus
+    ]);
 
     return (
       <div
@@ -193,8 +224,7 @@ export const InputButtonLabel = React.memo(
           width: '100%',
           display: 'flex',
           flexDirection: 'row',
-          alignItems: 'center',
-          columnGap: theme.spacing(1),
+          columnGap: theme.spacing(0.5),
           ...(overflowHidden && { textOverflow: 'ellipsis', whiteSpace: 'nowrap', overflow: 'hidden' })
         }}
       >
@@ -220,6 +250,7 @@ export const InputButtonLabel = React.memo(
         >
           <InputRequiredBadge ignoreRequired={ignoreRequired}>{label}</InputRequiredBadge>
         </Typography>
+        {tooltip && !ignoreTooltipIcon && <InfoOutlinedIcon sx={{ color, fontSize: 'small' }} />}
       </div>
     );
   }

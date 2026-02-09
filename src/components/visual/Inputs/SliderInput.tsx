@@ -79,8 +79,8 @@ const WrappedSliderInput = () => {
                   {...(min && { min: min })}
                   {...(max && { max: max })}
                   onFocus={handleFocus}
-                  onBlur={e => handleBlur(e, value)}
-                  onChange={(e, v) => handleChange(e as unknown as React.SyntheticEvent, v)}
+                  onBlur={e => handleBlur(e, value, rawValue)}
+                  onChange={(e, v) => handleChange(e as unknown as React.SyntheticEvent, v, rawValue)}
                 />
               </div>
               <ResetInputAdornment />

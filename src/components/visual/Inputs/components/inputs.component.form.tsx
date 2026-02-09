@@ -218,19 +218,32 @@ export const InputFormLabel = React.memo(() => {
 
     switch (validationStatus) {
       case 'error':
-        return 'error';
+        return theme.palette.error.main;
       case 'warning':
-        return 'warning';
+        return theme.palette.warning.main;
       case 'success':
-        return 'success';
+        return theme.palette.success.main;
       case 'info':
-        return 'info';
+        return theme.palette.info.main;
       case 'default':
       default:
-        if (isFocused) return 'primary';
-        return 'textSecondary';
+        if (isFocused) return theme.palette.primary.main;
+        return theme.palette.text.secondary;
     }
-  }, [disabled, isFocused, loading, preventDisabledColor, readOnly, validationStatus]);
+  }, [
+    disabled,
+    isFocused,
+    loading,
+    preventDisabledColor,
+    readOnly,
+    theme.palette.error.main,
+    theme.palette.info.main,
+    theme.palette.primary.main,
+    theme.palette.success.main,
+    theme.palette.text.secondary,
+    theme.palette.warning.main,
+    validationStatus
+  ]);
 
   return (
     <Tooltip
@@ -238,32 +251,46 @@ export const InputFormLabel = React.memo(() => {
       {...formLabelTooltipProps}
       slotProps={{
         ...formLabelTooltipProps?.slotProps,
+        popper: {
+          modifiers: [{ name: 'offset', options: { offset: [0, -10] } }],
+          ...formLabelTooltipProps?.slotProps?.popper
+        },
         tooltip: {
           ...formLabelTooltipProps?.slotProps?.tooltip,
           style: { whiteSpace: 'normal', ...(formLabelTooltipProps?.slotProps?.tooltip as any)?.style }
         }
       }}
     >
-      <Typography
-        id={`${id}-form-label`}
-        color={color}
-        component={InputLabel}
-        gutterBottom
-        htmlFor={id}
-        variant="body2"
-        whiteSpace="nowrap"
-        {...formLabelProps}
-        sx={{
-          ...(!overflowHidden && { whiteSpace: 'normal' }),
-          ...(disabled &&
-            !preventDisabledColor && {
-              WebkitTextFillColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.38)'
-            }),
-          ...formLabelProps?.sx
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          flexWrap: 'nowrap',
+          columnGap: theme.spacing(0.5),
+          marginBottom: theme.spacing(0)
         }}
       >
-        <InputRequiredBadge>{label}</InputRequiredBadge>
-      </Typography>
+        <Typography
+          id={`${id}-form-label`}
+          color={color}
+          component={InputLabel}
+          htmlFor={id}
+          variant="body2"
+          whiteSpace="nowrap"
+          {...formLabelProps}
+          sx={{
+            ...(!overflowHidden && { whiteSpace: 'normal' }),
+            ...(disabled &&
+              !preventDisabledColor && {
+                WebkitTextFillColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.38)'
+              }),
+            ...formLabelProps?.sx
+          }}
+        >
+          <InputRequiredBadge>{label}</InputRequiredBadge>
+        </Typography>
+        {tooltip && <InfoOutlinedIcon sx={{ color, fontSize: 'small' }} />}
+      </div>
     </Tooltip>
   );
 });

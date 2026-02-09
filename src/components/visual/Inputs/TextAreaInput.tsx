@@ -73,9 +73,9 @@ const WrappedTextAreaInput = () => {
               autoComplete={autoComplete}
               id={id}
               value={rawValue}
-              onChange={e => handleChange(e, e.target.value)}
+              onChange={e => handleChange(e, e.target.value, rawValue)}
               onFocus={handleFocus}
-              onBlur={e => handleBlur(e, value)}
+              onBlur={e => handleBlur(e, value, rawValue)}
             />
             <InputHelperText />
           </>

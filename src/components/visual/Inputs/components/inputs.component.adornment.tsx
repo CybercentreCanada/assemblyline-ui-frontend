@@ -687,6 +687,7 @@ export const InputButtonEndAdornment = React.memo(
           display: 'flex',
           alignItems: 'center',
           maxHeight: 'initial',
+          marginLeft: '0px',
           color: theme.palette.text.secondary,
           ...props?.sx,
           '& .MuiTooltip-tooltip': {

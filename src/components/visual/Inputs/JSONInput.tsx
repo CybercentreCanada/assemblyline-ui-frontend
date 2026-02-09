@@ -115,17 +115,17 @@ const WrappedJSONInput = () => {
                 onAdd={
                   disabled || readOnly
                     ? false
-                    : event => handleChange(event as unknown as React.SyntheticEvent, event.updated_src)
+                    : event => handleChange(event as unknown as React.SyntheticEvent, event.updated_src, rawValue)
                 }
                 onDelete={
                   disabled || readOnly
                     ? false
-                    : event => handleChange(event as unknown as React.SyntheticEvent, event.updated_src)
+                    : event => handleChange(event as unknown as React.SyntheticEvent, event.updated_src, rawValue)
                 }
                 onEdit={
                   disabled || readOnly
                     ? false
-                    : event => handleChange(event as unknown as React.SyntheticEvent, event.updated_src)
+                    : event => handleChange(event as unknown as React.SyntheticEvent, event.updated_src, rawValue)
                 }
                 style={{
                   fontSize: '1rem',

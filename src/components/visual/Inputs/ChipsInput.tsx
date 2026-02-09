@@ -86,11 +86,11 @@ const WrappedChipsInput = () => {
             size="small"
             value={rawValue}
             onInputChange={(e, v) => setStore(s => ({ ...s, currentValue: v }))}
-            onChange={(e, v) => handleChange(e, v as string[])}
+            onChange={(e, v) => handleChange(e, v as string[], rawValue)}
             onFocus={handleFocus}
             onBlur={e => {
               setStore(s => ({ ...s, currentValue: '' }));
-              handleBlur(e, currentValue && !value.includes(currentValue) ? [...value, currentValue] : value);
+              handleBlur(e, currentValue && !value.includes(currentValue) ? [...value, currentValue] : value, rawValue);
             }}
             renderValue={
               renderValue ??

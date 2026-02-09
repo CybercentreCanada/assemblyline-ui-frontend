@@ -53,6 +53,7 @@ const Parameter = React.memo(({ customize, disabled, loading, param_id, spec_id 
                 reset={defaultValue !== null && value !== defaultValue}
                 value={value as string}
                 defaultValue={defaultValue as string}
+                overflowHidden
                 onChange={(event, v) => handleChange(v)}
               />
             );
@@ -68,6 +69,7 @@ const Parameter = React.memo(({ customize, disabled, loading, param_id, spec_id 
                 reset={defaultValue !== null && value !== defaultValue}
                 value={value as number}
                 defaultValue={defaultValue as number}
+                overflowHidden
                 onChange={(event, v) => handleChange(v)}
                 onBlur={() => {
                   if (value === null) {
@@ -91,6 +93,7 @@ const Parameter = React.memo(({ customize, disabled, loading, param_id, spec_id 
                 disabled={disabled || (!customize && restricted)}
                 loading={loading}
                 reset={defaultValue !== null && value !== defaultValue}
+                overflowHidden
                 value={value as boolean}
                 defaultValue={defaultValue as boolean}
                 onChange={(event, v) => handleChange(v)}
@@ -108,6 +111,7 @@ const Parameter = React.memo(({ customize, disabled, loading, param_id, spec_id 
                 reset={defaultValue !== null && value !== defaultValue}
                 value={value as string}
                 defaultValue={defaultValue as string}
+                overflowHidden
                 options={(Array.isArray(list) ? list : []).map(item => ({
                   value: item,
                   primary: item.replaceAll('_', ' ')

@@ -73,8 +73,8 @@ const WrappedRadioInput = <O extends readonly Option[]>() => {
             <InputFormButton
               key={`${index}-${option.label}`}
               onFocus={handleFocus}
-              onBlur={e => handleBlur(e, value)}
-              onClick={e => handleChange(e, option.value)}
+              onBlur={e => handleBlur(e, value, rawValue)}
+              onClick={e => handleChange(e, option.value, rawValue)}
             >
               <InputButtonFormControlLabel
                 label={
@@ -82,6 +82,7 @@ const WrappedRadioInput = <O extends readonly Option[]>() => {
                     label={option.label}
                     isFocused={isFocused && rawValue === (option.value ?? '')}
                     ignoreRequired
+                    ignoreTooltipIcon
                   />
                 }
                 value={option.value ?? ''}

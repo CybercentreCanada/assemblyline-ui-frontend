@@ -64,9 +64,9 @@ const WrappedTextInput = () => {
             readOnly={readOnly}
             size="small"
             value={value}
-            onInputChange={(e, v) => handleChange(e, v)}
+            onInputChange={(e, v) => handleChange(e, v, rawValue)}
             onFocus={handleFocus}
-            onBlur={e => handleBlur(e, value)}
+            onBlur={e => handleBlur(e, value, rawValue)}
             renderOption={(props, option, { index }) => (
               <Typography {...props} key={`${option}-${index}`} variant={tiny ? 'body2' : 'body1'}>
                 {option}

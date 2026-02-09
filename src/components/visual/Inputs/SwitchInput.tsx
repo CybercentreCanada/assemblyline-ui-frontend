@@ -56,7 +56,7 @@ const WrappedSwitchInput = () => {
       <InputFormControl>
         <InputFormButton
           onFocus={handleFocus}
-          onBlur={e => handleBlur(e, value)}
+          onBlur={e => handleBlur(e, value, rawValue)}
           onClick={e => handleClick(e, !rawValue)}
         >
           <InputButtonFormControlLabel label={<InputButtonLabel />}>

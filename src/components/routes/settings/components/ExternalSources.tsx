@@ -62,6 +62,7 @@ export const ExternalSourcesSection = React.memo(() => {
                       value={value}
                       loading={loading}
                       disabled={disabled}
+                      overflowHidden
                       onChange={(_, checked) => {
                         form.setFieldValue('settings', settings => {
                           if (!settings.default_external_sources?.value) {
