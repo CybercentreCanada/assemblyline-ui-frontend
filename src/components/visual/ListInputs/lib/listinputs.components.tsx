@@ -1,21 +1,30 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 import type { AutocompleteRenderInputParams, ListItemButtonProps, ListItemProps, TextFieldProps } from '@mui/material';
 import {
   Box,
   InputAdornment,
   ListItem,
   ListItemButton,
+  ListItemIcon,
   Skeleton,
   TextField,
   Typography,
   useTheme
 } from '@mui/material';
 import { usePropStore } from 'components/core/PropProvider/PropProvider';
+import { IconButton } from 'components/visual/Buttons/IconButton';
+import {
+  InputListItemText,
+  SelectInputOptionMenuItem
+} from 'components/visual/Inputs/components/inputs.component.form';
 import { useInputTextFieldSlots } from 'components/visual/Inputs/components/inputs.component.textfield';
 import { useInputId } from 'components/visual/Inputs/hooks/inputs.hook.renderer';
+import type { SelectInputOption } from 'components/visual/Inputs/models/inputs.model';
 import type { ListInputControllerProps } from 'components/visual/ListInputs/lib/listinputs.model';
 import React from 'react';
+import { useTranslation } from 'react-i18next';
 
 /**********************************************************************************************************************
  * Skeletons
@@ -309,3 +318,70 @@ export const ListInputTextField = React.memo(({ params, ...props }: ListInputTex
 });
 
 ListInputTextField.displayName = 'ListInputTextField';
+
+/**********************************************************************************************************************
+ * Select List Input Option Menu Item
+ *********************************************************************************************************************/
+export const SelectListInputOptionMenuItem = React.memo(
+  ({ primary, secondary = null, helpLink = null, helpName = null }: SelectInputOption) => {
+    const { t } = useTranslation('inputs');
+    const theme = useTheme();
+
+    const [get] = usePropStore<ListInputControllerProps>();
+
+    const tiny = get('tiny');
+
+    const isExternal = helpLink?.startsWith('http');
+
+    return (
+      <>
+        <InputListItemText
+          primary={primary ? primary : '\u00A0'}
+          secondary={secondary}
+          slotProps={{
+            primary: {
+              overflow: 'auto',
+              textOverflow: 'initial',
+              whiteSpace: 'normal',
+              maxWidth: theme.breakpoints.values.sm
+            },
+            secondary: {
+              overflow: 'auto',
+              textOverflow: 'initial',
+              whiteSpace: 'normal',
+              maxWidth: theme.breakpoints.values.sm
+            }
+          }}
+        />
+        {helpLink && (
+          <ListItemIcon sx={{ minWidth: 'auto !important' }}>
+            <IconButton
+              color="secondary"
+              tabIndex={-1}
+              to={helpLink}
+              tooltip={
+                <>
+                  <span style={{ color: theme.palette.text.secondary }}>{t('adornment.help.tooltip')}</span>
+                  <span>{helpName ?? helpLink}</span>
+                </>
+              }
+              tooltipProps={{ arrow: true }}
+              type="button"
+              {...(isExternal && { target: '_blank', rel: 'noopener noreferrer' })}
+              onClick={event => {
+                event.stopPropagation();
+              }}
+              sx={{
+                padding: tiny ? theme.spacing(0.25) : theme.spacing(0.5)
+              }}
+            >
+              <HelpOutlineOutlinedIcon fontSize="small" />
+            </IconButton>
+          </ListItemIcon>
+        )}
+      </>
+    );
+  }
+);
+
+SelectInputOptionMenuItem.displayName = 'SelectInputOptionMenuItem';

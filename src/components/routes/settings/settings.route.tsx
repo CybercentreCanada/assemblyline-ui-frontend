@@ -8,7 +8,10 @@ import { InterfaceSection } from 'components/routes/settings/components/Interfac
 import { LeftNav } from 'components/routes/settings/components/LeftNav';
 import { RightNav } from 'components/routes/settings/components/RightNav';
 import { ServicesSection } from 'components/routes/settings/components/Services';
-import { SubmissionSection } from 'components/routes/settings/components/Submission';
+import {
+  SubmissionOptionsSection,
+  SubmissionProfileDescription
+} from 'components/routes/settings/components/Submission';
 import type { SettingsStore } from 'components/routes/settings/settings.form';
 import { useForm } from 'components/routes/settings/settings.form';
 import {
@@ -75,7 +78,8 @@ const WrappedSettingsRoute = () => {
           >
             {!hasSettings ? null : tab in settings.submission_profiles ? (
               <>
-                <SubmissionSection />
+                <SubmissionProfileDescription />
+                <SubmissionOptionsSection />
                 <ServicesSection />
               </>
             ) : (
