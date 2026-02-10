@@ -37,6 +37,7 @@ import { Button } from 'components/visual/Buttons/Button';
 import { IconButton } from 'components/visual/Buttons/IconButton';
 import Classification from 'components/visual/Classification';
 import { CheckboxInput } from 'components/visual/Inputs/CheckboxInput';
+import type { SelectInputOption } from 'components/visual/Inputs/models/inputs.model';
 import { SelectInput } from 'components/visual/Inputs/SelectInput';
 import { SwitchInput } from 'components/visual/Inputs/SwitchInput';
 import { TextInput } from 'components/visual/Inputs/TextInput';
@@ -181,17 +182,21 @@ export const SubmissionProfileInput = React.memo(() => {
 
   const options = useMemo(
     () =>
-      getProfileNames(settings).map(profileValue => ({
-        value: profileValue,
-        primary:
-          profileValue === 'default'
-            ? t('profile.option.custom.label')
-            : configuration.submission.profiles[profileValue].display_name,
-        secondary:
-          profileValue === 'default'
-            ? t('profile.option.custom.description')
-            : configuration.submission.profiles[profileValue].description
-      })),
+      getProfileNames(settings).map(
+        profileValue =>
+          ({
+            value: profileValue,
+            primary:
+              profileValue === 'default'
+                ? t('profile.option.custom.label')
+                : configuration.submission.profiles[profileValue].display_name,
+            secondary:
+              profileValue === 'default'
+                ? t('profile.option.custom.description')
+                : configuration.submission.profiles[profileValue].description,
+            helpLink: `/settings/${profileValue}`
+          }) satisfies SelectInputOption
+      ),
     [configuration.submission.profiles, settings, t]
   );
 
@@ -215,8 +220,6 @@ export const SubmissionProfileInput = React.memo(() => {
           loading={loading}
           disabled={disabled || !isEditing}
           options={options}
-          helpLink="https://cybercentrecanada.github.io/assemblyline4_docs/"
-          helpName="Assemblyline Docs"
           onChange={(_, profile) => {
             const prevProfile = form.store.state.values.state.profile;
             if (prevProfile === profile) return;

@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import CheckCircleOutlinedIcon from '@mui/icons-material/CheckCircleOutlined';
 import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
+import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import WarningAmberOutlinedIcon from '@mui/icons-material/WarningAmberOutlined';
 import type { FormHelperTextProps, ListItemTextProps, TypographyProps } from '@mui/material';
@@ -10,16 +11,19 @@ import {
   FormControl,
   FormHelperText,
   InputLabel,
+  ListItemIcon,
   ListItemText,
   Skeleton,
   Typography,
   useTheme
 } from '@mui/material';
 import { usePropStore } from 'components/core/PropProvider/PropProvider';
+import { IconButton } from 'components/visual/Buttons/IconButton';
 import { useInputId, useInputLabel } from 'components/visual/Inputs/hooks/inputs.hook.renderer';
-import type { InputControllerProps } from 'components/visual/Inputs/models/inputs.model';
+import type { InputControllerProps, SelectInputOption } from 'components/visual/Inputs/models/inputs.model';
 import { Tooltip } from 'components/visual/Tooltip';
 import React, { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 /**********************************************************************************************************************
  * Skeletons
@@ -424,3 +428,56 @@ export const InputListItemText = React.memo(({ primary, secondary = null, ...pro
 });
 
 InputListItemText.displayName = 'InputListItemText';
+
+/**********************************************************************************************************************
+ * Select Input Option Menu Item
+ *********************************************************************************************************************/
+export const SelectInputOptionMenuItem = React.memo(
+  ({ primary, secondary = null, helpLink = null, helpName = null }: SelectInputOption) => {
+    const { t } = useTranslation('inputs');
+    const theme = useTheme();
+
+    const [get] = usePropStore<InputControllerProps>();
+
+    const helpAdornmentProps = get('slotProps')?.helpAdornment;
+    const tiny = get('tiny');
+
+    const isExternal = helpLink?.startsWith('http');
+
+    return (
+      <>
+        <InputListItemText primary={primary ? primary : '\u00A0'} secondary={secondary} />
+        {helpLink && (
+          <ListItemIcon sx={{ minWidth: 'auto !important' }}>
+            <IconButton
+              color="secondary"
+              tabIndex={-1}
+              to={helpLink}
+              tooltip={
+                <>
+                  <span style={{ color: theme.palette.text.secondary }}>{t('adornment.help.tooltip')}</span>
+                  <span>{helpName ?? helpLink}</span>
+                </>
+              }
+              tooltipProps={{ arrow: true }}
+              type="button"
+              {...(isExternal && { target: '_blank', rel: 'noopener noreferrer' })}
+              onClick={event => {
+                event.stopPropagation();
+              }}
+              {...helpAdornmentProps}
+              sx={{
+                padding: tiny ? theme.spacing(0.25) : theme.spacing(0.5),
+                ...helpAdornmentProps?.sx
+              }}
+            >
+              <HelpOutlineOutlinedIcon fontSize="small" />
+            </IconButton>
+          </ListItemIcon>
+        )}
+      </>
+    );
+  }
+);
+
+SelectInputOptionMenuItem.displayName = 'SelectInputOptionMenuItem';

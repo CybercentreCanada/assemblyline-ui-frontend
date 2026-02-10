@@ -1,4 +1,4 @@
-import type { ListItemTextProps, MenuItemProps, SelectProps } from '@mui/material';
+import type { MenuItemProps, SelectProps } from '@mui/material';
 import { ListItemText, MenuItem, Select } from '@mui/material';
 import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
 import {
@@ -13,9 +13,9 @@ import {
   InputFormControl,
   InputFormLabel,
   InputHelperText,
-  InputListItemText,
   InputRoot,
-  InputSkeleton
+  InputSkeleton,
+  SelectInputOptionMenuItem
 } from 'components/visual/Inputs/components/inputs.component.form';
 import { useInputBlur, useInputChange, useInputFocus } from 'components/visual/Inputs/hooks/inputs.hook.event_handlers';
 import { useInputId } from 'components/visual/Inputs/hooks/inputs.hook.renderer';
@@ -24,17 +24,12 @@ import type {
   InputOptions,
   InputRuntimeState,
   InputSlotProps,
-  InputValueModel
+  InputValueModel,
+  SelectInputOption
 } from 'components/visual/Inputs/models/inputs.model';
 import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/models/inputs.model';
 
-export type Option = {
-  primary: ListItemTextProps['primary'];
-  secondary?: ListItemTextProps['secondary'];
-  value: MenuItemProps['value'] | boolean;
-};
-
-export type SelectInputProps<O extends readonly Option[]> = InputValueModel<O[number]['value']> &
+export type SelectInputProps<O extends readonly SelectInputOption[]> = InputValueModel<O[number]['value']> &
   InputOptions &
   InputSlotProps & {
     capitalize?: boolean;
@@ -42,9 +37,10 @@ export type SelectInputProps<O extends readonly Option[]> = InputValueModel<O[nu
     options?: O;
   };
 
-type SelectInputController<O extends readonly Option[]> = SelectInputProps<O> & InputRuntimeState<O[number]['value']>;
+type SelectInputController<O extends readonly SelectInputOption[]> = SelectInputProps<O> &
+  InputRuntimeState<O[number]['value']>;
 
-const WrappedSelectInput = <O extends readonly Option[]>() => {
+const WrappedSelectInput = <O extends readonly SelectInputOption[]>() => {
   const [get, setStore] = usePropStore<SelectInputController<O>>();
 
   const capitalize = get('capitalize');
@@ -152,9 +148,15 @@ const WrappedSelectInput = <O extends readonly Option[]>() => {
               }
             }}
           >
-            {options.map((option, i) => (
-              <MenuItem key={i} value={option.value as MenuItemProps['value']}>
-                <InputListItemText primary={option.primary ? option.primary : '\u00A0'} secondary={option.secondary} />
+            {options.map(({ primary, secondary, value, helpLink, helpName }, i) => (
+              <MenuItem key={i} value={value as MenuItemProps['value']}>
+                <SelectInputOptionMenuItem
+                  primary={primary}
+                  secondary={secondary}
+                  value={value}
+                  helpLink={helpLink}
+                  helpName={helpName}
+                />
               </MenuItem>
             ))}
           </Select>
@@ -165,7 +167,7 @@ const WrappedSelectInput = <O extends readonly Option[]>() => {
   );
 };
 
-export const SelectInput = <O extends readonly Option[]>({
+export const SelectInput = <O extends readonly SelectInputOption[]>({
   preventRender = false,
   value,
   ...props
