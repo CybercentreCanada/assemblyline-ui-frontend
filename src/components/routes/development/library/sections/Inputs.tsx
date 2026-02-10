@@ -359,7 +359,7 @@ export const InputsSection = React.memo(() => {
                   expand: expand,
                   onExpand: () => form.setFieldValue('components.inputs.state.expand', !expand)
                 }),
-                ...(help && { help: '/help/search' }),
+                ...(help && { helpLink: '/help/search', helpName: '/help/search' }),
                 ...(password && { password }),
                 ...(progress && { progress: 'in progress' }),
                 ...(startAdornment && { startAdornment: <Button variant="contained">Start</Button> }),

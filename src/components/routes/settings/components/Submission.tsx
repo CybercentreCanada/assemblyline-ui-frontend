@@ -1,4 +1,4 @@
-import { useTheme } from '@mui/material';
+import { Paper, useTheme } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
 import { useForm } from 'components/routes/settings/settings.form';
 import { PageSection } from 'components/visual/Layouts/PageSection';
@@ -6,10 +6,37 @@ import { List } from 'components/visual/List/List';
 import { BooleanListInput } from 'components/visual/ListInputs/BooleanListInput';
 import { ClassificationListInput } from 'components/visual/ListInputs/ClassificationListInput';
 import { NumberListInput } from 'components/visual/ListInputs/NumberListInput';
+import { Markdown } from 'components/visual/Markdown';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-export const SubmissionSection = React.memo(() => {
+export const SubmissionProfileDescription = React.memo(() => {
+  const { t } = useTranslation(['settings']);
+  const theme = useTheme();
+  const form = useForm();
+  const { configuration } = useALContext();
+
+  return (
+    <form.Subscribe selector={state => [state.values.state.tab] as const}>
+      {([tab]) =>
+        tab !== 'default' &&
+        configuration?.submission?.profiles?.[tab]?.description && (
+          <div style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(0.5) }}>
+            <PageSection id="profile" primary={t('profile.title')} primaryProps={{ variant: 'h6' }} subheader anchor />
+
+            <Paper sx={{ py: theme.spacing(0.5), px: theme.spacing(2) }}>
+              <Markdown>{configuration.submission.profiles[tab].description}</Markdown>
+            </Paper>
+          </div>
+        )
+      }
+    </form.Subscribe>
+  );
+});
+
+SubmissionProfileDescription.displayName = 'SubmissionProfileDescription';
+
+export const SubmissionOptionsSection = React.memo(() => {
   const { t } = useTranslation(['settings']);
   const theme = useTheme();
   const form = useForm();
@@ -214,4 +241,4 @@ export const SubmissionSection = React.memo(() => {
   );
 });
 
-SubmissionSection.displayName = 'SubmissionSection';
+SubmissionOptionsSection.displayName = 'SubmissionOptionsSection';

@@ -102,7 +102,6 @@ export const HeaderSection = React.memo(() => {
                       color="secondary"
                       style={{ fontSize: '110%', fontFamily: 'monospace', wordBreak: 'break-word' }}
                     >{`{"submission_profile": "${tab}"}`}</Typography>
-                    {configuration.submission.profiles[tab].description}
                   </>
                 )}
               </>

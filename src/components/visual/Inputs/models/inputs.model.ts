@@ -2,6 +2,7 @@ import type {
   CircularProgressProps,
   FormControlProps,
   FormHelperTextProps,
+  MenuItemProps,
   SkeletonProps,
   TooltipProps,
   TypographyProps
@@ -15,6 +16,17 @@ import type {
   Validator
 } from 'components/visual/Inputs/utils/inputs.util.validation';
 import type React from 'react';
+
+/**********************************************************************************************************************
+ * Input Models
+ *********************************************************************************************************************/
+export type SelectInputOption = {
+  primary: string;
+  secondary?: string;
+  value: MenuItemProps['value'] | boolean;
+  helpLink?: InputOptions['helpLink'];
+  helpName?: InputOptions['helpName'];
+};
 
 /**********************************************************************************************************************
  * Input Value Model (controlled data + validation behavior)

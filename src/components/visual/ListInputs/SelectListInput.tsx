@@ -1,4 +1,4 @@
-import type { ListItemTextProps, MenuItemProps, SelectProps } from '@mui/material';
+import type { MenuItemProps, SelectProps } from '@mui/material';
 import { ListItemText, MenuItem, Select, useTheme } from '@mui/material';
 import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
 import {
@@ -7,39 +7,38 @@ import {
   ProgressInputAdornment,
   ResetInputAdornment
 } from 'components/visual/Inputs/components/inputs.component.adornment';
-import { InputHelperText, InputListItemText } from 'components/visual/Inputs/components/inputs.component.form';
+import { InputHelperText } from 'components/visual/Inputs/components/inputs.component.form';
 import { useInputBlur, useInputChange, useInputFocus } from 'components/visual/Inputs/hooks/inputs.hook.event_handlers';
 import { useInputId } from 'components/visual/Inputs/hooks/inputs.hook.renderer';
 import { useInputValidation } from 'components/visual/Inputs/hooks/inputs.hook.validation';
-import type { InputRuntimeState, InputValueModel } from 'components/visual/Inputs/models/inputs.model';
+import type {
+  InputRuntimeState,
+  InputValueModel,
+  SelectInputOption
+} from 'components/visual/Inputs/models/inputs.model';
 import {
   ListInputInner,
   ListInputLoading,
   ListInputRoot,
   ListInputText,
-  ListInputWrapper
+  ListInputWrapper,
+  SelectListInputOptionMenuItem
 } from 'components/visual/ListInputs/lib/listinputs.components';
 import type { ListInputOptions, ListInputSlotProps } from 'components/visual/ListInputs/lib/listinputs.model';
 import { DEFAULT_LIST_INPUT_CONTROLLER_PROPS } from 'components/visual/ListInputs/lib/listinputs.model';
 import React from 'react';
 
-export type Option = {
-  primary: ListItemTextProps['primary'];
-  secondary?: ListItemTextProps['secondary'];
-  value: MenuItemProps['value'] | boolean;
-};
-
-export type SelectListInputProps<O extends readonly Option[]> = InputValueModel<O[number]['value']> &
+export type SelectListInputProps<O extends readonly SelectInputOption[]> = InputValueModel<O[number]['value']> &
   ListInputOptions &
   ListInputSlotProps & {
     displayEmpty?: SelectProps['displayEmpty'];
     options?: O;
   };
 
-type SelectListInputController<O extends readonly Option[]> = SelectListInputProps<O> &
+type SelectListInputController<O extends readonly SelectInputOption[]> = SelectListInputProps<O> &
   InputRuntimeState<O[number]['value']>;
 
-const WrappedSelectListInput = <O extends readonly Option[]>() => {
+const WrappedSelectListInput = <O extends readonly SelectInputOption[]>() => {
   const theme = useTheme();
 
   const [get, setStore] = usePropStore<SelectListInputController<O>>();
@@ -154,32 +153,21 @@ const WrappedSelectListInput = <O extends readonly Option[]>() => {
                   }
                 }}
               >
-                {options.map((option, i) => (
+                {options.map(({ primary, secondary, value, helpLink, helpName }, i) => (
                   <MenuItem
                     key={i}
-                    value={option.value as MenuItemProps['value']}
+                    value={value as MenuItemProps['value']}
                     sx={{
                       '&>label': { margin: 0, cursor: 'pointer !important', maxWidth: theme.breakpoints.values.sm },
                       ...(capitalize && { textTransform: 'capitalize' })
                     }}
                   >
-                    <InputListItemText
-                      primary={option.primary ? option.primary : '\u00A0'}
-                      secondary={option.secondary}
-                      slotProps={{
-                        primary: {
-                          overflow: 'auto',
-                          textOverflow: 'initial',
-                          whiteSpace: 'normal',
-                          maxWidth: theme.breakpoints.values.sm
-                        },
-                        secondary: {
-                          overflow: 'auto',
-                          textOverflow: 'initial',
-                          whiteSpace: 'normal',
-                          maxWidth: theme.breakpoints.values.sm
-                        }
-                      }}
+                    <SelectListInputOptionMenuItem
+                      primary={primary}
+                      secondary={secondary}
+                      value={value}
+                      helpLink={helpLink}
+                      helpName={helpName}
                     />
                   </MenuItem>
                 ))}
@@ -194,7 +182,7 @@ const WrappedSelectListInput = <O extends readonly Option[]>() => {
   );
 };
 
-export const SelectListInput = <O extends readonly Option[]>({
+export const SelectListInput = <O extends readonly SelectInputOption[]>({
   preventRender = false,
   value,
   ...props
