@@ -69,9 +69,7 @@ const Param: React.FC<ParamProps> = React.memo(({ param_id, spec_id, service }) 
 
         switch (type) {
           case 'bool':
-            return (
-              <CheckboxInput {...common} value={Boolean(value)} defaultValue={Boolean(defaultValue)} slotProps={null} />
-            );
+            return <CheckboxInput {...common} value={Boolean(value)} defaultValue={Boolean(defaultValue)} />;
 
           case 'int':
             return <NumberInput {...common} value={value as number} defaultValue={defaultValue as number} />;
