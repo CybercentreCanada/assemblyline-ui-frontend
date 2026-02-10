@@ -31,6 +31,7 @@
   "profile.custom": "Analyse personnalisée",
   "profile.custom_desc": "Les paramètres spécifiés sont en dehors de tout profil de soumission géré par le système.",
   "profile.interface": "Interface",
+  "profile.title": "Description du Profile",
   "profiles": "Profils",
   "save.acceptText": "Enregistrer",
   "save.cancelText": "Annuler",

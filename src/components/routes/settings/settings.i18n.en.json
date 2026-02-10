@@ -31,6 +31,7 @@
   "profile.custom": "Custom Analysis",
   "profile.custom_desc": "The parameters specified are outside of any system-managed submission profile.",
   "profile.interface": "Interface",
+  "profile.title": "Profile Description",
   "profiles": "Profiles",
   "save.acceptText": "Save",
   "save.cancelText": "Cancel",

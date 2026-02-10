@@ -192,9 +192,9 @@ export const SubmissionProfileInput = React.memo(() => {
                 : configuration.submission.profiles[profileValue].display_name,
             secondary:
               profileValue === 'default'
-                ? t('profile.option.custom.description')
-                : configuration.submission.profiles[profileValue].description,
-            helpLink: `/settings/${profileValue}`
+                ? t('profile.option.custom.summary')
+                : configuration.submission.profiles[profileValue].summary,
+            ...(profileValue !== 'default' && { helpLink: `/settings/${profileValue}` })
           }) satisfies SelectInputOption
       ),
     [configuration.submission.profiles, settings, t]

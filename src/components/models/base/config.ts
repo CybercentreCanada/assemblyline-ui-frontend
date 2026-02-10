@@ -496,8 +496,11 @@ export type SubmissionProfile = {
   /** Default submission parameters for profile */
   params: SubmissionProfileParams;
 
-  /** A description of the submission profile */
+  /** Detailed description of the submission profile (Markdown supported) */
   description?: string;
+
+  /** Short summary of the submission profile */
+  summary?: string;
 };
 
 /** Options regarding all submissions, regardless of their input method */
