@@ -233,7 +233,6 @@ export const InputButtonLabel = React.memo(
           variant="body2"
           {...formLabelProps}
           sx={{
-            ...formLabelProps?.sx,
             marginLeft: theme.spacing(1),
             textAlign: 'start',
             width: '100%',
@@ -245,7 +244,8 @@ export const InputButtonLabel = React.memo(
                 WebkitTextSecurity: 'disc',
                 MozTextSecurity: 'disc',
                 textSecurity: 'disc'
-              })
+              }),
+            ...formLabelProps?.sx
           }}
         >
           <InputRequiredBadge ignoreRequired={ignoreRequired}>{label}</InputRequiredBadge>
