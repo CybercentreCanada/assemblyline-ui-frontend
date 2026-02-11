@@ -185,7 +185,12 @@ const WrappedWorkflowCreate = ({ id: propID = null, onClose = () => null }: Prop
 
         {c12nDef.enforce && (
           <div style={{ paddingBottom: theme.spacing(2) }}>
-            <Classification type="picker" c12n={!workflow ? null : workflow.classification} />
+            <Classification
+              type="picker"
+              format="long"
+              c12n={!workflow ? null : workflow.classification}
+              setClassification={v => setWorkflow(wf => ({ ...wf, classification: v }))}
+            />
           </div>
         )}
 
