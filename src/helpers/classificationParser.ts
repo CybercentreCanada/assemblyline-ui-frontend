@@ -11,14 +11,14 @@ import type { ClassificationAliases } from 'components/hooks/useMyUser';
  */
 export type FormatProp = 'long' | 'short';
 
-type LevelStylesheet = {
+export type LevelStylesheet = {
   banner?: string;
   label?: string;
   text?: string;
   color?: string;
 };
 
-type ClassificationLevel = {
+export type ClassificationLevel = {
   aliases: string[];
   css: LevelStylesheet;
   description: string;
@@ -28,7 +28,7 @@ type ClassificationLevel = {
   is_hidden?: boolean;
 };
 
-type ClassificationRequired = {
+export type ClassificationRequired = {
   aliases: string[];
   description: string;
   name: string;
@@ -38,7 +38,7 @@ type ClassificationRequired = {
   is_hidden?: boolean;
 };
 
-type ClassificationGroup = {
+export type ClassificationGroup = {
   aliases: string[];
   auto_select?: boolean;
   description: string;
@@ -48,7 +48,7 @@ type ClassificationGroup = {
   is_hidden?: boolean;
 };
 
-type ClassificationSubGroup = {
+export type ClassificationSubGroup = {
   aliases: string[];
   auto_select?: boolean;
   description: string;
@@ -60,7 +60,7 @@ type ClassificationSubGroup = {
   is_hidden?: boolean;
 };
 
-type ClassificationYAMLDefinition = {
+export type ClassificationYAMLDefinition = {
   dynamic_groups: boolean;
   dynamic_groups_type: string;
   enforce: boolean;
