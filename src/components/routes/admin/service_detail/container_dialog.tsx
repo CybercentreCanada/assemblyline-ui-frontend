@@ -479,7 +479,7 @@ const WrappedContainerDialog = ({
                 loading={!tempContainer}
                 value={!tempContainer ? null : tempContainer.cpu_cores}
                 defaultValue={!defaults ? undefined : defaults?.cpu_cores}
-                min={1}
+                min={0}
                 validators={v => v.required().inRange()}
                 coercers={c => c.required().inRange()}
                 reset={showReset(tempContainer, defaults, 'cpu_cores')}
