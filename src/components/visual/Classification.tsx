@@ -1,16 +1,15 @@
 import {
+  alpha,
   Card,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
   Grid,
-  List,
   ListItemButton,
   ListItemText,
   Skeleton,
   styled,
-  Tooltip,
   Typography,
   useMediaQuery,
   useTheme
@@ -18,7 +17,15 @@ import {
 import useALContext from 'components/hooks/useALContext';
 import { Button } from 'components/visual/Buttons/Button';
 import CustomChip, { COLOR_MAP } from 'components/visual/CustomChip';
-import type { FormatProp } from 'helpers/classificationParser';
+import type {
+  ClassificationGroup,
+  ClassificationLevel,
+  ClassificationParts,
+  ClassificationRequired,
+  ClassificationSubGroup,
+  ClassificationValidator,
+  FormatProp
+} from 'helpers/classificationParser';
 import {
   applyAliases,
   applyClassificationRules,
@@ -30,20 +37,21 @@ import {
   normalizedClassification
 } from 'helpers/classificationParser';
 import type { PossibleColor } from 'helpers/colors';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Tooltip } from './Tooltip';
 
 export interface ClassificationProps {
   c12n: string;
-  setClassification?: (classification: string) => void;
-  size?: 'medium' | 'small' | 'tiny';
-  type?: 'picker' | 'pill' | 'outlined' | 'text';
+  disabled?: boolean;
+  dynGroup?: string;
   format?: FormatProp;
+  fullWidth?: boolean;
   inline?: boolean;
   isUser?: boolean;
-  fullWidth?: boolean;
-  dynGroup?: string;
-  disabled?: boolean;
+  size?: 'medium' | 'small' | 'tiny';
+  type?: 'picker' | 'pill' | 'outlined' | 'text';
+  setClassification?: (classification: string) => void;
 }
 
 type ClassificationTextProps = {
@@ -74,293 +82,332 @@ const ClassificationText = styled('span', {
   })()
 }));
 
-function WrappedClassification({
-  c12n = null,
-  format = 'short',
-  inline = false,
-  setClassification = null,
-  size = 'medium',
-  type = 'pill',
-  isUser = false,
-  fullWidth = true,
-  dynGroup = null,
-  disabled = false
-}: ClassificationProps) {
-  const { t } = useTranslation();
-  const theme = useTheme();
-  const { user: currentUser, c12nDef, classificationAliases } = useALContext();
-  const isPhone = useMediaQuery(theme.breakpoints.only('xs'));
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-  const [showPicker, setShowPicker] = useState(false);
-  const [uParts, setUserParts] = useState(defaultParts);
-  const [validated, setValidated] = useState(defaultClassificationValidator);
-  const sp2 = theme.spacing(2);
+export const Classification = React.memo(
+  ({
+    c12n = null,
+    disabled = false,
+    dynGroup = null,
+    format = 'short',
+    fullWidth = true,
+    inline = false,
+    isUser = false,
+    size = 'medium',
+    type = 'pill',
+    setClassification = null
+  }: ClassificationProps) => {
+    const { t } = useTranslation();
+    const theme = useTheme();
+    const { user: currentUser, c12nDef, classificationAliases } = useALContext();
 
-  useEffect(() => {
-    if (c12nDef && c12nDef.enforce && c12n) {
-      const parts = getParts(c12n.toLocaleUpperCase(), c12nDef, format, isMobile);
-      if (type === 'picker') {
-        setUserParts(getParts(currentUser.classification, c12nDef, format, isMobile));
-        setValidated(applyClassificationRules(parts, c12nDef, format, isMobile, isUser));
-      } else {
-        setValidated({
-          disabled: defaultDisabled,
-          parts
-        });
+    const [showPicker, setShowPicker] = useState<boolean>(false);
+    const [uParts, setUserParts] = useState<ClassificationParts>(defaultParts);
+    const [validated, setValidated] = useState<ClassificationValidator>(defaultClassificationValidator);
+
+    const sp2 = theme.spacing(2);
+    const isPhone = useMediaQuery(theme.breakpoints.only('xs'));
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
+    const skelheight = useMemo(
+      () => ({
+        medium: theme.spacing(4),
+        small: theme.spacing(3.5),
+        tiny: theme.spacing(3)
+      }),
+      [theme]
+    );
+
+    const classificationColor = useMemo<PossibleColor>(() => {
+      const levelStyles = c12nDef.levels_styles_map[validated.parts.lvl];
+      if (!levelStyles) {
+        return 'default';
       }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [c12n, currentUser, isMobile, type]);
+      return COLOR_MAP[levelStyles.color || levelStyles.label.replace('label-', '')] || ('default' as const);
+    }, [c12nDef.levels_styles_map, validated.parts.lvl]);
 
-  function toggleGroups(grp) {
-    const newGrp = validated.parts.groups;
+    const classificationLabel = useMemo<string>(
+      () =>
+        c12nDef && c12nDef.enforce && !!validated?.parts?.lvl && c12n
+          ? normalizedClassification(validated.parts, c12nDef, format, isMobile, isUser, classificationAliases)
+          : null,
+      [c12n, c12nDef, classificationAliases, format, isMobile, isUser, validated.parts]
+    );
 
-    if (newGrp.indexOf(grp.name) === -1 && newGrp.indexOf(grp.short_name) === -1) {
-      newGrp.push(format === 'long' && !isMobile ? grp.name : grp.short_name);
-    } else {
-      if (newGrp.indexOf(grp.name) !== -1) {
-        newGrp.splice(newGrp.indexOf(grp.name), 1);
-      } else {
-        newGrp.splice(newGrp.indexOf(grp.short_name), 1);
-      }
-      if (newGrp.length === 1 && !isUser) {
-        const lastGrp = newGrp[0];
-        for (const grpItem of c12nDef.original_definition.groups) {
-          if ((lastGrp === grpItem.name || lastGrp === grpItem.short_name) && grpItem.auto_select) {
-            newGrp.splice(newGrp.indexOf(lastGrp), 1);
+    const classificationTooltip = useMemo<string>(
+      () =>
+        c12nDef && c12nDef.enforce && !!validated?.parts?.lvl && c12n
+          ? normalizedClassification(validated.parts, c12nDef, 'long', isMobile, isUser, classificationAliases)
+          : null,
+      [c12n, c12nDef, classificationAliases, isMobile, isUser, validated.parts]
+    );
+
+    const toggleGroups = useCallback(
+      (grp: Partial<ClassificationGroup>) => {
+        const newGrp = validated.parts.groups;
+
+        if (newGrp.indexOf(grp.name) === -1 && newGrp.indexOf(grp.short_name) === -1) {
+          newGrp.push(format === 'long' && !isMobile ? grp.name : grp.short_name);
+        } else {
+          if (newGrp.indexOf(grp.name) !== -1) {
+            newGrp.splice(newGrp.indexOf(grp.name), 1);
+          } else {
+            newGrp.splice(newGrp.indexOf(grp.short_name), 1);
+          }
+          if (newGrp.length === 1 && !isUser) {
+            const lastGrp = newGrp[0];
+            for (const grpItem of c12nDef.original_definition.groups) {
+              if ((lastGrp === grpItem.name || lastGrp === grpItem.short_name) && grpItem.auto_select) {
+                newGrp.splice(newGrp.indexOf(lastGrp), 1);
+              }
+            }
           }
         }
+
+        setValidated(
+          applyClassificationRules({ ...validated.parts, groups: newGrp }, c12nDef, format, isMobile, isUser)
+        );
+      },
+      [c12nDef, format, isMobile, isUser, validated.parts]
+    );
+
+    const toggleSubGroups = useCallback(
+      (sgrp: Partial<ClassificationSubGroup>) => {
+        const newSGrp = validated.parts.subgroups;
+
+        if (newSGrp.indexOf(sgrp.name) === -1 && newSGrp.indexOf(sgrp.short_name) === -1) {
+          newSGrp.push(format === 'long' && !isMobile ? sgrp.name : sgrp.short_name);
+        } else if (newSGrp.indexOf(sgrp.name) !== -1) {
+          newSGrp.splice(newSGrp.indexOf(sgrp.name), 1);
+        } else {
+          newSGrp.splice(newSGrp.indexOf(sgrp.short_name), 1);
+        }
+
+        setValidated(
+          applyClassificationRules({ ...validated.parts, subgroups: newSGrp }, c12nDef, format, isMobile, isUser)
+        );
+      },
+      [c12nDef, format, isMobile, isUser, validated.parts]
+    );
+
+    const toggleRequired = useCallback(
+      (req: Partial<ClassificationRequired>) => {
+        const newReq = validated.parts.req;
+
+        if (newReq.indexOf(req.name) === -1 && newReq.indexOf(req.short_name) === -1) {
+          newReq.push(format === 'long' && !isMobile ? req.name : req.short_name);
+        } else if (newReq.indexOf(req.name) !== -1) {
+          newReq.splice(newReq.indexOf(req.name), 1);
+        } else {
+          newReq.splice(newReq.indexOf(req.short_name), 1);
+        }
+
+        setValidated(applyClassificationRules({ ...validated.parts, req: newReq }, c12nDef, format, isMobile, isUser));
+      },
+      [c12nDef, format, isMobile, isUser, validated.parts]
+    );
+
+    const selectLevel = useCallback(
+      (lvlIdx: ClassificationLevel['lvl']) => {
+        setValidated(
+          applyClassificationRules(
+            { ...validated.parts, lvlIdx, lvl: getLevelText(lvlIdx, c12nDef, format, isMobile) },
+            c12nDef,
+            format,
+            isMobile,
+            isUser
+          )
+        );
+      },
+      [c12nDef, format, isMobile, isUser, validated.parts]
+    );
+
+    const applyClassification = useCallback(() => {
+      const newC12n = normalizedClassification(validated.parts, c12nDef, format, isMobile, isUser);
+      const originalParts = getParts(c12n.toLocaleUpperCase(), c12nDef, format, isMobile);
+      const originalC12n = normalizedClassification(originalParts, c12nDef, format, isMobile, isUser);
+      if (setClassification && newC12n !== originalC12n) {
+        setClassification(newC12n);
       }
-    }
+      setShowPicker(false);
+    }, [c12n, c12nDef, format, isMobile, isUser, setClassification, validated.parts]);
 
-    setValidated(applyClassificationRules({ ...validated.parts, groups: newGrp }, c12nDef, format, isMobile, isUser));
-  }
+    useEffect(() => {
+      if (c12nDef && c12nDef.enforce && c12n) {
+        const parts = getParts(c12n.toLocaleUpperCase(), c12nDef, format, isMobile);
+        if (type === 'picker') {
+          setUserParts(getParts(currentUser.classification, c12nDef, format, isMobile));
+          setValidated(applyClassificationRules(parts, c12nDef, format, isMobile, isUser));
+        } else {
+          setValidated({
+            disabled: defaultDisabled,
+            parts
+          });
+        }
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [c12n, currentUser, isMobile, type]);
 
-  function toggleSubGroups(sgrp) {
-    const newSGrp = validated.parts.subgroups;
-
-    if (newSGrp.indexOf(sgrp.name) === -1 && newSGrp.indexOf(sgrp.short_name) === -1) {
-      newSGrp.push(format === 'long' && !isMobile ? sgrp.name : sgrp.short_name);
-    } else if (newSGrp.indexOf(sgrp.name) !== -1) {
-      newSGrp.splice(newSGrp.indexOf(sgrp.name), 1);
-    } else {
-      newSGrp.splice(newSGrp.indexOf(sgrp.short_name), 1);
-    }
-
-    setValidated(
-      applyClassificationRules({ ...validated.parts, subgroups: newSGrp }, c12nDef, format, isMobile, isUser)
-    );
-  }
-
-  function toggleRequired(req) {
-    const newReq = validated.parts.req;
-
-    if (newReq.indexOf(req.name) === -1 && newReq.indexOf(req.short_name) === -1) {
-      newReq.push(format === 'long' && !isMobile ? req.name : req.short_name);
-    } else if (newReq.indexOf(req.name) !== -1) {
-      newReq.splice(newReq.indexOf(req.name), 1);
-    } else {
-      newReq.splice(newReq.indexOf(req.short_name), 1);
-    }
-
-    setValidated(applyClassificationRules({ ...validated.parts, req: newReq }, c12nDef, format, isMobile, isUser));
-  }
-
-  function selectLevel(lvlIdx) {
-    setValidated(
-      applyClassificationRules(
-        { ...validated.parts, lvlIdx, lvl: getLevelText(lvlIdx, c12nDef, format, isMobile) },
-        c12nDef,
-        format,
-        isMobile,
-        isUser
-      )
-    );
-  }
-
-  const computeColor = (): PossibleColor => {
-    const levelStyles = c12nDef.levels_styles_map[validated.parts.lvl];
-    if (!levelStyles) {
-      return 'default' as const;
-    }
-    return COLOR_MAP[levelStyles.color || levelStyles.label.replace('label-', '')] || ('default' as const);
-  };
-
-  const skelheight = {
-    medium: theme.spacing(4),
-    small: theme.spacing(3.5),
-    tiny: theme.spacing(3)
-  };
-
-  const useClassification = () => {
-    const newC12n = normalizedClassification(validated.parts, c12nDef, format, isMobile, isUser);
-    const originalParts = getParts(c12n.toLocaleUpperCase(), c12nDef, format, isMobile);
-    const originalC12n = normalizedClassification(originalParts, c12nDef, format, isMobile, isUser);
-    if (setClassification && newC12n !== originalC12n) {
-      setClassification(newC12n);
-    }
-    setShowPicker(false);
-  };
-  // Build chip based on computed values
-  return (
-    c12nDef &&
-    c12nDef.enforce &&
-    (!!validated?.parts?.lvl && c12n ? (
-      <>
-        {type === 'text' ? (
-          <Tooltip
-            title={normalizedClassification(validated.parts, c12nDef, format, isMobile, isUser)}
-            placement="bottom"
-          >
-            <ClassificationText color={computeColor()}>
-              {normalizedClassification(validated.parts, c12nDef, format, isMobile, isUser, classificationAliases)}
-            </ClassificationText>
-          </Tooltip>
-        ) : (
-          <Tooltip
-            title={normalizedClassification(validated.parts, c12nDef, format, isMobile, isUser)}
-            placement="bottom"
-          >
-            <div style={{ display: inline ? 'inline-block' : null }}>
-              <CustomChip
-                type="rounded"
-                variant={type === 'outlined' ? 'outlined' : 'filled'}
-                size={size}
-                color={computeColor()}
-                label={normalizedClassification(
-                  validated.parts,
-                  c12nDef,
-                  format,
-                  isMobile,
-                  isUser,
-                  classificationAliases
-                )}
-                onClick={type === 'picker' ? () => setShowPicker(true) : null}
-                fullWidth={fullWidth}
-                disabled={disabled}
-                sx={{ fontWeight: 500 }}
-              />
-            </div>
-          </Tooltip>
-        )}
-        {type === 'picker' ? (
-          <Dialog
-            fullScreen={isPhone}
-            fullWidth
-            maxWidth={isMobile ? 'xs' : 'md'}
-            open={showPicker}
-            onClose={useClassification}
-          >
-            <DialogTitle>
-              <CustomChip
-                type="rounded"
-                variant="outlined"
-                size={size}
-                color={computeColor()}
-                label={normalizedClassification(
-                  validated.parts,
-                  c12nDef,
-                  format,
-                  isMobile,
-                  isUser,
-                  classificationAliases
-                )}
-                fullWidth={fullWidth}
-                sx={{ fontWeight: 500 }}
-              />
-            </DialogTitle>
-            <DialogContent>
-              <Grid container spacing={2}>
-                <Grid size={{ xs: 12, md: 'grow' }}>
-                  <Typography color="textSecondary" variant="body2">
-                    {t('classification.level')}
-                  </Typography>
-                  <Card variant="outlined">
-                    <List disablePadding style={{ borderRadius: '6px' }}>
+    return (
+      c12nDef &&
+      c12nDef.enforce &&
+      (!!validated?.parts?.lvl && c12n ? (
+        <>
+          {type === 'text' ? (
+            <Tooltip title={classificationTooltip} placement="bottom" noDiv>
+              <ClassificationText color={classificationColor}>{classificationLabel}</ClassificationText>
+            </Tooltip>
+          ) : (
+            <Tooltip title={classificationTooltip} placement="bottom" noDiv>
+              <div style={{ display: inline ? 'inline-block' : null }}>
+                <CustomChip
+                  type="rounded"
+                  variant={type === 'outlined' ? 'outlined' : 'filled'}
+                  size={size}
+                  color={classificationColor}
+                  label={classificationLabel}
+                  onClick={type === 'picker' ? () => setShowPicker(true) : null}
+                  fullWidth={fullWidth}
+                  disabled={disabled}
+                  sx={{ fontWeight: 500 }}
+                />
+              </div>
+            </Tooltip>
+          )}
+          {type === 'picker' ? (
+            <Dialog
+              fullScreen={isPhone}
+              fullWidth
+              maxWidth={isMobile ? 'xs' : 'md'}
+              open={showPicker}
+              onClose={applyClassification}
+            >
+              <DialogTitle>
+                <CustomChip
+                  type="rounded"
+                  variant="outlined"
+                  size={size}
+                  color={classificationColor}
+                  label={classificationLabel}
+                  fullWidth={fullWidth}
+                  sx={{ fontWeight: 500 }}
+                />
+              </DialogTitle>
+              <DialogContent>
+                <Grid container spacing={2}>
+                  <Grid size={{ xs: 12, md: 'grow' }}>
+                    <Typography color="textSecondary" variant="body2">
+                      {t('classification.level')}
+                    </Typography>
+                    <Card variant="outlined">
                       {c12nDef.original_definition.levels.map(
                         (lvl, idx) =>
                           (isUser || (lvl.lvl <= uParts.lvlIdx && !lvl.is_hidden)) && (
-                            <ListItemButton
+                            <Tooltip
                               key={idx}
-                              disabled={
-                                validated.disabled.levels.includes(lvl.name) ||
-                                validated.disabled.levels.includes(lvl.short_name)
-                              }
-                              selected={validated.parts.lvlIdx === lvl.lvl}
-                              onClick={() => selectLevel(lvl.lvl)}
+                              title={c12nDef.description?.[lvl.name]}
+                              placement="bottom"
+                              slotProps={{
+                                popper: { modifiers: [{ name: 'offset', options: { offset: [0, -8] } }] },
+                                tooltip: { sx: { backgroundColor: alpha(theme.palette.Tooltip.bg, 1) } }
+                              }}
                             >
-                              <ListItemText style={{ textAlign: 'center' }} primary={lvl.name} />
-                            </ListItemButton>
+                              <ListItemButton
+                                disabled={
+                                  validated.disabled.levels.includes(lvl.name) ||
+                                  validated.disabled.levels.includes(lvl.short_name)
+                                }
+                                selected={validated.parts.lvlIdx === lvl.lvl}
+                                onClick={() => selectLevel(lvl.lvl)}
+                              >
+                                <ListItemText style={{ textAlign: 'center' }} primary={lvl.name} />
+                              </ListItemButton>
+                            </Tooltip>
                           )
                       )}
-                    </List>
-                  </Card>
-                </Grid>
-                {((isUser && c12nDef.original_definition.required.length !== 0) ||
-                  (uParts.req.length !== 0 &&
-                    c12nDef.original_definition.required.filter(r => !r.is_hidden).length !== 0)) && (
-                  <Grid size={{ xs: 12, md: 'grow' }}>
-                    <Typography color="textSecondary" variant="body2">
-                      {t('classification.required_tokens')}
-                    </Typography>
-                    <Card variant="outlined">
-                      <List disablePadding>
+                    </Card>
+                  </Grid>
+                  {((isUser && c12nDef.original_definition.required.length !== 0) ||
+                    (uParts.req.length !== 0 &&
+                      c12nDef.original_definition.required.filter(r => !r.is_hidden).length !== 0)) && (
+                    <Grid size={{ xs: 12, md: 'grow' }}>
+                      <Typography color="textSecondary" variant="body2">
+                        {t('classification.required_tokens')}
+                      </Typography>
+                      <Card variant="outlined">
                         {c12nDef.original_definition.required.map(
                           (req, idx) =>
                             (isUser ||
                               ([req.name, req.short_name].some(r => uParts.req.includes(r)) && !req.is_hidden)) && (
-                              <ListItemButton
+                              <Tooltip
                                 key={idx}
-                                selected={
-                                  validated.parts.req.includes(req.name) || validated.parts.req.includes(req.short_name)
-                                }
-                                onClick={() => toggleRequired(req)}
+                                title={c12nDef.description?.[req.short_name]}
+                                placement="bottom"
+                                slotProps={{
+                                  popper: { modifiers: [{ name: 'offset', options: { offset: [0, -8] } }] },
+                                  tooltip: { sx: { backgroundColor: alpha(theme.palette.Tooltip.bg, 1) } }
+                                }}
                               >
-                                <ListItemText style={{ textAlign: 'center' }} primary={req.name} />
-                              </ListItemButton>
+                                <ListItemButton
+                                  key={idx}
+                                  selected={
+                                    validated.parts.req.includes(req.name) ||
+                                    validated.parts.req.includes(req.short_name)
+                                  }
+                                  onClick={() => toggleRequired(req)}
+                                >
+                                  <ListItemText style={{ textAlign: 'center' }} primary={req.name} />
+                                </ListItemButton>
+                              </Tooltip>
                             )
                         )}
-                      </List>
-                    </Card>
-                  </Grid>
-                )}
-                {((isUser &&
-                  (c12nDef.original_definition.groups.length !== 0 ||
-                    c12nDef.original_definition.subgroups.length !== 0)) ||
-                  (uParts.groups.length !== 0 &&
-                    c12nDef.original_definition.groups.filter(g => !g.is_hidden).length !== 0) ||
-                  (uParts.subgroups.length !== 0 &&
-                    c12nDef.original_definition.subgroups.filter(sg => !sg.is_hidden).length !== 0)) && (
-                  <Grid size={{ xs: 12, md: 'grow' }}>
-                    {((isUser && (c12nDef.original_definition.groups.length !== 0 || c12nDef.dynamic_groups)) ||
-                      (uParts.groups.length !== 0 &&
-                        c12nDef.original_definition.groups.filter(g => !g.is_hidden).length !== 0)) && (
-                      <div style={{ paddingBottom: sp2 }}>
-                        <Typography color="textSecondary" variant="body2">
-                          {t('classification.groups_releasability')}
-                        </Typography>
-                        <Card variant="outlined">
-                          <List disablePadding>
+                      </Card>
+                    </Grid>
+                  )}
+                  {((isUser &&
+                    (c12nDef.original_definition.groups.length !== 0 ||
+                      c12nDef.original_definition.subgroups.length !== 0)) ||
+                    (uParts.groups.length !== 0 &&
+                      c12nDef.original_definition.groups.filter(g => !g.is_hidden).length !== 0) ||
+                    (uParts.subgroups.length !== 0 &&
+                      c12nDef.original_definition.subgroups.filter(sg => !sg.is_hidden).length !== 0)) && (
+                    <Grid size={{ xs: 12, md: 'grow' }}>
+                      {((isUser && (c12nDef.original_definition.groups.length !== 0 || c12nDef.dynamic_groups)) ||
+                        (uParts.groups.length !== 0 &&
+                          c12nDef.original_definition.groups.filter(g => !g.is_hidden).length !== 0)) && (
+                        <div style={{ paddingBottom: sp2 }}>
+                          <Typography color="textSecondary" variant="body2">
+                            {t('classification.groups_releasability')}
+                          </Typography>
+                          <Card variant="outlined">
                             {c12nDef.original_definition.groups
                               .filter(grp => isUser || !grp.is_hidden)
                               .map((grp, idx) => (
-                                <ListItemButton
+                                <Tooltip
                                   key={idx}
-                                  disabled={
-                                    validated.disabled.groups.includes(grp.name) ||
-                                    validated.disabled.groups.includes(grp.short_name)
-                                  }
-                                  selected={
-                                    validated.parts.groups.includes(grp.name) ||
-                                    validated.parts.groups.includes(grp.short_name)
-                                  }
-                                  onClick={() => toggleGroups(grp)}
+                                  title={grp?.description}
+                                  placement="bottom"
+                                  slotProps={{
+                                    popper: { modifiers: [{ name: 'offset', options: { offset: [0, -8] } }] },
+                                    tooltip: { sx: { backgroundColor: alpha(theme.palette.Tooltip.bg, 1) } }
+                                  }}
                                 >
-                                  <ListItemText
-                                    style={{ textAlign: 'center' }}
-                                    primary={applyAliases(grp.name, classificationAliases, format)}
-                                  />
-                                </ListItemButton>
+                                  <ListItemButton
+                                    key={idx}
+                                    disabled={
+                                      validated.disabled.groups.includes(grp.name) ||
+                                      validated.disabled.groups.includes(grp.short_name)
+                                    }
+                                    selected={
+                                      validated.parts.groups.includes(grp.name) ||
+                                      validated.parts.groups.includes(grp.short_name)
+                                    }
+                                    onClick={() => toggleGroups(grp)}
+                                  >
+                                    <ListItemText
+                                      style={{ textAlign: 'center' }}
+                                      primary={applyAliases(grp.name, classificationAliases, format)}
+                                    />
+                                  </ListItemButton>
+                                </Tooltip>
                               ))}
                             {c12nDef.dynamic_groups &&
                               ['email', 'all'].includes(c12nDef.dynamic_groups_type) &&
@@ -398,87 +445,105 @@ function WrappedClassification({
                                     )
                                 )
                                 .map((group, idx_group) => (
-                                  <ListItemButton
+                                  <Tooltip
                                     key={idx_group}
-                                    disabled={validated.disabled.groups.includes(group)}
-                                    selected={validated.parts.groups.includes(group)}
-                                    onClick={() =>
-                                      toggleGroups({
-                                        name: group,
-                                        short_name: group
-                                      })
-                                    }
+                                    title={c12nDef.description?.[group]}
+                                    placement="bottom"
+                                    slotProps={{
+                                      popper: { modifiers: [{ name: 'offset', options: { offset: [0, -8] } }] },
+                                      tooltip: { sx: { backgroundColor: alpha(theme.palette.Tooltip.bg, 1) } }
+                                    }}
                                   >
-                                    <ListItemText
-                                      style={{ textAlign: 'center' }}
-                                      primary={applyAliases(group, classificationAliases, format)}
-                                    />
-                                  </ListItemButton>
+                                    <ListItemButton
+                                      key={idx_group}
+                                      disabled={validated.disabled.groups.includes(group)}
+                                      selected={validated.parts.groups.includes(group)}
+                                      onClick={() =>
+                                        toggleGroups({
+                                          name: group,
+                                          short_name: group
+                                        })
+                                      }
+                                    >
+                                      <ListItemText
+                                        style={{ textAlign: 'center' }}
+                                        primary={applyAliases(group, classificationAliases, format)}
+                                      />
+                                    </ListItemButton>
+                                  </Tooltip>
                                 ))}
-                          </List>
-                        </Card>
-                      </div>
-                    )}
-                    {((isUser && c12nDef.original_definition.subgroups.length !== 0) ||
-                      (uParts.subgroups.length !== 0 &&
-                        c12nDef.original_definition.subgroups.filter(sg => !sg.is_hidden).length !== 0)) && (
-                      <>
-                        <Typography color="textSecondary" variant="body2">
-                          {t('classification.sub-groups_releasability')}
-                        </Typography>
-                        <Card variant="outlined">
-                          <List disablePadding>
+                          </Card>
+                        </div>
+                      )}
+                      {((isUser && c12nDef.original_definition.subgroups.length !== 0) ||
+                        (uParts.subgroups.length !== 0 &&
+                          c12nDef.original_definition.subgroups.filter(sg => !sg.is_hidden).length !== 0)) && (
+                        <>
+                          <Typography color="textSecondary" variant="body2">
+                            {t('classification.sub-groups_releasability')}
+                          </Typography>
+                          <Card variant="outlined">
                             {c12nDef.original_definition.subgroups
                               .filter(sgrp => isUser || !sgrp.is_hidden)
                               .map((sgrp, idx) => (
-                                <ListItemButton
+                                <Tooltip
                                   key={idx}
-                                  selected={
-                                    validated.parts.subgroups.includes(sgrp.name) ||
-                                    validated.parts.subgroups.includes(sgrp.short_name)
-                                  }
-                                  onClick={() => toggleSubGroups(sgrp)}
+                                  title={sgrp?.description}
+                                  placement="bottom"
+                                  slotProps={{
+                                    popper: { modifiers: [{ name: 'offset', options: { offset: [0, -8] } }] },
+                                    tooltip: { sx: { backgroundColor: alpha(theme.palette.Tooltip.bg, 1) } }
+                                  }}
                                 >
-                                  <ListItemText style={{ textAlign: 'center' }} primary={sgrp.name} />
-                                </ListItemButton>
+                                  <ListItemButton
+                                    key={idx}
+                                    selected={
+                                      validated.parts.subgroups.includes(sgrp.name) ||
+                                      validated.parts.subgroups.includes(sgrp.short_name)
+                                    }
+                                    onClick={() => toggleSubGroups(sgrp)}
+                                  >
+                                    <ListItemText style={{ textAlign: 'center' }} primary={sgrp.name} />
+                                  </ListItemButton>
+                                </Tooltip>
                               ))}
-                          </List>
-                        </Card>
-                      </>
-                    )}
-                  </Grid>
-                )}
-              </Grid>
-            </DialogContent>
-            <DialogActions>
-              <Button
-                color="secondary"
-                to="/help/classification"
-                variant="outlined"
-                onClick={() => setShowPicker(false)}
-              >
-                {t('classification.help')}
-              </Button>
-              <div style={{ flex: 1 }} />
-              <Button autoFocus color="primary" disableElevation variant="contained" onClick={useClassification}>
-                {t('classification.done')}
-              </Button>
-            </DialogActions>
-          </Dialog>
-        ) : null}
-      </>
-    ) : (
-      <Skeleton
-        variant={type === 'text' ? 'text' : 'rectangular'}
-        height={type !== 'text' ? skelheight[size] : null}
-        sx={{
-          borderRadius: theme.spacing(0.5),
-          ...(inline && { display: 'inline-block', width: '8rem', verticalAlign: 'bottom' })
-        }}
-      />
-    ))
-  );
-}
+                          </Card>
+                        </>
+                      )}
+                    </Grid>
+                  )}
+                </Grid>
+              </DialogContent>
+              <DialogActions>
+                <Button
+                  color="secondary"
+                  to="/help/classification"
+                  variant="outlined"
+                  onClick={() => setShowPicker(false)}
+                >
+                  {t('classification.help')}
+                </Button>
+                <div style={{ flex: 1 }} />
+                <Button autoFocus color="primary" disableElevation variant="contained" onClick={applyClassification}>
+                  {t('classification.done')}
+                </Button>
+              </DialogActions>
+            </Dialog>
+          ) : null}
+        </>
+      ) : (
+        <Skeleton
+          variant={type === 'text' ? 'text' : 'rectangular'}
+          height={type !== 'text' ? skelheight[size] : null}
+          sx={{
+            borderRadius: theme.spacing(0.5),
+            ...(inline && { display: 'inline-block', width: '8rem', verticalAlign: 'bottom' })
+          }}
+        />
+      ))
+    );
+  }
+);
 
-const Classification = React.memo(WrappedClassification);
+Classification.displayName = 'Classification';
 export default Classification;

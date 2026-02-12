@@ -198,11 +198,11 @@ export const SelectListInput = <O extends readonly SelectInputOption[]>({
       props={{
         capitalize: false,
         displayEmpty: false,
-        rawValue: value,
         options: [] as unknown as O,
         preventRender,
-        validationStatus,
+        rawValue: value,
         validationMessage,
+        validationStatus,
         value,
         ...props
       }}

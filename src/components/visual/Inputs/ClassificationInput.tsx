@@ -1,11 +1,11 @@
 import {
+  alpha,
   Card,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
   Grid,
-  List,
   ListItemButton,
   ListItemText,
   Typography,
@@ -31,11 +31,8 @@ import {
   InputRoot,
   InputSkeleton
 } from 'components/visual/Inputs/components/inputs.component.form';
-import {
-  useInputCoercingResolver,
-  useInputValidation,
-  useInputValidationResolver
-} from 'components/visual/Inputs/hooks/inputs.hook.validation';
+import { useInputBlur } from 'components/visual/Inputs/hooks/inputs.hook.event_handlers';
+import { useInputValidation } from 'components/visual/Inputs/hooks/inputs.hook.validation';
 import type {
   InputOptions,
   InputRuntimeState,
@@ -43,6 +40,7 @@ import type {
   InputValueModel
 } from 'components/visual/Inputs/models/inputs.model';
 import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/models/inputs.model';
+import { Tooltip } from 'components/visual/Tooltip';
 import type { ClassificationParts, ClassificationValidator } from 'helpers/classificationParser';
 import {
   applyAliases,
@@ -54,7 +52,7 @@ import {
   normalizedClassification
 } from 'helpers/classificationParser';
 import type { PossibleColor } from 'helpers/colors';
-import React, { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export type ClassificationInputProps = Omit<ClassificationProps, 'c12n' | 'setClassification'> &
@@ -91,6 +89,7 @@ const WrappedClassificationInput = () => {
   const monospace = get('monospace');
   const password = get('password');
   const preventRenderStore = get('preventRender');
+  const rawValue = get('rawValue');
   const readOnly = get('readOnly');
   const startAdornment = get('startAdornment');
   const tiny = get('tiny');
@@ -101,10 +100,7 @@ const WrappedClassificationInput = () => {
   const uParts = get('uParts') ?? defaultParts;
   const validated = get('validated') ?? defaultClassificationValidator;
 
-  const resolveCoercing = useInputCoercingResolver<string>();
-  const resolveValidation = useInputValidationResolver<string>();
-
-  const onChange = get('onChange');
+  const handleBlur = useInputBlur<ClassificationProps['c12n']>();
 
   const preventRender = useMemo(
     () => preventRenderStore || !c12nDef?.enforce || !validated?.parts?.lvl,
@@ -220,23 +216,15 @@ const WrappedClassificationInput = () => {
     [c12nDef, format, isMobile, isUser, setStore, validated.parts]
   );
 
-  const handleChange = useCallback(
-    (event: React.SyntheticEvent) => {
-      const newC12n = normalizedClassification(validated.parts, c12nDef, format, isMobile, isUser);
-
-      const { ignore } = resolveCoercing(event, newC12n);
-      const [validationStatus, validationMessage] = resolveValidation(newC12n);
-
-      if (!ignore) onChange(event, newC12n);
-      setStore(() => ({
-        ...(!ignore && { value: newC12n }),
-        rawValue: newC12n,
-        validationStatus,
-        validationMessage,
-        showPicker: false
-      }));
+  const handleClassificationChange = useCallback(
+    event => {
+      const newC12n = normalizedClassification(validated.parts, c12nDef, 'long', isMobile, isUser);
+      const originalParts = getParts(rawValue.toLocaleUpperCase(), c12nDef, 'long', isMobile);
+      const originalC12n = normalizedClassification(originalParts, c12nDef, 'long', isMobile, isUser);
+      handleBlur(event, newC12n, originalC12n);
+      setStore(() => ({ showPicker: false }));
     },
-    [c12nDef, format, isMobile, isUser, onChange, resolveCoercing, resolveValidation, setStore, validated.parts]
+    [c12nDef, handleBlur, isMobile, isUser, rawValue, setStore, validated.parts]
   );
 
   useEffect(() => {
@@ -288,7 +276,7 @@ const WrappedClassificationInput = () => {
               fullWidth
               maxWidth={isMobile ? 'xs' : 'md'}
               open={showPicker}
-              onClose={event => handleChange(event as React.SyntheticEvent)}
+              onClose={handleClassificationChange}
             >
               <DialogTitle>
                 <CustomChip
@@ -308,10 +296,18 @@ const WrappedClassificationInput = () => {
                       {t('classification.level')}
                     </Typography>
                     <Card variant="outlined">
-                      <List disablePadding style={{ borderRadius: '6px' }}>
-                        {c12nDef.original_definition.levels.map(
-                          (lvl, idx) =>
-                            (isUser || (lvl.lvl <= uParts.lvlIdx && !lvl.is_hidden)) && (
+                      {c12nDef.original_definition.levels.map(
+                        (lvl, idx) =>
+                          (isUser || (lvl.lvl <= uParts.lvlIdx && !lvl.is_hidden)) && (
+                            <Tooltip
+                              key={idx}
+                              title={c12nDef.description?.[lvl.name]}
+                              placement="bottom"
+                              slotProps={{
+                                popper: { modifiers: [{ name: 'offset', options: { offset: [0, -8] } }] },
+                                tooltip: { sx: { backgroundColor: alpha(theme.palette.Tooltip.bg, 1) } }
+                              }}
+                            >
                               <ListItemButton
                                 key={idx}
                                 disabled={
@@ -323,9 +319,9 @@ const WrappedClassificationInput = () => {
                               >
                                 <ListItemText style={{ textAlign: 'center' }} primary={lvl.name} />
                               </ListItemButton>
-                            )
-                        )}
-                      </List>
+                            </Tooltip>
+                          )
+                      )}
                     </Card>
                   </Grid>
                   {((isUser && c12nDef.original_definition.required.length !== 0) ||
@@ -336,11 +332,19 @@ const WrappedClassificationInput = () => {
                         {t('classification.required_tokens')}
                       </Typography>
                       <Card variant="outlined">
-                        <List disablePadding>
-                          {c12nDef.original_definition.required.map(
-                            (req, idx) =>
-                              (isUser ||
-                                ([req.name, req.short_name].some(r => uParts.req.includes(r)) && !req.is_hidden)) && (
+                        {c12nDef.original_definition.required.map(
+                          (req, idx) =>
+                            (isUser ||
+                              ([req.name, req.short_name].some(r => uParts.req.includes(r)) && !req.is_hidden)) && (
+                              <Tooltip
+                                key={idx}
+                                title={c12nDef.description?.[req.short_name]}
+                                placement="bottom"
+                                slotProps={{
+                                  popper: { modifiers: [{ name: 'offset', options: { offset: [0, -8] } }] },
+                                  tooltip: { sx: { backgroundColor: alpha(theme.palette.Tooltip.bg, 1) } }
+                                }}
+                              >
                                 <ListItemButton
                                   key={idx}
                                   selected={
@@ -351,9 +355,9 @@ const WrappedClassificationInput = () => {
                                 >
                                   <ListItemText style={{ textAlign: 'center' }} primary={req.name} />
                                 </ListItemButton>
-                              )
-                          )}
-                        </List>
+                              </Tooltip>
+                            )
+                        )}
                       </Card>
                     </Grid>
                   )}
@@ -373,10 +377,18 @@ const WrappedClassificationInput = () => {
                             {t('classification.groups_releasability')}
                           </Typography>
                           <Card variant="outlined">
-                            <List disablePadding>
-                              {c12nDef.original_definition.groups
-                                .filter(grp => isUser || !grp.is_hidden)
-                                .map((grp, idx) => (
+                            {c12nDef.original_definition.groups
+                              .filter(grp => isUser || !grp.is_hidden)
+                              .map((grp, idx) => (
+                                <Tooltip
+                                  key={idx}
+                                  title={grp?.description}
+                                  placement="bottom"
+                                  slotProps={{
+                                    popper: { modifiers: [{ name: 'offset', options: { offset: [0, -8] } }] },
+                                    tooltip: { sx: { backgroundColor: alpha(theme.palette.Tooltip.bg, 1) } }
+                                  }}
+                                >
                                   <ListItemButton
                                     key={idx}
                                     disabled={
@@ -394,43 +406,53 @@ const WrappedClassificationInput = () => {
                                       primary={applyAliases(grp.name, classificationAliases, format)}
                                     />
                                   </ListItemButton>
-                                ))}
-                              {c12nDef.dynamic_groups &&
-                                ['email', 'all'].includes(c12nDef.dynamic_groups_type) &&
-                                currentUser.email && (
-                                  <ListItemButton
-                                    disabled={validated.disabled.groups.includes(dynGroup || currentUser.dynamic_group)}
-                                    selected={validated.parts.groups.includes(dynGroup || currentUser.dynamic_group)}
-                                    onClick={() =>
-                                      handleGroupsChange({
-                                        name: dynGroup || currentUser.dynamic_group,
-                                        short_name: dynGroup || currentUser.dynamic_group
-                                      })
-                                    }
+                                </Tooltip>
+                              ))}
+                            {c12nDef.dynamic_groups &&
+                              ['email', 'all'].includes(c12nDef.dynamic_groups_type) &&
+                              currentUser.email && (
+                                <ListItemButton
+                                  disabled={validated.disabled.groups.includes(dynGroup || currentUser.dynamic_group)}
+                                  selected={validated.parts.groups.includes(dynGroup || currentUser.dynamic_group)}
+                                  onClick={() =>
+                                    handleGroupsChange({
+                                      name: dynGroup || currentUser.dynamic_group,
+                                      short_name: dynGroup || currentUser.dynamic_group
+                                    })
+                                  }
+                                >
+                                  <ListItemText
+                                    style={{ textAlign: 'center' }}
+                                    primary={applyAliases(
+                                      dynGroup || currentUser.dynamic_group,
+                                      classificationAliases,
+                                      format
+                                    )}
+                                  />
+                                </ListItemButton>
+                              )}
+                            {c12nDef.dynamic_groups &&
+                              ['group', 'all'].includes(c12nDef.dynamic_groups_type) &&
+                              currentUser.groups
+                                .filter(
+                                  group =>
+                                    !(
+                                      group in c12nDef.groups_map_lts ||
+                                      group in c12nDef.groups_map_stl ||
+                                      group in c12nDef.subgroups_map_lts ||
+                                      group in c12nDef.subgroups_map_stl
+                                    )
+                                )
+                                .map((group, idx_group) => (
+                                  <Tooltip
+                                    key={idx_group}
+                                    title={c12nDef.description?.[group]}
+                                    placement="bottom"
+                                    slotProps={{
+                                      popper: { modifiers: [{ name: 'offset', options: { offset: [0, -8] } }] },
+                                      tooltip: { sx: { backgroundColor: alpha(theme.palette.Tooltip.bg, 1) } }
+                                    }}
                                   >
-                                    <ListItemText
-                                      style={{ textAlign: 'center' }}
-                                      primary={applyAliases(
-                                        dynGroup || currentUser.dynamic_group,
-                                        classificationAliases,
-                                        format
-                                      )}
-                                    />
-                                  </ListItemButton>
-                                )}
-                              {c12nDef.dynamic_groups &&
-                                ['group', 'all'].includes(c12nDef.dynamic_groups_type) &&
-                                currentUser.groups
-                                  .filter(
-                                    group =>
-                                      !(
-                                        group in c12nDef.groups_map_lts ||
-                                        group in c12nDef.groups_map_stl ||
-                                        group in c12nDef.subgroups_map_lts ||
-                                        group in c12nDef.subgroups_map_stl
-                                      )
-                                  )
-                                  .map((group, idx_group) => (
                                     <ListItemButton
                                       key={idx_group}
                                       disabled={validated.disabled.groups.includes(group)}
@@ -447,8 +469,8 @@ const WrappedClassificationInput = () => {
                                         primary={applyAliases(group, classificationAliases, format)}
                                       />
                                     </ListItemButton>
-                                  ))}
-                            </List>
+                                  </Tooltip>
+                                ))}
                           </Card>
                         </div>
                       )}
@@ -460,10 +482,18 @@ const WrappedClassificationInput = () => {
                             {t('classification.sub-groups_releasability')}
                           </Typography>
                           <Card variant="outlined">
-                            <List disablePadding>
-                              {c12nDef.original_definition.subgroups
-                                .filter(sgrp => isUser || !sgrp.is_hidden)
-                                .map((sgrp, idx) => (
+                            {c12nDef.original_definition.subgroups
+                              .filter(sgrp => isUser || !sgrp.is_hidden)
+                              .map((sgrp, idx) => (
+                                <Tooltip
+                                  key={idx}
+                                  title={sgrp?.description}
+                                  placement="bottom"
+                                  slotProps={{
+                                    popper: { modifiers: [{ name: 'offset', options: { offset: [0, -8] } }] },
+                                    tooltip: { sx: { backgroundColor: alpha(theme.palette.Tooltip.bg, 1) } }
+                                  }}
+                                >
                                   <ListItemButton
                                     key={idx}
                                     selected={
@@ -474,8 +504,8 @@ const WrappedClassificationInput = () => {
                                   >
                                     <ListItemText style={{ textAlign: 'center' }} primary={sgrp.name} />
                                   </ListItemButton>
-                                ))}
-                            </List>
+                                </Tooltip>
+                              ))}
                           </Card>
                         </>
                       )}
@@ -496,7 +526,7 @@ const WrappedClassificationInput = () => {
                   color="primary"
                   disableElevation
                   variant="contained"
-                  onClick={event => handleChange(event)}
+                  onClick={handleClassificationChange}
                 >
                   {t('classification.done')}
                 </Button>
@@ -524,13 +554,13 @@ export const ClassificationInput = ({ preventRender = false, value, ...props }: 
         dynGroup: null,
         format: 'short',
         fullWidth: true,
+        helpLink: '/help/classification',
         inline: false,
         isUser: false,
         preventRender,
         rawValue: value ?? '',
         validationMessage,
         validationStatus,
-        helpLink: '/help/classification',
         value,
         ...props
       }}

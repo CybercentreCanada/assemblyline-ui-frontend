@@ -17,10 +17,11 @@ function createPropStore<Props extends object>(initialProps: Props) {
 
   const get = <K extends keyof Props = keyof Props>(key: K): Props[K] => state[key] ?? initialProps[key];
 
-  const reset = (incoming: Props) => {
-    if (shallowEqual(incoming, prevProps)) return;
-    state = shallowReconcile(incoming, prevProps, state) as Props;
-    prevProps = incoming;
+  const reset = (incoming: Props | ((prev: Props, state: Props) => Props)) => {
+    const incomingProps = typeof incoming === 'function' ? incoming(prevProps, state) : incoming;
+    if (shallowEqual(incomingProps, prevProps)) return;
+    state = shallowReconcile(incomingProps, prevProps, state) as Props;
+    prevProps = incomingProps;
     emit();
   };
 
@@ -50,7 +51,7 @@ const PropContext = createContext<ReturnType<typeof createPropStore<object>> | n
 type PropProviderProps<Props extends object> = {
   children: React.ReactNode;
   initialProps: Props;
-  props: Props;
+  props: Props | ((prev: Props, state: Props) => Props);
 };
 
 const WrappedPropProvider = <Props extends object>({

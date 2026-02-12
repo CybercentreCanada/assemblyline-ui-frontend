@@ -109,9 +109,9 @@ export const CheckboxInput = ({ preventRender = false, value, ...props }: Checkb
       props={{
         indeterminate: false,
         rawValue: value,
-        value,
         validationMessage,
         validationStatus,
+        value,
         ...props
       }}
     >

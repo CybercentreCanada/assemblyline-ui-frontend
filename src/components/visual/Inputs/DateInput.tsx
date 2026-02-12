@@ -266,18 +266,18 @@ export const DateInput = ({ preventRender = false, value, ...props }: DateInputP
         ...(DEFAULT_INPUT_CONTROLLER_PROPS as DateInputController),
         showPopover: false
       }}
-      props={{
+      props={(prev, state) => ({
         autoComplete: 'off',
         defaultDateOffset: null,
-        rawValue: value ? moment(value) : null,
         maxDateToday: false,
         minDateTomorrow: false,
         preventRender,
-        validationStatus,
+        rawValue: value === state?.value ? state?.rawValue : value ? moment(value) : null,
         validationMessage,
+        validationStatus,
         value,
         ...props
-      }}
+      })}
     >
       <WrappedDateInput />
     </PropProvider>

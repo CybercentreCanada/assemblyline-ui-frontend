@@ -6,10 +6,11 @@ import React, { useState } from 'react';
 export type TooltipProps = Omit<MuiTooltipProps, 'title' | 'children'> & {
   children?: React.ReactNode;
   title?: MuiTooltipProps['title'];
+  noDiv?: boolean;
 };
 
 export const Tooltip: React.FC<TooltipProps> = React.memo(
-  ({ children = null, title = null, ...tooltipProps }: TooltipProps) => {
+  ({ children = null, title = null, noDiv = false, ...tooltipProps }: TooltipProps) => {
     const [open, setOpen] = useState<boolean>(false);
 
     return title ? (
@@ -38,7 +39,7 @@ export const Tooltip: React.FC<TooltipProps> = React.memo(
           }
         }}
       >
-        <div>{children}</div>
+        {noDiv ? (children as React.ReactElement<unknown, any>) : <div>{children}</div>}
       </MuiTooltip>
     ) : (
       children

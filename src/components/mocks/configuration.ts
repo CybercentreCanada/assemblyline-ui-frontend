@@ -79,9 +79,23 @@ export const MOCK_CONFIGURATION: Configuration = {
     },
     profiles: {
       static: {
-        description:
-          'Analyze files using static analysis techniques and extract information from the file without executing it, such as metadata, strings, and structural information.',
-        display_name: '[OFFLINE] Static Analysis',
+        display_name: 'Static Analysis [OFFLINE]',
+        summary: 'Quick scan; keep it local',
+        description: `**Summary**
+
+Quick, local-only scan with no execution.
+
+**What it does**
+
+Analyzes files using internal and open-source tools (e.g., YARA, CAPA) to inspect their structure, metadata, and embedded indicators without running any code.
+
+**When to use it**
+- Rapid triage
+- Checking sensitive or proprietary files that must never leave the local network
+
+**Limitations**
+- Low detection rate for packed or heavily obfuscated malware
+- Cannot observe runtime behavior or command-and-control (C2) logic`,
         params: {
           services: {
             excluded: [],
@@ -93,9 +107,23 @@ export const MOCK_CONFIGURATION: Configuration = {
         restricted_params: {}
       },
       static_and_dynamic_with_internet: {
-        description:
-          'Perform comprehensive file analysis using traditional static and dynamic analysis techniques with internet access.',
-        display_name: '[ONLINE] Static + Dynamic Analysis',
+        display_name: 'Static + Dynamic Analysis [ONLINE]',
+        summary: 'Full deep-dive; allow network traffic',
+        description: `**Summary**
+
+Complete analysis with execution and internet access.
+
+**What it does**
+
+Executes files in a sandbox with live internet connectivity to capture command-and-control traffic, network indicators, and runtime behavior, while also leveraging external reputation services.
+
+**When to use it**
+- Deep investigation of unknown or high-risk samples
+- Identifying network IOCs and full malware lifecycle behavior
+
+**Limitations**
+- Privacy and data exposure risk
+- Sample or metadata may be shared with third-party services`,
         params: {
           service_spec: {
             CAPE: {
@@ -123,9 +151,23 @@ export const MOCK_CONFIGURATION: Configuration = {
         restricted_params: {}
       },
       static_with_dynamic: {
-        description:
-          'Analyze files using static analysis techniques along with executing them in a controlled environment to observe their behavior and capture runtime activities, interactions with the system, network communications, and any malicious behavior exhibited by the file during execution.',
-        display_name: '[OFFLINE] Static + Dynamic Analysis',
+        display_name: 'Static + Dynamic Analysis [OFFLINE]',
+        summary: 'See behavior; keep it local',
+        description: `**Summary**
+
+Local sandbox detonation with behavioral visibility.
+
+**What it does**
+
+Combines static analysis with full dynamic execution in a local sandbox to observe process creation, file system changes, registry activity, and system interactions.
+
+**When to use it**
+- Standard malware investigation
+- Understanding what a file does at runtime without risking data leakage to third-party APIs
+
+**Limitations**
+- Malware may evade or delay execution if it detects the sandbox environment
+- Limited visibility into network-based indicators without internet access`,
         params: {
           services: {
             excluded: [],
@@ -137,9 +179,23 @@ export const MOCK_CONFIGURATION: Configuration = {
         restricted_params: {}
       },
       static_with_internet: {
-        description:
-          'Combine traditional static analysis techniques with internet-connected services to gather additional information and context about the file being analyzed.',
-        display_name: '[ONLINE] Static Analysis',
+        display_name: 'Static Analysis [ONLINE]',
+        summary: 'Is this a known threat? (Quick check)',
+        description: `**Summary**
+
+Quick reputation check using global intelligence sources.
+
+**What it does**
+
+Performs metadata and hash lookups against external services (e.g., VirusTotal, Google Threat Intelligence) without executing the file.
+
+**When to use it**
+- Quickly determining whether a file is already known malicious
+- Prioritizing triage based on global reputation
+
+**Limitations**
+- Potential data leakage via hash or metadata queries
+- Unique samples may alert adversaries that analysis is occurring`,
         params: {
           services: {
             excluded: [],
@@ -460,4 +516,8 @@ export const MOCK_CONFIGURATION: Configuration = {
     ],
     types: ['admin', 'user', 'signature_manager', 'signature_importer', 'viewer', 'submitter']
   }
+};
+
+export default {
+  configuration: MOCK_CONFIGURATION
 };

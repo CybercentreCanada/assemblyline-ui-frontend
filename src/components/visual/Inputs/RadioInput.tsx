@@ -132,10 +132,10 @@ export const RadioInput = <O extends readonly Option[]>({
       props={{
         options: [] as unknown as O,
         preventRender,
-        value,
         rawValue: value ?? '',
-        validationStatus,
         validationMessage,
+        validationStatus,
+        value,
         ...props
       }}
     >

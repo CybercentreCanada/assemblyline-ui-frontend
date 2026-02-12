@@ -155,18 +155,18 @@ export const ChipsInput = ({ preventRender = false, value = [], ...props }: Chip
       props={{
         allowEmptyStrings: false,
         autoComplete: 'off',
-        showClearButton: true,
         currentValue: '',
         disableCloseOnSelect: false,
         filterSelectedOptions: false,
-        rawValue: value ?? [],
         isOptionEqualToValue: (option, value) => option === value,
         options: [],
         preventRender,
+        rawValue: value ?? [],
         renderOption: null,
         renderValue: null,
-        validationStatus,
+        showClearButton: true,
         validationMessage,
+        validationStatus,
         value,
         ...props
       }}
