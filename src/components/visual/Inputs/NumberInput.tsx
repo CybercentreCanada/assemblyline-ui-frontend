@@ -108,9 +108,8 @@ export const NumberInput = ({ preventRender = false, value, ...props }: NumberIn
   return preventRender ? null : (
     <PropProvider<NumberInputController>
       initialProps={DEFAULT_INPUT_CONTROLLER_PROPS as NumberInputController}
-      props={{
+      props={prev => ({
         autoComplete: 'off',
-        rawValue: value == null ? '' : String(value),
         max: null,
         min: null,
         preventRender,
@@ -119,8 +118,9 @@ export const NumberInput = ({ preventRender = false, value, ...props }: NumberIn
         validationMessage,
         step: 1,
         value,
+        ...(value !== prev?.value && { rawValue: value == null ? '' : String(value) }),
         ...props
-      }}
+      })}
     >
       <WrappedNumberInput />
     </PropProvider>

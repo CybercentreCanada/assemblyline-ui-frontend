@@ -50,7 +50,7 @@ const PropContext = createContext<ReturnType<typeof createPropStore<object>> | n
 type PropProviderProps<Props extends object> = {
   children: React.ReactNode;
   initialProps: Props;
-  props: Props;
+  props: Props | ((prev: Props) => Props);
 };
 
 const WrappedPropProvider = <Props extends object>({
@@ -62,11 +62,11 @@ const WrappedPropProvider = <Props extends object>({
 
   if (!storeRef.current) {
     storeRef.current = createPropStore(initialProps);
-    storeRef.current.reset(props);
+    storeRef.current.reset(typeof props === 'function' ? props(storeRef.current.getState()) : props);
   }
 
   useEffect(() => {
-    storeRef.current.reset(props);
+    storeRef.current.reset(typeof props === 'function' ? props(storeRef.current.getState()) : props);
   }, [props]);
 
   return <PropContext.Provider value={storeRef.current}>{children}</PropContext.Provider>;
