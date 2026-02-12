@@ -129,17 +129,17 @@ export const NumberListInput = ({ preventRender = false, value, ...props }: Numb
   return preventRender ? null : (
     <PropProvider<NumberListInputController>
       initialProps={DEFAULT_LIST_INPUT_CONTROLLER_PROPS as NumberListInputController}
-      props={prev => ({
+      props={(prev, state) => ({
         autoComplete: 'off',
         max: null,
         min: null,
         preventRender,
+        rawValue: value === state?.value ? state?.rawValue : value == null ? '' : String(value),
         showNumericalSpinner: true,
         step: 1,
         validationMessage,
         validationStatus,
         value,
-        ...(value !== prev?.value && { rawValue: value == null ? '' : String(value) }),
         ...props
       })}
     >

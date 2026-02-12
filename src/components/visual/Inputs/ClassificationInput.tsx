@@ -554,13 +554,13 @@ export const ClassificationInput = ({ preventRender = false, value, ...props }: 
         dynGroup: null,
         format: 'short',
         fullWidth: true,
+        helpLink: '/help/classification',
         inline: false,
         isUser: false,
         preventRender,
         rawValue: value ?? '',
         validationMessage,
         validationStatus,
-        helpLink: '/help/classification',
         value,
         ...props
       }}

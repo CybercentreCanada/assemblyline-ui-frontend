@@ -17,10 +17,11 @@ function createPropStore<Props extends object>(initialProps: Props) {
 
   const get = <K extends keyof Props = keyof Props>(key: K): Props[K] => state[key] ?? initialProps[key];
 
-  const reset = (incoming: Props) => {
-    if (shallowEqual(incoming, prevProps)) return;
-    state = shallowReconcile(incoming, prevProps, state) as Props;
-    prevProps = incoming;
+  const reset = (incoming: Props | ((prev: Props, state: Props) => Props)) => {
+    const incomingProps = typeof incoming === 'function' ? incoming(prevProps, state) : incoming;
+    if (shallowEqual(incomingProps, prevProps)) return;
+    state = shallowReconcile(incomingProps, prevProps, state) as Props;
+    prevProps = incomingProps;
     emit();
   };
 
@@ -50,7 +51,7 @@ const PropContext = createContext<ReturnType<typeof createPropStore<object>> | n
 type PropProviderProps<Props extends object> = {
   children: React.ReactNode;
   initialProps: Props;
-  props: Props | ((prev: Props) => Props);
+  props: Props | ((prev: Props, state: Props) => Props);
 };
 
 const WrappedPropProvider = <Props extends object>({
@@ -62,11 +63,11 @@ const WrappedPropProvider = <Props extends object>({
 
   if (!storeRef.current) {
     storeRef.current = createPropStore(initialProps);
-    storeRef.current.reset(typeof props === 'function' ? props(storeRef.current.getState()) : props);
+    storeRef.current.reset(props);
   }
 
   useEffect(() => {
-    storeRef.current.reset(typeof props === 'function' ? props(storeRef.current.getState()) : props);
+    storeRef.current.reset(props);
   }, [props]);
 
   return <PropContext.Provider value={storeRef.current}>{children}</PropContext.Provider>;
