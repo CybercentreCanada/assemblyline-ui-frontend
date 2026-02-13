@@ -4,7 +4,16 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import OndemandVideoOutlinedIcon from '@mui/icons-material/OndemandVideoOutlined';
 import PageviewOutlinedIcon from '@mui/icons-material/PageviewOutlined';
 import TuneOutlinedIcon from '@mui/icons-material/TuneOutlined';
-import { List, ListItemButton, ListItemIcon, ListItemText, Popover, Tooltip, useTheme } from '@mui/material';
+import {
+  List,
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Link as MuiLink,
+  Popover,
+  Tooltip,
+  useTheme
+} from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
@@ -78,11 +87,11 @@ export const ExtractedFile: React.FC<ExtractedFileProps> = React.memo(({ file, d
       <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', wordBreak: 'break-word' }}>
         <div style={{ marginRight: theme.spacing(1) }}>
           {download ? (
-            <Link
-              to={`/api/v4/file/download/${file.sha256}/?${sid ? `sid=${sid}&` : ''}name=${encodeURIComponent(file.name)}`}
+            <MuiLink
+              href={`/api/v4/file/download/${file.sha256}/?${sid ? `sid=${sid}&` : ''}name=${encodeURIComponent(file.name)}`}
             >
               {file.name}
-            </Link>
+            </MuiLink>
           ) : (
             <Link
               to={
