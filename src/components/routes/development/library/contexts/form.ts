@@ -1,4 +1,8 @@
 import { createFormContext } from 'components/core/form/createFormContext';
+import {
+  ACTIONABLE_LIBRARY_STATE,
+  type ActionableLibraryState
+} from 'components/routes/development/library/sections/Actionable';
 import type { DateTimeLibraryState } from 'components/routes/development/library/sections/DateTime';
 import { DATETIME_LIBRARY_STATE } from 'components/routes/development/library/sections/DateTime';
 import { INPUTS_LIBRARY_STATE, type InputsLibraryState } from 'components/routes/development/library/sections/Inputs';
@@ -9,7 +13,8 @@ import {
   type ListInputsLibraryState
 } from 'components/routes/development/library/sections/ListInputs';
 
-type LibraryComponents = DateTimeLibraryState &
+type LibraryComponents = ActionableLibraryState &
+  DateTimeLibraryState &
   InputsLibraryState &
   LayoutLibraryState &
   ListInputsLibraryState &
@@ -27,6 +32,7 @@ const LIBRARY_FORM_STORE: LibraryFormStore = Object.freeze({
     tab: null
   },
   components: {
+    ...ACTIONABLE_LIBRARY_STATE,
     ...DATETIME_LIBRARY_STATE,
     ...INPUTS_LIBRARY_STATE,
     ...LAYOUT_LIBRARY_STATE,
