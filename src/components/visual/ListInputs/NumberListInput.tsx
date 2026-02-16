@@ -89,9 +89,10 @@ const WrappedNumberListInput = React.memo(() => {
                 ref={inputRef}
                 type="number"
                 value={rawValue}
+                onBlur={e => handleBlur(e, toRawValue(value), rawValue, toValue, toRawValue)}
                 onChange={e => handleChange(e, e.target.value, rawValue, toValue)}
                 onFocus={handleFocus}
-                onBlur={e => handleBlur(e, toRawValue(value), rawValue, toValue, toRawValue)}
+                onInvalid={e => e.preventDefault()}
                 sx={{
                   maxWidth: width,
                   minWidth: width,

@@ -81,6 +81,7 @@ const WrappedNumberInput = () => {
               onChange={e => handleChange(e, e.target.value, rawValue, toValue)}
               onFocus={handleFocus}
               onBlur={e => handleBlur(e, toRawValue(value), rawValue, toValue, toRawValue)}
+              onInvalid={e => e.preventDefault()}
               slotProps={{
                 input: {
                   inputProps: {
