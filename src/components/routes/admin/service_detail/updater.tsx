@@ -105,6 +105,7 @@ const ServiceUpdater = ({ service, defaults, setService, setModified }: ServiceU
           reset={showReset(service.update_config, defaults.update_config, 'update_interval_seconds')}
           min={3600}
           max={86400}
+          step={1}
           valueLabelDisplay="off"
           marks={[
             { value: 3600, label: '1h' },
@@ -135,7 +136,8 @@ const ServiceUpdater = ({ service, defaults, setService, setModified }: ServiceU
           endAdornment="sec"
           min={60}
           max={86400}
-          required
+          validators={v => v.required().inRange().isInteger()}
+          coercers={c => c.required().inRange().floor()}
           onChange={(e, v) => {
             if (service?.update_config?.update_interval_seconds !== v) setModified(true);
             setService({

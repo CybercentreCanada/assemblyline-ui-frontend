@@ -23,6 +23,7 @@ import type { SwitchInputProps } from 'components/visual/Inputs/SwitchInput';
 import { SwitchInput } from 'components/visual/Inputs/SwitchInput';
 import type { TextInputProps } from 'components/visual/Inputs/TextInput';
 import { TextInput } from 'components/visual/Inputs/TextInput';
+import type { Validator } from 'components/visual/Inputs/utils/inputs.util.validation';
 import MonacoEditor from 'components/visual/MonacoEditor';
 import { isURL } from 'helpers/utils';
 import _ from 'lodash';
@@ -73,14 +74,14 @@ export const MetadataParam: React.FC<MetadataParamProps> = React.memo(
       }
     }, [validatorParams, validatorType]);
 
-    const handleValid = useCallback(
-      (value: unknown): string | null => {
-        if (!value) return metadata.required ? t('required') : null;
+    const handleValidate = useCallback<Validator<unknown>>(
+      value => {
+        if (!value) return metadata.required ? { status: 'error', message: t('required') } : null;
         const strValue = safeString(value);
-        if (validatorType === 'uri') return isURL(strValue) ? null : t('invalid_url');
+        if (validatorType === 'uri') return isURL(strValue) ? null : { status: 'error', message: t('invalid_url') };
         if (validatorType === 'regex') {
-          if (!compiledRegex) return t('invalid_regex');
-          return compiledRegex.test(strValue) ? null : t('invalid_regex');
+          if (!compiledRegex) return { status: 'error', message: t('invalid_regex') };
+          return compiledRegex.test(strValue) ? null : { status: 'error', message: t('invalid_regex') };
         }
         return null;
       },
@@ -180,9 +181,9 @@ export const MetadataParam: React.FC<MetadataParamProps> = React.memo(
                   value={safeString(val)}
                   options={options}
                   reset={!!val}
-                  error={handleValid}
+                  validate={handleValidate}
                   tooltip={safeString(validatorParams?.validation_regex)}
-                  tooltipProps={{ placement: 'right' }}
+                  slotProps={{ formLabelTooltip: { placement: 'right' } }}
                 />
               );
             default:
@@ -192,7 +193,7 @@ export const MetadataParam: React.FC<MetadataParamProps> = React.memo(
                   value={safeString(val)}
                   options={options}
                   reset={!!val}
-                  error={handleValid}
+                  validate={handleValidate}
                 />
               );
           }

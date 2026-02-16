@@ -2,37 +2,51 @@ import type { ThemeObject } from '@microlink/react-json-view';
 import ReactJson from '@microlink/react-json-view';
 import { useTheme } from '@mui/material';
 import { useAppTheme } from 'commons/components/app/hooks';
+import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
 import {
-  HelperText,
-  PasswordAdornment,
-  ResetAdornment,
-  StyledEndAdornmentBox,
-  StyledFormControl,
-  StyledFormLabel,
-  StyledInputSkeleton,
-  StyledRoot
-} from 'components/visual/Inputs/lib/inputs.components';
-import { useErrorCallback, useInputChange } from 'components/visual/Inputs/lib/inputs.hook';
-import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
-import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
+  HelpInputAdornment,
+  InputEndAdornment,
+  PasswordInputAdornment,
+  ProgressInputAdornment,
+  ResetInputAdornment
+} from 'components/visual/Inputs/components/inputs.component.adornment';
+import {
+  InputFormControl,
+  InputFormLabel,
+  InputHelperText,
+  InputRoot,
+  InputSkeleton
+} from 'components/visual/Inputs/components/inputs.component.form';
+import { useInputChange } from 'components/visual/Inputs/hooks/inputs.hook.event_handlers';
+import { useInputValidation } from 'components/visual/Inputs/hooks/inputs.hook.validation';
+import type {
+  InputOptions,
+  InputRuntimeState,
+  InputSlotProps,
+  InputValueModel
+} from 'components/visual/Inputs/models/inputs.model';
+import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/models/inputs.model';
 import React, { useMemo } from 'react';
 
-export type JSONInputProps = InputValues<object> & InputProps;
+export type JSONInputProps = InputValueModel<object> & InputOptions & InputSlotProps;
+
+type JSONInputController = JSONInputProps & InputRuntimeState<object>;
 
 const WrappedJSONInput = () => {
   const theme = useTheme();
   const { isDark: isDarkTheme } = useAppTheme();
-  const [get] = usePropStore<JSONInputProps>();
+  const [get] = usePropStore<JSONInputController>();
 
   const disabled = get('disabled');
-  const errorMessage = get('errorMessage');
-  const inputValue = get('inputValue') ?? null;
+  const endAdornment = get('endAdornment');
+  const isPasswordVisible = get('isPasswordVisible');
   const loading = get('loading');
   const monospace = get('monospace');
   const password = get('password');
+  const rawValue = get('rawValue');
   const readOnly = get('readOnly');
-  const showPassword = get('showPassword');
   const tiny = get('tiny');
+  const validationStatus = get('validationStatus');
 
   const jsonTheme = useMemo<ThemeObject>(
     () => ({
@@ -56,23 +70,38 @@ const WrappedJSONInput = () => {
     [theme, isDarkTheme]
   );
 
-  const handleChange = useInputChange<JSONInputProps>();
+  const color = (() => {
+    switch (validationStatus) {
+      case 'error':
+        return theme.palette.error.main;
+      case 'warning':
+        return theme.palette.warning.main;
+      case 'success':
+        return theme.palette.success.main;
+      case 'info':
+        return theme.palette.info.main;
+      case 'default':
+      default:
+        return theme.palette.divider;
+    }
+  })();
+
+  const handleChange = useInputChange<object>();
 
   return (
-    <StyledRoot>
-      <StyledFormLabel />
-      <StyledFormControl>
+    <InputRoot>
+      <InputFormLabel />
+      <InputFormControl>
         {loading ? (
-          <StyledInputSkeleton />
+          <InputSkeleton />
         ) : (
           <>
             <div
               style={{
                 display: 'flex',
                 alignItems: 'flex-start',
-                border: `1px solid ${theme.palette.divider}`,
-                borderRadius: '4px',
-                ...(errorMessage && { border: `1px solid ${theme.palette.error.main}` })
+                border: `1px solid ${color}`,
+                borderRadius: '4px'
               }}
             >
               <ReactJson
@@ -82,24 +111,21 @@ const WrappedJSONInput = () => {
                 groupArraysAfterLength={10}
                 displayDataTypes={false}
                 displayObjectSize={false}
-                src={inputValue}
+                src={rawValue}
                 onAdd={
                   disabled || readOnly
                     ? false
-                    : event =>
-                        handleChange(event as unknown as React.SyntheticEvent, event.updated_src, event.updated_src)
+                    : event => handleChange(event as unknown as React.SyntheticEvent, event.updated_src, rawValue)
                 }
                 onDelete={
                   disabled || readOnly
                     ? false
-                    : event =>
-                        handleChange(event as unknown as React.SyntheticEvent, event.updated_src, event.updated_src)
+                    : event => handleChange(event as unknown as React.SyntheticEvent, event.updated_src, rawValue)
                 }
                 onEdit={
                   disabled || readOnly
                     ? false
-                    : event =>
-                        handleChange(event as unknown as React.SyntheticEvent, event.updated_src, event.updated_src)
+                    : event => handleChange(event as unknown as React.SyntheticEvent, event.updated_src, rawValue)
                 }
                 style={{
                   fontSize: '1rem',
@@ -109,7 +135,7 @@ const WrappedJSONInput = () => {
                   ...(monospace && { fontFamily: 'monospace' }),
                   ...(!tiny ? { minHeight: theme.spacing(5) } : { paddingTop: '2px', paddingBottom: '2px' }),
                   ...(password &&
-                    showPassword && {
+                    isPasswordVisible && {
                       fontFamily: 'password',
                       WebkitTextSecurity: 'disc',
                       MozTextSecurity: 'disc',
@@ -117,24 +143,33 @@ const WrappedJSONInput = () => {
                     })
                 }}
               />
-              <StyledEndAdornmentBox>
-                <PasswordAdornment />
-                <ResetAdornment />
-              </StyledEndAdornmentBox>
+              <InputEndAdornment>
+                {endAdornment}
+                <HelpInputAdornment />
+                <PasswordInputAdornment />
+                <ProgressInputAdornment />
+                <ResetInputAdornment />
+              </InputEndAdornment>
             </div>
-            <HelperText />
+            <InputHelperText />
           </>
         )}
-      </StyledFormControl>
-    </StyledRoot>
+      </InputFormControl>
+    </InputRoot>
   );
 };
 
 export const JSONInput = ({ preventRender = false, value, ...props }: JSONInputProps) => {
-  const errorMessage = useErrorCallback({ preventRender, value, ...props });
+  const { status: validationStatus, message: validationMessage } = useInputValidation<object>({
+    value: value ?? null,
+    ...props
+  });
 
   return preventRender ? null : (
-    <PropProvider<JSONInputProps> props={{ preventRender, inputValue: value, value, errorMessage, ...props }}>
+    <PropProvider<JSONInputController>
+      initialProps={DEFAULT_INPUT_CONTROLLER_PROPS as JSONInputController}
+      props={{ preventRender, rawValue: value ?? null, value, validationStatus, validationMessage, ...props }}
+    >
       <WrappedJSONInput />
     </PropProvider>
   );

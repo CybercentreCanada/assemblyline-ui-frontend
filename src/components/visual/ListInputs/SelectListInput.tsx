@@ -1,96 +1,99 @@
-import type { ListItemTextProps, MenuItemProps, SelectProps } from '@mui/material';
+import type { MenuItemProps, SelectProps } from '@mui/material';
 import { ListItemText, MenuItem, Select, useTheme } from '@mui/material';
+import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
 import {
-  StyledHelperText,
-  StyledListInputInner,
-  StyledListInputLoading,
-  StyledListInputText,
-  StyledListInputWrapper,
-  StyledListItemRoot,
-  StyledListItemText,
-  StyledPasswordAdornment,
-  StyledResetAdornment
+  HelpInputAdornment,
+  PasswordInputAdornment,
+  ProgressInputAdornment,
+  ResetInputAdornment
+} from 'components/visual/Inputs/components/inputs.component.adornment';
+import { InputHelperText } from 'components/visual/Inputs/components/inputs.component.form';
+import { useInputBlur, useInputChange, useInputFocus } from 'components/visual/Inputs/hooks/inputs.hook.event_handlers';
+import { useInputId } from 'components/visual/Inputs/hooks/inputs.hook.renderer';
+import { useInputValidation } from 'components/visual/Inputs/hooks/inputs.hook.validation';
+import type {
+  InputRuntimeState,
+  InputValueModel,
+  SelectInputOption
+} from 'components/visual/Inputs/models/inputs.model';
+import {
+  ListInputInner,
+  ListInputLoading,
+  ListInputRoot,
+  ListInputText,
+  ListInputWrapper,
+  SelectListInputOptionMenuItem
 } from 'components/visual/ListInputs/lib/listinputs.components';
-import {
-  useErrorCallback,
-  useInputBlur,
-  useInputChange,
-  useInputFocus,
-  usePropID
-} from 'components/visual/ListInputs/lib/listinputs.hook';
-import type { ListInputProps, ListInputValues } from 'components/visual/ListInputs/lib/listinputs.model';
-import { PropProvider, usePropStore } from 'components/visual/ListInputs/lib/listinputs.provider';
+import type { ListInputOptions, ListInputSlotProps } from 'components/visual/ListInputs/lib/listinputs.model';
+import { DEFAULT_LIST_INPUT_CONTROLLER_PROPS } from 'components/visual/ListInputs/lib/listinputs.model';
 import React from 'react';
 
-export type Option = {
-  primary: ListItemTextProps['primary'];
-  secondary?: ListItemTextProps['secondary'];
-  value: MenuItemProps['value'] | boolean;
-};
-
-export type SelectListInputProps<O extends readonly Option[]> = ListInputValues<
-  O[number]['value'],
-  O[number]['value']
-> &
-  ListInputProps & {
+export type SelectListInputProps<O extends readonly SelectInputOption[]> = InputValueModel<O[number]['value']> &
+  ListInputOptions &
+  ListInputSlotProps & {
     displayEmpty?: SelectProps['displayEmpty'];
     options?: O;
   };
 
-const WrappedSelectListInput = <O extends readonly Option[]>() => {
+type SelectListInputController<O extends readonly SelectInputOption[]> = SelectListInputProps<O> &
+  InputRuntimeState<O[number]['value']>;
+
+const WrappedSelectListInput = <O extends readonly SelectInputOption[]>() => {
   const theme = useTheme();
 
-  const [get, setStore] = usePropStore<SelectListInputProps<O>>();
+  const [get, setStore] = usePropStore<SelectListInputController<O>>();
 
   const capitalize = get('capitalize');
   const disabled = get('disabled');
   const displayEmpty = get('displayEmpty');
-  const errorMessage = get('errorMessage');
-  const id = usePropID();
-  const inputValue = get('inputValue');
+  const id = useInputId();
+  const isMenuOpen = get('isMenuOpen');
+  const isPasswordVisible = get('isPasswordVisible');
   const loading = get('loading');
   const monospace = get('monospace');
   const options = get('options');
   const overflowHidden = get('overflowHidden');
   const password = get('password');
+  const rawValue = get('rawValue');
   const readOnly = get('readOnly');
-  const showMenu = get('showMenu');
-  const showPassword = get('showPassword');
   const tiny = get('tiny');
+  const validationStatus = get('validationStatus');
   const value = get('value');
   const width = get('width');
 
-  const handleBlur = useInputBlur<SelectListInputProps<O>>();
-  const handleChange = useInputChange<SelectListInputProps<O>>();
-  const handleFocus = useInputFocus<SelectListInputProps<O>>();
+  const handleBlur = useInputBlur<O[number]['value']>();
+  const handleChange = useInputChange<O[number]['value']>();
+  const handleFocus = useInputFocus<O[number]['value']>();
 
   return (
-    <StyledListItemRoot>
-      <StyledListInputWrapper>
-        <StyledListInputInner>
-          <StyledListInputText />
+    <ListInputRoot>
+      <ListInputWrapper>
+        <ListInputInner>
+          <ListInputText />
 
           {loading ? (
-            <StyledListInputLoading />
+            <ListInputLoading />
           ) : (
             <>
-              <StyledPasswordAdornment />
-              <StyledResetAdornment />
+              <HelpInputAdornment />
+              <PasswordInputAdornment />
+              <ProgressInputAdornment />
+              <ResetInputAdornment />
               <Select
                 disabled={disabled}
                 displayEmpty={displayEmpty}
-                error={!!errorMessage}
+                error={validationStatus === 'error'}
                 fullWidth
                 id={id}
                 readOnly={readOnly}
                 size="small"
-                open={showMenu}
-                value={options?.some(o => o.value === inputValue) ? inputValue : ''}
-                onChange={event => handleChange(event as React.SyntheticEvent, event.target.value, event.target.value)}
+                open={isMenuOpen}
+                value={options?.some(o => o.value === rawValue) ? rawValue : ''}
+                onChange={event => handleChange(event as React.SyntheticEvent, event.target.value, rawValue)}
                 onFocus={handleFocus}
-                onBlur={e => handleBlur(e, value, value)}
-                onClose={() => setStore({ showMenu: false })}
-                onOpen={() => setStore({ showMenu: true })}
+                onBlur={e => handleBlur(e, value, rawValue)}
+                onClose={() => setStore({ isMenuOpen: false })}
+                onOpen={() => setStore({ isMenuOpen: true })}
                 renderValue={option => (
                   <ListItemText
                     primary={options?.find(o => o.value === option)?.primary || ''}
@@ -125,7 +128,7 @@ const WrappedSelectListInput = <O extends readonly Option[]>() => {
                           ...(readOnly && { cursor: 'default', userSelect: 'text' }),
                           ...(monospace && { fontFamily: 'monospace' }),
                           ...(password &&
-                            showPassword && {
+                            isPasswordVisible && {
                               fontFamily: 'password',
                               WebkitTextSecurity: 'disc',
                               MozTextSecurity: 'disc',
@@ -150,63 +153,56 @@ const WrappedSelectListInput = <O extends readonly Option[]>() => {
                   }
                 }}
               >
-                {options.map((option, i) => (
+                {options.map(({ primary, secondary, value, helpLink, helpName }, i) => (
                   <MenuItem
                     key={i}
-                    value={option.value as MenuItemProps['value']}
+                    value={value as MenuItemProps['value']}
                     sx={{
                       '&>label': { margin: 0, cursor: 'pointer !important', maxWidth: theme.breakpoints.values.sm },
                       ...(capitalize && { textTransform: 'capitalize' })
                     }}
                   >
-                    <StyledListItemText
-                      primary={option.primary ? option.primary : '\u00A0'}
-                      secondary={option.secondary}
-                      slotProps={{
-                        primary: {
-                          overflow: 'auto',
-                          textOverflow: 'initial',
-                          whiteSpace: 'normal',
-                          maxWidth: theme.breakpoints.values.sm
-                        },
-                        secondary: {
-                          overflow: 'auto',
-                          textOverflow: 'initial',
-                          whiteSpace: 'normal',
-                          maxWidth: theme.breakpoints.values.sm
-                        }
-                      }}
+                    <SelectListInputOptionMenuItem
+                      primary={primary}
+                      secondary={secondary}
+                      value={value}
+                      helpLink={helpLink}
+                      helpName={helpName}
                     />
                   </MenuItem>
                 ))}
               </Select>
             </>
           )}
-        </StyledListInputInner>
+        </ListInputInner>
 
-        <StyledHelperText />
-      </StyledListInputWrapper>
-    </StyledListItemRoot>
+        <InputHelperText sx={{ width: '100%', justifyContent: 'flex-end', margin: 0 }} />
+      </ListInputWrapper>
+    </ListInputRoot>
   );
 };
 
-export const SelectListInput = <O extends readonly Option[]>({
+export const SelectListInput = <O extends readonly SelectInputOption[]>({
   preventRender = false,
   value,
   ...props
 }: SelectListInputProps<O>) => {
-  const errorMessage = useErrorCallback({ preventRender, value, ...props });
+  const { status: validationStatus, message: validationMessage } = useInputValidation<O[number]['value']>({
+    value: value ?? '',
+    ...props
+  });
 
   return preventRender ? null : (
-    <PropProvider<SelectListInputProps<O>>
+    <PropProvider<SelectListInputController<O>>
+      initialProps={DEFAULT_LIST_INPUT_CONTROLLER_PROPS as SelectListInputController<O>}
       props={{
         capitalize: false,
         displayEmpty: false,
-        errorMessage,
-        inputValue: value,
         options: [] as unknown as O,
-        overflowHidden: true,
         preventRender,
+        rawValue: value,
+        validationMessage,
+        validationStatus,
         value,
         ...props
       }}

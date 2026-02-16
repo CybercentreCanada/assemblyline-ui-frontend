@@ -53,6 +53,7 @@ const Parameter = React.memo(({ customize, disabled, loading, param_id, spec_id 
                 reset={defaultValue !== null && value !== defaultValue}
                 value={value as string}
                 defaultValue={defaultValue as string}
+                overflowHidden
                 onChange={(event, v) => handleChange(v)}
               />
             );
@@ -68,6 +69,7 @@ const Parameter = React.memo(({ customize, disabled, loading, param_id, spec_id 
                 reset={defaultValue !== null && value !== defaultValue}
                 value={value as number}
                 defaultValue={defaultValue as number}
+                overflowHidden
                 onChange={(event, v) => handleChange(v)}
                 onBlur={() => {
                   if (value === null) {
@@ -91,6 +93,7 @@ const Parameter = React.memo(({ customize, disabled, loading, param_id, spec_id 
                 disabled={disabled || (!customize && restricted)}
                 loading={loading}
                 reset={defaultValue !== null && value !== defaultValue}
+                overflowHidden
                 value={value as boolean}
                 defaultValue={defaultValue as boolean}
                 onChange={(event, v) => handleChange(v)}
@@ -108,6 +111,7 @@ const Parameter = React.memo(({ customize, disabled, loading, param_id, spec_id 
                 reset={defaultValue !== null && value !== defaultValue}
                 value={value as string}
                 defaultValue={defaultValue as string}
+                overflowHidden
                 options={(Array.isArray(list) ? list : []).map(item => ({
                   value: item,
                   primary: item.replaceAll('_', ' ')
@@ -123,6 +127,7 @@ const Parameter = React.memo(({ customize, disabled, loading, param_id, spec_id 
     />
   );
 });
+
 Parameter.displayName = 'Parameter';
 
 type ServiceProps = {
@@ -164,13 +169,14 @@ const Service = React.memo(({ cat_id, svr_id, customize, disabled, loading }: Se
           <ListHeader
             id={`${category}-${name}`}
             primary={name}
-            primaryProps={{ className: 'Anchor' }}
             secondary={description}
             checked={selected}
             anchor
+            overflowHidden
             reset={defaultValue !== null && selected !== defaultValue}
             onChange={!customize && restricted ? undefined : () => handleChange(!selected)}
             onReset={!customize && restricted ? undefined : () => handleChange(defaultValue)}
+            slotProps={{ primary: { className: 'Anchor' } }}
           />
         )}
       />
@@ -213,6 +219,7 @@ const Service = React.memo(({ cat_id, svr_id, customize, disabled, loading }: Se
     </div>
   );
 });
+
 Service.displayName = 'Service';
 
 type CategoryProps = {
@@ -260,14 +267,15 @@ const Category = React.memo(
               id={name}
               anchorProps={{ subheader: true }}
               primary={name}
-              primaryProps={{ color: theme.palette.text.secondary }}
               checked={selected}
               indeterminate={indeterminate}
               divider
               anchor
+              overflowHidden
               reset={defaultValue !== null && selected !== defaultValue}
               onChange={!customize && restricted ? undefined : () => handleChange(!selected)}
               onReset={!customize && restricted ? undefined : () => handleChange(defaultValue)}
+              slotProps={{ primary: { color: theme.palette.text.secondary } }}
             />
           )}
         />
@@ -291,6 +299,7 @@ const Category = React.memo(
     );
   }
 );
+
 Category.displayName = 'Category';
 
 export const ServicesSection = React.memo(() => {
@@ -333,4 +342,5 @@ export const ServicesSection = React.memo(() => {
     />
   );
 });
+
 ServicesSection.displayName = 'ServicesSection';

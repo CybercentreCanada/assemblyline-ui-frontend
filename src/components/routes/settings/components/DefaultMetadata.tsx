@@ -39,7 +39,7 @@ export const DefaultMetadataSection = React.memo(() => {
         }}
       >
         {Object.entries(metadata).map(([key, value]) => (
-          <TextListInput key={key} id={key} primary={key} value={value} disabled />
+          <TextListInput key={key} id={key} primary={key} value={value} disabled overflowHidden />
         ))}
       </List>
     </div>

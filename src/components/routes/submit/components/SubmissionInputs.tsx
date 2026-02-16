@@ -37,6 +37,7 @@ import { Button } from 'components/visual/Buttons/Button';
 import { IconButton } from 'components/visual/Buttons/IconButton';
 import Classification from 'components/visual/Classification';
 import { CheckboxInput } from 'components/visual/Inputs/CheckboxInput';
+import type { SelectInputOption } from 'components/visual/Inputs/models/inputs.model';
 import { SelectInput } from 'components/visual/Inputs/SelectInput';
 import { SwitchInput } from 'components/visual/Inputs/SwitchInput';
 import { TextInput } from 'components/visual/Inputs/TextInput';
@@ -181,17 +182,24 @@ export const SubmissionProfileInput = React.memo(() => {
 
   const options = useMemo(
     () =>
-      getProfileNames(settings).map(profileValue => ({
-        value: profileValue,
-        primary:
-          profileValue === 'default'
-            ? t('profile.option.custom.label')
-            : configuration.submission.profiles[profileValue].display_name,
-        secondary:
-          profileValue === 'default'
-            ? t('profile.option.custom.description')
-            : configuration.submission.profiles[profileValue].description
-      })),
+      getProfileNames(settings).map(
+        profileValue =>
+          ({
+            value: profileValue,
+            primary:
+              profileValue === 'default'
+                ? t('profile.option.custom.label')
+                : configuration?.submission?.profiles?.[profileValue]?.display_name,
+            secondary:
+              profileValue === 'default'
+                ? t('profile.option.custom.summary')
+                : configuration?.submission?.profiles?.[profileValue]?.summary,
+            ...(profileValue !== 'default' &&
+              configuration?.submission?.profiles?.[profileValue]?.description && {
+                helpLink: `/settings/${profileValue}`
+              })
+          }) satisfies SelectInputOption
+      ),
     [configuration.submission.profiles, settings, t]
   );
 
@@ -247,13 +255,13 @@ export const MaliciousInput = React.memo(() => {
       {([isFile, value, loading, disabled, isEditing]) => (
         <SwitchInput
           label={t('malicious.switch.label')}
-          labelProps={{ color: 'textPrimary' }}
           tooltip={t('malicious.switch.tooltip')}
           value={value}
           loading={loading}
           disabled={disabled || !isEditing}
           preventRender={!isFile}
           onChange={(_, v) => form.setFieldValue('settings.malicious.value', v)}
+          slotProps={{ formLabel: { color: 'textPrimary' } }}
         />
       )}
     </form.Subscribe>
@@ -293,7 +301,6 @@ export const ExternalSources = React.memo(() => {
                     key={i}
                     id={`source-${source.replace('_', ' ')}`}
                     label={source.replace('_', ' ')}
-                    labelProps={{ color: 'textPrimary' }}
                     value={value}
                     loading={loading}
                     disabled={disabled || !isEditing}
@@ -303,6 +310,7 @@ export const ExternalSources = React.memo(() => {
                         return s;
                       });
                     }}
+                    slotProps={{ formLabel: { color: 'textPrimary' } }}
                   />
                 )}
               />
@@ -348,7 +356,6 @@ export const ExternalServices = React.memo(() => {
                   <CheckboxInput
                     id={`url_submission_auto_service_selection-${name.replace('_', ' ')}`}
                     label={name.replace('_', ' ')}
-                    labelProps={{ textTransform: 'capitalize', color: 'textPrimary' }}
                     value={selected}
                     loading={loading}
                     disabled={disabled || !isEditing || (!customize && restricted)}
@@ -359,6 +366,7 @@ export const ExternalServices = React.memo(() => {
                         return s;
                       });
                     }}
+                    slotProps={{ formLabel: { color: 'textPrimary', textTransform: 'capitalize' } }}
                   />
                 )}
               </form.Subscribe>

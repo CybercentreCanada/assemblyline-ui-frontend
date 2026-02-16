@@ -67,9 +67,9 @@ export const SubmissionOptions = React.memo(() => {
                           ? `Inspection of ${hashType.toUpperCase()}: ${hashValue}`
                           : null
                     }
-                    rootProps={{ style: { marginBottom: theme.spacing(1) } }}
                     onChange={(e, v) => form.setFieldValue('settings.description.value', v)}
                     onReset={() => form.setFieldValue('settings.description.value', defaultValue)}
+                    slotProps={{ root: { style: { marginBottom: theme.spacing(1) } } }}
                   />
                 )}
               />
@@ -90,16 +90,16 @@ export const SubmissionOptions = React.memo(() => {
                       preventRender={!customize && restricted}
                       reset={defaultValue !== null && value !== defaultValue}
                       options={priorityOptions}
-                      error={v =>
+                      validate={v =>
                         !v
-                          ? t('options.submission.priority.error.empty')
+                          ? { status: 'error', message: t('options.submission.priority.error.empty') }
                           : !priorityOptions.some(o => o.value === v)
-                            ? t('options.submission.priority.error.invalid')
+                            ? { status: 'error', message: t('options.submission.priority.error.invalid') }
                             : null
                       }
-                      rootProps={{ style: { marginBottom: theme.spacing(1), flex: 1 } }}
                       onChange={(e, v) => form.setFieldValue('settings.priority.value', v)}
                       onReset={() => form.setFieldValue('settings.priority.value', defaultValue)}
+                      slotProps={{ root: { style: { marginBottom: theme.spacing(1), flex: 1 } } }}
                     />
                   )}
                 />
@@ -126,10 +126,11 @@ export const SubmissionOptions = React.memo(() => {
                       reset={defaultValue !== null && value !== defaultValue}
                       min={configuration.submission.max_dtl !== 0 ? 1 : 0}
                       max={configuration.submission.max_dtl !== 0 ? configuration.submission.max_dtl : 365}
-                      required
-                      rootProps={{ style: { marginBottom: theme.spacing(1), flex: 1 } }}
+                      validators={v => v.required().inRange().isInteger()}
+                      coercers={c => c.required().inRange().floor()}
                       onChange={(e, v) => form.setFieldValue('settings.ttl.value', v)}
                       onReset={() => form.setFieldValue('settings.ttl.value', defaultValue)}
+                      slotProps={{ root: { style: { marginBottom: theme.spacing(1), flex: 1 } } }}
                     />
                   )}
                 />
@@ -150,9 +151,9 @@ export const SubmissionOptions = React.memo(() => {
                     disabled={disabled || !isEditing || (!customize && restricted)}
                     preventRender={!customize && restricted}
                     reset={defaultValue !== null && value !== defaultValue}
-                    labelProps={{ color: 'textPrimary' }}
                     onChange={(e, v) => form.setFieldValue('settings.generate_alert.value', v)}
                     onReset={() => form.setFieldValue('settings.generate_alert.value', defaultValue)}
+                    slotProps={{ formLabel: { color: 'textPrimary' } }}
                   />
                 )}
               />
@@ -172,9 +173,9 @@ export const SubmissionOptions = React.memo(() => {
                     disabled={disabled || !isEditing || (!customize && restricted)}
                     preventRender={!customize && restricted}
                     reset={defaultValue !== null && value !== defaultValue}
-                    labelProps={{ color: 'textPrimary' }}
                     onChange={(e, v) => form.setFieldValue('settings.ignore_filtering.value', v)}
                     onReset={() => form.setFieldValue('settings.ignore_filtering.value', defaultValue)}
+                    slotProps={{ formLabel: { color: 'textPrimary' } }}
                   />
                 )}
               />
@@ -194,9 +195,9 @@ export const SubmissionOptions = React.memo(() => {
                     disabled={disabled || !isEditing || (!customize && restricted)}
                     preventRender={!customize && restricted}
                     reset={defaultValue !== null && value !== defaultValue}
-                    labelProps={{ color: 'textPrimary' }}
                     onChange={(e, v) => form.setFieldValue('settings.ignore_cache.value', v)}
                     onReset={() => form.setFieldValue('settings.ignore_cache.value', defaultValue)}
+                    slotProps={{ formLabel: { color: 'textPrimary' } }}
                   />
                 )}
               />
@@ -216,9 +217,9 @@ export const SubmissionOptions = React.memo(() => {
                     disabled={disabled || !isEditing || (!customize && restricted)}
                     preventRender={!customize && restricted}
                     reset={defaultValue !== null && value !== defaultValue}
-                    labelProps={{ color: 'textPrimary' }}
                     onChange={(e, v) => form.setFieldValue('settings.ignore_recursion_prevention.value', v)}
                     onReset={() => form.setFieldValue('settings.ignore_recursion_prevention.value', defaultValue)}
+                    slotProps={{ formLabel: { color: 'textPrimary' } }}
                   />
                 )}
               />
@@ -238,9 +239,9 @@ export const SubmissionOptions = React.memo(() => {
                     disabled={disabled || !isEditing || (!customize && restricted)}
                     preventRender={!customize && restricted}
                     reset={defaultValue !== null && value !== defaultValue}
-                    labelProps={{ color: 'textPrimary' }}
                     onChange={(e, v) => form.setFieldValue('settings.deep_scan.value', v)}
                     onReset={() => form.setFieldValue('settings.deep_scan.value', defaultValue)}
+                    slotProps={{ formLabel: { color: 'textPrimary' } }}
                   />
                 )}
               />
