@@ -14,12 +14,14 @@ export const ExternalLinkConfirmation = memo(({ href, children, ...props }: Exte
 
   const [open, setOpen] = useState<boolean>(false);
 
-  const url = useMemo(() => href.toString(), [href]);
+  const url = useMemo(() => href?.toString() || null, [href]);
 
   const handleContinue = useCallback(() => {
     setOpen(false);
     window.open(url, '_blank', 'noopener,noreferrer');
   }, [url]);
+
+  if (!url) return null;
 
   return (
     <>
