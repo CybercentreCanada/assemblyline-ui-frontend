@@ -17,6 +17,7 @@ import {
 import useALContext from 'components/hooks/useALContext';
 import { Button } from 'components/visual/Buttons/Button';
 import CustomChip, { COLOR_MAP } from 'components/visual/CustomChip';
+import { Tooltip } from 'components/visual/Tooltip';
 import type {
   ClassificationGroup,
   ClassificationLevel,
@@ -39,7 +40,6 @@ import {
 import type { PossibleColor } from 'helpers/colors';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Tooltip } from './Tooltip';
 
 export interface ClassificationProps {
   c12n: string;
