@@ -1,7 +1,8 @@
 import BrokenImageOutlinedIcon from '@mui/icons-material/BrokenImageOutlined';
 import { alpha, Button, CircularProgress, styled, Tooltip, useTheme } from '@mui/material';
 import useMyAPI from 'components/hooks/useMyAPI';
-import React, { memo, useEffect, useMemo, useState } from 'react';
+import type { BackgroundMode } from 'components/visual/Carousel/Container';
+import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 
 const Img = memo(
   styled('img')(({ theme }) => ({
@@ -26,10 +27,11 @@ type Props = {
   alt: string;
   src: string;
   selected?: boolean;
+  backgroundMode?: BackgroundMode;
   onClick?: React.MouseEventHandler<HTMLElement>;
 };
 
-const WrappedCarouselItem = ({ alt, src, selected, onClick }: Props) => {
+const WrappedCarouselItem = ({ alt, src, selected, backgroundMode, onClick }: Props) => {
   // const { t } = useTranslation(['carousel']);
   const theme = useTheme();
   const { apiCall } = useMyAPI();
@@ -40,6 +42,21 @@ const WrappedCarouselItem = ({ alt, src, selected, onClick }: Props) => {
   const augmentedPaper = useMemo(
     () => theme.palette.augmentColor({ color: { main: theme.palette.background.default } }),
     [theme.palette]
+  );
+
+  const getBackgroundColor = useCallback(
+    (mode: BackgroundMode) => {
+      switch (mode) {
+        case 'light':
+          return theme.palette.grey[100];
+        case 'dark':
+          return theme.palette.grey[900];
+        case 'transparent':
+        default:
+          return 'transparent';
+      }
+    },
+    [theme.palette.grey]
   );
 
   useEffect(() => {
@@ -83,7 +100,14 @@ const WrappedCarouselItem = ({ alt, src, selected, onClick }: Props) => {
         }}
       >
         {data ? (
-          <Img src={data} alt={alt} draggable={false} />
+          <Img
+            src={data}
+            alt={alt}
+            draggable={false}
+            style={{
+              backgroundColor: backgroundMode === 'transparent' ? 'transparent' : getBackgroundColor(backgroundMode)
+            }}
+          />
         ) : loading ? (
           <CircularProgress color="primary" />
         ) : (

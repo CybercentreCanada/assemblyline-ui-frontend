@@ -185,7 +185,12 @@ const WrappedWorkflowCreate = ({ id: propID = null, onClose = () => null }: Prop
 
         {c12nDef.enforce && (
           <div style={{ paddingBottom: theme.spacing(2) }}>
-            <Classification type="picker" c12n={!workflow ? null : workflow.classification} />
+            <Classification
+              type="picker"
+              format="long"
+              c12n={!workflow ? null : workflow.classification}
+              setClassification={v => setWorkflow(wf => ({ ...wf, classification: v }))}
+            />
           </div>
         )}
 
@@ -233,7 +238,8 @@ const WrappedWorkflowCreate = ({ id: propID = null, onClose = () => null }: Prop
               label={t('name')}
               loading={!workflow || handleFetch.isFetching}
               value={!workflow ? null : workflow.name}
-              required
+              coercers={c => c.required()}
+              validators={v => v.required()}
               onChange={(event, value) => setWorkflow(wf => ({ ...wf, name: value }))}
             />
           </Grid>
@@ -243,12 +249,12 @@ const WrappedWorkflowCreate = ({ id: propID = null, onClose = () => null }: Prop
               label={t('query')}
               loading={!workflow || handleFetch.isFetching}
               value={!workflow ? null : workflow.query}
-              error={() =>
-                handleResults.isDebouncing || handleResults.isFetching ? t('query.validating') : handleResults.error
-              }
+              progress={handleResults.isDebouncing || handleResults.isFetching ? t('query.validating') : null}
+              coercers={c => c.required()}
+              validators={v => v.required()}
+              validate={() => (handleResults.error ? { status: 'error', message: handleResults.error } : null)}
               minRows={1}
               maxRows={5}
-              required
               onChange={(event, value) => setWorkflow(wf => ({ ...wf, query: value }))}
             />
           </Grid>

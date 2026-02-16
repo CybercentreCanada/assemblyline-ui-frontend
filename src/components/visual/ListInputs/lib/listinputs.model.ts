@@ -1,300 +1,93 @@
-import type { FormHelperTextProps, IconButtonProps, ListItemTextProps, TypographyProps } from '@mui/material';
-import type React from 'react';
+import type {
+  FormHelperTextProps,
+  ListItemButtonBaseProps,
+  ListItemProps,
+  ListItemTextProps,
+  SkeletonProps,
+  TypographyProps
+} from '@mui/material';
+import type { InputOptions, InputRuntimeState, InputValueModel } from 'components/visual/Inputs/models/inputs.model';
+import {
+  DEFAULT_INPUT_OPTIONS,
+  DEFAULT_INPUT_RUNTIME_STATE,
+  DEFAULT_INPUT_VALUE_MODEL
+} from 'components/visual/Inputs/models/inputs.model';
 import type { CSSProperties } from 'react';
 
-export type ListInputValues<Value, InputValue = Value, Event = React.SyntheticEvent> = {
+/**********************************************************************************************************************
+ * List Input Options (visual + behavioral configuration)
+ *********************************************************************************************************************/
+export type ListInputOptions = Omit<InputOptions, 'label' | 'labelProps'> & {
   /**
-   * The current value of the input
-   */
-  value: Value;
-
-  /**
-   * The default value of the input
-   */
-  defaultValue?: Value;
-
-  /**
-   * The raw user-entered value (may differ from `value`)
-   */
-  inputValue?: InputValue;
-
-  // parser?: (inputValue: InputValue) => InputValue;
-
-  /**
-   * If `true`, shows a reset/clear button
+   * If `true`, applies an inset layout to the list item content.
    * @default false
    */
-  reset?: boolean | ((value: Value, inputValue: InputValue) => boolean);
-
-  /**
-   * Validation function that returns an error message string
-   * when the value is invalid
-   */
-  error?: (value: Value) => string;
-
-  /**
-   * Callback fired when the value changes
-   *
-   * @param event The React event
-   * @param value The new value
-   * @param other Additional arguments
-   */
-  onChange?: (event: Event, value: Value, ...other: unknown[]) => void;
-
-  /**
-   * Callback fired when the reset button is clicked
-   */
-  onReset?: IconButtonProps['onClick'];
-};
-
-export const DEFAULT_LIST_INPUT_VALUES: ListInputValues<unknown, unknown> = {
-  defaultValue: null,
-  error: null,
-  inputValue: null,
-  reset: false,
-  value: null,
-  onChange: null,
-  onReset: null
-};
-
-export type ListInputProps = {
-  /**
-   * If `true`, a small badge indicator is shown
-   * @default false
-   */
-  badge?: boolean;
-
-  /**
-   * If `true`, text will be automatically capitalized
-   * @default false
-   */
-  capitalize?: boolean;
-  /**
-   * If `true`, the input will be disabled
-   * @default false
-   */
-  disabled?: boolean;
-  /**
-   * If `true`, renders a divider under/around the input
-   * @default false
-   */
-  divider?: boolean;
-  /**
-   * Element rendered at the end (e.g. icon, button)
-   */
-  endAdornment?: React.ReactNode;
-  /**
-   * When enabled, the input will only propagate valid values.
-   */
-  enforceValidValue?: boolean;
-  /**
-   * Props applied to the error helper text
-   */
-  errorProps?: FormHelperTextProps;
-  /**
-   * If `true`, shows an expand/collapse button
-   * @default false
-   */
-  expand?: boolean;
-  // /**
-  //  * Props applied to the expand/collapse button
-  //  */
-  // expandProps?: IconButtonProps;
-  /**
-   * The helper/description text displayed under the input
-   */
-  helperText?: string;
-  /**
-   * Props applied to the helper text component
-   */
-  helperTextProps?: FormHelperTextProps;
-  /**
-   * The id of the input element
-   */
-  id?: string;
-  // /**
-  //  * The label content
-  //  */
-  // label?: string;
-  // /**
-  //  * Props applied to the label typography
-  //  */
-  // labelProps?: TypographyProps;
-  /**
-   * If `true`, shows a loading spinner
-   * @default false
-   */
-  loading?: boolean;
-  /**
-   * If `true`, renders input text in monospace font
-   * @default false
-   */
-  monospace?: boolean;
-  /**
-   * If `true`, hides text overflow
-   * @default false
-   */
-  overflowHidden?: boolean;
-  /**
-   * If `true`, the input behaves as a password field
-   * @default false
-   */
-  password?: boolean;
-  /**
-   * The short hint displayed in the input before the user enters a value
-   */
-  placeholder?: string;
-  /**
-   * If `true`, disables the default greyed-out style when disabled
-   * @default false
-   */
-  preventDisabledColor?: boolean;
-  /**
-   * If `true`, prevents the input from rendering
-   * @default false
-   */
-  preventRender?: boolean;
-  /**
-   * If `true`, the input is read-only
-   * @default false
-   */
-  readOnly?: boolean;
-  /**
-   * If `true`, marks the input as required
-   * @default false
-   */
-  required?: boolean;
-  /**
-   * Props applied to the reset button
-   */
-  resetProps?: IconButtonProps;
-  // /**
-  //  * Props applied to the root container element
-  //  */
-  // rootProps?: React.HTMLAttributes<HTMLDivElement>;
-  /**
-   * Element rendered at the start (e.g. icon)
-   */
-  startAdornment?: React.ReactNode;
-  /**
-   * If `true`, applies a compact "tiny" style
-   * @default false
-   */
-  tiny?: boolean;
-  // /**
-  //  * Tooltip content to display on hover
-  //  */
-  // tooltip?: TooltipProps['title'];
-  // /**
-  //  * Props applied to the tooltip component
-  //  */
-  // tooltipProps?: Omit<TooltipProps, 'children' | 'title'>;
   inset?: boolean;
+
+  /**
+   * The primary text content of the list item.
+   */
   primary?: ListItemTextProps['primary'];
+
+  /**
+   * The secondary text content of the list item.
+   */
   secondary?: ListItemTextProps['secondary'];
-  primaryProps?: TypographyProps;
-  secondaryProps?: TypographyProps;
 
+  /**
+   * Maximum width of the list item.
+   */
   width?: CSSProperties['maxWidth'];
-  /**
-   * Callback fired when the input loses focus
-   */
-  onBlur?: (event: React.SyntheticEvent | Event) => void;
-  /**
-   * Callback fired when validation fails
-   */
-  onError?: (error: string) => void;
-  // /**
-  //  * Callback fired when the expand button is clicked
-  //  */
-  // onExpand?: (event: React.MouseEvent<HTMLButtonElement, MouseEvent>) => void;
-  /**
-   * Callback fired when the input gains focus
-   */
-  onFocus?: (event: React.SyntheticEvent | Event) => void;
 };
 
-export const DEFAULT_LIST_INPUT_PROPS: ListInputProps = {
-  badge: false,
-  capitalize: false,
-  disabled: false,
-  divider: false,
-  endAdornment: null,
-  enforceValidValue: false,
-  errorProps: null,
-  expand: null,
-  // expandProps: null,
-  helperText: null,
-  helperTextProps: null,
-  id: null,
-  // label: null,
-  // labelProps: null,
-  loading: false,
-  monospace: false,
-  overflowHidden: false,
-  password: false,
-  placeholder: null,
-  preventDisabledColor: false,
-  preventRender: false,
-  readOnly: false,
-  required: false,
-  resetProps: null,
-  // rootProps: null,
-  startAdornment: null,
-  tiny: false,
-  // tooltip: null,
-  // tooltipProps: null,
-  width: '30%',
-
-  onBlur: () => null,
-  onError: () => null,
-  // onExpand: () => null,
-  onFocus: () => null
+export const DEFAULT_LIST_INPUT_OPTIONS: ListInputOptions = {
+  ...DEFAULT_INPUT_OPTIONS,
+  inset: false,
+  primary: null,
+  secondary: null,
+  width: '30%'
 };
 
-export type ListInputStates = {
-  /**
-   * If `true`, the clear adornment is visible
-   * @default false
-   */
-  clearAdornment?: boolean;
-  /**
-   * The current error message to display below the input.
-   */
-  errorMessage?: string;
-  /**
-   * If `true`, the input is focused
-   * @default false
-   */
-  focused?: boolean;
-  /**
-   * If `true`, this input has a menu end adornment
-   * @default false
-   */
-  menuAdornment?: boolean;
-  /**
-   * If `true`, the menu is opened
-   * @default false
-   */
-  showMenu?: boolean;
-  /**
-   * If `true`, the password is visible
-   * @default true
-   */
-  showPassword?: boolean;
-  /**
-   * If `true`, the spinner adornment is visible
-   * @default false
-   */
-  spinnerAdornment?: boolean;
+/**********************************************************************************************************************
+ * List Input Slot Props
+ *********************************************************************************************************************/
+export type ListInputSlotProps = {
+  slotProps?: {
+    buttonRoot?: Omit<ListItemButtonBaseProps, 'children'>;
+    helperText?: FormHelperTextProps;
+    inner?: Omit<React.HTMLAttributes<HTMLDivElement>, 'children'>;
+    primary?: TypographyProps;
+    root?: Omit<ListItemProps, 'children'>;
+    secondary?: TypographyProps;
+    skeleton?: SkeletonProps;
+    wrapper?: Omit<React.HTMLAttributes<HTMLDivElement>, 'children'>;
+  };
 };
 
-export const DEFAULT_LIST_INPUT_STATES: ListInputStates = {
-  clearAdornment: false,
-  errorMessage: null,
-  focused: false,
-  menuAdornment: false,
-  showMenu: false,
-  showPassword: true,
-  spinnerAdornment: false
+export const DEFAULT_LIST_INPUT_SLOT_PROPS: ListInputSlotProps = {
+  slotProps: {
+    buttonRoot: null,
+    helperText: null,
+    inner: null,
+    primary: null,
+    root: null,
+    secondary: null,
+    skeleton: null,
+    wrapper: null
+  }
+};
+
+/**********************************************************************************************************************
+ * Combined Internal Controller Props
+ *********************************************************************************************************************/
+export type ListInputControllerProps<Value = unknown, RawValue = Value> = InputValueModel<Value> &
+  ListInputOptions &
+  InputRuntimeState<RawValue> &
+  ListInputSlotProps;
+
+export const DEFAULT_LIST_INPUT_CONTROLLER_PROPS: ListInputControllerProps = {
+  ...DEFAULT_INPUT_VALUE_MODEL,
+  ...DEFAULT_INPUT_RUNTIME_STATE,
+  ...DEFAULT_LIST_INPUT_OPTIONS,
+  ...DEFAULT_LIST_INPUT_SLOT_PROPS
 };

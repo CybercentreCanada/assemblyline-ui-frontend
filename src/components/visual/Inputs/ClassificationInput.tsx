@@ -1,32 +1,45 @@
 import {
-  Button,
+  alpha,
   Card,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
   Grid,
-  List,
   ListItemButton,
   ListItemText,
+  Typography,
   useMediaQuery,
   useTheme
 } from '@mui/material';
+import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
 import useALContext from 'components/hooks/useALContext';
 import type { WhoAmI } from 'components/models/ui/user';
+import { Button } from 'components/visual/Buttons/Button';
 import type { ClassificationProps } from 'components/visual/Classification';
 import CustomChip, { COLOR_MAP } from 'components/visual/CustomChip';
 import {
-  HelperText,
-  PasswordAdornment,
-  StyledFormControl,
-  StyledFormLabel,
-  StyledInputSkeleton,
-  StyledRoot
-} from 'components/visual/Inputs/lib/inputs.components';
-import { useError, useErrorCallback } from 'components/visual/Inputs/lib/inputs.hook';
-import type { InputProps, InputValues } from 'components/visual/Inputs/lib/inputs.model';
-import { PropProvider, usePropStore } from 'components/visual/Inputs/lib/inputs.provider';
+  HelpInputAdornment,
+  PasswordInputAdornment,
+  ProgressInputAdornment,
+  ResetInputAdornment
+} from 'components/visual/Inputs/components/inputs.component.adornment';
+import {
+  InputFormControl,
+  InputFormLabel,
+  InputHelperText,
+  InputRoot,
+  InputSkeleton
+} from 'components/visual/Inputs/components/inputs.component.form';
+import { useInputBlur } from 'components/visual/Inputs/hooks/inputs.hook.event_handlers';
+import { useInputValidation } from 'components/visual/Inputs/hooks/inputs.hook.validation';
+import type {
+  InputOptions,
+  InputRuntimeState,
+  InputSlotProps,
+  InputValueModel
+} from 'components/visual/Inputs/models/inputs.model';
+import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/models/inputs.model';
 import { Tooltip } from 'components/visual/Tooltip';
 import type { ClassificationParts, ClassificationValidator } from 'helpers/classificationParser';
 import {
@@ -39,18 +52,20 @@ import {
   normalizedClassification
 } from 'helpers/classificationParser';
 import type { PossibleColor } from 'helpers/colors';
-import React, { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export type ClassificationInputProps = Omit<ClassificationProps, 'c12n' | 'setClassification'> &
-  InputValues<ClassificationProps['c12n']> &
-  InputProps;
+  InputValueModel<ClassificationProps['c12n']> &
+  InputOptions &
+  InputSlotProps;
 
-type ClassificationInputState = ClassificationInputProps & {
-  showPicker: boolean;
-  uParts: ClassificationParts;
-  validated: ClassificationValidator;
-};
+type ClassificationInputController = ClassificationInputProps &
+  InputRuntimeState<ClassificationProps['c12n']> & {
+    showPicker?: boolean;
+    uParts?: ClassificationParts;
+    validated?: ClassificationValidator;
+  };
 
 const WrappedClassificationInput = () => {
   const { t } = useTranslation('inputs');
@@ -61,21 +76,22 @@ const WrappedClassificationInput = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
   const sp2 = theme.spacing(2);
 
-  const [get, setStore] = usePropStore<ClassificationInputState>();
+  const [get, setStore] = usePropStore<ClassificationInputController>();
 
-  const defaultValue = get('defaultValue');
   const disabled = get('disabled');
+  const endAdornment = get('endAdornment');
   const format = get('format');
   const fullWidth = get('fullWidth');
   const inline = get('inline');
+  const isPasswordVisible = get('isPasswordVisible');
   const isUser = get('isUser');
   const loading = get('loading');
   const monospace = get('monospace');
   const password = get('password');
   const preventRenderStore = get('preventRender');
+  const rawValue = get('rawValue');
   const readOnly = get('readOnly');
-  const reset = get('reset');
-  const showPassword = get('showPassword');
+  const startAdornment = get('startAdornment');
   const tiny = get('tiny');
   const value = get('value');
 
@@ -84,10 +100,7 @@ const WrappedClassificationInput = () => {
   const uParts = get('uParts') ?? defaultParts;
   const validated = get('validated') ?? defaultClassificationValidator;
 
-  const error = useError();
-  const onChange = get('onChange');
-  const onError = get('onError');
-  const onReset = get('onReset');
+  const handleBlur = useInputBlur<ClassificationProps['c12n']>();
 
   const preventRender = useMemo(
     () => preventRenderStore || !c12nDef?.enforce || !validated?.parts?.lvl,
@@ -111,23 +124,6 @@ const WrappedClassificationInput = () => {
     }
     return COLOR_MAP[levelStyles.color || levelStyles.label.replace('label-', '')] || ('default' as const);
   }, [c12nDef.levels_styles_map, preventRender, validated.parts.lvl]);
-
-  const title = useMemo<React.ReactNode>(
-    () =>
-      defaultValue === undefined ? null : (
-        <>
-          <span style={{ color: theme.palette.text.secondary }}>{t('reset_to')}</span>
-          <span>
-            {typeof defaultValue === 'object'
-              ? JSON.stringify(defaultValue)
-              : typeof defaultValue === 'string'
-                ? `"${defaultValue}"`
-                : `${defaultValue}`}
-          </span>
-        </>
-      ),
-    [defaultValue, t, theme.palette.text.secondary]
-  );
 
   const handleGroupsChange = useCallback(
     (grp: WhoAmI['classification_aliases'][keyof WhoAmI['classification_aliases']]) => {
@@ -220,30 +216,15 @@ const WrappedClassificationInput = () => {
     [c12nDef, format, isMobile, isUser, setStore, validated.parts]
   );
 
-  const handleChange = useCallback(
-    (event: React.SyntheticEvent) => {
-      const newC12n = normalizedClassification(validated.parts, c12nDef, format, isMobile, isUser);
-      const err = error(newC12n);
-      onError(err);
-      if (!err) onChange(event, newC12n);
-      setStore(() => ({ ...(!err && { value: newC12n }), inputValue: newC12n, errorMsg: err, showPicker: false }));
+  const handleClassificationChange = useCallback(
+    event => {
+      const newC12n = normalizedClassification(validated.parts, c12nDef, 'long', isMobile, isUser);
+      const originalParts = getParts(rawValue.toLocaleUpperCase(), c12nDef, 'long', isMobile);
+      const originalC12n = normalizedClassification(originalParts, c12nDef, 'long', isMobile, isUser);
+      handleBlur(event, newC12n, originalC12n);
+      setStore(() => ({ showPicker: false }));
     },
-    [c12nDef, error, format, isMobile, isUser, onChange, onError, setStore, validated.parts]
-  );
-
-  const handleReset = useCallback(
-    (event: React.SyntheticEvent) => {
-      const err = error(defaultValue);
-      onError(err);
-      if (!err) onChange(event, defaultValue);
-      setStore(() => ({
-        ...(!err && { value: defaultValue }),
-        inputValue: defaultValue,
-        errorMsg: err,
-        showPicker: false
-      }));
-    },
-    [defaultValue, error, onChange, onError, setStore]
+    [c12nDef, handleBlur, isMobile, isUser, rawValue, setStore, validated.parts]
   );
 
   useEffect(() => {
@@ -258,11 +239,11 @@ const WrappedClassificationInput = () => {
   }, [c12nDef, currentUser.classification, format, isMobile, isUser, setStore, value]);
 
   return (
-    <StyledRoot>
-      <StyledFormLabel />
-      <StyledFormControl>
+    <InputRoot>
+      <InputFormLabel />
+      <InputFormControl>
         {loading ? (
-          <StyledInputSkeleton />
+          <InputSkeleton />
         ) : (
           <>
             <div style={{ display: inline ? 'inline-block' : null }}>
@@ -280,7 +261,7 @@ const WrappedClassificationInput = () => {
                   mb: 0.75,
                   ...(monospace && { fontFamily: 'monospace' }),
                   ...(password &&
-                    showPassword && {
+                    isPasswordVisible && {
                       fontFamily: 'password',
                       WebkitTextSecurity: 'disc',
                       MozTextSecurity: 'disc',
@@ -295,7 +276,7 @@ const WrappedClassificationInput = () => {
               fullWidth
               maxWidth={isMobile ? 'xs' : 'md'}
               open={showPicker}
-              onClose={event => handleChange(event as React.SyntheticEvent)}
+              onClose={handleClassificationChange}
             >
               <DialogTitle>
                 <CustomChip
@@ -311,11 +292,22 @@ const WrappedClassificationInput = () => {
               <DialogContent>
                 <Grid container spacing={2}>
                   <Grid size={{ xs: 12, md: 'grow' }}>
+                    <Typography color="textSecondary" variant="body2">
+                      {t('classification.level')}
+                    </Typography>
                     <Card variant="outlined">
-                      <List disablePadding style={{ borderRadius: '6px' }}>
-                        {c12nDef.original_definition.levels.map(
-                          (lvl, idx) =>
-                            (isUser || (lvl.lvl <= uParts.lvlIdx && !lvl.is_hidden)) && (
+                      {c12nDef.original_definition.levels.map(
+                        (lvl, idx) =>
+                          (isUser || (lvl.lvl <= uParts.lvlIdx && !lvl.is_hidden)) && (
+                            <Tooltip
+                              key={idx}
+                              title={c12nDef.description?.[lvl.name]}
+                              placement="bottom"
+                              slotProps={{
+                                popper: { modifiers: [{ name: 'offset', options: { offset: [0, -8] } }] },
+                                tooltip: { sx: { backgroundColor: alpha(theme.palette.Tooltip.bg, 1) } }
+                              }}
+                            >
                               <ListItemButton
                                 key={idx}
                                 disabled={
@@ -327,21 +319,32 @@ const WrappedClassificationInput = () => {
                               >
                                 <ListItemText style={{ textAlign: 'center' }} primary={lvl.name} />
                               </ListItemButton>
-                            )
-                        )}
-                      </List>
+                            </Tooltip>
+                          )
+                      )}
                     </Card>
                   </Grid>
                   {((isUser && c12nDef.original_definition.required.length !== 0) ||
                     (uParts.req.length !== 0 &&
                       c12nDef.original_definition.required.filter(r => !r.is_hidden).length !== 0)) && (
                     <Grid size={{ xs: 12, md: 'grow' }}>
+                      <Typography color="textSecondary" variant="body2">
+                        {t('classification.required_tokens')}
+                      </Typography>
                       <Card variant="outlined">
-                        <List disablePadding>
-                          {c12nDef.original_definition.required.map(
-                            (req, idx) =>
-                              (isUser ||
-                                ([req.name, req.short_name].some(r => uParts.req.includes(r)) && !req.is_hidden)) && (
+                        {c12nDef.original_definition.required.map(
+                          (req, idx) =>
+                            (isUser ||
+                              ([req.name, req.short_name].some(r => uParts.req.includes(r)) && !req.is_hidden)) && (
+                              <Tooltip
+                                key={idx}
+                                title={c12nDef.description?.[req.short_name]}
+                                placement="bottom"
+                                slotProps={{
+                                  popper: { modifiers: [{ name: 'offset', options: { offset: [0, -8] } }] },
+                                  tooltip: { sx: { backgroundColor: alpha(theme.palette.Tooltip.bg, 1) } }
+                                }}
+                              >
                                 <ListItemButton
                                   key={idx}
                                   selected={
@@ -352,9 +355,9 @@ const WrappedClassificationInput = () => {
                                 >
                                   <ListItemText style={{ textAlign: 'center' }} primary={req.name} />
                                 </ListItemButton>
-                              )
-                          )}
-                        </List>
+                              </Tooltip>
+                            )
+                        )}
                       </Card>
                     </Grid>
                   )}
@@ -370,11 +373,22 @@ const WrappedClassificationInput = () => {
                         (uParts.groups.length !== 0 &&
                           c12nDef.original_definition.groups.filter(g => !g.is_hidden).length !== 0)) && (
                         <div style={{ paddingBottom: sp2 }}>
+                          <Typography color="textSecondary" variant="body2">
+                            {t('classification.groups_releasability')}
+                          </Typography>
                           <Card variant="outlined">
-                            <List disablePadding>
-                              {c12nDef.original_definition.groups
-                                .filter(grp => isUser || !grp.is_hidden)
-                                .map((grp, idx) => (
+                            {c12nDef.original_definition.groups
+                              .filter(grp => isUser || !grp.is_hidden)
+                              .map((grp, idx) => (
+                                <Tooltip
+                                  key={idx}
+                                  title={grp?.description}
+                                  placement="bottom"
+                                  slotProps={{
+                                    popper: { modifiers: [{ name: 'offset', options: { offset: [0, -8] } }] },
+                                    tooltip: { sx: { backgroundColor: alpha(theme.palette.Tooltip.bg, 1) } }
+                                  }}
+                                >
                                   <ListItemButton
                                     key={idx}
                                     disabled={
@@ -392,43 +406,53 @@ const WrappedClassificationInput = () => {
                                       primary={applyAliases(grp.name, classificationAliases, format)}
                                     />
                                   </ListItemButton>
-                                ))}
-                              {c12nDef.dynamic_groups &&
-                                ['email', 'all'].includes(c12nDef.dynamic_groups_type) &&
-                                currentUser.email && (
-                                  <ListItemButton
-                                    disabled={validated.disabled.groups.includes(dynGroup || currentUser.dynamic_group)}
-                                    selected={validated.parts.groups.includes(dynGroup || currentUser.dynamic_group)}
-                                    onClick={() =>
-                                      handleGroupsChange({
-                                        name: dynGroup || currentUser.dynamic_group,
-                                        short_name: dynGroup || currentUser.dynamic_group
-                                      })
-                                    }
+                                </Tooltip>
+                              ))}
+                            {c12nDef.dynamic_groups &&
+                              ['email', 'all'].includes(c12nDef.dynamic_groups_type) &&
+                              currentUser.email && (
+                                <ListItemButton
+                                  disabled={validated.disabled.groups.includes(dynGroup || currentUser.dynamic_group)}
+                                  selected={validated.parts.groups.includes(dynGroup || currentUser.dynamic_group)}
+                                  onClick={() =>
+                                    handleGroupsChange({
+                                      name: dynGroup || currentUser.dynamic_group,
+                                      short_name: dynGroup || currentUser.dynamic_group
+                                    })
+                                  }
+                                >
+                                  <ListItemText
+                                    style={{ textAlign: 'center' }}
+                                    primary={applyAliases(
+                                      dynGroup || currentUser.dynamic_group,
+                                      classificationAliases,
+                                      format
+                                    )}
+                                  />
+                                </ListItemButton>
+                              )}
+                            {c12nDef.dynamic_groups &&
+                              ['group', 'all'].includes(c12nDef.dynamic_groups_type) &&
+                              currentUser.groups
+                                .filter(
+                                  group =>
+                                    !(
+                                      group in c12nDef.groups_map_lts ||
+                                      group in c12nDef.groups_map_stl ||
+                                      group in c12nDef.subgroups_map_lts ||
+                                      group in c12nDef.subgroups_map_stl
+                                    )
+                                )
+                                .map((group, idx_group) => (
+                                  <Tooltip
+                                    key={idx_group}
+                                    title={c12nDef.description?.[group]}
+                                    placement="bottom"
+                                    slotProps={{
+                                      popper: { modifiers: [{ name: 'offset', options: { offset: [0, -8] } }] },
+                                      tooltip: { sx: { backgroundColor: alpha(theme.palette.Tooltip.bg, 1) } }
+                                    }}
                                   >
-                                    <ListItemText
-                                      style={{ textAlign: 'center' }}
-                                      primary={applyAliases(
-                                        dynGroup || currentUser.dynamic_group,
-                                        classificationAliases,
-                                        format
-                                      )}
-                                    />
-                                  </ListItemButton>
-                                )}
-                              {c12nDef.dynamic_groups &&
-                                ['group', 'all'].includes(c12nDef.dynamic_groups_type) &&
-                                currentUser.groups
-                                  .filter(
-                                    group =>
-                                      !(
-                                        group in c12nDef.groups_map_lts ||
-                                        group in c12nDef.groups_map_stl ||
-                                        group in c12nDef.subgroups_map_lts ||
-                                        group in c12nDef.subgroups_map_stl
-                                      )
-                                  )
-                                  .map((group, idx_group) => (
                                     <ListItemButton
                                       key={idx_group}
                                       disabled={validated.disabled.groups.includes(group)}
@@ -445,47 +469,65 @@ const WrappedClassificationInput = () => {
                                         primary={applyAliases(group, classificationAliases, format)}
                                       />
                                     </ListItemButton>
-                                  ))}
-                            </List>
+                                  </Tooltip>
+                                ))}
                           </Card>
                         </div>
                       )}
                       {((isUser && c12nDef.original_definition.subgroups.length !== 0) ||
                         (uParts.subgroups.length !== 0 &&
                           c12nDef.original_definition.subgroups.filter(sg => !sg.is_hidden).length !== 0)) && (
-                        <Card variant="outlined">
-                          <List disablePadding>
+                        <>
+                          <Typography color="textSecondary" variant="body2">
+                            {t('classification.sub-groups_releasability')}
+                          </Typography>
+                          <Card variant="outlined">
                             {c12nDef.original_definition.subgroups
                               .filter(sgrp => isUser || !sgrp.is_hidden)
                               .map((sgrp, idx) => (
-                                <ListItemButton
+                                <Tooltip
                                   key={idx}
-                                  selected={
-                                    validated.parts.subgroups.includes(sgrp.name) ||
-                                    validated.parts.subgroups.includes(sgrp.short_name)
-                                  }
-                                  onClick={() => handleSubGroupsChange(sgrp)}
+                                  title={sgrp?.description}
+                                  placement="bottom"
+                                  slotProps={{
+                                    popper: { modifiers: [{ name: 'offset', options: { offset: [0, -8] } }] },
+                                    tooltip: { sx: { backgroundColor: alpha(theme.palette.Tooltip.bg, 1) } }
+                                  }}
                                 >
-                                  <ListItemText style={{ textAlign: 'center' }} primary={sgrp.name} />
-                                </ListItemButton>
+                                  <ListItemButton
+                                    key={idx}
+                                    selected={
+                                      validated.parts.subgroups.includes(sgrp.name) ||
+                                      validated.parts.subgroups.includes(sgrp.short_name)
+                                    }
+                                    onClick={() => handleSubGroupsChange(sgrp)}
+                                  >
+                                    <ListItemText style={{ textAlign: 'center' }} primary={sgrp.name} />
+                                  </ListItemButton>
+                                </Tooltip>
                               ))}
-                          </List>
-                        </Card>
+                          </Card>
+                        </>
                       )}
                     </Grid>
                   )}
                 </Grid>
               </DialogContent>
               <DialogActions>
-                <PasswordAdornment />
-                {reset && (
-                  <Tooltip arrow title={title} placement="bottom">
-                    <Button onClick={onReset ? onReset : handleReset} color="secondary">
-                      {t('classification.reset')}
-                    </Button>
-                  </Tooltip>
-                )}
-                <Button onClick={event => handleChange(event)} color="primary" autoFocus>
+                <HelpInputAdornment variant="text" />
+                <PasswordInputAdornment variant="text" />
+                <ResetInputAdornment variant="text" />
+                {endAdornment}
+                <div style={{ flex: 1 }} />
+                {startAdornment}
+                <ProgressInputAdornment />
+                <Button
+                  autoFocus
+                  color="primary"
+                  disableElevation
+                  variant="contained"
+                  onClick={handleClassificationChange}
+                >
                   {t('classification.done')}
                 </Button>
               </DialogActions>
@@ -493,26 +535,32 @@ const WrappedClassificationInput = () => {
           </>
         )}
 
-        <HelperText />
-      </StyledFormControl>
-    </StyledRoot>
+        <InputHelperText />
+      </InputFormControl>
+    </InputRoot>
   );
 };
 
 export const ClassificationInput = ({ preventRender = false, value, ...props }: ClassificationInputProps) => {
-  const errorMessage = useErrorCallback({ preventRender, value, ...props });
+  const { status: validationStatus, message: validationMessage } = useInputValidation<string>({
+    value: value ?? '',
+    ...props
+  });
 
   return preventRender || !value ? null : (
-    <PropProvider<ClassificationInputProps>
+    <PropProvider<ClassificationInputController>
+      initialProps={DEFAULT_INPUT_CONTROLLER_PROPS as ClassificationInputController}
       props={{
         dynGroup: null,
-        errorMessage,
         format: 'short',
         fullWidth: true,
+        helpLink: '/help/classification',
         inline: false,
-        inputValue: value,
         isUser: false,
         preventRender,
+        rawValue: value ?? '',
+        validationMessage,
+        validationStatus,
         value,
         ...props
       }}

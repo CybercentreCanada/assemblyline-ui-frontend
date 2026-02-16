@@ -3,6 +3,7 @@ import { Typography, useTheme } from '@mui/material';
 import type { ProfileSettings } from 'components/routes/settings/settings.utils';
 import { useForm } from 'components/routes/submit/submit.form';
 import { CheckboxInput } from 'components/visual/Inputs/CheckboxInput';
+import type { InputOptions, InputSlotProps, InputValueModel } from 'components/visual/Inputs/models/inputs.model';
 import { NumberInput } from 'components/visual/Inputs/NumberInput';
 import { SelectInput } from 'components/visual/Inputs/SelectInput';
 import { TextInput } from 'components/visual/Inputs/TextInput';
@@ -47,11 +48,9 @@ const Param: React.FC<ParamProps> = React.memo(({ param_id, spec_id, service }) 
         const common = {
           id: `${service.category} ${service.name} ${name.replaceAll('_', ' ')}`,
           label: name.replaceAll('_', ' '),
-          labelProps: { textTransform: 'capitalize' },
           disabled: disabled || !isEditing || (!customize && restricted),
           preventRender: !customize && restricted,
           reset: defaultValue !== null && value !== defaultValue,
-          rootProps: { style: { padding: theme.spacing(1) } },
           onChange: (e, v) =>
             form.setFieldValue('settings.service_spec', s => {
               s[spec_id].params[param_id].value = v;
@@ -61,32 +60,23 @@ const Param: React.FC<ParamProps> = React.memo(({ param_id, spec_id, service }) 
             form.setFieldValue('settings.service_spec', s => {
               s[spec_id].params[param_id].value = defaultValue;
               return s;
-            })
-        } as const;
+            }),
+          slotProps: {
+            root: { style: { padding: theme.spacing(1) } },
+            formLabel: { style: { textTransform: 'capitalize' } }
+          }
+        } satisfies InputOptions & InputSlotProps & Omit<InputValueModel<any>, 'value'>;
 
         switch (type) {
           case 'bool':
             return <CheckboxInput {...common} value={Boolean(value)} defaultValue={Boolean(defaultValue)} />;
 
           case 'int':
-            return (
-              <NumberInput
-                {...common}
-                value={value as number}
-                defaultValue={defaultValue as number}
-                rootProps={{ style: { padding: theme.spacing(1) } }}
-              />
-            );
+            return <NumberInput {...common} value={value as number} defaultValue={defaultValue as number} />;
 
           case 'str':
             return (
-              <TextInput
-                {...common}
-                value={value as string}
-                defaultValue={defaultValue as string}
-                options={list}
-                rootProps={{ style: { padding: theme.spacing(1) } }}
-              />
+              <TextInput {...common} value={value as string} defaultValue={defaultValue as string} options={list} />
             );
 
           case 'list':
@@ -102,7 +92,6 @@ const Param: React.FC<ParamProps> = React.memo(({ param_id, spec_id, service }) 
                         .sort((a, b) => a.primary.localeCompare(b.primary))
                     : []
                 }
-                rootProps={{ style: { padding: theme.spacing(1) } }}
                 capitalize
               />
             );
@@ -297,7 +286,6 @@ const Category = React.memo(({ cat_id, category }: CategoryProps) => {
           header={({ open, setOpen }) => (
             <CheckboxInput
               label={category.name}
-              labelProps={{ color: 'textSecondary' }}
               disabled={disabled || !isEditing || (!customize && restricted)}
               divider
               expand={open}
@@ -308,6 +296,7 @@ const Category = React.memo(({ cat_id, category }: CategoryProps) => {
               onChange={!customize && restricted ? null : (e, v) => handleChange(v)}
               onExpand={() => setOpen(o => !o)}
               onReset={!customize && restricted ? null : () => handleChange(defaultValue)}
+              slotProps={{ formLabel: { color: 'textSecondary' } }}
             />
           )}
           preventRender={!customize && restricted && !(selected || indeterminate)}

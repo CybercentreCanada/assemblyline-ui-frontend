@@ -21,12 +21,11 @@ import type { JSONFeedItem } from 'components/visual/Notification/useNotificatio
 import { useNotificationFeed } from 'components/visual/Notification/useNotificationFeed';
 import { RouterPrompt } from 'components/visual/RouterPrompt';
 import { getVersionQuery } from 'helpers/utils';
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useNavigate, useParams } from 'react-router';
 
-const TAB_TYPES = ['general', 'docker', 'updater', 'params'] as const;
-type TabType = (typeof TAB_TYPES)[number];
+type TabType = 'general' | 'docker' | 'updater' | 'params';
 
 type ParamProps = {
   svc: string;
@@ -38,7 +37,7 @@ type ServiceProps = {
   onUpdated?: () => void;
 };
 
-function Service({ name = null, onDeleted = () => null, onUpdated = () => null }: ServiceProps) {
+const Service = ({ name = null, onDeleted = () => null, onUpdated = () => null }: ServiceProps) => {
   const { t } = useTranslation(['adminServices']);
   const theme = useTheme();
   const navigate = useNavigate();
@@ -69,9 +68,24 @@ function Service({ name = null, onDeleted = () => null, onUpdated = () => null }
     [serviceFeeds]
   );
 
-  function saveService() {
+  const nameOrSvc = useMemo<string>(() => name || svc, [name, svc]);
+
+  const isSaveDisabled = useMemo<boolean>(
+    () => overallError || buttonLoading || !modified,
+    [overallError, buttonLoading, modified]
+  );
+
+  const handleTabChange = useCallback((event, newValue) => {
+    setTab(newValue as TabType);
+  }, []);
+
+  const handleCloseDialog = useCallback(() => {
+    setDeleteDialog(false);
+  }, []);
+
+  const handleSaveService = useCallback(() => {
     apiCall({
-      url: `/api/v4/service/${name || svc}/`,
+      url: `/api/v4/service/${nameOrSvc}/`,
       method: 'POST',
       body: service,
       onSuccess: () => {
@@ -82,20 +96,13 @@ function Service({ name = null, onDeleted = () => null, onUpdated = () => null }
       onEnter: () => setButtonLoading(true),
       onExit: () => setButtonLoading(false)
     });
-  }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [nameOrSvc, service, showSuccessMessage, t, onUpdated]);
 
-  const onChangeTab = (event, newValue) => {
-    setTab(newValue);
-  };
-
-  const closeDialog = () => {
-    setDeleteDialog(false);
-  };
-
-  const handleExecuteDeleteButtonClick = () => {
-    closeDialog();
+  const handleExecuteDeleteButtonClick = useCallback(() => {
+    handleCloseDialog();
     apiCall({
-      url: `/api/v4/service/${name || svc}/`,
+      url: `/api/v4/service/${nameOrSvc}/`,
       method: 'DELETE',
       onSuccess: () => {
         showSuccessMessage(t('delete.success'));
@@ -105,16 +112,17 @@ function Service({ name = null, onDeleted = () => null, onUpdated = () => null }
       onEnter: () => setButtonLoading(true),
       onExit: () => setButtonLoading(false)
     });
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [handleCloseDialog, nameOrSvc, showSuccessMessage, t, svc, onDeleted]);
 
-  const handleDeleteButtonClick = () => {
+  const handleDeleteButtonClick = useCallback(() => {
     setDeleteDialog(true);
-  };
+  }, []);
 
-  const handleToggleEnabled = () => {
+  const handleToggleEnabled = useCallback(() => {
     setModified(true);
-    setService({ ...service, enabled: !service.enabled });
-  };
+    setService(prev => ({ ...prev, enabled: !prev.enabled }));
+  }, []);
 
   useEffect(() => {
     // Reset tab because we are using a different service
@@ -125,21 +133,21 @@ function Service({ name = null, onDeleted = () => null, onUpdated = () => null }
     // Load user on start
     if (currentUser.is_admin) {
       apiCall<ServiceData>({
-        url: `/api/v4/service/${name || svc}/`,
+        url: `/api/v4/service/${nameOrSvc}/`,
         onSuccess: api_data => {
           setService(api_data.api_response);
           setServiceVersion(api_data.api_response.version);
         }
       });
       apiCall<string[]>({
-        url: `/api/v4/service/versions/${name || svc}/`,
+        url: `/api/v4/service/versions/${nameOrSvc}/`,
         onSuccess: api_data => {
           setVersions(api_data.api_response);
         }
       });
     }
-    // eslint-disable-next-line
-  }, [name]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentUser.is_admin, nameOrSvc]);
 
   useEffect(() => {
     // Reset tab because we are using a different service
@@ -148,12 +156,12 @@ function Service({ name = null, onDeleted = () => null, onUpdated = () => null }
     // Load user on start
     if (currentUser.is_admin && serviceVersion) {
       apiCall<ServiceData>({
-        url: `/api/v4/service/${name || svc}/${serviceVersion}/`,
+        url: `/api/v4/service/${nameOrSvc}/${serviceVersion}/`,
         onSuccess: ({ api_response }) => setServiceDefault(api_response)
       });
     }
-    // eslint-disable-next-line
-  }, [serviceVersion]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentUser.is_admin, nameOrSvc, serviceVersion]);
 
   useEffect(() => {
     // Set the global error flag based on each sub-error value
@@ -168,7 +176,7 @@ function Service({ name = null, onDeleted = () => null, onUpdated = () => null }
       onSuccess: ({ api_response }) => setConstants(api_response)
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [currentUser.is_admin]);
 
   useEffect(() => {
     fetchJSONNotifications({
@@ -207,8 +215,8 @@ function Service({ name = null, onDeleted = () => null, onUpdated = () => null }
               sx={{ color: theme.palette.action.active }}
               tooltip={t('errors')}
               to={() =>
-                `/admin/errors?filters=response.service_name%3A${service.name}&filters=${getVersionQuery(
-                  service.version
+                `/admin/errors?filters=response.service_name%3A${service?.name}&filters=${getVersionQuery(
+                  service?.version
                 )}`
               }
             >
@@ -219,7 +227,7 @@ function Service({ name = null, onDeleted = () => null, onUpdated = () => null }
               loading={!service}
               size="large"
               sx={{ color: theme.palette.action.active }}
-              to={() => `/admin/service_review?service=${service.name}&v1=${service.version}`}
+              to={() => `/admin/service_review?service=${service?.name}&v1=${service?.version}`}
               tooltip={t('compare')}
             >
               <CompareArrowsOutlinedIcon />
@@ -260,7 +268,7 @@ function Service({ name = null, onDeleted = () => null, onUpdated = () => null }
             style={{ backgroundColor: name ? theme.palette.background.default : theme.palette.background.paper }}
           >
             <TabList
-              onChange={onChangeTab}
+              onChange={handleTabChange}
               indicatorColor="primary"
               textColor="primary"
               variant="scrollable"
@@ -333,12 +341,7 @@ function Service({ name = null, onDeleted = () => null, onUpdated = () => null }
             boxShadow: theme.shadows[4]
           }}
         >
-          <Button
-            variant="contained"
-            color="primary"
-            disabled={overallError || buttonLoading || !modified}
-            onClick={saveService}
-          >
+          <Button variant="contained" color="primary" disabled={isSaveDisabled} onClick={handleSaveService}>
             {t('save')}
             {buttonLoading && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
           </Button>
@@ -346,6 +349,6 @@ function Service({ name = null, onDeleted = () => null, onUpdated = () => null }
       ) : null}
     </PageCenter>
   );
-}
+};
 
 export default Service;

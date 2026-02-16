@@ -1,4 +1,4 @@
-import { useTheme } from '@mui/material';
+import { Paper, useTheme } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
 import { useForm } from 'components/routes/settings/settings.form';
 import { PageSection } from 'components/visual/Layouts/PageSection';
@@ -6,10 +6,37 @@ import { List } from 'components/visual/List/List';
 import { BooleanListInput } from 'components/visual/ListInputs/BooleanListInput';
 import { ClassificationListInput } from 'components/visual/ListInputs/ClassificationListInput';
 import { NumberListInput } from 'components/visual/ListInputs/NumberListInput';
+import { Markdown } from 'components/visual/Markdown';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-export const SubmissionSection = React.memo(() => {
+export const SubmissionProfileDescription = React.memo(() => {
+  const { t } = useTranslation(['settings']);
+  const theme = useTheme();
+  const form = useForm();
+  const { configuration } = useALContext();
+
+  return (
+    <form.Subscribe selector={state => [state.values.state.tab] as const}>
+      {([tab]) =>
+        tab !== 'default' &&
+        configuration?.submission?.profiles?.[tab]?.description && (
+          <div style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(0.5) }}>
+            <PageSection id="profile" primary={t('profile.title')} primaryProps={{ variant: 'h6' }} subheader anchor />
+
+            <Paper sx={{ py: theme.spacing(0.5), px: theme.spacing(2) }}>
+              <Markdown>{configuration.submission.profiles[tab].description}</Markdown>
+            </Paper>
+          </div>
+        )
+      }
+    </form.Subscribe>
+  );
+});
+
+SubmissionProfileDescription.displayName = 'SubmissionProfileDescription';
+
+export const SubmissionOptionsSection = React.memo(() => {
   const { t } = useTranslation(['settings']);
   const theme = useTheme();
   const form = useForm();
@@ -55,6 +82,7 @@ export const SubmissionSection = React.memo(() => {
                     value={value ?? defaultValue}
                     loading={loading}
                     disabled={disabled || !(customize || !restricted)}
+                    overflowHidden
                     onChange={(e, v) => form.setFieldValue(`settings.classification.value`, v)}
                   />
                 )}
@@ -81,7 +109,9 @@ export const SubmissionSection = React.memo(() => {
                   reset={defaultValue !== null && value !== defaultValue}
                   min={maxTTL !== 0 ? 1 : 0}
                   max={maxTTL}
-                  required
+                  overflowHidden
+                  validators={v => v.required().inRange().isInteger()}
+                  coercers={c => c.required().inRange().floor()}
                   onChange={(event, v) => form.setFieldValue(`settings.ttl.value`, v)}
                   onBlur={() => {
                     if (value === null) form.setFieldValue(`settings.ttl.value`, defaultValue);
@@ -106,6 +136,7 @@ export const SubmissionSection = React.memo(() => {
                   defaultValue={defaultValue}
                   loading={loading}
                   disabled={disabled || (!customize && restricted)}
+                  overflowHidden
                   reset={defaultValue !== null && value !== defaultValue}
                   onChange={(event, v) => form.setFieldValue(`settings.deep_scan.value`, v)}
                 />
@@ -129,6 +160,7 @@ export const SubmissionSection = React.memo(() => {
                   loading={loading}
                   disabled={disabled || (!customize && restricted)}
                   reset={defaultValue !== null && value !== defaultValue}
+                  overflowHidden
                   onChange={(event, v) => form.setFieldValue(`settings.ignore_recursion_prevention.value`, v)}
                 />
               )}
@@ -151,6 +183,7 @@ export const SubmissionSection = React.memo(() => {
                   loading={loading}
                   disabled={disabled || (!customize && restricted)}
                   reset={defaultValue !== null && value !== defaultValue}
+                  overflowHidden
                   onChange={(event, v) => form.setFieldValue(`settings.ignore_filtering.value`, v)}
                 />
               )}
@@ -173,6 +206,7 @@ export const SubmissionSection = React.memo(() => {
                   loading={loading}
                   disabled={disabled || (!customize && restricted)}
                   reset={defaultValue !== null && value !== defaultValue}
+                  overflowHidden
                   onChange={(event, v) => form.setFieldValue(`settings.generate_alert.value`, v)}
                 />
               )}
@@ -195,6 +229,7 @@ export const SubmissionSection = React.memo(() => {
                   loading={loading}
                   disabled={disabled || (!customize && restricted)}
                   reset={defaultValue !== null && value !== defaultValue}
+                  overflowHidden
                   onChange={(event, v) => form.setFieldValue(`settings.ignore_cache.value`, v)}
                 />
               )}
@@ -206,4 +241,4 @@ export const SubmissionSection = React.memo(() => {
   );
 });
 
-SubmissionSection.displayName = 'SubmissionSection';
+SubmissionOptionsSection.displayName = 'SubmissionOptionsSection';

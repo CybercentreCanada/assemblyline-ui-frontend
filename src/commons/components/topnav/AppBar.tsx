@@ -137,18 +137,20 @@ const AppBar = () => {
         {quicksearch.show && <AppSearch />}
         {configuration.system.support?.documentation && (
           <IconButton
-            onClick={() => window.open(configuration.system.support.documentation, '_blank')}
-            tooltip={t('support.documentation')}
             color="inherit"
+            size="large"
+            tooltip={t('support.documentation')}
+            onClick={() => window.open(configuration.system.support.documentation, '_blank')}
           >
             <MenuBookOutlinedIcon />
           </IconButton>
         )}
         {configuration.system.support?.email && (
           <IconButton
-            onClick={() => window.open(configuration.system.support.email, '_blank')}
-            tooltip={t('support.email')}
             color="inherit"
+            size="large"
+            tooltip={t('support.email')}
+            onClick={() => window.open(configuration.system.support.email, '_blank')}
           >
             <EmailOutlinedIcon />
           </IconButton>
