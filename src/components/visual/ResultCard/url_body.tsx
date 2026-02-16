@@ -1,6 +1,6 @@
-import { Link } from '@mui/material';
 import type { URLBody as URLData } from 'components/models/base/result_body';
-import { default as React } from 'react';
+import { ExternalLinkConfirmation } from 'components/visual/ExternalLinkConfirmation';
+import React from 'react';
 
 type Props = {
   body: URLData;
@@ -25,7 +25,7 @@ const WrappedURLBody = ({ body }: Props) => {
     >
       {arr.map((item, id) => (
         <li key={id}>
-          <Link href={item.url}>{item.name ? item.name : item.url}</Link>
+          <ExternalLinkConfirmation href={item.url}>{item.name ? item.name : item.url}</ExternalLinkConfirmation>
         </li>
       ))}
     </ul>

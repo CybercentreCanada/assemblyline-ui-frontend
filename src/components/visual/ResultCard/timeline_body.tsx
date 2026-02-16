@@ -118,14 +118,16 @@ const TimelineBodyComponent: React.FC<Props> = ({ body }) => {
               <TimelineContent
                 sx={{
                   alignSelf: 'center',
-                  overflow: 'hidden',
+                  overflowX: 'hidden',
                   textOverflow: 'ellipsis',
                   whiteSpace: 'nowrap'
                 }}
               >
-                <Typography variant="button">{title}</Typography>
+                <Typography component="p" variant="button">
+                  {title}
+                </Typography>
                 {content && (
-                  <Typography variant="caption" color="text.secondary">
+                  <Typography component="p" variant="caption" color="text.secondary">
                     {content}
                   </Typography>
                 )}
