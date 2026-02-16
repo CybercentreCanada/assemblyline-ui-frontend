@@ -1,10 +1,10 @@
-import type { TypographyProps } from '@mui/material';
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Stack, Typography } from '@mui/material';
+import type { LinkProps } from '@mui/material';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Link, Stack, Typography } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
 import { memo, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-export type ExternalLinkConfirmationProps = TypographyProps & {
+export type ExternalLinkConfirmationProps = Omit<LinkProps, 'href'> & {
   href: string | URL;
 };
 
@@ -14,24 +14,28 @@ export const ExternalLinkConfirmation = memo(({ href, children, ...props }: Exte
 
   const [open, setOpen] = useState<boolean>(false);
 
-  const url = useMemo(() => href.toString(), [href]);
+  const url = useMemo(() => href?.toString() || null, [href]);
 
   const handleContinue = useCallback(() => {
     setOpen(false);
     window.open(url, '_blank', 'noopener,noreferrer');
   }, [url]);
 
+  if (!url) return null;
+
   return (
     <>
-      <Typography
-        variant="body2"
+      <Link
         {...props}
-        onClick={() => setOpen(true)}
+        href={url}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={event => {
+          event.preventDefault();
+          setOpen(true);
+        }}
         sx={{
-          color: 'primary.main',
-          textDecoration: 'underline',
           textDecorationColor: 'rgba(var(--mui-palette-primary-mainChannel) / 0.4)',
-          cursor: 'pointer',
           '&:hover': {
             textDecorationColor: 'inherit'
           },
@@ -39,7 +43,7 @@ export const ExternalLinkConfirmation = memo(({ href, children, ...props }: Exte
         }}
       >
         {children}
-      </Typography>
+      </Link>
 
       <Dialog open={open} onClose={() => setOpen(false)} maxWidth="sm" fullWidth>
         <DialogTitle> {t('external_link_confirmation.title')}</DialogTitle>
