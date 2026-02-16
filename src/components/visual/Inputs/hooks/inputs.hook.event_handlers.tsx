@@ -33,7 +33,8 @@ export const useInputClick = <Value extends unknown = unknown, RawValue = Value>
 
       if (nextRawValue === previousRawValue) return;
 
-      const { value: coercedValue, ignore } = resolveCoercing(event, toValue(nextRawValue));
+      const nextValue = toValue(nextRawValue);
+      const { value: coercedValue, ignore } = resolveCoercing(event, nextValue);
       const [validationStatus, validationMessage] = resolveValidation(coercedValue);
       setStore({ rawValue: nextRawValue, validationStatus, validationMessage });
 
@@ -41,7 +42,7 @@ export const useInputClick = <Value extends unknown = unknown, RawValue = Value>
       startTransition(() => {
         if (id === latestId.current && !ignore) {
           setStore({ value: coercedValue });
-          onChange(event, toValue(nextRawValue));
+          onChange(event, nextValue);
         }
       });
     },
@@ -72,15 +73,16 @@ export const useInputChange = <Value extends unknown = unknown, RawValue = Value
     ) => {
       if (nextRawValue === previousRawValue) return;
 
-      const { ignore } = resolveCoercing(event, toValue(nextRawValue));
-      const [validationStatus, validationMessage] = resolveValidation(toValue(nextRawValue));
+      const nextValue = toValue(nextRawValue);
+      const { ignore } = resolveCoercing(event, nextValue);
+      const [validationStatus, validationMessage] = resolveValidation(nextValue);
       setStore({ rawValue: nextRawValue, validationStatus, validationMessage });
 
       const id = ++latestId.current;
       startTransition(() => {
         if (id === latestId.current && !ignore) {
-          setStore({ value: toValue(nextRawValue) });
-          onChange(event, toValue(nextRawValue));
+          setStore({ value: nextValue });
+          onChange(event, nextValue);
         }
       });
     },

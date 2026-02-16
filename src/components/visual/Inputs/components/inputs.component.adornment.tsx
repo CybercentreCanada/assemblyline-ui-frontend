@@ -358,6 +358,7 @@ export const NumericalSpinnerInputAdornment = () => {
   const intervalRef = useRef<NodeJS.Timeout>(null);
 
   const toRawValue = useCallback((v: number) => (v == null ? '' : String(v)), []);
+  const toValue = useCallback((v: string): number => (v !== '' ? Number(v) : null), []);
 
   const clamp = useCallback(
     (val: number) => Math.min(max ?? Number.POSITIVE_INFINITY, Math.max(min ?? Number.NEGATIVE_INFINITY, val)),
@@ -379,7 +380,7 @@ export const NumericalSpinnerInputAdornment = () => {
       focusInputIfNeeded();
       let nextValue = clamp(initialValue + delta);
       const absDelta = Math.abs(delta);
-      handleChange(event, nextValue, toRawValue);
+      handleChange(event, toRawValue(nextValue), toRawValue(initialValue), toValue);
 
       timeoutRef.current = setTimeout(() => {
         if (timeoutRef.current) {
@@ -387,13 +388,14 @@ export const NumericalSpinnerInputAdornment = () => {
             const rect = boxRef.current.getBoundingClientRect();
             const centerY = rect.top + rect.height / 2;
             const stepDir = centerY > mouseYRef.current ? absDelta : -absDelta;
+            const previousValue = nextValue;
             nextValue = clamp(nextValue + stepDir);
-            handleChange(event, nextValue, toRawValue);
+            handleChange(event, toRawValue(nextValue), toRawValue(previousValue), toValue);
           }, 50);
         }
       }, 150);
     },
-    [clamp, focusInputIfNeeded, handleChange, toRawValue]
+    [clamp, focusInputIfNeeded, handleChange, toRawValue, toValue]
   );
 
   useEffect(() => {
