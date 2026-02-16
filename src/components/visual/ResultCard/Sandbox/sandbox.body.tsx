@@ -164,4 +164,6 @@ export const SandboxBody = React.memo(({ body, printable = false }: SandboxBodyP
     // eslint-disable-next-line no-console
     console.log('[WARNING] Could not parse Sandbox body. The section will be skipped...');
   }
+
+  return null;
 });
