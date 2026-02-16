@@ -43,7 +43,7 @@ import { TextAreaInput } from 'components/visual/Inputs/TextAreaInput';
 import { TextInput } from 'components/visual/Inputs/TextInput';
 import { getSubmitType } from 'helpers/utils';
 import generateUUID from 'helpers/uuid';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import { Link } from 'react-router-dom';
@@ -233,8 +233,12 @@ export const RawInput = React.memo(() => {
   const { t } = useTranslation(['submit']);
   const form = useForm();
 
+  const hashRequestId = useRef<number>(0);
+
   const handleRawChange = useCallback(
     (event: unknown, value: string) => {
+      const requestId = ++hashRequestId.current;
+
       if (!value) {
         form.setFieldValue('raw.hash', null);
         form.setFieldValue('raw.value', null);
@@ -244,7 +248,11 @@ export const RawInput = React.memo(() => {
 
         form.setFieldValue('raw.value', value);
         calculateFileHash(tempFile)
-          .then(hash => form.setFieldValue('raw.hash', hash))
+          .then(hash => {
+            if (requestId !== hashRequestId.current) return;
+            if (form.getFieldValue('raw.value') !== value) return;
+            form.setFieldValue('raw.hash', hash);
+          })
           // eslint-disable-next-line no-console
           .catch(console.error);
       }
