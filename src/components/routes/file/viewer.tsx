@@ -171,6 +171,10 @@ const WrappedFileViewer = () => {
   }, [sha256]);
 
   useEffect(() => {
+    selection?.setSelection?.(null);
+  }, [selection, sha256]);
+
+  useEffect(() => {
     if (codeAllowed) {
       addInsight({ type: 'code', value: sha256 });
       addInsight({ type: 'file', value: sha256 });
