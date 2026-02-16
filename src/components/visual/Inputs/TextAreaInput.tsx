@@ -39,6 +39,7 @@ const WrappedTextAreaInput = () => {
   const id = useInputId();
   const isPasswordVisible = get('isPasswordVisible');
   const loading = get('loading');
+  const placeholder = get('placeholder');
   const maxRows = get('maxRows');
   const minRows = get('minRows');
   const overflowHidden = get('overflowHidden');

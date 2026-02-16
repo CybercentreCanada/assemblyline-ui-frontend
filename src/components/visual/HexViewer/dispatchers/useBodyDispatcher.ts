@@ -10,7 +10,11 @@ export type BodyAction =
   | { type: 'bodyScrollInit'; payload: void }
   | { type: 'bodyResize'; payload: { width?: number; height?: number }; tracked: false; repeat: true }
   | { type: 'bodyMouseLeave'; payload: void; tracked: false; repeat: false }
-  | { type: 'bodyMouseUp'; payload: void; guard: { store: Store; event: MouseEvent } }
+  | {
+      type: 'bodyMouseUp';
+      payload: { onSelectionChange: (value: string) => void };
+      guard: { store: Store; event: MouseEvent };
+    }
   | { type: 'bodyScrollWheel'; payload: { event: React.WheelEvent<HTMLDivElement> } }
   | { type: 'bodyItemsRendered'; payload: { event: ListOnItemsRenderedProps | null } }
   | { type: 'cursorKeyDown'; payload: { event: KeyboardEvent }; guard: { store: Store } }
@@ -67,7 +71,7 @@ export const useBodyDispatcher = (dispatch: Dispatch): BodyDispatchers => {
     (payload, { store, event }) => {
       if (!isType.layout.isFocusing(store, 'body') || event.button !== 0) return;
       event.preventDefault();
-      dispatch({ type: ACTIONS.bodyMouseUp, payload: null });
+      dispatch({ type: ACTIONS.bodyMouseUp, payload });
     },
     [dispatch]
   );
