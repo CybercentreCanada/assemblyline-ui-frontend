@@ -66,7 +66,7 @@
   "options.submission.ttl.label": "Days to live",
   "options.submission.ttl.max": "Maximum",
   "options.submission.ttl.tooltip": "Number of days your submissions will stay in the system.",
-  "options.submission.url_submission_auto_service_selection.label": "The following services were auto-selected for better URL scanning results",
+  "options.submission.url_submission_auto_service_selection.label": "Enable these services to improve URL scan results.",
   "profile.input.label": "Type of Analysis",
   "profile.input.tooltip": "Select the type of analysis to perform",
   "profile.option.custom.label": "Custom Analysis",

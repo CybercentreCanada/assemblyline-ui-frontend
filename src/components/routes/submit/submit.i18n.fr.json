@@ -66,7 +66,7 @@
   "options.submission.ttl.label": "Jours a vivre",
   "options.submission.ttl.max": "Maximum",
   "options.submission.ttl.tooltip": "Nombre de jours pendant lesquels vos soumissions resteront dans le système.",
-  "options.submission.url_submission_auto_service_selection.label": "Les services suivants ont été sélectionnés automatiquement pour de meilleurs résultats d'analyse d'URL",
+  "options.submission.url_submission_auto_service_selection.label": "Selectionnez les services suivants pour améliorer les résultats de l'analyse d'URL.",
   "profile.input.label": "Type d'analyse",
   "profile.input.tooltip": "Sélectionnez le type d'analyse à effectuer",
   "profile.option.custom.label": "Analyse personnalisée",
