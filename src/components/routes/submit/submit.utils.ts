@@ -544,12 +544,14 @@ export const useAutoURLServicesSelection = () => {
   const addSelection = useCallback(() => {
     const added: AutoURLServiceIndices = [];
 
+    const profile = form.getFieldValue('state.profile');
+
     form.setFieldValue('settings.services', categories =>
       categories.map((cat, ci) => {
         const services = cat.services.map((svc, si) => {
           if (autoNames.includes(svc.name)) {
             added.push([ci, si]);
-            return { ...svc, selected: true };
+            return { ...svc, selected: profile === 'default' ? true : svc.selected };
           }
           return svc;
         });
@@ -608,10 +610,8 @@ export const useAutoURLServicesSelection = () => {
     }
 
     if (currHasURL) {
-      console.log('addSelection');
       addSelection();
     } else if (prevHasURL && !currHasURL) {
-      console.log('removeSelection');
       removeSelection();
     }
 
