@@ -11,6 +11,8 @@ export type GuardResult = true | 'forbidden' | 'notfound' | `redirect:${string}`
 export type TypedRoute<Path extends string> = {
   path: Path;
   params: PathParams<Path>;
+  search: any;
+  hash: any;
   page: React.ReactElement;
   route: React.ReactElement;
   to: (params: PathParams<Path>) => string;

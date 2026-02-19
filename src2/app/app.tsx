@@ -7,7 +7,7 @@ export const AssemblylineApp = () => (
     <BrowserRouter basename="/">
       <div style={{ backgroundColor: 'black', color: 'white', width: '100vw', height: '100vh' }}>
         <div style={{ padding: '16px' }}>
-          <div style={{ textAlign: 'center' }}>Assemblyline App</div>
+          <h1 style={{ textAlign: 'center' }}>Assemblyline App</h1>
           {/* <AppRoutes location="/page1" /> */}
           <Router />
         </div>

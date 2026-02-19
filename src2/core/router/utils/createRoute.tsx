@@ -50,6 +50,8 @@ export const createRoute = <Path extends string>({
     path,
     page,
     params: null as PathParams<Path>,
+    search: null,
+    hash: null,
     route: <Route path={path} element={page} />,
     to: params => buildPath(path, params)
   });
