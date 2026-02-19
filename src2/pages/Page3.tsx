@@ -1,14 +1,30 @@
+import { Link } from 'core/router/components/Link';
 import { createRoute } from 'core/router/utils/createRoute';
 import React from 'react';
 import { useLocation } from 'react-router';
+import Page2 from './Page2';
 
 export const Page3Route = React.memo(() => {
   // const { fileID } = useParams();
   const location = useLocation();
 
-  // console.log(location, fileID);
-
-  return <h1>Page 3{/* <Link to={{}}>test</Link> */}</h1>;
+  return (
+    <div>
+      <h1>Page 3</h1>
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        <Link to="/page1">Go to Page 1</Link>
+        <Link to={Page2} params={{ fileID: 'from-page3' }}>
+          Go to Page 2
+        </Link>
+        <Link to="/page1" panel="drawer">
+          Open Page 1 (drawer)
+        </Link>
+        <Link to={Page2} params={{ fileID: 'from-page3-drawer' }} panel="drawer">
+          Open Page 2 (drawer)
+        </Link>
+      </div>
+    </div>
+  );
 });
 
 export const Page3 = createRoute({

@@ -1,5 +1,8 @@
 import { createReversePortalNode, InPortal, OutPortal } from 'core/router/components/Portals';
+import { Link } from 'core/router/components/Link';
 import React, { useMemo, useState } from 'react';
+import Page2 from './Page2';
+import Page3 from './Page3';
 
 const StatefulWidget = React.memo(() => {
   const [count, setCount] = useState(0);
@@ -42,7 +45,23 @@ export const Page1 = () => {
   const node = useMemo(() => createReversePortalNode(), []);
   const [right, setRight] = useState<null | number>(null);
 
-  return <h1>Page 1</h1>;
+  return (
+    <div>
+      <h1>Page 1</h1>
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        <Link to={Page2} params={{ fileID: 'from-page1' }}>
+          Go to Page 2
+        </Link>
+        <Link to={Page3}>Go to Page 3</Link>
+        <Link to={Page2} params={{ fileID: 'from-page1-drawer' }} panel="drawer">
+          Open Page 2 (drawer)
+        </Link>
+        <Link to={Page3} panel="drawer">
+          Open Page 3 (drawer)
+        </Link>
+      </div>
+    </div>
+  );
 
   return (
     <div style={{ display: 'flex', gap: 16 }}>
