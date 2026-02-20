@@ -1,8 +1,10 @@
-import type { AnyTypedRoute } from '../models/router.models';
+type RegisteredRoute = {
+  path: string;
+};
 
-const routeRegistry = new Map<string, AnyTypedRoute>();
+const routeRegistry = new Map<string, RegisteredRoute>();
 
-export const registerRoute = (route: AnyTypedRoute) => {
+export const registerRoute = <T extends RegisteredRoute>(route: T) => {
   routeRegistry.set(route.path, route);
   return route;
 };

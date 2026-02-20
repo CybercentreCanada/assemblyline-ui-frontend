@@ -2,7 +2,6 @@ import { createSearchParams, SearchParamsProvider } from 'core/search-params/cre
 import { PARAM_BLUEPRINTS } from 'core/search-params/lib/search_params.blueprint';
 import { SearchParamBlueprints, SearchParamValues } from 'core/search-params/lib/search_params.model';
 import type { ComponentType, MemoExoticComponent, ReactNode } from 'react';
-import { useMemo } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { useParams as useRouterParams } from 'react-router';
 import { DisabledBoundary } from '../components/DisabledBoundary';
@@ -91,9 +90,9 @@ export const createRoute = <
 }: CreateRouteProps<Path, Search, Hash, Params>): CreateRouteReturn<Path, Search, Hash, Params> => {
   void loader;
 
-  const paramsParser = useMemo(() => (params ? createParamsParser(params) : undefined), [params]);
-  const searchParser = useMemo(() => (search ? createSearchParams(search) : undefined), [search]);
-  const content = useMemo(() => toElement(component), [component]);
+  const paramsParser = params ? createParamsParser(params) : undefined;
+  const searchParser = search ? createSearchParams(search) : undefined;
+  const content = toElement(component);
 
   const withSearch = searchParser ? (
     <SearchParamsProvider params={searchParser}>{content}</SearchParamsProvider>

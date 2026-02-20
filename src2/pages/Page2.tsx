@@ -5,7 +5,7 @@ import { useParams } from 'core/router/hooks/useParams';
 import { useSearch } from 'core/router/hooks/useSearch';
 import { createRoute } from 'core/router/utils/createRoute';
 import React from 'react';
-import Page3 from './Submissions';
+import { SubmissionsRoute } from './Submissions';
 
 export type Page2Params = typeof Page2.params;
 export type Page2Search = typeof Page2.search;
@@ -23,21 +23,21 @@ export const Page2Route = React.memo(() => {
   return (
     <div>
       <h1>Page 2</h1>
-      <Link to={Page2} params={{ fileID: 'asd' }}>
+      {/* <Link to={Page2} params={{ fileID: 'asd' }}>
         Current route param: {fileID}
-      </Link>
+      </Link> */}
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
         <Link to="/page1">Go to Page 1</Link>
-        <Link to={Page3}>Go to Page 3</Link>
-        <button onClick={() => navigate({ path: '/page2/:fileID', params: { fileID: 'from-useNavigate' } }, {})}>
+        <Link to={SubmissionsRoute}>Go to Submission</Link>
+        {/* <button onClick={() => navigate({ path: '/page2/:fileID', params: { fileID: 'from-useNavigate' } }, {})}>
           Go to Page 2 (hook)
         </button>
-        <Link to="/page1" panel="drawer">
+        <Link to="/page1" panel={2}>
           Open Page 1 (drawer)
         </Link>
-        <Link to={Page3} panel="drawer">
+        <Link to={Page3} panel={2}>
           Open Page 3 (drawer)
-        </Link>
+        </Link> */}
       </div>
     </div>
   );

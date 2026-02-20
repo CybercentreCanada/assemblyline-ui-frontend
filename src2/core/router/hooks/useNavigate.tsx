@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 import { usePanel, type RoutePanel } from '../providers/PanelProvider';
-import { useRouterContext } from '../providers/RouterProvider';
+import { useRouter } from '../providers/RouterProvider';
 import { AppRoutes } from '../store/routes';
 
 type NavigateOptions = { panel?: RoutePanel } | { variant?: 'replace' | 'next' };
@@ -19,7 +19,7 @@ export type NavigateTo = AppRoute extends infer Route ? (Route extends AppRoute 
 
 export const useNavigate = () => {
   const { panel } = usePanel();
-  const { navigateTo } = useRouterContext();
+  const { navigateTo } = useRouter();
 
   return useCallback(
     (to: NavigateTo, options?: NavigateOptions) => {

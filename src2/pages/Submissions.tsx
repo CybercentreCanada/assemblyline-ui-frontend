@@ -27,18 +27,18 @@ export const SubmissionsPage = React.memo(() => {
 
   return (
     <div>
-      <h1>Page 3</h1>
+      <h1>Submissions</h1>
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
         <Link to="/page1">Go to Page 1</Link>
         <Link to={Page2} params={{ fileID: 'from-page3' }}>
           Go to Page 2
         </Link>
-        <Link to="/page1" panel="drawer">
+        {/* <Link to="/page1" panel={2}>
           Open Page 1 (drawer)
         </Link>
-        <Link to={Page2} params={{ fileID: 'from-page3-drawer' }} panel="drawer">
+        <Link to={Page2} params={{ fileID: 'from-page3-drawer' }} panel={2}>
           Open Page 2 (drawer)
-        </Link>
+        </Link> */}
       </div>
     </div>
   );
