@@ -1,5 +1,5 @@
 import { createRoute } from 'core/router/utils/createRoute';
-import { Page3 } from './Page3';
+import { Page3 } from './Submissions';
 
 export const Page3Route = createRoute({
   path: '/page2/:fileID',

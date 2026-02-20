@@ -5,17 +5,17 @@ const DefaultDisabledRouteFallback = React.memo(() => {
   return 'disabled';
 });
 
-type DisabledRouteProps = {
+type DisabledBoundaryProps = {
   disabled?: boolean | (() => boolean);
-  fallback?: ReactNode | MemoExoticComponent<ComponentType<any>>;
+  FallbackComponent?: ReactNode | MemoExoticComponent<ComponentType<any>>;
   children: ReactNode | MemoExoticComponent<ComponentType<any>>;
 };
 
-export const DisabledRoute = ({
+export const DisabledBoundary = ({
   disabled = false,
-  fallback = DefaultDisabledRouteFallback,
+  FallbackComponent = DefaultDisabledRouteFallback,
   children
-}: DisabledRouteProps) => {
-  if (typeof disabled === 'function' ? disabled() : disabled) return <>{fallback}</>;
+}: DisabledBoundaryProps) => {
+  if (typeof disabled === 'function' ? disabled() : disabled) return <>{FallbackComponent}</>;
   return <>{children}</>;
 };

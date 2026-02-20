@@ -1,14 +1,36 @@
-import { DisabledRoute } from 'core/router/components/DisabledRoute';
-import { ForbiddenRoute } from 'core/router/components/ForbiddenRoute';
+import { createSearchParams, SearchParamsProvider } from 'core/search-params/createSearchParams';
+import { PARAM_BLUEPRINTS } from 'core/search-params/lib/search_params.blueprint';
+import { SearchParamBlueprints, SearchParamValues } from 'core/search-params/lib/search_params.model';
 import type { ComponentType, MemoExoticComponent, ReactNode } from 'react';
-import { Route } from 'react-router';
-import type { PathParams, TypedRoute } from '../models/router.models';
-import { registerRoute } from '../store/router.store';
-import { buildPath, toElement } from './router.utils';
+import { useMemo } from 'react';
+import { ErrorBoundary } from 'react-error-boundary';
+import { useParams as useRouterParams } from 'react-router';
+import { DisabledBoundary } from '../components/DisabledBoundary';
+import { ForbiddenBoundary } from '../components/ForbiddenBoundary';
+import type {
+  ParamsBlueprints,
+  ParamsBlueprintsForPath,
+  ParamsParser,
+  ParamsValues,
+  PathParams
+} from '../models/router.models';
+import { RouteProvider } from '../providers/RouteProvider';
+import { createParamsParser, PARAM_PARSERS, toElement } from './router.utils';
 
-export type CreateRouteProps<Path extends string> = {
+export type RoutePath = string;
+export type RouteSearch = undefined | SearchParamBlueprints;
+export type RouteHash = undefined | string;
+
+export type CreateRouteProps<
+  Path extends RoutePath = RoutePath,
+  Search extends RouteSearch = undefined,
+  Hash extends RouteHash = undefined,
+  Params extends ParamsBlueprintsForPath<Path> = ParamsBlueprintsForPath<Path>
+> = {
   path: Path;
-  search?: any;
+  params?: (parsers: typeof PARAM_PARSERS) => Params;
+  search?: (blueprints: typeof PARAM_BLUEPRINTS) => Search;
+  hash?: Hash;
 
   disabled?: boolean | (() => boolean);
   forbidden?: boolean | (() => boolean);
@@ -27,32 +49,95 @@ export type CreateRouteProps<Path extends string> = {
   };
 };
 
-export const createRoute = <Path extends string>({
+// & ([PathParamKeys<Path>] extends [never]
+//   ? { params?: undefined }
+//   : { params?: (parsers: typeof PARAM_PARSERS) => ParamsBlueprintsForPath<Path> });
+
+export type CreateRouteReturn<
+  Path extends RoutePath = RoutePath,
+  Search extends RouteSearch = undefined,
+  Hash extends RouteHash = undefined,
+  Params extends ParamsBlueprints = ParamsBlueprints
+> = {
+  path: Path;
+  params: ParamsValues<Params>;
+  paramsParser: undefined | ParamsParser<Params>;
+  search: SearchParamValues<Search>;
+  searchParser: undefined | Search;
+  hash: Hash;
+  // paramTypes: ReturnType<typeof createParamsParser>;
+  element: React.ReactNode;
+};
+
+// & (PathParamKeys<Path> extends never ? { params?: undefined } : { params?: any });
+
+export const createRoute = <
+  Path extends RoutePath = RoutePath,
+  Search extends RouteSearch = undefined,
+  Hash extends RouteHash = undefined,
+  Params extends ParamsBlueprintsForPath<Path> = ParamsBlueprintsForPath<Path>
+>({
   path,
+  params,
+  search,
+  hash,
+
   loader,
   disabled,
   component,
   forbidden,
   forbiddenComponent,
   disabledComponent
-}: CreateRouteProps<Path>): TypedRoute<Path> => {
+}: CreateRouteProps<Path, Search, Hash, Params>): CreateRouteReturn<Path, Search, Hash, Params> => {
   void loader;
 
-  const page = (
-    <DisabledRoute disabled={disabled} fallback={disabledComponent}>
-      <ForbiddenRoute forbidden={forbidden} fallback={forbiddenComponent}>
-        {toElement(component)}
-      </ForbiddenRoute>
-    </DisabledRoute>
+  const paramsParser = useMemo(() => (params ? createParamsParser(params) : undefined), [params]);
+  const searchParser = useMemo(() => (search ? createSearchParams(search) : undefined), [search]);
+  const content = useMemo(() => toElement(component), [component]);
+
+  const withSearch = searchParser ? (
+    <SearchParamsProvider params={searchParser}>{content}</SearchParamsProvider>
+  ) : (
+    content
   );
 
-  return registerRoute({
+  const element = (
+    <ErrorBoundary
+      FallbackComponent={props => <div>{JSON.stringify(props)}</div>}
+      onReset={() => {
+        window.location.reload();
+      }}
+    >
+      <DisabledBoundary disabled={disabled} FallbackComponent={disabledComponent}>
+        <ForbiddenBoundary forbidden={forbidden} FallbackComponent={forbiddenComponent}>
+          <RouteProvider path={path} params={params} search={search} hash={hash}>
+            {withSearch}
+          </RouteProvider>
+        </ForbiddenBoundary>
+      </DisabledBoundary>
+    </ErrorBoundary>
+  );
+
+  const useParams = () => {
+    const rawParams = useRouterParams() as Record<string, string | undefined>;
+    return (paramsParser ? paramsParser.parse(rawParams) : rawParams) as PathParams<Path> | Record<string, string>;
+  };
+
+  return {
     path,
-    page,
-    params: null as PathParams<Path>,
-    search: null,
-    hash: null,
-    route: <Route path={path} element={page} />,
-    to: params => buildPath(path, params)
-  });
+    params: {} as ParamsValues<Params>,
+    paramsParser,
+    search: {} as SearchParamValues<Search>,
+    searchParser,
+    hash: hash ?? undefined,
+    element
+    // useParams,
+    // to: (pathParams: PathParams<Path>) => {
+    //   const stringParams = paramsParser
+    //     ? paramsParser.stringify(pathParams as unknown as Partial<ReturnType<typeof paramsParser.parse>>)
+    //     : (pathParams as unknown as Record<string, PathParamValue>);
+
+    //   return buildPath(path, stringParams);
+    // }
+  };
 };

@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useMemo, useSyncExternalStore } from 'react';
 import { useLocation, useNavigate } from 'react-router';
 import { getRegisteredRoutes } from '../store/router.store';
-import type { RoutePanel } from './RouteProvider';
+import { RoutePanel } from './PanelProvider';
 
 export type RouterStoreState = {
   pathname: string;

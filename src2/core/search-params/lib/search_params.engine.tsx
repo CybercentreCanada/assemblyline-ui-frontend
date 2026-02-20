@@ -1,19 +1,15 @@
+import type { Location } from 'react-router';
 import {
   BooleanBlueprint,
   EnumBlueprint,
   FiltersBlueprint,
   NumberBlueprint,
   StringBlueprint
-} from 'components/core/SearchParams/lib/search_params.blueprint';
-import type {
-  ParamBlueprints,
-  SearchParamRuntimes,
-  SearchParamValues
-} from 'components/core/SearchParams/lib/search_params.model';
-import type { ParamRuntime } from 'components/core/SearchParams/lib/search_params.runtime';
-import { PARAM_RUNTIMES } from 'components/core/SearchParams/lib/search_params.runtime';
-import { SearchParamSnapshot } from 'components/core/SearchParams/lib/search_params.snapshot';
-import type { Location } from 'react-router';
+} from '../lib/search_params.blueprint';
+import type { ParamBlueprints, SearchParamRuntimes, SearchParamValues } from '../lib/search_params.model';
+import type { ParamRuntime } from '../lib/search_params.runtime';
+import { PARAM_RUNTIMES } from '../lib/search_params.runtime';
+import { SearchParamSnapshot } from '../lib/search_params.snapshot';
 
 export class SearchParamEngine<Blueprints extends Record<string, ParamBlueprints>> {
   private runtimes: SearchParamRuntimes<Blueprints>;

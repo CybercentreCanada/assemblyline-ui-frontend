@@ -1,11 +1,6 @@
-import type {
-  ParamBlueprints,
-  ParamValues,
-  SearchParamRuntimes,
-  SearchParamValues
-} from 'components/core/SearchParams/lib/search_params.model';
-import type { ParamRuntime } from 'components/core/SearchParams/lib/search_params.runtime';
 import type { Location } from 'react-router';
+import type { ParamBlueprints, ParamValues, SearchParamRuntimes, SearchParamValues } from '../lib/search_params.model';
+import type { ParamRuntime } from '../lib/search_params.runtime';
 
 export class SearchParamSnapshot<Blueprints extends Record<string, ParamBlueprints>> {
   constructor(

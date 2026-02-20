@@ -5,17 +5,17 @@ const DefaultForbiddenRouteFallback = React.memo(() => {
   return 'forbidden';
 });
 
-type ForbiddenRouteProps = {
+type ForbiddenBoundaryProps = {
   forbidden?: boolean | (() => boolean);
-  fallback?: ReactNode | MemoExoticComponent<ComponentType<any>>;
+  FallbackComponent?: ReactNode | MemoExoticComponent<ComponentType<any>>;
   children: ReactNode | MemoExoticComponent<ComponentType<any>>;
 };
 
-export const ForbiddenRoute = ({
+export const ForbiddenBoundary = ({
   forbidden = false,
-  fallback = DefaultForbiddenRouteFallback,
+  FallbackComponent = DefaultForbiddenRouteFallback,
   children
-}: ForbiddenRouteProps) => {
-  if (typeof forbidden === 'function' ? forbidden() : forbidden) return <>{fallback}</>;
+}: ForbiddenBoundaryProps) => {
+  if (typeof forbidden === 'function' ? forbidden() : forbidden) return <>{FallbackComponent}</>;
   return <>{children}</>;
 };
