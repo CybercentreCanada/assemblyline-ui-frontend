@@ -1,9 +1,9 @@
 import type { UndefinedInitialDataOptions } from '@tanstack/react-query';
-import type { UseAPIQueryProps } from 'components/core/Query/API/useAPIQuery';
-import { useAPIQuery } from 'components/core/Query/API/useAPIQuery';
-import type { ALRequests, ALResponses } from 'components/core/Query/components/al.models';
-import type { APIQueryKey, APIResponse } from 'components/core/Query/components/api.models';
-import type { UseAPICallFnProps } from 'components/core/Query/components/useAPICallFn';
+import type { UseAPIQueryProps } from '../API/useAPIQuery';
+import { useAPIQuery } from '../API/useAPIQuery';
+import type { ALRequests, ALResponses } from '../components/al.models';
+import type { APIQueryKey, APIResponse } from '../components/api.models';
+import type { UseAPICallFnProps } from '../components/useAPICallFn';
 
 export type UseALQueryProps<Request extends ALRequests> = {
   queryProps?: Omit<

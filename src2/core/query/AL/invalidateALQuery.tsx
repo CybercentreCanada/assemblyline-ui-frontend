@@ -1,7 +1,7 @@
-import { queryClient } from 'components/core/Query/components/APIProvider';
-import type { ALRequests } from 'components/core/Query/components/al.models';
-import type { APIQueryKey, APIRequest } from 'components/core/Query/components/api.models';
-import { DEFAULT_INVALIDATE_DELAY } from 'components/core/Query/components/constants';
+import { queryClient } from '../components/APIProvider';
+import type { ALRequests } from '../components/al.models';
+import type { APIQueryKey, APIRequest } from '../components/api.models';
+import { DEFAULT_INVALIDATE_DELAY } from '../components/constants';
 
 function isObject(variable) {
   return variable !== null && typeof variable === 'object' && !Array.isArray(variable);

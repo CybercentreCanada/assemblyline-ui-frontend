@@ -1,10 +1,10 @@
-import type { APIRequest, APIResponse } from 'components/core/Query/components/api.models';
-import { DEFAULT_RETRY_MS } from 'components/core/Query/components/constants';
-import { isAPIData } from 'components/core/Query/components/utils';
-import useALContext from 'components/hooks/useALContext';
-import useMySnackbar from 'components/hooks/useMySnackbar';
-import useQuota from 'components/hooks/useQuota';
-import getXSRFCookie from 'helpers/xsrf';
+import type { APIRequest, APIResponse } from './api.models';
+import { DEFAULT_RETRY_MS } from './constants';
+import { isAPIData } from './utils';
+import useALContext from '../../../../src/components/hooks/useALContext';
+import useMySnackbar from '../../../../src/components/hooks/useMySnackbar';
+import useQuota from '../../../../src/components/hooks/useQuota';
+import getXSRFCookie from '../../../../src/helpers/xsrf';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 

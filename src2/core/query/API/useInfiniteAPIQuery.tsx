@@ -1,10 +1,10 @@
 import type { InfiniteData } from '@tanstack/react-query';
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
-import type { APIQueryKey, APIRequest, APIResponse } from 'components/core/Query/components/api.models';
-import { DEFAULT_RETRY_MS } from 'components/core/Query/components/constants';
-import type { UseAPICallFnProps } from 'components/core/Query/components/useAPICallFn';
-import { useAPICallFn } from 'components/core/Query/components/useAPICallFn';
-import { stableStringify } from 'components/core/Query/components/utils';
+import type { APIQueryKey, APIRequest, APIResponse } from '../components/api.models';
+import { DEFAULT_RETRY_MS } from '../components/constants';
+import type { UseAPICallFnProps } from '../components/useAPICallFn';
+import { useAPICallFn } from '../components/useAPICallFn';
+import { stableStringify } from '../components/utils';
 import { useMemo } from 'react';
 
 export type UseInfiniteAPIQueryProps<Response = unknown, Request extends APIRequest = APIRequest, Error = string> = {

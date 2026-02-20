@@ -1,4 +1,4 @@
-import { createFormContext } from 'components/core/form/createFormContext';
+import { createFormContext } from '../form/createFormContext';
 import React, { useCallback, useContext, useEffect, useMemo, useRef } from 'react';
 
 export type TableOfContentAnchor = {

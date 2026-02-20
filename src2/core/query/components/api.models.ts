@@ -1,4 +1,4 @@
-import type { Method } from 'components/models/utils/request';
+import type { Method } from '../../../../src/components/models/utils/request';
 
 export type APIRequest = {
   url: string;

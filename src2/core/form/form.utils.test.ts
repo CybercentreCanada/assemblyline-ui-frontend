@@ -1,4 +1,4 @@
-import { isObject } from 'components/core/form/form.utils';
+import { isObject } from './form.utils';
 import { expect } from 'vitest';
 
 describe('Test `Form Utilities`', () => {

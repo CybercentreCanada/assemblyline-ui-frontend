@@ -1,9 +1,9 @@
 import type { UseMutationOptions } from '@tanstack/react-query';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import type { APIRequest, APIResponse } from 'components/core/Query/components/api.models';
-import type { UseAPICallFnProps } from 'components/core/Query/components/useAPICallFn';
-import { useAPICallFn } from 'components/core/Query/components/useAPICallFn';
-import { getAPIResponse } from 'components/core/Query/components/utils';
+import type { APIRequest, APIResponse } from '../components/api.models';
+import type { UseAPICallFnProps } from '../components/useAPICallFn';
+import { useAPICallFn } from '../components/useAPICallFn';
+import { getAPIResponse } from '../components/utils';
 
 export const useAPIMutation = <
   Props extends unknown[],

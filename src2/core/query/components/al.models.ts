@@ -1,7 +1,7 @@
-import type { RootRequests, RootResponses } from 'components/models/ui';
-import type { BadlistRequests, BadlistResponses } from 'components/models/ui/badlist';
-import type { SearchRequests, SearchResponses } from 'components/models/ui/search';
-import type { UserRequests, UserResponses } from 'components/models/ui/user';
+import type { RootRequests, RootResponses } from '../../../../src/components/models/ui';
+import type { BadlistRequests, BadlistResponses } from '../../../../src/components/models/ui/badlist';
+import type { SearchRequests, SearchResponses } from '../../../../src/components/models/ui/search';
+import type { UserRequests, UserResponses } from '../../../../src/components/models/ui/user';
 
 // prettier-ignore
 export type ALRequests =

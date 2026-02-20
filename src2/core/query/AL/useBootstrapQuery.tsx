@@ -1,15 +1,15 @@
 import type { UndefinedInitialDataOptions } from '@tanstack/react-query';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import type { APIQueryKey, APIResponse } from 'components/core/Query/components/api.models';
-import { DEFAULT_RETRY_MS } from 'components/core/Query/components/constants';
-import { getAPIResponse, isAPIData, stableStringify } from 'components/core/Query/components/utils';
-import useALContext from 'components/hooks/useALContext';
-import type { LoginParamsProps } from 'components/hooks/useMyAPI';
-import useMySnackbar from 'components/hooks/useMySnackbar';
-import useQuota from 'components/hooks/useQuota';
-import type { Configuration } from 'components/models/base/config';
-import type { CustomUser, WhoAmIProps } from 'components/models/ui/user';
-import getXSRFCookie from 'helpers/xsrf';
+import type { APIQueryKey, APIResponse } from '../components/api.models';
+import { DEFAULT_RETRY_MS } from '../components/constants';
+import { getAPIResponse, isAPIData, stableStringify } from '../components/utils';
+import useALContext from '../../../../src/components/hooks/useALContext';
+import type { LoginParamsProps } from '../../../../src/components/hooks/useMyAPI';
+import useMySnackbar from '../../../../src/components/hooks/useMySnackbar';
+import useQuota from '../../../../src/components/hooks/useQuota';
+import type { Configuration } from '../../../../src/components/models/base/config';
+import type { CustomUser, WhoAmIProps } from '../../../../src/components/models/ui/user';
+import getXSRFCookie from '../../../../src/helpers/xsrf';
 import { useTranslation } from 'react-i18next';
 
 export type UseBootstrapQueryProps = {

@@ -1,7 +1,7 @@
-import { useInfiniteAPIQuery } from 'components/core/Query/API/useInfiniteAPIQuery';
-import type { ALRequests, ALResponses } from 'components/core/Query/components/al.models';
-import type { APIResponse } from 'components/core/Query/components/api.models';
-import type { UseAPICallFnProps } from 'components/core/Query/components/useAPICallFn';
+import { useInfiniteAPIQuery } from '../API/useInfiniteAPIQuery';
+import type { ALRequests, ALResponses } from '../components/al.models';
+import type { APIResponse } from '../components/api.models';
+import type { UseAPICallFnProps } from '../components/useAPICallFn';
 
 export type UseInfiniteALQueryProps<Request extends ALRequests, Error extends string = string> = {
   initialOffset?: number;

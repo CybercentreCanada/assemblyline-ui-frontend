@@ -1,11 +1,11 @@
 import type { UndefinedInitialDataOptions } from '@tanstack/react-query';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import type { APIQueryKey, APIRequest, APIResponse } from 'components/core/Query/components/api.models';
-import { DEFAULT_RETRY_MS } from 'components/core/Query/components/constants';
-import type { UseAPICallFnProps } from 'components/core/Query/components/useAPICallFn';
-import { useAPICallFn } from 'components/core/Query/components/useAPICallFn';
-import { useIsDebouncing } from 'components/core/Query/components/useIsDebouncing';
-import { getAPIResponse, stableStringify } from 'components/core/Query/components/utils';
+import type { APIQueryKey, APIRequest, APIResponse } from '../components/api.models';
+import { DEFAULT_RETRY_MS } from '../components/constants';
+import type { UseAPICallFnProps } from '../components/useAPICallFn';
+import { useAPICallFn } from '../components/useAPICallFn';
+import { useIsDebouncing } from '../components/useIsDebouncing';
+import { getAPIResponse, stableStringify } from '../components/utils';
 
 export type UseAPIQueryProps<Response = unknown, Request extends APIRequest = APIRequest, Error = string> = {
   queryProps?: Omit<

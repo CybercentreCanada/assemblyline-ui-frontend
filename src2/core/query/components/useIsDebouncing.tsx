@@ -1,4 +1,4 @@
-import { stableStringify } from 'components/core/Query/components/utils';
+import { stableStringify } from './utils';
 import { useEffect, useMemo, useState } from 'react';
 
 export const useIsDebouncing = (delay: number | null = null, dependencies: readonly unknown[] = []): boolean => {

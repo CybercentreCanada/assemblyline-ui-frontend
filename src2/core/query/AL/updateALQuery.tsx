@@ -1,6 +1,6 @@
-import { queryClient } from 'components/core/Query/components/APIProvider';
-import type { ALRequests, ALResponses } from 'components/core/Query/components/al.models';
-import type { APIQueryKey, APIRequest, APIResponse } from 'components/core/Query/components/api.models';
+import { queryClient } from '../components/APIProvider';
+import type { ALRequests, ALResponses } from '../components/al.models';
+import type { APIQueryKey, APIRequest, APIResponse } from '../components/api.models';
 
 function isObject(variable) {
   return variable !== null && typeof variable === 'object' && !Array.isArray(variable);

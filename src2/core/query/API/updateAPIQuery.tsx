@@ -1,5 +1,5 @@
-import { queryClient } from 'components/core/Query/components/APIProvider';
-import type { APIQueryKey, APIRequest, APIResponse } from 'components/core/Query/components/api.models';
+import { queryClient } from '../components/APIProvider';
+import type { APIQueryKey, APIRequest, APIResponse } from '../components/api.models';
 
 // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-constraint
 export const updateAPIQuery = <T extends unknown = unknown>(

@@ -4,7 +4,7 @@ import {
   isValidValue,
   shallowEqual,
   shallowReconcile
-} from 'components/core/PropProvider/props.utils';
+} from './props.utils';
 import { describe, expect, it } from 'vitest';
 
 describe('isValidValue', () => {

@@ -1,4 +1,4 @@
-import { stableStringify } from 'components/core/Query/components/utils';
+import { stableStringify } from './utils';
 import { describe, expect, it } from 'vitest';
 
 describe('stableStringify', () => {
