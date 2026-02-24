@@ -1,6 +1,8 @@
 import type { ComponentType, MemoExoticComponent, ReactNode } from 'react';
 import React from 'react';
 import { ParamsBlueprint, ParamsBlueprints, ParamsValues, PathParamValue } from '../models/router.models';
+import { RoutePanel } from '../providers/PanelProvider';
+import { RouterStore } from '../providers/RouterProvider';
 
 //*****************************************************************************************
 // Path
@@ -95,3 +97,87 @@ export const toElement = (value: ReactNode | MemoExoticComponent<ComponentType<a
 export type Params<Path extends string> = null;
 
 export const buildParams = <Path extends string>(path: Path) => {};
+
+//*****************************************************************************************
+// Router
+//*****************************************************************************************
+
+export const getTargetPanel = (fromPanel: RoutePanel | null = 'panel-0', panel?: RoutePanel): RoutePanel => {
+  if (panel) return panel;
+  if (!fromPanel || fromPanel === 'panel-0') return 'panel-1';
+  if (fromPanel === 'panel-1') return 'panel-2';
+  if (fromPanel === 'panel-2') return 'panel-1';
+  return 'panel-1';
+};
+
+export const withParams = (path: string, params?: Record<string, string | number | boolean>) => {
+  if (!params) return path;
+  return Object.entries(params).reduce(
+    (acc, [key, value]) => acc.replace(`:${key}`, encodeURIComponent(String(value))),
+    path
+  );
+};
+
+export const toSearchString = (search?: Record<string, unknown>) => {
+  if (!search) return '';
+  const searchParams = new URLSearchParams();
+  Object.entries(search).forEach(([key, value]) => {
+    if (value === null || value === undefined) return;
+    if (Array.isArray(value)) {
+      value.forEach(item => searchParams.append(key, String(item)));
+      return;
+    }
+    searchParams.set(key, String(value));
+  });
+  const value = searchParams.toString();
+  return value ? `?${value}` : '';
+};
+
+export const upsertRouteInStore = (state: RouterStore, href: string, path: string): RouterStore => {
+  const now = Date.now();
+  const routeId = href;
+  const routes = new Map(state.routes);
+  const existing = routes.get(routeId);
+  routes.set(routeId, existing ? { ...existing, path, href, lastVisitedAt: now } : { path, href, lastVisitedAt: now });
+
+  return { ...state, routes };
+};
+
+export const assignRouteToPanel = (state: RouterStore, panelId: string, routeId: string): RouterStore => {
+  const panels = new Map(state.panels);
+  const panel = panels.get(panelId) ?? { nodeId: null, tabbedRouteIds: [] };
+
+  let nodeId = panel.nodeId;
+  const nodes = new Map(state.nodes);
+
+  if (!nodeId) {
+    const freeNode = Array.from(nodes.entries()).find(([, node]) => !node.routeId);
+    if (freeNode) {
+      nodeId = freeNode[0];
+    } else {
+      const leastUsedNode = Array.from(nodes.entries()).reduce((oldest, current) => {
+        return current[1].lastUsedAt < oldest[1].lastUsedAt ? current : oldest;
+      });
+      nodeId = leastUsedNode?.[0] ?? null;
+    }
+  }
+
+  if (!nodeId) return state;
+
+  const now = Date.now();
+  const currentNode = nodes.get(nodeId);
+  if (!currentNode) return state;
+  nodes.set(nodeId, {
+    ...currentNode,
+    routeId,
+    lastUsedAt: now
+  });
+
+  panels.set(panelId, {
+    ...panel,
+    nodeId,
+    tabbedRouteIds: panel.tabbedRouteIds.includes(routeId) ? panel.tabbedRouteIds : [...panel.tabbedRouteIds, routeId]
+  });
+
+  return { ...state, nodes, panels };
+};

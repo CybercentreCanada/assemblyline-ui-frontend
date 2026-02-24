@@ -1,8 +1,6 @@
-import { Link } from 'core/router/components/Link';
+import { Link } from 'core/router';
 import { createReversePortalNode, InPortal, OutPortal } from 'core/router/components/Portals';
 import React, { useMemo, useState } from 'react';
-import Page2 from './Page2';
-import { SubmissionsRoute } from './Submissions';
 
 const StatefulWidget = React.memo(() => {
   const [count, setCount] = useState(0);
@@ -49,10 +47,15 @@ export const Page1 = () => {
     <div>
       <h1>Page 1</h1>
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-        <Link to={Page2} params={{ fileID: 'from-page1' }}>
+        <Link to="/page1">Page 1</Link>
+        <Link to="/page2/asdasd">Page 2</Link>
+        <Link to="/submissions/asdasd">Submissions</Link>
+
+        {/* <Link to={{ path: '/path1' }}>Page 1</Link> */}
+        {/* <Link to={Page2} params={{ fileID: 'from-page1' }}>
           Go to Page 2
         </Link>
-        <Link to={SubmissionsRoute}>Go to Submissions</Link>
+        <Link to={SubmissionsRoute}>Go to Submissions</Link> */}
         {/* <Link to={Page2} params={{ fileID: 'from-page1-drawer' }}>
           Open Page 2 (drawer)
         </Link>

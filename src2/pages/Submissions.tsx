@@ -1,9 +1,7 @@
-import { useNavigate, useParams, useSearch } from 'core/router';
-import { Link } from 'core/router/components/Link';
+import { Link, useNavigate, useParams, useSearch } from 'core/router';
 import { createRoute } from 'core/router/utils/createRoute';
 import React, { useCallback } from 'react';
 import { useLocation } from 'react-router';
-import Page2 from './Page2';
 
 export const SubmissionsPage = React.memo(() => {
   // const { fileID } = useParams();
@@ -19,9 +17,8 @@ export const SubmissionsPage = React.memo(() => {
     navigate({
       path: '/submissions/:query',
       params: { query: '123' },
-      search: { query: '123' }
-
-      // search: { query: 123, offset: '123' }
+      search: { query: '123' },
+      target: ['open', 'replace']
     });
   }, []);
 
@@ -29,10 +26,11 @@ export const SubmissionsPage = React.memo(() => {
     <div>
       <h1>Submissions</h1>
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-        <Link to="/page1">Go to Page 1</Link>
-        <Link to={Page2} params={{ fileID: 'from-page3' }}>
-          Go to Page 2
-        </Link>
+        <Link to="/page1">Page 1</Link>
+        <Link to="/page2/asdasd">Page 2</Link>
+        <Link to="/submissions/asdasd">Submissions</Link>
+        {/* <Link to={{ path: '/page2/:fileID', params: { fileID: 'asd' }, target: 'open' }}>Go to Page 1</Link> */}
+        {/* <Link>Go to Page 2</Link> */}
         {/* <Link to="/page1" panel={2}>
           Open Page 1 (drawer)
         </Link>
@@ -45,25 +43,27 @@ export const SubmissionsPage = React.memo(() => {
 });
 
 export const SubmissionsRoute = createRoute({
-  path: '/submissions/:query',
-  params: p => ({
-    query: p.string()
-  }),
-  search: p => ({
-    query: p.string(''),
-    offset: p.number(0).min(0).origin('snapshot').ephemeral(),
-    rows: p.number(25).locked().origin('snapshot').ephemeral(),
-    sort: p.string('times.submitted desc').ephemeral(),
-    filters: p.filters([]),
-    track_total_hits: p.number(null).origin('snapshot').nullable().ephemeral()
-  }),
-
   component: SubmissionsPage,
+  path: '/submissions/:query',
+  loading: () => false,
 
   disabled: () => {
     // const { features } = appStore.getState();
     return false;
-  }
+  },
+
+  paramParser: p => ({
+    query: p.string()
+  }),
+  searchParser: s => ({
+    query: s.string(''),
+    offset: s.number(0).min(0).origin('snapshot').ephemeral(),
+    rows: s.number(25).locked().origin('snapshot').ephemeral(),
+    sort: s.string('times.submitted desc').ephemeral(),
+    filters: s.filters([]),
+    track_total_hits: s.number(null).origin('snapshot').nullable().ephemeral()
+  }),
+  hashParser: h => ({})
 });
 
 SubmissionsRoute.search;

@@ -1,220 +1,174 @@
-import React, { createContext, useCallback, useContext, useEffect, useRef, useSyncExternalStore } from 'react';
-import { RoutePanel } from './PanelProvider';
+import { createStoreContext } from 'core/store/createStoreContext';
+import React, { useCallback } from 'react';
+import { useLocation, useNavigate } from 'react-router';
+import { createReversePortalNode, type ReversePortalNode } from '../components/Portals';
+import type { NavigateTo } from '../hooks/useNavigate';
+import {
+  assignRouteToPanel,
+  getTargetPanel,
+  toSearchString,
+  upsertRouteInStore,
+  withParams
+} from '../utils/router.utils';
+import type { RoutePanel } from './PanelProvider';
+
+// ********************************************************************************************
+// Router Store
+// ********************************************************************************************
+
+export type RouteInstance = {
+  id: string;
+  pathname: string;
+  search?: string;
+  hash?: string;
+  state?: any;
+};
+
+export type NodeState = {
+  id: string;
+  portal: ReversePortalNode;
+  routeKey: string | null;
+  lastUsedAt: number;
+};
+
+export type PanelState = {
+  id: string;
+  nodeKey: string | null;
+  tabbedRouteKeys: string[];
+};
 
 export type RouterStore = {
-  pathname: string;
-  hashPath: string;
-  registeredPaths: string[];
+  panels: PanelState[];
+  nodes: NodeState[];
+  routes: RouteInstance[];
 };
 
-export const DEFAULT_ROUTER_STORE: RouterStore = {
-  pathname: null,
-  hashPath: null,
-  registeredPaths: []
-};
-
-const useRouterData = (
-  data: RouterStore
-): {
-  get: () => RouterStore;
-  set: (dispatch: Partial<RouterStore> | ((value: Partial<RouterStore>) => Partial<RouterStore>)) => void;
-  subscribe: (callback: () => void) => () => void;
-} => {
-  const store = useRef<RouterStore>(data);
-
-  const get = useCallback(() => store.current, []);
-
-  const subscribers = useRef<Set<() => void>>(new Set<() => void>());
-
-  const reset = useCallback((data: RouterStore) => {
-    Object.keys(store.current || {}).forEach(key => {
-      if (!(key in data) && key in DEFAULT_ROUTER_STORE) {
-        delete store.current[key];
-      }
-    });
-
-    store.current = { ...store.current, ...data };
-    subscribers.current.forEach(callback => callback());
-  }, []);
-
-  const set = useCallback(
-    (dispatch: Partial<RouterStore> | ((value: Partial<RouterStore>) => Partial<RouterStore>)) => {
-      store.current =
-        typeof dispatch === 'function'
-          ? { ...store.current, ...dispatch(store.current) }
-          : { ...store.current, ...dispatch };
-      subscribers.current.forEach(callback => callback());
-    },
-    []
-  );
-
-  const subscribe = useCallback((callback: () => void) => {
-    subscribers.current.add(callback);
-    return () => subscribers.current.delete(callback);
-  }, []);
-
-  useEffect(() => {
-    reset(data);
-  }, [data, reset]);
-
-  return { get, set, subscribe };
-};
-
-export type UseRouterDataReturnType = ReturnType<typeof useRouterData>;
-
-export const RouterContext = createContext<UseRouterDataReturnType | null>(null);
-
-export type RouterProviderProps = {
-  children: React.ReactNode;
-  // data: RouterStore;
-};
-
-export const RouterProvider = ({ children }: RouterProviderProps) => (
-  <RouterContext.Provider value={useRouterData(DEFAULT_ROUTER_STORE)}>{children}</RouterContext.Provider>
-);
-
-export const useRouter = <SelectorOutput,>() =>
-  // selector: (store: Store) => SelectorOutput
-  // ): [SelectorOutput, (dispatch: Partial<Store> | ((value: Partial<Store>) => Partial<Store>)) => void] => {
-  {
-    const store = useContext(RouterContext);
-    if (!store) {
-      throw new Error('Store not found');
-    }
-
-    const selector = (store: RouterStore) => null;
-
-    const state = useSyncExternalStore(
-      store.subscribe,
-      () => selector(store.get()) ?? selector(DEFAULT_ROUTER_STORE),
-      () => selector(DEFAULT_ROUTER_STORE)
-    );
-
-    const navigateTo = useCallback(
-      (to: string, options?: { fromPanel?: RoutePanel; panel?: RoutePanel; replace?: boolean }) => {},
-      []
-    );
-
-    const resolveHref = useCallback((to: string, options?: { fromPanel?: RoutePanel; panel?: RoutePanel }): string => {
-      return '';
-    }, []);
-
-    return { navigateTo, resolveHref };
-    // return [state, store.set];
-  };
-
-// export type RouterStoreState = {
-//   pathname: string;
-//   hashPath: string;
-//   registeredPaths: string[];
-// };
-
-// type RouterStore = {
-//   getState: () => RouterStoreState;
-//   subscribe: (listener: () => void) => () => void;
-//   setState: (updater: (prev: RouterStoreState) => RouterStoreState) => void;
-// };
-
-// const createRouterStore = (initialState: RouterStoreState): RouterStore => {
-//   let state = initialState;
-//   const listeners = new Set<() => void>();
+// const createDefaultRouterStore2 = (): RouterStore => {
+//   const now = Date.now();
 
 //   return {
-//     getState: () => state,
-//     subscribe: listener => {
-//       listeners.add(listener);
-//       return () => listeners.delete(listener);
+//     maxNodes: 3,
+//     routesById: {
+//       'route-1': { id: 'route-1', path: '/page1', href: '/page1', lastVisitedAt: now },
+//       'route-2': { id: 'route-2', path: '/page2/:fileID', href: '/page2/asd', lastVisitedAt: now },
+//       submission: { id: 'submission', path: '/submissions/:query', href: '/submissions/asd', lastVisitedAt: now }
 //     },
-//     setState: updater => {
-//       state = updater(state);
-//       listeners.forEach(listener => listener());
-//     }
+//     routeOrder: ['route-1', 'route-2', 'submission'],
+//     nodesById: {
+//       'node-1': { id: `node-1`, portal: createReversePortalNode(), routeId: `route-1`, lastUsedAt: 0 },
+//       'node-2': { id: `node-2`, portal: createReversePortalNode(), routeId: `route-2`, lastUsedAt: 0 },
+//       submission: { id: `submission`, portal: createReversePortalNode(), routeId: `submission`, lastUsedAt: 0 }
+//     },
+//     nodeOrder: ['node-1', 'node-2'],
+//     panelsById: {
+//       1: { id: 1, nodeId: 'node-1' },
+//       2: { id: 2, nodeId: 'node-2' },
+//       3: { id: 2, nodeId: 'submission' }
+//     },
+//     panelOrder: [1, 2, 3]
 //   };
 // };
 
-// export type RouterContextValue = {
-//   store: RouterStore;
-//   navigateTo: (to: string, options?: { fromPanel?: RoutePanel; panel?: RoutePanel; replace?: boolean }) => void;
-//   resolveHref: (to: string, options?: { fromPanel?: RoutePanel; panel?: RoutePanel }) => string;
-// };
+const createDefaultRouterStore = (): RouterStore => {
+  const now = Date.now();
 
-// const RouterContext = createContext<RouterContextValue | null>(null);
+  return {
+    panels: [
+      { id: 'panel-1', nodeKey: 'node-1', tabbedRouteKeys: ['route-1'] },
+      { id: 'panel-2', nodeKey: 'node-2', tabbedRouteKeys: ['route-2'] },
+      { id: 'panel-3', nodeKey: 'node-3', tabbedRouteKeys: ['route-3'] }
+    ],
+    nodes: [
+      { id: 'node-1', portal: createReversePortalNode(), routeKey: `route-1`, lastUsedAt: 0 },
+      { id: 'node-2', portal: createReversePortalNode(), routeKey: `route-2`, lastUsedAt: 0 },
+      { id: 'node-3', portal: createReversePortalNode(), routeKey: `route-3`, lastUsedAt: 0 }
+    ],
+    routes: [
+      { id: 'route-1', pathname: '/page1' },
+      { id: 'route-2', pathname: '/page2/asd' },
+      { id: 'route-3', pathname: '/submissions/asd' }
+    ]
+  };
+};
 
-// export type RouterProviderProps = {
-//   children: React.ReactNode;
-// };
+const { StoreProvider, useStore: useRouterStore } = createStoreContext<RouterStore>(createDefaultRouterStore());
 
-// export const RouterProvider = ({ children }: RouterProviderProps) => {
-//   const location = useLocation();
-//   const navigate = useNavigate();
+export { useRouterStore };
 
-//   const store = useMemo(
-//     () =>
-//       createRouterStore({
-//         pathname: location.pathname,
-//         hashPath: location.hash.startsWith('#') ? location.hash.slice(1) : '',
-//         registeredPaths: getRegisteredRoutes().map(route => route.path)
-//       }),
-//     []
-//   );
+export const RouterProvider = React.memo(({ children }: { children: React.ReactNode }) => {
+  return <StoreProvider data={createDefaultRouterStore()}>{children}</StoreProvider>;
+});
 
-//   const getTargetPanel = (fromPanel: RoutePanel = 0, panel?: RoutePanel): RoutePanel => {
-//     if (typeof panel === 'number') return panel;
+// ********************************************************************************************
+// Router Actions
+// ********************************************************************************************
+export type UseRouterActions = {
+  resolveHref: (href: string, options?: { fromPanel?: RoutePanel; panel?: RoutePanel }) => string;
+  resolveTo: (
+    to:
+      | NavigateTo
+      | {
+          path: string;
+          params?: Record<string, string | number | boolean>;
+          search?: Record<string, unknown>;
+          hash?: string;
+        },
+    options?: {
+      fromPanel?: RoutePanel;
+      panel?: RoutePanel;
+      params?: Record<string, string | number | boolean>;
+      search?: Record<string, unknown>;
+      hash?: string;
+    }
+  ) => string;
+  navigateTo: (
+    href: string,
+    options?: { fromPanel?: RoutePanel; panel?: RoutePanel; replace?: boolean; keepAlive?: boolean }
+  ) => void;
+};
 
-//     switch (fromPanel) {
-//       case 0:
-//         return 1;
-//       case 1:
-//         return 2;
-//       case 2:
-//         return 1;
-//       default:
-//         return 1;
-//     }
-//   };
+export const useRouterActions = (): UseRouterActions => {
+  const [, setStore] = useRouterStore(s => s);
+  const location = useLocation();
+  const navigate = useNavigate();
 
-//   const value = useMemo<RouterContextValue>(
-//     () => ({
-//       store,
-//       resolveHref: (to, options) => {
-//         const targetPanel = getTargetPanel(options?.fromPanel ?? 0, options?.panel);
-//         if (targetPanel > 1) return `${location.pathname}#${to}`;
-//         else return `${to}${location.hash}`;
-//       },
-//       navigateTo: (to, options) => {
-//         const targetPanel = getTargetPanel(options?.fromPanel ?? 0, options?.panel);
-//         const target = targetPanel > 1 ? `${location.pathname}#${to}` : `${to}${location.hash}`;
-//         navigate(target, { replace: options?.replace });
-//       }
-//     }),
-//     [location.pathname, navigate, store]
-//   );
+  const resolveHref = useCallback(
+    (href: string, options?: { fromPanel?: RoutePanel; panel?: RoutePanel }) => {
+      const targetPanel = getTargetPanel(options?.fromPanel ?? 'panel-0', options?.panel);
+      return targetPanel !== 'panel-1' ? `${location.pathname}#${href}` : `${href}${location.hash}`;
+    },
+    [location.hash, location.pathname]
+  );
 
-//   useEffect(() => {
-//     store.setState(prev => ({
-//       ...prev,
-//       pathname: location.pathname,
-//       hashPath: location.hash.startsWith('#') ? location.hash.slice(1) : '',
-//       registeredPaths: getRegisteredRoutes().map(route => route.path)
-//     }));
-//   }, [location.hash, location.pathname, store]);
+  const resolveTo = useCallback<UseRouterActions['resolveTo']>(
+    (to, options) => {
+      const path = withParams(to.path, to.params ?? options?.params);
+      const search = toSearchString((to.search as Record<string, unknown> | undefined) ?? options?.search);
+      const hashValue = (to.hash as string | undefined) ?? options?.hash;
+      const hash = hashValue ? `#${hashValue}` : '';
+      const href = `${path}${search}${hash}`;
+      return resolveHref(href, options);
+    },
+    [resolveHref]
+  );
 
-//   return <RouterContext.Provider value={{ store }}>{children}</RouterContext.Provider>;
-// };
+  const navigateTo = useCallback<UseRouterActions['navigateTo']>(
+    (href, options) => {
+      const targetPanel = getTargetPanel(options?.fromPanel ?? 'panel-0', options?.panel);
+      const basePath = href.split('?')[0]?.split('#')[0] ?? href;
+      const routeId = href;
 
-// export const useRouterContext = () => {
-//   const context = useContext(RouterContext);
-//   if (!context) {
-//     throw new Error('useRouterContext must be used inside RouterProvider');
-//   }
-//   return context;
-// };
+      setStore(prev => {
+        const current = prev as RouterStore;
+        const withRoute = upsertRouteInStore(current, href, basePath);
+        return assignRouteToPanel(withRoute, targetPanel, routeId);
+      });
 
-// export const useRouterStore = <T,>(selector: (state: RouterStoreState) => T) => {
-//   const { store } = useRouterContext();
-//   return useSyncExternalStore(
-//     store.subscribe,
-//     () => selector(store.getState()),
-//     () => selector(store.getState())
-//   );
-// };
+      const resolved = resolveHref(href, options);
+      navigate(resolved, { replace: options?.replace });
+    },
+    [navigate, resolveHref, setStore]
+  );
+
+  return { resolveHref, resolveTo, navigateTo };
+};

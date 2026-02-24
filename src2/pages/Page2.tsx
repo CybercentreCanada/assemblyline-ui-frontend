@@ -5,7 +5,6 @@ import { useParams } from 'core/router/hooks/useParams';
 import { useSearch } from 'core/router/hooks/useSearch';
 import { createRoute } from 'core/router/utils/createRoute';
 import React from 'react';
-import { SubmissionsRoute } from './Submissions';
 
 export type Page2Params = typeof Page2.params;
 export type Page2Search = typeof Page2.search;
@@ -18,7 +17,7 @@ export const Page2Route = React.memo(() => {
 
   const navigate = useNavigate();
 
-  console.log(location, fileID);
+  // console.log(location, fileID);
 
   return (
     <div>
@@ -27,8 +26,10 @@ export const Page2Route = React.memo(() => {
         Current route param: {fileID}
       </Link> */}
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-        <Link to="/page1">Go to Page 1</Link>
-        <Link to={SubmissionsRoute}>Go to Submission</Link>
+        <Link to="/page1">Page 1</Link>
+        <Link to="/page2/asdasd">Page 2</Link>
+        <Link to="/submissions/asdasd">Submissions</Link>
+        {/* <Link to={SubmissionsRoute}>Go to Submission</Link> */}
         {/* <button onClick={() => navigate({ path: '/page2/:fileID', params: { fileID: 'from-useNavigate' } }, {})}>
           Go to Page 2 (hook)
         </button>

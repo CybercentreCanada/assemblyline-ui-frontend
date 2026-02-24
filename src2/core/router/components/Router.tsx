@@ -1,53 +1,81 @@
-import Page2 from 'pages/Page2';
-import { SubmissionsRoute } from 'pages/Submissions';
-import { useLocation } from 'react-router';
-import { PanelProvider } from '../providers/PanelProvider';
-import { RouteProvider } from '../providers/RouteProvider';
-import { RouterProvider } from '../providers/RouterProvider';
+import React from 'react';
+import { RouteIDProvider } from '../providers/RouteIdProvider';
+import { useRouterStore } from '../providers/RouterProvider';
 import { Link } from './Link';
+import { InPortal, OutPortal } from './Portals';
 import { Routes } from './Routes';
 
-export const Router = () => {
-  const location = useLocation();
+type PanelViewProps = {
+  panelKey: string;
+};
+
+const PanelView = React.memo(({ panelKey }: PanelViewProps) => {
+  const [panel] = useRouterStore(store => store.panels.find(p => p.id === panelKey));
+  const [node] = useRouterStore(store => (panel?.nodeKey ? store.nodes.find(n => n.id === panel.nodeKey) : null));
+  const [route] = useRouterStore(store => (node?.routeKey ? store.routes.find(r => r.id === node.routeKey) : null));
 
   return (
-    <RouterProvider>
-      <>
-        <nav style={{ display: 'flex', gap: '8px', marginBottom: '12px', flexWrap: 'wrap' }}>
-          <Link to="/page1">Page 1</Link>
-          <Link to={Page2} params={{ fileID: 'router-nav' }}>
-            Page 2
-          </Link>
-          <Link to={SubmissionsRoute}>Submissions</Link>
-          {/* <span style={{ marginLeft: '8px' }}>|</span>
-            <Link to="/page1">Open Page 1 (drawer)</Link>
-            <Link to={Page2} params={{ fileID: 'drawer-nav' }}>
-              Open Page 2 (drawer)
-            </Link>
-            <Link to={Page3}>Open Page 3 (drawer)</Link> */}
-        </nav>
+    <div style={{ border: '1px solid grey', minHeight: '220px', padding: '8px' }}>
+      <div style={{ marginTop: '8px', opacity: 0.75 }}>panel: {panelKey}</div>
+      <div style={{ opacity: 0.75 }}>route: {route?.pathname ?? 'none'}</div>
+      {node ? <OutPortal node={node.portal} /> : <div>No node assigned</div>}
+    </div>
+  );
+});
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gridGap: '16px', height: '50vh' }}>
-          <div style={{ border: '1px solid grey' }}>
-            <PanelProvider panel={1}>
-              <RouteProvider>
-                <Routes location={location.pathname} />
-              </RouteProvider>
-            </PanelProvider>
-          </div>
-          <div style={{ border: '1px solid grey' }}>
-            {
-              <PanelProvider panel={2}>
-                {location.hash.slice(1) && (
-                  <RouteProvider>
-                    <Routes location={location.hash.slice(1)} />
-                  </RouteProvider>
-                )}
-              </PanelProvider>
-            }
-          </div>
-        </div>
-      </>
-    </RouterProvider>
+type NodeMountProps = {
+  nodeKey: string;
+};
+
+const NodeMount = React.memo(({ nodeKey }: NodeMountProps) => {
+  const [node] = useRouterStore(store => store.nodes.find(n => n.id === nodeKey));
+  const [route] = useRouterStore(store => (node?.routeKey ? store.routes.find(r => r.id === node.routeKey) : null));
+
+  if (!node || !route) return null;
+
+  return (
+    <InPortal node={node.portal}>
+      <RouteIDProvider routeId={route?.id}>
+        <Routes pathname={route?.pathname} search={route?.search} hash={route?.hash} state={route?.state} />
+      </RouteIDProvider>
+    </InPortal>
+  );
+});
+
+export const Router = () => {
+  const [panels] = useRouterStore(store => store.panels);
+  const [nodes] = useRouterStore(store => store.nodes);
+
+  // const panelKeys = useMemo<string[]>(() => Array.from(panels.keys()), []);
+
+  // const nodeKeys = useMemo<string[]>(() => Array.from(nodes.keys()), []);
+
+  return (
+    <>
+      <nav style={{ display: 'flex', gap: '8px', marginBottom: '12px', flexWrap: 'wrap' }}>
+        <Link to="/page1">Page 1</Link>
+        <Link to="/page2/asdasd">Page 2</Link>
+        <Link to="/submissions/asdasd">Submissions</Link>
+      </nav>
+
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: `repeat(${Math.max(panels.length, 1)}, 1fr)`,
+          gridGap: '16px',
+          height: '50vh'
+        }}
+      >
+        {panels.map(({ id }) => (
+          <PanelView key={id} panelKey={id} />
+        ))}
+      </div>
+
+      <div style={{ display: 'none' }}>
+        {nodes.map(({ id }) => (
+          <NodeMount key={id} nodeKey={id} />
+        ))}
+      </div>
+    </>
   );
 };

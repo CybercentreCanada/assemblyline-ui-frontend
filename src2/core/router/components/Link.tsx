@@ -1,61 +1,49 @@
 import React from 'react';
 import type { LinkProps as RouterLinkProps } from 'react-router';
 import { Link as RouterLink } from 'react-router';
-import type { NavigateTo } from '../hooks/useNavigate';
-import { usePanel, type RoutePanel } from '../providers/PanelProvider';
-import { useRouter } from '../providers/RouterProvider';
+import { useNavigate, type NavigateTo } from '../hooks/useNavigate';
 import type { AppRoutes } from '../store/routes';
+
+// 'open' | 'replace'
 
 type AppRoute = AppRoutes[number];
 
-export type LinkProps = Omit<RouterLinkProps, 'to'> & {
+export type LinkProps2 = Omit<RouterLinkProps, 'to'> & {
   to: string | NavigateTo | AppRoute;
-  panel?: RoutePanel;
-  params?: Record<string, string | number | boolean>;
-  search?: Record<string, string | number | boolean | null | undefined>;
-  hash?: string;
+
+  // panel?: RoutePanel;
+  // params?: Record<string, string | number | boolean>;
+  // search?: Record<string, string | number | boolean | null | undefined>;
+  // hash?: string;
 };
 
-const buildHref = (
-  to: NavigateTo | AppRoute,
-  opts?: {
-    params?: Record<string, string | number | boolean>;
-    search?: Record<string, string | number | boolean | null | undefined>;
-    hash?: string;
-  }
-) => {
-  const paramsSource = (('params' in to && to.params) || opts?.params) as
-    | Record<string, string | number | boolean>
-    | undefined;
+// export type LinkProps = ({ to: string } | Partial<Path>) & Omit<RouterLinkProps, 'to' | 'pathname' | 'search' | 'hash'>;
 
-  const withParams = paramsSource
-    ? Object.entries(paramsSource).reduce(
-        (acc, [key, value]) => acc.replace(`:${key}`, encodeURIComponent(String(value))),
-        to.path
-      )
-    : to.path;
+export type LinkProps = { to: string } & Omit<RouterLinkProps, 'to' | 'pathname' | 'search' | 'hash'>;
 
-  const searchSource = ('search' in to ? to.search : undefined) ?? opts?.search;
-  const search = searchSource
-    ? new URLSearchParams(
-        Object.entries(searchSource).reduce<Record<string, string>>((acc, [key, value]) => {
-          if (value === undefined || value === null) return acc;
-          return { ...acc, [key]: String(value) };
-        }, {})
-      ).toString()
-    : '';
+// export const Link = React.memo(({ to, panel, params, search, hash, ...props }: LinkProps) => {
+export const Link = React.memo(({ to, onClick, ...props }: LinkProps) => {
+  // const { panel: currentPanel } = usePanel();
+  // const { resolveHref, resolveTo } = useRouterActions();
+  const navigate = useNavigate();
 
-  const hashValue = ('hash' in to ? to.hash : undefined) ?? opts?.hash;
-  const hash = typeof hashValue === 'string' && hashValue.length > 0 ? `#${hashValue}` : '';
+  // const href =
+  //   typeof to === 'string'
+  //     ? resolveHref(to, { fromPanel: currentPanel, panel })
+  //     : resolveTo(to, { fromPanel: currentPanel, panel, params, search, hash });
 
-  return `${withParams}${search ? `?${search}` : ''}${hash}`;
-};
+  // const href = useMemo(() => resolveTo(to) , [])
 
-export const Link = React.memo(({ to, panel, params, search, hash, ...props }: LinkProps) => {
-  const { panel: currentPanel } = usePanel();
-  const { resolveHref } = useRouter();
-
-  const href = typeof to === 'string' ? to : buildHref(to, { params, search, hash });
-
-  return <RouterLink to={resolveHref(href, { fromPanel: currentPanel, panel })} {...props} />;
+  return (
+    <RouterLink
+      // to={href}
+      to={to}
+      onClick={e => {
+        e.preventDefault();
+        e.stopPropagation();
+        navigate(to);
+      }}
+      {...props}
+    />
+  );
 });
