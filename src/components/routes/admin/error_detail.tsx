@@ -14,7 +14,7 @@ import type { CustomUser } from 'components/models/ui/user';
 import { DEFAULT_TAB, TAB_OPTIONS } from 'components/routes/file/viewer';
 import { FileDownloader } from 'components/visual/Buttons/FileDownloader';
 import Moment from 'components/visual/Moment';
-import { useEffect, useMemo, useState } from 'react';
+import { ReactElement, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BsClipboard } from 'react-icons/bs';
 import { Navigate, useLocation, useParams } from 'react-router';
@@ -54,16 +54,25 @@ export const ErrorDetail = ({ error_key = null }: ErrorDetailProps) => {
   const { user: currentUser } = useAppUser<CustomUser>();
   const downSM = useMediaQuery(theme.breakpoints.down('md'));
 
-  const errorMap = {
-    'MAX DEPTH REACHED': <PanToolOutlinedIcon style={{ color: theme.palette.action.active }} />,
-    'MAX RETRY REACHED': <PanToolOutlinedIcon style={{ color: theme.palette.action.active }} />,
-    EXCEPTION: <ReportProblemOutlinedIcon style={{ color: theme.palette.action.active }} />,
-    'TASK PRE-EMPTED': <CancelOutlinedIcon style={{ color: theme.palette.action.active }} />,
-    'SERVICE DOWN': <CancelOutlinedIcon style={{ color: theme.palette.action.active }} />,
-    'SERVICE BUSY': <CancelOutlinedIcon style={{ color: theme.palette.action.active }} />,
-    'MAX FILES REACHED': <PanToolOutlinedIcon style={{ color: theme.palette.action.active }} />,
-    UNKNOWN: <ReportProblemOutlinedIcon style={{ color: theme.palette.action.active }} />
-  };
+  const typeMap = useMemo<Record<Error['type'], ReactElement>>(() => {
+    const color =
+      error?.severity === 'error'
+        ? theme.palette.error.main
+        : error?.severity === 'warning'
+          ? theme.palette.warning.main
+          : theme.palette.action.active;
+
+    return {
+      'MAX DEPTH REACHED': <PanToolOutlinedIcon style={{ color }} />,
+      'MAX RETRY REACHED': <PanToolOutlinedIcon style={{ color }} />,
+      EXCEPTION: <ReportProblemOutlinedIcon style={{ color }} />,
+      'TASK PRE-EMPTED': <CancelOutlinedIcon style={{ color }} />,
+      'SERVICE DOWN': <CancelOutlinedIcon style={{ color }} />,
+      'SERVICE BUSY': <CancelOutlinedIcon style={{ color }} />,
+      'MAX FILES REACHED': <PanToolOutlinedIcon style={{ color }} />,
+      UNKNOWN: <ReportProblemOutlinedIcon style={{ color }} />
+    };
+  }, [error?.severity, theme.palette.action.active, theme.palette.error.main, theme.palette.warning.main]);
 
   const fileViewerPath = useMemo<string>(() => {
     const tab = TAB_OPTIONS.find(option => location.pathname.indexOf(option) >= 0);
@@ -114,9 +123,12 @@ export const ErrorDetail = ({ error_key = null }: ErrorDetailProps) => {
                 </Typography>
               </div>
             </Grid>
-            <Grid size={{ xs: 12, sm: 8 }}>
-              <span style={{ verticalAlign: 'middle' }}>{errorMap[error.type]}&nbsp;</span>
-              <span style={{ verticalAlign: 'middle' }}>{t(`type.${error.type}`)}</span>
+            <Grid
+              size={{ xs: 12, sm: 8 }}
+              sx={{ display: 'flex', alignItems: 'center', columnGap: theme.spacing(0.5) }}
+            >
+              {typeMap?.[error?.type]}
+              <span>{t(`type.${error?.type}`)}</span>
             </Grid>
             <Grid size={{ xs: 12, sm: 4 }} style={{ alignSelf: 'center' }}>
               <span style={{ verticalAlign: 'middle' }}>{t(`fail.${error.response.status}`)}</span>
