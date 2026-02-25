@@ -681,16 +681,16 @@ const WrappedAlertActions = ({ alert, inDrawer = false }: Props) => {
         <SpeedDial
           ariaLabel={t('action_menu')}
           sx={{
-            ...(permanent && {
-              ['&.MuiSpeedDial-root']: {
-                marginRight: '-6px'
-              }
-            }),
-            ...(!vertical && {
-              ['&.MuiSpeedDial-actionsClosed']: {
-                width: 0
-              }
-            })
+            '&.MuiSpeedDial-root': {
+              ...(permanent && { marginRight: '-6px' })
+            },
+            '.MuiSpeedDial-actions': {
+              backgroundColor: theme.palette.background.paper
+            },
+            '.MuiSpeedDial-actionsClosed': {
+              backgroundColor: 'rgba(0, 0, 0, 0) !important',
+              ...(!vertical && { width: 0 })
+            }
           }}
           icon={
             <SpeedDialIcon
