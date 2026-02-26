@@ -1,4 +1,4 @@
-import { Link } from 'core/router';
+import { createRoute, Link } from 'core/router';
 import { createReversePortalNode, InPortal, OutPortal } from 'core/router/components/Portals';
 import React, { useMemo, useState } from 'react';
 
@@ -39,7 +39,7 @@ const StatefulWidget = React.memo(() => {
   );
 });
 
-export const Page1 = React.memo(() => {
+export const Page1Page = React.memo(() => {
   const node = useMemo(() => createReversePortalNode(), []);
   const [right, setRight] = useState<null | number>(null);
 
@@ -102,6 +102,8 @@ export const Page1 = React.memo(() => {
   );
 });
 
-export default Page1;
+Page1Page.displayName = 'Page1Page';
 
-Page1.displayName = 'Page1';
+export const Page1Route = createRoute({ path: '/page1', component: Page1Page });
+
+export default Page1Route;

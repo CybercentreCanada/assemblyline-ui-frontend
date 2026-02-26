@@ -1,8 +1,9 @@
 import { useCallback } from 'react';
-import { type RoutePanel } from '../providers/PanelProvider';
+import { useNavigate as useRouterNavigate } from 'react-router';
+import { AppRoutes } from '../components/Routes';
+import type { RoutePanel } from '../providers/PanelProvider';
 import { useRouteID } from '../providers/RouteIdProvider';
-import { useRouterActions } from '../providers/RouterProvider';
-import { AppRoutes } from '../store/routes';
+import { useRouterStore } from '../providers/RouterProvider';
 
 type NavigateOptions = { panel?: RoutePanel } | { variant?: 'open' | 'replace' };
 
@@ -19,15 +20,30 @@ type RouteInput<Route extends AppRoute> = Expand<
 export type NavigateTo = AppRoute extends infer Route ? (Route extends AppRoute ? RouteInput<Route> : never) : never;
 
 export const useNavigate = () => {
+  const routerNavigate = useRouterNavigate();
   const { routeId } = useRouteID();
-  const { navigateTo } = useRouterActions();
+  const [store] = useRouterStore(s => s);
 
   return useCallback(
     // (to: NavigateTo, options?: NavigateOptions) => {
-    (to: string, options?: NavigateOptions) => {
-      const explicitPanel = options && 'panel' in options ? options.panel : undefined;
-      navigateTo(to, { fromPanel: routeId ? 'panel-1' : 'panel-0', panel: explicitPanel });
+    (type: 'open' | 'replace' | number, href: string, options?: NavigateOptions) => {
+      console.log(type, href, options);
 
+      const nextLocation =
+        type === 'open'
+          ? calculateOpenRoute(store, href, routeId)
+          : type === 'replace'
+            ? calculateReplaceRoute(store, href, routeId)
+            : typeof type === 'number'
+              ? calculateGoToRoute(store, href, type, routeId)
+              : null;
+
+      if (nextLocation) {
+        routerNavigate(nextLocation);
+      }
+
+      // const explicitPanel = options && 'panel' in options ? options.panel : undefined;
+      // navigateTo(to, { fromPanel: routeId ? 'panel-1' : 'panel-0', panel: explicitPanel });
       // const explicitPanel = options && 'panel' in options ? options.panel : undefined;
       // const path = Object.entries((to.params ?? {}) as Record<string, string | number | boolean>).reduce(
       //   (acc, [key, value]) => acc.replace(`:${key}`, encodeURIComponent(String(value))),
@@ -43,6 +59,6 @@ export const useNavigate = () => {
       // const href = `${path}${search ? `?${search}` : ''}${hash}`;
       // navigateTo(href, { fromPanel: panel, panel: explicitPanel });
     },
-    [navigateTo, routeId]
+    [routeId]
   );
 };

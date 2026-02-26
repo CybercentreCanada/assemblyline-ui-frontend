@@ -42,6 +42,8 @@ export const SubmissionsPage = React.memo(() => {
   );
 });
 
+SubmissionsPage.displayName = 'SubmissionsPage';
+
 export const SubmissionsRoute = createRoute({
   component: SubmissionsPage,
   path: '/submissions/:query',
@@ -65,7 +67,5 @@ export const SubmissionsRoute = createRoute({
   }),
   hashParser: h => ({})
 });
-
-SubmissionsRoute.search;
 
 export default SubmissionsRoute;
