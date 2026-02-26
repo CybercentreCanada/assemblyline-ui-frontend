@@ -1,35 +1,66 @@
-import React, { createContext, useCallback, useContext, useEffect, useRef, useSyncExternalStore } from 'react';
+import { createContext, useCallback, useContext, useEffect, useRef, useSyncExternalStore } from 'react';
+
+type DeepPartial<T> =
+  T extends Array<infer U> ? Array<DeepPartial<U>> : T extends object ? { [K in keyof T]?: DeepPartial<T[K]> } : T;
+
+const isObject = (value: unknown): value is Record<string, unknown> =>
+  value != null && typeof value === 'object' && !Array.isArray(value);
+
+const deepPatch = <T extends object>(base: T, patch?: DeepPartial<T>): T => {
+  if (patch == null) return base;
+  if (!isObject(base) || !isObject(patch)) {
+    return (patch as T) ?? base;
+  }
+
+  let changed = false;
+  const next: Record<string, unknown> = { ...(base as Record<string, unknown>) };
+
+  for (const key of Object.keys(patch as object)) {
+    const patchValue = (patch as Record<string, unknown>)[key];
+    const baseValue = (base as Record<string, unknown>)[key];
+
+    if (patchValue === undefined) continue;
+
+    const nextValue =
+      isObject(baseValue) && isObject(patchValue)
+        ? deepPatch(baseValue as Record<string, unknown>, patchValue as Record<string, unknown>)
+        : (patchValue as unknown);
+
+    if (!Object.is(baseValue, nextValue)) {
+      changed = true;
+      next[key] = nextValue;
+    }
+  }
+
+  return (changed ? (next as T) : base) as T;
+};
 
 export const createStoreContext = <Store extends object>(initialState: Store) => {
   const useStoreData = (
-    data: Store
+    data: DeepPartial<Store>
   ): {
     get: () => Store;
-    set: (dispatch: Partial<Store> | ((value: Partial<Store>) => Partial<Store>)) => void;
+    set: (dispatch: DeepPartial<Store> | ((value: Store) => DeepPartial<Store>)) => void;
     subscribe: (callback: () => void) => () => void;
   } => {
-    const store = useRef<Store>(data);
+    const store = useRef<Store>(deepPatch(initialState, data));
 
     const get = useCallback(() => store.current, []);
 
     const subscribers = useRef<Set<() => void>>(new Set<() => void>());
 
-    const reset = useCallback((data: Store) => {
-      Object.keys(store.current).forEach(key => {
-        if (!(key in data) && key in initialState) {
-          delete store.current[key];
-        }
-      });
-
-      store.current = { ...store.current, ...data };
+    const reset = useCallback((patch: DeepPartial<Store>) => {
+      const next = deepPatch(initialState, patch);
+      if (Object.is(next, store.current)) return;
+      store.current = next;
       subscribers.current.forEach(callback => callback());
     }, []);
 
-    const set = useCallback((dispatch: Partial<Store> | ((value: Partial<Store>) => Partial<Store>)) => {
-      store.current =
-        typeof dispatch === 'function'
-          ? { ...store.current, ...dispatch(store.current) }
-          : { ...store.current, ...dispatch };
+    const set = useCallback((dispatch: DeepPartial<Store> | ((value: Store) => DeepPartial<Store>)) => {
+      const patch = typeof dispatch === 'function' ? dispatch(store.current) : dispatch;
+      const next = deepPatch(store.current, patch);
+      if (Object.is(next, store.current)) return;
+      store.current = next;
       subscribers.current.forEach(callback => callback());
     }, []);
 
@@ -51,7 +82,7 @@ export const createStoreContext = <Store extends object>(initialState: Store) =>
 
   type ProviderProps = {
     children: React.ReactNode;
-    data: Store;
+    data: DeepPartial<Store>;
   };
 
   const StoreProvider = ({ children, data }: ProviderProps) => (
@@ -60,7 +91,7 @@ export const createStoreContext = <Store extends object>(initialState: Store) =>
 
   const useStore = <SelectorOutput,>(
     selector: (store: Store) => SelectorOutput
-  ): [SelectorOutput, (dispatch: Partial<Store> | ((value: Partial<Store>) => Partial<Store>)) => void] => {
+  ): [SelectorOutput, (dispatch: DeepPartial<Store> | ((value: Store) => DeepPartial<Store>)) => void] => {
     const store = useContext(StoreContext);
     if (!store) {
       throw new Error('Store not found');

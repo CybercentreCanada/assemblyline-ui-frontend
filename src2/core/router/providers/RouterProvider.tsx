@@ -1,11 +1,15 @@
 import { createStoreContext } from 'core/store/createStoreContext';
-import React, { useCallback } from 'react';
+import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string';
+import React, { useCallback, useMemo } from 'react';
+import type { Location } from 'react-router';
 import { useLocation, useNavigate } from 'react-router';
-import { createReversePortalNode, type ReversePortalNode } from '../components/Portals';
+import { createReversePortalNode } from '../components/Portals';
 import type { NavigateTo } from '../hooks/useNavigate';
+import { RouterState, RouterStore } from '../models/router.models';
 import {
   assignRouteToPanel,
   getTargetPanel,
+  parseLocationToRouterStore,
   toSearchString,
   upsertRouteInStore,
   withParams
@@ -16,32 +20,29 @@ import type { RoutePanel } from './PanelProvider';
 // Router Store
 // ********************************************************************************************
 
-export type RouteInstance = {
-  id: string;
-  pathname: string;
-  search?: string;
-  hash?: string;
-  state?: any;
-};
+const payload2 = [
+  { pathname: '/a/very/long/path', search: '?q=test&offset=10', hash: '#tab-1' },
+  { pathname: '/a/very/long/path', search: '?q=test&offset=20', hash: '#tab-2' },
+  { pathname: '/another/path', search: '?filter=x&sort=desc', hash: '#details' }
+];
 
-export type NodeState = {
-  id: string;
-  portal: ReversePortalNode;
-  routeKey: string | null;
-  lastUsedAt: number;
-};
+const payload = [
+  '/a/very/long/path?q=test&offset=10#tab-1',
+  '/a/very/long/path?q=test&offset=20#tab-2',
+  '/another/path?filter=x&sort=desc#details'
+];
 
-export type PanelState = {
-  id: string;
-  nodeKey: string | null;
-  tabbedRouteKeys: string[];
-};
+const json = JSON.stringify(payload);
+const safe_json = encodeURIComponent(json);
+const compressed = compressToEncodedURIComponent(json);
 
-export type RouterStore = {
-  panels: PanelState[];
-  nodes: NodeState[];
-  routes: RouteInstance[];
-};
+// console.log('raw', safe_json.length);
+// console.log('raw length', json.length);
+// console.log('compressed length', compressed.length);
+
+// restore
+const restored = JSON.parse(decompressFromEncodedURIComponent(compressed) ?? '[]');
+// console.log(restored);
 
 // const createDefaultRouterStore2 = (): RouterStore => {
 //   const now = Date.now();
@@ -69,34 +70,55 @@ export type RouterStore = {
 //   };
 // };
 
-const createDefaultRouterStore = (): RouterStore => {
-  const now = Date.now();
-
+const createDefaultRouterStore2 = (): RouterStore => {
   return {
-    panels: [
-      { id: 'panel-1', nodeKey: 'node-1', tabbedRouteKeys: ['route-1'] },
-      { id: 'panel-2', nodeKey: 'node-2', tabbedRouteKeys: ['route-2'] },
-      { id: 'panel-3', nodeKey: 'node-3', tabbedRouteKeys: ['route-3'] }
-    ],
-    nodes: [
-      { id: 'node-1', portal: createReversePortalNode(), routeKey: `route-1`, lastUsedAt: 0 },
-      { id: 'node-2', portal: createReversePortalNode(), routeKey: `route-2`, lastUsedAt: 0 },
-      { id: 'node-3', portal: createReversePortalNode(), routeKey: `route-3`, lastUsedAt: 0 }
-    ],
-    routes: [
-      { id: 'route-1', pathname: '/page1' },
-      { id: 'route-2', pathname: '/page2/asd' },
-      { id: 'route-3', pathname: '/submissions/asd' }
-    ]
+    maxPanels: 3,
+    maxNodes: 3,
+    panels: {
+      keys: ['panel-1', 'panel-2', 'panel-3'],
+      entries: {
+        'panel-1': { nodeKey: 'node-1', tabbedRoutes: ['route-1'], pinnedRoutes: [] },
+        'panel-2': { nodeKey: 'node-2', tabbedRoutes: ['route-2'], pinnedRoutes: [] },
+        'panel-3': { nodeKey: 'node-3', tabbedRoutes: ['route-3'], pinnedRoutes: [] }
+      }
+    },
+    nodes: {
+      keys: ['node-1', 'node-2', 'node-3'],
+      entries: {
+        'node-1': { portal: createReversePortalNode(), routeKey: 'route-1', lastUsedAt: 0 },
+        'node-2': { portal: createReversePortalNode(), routeKey: 'route-2', lastUsedAt: 0 },
+        'node-3': { portal: createReversePortalNode(), routeKey: 'route-3', lastUsedAt: 0 }
+      }
+    },
+    routes: {
+      keys: ['route-1', 'route-2', 'route-3'],
+      entries: {
+        'route-1': { href: '/page1', state: null },
+        'route-2': { href: '/page2/asd', state: null },
+        'route-3': { href: '/submissions/asd', state: null }
+      }
+    }
   };
 };
+
+const createDefaultRouterStore = (): RouterStore => ({
+  maxPanels: 3,
+  maxNodes: 3,
+  panels: { keys: [], entries: {} },
+  nodes: { keys: [], entries: {} },
+  routes: { keys: [], entries: {} }
+});
 
 const { StoreProvider, useStore: useRouterStore } = createStoreContext<RouterStore>(createDefaultRouterStore());
 
 export { useRouterStore };
 
 export const RouterProvider = React.memo(({ children }: { children: React.ReactNode }) => {
-  return <StoreProvider data={createDefaultRouterStore()}>{children}</StoreProvider>;
+  const location: Location<RouterState> = useLocation();
+
+  const data = useMemo<Partial<RouterStore>>(() => parseLocationToRouterStore(location), []);
+
+  return <StoreProvider data={data}>{children}</StoreProvider>;
 });
 
 // ********************************************************************************************

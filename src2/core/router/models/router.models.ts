@@ -1,3 +1,67 @@
+import { ReversePortalNode } from '../components/Portals';
+
+//*****************************************************************************************
+// Location
+//*****************************************************************************************
+export type RouterStatePanel = {
+  route: string;
+  tabbedRoutes: string[];
+  pinnedRoutes: string[];
+};
+
+export type RouterStateRoute = {
+  key: string;
+  href: string;
+  state: any;
+};
+
+export type RouterState = {
+  panels: RouterStatePanel[];
+  routes: RouterStateRoute[];
+};
+
+//*****************************************************************************************
+// Router Store
+//*****************************************************************************************
+
+export type RouterPanel = {
+  // key: string;
+  nodeKey: string;
+  pinnedRoutes: string[];
+  tabbedRoutes: string[];
+};
+
+export type RouterNode = {
+  // key: string;
+  portal: ReversePortalNode;
+  routeKey: string | null;
+  lastUsedAt: number;
+};
+
+export type RouterRoute = {
+  // key: string;
+  href: string;
+  state?: any;
+};
+
+export type RouterStore = {
+  maxPanels: number;
+  maxNodes: number;
+
+  panels: {
+    keys: string[];
+    entries: Record<string, RouterPanel>;
+  };
+  nodes: {
+    keys: string[];
+    entries: Record<string, RouterNode>;
+  };
+  routes: {
+    keys: string[];
+    entries: Record<string, RouterRoute>;
+  };
+};
+
 //*****************************************************************************************
 // Path
 //*****************************************************************************************

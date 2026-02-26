@@ -3,7 +3,7 @@ import React, { createContext, useContext } from 'react';
 export type RoutePanel = string;
 
 export type PanelContextValue = {
-  panel: string;
+  panel: string | null;
 };
 
 const PanelContext = createContext<PanelContextValue | null>(null);

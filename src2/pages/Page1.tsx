@@ -39,7 +39,7 @@ const StatefulWidget = React.memo(() => {
   );
 });
 
-export const Page1 = () => {
+export const Page1 = React.memo(() => {
   const node = useMemo(() => createReversePortalNode(), []);
   const [right, setRight] = useState<null | number>(null);
 
@@ -100,4 +100,8 @@ export const Page1 = () => {
       </InPortal>
     </div>
   );
-};
+});
+
+export default Page1;
+
+Page1.displayName = 'Page1';

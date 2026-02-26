@@ -3,13 +3,13 @@ import React, { createContext, useContext } from 'react';
 export type RouteRouteID = string;
 
 export type RouteIDContextValue = {
-  routeId: string;
+  routeId: string | null;
 };
 
 const RouteIDContext = createContext<RouteIDContextValue | null>(null);
 
 export type RouteIDProviderProps = {
-  routeId: string;
+  routeId: string | null;
   children: React.ReactNode;
 };
 

@@ -1,8 +1,4 @@
-import { useNavigate } from 'core/router';
 import { Link } from 'core/router/components/Link';
-import { useHash } from 'core/router/hooks/useHash';
-import { useParams } from 'core/router/hooks/useParams';
-import { useSearch } from 'core/router/hooks/useSearch';
 import { createRoute } from 'core/router/utils/createRoute';
 import React from 'react';
 
@@ -11,11 +7,11 @@ export type Page2Search = typeof Page2.search;
 export type Page2Hash = typeof Page2.hash;
 
 export const Page2Route = React.memo(() => {
-  const { fileID } = useParams<typeof Page2>();
-  const search = useSearch<typeof Page2>();
-  const hash = useHash<typeof Page2>();
+  // const { fileID } = useParams<typeof Page2>();
+  // const search = useSearch<typeof Page2>();
+  // const hash = useHash<typeof Page2>();
 
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   // console.log(location, fileID);
 
@@ -47,3 +43,5 @@ export const Page2Route = React.memo(() => {
 export const Page2 = createRoute({ path: '/page2/:fileID', component: Page2Route });
 
 export default Page2;
+
+Page2Route.displayName = 'Page2Route';

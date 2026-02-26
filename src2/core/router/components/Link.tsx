@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import type { LinkProps as RouterLinkProps } from 'react-router';
 import { Link as RouterLink } from 'react-router';
 import { useNavigate, type NavigateTo } from '../hooks/useNavigate';
-import type { AppRoutes } from '../store/routes';
+import { AppRoutes } from './Routes';
 
 // 'open' | 'replace'
 
@@ -19,10 +19,13 @@ export type LinkProps2 = Omit<RouterLinkProps, 'to'> & {
 
 // export type LinkProps = ({ to: string } | Partial<Path>) & Omit<RouterLinkProps, 'to' | 'pathname' | 'search' | 'hash'>;
 
-export type LinkProps = { to: string } & Omit<RouterLinkProps, 'to' | 'pathname' | 'search' | 'hash'>;
+export type LinkProps = { type?: 'open' | 'replace' | number; to: string } & Omit<
+  RouterLinkProps,
+  'to' | 'pathname' | 'search' | 'hash'
+>;
 
 // export const Link = React.memo(({ to, panel, params, search, hash, ...props }: LinkProps) => {
-export const Link = React.memo(({ to, onClick, ...props }: LinkProps) => {
+export const Link = React.memo(({ to, type = 'open', onClick, ...props }: LinkProps) => {
   // const { panel: currentPanel } = usePanel();
   // const { resolveHref, resolveTo } = useRouterActions();
   const navigate = useNavigate();
@@ -34,16 +37,23 @@ export const Link = React.memo(({ to, onClick, ...props }: LinkProps) => {
 
   // const href = useMemo(() => resolveTo(to) , [])
 
+  const handleClick = useCallback(
+    (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+      event.preventDefault();
+      event.stopPropagation();
+      navigate(type, to);
+    },
+    [navigate, type]
+  );
+
   return (
     <RouterLink
       // to={href}
       to={to}
-      onClick={e => {
-        e.preventDefault();
-        e.stopPropagation();
-        navigate(to);
-      }}
+      onClick={handleClick}
       {...props}
     />
   );
 });
+
+Link.displayName = 'Link';
