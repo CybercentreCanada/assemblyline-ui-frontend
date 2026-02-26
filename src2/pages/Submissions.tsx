@@ -1,7 +1,8 @@
-import { Link, useNavigate, useParams, useSearch } from 'core/router';
+import { useNavigate, useParams, useSearch } from 'core/router';
 import { createRoute } from 'core/router/utils/createRoute';
-import React, { useCallback } from 'react';
+import React from 'react';
 import { useLocation } from 'react-router';
+import { Links } from './Links';
 
 export const SubmissionsPage = React.memo(() => {
   // const { fileID } = useParams();
@@ -13,31 +14,19 @@ export const SubmissionsPage = React.memo(() => {
 
   const navigate = useNavigate();
 
-  const callback = useCallback(() => {
-    navigate({
-      path: '/submissions/:query',
-      params: { query: '123' },
-      search: { query: '123' },
-      target: ['open', 'replace']
-    });
-  }, []);
+  // const callback = useCallback(() => {
+  //   navigate({
+  //     path: '/submissions/:query',
+  //     params: { query: '123' },
+  //     search: { query: '123' },
+  //     target: ['open', 'replace']
+  //   });
+  // }, []);
 
   return (
     <div>
+      <Links />
       <h1>Submissions</h1>
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-        <Link to="/page1">Page 1</Link>
-        <Link to="/page2/asdasd">Page 2</Link>
-        <Link to="/submissions/asdasd">Submissions</Link>
-        {/* <Link to={{ path: '/page2/:fileID', params: { fileID: 'asd' }, target: 'open' }}>Go to Page 1</Link> */}
-        {/* <Link>Go to Page 2</Link> */}
-        {/* <Link to="/page1" panel={2}>
-          Open Page 1 (drawer)
-        </Link>
-        <Link to={Page2} params={{ fileID: 'from-page3-drawer' }} panel={2}>
-          Open Page 2 (drawer)
-        </Link> */}
-      </div>
     </div>
   );
 });

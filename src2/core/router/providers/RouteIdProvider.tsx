@@ -1,22 +1,24 @@
 import React, { createContext, useContext } from 'react';
 
-export type RouteRouteID = string;
-
 export type RouteIDContextValue = {
-  routeId: string | null;
+  routeKey: string;
 };
 
 const RouteIDContext = createContext<RouteIDContextValue | null>(null);
 
+RouteIDContext.displayName = 'RouteIDContext';
+
 export type RouteIDProviderProps = {
-  routeId: string | null;
+  routeKey: string;
   children: React.ReactNode;
 };
 
-export const RouteIDProvider = ({ routeId, children }: RouteIDProviderProps) => {
-  return <RouteIDContext.Provider value={{ routeId }}>{children}</RouteIDContext.Provider>;
-};
+export const RouteIDProvider = React.memo(({ routeKey, children }: RouteIDProviderProps) => {
+  return <RouteIDContext.Provider value={{ routeKey }}>{children}</RouteIDContext.Provider>;
+});
+
+RouteIDProvider.displayName = 'RouteIDProvider';
 
 export const useRouteID = (): RouteIDContextValue => {
-  return useContext(RouteIDContext) ?? { routeId: null };
+  return useContext(RouteIDContext) ?? { routeKey: null };
 };

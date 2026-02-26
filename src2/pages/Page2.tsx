@@ -1,6 +1,6 @@
-import { Link } from 'core/router/components/Link';
 import { createRoute } from 'core/router/utils/createRoute';
 import React from 'react';
+import { Links } from './Links';
 
 export type Page2Params = typeof Page2Route.params;
 export type Page2Search = typeof Page2Route.search;
@@ -17,25 +17,8 @@ export const Page2Page = React.memo(() => {
 
   return (
     <div>
+      <Links />
       <h1>Page 2</h1>
-      {/* <Link to={Page2} params={{ fileID: 'asd' }}>
-        Current route param: {fileID}
-      </Link> */}
-      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-        <Link to="/page1">Page 1</Link>
-        <Link to="/page2/asdasd">Page 2</Link>
-        <Link to="/submissions/asdasd">Submissions</Link>
-        {/* <Link to={SubmissionsRoute}>Go to Submission</Link> */}
-        {/* <button onClick={() => navigate({ path: '/page2/:fileID', params: { fileID: 'from-useNavigate' } }, {})}>
-          Go to Page 2 (hook)
-        </button>
-        <Link to="/page1" panel={2}>
-          Open Page 1 (drawer)
-        </Link>
-        <Link to={Page3} panel={2}>
-          Open Page 3 (drawer)
-        </Link> */}
-      </div>
     </div>
   );
 });

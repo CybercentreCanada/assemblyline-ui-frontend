@@ -18,6 +18,8 @@ export type RouteContextProps<Path extends string, Search extends SearchParamBlu
 
 const RouteContext = createContext<RouteContextProps<string, {}, string> | null>(null);
 
+RouteContext.displayName = 'RouteContext';
+
 //*****************************************************************************************
 // Provider
 //*****************************************************************************************
@@ -53,6 +55,8 @@ export const RouteProvider = React.memo(
     return <RouteContext.Provider value={value}>{children}</RouteContext.Provider>;
   }
 );
+
+RouteProvider.displayName = 'RouteProvider';
 
 //*****************************************************************************************
 // Hook

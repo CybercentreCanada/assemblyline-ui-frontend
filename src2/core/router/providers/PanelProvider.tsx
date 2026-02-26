@@ -8,14 +8,18 @@ export type PanelContextValue = {
 
 const PanelContext = createContext<PanelContextValue | null>(null);
 
+PanelContext.displayName = 'PanelContext';
+
 export type PanelProviderProps = {
   panel: string;
   children: React.ReactNode;
 };
 
-export const PanelProvider = ({ panel, children }: PanelProviderProps) => {
+export const PanelProvider = React.memo(({ panel, children }: PanelProviderProps) => {
   return <PanelContext.Provider value={{ panel }}>{children}</PanelContext.Provider>;
-};
+});
+
+PanelProvider.displayName = 'PanelProvider';
 
 export const usePanel = (): PanelContextValue => {
   return useContext(PanelContext) ?? { panel: null };

@@ -33,7 +33,7 @@ export type CreateRouteProps<
 
   disabled?: boolean | (() => boolean);
   forbidden?: boolean | (() => boolean);
-  loader?: (args: any) => Promise<unknown>;
+  loading?: boolean | ((args: any) => boolean);
 
   component: ReactNode | MemoExoticComponent<ComponentType<any>>;
   disabledComponent?: ReactNode | MemoExoticComponent<ComponentType<any>>;
@@ -48,10 +48,6 @@ export type CreateRouteProps<
   };
 };
 
-// & ([PathParamKeys<Path>] extends [never]
-//   ? { params?: undefined }
-//   : { params?: (parsers: typeof PARAM_PARSERS) => ParamsBlueprintsForPath<Path> });
-
 export type CreateRouteReturn<
   Path extends RoutePath = RoutePath,
   Search extends RouteSearch = undefined,
@@ -64,11 +60,8 @@ export type CreateRouteReturn<
   search: SearchParamValues<Search>;
   searchParser: undefined | Search;
   hash: Hash;
-  // paramTypes: ReturnType<typeof createParamsParser>;
   element: React.ReactNode;
 };
-
-// & (PathParamKeys<Path> extends never ? { params?: undefined } : { params?: any });
 
 export const createRoute = <
   Path extends RoutePath = RoutePath,
@@ -81,14 +74,14 @@ export const createRoute = <
   search,
   hash,
 
-  loader,
+  loading,
   disabled,
   component,
   forbidden,
   forbiddenComponent,
   disabledComponent
 }: CreateRouteProps<Path, Search, Hash, Params>): CreateRouteReturn<Path, Search, Hash, Params> => {
-  void loader;
+  void loading;
 
   const paramsParser = params ? createParamsParser(params) : undefined;
   const searchParser = search ? createSearchParams(search) : undefined;
@@ -130,13 +123,5 @@ export const createRoute = <
     searchParser,
     hash: hash ?? undefined,
     element
-    // useParams,
-    // to: (pathParams: PathParams<Path>) => {
-    //   const stringParams = paramsParser
-    //     ? paramsParser.stringify(pathParams as unknown as Partial<ReturnType<typeof paramsParser.parse>>)
-    //     : (pathParams as unknown as Record<string, PathParamValue>);
-
-    //   return buildPath(path, stringParams);
-    // }
   };
 };

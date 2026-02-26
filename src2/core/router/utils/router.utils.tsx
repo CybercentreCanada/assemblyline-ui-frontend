@@ -1,6 +1,6 @@
 import type { ComponentType, MemoExoticComponent, ReactNode } from 'react';
 import React from 'react';
-import type { Location } from 'react-router';
+import type { Location, NavigateOptions, To } from 'react-router';
 import { createReversePortalNode } from '../components/Portals';
 import {
   ParamsBlueprint,
@@ -12,11 +12,111 @@ import {
 } from '../models/router.models';
 import { RoutePanel } from '../providers/PanelProvider';
 
+export const generateRandomUUID = () => btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(12))));
+
 //*****************************************************************************************
 // Location
 //*****************************************************************************************
 
-export const parseLocationToRouterStore = ({ state, search }: Location<RouterState>): RouterStore => {
+export const parseLocationToRouterStore = (store: RouterStore, location: Location<RouterState>): RouterStore => {
+  try {
+    if (!!location.state) {
+      console.log(location.state);
+
+      // Panels
+      location.state.panels.forEach((panel, i) => {
+        if (store?.panels?.[i]) store.panels[i].route = panel.route;
+        else store.panels[i] = { route: panel.route, pinnedRoutes: [], tabbedRoutes: [] };
+      });
+      store.panels.splice(location.state.panels.length + 1);
+
+      // Routes
+      Object.entries(location.state.routes).forEach(([key, route], i) => {
+        if (store?.routes?.[key]) {
+          store.routes[key].href = route.href;
+          store.routes[key].state = route.state;
+        } else {
+          store.routes[key] = { href: route.href, state: route.state };
+        }
+      });
+
+      Object.keys(store.routes)
+        .filter(k => !(k in location.state.routes))
+        .forEach(key => {
+          delete store.routes[key];
+        });
+
+      // Nodes
+      store.panels.forEach((panel, i) => {
+        const nodeIndex = store.nodes.findIndex(n => n.panelKey === i);
+
+        if (nodeIndex >= 0) store.nodes[nodeIndex].routeKey = panel.route;
+        else
+          store.nodes.push({
+            panelKey: i,
+            routeKey: panel.route,
+            portal: createReversePortalNode(),
+            lastUsedAt: 0
+          });
+      });
+
+      return store;
+    } else if (!!location.search) {
+      const searchParams = new URLSearchParams(location.search ?? '');
+      const hrefs = searchParams
+        .getAll('p')
+        .filter(Boolean)
+        .map(value => {
+          try {
+            const decoded = decodeURIComponent(value);
+            const url = new URL(decoded, window.location.origin);
+            return `${url.pathname}${url.search}${url.hash}`;
+          } catch {
+            return null;
+          }
+        })
+        .filter((href): href is string => href !== null);
+
+      const nextPanels: RouterStore['panels'] = [];
+      const nextNodes: RouterStore['nodes'] = [];
+      const nextRoutes: RouterStore['routes'] = {};
+
+      hrefs.map((href, i) => {
+        let newRouteID = null;
+        while (newRouteID === null || newRouteID in nextRoutes) {
+          newRouteID = generateRandomUUID();
+        }
+
+        nextRoutes[newRouteID] = { href, state: null };
+        nextPanels.push({ route: newRouteID, pinnedRoutes: [], tabbedRoutes: [] });
+        nextNodes.push({
+          panelKey: nextPanels.length - 1,
+          routeKey: newRouteID,
+          portal: createReversePortalNode(),
+          lastUsedAt: 0
+        });
+      });
+
+      return {
+        maxPanels: store.maxPanels,
+        maxNodes: store.maxNodes,
+        panels: nextPanels,
+        nodes: nextNodes,
+        routes: nextRoutes
+      };
+    }
+  } catch (e) {
+    console.error('error parsing the location', e);
+  }
+
+  return {
+    maxPanels: store.maxPanels,
+    maxNodes: store.maxNodes,
+    panels: [{ route: 'default', pinnedRoutes: [], tabbedRoutes: [] }],
+    nodes: [{ panelKey: 0, routeKey: 'default', portal: createReversePortalNode(), lastUsedAt: 0 }],
+    routes: { default: { href: '/submit', state: null } }
+  };
+
   const primaryHref = '/submit';
 
   const stateRoutes = state?.routes ?? [];
@@ -106,45 +206,92 @@ export const parseLocationToRouterStore = ({ state, search }: Location<RouterSta
   };
 };
 
-export const parseRouterStoreToLocation = (store: RouterStore): Location<RouterState> => {
-  const routes: RouterState['routes'] = store.routes.keys
-    .map(key => {
-      const route = store.routes.entries[key];
-      if (!route) return null;
-      return { key, href: route.href, state: route.state ?? null };
-    })
-    .filter((route): route is RouterState['routes'][number] => route !== null);
+export const parseRouterStoreToLocation = (
+  { panels, routes }: RouterStore,
+  { state }: Location<RouterState>
+): Pick<Location<RouterState>, 'pathname' | 'search' | 'hash' | 'state'> => {
+  const searchParams = new URLSearchParams();
 
-  const panels: RouterState['panels'] = store.panels.keys
-    .map(panelKey => {
-      const panel = store.panels.entries[panelKey];
-      if (!panel) return null;
-
-      const node = store.nodes.entries[panel.nodeKey];
-      const activeRouteHref = node?.routeKey ? store.routes.entries[node.routeKey]?.href : undefined;
-
-      return {
-        route: activeRouteHref ?? '/submit',
-        tabbedRoutes: panel.tabbedRoutes,
-        pinnedRoutes: panel.pinnedRoutes
-      };
-    })
-    .filter((panel): panel is RouterState['panels'][number] => panel !== null);
-
-  const panelSearchParams = new URLSearchParams();
-  panels.forEach((panel, index) => {
-    panelSearchParams.set(`p${index + 1}`, panel.route);
+  panels.forEach((panel, i) => {
+    searchParams.append('p', routes[panel.route].href);
   });
 
-  const primaryHref = panels[0]?.route ?? '/submit';
-  const primaryUrl = new URL(primaryHref, window.location.origin);
+  return {
+    pathname: null,
+    search: searchParams.toString(),
+    hash: null,
+    state
+  };
+
+  // const routes: RouterState['routes'] = store.routes.keys
+  //   .map(key => {
+  //     const route = store.routes.entries[key];
+  //     if (!route) return null;
+  //     return { key, href: route.href, state: route.state ?? null };
+  //   })
+  //   .filter((route): route is RouterState['routes'][number] => route !== null);
+
+  // const panels: RouterState['panels'] = store.panels.keys
+  //   .map(panelKey => {
+  //     const panel = store.panels.entries[panelKey];
+  //     if (!panel) return null;
+
+  //     const node = store.nodes.entries[panel.nodeKey];
+  //     const activeRouteHref = node?.routeKey ? store.routes.entries[node.routeKey]?.href : undefined;
+
+  //     return {
+  //       route: activeRouteHref ?? '/submit',
+  //       tabbedRoutes: panel.tabbedRoutes,
+  //       pinnedRoutes: panel.pinnedRoutes
+  //     };
+  //   })
+  //   .filter((panel): panel is RouterState['panels'][number] => panel !== null);
+
+  // const panelSearchParams = new URLSearchParams();
+  // panels.forEach((panel, index) => {
+  //   panelSearchParams.set(`p${index + 1}`, panel.route);
+  // });
+
+  // const primaryHref = panels[0]?.route ?? '/submit';
+  // const primaryUrl = new URL(primaryHref, window.location.origin);
+
+  // return {
+  //   key: null,
+  //   pathname: null,
+  //   search: panelSearchParams.toString() ? `?${panelSearchParams.toString()}` : '',
+  //   hash: primaryUrl.hash,
+  //   state: { panels, routes }
+  // };
+};
+
+//*****************************************************************************************
+// Navigate
+//*****************************************************************************************
+
+export const navigateOpenRoute = (
+  store: RouterStore,
+  href: string,
+  currentRouteKey: string
+): { to: To; options: NavigateOptions } => {
+  const currentPanelIndex = store.panels.findIndex(p => p.route === currentRouteKey);
+  const nextPanelIndex = (currentPanelIndex + 1) % store.maxPanels;
+
+  let newRouteKey = null;
+  while (newRouteKey === null || newRouteKey in store.routes) {
+    newRouteKey = generateRandomUUID();
+  }
+  store.routes[newRouteKey] = { href, state: null };
+  store.panels[nextPanelIndex].route = newRouteKey;
+
+  const searchParams = new URLSearchParams();
+
+  store.panels.forEach((panel, i) => {
+    searchParams.append('p', store.routes[panel.route].href);
+  });
 
   return {
-    key: null,
-    pathname: null,
-    search: panelSearchParams.toString() ? `?${panelSearchParams.toString()}` : '',
-    hash: primaryUrl.hash,
-    state: { panels, routes }
+    to: { pathname: null, search: searchParams.toString(), hash: null },
+    options: { state: { panels: store.panels, routes: store.routes } }
   };
 };
 

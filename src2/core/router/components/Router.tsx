@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Link as RouterLink } from 'react-router';
 import { RouteIDProvider } from '../providers/RouteIdProvider';
 import { useRouterStore } from '../providers/RouterProvider';
@@ -7,13 +7,13 @@ import { InPortal, OutPortal } from './Portals';
 import { Routes } from './Routes';
 
 type PanelViewProps = {
-  panelKey: string;
+  panelKey: number;
 };
 
 const PanelView = React.memo(({ panelKey }: PanelViewProps) => {
-  const [panel] = useRouterStore(store => store.panels.entries[panelKey]);
-  const [node] = useRouterStore(store => (panel?.nodeKey ? store.nodes.entries[panel.nodeKey] : null));
-  const [route] = useRouterStore(store => (node?.routeKey ? store.routes.entries[node.routeKey] : null));
+  const [panel] = useRouterStore(store => store.panels[panelKey]);
+  const [node] = useRouterStore(store => store.nodes.find(current => current.panelKey === panelKey) ?? null);
+  const [route] = useRouterStore(store => (node?.routeKey ? store.routes[node.routeKey] : null));
 
   return (
     <div style={{ border: '1px solid grey', minHeight: '220px', padding: '8px' }}>
@@ -24,43 +24,34 @@ const PanelView = React.memo(({ panelKey }: PanelViewProps) => {
   );
 });
 
+PanelView.displayName = 'PanelView';
+
 type NodeMountProps = {
-  nodeKey: string;
+  nodeKey: number;
 };
 
 const NodeMount = React.memo(({ nodeKey }: NodeMountProps) => {
-  const [node] = useRouterStore(store => store.nodes.entries[nodeKey]);
-  const [route] = useRouterStore(store => (node?.routeKey ? store.routes.entries[node.routeKey] : null));
+  const [node] = useRouterStore(store => store.nodes[nodeKey]);
+  const [route] = useRouterStore(store => (node?.routeKey ? store.routes[node.routeKey] : null));
 
   if (!node || !route) return null;
 
   return (
     <InPortal node={node.portal}>
-      <RouteIDProvider routeId={node.routeKey}>
+      <RouteIDProvider routeKey={node.routeKey}>
         <Routes href={route.href} state={route.state} />
       </RouteIDProvider>
     </InPortal>
   );
 });
 
-export const Router = () => {
-  const [store, setRouterStore] = useRouterStore(s => s);
+NodeMount.displayName = 'NodeMount';
+
+export const Router = React.memo(() => {
   const [panels] = useRouterStore(s => s.panels);
   const [nodes] = useRouterStore(s => s.nodes);
 
-  useEffect(() => {
-    function handleResize() {
-      // TODO
-      console.log('TODO: Resize');
-      setRouterStore(s => s);
-    }
-
-    document.addEventListener('resize', handleResize);
-    handleResize();
-    return () => document.removeEventListener('resize', handleResize);
-  }, []);
-
-  console.log(store);
+  console.log(panels, nodes);
 
   return (
     <>
@@ -77,21 +68,23 @@ export const Router = () => {
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: `repeat(${Math.max(panels.keys.length, 1)}, 1fr)`,
+          gridTemplateColumns: `repeat(${Math.max(panels.length, 1)}, 1fr)`,
           gridGap: '16px',
           height: '50vh'
         }}
       >
-        {panels.keys.map(panelKey => (
+        {panels.map((panel, panelKey) => (
           <PanelView key={panelKey} panelKey={panelKey} />
         ))}
       </div>
 
       <div style={{ display: 'none' }}>
-        {nodes.keys.map(nodeKey => (
+        {nodes.map((node, nodeKey) => (
           <NodeMount key={nodeKey} nodeKey={nodeKey} />
         ))}
       </div>
     </>
   );
-};
+});
+
+Router.displayName = 'Router';

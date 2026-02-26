@@ -4,6 +4,7 @@ import { AppRoutes } from '../components/Routes';
 import type { RoutePanel } from '../providers/PanelProvider';
 import { useRouteID } from '../providers/RouteIdProvider';
 import { useRouterStore } from '../providers/RouterProvider';
+import { navigateOpenRoute } from '../utils/router.utils';
 
 type NavigateOptions = { panel?: RoutePanel } | { variant?: 'open' | 'replace' };
 
@@ -21,44 +22,26 @@ export type NavigateTo = AppRoute extends infer Route ? (Route extends AppRoute 
 
 export const useNavigate = () => {
   const routerNavigate = useRouterNavigate();
-  const { routeId } = useRouteID();
+  const { routeKey } = useRouteID();
   const [store] = useRouterStore(s => s);
 
   return useCallback(
     // (to: NavigateTo, options?: NavigateOptions) => {
     (type: 'open' | 'replace' | number, href: string, options?: NavigateOptions) => {
-      console.log(type, href, options);
+      // const nextLocation =
+      //   type === 'open'
+      //     ? navigateOpenRoute(store, href, routeKey)
+      //     : type === 'replace'
+      //       ? navigateReplaceRoute(store, href, routeKey)
+      //       : typeof type === 'number'
+      //         ? navigateGoToRoute(store, href, type, routeKey)
+      //         : null;
 
-      const nextLocation =
-        type === 'open'
-          ? calculateOpenRoute(store, href, routeId)
-          : type === 'replace'
-            ? calculateReplaceRoute(store, href, routeId)
-            : typeof type === 'number'
-              ? calculateGoToRoute(store, href, type, routeId)
-              : null;
-
+      const nextLocation = navigateOpenRoute(store, href, routeKey);
       if (nextLocation) {
-        routerNavigate(nextLocation);
+        routerNavigate(nextLocation.to, nextLocation.options);
       }
-
-      // const explicitPanel = options && 'panel' in options ? options.panel : undefined;
-      // navigateTo(to, { fromPanel: routeId ? 'panel-1' : 'panel-0', panel: explicitPanel });
-      // const explicitPanel = options && 'panel' in options ? options.panel : undefined;
-      // const path = Object.entries((to.params ?? {}) as Record<string, string | number | boolean>).reduce(
-      //   (acc, [key, value]) => acc.replace(`:${key}`, encodeURIComponent(String(value))),
-      //   to.path
-      // );
-      // const params = new URLSearchParams();
-      // Object.entries((to.search ?? {}) as Record<string, unknown>).forEach(([key, value]) => {
-      //   if (value === undefined || value === null) return;
-      //   params.set(key, String(value));
-      // });
-      // const search = params.toString();
-      // const hash = to.hash ? `#${to.hash}` : '';
-      // const href = `${path}${search ? `?${search}` : ''}${hash}`;
-      // navigateTo(href, { fromPanel: panel, panel: explicitPanel });
     },
-    [routeId]
+    [routeKey]
   );
 };

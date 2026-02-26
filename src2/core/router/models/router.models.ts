@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import { ReversePortalNode } from '../components/Portals';
 
 //*****************************************************************************************
@@ -5,41 +6,56 @@ import { ReversePortalNode } from '../components/Portals';
 //*****************************************************************************************
 export type RouterStatePanel = {
   route: string;
-  tabbedRoutes: string[];
   pinnedRoutes: string[];
+  tabbedRoutes: string[];
 };
 
 export type RouterStateRoute = {
-  key: string;
   href: string;
   state: any;
 };
 
 export type RouterState = {
   panels: RouterStatePanel[];
-  routes: RouterStateRoute[];
+  routes: Record<string, RouterStateRoute>;
 };
+
+export const RouterStatePanelSchema = z.object({
+  route: z.string(),
+  pinnedRoutes: z.array(z.string()),
+  tabbedRoutes: z.array(z.string())
+});
+
+export const RouterStateRouteSchema = z.object({
+  href: z.string(),
+  state: z.unknown()
+});
+
+export const RouterStateSchema = z.object({
+  panels: z.array(RouterStatePanelSchema),
+  routes: z.record(z.string(), RouterStateRouteSchema)
+});
+
+export type RouterState2 = z.infer<typeof RouterStateSchema>;
 
 //*****************************************************************************************
 // Router Store
 //*****************************************************************************************
 
 export type RouterPanel = {
-  // key: string;
-  nodeKey: string;
+  route: string;
   pinnedRoutes: string[];
   tabbedRoutes: string[];
 };
 
 export type RouterNode = {
-  // key: string;
+  panelKey: number;
+  routeKey: string;
   portal: ReversePortalNode;
-  routeKey: string | null;
   lastUsedAt: number;
 };
 
 export type RouterRoute = {
-  // key: string;
   href: string;
   state?: any;
 };
@@ -48,19 +64,36 @@ export type RouterStore = {
   maxPanels: number;
   maxNodes: number;
 
-  panels: {
-    keys: string[];
-    entries: Record<string, RouterPanel>;
-  };
-  nodes: {
-    keys: string[];
-    entries: Record<string, RouterNode>;
-  };
-  routes: {
-    keys: string[];
-    entries: Record<string, RouterRoute>;
-  };
+  panels: RouterPanel[];
+  nodes: RouterNode[];
+  routes: Record<string, RouterRoute>;
 };
+
+export const RouterPanelSchema = z.object({
+  route: z.string(),
+  pinnedRoutes: z.array(z.string()),
+  tabbedRoutes: z.array(z.string())
+});
+
+export const RouterNodeSchema = z.object({
+  panelKey: z.number(),
+  routeKey: z.string(),
+  portal: z.custom<ReversePortalNode>(value => value != null, { message: 'Invalid portal node' }),
+  lastUsedAt: z.number()
+});
+
+export const RouterRouteSchema = z.object({
+  href: z.string(),
+  state: z.unknown().optional()
+});
+
+export const RouterStoreSchema = z.object({
+  maxPanels: z.number(),
+  maxNodes: z.number(),
+  panels: z.array(RouterPanelSchema),
+  nodes: z.array(RouterNodeSchema),
+  routes: z.record(z.string(), RouterRouteSchema)
+});
 
 //*****************************************************************************************
 // Path
@@ -123,16 +156,3 @@ export type ParamsParser<Blueprints extends ParamsBlueprints = ParamsBlueprints>
 //*****************************************************************************************
 
 export type GuardResult = true | 'forbidden' | 'notfound' | `redirect:${string}`;
-
-// export type TypedRoute<Path extends string> = {
-//   path: Path;
-//   params: PathParams<Path>;
-//   search?: SearchParamBlueprints;
-//   hash?: string;
-//   element: React.ReactElement;
-//   paramsParser?: ParamsParser;
-//   useParams: () => PathParams<Path> | Record<string, string>;
-//   to: (params: PathParams<Path>) => string;
-// };
-
-// export type AnyTypedRoute<Path extends string = string> = TypedRoute<Path>;
