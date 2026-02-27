@@ -68,7 +68,7 @@ export const SubmissionsPage = React.memo(() => {
       <button
         onClick={() => {
           setArray(arr => {
-            return [...arr, { test: `${arr.length}` }];
+            return [...arr, { test: `${arr.length + 1}` }];
           });
         }}
       >
