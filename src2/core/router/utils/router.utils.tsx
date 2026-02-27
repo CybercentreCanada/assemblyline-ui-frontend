@@ -6,12 +6,10 @@ import {
   ParamsBlueprint,
   ParamsBlueprints,
   ParamsValues,
-  PathParamValue,
   RouterRoute,
   RouterState,
   RouterStore
 } from '../models/router.models';
-import { RoutePanel } from '../providers/PanelProvider';
 
 const DEFAULT_ROUTER_STORE: RouterStore = {
   maxPanels: 3,
@@ -75,10 +73,10 @@ const pushNewRoute = (store: RouterStore, newRoute: RouterRoute, fromPanelKey: n
   if (nextPanelKey >= maxPanels) {
     for (let i = 0; i < maxPanels - 1; i++) {
       store.panels[i].route = store.panels[i + 1].route;
-      store = usingNode(store, i);
+      store = updateNodeLastUsed(store, i);
     }
     store.panels[nextPanelKey - 1].route = newRouteKey;
-    store = usingNode(store, nextPanelKey - 1);
+    store = updateNodeLastUsed(store, nextPanelKey - 1);
   } else if (nextPanelKey >= store.panels.length) {
     store.panels.push({ route: newRouteKey, pinnedRoutes: [], tabbedRoutes: [] });
   } else {
@@ -97,10 +95,10 @@ const loopNewRoute = (store: RouterStore, newRoute: RouterRoute, fromPanelKey: n
 
   if (nextPanelKey >= maxPanels) {
     store.panels[0].route = newRouteKey;
-    store = usingNode(store, 0);
+    store = updateNodeLastUsed(store, 0);
   } else if (nextPanelKey >= store.panels.length) {
     store.panels.push({ route: newRouteKey, pinnedRoutes: [], tabbedRoutes: [] });
-    store = usingNode(store, store.panels.length - 1);
+    store = updateNodeLastUsed(store, store.panels.length - 1);
   } else {
     store.panels[nextPanelKey].route = newRouteKey;
   }
@@ -125,7 +123,6 @@ const generateLastUsedAt = (store: RouterStore): number =>
 
 const addNode = (store: RouterStore, panelKey: number): RouterStore => {
   store.nodes[generateRandomUUID(Object.keys(store.nodes))] = {
-    // panelKey,
     routeKey: store.panels[panelKey].route,
     portal: createReversePortalNode(),
     lastUsedAt: generateLastUsedAt(store)
@@ -134,7 +131,7 @@ const addNode = (store: RouterStore, panelKey: number): RouterStore => {
   return store;
 };
 
-const usingNode = (store: RouterStore, panelKey: number): RouterStore => {
+const updateNodeLastUsed = (store: RouterStore, panelKey: number): RouterStore => {
   for (const nodeKey in store.nodes) {
     if (store.panels[panelKey].route === store.nodes[nodeKey].routeKey) {
       store.nodes[nodeKey].lastUsedAt = generateLastUsedAt(store);
@@ -148,7 +145,6 @@ const removeNode = (store: RouterStore): RouterStore => {
   let nodeKeyToRemove = null;
   let lowestLastUsedAt = Infinity;
 
-  // make sure its not being used
   for (const nodeKey in store.nodes) {
     if (store.nodes[nodeKey].lastUsedAt < lowestLastUsedAt) {
       lowestLastUsedAt = store.nodes[nodeKey].lastUsedAt;
@@ -164,11 +160,9 @@ const removeNode = (store: RouterStore): RouterStore => {
 };
 
 const sanitizeNodes = (store: RouterStore): RouterStore => {
-  // debugger;
   for (const [panelKey, panel] of store.panels.entries()) {
     let exists = false;
     for (const nodeKey in store.nodes) {
-      // remap here
       if (panel.route === store.nodes[nodeKey].routeKey) {
         exists = true;
         break;
@@ -187,79 +181,6 @@ const sanitizeNodes = (store: RouterStore): RouterStore => {
   return store;
 };
 
-// const sanitizeNodes = (store: RouterStore): RouterStore => {
-//   const maxAllowedNodes = store.maxPanels + store.maxNodes;
-//   const validPairKey = (panelKey: number, routeKey: string) => `${panelKey}::${routeKey}`;
-//   const nodes = Object.entries(store.nodes);
-
-//   const validPairs = new Set<string>();
-//   for (const [panelKey, panel] of store.panels.entries()) {
-//     if (panel?.route && panel.route in store.routes) {
-//       validPairs.add(validPairKey(panelKey, panel.route));
-//     }
-//   }
-
-//   // Keep only nodes that still match an existing panel-route pair.
-//   let activeNodes = nodes.filter(([, node]) => validPairs.has(validPairKey(node.panelKey, node.routeKey)));
-
-//   // Ensure each panel-route pair has a node connection.
-//   for (const [panelKey, panel] of store.panels.entries()) {
-//     if (!panel?.route) continue;
-//     if (!(panel.route in store.routes)) continue;
-
-//     const currentPair = validPairKey(panelKey, panel.route);
-//     const hasNode = activeNodes.some(([, node]) => validPairKey(node.panelKey, node.routeKey) === currentPair);
-//     if (hasNode) continue;
-
-//     if (activeNodes.length < maxAllowedNodes) {
-//       const newNodeKey = generateRandomUUID(Object.keys(store.nodes));
-//       activeNodes.push([
-//         newNodeKey,
-//         {
-//           panelKey,
-//           routeKey: panel.route,
-//           portal: createReversePortalNode(),
-//           lastUsedAt: newLastUsedAt(store)
-//         }
-//       ]);
-//       continue;
-//     }
-
-//     // At capacity: remap the oldest node.
-//     if (activeNodes.length > 0) {
-//       let oldestIndex = 0;
-//       let oldestTime = activeNodes[0][1].lastUsedAt ?? 0;
-
-//       for (let i = 1; i < activeNodes.length; i++) {
-//         const time = activeNodes[i][1].lastUsedAt ?? 0;
-//         if (time < oldestTime) {
-//           oldestTime = time;
-//           oldestIndex = i;
-//         }
-//       }
-
-//       activeNodes[oldestIndex][1].panelKey = panelKey;
-//       activeNodes[oldestIndex][1].routeKey = panel.route;
-//       activeNodes[oldestIndex][1].lastUsedAt = newLastUsedAt(store);
-//     }
-//   }
-
-//   // If overflow exists, remove oldest nodes until capacity is respected.
-//   if (activeNodes.length > maxAllowedNodes) {
-//     const indexesByOldest = activeNodes
-//       .map(([, node], index) => ({ index, time: node.lastUsedAt ?? 0 }))
-//       .sort((a, b) => a.time - b.time);
-
-//     const toDelete = activeNodes.length - maxAllowedNodes;
-//     const deleteSet = new Set(indexesByOldest.slice(0, toDelete).map(item => item.index));
-//     activeNodes = activeNodes.filter((_, index) => !deleteSet.has(index));
-//   }
-
-//   store.nodes = Object.fromEntries(activeNodes);
-
-//   return store;
-// };
-
 //*****************************************************************************************
 // Panel
 //*****************************************************************************************
@@ -267,11 +188,6 @@ const sanitizePanels = (store: RouterStore): RouterStore => {
   for (let i = store.panels.length - 1; i >= 0; i--) {
     if (!store.panels[i].route || !(store.panels[i].route in store.routes)) {
       store.panels.splice(i, 1);
-
-      // for (let j = store.nodes.length - 1; j >= 0; j--) {
-      //   if (store.nodes[j].panelKey > i) store.nodes[j].panelKey -= 1;
-      //   else if (store.nodes[j].panelKey === i) store.nodes.splice(j, 1);
-      // }
     }
   }
 
@@ -367,7 +283,6 @@ export const locationToStore = (store: RouterStore, location: Location<RouterSta
     maxPanels: store.maxPanels,
     maxNodes: store.maxNodes,
     panels: [{ route: 'default', pinnedRoutes: [], tabbedRoutes: [] }],
-    // nodes: { default: { panelKey: 0, routeKey: 'default', portal: createReversePortalNode(), lastUsedAt: 0 } },
     nodes: { default: { routeKey: 'default', portal: createReversePortalNode(), lastUsedAt: 0 } },
     routes: { default: { href: '/submit', state: null } }
   };
@@ -409,23 +324,6 @@ export const navigateOpenRoute = (
     store = sanitizeRoutes(store);
   }
 
-  // const currentPanelIndex = store.panels.findIndex(p => p.route === currentRouteKey);
-  // const nextPanelIndex = currentPanelIndex + 1 >= store.maxPanels ? 0 : currentPanelIndex + 1;
-
-  // let newRouteKey = null;
-  // while (newRouteKey === null || newRouteKey in store.routes) {
-  //   newRouteKey = generateRandomUUID();
-  // }
-  // store.routes[newRouteKey] = { href, state: null };
-
-  // if (nextPanelIndex >= store.panels.length) {
-  //   store.panels.push({ route: newRouteKey, pinnedRoutes: [], tabbedRoutes: [] });
-  // } else {
-  //   store.panels[nextPanelIndex].route = newRouteKey;
-  // }
-
-  console.log(store);
-
   return storeToNavigateTo(store);
 };
 
@@ -434,10 +332,6 @@ export const navigateOpenRoute = (
 //*****************************************************************************************
 export const closeRouterPanel = (store: RouterStore, panelKey: number): storeToNavigateToReturnType => {
   store.panels.splice(panelKey, 1);
-  // Object.values(store.nodes).map(node => {
-  //   if (node.panelKey === panelKey) node.panelKey = null;
-  //   return node;
-  // });
 
   return storeToNavigateTo(store);
 };
@@ -446,12 +340,12 @@ export const closeRouterPanel = (store: RouterStore, panelKey: number): storeToN
 // Path
 //*****************************************************************************************
 
-export const buildPath = <Path extends string>(path: Path, params: Record<string, PathParamValue>) => {
-  return path.replace(/:([^/]+)/g, (_, key: string) => {
-    const value = params[key];
-    return encodeURIComponent(String(value));
-  });
-};
+// export const buildPath = <Path extends string>(path: Path, params: Record<string, PathParamValue>) => {
+//   return path.replace(/:([^/]+)/g, (_, key: string) => {
+//     const value = params[key];
+//     return encodeURIComponent(String(value));
+//   });
+// };
 
 //*****************************************************************************************
 // Params
@@ -532,111 +426,111 @@ export const toElement = (value: ReactNode | MemoExoticComponent<ComponentType<a
 // Other
 //*****************************************************************************************
 
-export type Params<Path extends string> = null;
+// export type Params<Path extends string> = null;
 
-export const buildParams = <Path extends string>(path: Path) => {};
+// export const buildParams = <Path extends string>(path: Path) => {};
 
 //*****************************************************************************************
 // Router
 //*****************************************************************************************
 
-export const getTargetPanel = (fromPanel: RoutePanel | null = 'panel-0', panel?: RoutePanel): RoutePanel => {
-  if (panel) return panel;
-  if (!fromPanel || fromPanel === 'panel-0') return 'panel-1';
-  if (fromPanel === 'panel-1') return 'panel-2';
-  if (fromPanel === 'panel-2') return 'panel-1';
-  return 'panel-1';
-};
+// export const getTargetPanel = (fromPanel: RoutePanel | null = 'panel-0', panel?: RoutePanel): RoutePanel => {
+//   if (panel) return panel;
+//   if (!fromPanel || fromPanel === 'panel-0') return 'panel-1';
+//   if (fromPanel === 'panel-1') return 'panel-2';
+//   if (fromPanel === 'panel-2') return 'panel-1';
+//   return 'panel-1';
+// };
 
-export const withParams = (path: string, params?: Record<string, string | number | boolean>) => {
-  if (!params) return path;
-  return Object.entries(params).reduce(
-    (acc, [key, value]) => acc.replace(`:${key}`, encodeURIComponent(String(value))),
-    path
-  );
-};
+// export const withParams = (path: string, params?: Record<string, string | number | boolean>) => {
+//   if (!params) return path;
+//   return Object.entries(params).reduce(
+//     (acc, [key, value]) => acc.replace(`:${key}`, encodeURIComponent(String(value))),
+//     path
+//   );
+// };
 
-export const toSearchString = (search?: Record<string, unknown>) => {
-  if (!search) return '';
-  const searchParams = new URLSearchParams();
-  Object.entries(search).forEach(([key, value]) => {
-    if (value === null || value === undefined) return;
-    if (Array.isArray(value)) {
-      value.forEach(item => searchParams.append(key, String(item)));
-      return;
-    }
-    searchParams.set(key, String(value));
-  });
-  const value = searchParams.toString();
-  return value ? `?${value}` : '';
-};
+// export const toSearchString = (search?: Record<string, unknown>) => {
+//   if (!search) return '';
+//   const searchParams = new URLSearchParams();
+//   Object.entries(search).forEach(([key, value]) => {
+//     if (value === null || value === undefined) return;
+//     if (Array.isArray(value)) {
+//       value.forEach(item => searchParams.append(key, String(item)));
+//       return;
+//     }
+//     searchParams.set(key, String(value));
+//   });
+//   const value = searchParams.toString();
+//   return value ? `?${value}` : '';
+// };
 
-export const upsertRouteInStore = (state: RouterStore, href: string, path: string): RouterStore => {
-  const routeId = href;
-  const routeKeys = state.routes.keys.includes(routeId) ? state.routes.keys : [...state.routes.keys, routeId];
-  const routeEntries = {
-    ...state.routes.entries,
-    [routeId]: {
-      href,
-      state: state.routes.entries[routeId]?.state ?? null
-    }
-  };
+// export const upsertRouteInStore = (state: RouterStore, href: string, path: string): RouterStore => {
+//   const routeId = href;
+//   const routeKeys = state.routes.keys.includes(routeId) ? state.routes.keys : [...state.routes.keys, routeId];
+//   const routeEntries = {
+//     ...state.routes.entries,
+//     [routeId]: {
+//       href,
+//       state: state.routes.entries[routeId]?.state ?? null
+//     }
+//   };
 
-  return {
-    ...state,
-    routes: {
-      keys: routeKeys,
-      entries: routeEntries
-    }
-  };
-};
+//   return {
+//     ...state,
+//     routes: {
+//       keys: routeKeys,
+//       entries: routeEntries
+//     }
+//   };
+// };
 
-export const assignRouteToPanel = (state: RouterStore, panelId: string, routeId: string): RouterStore => {
-  const panel = state.panels.entries[panelId];
-  if (!panel) return state;
+// export const assignRouteToPanel = (state: RouterStore, panelId: string, routeId: string): RouterStore => {
+//   const panel = state.panels.entries[panelId];
+//   if (!panel) return state;
 
-  let nodeKey = panel.nodeKey;
-  if (!nodeKey) {
-    const freeNodeKey = state.nodes.keys.find(key => !state.nodes.entries[key]?.routeKey);
-    if (freeNodeKey) {
-      nodeKey = freeNodeKey;
-    } else {
-      const leastUsedNodeKey =
-        state.nodes.keys.reduce((oldestKey, currentKey) => {
-          const oldest = state.nodes.entries[oldestKey];
-          const current = state.nodes.entries[currentKey];
-          return current.lastUsedAt < oldest.lastUsedAt ? currentKey : oldestKey;
-        }, state.nodes.keys[0]) ?? null;
-      nodeKey = leastUsedNodeKey;
-    }
-  }
+//   let nodeKey = panel.nodeKey;
+//   if (!nodeKey) {
+//     const freeNodeKey = state.nodes.keys.find(key => !state.nodes.entries[key]?.routeKey);
+//     if (freeNodeKey) {
+//       nodeKey = freeNodeKey;
+//     } else {
+//       const leastUsedNodeKey =
+//         state.nodes.keys.reduce((oldestKey, currentKey) => {
+//           const oldest = state.nodes.entries[oldestKey];
+//           const current = state.nodes.entries[currentKey];
+//           return current.lastUsedAt < oldest.lastUsedAt ? currentKey : oldestKey;
+//         }, state.nodes.keys[0]) ?? null;
+//       nodeKey = leastUsedNodeKey;
+//     }
+//   }
 
-  if (!nodeKey) return state;
+//   if (!nodeKey) return state;
 
-  const node = state.nodes.entries[nodeKey];
-  if (!node) return state;
+//   const node = state.nodes.entries[nodeKey];
+//   if (!node) return state;
 
-  const nodesEntries = {
-    ...state.nodes.entries,
-    [nodeKey]: {
-      ...node,
-      routeKey: routeId,
-      lastUsedAt: Date.now()
-    }
-  };
+//   const nodesEntries = {
+//     ...state.nodes.entries,
+//     [nodeKey]: {
+//       ...node,
+//       routeKey: routeId,
+//       lastUsedAt: Date.now()
+//     }
+//   };
 
-  const panelsEntries = {
-    ...state.panels.entries,
-    [panelId]: {
-      ...panel,
-      nodeKey,
-      tabbedRoutes: panel.tabbedRoutes.includes(routeId) ? panel.tabbedRoutes : [...panel.tabbedRoutes, routeId]
-    }
-  };
+//   const panelsEntries = {
+//     ...state.panels.entries,
+//     [panelId]: {
+//       ...panel,
+//       nodeKey,
+//       tabbedRoutes: panel.tabbedRoutes.includes(routeId) ? panel.tabbedRoutes : [...panel.tabbedRoutes, routeId]
+//     }
+//   };
 
-  return {
-    ...state,
-    nodes: { ...state.nodes, entries: nodesEntries },
-    panels: { ...state.panels, entries: panelsEntries }
-  };
-};
+//   return {
+//     ...state,
+//     nodes: { ...state.nodes, entries: nodesEntries },
+//     panels: { ...state.panels, entries: panelsEntries }
+//   };
+// };
