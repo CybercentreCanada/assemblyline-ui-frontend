@@ -4,21 +4,16 @@ import { ReversePortalNode } from '../components/Portals';
 //*****************************************************************************************
 // Location
 //*****************************************************************************************
-export type RouterStatePanel = {
-  route: string;
-  pinnedRoutes: string[];
-  tabbedRoutes: string[];
-};
+// export type RouterStatePanel = {
+//   route: string;
+//   pinnedRoutes: string[];
+//   tabbedRoutes: string[];
+// };
 
-export type RouterStateRoute = {
-  href: string;
-  state: any;
-};
-
-export type RouterState = {
-  panels: RouterStatePanel[];
-  routes: Record<string, RouterStateRoute>;
-};
+// export type RouterStateRoute = {
+//   href: string;
+//   state: any;
+// };
 
 export const RouterStatePanelSchema = z.object({
   route: z.string(),
@@ -49,7 +44,6 @@ export type RouterPanel = {
 };
 
 export type RouterNode = {
-  panelKey: number;
   routeKey: string;
   portal: ReversePortalNode;
   lastUsedAt: number;
@@ -60,12 +54,17 @@ export type RouterRoute = {
   state?: any;
 };
 
+export type RouterState = {
+  panels: RouterPanel[];
+  routes: Record<string, RouterRoute>;
+};
+
 export type RouterStore = {
   maxPanels: number;
   maxNodes: number;
 
   panels: RouterPanel[];
-  nodes: RouterNode[];
+  nodes: Record<string, RouterNode>;
   routes: Record<string, RouterRoute>;
 };
 

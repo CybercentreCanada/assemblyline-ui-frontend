@@ -1,6 +1,6 @@
 import { createRoute } from 'core/router';
 import { createReversePortalNode, InPortal, OutPortal } from 'core/router/components/Portals';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Links } from './Links';
 
 const StatefulWidget = React.memo(() => {
@@ -44,7 +44,17 @@ export const Page1Page = React.memo(() => {
   const node = useMemo(() => createReversePortalNode(), []);
   const [right, setRight] = useState<null | number>(null);
 
-  return (
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+  }, []);
+
+  return loading ? (
+    <div>loading</div>
+  ) : (
     <div>
       <Links />
       <h1>Page 1</h1>

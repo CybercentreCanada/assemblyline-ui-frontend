@@ -38,6 +38,9 @@ export const useNavigate = () => {
       //         : null;
 
       const nextLocation = navigateOpenRoute(store, href, routeKey);
+
+      console.log(nextLocation);
+
       if (nextLocation) {
         routerNavigate(nextLocation.to, nextLocation.options);
       }

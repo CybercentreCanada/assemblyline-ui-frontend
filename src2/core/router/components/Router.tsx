@@ -1,7 +1,8 @@
 import React from 'react';
-import { Link as RouterLink } from 'react-router';
+import { Link as RouterLink, useNavigate as useRouterNavigate } from 'react-router';
 import { RouteIDProvider } from '../providers/RouteIdProvider';
 import { useRouterStore } from '../providers/RouterProvider';
+import { closeRouterPanel } from '../utils/router.utils';
 import { Link } from './Link';
 import { InPortal, OutPortal } from './Portals';
 import { Routes } from './Routes';
@@ -11,12 +12,28 @@ type PanelViewProps = {
 };
 
 const PanelView = React.memo(({ panelKey }: PanelViewProps) => {
-  const [panel] = useRouterStore(store => store.panels[panelKey]);
-  const [node] = useRouterStore(store => store.nodes.find(current => current.panelKey === panelKey) ?? null);
-  const [route] = useRouterStore(store => (node?.routeKey ? store.routes[node.routeKey] : null));
+  const routerNavigate = useRouterNavigate();
+
+  const [store] = useRouterStore(s => s);
+  const [panel] = useRouterStore(store => store.panels?.[panelKey]);
+  const [node] = useRouterStore(
+    store => Object.entries(store.nodes).find(([, node]) => node?.routeKey === panel?.route)?.[1] ?? null
+  );
+  const [route] = useRouterStore(store => (node?.routeKey ? store.routes?.[node.routeKey] : null));
 
   return (
     <div style={{ border: '1px solid grey', minHeight: '220px', padding: '8px' }}>
+      <button
+        onClick={() => {
+          const nextLocation = closeRouterPanel(store, panelKey);
+
+          if (nextLocation) {
+            routerNavigate(nextLocation.to, nextLocation.options);
+          }
+        }}
+      >
+        X
+      </button>
       <div style={{ marginTop: '8px', opacity: 0.75 }}>panel: {panelKey}</div>
       <div style={{ opacity: 0.75 }}>route: {route?.href ?? 'none'}</div>
       {node ? <OutPortal node={node.portal} /> : <div>No node assigned</div>}
@@ -27,7 +44,7 @@ const PanelView = React.memo(({ panelKey }: PanelViewProps) => {
 PanelView.displayName = 'PanelView';
 
 type NodeMountProps = {
-  nodeKey: number;
+  nodeKey: string;
 };
 
 const NodeMount = React.memo(({ nodeKey }: NodeMountProps) => {
@@ -48,10 +65,8 @@ const NodeMount = React.memo(({ nodeKey }: NodeMountProps) => {
 NodeMount.displayName = 'NodeMount';
 
 export const Router = React.memo(() => {
-  const [panels] = useRouterStore(s => s.panels);
-  const [nodes] = useRouterStore(s => s.nodes);
-
-  console.log(panels, nodes);
+  const [nbOfPanels] = useRouterStore(s => Math.max(s.panels?.length, 1));
+  const [nodeKeys] = useRouterStore(s => Object.keys(s.nodes).toString());
 
   return (
     <>
@@ -68,18 +83,18 @@ export const Router = React.memo(() => {
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: `repeat(${Math.max(panels.length, 1)}, 1fr)`,
+          gridTemplateColumns: `repeat(${nbOfPanels}, 1fr)`,
           gridGap: '16px',
           height: '50vh'
         }}
       >
-        {panels.map((panel, panelKey) => (
+        {Array.from({ length: nbOfPanels }).map((panel, panelKey) => (
           <PanelView key={panelKey} panelKey={panelKey} />
         ))}
       </div>
 
       <div style={{ display: 'none' }}>
-        {nodes.map((node, nodeKey) => (
+        {nodeKeys.split(',').map(nodeKey => (
           <NodeMount key={nodeKey} nodeKey={nodeKey} />
         ))}
       </div>

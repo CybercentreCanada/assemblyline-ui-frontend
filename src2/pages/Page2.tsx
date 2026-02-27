@@ -1,5 +1,5 @@
 import { createRoute } from 'core/router/utils/createRoute';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Links } from './Links';
 
 export type Page2Params = typeof Page2Route.params;
@@ -15,7 +15,17 @@ export const Page2Page = React.memo(() => {
 
   // console.log(location, fileID);
 
-  return (
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+  }, []);
+
+  return loading ? (
+    <div>loading</div>
+  ) : (
     <div>
       <Links />
       <h1>Page 2</h1>

@@ -1,8 +1,16 @@
 import { useNavigate, useParams, useSearch } from 'core/router';
 import { createRoute } from 'core/router/utils/createRoute';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router';
 import { Links } from './Links';
+
+type TestProps = {
+  test: string;
+};
+
+const Test = React.memo(({ test }: TestProps) => {
+  return <div>{test}</div>;
+});
 
 export const SubmissionsPage = React.memo(() => {
   // const { fileID } = useParams();
@@ -23,10 +31,53 @@ export const SubmissionsPage = React.memo(() => {
   //   });
   // }, []);
 
-  return (
+  const [loading, setLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+  }, []);
+
+  const [array, setArray] = useState([
+    { test: '1' },
+    { test: '2' },
+    { test: '3' },
+    { test: '4' },
+    { test: '5' },
+    { test: '6' }
+  ]);
+
+  return loading ? (
+    <div>loading</div>
+  ) : (
     <div>
       <Links />
       <h1>Submissions</h1>
+
+      <button
+        onClick={() => {
+          setArray(arr => {
+            return [arr[array.length - 1], ...arr.toSpliced(array.length - 1, 1)];
+          });
+        }}
+      >
+        shift
+      </button>
+
+      <button
+        onClick={() => {
+          setArray(arr => {
+            return [...arr, { test: `${arr.length}` }];
+          });
+        }}
+      >
+        add
+      </button>
+
+      {array.map(a => (
+        <Test key={a.test} test={a.test} />
+      ))}
     </div>
   );
 });
