@@ -17,7 +17,7 @@ const PanelView = React.memo(({ panelKey }: PanelViewProps) => {
   const [store] = useRouterStore(s => s);
   const [panel] = useRouterStore(store => store.panels?.[panelKey]);
   const [node] = useRouterStore(
-    store => Object.entries(store.nodes).find(([, node]) => node?.routeKey === panel?.route)?.[1] ?? null
+    store => Object.entries(store.nodes).find(([, node]) => node?.routeKey === panel?.routeKey)?.[1] ?? null
   );
   const [route] = useRouterStore(store => (node?.routeKey ? store.routes?.[node.routeKey] : null));
 

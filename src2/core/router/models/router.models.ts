@@ -38,25 +38,26 @@ export type RouterState2 = z.infer<typeof RouterStateSchema>;
 //*****************************************************************************************
 
 export type RouterPanel = {
-  route: string;
-  pinnedRoutes: string[];
-  tabbedRoutes: string[];
+  routeKey: keyof RouterStore['routes'];
+  temporaryRouteKey: keyof RouterStore['routes'];
+  pinnedRouteKeys: (keyof RouterStore['routes'])[];
+  tabbedRouteKeys: (keyof RouterStore['routes'])[];
 };
 
 export type RouterNode = {
-  routeKey: string;
+  routeKey: keyof RouterStore['routes'];
   portal: ReversePortalNode;
   lastUsedAt: number;
 };
 
-export type RouterRoute = {
+export type RouterRoute<State = any> = {
   href: string;
-  state?: any;
+  state?: State;
 };
 
 export type RouterState = {
-  panels: RouterPanel[];
-  routes: Record<string, RouterRoute>;
+  panels: RouterStore['panels'];
+  routes: RouterStore['routes'];
 };
 
 export type RouterStore = {

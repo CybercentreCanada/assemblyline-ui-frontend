@@ -4,7 +4,7 @@ import { AppRoutes } from '../components/Routes';
 import type { RoutePanel } from '../providers/PanelProvider';
 import { useRouteID } from '../providers/RouteIdProvider';
 import { useRouterStore } from '../providers/RouterProvider';
-import { navigateOpenRoute } from '../utils/router.utils';
+import { openRoute, replaceRoute } from '../utils/router.utils';
 
 type NavigateOptions = { panel?: RoutePanel } | { variant?: 'open' | 'replace' };
 
@@ -37,9 +37,15 @@ export const useNavigate = () => {
       //         ? navigateGoToRoute(store, href, type, routeKey)
       //         : null;
 
-      const nextLocation = navigateOpenRoute(store, href, routeKey);
-
-      // console.log(nextLocation);
+      let nextLocation = null;
+      switch (type) {
+        case 'open':
+          nextLocation = openRoute(store, { href }, routeKey);
+          break;
+        case 'replace':
+          nextLocation = replaceRoute(store, { href }, routeKey);
+          break;
+      }
 
       if (nextLocation) {
         routerNavigate(nextLocation.to, nextLocation.options);

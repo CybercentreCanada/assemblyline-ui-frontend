@@ -1,52 +1,37 @@
+import { deepCompare, generateRandomUUID } from 'core/app/utils/app.utils';
 import type { ComponentType, MemoExoticComponent, ReactNode } from 'react';
 import React from 'react';
 import type { Location, NavigateOptions, To } from 'react-router';
 import { createReversePortalNode } from '../components/Portals';
-import {
-  ParamsBlueprint,
-  ParamsBlueprints,
-  ParamsValues,
-  RouterRoute,
-  RouterState,
-  RouterStore
-} from '../models/router.models';
-
-const DEFAULT_ROUTER_STORE: RouterStore = {
-  maxPanels: 3,
-  maxNodes: 3,
-  panels: [],
-  nodes: {},
-  routes: {}
-};
-
-const generateRandomUUID = (existingUUIDs: string[] = []) => {
-  let uuid = null;
-
-  while (uuid === null || existingUUIDs.findIndex(u => u === uuid) >= 0) {
-    uuid = btoa(String.fromCharCode(...crypto.getRandomValues(new Uint8Array(12))));
-  }
-
-  return uuid;
-};
+import { DEFAULT_ROUTER_PANEL, DEFAULT_ROUTER_ROUTE, ROUTER_STORE_EXAMPLE } from '../models/router.defaults';
+import { ParamsBlueprint, ParamsBlueprints, ParamsValues, RouterState, RouterStore } from '../models/router.models';
 
 //*****************************************************************************************
 // Route
 //*****************************************************************************************
 
-const sanitizeRoutes = (store: RouterStore): RouterStore => {
+/**
+ * @name sanitizeRoutes
+ * @description Collects all route keys currently referenced by panels and nodes, then removes unreferenced routes from the store.
+ * @param store - Router store
+ * @returns Updated router store with orphaned routes removed
+ */
+export const sanitizeRoutes = (store: RouterStore): RouterStore => {
   const activeRoutes = new Set<string>();
 
   for (const panel of store.panels) {
     if (!panel) continue;
 
-    if (panel.route) activeRoutes.add(panel.route);
+    if (panel.routeKey) activeRoutes.add(panel.routeKey);
 
-    if (panel.tabbedRoutes) {
-      for (const route of panel.tabbedRoutes) activeRoutes.add(route);
+    if (panel.temporaryRouteKey) activeRoutes.add(panel.temporaryRouteKey);
+
+    if (panel.tabbedRouteKeys) {
+      for (const route of panel.tabbedRouteKeys) activeRoutes.add(route);
     }
 
-    if (panel.pinnedRoutes) {
-      for (const route of panel.pinnedRoutes) activeRoutes.add(route);
+    if (panel.pinnedRouteKeys) {
+      for (const route of panel.pinnedRouteKeys) activeRoutes.add(route);
     }
   }
 
@@ -63,30 +48,318 @@ const sanitizeRoutes = (store: RouterStore): RouterStore => {
   return store;
 };
 
-const pushNewRoute = (store: RouterStore, newRoute: RouterRoute, fromPanelKey: number): RouterStore => {
+/**
+ * @name insertLeftRoute
+ * @description Inserts a new panel route to the left of the given panel key and, if max capacity is exceeded, removes the last panel.
+ * @param store - Router store
+ * @param newRoute - Route data to insert
+ * @param panelKey - Target panel index to insert to the left (defaults to 0)
+ * @returns Updated router store with the route inserted from the left and overflow trimmed from the end
+ */
+export const insertLeftRoute = (
+  store: RouterStore,
+  newRoute: RouterStore['routes'][string],
+  panelKey: number = 0
+): RouterStore => {
+  if (store.maxPanels <= 0) return store;
+
+  const panelIndex = Math.min(Math.max(0, Math.trunc(panelKey)), store.panels.length);
   const newRouteKey = generateRandomUUID(Object.keys(store.routes));
-  store.routes[newRouteKey] = { href: null, state: null, ...newRoute };
+  store.routes[newRouteKey] = { ...DEFAULT_ROUTER_ROUTE, ...newRoute };
+
+  store.panels.splice(panelIndex, 0, {
+    ...DEFAULT_ROUTER_PANEL,
+    routeKey: newRouteKey,
+    tabbedRouteKeys: [newRouteKey]
+  });
+
+  if (store.panels.length > store.maxPanels) {
+    store.panels.splice(-1, 1);
+  }
+
+  return store;
+};
+
+/**
+ * @name insertRightRoute
+ * @description Inserts a new panel route to the right of the given panel key and, if max capacity is exceeded, removes the first panel.
+ * @param store - Router store
+ * @param newRoute - Route data to insert
+ * @param panelKey - Base panel index used to insert at panelKey + 1 (defaults to last panel)
+ * @returns Updated router store with the route inserted from the right and overflow trimmed from the start
+ */
+export const insertRightRoute = (
+  store: RouterStore,
+  newRoute: RouterStore['routes'][string],
+  panelKey: number = Math.max(store.panels.length - 1, -1)
+): RouterStore => {
+  if (store.maxPanels <= 0) return store;
+
+  const panelIndex = Math.min(Math.max(0, Math.trunc(panelKey)), store.panels.length - 1);
+  const newRouteKey = generateRandomUUID(Object.keys(store.routes));
+  store.routes[newRouteKey] = { ...DEFAULT_ROUTER_ROUTE, ...newRoute };
+
+  store.panels.splice(panelIndex + 1, 0, {
+    ...DEFAULT_ROUTER_PANEL,
+    routeKey: newRouteKey,
+    tabbedRouteKeys: [newRouteKey]
+  });
+
+  if (store.panels.length > store.maxPanels) {
+    store.panels.splice(0, 1);
+  }
+
+  return store;
+};
+
+/**
+ * @name addRoute
+ * @description Adds a new route to an existing panel, removes invalid/non-permanent tabbed routes, sets the new route as active, and appends it to the panel tabs.
+ * @param store - Router store
+ * @param newRoute - Route data to add
+ * @param panelKey - Target panel index (clamped to valid bounds)
+ * @returns Updated router store with the route added to the target panel, or unchanged when no panel exists
+ */
+export const addRoute = (
+  store: RouterStore,
+  newRoute: RouterStore['routes'][string],
+  panelKey: number
+): RouterStore => {
+  if (store.panels.length === 0) return store;
+
+  const panelIndex = Math.min(Math.max(0, Math.trunc(panelKey)), store.panels.length - 1);
+
+  const newRouteKey = generateRandomUUID(Object.keys(store.routes));
+  store.routes[newRouteKey] = { ...DEFAULT_ROUTER_ROUTE, ...newRoute };
+  store.panels[panelIndex].routeKey = newRouteKey;
+  store.panels[panelIndex].temporaryRouteKey = newRouteKey;
+
+  return store;
+};
+
+/**
+ * @name findRouteKey
+ * @description Finds the key of a route in the store by deep value comparison.
+ * @param store - Router store
+ * @param route - Route value to find
+ * @returns Matching route key, or null if none is found
+ */
+export const findRouteKey = (store: RouterStore, route: RouterStore['routes'][string]): keyof RouterStore['routes'] => {
+  Object.keys(store.routes).forEach(key => {
+    if (deepCompare(route, store.routes[key])) {
+      return key;
+    }
+  });
+
+  return null;
+};
+
+/**
+ * @name findRoute
+ * @description Finds and returns a matching route object from the store by deep value comparison.
+ * @param store - Router store
+ * @param route - Route value to find
+ * @returns Matching route object, or null if none is found
+ */
+export const findRoute = (store: RouterStore, route: RouterStore['routes'][string]): RouterStore['routes'][string] => {
+  const key = findRouteKey(store, route);
+  return key !== null ? store.routes[key] : null;
+};
+
+/**
+ * @name findPanel
+ * @description Finds and returns a matching route object from the store by deep value comparison.
+ * @param store - Router store
+ * @param route - Route value to find
+ * @returns Matching route object, or null if none is found
+ */
+export const findPanelKey = (
+  store: RouterStore,
+  routeKey: keyof RouterStore['routes'],
+  source: ('temporary' | 'tabbed' | 'pinned')[]
+): number => {
+  for (let i = 0; i < store.panels.length; i++) {
+    if (source.includes('temporary') && store.panels[i].temporaryRouteKey === routeKey) return i;
+    else if (source.includes('tabbed') && store.panels[i].tabbedRouteKeys.includes(routeKey)) return i;
+    else if (source.includes('pinned') && store.panels[i].pinnedRouteKeys.includes(routeKey)) return i;
+  }
+
+  return null;
+};
+
+/**
+ * @name setPermanentRoute
+ * @description Marks a route as permanent in the store.
+ * @param store - Router store
+ * @param routeKey - Route key to mark as permanent
+ * @returns Updated router store with the route marked permanent
+ */
+export const setPermanentRoute = (store: RouterStore, routeKey: keyof RouterStore['routes']): RouterStore => {
+  if (!(routeKey in store.routes)) return store;
+
+  const panelIndex = findPanelKey(store, routeKey, ['temporary']);
+  if (panelIndex === null) return store;
+
+  store.panels[panelIndex].tabbedRouteKeys.push(store.panels[panelIndex].temporaryRouteKey);
+  store.panels[panelIndex].temporaryRouteKey = null;
+
+  return store;
+};
+
+/**
+ * @name setPinnedRoute
+ * @description Marks a route as permanent in the store.
+ * @param store - Router store
+ * @param routeKey - Route key to mark as permanent
+ * @returns Updated router store with the route marked permanent
+ */
+export const setPinnedRoute = (store: RouterStore, routeKey: keyof RouterStore['routes']): RouterStore => {
+  if (!(routeKey in store.routes)) return store;
+
+  const panelIndex = findPanelKey(store, routeKey, ['temporary', 'tabbed']);
+  if (panelIndex === null) return store;
+
+  store.panels[panelIndex].tabbedRouteKeys.push(store.panels[panelIndex].temporaryRouteKey);
+  store.panels[panelIndex].temporaryRouteKey = null;
+
+  return store;
+};
+
+/**
+ * @name setUnpinnedRoute
+ * @description Removes a route key from the pinned route list and keeps it as a regular tabbed route.
+ * @param store - Router store
+ * @param routeKey - Route key to unpin
+ * @param tabIndex - Target tab index for the unpinned route
+ * @returns Updated router store with the route unpinned
+ */
+const setUnpinnedRoute = (store: RouterStore, routeKey: keyof RouterStore['routes'], tabIndex: number): RouterStore => {
+  return store;
+};
+
+/**
+ * @name moveRouteKey
+ * @description Moves a route key between panel tab collections.
+ * @param store - Router store
+ * @param routeKey - Route key to move
+ * @param panelKey - Destination panel index
+ * @param tabIndex - Destination tab index
+ * @param tab - Destination tab collection ('pinned' or 'permanent')
+ * @returns Updated router store after moving the route key
+ */
+const moveTabbedRouteKey = (
+  store: RouterStore,
+  routeKey: keyof RouterStore['routes'],
+  panelKey: number,
+  tabIndex: number,
+  tab: 'pinned' | 'tab'
+): RouterStore => {
+  if (
+    !(routeKey in store.routes) ||
+    panelKey < 0 ||
+    panelKey >= store.panels.length ||
+    (tab === 'tab' && (tabIndex < 0 || tabIndex >= store.panels[panelKey].tabbedRouteKeys.length))
+  )
+    return store;
+
+  // Remove source
+
+  // Add destination
+  if (tab === 'pinned') {
+  } else {
+  }
+
+  // Set it permanent
+
+  // Set it in the panel
+
+  return store;
+};
+
+// TODO
+const insertRouteAtIndex = (
+  store: RouterStore,
+  newRoute: RouterStore['routes'][string],
+  panelKey: number,
+  evictionDirection: 'head' | 'tail'
+): RouterStore => {
+  return store;
+};
+
+//TODO
+const replaceRouteAtIndex = (
+  store: RouterStore,
+  newRoute: RouterStore['routes'][string],
+  panelKey: number
+): RouterStore => {
+  return store;
+};
+
+const openNewRouteAtPanelKey = (
+  store: RouterStore,
+  newRoute: RouterStore['routes'][string],
+  toPanelKey: number
+): RouterStore => {
+  const newRouteKey = generateRandomUUID(Object.keys(store.routes));
+  store.routes[newRouteKey] = { ...DEFAULT_ROUTER_ROUTE, ...newRoute };
+  const maxPanels = store.maxPanels;
+
+  if (toPanelKey < 0) {
+    // TODO
+    // for (let i = 0; i < maxPanels - 1; i++) {
+    //   store.panels[i].route = store.panels[i + 1].route;
+    //   store = updateNodeLastUsed(store, i);
+    // }
+    // store.panels[toPanelKey].route = newRouteKey;
+    // store = updateNodeLastUsed(store, toPanelKey);
+  } else if (toPanelKey >= maxPanels) {
+    for (let i = 0; i < maxPanels - 1; i++) {
+      store.panels[i].routeKey = store.panels[i + 1].routeKey;
+      store = updateNodeLastUsed(store, i);
+    }
+    store.panels[toPanelKey - 1].routeKey = newRouteKey;
+    store = updateNodeLastUsed(store, toPanelKey - 1);
+  } else if (toPanelKey >= store.panels.length) {
+    store.panels.push({ ...DEFAULT_ROUTER_PANEL, routeKey: newRouteKey });
+  } else {
+    store.panels[toPanelKey].routeKey = newRouteKey;
+  }
+
+  return store;
+};
+
+const pushNewRoute = (
+  store: RouterStore,
+  newRoute: RouterStore['routes'][string],
+  fromPanelKey: number
+): RouterStore => {
+  const newRouteKey = generateRandomUUID(Object.keys(store.routes));
+  store.routes[newRouteKey] = { ...DEFAULT_ROUTER_ROUTE, ...newRoute };
 
   const maxPanels = store.maxPanels;
   const nextPanelKey = fromPanelKey + 1;
 
   if (nextPanelKey >= maxPanels) {
     for (let i = 0; i < maxPanels - 1; i++) {
-      store.panels[i].route = store.panels[i + 1].route;
+      store.panels[i].routeKey = store.panels[i + 1].routeKey;
       store = updateNodeLastUsed(store, i);
     }
-    store.panels[nextPanelKey - 1].route = newRouteKey;
+    store.panels[nextPanelKey - 1].routeKey = newRouteKey;
     store = updateNodeLastUsed(store, nextPanelKey - 1);
   } else if (nextPanelKey >= store.panels.length) {
-    store.panels.push({ route: newRouteKey, pinnedRoutes: [], tabbedRoutes: [] });
+    store.panels.push({ ...DEFAULT_ROUTER_PANEL, routeKey: newRouteKey });
   } else {
-    store.panels[nextPanelKey].route = newRouteKey;
+    store.panels[nextPanelKey].routeKey = newRouteKey;
   }
 
   return store;
 };
 
-const loopNewRoute = (store: RouterStore, newRoute: RouterRoute, fromPanelKey: number): RouterStore => {
+const loopNewRoute = (
+  store: RouterStore,
+  newRoute: RouterStore['routes'][string],
+  fromPanelKey: number
+): RouterStore => {
   const newRouteKey = generateRandomUUID(Object.keys(store.routes));
   store.routes[newRouteKey] = newRoute;
 
@@ -94,19 +367,24 @@ const loopNewRoute = (store: RouterStore, newRoute: RouterRoute, fromPanelKey: n
   const nextPanelKey = fromPanelKey + 1;
 
   if (nextPanelKey >= maxPanels) {
-    store.panels[0].route = newRouteKey;
+    store.panels[0].routeKey = newRouteKey;
     store = updateNodeLastUsed(store, 0);
   } else if (nextPanelKey >= store.panels.length) {
-    store.panels.push({ route: newRouteKey, pinnedRoutes: [], tabbedRoutes: [] });
+    store.panels.push({ ...DEFAULT_ROUTER_PANEL, routeKey: newRouteKey });
     store = updateNodeLastUsed(store, store.panels.length - 1);
   } else {
-    store.panels[nextPanelKey].route = newRouteKey;
+    store.panels[nextPanelKey].routeKey = newRouteKey;
   }
 
   return store;
 };
 
-const splicePanel = (store: RouterStore, panelKey: number): RouterStore => {
+const updateRoute = (store: RouterStore, route: RouterStore['routes'][string], routeKey: string): RouterStore => {
+  store.routes[routeKey] = { ...store.routes[routeKey], ...route };
+  return store;
+};
+
+const removePanel = (store: RouterStore, panelKey: number): RouterStore => {
   if (panelKey >= 0 && panelKey < store.panels.length) {
     store.panels.splice(panelKey, 1);
   }
@@ -121,9 +399,19 @@ const splicePanel = (store: RouterStore, panelKey: number): RouterStore => {
 const generateLastUsedAt = (store: RouterStore): number =>
   Math.max(0, ...Object.values(store.nodes).map(n => n.lastUsedAt)) + 1;
 
+const rebaseAllLastUsedAt = (store: RouterStore): RouterStore => {
+  const min = Math.min(...Object.values(store.nodes).map(x => x.lastUsedAt));
+
+  for (const key in store.nodes) {
+    store.nodes[key].lastUsedAt -= min;
+  }
+
+  return store;
+};
+
 const addNode = (store: RouterStore, panelKey: number): RouterStore => {
   store.nodes[generateRandomUUID(Object.keys(store.nodes))] = {
-    routeKey: store.panels[panelKey].route,
+    routeKey: store.panels[panelKey].routeKey,
     portal: createReversePortalNode(),
     lastUsedAt: generateLastUsedAt(store)
   };
@@ -132,10 +420,15 @@ const addNode = (store: RouterStore, panelKey: number): RouterStore => {
 };
 
 const updateNodeLastUsed = (store: RouterStore, panelKey: number): RouterStore => {
+  const nextLastUsedAt = generateLastUsedAt(store);
   for (const nodeKey in store.nodes) {
-    if (store.panels[panelKey].route === store.nodes[nodeKey].routeKey) {
-      store.nodes[nodeKey].lastUsedAt = generateLastUsedAt(store);
+    if (store.panels[panelKey].routeKey === store.nodes[nodeKey].routeKey) {
+      store.nodes[nodeKey].lastUsedAt = nextLastUsedAt;
     }
+  }
+
+  if (nextLastUsedAt > store.maxNodes + store.maxPanels + 50) {
+    store = rebaseAllLastUsedAt(store);
   }
 
   return store;
@@ -163,7 +456,7 @@ const sanitizeNodes = (store: RouterStore): RouterStore => {
   for (const [panelKey, panel] of store.panels.entries()) {
     let exists = false;
     for (const nodeKey in store.nodes) {
-      if (panel.route === store.nodes[nodeKey].routeKey) {
+      if (panel.routeKey === store.nodes[nodeKey].routeKey) {
         exists = true;
         break;
       }
@@ -186,7 +479,7 @@ const sanitizeNodes = (store: RouterStore): RouterStore => {
 //*****************************************************************************************
 const sanitizePanels = (store: RouterStore): RouterStore => {
   for (let i = store.panels.length - 1; i >= 0; i--) {
-    if (!store.panels[i].route || !(store.panels[i].route in store.routes)) {
+    if (!store.panels[i].routeKey || !(store.panels[i].routeKey in store.routes)) {
       store.panels.splice(i, 1);
     }
   }
@@ -196,7 +489,7 @@ const sanitizePanels = (store: RouterStore): RouterStore => {
 
 const findPanelFromRoute = (store: RouterStore, routeKey: string): number => {
   for (const [panelKey, panel] of store.panels.entries()) {
-    if (panel.route === routeKey) {
+    if (panel.routeKey === routeKey) {
       return panelKey;
     }
   }
@@ -212,8 +505,8 @@ export const locationToStore = (store: RouterStore, location: Location<RouterSta
     if (!!location.state) {
       // Panels
       location.state.panels.forEach((panel, i) => {
-        if (store?.panels?.[i]) store.panels[i].route = panel.route;
-        else store.panels[i] = { route: panel.route, pinnedRoutes: [], tabbedRoutes: [] };
+        if (store?.panels?.[i]) store.panels[i].routeKey = panel.routeKey;
+        else store.panels[i] = { ...DEFAULT_ROUTER_PANEL, routeKey: panel.routeKey };
       });
       store.panels.splice(location.state.panels.length);
 
@@ -257,7 +550,7 @@ export const locationToStore = (store: RouterStore, location: Location<RouterSta
         const newNodeKey = generateRandomUUID(Object.keys(nextNodes));
 
         nextRoutes[newRouteKey] = { href, state: null };
-        nextPanels.push({ route: newRouteKey, pinnedRoutes: [], tabbedRoutes: [] });
+        nextPanels.push({ ...DEFAULT_ROUTER_PANEL, routeKey: newRouteKey });
 
         nextNodes[newNodeKey] = {
           // panelKey: nextPanels.length - 1,
@@ -279,29 +572,24 @@ export const locationToStore = (store: RouterStore, location: Location<RouterSta
     console.error('error parsing the location', e);
   }
 
-  return {
-    maxPanels: store.maxPanels,
-    maxNodes: store.maxNodes,
-    panels: [{ route: 'default', pinnedRoutes: [], tabbedRoutes: [] }],
-    nodes: { default: { routeKey: 'default', portal: createReversePortalNode(), lastUsedAt: 0 } },
-    routes: { default: { href: '/submit', state: null } }
-  };
+  return { ...ROUTER_STORE_EXAMPLE, maxPanels: store.maxPanels, maxNodes: store.maxNodes };
 };
 
-export type storeToNavigateToReturnType = {
+export type storeToNavigateReturnType = {
   to: To;
   options: NavigateOptions;
 };
 
-export const storeToNavigateTo = (store: RouterStore): storeToNavigateToReturnType => {
+export const storeToNavigate = (store: RouterStore): storeToNavigateReturnType => {
   const searchParams = new URLSearchParams();
 
   store.panels.forEach((panel, i) => {
-    searchParams.append('p', store.routes[panel.route].href);
+    searchParams.append('p', store.routes[panel.routeKey].href);
   });
 
   return {
-    to: { search: `/?${searchParams.toString()}` },
+    // to: { search: `/?${searchParams.toString()}` },
+    to: `/?${searchParams.toString()}`,
     options: { state: { panels: store.panels, routes: store.routes } }
   };
 };
@@ -310,30 +598,74 @@ export const storeToNavigateTo = (store: RouterStore): storeToNavigateToReturnTy
 // Navigate
 //*****************************************************************************************
 
-export const navigateOpenRoute = (
+export const openRoute = (
   store: RouterStore,
-  href: string,
-  currentRouteKey: string
-): storeToNavigateToReturnType => {
-  const currentPanelKey = findPanelFromRoute(store, currentRouteKey);
+  route: RouterStore['routes'][string],
+  routeKey: string
+): storeToNavigateReturnType => {
+  const currentPanelKey = findPanelFromRoute(store, routeKey);
 
   if (currentPanelKey >= 0) {
-    store = pushNewRoute(store, { href }, currentPanelKey);
+    store = pushNewRoute(store, route, currentPanelKey);
     store = sanitizePanels(store);
     store = sanitizeNodes(store);
     store = sanitizeRoutes(store);
   }
 
-  return storeToNavigateTo(store);
+  return storeToNavigate(store);
+};
+
+export const replaceRoute2 = (
+  store: RouterStore,
+  route: RouterStore['routes'][string],
+  routeKey: string
+): storeToNavigateReturnType => {
+  if (routeKey in store.routes) {
+    store = updateRoute(store, route, routeKey);
+  }
+
+  return storeToNavigate(store);
+};
+
+export const openRouteAtPanelKey = (
+  store: RouterStore,
+  route: RouterStore['routes'][string],
+  panelKey: number
+): storeToNavigateReturnType => {
+  if (panelKey >= 0 && panelKey < store.maxPanels) {
+    if (panelKey >= store.panels.length) store = pushNewRoute(store, route, panelKey);
+    else store = openNewRouteAtPanelKey(store, route, panelKey);
+
+    store = sanitizePanels(store);
+    store = sanitizeNodes(store);
+    store = sanitizeRoutes(store);
+  }
+
+  return storeToNavigate(store);
+};
+
+export const moveRouteToPanelKey = (
+  store: RouterStore,
+  route: RouterStore['routes'][string],
+  panelKey: number
+): storeToNavigateReturnType => {
+  // if (panelKey >= 0 && panelKey < store.maxPanels) {
+  //   if (panelKey >= store.panels.length) store = pushNewRoute(store, route, panelKey);
+  //   else store = openNewRouteAtPanelKey(store, route, panelKey);
+  //   store = sanitizePanels(store);
+  //   store = sanitizeNodes(store);
+  //   store = sanitizeRoutes(store);
+  // }
+  // return storeToNavigate(store);
 };
 
 //*****************************************************************************************
 // Panel
 //*****************************************************************************************
-export const closeRouterPanel = (store: RouterStore, panelKey: number): storeToNavigateToReturnType => {
+export const closeRouterPanel = (store: RouterStore, panelKey: number): storeToNavigateReturnType => {
   store.panels.splice(panelKey, 1);
 
-  return storeToNavigateTo(store);
+  return storeToNavigate(store);
 };
 
 //*****************************************************************************************
@@ -524,7 +856,7 @@ export const toElement = (value: ReactNode | MemoExoticComponent<ComponentType<a
 //     [panelId]: {
 //       ...panel,
 //       nodeKey,
-//       tabbedRoutes: panel.tabbedRoutes.includes(routeId) ? panel.tabbedRoutes : [...panel.tabbedRoutes, routeId]
+//       tabbedRoutes: panel.tabbedRouteKeys.includes(routeId) ? panel.tabbedRouteKeys : [...panel.tabbedRouteKeys, routeId]
 //     }
 //   };
 
