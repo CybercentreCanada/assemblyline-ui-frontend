@@ -1,3 +1,4 @@
+import { toElement } from 'core/app/utils/app.utils';
 import { createSearchParams, SearchParamsProvider } from 'core/search-params/createSearchParams';
 import { PARAM_BLUEPRINTS } from 'core/search-params/lib/search_params.blueprint';
 import { SearchParamBlueprints, SearchParamValues } from 'core/search-params/lib/search_params.model';
@@ -14,7 +15,7 @@ import type {
   PathParams
 } from '../models/router.models';
 import { RouteProvider } from '../providers/RouteProvider';
-import { createParamsParser, PARAM_PARSERS, toElement } from './router.utils';
+import { createParamsParser, PARAM_PARSERS } from './param.utils';
 
 export type RoutePath = string;
 export type RouteSearch = undefined | SearchParamBlueprints;

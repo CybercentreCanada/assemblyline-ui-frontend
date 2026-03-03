@@ -10,21 +10,21 @@ export type LinkProps2 = Omit<RouterLinkProps, 'to'> & {
   to: string | NavigateTo | AppRoute;
 };
 
-export type LinkProps = { type?: 'open' | 'replace' | number; to: string } & Omit<
+export type LinkProps = { variant?: 'open' | 'replace' | 'to'; panel: number; to: string } & Omit<
   RouterLinkProps,
   'to' | 'pathname' | 'search' | 'hash'
 >;
 
-export const Link = React.memo(({ type = 'open', to, onClick, ...props }: LinkProps) => {
+export const Link = React.memo(({ variant = 'open', panel = null, to, onClick, ...props }: LinkProps) => {
   const navigate = useNavigate();
 
   const handleClick = useCallback(
     (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
       event.preventDefault();
       event.stopPropagation();
-      navigate(type, to);
+      navigate(to, { variant, panel });
     },
-    [navigate, type]
+    [navigate]
   );
 
   return <RouterLink to={to} onClick={handleClick} {...props} />;

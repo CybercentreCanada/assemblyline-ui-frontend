@@ -1,13 +1,13 @@
 import { useCallback } from 'react';
 import { useNavigate as useRouterNavigate } from 'react-router';
 import { AppRoutes } from '../components/Routes';
-import type { RoutePanel } from '../providers/PanelProvider';
+import { DEFAULT_ROUTER_ROUTE } from '../models/router.defaults';
+import { RouterRoute } from '../models/router.models';
 import { useRouteID } from '../providers/RouteIdProvider';
 import { useRouterStore } from '../providers/RouterProvider';
-import { openRoute, replaceRoute } from '../utils/router.utils';
+import { addRoute, findPanelKey, insertRightRoute, sanitizeRouter, storeToNavigate } from '../utils/router.utils';
 
-type NavigateOptions = { panel?: RoutePanel } | { variant?: 'open' | 'replace' };
-
+type NavigateOptions = { variant: 'open' } | { variant: 'replace' } | { variant: 'to'; panel: number };
 type AppRoute = AppRoutes[number];
 
 type Expand<T> = T extends infer O ? { [K in keyof O]: O[K] } : never;
@@ -25,31 +25,24 @@ export const useNavigate = () => {
   const { routeKey } = useRouteID();
   const [store] = useRouterStore(s => s);
 
+  let navigationStyle: 'push' | 'loop' = 'push';
+
   return useCallback(
-    // (to: NavigateTo, options?: NavigateOptions) => {
-    (type: 'open' | 'replace' | number, href: string, options?: NavigateOptions) => {
-      // const nextLocation =
-      //   type === 'open'
-      //     ? navigateOpenRoute(store, href, routeKey)
-      //     : type === 'replace'
-      //       ? navigateReplaceRoute(store, href, routeKey)
-      //       : typeof type === 'number'
-      //         ? navigateGoToRoute(store, href, type, routeKey)
-      //         : null;
+    (href: string, options?: NavigateOptions) => {
+      let nextStore = store;
+      const panelKey = findPanelKey(nextStore, routeKey, 'active') + 1;
+      if (panelKey === null) return null;
 
-      let nextLocation = null;
-      switch (type) {
-        case 'open':
-          nextLocation = openRoute(store, { href }, routeKey);
-          break;
-        case 'replace':
-          nextLocation = replaceRoute(store, { href }, routeKey);
-          break;
+      const nextRoute: RouterRoute = { ...DEFAULT_ROUTER_ROUTE, href };
+      if (navigationStyle === 'push') {
+        if (panelKey >= nextStore.panels.length) nextStore = insertRightRoute(nextStore, nextRoute);
+        else nextStore = addRoute(nextStore, nextRoute, panelKey);
+      } else if (navigationStyle === 'loop') {
       }
 
-      if (nextLocation) {
-        routerNavigate(nextLocation.to, nextLocation.options);
-      }
+      nextStore = sanitizeRouter(nextStore);
+      const nextLocation = storeToNavigate(nextStore);
+      if (nextLocation) routerNavigate(nextLocation.to, nextLocation.options);
     },
     [routeKey]
   );

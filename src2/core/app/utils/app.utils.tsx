@@ -1,3 +1,5 @@
+import React, { ComponentType, MemoExoticComponent, ReactNode } from 'react';
+
 /**
  * @name generateRandomUUID
  * @description Generates a random base64 id with a configurable character length and retries on collisions.
@@ -142,3 +144,21 @@ export function deepReconcile<T extends Record<string, unknown>>(
 
   return result as T;
 }
+
+/**
+ * @name toElement
+ * @description Reconciles fields by prioritizing incoming values and restoring initial values for keys present in
+ * existing+initial but missing from incoming.
+ * @param incoming - Latest partial state to apply
+ * @param existing - Current stored state before reconciliation
+ * @param initial - Initial baseline state used for restoration
+ * @returns A reconciled object following deep-reconcile fallback precedence
+ */
+export const toElement = (value: ReactNode | MemoExoticComponent<ComponentType<any>>) => {
+  if (React.isValidElement(value)) {
+    return value;
+  }
+
+  const Component = value as ComponentType<any>;
+  return <Component />;
+};

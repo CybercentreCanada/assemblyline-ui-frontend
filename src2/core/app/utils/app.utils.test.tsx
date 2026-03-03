@@ -5,20 +5,34 @@ import { deepCompare, deepReconcile, generateRandomUUID, shallowCompareObject, s
 // generateRandomUUID
 //*****************************************************************************************
 describe('generateRandomUUID', () => {
-  it('returns ids with the requested size', () => {
-    const id6 = generateRandomUUID([], 6);
-    const id16 = generateRandomUUID([], 16);
-
-    expect(id6).toHaveLength(6);
-    expect(id16).toHaveLength(16);
+  it('returns a base64 id string', () => {
+    const id = generateRandomUUID();
+    expect(typeof id).toBe('string');
+    expect(id.length).toBeGreaterThan(0);
   });
 
-  it('does not return an existing id', () => {
-    const first = generateRandomUUID([], 12);
-    const next = generateRandomUUID([first], 12);
+  it('retries when generated id already exists', () => {
+    const firstBytes = new Uint8Array(12).fill(1);
+    const secondBytes = new Uint8Array(12).fill(2);
+    const firstId = btoa(String.fromCharCode(...firstBytes));
+    const secondId = btoa(String.fromCharCode(...secondBytes));
 
-    expect(next).toHaveLength(12);
-    expect(next).not.toBe(first);
+    const spy = vi.spyOn(crypto, 'getRandomValues');
+    spy
+      .mockImplementationOnce((typedArray: Uint8Array) => {
+        typedArray.set(firstBytes);
+        return typedArray;
+      })
+      .mockImplementationOnce((typedArray: Uint8Array) => {
+        typedArray.set(secondBytes);
+        return typedArray;
+      });
+
+    const id = generateRandomUUID([firstId]);
+
+    expect(id).toBe(secondId);
+    expect(spy).toHaveBeenCalledTimes(2);
+    spy.mockRestore();
   });
 });
 

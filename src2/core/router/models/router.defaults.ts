@@ -10,13 +10,13 @@ export const DEFAULT_ROUTER_PANEL: RouterPanel = {
 
 export const DEFAULT_ROUTER_NODE: RouterNode = {
   routeKey: null,
-  portal: createReversePortalNode(),
-  lastUsedAt: 0
+  portal: createReversePortalNode()
 };
 
 export const DEFAULT_ROUTER_ROUTE: RouterRoute = {
   href: null,
-  state: null
+  state: null,
+  age: 0
 };
 
 export const DEFAULT_ROUTER_STATE: RouterState = {
@@ -36,6 +36,6 @@ export const ROUTER_STORE_EXAMPLE: RouterStore = {
   maxPanels: 1,
   maxNodes: 0,
   panels: [{ routeKey: 'default', temporaryRouteKey: 'default', pinnedRouteKeys: [], tabbedRouteKeys: [] }],
-  nodes: { default: { routeKey: 'default', portal: createReversePortalNode(), lastUsedAt: 0 } },
-  routes: { default: { href: '/submit', state: null } }
+  nodes: { default: { routeKey: 'default', portal: createReversePortalNode() } },
+  routes: { default: { href: '/submit', state: null, age: 0 } }
 };

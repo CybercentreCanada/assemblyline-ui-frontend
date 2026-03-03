@@ -3,7 +3,7 @@ import { PARAM_BLUEPRINTS } from 'core/search-params/lib/search_params.blueprint
 import type { SearchParamBlueprints } from 'core/search-params/lib/search_params.model';
 import React, { createContext, useContext, useMemo } from 'react';
 import type { ParamsBlueprintsForPath, ParamsParser, PathParamKeys } from '../models/router.models';
-import { createParamsParser, PARAM_PARSERS } from '../utils/router.utils';
+import { createParamsParser, PARAM_PARSERS } from '../utils/param.utils';
 
 //*****************************************************************************************
 // Context

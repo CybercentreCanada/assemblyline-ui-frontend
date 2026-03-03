@@ -47,12 +47,12 @@ export type RouterPanel = {
 export type RouterNode = {
   routeKey: keyof RouterStore['routes'];
   portal: ReversePortalNode;
-  lastUsedAt: number;
 };
 
 export type RouterRoute<State = any> = {
   href: string;
   state?: State;
+  age: number;
 };
 
 export type RouterState = {

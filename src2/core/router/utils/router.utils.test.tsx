@@ -1,42 +1,7 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { DEFAULT_ROUTER_PANEL, DEFAULT_ROUTER_STORE } from '../models/router.defaults';
 import type { RouterStore } from '../models/router.models';
-import { addRoute, generateRandomUUID, insertLeftRoute, insertRightRoute, sanitizeRoutes } from './router.utils';
-
-//*****************************************************************************************
-// generateRandomUUID
-//*****************************************************************************************
-describe('generateRandomUUID', () => {
-  it('returns a base64 id string', () => {
-    const id = generateRandomUUID();
-    expect(typeof id).toBe('string');
-    expect(id.length).toBeGreaterThan(0);
-  });
-
-  it('retries when generated id already exists', () => {
-    const firstBytes = new Uint8Array(12).fill(1);
-    const secondBytes = new Uint8Array(12).fill(2);
-    const firstId = btoa(String.fromCharCode(...firstBytes));
-    const secondId = btoa(String.fromCharCode(...secondBytes));
-
-    const spy = vi.spyOn(crypto, 'getRandomValues');
-    spy
-      .mockImplementationOnce((typedArray: Uint8Array) => {
-        typedArray.set(firstBytes);
-        return typedArray;
-      })
-      .mockImplementationOnce((typedArray: Uint8Array) => {
-        typedArray.set(secondBytes);
-        return typedArray;
-      });
-
-    const id = generateRandomUUID([firstId]);
-
-    expect(id).toBe(secondId);
-    expect(spy).toHaveBeenCalledTimes(2);
-    spy.mockRestore();
-  });
-});
+import { addRoute, insertLeftRoute, insertRightRoute, refreshLastUsedAt, sanitizeRoutes } from './router.utils';
 
 //*****************************************************************************************
 // sanitizeRoutes
@@ -62,6 +27,7 @@ describe('sanitizeRoutes', () => {
       ...DEFAULT_ROUTER_STORE,
       panels: [
         {
+          ...DEFAULT_ROUTER_PANEL,
           routeKey: 'active',
           pinnedRouteKeys: ['pin'],
           tabbedRouteKeys: ['tab']
@@ -113,8 +79,8 @@ describe('insertLeftRoute', () => {
       maxPanels: 2,
       maxNodes: 2,
       panels: [
-        { routeKey: 'r1', pinnedRouteKeys: [], tabbedRouteKeys: [] },
-        { routeKey: 'r2', pinnedRouteKeys: [], tabbedRouteKeys: [] }
+        { ...DEFAULT_ROUTER_PANEL, routeKey: 'r1' },
+        { ...DEFAULT_ROUTER_PANEL, routeKey: 'r2' }
       ],
       nodes: {},
       routes: {
@@ -135,7 +101,7 @@ describe('insertLeftRoute', () => {
     const store: RouterStore = {
       maxPanels: 2,
       maxNodes: 2,
-      panels: [{ routeKey: 'r1', pinnedRouteKeys: [], tabbedRouteKeys: [] }],
+      panels: [{ ...DEFAULT_ROUTER_PANEL, routeKey: 'r1' }],
       nodes: {},
       routes: { r1: { href: '/page1', state: null } }
     };
@@ -154,8 +120,8 @@ describe('insertRightRoute', () => {
       maxPanels: 2,
       maxNodes: 2,
       panels: [
-        { routeKey: 'r1', pinnedRouteKeys: [], tabbedRouteKeys: [] },
-        { routeKey: 'r2', pinnedRouteKeys: [], tabbedRouteKeys: [] }
+        { ...DEFAULT_ROUTER_PANEL, routeKey: 'r1' },
+        { ...DEFAULT_ROUTER_PANEL, routeKey: 'r2' }
       ],
       nodes: {},
       routes: {
@@ -176,7 +142,7 @@ describe('insertRightRoute', () => {
     const store: RouterStore = {
       maxPanels: 2,
       maxNodes: 2,
-      panels: [{ routeKey: 'r1', pinnedRouteKeys: [], tabbedRouteKeys: [] }],
+      panels: [{ ...DEFAULT_ROUTER_PANEL, routeKey: 'r1' }],
       nodes: {},
       routes: { r1: { href: '/page1', state: null } }
     };
@@ -189,7 +155,7 @@ describe('insertRightRoute', () => {
     const store: RouterStore = {
       maxPanels: 3,
       maxNodes: 2,
-      panels: [{ routeKey: 'r1', pinnedRouteKeys: [], tabbedRouteKeys: [] }],
+      panels: [{ ...DEFAULT_ROUTER_PANEL, routeKey: 'r1' }],
       nodes: {},
       routes: { r1: { href: '/page1', state: null } }
     };
@@ -207,11 +173,11 @@ describe('insertRightRoute', () => {
 // addRoute
 //*****************************************************************************************
 describe('addRoute', () => {
-  it('replaces active route for the panel and appends the new route to tabbedRouteKeys', () => {
+  it('replaces active route for the panel and marks it as temporary', () => {
     const store: RouterStore = {
       maxPanels: 2,
       maxNodes: 2,
-      panels: [{ routeKey: 'r1', pinnedRouteKeys: [], tabbedRouteKeys: ['r1'] }],
+      panels: [{ ...DEFAULT_ROUTER_PANEL, routeKey: 'r1', tabbedRouteKeys: ['r1'] }],
       nodes: {},
       routes: { r1: { href: '/page1', state: null } }
     };
@@ -220,8 +186,8 @@ describe('addRoute', () => {
     const panel = next.panels[0];
 
     expect(panel.routeKey).not.toBe('r1');
-    expect(panel.tabbedRouteKeys).toHaveLength(2);
-    expect(panel.tabbedRouteKeys[1]).toBe(panel.routeKey);
+    expect(panel.tabbedRouteKeys).toEqual(['r1']);
+    expect(panel.temporaryRouteKey).toBe(panel.routeKey);
     expect(next.routes[panel.routeKey].href).toBe('/page2');
     expect(next.routes[panel.routeKey].state).toEqual({ q: 'x' });
   });
@@ -231,8 +197,8 @@ describe('addRoute', () => {
       maxPanels: 3,
       maxNodes: 2,
       panels: [
-        { routeKey: 'r1', pinnedRouteKeys: [], tabbedRouteKeys: [] },
-        { routeKey: 'r2', pinnedRouteKeys: [], tabbedRouteKeys: [] }
+        { ...DEFAULT_ROUTER_PANEL, routeKey: 'r1' },
+        { ...DEFAULT_ROUTER_PANEL, routeKey: 'r2' }
       ],
       nodes: {},
       routes: {
@@ -251,8 +217,8 @@ describe('addRoute', () => {
       maxPanels: 3,
       maxNodes: 2,
       panels: [
-        { routeKey: 'r1', pinnedRouteKeys: [], tabbedRouteKeys: [] },
-        { routeKey: 'r2', pinnedRouteKeys: [], tabbedRouteKeys: [] }
+        { ...DEFAULT_ROUTER_PANEL, routeKey: 'r1' },
+        { ...DEFAULT_ROUTER_PANEL, routeKey: 'r2' }
       ],
       nodes: {},
       routes: {
@@ -280,27 +246,105 @@ describe('addRoute', () => {
     expect(Object.keys(next.routes)).toHaveLength(0);
   });
 
-  it('removes invalid and non-permanent tabbed routes before appending the new route', () => {
+  it('preserves existing tabbed and pinned keys while swapping active route', () => {
     const store: RouterStore = {
       maxPanels: 2,
       maxNodes: 2,
-      panels: [{ routeKey: 'keep', pinnedRouteKeys: [], tabbedRouteKeys: ['keep', 'tmp', 'missing'] }],
+      panels: [
+        {
+          ...DEFAULT_ROUTER_PANEL,
+          routeKey: 'keep',
+          pinnedRouteKeys: ['pin'],
+          tabbedRouteKeys: ['keep', 'tmp', 'missing']
+        }
+      ],
       nodes: {},
       routes: {
-        keep: { href: '/keep', state: null, permanent: true },
-        tmp: { href: '/tmp', state: null, permanent: false }
+        keep: { href: '/keep', state: null },
+        pin: { href: '/pin', state: null },
+        tmp: { href: '/tmp', state: null }
       }
     };
 
     const next = addRoute(store, { href: '/new', state: null }, 0);
     const panel = next.panels[0];
 
-    expect(panel.tabbedRouteKeys).toHaveLength(2);
-    expect(panel.tabbedRouteKeys[0]).toBe('keep');
-    expect(panel.tabbedRouteKeys[1]).toBe(panel.routeKey);
-    expect(panel.tabbedRouteKeys).not.toContain('tmp');
-    expect(panel.tabbedRouteKeys).not.toContain('missing');
+    expect(panel.tabbedRouteKeys).toEqual(['keep', 'tmp', 'missing']);
+    expect(panel.pinnedRouteKeys).toEqual(['pin']);
+    expect(panel.temporaryRouteKey).toBe(panel.routeKey);
+    expect(panel.routeKey).not.toBe('keep');
     expect(next.routes[panel.routeKey].href).toBe('/new');
+  });
+});
+
+//*****************************************************************************************
+// refreshLastUsedAt
+//*****************************************************************************************
+describe('refreshLastUsedAt', () => {
+  it('prioritizes nodes currently displayed by panels, then sorts by lastUsedAt and reindexes', () => {
+    const store: RouterStore = {
+      maxPanels: 2,
+      maxNodes: 3,
+      panels: [
+        { ...DEFAULT_ROUTER_PANEL, routeKey: 'panel-route-a' },
+        { ...DEFAULT_ROUTER_PANEL, routeKey: 'panel-route-b' }
+      ],
+      nodes: {
+        n1: {
+          routeKey: 'offscreen-1',
+          portal: { hostEl: document.createElement('div'), setOutlet: () => {} },
+          lastUsedAt: 1
+        },
+        n2: {
+          routeKey: 'panel-route-a',
+          portal: { hostEl: document.createElement('div'), setOutlet: () => {} },
+          lastUsedAt: 5
+        },
+        n3: {
+          routeKey: 'panel-route-b',
+          portal: { hostEl: document.createElement('div'), setOutlet: () => {} },
+          lastUsedAt: 2
+        },
+        n4: {
+          routeKey: 'offscreen-2',
+          portal: { hostEl: document.createElement('div'), setOutlet: () => {} },
+          lastUsedAt: 0
+        }
+      },
+      routes: {
+        'panel-route-a': { href: '/a', state: null },
+        'panel-route-b': { href: '/b', state: null },
+        'offscreen-1': { href: '/1', state: null },
+        'offscreen-2': { href: '/2', state: null }
+      }
+    };
+
+    const next = refreshLastUsedAt(store);
+
+    expect(next.nodes.n3.lastUsedAt).toBe(0);
+    expect(next.nodes.n2.lastUsedAt).toBe(1);
+    expect(next.nodes.n4.lastUsedAt).toBe(2);
+    expect(next.nodes.n1.lastUsedAt).toBe(3);
+  });
+
+  it('uses node key as a deterministic tie-breaker when lastUsedAt is equal', () => {
+    const store: RouterStore = {
+      maxPanels: 0,
+      maxNodes: 3,
+      panels: [],
+      nodes: {
+        b: { routeKey: 'r-b', portal: { hostEl: document.createElement('div'), setOutlet: () => {} }, lastUsedAt: 7 },
+        a: { routeKey: 'r-a', portal: { hostEl: document.createElement('div'), setOutlet: () => {} }, lastUsedAt: 7 }
+      },
+      routes: {
+        'r-a': { href: '/a', state: null },
+        'r-b': { href: '/b', state: null }
+      }
+    };
+
+    const next = refreshLastUsedAt(store);
+    expect(next.nodes.a.lastUsedAt).toBe(0);
+    expect(next.nodes.b.lastUsedAt).toBe(1);
   });
 });
 
