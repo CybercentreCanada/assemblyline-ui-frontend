@@ -1,11 +1,16 @@
 import { useCallback } from 'react';
 import { useNavigate as useRouterNavigate } from 'react-router';
 import { AppRoutes } from '../components/Routes';
-import { DEFAULT_ROUTER_ROUTE } from '../models/router.defaults';
-import { RouterRoute } from '../models/router.models';
 import { useRouteID } from '../providers/RouteIdProvider';
 import { useRouterStore } from '../providers/RouterProvider';
-import { addRoute, findPanelKey, insertRightRoute, sanitizeRouter, storeToNavigate } from '../utils/router.utils';
+import {
+  addRoute,
+  findPanelKey,
+  insertRightPanel,
+  sanitizeRouterStore,
+  storeToNavigate,
+  updatePanel
+} from '../utils/router.utils';
 
 type NavigateOptions = { variant: 'open' } | { variant: 'replace' } | { variant: 'to'; panel: number };
 type AppRoute = AppRoutes[number];
@@ -30,20 +35,26 @@ export const useNavigate = () => {
   return useCallback(
     (href: string, options?: NavigateOptions) => {
       let nextStore = store;
-      const panelKey = findPanelKey(nextStore, routeKey, 'active') + 1;
-      if (panelKey === null) return null;
+      let nextRouteKey = null;
 
-      const nextRoute: RouterRoute = { ...DEFAULT_ROUTER_ROUTE, href };
+      const currentPanelKey = findPanelKey(store, { routeKey });
+      const panelKey = currentPanelKey >= 0 ? currentPanelKey + 1 : 0;
+      [nextStore, nextRouteKey] = addRoute(store, { href });
+
       if (navigationStyle === 'push') {
-        if (panelKey >= nextStore.panels.length) nextStore = insertRightRoute(nextStore, nextRoute);
-        else nextStore = addRoute(nextStore, nextRoute, panelKey);
+        if (panelKey >= nextStore.panels.length)
+          [nextStore] = insertRightPanel(nextStore, panelKey, {
+            routeKey: nextRouteKey,
+            temporaryRouteKey: nextRouteKey
+          });
+        else nextStore = updatePanel(nextStore, panelKey, { routeKey: nextRouteKey, temporaryRouteKey: nextRouteKey });
       } else if (navigationStyle === 'loop') {
       }
 
-      nextStore = sanitizeRouter(nextStore);
+      nextStore = sanitizeRouterStore(nextStore);
       const nextLocation = storeToNavigate(nextStore);
       if (nextLocation) routerNavigate(nextLocation.to, nextLocation.options);
     },
-    [routeKey]
+    [navigationStyle, routeKey, routerNavigate, store]
   );
 };

@@ -1,8 +1,8 @@
 import React from 'react';
-import { Link as RouterLink, useNavigate as useRouterNavigate } from 'react-router';
+import { Link as RouterLink, useLocation, useNavigate as useRouterNavigate } from 'react-router';
 import { RouteIDProvider } from '../providers/RouteIdProvider';
 import { useRouterStore } from '../providers/RouterProvider';
-import { closeRouterPanel } from '../utils/router.utils';
+import { findNode, removePanel, sanitizeRouterStore, storeToNavigate } from '../utils/router.utils';
 import { Link } from './Link';
 import { InPortal, OutPortal } from './Portals';
 import { Routes } from './Routes';
@@ -15,18 +15,17 @@ const PanelView = React.memo(({ panelKey }: PanelViewProps) => {
   const routerNavigate = useRouterNavigate();
 
   const [store] = useRouterStore(s => s);
-  const [panel] = useRouterStore(store => store.panels?.[panelKey]);
-  const [node] = useRouterStore(
-    store => Object.entries(store.nodes).find(([, node]) => node?.routeKey === panel?.routeKey)?.[1] ?? null
-  );
-  const [route] = useRouterStore(store => (node?.routeKey ? store.routes?.[node.routeKey] : null));
+  const [panel] = useRouterStore(s => s.panels?.[panelKey]);
+  const [node] = useRouterStore(s => findNode(s, { routeKey: panel?.routeKey }));
+  const [route] = useRouterStore(s => (node?.routeKey ? s.routes?.[node.routeKey] : null));
 
   return (
     <div style={{ border: '1px solid grey', minHeight: '220px', padding: '8px' }}>
       <button
         onClick={() => {
-          const nextLocation = closeRouterPanel(store, panelKey);
-
+          let nextStore = removePanel(store, panelKey);
+          nextStore = sanitizeRouterStore(nextStore);
+          const nextLocation = storeToNavigate(nextStore);
           if (nextLocation) {
             routerNavigate(nextLocation.to, nextLocation.options);
           }
@@ -65,7 +64,10 @@ const NodeMount = React.memo(({ nodeKey }: NodeMountProps) => {
 NodeMount.displayName = 'NodeMount';
 
 export const Router = React.memo(() => {
-  const [nbOfPanels] = useRouterStore(s => Math.max(s.panels?.length, 1));
+  const location = useLocation();
+
+  const [store] = useRouterStore(s => s);
+  const [nbOfPanels] = useRouterStore(s => Math.max(s.panels?.length, 0));
   const [nodeKeys] = useRouterStore(s => Object.keys(s.nodes).toString());
 
   return (
