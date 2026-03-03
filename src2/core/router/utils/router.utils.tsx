@@ -15,11 +15,10 @@ import { RouterState, RouterStore } from '../models/router.models';
 
 /**
  * @name findPanelKey
- * @description Finds the first panel index containing the given route key in the requested collections.
+ * @description Finds the first panel index matching the provided partial panel criteria.
  * @param store - Router store
- * @param routeKey - Route key to search for
- * @param source - Panel collections to inspect ('temporary', 'tabbed', and/or 'pinned')
- * @returns Matching panel index, or null if none is found
+ * @param partialPanel - Partial panel matcher
+ * @returns Matching panel index, or -1 when not found
  */
 export const findPanelKey = (store: RouterStore, partialPanel: Partial<RouterStore['panels'][number]>): number => {
   for (let i = 0; i < store.panels.length; i++) {
@@ -42,11 +41,11 @@ export const findPanelKey = (store: RouterStore, partialPanel: Partial<RouterSto
 };
 
 /**
- * @name findPanelFromRoute
- * @description Finds the panel index whose active route key matches the given route key.
+ * @name findPanel
+ * @description Returns the first panel matching the provided partial panel criteria.
  * @param store - Router store
- * @param routeKey - Route key to locate
- * @returns Panel index, or -1 when not found
+ * @param partialPanel - Partial panel matcher
+ * @returns Matching panel, or null when not found
  */
 export const findPanel = (
   store: RouterStore,
@@ -57,11 +56,11 @@ export const findPanel = (
 };
 
 /**
- * @name findPanelFromRoute
- * @description Finds the panel index whose active route key matches the given route key.
+ * @name removePanel
+ * @description Removes a panel by index when it exists.
  * @param store - Router store
- * @param routeKey - Route key to locate
- * @returns Panel index, or -1 when not found
+ * @param panelKey - Panel index to remove
+ * @returns Updated router store
  */
 export const removePanel = (store: RouterStore, panelKey: number): RouterStore => {
   if (panelKey < 0 || panelKey >= store.panels.length) return store;
@@ -70,10 +69,11 @@ export const removePanel = (store: RouterStore, panelKey: number): RouterStore =
 };
 
 /**
- * @name sanitizePanels
- * @description Removes panels whose active route key is missing or no longer exists in the route store.
+ * @name removeEmptyPanel
+ * @description Removes a panel when it has no active, temporary, tabbed, or pinned routes.
  * @param store - Router store
- * @returns Updated router store with invalid panels removed
+ * @param panelKey - Panel index to evaluate
+ * @returns Updated router store
  */
 export const removeEmptyPanel = (store: RouterStore, panelKey: number): RouterStore => {
   if (panelKey < 0 || store.panels.length >= panelKey) return store;
@@ -91,11 +91,12 @@ export const removeEmptyPanel = (store: RouterStore, panelKey: number): RouterSt
 };
 
 /**
- * @name findPanelFromRoute
- * @description Finds the panel index whose active route key matches the given route key.
+ * @name updatePanel
+ * @description Patches panel fields with provided partial values.
  * @param store - Router store
- * @param routeKey - Route key to locate
- * @returns Panel index, or -1 when not found
+ * @param panelKey - Panel index to update
+ * @param partialPanel - Partial panel payload
+ * @returns Updated router store
  */
 export const updatePanel = (
   store: RouterStore,
@@ -124,11 +125,12 @@ export const updatePanel = (
 };
 
 /**
- * @name findPanelFromRoute
- * @description Finds the panel index whose active route key matches the given route key.
+ * @name mergePanels
+ * @description Merges tabbed and pinned routes from source panel into destination panel.
  * @param store - Router store
- * @param routeKey - Route key to locate
- * @returns Panel index, or -1 when not found
+ * @param panelKeyA - Destination panel index
+ * @param panelKeyB - Source panel index
+ * @returns Updated router store
  */
 export const mergePanels = (store: RouterStore, panelKeyA: number, panelKeyB: number): RouterStore => {
   if (panelKeyA >= store.panels.length || panelKeyB >= store.panels.length) return store;
@@ -147,11 +149,12 @@ export const mergePanels = (store: RouterStore, panelKeyA: number, panelKeyB: nu
 };
 
 /**
- * @name findPanelFromRoute
- * @description Finds the panel index whose active route key matches the given route key.
+ * @name insertLeftPanel
+ * @description Inserts a panel at the target index and trims overflow from the end.
  * @param store - Router store
- * @param routeKey - Route key to locate
- * @returns Panel index, or -1 when not found
+ * @param panelKey - Target insertion index
+ * @param partialPanel - Partial panel payload
+ * @returns Tuple of updated store and inserted index
  */
 export const insertLeftPanel = (
   store: RouterStore,
@@ -167,11 +170,12 @@ export const insertLeftPanel = (
 };
 
 /**
- * @name findPanelFromRoute
- * @description Finds the panel index whose active route key matches the given route key.
+ * @name insertRightPanel
+ * @description Inserts a panel to the right of source index and trims overflow from the start.
  * @param store - Router store
- * @param routeKey - Route key to locate
- * @returns Panel index, or -1 when not found
+ * @param sourcePanelKey - Source panel index
+ * @param partialPanel - Partial panel payload
+ * @returns Tuple of updated store and inserted index
  */
 export const insertRightPanel = (
   store: RouterStore,
@@ -192,11 +196,12 @@ export const insertRightPanel = (
 };
 
 /**
- * @name findPanelFromRoute
- * @description Finds the panel index whose active route key matches the given route key.
+ * @name upsertPanel
+ * @description Updates an existing panel or inserts one when index is out of range.
  * @param store - Router store
- * @param routeKey - Route key to locate
- * @returns Panel index, or -1 when not found
+ * @param panelKey - Target panel index
+ * @param partialPanel - Partial panel payload
+ * @returns Tuple of updated store and resolved panel index
  */
 export const upsertPanel = (
   store: RouterStore,
@@ -209,10 +214,11 @@ export const upsertPanel = (
 };
 
 /**
- * @name sanitizePanels
- * @description Removes panels whose active route key is missing or no longer exists in the route store.
+ * @name filterPanelMissingRouteKeys
+ * @description Removes panel route references that no longer exist in the route store.
  * @param store - Router store
- * @returns Updated router store with invalid panels removed
+ * @param panelKey - Panel index to sanitize
+ * @returns Updated router store
  */
 export const filterPanelMissingRouteKeys = (store: RouterStore, panelKey: number): RouterStore => {
   if (panelKey < 0 || store.panels.length >= panelKey) return store;
@@ -241,10 +247,11 @@ export const filterPanelMissingRouteKeys = (store: RouterStore, panelKey: number
 };
 
 /**
- * @name sanitizePanels
- * @description Removes panels whose active route key is missing or no longer exists in the route store.
+ * @name setPanelActiveRoute
+ * @description Sets panel active route when missing by selecting the oldest associated route.
  * @param store - Router store
- * @returns Updated router store with invalid panels removed
+ * @param panelKey - Panel index to update
+ * @returns Updated router store
  */
 export const setPanelActiveRoute = (store: RouterStore, panelKey: number): RouterStore => {
   if (panelKey < 0 || panelKey >= store.panels.length || store.panels[panelKey].routeKey) return store;
@@ -268,9 +275,9 @@ export const setPanelActiveRoute = (store: RouterStore, panelKey: number): Route
 
 /**
  * @name sanitizePanels
- * @description Removes panels whose active route key is missing or no longer exists in the route store.
+ * @description Normalizes panel references, removes empty panels, enforces max panels, and resolves active route keys.
  * @param store - Router store
- * @returns Updated router store with invalid panels removed
+ * @returns Updated router store
  */
 export const sanitizePanels = (store: RouterStore): RouterStore => {
   for (let i = store.panels.length - 1; i >= 0; i--) {
@@ -294,11 +301,10 @@ export const sanitizePanels = (store: RouterStore): RouterStore => {
 //*****************************************************************************************
 
 /**
- * @name addNode
- * @description Adds a node for the route currently displayed in the given panel.
+ * @name findOldestNodeKey
+ * @description Finds the node whose associated route has the highest age value.
  * @param store - Router store
- * @param panelKey - Source panel index
- * @returns Updated router store with a newly added node
+ * @returns Oldest node key, or null
  */
 export const findOldestNodeKey = (store: RouterStore): keyof RouterStore['nodes'] => {
   const [nodeKey, age] = Object.entries(store.nodes).reduce<
@@ -316,11 +322,11 @@ export const findOldestNodeKey = (store: RouterStore): keyof RouterStore['nodes'
 };
 
 /**
- * @name addNode
- * @description Adds a node for the route currently displayed in the given panel.
+ * @name findNodeKey
+ * @description Finds a node key by partial node criteria.
  * @param store - Router store
- * @param panelKey - Source panel index
- * @returns Updated router store with a newly added node
+ * @param partialNode - Partial node matcher
+ * @returns Matching node key, or null
  */
 export const findNodeKey = (
   store: RouterStore,
@@ -333,11 +339,11 @@ export const findNodeKey = (
 };
 
 /**
- * @name addNode
- * @description Adds a node for the route currently displayed in the given panel.
+ * @name findNode
+ * @description Finds and returns a node by partial criteria.
  * @param store - Router store
- * @param panelKey - Source panel index
- * @returns Updated router store with a newly added node
+ * @param partialNode - Partial node matcher
+ * @returns Matching node, or null
  */
 export const findNode = (
   store: RouterStore,
@@ -348,8 +354,8 @@ export const findNode = (
 };
 
 /**
- * @name removeLastNode
- * @description Removes the least-recently-used node from the store.
+ * @name removeNode
+ * @description Removes a node from the store.
  * @param store - Router store
  * @returns Updated router store with one node removed when available
  */
@@ -360,11 +366,12 @@ export const removeNode = (store: RouterStore, nodeKey: keyof RouterStore['nodes
 };
 
 /**
- * @name findPanelFromRoute
- * @description Finds the panel index whose active route key matches the given route key.
+ * @name updateNode
+ * @description Updates node fields by key.
  * @param store - Router store
- * @param routeKey - Route key to locate
- * @returns Panel index, or -1 when not found
+ * @param nodeKey - Node key to update
+ * @param partialNode - Partial node values
+ * @returns Updated router store
  */
 export const updateNode = (
   store: RouterStore,
@@ -386,10 +393,10 @@ export const updateNode = (
 
 /**
  * @name addNode
- * @description Adds a node for the route currently displayed in the given panel.
+ * @description Adds a node and returns its generated key.
  * @param store - Router store
- * @param panelKey - Source panel index
- * @returns Updated router store with a newly added node
+ * @param partialNode - Partial node payload
+ * @returns Tuple of updated store and new node key
  */
 export const addNode = (
   store: RouterStore,
@@ -401,11 +408,12 @@ export const addNode = (
 };
 
 /**
- * @name addNode
- * @description Adds a node for the route currently displayed in the given panel.
+ * @name upsertNode
+ * @description Updates an existing node or inserts a new node when missing.
  * @param store - Router store
- * @param panelKey - Source panel index
- * @returns Updated router store with a newly added node
+ * @param nodeKey - Optional target node key
+ * @param partialNode - Partial node payload
+ * @returns Tuple of updated store and resolved node key
  */
 export const upsertNode = (
   store: RouterStore,
@@ -418,10 +426,10 @@ export const upsertNode = (
 };
 
 /**
- * @name sanitizeNodes
- * @description Ensures each panel route has a backing node and trims nodes to `maxPanels + maxNodes`.
+ * @name filterOrphanedNodes
+ * @description Removes nodes whose route keys are missing from the route store.
  * @param store - Router store
- * @returns Updated router store with normalized node entries
+ * @returns Updated router store
  */
 export const filterOrphanedNodes = (store: RouterStore): RouterStore => {
   Object.keys(store.nodes).forEach(nodeKey => {
@@ -434,10 +442,10 @@ export const filterOrphanedNodes = (store: RouterStore): RouterStore => {
 };
 
 /**
- * @name sanitizeNodes
- * @description Ensures each panel route has a backing node and trims nodes to `maxPanels + maxNodes`.
+ * @name addMissingNodes
+ * @description Ensures each active panel route has a backing node.
  * @param store - Router store
- * @returns Updated router store with normalized node entries
+ * @returns Updated router store
  */
 export const addMissingNodes = (store: RouterStore): RouterStore => {
   for (const [, panel] of store.panels.entries()) {
@@ -449,10 +457,10 @@ export const addMissingNodes = (store: RouterStore): RouterStore => {
 };
 
 /**
- * @name sanitizeNodes
- * @description Ensures each panel route has a backing node and trims nodes to `maxPanels + maxNodes`.
+ * @name removeOldestNodes
+ * @description Trims node count to `maxPanels + maxNodes` by removing oldest nodes.
  * @param store - Router store
- * @returns Updated router store with normalized node entries
+ * @returns Updated router store
  */
 export const removeOldestNodes = (store: RouterStore): RouterStore => {
   while (Object.keys(store.nodes).length > store.maxPanels + store.maxNodes) {
@@ -465,9 +473,9 @@ export const removeOldestNodes = (store: RouterStore): RouterStore => {
 
 /**
  * @name sanitizeNodes
- * @description Ensures each panel route has a backing node and trims nodes to `maxPanels + maxNodes`.
+ * @description Normalizes nodes by removing orphaned nodes, adding missing nodes, and trimming excess nodes.
  * @param store - Router store
- * @returns Updated router store with normalized node entries
+ * @returns Updated router store
  */
 export const sanitizeNodes = (store: RouterStore): RouterStore => {
   store = filterOrphanedNodes(store);
@@ -511,11 +519,10 @@ export const findRoute = (store: RouterStore, route: RouterStore['routes'][strin
 
 /**
  * @name removeRoute
- * @description Adds a new route to an existing panel, removes invalid/non-permanent tabbed routes, sets the new route as active, and appends it to the panel tabs.
+ * @description Removes a route by key when it exists.
  * @param store - Router store
- * @param newRoute - Route data to add
- * @param panelKey - Target panel index (clamped to valid bounds)
- * @returns Updated router store with the route added to the target panel, or unchanged when no panel exists
+ * @param routeKey - Route key to remove
+ * @returns Updated router store
  */
 export const removeRoute = (store: RouterStore, routeKey: keyof RouterStore['routes']): RouterStore => {
   if (!(routeKey in store.routes)) return store;
@@ -524,11 +531,12 @@ export const removeRoute = (store: RouterStore, routeKey: keyof RouterStore['rou
 };
 
 /**
- * @name findPanelFromRoute
- * @description Finds the panel index whose active route key matches the given route key.
+ * @name updateRoute
+ * @description Updates route fields by key.
  * @param store - Router store
- * @param routeKey - Route key to locate
- * @returns Panel index, or -1 when not found
+ * @param routeKey - Route key to update
+ * @param partialRoute - Partial route payload
+ * @returns Updated router store
  */
 export const updateRoute = (
   store: RouterStore,
@@ -554,11 +562,10 @@ export const updateRoute = (
 
 /**
  * @name addRoute
- * @description Adds a new route to an existing panel, removes invalid/non-permanent tabbed routes, sets the new route as active, and appends it to the panel tabs.
+ * @description Creates a new route entry and returns its generated key.
  * @param store - Router store
- * @param newRoute - Route data to add
- * @param panelKey - Target panel index (clamped to valid bounds)
- * @returns Updated router store with the route added to the target panel, or unchanged when no panel exists
+ * @param partialRoute - Partial route payload
+ * @returns Tuple of updated store and route key
  */
 export const addRoute = (
   store: RouterStore,
@@ -570,12 +577,12 @@ export const addRoute = (
 };
 
 /**
- * @name addRoute
- * @description Adds a new route to an existing panel, removes invalid/non-permanent tabbed routes, sets the new route as active, and appends it to the panel tabs.
+ * @name addRouteToPanel
+ * @description Creates a route and assigns it as the active temporary route of the target panel.
  * @param store - Router store
- * @param newRoute - Route data to add
- * @param panelKey - Target panel index (clamped to valid bounds)
- * @returns Updated router store with the route added to the target panel, or unchanged when no panel exists
+ * @param panelKey - Target panel index
+ * @param partialRoute - Partial route payload
+ * @returns Updated router store
  */
 export const addRouteToPanel = (
   store: RouterStore,
@@ -593,12 +600,12 @@ export const addRouteToPanel = (
 };
 
 /**
- * @name addRoute
- * @description Adds a new route to an existing panel, removes invalid/non-permanent tabbed routes, sets the new route as active, and appends it to the panel tabs.
+ * @name upsertRoute
+ * @description Updates route when key exists; otherwise creates a new route.
  * @param store - Router store
- * @param newRoute - Route data to add
- * @param panelKey - Target panel index (clamped to valid bounds)
- * @returns Updated router store with the route added to the target panel, or unchanged when no panel exists
+ * @param routeKey - Route key to update
+ * @param partialRoute - Partial route payload
+ * @returns Tuple of updated store and resolved route key
  */
 export const upsertRoute = (
   store: RouterStore,
@@ -611,10 +618,10 @@ export const upsertRoute = (
 };
 
 /**
- * @name refreshLastUsedAt
- * @description Rebases all node `lastUsedAt` values so the minimum becomes zero.
+ * @name refreshRouteAges
+ * @description Recomputes route age ordering, prioritizing displayed routes.
  * @param store - Router store
- * @returns Updated router store with rebased node usage timestamps
+ * @returns Updated router store
  */
 export const refreshRouteAges = (store: RouterStore): RouterStore => {
   const orderedEntries = Object.entries(store.routes).sort(([routeKeyA, routeA], [routeKeyB, routeB]) => {
@@ -676,11 +683,12 @@ export const sanitizeRoutes = (store: RouterStore): RouterStore => {
 //*****************************************************************************************
 
 /**
- * @name setPermanentRoute
- * @description Marks a route as permanent in the store.
+ * @name showPreviousTab
+ * @description Placeholder for moving to a previous tab in a panel.
  * @param store - Router store
- * @param routeKey - Route key to mark as permanent
- * @returns Updated router store with the route marked permanent
+ * @param panelKey - Panel key context
+ * @param source - Route source filter
+ * @returns Router store (currently unchanged)
  */
 export const showPreviousTab = (
   store: RouterStore,
@@ -690,6 +698,14 @@ export const showPreviousTab = (
   return store;
 };
 
+/**
+ * @name removeTabFromPanel
+ * @description Removes a route key from a single panel active/temporary/tabbed/pinned entries.
+ * @param store - Router store
+ * @param panelKey - Target panel index
+ * @param routeKey - Route key to remove
+ * @returns Updated router store
+ */
 export const removeTabFromPanel = (
   store: RouterStore,
   panelKey: number = null,
@@ -721,11 +737,11 @@ export const removeTabFromPanel = (
 };
 
 /**
- * @name setPermanentRoute
- * @description Marks a route as permanent in the store.
+ * @name removeTab
+ * @description Removes a route key from all panels' active/temporary/tabbed/pinned entries.
  * @param store - Router store
- * @param routeKey - Route key to mark as permanent
- * @returns Updated router store with the route marked permanent
+ * @param routeKey - Route key to remove
+ * @returns Updated router store
  */
 export const removeTab = (store: RouterStore, routeKey: keyof RouterStore['routes'] = null): RouterStore => {
   for (let i = 0; i < store.panels.length; i++) {
@@ -736,11 +752,13 @@ export const removeTab = (store: RouterStore, routeKey: keyof RouterStore['route
 };
 
 /**
- * @name setPermanentRoute
- * @description Marks a route as permanent in the store.
+ * @name addTab
+ * @description Adds/sets a route in the chosen tab source of a panel.
  * @param store - Router store
- * @param routeKey - Route key to mark as permanent
- * @returns Updated router store with the route marked permanent
+ * @param panelKey - Target panel index
+ * @param routeKey - Route key to add
+ * @param source - Destination collection
+ * @returns Updated router store
  */
 export const addTab = (
   store: RouterStore,
@@ -768,11 +786,11 @@ export const addTab = (
 };
 
 /**
- * @name setPermanentRoute
- * @description Marks a route as permanent in the store.
+ * @name permanentTab
+ * @description Converts a temporary route to a tabbed route and keeps it active.
  * @param store - Router store
- * @param routeKey - Route key to mark as permanent
- * @returns Updated router store with the route marked permanent
+ * @param routeKey - Route key to convert
+ * @returns Updated router store
  */
 export const permanentTab = (store: RouterStore, routeKey: keyof RouterStore['routes']): RouterStore => {
   if (!(routeKey in store.routes)) return store;
@@ -892,6 +910,12 @@ export const moveTabbedRouteKey = (
 // Location
 //*****************************************************************************************
 
+/**
+ * @name sanitizeRouterStore
+ * @description Runs panel, route, and node sanitizers in sequence.
+ * @param store - Router store
+ * @returns Updated router store
+ */
 export const sanitizeRouterStore = (store: RouterStore): RouterStore => {
   store = sanitizePanels(store);
   store = sanitizeRoutes(store);
@@ -900,11 +924,11 @@ export const sanitizeRouterStore = (store: RouterStore): RouterStore => {
 };
 
 /**
- * @name locationToStore
- * @description Hydrates router store state from navigation state or query-string panel hrefs.
+ * @name parseLocationSearch
+ * @description Builds routes/panels/nodes from `p` query params in location.search.
  * @param store - Current router store
- * @param location - React Router location containing state/search
- * @returns Updated router store parsed from location, or a safe default on parse failure
+ * @param location - React Router location
+ * @returns Updated router store
  */
 export const parseLocationSearch = (store: RouterStore, location: Location<RouterState>): RouterStore => {
   const searchParams = new URLSearchParams(location.search ?? '');
@@ -937,11 +961,11 @@ export const parseLocationSearch = (store: RouterStore, location: Location<Route
 };
 
 /**
- * @name locationToStore
- * @description Hydrates router store state from navigation state or query-string panel hrefs.
+ * @name parseLocationState
+ * @description Merges location.state routes and panels into the store using upsert helpers.
  * @param store - Current router store
- * @param location - React Router location containing state/search
- * @returns Updated router store parsed from location, or a safe default on parse failure
+ * @param location - React Router location
+ * @returns Updated router store
  */
 export const parseLocationState = (store: RouterStore, location: Location<RouterState>): RouterStore => {
   Object.entries(location?.state?.routes || {}).forEach(([routeKey, route]) => {
