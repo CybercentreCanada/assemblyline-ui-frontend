@@ -56,7 +56,11 @@ export const Link = React.memo(({ children, path, params, variant = 'open', pane
     [href, navigate, onClick, panel, variant]
   );
 
-  return <RouterLink to={href} onClick={handleClick} {...props} />;
+  return (
+    <RouterLink to={href} onClick={handleClick} {...props}>
+      {children}
+    </RouterLink>
+  );
 });
 
 Link.displayName = 'Link';
