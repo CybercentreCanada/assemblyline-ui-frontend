@@ -3,33 +3,33 @@ import React, { useCallback } from 'react';
 import { useLocation } from 'react-router';
 import { PathParamBlueprintMap, PathParamCodec } from '../path-params/path-params.models';
 import { RouterStore } from '../router/router.models';
-import { CreateRouteHash, CreateRouteSearch, RoutePath } from './route.models';
+import { SearchParamEngine } from '../search-params/lib/search_params.engine';
+import { SearchParamSnapshot } from '../search-params/lib/search_params.snapshot';
+import { CreateRouteHash, RoutePath } from './route.models';
 
 //*****************************************************************************************
 // Route Provider
 //*****************************************************************************************
 
-const SEARCH_PARAM_BLUEPRINTS = null;
-
 export type RouteStore<
   Path extends RoutePath = RoutePath,
   Params extends PathParamCodec = any,
-  Search extends CreateRouteSearch = any,
+  Search extends SearchParamSnapshot<any> = SearchParamSnapshot<any>,
   Hash extends CreateRouteHash = any
 > = {
   params: Params;
-  // search: Route['search'];
+  search: Search;
   // hash: Route['hash'];
 };
 
 const createDefaultRouteStore = <
   Path extends RoutePath,
   Params extends PathParamCodec,
-  Search extends CreateRouteSearch,
+  Search extends SearchParamSnapshot<any>,
   Hash extends CreateRouteHash
 >(): RouteStore<Path, Params, Search, Hash> => ({
-  params: null
-  // search: {},
+  params: null,
+  search: null
   // hash: null
 });
 
@@ -39,41 +39,34 @@ export const { StoreProvider: RouteStoreProvider, useStore: useRouteStore } =
 export type RouteProviderProps<
   Path extends RoutePath,
   Params extends PathParamBlueprintMap<Path>,
-  Search extends CreateRouteSearch,
+  Search extends SearchParamEngine<any>,
   Hash extends CreateRouteHash
 > = {
   children: React.ReactNode;
   params?: PathParamCodec<Params>;
-  search?: (blueprints: typeof SEARCH_PARAM_BLUEPRINTS) => Search;
+  search?: Search;
   hash?: (hash: Location['hash']) => Hash;
 };
 
-export const RouteProvider = React.memo(
-  <
-    const Path extends RoutePath,
-    const Params extends PathParamBlueprintMap<Path>,
-    const Search extends CreateRouteSearch,
-    const Hash extends CreateRouteHash
-  >({
-    children,
-    params,
-    search,
-    hash
-  }: RouteProviderProps<Path, Params, Search, Hash>) => {
-    const location = useLocation();
+export const RouteProvider = React.memo(function <
+  const Path extends RoutePath,
+  const Params extends PathParamBlueprintMap<Path>,
+  const Search extends SearchParamEngine<any>,
+  const Hash extends CreateRouteHash
+>({ children, params, search, hash }: RouteProviderProps<Path, Params, Search, Hash>) {
+  const location = useLocation();
 
-    const reset = useCallback(
-      () => ({
-        params: params ? params.parse(location) : undefined
-        // search: search.parse(location),
-        // hash: hashParser(location)
-      }),
-      [location]
-    );
+  const reset = useCallback(
+    () => ({
+      params: !params ? undefined : params.parse(location),
+      search: !search ? undefined : search.fromLocation(location).omit(search.getIgnoredKeys())
+      // hash: hashParser(location)
+    }),
+    [location]
+  );
 
-    return <RouteStoreProvider data={reset}>{children}</RouteStoreProvider>;
-  }
-);
+  return <RouteStoreProvider data={reset}>{children}</RouteStoreProvider>;
+});
 
 RouteProvider.displayName = 'RouteProvider';
 
@@ -91,6 +84,8 @@ const createDefaultRouteKeyStore = (): RouteKeyStore => ({
 
 const { StoreProvider: RouteKeyStoreProvider, useStore: useRouteKeyStore } =
   createStoreContext<RouteKeyStore>(createDefaultRouteKeyStore());
+
+RouteKeyStoreProvider.displayName = 'RouteKeyStoreProvider';
 
 export type RouteKeyStoreProviderProps = {
   children: React.ReactNode;

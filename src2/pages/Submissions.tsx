@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { Links } from './Links';
-import { useRoute } from 'core/router/route/route.hooks';
+import { usePathParam, useSearchParam } from 'core/router/route/route.hooks';
+import { useRouteStore } from 'core/router/route/route.providers';
 import { createRoute } from 'core/router/route/route.utils';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
+import { Links } from './Links';
 
 type TestProps = {
   test: string;
@@ -15,7 +16,13 @@ const Test = React.memo(({ test }: TestProps) => {
 export const SubmissionsPage = React.memo(() => {
   // const { fileID } = useParams();
 
-  const queryParam = useRoute<typeof SubmissionsRoute>()(s => s.params.query);
+  const queryParam = usePathParam('/submissions/:query', s => s.query);
+
+  const query = useSearchParam('/submissions/:query', s => s.get('query'));
+
+  const rows = useRouteStore(s => s.search.get('rows'));
+
+  console.log(rows);
 
   // const queryParam = useParams<typeof SubmissionsRoute>()(s => s.query);
 

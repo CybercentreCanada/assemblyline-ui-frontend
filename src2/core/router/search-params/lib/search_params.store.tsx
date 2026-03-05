@@ -12,14 +12,14 @@ import React, {
 import type { NavigateOptions } from 'react-router';
 import { useLocation, useNavigate } from 'react-router';
 import { SearchParamEngine } from '../lib/search_params.engine';
-import type { SearchParamBlueprints, SearchParamValues } from '../lib/search_params.model';
 import { SearchParamSnapshot } from '../lib/search_params.snapshot';
+import { SearchParamBlueprintMap, SearchParamValueMap } from './search_params.model';
 
 export const createSearchParamsStore = () => {
   // -------------------------
   // Store
   // -------------------------
-  const useSearchParamsStore = <Blueprints extends SearchParamBlueprints>(
+  const useSearchParamsStore = <Blueprints extends SearchParamBlueprintMap>(
     params: Blueprints,
     storageKey: string = null
   ) => {
@@ -87,8 +87,8 @@ export const createSearchParamsStore = () => {
     const setSearchObject = useCallback(
       (
         input:
-          | SearchParamValues<Blueprints>
-          | ((params: SearchParamValues<Blueprints>) => SearchParamValues<Blueprints>),
+          | SearchParamValueMap<Blueprints>
+          | ((params: SearchParamValueMap<Blueprints>) => SearchParamValueMap<Blueprints>),
         replace: NavigateOptions['replace'] = false
       ) => {
         const values = typeof input === 'function' ? input(snapshotRef.current.toObject()) : input;
@@ -106,7 +106,7 @@ export const createSearchParamsStore = () => {
     );
 
     const setDefaultParams = useCallback(
-      (value: SearchParamValues<Blueprints>) => {
+      (value: SearchParamValueMap<Blueprints>) => {
         if (!storageKey) return;
         const search = engine.delta(value).omit(engine.getEphemeralKeys()).toParams();
         localStorage.setItem(storageKey, search.toString());
@@ -148,7 +148,7 @@ export const createSearchParamsStore = () => {
   // -------------------------
   // Context
   // -------------------------
-  type SearchParamsContextProps<Blueprints extends SearchParamBlueprints = SearchParamBlueprints> = ReturnType<
+  type SearchParamsContextProps<Blueprints extends SearchParamBlueprintMap = SearchParamBlueprintMap> = ReturnType<
     typeof useSearchParamsStore<Blueprints>
   > | null;
 
@@ -157,14 +157,14 @@ export const createSearchParamsStore = () => {
   // -------------------------
   // Provider
   // -------------------------
-  type SearchParamsProviderProps<Blueprints extends SearchParamBlueprints> = {
+  type SearchParamsProviderProps<Blueprints extends SearchParamBlueprintMap> = {
     children: React.ReactNode;
     params: Blueprints;
     storageKey?: string;
   };
 
   const SearchParamsProvider = React.memo(
-    <Blueprints extends SearchParamBlueprints>({
+    <Blueprints extends SearchParamBlueprintMap>({
       children,
       params,
       storageKey
@@ -178,7 +178,7 @@ export const createSearchParamsStore = () => {
   // -------------------------
   // Hook
   // -------------------------
-  type UseSearchParams<Blueprints extends SearchParamBlueprints> = {
+  type UseSearchParams<Blueprints extends SearchParamBlueprintMap> = {
     search: SearchParamSnapshot<Blueprints>;
     setSearchParams: ReturnType<typeof useSearchParamsStore<Blueprints>>['setSearchParams'];
     setSearchObject: ReturnType<typeof useSearchParamsStore<Blueprints>>['setSearchObject'];
@@ -186,7 +186,7 @@ export const createSearchParamsStore = () => {
     clearDefaultParams: ReturnType<typeof useSearchParamsStore<Blueprints>>['clearDefaultParams'];
   };
 
-  const useSearchParams = <Blueprints extends SearchParamBlueprints>() => {
+  const useSearchParams = <Blueprints extends SearchParamBlueprintMap>() => {
     const ctx = useContext(SearchParamsContext);
 
     const emptySnapshot = useMemo(() => new SearchParamSnapshot<Blueprints>(), []);

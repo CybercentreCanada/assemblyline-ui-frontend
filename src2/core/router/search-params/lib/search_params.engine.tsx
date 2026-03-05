@@ -6,13 +6,13 @@ import {
   NumberBlueprint,
   StringBlueprint
 } from '../lib/search_params.blueprint';
-import type { ParamBlueprints, SearchParamRuntimes, SearchParamValues } from '../lib/search_params.model';
 import type { ParamRuntime } from '../lib/search_params.runtime';
 import { PARAM_RUNTIMES } from '../lib/search_params.runtime';
 import { SearchParamSnapshot } from '../lib/search_params.snapshot';
+import type { ParamBlueprints, SearchParamRuntimeMap, SearchParamValueMap } from './search_params.model';
 
 export class SearchParamEngine<Blueprints extends Record<string, ParamBlueprints>> {
-  private runtimes: SearchParamRuntimes<Blueprints>;
+  private runtimes: SearchParamRuntimeMap<Blueprints>;
 
   constructor(blueprints: Blueprints) {
     this.runtimes = Object.entries(blueprints).reduce((prev, [key, bp]) => {
@@ -22,7 +22,7 @@ export class SearchParamEngine<Blueprints extends Record<string, ParamBlueprints
       if (bp instanceof FiltersBlueprint) return { ...prev, [key]: new PARAM_RUNTIMES.filters(key, bp) };
       if (bp instanceof EnumBlueprint) return { ...prev, [key]: new PARAM_RUNTIMES.enum(key, bp) };
       return prev;
-    }, {} as SearchParamRuntimes<Blueprints>);
+    }, {} as SearchParamRuntimeMap<Blueprints>);
   }
 
   private runtimeEntries() {
@@ -32,7 +32,7 @@ export class SearchParamEngine<Blueprints extends Record<string, ParamBlueprints
   public getDefaultValues() {
     const values = this.runtimeEntries().reduce(
       (prev, [key, runtime]) => ({ ...prev, [key]: runtime.getDefaultValue() }),
-      {} as SearchParamValues<Blueprints>
+      {} as SearchParamValueMap<Blueprints>
     );
     return new SearchParamSnapshot<Blueprints>(this.runtimes, values);
   }
@@ -41,7 +41,7 @@ export class SearchParamEngine<Blueprints extends Record<string, ParamBlueprints
     if (!values) return this;
     this.runtimes = this.runtimeEntries().reduce(
       (prev, [key, runtime]) => ({ ...prev, [key]: runtime.setDefaultValue(values) }),
-      {} as SearchParamRuntimes<Blueprints>
+      {} as SearchParamRuntimeMap<Blueprints>
     );
     return this;
   }
@@ -67,19 +67,19 @@ export class SearchParamEngine<Blueprints extends Record<string, ParamBlueprints
     );
   }
 
-  public full(value: URLSearchParams | SearchParamValues<Blueprints>) {
+  public full(value: URLSearchParams | SearchParamValueMap<Blueprints>) {
     const values = this.runtimeEntries().reduce(
       (prev, [, runtime]) => runtime.full(prev, value),
-      {} as SearchParamValues<Blueprints>
+      {} as SearchParamValueMap<Blueprints>
     );
 
     return new SearchParamSnapshot<Blueprints>(this.runtimes, values);
   }
 
-  public delta(value: URLSearchParams | SearchParamValues<Blueprints>) {
+  public delta(value: URLSearchParams | SearchParamValueMap<Blueprints>) {
     const values = this.runtimeEntries().reduce(
       (prev, [, runtime]) => runtime.delta(prev, value),
-      {} as SearchParamValues<Blueprints>
+      {} as SearchParamValueMap<Blueprints>
     );
 
     return new SearchParamSnapshot<Blueprints>(this.runtimes, values);
@@ -88,7 +88,7 @@ export class SearchParamEngine<Blueprints extends Record<string, ParamBlueprints
   public fromLocation(location: Location, snapshot: SearchParamSnapshot<Blueprints> = null) {
     const values = this.runtimeEntries().reduce(
       (prev, [, runtime]) => runtime.fromLocation(prev, location, snapshot),
-      {} as SearchParamValues<Blueprints>
+      {} as SearchParamValueMap<Blueprints>
     );
     return new SearchParamSnapshot<Blueprints>(this.runtimes, values);
   }

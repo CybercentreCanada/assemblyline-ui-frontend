@@ -1,28 +1,29 @@
 import { toElement } from 'core/app/utils/app.utils';
-import { createSearchParams } from 'core/search-params/createSearchParams';
 import { ComponentType, MemoExoticComponent, ReactNode } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { PathParamBlueprintMap } from '../path-params/path-params.models';
 import { PATH_PARAM_BLUEPRINTS_MAP, createPathParamsCodec } from '../path-params/path-params.utils';
+import { createSearchParamsCodec } from '../search-params/createSearchParams';
+import { SEARCH_PARAM_BLUEPRINTS_MAP } from '../search-params/lib/search_params.blueprint';
+import { SearchParamEngine } from '../search-params/lib/search_params.engine';
+import { SearchParamBlueprintMap } from '../search-params/lib/search_params.model';
 import { DisabledBoundary, ForbiddenBoundary } from './route.components';
-import { CreateRouteHash, CreateRouteSearch, RoutePath } from './route.models';
+import { CreateRouteHash, RoutePath } from './route.models';
 import { RouteProvider } from './route.providers';
 
 //*****************************************************************************************
 // Create Route
 //*****************************************************************************************
 
-const SEARCH_PARAM_BLUEPRINTS = null;
-
 export type CreateRouteProps<
   Path extends RoutePath,
   Params extends PathParamBlueprintMap<Path>,
-  Search extends CreateRouteSearch,
+  Search extends SearchParamBlueprintMap,
   Hash extends CreateRouteHash
 > = {
   path: Path;
   params?: (blueprints: typeof PATH_PARAM_BLUEPRINTS_MAP) => Params;
-  search?: (blueprints: typeof SEARCH_PARAM_BLUEPRINTS) => Search;
+  search?: (blueprints: typeof SEARCH_PARAM_BLUEPRINTS_MAP) => Search;
   hash?: (hash: Location['hash']) => Hash;
 
   disabled?: boolean | (() => boolean);
@@ -45,7 +46,7 @@ export type CreateRouteProps<
 export const createRoute = <
   const Path extends RoutePath,
   const Params extends PathParamBlueprintMap<Path>,
-  const Search extends CreateRouteSearch,
+  const Search extends SearchParamBlueprintMap,
   const Hash extends CreateRouteHash
 >({
   path,
@@ -65,9 +66,11 @@ export const createRoute = <
 
   const content = toElement(component);
 
-  const paramCodec = params ? createPathParamsCodec<Path>(path)(params) : undefined;
+  const paramCodec = !params ? undefined : createPathParamsCodec<Path>(path)(params);
 
-  const searchCodec = search ? createSearchParams(search) : undefined;
+  const searchEngine = !search
+    ? undefined
+    : new SearchParamEngine(createSearchParamsCodec(search)).setDefaultValues(null);
 
   const hashCodec = hash ?? (h => h);
 
@@ -80,7 +83,9 @@ export const createRoute = <
     >
       <DisabledBoundary disabled={disabled} FallbackComponent={disabledComponent}>
         <ForbiddenBoundary forbidden={forbidden} FallbackComponent={forbiddenComponent}>
-          <RouteProvider params={paramCodec}>{content}</RouteProvider>
+          <RouteProvider params={paramCodec} search={searchEngine}>
+            {content}
+          </RouteProvider>
         </ForbiddenBoundary>
       </DisabledBoundary>
     </ErrorBoundary>
@@ -90,7 +95,7 @@ export const createRoute = <
     element,
     path,
     params: paramCodec,
-    search: searchCodec,
+    search: !search ? undefined : searchEngine.fromLocation({ search: null }),
     hash: hashCodec
   };
 };

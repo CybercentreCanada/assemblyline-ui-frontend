@@ -1,5 +1,5 @@
 import type { Location } from 'react-router';
-import type { ParamBlueprints, ParamSource, ParamValues, SearchParamValues } from '../lib/search_params.model';
+import type { ParamBlueprints, ParamSource, ParamValues, SearchParamValueMap } from '../lib/search_params.model';
 import type { SearchParamSnapshot } from '../lib/search_params.snapshot';
 
 export abstract class BaseBlueprint<T extends ParamValues> {
@@ -164,9 +164,9 @@ export abstract class BaseBlueprint<T extends ParamValues> {
   // -------------------------
 
   protected full<Blueprints extends Record<string, ParamBlueprints>>(
-    prev: SearchParamValues<Blueprints>,
-    params: URLSearchParams | SearchParamValues<Blueprints>
-  ): SearchParamValues<Blueprints> {
+    prev: SearchParamValueMap<Blueprints>,
+    params: URLSearchParams | SearchParamValueMap<Blueprints>
+  ): SearchParamValueMap<Blueprints> {
     const value = this.get(params);
     if (!this._locked && this.valid(value)) return { ...prev, [this._key]: value };
     else if (this.valid(this._defaultValue)) return { ...prev, [this._key]: this._defaultValue };
@@ -174,19 +174,19 @@ export abstract class BaseBlueprint<T extends ParamValues> {
   }
 
   protected delta<Blueprints extends Record<string, ParamBlueprints>>(
-    prev: SearchParamValues<Blueprints>,
-    params: URLSearchParams | SearchParamValues<Blueprints>
-  ): SearchParamValues<Blueprints> {
+    prev: SearchParamValueMap<Blueprints>,
+    params: URLSearchParams | SearchParamValueMap<Blueprints>
+  ): SearchParamValueMap<Blueprints> {
     const value = this.get(params);
     if (!this._locked && this.valid(value) && value !== this._defaultValue) return { ...prev, [this._key]: value };
     else return prev;
   }
 
   protected fromLocation<Blueprints extends Record<string, ParamBlueprints>>(
-    prev: SearchParamValues<Blueprints>,
+    prev: SearchParamValueMap<Blueprints>,
     location: Location,
     snapshot: SearchParamSnapshot<Blueprints> | null = null
-  ): SearchParamValues<Blueprints> {
+  ): SearchParamValueMap<Blueprints> {
     let value: T | undefined;
 
     switch (this._origin) {
@@ -217,7 +217,7 @@ export abstract class BaseBlueprint<T extends ParamValues> {
 
   protected toParams<Blueprints extends Record<string, ParamBlueprints>>(
     prev: string[][],
-    snapshot: SearchParamValues<Blueprints>
+    snapshot: SearchParamValueMap<Blueprints>
   ): string[][] {
     return this._key in snapshot && snapshot?.[this._key] !== null && snapshot?.[this._key] !== undefined
       ? [...prev, [this._key, String(snapshot?.[this._key])]]
@@ -399,9 +399,9 @@ export class FiltersBlueprint extends BaseBlueprint<string[]> {
   }
 
   private append<Blueprints extends Record<string, ParamBlueprints>>(
-    prev: SearchParamValues<Blueprints>,
+    prev: SearchParamValueMap<Blueprints>,
     values: string[][]
-  ): SearchParamValues<Blueprints> {
+  ): SearchParamValueMap<Blueprints> {
     const res = values.toSorted((a, b) => a.at(-1).localeCompare(b.at(-1))).map(value => this.fromPrefix(value));
     return { ...prev, [this._key]: res };
   }
@@ -423,7 +423,7 @@ export class FiltersBlueprint extends BaseBlueprint<string[]> {
   }
 
   protected override get<Blueprints extends Record<string, ParamBlueprints>>(
-    search: SearchParamValues<Blueprints> | URLSearchParams
+    search: SearchParamValueMap<Blueprints> | URLSearchParams
   ): string[] {
     if (search instanceof URLSearchParams) {
       const value = this.parse(search.getAll(this._key));
@@ -440,17 +440,17 @@ export class FiltersBlueprint extends BaseBlueprint<string[]> {
   // -------------------------
 
   protected override full<Blueprints extends Record<string, ParamBlueprints>>(
-    prev: SearchParamValues<Blueprints>,
-    params: URLSearchParams | SearchParamValues<Blueprints>
-  ): SearchParamValues<Blueprints> {
+    prev: SearchParamValueMap<Blueprints>,
+    params: URLSearchParams | SearchParamValueMap<Blueprints>
+  ): SearchParamValueMap<Blueprints> {
     const data = this.get(params);
     return this.append(prev, this.clean([...this._defaultValue, ...(!this._locked && data)]));
   }
 
   protected override delta<Blueprints extends Record<string, ParamBlueprints>>(
-    prev: SearchParamValues<Blueprints>,
-    params: URLSearchParams | SearchParamValues<Blueprints>
-  ): SearchParamValues<Blueprints> {
+    prev: SearchParamValueMap<Blueprints>,
+    params: URLSearchParams | SearchParamValueMap<Blueprints>
+  ): SearchParamValueMap<Blueprints> {
     const data = this.get(params);
     if (this._locked || !Array.isArray(data)) return prev;
 
@@ -472,10 +472,10 @@ export class FiltersBlueprint extends BaseBlueprint<string[]> {
   }
 
   protected override fromLocation<Blueprints extends Record<string, ParamBlueprints>>(
-    prev: SearchParamValues<Blueprints>,
+    prev: SearchParamValueMap<Blueprints>,
     location: Location,
     snapshot: SearchParamSnapshot<Blueprints> | null = null
-  ): SearchParamValues<Blueprints> {
+  ): SearchParamValueMap<Blueprints> {
     let value: string[] | undefined;
 
     switch (this._origin) {
@@ -504,14 +504,14 @@ export class FiltersBlueprint extends BaseBlueprint<string[]> {
 
   protected override toParams<Blueprints extends Record<string, ParamBlueprints>>(
     prev: string[][],
-    snapshot: SearchParamValues<Blueprints>
+    snapshot: SearchParamValueMap<Blueprints>
   ): string[][] {
     if (!(this._key in snapshot) || !this.check(snapshot?.[this._key])) return prev;
     return (snapshot[this._key] as string[]).reduce((p, f) => [...p, [this._key, String(f)]], prev);
   }
 }
 
-export const PARAM_BLUEPRINTS = {
+export const SEARCH_PARAM_BLUEPRINTS_MAP = {
   boolean: (value: boolean) => new BooleanBlueprint().defaultValue(value),
   number: (value: number) => new NumberBlueprint().defaultValue(value),
   string: (value: string) => new StringBlueprint().defaultValue(value),

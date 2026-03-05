@@ -53,18 +53,18 @@ export type InferRuntime<B> =
 /**
  * Map of search param blueprints.
  */
-export type SearchParamBlueprints = Record<string, ParamBlueprints>;
+export type SearchParamBlueprintMap = Record<string, ParamBlueprints>;
 
 /**
  * Map of search param names → resolved values.
  */
-export type SearchParamValues<Blueprints extends Record<string, ParamBlueprints>> = {
+export type SearchParamValueMap<Blueprints extends Record<string, ParamBlueprints>> = {
   [K in keyof Blueprints]: InferValue<Blueprints[K]>;
 };
 
 /**
  * Map of search param names → runtime handlers.
  */
-export type SearchParamRuntimes<Blueprints extends Record<string, ParamBlueprints>> = {
+export type SearchParamRuntimeMap<Blueprints extends Record<string, ParamBlueprints>> = {
   [K in keyof Blueprints]: InferRuntime<Blueprints[K]>;
 };
