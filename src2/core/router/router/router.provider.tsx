@@ -5,6 +5,10 @@ import { useLocation } from 'react-router';
 import { RouterState, RouterStore } from './router.models';
 import { locationToStore } from './router.utils';
 
+//*****************************************************************************************
+// RouterProvider
+//*****************************************************************************************
+
 const createDefaultRouterStore = (): RouterStore => ({
   maxPanels: 3,
   maxNodes: 3,

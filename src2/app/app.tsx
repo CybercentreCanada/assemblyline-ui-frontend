@@ -1,4 +1,4 @@
-import { RouterProvider } from 'core/router/router/router.provider';
+import { RouterProvider } from 'core/router';
 import { StrictMode } from 'react';
 import { BrowserRouter } from 'react-router';
 import { AppRouter } from './app.router';

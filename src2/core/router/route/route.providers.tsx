@@ -1,14 +1,15 @@
 import { createStoreContext } from 'core/store/createStoreContext';
 import React, { useCallback } from 'react';
 import { useLocation } from 'react-router';
-import { PathParamCodec, PathParamBlueprintMap } from '../path-params/path-params.models';
-import { RoutePath, CreateRouteSearch, CreateRouteHash } from './route.models';
+import { PathParamBlueprintMap, PathParamCodec } from '../path-params/path-params.models';
+import { RouterStore } from '../router/router.models';
+import { CreateRouteHash, CreateRouteSearch, RoutePath } from './route.models';
+
+//*****************************************************************************************
+// Route Provider
+//*****************************************************************************************
 
 const SEARCH_PARAM_BLUEPRINTS = null;
-
-//*****************************************************************************************
-// Context
-//*****************************************************************************************
 
 export type RouteStore<
   Path extends RoutePath = RoutePath,
@@ -75,6 +76,38 @@ export const RouteProvider = React.memo(
 );
 
 RouteProvider.displayName = 'RouteProvider';
+
+//*****************************************************************************************
+// Route Key Provider
+//*****************************************************************************************
+
+export type RouteKeyStore = {
+  routeKey: keyof RouterStore['routes'];
+};
+
+const createDefaultRouteKeyStore = (): RouteKeyStore => ({
+  routeKey: null
+});
+
+const { StoreProvider: RouteKeyStoreProvider, useStore: useRouteKeyStore } =
+  createStoreContext<RouteKeyStore>(createDefaultRouteKeyStore());
+
+export type RouteKeyStoreProviderProps = {
+  children: React.ReactNode;
+  routeKey: keyof RouterStore['routes'];
+};
+
+export const RouteKeyProvider = React.memo(({ children, routeKey }: RouteKeyStoreProviderProps) => (
+  <RouteKeyStoreProvider data={{ routeKey }}>{children}</RouteKeyStoreProvider>
+));
+
+RouteKeyProvider.displayName = 'RouteKeyProvider';
+
+export const useRouteKey = () => {
+  const context = useRouteKeyStore(s => s.routeKey);
+  if (!context) return null;
+  return context[0];
+};
 
 // //*****************************************************************************************
 // // Context

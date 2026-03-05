@@ -1,10 +1,9 @@
-import { AppRoute } from 'app/app.routes';
 import { SearchParamBlueprints } from 'core/search-params/lib/search_params.model';
 import { PathParamBlueprintMap } from '../path-params/path-params.models';
 
-//**************************************************************
+//*****************************************************************************************
 // Create Route Types
-//**************************************************************
+//*****************************************************************************************
 
 export type CreateRoutePath = string;
 
@@ -19,17 +18,17 @@ export type CreateRouteMeta = {
   breadcrumb?: string | ((params: any) => string);
 };
 
-//**************************************************************
+//*****************************************************************************************
 // Created Routes Routes
-//**************************************************************
+//*****************************************************************************************
 
-export type RoutePath = AppRoute['path'];
+export type RoutePath = string;
 
-export type RouteParams<Path extends RoutePath> = Extract<AppRoute, { path: Path }>['params'];
+export type RouteParams<Path extends RoutePath> = CreateRouteParams<Path>;
 
-export type RouteSearch<Path extends RoutePath> = Extract<AppRoute, { path: Path }>['search'];
+export type RouteSearch<Path extends RoutePath> = CreateRouteSearch;
 
-export type RouteHash<Path extends RoutePath> = Extract<AppRoute, { path: Path }>['hash'];
+export type RouteHash<Path extends RoutePath> = CreateRouteHash;
 
 export type RouteStore = {};
 

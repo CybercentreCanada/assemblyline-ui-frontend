@@ -5,9 +5,9 @@ import SubmitRoute from 'pages/Submit';
 import React, { useMemo } from 'react';
 import { Route, Routes as RouterRoutes } from 'react-router';
 
-//**************************************************************
-// App Routes
-//**************************************************************
+//*****************************************************************************************
+// AppRoutes
+//*****************************************************************************************
 export const APP_ROUTES = [SubmitRoute, Page1Route, Page2Route, SubmissionsRoute] as const;
 
 export type AppRoute = (typeof APP_ROUTES)[number];

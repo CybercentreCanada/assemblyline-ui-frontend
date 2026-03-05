@@ -4,13 +4,13 @@ import { ComponentType, MemoExoticComponent, ReactNode } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { PathParamBlueprintMap } from '../path-params/path-params.models';
 import { PATH_PARAM_BLUEPRINTS_MAP, createPathParamsCodec } from '../path-params/path-params.utils';
-import { RoutePath, CreateRouteSearch, CreateRouteHash } from './route.models';
-import { RouteProvider } from './route.providers';
 import { DisabledBoundary, ForbiddenBoundary } from './route.components';
+import { CreateRouteHash, CreateRouteSearch, RoutePath } from './route.models';
+import { RouteProvider } from './route.providers';
 
-// export type RoutePath = string;
-// export type RouteSearch = undefined | SearchParamBlueprints;
-// export type RouteHash = undefined | string;
+//*****************************************************************************************
+// Create Route
+//*****************************************************************************************
 
 const SEARCH_PARAM_BLUEPRINTS = null;
 

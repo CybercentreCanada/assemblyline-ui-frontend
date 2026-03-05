@@ -1,12 +1,15 @@
-import { RouteKeyProvider } from 'core/router/route/route-key.provider';
+import { InPortal, OutPortal } from 'core/portal';
+import { RouteKeyProvider } from 'core/router/route/route.providers';
 import { useRouterStore } from 'core/router/router/router.provider';
 import { findNode, removePanel, sanitizeRouterStore, storeToNavigate } from 'core/router/router/router.utils';
 import { Links } from 'pages/Links';
 import React from 'react';
 import { Link as RouterLink, useLocation, useNavigate as useRouterNavigate } from 'react-router';
 import { AppRoutes } from './app.routes';
-import { OutPortal, InPortal } from 'core/portal';
 
+//*****************************************************************************************
+// Panel View
+//*****************************************************************************************
 type PanelViewProps = {
   panelKey: number;
 };
@@ -42,6 +45,10 @@ const PanelView = React.memo(({ panelKey }: PanelViewProps) => {
 
 PanelView.displayName = 'PanelView';
 
+//*****************************************************************************************
+// Node Mount
+//*****************************************************************************************
+
 type NodeMountProps = {
   nodeKey: string;
 };
@@ -62,6 +69,10 @@ const NodeMount = React.memo(({ nodeKey }: NodeMountProps) => {
 });
 
 NodeMount.displayName = 'NodeMount';
+
+//*****************************************************************************************
+// App Router
+//*****************************************************************************************
 
 export const AppRouter = React.memo(() => {
   const location = useLocation();

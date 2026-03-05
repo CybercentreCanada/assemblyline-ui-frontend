@@ -2,9 +2,12 @@ import { APP_ROUTES, AppRoute } from 'app/app.routes';
 import React, { ReactNode, useCallback, useMemo } from 'react';
 import type { LinkProps as RouterLinkProps } from 'react-router';
 import { Link as RouterLink } from 'react-router';
-import { useNavigate } from './navigate.hooks';
 import { PathParamKeyForPath } from '../path-params/path-params.models';
+import { useNavigate } from './navigate.hooks';
 
+//*****************************************************************************************
+// Link
+//*****************************************************************************************
 type LinkBaseProps = { variant?: 'open' | 'replace' | 'to'; panel?: number } & Omit<
   RouterLinkProps,
   'to' | 'pathname' | 'search' | 'hash'

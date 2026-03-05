@@ -1,17 +1,20 @@
 import { AppRoute } from 'app/app.routes';
 import { useCallback } from 'react';
 import { useNavigate as useRouterNavigate } from 'react-router';
-import { useRouteKey } from '../route/route-key.provider';
+import { useRouteKey } from '../route/route.providers';
 import { useRouterStore } from '../router/router.provider';
 import {
-  findPanelKey,
   addRoute,
+  findPanelKey,
   insertRightPanel,
-  updatePanel,
   sanitizeRouterStore,
-  storeToNavigate
+  storeToNavigate,
+  updatePanel
 } from '../router/router.utils';
 
+//*****************************************************************************************
+// useNavigate
+//*****************************************************************************************
 type NavigateOptions = { variant: 'open' } | { variant: 'replace' } | { variant: 'to'; panel: number };
 
 type Expand<T> = T extends infer O ? { [K in keyof O]: O[K] } : never;

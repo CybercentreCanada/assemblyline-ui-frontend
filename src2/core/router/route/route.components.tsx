@@ -1,9 +1,14 @@
 import type { ComponentType, MemoExoticComponent, ReactNode } from 'react';
 import React from 'react';
 
+//*****************************************************************************************
+// DisabledBoundary
+//*****************************************************************************************
 const DefaultDisabledRouteFallback = React.memo(() => {
   return 'disabled';
 });
+
+DefaultDisabledRouteFallback.displayName = 'DefaultDisabledRouteFallback';
 
 type DisabledBoundaryProps = {
   disabled?: boolean | (() => boolean);
@@ -20,9 +25,17 @@ export const DisabledBoundary = ({
   return <>{children}</>;
 };
 
+DisabledBoundary.displayName = 'DisabledBoundary';
+
+//*****************************************************************************************
+// ForbiddenBoundary
+//*****************************************************************************************
+
 const DefaultForbiddenRouteFallback = React.memo(() => {
   return 'forbidden';
 });
+
+DefaultForbiddenRouteFallback.displayName = 'DefaultForbiddenRouteFallback';
 
 type ForbiddenBoundaryProps = {
   forbidden?: boolean | (() => boolean);
@@ -38,3 +51,5 @@ export const ForbiddenBoundary = ({
   if (typeof forbidden === 'function' ? forbidden() : forbidden) return <>{FallbackComponent}</>;
   return <>{children}</>;
 };
+
+ForbiddenBoundary.displayName = 'ForbiddenBoundary';

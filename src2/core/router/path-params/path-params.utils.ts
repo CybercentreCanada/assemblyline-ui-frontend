@@ -6,6 +6,9 @@ import {
   RoutePath
 } from './path-params.models';
 
+//*****************************************************************************************
+// Path Param Blueprints
+//*****************************************************************************************
 export const PATH_PARAM_BLUEPRINTS_MAP = {
   string: (defaultValue = ''): PathParamBlueprint<string> => ({
     type: '',
@@ -33,6 +36,9 @@ export const PATH_PARAM_BLUEPRINTS_MAP = {
   })
 };
 
+//*****************************************************************************************
+// Create Path Param Codec
+//*****************************************************************************************
 export function createPathParamsCodec<const Path extends RoutePath>(basePath: Path) {
   return function <const Blueprints extends PathParamBlueprintMap<Path>>(
     input: (blueprints: typeof PATH_PARAM_BLUEPRINTS_MAP) => Blueprints
