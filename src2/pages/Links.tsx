@@ -1,4 +1,4 @@
-import { Link } from 'core/router';
+import { Link } from 'core/router/navigate/navigate.components';
 import React from 'react';
 
 export const Links = React.memo(() => {

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Links } from './Links';
-import { createRoute, useRoute } from 'core/router';
+import { useRoute } from 'core/router/route/route.hooks';
+import { createRoute } from 'core/router/route/route.utils';
 import { useNavigate } from 'react-router';
 
 type TestProps = {
