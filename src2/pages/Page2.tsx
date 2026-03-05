@@ -35,6 +35,10 @@ export const Page2Page = React.memo(() => {
 
 Page2Page.displayName = 'Page2Page';
 
-export const Page2Route = createRoute({ path: '/page2/:fileID', component: Page2Page });
+export const Page2Route = createRoute({
+  component: Page2Page,
+  path: '/page2/:fileID',
+  params: p => ({ fileID: p.string() })
+});
 
 export default Page2Route;

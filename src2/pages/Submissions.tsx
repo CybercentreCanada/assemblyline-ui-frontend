@@ -1,7 +1,7 @@
-import { useNavigate, useParams, useSearch } from 'core/router';
+import { useNavigate } from 'core/router';
+import { useRoute } from 'core/router/hooks/useRoute';
 import { createRoute } from 'core/router/utils/createRoute';
 import React, { useEffect, useState } from 'react';
-import { useLocation } from 'react-router';
 import { Links } from './Links';
 
 type TestProps = {
@@ -14,11 +14,12 @@ const Test = React.memo(({ test }: TestProps) => {
 
 export const SubmissionsPage = React.memo(() => {
   // const { fileID } = useParams();
-  const location = useLocation();
 
-  const { query } = useParams<typeof SubmissionsRoute>();
+  const queryParam = useRoute<typeof SubmissionsRoute>()(s => s.params.query);
 
-  const search = useSearch<typeof SubmissionsRoute>();
+  // const queryParam = useParams<typeof SubmissionsRoute>()(s => s.query);
+
+  // const search = useSearch<typeof SubmissionsRoute>();
 
   const navigate = useNavigate();
 
@@ -87,17 +88,10 @@ SubmissionsPage.displayName = 'SubmissionsPage';
 export const SubmissionsRoute = createRoute({
   component: SubmissionsPage,
   path: '/submissions/:query',
-  loading: () => false,
-
-  disabled: () => {
-    // const { features } = appStore.getState();
-    return false;
-  },
-
-  paramParser: p => ({
-    query: p.string()
+  params: s => ({
+    query: s.string()
   }),
-  searchParser: s => ({
+  search: s => ({
     query: s.string(''),
     offset: s.number(0).min(0).origin('snapshot').ephemeral(),
     rows: s.number(25).locked().origin('snapshot').ephemeral(),
@@ -105,7 +99,44 @@ export const SubmissionsRoute = createRoute({
     filters: s.filters([]),
     track_total_hits: s.number(null).origin('snapshot').nullable().ephemeral()
   }),
-  hashParser: h => ({})
+  hash: hash => hash,
+
+  loading: () => false,
+
+  disabled: () => {
+    // const { features } = appStore.getState();
+    return false;
+  }
 });
 
 export default SubmissionsRoute;
+
+//*****************************************************************************************
+// to Delete
+//*****************************************************************************************
+
+// export const another2 = createPathParamsCodec('/submissions/:query')(p => ({ query: p.string() }));
+
+// another2.type.query = 123;
+
+// const another = createPathParamsCodec('/submit/:test')(p => ({ test: p.string() }));
+
+// const test123: typeof another = null;
+
+// test123.type.test = 123;
+
+// SubmissionsRoute.params.query = 1;
+
+// type Test = (typeof SubmissionsRoute)['path'];
+
+// const test4: Test = null;
+
+// const test: Test = {
+//   query: 123
+// };
+
+// type Test2 = (typeof SubmissionsRoute)['params']['type'];
+
+// const test2: Test2 = {
+//   query: 123
+// };

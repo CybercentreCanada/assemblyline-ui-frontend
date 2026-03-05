@@ -1,7 +1,7 @@
+import { AppRoute } from 'app/app.routes';
 import { useCallback } from 'react';
 import { useNavigate as useRouterNavigate } from 'react-router';
-import { AppRoutes } from '../components/Routes';
-import { useRouteID } from '../providers/RouteIdProvider';
+import { useRouteKey } from '../providers/RouteKeyProvider';
 import { useRouterStore } from '../providers/RouterProvider';
 import {
   addRoute,
@@ -13,7 +13,6 @@ import {
 } from '../utils/router.utils';
 
 type NavigateOptions = { variant: 'open' } | { variant: 'replace' } | { variant: 'to'; panel: number };
-type AppRoute = AppRoutes[number];
 
 type Expand<T> = T extends infer O ? { [K in keyof O]: O[K] } : never;
 
@@ -27,7 +26,7 @@ export type NavigateTo = AppRoute extends infer Route ? (Route extends AppRoute 
 
 export const useNavigate = () => {
   const routerNavigate = useRouterNavigate();
-  const { routeKey } = useRouteID();
+  const routeKey = useRouteKey();
   const [store] = useRouterStore(s => s);
 
   let navigationStyle: 'push' | 'loop' = 'push';

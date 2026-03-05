@@ -3,12 +3,16 @@ import React from 'react';
 
 export const Links = React.memo(() => {
   return (
-    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-      <Link to="/submit">Submit</Link>
-      <Link to="/page1">Page 1</Link>
-      <Link to="/page2/asdasd">Page 2</Link>
-      <Link to="/submissions/asdasd">Submissions</Link>
-    </div>
+    <nav style={{ display: 'flex', gap: '8px', marginBottom: '12px', flexWrap: 'wrap' }}>
+      <Link path="/submit">Submit</Link>
+      <Link path="/page1">Submit</Link>
+      <Link path="/page2/:fileID" params={{ fileID: 'asd' }}>
+        Submit
+      </Link>
+      <Link path="/submissions/:query" params={{ query: '123' }}>
+        Submit
+      </Link>
+    </nav>
   );
 });
 

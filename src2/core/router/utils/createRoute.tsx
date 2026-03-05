@@ -1,36 +1,30 @@
 import { toElement } from 'core/app/utils/app.utils';
-import { createSearchParams, SearchParamsProvider } from 'core/search-params/createSearchParams';
-import { PARAM_BLUEPRINTS } from 'core/search-params/lib/search_params.blueprint';
-import { SearchParamBlueprints, SearchParamValues } from 'core/search-params/lib/search_params.model';
-import type { ComponentType, MemoExoticComponent, ReactNode } from 'react';
+import { createSearchParams } from 'core/search-params/createSearchParams';
+import { ComponentType, MemoExoticComponent, ReactNode } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
-import { useParams as useRouterParams } from 'react-router';
 import { DisabledBoundary } from '../components/DisabledBoundary';
 import { ForbiddenBoundary } from '../components/ForbiddenBoundary';
-import type {
-  ParamsBlueprints,
-  ParamsBlueprintsForPath,
-  ParamsParser,
-  ParamsValues,
-  PathParams
-} from '../models/router.models';
+import { PathParamBlueprintMap, RoutePath } from '../models/params.models';
+import { CreateRouteHash, CreateRouteSearch } from '../models/route.models';
 import { RouteProvider } from '../providers/RouteProvider';
-import { createParamsParser, PARAM_PARSERS } from './param.utils';
+import { createPathParamsCodec, PATH_PARAM_BLUEPRINTS_MAP } from './param.utils';
 
-export type RoutePath = string;
-export type RouteSearch = undefined | SearchParamBlueprints;
-export type RouteHash = undefined | string;
+// export type RoutePath = string;
+// export type RouteSearch = undefined | SearchParamBlueprints;
+// export type RouteHash = undefined | string;
+
+const SEARCH_PARAM_BLUEPRINTS = null;
 
 export type CreateRouteProps<
-  Path extends RoutePath = RoutePath,
-  Search extends RouteSearch = undefined,
-  Hash extends RouteHash = undefined,
-  Params extends ParamsBlueprintsForPath<Path> = ParamsBlueprintsForPath<Path>
+  Path extends RoutePath,
+  Params extends PathParamBlueprintMap<Path>,
+  Search extends CreateRouteSearch,
+  Hash extends CreateRouteHash
 > = {
   path: Path;
-  params?: (parsers: typeof PARAM_PARSERS) => Params;
-  search?: (blueprints: typeof PARAM_BLUEPRINTS) => Search;
-  hash?: Hash;
+  params?: (blueprints: typeof PATH_PARAM_BLUEPRINTS_MAP) => Params;
+  search?: (blueprints: typeof SEARCH_PARAM_BLUEPRINTS) => Search;
+  hash?: (hash: Location['hash']) => Hash;
 
   disabled?: boolean | (() => boolean);
   forbidden?: boolean | (() => boolean);
@@ -49,26 +43,11 @@ export type CreateRouteProps<
   };
 };
 
-export type CreateRouteReturn<
-  Path extends RoutePath = RoutePath,
-  Search extends RouteSearch = undefined,
-  Hash extends RouteHash = undefined,
-  Params extends ParamsBlueprints = ParamsBlueprints
-> = {
-  path: Path;
-  params: ParamsValues<Params>;
-  paramsParser: undefined | ParamsParser<Params>;
-  search: SearchParamValues<Search>;
-  searchParser: undefined | Search;
-  hash: Hash;
-  element: React.ReactNode;
-};
-
 export const createRoute = <
-  Path extends RoutePath = RoutePath,
-  Search extends RouteSearch = undefined,
-  Hash extends RouteHash = undefined,
-  Params extends ParamsBlueprintsForPath<Path> = ParamsBlueprintsForPath<Path>
+  const Path extends RoutePath,
+  const Params extends PathParamBlueprintMap<Path>,
+  const Search extends CreateRouteSearch,
+  const Hash extends CreateRouteHash
 >({
   path,
   params,
@@ -77,22 +56,21 @@ export const createRoute = <
 
   loading,
   disabled,
-  component,
   forbidden,
+
+  component,
   forbiddenComponent,
   disabledComponent
-}: CreateRouteProps<Path, Search, Hash, Params>): CreateRouteReturn<Path, Search, Hash, Params> => {
+}: CreateRouteProps<Path, Params, Search, Hash>) => {
   void loading;
 
-  const paramsParser = params ? createParamsParser(params) : undefined;
-  const searchParser = search ? createSearchParams(search) : undefined;
   const content = toElement(component);
 
-  const withSearch = searchParser ? (
-    <SearchParamsProvider params={searchParser}>{content}</SearchParamsProvider>
-  ) : (
-    content
-  );
+  const paramCodec = params ? createPathParamsCodec<Path>(path)(params) : undefined;
+
+  const searchCodec = search ? createSearchParams(search) : undefined;
+
+  const hashCodec = hash ?? (h => h);
 
   const element = (
     <ErrorBoundary
@@ -103,26 +81,17 @@ export const createRoute = <
     >
       <DisabledBoundary disabled={disabled} FallbackComponent={disabledComponent}>
         <ForbiddenBoundary forbidden={forbidden} FallbackComponent={forbiddenComponent}>
-          <RouteProvider path={path} params={params} search={search} hash={hash}>
-            {withSearch}
-          </RouteProvider>
+          <RouteProvider params={paramCodec}>{content}</RouteProvider>
         </ForbiddenBoundary>
       </DisabledBoundary>
     </ErrorBoundary>
   );
 
-  const useParams = () => {
-    const rawParams = useRouterParams() as Record<string, string | undefined>;
-    return (paramsParser ? paramsParser.parse(rawParams) : rawParams) as PathParams<Path> | Record<string, string>;
-  };
-
   return {
+    element,
     path,
-    params: {} as ParamsValues<Params>,
-    paramsParser,
-    search: {} as SearchParamValues<Search>,
-    searchParser,
-    hash: hash ?? undefined,
-    element
+    params: paramCodec,
+    search: searchCodec,
+    hash: hashCodec
   };
 };

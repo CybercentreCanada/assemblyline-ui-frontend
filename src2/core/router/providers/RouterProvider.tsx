@@ -5,12 +5,6 @@ import { useLocation } from 'react-router';
 import { RouterState, RouterStore } from '../models/router.models';
 import { locationToStore } from '../utils/router.utils';
 
-// import { compressToEncodedURIComponent, decompressFromEncodedURIComponent } from 'lz-string';
-
-// ********************************************************************************************
-// Router Store
-// ********************************************************************************************
-
 const createDefaultRouterStore = (): RouterStore => ({
   maxPanels: 3,
   maxNodes: 3,
@@ -19,23 +13,17 @@ const createDefaultRouterStore = (): RouterStore => ({
   routes: {}
 });
 
-const { StoreProvider, useStore: useRouterStore } = createStoreContext<RouterStore>(createDefaultRouterStore());
+export const { StoreProvider: RouterStoreProvider, useStore: useRouterStore } =
+  createStoreContext<RouterStore>(createDefaultRouterStore());
 
-export { useRouterStore };
+export type RouterProviderProps = {
+  children: React.ReactNode;
+};
 
-export const RouterProvider = React.memo(({ children }: { children: React.ReactNode }) => {
+export const RouterProvider = React.memo(({ children }: RouterProviderProps) => {
   const location: Location<RouterState> = useLocation();
-
-  const reset = useCallback(
-    (store: RouterStore) => {
-      const nextStore = locationToStore(store, location);
-      // navigate(parseRouterStoreToLocation(nextStore, location), { replace: true });
-      return nextStore;
-    },
-    [location]
-  );
-
-  return <StoreProvider data={reset}>{children}</StoreProvider>;
+  const reset = useCallback((store: RouterStore) => locationToStore(store, location), [location]);
+  return <RouterStoreProvider data={reset}>{children}</RouterStoreProvider>;
 });
 
 RouterProvider.displayName = 'RouterProvider';

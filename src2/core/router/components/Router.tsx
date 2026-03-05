@@ -1,9 +1,9 @@
+import { Links } from 'pages/Links';
 import React from 'react';
 import { Link as RouterLink, useLocation, useNavigate as useRouterNavigate } from 'react-router';
-import { RouteIDProvider } from '../providers/RouteIdProvider';
+import { RouteKeyProvider } from '../providers/RouteKeyProvider';
 import { useRouterStore } from '../providers/RouterProvider';
 import { findNode, removePanel, sanitizeRouterStore, storeToNavigate } from '../utils/router.utils';
-import { Link } from './Link';
 import { InPortal, OutPortal } from './Portals';
 import { Routes } from './Routes';
 
@@ -54,9 +54,9 @@ const NodeMount = React.memo(({ nodeKey }: NodeMountProps) => {
 
   return (
     <InPortal node={node.portal}>
-      <RouteIDProvider routeKey={node.routeKey}>
+      <RouteKeyProvider routeKey={node.routeKey}>
         <Routes href={route.href} state={route.state} />
-      </RouteIDProvider>
+      </RouteKeyProvider>
     </InPortal>
   );
 });
@@ -76,11 +76,7 @@ export const Router = React.memo(() => {
         link
       </RouterLink>
 
-      <nav style={{ display: 'flex', gap: '8px', marginBottom: '12px', flexWrap: 'wrap' }}>
-        <Link to="/page1">Page 1</Link>
-        <Link to="/page2/asdasd">Page 2</Link>
-        <Link to="/submissions/asdasd">Submissions</Link>
-      </nav>
+      <Links />
 
       <div
         style={{

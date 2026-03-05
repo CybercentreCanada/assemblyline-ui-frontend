@@ -25,7 +25,7 @@ export const DEFAULT_ROUTER_STATE: RouterState = {
 };
 
 export const DEFAULT_ROUTER_STORE: RouterStore = {
-  maxPanels: 1,
+  maxPanels: 2,
   maxNodes: 0,
   panels: [],
   nodes: {},
@@ -33,7 +33,7 @@ export const DEFAULT_ROUTER_STORE: RouterStore = {
 };
 
 export const ROUTER_STORE_EXAMPLE: RouterStore = {
-  maxPanels: 1,
+  maxPanels: 2,
   maxNodes: 0,
   panels: [{ routeKey: 'default', temporaryRouteKey: 'default', pinnedRouteKeys: [], tabbedRouteKeys: [] }],
   nodes: { default: { routeKey: 'default', portal: createReversePortalNode() } },

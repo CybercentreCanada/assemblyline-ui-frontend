@@ -90,7 +90,7 @@ export const createStoreContext = <Store extends object>(initialState: Store) =>
   ): [SelectorOutput, (dispatch: StorePatch) => void] => {
     const store = useContext(StoreContext);
     if (!store) {
-      throw new Error('Store not found');
+      return [null, () => null];
     }
 
     const lastSelectionRef = useRef<SelectorOutput>(selector(store.get()) ?? selector(initialState));
