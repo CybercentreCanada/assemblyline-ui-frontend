@@ -1,4 +1,4 @@
-import { createReversePortalNode } from '../components/Portals';
+import { createReversePortalNode } from 'core/portal';
 import { RouterNode, RouterPanel, RouterRoute, RouterState, RouterStore } from './router.models';
 
 export const DEFAULT_ROUTER_PANEL: RouterPanel = {

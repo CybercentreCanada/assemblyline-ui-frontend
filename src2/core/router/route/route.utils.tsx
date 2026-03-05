@@ -2,12 +2,11 @@ import { toElement } from 'core/app/utils/app.utils';
 import { createSearchParams } from 'core/search-params/createSearchParams';
 import { ComponentType, MemoExoticComponent, ReactNode } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
-import { DisabledBoundary } from '../components/DisabledBoundary';
-import { ForbiddenBoundary } from '../components/ForbiddenBoundary';
-import { PathParamBlueprintMap, RoutePath } from '../models/params.models';
-import { CreateRouteHash, CreateRouteSearch } from '../models/route.models';
-import { RouteProvider } from '../providers/RouteProvider';
-import { createPathParamsCodec, PATH_PARAM_BLUEPRINTS_MAP } from './param.utils';
+import { PathParamBlueprintMap } from '../path-params/path-params.models';
+import { PATH_PARAM_BLUEPRINTS_MAP, createPathParamsCodec } from '../path-params/path-params.utils';
+import { RoutePath, CreateRouteSearch, CreateRouteHash } from './route.models';
+import { RouteProvider } from './route.providers';
+import { DisabledBoundary, ForbiddenBoundary } from './route.components';
 
 // export type RoutePath = string;
 // export type RouteSearch = undefined | SearchParamBlueprints;

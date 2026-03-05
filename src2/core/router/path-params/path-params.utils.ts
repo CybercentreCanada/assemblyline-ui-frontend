@@ -4,7 +4,7 @@ import {
   PathParamBlueprintValues,
   PathParamCodec,
   RoutePath
-} from '../models/params.models';
+} from './path-params.models';
 
 export const PATH_PARAM_BLUEPRINTS_MAP = {
   string: (defaultValue = ''): PathParamBlueprint<string> => ({

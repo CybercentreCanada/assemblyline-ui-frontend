@@ -1,8 +1,8 @@
 import { createStoreContext } from 'core/store/createStoreContext';
 import React, { useCallback } from 'react';
 import { useLocation } from 'react-router';
-import { PathParamBlueprintMap, PathParamCodec, RoutePath } from '../models/params.models';
-import { CreateRouteHash, CreateRouteSearch } from '../models/route.models';
+import { PathParamCodec, PathParamBlueprintMap } from '../path-params/path-params.models';
+import { RoutePath, CreateRouteSearch, CreateRouteHash } from './route.models';
 
 const SEARCH_PARAM_BLUEPRINTS = null;
 

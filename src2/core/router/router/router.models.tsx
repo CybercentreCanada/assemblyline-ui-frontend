@@ -1,5 +1,5 @@
+import { ReversePortalNode } from 'core/portal';
 import { z } from 'zod';
-import { ReversePortalNode } from '../components/Portals';
 
 //*****************************************************************************************
 // Location

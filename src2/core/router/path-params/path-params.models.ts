@@ -1,8 +1,8 @@
+import type { Location } from 'react-router';
+
 //*****************************************************************************************
 // Path Params Primitives
 //*****************************************************************************************
-
-import { Location } from 'react-router';
 
 export type RoutePath = string;
 

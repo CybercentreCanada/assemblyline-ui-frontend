@@ -1,8 +1,7 @@
-import { useNavigate } from 'core/router';
-import { useRoute } from 'core/router/hooks/useRoute';
-import { createRoute } from 'core/router/utils/createRoute';
 import React, { useEffect, useState } from 'react';
 import { Links } from './Links';
+import { createRoute, useRoute } from 'core/router';
+import { useNavigate } from 'react-router';
 
 type TestProps = {
   test: string;

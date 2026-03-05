@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { DEFAULT_ROUTER_PANEL, DEFAULT_ROUTER_STORE } from '../models/router.defaults';
-import type { RouterStore } from '../models/router.models';
-import { addRoute, insertLeftRoute, insertRightRoute, refreshLastUsedAt, sanitizeRoutes } from './router.utils';
+import { DEFAULT_ROUTER_STORE, DEFAULT_ROUTER_PANEL } from './router.defaults';
+import { RouterStore } from './router.models';
+import { sanitizeRoutes, addRoute } from './router.utils';
 
 //*****************************************************************************************
 // sanitizeRoutes

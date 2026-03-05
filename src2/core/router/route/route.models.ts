@@ -1,6 +1,6 @@
 import { AppRoute } from 'app/app.routes';
 import { SearchParamBlueprints } from 'core/search-params/lib/search_params.model';
-import { PathParamBlueprintMap } from './params.models';
+import { PathParamBlueprintMap } from '../path-params/path-params.models';
 
 //**************************************************************
 // Create Route Types

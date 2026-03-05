@@ -1,5 +1,5 @@
 import { AppRoute } from 'app/app.routes';
-import { useRouteStore } from '../providers/RouteProvider';
+import { useRouteStore } from './route.providers';
 
 export type AppRouteStore<Route extends AppRoute> = {
   params: Route['params']['type'];

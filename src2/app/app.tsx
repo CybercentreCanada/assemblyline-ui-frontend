@@ -1,7 +1,7 @@
-import { Router } from 'core/router/components/Router';
-import { RouterProvider } from 'core/router/providers/RouterProvider';
+import { RouterProvider } from 'core/router/router/router.provider';
 import { StrictMode } from 'react';
 import { BrowserRouter } from 'react-router';
+import { AppRouter } from './app.router';
 
 export const AssemblylineApp = () => (
   <StrictMode>
@@ -11,7 +11,7 @@ export const AssemblylineApp = () => (
           <div style={{ padding: '16px' }}>
             <h1 style={{ textAlign: 'center' }}>Assemblyline App</h1>
             {/* <AppRoutes location="/page1" /> */}
-            <Router />
+            <AppRouter />
           </div>
         </div>
       </RouterProvider>

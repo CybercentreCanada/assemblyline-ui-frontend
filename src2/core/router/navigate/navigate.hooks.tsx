@@ -1,16 +1,16 @@
 import { AppRoute } from 'app/app.routes';
 import { useCallback } from 'react';
 import { useNavigate as useRouterNavigate } from 'react-router';
-import { useRouteKey } from '../providers/RouteKeyProvider';
-import { useRouterStore } from '../providers/RouterProvider';
+import { useRouteKey } from '../route/route-key.provider';
+import { useRouterStore } from '../router/router.provider';
 import {
-  addRoute,
   findPanelKey,
+  addRoute,
   insertRightPanel,
+  updatePanel,
   sanitizeRouterStore,
-  storeToNavigate,
-  updatePanel
-} from '../utils/router.utils';
+  storeToNavigate
+} from '../router/router.utils';
 
 type NavigateOptions = { variant: 'open' } | { variant: 'replace' } | { variant: 'to'; panel: number };
 

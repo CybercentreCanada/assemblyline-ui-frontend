@@ -1,6 +1,6 @@
 import { createStoreContext } from 'core/store/createStoreContext';
 import React from 'react';
-import { RouterStore } from '../models/router.models';
+import { RouterStore } from '../router/router.models';
 
 export type RouteKeyStore = {
   routeKey: keyof RouterStore['routes'];

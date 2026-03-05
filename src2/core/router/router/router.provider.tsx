@@ -2,8 +2,8 @@ import { createStoreContext } from 'core/store/createStoreContext';
 import React, { useCallback } from 'react';
 import type { Location } from 'react-router';
 import { useLocation } from 'react-router';
-import { RouterState, RouterStore } from '../models/router.models';
-import { locationToStore } from '../utils/router.utils';
+import { RouterState, RouterStore } from './router.models';
+import { locationToStore } from './router.utils';
 
 const createDefaultRouterStore = (): RouterStore => ({
   maxPanels: 3,

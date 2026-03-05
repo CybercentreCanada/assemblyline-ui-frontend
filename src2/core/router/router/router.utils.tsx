@@ -1,13 +1,13 @@
 import { deepCompare, generateRandomUUID } from 'core/app/utils/app.utils';
 import type { Location, NavigateOptions, To } from 'react-router';
-import { createReversePortalNode } from '../components/Portals';
+import { RouterState, RouterStore } from './router.models';
 import {
   DEFAULT_ROUTER_NODE,
   DEFAULT_ROUTER_PANEL,
   DEFAULT_ROUTER_ROUTE,
   ROUTER_STORE_EXAMPLE
-} from '../models/router.defaults';
-import { RouterState, RouterStore } from '../models/router.models';
+} from './router.defaults';
+import { createReversePortalNode } from 'core/portal';
 
 //*****************************************************************************************
 // Panel
