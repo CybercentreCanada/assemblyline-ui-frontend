@@ -1,6 +1,6 @@
 import { createStoreContext } from 'core/store/createStoreContext';
 import React, { useCallback } from 'react';
-import { useLocation } from 'react-router';
+import { Location, useLocation } from 'react-router';
 import { PathParamBlueprintMap, PathParamCodec } from '../path-params/path-params.models';
 import { RouterStore } from '../router/router.models';
 import { SearchParamEngine } from '../search-params/lib/search_params.engine';
@@ -19,7 +19,7 @@ export type RouteStore<
 > = {
   params: Params;
   search: Search;
-  // hash: Route['hash'];
+  hash: Hash;
 };
 
 const createDefaultRouteStore = <
@@ -29,8 +29,8 @@ const createDefaultRouteStore = <
   Hash extends CreateRouteHash
 >(): RouteStore<Path, Params, Search, Hash> => ({
   params: null,
-  search: null
-  // hash: null
+  search: null,
+  hash: null
 });
 
 export const { StoreProvider: RouteStoreProvider, useStore: useRouteStore } =
@@ -45,7 +45,7 @@ export type RouteProviderProps<
   children: React.ReactNode;
   params?: PathParamCodec<Params>;
   search?: Search;
-  hash?: (hash: Location['hash']) => Hash;
+  hash?: (hash: Location) => Hash;
 };
 
 export const RouteProvider = React.memo(function <
@@ -54,13 +54,13 @@ export const RouteProvider = React.memo(function <
   const Search extends SearchParamEngine<any>,
   const Hash extends CreateRouteHash
 >({ children, params, search, hash }: RouteProviderProps<Path, Params, Search, Hash>) {
-  const location = useLocation();
+  const location = useLocation() as Location<any>;
 
   const reset = useCallback(
     () => ({
       params: !params ? undefined : params.parse(location),
-      search: !search ? undefined : search.fromLocation(location).omit(search.getIgnoredKeys())
-      // hash: hashParser(location)
+      search: !search ? undefined : search.fromLocation(location).omit(search.getIgnoredKeys()),
+      hash: !hash ? undefined : hash(location)
     }),
     [location]
   );

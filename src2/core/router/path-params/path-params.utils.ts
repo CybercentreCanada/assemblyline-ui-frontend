@@ -1,3 +1,4 @@
+import type { Location } from 'react-router';
 import {
   PathParamBlueprint,
   PathParamBlueprintMap,
@@ -51,8 +52,8 @@ export function createPathParamsCodec<const Path extends RoutePath>(basePath: Pa
       type[key as keyof typeof type] = blueprints[key].type as any;
     }
 
-    const parse: PathParamCodec<Blueprints>['parse'] = pathname => {
-      const safePathname = typeof pathname === 'string' ? pathname : '';
+    const parse: PathParamCodec<Blueprints>['parse'] = (location: Location<any>) => {
+      const safePathname = typeof location?.pathname === 'string' ? location?.pathname : '';
       const safeBasePath = typeof basePath === 'string' ? basePath : '';
       const raw: Record<string, string | undefined> = {};
       const pathnameParts = safePathname.split('/').filter(Boolean);

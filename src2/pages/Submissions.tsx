@@ -18,9 +18,13 @@ export const SubmissionsPage = React.memo(() => {
 
   const queryParam = usePathParam('/submissions/:query', s => s.query);
 
+  console.log(queryParam);
+
   const query = useSearchParam('/submissions/:query', s => s.get('query'));
 
-  const rows = useRouteStore(s => s.search.get('rows'));
+  console.log(query);
+
+  const [rows] = useRouteStore(s => s);
 
   console.log(rows);
 

@@ -3,7 +3,6 @@ import { ComponentType, MemoExoticComponent, ReactNode } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { PathParamBlueprintMap } from '../path-params/path-params.models';
 import { PATH_PARAM_BLUEPRINTS_MAP, createPathParamsCodec } from '../path-params/path-params.utils';
-import { createSearchParamsCodec } from '../search-params/createSearchParams';
 import { SEARCH_PARAM_BLUEPRINTS_MAP } from '../search-params/lib/search_params.blueprint';
 import { SearchParamEngine } from '../search-params/lib/search_params.engine';
 import { SearchParamBlueprintMap } from '../search-params/lib/search_params.model';
@@ -70,7 +69,7 @@ export const createRoute = <
 
   const searchEngine = !search
     ? undefined
-    : new SearchParamEngine(createSearchParamsCodec(search)).setDefaultValues(null);
+    : new SearchParamEngine(search(SEARCH_PARAM_BLUEPRINTS_MAP)).setDefaultValues(null);
 
   const hashCodec = hash ?? (h => h);
 
@@ -95,7 +94,7 @@ export const createRoute = <
     element,
     path,
     params: paramCodec,
-    search: !search ? undefined : searchEngine.fromLocation({ search: null }),
+    search: !search ? undefined : searchEngine.fromLocation({ search: null } as any),
     hash: hashCodec
   };
 };
