@@ -14,6 +14,8 @@ import { AppRouteProvider } from './route.providers';
 // Create Route
 //*****************************************************************************************
 
+// TODO: add a resize observer similar to useMediaQuery
+
 export type CreateAppRouteProps<
   Path extends RoutePath,
   Params extends PathParamBlueprintMap<Path>,

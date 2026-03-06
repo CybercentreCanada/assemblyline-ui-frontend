@@ -1,16 +1,3 @@
-body {
-  background-color: black;
-  margin: 0px;
-}
-
-a {
-  color: cyan;
-}
-
-a:visited {
-  color: blueviolet;
-}
-
 @media print {
   body {
     color: rgba(0, 0, 0, 0.87) !important;

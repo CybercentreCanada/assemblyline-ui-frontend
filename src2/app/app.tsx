@@ -1,3 +1,6 @@
+import { Button } from '@mui/material';
+import { AppConfigProvider } from 'core/config/config.providers';
+import { AppPreferenceProvider } from 'core/preference/preference.providers';
 import { AppThemeProvider } from 'core/theme/theme.provider';
 import { StrictMode } from 'react';
 import { BrowserRouter } from 'react-router';
@@ -31,11 +34,8 @@ import { BrowserRouter } from 'react-router';
  * AppLayoutProvider
  */
 
-export const AssemblylineApp = () => (
-  <StrictMode>
-    <BrowserRouter basename="/">
-      <AppThemeProvider />
-      {/* <RouterProvider>
+{
+  /* <RouterProvider>
         <div style={{ backgroundColor: 'black', color: 'white', width: '100vw', height: '100vh' }}>
           <div style={{ padding: '16px' }}>
             <h1 style={{ textAlign: 'center' }}>Assemblyline App</h1>
@@ -43,7 +43,19 @@ export const AssemblylineApp = () => (
             <AppRouter />
           </div>
         </div>
-      </RouterProvider> */}
+      </RouterProvider> */
+}
+
+export const AssemblylineApp = () => (
+  <StrictMode>
+    <BrowserRouter basename="/">
+      <AppConfigProvider>
+        <AppPreferenceProvider>
+          <AppThemeProvider>
+            <Button variant="contained">Hello MUI</Button>
+          </AppThemeProvider>
+        </AppPreferenceProvider>
+      </AppConfigProvider>
     </BrowserRouter>
   </StrictMode>
 );

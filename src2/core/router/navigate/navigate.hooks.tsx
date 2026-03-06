@@ -2,7 +2,7 @@ import { AppRoute } from 'app/app.routes';
 import { useCallback } from 'react';
 import { useNavigate } from 'react-router';
 import { useAppRouteKey } from '../route/route.providers';
-import { useAppRouterStore } from '../router/router.provider';
+import { useAppRouterStore } from '../router/router.providers';
 import {
   addRoute,
   findPanelKey,
