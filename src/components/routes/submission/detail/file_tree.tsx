@@ -28,9 +28,16 @@ type FileTreeSectionProps = {
   sid: string;
   baseFiles: string[];
   force?: boolean;
+  filetype_override?: string;
 };
 
-const WrappedFileTreeSection: React.FC<FileTreeSectionProps> = ({ tree, sid, baseFiles, force = false }) => {
+const WrappedFileTreeSection: React.FC<FileTreeSectionProps> = ({
+  tree,
+  sid,
+  baseFiles,
+  force = false,
+  filetype_override = null
+}) => {
   const { t } = useTranslation(['submissionDetail']);
   const [open, setOpen] = useState(true);
   const theme = useTheme();
@@ -68,7 +75,13 @@ const WrappedFileTreeSection: React.FC<FileTreeSectionProps> = ({ tree, sid, bas
       <Collapse in={open} timeout="auto">
         <div style={{ paddingTop: sp2 }}>
           {tree !== null ? (
-            <FileTree tree={tree} sid={sid} force={force} defaultForceShown={forcedShown} />
+            <FileTree
+              tree={tree}
+              sid={sid}
+              force={force}
+              filetype_override={filetype_override}
+              defaultForceShown={forcedShown}
+            />
           ) : (
             Array.from({ length: 3 }).map((_, i) => (
               <div style={{ display: 'flex' }} key={i}>
@@ -88,9 +101,16 @@ type FileTreeProps = {
   sid: string;
   force: boolean;
   defaultForceShown: string[];
+  filetype_override?: string;
 };
 
-const WrappedFileTree: React.FC<FileTreeProps> = ({ tree, sid, defaultForceShown, force = false }) => {
+const WrappedFileTree: React.FC<FileTreeProps> = ({
+  tree,
+  sid,
+  defaultForceShown,
+  force = false,
+  filetype_override = null
+}) => {
   const { t } = useTranslation(['submissionDetail']);
   const theme = useTheme();
   const navigate = useNavigate();
@@ -180,7 +200,18 @@ const WrappedFileTree: React.FC<FileTreeProps> = ({ tree, sid, defaultForceShown
                   <span style={{ paddingRight: '4px', unicodeBidi: 'isolate-override' }}>
                     {item.name.sort().join(' | ')}
                   </span>
-                  <span style={{ fontSize: '80%', color: theme.palette.text.secondary }}>{`[${item.type}]`}</span>
+                  {filetype_override ? (
+                    <>
+                      <span
+                        style={{ fontSize: '80%', color: theme.palette.text.disabled, textDecoration: 'line-through' }}
+                      >{`[${item.type}]`}</span>
+                      <span
+                        style={{ fontSize: '80%', color: theme.palette.text.secondary }}
+                      >{`[${filetype_override}]`}</span>
+                    </>
+                  ) : (
+                    <span style={{ fontSize: '80%', color: theme.palette.text.secondary }}>{`[${item.type}]`}</span>
+                  )}
                 </span>
               </div>
             </Box>

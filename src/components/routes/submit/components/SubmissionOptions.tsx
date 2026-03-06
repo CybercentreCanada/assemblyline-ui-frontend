@@ -1,14 +1,17 @@
 import { Typography, useTheme } from '@mui/material';
+import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useALContext from 'components/hooks/useALContext';
+import useMyAPI from 'components/hooks/useMyAPI';
 import { useForm } from 'components/routes/submit/submit.form';
 import { CheckboxInput } from 'components/visual/Inputs/CheckboxInput';
 import { NumberInput } from 'components/visual/Inputs/NumberInput';
 import { SelectInput } from 'components/visual/Inputs/SelectInput';
 import { TextInput } from 'components/visual/Inputs/TextInput';
-import React, { useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export const SubmissionOptions = React.memo(() => {
+  const { apiCall } = useMyAPI();
   const { t } = useTranslation(['submit']);
   const theme = useTheme();
   const { configuration } = useALContext();
@@ -22,6 +25,17 @@ export const SubmissionOptions = React.memo(() => {
     ],
     [t]
   );
+  const [fileTypes, setFileTypes] = useState<string[]>([]);
+
+  useEffectOnce(() => {
+    // Load all file types
+    apiCall({
+      url: '/api/v4/help/constants/',
+      onSuccess: api_data => {
+        setFileTypes(api_data.api_response['file_types'].map(i => i[0]).filter(i => i !== '*') as string[]);
+      }
+    });
+  });
 
   return (
     <div>
@@ -77,6 +91,29 @@ export const SubmissionOptions = React.memo(() => {
                 )}
               />
 
+              <form.Subscribe
+                selector={state => {
+                  const param = state.values.settings.filetype_override;
+                  return [param.value, param.default, param.restricted] as const;
+                }}
+                children={([value, defaultValue, restricted]) => (
+                  <TextInput
+                    label={t('options.submission.filetype_override.label')}
+                    value={value}
+                    defaultValue={defaultValue}
+                    loading={loading}
+                    disabled={disabled || !isEditing || (!customize && restricted)}
+                    preventRender={!customize && restricted}
+                    reset={value !== defaultValue}
+                    placeholder={t('options.submission.filetype_override.placeholder')}
+                    options={fileTypes}
+                    onChange={(_, v) => form.setFieldValue('settings.filetype_override.value', v)}
+                    onReset={() => form.setFieldValue('settings.filetype_override.value', defaultValue)}
+                    validate={v => v && !fileTypes.includes(v) ? { status: 'error', message: t('options.submission.filetype_override.validate.error') } : null}
+                    slotProps={{ root: { style: { marginBottom: theme.spacing(1) } } }}
+                  />
+                )}
+              />
               <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'nowrap', columnGap: theme.spacing(1) }}>
                 <form.Subscribe
                   selector={state => {

@@ -1246,7 +1246,10 @@ function WrappedSubmissionDetail() {
                         to={`/submit?hash=${submission.files[0].sha256}`}
                         state={{
                           c12n: submission.classification,
-                          metadata: submission.metadata
+                          metadata: submission.metadata,
+                          params: {
+                            filetype_override: submission?.params?.filetype_override
+                          }
                         }}
                         dense
                         onClick={() => setResubmitAnchor(null)}
@@ -1499,7 +1502,13 @@ function WrappedSubmissionDetail() {
         {submission && submission.state !== 'completed' && liveErrorKeys.length !== 0 && liveErrors !== null && (
           <ErrorSection sid={id} errors={liveErrors} />
         )}
-        <FileTreeSection tree={tree} sid={id} baseFiles={baseFiles} force={submission && submission.max_score < 0} />
+        <FileTreeSection
+          tree={tree}
+          sid={id}
+          baseFiles={baseFiles}
+          force={submission && submission.max_score < 0}
+          filetype_override={submission?.params?.filetype_override}
+        />
       </div>
     </PageCenter>
   ) : (
