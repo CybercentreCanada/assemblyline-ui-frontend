@@ -1,4 +1,4 @@
-import { shallowEqual } from 'core/prop-provider/props.utils';
+import { shallowEqual } from 'features/prop-provider/props.utils';
 import React, {
   createContext,
   useCallback,

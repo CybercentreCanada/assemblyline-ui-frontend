@@ -1,4 +1,4 @@
-import { createStoreContext } from 'core/store/createStoreContext';
+import { createStoreContext } from 'features/store/createStoreContext';
 import React, { useCallback } from 'react';
 import type { Location } from 'react-router';
 import { useLocation } from 'react-router';

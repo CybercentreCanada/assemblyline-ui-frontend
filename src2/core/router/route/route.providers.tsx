@@ -1,4 +1,4 @@
-import { createStoreContext } from 'core/store/createStoreContext';
+import { createStoreContext } from 'features/store/createStoreContext';
 import React, { useCallback } from 'react';
 import { Location, useLocation } from 'react-router';
 import { PathParamBlueprintMap, PathParamCodec } from '../path-params/path-params.models';

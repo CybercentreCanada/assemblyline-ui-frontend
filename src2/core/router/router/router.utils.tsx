@@ -1,5 +1,5 @@
-import { deepCompare, generateRandomUUID } from 'core/app/utils/app.utils';
-import { createReversePortalNode } from 'core/portal';
+import { createReversePortalNode } from 'features/portal';
+import { deepCompare, generateRandomUUID } from 'lib/utils/app.utils';
 import type { Location, NavigateOptions, To } from 'react-router';
 import {
   DEFAULT_ROUTER_NODE,

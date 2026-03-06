@@ -1,4 +1,4 @@
-import { toElement } from 'core/app/utils/app.utils';
+import { toElement } from 'lib/utils/app.utils';
 import { ComponentType, MemoExoticComponent, ReactNode } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { PathParamBlueprintMap } from '../path-params/path-params.models';

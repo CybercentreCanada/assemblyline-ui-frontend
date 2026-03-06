@@ -1,7 +1,7 @@
-import { InPortal, OutPortal } from 'core/portal';
 import { RouteKeyProvider } from 'core/router/route/route.providers';
 import { useRouterStore } from 'core/router/router/router.provider';
 import { findNode, removePanel, sanitizeRouterStore, storeToNavigate } from 'core/router/router/router.utils';
+import { InPortal, OutPortal } from 'features/portal';
 import { Links } from 'pages/Links';
 import React from 'react';
 import { Link as RouterLink, useLocation, useNavigate as useRouterNavigate } from 'react-router';

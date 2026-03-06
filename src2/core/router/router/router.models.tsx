@@ -1,4 +1,4 @@
-import { ReversePortalNode } from 'core/portal';
+import { ReversePortalNode } from 'features/portal';
 import { z } from 'zod';
 
 //*****************************************************************************************

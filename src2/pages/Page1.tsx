@@ -1,7 +1,7 @@
+import { createRoute } from 'core/router/route/route.utils';
+import { createReversePortalNode, InPortal, OutPortal } from 'features/portal';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Links } from './Links';
-import { createReversePortalNode, OutPortal, InPortal } from 'core/portal';
-import { createRoute } from 'core/router/route/route.utils';
 
 const StatefulWidget = React.memo(() => {
   const [count, setCount] = useState(0);
