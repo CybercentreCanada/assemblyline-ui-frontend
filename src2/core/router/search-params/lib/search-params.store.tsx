@@ -11,9 +11,9 @@ import React, {
 } from 'react';
 import type { NavigateOptions } from 'react-router';
 import { useLocation, useNavigate } from 'react-router';
-import { SearchParamEngine } from '../lib/search_params.engine';
-import { SearchParamSnapshot } from '../lib/search_params.snapshot';
-import { SearchParamBlueprintMap, SearchParamValueMap } from './search_params.model';
+import { SearchParamEngine } from '../lib/search-params.engine';
+import { SearchParamSnapshot } from '../lib/search-params.snapshot';
+import { SearchParamBlueprintMap, SearchParamValueMap } from './search-params.model';
 
 export const createSearchParamsStore = () => {
   // -------------------------

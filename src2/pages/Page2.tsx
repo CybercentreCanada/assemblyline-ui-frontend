@@ -1,4 +1,4 @@
-import { createAppRoute } from 'core/router';
+import { createAppRoute } from 'core/router/route/route.utils';
 import React, { useEffect, useState } from 'react';
 import { Links } from './Links';
 

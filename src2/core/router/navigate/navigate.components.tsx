@@ -1,8 +1,9 @@
-import { APP_ROUTES, AppRoute } from 'app/app.routes';
+import { APP_ROUTES } from 'app/app.routes';
 import React, { ReactNode, useCallback, useMemo } from 'react';
 import type { LinkProps } from 'react-router';
 import { Link } from 'react-router';
 import { PathParamKeyForPath } from '../path-params/path-params.models';
+import { AppRoute } from '../route/route.components';
 import { useAppNavigate } from './navigate.hooks';
 
 //*****************************************************************************************

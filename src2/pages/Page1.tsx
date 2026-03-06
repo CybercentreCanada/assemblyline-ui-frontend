@@ -1,4 +1,4 @@
-import { createAppRoute } from 'core/router';
+import { createAppRoute } from 'core/router/route/route.utils';
 import { createReversePortalNode, InPortal, OutPortal } from 'features/portal';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Links } from './Links';

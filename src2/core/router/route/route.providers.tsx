@@ -3,8 +3,8 @@ import React, { useCallback } from 'react';
 import { Location, useLocation } from 'react-router';
 import { PathParamBlueprintMap, PathParamCodec } from '../path-params/path-params.models';
 import { RouterStore } from '../router/router.models';
-import { SearchParamEngine } from '../search-params/lib/search_params.engine';
-import { SearchParamSnapshot } from '../search-params/lib/search_params.snapshot';
+import { SearchParamEngine } from '../search-params/lib/search-params.engine';
+import { SearchParamSnapshot } from '../search-params/lib/search-params.snapshot';
 import { RouteHash, RoutePath } from './route.models';
 
 //*****************************************************************************************

@@ -1,5 +1,7 @@
+import { APP_ROUTES } from 'app/app.routes';
 import type { ComponentType, MemoExoticComponent, ReactNode } from 'react';
-import React from 'react';
+import React, { useMemo } from 'react';
+import { Route, Routes } from 'react-router';
 
 //*****************************************************************************************
 // DisabledBoundary
@@ -53,3 +55,34 @@ export const ForbiddenBoundary = ({
 };
 
 ForbiddenBoundary.displayName = 'ForbiddenBoundary';
+
+//*****************************************************************************************
+// App Routes
+//*****************************************************************************************
+
+export type AppRoute = (typeof APP_ROUTES)[number];
+
+export type RoutesProps = {
+  href: string;
+  state?: any;
+};
+
+export const AppRoutes = React.memo(({ href, state }: RoutesProps) => {
+  const { pathname, search, hash } = useMemo(() => new URL(href, window.location.origin), [href]);
+
+  return (
+    <Routes location={{ pathname, search, hash, state }}>
+      {APP_ROUTES.map((route, i) => (
+        <Route
+          key={i}
+          path={route.path}
+          element={route.element}
+          loader={() => {
+            console.log('loader');
+          }}
+        />
+      ))}
+      <Route path="*" element={'null'} />
+    </Routes>
+  );
+});

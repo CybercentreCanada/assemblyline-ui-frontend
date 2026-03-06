@@ -1,10 +1,10 @@
 import { AppRouteKeyProvider, useAppRouterStore } from 'core/router';
+import { AppRoutes } from 'core/router/route/route.components';
 import { findNode, removePanel, sanitizeRouterStore, storeToNavigate } from 'core/router/router/router.utils';
 import { InPortal, OutPortal } from 'features/portal';
 import { Links } from 'pages/Links';
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router';
-import { AppRoutes } from './app.routes';
 
 //*****************************************************************************************
 // Panel View

@@ -1,7 +1,7 @@
-import type { AppRoute } from 'app/app.routes';
-import type { SearchParamEngine } from '../search-params/lib/search_params.engine';
-import type { SearchParamBlueprintMap } from '../search-params/lib/search_params.model';
-import type { SearchParamSnapshot } from '../search-params/lib/search_params.snapshot';
+import { AppRoute } from '../route/route.components';
+import type { SearchParamEngine } from '../search-params/lib/search-params.engine';
+import type { SearchParamBlueprintMap } from '../search-params/lib/search-params.model';
+import type { SearchParamSnapshot } from '../search-params/lib/search-params.snapshot';
 import { useAppRouteStore } from './route.providers';
 
 type RouteByPath<Path extends AppRoute['path']> = Extract<AppRoute, { path: Path }>;

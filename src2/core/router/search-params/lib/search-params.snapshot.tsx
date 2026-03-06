@@ -4,8 +4,8 @@ import type {
   ParamValues,
   SearchParamRuntimeMap,
   SearchParamValueMap
-} from '../lib/search_params.model';
-import type { ParamRuntime } from '../lib/search_params.runtime';
+} from '../lib/search-params.model';
+import type { ParamRuntime } from '../lib/search-params.runtime';
 
 export class SearchParamSnapshot<Blueprints extends Record<string, ParamBlueprints>> {
   constructor(
