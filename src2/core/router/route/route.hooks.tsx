@@ -1,4 +1,7 @@
 import type { AppRoute } from 'app/app.routes';
+import type { SearchParamEngine } from '../search-params/lib/search_params.engine';
+import type { SearchParamBlueprintMap } from '../search-params/lib/search_params.model';
+import type { SearchParamSnapshot } from '../search-params/lib/search_params.snapshot';
 import { useRouteStore } from './route.providers';
 
 type RouteByPath<Path extends AppRoute['path']> = Extract<AppRoute, { path: Path }>;
@@ -35,11 +38,14 @@ export function usePathParam<const Path extends AppRoute['path'], const Selector
 //*****************************************************************************************
 
 type SearchShape<Path extends AppRoute['path']> =
-  Exclude<RouteByPath<Path>['search'], undefined> extends { type: infer Params }
+  Exclude<RouteByPath<Path>['search'], undefined> extends never
     ? { search?: never }
-    : { search: Exclude<RouteByPath<Path>['search'], undefined> };
+    : { search: SearchParamValue<Path> };
 
-type SearchParamValue<Path extends AppRoute['path']> = Exclude<RouteByPath<Path>['search'], undefined>;
+type SearchParamValue<Path extends AppRoute['path']> =
+  Exclude<RouteByPath<Path>['search'], undefined> extends SearchParamEngine<infer Blueprints extends SearchParamBlueprintMap>
+    ? SearchParamSnapshot<Blueprints>
+    : never;
 
 // prettier-ignore
 export type SearchParamSelector<Path extends AppRoute['path'], SelectorOutput> =

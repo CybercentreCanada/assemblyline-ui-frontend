@@ -16,17 +16,11 @@ const Test = React.memo(({ test }: TestProps) => {
 export const SubmissionsPage = React.memo(() => {
   // const { fileID } = useParams();
 
-  const queryParam = usePathParam('/submissions/:query', s => s.query);
+  const query = usePathParam('/submissions/:query', s => s.query);
 
-  console.log(queryParam);
+  const offset = useSearchParam('/submissions/:query', s => s.get('offset'));
 
-  const query = useSearchParam('/submissions/:query', s => s.get('query'));
-
-  console.log(query);
-
-  const [rows] = useRouteStore(s => s);
-
-  console.log(rows);
+  const [search] = useRouteStore(s => s.search.toString());
 
   // const queryParam = useParams<typeof SubmissionsRoute>()(s => s.query);
 
@@ -66,6 +60,10 @@ export const SubmissionsPage = React.memo(() => {
     <div>
       <Links />
       <h1>Submissions</h1>
+
+      <div>{`query: ${query}`}</div>
+      <div>{`offset: ${offset}`}</div>
+      <div>{`search: ${search}`}</div>
 
       <button
         onClick={() => {

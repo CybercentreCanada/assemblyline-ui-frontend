@@ -7,7 +7,7 @@ import { SEARCH_PARAM_BLUEPRINTS_MAP } from '../search-params/lib/search_params.
 import { SearchParamEngine } from '../search-params/lib/search_params.engine';
 import { SearchParamBlueprintMap } from '../search-params/lib/search_params.model';
 import { DisabledBoundary, ForbiddenBoundary } from './route.components';
-import { CreateRouteHash, RoutePath } from './route.models';
+import { RouteHash, RouteMeta, RoutePath } from './route.models';
 import { RouteProvider } from './route.providers';
 
 //*****************************************************************************************
@@ -18,7 +18,7 @@ export type CreateRouteProps<
   Path extends RoutePath,
   Params extends PathParamBlueprintMap<Path>,
   Search extends SearchParamBlueprintMap,
-  Hash extends CreateRouteHash
+  Hash extends RouteHash
 > = {
   path: Path;
   params?: (blueprints: typeof PATH_PARAM_BLUEPRINTS_MAP) => Params;
@@ -36,17 +36,14 @@ export type CreateRouteProps<
   pendingComponent?: ReactNode | MemoExoticComponent<ComponentType<any>>;
   quotaExceededComponent?: ReactNode | MemoExoticComponent<ComponentType<any>>;
 
-  meta?: {
-    title?: string;
-    breadcrumb?: string | ((params: any) => string);
-  };
+  meta?: RouteMeta;
 };
 
 export const createRoute = <
   const Path extends RoutePath,
   const Params extends PathParamBlueprintMap<Path>,
   const Search extends SearchParamBlueprintMap,
-  const Hash extends CreateRouteHash
+  const Hash extends RouteHash
 >({
   path,
   params,
@@ -63,8 +60,6 @@ export const createRoute = <
 }: CreateRouteProps<Path, Params, Search, Hash>) => {
   void loading;
 
-  const content = toElement(component);
-
   const paramCodec = !params ? undefined : createPathParamsCodec<Path>(path)(params);
 
   const searchEngine = !search
@@ -73,28 +68,27 @@ export const createRoute = <
 
   const hashCodec = hash ?? (h => h);
 
-  const element = (
-    <ErrorBoundary
-      FallbackComponent={props => <div>{JSON.stringify(props)}</div>}
-      onReset={() => {
-        window.location.reload();
-      }}
-    >
-      <DisabledBoundary disabled={disabled} FallbackComponent={disabledComponent}>
-        <ForbiddenBoundary forbidden={forbidden} FallbackComponent={forbiddenComponent}>
-          <RouteProvider params={paramCodec} search={searchEngine}>
-            {content}
-          </RouteProvider>
-        </ForbiddenBoundary>
-      </DisabledBoundary>
-    </ErrorBoundary>
-  );
-
   return {
-    element,
     path,
     params: paramCodec,
-    search: !search ? undefined : searchEngine.fromLocation({ search: null } as any),
-    hash: hashCodec
+    search: searchEngine,
+    // search: !search ? undefined : searchEngine.fromLocation({ search: null } as any),
+    hash: hashCodec,
+    element: (
+      <ErrorBoundary
+        FallbackComponent={props => <div>{JSON.stringify(props)}</div>}
+        onReset={() => {
+          window.location.reload();
+        }}
+      >
+        <DisabledBoundary disabled={disabled} FallbackComponent={disabledComponent}>
+          <ForbiddenBoundary forbidden={forbidden} FallbackComponent={forbiddenComponent}>
+            <RouteProvider params={paramCodec} search={searchEngine}>
+              {toElement(component)}
+            </RouteProvider>
+          </ForbiddenBoundary>
+        </DisabledBoundary>
+      </ErrorBoundary>
+    )
   };
 };

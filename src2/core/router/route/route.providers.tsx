@@ -5,7 +5,7 @@ import { PathParamBlueprintMap, PathParamCodec } from '../path-params/path-param
 import { RouterStore } from '../router/router.models';
 import { SearchParamEngine } from '../search-params/lib/search_params.engine';
 import { SearchParamSnapshot } from '../search-params/lib/search_params.snapshot';
-import { CreateRouteHash, RoutePath } from './route.models';
+import { RouteHash, RoutePath } from './route.models';
 
 //*****************************************************************************************
 // Route Provider
@@ -15,7 +15,7 @@ export type RouteStore<
   Path extends RoutePath = RoutePath,
   Params extends PathParamCodec = any,
   Search extends SearchParamSnapshot<any> = SearchParamSnapshot<any>,
-  Hash extends CreateRouteHash = any
+  Hash extends RouteHash = any
 > = {
   params: Params;
   search: Search;
@@ -26,7 +26,7 @@ const createDefaultRouteStore = <
   Path extends RoutePath,
   Params extends PathParamCodec,
   Search extends SearchParamSnapshot<any>,
-  Hash extends CreateRouteHash
+  Hash extends RouteHash
 >(): RouteStore<Path, Params, Search, Hash> => ({
   params: null,
   search: null,
@@ -40,7 +40,7 @@ export type RouteProviderProps<
   Path extends RoutePath,
   Params extends PathParamBlueprintMap<Path>,
   Search extends SearchParamEngine<any>,
-  Hash extends CreateRouteHash
+  Hash extends RouteHash
 > = {
   children: React.ReactNode;
   params?: PathParamCodec<Params>;
@@ -52,7 +52,7 @@ export const RouteProvider = React.memo(function <
   const Path extends RoutePath,
   const Params extends PathParamBlueprintMap<Path>,
   const Search extends SearchParamEngine<any>,
-  const Hash extends CreateRouteHash
+  const Hash extends RouteHash
 >({ children, params, search, hash }: RouteProviderProps<Path, Params, Search, Hash>) {
   const location = useLocation() as Location<any>;
 
