@@ -1,6 +1,4 @@
-import { usePathParam, useSearchParam } from 'core/router/route/route.hooks';
-import { useRouteStore } from 'core/router/route/route.providers';
-import { createRoute } from 'core/router/route/route.utils';
+import { createAppRoute, useAppPathParams, useAppRouteStore, useAppSearchParams } from 'core/router';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { Links } from './Links';
@@ -16,11 +14,11 @@ const Test = React.memo(({ test }: TestProps) => {
 export const SubmissionsPage = React.memo(() => {
   // const { fileID } = useParams();
 
-  const query = usePathParam('/submissions/:query', s => s.query);
+  const query = useAppPathParams('/submissions/:query', s => s.query);
 
-  const offset = useSearchParam('/submissions/:query', s => s.get('offset'));
+  const offset = useAppSearchParams('/submissions/:query', s => s.get('offset'));
 
-  const [search] = useRouteStore(s => s.search.toString());
+  const [search] = useAppRouteStore(s => s.search.toString());
 
   // const queryParam = useParams<typeof SubmissionsRoute>()(s => s.query);
 
@@ -94,7 +92,7 @@ export const SubmissionsPage = React.memo(() => {
 
 SubmissionsPage.displayName = 'SubmissionsPage';
 
-export const SubmissionsRoute = createRoute({
+export const SubmissionsRoute = createAppRoute({
   component: SubmissionsPage,
   path: '/submissions/:query',
   params: s => ({

@@ -1,17 +1,17 @@
-import { Link } from 'core/router/navigate/navigate.components';
+import { AppLink } from 'core/router';
 import React from 'react';
 
 export const Links = React.memo(() => {
   return (
     <nav style={{ display: 'flex', gap: '8px', marginBottom: '12px', flexWrap: 'wrap' }}>
-      <Link path="/submit">Submit</Link>
-      <Link path="/page1">Page 1</Link>
-      <Link path="/page2/:fileID" params={{ fileID: 'asd' }}>
+      <AppLink path="/submit">Submit</AppLink>
+      <AppLink path="/page1">Page 1</AppLink>
+      <AppLink path="/page2/:fileID" params={{ fileID: 'asd' }}>
         Page 2
-      </Link>
-      <Link path="/submissions/:query" params={{ query: '123' }}>
+      </AppLink>
+      <AppLink path="/submissions/:query" params={{ query: '123' }}>
         Submission
-      </Link>
+      </AppLink>
     </nav>
   );
 });

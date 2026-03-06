@@ -11,7 +11,7 @@ import { RouteHash, RoutePath } from './route.models';
 // Route Provider
 //*****************************************************************************************
 
-export type RouteStore<
+export type AppRouteStore<
   Path extends RoutePath = RoutePath,
   Params extends PathParamCodec = any,
   Search extends SearchParamSnapshot<any> = SearchParamSnapshot<any>,
@@ -22,21 +22,21 @@ export type RouteStore<
   hash: Hash;
 };
 
-const createDefaultRouteStore = <
+const createDefaultAppRouteStore = <
   Path extends RoutePath,
   Params extends PathParamCodec,
   Search extends SearchParamSnapshot<any>,
   Hash extends RouteHash
->(): RouteStore<Path, Params, Search, Hash> => ({
+>(): AppRouteStore<Path, Params, Search, Hash> => ({
   params: null,
   search: null,
   hash: null
 });
 
-export const { StoreProvider: RouteStoreProvider, useStore: useRouteStore } =
-  createStoreContext<RouteStore>(createDefaultRouteStore());
+export const { StoreProvider: AppRouteStoreProvider, useStore: useAppRouteStore } =
+  createStoreContext<AppRouteStore>(createDefaultAppRouteStore());
 
-export type RouteProviderProps<
+export type AppRouteProviderProps<
   Path extends RoutePath,
   Params extends PathParamBlueprintMap<Path>,
   Search extends SearchParamEngine<any>,
@@ -48,12 +48,12 @@ export type RouteProviderProps<
   hash?: (hash: Location) => Hash;
 };
 
-export const RouteProvider = React.memo(function <
+export const AppRouteProvider = React.memo(function <
   const Path extends RoutePath,
   const Params extends PathParamBlueprintMap<Path>,
   const Search extends SearchParamEngine<any>,
   const Hash extends RouteHash
->({ children, params, search, hash }: RouteProviderProps<Path, Params, Search, Hash>) {
+>({ children, params, search, hash }: AppRouteProviderProps<Path, Params, Search, Hash>) {
   const location = useLocation() as Location<any>;
 
   const reset = useCallback(
@@ -65,41 +65,41 @@ export const RouteProvider = React.memo(function <
     [location]
   );
 
-  return <RouteStoreProvider data={reset}>{children}</RouteStoreProvider>;
+  return <AppRouteStoreProvider data={reset}>{children}</AppRouteStoreProvider>;
 });
 
-RouteProvider.displayName = 'RouteProvider';
+AppRouteProvider.displayName = 'AppRouteProvider';
 
 //*****************************************************************************************
 // Route Key Provider
 //*****************************************************************************************
 
-export type RouteKeyStore = {
+export type AppRouteKeyStore = {
   routeKey: keyof RouterStore['routes'];
 };
 
-const createDefaultRouteKeyStore = (): RouteKeyStore => ({
+const createDefaultAppRouteKeyStore = (): AppRouteKeyStore => ({
   routeKey: null
 });
 
-const { StoreProvider: RouteKeyStoreProvider, useStore: useRouteKeyStore } =
-  createStoreContext<RouteKeyStore>(createDefaultRouteKeyStore());
+export const { StoreProvider: AppRouteKeyStoreProvider, useStore: useAppRouteKeyStore } =
+  createStoreContext<AppRouteKeyStore>(createDefaultAppRouteKeyStore());
 
-RouteKeyStoreProvider.displayName = 'RouteKeyStoreProvider';
+AppRouteKeyStoreProvider.displayName = 'AppRouteKeyStoreProvider';
 
-export type RouteKeyStoreProviderProps = {
+export type AppRouteKeyStoreProviderProps = {
   children: React.ReactNode;
   routeKey: keyof RouterStore['routes'];
 };
 
-export const RouteKeyProvider = React.memo(({ children, routeKey }: RouteKeyStoreProviderProps) => (
-  <RouteKeyStoreProvider data={{ routeKey }}>{children}</RouteKeyStoreProvider>
+export const AppRouteKeyProvider = React.memo(({ children, routeKey }: AppRouteKeyStoreProviderProps) => (
+  <AppRouteKeyStoreProvider data={{ routeKey }}>{children}</AppRouteKeyStoreProvider>
 ));
 
-RouteKeyProvider.displayName = 'RouteKeyProvider';
+AppRouteKeyProvider.displayName = 'AppRouteKeyProvider';
 
-export const useRouteKey = () => {
-  const context = useRouteKeyStore(s => s.routeKey);
+export const useAppRouteKey = () => {
+  const context = useAppRouteKeyStore(s => s.routeKey);
   if (!context) return null;
   return context[0];
 };

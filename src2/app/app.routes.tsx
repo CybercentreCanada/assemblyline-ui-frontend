@@ -3,7 +3,7 @@ import Page2Route from 'pages/Page2';
 import SubmissionsRoute from 'pages/Submissions';
 import SubmitRoute from 'pages/Submit';
 import React, { useMemo } from 'react';
-import { Route, Routes as RouterRoutes } from 'react-router';
+import { Route, Routes } from 'react-router';
 
 //*****************************************************************************************
 // AppRoutes
@@ -21,7 +21,7 @@ export const AppRoutes = React.memo(({ href, state }: RoutesProps) => {
   const { pathname, search, hash } = useMemo(() => new URL(href, window.location.origin), [href]);
 
   return (
-    <RouterRoutes location={{ pathname, search, hash, state }}>
+    <Routes location={{ pathname, search, hash, state }}>
       {APP_ROUTES.map((route, i) => (
         <Route
           key={i}
@@ -33,6 +33,6 @@ export const AppRoutes = React.memo(({ href, state }: RoutesProps) => {
         />
       ))}
       <Route path="*" element={'null'} />
-    </RouterRoutes>
+    </Routes>
   );
 });

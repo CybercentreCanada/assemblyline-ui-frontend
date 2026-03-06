@@ -8,13 +8,13 @@ import { SearchParamEngine } from '../search-params/lib/search_params.engine';
 import { SearchParamBlueprintMap } from '../search-params/lib/search_params.model';
 import { DisabledBoundary, ForbiddenBoundary } from './route.components';
 import { RouteHash, RouteMeta, RoutePath } from './route.models';
-import { RouteProvider } from './route.providers';
+import { AppRouteProvider } from './route.providers';
 
 //*****************************************************************************************
 // Create Route
 //*****************************************************************************************
 
-export type CreateRouteProps<
+export type CreateAppRouteProps<
   Path extends RoutePath,
   Params extends PathParamBlueprintMap<Path>,
   Search extends SearchParamBlueprintMap,
@@ -39,7 +39,7 @@ export type CreateRouteProps<
   meta?: RouteMeta;
 };
 
-export const createRoute = <
+export const createAppRoute = <
   const Path extends RoutePath,
   const Params extends PathParamBlueprintMap<Path>,
   const Search extends SearchParamBlueprintMap,
@@ -57,7 +57,7 @@ export const createRoute = <
   component,
   forbiddenComponent,
   disabledComponent
-}: CreateRouteProps<Path, Params, Search, Hash>) => {
+}: CreateAppRouteProps<Path, Params, Search, Hash>) => {
   void loading;
 
   const paramCodec = !params ? undefined : createPathParamsCodec<Path>(path)(params);
@@ -83,9 +83,9 @@ export const createRoute = <
       >
         <DisabledBoundary disabled={disabled} FallbackComponent={disabledComponent}>
           <ForbiddenBoundary forbidden={forbidden} FallbackComponent={forbiddenComponent}>
-            <RouteProvider params={paramCodec} search={searchEngine}>
+            <AppRouteProvider params={paramCodec} search={searchEngine}>
               {toElement(component)}
-            </RouteProvider>
+            </AppRouteProvider>
           </ForbiddenBoundary>
         </DisabledBoundary>
       </ErrorBoundary>

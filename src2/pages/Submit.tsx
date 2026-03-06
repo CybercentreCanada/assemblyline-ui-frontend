@@ -1,4 +1,4 @@
-import { createRoute } from 'core/router/route/route.utils';
+import { createAppRoute } from 'core/router';
 import React, { useEffect, useState } from 'react';
 import { Links } from './Links';
 
@@ -129,6 +129,6 @@ export const SubmitPage = React.memo(() => {
 
 SubmitPage.displayName = 'SubmitPage';
 
-export const SubmitRoute = createRoute({ path: '/submit', component: SubmitPage });
+export const SubmitRoute = createAppRoute({ path: '/submit', component: SubmitPage });
 
 export default SubmitRoute;

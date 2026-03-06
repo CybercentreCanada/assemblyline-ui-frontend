@@ -1,4 +1,4 @@
-import { createRoute } from 'core/router/route/route.utils';
+import { createAppRoute } from 'core/router';
 import React, { useEffect, useState } from 'react';
 import { Links } from './Links';
 
@@ -35,7 +35,7 @@ export const Page2Page = React.memo(() => {
 
 Page2Page.displayName = 'Page2Page';
 
-export const Page2Route = createRoute({
+export const Page2Route = createAppRoute({
   component: Page2Page,
   path: '/page2/:fileID',
   params: p => ({ fileID: p.string() })

@@ -1,8 +1,8 @@
 import { AppRoute } from 'app/app.routes';
 import { useCallback } from 'react';
-import { useNavigate as useRouterNavigate } from 'react-router';
-import { useRouteKey } from '../route/route.providers';
-import { useRouterStore } from '../router/router.provider';
+import { useNavigate } from 'react-router';
+import { useAppRouteKey } from '../route/route.providers';
+import { useAppRouterStore } from '../router/router.provider';
 import {
   addRoute,
   findPanelKey,
@@ -27,10 +27,10 @@ type RouteInput<Route extends AppRoute> = Expand<
 
 export type NavigateTo = AppRoute extends infer Route ? (Route extends AppRoute ? RouteInput<Route> : never) : never;
 
-export const useNavigate = () => {
-  const routerNavigate = useRouterNavigate();
-  const routeKey = useRouteKey();
-  const [store] = useRouterStore(s => s);
+export const useAppNavigate = () => {
+  const routerNavigate = useNavigate();
+  const routeKey = useAppRouteKey();
+  const [store] = useAppRouterStore(s => s);
 
   let navigationStyle: 'push' | 'loop' = 'push';
 

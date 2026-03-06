@@ -9,7 +9,7 @@ import { locationToStore } from './router.utils';
 // RouterProvider
 //*****************************************************************************************
 
-const createDefaultRouterStore = (): RouterStore => ({
+const createDefaultAppRouterStore = (): RouterStore => ({
   maxPanels: 3,
   maxNodes: 3,
   panels: [],
@@ -17,17 +17,17 @@ const createDefaultRouterStore = (): RouterStore => ({
   routes: {}
 });
 
-export const { StoreProvider: RouterStoreProvider, useStore: useRouterStore } =
-  createStoreContext<RouterStore>(createDefaultRouterStore());
+export const { StoreProvider: AppRouterStoreProvider, useStore: useAppRouterStore } =
+  createStoreContext<RouterStore>(createDefaultAppRouterStore());
 
-export type RouterProviderProps = {
+export type AppRouterProviderProps = {
   children: React.ReactNode;
 };
 
-export const RouterProvider = React.memo(({ children }: RouterProviderProps) => {
+export const AppRouterProvider = React.memo(({ children }: AppRouterProviderProps) => {
   const location: Location<RouterState> = useLocation();
   const reset = useCallback((store: RouterStore) => locationToStore(store, location), [location]);
-  return <RouterStoreProvider data={reset}>{children}</RouterStoreProvider>;
+  return <AppRouterStoreProvider data={reset}>{children}</AppRouterStoreProvider>;
 });
 
-RouterProvider.displayName = 'RouterProvider';
+AppRouterStoreProvider.displayName = 'AppRouterStoreProvider';

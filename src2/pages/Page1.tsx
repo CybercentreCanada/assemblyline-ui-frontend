@@ -1,4 +1,4 @@
-import { createRoute } from 'core/router/route/route.utils';
+import { createAppRoute } from 'core/router';
 import { createReversePortalNode, InPortal, OutPortal } from 'features/portal';
 import React, { useEffect, useMemo, useState } from 'react';
 import { Links } from './Links';
@@ -101,6 +101,6 @@ export const Page1Page = React.memo(() => {
 
 Page1Page.displayName = 'Page1Page';
 
-export const Page1Route = createRoute({ path: '/page1', component: Page1Page });
+export const Page1Route = createAppRoute({ path: '/page1', component: Page1Page });
 
 export default Page1Route;
