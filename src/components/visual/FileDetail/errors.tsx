@@ -9,12 +9,12 @@ type ErrorSectionProps = {
   nocollapse?: boolean;
 };
 
-const WrappedErrorSection: React.FC<ErrorSectionProps> = ({ errors, nocollapse = false }) => {
+const WrappedErrorSection: React.FC<ErrorSectionProps> = ({ errors = [], nocollapse = false }) => {
   const { t } = useTranslation(['fileDetail']);
 
-  const parsedWarnings = useMemo<Error[]>(() => errors.filter(e => e?.severity === 'warning'), [errors]);
+  const parsedWarnings = useMemo<Error[]>(() => errors?.filter(e => e?.severity === 'warning'), [errors]);
 
-  const parsedErrors = useMemo<Error[]>(() => errors.filter(error => error?.severity !== 'warning'), [errors]);
+  const parsedErrors = useMemo<Error[]>(() => errors?.filter(error => error?.severity !== 'warning'), [errors]);
 
   return (
     <>
