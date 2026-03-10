@@ -2,6 +2,7 @@ import { TableOfContentProvider, useTableOfContent } from 'components/core/Table
 import useALContext from 'components/hooks/useALContext';
 import type { LibraryFormStore } from 'components/routes/development/library/contexts/form';
 import { FormProvider, useForm } from 'components/routes/development/library/contexts/form';
+import { ActionableSection } from 'components/routes/development/library/sections/Actionable';
 import { DateTimeSection } from 'components/routes/development/library/sections/DateTime';
 import { InputsSection } from 'components/routes/development/library/sections/Inputs';
 import { LayoutSection } from 'components/routes/development/library/sections/Layout';
@@ -35,6 +36,7 @@ const LibraryPageContentInnerComponent: React.FC<LibraryPageContentInnerProps> =
   const SectionComponent = useMemo<React.ReactNode>(() => {
     return (
       {
+        actionable: <ActionableSection />,
         datetime: <DateTimeSection />,
         inputs: <InputsSection />,
         layout: <LayoutSection />,
