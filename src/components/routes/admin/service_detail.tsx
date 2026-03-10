@@ -141,9 +141,7 @@ const Service = ({ name = null, onDeleted = () => null, onUpdated = () => null }
       });
       apiCall<string[]>({
         url: `/api/v4/service/versions/${nameOrSvc}/`,
-        onSuccess: api_data => {
-          setVersions(api_data.api_response);
-        }
+        onSuccess: api_data => setVersions(api_data.api_response)
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -161,7 +159,7 @@ const Service = ({ name = null, onDeleted = () => null, onUpdated = () => null }
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentUser.is_admin, nameOrSvc, serviceVersion]);
+  }, [currentUser.is_admin, service, serviceVersion]);
 
   useEffect(() => {
     // Set the global error flag based on each sub-error value
