@@ -1,5 +1,9 @@
 import { z } from 'zod';
-import type { Method } from '../../../../src/components/models/utils/request';
+// import type { Method } from '../../../../src/components/models/utils/request';
+// import type { RootRequests, RootResponses } from '../../../../src/components/models/ui';
+// import type { BadlistRequests, BadlistResponses } from '../../../../src/components/models/ui/badlist';
+// import type { SearchRequests, SearchResponses } from '../../../../src/components/models/ui/search';
+// import type { UserRequests, UserResponses } from '../../../../src/components/models/ui/user';
 
 export type APIRequest = {
   url: string;
@@ -39,18 +43,23 @@ export type APIQueryKey = [
   boolean // allowCache
 ];
 
-// export type APIQueryKey<Body extends object = object> = {
-//   body: Body;
-//   contentType: string;
-//   enabled: boolean;
-//   method: string;
-//   reloadOnUnauthorize: boolean;
-//   url: string;
-//   [key: string]: unknown;
-// };
+// prettier-ignore
+export type ALRequests =
+  | BadlistRequests
+  | RootRequests
+  | SearchRequests
+  | UserRequests
+
+// prettier-ignore
+export type ALResponses<Request extends ALRequests> =
+  Request extends BadlistRequests ? BadlistResponses<Request> :
+  Request extends RootRequests ? RootResponses<Request> :
+  Request extends SearchRequests ? SearchResponses<Request> :
+  Request extends UserRequests ? UserResponses<Request> :
+  never;
 
 //*****************************************************************************************
-// App Theme Settings & Config
+// App API Settings & Config
 //*****************************************************************************************
 
 export const AppAPISettingsSchema = z.object({

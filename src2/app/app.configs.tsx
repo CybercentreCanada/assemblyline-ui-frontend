@@ -11,6 +11,10 @@ export const DEFAULT_APP_CONFIG: AppConfig = {
   // config: {
   //   storageKey: 'al.storage'
   // },
+  quota: {
+    api: null,
+    submission: null
+  },
   router: {
     maxPanels: 3,
     maxNodes: 3

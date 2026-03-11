@@ -1,4 +1,4 @@
-import { AppAPIConfig, AppAPISettingsSchema } from 'core/api/components/api.models';
+import { AppAPIConfig, AppAPISettingsSchema } from 'core/api/api.models';
 import { AppRouterConfig, AppRouterSettingsSchema } from 'core/router/router/router.models';
 import { AppThemeConfig, AppThemeSettingsSchema } from 'core/theme/theme.models';
 import { z } from 'zod';
@@ -50,6 +50,7 @@ export type AppSettings = z.infer<typeof AppSettingsSchema>;
 
 export type AppConfig = {
   api: AppAPIConfig;
+  quota: { api: number; submission: number };
   router: AppRouterConfig;
   theme: AppThemeConfig;
 };

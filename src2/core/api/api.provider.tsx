@@ -3,9 +3,9 @@ import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import type { PersistedClient } from '@tanstack/react-query-persist-client';
 import { useAppConfigStore } from 'core/config';
-import React, { Activity, PropsWithChildren, useEffect, useMemo, useState } from 'react';
+import React, { Activity, PropsWithChildren, useEffect, useMemo } from 'react';
 import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
-import { APIQueryKey } from 'core/api';
+import type { APIQueryKey } from './api.models';
 import { compress, decompress } from 'lz-string';
 
 export const queryClient = new QueryClient({
