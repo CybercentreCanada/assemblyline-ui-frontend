@@ -1,10 +1,11 @@
 import { AppRouteKeyProvider, useAppRouterStore } from 'core/router';
 import { AppRoutes } from 'core/router/route/route.components';
-import { findNode, removePanel, sanitizeRouterStore, storeToNavigate } from 'core/router/router/router.utils';
+import { findNode, removePanel, storeToNavigate, sanitizeAppRouterStore } from 'core/router/router/router.utils';
 import { InPortal, OutPortal } from 'features/portal';
 import { Links } from 'pages/Links';
 import React from 'react';
 import { Link, useLocation, useNavigate } from 'react-router';
+import { useShallow } from 'zustand/react/shallow';
 
 //*****************************************************************************************
 // Panel View
@@ -16,17 +17,17 @@ type PanelViewProps = {
 const PanelView = React.memo(({ panelKey }: PanelViewProps) => {
   const routerNavigate = useNavigate();
 
-  const [store] = useAppRouterStore(s => s);
-  const [panel] = useAppRouterStore(s => s.panels?.[panelKey]);
-  const [node] = useAppRouterStore(s => findNode(s, { routeKey: panel?.routeKey }));
-  const [route] = useAppRouterStore(s => (node?.routeKey ? s.routes?.[node.routeKey] : null));
+  const store = useAppRouterStore(s => s);
+  const panel = useAppRouterStore(s => s.panels?.[panelKey]);
+  const node = useAppRouterStore(s => findNode(s, { routeKey: panel?.routeKey }));
+  const route = useAppRouterStore(s => (node?.routeKey ? s.routes?.[node.routeKey] : null));
 
   return (
     <div style={{ border: '1px solid grey', minHeight: '220px', padding: '8px' }}>
       <button
         onClick={() => {
           let nextStore = removePanel(store, panelKey);
-          nextStore = sanitizeRouterStore(nextStore);
+          nextStore = sanitizeAppRouterStore(nextStore);
           const nextLocation = storeToNavigate(nextStore);
           if (nextLocation) {
             routerNavigate(nextLocation.to, nextLocation.options);
@@ -53,8 +54,8 @@ type NodeMountProps = {
 };
 
 const NodeMount = React.memo(({ nodeKey }: NodeMountProps) => {
-  const [node] = useAppRouterStore(store => store.nodes[nodeKey]);
-  const [route] = useAppRouterStore(store => (node?.routeKey ? store.routes[node.routeKey] : null));
+  const node = useAppRouterStore(store => store.nodes[nodeKey]);
+  const route = useAppRouterStore(store => (node?.routeKey ? store.routes[node.routeKey] : null));
 
   if (!node || !route) return null;
 
@@ -74,11 +75,9 @@ NodeMount.displayName = 'NodeMount';
 //*****************************************************************************************
 
 export const AppRouter = React.memo(() => {
-  const location = useLocation();
-
-  const [store] = useAppRouterStore(s => s);
-  const [nbOfPanels] = useAppRouterStore(s => Math.max(s.panels?.length, 0));
-  const [nodeKeys] = useAppRouterStore(s => Object.keys(s.nodes).toString());
+  const store = useAppRouterStore(s => s);
+  const nbOfPanels = useAppRouterStore(s => Math.max(s.panels?.length, 0));
+  const nodeKeys = useAppRouterStore(useShallow(s => Object.keys(s.nodes)));
 
   return (
     <>
@@ -102,7 +101,7 @@ export const AppRouter = React.memo(() => {
       </div>
 
       <div style={{ display: 'none' }}>
-        {nodeKeys.split(',').map(nodeKey => (
+        {nodeKeys.map(nodeKey => (
           <NodeMount key={nodeKey} nodeKey={nodeKey} />
         ))}
       </div>

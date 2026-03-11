@@ -1,11 +1,11 @@
-import { createStoreContext } from 'features/store/createStoreContext';
 import React, { useCallback } from 'react';
 import { Location, useLocation } from 'react-router';
 import { PathParamBlueprintMap, PathParamCodec } from '../path-params/path-params.models';
-import { RouterStore } from '../router/router.models';
+import { AppRouterStore } from '../router/router.models';
 import { SearchParamEngine } from '../search-params/lib/search-params.engine';
 import { SearchParamSnapshot } from '../search-params/lib/search-params.snapshot';
 import { RouteHash, RoutePath } from './route.models';
+import { createAppStore } from 'features/store/createAppStore';
 
 //*****************************************************************************************
 // Route Provider
@@ -33,8 +33,11 @@ const createDefaultAppRouteStore = <
   hash: null
 });
 
-export const { StoreProvider: AppRouteStoreProvider, useStore: useAppRouteStore } =
-  createStoreContext<AppRouteStore>(createDefaultAppRouteStore());
+export const {
+  StoreProvider: AppRouteStoreProvider,
+  useStore: useAppRouteStore,
+  useSetStore: useAppRouteSetStore
+} = createAppStore<AppRouteStore>(createDefaultAppRouteStore());
 
 export type AppRouteProviderProps<
   Path extends RoutePath,
@@ -75,21 +78,24 @@ AppRouteProvider.displayName = 'AppRouteProvider';
 //*****************************************************************************************
 
 export type AppRouteKeyStore = {
-  routeKey: keyof RouterStore['routes'];
+  routeKey: keyof AppRouterStore['routes'];
 };
 
 const createDefaultAppRouteKeyStore = (): AppRouteKeyStore => ({
   routeKey: null
 });
 
-export const { StoreProvider: AppRouteKeyStoreProvider, useStore: useAppRouteKeyStore } =
-  createStoreContext<AppRouteKeyStore>(createDefaultAppRouteKeyStore());
+export const {
+  StoreProvider: AppRouteKeyStoreProvider,
+  useStore: useAppRouteKeyStore,
+  useSetStore: useAppRouteKeySetStore
+} = createAppStore<AppRouteKeyStore>(createDefaultAppRouteKeyStore());
 
 AppRouteKeyStoreProvider.displayName = 'AppRouteKeyStoreProvider';
 
 export type AppRouteKeyStoreProviderProps = {
   children: React.ReactNode;
-  routeKey: keyof RouterStore['routes'];
+  routeKey: keyof AppRouterStore['routes'];
 };
 
 export const AppRouteKeyProvider = React.memo(({ children, routeKey }: AppRouteKeyStoreProviderProps) => (
@@ -100,72 +106,5 @@ AppRouteKeyProvider.displayName = 'AppRouteKeyProvider';
 
 export const useAppRouteKey = () => {
   const context = useAppRouteKeyStore(s => s.routeKey);
-  if (!context) return null;
-  return context[0];
+  return !context ? null : context;
 };
-
-// //*****************************************************************************************
-// // Context
-// //*****************************************************************************************
-
-// export type RouteContextProps<Path extends string, Search extends SearchParamBlueprints, Hash extends string> = {
-//   path?: string;
-//   params?: PathParamParser;
-//   search?: SearchParamBlueprints;
-//   hash?: string;
-// };
-
-// const RouteContext = createContext<RouteContextProps<string, {}, string> | null>(null);
-
-// RouteContext.displayName = 'RouteContext';
-
-// //*****************************************************************************************
-// // Provider
-// //*****************************************************************************************
-
-// export type RouteParamsProp<Path extends string> = [PathParamKeys<Path>] extends [never]
-//   ? { params?: undefined }
-//   : { params?: (blueprints: typeof PATH_PARAM_BLUEPRINTS) => PathParamBlueprintsForPath<Path> };
-
-// export type RouteProviderProps<Path extends string, Search extends SearchParamBlueprints, Hash extends string> = {
-//   children: React.ReactNode;
-//   path?: Path;
-//   search?: (blueprints: typeof PARAM_BLUEPRINTS) => Search;
-//   hash?: Hash;
-// } & RouteParamsProp<Path>;
-
-// export const RouteProvider = React.memo(
-//   <Path extends string, Search extends SearchParamBlueprints, Hash extends string>({
-//     children,
-//     path,
-//     params,
-//     search,
-//     hash
-//   }: RouteProviderProps<Path, Search, Hash>) => {
-//     const paramsParser = useMemo(() => (params ? createPathParams(params) : undefined), [params]);
-
-//     const searchParser = useMemo(() => (search ? createSearchParams(search) : undefined), [search]);
-
-//     const value = useMemo<RouteContextProps<Path, Search, Hash>>(
-//       () => ({ path, params: paramsParser, search: searchParser, hash }),
-//       [path, paramsParser, searchParser, hash]
-//     );
-
-//     return <RouteContext.Provider value={value}>{children}</RouteContext.Provider>;
-//   }
-// );
-
-// RouteProvider.displayName = 'RouteProvider';
-
-// //*****************************************************************************************
-// // Hook
-// //*****************************************************************************************
-// export const useRoute = () => {
-//   const context = useContext(RouteContext);
-
-//   if (!context) {
-//     throw new Error('useRoute must be used inside RouteProvider');
-//   }
-
-//   return context;
-// };

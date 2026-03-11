@@ -2,12 +2,12 @@ import { createReversePortalNode } from 'features/portal';
 import { deepCompare, generateRandomUUID } from 'lib/utils/app.utils';
 import type { Location, NavigateOptions, To } from 'react-router';
 import {
-  DEFAULT_ROUTER_NODE,
-  DEFAULT_ROUTER_PANEL,
-  DEFAULT_ROUTER_ROUTE,
+  DEFAULT_APP_ROUTER_NODE,
+  DEFAULT_APP_ROUTER_PANEL,
+  DEFAULT_APP_ROUTER_ROUTE,
   ROUTER_STORE_EXAMPLE
 } from './router.defaults';
-import { RouterState, RouterStore } from './router.models';
+import { AppRouterState, AppRouterStore } from './router.models';
 
 //*****************************************************************************************
 // Panel
@@ -20,7 +20,10 @@ import { RouterState, RouterStore } from './router.models';
  * @param partialPanel - Partial panel matcher
  * @returns Matching panel index, or -1 when not found
  */
-export const findPanelKey = (store: RouterStore, partialPanel: Partial<RouterStore['panels'][number]>): number => {
+export const findPanelKey = (
+  store: AppRouterStore,
+  partialPanel: Partial<AppRouterStore['panels'][number]>
+): number => {
   for (let i = 0; i < store.panels.length; i++) {
     if (partialPanel?.routeKey && store.panels[i].routeKey === partialPanel?.routeKey) return i;
     else if (partialPanel?.temporaryRouteKey && store.panels[i].temporaryRouteKey === partialPanel?.temporaryRouteKey)
@@ -48,9 +51,9 @@ export const findPanelKey = (store: RouterStore, partialPanel: Partial<RouterSto
  * @returns Matching panel, or null when not found
  */
 export const findPanel = (
-  store: RouterStore,
-  partialPanel: Partial<RouterStore['panels'][number]>
-): RouterStore['panels'][number] => {
+  store: AppRouterStore,
+  partialPanel: Partial<AppRouterStore['panels'][number]>
+): AppRouterStore['panels'][number] => {
   const panelKey = findPanelKey(store, partialPanel);
   return panelKey >= 0 ? store.panels[panelKey] : null;
 };
@@ -62,7 +65,7 @@ export const findPanel = (
  * @param panelKey - Panel index to remove
  * @returns Updated router store
  */
-export const removePanel = (store: RouterStore, panelKey: number): RouterStore => {
+export const removePanel = (store: AppRouterStore, panelKey: number): AppRouterStore => {
   if (panelKey < 0 || panelKey >= store.panels.length) return store;
   store.panels.splice(panelKey, 1);
   return store;
@@ -75,7 +78,7 @@ export const removePanel = (store: RouterStore, panelKey: number): RouterStore =
  * @param panelKey - Panel index to evaluate
  * @returns Updated router store
  */
-export const removeEmptyPanel = (store: RouterStore, panelKey: number): RouterStore => {
+export const removeEmptyPanel = (store: AppRouterStore, panelKey: number): AppRouterStore => {
   if (panelKey < 0 || panelKey >= store.panels.length) return store;
 
   if (
@@ -99,10 +102,10 @@ export const removeEmptyPanel = (store: RouterStore, panelKey: number): RouterSt
  * @returns Updated router store
  */
 export const updatePanel = (
-  store: RouterStore,
+  store: AppRouterStore,
   panelKey: number,
-  partialPanel: Partial<RouterStore['panels'][number]> = null
-): RouterStore => {
+  partialPanel: Partial<AppRouterStore['panels'][number]> = null
+): AppRouterStore => {
   if (panelKey < 0 || panelKey >= store.panels.length) return store;
 
   if (partialPanel && 'routeKey' in partialPanel) {
@@ -132,7 +135,7 @@ export const updatePanel = (
  * @param panelKeyB - Source panel index
  * @returns Updated router store
  */
-export const mergePanels = (store: RouterStore, panelKeyA: number, panelKeyB: number): RouterStore => {
+export const mergePanels = (store: AppRouterStore, panelKeyA: number, panelKeyB: number): AppRouterStore => {
   if (panelKeyA < 0 || panelKeyB < 0 || panelKeyA >= store.panels.length || panelKeyB >= store.panels.length) {
     return store;
   }
@@ -158,11 +161,11 @@ export const mergePanels = (store: RouterStore, panelKeyA: number, panelKeyB: nu
  * @returns Tuple of updated store and route key
  */
 export const setPanel = (
-  store: RouterStore,
+  store: AppRouterStore,
   panelKey: number,
-  partialPanel: Partial<RouterStore['panels'][number]>
-): RouterStore => {
-  store.panels[panelKey] = { ...DEFAULT_ROUTER_PANEL, ...partialPanel };
+  partialPanel: Partial<AppRouterStore['panels'][number]>
+): AppRouterStore => {
+  store.panels[panelKey] = { ...DEFAULT_APP_ROUTER_PANEL, ...partialPanel };
   return store;
 };
 
@@ -175,14 +178,14 @@ export const setPanel = (
  * @returns Tuple of updated store and inserted index
  */
 export const insertLeftPanel = (
-  store: RouterStore,
+  store: AppRouterStore,
   panelKey: number = 0,
-  partialPanel: Partial<RouterStore['panels'][number]> = null
-): [RouterStore, number] => {
+  partialPanel: Partial<AppRouterStore['panels'][number]> = null
+): [AppRouterStore, number] => {
   if (store.maxPanels <= 0) return [store, null];
 
   const panelIndex = Math.min(Math.max(0, Math.trunc(panelKey)), store.panels.length - 1);
-  store.panels.splice(panelIndex, 0, { ...DEFAULT_ROUTER_PANEL, ...partialPanel });
+  store.panels.splice(panelIndex, 0, { ...DEFAULT_APP_ROUTER_PANEL, ...partialPanel });
   if (store.panels.length > store.maxPanels) store.panels.splice(-1, 1);
   return [store, panelIndex];
 };
@@ -196,14 +199,14 @@ export const insertLeftPanel = (
  * @returns Tuple of updated store and inserted index
  */
 export const insertRightPanel = (
-  store: RouterStore,
+  store: AppRouterStore,
   sourcePanelKey: number = store.panels.length - 1,
-  partialPanel: Partial<RouterStore['panels'][number]> = null
-): [RouterStore, number] => {
+  partialPanel: Partial<AppRouterStore['panels'][number]> = null
+): [AppRouterStore, number] => {
   if (store.maxPanels <= 0) return [store, null];
 
   const panelIndex = Math.min(Math.max(0, Math.trunc(sourcePanelKey)), store.panels.length - 1);
-  store.panels.splice(panelIndex + 1, 0, { ...DEFAULT_ROUTER_PANEL, ...partialPanel });
+  store.panels.splice(panelIndex + 1, 0, { ...DEFAULT_APP_ROUTER_PANEL, ...partialPanel });
 
   if (store.panels.length > store.maxPanels) {
     store.panels.splice(0, 1);
@@ -222,10 +225,10 @@ export const insertRightPanel = (
  * @returns Tuple of updated store and resolved panel index
  */
 export const upsertPanel = (
-  store: RouterStore,
+  store: AppRouterStore,
   panelKey: number = store.panels.length - 1,
-  partialPanel: Partial<RouterStore['panels'][number]> = null
-): [RouterStore, number] => {
+  partialPanel: Partial<AppRouterStore['panels'][number]> = null
+): [AppRouterStore, number] => {
   if (panelKey >= 0 && panelKey < store.panels.length) store = updatePanel(store, panelKey, partialPanel);
   else [store, panelKey] = insertRightPanel(store, panelKey, partialPanel);
   return [store, panelKey];
@@ -238,7 +241,7 @@ export const upsertPanel = (
  * @param panelKey - Panel index to sanitize
  * @returns Updated router store
  */
-export const filterPanelMissingRouteKeys = (store: RouterStore, panelKey: number): RouterStore => {
+export const filterPanelMissingRouteKeys = (store: AppRouterStore, panelKey: number): AppRouterStore => {
   if (panelKey < 0 || panelKey >= store.panels.length) return store;
 
   if (!(store.panels[panelKey].routeKey in store.routes)) {
@@ -271,11 +274,11 @@ export const filterPanelMissingRouteKeys = (store: RouterStore, panelKey: number
  * @param panelKey - Panel index to update
  * @returns Updated router store
  */
-export const setPanelActiveRoute = (store: RouterStore, panelKey: number): RouterStore => {
+export const setPanelActiveRoute = (store: AppRouterStore, panelKey: number): AppRouterStore => {
   if (panelKey < 0 || panelKey >= store.panels.length || store.panels[panelKey].routeKey) return store;
 
   const panel = store.panels[panelKey];
-  let youngestRouteKey: keyof RouterStore['routes'] = null;
+  let youngestRouteKey: keyof AppRouterStore['routes'] = null;
   let youngestAge = Infinity;
   const candidates = new Set([panel.temporaryRouteKey, ...panel.tabbedRouteKeys, ...panel.pinnedRouteKeys]);
 
@@ -301,7 +304,7 @@ export const setPanelActiveRoute = (store: RouterStore, panelKey: number): Route
  * @param store - Router store
  * @returns Updated router store
  */
-export const sanitizePanels = (store: RouterStore): RouterStore => {
+export const sanitizePanels = (store: AppRouterStore): AppRouterStore => {
   for (let i = store.panels.length - 1; i >= 0; i--) {
     store = filterPanelMissingRouteKeys(store, i);
     store = removeEmptyPanel(store, i);
@@ -328,8 +331,8 @@ export const sanitizePanels = (store: RouterStore): RouterStore => {
  * @param store - Router store
  * @returns Oldest node key, or null
  */
-export const findOldestNodeKey = (store: RouterStore): keyof RouterStore['nodes'] => {
-  let oldestNodeKey: keyof RouterStore['nodes'] = null;
+export const findOldestNodeKey = (store: AppRouterStore): keyof AppRouterStore['nodes'] => {
+  let oldestNodeKey: keyof AppRouterStore['nodes'] = null;
   let oldestAge = -Infinity;
 
   for (const nodeKey in store.nodes) {
@@ -353,9 +356,9 @@ export const findOldestNodeKey = (store: RouterStore): keyof RouterStore['nodes'
  * @returns Matching node key, or null
  */
 export const findNodeKey = (
-  store: RouterStore,
-  partialNode: Partial<RouterStore['nodes']['string']>
-): keyof RouterStore['nodes'] => {
+  store: AppRouterStore,
+  partialNode: Partial<AppRouterStore['nodes']['string']>
+): keyof AppRouterStore['nodes'] => {
   const node = Object.entries(store.nodes).find(
     ([key, node]) => partialNode?.routeKey && node?.routeKey === partialNode?.routeKey
   );
@@ -370,9 +373,9 @@ export const findNodeKey = (
  * @returns Matching node, or null
  */
 export const findNode = (
-  store: RouterStore,
-  partialNode: Partial<RouterStore['nodes']['string']>
-): RouterStore['nodes'][string] => {
+  store: AppRouterStore,
+  partialNode: Partial<AppRouterStore['nodes']['string']>
+): AppRouterStore['nodes'][string] => {
   const nodeKey = findNodeKey(store, partialNode);
   return store.nodes?.[nodeKey] ?? null;
 };
@@ -383,7 +386,7 @@ export const findNode = (
  * @param store - Router store
  * @returns Updated router store with one node removed when available
  */
-export const removeNode = (store: RouterStore, nodeKey: keyof RouterStore['nodes']): RouterStore => {
+export const removeNode = (store: AppRouterStore, nodeKey: keyof AppRouterStore['nodes']): AppRouterStore => {
   if (!(nodeKey in store.nodes)) return store;
   delete store.nodes[nodeKey];
   return store;
@@ -398,10 +401,10 @@ export const removeNode = (store: RouterStore, nodeKey: keyof RouterStore['nodes
  * @returns Updated router store
  */
 export const updateNode = (
-  store: RouterStore,
-  nodeKey: keyof RouterStore['nodes'],
-  partialNode: Partial<RouterStore['nodes'][number]> = null
-): RouterStore => {
+  store: AppRouterStore,
+  nodeKey: keyof AppRouterStore['nodes'],
+  partialNode: Partial<AppRouterStore['nodes'][number]> = null
+): AppRouterStore => {
   if (!(nodeKey in store.nodes)) return store;
 
   if (partialNode?.routeKey) {
@@ -423,11 +426,11 @@ export const updateNode = (
  * @returns Tuple of updated store and route key
  */
 export const setNode = (
-  store: RouterStore,
-  nodeKey: keyof RouterStore['nodes'],
-  partialNode: Partial<RouterStore['nodes'][string]>
-): RouterStore => {
-  store.nodes[nodeKey] = { ...DEFAULT_ROUTER_NODE, ...partialNode };
+  store: AppRouterStore,
+  nodeKey: keyof AppRouterStore['nodes'],
+  partialNode: Partial<AppRouterStore['nodes'][string]>
+): AppRouterStore => {
+  store.nodes[nodeKey] = { ...DEFAULT_APP_ROUTER_NODE, ...partialNode };
   return store;
 };
 
@@ -439,11 +442,11 @@ export const setNode = (
  * @returns Tuple of updated store and new node key
  */
 export const addNode = (
-  store: RouterStore,
-  partialNode: Partial<RouterStore['nodes']['string']> = null
-): [RouterStore, keyof RouterStore['nodes']] => {
+  store: AppRouterStore,
+  partialNode: Partial<AppRouterStore['nodes']['string']> = null
+): [AppRouterStore, keyof AppRouterStore['nodes']] => {
   const nodeKey = generateRandomUUID(Object.keys(store.nodes));
-  store.nodes[nodeKey] = { ...DEFAULT_ROUTER_NODE, ...partialNode, portal: createReversePortalNode() };
+  store.nodes[nodeKey] = { ...DEFAULT_APP_ROUTER_NODE, ...partialNode, portal: createReversePortalNode() };
   return [store, nodeKey];
 };
 
@@ -456,10 +459,10 @@ export const addNode = (
  * @returns Tuple of updated store and resolved node key
  */
 export const upsertNode = (
-  store: RouterStore,
-  nodeKey: keyof RouterStore['nodes'] = null,
-  partialNode: Partial<RouterStore['nodes']['string']> = null
-): [RouterStore, keyof RouterStore['nodes']] => {
+  store: AppRouterStore,
+  nodeKey: keyof AppRouterStore['nodes'] = null,
+  partialNode: Partial<AppRouterStore['nodes']['string']> = null
+): [AppRouterStore, keyof AppRouterStore['nodes']] => {
   if (nodeKey in store.nodes) store = updateNode(store, nodeKey, partialNode);
   else [store, nodeKey] = addNode(store, partialNode);
   return [store, nodeKey];
@@ -471,7 +474,7 @@ export const upsertNode = (
  * @param store - Router store
  * @returns Updated router store
  */
-export const filterOrphanedNodes = (store: RouterStore): RouterStore => {
+export const filterOrphanedNodes = (store: AppRouterStore): AppRouterStore => {
   Object.keys(store.nodes).forEach(nodeKey => {
     if (!(store.nodes[nodeKey].routeKey in store.routes)) {
       delete store.nodes[nodeKey];
@@ -487,7 +490,7 @@ export const filterOrphanedNodes = (store: RouterStore): RouterStore => {
  * @param store - Router store
  * @returns Updated router store
  */
-export const addMissingNodes = (store: RouterStore): RouterStore => {
+export const addMissingNodes = (store: AppRouterStore): AppRouterStore => {
   for (const [, panel] of store.panels.entries()) {
     if (!panel.routeKey) continue;
     const nodeKey = findNodeKey(store, { routeKey: panel.routeKey });
@@ -503,7 +506,7 @@ export const addMissingNodes = (store: RouterStore): RouterStore => {
  * @param store - Router store
  * @returns Updated router store
  */
-export const removeOldestNodes = (store: RouterStore): RouterStore => {
+export const removeOldestNodes = (store: AppRouterStore): AppRouterStore => {
   while (Object.keys(store.nodes).length > store.maxPanels + store.maxNodes) {
     const nodeKey = findOldestNodeKey(store);
     store = removeNode(store, nodeKey);
@@ -518,7 +521,7 @@ export const removeOldestNodes = (store: RouterStore): RouterStore => {
  * @param store - Router store
  * @returns Updated router store
  */
-export const sanitizeNodes = (store: RouterStore): RouterStore => {
+export const sanitizeNodes = (store: AppRouterStore): AppRouterStore => {
   store = filterOrphanedNodes(store);
   store = addMissingNodes(store);
   store = removeOldestNodes(store);
@@ -536,7 +539,10 @@ export const sanitizeNodes = (store: RouterStore): RouterStore => {
  * @param route - Route value to find
  * @returns Matching route key, or null if none is found
  */
-export const findRouteKey = (store: RouterStore, route: RouterStore['routes'][string]): keyof RouterStore['routes'] => {
+export const findRouteKey = (
+  store: AppRouterStore,
+  route: AppRouterStore['routes'][string]
+): keyof AppRouterStore['routes'] => {
   for (const routeKey in store.routes) {
     if (deepCompare(route, store.routes[routeKey])) return routeKey;
   }
@@ -550,7 +556,10 @@ export const findRouteKey = (store: RouterStore, route: RouterStore['routes'][st
  * @param route - Route value to find
  * @returns Matching route object, or null if none is found
  */
-export const findRoute = (store: RouterStore, route: RouterStore['routes'][string]): RouterStore['routes'][string] => {
+export const findRoute = (
+  store: AppRouterStore,
+  route: AppRouterStore['routes'][string]
+): AppRouterStore['routes'][string] => {
   const key = findRouteKey(store, route);
   return key !== null ? store.routes[key] : null;
 };
@@ -562,7 +571,7 @@ export const findRoute = (store: RouterStore, route: RouterStore['routes'][strin
  * @param routeKey - Route key to remove
  * @returns Updated router store
  */
-export const removeRoute = (store: RouterStore, routeKey: keyof RouterStore['routes']): RouterStore => {
+export const removeRoute = (store: AppRouterStore, routeKey: keyof AppRouterStore['routes']): AppRouterStore => {
   if (!(routeKey in store.routes)) return store;
   delete store.routes[routeKey];
   return store;
@@ -577,10 +586,10 @@ export const removeRoute = (store: RouterStore, routeKey: keyof RouterStore['rou
  * @returns Updated router store
  */
 export const updateRoute = (
-  store: RouterStore,
-  routeKey: keyof RouterStore['routes'],
-  partialRoute: Partial<RouterStore['routes'][string]> = null
-): RouterStore => {
+  store: AppRouterStore,
+  routeKey: keyof AppRouterStore['routes'],
+  partialRoute: Partial<AppRouterStore['routes'][string]> = null
+): AppRouterStore => {
   if (!(routeKey in store.routes)) return store;
 
   if (partialRoute && 'href' in partialRoute) {
@@ -606,11 +615,11 @@ export const updateRoute = (
  * @returns Tuple of updated store and route key
  */
 export const setRoute = (
-  store: RouterStore,
-  routeKey: keyof RouterStore['routes'],
-  partialRoute: Partial<RouterStore['routes'][string]>
-): RouterStore => {
-  store.routes[routeKey] = { ...DEFAULT_ROUTER_ROUTE, ...partialRoute };
+  store: AppRouterStore,
+  routeKey: keyof AppRouterStore['routes'],
+  partialRoute: Partial<AppRouterStore['routes'][string]>
+): AppRouterStore => {
+  store.routes[routeKey] = { ...DEFAULT_APP_ROUTER_ROUTE, ...partialRoute };
   return store;
 };
 
@@ -622,11 +631,11 @@ export const setRoute = (
  * @returns Tuple of updated store and route key
  */
 export const addRoute = (
-  store: RouterStore,
-  partialRoute: Partial<RouterStore['routes'][string]>
-): [RouterStore, keyof RouterStore['routes']] => {
+  store: AppRouterStore,
+  partialRoute: Partial<AppRouterStore['routes'][string]>
+): [AppRouterStore, keyof AppRouterStore['routes']] => {
   const routeKey = generateRandomUUID(Object.keys(store.routes));
-  store.routes[routeKey] = { ...DEFAULT_ROUTER_ROUTE, ...partialRoute };
+  store.routes[routeKey] = { ...DEFAULT_APP_ROUTER_ROUTE, ...partialRoute };
   return [store, routeKey];
 };
 
@@ -639,14 +648,14 @@ export const addRoute = (
  * @returns Updated router store
  */
 export const addRouteToPanel = (
-  store: RouterStore,
+  store: AppRouterStore,
   panelKey: number,
-  partialRoute: Partial<RouterStore['routes'][string]>
-): RouterStore => {
+  partialRoute: Partial<AppRouterStore['routes'][string]>
+): AppRouterStore => {
   if (store.panels.length === 0 || panelKey < 0 || panelKey >= store.panels.length) return store;
 
   const newRouteKey = generateRandomUUID(Object.keys(store.routes));
-  store.routes[newRouteKey] = { ...DEFAULT_ROUTER_ROUTE, ...partialRoute };
+  store.routes[newRouteKey] = { ...DEFAULT_APP_ROUTER_ROUTE, ...partialRoute };
   store.panels[panelKey].routeKey = newRouteKey;
   store.panels[panelKey].temporaryRouteKey = newRouteKey;
 
@@ -662,10 +671,10 @@ export const addRouteToPanel = (
  * @returns Tuple of updated store and resolved route key
  */
 export const upsertRoute = (
-  store: RouterStore,
-  routeKey: keyof RouterStore['routes'],
-  partialRoute: Partial<RouterStore['routes'][string]>
-): [RouterStore, keyof RouterStore['routes']] => {
+  store: AppRouterStore,
+  routeKey: keyof AppRouterStore['routes'],
+  partialRoute: Partial<AppRouterStore['routes'][string]>
+): [AppRouterStore, keyof AppRouterStore['routes']] => {
   if (routeKey in store.routes) store = updateRoute(store, routeKey, partialRoute);
   else [store, routeKey] = addRoute(store, partialRoute);
   return [store, routeKey];
@@ -677,7 +686,7 @@ export const upsertRoute = (
  * @param store - Router store
  * @returns Updated router store
  */
-export const refreshRouteAges = (store: RouterStore): RouterStore => {
+export const refreshRouteAges = (store: AppRouterStore): AppRouterStore => {
   const orderedEntries = Object.entries(store.routes).sort(([routeKeyA, routeA], [routeKeyB, routeB]) => {
     const aIsDisplayed = findPanelKey(store, { routeKey: routeKeyA }) >= 0;
     const bIsDisplayed = findPanelKey(store, { routeKey: routeKeyB }) >= 0;
@@ -700,7 +709,7 @@ export const refreshRouteAges = (store: RouterStore): RouterStore => {
  * @param store - Router store
  * @returns Updated router store with orphaned routes removed
  */
-export const filterOrphanedRoutes = (store: RouterStore) => {
+export const filterOrphanedRoutes = (store: AppRouterStore) => {
   const activeRoutes = new Set<string>();
 
   for (const panel of store.panels) {
@@ -738,7 +747,7 @@ export const filterOrphanedRoutes = (store: RouterStore) => {
  * @param store - Router store
  * @returns Updated router store with orphaned routes removed
  */
-export const sanitizeRoutes = (store: RouterStore): RouterStore => {
+export const sanitizeRoutes = (store: AppRouterStore): AppRouterStore => {
   store = filterOrphanedRoutes(store);
   store = refreshRouteAges(store);
   return store;
@@ -757,10 +766,10 @@ export const sanitizeRoutes = (store: RouterStore): RouterStore => {
  * @returns Router store (currently unchanged)
  */
 export const showPreviousTab = (
-  store: RouterStore,
-  panelKey: keyof RouterStore['routes'],
+  store: AppRouterStore,
+  panelKey: keyof AppRouterStore['routes'],
   source: 'active' | 'temporary' | 'tabbed' | 'pinned' = null
-): RouterStore => {
+): AppRouterStore => {
   return store;
 };
 
@@ -773,10 +782,10 @@ export const showPreviousTab = (
  * @returns Updated router store
  */
 export const removeTabFromPanel = (
-  store: RouterStore,
+  store: AppRouterStore,
   panelKey: number = null,
-  routeKey: keyof RouterStore['routes'] = null
-): RouterStore => {
+  routeKey: keyof AppRouterStore['routes'] = null
+): AppRouterStore => {
   if (panelKey === null || panelKey < 0 || panelKey >= store.panels.length) return store;
   const panel = store.panels[panelKey];
 
@@ -799,7 +808,7 @@ export const removeTabFromPanel = (
  * @param routeKey - Route key to remove
  * @returns Updated router store
  */
-export const removeTab = (store: RouterStore, routeKey: keyof RouterStore['routes'] = null): RouterStore => {
+export const removeTab = (store: AppRouterStore, routeKey: keyof AppRouterStore['routes'] = null): AppRouterStore => {
   for (let i = 0; i < store.panels.length; i++) {
     store = removeTabFromPanel(store, i, routeKey);
   }
@@ -817,11 +826,11 @@ export const removeTab = (store: RouterStore, routeKey: keyof RouterStore['route
  * @returns Updated router store
  */
 export const addTab = (
-  store: RouterStore,
+  store: AppRouterStore,
   panelKey: number = -1,
-  routeKey: keyof RouterStore['routes'] = null,
+  routeKey: keyof AppRouterStore['routes'] = null,
   source: 'temporary' | 'tabbed' | 'pinned' = 'temporary'
-): RouterStore => {
+): AppRouterStore => {
   if (panelKey < 0 || panelKey >= store.panels.length || !(routeKey in store.routes)) return store;
 
   store.panels[panelKey].routeKey = routeKey;
@@ -848,7 +857,7 @@ export const addTab = (
  * @param routeKey - Route key to convert
  * @returns Updated router store
  */
-export const permanentTab = (store: RouterStore, routeKey: keyof RouterStore['routes']): RouterStore => {
+export const permanentTab = (store: AppRouterStore, routeKey: keyof AppRouterStore['routes']): AppRouterStore => {
   if (!(routeKey in store.routes)) return store;
 
   const panelKey = findPanelKey(store, routeKey, 'temporary');
@@ -867,7 +876,7 @@ export const permanentTab = (store: RouterStore, routeKey: keyof RouterStore['ro
  * @param routeKey - Route key to mark as permanent
  * @returns Updated router store with the route marked permanent
  */
-export const setPermanentRoute = (store: RouterStore, routeKey: keyof RouterStore['routes']): RouterStore => {
+export const setPermanentRoute = (store: AppRouterStore, routeKey: keyof AppRouterStore['routes']): AppRouterStore => {
   if (!(routeKey in store.routes)) return store;
 
   const panelIndex = findPanelKey(store, routeKey, 'temporary');
@@ -885,7 +894,7 @@ export const setPermanentRoute = (store: RouterStore, routeKey: keyof RouterStor
  * @param routeKey - Route key to pin
  * @returns Updated router store with the route pinned where found
  */
-export const setPinnedRoute = (store: RouterStore, routeKey: keyof RouterStore['routes']): RouterStore => {
+export const setPinnedRoute = (store: AppRouterStore, routeKey: keyof AppRouterStore['routes']): AppRouterStore => {
   if (!(routeKey in store.routes)) return store;
 
   let panelIndex = findPanelKey(store, routeKey, 'temporary');
@@ -911,7 +920,7 @@ export const setPinnedRoute = (store: RouterStore, routeKey: keyof RouterStore['
  * @param routeKey - Route key to unpin
  * @returns Updated router store with the route unpinned
  */
-export const setUnpinnedRoute = (store: RouterStore, routeKey: keyof RouterStore['routes']): RouterStore => {
+export const setUnpinnedRoute = (store: AppRouterStore, routeKey: keyof AppRouterStore['routes']): AppRouterStore => {
   if (!(routeKey in store.routes)) return store;
 
   const panelIndex = findPanelKey(store, routeKey, 'pinned');
@@ -935,12 +944,12 @@ export const setUnpinnedRoute = (store: RouterStore, routeKey: keyof RouterStore
  * @returns Router store (currently unchanged)
  */
 export const moveTabbedRouteKey = (
-  store: RouterStore,
-  routeKey: keyof RouterStore['routes'],
+  store: AppRouterStore,
+  routeKey: keyof AppRouterStore['routes'],
   panelKey: number,
   tabIndex: number,
   tab: 'pinned' | 'tab'
-): RouterStore => {
+): AppRouterStore => {
   if (
     !(routeKey in store.routes) ||
     panelKey < 0 ||
@@ -968,12 +977,12 @@ export const moveTabbedRouteKey = (
 //*****************************************************************************************
 
 /**
- * @name sanitizeRouterStore
+ * @name sanitizeAppRouterStore
  * @description Runs panel, route, and node sanitizers in sequence.
  * @param store - Router store
  * @returns Updated router store
  */
-export const sanitizeRouterStore = (store: RouterStore): RouterStore => {
+export const sanitizeAppRouterStore = (store: AppRouterStore): AppRouterStore => {
   store = sanitizePanels(store);
   store = sanitizeNodes(store);
   store = sanitizeRoutes(store);
@@ -987,7 +996,7 @@ export const sanitizeRouterStore = (store: RouterStore): RouterStore => {
  * @param location - React Router location
  * @returns Updated router store
  */
-export const parseLocationSearch = (store: RouterStore, location: Location<RouterState>): RouterStore => {
+export const parseLocationSearch = (store: AppRouterStore, location: Location<AppRouterState>): AppRouterStore => {
   const searchParams = new URLSearchParams(location.search ?? '');
   const hrefValues = searchParams.getAll('p');
 
@@ -1007,7 +1016,7 @@ export const parseLocationSearch = (store: RouterStore, location: Location<Route
     } catch {}
   }
 
-  return sanitizeRouterStore(store);
+  return sanitizeAppRouterStore(store);
 };
 
 /**
@@ -1017,7 +1026,7 @@ export const parseLocationSearch = (store: RouterStore, location: Location<Route
  * @param location - React Router location
  * @returns Updated router store
  */
-export const parseLocationState = (store: RouterStore, location: Location<RouterState>): RouterStore => {
+export const parseLocationState = (store: AppRouterStore, location: Location<AppRouterState>): AppRouterStore => {
   for (const [rawRouteKey, route] of Object.entries(location?.state?.routes || {})) {
     let routeKey = rawRouteKey;
     store = setRoute(store, routeKey, route);
@@ -1029,7 +1038,7 @@ export const parseLocationState = (store: RouterStore, location: Location<Router
     store = setPanel(store, panelKey, panel);
   }
 
-  return sanitizeRouterStore(store);
+  return sanitizeAppRouterStore(store);
 };
 
 /**
@@ -1039,7 +1048,7 @@ export const parseLocationState = (store: RouterStore, location: Location<Router
  * @param location - React Router location containing state/search
  * @returns Updated router store parsed from location, or a safe default on parse failure
  */
-export const locationToStore = (store: RouterStore, location: Location<RouterState>): RouterStore => {
+export const locationToStore = (store: AppRouterStore, location: Location<AppRouterState>): AppRouterStore => {
   try {
     if (!!location.state) return parseLocationState(store, location);
     else if (!!location.search) return parseLocationSearch(store, location);
@@ -1061,7 +1070,7 @@ export type storeToNavigateReturnType = {
  * @param store - Router store
  * @returns Navigate target (`to`) and options (`state`) representing current panels/routes
  */
-export const storeToNavigate = (store: RouterStore): storeToNavigateReturnType => {
+export const storeToNavigate = (store: AppRouterStore): storeToNavigateReturnType => {
   const searchParams = new URLSearchParams();
 
   store.panels.forEach((panel, i) => {
@@ -1088,8 +1097,8 @@ export const storeToNavigate = (store: RouterStore): storeToNavigateReturnType =
  * @returns Navigation payload for the updated store
  */
 export const openRoute = (
-  store: RouterStore,
-  route: RouterStore['routes'][string],
+  store: AppRouterStore,
+  route: AppRouterStore['routes'][string],
   routeKey: string
 ): storeToNavigateReturnType => {
   const currentPanelKey = findPanelKey(store, { routeKey });
@@ -1124,8 +1133,8 @@ export const openRoute = (
  * @returns Navigation payload for the updated store
  */
 export const replaceRoute2 = (
-  store: RouterStore,
-  route: RouterStore['routes'][string],
+  store: AppRouterStore,
+  route: AppRouterStore['routes'][string],
   routeKey: string
 ): storeToNavigateReturnType => {
   if (routeKey in store.routes) {
@@ -1144,8 +1153,8 @@ export const replaceRoute2 = (
  * @returns Navigation payload for the updated store
  */
 export const openRouteAtPanelKey = (
-  store: RouterStore,
-  route: RouterStore['routes'][string],
+  store: AppRouterStore,
+  route: AppRouterStore['routes'][string],
   panelKey: number
 ): storeToNavigateReturnType => {
   if (panelKey >= 0 && panelKey < store.maxPanels) {
@@ -1176,8 +1185,8 @@ export const openRouteAtPanelKey = (
  * @returns Navigation payload (currently unimplemented)
  */
 export const moveRouteToPanelKey = (
-  store: RouterStore,
-  route: RouterStore['routes'][string],
+  store: AppRouterStore,
+  route: AppRouterStore['routes'][string],
   panelKey: number
 ): storeToNavigateReturnType => {
   // if (panelKey >= 0 && panelKey < store.maxPanels) {
@@ -1312,7 +1321,7 @@ export const moveRouteToPanelKey = (
 //   return value ? `?${value}` : '';
 // };
 
-// export const upsertRouteInStore = (state: RouterStore, href: string, path: string): RouterStore => {
+// export const upsertRouteInStore = (state: AppRouterStore, href: string, path: string): AppRouterStore => {
 //   const routeId = href;
 //   const routeKeys = state.routes.keys.includes(routeId) ? state.routes.keys : [...state.routes.keys, routeId];
 //   const routeEntries = {
@@ -1332,7 +1341,7 @@ export const moveRouteToPanelKey = (
 //   };
 // };
 
-// export const assignRouteToPanel = (state: RouterStore, panelId: string, routeId: string): RouterStore => {
+// export const assignRouteToPanel = (state: AppRouterStore, panelId: string, routeId: string): AppRouterStore => {
 //   const panel = state.panels.entries[panelId];
 //   if (!panel) return state;
 

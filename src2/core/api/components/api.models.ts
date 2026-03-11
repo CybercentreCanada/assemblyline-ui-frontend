@@ -1,3 +1,4 @@
+import { z } from 'zod';
 import type { Method } from '../../../../src/components/models/utils/request';
 
 export type APIRequest = {
@@ -47,3 +48,18 @@ export type APIQueryKey = [
 //   url: string;
 //   [key: string]: unknown;
 // };
+
+//*****************************************************************************************
+// App Theme Settings & Config
+//*****************************************************************************************
+
+export const AppAPISettingsSchema = z.object({
+  staleTime: z.number().min(0).optional(),
+  gcTime: z.number().min(0).optional()
+});
+
+export type AppAPISettings = z.infer<typeof AppAPISettingsSchema>;
+
+export type AppAPIConfig = AppAPISettings & {
+  showDevtools?: boolean;
+};

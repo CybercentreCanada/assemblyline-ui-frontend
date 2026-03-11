@@ -22,6 +22,7 @@
     "@mui/material": "^7.0.2",
     "@mui/styled-engine-sc": "^7.0.2",
     "@mui/styles": "^5.11.9",
+    "@mui/utils": "7.0.2",
     "@mui/x-date-pickers": "^7.28.3",
     "@mui/x-tree-view": "^7.28.1",
     "@tanstack/query-sync-storage-persister": "^5.69.0",
@@ -83,7 +84,8 @@
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^3.2.4",
     "web-vitals": "^3.1.1",
-    "zod": "^4.3.6"
+    "zod": "^4.3.6",
+    "zustand": "^5.0.11"
   },
   "scripts": {
     "dev": "VITE_CJS_TRACE=true vite dev",

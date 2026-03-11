@@ -1,45 +1,89 @@
-import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
 import { keepPreviousData, QueryClient } from '@tanstack/react-query';
+import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
-import type { APIQueryKey } from './api.models';
-import { DEFAULT_GC_TIME, DEFAULT_STALE_TIME } from './constants';
+import type { PersistedClient } from '@tanstack/react-query-persist-client';
+import { useAppConfigStore } from 'core/config';
+import React, { Activity, PropsWithChildren, useEffect, useMemo, useState } from 'react';
+import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
+import { APIQueryKey } from 'core/api';
 import { compress, decompress } from 'lz-string';
-import React from 'react';
 
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
-      staleTime: DEFAULT_STALE_TIME,
-      gcTime: DEFAULT_GC_TIME,
+      // staleTime: API_STALE_TIME,
+      // gcTime: API_GARBAGE_COLLECTION_TIME,
       placeholderData: keepPreviousData
     }
   }
 });
 
-type Props = {
-  children: React.ReactNode;
-};
+export const AppAPIProvider = React.memo(({ children }: PropsWithChildren) => {
+  const staleTime = useAppConfigStore(s => s.api.staleTime);
+  const gcTime = useAppConfigStore(s => s.api.gcTime);
+  const showDevtools = useAppConfigStore(s => s.api.showDevtools);
 
-const persister = createSyncStoragePersister({
-  storage: window.sessionStorage,
-  serialize: data =>
-    compress(
-      JSON.stringify({
-        ...data,
-        clientState: {
-          mutations: [],
-          queries: data.clientState.queries.filter(q => (q.queryKey as APIQueryKey)[3])
+  const persister = useMemo(
+    () =>
+      createSyncStoragePersister({
+        storage: window.sessionStorage,
+        serialize: data =>
+          compress(
+            JSON.stringify({
+              ...data,
+              clientState: {
+                mutations: [],
+                queries: data.clientState.queries.filter(q => (q.queryKey as APIQueryKey)[3])
+              }
+            })
+          ),
+        deserialize: data => {
+          const decompressed = decompress(data);
+          if (!decompressed) {
+            return {
+              buster: '',
+              timestamp: 0,
+              clientState: { mutations: [], queries: [] }
+            } satisfies PersistedClient;
+          }
+
+          return JSON.parse(decompressed) as PersistedClient;
         }
-      })
-    ),
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-  deserialize: data => JSON.parse(decompress(data))
-});
+      }),
+    []
+  );
 
-export const APIProvider: React.FC<Props> = React.memo(({ children }: Props) => (
-  <PersistQueryClientProvider client={queryClient} persistOptions={{ persister }}>
-    {children}
-    {/* <ReactQueryDevtools initialIsOpen={true} /> */}
-  </PersistQueryClientProvider>
-));
+  useEffect(() => {
+    queryClient.setDefaultOptions({
+      queries: {
+        refetchOnWindowFocus: false,
+        staleTime,
+        gcTime,
+        placeholderData: keepPreviousData
+      }
+    });
+  }, [gcTime, queryClient, staleTime]);
+
+  return (
+    <PersistQueryClientProvider client={queryClient} persistOptions={{ persister }}>
+      {children}
+
+      <Activity mode={showDevtools ? 'visible' : 'hidden'}>
+        <div
+          style={{
+            position: 'fixed',
+            right: 16,
+            bottom: 16,
+            width: 420,
+            height: 560,
+            zIndex: 9999,
+            background: '#fff'
+          }}
+        >
+          <ReactQueryDevtoolsPanel client={queryClient} />
+        </div>
+      </Activity>
+    </PersistQueryClientProvider>
+  );
+});

@@ -7,7 +7,7 @@ import {
   addRoute,
   findPanelKey,
   insertRightPanel,
-  sanitizeRouterStore,
+  sanitizeAppRouterStore,
   storeToNavigate,
   updatePanel
 } from '../router/router.utils';
@@ -30,7 +30,7 @@ export type NavigateTo = AppRoute extends infer Route ? (Route extends AppRoute 
 export const useAppNavigate = () => {
   const routerNavigate = useNavigate();
   const routeKey = useAppRouteKey();
-  const [store] = useAppRouterStore(s => s);
+  const store = useAppRouterStore(s => s);
 
   let navigationStyle: 'push' | 'loop' = 'push';
 
@@ -53,7 +53,7 @@ export const useAppNavigate = () => {
       } else if (navigationStyle === 'loop') {
       }
 
-      nextStore = sanitizeRouterStore(nextStore);
+      nextStore = sanitizeAppRouterStore(nextStore);
       const nextLocation = storeToNavigate(nextStore);
       if (nextLocation) routerNavigate(nextLocation.to, nextLocation.options);
     },

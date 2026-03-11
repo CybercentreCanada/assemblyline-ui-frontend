@@ -1,55 +1,30 @@
-import type { Components, PaletteOptions, Theme, TypographyVariantsOptions } from '@mui/material';
-import type { CSSProperties } from 'react';
+import type { ThemeOptions } from '@mui/material';
+import { z } from 'zod';
 
-/**
- * Subset of CSS values used by the app bar theme model.
- */
-type AppBarColorValue = CSSProperties['color'];
-type AppBarBackgroundValue = CSSProperties['backgroundColor'];
-
-/**
- * Style tokens that can be configured per app bar color mode.
- */
-export type AppBarStyles = {
-  /** Text/icon color applied to the app bar. */
-  color?: AppBarColorValue;
-  /** Surface color applied to the app bar. */
-  backgroundColor?: AppBarBackgroundValue;
+export type AppThemeConfigs = {
+  global?: Partial<ThemeOptions>;
+  light?: Partial<ThemeOptions>;
+  dark?: Partial<ThemeOptions>;
 };
 
-/**
- * App bar-specific theme configuration used by the app shell.
- */
-export type AppBarThemeConfigs = {
-  /** Shadow depth for the app bar. Typically relevant for top layouts. */
-  elevation?: number;
-  /** App bar colors when the active palette mode is `light`. */
-  light?: AppBarStyles;
-  /** App bar colors when the active palette mode is `dark`. */
-  dark?: AppBarStyles;
-};
-
-/**
- * Palette overrides by color mode.
- * Each value is forwarded to MUI `createTheme({ palette })`.
- */
-export type AppThemePalette = {
-  /** Palette overrides for light mode. */
-  light?: PaletteOptions;
-  /** Palette overrides for dark mode. */
-  dark?: PaletteOptions;
-};
-
-/**
- * Root theme contract consumed by the app-level theme provider.
- */
 export type AppTheme = {
-  /** App bar visual configuration by mode. */
-  appbar?: AppBarThemeConfigs;
-  /** Component-level MUI overrides (`theme.components`). */
-  components?: Components<Omit<Theme, 'components'>>;
-  /** Palette overrides split by light and dark mode. */
-  palette?: AppThemePalette;
-  /** Typography variant overrides (`theme.typography`). */
-  typography?: TypographyVariantsOptions;
+  i18n: Record<string, string>;
+  configs: AppThemeConfigs;
+};
+
+export type AppThemes = Record<string, AppTheme>;
+
+//*****************************************************************************************
+// App Theme Settings & Config
+//*****************************************************************************************
+
+export const AppThemeSettingsSchema = z.object({
+  mode: z.enum(['system', 'light', 'dark']).optional(),
+  variant: z.enum(['default']).optional()
+});
+
+export type AppThemeSettings = z.infer<typeof AppThemeSettingsSchema>;
+
+export type AppThemeConfig = AppThemeSettings & {
+  injectFirst?: boolean;
 };
