@@ -1,6 +1,11 @@
 import { AppAPIConfig, AppAPISettingsSchema } from 'core/api/api.models';
+import { AppAuthConfig } from 'core/auth/auth.models';
 import { AppRouterConfig, AppRouterSettingsSchema } from 'core/router/router/router.models';
 import { AppThemeConfig, AppThemeSettingsSchema } from 'core/theme/theme.models';
+import type { ClassificationDefinition } from 'helpers/classificationParser';
+import type { Configuration } from 'models/base/config';
+import type { UserSettings } from 'models/base/user_settings';
+import type { CustomUser, Indexes, SystemMessage } from 'models/ui/user';
 import { z } from 'zod';
 
 // export type AppAPIConfig = {
@@ -50,7 +55,17 @@ export type AppSettings = z.infer<typeof AppSettingsSchema>;
 
 export type AppConfig = {
   api: AppAPIConfig;
+  auth: AppAuthConfig;
   quota: { api: number; submission: number };
   router: AppRouterConfig;
   theme: AppThemeConfig;
+
+  c12nDef: ClassificationDefinition;
+  classificationAliases: ClassificationAliases;
+  configuration: Configuration;
+  flattenedProps: any;
+  indexes: Indexes;
+  settings: UserSettings;
+  systemMessage: SystemMessage;
+  user: CustomUser;
 };
