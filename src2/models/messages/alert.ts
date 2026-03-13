@@ -1,4 +1,4 @@
-import type { Alert } from 'components/models/base/alert';
+import type { Alert } from 'models/base/alert';
 
 export const MSG_TYPES = ['AlertCreated', 'AlertUpdated'] as const;
 export const LOADER_CLASS = 'assemblyline.odm.messages.alert.AlertMessage';

@@ -4,7 +4,7 @@ import { Typography } from '@mui/material';
 // import useMyAPI from 'components/hooks/useMyAPI';
 // import useMySnackbar from 'components/hooks/useMySnackbar';
 // import { decode, encode } from 'helpers/cbor';
-// import toArrayBuffer from 'helpers/toArrayBuffer';
+// import toArrayBuffer from 'lib/utils/toArrayBuffer';
 import { useTranslation } from 'react-i18next';
 
 type SecTokenProps = {

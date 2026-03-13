@@ -1,5 +1,5 @@
-import type { SubmissionProfileParams } from 'components/models/base/config';
-import type { SelectedServiceCategory, ServiceSpecification } from 'components/models/base/service';
+import type { SubmissionProfileParams } from 'models/base/config';
+import type { SelectedServiceCategory, ServiceSpecification } from 'models/base/service';
 
 export const ENCODINGS = ['cart', 'raw', 'zip'] as const;
 export const VIEWS = ['report', 'details'] as const;

@@ -1,9 +1,9 @@
-import type { AppUser } from 'commons/components/app/AppUserService';
-import type { Configuration } from 'components/models/base/config';
-import type { Role, Type, User } from 'components/models/base/user';
-import type { UserSettings } from 'components/models/base/user_settings';
-import type { RequestBuilder } from 'components/models/utils/request';
-import type { ClassificationDefinition } from 'helpers/classificationParser';
+// import type { AppUser } from 'commons/components/app/AppUserService';
+import type { Configuration } from 'models/base/config';
+import type { Role, Type, User } from 'models/base/user';
+import type { UserSettings } from 'models/base/user_settings';
+import type { RequestBuilder } from 'models/utils/request';
+// import type { ClassificationDefinition } from 'helpers/classificationParser';
 
 /** Data Types based on the elastic definitions */
 export const FIELD_TYPES = [

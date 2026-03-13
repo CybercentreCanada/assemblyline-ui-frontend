@@ -52,36 +52,20 @@ export const APP_DARK_LOGO = React.memo(() => {
 export const APP_LIGHT_BANNER = React.memo(() => {
   const { t } = useTranslation();
 
-  return (
-    <img
-      style={{ display: 'inline-block', width: '100%', margin: '2rem 0' }}
-      src="/images/banner.svg"
-      alt={t('banner.alt')}
-    />
-  );
+  return <img style={{ display: 'inline-block', width: '100%' }} src="/images/banner.svg" alt={t('banner.alt')} />;
 });
 
 export const APP_DARK_BANNER = React.memo(() => {
   const { t } = useTranslation();
 
-  return (
-    <img
-      style={{ display: 'inline-block', width: '100%', margin: '2rem 0' }}
-      src="/images/banner_dark.svg"
-      alt={t('banner.alt')}
-    />
-  );
+  return <img style={{ display: 'inline-block', width: '100%' }} src="/images/banner_dark.svg" alt={t('banner.alt')} />;
 });
 
 export const APP_LIGHT_BANNER_VERT = React.memo(() => {
   const { t } = useTranslation();
 
   return (
-    <img
-      style={{ display: 'inline-block', width: '100%', margin: '2rem 0' }}
-      src="/images/vertical_banner.svg"
-      alt={t('banner.alt')}
-    />
+    <img style={{ display: 'inline-block', width: '100%' }} src="/images/vertical_banner.svg" alt={t('banner.alt')} />
   );
 });
 
@@ -90,7 +74,7 @@ export const APP_DARK_BANNER_VERT = React.memo(() => {
 
   return (
     <img
-      style={{ display: 'inline-block', width: '100%', margin: '2rem 0' }}
+      style={{ display: 'inline-block', width: '100%' }}
       src="/images/vertical_banner_dark.svg"
       alt={t('banner.alt')}
     />

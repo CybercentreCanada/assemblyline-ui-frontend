@@ -1,14 +1,14 @@
-import type { AlertIndexed } from 'components/models/base/alert';
-import type { Badlist } from 'components/models/base/badlist';
-import type { FileIndexed } from 'components/models/base/file';
-import type { Heuristic } from 'components/models/base/heuristic';
-import type { ResultIndexed } from 'components/models/base/result';
-import type { RetrohuntIndexed } from 'components/models/base/retrohunt';
-import type { Safelist } from 'components/models/base/safelist';
-import type { SignatureIndexed } from 'components/models/base/signature';
-import type { SubmissionIndexed } from 'components/models/base/submission';
-import type { WorkflowIndexed } from 'components/models/base/workflow';
-import type { RequestBuilder } from 'components/models/utils/request';
+import type { AlertIndexed } from 'models/base/alert';
+import type { Badlist } from 'models/base/badlist';
+import type { FileIndexed } from 'models/base/file';
+import type { Heuristic } from 'models/base/heuristic';
+import type { ResultIndexed } from 'models/base/result';
+import type { RetrohuntIndexed } from 'models/base/retrohunt';
+import type { Safelist } from 'models/base/safelist';
+import type { SignatureIndexed } from 'models/base/signature';
+import type { SubmissionIndexed } from 'models/base/submission';
+import type { WorkflowIndexed } from 'models/base/workflow';
+import type { RequestBuilder } from 'models/utils/request';
 
 type SearchIndex =
   | 'alert'

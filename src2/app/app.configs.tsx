@@ -9,7 +9,8 @@ export const DEFAULT_APP_CONFIG: AppConfig = {
     showDevtools: false
   },
   auth: {
-    login: null
+    login: null,
+    mode: 'loading'
   },
   // config: {
   //   storageKey: 'al.storage'

@@ -2,17 +2,16 @@ import type { InfiniteData, UndefinedInitialDataOptions, UseMutationOptions } fr
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-// import useALContext from '../../../../src/components/hooks/useALContext';
-// import type { LoginParamsProps } from '../../../../src/components/hooks/useMyAPI';
-// import useMySnackbar from '../../../../src/components/hooks/useMySnackbar';
-// import useQuota from '../../../../src/components/hooks/useQuota';
-// import type { Configuration } from '../../../../src/components/models/base/config';
-// import type { CustomUser, WhoAmIProps } from '../../../../src/components/models/ui/user';
-// import { getFileName } from '../../../../src/helpers/utils';
-// import getXSRFCookie from '../../../../src/helpers/xsrf';
-import { useAppConfigSetStore } from 'core/config/config.providers';
+// import useALContext from 'components/hooks/useALContext';
+// import type { LoginParamsProps } from 'components/hooks/useMyAPI';
+// import useMySnackbar from 'components/hooks/useMySnackbar';
+// import useQuota from 'components/hooks/useQuota';
+import { useAppConfigSetStore, useAppConfigStore } from 'core/config/config.providers';
 import { useAppSnackbar } from 'features/snackbar/useAppSnackbar';
+import { getFileName } from 'lib/utils/utils';
 import { getXSRFCookie } from 'lib/utils/xsrf.utils';
+import type { Configuration } from 'models/base/config';
+import type { CustomUser, WhoAmIProps } from 'models/ui/user';
 import { DEFAULT_RETRY_MS } from './api.constants';
 import type { ALRequests, ALResponses, APIQueryKey, APIRequest, APIResponse, BlobResponse } from './api.models';
 import { getAPIResponse, getBlobResponse, isAPIData, stableStringify } from './api.utils';
@@ -41,7 +40,7 @@ export const useAPICallFn = <
 >() => {
   const { t } = useTranslation();
   const { showErrorMessage, closeSnackbar } = useAppSnackbar();
-  const { configuration: systemConfig } = useALContext();
+  const systemConfig = useAppConfigStore(s => s.configuration);
   // const { setApiQuotaremaining, setSubmissionQuotaremaining } = useQuota();
   const setStore = useAppConfigSetStore();
 

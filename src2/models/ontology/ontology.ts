@@ -1,10 +1,10 @@
-import type { Antivirus } from 'components/models/ontology/results/antivirus';
-import type { HTTP } from 'components/models/ontology/results/http';
-import type { MalwareConfig } from 'components/models/ontology/results/malware_config';
-import type { NetworkConnection } from 'components/models/ontology/results/network';
-import type { Process } from 'components/models/ontology/results/process';
-import type { Sandbox } from 'components/models/ontology/results/sandbox';
-import type { Signature } from 'components/models/ontology/results/signature';
+import type { Antivirus } from 'models/ontology/results/antivirus';
+import type { HTTP } from 'models/ontology/results/http';
+import type { MalwareConfig } from 'models/ontology/results/malware_config';
+import type { NetworkConnection } from 'models/ontology/results/network';
+import type { Process } from 'models/ontology/results/process';
+import type { Sandbox } from 'models/ontology/results/sandbox';
+import type { Signature } from 'models/ontology/results/signature';
 
 /**
  * Heuristics raised

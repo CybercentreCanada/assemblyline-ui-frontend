@@ -1,41 +1,34 @@
 import { useAppConfigStore } from 'core/config';
+import { LoadingPage } from 'pages/loading/loading.route';
+import { LockedPage } from 'pages/locked/locked.route';
+import { LoginPage } from 'pages/log-in/log-in.route';
+import { LogoutPage } from 'pages/log-out/log-out.route';
+import { QuotaPage } from 'pages/quota/quota.route';
+import { ToSPage } from 'pages/terms-of-service/terms-of-service.route';
 import React, { PropsWithChildren } from 'react';
-import { LoadingCard, LockedPage, LoginCard } from './auth/auth.components';
-import { AuthFormProvider, useAuthForm } from './auth/auth.providers';
-import { useAuthQuery } from './auth/auth.query';
 
-export const AuthMain = React.memo(({ children }: PropsWithChildren) => {
+export const AppAuth = React.memo(({ children }: PropsWithChildren) => {
   const loginParams = useAppConfigStore(s => s.auth.login);
-  const form = useAuthForm();
+  const mode = useAppConfigStore(s => s.auth.mode);
 
-  useAuthQuery();
+  console.log(mode);
 
-  return (
-    <form.Subscribe selector={s => s.values.variant}>
-      {variant => {
-        switch (variant) {
-          case 'loading':
-            return <LoadingCard />;
-          case 'locked':
-            return <LockedPage />;
-          case 'login':
-            return !loginParams ? <LoadingCard /> : <LoginCard />;
-          case 'quota':
-            return <QuotaCard />;
-          case 'routes':
-            return children;
-          case 'tos':
-            return <ToSCard />;
-          default:
-            return null;
-        }
-      }}
-    </form.Subscribe>
-  );
+  switch (mode) {
+    case 'loading':
+      return <LoadingPage />;
+    case 'locked':
+      return <LockedPage />;
+    case 'login':
+      return !loginParams ? <LoadingPage /> : <LoginPage />;
+    case 'quota':
+      return <QuotaPage />;
+    case 'app':
+      return children;
+    case 'tos':
+      return <ToSPage />;
+    case 'logout':
+      return <LogoutPage />;
+    default:
+      return null;
+  }
 });
-
-export const AppAuth = React.memo(({ children }: PropsWithChildren) => (
-  <AuthFormProvider>
-    <AuthMain>{children}</AuthMain>
-  </AuthFormProvider>
-));

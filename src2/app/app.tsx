@@ -1,4 +1,5 @@
 import { AppAPIProvider } from 'core/api';
+import { AppAuthProvider } from 'core/auth/auth.providers';
 import { AppConfigProvider } from 'core/config/config.providers';
 import { AppRouterProvider } from 'core/router';
 import { AppThemeProvider } from 'core/theme';
@@ -40,7 +41,9 @@ export const AssemblylineApp = () => (
       <AppAPIProvider>
         <AppThemeProvider>
           <AppRouterProvider>
-            <AppRoot />
+            <AppAuthProvider>
+              <AppRoot />
+            </AppAuthProvider>
           </AppRouterProvider>
         </AppThemeProvider>
       </AppAPIProvider>

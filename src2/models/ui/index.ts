@@ -1,5 +1,5 @@
-import type { Role } from 'components/models/base/user';
-import type { Method, RequestBuilder } from 'components/models/utils/request';
+import type { Role } from 'models/base/user';
+import type { Method, RequestBuilder } from 'models/utils/request';
 
 /** Represents a single API detail */
 export type ApiDocumentation = {

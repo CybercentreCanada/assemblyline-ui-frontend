@@ -1,7 +1,8 @@
 import { Box, BoxProps, styled } from '@mui/material';
 import React, { memo } from 'react';
+import { PageContent } from './PageContent';
 
-type PageCenterProps = PageProps & {
+type PageCenterProps = BoxProps & {
   children: React.ReactNode;
   maxWidth?: string;
   textAlign?: string;

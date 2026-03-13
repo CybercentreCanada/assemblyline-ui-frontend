@@ -1,8 +1,8 @@
-import type { Verdict } from 'components/models/base/alert';
-import type { Error } from 'components/models/base/error';
-import type { FileIndexed, File as FileInfo } from 'components/models/base/file';
-import type { AlternateResult, FileResult, ResultIndexed } from 'components/models/base/result';
-import type { Attack, Signature, Tag } from 'components/models/base/tagging';
+import type { Verdict } from 'models/base/alert';
+import type { Error } from 'models/base/error';
+import type { FileIndexed, File as FileInfo } from 'models/base/file';
+import type { AlternateResult, FileResult, ResultIndexed } from 'models/base/result';
+import type { Attack, Signature, Tag } from 'models/base/tagging';
 
 export const SIMILAR_TYPES = ['tlsh', 'ssdeep', 'vector'] as const;
 

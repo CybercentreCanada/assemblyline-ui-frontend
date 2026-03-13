@@ -1,10 +1,10 @@
-import type { Verdict } from 'components/models/base/alert';
-import type { File } from 'components/models/base/file';
-import type { PromoteTo } from 'components/models/base/result';
-import type { SectionBody } from 'components/models/base/result_body';
-import type { Submission } from 'components/models/base/submission';
-import type { Tags } from 'components/models/ui/file';
-import type { SubmissionSummary } from 'components/models/ui/submission';
+import type { Verdict } from 'models/base/alert';
+import type { File } from 'models/base/file';
+import type { PromoteTo } from 'models/base/result';
+import type { SectionBody } from 'models/base/result_body';
+import type { Submission } from 'models/base/submission';
+import type { Tags } from 'models/ui/file';
+import type { SubmissionSummary } from 'models/ui/submission';
 
 /** */
 export type TPromotedSection = SectionBody & {

@@ -1,5 +1,5 @@
-import type { Attack } from 'components/models/base/result';
-import type { ObjectID } from 'components/models/ontology/results/process';
+import type { Attack } from 'models/base/result';
+import type { ObjectID } from 'models/ontology/results/process';
 
 /**
  * Possible signature types.

@@ -1,4 +1,4 @@
-import type { ObjectID } from 'components/models/ontology/results/process';
+import type { ObjectID } from 'models/ontology/results/process';
 
 /**
  * Fields used for generating a unique object ID hash for sandbox entities.

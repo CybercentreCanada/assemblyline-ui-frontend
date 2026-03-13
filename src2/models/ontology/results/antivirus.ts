@@ -1,4 +1,4 @@
-import type { ObjectID } from 'components/models/ontology/results/process';
+import type { ObjectID } from 'models/ontology/results/process';
 
 export const ANTIVIRUS_CATEGORIES = ['type-unsupported', 'undetected', 'failure', 'suspicious', 'malicious'] as const;
 

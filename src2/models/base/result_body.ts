@@ -3,8 +3,8 @@ import type {
   ConnectionType,
   LookupType,
   RequestMethod
-} from 'components/models/ontology/results/network';
-import type { SignatureType } from 'components/models/ontology/results/signature';
+} from 'models/ontology/results/network';
+import type { SignatureType } from 'models/ontology/results/signature';
 
 export const BODY_FORMAT = [
   'GRAPH_DATA',

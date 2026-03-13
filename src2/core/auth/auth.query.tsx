@@ -1,19 +1,25 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { APIQueryKey, APIResponse, DEFAULT_RETRY_MS, isAPIData, stableStringify } from 'core/api';
-import { useAppConfigSetStore } from 'core/config/config.providers';
+import { LoginParamsProps } from 'core/auth/auth.models';
+import { useSaveAppConfig } from 'core/config/config.hooks';
+import { useAppConfigSetStore, useAppConfigStore } from 'core/config/config.providers';
 import { useAppSnackbar } from 'features/snackbar/useAppSnackbar';
 import { getXSRFCookie } from 'lib/utils/xsrf.utils';
+import { Configuration } from 'models/base/config';
+import { WhoAmIProps } from 'models/ui/user';
 import { useTranslation } from 'react-i18next';
-import { useAuthForm } from './auth.providers';
+import { normalizeWhoAmI } from './auth.utils';
 
 export const useAuthQuery = () => {
   const queryClient = useQueryClient();
   const { t } = useTranslation();
   const { showErrorMessage, closeSnackbar } = useAppSnackbar();
-  // const { configuration: systemConfig } = useALContext();
-  // const { setApiQuotaremaining, setSubmissionQuotaremaining } = useQuota();
-  const form = useAuthForm();
   const setStore = useAppConfigSetStore();
+  const systemConfig = useAppConfigStore(s => s?.configuration);
+
+  const store = useAppConfigStore(s => s);
+
+  const saveSettings = useSaveAppConfig();
 
   const disabled = false;
   const retryAfter = 10 * 1000;
@@ -77,7 +83,10 @@ export const useAuthQuery = () => {
         // Check for an invalid json format
         if (!isAPIData(json)) {
           showErrorMessage(t('api.invalid'), 30000);
-          form.setFieldValue('variant', 'load');
+          setStore(s => {
+            s.auth.mode = 'loading';
+            return s;
+          });
           return Promise.reject({
             api_error_message: t('api.invalid'),
             api_response: '',
@@ -91,27 +100,33 @@ export const useAuthQuery = () => {
         // Forbiden response indicate that the user's account is locked.
         if (res.status === 403) {
           if (retryAfter !== DEFAULT_RETRY_MS) closeSnackbar();
-          setConfiguration(json.api_response as Configuration);
-          form.setFieldValue('variant', 'locked');
+          setStore(s => {
+            s.auth.mode = 'locked';
+            s['configuration'] = json.api_response as Configuration;
+            return s;
+          });
           return Promise.reject(json);
         }
 
         // Unauthorized response indicate that the user is not logged in.
         if (res.status === 401) {
           if (retryAfter !== DEFAULT_RETRY_MS) closeSnackbar();
-          localStorage.setItem('loginParams', JSON.stringify(json.api_response));
-          sessionStorage.clear();
           setStore(s => {
             s.auth.login = { ...s.auth.login, ...(json.api_response as LoginParamsProps) };
+            s.auth.mode = 'login';
             return s;
           });
-          form.setFieldValue('variant', 'login');
+          sessionStorage.clear();
+          saveSettings();
           return Promise.reject(json);
         }
 
         // Daily quota error, stop everything!
         if (res.status === 503 && ['API', 'quota', 'daily'].every(v => error.includes(v))) {
-          form.setFieldValue('variant', 'quota');
+          setStore(s => {
+            s.auth.mode = 'quota';
+            return s;
+          });
           return Promise.reject(json);
         }
 
@@ -127,20 +142,27 @@ export const useAuthQuery = () => {
           const user = json.api_response as WhoAmIProps;
 
           // Set the current user
-          setUser(user);
+          setStore(s => ({ ...s, ...normalizeWhoAmI(json.api_response) }));
 
           // Mark the interface ready
-          setReady(
-            true,
-            'borealis' in user.configuration.ui.api_proxies,
-            user.configuration?.ui?.api_proxies?.borealis?.custom_iconify || null
-          );
+          // TODO
+          // setReady(
+          //   true,
+          //   'borealis' in user.configuration.ui.api_proxies,
+          //   user.configuration?.ui?.api_proxies?.borealis?.custom_iconify || null
+          // );
 
           // Render appropriate page
           if (!user.agrees_with_tos && user.configuration.ui.tos) {
-            form.setFieldValue('variant', 'tos');
+            setStore(s => {
+              s.auth.mode = 'tos';
+              return s;
+            });
           } else {
-            form.setFieldValue('variant', 'routes');
+            setStore(s => {
+              s.auth.mode = 'app';
+              return s;
+            });
           }
 
           return Promise.resolve(json);

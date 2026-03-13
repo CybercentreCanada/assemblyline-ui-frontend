@@ -1,11 +1,11 @@
 import type { ButtonProps as MuiButtonProps, TooltipProps } from '@mui/material';
 import { Button as MuiButton, Skeleton } from '@mui/material';
-import { CircularProgress } from 'components/visual/Buttons/CircularProgress';
-import { Tooltip } from 'components/visual/Tooltip';
-import { getTextContent } from 'helpers/utils';
+import { getTextContent } from 'lib/utils/utils';
 import React, { useMemo } from 'react';
 import type { LinkProps } from 'react-router-dom';
 import { Link } from 'react-router-dom';
+import { Tooltip } from 'ui/Tooltip';
+import { CircularProgress } from './CircularProgress';
 
 export type ButtonProps = MuiButtonProps & {
   link?: boolean;

@@ -3,7 +3,7 @@ import FullscreenExitIcon from '@mui/icons-material/FullscreenExit';
 import { Box, IconButton, Tooltip, useTheme } from '@mui/material';
 import browser from 'browser-detect';
 import { useAppBar, useAppBarHeight, useAppLayout } from 'commons/components/app/hooks';
-import PageContent from 'commons/components/pages/PageContent';
+import { PageContent } from 'ui/layouts/PageContent';
 import useFullscreenStatus from 'commons/components/utils/hooks/useFullscreenStatus';
 import { memo, useCallback, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';

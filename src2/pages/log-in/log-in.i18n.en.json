@@ -1,0 +1,43 @@
+{
+  "button": "Sign in",
+  "button_oauth": "Sign in with",
+  "button_saml": "Sign in with SAML",
+  "other": "Or sign in as a different user...",
+  "otp": "One Time Password",
+  "password": "Password",
+  "reset.button": "Reset password",
+  "reset.desc": "Forgot password?",
+  "reset.done": "An email was sent to your address with instructions on how to reset your password.",
+  "reset.email": "Enter your email address",
+  "reset.link": "Reset it!",
+  "reset_now.button": "Reset",
+  "reset_now.done": "Password reset!",
+  "reset_now.password": "New password",
+  "reset_now.password_confirm": "Confirm new password",
+  "reset_now.redirect": "You will be redirected to the login screen in a few seconds...",
+  "securitytoken": "Please touch the flashing security token",
+  "securitytoken.error": "Security token was invalid or operation was cancelled. Try with One Time Password instead...",
+  "securitytoken.unavailable": "Cannot use security token on this server. Use One Time Password instead...",
+  "signup": "Do not have an account?",
+  "signup.button": "Create my account",
+  "signup.completed": "New account registration is now complete, you can now login with your account",
+  "signup.done": "An email was sent to your address with the final instructions to create a new account.",
+  "signup.email": "Email address",
+  "signup.link": "Sign up!",
+  "signup.password": "Password",
+  "signup.password_confirm": "Password confirmation",
+  "signup.username": "Username",
+  "username": "Username",
+
+  "validate.username.required": "Username is required",
+  "validate.username.too_short": "Username is too short",
+  "validate.username.characters": "Username must only use lowercase letters or dashes",
+
+  "validate.password.required": "Password is required",
+  "validate.password_confirm.mismatch": "Passwords do not match",
+
+  "validate.email.required": "Email is required",
+  "validate.email.invalid": "Invalid email address",
+
+  "divider": "OR"
+}

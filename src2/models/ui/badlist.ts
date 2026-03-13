@@ -1,5 +1,5 @@
-import type { Badlist } from 'components/models/base/badlist';
-import type { RequestBuilder } from 'components/models/utils/request';
+import type { Badlist } from 'models/base/badlist';
+import type { RequestBuilder } from 'models/utils/request';
 
 type SuccessResponse = { success: boolean };
 

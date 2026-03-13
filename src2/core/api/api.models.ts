@@ -1,9 +1,9 @@
 import { z } from 'zod';
-// import type { Method } from '../../../../src/components/models/utils/request';
-// import type { RootRequests, RootResponses } from '../../../../src/components/models/ui';
-// import type { BadlistRequests, BadlistResponses } from '../../../../src/components/models/ui/badlist';
-// import type { SearchRequests, SearchResponses } from '../../../../src/components/models/ui/search';
-// import type { UserRequests, UserResponses } from '../../../../src/components/models/ui/user';
+// import type { Method } from '../../../../src/models/utils/request';
+// import type { RootRequests, RootResponses } from '../../../../src/models/ui';
+// import type { BadlistRequests, BadlistResponses } from '../../../../src/models/ui/badlist';
+// import type { SearchRequests, SearchResponses } from '../../../../src/models/ui/search';
+// import type { UserRequests, UserResponses } from '../../../../src/models/ui/user';
 
 export type APIRequest = {
   url: string;

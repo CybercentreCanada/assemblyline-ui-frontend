@@ -1,16 +1,26 @@
 import { Box, Link, Skeleton, Typography, useTheme } from '@mui/material';
 import { useAPIMutation, useAPIQuery } from 'core/api';
+import { useAppConfigStore } from 'core/config';
 import { useAppBanner } from 'core/preference/preference.hooks';
-import { PageCenter } from 'layout/page/PageCenter';
+import { createAppRoute } from 'core/router/route/route.utils';
+import { NotFoundPage } from 'pages/not-found/not-found.route';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Markdown from 'react-markdown';
-import { Button } from 'ui/Buttons/Button';
+import { Button } from 'ui/buttons/Button';
+import { PageCenter } from 'ui/layouts/PageCenter';
 
-export default function Tos() {
+//*****************************************************************************************
+// ToS Page
+//*****************************************************************************************
+
+export const ToSPage = React.memo(() => {
   const { t } = useTranslation(['tos']);
   const theme = useTheme();
   const Banner = useAppBanner();
-  const { user: currentUser, configuration } = useALContext();
+
+  const currentUser = useAppConfigStore(s => s.user);
+  const configuration = useAppConfigStore(s => s.configuration);
 
   const handleCancel = useAPIMutation(() => ({
     url: '/api/v4/auth/logout/',
@@ -24,7 +34,9 @@ export default function Tos() {
 
   const { data: tos } = useAPIQuery<string>({ url: '/api/v4/help/tos/', disabled: !configuration?.ui?.tos });
 
-  return configuration.ui.tos ? (
+  return !configuration?.ui?.tos ? (
+    <NotFoundPage />
+  ) : (
     <PageCenter margin={4} width="100%">
       <Box
         sx={{
@@ -46,7 +58,16 @@ export default function Tos() {
             {t('title')}
           </Typography>
         </div>
-        {tos ? (
+        {!tos ? (
+          <>
+            <Skeleton style={{ marginBottom: 12 }} />
+            <Skeleton style={{ marginBottom: 12 }} />
+            <Skeleton style={{ marginBottom: 12 }} />
+            <Skeleton style={{ marginBottom: 12 }} />
+            <Skeleton style={{ marginBottom: 12 }} />
+            <Skeleton />
+          </>
+        ) : (
           <>
             <div style={{ textAlign: 'left' }}>
               <Markdown components={{ a: props => <Link href={props.href}>{props.children}</Link> }}>{tos}</Markdown>
@@ -82,19 +103,19 @@ export default function Tos() {
               </div>
             )}
           </>
-        ) : (
-          <>
-            <Skeleton style={{ marginBottom: 12 }} />
-            <Skeleton style={{ marginBottom: 12 }} />
-            <Skeleton style={{ marginBottom: 12 }} />
-            <Skeleton style={{ marginBottom: 12 }} />
-            <Skeleton style={{ marginBottom: 12 }} />
-            <Skeleton />
-          </>
         )}
       </Box>
     </PageCenter>
-  ) : (
-    <NotFoundPage />
   );
-}
+});
+
+//*****************************************************************************************
+// ToS Route
+//*****************************************************************************************
+
+export const ToSRoute = createAppRoute({
+  component: ToSPage,
+  path: '/tos'
+});
+
+export default ToSRoute;

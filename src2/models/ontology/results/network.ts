@@ -1,5 +1,5 @@
-import type { File } from 'components/models/ontology/file';
-import type { ObjectID, Process } from 'components/models/ontology/results/process';
+import type { File } from 'models/ontology/file';
+import type { ObjectID, Process } from 'models/ontology/results/process';
 
 /**
  * List of supported DNS lookup types.

@@ -1,4 +1,4 @@
-import type { File } from 'components/models/ontology/file';
+import type { File } from 'models/ontology/file';
 
 /** HTTP Redirect. */
 export type HTTPRedirect = {

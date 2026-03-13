@@ -1,6 +1,6 @@
 import type { AppSwitcherItem } from 'commons/components/app/AppConfigs';
-import type { ServiceSelection } from 'components/models/base/submission';
-import type { ACL, Role, Type } from 'components/models/base/user';
+import type { ServiceSelection } from 'models/base/submission';
+import type { ACL, Role, Type } from 'models/base/user';
 
 export const API_PRIV = ['READ', 'READ_WRITE', 'WRITE', 'CUSTOM', 'EXTENDED'] as const;
 export const AUTO_PROPERTY_TYPES = ['access', 'classification', 'type', 'role', 'remove_role', 'group'];

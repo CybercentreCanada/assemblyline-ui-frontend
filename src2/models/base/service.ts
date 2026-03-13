@@ -1,4 +1,4 @@
-import type { RegistryType, ServiceCategory } from 'components/models/base/config';
+import type { RegistryType, ServiceCategory } from 'models/base/config';
 
 export const ACCESS_MODES = ['ReadWriteOnce', 'ReadWriteMany'] as const;
 export const OPERATING_SYSTEMS = ['windows', 'linux'] as const;

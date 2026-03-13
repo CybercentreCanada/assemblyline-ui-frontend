@@ -1,4 +1,4 @@
-import getXSRFCookie from 'helpers/xsrf';
+import { getXSRFCookie } from 'lib/utils/xsrf.utils';
 import { expect, vi } from 'vitest';
 
 describe('Test `getXSRFCookie`', () => {

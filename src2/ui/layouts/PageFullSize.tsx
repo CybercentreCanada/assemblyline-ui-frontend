@@ -1,5 +1,6 @@
-import { Box, styled, useMediaQuery, useTheme } from '@mui/material';
+import { Box, BoxProps, styled, useMediaQuery, useTheme } from '@mui/material';
 import React, { forwardRef } from 'react';
+import { PageContent } from './PageContent';
 
 type PageFullSizeProps = {
   id?: string;
