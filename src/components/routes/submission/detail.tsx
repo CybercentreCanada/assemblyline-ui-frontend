@@ -80,7 +80,7 @@ import io from 'socket.io-client';
 
 const NAMESPACE = '/live_submission';
 const MESSAGE_TIMEOUT = 5000;
-const OUTSTANDING_TRIGGER_COUNT = 1;
+const OUTSTANDING_TRIGGER_COUNT = 0;
 
 type ParamProps = {
   id: string;
@@ -839,11 +839,6 @@ function WrappedSubmissionDetail() {
     setLiveErrorKeys([data.msg]);
   }, []);
 
-  const resetOutstanding = useCallback(() => {
-    setLastSuccessfulTrigger(loadTrigger);
-    setOutstanding(null);
-  }, [loadTrigger]);
-
   useEffect(
     () => () => {
       if (loadInterval) clearInterval(loadInterval);
@@ -972,10 +967,7 @@ function WrappedSubmissionDetail() {
   }, [loadTrigger]);
 
   useEffect(() => {
-    if (
-      loadTrigger >= lastSuccessfulTrigger + OUTSTANDING_TRIGGER_COUNT &&
-      loadTrigger % OUTSTANDING_TRIGGER_COUNT === 0
-    ) {
+    if (loadTrigger !== null) {
       // eslint-disable-next-line no-console
       console.debug('LIVE :: Finding out oustanding services...');
 
