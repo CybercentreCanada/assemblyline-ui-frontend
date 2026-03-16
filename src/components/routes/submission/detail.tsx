@@ -1,7 +1,6 @@
 import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
 import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
 import ChromeReaderModeOutlinedIcon from '@mui/icons-material/ChromeReaderModeOutlined';
-import CloseIcon from '@mui/icons-material/Close';
 import CloudDownloadOutlinedIcon from '@mui/icons-material/CloudDownloadOutlined';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -15,7 +14,7 @@ import ReplayOutlinedIcon from '@mui/icons-material/ReplayOutlined';
 import TuneOutlinedIcon from '@mui/icons-material/TuneOutlined';
 import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import {
-  Alert,
+  Collapse,
   DialogContentText,
   FormControl,
   FormControlLabel,
@@ -29,7 +28,6 @@ import {
   Radio,
   RadioGroup,
   Skeleton,
-  Snackbar,
   Stack,
   Tooltip,
   Typography,
@@ -82,7 +80,7 @@ import io from 'socket.io-client';
 
 const NAMESPACE = '/live_submission';
 const MESSAGE_TIMEOUT = 5000;
-const OUTSTANDING_TRIGGER_COUNT = 4;
+const OUTSTANDING_TRIGGER_COUNT = 1;
 
 type ParamProps = {
   id: string;
@@ -148,6 +146,7 @@ function WrappedSubmissionDetail() {
   const [baseFiles, setBaseFiles] = useState<string[]>([]);
   const [archivingMetadata, setArchivingMetadata] = useState<Record<string, ArchiverMetadata>>({});
   const [archivingUseAlternateDtl, setArchivingUseAlternateDtl] = useState<'true' | 'false'>('false');
+  const [outstandingOpen, setOutstandingOpen] = useState<boolean>(true);
 
   const [liveResultKeys, setLiveResultKeys] = useReducer(messageReducer, []);
   const [liveErrorKeys, setLiveErrorKeys] = useReducer(messageReducer, []);
@@ -968,7 +967,12 @@ function WrappedSubmissionDetail() {
           updateLiveSumary(api_data.api_response.result);
         }
       });
-    } else if (
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loadTrigger]);
+
+  useEffect(() => {
+    if (
       loadTrigger >= lastSuccessfulTrigger + OUTSTANDING_TRIGGER_COUNT &&
       loadTrigger % OUTSTANDING_TRIGGER_COUNT === 0
     ) {
@@ -1008,9 +1012,8 @@ function WrappedSubmissionDetail() {
         }
       });
     }
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loadTrigger]);
+  }, [lastSuccessfulTrigger]);
 
   useEffect(() => {
     addInsight({ type: 'report', value: id });
@@ -1111,49 +1114,6 @@ function WrappedSubmissionDetail() {
           .filter(metakey => systemConfig.submission.metadata.archive[metakey].required)
           .some(metakey => !Object.keys(archivingMetadata).includes(metakey))}
       />
-      {outstanding && Object.keys(outstanding).length > 0 && (
-        <Snackbar
-          anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-          open={outstanding !== null}
-          key="outstanding"
-          style={{ top: theme.spacing(8), zIndex: 100 }}
-        >
-          <Alert
-            elevation={6}
-            severity="info"
-            style={{ textAlign: 'left' }}
-            action={
-              <IconButton
-                aria-label="close"
-                color="inherit"
-                size="small"
-                onClick={resetOutstanding}
-                style={{ alignSelf: 'start' }}
-              >
-                <CloseIcon fontSize="inherit" />
-              </IconButton>
-            }
-          >
-            <span style={{ fontWeight: 500, textAlign: 'left' }}>{t('outstanding.title')}</span>
-            <Grid container style={{ marginTop: theme.spacing(1) }}>
-              <Grid size={{ xs: 6 }}>
-                <b>{t('outstanding.services')}</b>
-              </Grid>
-              <Grid size={{ xs: 6 }}>
-                <b>{t('outstanding.files')}</b>
-              </Grid>
-            </Grid>
-            {Object.keys(outstanding).map(service => (
-              <Grid key={service} container>
-                <Grid size={{ xs: 6 }}>
-                  <b>{service}</b>
-                </Grid>
-                <Grid size={{ xs: 6 }}>{outstanding[service]}</Grid>
-              </Grid>
-            ))}
-          </Alert>
-        </Snackbar>
-      )}
 
       <PageHeader
         classification={() => submission.classification}
@@ -1337,33 +1297,83 @@ function WrappedSubmissionDetail() {
                 style={{
                   width: '100%',
                   maxWidth: theme.breakpoints.values.sm,
-                  display: 'flex',
                   color: theme.palette.mode === 'dark' ? theme.palette.primary.light : theme.palette.primary.dark,
                   paddingBottom: theme.spacing(3),
                   paddingTop: theme.spacing(2)
                 }}
               >
-                {liveStatus === 'processing' ? (
-                  <PlayCircleOutlineIcon
-                    style={{
-                      height: theme.spacing(3),
-                      width: theme.spacing(3),
-                      marginRight: theme.spacing(1)
-                    }}
-                  />
-                ) : (
-                  <PauseCircleOutlineOutlinedIcon
-                    style={{
-                      height: theme.spacing(3),
-                      width: theme.spacing(3),
-                      marginRight: theme.spacing(1)
-                    }}
-                  />
-                )}
-                <div style={{ width: '100%' }}>
-                  {t(liveStatus)}
-                  <LinearProgress />
+                <div style={{ display: 'flex' }}>
+                  {liveStatus === 'processing' ? (
+                    <PlayCircleOutlineIcon
+                      style={{
+                        height: theme.spacing(3),
+                        width: theme.spacing(3),
+                        marginRight: theme.spacing(1)
+                      }}
+                    />
+                  ) : (
+                    <PauseCircleOutlineOutlinedIcon
+                      style={{
+                        height: theme.spacing(3),
+                        width: theme.spacing(3),
+                        marginRight: theme.spacing(1)
+                      }}
+                    />
+                  )}
+                  <div style={{ width: '100%' }}>
+                    {t(liveStatus)}
+                    <LinearProgress />
+                  </div>
+                  {outstanding && Object.keys(outstanding).length > 0 && (
+                    <IconButton
+                      color="primary"
+                      size="small"
+                      tooltip={outstandingOpen ? t('collapse') : t('expand')}
+                      onClick={() => setOutstandingOpen(o => !o)}
+                      sx={{ padding: 0, marginLeft: theme.spacing(1) }}
+                    >
+                      <ExpandLessIcon
+                        style={{
+                          transform: 'rotate(0deg)',
+                          transition: theme.transitions.create('transform', {
+                            duration: theme.transitions.duration.shortest
+                          }),
+                          ...(outstandingOpen && {
+                            transform: 'rotate(180deg)'
+                          })
+                        }}
+                      />
+                    </IconButton>
+                  )}
                 </div>
+                <Collapse in={outstandingOpen} timeout="auto">
+                  {outstanding && Object.keys(outstanding).length > 0 && (
+                    <table style={{ marginLeft: theme.spacing(4) }}>
+                      <thead>
+                        <tr>
+                          <td style={{ paddingRight: theme.spacing(4) }}>
+                            <b>{t('outstanding.services')}</b>
+                          </td>
+                          <td>
+                            <b>{t('outstanding.files')}</b>
+                          </td>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {Object.entries(outstanding).map(([name, file], i) => (
+                          <tr key={`${name}-${i}`}>
+                            <td>
+                              <b>{name}</b>
+                            </td>
+                            <td>
+                              <b>{file}</b>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  )}
+                </Collapse>
               </div>
             )}
           </>
