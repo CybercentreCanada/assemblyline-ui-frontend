@@ -1,6 +1,7 @@
 import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
 import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
 import ChromeReaderModeOutlinedIcon from '@mui/icons-material/ChromeReaderModeOutlined';
+import CloseIcon from '@mui/icons-material/Close';
 import CloudDownloadOutlinedIcon from '@mui/icons-material/CloudDownloadOutlined';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -14,7 +15,7 @@ import ReplayOutlinedIcon from '@mui/icons-material/ReplayOutlined';
 import TuneOutlinedIcon from '@mui/icons-material/TuneOutlined';
 import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import {
-  Collapse,
+  Alert,
   DialogContentText,
   FormControl,
   FormControlLabel,
@@ -28,6 +29,7 @@ import {
   Radio,
   RadioGroup,
   Skeleton,
+  Snackbar,
   Stack,
   Tooltip,
   Typography,
@@ -60,6 +62,7 @@ import FileTreeSection from 'components/routes/submission/detail/file_tree';
 import InfoSection from 'components/routes/submission/detail/info';
 import MetaSection from 'components/routes/submission/detail/meta';
 import TagSection from 'components/routes/submission/detail/tags';
+import { Button } from 'components/visual/Buttons/Button';
 import { FileDownloader } from 'components/visual/Buttons/FileDownloader';
 import { IconButton } from 'components/visual/Buttons/IconButton';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
@@ -1105,6 +1108,49 @@ function WrappedSubmissionDetail() {
           .filter(metakey => systemConfig.submission.metadata.archive[metakey].required)
           .some(metakey => !Object.keys(archivingMetadata).includes(metakey))}
       />
+      {outstandingOpen && outstanding && Object.keys(outstanding).length > 0 && (
+        <Snackbar
+          anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+          open={outstanding !== null}
+          key="outstanding"
+          style={{ top: theme.spacing(8), zIndex: 100 }}
+        >
+          <Alert
+            elevation={6}
+            severity="info"
+            style={{ textAlign: 'left' }}
+            action={
+              <IconButton
+                aria-label="close"
+                color="inherit"
+                size="small"
+                onClick={() => setOutstandingOpen(false)}
+                style={{ alignSelf: 'start' }}
+              >
+                <CloseIcon fontSize="inherit" />
+              </IconButton>
+            }
+          >
+            <span style={{ fontWeight: 500, textAlign: 'left' }}>{t('outstanding.title')}</span>
+            <Grid container style={{ marginTop: theme.spacing(1) }}>
+              <Grid size={{ xs: 6 }}>
+                <b>{t('outstanding.services')}</b>
+              </Grid>
+              <Grid size={{ xs: 6 }}>
+                <b>{t('outstanding.files')}</b>
+              </Grid>
+            </Grid>
+            {Object.keys(outstanding).map(service => (
+              <Grid key={service} container>
+                <Grid size={{ xs: 6 }}>
+                  <b>{service}</b>
+                </Grid>
+                <Grid size={{ xs: 6 }}>{outstanding[service]}</Grid>
+              </Grid>
+            ))}
+          </Alert>
+        </Snackbar>
+      )}
 
       <PageHeader
         classification={() => submission.classification}
@@ -1293,7 +1339,24 @@ function WrappedSubmissionDetail() {
                   paddingTop: theme.spacing(2)
                 }}
               >
-                <div style={{ display: 'flex' }}>
+                <Button
+                  disabled
+                  sx={{
+                    color: `${theme.palette.mode === 'dark' ? theme.palette.primary.light : theme.palette.primary.dark} !important`,
+                    display: 'flex',
+                    fontWeight: 'normal',
+                    padding: 0,
+                    textAlign: 'left',
+                    textTransform: 'none',
+                    width: '100%'
+                  }}
+                  {...(outstanding &&
+                    Object.keys(outstanding).length > 0 && {
+                      disabled: false,
+                      tooltip: t('outstanding_services.open'),
+                      onClick: () => setOutstandingOpen(true)
+                    })}
+                >
                   {liveStatus === 'processing' ? (
                     <PlayCircleOutlineIcon
                       style={{
@@ -1315,56 +1378,7 @@ function WrappedSubmissionDetail() {
                     {t(liveStatus)}
                     <LinearProgress />
                   </div>
-                  {outstanding && Object.keys(outstanding).length > 0 && (
-                    <IconButton
-                      color="primary"
-                      size="small"
-                      tooltip={outstandingOpen ? t('collapse') : t('expand')}
-                      onClick={() => setOutstandingOpen(o => !o)}
-                      sx={{ padding: 0, marginLeft: theme.spacing(1) }}
-                    >
-                      <ExpandMoreIcon
-                        style={{
-                          transform: 'rotate(0deg)',
-                          transition: theme.transitions.create('transform', {
-                            duration: theme.transitions.duration.shortest
-                          }),
-                          ...(outstandingOpen && {
-                            transform: 'rotate(180deg)'
-                          })
-                        }}
-                      />
-                    </IconButton>
-                  )}
-                </div>
-                <Collapse in={outstandingOpen} timeout="auto">
-                  {outstanding && Object.keys(outstanding).length > 0 && (
-                    <table style={{ marginLeft: theme.spacing(4) }}>
-                      <thead>
-                        <tr>
-                          <td style={{ paddingRight: theme.spacing(4) }}>
-                            <b>{t('outstanding.services')}</b>
-                          </td>
-                          <td>
-                            <b>{t('outstanding.files')}</b>
-                          </td>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {Object.entries(outstanding).map(([name, file], i) => (
-                          <tr key={`${name}-${i}`}>
-                            <td style={{ paddingRight: theme.spacing(4) }}>
-                              <b>{name}</b>
-                            </td>
-                            <td>
-                              <b>{file}</b>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  )}
-                </Collapse>
+                </Button>
               </div>
             )}
           </>
