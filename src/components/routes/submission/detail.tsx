@@ -80,7 +80,6 @@ import io from 'socket.io-client';
 
 const NAMESPACE = '/live_submission';
 const MESSAGE_TIMEOUT = 5000;
-const OUTSTANDING_TRIGGER_COUNT = 0;
 
 type ParamProps = {
   id: string;
@@ -1324,7 +1323,7 @@ function WrappedSubmissionDetail() {
                       onClick={() => setOutstandingOpen(o => !o)}
                       sx={{ padding: 0, marginLeft: theme.spacing(1) }}
                     >
-                      <ExpandLessIcon
+                      <ExpandMoreIcon
                         style={{
                           transform: 'rotate(0deg)',
                           transition: theme.transitions.create('transform', {
@@ -1354,7 +1353,7 @@ function WrappedSubmissionDetail() {
                       <tbody>
                         {Object.entries(outstanding).map(([name, file], i) => (
                           <tr key={`${name}-${i}`}>
-                            <td>
+                            <td style={{ paddingRight: theme.spacing(4) }}>
                               <b>{name}</b>
                             </td>
                             <td>
