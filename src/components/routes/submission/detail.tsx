@@ -1353,7 +1353,7 @@ function WrappedSubmissionDetail() {
                   {...(outstanding &&
                     Object.keys(outstanding).length > 0 && {
                       disabled: false,
-                      tooltip: t('outstanding_services.open'),
+                      tooltip: t('outstanding_services.show'),
                       onClick: () => setOutstandingOpen(true)
                     })}
                 >
