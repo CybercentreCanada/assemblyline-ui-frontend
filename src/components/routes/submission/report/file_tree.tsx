@@ -44,8 +44,7 @@ function FileTree({ tree, important_files }: Props) {
                         }}
                       >
                         {`${tree[f].sha256} - ${tree[f].type} - `}
-                        <b>{tree[f].size}</b>
-                        <span style={{ fontWeight: 300 }}> ({bytesToSize(tree[f].size)})</span>
+                        <span style={{ fontWeight: 300 }}>{bytesToSize(tree[f].size)}</span>
                       </Box>
                     </td>
                   </tr>
