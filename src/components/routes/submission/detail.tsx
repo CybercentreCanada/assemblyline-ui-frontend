@@ -149,7 +149,7 @@ function WrappedSubmissionDetail() {
   const [baseFiles, setBaseFiles] = useState<string[]>([]);
   const [archivingMetadata, setArchivingMetadata] = useState<Record<string, ArchiverMetadata>>({});
   const [archivingUseAlternateDtl, setArchivingUseAlternateDtl] = useState<'true' | 'false'>('false');
-  const [outstandingOpen, setOutstandingOpen] = useState<boolean>(true);
+  const [outstandingOpen, setOutstandingOpen] = useState<boolean>(false);
 
   const [liveResultKeys, setLiveResultKeys] = useReducer(messageReducer, []);
   const [liveErrorKeys, setLiveErrorKeys] = useReducer(messageReducer, []);
