@@ -26,10 +26,10 @@ import {
   ListItemIcon,
   ListItemText,
   Popover,
+  Popper,
   Radio,
   RadioGroup,
   Skeleton,
-  Snackbar,
   Stack,
   Tooltip,
   Typography,
@@ -74,7 +74,7 @@ import VerdictBar from 'components/visual/VerdictBar';
 import { getErrorIDFromKey, getServiceFromKey } from 'helpers/errors';
 import { setNotifyFavicon } from 'helpers/utils';
 import moment from 'moment';
-import React, { useCallback, useEffect, useMemo, useReducer, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router';
 import { Link } from 'react-router-dom';
@@ -83,6 +83,7 @@ import io from 'socket.io-client';
 
 const NAMESPACE = '/live_submission';
 const MESSAGE_TIMEOUT = 5000;
+const OUTSTANDING_TRIGGER_COUNT = 4;
 
 type ParamProps = {
   id: string;
@@ -136,7 +137,7 @@ function WrappedSubmissionDetail() {
   const [configuration, setConfiguration] = useState<Configuration>(null);
   const [liveErrors, setLiveErrors] = useState<string[]>(null);
   const [liveTagMap, setLiveTagMap] = useState<SubmissionTags>(null);
-  const [outstanding, setOutstanding] = useState<OutstandingServices>(null);
+  const [outstanding, setOutstanding] = useState<OutstandingServices>({ test: 2 });
   const [liveStatus, setLiveStatus] = useState<LiveStatus>('queued');
   const [socket, setSocket] = useState<Socket>(null);
   const [loadInterval, setLoadInterval] = useState<NodeJS.Timeout>(null);
@@ -148,13 +149,15 @@ function WrappedSubmissionDetail() {
   const [baseFiles, setBaseFiles] = useState<string[]>([]);
   const [archivingMetadata, setArchivingMetadata] = useState<Record<string, ArchiverMetadata>>({});
   const [archivingUseAlternateDtl, setArchivingUseAlternateDtl] = useState<'true' | 'false'>('false');
-  const [outstandingOpen, setOutstandingOpen] = useState<boolean>(true);
+  const [outstandingOpen, setOutstandingOpen] = useState<boolean>(false);
 
   const [liveResultKeys, setLiveResultKeys] = useReducer(messageReducer, []);
   const [liveErrorKeys, setLiveErrorKeys] = useReducer(messageReducer, []);
   const [processedKeys, setProcessedKeys] = useReducer(messageReducer, []);
   const [liveResults, setLiveResults] = useReducer(resultReducer, null);
   const [loadTrigger, incrementLoadTrigger] = useReducer(incrementReducer, 0);
+
+  const anchorRef = useRef<HTMLDivElement>(null);
 
   const popoverOpen = Boolean(resubmitAnchor);
 
@@ -964,12 +967,18 @@ function WrappedSubmissionDetail() {
           updateLiveSumary(api_data.api_response.result);
         }
       });
+    } else if (
+      loadTrigger >= lastSuccessfulTrigger + OUTSTANDING_TRIGGER_COUNT &&
+      loadTrigger % OUTSTANDING_TRIGGER_COUNT === 0
+    ) {
+      setOutstandingOpen(true);
     }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [loadTrigger]);
 
   useEffect(() => {
-    if (loadTrigger !== null) {
+    if (loadTrigger !== null && outstandingOpen) {
       // eslint-disable-next-line no-console
       console.debug('LIVE :: Finding out oustanding services...');
 
@@ -1007,7 +1016,7 @@ function WrappedSubmissionDetail() {
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [lastSuccessfulTrigger]);
+  }, [lastSuccessfulTrigger, outstandingOpen]);
 
   useEffect(() => {
     addInsight({ type: 'report', value: id });
@@ -1108,12 +1117,23 @@ function WrappedSubmissionDetail() {
           .filter(metakey => systemConfig.submission.metadata.archive[metakey].required)
           .some(metakey => !Object.keys(archivingMetadata).includes(metakey))}
       />
+
+      <div ref={anchorRef} style={{ width: '100%' }} />
       {outstandingOpen && outstanding && Object.keys(outstanding).length > 0 && (
-        <Snackbar
-          anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+        <Popper
+          anchorEl={anchorRef.current}
+          placement="bottom-end"
           open={outstanding !== null}
-          key="outstanding"
-          style={{ top: theme.spacing(8), zIndex: 100 }}
+          disablePortal
+          style={{ zIndex: 100 }}
+          modifiers={[
+            {
+              name: 'offset',
+              options: {
+                offset: [0, 64]
+              }
+            }
+          ]}
         >
           <Alert
             elevation={6}
@@ -1149,7 +1169,7 @@ function WrappedSubmissionDetail() {
               </Grid>
             ))}
           </Alert>
-        </Snackbar>
+        </Popper>
       )}
 
       <PageHeader
