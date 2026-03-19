@@ -54,6 +54,7 @@ export const SignUpRequest = React.memo(() => {
       body,
       onEnter: () => {
         form.setFieldValue('mode', 'loading');
+        form.setFieldValue('loading', t('signup.loading'));
       },
       onFailure: ({ api_error_message }) => {
         form.setFieldValue('mode', 'reset-password-request');

@@ -1,9 +1,10 @@
 import { CircularProgress, Typography, useTheme } from '@mui/material';
-import { useAPIQuery } from 'core/api';
+import { invalidateAPIQuery, useAPIQuery } from 'core/api';
 import { useAppBannerVert } from 'core/preference/preference.hooks';
 import { createAppRoute } from 'core/router/route/route.utils';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router';
 import { PageCardCentered } from 'ui/layouts/PageCardCentered';
 
 //*****************************************************************************************
@@ -15,23 +16,15 @@ export const LogoutPage = React.memo(({}: LogoutPageProps) => {
   const { t } = useTranslation(['logout']);
   const theme = useTheme();
   const Banner = useAppBannerVert();
+  const navigate = useNavigate();
 
-  // useEffectOnce(() => {
-  //   hideMenus();
-
-  //   apiCall({
-  //     url: '/api/v4/auth/logout/',
-  //     onSuccess: () => {
-  //       setTimeout(() => {
-  //         window.location.replace('/');
-  //       }, 500);
-  //     }
-  //   });
-  // });
-
-  const logout = useAPIQuery({
+  useAPIQuery({
     url: '/api/v4/auth/logout/',
-    onSuccess: () => null
+    method: 'GET',
+    onExit: () => {
+      navigate('/');
+      invalidateAPIQuery(({ url }) => '/api/v4/user/whoami/' === url, 0);
+    }
   });
 
   return (

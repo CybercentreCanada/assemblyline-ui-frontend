@@ -2,6 +2,9 @@
   "button": "Sign in",
   "button_oauth": "Sign in with",
   "button_saml": "Sign in with SAML",
+  "divider": "OR",
+  "login.loading": "Signing you in...",
+  "oauth.loading": "Signing you in...",
   "other": "Or sign in as a different user...",
   "otp": "One Time Password",
   "password": "Password",
@@ -10,8 +13,10 @@
   "reset.done": "An email was sent to your address with instructions on how to reset your password.",
   "reset.email": "Enter your email address",
   "reset.link": "Reset it!",
+  "reset.loading": "Requesting password reset...",
   "reset_now.button": "Reset",
   "reset_now.done": "Password reset!",
+  "reset_now.loading": "Resetting your password...",
   "reset_now.password": "New password",
   "reset_now.password_confirm": "Confirm new password",
   "reset_now.redirect": "You will be redirected to the login screen in a few seconds...",
@@ -21,22 +26,18 @@
   "signup": "Do not have an account?",
   "signup.button": "Create my account",
   "signup.completed": "New account registration is now complete, you can now login with your account",
+  "signup.confirming": "Confirming the creation of the account",
   "signup.done": "An email was sent to your address with the final instructions to create a new account.",
   "signup.email": "Email address",
-  "signup.confirming": "Confirming the creation of the account",
   "signup.link": "Sign up!",
+  "signup.loading": "RequesCreating you account...",
   "signup.password": "Password",
   "signup.password_confirm": "Password confirmation",
   "signup.username": "Username",
   "username": "Username",
-
-  "validate.username.characters": "lowercase letters or dashes only",
-
+  "validate.email.invalid": "Invalid email address",
+  "validate.email.required": "Email is required",
   "validate.password.required": "Password is required",
   "validate.password_confirm.mismatch": "Passwords do not match",
-
-  "validate.email.required": "Email is required",
-  "validate.email.invalid": "Invalid email address",
-
-  "divider": "OR"
+  "validate.username.characters": "lowercase letters or dashes only"
 }

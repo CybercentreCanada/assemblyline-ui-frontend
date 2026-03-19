@@ -1,8 +1,7 @@
-import { CircularProgress, Stack, useTheme } from '@mui/material';
+import { Stack, useTheme } from '@mui/material';
 import { useAppBanner, useAppBannerVert } from 'core/preference/preference.hooks';
 import { createAppRoute } from 'core/router/route/route.utils';
 import React from 'react';
-import { useTranslation } from 'react-i18next';
 import { PageCardCentered } from 'ui/layouts/PageCardCentered';
 import { OneTimePassword } from './components/OneTimePassword';
 import { ResetPasswordConfirmation, ResetPasswordLink, ResetPasswordRequest } from './components/ResetPassword';
@@ -10,7 +9,7 @@ import { SecurityTokenLogin } from './components/SecurityToken';
 import { SignUpConfirmation, SignUpLink, SignUpRequest } from './components/SignUp';
 import { OAuthLogin, SAMLLogin, SingleSignOn } from './components/SingleSignOn';
 import { UserPasswordLogin } from './components/UserPassword';
-import { LoginDivider } from './log-in.components';
+import { LoadingCard, LoginDivider } from './log-in.components';
 import { useOAuthLogin, usePasswordResetEmail, useQuickLogin, useSAMLLogin, useSignUpEmail } from './log-in.hooks';
 import { LoginFormProvider, useLoginForm } from './log-in.providers';
 
@@ -27,7 +26,6 @@ type LoginRequest = {
 // Login Page Content
 //*****************************************************************************************
 const LoginPageContent = React.memo(() => {
-  const { t } = useTranslation(['login']);
   const Banner = useAppBanner();
   const BannerVert = useAppBannerVert();
   const theme = useTheme();
@@ -51,11 +49,7 @@ const LoginPageContent = React.memo(() => {
               {(() => {
                 switch (mode) {
                   case 'loading':
-                    return (
-                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                        <CircularProgress variant="indeterminate" />
-                      </div>
-                    );
+                    return <LoadingCard />;
                   case 'log-in':
                     return (
                       <>

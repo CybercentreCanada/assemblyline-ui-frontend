@@ -1,4 +1,4 @@
-import { Divider, TextField, TextFieldProps, useTheme } from '@mui/material';
+import { CircularProgress, Divider, TextField, TextFieldProps, Typography, useTheme } from '@mui/material';
 import { useAppConfigStore } from 'core/config';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -193,3 +193,26 @@ export const EmailInput = React.memo((props: TextFieldProps) => {
 });
 
 EmailInput.displayName = 'EmailInput';
+
+//*****************************************************************************************
+// Loading Card
+//*****************************************************************************************
+export const LoadingCard = React.memo(() => {
+  const { t } = useTranslation(['login']);
+  const form = useLoginForm();
+
+  return (
+    <form.Subscribe selector={s => s.values.loading}>
+      {loading => (
+        <>
+          <Typography sx={{ width: '100%', textAlign: 'center' }}>{loading}</Typography>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <CircularProgress variant="indeterminate" />
+          </div>
+        </>
+      )}
+    </form.Subscribe>
+  );
+});
+
+LoadingCard.displayName = 'LoadingCard';

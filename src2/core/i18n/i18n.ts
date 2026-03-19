@@ -6,6 +6,8 @@ import lockedEN from 'pages/locked/locked.i18n.en.json';
 import lockedFR from 'pages/locked/locked.i18n.fr.json';
 import loginEN from 'pages/log-in/log-in.i18n.en.json';
 import loginFR from 'pages/log-in/log-in.i18n.fr.json';
+import logoutEN from 'pages/log-out/log-out.i18n.en.json';
+import logoutFR from 'pages/log-out/log-out.i18n.fr.json';
 import notFoundEN from 'pages/not-found/not-found.i18n.en.json';
 import notFoundFR from 'pages/not-found/not-found.i18n.fr.json';
 import quotaEN from 'pages/quota/quota.i18n.en.json';
@@ -19,8 +21,9 @@ const resources = {
     error403: forbiddenEN,
     error404: notFoundEN,
     locked: lockedEN,
-    quota: quotaEN,
     login: loginEN,
+    logout: logoutEN,
+    quota: quotaEN,
     tos: tosEN,
     translation: {}
   },
@@ -28,9 +31,10 @@ const resources = {
     error403: forbiddenFR,
     error404: notFoundFR,
     locked: lockedFR,
+    login: loginFR,
+    logout: logoutFR,
     quota: quotaFR,
     tos: tosFR,
-    login: loginFR,
     translation: {}
   }
 };

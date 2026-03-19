@@ -25,6 +25,8 @@ export type LoginFormStore = {
   oauth_token_id: string;
   saml_token_id: string;
   webauthn_auth_resp: number[];
+
+  loading: string;
 };
 
 export const DEFAULT_LOGIN_FORM_STORE: LoginFormStore = {
@@ -42,7 +44,9 @@ export const DEFAULT_LOGIN_FORM_STORE: LoginFormStore = {
 
   oauth_token_id: null,
   saml_token_id: null,
-  webauthn_auth_resp: null
+  webauthn_auth_resp: null,
+
+  loading: null
 };
 
 export const { FormProvider: LoginFormProvider, useForm: useLoginForm } = createFormContext<LoginFormStore>({

@@ -26,6 +26,7 @@ export const ResetPasswordConfirmation = React.memo(() => {
       body,
       onEnter: () => {
         form.setFieldValue('mode', 'loading');
+        form.setFieldValue('loading', t('reset_now.loading'));
       },
       onFailure: ({ api_status_code, api_error_message }) => {
         if (api_status_code === 403) resetLogin();
@@ -86,6 +87,7 @@ export const ResetPasswordRequest = React.memo(() => {
     body,
     onEnter: () => {
       form.setFieldValue('mode', 'loading');
+      form.setFieldValue('loading', t('reset.loading'));
     },
     onFailure: ({ api_error_message }) => {
       form.setFieldValue('mode', 'reset-password-request');

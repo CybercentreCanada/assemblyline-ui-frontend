@@ -24,6 +24,8 @@ export const useLoginReset = () => {
     form.setFieldValue('oauth_token_id', null);
     form.setFieldValue('saml_token_id', null);
     form.setFieldValue('webauthn_auth_resp', null);
+
+    form.setFieldValue('loading', null);
   }, []);
 };
 
@@ -73,6 +75,7 @@ export const useSignUpEmail = () => {
  * @returns
  */
 export const useOAuthLogin = () => {
+  const { t } = useTranslation(['login']);
   const navigate = useNavigate();
   const { pathname, search } = useLocation();
   const { showErrorMessage } = useAppSnackbar();
@@ -103,6 +106,7 @@ export const useOAuthLogin = () => {
     disabled: !provider,
     onEnter: () => {
       form.setFieldValue('mode', 'loading');
+      form.setFieldValue('loading', t('oauth.loading'));
     },
     onFailure: ({ api_error_message }) => {
       showErrorMessage(api_error_message);
@@ -210,6 +214,7 @@ export const useLoginRequest = () => {
     },
     onEnter: () => {
       form.setFieldValue('mode', 'loading');
+      form.setFieldValue('loading', t('login.loading'));
     },
     onFailure: ({ api_error_message: msg }) => {
       const mode = form.getFieldValue('mode');
@@ -229,7 +234,7 @@ export const useLoginRequest = () => {
       }
     },
     onSuccess: () => {
-      invalidateAPIQuery(({ url }) => '/api/v4/user/whoami/' === url);
+      invalidateAPIQuery(({ url }) => '/api/v4/user/whoami/' === url, 0);
     }
   }));
 };
