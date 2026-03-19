@@ -2,39 +2,54 @@ import { TextField } from '@mui/material';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from 'ui/buttons/Button';
+import { TextDivider } from '../log-in.components';
+import { useLoginRequest, useLoginReset } from '../log-in.hooks';
 import { useLoginForm } from '../log-in.providers';
 
-type OTPProps = {
-  onSubmit: (event: React.FormEvent<HTMLFormElement> | null) => void;
-  buttonLoading: boolean;
-};
-
-export const OneTimePassLogin = React.memo(({ onSubmit, buttonLoading }: OTPProps) => {
+export const OneTimePassword = React.memo(() => {
   const { t } = useTranslation(['login']);
+
   const form = useLoginForm();
+  const requestLogin = useLoginRequest();
+  const resetLogin = useLoginReset();
 
   return (
-    <form onSubmit={onSubmit}>
-      <div style={{ display: 'flex', flexDirection: 'column' }}>
-        <form.Subscribe selector={s => [s.values.otp.code, s.values.disabled] as const}>
-          {([code, disabled]) => (
-            <TextField
-              inputProps={{ maxLength: 6 }}
-              autoFocus
-              variant="outlined"
-              size="small"
-              label={t('otp')}
-              value={code}
-              disabled={disabled}
-              onChange={event => form.setFieldValue('otp.code', event.target.value)}
-            />
-          )}
-        </form.Subscribe>
+    <form
+      style={{ display: 'contents' }}
+      onSubmit={e => {
+        e.preventDefault();
+        e.stopPropagation();
+        requestLogin.mutate();
+      }}
+    >
+      <form.Field name="otp_code">
+        {field => (
+          <TextField
+            label={t('otp')}
+            size="small"
+            type="number"
+            variant="outlined"
+            slotProps={{
+              htmlInput: {
+                required: true,
+                maxLength: 6
+              }
+            }}
+            value={field.state.value}
+            onChange={event => field.handleChange(event.target.value)}
+          />
+        )}
+      </form.Field>
 
-        <Button type="submit" variant="contained" color="primary" disabled={buttonLoading} progress={buttonLoading}>
-          {t('button')}
-        </Button>
-      </div>
+      <Button color="primary" type="submit" variant="contained">
+        {t('button')}
+      </Button>
+
+      <TextDivider />
+
+      <Button variant="text" color="primary" onClick={() => resetLogin()}>
+        {t('button')}
+      </Button>
     </form>
   );
 });

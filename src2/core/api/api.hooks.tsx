@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 // import useMySnackbar from 'components/hooks/useMySnackbar';
 // import useQuota from 'components/hooks/useQuota';
 import { useAppConfigSetStore, useAppConfigStore } from 'core/config/config.providers';
-import { useAppSnackbar } from 'features/snackbar/useAppSnackbar';
+import { useAppSnackbar } from 'core/snackbar/snackbar.hooks';
 import { getFileName } from 'lib/utils/utils';
 import { getXSRFCookie } from 'lib/utils/xsrf.utils';
 import type { Configuration } from 'models/base/config';
@@ -142,7 +142,7 @@ export const useAPICallFn = <
 
         // unauthorized
         if (res.status === 401 && reloadOnUnauthorize) {
-          window.location.reload();
+          // window.location.reload();
           return rejectWith(json);
         }
 

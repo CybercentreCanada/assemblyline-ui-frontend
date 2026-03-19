@@ -10,7 +10,9 @@ export const DEFAULT_APP_CONFIG: AppConfig = {
   },
   auth: {
     login: null,
-    mode: 'loading'
+    mode: 'loading',
+    preferredMethod: null,
+    redirectTo: null
   },
   // config: {
   //   storageKey: 'al.storage'
@@ -22,6 +24,10 @@ export const DEFAULT_APP_CONFIG: AppConfig = {
   router: {
     maxPanels: 3,
     maxNodes: 3
+  },
+  snackbar: {
+    dense: true,
+    maxSnack: 3
   },
   theme: {
     mode: 'system',

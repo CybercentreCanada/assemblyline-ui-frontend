@@ -1,66 +1,154 @@
-import { Typography } from '@mui/material';
+import { Link, Typography } from '@mui/material';
 import { useAPIMutation } from 'core/api';
-import { useAppSnackbar } from 'features/snackbar/useAppSnackbar';
+import { useAppConfigStore } from 'core/config';
+import { useAppSnackbar } from 'core/snackbar/snackbar.hooks';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from 'ui/buttons/Button';
-import { EmailInput, TextDivider } from '../log-in.components';
+import { EmailInput, PasswordConfirmInput, PasswordInput, TextDivider } from '../log-in.components';
+import { useLoginReset } from '../log-in.hooks';
 import { useLoginForm } from '../log-in.providers';
-import { useLoginReset } from '../log-in.utils';
 
-export const ResetPassword = React.memo(() => {
+//*****************************************************************************************
+// Reset Password Confirmation
+//*****************************************************************************************
+export const ResetPasswordConfirmation = React.memo(() => {
   const { t } = useTranslation(['login']);
   const form = useLoginForm();
-  const { showErrorMessage } = useAppSnackbar();
+  const { showErrorMessage, showSuccessMessage } = useAppSnackbar();
 
-  const reset = useLoginReset();
+  const resetLogin = useLoginReset();
 
-  const resetPassword = useAPIMutation<[{ email: string }]>(body => ({
+  const confirmResetPassword = useAPIMutation<[{ reset_id: string; password: string; password_confirm: string }]>(
+    body => ({
+      url: '/api/v4/auth/reset_pwd/',
+      method: 'POST',
+      body,
+      onEnter: () => {
+        form.setFieldValue('mode', 'loading');
+      },
+      onFailure: ({ api_status_code, api_error_message }) => {
+        if (api_status_code === 403) resetLogin();
+        else form.setFieldValue('mode', 'reset-password-confirmation');
+        showErrorMessage(api_error_message);
+      },
+      onSuccess: () => {
+        resetLogin();
+        showSuccessMessage(t('reset_now.done'));
+      }
+    })
+  );
+
+  return (
+    <form
+      style={{ display: 'contents' }}
+      onSubmit={e => {
+        e.preventDefault();
+        e.stopPropagation();
+        confirmResetPassword.mutate({
+          reset_id: form.state.values.reset_id,
+          password: form.state.values.password,
+          password_confirm: form.state.values.password_confirm
+        });
+      }}
+    >
+      <PasswordInput autoFocus label={t('reset_now.password')} />
+      <PasswordConfirmInput label={t('reset_now.password_confirm')} />
+
+      <Button color="primary" type="submit" variant="contained">
+        {t('reset_now.button')}
+      </Button>
+
+      <TextDivider />
+
+      <Button variant="text" color="primary" onClick={() => resetLogin()}>
+        {t('button')}
+      </Button>
+    </form>
+  );
+});
+
+ResetPasswordConfirmation.displayName = 'ResetPasswordConfirmation';
+
+//*****************************************************************************************
+// Reset Password Request
+//*****************************************************************************************
+export const ResetPasswordRequest = React.memo(() => {
+  const { t } = useTranslation(['login']);
+  const form = useLoginForm();
+  const { showErrorMessage, showSuccessMessage } = useAppSnackbar();
+
+  const resetLogin = useLoginReset();
+
+  const getResetLink = useAPIMutation<[{ email: string }]>(body => ({
     url: '/api/v4/auth/get_reset_link/',
     method: 'POST',
     body,
-    onFailure: api_data => showErrorMessage(api_data.api_error_message),
-    onSuccess: () => form.setFieldValue('reset.done', true)
+    onEnter: () => {
+      form.setFieldValue('mode', 'loading');
+    },
+    onFailure: ({ api_error_message }) => {
+      form.setFieldValue('mode', 'reset-password-request');
+      showErrorMessage(api_error_message);
+    },
+    onSuccess: () => {
+      showSuccessMessage(t('reset.done'));
+      resetLogin();
+    }
   }));
 
   return (
-    <form.Subscribe selector={s => s.values.reset.done}>
-      {done =>
-        done ? (
-          <Typography align="center">{t('reset.done')}</Typography>
-        ) : (
-          <>
-            <EmailInput autoFocus disabled={resetPassword.isPending} />
+    <form
+      style={{ display: 'contents' }}
+      onSubmit={e => {
+        e.preventDefault();
+        e.stopPropagation();
+        getResetLink.mutate({ email: form.state.values.email });
+      }}
+    >
+      <EmailInput autoFocus label={t('reset.email')} />
 
-            <form.Subscribe
-              selector={s =>
-                ({
-                  isInvalid: !s.values.reset.email || s.fieldMeta['reset.email'].errors.length > 0,
-                  values: { email: s.values.reset.email.trim().toLowerCase() }
-                }) as const
-              }
-            >
-              {({ values, isInvalid }) => (
-                <Button
-                  variant="contained"
-                  color="primary"
-                  disabled={isInvalid}
-                  progress={resetPassword.isPending}
-                  onClick={() => resetPassword.mutate(values)}
-                >
-                  {t('reset.button')}
-                </Button>
-              )}
-            </form.Subscribe>
+      <Button color="primary" type="submit" variant="contained">
+        {t('reset.button')}
+      </Button>
 
-            <TextDivider />
+      <TextDivider />
 
-            <Button variant="text" color="primary" disabled={resetPassword.isPending} onClick={() => reset()}>
-              {t('signin')}
-            </Button>
-          </>
-        )
-      }
-    </form.Subscribe>
+      <Button variant="text" color="primary" onClick={() => resetLogin()}>
+        {t('button')}
+      </Button>
+    </form>
   );
 });
+
+ResetPasswordRequest.displayName = 'ResetPasswordRequest';
+
+//*****************************************************************************************
+// Reset Password Link
+//*****************************************************************************************
+export const ResetPasswordLink = React.memo(() => {
+  const { t } = useTranslation(['login']);
+  const form = useLoginForm();
+
+  const resetLogin = useLoginReset();
+
+  const allowUserPass = useAppConfigStore(s => s.auth.login.allow_userpass_login);
+  const allowSignup = useAppConfigStore(s => s.auth.login.allow_signup);
+
+  return !allowUserPass || !allowSignup ? null : (
+    <Typography align="center" variant="caption">
+      {t('reset.desc')}&nbsp;&nbsp;
+      <Link
+        href="#"
+        onClick={() => {
+          resetLogin();
+          form.setFieldValue('mode', 'reset-password-request');
+        }}
+      >
+        {t('reset.link')}
+      </Link>
+    </Typography>
+  );
+});
+
+ResetPasswordLink.displayName = 'ResetPasswordLink';

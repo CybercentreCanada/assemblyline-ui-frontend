@@ -77,7 +77,9 @@ export const AppAuthSettingsSchema = z.object({
       allow_userpass_login: z.boolean().optional(),
       oauth_providers: z.array(z.string()).optional()
     })
-    .optional()
+    .optional(),
+  redirectTo: z.string(),
+  preferredMethod: z.string()
 });
 
 export type AppAuthSettings = z.infer<typeof AppAuthSettingsSchema>;

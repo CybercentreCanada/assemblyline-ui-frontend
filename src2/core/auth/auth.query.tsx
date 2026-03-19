@@ -3,7 +3,7 @@ import { APIQueryKey, APIResponse, DEFAULT_RETRY_MS, isAPIData, stableStringify 
 import { LoginParamsProps } from 'core/auth/auth.models';
 import { useSaveAppConfig } from 'core/config/config.hooks';
 import { useAppConfigSetStore, useAppConfigStore } from 'core/config/config.providers';
-import { useAppSnackbar } from 'features/snackbar/useAppSnackbar';
+import { useAppSnackbar } from 'core/snackbar/snackbar.hooks';
 import { getXSRFCookie } from 'lib/utils/xsrf.utils';
 import { Configuration } from 'models/base/config';
 import { WhoAmIProps } from 'models/ui/user';

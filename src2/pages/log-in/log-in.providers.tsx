@@ -1,61 +1,48 @@
 import { createFormContext } from 'features/form/createFormContext';
 
 export type LoginFormStore = {
-  mode: 'login' | 'oauth' | 'otp' | 'reset-password-now' | 'reset-password' | 'saml' | 'sectoken' | 'sign-up';
-  inputs: {
-    username: string;
-    password: string;
-    password_confirm: string;
-    email: string;
-  };
-  tokens: {};
-  done: boolean;
-  disabled: boolean;
+  mode:
+    | 'loading'
+    | 'log-in'
+    | 'otp'
+    | 'reset-password-confirmation'
+    | 'reset-password-request'
+    | 'sectoken'
+    | 'sign-up-confirmation'
+    | 'sign-up-request'
+    | 'sso';
+
+  avatar: string;
+  username: string;
+  password: string;
+  password_confirm: string;
+  email: string;
 
   reset_id: string;
+  otp_code: string;
+  registration_key: string;
 
-  otp: {
-    code: string;
-  };
-  sso: {
-    avatar: string;
-    username: string;
-    email: string;
-    oauth_token_id: string;
-    saml_token_id: string;
-  };
-  webauthn: {
-    response: number[] | null;
-  };
+  oauth_token_id: string;
+  saml_token_id: string;
+  webauthn_auth_resp: number[];
 };
 
 export const DEFAULT_LOGIN_FORM_STORE: LoginFormStore = {
-  mode: 'login',
-  inputs: {
-    username: '',
-    password: '',
-    password_confirm: '',
-    email: ''
-  },
-  tokens: null,
-  done: false,
-  disabled: false,
+  mode: 'log-in',
 
-  reset_id: '',
+  avatar: null,
+  username: null,
+  password: null,
+  password_confirm: null,
+  email: null,
 
-  otp: {
-    code: ''
-  },
-  sso: {
-    avatar: '',
-    username: '',
-    email: '',
-    oauth_token_id: '',
-    saml_token_id: ''
-  },
-  webauthn: {
-    response: null
-  }
+  reset_id: null,
+  otp_code: null,
+  registration_key: null,
+
+  oauth_token_id: null,
+  saml_token_id: null,
+  webauthn_auth_resp: null
 };
 
 export const { FormProvider: LoginFormProvider, useForm: useLoginForm } = createFormContext<LoginFormStore>({

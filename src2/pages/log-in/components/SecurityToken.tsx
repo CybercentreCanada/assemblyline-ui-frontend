@@ -1,27 +1,23 @@
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { Typography } from '@mui/material';
-import { useAPIMutation } from 'core/api';
-import { useAppSnackbar } from 'features/snackbar/useAppSnackbar';
+import { useAPIQuery } from 'core/api';
+import { useAppSnackbar } from 'core/snackbar/snackbar.hooks';
 import { decode, encode } from 'lib/utils/cbor';
 import toArrayBuffer from 'lib/utils/toArrayBuffer';
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLoginForm } from '../log-in.providers';
 
-type SecTokenProps = {
-  setVariant: (value: 'otp' | 'login') => void;
-};
-
-export const SecurityTokenLogin = React.memo(({ setVariant }: SecTokenProps) => {
+export const SecurityTokenLogin = React.memo(() => {
   const { t } = useTranslation(['login']);
   const form = useLoginForm();
   const { showErrorMessage } = useAppSnackbar();
-  const username = form.state.values.userpass.username;
 
-  const beginWebAuthn = useAPIMutation<[string]>(user => ({
-    url: `/api/v4/webauthn/authenticate/begin/${user}/`,
-    onSuccess: api_data => {
-      const arrayData = toArrayBuffer(api_data.api_response);
+  useAPIQuery({
+    url: `/api/v4/webauthn/authenticate/begin/${form.state.values.username || ''}/`,
+    method: 'GET',
+    onSuccess: ({ api_response }) => {
+      const arrayData = toArrayBuffer(api_response);
       const options = decode(arrayData.buffer);
       const credentialHelper = navigator.credentials;
       if (credentialHelper !== undefined) {
@@ -36,25 +32,20 @@ export const SecurityTokenLogin = React.memo(({ setVariant }: SecTokenProps) => 
               signature: new Uint8Array(response.signature)
             });
 
-            form.setFieldValue('webauthn.response', Array.from(new Uint8Array(assertionData)));
+            form.setFieldValue('webauthn_auth_resp', Array.from(new Uint8Array(assertionData)));
           })
           .catch(ex => {
             // eslint-disable-next-line no-console
             console.log(`${ex.name}: ${ex.message}`);
-            setVariant('otp');
+            form.setFieldValue('mode', 'otp');
             showErrorMessage(t('securitytoken.error'));
           });
       } else {
-        setVariant('otp');
+        form.setFieldValue('mode', 'otp');
         showErrorMessage(t('securitytoken.unavailable'));
       }
     }
-  }));
-
-  useEffect(() => {
-    if (!username) return;
-    beginWebAuthn.mutate(username);
-  }, [beginWebAuthn, username]);
+  });
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'center' }}>

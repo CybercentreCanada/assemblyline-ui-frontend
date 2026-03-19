@@ -1,6 +1,7 @@
 import { AppAPIConfig, AppAPISettingsSchema } from 'core/api/api.models';
 import { AppAuthConfig } from 'core/auth/auth.models';
 import { AppRouterConfig, AppRouterSettingsSchema } from 'core/router/router/router.models';
+import { AppSnackbarConfig } from 'core/snackbar/snackbar.models';
 import { AppThemeConfig, AppThemeSettingsSchema } from 'core/theme/theme.models';
 import type { ClassificationDefinition } from 'helpers/classificationParser';
 import type { Configuration } from 'models/base/config';
@@ -58,6 +59,7 @@ export type AppConfig = {
   auth: AppAuthConfig;
   quota: { api: number; submission: number };
   router: AppRouterConfig;
+  snackbar: AppSnackbarConfig;
   theme: AppThemeConfig;
 
   c12nDef: ClassificationDefinition;

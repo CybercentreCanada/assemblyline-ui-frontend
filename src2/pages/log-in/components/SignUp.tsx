@@ -1,86 +1,132 @@
-import { Typography } from '@mui/material';
-import { useAPIMutation } from 'core/api';
-import { useAppSnackbar } from 'features/snackbar/useAppSnackbar';
-import React from 'react';
+import { CircularProgress, Link, Typography } from '@mui/material';
+import { useAPIMutation, useAPIQuery } from 'core/api';
+import { useAppConfigStore } from 'core/config';
+import { useAppSnackbar } from 'core/snackbar/snackbar.hooks';
+import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from 'ui/buttons/Button';
 import { EmailInput, PasswordConfirmInput, PasswordInput, TextDivider, UsernameInput } from '../log-in.components';
+import { useLoginReset } from '../log-in.hooks';
 import { useLoginForm } from '../log-in.providers';
-import { useLoginReset } from '../log-in.utils';
 
-export const SignUp = React.memo(() => {
+//*****************************************************************************************
+// Sign Up Confirmation
+//*****************************************************************************************
+export const SignUpConfirmation = React.memo(() => {
   const { t } = useTranslation(['login']);
   const form = useLoginForm();
-  const { showErrorMessage } = useAppSnackbar();
+  const { showSuccessMessage } = useAppSnackbar();
 
-  const reset = useLoginReset();
+  const resetLogin = useLoginReset();
+
+  useAPIQuery({
+    url: '/api/v4/auth/signup_validate/',
+    method: 'POST',
+    body: { registration_key: form.getFieldValue('registration_key') },
+    onSuccess: () => showSuccessMessage(t('signup.completed'), 10000),
+    onExit: () => resetLogin()
+  });
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+      <Typography align="center">{t('signup.confirming')}</Typography>
+      <CircularProgress variant="indeterminate" />
+    </div>
+  );
+});
+
+SignUpConfirmation.displayName = 'SignUpConfirmation';
+
+//*****************************************************************************************
+// Sign Up Request
+//*****************************************************************************************
+export const SignUpRequest = React.memo(() => {
+  const { t } = useTranslation(['login']);
+  const form = useLoginForm();
+  const { showErrorMessage, showSuccessMessage } = useAppSnackbar();
+
+  const resetLogin = useLoginReset();
 
   const createAccount = useAPIMutation<[{ user: string; password: string; password_confirm: string; email: string }]>(
     body => ({
       url: '/api/v4/auth/signup/',
       method: 'POST',
       body,
-      onFailure: api_data => showErrorMessage(api_data.api_error_message),
-      onSuccess: () => form.setFieldValue('signup.done', true)
+      onEnter: () => {
+        form.setFieldValue('mode', 'loading');
+      },
+      onFailure: ({ api_error_message }) => {
+        form.setFieldValue('mode', 'reset-password-request');
+        showErrorMessage(api_error_message);
+      },
+      onSuccess: () => {
+        resetLogin();
+        showSuccessMessage(t('signup.done'));
+      }
     })
   );
 
   return (
-    <form.Subscribe selector={s => s.values.signup.done}>
-      {done =>
-        done ? (
-          <Typography align="center">{t('signup.done')}</Typography>
-        ) : (
-          <>
-            <UsernameInput autoFocus disabled={createAccount.isPending} />
-            <PasswordInput disabled={createAccount.isPending} />
-            <PasswordConfirmInput disabled={createAccount.isPending} />
-            <EmailInput disabled={createAccount.isPending} />
+    <form
+      style={{ display: 'contents' }}
+      onSubmit={e => {
+        e.preventDefault();
+        e.stopPropagation();
+        createAccount.mutate({
+          user: form.state.values.username,
+          password: form.state.values.password,
+          password_confirm: form.state.values.password_confirm,
+          email: form.state.values.email
+        });
+      }}
+    >
+      <UsernameInput autoFocus />
+      <PasswordInput />
+      <PasswordConfirmInput />
+      <EmailInput />
 
-            <form.Subscribe
-              selector={s =>
-                ({
-                  values: {
-                    user: s.values.signup.username,
-                    password: s.values.signup.password,
-                    password_confirm: s.values.signup.password_confirm,
-                    email: s.values.signup.email
-                  },
-                  isInvalid:
-                    !s.values.signup.username ||
-                    !s.values.signup.password ||
-                    !s.values.signup.password_confirm ||
-                    !s.values.signup.email ||
-                    s.fieldMeta['signup.username'].errors.length > 0 ||
-                    s.fieldMeta['signup.password'].errors.length > 0 ||
-                    s.fieldMeta['signup.password_confirm'].errors.length > 0 ||
-                    s.fieldMeta['signup.email'].errors.length > 0
-                }) as const
-              }
-            >
-              {({ values, isInvalid }) => (
-                <Button
-                  variant="contained"
-                  color="primary"
-                  disabled={isInvalid}
-                  progress={createAccount.isPending}
-                  onClick={() => createAccount.mutate(values)}
-                >
-                  {t('signup.button')}
-                </Button>
-              )}
-            </form.Subscribe>
+      <Button variant="contained" color="primary" type="submit">
+        {t('signup.button')}
+      </Button>
 
-            <TextDivider />
+      <TextDivider />
 
-            <Button variant="text" color="primary" disabled={createAccount.isPending} onClick={() => reset()}>
-              {t('signin')}
-            </Button>
-          </>
-        )
-      }
-    </form.Subscribe>
+      <Button variant="text" color="primary" onClick={() => resetLogin()}>
+        {t('button')}
+      </Button>
+    </form>
   );
 });
 
-SignUp.displayName = 'SignUp';
+SignUpRequest.displayName = 'SignUpRequest';
+
+//*****************************************************************************************
+// Sign Up Link
+//*****************************************************************************************
+export const SignUpLink = React.memo(() => {
+  const { t } = useTranslation(['login']);
+  const form = useLoginForm();
+
+  const resetLogin = useLoginReset();
+
+  const allowUserPass = useAppConfigStore(s => s.auth.login.allow_userpass_login);
+  const allowSignup = useAppConfigStore(s => s.auth.login.allow_signup);
+
+  const handleClick = useCallback(() => {
+    resetLogin();
+    form.setFieldValue('mode', 'sign-up-request');
+  }, []);
+
+  return !allowUserPass || !allowSignup ? null : (
+    <>
+      <Typography align="center" variant="caption">
+        {t('signup')}&nbsp;&nbsp;
+        <Link href="#" onClick={handleClick}>
+          {t('signup.link')}
+        </Link>
+      </Typography>
+    </>
+  );
+});
+
+SignUpLink.displayName = 'SignUpLink';

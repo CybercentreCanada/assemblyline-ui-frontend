@@ -42,9 +42,9 @@ const TextDivider: React.FC<TextDividerProps> = ({ forcePaper = false }) => {
 
   return (
     <div>
-      <Divider forcePaper={forcePaper}>
-        <Inner>{t('divider')}</Inner>
-      </Divider>
+      <Divider forcePaper={forcePaper} />
+      <Inner>{t('divider')}</Inner>
+      <Divider />
     </div>
   );
 };

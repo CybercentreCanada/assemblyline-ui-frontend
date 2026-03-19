@@ -1,4 +1,4 @@
-import { AppRoute } from '../route/route.components';
+import { AppRoute } from 'app/app.routes';
 import type { SearchParamEngine } from '../search-params/lib/search-params.engine';
 import type { SearchParamBlueprintMap } from '../search-params/lib/search-params.model';
 import type { SearchParamSnapshot } from '../search-params/lib/search-params.snapshot';

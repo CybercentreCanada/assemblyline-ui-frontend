@@ -1,10 +1,10 @@
+import { AppRoutes } from 'app/app.routes';
 import { AppRouteKeyProvider, useAppRouterStore } from 'core/router';
-import { AppRoutes } from 'core/router/route/route.components';
-import { findNode, removePanel, storeToNavigate, sanitizeAppRouterStore } from 'core/router/router/router.utils';
+import { findNode, removePanel, sanitizeAppRouterStore, storeToNavigate } from 'core/router/router/router.utils';
 import { InPortal, OutPortal } from 'features/portal';
 import { Links } from 'pages/Links';
 import React from 'react';
-import { Link, useLocation, useNavigate } from 'react-router';
+import { Link, useNavigate } from 'react-router';
 import { useShallow } from 'zustand/react/shallow';
 
 //*****************************************************************************************

@@ -23,15 +23,14 @@
   "signup.completed": "New account registration is now complete, you can now login with your account",
   "signup.done": "An email was sent to your address with the final instructions to create a new account.",
   "signup.email": "Email address",
+  "signup.confirming": "Confirming the creation of the account",
   "signup.link": "Sign up!",
   "signup.password": "Password",
   "signup.password_confirm": "Password confirmation",
   "signup.username": "Username",
   "username": "Username",
 
-  "validate.username.required": "Username is required",
-  "validate.username.too_short": "Username is too short",
-  "validate.username.characters": "Username must only use lowercase letters or dashes",
+  "validate.username.characters": "lowercase letters or dashes only",
 
   "validate.password.required": "Password is required",
   "validate.password_confirm.mismatch": "Passwords do not match",

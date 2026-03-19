@@ -20,7 +20,7 @@ export const LoadingPage = React.memo(({ hideBanner = false }: LoadingPageProps)
       <CircularProgress variant="indeterminate" />
     </div>
   ) : (
-    <PageCardCentered sx={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(3), textAlign: 'center' }}>
+    <PageCardCentered sx={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(3), alignItems: 'center' }}>
       <Banner />
       <CircularProgress variant="indeterminate" />
     </PageCardCentered>

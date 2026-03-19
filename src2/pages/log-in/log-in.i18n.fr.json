@@ -23,15 +23,14 @@
   "signup.completed": "L'enregistrement d'un nouveau compte est maintenant terminé, vous pouvez maintenant vous connecter avec votre compte",
   "signup.done": "Un courriel a été envoyé à votre adresse avec les instructions finales pour créer un nouveau compte.",
   "signup.email": "Addresse courriel",
+  "signup.confirming": "Confirmation de la création du compte",
   "signup.link": "Abonnez-vous!",
   "signup.password": "Mot de passe",
   "signup.password_confirm": "Confirmation du mot de passe",
   "signup.username": "Nom d'utilisateur",
   "username": "Nom d'utilisateur",
 
-  "validate.username.required": "Le nom d'utilisateur est requis",
-  "validate.username.too_short": "Le nom d'utilisateur est trop court",
-  "validate.username.characters": "Le nom d'utilisateur ne doit contenir que des lettres minuscules ou des tirets",
+  "validate.username.characters": "lettres minuscules ou des tirets seulement",
 
   "validate.password.required": "Le mot de passe est requis",
   "validate.password_confirm.mismatch": "Les mots de passe ne correspondent pas",
