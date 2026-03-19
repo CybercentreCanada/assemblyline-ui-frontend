@@ -430,7 +430,7 @@ const WrappedFileDetail: React.FC<Props> = ({
             <FileDownloader
               link={() =>
                 `/api/v4/file/download/${file.file_info.sha256}/?${
-                  fileName && file.file_info.sha256 !== fileName ? `name=${fileName}&` : ''
+                  fileName && file.file_info.sha256 !== fileName ? `name=${encodeURIComponent(fileName)}&` : ''
                 }${sid ? `sid=${sid}&` : ''}`
               }
               loading={!file}
