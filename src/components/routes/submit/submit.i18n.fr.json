@@ -48,7 +48,7 @@
   "options.submission.description.label": "Description",
   "options.submission.filetype_override.label": "Type de fichier",
   "options.submission.filetype_override.placeholder": "Détection automatique",
-  "options.submission.filetype_override.tooltip": "Définisser le type du fichier envoyé.",
+  "options.submission.filetype_override.tooltip": "Définir le type du fichier envoyé.",
   "options.submission.filetype_override.validate.error": "Valeur du type du fichier invalide",
   "options.submission.generate_alert.label": "Générer une alerte",
   "options.submission.generate_alert.tooltip": "La soumission déclenchera une alerte à la fin de l'analyse.",
