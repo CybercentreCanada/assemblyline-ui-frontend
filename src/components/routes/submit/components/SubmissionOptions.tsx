@@ -109,7 +109,11 @@ export const SubmissionOptions = React.memo(() => {
                     options={fileTypes}
                     onChange={(_, v) => form.setFieldValue('settings.filetype_override.value', v)}
                     onReset={() => form.setFieldValue('settings.filetype_override.value', defaultValue)}
-                    validate={v => v && !fileTypes.includes(v) ? { status: 'error', message: t('options.submission.filetype_override.validate.error') } : null}
+                    validate={v =>
+                      v && !fileTypes.includes(v)
+                        ? { status: 'error', message: t('options.submission.filetype_override.validate.error') }
+                        : null
+                    }
                     slotProps={{ root: { style: { marginBottom: theme.spacing(1) } } }}
                   />
                 )}

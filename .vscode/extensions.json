@@ -5,6 +5,7 @@
     "firefox-devtools.vscode-firefox-debug",
     "dbaeumer.vscode-eslint",
     "syler.sass-indented",
-    "richie5um2.vscode-sort-json"
+    "richie5um2.vscode-sort-json",
+    "ms-playwright.playwright"
   ]
 }

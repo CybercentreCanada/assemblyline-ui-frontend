@@ -58,4 +58,103 @@ test.describe('Submit Page', () => {
       });
     });
   });
+  test.describe('File Type Override tests', () => {
+    // Ensure that the input is visible when interacting with the adjustment panel
+    test('should display the file type override input in the adjust panel', async ({ userSession }) => {
+      void userSession.crashPage.monitorForNoError();
+      void userSession.notFoundPage.monitorForNoError();
+      void userSession.forbiddenPage.monitorForNoError();
+      void userSession.snackbarContext.monitorForNoError();
+
+      await userSession.submitPage.goto();
+      await userSession.submitPage.expectToBeVisible();
+      await userSession.submitPage.clickAdjust();
+      await userSession.submitPage.expectFileTypeVisible();
+    });
+
+    // Test input reset functionality by entering a value, resetting it, and ensuring the value is cleared
+    test('should reset the file type override input value', async ({ userSession }) => {
+      void userSession.crashPage.monitorForNoError();
+      void userSession.notFoundPage.monitorForNoError();
+      void userSession.forbiddenPage.monitorForNoError();
+      void userSession.snackbarContext.monitorForNoError();
+
+      await userSession.submitPage.goto();
+      await userSession.submitPage.expectToBeVisible();
+      await userSession.submitPage.clickAdjust();
+      await userSession.submitPage.setFileType('test/type');
+      await userSession.submitPage.expectFileTypeValue('test/type');
+      await userSession.submitPage.fileTypeInput.resetValue();
+      await userSession.submitPage.expectFileTypeValue('');
+    });
+
+    // Ensure that if we're given a route /submit?fileType=some/type, the file type override input is pre-filled with that value
+    // This simulates a user being given a link to submit with a file type override already set, and ensures that the value is correctly populated in the input (ie. submitting an existing submission)
+    test('should set file type override via URL parameter', async ({ userSession }) => {
+      void userSession.crashPage.monitorForNoError();
+      void userSession.notFoundPage.monitorForNoError();
+      void userSession.forbiddenPage.monitorForNoError();
+      void userSession.snackbarContext.monitorForNoError();
+
+      await userSession.submitPage.gotoWithFileTypeOverride('executable/windows/pe64');
+      await userSession.submitPage.expectToBeVisible();
+      await userSession.submitPage.clickAdjust();
+      await userSession.submitPage.expectFileTypeValue('executable/windows/pe64');
+    });
+
+    // Simulate a user specifying the type override through different methods of submission.
+    ['File', 'Hash/URL'].forEach(tab => {
+      test(`should allow manually setting a file type override value with ${tab} input`, async ({ userSession }) => {
+        void userSession.crashPage.monitorForNoError();
+        void userSession.notFoundPage.monitorForNoError();
+        void userSession.forbiddenPage.monitorForNoError();
+        void userSession.snackbarContext.monitorForNoError();
+
+        // Set an invalid file type and expect an error message when attempting to submit
+        const testFilePath = path.join(MOCKS_DIR, 'samples', 'test.txt');
+        await userSession.submitPage.goto();
+        await userSession.submitPage.expectToBeVisible();
+        await userSession.submitPage.clickAdjust();
+        await userSession.submitPage.setFileType('bob');
+        await userSession.submitPage.expectFileTypeValue('bob');
+        if (tab === 'File') {
+          await userSession.submitPage.switchTab('File');
+          await userSession.submitPage.uploadFile(testFilePath);
+          await userSession.submitPage.clickSubmit();
+          await userSession.snackbarContext.expect(
+            'error',
+            /The file you are trying to start did not upload properly, try again.../i
+          );
+        } else {
+          await userSession.submitPage.switchTab('Hash/URL');
+          const testFileHash = 'b6668cf8c46c7075e18215d922e7812ca082fa6cc34668d00a6c20aee4551fb6';
+          await userSession.submitPage.uploadHash(testFileHash);
+          await userSession.submitPage.clickSubmit();
+          await userSession.snackbarContext.expect(
+            'error',
+            /Filetype override 'bob' is not a recognized file type in the system/i
+          );
+        }
+
+        // Reset the value and expect it to be cleared
+        await userSession.submitPage.fileTypeInput.resetValue();
+        await userSession.submitPage.expectFileTypeValue('');
+
+        // Set a valid file type and expect it to be accepted when submitting
+        await userSession.submitPage.setFileType('archive/zip');
+        await userSession.submitPage.expectFileTypeValue('archive/zip');
+        await userSession.submitPage.clickSubmit();
+        await userSession.snackbarContext.expect(
+          'success',
+          /Successfully submitted, redirecting you to submission ID:.*/i
+        );
+        await test.step('Waiting for submission detail or report page', async () => {
+          await Promise.race([
+            userSession.submissionDetailPage.waitForPage({ timeout: LONG_TIMEOUT }),
+            userSession.submissionReportPage.waitForPage({ timeout: LONG_TIMEOUT })
+          ]);
+        });
+      });
+    });
+  });
 });
