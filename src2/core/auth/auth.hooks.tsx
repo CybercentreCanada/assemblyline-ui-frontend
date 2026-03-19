@@ -1,5 +1,6 @@
 import { useAppConfigStore } from 'core/config';
 import { useCallback, useMemo } from 'react';
+import { useLocation } from 'react-router';
 
 export const useScoreToVerdict = () => {
   const verdicts = useAppConfigStore(s => s?.configuration?.submission?.verdicts);
@@ -22,4 +23,13 @@ export const useIsAppReady = () => {
   const tos = useAppConfigStore(s => s?.configuration?.ui?.tos);
 
   return useMemo(() => is_active && (agrees_with_tos || !tos), []);
+};
+
+export const useIsAuthenticating = () => {
+  const { pathname } = useLocation();
+
+  return useMemo(
+    () => pathname.includes(`/oauth/`) || pathname.includes(`/saml/`) || pathname.includes(`/signin/`),
+    [pathname]
+  );
 };

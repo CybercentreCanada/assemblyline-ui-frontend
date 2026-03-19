@@ -1,5 +1,6 @@
 import { invalidateAPIQuery, useAPIMutation, useAPIQuery } from 'core/api';
 import { useAppConfigStore } from 'core/config';
+import { useSaveAppConfig } from 'core/config/config.hooks';
 import { useAppConfigSetStore } from 'core/config/config.providers';
 import { useAppSnackbar } from 'core/snackbar/snackbar.hooks';
 import { useCallback, useEffect, useMemo } from 'react';
@@ -118,14 +119,7 @@ export const useOAuthLogin = () => {
       form.setFieldValue('oauth_token_id', api_response.oauth_token_id || null);
       form.setFieldValue('email', api_response.email_adr || null);
       form.setFieldValue('mode', 'sso');
-
-      if (redirectTo) {
-        navigate(redirectTo);
-        setStore(s => {
-          s.auth.redirectTo = null;
-          return s;
-        });
-      }
+      navigate('/signin/');
     }
   });
 };
@@ -168,14 +162,7 @@ export const useSAMLLogin = () => {
       form.setFieldValue('email', prev => samlData.email || prev);
       form.setFieldValue('saml_token_id', prev => samlData.saml_token_id || prev);
       form.setFieldValue('mode', 'sso');
-
-      if (redirectTo) {
-        navigate(redirectTo);
-        setStore(s => {
-          s.auth.redirectTo = null;
-          return s;
-        });
-      }
+      navigate('/signin/');
     }
   }, [samlData]);
 };
@@ -196,10 +183,14 @@ export const useQuickLogin = () => {
  */
 export const useLoginRequest = () => {
   const { t } = useTranslation(['login']);
+  const navigate = useNavigate();
   const { showErrorMessage } = useAppSnackbar();
   const form = useLoginForm();
 
+  const redirectTo = useAppConfigStore(s => s.auth.redirectTo);
+  const setStore = useAppConfigSetStore();
   const resetLogin = useLoginReset();
+  const saveSettings = useSaveAppConfig();
 
   return useAPIMutation(() => ({
     url: '/api/v4/auth/login/',
@@ -235,6 +226,15 @@ export const useLoginRequest = () => {
     },
     onSuccess: () => {
       invalidateAPIQuery(({ url }) => '/api/v4/user/whoami/' === url, 0);
+
+      if (redirectTo) {
+        navigate(redirectTo);
+        setStore(s => {
+          s.auth.redirectTo = null;
+          return s;
+        });
+        saveSettings();
+      }
     }
   }));
 };

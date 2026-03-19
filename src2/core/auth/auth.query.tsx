@@ -8,6 +8,7 @@ import { getXSRFCookie } from 'lib/utils/xsrf.utils';
 import { Configuration } from 'models/base/config';
 import { WhoAmIProps } from 'models/ui/user';
 import { useTranslation } from 'react-i18next';
+import { useIsAuthenticating } from './auth.hooks';
 import { normalizeWhoAmI } from './auth.utils';
 
 export const useAuthQuery = () => {
@@ -21,6 +22,8 @@ export const useAuthQuery = () => {
 
   const saveSettings = useSaveAppConfig();
 
+  const isAuthenticating = useIsAuthenticating();
+
   const disabled = false;
   const retryAfter = 10 * 1000;
   const allowCache = false;
@@ -33,6 +36,7 @@ export const useAuthQuery = () => {
   >(
     {
       queryKey: ['/api/v4/user/whoami/', 'GET', stableStringify(null), allowCache],
+      enabled: !isAuthenticating,
       retry: (failureCount, error) => failureCount < 1 || error?.api_status_code === 502,
       retryDelay: failureCount => Math.min(retryAfter * (failureCount + 1), 10000),
       queryFn: async ({ signal }) => {
