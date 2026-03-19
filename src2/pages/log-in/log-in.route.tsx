@@ -10,7 +10,7 @@ import { SignUpConfirmation, SignUpLink, SignUpRequest } from './components/Sign
 import { OAuthLogin, SAMLLogin, SingleSignOn } from './components/SingleSignOn';
 import { UserPasswordLogin } from './components/UserPassword';
 import { LoadingCard, LoginDivider } from './log-in.components';
-import { useOAuthLogin, usePasswordResetEmail, useQuickLogin, useSAMLLogin, useSignUpEmail } from './log-in.hooks';
+import { useOAuthLogin, usePasswordResetEmail, useSAMLLogin, useSignUpEmail } from './log-in.hooks';
 import { LoginFormProvider, useLoginForm } from './log-in.providers';
 
 type LoginRequest = {
@@ -36,7 +36,6 @@ const LoginPageContent = React.memo(() => {
   useSignUpEmail();
   useOAuthLogin();
   useSAMLLogin();
-  useQuickLogin();
 
   return (
     <PageCardCentered>

@@ -49,6 +49,20 @@ export const DEFAULT_LOGIN_FORM_STORE: LoginFormStore = {
   loading: null
 };
 
-export const { FormProvider: LoginFormProvider, useForm: useLoginForm } = createFormContext<LoginFormStore>({
+const loginFormContext = createFormContext<LoginFormStore>({
   defaultValues: structuredClone(DEFAULT_LOGIN_FORM_STORE)
 });
+
+/**
+ * React context provider that wires up the login form store (TanStack React Form).
+ *
+ * @returns A component that must wrap any login page children that call `useLoginForm()`.
+ */
+export const LoginFormProvider = loginFormContext.FormProvider;
+
+/**
+ * Accessor hook for the login form store (values, setters, field helpers, subscriptions).
+ *
+ * @returns The login form API instance for reading/writing login-related fields.
+ */
+export const useLoginForm = loginFormContext.useForm;

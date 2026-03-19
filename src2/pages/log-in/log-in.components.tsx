@@ -75,7 +75,7 @@ export const UsernameInput = React.memo((props: TextFieldProps) => {
           variant="outlined"
           {...props}
           value={field.state.value}
-          onChange={event => form.setFieldValue('username', event.target.value)}
+          onChange={event => field.handleChange(event.target.value)}
         />
       )}
     </form.Field>

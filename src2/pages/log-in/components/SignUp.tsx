@@ -116,7 +116,7 @@ export const SignUpLink = React.memo(() => {
   const handleClick = useCallback(() => {
     resetLogin();
     form.setFieldValue('mode', 'sign-up-request');
-  }, []);
+  }, [form, resetLogin]);
 
   return !allowUserPass || !allowSignup ? null : (
     <>

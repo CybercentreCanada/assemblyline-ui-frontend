@@ -8,32 +8,27 @@ import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
 import { useLoginForm } from './log-in.providers';
 
+/**
+ * Creates a stable callback that resets the login form back to its default values.
+ *
+ * @returns A function that clears any in-progress login state (OTP, reset password, SSO tokens, etc.).
+ */
 export const useLoginReset = () => {
   const form = useLoginForm();
 
   return useCallback(() => {
-    form.setFieldValue('mode', 'log-in');
-    form.setFieldValue('username', null);
-    form.setFieldValue('password', null);
-    form.setFieldValue('password_confirm', null);
-    form.setFieldValue('email', null);
-
-    form.setFieldValue('reset_id', null);
-    form.setFieldValue('otp_code', null);
-    form.setFieldValue('registration_key', null);
-
-    form.setFieldValue('oauth_token_id', null);
-    form.setFieldValue('saml_token_id', null);
-    form.setFieldValue('webauthn_auth_resp', null);
-
-    form.setFieldValue('loading', null);
-  }, []);
+    form.reset();
+  }, [form]);
 };
 
 /**
+ * Reads the `reset_id` query param and, when present, switches the form into reset-password confirmation mode.
+ * This enables deep-linking from password reset emails.
  *
+ * @returns Nothing (side-effect only).
  */
 export const usePasswordResetEmail = () => {
+  const location = useLocation();
   const form = useLoginForm();
 
   const resetID = useMemo(() => {
@@ -46,15 +41,16 @@ export const usePasswordResetEmail = () => {
       form.setFieldValue('mode', 'reset-password-confirmation');
       form.setFieldValue('reset_id', resetID);
     }
-  }, [resetID]);
+  }, [form, resetID]);
 };
 
 /**
+ * Reads the `registration_key` query param and, when present, switches the form into sign-up confirmation mode.
+ * This enables deep-linking from registration emails.
  *
- * @returns
+ * @returns Nothing (side-effect only).
  */
 export const useSignUpEmail = () => {
-  const { t } = useTranslation(['login']);
   const location = useLocation();
   const form = useLoginForm();
 
@@ -68,12 +64,16 @@ export const useSignUpEmail = () => {
       form.setFieldValue('registration_key', registration_key);
       form.setFieldValue('mode', 'sign-up-confirmation');
     }
-  }, [registration_key]);
+  }, [form, registration_key]);
 };
 
 /**
+ * Handles the OAuth callback flow:
+ * - detects the OAuth provider from the URL
+ * - exchanges the query string for a temporary token via the backend
+ * - transitions the login form into the SSO confirmation step
  *
- * @returns
+ * @returns Nothing (side-effect only).
  */
 export const useOAuthLogin = () => {
   const { t } = useTranslation(['login']);
@@ -81,16 +81,15 @@ export const useOAuthLogin = () => {
   const { pathname, search } = useLocation();
   const { showErrorMessage } = useAppSnackbar();
 
-  const redirectTo = useAppConfigStore(s => s.auth.redirectTo);
-  const setStore = useAppConfigSetStore();
   const form = useLoginForm();
   const resetLogin = useLoginReset();
 
-  const provider = useMemo<string>(() => {
-    if (pathname.includes(`/oauth/`)) {
-      return pathname.split(`/oauth/`).pop().slice(0, -1);
-    }
-    return null;
+  const provider = useMemo<string | null>(() => {
+    const marker = '/oauth/';
+    if (!pathname.includes(marker)) return null;
+    const tail = pathname.split(marker).pop() ?? '';
+    const normalized = tail.replace(/\/$/, '');
+    return normalized || null;
   }, [pathname]);
 
   const params = useMemo<URLSearchParams>(() => {
@@ -100,7 +99,7 @@ export const useOAuthLogin = () => {
       p.set('provider', provider);
     }
     return p;
-  }, [search]);
+  }, [provider, search]);
 
   useAPIQuery<{ avatar: string; username: string; oauth_token_id: string; email_adr: string }>({
     url: `/api/v4/auth/oauth/?${params.toString()}`,
@@ -125,16 +124,15 @@ export const useOAuthLogin = () => {
 };
 
 /**
+ * Handles the SAML callback flow by decoding the `data` query param and transitioning the login form into SSO mode.
  *
- * @returns
+ * @returns Nothing (side-effect only).
  */
 export const useSAMLLogin = () => {
   const navigate = useNavigate();
   const { pathname, search } = useLocation();
   const { showErrorMessage } = useAppSnackbar();
 
-  const redirectTo = useAppConfigStore(s => s.auth.redirectTo);
-  const setStore = useAppConfigSetStore();
   const form = useLoginForm();
   const resetLogin = useLoginReset();
 
@@ -143,8 +141,8 @@ export const useSAMLLogin = () => {
       if (pathname.includes(`/saml/`)) {
         const params = new URLSearchParams(search);
         const data = params.get('data');
-        if (data !== null || data !== undefined) {
-          return JSON.parse(atob(data).toString());
+        if (data != null && data !== '') {
+          return JSON.parse(atob(data));
         }
       }
     } catch (e) {
@@ -164,22 +162,27 @@ export const useSAMLLogin = () => {
       form.setFieldValue('mode', 'sso');
       navigate('/signin/');
     }
-  }, [samlData]);
+  }, [form, navigate, resetLogin, samlData, showErrorMessage]);
 };
 
+/**
+ * Returns `true` when the current auth configuration implies there is only one viable login choice (so the UI can skip
+ * the "choose login method" step).
+ *
+ * @returns Whether the user should be auto-forwarded into the SSO confirmation step.
+ */
 export const useQuickLogin = () => {
   const allowSAML = useAppConfigStore(s => s.auth.login.allow_saml_login);
   const oAuthProviders = useAppConfigStore(s => s.auth.login.oauth_providers);
 
-  return useMemo<boolean>(
-    () => (allowSAML && oAuthProviders?.length === 0 ? true : !allowSAML && oAuthProviders?.length === 1),
-    []
-  );
+  return (allowSAML && (oAuthProviders?.length ?? 0) === 0) || (!allowSAML && (oAuthProviders?.length ?? 0) === 1);
 };
 
 /**
+ * Performs a login request using the current form values (username/password/OTP/SSO tokens).
+ * On success, invalidates the `whoami` query and navigates to any stored post-login redirect.
  *
- * @returns
+ * @returns A mutation object with a `mutate()` method that triggers the login attempt.
  */
 export const useLoginRequest = () => {
   const { t } = useTranslation(['login']);

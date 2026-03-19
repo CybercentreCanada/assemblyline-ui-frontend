@@ -23,7 +23,7 @@ export const SingleSignOn = React.memo(() => {
 
   useEffect(() => {
     if (quickLogin) requestLogin.mutate();
-  }, [quickLogin]);
+  }, [quickLogin, requestLogin]);
 
   return quickLogin ? null : (
     <form
@@ -89,7 +89,7 @@ export const OAuthLogin = React.memo(() => {
       });
       save();
     }
-  }, [location]);
+  }, [location, save, setStore]);
 
   return (oAuthProviders || []).map((provider, i) => (
     <Button
@@ -111,6 +111,7 @@ OAuthLogin.displayName = 'OAuthLogin';
 //*****************************************************************************************
 export const SAMLLogin = React.memo(() => {
   const { t } = useTranslation(['login']);
+  const location = useLocation();
   const allowSAML = useAppConfigStore(s => s.auth.login.allow_saml_login);
 
   const setStore = useAppConfigSetStore();
@@ -125,7 +126,7 @@ export const SAMLLogin = React.memo(() => {
       });
       save();
     }
-  }, [location]);
+  }, [location, save, setStore]);
 
   return !allowSAML ? null : (
     <Button color="primary" href="/api/v4/auth/saml/sso/" variant="contained" onClick={handleClick}>
