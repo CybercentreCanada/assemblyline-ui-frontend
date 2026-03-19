@@ -8,7 +8,6 @@
 # testing
 /coverage
 /playwright-report
-.pnpm-store*
 .idea
 venv
 __pycache__

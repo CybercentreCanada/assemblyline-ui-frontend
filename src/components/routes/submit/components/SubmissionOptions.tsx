@@ -1,5 +1,4 @@
 import { Typography, useTheme } from '@mui/material';
-import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
 import useALContext from 'components/hooks/useALContext';
 import useMyAPI from 'components/hooks/useMyAPI';
 import { useForm } from 'components/routes/submit/submit.form';
@@ -7,7 +6,7 @@ import { CheckboxInput } from 'components/visual/Inputs/CheckboxInput';
 import { NumberInput } from 'components/visual/Inputs/NumberInput';
 import { SelectInput } from 'components/visual/Inputs/SelectInput';
 import { TextInput } from 'components/visual/Inputs/TextInput';
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export const SubmissionOptions = React.memo(() => {
@@ -17,6 +16,8 @@ export const SubmissionOptions = React.memo(() => {
   const { configuration } = useALContext();
   const form = useForm();
 
+  const [fileTypes, setFileTypes] = useState<string[]>([]);
+
   const priorityOptions = useMemo(
     () => [
       { primary: t('options.submission.priority.high'), value: 1500 },
@@ -25,17 +26,15 @@ export const SubmissionOptions = React.memo(() => {
     ],
     [t]
   );
-  const [fileTypes, setFileTypes] = useState<string[]>([]);
 
-  useEffectOnce(() => {
-    // Load all file types
-    apiCall({
+  useEffect(() => {
+    apiCall<{ file_types: [string, string[]][] }>({
       url: '/api/v4/help/constants/',
-      onSuccess: api_data => {
-        setFileTypes(api_data.api_response['file_types'].map(i => i[0]).filter(i => i !== '*') as string[]);
-      }
+      onSuccess: ({ api_response }) =>
+        setFileTypes(api_response?.file_types?.map(i => i?.[0])?.filter(i => i !== '*') || [])
     });
-  });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div>

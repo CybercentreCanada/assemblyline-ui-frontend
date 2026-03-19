@@ -1,4 +1,4 @@
-import { LONG_TIMEOUT, MOCKS_DIR } from 'e2e/shared/constants';
+import { LONG_TIMEOUT, MEDIUM_TIMEOUT, MOCKS_DIR } from 'e2e/shared/constants';
 import { test } from 'e2e/shared/fixtures';
 import path from 'path';
 
@@ -68,8 +68,8 @@ test.describe('Submit Page', () => {
 
       await userSession.submitPage.goto();
       await userSession.submitPage.expectToBeVisible();
-      await userSession.submitPage.clickAdjust();
-      await userSession.submitPage.expectFileTypeVisible();
+      await userSession.submitPage.adjustButton.click({ timeout: MEDIUM_TIMEOUT });
+      await userSession.submitPage.fileTypeInput.expectVisible();
     });
 
     // Test input reset functionality by entering a value, resetting it, and ensuring the value is cleared
@@ -81,11 +81,11 @@ test.describe('Submit Page', () => {
 
       await userSession.submitPage.goto();
       await userSession.submitPage.expectToBeVisible();
-      await userSession.submitPage.clickAdjust();
-      await userSession.submitPage.setFileType('test/type');
-      await userSession.submitPage.expectFileTypeValue('test/type');
+      await userSession.submitPage.adjustButton.click({ timeout: MEDIUM_TIMEOUT });
+      await userSession.submitPage.fileTypeInput.inputValue('test/type');
+      await userSession.submitPage.fileTypeInput.expectValue('test/type');
       await userSession.submitPage.fileTypeInput.resetValue();
-      await userSession.submitPage.expectFileTypeValue('');
+      await userSession.submitPage.fileTypeInput.expectValue('');
     });
 
     // Ensure that if we're given a route /submit?fileType=some/type, the file type override input is pre-filled with that value
@@ -96,10 +96,13 @@ test.describe('Submit Page', () => {
       void userSession.forbiddenPage.monitorForNoError();
       void userSession.snackbarContext.monitorForNoError();
 
-      await userSession.submitPage.gotoWithFileTypeOverride('executable/windows/pe64');
+      const fileType = 'executable/windows/pe64';
+      await test.step(`Navigating to submit page with filetype_override="${fileType}"`, async () => {
+        await userSession.page.goto(`/submit?params.filetype_override=${encodeURIComponent(fileType)}`);
+      });
       await userSession.submitPage.expectToBeVisible();
-      await userSession.submitPage.clickAdjust();
-      await userSession.submitPage.expectFileTypeValue('executable/windows/pe64');
+      await userSession.submitPage.adjustButton.click({ timeout: MEDIUM_TIMEOUT });
+      await userSession.submitPage.fileTypeInput.expectValue(fileType);
     });
 
     // Simulate a user specifying the type override through different methods of submission.
@@ -114,9 +117,9 @@ test.describe('Submit Page', () => {
         const testFilePath = path.join(MOCKS_DIR, 'samples', 'test.txt');
         await userSession.submitPage.goto();
         await userSession.submitPage.expectToBeVisible();
-        await userSession.submitPage.clickAdjust();
-        await userSession.submitPage.setFileType('bob');
-        await userSession.submitPage.expectFileTypeValue('bob');
+        await userSession.submitPage.adjustButton.click({ timeout: MEDIUM_TIMEOUT });
+        await userSession.submitPage.fileTypeInput.inputValue('bob');
+        await userSession.submitPage.fileTypeInput.expectValue('bob');
         if (tab === 'File') {
           await userSession.submitPage.switchTab('File');
           await userSession.submitPage.uploadFile(testFilePath);
@@ -138,11 +141,11 @@ test.describe('Submit Page', () => {
 
         // Reset the value and expect it to be cleared
         await userSession.submitPage.fileTypeInput.resetValue();
-        await userSession.submitPage.expectFileTypeValue('');
+        await userSession.submitPage.fileTypeInput.expectValue('');
 
         // Set a valid file type and expect it to be accepted when submitting
-        await userSession.submitPage.setFileType('archive/zip');
-        await userSession.submitPage.expectFileTypeValue('archive/zip');
+        await userSession.submitPage.fileTypeInput.inputValue('archive/zip');
+        await userSession.submitPage.fileTypeInput.expectValue('archive/zip');
         await userSession.submitPage.clickSubmit();
         await userSession.snackbarContext.expect(
           'success',
