@@ -907,6 +907,7 @@ function WrappedSubmissionDetail() {
             liveResultKeys={liveResultKeys}
             liveErrors={curFileLiveErrors}
             force={submission && submission.max_score < 0}
+            filetype_override={submission?.params?.filetype_override}
           />,
           { hasMaximize: true }
         );
@@ -917,6 +918,7 @@ function WrappedSubmissionDetail() {
             sid={id}
             metadata={submission?.metadata}
             force={submission && submission.max_score < 0}
+            filetype_override={submission?.params?.filetype_override}
           />,
           {
             hasMaximize: true

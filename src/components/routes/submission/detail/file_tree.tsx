@@ -203,11 +203,16 @@ const WrappedFileTree: React.FC<FileTreeProps> = ({
                   {filetype_override ? (
                     <>
                       <span
-                        style={{ fontSize: '80%', color: theme.palette.text.disabled, textDecoration: 'line-through' }}
-                      >{`[${item.type}]`}</span>
-                      <span
                         style={{ fontSize: '80%', color: theme.palette.text.secondary }}
                       >{`[${filetype_override}]`}</span>
+                      <span
+                        style={{
+                          fontSize: '80%',
+                          color: theme.palette.text.disabled,
+                          textDecoration: 'line-through',
+                          paddingRight: theme.spacing(0.5)
+                        }}
+                      >{`[${item.type}]`}</span>
                     </>
                   ) : (
                     <span style={{ fontSize: '80%', color: theme.palette.text.secondary }}>{`[${item.type}]`}</span>
