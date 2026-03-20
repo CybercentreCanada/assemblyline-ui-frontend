@@ -63,7 +63,7 @@ export const ResetPasswordConfirmation = React.memo(() => {
       <TextDivider />
 
       <Button variant="text" color="primary" onClick={() => resetLogin()}>
-        {t('button')}
+        {t('other')}
       </Button>
     </form>
   );
@@ -108,7 +108,7 @@ export const ResetPasswordRequest = React.memo(() => {
         getResetLink.mutate({ email: form.state.values.email });
       }}
     >
-      <EmailInput autoFocus label={t('reset.email')} />
+      <EmailInput autoFocus />
 
       <Button color="primary" type="submit" variant="contained">
         {t('reset.button')}
@@ -117,7 +117,7 @@ export const ResetPasswordRequest = React.memo(() => {
       <TextDivider />
 
       <Button variant="text" color="primary" onClick={() => resetLogin()}>
-        {t('button')}
+        {t('other')}
       </Button>
     </form>
   );

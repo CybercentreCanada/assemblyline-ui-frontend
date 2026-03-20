@@ -48,7 +48,7 @@ export const OneTimePassword = React.memo(() => {
       <TextDivider />
 
       <Button variant="text" color="primary" onClick={() => resetLogin()}>
-        {t('button')}
+        {t('other')}
       </Button>
     </form>
   );

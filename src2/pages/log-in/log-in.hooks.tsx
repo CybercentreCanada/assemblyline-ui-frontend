@@ -106,7 +106,7 @@ export const useOAuthLogin = () => {
     disabled: !provider,
     onEnter: () => {
       form.setFieldValue('mode', 'loading');
-      form.setFieldValue('loading', t('oauth.loading'));
+      form.setFieldValue('loading', t('login.loading'));
     },
     onFailure: ({ api_error_message }) => {
       showErrorMessage(api_error_message);

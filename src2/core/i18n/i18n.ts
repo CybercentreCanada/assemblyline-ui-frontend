@@ -1,3 +1,5 @@
+import apiEN from 'core/api/api.i18n.en.json';
+import apiFR from 'core/api/api.i18n.fr.json';
 import { default as i18n } from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import forbiddenEN from 'pages/forbidden/forbidden.i18n.en.json';
@@ -18,6 +20,7 @@ import { initReactI18next } from 'react-i18next';
 
 const resources = {
   en: {
+    api: apiEN,
     error403: forbiddenEN,
     error404: notFoundEN,
     locked: lockedEN,
@@ -28,6 +31,7 @@ const resources = {
     translation: {}
   },
   fr: {
+    api: apiFR,
     error403: forbiddenFR,
     error404: notFoundFR,
     locked: lockedFR,

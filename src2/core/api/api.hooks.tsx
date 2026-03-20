@@ -38,7 +38,7 @@ export const useAPICallFn = <
   Request extends APIRequest = APIRequest,
   Error extends APIResponse = APIResponse<string>
 >() => {
-  const { t } = useTranslation();
+  const { t } = useTranslation(['api']);
   const { showErrorMessage, closeSnackbar } = useAppSnackbar();
   const systemConfig = useAppConfigStore(s => s.configuration);
   // const { setApiQuotaremaining, setSubmissionQuotaremaining } = useQuota();
@@ -108,12 +108,12 @@ export const useAPICallFn = <
         if (res.status === 502) {
           return rejectWith(
             {
-              api_error_message: t('api.unreachable'),
+              api_error_message: t('unreachable'),
               api_response: '',
               api_server_version: systemConfig.system.version,
               api_status_code: 502
             },
-            t('api.unreachable')
+            t('unreachable')
           );
         }
 
@@ -121,12 +121,12 @@ export const useAPICallFn = <
         if (!isAPIData(json)) {
           return rejectWith(
             {
-              api_error_message: t('api.invalid'),
+              api_error_message: t('invalid'),
               api_response: '',
               api_server_version: systemConfig.system.version,
               api_status_code: 400
             },
-            t('api.invalid')
+            t('invalid')
           );
         }
 
@@ -429,7 +429,7 @@ export const useDownloadBlob = ({
   url
 }: UseDownloadBlobProps) => {
   const queryClient = useQueryClient();
-  const { t } = useTranslation();
+  const { t } = useTranslation(['api']);
   const { showErrorMessage, closeSnackbar } = useMySnackbar();
   const { configuration: systemConfig } = useALContext();
   const { setApiQuotaremaining, setSubmissionQuotaremaining } = useQuota();
@@ -462,9 +462,9 @@ export const useDownloadBlob = ({
 
         // Handle an unreachable API
         if (res.status === 502) {
-          showErrorMessage(t('api.unreachable'), 10000);
+          showErrorMessage(t('unreachable'), 10000);
           return Promise.reject({
-            api_error_message: t('api.unreachable'),
+            api_error_message: t('unreachable'),
             api_response: '',
             api_server_version: systemConfig.system.version,
             api_status_code: 502
@@ -475,9 +475,9 @@ export const useDownloadBlob = ({
 
         // Check for an invalid json format
         if (!isAPIData(json)) {
-          showErrorMessage(t('api.invalid'));
+          showErrorMessage(t('invalid'));
           return Promise.reject({
-            api_error_message: t('api.invalid'),
+            api_error_message: t('invalid'),
             api_response: '',
             api_server_version: systemConfig.system.version,
             api_status_code: 400
@@ -717,7 +717,7 @@ export const useBootstrapQuery = ({
   allowCache = false
 }: UseBootstrapQueryProps) => {
   const queryClient = useQueryClient();
-  const { t } = useTranslation();
+  const { t } = useTranslation(['api']);
   const { showErrorMessage, closeSnackbar } = useMySnackbar();
   const { configuration: systemConfig } = useALContext();
   const { setApiQuotaremaining, setSubmissionQuotaremaining } = useQuota();
@@ -758,9 +758,9 @@ export const useBootstrapQuery = ({
 
         // Handle an unreachable API
         if (res.status === 502) {
-          showErrorMessage(t('api.unreachable'), 10000);
+          showErrorMessage(t('unreachable'), 10000);
           return Promise.reject({
-            api_error_message: t('api.unreachable'),
+            api_error_message: t('unreachable'),
             api_response: '',
             api_server_version: systemConfig.system.version,
             api_status_code: 502
@@ -771,10 +771,10 @@ export const useBootstrapQuery = ({
 
         // Check for an invalid json format
         if (!isAPIData(json)) {
-          showErrorMessage(t('api.invalid'), 30000);
+          showErrorMessage(t('invalid'), 30000);
           switchRenderedApp('load');
           return Promise.reject({
-            api_error_message: t('api.invalid'),
+            api_error_message: t('invalid'),
             api_response: '',
             api_server_version: systemConfig.system.version,
             api_status_code: 400
