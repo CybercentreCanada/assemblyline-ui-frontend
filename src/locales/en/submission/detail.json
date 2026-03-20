@@ -51,6 +51,7 @@
   "outstanding.files": "Files remaining",
   "outstanding.services": "Services",
   "outstanding.title": "You are waiting on the following services to finish processing:",
+  "outstanding_services.show": "Show outstanding services",
   "params.deep_scan": "Deep Scan",
   "params.description": "Description",
   "params.dtl": "Days to live",
