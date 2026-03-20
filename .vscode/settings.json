@@ -1,5 +1,4 @@
 {
-  "debug.node.autoAttach": "on",
   "editor.codeActionsOnSave": {
     "source.organizeImports": "explicit"
     // "source.addMissingImports.ts": "explicit",
@@ -35,8 +34,6 @@
   "[typescriptreact]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "python.linting.pylintEnabled": true,
-  "python.linting.enabled": true,
   "emmet.includeLanguages": {
     "javascript": "javascriptreact",
     "typescript": "typescriptreact"

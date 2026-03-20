@@ -35,6 +35,9 @@ export type UserSettings = {
   /** Auto-expand section when score bigger then this */
   expand_min_score: number;
 
+  /** File type override */
+  filetype_override?: string;
+
   /** Generate an alert? */
   generate_alert: boolean;
 

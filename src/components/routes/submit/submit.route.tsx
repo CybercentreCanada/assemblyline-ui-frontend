@@ -235,6 +235,15 @@ const WrappedSubmitRoute = () => {
     [configuration, form]
   );
 
+  const setFileTypeFromURL = useCallback(
+    (state: SubmitState, search: URLSearchParams) => {
+      const fileType = state?.params.filetype_override || search.get('params.filetype_override');
+      if (!fileType) return;
+      form.setFieldValue('settings.filetype_override.value', fileType);
+    },
+    [form]
+  );
+
   useEffect(() => {
     closeSnackbar();
 
@@ -269,6 +278,7 @@ const WrappedSubmitRoute = () => {
     setDescriptionFromURL(state, search);
     setPriorityFromURL(state, search);
     setTTLFromURL(state, search);
+    setFileTypeFromURL(state, search);
 
     form.setFieldValue('state.phase', 'editing');
 
