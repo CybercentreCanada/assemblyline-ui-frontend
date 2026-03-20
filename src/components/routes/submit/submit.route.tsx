@@ -236,8 +236,8 @@ const WrappedSubmitRoute = () => {
   );
 
   const setFileTypeFromURL = useCallback(
-    (state: SubmitState, search: URLSearchParams) => 
-      const fileType = state?.params?.filetype_override || search.get('params.filetype_override')
+    (state: SubmitState, search: URLSearchParams) => {
+      const fileType = state?.params?.filetype_override || search.get('params.filetype_override');
       if (!fileType) return;
       form.setFieldValue('settings.filetype_override.value', fileType);
     },
