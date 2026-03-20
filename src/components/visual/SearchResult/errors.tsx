@@ -1,6 +1,8 @@
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
+import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import PanToolOutlinedIcon from '@mui/icons-material/PanToolOutlined';
 import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
+import WarningAmberOutlinedIcon from '@mui/icons-material/WarningAmberOutlined';
 import { AlertTitle, Skeleton, Tooltip, useTheme } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
@@ -19,7 +21,7 @@ import InformativeAlert from 'components/visual/InformativeAlert';
 import Moment from 'components/visual/Moment';
 import { bytesToSize } from 'helpers/utils';
 import type { ReactElement } from 'react';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 
@@ -35,16 +37,27 @@ const WrappedErrorsTable: React.FC<Props> = ({ errorResults, setErrorKey = null,
   const { t } = useTranslation(['adminErrorViewer']);
   const theme = useTheme();
 
-  const errorMap: Record<ErrorType, ReactElement> = {
-    'MAX DEPTH REACHED': <PanToolOutlinedIcon style={{ color: theme.palette.action.active }} />,
-    'MAX RETRY REACHED': <PanToolOutlinedIcon style={{ color: theme.palette.action.active }} />,
-    EXCEPTION: <ReportProblemOutlinedIcon style={{ color: theme.palette.action.active }} />,
-    'TASK PRE-EMPTED': <CancelOutlinedIcon style={{ color: theme.palette.action.active }} />,
-    'SERVICE DOWN': <CancelOutlinedIcon style={{ color: theme.palette.action.active }} />,
-    'SERVICE BUSY': <CancelOutlinedIcon style={{ color: theme.palette.action.active }} />,
-    'MAX FILES REACHED': <PanToolOutlinedIcon style={{ color: theme.palette.action.active }} />,
-    UNKNOWN: <ReportProblemOutlinedIcon style={{ color: theme.palette.action.active }} />
-  };
+  const severityMap = useMemo<Record<Error['severity'], ReactElement>>(
+    () => ({
+      warning: <WarningAmberOutlinedIcon style={{ color: theme.palette.warning.main }} />,
+      error: <ErrorOutlineOutlinedIcon style={{ color: theme.palette.error.main }} />
+    }),
+    [theme.palette.error.main, theme.palette.warning.main]
+  );
+
+  const typeMap = useMemo<Record<ErrorType, ReactElement>>(
+    () => ({
+      'MAX DEPTH REACHED': <PanToolOutlinedIcon style={{ color: theme.palette.action.active }} />,
+      'MAX RETRY REACHED': <PanToolOutlinedIcon style={{ color: theme.palette.action.active }} />,
+      EXCEPTION: <ReportProblemOutlinedIcon style={{ color: theme.palette.action.active }} />,
+      'TASK PRE-EMPTED': <CancelOutlinedIcon style={{ color: theme.palette.action.active }} />,
+      'SERVICE DOWN': <CancelOutlinedIcon style={{ color: theme.palette.action.active }} />,
+      'SERVICE BUSY': <CancelOutlinedIcon style={{ color: theme.palette.action.active }} />,
+      'MAX FILES REACHED': <PanToolOutlinedIcon style={{ color: theme.palette.action.active }} />,
+      UNKNOWN: <ReportProblemOutlinedIcon style={{ color: theme.palette.action.active }} />
+    }),
+    [theme.palette.action.active]
+  );
 
   return errorResults ? (
     errorResults.total !== 0 ? (
@@ -59,6 +72,9 @@ const WrappedErrorsTable: React.FC<Props> = ({ errorResults, setErrorKey = null,
                 {t('header.service')}
               </SortableHeaderCell>
               <DivTableCell>{t('header.message')}</DivTableCell>
+              <SortableHeaderCell sortField="severity" allowSort={allowSort}>
+                {t('header.severity')}
+              </SortableHeaderCell>
               <SortableHeaderCell sortField="type" allowSort={allowSort}>
                 {t('header.type')}
               </SortableHeaderCell>
@@ -101,8 +117,13 @@ const WrappedErrorsTable: React.FC<Props> = ({ errorResults, setErrorKey = null,
                   )}
                 </DivTableCell>
                 <DivTableCell style={{ whiteSpace: 'nowrap' }}>
+                  <Tooltip title={t(`severity.${error.severity}`)}>
+                    <span>{severityMap?.[error?.severity]}</span>
+                  </Tooltip>
+                </DivTableCell>
+                <DivTableCell style={{ whiteSpace: 'nowrap' }}>
                   <Tooltip title={t(`type.${error.type}`)}>
-                    <span>{errorMap[error.type]}</span>
+                    <span>{typeMap?.[error?.type]}</span>
                   </Tooltip>
                 </DivTableCell>
               </LinkRow>
