@@ -279,7 +279,16 @@ function WrappedGeneralInformation({ report }: Props) {
               <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
                 <span style={{ fontWeight: 500 }}>{t('file.size')}</span>
               </Grid>
-              <Grid size={{ xs: 8, sm: 9, lg: 10 }}>{report ? bytesToSize(report.file_info.size) : <Skeleton />}</Grid>
+              <Grid size={{ xs: 8, sm: 9, lg: 10 }}>
+                {!report ? (
+                  <Skeleton />
+                ) : !report?.file_info?.size ? null : (
+                  <span style={{ fontWeight: 500 }}>
+                    {report?.file_info?.size}
+                    <span>{` (${bytesToSize(report?.file_info?.size)})`}</span>
+                  </span>
+                )}
+              </Grid>
 
               <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
                 <span style={{ fontWeight: 500 }}>{t('file.md5')}</span>
