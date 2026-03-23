@@ -10,7 +10,9 @@ import useQuota from 'components/hooks/useQuota';
 import type { Configuration } from 'components/models/base/config';
 import type { CustomUser, WhoAmIProps } from 'components/models/ui/user';
 import getXSRFCookie from 'helpers/xsrf';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useLocation } from 'react-router';
 
 export type UseBootstrapQueryProps = {
   queryProps?: Omit<
@@ -44,10 +46,16 @@ export const useBootstrapQuery = ({
   allowCache = false
 }: UseBootstrapQueryProps) => {
   const queryClient = useQueryClient();
+  const { pathname } = useLocation();
   const { t } = useTranslation();
   const { showErrorMessage, closeSnackbar } = useMySnackbar();
   const { configuration: systemConfig } = useALContext();
   const { setApiQuotaremaining, setSubmissionQuotaremaining } = useQuota();
+
+  const isAuthenticating = useMemo(
+    () => pathname.includes(`/oauth/`) || pathname.includes(`/saml/`) || pathname.includes(`/signin/`),
+    [pathname]
+  );
 
   const query = useQuery<
     APIResponse<Configuration | LoginParamsProps | WhoAmIProps>,
@@ -57,7 +65,7 @@ export const useBootstrapQuery = ({
   >(
     {
       ...queryProps,
-      enabled: !disabled,
+      enabled: !disabled && !isAuthenticating,
       queryKey: ['/api/v4/user/whoami/', 'GET', stableStringify(null), allowCache],
       retry: (failureCount, error) => failureCount < 1 || error?.api_status_code === 502,
       retryDelay: failureCount => Math.min(retryAfter * (failureCount + 1), 10000),

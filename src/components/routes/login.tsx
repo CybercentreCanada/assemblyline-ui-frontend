@@ -162,7 +162,7 @@ export default function LoginScreen({ allowUserPass, allowSAML, allowSignup, oAu
         },
         onFinalize: () => {
           if (provider) {
-            navigate(localStorage.getItem('nextLocation') || '/');
+            navigate('/signin/');
           }
         }
       });
@@ -188,7 +188,7 @@ export default function LoginScreen({ allowUserPass, allowSAML, allowSignup, oAu
         setEmail(cur_email => samlData.email || cur_email);
         setSAMLTokenID(cur_token => samlData.saml_token_id || cur_token);
       }
-      navigate(localStorage.getItem('nextLocation') || '/');
+      navigate('/signin/');
     }
 
     // eslint-disable-next-line
