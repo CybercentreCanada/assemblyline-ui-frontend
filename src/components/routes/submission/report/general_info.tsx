@@ -264,7 +264,6 @@ function WrappedGeneralInformation({ report }: Props) {
                 <span style={{ fontWeight: 500 }}>{t('file.type')}</span>
               </Grid>
               <Grid size={{ xs: 8, sm: 9, lg: 10 }}>
-                {' '}
                 {report ? (
                   report?.params?.filetype_override ? (
                     <>
