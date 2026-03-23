@@ -906,7 +906,7 @@ function WrappedSubmissionDetail() {
             liveResultKeys={liveResultKeys}
             liveErrors={curFileLiveErrors}
             force={submission && submission.max_score < 0}
-            filetype_override={submission?.params?.filetype_override}
+            filetype_override={submission?.files?.[0]?.sha256 !== fid ? null : submission?.params?.filetype_override}
           />,
           { hasMaximize: true }
         );
@@ -917,7 +917,7 @@ function WrappedSubmissionDetail() {
             sid={id}
             metadata={submission?.metadata}
             force={submission && submission.max_score < 0}
-            filetype_override={submission?.params?.filetype_override}
+            filetype_override={submission?.files?.[0]?.sha256 !== fid ? null : submission?.params?.filetype_override}
           />,
           {
             hasMaximize: true
