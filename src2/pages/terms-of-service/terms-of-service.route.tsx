@@ -1,7 +1,7 @@
 import { Box, Link, Skeleton, Typography, useTheme } from '@mui/material';
 import { useAPIMutation, useAPIQuery } from 'core/api';
 import { useAppConfigStore } from 'core/config';
-import { useAppBanner } from 'core/preference/preference.hooks';
+import { AppBanner } from 'core/layout/layout.components';
 import { createAppRoute } from 'core/router/route/route.utils';
 import { NotFoundPage } from 'pages/not-found/not-found.route';
 import React from 'react';
@@ -17,7 +17,6 @@ import { PageCenter } from 'ui/layouts/PageCenter';
 export const ToSPage = React.memo(() => {
   const { t } = useTranslation(['tos']);
   const theme = useTheme();
-  const Banner = useAppBanner();
 
   const currentUser = useAppConfigStore(s => s.user);
   const configuration = useAppConfigStore(s => s.configuration);
@@ -52,7 +51,7 @@ export const ToSPage = React.memo(() => {
           }
         }}
       >
-        <Banner />
+        <AppBanner />
         <div style={{ marginBottom: theme.spacing(6), textAlign: 'left' }}>
           <Typography variant="h3" gutterBottom>
             {t('title')}

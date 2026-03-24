@@ -1,5 +1,7 @@
 import apiEN from 'core/api/api.i18n.en.json';
 import apiFR from 'core/api/api.i18n.fr.json';
+import layoutEN from 'core/layout/layout.i18n.en.json';
+import layoutFR from 'core/layout/layout.i18n.fr.json';
 import { default as i18n } from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import forbiddenEN from 'pages/forbidden/forbidden.i18n.en.json';
@@ -23,6 +25,7 @@ const resources = {
     api: apiEN,
     error403: forbiddenEN,
     error404: notFoundEN,
+    layout: layoutEN,
     locked: lockedEN,
     login: loginEN,
     logout: logoutEN,
@@ -34,6 +37,7 @@ const resources = {
     api: apiFR,
     error403: forbiddenFR,
     error404: notFoundFR,
+    layout: layoutFR,
     locked: lockedFR,
     login: loginFR,
     logout: logoutFR,

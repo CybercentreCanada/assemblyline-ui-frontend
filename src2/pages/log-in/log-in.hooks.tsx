@@ -1,6 +1,5 @@
 import { invalidateAPIQuery, useAPIMutation, useAPIQuery } from 'core/api';
 import { useAppConfigStore } from 'core/config';
-import { useSaveAppConfig } from 'core/config/config.hooks';
 import { useAppConfigSetStore } from 'core/config/config.providers';
 import { useAppSnackbar } from 'core/snackbar/snackbar.hooks';
 import { useCallback, useEffect, useMemo } from 'react';
@@ -14,11 +13,33 @@ import { useLoginForm } from './log-in.providers';
  * @returns A function that clears any in-progress login state (OTP, reset password, SSO tokens, etc.).
  */
 export const useLoginReset = () => {
+  const setStore = useAppConfigSetStore();
   const form = useLoginForm();
 
   return useCallback(() => {
-    form.reset();
-  }, [form]);
+    form.setFieldValue('mode', 'log-in');
+
+    form.setFieldValue('avatar', null);
+    form.setFieldValue('username', null);
+    form.setFieldValue('password', null);
+    form.setFieldValue('password_confirm', null);
+    form.setFieldValue('email', null);
+
+    form.setFieldValue('reset_id', null);
+    form.setFieldValue('otp_code', null);
+    form.setFieldValue('registration_key', null);
+
+    form.setFieldValue('oauth_token_id', null);
+    form.setFieldValue('saml_token_id', null);
+    form.setFieldValue('webauthn_auth_resp', null);
+
+    form.setFieldValue('loading', null);
+
+    setStore(s => {
+      s.auth.disableWhoAmI = false;
+      return s;
+    });
+  }, [form, setStore]);
 };
 
 /**
@@ -37,10 +58,10 @@ export const usePasswordResetEmail = () => {
   }, [location.search]);
 
   useEffect(() => {
-    if (resetID) {
-      form.setFieldValue('mode', 'reset-password-confirmation');
-      form.setFieldValue('reset_id', resetID);
-    }
+    if (!resetID) return;
+
+    form.setFieldValue('mode', 'reset-password-confirmation');
+    form.setFieldValue('reset_id', resetID);
   }, [form, resetID]);
 };
 
@@ -60,10 +81,10 @@ export const useSignUpEmail = () => {
   }, [location.search]);
 
   useEffect(() => {
-    if (registration_key) {
-      form.setFieldValue('registration_key', registration_key);
-      form.setFieldValue('mode', 'sign-up-confirmation');
-    }
+    if (!registration_key) return;
+
+    form.setFieldValue('registration_key', registration_key);
+    form.setFieldValue('mode', 'sign-up-confirmation');
   }, [form, registration_key]);
 };
 
@@ -83,6 +104,9 @@ export const useOAuthLogin = () => {
 
   const form = useLoginForm();
   const resetLogin = useLoginReset();
+
+  const setStore = useAppConfigSetStore();
+  const redirectTo = useAppConfigStore(s => s.auth.redirectTo);
 
   const provider = useMemo<string | null>(() => {
     const marker = '/oauth/';
@@ -118,7 +142,14 @@ export const useOAuthLogin = () => {
       form.setFieldValue('oauth_token_id', api_response.oauth_token_id || null);
       form.setFieldValue('email', api_response.email_adr || null);
       form.setFieldValue('mode', 'sso');
-      navigate('/signin/');
+
+      setStore(s => {
+        s.auth.disableWhoAmI = true;
+        s.auth.redirectTo = null;
+        return s;
+      });
+
+      navigate(redirectTo || '/');
     }
   });
 };
@@ -135,6 +166,9 @@ export const useSAMLLogin = () => {
 
   const form = useLoginForm();
   const resetLogin = useLoginReset();
+
+  const setStore = useAppConfigSetStore();
+  const redirectTo = useAppConfigStore(s => s.auth.redirectTo);
 
   const samlData = useMemo<{ username: string; email: string; saml_token_id: string; error: string }>(() => {
     try {
@@ -160,7 +194,14 @@ export const useSAMLLogin = () => {
       form.setFieldValue('email', prev => samlData.email || prev);
       form.setFieldValue('saml_token_id', prev => samlData.saml_token_id || prev);
       form.setFieldValue('mode', 'sso');
-      navigate('/signin/');
+
+      setStore(s => {
+        s.auth.disableWhoAmI = true;
+        s.auth.redirectTo = null;
+        return s;
+      });
+
+      navigate(redirectTo || '/');
     }
   }, [form, navigate, resetLogin, samlData, showErrorMessage]);
 };
@@ -186,14 +227,11 @@ export const useQuickLogin = () => {
  */
 export const useLoginRequest = () => {
   const { t } = useTranslation(['login']);
-  const navigate = useNavigate();
   const { showErrorMessage } = useAppSnackbar();
   const form = useLoginForm();
 
-  const redirectTo = useAppConfigStore(s => s.auth.redirectTo);
   const setStore = useAppConfigSetStore();
   const resetLogin = useLoginReset();
-  const saveSettings = useSaveAppConfig();
 
   return useAPIMutation(() => ({
     url: '/api/v4/auth/login/',
@@ -225,19 +263,16 @@ export const useLoginRequest = () => {
         resetLogin();
       } else {
         showErrorMessage(msg);
+        form.setFieldValue('mode', 'log-in');
       }
     },
     onSuccess: () => {
-      invalidateAPIQuery(({ url }) => '/api/v4/user/whoami/' === url, 0);
+      setStore(s => {
+        s.auth.disableWhoAmI = false;
+        return s;
+      });
 
-      if (redirectTo) {
-        navigate(redirectTo);
-        setStore(s => {
-          s.auth.redirectTo = null;
-          return s;
-        });
-        saveSettings();
-      }
+      invalidateAPIQuery(({ url }) => '/api/v4/user/whoami/' === url, 100);
     }
   }));
 };

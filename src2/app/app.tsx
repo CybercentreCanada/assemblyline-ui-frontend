@@ -1,6 +1,7 @@
 import { AppAPIProvider } from 'core/api';
 import { AppAuthProvider } from 'core/auth/auth.providers';
 import { AppConfigProvider } from 'core/config/config.providers';
+import { AppLayoutProvider } from 'core/layout/layout.providers';
 import { AppRouterProvider } from 'core/router';
 import { AppSnackbarProvider } from 'core/snackbar/snackbar.providers';
 import { AppThemeProvider } from 'core/theme';
@@ -46,7 +47,9 @@ export const AssemblylineApp = () => (
             <SnackbarProvider>
               <AppRouterProvider>
                 <AppAuthProvider>
-                  <AppRoot />
+                  <AppLayoutProvider>
+                    <AppRoot />
+                  </AppLayoutProvider>
                 </AppAuthProvider>
               </AppRouterProvider>
             </SnackbarProvider>

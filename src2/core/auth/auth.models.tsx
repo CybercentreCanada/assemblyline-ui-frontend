@@ -86,4 +86,5 @@ export type AppAuthSettings = z.infer<typeof AppAuthSettingsSchema>;
 
 export type AppAuthConfig = AppAuthSettings & {
   mode: 'login' | 'loading' | 'locked' | 'quota' | 'tos' | 'app' | 'logout';
+  disableWhoAmI: boolean;
 };

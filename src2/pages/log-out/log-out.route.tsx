@@ -1,6 +1,6 @@
 import { CircularProgress, Typography, useTheme } from '@mui/material';
 import { invalidateAPIQuery, useAPIQuery } from 'core/api';
-import { useAppBannerVert } from 'core/preference/preference.hooks';
+import { AppVerticalBanner } from 'core/layout/layout.components';
 import { createAppRoute } from 'core/router/route/route.utils';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
@@ -15,7 +15,6 @@ export type LogoutPageProps = {};
 export const LogoutPage = React.memo(({}: LogoutPageProps) => {
   const { t } = useTranslation(['logout']);
   const theme = useTheme();
-  const Banner = useAppBannerVert();
   const navigate = useNavigate();
 
   useAPIQuery({
@@ -30,7 +29,7 @@ export const LogoutPage = React.memo(({}: LogoutPageProps) => {
   return (
     <PageCardCentered>
       <div style={{ textAlign: 'center' }}>
-        <Banner />
+        <AppVerticalBanner />
         <div style={{ marginBottom: theme.spacing(3) }}>
           <Typography>{t('title')}</Typography>
         </div>

@@ -11,8 +11,16 @@ export const DEFAULT_APP_CONFIG: AppConfig = {
   auth: {
     login: null,
     mode: 'loading',
+    disableWhoAmI: false,
     preferredMethod: null,
     redirectTo: null
+  },
+  layout: {
+    mode: 'side',
+    left_nav: {
+      open: true,
+      width: 500
+    }
   },
   // config: {
   //   storageKey: 'al.storage'

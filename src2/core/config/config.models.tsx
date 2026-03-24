@@ -1,5 +1,6 @@
 import { AppAPIConfig, AppAPISettingsSchema } from 'core/api/api.models';
 import { AppAuthConfig } from 'core/auth/auth.models';
+import { AppLayoutConfig, AppLayoutSettingsSchema } from 'core/layout/layout.config';
 import { AppRouterConfig, AppRouterSettingsSchema } from 'core/router/router/router.models';
 import { AppSnackbarConfig } from 'core/snackbar/snackbar.models';
 import { AppThemeConfig, AppThemeSettingsSchema } from 'core/theme/theme.models';
@@ -46,6 +47,7 @@ import { z } from 'zod';
 export const AppSettingsSchema = z
   .object({
     api: AppAPISettingsSchema.optional().nullable(),
+    layout: AppLayoutSettingsSchema.optional().nullable(),
     router: AppRouterSettingsSchema.optional().nullable(),
     theme: AppThemeSettingsSchema.optional().nullable()
   })
@@ -57,6 +59,7 @@ export type AppSettings = z.infer<typeof AppSettingsSchema>;
 export type AppConfig = {
   api: AppAPIConfig;
   auth: AppAuthConfig;
+  layout: AppLayoutConfig;
   quota: { api: number; submission: number };
   router: AppRouterConfig;
   snackbar: AppSnackbarConfig;

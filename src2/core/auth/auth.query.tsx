@@ -13,12 +13,10 @@ import { normalizeWhoAmI } from './auth.utils';
 
 export const useAuthQuery = () => {
   const queryClient = useQueryClient();
-  const { t } = useTranslation();
+  const { t } = useTranslation(['api']);
   const { showErrorMessage, closeSnackbar } = useAppSnackbar();
   const setStore = useAppConfigSetStore();
   const systemConfig = useAppConfigStore(s => s?.configuration);
-
-  const store = useAppConfigStore(s => s);
 
   const saveSettings = useSaveAppConfig();
 
@@ -28,7 +26,7 @@ export const useAuthQuery = () => {
   const retryAfter = 10 * 1000;
   const allowCache = false;
 
-  const query = useQuery<
+  return useQuery<
     APIResponse<Configuration | LoginParamsProps | WhoAmIProps>,
     APIResponse<Error>,
     APIResponse<Configuration | LoginParamsProps | WhoAmIProps>,
@@ -73,9 +71,9 @@ export const useAuthQuery = () => {
 
         // Handle an unreachable API
         if (res.status === 502) {
-          showErrorMessage(t('api.unreachable'), 10000);
+          showErrorMessage(t('unreachable'), 10000);
           return Promise.reject({
-            api_error_message: t('api.unreachable'),
+            api_error_message: t('unreachable'),
             api_response: '',
             api_server_version: systemConfig.system.version,
             api_status_code: 502
@@ -86,13 +84,13 @@ export const useAuthQuery = () => {
 
         // Check for an invalid json format
         if (!isAPIData(json)) {
-          showErrorMessage(t('api.invalid'), 30000);
+          showErrorMessage(t('invalid'), 30000);
           setStore(s => {
             s.auth.mode = 'loading';
             return s;
           });
           return Promise.reject({
-            api_error_message: t('api.invalid'),
+            api_error_message: t('invalid'),
             api_response: '',
             api_server_version: systemConfig.system.version,
             api_status_code: 400
@@ -175,6 +173,4 @@ export const useAuthQuery = () => {
     },
     queryClient
   );
-
-  return null;
 };

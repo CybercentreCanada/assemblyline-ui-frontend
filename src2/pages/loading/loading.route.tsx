@@ -1,5 +1,5 @@
 import { CircularProgress, useTheme } from '@mui/material';
-import { useAppBannerVert } from 'core/preference/preference.hooks';
+import { AppVerticalBanner } from 'core/layout/layout.components';
 import { createAppRoute } from 'core/router/route/route.utils';
 import React from 'react';
 import { PageCardCentered } from 'ui/layouts/PageCardCentered';
@@ -13,7 +13,6 @@ export type LoadingPageProps = {
 
 export const LoadingPage = React.memo(({ hideBanner = false }: LoadingPageProps) => {
   const theme = useTheme();
-  const Banner = useAppBannerVert();
 
   return hideBanner ? (
     <div style={{ display: 'grid', placeItems: 'center', height: '100%' }}>
@@ -21,7 +20,7 @@ export const LoadingPage = React.memo(({ hideBanner = false }: LoadingPageProps)
     </div>
   ) : (
     <PageCardCentered sx={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(3), alignItems: 'center' }}>
-      <Banner />
+      <AppVerticalBanner />
       <CircularProgress variant="indeterminate" />
     </PageCardCentered>
   );

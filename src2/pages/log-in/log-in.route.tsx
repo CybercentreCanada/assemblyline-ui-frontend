@@ -1,5 +1,5 @@
 import { Stack, useTheme } from '@mui/material';
-import { useAppBanner, useAppBannerVert } from 'core/preference/preference.hooks';
+import { AppBanner, AppVerticalBanner } from 'core/layout/layout.components';
 import { createAppRoute } from 'core/router/route/route.utils';
 import React from 'react';
 import { PageCardCentered } from 'ui/layouts/PageCardCentered';
@@ -26,10 +26,7 @@ type LoginRequest = {
 // Login Page Content
 //*****************************************************************************************
 const LoginPageContent = React.memo(() => {
-  const Banner = useAppBanner();
-  const BannerVert = useAppBannerVert();
   const theme = useTheme();
-
   const form = useLoginForm();
 
   usePasswordResetEmail();
@@ -43,7 +40,7 @@ const LoginPageContent = React.memo(() => {
         <form.Subscribe selector={s => s.values.mode}>
           {mode => (
             <>
-              {mode === 'log-in' ? <BannerVert /> : <Banner />}
+              {mode === 'log-in' ? <AppVerticalBanner /> : <AppBanner />}
 
               {(() => {
                 switch (mode) {

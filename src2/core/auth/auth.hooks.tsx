@@ -28,8 +28,10 @@ export const useIsAppReady = () => {
 export const useIsAuthenticating = () => {
   const { pathname } = useLocation();
 
+  const disableWhoAmI = useAppConfigStore(s => s?.auth?.disableWhoAmI);
+
   return useMemo(
-    () => pathname.includes(`/oauth/`) || pathname.includes(`/saml/`) || pathname.includes(`/signin/`),
-    [pathname]
+    () => pathname.includes(`/oauth/`) || pathname.includes(`/saml/`) || disableWhoAmI,
+    [disableWhoAmI, pathname]
   );
 };

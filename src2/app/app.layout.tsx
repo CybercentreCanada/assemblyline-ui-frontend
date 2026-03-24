@@ -82,7 +82,7 @@ export const APP_DARK_BANNER_VERT = React.memo(() => {
 });
 
 export const APP_TOP_NAV_RIGHT = React.memo(() => {
-  return <NotificationArea />;
+  return null;
 });
 
 export const APP_LEFT_MENU_ITEMS = [
