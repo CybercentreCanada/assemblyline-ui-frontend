@@ -1,7 +1,6 @@
 import { Avatar, Button, CircularProgress, Link, Typography, useTheme } from '@mui/material';
 import Skeleton from '@mui/material/Skeleton';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
 
 type SSOProps = {
   avatar: string;
@@ -17,22 +16,15 @@ type SSOProps = {
 export function SSOLogin({ avatar, username, email, tokenID, buttonLoading, onSubmit, reset, quickLogin }: SSOProps) {
   const { t } = useTranslation(['login']);
   const theme = useTheme();
-  const navigate = useNavigate();
 
   // Perform a quick login if we have all the necessary data
   if (quickLogin && tokenID) {
-    navigate(localStorage.getItem('nextLocation') || '/');
     onSubmit(null);
     return;
   }
 
   return (
-    <form
-      onSubmit={event => {
-        navigate(localStorage.getItem('nextLocation') || '/');
-        onSubmit(event);
-      }}
-    >
+    <form onSubmit={onSubmit}>
       <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'center', justifyContent: 'center' }}>
         {!tokenID ? (
           <Skeleton variant="circular" style={{ alignSelf: 'center' }} width={144} height={144} />

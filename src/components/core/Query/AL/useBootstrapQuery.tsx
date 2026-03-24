@@ -1,6 +1,7 @@
 import type { UndefinedInitialDataOptions } from '@tanstack/react-query';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import type { APIQueryKey, APIResponse } from 'components/core/Query/components/api.models';
+import { useAPIStore } from 'components/core/Query/components/APIProvider';
 import { DEFAULT_RETRY_MS } from 'components/core/Query/components/constants';
 import { getAPIResponse, isAPIData, stableStringify } from 'components/core/Query/components/utils';
 import useALContext from 'components/hooks/useALContext';
@@ -52,10 +53,9 @@ export const useBootstrapQuery = ({
   const { configuration: systemConfig } = useALContext();
   const { setApiQuotaremaining, setSubmissionQuotaremaining } = useQuota();
 
-  const isAuthenticating = useMemo(
-    () => pathname.includes(`/oauth/`) || pathname.includes(`/saml/`) || pathname.includes(`/signin/`),
-    [pathname]
-  );
+  const [disableWhoAmI] = useAPIStore(s => s.disabledWhoAmI);
+
+  const isAuthenticating = useMemo(() => pathname.includes(`/oauth/`) || pathname.includes(`/saml/`), [pathname]);
 
   const query = useQuery<
     APIResponse<Configuration | LoginParamsProps | WhoAmIProps>,
@@ -65,7 +65,7 @@ export const useBootstrapQuery = ({
   >(
     {
       ...queryProps,
-      enabled: !disabled && !isAuthenticating,
+      enabled: !disabled && !isAuthenticating && !disableWhoAmI,
       queryKey: ['/api/v4/user/whoami/', 'GET', stableStringify(null), allowCache],
       retry: (failureCount, error) => failureCount < 1 || error?.api_status_code === 502,
       retryDelay: failureCount => Math.min(retryAfter * (failureCount + 1), 10000),
