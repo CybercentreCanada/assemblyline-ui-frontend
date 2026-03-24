@@ -283,7 +283,7 @@ function WrappedGeneralInformation({ report }: Props) {
                 {!report ? (
                   <Skeleton />
                 ) : !report?.file_info?.size ? null : (
-                  <span style={{ fontWeight: 500 }}>
+                  <span>
                     {report?.file_info?.size}
                     <span>{` (${bytesToSize(report?.file_info?.size)})`}</span>
                   </span>
