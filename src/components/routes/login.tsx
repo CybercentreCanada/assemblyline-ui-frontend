@@ -71,6 +71,11 @@ export default function LoginScreen({ allowUserPass, allowSAML, allowSignup, oAu
     if (event) {
       event.preventDefault();
     }
+
+    setStore(s => {
+      s.disabledWhoAmI = false;
+      return s;
+    });
   }
 
   function login(focusTarget) {
