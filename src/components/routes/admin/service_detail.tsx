@@ -161,7 +161,7 @@ const Service = ({ name = null, onDeleted = () => null, onUpdated = () => null }
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentUser.is_admin, service, serviceVersion]);
+  }, [currentUser.is_admin, service?.name || '', serviceVersion]);
 
   useEffect(() => {
     // Set the global error flag based on each sub-error value
