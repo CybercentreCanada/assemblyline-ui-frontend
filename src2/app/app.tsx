@@ -6,7 +6,6 @@ import { AppRouterProvider } from 'core/router';
 import { AppSnackbarProvider } from 'core/snackbar/snackbar.providers';
 import { AppThemeProvider } from 'core/theme';
 import { AppRoot } from 'layout/AppRoot';
-import { SnackbarProvider } from 'notistack';
 import { StrictMode } from 'react';
 
 /**
@@ -44,15 +43,13 @@ export const AssemblylineApp = () => (
       <AppAPIProvider>
         <AppThemeProvider>
           <AppSnackbarProvider>
-            <SnackbarProvider>
-              <AppRouterProvider>
-                <AppAuthProvider>
-                  <AppLayoutProvider>
-                    <AppRoot />
-                  </AppLayoutProvider>
-                </AppAuthProvider>
-              </AppRouterProvider>
-            </SnackbarProvider>
+            <AppRouterProvider>
+              <AppAuthProvider>
+                <AppLayoutProvider>
+                  <AppRoot />
+                </AppLayoutProvider>
+              </AppAuthProvider>
+            </AppRouterProvider>
           </AppSnackbarProvider>
         </AppThemeProvider>
       </AppAPIProvider>
