@@ -1,6 +1,6 @@
 import { invalidateAPIQuery, useAPIMutation, useAPIQuery } from 'core/api';
-import { useAppConfigStore } from 'core/config';
-import { useAppConfigSetStore } from 'core/config/config.providers';
+import { useAppConfig } from 'core/config';
+import { useAppSetConfig } from 'core/config/config.providers';
 import { useAppSnackbar } from 'core/snackbar/snackbar.hooks';
 import { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -13,7 +13,7 @@ import { useLoginForm } from './log-in.providers';
  * @returns A function that clears any in-progress login state (OTP, reset password, SSO tokens, etc.).
  */
 export const useLoginReset = () => {
-  const setStore = useAppConfigSetStore();
+  const setStore = useAppSetConfig();
   const form = useLoginForm();
 
   return useCallback(() => {
@@ -105,8 +105,8 @@ export const useOAuthLogin = () => {
   const form = useLoginForm();
   const resetLogin = useLoginReset();
 
-  const setStore = useAppConfigSetStore();
-  const redirectTo = useAppConfigStore(s => s.auth.redirectTo);
+  const setStore = useAppSetConfig();
+  const redirectTo = useAppConfig(s => s.auth.redirectTo);
 
   const provider = useMemo<string | null>(() => {
     const marker = '/oauth/';
@@ -167,8 +167,8 @@ export const useSAMLLogin = () => {
   const form = useLoginForm();
   const resetLogin = useLoginReset();
 
-  const setStore = useAppConfigSetStore();
-  const redirectTo = useAppConfigStore(s => s.auth.redirectTo);
+  const setStore = useAppSetConfig();
+  const redirectTo = useAppConfig(s => s.auth.redirectTo);
 
   const samlData = useMemo<{ username: string; email: string; saml_token_id: string; error: string }>(() => {
     try {
@@ -213,8 +213,8 @@ export const useSAMLLogin = () => {
  * @returns Whether the user should be auto-forwarded into the SSO confirmation step.
  */
 export const useQuickLogin = () => {
-  const allowSAML = useAppConfigStore(s => s.auth.login.allow_saml_login);
-  const oAuthProviders = useAppConfigStore(s => s.auth.login.oauth_providers);
+  const allowSAML = useAppConfig(s => s.auth.login.allow_saml_login);
+  const oAuthProviders = useAppConfig(s => s.auth.login.oauth_providers);
 
   return (allowSAML && (oAuthProviders?.length ?? 0) === 0) || (!allowSAML && (oAuthProviders?.length ?? 0) === 1);
 };
@@ -230,7 +230,7 @@ export const useLoginRequest = () => {
   const { showErrorMessage } = useAppSnackbar();
   const form = useLoginForm();
 
-  const setStore = useAppConfigSetStore();
+  const setStore = useAppSetConfig();
   const resetLogin = useLoginReset();
 
   return useAPIMutation(() => ({

@@ -1,14 +1,14 @@
 import { Button } from '@mui/material';
-import { useAppConfigSetStore } from 'core/config/config.providers';
+import { useAppSetConfig } from 'core/config/config.providers';
 import React, { PropsWithChildren } from 'react';
 
 export const AppRoot = React.memo(({ children }: PropsWithChildren) => {
-  const setStore = useAppConfigSetStore();
+  const setConfig = useAppSetConfig();
 
   return (
     <Button
       onClick={() => {
-        setStore(s => {
+        setConfig(s => {
           s.auth.mode = 'logout';
           return s;
         });

@@ -1,9 +1,9 @@
+import translationEN from 'app/app.i18n.en.json';
+import translationFR from 'app/app.i18n.fr.json';
 import apiEN from 'core/api/api.i18n.en.json';
 import apiFR from 'core/api/api.i18n.fr.json';
 import layoutEN from 'core/layout/layout.i18n.en.json';
 import layoutFR from 'core/layout/layout.i18n.fr.json';
-import { default as i18n } from 'i18next';
-import LanguageDetector from 'i18next-browser-languagedetector';
 import forbiddenEN from 'pages/forbidden/forbidden.i18n.en.json';
 import forbiddenFR from 'pages/forbidden/forbidden.i18n.fr.json';
 import lockedEN from 'pages/locked/locked.i18n.en.json';
@@ -18,9 +18,8 @@ import quotaEN from 'pages/quota/quota.i18n.en.json';
 import quotaFR from 'pages/quota/quota.i18n.fr.json';
 import tosEN from 'pages/terms-of-service/terms-of-service.i18n.en.json';
 import tosFR from 'pages/terms-of-service/terms-of-service.i18n.fr.json';
-import { initReactI18next } from 'react-i18next';
 
-const resources = {
+export const I18N_RESSOURCES = {
   en: {
     api: apiEN,
     error403: forbiddenEN,
@@ -31,7 +30,7 @@ const resources = {
     logout: logoutEN,
     quota: quotaEN,
     tos: tosEN,
-    translation: {}
+    translation: translationEN
   },
   fr: {
     api: apiFR,
@@ -43,24 +42,6 @@ const resources = {
     logout: logoutFR,
     quota: quotaFR,
     tos: tosFR,
-    translation: {}
+    translation: translationFR
   }
 };
-
-void i18n
-  .use(LanguageDetector)
-  .use(initReactI18next)
-  .init({
-    fallbackLng: 'en',
-    defaultNS: 'translation',
-    keySeparator: false,
-    interpolation: {
-      escapeValue: false
-    },
-    detection: {
-      order: ['localStorage', 'cookie']
-    },
-    resources
-  });
-
-export default i18n;

@@ -3,9 +3,15 @@ import type { AppConfig } from 'core/config/config.models';
 export const APP_CONFIG_LOCAL_STORAGE_KEY = 'al.settings';
 
 export const DEFAULT_APP_CONFIG: AppConfig = {
+  app: {
+    name: 'Assemblyline',
+    link: '/'
+  },
   api: {
-    staleTime: 0,
-    gcTime: 0,
+    staleTime: 1_000,
+    gcTime: 1_000,
+    retryTime: 10_000,
+    invalidateDelay: 1_000,
     showDevtools: false
   },
   auth: {
@@ -19,12 +25,9 @@ export const DEFAULT_APP_CONFIG: AppConfig = {
     mode: 'side',
     left_nav: {
       open: true,
-      width: 500
+      width: 240
     }
   },
-  // config: {
-  //   storageKey: 'al.storage'
-  // },
   quota: {
     api: null,
     submission: null

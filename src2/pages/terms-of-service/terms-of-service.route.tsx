@@ -1,6 +1,6 @@
 import { Box, Link, Skeleton, Typography, useTheme } from '@mui/material';
 import { useAPIMutation, useAPIQuery } from 'core/api';
-import { useAppConfigStore } from 'core/config';
+import { useAppConfig } from 'core/config';
 import { AppBanner } from 'core/layout/layout.components';
 import { createAppRoute } from 'core/router/route/route.utils';
 import { NotFoundPage } from 'pages/not-found/not-found.route';
@@ -18,8 +18,8 @@ export const ToSPage = React.memo(() => {
   const { t } = useTranslation(['tos']);
   const theme = useTheme();
 
-  const currentUser = useAppConfigStore(s => s.user);
-  const configuration = useAppConfigStore(s => s.configuration);
+  const currentUser = useAppConfig(s => s.user);
+  const configuration = useAppConfig(s => s.configuration);
 
   const handleCancel = useAPIMutation(() => ({
     url: '/api/v4/auth/logout/',

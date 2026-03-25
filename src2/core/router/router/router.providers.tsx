@@ -1,4 +1,4 @@
-import { useAppConfigStore } from 'core/config';
+import { useAppConfig } from 'core/config';
 import { createAppStore } from 'features/store/createAppStore';
 import React, { PropsWithChildren, useCallback } from 'react';
 import type { Location } from 'react-router';
@@ -25,7 +25,7 @@ AppRouterStoreProvider.displayName = 'AppRouterStoreProvider';
 export const AppRouterStoreSync = React.memo(({ children }: PropsWithChildren) => {
   const location: Location<AppRouterState> = useLocation();
 
-  const { maxPanels, maxNodes } = useAppConfigStore(
+  const { maxPanels, maxNodes } = useAppConfig(
     useShallow(s => ({
       maxNodes: s.router.maxNodes,
       maxPanels: s.router.maxPanels

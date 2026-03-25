@@ -1,11 +1,11 @@
 import { deepmerge } from '@mui/utils';
 import { APP_CONFIG_LOCAL_STORAGE_KEY } from 'app/app.configs';
 import { useCallback, useMemo, useState } from 'react';
-import { useAppConfigSetStore, useAppConfigStore } from './config.providers';
+import { useAppSetConfig, useAppConfig } from './config.providers';
 import { loadSettingsFromLocalStorage, saveSettingsFromLocalStorage } from './config.utils';
 
 export const useSaveAppConfig = () => {
-  const store = useAppConfigStore(s => s);
+  const store = useAppConfig(s => s);
 
   return useCallback(() => {
     try {
@@ -17,7 +17,7 @@ export const useSaveAppConfig = () => {
 };
 
 export const useLoadAppConfig = () => {
-  const setStore = useAppConfigSetStore();
+  const setStore = useAppSetConfig();
 
   return useCallback(() => {
     try {
@@ -30,7 +30,7 @@ export const useLoadAppConfig = () => {
 };
 
 export const useSaveSettings = () => {
-  const store = useAppConfigStore(s => s);
+  const store = useAppConfig(s => s);
 
   const [isPending, setIsPending] = useState<boolean>(false);
 
@@ -48,7 +48,7 @@ export const useSaveSettings = () => {
 };
 
 export const useLoadSettings = () => {
-  const setStore = useAppConfigSetStore();
+  const setStore = useAppSetConfig();
 
   const [isPending, setIsPending] = useState<boolean>(false);
 

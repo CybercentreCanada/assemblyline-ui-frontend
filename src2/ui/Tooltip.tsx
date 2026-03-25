@@ -7,28 +7,30 @@ export type TooltipProps = Omit<MuiTooltipProps, 'title' | 'children'> & {
   children?: React.ReactNode;
   title?: MuiTooltipProps['title'];
   noDiv?: boolean;
+  disabled?: boolean;
 };
 
 export const Tooltip: React.FC<TooltipProps> = React.memo(
-  ({ children = null, title = null, noDiv = false, ...tooltipProps }: TooltipProps) => {
+  ({ children = null, title = null, noDiv = false, disabled = false, ...tooltipProps }: TooltipProps) => {
     const [open, setOpen] = useState<boolean>(false);
 
-    return title ? (
+    return disabled ? (
+      children
+    ) : (
       <MuiTooltip
         title={title}
         placement="bottom-start"
         disableInteractive
-        open={open}
-        onOpen={() => setOpen(true)}
+        open={open && !!title}
+        onOpen={() => setOpen(true && !!title)}
         onClose={() => setOpen(false)}
         {...tooltipProps}
         slotProps={{
           ...tooltipProps?.slotProps,
           popper: {
-            ...tooltipProps?.slotProps?.popper,
-            disablePortal: true,
             // modifiers: [{ name: 'offset', options: { offset: [0, 0] } }],
-            onMouseOver: () => setOpen(false)
+            onMouseOver: () => setOpen(false),
+            ...tooltipProps?.slotProps?.popper
           },
           tooltip: {
             ...tooltipProps?.slotProps?.tooltip,
@@ -41,8 +43,6 @@ export const Tooltip: React.FC<TooltipProps> = React.memo(
       >
         {noDiv ? (children as React.ReactElement<unknown, any>) : <div>{children}</div>}
       </MuiTooltip>
-    ) : (
-      children
     );
   }
 );

@@ -1,9 +1,10 @@
-import { z } from 'zod';
-// import type { Method } from '../../../../src/models/utils/request';
-// import type { RootRequests, RootResponses } from '../../../../src/models/ui';
-// import type { BadlistRequests, BadlistResponses } from '../../../../src/models/ui/badlist';
-// import type { SearchRequests, SearchResponses } from '../../../../src/models/ui/search';
-// import type { UserRequests, UserResponses } from '../../../../src/models/ui/user';
+export type Method = 'GET' | 'HEAD' | 'POST' | 'PUT' | 'DELETE' | 'CONNECT' | 'OPTIONS' | 'TRACE' | 'PATCH';
+
+export type RequestBuilder<URL extends string = string, M extends Method = 'GET', Body = null> = {
+  url: URL;
+  method?: M;
+  body?: Body;
+};
 
 export type APIRequest = {
   url: string;
@@ -42,33 +43,3 @@ export type APIQueryKey = [
   string, // Stringified Body
   boolean // allowCache
 ];
-
-// prettier-ignore
-export type ALRequests =
-  | BadlistRequests
-  | RootRequests
-  | SearchRequests
-  | UserRequests
-
-// prettier-ignore
-export type ALResponses<Request extends ALRequests> =
-  Request extends BadlistRequests ? BadlistResponses<Request> :
-  Request extends RootRequests ? RootResponses<Request> :
-  Request extends SearchRequests ? SearchResponses<Request> :
-  Request extends UserRequests ? UserResponses<Request> :
-  never;
-
-//*****************************************************************************************
-// App API Settings & Config
-//*****************************************************************************************
-
-export const AppAPISettingsSchema = z.object({
-  staleTime: z.number().min(0).optional(),
-  gcTime: z.number().min(0).optional()
-});
-
-export type AppAPISettings = z.infer<typeof AppAPISettingsSchema>;
-
-export type AppAPIConfig = AppAPISettings & {
-  showDevtools?: boolean;
-};

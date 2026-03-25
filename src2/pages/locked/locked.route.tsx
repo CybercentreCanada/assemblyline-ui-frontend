@@ -1,6 +1,6 @@
 import HourglassEmptyOutlinedIcon from '@mui/icons-material/HourglassEmptyOutlined';
 import { Typography, useTheme } from '@mui/material';
-import { useAppConfigStore } from 'core/config';
+import { useAppConfig } from 'core/config';
 import { createAppRoute } from 'core/router/route/route.utils';
 import { ForbiddenPage } from 'pages/forbidden/forbidden.route';
 import React from 'react';
@@ -16,8 +16,8 @@ export const LockedPage = React.memo(({}: LockedPageProps) => {
   const { t } = useTranslation(['locked']);
   const theme = useTheme();
 
-  const tos = useAppConfigStore(s => s.configuration?.ui?.tos);
-  const tos_lockout_notify = useAppConfigStore(s => s.configuration?.ui?.tos_lockout_notify);
+  const tos = useAppConfig(s => s.configuration?.ui?.tos);
+  const tos_lockout_notify = useAppConfig(s => s.configuration?.ui?.tos_lockout_notify);
 
   return (
     <>

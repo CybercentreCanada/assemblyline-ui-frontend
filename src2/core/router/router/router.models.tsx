@@ -1,9 +1,4 @@
 import { ReversePortalNode } from 'features/portal';
-import { z } from 'zod';
-
-//*****************************************************************************************
-// App Router Store
-//*****************************************************************************************
 
 export type AppRouterPanel = {
   routeKey: keyof AppRouterStore['routes'];
@@ -36,16 +31,3 @@ export type AppRouterStore = {
   nodes: Record<string, AppRouterNode>;
   routes: Record<string, AppRouterRoute>;
 };
-
-//*****************************************************************************************
-// App Router Settings & Config
-//*****************************************************************************************
-
-export const AppRouterSettingsSchema = z.object({
-  maxPanels: z.number().min(1).optional(),
-  maxNodes: z.number().min(0).optional()
-});
-
-export type AppRouterSettings = z.infer<typeof AppRouterSettingsSchema>;
-
-export type AppRouterConfig = AppRouterSettings & {};

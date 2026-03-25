@@ -10,8 +10,8 @@ import { loadSettingsFromLocalStorage } from './config.utils';
 //*****************************************************************************************
 export const {
   StoreProvider: AppConfigStoreProvider,
-  useStore: useAppConfigStore,
-  useSetStore: useAppConfigSetStore
+  useStore: useAppConfig,
+  useSetStore: useAppSetConfig
 } = createAppStore<AppConfig>(DEFAULT_APP_CONFIG);
 
 AppConfigStoreProvider.displayName = 'AppConfigStoreProvider';

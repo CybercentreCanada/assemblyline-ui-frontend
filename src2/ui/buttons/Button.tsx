@@ -51,7 +51,7 @@ export const Button: React.FC<ButtonProps> = React.memo(
         />
       </MuiButton>
     ) : preventRender ? null : (
-      <Tooltip title={tooltip} placement="bottom" {...tooltipProps}>
+      <Tooltip title={tooltip} placement="bottom" noDiv {...tooltipProps}>
         <MuiButton
           id={id ?? getTextContent(children)}
           disabled={progress || disabled}

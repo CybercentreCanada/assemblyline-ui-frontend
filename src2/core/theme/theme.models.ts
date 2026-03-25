@@ -1,5 +1,4 @@
 import type { ThemeOptions } from '@mui/material';
-import { z } from 'zod';
 
 export type AppThemeConfigs = {
   global?: Partial<ThemeOptions>;
@@ -13,18 +12,3 @@ export type AppTheme = {
 };
 
 export type AppThemes = Record<string, AppTheme>;
-
-//*****************************************************************************************
-// App Theme Settings & Config
-//*****************************************************************************************
-
-export const AppThemeSettingsSchema = z.object({
-  mode: z.enum(['system', 'light', 'dark']).optional(),
-  variant: z.enum(['default']).optional()
-});
-
-export type AppThemeSettings = z.infer<typeof AppThemeSettingsSchema>;
-
-export type AppThemeConfig = AppThemeSettings & {
-  injectFirst?: boolean;
-};

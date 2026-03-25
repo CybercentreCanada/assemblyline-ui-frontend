@@ -1,4 +1,4 @@
-import { useAppConfigStore } from 'core/config';
+import { useAppConfig } from 'core/config';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from 'ui/buttons/Button';
@@ -10,7 +10,7 @@ import { useLoginRequest } from '../log-in.hooks';
 //*****************************************************************************************
 export const UserPasswordLogin = React.memo(() => {
   const { t } = useTranslation(['login']);
-  const allowUserPass = useAppConfigStore(s => s.auth.login.allow_userpass_login);
+  const allowUserPass = useAppConfig(s => s.auth.login.allow_userpass_login);
 
   const requestLogin = useLoginRequest();
 

@@ -17,6 +17,7 @@ export type {
   AppRouteStore
 } from './route/route.providers';
 export type { CreateAppRouteProps } from './route/route.utils';
+export * from './router.config';
 export {
   AppRouterProvider,
   AppRouterStoreProvider,

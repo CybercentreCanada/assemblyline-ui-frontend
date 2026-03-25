@@ -1,12 +1,12 @@
+import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
 import { keepPreviousData, QueryClient } from '@tanstack/react-query';
 import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools';
-import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import type { PersistedClient } from '@tanstack/react-query-persist-client';
-import { useAppConfigStore } from 'core/config';
-import React, { Activity, PropsWithChildren, useEffect, useMemo } from 'react';
-import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
-import type { APIQueryKey } from './api.models';
+import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
+import { useAppConfig } from 'core/config';
 import { compress, decompress } from 'lz-string';
+import React, { Activity, PropsWithChildren, useEffect, useMemo } from 'react';
+import type { APIQueryKey } from './api.models';
 
 export const queryClient = new QueryClient({
   defaultOptions: {
@@ -20,9 +20,9 @@ export const queryClient = new QueryClient({
 });
 
 export const AppAPIProvider = React.memo(({ children }: PropsWithChildren) => {
-  const staleTime = useAppConfigStore(s => s.api.staleTime);
-  const gcTime = useAppConfigStore(s => s.api.gcTime);
-  const showDevtools = useAppConfigStore(s => s.api.showDevtools);
+  const staleTime = useAppConfig(s => s.api.staleTime);
+  const gcTime = useAppConfig(s => s.api.gcTime);
+  const showDevtools = useAppConfig(s => s.api.showDevtools);
 
   const persister = useMemo(
     () =>

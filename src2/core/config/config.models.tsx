@@ -1,9 +1,9 @@
-import { AppAPIConfig, AppAPISettingsSchema } from 'core/api/api.models';
-import { AppAuthConfig } from 'core/auth/auth.models';
-import { AppLayoutConfig, AppLayoutSettingsSchema } from 'core/layout/layout.config';
-import { AppRouterConfig, AppRouterSettingsSchema } from 'core/router/router/router.models';
-import { AppSnackbarConfig } from 'core/snackbar/snackbar.models';
-import { AppThemeConfig, AppThemeSettingsSchema } from 'core/theme/theme.models';
+import { AppAPIConfig, AppAPISettingsSchema } from 'core/api/api.config';
+import { AppAuthConfig } from 'core/auth';
+import { AppLayoutConfig, AppLayoutSettingsSchema } from 'core/layout';
+import { AppRouterConfig, AppRouterSettingsSchema } from 'core/router';
+import { AppSnackbarConfig } from 'core/snackbar';
+import { AppThemeConfig, AppThemeSettingsSchema } from 'core/theme';
 import type { ClassificationDefinition } from 'helpers/classificationParser';
 import type { Configuration } from 'models/base/config';
 import type { UserSettings } from 'models/base/user_settings';
@@ -57,6 +57,10 @@ export const AppSettingsSchema = z
 export type AppSettings = z.infer<typeof AppSettingsSchema>;
 
 export type AppConfig = {
+  app: {
+    name: string;
+    link: string;
+  };
   api: AppAPIConfig;
   auth: AppAuthConfig;
   layout: AppLayoutConfig;

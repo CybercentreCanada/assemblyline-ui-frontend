@@ -1,7 +1,7 @@
 import { Avatar, Link, Typography, useTheme } from '@mui/material';
-import { useAppConfigStore } from 'core/config';
+import { useAppConfig } from 'core/config';
 import { useSaveAppConfig } from 'core/config/config.hooks';
-import { useAppConfigSetStore } from 'core/config/config.providers';
+import { useAppSetConfig } from 'core/config/config.providers';
 import React, { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router';
@@ -75,9 +75,9 @@ SingleSignOn.displayName = 'SingleSignOn';
 export const OAuthLogin = React.memo(() => {
   const { t } = useTranslation(['login']);
   const location = useLocation();
-  const oAuthProviders = useAppConfigStore(s => s.auth.login.oauth_providers);
+  const oAuthProviders = useAppConfig(s => s.auth.login.oauth_providers);
 
-  const setStore = useAppConfigSetStore();
+  const setStore = useAppSetConfig();
   const save = useSaveAppConfig();
 
   const handleClick = useCallback(() => {
@@ -112,9 +112,9 @@ OAuthLogin.displayName = 'OAuthLogin';
 export const SAMLLogin = React.memo(() => {
   const { t } = useTranslation(['login']);
   const location = useLocation();
-  const allowSAML = useAppConfigStore(s => s.auth.login.allow_saml_login);
+  const allowSAML = useAppConfig(s => s.auth.login.allow_saml_login);
 
-  const setStore = useAppConfigSetStore();
+  const setStore = useAppSetConfig();
   const save = useSaveAppConfig();
 
   const handleClick = useCallback(() => {

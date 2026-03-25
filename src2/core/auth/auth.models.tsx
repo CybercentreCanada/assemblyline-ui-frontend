@@ -1,8 +1,5 @@
 import { Configuration } from 'models/base/config';
 import { WhoAmIProps } from 'models/ui/user';
-import { z } from 'zod';
-
-const DEFAULT_RETRY_MS = 32;
 
 export type APIResponseProps<APIResponse> = {
   api_error_message: string;
@@ -28,7 +25,7 @@ export type LoginParamsProps = {
   allow_saml_login: boolean;
 };
 
-type APICallProps<SuccessData, FailureData> = {
+export type APICallProps<SuccessData, FailureData> = {
   url: string;
   contentType?: string;
   method?: string;
@@ -43,7 +40,7 @@ type APICallProps<SuccessData, FailureData> = {
   retryAfter?: number;
 };
 
-type BootstrapProps = {
+export type BootstrapProps = {
   switchRenderedApp: (value: string) => void;
   setConfiguration: (cfg: Configuration) => void;
   setLoginParams: (params: LoginParamsProps) => void;
@@ -52,7 +49,7 @@ type BootstrapProps = {
   retryAfter?: number;
 };
 
-type DownloadBlobProps<SuccessData, FailureData> = {
+export type DownloadBlobProps<SuccessData, FailureData> = {
   url: string;
   onSuccess?: (blob: DownloadResponseProps<SuccessData>) => void;
   onFailure?: (api_data: DownloadResponseProps<FailureData>) => void;
@@ -61,30 +58,10 @@ type DownloadBlobProps<SuccessData, FailureData> = {
   retryAfter?: number;
 };
 
-type UseMyAPIReturn = {
+export type UseMyAPIReturn = {
   apiCall: <SuccessData = any, FailureData = any>(props: APICallProps<SuccessData, FailureData>) => void;
   bootstrap: (props: BootstrapProps) => void;
   downloadBlob: <SuccessData = ReadableStream, FailureData = ReadableStream>(
     props: DownloadBlobProps<SuccessData, FailureData>
   ) => void;
-};
-
-export const AppAuthSettingsSchema = z.object({
-  login: z
-    .object({
-      allow_saml_login: z.boolean().optional(),
-      allow_signup: z.boolean().optional(),
-      allow_userpass_login: z.boolean().optional(),
-      oauth_providers: z.array(z.string()).optional()
-    })
-    .optional(),
-  redirectTo: z.string(),
-  preferredMethod: z.string()
-});
-
-export type AppAuthSettings = z.infer<typeof AppAuthSettingsSchema>;
-
-export type AppAuthConfig = AppAuthSettings & {
-  mode: 'login' | 'loading' | 'locked' | 'quota' | 'tos' | 'app' | 'logout';
-  disableWhoAmI: boolean;
 };

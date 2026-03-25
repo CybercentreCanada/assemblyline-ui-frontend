@@ -1,7 +1,7 @@
 import { createTheme, CssBaseline, StyledEngineProvider, ThemeProvider, useMediaQuery } from '@mui/material';
 import { deepmerge } from '@mui/utils';
 import { APP_THEMES } from 'app/app.themes';
-import { useAppConfigStore } from 'core/config';
+import { useAppConfig } from 'core/config';
 import type { AppThemeConfigs } from 'core/theme/theme.models';
 import React, { PropsWithChildren, useMemo } from 'react';
 
@@ -15,9 +15,9 @@ const mergeThemeConfigs = (configs: AppThemeConfigs, mode: 'light' | 'dark') => 
 };
 
 export const AppThemeProvider = React.memo(({ children }: PropsWithChildren) => {
-  const injectFirst = useAppConfigStore(s => s.theme.injectFirst ?? false);
-  const requestedMode = useAppConfigStore(s => s.theme.mode);
-  const variant = useAppConfigStore(s => (s.theme.variant in APP_THEMES ? s.theme.variant : DEFAULT_THEME_VARIANT));
+  const injectFirst = useAppConfig(s => s.theme.injectFirst ?? false);
+  const requestedMode = useAppConfig(s => s.theme.mode);
+  const variant = useAppConfig(s => (s.theme.variant in APP_THEMES ? s.theme.variant : DEFAULT_THEME_VARIANT));
 
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
 

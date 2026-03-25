@@ -31,9 +31,100 @@ import SimCardOutlinedIcon from '@mui/icons-material/SimCardOutlined';
 import SupervisorAccountOutlinedIcon from '@mui/icons-material/SupervisorAccountOutlined';
 import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
-import React from 'react';
+import { useTheme } from '@mui/material';
+import { AppMenuItemConfig } from 'core/layout/layout.models';
+import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
+
+export const AppLogo = React.memo(() => {
+  const { t } = useTranslation('layout');
+  const theme = useTheme();
+
+  switch (theme.palette.mode) {
+    case 'dark':
+      return (
+        <img alt={t('logo.alt')} src="/images/noswoop_dark.svg" width="40" height="32" style={{ marginLeft: '-8px' }} />
+      );
+    case 'light':
+      return (
+        <img alt={t('logo.alt')} src="/images/noswoop.svg" width="40" height="32" style={{ marginLeft: '-8px' }} />
+      );
+    default:
+      return null;
+  }
+});
+
+export const AppBanner = React.memo(() => {
+  const { t } = useTranslation('layout');
+  const theme = useTheme();
+
+  switch (theme.palette.mode) {
+    case 'dark':
+      return (
+        <img alt={t('banner.alt')} src="/images/banner_dark.svg" style={{ display: 'inline-block', width: '100%' }} />
+      );
+    case 'light':
+      return <img alt={t('banner.alt')} src="/images/banner.svg" style={{ display: 'inline-block', width: '100%' }} />;
+    default:
+      return null;
+  }
+});
+
+export const AppVerticalBanner = React.memo(() => {
+  const { t } = useTranslation('layout');
+  const theme = useTheme();
+
+  switch (theme.palette.mode) {
+    case 'dark':
+      return (
+        <img
+          alt={t('banner.alt')}
+          src="/images/vertical_banner_dark.svg"
+          style={{ display: 'inline-block', width: '100%' }}
+        />
+      );
+    case 'light':
+      return (
+        <img
+          alt={t('banner.alt')}
+          src="/images/vertical_banner.svg"
+          style={{ display: 'inline-block', width: '100%' }}
+        />
+      );
+    default:
+      return null;
+  }
+});
+
+export const APP_USER_MENU_ITEMS = [
+  {
+    i18nKey: 'usermenu.account',
+    route: '/account',
+    icon: <AccountCircleOutlinedIcon />
+  },
+  {
+    i18nKey: 'usermenu.settings',
+    route: '/settings',
+    icon: <SettingsOutlinedIcon />
+  },
+  {
+    i18nKey: 'usermenu.logout',
+    route: '/logout',
+    icon: <ExitToAppIcon />
+  }
+];
+
+export const useAppLeftMenuItems = () => {
+  const { t } = useTranslation(['layout']);
+
+  return useMemo<AppMenuItemConfig[]>(
+    () => [{ id: 'submit', primary: t('drawer.submit'), icon: <PublishOutlinedIcon />, link: '/submit' }],
+    []
+  );
+};
+
+// OLD
 
 export const APP_LIGHT_LOGO = React.memo(() => {
   const { t } = useTranslation();
@@ -480,23 +571,5 @@ export const APP_LEFT_MENU_ITEMS = [
         }
       ]
     }
-  }
-];
-
-export const APP_USER_MENU_ITEMS = [
-  {
-    i18nKey: 'usermenu.account',
-    route: '/account',
-    icon: <AccountCircleOutlinedIcon />
-  },
-  {
-    i18nKey: 'usermenu.settings',
-    route: '/settings',
-    icon: <SettingsOutlinedIcon />
-  },
-  {
-    i18nKey: 'usermenu.logout',
-    route: '/logout',
-    icon: <ExitToAppIcon />
   }
 ];

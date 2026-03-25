@@ -1,8 +1,5 @@
-import { SnackbarProviderProps } from 'notistack';
+import type { OptionsObject, SnackbarMessage } from 'notistack';
 
-export type AppSnackbarPreference = {
-  dense: SnackbarProviderProps['dense'];
-  maxSnack: SnackbarProviderProps['maxSnack'];
-};
+export type AppSnackbarVariant = 'error' | 'success' | 'warning' | 'info';
 
-export type AppSnackbarConfig = AppSnackbarPreference;
+export type AppSnackbarShowMessage = (message: SnackbarMessage, timeout?: number, options?: OptionsObject) => void;

@@ -1,5 +1,5 @@
 import { CircularProgress, Divider, TextField, TextFieldProps, Typography, useTheme } from '@mui/material';
-import { useAppConfigStore } from 'core/config';
+import { useAppConfig } from 'core/config';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLoginForm } from './log-in.providers';
@@ -37,9 +37,9 @@ TextDivider.displayName = 'TextDivider';
 //*****************************************************************************************
 
 export const LoginDivider = React.memo(() => {
-  const allowUserPass = useAppConfigStore(s => s.auth.login.allow_userpass_login);
-  const allowSAML = useAppConfigStore(s => s.auth.login.allow_saml_login);
-  const oAuthProviders = useAppConfigStore(s => s.auth.login.oauth_providers);
+  const allowUserPass = useAppConfig(s => s.auth.login.allow_userpass_login);
+  const allowSAML = useAppConfig(s => s.auth.login.allow_saml_login);
+  const oAuthProviders = useAppConfig(s => s.auth.login.oauth_providers);
 
   return !allowUserPass || (!oAuthProviders?.length && !allowSAML) ? null : <TextDivider />;
 });
