@@ -120,6 +120,7 @@ export const SandboxBody = React.memo(({ body, printable = false }: SandboxBodyP
                     startTime={startTime}
                     filterValue={filterValue}
                     getRowCount={handleRowCountChange('processes')}
+                    onFilterChange={setFilterValue}
                   />
                 )
               }
@@ -137,6 +138,7 @@ export const SandboxBody = React.memo(({ body, printable = false }: SandboxBodyP
                     startTime={startTime}
                     filterValue={filterValue}
                     getRowCount={handleRowCountChange('netflows')}
+                    onFilterChange={setFilterValue}
                   />
                 )
               }
@@ -151,6 +153,7 @@ export const SandboxBody = React.memo(({ body, printable = false }: SandboxBodyP
                     printable={printable}
                     filterValue={filterValue}
                     getRowCount={handleRowCountChange('signatures')}
+                    onFilterChange={setFilterValue}
                   />
                 )
               }
