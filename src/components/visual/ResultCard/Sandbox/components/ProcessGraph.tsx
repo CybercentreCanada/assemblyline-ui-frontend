@@ -143,7 +143,7 @@ const ProcessTreeItem = React.memo(
     const { configuration, scoreToVerdict } = useALContext();
 
     const hasChildren = item.children?.length > 0;
-    const isActive = activeValue.includes(item.pid);
+    const isActive = activeValue?.includes(item?.pid) || false;
     const indent = theme.spacing((depth + 1) * 3);
 
     const processScore = useMemo(
