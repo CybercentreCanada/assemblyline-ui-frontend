@@ -127,13 +127,16 @@ const Service = ({ name = null, onDeleted = () => null, onUpdated = () => null }
   useEffect(() => {
     // Reset tab because we are using a different service
     setTab('general');
-    setVersions(null);
     setModified(false);
 
     // Load user on start
     if (currentUser.is_admin) {
       apiCall<ServiceData>({
         url: `/api/v4/service/${nameOrSvc}/`,
+        onEnter: () => {
+          setService(null);
+          setServiceVersion(null);
+        },
         onSuccess: api_data => {
           setService(api_data.api_response);
           setServiceVersion(api_data.api_response.version);
@@ -141,27 +144,24 @@ const Service = ({ name = null, onDeleted = () => null, onUpdated = () => null }
       });
       apiCall<string[]>({
         url: `/api/v4/service/versions/${nameOrSvc}/`,
-        onSuccess: api_data => {
-          setVersions(api_data.api_response);
-        }
+        onEnter: () => setVersions(null),
+        onSuccess: api_data => setVersions(api_data.api_response)
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser.is_admin, nameOrSvc]);
 
   useEffect(() => {
-    // Reset tab because we are using a different service
-    setServiceDefault(null);
-
     // Load user on start
     if (currentUser.is_admin && serviceVersion) {
       apiCall<ServiceData>({
         url: `/api/v4/service/${nameOrSvc}/${serviceVersion}/`,
+        onEnter: () => setServiceDefault(null),
         onSuccess: ({ api_response }) => setServiceDefault(api_response)
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentUser.is_admin, nameOrSvc, serviceVersion]);
+  }, [currentUser.is_admin, service?.name || '', serviceVersion]);
 
   useEffect(() => {
     // Set the global error flag based on each sub-error value
@@ -173,6 +173,7 @@ const Service = ({ name = null, onDeleted = () => null, onUpdated = () => null }
     if (!currentUser.is_admin) return;
     apiCall<ServiceConstants>({
       url: '/api/v4/service/constants/',
+      onEnter: () => setConstants(null),
       onSuccess: ({ api_response }) => setConstants(api_response)
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
