@@ -241,7 +241,7 @@ export const NetflowTable = React.memo(
         filterValue={filterValue}
         preventRender={preventRender}
         getRowCount={getRowCount}
-        isRowFiltered={(row, value) => (!value?.length ? false : value.includes(row.process))}
+        isRowFiltered={(row, value) => (!value?.length ? true : value.includes(row.process))}
         onRowClick={handleRowClick}
       />
     );
