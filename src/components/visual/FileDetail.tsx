@@ -53,6 +53,7 @@ type Props = {
   liveResultKeys?: string[];
   liveErrors?: Error[];
   force?: boolean;
+  filetype_override?: string;
 };
 
 const WrappedFileDetail: React.FC<Props> = ({
@@ -61,7 +62,8 @@ const WrappedFileDetail: React.FC<Props> = ({
   metadata = null,
   liveResultKeys = null,
   liveErrors = null,
-  force = false
+  force = false,
+  filetype_override = null
 }) => {
   const { t } = useTranslation(['fileDetail']);
   const theme = useTheme();
@@ -481,7 +483,10 @@ const WrappedFileDetail: React.FC<Props> = ({
                     to={`/submit?hash=${file.file_info.sha256}`}
                     state={{
                       c12n: file.file_info.classification,
-                      metadata: metadata
+                      metadata: metadata,
+                      params: {
+                        filetype_override: filetype_override
+                      }
                     }}
                     dense
                     onClick={() => setResubmitAnchor(null)}
@@ -535,7 +540,11 @@ const WrappedFileDetail: React.FC<Props> = ({
         {file?.file_info?.type.startsWith('uri/') ? (
           <URIIdentificationSection fileinfo={file ? file.file_info : null} promotedSections={promotedSections} />
         ) : (
-          <IdentificationSection fileinfo={file ? file.file_info : null} promotedSections={promotedSections} />
+          <IdentificationSection
+            fileinfo={file ? file.file_info : null}
+            promotedSections={promotedSections}
+            filetype_override={filetype_override}
+          />
         )}
         <FrequencySection seen={file ? file.file_info?.seen : null} />
         <MetadataSection metadata={file ? file.metadata : null} />

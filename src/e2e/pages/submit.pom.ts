@@ -24,10 +24,11 @@ export class SubmitPage extends PageObjectModel {
   private readonly cancelButton: Locator;
   private readonly submitButton: Locator;
   private readonly searchButton: Locator;
-  private readonly adjustButton: Locator;
+  public readonly adjustButton: Locator;
   private readonly submissionProfileInput: SelectInput<typeof SUBMISSION_PROFILES>;
   private readonly tab: TabContainer<SubmitTab>;
   private readonly hashInput: TextInput;
+  public readonly fileTypeInput: TextInput;
 
   constructor(page: Page) {
     super(page, 'Submit page', '/submit');
@@ -40,6 +41,7 @@ export class SubmitPage extends PageObjectModel {
     this.submissionProfileInput = new SelectInput(page, 'submission-profile');
     this.tab = new TabContainer(page);
     this.hashInput = new TextInput(page, 'HashInput');
+    this.fileTypeInput = new TextInput(page, 'file-type');
   }
 
   locators(): Locator[] {

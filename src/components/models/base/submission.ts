@@ -48,6 +48,9 @@ export type SubmissionParams = {
   /** Description of the submission */
   description: string;
 
+  /** File type override */
+  filetype_override?: string;
+
   /** Should this submission generate an alert? */
   generate_alert: boolean;
 

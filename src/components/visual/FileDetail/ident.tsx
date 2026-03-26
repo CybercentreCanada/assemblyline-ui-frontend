@@ -16,12 +16,14 @@ type IdentificationSectionProps = {
   fileinfo: FileInfo;
   promotedSections?: Section[];
   nocollapse?: boolean;
+  filetype_override?: string;
 };
 
 const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({
   fileinfo,
   promotedSections = [],
-  nocollapse = false
+  nocollapse = false,
+  filetype_override = null
 }) => {
   const { t } = useTranslation(['fileDetail']);
   const theme = useTheme();
@@ -162,7 +164,23 @@ const WrappedIdentificationSection: React.FC<IdentificationSectionProps> = ({
           <span style={{ fontWeight: 500 }}>{t('type')}</span>
         </Grid>
         <Grid size={{ xs: 8, sm: 9, lg: 10 }} style={{ wordBreak: 'break-word' }}>
-          {fileinfo ? fileinfo.type : <Skeleton />}
+          {fileinfo ? (
+            filetype_override ? (
+              <>
+                <span style={{ paddingRight: theme.spacing(0.5) }}>{`${filetype_override}`}</span>
+                <span
+                  style={{
+                    textDecoration: 'line-through',
+                    color: theme.palette.text.disabled
+                  }}
+                >{`${fileinfo.type}`}</span>
+              </>
+            ) : (
+              fileinfo.type
+            )
+          ) : (
+            <Skeleton />
+          )}
         </Grid>
 
         <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
