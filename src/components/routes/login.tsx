@@ -2,6 +2,7 @@ import { Box, Button, CircularProgress, Link, Stack, Typography, useTheme } from
 import { useAppBanner, useAppLayout } from 'commons/components/app/hooks';
 import useAppBannerVert from 'commons/components/app/hooks/useAppBannerVert';
 import PageCardCentered from 'commons/components/pages/PageCardCentered';
+import { useAPIStore } from 'components/core/Query/components/APIProvider';
 import useMyAPI from 'components/hooks/useMyAPI';
 import useMySnackbar from 'components/hooks/useMySnackbar';
 import { OneTimePassLogin } from 'components/routes/login/otp';
@@ -35,6 +36,8 @@ export default function LoginScreen({ allowUserPass, allowSAML, allowSignup, oAu
   const { hideMenus } = useAppLayout();
   const provider = getProvider();
   const samlData = getSAMLData();
+  const [, setStore] = useAPIStore(s => s);
+
   const [shownControls, setShownControls] = useState(
     provider ? 'oauth' : params.get('reset_id') ? 'reset_now' : samlData ? 'saml' : 'login'
   );
@@ -68,6 +71,11 @@ export default function LoginScreen({ allowUserPass, allowSAML, allowSignup, oAu
     if (event) {
       event.preventDefault();
     }
+
+    setStore(s => {
+      s.disabledWhoAmI = false;
+      return s;
+    });
   }
 
   function login(focusTarget) {
@@ -114,6 +122,10 @@ export default function LoginScreen({ allowUserPass, allowSAML, allowSignup, oAu
         }
       },
       onSuccess: () => {
+        setStore(s => {
+          s.disabledWhoAmI = false;
+          return s;
+        });
         window.location.reload();
       }
     });
@@ -162,6 +174,10 @@ export default function LoginScreen({ allowUserPass, allowSAML, allowSignup, oAu
         },
         onFinalize: () => {
           if (provider) {
+            setStore(s => {
+              s.disabledWhoAmI = true;
+              return s;
+            });
             navigate(localStorage.getItem('nextLocation') || '/');
           }
         }
@@ -188,6 +204,11 @@ export default function LoginScreen({ allowUserPass, allowSAML, allowSignup, oAu
         setEmail(cur_email => samlData.email || cur_email);
         setSAMLTokenID(cur_token => samlData.saml_token_id || cur_token);
       }
+      navigate(localStorage.getItem('nextLocation') || '/');
+      setStore(s => {
+        s.disabledWhoAmI = true;
+        return s;
+      });
       navigate(localStorage.getItem('nextLocation') || '/');
     }
 
