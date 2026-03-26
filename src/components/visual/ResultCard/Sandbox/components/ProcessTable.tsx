@@ -144,7 +144,7 @@ export const ProcessTable = React.memo(
         filterValue={filterValue}
         preventRender={preventRender}
         getRowCount={getRowCount}
-        isRowFiltered={(row, value) => value.includes(row.pid)}
+        isRowFiltered={(row, value) => (!value?.length ? false : value.includes(row.pid))}
         onRowClick={handleRowClick}
       />
     );
