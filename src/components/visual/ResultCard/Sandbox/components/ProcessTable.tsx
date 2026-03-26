@@ -7,7 +7,7 @@ import { ProcessChip } from 'components/visual/ResultCard/Sandbox/common/Process
 import { TableContainer } from 'components/visual/ResultCard/Sandbox/common/TableContainer';
 import { DetailTableCellValue } from 'components/visual/ResultCard/Sandbox/common/Tables';
 import type { SandboxFilter } from 'components/visual/ResultCard/Sandbox/sandbox.utils';
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 type ProcessTableProps = {
@@ -27,7 +27,8 @@ export const ProcessTable = React.memo(
     startTime,
     filterValue,
     preventRender,
-    getRowCount = () => null
+    getRowCount = () => null,
+    onFilterChange = () => null
   }: ProcessTableProps) => {
     const { t } = useTranslation('sandboxResult');
     const theme = useTheme();
@@ -124,6 +125,16 @@ export const ProcessTable = React.memo(
       [t, theme.palette.text.secondary, startTime, body?.processes, columnHelper]
     );
 
+    const handleRowClick = useCallback(
+      (row: SandboxProcessItem) =>
+        onFilterChange(prev => {
+          const current = prev ?? [];
+          if (!row?.pid) return current;
+          return current.includes(row.pid) ? current.filter(n => n !== row.pid) : [...current, row.pid];
+        }),
+      [onFilterChange]
+    );
+
     return (
       <TableContainer
         columns={columns}
@@ -133,7 +144,8 @@ export const ProcessTable = React.memo(
         filterValue={filterValue}
         preventRender={preventRender}
         getRowCount={getRowCount}
-        isRowFiltered={(row, value) => row.pid === value.pid}
+        isRowFiltered={(row, value) => (!value?.length ? true : value.includes(row.pid))}
+        onRowClick={handleRowClick}
       />
     );
   }

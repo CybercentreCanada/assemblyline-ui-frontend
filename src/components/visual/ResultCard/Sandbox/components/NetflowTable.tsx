@@ -9,7 +9,7 @@ import { ProcessChip } from 'components/visual/ResultCard/Sandbox/common/Process
 import { TableContainer } from 'components/visual/ResultCard/Sandbox/common/TableContainer';
 import { DetailTableCellValue, DetailTableRow } from 'components/visual/ResultCard/Sandbox/common/Tables';
 import { compareIPs, hasObjectData, type SandboxFilter } from 'components/visual/ResultCard/Sandbox/sandbox.utils';
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 type NetflowTableProps = {
@@ -19,6 +19,7 @@ type NetflowTableProps = {
   filterValue?: SandboxFilter;
   preventRender?: boolean;
   getRowCount?: (count: number) => void;
+  onFilterChange?: React.Dispatch<React.SetStateAction<SandboxFilter>>;
 };
 
 export const NetflowTable = React.memo(
@@ -28,7 +29,8 @@ export const NetflowTable = React.memo(
     startTime,
     filterValue,
     preventRender,
-    getRowCount = () => null
+    getRowCount = () => null,
+    onFilterChange = () => null
   }: NetflowTableProps) => {
     const { t } = useTranslation('sandboxResult');
     const theme = useTheme();
@@ -220,6 +222,16 @@ export const NetflowTable = React.memo(
       [columnHelper, theme.palette.text.secondary, t, startTime, body?.processes]
     );
 
+    const handleRowClick = useCallback(
+      (row: SandboxNetflowItem) =>
+        onFilterChange(prev => {
+          const current = prev ?? [];
+          if (!row?.process) return current;
+          return current.includes(row.process) ? current.filter(n => n !== row.process) : [...current, row.process];
+        }),
+      [onFilterChange]
+    );
+
     return (
       <TableContainer
         columns={columns}
@@ -229,7 +241,8 @@ export const NetflowTable = React.memo(
         filterValue={filterValue}
         preventRender={preventRender}
         getRowCount={getRowCount}
-        isRowFiltered={(row, value) => row.process === value.pid}
+        isRowFiltered={(row, value) => (!value?.length ? true : value.includes(row.process))}
+        onRowClick={handleRowClick}
       />
     );
   }

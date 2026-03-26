@@ -143,7 +143,7 @@ const ProcessTreeItem = React.memo(
     const { configuration, scoreToVerdict } = useALContext();
 
     const hasChildren = item.children?.length > 0;
-    const isActive = activeValue?.pid === item.pid;
+    const isActive = activeValue?.includes(item?.pid) || false;
     const indent = theme.spacing((depth + 1) * 3);
 
     const processScore = useMemo(
@@ -168,7 +168,12 @@ const ProcessTreeItem = React.memo(
     const handleToggle = useCallback(() => setOpen(o => !o), []);
 
     const handleClick = useCallback(
-      (row: SandboxProcessItem) => onActiveChange(prev => (prev?.pid === row.pid ? undefined : structuredClone(row))),
+      (row: SandboxProcessItem) =>
+        onActiveChange(prev => {
+          const current = prev ?? [];
+          if (!row?.pid) return current;
+          return current.includes(row.pid) ? current.filter(n => n !== row.pid) : [...current, row.pid];
+        }),
       [onActiveChange]
     );
 

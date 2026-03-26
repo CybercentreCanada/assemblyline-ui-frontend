@@ -17,7 +17,8 @@ export type ProcessItem = SandboxProcessItem & {
   children?: ProcessItem[];
 };
 
-export type SandboxFilter = SandboxProcessItem;
+// Filtered PIDs
+export type SandboxFilter = number[];
 
 /* ----------------------------------------------------------------------------
  * Checks if an object has any meaningful data.
