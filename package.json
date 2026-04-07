@@ -76,7 +76,7 @@
     "selfsigned": "^2.1.1",
     "socket.io-client": "^4.8.1",
     "styled-components": "^6.1.17",
-    "vite": "^6.4.1",
+    "vite": "^6.4.2",
     "vite-plugin-mkcert": "^1.17.9",
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^3.2.4",
