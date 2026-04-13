@@ -25,11 +25,11 @@
     /* Previous definition */
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
-    "baseUrl": "src",
+    "baseUrl": "src2",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true
   },
-  "include": ["src"],
+  "include": ["src2"],
   "exclude": ["dist"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

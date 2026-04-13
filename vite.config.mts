@@ -25,7 +25,7 @@ export default defineConfig(({ mode }) => {
       __APP_ENV__: JSON.stringify(env.APP_ENV)
     },
     optimizeDeps: {
-      include: ['./src/**/*.{js,jsx,ts,tsx}']
+      include: ['./src2/**/*.{js,jsx,ts,tsx}']
     },
     plugins: [react(), tsconfigPaths(), mkcert()],
     resolve: {

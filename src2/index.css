@@ -1,0 +1,73 @@
+html,
+body,
+#root {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+@media print {
+  body {
+    color: rgba(0, 0, 0, 0.87) !important;
+    page-break-after: avoid;
+    page-break-before: avoid;
+    -webkit-print-color-adjust: exact; /*chrome & webkit browsers*/
+    print-color-adjust: exact; /*firefox & IE */
+  }
+
+  #root {
+    position: unset !important;
+  }
+
+  h1 {
+    font-size: 4rem !important;
+  }
+
+  h2 {
+    font-size: 3rem !important;
+  }
+
+  h3 {
+    font-size: 2.125rem !important;
+  }
+
+  h4 {
+    font-size: 1.5rem !important;
+  }
+
+  h5 {
+    font-size: 1.25rem !important;
+  }
+
+  h6 {
+    font-size: 1.1rem !important;
+  }
+
+  @page {
+    size: 1020px 1320px;
+    margin: 0.4in;
+  }
+
+  .no-print,
+  .no-print * {
+    display: none !important;
+  }
+
+  .print-footer {
+    position: fixed;
+    text-align: center;
+    width: 100%;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    color: #0000008a;
+    background-color: #fff !important;
+  }
+}
+
+@media screen {
+  .print-only,
+  .print-only * {
+    display: none !important;
+  }
+}
