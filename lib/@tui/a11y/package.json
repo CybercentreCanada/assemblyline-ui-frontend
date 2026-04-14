@@ -3,12 +3,6 @@
   "version": "4.0.2",
   "sideEffects": false,
   "type": "module",
-  "scripts": {
-    "clean": "rimraf dist",
-    "build": "tsdown",
-    "typecheck": "tsc --noEmit",
-    "lint": "eslint ./src"
-  },
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -30,8 +24,8 @@
   "dependencies": {},
   "devDependencies": {
     "tsdown": "^0.15.12",
-    "@tui/core": "workspace:*",
-    "@tui/drawer": "workspace:*"
+    "@tui/core": "4.0.2",
+    "@tui/drawer": "4.0.2"
   },
   "peerDependencies": {
     "@mui/icons-material": "^7",
@@ -41,5 +35,11 @@
     "i18next": ">=25",
     "react": "^19.2",
     "react-i18next": ">=16"
+  },
+  "scripts": {
+    "clean": "rimraf dist",
+    "build": "tsdown",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint ./src"
   }
 }

@@ -3,12 +3,6 @@
   "version": "4.0.2",
   "sideEffects": false,
   "type": "module",
-  "scripts": {
-    "clean": "rimraf dist",
-    "build": "tsdown",
-    "typecheck": "tsc --noEmit",
-    "lint": "eslint ./src"
-  },
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -35,5 +29,11 @@
     "@mui/icons-material": "^7",
     "@mui/material": "^7",
     "react": "^19.2"
+  },
+  "scripts": {
+    "clean": "rimraf dist",
+    "build": "tsdown",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint ./src"
   }
 }

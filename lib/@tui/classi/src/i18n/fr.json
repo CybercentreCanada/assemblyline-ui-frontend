@@ -1,8 +1,0 @@
-{
-  "classification.state.loading.long": "Chargement",
-  "classification.state.loading.short": "...",
-  "classification.state.error.long": "Erreur",
-  "classification.state.error.short": "?",
-  "classification.state.unsupported.long": "Non supporté",
-  "classification.state.unsupported.short": "?"
-}

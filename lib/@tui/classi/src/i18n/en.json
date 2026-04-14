@@ -1,8 +1,0 @@
-{
-  "classification.state.loading.long": "Loading",
-  "classification.state.loading.short": "...",
-  "classification.state.error.long": "Error",
-  "classification.state.error.short": "X",
-  "classification.state.unsupported.long": "Unsupported",
-  "classification.state.unsupported.short": "?"
-}
