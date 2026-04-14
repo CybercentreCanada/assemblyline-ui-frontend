@@ -1,7 +1,6 @@
 import { ChevronRight } from '@mui/icons-material';
 import {
   Box,
-  BoxProps,
   ClickAwayListener,
   Divider,
   Drawer,
@@ -9,21 +8,23 @@ import {
   ListItemButton,
   ListItemIcon,
   Stack,
-  styled,
   Toolbar,
   Tooltip,
+  styled,
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import { useAppConfigStore } from 'core/config';
-import { useAppConfigSetStore } from 'core/config/config.providers';
-import { t } from 'i18next';
-import React, { FC, useCallback, useContext, useMemo, useRef } from 'react';
-import { AppLogo } from '../layout.components';
+import { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useAppLayout, useAppLeftNav, useAppPreferences } from '../app/hooks';
+import { LeftNavMenuRoot } from '../leftnav/v2/LeftNavMenu';
+import { MODULE_NAME } from '../name';
+import { OverlayShadow } from '../overlay/OverlayShadow';
+import { AppName } from '../topnav/AppName';
 
 const StyledDrawer = styled(Drawer, { shouldForwardProp: prop => prop !== 'open' && prop !== 'width' })<{
   open: boolean;
-  width: number;
+  width: number | string;
 }>(({ theme, open, width }) => ({
   width,
   flexShrink: 0,
@@ -44,7 +45,7 @@ const StyledDrawer = styled(Drawer, { shouldForwardProp: prop => prop !== 'open'
     overflowX: 'hidden',
     width: 0,
     [theme.breakpoints.up('sm')]: {
-      width: theme.spacing(7)
+      width: `max(${theme.spacing(7)}, 42px)`
     },
     [theme.breakpoints.only('xs')]: {
       border: 'none'
@@ -64,7 +65,7 @@ const StyledDrawer = styled(Drawer, { shouldForwardProp: prop => prop !== 'open'
       }),
       width: 0,
       [theme.breakpoints.up('sm')]: {
-        width: theme.spacing(7)
+        width: `max(${theme.spacing(7)}, 42px)`
       },
       [theme.breakpoints.only('xs')]: {
         border: 'none'
@@ -73,54 +74,10 @@ const StyledDrawer = styled(Drawer, { shouldForwardProp: prop => prop !== 'open'
   }
 }));
 
-export const OverlayShadow: FC<Omit<BoxProps, 'component'> & { region: string; id: string }> = ({
-  region,
-  id,
-  children,
-  ...boxProps
-}) => {
-  return children;
-
-  const ctx = useContext(OverlayContext);
-
-  const ref = useRef<HTMLDivElement | null>(null);
-
-  const enabled = useMemo(() => ctx?.regions.includes(region), [region, ctx?.regions]);
-
-  const active = useMemo(() => ctx?.actives.includes(id), [id, ctx?.actives]);
-
-  if (!enabled) {
-    return children;
-  }
-
-  return (
-    <Box
-      ref={ref}
-      data-layout-region={region}
-      data-layout-id={id}
-      style={
-        !children
-          ? {
-              height: '100%',
-              width: active ? 100 : 0
-            }
-          : {}
-      }
-      {...boxProps}
-    >
-      {children}
-    </Box>
-  );
-};
-
 const LeftNavHeader = () => {
   const theme = useTheme();
-  // const layout = useAppLayout();
-  // const isTopLayout = layout.current === 'top';
-
-  const isTopLayout = useAppConfigStore(s => s.layout.mode === 'top');
-
-  return <AppLogo />;
+  const layout = useAppLayout();
+  const isTopLayout = layout.current === 'top';
 
   return (
     <OverlayShadow region="layout" id="app-brand">
@@ -139,28 +96,26 @@ const LeftNavHeader = () => {
 };
 
 const LeftNavFooter = () => {
-  // const leftnav = useAppLeftNav();
-  // const { t } = useTranslation(MODULE_NAME);
+  const leftnav = useAppLeftNav();
+  const { t } = useTranslation(MODULE_NAME);
 
   const onToggle = useCallback(() => {
-    // if (!leftnav.open) {
-    //   leftnav.collapseMenus();
-    // }
-    // leftnav.toggle();
-  }, []);
-
-  return 'item';
+    if (!leftnav.open) {
+      leftnav.collapseMenus();
+    }
+    leftnav.toggle();
+  }, [leftnav]);
 
   return (
     <Tooltip
-      title={t(leftnav.open ? 'drawer.collapse' : 'drawer.expand')}
-      aria-label={t(leftnav.open ? 'drawer.collapse' : 'drawer.expand')}
+      title={leftnav.open ? t('drawer.collapse') : t('drawer.expand')}
+      aria-label={leftnav.open ? t('drawer.collapse') : t('drawer.expand')}
       placement="right"
       style={{ alignSelf: 'flex-start' }}
       id="app-leftnav-footer"
     >
       <ListItem disablePadding>
-        <ListItemButton key="chevron" onClick={onToggle} sx={{ minHeight: 48 }}>
+        <ListItemButton key="chevron" onClick={onToggle} sx={theme => ({ minHeight: theme.spacing(6) })}>
           <ListItemIcon>
             <ChevronRight
               sx={theme => ({
@@ -180,35 +135,26 @@ const LeftNavFooter = () => {
   );
 };
 
-export const LeftNavBar = React.memo(() => {
+const LeftNavDrawer = () => {
   const theme = useTheme();
+  const leftnav = useAppLeftNav();
 
-  const open = useAppConfigStore(s => s.layout.left_nav.open);
-  const width = useAppConfigStore(s => s.layout.left_nav.width);
-
-  const setStore = useAppConfigSetStore();
-
-  // const leftnav = useAppLeftNav();
-
-  // const { leftnav: leftnavPreference } = useAppPreferences();
+  const { leftnav: leftnavPreference } = useAppPreferences();
 
   const isSmDown = useMediaQuery(theme.breakpoints.down('sm'));
 
   const onCloseDrawerIfOpen = useCallback(() => {
-    if (isSmDown && open) {
-      setStore(s => {
-        s.layout.left_nav.open = false;
-        return s;
-      });
+    if (isSmDown && leftnav.open) {
+      leftnav.setOpen(false);
     }
-  }, []);
+  }, [isSmDown, leftnav]);
 
   const onToggle = useCallback(() => {
     if (!leftnav.open) {
       leftnav.collapseMenus();
     }
     leftnav.toggle();
-  }, []);
+  }, [leftnav]);
 
   return (
     <ClickAwayListener mouseEvent="onMouseDown" touchEvent="onTouchStart" onClickAway={onCloseDrawerIfOpen}>
@@ -221,8 +167,8 @@ export const LeftNavBar = React.memo(() => {
         }}
         variant="permanent"
         style={{ height: '100%' }}
-        open={open}
-        width={width}
+        width={leftnavPreference.width}
+        open={leftnav.open}
       >
         <LeftNavHeader />
 
@@ -232,9 +178,9 @@ export const LeftNavBar = React.memo(() => {
             overflowX: 'hidden'
           }}
         >
-          {/* <OverlayShadow region="layout" id="app-leftnav-menus">
+          <OverlayShadow region="layout" id="app-leftnav-menus">
             <LeftNavMenuRoot />
-          </OverlayShadow> */}
+          </OverlayShadow>
         </Stack>
 
         <Box
@@ -253,4 +199,6 @@ export const LeftNavBar = React.memo(() => {
       </StyledDrawer>
     </ClickAwayListener>
   );
-});
+};
+
+export default LeftNavDrawer;

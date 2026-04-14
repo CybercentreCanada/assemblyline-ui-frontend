@@ -1,0 +1,50 @@
+{
+  "name": "@tui/cli",
+  "version": "4.0.2",
+  "type": "module",
+  "bin": {
+    "tcli": "dist/index.cjs"
+  },
+  "scripts": {
+    "start": "tsx ./src/index.ts",
+    "generate-exports": "tsx scripts/generate-exports.ts src/commands/upgrade/codemods/codeshift/exports.json ../../packages/core ../../packages/a11y ../../packages/apps ../../packages/drawer ../../packages/notis ../../packages/classi",
+    "build": "tsdown src/index.ts && npm run generate-exports && node scripts/copy-codemods.js",
+    "dev": "tsdown --watch",
+    "test": "vitest",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint ./src",
+    "run-create": "node dist/index.cjs create",
+    "run-upgrade": "node dist/index.cjs upgrade"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": "./dist/index.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "package.json",
+    "README.md"
+  ],
+  "devDependencies": {
+    "@types/node": "^24.9.1",
+    "@types/semver": "^7.7.1",
+    "tsdown": "^0.15.9",
+    "tsx": "^4.20.6",
+    "typescript": "^5.9.3",
+    "vitest": "^4.0.1"
+  },
+  "dependencies": {
+    "boxen": "^8.0.1",
+    "chalk": "^5.6.2",
+    "commander": "^14.0.2",
+    "execa": "^9.6.1",
+    "inquirer": "^12.10.0",
+    "ora": "^9.0.0",
+    "semver": "^7.7.3",
+    "simple-git": "^3.33.0",
+    "string-width": "^8.1.0"
+  }
+}

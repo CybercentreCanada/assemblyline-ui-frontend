@@ -1,0 +1,39 @@
+{
+  "name": "@tui/apps",
+  "version": "4.0.2",
+  "sideEffects": false,
+  "type": "module",
+  "scripts": {
+    "clean": "rimraf dist",
+    "build": "tsdown",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint ./src"
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./*": {
+      "types": "./dist/*.d.ts",
+      "import": "./dist/*.js"
+    }
+  },
+  "files": [
+    "dist",
+    "package.json",
+    "README.md"
+  ],
+  "devDependencies": {
+    "@rollup/plugin-alias": "^6.0.0",
+    "tsdown": "^0.15.12"
+  },
+  "peerDependencies": {
+    "@mui/icons-material": "^7",
+    "@mui/material": "^7",
+    "react": "^19.2"
+  }
+}
