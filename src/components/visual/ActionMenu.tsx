@@ -444,7 +444,7 @@ const WrappedActionMenu = ({
             to={
               index
                 ? `/search${index}?query=${type}:${safeFieldValueURI(value)}`
-                : `/search${categoryIndex[category]}?query=${categoryPrefix[category]}${type}:${safeFieldValueURI(
+                : `/search${categoryIndex[category]}?query=${category === 'tag' && safelisted ? 'result.sections.safelisted_tags.' : categoryPrefix[category]}${type}:${safeFieldValueURI(
                     value
                   )}`
             }
