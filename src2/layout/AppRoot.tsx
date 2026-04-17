@@ -1,5 +1,5 @@
 import { Button } from '@mui/material';
-import { useAppSetConfig } from 'core/config/config.providers';
+import { useAppSetConfig } from 'core/config';
 import React, { PropsWithChildren } from 'react';
 
 export const AppRoot = React.memo(({ children }: PropsWithChildren) => {

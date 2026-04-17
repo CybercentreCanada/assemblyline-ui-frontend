@@ -9,9 +9,9 @@ import React, { PropsWithChildren } from 'react';
 import { useAuthQuery } from './auth.hooks';
 
 export const AppAuthProvider = React.memo(({ children }: PropsWithChildren) => {
-  const mode = useAppConfig(s => s.auth.mode);
-
   useAuthQuery();
+
+  const mode = useAppConfig(s => s.auth.mode);
 
   switch (mode) {
     case 'app':

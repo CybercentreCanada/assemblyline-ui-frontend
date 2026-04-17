@@ -1,5 +1,5 @@
 import { CircularProgress, useTheme } from '@mui/material';
-import { AppVerticalBanner } from 'core/layout/layout.components';
+import { AppVerticalBanner } from 'core/layout';
 import { createAppRoute } from 'core/router/route/route.utils';
 import React from 'react';
 import { PageCardCentered } from 'ui/layouts/PageCardCentered';

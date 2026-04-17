@@ -1,7 +1,6 @@
 import { Avatar, Link, Typography, useTheme } from '@mui/material';
-import { useAppConfig } from 'core/config';
+import { useAppConfig, useAppSetConfig } from 'core/config';
 import { useSaveAppConfig } from 'core/config/config.hooks';
-import { useAppSetConfig } from 'core/config/config.providers';
 import React, { useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router';

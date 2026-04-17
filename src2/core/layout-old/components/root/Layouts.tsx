@@ -46,3 +46,14 @@ export const AppVerticalRight = React.memo(
     }
   })
 );
+
+export const AppContent = React.memo(
+  styled('div')({
+    display: 'flex',
+    flexDirection: 'column',
+    position: 'relative',
+    flex: 1,
+    height: '100%',
+    minWidth: 0
+  })
+);

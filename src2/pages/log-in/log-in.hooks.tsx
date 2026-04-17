@@ -1,6 +1,5 @@
 import { invalidateAPIQuery, useAPIMutation, useAPIQuery } from 'core/api';
-import { useAppConfig } from 'core/config';
-import { useAppSetConfig } from 'core/config/config.providers';
+import { useAppConfig, useAppSetConfig } from 'core/config';
 import { useAppSnackbar } from 'core/snackbar/snackbar.hooks';
 import { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';

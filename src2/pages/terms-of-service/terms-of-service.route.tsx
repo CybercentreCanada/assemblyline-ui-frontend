@@ -1,7 +1,7 @@
 import { Box, Link, Skeleton, Typography, useTheme } from '@mui/material';
 import { useAPIMutation, useAPIQuery } from 'core/api';
 import { useAppConfig } from 'core/config';
-import { AppBanner } from 'core/layout/layout.components';
+import { AppBanner } from 'core/layout';
 import { createAppRoute } from 'core/router/route/route.utils';
 import { NotFoundPage } from 'pages/not-found/not-found.route';
 import React from 'react';

@@ -1,7 +1,7 @@
 import React, { createContext, PropsWithChildren, useCallback, useContext, useEffect, useRef } from 'react';
 import { useStore as useZustandStore } from 'zustand';
-import { createStore, StoreApi } from 'zustand/vanilla';
 import { devtools } from 'zustand/middleware';
+import { createStore, StoreApi } from 'zustand/vanilla';
 
 export const createAppStore = <Store extends object>(initialState: Store) => {
   type StorePatch = Partial<Store> | ((state: Store) => Partial<Store>);
@@ -30,6 +30,10 @@ export const createAppStore = <Store extends object>(initialState: Store) => {
   const useStore = <T,>(selector: (state: Store) => T): T => {
     const store = useContext(StoreContext);
 
+    if (!store) {
+      console.warn('[createAppStore] `useStore` called outside of StoreProvider.');
+    }
+
     return !store ? selector(initialState) : useZustandStore(store, selector);
   };
 
@@ -38,7 +42,10 @@ export const createAppStore = <Store extends object>(initialState: Store) => {
 
     return useCallback(
       (patch: StorePatch) => {
-        if (!store) return;
+        if (!store) {
+          console.warn('[createAppStore] `useSetStore` called outside of StoreProvider.');
+          return;
+        }
 
         store.setState(prev => ({ ...prev, ...(typeof patch === 'function' ? patch(prev) : patch) }));
       },

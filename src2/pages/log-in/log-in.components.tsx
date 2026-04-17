@@ -74,7 +74,7 @@ export const UsernameInput = React.memo((props: TextFieldProps) => {
           }}
           variant="outlined"
           {...props}
-          value={field.state.value}
+          value={field.state.value || ''}
           onChange={event => field.handleChange(event.target.value)}
         />
       )}
@@ -105,7 +105,7 @@ export const PasswordInput = React.memo((props: TextFieldProps) => {
             }
           }}
           {...props}
-          value={field.state.value}
+          value={field.state.value || ''}
           onChange={event => field.handleChange(event.target.value)}
         />
       )}
@@ -147,7 +147,7 @@ export const PasswordConfirmInput = React.memo((props: TextFieldProps) => {
             }
           }}
           {...props}
-          value={field.state.value}
+          value={field.state.value || ''}
           onChange={event => field.handleChange(event.target.value)}
         />
       )}
@@ -184,7 +184,7 @@ export const EmailInput = React.memo((props: TextFieldProps) => {
             }
           }}
           {...props}
-          value={field.state.value}
+          value={field.state.value || ''}
           onChange={event => field.handleChange(event.target.value)}
         />
       )}

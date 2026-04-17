@@ -1,13 +1,13 @@
 import type { IconButtonProps as MuiIconButtonProps, TooltipProps } from '@mui/material';
 import { IconButton as MuiIconButton, Skeleton, useTheme } from '@mui/material';
-import type { CircularProgressProps } from 'ui/buttons/CircularProgress';
-import { CircularProgress } from 'ui/buttons/CircularProgress';
-import { Tooltip } from 'ui/Tooltip';
 import { getTextContent } from 'lib/utils/utils';
 import type { CSSProperties } from 'react';
 import React, { useMemo } from 'react';
 import type { LinkProps } from 'react-router-dom';
 import { Link } from 'react-router-dom';
+import type { CircularProgressProps } from 'ui/buttons/CircularProgress';
+import { CircularProgress } from 'ui/buttons/CircularProgress';
+import { Tooltip } from 'ui/Tooltip';
 
 export type IconButtonProps = MuiIconButtonProps & {
   loading?: boolean;

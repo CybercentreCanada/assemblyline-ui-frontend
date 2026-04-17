@@ -1,4 +1,4 @@
-import { AppConfig, AppSettings, AppSettingsSchema } from './config.models';
+import { AppConfig, AppSettings, AppSettingsSchema } from 'app/app.configs';
 
 export const saveSettingsFromLocalStorage = (key: string, store: AppConfig) => {
   const parsed = AppSettingsSchema.parse(store);

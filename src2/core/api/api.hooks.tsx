@@ -6,13 +6,13 @@ import { useTranslation } from 'react-i18next';
 // import type { LoginParamsProps } from 'components/hooks/useMyAPI';
 // import useMySnackbar from 'components/hooks/useMySnackbar';
 // import useQuota from 'components/hooks/useQuota';
-import { useAppSetConfig, useAppConfig } from 'core/config/config.providers';
+import { DEFAULT_APP_CONFIG } from 'app/app.configs';
+import { useAppConfig, useAppSetConfig } from 'core/config';
 import { useAppSnackbar } from 'core/snackbar/snackbar.hooks';
 import { getFileName } from 'lib/utils/utils';
 import { getXSRFCookie } from 'lib/utils/xsrf.utils';
 import type { Configuration } from 'models/base/config';
 import type { CustomUser, WhoAmIProps } from 'models/ui/user';
-import { DEFAULT_RETRY_MS } from './api.constants';
 import type { ALRequests, ALResponses, APIQueryKey, APIRequest, APIResponse, BlobResponse } from './api.models';
 import { getAPIResponse, getBlobResponse, isAPIData, stableStringify } from './api.utils';
 
@@ -53,7 +53,7 @@ export const useAPICallFn = <
       headers,
       method = 'GET',
       reloadOnUnauthorize = true,
-      retryAfter = DEFAULT_RETRY_MS,
+      retryAfter = DEFAULT_APP_CONFIG.api.retryTime,
       signal,
       url,
       onSuccess,
@@ -152,7 +152,7 @@ export const useAPICallFn = <
         }
 
         // success
-        if (retryAfter !== DEFAULT_RETRY_MS) closeSnackbar();
+        if (retryAfter !== DEFAULT_APP_CONFIG.api.retryTime) closeSnackbar();
 
         onSuccess?.(json as Response);
         return json as Response;
@@ -161,7 +161,7 @@ export const useAPICallFn = <
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [systemConfig.system.version, t]
+    [systemConfig?.system?.version, t]
   );
 };
 
@@ -205,7 +205,7 @@ export const useAPIQuery = <
   disabled = false,
   method,
   queryProps = null,
-  retryAfter = DEFAULT_RETRY_MS,
+  retryAfter = DEFAULT_APP_CONFIG.api.retryTime,
   url,
   ...params
 }: UseAPIQueryProps<Response, Request, Error>) => {
@@ -309,7 +309,7 @@ export const useInfiniteAPIQuery = <
   getPreviousOffset = () => null,
   getNextOffset = () => null,
   allowCache = false,
-  retryAfter = DEFAULT_RETRY_MS
+  retryAfter = DEFAULT_APP_CONFIG.api.retryTime
 }: UseInfiniteAPIQueryProps<Response, Request, Error>) => {
   const queryClient = useQueryClient();
   const apiCallFn = useAPICallFn<APIResponse<Response>>();
@@ -425,7 +425,7 @@ export const useDownloadBlob = ({
   disabled,
   queryProps = null,
   reloadOnUnauthorize = true,
-  retryAfter = DEFAULT_RETRY_MS,
+  retryAfter = DEFAULT_APP_CONFIG.api.retryTime,
   url
 }: UseDownloadBlobProps) => {
   const queryClient = useQueryClient();
@@ -510,7 +510,7 @@ export const useDownloadBlob = ({
         }
 
         // Handle successful request
-        if (retryAfter !== DEFAULT_RETRY_MS) closeSnackbar();
+        if (retryAfter !== DEFAULT_APP_CONFIG.api.retryTime) closeSnackbar();
 
         // Handle all non-successful request
         if (res.status !== 200) {
@@ -785,7 +785,7 @@ export const useBootstrapQuery = ({
 
         // Forbiden response indicate that the user's account is locked.
         if (res.status === 403) {
-          if (retryAfter !== DEFAULT_RETRY_MS) closeSnackbar();
+          if (retryAfter !== DEFAULT_APP_CONFIG.api.retryTime) closeSnackbar();
           setConfiguration(json.api_response as Configuration);
           switchRenderedApp('locked');
           return Promise.reject(json);
@@ -793,7 +793,7 @@ export const useBootstrapQuery = ({
 
         // Unauthorized response indicate that the user is not logged in.
         if (res.status === 401) {
-          if (retryAfter !== DEFAULT_RETRY_MS) closeSnackbar();
+          if (retryAfter !== DEFAULT_APP_CONFIG.api.retryTime) closeSnackbar();
           localStorage.setItem('loginParams', JSON.stringify(json.api_response));
           sessionStorage.clear();
           setLoginParams(json.api_response as LoginParamsProps);
@@ -814,7 +814,7 @@ export const useBootstrapQuery = ({
         }
 
         if (res.status === 200) {
-          if (retryAfter !== DEFAULT_RETRY_MS) closeSnackbar();
+          if (retryAfter !== DEFAULT_APP_CONFIG.api.retryTime) closeSnackbar();
 
           const user = json.api_response as WhoAmIProps;
 

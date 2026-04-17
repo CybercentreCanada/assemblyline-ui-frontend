@@ -1,12 +1,13 @@
 import { AppAPIProvider } from 'core/api';
 import { AppAuthProvider } from 'core/auth/auth.providers';
-import { AppConfigProvider } from 'core/config/config.providers';
-import { AppLayoutProvider } from 'core/layout/layout.providers';
+import { AppConfigProvider } from 'core/config';
+import { AppLayoutProvider } from 'core/layout/providers/AppLayoutProvider';
+import { AppLayoutRoot } from 'core/layout/providers/AppLayoutRoot';
 import { AppRouterProvider } from 'core/router';
 import { AppSnackbarProvider } from 'core/snackbar/snackbar.providers';
-import { AppThemeProvider } from 'core/theme';
 import { AppRoot } from 'layout/AppRoot';
 import { StrictMode } from 'react';
+import i18n from './app.i18n';
 
 /**
  * MyAPP:
@@ -41,7 +42,7 @@ export const AssemblylineApp = () => (
   <StrictMode>
     <AppConfigProvider>
       <AppAPIProvider>
-        <AppThemeProvider>
+        <AppLayoutRoot i18n={i18n}>
           <AppSnackbarProvider>
             <AppRouterProvider>
               <AppAuthProvider>
@@ -51,7 +52,7 @@ export const AssemblylineApp = () => (
               </AppAuthProvider>
             </AppRouterProvider>
           </AppSnackbarProvider>
-        </AppThemeProvider>
+        </AppLayoutRoot>
       </AppAPIProvider>
     </AppConfigProvider>
   </StrictMode>

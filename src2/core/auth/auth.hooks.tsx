@@ -2,9 +2,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { DEFAULT_APP_CONFIG } from 'app/app.configs';
 import { APIQueryKey, APIResponse, isAPIData, stableStringify } from 'core/api';
 import { LoginParamsProps } from 'core/auth/auth.models';
-import { useAppSetConfig } from 'core/config';
-import { useSaveAppConfig } from 'core/config/config.hooks';
-import { useAppConfig } from 'core/config/config.providers';
+import { useAppConfig, useAppSetConfig, useSaveAppConfig } from 'core/config';
 import { useAppSnackbar } from 'core/snackbar/snackbar.hooks';
 import { getXSRFCookie } from 'lib/utils/xsrf.utils';
 import { Configuration } from 'models/base/config';
@@ -52,7 +50,7 @@ export const useAuthQuery = () => {
   const queryClient = useQueryClient();
   const { t } = useTranslation(['api']);
   const { showErrorMessage, closeSnackbar } = useAppSnackbar();
-  const setStore = useAppSetConfig();
+  const setConfig = useAppSetConfig();
   const systemConfig = useAppConfig(s => s?.configuration);
 
   const saveSettings = useSaveAppConfig();
@@ -91,7 +89,7 @@ export const useAuthQuery = () => {
         // Setting the API quota
         const apiQuota = res.headers.get('X-Remaining-Quota-Api');
         if (apiQuota) {
-          setStore(s => {
+          setConfig(s => {
             s.quota.api = parseInt(apiQuota);
             return s;
           });
@@ -100,7 +98,7 @@ export const useAuthQuery = () => {
         // Setting the Submission quota
         const submissionQuota = res.headers.get('X-Remaining-Quota-Submission');
         if (submissionQuota) {
-          setStore(s => {
+          setConfig(s => {
             s.quota.submission = parseInt(submissionQuota);
             return s;
           });
@@ -117,12 +115,39 @@ export const useAuthQuery = () => {
           });
         }
 
-        const json = (await res.json()) as APIResponse<Configuration | LoginParamsProps | WhoAmIProps>;
+        let json: APIResponse<Configuration | LoginParamsProps | WhoAmIProps>;
+        try {
+          json = (await res.json()) as APIResponse<Configuration | LoginParamsProps | WhoAmIProps>;
+        } catch {
+          json = {
+            api_error_message: res.statusText || t('invalid'),
+            api_response: null as unknown as Configuration | LoginParamsProps | WhoAmIProps,
+            api_server_version: systemConfig.system.version,
+            api_status_code: res.status
+          };
+        }
+
+        // Unauthorized response indicate that the user is not logged in.
+        if (res.status === 401) {
+          if (retryAfter !== DEFAULT_APP_CONFIG.api.retryTime) closeSnackbar();
+
+          setConfig(s => {
+            s.auth.login = {
+              ...s.auth.login,
+              ...(isAPIData(json) ? ((json.api_response as LoginParamsProps) ?? {}) : {})
+            };
+            s.auth.mode = 'login';
+            return s;
+          });
+          sessionStorage.clear();
+          saveSettings();
+          return Promise.reject(json);
+        }
 
         // Check for an invalid json format
         if (!isAPIData(json)) {
           showErrorMessage(t('invalid'), 30000);
-          setStore(s => {
+          setConfig(s => {
             s.auth.mode = 'loading';
             return s;
           });
@@ -139,30 +164,17 @@ export const useAuthQuery = () => {
         // Forbiden response indicate that the user's account is locked.
         if (res.status === 403) {
           if (retryAfter !== DEFAULT_APP_CONFIG.api.retryTime) closeSnackbar();
-          setStore(s => {
+          setConfig(s => {
             s.auth.mode = 'locked';
-            s['configuration'] = json.api_response as Configuration;
+            if (json.api_response) s.configuration = json.api_response as Configuration;
             return s;
           });
-          return Promise.reject(json);
-        }
-
-        // Unauthorized response indicate that the user is not logged in.
-        if (res.status === 401) {
-          if (retryAfter !== DEFAULT_APP_CONFIG.api.retryTime) closeSnackbar();
-          setStore(s => {
-            s.auth.login = { ...s.auth.login, ...(json.api_response as LoginParamsProps) };
-            s.auth.mode = 'login';
-            return s;
-          });
-          sessionStorage.clear();
-          saveSettings();
           return Promise.reject(json);
         }
 
         // Daily quota error, stop everything!
         if (res.status === 503 && ['API', 'quota', 'daily'].every(v => error.includes(v))) {
-          setStore(s => {
+          setConfig(s => {
             s.auth.mode = 'quota';
             return s;
           });
@@ -181,7 +193,7 @@ export const useAuthQuery = () => {
           const user = json.api_response as WhoAmIProps;
 
           // Set the current user
-          setStore(s => ({ ...s, ...normalizeWhoAmI(json.api_response) }));
+          setConfig(s => ({ ...s, ...normalizeWhoAmI(json.api_response) }));
 
           // Mark the interface ready
           // TODO
@@ -193,12 +205,12 @@ export const useAuthQuery = () => {
 
           // Render appropriate page
           if (!user.agrees_with_tos && user.configuration.ui.tos) {
-            setStore(s => {
+            setConfig(s => {
               s.auth.mode = 'tos';
               return s;
             });
           } else {
-            setStore(s => {
+            setConfig(s => {
               s.auth.mode = 'app';
               return s;
             });
