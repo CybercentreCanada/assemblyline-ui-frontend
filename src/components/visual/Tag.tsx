@@ -2,6 +2,7 @@ import { HIDE_EVENT_ID } from 'borealis-ui/dist/data/event';
 import useALContext from 'components/hooks/useALContext';
 import useHighlighter from 'components/hooks/useHighlighter';
 import useSafeResults from 'components/hooks/useSafeResults';
+import type { ActionMenuProps } from 'components/visual/ActionMenu';
 import ActionMenu from 'components/visual/ActionMenu';
 import CustomChip from 'components/visual/CustomChip';
 import EnrichmentCustomChip, { BOREALIS_TYPE_MAP } from 'components/visual/EnrichmentCustomChip';
@@ -104,6 +105,7 @@ const WrappedTag: React.FC<TagProps> = ({
           setState={setState}
           classification={classification}
           highlight_key={highlight_key}
+          maliciousness={maliciousness as ActionMenuProps['maliciousness']}
           setBorealisDetails={setShowBorealisDetails}
         />
       )}
