@@ -445,7 +445,10 @@ const WrappedFileDetail: React.FC<Props> = ({
               size="large"
               to={fileViewerPath}
               tooltip={t('file_viewer')}
-              preventRender={!currentUser.roles.includes('file_detail')}
+              preventRender={
+                !currentUser.roles.includes('file_detail') ||
+                (file?.file_info?.type.startsWith('uri/') && !currentUser.is_admin)
+              }
             >
               <PageviewOutlinedIcon />
             </IconButton>
