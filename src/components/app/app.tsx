@@ -23,7 +23,7 @@ import QuotaExceeded from 'components/routes/quota';
 import Routes from 'components/routes/routes';
 import Tos from 'components/routes/tos';
 import setMomentFRLocale from 'helpers/moment-fr-locale';
-import { getProvider } from 'helpers/utils';
+import { getProvider, getSAMLData } from 'helpers/utils';
 import React, { useCallback, useEffect, useState } from 'react';
 import { BrowserRouter } from 'react-router-dom';
 
@@ -34,12 +34,15 @@ const MyAppMain = () => {
   const defaultLoginParams = storedLoginParams ? JSON.parse(storedLoginParams) : null;
 
   const provider = getProvider();
+  const samlData = getSAMLData();
   const { setUser, setConfiguration, user, configuration } = useALContext();
   const { setReady: setAppLayoutReady } = useAppLayout();
   const { setReady: setBorealisReady, setCustomIconify } = useBorealis();
   const { setItems } = useAppSwitcher();
 
-  const [renderedApp, setRenderedApp] = useState<PossibleApps>(user ? 'routes' : provider ? 'login' : 'load');
+  const [renderedApp, setRenderedApp] = useState<PossibleApps>(
+    user ? 'routes' : provider || samlData ? 'login' : 'load'
+  );
   const [loginParams, setLoginParams] = useState<LoginParamsProps | null>(defaultLoginParams);
 
   const switchRenderedApp = useCallback(
