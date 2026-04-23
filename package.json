@@ -9,6 +9,9 @@
   "version": "4.6.0",
   "license": "MIT",
   "private": true,
+  "config": {
+    "min-release-age": "3"
+  },
   "dependencies": {
     "@date-io/date-fns": "^3.2.1",
     "@emotion/react": "^11.14.0",
