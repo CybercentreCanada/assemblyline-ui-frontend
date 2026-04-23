@@ -9,7 +9,7 @@ import { TableContainer } from 'components/visual/ResultCard/Sandbox/common/Tabl
 import { DetailTableCellValue, DetailTableRow } from 'components/visual/ResultCard/Sandbox/common/Tables';
 import type { SandboxFilter } from 'components/visual/ResultCard/Sandbox/sandbox.utils';
 import Verdict from 'components/visual/Verdict';
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 type FlatSignatures = SandboxSignatureItem & {
@@ -24,7 +24,6 @@ type SignatureTableProps = {
   activeValue?: SandboxFilter;
   preventRender?: boolean;
   getRowCount?: (count: number) => void;
-  onActiveChange?: React.Dispatch<React.SetStateAction<SandboxFilter>>;
   onFilterChange?: React.Dispatch<React.SetStateAction<SandboxFilter>>;
 };
 
@@ -35,7 +34,8 @@ export const SignatureTable = React.memo(
     filterValue,
     activeValue,
     preventRender,
-    getRowCount = () => null
+    getRowCount = () => null,
+    onFilterChange = () => null
   }: SignatureTableProps) => {
     const { t } = useTranslation('sandboxResult');
     const theme = useTheme();
@@ -138,6 +138,17 @@ export const SignatureTable = React.memo(
       [body.processes, columnHelper, t, theme.palette.text.secondary]
     );
 
+    const handleRowClick = useCallback(
+      (row: SandboxSignatureItem) =>
+        onFilterChange(prev => {
+          const current = prev ?? [];
+          if (!row?.pid?.length) return current;
+          const isSelected = row.pid.every(v => current.includes(v));
+          return isSelected ? current.filter(v => !row.pid.includes(v)) : [...new Set([...current, ...row.pid])];
+        }),
+      [onFilterChange]
+    );
+
     return (
       <TableContainer
         columns={columns}
@@ -148,7 +159,8 @@ export const SignatureTable = React.memo(
         activeValue={activeValue}
         preventRender={preventRender}
         getRowCount={getRowCount}
-        isRowFiltered={(row, value) => row.pid?.includes(value.pid)}
+        isRowFiltered={(row, value) => (!value?.length ? true : value?.every(v => row?.pid?.includes(v) || false))}
+        onRowClick={handleRowClick}
       />
     );
   }
