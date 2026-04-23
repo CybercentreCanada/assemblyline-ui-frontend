@@ -68,7 +68,7 @@ const categoryIndex = {
   hash: ''
 } as const;
 
-type ActionMenuProps = {
+export type ActionMenuProps = {
   category: 'heuristic' | 'signature' | 'hash' | 'metadata' | 'tag';
   index?: string;
   type: string;
@@ -76,6 +76,7 @@ type ActionMenuProps = {
   classification?: string | null;
   state: Coordinates;
   highlight_key?: string;
+  maliciousness?: 'suspicious' | 'malicious' | 'safe' | 'info' | 'highly_suspicious';
   setState: (coordinates: Coordinates) => void;
   setBorealisDetails?: (value: boolean) => void;
 };
@@ -89,6 +90,7 @@ const WrappedActionMenu = ({
   state,
   setState,
   highlight_key = null,
+  maliciousness = null,
   setBorealisDetails = null
 }: ActionMenuProps) => {
   const { t } = useTranslation();
@@ -444,7 +446,7 @@ const WrappedActionMenu = ({
             to={
               index
                 ? `/search${index}?query=${type}:${safeFieldValueURI(value)}`
-                : `/search${categoryIndex[category]}?query=${categoryPrefix[category]}${type}:${safeFieldValueURI(
+                : `/search${categoryIndex[category]}?query=${category === 'tag' && maliciousness === 'safe' ? 'result.sections.safelisted_tags.' : categoryPrefix[category]}${type}:${safeFieldValueURI(
                     value
                   )}`
             }
