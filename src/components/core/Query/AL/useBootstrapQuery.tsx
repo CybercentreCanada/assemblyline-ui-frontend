@@ -121,9 +121,17 @@ export const useBootstrapQuery = ({
         // Forbiden response indicate that the user's account is locked.
         if (res.status === 403) {
           if (retryAfter !== DEFAULT_RETRY_MS) closeSnackbar();
-          setConfiguration(json.api_response as Configuration);
-          switchRenderedApp('locked');
-          return Promise.reject(json);
+
+          if (json?.api_error_message?.includes('Invalid XSRF token')) {
+            sessionStorage.clear();
+            setConfiguration(json.api_response as Configuration);
+            switchRenderedApp('login');
+            return Promise.reject(json);
+          } else {
+            setConfiguration(json.api_response as Configuration);
+            switchRenderedApp('locked');
+            return Promise.reject(json);
+          }
         }
 
         // Unauthorized response indicate that the user is not logged in.
