@@ -1,1 +1,1 @@
-export * from './providers/AppTemplateLayout';
+export * from './AppTemplateLayout';

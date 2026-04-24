@@ -1,7 +1,7 @@
 import { AppAPIConfig, AppAPISettingsSchema } from 'core/api/api.config';
 import { AppAuthConfig, AppAuthSettingsSchema } from 'core/auth/auth.config';
 import { AppLayoutConfig, AppLayoutSettingsSchema } from 'core/layout/layout.config';
-import { AppRouterConfig, AppRouterSettingsSchema } from 'core/router/router.config';
+import { AppRouterConfig, AppRouterSettingsSchema } from 'core/router/router/router.config';
 import { AppSnackbarConfig } from 'core/snackbar/snackbar.config';
 import { AppThemeConfig, AppThemeSettingsSchema } from 'core/theme/theme.config';
 import { ClassificationAliases, ClassificationDefinition } from 'features/classification/classificationParser';
@@ -105,6 +105,9 @@ export const DEFAULT_APP_CONFIG: AppConfig = {
       showQuickSearch: true,
       theme: 'tui.theme.default'
     },
+    drawer: {
+      maximized: false
+    },
     usermenu: {
       open: false
     }
@@ -114,8 +117,8 @@ export const DEFAULT_APP_CONFIG: AppConfig = {
     submission: null
   },
   router: {
-    maxPanels: 3,
-    maxNodes: 3
+    maxPanels: 2,
+    maxNodes: 2
   },
   snackbar: {
     dense: true,

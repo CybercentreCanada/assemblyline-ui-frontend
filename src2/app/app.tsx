@@ -7,9 +7,12 @@ import { AppSnackbarProvider } from 'core/snackbar';
 import { AppThemeProvider } from 'core/theme';
 import { AppAppsLayout } from 'layout/apps/apps.layout';
 import { AppAuthLayout } from 'layout/auth';
+import { AppDrawerLayout } from 'layout/drawer/drawer.layout';
+import { AppRouterLayout, AppRouterPanel } from 'layout/router';
 import { AppTemplateLayout } from 'layout/template';
 import { StrictMode } from 'react';
 import i18n from './app.i18n';
+import { APP_ROUTES } from './app.routes';
 
 /**
  * MyAPP:
@@ -69,9 +72,15 @@ import i18n from './app.i18n';
 
 export const AppLayout = () => (
   <AppAuthLayout>
-    <AppAppsLayout>
-      <AppTemplateLayout>App</AppTemplateLayout>
-    </AppAppsLayout>
+    <AppRouterLayout routes={APP_ROUTES}>
+      <AppDrawerLayout content={<AppRouterPanel panelKey={1} />}>
+        <AppAppsLayout>
+          <AppTemplateLayout>
+            <AppRouterPanel panelKey={0} />
+          </AppTemplateLayout>
+        </AppAppsLayout>
+      </AppDrawerLayout>
+    </AppRouterLayout>
   </AppAuthLayout>
 );
 

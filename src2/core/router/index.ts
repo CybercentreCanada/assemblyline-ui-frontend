@@ -10,6 +10,7 @@ export { useAppHashParams, useAppPathParams, useAppSearchParams } from './route/
 export { useAppRouteStore } from './route/route.providers';
 export * from './route/route.utils';
 
+export * from './router/router.config';
 export * from './router/router.defaults';
 export * from './router/router.models';
 export * from './router/router.providers';

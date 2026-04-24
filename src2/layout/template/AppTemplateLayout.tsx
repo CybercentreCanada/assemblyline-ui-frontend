@@ -1,9 +1,9 @@
 import { useAppSwitcher } from '@tui/apps';
 import { AppProvider, useAppLayout, useAppUser } from '@tui/core';
 import React, { PropsWithChildren, useEffect } from 'react';
-import { useAppTemplatePreferences } from '../hooks/useAppTemplatePreferences';
-import { useAppTemplateRouter } from '../hooks/useAppTemplateRouter';
-import { useAppTemplateUser } from '../hooks/useAppTemplateUser';
+import { useAppTemplatePreferences } from './hooks/useAppTemplatePreferences';
+import { useAppTemplateRouter } from './hooks/useAppTemplateRouter';
+import { useAppTemplateUser } from './hooks/useAppTemplateUser';
 
 // const cookies: {
 //   theme: string;

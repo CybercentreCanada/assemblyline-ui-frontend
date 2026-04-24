@@ -25,4 +25,7 @@ export type AppLayoutConfig = AppLayoutSettings & {
   usermenu: {
     open: boolean;
   };
+  drawer: {
+    maximized: boolean;
+  };
 };
