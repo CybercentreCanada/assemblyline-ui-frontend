@@ -19,7 +19,7 @@ export const SubmissionsPage = React.memo(() => {
 
   const offset = useAppSearchParams('/submissions/:query', s => s.get('offset'));
 
-  const [search] = useAppRouteStore(s => s.search.toString());
+  const [search] = useAppRouteStore(s => s.params);
 
   // const queryParam = useParams<typeof SubmissionsRoute>()(s => s.query);
 

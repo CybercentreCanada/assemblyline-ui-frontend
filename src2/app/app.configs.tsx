@@ -1,10 +1,10 @@
 import { AppAPIConfig, AppAPISettingsSchema } from 'core/api/api.config';
-import { AppAuthConfig } from 'core/auth/auth.config';
+import { AppAuthConfig, AppAuthSettingsSchema } from 'core/auth/auth.config';
 import { AppLayoutConfig, AppLayoutSettingsSchema } from 'core/layout/layout.config';
 import { AppRouterConfig, AppRouterSettingsSchema } from 'core/router/router.config';
 import { AppSnackbarConfig } from 'core/snackbar/snackbar.config';
 import { AppThemeConfig, AppThemeSettingsSchema } from 'core/theme/theme.config';
-import type { ClassificationDefinition } from 'helpers/classificationParser';
+import { ClassificationAliases, ClassificationDefinition } from 'features/classification/classificationParser';
 import type { Configuration } from 'models/base/config';
 import type { UserSettings } from 'models/base/user_settings';
 import type { CustomUser, Indexes, SystemMessage } from 'models/ui/user';
@@ -47,6 +47,7 @@ import { z } from 'zod';
 export const AppSettingsSchema = z
   .object({
     api: AppAPISettingsSchema.optional().nullable(),
+    auth: AppAuthSettingsSchema.optional().nullable(),
     layout: AppLayoutSettingsSchema.optional().nullable(),
     router: AppRouterSettingsSchema.optional().nullable(),
     theme: AppThemeSettingsSchema.optional().nullable()
@@ -57,10 +58,6 @@ export const AppSettingsSchema = z
 export type AppSettings = z.infer<typeof AppSettingsSchema>;
 
 export type AppConfig = {
-  app: {
-    name: string;
-    link: string;
-  };
   api: AppAPIConfig;
   auth: AppAuthConfig;
   layout: AppLayoutConfig;
@@ -69,23 +66,19 @@ export type AppConfig = {
   snackbar: AppSnackbarConfig;
   theme: AppThemeConfig;
 
-  c12nDef: ClassificationDefinition;
-  classificationAliases: ClassificationAliases;
-  configuration: Configuration;
-  flattenedProps: any;
-  indexes: Indexes;
-  settings: UserSettings;
-  systemMessage: SystemMessage;
-  user: CustomUser;
+  c12nDef?: ClassificationDefinition;
+  classificationAliases?: ClassificationAliases;
+  configuration?: Configuration;
+  flattenedProps?: any;
+  indexes?: Indexes;
+  settings?: UserSettings;
+  systemMessage?: SystemMessage;
+  user?: CustomUser;
 };
 
 export const APP_CONFIG_LOCAL_STORAGE_KEY = 'al.settings';
 
 export const DEFAULT_APP_CONFIG: AppConfig = {
-  app: {
-    name: 'Assemblyline',
-    link: '/'
-  },
   api: {
     staleTime: 1_000,
     gcTime: 1_000,

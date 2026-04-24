@@ -1,15 +1,15 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { DEFAULT_APP_CONFIG } from 'app/app.configs';
 import { APIQueryKey, APIResponse, isAPIData, stableStringify } from 'core/api';
-import { LoginParamsProps } from 'core/auth/auth.models';
 import { useAppConfig, useAppSetConfig, useSaveAppConfig } from 'core/config';
 import { useAppSnackbar } from 'core/snackbar/snackbar.hooks';
-import { getXSRFCookie } from 'lib/utils/xsrf.utils';
 import { Configuration } from 'models/base/config';
 import { WhoAmIProps } from 'models/ui/user';
 import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router';
+import { getXSRFCookie } from 'shared/utils/xsrf.utils';
+import { LoginParamsProps } from './auth.models';
 import { normalizeWhoAmI } from './auth.utils';
 
 export const useScoreToVerdict = () => {

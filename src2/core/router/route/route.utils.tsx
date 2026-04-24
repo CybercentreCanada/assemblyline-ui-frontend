@@ -1,6 +1,6 @@
-import { toElement } from 'lib/utils/app.utils';
 import { ComponentType, MemoExoticComponent, ReactNode } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
+import { toElement } from 'shared/utils/app.utils';
 import { PathParamBlueprintMap } from '../path-params/path-params.models';
 import { PATH_PARAM_BLUEPRINTS_MAP, createPathParamsCodec } from '../path-params/path-params.utils';
 import { SEARCH_PARAM_BLUEPRINTS_MAP } from '../search-params/lib/search-params.blueprint';

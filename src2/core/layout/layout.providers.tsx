@@ -1,116 +1,41 @@
-import {
-  AppPreferenceConfigs,
-  AppProvider,
-  AppRoot,
-  AppSearchService,
-  AppUserService,
-  parseTuiClientCookies,
-  useAppLayout,
-  useAppUser
-} from '@tui/core';
-import i18n from 'app/app.i18n';
-import { useMyPreferences } from 'app/app.preferences';
-import { User } from 'models/base/user';
-import React, { PropsWithChildren, useEffect } from 'react';
-import { useMyAccessibility } from './hooks/useMyAccessibility';
-import { useMyApps } from './hooks/useMyApps';
-import useMyNotification from './hooks/useMyNotifications';
-import { useMyRouter } from './hooks/useMyRouter';
-import useMySearch, { SearchItem } from './hooks/useMySearch';
-import useMyUser from './hooks/useMyUser';
+import { AppRoot } from '@tui/core';
+import { useAppConfig } from 'core/config';
+import { i18n } from 'i18next';
+import React, { PropsWithChildren } from 'react';
+import { useAppLayoutThemeMode } from './layout.hooks';
 
-// const cookies: {
-//   theme: string;
-//   mode: 'light' | 'dark';
-//   lang: string;
-//   layout: 'top' | 'side';
-//   density: 'dense' | 'comfortable' | 'compact';
-//   drawerOpen: boolean;
-//   autoHideAppbar: boolean;
-//   showQuickSearch: boolean;
-//   showBreadcrumbs: boolean;
-// };
-
-export const Inner = ({ children }: PropsWithChildren) => {
-  const appLayout = useAppLayout();
-  const { isReady } = useAppUser();
-
-  useEffect(() => {
-    isReady();
-    appLayout.setReady(true);
-
-    return () => {
-      appLayout.setReady(false);
-    };
-  }, [appLayout, isReady]);
-
-  return children;
+export type AppLayoutProviderProps = PropsWithChildren & {
+  i18n: i18n;
 };
 
-export const AppLayoutProvider = React.memo(({ children }: PropsWithChildren) => {
-  const cookies = parseTuiClientCookies();
+export const AppLayoutProvider = React.memo(({ children, i18n }: AppLayoutProviderProps) => {
+  const autoHideAppbar = useAppConfig(s => s?.layout?.cookies?.autoHideAppbar);
+  const density = useAppConfig(s => s?.layout?.cookies?.density);
+  const drawerOpen = useAppConfig(s => s?.layout?.cookies?.drawerOpen);
+  const lang = useAppConfig(s => s?.layout?.cookies?.lang);
+  const layout = useAppConfig(s => s?.layout?.cookies?.layout);
+  const showBreadcrumbs = useAppConfig(s => s?.layout?.cookies?.showBreadcrumbs);
+  const showQuickSearch = useAppConfig(s => s?.layout?.cookies?.showQuickSearch);
+  const theme = useAppConfig(s => s?.layout?.cookies?.theme);
 
-  const myPreferences: AppPreferenceConfigs = useMyPreferences();
-  const myUser: AppUserService<User> = useMyUser();
-  const mySearch: AppSearchService<SearchItem> = useMySearch();
-  const myAccessibility = useMyAccessibility();
-  const myNotification = useMyNotification();
-  const myApps = useMyApps();
-  const myRouter = useMyRouter();
+  const mode = useAppLayoutThemeMode();
 
   return (
     <AppRoot
-      // cookies={cookies}
       cookies={{
-        theme: 'default',
-        mode: 'dark',
-        lang: 'en',
-        layout: 'top',
-        density: 'dense',
-        drawerOpen: true,
-        autoHideAppbar: false,
-        showQuickSearch: false,
-        showBreadcrumbs: false
+        autoHideAppbar,
+        density,
+        drawerOpen,
+        lang,
+        layout,
+        mode,
+        showBreadcrumbs,
+        showQuickSearch,
+        theme
       }}
       i18n={i18n}
     >
-      {/* <AppDrawerProvider>
-        <AppAccessibilityProvider {...myAccessibility}>
-          <AppNotificationServiceProvider service={myNotification}>
-            <AppSwitcherProvider apps={myApps}>
-              <AppClassificationProvider
-                url="/api/v1/classification" //                  👈 classfification provider from server endpoint.
-                //value={value.public_settings.classification}   👈 classification provided by root loader.
-                // value="u"                                     👈 classification explicitly provided.
-              > */}
-      <AppProvider
-        router={myRouter}
-        preferences={myPreferences}
-        user={{
-          isReady: () => true,
-          user: { id: 'test', name: 'test' },
-          setUser: () => {},
-          validateProps: () => true
-        }}
-
-        // preferences={null}
-        // sitemap={{}}
-        // theme={{}}
-        // user={null}
-
-        // preferences={myPreferences}
-        // theme={myTheme}
-        // sitemap={mySitemap}
-        // search={mySearch}
-        // user={myUser}
-      >
-        <Inner>{children}</Inner>
-      </AppProvider>
-      {/* </AppClassificationProvider>
-            </AppSwitcherProvider>
-          </AppNotificationServiceProvider>
-        </AppAccessibilityProvider>
-      </AppDrawerProvider> */}
+      {children}
     </AppRoot>
   );
 });

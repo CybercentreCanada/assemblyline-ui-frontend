@@ -1,8 +1,9 @@
 import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
+import { useAppSnackbar } from 'layout/snackbar/snackbar.hooks';
 // import useMyAPI from 'components/hooks/useMyAPI';
 // import useMySnackbar from 'components/hooks/useMySnackbar';
-import { getTextContent } from 'lib/utils/utils';
 import React, { useCallback, useMemo, useState } from 'react';
+import { getTextContent } from 'shared/utils/utils';
 import type { IconButtonProps } from 'ui/buttons/IconButton';
 import { IconButton } from 'ui/buttons/IconButton';
 
@@ -24,7 +25,7 @@ export const WrappedFileDownloader = ({
   ...props
 }: FileDownloaderProps) => {
   const { downloadBlob } = useMyAPI();
-  const { showSuccessMessage, showErrorMessage } = useMySnackbar();
+  const { showSuccessMessage, showErrorMessage } = useAppSnackbar();
 
   const [progress, setProgress] = useState<number>(null);
   const [total, setTotal] = useState<number>(null);

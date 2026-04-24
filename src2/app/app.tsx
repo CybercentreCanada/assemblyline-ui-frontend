@@ -1,11 +1,13 @@
 import { AppAPIProvider } from 'core/api';
-import { AppAuthProvider } from 'core/auth/auth.providers';
 import { AppConfigProvider } from 'core/config';
-import { AppLayoutProvider } from 'core/layout/providers/AppLayoutProvider';
-import { AppLayoutRoot } from 'core/layout/providers/AppLayoutRoot';
+import { AppErrorProviders } from 'core/error';
+import { AppLayoutProvider } from 'core/layout';
 import { AppRouterProvider } from 'core/router';
-import { AppSnackbarProvider } from 'core/snackbar/snackbar.providers';
-import { AppRoot } from 'layout/AppRoot';
+import { AppSnackbarProvider } from 'core/snackbar';
+import { AppThemeProvider } from 'core/theme';
+import { AppAppsLayout } from 'layout/apps/apps.layout';
+import { AppAuthLayout } from 'layout/auth';
+import { AppTemplateLayout } from 'layout/template';
 import { StrictMode } from 'react';
 import i18n from './app.i18n';
 
@@ -38,22 +40,57 @@ import i18n from './app.i18n';
  * AppLayoutProvider
  */
 
-export const AssemblylineApp = () => (
+// export const Layout = () => <AppAuthLayout></AppAuthLayout>;
+
+// export const App2 = () => (
+//   <StrictMode>
+//     <AppConfigProvider>
+//       <AppThemeProvider>
+//         <AppErrorLayout>
+//           <AppAPIProvider>
+//             app
+//             {/* <AppLayoutRoot>
+//               <AppSnackbarProvider>
+//                 <AppRouterProvider>
+//                   <AppAuthProvider>
+//                     <AppLayoutProvider>
+//                       <AppRouter />
+//                     </AppLayoutProvider>
+//                   </AppAuthProvider>
+//                 </AppRouterProvider>
+//               </AppSnackbarProvider>
+//             </AppLayoutRoot> */}
+//           </AppAPIProvider>
+//         </AppErrorLayout>
+//       </AppThemeProvider>
+//     </AppConfigProvider>
+//   </StrictMode>
+// );
+
+export const AppLayout = () => (
+  <AppAuthLayout>
+    <AppAppsLayout>
+      <AppTemplateLayout>App</AppTemplateLayout>
+    </AppAppsLayout>
+  </AppAuthLayout>
+);
+
+export const App = () => (
   <StrictMode>
     <AppConfigProvider>
-      <AppAPIProvider>
-        <AppLayoutRoot i18n={i18n}>
-          <AppSnackbarProvider>
-            <AppRouterProvider>
-              <AppAuthProvider>
-                <AppLayoutProvider>
-                  <AppRoot />
+      <AppThemeProvider>
+        <AppErrorProviders>
+          <AppAPIProvider>
+            <AppSnackbarProvider>
+              <AppRouterProvider>
+                <AppLayoutProvider i18n={i18n}>
+                  <AppLayout />
                 </AppLayoutProvider>
-              </AppAuthProvider>
-            </AppRouterProvider>
-          </AppSnackbarProvider>
-        </AppLayoutRoot>
-      </AppAPIProvider>
+              </AppRouterProvider>
+            </AppSnackbarProvider>
+          </AppAPIProvider>
+        </AppErrorProviders>
+      </AppThemeProvider>
     </AppConfigProvider>
   </StrictMode>
 );

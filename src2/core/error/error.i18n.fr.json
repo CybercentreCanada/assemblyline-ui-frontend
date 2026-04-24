@@ -1,0 +1,9 @@
+{
+  "error": "erreur",
+  "error.button": "Essayer de nouveau",
+  "error.chunk": "Rechargement de l'application pour corriger une erreur de chargement...",
+  "error.description": "Voici l'erreur que nous avons:",
+  "error.hideStack": "Masquer la pile",
+  "error.showStack": "Afficher la pile",
+  "error.title": "Il y a certainement un 'bug' ici!"
+}

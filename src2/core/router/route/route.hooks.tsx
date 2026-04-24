@@ -27,7 +27,7 @@ export type PathParamSelector<Path extends AppRoute['path'], SelectorOutput> =
 export function useAppPathParams<const Path extends AppRoute['path'], const SelectorOutput>(
   path: Path,
   selector: PathParamSelector<Path, SelectorOutput>
-) {
+): SelectorOutput {
   const context = useAppRouteStore<SelectorOutput>(s => selector(s.params));
   if (!context) return null;
   return context[0];
@@ -42,7 +42,7 @@ type SearchShape<Path extends AppRoute['path']> =
     ? { search?: never }
     : { search: SearchParamValue<Path> };
 
-type SearchParamValue<Path extends AppRoute['path']> =
+export type SearchParamValue<Path extends AppRoute['path']> =
   Exclude<RouteByPath<Path>['search'], undefined> extends SearchParamEngine<
     infer Blueprints extends SearchParamBlueprintMap
   >
@@ -56,7 +56,7 @@ export type SearchParamSelector<Path extends AppRoute['path'], SelectorOutput> =
 export function useAppSearchParams<const Path extends AppRoute['path'], const SelectorOutput>(
   path: Path,
   selector: SearchParamSelector<Path, SelectorOutput>
-) {
+): SelectorOutput {
   const context = useAppRouteStore<SelectorOutput>(s => selector(s.search as SearchParamValue<Path>));
   if (!context) return null;
   return context[0];
@@ -80,7 +80,7 @@ export type HashParamSelector<Path extends AppRoute['path'], SelectorOutput> =
 export function useAppHashParams<const Path extends AppRoute['path'], const SelectorOutput>(
   path: Path,
   selector: HashParamSelector<Path, SelectorOutput>
-) {
+): SelectorOutput {
   const context = useAppRouteStore<SelectorOutput>(s => selector(s.hash as HashParamValue<Path>));
   if (!context) return null;
   return context[0];

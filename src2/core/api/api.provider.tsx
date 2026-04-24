@@ -1,5 +1,5 @@
 import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
-import { keepPreviousData, QueryClient } from '@tanstack/react-query';
+import { keepPreviousData, QueryClient, QueryClientConfig } from '@tanstack/react-query';
 import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools';
 import type { PersistedClient } from '@tanstack/react-query-persist-client';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
@@ -7,6 +7,37 @@ import { useAppConfig } from 'core/config';
 import { compress, decompress } from 'lz-string';
 import React, { Activity, PropsWithChildren, useEffect, useMemo } from 'react';
 import type { APIQueryKey } from './api.models';
+
+const API_STALE_TIME = 1000;
+
+const API_GARBAGE_COLLECTION_TIME = 1000;
+
+export const APP_API_CONFIG: QueryClientConfig = {
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      staleTime: API_STALE_TIME,
+      gcTime: API_GARBAGE_COLLECTION_TIME,
+      placeholderData: keepPreviousData
+    }
+  }
+};
+
+export const APP_API_PERSISTER = createSyncStoragePersister({
+  storage: window.sessionStorage,
+  serialize: data =>
+    compress(
+      JSON.stringify({
+        ...data,
+        clientState: {
+          mutations: [],
+          queries: data.clientState.queries.filter(q => (q.queryKey as APIQueryKey)[3])
+        }
+      })
+    ),
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+  deserialize: data => JSON.parse(decompress(data))
+});
 
 export const queryClient = new QueryClient({
   defaultOptions: {

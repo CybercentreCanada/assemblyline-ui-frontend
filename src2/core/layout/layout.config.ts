@@ -14,6 +14,7 @@ export const AppLayoutSettingsSchema = z.object({
     mode: z.enum(['light', 'dark', 'system']).optional(),
     showBreadcrumbs: z.boolean().optional(),
     showQuickSearch: z.boolean().optional(),
+    showSafeResults: z.boolean().optional(),
     theme: z.string().optional()
   })
 });

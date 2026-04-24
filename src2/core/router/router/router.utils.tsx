@@ -1,6 +1,6 @@
 import { createReversePortalNode } from 'features/portal';
-import { deepCompare, generateRandomUUID } from 'lib/utils/app.utils';
 import type { Location, NavigateOptions, To } from 'react-router';
+import { deepCompare, generateRandomUUID } from 'shared/utils/app.utils';
 import {
   DEFAULT_APP_ROUTER_NODE,
   DEFAULT_APP_ROUTER_PANEL,

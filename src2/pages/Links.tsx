@@ -9,7 +9,7 @@ export const Links = React.memo(() => {
       <AppLink path="/page2/:fileID" params={{ fileID: 'asd' }}>
         Page 2
       </AppLink>
-      <AppLink path="/submissions/:query" params={{ query: '123' }}>
+      <AppLink path="/submissions/:query" params={{ query: '123' }} search={{ query: 'asdf' }}>
         Submission
       </AppLink>
     </nav>

@@ -6,14 +6,15 @@ import { useTranslation } from 'react-i18next';
 // import type { LoginParamsProps } from 'components/hooks/useMyAPI';
 // import useMySnackbar from 'components/hooks/useMySnackbar';
 // import useQuota from 'components/hooks/useQuota';
+import { APIRequests, APIResponses } from 'app/app.api';
 import { DEFAULT_APP_CONFIG } from 'app/app.configs';
 import { useAppConfig, useAppSetConfig } from 'core/config';
-import { useAppSnackbar } from 'core/snackbar/snackbar.hooks';
-import { getFileName } from 'lib/utils/utils';
-import { getXSRFCookie } from 'lib/utils/xsrf.utils';
+import { useAppSnackbar } from 'core/snackbar';
 import type { Configuration } from 'models/base/config';
 import type { CustomUser, WhoAmIProps } from 'models/ui/user';
-import type { ALRequests, ALResponses, APIQueryKey, APIRequest, APIResponse, BlobResponse } from './api.models';
+import { getFileName } from 'shared/utils/utils';
+import { getXSRFCookie } from 'shared/utils/xsrf.utils';
+import type { APIQueryKey, APIRequest, APIResponse, BlobResponse } from './api.models';
 import { getAPIResponse, getBlobResponse, isAPIData, stableStringify } from './api.utils';
 
 export type UseAPICallFnProps<
@@ -430,8 +431,8 @@ export const useDownloadBlob = ({
 }: UseDownloadBlobProps) => {
   const queryClient = useQueryClient();
   const { t } = useTranslation(['api']);
-  const { showErrorMessage, closeSnackbar } = useMySnackbar();
-  const { configuration: systemConfig } = useALContext();
+  const { showErrorMessage, closeSnackbar } = useAppSnackbar();
+  const systemConfig = useAppConfig(s => s?.configuration);
   const { setApiQuotaremaining, setSubmissionQuotaremaining } = useQuota();
 
   const query = useQuery<BlobResponse, APIResponse<Error>, BlobResponse, APIQueryKey>(
@@ -603,12 +604,12 @@ export const useDownloadBlob = ({
   );
 };
 
-export type UseALQueryProps<Request extends ALRequests> = {
+export type UseALQueryProps<Request extends APIRequests> = {
   queryProps?: Omit<
     UndefinedInitialDataOptions<
-      APIResponse<ALResponses<Request>>,
+      APIResponse<APIResponses<Request>>,
       APIResponse<string>,
-      APIResponse<ALResponses<Request>>,
+      APIResponse<APIResponses<Request>>,
       APIQueryKey
     >,
     'queryKey' | 'queryFn'
@@ -617,9 +618,9 @@ export type UseALQueryProps<Request extends ALRequests> = {
   delay?: number;
   disabled?: boolean;
   retryAfter?: number;
-} & UseAPICallFnProps<APIResponse<ALResponses<Request>>, Request>;
+} & UseAPICallFnProps<APIResponse<APIResponses<Request>>, Request>;
 
-export const useALQuery = <Request extends ALRequests>({
+export const useALQuery = <Request extends APIRequests>({
   url,
   method = 'GET',
   body = null,
@@ -627,7 +628,7 @@ export const useALQuery = <Request extends ALRequests>({
   disabled = false,
   ...props
 }: UseALQueryProps<Request>) =>
-  useAPIQuery<ALResponses<Request>, Request, string>({
+  useAPIQuery<APIResponses<Request>, Request, string>({
     url:
       method !== 'GET'
         ? url
@@ -639,28 +640,28 @@ export const useALQuery = <Request extends ALRequests>({
     disabled,
     allowCache,
     ...props
-  } as UseAPIQueryProps<ALResponses<Request>, Request, string>);
+  } as UseAPIQueryProps<APIResponses<Request>, Request, string>);
 
-export const useALMutation = <Props extends unknown[], Request extends ALRequests, Error extends string = string>(
-  mutationFn: (...props: Props) => UseAPICallFnProps<APIResponse<ALResponses<Request>>, Request, APIResponse<Error>>,
+export const useALMutation = <Props extends unknown[], Request extends APIRequests, Error extends string = string>(
+  mutationFn: (...props: Props) => UseAPICallFnProps<APIResponse<APIResponses<Request>>, Request, APIResponse<Error>>,
   mutationProps?: Omit<
-    UseMutationOptions<APIResponse<ALResponses<Request>>, APIResponse<Error>, Props, unknown>,
+    UseMutationOptions<APIResponse<APIResponses<Request>>, APIResponse<Error>, Props, unknown>,
     'mutationFn'
   >
-) => useAPIMutation<Props, ALResponses<Request>, Request, Error>(mutationFn, mutationProps);
+) => useAPIMutation<Props, APIResponses<Request>, Request, Error>(mutationFn, mutationProps);
 
-export type UseInfiniteALQueryProps<Request extends ALRequests, Error extends string = string> = {
+export type UseInfiniteALQueryProps<Request extends APIRequests, Error extends string = string> = {
   initialOffset?: number;
-  getParams: (offset: number) => UseAPICallFnProps<APIResponse<ALResponses<Request>>, Request, APIResponse<Error>>;
+  getParams: (offset: number) => UseAPICallFnProps<APIResponse<APIResponses<Request>>, Request, APIResponse<Error>>;
   getPreviousOffset?: (
-    firstPage: APIResponse<ALResponses<Request>>,
-    allPages: Array<APIResponse<ALResponses<Request>>>,
+    firstPage: APIResponse<APIResponses<Request>>,
+    allPages: Array<APIResponse<APIResponses<Request>>>,
     firstPageParam: number,
     allPageParams: Array<number>
   ) => number | undefined;
   getNextOffset?: (
-    lastPage: APIResponse<ALResponses<Request>>,
-    allPages: Array<APIResponse<ALResponses<Request>>>,
+    lastPage: APIResponse<APIResponses<Request>>,
+    allPages: Array<APIResponse<APIResponses<Request>>>,
     lastPageParam: number,
     allPageParams: Array<number>
   ) => number | undefined;
@@ -668,7 +669,7 @@ export type UseInfiniteALQueryProps<Request extends ALRequests, Error extends st
   retryAfter?: number;
 };
 
-export const useInfiniteALQuery = <Request extends ALRequests, Error extends string = string>({
+export const useInfiniteALQuery = <Request extends APIRequests, Error extends string = string>({
   initialOffset = 0,
   getParams = () => null,
   getPreviousOffset = () => null,
@@ -676,7 +677,7 @@ export const useInfiniteALQuery = <Request extends ALRequests, Error extends str
   allowCache = false,
   retryAfter
 }: UseInfiniteALQueryProps<Request, Error>) =>
-  useInfiniteAPIQuery<ALResponses<Request>, Request, Error>({
+  useInfiniteAPIQuery<APIResponses<Request>, Request, Error>({
     initialOffset,
     getParams,
     getPreviousOffset,

@@ -4,7 +4,7 @@ import Typography from '@mui/material/Typography';
 import { createAppRoute } from 'core/router/route/route.utils';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { PageCenter } from 'ui/layouts/PageCenter';
+import { PageCenter } from 'ui/pages';
 
 //*****************************************************************************************
 // Not Found Page

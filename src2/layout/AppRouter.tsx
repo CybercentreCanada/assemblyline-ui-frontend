@@ -1,9 +1,8 @@
 import { AppRouteKeyProvider, useAppRouterStore } from 'core/router';
 import { findNode, removePanel, sanitizeAppRouterStore, storeToNavigate } from 'core/router/router/router.utils';
 import { InPortal, OutPortal } from 'features/portal';
-import { Links } from 'pages/Links';
 import React from 'react';
-import { Link, useNavigate } from 'react-router';
+import { useNavigate } from 'react-router';
 import { useShallow } from 'zustand/react/shallow';
 import { AppRoutes } from './AppRoutes';
 
@@ -21,6 +20,8 @@ const PanelView = React.memo(({ panelKey }: PanelViewProps) => {
   const panel = useAppRouterStore(s => s.panels?.[panelKey]);
   const node = useAppRouterStore(s => findNode(s, { routeKey: panel?.routeKey }));
   const route = useAppRouterStore(s => (node?.routeKey ? s.routes?.[node.routeKey] : null));
+
+  return <OutPortal node={node.portal} />;
 
   return (
     <div style={{ border: '1px solid grey', minHeight: '220px', padding: '8px' }}>
@@ -81,12 +82,6 @@ export const AppRouter = React.memo(() => {
 
   return (
     <>
-      <Link to={{ pathname: '/page1' }} state={{ asdasdasd: 'asdasdasdasdasd' }}>
-        link
-      </Link>
-
-      <Links />
-
       <div
         style={{
           display: 'grid',
