@@ -8,41 +8,48 @@ import {
   useTheme
 } from '@mui/material';
 import { LeftNavChildRenderProps } from '@tui/core';
-import { AppLink, useAppRouteLocation } from 'core/router';
-import { CreatedAppRouteParamsMap, createAppRoute } from 'core/routes';
-import React, { useMemo } from 'react';
+import { AppLink } from 'core/router';
+import { AppRoute, CreatedAppRouteParamsMap } from 'core/routes';
+import React, { memo, useMemo } from 'react';
 
-export type LeftNavLinkProps = {
+export type LeftNavLinkProps<Route extends AppRoute> = {
   icon?: ListItemIconProps['children'];
   navOpen: boolean;
   navProps?: LeftNavChildRenderProps;
-  preventRender?: boolean;
   primary?: ListItemTextProps['primary'];
-  routes?: readonly ReturnType<typeof createAppRoute>[];
-  to?: CreatedAppRouteParamsMap;
+  to?: CreatedAppRouteParamsMap<Route>;
+  onClick?: ListItemIconProps['onClick'];
 };
 
-export const LeftNavRoute = React.memo(
-  ({ icon, navOpen, navProps, primary, to: toProp = null, preventRender = false, routes = null }: LeftNavLinkProps) => {
-    const theme = useTheme();
-    const { active, level } = useMemo(() => navProps ?? { active: false, level: 0 }, [navProps]);
+function WrappedLeftNavRoute<const Route extends AppRoute>({
+  icon,
+  navOpen,
+  navProps,
+  primary,
+  to = null,
+  onClick = () => null
+}: LeftNavLinkProps<Route>) {
+  const theme = useTheme();
+  const { active, level } = useMemo(() => navProps ?? { active: false, level: 0 }, [navProps]);
 
-    const { href, state } = useAppRouteLocation(toProp as never);
+  return (
+    <ListItem disablePadding>
+      <ListItemButton
+        dense={level > 0}
+        selected={active}
+        sx={{ minHeight: undefined, paddingLeft: level === 0 ? undefined : theme.spacing(navOpen ? 4 : 2) }}
+        {...(!to ? null : { component: AppLink, to })}
+      >
+        {icon && <ListItemIcon sx={{ color: 'inherit' }}>{icon}</ListItemIcon>}
+        <ListItemText primary={primary} />
+      </ListItemButton>
+    </ListItem>
+  );
+}
 
-    return (
-      <ListItem disablePadding>
-        <ListItemButton
-          dense={level > 0}
-          selected={active}
-          sx={{ minHeight: undefined, paddingLeft: level === 0 ? undefined : theme.spacing(navOpen ? 4 : 2) }}
-          {...(!href ? null : { component: AppLink, to: href, state: state })}
-        >
-          {icon && <ListItemIcon sx={{ color: 'inherit' }}>{icon}</ListItemIcon>}
-          <ListItemText primary={primary} />
-        </ListItemButton>
-      </ListItem>
-    );
-  }
-);
+export const LeftNavRoute = memo(WrappedLeftNavRoute) as <const Route extends AppRoute>(
+  props: LeftNavLinkProps<Route>
+) => React.JSX.Element | null;
 
-LeftNavRoute.displayName = 'LeftNavRoute';
+WrappedLeftNavRoute.displayName = 'WrappedLeftNavRoute';
+(LeftNavRoute as any).displayName = 'LeftNavRoute';

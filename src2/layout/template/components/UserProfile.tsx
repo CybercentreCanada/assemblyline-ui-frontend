@@ -33,7 +33,6 @@ import {
   useAppTheme
 } from '@tui/core';
 import { useAppConfig, useAppSetConfig } from 'core/config';
-import { AppLink } from 'core/router';
 import React, { useCallback, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IconButton } from 'ui/buttons/IconButton';
@@ -425,9 +424,7 @@ const UserMenuHeader = React.memo(() => {
             </Typography>
             <Box sx={{ display: 'flex', justifyContent: 'end' }}>
               <IconButton
-                path="/help/api/:id"
-                params={{ id: '123' }}
-                search={{ query: 123, asdasd: 123 }}
+                to={{ path: '/account' }}
                 size="large"
                 tooltip={t('usermenu.account')}
                 sx={{ color: theme.palette.text.primary }}
@@ -435,9 +432,7 @@ const UserMenuHeader = React.memo(() => {
                 <AccountCircleOutlinedIcon />
               </IconButton>
               <IconButton
-                component={AppLink}
-                search={{ query: null }}
-                path="/settings"
+                to={{ path: '/settings' }}
                 size="large"
                 tooltip={t('usermenu.settings')}
                 sx={{ color: theme.palette.text.primary }}

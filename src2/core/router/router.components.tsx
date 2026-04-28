@@ -9,20 +9,20 @@ import { AppLinkProps } from './router.models';
 //*****************************************************************************************
 
 export function WrappedAppLink<const Route extends AppRoute>(
-  { children, ...props }: AppLinkProps<Route>,
+  { children, to = null, onClick = () => null, ...props }: AppLinkProps<Route>,
   ref: React.ForwardedRef<HTMLAnchorElement>
 ) {
-  const { href, state } = useAppRouteLocation(props?.to);
+  const { href, state } = useAppRouteLocation(to);
   const navigate = useAppNavigate();
 
   const handleClick = useCallback(
     (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
       event.preventDefault();
       event.stopPropagation();
-      navigate(props?.to);
-      props?.onClick?.(event);
+      navigate(to);
+      onClick(event);
     },
-    [props?.to]
+    [navigate, onClick, to]
   );
 
   return (

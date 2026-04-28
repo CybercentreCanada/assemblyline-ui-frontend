@@ -1,6 +1,6 @@
 import type { IconButtonProps as MuiIconButtonProps, TooltipProps } from '@mui/material';
 import { IconButton as MuiIconButton, Skeleton, useTheme } from '@mui/material';
-import { AppLink, useAppRouteLocation } from 'core/router';
+import { AppLink } from 'core/router';
 import { AppRoute, CreatedAppRouteParamsMap } from 'core/routes';
 import type { CSSProperties } from 'react';
 import React, { useMemo } from 'react';
@@ -58,8 +58,6 @@ export const IconButton: React.FC<IconButtonProps> = React.memo(
       }
     }, [color, disabled, progress, theme.palette]);
 
-    const { href, state } = useAppRouteLocation(toProp as never);
-
     return loading ? (
       <Skeleton
         variant="circular"
@@ -77,8 +75,8 @@ export const IconButton: React.FC<IconButtonProps> = React.memo(
           aria-label={id ?? getTextContent(tooltip)}
           disabled={disabled || progress !== false}
           size={size}
-          {...(!href ? null : { component: AppLink, to: href, state: state })}
           {...props}
+          {...(!toProp ? null : { component: AppLink, to: toProp })}
           sx={{ height: 'fit-content', color: resolvedColor, ...props?.sx }}
         >
           {children}

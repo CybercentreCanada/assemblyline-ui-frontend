@@ -1,7 +1,7 @@
 import { Divider } from '@mui/material';
 import { LeftNavMenuProps } from '@tui/core';
 import { useAppLeftNavMenu } from 'app/layout.left-nav';
-import { CreatedAppRouteParamsMap, createAppRoute } from 'core/routes';
+import { AppRoute, CreatedAppRouteParamsMap, createAppRoute } from 'core/routes';
 import { useCallback, useMemo } from 'react';
 import { LeftNavRoute } from '../components/LeftNavRoute';
 
@@ -15,7 +15,7 @@ export type AppLeftNavItem = {
   label?: LeftNavMenuProps['label'];
   preventRender?: boolean;
   routes?: readonly ReturnType<typeof createAppRoute>[];
-  to?: CreatedAppRouteParamsMap;
+  to?: CreatedAppRouteParamsMap<AppRoute>;
 };
 
 export const useAppTemplateLeftNavMenu = () => {
@@ -47,15 +47,7 @@ export const useAppTemplateLeftNavMenu = () => {
       type: 'slot',
       withProps: true,
       render: (navOpen, navProps) => (
-        <LeftNavRoute
-          primary={label}
-          to={to}
-          routes={routes}
-          preventRender={preventRender}
-          icon={icon}
-          navOpen={navOpen}
-          navProps={navProps}
-        />
+        <LeftNavRoute primary={label} to={to} icon={icon} navOpen={navOpen} navProps={navProps} />
       )
     };
   }, []);

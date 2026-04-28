@@ -1,6 +1,6 @@
 import type { ButtonProps as MuiButtonProps, TooltipProps } from '@mui/material';
 import { Button as MuiButton, Skeleton } from '@mui/material';
-import { AppLink, useAppRouteLocation } from 'core/router';
+import { AppLink } from 'core/router';
 import { AppRoute, CreatedAppRouteParamsMap } from 'core/routes';
 import React, { useMemo } from 'react';
 import { getTextContent } from 'shared/utils/utils';
@@ -35,8 +35,6 @@ export const Button: React.FC<ButtonProps> = React.memo(
       [loading, preventRenderProp]
     );
 
-    const { href, state } = useAppRouteLocation(toProp as never);
-
     return loading ? (
       <MuiButton disabled size={size} sx={{ padding: 0 }}>
         <Skeleton
@@ -57,7 +55,7 @@ export const Button: React.FC<ButtonProps> = React.memo(
           id={id ?? getTextContent(children)}
           disabled={progress || disabled}
           size={size}
-          {...(!href ? null : { component: AppLink, to: href, state: state })}
+          {...(!toProp ? null : { component: AppLink, to: toProp })}
           {...props}
         >
           {children}
