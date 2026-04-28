@@ -25,7 +25,7 @@ export const METADATA_FIELDTYPE_MAP = [
   'text',
   'uri'
 ] as const;
-export const REGISTRY_TYPES = ['docker', 'harbor'] as const;
+export const REGISTRY_TYPES = ['docker', 'harbor', 'jfrog'] as const;
 export const SAFELIST_HASH_TYPES = ['sha1', 'sha256', 'md5'] as const;
 export const SERVICE_CATEGORIES = [
   'Antivirus',
