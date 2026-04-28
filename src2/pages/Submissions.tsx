@@ -1,5 +1,4 @@
-import { useAppPathParams, useAppRouteStore, useAppSearchParams } from 'core/router';
-import { createAppRoute } from 'core/router/route/route.utils';
+import { createAppRoute, useAppPathParams, useAppRouteStore, useAppSearchParams } from 'core/routes';
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { Links } from './Links';

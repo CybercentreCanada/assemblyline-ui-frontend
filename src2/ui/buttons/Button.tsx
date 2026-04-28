@@ -1,10 +1,8 @@
 import type { ButtonProps as MuiButtonProps, TooltipProps } from '@mui/material';
 import { Button as MuiButton, Skeleton } from '@mui/material';
-import { APP_ROUTES, AppRoute } from 'app/app.routes';
-import type { NavigateTo2 } from 'core/router';
-import { useAppNavigateTo } from 'core/router';
+import { AppLink, useAppRouteLocation } from 'core/router';
+import { AppRoute, CreatedAppRouteParamsMap } from 'core/routes';
 import React, { useMemo } from 'react';
-import { Link } from 'react-router';
 import { getTextContent } from 'shared/utils/utils';
 import { Tooltip } from 'ui/Tooltip';
 import { CircularProgress } from './CircularProgress';
@@ -13,7 +11,7 @@ export type ButtonProps = MuiButtonProps & {
   loading?: boolean;
   preventRender?: boolean | (() => boolean);
   progress?: boolean;
-  to?: NavigateTo2<AppRoute>;
+  to?: CreatedAppRouteParamsMap<AppRoute>;
   tooltip?: TooltipProps['title'];
   tooltipProps?: Omit<TooltipProps, 'children' | 'title'>;
 };
@@ -37,7 +35,7 @@ export const Button: React.FC<ButtonProps> = React.memo(
       [loading, preventRenderProp]
     );
 
-    const to = useAppNavigateTo(toProp, APP_ROUTES);
+    const { href, state } = useAppRouteLocation(toProp as never);
 
     return loading ? (
       <MuiButton disabled size={size} sx={{ padding: 0 }}>
@@ -59,7 +57,7 @@ export const Button: React.FC<ButtonProps> = React.memo(
           id={id ?? getTextContent(children)}
           disabled={progress || disabled}
           size={size}
-          {...(!to || loading ? null : { component: Link, to })}
+          {...(!href ? null : { component: AppLink, to: href, state: state })}
           {...props}
         >
           {children}

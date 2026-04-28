@@ -5,11 +5,10 @@ import {
   FiltersBlueprint,
   NumberBlueprint,
   StringBlueprint
-} from '../lib/search-params.blueprint';
-import type { ParamRuntime } from '../lib/search-params.runtime';
-import { PARAM_RUNTIMES } from '../lib/search-params.runtime';
-import { SearchParamSnapshot } from '../lib/search-params.snapshot';
-import type { ParamBlueprints, SearchParamRuntimeMap, SearchParamValueMap } from './search-params.model';
+} from './search-params.blueprints';
+import type { ParamBlueprints, SearchParamRuntimeMap, SearchParamValueMap } from './search-params.models';
+import { PARAM_RUNTIMES, ParamRuntime } from './search-params.runtimes';
+import { SearchParamSnapshot } from './search-params.snapshots';
 
 export class SearchParamEngine<Blueprints extends Record<string, ParamBlueprints>> {
   private runtimes: SearchParamRuntimeMap<Blueprints>;

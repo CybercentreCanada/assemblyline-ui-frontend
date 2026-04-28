@@ -1,6 +1,6 @@
 import { CircularProgress, Typography, useTheme } from '@mui/material';
 import { invalidateAPIQuery, useAPIQuery } from 'core/api';
-import { createAppRoute } from 'core/router/route/route.utils';
+import { createAppRoute } from 'core/routes';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { AppVerticalBanner } from 'ui/branding';

@@ -85,7 +85,7 @@ export const DEFAULT_THEME: AppTheme = {
         mode: 'light',
         background: {
           default: BASE_LAYER.D12,
-          paper: BASE_LAYER.D12
+          paper: BASE_LAYER.D1
         },
         primary: {
           main: ACCENT_LAYER.light.PRIMARY

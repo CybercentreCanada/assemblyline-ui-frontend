@@ -1,4 +1,4 @@
-import { ALRequests, ALResponses } from 'app/app.api';
+import { APIRequests, APIResponses } from 'app/app.api';
 import { DEFAULT_APP_CONFIG } from 'app/app.configs';
 import type { APIQueryKey, APIRequest, APIResponse, BlobResponse } from './api.models';
 import { queryClient } from './api.provider';
@@ -120,7 +120,7 @@ export const updateAPIQuery = <T extends unknown = unknown>(
     prev => (prev ? { ...prev, api_response: update(prev.api_response as T) } : prev)
   );
 
-export const invalidateALQuery = <Request extends ALRequests>(
+export const invalidateALQuery = <Request extends APIRequests>(
   request: Partial<Request>,
   delay: number = DEFAULT_APP_CONFIG.api.invalidateDelay
 ) =>
@@ -158,11 +158,11 @@ export const invalidateALQuery = <Request extends ALRequests>(
     });
   }, delay);
 
-export const updateALQuery = <Request extends ALRequests>(
+export const updateALQuery = <Request extends APIRequests>(
   request: Partial<Request>,
-  updater: (prev: ALResponses<Request>) => ALResponses<Request>
+  updater: (prev: APIResponses<Request>) => APIResponses<Request>
 ) =>
-  queryClient.setQueriesData<APIResponse<ALResponses<Request>>>(
+  queryClient.setQueriesData<APIResponse<APIResponses<Request>>>(
     {
       predicate: ({ queryKey }) => {
         try {
@@ -194,5 +194,5 @@ export const updateALQuery = <Request extends ALRequests>(
         }
       }
     },
-    prev => (prev ? { ...prev, api_response: updater(prev.api_response as ALResponses<Request>) } : prev)
+    prev => (prev ? { ...prev, api_response: updater(prev.api_response as APIResponses<Request>) } : prev)
   );

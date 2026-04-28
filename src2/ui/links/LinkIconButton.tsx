@@ -1,12 +1,11 @@
-import type { AppRoute } from 'app/app.routes';
-import { AppRouteLink, useAppLinkOnClick, useAppLinkTo } from 'core/router';
+import { AppLink, AppLinkProps, useAppRouteLocation } from 'core/router';
+import type { AppRoute } from 'core/routes';
 import React, { forwardRef, memo } from 'react';
 import type { LinkProps } from 'react-router';
-import { Link } from 'react-router';
 import { IconButton } from 'ui/buttons/IconButton';
 
 type RouterLinkProps = Omit<LinkProps, 'to' | 'pathname' | 'search' | 'hash'>;
-type RouteLinkForPath<Path extends AppRoute['path']> = Extract<AppRouteLink, { path: Path }>;
+type RouteLinkForPath<Path extends AppRoute['path']> = Extract<AppLinkProps<AppRoute>, { path: Path }>;
 
 export type LinkIconButtonProps<Path extends AppRoute['path'] = AppRoute['path'], Props = RouterLinkProps> = Omit<
   Props,
@@ -18,11 +17,11 @@ function WrappedLinkIconButton<const Path extends AppRoute['path']>(
   { children, ...props }: LinkIconButtonProps<Path>,
   ref: React.ForwardedRef<HTMLAnchorElement>
 ) {
-  const to = useAppLinkTo(props);
+  const { href, state } = useAppRouteLocation(props);
   const handleClick = useAppLinkOnClick(props);
 
   return (
-    <IconButton ref={ref} component={Link} to={to} onClick={handleClick}>
+    <IconButton ref={ref} component={AppLink} to={href} state={state} onClick={handleClick}>
       {children}
     </IconButton>
   );

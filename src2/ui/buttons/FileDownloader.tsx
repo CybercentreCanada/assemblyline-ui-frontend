@@ -1,5 +1,5 @@
 import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
-import { useAppSnackbar } from 'layout/snackbar/snackbar.hooks';
+import { useAppSnackbar } from 'core/snackbar';
 // import useMyAPI from 'components/hooks/useMyAPI';
 // import useMySnackbar from 'components/hooks/useMySnackbar';
 import React, { useCallback, useMemo, useState } from 'react';

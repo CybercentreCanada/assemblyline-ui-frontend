@@ -1,6 +1,7 @@
-import { createAppRoute } from 'core/router/route/route.utils';
+import { createAppRoute } from 'core/routes';
 import { createReversePortalNode, InPortal, OutPortal } from 'features/portal';
 import React, { useEffect, useMemo, useState } from 'react';
+import { Button } from 'ui/buttons/Button';
 import { Links } from './Links';
 
 const StatefulWidget = React.memo(() => {
@@ -46,6 +47,10 @@ export const Page1Page = React.memo(() => {
 
   const [loading, setLoading] = useState<boolean>(true);
 
+
+
+
+
   useEffect(() => {
     setTimeout(() => {
       setLoading(false);
@@ -58,6 +63,7 @@ export const Page1Page = React.memo(() => {
     <div>
       <Links />
       <h1>Page 1</h1>
+      <Button to={{ path: '/subm', search: { query: '' } }}>asdasd</Button>
     </div>
   );
 

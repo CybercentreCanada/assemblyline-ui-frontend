@@ -1,5 +1,5 @@
 import { Stack, useTheme } from '@mui/material';
-import { createAppRoute } from 'core/router/route/route.utils';
+import { createAppRoute } from 'core/routes';
 import React from 'react';
 import { AppBanner, AppVerticalBanner } from 'ui/branding';
 import { PageCardCentered } from 'ui/pages/PageCardCentered';

@@ -18,8 +18,7 @@ import {
 import type { SelectChangeEvent } from '@mui/material/Select';
 import { useAPIQuery } from 'core/api';
 import { useAppConfig } from 'core/config';
-import { useAppHashParams, useAppPathParams, useAppSearchParams } from 'core/router';
-import { createAppRoute } from 'core/router/route/route.utils';
+import { createAppRoute, useAppHashParams, useAppPathParams, useAppSearchParams } from 'core/routes';
 import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CustomChip } from 'ui/CustomChip';

@@ -1,12 +1,11 @@
+import { AppRouterStore } from 'core/router/router.models';
+import { PathParamBlueprintMap, PathParamCodec } from 'features/path-params';
+import { SearchParamEngine, SearchParamSnapshot } from 'features/search-params';
 import { createAppStore } from 'features/store/createAppStore';
 import { createStoreContext } from 'features/store/createStoreContext';
 import React, { useCallback } from 'react';
 import { Location, useLocation } from 'react-router';
-import { PathParamBlueprintMap, PathParamCodec } from '../path-params/path-params.models';
-import { AppRouterStore } from '../router/router.models';
-import { SearchParamEngine } from '../search-params/lib/search-params.engine';
-import { SearchParamSnapshot } from '../search-params/lib/search-params.snapshot';
-import { RouteHash, RoutePath } from './route.models';
+import { RouteHash, RoutePath } from './routes.models';
 
 //*****************************************************************************************
 // Route Provider

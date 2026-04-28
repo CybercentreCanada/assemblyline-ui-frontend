@@ -1,14 +1,16 @@
+import {
+  PATH_PARAM_BLUEPRINTS_MAP,
+  PathParamBlueprintMap,
+  RoutePath,
+  createPathParamsCodec
+} from 'features/path-params';
+import { SEARCH_PARAM_BLUEPRINTS_MAP, SearchParamBlueprintMap, SearchParamEngine } from 'features/search-params';
 import { ComponentType, MemoExoticComponent, ReactNode } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { toElement } from 'shared/utils/app.utils';
-import { PathParamBlueprintMap } from '../path-params/path-params.models';
-import { PATH_PARAM_BLUEPRINTS_MAP, createPathParamsCodec } from '../path-params/path-params.utils';
-import { SEARCH_PARAM_BLUEPRINTS_MAP } from '../search-params/lib/search-params.blueprint';
-import { SearchParamEngine } from '../search-params/lib/search-params.engine';
-import { SearchParamBlueprintMap } from '../search-params/lib/search-params.model';
-import { DisabledBoundary, ForbiddenBoundary } from './route.components';
-import { RouteHash, RouteMeta, RoutePath } from './route.models';
-import { AppRouteProvider } from './route.providers';
+import { DisabledBoundary, ForbiddenBoundary } from './routes.components';
+import { RouteHash, RouteMeta } from './routes.models';
+import { AppRouteProvider } from './routes.providers';
 
 //*****************************************************************************************
 // Create Route
@@ -85,7 +87,7 @@ export const createAppRoute = <
       >
         <DisabledBoundary disabled={disabled} FallbackComponent={disabledComponent}>
           <ForbiddenBoundary forbidden={forbidden} FallbackComponent={forbiddenComponent}>
-            <AppRouteProvider params={paramCodec} search={searchEngine}>
+            <AppRouteProvider params={paramCodec} search={searchEngine} hash={hashCodec}>
               {toElement(component)}
             </AppRouteProvider>
           </ForbiddenBoundary>

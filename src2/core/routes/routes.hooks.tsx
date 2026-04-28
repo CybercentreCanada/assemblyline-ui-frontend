@@ -1,13 +1,11 @@
-import { AppRoute } from 'app/app.routes';
-import type { SearchParamEngine } from '../search-params/lib/search-params.engine';
-import type { SearchParamBlueprintMap } from '../search-params/lib/search-params.model';
-import type { SearchParamSnapshot } from '../search-params/lib/search-params.snapshot';
-import { useAppRouteStore } from './route.providers';
+import { useAppRouteStore } from 'core/routes';
+import { SearchParamBlueprintMap, SearchParamEngine, SearchParamSnapshot } from 'features/search-params';
+import { AppRoute } from './routes.models';
 
 type RouteByPath<Path extends AppRoute['path']> = Extract<AppRoute, { path: Path }>;
 
 //*****************************************************************************************
-// usePathParam
+// useAppPathParams
 //*****************************************************************************************
 
 type ParamsShape<Path extends AppRoute['path']> = RouteByPath<Path>['params'] extends { type: infer Params }
@@ -34,7 +32,7 @@ export function useAppPathParams<const Path extends AppRoute['path'], const Sele
 }
 
 //*****************************************************************************************
-// useSearchParam
+// useAppSearchParams
 //*****************************************************************************************
 
 type SearchShape<Path extends AppRoute['path']> =
@@ -63,7 +61,7 @@ export function useAppSearchParams<const Path extends AppRoute['path'], const Se
 }
 
 //*****************************************************************************************
-// useHashParams
+// useAppHashParams
 //*****************************************************************************************
 
 type HashShape<Path extends AppRoute['path']> =
@@ -87,7 +85,7 @@ export function useAppHashParams<const Path extends AppRoute['path'], const Sele
 }
 
 //*****************************************************************************************
-// useRoute
+// useAppRoute
 //*****************************************************************************************
 
 export type AppRouteStore<Path extends AppRoute['path']> = ParamsShape<Path> & SearchShape<Path> & HashShape<Path>;

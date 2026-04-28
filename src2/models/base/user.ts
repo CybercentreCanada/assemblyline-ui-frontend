@@ -1,4 +1,5 @@
-import type { AppUser } from 'commons/components/app/AppUserService';
+// TODO: Migrate AppUser from commons/components/app/AppUserService
+type AppUser = any;
 
 export const TYPES = [
   'admin',

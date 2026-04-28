@@ -1,7 +1,7 @@
 import BlockOutlinedIcon from '@mui/icons-material/BlockOutlined';
 import { useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
-import { createAppRoute } from 'core/router/route/route.utils';
+import { createAppRoute } from 'core/routes';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { PageCenter } from 'ui/pages';

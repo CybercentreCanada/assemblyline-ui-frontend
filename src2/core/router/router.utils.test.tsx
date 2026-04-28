@@ -1,16 +1,16 @@
 import { describe, expect, it } from 'vitest';
-import { DEFAULT_ROUTER_STORE, DEFAULT_ROUTER_PANEL } from './router.defaults';
-import { RouterStore } from './router.models';
-import { sanitizeRoutes, addRoute } from './router.utils';
+import { DEFAULT_APP_ROUTER_PANEL, DEFAULT_APP_ROUTER_STORE } from './router.defaults';
+import { AppRouterStore } from './router.models';
+import { addRoute, sanitizeRoutes } from './router.utils';
 
 //*****************************************************************************************
 // sanitizeRoutes
 //*****************************************************************************************
 describe('sanitizeRoutes', () => {
   it('removes routes that are not referenced by panels or nodes', () => {
-    const store: RouterStore = {
-      ...DEFAULT_ROUTER_STORE,
-      panels: [{ ...DEFAULT_ROUTER_PANEL, routeKey: 'r1' }],
+    const store: AppRouterStore = {
+      ...DEFAULT_APP_ROUTER_STORE,
+      panels: [{ ...DEFAULT_APP_ROUTER_PANEL, routeKey: 'r1' }],
       routes: {
         r1: { href: '/page1', state: null },
         orphan: { href: '/orphan', state: null }
@@ -23,11 +23,11 @@ describe('sanitizeRoutes', () => {
   });
 
   it('keeps routes referenced by panel tabbed/pinned keys', () => {
-    const store: RouterStore = {
-      ...DEFAULT_ROUTER_STORE,
+    const store: AppRouterStore = {
+      ...DEFAULT_APP_ROUTER_STORE,
       panels: [
         {
-          ...DEFAULT_ROUTER_PANEL,
+          ...DEFAULT_APP_ROUTER_PANEL,
           routeKey: 'active',
           pinnedRouteKeys: ['pin'],
           tabbedRouteKeys: ['tab']
@@ -49,8 +49,8 @@ describe('sanitizeRoutes', () => {
   });
 
   it('keeps routes referenced by nodes even when not in panels', () => {
-    const store: RouterStore = {
-      ...DEFAULT_ROUTER_STORE,
+    const store: AppRouterStore = {
+      ...DEFAULT_APP_ROUTER_STORE,
       nodes: {
         n1: {
           routeKey: 'from-node',
@@ -75,12 +75,12 @@ describe('sanitizeRoutes', () => {
 //*****************************************************************************************
 describe('insertLeftRoute', () => {
   it('inserts at index and trims overflow from tail', () => {
-    const store: RouterStore = {
+    const store: AppRouterStore = {
       maxPanels: 2,
       maxNodes: 2,
       panels: [
-        { ...DEFAULT_ROUTER_PANEL, routeKey: 'r1' },
-        { ...DEFAULT_ROUTER_PANEL, routeKey: 'r2' }
+        { ...DEFAULT_APP_ROUTER_PANEL, routeKey: 'r1' },
+        { ...DEFAULT_APP_ROUTER_PANEL, routeKey: 'r2' }
       ],
       nodes: {},
       routes: {
@@ -98,10 +98,10 @@ describe('insertLeftRoute', () => {
   });
 
   it('default inserts at beginning', () => {
-    const store: RouterStore = {
+    const store: AppRouterStore = {
       maxPanels: 2,
       maxNodes: 2,
-      panels: [{ ...DEFAULT_ROUTER_PANEL, routeKey: 'r1' }],
+      panels: [{ ...DEFAULT_APP_ROUTER_PANEL, routeKey: 'r1' }],
       nodes: {},
       routes: { r1: { href: '/page1', state: null } }
     };
@@ -116,12 +116,12 @@ describe('insertLeftRoute', () => {
 //*****************************************************************************************
 describe('insertRightRoute', () => {
   it('inserts after index and trims overflow from head', () => {
-    const store: RouterStore = {
+    const store: AppRouterStore = {
       maxPanels: 2,
       maxNodes: 2,
       panels: [
-        { ...DEFAULT_ROUTER_PANEL, routeKey: 'r1' },
-        { ...DEFAULT_ROUTER_PANEL, routeKey: 'r2' }
+        { ...DEFAULT_APP_ROUTER_PANEL, routeKey: 'r1' },
+        { ...DEFAULT_APP_ROUTER_PANEL, routeKey: 'r2' }
       ],
       nodes: {},
       routes: {
@@ -139,10 +139,10 @@ describe('insertRightRoute', () => {
   });
 
   it('default inserts at end', () => {
-    const store: RouterStore = {
+    const store: AppRouterStore = {
       maxPanels: 2,
       maxNodes: 2,
-      panels: [{ ...DEFAULT_ROUTER_PANEL, routeKey: 'r1' }],
+      panels: [{ ...DEFAULT_APP_ROUTER_PANEL, routeKey: 'r1' }],
       nodes: {},
       routes: { r1: { href: '/page1', state: null } }
     };
@@ -152,10 +152,10 @@ describe('insertRightRoute', () => {
   });
 
   it('adds the new route key to tabbedRouteKeys for inserted panel', () => {
-    const store: RouterStore = {
+    const store: AppRouterStore = {
       maxPanels: 3,
       maxNodes: 2,
-      panels: [{ ...DEFAULT_ROUTER_PANEL, routeKey: 'r1' }],
+      panels: [{ ...DEFAULT_APP_ROUTER_PANEL, routeKey: 'r1' }],
       nodes: {},
       routes: { r1: { href: '/page1', state: null } }
     };
@@ -174,10 +174,10 @@ describe('insertRightRoute', () => {
 //*****************************************************************************************
 describe('addRoute', () => {
   it('replaces active route for the panel and marks it as temporary', () => {
-    const store: RouterStore = {
+    const store: AppRouterStore = {
       maxPanels: 2,
       maxNodes: 2,
-      panels: [{ ...DEFAULT_ROUTER_PANEL, routeKey: 'r1', tabbedRouteKeys: ['r1'] }],
+      panels: [{ ...DEFAULT_APP_ROUTER_PANEL, routeKey: 'r1', tabbedRouteKeys: ['r1'] }],
       nodes: {},
       routes: { r1: { href: '/page1', state: null } }
     };
@@ -193,12 +193,12 @@ describe('addRoute', () => {
   });
 
   it('clamps out-of-range panel index to first panel', () => {
-    const store: RouterStore = {
+    const store: AppRouterStore = {
       maxPanels: 3,
       maxNodes: 2,
       panels: [
-        { ...DEFAULT_ROUTER_PANEL, routeKey: 'r1' },
-        { ...DEFAULT_ROUTER_PANEL, routeKey: 'r2' }
+        { ...DEFAULT_APP_ROUTER_PANEL, routeKey: 'r1' },
+        { ...DEFAULT_APP_ROUTER_PANEL, routeKey: 'r2' }
       ],
       nodes: {},
       routes: {
@@ -213,12 +213,12 @@ describe('addRoute', () => {
   });
 
   it('clamps out-of-range panel index to last panel', () => {
-    const store: RouterStore = {
+    const store: AppRouterStore = {
       maxPanels: 3,
       maxNodes: 2,
       panels: [
-        { ...DEFAULT_ROUTER_PANEL, routeKey: 'r1' },
-        { ...DEFAULT_ROUTER_PANEL, routeKey: 'r2' }
+        { ...DEFAULT_APP_ROUTER_PANEL, routeKey: 'r1' },
+        { ...DEFAULT_APP_ROUTER_PANEL, routeKey: 'r2' }
       ],
       nodes: {},
       routes: {
@@ -233,7 +233,7 @@ describe('addRoute', () => {
   });
 
   it('is a no-op when panels array is empty', () => {
-    const store: RouterStore = {
+    const store: AppRouterStore = {
       maxPanels: 2,
       maxNodes: 2,
       panels: [],
@@ -247,12 +247,12 @@ describe('addRoute', () => {
   });
 
   it('preserves existing tabbed and pinned keys while swapping active route', () => {
-    const store: RouterStore = {
+    const store: AppRouterStore = {
       maxPanels: 2,
       maxNodes: 2,
       panels: [
         {
-          ...DEFAULT_ROUTER_PANEL,
+          ...DEFAULT_APP_ROUTER_PANEL,
           routeKey: 'keep',
           pinnedRouteKeys: ['pin'],
           tabbedRouteKeys: ['keep', 'tmp', 'missing']
@@ -282,12 +282,12 @@ describe('addRoute', () => {
 //*****************************************************************************************
 describe('refreshLastUsedAt', () => {
   it('prioritizes nodes currently displayed by panels, then sorts by lastUsedAt and reindexes', () => {
-    const store: RouterStore = {
+    const store: AppRouterStore = {
       maxPanels: 2,
       maxNodes: 3,
       panels: [
-        { ...DEFAULT_ROUTER_PANEL, routeKey: 'panel-route-a' },
-        { ...DEFAULT_ROUTER_PANEL, routeKey: 'panel-route-b' }
+        { ...DEFAULT_APP_ROUTER_PANEL, routeKey: 'panel-route-a' },
+        { ...DEFAULT_APP_ROUTER_PANEL, routeKey: 'panel-route-b' }
       ],
       nodes: {
         n1: {
@@ -328,7 +328,7 @@ describe('refreshLastUsedAt', () => {
   });
 
   it('uses node key as a deterministic tie-breaker when lastUsedAt is equal', () => {
-    const store: RouterStore = {
+    const store: AppRouterStore = {
       maxPanels: 0,
       maxNodes: 3,
       panels: [],
@@ -359,7 +359,7 @@ describe('refreshLastUsedAt', () => {
 // it('navigateOpenRoute updates the next panel route', () => {
 //   const store = createStore();
 //   const result = openRoute(store, { href: '/new', state: null }, 'r1');
-//   const nextState = result.options.state as { panels: RouterStore['panels']; routes: RouterStore['routes'] };
+//   const nextState = result.options.state as { panels: AppRouterStore['panels']; routes: AppRouterStore['routes'] };
 
 //   const nextRouteKey = nextState.panels[1].route;
 //   expect(nextRouteKey).not.toBe('r2');
@@ -369,7 +369,7 @@ describe('refreshLastUsedAt', () => {
 // it('navigateOpenRoute at max panel shifts and writes to last panel', () => {
 //   const store = createStore();
 //   const result = openRoute(store, { href: '/last', state: null }, 'r2');
-//   const nextState = result.options.state as { panels: RouterStore['panels']; routes: RouterStore['routes'] };
+//   const nextState = result.options.state as { panels: AppRouterStore['panels']; routes: AppRouterStore['routes'] };
 
 //   expect(nextState.routes[nextState.panels[1].route].href).toBe('/last');
 // });
@@ -377,7 +377,7 @@ describe('refreshLastUsedAt', () => {
 // it('navigateOpenRoute is no-op for unknown current route', () => {
 //   const store = createStore();
 //   const result = openRoute(store, { href: '/ignored', state: null }, 'missing');
-//   const nextState = result.options.state as { panels: RouterStore['panels']; routes: RouterStore['routes'] };
+//   const nextState = result.options.state as { panels: AppRouterStore['panels']; routes: AppRouterStore['routes'] };
 
 //   expect(nextState.panels.map(p => p.route)).toEqual(['r1', 'r2']);
 //   expect(Object.values(nextState.routes).map(r => r.href)).not.toContain('/ignored');

@@ -1,7 +1,6 @@
-import type { AppRoute } from 'app/app.routes';
+import type { AppRoute } from 'core/routes';
 import React, { forwardRef, memo } from 'react';
-import type { LinkProps as RouterLinkProps} from 'react-router';
-import { Link as RouterLink} from 'react-router';
+import type { LinkProps as RouterLinkProps } from 'react-router';
 
 type RouterLinkProps = Omit<LinkProps, 'to' | 'pathname' | 'search' | 'hash'>;
 type RouteLinkForPath<Path extends AppRoute['path']> = Extract<AppRouteLink, { path: Path }>;

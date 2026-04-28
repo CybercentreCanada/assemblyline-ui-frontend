@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type {
+import {
   BooleanBlueprint,
   EnumBlueprint,
   FiltersBlueprint,
   NumberBlueprint,
   StringBlueprint
-} from '../lib/search-params.blueprint';
-import type { PARAM_RUNTIMES } from '../lib/search-params.runtime';
+} from './search-params.blueprints';
+import { PARAM_RUNTIMES } from './search-params.runtimes';
 
 export type ParamValues = null | boolean | number | string | string[];
 

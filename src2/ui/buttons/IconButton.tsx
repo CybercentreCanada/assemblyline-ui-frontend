@@ -1,10 +1,9 @@
 import type { IconButtonProps as MuiIconButtonProps, TooltipProps } from '@mui/material';
 import { IconButton as MuiIconButton, Skeleton, useTheme } from '@mui/material';
-import { APP_ROUTES, AppRoute } from 'app/app.routes';
-import { NavigateTo2, useAppNavigateTo } from 'core/router';
+import { AppLink, useAppRouteLocation } from 'core/router';
+import { AppRoute, CreatedAppRouteParamsMap } from 'core/routes';
 import type { CSSProperties } from 'react';
 import React, { useMemo } from 'react';
-import { Link } from 'react-router';
 import { getTextContent } from 'shared/utils/utils';
 import type { CircularProgressProps } from 'ui/buttons/CircularProgress';
 import { CircularProgress } from 'ui/buttons/CircularProgress';
@@ -14,7 +13,7 @@ export type IconButtonProps = MuiIconButtonProps & {
   loading?: boolean;
   preventRender?: boolean | (() => boolean);
   progress?: CircularProgressProps['progress'];
-  to?: NavigateTo2<AppRoute>;
+  to?: CreatedAppRouteParamsMap<AppRoute>;
   tooltip?: TooltipProps['title'];
   tooltipProps?: Omit<TooltipProps, 'children' | 'title'>;
 };
@@ -59,7 +58,7 @@ export const IconButton: React.FC<IconButtonProps> = React.memo(
       }
     }, [color, disabled, progress, theme.palette]);
 
-    const to = useAppNavigateTo(toProp, APP_ROUTES);
+    const { href, state } = useAppRouteLocation(toProp as never);
 
     return loading ? (
       <Skeleton
@@ -78,7 +77,7 @@ export const IconButton: React.FC<IconButtonProps> = React.memo(
           aria-label={id ?? getTextContent(tooltip)}
           disabled={disabled || progress !== false}
           size={size}
-          {...(!to || loading ? null : { component: Link, to })}
+          {...(!href ? null : { component: AppLink, to: href, state: state })}
           {...props}
           sx={{ height: 'fit-content', color: resolvedColor, ...props?.sx }}
         >

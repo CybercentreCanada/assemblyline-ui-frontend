@@ -1,6 +1,6 @@
 import type { Location } from 'react-router';
-import type { ParamBlueprints, ParamSource, ParamValues, SearchParamValueMap } from '../lib/search-params.model';
-import type { SearchParamSnapshot } from '../lib/search-params.snapshot';
+import { ParamBlueprints, ParamSource, ParamValues, SearchParamValueMap } from './search-params.models';
+import { SearchParamSnapshot } from './search-params.snapshots';
 
 export abstract class BaseBlueprint<T extends ParamValues> {
   /**

@@ -1,13 +1,14 @@
 import { APP_ROUTES } from 'app/app.routes';
-import React, { useMemo } from 'react';
+import { AppRouteLocation } from 'core/routes';
+import { memo, useMemo } from 'react';
 import { Route, Routes } from 'react-router';
 
-export type RoutesProps = {
-  href: string;
-  state?: any;
-};
+//*****************************************************************************************
+// App Routes
+//*****************************************************************************************
+export type AppRoutesProps = AppRouteLocation;
 
-export const AppRoutes = React.memo(({ href, state }: RoutesProps) => {
+export const AppRoutes = memo(({ href, state }: AppRoutesProps) => {
   const { pathname, search, hash } = useMemo(() => new URL(href, window.location.origin), [href]);
 
   return (
@@ -26,3 +27,5 @@ export const AppRoutes = React.memo(({ href, state }: RoutesProps) => {
     </Routes>
   );
 });
+
+AppRoutes.displayName = 'AppRoutes';

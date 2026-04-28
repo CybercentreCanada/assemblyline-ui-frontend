@@ -8,9 +8,9 @@ import {
   useTheme
 } from '@mui/material';
 import { LeftNavChildRenderProps } from '@tui/core';
-import { AppNavigateToInput, createAppRoute, useAppNavigateTo } from 'core/router';
+import { AppLink, useAppRouteLocation } from 'core/router';
+import { CreatedAppRouteParamsMap, createAppRoute } from 'core/routes';
 import React, { useMemo } from 'react';
-import { Link } from 'react-router';
 
 export type LeftNavLinkProps = {
   icon?: ListItemIconProps['children'];
@@ -19,7 +19,7 @@ export type LeftNavLinkProps = {
   preventRender?: boolean;
   primary?: ListItemTextProps['primary'];
   routes?: readonly ReturnType<typeof createAppRoute>[];
-  to?: AppNavigateToInput;
+  to?: CreatedAppRouteParamsMap;
 };
 
 export const LeftNavRoute = React.memo(
@@ -27,7 +27,7 @@ export const LeftNavRoute = React.memo(
     const theme = useTheme();
     const { active, level } = useMemo(() => navProps ?? { active: false, level: 0 }, [navProps]);
 
-    const to = useAppNavigateTo(toProp, routes);
+    const { href, state } = useAppRouteLocation(toProp as never);
 
     return (
       <ListItem disablePadding>
@@ -35,7 +35,7 @@ export const LeftNavRoute = React.memo(
           dense={level > 0}
           selected={active}
           sx={{ minHeight: undefined, paddingLeft: level === 0 ? undefined : theme.spacing(navOpen ? 4 : 2) }}
-          {...(!to ? null : { component: Link, to })}
+          {...(!href ? null : { component: AppLink, to: href, state: state })}
         >
           {icon && <ListItemIcon sx={{ color: 'inherit' }}>{icon}</ListItemIcon>}
           <ListItemText primary={primary} />

@@ -1,5 +1,5 @@
 import type { ComponentType, MemoExoticComponent, ReactNode } from 'react';
-import React from 'react';
+import React, { memo } from 'react';
 
 //*****************************************************************************************
 // DisabledBoundary
@@ -16,14 +16,12 @@ type DisabledBoundaryProps = {
   children: ReactNode | MemoExoticComponent<ComponentType<any>>;
 };
 
-export const DisabledBoundary = ({
-  disabled = false,
-  FallbackComponent = DefaultDisabledRouteFallback,
-  children
-}: DisabledBoundaryProps) => {
-  if (typeof disabled === 'function' ? disabled() : disabled) return <>{FallbackComponent}</>;
-  return <>{children}</>;
-};
+export const DisabledBoundary = memo(
+  ({ disabled = false, FallbackComponent = DefaultDisabledRouteFallback, children }: DisabledBoundaryProps) => {
+    if (typeof disabled === 'function' ? disabled() : disabled) return <>{FallbackComponent}</>;
+    return <>{children}</>;
+  }
+);
 
 DisabledBoundary.displayName = 'DisabledBoundary';
 
@@ -43,13 +41,11 @@ type ForbiddenBoundaryProps = {
   children: ReactNode | MemoExoticComponent<ComponentType<any>>;
 };
 
-export const ForbiddenBoundary = ({
-  forbidden = false,
-  FallbackComponent = DefaultForbiddenRouteFallback,
-  children
-}: ForbiddenBoundaryProps) => {
-  if (typeof forbidden === 'function' ? forbidden() : forbidden) return <>{FallbackComponent}</>;
-  return <>{children}</>;
-};
+export const ForbiddenBoundary = memo(
+  ({ forbidden = false, FallbackComponent = DefaultForbiddenRouteFallback, children }: ForbiddenBoundaryProps) => {
+    if (typeof forbidden === 'function' ? forbidden() : forbidden) return <>{FallbackComponent}</>;
+    return <>{children}</>;
+  }
+);
 
 ForbiddenBoundary.displayName = 'ForbiddenBoundary';

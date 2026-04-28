@@ -1,7 +1,7 @@
 import { Box, Link, Skeleton, Typography, useTheme } from '@mui/material';
 import { useAPIMutation, useAPIQuery } from 'core/api';
 import { useAppConfig } from 'core/config';
-import { createAppRoute } from 'core/router/route/route.utils';
+import { createAppRoute } from 'core/routes';
 import { NotFoundPage } from 'pages/not-found/not-found.route';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
