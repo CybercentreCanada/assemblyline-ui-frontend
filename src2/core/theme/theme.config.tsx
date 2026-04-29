@@ -1,3 +1,4 @@
+import { AppTheme } from '@tui/core';
 import z from 'zod';
 
 export const AppThemeSettingsSchema = z.object({
@@ -8,5 +9,7 @@ export const AppThemeSettingsSchema = z.object({
 export type AppThemeSettings = z.infer<typeof AppThemeSettingsSchema>;
 
 export type AppThemeConfig = AppThemeSettings & {
+  initialized?: boolean;
   injectFirst?: boolean;
+  skin?: AppTheme;
 };

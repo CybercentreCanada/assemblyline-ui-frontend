@@ -1,7 +1,7 @@
 import { AppRoot } from '@tui/core';
 import { useAppConfig } from 'core/config';
 import { i18n } from 'i18next';
-import React, { PropsWithChildren } from 'react';
+import React, { PropsWithChildren, useMemo } from 'react';
 import { useAppLayoutThemeMode } from './layout.hooks';
 
 export type AppLayoutProviderProps = PropsWithChildren & {
@@ -16,9 +16,11 @@ export const AppLayoutProvider = React.memo(({ children, i18n }: AppLayoutProvid
   const layout = useAppConfig(s => s?.layout?.cookies?.layout);
   const showBreadcrumbs = useAppConfig(s => s?.layout?.cookies?.showBreadcrumbs);
   const showQuickSearch = useAppConfig(s => s?.layout?.cookies?.showQuickSearch);
-  const theme = useAppConfig(s => s?.layout?.cookies?.theme);
+  const themeID = useAppConfig(s => s?.layout?.cookies?.theme);
 
   const mode = useAppLayoutThemeMode();
+  const skin = useAppConfig(s => s?.theme?.skin);
+  const themes = useMemo(() => (skin ? [skin] : []), [skin]);
 
   return (
     <AppRoot
@@ -31,9 +33,10 @@ export const AppLayoutProvider = React.memo(({ children, i18n }: AppLayoutProvid
         mode,
         showBreadcrumbs,
         showQuickSearch,
-        theme
+        theme: themeID
       }}
       i18n={i18n}
+      themes={themes}
     >
       {children}
     </AppRoot>
