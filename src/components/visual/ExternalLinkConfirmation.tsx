@@ -14,7 +14,17 @@ export const ExternalLinkConfirmation = memo(({ href, children, ...props }: Exte
 
   const [open, setOpen] = useState<boolean>(false);
 
-  const url = useMemo(() => href?.toString() || null, [href]);
+  const url = useMemo(() => {
+    const str = href?.toString() || null;
+    if (!str) return null;
+    try {
+      const { protocol } = new URL(str);
+      if (protocol !== 'http:' && protocol !== 'https:') return null;
+    } catch {
+      return null;
+    }
+    return str;
+  }, [href]);
 
   const handleContinue = useCallback(() => {
     setOpen(false);
