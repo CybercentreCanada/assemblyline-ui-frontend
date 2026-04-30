@@ -2,6 +2,7 @@ import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import { AppSwitcher } from '@tui/apps';
 import { AppPreferenceConfigs } from '@tui/core';
 import { useAppPreferences } from 'app/layout.preferences';
+import { Notifications } from 'layout/notifications';
 import { useMemo } from 'react';
 import { DocumentationButton } from '../components/DocumentationButton';
 import { EmailButton } from '../components/EmailButton';
@@ -31,6 +32,7 @@ export const useAppTemplatePreferences = () => {
             right: [
               <DocumentationButton key="documentation" />,
               <EmailButton key="email" />,
+              <Notifications key="notifications" />,
               <AppSwitcher key="app-switcher" />,
               <UserProfile key="user-profile" />
             ]
