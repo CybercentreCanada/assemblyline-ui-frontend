@@ -17,6 +17,7 @@ export const ExternalLinkConfirmation = memo(({ href, children, ...props }: Exte
   const url = useMemo(() => {
     const str = href?.toString() || null;
     if (!str) return null;
+    if (str.startsWith('/')) return str;
     try {
       const { protocol } = new URL(str);
       if (protocol !== 'http:' && protocol !== 'https:') return null;
