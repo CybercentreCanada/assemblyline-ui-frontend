@@ -31,7 +31,7 @@ If your tool doesn't auto-discover rules, paste this at the start of a session:
 ## Files
 
 | File | What it Covers |
-|------|---------------|
+| ---- | -------------- |
 | [architecture-rules.md](./architecture-rules.md) | Layer dependencies, forbidden patterns, required patterns, core principles |
 | [component-patterns.md](./component-patterns.md) | How to write React components (structure, hooks, handlers, conditionals) |
 | [state-patterns.md](./state-patterns.md) | How to read/write state (Zustand, React Query, custom hooks) |

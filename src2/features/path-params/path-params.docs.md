@@ -17,6 +17,7 @@ Type-safe URL path parameter extraction and encoding. Provides compile-time type
 ### Blueprint
 
 A `PathParamBlueprint<T>` defines how a single path param segment is handled:
+
 - `type` — The TypeScript type marker (used for inference only)
 - `parse(value: string | undefined) → T` — Converts a raw URL segment into the typed value
 - `stringify(value: T) → string` — Converts a typed value back to a URL-safe string
@@ -28,6 +29,7 @@ A `PathParamBlueprint<T>` defines how a single path param segment is handled:
 ### Codec
 
 `PathParamCodec<Blueprints>` is the compiled output of `createPathParamsCodec`. It contains:
+
 - `blueprints` — The original blueprint definitions
 - `type` — A typed object used for inference (never read at runtime)
 - `parse(location) → values` — Splits `location.pathname` by the base path and applies each blueprint's parser
@@ -42,7 +44,7 @@ The `PathParamKeyForPath<Path>` utility type recursively extracts `:param` segme
 ### Available Blueprint Types
 
 | Blueprint | Default | Parse logic |
-|-----------|---------|-------------|
+| --------- | ------- | ----------- |
 | `string(defaultValue?)` | `''` | Returns raw segment or default |
 | `number(defaultValue?)` | `0` | `Number(value)`, falls back if `NaN` |
 | `boolean(defaultValue?)` | `false` | `'true'`/`'1'` → true, `'false'`/`'0'` → false |
@@ -88,7 +90,7 @@ The codec handles the parsing step invisibly — when the router detects a locat
 ### Key Files
 
 | File | Role |
-|------|------|
+| ---- | ---- |
 | `path-params.models.ts` | Type definitions: `RoutePath`, `PathParamBlueprint`, `PathParamBlueprintMap`, `PathParamCodec`, `PathParamKeyForPath` |
 | `path-params.codec.ts` | `PATH_PARAM_BLUEPRINTS_MAP` (blueprint factories), `createPathParamsCodec` (codec factory) |
 | `path-params.codec.test.ts` | Unit tests for codec parse/stringify |
@@ -97,7 +99,7 @@ The codec handles the parsing step invisibly — when the router detects a locat
 ### Type Utilities
 
 | Type | Purpose |
-|------|---------|
+| ---- | ------- |
 | `RoutePath` | Alias for `string` — the raw path pattern |
 | `PathParamKeyForPath<Path>` | Extracts `:param` keys from a path literal |
 | `PathParamBlueprint<T>` | Single param definition (type + parse + stringify) |

@@ -7,6 +7,7 @@ Historically, complex behavior was packed into single large components so everyt
 The solution is to break UI into smaller, focused components each wrapped in `memo()`. This limits the scope of re-renders — only the component whose specific slice of state changed will re-render, not its siblings or parent. Smaller components with a focused purpose are always preferred over monolithic components that do everything.
 
 **Guiding principles:**
+
 - One component = one responsibility
 - Wrap every exported component in `memo()` to cut off unnecessary re-render propagation
 - Read state via selectors so each component subscribes only to what it needs
@@ -41,6 +42,7 @@ MyComponent.displayName = 'MyComponent';
 ```
 
 **Rules:**
+
 - Every component is preceded by a comment delimiter block
 - Props are defined as a named `type` export directly above the component
 - Each prop has a JSDoc comment explaining its purpose
@@ -89,7 +91,7 @@ const MyComponent = memo(({ onClose }: MyComponentProps) => {
 - **Components (no generics):** Use `memo()` with an arrow function — avoids writing the component name twice
 - **Components (with generics):** Use the `function` keyword — the only case where `function` is needed
 
-### Standard component (arrow + memo):
+### Standard component (arrow + memo)
 
 ```typescript
 //*****************************************************************************************
@@ -114,7 +116,7 @@ export const Component = memo(
 Component.displayName = 'Component';
 ```
 
-### Generic component (function keyword + forwardRef + type cast):
+### Generic component (function keyword + forwardRef + type cast)
 
 ```typescript
 //*****************************************************************************************
@@ -152,10 +154,10 @@ WrappedComponent.displayName = 'WrappedComponent';
 (Component as any).displayName = 'Component';
 ```
 
-### When to use which:
+### When to use which
 
 | Scenario | Style |
-|----------|-------|
+| -------- | ----- |
 | Component without generic props | Arrow function inside `memo()` |
 | Component with generic type params | `function` keyword + `memo(forwardRef(...))` with type cast |
 | Hooks, handlers, utilities | Arrow function |
@@ -165,7 +167,7 @@ WrappedComponent.displayName = 'WrappedComponent';
 Every function inside a component must be wrapped in `useCallback`. Naming distinguishes local handlers from prop callbacks:
 
 | Prefix | Meaning | Example |
-|--------|---------|---------|
+| ------ | ------- | ------- |
 | `handle*` | Handled in this component | `const handleOpen = useCallback(...)` |
 | `on*` | Passed in as a prop | `onClose: () => void` |
 
@@ -195,6 +197,7 @@ MyDialog.displayName = 'MyDialog';
 ```
 
 **Rules:**
+
 - All component-internal functions use `useCallback`
 - Local handlers: `handle<Action>` (e.g., `handleOpen`, `handleSave`, `handleDelete`)
 - Prop callbacks: `on<Action>` (e.g., `onClose`, `onChange`, `onSubmit`)
@@ -205,7 +208,7 @@ MyDialog.displayName = 'MyDialog';
 Limit prop drilling in favor of store-based solutions for maximum performance and focused re-renders:
 
 | Solution | When to Use |
-|----------|------------|
+| -------- | ----------- |
 | `useAppConfig` / `useAppSetConfig` | App-wide state (layout, auth, config) |
 | `createAppStore` | Feature-scoped state shared across a component tree |
 | TanStack Form stores | Form state with validation |
@@ -233,7 +236,7 @@ Components are tested end-to-end using Playwright with the Page Object Model (PO
 
 ### File Structure
 
-```
+```text
 module/
   my-feature.components.tsx
   pom/
@@ -275,6 +278,7 @@ export class MyFeaturePOM {
 ```
 
 **POM rules:**
+
 - File naming: `<ComponentName>.pom.ts`
 - One class per component
 - Expose locators as getters
@@ -311,6 +315,7 @@ test.describe('MyFeature', () => {
 ```
 
 **Spec rules:**
+
 - File naming: `*.spec.ts`
 - Import `test` and `expect` from `@playwright/test`
 - One `test.describe` per feature/component
@@ -352,6 +357,7 @@ return <Content />;
 ```
 
 **Rules:**
+
 - Ternary for either/or rendering (show A or B)
 - `&&` for show-or-nothing (show A or nothing)
 - Never early return — the component always returns a single JSX expression
@@ -387,6 +393,7 @@ setCount(0);
 ```
 
 **Rules:**
+
 - JSDoc for all exported types, functions, and components
 - Comment delimiter blocks between logical groups (components, function groups)
 - Inline comments only for non-obvious "why" explanations

@@ -74,6 +74,7 @@ const App = memo(() => (
 ```
 
 `AppRouterProvider` composes:
+
 1. `BrowserRouter` (react-router's base with `basename="/"`)
 2. `AppRouterStoreSync` — reads `useLocation()` on every navigation and hydrates the router store from either `location.state` (preferred, full fidelity) or `location.search` (fallback, query params only)
 
@@ -90,7 +91,7 @@ type AppRouterConfig = {
 ```
 
 | Setting | Effect |
-|---------|--------|
+| ------- | ------ |
 | `maxPanels: 1` | Single panel, no split view. Navigating always replaces the current view. |
 | `maxPanels: 2` | Two panels max. Navigating opens a split to the right; if already at 2, the leftmost is collapsed. |
 | `maxNodes: 0` | No background caching. Only active panel routes stay mounted. Navigating away always unmounts. |
@@ -186,7 +187,7 @@ const setStore = useAppRouterSetStore();
 ### Key Files
 
 | File | Role |
-|------|------|
+| ---- | ---- |
 | `router.models.tsx` | Type definitions: `AppRouterPanel`, `AppRouterNode`, `AppRouterRoute`, `AppRouterStore`, `AppLinkProps` |
 | `router.config.tsx` | Zod schema for config validation, `AppRouterConfig` type |
 | `router.defaults.tsx` | Default values for panels, nodes, routes, store; example store for fallback |
@@ -208,7 +209,7 @@ const setStore = useAppRouterSetStore();
 The previous implementation used a "Drawer" component for side-by-side viewing. Every page managed the Drawer's state (what page was open in it, its actions, its transitions), creating massive coupling. Some states were stored only in component memory and couldn't be reproduced from the URL, so shared links were broken. The hash (`#sha256=...`) was used as a partial workaround but only covered a few variables.
 
 | Legacy Limitation | New Router Solution |
-|-------------------|--------------------|
+| ----------------- | ------------------- |
 | Pages managed each other's state via Drawer | Pages have zero awareness of other panels — router handles orchestration |
 | States not reproducible from URL | Full state serialized into query params + `location.state` |
 | Navigation unmounts previous view | LRU nodes keep views mounted; navigation is instant |

@@ -50,6 +50,7 @@ const { data } = useAPIQuery<ResponseType>({
 ```
 
 **Rules:**
+
 - Always type the response: `useAPIQuery<ResponseType>(...)`
 - Use `disabled` to conditionally skip queries — never conditionally call the hook
 - Use `delay` for user-input-driven queries (search, filtering)
@@ -193,7 +194,7 @@ const { data, isError, error } = useAPIQuery<ResponseType>({
 ### What NOT to Do
 
 | Anti-pattern | Why | Do instead |
-|-------------|-----|-----------|
+| ------------ | --- | ---------- |
 | Raw `fetch` or `axios` | Bypasses token handling, error normalization, caching | `useAPIQuery` / `useAPIMutation` |
 | `useQuery` / `useMutation` directly | Bypasses app conventions and response normalization | Use the app's hooks |
 | Wrapper hooks for single mutations | Hides data flow, premature abstraction | Inline mutations |

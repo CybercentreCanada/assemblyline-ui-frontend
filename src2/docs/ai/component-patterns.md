@@ -100,6 +100,7 @@ const handleSave = useAPIMutation(
 ### Hook Ordering
 
 Inside a component, hooks follow this strict order:
+
 1. Library hooks (i18next, router, MUI theme)
 2. App/core hooks (store, API)
 3. `useState` (rare — local ephemeral state only)

@@ -3,7 +3,7 @@
 ## Where to Put New Code
 
 | What you're adding | Where it goes |
-|-------------------|--------------|
+| ------------------ | ------------- |
 | New page/view | `pages/<PageName>.tsx` |
 | Layout-level feature (drawer, panel, toolbar) | `layout/<feature>/` |
 | Reusable domain-agnostic utility | `features/<feature>/` |
@@ -16,7 +16,7 @@
 
 Every file in a module uses a dot-prefix matching the folder name:
 
-```
+```text
 <module>/
 ├── <module>.components.tsx    ← React components (UI)
 ├── <module>.hooks.tsx         ← Custom hooks
@@ -70,6 +70,7 @@ import type { MyProps } from './my-feature.models';
 ```
 
 **Rules:**
+
 - Never use default imports — always destructure
 - Use `import type {}` for type-only imports
 - Barrel exports (`index.ts`) acceptable for module public APIs
@@ -86,6 +87,7 @@ export type { NotificationModel } from './notifications.models';
 ```
 
 Rules:
+
 - Only export what other modules actually import
 - Do NOT re-export everything — keep internals private
 - Do NOT create nested barrel exports (no `index.ts` in subfolders unless it's a separate module)

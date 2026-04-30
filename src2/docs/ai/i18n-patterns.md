@@ -4,7 +4,7 @@
 
 Each module has its own translation files:
 
-```
+```text
 <module>.i18n.en.json   ← English
 <module>.i18n.fr.json   ← French
 ```
@@ -40,7 +40,7 @@ const MyComponent = memo(function MyComponent() {
 });
 ```
 
-## Rules
+## Usage Rules
 
 1. **All user-visible strings must use translation keys** — no hardcoded text
 2. **No fallback default values** — use strict key usage: `t('key')` not `t('key', 'Default')`

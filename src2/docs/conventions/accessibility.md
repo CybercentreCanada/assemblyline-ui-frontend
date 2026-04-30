@@ -53,6 +53,7 @@ Add `aria-*` attributes to every interactive and meaningful element. These attri
 ```
 
 **Required aria attributes:**
+
 - `aria-label` — on every icon button and non-text interactive element
 - `aria-expanded` — on every toggle/accordion trigger
 - `aria-hidden` — on decorative elements and hidden content
@@ -65,7 +66,7 @@ Add `aria-*` attributes to every interactive and meaningful element. These attri
 Use the correct HTML element before reaching for aria attributes:
 
 | Need | Use | Not |
-|------|-----|-----|
+| ---- | --- | --- |
 | Navigation | `<nav>` | `<div role="navigation">` |
 | Main content | `<main>` | `<div role="main">` |
 | Section heading | `<h1>`–`<h6>` | `<div aria-level="1">` |
@@ -101,6 +102,7 @@ All interactive elements must be keyboard-accessible:
 Aria attributes and `data-testid` provide reliable locators for Playwright POMs. Prefer semantic locators over test-specific attributes when possible:
 
 **Locator priority (best to worst):**
+
 1. `getByRole()` — uses aria roles and labels (best: accessible AND testable)
 2. `getByLabel()` — uses `aria-label` or associated `<label>`
 3. `getByText()` — visible text content
@@ -127,6 +129,7 @@ get itemRows() {
 ```
 
 **Rules for `data-testid`:**
+
 - Use when no semantic locator is available (e.g., generic containers, repeated items in lists)
 - Name format: `kebab-case` describing the element's purpose
 - Add directly to the DOM element: `<div data-testid="alert-details-panel">`
@@ -140,11 +143,13 @@ get itemRows() {
 Rely on MUI's theme palette for color choices — the default palettes are designed to meet WCAG AA contrast ratios (4.5:1 for normal text, 3:1 for large text). When using raw HTML elements with the `style` prop:
 
 - Always use theme palette colors accessed via `useTheme()`:
+
   ```typescript
   const theme = useTheme();
   // ✅ Theme colors maintain proper contrast in both light and dark modes
   <div style={{ color: theme.palette.text.primary, backgroundColor: theme.palette.background.paper }}>
   ```
+
 - Never hardcode colors — they won't adapt to dark mode and may fail contrast checks
 - For status colors (error, warning, success), use `theme.palette.error.main`, `theme.palette.warning.main`, etc.
 - For text on colored backgrounds, use `theme.palette.error.contrastText`, etc.

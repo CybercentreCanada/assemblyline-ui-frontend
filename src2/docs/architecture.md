@@ -5,11 +5,13 @@
 This architecture was redesigned to move away from a **technology-based structure** (grouping by technical role: `components/`, `hooks/`, `utils/`, `types/`) into a **feature-based structure** (grouping by domain resource).
 
 **The problem with technology-based architecture:**
+
 - Related files scattered across distant folders (`components/Alert.tsx`, `hooks/useAlert.ts`, `types/alert.ts`, `utils/alert.ts`)
 - Constantly navigating back to the top of the tree to find sibling files
 - The "separation of concerns" by file role breaks down at scale — with a big application, it's far better to have everything related to a resource in one location
 
 **The solution:**
+
 - All files related to a feature/resource live together in a single folder
 - You never leave that folder when working on a feature
 - File naming makes the role explicit: `<primary>-<secondary>.<role>.<ext>`
@@ -18,7 +20,7 @@ This architecture was redesigned to move away from a **technology-based structur
 ## Technology Stack
 
 | Layer | Technology |
-|-------|-----------|
+| ----- | ---------- |
 | UI Framework | React 18+ (StrictMode, memo, Activity API) |
 | State | Zustand (vanilla store + devtools) |
 | Server State | TanStack React Query (persisted, lz-string compressed) |
@@ -38,6 +40,7 @@ This is the core of the architecture. The application is divided into layers wit
 The entry point and top-level configuration of the application. This layer bootstraps everything.Nothing domain-specific lives here — it's purely infrastructure that wires the app together on startup.
 
 **Contains:**
+
 - `app.tsx` — Root component that composes all providers
 - `app.api.tsx` — API client configuration (base URL, interceptors, query client)
 - `app.configs.tsx` — Global configuration constants and defaults
@@ -52,6 +55,7 @@ The entry point and top-level configuration of the application. This layer boots
 The foundational systems that the entire application depends on. These are framework-level concerns that are domain-agnostic — they provide capabilities that any feature or page can consume. Core modules are heavily tested and rarely change.
 
 **Contains:**
+
 - [`api/`](../core/api/api.docs.md) — HTTP client abstraction, request/response interceptors, query/mutation factories
 - [`auth/`](../core/auth/auth.docs.md) — Authentication flow, token management, session handling
 - [`config/`](../core/config/config.docs.md) — Global Zustand store (`AppConfig`), selectors, setters
@@ -67,6 +71,7 @@ The foundational systems that the entire application depends on. These are frame
 Self-contained, reusable modules that provide a specific capability to the application. Unlike `core/`, these are opt-in — a page or layout component uses them when it needs that specific functionality. Each feature is independently testable and has no knowledge of the pages that consume it.
 
 **Contains:**
+
 - [`classification/`](../features/classification/classification.docs.md) — Classification banner and marking system
 - [`form/`](../features/form/form.docs.md) — TanStack Form integration, form field components, validation patterns
 - `hash-params/` — URL hash parameter reading and writing
@@ -82,6 +87,7 @@ Self-contained, reusable modules that provide a specific capability to the appli
 Components that form the application's visual structure and chrome — everything the user sees that isn't page-specific content. These components compose features and core modules into the actual UI shell.
 
 **Contains:**
+
 - [`apps/`](../layout/apps/apps.docs.md) — Application switcher and app registry UI
 - [`auth/`](../layout/auth/auth.docs.md) — Login, logout, session expired screens
 - `carousel/` — Carousel/slideshow layout components
@@ -96,6 +102,7 @@ Components that form the application's visual structure and chrome — everythin
 Pure type definitions with zero runtime code and zero internal dependencies. This is the single source of truth for data shapes used across the application.
 
 **Contains:**
+
 - `api/` — Request input and response output types for API calls (will be auto-generated from OpenAPI)
 - `base/` — Mirror of assemblyline-base backend models (must match exactly)
 - `messages/` — Mirror of backend message models from assemblyline-base
@@ -106,6 +113,7 @@ Pure type definitions with zero runtime code and zero internal dependencies. Thi
 The leaf nodes of the application. Each page is the component rendered when the user navigates to a specific route. Pages are thin orchestrators — they compose layout components, read from stores, and wire up mutations. Complex logic is pushed down into utilities and hooks; the page itself stays focused on assembly.
 
 **Contains:**
+
 - One file (or folder) per route
 - Pages compose components from `layout/`, `features/`, and `ui/`
 - Each page primarily affects a **resource** and secondarily performs an **action**
@@ -116,6 +124,7 @@ The leaf nodes of the application. Each page is the component rendered when the 
 Generic code that are used across multiple layers but don't belong to any specific feature or core module. These are small, general-purpose building blocks that have no domain knowledge.
 
 **Contains:**
+
 - `hooks/` — Generic reusable hooks (debounce, throttle, media queries, etc.)
 - `models/` — Generic TypeScript utility types (mapped types, conditional types)
 - `utils/` — Generic utility functions (formatting, parsing, string manipulation)
@@ -129,6 +138,7 @@ The lowest-level UI building blocks. These are thin wrappers around MUI componen
 Shared test utilities, fixtures, mocks, and setup files used across unit and E2E tests. This is not where tests live (those are co-located with their source) — this is where test support code lives.
 
 **Contains:**
+
 - `vitest/` — Vitest setup, global mocks, test utilities, custom matchers
 - `playwright/` — Playwright configuration, global setup/teardown, shared fixtures
 
@@ -136,7 +146,7 @@ Shared test utilities, fixtures, mocks, and setup files used across unit and E2E
 
 Dependencies flow **downward only**:
 
-```
+```text
 pages → layout → features → core → models
          ↓         ↓         ↓
         app       shared     ui
@@ -150,7 +160,7 @@ pages → layout → features → core → models
 
 ## Data Flow
 
-```
+```text
 ┌─────────────────────────────────────────────────────┐
 │                     Browser                          │
 └──────────────────────┬──────────────────────────────┘
@@ -200,4 +210,3 @@ Files are co-located by domain/resource, not by technical role. Everything about
 Each page primarily affects a **resource** and secondarily performs an **action**. This is reflected in the file naming (`<resource>-<action>.<role>.<ext>`) and in folder organization.
 
 See `docs/conventions/modules.md` for detailed module organization patterns.
-

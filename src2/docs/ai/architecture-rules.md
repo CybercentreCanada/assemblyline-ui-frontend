@@ -4,7 +4,7 @@
 
 The codebase has strict dependency layers (top imports from bottom, never reverse):
 
-```
+```text
 pages → layout → features → core → models → ui
 ```
 

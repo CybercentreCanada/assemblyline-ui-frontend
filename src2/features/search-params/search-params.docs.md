@@ -23,6 +23,7 @@ Comprehensive URL search parameter management system. Handles typed reading, wri
 ### Blueprint
 
 A class extending `BaseBlueprint<T>` that defines:
+
 - **Key** — The query param name in the URL (e.g., `?page=2` → key = `"page"`)
 - **Default value** — What to use when the param is missing or invalid
 - **Parse** — Convert a raw string from the URL into the typed value
@@ -30,8 +31,9 @@ A class extending `BaseBlueprint<T>` that defines:
 - **Origin** — Where to resolve the value from (`'search'` | `'state'` | `'snapshot'`)
 
 Available blueprint classes:
+
 | Class | Value type | Notes |
-|-------|-----------|-------|
+| ----- | ---------- | ----- |
 | `BooleanBlueprint` | `boolean` | Parses `'true'`/`'false'` |
 | `NumberBlueprint` | `number` | Supports `.min()` / `.max()` clamping |
 | `StringBlueprint` | `string` | Direct string passthrough |
@@ -41,6 +43,7 @@ Available blueprint classes:
 ### Engine
 
 `SearchParamEngine<Blueprints>` is the orchestrator. Given a map of blueprints, it:
+
 1. Creates a runtime wrapper for each blueprint (exposing protected methods as public)
 2. Provides `full(params)` — resolve all params, filling defaults for missing ones
 3. Provides `delta(params)` — resolve only non-default params (for minimal URL serialization)
@@ -49,6 +52,7 @@ Available blueprint classes:
 ### Snapshot
 
 `SearchParamSnapshot<Blueprints>` is an immutable value object holding the current resolved values. It provides:
+
 - `has(key, value?)` — Check if a param has a valid value (optionally matching a specific value)
 - `get(key)` — Get a single param value
 - `pick(keys)` / `omit(keys)` — Create a subset snapshot
@@ -65,6 +69,7 @@ The `Runtime()` factory wraps a blueprint class, promoting its protected methods
 ### Store
 
 `createSearchParamsStore()` creates a context-based store with:
+
 - A `SearchParamsProvider` that wires up the engine + location sync
 - A `useSearchParams` hook that returns the current snapshot + setters
 - Uses `useSyncExternalStore` for tear-free reads
@@ -90,7 +95,7 @@ const PARAMS = {
 ### Blueprint Options (Builder Methods)
 
 | Method | Effect |
-|--------|--------|
+| ------ | ------ |
 | `.defaultValue(v)` | Set the default/fallback value |
 | `.ephemeral()` | Exclude from localStorage persistence |
 | `.ignored()` | Changes don't trigger snapshot difference detection |
@@ -164,7 +169,7 @@ clearDefaultParams();
 ### Key Files
 
 | File | Role |
-|------|------|
+| ---- | ---- |
 | `search-params.models.tsx` | Type definitions: `ParamValues`, `ParamSource`, `ParamBlueprints`, `InferValue`, `SearchParamValueMap`, `SearchParamRuntimeMap` |
 | `search-params.blueprints.tsx` | `BaseBlueprint<T>` abstract class + concrete classes: `BooleanBlueprint`, `NumberBlueprint`, `StringBlueprint`, `EnumBlueprint`, `FiltersBlueprint` |
 | `search-params.engines.tsx` | `SearchParamEngine` — orchestrates blueprints into full/delta/fromLocation resolution |
@@ -176,7 +181,7 @@ clearDefaultParams();
 ### Engine Methods
 
 | Method | Purpose |
-|--------|---------|
+| ------ | ------- |
 | `getDefaultValues()` | Snapshot with all defaults |
 | `setDefaultValues(params)` | Override defaults from URLSearchParams (used for localStorage restore) |
 | `getEphemeralKeys()` | Keys excluded from persistence |

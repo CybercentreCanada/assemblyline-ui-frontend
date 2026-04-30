@@ -27,7 +27,7 @@ A DOM container (`<div ref>`) that calls `node.setOutlet(el)` on mount. This phy
 
 ### Lifecycle
 
-```
+```text
 createReversePortalNode()  →  node (detached <div>)
          │
     InPortal(node)         →  children rendered into node.hostEl (always mounted)
@@ -100,14 +100,14 @@ const node = createReversePortalNode();
 ### Key Files
 
 | File | Role |
-|------|------|
+| ---- | ---- |
 | `portal.components.tsx` | `createReversePortalNode`, `InPortal`, `OutPortal` |
 | `index.tsx` | Public exports |
 
 ### Exports
 
 | Export | Type | Purpose |
-|--------|------|---------|
+| ------ | ---- | ------- |
 | `createReversePortalNode()` | Function | Creates a detached portal node with `hostEl` + `setOutlet` |
 | `InPortal` | Component | Renders children into `node.hostEl` via `createPortal` |
 | `OutPortal` | Component | Mounts `node.hostEl` into its DOM position via `setOutlet` |

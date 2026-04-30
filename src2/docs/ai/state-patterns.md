@@ -121,6 +121,7 @@ const [Provider, useStore] = createAppStore({
 ```
 
 Use when:
+
 - State is private to one feature/component tree
 - State has complex update logic
 - State lifecycle is tied to mount/unmount

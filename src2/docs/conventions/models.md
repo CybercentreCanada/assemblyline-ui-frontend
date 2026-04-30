@@ -18,7 +18,7 @@ Well-typed models also serve as living documentation — reading a type definiti
 ### `models/` Structure
 
 | Path | Purpose |
-|------|---------|
+| ---- | ------- |
 | `models/base/` | Mirror of backend models from the assemblyline-base repository. Must match the backend exactly — same field names, descriptions, and sorting |
 | `models/messages/` | Mirror of backend message models from assemblyline-base. Same parity rules apply |
 | `models/ontology/` | Mirror of backend ontology models from assemblyline-base. Same parity rules apply |
@@ -54,6 +54,7 @@ export type Record = {
 ```
 
 **Rules:**
+
 - Fields are always sorted alphabetically
 - Each type has a JSDoc comment explaining its purpose
 - Each field has a JSDoc comment explaining what it represents
@@ -90,6 +91,7 @@ export const DEFAULT_RECORD: Record = {
 ```
 
 **Rules:**
+
 - Named `DEFAULT_<MODEL>` in `SCREAMING_SNAKE_CASE`
 - Defined directly below its type in the same file
 - Fields sorted alphabetically (same as the type)
@@ -110,10 +112,12 @@ export type StoredConfig = z.infer<typeof StoredConfigSchema>;
 ```
 
 **When to use Zod:**
+
 - Parsing localStorage/sessionStorage config values
 - Ensuring manually edited storage values don't break the app
 
 **When NOT to use Zod:**
+
 - API responses (backend validates; trust the model)
 - Internal type definitions (just use `type`)
 - Props (validated by TypeScript at compile time)
@@ -133,6 +137,7 @@ enum Status { Pending, Active, Completed, Archived }
 ```
 
 **Rules:**
+
 - Array name in `SCREAMING_SNAKE_CASE`
 - Type name in `PascalCase`, derived via `(typeof ARRAY)[number]`
 - The array is the source of truth — use it for iteration, validation, dropdowns, etc.

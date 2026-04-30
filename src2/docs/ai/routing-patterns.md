@@ -8,13 +8,13 @@ The app uses a custom multi-panel router built on react-router v6. It supports c
 
 1. Define the route in `app/app.routes.tsx`:
 
-```typescript
-export const myPageRoute = createRoute({
-  path: '/my-page/:id',
-  params: z.object({ id: z.string() }),
-  search: z.object({ tab: z.enum(['overview', 'details']).optional() }),
-});
-```
+   ```typescript
+   export const myPageRoute = createRoute({
+     path: '/my-page/:id',
+     params: z.object({ id: z.string() }),
+     search: z.object({ tab: z.enum(['overview', 'details']).optional() }),
+   });
+   ```
 
 2. Create the page component in `pages/MyPage.tsx`
 
@@ -54,7 +54,7 @@ navigate(myPageRoute, { params: { id: '456' } });
 ## Navigation Hooks
 
 | Hook | Purpose |
-|------|---------|
+| ---- | ------- |
 | `useNavigate` | Navigate to a typed route |
 | `useRouteParams` | Read typed path params |
 | `useRouteSearch` | Read typed search params |
@@ -64,7 +64,7 @@ navigate(myPageRoute, { params: { id: '456' } });
 
 ## File Organization
 
-```
+```text
 core/router/        → Router engine: models, providers, hooks, utils
 core/routes/        → Route definitions: factories, typed params, guards
 layout/router/      → Router UI: AppRouterLayout, AppRouterPanel, AppRouterNode

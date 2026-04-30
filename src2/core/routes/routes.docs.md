@@ -19,6 +19,7 @@ The route definition system that provides compile-time type safety for all navig
 ### Route Factory
 
 `createAppRoute` takes a path string and optional param/search/hash definitions, then returns a route object containing:
+
 - The path pattern (e.g., `/alerts/:id`)
 - A `params` codec (parse URL segments → typed object, stringify typed object → URL segments)
 - A `search` engine (parse query string → typed snapshot, delta → minimal query string)
@@ -32,6 +33,7 @@ Path params use blueprint-based codecs from `features/path-params`. Each param k
 ### Search Param Engine
 
 Search params use `features/search-params` which provides:
+
 - **Blueprints** — Define each param's type, default value, and serialization
 - **Delta** — Only non-default values are serialized to the URL, keeping it clean
 - **Snapshots** — A frozen object representing current search param state
@@ -74,7 +76,7 @@ export const APP_ROUTES = [
 ### Route Options
 
 | Option | Purpose |
-|--------|---------|
+| ------ | ------- |
 | `path` | URL pattern with `:param` segments |
 | `params` | Path param blueprints — defines codec for each `:param` |
 | `search` | Search param blueprints — defines typed query params |
@@ -155,7 +157,7 @@ const { href, state } = buildRouteLocation(APP_ROUTES, {
 ### Key Files
 
 | File | Role |
-|------|------|
+| ---- | ---- |
 | `routes.models.ts` | Type definitions: `AppRoute`, `CreatedAppRoute`, `CreatedAppRouteParamsMap`, `AppRouteLocation` |
 | `routes.factories.tsx` | `createAppRoute` — builds a route object from path + options |
 | `routes.hooks.tsx` | `useAppPathParams`, `useAppSearchParams`, `useAppHashParams`, `useAppRoute` |
@@ -167,7 +169,7 @@ const { href, state } = buildRouteLocation(APP_ROUTES, {
 ### Utility Functions
 
 | Function | Purpose |
-|----------|---------|
+| -------- | ------- |
 | `findAppRoute` | Finds a route definition matching a typed destination |
 | `buildRoutePathname` | Resolves `:param` segments into actual values via codec |
 | `buildRouteSearch` | Serializes search params via delta (only non-default values) |

@@ -22,6 +22,7 @@ Global application state management via a single Zustand store (`AppConfig`). Th
 The application needs to share state across deeply nested component trees — auth status, layout preferences, server-derived configuration, and transient UI state (drawers, modals, etc.).
 
 Options considered:
+
 1. **React Context** — Causes full subtree re-renders on any change
 2. **Redux** — Heavy boilerplate, overkill for our needs
 3. **Multiple Zustand stores** — Clean separation but harder cross-store coordination
@@ -30,11 +31,13 @@ Options considered:
 The single-store approach won because selector-based subscriptions prevent unnecessary re-renders, there's a single source of truth (easy to debug with devtools), and zero boilerplate to add new state (just extend the type).
 
 **Tradeoffs:**
+
 - Mixes concerns: UI state, server-derived state, and persisted preferences live together
 - Nested updates require manual spreading (no immer)
 - Risk of "god object" if discipline isn't maintained
 
 **Mitigations:**
+
 - Config is typed — adding fields requires touching the type definition
 - Each domain (layout, router, theme, auth) owns a nested subtree
 - Server-derived state is being progressively moved to React Query cache
@@ -45,7 +48,7 @@ The single-store approach won because selector-based subscriptions prevent unnec
 State is categorized by **ownership and lifecycle**:
 
 | Category | Owner | Lifetime | Storage |
-|----------|-------|----------|---------|
+| -------- | ----- | -------- | ------- |
 | UI State | Client | Session | Zustand (AppConfig) |
 | Server State | API | Cache TTL | React Query |
 | Navigation State | URL | Page visit | react-router / search params |
@@ -107,6 +110,7 @@ Key: `al.settings`
 ## React Query (TanStack)
 
 All API data fetching and caching uses React Query. Query results are:
+
 - Cached with configurable `staleTime` and `gcTime`
 - Persisted to sessionStorage via `PersistQueryClientProvider`
 - Compressed with lz-string to reduce storage size
@@ -118,6 +122,7 @@ After mutations, invalidate related queries explicitly. Do not rely on automatic
 For feature-local state that doesn't belong in AppConfig, use `createAppStore` (Zustand wrapper in `features/store/`). This creates a context-scoped store with the same selector pattern.
 
 Use when:
+
 - State is feature-private (no other feature needs it)
 - State has complex update logic (reducers, computed values)
 - State lifecycle is tied to a component tree (mount/unmount)

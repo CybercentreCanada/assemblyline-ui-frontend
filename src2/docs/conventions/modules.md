@@ -6,7 +6,7 @@ Modules can be organized with either a **file-based** or **folder-based** approa
 
 Use when a module is small enough that each role fits in a single file. Files use a dot-delimited prefix matching the parent folder:
 
-```
+```text
 <layer>/<module>/
 ├── <module>.components.tsx    ← All UI components
 ├── <module>.config.tsx        ← Default config, constants
@@ -27,7 +27,7 @@ Use when a module is small enough that each role fits in a single file. Files us
 
 Use when a module grows large enough that individual roles benefit from splitting into separate files. Subfolders are named by role, and individual files follow the [naming standards](./naming.md):
 
-```
+```text
 <layer>/<module>/
 ├── components/
 │   ├── ComponentA.tsx
@@ -58,7 +58,7 @@ Use when a module grows large enough that individual roles benefit from splittin
 ## When to Use Which
 
 | Signal | Approach |
-|--------|----------|
+| ------ | -------- |
 | < 5 components, simple hooks | File-based |
 | Growing file size (300+ lines per role file) | Folder-based |
 | Many components that are independently testable | Folder-based |
