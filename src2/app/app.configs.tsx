@@ -5,6 +5,7 @@ import { AppRouterConfig, AppRouterSettingsSchema } from 'core/router/router.con
 import { AppSnackbarConfig } from 'core/snackbar/snackbar.config';
 import { AppThemeConfig, AppThemeSettingsSchema } from 'core/theme/theme.config';
 import { ClassificationAliases, ClassificationDefinition } from 'features/classification/classificationParser';
+import { APP_LAYOUT_NOTIFICATIONS_CONFIG } from 'layout/notifications/notifications.config';
 import type { Configuration } from 'models/base/config';
 import type { UserSettings } from 'models/base/user_settings';
 import type { CustomUser, Indexes, SystemMessage } from 'models/ui/user';
@@ -103,11 +104,12 @@ export const DEFAULT_APP_CONFIG: AppConfig = {
       mode: 'system',
       showBreadcrumbs: true,
       showQuickSearch: true,
-      theme: 'tui.theme.default'
+      theme: 'theme.default'
     },
     drawer: {
       maximized: false
     },
+    notifications: APP_LAYOUT_NOTIFICATIONS_CONFIG,
     usermenu: {
       open: false
     }
@@ -126,7 +128,9 @@ export const DEFAULT_APP_CONFIG: AppConfig = {
     maxSnack: 3
   },
   theme: {
+    initialized: false,
     mode: 'system',
+    skin: null,
     variant: 'default'
   }
   // c12nDef: undefined,

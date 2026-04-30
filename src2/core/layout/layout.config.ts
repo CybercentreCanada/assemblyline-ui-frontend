@@ -1,3 +1,4 @@
+import { AppLayoutNotificationsConfig } from 'layout/notifications/notifications.config';
 import { z } from 'zod';
 
 //*****************************************************************************************
@@ -28,4 +29,5 @@ export type AppLayoutConfig = AppLayoutSettings & {
   drawer: {
     maximized: boolean;
   };
+  notifications: AppLayoutNotificationsConfig;
 };

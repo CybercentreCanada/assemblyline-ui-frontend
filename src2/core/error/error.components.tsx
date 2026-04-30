@@ -166,7 +166,7 @@ export const ErrorFallback = React.memo(({ error, resetErrorBoundary }: Fallback
       <LinearProgress />
     </div>
   ) : (
-    <div data-testid="error-fallback" role="alert">
+    <div data-testid="error-fallback" role="alert" style={{ display: 'flex', justifyContent: 'center' }}>
       <PageCenter margin={4}>
         <BugContainer>
           <Bug fontSize="inherit" />

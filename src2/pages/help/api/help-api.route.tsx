@@ -18,7 +18,7 @@ import {
 import type { SelectChangeEvent } from '@mui/material/Select';
 import { useAPIQuery } from 'core/api';
 import { useAppConfig } from 'core/config';
-import { createAppRoute, useAppHashParams, useAppPathParams, useAppSearchParams } from 'core/routes';
+import { createAppRoute } from 'core/routes';
 import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CustomChip } from 'ui/CustomChip';
@@ -104,8 +104,8 @@ const Expand = memo(
 //*****************************************************************************************
 
 export const HelpAPIPage = React.memo(() => {
-  const theme = useTheme();
   const { t } = useTranslation(['helpAPI']);
+  const theme = useTheme();
 
   const [apiSelected, setApiSelected] = useState<string>('');
   const [expandMap, setExpandMap] = useState<Record<string, boolean>>({});
@@ -118,10 +118,6 @@ export const HelpAPIPage = React.memo(() => {
   const downSM = useMediaQuery(theme.breakpoints.down('md'));
   const xs = useMediaQuery(theme.breakpoints.only('xs'));
   const isDark = useMemo(() => theme.palette.mode === 'dark', [theme.palette.mode]);
-
-  const pathParams = useAppPathParams('/submissions/:query', s => s.query);
-  const searchParams = useAppSearchParams('/help/api/:id', s => s.toObject());
-  const hashParams = useAppHashParams('/help/api/:id', s => s);
 
   const { data: apiListData, isLoading: isLoadingApiList } = useAPIQuery<string[]>({
     method: 'GET',
@@ -465,19 +461,7 @@ HelpAPIPage.displayName = 'HelpAPIPage';
 
 export const HelpAPIRoute = createAppRoute({
   component: HelpAPIPage,
-  path: '/help/api/:id',
-  params: s => ({
-    id: s.boolean()
-  }),
-  search: s => ({
-    query: s.string(''),
-    offset: s.number(0).min(0).origin('snapshot').ephemeral(),
-    rows: s.number(25).locked().origin('snapshot').ephemeral(),
-    sort: s.string('times.submitted desc').ephemeral(),
-    filters: s.filters([]),
-    track_total_hits: s.number(null).origin('snapshot').nullable().ephemeral()
-  }),
-  hash: s => s
+  path: '/help/api'
 });
 
 export default HelpAPIRoute;

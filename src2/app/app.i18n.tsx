@@ -21,6 +21,8 @@ import quotaEN from 'layout/auth/quota/quota.i18n.en.json';
 import quotaFR from 'layout/auth/quota/quota.i18n.fr.json';
 import tosEN from 'layout/auth/terms-of-service/terms-of-service.i18n.en.json';
 import tosFR from 'layout/auth/terms-of-service/terms-of-service.i18n.fr.json';
+import notificationsEN from 'layout/notifications/notifications.i18n.en.json';
+import notificationsFR from 'layout/notifications/notifications.i18n.fr.json';
 import forbiddenEN from 'pages/forbidden/forbidden.i18n.en.json';
 import forbiddenFR from 'pages/forbidden/forbidden.i18n.fr.json';
 import helpAPIEN from 'pages/help/api/help-api.i18n.en.json';
@@ -40,6 +42,7 @@ export const I18N_RESSOURCES = {
     locked: lockedEN,
     login: loginEN,
     logout: logoutEN,
+    notifications: notificationsEN,
     quota: quotaEN,
     tos: tosEN
   },
@@ -53,6 +56,7 @@ export const I18N_RESSOURCES = {
     locked: lockedFR,
     login: loginFR,
     logout: logoutFR,
+    notifications: notificationsFR,
     quota: quotaFR,
     tos: tosFR
   }
