@@ -1,22 +1,18 @@
-import { SystemMessage } from 'models/ui/user';
-import z from 'zod';
+import type { SystemMessage } from 'models/ui/user';
+import type { JSONFeedItem } from './notifications.models';
 import { DEFAULT_SYSTEM_MESSAGE } from './notifications.models';
-
-export const AppLayoutNotificationsSettingsSchema = null;
-
-export type AppLayoutNotificationsSettings = z.infer<typeof AppLayoutNotificationsSettingsSchema>;
 
 export type AppLayoutNotificationsConfig = {
   open: boolean;
-  read?: boolean;
-  loading?: boolean;
-  items?: any[];
-  announcementEditOpen?: boolean;
-  announcementDeleteOpen?: boolean;
-  announcementDraft?: SystemMessage;
-  announcementSaving?: boolean;
-  announcementDeleting?: boolean;
-  saveConfirmationOpen?: boolean;
+  read: boolean;
+  loading: boolean;
+  items: JSONFeedItem[];
+  announcementEditOpen: boolean;
+  announcementDeleteOpen: boolean;
+  announcementDraft: SystemMessage;
+  announcementSaving: boolean;
+  announcementDeleting: boolean;
+  saveConfirmationOpen: boolean;
 };
 
 export const APP_LAYOUT_NOTIFICATIONS_CONFIG: AppLayoutNotificationsConfig = {

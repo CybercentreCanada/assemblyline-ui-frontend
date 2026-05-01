@@ -12,7 +12,7 @@ import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined
 import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
 import {
   Badge,
-  BadgeProps,
+  type BadgeProps,
   Dialog,
   DialogActions,
   DialogContent,
@@ -37,21 +37,15 @@ import { useAppConfig, useAppSetConfig } from 'core/config';
 import { useAppSnackbar } from 'core/snackbar';
 import DOMPurify from 'dompurify';
 import type { SystemMessage } from 'models/ui/user';
-import { ChangeEvent, memo, type PropsWithChildren, useCallback, useMemo } from 'react';
+import { type ChangeEvent, memo, type ReactNode, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import Markdown from 'react-markdown';
-import { CustomChip } from 'ui/CustomChip';
 import { Button } from 'ui/buttons/Button';
 import { IconButton } from 'ui/buttons/IconButton';
-import { useNotificationAutoRefresh } from './notifications.hooks';
+import { CustomChip } from 'ui/CustomChip';
+import { useNotificationAutoRefresh, useNotificationClose } from './notifications.hooks';
 import { DEFAULT_SYSTEM_MESSAGE, type JSONFeedAuthor, type JSONFeedItem } from './notifications.models';
-import {
-  formatDate,
-  getBackgroundColor,
-  getColor,
-  markItemsAsNewerThan,
-  writeLastOpenedAt
-} from './notifications.utils';
+import { formatDate, getBackgroundColor, getColor } from './notifications.utils';
 
 const Row = styled('div')(() => ({
   width: '100%',
@@ -123,7 +117,7 @@ const NotificationAuthor = memo(({ author }: { author: JSONFeedAuthor }) => {
         <Typography
           variant="caption"
           color="text.secondary"
-          sx={{ marginLeft: theme.spacing(0.25), marginRight: theme.spacing(0.25) }}
+          style={{ marginLeft: theme.spacing(0.25), marginRight: theme.spacing(0.25) }}
         >
           {author.name}
         </Typography>
@@ -131,15 +125,13 @@ const NotificationAuthor = memo(({ author }: { author: JSONFeedAuthor }) => {
     </>
   );
 
-  if (author?.url) {
-    return (
-      <Link href={author.url} target="_blank" rel="noopener noreferrer" style={{ display: 'contents' }}>
-        {content}
-      </Link>
-    );
-  }
-
-  return <div style={{ display: 'contents' }}>{content}</div>;
+  return author?.url ? (
+    <Link href={author.url} target="_blank" rel="noopener noreferrer" style={{ display: 'contents' }}>
+      {content}
+    </Link>
+  ) : (
+    <div style={{ display: 'contents' }}>{content}</div>
+  );
 });
 
 NotificationAuthor.displayName = 'NotificationAuthor';
@@ -168,7 +160,7 @@ const NotificationItem = memo(({ notification }: { notification: JSONFeedItem })
       );
     }
 
-    if (notification.date_published) {
+    if (notification.content_html) {
       return (
         <span
           dangerouslySetInnerHTML={{
@@ -192,7 +184,7 @@ const NotificationItem = memo(({ notification }: { notification: JSONFeedItem })
         <Link href={notification.url} target="_blank" rel="noopener noreferrer" underline="none">
           <Typography
             variant="subtitle1"
-            sx={{
+            style={{
               fontWeight: notification._isNew ? 700 : 500,
               color: theme.palette.primary.main
             }}
@@ -201,7 +193,7 @@ const NotificationItem = memo(({ notification }: { notification: JSONFeedItem })
           </Typography>
         </Link>
       ) : (
-        <Typography variant="subtitle1" sx={{ fontWeight: notification._isNew ? 700 : 500 }}>
+        <Typography variant="subtitle1" style={{ fontWeight: notification._isNew ? 700 : 500 }}>
           {notification.title}
         </Typography>
       )}
@@ -220,7 +212,7 @@ const NotificationItem = memo(({ notification }: { notification: JSONFeedItem })
                 variant="outlined"
                 color={TAG_COLORS[tag] || 'default'}
                 label={tag}
-                sx={{ textTransform: 'capitalize' }}
+                style={{ textTransform: 'capitalize' }}
               />
             ))}
         </Row>
@@ -257,39 +249,48 @@ NotificationItem.displayName = 'NotificationItem';
 
 const AnnouncementActions = memo(() => {
   const { t } = useTranslation(['notifications']);
-  const theme = useTheme();
 
-  const isAdmin = useAppConfig(s => Boolean((s?.user as any)?.is_admin));
+  const isAdmin = useAppConfig(s => Boolean(s?.user?.is_admin));
   const systemMessage = useAppConfig(s => s?.systemMessage ?? null);
 
   const setConfig = useAppSetConfig();
 
   const handleOpenCreateDialog = useCallback(() => {
-    setConfig(s => {
-      s.layout.notifications.announcementDraft = { ...DEFAULT_SYSTEM_MESSAGE };
-      s.layout.notifications.announcementEditOpen = true;
-      return s;
-    });
+    setConfig(prev => ({
+      layout: {
+        ...prev.layout,
+        notifications: {
+          ...prev.layout.notifications,
+          announcementDraft: { ...DEFAULT_SYSTEM_MESSAGE },
+          announcementEditOpen: true
+        }
+      }
+    }));
   }, [setConfig]);
 
   const handleOpenEditDialog = useCallback(() => {
-    setConfig(s => {
-      s.layout.notifications.announcementDraft = { ...systemMessage };
-      s.layout.notifications.announcementEditOpen = true;
-      return s;
-    });
-  }, [setConfig]);
+    setConfig(prev => ({
+      layout: {
+        ...prev.layout,
+        notifications: {
+          ...prev.layout.notifications,
+          announcementDraft: { ...systemMessage },
+          announcementEditOpen: true
+        }
+      }
+    }));
+  }, [setConfig, systemMessage]);
 
   const handleOpenDeleteDialog = useCallback(() => {
-    setConfig(s => {
-      s.layout.notifications.announcementDeleteOpen = true;
-      return s;
-    });
+    setConfig(prev => ({
+      layout: {
+        ...prev.layout,
+        notifications: { ...prev.layout.notifications, announcementDeleteOpen: true }
+      }
+    }));
   }, [setConfig]);
 
-  if (!isAdmin) return null;
-
-  return (
+  return isAdmin ? (
     <Row style={{ width: 'auto' }}>
       {Boolean(systemMessage) ? (
         <>
@@ -306,7 +307,7 @@ const AnnouncementActions = memo(() => {
         </IconButton>
       )}
     </Row>
-  );
+  ) : null;
 });
 
 AnnouncementActions.displayName = 'AnnouncementActions';
@@ -320,35 +321,31 @@ const AnnouncementContent = memo(() => {
   const theme = useTheme();
   const systemMessage = useAppConfig(s => (s?.systemMessage ?? null) as SystemMessage | null);
 
-  if (!systemMessage) {
-    return (
-      <Typography variant="body2" color="text.secondary">
-        {t('systemMessage.none')}
-      </Typography>
-    );
-  }
-
-  return (
+  return systemMessage ? (
     <>
       <Typography
         variant="body1"
-        sx={{ fontWeight: 700, paddingLeft: theme.spacing(1.25), ...getColor(systemMessage.severity, 2, theme) }}
+        style={{ fontWeight: 700, paddingLeft: theme.spacing(1.25), ...getColor(systemMessage.severity, 2, theme) }}
       >
         {systemMessage.title || t('systemMessage.header')}
       </Typography>
-      <Typography variant="body2" color="text.secondary" sx={{ paddingLeft: theme.spacing(1.25) }}>
+      <Typography variant="body2" color="text.secondary" style={{ paddingLeft: theme.spacing(1.25) }}>
         {systemMessage.message}
       </Typography>
       {systemMessage.user ? (
         <Typography
           variant="caption"
           color="text.secondary"
-          sx={{ display: 'block', textAlign: 'right', paddingTop: theme.spacing(1), paddingRight: theme.spacing(1) }}
+          style={{ display: 'block', textAlign: 'right', paddingTop: theme.spacing(1), paddingRight: theme.spacing(1) }}
         >
           {systemMessage.user}
         </Typography>
       ) : null}
     </>
+  ) : (
+    <Typography variant="body2" color="text.secondary">
+      {t('systemMessage.none')}
+    </Typography>
   );
 });
 
@@ -357,6 +354,7 @@ AnnouncementContent.displayName = 'AnnouncementContent';
 //*****************************************************************************************
 // Announcement Save Confirmation Dialog
 //*****************************************************************************************
+
 const AnnouncementSaveConfirmation = memo(() => {
   const { t } = useTranslation(['notifications']);
   const { showSuccessMessage } = useAppSnackbar();
@@ -367,25 +365,32 @@ const AnnouncementSaveConfirmation = memo(() => {
   const setConfig = useAppSetConfig();
 
   const handleCloseDialog = useCallback(() => {
-    setConfig(s => {
-      s.layout.notifications.saveConfirmationOpen = false;
-      return s;
-    });
+    setConfig(prev => ({
+      layout: {
+        ...prev.layout,
+        notifications: { ...prev.layout.notifications, saveConfirmationOpen: false }
+      }
+    }));
   }, [setConfig]);
 
   const handleSaveSystemMessage = useAPIMutation(() => ({
     url: '/api/v4/system/system_message/',
     method: 'PUT',
     body: draftMessage,
-    onSuccess: ({ api_response }) => {
+    onSuccess: () => {
       showSuccessMessage(t('save.success'));
 
-      setConfig(s => {
-        s.systemMessage = draftMessage;
-        s.layout.notifications.saveConfirmationOpen = false;
-        s.layout.notifications.announcementEditOpen = false;
-        return s;
-      });
+      setConfig(prev => ({
+        systemMessage: draftMessage,
+        layout: {
+          ...prev.layout,
+          notifications: {
+            ...prev.layout.notifications,
+            saveConfirmationOpen: false,
+            announcementEditOpen: false
+          }
+        }
+      }));
     }
   }));
 
@@ -411,6 +416,8 @@ const AnnouncementSaveConfirmation = memo(() => {
   );
 });
 
+AnnouncementSaveConfirmation.displayName = 'AnnouncementSaveConfirmation';
+
 //*****************************************************************************************
 // Announcement Edit Dialog
 //*****************************************************************************************
@@ -432,58 +439,77 @@ const AnnouncementEditDialog = memo(() => {
       const value = event.target.value as SystemMessage['severity'];
       if (!['error', 'warning', 'info', 'success'].includes(value)) return;
 
-      setConfig(s => {
-        s.layout.notifications.announcementDraft.severity = value;
-        return s;
-      });
+      setConfig(prev => ({
+        layout: {
+          ...prev.layout,
+          notifications: {
+            ...prev.layout.notifications,
+            announcementDraft: { ...prev.layout.notifications.announcementDraft, severity: value }
+          }
+        }
+      }));
     },
     [setConfig]
   );
 
   const handleTitleChange = useCallback(
     (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      setConfig(s => {
-        s.layout.notifications.announcementDraft.title = event.target.value;
-        return s;
-      });
+      setConfig(prev => ({
+        layout: {
+          ...prev.layout,
+          notifications: {
+            ...prev.layout.notifications,
+            announcementDraft: { ...prev.layout.notifications.announcementDraft, title: event.target.value }
+          }
+        }
+      }));
     },
     [setConfig]
   );
 
   const handleMessageChange = useCallback(
     (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      setConfig(s => {
-        s.layout.notifications.announcementDraft.message = event.target.value;
-        return s;
-      });
+      setConfig(prev => ({
+        layout: {
+          ...prev.layout,
+          notifications: {
+            ...prev.layout.notifications,
+            announcementDraft: { ...prev.layout.notifications.announcementDraft, message: event.target.value }
+          }
+        }
+      }));
     },
     [setConfig]
   );
 
   const handleCancel = useCallback(() => {
-    setConfig(s => {
-      s.layout.notifications.announcementEditOpen = false;
-      return s;
-    });
+    setConfig(prev => ({
+      layout: {
+        ...prev.layout,
+        notifications: { ...prev.layout.notifications, announcementEditOpen: false }
+      }
+    }));
   }, [setConfig]);
 
   const handleAccept = useCallback(() => {
-    setConfig(s => {
-      s.layout.notifications.saveConfirmationOpen = true;
-      return s;
-    });
+    setConfig(prev => ({
+      layout: {
+        ...prev.layout,
+        notifications: { ...prev.layout.notifications, saveConfirmationOpen: true }
+      }
+    }));
   }, [setConfig]);
 
   return (
     <Dialog fullWidth maxWidth="sm" open={isEditDialogOpen} onClose={handleCancel}>
       <DialogTitle>{Boolean(systemMessage) ? t('edit.title') : t('add.title')}</DialogTitle>
       <DialogContent>
-        <DialogContentText sx={{ mb: 2 }}>{t('edit.text')}</DialogContentText>
+        <DialogContentText style={{ marginBottom: '16px' }}>{t('edit.text')}</DialogContentText>
 
-        <Typography variant="subtitle2" sx={{ mt: 1, mb: 0.75 }}>
+        <Typography variant="subtitle2" style={{ marginTop: '8px', marginBottom: '6px' }}>
           {t('edit.severity')}
         </Typography>
-        <FormControl fullWidth size="small" sx={{ mb: 2 }}>
+        <FormControl fullWidth size="small" style={{ marginBottom: '16px' }}>
           <Select value={severity} onChange={handleSeverityChange}>
             <MenuItem value="info">{t('severity.info')}</MenuItem>
             <MenuItem value="warning">{t('severity.warning')}</MenuItem>
@@ -493,7 +519,14 @@ const AnnouncementEditDialog = memo(() => {
         </FormControl>
 
         <Typography variant="subtitle2">{t('edit.message.title')}</Typography>
-        <TextField autoFocus fullWidth size="small" value={title} onChange={handleTitleChange} sx={{ mb: 2 }} />
+        <TextField
+          autoFocus
+          fullWidth
+          size="small"
+          value={title}
+          onChange={handleTitleChange}
+          style={{ marginBottom: '16px' }}
+        />
 
         <Typography variant="subtitle2">{t('edit.message')}</Typography>
         <TextField fullWidth multiline rows={4} value={message} onChange={handleMessageChange} />
@@ -525,23 +558,28 @@ const AnnouncementDeleteDialog = memo(() => {
   const setConfig = useAppSetConfig();
 
   const handleCloseDialog = useCallback(() => {
-    setConfig(s => {
-      s.layout.notifications.announcementDeleteOpen = false;
-      return s;
-    });
+    setConfig(prev => ({
+      layout: {
+        ...prev.layout,
+        notifications: { ...prev.layout.notifications, announcementDeleteOpen: false }
+      }
+    }));
   }, [setConfig]);
 
   const handleDeleteSystemMessage = useAPIMutation(() => ({
     url: '/api/v4/system/system_message/',
     method: 'DELETE',
     body: null,
-    onSuccess: ({ api_response }) => {
+    onSuccess: () => {
       showSuccessMessage(t('delete.success'));
 
-      setConfig(s => {
-        s.systemMessage = null;
-        return s;
-      });
+      setConfig(prev => ({
+        systemMessage: null,
+        layout: {
+          ...prev.layout,
+          notifications: { ...prev.layout.notifications, announcementDeleteOpen: false }
+        }
+      }));
     }
   }));
 
@@ -583,13 +621,13 @@ const NotificationFeedHeader = memo(() => {
       <Row style={{ paddingTop: theme.spacing(2) }}>
         <FeedbackOutlinedIcon
           fontSize="medium"
-          sx={{ marginLeft: theme.spacing(1.5), marginRight: theme.spacing(1.5) }}
+          style={{ marginLeft: theme.spacing(1.5), marginRight: theme.spacing(1.5) }}
         />
-        <Typography variant="h6" sx={{ fontSize: 'large', fontWeight: 'bolder', flex: 1 }}>
+        <Typography variant="h6" style={{ fontSize: 'large', fontWeight: 'bolder', flex: 1 }}>
           {t('notification.header')}
         </Typography>
       </Row>
-      <Divider sx={{ mb: 2, width: '100%' }} />
+      <Divider style={{ marginBottom: '16px', width: '100%' }} />
     </>
   );
 });
@@ -605,29 +643,25 @@ const NotificationContent = memo(() => {
   const theme = useTheme();
 
   const isLoading = useAppConfig(s => s?.layout?.notifications?.loading ?? false);
-  const notifications = useAppConfig(s => s?.layout?.notifications?.items);
+  const notifications = useAppConfig(s => s?.layout?.notifications?.items ?? []);
 
-  if (isLoading) {
-    return (
-      <Row>
-        <Skeleton variant="text" animation="wave" sx={{ width: '100%', height: theme.spacing(8) }} />
-      </Row>
-    );
-  }
-
-  if (notifications.length === 0) {
-    return (
-      <Row style={{ justifyContent: 'center' }}>
-        <Typography variant="body2" color="secondary">
-          {t('notification.none')}
-        </Typography>
-      </Row>
-    );
-  }
-
-  return notifications.map((n, i) => (
-    <NotificationItem key={i} notification={n} hideDivider={i === notifications.length - 1} />
-  ));
+  return isLoading ? (
+    <Row>
+      <Skeleton variant="text" animation="wave" style={{ width: '100%', height: theme.spacing(8) }} />
+    </Row>
+  ) : notifications.length === 0 ? (
+    <Row style={{ justifyContent: 'center' }}>
+      <Typography variant="body2" color="secondary">
+        {t('notification.none')}
+      </Typography>
+    </Row>
+  ) : (
+    <>
+      {notifications.map((n, i) => (
+        <NotificationItem key={n.id || i} notification={n} />
+      ))}
+    </>
+  );
 });
 
 NotificationContent.displayName = 'NotificationContent';
@@ -647,7 +681,7 @@ export const AnnouncementSection = memo(() => {
       <Row style={{ paddingTop: theme.spacing(2) }}>
         <SystemMessageIcon
           severity={systemMessage?.severity}
-          sx={{
+          style={{
             marginLeft: theme.spacing(1.5),
             marginRight: theme.spacing(1.5),
             ...getColor(systemMessage?.severity, 1, theme)
@@ -655,7 +689,7 @@ export const AnnouncementSection = memo(() => {
         />
         <Typography
           variant="h6"
-          sx={{
+          style={{
             fontSize: 'large',
             fontWeight: 'bolder',
             flex: 1,
@@ -669,8 +703,8 @@ export const AnnouncementSection = memo(() => {
       </Row>
 
       <Divider
-        sx={{
-          mb: 2,
+        style={{
+          marginBottom: '16px',
           width: '100%',
           ...getBackgroundColor(systemMessage?.severity, 2, theme)
         }}
@@ -736,10 +770,12 @@ const NotificationIconButton = memo(() => {
   }, [newNotificationsCount, systemMessage]);
 
   const handleOpen = useCallback(() => {
-    setConfig(s => {
-      s.layout.notifications.open = true;
-      return s;
-    });
+    setConfig(prev => ({
+      layout: {
+        ...prev.layout,
+        notifications: { ...prev.layout.notifications, open: true }
+      }
+    }));
   }, [setConfig]);
 
   return (
@@ -769,23 +805,10 @@ NotificationIconButton.displayName = 'NotificationIconButton';
 //*****************************************************************************************
 // Notification Close Button
 //*****************************************************************************************
+
 const NotificationCloseButton = memo(() => {
   const theme = useTheme();
-
-  const items = useAppConfig(s => (s?.layout?.notifications?.items ?? []) as JSONFeedItem[]);
-  const setConfig = useAppSetConfig();
-
-  const handleClose = useCallback(() => {
-    const now = new Date();
-    writeLastOpenedAt(now);
-
-    setConfig(s => {
-      s.layout.notifications.items = markItemsAsNewerThan(items, now);
-      s.layout.notifications.open = false;
-      s.layout.notifications.read = true;
-      return s;
-    });
-  }, [items, setConfig]);
+  const handleClose = useNotificationClose();
 
   return (
     <Row
@@ -810,24 +833,11 @@ NotificationCloseButton.displayName = 'NotificationCloseButton';
 // Notification Drawer
 //*****************************************************************************************
 
-const NotificationDrawer = memo(({ children }: PropsWithChildren) => {
+const NotificationDrawer = memo(({ children }: { children: ReactNode }) => {
   const theme = useTheme();
 
   const isDrawerOpen = useAppConfig(s => s.layout.notifications.open);
-  const items = useAppConfig(s => (s?.layout?.notifications?.items ?? []) as JSONFeedItem[]);
-  const setConfig = useAppSetConfig();
-
-  const handleClose = useCallback(() => {
-    const now = new Date();
-    writeLastOpenedAt(now);
-
-    setConfig(s => {
-      s.layout.notifications.items = markItemsAsNewerThan(items, now);
-      s.layout.notifications.open = false;
-      s.layout.notifications.read = true;
-      return s;
-    });
-  }, [items, setConfig]);
+  const handleClose = useNotificationClose();
 
   return (
     <Drawer
@@ -836,12 +846,9 @@ const NotificationDrawer = memo(({ children }: PropsWithChildren) => {
       onClose={handleClose}
       slotProps={{
         paper: {
-          sx: {
+          style: {
             width: '80%',
-            maxWidth: '500px',
-            [theme.breakpoints.down('sm')]: {
-              width: '100%'
-            }
+            maxWidth: '500px'
           }
         }
       }}

@@ -1,114 +1,182 @@
-import { SystemMessage } from 'models/ui/user';
+import type { SystemMessage } from 'models/ui/user';
 
 /**
  * JSON Feed Version 1.1
  * https://www.jsonfeed.org/
  */
 
+//*****************************************************************************************
+// JSON Feed Item Attachment
+//*****************************************************************************************
+
+/** Represents a media attachment on a JSON Feed item. */
 export type JSONFeedItemAttachment = {
-  url: string;
-  mime_type: string;
-  title?: string;
-  size_in_bytes?: number;
+  /** Duration of media in seconds. */
   duration_in_seconds?: number;
+  /** MIME type of the attachment. */
+  mime_type: string;
+  /** Size of the file in bytes. */
+  size_in_bytes?: number;
+  /** Display title of the attachment. */
+  title?: string;
+  /** URL to the attachment resource. */
+  url: string;
 };
 
 export const DEFAULT_JSON_FEED_ITEM_ATTACHMENT: JSONFeedItemAttachment = {
-  url: null,
-  mime_type: null,
-  title: null,
+  duration_in_seconds: 0,
+  mime_type: '',
   size_in_bytes: 0,
-  duration_in_seconds: 0
+  title: '',
+  url: ''
 };
 
+//*****************************************************************************************
+// JSON Feed Author
+//*****************************************************************************************
+
+/** Represents an author of a JSON Feed or item. */
 export type JSONFeedAuthor = {
-  name?: string;
-  url?: string;
+  /** URL to the author's avatar image. */
   avatar?: string;
+  /** Display name of the author. */
+  name?: string;
+  /** URL to the author's profile or website. */
+  url?: string;
 };
 
 export const DEFAULT_JSON_FEED_AUTHOR: JSONFeedAuthor = {
-  name: null,
-  url: null,
-  avatar: null
+  avatar: '',
+  name: '',
+  url: ''
 };
 
+//*****************************************************************************************
+// JSON Feed Item
+//*****************************************************************************************
+
+/** Tag values assignable to a notification feed item. */
+export const NOTIFICATION_TAGS = ['new', 'current', 'dev', 'service', 'blog', 'community'] as const;
+export type NotificationTag = (typeof NOTIFICATION_TAGS)[number];
+
+/** Represents a single item in a JSON Feed. */
 export type JSONFeedItem = {
-  id: string;
-  url?: string;
-  external_url?: string;
-  title?: string;
-  content_html?: string;
-  content_text?: string;
-  content_md?: string;
-  summary?: string;
-  image?: string;
-  banner_image?: string;
-  date_published?: string;
-  date_modified?: string;
-  authors?: JSONFeedAuthor[];
-  tags?: ('new' | 'current' | 'dev' | 'service' | 'blog' | 'community')[];
-  language?: string;
-  attachments?: JSONFeedItemAttachment[];
+  /** Whether this item is newer than the last time the user opened notifications. */
   _isNew: boolean;
+  /** List of media attachments. */
+  attachments?: JSONFeedItemAttachment[];
+  /** List of authors. */
+  authors?: JSONFeedAuthor[];
+  /** Banner image URL. */
+  banner_image?: string;
+  /** HTML content of the item. */
+  content_html?: string;
+  /** Markdown content of the item. */
+  content_md?: string;
+  /** Plain text content of the item. */
+  content_text?: string;
+  /** Last modification date (ISO 8601). */
+  date_modified?: string;
+  /** Publication date (ISO 8601). */
+  date_published?: string;
+  /** External URL related to this item. */
+  external_url?: string;
+  /** Unique identifier of the item. */
+  id: string;
+  /** Image URL associated with the item. */
+  image?: string;
+  /** Language code of the item. */
+  language?: string;
+  /** Short summary of the item. */
+  summary?: string;
+  /** Tags categorizing the item. */
+  tags?: NotificationTag[];
+  /** Title of the item. */
+  title?: string;
+  /** Primary URL of the item. */
+  url?: string;
 };
 
 export const DEFAULT_JSON_FEED_ITEM: JSONFeedItem = {
-  id: null,
-  url: null,
-  external_url: null,
-  title: null,
-  content_html: null,
-  content_text: null,
-  summary: null,
-  image: null,
-  banner_image: null,
-  date_published: null,
-  date_modified: null,
-  authors: [],
-  tags: [],
-  language: null,
+  _isNew: false,
   attachments: [],
-  _isNew: false
+  authors: [],
+  banner_image: '',
+  content_html: '',
+  content_md: '',
+  content_text: '',
+  date_modified: '',
+  date_published: '',
+  external_url: '',
+  id: '',
+  image: '',
+  language: '',
+  summary: '',
+  tags: [],
+  title: '',
+  url: ''
 };
 
+//*****************************************************************************************
+// JSON Feed
+//*****************************************************************************************
+
+/** Represents a complete JSON Feed document. */
 export type JSONFeed = {
-  version: string;
-  title: string;
-  home_page_url?: string;
-  feed_url?: string;
-  description?: string;
-  user_comment?: string;
-  next_url?: string;
-  icon?: string;
-  favicon?: string;
+  /** List of feed-level authors. */
   authors?: JSONFeedAuthor[];
-  language?: string;
+  /** Description of the feed. */
+  description?: string;
+  /** Whether the feed has expired. */
   expired?: boolean;
+  /** Favicon URL. */
+  favicon?: string;
+  /** URL of the feed itself. */
+  feed_url?: string;
+  /** URL to the feed's home page. */
+  home_page_url?: string;
+  /** Hub subscriptions. */
   hubs?: { type: string; url: string }[];
+  /** Icon URL. */
+  icon?: string;
+  /** List of feed items. */
   items: JSONFeedItem[];
+  /** Language of the feed. */
+  language?: string;
+  /** URL to the next page of items. */
+  next_url?: string;
+  /** Title of the feed. */
+  title: string;
+  /** User-facing comment about the feed. */
+  user_comment?: string;
+  /** JSON Feed version string. */
+  version: string;
 };
 
 export const DEFAULT_JSON_FEED: JSONFeed = {
-  version: null,
-  title: null,
-  home_page_url: null,
-  feed_url: null,
-  description: null,
-  user_comment: null,
-  next_url: null,
-  icon: null,
-  favicon: null,
   authors: [],
-  language: null,
+  description: '',
   expired: false,
+  favicon: '',
+  feed_url: '',
+  home_page_url: '',
   hubs: [],
-  items: []
+  icon: '',
+  items: [],
+  language: '',
+  next_url: '',
+  title: '',
+  user_comment: '',
+  version: ''
 };
+
+//*****************************************************************************************
+// System Message
+//*****************************************************************************************
 
 export const DEFAULT_SYSTEM_MESSAGE: SystemMessage = {
   message: '',
   severity: 'info',
   title: '',
-  user: null
+  user: ''
 };

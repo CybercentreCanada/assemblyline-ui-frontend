@@ -1,5 +1,41 @@
-export * from './notifications.components';
-export * from './notifications.hooks';
-export * from './notifications.models';
-export * from './notifications.providers';
-export * from './notifications.utils';
+export { AnnouncementSection, Notifications } from './notifications.components';
+export { useNotificationAutoRefresh, useNotificationClose } from './notifications.hooks';
+export {
+  DEFAULT_JSON_FEED,
+  DEFAULT_JSON_FEED_AUTHOR,
+  DEFAULT_JSON_FEED_ITEM,
+  DEFAULT_JSON_FEED_ITEM_ATTACHMENT,
+  DEFAULT_SYSTEM_MESSAGE,
+  NOTIFICATION_TAGS,
+  type JSONFeed,
+  type JSONFeedAuthor,
+  type JSONFeedItem,
+  type JSONFeedItemAttachment,
+  type NotificationTag
+} from './notifications.models';
+export {
+  applyLegacyNotificationRules,
+  arrayEquals,
+  arrayHigher,
+  decodeHTML,
+  fetchJSON,
+  fetchJSONFeeds,
+  fetchJSONNotifications,
+  formatDate,
+  getBackgroundColor,
+  getColor,
+  getNewService,
+  getVersionType,
+  getVersionValues,
+  markItemsAsNewerThan,
+  normalizeTags,
+  parseJSONFeed,
+  parseJSONFeedAuthor,
+  parseJSONFeedItem,
+  parseJSONFeedItemAttachment,
+  readLastOpenedAt,
+  sortByPublishedDateDesc,
+  writeLastOpenedAt,
+  type MinimalService,
+  type NotificationVersionType
+} from './notifications.utils';

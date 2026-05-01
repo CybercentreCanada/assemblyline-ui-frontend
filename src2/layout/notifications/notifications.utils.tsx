@@ -1,17 +1,14 @@
-import { Theme } from '@mui/material';
+import type { Theme } from '@mui/material';
 import { blue } from '@mui/material/colors';
 import type { Configuration } from 'models/base/config';
-import { CSSProperties } from 'react';
-import { PossibleColor } from 'shared/utils/colors';
+import type { CSSProperties } from 'react';
+import type { PossibleColor } from 'shared/utils/colors';
+import type { JSONFeed, JSONFeedAuthor, JSONFeedItem, JSONFeedItemAttachment } from './notifications.models';
 import {
   DEFAULT_JSON_FEED,
   DEFAULT_JSON_FEED_AUTHOR,
   DEFAULT_JSON_FEED_ITEM,
-  DEFAULT_JSON_FEED_ITEM_ATTACHMENT,
-  JSONFeed,
-  JSONFeedAuthor,
-  JSONFeedItem,
-  JSONFeedItemAttachment
+  DEFAULT_JSON_FEED_ITEM_ATTACHMENT
 } from './notifications.models';
 
 const NOTIFICATIONS_LAST_OPENED_AT_KEY = 'notifications.lastOpenedAt';
@@ -23,7 +20,19 @@ export type MinimalService = {
 
 export type NotificationVersionType = null | 'newer' | 'current' | 'older';
 
-export const getColor = (severity: PossibleColor, variant: 1 | 2 | 3, theme: Theme) => {
+//*****************************************************************************************
+// Color Utilities
+//*****************************************************************************************
+
+/**
+ * @name getColor
+ * @description Returns a CSS color property for the given severity and variant.
+ * @param severity - Notification severity level
+ * @param variant - Color variant (1=main, 2=contrast text, 3=inverse)
+ * @param theme - MUI theme instance
+ * @returns CSSProperties with the color value
+ */
+export const getColor = (severity: PossibleColor, variant: 1 | 2 | 3, theme: Theme): CSSProperties => {
   const colors: Record<string, Record<number, CSSProperties>> = {
     error: {
       1: { color: theme.palette.error.main },
@@ -50,7 +59,15 @@ export const getColor = (severity: PossibleColor, variant: 1 | 2 | 3, theme: The
   return colors?.[severity]?.[variant];
 };
 
-export const getBackgroundColor = (severity: PossibleColor, variant: 1 | 2 | 3, theme: Theme) => {
+/**
+ * @name getBackgroundColor
+ * @description Returns a CSS background-color property for the given severity and variant.
+ * @param severity - Notification severity level
+ * @param variant - Color variant (1=main, 2=contrast text, 3=inverse)
+ * @param theme - MUI theme instance
+ * @returns CSSProperties with the backgroundColor value
+ */
+export const getBackgroundColor = (severity: PossibleColor, variant: 1 | 2 | 3, theme: Theme): CSSProperties => {
   const backgroundColors: Record<string, Record<number, CSSProperties>> = {
     error: {
       1: { backgroundColor: theme.palette.error.main },
@@ -77,14 +94,29 @@ export const getBackgroundColor = (severity: PossibleColor, variant: 1 | 2 | 3, 
   return backgroundColors?.[severity]?.[variant];
 };
 
-export const formatDate = (value?: string) => {
+//*****************************************************************************************
+// Date & Storage
+//*****************************************************************************************
+
+/**
+ * @name formatDate
+ * @description Formats an ISO date string to a locale-specific string.
+ * @param value - ISO 8601 date string
+ * @returns Formatted date string, or empty string if invalid
+ */
+export const formatDate = (value?: string): string => {
   if (!value) return '';
   const date = new Date(value);
   if (Number.isNaN(date.valueOf())) return '';
   return date.toLocaleString();
 };
 
-export const readLastOpenedAt = () => {
+/**
+ * @name readLastOpenedAt
+ * @description Reads the last-opened timestamp from localStorage.
+ * @returns Date representing when notifications were last opened
+ */
+export const readLastOpenedAt = (): Date => {
   try {
     const rawValue = localStorage.getItem(NOTIFICATIONS_LAST_OPENED_AT_KEY);
     if (!rawValue) return new Date(0);
@@ -98,27 +130,74 @@ export const readLastOpenedAt = () => {
   }
 };
 
-export const writeLastOpenedAt = (date: Date) => {
+/**
+ * @name writeLastOpenedAt
+ * @description Persists the last-opened timestamp to localStorage.
+ * @param date - Date to store
+ */
+export const writeLastOpenedAt = (date: Date): void => {
   try {
     localStorage.setItem(NOTIFICATIONS_LAST_OPENED_AT_KEY, JSON.stringify(date.valueOf()));
   } catch {}
 };
 
-export const sortByPublishedDateDesc = (items: JSONFeedItem[]) =>
+//*****************************************************************************************
+// Item Transformations
+//*****************************************************************************************
+
+/**
+ * @name sortByPublishedDateDesc
+ * @description Sorts feed items by publication date in descending order.
+ * @param items - Array of JSON Feed items
+ * @returns New sorted array
+ */
+export const sortByPublishedDateDesc = (items: JSONFeedItem[]): JSONFeedItem[] =>
   [...items].sort((a, b) => new Date(b?.date_published || 0).valueOf() - new Date(a?.date_published || 0).valueOf());
 
+/**
+ * @name markItemsAsNewerThan
+ * @description Marks items as new if published after the given cutoff date.
+ * @param items - Array of JSON Feed items
+ * @param cutoffDate - Date threshold for newness
+ * @returns New array with updated _isNew flags
+ */
 export const markItemsAsNewerThan = (items: JSONFeedItem[], cutoffDate: Date): JSONFeedItem[] =>
   items.map(item => ({
     ...item,
     _isNew: new Date(item?.date_published || 0).valueOf() > cutoffDate.valueOf()
   }));
 
-export const normalizeTags = (tags: JSONFeedItem['tags']) => (Array.isArray(tags) ? tags.filter(Boolean) : []);
+/**
+ * @name normalizeTags
+ * @description Filters out falsy values from a tags array.
+ * @param tags - Raw tags array from a feed item
+ * @returns Cleaned array of valid tags
+ */
+export const normalizeTags = (tags: JSONFeedItem['tags']): JSONFeedItem['tags'] =>
+  Array.isArray(tags) ? tags.filter(Boolean) : [];
 
-export const arrayEquals = (a: number[], b: number[]) =>
+//*****************************************************************************************
+// Version Comparison
+//*****************************************************************************************
+
+/**
+ * @name arrayEquals
+ * @description Checks if two number arrays are equal element-by-element.
+ * @param a - First array
+ * @param b - Second array
+ * @returns Whether the arrays are equal
+ */
+export const arrayEquals = (a: number[], b: number[]): boolean =>
   Array.isArray(a) && Array.isArray(b) && a.length === b.length && a.every((value, index) => value === b[index]);
 
-export const arrayHigher = (a: number[], b: number[]) => {
+/**
+ * @name arrayHigher
+ * @description Checks if array `a` represents a higher version than array `b`.
+ * @param a - First version array
+ * @param b - Second version array
+ * @returns Whether `a` is higher than `b`
+ */
+export const arrayHigher = (a: number[], b: number[]): boolean => {
   if (!Array.isArray(a) || !Array.isArray(b) || a.length !== b.length) return false;
 
   for (let index = 0; index < a.length; index += 1) {
@@ -129,6 +208,12 @@ export const arrayHigher = (a: number[], b: number[]) => {
   return false;
 };
 
+/**
+ * @name getVersionValues
+ * @description Extracts numeric version segments from a version string.
+ * @param value - String containing a version number (e.g., "4.5.1.stable1")
+ * @returns Array of numeric version segments
+ */
 export const getVersionValues = (value: string): number[] => {
   const version = value
     ?.match(/(\d){1,}\.(\d){1,}\.(\d){1,}\..*/g)
@@ -140,6 +225,13 @@ export const getVersionValues = (value: string): number[] => {
   return Array.isArray(version) ? version : [];
 };
 
+/**
+ * @name getVersionType
+ * @description Determines if a notification's version is newer, current, or older than the system.
+ * @param notification - JSON Feed item with version info in its URL
+ * @param config - System configuration containing the current version
+ * @returns Version comparison result
+ */
 export const getVersionType = (notification: JSONFeedItem, config: Configuration): NotificationVersionType => {
   const notificationVersion = notification?.url;
   const systemVersion = config?.system?.version;
@@ -164,6 +256,13 @@ export const getVersionType = (notification: JSONFeedItem, config: Configuration
   return 'older';
 };
 
+/**
+ * @name getNewService
+ * @description Checks if a notification refers to a service not yet installed.
+ * @param notification - JSON Feed item
+ * @param services - List of installed services
+ * @returns null if not a service notification, true if service exists, false if new
+ */
 export const getNewService = (notification: JSONFeedItem, services: MinimalService[]): null | boolean => {
   if (!/(s|S)ervice/g.test(notification?.title || '')) return null;
 
@@ -173,6 +272,16 @@ export const getNewService = (notification: JSONFeedItem, services: MinimalServi
   return services.some(service => notificationTitle === service?.name?.toLowerCase());
 };
 
+//*****************************************************************************************
+// Filtering & Enrichment
+//*****************************************************************************************
+
+/**
+ * @name applyLegacyNotificationRules
+ * @description Filters and enriches feed items with version/service tags and newness status.
+ * @param params - Configuration, items, services, and admin status
+ * @returns Filtered, enriched, and sorted items
+ */
 export const applyLegacyNotificationRules = ({
   config,
   isAdmin,
@@ -225,44 +334,96 @@ export const applyLegacyNotificationRules = ({
   return sortByPublishedDateDesc(enrichedItems);
 };
 
-export const decodeHTML = (html: string) => {
+//*****************************************************************************************
+// JSON Feed Parsing
+//*****************************************************************************************
+
+/**
+ * @name decodeHTML
+ * @description Decodes HTML entities in a string.
+ * @param html - HTML-encoded string
+ * @returns Decoded plain text
+ */
+export const decodeHTML = (html: string): string => {
   if (!html) return '';
   const txt = document.createElement('textarea');
   txt.innerHTML = html;
   return txt.value;
 };
 
-export const parseJSONFeedItemAttachment = (attachments: any[]): JSONFeedItemAttachment[] =>
-  !attachments ? [] : attachments.map(attachment => ({ ...DEFAULT_JSON_FEED_ITEM_ATTACHMENT, ...attachment }));
-
-export const parseJSONFeedAuthor = (authors: any[]): JSONFeedAuthor[] =>
-  !authors ? [] : authors.map(author => ({ ...DEFAULT_JSON_FEED_AUTHOR, ...author }));
-
-export const parseJSONFeedItem = (items: any[]) =>
-  !items
+/**
+ * @name parseJSONFeedItemAttachment
+ * @description Parses raw attachment data into typed JSONFeedItemAttachment objects.
+ * @param attachments - Raw attachment array from JSON
+ * @returns Parsed attachments
+ */
+export const parseJSONFeedItemAttachment = (attachments: unknown[]): JSONFeedItemAttachment[] =>
+  !attachments
     ? []
-    : items.map(item => ({
-        ...DEFAULT_JSON_FEED_ITEM,
-        ...item,
-        date_published: new Date(item.date_published),
-        date_modified: new Date(item.date_modified),
-        authors: parseJSONFeedAuthor(item?.authors),
-        attachments: parseJSONFeedItemAttachment(item?.attachment),
-        content_html: decodeHTML(item?.content_html)
+    : attachments.map(attachment => ({
+        ...DEFAULT_JSON_FEED_ITEM_ATTACHMENT,
+        ...(attachment as Record<string, unknown>)
       }));
 
-export const parseJSONFeed = (feed: any): JSONFeed =>
+/**
+ * @name parseJSONFeedAuthor
+ * @description Parses raw author data into typed JSONFeedAuthor objects.
+ * @param authors - Raw author array from JSON
+ * @returns Parsed authors
+ */
+export const parseJSONFeedAuthor = (authors: unknown[]): JSONFeedAuthor[] =>
+  !authors ? [] : authors.map(author => ({ ...DEFAULT_JSON_FEED_AUTHOR, ...(author as Record<string, unknown>) }));
+
+/**
+ * @name parseJSONFeedItem
+ * @description Parses raw item data into typed JSONFeedItem objects.
+ * @param items - Raw item array from JSON
+ * @returns Parsed feed items
+ */
+export const parseJSONFeedItem = (items: unknown[]): JSONFeedItem[] =>
+  !items
+    ? []
+    : items.map(rawItem => {
+        const item = rawItem as Record<string, unknown>;
+        return {
+          ...DEFAULT_JSON_FEED_ITEM,
+          ...item,
+          date_published: new Date(item.date_published as string),
+          date_modified: new Date(item.date_modified as string),
+          authors: parseJSONFeedAuthor(item?.authors as unknown[]),
+          attachments: parseJSONFeedItemAttachment(item?.attachment as unknown[]),
+          content_html: decodeHTML(item?.content_html as string)
+        };
+      });
+
+/**
+ * @name parseJSONFeed
+ * @description Parses raw JSON feed data into a typed JSONFeed object.
+ * @param feed - Raw feed object from JSON
+ * @returns Parsed feed
+ */
+export const parseJSONFeed = (feed: unknown): JSONFeed =>
   !feed
     ? null
     : {
         ...DEFAULT_JSON_FEED,
-        ...feed,
-        items: parseJSONFeedItem(feed?.items),
-        authors: parseJSONFeedAuthor(feed?.authors)
+        ...(feed as Record<string, unknown>),
+        items: parseJSONFeedItem((feed as Record<string, unknown>)?.items as unknown[]),
+        authors: parseJSONFeedAuthor((feed as Record<string, unknown>)?.authors as unknown[])
       };
 
-export const fetchJSON = (url: string): Promise<any> =>
-  new Promise(async (resolve, reject) => {
+//*****************************************************************************************
+// Network
+//*****************************************************************************************
+
+/**
+ * @name fetchJSON
+ * @description Fetches and parses a single JSON Feed from a URL.
+ * @param url - URL of the JSON Feed
+ * @returns Parsed JSON Feed
+ */
+export const fetchJSON = (url: string): Promise<JSONFeed> =>
+  new Promise(async resolve => {
     const response: Response = (await fetch(url, { method: 'GET' }).catch(err =>
       // eslint-disable-next-line no-console
       console.error(`Notification Area: error caused by URL "${err}`)
@@ -279,6 +440,12 @@ export const fetchJSON = (url: string): Promise<any> =>
     return;
   });
 
+/**
+ * @name fetchJSONFeeds
+ * @description Fetches and parses multiple JSON Feeds in parallel.
+ * @param urls - Array of feed URLs
+ * @returns Array of parsed JSON Feeds
+ */
 export const fetchJSONFeeds = (urls: string[] = []): Promise<JSONFeed[]> =>
   new Promise(async (resolve, reject) => {
     if (!urls) {
@@ -294,9 +461,14 @@ export const fetchJSONFeeds = (urls: string[] = []): Promise<JSONFeed[]> =>
 type FetchJSONProps = {
   urls: string[];
   onSuccess?: (feeds: JSONFeedItem[]) => void;
-  onError?: (err: any) => void;
+  onError?: (err: unknown) => void;
 };
 
+/**
+ * @name fetchJSONNotifications
+ * @description Fetches multiple feeds and returns all items flattened.
+ * @param params - URLs and callbacks
+ */
 export const fetchJSONNotifications = ({ urls, onSuccess = null, onError = null }: FetchJSONProps): void => {
   fetchJSONFeeds(urls)
     .then(feeds => onSuccess && onSuccess(feeds.flatMap(f => f.items)))
