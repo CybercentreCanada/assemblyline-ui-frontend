@@ -1,17 +1,17 @@
 import { z } from 'zod';
 
 declare global {
-  type AppPreferences = z.infer<typeof AppPreferencesSchema>;
+  type AppPreference = z.infer<typeof AppPreferenceSchema>;
 }
 
-const ApiPreferencesSchema = z.object({
+const ApiPreferenceSchema = z.object({
   gcTime: z.number().catch(1_000),
   invalidateDelay: z.number().catch(1_000),
   retryTime: z.number().catch(10_000),
   staleTime: z.number().catch(1_000)
 });
 
-const LayoutPreferencesSchema = z.object({
+const LayoutPreferenceSchema = z.object({
   autoHideAppbar: z.boolean().catch(true),
   density: z.enum(['comfortable', 'compact', 'dense']).catch('comfortable'),
   drawerOpen: z.boolean().catch(true),
@@ -23,15 +23,15 @@ const LayoutPreferencesSchema = z.object({
   theme: z.string().catch('theme.default')
 });
 
-const ThemePreferencesSchema = z.object({
+const ThemePreferenceSchema = z.object({
   mode: z.enum(['system', 'light', 'dark']).catch('system'),
   variant: z.enum(['default']).catch('default')
 });
 
-export const PreferencesSchema = z.object({
-  api: ApiPreferencesSchema.catch(ApiPreferencesSchema.parse({})),
-  layout: LayoutPreferencesSchema.catch(LayoutPreferencesSchema.parse({})),
-  theme: ThemePreferencesSchema.catch(ThemePreferencesSchema.parse({}))
+export const PreferenceSchema = z.object({
+  api: ApiPreferenceSchema.catch(ApiPreferenceSchema.parse({})),
+  layout: LayoutPreferenceSchema.catch(LayoutPreferenceSchema.parse({})),
+  theme: ThemePreferenceSchema.catch(ThemePreferenceSchema.parse({}))
 });
 
-export const AppPreferencesSchema = PreferencesSchema;
+export const AppPreferenceSchema = PreferenceSchema;

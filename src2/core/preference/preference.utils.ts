@@ -30,33 +30,33 @@ const deepDiff = (current: Record<string, any>, defaults: Record<string, any>): 
 };
 
 /**
- * @name savePreferencesToLocalStorage
- * @description Persists only the differences between current preferences and schema defaults.
+ * @name savePreferenceToLocalStorage
+ * @description Persists only the differences between current preference and schema defaults.
  * @param schema - Zod schema used to derive defaults
- * @param preferences - Current preferences state
+ * @param preference - Current preference state
  * @param key - localStorage key
  * @returns void
  */
-export const savePreferencesToLocalStorage = (
+export const savePreferenceToLocalStorage = (
   schema: z.ZodObject<any>,
-  preferences: AppPreferences,
+  preference: AppPreference,
   key: string
 ): void => {
   const defaults = schema.parse({});
-  const diff = deepDiff(preferences, defaults);
+  const diff = deepDiff(preference, defaults);
 
   if (Object.keys(diff).length === 0) localStorage.removeItem(key);
   else localStorage.setItem(key, JSON.stringify(diff));
 };
 
 /**
- * @name loadPreferencesFromLocalStorage
+ * @name loadPreferenceFromLocalStorage
  * @description Reads stored preference diff from localStorage and validates with safeParse. Returns only the stored overrides or empty object on failure.
  * @param schema - Zod schema to validate stored data against
  * @param key - localStorage key
- * @returns Partial preferences containing only stored overrides
+ * @returns Partial preference containing only stored overrides
  */
-export const loadPreferencesFromLocalStorage = (schema: z.ZodObject<any>, key: string): Partial<AppPreferences> => {
+export const loadPreferenceFromLocalStorage = (schema: z.ZodObject<any>, key: string): Partial<AppPreference> => {
   try {
     const raw = localStorage.getItem(key);
     const stored = JSON.parse(raw);
