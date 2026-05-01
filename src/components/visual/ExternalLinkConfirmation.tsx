@@ -14,7 +14,17 @@ export const ExternalLinkConfirmation = memo(({ href, children, ...props }: Exte
 
   const [open, setOpen] = useState<boolean>(false);
 
-  const url = useMemo(() => href?.toString() || null, [href]);
+  const url = useMemo(() => {
+    const str = href?.toString() || null;
+    // If the href is empty, then we won't render a link at all
+    if (!str) return null;
+    // Relative path to the same domain is allowed
+    else if (str.startsWith('/')) return str;
+    // Absolute URLs must start with http:// or https://
+    else if (str.startsWith('https://') || str.startsWith('http://')) return str;
+    // Anything else is considered invalid and will not render a link
+    else return null;
+  }, [href]);
 
   const handleContinue = useCallback(() => {
     setOpen(false);
