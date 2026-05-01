@@ -6,7 +6,7 @@ Consistent import ordering makes files scannable — you can immediately tell wh
 
 ## Import Ordering (strict)
 
-Imports are grouped in this order, separated by blank lines between groups:
+Imports are grouped in this order, with no blank lines between them:
 
 1. **MUI icons** — default imports from `@mui/icons-material/*`
 2. **MUI components** — named imports from `@mui/material`

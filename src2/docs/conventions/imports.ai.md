@@ -8,7 +8,7 @@
 4. Third-party libraries — `react`, `react-i18next`, `react-router`, `dompurify`, etc.
 5. Local relative imports — `./` files (hooks, models, utils, config)
 
-Separate groups with blank lines. Sort alphabetically within each group.
+**No blank lines** in the import section. Sort alphabetically within each group.
 
 ## Must
 
@@ -21,6 +21,7 @@ Separate groups with blank lines. Sort alphabetically within each group.
 
 ## Never
 
+- NO blank lines anywhere in the import section (not between groups, not between imports)
 - NO `import { type X }` — use `import type { X }`
 - NO default imports (exceptions: MUI icons, DOMPurify, Markdown)
 - NO circular imports between modules
@@ -33,15 +34,12 @@ Separate groups with blank lines. Sort alphabetically within each group.
 ```typescript
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import { Badge, Drawer, styled, useTheme } from '@mui/material';
-
 import { useAPIMutation } from 'core/api';
 import { useAppConfig, useAppSetConfig } from 'core/config';
 import type { SystemMessage } from 'models/ui/user';
 import { IconButton } from 'ui/buttons/IconButton';
-
 import { memo, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-
 import { useNotificationClose } from './notifications.hooks';
 import { DEFAULT_SYSTEM_MESSAGE } from './notifications.models';
 import { formatDate } from './notifications.utils';
