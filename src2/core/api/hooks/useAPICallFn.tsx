@@ -4,7 +4,7 @@ import { useAppSnackbar } from 'core/snackbar/snackbar.hooks';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getXSRFCookie } from 'shared/utils/xsrf.utils';
-import { APIRequest, APIResponse } from '../api.models';
+import type { APIRequest, APIResponse } from '../api.models';
 import { isAPIData } from '../api.utils';
 
 export type UseAPICallFnProps<

@@ -1,0 +1,20 @@
+import { useEffect, useMemo, useState } from 'react';
+import { stableStringify } from '../api.utils';
+
+export const useIsDebouncing = (delay: number | null = null, dependencies: readonly unknown[] = []): boolean => {
+  const [bouncedDependencies, setBouncedDependencies] = useState<string | null>(null);
+
+  const stringifiedDependencies = useMemo<string>(() => stableStringify(dependencies), [dependencies]);
+
+  useEffect(() => {
+    if (!delay) return;
+    const handler = setTimeout(() => setBouncedDependencies(stableStringify(dependencies)), delay);
+    return () => clearTimeout(handler);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [delay, ...dependencies]);
+
+  return useMemo(
+    () => (delay ? bouncedDependencies !== stringifiedDependencies : false),
+    [bouncedDependencies, delay, stringifiedDependencies]
+  );
+};

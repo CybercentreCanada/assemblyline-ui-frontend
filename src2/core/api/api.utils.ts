@@ -1,10 +1,24 @@
-import { APIRequests, APIResponses } from 'app/app.api';
-import { DEFAULT_APP_CONFIG } from 'app/app.configs';
-import type { APIQueryKey, APIRequest, APIResponse, BlobResponse } from './api.models';
-import { queryClient } from './api.provider';
+import type { APIResponse, BlobResponse } from './api.models';
 
-const isObject = (variable: unknown) => variable !== null && typeof variable === 'object' && !Array.isArray(variable);
+/**
+ * @name isObject
+ * @description Checks whether a value is a plain object (not null and not an array).
+ * @param variable - The value to check
+ * @returns True if the value is a plain object
+ */
+export const isObject = (variable: unknown) =>
+  variable !== null && typeof variable === 'object' && !Array.isArray(variable);
 
+//*****************************************************************************************
+// isAPIData
+//*****************************************************************************************
+
+/**
+ * @name isAPIData
+ * @description Type guard that checks whether a value conforms to the APIResponse shape.
+ * @param value - The object to check
+ * @returns True if the value is an APIResponse
+ */
 export const isAPIData = (value: object): value is APIResponse =>
   value !== undefined &&
   value !== null &&
@@ -13,9 +27,32 @@ export const isAPIData = (value: object): value is APIResponse =>
   'api_server_version' in value &&
   'api_status_code' in value;
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access
-const getValue = (key, ...responses) => responses?.find(r => !!r?.[key])?.[key] || null;
+//*****************************************************************************************
+// getValue
+//*****************************************************************************************
 
+/**
+ * @name getValue
+ * @description Extracts the first non-falsy value for a given key across multiple response objects.
+ * @param key - The property key to look up
+ * @param responses - One or more response objects to search
+ * @returns The first truthy value found, or null
+ */
+// eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access
+export const getValue = (key, ...responses) => responses?.find(r => !!r?.[key])?.[key] || null;
+
+//*****************************************************************************************
+// getAPIResponse
+//*****************************************************************************************
+
+/**
+ * @name getAPIResponse
+ * @description Normalizes query data, error, and failureReason into a single flat response object.
+ * @param data - The successful API response
+ * @param error - The error API response
+ * @param failureReason - The failure reason API response
+ * @returns A normalized object with statusCode, serverVersion, data, and error
+ */
 export const getAPIResponse = <R, E>(data: APIResponse<R>, error: APIResponse<E>, failureReason: APIResponse<E>) => ({
   statusCode: getValue('api_status_code', data, error, failureReason) as number,
   serverVersion: getValue('api_server_version', data, error, failureReason) as string,
@@ -23,6 +60,18 @@ export const getAPIResponse = <R, E>(data: APIResponse<R>, error: APIResponse<E>
   error: getValue('api_error_message', data, error, failureReason) as E
 });
 
+//*****************************************************************************************
+// getBlobResponse
+//*****************************************************************************************
+
+/**
+ * @name getBlobResponse
+ * @description Normalizes blob query data, error, and failureReason into a single flat response object including file metadata.
+ * @param data - The successful blob response
+ * @param error - The error API response
+ * @param failureReason - The failure reason API response
+ * @returns A normalized object with statusCode, serverVersion, data, error, filename, size, and type
+ */
 export const getBlobResponse = <R, E>(data: BlobResponse, error: APIResponse<E>, failureReason: APIResponse<E>) => ({
   statusCode: getValue('api_status_code', data, error, failureReason) as number,
   serverVersion: getValue('api_server_version', data, error, failureReason) as string,
@@ -33,17 +82,14 @@ export const getBlobResponse = <R, E>(data: BlobResponse, error: APIResponse<E>,
   type: getValue('type', data, error, failureReason) as string
 });
 
+//*****************************************************************************************
+// stableStringify
+//*****************************************************************************************
+
 /**
- * Recursively serializes a JSON-serializable value into a **deterministic string**.
- *
- * Unlike `JSON.stringify`, this function ensures that object keys are sorted alphabetically,
- * producing a stable string output for the same content. This is useful for caching, query keys,
- * and other scenarios where object reference equality cannot be relied upon.
- *
- * Constraints:
- * - Only works with JSON-serializable values (no functions, Symbols, circular references).
- * - Dates will be converted to ISO strings automatically.
- *
+ * @name stableStringify
+ * @description Recursively serializes a JSON-serializable value into a deterministic string
+ * with object keys sorted alphabetically. Useful for caching and query keys.
  * @param value - Any JSON-serializable value (object, array, primitive)
  * @returns A deterministic string representation of the value
  */
@@ -65,134 +111,3 @@ export const stableStringify = (value: unknown): string => {
 
   return `{${keys.map(key => `${JSON.stringify(key)}:${stableStringify(obj[key])}`).join(',')}}`;
 };
-
-export const invalidateAPIQuery = (
-  filter: (key: APIRequest) => boolean,
-  delay: number = DEFAULT_APP_CONFIG.api.invalidateDelay
-) =>
-  setTimeout(async () => {
-    await queryClient.invalidateQueries({
-      predicate: ({ queryKey }) => {
-        try {
-          const [url, method, bodyStr] = queryKey as unknown as APIQueryKey;
-          let body: APIRequest['body'] = null;
-          if (typeof bodyStr === 'string') {
-            try {
-              body = JSON.parse(bodyStr);
-            } catch {
-              body = bodyStr;
-            }
-          }
-          const req: APIRequest = { url, method, body };
-          return filter(req);
-        } catch {
-          return false;
-        }
-      }
-    });
-  }, delay);
-
-// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-constraint
-export const updateAPIQuery = <T extends unknown = unknown>(
-  filter: (key: APIRequest) => boolean,
-  update: (prev: T) => T
-) =>
-  queryClient.setQueriesData<APIResponse<T>>(
-    {
-      predicate: ({ queryKey }) => {
-        try {
-          const [url, method, bodyStr] = queryKey as unknown as APIQueryKey;
-          let body: APIRequest['body'] = null;
-          if (typeof bodyStr === 'string') {
-            try {
-              body = JSON.parse(bodyStr);
-            } catch {
-              body = bodyStr;
-            }
-          }
-          const req: APIRequest = { url, method, body };
-          return filter(req);
-        } catch {
-          return false;
-        }
-      }
-    },
-    prev => (prev ? { ...prev, api_response: update(prev.api_response as T) } : prev)
-  );
-
-export const invalidateALQuery = <Request extends APIRequests>(
-  request: Partial<Request>,
-  delay: number = DEFAULT_APP_CONFIG.api.invalidateDelay
-) =>
-  setTimeout(async () => {
-    await queryClient.invalidateQueries({
-      predicate: ({ queryKey }) => {
-        try {
-          const [url, method, bodyStr] = queryKey as unknown as APIQueryKey;
-          let body: APIRequest['body'] = null;
-          if (typeof bodyStr === 'string') {
-            try {
-              body = JSON.parse(bodyStr);
-            } catch {
-              body = bodyStr;
-            }
-          }
-          const req: APIRequest = { url, method, body };
-
-          return (
-            (!('url' in request) ? true : req.url.startsWith(request?.url as string)) &&
-            (!('method' in request) ? true : (request?.method || 'GET') === req.method) &&
-            (!('body' in request)
-              ? true
-              : !isObject(request?.body)
-                ? (request?.body ?? null) === req.body
-                : isObject(req.body) &&
-                  Object.keys(request?.body as object).every(key =>
-                    Object.prototype.hasOwnProperty.call(req.body as object, key)
-                  ))
-          );
-        } catch {
-          return false;
-        }
-      }
-    });
-  }, delay);
-
-export const updateALQuery = <Request extends APIRequests>(
-  request: Partial<Request>,
-  updater: (prev: APIResponses<Request>) => APIResponses<Request>
-) =>
-  queryClient.setQueriesData<APIResponse<APIResponses<Request>>>(
-    {
-      predicate: ({ queryKey }) => {
-        try {
-          const [url, method, bodyStr] = queryKey as unknown as APIQueryKey;
-          let body: APIRequest['body'] = null;
-          if (typeof bodyStr === 'string') {
-            try {
-              body = JSON.parse(bodyStr);
-            } catch {
-              body = bodyStr;
-            }
-          }
-          const req: APIRequest = { url, method, body };
-
-          return (
-            (!('url' in request) ? true : req.url.startsWith(request?.url as string)) &&
-            (!('method' in request) ? true : (request?.method || 'GET') === req.method) &&
-            (!('body' in request)
-              ? true
-              : !isObject(request?.body)
-                ? (request?.body ?? null) === req.body
-                : isObject(req.body) &&
-                  Object.keys(request?.body as object).every(key =>
-                    Object.prototype.hasOwnProperty.call(req.body as object, key)
-                  ))
-          );
-        } catch {
-          return false;
-        }
-      }
-    },
-    prev => (prev ? { ...prev, api_response: updater(prev.api_response as APIResponses<Request>) } : prev)
-  );

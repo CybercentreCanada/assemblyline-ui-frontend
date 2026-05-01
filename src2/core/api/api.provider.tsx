@@ -1,59 +1,88 @@
 import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
-import { keepPreviousData, QueryClient, QueryClientConfig } from '@tanstack/react-query';
+import { keepPreviousData, QueryClient } from '@tanstack/react-query';
 import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools';
 import type { PersistedClient } from '@tanstack/react-query-persist-client';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
-import { useAppConfig } from 'core/config';
+import { useAppPreference } from 'core/preference';
+import { createAppStore } from 'features/store/createAppStore';
 import { compress, decompress } from 'lz-string';
-import React, { Activity, PropsWithChildren, useEffect, useMemo } from 'react';
+import type { PropsWithChildren } from 'react';
+import { Activity, memo, useEffect, useMemo } from 'react';
 import type { APIQueryKey } from './api.models';
 
-const API_STALE_TIME = 1000;
+//*****************************************************************************************
+// App API Store
+//*****************************************************************************************
 
-const API_GARBAGE_COLLECTION_TIME = 1000;
-
-export const APP_API_CONFIG: QueryClientConfig = {
-  defaultOptions: {
-    queries: {
-      refetchOnWindowFocus: false,
-      staleTime: API_STALE_TIME,
-      gcTime: API_GARBAGE_COLLECTION_TIME,
-      placeholderData: keepPreviousData
-    }
-  }
+export type AppApiStore = {
+  showDevtools: boolean;
 };
 
-export const APP_API_PERSISTER = createSyncStoragePersister({
-  storage: window.sessionStorage,
-  serialize: data =>
-    compress(
-      JSON.stringify({
-        ...data,
-        clientState: {
-          mutations: [],
-          queries: data.clientState.queries.filter(q => (q.queryKey as APIQueryKey)[3])
-        }
-      })
-    ),
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-  deserialize: data => JSON.parse(decompress(data))
+export const DEFAULT_APP_API_STORE: AppApiStore = {
+  showDevtools: false
+};
+
+export const {
+  StoreProvider: AppApiStoreProvider,
+  useStore: useAppAPIStore,
+  useSetStore: useAppSetAPIStore
+} = createAppStore<AppApiStore>(DEFAULT_APP_API_STORE);
+
+AppApiStoreProvider.displayName = 'AppApiStoreProvider';
+
+//*****************************************************************************************
+// App API Debugger Layout
+//*****************************************************************************************
+
+export type AppApiLayoutProps = {
+  /** Provider children. */
+  children: PropsWithChildren['children'];
+};
+
+export const AppApiLayout = memo(({ children }: AppApiLayoutProps) => {
+  const showDevtools = useAppAPIStore(s => s.showDevtools);
+
+  return (
+    <>
+      {children}
+
+      <Activity mode={showDevtools ? 'visible' : 'hidden'}>
+        <div
+          style={{
+            position: 'fixed',
+            right: 16,
+            bottom: 16,
+            width: 420,
+            height: 560,
+            zIndex: 9999,
+            background: '#fff'
+          }}
+        >
+          <ReactQueryDevtoolsPanel client={queryClient} />
+        </div>
+      </Activity>
+    </>
+  );
 });
+
+AppApiLayout.displayName = 'AppApiLayout';
+
+//*****************************************************************************************
+// App API Provider
+//*****************************************************************************************
 
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       refetchOnWindowFocus: false,
-      // staleTime: API_STALE_TIME,
-      // gcTime: API_GARBAGE_COLLECTION_TIME,
       placeholderData: keepPreviousData
     }
   }
 });
 
-export const AppAPIProvider = React.memo(({ children }: PropsWithChildren) => {
-  const staleTime = useAppConfig(s => s.api.staleTime);
-  const gcTime = useAppConfig(s => s.api.gcTime);
-  const showDevtools = useAppConfig(s => s.api.showDevtools);
+export const AppAPIProvider = memo(({ children }: PropsWithChildren) => {
+  const gcTime = useAppPreference(s => s.api.gcTime);
+  const staleTime = useAppPreference(s => s.api.staleTime);
 
   const persister = useMemo(
     () =>
@@ -99,22 +128,8 @@ export const AppAPIProvider = React.memo(({ children }: PropsWithChildren) => {
   return (
     <PersistQueryClientProvider client={queryClient} persistOptions={{ persister }}>
       {children}
-
-      <Activity mode={showDevtools ? 'visible' : 'hidden'}>
-        <div
-          style={{
-            position: 'fixed',
-            right: 16,
-            bottom: 16,
-            width: 420,
-            height: 560,
-            zIndex: 9999,
-            background: '#fff'
-          }}
-        >
-          <ReactQueryDevtoolsPanel client={queryClient} />
-        </div>
-      </Activity>
     </PersistQueryClientProvider>
   );
 });
+
+AppAPIProvider.displayName = 'AppAPIProvider';

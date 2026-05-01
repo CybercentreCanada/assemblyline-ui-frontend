@@ -15,10 +15,23 @@ Centralized API client built on TanStack React Query. Provides typed hooks for a
 ## Key Files
 
 - `api.config.ts` — Base URL, default headers, timeout configuration
-- `api.hooks.tsx` — Core query/mutation hooks
 - `api.models.ts` — Request/response type definitions
 - `api.provider.tsx` — QueryClientProvider wrapper with persistence
 - `api.utils.ts` — Response parsing, error formatting utilities
+- `hooks/useAPIQuery.tsx` — Core typed GET hook with caching and refetching
+- `hooks/useAPIMutation.tsx` — Core typed POST/PUT/DELETE hook
+- `hooks/useAPICallFn.tsx` — Imperative API call function for use outside React
+- `hooks/useAppQuery.tsx` — App-specific query wrapper over `useAPIQuery`
+- `hooks/useAppMutation.tsx` — App-specific mutation wrapper over `useAPIMutation`
+- `hooks/useInfiniteAPIQuery.tsx` — Paginated/infinite query hook
+- `hooks/useInfiniteAppQuery.tsx` — App-specific infinite query wrapper
+- `hooks/useDownloadBlob.tsx` — File download hook
+- `hooks/useBootstrapQuery.tsx` — Initial data loading hook
+- `hooks/useIsDebouncing.tsx` — Debounce state tracking hook
+- `utils/invalidateAPIQuery.ts` — Generic query invalidation by filter function
+- `utils/invalidateAppQuery.ts` — App-specific query invalidation by partial request match
+- `utils/updateAPIQuery.ts` — Generic query cache update by filter function
+- `utils/updateAppQuery.ts` — App-specific query cache update by partial request match
 
 ## Usage Patterns
 
@@ -163,16 +176,20 @@ const useDeleteAlert = () => {
 After a mutation that changes data, invalidate related queries so they refetch:
 
 ```typescript
-import { invalidateAPIQuery } from 'core/api';
+import { invalidateAPIQuery, invalidateAppQuery } from 'core/api';
 
-// Invalidate by URL pattern
+// Generic: invalidate by custom filter function
 invalidateAPIQuery(({ url }) => url.startsWith('/api/v4/alert/'));
 
-// Invalidate a specific query
+// Generic: invalidate a specific query
 invalidateAPIQuery(({ url }) => url === '/api/v4/user/whoami/');
 
-// Invalidate with delay (wait for backend to process)
+// Generic: invalidate with delay (wait for backend to process)
 invalidateAPIQuery(({ url }) => url.startsWith('/api/v4/alert/'), 500);
+
+// App-specific: invalidate by partial request match (url prefix, method, body keys)
+invalidateAppQuery({ url: '/api/v4/alert/' });
+invalidateAppQuery({ url: '/api/v4/alert/', method: 'GET' });
 ```
 
 ### Error Handling

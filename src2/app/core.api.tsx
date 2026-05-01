@@ -1,0 +1,21 @@
+import { RootRequests, RootResponses } from 'models/api';
+import { BadlistRequests, BadlistResponses } from 'models/api/badlist';
+import { SearchRequests, SearchResponses } from 'models/api/search';
+import { UserRequests, UserResponses } from 'models/api/user';
+
+declare global {
+  // prettier-ignore
+  type APIRequests =
+    | BadlistRequests
+    | RootRequests
+    | SearchRequests
+    | UserRequests;
+
+  // prettier-ignore
+  type APIResponses<Request extends APIRequests> =
+    Request extends BadlistRequests ? BadlistResponses<Request> :
+    Request extends RootRequests ? RootResponses<Request> :
+    Request extends SearchRequests ? SearchResponses<Request> :
+    Request extends UserRequests ? UserResponses<Request> :
+    never;
+}
