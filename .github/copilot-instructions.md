@@ -1,41 +1,29 @@
 # Project Coding Instructions
 
-This project follows strict architecture rules documented in `src2/docs/ai/`.
+This project follows strict architecture rules documented in `src2/docs/`.
 
-Before generating or modifying code, read and follow these documents:
+Before generating or modifying code, read and follow the AI rules in `src2/docs/`:
 
-1. `src2/docs/ai/architecture-rules.md` — Layer dependencies, forbidden/required patterns
-2. `src2/docs/ai/component-patterns.md` — How to write React components
-3. `src2/docs/ai/state-patterns.md` — How to read/write state (Zustand, React Query)
-4. `src2/docs/ai/file-structure.md` — Where to put files, naming conventions
-5. `src2/docs/ai/routing-patterns.md` — How to add routes and navigate
-6. `src2/docs/ai/i18n-patterns.md` — Translation key conventions
+## Architecture & File Structure
 
-## Quick Reference (Critical Rules)
+- `src2/docs/architecture.ai.md` — Layer dependencies, forbidden/required patterns
+- `src2/docs/file-structure.ai.md` — Where to put files, naming conventions
 
-### Required
+## File Types
 
-- Use `memo()` for all exported components
-- Set `.displayName` on every component
-- All component-internal functions use `useCallback`
-- Read state via `useAppConfig(c => c.some.path)` — NOT full config
-- Write state via `useAppSetConfig()` — shallow merge with manual nested spreading
-- API calls via `useAPIMutation` / `useAPIQuery` — NOT raw fetch
-- All user-visible strings must use `t('module.key')` from i18next
-- Use `import type {}` for type-only imports
-- Use `type` keyword for all type declarations
-- File naming: `<module>.<role>.tsx` (e.g., `notifications.components.tsx`)
-- Types in `*.models.ts`, not in component files
+- `src2/docs/file-structure/components.ai.md` — How to write React components
+- `src2/docs/file-structure/hooks.ai.md` — Hook ordering, when to extract hooks
+- `src2/docs/file-structure/models.ai.md` — Type declarations, defaults, enums
+- `src2/docs/file-structure/i18n.ai.md` — Translation key conventions
+- `src2/docs/file-structure/utils.ai.md` — Utility function patterns
+- `src2/docs/file-structure/utils.test.ai.md` — Unit test patterns for utilities
+- `src2/docs/file-structure/pom.ai.md` — Page Object Model for E2E tests
+- `src2/docs/file-structure/spec.ai.md` — Playwright E2E spec files
 
-### Forbidden
+## Conventions
 
-- NO React Context for shared state — use Zustand
-- NO wrapper hooks for single-use mutations — keep inline
-- NO default exports — named exports only
-- NO default imports — always destructure (`import { memo } from 'react'`)
-- NO `interface` keyword — use `type`
-- NO `any` type
-- NO MUI `sx` prop — use `styled()` for reuse, raw HTML + `style` for single-use
-- NO MUI layout components (`Box`, `Stack`, `Grid`) — use raw HTML elements
-- NO `lazy()` or dynamic `import()` — no code splitting
-- NO Zod for API responses — only for localStorage config validation
+- `src2/docs/conventions/imports.ai.md` — Import ordering and syntax
+- `src2/docs/conventions/styling.ai.md` — Styling approach (styled, raw HTML, theme)
+- `src2/docs/conventions/performance.ai.md` — Memoization, stable references, selectors
+- `src2/docs/conventions/accessibility.ai.md` — ARIA, semantic HTML, keyboard, E2E locators
+- `src2/docs/conventions/react.ai.md` — React hooks and components usage guide

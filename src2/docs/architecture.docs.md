@@ -182,31 +182,3 @@ pages → layout → features → core → models
 │  API Layer (fetch → /api/v4/*)                       │
 └─────────────────────────────────────────────────────┘
 ```
-
-## Key Architectural Decisions
-
-### Single Global Store
-
-One Zustand store (`AppConfig`) holds all application-wide state. Components access it via selector hooks (`useAppConfig`) and mutate via `useAppSetConfig`. This eliminates prop drilling and context providers for shared state.
-
-See `core/config/config.docs.md` for full rationale and usage patterns.
-
-### Multi-Panel Router
-
-The router supports concurrent panels (split views), each with its own navigation stack. Panels render into LRU-cached nodes to preserve component state across navigations. Reverse portals prevent unmounting.
-
-See `core/router/router.docs.md` for full rationale and usage patterns.
-
-### Inline Mutations
-
-Components own their mutations directly rather than importing pre-built hook abstractions. This makes data flow visible at the component level and prevents premature abstraction.
-
-See `core/api/api.docs.md` for full rationale and usage patterns.
-
-### Feature-Sliced Structure
-
-Files are co-located by domain/resource, not by technical role. Everything about a feature lives together — its components, hooks, config, i18n, models, utils, POMs, and specs all reside in the same folder. You never leave that folder when working on a feature.
-
-Each page primarily affects a **resource** and secondarily performs an **action**. This is reflected in the file naming (`<resource>-<action>.<role>.<ext>`) and in folder organization.
-
-See `docs/conventions/modules.md` for detailed module organization patterns.

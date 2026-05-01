@@ -30,25 +30,42 @@ const config = useAppConfig(c => c);
 
 ### Stable references
 
-Avoid creating new objects, arrays, or functions in render that get passed as props — they break `memo()`:
+Not all inline objects break `memo()`. Simple, static objects (like a `style` prop with a few properties) are cheap to create and compare — React's shallow comparison handles them fine in practice. The rule is about **complexity**, not just inline syntax.
+
+**When inline is OK:**
+- Simple `style` objects with static values: `style={{ display: 'flex', gap: 8 }}`
+- Small static configuration objects with primitive values
+
+**When `useMemo`/`useCallback` is required:**
+- Arrays that are filtered, sorted, or transformed
+- Objects built from dynamic data or state
+- Functions passed as props (always `useCallback`)
+- Any value computed from dependencies that change
 
 ```typescript
-// ❌ New object every render — child always re-renders
-<MyComponent style={{ padding: 8 }} />
-<MyComponent options={['a', 'b', 'c']} />
-<MyComponent onClick={() => doSomething()} />
+// ✅ Simple static style — OK inline
+<div style={{ display: 'flex', gap: 8 }}>{children}</div>
 
-// ✅ Stable references — child only re-renders when values actually change
-const style = useMemo(() => ({ padding: 8 }), []);
-const options = useMemo(() => ['a', 'b', 'c'], []);
-const handleClick = useCallback(() => doSomething(), []);
+// ✅ Simple static config — OK inline
+<MyComponent config={{ rows: 5, dense: true }} />
 
-<MyComponent style={style} />
-<MyComponent options={options} />
+// ❌ Dynamic computation — needs useMemo
+<MyComponent items={items.filter(i => i.active)} />
+<MyComponent sorted={[...items].sort((a, b) => a.score - b.score)} />
+
+// ✅ Dynamic computation — stabilized
+const activeItems = useMemo(() => items.filter(i => i.active), [items]);
+<MyComponent items={activeItems} />
+
+// ❌ Function prop — always needs useCallback
+<MyComponent onClick={() => doSomething(id)} />
+
+// ✅ Function prop — stabilized
+const handleClick = useCallback(() => doSomething(id), [id]);
 <MyComponent onClick={handleClick} />
 ```
 
-**Rule:** Every function passed as a prop must be wrapped in `useCallback`. Every object/array passed as a prop must be wrapped in `useMemo` or defined outside the component.
+**Rule:** Functions passed as props must always be wrapped in `useCallback`. Objects/arrays that involve computation (filtering, sorting, mapping, spreading) must be wrapped in `useMemo`. Simple static objects are fine inline.
 
 ## Lists and Repeated Elements
 
@@ -56,7 +73,7 @@ When rendering 10+ items, performance of each item is critical:
 
 ### Use raw HTML over MUI
 
-MUI components add significant overhead per instance. For list items, table rows, grid cells — use raw HTML with the `style` prop:
+MUI components carry significant overhead per instance through emotion's CSS-in-JS engine. For list items, table rows, grid cells — use raw HTML with the `style` prop:
 
 ```typescript
 // ✅ Fast — raw elements in a list
@@ -75,6 +92,8 @@ MUI components add significant overhead per instance. For list items, table rows
   </Stack>
 ))}
 ```
+
+Do not use `Box`, `Stack`, `Grid`, or `Paper` as layout primitives — especially inside loops. Use MUI components only when you need their specific behavior (ripple, transitions, focus traps).
 
 ### Virtualization
 
@@ -142,9 +161,10 @@ import { Page } from './page.components';
 | Anti-pattern | Why | Fix |
 |-------------|-----|-----|
 | `useEffect` for derived state | Extra render cycle | Use `useMemo` instead |
-| Object/array literals as props | New reference every render, breaks `memo()` | `useMemo` or define outside |
+| Computed arrays/objects as props | New reference every render, breaks `memo()` | `useMemo` |
 | Inline arrow functions as props | New reference every render | `useCallback` |
 | Subscribing to entire store | Re-renders on any change | Focused selectors |
-| MUI layout components in lists | Heavy per-instance overhead | Raw HTML + `style` |
+| MUI layout components (`Box`, `Stack`, `Grid`) | Heavy per-instance overhead | Raw HTML + `style` |
+| MUI `sx` prop | Emotion CSS-in-JS overhead | `styled()` or `style` prop |
 | Unvirtualized lists of 100+ items | All items rendered, slow layout | Virtualize |
 | Re-computing on every render | Wasted CPU | `useMemo` with deps |

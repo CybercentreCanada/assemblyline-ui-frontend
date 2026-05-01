@@ -1,0 +1,79 @@
+# Performance — AI Rules
+
+## Must
+
+- Every exported component wrapped in `memo()`
+- Focused store selectors — never subscribe to entire store
+- Functions passed as props must use `useCallback`
+- Computed arrays/objects (filter, sort, map, spread) passed as props must use `useMemo`
+- Empty array/object defaults must be module-level constants
+- Raw HTML + `style` for lists of 10+ items — no MUI layout components
+- Virtualize lists of 100+ items (`@tanstack/react-virtual`)
+- Stable unique `key` prop — never array index for dynamic lists
+- `useMemo` for derived/filtered/sorted data
+- `useDeferredValue` for search-filtered large lists
+
+## Simple Inline Objects Are OK
+
+Simple static objects do not need `useMemo`:
+
+```typescript
+// ✅ Simple static style — OK inline
+<div style={{ display: 'flex', gap: 8 }}>{children}</div>
+<MyComponent config={{ rows: 5, dense: true }} />
+
+// ❌ Computed value — needs useMemo
+<MyComponent items={items.filter(i => i.active)} />
+<MyComponent sorted={[...items].sort((a, b) => a.score - b.score)} />
+
+// ✅ Stabilized
+const activeItems = useMemo(() => items.filter(i => i.active), [items]);
+```
+
+**Rule:** If it involves computation (filtering, sorting, mapping, spreading) → `useMemo`. If it's a plain static literal → inline is fine.
+
+## Empty Defaults Outside Components
+
+```typescript
+// ✅ Module-level — same reference every render
+const EMPTY_SERVICES: MinimalService[] = [];
+
+export const MyComponent = memo(() => {
+  const services = useAppConfig(s => s?.services ?? EMPTY_SERVICES);
+});
+
+// ❌ Inline default — new array every render
+const services = useAppConfig(s => s?.services ?? []);
+```
+
+## Derived State
+
+```typescript
+// ✅ useMemo for derived data
+const filtered = useMemo(
+  () => items.filter(i => i.active).sort((a, b) => a.score - b.score),
+  [items]
+);
+
+// ❌ useEffect to compute derived state
+useEffect(() => { setFiltered(items.filter(...)); }, [items]);
+```
+
+## MUI Performance
+
+- MUI components add significant overhead per instance (emotion CSS-in-JS)
+- Use MUI only for behavior (ripple, transitions, focus traps) — not layout
+- In lists/loops: always raw HTML + `style` prop
+- Never use `Box`, `Stack`, `Grid`, `Paper` as layout primitives
+- Never use `sx` prop — use `styled()` or `style`
+
+## Never
+
+- NO `useEffect` for derived state — use `useMemo`
+- NO inline arrow functions as JSX props — use `useCallback`
+- NO computed arrays/objects inline as props — use `useMemo`
+- NO subscribing to entire store
+- NO `lazy()` or code splitting — everything bundled upfront
+- NO unvirtualized lists of 100+ items
+- NO MUI layout components (`Box`, `Stack`, `Grid`) — raw HTML
+- NO `sx` prop — use `styled()` or `style`

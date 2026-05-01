@@ -230,102 +230,9 @@ const MyComponent = memo(() => {
 MyComponent.displayName = 'MyComponent';
 ```
 
-## E2E Testing
-
-Components are tested end-to-end using Playwright with the Page Object Model (POM) pattern. Each component that needs E2E coverage has a corresponding POM and spec file.
-
-### File Structure
-
-```text
-module/
-  my-feature.components.tsx
-  pom/
-    MyFeature.pom.ts
-  spec/
-    my-feature.spec.ts
-```
-
-### Page Object Model (POM)
-
-A POM encapsulates all locators and interactions for a component. One POM per component, co-located in a `pom/` folder:
-
-```typescript
-import type { Page } from '@playwright/test';
-
-export class MyFeaturePOM {
-  constructor(private page: Page) {}
-
-  get container() {
-    return this.page.getByTestId('my-feature');
-  }
-
-  get submitButton() {
-    return this.page.getByRole('button', { name: 'Submit' });
-  }
-
-  get items() {
-    return this.container.getByTestId('item');
-  }
-
-  async submit() {
-    await this.submitButton.click();
-  }
-
-  async waitForLoaded() {
-    await this.container.waitFor({ state: 'visible' });
-  }
-}
-```
-
-**POM rules:**
-
-- File naming: `<ComponentName>.pom.ts`
-- One class per component
-- Expose locators as getters
-- Expose complex interactions as methods
-- No assertions inside POMs — assertions belong in specs
-- Constructor takes a Playwright `Page` instance
-
-### Spec Files
-
-Specs live in a `spec/` folder and use POMs for all interactions:
-
-```typescript
-import { expect, test } from '@playwright/test';
-import { MyFeaturePOM } from '../pom/MyFeature.pom';
-
-test.describe('MyFeature', () => {
-  test('displays items after loading', async ({ page }) => {
-    const feature = new MyFeaturePOM(page);
-    await page.goto('/my-feature');
-    await feature.waitForLoaded();
-
-    await expect(feature.items).toHaveCount(3);
-  });
-
-  test('submits successfully', async ({ page }) => {
-    const feature = new MyFeaturePOM(page);
-    await page.goto('/my-feature');
-    await feature.waitForLoaded();
-    await feature.submit();
-
-    await expect(feature.container).toContainText('Success');
-  });
-});
-```
-
-**Spec rules:**
-
-- File naming: `*.spec.ts`
-- Import `test` and `expect` from `@playwright/test`
-- One `test.describe` per feature/component
-- Instantiate POMs inside each test — no shared state between tests
-- All DOM interaction goes through the POM, never raw locators in specs
-- Descriptive test names explaining the user behavior being verified
-
 ## Conditional Rendering
 
-Use ternaries as the primary approach, `&&` for simple presence checks. Never use early returns for conditional rendering.
+Use ternaries as the primary approach, `&&` for simple presence checks. Never use early returns.
 
 ```typescript
 // ✅ Ternary — preferred for if/else rendering
@@ -357,44 +264,35 @@ return <Content />;
 ```
 
 **Rules:**
-
 - Ternary for either/or rendering (show A or B)
 - `&&` for show-or-nothing (show A or nothing)
 - Never early return — the component always returns a single JSX expression
 - For complex multi-state conditions, extract into a `useMemo` variable
 
-## Comments
+## Hook & React API Usage
 
-Prefer JSDoc over inline comments. Code should be self-documenting through clear naming; comments explain **why**, not **what**.
+### Hooks
 
-```typescript
-// ✅ JSDoc on types, functions, and components
-/** Props for the notification feed panel. */
-export type FeedPanelProps = { ... };
+| Hook | Guidance |
+|------|----------|
+| `useState` | Rarely needed — most state belongs in a store. Use only for truly local, ephemeral UI state (e.g., tooltip anchor, local animation flag) |
+| `useEffect` | Avoid — waits for a render cycle before executing. Prefer event handlers, mutation callbacks, or store subscriptions |
+| `useRef` | Fine to use whenever needed (DOM refs, mutable values that don't trigger re-renders) |
+| `useMemo` | Fine to use for expensive derived computations |
+| `useCallback` | Required for all component-internal handlers |
+| `useContext` | Avoid for shared state (use Zustand). Acceptable for dependency injection of non-reactive values (e.g., store instance from `createAppStore`) |
+| `useReducer` | Avoid — use a store instead. Only acceptable for complex local state machines that are truly component-private |
+| `useImperativeHandle` | Use with `forwardRef` when a parent needs to call imperative methods on a child |
+| `useLayoutEffect` | Use when you need synchronous DOM measurements before paint. Prefer over `useEffect` for layout calculations |
+| `useDeferredValue` | Use for deferring expensive re-renders of non-urgent UI (e.g., filtering a large list while typing) |
+| `useTransition` | Use to mark state updates as non-blocking transitions (e.g., tab switching, heavy computations) |
+| `useId` | Use for generating unique IDs for accessibility attributes (`aria-labelledby`, `htmlFor`) — never for keys |
 
-/**
- * @name sanitizeEntries
- * @description Removes orphaned entries that are no longer referenced.
- */
-export const sanitizeEntries = (...) => { ... };
+### Components
 
-// ✅ Comment delimiter blocks to separate groups
-//*****************************************************************************************
-// Panel Operations
-//*****************************************************************************************
-
-// ✅ Inline comment only when explaining WHY (non-obvious reason)
-// Delay needed because the DOM transition hasn't completed yet
-await new Promise(resolve => setTimeout(resolve, 300));
-
-// ❌ Avoid explaining WHAT (the code already says what)
-// Set the count to zero
-setCount(0);
-```
-
-**Rules:**
-
-- JSDoc for all exported types, functions, and components
-- Comment delimiter blocks between logical groups (components, function groups)
-- Inline comments only for non-obvious "why" explanations
-- Never comment out dead code — delete it
+| Component | Guidance |
+|-----------|----------|
+| `Fragment` (`<>...</>`) | Use freely to group elements without adding DOM nodes |
+| `Suspense` | Use to wrap async boundaries. Place at meaningful UI boundaries |
+| `StrictMode` | Enabled at app root — do not remove |
+| `lazy` | Use for route-level code splitting only. Do not lazy-load small components |

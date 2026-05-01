@@ -10,7 +10,7 @@ import { AppAuthLayout } from 'layout/auth';
 import { AppDrawerLayout } from 'layout/drawer/drawer.layout';
 import { AppRouterLayout, AppRouterPanel } from 'layout/router';
 import { AppTemplateLayout } from 'layout/template';
-import { StrictMode } from 'react';
+import { memo, PropsWithChildren, StrictMode } from 'react';
 import i18n from './app.i18n';
 import { APP_ROUTES } from './app.routes';
 
@@ -70,21 +70,7 @@ import { APP_ROUTES } from './app.routes';
 //   </StrictMode>
 // );
 
-export const AppLayout = () => (
-  <AppAuthLayout>
-    <AppRouterLayout routes={APP_ROUTES}>
-      <AppDrawerLayout content={<AppRouterPanel panelKey={1} />}>
-        <AppAppsLayout>
-          <AppTemplateLayout>
-            <AppRouterPanel panelKey={0} />
-          </AppTemplateLayout>
-        </AppAppsLayout>
-      </AppDrawerLayout>
-    </AppRouterLayout>
-  </AppAuthLayout>
-);
-
-export const App = () => (
+export const App2 = () => (
   <StrictMode>
     <AppConfigProvider>
       <AppThemeProvider>
@@ -103,3 +89,42 @@ export const App = () => (
     </AppConfigProvider>
   </StrictMode>
 );
+
+//*****************************************************************************************
+// App Layout
+//*****************************************************************************************
+export const AppLayout = () => (
+  <AppAuthLayout>
+    <AppRouterLayout routes={APP_ROUTES}>
+      <AppDrawerLayout content={<AppRouterPanel panelKey={1} />}>
+        <AppAppsLayout>
+          <AppTemplateLayout>
+            <AppRouterPanel panelKey={0} />
+          </AppTemplateLayout>
+        </AppAppsLayout>
+      </AppDrawerLayout>
+    </AppRouterLayout>
+  </AppAuthLayout>
+);
+
+//*****************************************************************************************
+// App Store Initializers
+//*****************************************************************************************
+
+const AppStoreInit = memo(({ children }: PropsWithChildren) => children);
+
+//*****************************************************************************************
+// App Store Providers
+//*****************************************************************************************
+
+const AppStoreProviders = memo(({ children }: PropsWithChildren) => children);
+
+export const App = memo(() => (
+  <StrictMode>
+    <AppStoreProviders>
+      <AppStoreInit>
+        <AppLayout />
+      </AppStoreInit>
+    </AppStoreProviders>
+  </StrictMode>
+));

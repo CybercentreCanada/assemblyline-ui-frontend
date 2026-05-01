@@ -5,6 +5,7 @@
 Utility functions exist to make complex operations unit-testable. If a complex operation lives inside a hook or component, it cannot be tested in isolation. By extracting that logic into a pure utility function, the hook simply calls the utility, and the utility gets a dedicated test suite via Vitest.
 
 **The pattern:**
+
 1. Identify a complex operation inside a hook or component
 2. Extract it into a `*.utils.ts` file as a standalone function
 3. Write a corresponding `*.utils.test.ts` covering edge cases
@@ -38,6 +39,7 @@ export const findItemIndex = (
 ```
 
 **Rules:**
+
 - Always use `const` arrow functions (not the `function` keyword)
 - Always include a JSDoc block with `@name`, `@description`, `@param`, and `@returns`
 - Always explicitly type the return value
@@ -67,6 +69,7 @@ export const removeCategory = (...) => { ... };
 ```
 
 **Ordering within a group:**
+
 1. Finders / getters (`find*`, `get*`)
 2. Removers (`remove*`, `filter*`)
 3. Updaters (`update*`, `set*`)
@@ -77,6 +80,7 @@ export const removeCategory = (...) => { ... };
 
 | Prefix | Purpose | Example |
 |--------|---------|---------|
+
 | `find*` | Locate and return an item | `findItemIndex`, `findEntry` |
 | `get*` | Compute/derive a value | `getBackgroundColor`, `getLabel` |
 | `remove*` | Remove an item from a collection | `removeItem`, `removeEntry` |
@@ -112,50 +116,3 @@ export const removeItem = (items: Item[], index: number): Item[] => {
 ```
 
 The caller (hook or store setter) is responsible for deciding when to create a new reference for React's change detection. The utility itself should not make that decision.
-
-## Testing
-
-Each utility file has a corresponding test file with:
-- One `describe` block per function (or logical group)
-- Comment delimiters matching the source file structure
-- Descriptive `it` labels explaining the behavior being verified
-
-```typescript
-import { describe, expect, it } from 'vitest';
-
-//*****************************************************************************************
-// sanitizeEntries
-//*****************************************************************************************
-describe('sanitizeEntries', () => {
-  it('removes entries that are not referenced by any group', () => {
-    const entries = { ... };
-    const next = sanitizeEntries(entries, groups);
-    expect(next.orphan).toBeUndefined();
-  });
-
-  it('keeps entries referenced by active groups', () => {
-    // ...
-  });
-});
-
-//*****************************************************************************************
-// addEntry
-//*****************************************************************************************
-describe('addEntry', () => {
-  it('inserts the entry and marks it as temporary', () => {
-    // ...
-  });
-
-  it('clamps out-of-range index to first position', () => {
-    // ...
-  });
-});
-```
-
-**Test rules:**
-- Import `describe`, `expect`, `it` from `vitest`
-- Use comment delimiters between `describe` blocks (same as source)
-- Name tests as behavior descriptions: `it('removes X when Y', ...)`
-- Each test sets up its own state — no shared mutable state between tests
-- Test edge cases: empty inputs, out-of-bounds indices, missing keys
-- No mocking unless testing side effects (keep utils pure)
