@@ -1,7 +1,7 @@
-import type { APIRequests } from 'app/app.api';
+import type { ApiRequests } from 'app/app.api';
 import { DEFAULT_APP_CONFIG } from 'app/app.configs';
-import type { APIQueryKey, APIRequest } from '../api.models';
-import { queryClient } from '../api.provider';
+import type { ApiQueryKey, ApiRequest } from '../api.models';
+import { queryClient } from '../api.providers';
 import { isObject } from '../api.utils';
 
 /**
@@ -11,7 +11,7 @@ import { isObject } from '../api.utils';
  * @param delay - Milliseconds to wait before invalidating (defaults to app config)
  * @returns The timeout ID
  */
-export const invalidateAppQuery = <Request extends APIRequests>(
+export const invalidateAppQuery = <Request extends ApiRequests>(
   request: Partial<Request>,
   delay: number = DEFAULT_APP_CONFIG.api.invalidateDelay
 ) =>
@@ -19,8 +19,8 @@ export const invalidateAppQuery = <Request extends APIRequests>(
     await queryClient.invalidateQueries({
       predicate: ({ queryKey }) => {
         try {
-          const [url, method, bodyStr] = queryKey as unknown as APIQueryKey;
-          let body: APIRequest['body'] = null;
+          const [url, method, bodyStr] = queryKey as unknown as ApiQueryKey;
+          let body: ApiRequest['body'] = null;
           if (typeof bodyStr === 'string') {
             try {
               body = JSON.parse(bodyStr);
@@ -28,7 +28,7 @@ export const invalidateAppQuery = <Request extends APIRequests>(
               body = bodyStr;
             }
           }
-          const req: APIRequest = { url, method, body };
+          const req: ApiRequest = { url, method, body };
 
           return (
             (!('url' in request) ? true : req.url.startsWith(request?.url as string)) &&

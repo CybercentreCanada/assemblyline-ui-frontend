@@ -1,20 +1,22 @@
-import React, { PropsWithChildren, useCallback } from 'react';
+import type { PropsWithChildren } from 'react';
+import { memo, useCallback } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { ErrorFallback } from './error.components';
 
-export const AppErrorProviders = React.memo(({ children }: PropsWithChildren) => {
+//*****************************************************************************************
+// AppErrorProvider
+//*****************************************************************************************
+
+export const AppErrorProvider = memo(({ children }: PropsWithChildren) => {
   const handleReset = useCallback(() => {
     window.location.reload();
   }, []);
 
   return (
-    <ErrorBoundary
-      FallbackComponent={({ error, resetErrorBoundary }) => (
-        <ErrorFallback error={error} resetErrorBoundary={resetErrorBoundary} />
-      )}
-      onReset={handleReset}
-    >
+    <ErrorBoundary FallbackComponent={ErrorFallback} onReset={handleReset}>
       {children}
     </ErrorBoundary>
   );
 });
+
+AppErrorProvider.displayName = 'AppErrorProvider';

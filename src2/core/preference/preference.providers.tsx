@@ -1,3 +1,4 @@
+import { APP_PREFERENCE_SCHEMA } from 'app/core.preference';
 import { createAppStore } from 'features/store/createAppStore';
 import type { PropsWithChildren } from 'react';
 import { memo, useEffect, useRef } from 'react';
@@ -9,9 +10,9 @@ import { loadPreferenceFromLocalStorage, savePreferenceToLocalStorage } from './
 //*****************************************************************************************
 export const {
   StoreProvider: AppPreferenceStoreProvider,
-  useStore: useAppPreference,
-  useSetStore: useAppSetPreference
-} = createAppStore<AppPreference>({});
+  useStore: useAppPreferenceStore,
+  useSetStore: useAppSetPreferenceStore
+} = createAppStore<AppPreference>(APP_PREFERENCE_SCHEMA.parse({}));
 
 AppPreferenceStoreProvider.displayName = 'AppPreferenceStoreProvider';
 
@@ -29,8 +30,8 @@ export type AppPreferenceProps = {
 };
 
 export const AppPreference = memo(({ children, schema, storageKey }: AppPreferenceProps) => {
-  const preference = useAppPreference(s => s);
-  const setPreference = useAppSetPreference();
+  const preference = useAppPreferenceStore(s => s);
+  const setPreference = useAppSetPreferenceStore();
 
   const initializedRef = useRef<boolean>(false);
 

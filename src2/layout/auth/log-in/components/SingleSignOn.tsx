@@ -1,7 +1,7 @@
 import { Avatar, Link, Typography, useTheme } from '@mui/material';
-import { useAppConfig, useAppSetConfig } from 'core/config';
 import { useSaveAppConfig } from 'core/config/config.hooks';
-import React, { useCallback, useEffect } from 'react';
+import { useAppAuthStore, useAppSetAuthStore } from 'layout/auth/auth.providers';
+import { memo, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router';
 import { Button } from 'ui/buttons/Button';
@@ -11,7 +11,7 @@ import { useLoginForm } from '../log-in.providers';
 //*****************************************************************************************
 // SingleSignOn
 //*****************************************************************************************
-export const SingleSignOn = React.memo(() => {
+export const SingleSignOn = memo(() => {
   const { t } = useTranslation(['login']);
   const theme = useTheme();
   const form = useLoginForm();
@@ -71,24 +71,24 @@ SingleSignOn.displayName = 'SingleSignOn';
 //*****************************************************************************************
 // OAuthLogin
 //*****************************************************************************************
-export const OAuthLogin = React.memo(() => {
+export const OAuthLogin = memo(() => {
   const { t } = useTranslation(['login']);
   const location = useLocation();
-  const oAuthProviders = useAppConfig(s => s.auth.login.oauth_providers);
+  const oAuthProviders = useAppAuthStore(s => s.login.oauth_providers);
 
-  const setStore = useAppSetConfig();
+  const setAuthStore = useAppSetAuthStore();
   const save = useSaveAppConfig();
 
   const handleClick = useCallback(() => {
     const { pathname, search, hash } = location;
     if (!['/logout'].includes(pathname)) {
-      setStore(s => {
-        s.auth.redirectTo = `${pathname}${search}${hash}`;
+      setAuthStore(s => {
+        s.redirectTo = `${pathname}${search}${hash}`;
         return s;
       });
       save();
     }
-  }, [location, save, setStore]);
+  }, [location, save, setAuthStore]);
 
   return (oAuthProviders || []).map((provider, i) => (
     <Button
@@ -108,24 +108,24 @@ OAuthLogin.displayName = 'OAuthLogin';
 //*****************************************************************************************
 // SAML
 //*****************************************************************************************
-export const SAMLLogin = React.memo(() => {
+export const SAMLLogin = memo(() => {
   const { t } = useTranslation(['login']);
   const location = useLocation();
-  const allowSAML = useAppConfig(s => s.auth.login.allow_saml_login);
+  const allowSAML = useAppAuthStore(s => s.login.allow_saml_login);
 
-  const setStore = useAppSetConfig();
+  const setAuthStore = useAppSetAuthStore();
   const save = useSaveAppConfig();
 
   const handleClick = useCallback(() => {
     const { pathname, search, hash } = location;
     if (!['/logout'].includes(pathname)) {
-      setStore(s => {
-        s.auth.redirectTo = `${pathname}${search}${hash}`;
+      setAuthStore(s => {
+        s.redirectTo = `${pathname}${search}${hash}`;
         return s;
       });
       save();
     }
-  }, [location, save, setStore]);
+  }, [location, save, setAuthStore]);
 
   return !allowSAML ? null : (
     <Button color="primary" href="/api/v4/auth/saml/sso/" variant="contained" onClick={handleClick}>

@@ -24,7 +24,7 @@ These patterns are NOT allowed in this codebase:
 3. **Prop drilling beyond 2 levels** — Use the store
 4. **Default exports** — Use named exports only
 5. **Redux or any Redux-like library** — We use Zustand
-6. **MUI `sx` prop** — Use MUI's `styled()` for reusable styles, raw HTML + `style` prop for single-use/lists
+6. **`style` prop on MUI components / `sx` on raw HTML** — Use `sx` on MUI components, `style` on raw HTML elements, `styled()` for reusable styles. For performance, prefer raw HTML + `style` over MUI components.
 7. **MUI layout components (`Box`, `Stack`, `Grid`) for layout** — Use raw HTML elements. MUI is only for behavior (ripple, Dialog, Typography, etc.)
 8. **Relative imports crossing module boundaries** — Use path aliases (`core/`, `features/`, etc.)
 9. **Barrel re-exports from parent folders** — Each module's `index.ts` exports only its own public API

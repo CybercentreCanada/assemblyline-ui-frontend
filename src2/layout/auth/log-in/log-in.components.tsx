@@ -1,7 +1,8 @@
-import { CircularProgress, Divider, TextField, TextFieldProps, Typography, useTheme } from '@mui/material';
-import { useAppConfig } from 'core/config';
-import React from 'react';
+import type { TextFieldProps } from '@mui/material';
+import { CircularProgress, Divider, TextField, Typography, useTheme } from '@mui/material';
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useAppAuthStore } from '../auth.providers';
 import { useLoginForm } from './log-in.providers';
 import {
   EMAIL_PATTERN,
@@ -17,7 +18,7 @@ import {
 // Divider
 //*****************************************************************************************
 
-export const TextDivider = React.memo(() => {
+export const TextDivider = memo(() => {
   const theme = useTheme();
   const { t } = useTranslation(['login']);
 
@@ -36,10 +37,10 @@ TextDivider.displayName = 'TextDivider';
 // LoginDivider
 //*****************************************************************************************
 
-export const LoginDivider = React.memo(() => {
-  const allowUserPass = useAppConfig(s => s.auth.login.allow_userpass_login);
-  const allowSAML = useAppConfig(s => s.auth.login.allow_saml_login);
-  const oAuthProviders = useAppConfig(s => s.auth.login.oauth_providers);
+export const LoginDivider = memo(() => {
+  const allowUserPass = useAppAuthStore(s => s.login.allow_userpass_login);
+  const allowSAML = useAppAuthStore(s => s.login.allow_saml_login);
+  const oAuthProviders = useAppAuthStore(s => s.login.oauth_providers);
 
   return !allowUserPass || (!oAuthProviders?.length && !allowSAML) ? null : <TextDivider />;
 });
@@ -49,7 +50,7 @@ LoginDivider.displayName = 'LoginDivider';
 //*****************************************************************************************
 // Username Input
 //*****************************************************************************************
-export const UsernameInput = React.memo((props: TextFieldProps) => {
+export const UsernameInput = memo((props: TextFieldProps) => {
   const { t } = useTranslation(['login']);
   const form = useLoginForm();
 
@@ -87,7 +88,7 @@ UsernameInput.displayName = 'UsernameInput';
 //*****************************************************************************************
 // Password Input
 //*****************************************************************************************
-export const PasswordInput = React.memo((props: TextFieldProps) => {
+export const PasswordInput = memo((props: TextFieldProps) => {
   const { t } = useTranslation(['login']);
   const form = useLoginForm();
 
@@ -118,7 +119,7 @@ PasswordInput.displayName = 'PasswordInput';
 //*****************************************************************************************
 // Password Input
 //*****************************************************************************************
-export const PasswordConfirmInput = React.memo((props: TextFieldProps) => {
+export const PasswordConfirmInput = memo((props: TextFieldProps) => {
   const { t } = useTranslation(['login']);
   const form = useLoginForm();
 
@@ -160,7 +161,7 @@ PasswordConfirmInput.displayName = 'PasswordConfirmInput';
 //*****************************************************************************************
 // Email Input
 //*****************************************************************************************
-export const EmailInput = React.memo((props: TextFieldProps) => {
+export const EmailInput = memo((props: TextFieldProps) => {
   const { t } = useTranslation(['login']);
   const form = useLoginForm();
 
@@ -197,7 +198,7 @@ EmailInput.displayName = 'EmailInput';
 //*****************************************************************************************
 // Loading Card
 //*****************************************************************************************
-export const LoadingCard = React.memo(() => {
+export const LoadingCard = memo(() => {
   const { t } = useTranslation(['login']);
   const form = useLoginForm();
 

@@ -1,7 +1,12 @@
 import { styled } from '@mui/material';
-import { useAppConfig } from 'core/config';
+import { useAppPreferenceStore } from 'core/preference';
 import { SnackbarProvider } from 'notistack';
-import React, { PropsWithChildren } from 'react';
+import type { PropsWithChildren } from 'react';
+import { memo } from 'react';
+
+//*****************************************************************************************
+// StyledSnackbarProvider
+//*****************************************************************************************
 
 const StyledSnackbarProvider = styled(SnackbarProvider)`
   & .SnackbarItem-message {
@@ -9,12 +14,15 @@ const StyledSnackbarProvider = styled(SnackbarProvider)`
   }
 `;
 
+StyledSnackbarProvider.displayName = 'StyledSnackbarProvider';
+
 //*****************************************************************************************
-// App Snackbar Provider
+// AppSnackbarProvider
 //*****************************************************************************************
-export const AppSnackbarProvider = React.memo(({ children }: PropsWithChildren) => {
-  const dense = useAppConfig(s => s.snackbar.dense);
-  const maxSnack = useAppConfig(s => s.snackbar.maxSnack);
+
+export const AppSnackbarProvider = memo(({ children }: PropsWithChildren) => {
+  const dense = useAppPreferenceStore(s => s.snackbar.dense);
+  const maxSnack = useAppPreferenceStore(s => s.snackbar.maxSnack);
 
   return (
     <StyledSnackbarProvider maxSnack={maxSnack} dense={dense}>

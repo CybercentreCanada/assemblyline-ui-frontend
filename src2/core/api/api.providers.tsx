@@ -3,12 +3,12 @@ import { keepPreviousData, QueryClient } from '@tanstack/react-query';
 import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools';
 import type { PersistedClient } from '@tanstack/react-query-persist-client';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
-import { useAppPreference } from 'core/preference';
+import { useAppPreferenceStore } from 'core/preference';
 import { createAppStore } from 'features/store/createAppStore';
 import { compress, decompress } from 'lz-string';
 import type { PropsWithChildren } from 'react';
 import { Activity, memo, useEffect, useMemo } from 'react';
-import type { APIQueryKey } from './api.models';
+import type { ApiQueryKey } from './api.models';
 
 //*****************************************************************************************
 // App API Store
@@ -16,16 +16,24 @@ import type { APIQueryKey } from './api.models';
 
 export type AppApiStore = {
   showDevtools: boolean;
+  quota: {
+    api: number;
+    submission: number;
+  };
 };
 
 export const DEFAULT_APP_API_STORE: AppApiStore = {
-  showDevtools: false
+  showDevtools: false,
+  quota: {
+    api: 0,
+    submission: 0
+  }
 };
 
 export const {
   StoreProvider: AppApiStoreProvider,
-  useStore: useAppAPIStore,
-  useSetStore: useAppSetAPIStore
+  useStore: useAppApiStore,
+  useSetStore: useAppSetApiStore
 } = createAppStore<AppApiStore>(DEFAULT_APP_API_STORE);
 
 AppApiStoreProvider.displayName = 'AppApiStoreProvider';
@@ -40,7 +48,7 @@ export type AppApiLayoutProps = {
 };
 
 export const AppApiLayout = memo(({ children }: AppApiLayoutProps) => {
-  const showDevtools = useAppAPIStore(s => s.showDevtools);
+  const showDevtools = useAppApiStore(s => s.showDevtools);
 
   return (
     <>
@@ -80,9 +88,9 @@ export const queryClient = new QueryClient({
   }
 });
 
-export const AppAPIProvider = memo(({ children }: PropsWithChildren) => {
-  const gcTime = useAppPreference(s => s.api.gcTime);
-  const staleTime = useAppPreference(s => s.api.staleTime);
+export const AppApiProvider = memo(({ children }: PropsWithChildren) => {
+  const gcTime = useAppPreferenceStore(s => s?.api?.gcTime);
+  const staleTime = useAppPreferenceStore(s => s?.api?.staleTime);
 
   const persister = useMemo(
     () =>
@@ -94,7 +102,7 @@ export const AppAPIProvider = memo(({ children }: PropsWithChildren) => {
               ...data,
               clientState: {
                 mutations: [],
-                queries: data.clientState.queries.filter(q => (q.queryKey as APIQueryKey)[3])
+                queries: data.clientState.queries.filter(q => (q.queryKey as ApiQueryKey)[3])
               }
             })
           ),
@@ -132,4 +140,4 @@ export const AppAPIProvider = memo(({ children }: PropsWithChildren) => {
   );
 });
 
-AppAPIProvider.displayName = 'AppAPIProvider';
+AppApiProvider.displayName = 'AppApiProvider';

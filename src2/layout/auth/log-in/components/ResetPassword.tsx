@@ -1,8 +1,8 @@
 import { Link, Typography } from '@mui/material';
-import { useAPIMutation } from 'core/api';
-import { useAppConfig } from 'core/config';
+import { useApiMutation } from 'core/api';
 import { useAppSnackbar } from 'core/snackbar/snackbar.hooks';
-import React from 'react';
+import { useAppAuthStore } from 'layout/auth/auth.providers';
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from 'ui/buttons/Button';
 import { EmailInput, PasswordConfirmInput, PasswordInput, TextDivider } from '../log-in.components';
@@ -12,14 +12,14 @@ import { useLoginForm } from '../log-in.providers';
 //*****************************************************************************************
 // Reset Password Confirmation
 //*****************************************************************************************
-export const ResetPasswordConfirmation = React.memo(() => {
+export const ResetPasswordConfirmation = memo(() => {
   const { t } = useTranslation(['login']);
   const form = useLoginForm();
   const { showErrorMessage, showSuccessMessage } = useAppSnackbar();
 
   const resetLogin = useLoginReset();
 
-  const confirmResetPassword = useAPIMutation<[{ reset_id: string; password: string; password_confirm: string }]>(
+  const confirmResetPassword = useApiMutation<[{ reset_id: string; password: string; password_confirm: string }]>(
     body => ({
       url: '/api/v4/auth/reset_pwd/',
       method: 'POST',
@@ -74,14 +74,14 @@ ResetPasswordConfirmation.displayName = 'ResetPasswordConfirmation';
 //*****************************************************************************************
 // Reset Password Request
 //*****************************************************************************************
-export const ResetPasswordRequest = React.memo(() => {
+export const ResetPasswordRequest = memo(() => {
   const { t } = useTranslation(['login']);
   const form = useLoginForm();
   const { showErrorMessage, showSuccessMessage } = useAppSnackbar();
 
   const resetLogin = useLoginReset();
 
-  const getResetLink = useAPIMutation<[{ email: string }]>(body => ({
+  const getResetLink = useApiMutation<[{ email: string }]>(body => ({
     url: '/api/v4/auth/get_reset_link/',
     method: 'POST',
     body,
@@ -128,14 +128,14 @@ ResetPasswordRequest.displayName = 'ResetPasswordRequest';
 //*****************************************************************************************
 // Reset Password Link
 //*****************************************************************************************
-export const ResetPasswordLink = React.memo(() => {
+export const ResetPasswordLink = memo(() => {
   const { t } = useTranslation(['login']);
   const form = useLoginForm();
 
   const resetLogin = useLoginReset();
 
-  const allowUserPass = useAppConfig(s => s.auth.login.allow_userpass_login);
-  const allowSignup = useAppConfig(s => s.auth.login.allow_signup);
+  const allowUserPass = useAppAuthStore(s => s.login.allow_userpass_login);
+  const allowSignup = useAppAuthStore(s => s.login.allow_signup);
 
   return !allowUserPass || !allowSignup ? null : (
     <Typography align="center" variant="caption">

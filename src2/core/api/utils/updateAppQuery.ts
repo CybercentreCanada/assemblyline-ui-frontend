@@ -1,6 +1,6 @@
-import type { APIRequests, APIResponses } from 'app/app.api';
-import type { APIQueryKey, APIRequest, APIResponse } from '../api.models';
-import { queryClient } from '../api.provider';
+import type { ApiRequests, ApiResponses } from 'app/app.api';
+import type { ApiQueryKey, ApiRequest, ApiResponse } from '../api.models';
+import { queryClient } from '../api.providers';
 
 /**
  * @name isObject
@@ -17,16 +17,16 @@ const isObject = (variable: unknown) => variable !== null && typeof variable ===
  * @param updater - Updater function receiving the previous api_response value
  * @returns The result of setQueriesData
  */
-export const updateAppQuery = <Request extends APIRequests>(
+export const updateAppQuery = <Request extends ApiRequests>(
   request: Partial<Request>,
-  updater: (prev: APIResponses<Request>) => APIResponses<Request>
+  updater: (prev: ApiResponses<Request>) => ApiResponses<Request>
 ) =>
-  queryClient.setQueriesData<APIResponse<APIResponses<Request>>>(
+  queryClient.setQueriesData<ApiResponse<ApiResponses<Request>>>(
     {
       predicate: ({ queryKey }) => {
         try {
-          const [url, method, bodyStr] = queryKey as unknown as APIQueryKey;
-          let body: APIRequest['body'] = null;
+          const [url, method, bodyStr] = queryKey as unknown as ApiQueryKey;
+          let body: ApiRequest['body'] = null;
           if (typeof bodyStr === 'string') {
             try {
               body = JSON.parse(bodyStr);
@@ -34,7 +34,7 @@ export const updateAppQuery = <Request extends APIRequests>(
               body = bodyStr;
             }
           }
-          const req: APIRequest = { url, method, body };
+          const req: ApiRequest = { url, method, body };
 
           return (
             (!('url' in request) ? true : req.url.startsWith(request?.url as string)) &&
@@ -53,5 +53,5 @@ export const updateAppQuery = <Request extends APIRequests>(
         }
       }
     },
-    prev => (prev ? { ...prev, api_response: updater(prev.api_response as APIResponses<Request>) } : prev)
+    prev => (prev ? { ...prev, api_response: updater(prev.api_response as ApiResponses<Request>) } : prev)
   );

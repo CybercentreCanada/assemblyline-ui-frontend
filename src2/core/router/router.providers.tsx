@@ -1,11 +1,11 @@
-import { useAppConfig } from 'core/config';
+import { useAppPreferenceStore } from 'core/preference';
 import { createAppStore } from 'features/store/createAppStore';
-import React, { PropsWithChildren, useCallback } from 'react';
+import type { PropsWithChildren } from 'react';
+import { memo, useEffect } from 'react';
 import type { Location } from 'react-router';
 import { BrowserRouter, useLocation } from 'react-router';
-import { useShallow } from 'zustand/react/shallow';
 import { DEFAULT_APP_ROUTER_STORE } from './router.defaults';
-import { AppRouterState, AppRouterStore } from './router.models';
+import type { AppRouterState, AppRouterStore } from './router.models';
 import { locationToStore } from './router.utils';
 
 //*****************************************************************************************
@@ -14,7 +14,7 @@ import { locationToStore } from './router.utils';
 export const {
   StoreProvider: AppRouterStoreProvider,
   useStore: useAppRouterStore,
-  useSetStore: useAppRouterSetStore
+  useSetStore: useAppSetRouterStore
 } = createAppStore<AppRouterStore>(DEFAULT_APP_ROUTER_STORE);
 
 AppRouterStoreProvider.displayName = 'AppRouterStoreProvider';
@@ -22,34 +22,33 @@ AppRouterStoreProvider.displayName = 'AppRouterStoreProvider';
 //*****************************************************************************************
 // App Router Store Sync
 //*****************************************************************************************
-export const AppRouterStoreSync = React.memo(({ children }: PropsWithChildren) => {
+export const AppRouterProvider = memo(({ children }: PropsWithChildren) => {
   const location: Location<AppRouterState> = useLocation();
 
-  const { maxPanels, maxNodes } = useAppConfig(
-    useShallow(s => ({
-      maxNodes: s.router.maxNodes,
-      maxPanels: s.router.maxPanels
-    }))
-  );
+  const maxPanels = useAppPreferenceStore(s => s.router.maxPanels);
+  const maxNodes = useAppPreferenceStore(s => s.router.maxNodes);
 
-  const reset = useCallback(
-    (store: AppRouterStore) => ({ ...locationToStore(store, location), maxNodes, maxPanels }),
-    [location]
-  );
+  const setRouter = useAppSetRouterStore();
 
-  return <AppRouterStoreProvider data={reset}>{children}</AppRouterStoreProvider>;
+  useEffect(() => {
+    setRouter(s => {
+      const store = locationToStore(s, location);
+      return { ...store, maxNodes: 2, maxPanels: 2 };
+    });
+  }, []);
+
+  return children;
 });
 
-AppRouterStoreSync.displayName = 'AppRouterStoreSync';
+AppRouterProvider.displayName = 'AppRouterProvider';
 
 //*****************************************************************************************
-// App Router Provider
+// App Router Root Provider
 //*****************************************************************************************
-
-export const AppRouterProvider = React.memo(({ children }: PropsWithChildren) => (
+export const AppRouterRootProvider = memo(({ children }: PropsWithChildren) => (
   <BrowserRouter basename="/">
-    <AppRouterStoreSync>{children}</AppRouterStoreSync>
+    <AppRouterStoreProvider>{children}</AppRouterStoreProvider>
   </BrowserRouter>
 ));
 
-AppRouterProvider.displayName = 'AppRouterProvider';
+AppRouterRootProvider.displayName = 'AppRouterRootProvider';

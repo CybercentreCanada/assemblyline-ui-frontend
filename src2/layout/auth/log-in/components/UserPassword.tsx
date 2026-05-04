@@ -1,5 +1,5 @@
-import { useAppConfig } from 'core/config';
-import React from 'react';
+import { useAppAuthStore } from 'layout/auth/auth.providers';
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from 'ui/buttons/Button';
 import { PasswordInput, UsernameInput } from '../log-in.components';
@@ -8,9 +8,9 @@ import { useLoginRequest } from '../log-in.hooks';
 //*****************************************************************************************
 // User Password Login
 //*****************************************************************************************
-export const UserPasswordLogin = React.memo(() => {
+export const UserPasswordLogin = memo(() => {
   const { t } = useTranslation(['login']);
-  const allowUserPass = useAppConfig(s => s.auth.login.allow_userpass_login);
+  const allowUserPass = useAppAuthStore(s => s.login.allow_userpass_login);
 
   const requestLogin = useLoginRequest();
 

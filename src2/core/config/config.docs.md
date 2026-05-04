@@ -1,135 +1,101 @@
 # core/config
 
-Global application state management via a single Zustand store (`AppConfig`). This is the central nervous system of the app — all shared UI state flows through here.
+Application configuration store — **read-only after bootstrap**. Holds the `AppConfig` data received from the backend during authentication. Auth fetches `/api/v4/user/whoami/`, normalizes the response, and pushes it into this store. All other modules subscribe read-only.
 
-## Responsibilities
+## Architecture (3-layer model)
 
-- Single global Zustand store holding all application-wide state
-- `useAppConfig(selector)` — read specific slices of state with focused re-renders
-- `useAppSetConfig()` — write to the store via shallow merge
-- Persistence of user settings to localStorage (with Zod validation on read)
-- Deep merge utilities for initializing and restoring defaults
-- Provider that hydrates the store on app startup
+| Layer | Store | Mutability | Persistence | Owner |
+| ----- | ----- | ---------- | ----------- | ----- |
+| **App Config** | `useAppConfig` | Read-only after auth sets it | None (from backend via auth) | Auth (populates), Config (stores) |
+| **System Config** | `useSystemConfig` | Read-only after bootstrap | None (from backend/env) | Backend/Admin |
+| **User Preferences** | `usePreferences` | User-writable | Backend API + localStorage | User |
+| **Session State** | Module-owned stores | Ephemeral | None | Each module |
+
+### App Config (`core/config/`)
+
+The main application data from the `/api/v4/user/whoami/` response. Set by the auth process after successful authentication. Components subscribe with `useAppConfig(s => s.field)`.
+
+Shape (`AppConfig`): `c12nDef`, `classificationAliases`, `configuration`, `flattenedProps`, `indexes`, `systemMessage`, `user`, `settings`.
+
+### System Config (`core/config/`)
+
+Infrastructure-level values (API timing, quotas, snackbar config). Set once during bootstrap. Components subscribe with `useSystemConfig(s => s.field)`.
+
+### User Preferences (`core/preferences/`)
+
+Data the **user controls** about how the app looks/behaves for them. Persisted to backend (eventually) and localStorage as fallback.
+
+Examples: theme mode, density, language, layout style, drawer default, router panel count.
+
+### Session/Runtime State (module-owned)
+
+Ephemeral UI state that resets on refresh/logout. Each module declares its own store.
+
+Examples: auth mode, current user, drawer open/closed, usermenu visibility, notification panel state.
 
 ## Key Files
 
-- `config.hooks.tsx` — `useAppConfig`, `useAppSetConfig`, and derived selector hooks
-- `config.providers.tsx` — Store initialization and hydration provider
-- `config.utils.ts` — Deep merge, persistence read/write, default generation
+- `config.providers.tsx` — `useAppConfig`, `useAppSetConfig`, `useSystemConfig`, `useSetSystemConfig`, `AppConfigProvider`
+- `config.hooks.tsx` — Legacy hooks for saving/loading config to localStorage
+- `config.utils.ts` — LocalStorage persistence utilities (save/load with Zod validation)
+- `index.ts` — Public API barrel
 
-## Why a Single Store
+## Data Flow
 
-The application needs to share state across deeply nested component trees — auth status, layout preferences, server-derived configuration, and transient UI state (drawers, modals, etc.).
-
-Options considered:
-
-1. **React Context** — Causes full subtree re-renders on any change
-2. **Redux** — Heavy boilerplate, overkill for our needs
-3. **Multiple Zustand stores** — Clean separation but harder cross-store coordination
-4. **Single Zustand store with selectors** — Simple, performant, one mental model
-
-The single-store approach won because selector-based subscriptions prevent unnecessary re-renders, there's a single source of truth (easy to debug with devtools), and zero boilerplate to add new state (just extend the type).
-
-**Tradeoffs:**
-
-- Mixes concerns: UI state, server-derived state, and persisted preferences live together
-- Nested updates require manual spreading (no immer)
-- Risk of "god object" if discipline isn't maintained
-
-**Mitigations:**
-
-- Config is typed — adding fields requires touching the type definition
-- Each domain (layout, router, theme, auth) owns a nested subtree
-- Server-derived state is being progressively moved to React Query cache
-- Persisted preferences are validated by Zod schema on load
-
-## State Philosophy
-
-State is categorized by **ownership and lifecycle**:
-
-| Category | Owner | Lifetime | Storage |
-| -------- | ----- | -------- | ------- |
-| UI State | Client | Session | Zustand (AppConfig) |
-| Server State | API | Cache TTL | React Query |
-| Navigation State | URL | Page visit | react-router / search params |
-| Persisted Preferences | User | Permanent | localStorage (via Zod schema) |
-
-The goal is to keep each category in the tool best suited for it. In practice, the AppConfig store currently handles UI state + persisted preferences + some server state.
-
-## Store Structure
-
-```typescript
-type AppConfig = {
-  // Static/boot config
-  api: AppAPIConfig;
-  auth: AppAuthConfig;
-  router: AppRouterConfig;
-  snackbar: AppSnackbarConfig;
-  theme: AppThemeConfig;
-
-  // UI layout state
-  layout: AppLayoutConfig;
-  quota: { api: number; submission: number };
-
-  // Server-derived state (populated after auth)
-  c12nDef?: ClassificationDefinition;
-  configuration?: Configuration;
-  indexes?: Indexes;
-  settings?: UserSettings;
-  systemMessage?: SystemMessage;
-  user?: CustomUser;
-};
+```
+/api/v4/user/whoami/ (200)
+  → auth normalizes response (normalizeWhoAmI)
+  → auth calls useAppSetConfig({ ...normalizedData })
+  → config store updates
+  → consumers re-render via useAppConfig(selector)
 ```
 
-## Access Patterns
+## Store API
 
-**Reading state** — Use `useAppConfig` with a selector:
+### Reading
 
 ```typescript
-const drawerOpen = useAppConfig(c => c.layout.notifications.open);
-const isAdmin = useAppConfig(c => c.user?.is_admin ?? false);
+import { useAppConfig } from 'core/config';
+
+// Subscribe to a specific field
+const configuration = useAppConfig(s => s.configuration);
+const user = useAppConfig(s => s.user);
+const c12nDef = useAppConfig(s => s.c12nDef);
 ```
 
-Selectors are memoized via `useShallow` internally. Components only re-render when their selected slice changes.
-
-**Writing state** — Use `useAppSetConfig` which returns a setter that shallow-merges:
+### Writing (auth only)
 
 ```typescript
+import { useAppSetConfig } from 'core/config';
+
 const setConfig = useAppSetConfig();
-setConfig({ layout: { ...config.layout, notifications: { ...config.layout.notifications, open: true } } });
+
+// Set after successful whoami
+setConfig(normalizedWhoAmI);
+
+// Partial update
+setConfig(prev => ({ ...prev, user: updatedUser }));
 ```
 
-For nested updates, always spread the intermediate objects to avoid clobbering sibling properties.
+### Outside React
 
-## Persistence
+```typescript
+import { getAppConfigState } from 'core/config';
 
-A subset of the config store is persisted to localStorage on change. The `AppSettingsSchema` (Zod) defines which fields are saved and validates them on load. Invalid stored data falls back to `DEFAULT_APP_CONFIG`.
+const current = getAppConfigState();
+```
 
-Key: `al.settings`
+## Legacy Hooks
 
-## React Query (TanStack)
+These still exist for backward compatibility during migration:
 
-All API data fetching and caching uses React Query. Query results are:
+- `useSaveAppConfig` — saves current store to localStorage
+- `useLoadAppConfig` — loads from localStorage into store
+- `useSaveSettings` / `useLoadSettings` — same with pending state
 
-- Cached with configurable `staleTime` and `gcTime`
-- Persisted to sessionStorage via `PersistQueryClientProvider`
-- Compressed with lz-string to reduce storage size
+## What NOT to Do
 
-After mutations, invalidate related queries explicitly. Do not rely on automatic refetching. See `core/api/api.docs.md` for query/mutation patterns.
-
-## Per-Feature Stores
-
-For feature-local state that doesn't belong in AppConfig, use `createAppStore` (Zustand wrapper in `features/store/`). This creates a context-scoped store with the same selector pattern.
-
-Use when:
-
-- State is feature-private (no other feature needs it)
-- State has complex update logic (reducers, computed values)
-- State lifecycle is tied to a component tree (mount/unmount)
-
-## What NOT to Use
-
-- **React Context for shared state** — Use Zustand instead. Context causes full-subtree re-renders.
-- **Redux** — Not used. Zustand provides the same capability with less boilerplate.
-- **Component-local state for shared concerns** — If two components need the same state, lift it to the store.
-- **Prop drilling beyond 2 levels** — Use the store instead.
+- **Fetch data in the config module** — Auth owns the fetch. Config just stores.
+- **Mutate config from feature modules** — Only auth sets config. Everyone else reads.
+- **Use React Context for shared state** — Use Zustand stores. Context causes full-subtree re-renders.
+- **Prop drill config beyond 2 levels** — Use `useAppConfig(selector)` directly.

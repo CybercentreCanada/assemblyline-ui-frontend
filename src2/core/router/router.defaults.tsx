@@ -1,6 +1,6 @@
 import { createReversePortalNode } from 'features/portal';
-import { AppRouterConfig } from './router.config';
-import { AppRouterNode, AppRouterPanel, AppRouterRoute, AppRouterState, AppRouterStore } from './router.models';
+import type { AppRouterConfig } from './router.config';
+import type { AppRouterNode, AppRouterPanel, AppRouterRoute, AppRouterState, AppRouterStore } from './router.models';
 
 export const DEFAULT_APP_ROUTER_PANEL: AppRouterPanel = {
   routeKey: null,

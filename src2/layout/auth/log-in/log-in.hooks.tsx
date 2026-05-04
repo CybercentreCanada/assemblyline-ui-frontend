@@ -1,9 +1,9 @@
-import { invalidateAPIQuery, useAPIMutation, useAPIQuery } from 'core/api';
-import { useAppConfig, useAppSetConfig } from 'core/config';
+import { invalidateApiQuery, useApiMutation, useApiQuery } from 'core/api';
 import { useAppSnackbar } from 'core/snackbar/snackbar.hooks';
 import { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
+import { useAppAuthStore, useAppSetAuthStore } from '../auth.providers';
 import { useLoginForm } from './log-in.providers';
 
 /**
@@ -12,7 +12,7 @@ import { useLoginForm } from './log-in.providers';
  * @returns A function that clears any in-progress login state (OTP, reset password, SSO tokens, etc.).
  */
 export const useLoginReset = () => {
-  const setStore = useAppSetConfig();
+  const setAuthStore = useAppSetAuthStore();
   const form = useLoginForm();
 
   return useCallback(() => {
@@ -34,11 +34,11 @@ export const useLoginReset = () => {
 
     form.setFieldValue('loading', null);
 
-    setStore(s => {
-      s.auth.disableWhoAmI = false;
+    setAuthStore(s => {
+      s.disableWhoAmI = false;
       return s;
     });
-  }, [form, setStore]);
+  }, [form, setAuthStore]);
 };
 
 /**
@@ -104,8 +104,8 @@ export const useOAuthLogin = () => {
   const form = useLoginForm();
   const resetLogin = useLoginReset();
 
-  const setStore = useAppSetConfig();
-  const redirectTo = useAppConfig(s => s.auth.redirectTo);
+  const setAuthStore = useAppSetAuthStore();
+  const redirectTo = useAppAuthStore(s => s.redirectTo);
 
   const provider = useMemo<string | null>(() => {
     const marker = '/oauth/';
@@ -124,7 +124,7 @@ export const useOAuthLogin = () => {
     return p;
   }, [provider, search]);
 
-  useAPIQuery<{ avatar: string; username: string; oauth_token_id: string; email_adr: string }>({
+  useApiQuery<{ avatar: string; username: string; oauth_token_id: string; email_adr: string }>({
     url: `/api/v4/auth/oauth/?${params.toString()}`,
     disabled: !provider,
     onEnter: () => {
@@ -142,9 +142,9 @@ export const useOAuthLogin = () => {
       form.setFieldValue('email', api_response.email_adr || null);
       form.setFieldValue('mode', 'sso');
 
-      setStore(s => {
-        s.auth.disableWhoAmI = true;
-        s.auth.redirectTo = null;
+      setAuthStore(s => {
+        s.disableWhoAmI = true;
+        s.redirectTo = null;
         return s;
       });
 
@@ -166,8 +166,8 @@ export const useSAMLLogin = () => {
   const form = useLoginForm();
   const resetLogin = useLoginReset();
 
-  const setStore = useAppSetConfig();
-  const redirectTo = useAppConfig(s => s.auth.redirectTo);
+  const setAuthStore = useAppSetAuthStore();
+  const redirectTo = useAppAuthStore(s => s.redirectTo);
 
   const samlData = useMemo<{ username: string; email: string; saml_token_id: string; error: string }>(() => {
     try {
@@ -194,9 +194,9 @@ export const useSAMLLogin = () => {
       form.setFieldValue('saml_token_id', prev => samlData.saml_token_id || prev);
       form.setFieldValue('mode', 'sso');
 
-      setStore(s => {
-        s.auth.disableWhoAmI = true;
-        s.auth.redirectTo = null;
+      setAuthStore(s => {
+        s.disableWhoAmI = true;
+        s.redirectTo = null;
         return s;
       });
 
@@ -212,8 +212,8 @@ export const useSAMLLogin = () => {
  * @returns Whether the user should be auto-forwarded into the SSO confirmation step.
  */
 export const useQuickLogin = () => {
-  const allowSAML = useAppConfig(s => s.auth.login.allow_saml_login);
-  const oAuthProviders = useAppConfig(s => s.auth.login.oauth_providers);
+  const allowSAML = useAppAuthStore(s => s.login.allow_saml_login);
+  const oAuthProviders = useAppAuthStore(s => s.login.oauth_providers);
 
   return (allowSAML && (oAuthProviders?.length ?? 0) === 0) || (!allowSAML && (oAuthProviders?.length ?? 0) === 1);
 };
@@ -229,10 +229,10 @@ export const useLoginRequest = () => {
   const { showErrorMessage } = useAppSnackbar();
   const form = useLoginForm();
 
-  const setStore = useAppSetConfig();
+  const setAuthStore = useAppSetAuthStore();
   const resetLogin = useLoginReset();
 
-  return useAPIMutation(() => ({
+  return useApiMutation(() => ({
     url: '/api/v4/auth/login/',
     method: 'POST',
     body: {
@@ -266,12 +266,12 @@ export const useLoginRequest = () => {
       }
     },
     onSuccess: () => {
-      setStore(s => {
-        s.auth.disableWhoAmI = false;
+      setAuthStore(s => {
+        s.disableWhoAmI = false;
         return s;
       });
 
-      invalidateAPIQuery(({ url }) => '/api/v4/user/whoami/' === url, 100);
+      invalidateApiQuery(({ url }) => '/api/v4/user/whoami/' === url, 100);
     }
   }));
 };

@@ -1,20 +1,20 @@
-import type { APIRequests, APIResponses } from 'app/app.api';
-import type { APIResponse } from '../api.models';
-import type { UseAPICallFnProps } from './useAPICallFn';
-import { useInfiniteAPIQuery } from './useInfiniteAPIQuery';
+import type { ApiRequests, ApiResponses } from 'app/app.api';
+import type { ApiResponse } from '../api.models';
+import type { UseApiCallFnProps } from './useApiCallFn';
+import { useInfiniteApiQuery } from './useInfiniteApiQuery';
 
-export type UseInfiniteAppQueryProps<Request extends APIRequests, Error extends string = string> = {
+export type UseInfiniteAppQueryProps<Request extends ApiRequests, Error extends string = string> = {
   initialOffset?: number;
-  getParams: (offset: number) => UseAPICallFnProps<APIResponse<APIResponses<Request>>, Request, APIResponse<Error>>;
+  getParams: (offset: number) => UseApiCallFnProps<ApiResponse<ApiResponses<Request>>, Request, ApiResponse<Error>>;
   getPreviousOffset?: (
-    firstPage: APIResponse<APIResponses<Request>>,
-    allPages: Array<APIResponse<APIResponses<Request>>>,
+    firstPage: ApiResponse<ApiResponses<Request>>,
+    allPages: Array<ApiResponse<ApiResponses<Request>>>,
     firstPageParam: number,
     allPageParams: Array<number>
   ) => number | undefined;
   getNextOffset?: (
-    lastPage: APIResponse<APIResponses<Request>>,
-    allPages: Array<APIResponse<APIResponses<Request>>>,
+    lastPage: ApiResponse<ApiResponses<Request>>,
+    allPages: Array<ApiResponse<ApiResponses<Request>>>,
     lastPageParam: number,
     allPageParams: Array<number>
   ) => number | undefined;
@@ -22,7 +22,7 @@ export type UseInfiniteAppQueryProps<Request extends APIRequests, Error extends 
   retryAfter?: number;
 };
 
-export const useInfiniteAppQuery = <Request extends APIRequests, Error extends string = string>({
+export const useInfiniteAppQuery = <Request extends ApiRequests, Error extends string = string>({
   initialOffset = 0,
   getParams = () => null,
   getPreviousOffset = () => null,
@@ -30,7 +30,7 @@ export const useInfiniteAppQuery = <Request extends APIRequests, Error extends s
   allowCache = false,
   retryAfter
 }: UseInfiniteAppQueryProps<Request, Error>) =>
-  useInfiniteAPIQuery<APIResponses<Request>, Request, Error>({
+  useInfiniteApiQuery<ApiResponses<Request>, Request, Error>({
     initialOffset,
     getParams,
     getPreviousOffset,

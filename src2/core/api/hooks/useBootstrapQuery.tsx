@@ -7,16 +7,16 @@ import type { Configuration } from 'models/base/config';
 import type { CustomUser, WhoAmIProps } from 'models/ui/user';
 import { useTranslation } from 'react-i18next';
 import { getXSRFCookie } from 'shared/utils/xsrf.utils';
-import type { APIQueryKey, APIResponse } from '../api.models';
-import { getAPIResponse, isAPIData, stableStringify } from '../api.utils';
+import type { ApiQueryKey, ApiResponse } from '../api.models';
+import { getApiResponse, isApiData, stableStringify } from '../api.utils';
 
 export type UseBootstrapQueryProps = {
   queryProps?: Omit<
     UndefinedInitialDataOptions<
-      APIResponse<Configuration | LoginParamsProps | WhoAmIProps>,
-      APIResponse<Error>,
-      APIResponse<Configuration | LoginParamsProps | WhoAmIProps>,
-      APIQueryKey
+      ApiResponse<Configuration | LoginParamsProps | WhoAmIProps>,
+      ApiResponse<Error>,
+      ApiResponse<Configuration | LoginParamsProps | WhoAmIProps>,
+      ApiQueryKey
     >,
     'queryKey' | 'queryFn'
   >;
@@ -48,10 +48,10 @@ export const useBootstrapQuery = ({
   const setStore = useAppSetConfig();
 
   const query = useQuery<
-    APIResponse<Configuration | LoginParamsProps | WhoAmIProps>,
-    APIResponse<Error>,
-    APIResponse<Configuration | LoginParamsProps | WhoAmIProps>,
-    APIQueryKey
+    ApiResponse<Configuration | LoginParamsProps | WhoAmIProps>,
+    ApiResponse<Error>,
+    ApiResponse<Configuration | LoginParamsProps | WhoAmIProps>,
+    ApiQueryKey
   >(
     {
       ...queryProps,
@@ -102,10 +102,10 @@ export const useBootstrapQuery = ({
           });
         }
 
-        const json = (await res.json()) as APIResponse<Configuration | LoginParamsProps | WhoAmIProps>;
+        const json = (await res.json()) as ApiResponse<Configuration | LoginParamsProps | WhoAmIProps>;
 
         // Check for an invalid json format
-        if (!isAPIData(json)) {
+        if (!isApiData(json)) {
           showErrorMessage(t('invalid'), 30000);
           switchRenderedApp('load');
           return Promise.reject({
@@ -177,7 +177,7 @@ export const useBootstrapQuery = ({
     queryClient
   );
 
-  const { data, error, serverVersion, statusCode } = getAPIResponse(query.data, query.error, query.failureReason);
+  const { data, error, serverVersion, statusCode } = getApiResponse(query.data, query.error, query.failureReason);
 
   return {
     ...query,

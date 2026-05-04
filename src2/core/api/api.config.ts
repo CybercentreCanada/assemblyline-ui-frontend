@@ -1,6 +1,6 @@
 import z from 'zod';
 
-export const AppAPISettingsSchema = z.object({
+export const AppApiSettingsSchema = z.object({
   /** The time in milliseconds after data is considered stale. If set to Infinity, the data will never be considered stale. If set to a function, the function will be executed with the query to compute a staleTime. */
   staleTime: z.number().min(0).optional(),
 
@@ -12,8 +12,8 @@ export const AppAPISettingsSchema = z.object({
   invalidateDelay: z.number().min(0).optional()
 });
 
-export type AppAPISettings = z.infer<typeof AppAPISettingsSchema>;
+export type AppApiSettings = z.infer<typeof AppApiSettingsSchema>;
 
-export type AppAPIConfig = AppAPISettings & {
+export type AppApiConfig = AppApiSettings & {
   showDevtools?: boolean;
 };

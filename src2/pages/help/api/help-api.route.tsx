@@ -16,7 +16,7 @@ import {
   useTheme
 } from '@mui/material';
 import type { SelectChangeEvent } from '@mui/material/Select';
-import { useAPIQuery } from 'core/api';
+import { useApiQuery } from 'core/api';
 import { useAppConfig } from 'core/config';
 import { createAppRoute } from 'core/routes';
 import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
@@ -119,7 +119,7 @@ export const HelpAPIPage = React.memo(() => {
   const xs = useMediaQuery(theme.breakpoints.only('xs'));
   const isDark = useMemo(() => theme.palette.mode === 'dark', [theme.palette.mode]);
 
-  const { data: apiListData, isLoading: isLoadingApiList } = useAPIQuery<string[]>({
+  const { data: apiListData, isLoading: isLoadingApiList } = useApiQuery<string[]>({
     method: 'GET',
     url: '/api/'
   });
@@ -132,7 +132,7 @@ export const HelpAPIPage = React.memo(() => {
     }
   }, [apiList, apiSelected]);
 
-  const { data: apiDefinition, isLoading: isLoadingApiDefinition } = useAPIQuery<APIDefinition>({
+  const { data: apiDefinition, isLoading: isLoadingApiDefinition } = useApiQuery<APIDefinition>({
     disabled: !apiSelected,
     method: 'GET',
     url: `/api/${apiSelected}/`

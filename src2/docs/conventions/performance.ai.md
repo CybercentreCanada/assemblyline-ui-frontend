@@ -62,10 +62,12 @@ useEffect(() => { setFiltered(items.filter(...)); }, [items]);
 ## MUI Performance
 
 - MUI components add significant overhead per instance (emotion CSS-in-JS)
+- Prefer raw HTML elements + `style` prop over MUI components for performance
 - Use MUI only for behavior (ripple, transitions, focus traps) — not layout
 - In lists/loops: always raw HTML + `style` prop
-- Never use `Box`, `Stack`, `Grid`, `Paper` as layout primitives
-- Never use `sx` prop — use `styled()` or `style`
+- Never use `Box`, `Stack`, `Grid` as layout primitives
+- When using MUI components: use `sx` prop for styling
+- When using raw HTML elements: use `style` prop for styling
 
 ## Never
 
@@ -76,4 +78,5 @@ useEffect(() => { setFiltered(items.filter(...)); }, [items]);
 - NO `lazy()` or code splitting — everything bundled upfront
 - NO unvirtualized lists of 100+ items
 - NO MUI layout components (`Box`, `Stack`, `Grid`) — raw HTML
-- NO `sx` prop — use `styled()` or `style`
+- NO `style` prop on MUI components — use `sx`
+- NO `sx` prop on raw HTML elements — use `style`

@@ -1,4 +1,4 @@
-import type { APIResponse, BlobResponse } from './api.models';
+import type { ApiResponse, BlobResponse } from './api.models';
 
 /**
  * @name isObject
@@ -19,7 +19,7 @@ export const isObject = (variable: unknown) =>
  * @param value - The object to check
  * @returns True if the value is an APIResponse
  */
-export const isAPIData = (value: object): value is APIResponse =>
+export const isApiData = (value: object): value is ApiResponse =>
   value !== undefined &&
   value !== null &&
   'api_response' in value &&
@@ -53,7 +53,7 @@ export const getValue = (key, ...responses) => responses?.find(r => !!r?.[key])?
  * @param failureReason - The failure reason API response
  * @returns A normalized object with statusCode, serverVersion, data, and error
  */
-export const getAPIResponse = <R, E>(data: APIResponse<R>, error: APIResponse<E>, failureReason: APIResponse<E>) => ({
+export const getApiResponse = <R, E>(data: ApiResponse<R>, error: ApiResponse<E>, failureReason: ApiResponse<E>) => ({
   statusCode: getValue('api_status_code', data, error, failureReason) as number,
   serverVersion: getValue('api_server_version', data, error, failureReason) as string,
   data: getValue('api_response', data, error, failureReason) as R,
@@ -72,7 +72,7 @@ export const getAPIResponse = <R, E>(data: APIResponse<R>, error: APIResponse<E>
  * @param failureReason - The failure reason API response
  * @returns A normalized object with statusCode, serverVersion, data, error, filename, size, and type
  */
-export const getBlobResponse = <R, E>(data: BlobResponse, error: APIResponse<E>, failureReason: APIResponse<E>) => ({
+export const getBlobResponse = <R, E>(data: BlobResponse, error: ApiResponse<E>, failureReason: ApiResponse<E>) => ({
   statusCode: getValue('api_status_code', data, error, failureReason) as number,
   serverVersion: getValue('api_server_version', data, error, failureReason) as string,
   data: getValue('api_response', data, error, failureReason) as R,

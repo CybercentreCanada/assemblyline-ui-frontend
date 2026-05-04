@@ -8,4 +8,4 @@ export const AppRouterSettingsSchema = z.object({
 
 export type AppRouterSettings = z.infer<typeof AppRouterSettingsSchema>;
 
-export type AppRouterConfig = AppRouterSettings & {};
+export type AppRouterConfig = AppRouterSettings;

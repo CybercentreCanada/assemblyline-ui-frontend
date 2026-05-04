@@ -32,7 +32,7 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
-import { useAPIMutation } from 'core/api';
+import { useApiMutation } from 'core/api';
 import { useAppConfig, useAppSetConfig } from 'core/config';
 import { useAppSnackbar } from 'core/snackbar';
 import DOMPurify from 'dompurify';
@@ -373,7 +373,7 @@ const AnnouncementSaveConfirmation = memo(() => {
     }));
   }, [setConfig]);
 
-  const handleSaveSystemMessage = useAPIMutation(() => ({
+  const handleSaveSystemMessage = useApiMutation(() => ({
     url: '/api/v4/system/system_message/',
     method: 'PUT',
     body: draftMessage,
@@ -566,7 +566,7 @@ const AnnouncementDeleteDialog = memo(() => {
     }));
   }, [setConfig]);
 
-  const handleDeleteSystemMessage = useAPIMutation(() => ({
+  const handleDeleteSystemMessage = useApiMutation(() => ({
     url: '/api/v4/system/system_message/',
     method: 'DELETE',
     body: null,

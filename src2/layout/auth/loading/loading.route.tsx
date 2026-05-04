@@ -1,6 +1,6 @@
 import { CircularProgress, useTheme } from '@mui/material';
 import { createAppRoute } from 'core/routes';
-import React from 'react';
+import { memo } from 'react';
 import { AppVerticalBanner } from 'ui/branding';
 import { PageCardCentered } from 'ui/pages';
 
@@ -11,7 +11,7 @@ export type LoadingPageProps = {
   hideBanner?: boolean;
 };
 
-export const LoadingPage = React.memo(({ hideBanner = false }: LoadingPageProps) => {
+export const LoadingPage = memo(({ hideBanner = false }: LoadingPageProps) => {
   const theme = useTheme();
 
   return hideBanner ? (
@@ -36,5 +36,3 @@ export const LoadingRoute = createAppRoute({
   component: LoadingPage,
   path: '/loading'
 });
-
-export default LoadingRoute;

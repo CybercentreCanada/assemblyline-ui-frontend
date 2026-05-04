@@ -1,4 +1,4 @@
-import { useAPIQuery } from 'core/api';
+import { useApiQuery } from 'core/api';
 import { useAppConfig, useAppSetConfig } from 'core/config';
 import type { Configuration } from 'models/base/config';
 import { useCallback, useEffect } from 'react';
@@ -24,7 +24,7 @@ export const useNotificationAutoRefresh = () => {
   );
   const setConfig = useAppSetConfig();
 
-  const servicesQuery = useAPIQuery<MinimalService[]>({
+  const servicesQuery = useApiQuery<MinimalService[]>({
     url: '/api/v4/service/all/',
     method: 'GET',
     disabled: isAdmin || !configuration || !notificationFeedUrls?.length

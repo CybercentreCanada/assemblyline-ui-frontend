@@ -1,8 +1,7 @@
 import BlockOutlinedIcon from '@mui/icons-material/BlockOutlined';
-import { useTheme } from '@mui/material';
-import Typography from '@mui/material/Typography';
+import { Typography, useTheme } from '@mui/material';
 import { createAppRoute } from 'core/routes';
-import React from 'react';
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { PageCenter } from 'ui/pages';
 
@@ -13,7 +12,7 @@ type QuotaPageProps = {
   disabled?: boolean;
 };
 
-export const QuotaPage = React.memo(({ disabled = false }: QuotaPageProps) => {
+export const QuotaPage = memo(({ disabled = false }: QuotaPageProps) => {
   const { t } = useTranslation(['quota']);
   const theme = useTheme();
 
@@ -35,6 +34,8 @@ export const QuotaPage = React.memo(({ disabled = false }: QuotaPageProps) => {
   );
 });
 
+QuotaPage.displayName = 'QuotaPage';
+
 //*****************************************************************************************
 // Quota Route
 //*****************************************************************************************
@@ -43,5 +44,3 @@ export const QuotaRoute = createAppRoute({
   component: QuotaPage,
   path: '/quota'
 });
-
-export default QuotaRoute;

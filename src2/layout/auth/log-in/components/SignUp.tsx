@@ -1,8 +1,8 @@
 import { CircularProgress, Link, Typography } from '@mui/material';
-import { useAPIMutation, useAPIQuery } from 'core/api';
-import { useAppConfig } from 'core/config';
+import { useApiMutation, useApiQuery } from 'core/api';
 import { useAppSnackbar } from 'core/snackbar/snackbar.hooks';
-import React, { useCallback } from 'react';
+import { useAppAuthStore } from 'layout/auth/auth.providers';
+import { memo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from 'ui/buttons/Button';
 import { EmailInput, PasswordConfirmInput, PasswordInput, TextDivider, UsernameInput } from '../log-in.components';
@@ -12,14 +12,14 @@ import { useLoginForm } from '../log-in.providers';
 //*****************************************************************************************
 // Sign Up Confirmation
 //*****************************************************************************************
-export const SignUpConfirmation = React.memo(() => {
+export const SignUpConfirmation = memo(() => {
   const { t } = useTranslation(['login']);
   const form = useLoginForm();
   const { showSuccessMessage } = useAppSnackbar();
 
   const resetLogin = useLoginReset();
 
-  useAPIQuery({
+  useApiQuery({
     url: '/api/v4/auth/signup_validate/',
     method: 'POST',
     body: { registration_key: form.getFieldValue('registration_key') },
@@ -40,14 +40,14 @@ SignUpConfirmation.displayName = 'SignUpConfirmation';
 //*****************************************************************************************
 // Sign Up Request
 //*****************************************************************************************
-export const SignUpRequest = React.memo(() => {
+export const SignUpRequest = memo(() => {
   const { t } = useTranslation(['login']);
   const form = useLoginForm();
   const { showErrorMessage, showSuccessMessage } = useAppSnackbar();
 
   const resetLogin = useLoginReset();
 
-  const createAccount = useAPIMutation<[{ user: string; password: string; password_confirm: string; email: string }]>(
+  const createAccount = useApiMutation<[{ user: string; password: string; password_confirm: string; email: string }]>(
     body => ({
       url: '/api/v4/auth/signup/',
       method: 'POST',
@@ -104,14 +104,14 @@ SignUpRequest.displayName = 'SignUpRequest';
 //*****************************************************************************************
 // Sign Up Link
 //*****************************************************************************************
-export const SignUpLink = React.memo(() => {
+export const SignUpLink = memo(() => {
   const { t } = useTranslation(['login']);
   const form = useLoginForm();
 
   const resetLogin = useLoginReset();
 
-  const allowUserPass = useAppConfig(s => s.auth.login.allow_userpass_login);
-  const allowSignup = useAppConfig(s => s.auth.login.allow_signup);
+  const allowUserPass = useAppAuthStore(s => s.login.allow_userpass_login);
+  const allowSignup = useAppAuthStore(s => s.login.allow_signup);
 
   const handleClick = useCallback(() => {
     resetLogin();

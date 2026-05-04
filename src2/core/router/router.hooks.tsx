@@ -1,10 +1,11 @@
 import { APP_ROUTES } from 'app/app.routes';
-import { useAppConfig } from 'core/config';
-import { AppRoute, AppRouteLocation, CreatedAppRouteParamsMap, useAppRouteKey } from 'core/routes';
+import { useAppPreferenceStore } from 'core/preference';
+import type { AppRoute, AppRouteLocation, CreatedAppRouteParamsMap } from 'core/routes';
+import { useAppRouteKey } from 'core/routes';
 import { buildRouteLocation } from 'core/routes/routes.utils';
 import { useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router';
-import { useAppRouterSetStore, useAppRouterStore } from './router.providers';
+import { useAppRouterStore, useAppSetRouterStore } from './router.providers';
 import {
   addRoute,
   findPanelKey,
@@ -68,8 +69,8 @@ export function useAppNavigate<const Route extends AppRoute>(): (to: CreatedAppR
   const routerNavigate = useNavigate();
   const routeKey = useAppRouteKey();
   const store = useAppRouterStore(s => s);
-  const setStore = useAppRouterSetStore();
-  const navigationStyle = useAppConfig(s => s?.router?.navigation);
+  const setStore = useAppSetRouterStore();
+  const navigationStyle = useAppPreferenceStore(s => s?.router?.navigation);
 
   return useCallback(
     to => {

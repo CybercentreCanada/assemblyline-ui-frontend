@@ -3,16 +3,15 @@ import { Typography, useTheme } from '@mui/material';
 import { useAppConfig } from 'core/config';
 import { createAppRoute } from 'core/routes';
 import { ForbiddenPage } from 'pages/forbidden/forbidden.route';
-import React from 'react';
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { PageCenter } from 'ui/pages';
 
 //*****************************************************************************************
 // Locked Page
 //*****************************************************************************************
-export type LockedPageProps = {};
 
-export const LockedPage = React.memo(({}: LockedPageProps) => {
+export const LockedPage = memo(() => {
   const { t } = useTranslation(['locked']);
   const theme = useTheme();
 
@@ -56,5 +55,3 @@ export const LockedRoute = createAppRoute({
   component: LockedPage,
   path: '/locked'
 });
-
-export default LockedRoute;

@@ -7,7 +7,14 @@
 | Single-use layout element | Raw HTML + `style` prop |
 | Reusable styled element | `styled('div')` from MUI |
 | 10+ instances (lists, grids) | Raw HTML + `style` prop |
-| Need MUI behavior (ripple, transitions) | Use MUI component |
+| Need MUI behavior (ripple, transitions) | Use MUI component + `sx` prop |
+| Performance-sensitive path | Prefer raw HTML + `style` over MUI |
+
+## Styling Props
+
+- **MUI components** → use `sx` prop
+- **Raw HTML elements** → use `style` prop
+- Never mix: no `style` on MUI components, no `sx` on raw HTML
 
 ## Raw HTML + `style` (default)
 
@@ -76,6 +83,12 @@ styled('div')(() => ({ color: '#333', padding: '16px' }));
 
 // ❌ Missing displayName on styled components
 const Row = styled('div')(() => ({ ... }));
+
+// ❌ style prop on MUI components — use sx instead
+<Typography style={{ color: 'red' }} />
+
+// ❌ sx prop on raw HTML elements — use style instead
+<div sx={{ display: 'flex' }} />
 ```
 
 ## Required

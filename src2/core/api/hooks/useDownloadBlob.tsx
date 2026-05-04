@@ -7,12 +7,12 @@ import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getFileName } from 'shared/utils/utils';
 import { getXSRFCookie } from 'shared/utils/xsrf.utils';
-import type { APIQueryKey, APIResponse, BlobResponse } from '../api.models';
-import { getBlobResponse, isAPIData, stableStringify } from '../api.utils';
+import type { ApiQueryKey, ApiResponse, BlobResponse } from '../api.models';
+import { getBlobResponse, isApiData, stableStringify } from '../api.utils';
 
 export type UseDownloadBlobProps = {
   queryProps?: Omit<
-    UndefinedInitialDataOptions<BlobResponse, APIResponse<Error>, BlobResponse, APIQueryKey>,
+    UndefinedInitialDataOptions<BlobResponse, ApiResponse<Error>, BlobResponse, ApiQueryKey>,
     'queryKey' | 'queryFn'
   >;
   allowCache?: boolean;
@@ -36,7 +36,7 @@ export const useDownloadBlob = ({
   const systemConfig = useAppConfig(s => s?.configuration);
   const setStore = useAppSetConfig();
 
-  const query = useQuery<BlobResponse, APIResponse<Error>, BlobResponse, APIQueryKey>(
+  const query = useQuery<BlobResponse, ApiResponse<Error>, BlobResponse, ApiQueryKey>(
     {
       ...queryProps,
       queryKey: [url, 'GET', stableStringify(null), allowCache],
@@ -86,7 +86,7 @@ export const useDownloadBlob = ({
         const json = (await res.json()) as BlobResponse;
 
         // Check for an invalid json format
-        if (!isAPIData(json)) {
+        if (!isApiData(json)) {
           showErrorMessage(t('invalid'));
           return Promise.reject({
             api_error_message: t('invalid'),

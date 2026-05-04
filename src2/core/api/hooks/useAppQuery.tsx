@@ -1,18 +1,18 @@
-import type { APIRequests, APIResponses } from 'app/app.api';
-import type { APIResponse } from '../api.models';
-import type { UseAPICallFnProps } from './useAPICallFn';
-import type { UseAPIQueryProps } from './useAPIQuery';
-import { useAPIQuery } from './useAPIQuery';
+import type { ApiRequests, ApiResponses } from 'app/app.api';
+import type { ApiResponse } from '../api.models';
+import type { UseApiCallFnProps } from './useApiCallFn';
+import type { UseApiQueryProps } from './useApiQuery';
+import { useApiQuery } from './useApiQuery';
 
-export type UseAppQueryProps<Request extends APIRequests> = {
-  queryProps?: UseAPIQueryProps<APIResponses<Request>, Request, string>['queryProps'];
+export type UseAppQueryProps<Request extends ApiRequests> = {
+  queryProps?: UseApiQueryProps<ApiResponses<Request>, Request, string>['queryProps'];
   allowCache?: boolean;
   delay?: number;
   disabled?: boolean;
   retryAfter?: number;
-} & UseAPICallFnProps<APIResponse<APIResponses<Request>>, Request>;
+} & UseApiCallFnProps<ApiResponse<ApiResponses<Request>>, Request>;
 
-export const useAppQuery = <Request extends APIRequests>({
+export const useAppQuery = <Request extends ApiRequests>({
   url,
   method = 'GET',
   body = null,
@@ -20,7 +20,7 @@ export const useAppQuery = <Request extends APIRequests>({
   disabled = false,
   ...props
 }: UseAppQueryProps<Request>) =>
-  useAPIQuery<APIResponses<Request>, Request, string>({
+  useApiQuery<ApiResponses<Request>, Request, string>({
     url:
       method !== 'GET'
         ? url
@@ -32,4 +32,4 @@ export const useAppQuery = <Request extends APIRequests>({
     disabled,
     allowCache,
     ...props
-  } as UseAPIQueryProps<APIResponses<Request>, Request, string>);
+  } as UseApiQueryProps<ApiResponses<Request>, Request, string>);

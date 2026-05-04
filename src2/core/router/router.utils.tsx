@@ -7,7 +7,7 @@ import {
   DEFAULT_APP_ROUTER_ROUTE,
   ROUTER_STORE_EXAMPLE
 } from './router.defaults';
-import { AppRouterState, AppRouterStore } from './router.models';
+import type { AppRouterState, AppRouterStore } from './router.models';
 
 //*****************************************************************************************
 // Panel

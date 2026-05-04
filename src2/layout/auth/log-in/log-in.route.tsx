@@ -1,6 +1,6 @@
-import { Stack, useTheme } from '@mui/material';
+import { useTheme } from '@mui/material';
 import { createAppRoute } from 'core/routes';
-import React from 'react';
+import { memo } from 'react';
 import { AppBanner, AppVerticalBanner } from 'ui/branding';
 import { PageCardCentered } from 'ui/pages/PageCardCentered';
 import { OneTimePassword } from './components/OneTimePassword';
@@ -25,7 +25,7 @@ type LoginRequest = {
 //*****************************************************************************************
 // Login Page Content
 //*****************************************************************************************
-const LoginPageContent = React.memo(() => {
+const LoginPageContent = memo(() => {
   const theme = useTheme();
   const form = useLoginForm();
 
@@ -36,7 +36,7 @@ const LoginPageContent = React.memo(() => {
 
   return (
     <PageCardCentered>
-      <Stack direction="column" sx={{ rowGap: theme.spacing(2) }}>
+      <div style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(2) }}>
         <form.Subscribe selector={s => s.values.mode}>
           {mode => (
             <>
@@ -80,7 +80,7 @@ const LoginPageContent = React.memo(() => {
             </>
           )}
         </form.Subscribe>
-      </Stack>
+      </div>
     </PageCardCentered>
   );
 });
@@ -90,7 +90,7 @@ LoginPageContent.displayName = 'LoginPageContent';
 //*****************************************************************************************
 // Login Page
 //*****************************************************************************************
-export const LoginPage = React.memo(() => (
+export const LoginPage = memo(() => (
   <LoginFormProvider>
     <LoginPageContent />
   </LoginFormProvider>

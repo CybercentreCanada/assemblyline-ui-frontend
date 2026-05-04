@@ -1,6 +1,7 @@
 import React, { createContext, PropsWithChildren, useCallback, useContext, useEffect, useRef } from 'react';
 import { useStore as useZustandStore } from 'zustand';
 import { devtools } from 'zustand/middleware';
+import { useShallow } from 'zustand/react/shallow';
 import { createStore, StoreApi } from 'zustand/vanilla';
 
 export const createAppStore = <Store extends object>(initialState: Store) => {
@@ -34,7 +35,7 @@ export const createAppStore = <Store extends object>(initialState: Store) => {
       console.warn('[createAppStore] `useStore` called outside of StoreProvider.');
     }
 
-    return !store ? selector(initialState) : useZustandStore(store, selector);
+    return !store ? selector(initialState) : useZustandStore(store, useShallow(selector));
   };
 
   const useSetStore = () => {

@@ -6,13 +6,13 @@ export type RequestBuilder<URL extends string = string, M extends Method = 'GET'
   body?: Body;
 };
 
-export type APIRequest = {
+export type ApiRequest = {
   url: string;
   method?: Method;
   body?: null | boolean | number | string | object;
 };
 
-export type APIResponse<T = unknown> = {
+export type ApiResponse<T = unknown> = {
   message?: string;
   api_error_message: string;
   api_response: T;
@@ -30,14 +30,14 @@ export type BlobResponse<T = unknown> = {
   type: string;
 };
 
-export type APIReturn<Response = unknown> = {
+export type ApiReturn<Response = unknown> = {
   data: Response;
   error: string;
   serverVersion: string;
   statusCode: number;
 };
 
-export type APIQueryKey = [
+export type ApiQueryKey = [
   string, // URL
   Method, // Method
   string, // Stringified Body

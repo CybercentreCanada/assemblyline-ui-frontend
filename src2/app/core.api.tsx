@@ -5,14 +5,14 @@ import { UserRequests, UserResponses } from 'models/api/user';
 
 declare global {
   // prettier-ignore
-  type APIRequests =
+  type ApiRequests =
     | BadlistRequests
     | RootRequests
     | SearchRequests
     | UserRequests;
 
   // prettier-ignore
-  type APIResponses<Request extends APIRequests> =
+  type ApiResponses<Request extends ApiRequests> =
     Request extends BadlistRequests ? BadlistResponses<Request> :
     Request extends RootRequests ? RootResponses<Request> :
     Request extends SearchRequests ? SearchResponses<Request> :

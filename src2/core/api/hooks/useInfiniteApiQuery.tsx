@@ -4,8 +4,8 @@ import { DEFAULT_APP_CONFIG } from 'app/app.configs';
 import { useMemo } from 'react';
 import type { ApiQueryKey, ApiRequest, ApiResponse } from '../api.models';
 import { stableStringify } from '../api.utils';
-import type { UseApiCallFnProps } from './useAPICallFn';
-import { useApiCallFn } from './useAPICallFn';
+import type { UseApiCallFnProps } from './useApiCallFn';
+import { useApiCallFn } from './useApiCallFn';
 
 export type UseInfiniteApiQueryProps<Response = unknown, Request extends ApiRequest = ApiRequest, Error = string> = {
   initialOffset?: number;

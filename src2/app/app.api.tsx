@@ -4,14 +4,14 @@ import { SearchRequests, SearchResponses } from 'models/api/search';
 import { UserRequests, UserResponses } from 'models/api/user';
 
 // prettier-ignore
-export type APIRequests =
+export type ApiRequests =
   | BadlistRequests
   | RootRequests
   | SearchRequests
   | UserRequests;
 
 // prettier-ignore
-export type APIResponses<Request extends APIRequests> =
+export type ApiResponses<Request extends ApiRequests> =
   Request extends BadlistRequests ? BadlistResponses<Request> :
   Request extends RootRequests ? RootResponses<Request> :
   Request extends SearchRequests ? SearchResponses<Request> :

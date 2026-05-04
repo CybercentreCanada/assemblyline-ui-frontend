@@ -1,11 +1,24 @@
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { Button, Collapse, LinearProgress, Paper, SvgIcon, Typography, useMediaQuery, useTheme } from '@mui/material';
-import { styled } from '@mui/material/styles';
-import React, { useEffect, useState } from 'react';
+import {
+  Button,
+  Collapse,
+  LinearProgress,
+  Paper,
+  styled,
+  SvgIcon,
+  Typography,
+  useMediaQuery,
+  useTheme
+} from '@mui/material';
+import { memo, useCallback, useEffect, useState } from 'react';
 import type { FallbackProps } from 'react-error-boundary';
 import { useTranslation } from 'react-i18next';
 import { GiSpottedBug } from 'react-icons/gi';
 import { PageCenter } from 'ui/pages';
+
+//*****************************************************************************************
+// BugContainer
+//*****************************************************************************************
 
 const BugContainer = styled('div')(({ theme }) => ({
   paddingTop: theme.spacing(10),
@@ -16,6 +29,8 @@ const BugContainer = styled('div')(({ theme }) => ({
     transform: 'translateY(50px)'
   }
 }));
+
+BugContainer.displayName = 'BugContainer';
 
 const Bug = styled(GiSpottedBug)(({ theme }) => ({
   '@keyframes path': {
@@ -126,11 +141,15 @@ const Bug = styled(GiSpottedBug)(({ theme }) => ({
   animationIterationCount: 'infinite'
 }));
 
-const ExpandMore = styled((props: any & { expand: boolean }) => {
-  // eslint-disable-next-line no-unused-vars
-  const { expand, ...other } = props;
-  return <SvgIcon {...other} />;
-})(({ theme, expand }) => ({
+Bug.displayName = 'Bug';
+
+//*****************************************************************************************
+// ExpandMore
+//*****************************************************************************************
+
+const ExpandMore = styled(SvgIcon, {
+  shouldForwardProp: prop => prop !== 'expand'
+})<{ expand: boolean }>(({ theme, expand }) => ({
   transform: !expand ? 'rotate(0deg)' : 'rotate(180deg)',
   marginLeft: 'auto',
   transition: theme.transitions.create('transform', {
@@ -138,11 +157,21 @@ const ExpandMore = styled((props: any & { expand: boolean }) => {
   })
 }));
 
-export const ErrorFallback = React.memo(({ error, resetErrorBoundary }: FallbackProps) => {
+ExpandMore.displayName = 'ExpandMore';
+
+//*****************************************************************************************
+// ErrorFallback
+//*****************************************************************************************
+
+export const ErrorFallback = memo(({ error, resetErrorBoundary }: FallbackProps) => {
   const { t } = useTranslation(['error']);
   const theme = useTheme();
-  const downSM = useMediaQuery(theme.breakpoints.down('md'));
   const [expanded, setExpanded] = useState<boolean>(false);
+  const downSM = useMediaQuery(theme.breakpoints.down('md'));
+
+  const handleExpandToggle = useCallback(() => {
+    setExpanded(e => !e);
+  }, []);
 
   useEffect(() => {
     if (error.name === 'ChunkLoadError') {
@@ -192,17 +221,9 @@ export const ErrorFallback = React.memo(({ error, resetErrorBoundary }: Fallback
             component="pre"
             sx={{ paddingTop: theme.spacing(1), whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}
           />
-          <Button
-            onClick={() => setExpanded(e => !e)}
-            sx={{ margin: theme.spacing(1), color: theme.palette.primary.main }}
-          >
+          <Button onClick={handleExpandToggle} sx={{ margin: theme.spacing(1), color: theme.palette.primary.main }}>
             {expanded ? t('error.hideStack') : t('error.showStack')}
-            <ExpandMore
-              expand={expanded}
-              onClick={() => setExpanded(e => !e)}
-              aria-expanded={expanded}
-              aria-label="show more"
-            >
+            <ExpandMore expand={expanded} aria-expanded={expanded} aria-label="show more">
               <ExpandMoreIcon />
             </ExpandMore>
           </Button>

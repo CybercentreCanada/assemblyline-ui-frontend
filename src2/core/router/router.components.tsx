@@ -1,13 +1,12 @@
-import { AppRoute } from 'core/routes';
+import type { AppRoute } from 'core/routes';
 import { forwardRef, memo, useCallback } from 'react';
 import { Link } from 'react-router';
 import { useAppNavigate, useAppRouteLocation } from './router.hooks';
-import { AppLinkProps } from './router.models';
+import type { AppLinkProps } from './router.models';
 
 //*****************************************************************************************
 // App Link
 //*****************************************************************************************
-
 export function WrappedAppLink<const Route extends AppRoute>(
   { children, to = null, onClick = () => null, ...props }: AppLinkProps<Route>,
   ref: React.ForwardedRef<HTMLAnchorElement>
@@ -32,9 +31,10 @@ export function WrappedAppLink<const Route extends AppRoute>(
   );
 }
 
+WrappedAppLink.displayName = 'WrappedAppLink';
+
 export const AppLink = memo(forwardRef(WrappedAppLink)) as <const Route extends AppRoute>(
   props: AppLinkProps<Route> & { ref?: React.ForwardedRef<HTMLAnchorElement> }
 ) => React.JSX.Element | null;
 
-WrappedAppLink.displayName = 'WrappedAppLink';
-(AppLink as any).displayName = 'AppLink';
+(AppLink as unknown as { displayName: string }).displayName = 'AppLink';

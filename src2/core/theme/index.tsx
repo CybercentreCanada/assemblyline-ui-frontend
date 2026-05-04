@@ -1,6 +1,9 @@
-export * from './theme.config';
-export * from './theme.defaults';
-export * from './theme.hooks';
-export * from './theme.models';
-export * from './theme.provider';
-export * from './theme.utils';
+export {
+  AppThemeProvider,
+  AppThemeStoreProvider,
+  DEFAULT_APP_THEME_STORE,
+  useAppSetThemeStore,
+  useAppThemeStore
+} from './theme.provider';
+export type { AppThemeStore } from './theme.provider';
+export { mergeThemeConfigs } from './theme.utils';

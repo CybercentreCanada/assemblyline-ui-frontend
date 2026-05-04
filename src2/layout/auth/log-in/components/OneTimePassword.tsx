@@ -1,12 +1,12 @@
 import { TextField } from '@mui/material';
-import React from 'react';
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from 'ui/buttons/Button';
 import { TextDivider } from '../log-in.components';
 import { useLoginRequest, useLoginReset } from '../log-in.hooks';
 import { useLoginForm } from '../log-in.providers';
 
-export const OneTimePassword = React.memo(() => {
+export const OneTimePassword = memo(() => {
   const { t } = useTranslation(['login']);
 
   const form = useLoginForm();
@@ -53,3 +53,5 @@ export const OneTimePassword = React.memo(() => {
     </form>
   );
 });
+
+OneTimePassword.displayName = 'OneTimePassword';

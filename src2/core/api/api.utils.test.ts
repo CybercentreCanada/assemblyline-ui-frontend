@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import type { APIResponse, BlobResponse } from './api.models';
-import { getAPIResponse, getBlobResponse, getValue, isAPIData, stableStringify } from './api.utils';
+import type { ApiResponse, BlobResponse } from './api.models';
+import { getApiResponse, getBlobResponse, getValue, isApiData, stableStringify } from './api.utils';
 
 //*****************************************************************************************
 // isAPIData
@@ -13,7 +13,7 @@ describe('isAPIData', () => {
       api_server_version: '1.0.0',
       api_status_code: 200
     };
-    expect(isAPIData(value)).toBe(true);
+    expect(isApiData(value)).toBe(true);
   });
 
   it('returns false when api_response is missing', () => {
@@ -22,7 +22,7 @@ describe('isAPIData', () => {
       api_server_version: '1.0.0',
       api_status_code: 200
     };
-    expect(isAPIData(value)).toBe(false);
+    expect(isApiData(value)).toBe(false);
   });
 
   it('returns false when api_error_message is missing', () => {
@@ -31,7 +31,7 @@ describe('isAPIData', () => {
       api_server_version: '1.0.0',
       api_status_code: 200
     };
-    expect(isAPIData(value)).toBe(false);
+    expect(isApiData(value)).toBe(false);
   });
 
   it('returns false when api_server_version is missing', () => {
@@ -40,7 +40,7 @@ describe('isAPIData', () => {
       api_error_message: '',
       api_status_code: 200
     };
-    expect(isAPIData(value)).toBe(false);
+    expect(isApiData(value)).toBe(false);
   });
 
   it('returns false when api_status_code is missing', () => {
@@ -49,11 +49,11 @@ describe('isAPIData', () => {
       api_error_message: '',
       api_server_version: '1.0.0'
     };
-    expect(isAPIData(value)).toBe(false);
+    expect(isApiData(value)).toBe(false);
   });
 
   it('returns false for an empty object', () => {
-    expect(isAPIData({})).toBe(false);
+    expect(isApiData({})).toBe(false);
   });
 
   it('returns true even when api_response is null', () => {
@@ -63,7 +63,7 @@ describe('isAPIData', () => {
       api_server_version: '1.0.0',
       api_status_code: 200
     };
-    expect(isAPIData(value)).toBe(true);
+    expect(isApiData(value)).toBe(true);
   });
 });
 
@@ -109,15 +109,15 @@ describe('getValue', () => {
 //*****************************************************************************************
 describe('getAPIResponse', () => {
   it('extracts fields from the data response when available', () => {
-    const data: APIResponse<string> = {
+    const data: ApiResponse<string> = {
       api_response: 'result',
       api_error_message: '',
       api_server_version: '1.0.0',
       api_status_code: 200
     };
-    const empty = null as unknown as APIResponse<string>;
+    const empty = null as unknown as ApiResponse<string>;
 
-    const result = getAPIResponse(data, empty, empty);
+    const result = getApiResponse(data, empty, empty);
     expect(result.statusCode).toBe(200);
     expect(result.serverVersion).toBe('1.0.0');
     expect(result.data).toBe('result');
@@ -125,36 +125,36 @@ describe('getAPIResponse', () => {
   });
 
   it('falls back to error response when data is null', () => {
-    const error: APIResponse<string> = {
+    const error: ApiResponse<string> = {
       api_response: null as unknown as string,
       api_error_message: 'Not found',
       api_server_version: '1.0.0',
       api_status_code: 404
     };
-    const empty = null as unknown as APIResponse<string>;
+    const empty = null as unknown as ApiResponse<string>;
 
-    const result = getAPIResponse(empty, error, empty);
+    const result = getApiResponse(empty, error, empty);
     expect(result.statusCode).toBe(404);
     expect(result.error).toBe('Not found');
   });
 
   it('falls back to failureReason when data and error are null', () => {
-    const failureReason: APIResponse<string> = {
+    const failureReason: ApiResponse<string> = {
       api_response: null as unknown as string,
       api_error_message: 'Server error',
       api_server_version: '1.0.0',
       api_status_code: 500
     };
-    const empty = null as unknown as APIResponse<string>;
+    const empty = null as unknown as ApiResponse<string>;
 
-    const result = getAPIResponse(empty, empty, failureReason);
+    const result = getApiResponse(empty, empty, failureReason);
     expect(result.statusCode).toBe(500);
     expect(result.error).toBe('Server error');
   });
 
   it('returns all null values when all inputs are null', () => {
-    const empty = null as unknown as APIResponse<string>;
-    const result = getAPIResponse(empty, empty, empty);
+    const empty = null as unknown as ApiResponse<string>;
+    const result = getApiResponse(empty, empty, empty);
     expect(result.statusCode).toBeNull();
     expect(result.serverVersion).toBeNull();
     expect(result.data).toBeNull();
@@ -176,7 +176,7 @@ describe('getBlobResponse', () => {
       size: 1024,
       type: 'application/pdf'
     };
-    const empty = null as unknown as APIResponse<string>;
+    const empty = null as unknown as ApiResponse<string>;
 
     const result = getBlobResponse<Blob, string>(data, empty, empty);
     expect(result.statusCode).toBe(200);
@@ -187,7 +187,7 @@ describe('getBlobResponse', () => {
   });
 
   it('falls back to error response for shared fields', () => {
-    const error: APIResponse<string> = {
+    const error: ApiResponse<string> = {
       api_response: null as unknown as string,
       api_error_message: 'Forbidden',
       api_server_version: '1.0.0',
@@ -195,14 +195,14 @@ describe('getBlobResponse', () => {
     };
     const empty = null as unknown as BlobResponse;
 
-    const result = getBlobResponse<Blob, string>(empty, error, null as unknown as APIResponse<string>);
+    const result = getBlobResponse<Blob, string>(empty, error, null as unknown as ApiResponse<string>);
     expect(result.statusCode).toBe(403);
     expect(result.error).toBe('Forbidden');
   });
 
   it('returns all null values when all inputs are null', () => {
     const empty = null as unknown as BlobResponse;
-    const emptyErr = null as unknown as APIResponse<string>;
+    const emptyErr = null as unknown as ApiResponse<string>;
     const result = getBlobResponse<Blob, string>(empty, emptyErr, emptyErr);
     expect(result.statusCode).toBeNull();
     expect(result.filename).toBeNull();

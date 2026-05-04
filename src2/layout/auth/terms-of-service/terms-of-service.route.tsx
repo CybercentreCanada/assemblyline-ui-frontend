@@ -1,9 +1,9 @@
-import { Box, Link, Skeleton, Typography, useTheme } from '@mui/material';
-import { useAPIMutation, useAPIQuery } from 'core/api';
+import { Link, Skeleton, Typography, styled, useTheme } from '@mui/material';
+import { useApiMutation, useApiQuery } from 'core/api';
 import { useAppConfig } from 'core/config';
 import { createAppRoute } from 'core/routes';
 import { NotFoundPage } from 'pages/not-found/not-found.route';
-import React from 'react';
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import Markdown from 'react-markdown';
 import { AppBanner } from 'ui/branding';
@@ -14,43 +14,45 @@ import { PageCenter } from 'ui/pages';
 // ToS Page
 //*****************************************************************************************
 
-export const ToSPage = React.memo(() => {
+const TosContainer = styled('div')(({ theme }) => ({
+  display: 'inline-block',
+  textAlign: 'center',
+  maxWidth: '960px',
+  width: '100%',
+  [theme.breakpoints.down('sm')]: {
+    maxWidth: '100%'
+  },
+  [theme.breakpoints.only('md')]: {
+    maxWidth: '630px'
+  }
+}));
+
+TosContainer.displayName = 'TosContainer';
+
+export const ToSPage = memo(() => {
   const { t } = useTranslation(['tos']);
   const theme = useTheme();
 
   const currentUser = useAppConfig(s => s.user);
   const configuration = useAppConfig(s => s.configuration);
 
-  const handleCancel = useAPIMutation(() => ({
+  const handleCancel = useApiMutation(() => ({
     url: '/api/v4/auth/logout/',
     onSuccess: () => window.location.reload()
   }));
 
-  const handleAccept = useAPIMutation(() => ({
+  const handleAccept = useApiMutation(() => ({
     url: `/api/v4/user/tos/${currentUser.username}/`,
     onSuccess: () => window.location.reload()
   }));
 
-  const { data: tos } = useAPIQuery<string>({ url: '/api/v4/help/tos/', disabled: !configuration?.ui?.tos });
+  const { data: tos } = useApiQuery<string>({ url: '/api/v4/help/tos/', disabled: !configuration?.ui?.tos });
 
   return !configuration?.ui?.tos ? (
     <NotFoundPage />
   ) : (
     <PageCenter margin={4} width="100%">
-      <Box
-        sx={{
-          display: 'inline-block',
-          textAlign: 'center',
-          maxWidth: '960px',
-          width: '100%',
-          [theme.breakpoints.down('sm')]: {
-            maxWidth: '100%'
-          },
-          [theme.breakpoints.only('md')]: {
-            maxWidth: '630px'
-          }
-        }}
-      >
+      <TosContainer>
         <AppBanner />
         <div style={{ marginBottom: theme.spacing(6), textAlign: 'left' }}>
           <Typography variant="h3" gutterBottom>
@@ -103,10 +105,12 @@ export const ToSPage = React.memo(() => {
             )}
           </>
         )}
-      </Box>
+      </TosContainer>
     </PageCenter>
   );
 });
+
+ToSPage.displayName = 'ToSPage';
 
 //*****************************************************************************************
 // ToS Route
@@ -116,5 +120,3 @@ export const ToSRoute = createAppRoute({
   component: ToSPage,
   path: '/tos'
 });
-
-export default ToSRoute;

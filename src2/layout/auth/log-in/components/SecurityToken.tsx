@@ -1,19 +1,19 @@
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { Typography } from '@mui/material';
-import { useAPIQuery } from 'core/api';
+import { useApiQuery } from 'core/api';
 import { useAppSnackbar } from 'core/snackbar/snackbar.hooks';
-import React from 'react';
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { decode, encode } from 'shared/utils/cbor';
 import toArrayBuffer from 'shared/utils/toArrayBuffer';
 import { useLoginForm } from '../log-in.providers';
 
-export const SecurityTokenLogin = React.memo(() => {
+export const SecurityTokenLogin = memo(() => {
   const { t } = useTranslation(['login']);
   const form = useLoginForm();
   const { showErrorMessage } = useAppSnackbar();
 
-  useAPIQuery({
+  useApiQuery({
     url: `/api/v4/webauthn/authenticate/begin/${form.state.values.username || ''}/`,
     method: 'GET',
     onSuccess: ({ api_response }) => {

@@ -1,10 +1,10 @@
-import { AppAPIConfig, AppAPISettingsSchema } from 'core/api/api.config';
-import { AppAuthConfig, AppAuthSettingsSchema } from 'core/auth/auth.config';
+import { AppApiConfig, AppApiSettingsSchema } from 'core/api/api.config';
 import { AppLayoutConfig, AppLayoutSettingsSchema } from 'core/layout/layout.config';
 import { AppRouterConfig, AppRouterSettingsSchema } from 'core/router/router.config';
 import { AppSnackbarConfig } from 'core/snackbar/snackbar.config';
 import { AppThemeConfig, AppThemeSettingsSchema } from 'core/theme/theme.config';
 import { ClassificationAliases, ClassificationDefinition } from 'features/classification/classificationParser';
+import { AppAuthConfig, AppAuthSettingsSchema } from 'layout/auth/auth.config';
 import { APP_LAYOUT_NOTIFICATIONS_CONFIG } from 'layout/notifications/notifications.config';
 import type { Configuration } from 'models/base/config';
 import type { UserSettings } from 'models/base/user_settings';
@@ -47,7 +47,7 @@ import { z } from 'zod';
 
 export const AppSettingsSchema = z
   .object({
-    api: AppAPISettingsSchema.optional().nullable(),
+    api: AppApiSettingsSchema.optional().nullable(),
     auth: AppAuthSettingsSchema.optional().nullable(),
     layout: AppLayoutSettingsSchema.optional().nullable(),
     router: AppRouterSettingsSchema.optional().nullable(),
@@ -59,7 +59,7 @@ export const AppSettingsSchema = z
 export type AppSettings = z.infer<typeof AppSettingsSchema>;
 
 export type AppConfig = {
-  api: AppAPIConfig;
+  api: AppApiConfig;
   auth: AppAuthConfig;
   layout: AppLayoutConfig;
   quota: { api: number; submission: number };

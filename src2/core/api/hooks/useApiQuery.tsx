@@ -3,8 +3,8 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { DEFAULT_APP_CONFIG } from 'app/app.configs';
 import type { ApiQueryKey, ApiRequest, ApiResponse } from '../api.models';
 import { getApiResponse, stableStringify } from '../api.utils';
-import type { UseApiCallFnProps } from './useAPICallFn';
-import { useApiCallFn } from './useAPICallFn';
+import type { UseApiCallFnProps } from './useApiCallFn';
+import { useApiCallFn } from './useApiCallFn';
 import { useIsDebouncing } from './useIsDebouncing';
 
 export type UseApiQueryProps<Response = unknown, Request extends ApiRequest = ApiRequest, Error = string> = {

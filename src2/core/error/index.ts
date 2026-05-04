@@ -1,2 +1,2 @@
-export * from './error.components';
-export * from './error.providers';
+export { ErrorFallback } from './error.components';
+export { AppErrorProvider } from './error.providers';

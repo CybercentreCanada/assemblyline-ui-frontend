@@ -1,16 +1,16 @@
-import { Configuration } from 'models/base/config';
-import { WhoAmIProps } from 'models/ui/user';
+import type { Configuration } from 'models/base/config';
+import type { WhoAmIProps } from 'models/ui/user';
 
-export type APIResponseProps<APIResponse> = {
+export type ApiResponseProps<ApiResponse> = {
   api_error_message: string;
-  api_response: APIResponse;
+  api_response: ApiResponse;
   api_server_version: string;
   api_status_code: number;
 };
 
-export type DownloadResponseProps<APIResponse> = {
+export type DownloadResponseProps<ApiResponse> = {
   api_error_message: string;
-  api_response: APIResponse;
+  api_response: ApiResponse;
   api_server_version: string;
   api_status_code: number;
   filename?: string;
@@ -32,11 +32,11 @@ export type APICallProps<SuccessData, FailureData> = {
   body?: boolean | string | object;
   reloadOnUnauthorize?: boolean;
   allowCache?: boolean;
-  onSuccess?: (api_data: APIResponseProps<SuccessData>) => void;
-  onFailure?: (api_data: APIResponseProps<FailureData>) => void;
+  onSuccess?: (api_data: ApiResponseProps<SuccessData>) => void;
+  onFailure?: (api_data: ApiResponseProps<FailureData>) => void;
   onEnter?: () => void;
   onExit?: () => void;
-  onFinalize?: (api_data: APIResponseProps<unknown>) => void;
+  onFinalize?: (api_data: ApiResponseProps<unknown>) => void;
   retryAfter?: number;
 };
 
@@ -59,7 +59,7 @@ export type DownloadBlobProps<SuccessData, FailureData> = {
 };
 
 export type UseMyAPIReturn = {
-  apiCall: <SuccessData = any, FailureData = any>(props: APICallProps<SuccessData, FailureData>) => void;
+  apiCall: <SuccessData = unknown, FailureData = unknown>(props: APICallProps<SuccessData, FailureData>) => void;
   bootstrap: (props: BootstrapProps) => void;
   downloadBlob: <SuccessData = ReadableStream, FailureData = ReadableStream>(
     props: DownloadBlobProps<SuccessData, FailureData>
