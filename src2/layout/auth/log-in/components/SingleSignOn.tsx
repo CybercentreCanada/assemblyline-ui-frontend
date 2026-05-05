@@ -1,6 +1,7 @@
 import { Avatar, Link, Typography, useTheme } from '@mui/material';
 import { useSaveAppConfig } from 'core/config/config.hooks';
-import { useAppInterfaceStore, useAppSetInterfaceStore } from 'core/interface';
+import { useAppInterfaceStore } from 'core/interface';
+import { useAppSetPreferenceStore } from 'core/preference';
 import { memo, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router';
@@ -76,19 +77,19 @@ export const OAuthLogin = memo(() => {
   const location = useLocation();
   const oAuthProviders = useAppInterfaceStore(s => s.auth.login.oauth_providers);
 
-  const setInterfaceStore = useAppSetInterfaceStore();
+  const setPreferenceStore = useAppSetPreferenceStore();
   const save = useSaveAppConfig();
 
   const handleClick = useCallback(() => {
     const { pathname, search, hash } = location;
     if (!['/logout'].includes(pathname)) {
-      setInterfaceStore(s => {
+      setPreferenceStore(s => {
         s.auth.redirectTo = `${pathname}${search}${hash}`;
         return s;
       });
       save();
     }
-  }, [location, save, setInterfaceStore]);
+  }, [location, save, setPreferenceStore]);
 
   return (oAuthProviders || []).map((provider, i) => (
     <Button
@@ -113,19 +114,19 @@ export const SAMLLogin = memo(() => {
   const location = useLocation();
   const allowSAML = useAppInterfaceStore(s => s.auth.login.allow_saml_login);
 
-  const setInterfaceStore = useAppSetInterfaceStore();
+  const setPreferenceStore = useAppSetPreferenceStore();
   const save = useSaveAppConfig();
 
   const handleClick = useCallback(() => {
     const { pathname, search, hash } = location;
     if (!['/logout'].includes(pathname)) {
-      setInterfaceStore(s => {
+      setPreferenceStore(s => {
         s.auth.redirectTo = `${pathname}${search}${hash}`;
         return s;
       });
       save();
     }
-  }, [location, save, setInterfaceStore]);
+  }, [location, save, setPreferenceStore]);
 
   return !allowSAML ? null : (
     <Button color="primary" href="/api/v4/auth/saml/sso/" variant="contained" onClick={handleClick}>

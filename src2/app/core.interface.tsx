@@ -25,8 +25,6 @@ declare global {
       };
       /** Current authentication mode/page. */
       mode: 'app' | 'loading' | 'locked' | 'login' | 'logout' | 'quota' | 'tos';
-      /** Post-login redirect path. */
-      redirectTo: string;
     };
     /** API usage quota counters. */
     quota: {
@@ -64,8 +62,7 @@ export const DEFAULT_APP_INTERFACE_STORE: AppInterface = {
       allow_userpass_login: false,
       oauth_providers: []
     },
-    mode: 'loading',
-    redirectTo: null
+    mode: 'loading'
   },
   quota: {
     api: 0,

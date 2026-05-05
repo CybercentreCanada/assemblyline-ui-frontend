@@ -12,19 +12,6 @@ const API_PREFERENCE_SCHEMA = z.object({
 });
 
 const AUTH_PREFERENCE_SCHEMA = z.object({
-  // login: z
-  //   .object({
-  //     allow_saml_login: z.boolean().catch(false),
-  //     allow_signup: z.boolean().catch(false),
-  //     allow_userpass_login: z.boolean().catch(false),
-  //     oauth_providers: z.array(z.string()).catch([])
-  //   })
-  //   .catch({
-  //     allow_saml_login: false,
-  //     allow_signup: false,
-  //     allow_userpass_login: false,
-  //     oauth_providers: []
-  //   }),
   preferredMethod: z.string().catch(null),
   redirectTo: z.string().catch(null)
 });

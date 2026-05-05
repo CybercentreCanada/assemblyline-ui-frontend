@@ -1,5 +1,6 @@
 import { invalidateApiQuery, useApiMutation, useApiQuery } from 'core/api';
 import { useAppInterfaceStore, useAppSetInterfaceStore } from 'core/interface';
+import { useAppPreferenceStore, useAppSetPreferenceStore } from 'core/preference';
 import { useAppSnackbar } from 'core/snackbar/snackbar.hooks';
 import { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -105,7 +106,8 @@ export const useOAuthLogin = () => {
   const resetLogin = useLoginReset();
 
   const setInterfaceStore = useAppSetInterfaceStore();
-  const redirectTo = useAppInterfaceStore(s => s.auth.redirectTo);
+  const setPreferenceStore = useAppSetPreferenceStore();
+  const redirectTo = useAppPreferenceStore(s => s.auth.redirectTo);
 
   const provider = useMemo<string | null>(() => {
     const marker = '/oauth/';
@@ -144,6 +146,10 @@ export const useOAuthLogin = () => {
 
       setInterfaceStore(s => {
         s.auth.disableWhoAmI = true;
+        return s;
+      });
+
+      setPreferenceStore(s => {
         s.auth.redirectTo = null;
         return s;
       });
@@ -167,7 +173,8 @@ export const useSAMLLogin = () => {
   const resetLogin = useLoginReset();
 
   const setInterfaceStore = useAppSetInterfaceStore();
-  const redirectTo = useAppInterfaceStore(s => s.auth.redirectTo);
+  const setPreferenceStore = useAppSetPreferenceStore();
+  const redirectTo = useAppPreferenceStore(s => s.auth.redirectTo);
 
   const samlData = useMemo<{ username: string; email: string; saml_token_id: string; error: string }>(() => {
     try {
@@ -196,6 +203,10 @@ export const useSAMLLogin = () => {
 
       setInterfaceStore(s => {
         s.auth.disableWhoAmI = true;
+        return s;
+      });
+
+      setPreferenceStore(s => {
         s.auth.redirectTo = null;
         return s;
       });
