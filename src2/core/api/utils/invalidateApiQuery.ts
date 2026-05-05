@@ -1,4 +1,4 @@
-import { DEFAULT_APP_CONFIG } from 'app/app.configs';
+import { DEFAULT_APP_PREFERENCE } from 'app/core.preference';
 import type { ApiQueryKey, ApiRequest } from '../api.models';
 import { queryClient } from '../api.providers';
 
@@ -11,7 +11,7 @@ import { queryClient } from '../api.providers';
  */
 export const invalidateApiQuery = (
   filter: (key: ApiRequest) => boolean,
-  delay: number = DEFAULT_APP_CONFIG.api.invalidateDelay
+  delay: number = DEFAULT_APP_PREFERENCE.api.invalidateDelay
 ) =>
   setTimeout(async () => {
     await queryClient.invalidateQueries({

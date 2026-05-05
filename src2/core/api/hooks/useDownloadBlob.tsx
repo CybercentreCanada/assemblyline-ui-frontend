@@ -1,7 +1,8 @@
 import type { UndefinedInitialDataOptions } from '@tanstack/react-query';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { DEFAULT_APP_CONFIG } from 'app/app.configs';
-import { useAppConfig, useAppSetConfig } from 'core/config';
+import { DEFAULT_APP_PREFERENCE } from 'app/core.preference';
+import { useAppConfig } from 'core/config';
+import { useAppSetInterfaceStore } from 'core/interface';
 import { useAppSnackbar } from 'core/snackbar';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -27,14 +28,14 @@ export const useDownloadBlob = ({
   disabled,
   queryProps = null,
   reloadOnUnauthorize = true,
-  retryAfter = DEFAULT_APP_CONFIG.api.retryTime,
+  retryAfter = DEFAULT_APP_PREFERENCE.api.retryTime,
   url
 }: UseDownloadBlobProps) => {
   const queryClient = useQueryClient();
   const { t } = useTranslation(['api']);
   const { showErrorMessage, closeSnackbar } = useAppSnackbar();
   const systemConfig = useAppConfig(s => s?.configuration);
-  const setStore = useAppSetConfig();
+  const setInterfaceStore = useAppSetInterfaceStore();
 
   const query = useQuery<BlobResponse, ApiResponse<Error>, BlobResponse, ApiQueryKey>(
     {
@@ -57,7 +58,7 @@ export const useDownloadBlob = ({
         // Setting the API quota
         const apiQuota = res.headers.get('X-Remaining-Quota-Api');
         if (apiQuota) {
-          setStore(s => {
+          setInterfaceStore(s => {
             s.quota.api = parseInt(apiQuota);
             return s;
           });
@@ -66,7 +67,7 @@ export const useDownloadBlob = ({
         // Setting the Submission quota
         const submissionQuota = res.headers.get('X-Remaining-Quota-Submission');
         if (submissionQuota) {
-          setStore(s => {
+          setInterfaceStore(s => {
             s.quota.submission = parseInt(submissionQuota);
             return s;
           });
@@ -122,7 +123,7 @@ export const useDownloadBlob = ({
         }
 
         // Handle successful request
-        if (retryAfter !== DEFAULT_APP_CONFIG.api.retryTime) closeSnackbar();
+        if (retryAfter !== DEFAULT_APP_PREFERENCE.api.retryTime) closeSnackbar();
 
         // Handle all non-successful request
         if (res.status !== 200) {

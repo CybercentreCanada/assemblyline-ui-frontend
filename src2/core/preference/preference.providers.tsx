@@ -1,4 +1,4 @@
-import { APP_PREFERENCE_SCHEMA } from 'app/core.preference';
+import { DEFAULT_APP_PREFERENCE } from 'app/core.preference';
 import { createAppStore } from 'features/store/createAppStore';
 import type { PropsWithChildren } from 'react';
 import { memo, useEffect, useRef } from 'react';
@@ -12,7 +12,7 @@ export const {
   StoreProvider: AppPreferenceStoreProvider,
   useStore: useAppPreferenceStore,
   useSetStore: useAppSetPreferenceStore
-} = createAppStore<AppPreference>(APP_PREFERENCE_SCHEMA.parse({}));
+} = createAppStore<AppPreference>(DEFAULT_APP_PREFERENCE);
 
 AppPreferenceStoreProvider.displayName = 'AppPreferenceStoreProvider';
 

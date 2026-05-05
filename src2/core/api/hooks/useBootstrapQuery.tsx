@@ -1,7 +1,8 @@
 import type { UndefinedInitialDataOptions } from '@tanstack/react-query';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { DEFAULT_APP_CONFIG } from 'app/app.configs';
-import { useAppConfig, useAppSetConfig } from 'core/config';
+import { DEFAULT_APP_PREFERENCE } from 'app/core.preference';
+import { useAppConfig } from 'core/config';
+import { useAppSetInterfaceStore } from 'core/interface';
 import { useAppSnackbar } from 'core/snackbar';
 import type { LoginParamsProps } from 'layout/auth/auth.models';
 import type { CustomUser, WhoAmIProps } from 'models/api/user';
@@ -39,14 +40,14 @@ export const useBootstrapQuery = ({
   setUser = () => null,
   setReady = () => null,
   disabled = false,
-  retryAfter = DEFAULT_APP_CONFIG.api.retryTime,
+  retryAfter = DEFAULT_APP_PREFERENCE.api.retryTime,
   allowCache = false
 }: UseBootstrapQueryProps) => {
   const queryClient = useQueryClient();
   const { t } = useTranslation(['api']);
   const { showErrorMessage, closeSnackbar } = useAppSnackbar();
   const systemConfig = useAppConfig(s => s.configuration);
-  const setStore = useAppSetConfig();
+  const setInterfaceStore = useAppSetInterfaceStore();
 
   const query = useQuery<
     ApiResponse<Configuration | LoginParamsProps | WhoAmIProps>,
@@ -77,7 +78,7 @@ export const useBootstrapQuery = ({
         // Setting the API quota
         const apiQuota = res.headers.get('X-Remaining-Quota-Api');
         if (apiQuota) {
-          setStore(s => {
+          setInterfaceStore(s => {
             s.quota.api = parseInt(apiQuota);
             return s;
           });
@@ -86,7 +87,7 @@ export const useBootstrapQuery = ({
         // Setting the Submission quota
         const submissionQuota = res.headers.get('X-Remaining-Quota-Submission');
         if (submissionQuota) {
-          setStore(s => {
+          setInterfaceStore(s => {
             s.quota.submission = parseInt(submissionQuota);
             return s;
           });
@@ -121,7 +122,7 @@ export const useBootstrapQuery = ({
 
         // Forbiden response indicate that the user's account is locked.
         if (res.status === 403) {
-          if (retryAfter !== DEFAULT_APP_CONFIG.api.retryTime) closeSnackbar();
+          if (retryAfter !== DEFAULT_APP_PREFERENCE.api.retryTime) closeSnackbar();
           setConfiguration(json.api_response as Configuration);
           switchRenderedApp('locked');
           return Promise.reject(json);
@@ -129,7 +130,7 @@ export const useBootstrapQuery = ({
 
         // Unauthorized response indicate that the user is not logged in.
         if (res.status === 401) {
-          if (retryAfter !== DEFAULT_APP_CONFIG.api.retryTime) closeSnackbar();
+          if (retryAfter !== DEFAULT_APP_PREFERENCE.api.retryTime) closeSnackbar();
           localStorage.setItem('loginParams', JSON.stringify(json.api_response));
           sessionStorage.clear();
           setLoginParams(json.api_response as LoginParamsProps);
@@ -150,7 +151,7 @@ export const useBootstrapQuery = ({
         }
 
         if (res.status === 200) {
-          if (retryAfter !== DEFAULT_APP_CONFIG.api.retryTime) closeSnackbar();
+          if (retryAfter !== DEFAULT_APP_PREFERENCE.api.retryTime) closeSnackbar();
 
           const user = json.api_response as WhoAmIProps;
 

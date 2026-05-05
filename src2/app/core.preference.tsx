@@ -52,3 +52,5 @@ export const APP_PREFERENCE_SCHEMA = z.object({
   snackbar: SNACKBAR_PREFERENCE_sCHEMA.catch(SNACKBAR_PREFERENCE_sCHEMA.parse({})),
   theme: THEME_PREFERENCE_SCHEMA.catch(THEME_PREFERENCE_SCHEMA.parse({}))
 });
+
+export const DEFAULT_APP_PREFERENCE = APP_PREFERENCE_SCHEMA.parse({});

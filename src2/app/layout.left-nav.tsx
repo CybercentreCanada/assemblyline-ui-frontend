@@ -31,7 +31,7 @@ import DataObjectOutlinedIcon from '@mui/icons-material/DataObjectOutlined';
 import NotificationImportantOutlinedIcon from '@mui/icons-material/NotificationImportantOutlined';
 import PublishOutlinedIcon from '@mui/icons-material/PublishOutlined';
 import { useAppConfig } from 'core/config';
-import { AppLeftNavItem } from 'layout/template/hooks/useAppTemplateLeftNavMenu';
+import { AppLeftNavItem } from 'core/template';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';

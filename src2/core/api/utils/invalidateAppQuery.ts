@@ -1,5 +1,4 @@
-import type { ApiRequests } from 'app/app.api';
-import { DEFAULT_APP_CONFIG } from 'app/app.configs';
+import { DEFAULT_APP_PREFERENCE } from 'app/core.preference';
 import type { ApiQueryKey, ApiRequest } from '../api.models';
 import { queryClient } from '../api.providers';
 import { isObject } from '../api.utils';
@@ -13,7 +12,7 @@ import { isObject } from '../api.utils';
  */
 export const invalidateAppQuery = <Request extends ApiRequests>(
   request: Partial<Request>,
-  delay: number = DEFAULT_APP_CONFIG.api.invalidateDelay
+  delay: number = DEFAULT_APP_PREFERENCE.api.invalidateDelay
 ) =>
   setTimeout(async () => {
     await queryClient.invalidateQueries({

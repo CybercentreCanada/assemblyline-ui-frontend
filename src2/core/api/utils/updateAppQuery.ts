@@ -1,4 +1,3 @@
-import type { ApiRequests, ApiResponses } from 'app/app.api';
 import type { ApiQueryKey, ApiRequest, ApiResponse } from '../api.models';
 import { queryClient } from '../api.providers';
 

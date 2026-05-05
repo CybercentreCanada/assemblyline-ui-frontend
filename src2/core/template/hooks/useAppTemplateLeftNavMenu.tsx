@@ -2,8 +2,8 @@ import { Divider } from '@mui/material';
 import { LeftNavMenuProps } from '@tui/core';
 import { useAppLeftNavMenu } from 'app/layout.left-nav';
 import { AppRoute, CreatedAppRouteParamsMap, createAppRoute } from 'core/routes';
+import { LeftNavRoute } from 'layout/top-nav/LeftNavRoute';
 import { useCallback, useMemo } from 'react';
-import { LeftNavRoute } from '../components/LeftNavRoute';
 
 type AppTemplateLeftNavMenuItem = LeftNavMenuProps['items'][number];
 

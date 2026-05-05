@@ -2,10 +2,10 @@ import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import { AppSwitcher } from '@tui/apps';
 import { AppPreferenceConfigs } from '@tui/core';
 import { useAppPreferences } from 'app/layout.preferences';
+import { DocumentationButton } from 'layout/top-nav/DocumentationButton';
+import { EmailButton } from 'layout/top-nav/EmailButton';
+import { UserProfile } from 'layout/top-nav/UserProfile';
 import { useMemo } from 'react';
-import { DocumentationButton } from '../components/DocumentationButton';
-import { EmailButton } from '../components/EmailButton';
-import { UserProfile } from '../components/UserProfile';
 import { useAppTemplateLeftNavMenu } from './useAppTemplateLeftNavMenu';
 
 export const useAppTemplatePreferences = () => {

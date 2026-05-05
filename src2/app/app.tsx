@@ -2,16 +2,13 @@ import { AppApiProvider } from 'core/api';
 import { AppConfigStoreProvider } from 'core/config/config.providers';
 import { AppErrorProvider } from 'core/error';
 import { AppInterfaceStoreProvider } from 'core/interface';
-import { AppLayoutStoreProvider } from 'core/layout';
 import { AppPreferenceStoreProvider } from 'core/preference';
 import { AppRouterLayout, AppRouterPanel, AppRouterProvider, AppRouterRootProvider } from 'core/router';
 import { AppSnackbarProvider } from 'core/snackbar';
+import { AppTemplateLayout, AppTemplateProvider } from 'core/template';
 import { AppThemeProvider } from 'core/theme';
-import { AppAppsLayout } from 'layout/apps/apps.layout';
 import { AppAuthLayout } from 'layout/auth';
 import { AppDrawerLayout } from 'layout/drawer/drawer.layout';
-import { AppDrawerStoreProvider } from 'layout/drawer/drawer.providers';
-import { AppTemplateLayout, AppTemplateProvider } from 'layout/template';
 import type { PropsWithChildren } from 'react';
 import { memo, StrictMode } from 'react';
 import i18n from './app.i18n';
@@ -73,39 +70,39 @@ import { APP_ROUTES } from './app.routes';
 //   </StrictMode>
 // );
 
-export const AppLayout2 = () => (
-  <AppAuthLayout>
-    <AppRouterLayout routes={APP_ROUTES}>
-      <AppDrawerLayout content={<AppRouterPanel panelKey={1} />}>
-        <AppAppsLayout>
-          <AppTemplateLayout>
-            <AppRouterPanel panelKey={0} />
-          </AppTemplateLayout>
-        </AppAppsLayout>
-      </AppDrawerLayout>
-    </AppRouterLayout>
-  </AppAuthLayout>
-);
+// export const AppLayout2 = () => (
+//   <AppAuthLayout>
+//     <AppRouterLayout routes={APP_ROUTES}>
+//       <AppDrawerLayout content={<AppRouterPanel panelKey={1} />}>
+//         <AppAppsLayout>
+//           <AppTemplateLayout>
+//             <AppRouterPanel panelKey={0} />
+//           </AppTemplateLayout>
+//         </AppAppsLayout>
+//       </AppDrawerLayout>
+//     </AppRouterLayout>
+//   </AppAuthLayout>
+// );
 
-export const App2 = () => (
-  <StrictMode>
-    {/* <AppConfigProviderStore> */}
-    <AppThemeProvider>
-      <AppErrorProvider>
-        <AppApiProvider>
-          <AppSnackbarProvider>
-            <AppRouterProvider>
-              <AppLayoutProvider i18n={i18n}>
-                <AppLayout2 />
-              </AppLayoutProvider>
-            </AppRouterProvider>
-          </AppSnackbarProvider>
-        </AppApiProvider>
-      </AppErrorProvider>
-    </AppThemeProvider>
-    {/* </AppConfigProviderStore> */}
-  </StrictMode>
-);
+// export const App2 = () => (
+//   <StrictMode>
+//     {/* <AppConfigProviderStore> */}
+//     <AppThemeProvider>
+//       <AppErrorProvider>
+//         <AppApiProvider>
+//           <AppSnackbarProvider>
+//             <AppRouterProvider>
+//               <AppLayoutProvider i18n={i18n}>
+//                 <AppLayout2 />
+//               </AppLayoutProvider>
+//             </AppRouterProvider>
+//           </AppSnackbarProvider>
+//         </AppApiProvider>
+//       </AppErrorProvider>
+//     </AppThemeProvider>
+//     {/* </AppConfigProviderStore> */}
+//   </StrictMode>
+// );
 
 //*****************************************************************************************
 // App Layouts
@@ -153,17 +150,13 @@ AppProviders.displayName = 'AppProviders';
 
 const AppStores = memo(({ children }: PropsWithChildren) => (
   <AppConfigStoreProvider>
-    <AppDrawerStoreProvider>
-      <AppInterfaceStoreProvider>
-        <AppLayoutStoreProvider>
-          <AppPreferenceStoreProvider>
-            <AppRouterRootProvider>
-              <>{children}</>
-            </AppRouterRootProvider>
-          </AppPreferenceStoreProvider>
-        </AppLayoutStoreProvider>
-      </AppInterfaceStoreProvider>
-    </AppDrawerStoreProvider>
+    <AppInterfaceStoreProvider>
+      <AppPreferenceStoreProvider>
+        <AppRouterRootProvider>
+          <>{children}</>
+        </AppRouterRootProvider>
+      </AppPreferenceStoreProvider>
+    </AppInterfaceStoreProvider>
   </AppConfigStoreProvider>
 ));
 

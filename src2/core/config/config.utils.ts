@@ -1,5 +1,11 @@
-import type { AppSettings } from 'app/app.configs';
-import { AppSettingsSchema } from 'app/app.configs';
+import { z } from 'zod';
+
+export const APP_CONFIG_LOCAL_STORAGE_KEY = 'al.settings';
+
+/** @deprecated Use APP_PREFERENCE_SCHEMA from app/core.preference instead */
+const AppSettingsSchema = z.object({}).nullable().optional();
+
+type AppSettings = z.infer<typeof AppSettingsSchema>;
 
 //*****************************************************************************************
 // LocalStorage Persistence
