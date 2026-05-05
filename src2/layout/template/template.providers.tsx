@@ -1,28 +1,20 @@
 import { useAppSwitcher } from '@tui/apps';
 import { AppProvider, AppRoot, useAppLayout, useAppUser } from '@tui/core';
+import { useAppInterfaceStore } from 'core/interface';
 import { useAppPreferenceStore } from 'core/preference';
-import { useAppThemeStore } from 'core/theme';
 import type { i18n } from 'i18next';
 import type { PropsWithChildren } from 'react';
 import { memo, useEffect, useMemo } from 'react';
 import { useAppTemplatePreferences } from './hooks/useAppTemplatePreferences';
 import { useAppTemplateRouter } from './hooks/useAppTemplateRouter';
 import { useAppTemplateUser } from './hooks/useAppTemplateUser';
-import { useAppLayoutThemeMode } from './layout.hooks';
+import { useAppTemplateThemeMode } from './template.hooks';
 
-// const cookies: {
-//   theme: string;
-//   mode: 'light' | 'dark';
-//   lang: string;
-//   layout: 'top' | 'side';
-//   density: 'dense' | 'comfortable' | 'compact';
-//   drawerOpen: boolean;
-//   autoHideAppbar: boolean;
-//   showQuickSearch: boolean;
-//   showBreadcrumbs: boolean;
-// };
+//*****************************************************************************************
+// App Auth Store
+//*****************************************************************************************
 
-export const Inner = ({ children }: PropsWithChildren) => {
+const Inner = ({ children }: PropsWithChildren) => {
   const appLayout = useAppLayout();
   const { isReady } = useAppUser();
   const { setItems, items } = useAppSwitcher();
@@ -38,6 +30,10 @@ export const Inner = ({ children }: PropsWithChildren) => {
 
   return children;
 };
+
+//*****************************************************************************************
+// App Auth Store
+//*****************************************************************************************
 
 export const AppTemplateLayout = memo(({ children }: PropsWithChildren) => {
   // const cookies = parseTuiClientCookies();
@@ -76,11 +72,15 @@ export const AppTemplateLayout = memo(({ children }: PropsWithChildren) => {
 
 AppTemplateLayout.displayName = 'AppTemplateLayout';
 
+//*****************************************************************************************
+// App Auth Store
+//*****************************************************************************************
+
 export type AppLayoutProviderProps = PropsWithChildren & {
   i18n: i18n;
 };
 
-export const AppLayoutProvider = memo(({ children, i18n }: AppLayoutProviderProps) => {
+export const AppTemplateProvider = memo(({ children, i18n }: AppLayoutProviderProps) => {
   const autoHideAppbar = useAppPreferenceStore(s => s.layout.autoHideAppbar);
   const density = useAppPreferenceStore(s => s.layout.density);
   const drawerOpen = useAppPreferenceStore(s => s.layout.drawerOpen);
@@ -90,8 +90,8 @@ export const AppLayoutProvider = memo(({ children, i18n }: AppLayoutProviderProp
   const showQuickSearch = useAppPreferenceStore(s => s.layout.showQuickSearch);
   const themeID = useAppPreferenceStore(s => s.layout.theme);
 
-  const mode = useAppLayoutThemeMode();
-  const skin = useAppThemeStore(s => s.skin);
+  const mode = useAppTemplateThemeMode();
+  const skin = useAppInterfaceStore(s => s.theme.skin);
   const themes = useMemo(() => (skin ? [skin] : []), [skin]);
 
   return (
@@ -115,4 +115,4 @@ export const AppLayoutProvider = memo(({ children, i18n }: AppLayoutProviderProp
   );
 });
 
-AppLayoutProvider.displayName = 'AppLayoutProvider';
+AppTemplateProvider.displayName = 'AppTemplateProvider';

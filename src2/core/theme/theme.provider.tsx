@@ -1,38 +1,10 @@
 import type { ThemeProviderProps } from '@mui/material';
 import { createTheme, CssBaseline, StyledEngineProvider, ThemeProvider, useMediaQuery } from '@mui/material';
-import type { AppTheme } from '@tui/core';
+import { useAppInterfaceStore, useAppSetInterfaceStore } from 'core/interface';
 import { useAppPreferenceStore } from 'core/preference';
-import { createAppStore } from 'features/store/createAppStore';
 import type { PropsWithChildren } from 'react';
 import { memo, useEffect, useMemo } from 'react';
 import { mergeThemeConfigs } from './theme.utils';
-
-//*****************************************************************************************
-// App Theme Store
-//*****************************************************************************************
-
-export type AppThemeStore = {
-  /** Whether the theme has been loaded from the server. */
-  initialized?: boolean;
-  /** Whether to inject MUI styles first (for CSS override ordering). */
-  injectFirst?: boolean;
-  /** The active theme skin configuration. */
-  skin?: AppTheme;
-};
-
-export const DEFAULT_APP_THEME_STORE: AppThemeStore = {
-  initialized: false,
-  injectFirst: false,
-  skin: null
-};
-
-export const {
-  StoreProvider: AppThemeStoreProvider,
-  useStore: useAppThemeStore,
-  useSetStore: useAppSetThemeStore
-} = createAppStore<AppThemeStore>(DEFAULT_APP_THEME_STORE);
-
-AppThemeStoreProvider.displayName = 'AppThemeStoreProvider';
 
 //*****************************************************************************************
 // App Theme Provider
@@ -40,11 +12,11 @@ AppThemeStoreProvider.displayName = 'AppThemeStoreProvider';
 export const AppThemeProvider = memo(({ children }: PropsWithChildren) => {
   const requestedMode = useAppPreferenceStore(s => s.theme.mode);
 
-  const initialized = useAppThemeStore(s => s.initialized);
-  const injectFirst = useAppThemeStore(s => s.injectFirst);
-  const skin = useAppThemeStore(s => s.skin);
+  const initialized = useAppInterfaceStore(s => s.theme.initialized);
+  const injectFirst = useAppInterfaceStore(s => s.theme.injectFirst);
+  const skin = useAppInterfaceStore(s => s.theme.skin);
 
-  const setTheme = useAppSetThemeStore();
+  const setTheme = useAppSetInterfaceStore();
 
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
 
@@ -63,8 +35,8 @@ export const AppThemeProvider = memo(({ children }: PropsWithChildren) => {
       .then(response => response.json() as Promise<unknown>)
       .then(data =>
         setTheme(s => {
-          s.initialized = true;
-          s.skin = {
+          s.theme.initialized = true;
+          s.theme.skin = {
             id: 'theme.default',
             i18nKey: 'theme.default.label',
             default: true,

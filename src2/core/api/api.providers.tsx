@@ -3,44 +3,12 @@ import { keepPreviousData, QueryClient } from '@tanstack/react-query';
 import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools';
 import type { PersistedClient } from '@tanstack/react-query-persist-client';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
+import { useAppInterfaceStore } from 'core/interface';
 import { useAppPreferenceStore } from 'core/preference';
-import { createAppStore } from 'features/store/createAppStore';
 import { compress, decompress } from 'lz-string';
 import type { PropsWithChildren } from 'react';
 import { Activity, memo, useEffect, useMemo } from 'react';
 import type { ApiQueryKey } from './api.models';
-
-//*****************************************************************************************
-// App API Store
-//*****************************************************************************************
-
-export type AppApiStore = {
-  /** API usage quota counters. */
-  quota: {
-    /** General API call quota. */
-    api: number;
-    /** Submission quota. */
-    submission: number;
-  };
-  /** Whether to show React Query devtools panel. */
-  showDevtools: boolean;
-};
-
-export const DEFAULT_APP_API_STORE: AppApiStore = {
-  quota: {
-    api: 0,
-    submission: 0
-  },
-  showDevtools: false
-};
-
-export const {
-  StoreProvider: AppApiStoreProvider,
-  useStore: useAppApiStore,
-  useSetStore: useAppSetApiStore
-} = createAppStore<AppApiStore>(DEFAULT_APP_API_STORE);
-
-AppApiStoreProvider.displayName = 'AppApiStoreProvider';
 
 //*****************************************************************************************
 // App API Debugger Layout
@@ -52,7 +20,7 @@ export type AppApiLayoutProps = {
 };
 
 export const AppApiLayout = memo(({ children }: AppApiLayoutProps) => {
-  const showDevtools = useAppApiStore(s => s.showDevtools);
+  const showDevtools = useAppInterfaceStore(s => s.api.showDevtools);
 
   return (
     <>

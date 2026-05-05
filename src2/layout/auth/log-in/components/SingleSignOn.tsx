@@ -1,6 +1,6 @@
 import { Avatar, Link, Typography, useTheme } from '@mui/material';
 import { useSaveAppConfig } from 'core/config/config.hooks';
-import { useAppAuthStore, useAppSetAuthStore } from 'layout/auth/auth.providers';
+import { useAppInterfaceStore, useAppSetInterfaceStore } from 'core/interface';
 import { memo, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router';
@@ -74,21 +74,21 @@ SingleSignOn.displayName = 'SingleSignOn';
 export const OAuthLogin = memo(() => {
   const { t } = useTranslation(['login']);
   const location = useLocation();
-  const oAuthProviders = useAppAuthStore(s => s.login.oauth_providers);
+  const oAuthProviders = useAppInterfaceStore(s => s.auth.login.oauth_providers);
 
-  const setAuthStore = useAppSetAuthStore();
+  const setInterfaceStore = useAppSetInterfaceStore();
   const save = useSaveAppConfig();
 
   const handleClick = useCallback(() => {
     const { pathname, search, hash } = location;
     if (!['/logout'].includes(pathname)) {
-      setAuthStore(s => {
-        s.redirectTo = `${pathname}${search}${hash}`;
+      setInterfaceStore(s => {
+        s.auth.redirectTo = `${pathname}${search}${hash}`;
         return s;
       });
       save();
     }
-  }, [location, save, setAuthStore]);
+  }, [location, save, setInterfaceStore]);
 
   return (oAuthProviders || []).map((provider, i) => (
     <Button
@@ -111,21 +111,21 @@ OAuthLogin.displayName = 'OAuthLogin';
 export const SAMLLogin = memo(() => {
   const { t } = useTranslation(['login']);
   const location = useLocation();
-  const allowSAML = useAppAuthStore(s => s.login.allow_saml_login);
+  const allowSAML = useAppInterfaceStore(s => s.auth.login.allow_saml_login);
 
-  const setAuthStore = useAppSetAuthStore();
+  const setInterfaceStore = useAppSetInterfaceStore();
   const save = useSaveAppConfig();
 
   const handleClick = useCallback(() => {
     const { pathname, search, hash } = location;
     if (!['/logout'].includes(pathname)) {
-      setAuthStore(s => {
-        s.redirectTo = `${pathname}${search}${hash}`;
+      setInterfaceStore(s => {
+        s.auth.redirectTo = `${pathname}${search}${hash}`;
         return s;
       });
       save();
     }
-  }, [location, save, setAuthStore]);
+  }, [location, save, setInterfaceStore]);
 
   return !allowSAML ? null : (
     <Button color="primary" href="/api/v4/auth/saml/sso/" variant="contained" onClick={handleClick}>

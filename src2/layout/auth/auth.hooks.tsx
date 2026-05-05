@@ -1,7 +1,8 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import type { ApiQueryKey, ApiResponse } from 'core/api';
-import { isApiData, stableStringify, useAppSetApiStore } from 'core/api';
+import { isApiData, stableStringify } from 'core/api';
 import { useAppConfig, useAppSetConfig, useSaveAppConfig } from 'core/config';
+import { useAppInterfaceStore, useAppSetInterfaceStore } from 'core/interface';
 import { useAppSnackbar } from 'core/snackbar';
 import type { WhoAmIProps } from 'models/api/user';
 import type { Configuration } from 'models/base/config';
@@ -10,7 +11,6 @@ import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router';
 import { getXSRFCookie } from 'shared/utils/xsrf.utils';
 import type { LoginParamsProps } from './auth.models';
-import { useAppAuthStore, useAppSetAuthStore } from './auth.providers';
 import { normalizeWhoAmI } from './auth.utils';
 
 const DEFAULT_RETRY_TIME = 10_000;
@@ -56,7 +56,7 @@ export const useIsAppReady = () => {
 export const useIsAuthenticating = () => {
   const { pathname } = useLocation();
 
-  const disableWhoAmI = useAppAuthStore(s => s.disableWhoAmI);
+  const disableWhoAmI = useAppInterfaceStore(s => s.auth.disableWhoAmI);
 
   return useMemo(
     () => pathname.includes(`/oauth/`) || pathname.includes(`/saml/`) || disableWhoAmI,
@@ -76,8 +76,7 @@ export const useAuthQuery = () => {
 
   const systemConfig = useAppConfig(s => s?.configuration);
 
-  const setAuthStore = useAppSetAuthStore();
-  const setApiStore = useAppSetApiStore();
+  const setInterfaceStore = useAppSetInterfaceStore();
   const setConfig = useAppSetConfig();
 
   const isAuthenticating = useIsAuthenticating();
@@ -115,7 +114,7 @@ export const useAuthQuery = () => {
         // Setting the API quota
         const apiQuota = res.headers.get('X-Remaining-Quota-Api');
         if (apiQuota) {
-          setApiStore(s => {
+          setInterfaceStore(s => {
             s.quota.api = parseInt(apiQuota);
             return s;
           });
@@ -124,7 +123,7 @@ export const useAuthQuery = () => {
         // Setting the Submission quota
         const submissionQuota = res.headers.get('X-Remaining-Quota-Submission');
         if (submissionQuota) {
-          setApiStore(s => {
+          setInterfaceStore(s => {
             s.quota.submission = parseInt(submissionQuota);
             return s;
           });
@@ -157,12 +156,12 @@ export const useAuthQuery = () => {
         if (res.status === 401) {
           if (retryAfter !== DEFAULT_RETRY_TIME) closeSnackbar();
 
-          setAuthStore(s => {
-            s.login = {
-              ...s.login,
+          setInterfaceStore(s => {
+            s.auth.login = {
+              ...s.auth.login,
               ...(isApiData(json) ? ((json.api_response as LoginParamsProps) ?? {}) : {})
             };
-            s.mode = 'login';
+            s.auth.mode = 'login';
             return s;
           });
           sessionStorage.clear();
@@ -173,8 +172,8 @@ export const useAuthQuery = () => {
         // Check for an invalid json format
         if (!isApiData(json)) {
           showErrorMessage(t('invalid'), 30000);
-          setAuthStore(s => {
-            s.mode = 'loading';
+          setInterfaceStore(s => {
+            s.auth.mode = 'loading';
             return s;
           });
           return Promise.reject({
@@ -190,8 +189,8 @@ export const useAuthQuery = () => {
         // Forbiden response indicate that the user's account is locked.
         if (res.status === 403) {
           if (retryAfter !== DEFAULT_RETRY_TIME) closeSnackbar();
-          setAuthStore(s => {
-            s.mode = 'locked';
+          setInterfaceStore(s => {
+            s.auth.mode = 'locked';
             return s;
           });
 
@@ -205,8 +204,8 @@ export const useAuthQuery = () => {
 
         // Daily quota error, stop everything!
         if (res.status === 503 && ['API', 'quota', 'daily'].every(v => error.includes(v))) {
-          setAuthStore(s => {
-            s.mode = 'quota';
+          setInterfaceStore(s => {
+            s.auth.mode = 'quota';
             return s;
           });
           return Promise.reject(json);
@@ -224,7 +223,7 @@ export const useAuthQuery = () => {
           const user = json.api_response as WhoAmIProps;
 
           // Set the current user
-          setAuthStore(s => ({ ...s, ...normalizeWhoAmI(json.api_response) }));
+          setConfig(s => ({ ...s, ...normalizeWhoAmI(json.api_response) }));
 
           // Mark the interface ready
           // TODO
@@ -236,13 +235,13 @@ export const useAuthQuery = () => {
 
           // Render appropriate page
           if (!user.agrees_with_tos && user.configuration.ui.tos) {
-            setAuthStore(s => {
-              s.mode = 'tos';
+            setInterfaceStore(s => {
+              s.auth.mode = 'tos';
               return s;
             });
           } else {
-            setAuthStore(s => {
-              s.mode = 'app';
+            setInterfaceStore(s => {
+              s.auth.mode = 'app';
               return s;
             });
           }

@@ -32,7 +32,9 @@ import {
   useAppQuickSearch,
   useAppTheme
 } from '@tui/core';
-import { useAppConfig, useAppSetConfig } from 'core/config';
+import { useAppConfig } from 'core/config';
+import { useAppInterfaceStore, useAppSetInterfaceStore } from 'core/interface';
+import { useAppPreferenceStore, useAppSetPreferenceStore } from 'core/preference';
 import { forwardRef, memo, useCallback, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IconButton } from 'ui/buttons/IconButton';
@@ -48,7 +50,7 @@ const UserAvatar = memo(
     const name = useAppConfig(s => s?.user?.name);
     const avatar = useAppConfig(s => s?.user?.avatar);
     const email = useAppConfig(s => s?.user?.email);
-    const setConfig = useAppSetConfig();
+    const setTemplateStore = useAppSetInterfaceStore();
 
     const displayName = useMemo<string>(
       () =>
@@ -71,8 +73,8 @@ const UserAvatar = memo(
           marginRight: theme.spacing(1)
         }}
         onClick={() =>
-          setConfig(s => {
-            s.layout.usermenu.open = !s.layout.usermenu.open;
+          setTemplateStore(s => {
+            s.usermenu.open = !s.usermenu.open;
             return s;
           })
         }
@@ -140,8 +142,8 @@ export const UserQuota = memo(() => {
   const enforceQuota = useAppConfig(s => s.configuration.ui.enforce_quota);
   const apiDailyQuota = useAppConfig(s => s.user.apiDailyQuota);
   const submissionDailyQuota = useAppConfig(s => s.user.submissionDailyQuota);
-  const apiQuotaRemaining = useAppConfig(s => s.quota.api);
-  const submissionQuotaRemaining = useAppConfig(s => s.quota.submission);
+  const apiQuotaRemaining = useAppInterfaceStore(s => s.quota.api);
+  const submissionQuotaRemaining = useAppInterfaceStore(s => s.quota.submission);
 
   const hasUserQuota = apiDailyQuota !== 0 && apiQuotaRemaining !== null;
   const hasSubmissionQuota = submissionDailyQuota !== 0 && submissionQuotaRemaining !== null;
@@ -216,7 +218,7 @@ export const UserPersonalization = memo(() => {
     allowDensitySelection
   } = useAppPreferences();
 
-  const setAppConfig = useAppSetConfig();
+  const setTemplateStore = useAppSetInterfaceStore();
 
   const isSmDown = useMediaQuery(theme.breakpoints.down('sm'));
 
@@ -236,8 +238,8 @@ export const UserPersonalization = memo(() => {
                   checked={layout.current === 'top'}
                   onClick={() => {
                     layout.toggle();
-                    setAppConfig(s => {
-                      s.layout.usermenu.open = false;
+                    setTemplateStore(s => {
+                      s.usermenu.open = false;
                       return s;
                     });
                   }}
@@ -248,8 +250,8 @@ export const UserPersonalization = memo(() => {
                 id="personalization-sticky"
                 onClick={() => {
                   layout.toggle();
-                  setAppConfig(s => {
-                    s.layout.usermenu.open = false;
+                  setTemplateStore(s => {
+                    s.usermenu.open = false;
                     return s;
                   });
                 }}
@@ -327,9 +329,9 @@ export const UserTheme = memo(() => {
 
   const { allowThemeSelection } = useAppPreferences();
 
-  const themeMode = useAppConfig(s => s.theme.mode);
+  const themeMode = useAppPreferenceStore(s => s.theme.mode);
 
-  const setConfig = useAppSetConfig();
+  const setPreferenceStore = useAppSetPreferenceStore();
 
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
 
@@ -338,7 +340,7 @@ export const UserTheme = memo(() => {
       const value = event.target.value as 'system' | 'light' | 'dark';
       if (value === themeMode) return;
 
-      setConfig(s => {
+      setPreferenceStore(s => {
         s.theme.mode = value;
         return s;
       });
@@ -349,7 +351,7 @@ export const UserTheme = memo(() => {
         toggleThemeMode();
       }
     },
-    [mode, prefersDarkMode, setConfig, themeMode, toggleThemeMode]
+    [mode, prefersDarkMode, setPreferenceStore, themeMode, toggleThemeMode]
   );
 
   if (!allowThemeSelection) return null;
@@ -397,7 +399,8 @@ const UserMenuHeader = memo(() => {
     [name]
   );
 
-  const setConfig = useAppSetConfig();
+  const setTemplateStore = useAppSetInterfaceStore();
+  const setInterfaceStore = useAppSetInterfaceStore();
 
   return (
     <List
@@ -455,9 +458,12 @@ const UserMenuHeader = memo(() => {
                 size="large"
                 tooltip={t('usermenu.logout')}
                 onClick={() => {
-                  setConfig(s => {
+                  setInterfaceStore(s => {
                     s.auth.mode = 'logout';
-                    s.layout.usermenu.open = false;
+                    return s;
+                  });
+                  setTemplateStore(s => {
+                    s.usermenu.open = false;
                     return s;
                   });
                 }}
@@ -505,9 +511,9 @@ UserMenu.displayName = 'UserMenu';
 export const UserProfile = memo(() => {
   const theme = useTheme();
 
-  const open = useAppConfig(s => s?.layout?.usermenu?.open);
+  const open = useAppInterfaceStore(s => s.usermenu.open);
 
-  const setConfig = useAppSetConfig();
+  const setTemplateStore = useAppSetInterfaceStore();
 
   const anchorRef = useRef<HTMLButtonElement>(null);
 
@@ -519,8 +525,8 @@ export const UserProfile = memo(() => {
         open={open}
         anchorEl={anchorRef.current}
         onClose={() => {
-          setConfig(s => {
-            s.layout.usermenu.open = false;
+          setTemplateStore(s => {
+            s.usermenu.open = false;
             return s;
           });
         }}

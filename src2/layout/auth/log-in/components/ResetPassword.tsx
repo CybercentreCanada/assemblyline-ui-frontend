@@ -1,7 +1,7 @@
 import { Link, Typography } from '@mui/material';
 import { useApiMutation } from 'core/api';
+import { useAppInterfaceStore } from 'core/interface';
 import { useAppSnackbar } from 'core/snackbar/snackbar.hooks';
-import { useAppAuthStore } from 'layout/auth/auth.providers';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from 'ui/buttons/Button';
@@ -134,8 +134,8 @@ export const ResetPasswordLink = memo(() => {
 
   const resetLogin = useLoginReset();
 
-  const allowUserPass = useAppAuthStore(s => s.login.allow_userpass_login);
-  const allowSignup = useAppAuthStore(s => s.login.allow_signup);
+  const allowUserPass = useAppInterfaceStore(s => s.auth.login.allow_userpass_login);
+  const allowSignup = useAppInterfaceStore(s => s.auth.login.allow_signup);
 
   return !allowUserPass || !allowSignup ? null : (
     <Typography align="center" variant="caption">

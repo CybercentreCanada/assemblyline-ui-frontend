@@ -1,9 +1,9 @@
 import { invalidateApiQuery, useApiMutation, useApiQuery } from 'core/api';
+import { useAppInterfaceStore, useAppSetInterfaceStore } from 'core/interface';
 import { useAppSnackbar } from 'core/snackbar/snackbar.hooks';
 import { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
-import { useAppAuthStore, useAppSetAuthStore } from '../auth.providers';
 import { useLoginForm } from './log-in.providers';
 
 /**
@@ -12,7 +12,7 @@ import { useLoginForm } from './log-in.providers';
  * @returns A function that clears any in-progress login state (OTP, reset password, SSO tokens, etc.).
  */
 export const useLoginReset = () => {
-  const setAuthStore = useAppSetAuthStore();
+  const setInterfaceStore = useAppSetInterfaceStore();
   const form = useLoginForm();
 
   return useCallback(() => {
@@ -34,11 +34,11 @@ export const useLoginReset = () => {
 
     form.setFieldValue('loading', null);
 
-    setAuthStore(s => {
-      s.disableWhoAmI = false;
+    setInterfaceStore(s => {
+      s.auth.disableWhoAmI = false;
       return s;
     });
-  }, [form, setAuthStore]);
+  }, [form, setInterfaceStore]);
 };
 
 /**
@@ -104,8 +104,8 @@ export const useOAuthLogin = () => {
   const form = useLoginForm();
   const resetLogin = useLoginReset();
 
-  const setAuthStore = useAppSetAuthStore();
-  const redirectTo = useAppAuthStore(s => s.redirectTo);
+  const setInterfaceStore = useAppSetInterfaceStore();
+  const redirectTo = useAppInterfaceStore(s => s.auth.redirectTo);
 
   const provider = useMemo<string | null>(() => {
     const marker = '/oauth/';
@@ -142,9 +142,9 @@ export const useOAuthLogin = () => {
       form.setFieldValue('email', api_response.email_adr || null);
       form.setFieldValue('mode', 'sso');
 
-      setAuthStore(s => {
-        s.disableWhoAmI = true;
-        s.redirectTo = null;
+      setInterfaceStore(s => {
+        s.auth.disableWhoAmI = true;
+        s.auth.redirectTo = null;
         return s;
       });
 
@@ -166,8 +166,8 @@ export const useSAMLLogin = () => {
   const form = useLoginForm();
   const resetLogin = useLoginReset();
 
-  const setAuthStore = useAppSetAuthStore();
-  const redirectTo = useAppAuthStore(s => s.redirectTo);
+  const setInterfaceStore = useAppSetInterfaceStore();
+  const redirectTo = useAppInterfaceStore(s => s.auth.redirectTo);
 
   const samlData = useMemo<{ username: string; email: string; saml_token_id: string; error: string }>(() => {
     try {
@@ -194,9 +194,9 @@ export const useSAMLLogin = () => {
       form.setFieldValue('saml_token_id', prev => samlData.saml_token_id || prev);
       form.setFieldValue('mode', 'sso');
 
-      setAuthStore(s => {
-        s.disableWhoAmI = true;
-        s.redirectTo = null;
+      setInterfaceStore(s => {
+        s.auth.disableWhoAmI = true;
+        s.auth.redirectTo = null;
         return s;
       });
 
@@ -212,8 +212,8 @@ export const useSAMLLogin = () => {
  * @returns Whether the user should be auto-forwarded into the SSO confirmation step.
  */
 export const useQuickLogin = () => {
-  const allowSAML = useAppAuthStore(s => s.login.allow_saml_login);
-  const oAuthProviders = useAppAuthStore(s => s.login.oauth_providers);
+  const allowSAML = useAppInterfaceStore(s => s.auth.login.allow_saml_login);
+  const oAuthProviders = useAppInterfaceStore(s => s.auth.login.oauth_providers);
 
   return (allowSAML && (oAuthProviders?.length ?? 0) === 0) || (!allowSAML && (oAuthProviders?.length ?? 0) === 1);
 };
@@ -229,7 +229,7 @@ export const useLoginRequest = () => {
   const { showErrorMessage } = useAppSnackbar();
   const form = useLoginForm();
 
-  const setAuthStore = useAppSetAuthStore();
+  const setInterfaceStore = useAppSetInterfaceStore();
   const resetLogin = useLoginReset();
 
   return useApiMutation(() => ({
@@ -266,8 +266,8 @@ export const useLoginRequest = () => {
       }
     },
     onSuccess: () => {
-      setAuthStore(s => {
-        s.disableWhoAmI = false;
+      setInterfaceStore(s => {
+        s.auth.disableWhoAmI = false;
         return s;
       });
 

@@ -1,8 +1,8 @@
 import type { TextFieldProps } from '@mui/material';
 import { CircularProgress, Divider, TextField, Typography, useTheme } from '@mui/material';
+import { useAppInterfaceStore } from 'core/interface';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useAppAuthStore } from '../auth.providers';
 import { useLoginForm } from './log-in.providers';
 import {
   EMAIL_PATTERN,
@@ -38,9 +38,9 @@ TextDivider.displayName = 'TextDivider';
 //*****************************************************************************************
 
 export const LoginDivider = memo(() => {
-  const allowUserPass = useAppAuthStore(s => s.login.allow_userpass_login);
-  const allowSAML = useAppAuthStore(s => s.login.allow_saml_login);
-  const oAuthProviders = useAppAuthStore(s => s.login.oauth_providers);
+  const allowUserPass = useAppInterfaceStore(s => s.auth.login.allow_userpass_login);
+  const allowSAML = useAppInterfaceStore(s => s.auth.login.allow_saml_login);
+  const oAuthProviders = useAppInterfaceStore(s => s.auth.login.oauth_providers);
 
   return !allowUserPass || (!oAuthProviders?.length && !allowSAML) ? null : <TextDivider />;
 });
