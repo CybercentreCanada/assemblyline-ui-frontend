@@ -8,6 +8,7 @@ import { AppSnackbarProvider } from 'core/snackbar';
 import { AppTemplateLayout, AppTemplateProvider } from 'core/template';
 import { AppThemeProvider } from 'core/theme';
 import { AppAuthLayout } from 'layout/auth';
+import { AppCarouselProvider } from 'layout/carousel';
 import { AppDrawerLayout } from 'layout/drawer';
 import type { PropsWithChildren } from 'react';
 import { memo, StrictMode } from 'react';
@@ -133,7 +134,9 @@ const AppProviders = memo(({ children }: PropsWithChildren) => (
         <AppApiProvider>
           <AppRouterProvider>
             <AppTemplateProvider i18n={i18n}>
-              <>{children}</>
+              <AppCarouselProvider>
+                <>{children}</>
+              </AppCarouselProvider>
             </AppTemplateProvider>
           </AppRouterProvider>
         </AppApiProvider>
