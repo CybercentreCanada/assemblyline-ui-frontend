@@ -21,8 +21,9 @@ import { useAppConfig } from 'core/config';
 import { createAppRoute } from 'core/routes';
 import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CustomChip } from 'ui/CustomChip';
-import { PageFullWidth, PageHeader } from 'ui/pages';
+import { CustomChip } from 'ui/chips/CustomChip';
+import { PageFullWidth } from 'ui/pages/PageFullWidth';
+import { PageHeader } from 'ui/pages/PageHeader';
 
 const apiHeight = '48px';
 
@@ -178,7 +179,7 @@ export const HelpAPIPage = React.memo(() => {
   const enforceQuota = useMemo(() => Boolean(configuration?.ui?.enforce_quota), [configuration?.ui?.enforce_quota]);
 
   return (
-    <PageFullWidth sx={{ margin: theme.spacing(4) }}>
+    <PageFullWidth margin={4}>
       <div style={{ textAlign: 'left' }}>
         <PageHeader
           primary={t('title')}

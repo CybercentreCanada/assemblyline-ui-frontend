@@ -1,25 +1,24 @@
 import { styled } from '@mui/material';
-import React from 'react';
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-type DividerProps = {
-  forcePaper?: boolean;
-};
+//*****************************************************************************************
+// TextDivider
+//*****************************************************************************************
 
 const Divider = styled('div', {
   shouldForwardProp: prop => prop !== 'forcePaper'
-})<DividerProps>(({ theme, forcePaper }) => ({
+})<{ forcePaper?: boolean }>(({ theme, forcePaper }) => ({
   display: 'inline-block',
   textAlign: 'center',
   width: '100%',
   margin: '30px 0',
   position: 'relative',
   borderTop: `1px solid ${theme.palette.divider}`,
-
-  ...(forcePaper && {
-    backgroundColor: theme.palette.background.paper
-  })
+  ...(forcePaper && { backgroundColor: theme.palette.background.paper })
 }));
+
+Divider.displayName = 'Divider';
 
 const Inner = styled('div')(({ theme }) => ({
   backgroundColor: theme.palette.background.paper,
@@ -33,11 +32,15 @@ const Inner = styled('div')(({ theme }) => ({
   }
 }));
 
-interface TextDividerProps {
-  forcePaper?: boolean;
-}
+Inner.displayName = 'Inner';
 
-const TextDivider: React.FC<TextDividerProps> = ({ forcePaper = false }) => {
+/** Props for TextDivider. */
+export type TextDividerProps = {
+  /** Whether to force paper background color. */
+  forcePaper?: boolean;
+};
+
+export const TextDivider = memo(({ forcePaper = false }: TextDividerProps) => {
   const { t } = useTranslation();
 
   return (
@@ -47,6 +50,6 @@ const TextDivider: React.FC<TextDividerProps> = ({ forcePaper = false }) => {
       <Divider />
     </div>
   );
-};
+});
 
-export default TextDivider;
+TextDivider.displayName = 'TextDivider';

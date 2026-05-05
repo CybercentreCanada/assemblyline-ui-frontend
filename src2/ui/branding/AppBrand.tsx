@@ -1,5 +1,5 @@
-import { Stack, useTheme } from '@mui/material';
-import { useMemo } from 'react';
+import { useTheme } from '@mui/material';
+import { memo, useMemo } from 'react';
 
 export const SIZES = {
   app: {
@@ -108,9 +108,11 @@ export type AppBrandProps = {
   size?: BrandSize;
 };
 
-export const AppBrand = ({ application, variant = 'app', size = 'small' }: AppBrandProps) => {
+export const AppBrand = memo(({ application, variant = 'app', size: sizeProp = 'small' }: AppBrandProps) => {
   const muiTheme = useTheme();
   const theme = muiTheme.palette.mode;
+
+  const size = useMemo(() => (variant === 'app' ? 'app' : sizeProp), [variant, sizeProp]);
 
   const { logoSrc, nameSrc } = useMemo(() => {
     return {
@@ -119,35 +121,23 @@ export const AppBrand = ({ application, variant = 'app', size = 'small' }: AppBr
     };
   }, [theme, application]);
 
-  if (variant === 'logo') {
-    return (
-      <Stack direction="row" alignItems="center">
-        <AppLogo application={application} src={logoSrc} variant={variant} size={size} />
-      </Stack>
-    );
-  }
+  const direction = useMemo(() => (variant.endsWith('horizontal') || variant === 'app' ? 'row' : 'column'), [variant]);
 
-  if (variant === 'name') {
-    return (
-      <Stack direction="row" alignItems="center">
-        <AppName application={application} src={nameSrc} size={size} />
-      </Stack>
-    );
-  }
-
-  if (variant === 'app') {
-    size = 'app';
-  }
-
-  return (
-    <Stack
-      direction={variant.endsWith('horizontal') || variant === 'app' ? 'row' : 'column'}
-      alignItems="center"
-      style={{ width: 'fit-content' }}
-    >
+  return variant === 'logo' ? (
+    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+      <AppLogo application={application} src={logoSrc} variant={variant} size={size} />
+    </div>
+  ) : variant === 'name' ? (
+    <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+      <AppName application={application} src={nameSrc} size={size} />
+    </div>
+  ) : (
+    <div style={{ display: 'flex', flexDirection: direction, alignItems: 'center', width: 'fit-content' }}>
       <AppLogo application={application} src={logoSrc} variant={variant} size={size} />
       <div style={SIZES[size].divider} />
       <AppName application={application} src={nameSrc} size={size} />
-    </Stack>
+    </div>
   );
-};
+});
+
+AppBrand.displayName = 'AppBrand';

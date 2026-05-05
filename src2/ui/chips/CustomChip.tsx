@@ -1,7 +1,6 @@
 import type { ChipProps, TooltipProps } from '@mui/material';
 import { Chip, Tooltip, styled } from '@mui/material';
 import { darken } from '@mui/material/styles';
-import type { FC } from 'react';
 import { memo } from 'react';
 import { PossibleColor } from 'shared/utils/colors';
 
@@ -36,7 +35,7 @@ type StyledChipProps = Omit<ChipProps, 'color' | 'size'> & {
   wrap?: boolean;
 };
 
-const StyledChip: FC<StyledChipProps> = memo(
+const StyledChip = memo(
   styled(
     ({ color = 'default', size = 'medium', variant = 'filled', ...props }: StyledChipProps) => (
       <Chip color={COLOR_MAP?.[color]} size={SIZE_MAP?.[size]} variant={variant} {...props} />
@@ -176,20 +175,19 @@ export type CustomChipProps = StyledChipProps & {
   tooltipPlacement?: TooltipProps['placement'];
 };
 
-export const CustomChip: FC<CustomChipProps> = memo(
-  ({ tooltip = null, tooltipPlacement = 'bottom', ...chipProps }: CustomChipProps) =>
-    tooltip ? (
-      <Tooltip
-        title={tooltip}
-        placement={tooltipPlacement}
-        disableInteractive
-        slotProps={{ popper: { disablePortal: true } }}
-      >
-        <StyledChip {...chipProps} />
-      </Tooltip>
-    ) : (
+export const CustomChip = memo(({ tooltip = null, tooltipPlacement = 'bottom', ...chipProps }: CustomChipProps) =>
+  tooltip ? (
+    <Tooltip
+      title={tooltip}
+      placement={tooltipPlacement}
+      disableInteractive
+      slotProps={{ popper: { disablePortal: true } }}
+    >
       <StyledChip {...chipProps} />
-    )
+    </Tooltip>
+  ) : (
+    <StyledChip {...chipProps} />
+  )
 );
 
-export default CustomChip;
+CustomChip.displayName = 'CustomChip';

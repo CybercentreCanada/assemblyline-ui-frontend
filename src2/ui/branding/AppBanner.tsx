@@ -1,8 +1,8 @@
 import { useTheme } from '@mui/material';
-import React from 'react';
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-export const AppBanner = React.memo(() => {
+export const AppBanner = memo(() => {
   const { t } = useTranslation('layout');
   const theme = useTheme();
 
@@ -17,3 +17,5 @@ export const AppBanner = React.memo(() => {
       return null;
   }
 });
+
+AppBanner.displayName = 'AppBanner';

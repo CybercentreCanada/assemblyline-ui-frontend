@@ -1,57 +1,79 @@
-import { Box, BoxProps, styled } from '@mui/material';
-import React, { memo } from 'react';
+import { useTheme } from '@mui/material';
+import type { ReactNode } from 'react';
+import { memo } from 'react';
 import { PageContent } from './PageContent';
 
-type PageCenterProps = BoxProps & {
-  children: React.ReactNode;
+type PageCenterProps = {
+  children?: ReactNode;
+  height?: string | number;
+  margin?: number;
   maxWidth?: string;
+  mb?: number;
+  ml?: number;
+  mr?: number;
+  mt?: number;
   textAlign?: string;
+  width?: string;
 };
 
-const PageCenter2 = ({
-  children,
-  height,
-  width = '95%',
-  maxWidth = '1200px',
-  textAlign = 'center',
-  ...props
-}: PageCenterProps) => {
-  return (
-    <Box
-      component="div"
-      height={height}
-      width={width}
-      maxWidth={maxWidth}
-      sx={theme => ({
-        height,
-        width,
-        textAlign,
-        display: 'flex',
-        flexDirection: 'column',
-        marginInline: 'auto',
-        paddingInline: theme.spacing(2),
-        maxWidth,
-        [theme.breakpoints.down('sm')]: {
-          maxWidth: '100%',
-          paddingInline: theme.spacing(1.5)
-        }
-      })}
-    >
-      <PageContent {...props} height="100%">
+export const PageCenterLayout = memo(
+  ({ children, height, width = '95%', maxWidth = '1200px', textAlign = 'center' }: PageCenterProps) => {
+    return (
+      <div
+        style={{
+          height,
+          width,
+          textAlign,
+          display: 'flex',
+          flexDirection: 'column',
+          marginInline: 'auto',
+          maxWidth
+        }}
+      >
+        <PageContent style={{ height: '100%' }}>{children}</PageContent>
+      </div>
+    );
+  }
+);
+
+PageCenterLayout.displayName = 'PageCenterLayout';
+
+export const PageCenter = memo(
+  ({
+    children,
+    height,
+    margin,
+    mb,
+    ml,
+    mr,
+    mt,
+    width = '95%',
+    maxWidth = '1200px',
+    textAlign = 'center'
+  }: PageCenterProps) => {
+    const theme = useTheme();
+
+    return (
+      <div
+        style={{
+          height,
+          width,
+          maxWidth,
+          textAlign,
+          display: 'flex',
+          flexDirection: 'column',
+          marginInline: 'auto',
+          ...(margin !== undefined && { margin: theme.spacing(margin) }),
+          ...(mt !== undefined && { marginTop: theme.spacing(mt) }),
+          ...(mb !== undefined && { marginBottom: theme.spacing(mb) }),
+          ...(ml !== undefined && { marginLeft: theme.spacing(ml) }),
+          ...(mr !== undefined && { marginRight: theme.spacing(mr) })
+        }}
+      >
         {children}
-      </PageContent>
-    </Box>
-  );
-};
-
-export default memo(PageCenter2);
-
-export const PageCenter = React.memo(
-  styled(Box)(({ theme }) => ({
-    width: '95%',
-    maxWidth: '1200px',
-    textAlign: 'center'
-  }))
-) as React.FC<BoxProps>;
+      </div>
+    );
+  }
+);
 
 PageCenter.displayName = 'PageCenter';

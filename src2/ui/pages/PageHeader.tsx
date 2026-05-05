@@ -3,8 +3,8 @@ import { Skeleton, Typography, useTheme } from '@mui/material';
 import { useAppBar, useAppBarHeight, useAppLayout } from '@tui/core';
 import { useAppConfig } from 'core/config';
 import type { CSSProperties, DetailedHTMLProps, HTMLAttributes, ReactNode } from 'react';
-import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { Classification, ClassificationProps } from 'ui/Classification';
+import { memo, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { Classification, ClassificationProps } from 'ui/classification/Classification';
 
 export type PageHeaderProps = {
   actions?: ReactNode;
@@ -29,7 +29,7 @@ export type PageHeaderProps = {
   };
 };
 
-export const PageHeader: React.FC<PageHeaderProps> = React.memo(
+export const PageHeader = memo(
   ({
     actions = null,
     classification: classificationProp,
@@ -44,7 +44,7 @@ export const PageHeader: React.FC<PageHeaderProps> = React.memo(
     top = null,
     wrapStart = false,
     onClassificationChange = null
-  }) => {
+  }: PageHeaderProps) => {
     const theme = useTheme();
     const layout = useAppLayout();
     const appbar = useAppBar();

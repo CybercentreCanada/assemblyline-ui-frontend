@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 import Markdown from 'react-markdown';
 import { AppBanner } from 'ui/branding';
 import { Button } from 'ui/buttons/Button';
-import { PageCenter } from 'ui/pages';
+import { PageCenter } from 'ui/pages/PageCenter';
 
 //*****************************************************************************************
 // ToS Page

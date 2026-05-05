@@ -1,13 +1,6 @@
-import { Box, BoxProps, styled } from '@mui/material';
-import React from 'react';
+import { styled } from '@mui/material';
+import { memo } from 'react';
 
-export const PageContent = React.memo(
-  styled(Box)(({ theme }) => ({
-    // margin: theme.spacing(2),
-    // [theme.breakpoints.up('md')]: {
-    //   margin: theme.spacing(1)
-    // }
-  }))
-) as React.FC<BoxProps>;
+export const PageContent = memo(styled('div')(({ theme }) => ({})));
 
 PageContent.displayName = 'PageContent';

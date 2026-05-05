@@ -1,6 +1,6 @@
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import FullscreenExitIcon from '@mui/icons-material/FullscreenExit';
-import { Box, IconButton, Tooltip, useTheme } from '@mui/material';
+import { IconButton, Tooltip, useTheme } from '@mui/material';
 import { useAppBar, useAppBarHeight, useAppLayout, useFullscreenStatus } from '@tui/core';
 import browser from 'browser-detect';
 import { memo, useCallback, useMemo, useRef } from 'react';
@@ -68,13 +68,13 @@ const PageFullscreen = ({
       }}
     >
       <PageContent margin={margin} mb={mb} ml={ml} mr={mr} mt={mt}>
-        <Box
-          sx={{
+        <div
+          style={{
             position: fsIconPos,
             display: 'flex',
             justifyContent: 'flex-end',
-            paddingTop: 2,
-            paddingRight: 2,
+            paddingTop: 16,
+            paddingRight: 16,
             zIndex: theme.zIndex.appBar + 1,
             top: barWillHide || isFullscreen ? 0 : appBarHeight,
             right: 0,
@@ -95,18 +95,20 @@ const PageFullscreen = ({
         >
           {supportsFullscreen && (
             <Tooltip title={t(isFullscreen ? 'fullscreen.off' : 'fullscreen.on')}>
-              <Box>
+              <span>
                 <IconButton onClick={isFullscreen ? handleExitFullscreen : handleEnterFullscreen} size="large">
                   {isFullscreen ? <FullscreenExitIcon /> : <FullscreenIcon />}
                 </IconButton>
-              </Box>
+              </span>
             </Tooltip>
           )}
-        </Box>
+        </div>
         {children}
       </PageContent>
     </div>
   );
 };
 
-export default memo(PageFullscreen);
+export const PageFullScreen = memo(PageFullscreen);
+
+PageFullScreen.displayName = 'PageFullScreen';

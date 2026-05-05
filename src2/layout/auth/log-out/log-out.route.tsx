@@ -4,7 +4,7 @@ import { createAppRoute } from 'core/routes';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AppVerticalBanner } from 'ui/branding';
-import { PageCardCentered } from 'ui/pages';
+import { PageCardCentered } from 'ui/pages/PageCardCentered';
 
 //*****************************************************************************************
 // Logout Page

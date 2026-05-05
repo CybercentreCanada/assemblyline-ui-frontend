@@ -3,7 +3,7 @@ import { Typography, useTheme } from '@mui/material';
 import { createAppRoute } from 'core/routes';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { PageCenter } from 'ui/pages';
+import { PageCenter } from 'ui/pages/PageCenter';
 
 //*****************************************************************************************
 // Quota Page

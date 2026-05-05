@@ -1,21 +1,19 @@
 import {
   alpha,
-  Button,
   Card,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
-  Grid,
   ListItemButton,
   ListItemText,
   Skeleton,
   styled,
-  Tooltip,
   Typography,
   useMediaQuery,
   useTheme
 } from '@mui/material';
+import { useAppConfig } from 'core/config';
 import {
   applyAliases,
   applyClassificationRules,
@@ -33,12 +31,14 @@ import {
   getParts,
   normalizedClassification
 } from 'features/classification/classificationParser';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { PossibleColor } from 'shared/utils/colors';
-import CustomChip, { COLOR_MAP } from './CustomChip';
+import { Button } from 'ui/buttons/Button';
+import { Tooltip } from 'ui/text/Tooltip';
+import { COLOR_MAP, CustomChip } from '../chips/CustomChip';
 
-export interface ClassificationProps {
+export type ClassificationProps = {
   c12n: string;
   disabled?: boolean;
   dynGroup?: string;
@@ -49,7 +49,7 @@ export interface ClassificationProps {
   size?: 'medium' | 'small' | 'tiny';
   type?: 'picker' | 'pill' | 'outlined' | 'text';
   setClassification?: (classification: string) => void;
-}
+};
 
 type ClassificationTextProps = {
   color: PossibleColor;
@@ -79,7 +79,7 @@ const ClassificationText = styled('span', {
   })()
 }));
 
-export const Classification = React.memo(
+export const Classification = memo(
   ({
     c12n = null,
     disabled = false,
@@ -94,7 +94,9 @@ export const Classification = React.memo(
   }: ClassificationProps) => {
     const { t } = useTranslation();
     const theme = useTheme();
-    const { user: currentUser, c12nDef, classificationAliases } = useALContext();
+    const currentUser = useAppConfig(s => s.user);
+    const c12nDef = useAppConfig(s => s.c12nDef);
+    const classificationAliases = useAppConfig(s => s.classificationAliases);
 
     const [showPicker, setShowPicker] = useState<boolean>(false);
     const [uParts, setUserParts] = useState<ClassificationParts>(defaultParts);
@@ -289,8 +291,10 @@ export const Classification = React.memo(
                 />
               </DialogTitle>
               <DialogContent>
-                <Grid container spacing={2}>
-                  <Grid size={{ xs: 12, md: 'grow' }}>
+                <div
+                  style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}
+                >
+                  <div>
                     <Typography color="textSecondary" variant="body2">
                       {t('classification.level')}
                     </Typography>
@@ -321,11 +325,11 @@ export const Classification = React.memo(
                           )
                       )}
                     </Card>
-                  </Grid>
+                  </div>
                   {((isUser && c12nDef.original_definition.required.length !== 0) ||
                     (uParts.req.length !== 0 &&
                       c12nDef.original_definition.required.filter(r => !r.is_hidden).length !== 0)) && (
-                    <Grid size={{ xs: 12, md: 'grow' }}>
+                    <div>
                       <Typography color="textSecondary" variant="body2">
                         {t('classification.required_tokens')}
                       </Typography>
@@ -357,7 +361,7 @@ export const Classification = React.memo(
                             )
                         )}
                       </Card>
-                    </Grid>
+                    </div>
                   )}
                   {((isUser &&
                     (c12nDef.original_definition.groups.length !== 0 ||
@@ -366,7 +370,7 @@ export const Classification = React.memo(
                       c12nDef.original_definition.groups.filter(g => !g.is_hidden).length !== 0) ||
                     (uParts.subgroups.length !== 0 &&
                       c12nDef.original_definition.subgroups.filter(sg => !sg.is_hidden).length !== 0)) && (
-                    <Grid size={{ xs: 12, md: 'grow' }}>
+                    <div>
                       {((isUser && (c12nDef.original_definition.groups.length !== 0 || c12nDef.dynamic_groups)) ||
                         (uParts.groups.length !== 0 &&
                           c12nDef.original_definition.groups.filter(g => !g.is_hidden).length !== 0)) && (
@@ -507,9 +511,9 @@ export const Classification = React.memo(
                           </Card>
                         </>
                       )}
-                    </Grid>
+                    </div>
                   )}
-                </Grid>
+                </div>
               </DialogContent>
               <DialogActions>
                 <Button
@@ -543,4 +547,3 @@ export const Classification = React.memo(
 );
 
 Classification.displayName = 'Classification';
-export default Classification;

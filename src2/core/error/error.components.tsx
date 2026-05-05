@@ -14,7 +14,7 @@ import { memo, useCallback, useEffect, useState } from 'react';
 import type { FallbackProps } from 'react-error-boundary';
 import { useTranslation } from 'react-i18next';
 import { GiSpottedBug } from 'react-icons/gi';
-import { PageCenter } from 'ui/pages';
+import { PageCenter } from 'ui/pages/PageCenter';
 
 //*****************************************************************************************
 // BugContainer

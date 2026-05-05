@@ -1,8 +1,8 @@
 import { useTheme } from '@mui/material';
-import React from 'react';
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-export const AppVerticalBanner = React.memo(() => {
+export const AppVerticalBanner = memo(() => {
   const { t } = useTranslation('layout');
   const theme = useTheme();
 
@@ -27,3 +27,5 @@ export const AppVerticalBanner = React.memo(() => {
       return null;
   }
 });
+
+AppVerticalBanner.displayName = 'AppVerticalBanner';

@@ -5,7 +5,7 @@ import { createAppRoute } from 'core/routes';
 import { ForbiddenPage } from 'pages/forbidden/forbidden.route';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { PageCenter } from 'ui/pages';
+import { PageCenter } from 'ui/pages/PageCenter';
 
 //*****************************************************************************************
 // Locked Page

@@ -1,5 +1,5 @@
 import type { ButtonProps, IconButtonProps } from '@mui/material';
-import { AppBar, Box, Button, IconButton, Toolbar, Tooltip, useTheme } from '@mui/material';
+import { AppBar, Button, IconButton, Toolbar, Tooltip, useTheme } from '@mui/material';
 import { useAppBar, useAppBarHeight, useAppLayout } from '@tui/core';
 import { memo, useMemo } from 'react';
 
@@ -25,7 +25,7 @@ type PageHeaderProps = {
   className?: string;
 };
 
-const PageContainer: React.FC<PageHeaderProps> = ({
+const WrappedPageContainer = ({
   children,
   left,
   right,
@@ -68,8 +68,8 @@ const PageContainer: React.FC<PageHeaderProps> = ({
             gap: 2
           }}
         >
-          <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center', minWidth: 0 }}>{left}</Box>
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
+          <div style={{ flexGrow: 1, display: 'flex', alignItems: 'center', minWidth: 0 }}>{left}</div>
+          <div style={{ display: 'flex', alignItems: 'center' }}>
             {actions &&
               actions.map((a, i) => {
                 let act = null;
@@ -111,12 +111,14 @@ const PageContainer: React.FC<PageHeaderProps> = ({
                   act
                 );
               })}
-          </Box>
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>{right}</Box>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center' }}>{right}</div>
         </Toolbar>
       )}
     </AppBar>
   );
 };
 
-export default memo(PageContainer);
+export const PageContainer = memo(WrappedPageContainer);
+
+PageContainer.displayName = 'PageContainer';

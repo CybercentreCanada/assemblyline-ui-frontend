@@ -1,8 +1,8 @@
 import { useTheme } from '@mui/material';
-import React from 'react';
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 
-export const AppLogo = React.memo(() => {
+export const AppLogo = memo(() => {
   const { t } = useTranslation('layout');
   const theme = useTheme();
 
@@ -19,3 +19,5 @@ export const AppLogo = React.memo(() => {
       return null;
   }
 });
+
+AppLogo.displayName = 'AppLogo';

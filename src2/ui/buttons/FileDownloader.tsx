@@ -1,8 +1,6 @@
 import GetAppOutlinedIcon from '@mui/icons-material/GetAppOutlined';
 import { useAppSnackbar } from 'core/snackbar';
-// import useMyAPI from 'components/hooks/useMyAPI';
-// import useMySnackbar from 'components/hooks/useMySnackbar';
-import React, { useCallback, useMemo, useState } from 'react';
+import { memo, useCallback, useMemo, useState } from 'react';
 import { getTextContent } from 'shared/utils/utils';
 import type { IconButtonProps } from 'ui/buttons/IconButton';
 import { IconButton } from 'ui/buttons/IconButton';
@@ -101,4 +99,6 @@ export const WrappedFileDownloader = ({
   );
 };
 
-export const FileDownloader = React.memo(WrappedFileDownloader);
+export const FileDownloader = memo(WrappedFileDownloader);
+
+FileDownloader.displayName = 'FileDownloader';

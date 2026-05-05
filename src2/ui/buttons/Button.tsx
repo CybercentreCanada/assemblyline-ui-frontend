@@ -2,9 +2,9 @@ import type { ButtonProps as MuiButtonProps, TooltipProps } from '@mui/material'
 import { Button as MuiButton, Skeleton } from '@mui/material';
 import { AppLink } from 'core/router';
 import { AppRoute, CreatedAppRouteParamsMap } from 'core/routes';
-import React, { useMemo } from 'react';
+import { memo, useMemo } from 'react';
 import { getTextContent } from 'shared/utils/utils';
-import { Tooltip } from 'ui/Tooltip';
+import { Tooltip } from 'ui/text/Tooltip';
 import { CircularProgress } from './CircularProgress';
 
 export type ButtonProps = MuiButtonProps & {
@@ -16,7 +16,7 @@ export type ButtonProps = MuiButtonProps & {
   tooltipProps?: Omit<TooltipProps, 'children' | 'title'>;
 };
 
-export const Button: React.FC<ButtonProps> = React.memo(
+export const Button = memo(
   ({
     children = null,
     disabled = false,

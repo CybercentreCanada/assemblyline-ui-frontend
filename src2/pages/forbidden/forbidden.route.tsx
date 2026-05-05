@@ -4,7 +4,7 @@ import Typography from '@mui/material/Typography';
 import { createAppRoute } from 'core/routes';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { PageCenter } from 'ui/pages';
+import { PageCenter } from 'ui/pages/PageCenter';
 
 //*****************************************************************************************
 // Forbidden Page

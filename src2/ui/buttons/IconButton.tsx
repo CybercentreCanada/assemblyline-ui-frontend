@@ -3,11 +3,11 @@ import { IconButton as MuiIconButton, Skeleton, useTheme } from '@mui/material';
 import { AppLink } from 'core/router';
 import { AppRoute, CreatedAppRouteParamsMap } from 'core/routes';
 import type { CSSProperties } from 'react';
-import React, { useMemo } from 'react';
+import { memo, useMemo } from 'react';
 import { getTextContent } from 'shared/utils/utils';
 import type { CircularProgressProps } from 'ui/buttons/CircularProgress';
 import { CircularProgress } from 'ui/buttons/CircularProgress';
-import { Tooltip } from 'ui/Tooltip';
+import { Tooltip } from 'ui/text/Tooltip';
 
 export type IconButtonProps = MuiIconButtonProps & {
   loading?: boolean;
@@ -18,7 +18,7 @@ export type IconButtonProps = MuiIconButtonProps & {
   tooltipProps?: Omit<TooltipProps, 'children' | 'title'>;
 };
 
-export const IconButton: React.FC<IconButtonProps> = React.memo(
+export const IconButton = memo(
   ({
     children = null,
     color = null,

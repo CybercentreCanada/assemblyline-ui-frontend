@@ -1,5 +1,5 @@
 import { Card, type CardProps, styled, useMediaQuery, useTheme } from '@mui/material';
-import React from 'react';
+import { memo } from 'react';
 
 const StyledCard = styled(Card)(({ theme }) => ({
   backgroundColor: theme.palette.background.paper,
@@ -18,7 +18,7 @@ const StyledCard = styled(Card)(({ theme }) => ({
   }
 }));
 
-export const PageCardCentered = React.memo(({ children, ...props }: CardProps) => {
+export const PageCardCentered = memo(({ children, ...props }: CardProps) => {
   const theme = useTheme();
   const isXs = useMediaQuery(theme.breakpoints.only('xs'));
 
@@ -35,6 +35,6 @@ export const PageCardCentered = React.memo(({ children, ...props }: CardProps) =
       </StyledCard>
     </div>
   );
-}) as React.FC<CardProps>;
+});
 
 PageCardCentered.displayName = 'PageCardCentered';
