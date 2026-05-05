@@ -1,12 +1,12 @@
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import DoubleArrowOutlinedIcon from '@mui/icons-material/DoubleArrowOutlined';
 import { Drawer, styled, useMediaQuery, useTheme } from '@mui/material';
+import { useAppInterfaceStore, useAppSetInterfaceStore } from 'core/interface';
 import type { CSSProperties, PropsWithChildren } from 'react';
 import { memo, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IconButton } from 'ui/buttons/IconButton';
 import { useAppDrawerClose, useIsDrawerOpen } from './drawer.hooks';
-import { useAppDrawerStore, useAppSetDrawerStore } from './drawer.providers';
 
 const APP_DRAWER_WIDTHS: {
   xl: CSSProperties['width'];
@@ -36,6 +36,8 @@ export const AppDrawerMain = memo(
   }))
 );
 
+AppDrawerMain.displayName = 'AppDrawerMain';
+
 export const AppDrawerContent = memo(
   styled('div')(() => ({
     '@media print': {
@@ -50,6 +52,8 @@ export const AppDrawerContent = memo(
   }))
 );
 
+AppDrawerContent.displayName = 'AppDrawerContent';
+
 export const AppDrawerActions = memo(
   styled('div')(({ theme }) => ({
     display: 'flex',
@@ -63,6 +67,8 @@ export const AppDrawerActions = memo(
   }))
 );
 
+AppDrawerActions.displayName = 'AppDrawerActions';
+
 export const AppDrawerInner = memo(
   styled('div')(({ theme }) => ({
     height: '100%',
@@ -70,6 +76,8 @@ export const AppDrawerInner = memo(
     paddingRight: theme.spacing(2)
   }))
 );
+
+AppDrawerInner.displayName = 'AppDrawerInner';
 
 export const AppDrawerCloseButton = memo(() => {
   const { t } = useTranslation(['drawer']);
@@ -90,9 +98,9 @@ export const AppDrawerMaximizeButton = memo(() => {
   const theme = useTheme();
   const isXL = useMediaQuery(theme.breakpoints.only('xl'));
 
-  const isMaximized = useAppDrawerStore(s => s.maximized);
+  const isMaximized = useAppInterfaceStore(s => s.drawer.maximized);
 
-  const setDrawerConfig = useAppSetDrawerStore();
+  const setInterfaceStore = useAppSetInterfaceStore();
 
   const transition = useMemo<CSSProperties['transition']>(
     () =>
@@ -104,15 +112,13 @@ export const AppDrawerMaximizeButton = memo(() => {
   );
 
   const handleMaximize = useCallback(() => {
-    setDrawerConfig(s => {
-      s.maximized = !s.maximized;
+    setInterfaceStore(s => {
+      s.drawer.maximized = !s.drawer.maximized;
       return s;
     });
-  }, [setDrawerConfig]);
+  }, [setInterfaceStore]);
 
-  if (!isXL) return null;
-
-  return (
+  return !isXL ? null : (
     <IconButton tooltip={isMaximized ? t('minimize') : t('maximize')} size="large" onClick={handleMaximize}>
       <DoubleArrowOutlinedIcon
         sx={{
@@ -133,7 +139,7 @@ export const AppDrawerContainer = memo(({ children }: PropsWithChildren) => {
   const theme = useTheme();
 
   const open = useIsDrawerOpen();
-  const isMaximized = useAppDrawerStore(s => s.maximized);
+  const isMaximized = useAppInterfaceStore(s => s.drawer.maximized);
   const handleClose = useAppDrawerClose();
 
   const isMD = useMediaQuery(theme.breakpoints.only('md'));

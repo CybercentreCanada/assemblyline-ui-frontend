@@ -1,5 +1,4 @@
 export * from './hooks/useAppTemplateLeftNavMenu';
-export * from './hooks/useAppTemplatePreferences';
 export * from './hooks/useAppTemplateRouter';
 export * from './hooks/useAppTemplateUser';
 export * from './template.hooks';

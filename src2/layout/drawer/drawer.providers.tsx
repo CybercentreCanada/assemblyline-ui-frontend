@@ -1,23 +1,32 @@
-import { createAppStore } from 'features/store/createAppStore';
+import type { PropsWithChildren, ReactNode } from 'react';
+import { memo } from 'react';
+import {
+  AppDrawerActions,
+  AppDrawerCloseButton,
+  AppDrawerContainer,
+  AppDrawerContent,
+  AppDrawerInner,
+  AppDrawerMain,
+  AppDrawerMaximizeButton
+} from './drawer.components';
 
-//*****************************************************************************************
-// App Drawer Store
-//*****************************************************************************************
-
-/** App drawer state. */
-export type AppDrawerStore = {
-  /** Whether the drawer is expanded to maximized width. */
-  maximized: boolean;
+/** Props for AppDrawerLayout. */
+export type AppDrawerLayoutProps = PropsWithChildren & {
+  /** The content to render inside the drawer panel. */
+  content?: ReactNode;
 };
 
-export const DEFAULT_APP_DRAWER_STORE: AppDrawerStore = {
-  maximized: false
-};
+export const AppDrawerLayout = memo(({ children, content }: AppDrawerLayoutProps) => (
+  <AppDrawerMain>
+    <AppDrawerContent>{children}</AppDrawerContent>
+    <AppDrawerContainer>
+      <AppDrawerActions>
+        <AppDrawerCloseButton />
+        <AppDrawerMaximizeButton />
+      </AppDrawerActions>
+      <AppDrawerInner>{content}</AppDrawerInner>
+    </AppDrawerContainer>
+  </AppDrawerMain>
+));
 
-export const {
-  StoreProvider: AppDrawerStoreProvider,
-  useStore: useAppDrawerStore,
-  useSetStore: useAppSetDrawerStore
-} = createAppStore<AppDrawerStore>(DEFAULT_APP_DRAWER_STORE);
-
-AppDrawerStoreProvider.displayName = 'AppDrawerStoreProvider';
+AppDrawerLayout.displayName = 'AppDrawerLayout';

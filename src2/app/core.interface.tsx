@@ -1,4 +1,6 @@
 import type { AppTheme } from '@tui/core';
+import type { JSONFeedItem } from 'layout/notifications/notifications.models';
+import type { SystemMessage } from 'models/api/user';
 
 declare global {
   /** Transient UI state managed by the interface store — nothing is persisted. */
@@ -25,6 +27,32 @@ declare global {
       };
       /** Current authentication mode/page. */
       mode: 'app' | 'loading' | 'locked' | 'login' | 'logout' | 'quota' | 'tos';
+    };
+    /** Side drawer panel state. */
+    drawer: {
+      /** Whether the drawer is expanded to maximized width. */
+      maximized: boolean;
+    };
+    /** Notification panel state. */
+    notifications: {
+      /** Whether the announcement delete dialog is open. */
+      announcementDeleteOpen: boolean;
+      /** Draft system message being edited. */
+      announcementDraft: SystemMessage;
+      /** Whether the announcement edit dialog is open. */
+      announcementEditOpen: boolean;
+      /** Whether the announcement is currently being saved. */
+      announcementSaving: boolean;
+      /** Fetched and processed notification items. */
+      items: JSONFeedItem[];
+      /** Whether notifications are currently loading. */
+      loading: boolean;
+      /** Whether the notification drawer is open. */
+      open: boolean;
+      /** Whether the system message has been read. */
+      read: boolean;
+      /** Whether the save confirmation dialog is open. */
+      saveConfirmationOpen: boolean;
     };
     /** API usage quota counters. */
     quota: {
@@ -63,6 +91,25 @@ export const DEFAULT_APP_INTERFACE_STORE: AppInterface = {
       oauth_providers: []
     },
     mode: 'loading'
+  },
+  drawer: {
+    maximized: false
+  },
+  notifications: {
+    announcementDeleteOpen: false,
+    announcementDraft: {
+      message: '',
+      severity: 'info',
+      title: '',
+      user: ''
+    },
+    announcementEditOpen: false,
+    announcementSaving: false,
+    items: [],
+    loading: false,
+    open: false,
+    read: false,
+    saveConfirmationOpen: false
   },
   quota: {
     api: 0,

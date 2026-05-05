@@ -52,12 +52,16 @@ export const DEFAULT_JSON_FEED_AUTHOR: JSONFeedAuthor = {
 };
 
 //*****************************************************************************************
-// JSON Feed Item
+// Notification Tag
 //*****************************************************************************************
 
 /** Tag values assignable to a notification feed item. */
 export const NOTIFICATION_TAGS = ['new', 'current', 'dev', 'service', 'blog', 'community'] as const;
 export type NotificationTag = (typeof NOTIFICATION_TAGS)[number];
+
+//*****************************************************************************************
+// JSON Feed Item
+//*****************************************************************************************
 
 /** Represents a single item in a JSON Feed. */
 export type JSONFeedItem = {
@@ -149,7 +153,7 @@ export type JSONFeed = {
   title: string;
   /** User-facing comment about the feed. */
   user_comment?: string;
-  /** JSON Feed version string. */
+  /** JSON Feed specification version. */
   version: string;
 };
 
@@ -174,9 +178,27 @@ export const DEFAULT_JSON_FEED: JSONFeed = {
 // System Message
 //*****************************************************************************************
 
+/** Default system message state. */
 export const DEFAULT_SYSTEM_MESSAGE: SystemMessage = {
   message: '',
   severity: 'info',
   title: '',
   user: ''
+};
+
+//*****************************************************************************************
+// Version Type
+//*****************************************************************************************
+
+/** Result of comparing a notification version to the system version. */
+export type NotificationVersionType = null | 'newer' | 'current' | 'older';
+
+//*****************************************************************************************
+// Minimal Service
+//*****************************************************************************************
+
+/** Minimal service representation for notification filtering. */
+export type MinimalService = {
+  /** Service name. */
+  name?: string;
 };

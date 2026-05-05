@@ -2,8 +2,14 @@ import type { Theme } from '@mui/material';
 import { blue } from '@mui/material/colors';
 import type { Configuration } from 'models/base/config';
 import type { CSSProperties } from 'react';
-import type { PossibleColor } from 'shared/utils/colors';
-import type { JSONFeed, JSONFeedAuthor, JSONFeedItem, JSONFeedItemAttachment } from './notifications.models';
+import type {
+  JSONFeed,
+  JSONFeedAuthor,
+  JSONFeedItem,
+  JSONFeedItemAttachment,
+  MinimalService,
+  NotificationVersionType
+} from './notifications.models';
 import {
   DEFAULT_JSON_FEED,
   DEFAULT_JSON_FEED_AUTHOR,
@@ -13,12 +19,6 @@ import {
 
 const NOTIFICATIONS_LAST_OPENED_AT_KEY = 'notifications.lastOpenedAt';
 const ONE_YEAR_IN_MS = 365 * 24 * 60 * 60 * 1000;
-
-export type MinimalService = {
-  name?: string;
-};
-
-export type NotificationVersionType = null | 'newer' | 'current' | 'older';
 
 //*****************************************************************************************
 // Color Utilities
@@ -30,19 +30,14 @@ export type NotificationVersionType = null | 'newer' | 'current' | 'older';
  * @param severity - Notification severity level
  * @param variant - Color variant (1=main, 2=contrast text, 3=inverse)
  * @param theme - MUI theme instance
- * @returns CSSProperties with the color value
+ * @returns CSSProperties with the color value, or undefined
  */
-export const getColor = (severity: PossibleColor, variant: 1 | 2 | 3, theme: Theme): CSSProperties => {
+export const getColor = (severity: string, variant: 1 | 2 | 3, theme: Theme): CSSProperties | undefined => {
   const colors: Record<string, Record<number, CSSProperties>> = {
     error: {
       1: { color: theme.palette.error.main },
       2: { color: theme.palette.mode === 'dark' ? 'rgb(250, 179, 174)' : 'rgb(97, 26, 21)' },
       3: { color: theme.palette.getContrastText(theme.palette.error.main) }
-    },
-    warning: {
-      1: { color: theme.palette.warning.main },
-      2: { color: theme.palette.mode === 'dark' ? 'rgb(255, 213, 153)' : 'rgb(102, 60, 0)' },
-      3: { color: theme.palette.getContrastText(theme.palette.warning.main) }
     },
     info: {
       1: { color: blue[500] },
@@ -53,6 +48,11 @@ export const getColor = (severity: PossibleColor, variant: 1 | 2 | 3, theme: The
       1: { color: theme.palette.success.main },
       2: { color: theme.palette.mode === 'dark' ? 'rgb(183, 223, 185)' : 'rgb(30, 70, 32)' },
       3: { color: theme.palette.getContrastText(theme.palette.success.main) }
+    },
+    warning: {
+      1: { color: theme.palette.warning.main },
+      2: { color: theme.palette.mode === 'dark' ? 'rgb(255, 213, 153)' : 'rgb(102, 60, 0)' },
+      3: { color: theme.palette.getContrastText(theme.palette.warning.main) }
     }
   };
 
@@ -65,19 +65,14 @@ export const getColor = (severity: PossibleColor, variant: 1 | 2 | 3, theme: The
  * @param severity - Notification severity level
  * @param variant - Color variant (1=main, 2=contrast text, 3=inverse)
  * @param theme - MUI theme instance
- * @returns CSSProperties with the backgroundColor value
+ * @returns CSSProperties with the backgroundColor value, or undefined
  */
-export const getBackgroundColor = (severity: PossibleColor, variant: 1 | 2 | 3, theme: Theme): CSSProperties => {
+export const getBackgroundColor = (severity: string, variant: 1 | 2 | 3, theme: Theme): CSSProperties | undefined => {
   const backgroundColors: Record<string, Record<number, CSSProperties>> = {
     error: {
       1: { backgroundColor: theme.palette.error.main },
       2: { backgroundColor: theme.palette.mode === 'dark' ? 'rgb(24, 6, 5)' : 'rgb(253, 236, 234)' },
       3: { backgroundColor: theme.palette.getContrastText(theme.palette.error.main) }
-    },
-    warning: {
-      1: { backgroundColor: theme.palette.warning.main },
-      2: { backgroundColor: theme.palette.mode === 'dark' ? 'rgb(25, 15, 0)' : 'rgb(255, 244, 229)' },
-      3: { backgroundColor: theme.palette.getContrastText(theme.palette.warning.main) }
     },
     info: {
       1: { backgroundColor: blue[500] },
@@ -88,6 +83,11 @@ export const getBackgroundColor = (severity: PossibleColor, variant: 1 | 2 | 3, 
       1: { backgroundColor: theme.palette.success.main },
       2: { backgroundColor: theme.palette.mode === 'dark' ? 'rgb(7, 17, 7)' : 'rgb(237, 247, 237)' },
       3: { backgroundColor: theme.palette.getContrastText(theme.palette.success.main) }
+    },
+    warning: {
+      1: { backgroundColor: theme.palette.warning.main },
+      2: { backgroundColor: theme.palette.mode === 'dark' ? 'rgb(25, 15, 0)' : 'rgb(255, 244, 229)' },
+      3: { backgroundColor: theme.palette.getContrastText(theme.palette.warning.main) }
     }
   };
 
@@ -134,11 +134,14 @@ export const readLastOpenedAt = (): Date => {
  * @name writeLastOpenedAt
  * @description Persists the last-opened timestamp to localStorage.
  * @param date - Date to store
+ * @returns void
  */
 export const writeLastOpenedAt = (date: Date): void => {
   try {
     localStorage.setItem(NOTIFICATIONS_LAST_OPENED_AT_KEY, JSON.stringify(date.valueOf()));
-  } catch {}
+  } catch {
+    // Silently ignore write failures
+  }
 };
 
 //*****************************************************************************************
@@ -147,34 +150,26 @@ export const writeLastOpenedAt = (date: Date): void => {
 
 /**
  * @name sortByPublishedDateDesc
- * @description Sorts feed items by publication date in descending order.
+ * @description Sorts feed items by publication date in descending order (mutates in place).
  * @param items - Array of JSON Feed items
- * @returns New sorted array
+ * @returns The same array sorted in place
  */
 export const sortByPublishedDateDesc = (items: JSONFeedItem[]): JSONFeedItem[] =>
-  [...items].sort((a, b) => new Date(b?.date_published || 0).valueOf() - new Date(a?.date_published || 0).valueOf());
+  items.sort((a, b) => new Date(b?.date_published || 0).valueOf() - new Date(a?.date_published || 0).valueOf());
 
 /**
  * @name markItemsAsNewerThan
- * @description Marks items as new if published after the given cutoff date.
- * @param items - Array of JSON Feed items
+ * @description Sets `_isNew` on each item based on whether it was published after the cutoff.
+ * @param items - Array of JSON Feed items (mutated in place)
  * @param cutoffDate - Date threshold for newness
- * @returns New array with updated _isNew flags
+ * @returns The same array with updated _isNew flags
  */
-export const markItemsAsNewerThan = (items: JSONFeedItem[], cutoffDate: Date): JSONFeedItem[] =>
-  items.map(item => ({
-    ...item,
-    _isNew: new Date(item?.date_published || 0).valueOf() > cutoffDate.valueOf()
-  }));
-
-/**
- * @name normalizeTags
- * @description Filters out falsy values from a tags array.
- * @param tags - Raw tags array from a feed item
- * @returns Cleaned array of valid tags
- */
-export const normalizeTags = (tags: JSONFeedItem['tags']): JSONFeedItem['tags'] =>
-  Array.isArray(tags) ? tags.filter(Boolean) : [];
+export const markItemsAsNewerThan = (items: JSONFeedItem[], cutoffDate: Date): JSONFeedItem[] => {
+  for (const item of items) {
+    item._isNew = new Date(item?.date_published || 0).valueOf() > cutoffDate.valueOf();
+  }
+  return items;
+};
 
 //*****************************************************************************************
 // Version Comparison
@@ -294,44 +289,41 @@ export const applyLegacyNotificationRules = ({
   items: JSONFeedItem[];
   lastOpenedAt: Date;
   services: MinimalService[];
-}) => {
-  const filteredItems = items.filter(item => {
-    if (new Date(item?.date_published || 0).valueOf() < Date.now() - ONE_YEAR_IN_MS) return false;
+}): JSONFeedItem[] => {
+  const filtered: JSONFeedItem[] = [];
+
+  for (const item of items) {
+    if (new Date(item?.date_published || 0).valueOf() < Date.now() - ONE_YEAR_IN_MS) continue;
 
     if (!isAdmin) {
       const isKnownService = getNewService(item, services);
-      if (isKnownService === false) return false;
+      if (isKnownService === false) continue;
 
       const versionType = getVersionType(item, config);
-      if (versionType === 'newer') return false;
+      if (versionType === 'newer') continue;
     }
 
-    return true;
-  });
+    filtered.push(item);
+  }
 
-  const enrichedItems = filteredItems.map(item => {
-    const versionType = getVersionType(item, config);
-    const isKnownService = getNewService(item, services);
-    const baseItem = {
-      ...item,
-      _isNew: new Date(item?.date_published || 0).valueOf() > lastOpenedAt.valueOf()
-    };
+  for (const item of filtered) {
+    item._isNew = new Date(item?.date_published || 0).valueOf() > lastOpenedAt.valueOf();
 
-    if (!isAdmin) return baseItem;
+    if (isAdmin) {
+      const versionType = getVersionType(item, config);
+      const isKnownService = getNewService(item, services);
 
-    const adminTags = [
-      isKnownService === false ? 'new' : null,
-      versionType === 'newer' ? 'new' : null,
-      versionType === 'current' ? 'current' : null
-    ].filter(Boolean) as JSONFeedItem['tags'];
+      const adminTags = [
+        isKnownService === false ? ('new' as const) : null,
+        versionType === 'newer' ? ('new' as const) : null,
+        versionType === 'current' ? ('current' as const) : null
+      ].filter(Boolean) as JSONFeedItem['tags'];
 
-    return {
-      ...baseItem,
-      tags: [...adminTags, ...normalizeTags(item.tags)]
-    };
-  });
+      item.tags = [...adminTags, ...(Array.isArray(item.tags) ? item.tags : [])];
+    }
+  }
 
-  return sortByPublishedDateDesc(enrichedItems);
+  return sortByPublishedDateDesc(filtered);
 };
 
 //*****************************************************************************************
@@ -388,8 +380,8 @@ export const parseJSONFeedItem = (items: unknown[]): JSONFeedItem[] =>
         return {
           ...DEFAULT_JSON_FEED_ITEM,
           ...item,
-          date_published: new Date(item.date_published as string),
-          date_modified: new Date(item.date_modified as string),
+          date_published: String(new Date(item.date_published as string)),
+          date_modified: String(new Date(item.date_modified as string)),
           authors: parseJSONFeedAuthor(item?.authors as unknown[]),
           attachments: parseJSONFeedItemAttachment(item?.attachment as unknown[]),
           content_html: decodeHTML(item?.content_html as string)
@@ -400,9 +392,9 @@ export const parseJSONFeedItem = (items: unknown[]): JSONFeedItem[] =>
  * @name parseJSONFeed
  * @description Parses raw JSON feed data into a typed JSONFeed object.
  * @param feed - Raw feed object from JSON
- * @returns Parsed feed
+ * @returns Parsed feed, or null if input is falsy
  */
-export const parseJSONFeed = (feed: unknown): JSONFeed =>
+export const parseJSONFeed = (feed: unknown): JSONFeed | null =>
   !feed
     ? null
     : {
@@ -422,23 +414,20 @@ export const parseJSONFeed = (feed: unknown): JSONFeed =>
  * @param url - URL of the JSON Feed
  * @returns Parsed JSON Feed
  */
-export const fetchJSON = (url: string): Promise<JSONFeed> =>
-  new Promise(async resolve => {
-    const response: Response = (await fetch(url, { method: 'GET' }).catch(err =>
-      // eslint-disable-next-line no-console
-      console.error(`Notification Area: error caused by URL "${err}`)
-    )) as Response;
+export const fetchJSON = async (url: string): Promise<JSONFeed> => {
+  try {
+    const response = await fetch(url, { method: 'GET' });
+    if (!response) return { ...DEFAULT_JSON_FEED };
 
-    if (!response) {
-      resolve({ ...DEFAULT_JSON_FEED });
-      return;
-    }
-
-    const textResponse: string = await response.text();
+    const textResponse = await response.text();
     const jsonFeed = JSON.parse(textResponse) as unknown;
-    resolve(parseJSONFeed(jsonFeed));
-    return;
-  });
+    return parseJSONFeed(jsonFeed) ?? { ...DEFAULT_JSON_FEED };
+  } catch (err) {
+    // eslint-disable-next-line no-console
+    console.error(`Notification Area: error fetching "${url}"`, err);
+    return { ...DEFAULT_JSON_FEED };
+  }
+};
 
 /**
  * @name fetchJSONFeeds
@@ -446,31 +435,27 @@ export const fetchJSON = (url: string): Promise<JSONFeed> =>
  * @param urls - Array of feed URLs
  * @returns Array of parsed JSON Feeds
  */
-export const fetchJSONFeeds = (urls: string[] = []): Promise<JSONFeed[]> =>
-  new Promise(async (resolve, reject) => {
-    if (!urls) {
-      reject('no urls');
-      return;
-    }
-    const feeds: JSONFeed[] = (await Promise.all(urls.map(url => fetchJSON(url))).catch(err =>
-      reject(err)
-    )) as JSONFeed[];
-    resolve(feeds);
-  });
-
-type FetchJSONProps = {
-  urls: string[];
-  onSuccess?: (feeds: JSONFeedItem[]) => void;
-  onError?: (err: unknown) => void;
+export const fetchJSONFeeds = async (urls: string[]): Promise<JSONFeed[]> => {
+  if (!urls?.length) return [];
+  return Promise.all(urls.map(url => fetchJSON(url)));
 };
 
 /**
  * @name fetchJSONNotifications
- * @description Fetches multiple feeds and returns all items flattened.
+ * @description Fetches multiple feeds and returns all items flattened via callbacks.
  * @param params - URLs and callbacks
+ * @returns void
  */
-export const fetchJSONNotifications = ({ urls, onSuccess = null, onError = null }: FetchJSONProps): void => {
+export const fetchJSONNotifications = ({
+  urls,
+  onSuccess,
+  onError
+}: {
+  urls: string[];
+  onSuccess?: (items: JSONFeedItem[]) => void;
+  onError?: (err: unknown) => void;
+}): void => {
   fetchJSONFeeds(urls)
-    .then(feeds => onSuccess && onSuccess(feeds.flatMap(f => f.items)))
-    .catch(err => onError && onError(err));
+    .then(feeds => onSuccess?.(feeds.flatMap(f => f.items)))
+    .catch(err => onError?.(err));
 };

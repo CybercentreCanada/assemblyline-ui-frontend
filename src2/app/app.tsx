@@ -8,7 +8,7 @@ import { AppSnackbarProvider } from 'core/snackbar';
 import { AppTemplateLayout, AppTemplateProvider } from 'core/template';
 import { AppThemeProvider } from 'core/theme';
 import { AppAuthLayout } from 'layout/auth';
-import { AppDrawerLayout } from 'layout/drawer/drawer.layout';
+import { AppDrawerLayout } from 'layout/drawer';
 import type { PropsWithChildren } from 'react';
 import { memo, StrictMode } from 'react';
 import i18n from './app.i18n';

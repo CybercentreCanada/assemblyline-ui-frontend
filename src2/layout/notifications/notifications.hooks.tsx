@@ -1,122 +1,121 @@
-import { useApiQuery } from 'core/api';
-import { useAppConfig, useAppSetConfig } from 'core/config';
+import { useAppConfig } from 'core/config';
+import { useAppInterfaceStore, useAppSetInterfaceStore } from 'core/interface';
 import type { Configuration } from 'models/base/config';
-import { useCallback, useEffect } from 'react';
-import type { JSONFeedItem } from './notifications.models';
+import { useCallback, useEffect, useMemo } from 'react';
+import type { MinimalService } from './notifications.models';
 import {
   applyLegacyNotificationRules,
   fetchJSONNotifications,
   markItemsAsNewerThan,
-  type MinimalService,
   readLastOpenedAt,
   writeLastOpenedAt
 } from './notifications.utils';
 
-const EMPTY_NOTIFICATION_FEED_URLS: string[] = [];
+const EMPTY_FEED_URLS: string[] = [];
 const EMPTY_SERVICES: MinimalService[] = [];
 
+//*****************************************************************************************
+// useNotificationFeed
+//*****************************************************************************************
+
 /**
- * @name useNotificationAutoRefresh
- * @description Fetches and refreshes notification feeds automatically when the drawer opens.
- * @returns void
+ * @name useNotificationFeed
+ * @description Fetches notification feeds and applies filtering rules. Stores results in interface store.
  */
-export const useNotificationAutoRefresh = () => {
-  const open = useAppConfig(s => s?.layout?.notifications?.open ?? false);
+export const useNotificationFeed = (): void => {
   const isAdmin = useAppConfig(s => Boolean(s?.user?.is_admin));
   const configuration = useAppConfig(s => (s?.configuration || null) as Configuration | null);
-  const notificationFeedUrls = useAppConfig(
-    s => ((s?.configuration as Configuration)?.ui?.rss_feeds ?? EMPTY_NOTIFICATION_FEED_URLS) as string[]
-  );
-  const setConfig = useAppSetConfig();
+  const feedUrls = useMemo(() => configuration?.ui?.rss_feeds ?? EMPTY_FEED_URLS, [configuration]);
 
-  const servicesQuery = useApiQuery<MinimalService[]>({
-    url: '/api/v4/service/all/',
-    method: 'GET',
-    disabled: isAdmin || !configuration || !notificationFeedUrls?.length
-  });
+  const setInterface = useAppSetInterfaceStore();
 
-  const services = servicesQuery.data ?? EMPTY_SERVICES;
+  useEffect(() => {
+    if (!configuration || !feedUrls?.length) return;
 
-  const refreshNotifications = useCallback(() => {
-    if (!configuration || !notificationFeedUrls?.length) {
-      setConfig(prev => ({
-        layout: {
-          ...prev.layout,
-          notifications: { ...prev.layout.notifications, items: [], loading: false }
-        }
-      }));
-      return;
-    }
+    setInterface(s => {
+      s.notifications.loading = true;
+      return s;
+    });
 
-    setConfig(prev => ({
-      layout: {
-        ...prev.layout,
-        notifications: { ...prev.layout.notifications, loading: true }
-      }
-    }));
+    const lastOpenedAt = readLastOpenedAt();
 
     fetchJSONNotifications({
-      urls: notificationFeedUrls,
+      urls: feedUrls,
       onSuccess: fetchedItems => {
-        const lastOpenedAt = readLastOpenedAt();
-        const items = applyLegacyNotificationRules({
+        const processed = applyLegacyNotificationRules({
           config: configuration,
           isAdmin,
           items: fetchedItems,
           lastOpenedAt,
-          services: isAdmin ? EMPTY_SERVICES : services
+          services: EMPTY_SERVICES
         });
-        setConfig(prev => ({
-          layout: {
-            ...prev.layout,
-            notifications: { ...prev.layout.notifications, items, loading: false }
-          }
-        }));
+
+        setInterface(s => {
+          s.notifications.items = processed;
+          s.notifications.loading = false;
+          return s;
+        });
       },
       onError: () => {
-        setConfig(prev => ({
-          layout: {
-            ...prev.layout,
-            notifications: { ...prev.layout.notifications, loading: false }
-          }
-        }));
+        setInterface(s => {
+          s.notifications.loading = false;
+          return s;
+        });
       }
     });
-  }, [configuration, isAdmin, notificationFeedUrls, services, setConfig]);
-
-  useEffect(() => {
-    refreshNotifications();
-  }, [refreshNotifications]);
-
-  useEffect(() => {
-    if (!open) return;
-    refreshNotifications();
-  }, [open, refreshNotifications]);
+  }, [configuration, feedUrls, isAdmin, setInterface]);
 };
+
+//*****************************************************************************************
+// useNotificationClose
+//*****************************************************************************************
 
 /**
  * @name useNotificationClose
- * @description Returns a callback that closes the notification drawer and marks items as read.
- * @returns Callback to close notifications
+ * @description Returns a callback that closes the drawer, marks items as read, and persists timestamp.
  */
-export const useNotificationClose = () => {
-  const items = useAppConfig(s => s?.layout?.notifications?.items ?? []) as JSONFeedItem[];
-  const setConfig = useAppSetConfig();
+export const useNotificationClose = (): (() => void) => {
+  const setInterface = useAppSetInterfaceStore();
 
   return useCallback(() => {
     const now = new Date();
     writeLastOpenedAt(now);
 
-    setConfig(prev => ({
-      layout: {
-        ...prev.layout,
-        notifications: {
-          ...prev.layout.notifications,
-          items: markItemsAsNewerThan(items, now),
-          open: false,
-          read: true
-        }
-      }
-    }));
-  }, [items, setConfig]);
+    setInterface(s => {
+      s.notifications.open = false;
+      s.notifications.read = true;
+      s.notifications.items = markItemsAsNewerThan([...s.notifications.items], now);
+      return s;
+    });
+  }, [setInterface]);
 };
+
+//*****************************************************************************************
+// useNotificationOpen
+//*****************************************************************************************
+
+/**
+ * @name useNotificationOpen
+ * @description Returns a callback that opens the notification drawer.
+ */
+export const useNotificationOpen = (): (() => void) => {
+  const setInterface = useAppSetInterfaceStore();
+
+  return useCallback(() => {
+    setInterface(s => {
+      s.notifications.open = true;
+      return s;
+    });
+  }, [setInterface]);
+};
+
+//*****************************************************************************************
+// useNotificationNewCount
+//*****************************************************************************************
+
+/**
+ * @name useNotificationNewCount
+ * @description Returns the count of unread notifications.
+ */
+export const useNotificationNewCount = (): number =>
+  useAppInterfaceStore(s => s.notifications.items.filter(item => item?._isNew).length);

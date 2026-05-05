@@ -1,11 +1,11 @@
 import { useAppSwitcher } from '@tui/apps';
 import { AppProvider, AppRoot, useAppLayout, useAppUser } from '@tui/core';
+import { useAppPreferences } from 'app/layout.preferences';
 import { useAppInterfaceStore } from 'core/interface';
 import { useAppPreferenceStore } from 'core/preference';
 import type { i18n } from 'i18next';
 import type { PropsWithChildren } from 'react';
 import { memo, useEffect, useMemo } from 'react';
-import { useAppTemplatePreferences } from './hooks/useAppTemplatePreferences';
 import { useAppTemplateRouter } from './hooks/useAppTemplateRouter';
 import { useAppTemplateUser } from './hooks/useAppTemplateUser';
 import { useAppTemplateThemeMode } from './template.hooks';
@@ -44,13 +44,13 @@ export const AppTemplateLayout = memo(({ children }: PropsWithChildren) => {
   // const myAccessibility = useMyAccessibility();
   // const myNotification = useMyNotification();
   // const myApps = useMyApps();
-  const appTemplatePreferences = useAppTemplatePreferences();
+  const appPreferences = useAppPreferences();
   const appTemplateRouter = useAppTemplateRouter();
   const appTemplateUser = useAppTemplateUser();
 
   return (
     <AppProvider
-      preferences={appTemplatePreferences}
+      preferences={appPreferences}
       router={appTemplateRouter}
       user={appTemplateUser}
 

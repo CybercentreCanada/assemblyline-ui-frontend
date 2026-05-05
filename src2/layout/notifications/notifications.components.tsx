@@ -26,14 +26,14 @@ import {
   Select,
   type SelectChangeEvent,
   Skeleton,
-  styled,
   type SvgIconProps,
   TextField,
   Typography,
   useTheme
 } from '@mui/material';
 import { useApiMutation } from 'core/api';
-import { useAppConfig, useAppSetConfig } from 'core/config';
+import { useAppConfig } from 'core/config';
+import { useAppInterfaceStore, useAppSetInterfaceStore } from 'core/interface';
 import { useAppSnackbar } from 'core/snackbar';
 import DOMPurify from 'dompurify';
 import type { SystemMessage } from 'models/api/user';
@@ -44,46 +44,18 @@ import Markdown from 'react-markdown';
 import { Button } from 'ui/buttons/Button';
 import { IconButton } from 'ui/buttons/IconButton';
 import { CustomChip } from 'ui/CustomChip';
-import { useNotificationAutoRefresh, useNotificationClose } from './notifications.hooks';
+import {
+  useNotificationClose,
+  useNotificationFeed,
+  useNotificationNewCount,
+  useNotificationOpen
+} from './notifications.hooks';
 import type { JSONFeedAuthor, JSONFeedItem } from './notifications.models';
-import { DEFAULT_SYSTEM_MESSAGE } from './notifications.models';
 import { formatDate, getBackgroundColor, getColor } from './notifications.utils';
 
-const Row = styled('div')(() => ({
-  width: '100%',
-  display: 'flex',
-  flexDirection: 'row',
-  alignItems: 'center'
-}));
-
-const ItemContainer = styled('div')(({ theme }) => ({
-  width: '100%',
-  display: 'flex',
-  flexDirection: 'column',
-  gap: theme.spacing(0.75),
-  padding: `${theme.spacing(1.25)} ${theme.spacing(0.5)}`
-}));
-
-type SystemMessageIconProps = SvgIconProps & {
-  severity?: SystemMessage['severity'];
-};
-
-const SystemMessageIcon = memo(({ severity, fontSize = 'medium', ...props }: SystemMessageIconProps) => {
-  switch (severity) {
-    case 'error':
-      return <ErrorOutlineOutlinedIcon fontSize={fontSize} {...props} />;
-    case 'warning':
-      return <ReportProblemOutlinedIcon fontSize={fontSize} {...props} />;
-    case 'info':
-      return <InfoOutlinedIcon fontSize={fontSize} {...props} />;
-    case 'success':
-      return <CheckCircleOutlinedIcon fontSize={fontSize} {...props} />;
-    default:
-      return <NotificationsOutlinedIcon fontSize={fontSize} {...props} />;
-  }
-});
-
-SystemMessageIcon.displayName = 'SystemMessageIcon';
+//*****************************************************************************************
+// Constants
+//*****************************************************************************************
 
 const TAG_COLORS: Record<string, 'info' | 'success' | 'warning' | 'secondary' | 'default'> = {
   new: 'info',
@@ -94,37 +66,71 @@ const TAG_COLORS: Record<string, 'info' | 'success' | 'warning' | 'secondary' | 
   blog: 'default'
 };
 
+const VISIBLE_TAGS = ['new', 'current', 'dev', 'service', 'blog', 'community'];
+
+const DEFAULT_SYSTEM_MESSAGE: SystemMessage = {
+  message: '',
+  severity: 'info',
+  title: '',
+  user: ''
+};
+
+const ROW_STYLE = { width: '100%', display: 'flex', flexDirection: 'row' as const, alignItems: 'center' as const };
+
 //*****************************************************************************************
-// Notification Author
+// SystemMessageIcon
+//*****************************************************************************************
+
+type SystemMessageIconProps = SvgIconProps & { severity?: SystemMessage['severity'] };
+
+const SystemMessageIcon = memo(({ severity, fontSize = 'medium', ...props }: SystemMessageIconProps) => {
+  const iconMap: Record<string, typeof ErrorOutlineOutlinedIcon> = {
+    error: ErrorOutlineOutlinedIcon,
+    warning: ReportProblemOutlinedIcon,
+    info: InfoOutlinedIcon,
+    success: CheckCircleOutlinedIcon
+  };
+
+  const Icon = iconMap[severity] ?? NotificationsOutlinedIcon;
+  return <Icon fontSize={fontSize} {...props} />;
+});
+
+SystemMessageIcon.displayName = 'SystemMessageIcon';
+
+//*****************************************************************************************
+// NotificationAuthor
 //*****************************************************************************************
 
 const NotificationAuthor = memo(({ author }: { author: JSONFeedAuthor }) => {
   const theme = useTheme();
 
-  const content = (
-    <>
-      {author?.avatar ? (
-        <img
-          src={author.avatar}
-          alt={author.name || ''}
-          style={{
-            maxHeight: '25px',
-            borderRadius: '50%',
-            marginLeft: theme.spacing(0.25),
-            marginRight: theme.spacing(0.25)
-          }}
-        />
-      ) : null}
-      {author?.name ? (
-        <Typography
-          variant="caption"
-          color="text.secondary"
-          style={{ marginLeft: theme.spacing(0.25), marginRight: theme.spacing(0.25) }}
-        >
-          {author.name}
-        </Typography>
-      ) : null}
-    </>
+  const content = useMemo(
+    () => (
+      <>
+        {author?.avatar ? (
+          <img
+            src={author.avatar}
+            alt={author.name || ''}
+            style={{
+              maxHeight: '25px',
+              borderRadius: '50%',
+              marginLeft: theme.spacing(0.25),
+              marginRight: theme.spacing(0.25)
+            }}
+          />
+        ) : null}
+        {author?.name ? (
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            style={{ marginLeft: theme.spacing(0.25), marginRight: theme.spacing(0.25) }}
+          >
+            {author.name}
+          </Typography>
+        ) : null}
+      </>
+    ),
+    [author, theme]
   );
 
   return author?.url ? (
@@ -139,7 +145,7 @@ const NotificationAuthor = memo(({ author }: { author: JSONFeedAuthor }) => {
 NotificationAuthor.displayName = 'NotificationAuthor';
 
 //*****************************************************************************************
-// Notification Item
+// NotificationItem
 //*****************************************************************************************
 
 const NotificationItem = memo(({ notification }: { notification: JSONFeedItem }) => {
@@ -172,12 +178,19 @@ const NotificationItem = memo(({ notification }: { notification: JSONFeedItem })
       );
     }
 
-    if (notification.content_text) return <>{notification.content_text}</>;
-    return null;
+    return notification.content_text ? <>{notification.content_text}</> : null;
   }, [notification.content_html, notification.content_md, notification.content_text]);
 
   return (
-    <ItemContainer>
+    <div
+      style={{
+        width: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: theme.spacing(0.75),
+        padding: `${theme.spacing(1.25)} ${theme.spacing(0.5)}`
+      }}
+    >
       <Typography variant="caption" color="textSecondary">
         {formatDate(notification.date_published)}
       </Typography>
@@ -186,10 +199,7 @@ const NotificationItem = memo(({ notification }: { notification: JSONFeedItem })
         <Link href={notification.url} target="_blank" rel="noopener noreferrer" underline="none">
           <Typography
             variant="subtitle1"
-            style={{
-              fontWeight: notification._isNew ? 700 : 500,
-              color: theme.palette.primary.main
-            }}
+            style={{ fontWeight: notification._isNew ? 700 : 500, color: theme.palette.primary.main }}
           >
             {notification.title}
           </Typography>
@@ -200,12 +210,16 @@ const NotificationItem = memo(({ notification }: { notification: JSONFeedItem })
         </Typography>
       )}
 
-      {content ? <Typography variant="body2">{content}</Typography> : null}
+      {content ? (
+        <Typography variant="body2" component="div">
+          {content}
+        </Typography>
+      ) : null}
 
       {notification.tags?.length ? (
-        <Row style={{ flexWrap: 'wrap', gap: theme.spacing(0.5) }}>
+        <div style={{ ...ROW_STYLE, flexWrap: 'wrap', gap: theme.spacing(0.5) }}>
           {notification.tags
-            .filter(tag => ['new', 'current', 'dev', 'service', 'blog', 'community'].includes(tag))
+            .filter(tag => VISIBLE_TAGS.includes(tag))
             .map((tag, i) => (
               <CustomChip
                 key={`${notification.id}-tag-${i}`}
@@ -217,7 +231,7 @@ const NotificationItem = memo(({ notification }: { notification: JSONFeedItem })
                 style={{ textTransform: 'capitalize' }}
               />
             ))}
-        </Row>
+        </div>
       ) : null}
 
       {notification.image ? (
@@ -231,69 +245,57 @@ const NotificationItem = memo(({ notification }: { notification: JSONFeedItem })
       ) : null}
 
       {notification.authors?.length ? (
-        <Row style={{ justifyContent: 'flex-end', gap: theme.spacing(0.5), paddingTop: theme.spacing(0.5) }}>
+        <div
+          style={{ ...ROW_STYLE, justifyContent: 'flex-end', gap: theme.spacing(0.5), paddingTop: theme.spacing(0.5) }}
+        >
           {notification.authors
             .filter((_, i) => i < 2)
             .map((author, i) => (
               <NotificationAuthor key={`${notification.id}-author-${i}`} author={author} />
             ))}
-        </Row>
+        </div>
       ) : null}
-    </ItemContainer>
+    </div>
   );
 });
 
 NotificationItem.displayName = 'NotificationItem';
 
 //*****************************************************************************************
-// Announcement Actions
+// AnnouncementActions
 //*****************************************************************************************
 
 const AnnouncementActions = memo(() => {
   const { t } = useTranslation(['notifications']);
-
   const isAdmin = useAppConfig(s => Boolean(s?.user?.is_admin));
   const systemMessage = useAppConfig(s => s?.systemMessage ?? null);
-
-  const setConfig = useAppSetConfig();
+  const setInterface = useAppSetInterfaceStore();
 
   const handleOpenCreateDialog = useCallback(() => {
-    setConfig(prev => ({
-      layout: {
-        ...prev.layout,
-        notifications: {
-          ...prev.layout.notifications,
-          announcementDraft: { ...DEFAULT_SYSTEM_MESSAGE },
-          announcementEditOpen: true
-        }
-      }
-    }));
-  }, [setConfig]);
+    setInterface(s => {
+      s.notifications.announcementDraft = { ...DEFAULT_SYSTEM_MESSAGE };
+      s.notifications.announcementEditOpen = true;
+      return s;
+    });
+  }, [setInterface]);
 
   const handleOpenEditDialog = useCallback(() => {
-    setConfig(prev => ({
-      layout: {
-        ...prev.layout,
-        notifications: {
-          ...prev.layout.notifications,
-          announcementDraft: { ...systemMessage },
-          announcementEditOpen: true
-        }
-      }
-    }));
-  }, [setConfig, systemMessage]);
+    setInterface(s => {
+      s.notifications.announcementDraft = { ...(systemMessage as SystemMessage) };
+      s.notifications.announcementEditOpen = true;
+      return s;
+    });
+  }, [setInterface, systemMessage]);
 
   const handleOpenDeleteDialog = useCallback(() => {
-    setConfig(prev => ({
-      layout: {
-        ...prev.layout,
-        notifications: { ...prev.layout.notifications, announcementDeleteOpen: true }
-      }
-    }));
-  }, [setConfig]);
+    setInterface(s => {
+      s.notifications.announcementDeleteOpen = true;
+      return s;
+    });
+  }, [setInterface]);
 
   return isAdmin ? (
-    <Row style={{ width: 'auto' }}>
+    <div style={{ ...ROW_STYLE, width: 'auto' }}>
       {Boolean(systemMessage) ? (
         <>
           <IconButton size="small" onClick={handleOpenEditDialog} tooltip={t('edit.title')}>
@@ -308,14 +310,14 @@ const AnnouncementActions = memo(() => {
           <AddOutlinedIcon fontSize="small" />
         </IconButton>
       )}
-    </Row>
+    </div>
   ) : null;
 });
 
 AnnouncementActions.displayName = 'AnnouncementActions';
 
 //*****************************************************************************************
-// Announcement Content
+// AnnouncementContent
 //*****************************************************************************************
 
 const AnnouncementContent = memo(() => {
@@ -354,26 +356,22 @@ const AnnouncementContent = memo(() => {
 AnnouncementContent.displayName = 'AnnouncementContent';
 
 //*****************************************************************************************
-// Announcement Save Confirmation Dialog
+// AnnouncementSaveConfirmation
 //*****************************************************************************************
 
 const AnnouncementSaveConfirmation = memo(() => {
   const { t } = useTranslation(['notifications']);
   const { showSuccessMessage } = useAppSnackbar();
-
-  const saveConfirmationOpen = useAppConfig(s => s?.layout?.notifications?.saveConfirmationOpen ?? false);
-  const draftMessage = useAppConfig(s => (s?.layout?.notifications?.announcementDraft ?? null) as SystemMessage | null);
-
-  const setConfig = useAppSetConfig();
+  const saveConfirmationOpen = useAppInterfaceStore(s => s.notifications.saveConfirmationOpen);
+  const draftMessage = useAppInterfaceStore(s => s.notifications.announcementDraft);
+  const setInterface = useAppSetInterfaceStore();
 
   const handleCloseDialog = useCallback(() => {
-    setConfig(prev => ({
-      layout: {
-        ...prev.layout,
-        notifications: { ...prev.layout.notifications, saveConfirmationOpen: false }
-      }
-    }));
-  }, [setConfig]);
+    setInterface(s => {
+      s.notifications.saveConfirmationOpen = false;
+      return s;
+    });
+  }, [setInterface]);
 
   const handleSaveSystemMessage = useApiMutation(() => ({
     url: '/api/v4/system/system_message/',
@@ -381,18 +379,11 @@ const AnnouncementSaveConfirmation = memo(() => {
     body: draftMessage,
     onSuccess: () => {
       showSuccessMessage(t('save.success'));
-
-      setConfig(prev => ({
-        systemMessage: draftMessage,
-        layout: {
-          ...prev.layout,
-          notifications: {
-            ...prev.layout.notifications,
-            saveConfirmationOpen: false,
-            announcementEditOpen: false
-          }
-        }
-      }));
+      setInterface(s => {
+        s.notifications.saveConfirmationOpen = false;
+        s.notifications.announcementEditOpen = false;
+        return s;
+      });
     }
   }));
 
@@ -421,86 +412,63 @@ const AnnouncementSaveConfirmation = memo(() => {
 AnnouncementSaveConfirmation.displayName = 'AnnouncementSaveConfirmation';
 
 //*****************************************************************************************
-// Announcement Edit Dialog
+// AnnouncementEditDialog
 //*****************************************************************************************
 
 const AnnouncementEditDialog = memo(() => {
   const { t } = useTranslation(['notifications']);
-
-  const isEditDialogOpen = useAppConfig(s => s?.layout?.notifications?.announcementEditOpen ?? false);
-  const isSaving = useAppConfig(s => s?.layout?.notifications?.announcementSaving ?? false);
+  const isEditDialogOpen = useAppInterfaceStore(s => s.notifications.announcementEditOpen);
+  const isSaving = useAppInterfaceStore(s => s.notifications.announcementSaving);
+  const title = useAppInterfaceStore(s => s.notifications.announcementDraft.title);
+  const message = useAppInterfaceStore(s => s.notifications.announcementDraft.message);
+  const severity = useAppInterfaceStore(s => s.notifications.announcementDraft.severity);
   const systemMessage = useAppConfig(s => (s?.systemMessage ?? null) as SystemMessage | null);
-  const title = useAppConfig(s => s.layout.notifications.announcementDraft.title);
-  const message = useAppConfig(s => s.layout.notifications.announcementDraft.message);
-  const severity = useAppConfig(s => s.layout.notifications.announcementDraft.severity);
-
-  const setConfig = useAppSetConfig();
+  const setInterface = useAppSetInterfaceStore();
 
   const handleSeverityChange = useCallback(
     (event: SelectChangeEvent<string>) => {
       const value = event.target.value as SystemMessage['severity'];
-      if (!['error', 'warning', 'info', 'success'].includes(value)) return;
-
-      setConfig(prev => ({
-        layout: {
-          ...prev.layout,
-          notifications: {
-            ...prev.layout.notifications,
-            announcementDraft: { ...prev.layout.notifications.announcementDraft, severity: value }
-          }
-        }
-      }));
+      setInterface(s => {
+        s.notifications.announcementDraft.severity = value;
+        return s;
+      });
     },
-    [setConfig]
+    [setInterface]
   );
 
   const handleTitleChange = useCallback(
     (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      setConfig(prev => ({
-        layout: {
-          ...prev.layout,
-          notifications: {
-            ...prev.layout.notifications,
-            announcementDraft: { ...prev.layout.notifications.announcementDraft, title: event.target.value }
-          }
-        }
-      }));
+      setInterface(s => {
+        s.notifications.announcementDraft.title = event.target.value;
+        return s;
+      });
     },
-    [setConfig]
+    [setInterface]
   );
 
   const handleMessageChange = useCallback(
     (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      setConfig(prev => ({
-        layout: {
-          ...prev.layout,
-          notifications: {
-            ...prev.layout.notifications,
-            announcementDraft: { ...prev.layout.notifications.announcementDraft, message: event.target.value }
-          }
-        }
-      }));
+      setInterface(s => {
+        s.notifications.announcementDraft.message = event.target.value;
+        return s;
+      });
     },
-    [setConfig]
+    [setInterface]
   );
 
   const handleCancel = useCallback(() => {
-    setConfig(prev => ({
-      layout: {
-        ...prev.layout,
-        notifications: { ...prev.layout.notifications, announcementEditOpen: false }
-      }
-    }));
-  }, [setConfig]);
+    setInterface(s => {
+      s.notifications.announcementEditOpen = false;
+      return s;
+    });
+  }, [setInterface]);
 
   const handleAccept = useCallback(() => {
-    setConfig(prev => ({
-      layout: {
-        ...prev.layout,
-        notifications: { ...prev.layout.notifications, saveConfirmationOpen: true }
-      }
-    }));
-  }, [setConfig]);
+    setInterface(s => {
+      s.notifications.saveConfirmationOpen = true;
+      return s;
+    });
+  }, [setInterface]);
 
   return (
     <Dialog fullWidth maxWidth="sm" open={isEditDialogOpen} onClose={handleCancel}>
@@ -548,25 +516,21 @@ const AnnouncementEditDialog = memo(() => {
 AnnouncementEditDialog.displayName = 'AnnouncementEditDialog';
 
 //*****************************************************************************************
-// Announcement Delete Dialog
+// AnnouncementDeleteDialog
 //*****************************************************************************************
 
 const AnnouncementDeleteDialog = memo(() => {
   const { t } = useTranslation(['notifications']);
   const { showSuccessMessage } = useAppSnackbar();
-
-  const isDeleteDialogOpen = useAppConfig(s => s.layout.notifications.announcementDeleteOpen);
-
-  const setConfig = useAppSetConfig();
+  const isDeleteDialogOpen = useAppInterfaceStore(s => s.notifications.announcementDeleteOpen);
+  const setInterface = useAppSetInterfaceStore();
 
   const handleCloseDialog = useCallback(() => {
-    setConfig(prev => ({
-      layout: {
-        ...prev.layout,
-        notifications: { ...prev.layout.notifications, announcementDeleteOpen: false }
-      }
-    }));
-  }, [setConfig]);
+    setInterface(s => {
+      s.notifications.announcementDeleteOpen = false;
+      return s;
+    });
+  }, [setInterface]);
 
   const handleDeleteSystemMessage = useApiMutation(() => ({
     url: '/api/v4/system/system_message/',
@@ -574,14 +538,10 @@ const AnnouncementDeleteDialog = memo(() => {
     body: null,
     onSuccess: () => {
       showSuccessMessage(t('delete.success'));
-
-      setConfig(prev => ({
-        systemMessage: null,
-        layout: {
-          ...prev.layout,
-          notifications: { ...prev.layout.notifications, announcementDeleteOpen: false }
-        }
-      }));
+      setInterface(s => {
+        s.notifications.announcementDeleteOpen = false;
+        return s;
+      });
     }
   }));
 
@@ -611,7 +571,7 @@ const AnnouncementDeleteDialog = memo(() => {
 AnnouncementDeleteDialog.displayName = 'AnnouncementDeleteDialog';
 
 //*****************************************************************************************
-// Notification Feed Header
+// NotificationFeedHeader
 //*****************************************************************************************
 
 const NotificationFeedHeader = memo(() => {
@@ -620,7 +580,7 @@ const NotificationFeedHeader = memo(() => {
 
   return (
     <>
-      <Row style={{ paddingTop: theme.spacing(2) }}>
+      <div style={ROW_STYLE}>
         <FeedbackOutlinedIcon
           fontSize="medium"
           style={{ marginLeft: theme.spacing(1.5), marginRight: theme.spacing(1.5) }}
@@ -628,7 +588,7 @@ const NotificationFeedHeader = memo(() => {
         <Typography variant="h6" style={{ fontSize: 'large', fontWeight: 'bolder', flex: 1 }}>
           {t('notification.header')}
         </Typography>
-      </Row>
+      </div>
       <Divider style={{ marginBottom: '16px', width: '100%' }} />
     </>
   );
@@ -637,26 +597,25 @@ const NotificationFeedHeader = memo(() => {
 NotificationFeedHeader.displayName = 'NotificationFeedHeader';
 
 //*****************************************************************************************
-// Notifications Content
+// NotificationContent
 //*****************************************************************************************
 
 const NotificationContent = memo(() => {
   const { t } = useTranslation(['notifications']);
   const theme = useTheme();
-
-  const isLoading = useAppConfig(s => s?.layout?.notifications?.loading ?? false);
-  const notifications = useAppConfig(s => s?.layout?.notifications?.items ?? []);
+  const isLoading = useAppInterfaceStore(s => s.notifications.loading);
+  const notifications = useAppInterfaceStore(s => s.notifications.items);
 
   return isLoading ? (
-    <Row>
+    <div style={ROW_STYLE}>
       <Skeleton variant="text" animation="wave" style={{ width: '100%', height: theme.spacing(8) }} />
-    </Row>
+    </div>
   ) : notifications.length === 0 ? (
-    <Row style={{ justifyContent: 'center' }}>
+    <div style={{ ...ROW_STYLE, justifyContent: 'center' }}>
       <Typography variant="body2" color="secondary">
         {t('notification.none')}
       </Typography>
-    </Row>
+    </div>
   ) : (
     <>
       {notifications.map((n, i) => (
@@ -669,18 +628,17 @@ const NotificationContent = memo(() => {
 NotificationContent.displayName = 'NotificationContent';
 
 //*****************************************************************************************
-// Announcement Section
+// AnnouncementSection
 //*****************************************************************************************
 
 export const AnnouncementSection = memo(() => {
   const { t } = useTranslation(['notifications']);
   const theme = useTheme();
-
   const systemMessage = useAppConfig(s => s?.systemMessage);
 
   return (
     <>
-      <Row style={{ paddingTop: theme.spacing(2) }}>
+      <div style={{ ...ROW_STYLE, paddingTop: theme.spacing(2) }}>
         <SystemMessageIcon
           severity={systemMessage?.severity}
           style={{
@@ -700,9 +658,8 @@ export const AnnouncementSection = memo(() => {
         >
           {t('systemMessage.header')}
         </Typography>
-
         <AnnouncementActions />
-      </Row>
+      </div>
 
       <Divider
         style={{
@@ -729,20 +686,16 @@ export const AnnouncementSection = memo(() => {
 AnnouncementSection.displayName = 'AnnouncementSection';
 
 //*****************************************************************************************
-// Notification Icon Button
+// NotificationIconButton
 //*****************************************************************************************
 
 const NotificationIconButton = memo(() => {
   const { t } = useTranslation(['notifications']);
   const theme = useTheme();
-
   const systemMessage = useAppConfig(s => s?.systemMessage);
-  const isSystemMessageRead = useAppConfig(s => s?.layout?.notifications?.read ?? false);
-  const newNotificationsCount = useAppConfig(
-    s => (s?.layout?.notifications?.items ?? []).filter(notification => notification?._isNew).length
-  );
-
-  const setConfig = useAppSetConfig();
+  const isSystemMessageRead = useAppInterfaceStore(s => s.notifications.read);
+  const newNotificationsCount = useNotificationNewCount();
+  const handleOpen = useNotificationOpen();
 
   const hasUnreadSystemMessage = useMemo(
     () => Boolean(systemMessage?.message) && !isSystemMessageRead,
@@ -771,15 +724,6 @@ const NotificationIconButton = memo(() => {
     }
   }, [newNotificationsCount, systemMessage]);
 
-  const handleOpen = useCallback(() => {
-    setConfig(prev => ({
-      layout: {
-        ...prev.layout,
-        notifications: { ...prev.layout.notifications, open: true }
-      }
-    }));
-  }, [setConfig]);
-
   return (
     <IconButton size="large" tooltip={t('notification.title')} onClick={handleOpen}>
       <Badge
@@ -805,7 +749,7 @@ const NotificationIconButton = memo(() => {
 NotificationIconButton.displayName = 'NotificationIconButton';
 
 //*****************************************************************************************
-// Notification Close Button
+// NotificationCloseButton
 //*****************************************************************************************
 
 const NotificationCloseButton = memo(() => {
@@ -813,8 +757,9 @@ const NotificationCloseButton = memo(() => {
   const handleClose = useNotificationClose();
 
   return (
-    <Row
+    <div
       style={{
+        ...ROW_STYLE,
         position: 'sticky',
         paddingTop: theme.spacing(1),
         zIndex: 20000,
@@ -825,20 +770,19 @@ const NotificationCloseButton = memo(() => {
       <IconButton size="large" onClick={handleClose}>
         <CloseOutlinedIcon fontSize="medium" />
       </IconButton>
-    </Row>
+    </div>
   );
 });
 
 NotificationCloseButton.displayName = 'NotificationCloseButton';
 
 //*****************************************************************************************
-// Notification Drawer
+// NotificationDrawer
 //*****************************************************************************************
 
 const NotificationDrawer = memo(({ children }: { children: ReactNode }) => {
   const theme = useTheme();
-
-  const isDrawerOpen = useAppConfig(s => s.layout.notifications.open);
+  const isDrawerOpen = useAppInterfaceStore(s => s.notifications.open);
   const handleClose = useNotificationClose();
 
   return (
@@ -846,14 +790,7 @@ const NotificationDrawer = memo(({ children }: { children: ReactNode }) => {
       anchor="right"
       open={isDrawerOpen}
       onClose={handleClose}
-      slotProps={{
-        paper: {
-          style: {
-            width: '80%',
-            maxWidth: '500px'
-          }
-        }
-      }}
+      slotProps={{ paper: { style: { width: '80%', maxWidth: '500px' } } }}
     >
       <div
         style={{
@@ -890,7 +827,7 @@ NotificationDrawer.displayName = 'NotificationDrawer';
 //*****************************************************************************************
 
 export const Notifications = memo(() => {
-  useNotificationAutoRefresh();
+  useNotificationFeed();
 
   return (
     <>
