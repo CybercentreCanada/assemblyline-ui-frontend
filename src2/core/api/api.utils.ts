@@ -39,7 +39,8 @@ export const isApiData = (value: object): value is ApiResponse =>
  * @returns The first truthy value found, or null
  */
 // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access
-export const getValue = (key, ...responses) => responses?.find(r => !!r?.[key])?.[key] || null;
+export const getValue = (key: string, ...responses: Record<string, unknown>[]): unknown =>
+  responses?.find(r => !!r?.[key])?.[key] || null;
 
 //*****************************************************************************************
 // getAPIResponse

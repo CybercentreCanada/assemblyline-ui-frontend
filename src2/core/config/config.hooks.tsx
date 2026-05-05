@@ -1,10 +1,19 @@
 import { deepmerge } from '@mui/utils';
 import { APP_CONFIG_LOCAL_STORAGE_KEY } from 'app/app.configs';
 import { useCallback, useMemo, useState } from 'react';
-import { useAppSetConfig, useAppConfig } from './config.providers';
+import { useAppConfig, useAppSetConfig } from './config.providers';
 import { loadSettingsFromLocalStorage, saveSettingsFromLocalStorage } from './config.utils';
 
-export const useSaveAppConfig = () => {
+//*****************************************************************************************
+// useSaveAppConfig
+//*****************************************************************************************
+
+/**
+ * @name useSaveAppConfig
+ * @description Returns a callback that persists the current app config to localStorage.
+ * @returns Callback to save config
+ */
+export const useSaveAppConfig = (): (() => void) => {
   const store = useAppConfig(s => s);
 
   return useCallback(() => {
@@ -16,7 +25,16 @@ export const useSaveAppConfig = () => {
   }, [store]);
 };
 
-export const useLoadAppConfig = () => {
+//*****************************************************************************************
+// useLoadAppConfig
+//*****************************************************************************************
+
+/**
+ * @name useLoadAppConfig
+ * @description Returns a callback that loads and merges config from localStorage into the store.
+ * @returns Callback to load config
+ */
+export const useLoadAppConfig = (): (() => void) => {
   const setStore = useAppSetConfig();
 
   return useCallback(() => {
@@ -29,7 +47,16 @@ export const useLoadAppConfig = () => {
   }, []);
 };
 
-export const useSaveSettings = () => {
+//*****************************************************************************************
+// useSaveSettings
+//*****************************************************************************************
+
+/**
+ * @name useSaveSettings
+ * @description Returns a save callback and pending state for saving config to localStorage.
+ * @returns Object with isPending flag and save callback
+ */
+export const useSaveSettings = (): { isPending: boolean; save: () => void } => {
   const store = useAppConfig(s => s);
 
   const [isPending, setIsPending] = useState<boolean>(false);
@@ -47,7 +74,16 @@ export const useSaveSettings = () => {
   return useMemo(() => ({ isPending, save }), [isPending, save]);
 };
 
-export const useLoadSettings = () => {
+//*****************************************************************************************
+// useLoadSettings
+//*****************************************************************************************
+
+/**
+ * @name useLoadSettings
+ * @description Returns a load callback and pending state for loading config from localStorage.
+ * @returns Object with isPending flag and load callback
+ */
+export const useLoadSettings = (): { isPending: boolean; load: () => void } => {
   const setStore = useAppSetConfig();
 
   const [isPending, setIsPending] = useState<boolean>(false);

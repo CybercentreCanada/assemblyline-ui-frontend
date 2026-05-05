@@ -2,7 +2,7 @@ import { APP_PREFERENCE_SCHEMA } from 'app/core.preference';
 import { createAppStore } from 'features/store/createAppStore';
 import type { PropsWithChildren } from 'react';
 import { memo, useEffect, useRef } from 'react';
-import { z } from 'zod';
+import type { z } from 'zod';
 import { loadPreferenceFromLocalStorage, savePreferenceToLocalStorage } from './preference.utils';
 
 //*****************************************************************************************
@@ -24,7 +24,7 @@ export type AppPreferenceProps = {
   /** Provider children. */
   children: PropsWithChildren['children'];
   /** Zod schema to validate before saving. */
-  schema: z.ZodObject<any>;
+  schema: z.ZodObject<z.ZodRawShape>;
   /** localStorage key for persistence. */
   storageKey: string;
 };

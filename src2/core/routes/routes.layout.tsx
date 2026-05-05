@@ -1,7 +1,7 @@
 import { APP_ROUTES } from 'app/app.routes';
-import { AppRouteLocation } from 'core/routes';
 import { memo, useMemo } from 'react';
 import { Route, Routes } from 'react-router';
+import type { AppRouteLocation } from './routes.models';
 
 //*****************************************************************************************
 // App Routes

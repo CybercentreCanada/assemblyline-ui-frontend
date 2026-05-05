@@ -15,19 +15,23 @@ import type { ApiQueryKey } from './api.models';
 //*****************************************************************************************
 
 export type AppApiStore = {
-  showDevtools: boolean;
+  /** API usage quota counters. */
   quota: {
+    /** General API call quota. */
     api: number;
+    /** Submission quota. */
     submission: number;
   };
+  /** Whether to show React Query devtools panel. */
+  showDevtools: boolean;
 };
 
 export const DEFAULT_APP_API_STORE: AppApiStore = {
-  showDevtools: false,
   quota: {
     api: 0,
     submission: 0
-  }
+  },
+  showDevtools: false
 };
 
 export const {

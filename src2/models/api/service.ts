@@ -1,5 +1,5 @@
+import type { StatResult } from 'models/api/search';
 import type { ErrorType } from 'models/base/error';
-import type { StatResult } from 'models/ui/search';
 
 /** Get statistics for a service */
 export type ServiceStats = {

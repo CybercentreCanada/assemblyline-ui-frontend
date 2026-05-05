@@ -1,11 +1,13 @@
-import { AppRouterStore } from 'core/router/router.models';
-import { PathParamBlueprintMap, PathParamCodec } from 'features/path-params';
-import { SearchParamEngine, SearchParamSnapshot } from 'features/search-params';
+import type { AppRouterStore } from 'core/router/router.models';
+import type { PathParamBlueprintMap, PathParamCodec } from 'features/path-params';
+import type { SearchParamEngine, SearchParamSnapshot } from 'features/search-params';
 import { createAppStore } from 'features/store/createAppStore';
 import { createStoreContext } from 'features/store/createStoreContext';
-import React, { useCallback } from 'react';
-import { Location, useLocation } from 'react-router';
-import { RouteHash, RoutePath } from './routes.models';
+import type { ReactNode } from 'react';
+import { memo, useCallback } from 'react';
+import type { Location } from 'react-router';
+import { useLocation } from 'react-router';
+import type { RouteHash, RoutePath } from './routes.models';
 
 //*****************************************************************************************
 // Route Provider
@@ -13,24 +15,27 @@ import { RouteHash, RoutePath } from './routes.models';
 
 export type AppRouteStore<
   Path extends RoutePath = RoutePath,
-  Params extends PathParamCodec = any,
-  Search extends SearchParamSnapshot<any> = SearchParamSnapshot<any>,
-  Hash extends RouteHash = any
+  Params extends PathParamCodec = PathParamCodec,
+  Search extends SearchParamSnapshot<unknown> = SearchParamSnapshot<unknown>,
+  Hash extends RouteHash = RouteHash
 > = {
-  params: Params;
-  search: Search;
+  /** Parsed hash value. */
   hash: Hash;
+  /** Parsed path params. */
+  params: Params;
+  /** Parsed search params. */
+  search: Search;
 };
 
 const createDefaultAppRouteStore = <
   Path extends RoutePath,
   Params extends PathParamCodec,
-  Search extends SearchParamSnapshot<any>,
+  Search extends SearchParamSnapshot<unknown>,
   Hash extends RouteHash
 >(): AppRouteStore<Path, Params, Search, Hash> => ({
+  hash: null,
   params: null,
-  search: null,
-  hash: null
+  search: null
 });
 
 export const {
@@ -42,22 +47,26 @@ export const {
 export type AppRouteProviderProps<
   Path extends RoutePath,
   Params extends PathParamBlueprintMap<Path>,
-  Search extends SearchParamEngine<any>,
+  Search extends SearchParamEngine<unknown>,
   Hash extends RouteHash
 > = {
-  children: React.ReactNode;
-  params?: PathParamCodec<Params>;
-  search?: Search;
+  /** Provider children. */
+  children: ReactNode;
+  /** Hash codec function. */
   hash?: (hash: Location) => Hash;
+  /** Path param codec. */
+  params?: PathParamCodec<Params>;
+  /** Search param engine. */
+  search?: Search;
 };
 
-export const AppRouteProvider = React.memo(function <
+export const AppRouteProvider = memo(function AppRouteProvider<
   const Path extends RoutePath,
   const Params extends PathParamBlueprintMap<Path>,
-  const Search extends SearchParamEngine<any>,
+  const Search extends SearchParamEngine<unknown>,
   const Hash extends RouteHash
 >({ children, params, search, hash }: AppRouteProviderProps<Path, Params, Search, Hash>) {
-  const location = useLocation() as Location<any>;
+  const location = useLocation() as Location<unknown>;
 
   const reset = useCallback(
     () => ({
@@ -78,6 +87,7 @@ AppRouteProvider.displayName = 'AppRouteProvider';
 //*****************************************************************************************
 
 export type AppRouteKeyStore = {
+  /** Route key for this route context. */
   routeKey: keyof AppRouterStore['routes'];
 };
 
@@ -91,16 +101,23 @@ export const { StoreProvider: AppRouteKeyStoreProvider, useStore: useAppRouteKey
 AppRouteKeyStoreProvider.displayName = 'AppRouteKeyStoreProvider';
 
 export type AppRouteKeyStoreProviderProps = {
-  children: React.ReactNode;
+  /** Provider children. */
+  children: ReactNode;
+  /** Route key to provide. */
   routeKey: keyof AppRouterStore['routes'];
 };
 
-export const AppRouteKeyProvider = React.memo(({ children, routeKey }: AppRouteKeyStoreProviderProps) => (
+export const AppRouteKeyProvider = memo(({ children, routeKey }: AppRouteKeyStoreProviderProps) => (
   <AppRouteKeyStoreProvider data={{ routeKey }}>{children}</AppRouteKeyStoreProvider>
 ));
 
 AppRouteKeyProvider.displayName = 'AppRouteKeyProvider';
 
+/**
+ * @name useAppRouteKey
+ * @description Returns the current route key from the nearest AppRouteKeyProvider.
+ * @returns The current route key or null
+ */
 export const useAppRouteKey = () => {
   const context = useAppRouteKeyStore(s => s.routeKey);
   return !context ? null : context;

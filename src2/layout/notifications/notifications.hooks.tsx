@@ -15,6 +15,11 @@ import {
 const EMPTY_NOTIFICATION_FEED_URLS: string[] = [];
 const EMPTY_SERVICES: MinimalService[] = [];
 
+/**
+ * @name useNotificationAutoRefresh
+ * @description Fetches and refreshes notification feeds automatically when the drawer opens.
+ * @returns void
+ */
 export const useNotificationAutoRefresh = () => {
   const open = useAppConfig(s => s?.layout?.notifications?.open ?? false);
   const isAdmin = useAppConfig(s => Boolean(s?.user?.is_admin));
@@ -89,6 +94,11 @@ export const useNotificationAutoRefresh = () => {
   }, [open, refreshNotifications]);
 };
 
+/**
+ * @name useNotificationClose
+ * @description Returns a callback that closes the notification drawer and marks items as read.
+ * @returns Callback to close notifications
+ */
 export const useNotificationClose = () => {
   const items = useAppConfig(s => s?.layout?.notifications?.items ?? []) as JSONFeedItem[];
   const setConfig = useAppSetConfig();

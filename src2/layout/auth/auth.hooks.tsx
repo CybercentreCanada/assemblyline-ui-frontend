@@ -1,19 +1,25 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { DEFAULT_APP_CONFIG } from 'app/app.configs';
 import type { ApiQueryKey, ApiResponse } from 'core/api';
 import { isApiData, stableStringify, useAppSetApiStore } from 'core/api';
 import { useAppConfig, useAppSetConfig, useSaveAppConfig } from 'core/config';
-import { useAppSnackbar } from 'core/snackbar/snackbar.hooks';
+import { useAppSnackbar } from 'core/snackbar';
+import type { WhoAmIProps } from 'models/api/user';
 import type { Configuration } from 'models/base/config';
-import type { WhoAmIProps } from 'models/ui/user';
 import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router';
 import { getXSRFCookie } from 'shared/utils/xsrf.utils';
 import type { LoginParamsProps } from './auth.models';
-import { useAppSetAuthStore } from './auth.providers';
+import { useAppAuthStore, useAppSetAuthStore } from './auth.providers';
 import { normalizeWhoAmI } from './auth.utils';
 
+const DEFAULT_RETRY_TIME = 10_000;
+
+/**
+ * @name useScoreToVerdict
+ * @description Returns a function that maps a numeric score to a verdict string.
+ * @returns Score-to-verdict mapping function
+ */
 export const useScoreToVerdict = () => {
   const verdicts = useAppConfig(s => s?.configuration?.submission?.verdicts);
 
@@ -29,6 +35,11 @@ export const useScoreToVerdict = () => {
   );
 };
 
+/**
+ * @name useIsAppReady
+ * @description Returns whether the app is ready (user is active and ToS accepted).
+ * @returns Boolean indicating readiness
+ */
 export const useIsAppReady = () => {
   const agrees_with_tos = useAppConfig(s => s?.user?.agrees_with_tos);
   const is_active = useAppConfig(s => s?.user?.is_active);
@@ -37,10 +48,15 @@ export const useIsAppReady = () => {
   return useMemo(() => is_active && (agrees_with_tos || !tos), [agrees_with_tos, is_active, tos]);
 };
 
+/**
+ * @name useIsAuthenticating
+ * @description Returns whether the user is currently in an OAuth/SAML flow.
+ * @returns Boolean indicating authentication in progress
+ */
 export const useIsAuthenticating = () => {
   const { pathname } = useLocation();
 
-  const disableWhoAmI = useAppConfig(s => s?.auth?.disableWhoAmI);
+  const disableWhoAmI = useAppAuthStore(s => s.disableWhoAmI);
 
   return useMemo(
     () => pathname.includes(`/oauth/`) || pathname.includes(`/saml/`) || disableWhoAmI,
@@ -48,6 +64,11 @@ export const useIsAuthenticating = () => {
   );
 };
 
+/**
+ * @name useAuthQuery
+ * @description Main auth hook that fetches whoami and sets up the auth store state.
+ * @returns TanStack Query result for the whoami endpoint
+ */
 export const useAuthQuery = () => {
   const queryClient = useQueryClient();
   const { t } = useTranslation(['api']);
@@ -134,7 +155,7 @@ export const useAuthQuery = () => {
 
         // Unauthorized response indicate that the user is not logged in.
         if (res.status === 401) {
-          if (retryAfter !== DEFAULT_APP_CONFIG.api.retryTime) closeSnackbar();
+          if (retryAfter !== DEFAULT_RETRY_TIME) closeSnackbar();
 
           setAuthStore(s => {
             s.login = {
@@ -168,7 +189,7 @@ export const useAuthQuery = () => {
 
         // Forbiden response indicate that the user's account is locked.
         if (res.status === 403) {
-          if (retryAfter !== DEFAULT_APP_CONFIG.api.retryTime) closeSnackbar();
+          if (retryAfter !== DEFAULT_RETRY_TIME) closeSnackbar();
           setAuthStore(s => {
             s.mode = 'locked';
             return s;
@@ -198,7 +219,7 @@ export const useAuthQuery = () => {
         }
 
         if (res.status === 200) {
-          if (retryAfter !== DEFAULT_APP_CONFIG.api.retryTime) closeSnackbar();
+          if (retryAfter !== DEFAULT_RETRY_TIME) closeSnackbar();
 
           const user = json.api_response as WhoAmIProps;
 

@@ -1,9 +1,9 @@
 import InfoOutlineIcon from '@mui/icons-material/InfoOutline';
-import React from 'react';
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IconButton } from 'ui/buttons/IconButton';
 
-export const AboutButton = React.memo(() => {
+export const AboutButton = memo(() => {
   const { t } = useTranslation();
 
   return (

@@ -1,8 +1,7 @@
 import { APP_ROUTES } from 'app/app.routes';
 import { useAppPreferenceStore } from 'core/preference';
 import type { AppRoute, AppRouteLocation, CreatedAppRouteParamsMap } from 'core/routes';
-import { useAppRouteKey } from 'core/routes';
-import { buildRouteLocation } from 'core/routes/routes.utils';
+import { buildRouteLocation, useAppRouteKey } from 'core/routes';
 import { useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router';
 import { useAppRouterStore, useAppSetRouterStore } from './router.providers';

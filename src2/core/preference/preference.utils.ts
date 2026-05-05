@@ -11,15 +11,15 @@ import type { z } from 'zod';
  * @param defaults - Default values to compare against
  * @returns Object containing only keys/values that differ from defaults
  */
-const deepDiff = (current: Record<string, any>, defaults: Record<string, any>): Record<string, any> => {
-  const diff: Record<string, any> = {};
+const deepDiff = (current: Record<string, unknown>, defaults: Record<string, unknown>): Record<string, unknown> => {
+  const diff: Record<string, unknown> = {};
 
   for (const key of Object.keys(current)) {
     const currentVal = current[key];
     const defaultVal = defaults[key];
 
     if (currentVal != null && typeof currentVal === 'object' && !Array.isArray(currentVal) && defaultVal != null) {
-      const nested = deepDiff(currentVal, defaultVal);
+      const nested = deepDiff(currentVal as Record<string, unknown>, defaultVal as Record<string, unknown>);
       if (Object.keys(nested).length > 0) diff[key] = nested;
     } else if (currentVal !== defaultVal) {
       diff[key] = currentVal;
@@ -38,12 +38,12 @@ const deepDiff = (current: Record<string, any>, defaults: Record<string, any>): 
  * @returns void
  */
 export const savePreferenceToLocalStorage = (
-  schema: z.ZodObject<any>,
+  schema: z.ZodObject<z.ZodRawShape>,
   preference: AppPreference,
   key: string
 ): void => {
-  const defaults = schema.parse({});
-  const diff = deepDiff(preference, defaults);
+  const defaults = schema.parse({}) as Record<string, unknown>;
+  const diff = deepDiff(preference as unknown as Record<string, unknown>, defaults);
 
   if (Object.keys(diff).length === 0) localStorage.removeItem(key);
   else localStorage.setItem(key, JSON.stringify(diff));
@@ -56,13 +56,16 @@ export const savePreferenceToLocalStorage = (
  * @param key - localStorage key
  * @returns Partial preference containing only stored overrides
  */
-export const loadPreferenceFromLocalStorage = (schema: z.ZodObject<any>, key: string): Partial<AppPreference> => {
+export const loadPreferenceFromLocalStorage = (
+  schema: z.ZodObject<z.ZodRawShape>,
+  key: string
+): Partial<AppPreference> => {
   try {
     const raw = localStorage.getItem(key);
-    const stored = JSON.parse(raw);
-    const result = schema.parse({ ...stored });
-    return result;
+    const stored = JSON.parse(raw) as unknown;
+    const result = schema.parse({ ...(stored as Record<string, unknown>) });
+    return result as Partial<AppPreference>;
   } catch {
-    return schema.parse({});
+    return schema.parse({}) as Partial<AppPreference>;
   }
 };

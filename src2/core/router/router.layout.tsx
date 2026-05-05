@@ -1,18 +1,20 @@
-import { findNode, useAppRouterStore } from 'core/router';
-import { AppRouteKeyProvider, createAppRoute } from 'core/routes';
+import { AppRouteKeyProvider, AppRoutes, createAppRoute } from 'core/routes';
 import { InPortal, OutPortal } from 'features/portal';
-import { AppRoutes } from 'layout/routes';
-import React, { PropsWithChildren } from 'react';
+import type { PropsWithChildren } from 'react';
+import { memo } from 'react';
 import { useShallow } from 'zustand/react/shallow';
+import { useAppRouterStore } from './router.providers';
+import { findNode } from './router.utils';
 
 //*****************************************************************************************
 // App Router Panel
 //*****************************************************************************************
 export type AppRouterPanelProps = {
+  /** Panel index within the router panels array. */
   panelKey: number;
 };
 
-export const AppRouterPanel = React.memo(({ panelKey }: AppRouterPanelProps) => {
+export const AppRouterPanel = memo(({ panelKey }: AppRouterPanelProps) => {
   const panel = useAppRouterStore(s => s.panels?.[panelKey]);
   const node = useAppRouterStore(s => findNode(s, { routeKey: panel?.routeKey }));
 
@@ -26,17 +28,17 @@ AppRouterPanel.displayName = 'AppRouterPanel';
 //*****************************************************************************************
 
 export type AppRouterNodeProps = {
+  /** Key identifying this node in the router store. */
   nodeKey: string;
+  /** Routes definition array. */
   routes: readonly ReturnType<typeof createAppRoute>[];
 };
 
-export const AppRouterNode = React.memo(({ nodeKey, routes }: AppRouterNodeProps) => {
+export const AppRouterNode = memo(({ nodeKey, routes }: AppRouterNodeProps) => {
   const node = useAppRouterStore(store => store.nodes[nodeKey]);
   const route = useAppRouterStore(store => (node?.routeKey ? store.routes[node.routeKey] : null));
 
-  if (!node || !route) return null;
-
-  return (
+  return !node || !route ? null : (
     <InPortal node={node.portal}>
       <AppRouteKeyProvider routeKey={node.routeKey}>
         <AppRoutes href={route.href} state={route.state} />
@@ -52,10 +54,11 @@ AppRouterNode.displayName = 'AppRouterNode';
 //*****************************************************************************************
 
 export type AppRouterLayoutProps = PropsWithChildren & {
+  /** Routes definition array. */
   routes: readonly ReturnType<typeof createAppRoute>[];
 };
 
-export const AppRouterLayout = React.memo(({ children, routes }: AppRouterLayoutProps) => {
+export const AppRouterLayout = memo(({ children, routes }: AppRouterLayoutProps) => {
   const nodeKeys = useAppRouterStore(useShallow(s => Object.keys(s.nodes)));
 
   return (

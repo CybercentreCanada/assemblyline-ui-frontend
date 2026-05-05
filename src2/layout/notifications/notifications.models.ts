@@ -1,4 +1,4 @@
-import type { SystemMessage } from 'models/ui/user';
+import type { SystemMessage } from 'models/api/user';
 
 /**
  * JSON Feed Version 1.1

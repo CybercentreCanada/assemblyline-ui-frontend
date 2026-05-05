@@ -1,3 +1,4 @@
+/* @deprecated - commented out due to missing dependencies
 import { useAppRouterOnClick, useAppRouterTo } from 'core/router';
 import type { AppRoute } from 'core/routes';
 import React, { forwardRef, memo } from 'react';
@@ -24,3 +25,4 @@ export const LinkButton = memo(forwardRef(WrappedLinkButton)) as <const Path ext
 
 WrappedLinkButton.displayName = 'WrappedAppLink';
 (Link as React.FC<LinkProps>).displayName = 'AppLink';
+*/

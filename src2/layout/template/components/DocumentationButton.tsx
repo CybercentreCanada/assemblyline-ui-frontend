@@ -1,10 +1,10 @@
 import MenuBookOutlinedIcon from '@mui/icons-material/MenuBookOutlined';
 import { useAppConfig } from 'core/config';
-import React from 'react';
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IconButton } from 'ui/buttons/IconButton';
 
-export const DocumentationButton = React.memo(() => {
+export const DocumentationButton = memo(() => {
   const { t } = useTranslation();
 
   const documentation = useAppConfig(s => s?.configuration?.system?.support?.documentation);

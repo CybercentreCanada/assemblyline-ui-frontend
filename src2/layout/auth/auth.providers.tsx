@@ -13,27 +13,35 @@ import { ToSPage } from './terms-of-service/terms-of-service.route';
 // App Auth Store
 //*****************************************************************************************
 export type AppAuthStore = {
+  /** Whether to skip the whoami call. */
   disableWhoAmI: boolean;
-  mode: 'login' | 'loading' | 'locked' | 'quota' | 'tos' | 'app' | 'logout';
-  redirectTo: string;
+  /** Login provider configuration. */
   login: {
+    /** Whether SAML-based login is allowed. */
     allow_saml_login: boolean;
+    /** Whether user signup is allowed. */
     allow_signup: boolean;
+    /** Whether user/pass login is allowed. */
     allow_userpass_login: boolean;
+    /** List of OAuth provider identifiers. */
     oauth_providers: string[];
   };
+  /** Current authentication mode/page. */
+  mode: 'app' | 'loading' | 'locked' | 'login' | 'logout' | 'quota' | 'tos';
+  /** Post-login redirect path. */
+  redirectTo: string;
 };
 
 export const DEFAULT_APP_AUTH_STORE: AppAuthStore = {
   disableWhoAmI: false,
-  mode: 'loading',
-  redirectTo: null,
   login: {
     allow_saml_login: false,
     allow_signup: false,
     allow_userpass_login: false,
     oauth_providers: []
-  }
+  },
+  mode: 'loading',
+  redirectTo: null
 };
 
 export const {
@@ -74,16 +82,3 @@ export const AppAuthLayout = memo(({ children }: PropsWithChildren) => {
 });
 
 AppAuthLayout.displayName = 'AppAuthLayout';
-
-//*****************************************************************************************
-// App Auth
-//*****************************************************************************************
-
-export const AppAuth = memo(({ children }: PropsWithChildren) => {
-  const preference = useAppAuthStore(s => s);
-  const setAuth = useAppSetAuthStore();
-
-  return children;
-});
-
-AppAuth.displayName = 'AppAuth';

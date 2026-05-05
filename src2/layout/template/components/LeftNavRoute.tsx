@@ -1,16 +1,10 @@
-import {
-  ListItem,
-  ListItemButton,
-  ListItemIcon,
-  ListItemIconProps,
-  ListItemText,
-  ListItemTextProps,
-  useTheme
-} from '@mui/material';
-import { LeftNavChildRenderProps } from '@tui/core';
+import type { ListItemIconProps, ListItemTextProps } from '@mui/material';
+import { ListItem, ListItemButton, ListItemIcon, ListItemText, useTheme } from '@mui/material';
+import type { LeftNavChildRenderProps } from '@tui/core';
 import { AppLink } from 'core/router';
-import { AppRoute, CreatedAppRouteParamsMap } from 'core/routes';
-import React, { memo, useMemo } from 'react';
+import type { AppRoute, CreatedAppRouteParamsMap } from 'core/routes';
+import type { JSX } from 'react';
+import { memo, useMemo } from 'react';
 
 export type LeftNavLinkProps<Route extends AppRoute> = {
   icon?: ListItemIconProps['children'];
@@ -49,7 +43,7 @@ function WrappedLeftNavRoute<const Route extends AppRoute>({
 
 export const LeftNavRoute = memo(WrappedLeftNavRoute) as <const Route extends AppRoute>(
   props: LeftNavLinkProps<Route>
-) => React.JSX.Element | null;
+) => JSX.Element | null;
 
 WrappedLeftNavRoute.displayName = 'WrappedLeftNavRoute';
-(LeftNavRoute as any).displayName = 'LeftNavRoute';
+(LeftNavRoute as unknown as { displayName: string }).displayName = 'LeftNavRoute';

@@ -1,19 +1,35 @@
-import { AppConfig, AppSettings, AppSettingsSchema } from 'app/app.configs';
+import type { AppSettings } from 'app/app.configs';
+import { AppSettingsSchema } from 'app/app.configs';
 
-export const saveSettingsFromLocalStorage = (key: string, store: AppConfig) => {
+//*****************************************************************************************
+// LocalStorage Persistence
+//*****************************************************************************************
+
+/**
+ * @name saveSettingsFromLocalStorage
+ * @description Validates and persists the current config to localStorage.
+ * @param key - localStorage key
+ * @param store - Current config state to persist
+ * @returns void
+ */
+export const saveSettingsFromLocalStorage = (key: string, store: unknown): void => {
   const parsed = AppSettingsSchema.parse(store);
   if (parsed == null) localStorage.removeItem(key);
   else localStorage.setItem(key, JSON.stringify(parsed));
-  // else localStorage.setItem(key, LZString.compressToUTF16(JSON.stringify(parsed)));
 };
 
+/**
+ * @name loadSettingsFromLocalStorage
+ * @description Reads and validates stored config from localStorage.
+ * @param key - localStorage key
+ * @returns Validated settings or empty object on failure
+ */
 export const loadSettingsFromLocalStorage = (key: string): AppSettings => {
   const compressed = localStorage.getItem(key);
   if (!compressed) return {} as AppSettings;
-  // const json = LZString.decompressFromUTF16(compressed);
   const json = compressed;
   if (!json) return {} as AppSettings;
-  const parsed = JSON.parse(json);
+  const parsed = JSON.parse(json) as unknown;
   const settings = AppSettingsSchema.parse(parsed);
   if (settings == null) return {} as AppSettings;
   return settings;

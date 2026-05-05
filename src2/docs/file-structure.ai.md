@@ -19,7 +19,7 @@
 |-------------|-----------|---------|
 | `.components` | `.tsx` | UI components (memo, displayName, props) |
 | `.models` | `.ts` | Type declarations, `DEFAULT_*` constants, const arrays |
-| `.hooks` | `.ts` | Shared hooks (reused in 3+ components) |
+| `.hooks` | `.tsx` | Shared hooks (reused in 3+ components) |
 | `.utils` | `.ts` | Pure utility functions |
 | `.utils.test` | `.ts` | Unit tests for utils |
 | `.store` | `.ts` | Zustand store (`createAppStore`) |
@@ -50,7 +50,7 @@
 <module>/
 ├── <module>.components.tsx
 ├── <module>.models.ts
-├── <module>.hooks.ts
+├── <module>.hooks.tsx
 ├── <module>.utils.ts
 ├── <module>.utils.test.ts
 ├── <module>.store.ts

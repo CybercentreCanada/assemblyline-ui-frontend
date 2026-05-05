@@ -1,9 +1,14 @@
 import { useAppSwitcher } from '@tui/apps';
-import { AppProvider, useAppLayout, useAppUser } from '@tui/core';
-import React, { PropsWithChildren, useEffect } from 'react';
+import { AppProvider, AppRoot, useAppLayout, useAppUser } from '@tui/core';
+import { useAppPreferenceStore } from 'core/preference';
+import { useAppThemeStore } from 'core/theme';
+import type { i18n } from 'i18next';
+import type { PropsWithChildren } from 'react';
+import { memo, useEffect, useMemo } from 'react';
 import { useAppTemplatePreferences } from './hooks/useAppTemplatePreferences';
 import { useAppTemplateRouter } from './hooks/useAppTemplateRouter';
 import { useAppTemplateUser } from './hooks/useAppTemplateUser';
+import { useAppLayoutThemeMode } from './layout.hooks';
 
 // const cookies: {
 //   theme: string;
@@ -34,7 +39,7 @@ export const Inner = ({ children }: PropsWithChildren) => {
   return children;
 };
 
-export const AppTemplateLayout = React.memo(({ children }: PropsWithChildren) => {
+export const AppTemplateLayout = memo(({ children }: PropsWithChildren) => {
   // const cookies = parseTuiClientCookies();
 
   // const myPreferences: AppPreferenceConfigs = useMyPreferences();
@@ -68,3 +73,46 @@ export const AppTemplateLayout = React.memo(({ children }: PropsWithChildren) =>
     </AppProvider>
   );
 });
+
+AppTemplateLayout.displayName = 'AppTemplateLayout';
+
+export type AppLayoutProviderProps = PropsWithChildren & {
+  i18n: i18n;
+};
+
+export const AppLayoutProvider = memo(({ children, i18n }: AppLayoutProviderProps) => {
+  const autoHideAppbar = useAppPreferenceStore(s => s.layout.autoHideAppbar);
+  const density = useAppPreferenceStore(s => s.layout.density);
+  const drawerOpen = useAppPreferenceStore(s => s.layout.drawerOpen);
+  const lang = useAppPreferenceStore(s => s.layout.lang);
+  const layout = useAppPreferenceStore(s => s.layout.layout);
+  const showBreadcrumbs = useAppPreferenceStore(s => s.layout.showBreadcrumbs);
+  const showQuickSearch = useAppPreferenceStore(s => s.layout.showQuickSearch);
+  const themeID = useAppPreferenceStore(s => s.layout.theme);
+
+  const mode = useAppLayoutThemeMode();
+  const skin = useAppThemeStore(s => s.skin);
+  const themes = useMemo(() => (skin ? [skin] : []), [skin]);
+
+  return (
+    <AppRoot
+      cookies={{
+        autoHideAppbar,
+        density,
+        drawerOpen,
+        lang,
+        layout,
+        mode,
+        showBreadcrumbs,
+        showQuickSearch,
+        theme: themeID
+      }}
+      i18n={i18n}
+      themes={themes}
+    >
+      {children}
+    </AppRoot>
+  );
+});
+
+AppLayoutProvider.displayName = 'AppLayoutProvider';

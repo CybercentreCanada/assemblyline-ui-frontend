@@ -1,4 +1,4 @@
-import { WhoAmI } from 'models/ui/user';
+import { WhoAmI } from 'models/api/user';
 
 /**
  * @name flatten

@@ -50,12 +50,16 @@ export type Record = {
   label: string;
   /** Numeric score value. */
   score?: number;
+  /** Callback invoked when the record is deleted. */
+  onDelete?: () => void;
+  /** Callback invoked when the record is saved. */
+  onSave?: (data: unknown) => void;
 };
 ```
 
 **Rules:**
 
-- Fields are always sorted alphabetically
+- Fields are always sorted alphabetically, with function-typed fields grouped at the bottom (also sorted alphabetically among themselves)
 - Each type has a JSDoc comment explaining its purpose
 - Each field has a JSDoc comment explaining what it represents
 - Optional fields use `?` — never `| undefined`

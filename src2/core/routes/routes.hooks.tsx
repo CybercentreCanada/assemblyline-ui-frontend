@@ -1,6 +1,6 @@
-import { useAppRouteStore } from 'core/routes';
-import { SearchParamBlueprintMap, SearchParamEngine, SearchParamSnapshot } from 'features/search-params';
-import { AppRoute } from './routes.models';
+import type { SearchParamBlueprintMap, SearchParamEngine, SearchParamSnapshot } from 'features/search-params';
+import type { AppRoute } from './routes.models';
+import { useAppRouteStore } from './routes.providers';
 
 type RouteByPath<Path extends AppRoute['path']> = Extract<AppRoute, { path: Path }>;
 
@@ -88,11 +88,11 @@ export function useAppHashParams<const Path extends AppRoute['path'], const Sele
 // useAppRoute
 //*****************************************************************************************
 
-export type AppRouteStore<Path extends AppRoute['path']> = ParamsShape<Path> & SearchShape<Path> & HashShape<Path>;
+type AppRouteShape<Path extends AppRoute['path']> = ParamsShape<Path> & SearchShape<Path> & HashShape<Path>;
 
 export function useAppRoute<const Path extends AppRoute['path'], const SelectorOutput>(
   path: Path,
-  selector: (store: AppRouteStore<Path>) => SelectorOutput
+  selector: (store: AppRouteShape<Path>) => SelectorOutput
 ) {
   const context = useAppRouteStore<SelectorOutput>(selector as any);
   if (!context) return null;

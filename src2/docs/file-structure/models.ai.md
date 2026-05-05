@@ -6,7 +6,7 @@
 - Use `import type { X }` — never `import { type X }`
 - Every field must have a JSDoc comment
 - Every type must have a JSDoc comment explaining its purpose
-- Fields must be sorted alphabetically
+- Fields must be sorted alphabetically, with function-typed fields grouped at the bottom (also sorted alphabetically among themselves)
 - Every shared model type must have a `DEFAULT_<MODEL>` constant
 - Optional fields must use `?` — never `| undefined`
 - Types must live in `*.models.ts` files — not in component files
@@ -59,6 +59,10 @@ export type Record = {
   label: string;
   /** Numeric score value. */
   score?: number;
+  /** Callback invoked when the record is deleted. */
+  onDelete?: () => void;
+  /** Callback invoked when the record is saved. */
+  onSave?: (data: unknown) => void;
 };
 ```
 

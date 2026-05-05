@@ -4,8 +4,8 @@ import type { PropsWithChildren } from 'react';
 import { memo, useEffect } from 'react';
 import type { Location } from 'react-router';
 import { BrowserRouter, useLocation } from 'react-router';
-import { DEFAULT_APP_ROUTER_STORE } from './router.defaults';
 import type { AppRouterState, AppRouterStore } from './router.models';
+import { DEFAULT_APP_ROUTER_STORE } from './router.models';
 import { locationToStore } from './router.utils';
 
 //*****************************************************************************************
@@ -23,7 +23,7 @@ AppRouterStoreProvider.displayName = 'AppRouterStoreProvider';
 // App Router Store Sync
 //*****************************************************************************************
 export const AppRouterProvider = memo(({ children }: PropsWithChildren) => {
-  const location: Location<AppRouterState> = useLocation();
+  const location: Location<AppRouterState> = useLocation() as Location<AppRouterState>;
 
   const maxPanels = useAppPreferenceStore(s => s.router.maxPanels);
   const maxNodes = useAppPreferenceStore(s => s.router.maxNodes);

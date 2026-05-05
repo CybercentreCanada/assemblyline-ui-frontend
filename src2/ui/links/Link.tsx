@@ -1,3 +1,4 @@
+/* @deprecated - commented out due to missing dependencies
 import type { AppRoute } from 'core/routes';
 import React, { forwardRef, memo } from 'react';
 import type { LinkProps as RouterLinkProps } from 'react-router';
@@ -31,3 +32,4 @@ export const Link = memo(forwardRef(WrappedLink)) as <const Path extends AppRout
 
 WrappedLink.displayName = 'WrappedLink';
 (Link as React.FC<LinkProps>).displayName = 'Link';
+*/

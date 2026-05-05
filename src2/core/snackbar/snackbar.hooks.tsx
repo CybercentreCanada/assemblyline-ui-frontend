@@ -7,6 +7,11 @@ import type { AppSnackbarShowMessage, AppSnackbarVariant } from './snackbar.mode
 // useAppSnackbar
 //*****************************************************************************************
 
+/**
+ * @name useAppSnackbar
+ * @description Provides variant-specific show methods and closeSnackbar.
+ * @returns Object with showErrorMessage, showInfoMessage, showSuccessMessage, showWarningMessage, closeSnackbar
+ */
 export const useAppSnackbar = () => {
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
 

@@ -1,12 +1,26 @@
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import DoubleArrowOutlinedIcon from '@mui/icons-material/DoubleArrowOutlined';
 import { Drawer, styled, useMediaQuery, useTheme } from '@mui/material';
-import { useAppConfig, useAppSetConfig } from 'core/config';
-import { CSSProperties, memo, PropsWithChildren, useCallback, useMemo } from 'react';
+import type { CSSProperties, PropsWithChildren } from 'react';
+import { memo, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IconButton } from 'ui/buttons/IconButton';
-import { APP_DRAWER_WIDTHS } from './drawer.config';
 import { useAppDrawerClose, useIsDrawerOpen } from './drawer.hooks';
+import { useAppDrawerStore, useAppSetDrawerStore } from './drawer.providers';
+
+const APP_DRAWER_WIDTHS: {
+  xl: CSSProperties['width'];
+  lg: CSSProperties['width'];
+  md: CSSProperties['width'];
+  sm: CSSProperties['width'];
+  maximized: CSSProperties['width'];
+} = {
+  xl: '45vw',
+  lg: '75%',
+  md: '85%',
+  sm: '100%',
+  maximized: '90vw'
+};
 
 export const AppDrawerMain = memo(
   styled('div')(() => ({
@@ -69,14 +83,16 @@ export const AppDrawerCloseButton = memo(() => {
   );
 });
 
+AppDrawerCloseButton.displayName = 'AppDrawerCloseButton';
+
 export const AppDrawerMaximizeButton = memo(() => {
   const { t } = useTranslation(['drawer']);
   const theme = useTheme();
   const isXL = useMediaQuery(theme.breakpoints.only('xl'));
 
-  const isMaximized = useAppConfig(s => s.layout.drawer.maximized);
+  const isMaximized = useAppDrawerStore(s => s.maximized);
 
-  const setConfig = useAppSetConfig();
+  const setDrawerConfig = useAppSetDrawerStore();
 
   const transition = useMemo<CSSProperties['transition']>(
     () =>
@@ -88,11 +104,11 @@ export const AppDrawerMaximizeButton = memo(() => {
   );
 
   const handleMaximize = useCallback(() => {
-    setConfig(s => {
-      s.layout.drawer.maximized = !s.layout.drawer.maximized;
+    setDrawerConfig(s => {
+      s.maximized = !s.maximized;
       return s;
     });
-  }, [setConfig]);
+  }, [setDrawerConfig]);
 
   if (!isXL) return null;
 
@@ -111,11 +127,13 @@ export const AppDrawerMaximizeButton = memo(() => {
   );
 });
 
+AppDrawerMaximizeButton.displayName = 'AppDrawerMaximizeButton';
+
 export const AppDrawerContainer = memo(({ children }: PropsWithChildren) => {
   const theme = useTheme();
 
   const open = useIsDrawerOpen();
-  const isMaximized = useAppConfig(s => s.layout.drawer.maximized);
+  const isMaximized = useAppDrawerStore(s => s.maximized);
   const handleClose = useAppDrawerClose();
 
   const isMD = useMediaQuery(theme.breakpoints.only('md'));
@@ -190,3 +208,5 @@ export const AppDrawerContainer = memo(({ children }: PropsWithChildren) => {
     </Drawer>
   );
 });
+
+AppDrawerContainer.displayName = 'AppDrawerContainer';

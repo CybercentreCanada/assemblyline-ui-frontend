@@ -5,11 +5,11 @@ import {
   createPathParamsCodec
 } from 'features/path-params';
 import { SEARCH_PARAM_BLUEPRINTS_MAP, SearchParamBlueprintMap, SearchParamEngine } from 'features/search-params';
-import { ComponentType, MemoExoticComponent, ReactNode } from 'react';
+import type { ComponentType, MemoExoticComponent, ReactNode } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
 import { toElement } from 'shared/utils/app.utils';
 import { DisabledBoundary, ForbiddenBoundary } from './routes.components';
-import { RouteHash, RouteMeta } from './routes.models';
+import type { RouteHash, RouteMeta } from './routes.models';
 import { AppRouteProvider } from './routes.providers';
 
 //*****************************************************************************************
@@ -31,14 +31,14 @@ export type CreateAppRouteProps<
 
   disabled?: boolean | (() => boolean);
   forbidden?: boolean | (() => boolean);
-  loading?: boolean | ((args: any) => boolean);
+  loading?: boolean | ((args: unknown) => boolean);
 
-  component: ReactNode | MemoExoticComponent<ComponentType<any>>;
-  disabledComponent?: ReactNode | MemoExoticComponent<ComponentType<any>>;
-  errorComponent?: ReactNode | MemoExoticComponent<ComponentType<any>>;
-  forbiddenComponent?: ReactNode | MemoExoticComponent<ComponentType<any>>;
-  pendingComponent?: ReactNode | MemoExoticComponent<ComponentType<any>>;
-  quotaExceededComponent?: ReactNode | MemoExoticComponent<ComponentType<any>>;
+  component: ReactNode | MemoExoticComponent<ComponentType<unknown>>;
+  disabledComponent?: ReactNode | MemoExoticComponent<ComponentType<unknown>>;
+  errorComponent?: ReactNode | MemoExoticComponent<ComponentType<unknown>>;
+  forbiddenComponent?: ReactNode | MemoExoticComponent<ComponentType<unknown>>;
+  pendingComponent?: ReactNode | MemoExoticComponent<ComponentType<unknown>>;
+  quotaExceededComponent?: ReactNode | MemoExoticComponent<ComponentType<unknown>>;
 
   meta?: RouteMeta;
 };
@@ -70,7 +70,7 @@ export const createAppRoute = <
     ? undefined
     : new SearchParamEngine(search(SEARCH_PARAM_BLUEPRINTS_MAP)).setDefaultValues(null);
 
-  const hashCodec = hash ?? (h => h);
+  const hashCodec = hash ?? ((h: unknown) => h as Hash);
 
   return {
     path,

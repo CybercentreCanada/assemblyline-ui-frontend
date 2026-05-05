@@ -3,8 +3,8 @@ import type { File } from 'models/base/file';
 import type { PromoteTo } from 'models/base/result';
 import type { SectionBody } from 'models/base/result_body';
 import type { Submission } from 'models/base/submission';
-import type { Tags } from 'models/ui/file';
-import type { SubmissionSummary } from 'models/ui/submission';
+import type { Tags } from 'models/api/file';
+import type { SubmissionSummary } from 'models/api/submission';
 
 /** */
 export type TPromotedSection = SectionBody & {

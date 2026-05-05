@@ -12,8 +12,11 @@ import { mergeThemeConfigs } from './theme.utils';
 //*****************************************************************************************
 
 export type AppThemeStore = {
+  /** Whether the theme has been loaded from the server. */
   initialized?: boolean;
+  /** Whether to inject MUI styles first (for CSS override ordering). */
   injectFirst?: boolean;
+  /** The active theme skin configuration. */
   skin?: AppTheme;
 };
 
@@ -57,7 +60,7 @@ export const AppThemeProvider = memo(({ children }: PropsWithChildren) => {
 
   useEffect(() => {
     fetch('/theme.json')
-      .then(response => response.json())
+      .then(response => response.json() as Promise<unknown>)
       .then(data =>
         setTheme(s => {
           s.initialized = true;

@@ -33,15 +33,15 @@ import {
   useAppTheme
 } from '@tui/core';
 import { useAppConfig, useAppSetConfig } from 'core/config';
-import React, { useCallback, useMemo, useRef } from 'react';
+import { forwardRef, memo, useCallback, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IconButton } from 'ui/buttons/IconButton';
 
 //*****************************************************************************************
 // UserAvatar
 //*****************************************************************************************
-const UserAvatar = React.memo(
-  React.forwardRef<HTMLButtonElement, {}>((props, ref) => {
+const UserAvatar = memo(
+  forwardRef<HTMLButtonElement, {}>((props, ref) => {
     const { t } = useTranslation();
     const theme = useTheme();
 
@@ -86,6 +86,8 @@ const UserAvatar = React.memo(
   })
 );
 
+UserAvatar.displayName = 'UserAvatar';
+
 //*****************************************************************************************
 // AP Quota
 //*****************************************************************************************
@@ -101,7 +103,7 @@ type QuotaBarProps = {
   total: number;
 };
 
-const QuotaBar = React.memo(({ label, remaining, total }: QuotaBarProps) => {
+const QuotaBar = memo(({ label, remaining, total }: QuotaBarProps) => {
   const usedPercent = useMemo<number>(() => (total > 0 ? ((total - remaining) / total) * 100 : 0), [remaining, total]);
 
   const getProgressColor = (percent: number): 'success' | 'warning' | 'error' => {
@@ -130,7 +132,9 @@ const QuotaBar = React.memo(({ label, remaining, total }: QuotaBarProps) => {
   );
 });
 
-export const UserQuota = React.memo(() => {
+QuotaBar.displayName = 'QuotaBar';
+
+export const UserQuota = memo(() => {
   const { t } = useTranslation();
 
   const enforceQuota = useAppConfig(s => s.configuration.ui.enforce_quota);
@@ -158,10 +162,12 @@ export const UserQuota = React.memo(() => {
   );
 });
 
+UserQuota.displayName = 'UserQuota';
+
 //*****************************************************************************************
 // User Language
 //*****************************************************************************************
-export const UserLanguage = React.memo(() => {
+export const UserLanguage = memo(() => {
   const { t } = useTranslation();
 
   const { isFR, toggle: toggleLanguage } = useAppLanguage();
@@ -185,10 +191,12 @@ export const UserLanguage = React.memo(() => {
   );
 });
 
+UserLanguage.displayName = 'UserLanguage';
+
 //*****************************************************************************************
 // User Personalization
 //*****************************************************************************************
-export const UserPersonalization = React.memo(() => {
+export const UserPersonalization = memo(() => {
   const { t } = useTranslation();
   const theme = useTheme();
 
@@ -307,10 +315,12 @@ export const UserPersonalization = React.memo(() => {
   );
 });
 
+UserPersonalization.displayName = 'UserPersonalization';
+
 //*****************************************************************************************
 // User Theme
 //*****************************************************************************************
-export const UserTheme = React.memo(() => {
+export const UserTheme = memo(() => {
   const { t } = useTranslation();
 
   const { mode, toggleMode: toggleThemeMode } = useAppTheme();
@@ -365,10 +375,12 @@ export const UserTheme = React.memo(() => {
   );
 });
 
+UserTheme.displayName = 'UserTheme';
+
 //*****************************************************************************************
 // User Menu
 //*****************************************************************************************
-const UserMenuHeader = React.memo(() => {
+const UserMenuHeader = memo(() => {
   const { t } = useTranslation();
   const theme = useTheme();
 
@@ -461,7 +473,9 @@ const UserMenuHeader = React.memo(() => {
   );
 });
 
-export const UserMenu = React.memo(() => {
+UserMenuHeader.displayName = 'UserMenuHeader';
+
+export const UserMenu = memo(() => {
   const theme = useTheme();
 
   return (
@@ -483,10 +497,12 @@ export const UserMenu = React.memo(() => {
   );
 });
 
+UserMenu.displayName = 'UserMenu';
+
 //*****************************************************************************************
 // UserProfile
 //*****************************************************************************************
-export const UserProfile = React.memo(() => {
+export const UserProfile = memo(() => {
   const theme = useTheme();
 
   const open = useAppConfig(s => s?.layout?.usermenu?.open);
@@ -523,3 +539,5 @@ export const UserProfile = React.memo(() => {
     </>
   );
 });
+
+UserProfile.displayName = 'UserProfile';

@@ -1,3 +1,4 @@
+/* @deprecated - commented out due to missing dependencies
 import { AppLink, AppLinkProps, useAppRouteLocation } from 'core/router';
 import type { AppRoute } from 'core/routes';
 import React, { forwardRef, memo } from 'react';
@@ -33,3 +34,4 @@ export const LinkIconButton = memo(forwardRef(WrappedLinkIconButton)) as <const 
 
 WrappedLinkIconButton.displayName = 'WrappedLinkIconButton';
 (LinkIconButton as React.FC<LinkIconButtonProps>).displayName = 'AppLiLinkIconButtonnk';
+*/

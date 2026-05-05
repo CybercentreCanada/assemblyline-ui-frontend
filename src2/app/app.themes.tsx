@@ -1,3 +1,7 @@
+// @deprecated - This file is no longer used. Theme definitions now live in the @tui/core package.
+// All code below is commented out as core/theme/theme.models has been removed.
+
+/*
 import type { AppTheme, AppThemes } from 'core/theme/theme.models';
 
 //*****************************************************************************************
@@ -178,3 +182,4 @@ export const DEFAULT_THEME: AppTheme = {
 export const APP_THEMES: AppThemes = {
   default: DEFAULT_THEME
 } as const;
+*/

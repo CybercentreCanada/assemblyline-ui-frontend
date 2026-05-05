@@ -1,3 +1,7 @@
+// @deprecated - This file is no longer used. See core.preference.tsx and app.configs.tsx instead.
+// All code below is commented out as the referenced modules have been removed.
+
+/*
 import { AppApiConfig, AppApiSettingsSchema } from 'core/api/api.config';
 import { AppLayoutConfig, AppLayoutSettingsSchema } from 'core/layout/layout.config';
 import { AppRouterConfig, AppRouterSettingsSchema } from 'core/router/router.config';
@@ -8,7 +12,7 @@ import { AppAuthConfig, AppAuthSettingsSchema } from 'layout/auth/auth.config';
 import { APP_LAYOUT_NOTIFICATIONS_CONFIG } from 'layout/notifications/notifications.config';
 import type { Configuration } from 'models/base/config';
 import type { UserSettings } from 'models/base/user_settings';
-import type { CustomUser, Indexes, SystemMessage } from 'models/ui/user';
+import type { CustomUser, Indexes, SystemMessage } from 'models/api/user';
 import { z } from 'zod';
 
 // export type AppAPIConfig = {
@@ -299,3 +303,4 @@ export const DEFAULT_APP_CONFIG: AppConfig = {
   // },
   // user: undefined
 };
+*/

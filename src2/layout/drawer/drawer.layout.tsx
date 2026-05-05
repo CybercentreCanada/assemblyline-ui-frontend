@@ -1,4 +1,5 @@
-import React, { PropsWithChildren } from 'react';
+import type { PropsWithChildren, ReactNode } from 'react';
+import { memo } from 'react';
 import {
   AppDrawerActions,
   AppDrawerCloseButton,
@@ -10,10 +11,10 @@ import {
 } from './drawer.components';
 
 export type AppDrawerLayoutProps = PropsWithChildren & {
-  content?: React.ReactNode;
+  content?: ReactNode;
 };
 
-export const AppDrawerLayout = React.memo(({ children, content }: AppDrawerLayoutProps) => (
+export const AppDrawerLayout = memo(({ children, content }: AppDrawerLayoutProps) => (
   <AppDrawerMain>
     <AppDrawerContent>{children}</AppDrawerContent>
     <AppDrawerContainer>
@@ -25,3 +26,5 @@ export const AppDrawerLayout = React.memo(({ children, content }: AppDrawerLayou
     </AppDrawerContainer>
   </AppDrawerMain>
 ));
+
+AppDrawerLayout.displayName = 'AppDrawerLayout';

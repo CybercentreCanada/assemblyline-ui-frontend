@@ -111,7 +111,11 @@ export const App2 = () => (
 
 export const AppLayout = memo(() => (
   <AppAuthLayout>
-    <>{'Test'}</>
+    <AppRouterLayout routes={APP_ROUTES}>
+      <AppDrawerLayout content={<AppRouterPanel panelKey={1} />}>
+        <>{'Test'}</>
+      </AppDrawerLayout>
+    </AppRouterLayout>
   </AppAuthLayout>
 ));
 

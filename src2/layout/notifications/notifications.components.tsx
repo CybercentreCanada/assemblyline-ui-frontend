@@ -36,15 +36,17 @@ import { useApiMutation } from 'core/api';
 import { useAppConfig, useAppSetConfig } from 'core/config';
 import { useAppSnackbar } from 'core/snackbar';
 import DOMPurify from 'dompurify';
-import type { SystemMessage } from 'models/ui/user';
-import { type ChangeEvent, memo, type ReactNode, useCallback, useMemo } from 'react';
+import type { SystemMessage } from 'models/api/user';
+import type { ChangeEvent, ReactNode } from 'react';
+import { memo, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import Markdown from 'react-markdown';
 import { Button } from 'ui/buttons/Button';
 import { IconButton } from 'ui/buttons/IconButton';
 import { CustomChip } from 'ui/CustomChip';
 import { useNotificationAutoRefresh, useNotificationClose } from './notifications.hooks';
-import { DEFAULT_SYSTEM_MESSAGE, type JSONFeedAuthor, type JSONFeedItem } from './notifications.models';
+import type { JSONFeedAuthor, JSONFeedItem } from './notifications.models';
+import { DEFAULT_SYSTEM_MESSAGE } from './notifications.models';
 import { formatDate, getBackgroundColor, getColor } from './notifications.utils';
 
 const Row = styled('div')(() => ({
