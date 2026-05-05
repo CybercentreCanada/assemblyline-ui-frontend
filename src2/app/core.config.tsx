@@ -9,7 +9,7 @@ declare global {
     c12nDef?: ClassificationDefinition;
     classificationAliases?: ClassificationAliases;
     configuration?: Configuration;
-    flattenedProps?: any;
+    flattenedProps?: unknown;
     indexes?: Indexes;
     settings?: UserSettings;
     systemMessage?: SystemMessage;

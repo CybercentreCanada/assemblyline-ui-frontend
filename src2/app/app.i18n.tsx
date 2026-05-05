@@ -85,4 +85,4 @@ addClassiTranslations(i18n);
 addClassiTranslations(i18n);
 addDrawerTranslations(i18n);
 
-export default i18n;
+export { i18n };

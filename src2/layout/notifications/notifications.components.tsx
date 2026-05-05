@@ -10,9 +10,9 @@ import NotificationsActiveOutlinedIcon from '@mui/icons-material/NotificationsAc
 import NotificationsNoneOutlinedIcon from '@mui/icons-material/NotificationsNoneOutlined';
 import NotificationsOutlinedIcon from '@mui/icons-material/NotificationsOutlined';
 import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
+import type { BadgeProps, SelectChangeEvent, SvgIconProps } from '@mui/material';
 import {
   Badge,
-  type BadgeProps,
   Dialog,
   DialogActions,
   DialogContent,
@@ -24,9 +24,7 @@ import {
   Link,
   MenuItem,
   Select,
-  type SelectChangeEvent,
   Skeleton,
-  type SvgIconProps,
   TextField,
   Typography,
   useTheme

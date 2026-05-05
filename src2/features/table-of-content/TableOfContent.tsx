@@ -1,5 +1,6 @@
+import type { MutableRefObject, ReactNode, SyntheticEvent } from 'react';
+import { createContext, memo, useCallback, useContext, useEffect, useMemo, useRef } from 'react';
 import { createFormContext } from '../form/createFormContext';
-import React, { useCallback, useContext, useEffect, useMemo, useRef } from 'react';
 
 export type TableOfContentAnchor = {
   id: string;
@@ -13,12 +14,12 @@ export type TableOfContentStore = {
 };
 
 export type TableOfContentContextProps = {
-  rootRef: React.MutableRefObject<HTMLDivElement | null>;
-  headerRef: React.MutableRefObject<HTMLDivElement | null>;
+  rootRef: MutableRefObject<HTMLDivElement | null>;
+  headerRef: MutableRefObject<HTMLDivElement | null>;
   loadAnchors: (props?: Partial<TableOfContentAnchor>) => void;
-  scrollTo: (event: React.SyntheticEvent, id: string) => void;
-  Anchors: React.FC<{ children: (anchors: TableOfContentAnchor[]) => React.ReactNode }>;
-  ActiveAnchor: React.FC<{ activeID: string | null; children: (active: boolean) => React.ReactNode }>;
+  scrollTo: (event: SyntheticEvent, id: string) => void;
+  Anchors: (props: { children: (anchors: TableOfContentAnchor[]) => ReactNode }) => ReactNode;
+  ActiveAnchor: (props: { activeID: string | null; children: (active: boolean) => ReactNode }) => ReactNode;
 };
 
 const TABLE_OF_CONTENT_STORE: TableOfContentStore = Object.freeze({
@@ -30,7 +31,7 @@ const { FormProvider, useForm } = createFormContext<TableOfContentStore>({
   defaultValues: structuredClone(TABLE_OF_CONTENT_STORE)
 });
 
-export const TableOfContentContext = React.createContext<TableOfContentContextProps | null>(null);
+export const TableOfContentContext = createContext<TableOfContentContextProps | null>(null);
 
 export const useTableOfContent = (): TableOfContentContextProps => {
   const ctx = useContext(TableOfContentContext);
@@ -42,10 +43,10 @@ export const useTableOfContent = (): TableOfContentContextProps => {
 
 export type TableOfContentProps = {
   behavior?: ScrollOptions['behavior'];
-  children?: React.ReactNode;
+  children?: ReactNode;
 };
 
-export const TableOfContent: React.FC<TableOfContentProps> = React.memo(({ behavior = 'smooth', children }) => {
+export const TableOfContent = memo(({ behavior = 'smooth', children }: TableOfContentProps) => {
   const form = useForm();
 
   const rootRef = useRef<HTMLDivElement | null>(null);
@@ -167,10 +168,12 @@ export const TableOfContent: React.FC<TableOfContentProps> = React.memo(({ behav
   );
 });
 
-export const TableOfContentProvider = React.memo((props: TableOfContentProps) => (
+TableOfContent.displayName = 'TableOfContent';
+
+export const TableOfContentProvider = memo((props: TableOfContentProps) => (
   <FormProvider>
     <TableOfContent {...props} />
   </FormProvider>
 ));
 
-export default TableOfContentProvider;
+TableOfContentProvider.displayName = 'TableOfContentProvider';

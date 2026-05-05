@@ -1,7 +1,7 @@
 import { AppLink } from 'core/router';
-import React from 'react';
+import { memo } from 'react';
 
-export const Links = React.memo(() => {
+export const Links = memo(() => {
   return (
     <nav style={{ display: 'flex', gap: '8px', marginBottom: '12px', flexWrap: 'wrap' }}>
       <AppLink to={{ path: '/submit' }}>Submit</AppLink>

@@ -106,5 +106,3 @@ export const LoginRoute = createAppRoute({
   component: LoginPage,
   path: '/login'
 });
-
-export default LoginRoute;

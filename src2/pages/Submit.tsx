@@ -1,12 +1,12 @@
 import { createAppRoute } from 'core/routes';
-import React, { useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { Links } from './Links';
 
 export type SubmitParams = typeof SubmitRoute.params;
 export type SubmitSearch = typeof SubmitRoute.search;
 export type SubmitHash = typeof SubmitRoute.hash;
 
-export const SubmitPage = React.memo(() => {
+export const SubmitPage = memo(() => {
   // const { fileID } = useParams<typeof Submit>();
   // const search = useSearch<typeof Submit>();
   // const hash = useHash<typeof Submit>();
@@ -130,5 +130,3 @@ export const SubmitPage = React.memo(() => {
 SubmitPage.displayName = 'SubmitPage';
 
 export const SubmitRoute = createAppRoute({ path: '/submit', component: SubmitPage });
-
-export default SubmitRoute;

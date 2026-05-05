@@ -1,5 +1,6 @@
 import { Configuration, FileSource, HashPatternMap } from 'models/base/config';
-import React from 'react';
+import type { ReactNode } from 'react';
+import { Children, isValidElement } from 'react';
 import { PossibleColor } from './colors';
 import { LOWERCASE_HASH, URL_REGEX } from './constant';
 
@@ -500,15 +501,15 @@ export const getSHA256 = (value: string) =>
  * @param children - The ReactNode to extract text content from.
  * @returns A string containing all the concatenated text content from the children.
  */
-export const getTextContent = (children: React.ReactNode): string => {
+export const getTextContent = (children: ReactNode): string => {
   let textContent = '';
 
-  // React.Children.forEach is used to safely iterate over `children`, even if it's an array, null, or other types.
-  React.Children.forEach(children, child => {
+  // Children.forEach is used to safely iterate over `children`, even if it's an array, null, or other types.
+  Children.forEach(children, child => {
     if (typeof child === 'string' || typeof child === 'number') {
       // If the child is a simple string or number, add it to the textContent
       textContent += child;
-    } else if (React.isValidElement(child)) {
+    } else if (isValidElement(child)) {
       // If the child is a valid React element, recursively process its `props.children`
       // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
       textContent += getTextContent(child.props?.['children']);

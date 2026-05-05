@@ -5,7 +5,7 @@ import { useAppSnackbar } from 'core/snackbar/snackbar.hooks';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { decode, encode } from 'shared/utils/cbor';
-import toArrayBuffer from 'shared/utils/toArrayBuffer';
+import { toArrayBuffer } from 'shared/utils/toArrayBuffer';
 import { useLoginForm } from '../log-in.providers';
 
 export const SecurityTokenLogin = memo(() => {

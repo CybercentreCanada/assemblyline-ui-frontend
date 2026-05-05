@@ -2,7 +2,6 @@ import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import {
-  Box,
   Divider,
   LinearProgress,
   List,
@@ -58,7 +57,7 @@ const UserAvatar = memo(
           .split(' ', 2)
           .map(n => n[0].toUpperCase())
           .join(''),
-      []
+      [name]
     );
 
     return (
@@ -106,6 +105,8 @@ type QuotaBarProps = {
 };
 
 const QuotaBar = memo(({ label, remaining, total }: QuotaBarProps) => {
+  const theme = useTheme();
+
   const usedPercent = useMemo<number>(() => (total > 0 ? ((total - remaining) / total) * 100 : 0), [remaining, total]);
 
   const getProgressColor = (percent: number): 'success' | 'warning' | 'error' => {
@@ -117,7 +118,7 @@ const QuotaBar = memo(({ label, remaining, total }: QuotaBarProps) => {
   return (
     <Tooltip title={`${remaining} remaining`} placement="left">
       <ListItem disableGutters>
-        <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', gap: 2 }}>
+        <div style={{ display: 'flex', alignItems: 'center', width: '100%', gap: theme.spacing(2) }}>
           <Typography variant="body2" sx={{ whiteSpace: 'nowrap', minWidth: 'fit-content' }}>
             {label}
           </Typography>
@@ -128,7 +129,7 @@ const QuotaBar = memo(({ label, remaining, total }: QuotaBarProps) => {
             sx={{ flex: 1, height: 6 }}
             aria-label={`${label}: ${usedPercent.toFixed(0)}% used`}
           />
-        </Box>
+        </div>
       </ListItem>
     </Tooltip>
   );
@@ -149,9 +150,7 @@ export const UserQuota = memo(() => {
   const hasSubmissionQuota = submissionDailyQuota !== 0 && submissionQuotaRemaining !== null;
   const shouldRender = enforceQuota && (hasUserQuota || hasSubmissionQuota);
 
-  if (!shouldRender) return null;
-
-  return (
+  return !shouldRender ? null : (
     <>
       <Divider />
       <List dense subheader={<ListSubheader disableSticky>{t('quotas')}</ListSubheader>}>
@@ -171,22 +170,29 @@ UserQuota.displayName = 'UserQuota';
 //*****************************************************************************************
 export const UserLanguage = memo(() => {
   const { t } = useTranslation();
+  const theme = useTheme();
 
   const { isFR, toggle: toggleLanguage } = useAppLanguage();
   const { allowTranslate } = useAppPreferences();
 
-  if (!allowTranslate) return null;
-
-  return (
+  return !allowTranslate ? null : (
     <>
       <Divider />
       <List dense subheader={<ListSubheader disableSticky>{t('app.language')}</ListSubheader>}>
         <ListItemButton id="language" dense onClick={toggleLanguage}>
-          <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', justifyContent: 'space-between', gap: 2 }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              width: '100%',
+              justifyContent: 'space-between',
+              gap: theme.spacing(2)
+            }}
+          >
             <Typography variant="body2">English</Typography>
             <Switch checked={isFR()} name="langSwitch" />
             <Typography variant="body2">Français</Typography>
-          </Box>
+          </div>
         </ListItemButton>
       </List>
     </>
@@ -222,32 +228,17 @@ export const UserPersonalization = memo(() => {
 
   const isSmDown = useMediaQuery(theme.breakpoints.down('sm'));
 
-  if (!allowPersonalization) return null;
-
-  return (
+  return !allowPersonalization ? null : (
     <>
-      <>
-        <Divider />
-        <List dense subheader={<ListSubheader disableSticky>{t('personalization')}</ListSubheader>}>
-          {allowLayoutSelection && (
-            <ListItem
-              disablePadding
-              secondaryAction={
-                <Switch
-                  edge="end"
-                  checked={layout.current === 'top'}
-                  onClick={() => {
-                    layout.toggle();
-                    setTemplateStore(s => {
-                      s.usermenu.open = false;
-                      return s;
-                    });
-                  }}
-                />
-              }
-            >
-              <ListItemButton
-                id="personalization-sticky"
+      <Divider />
+      <List dense subheader={<ListSubheader disableSticky>{t('personalization')}</ListSubheader>}>
+        {allowLayoutSelection && (
+          <ListItem
+            disablePadding
+            secondaryAction={
+              <Switch
+                edge="end"
+                checked={layout.current === 'top'}
                 onClick={() => {
                   layout.toggle();
                   setTemplateStore(s => {
@@ -255,64 +246,75 @@ export const UserPersonalization = memo(() => {
                     return s;
                   });
                 }}
-              >
-                <ListItemText>{t('personalization.sticky')}</ListItemText>
-              </ListItemButton>
-            </ListItem>
-          )}
-          {allowQuickSearch && !isSmDown && (
-            <ListItem
-              disablePadding
-              secondaryAction={<Switch edge="end" checked={quicksearch.show} onClick={quicksearch.toggle} />}
+              />
+            }
+          >
+            <ListItemButton
+              id="personalization-sticky"
+              onClick={() => {
+                layout.toggle();
+                setTemplateStore(s => {
+                  s.usermenu.open = false;
+                  return s;
+                });
+              }}
             >
-              <ListItemButton onClick={quicksearch.toggle}>
-                <ListItemText>{t('personalization.quicksearch')}</ListItemText>
-              </ListItemButton>
-            </ListItem>
-          )}
-          {allowAutoHideTopbar && (
-            <ListItem
-              disablePadding
-              secondaryAction={
-                <Switch
-                  edge="end"
-                  disabled={layout.current === 'top'}
-                  checked={appbar.autoHide && layout.current !== 'top'}
-                  onClick={appbar.toggleAutoHide}
-                />
-              }
-            >
-              <ListItemButton
+              <ListItemText>{t('personalization.sticky')}</ListItemText>
+            </ListItemButton>
+          </ListItem>
+        )}
+        {allowQuickSearch && !isSmDown && (
+          <ListItem
+            disablePadding
+            secondaryAction={<Switch edge="end" checked={quicksearch.show} onClick={quicksearch.toggle} />}
+          >
+            <ListItemButton onClick={quicksearch.toggle}>
+              <ListItemText>{t('personalization.quicksearch')}</ListItemText>
+            </ListItemButton>
+          </ListItem>
+        )}
+        {allowAutoHideTopbar && (
+          <ListItem
+            disablePadding
+            secondaryAction={
+              <Switch
+                edge="end"
                 disabled={layout.current === 'top'}
+                checked={appbar.autoHide && layout.current !== 'top'}
                 onClick={appbar.toggleAutoHide}
-                id="personalization-autohideappbar"
-              >
-                <ListItemText>{t('personalization.autohideappbar')}</ListItemText>
-              </ListItemButton>
-            </ListItem>
-          )}
-          {allowBreadcrumbs && !isSmDown && (
-            <ListItem
-              disablePadding
-              secondaryAction={<Switch edge="end" checked={breadcrumbs.show} onClick={breadcrumbs.toggle} />}
+              />
+            }
+          >
+            <ListItemButton
+              disabled={layout.current === 'top'}
+              onClick={appbar.toggleAutoHide}
+              id="personalization-autohideappbar"
             >
-              <ListItemButton onClick={breadcrumbs.toggle} id="personalization-showbreadcrumbs">
-                <ListItemText>{t('personalization.showbreadcrumbs')}</ListItemText>
-              </ListItemButton>
-            </ListItem>
-          )}
-          {allowBreadcrumbs && !isSmDown && (
-            <ListItem
-              disablePadding
-              secondaryAction={<Switch edge="end" checked={breadcrumbs.show} onClick={breadcrumbs.toggle} />}
-            >
-              <ListItemButton onClick={breadcrumbs.toggle} id="personalization-showsaferesults">
-                <ListItemText>{t('personalization.showsaferesults')}</ListItemText>
-              </ListItemButton>
-            </ListItem>
-          )}
-        </List>
-      </>
+              <ListItemText>{t('personalization.autohideappbar')}</ListItemText>
+            </ListItemButton>
+          </ListItem>
+        )}
+        {allowBreadcrumbs && !isSmDown && (
+          <ListItem
+            disablePadding
+            secondaryAction={<Switch edge="end" checked={breadcrumbs.show} onClick={breadcrumbs.toggle} />}
+          >
+            <ListItemButton onClick={breadcrumbs.toggle} id="personalization-showbreadcrumbs">
+              <ListItemText>{t('personalization.showbreadcrumbs')}</ListItemText>
+            </ListItemButton>
+          </ListItem>
+        )}
+        {allowBreadcrumbs && !isSmDown && (
+          <ListItem
+            disablePadding
+            secondaryAction={<Switch edge="end" checked={breadcrumbs.show} onClick={breadcrumbs.toggle} />}
+          >
+            <ListItemButton onClick={breadcrumbs.toggle} id="personalization-showsaferesults">
+              <ListItemText>{t('personalization.showsaferesults')}</ListItemText>
+            </ListItemButton>
+          </ListItem>
+        )}
+      </List>
     </>
   );
 });
@@ -354,9 +356,7 @@ export const UserTheme = memo(() => {
     [mode, prefersDarkMode, setPreferenceStore, themeMode, toggleThemeMode]
   );
 
-  if (!allowThemeSelection) return null;
-
-  return (
+  return !allowThemeSelection ? null : (
     <>
       <Divider />
       <List dense subheader={<ListSubheader disableSticky>{t('thememenu')}</ListSubheader>}>
@@ -417,27 +417,27 @@ const UserMenuHeader = memo(() => {
       elevation={4}
     >
       <ListItem disableGutters dense>
-        <Box
-          sx={{
+        <div
+          style={{
             display: 'flex',
-            paddingTop: 2,
+            paddingTop: theme.spacing(2),
             paddingBottom: 0,
-            paddingLeft: 3,
-            paddingRight: 3,
+            paddingLeft: theme.spacing(3),
+            paddingRight: theme.spacing(3),
             alignItems: 'center'
           }}
         >
           <AppAvatar sx={{ width: theme.spacing(8), height: theme.spacing(8) }} alt={name} url={avatar} email={email}>
             {displayName}
           </AppAvatar>
-          <Box sx={{ paddingLeft: 2 }}>
+          <div style={{ paddingLeft: theme.spacing(2) }}>
             <Typography variant="body1" noWrap sx={{ fontWeight: 'bold' }}>
               {name}
             </Typography>
             <Typography variant="caption" noWrap>
               {email}
             </Typography>
-            <Box sx={{ display: 'flex', justifyContent: 'end' }}>
+            <div style={{ display: 'flex', justifyContent: 'end' }}>
               <IconButton
                 to={{ path: '/account' }}
                 size="large"
@@ -471,9 +471,9 @@ const UserMenuHeader = memo(() => {
               >
                 <ExitToAppIcon />
               </IconButton>
-            </Box>
-          </Box>
-        </Box>
+            </div>
+          </div>
+        </div>
       </ListItem>
     </List>
   );

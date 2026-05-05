@@ -1,14 +1,15 @@
+import type { DetailedHTMLProps, HTMLAttributes, ReactNode } from 'react';
+import { memo, useEffect, useId, useMemo } from 'react';
 import { useTableOfContent } from './TableOfContent';
-import React, { useEffect, useId, useMemo } from 'react';
 
-export type AnchorProps = React.DetailedHTMLProps<React.HTMLAttributes<HTMLDivElement>, HTMLDivElement> & {
+export type AnchorProps = DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> & {
   anchor?: string;
-  label?: React.ReactNode;
+  label?: ReactNode;
   subheader?: boolean;
   disabled?: boolean;
 };
 
-export const Anchor: React.FC<AnchorProps> = React.memo(
+export const Anchor = memo(
   ({ anchor = null, label = '', subheader = false, disabled = false, children = null, ...props }: AnchorProps) => {
     const autoID = useId();
     const actualID = useMemo(() => anchor || autoID, [anchor, autoID]);
@@ -41,3 +42,5 @@ export const Anchor: React.FC<AnchorProps> = React.memo(
     );
   }
 );
+
+Anchor.displayName = 'Anchor';

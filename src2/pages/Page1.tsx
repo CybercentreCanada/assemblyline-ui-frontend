@@ -1,14 +1,11 @@
 import { createAppRoute } from 'core/routes';
-import { createReversePortalNode, InPortal, OutPortal } from 'features/portal';
-import React, { useEffect, useMemo, useState } from 'react';
+import { memo, useEffect, useMemo, useState } from 'react';
 import { Button } from 'ui/buttons/Button';
 import { Links } from './Links';
 
-const StatefulWidget = React.memo(() => {
+const StatefulWidget = memo(() => {
   const [count, setCount] = useState(0);
   const [seed, setSeed] = useState(42);
-
-  console.log('statefull rerender');
 
   const expensiveValue = useMemo(() => {
     const size = 15000;
@@ -41,15 +38,10 @@ const StatefulWidget = React.memo(() => {
   );
 });
 
-export const Page1Page = React.memo(() => {
-  const node = useMemo(() => createReversePortalNode(), []);
-  const [right, setRight] = useState<null | number>(null);
+StatefulWidget.displayName = 'StatefulWidget';
 
+export const Page1Page = memo(() => {
   const [loading, setLoading] = useState<boolean>(true);
-
-
-
-
 
   useEffect(() => {
     setTimeout(() => {
@@ -66,47 +58,8 @@ export const Page1Page = React.memo(() => {
       <Button to={{ path: '/subm', search: { query: '' } }}>asdasd</Button>
     </div>
   );
-
-  return (
-    <div style={{ display: 'flex', gap: 16 }}>
-      <div style={{ flex: 1 }}>
-        <h3>Left</h3>
-        {right === 1 && <OutPortal node={node} />}
-      </div>
-
-      <div style={{ flex: 1 }}>
-        <h3>Right</h3>
-        {right === 2 && <OutPortal node={node} />}
-      </div>
-
-      <div style={{ position: 'fixed', bottom: 16 }}>
-        <button
-          onClick={() =>
-            setRight(v => {
-              switch (v) {
-                case 1:
-                  return 2;
-                case 2:
-                  return null;
-                default:
-                  return 1;
-              }
-            })
-          }
-        >
-          Move
-        </button>
-      </div>
-
-      <InPortal node={node}>
-        <StatefulWidget />
-      </InPortal>
-    </div>
-  );
 });
 
 Page1Page.displayName = 'Page1Page';
 
 export const Page1Route = createAppRoute({ path: '/page1', component: Page1Page });
-
-export default Page1Route;

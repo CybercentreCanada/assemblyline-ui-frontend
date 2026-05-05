@@ -464,5 +464,3 @@ export const HelpAPIRoute = createAppRoute({
   component: HelpAPIPage,
   path: '/help/api'
 });
-
-export default HelpAPIRoute;

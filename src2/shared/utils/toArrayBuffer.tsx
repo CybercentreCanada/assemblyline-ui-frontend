@@ -7,7 +7,7 @@
  * @returns A uint8Array buffer
  *
  */
-export default function toArrayBuffer(data) {
+export function toArrayBuffer(data) {
   const uint8Array = new Uint8Array(data.length);
   for (let i = 0; i < uint8Array.length; i++) {
     uint8Array[i] = data[i];

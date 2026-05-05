@@ -12,7 +12,7 @@ import { AppCarouselProvider } from 'layout/carousel';
 import { AppDrawerLayout } from 'layout/drawer';
 import type { PropsWithChildren } from 'react';
 import { memo, StrictMode } from 'react';
-import i18n from './app.i18n';
+import { i18n } from './app.i18n';
 import { APP_ROUTES } from './app.routes';
 
 /**

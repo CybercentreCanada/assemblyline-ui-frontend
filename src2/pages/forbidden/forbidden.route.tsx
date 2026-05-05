@@ -1,19 +1,19 @@
 import BlockIcon from '@mui/icons-material/Block';
-import { useTheme } from '@mui/material';
-import Typography from '@mui/material/Typography';
+import { Typography, useTheme } from '@mui/material';
 import { createAppRoute } from 'core/routes';
-import React from 'react';
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { PageCenter } from 'ui/pages/PageCenter';
 
 //*****************************************************************************************
 // Forbidden Page
 //*****************************************************************************************
+
 type ForbiddenPageProps = {
   disabled?: boolean;
 };
 
-export const ForbiddenPage = React.memo(({ disabled = false }: ForbiddenPageProps) => {
+export const ForbiddenPage = memo(({ disabled = false }: ForbiddenPageProps) => {
   const { t } = useTranslation(['error403']);
   const theme = useTheme();
 
@@ -41,6 +41,8 @@ export const ForbiddenPage = React.memo(({ disabled = false }: ForbiddenPageProp
   );
 });
 
+ForbiddenPage.displayName = 'ForbiddenPage';
+
 //*****************************************************************************************
 // Forbidden Route
 //*****************************************************************************************
@@ -49,5 +51,3 @@ export const ForbiddenRoute = createAppRoute({
   component: ForbiddenPage,
   path: '/forbidden'
 });
-
-export default ForbiddenRoute;

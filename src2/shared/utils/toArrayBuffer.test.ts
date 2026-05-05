@@ -1,4 +1,4 @@
-import toArrayBuffer from 'shared/utils/toArrayBuffer';
+import { toArrayBuffer } from 'shared/utils/toArrayBuffer';
 import { describe, expect, it } from 'vitest';
 
 describe('Test `toArrayBuffer`', () => {

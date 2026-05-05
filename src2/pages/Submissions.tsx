@@ -1,5 +1,5 @@
 import { createAppRoute, useAppPathParams, useAppRouteStore, useAppSearchParams } from 'core/routes';
-import React, { useEffect, useState } from 'react';
+import { memo, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
 import { Links } from './Links';
 
@@ -7,11 +7,13 @@ type TestProps = {
   test: string;
 };
 
-const Test = React.memo(({ test }: TestProps) => {
+const Test = memo(({ test }: TestProps) => {
   return <div>{test}</div>;
 });
 
-export const SubmissionsPage = React.memo(() => {
+Test.displayName = 'Test';
+
+export const SubmissionsPage = memo(() => {
   // const { fileID } = useParams();
 
   const query = useAppPathParams('/submissions/:query', s => s.query);
@@ -111,12 +113,9 @@ export const SubmissionsRoute = createAppRoute({
   loading: () => false,
 
   disabled: () => {
-    // const { features } = appStore.getState();
     return false;
   }
 });
-
-export default SubmissionsRoute;
 
 //*****************************************************************************************
 // to Delete

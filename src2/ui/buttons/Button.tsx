@@ -1,7 +1,7 @@
 import type { ButtonProps as MuiButtonProps, TooltipProps } from '@mui/material';
 import { Button as MuiButton, Skeleton } from '@mui/material';
 import { AppLink } from 'core/router';
-import { AppRoute, CreatedAppRouteParamsMap } from 'core/routes';
+import type { AppRoute, CreatedAppRouteParamsMap } from 'core/routes';
 import { memo, useMemo } from 'react';
 import { getTextContent } from 'shared/utils/utils';
 import { Tooltip } from 'ui/text/Tooltip';
