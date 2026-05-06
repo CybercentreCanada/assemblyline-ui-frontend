@@ -21,10 +21,10 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
+import { AppLink } from 'core/router';
+import { AppRoute, CreatedAppRouteParamsMap } from 'core/routes';
 import type { MouseEvent, ReactNode } from 'react';
 import { memo, useCallback, useMemo, useState } from 'react';
-import type { LinkProps } from 'react-router-dom';
-import { Link } from 'react-router-dom';
 
 type PageNavigationDrawerProps = {
   open: DrawerProps['open'];
@@ -63,7 +63,7 @@ export type PageNavigationItemProp = ListItemProps & {
   primaryProps?: ListItemTextProps['primaryTypographyProps'];
   readOnly?: boolean;
   subheader?: boolean;
-  to?: LinkProps['to'];
+  to?: CreatedAppRouteParamsMap<AppRoute>;
   variant?: DrawerProps['anchor'];
   onPageNavigation?: (e: MouseEvent<HTMLElement>, props: PageNavigationItemProp) => void;
 };
@@ -159,8 +159,6 @@ export const PageNavigationItem = memo((props: PageNavigationItemProp) => {
         id={computedId}
         className={active ? 'Active' : ''}
         onClick={handleClick}
-        component={to ? Link : 'div'}
-        to={to || undefined}
         sx={{
           pl: subheader ? 1.5 : 3,
           ...(active ? {} : { ml: '1px' }),
@@ -168,6 +166,7 @@ export const PageNavigationItem = memo((props: PageNavigationItemProp) => {
           ...(isMobile && { '&.Active': activeStyles }),
           ...listItemProps.sx
         }}
+        {...(!to ? null : { component: AppLink, to: to })}
       >
         <Typography
           variant="body2"

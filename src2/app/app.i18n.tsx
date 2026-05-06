@@ -29,6 +29,10 @@ import helpAPIEN from 'pages/help/api/help-api.i18n.en.json';
 import helpAPIFR from 'pages/help/api/help-api.i18n.fr.json';
 import notFoundEN from 'pages/not-found/not-found.i18n.en.json';
 import notFoundFR from 'pages/not-found/not-found.i18n.fr.json';
+import settingsEN from 'pages/settings/settings.i18n.en.json';
+import settingsFR from 'pages/settings/settings.i18n.fr.json';
+import submitEN from 'pages/submit/submit.i18n.en.json';
+import submitFR from 'pages/submit/submit.i18n.fr.json';
 import { initReactI18next } from 'react-i18next';
 
 export const I18N_RESSOURCES = {
@@ -44,6 +48,8 @@ export const I18N_RESSOURCES = {
     logout: logoutEN,
     notifications: notificationsEN,
     quota: quotaEN,
+    settings: settingsEN,
+    submit: submitEN,
     tos: tosEN
   },
   fr: {
@@ -58,6 +64,8 @@ export const I18N_RESSOURCES = {
     logout: logoutFR,
     notifications: notificationsFR,
     quota: quotaFR,
+    settings: settingsFR,
+    submit: submitFR,
     tos: tosFR
   }
 };
