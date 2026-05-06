@@ -6,9 +6,9 @@ Centralized API client built on TanStack React Query. Provides typed hooks for a
 
 - HTTP client abstraction with request/response interceptors
 - XSRF token handling and credential management
-- `useAPIQuery` — typed hook for GET requests with caching, refetching, and persistence
-- `useAPIMutation` — typed hook for POST/PUT/DELETE requests with optimistic updates
-- `useAPICallFn` — imperative API call function for use outside React components
+- `useApiQuery` — typed hook for GET requests with caching, refetching, and persistence
+- `useApiMutation` — typed hook for POST/PUT/DELETE requests with optimistic updates
+- `useApiCallFn` — imperative API call function for use outside React components
 - Response parsing utilities (error extraction, status handling)
 - Query client provider configuration (stale time, retry, persistence)
 
@@ -16,33 +16,33 @@ Centralized API client built on TanStack React Query. Provides typed hooks for a
 
 - `api.config.ts` — Base URL, default headers, timeout configuration
 - `api.models.ts` — Request/response type definitions
-- `api.provider.tsx` — QueryClientProvider wrapper with persistence
+- `api.providers.tsx` — QueryClientProvider wrapper with persistence
 - `api.utils.ts` — Response parsing, error formatting utilities
-- `hooks/useAPIQuery.tsx` — Core typed GET hook with caching and refetching
-- `hooks/useAPIMutation.tsx` — Core typed POST/PUT/DELETE hook
-- `hooks/useAPICallFn.tsx` — Imperative API call function for use outside React
-- `hooks/useAppQuery.tsx` — App-specific query wrapper over `useAPIQuery`
-- `hooks/useAppMutation.tsx` — App-specific mutation wrapper over `useAPIMutation`
-- `hooks/useInfiniteAPIQuery.tsx` — Paginated/infinite query hook
+- `hooks/useApiQuery.tsx` — Core typed GET hook with caching and refetching
+- `hooks/useApiMutation.tsx` — Core typed POST/PUT/DELETE hook
+- `hooks/useApiCallFn.tsx` — Imperative API call function for use outside React
+- `hooks/useAppQuery.tsx` — App-specific query wrapper over `useApiQuery`
+- `hooks/useAppMutation.tsx` — App-specific mutation wrapper over `useApiMutation`
+- `hooks/useInfiniteApiQuery.tsx` — Paginated/infinite query hook
 - `hooks/useInfiniteAppQuery.tsx` — App-specific infinite query wrapper
 - `hooks/useDownloadBlob.tsx` — File download hook
 - `hooks/useBootstrapQuery.tsx` — Initial data loading hook
 - `hooks/useIsDebouncing.tsx` — Debounce state tracking hook
-- `utils/invalidateAPIQuery.ts` — Generic query invalidation by filter function
+- `utils/invalidateApiQuery.ts` — Generic query invalidation by filter function
 - `utils/invalidateAppQuery.ts` — App-specific query invalidation by partial request match
-- `utils/updateAPIQuery.ts` — Generic query cache update by filter function
+- `utils/updateApiQuery.ts` — Generic query cache update by filter function
 - `utils/updateAppQuery.ts` — App-specific query cache update by partial request match
 
 ## Usage Patterns
 
-All server communication goes through `useAPIQuery` and `useAPIMutation`. Never use raw `fetch`, `axios`, or `useQuery`/`useMutation` directly. These hooks normalize responses, handle retries, manage XSRF tokens, and integrate with the app's error handling.
+All server communication goes through `useApiQuery` and `useApiMutation`. Never use raw `fetch`, `axios`, or `useQuery`/`useMutation` directly. These hooks normalize responses, handle retries, manage XSRF tokens, and integrate with the app's error handling.
 
 ### Queries (Reading Data)
 
-Use `useAPIQuery` for all GET requests:
+Use `useApiQuery` for all GET requests:
 
 ```typescript
-const { data, isLoading, isError, error } = useAPIQuery<ResponseType>({
+const { data, isLoading, isError, error } = useApiQuery<ResponseType>({
   url: '/api/v4/alert/',
   method: 'GET',
 });
@@ -51,7 +51,7 @@ const { data, isLoading, isError, error } = useAPIQuery<ResponseType>({
 #### Common Options
 
 ```typescript
-const { data } = useAPIQuery<ResponseType>({
+const { data } = useApiQuery<ResponseType>({
   url: `/api/v4/submission/${id}/`,
   method: 'GET',
   disabled: !id,                    // Skip query until ID is available
@@ -64,7 +64,7 @@ const { data } = useAPIQuery<ResponseType>({
 
 **Rules:**
 
-- Always type the response: `useAPIQuery<ResponseType>(...)`
+- Always type the response: `useApiQuery<ResponseType>(...)`
 - Use `disabled` to conditionally skip queries — never conditionally call the hook
 - Use `delay` for user-input-driven queries (search, filtering)
 - Mutations that affect the same data should invalidate related queries
@@ -73,23 +73,23 @@ const { data } = useAPIQuery<ResponseType>({
 
 ```typescript
 // ✅ Disable when dependency is missing
-const { data } = useAPIQuery<Detail>({
+const { data } = useApiQuery<Detail>({
   url: `/api/v4/alert/${alertId}/`,
   disabled: !alertId,
 });
 
 // ❌ Never conditionally call a hook
 if (alertId) {
-  const { data } = useAPIQuery(...); // Breaks Rules of Hooks
+  const { data } = useApiQuery(...); // Breaks Rules of Hooks
 }
 ```
 
 ### Mutations (Writing Data)
 
-Use `useAPIMutation` for all POST, PUT, DELETE requests. Mutations are defined inline in the component — no wrapper hooks for single-use mutations.
+Use `useApiMutation` for all POST, PUT, DELETE requests. Mutations are defined inline in the component — no wrapper hooks for single-use mutations.
 
 ```typescript
-const handleSubmit = useAPIMutation(
+const handleSubmit = useApiMutation(
   (body: SubmitRequest) => ({
     url: '/api/v4/submission/',
     method: 'POST',
@@ -107,14 +107,14 @@ handleSubmit.mutate(formData);
 #### With Cache Invalidation
 
 ```typescript
-import { invalidateAPIQuery } from 'core/api';
+import { invalidateApiQuery } from 'core/api';
 
-const handleDelete = useAPIMutation(
+const handleDelete = useApiMutation(
   (id: string) => ({
     url: `/api/v4/alert/${id}/`,
     method: 'DELETE',
     onSuccess: () => {
-      invalidateAPIQuery(({ url }) => url.startsWith('/api/v4/alert/'));
+      invalidateApiQuery(({ url }) => url.startsWith('/api/v4/alert/'));
     },
   })
 );
@@ -123,7 +123,7 @@ const handleDelete = useAPIMutation(
 #### Mutation State in UI
 
 ```typescript
-const handleSave = useAPIMutation(
+const handleSave = useApiMutation(
   (body: UpdateRequest) => ({
     url: `/api/v4/submission/${id}/`,
     method: 'POST',
@@ -149,7 +149,7 @@ Mutations are defined where they're used. Do not create custom hooks that wrap a
 ```typescript
 // ✅ Inline in the component
 const MyComponent = memo(() => {
-  const handleDelete = useAPIMutation(
+  const handleDelete = useApiMutation(
     (id: string) => ({
       url: `/api/v4/alert/${id}/`,
       method: 'DELETE',
@@ -162,7 +162,7 @@ const MyComponent = memo(() => {
 
 // ❌ Never create a wrapper hook for a single mutation
 const useDeleteAlert = () => {
-  return useAPIMutation((id: string) => ({
+  return useApiMutation((id: string) => ({
     url: `/api/v4/alert/${id}/`,
     method: 'DELETE',
   }));
@@ -176,16 +176,16 @@ const useDeleteAlert = () => {
 After a mutation that changes data, invalidate related queries so they refetch:
 
 ```typescript
-import { invalidateAPIQuery, invalidateAppQuery } from 'core/api';
+import { invalidateApiQuery, invalidateAppQuery } from 'core/api';
 
 // Generic: invalidate by custom filter function
-invalidateAPIQuery(({ url }) => url.startsWith('/api/v4/alert/'));
+invalidateApiQuery(({ url }) => url.startsWith('/api/v4/alert/'));
 
 // Generic: invalidate a specific query
-invalidateAPIQuery(({ url }) => url === '/api/v4/user/whoami/');
+invalidateApiQuery(({ url }) => url === '/api/v4/user/whoami/');
 
 // Generic: invalidate with delay (wait for backend to process)
-invalidateAPIQuery(({ url }) => url.startsWith('/api/v4/alert/'), 500);
+invalidateApiQuery(({ url }) => url.startsWith('/api/v4/alert/'), 500);
 
 // App-specific: invalidate by partial request match (url prefix, method, body keys)
 invalidateAppQuery({ url: '/api/v4/alert/' });
@@ -197,7 +197,7 @@ invalidateAppQuery({ url: '/api/v4/alert/', method: 'GET' });
 Errors are available on the hook's return value. Handle them in the UI or via the `onFailure` callback:
 
 ```typescript
-const { data, isError, error } = useAPIQuery<ResponseType>({
+const { data, isError, error } = useApiQuery<ResponseType>({
   url: '/api/v4/alert/',
   onFailure: (err) => {
     // Show snackbar, log, etc.
@@ -212,8 +212,8 @@ const { data, isError, error } = useAPIQuery<ResponseType>({
 
 | Anti-pattern | Why | Do instead |
 | ------------ | --- | ---------- |
-| Raw `fetch` or `axios` | Bypasses token handling, error normalization, caching | `useAPIQuery` / `useAPIMutation` |
+| Raw `fetch` or `axios` | Bypasses token handling, error normalization, caching | `useApiQuery` / `useApiMutation` |
 | `useQuery` / `useMutation` directly | Bypasses app conventions and response normalization | Use the app's hooks |
 | Wrapper hooks for single mutations | Hides data flow, premature abstraction | Inline mutations |
 | Calling hooks conditionally | Breaks Rules of Hooks | Use `disabled` prop |
-| Manual `refetch()` after mutations | Easy to forget, stale data | `invalidateAPIQuery` |
+| Manual `refetch()` after mutations | Easy to forget, stale data | `invalidateApiQuery` |

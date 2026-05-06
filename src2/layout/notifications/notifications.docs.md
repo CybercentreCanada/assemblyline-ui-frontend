@@ -13,10 +13,7 @@ Notification feed system with badge indicators, preference management, and feed 
 ## Key Files
 
 - `notifications.components.tsx` — Notification UI components (feed, badges, items)
-- `notifications.config.tsx` — Notification configuration and defaults
 - `notifications.hooks.tsx` — Hooks for notification state and actions
 - `notifications.models.ts` — Notification type definitions
-- `notifications.providers.tsx` — Notification state provider and feed polling
-- `notifications.utils.tsx` — Feed item processing utilities
-- `notifications.utils.test.tsx` — Unit tests for notification utilities
+- `notifications.utils.ts` — Feed item processing utilities
 - `notifications.i18n.en.json` / `notifications.i18n.fr.json` — Translations
