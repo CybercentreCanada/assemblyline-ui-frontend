@@ -28,6 +28,37 @@ const isOpen = useAppConfig(c => c.layout.notifications.open);
 const config = useAppConfig(c => c);
 ```
 
+### Store selectors — access leaf values
+
+Zustand (and similar stores that use in-place mutation) only trigger re-renders when the selected value's reference changes. If you select a parent object and then read its fields in JSX, the component will **not** re-render when those fields are mutated — because the parent object's reference never changed.
+
+Always select the most deeply nested primitive or leaf value you actually need. Use one selector per field:
+
+```typescript
+// ❌ Selecting the parent object — won't re-render when `href` or `state` is mutated
+const route = useStore(s => s.routes[routeKey]);
+return <AppRoutes href={route.href} state={route.state} />;
+
+// ✅ Selecting each leaf field — re-renders only when that specific field changes
+const href = useStore(s => s?.routes?.[routeKey]?.href || undefined);
+const state = useStore(s => s?.routes?.[routeKey]?.state || undefined);
+return <AppRoutes href={href} state={state} />;
+```
+
+### Store mutations — mutate in place
+
+Never spread or replace a parent object in the store. Mutate individual fields directly so that only the selectors watching those specific fields re-render:
+
+```typescript
+// ❌ Spreading creates a new object — ALL selectors on that subtree re-render
+setStore(s => ({ ...s, routes: { ...s.routes, [key]: { ...s.routes[key], href: newHref } } }));
+
+// ✅ Mutate in place — only selectors for `href` will re-render
+setStore(s => { s.routes[key].href = newHref; return s; });
+```
+
+**Why this matters:** The combination of in-place mutation + leaf-level selectors is what gives us surgical re-renders. If you break either side of the contract (spread a parent, or select a parent), the system stops working correctly.
+
 ### Stable references
 
 Not all inline objects break `memo()`. Simple, static objects (like a `style` prop with a few properties) are cheap to create and compare — React's shallow comparison handles them fine in practice. The rule is about **complexity**, not just inline syntax.
@@ -164,6 +195,8 @@ import { Page } from './page.components';
 | Computed arrays/objects as props | New reference every render, breaks `memo()` | `useMemo` |
 | Inline arrow functions as props | New reference every render | `useCallback` |
 | Subscribing to entire store | Re-renders on any change | Focused selectors |
+| Selecting a parent object from store | Won't react to field mutations | Select each leaf field separately |
+| Spreading/replacing objects in store | Re-renders all selectors on that subtree | Mutate fields in place |
 | MUI layout components (`Box`, `Stack`, `Grid`) | Heavy per-instance overhead | Raw HTML + `style` |
 | MUI `sx` prop | Emotion CSS-in-JS overhead | `styled()` or `style` prop |
 | Unvirtualized lists of 100+ items | All items rendered, slow layout | Virtualize |

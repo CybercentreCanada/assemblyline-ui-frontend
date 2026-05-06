@@ -4,6 +4,8 @@
 
 - Every exported component wrapped in `memo()`
 - Focused store selectors — never subscribe to entire store
+- Store selectors must access the most nested (leaf) values — never select a parent object and read its fields later
+- Mutate store objects in place — never spread/replace parent objects (preserves reference identity for unchanged siblings)
 - Functions passed as props must use `useCallback`
 - Computed arrays/objects (filter, sort, map, spread) passed as props must use `useMemo`
 - Empty array/object defaults must be module-level constants
@@ -46,6 +48,35 @@ export const MyComponent = memo(() => {
 const services = useAppConfig(s => s?.services ?? []);
 ```
 
+## Store Selectors — Access Leaf Values
+
+Zustand (and similar stores) only trigger re-renders when the selected value's reference changes. Selecting a parent object and then reading its fields in JSX will **not** react to field-level mutations (since the parent reference is preserved).
+
+```typescript
+// ❌ Selecting the parent object — won't re-render when `href` or `state` changes
+const route = useStore(s => s.routes[routeKey]);
+return <AppRoutes href={route.href} state={route.state} />;
+
+// ✅ Selecting each leaf field — re-renders only when that field changes
+const href = useStore(s => s?.routes?.[routeKey]?.href || undefined);
+const state = useStore(s => s?.routes?.[routeKey]?.state || undefined);
+return <AppRoutes href={href} state={state} />;
+```
+
+**Rule:** Always select the most deeply nested primitive or leaf value you actually need. One selector per field.
+
+## Store Mutations — Mutate In Place
+
+Never spread/replace a parent object in the store. Mutate the individual fields to preserve reference identity for unchanged siblings:
+
+```typescript
+// ❌ Spreading creates a new object — causes re-renders for ALL selectors on that subtree
+setStore(s => ({ ...s, routes: { ...s.routes, [key]: { ...s.routes[key], href: newHref } } }));
+
+// ✅ Mutate in place — only selectors for `href` will re-render
+setStore(s => { s.routes[key].href = newHref; return s; });
+```
+
 ## Derived State
 
 ```typescript
@@ -75,6 +106,8 @@ useEffect(() => { setFiltered(items.filter(...)); }, [items]);
 - NO inline arrow functions as JSX props — use `useCallback`
 - NO computed arrays/objects inline as props — use `useMemo`
 - NO subscribing to entire store
+- NO selecting a parent object from a store and reading its fields in JSX — select each leaf field separately
+- NO spreading/replacing parent objects in store mutations — mutate fields in place
 - NO `lazy()` or code splitting — everything bundled upfront
 - NO unvirtualized lists of 100+ items
 - NO MUI layout components (`Box`, `Stack`, `Grid`) — raw HTML
