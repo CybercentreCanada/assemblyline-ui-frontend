@@ -15,10 +15,10 @@ export type AppRouterPanelProps = {
 };
 
 export const AppRouterPanel = memo(({ panelKey }: AppRouterPanelProps) => {
-  const panel = useAppRouterStore(s => s.panels?.[panelKey]);
-  const node = useAppRouterStore(s => findNode(s, { routeKey: panel?.routeKey }));
+  const routeKey = useAppRouterStore(s => s?.panels?.[panelKey]?.routeKey || undefined);
+  const portal = useAppRouterStore(s => findNode(s, { routeKey: routeKey })?.portal || undefined);
 
-  return !node ? <div>No node assigned</div> : <OutPortal node={node.portal} />;
+  return !portal ? <div>No node assigned</div> : <OutPortal node={portal} />;
 });
 
 AppRouterPanel.displayName = 'AppRouterPanel';
@@ -35,13 +35,15 @@ export type AppRouterNodeProps = {
 };
 
 export const AppRouterNode = memo(({ nodeKey, routes }: AppRouterNodeProps) => {
-  const node = useAppRouterStore(store => store.nodes[nodeKey]);
-  const route = useAppRouterStore(store => (node?.routeKey ? store.routes[node.routeKey] : null));
+  const routeKey = useAppRouterStore(s => s?.nodes?.[nodeKey]?.routeKey || undefined);
+  const portal = useAppRouterStore(s => s?.nodes?.[nodeKey]?.portal || undefined);
+  const href = useAppRouterStore(s => s?.routes?.[routeKey]?.href || undefined);
+  const state = useAppRouterStore(s => s?.routes?.[routeKey]?.state || undefined);
 
-  return !node || !route ? null : (
-    <InPortal node={node.portal}>
-      <AppRouteKeyProvider routeKey={node.routeKey}>
-        <AppRoutes href={route.href} state={route.state} />
+  return !routeKey || !href ? null : (
+    <InPortal node={portal}>
+      <AppRouteKeyProvider routeKey={routeKey}>
+        <AppRoutes href={href} state={state} />
       </AppRouteKeyProvider>
     </InPortal>
   );

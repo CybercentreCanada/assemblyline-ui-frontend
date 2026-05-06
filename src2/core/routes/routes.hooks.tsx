@@ -28,7 +28,7 @@ export function useAppPathParams<const Path extends AppRoute['path'], const Sele
 ): SelectorOutput {
   const context = useAppRouteStore<SelectorOutput>(s => selector(s.params));
   if (!context) return null;
-  return context[0];
+  return context;
 }
 
 //*****************************************************************************************
@@ -57,7 +57,7 @@ export function useAppSearchParams<const Path extends AppRoute['path'], const Se
 ): SelectorOutput {
   const context = useAppRouteStore<SelectorOutput>(s => selector(s.search as SearchParamValue<Path>));
   if (!context) return null;
-  return context[0];
+  return context;
 }
 
 //*****************************************************************************************
@@ -81,7 +81,7 @@ export function useAppHashParams<const Path extends AppRoute['path'], const Sele
 ): SelectorOutput {
   const context = useAppRouteStore<SelectorOutput>(s => selector(s.hash as HashParamValue<Path>));
   if (!context) return null;
-  return context[0];
+  return context;
 }
 
 //*****************************************************************************************
@@ -96,5 +96,5 @@ export function useAppRoute<const Path extends AppRoute['path'], const SelectorO
 ) {
   const context = useAppRouteStore<SelectorOutput>(selector as any);
   if (!context) return null;
-  return context[0];
+  return context;
 }

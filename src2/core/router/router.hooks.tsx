@@ -11,7 +11,8 @@ import {
   insertRightPanel,
   sanitizeAppRouterStore,
   storeToNavigate,
-  updatePanel
+  updatePanel,
+  updateRoute
 } from './router.utils';
 
 //*****************************************************************************************
@@ -86,29 +87,35 @@ export function useAppNavigate<const Route extends AppRoute>(): (to: CreatedAppR
       const currentPanelKey = findPanelKey(store, { routeKey: currentRouteKey });
       let panelKey = currentPanelKey >= 0 ? currentPanelKey + 1 : 0;
 
-      if (variant === 'replace') {
-        panelKey = currentPanelKey >= 0 ? currentPanelKey : 0;
-      } else if (variant === 'to' && typeof panel === 'number') {
-        panelKey = Math.max(0, Math.trunc(panel));
-      }
+      if (variant === 'replace' && currentRouteKey) {
+        nextStore = updateRoute(nextStore, currentRouteKey, { href, state });
+      } else {
+        if (variant === 'to' && typeof panel === 'number') {
+          panelKey = Math.max(0, Math.trunc(panel));
+        }
 
-      [nextStore, nextRouteKey] = addRoute(store, { href, state });
+        [nextStore, nextRouteKey] = addRoute(store, { href, state });
 
-      if (navigationStyle === 'push') {
-        if (panelKey >= nextStore.panels.length)
-          [nextStore] = insertRightPanel(nextStore, panelKey, {
-            routeKey: nextRouteKey,
-            temporaryRouteKey: nextRouteKey
-          });
-        else nextStore = updatePanel(nextStore, panelKey, { routeKey: nextRouteKey, temporaryRouteKey: nextRouteKey });
-      } else if (navigationStyle === 'loop') {
+        if (navigationStyle === 'push') {
+          if (panelKey >= nextStore.panels.length)
+            [nextStore] = insertRightPanel(nextStore, panelKey, {
+              routeKey: nextRouteKey,
+              temporaryRouteKey: nextRouteKey
+            });
+          else
+            nextStore = updatePanel(nextStore, panelKey, { routeKey: nextRouteKey, temporaryRouteKey: nextRouteKey });
+        } else if (navigationStyle === 'loop') {
+        }
       }
 
       nextStore = sanitizeAppRouterStore(nextStore);
-      setStore(nextStore);
+
+      console.log(nextStore);
+
+      setStore(s => ({ ...nextStore }));
       const nextLocation = storeToNavigate(nextStore);
       if (nextLocation) routerNavigate(nextLocation.to, nextLocation.options);
     },
-    [navigationStyle, routeKey, routerNavigate, store]
+    [navigationStyle, routeKey, routerNavigate, store, setStore]
   );
 }
