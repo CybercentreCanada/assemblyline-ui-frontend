@@ -32,10 +32,11 @@ export const AppRouterProvider = memo(({ children }: PropsWithChildren) => {
 
   useEffect(() => {
     setRouter(s => {
+      // TODO: add a differs to only update the router store if there are changes
       const store = locationToStore(s, location);
       return { ...store, maxNodes: 2, maxPanels: 2 };
     });
-  }, []);
+  }, [location]);
 
   return children;
 });

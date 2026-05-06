@@ -34,6 +34,8 @@ import settingsFR from 'pages/settings/settings.i18n.fr.json';
 import submitEN from 'pages/submit/submit.i18n.en.json';
 import submitFR from 'pages/submit/submit.i18n.fr.json';
 import { initReactI18next } from 'react-i18next';
+import inputsEN from 'ui/inputs/i18n/inputs.i18n.en.json';
+import inputsFR from 'ui/inputs/i18n/inputs.i18n.fr.json';
 
 export const I18N_RESSOURCES = {
   en: {
@@ -43,6 +45,7 @@ export const I18N_RESSOURCES = {
     error403: forbiddenEN,
     error404: notFoundEN,
     helpAPI: helpAPIEN,
+    inputs: inputsEN,
     locked: lockedEN,
     login: loginEN,
     logout: logoutEN,
@@ -59,6 +62,7 @@ export const I18N_RESSOURCES = {
     error403: forbiddenFR,
     error404: notFoundFR,
     helpAPI: helpAPIFR,
+    inputs: inputsFR,
     locked: lockedFR,
     login: loginFR,
     logout: logoutFR,

@@ -42,9 +42,11 @@ export const AppRouterNode = memo(({ nodeKey, routes }: AppRouterNodeProps) => {
 
   return !routeKey || !href ? null : (
     <InPortal node={portal}>
+      {/* <AppThemeProvider> */}
       <AppRouteKeyProvider routeKey={routeKey}>
         <AppRoutes href={href} state={state} />
       </AppRouteKeyProvider>
+      {/* </AppThemeProvider> */}
     </InPortal>
   );
 });

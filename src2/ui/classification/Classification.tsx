@@ -1,5 +1,4 @@
 import {
-  alpha,
   Card,
   Dialog,
   DialogActions,
@@ -308,7 +307,7 @@ export const Classification = memo(
                               placement="bottom"
                               slotProps={{
                                 popper: { modifiers: [{ name: 'offset', options: { offset: [0, -8] } }] },
-                                tooltip: { sx: { backgroundColor: alpha(theme.palette.Tooltip.bg, 1) } }
+                                tooltip: { sx: { backgroundColor: theme.palette.grey[700] } }
                               }}
                             >
                               <ListItemButton
@@ -344,7 +343,7 @@ export const Classification = memo(
                                 placement="bottom"
                                 slotProps={{
                                   popper: { modifiers: [{ name: 'offset', options: { offset: [0, -8] } }] },
-                                  tooltip: { sx: { backgroundColor: alpha(theme.palette.Tooltip.bg, 1) } }
+                                  tooltip: { sx: { backgroundColor: theme.palette.grey[700] } }
                                 }}
                               >
                                 <ListItemButton
@@ -388,7 +387,7 @@ export const Classification = memo(
                                   placement="bottom"
                                   slotProps={{
                                     popper: { modifiers: [{ name: 'offset', options: { offset: [0, -8] } }] },
-                                    tooltip: { sx: { backgroundColor: alpha(theme.palette.Tooltip.bg, 1) } }
+                                    tooltip: { sx: { backgroundColor: theme.palette.grey[700] } }
                                   }}
                                 >
                                   <ListItemButton
@@ -452,7 +451,7 @@ export const Classification = memo(
                                     placement="bottom"
                                     slotProps={{
                                       popper: { modifiers: [{ name: 'offset', options: { offset: [0, -8] } }] },
-                                      tooltip: { sx: { backgroundColor: alpha(theme.palette.Tooltip.bg, 1) } }
+                                      tooltip: { sx: { backgroundColor: theme.palette.grey[700] } }
                                     }}
                                   >
                                     <ListItemButton
@@ -493,7 +492,7 @@ export const Classification = memo(
                                   placement="bottom"
                                   slotProps={{
                                     popper: { modifiers: [{ name: 'offset', options: { offset: [0, -8] } }] },
-                                    tooltip: { sx: { backgroundColor: alpha(theme.palette.Tooltip.bg, 1) } }
+                                    tooltip: { sx: { backgroundColor: theme.palette.grey[700] } }
                                   }}
                                 >
                                   <ListItemButton

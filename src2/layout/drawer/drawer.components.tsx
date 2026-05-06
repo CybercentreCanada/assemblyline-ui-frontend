@@ -60,24 +60,11 @@ export const AppDrawerActions = memo(
     flexDirection: 'row',
     columnGap: theme.spacing(1),
     backgroundColor: theme.palette.background.paper,
-    padding: theme.spacing(1),
-    position: 'sticky',
-    top: 0,
-    zIndex: 5
+    padding: theme.spacing(1)
   }))
 );
 
 AppDrawerActions.displayName = 'AppDrawerActions';
-
-export const AppDrawerInner = memo(
-  styled('div')(({ theme }) => ({
-    height: '100%',
-    paddingLeft: theme.spacing(2),
-    paddingRight: theme.spacing(2)
-  }))
-);
-
-AppDrawerInner.displayName = 'AppDrawerInner';
 
 export const AppDrawerCloseButton = memo(() => {
   const { t } = useTranslation(['drawer']);

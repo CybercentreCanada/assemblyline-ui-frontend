@@ -1,8 +1,7 @@
 import { useAppConfig } from 'core/config';
-import { createAppRoute, useAppPathParams, useAppRoute } from 'core/routes';
+import { createAppRoute, useAppPathParams } from 'core/routes';
 import { TableOfContentProvider, useTableOfContent } from 'features/table-of-content/TableOfContent';
 import { memo, useCallback, useEffect } from 'react';
-import { useParams } from 'react-router';
 import { ForbiddenRedirect } from 'ui/layouts/ForbiddenRedirect';
 import { PageLayout } from 'ui/layouts/PageLayout';
 import { DefaultMetadataSection } from './components/DefaultMetadata';
@@ -24,16 +23,10 @@ type Params = {
 const WrappedSettingsRoute = memo(() => {
   const form = useForm();
   const { rootRef, headerRef } = useTableOfContent();
-  const { tab: tabParam2 } = useParams<Params>();
+  const tabParam = useAppPathParams('/settings/:tab', s => s.tab);
   const currentUser = useAppConfig(s => s.user);
   const configuration = useAppConfig(s => s.configuration);
   const settings = useAppConfig(s => s.settings);
-
-  const tabParam = useAppPathParams('/settings/:tab', s => s.tab);
-
-  const route = useAppRoute('/settings/:tab', s => s);
-
-  console.log(tabParam2, route);
 
   const handleProfileChange = useCallback(() => {
     let s = form.getFieldValue('settings');

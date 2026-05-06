@@ -110,9 +110,7 @@ export function useAppNavigate<const Route extends AppRoute>(): (to: CreatedAppR
 
       nextStore = sanitizeAppRouterStore(nextStore);
 
-      console.log(nextStore);
-
-      setStore(s => ({ ...nextStore }));
+      setStore(nextStore);
       const nextLocation = storeToNavigate(nextStore);
       if (nextLocation) routerNavigate(nextLocation.to, nextLocation.options);
     },

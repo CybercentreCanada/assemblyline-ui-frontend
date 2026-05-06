@@ -9,6 +9,8 @@ import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router';
 import { generateRandomUUID } from 'shared/utils/app.utils';
 import { getSubmitType } from 'shared/utils/utils';
+import { AppBanner } from 'ui/branding';
+import { PageCenter } from 'ui/pages/PageCenter';
 import { TabContainer } from 'ui/TabContainer';
 import { ServiceParameters } from './components/ServiceParameters';
 import { SubmissionData } from './components/SubmissionData';
@@ -274,7 +276,11 @@ const WrappedSubmitRoute = memo(() => {
   }, [configuration, currentUser, settings]);
 
   return (
-    <div style={{ maxWidth: downMD ? '100%' : `${theme.breakpoints.values.md}px`, margin: '0 auto', width: '100%' }}>
+    <PageCenter maxWidth={downMD ? '100%' : `${theme.breakpoints.values.md}px`} margin={3.5} width="100%">
+      <div style={{ marginTop: theme.spacing(4), marginBottom: theme.spacing(4) }}>
+        <AppBanner />
+      </div>
+
       {configuration.ui.banner && (
         <Alert severity={configuration.ui.banner_level}>
           {configuration.ui.banner[i18n.language] ?? configuration.ui.banner.en}
@@ -385,7 +391,7 @@ const WrappedSubmitRoute = memo(() => {
       />
 
       <div style={{ height: '200px' }} />
-    </div>
+    </PageCenter>
   );
 });
 

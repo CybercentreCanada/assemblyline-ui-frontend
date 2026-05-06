@@ -1,3 +1,4 @@
+import { AppErrorProvider } from 'core/error';
 import {
   PATH_PARAM_BLUEPRINTS_MAP,
   PathParamBlueprintMap,
@@ -6,7 +7,6 @@ import {
 } from 'features/path-params';
 import { SEARCH_PARAM_BLUEPRINTS_MAP, SearchParamBlueprintMap, SearchParamEngine } from 'features/search-params';
 import type { ComponentType, MemoExoticComponent, ReactNode } from 'react';
-import { ErrorBoundary } from 'react-error-boundary';
 import { toElement } from 'shared/utils/app.utils';
 import { DisabledBoundary, ForbiddenBoundary } from './routes.components';
 import type { RouteHash, RouteMeta } from './routes.models';
@@ -79,12 +79,7 @@ export const createAppRoute = <
     // search: !search ? undefined : searchEngine.fromLocation({ search: null } as any),
     hash: hashCodec,
     element: (
-      <ErrorBoundary
-        FallbackComponent={props => <div>{JSON.stringify(props)}</div>}
-        onReset={() => {
-          window.location.reload();
-        }}
-      >
+      <AppErrorProvider>
         <DisabledBoundary disabled={disabled} FallbackComponent={disabledComponent}>
           <ForbiddenBoundary forbidden={forbidden} FallbackComponent={forbiddenComponent}>
             <AppRouteProvider params={paramCodec} search={searchEngine} hash={hashCodec}>
@@ -92,7 +87,7 @@ export const createAppRoute = <
             </AppRouteProvider>
           </ForbiddenBoundary>
         </DisabledBoundary>
-      </ErrorBoundary>
+      </AppErrorProvider>
     )
   };
 };

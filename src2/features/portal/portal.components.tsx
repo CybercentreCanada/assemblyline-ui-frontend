@@ -11,6 +11,7 @@ export type ReversePortalNode = {
 
 export const createReversePortalNode = (): ReversePortalNode => {
   const hostEl = document.createElement('div');
+  hostEl.style.display = 'contents';
   let currentOutlet: HTMLElement | null = null;
 
   const setOutlet = (el: HTMLElement | null) => {
@@ -51,7 +52,7 @@ export const OutPortal = React.memo(({ node }: OutPortalProps) => {
     return () => node.setOutlet(null);
   }, [node]);
 
-  return <div ref={outletRef} />;
+  return <div ref={outletRef} style={{ display: 'contents' }} />;
 });
 
 OutPortal.displayName = 'OutPortal';

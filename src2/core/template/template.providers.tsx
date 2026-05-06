@@ -1,11 +1,10 @@
 import { useAppSwitcher } from '@tui/apps';
 import { AppProvider, AppRoot, useAppLayout, useAppUser } from '@tui/core';
 import { useAppPreferences } from 'app/layout.preferences';
-import { useAppInterfaceStore } from 'core/interface';
 import { useAppPreferenceStore } from 'core/preference';
 import type { i18n } from 'i18next';
 import type { PropsWithChildren } from 'react';
-import { memo, useEffect, useMemo } from 'react';
+import { memo, useEffect } from 'react';
 import { useAppTemplateRouter } from './hooks/useAppTemplateRouter';
 import { useAppTemplateUser } from './hooks/useAppTemplateUser';
 import { useAppTemplateThemeMode } from './template.hooks';
@@ -91,8 +90,8 @@ export const AppTemplateProvider = memo(({ children, i18n }: AppLayoutProviderPr
   const themeID = useAppPreferenceStore(s => s.layout.theme);
 
   const mode = useAppTemplateThemeMode();
-  const skin = useAppInterfaceStore(s => s.theme.skin);
-  const themes = useMemo(() => (skin ? [skin] : []), [skin]);
+  // const skin = useAppInterfaceStore(s => s.theme.skin);
+  // const themes = useMemo(() => (skin ? [skin] : []), [skin]);
 
   return (
     <AppRoot
@@ -108,7 +107,7 @@ export const AppTemplateProvider = memo(({ children, i18n }: AppLayoutProviderPr
         theme: themeID
       }}
       i18n={i18n}
-      themes={themes}
+      // themes={themes}
     >
       {children}
     </AppRoot>

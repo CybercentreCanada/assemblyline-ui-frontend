@@ -5,7 +5,6 @@ import {
   AppDrawerCloseButton,
   AppDrawerContainer,
   AppDrawerContent,
-  AppDrawerInner,
   AppDrawerMain,
   AppDrawerMaximizeButton
 } from './drawer.components';
@@ -24,7 +23,7 @@ export const AppDrawerLayout = memo(({ children, content }: AppDrawerLayoutProps
         <AppDrawerCloseButton />
         <AppDrawerMaximizeButton />
       </AppDrawerActions>
-      <AppDrawerInner>{content}</AppDrawerInner>
+      {content}
     </AppDrawerContainer>
   </AppDrawerMain>
 ));

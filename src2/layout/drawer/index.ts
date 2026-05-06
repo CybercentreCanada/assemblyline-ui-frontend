@@ -3,7 +3,6 @@ export {
   AppDrawerCloseButton,
   AppDrawerContainer,
   AppDrawerContent,
-  AppDrawerInner,
   AppDrawerMain,
   AppDrawerMaximizeButton
 } from './drawer.components';

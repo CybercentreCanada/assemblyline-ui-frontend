@@ -1,4 +1,5 @@
 import { APP_ROUTES } from 'app/app.routes';
+import { NotFoundPage } from 'pages/not-found/not-found.route';
 import { memo, useMemo } from 'react';
 import { Route, Routes } from 'react-router';
 import type { AppRouteLocation } from './routes.models';
@@ -23,7 +24,7 @@ export const AppRoutes = memo(({ href, state }: AppRoutesProps) => {
           }}
         />
       ))}
-      <Route path="*" element={'null'} />
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
 });

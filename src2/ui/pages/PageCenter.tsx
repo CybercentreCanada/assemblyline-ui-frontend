@@ -1,19 +1,19 @@
 import { useTheme } from '@mui/material';
-import type { ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import { memo } from 'react';
 import { PageContent } from './PageContent';
 
 type PageCenterProps = {
   children?: ReactNode;
-  height?: string | number;
-  margin?: number;
-  maxWidth?: string;
+  height?: CSSProperties['height'];
+  margin?: CSSProperties['margin'];
+  maxWidth?: CSSProperties['maxWidth'];
   mb?: number;
   ml?: number;
   mr?: number;
   mt?: number;
-  textAlign?: string;
-  width?: string;
+  textAlign?: CSSProperties['textAlign'];
+  width?: CSSProperties['width'];
 };
 
 export const PageCenterLayout = memo(
@@ -54,23 +54,25 @@ export const PageCenter = memo(
     const theme = useTheme();
 
     return (
-      <div
-        style={{
-          height,
-          width,
-          maxWidth,
-          textAlign,
-          display: 'flex',
-          flexDirection: 'column',
-          marginInline: 'auto',
-          ...(margin !== undefined && { margin: theme.spacing(margin) }),
-          ...(mt !== undefined && { marginTop: theme.spacing(mt) }),
-          ...(mb !== undefined && { marginBottom: theme.spacing(mb) }),
-          ...(ml !== undefined && { marginLeft: theme.spacing(ml) }),
-          ...(mr !== undefined && { marginRight: theme.spacing(mr) })
-        }}
-      >
-        {children}
+      <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
+        <div
+          style={{
+            height,
+            width,
+            maxWidth,
+            textAlign,
+            display: 'flex',
+            flexDirection: 'column',
+            marginInline: 'auto',
+            ...(margin !== undefined && { margin: theme.spacing(margin) }),
+            ...(mt !== undefined && { marginTop: theme.spacing(mt) }),
+            ...(mb !== undefined && { marginBottom: theme.spacing(mb) }),
+            ...(ml !== undefined && { marginLeft: theme.spacing(ml) }),
+            ...(mr !== undefined && { marginRight: theme.spacing(mr) })
+          }}
+        >
+          {children}
+        </div>
       </div>
     );
   }
