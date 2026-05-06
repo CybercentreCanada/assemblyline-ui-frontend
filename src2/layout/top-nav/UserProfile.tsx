@@ -443,14 +443,26 @@ const UserMenuHeader = memo(() => {
                 size="large"
                 tooltip={t('usermenu.account')}
                 sx={{ color: theme.palette.text.primary }}
+                onClick={() => {
+                  setInterfaceStore(s => {
+                    s.usermenu.open = false;
+                    return s;
+                  });
+                }}
               >
                 <AccountCircleOutlinedIcon />
               </IconButton>
               <IconButton
-                to={{ path: '/settings' }}
+                to={{ path: '/settings/:tab', params: { tab: 'interface' } }}
                 size="large"
                 tooltip={t('usermenu.settings')}
                 sx={{ color: theme.palette.text.primary }}
+                onClick={() => {
+                  setInterfaceStore(s => {
+                    s.usermenu.open = false;
+                    return s;
+                  });
+                }}
               >
                 <SettingsOutlinedIcon />
               </IconButton>

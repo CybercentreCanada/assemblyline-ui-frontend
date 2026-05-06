@@ -1,0 +1,243 @@
+import { Paper, useTheme } from '@mui/material';
+import { useAppConfig } from 'core/config';
+import { memo, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import { PageSection } from 'ui/layouts/PageSection';
+import { BooleanListInput } from 'ui/list-inputs/BooleanListInput';
+import { ClassificationListInput } from 'ui/list-inputs/ClassificationListInput';
+import { NumberListInput } from 'ui/list-inputs/NumberListInput';
+import { List } from 'ui/list/List';
+import { Markdown } from 'ui/markdown/Markdown';
+import { useForm } from '../settings.form';
+
+export const SubmissionProfileDescription = memo(() => {
+  const { t } = useTranslation(['settings']);
+  const theme = useTheme();
+  const form = useForm();
+  const configuration = useAppConfig(s => s.configuration);
+
+  return (
+    <form.Subscribe selector={state => [state.values.state.tab] as const}>
+      {([tab]) =>
+        tab !== 'default' &&
+        configuration?.submission?.profiles?.[tab]?.description && (
+          <div style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(0.5) }}>
+            <PageSection id="profile" primary={t('profile.title')} primaryProps={{ variant: 'h6' }} subheader anchor />
+
+            <Paper sx={{ py: theme.spacing(0.5), px: theme.spacing(2) }}>
+              <Markdown>{configuration.submission.profiles[tab].description}</Markdown>
+            </Paper>
+          </div>
+        )
+      }
+    </form.Subscribe>
+  );
+});
+
+SubmissionProfileDescription.displayName = 'SubmissionProfileDescription';
+
+export const SubmissionOptionsSection = memo(() => {
+  const { t } = useTranslation(['settings']);
+  const theme = useTheme();
+  const form = useForm();
+  const configuration = useAppConfig(s => s.configuration);
+  const c12nDef = useAppConfig(s => s.c12nDef);
+
+  const maxTTL = useMemo<number>(() => {
+    if (!configuration?.submission) return 365;
+    return configuration.submission.max_dtl !== 0 ? configuration.submission.max_dtl : 365;
+  }, [configuration]);
+
+  return !configuration || !c12nDef ? null : (
+    <form.Subscribe
+      selector={state =>
+        [state.values.state.customize, state.values.state.disabled, state.values.state.loading] as const
+      }
+    >
+      {([customize, disabled, loading]) => (
+        <div style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(0.5) }}>
+          <PageSection
+            id="submissions"
+            primary={t('submissions')}
+            secondary={t('submissions.description')}
+            primaryProps={{ variant: 'h6' }}
+            subheader
+            anchor
+          />
+
+          <List>
+            {c12nDef.enforce && (
+              <form.Subscribe
+                selector={state => {
+                  const param = state.values.settings.classification;
+                  return [param.value, param.default, param.restricted] as const;
+                }}
+              >
+                {([value, defaultValue, restricted]) => (
+                  <ClassificationListInput
+                    id="settings:submissions.classification"
+                    primary={t('settings:submissions.classification')}
+                    secondary={t('settings:submissions.classification_desc')}
+                    value={value ?? defaultValue}
+                    loading={loading}
+                    disabled={disabled || !(customize || !restricted)}
+                    overflowHidden
+                    onChange={(e, v) => form.setFieldValue(`settings.classification.value`, v)}
+                  />
+                )}
+              </form.Subscribe>
+            )}
+
+            {/* TTL */}
+            <form.Subscribe
+              selector={state => {
+                const param = state.values.settings.ttl;
+                return [param.value, param.default, param.restricted] as const;
+              }}
+            >
+              {([value, defaultValue, restricted]) => (
+                <NumberListInput
+                  id="settings:submissions.ttl"
+                  primary={t('settings:submissions.ttl')}
+                  secondary={t('settings:submissions.ttl_desc')}
+                  endAdornment={t('settings:submissions.ttl_days')}
+                  value={value}
+                  defaultValue={defaultValue}
+                  loading={loading}
+                  disabled={disabled || (!customize && restricted)}
+                  reset={defaultValue !== null && value !== defaultValue}
+                  min={maxTTL !== 0 ? 1 : 0}
+                  max={maxTTL}
+                  overflowHidden
+                  validators={v => v.required().inRange().isInteger()}
+                  coercers={c => c.required().inRange().floor()}
+                  onChange={(event, v) => form.setFieldValue(`settings.ttl.value`, v)}
+                  onBlur={() => {
+                    if (value === null) form.setFieldValue(`settings.ttl.value`, defaultValue);
+                  }}
+                />
+              )}
+            </form.Subscribe>
+
+            {/* Deep Scan */}
+            <form.Subscribe
+              selector={state => {
+                const param = state.values.settings.deep_scan;
+                return [param.value, param.default, param.restricted] as const;
+              }}
+            >
+              {([value, defaultValue, restricted]) => (
+                <BooleanListInput
+                  id="settings:submissions.deep_scan"
+                  primary={t('settings:submissions.deep_scan')}
+                  secondary={t('settings:submissions.deep_scan_desc')}
+                  value={value}
+                  defaultValue={defaultValue}
+                  loading={loading}
+                  disabled={disabled || (!customize && restricted)}
+                  overflowHidden
+                  reset={defaultValue !== null && value !== defaultValue}
+                  onChange={(event, v) => form.setFieldValue(`settings.deep_scan.value`, v)}
+                />
+              )}
+            </form.Subscribe>
+
+            {/* Ignore Recursion Prevention */}
+            <form.Subscribe
+              selector={state => {
+                const param = state.values.settings.ignore_recursion_prevention;
+                return [param.value, param.default, param.restricted] as const;
+              }}
+            >
+              {([value, defaultValue, restricted]) => (
+                <BooleanListInput
+                  id="settings:submissions.ignore_recursion_prevention"
+                  primary={t('settings:submissions.ignore_recursion_prevention')}
+                  secondary={t('settings:submissions.ignore_recursion_prevention_desc')}
+                  value={value}
+                  defaultValue={defaultValue}
+                  loading={loading}
+                  disabled={disabled || (!customize && restricted)}
+                  reset={defaultValue !== null && value !== defaultValue}
+                  overflowHidden
+                  onChange={(event, v) => form.setFieldValue(`settings.ignore_recursion_prevention.value`, v)}
+                />
+              )}
+            </form.Subscribe>
+
+            {/* Ignore Filtering */}
+            <form.Subscribe
+              selector={state => {
+                const param = state.values.settings.ignore_filtering;
+                return [param.value, param.default, param.restricted] as const;
+              }}
+            >
+              {([value, defaultValue, restricted]) => (
+                <BooleanListInput
+                  id="settings:submissions.ignore_filtering"
+                  primary={t('settings:submissions.ignore_filtering')}
+                  secondary={t('settings:submissions.ignore_filtering_desc')}
+                  value={value}
+                  defaultValue={defaultValue}
+                  loading={loading}
+                  disabled={disabled || (!customize && restricted)}
+                  reset={defaultValue !== null && value !== defaultValue}
+                  overflowHidden
+                  onChange={(event, v) => form.setFieldValue(`settings.ignore_filtering.value`, v)}
+                />
+              )}
+            </form.Subscribe>
+
+            {/* Generate Alert */}
+            <form.Subscribe
+              selector={state => {
+                const param = state.values.settings.generate_alert;
+                return [param.value, param.default, param.restricted] as const;
+              }}
+            >
+              {([value, defaultValue, restricted]) => (
+                <BooleanListInput
+                  id="settings:submissions.generate_alert"
+                  primary={t('settings:submissions.generate_alert')}
+                  secondary={t('settings:submissions.generate_alert_desc')}
+                  value={value}
+                  defaultValue={defaultValue}
+                  loading={loading}
+                  disabled={disabled || (!customize && restricted)}
+                  reset={defaultValue !== null && value !== defaultValue}
+                  overflowHidden
+                  onChange={(event, v) => form.setFieldValue(`settings.generate_alert.value`, v)}
+                />
+              )}
+            </form.Subscribe>
+
+            {/* Ignore Cache */}
+            <form.Subscribe
+              selector={state => {
+                const param = state.values.settings.ignore_cache;
+                return [param.value, param.default, param.restricted] as const;
+              }}
+            >
+              {([value, defaultValue, restricted]) => (
+                <BooleanListInput
+                  id="settings:submissions.ignore_cache"
+                  primary={t('settings:submissions.ignore_cache')}
+                  secondary={t('settings:submissions.ignore_cache_desc')}
+                  value={value}
+                  defaultValue={defaultValue}
+                  loading={loading}
+                  disabled={disabled || (!customize && restricted)}
+                  reset={defaultValue !== null && value !== defaultValue}
+                  overflowHidden
+                  onChange={(event, v) => form.setFieldValue(`settings.ignore_cache.value`, v)}
+                />
+              )}
+            </form.Subscribe>
+          </List>
+        </div>
+      )}
+    </form.Subscribe>
+  );
+});
+
+SubmissionOptionsSection.displayName = 'SubmissionOptionsSection';
