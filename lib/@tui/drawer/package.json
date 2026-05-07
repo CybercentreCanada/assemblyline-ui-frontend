@@ -1,8 +1,14 @@
 {
   "name": "@tui/drawer",
-  "version": "4.0.2",
+  "version": "4.0.4",
   "sideEffects": false,
   "type": "module",
+  "scripts": {
+    "clean": "rimraf dist",
+    "build": "tsdown",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint ./src"
+  },
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -31,11 +37,5 @@
     "i18next": ">=25",
     "react": "^19.2",
     "react-i18next": ">=16"
-  },
-  "scripts": {
-    "clean": "rimraf dist",
-    "build": "tsdown",
-    "typecheck": "tsc --noEmit",
-    "lint": "eslint ./src"
   }
 }

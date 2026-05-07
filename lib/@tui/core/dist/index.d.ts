@@ -209,6 +209,7 @@ type LeftNavItemProps = LeftNavChildProps & {
 type LeftNavMenuProps = LeftNavItemProps & {
   type: 'menu';
   route?: string;
+  matcher?: RegExp;
   expanded?: boolean;
   popped?: boolean;
   keepMounted?: boolean;
@@ -326,6 +327,41 @@ declare const useAppRouter: () => AppRouterAdapter;
 //#region src/app/hooks/useAppSearchService.d.ts
 declare const useAppSearchService: <T = any>() => AppSearchServiceContextType<T>;
 //#endregion
+//#region src/themes/hooks/useAppThemeBuilder.d.ts
+/**
+ * Additional positional arguments forwarded to MUI's `createTheme(options, ...args)`.
+ *
+ * Typically used to pass MUI locale packs (e.g. `frFR` from `@mui/material/locale`,
+ * `@mui/x-data-grid/locales`, `@mui/x-date-pickers/locales`) so component
+ * `defaultProps` localized strings are merged into the resulting theme.
+ */
+type AppThemeLocalization = object[];
+/**
+ * Returns a memoized builder that produces a paired light/dark MUI `Theme` for the
+ * application.
+ *
+ * The builder deep-merges configuration in the following precedence (lowest to highest):
+ * 1. {@link BASE_THEME_CONFIG} — TUI baseline.
+ * 2. Density overrides resolved from `density` via `getDensityThemeOverrides`.
+ * 3. `theme.configs.global` — theme-level options shared across modes.
+ * 4. `optionsOverride.global` — caller-supplied global overrides.
+ * 5. `theme.configs.light` / `theme.configs.dark` — mode-specific options.
+ * 6. `optionsOverride.light` / `optionsOverride.dark` — caller-supplied mode overrides.
+ *
+ * The merged options are then passed to `createTheme(options, ...localization)`, where
+ * `localization` forwards MUI locale packs (see {@link AppThemeLocalization}) so component
+ * `defaultProps` translated strings are applied.
+ *
+ * All inputs are deep-cloned before merging to prevent mutation of caller-owned config
+ * objects across renders.
+ *
+ * @returns A stable callback `(theme, optionsOverride, density?, localization?) => { lightTheme, darkTheme }`.
+ */
+declare const useAppThemeBuilder: () => (theme: AppTheme, optionsOverride: Partial<AppThemeConfigs>, density?: AppDensityMode, localization?: AppThemeLocalization) => {
+  lightTheme: _mui_material0.Theme;
+  darkTheme: _mui_material0.Theme;
+};
+//#endregion
 //#region src/app/providers/AppThemesProvider.d.ts
 type TuiThemesContextType = AppContextBase & {
   current: AppTheme;
@@ -339,6 +375,7 @@ type TuiThemesContextType = AppContextBase & {
 type TuiThemesProviderProps = PropsWithChildren & {
   initTheme?: AppTheme;
   themes: AppTheme[];
+  localization?: AppThemeLocalization;
 };
 declare const AppThemesProvider: FC<TuiThemesProviderProps>;
 //#endregion
@@ -416,6 +453,18 @@ type AppTopNavConfigs = {
     };
   };
   profile?: {
+    slots?: {
+      top?: ReactElement[];
+      bottom?: ReactElement[];
+      userMenu?: {
+        before?: ReactElement[];
+        after?: ReactElement[];
+      };
+      admin?: {
+        before?: ReactElement[];
+        after?: ReactElement[];
+      };
+    };
     menus?: {
       user?: {
         i18nKey?: string;
@@ -514,11 +563,33 @@ declare const AppProvider: <U extends AppUser>({
   children
 }: Omit<AppProviderProps<U>, "theme">) => react_jsx_runtime0.JSX.Element;
 //#endregion
+//#region src/themes/tui-theme.d.ts
+declare module '@mui/material/styles' {
+  interface ZIndex {
+    tui: {
+      superOverlay: number;
+    };
+  }
+}
+//#endregion
+//#region src/themes/density.d.ts
+declare const getDensityThemeOverrides: (density: AppDensityMode) => Partial<ThemeOptions>;
+//#endregion
+//#region src/themes/elements/AppDensity.d.ts
+type AppDensityProps = PropsWithChildren<{
+  density: AppDensityMode;
+}>;
+declare const AppDensity: FC<AppDensityProps>;
+//#endregion
+//#region src/themes/index.d.ts
+declare const TUI_THEMES: AppTheme[];
+//#endregion
 //#region src/app/AppRoot.d.ts
 type AppRootProps = PropsWithChildren & {
   i18n: i18n;
   cookies: TuiCookies;
   themes?: AppTheme[];
+  localization?: AppThemeLocalization;
 };
 declare const AppRoot: FC<AppRootProps>;
 //#endregion
@@ -735,33 +806,6 @@ declare const PageHeader: react0.NamedExoticComponent<PageHeaderProps>;
  */
 declare const LayoutSkeleton: () => react_jsx_runtime0.JSX.Element;
 //#endregion
-//#region src/themes/tui-theme.d.ts
-declare module '@mui/material/styles' {
-  interface ZIndex {
-    tui: {
-      superOverlay: number;
-    };
-  }
-}
-//#endregion
-//#region src/themes/density.d.ts
-declare const getDensityThemeOverrides: (density: AppDensityMode) => Partial<ThemeOptions>;
-//#endregion
-//#region src/themes/elements/AppDensity.d.ts
-type AppDensityProps = PropsWithChildren<{
-  density: AppDensityMode;
-}>;
-declare const AppDensity: FC<AppDensityProps>;
-//#endregion
-//#region src/themes/hooks/useAppThemeBuilder.d.ts
-declare const useAppThemeBuilder: () => (theme: AppTheme, optionsOverride: Partial<AppThemeConfigs>, density?: AppDensityMode) => {
-  lightTheme: _mui_material0.Theme;
-  darkTheme: _mui_material0.Theme;
-};
-//#endregion
-//#region src/themes/index.d.ts
-declare const TUI_THEMES: AppTheme[];
-//#endregion
 //#region src/types/index.d.ts
 type MakeOptional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 //#endregion
@@ -856,5 +900,5 @@ declare const keyboard: {
   parseEvent: typeof parseEvent;
 };
 //#endregion
-export { APPBAR_READY_EVENT, ARROW_DOWN, ARROW_LEFT, ARROW_RIGHT, ARROW_UP, AppAvatar, AppAvatarProps, AppBarUserMenuElement, AppBrand, AppBrandComponentProps, AppBrandConfig, AppBrandProps, AppBreadcrumbItem, AppCookiesProvider, AppDefaultsCookieConfigs, AppDefaultsLeftNavConfigs, AppDefaultsPreferencesConfigs, AppDefaultsThemeConfigs, AppDefaultsTopNavConfigs, AppDensity, AppDensityMode, AppDensityProps, AppHistoryRoute, AppInfoPanel, AppInfoPanelProps, AppLayoutMode, AppLeftNavConfigs, AppListEmpty, AppPreferenceConfigs, AppProvider, AppRoot, AppRouterAdapter, AppRouterLocation, AppSearchItem, AppSearchItemRendererOption, AppSearchMode, AppSearchService, type AppSearchServiceState, AppSurface, AppSurfaceProps, AppTheme, AppThemeConfigs, AppThemeSelectionMode, AppThemesProvider, AppToc, AppTocElementProps, AppTocItem, AppTopNavConfigs, AppUser, AppUserAvatar, AppUserContext, AppUserContextType, AppUserService, AppUserValidatedProp, BACKSPACE, BRAND_VARIANTS, BrandSize, BrandSizeSpecs, BrandVariant, ENTER, ESCAPE, LayoutSkeleton, LeftNavAction, LeftNavActionProps, LeftNavChildProps, LeftNavChildRenderProps, LeftNavItem, LeftNavItemProps, LeftNavMenuItem, LeftNavMenuProps, LeftNavRoute, LeftNavRouteProps, LeftNavSlotProps, MODULE_NAME, MakeOptional, MuiColorType, OverlayDefs, OverlayLabel, OverlayProps, OverlayProvider, OverlayShadow, PageCardCentered, PageCenter, PageContent, PageFullWidth, PageFullscreen, PageHeader, PageHeaderAction, PageProps, SPACE, TUI_COOKIE_KEYS, TUI_COOKIE_OPTIONS, TUI_THEMES, TuiCookieDef, TuiCookies, TuiCookiesStore, TuiParsedJsCookies, UseAppLanguageType, UseAppThemeType, addTranslations, getBrandSizes, getDensityThemeOverrides, is, isArrowDown, isArrowLeft, isArrowRight, isArrowUp, isBackspace, isEnter, isEscape, isSpace, keyboard, parseCookies, parseEvent, parseExtraServerCookie, parseTuiClientCookies, parseTuiCookies, parseTuiServerCookies, setClientCookie, traverse, useAppBar, useAppBarHeight, useAppBarScrollTrigger, useAppBrand, useAppBreadcrumbs, useAppColor, useAppDensity, useAppEnv, useAppLanguage, useAppLayout, useAppLeftNav, useAppLogo, useAppOverlay, useAppPreferences, useAppQuickSearch, useAppRouter, useAppSearchService, useAppTheme, useAppThemeBuilder, useAppUser, useClipboard, useCookiesStore, useFullscreenStatus, useLocalStorage, useLocalStorageItem, usePageProps, usePathMatcher, visit };
+export { APPBAR_READY_EVENT, ARROW_DOWN, ARROW_LEFT, ARROW_RIGHT, ARROW_UP, AppAvatar, AppAvatarProps, AppBarUserMenuElement, AppBrand, AppBrandComponentProps, AppBrandConfig, AppBrandProps, AppBreadcrumbItem, AppCookiesProvider, AppDefaultsCookieConfigs, AppDefaultsLeftNavConfigs, AppDefaultsPreferencesConfigs, AppDefaultsThemeConfigs, AppDefaultsTopNavConfigs, AppDensity, AppDensityMode, AppDensityProps, AppHistoryRoute, AppInfoPanel, AppInfoPanelProps, AppLayoutMode, AppLeftNavConfigs, AppListEmpty, AppPreferenceConfigs, AppProvider, AppRoot, AppRouterAdapter, AppRouterLocation, AppSearchItem, AppSearchItemRendererOption, AppSearchMode, AppSearchService, type AppSearchServiceState, AppSurface, AppSurfaceProps, AppTheme, AppThemeConfigs, AppThemeLocalization, AppThemeSelectionMode, AppThemesProvider, AppToc, AppTocElementProps, AppTocItem, AppTopNavConfigs, AppUser, AppUserAvatar, AppUserContext, AppUserContextType, AppUserService, AppUserValidatedProp, BACKSPACE, BRAND_VARIANTS, BrandSize, BrandSizeSpecs, BrandVariant, ENTER, ESCAPE, LayoutSkeleton, LeftNavAction, LeftNavActionProps, LeftNavChildProps, LeftNavChildRenderProps, LeftNavItem, LeftNavItemProps, LeftNavMenuItem, LeftNavMenuProps, LeftNavRoute, LeftNavRouteProps, LeftNavSlotProps, MODULE_NAME, MakeOptional, MuiColorType, OverlayDefs, OverlayLabel, OverlayProps, OverlayProvider, OverlayShadow, PageCardCentered, PageCenter, PageContent, PageFullWidth, PageFullscreen, PageHeader, PageHeaderAction, PageProps, SPACE, TUI_COOKIE_KEYS, TUI_COOKIE_OPTIONS, TUI_THEMES, TuiCookieDef, TuiCookies, TuiCookiesStore, TuiParsedJsCookies, UseAppLanguageType, UseAppThemeType, addTranslations, getBrandSizes, getDensityThemeOverrides, is, isArrowDown, isArrowLeft, isArrowRight, isArrowUp, isBackspace, isEnter, isEscape, isSpace, keyboard, parseCookies, parseEvent, parseExtraServerCookie, parseTuiClientCookies, parseTuiCookies, parseTuiServerCookies, setClientCookie, traverse, useAppBar, useAppBarHeight, useAppBarScrollTrigger, useAppBrand, useAppBreadcrumbs, useAppColor, useAppDensity, useAppEnv, useAppLanguage, useAppLayout, useAppLeftNav, useAppLogo, useAppOverlay, useAppPreferences, useAppQuickSearch, useAppRouter, useAppSearchService, useAppTheme, useAppThemeBuilder, useAppUser, useClipboard, useCookiesStore, useFullscreenStatus, useLocalStorage, useLocalStorageItem, usePageProps, usePathMatcher, visit };
 //# sourceMappingURL=index.d.ts.map

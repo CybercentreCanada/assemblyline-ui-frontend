@@ -1,6 +1,6 @@
 import * as react0 from "react";
 import { FC, PropsWithChildren } from "react";
-import { BoxProps } from "@mui/material";
+import { BoxProps, Breakpoint } from "@mui/material";
 import { MuiColorType } from "@tui/core";
 import { i18n } from "i18next";
 
@@ -53,7 +53,7 @@ declare const AppClassificationProvider: FC<AppClassificationProviderProps>;
 //#region src/elements/AppClassification.d.ts
 type AppClassificationProps = {
   variant?: 'filled' | 'text' | 'outlined';
-  full?: boolean;
+  breakpoint?: Breakpoint;
   overwrite?: AppClassificationValue;
   mx?: MxProps;
 };
@@ -63,7 +63,7 @@ declare const AppClassification: FC<AppClassificationProps>;
 type AppClassificationBaseProps = {
   variant?: 'filled' | 'text' | 'outlined';
   state?: AppClassificationState | 'unsupported';
-  full?: boolean;
+  breakpoint?: Breakpoint;
   short_text_en: string;
   short_text_fr: string;
   long_text_en: string;
