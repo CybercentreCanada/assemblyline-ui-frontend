@@ -22,6 +22,7 @@ import type { ProcessItem, SandboxFilter } from 'components/visual/ResultCard/Sa
 import {
   buildProcessTree,
   getBackgroundColor,
+  getBorderColor,
   getDescendantPids,
   getProcessScore
 } from 'components/visual/ResultCard/Sandbox/sandbox.utils';
@@ -78,14 +79,13 @@ const ProcessStats = React.memo(({ body, item }: ProcessStatsProps) => {
   return (
     <div
       style={{
+        height: '100%',
         display: 'flex',
         flexWrap: 'wrap',
         gap: theme.spacing(0.5),
         alignItems: 'center',
         alignSelf: 'flex-start',
-        paddingTop: theme.spacing(1),
-        paddingRight: theme.spacing(0.5),
-        paddingLeft: theme.spacing(0.5)
+        padding: theme.spacing(0.5)
       }}
     >
       {item.integrity_level && (
@@ -93,7 +93,7 @@ const ProcessStats = React.memo(({ body, item }: ProcessStatsProps) => {
           label={item.integrity_level}
           size="tiny"
           variant="outlined"
-          sx={{ textTransform: 'capitalize', fontWeight: 400, mr: 0.5 }}
+          sx={{ textTransform: 'capitalize', fontWeight: 400, margin: 0 }}
         />
       )}
 
@@ -105,7 +105,7 @@ const ProcessStats = React.memo(({ body, item }: ProcessStatsProps) => {
             size="tiny"
             variant="outlined"
             type="rounded"
-            sx={{ columnGap: 0.5 }}
+            sx={{ columnGap: 0.5, margin: 0 }}
           />
         </Tooltip>
       ))}
@@ -149,6 +149,11 @@ const ProcessTreeItem = React.memo(
     const processScore = useMemo(
       () => (!item.safelisted ? (getProcessScore(item, body.signatures) ?? undefined) : undefined),
       [item, body.signatures]
+    );
+
+    const borderColor = useMemo(
+      () => getBorderColor(theme, scoreToVerdict, processScore),
+      [theme, scoreToVerdict, processScore]
     );
 
     const descendantMaxScore = useMemo(() => {
@@ -221,7 +226,7 @@ const ProcessTreeItem = React.memo(
             <CardContent
               component={Button}
               color="inherit"
-              style={{
+              sx={{
                 userSelect: 'text',
                 WebkitUserSelect: 'text',
                 textTransform: 'none',
@@ -231,6 +236,10 @@ const ProcessTreeItem = React.memo(
                 alignItems: 'stretch',
                 justifyContent: 'flex-start',
                 padding: 'inherit',
+                '&:last-child': {
+                  pb: 0
+                },
+                ...(borderColor && { borderLeft: `5px solid ${borderColor}` }),
                 ...(isActive && {
                   backgroundColor: alpha(
                     theme.palette.mode === 'dark' ? theme.palette.primary.light : theme.palette.primary.dark,
@@ -240,45 +249,65 @@ const ProcessTreeItem = React.memo(
               }}
               onClick={() => handleClick(item)}
             >
-              <Typography
-                variant="body2"
-                sx={{
-                  backgroundColor: getBackgroundColor(theme, scoreToVerdict, processScore, 0.25),
-                  minWidth: theme.spacing(5),
-                  py: 1,
-                  textAlign: 'center',
-                  fontFamily: 'monospace'
-                }}
-              >
-                {item.pid}
-              </Typography>
-
               <div
                 style={{
+                  width: '100%',
                   flex: 1,
                   display: 'flex',
                   flexDirection: 'column',
-                  alignItems: 'flex-start',
-                  marginLeft: theme.spacing(1),
-                  padding: `${theme.spacing(1)} 0`
+                  alignItems: 'flex-start'
                 }}
               >
-                <Typography component="div" fontWeight={500} variant="body2" sx={{ wordBreak: 'break-all' }}>
-                  {item.image?.split(/[/\\]/).pop() ?? ''}
-                </Typography>
+                <div
+                  style={{ width: '100%', flex: 1, display: 'flex', flexDirection: 'row', columnGap: theme.spacing(1) }}
+                >
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      backgroundColor: getBackgroundColor(theme, scoreToVerdict, 0, 0.25),
+                      minWidth: theme.spacing(5),
+                      px: 1,
+                      textAlign: 'center',
+                      fontFamily: 'monospace',
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center'
+                    }}
+                  >
+                    {item.pid}
+                  </Typography>
+                  <Typography
+                    component="div"
+                    fontWeight={500}
+                    variant="body2"
+                    sx={{
+                      wordBreak: 'break-all',
+                      display: 'flex',
+                      justifyContent: 'center',
+                      alignItems: 'center'
+                    }}
+                  >
+                    {item.image?.split(/[/\\]/).pop() ?? ''}
+                  </Typography>
+                  <div style={{ flex: 1 }} />
+
+                  <ProcessStats body={body} item={item} />
+                </div>
+
                 <Typography
                   component="div"
                   color="textSecondary"
                   fontFamily="monospace"
                   variant="body2"
                   textAlign="start"
-                  sx={{ wordBreak: 'break-all' }}
+                  sx={{
+                    wordBreak: 'break-all',
+                    padding: theme.spacing(0.5)
+                  }}
                 >
                   {item.command_line}
                 </Typography>
               </div>
-
-              <ProcessStats body={body} item={item} />
             </CardContent>
           </Card>
         </ListItem>

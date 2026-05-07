@@ -11,6 +11,7 @@ import {
   buildProcessTree,
   compareIPs,
   getBackgroundColor,
+  getBorderColor,
   getDescendantPids,
   getHighestProcessScore,
   getProcessScore,
@@ -21,6 +22,16 @@ import { describe, expect, it } from 'vitest';
 const mockTheme: Theme = {
   palette: {
     mode: 'light',
+    success: { light: '#00FF00', dark: '#007700' },
+    warning: { light: '#FFFF00', dark: '#777700' },
+    error: { light: '#FF0000', dark: '#770000' },
+    grey: { 800: '#808080' }
+  }
+} as unknown as Theme;
+
+const mockThemeDark: Theme = {
+  palette: {
+    mode: 'dark',
     success: { light: '#00FF00', dark: '#007700' },
     warning: { light: '#FFFF00', dark: '#777700' },
     error: { light: '#FF0000', dark: '#770000' },
@@ -187,6 +198,79 @@ describe('getBackgroundColor', () => {
   it('should handle undefined score', () => {
     const color = getBackgroundColor(mockTheme, scoreToVerdict, undefined);
     expect(color).toContain('rgba');
+  });
+});
+
+/* ----------------------------------------------------------------------------
+ * Tests for getBorderColor utility
+ * Ensures solid border colors match StyledChip outlined variant colors per
+ * heuristic verdict, and respects light/dark palette mode.
+ * -------------------------------------------------------------------------- */
+describe('getBorderColor', () => {
+  const scoreToVerdict = (score: number) =>
+    score >= 100
+      ? 'malicious'
+      : score >= 50
+        ? 'highly_suspicious'
+        : score >= 25
+          ? 'suspicious'
+          : score >= 10
+            ? 'info'
+            : 'safe';
+
+  it('should return success.dark (light mode) when score is undefined', () => {
+    expect(getBorderColor(mockTheme, scoreToVerdict, undefined)).toBe('#007700');
+  });
+
+  it('should return success.light (dark mode) when score is undefined', () => {
+    expect(getBorderColor(mockThemeDark, scoreToVerdict, undefined)).toBe('#00FF00');
+  });
+
+  it('should return error.light for malicious verdict in light mode', () => {
+    expect(getBorderColor(mockTheme, scoreToVerdict, 100)).toBe('#FF0000');
+  });
+
+  it('should return error.dark for malicious verdict in dark mode', () => {
+    expect(getBorderColor(mockThemeDark, scoreToVerdict, 100)).toBe('#770000');
+  });
+
+  it('should return warning.light for highly_suspicious verdict in light mode', () => {
+    expect(getBorderColor(mockTheme, scoreToVerdict, 50)).toBe('#FFFF00');
+  });
+
+  it('should return warning.dark for highly_suspicious verdict in dark mode', () => {
+    expect(getBorderColor(mockThemeDark, scoreToVerdict, 50)).toBe('#777700');
+  });
+
+  it('should return warning.light for suspicious verdict in light mode', () => {
+    expect(getBorderColor(mockTheme, scoreToVerdict, 25)).toBe('#FFFF00');
+  });
+
+  it('should return grey (#999) for info verdict in light mode', () => {
+    expect(getBorderColor(mockTheme, scoreToVerdict, 10)).toBe('#999');
+  });
+
+  it('should return grey (#616161) for info verdict in dark mode', () => {
+    expect(getBorderColor(mockThemeDark, scoreToVerdict, 10)).toBe('#616161');
+  });
+
+  it('should return success.light for safe verdict in light mode', () => {
+    expect(getBorderColor(mockTheme, scoreToVerdict, 0)).toBe('#00FF00');
+  });
+
+  it('should return success.dark for safe verdict in dark mode', () => {
+    expect(getBorderColor(mockThemeDark, scoreToVerdict, 0)).toBe('#007700');
+  });
+
+  it('should return null for an unknown verdict', () => {
+    expect(getBorderColor(mockTheme, () => 'unknown_verdict', 5)).toBeNull();
+  });
+
+  it('should return a solid color string (no rgba/alpha wrapping)', () => {
+    const color = getBorderColor(mockTheme, scoreToVerdict, 100);
+    expect(color).not.toContain('rgba');
+    expect(color).not.toContain('rgb(');
+    expect(color).toMatch(/^#[0-9a-fA-F]{6}$/);
   });
 });
 
