@@ -1,0 +1,74 @@
+import { useMediaQuery, useTheme } from '@mui/material';
+import { useAppTheme } from 'commons/components/app/hooks';
+import 'components/visual/HexViewer/styles/hex.css';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import type { DataProps, ModeLanguage, ModeTheme, ModeWidth } from '..';
+import { ACTIONS, HexLoading, HexPageLayout, useStore } from '..';
+
+const WrappedAppRoot = ({ data = '' }: DataProps) => {
+  const { store, dispatch, update } = useStore();
+
+  // Data
+  React.useEffect(() => {
+    dispatch({ type: ACTIONS.appLoad, payload: { data } });
+    return () => dispatch({ type: ACTIONS.appSave, payload: null });
+  }, [data, dispatch]);
+
+  // Theme
+  const { theme: appTheme } = useAppTheme();
+  React.useEffect(() => {
+    update.store.mode.setTheme(appTheme as ModeTheme);
+  }, [appTheme, update]);
+
+  // Language
+  const { i18n } = useTranslation(['hexViewer']);
+  React.useEffect(() => {
+    update.store.mode.setLanguage(i18n.language as ModeLanguage);
+  }, [i18n.language, update]);
+
+  // Width
+  const theme = useTheme();
+  const isXS = useMediaQuery(theme.breakpoints.only('xs'));
+  const isSM = useMediaQuery(theme.breakpoints.only('sm'));
+  const isMD = useMediaQuery(theme.breakpoints.only('md'));
+  const isLG = useMediaQuery(theme.breakpoints.only('lg'));
+  const isXL = useMediaQuery(theme.breakpoints.only('xl'));
+
+  React.useEffect(() => {
+    const width: ModeWidth = isXS ? 'xs' : isSM ? 'sm' : isMD ? 'md' : isLG ? 'lg' : isXL ? 'xl' : 'wd';
+    update.store.mode.setWidth(width);
+  }, [isLG, isMD, isSM, isXL, isXS, update]);
+
+  // History
+
+  // Setting
+  React.useEffect(() => {
+    dispatch({ type: ACTIONS.settingFetch, payload: null });
+  }, [dispatch]);
+  React.useEffect(() => {
+    if (store.loading.conditions.hasSettingsFetched) dispatch({ type: ACTIONS.settingLoad, payload: null });
+  }, [dispatch, store.loading.conditions.hasSettingsFetched]);
+
+  // Location
+  React.useEffect(() => {
+    if (store.loading.conditions.hasSettingsFetched && store.loading.conditions.hasSettingsLoaded)
+      dispatch({ type: ACTIONS.locationLoad, payload: null });
+  }, [dispatch, store.loading.conditions.hasSettingsFetched, store.loading.conditions.hasSettingsLoaded]);
+
+  return (
+    <div
+      style={{
+        flexGrow: 1,
+        display: 'flex',
+        flexDirection: 'column'
+      }}
+    >
+      <HexLoading store={store} />
+      {store.hex.codes.size !== 0 && store.loading.conditions.hasLocationInit && <HexPageLayout store={store} />}
+    </div>
+  );
+};
+
+export const AppRoot = React.memo(WrappedAppRoot);
+export default AppRoot;

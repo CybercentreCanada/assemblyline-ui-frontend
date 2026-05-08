@@ -1,0 +1,94 @@
+import { getASCIICharacter, getHexValue } from 'components/visual/HexViewer/handlers/HexHandler';
+import { useCallback } from 'react';
+import type { ReducerHandler, Reducers, RenderHandler, Store, UseReducer } from '..';
+import {
+  DEFAULT_STORE,
+  getSelectIndexes,
+  isAction,
+  isCellMouseDown,
+  isSameCellClick,
+  orderSelectIndexes,
+  renderArrayClass,
+  setStore
+} from '..';
+
+export const useSelectReducer: UseReducer = () => {
+  const selectRender = useCallback((prevStore: Store, nextStore: Store): void => {
+    const prev = getSelectIndexes(prevStore);
+    const next = getSelectIndexes(nextStore);
+    renderArrayClass(prev, next, 'hex-viewer-select', nextStore.cellsRendered);
+  }, []);
+
+  const selectClear: Reducers['appClickAway'] = useCallback(
+    store => ({ ...store, select: { ...store.select, startIndex: -1, endIndex: -1 } }),
+    []
+  );
+
+  const selectMouseEnter: Reducers['cellMouseEnter'] = useCallback((store, { onSelectionChange }) => {
+    if (!isCellMouseDown(store)) return { ...store };
+    const { mouseEnterIndex, mouseDownIndex } = store.cell;
+    const { startIndex, endIndex } = orderSelectIndexes(mouseDownIndex, mouseEnterIndex);
+
+    const parts: string[] = [];
+    for (let i = startIndex; i <= endIndex; i++) {
+      parts.push(getASCIICharacter(getHexValue(store.hex.codes, i)));
+    }
+    const data = parts.join('');
+    onSelectionChange(data);
+
+    return { ...store, select: { ...store.select, startIndex, endIndex } };
+  }, []);
+
+  const selectMouseDown: Reducers['cellMouseDown'] = useCallback(
+    store => {
+      return selectClear({ ...store, select: { ...store.select, isHighlighting: true } });
+    },
+    [selectClear]
+  );
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const selectMouseUp: Reducers['bodyMouseUp'] = useCallback(
+    store => {
+      if (store.cell.mouseEnterIndex === null) return { ...store };
+      else if (isSameCellClick(store) || !store.select.isHighlighting) return selectClear(store);
+      else {
+        return { ...store, select: { ...store.select, isHighlighting: false } };
+      }
+    },
+    [selectClear]
+  );
+
+  const locationLoad: Reducers['locationLoad'] = useCallback(store => {
+    if (
+      DEFAULT_STORE.select.startIndex === store.location.select.startIndex ||
+      DEFAULT_STORE.select.endIndex === store.location.select.endIndex
+    )
+      return { ...store };
+    else
+      return setStore.store.Select(
+        store,
+        orderSelectIndexes(store.location.select.startIndex, store.location.select.endIndex)
+      );
+  }, []);
+
+  const reducer: ReducerHandler = useCallback(
+    ({ store, action: { type, payload } }) => {
+      if (isAction.appClickAway(type)) return selectClear(store);
+      else if (isAction.cellMouseEnter(type)) return selectMouseEnter(store, payload);
+      else if (isAction.cellMouseDown(type)) return selectMouseDown(store, payload);
+      // else if (isAction.bodyMouseUp(type)) return selectMouseUp(store);
+      else if (isAction.locationLoad(type)) return locationLoad(store);
+      else return { ...store };
+    },
+    [selectClear, locationLoad, selectMouseDown, selectMouseEnter]
+  );
+
+  const render: RenderHandler = useCallback(
+    ({ prevStore, nextStore }) => {
+      if (!Object.is(prevStore.select, nextStore.select)) selectRender(prevStore, nextStore);
+    },
+    [selectRender]
+  );
+
+  return { reducer, render };
+};

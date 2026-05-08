@@ -1,0 +1,112 @@
+import { Alert, CircularProgress, styled, Tooltip, useTheme } from '@mui/material';
+import { useAppUser } from 'commons/components/app/hooks';
+import useMyAPI from 'components/hooks/useMyAPI';
+import type { CustomUser } from 'components/models/ui/user';
+import ForbiddenPage from 'components/routes/403';
+import AIMarkdown from 'components/visual/AiMarkdown';
+import React, { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
+const Spinner = styled('div')(({ theme }) => ({
+  textAlign: 'center',
+  position: 'relative',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)'
+}));
+
+const Watermark = styled('div')(({ theme }) => ({
+  float: 'right',
+  color: theme.palette.text.disabled,
+  fontSize: 'smaller',
+  cursor: 'pointer'
+}));
+
+type Props = {
+  sha256: string;
+  archiveOnly?: boolean;
+};
+
+const WrappedCodeSection: React.FC<Props> = ({ sha256, archiveOnly = false }) => {
+  const { apiCall } = useMyAPI();
+  const { user: currentUser } = useAppUser<CustomUser>();
+  const { t, i18n } = useTranslation(['fileViewer']);
+  const theme = useTheme();
+
+  const [analysing, setAnalysing] = useState(false);
+  const [codeError, setCodeError] = useState(null);
+  const [codeSummary, setCodeSummary] = useState(null);
+  const [codeTruncated, setCodeTruncated] = useState(false);
+
+  const getCodeSummary = useCallback(
+    noCache => {
+      const params = [`lang=${i18n.language === 'en' ? 'english' : 'french'}`];
+      if (noCache) {
+        params.push('no_cache');
+      }
+      if (archiveOnly) {
+        params.push('archive_only');
+      }
+      apiCall({
+        allowCache: !noCache,
+        url: `/api/v4/file/code_summary/${sha256}/${params ? `?${params.join('&')}` : ''}`,
+        onSuccess: api_data => {
+          if (codeError !== null) setCodeError(null);
+          setCodeSummary(api_data.api_response.content);
+          setCodeTruncated(api_data.api_response.truncated);
+        },
+        onFailure: api_data => {
+          setCodeError(api_data.api_error_message);
+          if (codeSummary !== null) {
+            setCodeSummary(null);
+            setCodeTruncated(false);
+          }
+        },
+        onEnter: () => setAnalysing(true),
+        onExit: () => setAnalysing(false)
+      });
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [codeSummary, codeError, sha256]
+  );
+
+  useEffect(() => {
+    if (!codeSummary) {
+      getCodeSummary(false);
+    }
+    return () => {
+      setCodeError(null);
+      setCodeSummary(null);
+      setCodeTruncated(false);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sha256]);
+
+  if (!currentUser.roles.includes('file_detail')) return <ForbiddenPage />;
+  return (
+    <>
+      <div style={{ flexGrow: 1, marginTop: !analysing && !codeError ? theme.spacing(-4) : null }}>
+        {analysing ? (
+          <Spinner>
+            <div style={{ paddingBottom: theme.spacing(2) }}>{t('analysing_code')}</div>
+            <CircularProgress variant="indeterminate" />
+          </Spinner>
+        ) : codeError ? (
+          <Alert severity="error">{codeError}</Alert>
+        ) : (
+          <AIMarkdown markdown={codeSummary} truncated={codeTruncated} />
+        )}
+      </div>
+      {!analysing && (codeSummary || codeError) && (
+        <div>
+          <Tooltip title={t('powered_by_ai.tooltip')} placement="top-end">
+            <Watermark onClick={() => getCodeSummary(true)}>{t('powered_by_ai')}</Watermark>
+          </Tooltip>
+        </div>
+      )}
+    </>
+  );
+};
+
+export const CodeSection = React.memo(WrappedCodeSection);
+export default CodeSection;

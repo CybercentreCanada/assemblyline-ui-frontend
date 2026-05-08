@@ -1,94 +1,79 @@
 import type { TabProps, TabsProps } from '@mui/material';
 import { Tab, Tabs, useTheme } from '@mui/material';
-import type { ReactElement, ReactNode } from 'react';
-import { createContext, memo, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-
-//*****************************************************************************************
-// TabContext
-//*****************************************************************************************
+import type { FC, ReactElement, ReactNode } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
 type TabContextProps = {
-  /** Change active tab programmatically. */
+  /** Change active tab programmatically */
   onTabChange: (value: string) => void;
 };
 
 const TabContext = createContext<TabContextProps | null>(null);
-
 export const useTab = (): TabContextProps => {
   const ctx = useContext(TabContext);
   if (!ctx) throw new Error('useTab must be used within <TabContainer>');
   return ctx;
 };
 
-//*****************************************************************************************
-// TabContent
-//*****************************************************************************************
-
-/** Props for TabContent. */
-export type TabContentProps = React.HTMLProps<HTMLDivElement> & {
-  /** If true, mounts children even when not visible. */
+type TabContentProps = React.HTMLProps<HTMLDivElement> & {
+  /** If true, mounts children even when not visible */
   allowRender?: boolean;
-  /** Tab content children. */
-  children?: ReactNode;
-  /** Whether this tab is currently active. */
+  /** Whether this tab is currently active */
   open?: boolean;
+  /** Tab content children */
+  children?: ReactNode;
 };
 
-export const TabContent = memo(({ allowRender = false, children, open = false, style, ...props }: TabContentProps) => {
-  const [render, setRender] = useState<boolean>(open || allowRender);
+export const TabContent: FC<TabContentProps> = React.memo(
+  ({ allowRender = false, open = false, children, style, ...props }) => {
+    const [render, setRender] = useState<boolean>(open || allowRender);
 
-  useEffect(() => {
-    if (open) setRender(true);
-  }, [open]);
+    useEffect(() => {
+      if (open) setRender(true);
+    }, [open]);
 
-  return (
-    <div {...props} style={{ display: open ? 'contents' : 'none', ...style }}>
-      {render && children}
-    </div>
-  );
-});
-
-TabContent.displayName = 'TabContent';
-
-//*****************************************************************************************
-// TabContainer
-//*****************************************************************************************
+    return (
+      <div {...props} style={{ display: open ? 'contents' : 'none', ...style }}>
+        {render && children}
+      </div>
+    );
+  }
+);
 
 type TabElement = TabProps & {
-  /** Inner content to render when active. */
+  /** Inner content to render when active */
   inner?: ReactNode;
-  /** If true, tab header won't render. */
+  /** If true, tab header won’t render */
   preventRender?: boolean;
 };
 
 type TabElements = Record<string, TabElement>;
 
-/** Props for TabContainer. */
-export type TabContainerProps<T extends TabElements> = TabsProps & {
-  /** Whether inactive tabs should still mount. */
+type TabContainerProps<T extends TabElements> = TabsProps & {
+  /** Whether inactive tabs should still mount */
   allowRender?: boolean;
-  /** Default active tab key. */
+  /** Default active tab key */
   defaultTab?: keyof T;
-  /** If true, uses paper background. */
+  /** If true, uses paper background */
   paper?: boolean;
-  /** Sticky header offset (null to disable). */
+  /** Sticky header offset (null to disable) */
   stickyTop?: number | null;
-  /** List of tabs (keyed). */
+  /** List of tabs (keyed) */
   tabs: T;
-  /** Controlled active tab value. */
+  /** Controlled active tab value */
   value?: keyof T;
 };
 
-export const TabContainer = memo(
+export const TabContainer = React.memo(
   <T extends TabElements>({
     allowRender = false,
     defaultTab: defaultTabProp = null,
-    onChange: onChangeProp = null,
     paper = false,
     stickyTop = null,
-    sx = {},
     tabs,
     value: valueProp = null,
+    onChange: onChangeProp = null,
+    sx = {},
     ...props
   }: TabContainerProps<T>): ReactElement => {
     const theme = useTheme();
@@ -170,5 +155,3 @@ export const TabContainer = memo(
     );
   }
 ) as <T extends TabElements>(props: TabContainerProps<T>) => React.ReactNode;
-
-(TabContainer as { displayName?: string }).displayName = 'TabContainer';
