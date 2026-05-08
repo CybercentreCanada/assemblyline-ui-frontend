@@ -28,10 +28,14 @@ const LAYOUT_PREFERENCE_SCHEMA = z.object({
   theme: z.string().catch('theme.default')
 });
 
-const ROUTER_ROUTER_SCHEMA = z.object({
+const ROUTER_PREFERENCE_SCHEMA = z.object({
   maxPanels: z.number().catch(2),
   maxNodes: z.number().catch(2),
   navigation: z.enum(['push', 'loop']).catch('push')
+});
+
+const SAFE_RESULTS_PREFERENCE_sCHEMA = z.object({
+  show: z.boolean().catch(true)
 });
 
 const SNACKBAR_PREFERENCE_sCHEMA = z.object({
@@ -48,7 +52,8 @@ export const APP_PREFERENCE_SCHEMA = z.object({
   api: API_PREFERENCE_SCHEMA.catch(API_PREFERENCE_SCHEMA.parse({})),
   auth: AUTH_PREFERENCE_SCHEMA.catch(AUTH_PREFERENCE_SCHEMA.parse({})),
   layout: LAYOUT_PREFERENCE_SCHEMA.catch(LAYOUT_PREFERENCE_SCHEMA.parse({})),
-  router: ROUTER_ROUTER_SCHEMA.catch(ROUTER_ROUTER_SCHEMA.parse({})),
+  router: ROUTER_PREFERENCE_SCHEMA.catch(ROUTER_PREFERENCE_SCHEMA.parse({})),
+  safeResults: SAFE_RESULTS_PREFERENCE_sCHEMA.catch(SAFE_RESULTS_PREFERENCE_sCHEMA.parse({})),
   snackbar: SNACKBAR_PREFERENCE_sCHEMA.catch(SNACKBAR_PREFERENCE_sCHEMA.parse({})),
   theme: THEME_PREFERENCE_SCHEMA.catch(THEME_PREFERENCE_SCHEMA.parse({}))
 });

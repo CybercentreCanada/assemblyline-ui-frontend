@@ -14,7 +14,6 @@ import type { MyComponentProps } from './my-feature.models';
 // My Component
 //*****************************************************************************************
 
-/** Props for MyComponent. */
 export type MyComponentProps = {
   /** Whether the panel is open. */
   open: boolean;
@@ -48,8 +47,11 @@ MyComponent.displayName = 'MyComponent';
 
 - `memo()` on every exported component
 - `.displayName` set immediately after definition
-- Comment delimiter block (`//***...`) above each component
-- Props as exported `type` above component, JSDoc per field, alphabetical order
+- Comment delimiter block (`//***...`) above each component — split PascalCase into words (e.g. `// My Component`)
+- **Order within each component block:** banner → props type → component → `displayName`
+- If a file contains exactly one component block in this format, place that file in the module's `components/` folder
+- For single-component files, filename must match the component name (PascalCase), e.g. `Component.tsx`
+- Props as exported `type` directly above component definition, JSDoc per field, alphabetical order
 - NO `React.FC`, NO `React.FunctionComponent`, NO default exports
 - One component = one responsibility — prefer many small files
 - Data from stores, not props — props are for configuration only (variant, size, disabled)

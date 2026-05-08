@@ -21,17 +21,20 @@ const DEFAULT_RETRY_TIME = 10_000;
  * @returns Score-to-verdict mapping function
  */
 export const useScoreToVerdict = () => {
-  const verdicts = useAppConfig(s => s?.configuration?.submission?.verdicts);
+  const malicious = useAppConfig(s => s.configuration.submission.verdicts.malicious);
+  const highly_suspicious = useAppConfig(s => s.configuration.submission.verdicts.highly_suspicious);
+  const suspicious = useAppConfig(s => s.configuration.submission.verdicts.suspicious);
+  const info = useAppConfig(s => s.configuration.submission.verdicts.info);
 
   return useCallback(
     (score: number | null) => {
-      if (score >= verdicts.malicious) return 'malicious';
-      else if (score >= verdicts.highly_suspicious) return 'highly_suspicious';
-      else if (score >= verdicts.suspicious) return 'suspicious';
-      else if (score === null || score >= verdicts.info) return 'info';
+      if (score >= malicious) return 'malicious';
+      else if (score >= highly_suspicious) return 'highly_suspicious';
+      else if (score >= suspicious) return 'suspicious';
+      else if (score === null || score >= info) return 'info';
       else return 'safe';
     },
-    [verdicts]
+    [malicious, highly_suspicious, suspicious, info]
   );
 };
 

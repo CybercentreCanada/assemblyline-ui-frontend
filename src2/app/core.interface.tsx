@@ -1,5 +1,6 @@
 import type { AppTheme } from '@tui/core';
-import type { JSONFeedItem } from 'layout/notifications/notifications.models';
+import type { ExternalEnrichmentState } from 'layout/external-lookup';
+import type { JSONFeedItem } from 'layout/notifications';
 import type { SystemMessage } from 'models/api/user';
 
 declare global {
@@ -32,6 +33,20 @@ declare global {
     drawer: {
       /** Whether the drawer is expanded to maximized width. */
       maximized: boolean;
+    };
+    /** External data source enrichment query state. */
+    externalLookup: {
+      /** Cached enrichment results indexed by tag key. */
+      enrichment: ExternalEnrichmentState;
+    };
+    /** Highlighter state used across detail/section components. */
+    highlighter: {
+      /** Map of key to related keys that should be highlighted together. */
+      links: Record<string, string[]>;
+      /** Directly highlighted keys. */
+      keys: Set<string>;
+      /** Derived related highlighted keys from `highlightMap`. */
+      related: Set<string>;
     };
     /** Notification panel state. */
     notifications: {
@@ -94,6 +109,14 @@ export const DEFAULT_APP_INTERFACE_STORE: AppInterface = {
   },
   drawer: {
     maximized: false
+  },
+  externalLookup: {
+    enrichment: {}
+  },
+  highlighter: {
+    links: {},
+    keys: new Set(),
+    related: new Set()
   },
   notifications: {
     announcementDeleteOpen: false,

@@ -7,10 +7,6 @@ import {
   saveSettingsFromLocalStorage
 } from './config.utils';
 
-//*****************************************************************************************
-// useSaveAppConfig
-//*****************************************************************************************
-
 /**
  * @name useSaveAppConfig
  * @description Returns a callback that persists the current app config to localStorage.
@@ -27,10 +23,6 @@ export const useSaveAppConfig = (): (() => void) => {
     }
   }, [store]);
 };
-
-//*****************************************************************************************
-// useLoadAppConfig
-//*****************************************************************************************
 
 /**
  * @name useLoadAppConfig
@@ -49,10 +41,6 @@ export const useLoadAppConfig = (): (() => void) => {
     }
   }, []);
 };
-
-//*****************************************************************************************
-// useSaveSettings
-//*****************************************************************************************
 
 /**
  * @name useSaveSettings
@@ -76,10 +64,6 @@ export const useSaveSettings = (): { isPending: boolean; save: () => void } => {
 
   return useMemo(() => ({ isPending, save }), [isPending, save]);
 };
-
-//*****************************************************************************************
-// useLoadSettings
-//*****************************************************************************************
 
 /**
  * @name useLoadSettings

@@ -92,6 +92,8 @@ Use when > 3 files OR sub-features:
 ## Rules
 
 - `.tsx` for files with JSX, `.ts` for pure logic/types
+- Single-component files must be placed in the module's `components/` folder
+- Single-component filenames must match the component name (PascalCase), e.g. `AISummarySection.tsx`
 - Tests co-located: `*.test.ts` next to source
 - One `index.ts` per module — exports public API only
 - 1:1 mappings: component → POM, utility → test file

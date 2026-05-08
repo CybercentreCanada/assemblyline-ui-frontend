@@ -140,6 +140,8 @@ Both approaches can coexist — pick per-module based on complexity.
 ### Rules (both approaches)
 
 - File extension: `.tsx` for files with JSX, `.ts` for pure logic/types
+- Single-component files must be placed in the module `components/` folder
+- Single-component filenames must match the component name (PascalCase), e.g. `AISummarySection.tsx`
 - Test files are co-located with the file they test: `*.test.tsx` / `*.test.ts`
 - Each module has an `index.ts` that exports the public API
 - **1:1 mappings**: each component gets a corresponding POM, each utility file gets a corresponding test file

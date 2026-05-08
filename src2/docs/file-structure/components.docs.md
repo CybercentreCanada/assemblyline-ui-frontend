@@ -25,7 +25,6 @@ Every component follows this structure outside its definition:
 // My Component
 //*****************************************************************************************
 
-/** Props for MyComponent. */
 export type MyComponentProps = {
   /** Whether the dialog is currently visible. */
   open: boolean;
@@ -44,6 +43,10 @@ MyComponent.displayName = 'MyComponent';
 **Rules:**
 
 - Every component is preceded by a comment delimiter block
+- Banner title splits PascalCase into words (e.g. `// My Component`)
+- Block order is strict: banner → props type → component → `displayName`
+- If a file contains exactly one component block in this format, place it under the module `components/` folder
+- For single-component files, filename must match the component name (PascalCase), e.g. `Component.tsx`
 - Props are defined as a named `type` export directly above the component
 - Each prop has a JSDoc comment explaining its purpose
 - Component uses `memo()` with an arrow function
