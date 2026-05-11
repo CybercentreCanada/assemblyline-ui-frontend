@@ -1,3 +1,5 @@
+import { i18n } from 'app/app.i18n';
+import { APP_ROUTES } from 'app/app.routes';
 import { AppApiProvider } from 'core/api';
 import { AppConfigStoreProvider } from 'core/config/config.providers';
 import { AppErrorProvider } from 'core/error';
@@ -12,8 +14,6 @@ import { AppCarouselProvider } from 'layout/carousel';
 import { AppDrawerLayout } from 'layout/drawer';
 import type { PropsWithChildren } from 'react';
 import { memo, StrictMode } from 'react';
-import { i18n } from './app.i18n';
-import { APP_ROUTES } from './app.routes';
 
 /**
  * MyAPP:
