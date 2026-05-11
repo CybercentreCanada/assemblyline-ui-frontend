@@ -3,7 +3,7 @@ import { invalidateApiQuery, useApiQuery } from 'core/api';
 import { createAppRoute } from 'core/routes';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AppVerticalBanner } from 'ui/branding';
+import { AppVerticalBanner } from 'ui/branding/AppVerticalBanner';
 import { PageCardCentered } from 'ui/pages/PageCardCentered';
 
 //*****************************************************************************************

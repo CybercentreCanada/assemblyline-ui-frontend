@@ -1,48 +1,55 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import type { TooltipProps as MuiTooltipProps } from '@mui/material';
 import { Tooltip as MuiTooltip } from '@mui/material';
-import React, { useState } from 'react';
+import { memo, useState } from 'react';
 
-export type TooltipProps = Omit<MuiTooltipProps, 'title' | 'children'> & {
+//*****************************************************************************************
+// Tooltip
+//*****************************************************************************************
+
+/** Props for Tooltip. */
+export type TooltipProps = Omit<MuiTooltipProps, 'children' | 'title'> & {
+  /** Content to wrap with the tooltip. */
   children?: React.ReactNode;
-  title?: MuiTooltipProps['title'];
+  /** Whether to skip the wrapper div. */
   noDiv?: boolean;
+  /** Tooltip content. */
+  title?: MuiTooltipProps['title'];
 };
 
-export const Tooltip: React.FC<TooltipProps> = React.memo(
-  ({ children = null, title = null, noDiv = false, ...tooltipProps }: TooltipProps) => {
-    const [open, setOpen] = useState<boolean>(false);
+export const Tooltip = memo(({ children = null, noDiv = false, title = null, ...tooltipProps }: TooltipProps) => {
+  const [open, setOpen] = useState<boolean>(false);
 
-    return title ? (
-      <MuiTooltip
-        title={title}
-        placement="bottom-start"
-        disableInteractive
-        open={open}
-        onOpen={() => setOpen(true)}
-        onClose={() => setOpen(false)}
-        {...tooltipProps}
-        slotProps={{
-          ...tooltipProps?.slotProps,
-          popper: {
-            ...tooltipProps?.slotProps?.popper,
-            disablePortal: true,
-            // modifiers: [{ name: 'offset', options: { offset: [0, 0] } }],
-            onMouseOver: () => setOpen(false)
-          },
-          tooltip: {
-            ...tooltipProps?.slotProps?.tooltip,
-            sx: {
-              textWrap: 'pretty',
-              ...tooltipProps?.slotProps?.tooltip?.['sx']
-            }
+  return title ? (
+    <MuiTooltip
+      title={title}
+      placement="bottom-start"
+      disableInteractive
+      open={open}
+      onOpen={() => setOpen(true)}
+      onClose={() => setOpen(false)}
+      {...tooltipProps}
+      slotProps={{
+        ...tooltipProps?.slotProps,
+        popper: {
+          ...tooltipProps?.slotProps?.popper,
+          disablePortal: true,
+          // modifiers: [{ name: 'offset', options: { offset: [0, 0] } }],
+          onMouseOver: () => setOpen(false)
+        },
+        tooltip: {
+          ...tooltipProps?.slotProps?.tooltip,
+          sx: {
+            textWrap: 'pretty',
+            ...tooltipProps?.slotProps?.tooltip?.['sx']
           }
-        }}
-      >
-        {noDiv ? (children as React.ReactElement<unknown, any>) : <div>{children}</div>}
-      </MuiTooltip>
-    ) : (
-      children
-    );
-  }
-);
+        }
+      }}
+    >
+      {noDiv ? (children as React.ReactElement<unknown, any>) : <div>{children}</div>}
+    </MuiTooltip>
+  ) : (
+    children
+  );
+});
+
+Tooltip.displayName = 'Tooltip';

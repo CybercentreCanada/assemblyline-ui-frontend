@@ -105,6 +105,7 @@ export function useAppNavigate<const Route extends AppRoute>(): (to: CreatedAppR
           else
             nextStore = updatePanel(nextStore, panelKey, { routeKey: nextRouteKey, temporaryRouteKey: nextRouteKey });
         } else if (navigationStyle === 'loop') {
+          // Loop navigation keeps current panel assignment by design.
         }
       }
 

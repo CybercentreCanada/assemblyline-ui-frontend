@@ -49,7 +49,7 @@ import { useTranslation } from 'react-i18next';
 import Markdown from 'react-markdown';
 import { Button } from 'ui/buttons/Button';
 import { IconButton } from 'ui/buttons/IconButton';
-import { CustomChip } from 'ui/chips/CustomChip';
+import { CustomChip } from 'ui/CustomChip';
 
 //*****************************************************************************************
 // Constants

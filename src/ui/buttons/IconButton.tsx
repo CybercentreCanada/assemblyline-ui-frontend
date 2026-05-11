@@ -1,24 +1,24 @@
 import type { IconButtonProps as MuiIconButtonProps, TooltipProps } from '@mui/material';
 import { IconButton as MuiIconButton, Skeleton, useTheme } from '@mui/material';
-import type { CircularProgressProps } from 'components/visual/Buttons/CircularProgress';
-import { CircularProgress } from 'components/visual/Buttons/CircularProgress';
-import { Tooltip } from 'components/visual/Tooltip';
-import { getTextContent } from 'helpers/utils';
+import { AppLink } from 'core/router';
+import type { AppRoute, CreatedAppRouteParamsMap } from 'core/routes';
 import type { CSSProperties } from 'react';
-import React, { useMemo } from 'react';
-import type { LinkProps } from 'react-router-dom';
-import { Link } from 'react-router-dom';
+import { memo, useMemo } from 'react';
+import { getTextContent } from 'shared/utils/utils';
+import type { CircularProgressProps } from 'ui/buttons/CircularProgress';
+import { CircularProgress } from 'ui/buttons/CircularProgress';
+import { Tooltip } from 'ui/text/Tooltip';
 
 export type IconButtonProps = MuiIconButtonProps & {
   loading?: boolean;
   preventRender?: boolean | (() => boolean);
   progress?: CircularProgressProps['progress'];
-  to?: LinkProps['to'] | (() => LinkProps['to']);
+  to?: CreatedAppRouteParamsMap<AppRoute>;
   tooltip?: TooltipProps['title'];
   tooltipProps?: Omit<TooltipProps, 'children' | 'title'>;
 };
 
-export const IconButton: React.FC<IconButtonProps> = React.memo(
+export const IconButton = memo(
   ({
     children = null,
     color = null,
@@ -28,7 +28,7 @@ export const IconButton: React.FC<IconButtonProps> = React.memo(
     preventRender: preventRenderProp = false,
     progress = false,
     size = 'medium',
-    to = null,
+    to: toProp = null,
     tooltip = null,
     tooltipProps = null,
     ...props
@@ -75,8 +75,8 @@ export const IconButton: React.FC<IconButtonProps> = React.memo(
           aria-label={id ?? getTextContent(tooltip)}
           disabled={disabled || progress !== false}
           size={size}
-          {...(!to ? null : { component: Link, to: typeof to === 'function' ? to() : to })}
           {...props}
+          {...(!toProp ? null : { component: AppLink, to: toProp })}
           sx={{ height: 'fit-content', color: resolvedColor, ...props?.sx }}
         >
           {children}
@@ -86,3 +86,5 @@ export const IconButton: React.FC<IconButtonProps> = React.memo(
     );
   }
 );
+
+IconButton.displayName = 'IconButton';

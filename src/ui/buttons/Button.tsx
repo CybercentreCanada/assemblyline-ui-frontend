@@ -1,23 +1,22 @@
 import type { ButtonProps as MuiButtonProps, TooltipProps } from '@mui/material';
 import { Button as MuiButton, Skeleton } from '@mui/material';
-import { CircularProgress } from 'components/visual/Buttons/CircularProgress';
-import { Tooltip } from 'components/visual/Tooltip';
-import { getTextContent } from 'helpers/utils';
-import React, { useMemo } from 'react';
-import type { LinkProps } from 'react-router-dom';
-import { Link } from 'react-router-dom';
+import { AppLink } from 'core/router';
+import type { AppRoute, CreatedAppRouteParamsMap } from 'core/routes';
+import { memo, useMemo } from 'react';
+import { getTextContent } from 'shared/utils/utils';
+import { Tooltip } from 'ui/text/Tooltip';
+import { CircularProgress } from './CircularProgress';
 
 export type ButtonProps = MuiButtonProps & {
-  link?: boolean;
   loading?: boolean;
   preventRender?: boolean | (() => boolean);
   progress?: boolean;
-  to?: LinkProps['to'] | (() => LinkProps['to']);
+  to?: CreatedAppRouteParamsMap<AppRoute>;
   tooltip?: TooltipProps['title'];
   tooltipProps?: Omit<TooltipProps, 'children' | 'title'>;
 };
 
-export const Button: React.FC<ButtonProps> = React.memo(
+export const Button = memo(
   ({
     children = null,
     disabled = false,
@@ -26,7 +25,7 @@ export const Button: React.FC<ButtonProps> = React.memo(
     preventRender: preventRenderProp = false,
     progress = false,
     size = 'medium',
-    to = null,
+    to: toProp = null,
     tooltip = null,
     tooltipProps = null,
     ...props
@@ -51,12 +50,12 @@ export const Button: React.FC<ButtonProps> = React.memo(
         />
       </MuiButton>
     ) : preventRender ? null : (
-      <Tooltip title={tooltip} placement="bottom" {...tooltipProps}>
+      <Tooltip title={tooltip} placement="bottom" noDiv {...tooltipProps}>
         <MuiButton
           id={id ?? getTextContent(children)}
           disabled={progress || disabled}
           size={size}
-          {...(!to || loading ? null : { component: Link, to: typeof to === 'function' ? to() : to })}
+          {...(!toProp ? null : { component: AppLink, to: toProp })}
           {...props}
         >
           {children}
@@ -66,3 +65,5 @@ export const Button: React.FC<ButtonProps> = React.memo(
     );
   }
 );
+
+Button.displayName = 'Button';

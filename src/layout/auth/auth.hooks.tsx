@@ -22,19 +22,19 @@ const DEFAULT_RETRY_TIME = 10_000;
  */
 export const useScoreToVerdict = () => {
   const malicious = useAppConfig(s => s.configuration.submission.verdicts.malicious);
-  const highly_suspicious = useAppConfig(s => s.configuration.submission.verdicts.highly_suspicious);
+  const highlySuspicious = useAppConfig(s => s.configuration.submission.verdicts.highly_suspicious);
   const suspicious = useAppConfig(s => s.configuration.submission.verdicts.suspicious);
   const info = useAppConfig(s => s.configuration.submission.verdicts.info);
 
   return useCallback(
     (score: number | null) => {
       if (score >= malicious) return 'malicious';
-      else if (score >= highly_suspicious) return 'highly_suspicious';
+      else if (score >= highlySuspicious) return 'highly_suspicious';
       else if (score >= suspicious) return 'suspicious';
       else if (score === null || score >= info) return 'info';
       else return 'safe';
     },
-    [malicious, highly_suspicious, suspicious, info]
+    [malicious, highlySuspicious, suspicious, info]
   );
 };
 
@@ -44,11 +44,11 @@ export const useScoreToVerdict = () => {
  * @returns Boolean indicating readiness
  */
 export const useIsAppReady = () => {
-  const agrees_with_tos = useAppConfig(s => s?.user?.agrees_with_tos);
-  const is_active = useAppConfig(s => s?.user?.is_active);
+  const agreesWithTos = useAppConfig(s => s?.user?.agrees_with_tos);
+  const isActive = useAppConfig(s => s?.user?.is_active);
   const tos = useAppConfig(s => s?.configuration?.ui?.tos);
 
-  return useMemo(() => is_active && (agrees_with_tos || !tos), [agrees_with_tos, is_active, tos]);
+  return useMemo(() => isActive && (agreesWithTos || !tos), [agreesWithTos, isActive, tos]);
 };
 
 /**

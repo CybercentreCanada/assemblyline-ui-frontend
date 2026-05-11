@@ -1,7 +1,7 @@
 import { CircularProgress, useTheme } from '@mui/material';
 import { createAppRoute } from 'core/routes';
 import { memo } from 'react';
-import { AppVerticalBanner } from 'ui/branding';
+import { AppVerticalBanner } from 'ui/branding/AppVerticalBanner';
 import { PageCardCentered } from 'ui/pages/PageCardCentered';
 
 //*****************************************************************************************

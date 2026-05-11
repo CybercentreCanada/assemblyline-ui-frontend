@@ -14,7 +14,8 @@ import { LoadingCard, LoginDivider } from 'layout/auth/log-in/log-in.components'
 import { useOAuthLogin, usePasswordResetEmail, useSAMLLogin, useSignUpEmail } from 'layout/auth/log-in/log-in.hooks';
 import { LoginFormProvider, useLoginForm } from 'layout/auth/log-in/log-in.providers';
 import { memo } from 'react';
-import { AppBanner, AppVerticalBanner } from 'ui/branding';
+import { AppBanner } from 'ui/branding/AppBanner';
+import { AppVerticalBanner } from 'ui/branding/AppVerticalBanner';
 import { PageCardCentered } from 'ui/pages/PageCardCentered';
 
 type LoginRequest = {

@@ -16,7 +16,7 @@ export const LockedPage = memo(() => {
   const theme = useTheme();
 
   const tos = useAppConfig(s => s.configuration?.ui?.tos);
-  const tos_lockout_notify = useAppConfig(s => s.configuration?.ui?.tos_lockout_notify);
+  const tosLockoutNotify = useAppConfig(s => s.configuration?.ui?.tos_lockout_notify);
 
   return (
     <>
@@ -28,7 +28,7 @@ export const LockedPage = memo(() => {
           <div style={{ paddingBottom: theme.spacing(2) }}>
             <Typography variant="h3">{t('title')}</Typography>
           </div>
-          {tos_lockout_notify ? (
+          {tosLockoutNotify ? (
             <div>
               <Typography variant="h6">{t('auto_notify')}</Typography>
             </div>

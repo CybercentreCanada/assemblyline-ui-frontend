@@ -75,17 +75,17 @@ export const useSignUpEmail = () => {
   const location = useLocation();
   const form = useLoginForm();
 
-  const registration_key = useMemo(() => {
+  const registrationKey = useMemo(() => {
     const params = new URLSearchParams(location.search);
     return params.get('registration_key') || '';
   }, [location.search]);
 
   useEffect(() => {
-    if (!registration_key) return;
+    if (!registrationKey) return;
 
-    form.setFieldValue('registration_key', registration_key);
+    form.setFieldValue('registration_key', registrationKey);
     form.setFieldValue('mode', 'sign-up-confirmation');
-  }, [form, registration_key]);
+  }, [form, registrationKey]);
 };
 
 /**

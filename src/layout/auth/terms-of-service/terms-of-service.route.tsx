@@ -6,7 +6,7 @@ import { NotFoundPage } from 'pages/not-found/not-found.route';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import Markdown from 'react-markdown';
-import { AppBanner } from 'ui/branding';
+import { AppBanner } from 'ui/branding/AppBanner';
 import { Button } from 'ui/buttons/Button';
 import { PageCenter } from 'ui/pages/PageCenter';
 

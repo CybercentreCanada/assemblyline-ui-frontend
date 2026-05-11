@@ -67,7 +67,7 @@ export const createAppRoute = <
     ? undefined
     : new SearchParamEngine(search(SEARCH_PARAM_BLUEPRINTS_MAP)).setDefaultValues(null);
 
-  const hashCodec = hash ?? ((h: unknown) => h as Hash);
+  const hashCodec = hash ?? ((h: Location['hash']) => h as Hash);
 
   return {
     path,
