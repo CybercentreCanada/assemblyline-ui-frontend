@@ -1,0 +1,7 @@
+{
+  "name": "Playwright Dev Container",
+  "image": "mcr.microsoft.com/playwright:v1.58.0-noble",
+  "forwardPorts": [3000],
+  "postCreateCommand": "npm install -g pnpm@latest-10 && pnpm install && npx playwright install --with-deps",
+  "runArgs": ["--ipc=host", "--init", "--network=host"]
+}

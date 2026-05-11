@@ -1,12 +1,13 @@
 {
   "recommendations": [
-    "esbenp.prettier-vscode",
-    "msjsdiag.debugger-for-chrome",
-    "firefox-devtools.vscode-firefox-debug",
     "dbaeumer.vscode-eslint",
     "eg2.vscode-npm-script",
-    "syler.sass-indented",
+    "esbenp.prettier-vscode",
+    "firefox-devtools.vscode-firefox-debug",
+    "ms-playwright.playwright",
     "ms-vscode.vscode-typescript-tslint-plugin",
-    "richie5um2.vscode-sort-json"
+    "msjsdiag.debugger-for-chrome",
+    "richie5um2.vscode-sort-json",
+    "syler.sass-indented"
   ]
 }
