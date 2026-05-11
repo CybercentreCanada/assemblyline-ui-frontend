@@ -1,6 +1,6 @@
 # File Structure
 
-> Applies to: all new files and modules in `src2/`.
+> Applies to: all new files and modules in `src/`.
 
 ## File Naming Pattern
 
@@ -15,27 +15,27 @@
 
 ## Module File Roles
 
-| Role Suffix | Extension | Purpose |
-|-------------|-----------|---------|
-| `.components` | `.tsx` | UI components (memo, displayName, props) |
-| `.models` | `.ts` | Type declarations, `DEFAULT_*` constants, const arrays |
-| `.hooks` | `.tsx` | Shared hooks (reused in 3+ components) |
-| `.utils` | `.ts` | Pure utility functions |
-| `.utils.test` | `.ts` | Unit tests for utils |
-| `.store` | `.ts` | Zustand store (`createAppStore`) |
-| `.providers` | `.tsx` | Context providers, store providers |
-| `.i18n.en` / `.i18n.fr` | `.json` | Translation files |
-| `.pom` | `.ts` | Playwright Page Object Model |
-| `.spec` | `.ts` | Playwright E2E tests |
+| Role Suffix             | Extension | Purpose                                                |
+| ----------------------- | --------- | ------------------------------------------------------ |
+| `.components`           | `.tsx`    | UI components (memo, displayName, props)               |
+| `.models`               | `.ts`     | Type declarations, `DEFAULT_*` constants, const arrays |
+| `.hooks`                | `.tsx`    | Shared hooks (reused in 3+ components)                 |
+| `.utils`                | `.ts`     | Pure utility functions                                 |
+| `.utils.test`           | `.ts`     | Unit tests for utils                                   |
+| `.store`                | `.ts`     | Zustand store (`createAppStore`)                       |
+| `.providers`            | `.tsx`    | Context providers, store providers                     |
+| `.i18n.en` / `.i18n.fr` | `.json`   | Translation files                                      |
+| `.pom`                  | `.ts`     | Playwright Page Object Model                           |
+| `.spec`                 | `.ts`     | Playwright E2E tests                                   |
 
 ## Where to Put Code
 
-| Type | Location |
-|------|----------|
-| Shared types/logic | `src2/commons/<category>/` |
-| Feature module | `src2/components/<module>/` |
-| Config/bootstrap | `src2/core/` |
-| Public assets | `public/` |
+| Type               | Location                   |
+| ------------------ | -------------------------- |
+| Shared types/logic | `src/commons/<category>/`  |
+| Feature module     | `src/components/<module>/` |
+| Config/bootstrap   | `src/core/`                |
+| Public assets      | `public/`                  |
 
 ## Naming Conventions
 
@@ -83,10 +83,10 @@ Use when > 3 files OR sub-features:
 
 ## Decision Table
 
-| Signal | Approach |
-|--------|----------|
-| < 5 components, simple hooks | File-based |
-| 300+ lines per role file | Folder-based |
+| Signal                                 | Approach     |
+| -------------------------------------- | ------------ |
+| < 5 components, simple hooks           | File-based   |
+| 300+ lines per role file               | Folder-based |
 | Many independently testable components | Folder-based |
 
 ## Rules
@@ -106,4 +106,3 @@ Use when > 3 files OR sub-features:
 3. Add `.utils.ts` only if pure functions extracted from components
 4. Add `.store.ts` + `.providers.tsx` only if feature-scoped state needed
 5. Add `.i18n.*.json` only if module has user-visible strings
-

@@ -1,10 +1,10 @@
 # TODO — Core Modules
 
-Tasks related to `src2/core/` (api, assistant, config, error, interface, preference, router, routes, snackbar, template, theme).
+Tasks related to `src/core/` (api, assistant, config, error, interface, preference, router, routes, snackbar, template, theme).
 
 ## Pending
 
-- [ ] **Port `AssistantProvider`** — Migrate the full AI assistant implementation from `src/components/providers/AssistantProvider.tsx` to `src2/core/assistant/`. The old implementation includes:
+- [ ] **Port `AssistantProvider`** — Migrate the full AI assistant implementation from `src/components/providers/AssistantProvider.tsx` to `src/core/assistant/`. The old implementation includes:
   - Chat UI (Popper + Backdrop + FAB)
   - Insight system (file, submission, report, code insights with chip triggers)
   - Conversation history + context management
@@ -13,10 +13,10 @@ Tasks related to `src2/core/` (api, assistant, config, error, interface, prefere
   - Reset/clear conversation actions
   - Currently uses `useMediaQuery` (needs `useAppMediaQuery` replacement)
 
-- [ ] **Port `BorealisProvider`** — Integrate the `borealis-ui` `BorealisProvider` into the `src2/` app template. Currently wired in `src/commons/components/app/AppProvider.tsx` with config:
+- [ ] **Port `BorealisProvider`** — Integrate the `borealis-ui` `BorealisProvider` into the `src/` app template. Currently wired in `src/commons/components/app/AppProvider.tsx` with config:
   - `baseURL`: `location.origin + '/api/v4/proxy/borealis'`
   - `getToken`: `() => null`
   - `chunkSize`: 200, `maxRequestCount`: 3, `defaultTimeout`: 60
-  - Should be placed in `src2/app/` template provider tree or a new `core/borealis/` module
+  - Should be placed in `src/app/` template provider tree or a new `core/borealis/` module
 
 ## Completed

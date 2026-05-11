@@ -1,6 +1,6 @@
 # TODO — Pages
 
-Tasks related to `src2/pages/` (page components, route definitions, page-specific logic).
+Tasks related to `src/pages/` (page components, route definitions, page-specific logic).
 
 ## Pending
 

@@ -1,6 +1,6 @@
 # TODO — Layout Modules
 
-Tasks related to `src2/layout/` (apps, auth, carousel, drawer, notifications, top-nav).
+Tasks related to `src/layout/` (apps, auth, carousel, drawer, notifications, top-nav).
 
 ## Pending
 
