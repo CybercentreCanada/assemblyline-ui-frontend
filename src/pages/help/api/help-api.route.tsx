@@ -21,7 +21,7 @@ import { useAppConfig } from 'core/config';
 import { createAppRoute } from 'core/routes';
 import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { CustomChip } from 'ui/chips/CustomChip';
+import { CustomChip } from 'ui/CustomChip';
 import { PageFullWidth } from 'ui/pages/PageFullWidth';
 import { PageHeader } from 'ui/pages/PageHeader';
 

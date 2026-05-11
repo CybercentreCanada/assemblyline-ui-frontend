@@ -1,19 +1,19 @@
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import type { ButtonProps, FormControlLabelProps, TypographyProps } from '@mui/material';
 import { Button, FormControlLabel, Skeleton, Typography, useTheme } from '@mui/material';
-import { usePropStore } from 'components/core/PropProvider/PropProvider';
-import { InputRequiredBadge } from 'components/visual/Inputs/components/inputs.component.form';
+import { usePropStore } from 'features/prop-provider/PropProvider';
+import React, { useMemo } from 'react';
+import type { TooltipProps } from 'ui/Tooltip';
+import { Tooltip } from 'ui/Tooltip';
+import { InputRequiredBadge } from 'ui/inputs/components/inputs.component.form';
 import {
   useInputId,
   useShouldRenderExpand,
   useShouldRenderPassword,
   useShouldRenderProgress,
   useShouldRenderReset
-} from 'components/visual/Inputs/hooks/inputs.hook.renderer';
-import type { InputControllerProps } from 'components/visual/Inputs/models/inputs.model';
-import type { TooltipProps } from 'components/visual/Tooltip';
-import { Tooltip } from 'components/visual/Tooltip';
-import React, { useMemo } from 'react';
+} from 'ui/inputs/hooks/inputs.hook.renderer';
+import type { InputControllerProps } from 'ui/inputs/models/inputs.model';
 
 export const InputCircularSkeleton = React.memo(() => {
   const [get] = usePropStore<InputControllerProps>();

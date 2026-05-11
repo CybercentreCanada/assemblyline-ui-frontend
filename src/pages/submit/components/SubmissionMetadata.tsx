@@ -15,6 +15,9 @@ import { isURL } from 'shared/utils/utils';
 import { Button } from 'ui/buttons/Button';
 import { IconButton } from 'ui/buttons/IconButton';
 // import { MonacoEditor } from 'ui/editors/MonacoEditor';
+import type { SubmitMetadata } from 'pages/submit/submit.form';
+import { useForm } from 'pages/submit/submit.form';
+import { isValidMetadata } from 'pages/submit/submit.utils';
 import type { DateInputProps } from 'ui/inputs/DateInput';
 import { DateInput } from 'ui/inputs/DateInput';
 import type { NumberInputProps } from 'ui/inputs/NumberInput';
@@ -26,9 +29,6 @@ import { SwitchInput } from 'ui/inputs/SwitchInput';
 import type { TextInputProps } from 'ui/inputs/TextInput';
 import { TextInput } from 'ui/inputs/TextInput';
 import type { Validator } from 'ui/inputs/utils/inputs.util.validation';
-import type { SubmitMetadata } from '../submit.form';
-import { useForm } from '../submit.form';
-import { isValidMetadata } from '../submit.utils';
 
 const STATIC_VALIDATOR_TYPES_SET = new Set<MetadataFieldTypeMap>(['enum', 'boolean', 'integer', 'date']);
 

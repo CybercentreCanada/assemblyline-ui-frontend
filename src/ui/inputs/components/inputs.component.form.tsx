@@ -17,13 +17,13 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
-import { usePropStore } from 'components/core/PropProvider/PropProvider';
-import { IconButton } from 'components/visual/Buttons/IconButton';
-import { useInputId, useInputLabel } from 'components/visual/Inputs/hooks/inputs.hook.renderer';
-import type { InputControllerProps, SelectInputOption } from 'components/visual/Inputs/models/inputs.model';
-import { Tooltip } from 'components/visual/Tooltip';
+import { usePropStore } from 'features/prop-provider/PropProvider';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { IconButton } from 'ui/buttons/IconButton';
+import { useInputId, useInputLabel } from 'ui/inputs/hooks/inputs.hook.renderer';
+import type { InputControllerProps, SelectInputOption } from 'ui/inputs/models/inputs.model';
+import { Tooltip } from 'ui/Tooltip';
 
 /**********************************************************************************************************************
  * Skeletons

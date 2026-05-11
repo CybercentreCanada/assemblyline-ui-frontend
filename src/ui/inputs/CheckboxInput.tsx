@@ -1,6 +1,7 @@
 import type { CheckboxProps } from '@mui/material';
 import { Checkbox } from '@mui/material';
-import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
+import { PropProvider, usePropStore } from 'features/prop-provider/PropProvider';
+import React from 'react';
 import {
   ExpandInputAdornment,
   HelpInputAdornment,
@@ -8,29 +9,19 @@ import {
   PasswordInputAdornment,
   ProgressInputAdornment,
   ResetInputAdornment
-} from 'components/visual/Inputs/components/inputs.component.adornment';
+} from 'ui/inputs/components/inputs.component.adornment';
 import {
   InputButtonFormControlLabel,
   InputButtonLabel,
   InputFormButton,
   InputFormButtonTooltip
-} from 'components/visual/Inputs/components/inputs.component.buttons';
-import { InputFormControl, InputHelperText } from 'components/visual/Inputs/components/inputs.component.form';
-import {
-  useInputClick,
-  useInputClickBlur,
-  useInputFocus
-} from 'components/visual/Inputs/hooks/inputs.hook.event_handlers';
-import { useInputId } from 'components/visual/Inputs/hooks/inputs.hook.renderer';
-import { useInputValidation } from 'components/visual/Inputs/hooks/inputs.hook.validation';
-import type {
-  InputOptions,
-  InputRuntimeState,
-  InputSlotProps,
-  InputValueModel
-} from 'components/visual/Inputs/models/inputs.model';
-import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/models/inputs.model';
-import React from 'react';
+} from 'ui/inputs/components/inputs.component.buttons';
+import { InputFormControl, InputHelperText } from 'ui/inputs/components/inputs.component.form';
+import { useInputClick, useInputClickBlur, useInputFocus } from 'ui/inputs/hooks/inputs.hook.event_handlers';
+import { useInputId } from 'ui/inputs/hooks/inputs.hook.renderer';
+import { useInputValidation } from 'ui/inputs/hooks/inputs.hook.validation';
+import type { InputOptions, InputRuntimeState, InputSlotProps, InputValueModel } from 'ui/inputs/models/inputs.model';
+import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'ui/inputs/models/inputs.model';
 
 export type CheckboxInputProps = InputValueModel<boolean, React.MouseEvent<HTMLButtonElement, MouseEvent>> &
   InputOptions &

@@ -1,5 +1,6 @@
 import { Paper, useTheme } from '@mui/material';
 import { useAppConfig } from 'core/config';
+import { useForm } from 'pages/settings/settings.form';
 import { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { PageSection } from 'ui/layouts/PageSection';
@@ -7,8 +8,7 @@ import { BooleanListInput } from 'ui/list-inputs/BooleanListInput';
 import { ClassificationListInput } from 'ui/list-inputs/ClassificationListInput';
 import { NumberListInput } from 'ui/list-inputs/NumberListInput';
 import { List } from 'ui/list/List';
-import { Markdown } from 'ui/markdown/Markdown';
-import { useForm } from '../settings.form';
+import { Markdown } from 'ui/Markdown';
 
 export const SubmissionProfileDescription = memo(() => {
   const { t } = useTranslation(['settings']);

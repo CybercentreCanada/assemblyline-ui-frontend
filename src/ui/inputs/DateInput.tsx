@@ -4,37 +4,32 @@ import { Popover, useTheme } from '@mui/material';
 import { DigitalClock, LocalizationProvider, DateTimePicker as MuiDateTimePicker } from '@mui/x-date-pickers';
 import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
-import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
-import { IconButton } from 'components/visual/Buttons/IconButton';
+import { PropProvider, usePropStore } from 'features/prop-provider/PropProvider';
+import type { Moment } from 'moment';
+import moment from 'moment';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { IconButton } from 'ui/buttons/IconButton';
 import {
   HelpInputAdornment,
   InputEndAdornment,
   PasswordInputAdornment,
   ProgressInputAdornment,
   ResetInputAdornment
-} from 'components/visual/Inputs/components/inputs.component.adornment';
+} from 'ui/inputs/components/inputs.component.adornment';
 import {
   InputFormControl,
   InputFormLabel,
   InputHelperText,
   InputRoot,
   InputSkeleton
-} from 'components/visual/Inputs/components/inputs.component.form';
-import { useInputTextFieldSlots } from 'components/visual/Inputs/components/inputs.component.textfield';
-import { useInputBlur, useInputChange, useInputFocus } from 'components/visual/Inputs/hooks/inputs.hook.event_handlers';
-import { useInputId } from 'components/visual/Inputs/hooks/inputs.hook.renderer';
-import { useInputValidation } from 'components/visual/Inputs/hooks/inputs.hook.validation';
-import type {
-  InputOptions,
-  InputRuntimeState,
-  InputSlotProps,
-  InputValueModel
-} from 'components/visual/Inputs/models/inputs.model';
-import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/models/inputs.model';
-import type { Moment } from 'moment';
-import moment from 'moment';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+} from 'ui/inputs/components/inputs.component.form';
+import { useInputTextFieldSlots } from 'ui/inputs/components/inputs.component.textfield';
+import { useInputBlur, useInputChange, useInputFocus } from 'ui/inputs/hooks/inputs.hook.event_handlers';
+import { useInputId } from 'ui/inputs/hooks/inputs.hook.renderer';
+import { useInputValidation } from 'ui/inputs/hooks/inputs.hook.validation';
+import type { InputOptions, InputRuntimeState, InputSlotProps, InputValueModel } from 'ui/inputs/models/inputs.model';
+import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'ui/inputs/models/inputs.model';
 
 // This function updates the week start for the specified locale
 function configureMomentLocale(language: string) {

@@ -1,6 +1,7 @@
 import OpenInNewOutlinedIcon from '@mui/icons-material/OpenInNewOutlined';
 import { Typography, useTheme } from '@mui/material';
 import type { ProfileSettings } from 'pages/settings/settings.utils';
+import { useForm } from 'pages/submit/submit.form';
 import { memo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CheckboxInput } from 'ui/inputs/CheckboxInput';
@@ -9,8 +10,7 @@ import { NumberInput } from 'ui/inputs/NumberInput';
 import { SelectInput } from 'ui/inputs/SelectInput';
 import { TextInput } from 'ui/inputs/TextInput';
 import { CollapseSection } from 'ui/layouts/CollapseSection';
-import { ShowMore } from 'ui/text/ShowMore';
-import { useForm } from '../submit.form';
+import { ShowMore } from 'ui/ShowMore';
 
 type SpecParamList = {
   show: number[];

@@ -1,11 +1,11 @@
 import type { TypographyProps } from '@mui/material';
 import { Skeleton, Typography, useTheme } from '@mui/material';
-import { useAppBar, useAppBarHeight, useAppLayout } from 'commons/components/app/hooks';
-import useALContext from 'components/hooks/useALContext';
-import type { ClassificationProps } from 'components/visual/Classification';
-import Classification from 'components/visual/Classification';
+import { useAppBar, useAppBarHeight, useAppLayout } from '@tui/core';
+import useALContext from 'deprecated/hooks/useALContext';
 import type { CSSProperties, DetailedHTMLProps, HTMLAttributes, ReactNode } from 'react';
 import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
+import type { ClassificationProps } from 'ui/Classification';
+import { Classification } from 'ui/Classification';
 
 export type PageHeaderProps = {
   actions?: ReactNode;

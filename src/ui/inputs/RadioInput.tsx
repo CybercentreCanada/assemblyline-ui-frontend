@@ -1,38 +1,29 @@
 import type { FormControlLabelProps } from '@mui/material';
 import { Radio, RadioGroup } from '@mui/material';
-import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
+import { PropProvider, usePropStore } from 'features/prop-provider/PropProvider';
+import React from 'react';
 import {
   HelpInputAdornment,
   InputButtonEndAdornment,
   PasswordInputAdornment,
   ProgressInputAdornment,
   ResetInputAdornment
-} from 'components/visual/Inputs/components/inputs.component.adornment';
+} from 'ui/inputs/components/inputs.component.adornment';
 import {
   InputButtonFormControlLabel,
   InputButtonLabel,
   InputFormButton
-} from 'components/visual/Inputs/components/inputs.component.buttons';
+} from 'ui/inputs/components/inputs.component.buttons';
 import {
   InputFormControl,
   InputFormLabel,
   InputHelperText,
   InputRoot
-} from 'components/visual/Inputs/components/inputs.component.form';
-import {
-  useInputChange,
-  useInputClickBlur,
-  useInputFocus
-} from 'components/visual/Inputs/hooks/inputs.hook.event_handlers';
-import { useInputValidation } from 'components/visual/Inputs/hooks/inputs.hook.validation';
-import type {
-  InputOptions,
-  InputRuntimeState,
-  InputSlotProps,
-  InputValueModel
-} from 'components/visual/Inputs/models/inputs.model';
-import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/models/inputs.model';
-import React from 'react';
+} from 'ui/inputs/components/inputs.component.form';
+import { useInputChange, useInputClickBlur, useInputFocus } from 'ui/inputs/hooks/inputs.hook.event_handlers';
+import { useInputValidation } from 'ui/inputs/hooks/inputs.hook.validation';
+import type { InputOptions, InputRuntimeState, InputSlotProps, InputValueModel } from 'ui/inputs/models/inputs.model';
+import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'ui/inputs/models/inputs.model';
 
 type Option = Omit<FormControlLabelProps, 'control' | 'label'> & {
   control?: FormControlLabelProps['control'];

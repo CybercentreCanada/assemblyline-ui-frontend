@@ -1,17 +1,17 @@
 /* eslint-disable @typescript-eslint/no-unnecessary-type-constraint */
-import { usePropStore } from 'components/core/PropProvider/PropProvider';
-import type { InputControllerProps, InputOptions, InputValueModel } from 'components/visual/Inputs/models/inputs.model';
+import { usePropStore } from 'features/prop-provider/PropProvider';
+import type { SyntheticEvent } from 'react';
+import { useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
+import type { InputControllerProps, InputOptions, InputValueModel } from 'ui/inputs/models/inputs.model';
 import type {
   Coercer,
   CoercersSchema,
   ValidationSchema,
   ValidationStatus,
   Validator
-} from 'components/visual/Inputs/utils/inputs.util.validation';
-import { CoercersResolver, ValidationResolver } from 'components/visual/Inputs/utils/inputs.util.validation';
-import type { SyntheticEvent } from 'react';
-import { useCallback } from 'react';
-import { useTranslation } from 'react-i18next';
+} from 'ui/inputs/utils/inputs.util.validation';
+import { CoercersResolver, ValidationResolver } from 'ui/inputs/utils/inputs.util.validation';
 
 /**********************************************************************************************************************
  * Validation Hooks

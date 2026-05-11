@@ -1,5 +1,6 @@
 import {
   alpha,
+  Button,
   Card,
   Dialog,
   DialogActions,
@@ -14,10 +15,7 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import useALContext from 'components/hooks/useALContext';
-import { Button } from 'components/visual/Buttons/Button';
-import CustomChip, { COLOR_MAP } from 'components/visual/CustomChip';
-import { Tooltip } from 'components/visual/Tooltip';
+import useALContext from 'deprecated/hooks/useALContext';
 import type {
   ClassificationGroup,
   ClassificationLevel,
@@ -26,7 +24,7 @@ import type {
   ClassificationSubGroup,
   ClassificationValidator,
   FormatProp
-} from 'helpers/classificationParser';
+} from 'features/classification/classificationParser';
 import {
   applyAliases,
   applyClassificationRules,
@@ -36,10 +34,12 @@ import {
   getLevelText,
   getParts,
   normalizedClassification
-} from 'helpers/classificationParser';
-import type { PossibleColor } from 'helpers/colors';
+} from 'features/classification/classificationParser';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import type { PossibleColor } from 'shared/utils/colors';
+import { COLOR_MAP, CustomChip } from 'ui/CustomChip';
+import { Tooltip } from './Tooltip';
 
 export interface ClassificationProps {
   c12n: string;

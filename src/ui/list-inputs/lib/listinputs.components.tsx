@@ -13,18 +13,15 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
-import { usePropStore } from 'components/core/PropProvider/PropProvider';
-import { IconButton } from 'components/visual/Buttons/IconButton';
-import {
-  InputListItemText,
-  SelectInputOptionMenuItem
-} from 'components/visual/Inputs/components/inputs.component.form';
-import { useInputTextFieldSlots } from 'components/visual/Inputs/components/inputs.component.textfield';
-import { useInputId } from 'components/visual/Inputs/hooks/inputs.hook.renderer';
-import type { SelectInputOption } from 'components/visual/Inputs/models/inputs.model';
-import type { ListInputControllerProps } from 'components/visual/ListInputs/lib/listinputs.model';
+import { usePropStore } from 'features/prop-provider/PropProvider';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { IconButton } from 'ui/buttons/IconButton';
+import { InputListItemText, SelectInputOptionMenuItem } from 'ui/inputs/components/inputs.component.form';
+import { useInputTextFieldSlots } from 'ui/inputs/components/inputs.component.textfield';
+import { useInputId } from 'ui/inputs/hooks/inputs.hook.renderer';
+import type { SelectInputOption } from 'ui/inputs/models/inputs.model';
+import type { ListInputControllerProps } from 'ui/list-inputs/lib/listinputs.model';
 
 /**********************************************************************************************************************
  * Skeletons

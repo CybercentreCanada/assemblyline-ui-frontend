@@ -1,21 +1,18 @@
 import type { MenuItemProps, SelectProps } from '@mui/material';
 import { ListItemText, MenuItem, Select, useTheme } from '@mui/material';
-import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
+import { PropProvider, usePropStore } from 'features/prop-provider/PropProvider';
+import React from 'react';
 import {
   HelpInputAdornment,
   PasswordInputAdornment,
   ProgressInputAdornment,
   ResetInputAdornment
-} from 'components/visual/Inputs/components/inputs.component.adornment';
-import { InputHelperText } from 'components/visual/Inputs/components/inputs.component.form';
-import { useInputBlur, useInputChange, useInputFocus } from 'components/visual/Inputs/hooks/inputs.hook.event_handlers';
-import { useInputId } from 'components/visual/Inputs/hooks/inputs.hook.renderer';
-import { useInputValidation } from 'components/visual/Inputs/hooks/inputs.hook.validation';
-import type {
-  InputRuntimeState,
-  InputValueModel,
-  SelectInputOption
-} from 'components/visual/Inputs/models/inputs.model';
+} from 'ui/inputs/components/inputs.component.adornment';
+import { InputHelperText } from 'ui/inputs/components/inputs.component.form';
+import { useInputBlur, useInputChange, useInputFocus } from 'ui/inputs/hooks/inputs.hook.event_handlers';
+import { useInputId } from 'ui/inputs/hooks/inputs.hook.renderer';
+import { useInputValidation } from 'ui/inputs/hooks/inputs.hook.validation';
+import type { InputRuntimeState, InputValueModel, SelectInputOption } from 'ui/inputs/models/inputs.model';
 import {
   ListInputInner,
   ListInputLoading,
@@ -23,10 +20,9 @@ import {
   ListInputText,
   ListInputWrapper,
   SelectListInputOptionMenuItem
-} from 'components/visual/ListInputs/lib/listinputs.components';
-import type { ListInputOptions, ListInputSlotProps } from 'components/visual/ListInputs/lib/listinputs.model';
-import { DEFAULT_LIST_INPUT_CONTROLLER_PROPS } from 'components/visual/ListInputs/lib/listinputs.model';
-import React from 'react';
+} from 'ui/list-inputs/lib/listinputs.components';
+import type { ListInputOptions, ListInputSlotProps } from 'ui/list-inputs/lib/listinputs.model';
+import { DEFAULT_LIST_INPUT_CONTROLLER_PROPS } from 'ui/list-inputs/lib/listinputs.model';
 
 export type SelectListInputProps<O extends readonly SelectInputOption[]> = InputValueModel<O[number]['value']> &
   ListInputOptions &

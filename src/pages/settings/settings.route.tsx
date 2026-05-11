@@ -1,20 +1,20 @@
 import { useAppConfig } from 'core/config';
 import { createAppRoute, useAppPathParams } from 'core/routes';
 import { TableOfContentProvider, useTableOfContent } from 'features/table-of-content/TableOfContent';
+import { DefaultMetadataSection } from 'pages/settings/components/DefaultMetadata';
+import { ExternalSourcesSection } from 'pages/settings/components/ExternalSources';
+import { HeaderSection } from 'pages/settings/components/Header';
+import { InterfaceSection } from 'pages/settings/components/Interface';
+import { LeftNav } from 'pages/settings/components/LeftNav';
+import { RightNav } from 'pages/settings/components/RightNav';
+import { ServicesSection } from 'pages/settings/components/Services';
+import { SubmissionOptionsSection, SubmissionProfileDescription } from 'pages/settings/components/Submission';
+import type { SettingsStore } from 'pages/settings/settings.form';
+import { FormProvider, useForm } from 'pages/settings/settings.form';
+import { initializeSettings, loadDefaultProfile, loadSubmissionProfile } from 'pages/settings/settings.utils';
 import { memo, useCallback, useEffect } from 'react';
 import { ForbiddenRedirect } from 'ui/layouts/ForbiddenRedirect';
 import { PageLayout } from 'ui/layouts/PageLayout';
-import { DefaultMetadataSection } from './components/DefaultMetadata';
-import { ExternalSourcesSection } from './components/ExternalSources';
-import { HeaderSection } from './components/Header';
-import { InterfaceSection } from './components/Interface';
-import { LeftNav } from './components/LeftNav';
-import { RightNav } from './components/RightNav';
-import { ServicesSection } from './components/Services';
-import { SubmissionOptionsSection, SubmissionProfileDescription } from './components/Submission';
-import type { SettingsStore } from './settings.form';
-import { FormProvider, useForm } from './settings.form';
-import { initializeSettings, loadDefaultProfile, loadSubmissionProfile } from './settings.utils';
 
 type Params = {
   tab: SettingsStore['state']['tab'];

@@ -6,7 +6,7 @@ import { memo, useCallback, useMemo } from 'react';
 import { useDropzone } from 'react-dropzone';
 import { useTranslation } from 'react-i18next';
 import { AiOutlineSecurityScan } from 'react-icons/ai';
-import { ByteNumber } from 'ui/text/ByteNumber';
+import { ByteNumber } from 'ui/ByteNumber';
 
 type DropZoneProps = {
   enter?: boolean;

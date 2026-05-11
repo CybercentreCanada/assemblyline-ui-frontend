@@ -1,6 +1,6 @@
 import type { MenuItemProps, SelectProps } from '@mui/material';
 import { ListItemText, MenuItem, Select } from '@mui/material';
-import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
+import { PropProvider, usePropStore } from 'features/prop-provider/PropProvider';
 import {
   HelpInputAdornment,
   InputEndAdornment,
@@ -8,7 +8,7 @@ import {
   PasswordInputAdornment,
   ProgressInputAdornment,
   ResetInputAdornment
-} from 'components/visual/Inputs/components/inputs.component.adornment';
+} from 'ui/inputs/components/inputs.component.adornment';
 import {
   InputFormControl,
   InputFormLabel,
@@ -16,18 +16,18 @@ import {
   InputRoot,
   InputSkeleton,
   SelectInputOptionMenuItem
-} from 'components/visual/Inputs/components/inputs.component.form';
-import { useInputBlur, useInputChange, useInputFocus } from 'components/visual/Inputs/hooks/inputs.hook.event_handlers';
-import { useInputId } from 'components/visual/Inputs/hooks/inputs.hook.renderer';
-import { useInputValidation } from 'components/visual/Inputs/hooks/inputs.hook.validation';
+} from 'ui/inputs/components/inputs.component.form';
+import { useInputBlur, useInputChange, useInputFocus } from 'ui/inputs/hooks/inputs.hook.event_handlers';
+import { useInputId } from 'ui/inputs/hooks/inputs.hook.renderer';
+import { useInputValidation } from 'ui/inputs/hooks/inputs.hook.validation';
 import type {
   InputOptions,
   InputRuntimeState,
   InputSlotProps,
   InputValueModel,
   SelectInputOption
-} from 'components/visual/Inputs/models/inputs.model';
-import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/models/inputs.model';
+} from 'ui/inputs/models/inputs.model';
+import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'ui/inputs/models/inputs.model';
 
 export type SelectInputProps<O extends readonly SelectInputOption[]> = InputValueModel<O[number]['value']> &
   InputOptions &

@@ -12,36 +12,8 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
-import useALContext from 'components/hooks/useALContext';
-import type { WhoAmI } from 'components/models/ui/user';
-import { Button } from 'components/visual/Buttons/Button';
-import type { ClassificationProps } from 'components/visual/Classification';
-import CustomChip, { COLOR_MAP } from 'components/visual/CustomChip';
-import {
-  HelpInputAdornment,
-  PasswordInputAdornment,
-  ProgressInputAdornment,
-  ResetInputAdornment
-} from 'components/visual/Inputs/components/inputs.component.adornment';
-import {
-  InputFormControl,
-  InputFormLabel,
-  InputHelperText,
-  InputRoot,
-  InputSkeleton
-} from 'components/visual/Inputs/components/inputs.component.form';
-import { useInputBlur } from 'components/visual/Inputs/hooks/inputs.hook.event_handlers';
-import { useInputValidation } from 'components/visual/Inputs/hooks/inputs.hook.validation';
-import type {
-  InputOptions,
-  InputRuntimeState,
-  InputSlotProps,
-  InputValueModel
-} from 'components/visual/Inputs/models/inputs.model';
-import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/models/inputs.model';
-import { Tooltip } from 'components/visual/Tooltip';
-import type { ClassificationParts, ClassificationValidator } from 'helpers/classificationParser';
+import useALContext from 'deprecated/hooks/useALContext';
+import type { ClassificationParts, ClassificationValidator } from 'features/classification/classificationParser';
 import {
   applyAliases,
   applyClassificationRules,
@@ -50,10 +22,33 @@ import {
   getLevelText,
   getParts,
   normalizedClassification
-} from 'helpers/classificationParser';
-import type { PossibleColor } from 'helpers/colors';
+} from 'features/classification/classificationParser';
+import { PropProvider, usePropStore } from 'features/prop-provider/PropProvider';
+import type { WhoAmI } from 'models/api/user';
 import { useCallback, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import type { PossibleColor } from 'shared/utils/colors';
+import { Button } from 'ui/buttons/Button';
+import type { ClassificationProps } from 'ui/Classification';
+import CustomChip, { COLOR_MAP } from 'ui/CustomChip';
+import {
+  HelpInputAdornment,
+  PasswordInputAdornment,
+  ProgressInputAdornment,
+  ResetInputAdornment
+} from 'ui/inputs/components/inputs.component.adornment';
+import {
+  InputFormControl,
+  InputFormLabel,
+  InputHelperText,
+  InputRoot,
+  InputSkeleton
+} from 'ui/inputs/components/inputs.component.form';
+import { useInputBlur } from 'ui/inputs/hooks/inputs.hook.event_handlers';
+import { useInputValidation } from 'ui/inputs/hooks/inputs.hook.validation';
+import type { InputOptions, InputRuntimeState, InputSlotProps, InputValueModel } from 'ui/inputs/models/inputs.model';
+import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'ui/inputs/models/inputs.model';
+import { Tooltip } from 'ui/Tooltip';
 
 export type ClassificationInputProps = Omit<ClassificationProps, 'c12n' | 'setClassification'> &
   InputValueModel<ClassificationProps['c12n']> &

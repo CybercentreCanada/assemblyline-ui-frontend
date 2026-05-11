@@ -4,16 +4,8 @@ import { createAppRoute } from 'core/routes';
 import { useAppSnackbar } from 'core/snackbar';
 import type { Metadata } from 'models/base/submission';
 import { initializeSettings, loadDefaultProfile, loadSubmissionProfile } from 'pages/settings/settings.utils';
-import { memo, useCallback, useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useLocation } from 'react-router';
-import { generateRandomUUID } from 'shared/utils/app.utils';
-import { getSubmitType } from 'shared/utils/utils';
-import { AppBanner } from 'ui/branding';
-import { PageCenter } from 'ui/pages/PageCenter';
-import { TabContainer } from 'ui/TabContainer';
-import { ServiceParameters } from './components/ServiceParameters';
-import { SubmissionData } from './components/SubmissionData';
+import { ServiceParameters } from 'pages/submit/components/ServiceParameters';
+import { SubmissionData } from 'pages/submit/components/SubmissionData';
 import {
   AdjustButton,
   AnalyzeSubmission,
@@ -29,11 +21,11 @@ import {
   RawInput,
   SubmissionProfileInput,
   ToS
-} from './components/SubmissionInputs';
-import { SubmissionMetadata } from './components/SubmissionMetadata';
-import { SubmissionOptions } from './components/SubmissionOptions';
-import type { SubmitState, SubmitStore } from './submit.form';
-import { FLOW, FormProvider, useForm } from './submit.form';
+} from 'pages/submit/components/SubmissionInputs';
+import { SubmissionMetadata } from 'pages/submit/components/SubmissionMetadata';
+import { SubmissionOptions } from 'pages/submit/components/SubmissionOptions';
+import type { SubmitState, SubmitStore } from 'pages/submit/submit.form';
+import { FLOW, FormProvider, useForm } from 'pages/submit/submit.form';
 import {
   calculateFileHash,
   getDefaultExternalSources,
@@ -41,7 +33,15 @@ import {
   isValidJSON,
   switchProfile,
   useAutoURLServicesSelection
-} from './submit.utils';
+} from 'pages/submit/submit.utils';
+import { memo, useCallback, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useLocation } from 'react-router';
+import { generateRandomUUID } from 'shared/utils/app.utils';
+import { getSubmitType } from 'shared/utils/utils';
+import { AppBanner } from 'ui/branding/AppBanner';
+import { PageCenter } from 'ui/pages/PageCenter';
+import { TabContainer } from 'ui/TabContainer';
 
 type AdjustProps = { adjust: boolean };
 

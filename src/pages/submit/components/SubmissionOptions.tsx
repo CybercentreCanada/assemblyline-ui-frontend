@@ -1,12 +1,12 @@
 import { Typography, useTheme } from '@mui/material';
 import { useAppConfig } from 'core/config';
-import { useForm } from '../submit.form';
+import { useForm } from 'pages/submit/submit.form';
+import { memo, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { CheckboxInput } from 'ui/inputs/CheckboxInput';
 import { NumberInput } from 'ui/inputs/NumberInput';
 import { SelectInput } from 'ui/inputs/SelectInput';
 import { TextInput } from 'ui/inputs/TextInput';
-import { memo, useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
 
 export const SubmissionOptions = memo(() => {
   const { t } = useTranslation(['submit']);

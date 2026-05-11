@@ -1,5 +1,5 @@
-import type { InputControllerProps } from 'components/visual/Inputs/models/inputs.model';
 import type { TFunction } from 'i18next';
+import type { InputControllerProps } from 'ui/inputs/models/inputs.model';
 
 /**********************************************************************************************************************
  * Validation

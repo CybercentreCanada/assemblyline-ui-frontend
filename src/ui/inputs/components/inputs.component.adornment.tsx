@@ -6,11 +6,13 @@ import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
 import type { InputAdornmentProps } from '@mui/material';
 import { CircularProgress, InputAdornment, Tooltip, useTheme } from '@mui/material';
-import { usePropStore } from 'components/core/PropProvider/PropProvider';
-import type { ButtonProps } from 'components/visual/Buttons/Button';
-import { Button } from 'components/visual/Buttons/Button';
-import { IconButton } from 'components/visual/Buttons/IconButton';
-import { useInputBlur, useInputChange } from 'components/visual/Inputs/hooks/inputs.hook.event_handlers';
+import { usePropStore } from 'features/prop-provider/PropProvider';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
+import type { ButtonProps } from 'ui/buttons/Button';
+import { Button } from 'ui/buttons/Button';
+import { IconButton } from 'ui/buttons/IconButton';
+import { useInputBlur, useInputChange } from 'ui/inputs/hooks/inputs.hook.event_handlers';
 import {
   useInputId,
   useShouldRenderAdornments,
@@ -22,10 +24,8 @@ import {
   useShouldRenderPassword,
   useShouldRenderProgress,
   useShouldRenderReset
-} from 'components/visual/Inputs/hooks/inputs.hook.renderer';
-import type { InputControllerProps } from 'components/visual/Inputs/models/inputs.model';
-import React, { useCallback, useEffect, useMemo, useRef } from 'react';
-import { useTranslation } from 'react-i18next';
+} from 'ui/inputs/hooks/inputs.hook.renderer';
+import type { InputControllerProps } from 'ui/inputs/models/inputs.model';
 
 export type InputButtonAdornmentProps = {
   variant?: 'icon' | 'text';

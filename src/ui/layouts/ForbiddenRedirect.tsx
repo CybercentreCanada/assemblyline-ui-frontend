@@ -1,6 +1,6 @@
-import useALContext from 'components/hooks/useALContext';
-import type { Role } from 'components/models/base/user';
-import ForbiddenPage from 'components/routes/403';
+import useALContext from 'deprecated/hooks/useALContext';
+import type { Role } from 'models/base/user';
+import { ForbiddenPage } from 'pages/forbidden/forbidden.route';
 import React from 'react';
 import { Navigate } from 'react-router';
 

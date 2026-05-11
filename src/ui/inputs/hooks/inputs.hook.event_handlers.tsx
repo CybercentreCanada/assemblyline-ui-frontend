@@ -1,12 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unnecessary-type-constraint */
-import { usePropStore } from 'components/core/PropProvider/PropProvider';
-import {
-  useInputCoercingResolver,
-  useInputValidationResolver
-} from 'components/visual/Inputs/hooks/inputs.hook.validation';
-import type { InputControllerProps } from 'components/visual/Inputs/models/inputs.model';
+import { usePropStore } from 'features/prop-provider/PropProvider';
 import type { SyntheticEvent } from 'react';
 import { useCallback, useRef, useTransition } from 'react';
+import { useInputCoercingResolver, useInputValidationResolver } from 'ui/inputs/hooks/inputs.hook.validation';
+import type { InputControllerProps } from 'ui/inputs/models/inputs.model';
 
 /**
  * Handles input click with validation and optional enforcement

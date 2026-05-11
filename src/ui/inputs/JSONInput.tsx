@@ -1,32 +1,26 @@
 import type { ThemeObject } from '@microlink/react-json-view';
 import ReactJson from '@microlink/react-json-view';
 import { useTheme } from '@mui/material';
-import { useAppTheme } from 'commons/components/app/hooks';
-import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
+import { PropProvider, usePropStore } from 'features/prop-provider/PropProvider';
+import React, { useMemo } from 'react';
 import {
   HelpInputAdornment,
   InputEndAdornment,
   PasswordInputAdornment,
   ProgressInputAdornment,
   ResetInputAdornment
-} from 'components/visual/Inputs/components/inputs.component.adornment';
+} from 'ui/inputs/components/inputs.component.adornment';
 import {
   InputFormControl,
   InputFormLabel,
   InputHelperText,
   InputRoot,
   InputSkeleton
-} from 'components/visual/Inputs/components/inputs.component.form';
-import { useInputChange } from 'components/visual/Inputs/hooks/inputs.hook.event_handlers';
-import { useInputValidation } from 'components/visual/Inputs/hooks/inputs.hook.validation';
-import type {
-  InputOptions,
-  InputRuntimeState,
-  InputSlotProps,
-  InputValueModel
-} from 'components/visual/Inputs/models/inputs.model';
-import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'components/visual/Inputs/models/inputs.model';
-import React, { useMemo } from 'react';
+} from 'ui/inputs/components/inputs.component.form';
+import { useInputChange } from 'ui/inputs/hooks/inputs.hook.event_handlers';
+import { useInputValidation } from 'ui/inputs/hooks/inputs.hook.validation';
+import type { InputOptions, InputRuntimeState, InputSlotProps, InputValueModel } from 'ui/inputs/models/inputs.model';
+import { DEFAULT_INPUT_CONTROLLER_PROPS } from 'ui/inputs/models/inputs.model';
 
 export type JSONInputProps = InputValueModel<object> & InputOptions & InputSlotProps;
 
@@ -34,7 +28,7 @@ type JSONInputController = JSONInputProps & InputRuntimeState<object>;
 
 const WrappedJSONInput = () => {
   const theme = useTheme();
-  const { isDark: isDarkTheme } = useAppTheme();
+  const isDarkTheme = theme.palette.mode === 'dark';
   const [get] = usePropStore<JSONInputController>();
 
   const disabled = get('disabled');

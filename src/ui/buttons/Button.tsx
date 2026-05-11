@@ -4,8 +4,8 @@ import { AppLink } from 'core/router';
 import type { AppRoute, CreatedAppRouteParamsMap } from 'core/routes';
 import { memo, useMemo } from 'react';
 import { getTextContent } from 'shared/utils/utils';
-import { Tooltip } from 'ui/text/Tooltip';
-import { CircularProgress } from './CircularProgress';
+import { Tooltip } from 'ui/Tooltip';
+import { CircularProgress } from 'ui/buttons/CircularProgress';
 
 export type ButtonProps = MuiButtonProps & {
   loading?: boolean;

@@ -1,5 +1,7 @@
 import { useTheme } from '@mui/material';
 import { useAppConfig } from 'core/config';
+import { useForm } from 'pages/settings/settings.form';
+import { getProfileNames } from 'pages/settings/settings.utils';
 import { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BooleanListInput } from 'ui/list-inputs/BooleanListInput';
@@ -7,8 +9,6 @@ import { SelectListInput } from 'ui/list-inputs/SelectListInput';
 import { TextListInput } from 'ui/list-inputs/TextListInput';
 import { List } from 'ui/list/List';
 import { ListHeader } from 'ui/list/ListHeader';
-import { useForm } from '../settings.form';
-import { getProfileNames } from '../settings.utils';
 
 export const InterfaceSection = memo(() => {
   const { t } = useTranslation(['settings']);

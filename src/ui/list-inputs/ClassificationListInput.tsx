@@ -1,26 +1,26 @@
-import { PropProvider, usePropStore } from 'components/core/PropProvider/PropProvider';
-import type { ClassificationProps } from 'components/visual/Classification';
-import Classification from 'components/visual/Classification';
+import { PropProvider, usePropStore } from 'features/prop-provider/PropProvider';
+import React from 'react';
+import type { ClassificationProps } from 'ui/Classification';
+import Classification from 'ui/Classification';
 import {
   HelpInputAdornment,
   PasswordInputAdornment,
   ProgressInputAdornment,
   ResetInputAdornment
-} from 'components/visual/Inputs/components/inputs.component.adornment';
-import { InputHelperText } from 'components/visual/Inputs/components/inputs.component.form';
-import { useInputChange } from 'components/visual/Inputs/hooks/inputs.hook.event_handlers';
-import { useInputValidation } from 'components/visual/Inputs/hooks/inputs.hook.validation';
-import type { InputRuntimeState, InputValueModel } from 'components/visual/Inputs/models/inputs.model';
+} from 'ui/inputs/components/inputs.component.adornment';
+import { InputHelperText } from 'ui/inputs/components/inputs.component.form';
+import { useInputChange } from 'ui/inputs/hooks/inputs.hook.event_handlers';
+import { useInputValidation } from 'ui/inputs/hooks/inputs.hook.validation';
+import type { InputRuntimeState, InputValueModel } from 'ui/inputs/models/inputs.model';
 import {
   ListInputInner,
   ListInputLoading,
   ListInputRoot,
   ListInputText,
   ListInputWrapper
-} from 'components/visual/ListInputs/lib/listinputs.components';
-import type { ListInputOptions, ListInputSlotProps } from 'components/visual/ListInputs/lib/listinputs.model';
-import { DEFAULT_LIST_INPUT_CONTROLLER_PROPS } from 'components/visual/ListInputs/lib/listinputs.model';
-import React from 'react';
+} from 'ui/list-inputs/lib/listinputs.components';
+import type { ListInputOptions, ListInputSlotProps } from 'ui/list-inputs/lib/listinputs.model';
+import { DEFAULT_LIST_INPUT_CONTROLLER_PROPS } from 'ui/list-inputs/lib/listinputs.model';
 
 export type ClassificationListInputProps = InputValueModel<ClassificationProps['c12n']> &
   ListInputOptions &

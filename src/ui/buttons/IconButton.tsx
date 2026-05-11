@@ -7,7 +7,7 @@ import { memo, useMemo } from 'react';
 import { getTextContent } from 'shared/utils/utils';
 import type { CircularProgressProps } from 'ui/buttons/CircularProgress';
 import { CircularProgress } from 'ui/buttons/CircularProgress';
-import { Tooltip } from 'ui/text/Tooltip';
+import { Tooltip } from 'ui/Tooltip';
 
 export type IconButtonProps = MuiIconButtonProps & {
   loading?: boolean;

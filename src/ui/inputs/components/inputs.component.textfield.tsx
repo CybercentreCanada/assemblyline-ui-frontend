@@ -1,8 +1,9 @@
 import type { AutocompleteProps, AutocompleteRenderInputParams, TextFieldProps } from '@mui/material';
 import { Autocomplete, InputAdornment, TextField, useTheme } from '@mui/material';
-import { usePropStore } from 'components/core/PropProvider/PropProvider';
-import type { CustomChipProps } from 'components/visual/CustomChip';
-import { CustomChip } from 'components/visual/CustomChip';
+import { usePropStore } from 'features/prop-provider/PropProvider';
+import React, { useMemo } from 'react';
+import type { CustomChipProps } from 'ui/CustomChip';
+import { CustomChip } from 'ui/CustomChip';
 import {
   ClearInputAdornment,
   HelpInputAdornment,
@@ -11,10 +12,9 @@ import {
   PasswordInputAdornment,
   ProgressInputAdornment,
   ResetInputAdornment
-} from 'components/visual/Inputs/components/inputs.component.adornment';
-import { useInputId, useInputLabel } from 'components/visual/Inputs/hooks/inputs.hook.renderer';
-import type { InputControllerProps } from 'components/visual/Inputs/models/inputs.model';
-import React, { useMemo } from 'react';
+} from 'ui/inputs/components/inputs.component.adornment';
+import { useInputId, useInputLabel } from 'ui/inputs/hooks/inputs.hook.renderer';
+import type { InputControllerProps } from 'ui/inputs/models/inputs.model';
 
 export const useInputTextFieldSlots = (overrides?: Partial<TextFieldProps>) => {
   const theme = useTheme();

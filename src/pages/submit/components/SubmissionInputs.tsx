@@ -22,6 +22,17 @@ import type { ApiResponseProps } from 'layout/auth/auth.models';
 import type { SearchResult } from 'models/api/search';
 import type { File as FileModel } from 'models/base/file';
 import { getProfileNames } from 'pages/settings/settings.utils';
+import { FileDropper } from 'pages/submit/components/FileDropper';
+import type { SubmitStore } from 'pages/submit/submit.form';
+import { FLOW, useForm } from 'pages/submit/submit.form';
+import {
+  calculateFileHash,
+  getHashQuery,
+  isUsingExternalServices,
+  parseSubmitProfile,
+  switchProfile,
+  useAutoURLServicesSelection
+} from 'pages/submit/submit.utils';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
@@ -30,24 +41,13 @@ import { getSubmitType } from 'shared/utils/utils';
 import type { ButtonProps } from 'ui/buttons/Button';
 import { Button } from 'ui/buttons/Button';
 import { IconButton } from 'ui/buttons/IconButton';
-import { Classification } from 'ui/classification/Classification';
+import { Classification } from 'ui/Classification';
 import { CheckboxInput } from 'ui/inputs/CheckboxInput';
 import type { SelectInputOption } from 'ui/inputs/models/inputs.model';
 import { SelectInput } from 'ui/inputs/SelectInput';
 import { SwitchInput } from 'ui/inputs/SwitchInput';
 import { TextAreaInput } from 'ui/inputs/TextAreaInput';
 import { TextInput } from 'ui/inputs/TextInput';
-import type { SubmitStore } from '../submit.form';
-import { FLOW, useForm } from '../submit.form';
-import {
-  calculateFileHash,
-  getHashQuery,
-  isUsingExternalServices,
-  parseSubmitProfile,
-  switchProfile,
-  useAutoURLServicesSelection
-} from '../submit.utils';
-import { FileDropper } from './FileDropper';
 
 export const ClassificationInput = memo(() => {
   const { t } = useTranslation(['submit']);

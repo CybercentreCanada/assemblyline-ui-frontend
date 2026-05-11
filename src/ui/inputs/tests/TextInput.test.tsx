@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import type { TextInputProps } from 'components/visual/Inputs/TextInput';
-import { TextInput } from 'components/visual/Inputs/TextInput';
+import type { TextInputProps } from 'ui/inputs/TextInput';
+import { TextInput } from 'ui/inputs/TextInput';
 import { vi } from 'vitest';
 
 const setup = (props: Partial<TextInputProps> = {}) => {

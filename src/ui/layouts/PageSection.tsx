@@ -2,8 +2,8 @@ import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import type { SvgIconProps, TypographyProps } from '@mui/material';
 import { Button, Collapse, Divider, Typography, useTheme } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import type { AnchorProps } from 'components/core/TableOfContent/Anchor';
-import { Anchor } from 'components/core/TableOfContent/Anchor';
+import type { AnchorProps } from 'features/table-of-content/Anchor';
+import { Anchor } from 'features/table-of-content/Anchor';
 import type { CSSProperties } from 'react';
 import React, { useEffect, useRef, useState } from 'react';
 

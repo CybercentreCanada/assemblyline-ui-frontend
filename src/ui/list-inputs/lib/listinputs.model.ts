@@ -6,13 +6,13 @@ import type {
   SkeletonProps,
   TypographyProps
 } from '@mui/material';
-import type { InputOptions, InputRuntimeState, InputValueModel } from 'components/visual/Inputs/models/inputs.model';
+import type { CSSProperties } from 'react';
+import type { InputOptions, InputRuntimeState, InputValueModel } from 'ui/inputs/models/inputs.model';
 import {
   DEFAULT_INPUT_OPTIONS,
   DEFAULT_INPUT_RUNTIME_STATE,
   DEFAULT_INPUT_VALUE_MODEL
-} from 'components/visual/Inputs/models/inputs.model';
-import type { CSSProperties } from 'react';
+} from 'ui/inputs/models/inputs.model';
 
 /**********************************************************************************************************************
  * List Input Options (visual + behavioral configuration)
