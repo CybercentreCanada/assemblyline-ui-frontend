@@ -1,5 +1,5 @@
 import type { TooltipProps as MuiTooltipProps } from '@mui/material';
-import { Tooltip as MuiTooltip } from '@mui/material';
+import { Tooltip as MuiTooltip, useTheme } from '@mui/material';
 import { memo, useState } from 'react';
 
 //*****************************************************************************************
@@ -17,6 +17,8 @@ export type TooltipProps = Omit<MuiTooltipProps, 'children' | 'title'> & {
 };
 
 export const Tooltip = memo(({ children = null, noDiv = false, title = null, ...tooltipProps }: TooltipProps) => {
+  const theme = useTheme();
+
   const [open, setOpen] = useState<boolean>(false);
 
   return title ? (
@@ -39,13 +41,15 @@ export const Tooltip = memo(({ children = null, noDiv = false, title = null, ...
         tooltip: {
           ...tooltipProps?.slotProps?.tooltip,
           sx: {
+            backgroundColor: theme.palette.grey[700],
+            opacity: 1,
             textWrap: 'pretty',
             ...tooltipProps?.slotProps?.tooltip?.['sx']
           }
         }
       }}
     >
-      {noDiv ? (children as React.ReactElement<unknown, any>) : <div>{children}</div>}
+      {noDiv ? (children as React.ReactElement) : <div>{children}</div>}
     </MuiTooltip>
   ) : (
     children

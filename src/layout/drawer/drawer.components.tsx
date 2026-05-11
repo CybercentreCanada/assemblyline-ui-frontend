@@ -59,7 +59,6 @@ export const AppDrawerActions = memo(
     display: 'flex',
     flexDirection: 'row',
     columnGap: theme.spacing(1),
-    backgroundColor: theme.palette.background.paper,
     padding: theme.spacing(1)
   }))
 );
@@ -191,6 +190,8 @@ export const AppDrawerContainer = memo(({ children }: PropsWithChildren) => {
         },
         paper: {
           sx: {
+            boxShadow: 'none',
+            backgroundImage: 'none',
             width: drawerWidth,
             transition
           }

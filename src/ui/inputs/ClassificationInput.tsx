@@ -1,5 +1,4 @@
 import {
-  alpha,
   Card,
   Dialog,
   DialogActions,
@@ -300,7 +299,7 @@ const WrappedClassificationInput = () => {
                               placement="bottom"
                               slotProps={{
                                 popper: { modifiers: [{ name: 'offset', options: { offset: [0, -8] } }] },
-                                tooltip: { sx: { backgroundColor: alpha(theme.palette.Tooltip.bg, 1) } }
+                                tooltip: { sx: { backgroundColor: theme.palette.grey[700] } }
                               }}
                             >
                               <ListItemButton
@@ -337,7 +336,7 @@ const WrappedClassificationInput = () => {
                                 placement="bottom"
                                 slotProps={{
                                   popper: { modifiers: [{ name: 'offset', options: { offset: [0, -8] } }] },
-                                  tooltip: { sx: { backgroundColor: alpha(theme.palette.Tooltip.bg, 1) } }
+                                  tooltip: { sx: { backgroundColor: theme.palette.grey[700] } }
                                 }}
                               >
                                 <ListItemButton
@@ -381,7 +380,7 @@ const WrappedClassificationInput = () => {
                                   placement="bottom"
                                   slotProps={{
                                     popper: { modifiers: [{ name: 'offset', options: { offset: [0, -8] } }] },
-                                    tooltip: { sx: { backgroundColor: alpha(theme.palette.Tooltip.bg, 1) } }
+                                    tooltip: { sx: { backgroundColor: theme.palette.grey[700] } }
                                   }}
                                 >
                                   <ListItemButton
@@ -445,7 +444,7 @@ const WrappedClassificationInput = () => {
                                     placement="bottom"
                                     slotProps={{
                                       popper: { modifiers: [{ name: 'offset', options: { offset: [0, -8] } }] },
-                                      tooltip: { sx: { backgroundColor: alpha(theme.palette.Tooltip.bg, 1) } }
+                                      tooltip: { sx: { backgroundColor: theme.palette.grey[700] } }
                                     }}
                                   >
                                     <ListItemButton
@@ -486,7 +485,7 @@ const WrappedClassificationInput = () => {
                                   placement="bottom"
                                   slotProps={{
                                     popper: { modifiers: [{ name: 'offset', options: { offset: [0, -8] } }] },
-                                    tooltip: { sx: { backgroundColor: alpha(theme.palette.Tooltip.bg, 1) } }
+                                    tooltip: { sx: { backgroundColor: theme.palette.grey[700] } }
                                   }}
                                 >
                                   <ListItemButton

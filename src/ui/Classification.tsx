@@ -1,6 +1,4 @@
 import {
-  alpha,
-  Button,
   Card,
   Dialog,
   DialogActions,
@@ -39,7 +37,8 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { PossibleColor } from 'shared/utils/colors';
 import { COLOR_MAP, CustomChip } from 'ui/CustomChip';
-import { Tooltip } from './Tooltip';
+import { Tooltip } from 'ui/Tooltip';
+import { Button } from 'ui/buttons/Button';
 
 export interface ClassificationProps {
   c12n: string;
@@ -307,7 +306,7 @@ export const Classification = React.memo(
                               placement="bottom"
                               slotProps={{
                                 popper: { modifiers: [{ name: 'offset', options: { offset: [0, -8] } }] },
-                                tooltip: { sx: { backgroundColor: alpha(theme.palette.Tooltip.bg, 1) } }
+                                tooltip: { sx: { backgroundColor: theme.palette.grey[700] } }
                               }}
                             >
                               <ListItemButton
@@ -343,7 +342,7 @@ export const Classification = React.memo(
                                 placement="bottom"
                                 slotProps={{
                                   popper: { modifiers: [{ name: 'offset', options: { offset: [0, -8] } }] },
-                                  tooltip: { sx: { backgroundColor: alpha(theme.palette.Tooltip.bg, 1) } }
+                                  tooltip: { sx: { backgroundColor: theme.palette.grey[700] } }
                                 }}
                               >
                                 <ListItemButton
@@ -387,7 +386,7 @@ export const Classification = React.memo(
                                   placement="bottom"
                                   slotProps={{
                                     popper: { modifiers: [{ name: 'offset', options: { offset: [0, -8] } }] },
-                                    tooltip: { sx: { backgroundColor: alpha(theme.palette.Tooltip.bg, 1) } }
+                                    tooltip: { sx: { backgroundColor: theme.palette.grey[700] } }
                                   }}
                                 >
                                   <ListItemButton
@@ -451,7 +450,7 @@ export const Classification = React.memo(
                                     placement="bottom"
                                     slotProps={{
                                       popper: { modifiers: [{ name: 'offset', options: { offset: [0, -8] } }] },
-                                      tooltip: { sx: { backgroundColor: alpha(theme.palette.Tooltip.bg, 1) } }
+                                      tooltip: { sx: { backgroundColor: theme.palette.grey[700] } }
                                     }}
                                   >
                                     <ListItemButton
@@ -492,7 +491,7 @@ export const Classification = React.memo(
                                   placement="bottom"
                                   slotProps={{
                                     popper: { modifiers: [{ name: 'offset', options: { offset: [0, -8] } }] },
-                                    tooltip: { sx: { backgroundColor: alpha(theme.palette.Tooltip.bg, 1) } }
+                                    tooltip: { sx: { backgroundColor: theme.palette.grey[700] } }
                                   }}
                                 >
                                   <ListItemButton
