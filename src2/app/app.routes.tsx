@@ -3,6 +3,7 @@ import { Page1Route } from 'pages/Page1';
 import { Page2Route } from 'pages/Page2';
 import { SettingsRoute } from 'pages/settings/settings.route';
 import { SubmissionsRoute } from 'pages/Submissions';
+import { SubmissionsSearchRoute } from 'pages/submissions/submissions.route';
 import { SubmitRoute } from 'pages/submit/submit.route';
 
 export const APP_ROUTES = [
@@ -22,5 +23,6 @@ export const APP_ROUTES = [
   // New
   HelpAPIRoute,
   SubmitRoute,
-  SettingsRoute
+  SettingsRoute,
+  SubmissionsSearchRoute
 ] as const;

@@ -1,4 +1,5 @@
 import type { AppTheme } from '@tui/core';
+import type { AssistantInsightProps, ContextMessageProps } from 'layout/assistant';
 import type { ExternalEnrichmentState } from 'layout/external-lookup';
 import type { JSONFeedItem } from 'layout/notifications';
 import type { SystemMessage } from 'models/api/user';
@@ -6,6 +7,16 @@ import type { SystemMessage } from 'models/api/user';
 declare global {
   /** Transient UI state managed by the interface store — nothing is persisted. */
   type AppInterface = {
+    assistant: {
+      open: boolean;
+      currentInsights: AssistantInsightProps[];
+      thinking: boolean;
+      currentContext: ContextMessageProps[];
+      currentHistory: ContextMessageProps[];
+      currentInput: string;
+      hasInsights: boolean;
+    };
+
     /** API developer tools configuration. */
     api: {
       /** Whether to show React Query devtools panel. */
@@ -145,5 +156,14 @@ export const DEFAULT_APP_INTERFACE_STORE: AppInterface = {
   },
   usermenu: {
     open: false
+  },
+  assistant: {
+    open: false,
+    currentInsights: [],
+    thinking: false,
+    currentContext: [],
+    currentHistory: [],
+    currentInput: '',
+    hasInsights: false
   }
 };

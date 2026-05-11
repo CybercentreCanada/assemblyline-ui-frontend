@@ -21,6 +21,8 @@ import quotaEN from 'layout/auth/quota/quota.i18n.en.json';
 import quotaFR from 'layout/auth/quota/quota.i18n.fr.json';
 import tosEN from 'layout/auth/terms-of-service/terms-of-service.i18n.en.json';
 import tosFR from 'layout/auth/terms-of-service/terms-of-service.i18n.fr.json';
+import externalLookupEN from 'layout/external-lookup/external-lookup.i18n.en.json';
+import externalLookupFR from 'layout/external-lookup/external-lookup.i18n.fr.json';
 import notificationsEN from 'layout/notifications/notifications.i18n.en.json';
 import notificationsFR from 'layout/notifications/notifications.i18n.fr.json';
 import forbiddenEN from 'pages/forbidden/forbidden.i18n.en.json';
@@ -31,11 +33,17 @@ import notFoundEN from 'pages/not-found/not-found.i18n.en.json';
 import notFoundFR from 'pages/not-found/not-found.i18n.fr.json';
 import settingsEN from 'pages/settings/settings.i18n.en.json';
 import settingsFR from 'pages/settings/settings.i18n.fr.json';
+import submissionDetailEN from 'pages/submission-detail/submission-detail.i18n.en.json';
+import submissionDetailFR from 'pages/submission-detail/submission-detail.i18n.fr.json';
+import submissionsEN from 'pages/submissions/submissions.i18n.en.json';
+import submissionsFR from 'pages/submissions/submissions.i18n.fr.json';
 import submitEN from 'pages/submit/submit.i18n.en.json';
 import submitFR from 'pages/submit/submit.i18n.fr.json';
 import { initReactI18next } from 'react-i18next';
 import inputsEN from 'ui/inputs/i18n/inputs.i18n.en.json';
 import inputsFR from 'ui/inputs/i18n/inputs.i18n.fr.json';
+import searchEN from 'ui/search/search.i18n.en.json';
+import searchFR from 'ui/search/search.i18n.fr.json';
 
 export const I18N_RESSOURCES = {
   en: {
@@ -44,6 +52,7 @@ export const I18N_RESSOURCES = {
     error: errorEN,
     error403: forbiddenEN,
     error404: notFoundEN,
+    externalLookup: externalLookupEN,
     helpAPI: helpAPIEN,
     inputs: inputsEN,
     locked: lockedEN,
@@ -51,7 +60,10 @@ export const I18N_RESSOURCES = {
     logout: logoutEN,
     notifications: notificationsEN,
     quota: quotaEN,
+    search: searchEN,
     settings: settingsEN,
+    submissionDetail: submissionDetailEN,
+    submissions: submissionsEN,
     submit: submitEN,
     tos: tosEN
   },
@@ -61,6 +73,7 @@ export const I18N_RESSOURCES = {
     error: errorFR,
     error403: forbiddenFR,
     error404: notFoundFR,
+    externalLookup: externalLookupFR,
     helpAPI: helpAPIFR,
     inputs: inputsFR,
     locked: lockedFR,
@@ -68,7 +81,10 @@ export const I18N_RESSOURCES = {
     logout: logoutFR,
     notifications: notificationsFR,
     quota: quotaFR,
+    search: searchFR,
     settings: settingsFR,
+    submissionDetail: submissionDetailFR,
+    submissions: submissionsFR,
     submit: submitFR,
     tos: tosFR
   }
