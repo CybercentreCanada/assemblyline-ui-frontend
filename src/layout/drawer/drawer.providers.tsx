@@ -1,5 +1,3 @@
-import type { PropsWithChildren, ReactNode } from 'react';
-import { memo } from 'react';
 import {
   AppDrawerActions,
   AppDrawerCloseButton,
@@ -7,7 +5,9 @@ import {
   AppDrawerContent,
   AppDrawerMain,
   AppDrawerMaximizeButton
-} from './drawer.components';
+} from 'layout/drawer/drawer.components';
+import type { PropsWithChildren, ReactNode } from 'react';
+import { memo } from 'react';
 
 /** Props for AppDrawerLayout. */
 export type AppDrawerLayoutProps = PropsWithChildren & {

@@ -1,7 +1,12 @@
 import { useAppInterfaceStore, useAppSetInterfaceStore } from 'core/interface';
+import type { HighlightMapProps } from 'layout/highlighter/highlighter.models';
+import {
+  getHighlighterKey,
+  hasHighlighterKey,
+  hasHighlighterKeys,
+  toggleHighlighterKey
+} from 'layout/highlighter/highlighter.utils';
 import { useCallback } from 'react';
-import type { HighlightMapProps } from './highlighter.models';
-import { getHighlighterKey, hasHighlighterKey, hasHighlighterKeys, toggleHighlighterKey } from './highlighter.utils';
 
 /** Manages highlight state for tree/list components with high fan-out (1000+ consumers). */
 export type UseAppHighlighter = {

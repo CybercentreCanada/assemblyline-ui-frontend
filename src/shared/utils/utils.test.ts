@@ -1,5 +1,4 @@
 import { CONFIGURATION } from 'models/base/config';
-import { describe, expect, it } from 'vitest';
 import {
   bytesToSize,
   getFileName,
@@ -20,7 +19,8 @@ import {
   toTitleCase,
   verdictRank,
   verdictToColor
-} from './utils';
+} from 'shared/utils/utils';
+import { describe, expect, it } from 'vitest';
 
 describe('Test `toTitleCase`', () => {
   it('Should split on whitespace and underscores', () => {

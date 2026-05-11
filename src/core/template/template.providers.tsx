@@ -2,12 +2,12 @@ import { useAppSwitcher } from '@tui/apps';
 import { AppProvider, AppRoot, useAppLayout, useAppUser } from '@tui/core';
 import { useAppPreferences } from 'app/layout.preferences';
 import { useAppPreferenceStore } from 'core/preference';
+import { useAppTemplateRouter } from 'core/template/hooks/useAppTemplateRouter';
+import { useAppTemplateUser } from 'core/template/hooks/useAppTemplateUser';
+import { useAppTemplateThemeMode } from 'core/template/template.hooks';
 import type { i18n } from 'i18next';
 import type { PropsWithChildren } from 'react';
 import { memo, useEffect } from 'react';
-import { useAppTemplateRouter } from './hooks/useAppTemplateRouter';
-import { useAppTemplateUser } from './hooks/useAppTemplateUser';
-import { useAppTemplateThemeMode } from './template.hooks';
 
 //*****************************************************************************************
 // App Auth Store

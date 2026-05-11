@@ -1,4 +1,5 @@
 import type { AppRouterStore } from 'core/router/router.models';
+import type { RouteHash, RoutePath } from 'core/routes/routes.models';
 import type { PathParamBlueprintMap, PathParamCodec } from 'features/path-params';
 import type { SearchParamEngine, SearchParamSnapshot } from 'features/search-params';
 import { createAppStore } from 'features/store/createAppStore';
@@ -7,7 +8,6 @@ import type { ReactNode } from 'react';
 import { memo, useCallback } from 'react';
 import type { Location } from 'react-router';
 import { useLocation } from 'react-router';
-import type { RouteHash, RoutePath } from './routes.models';
 
 //*****************************************************************************************
 // Route Provider

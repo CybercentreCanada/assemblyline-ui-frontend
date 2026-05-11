@@ -1,4 +1,4 @@
-import { AppUserService } from '@tui/core';
+import type { AppUserService } from '@tui/core';
 import { useMemo } from 'react';
 
 export const useAppTemplateUser = () => {

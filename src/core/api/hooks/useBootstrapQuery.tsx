@@ -1,6 +1,8 @@
 import type { UndefinedInitialDataOptions } from '@tanstack/react-query';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { DEFAULT_APP_PREFERENCE } from 'app/core.preference';
+import type { ApiQueryKey, ApiResponse } from 'core/api/api.models';
+import { getApiResponse, isApiData, stableStringify } from 'core/api/api.utils';
 import { useAppConfig } from 'core/config';
 import { useAppSetInterfaceStore } from 'core/interface';
 import { useAppSnackbar } from 'core/snackbar';
@@ -9,8 +11,6 @@ import type { CustomUser, WhoAmIProps } from 'models/api/user';
 import type { Configuration } from 'models/base/config';
 import { useTranslation } from 'react-i18next';
 import { getXSRFCookie } from 'shared/utils/xsrf.utils';
-import type { ApiQueryKey, ApiResponse } from '../api.models';
-import { getApiResponse, isApiData, stableStringify } from '../api.utils';
 
 export type UseBootstrapQueryProps = {
   queryProps?: Omit<

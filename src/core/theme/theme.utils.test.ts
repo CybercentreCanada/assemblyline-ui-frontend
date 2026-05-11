@@ -1,5 +1,5 @@
+import { mergeThemeConfigs } from 'core/theme/theme.utils';
 import { describe, expect, it } from 'vitest';
-import { mergeThemeConfigs } from './theme.utils';
 
 //*****************************************************************************************
 // mergeThemeConfigs

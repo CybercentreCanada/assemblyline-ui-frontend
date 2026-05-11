@@ -1,6 +1,6 @@
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import { AppSwitcher } from '@tui/apps';
-import { AppPreferenceConfigs } from '@tui/core';
+import type { AppPreferenceConfigs } from '@tui/core';
 import { useAppTemplateLeftNavMenu } from 'core/template';
 import { Notifications } from 'layout/notifications';
 import { DocumentationButton } from 'layout/top-nav/DocumentationButton';

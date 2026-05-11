@@ -1,10 +1,10 @@
 import type { ApiResponse } from 'core/api';
 import { useApiCallFn } from 'core/api';
+import type { BackgroundMode } from 'layout/carousel/carousel.models';
+import { BACKGROUND_ORDER } from 'layout/carousel/carousel.models';
+import type { AppCarouselContextProps } from 'layout/carousel/carousel.providers';
 import type { Image } from 'models/base/result_body';
 import { useCallback, useMemo, useState } from 'react';
-import type { BackgroundMode } from './carousel.models';
-import { BACKGROUND_ORDER } from './carousel.models';
-import { AppCarouselContextProps } from './carousel.providers';
 
 /**
  * @name useAppCarouselState

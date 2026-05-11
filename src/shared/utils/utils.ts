@@ -1,8 +1,8 @@
-import { Configuration, FileSource, HashPatternMap } from 'models/base/config';
+import type { Configuration, FileSource, HashPatternMap } from 'models/base/config';
 import type { ReactNode } from 'react';
 import { Children, isValidElement } from 'react';
-import { PossibleColor } from './colors';
-import { LOWERCASE_HASH, URL_REGEX } from './constant';
+import type { PossibleColor } from 'shared/utils/colors';
+import { LOWERCASE_HASH, URL_REGEX } from 'shared/utils/constant';
 
 /**
  *

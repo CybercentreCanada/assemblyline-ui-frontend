@@ -12,13 +12,13 @@ export const createStoreContext = <Store extends object>(initialState: Store) =>
     return aKeys.every(key => Object.is(a[key], b[key]));
   };
 
-  type useStoreDataReturn = {
+  type UseStoreDataReturn = {
     get: () => Store;
     set: (dispatch: StorePatch) => void;
     subscribe: (callback: () => void) => () => void;
   };
 
-  const useStoreData = (patch: StorePatch): useStoreDataReturn => {
+  const useStoreData = (patch: StorePatch): UseStoreDataReturn => {
     const resolvePatch = useCallback(
       (dispatch: StorePatch, current: Store): Partial<Store> =>
         typeof dispatch === 'function' ? dispatch(current) : dispatch,
@@ -26,7 +26,7 @@ export const createStoreContext = <Store extends object>(initialState: Store) =>
     );
 
     const store = useRef<Store>({ ...initialState, ...resolvePatch(patch, initialState) });
-    const apiRef = useRef<useStoreDataReturn>(null);
+    const apiRef = useRef<UseStoreDataReturn>(null);
 
     const get = useCallback(() => store.current, []);
 

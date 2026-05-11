@@ -1,7 +1,7 @@
-import { RootRequests, RootResponses } from 'models/api';
-import { BadlistRequests, BadlistResponses } from 'models/api/badlist';
-import { SearchRequests, SearchResponses } from 'models/api/search';
-import { UserRequests, UserResponses } from 'models/api/user';
+import type { RootRequests, RootResponses } from 'models/api';
+import type { BadlistRequests, BadlistResponses } from 'models/api/badlist';
+import type { SearchRequests, SearchResponses } from 'models/api/search';
+import type { UserRequests, UserResponses } from 'models/api/user';
 
 declare global {
   // prettier-ignore

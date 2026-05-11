@@ -1,15 +1,14 @@
 /* eslint-disable no-console */
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { ClassificationDefinition, ClassificationParts } from 'features/classification/classificationParser';
 import {
   applyClassificationRules,
-  ClassificationDefinition,
-  ClassificationParts,
   getLevelText,
   getMaxClassification,
   getParts,
   isAccessible,
   normalizedClassification
-} from './classificationParser';
+} from 'features/classification/classificationParser';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 // if you make changes to this definition, please ensure they are reflected in the assemblyline-base tests as well.
 const c12nDef: ClassificationDefinition = {

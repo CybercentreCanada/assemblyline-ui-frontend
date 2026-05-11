@@ -1,4 +1,7 @@
 import { shallowEqual } from 'features/prop-provider/props.utils';
+import { SearchParamEngine } from 'features/search-params/search-params.engines';
+import type { SearchParamBlueprintMap, SearchParamValueMap } from 'features/search-params/search-params.models';
+import { SearchParamSnapshot } from 'features/search-params/search-params.snapshots';
 import React, {
   createContext,
   useCallback,
@@ -11,9 +14,6 @@ import React, {
 } from 'react';
 import type { NavigateOptions } from 'react-router';
 import { useLocation, useNavigate } from 'react-router';
-import { SearchParamEngine } from './search-params.engines';
-import { SearchParamBlueprintMap, SearchParamValueMap } from './search-params.models';
-import { SearchParamSnapshot } from './search-params.snapshots';
 
 export const createSearchParamsStore = () => {
   // -------------------------

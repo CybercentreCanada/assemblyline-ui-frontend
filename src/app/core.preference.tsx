@@ -34,11 +34,11 @@ const ROUTER_PREFERENCE_SCHEMA = z.object({
   navigation: z.enum(['push', 'loop']).catch('push')
 });
 
-const SAFE_RESULTS_PREFERENCE_sCHEMA = z.object({
+const SAFE_RESULTS_PREFERENCE_SCHEMA = z.object({
   show: z.boolean().catch(true)
 });
 
-const SNACKBAR_PREFERENCE_sCHEMA = z.object({
+const SNACKBAR_PREFERENCE_SCHEMA = z.object({
   dense: z.boolean().catch(true),
   maxSnack: z.number().catch(3)
 });
@@ -53,8 +53,8 @@ export const APP_PREFERENCE_SCHEMA = z.object({
   auth: AUTH_PREFERENCE_SCHEMA.catch(AUTH_PREFERENCE_SCHEMA.parse({})),
   layout: LAYOUT_PREFERENCE_SCHEMA.catch(LAYOUT_PREFERENCE_SCHEMA.parse({})),
   router: ROUTER_PREFERENCE_SCHEMA.catch(ROUTER_PREFERENCE_SCHEMA.parse({})),
-  safeResults: SAFE_RESULTS_PREFERENCE_sCHEMA.catch(SAFE_RESULTS_PREFERENCE_sCHEMA.parse({})),
-  snackbar: SNACKBAR_PREFERENCE_sCHEMA.catch(SNACKBAR_PREFERENCE_sCHEMA.parse({})),
+  safeResults: SAFE_RESULTS_PREFERENCE_SCHEMA.catch(SAFE_RESULTS_PREFERENCE_SCHEMA.parse({})),
+  snackbar: SNACKBAR_PREFERENCE_SCHEMA.catch(SNACKBAR_PREFERENCE_SCHEMA.parse({})),
   theme: THEME_PREFERENCE_SCHEMA.catch(THEME_PREFERENCE_SCHEMA.parse({}))
 });
 

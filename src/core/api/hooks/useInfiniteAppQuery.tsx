@@ -1,21 +1,21 @@
-import type { ApiResponse } from '../api.models';
-import type { UseApiCallFnProps } from './useApiCallFn';
-import { useInfiniteApiQuery } from './useInfiniteApiQuery';
+import type { ApiResponse } from 'core/api/api.models';
+import type { UseApiCallFnProps } from 'core/api/hooks/useApiCallFn';
+import { useInfiniteApiQuery } from 'core/api/hooks/useInfiniteApiQuery';
 
 export type UseInfiniteAppQueryProps<Request extends ApiRequests, Error extends string = string> = {
   initialOffset?: number;
   getParams: (offset: number) => UseApiCallFnProps<ApiResponse<ApiResponses<Request>>, Request, ApiResponse<Error>>;
   getPreviousOffset?: (
     firstPage: ApiResponse<ApiResponses<Request>>,
-    allPages: Array<ApiResponse<ApiResponses<Request>>>,
+    allPages: ApiResponse<ApiResponses<Request>>[],
     firstPageParam: number,
-    allPageParams: Array<number>
+    allPageParams: number[]
   ) => number | undefined;
   getNextOffset?: (
     lastPage: ApiResponse<ApiResponses<Request>>,
-    allPages: Array<ApiResponse<ApiResponses<Request>>>,
+    allPages: ApiResponse<ApiResponses<Request>>[],
     lastPageParam: number,
-    allPageParams: Array<number>
+    allPageParams: number[]
   ) => number | undefined;
   allowCache?: boolean;
   retryAfter?: number;

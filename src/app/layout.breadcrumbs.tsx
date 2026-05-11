@@ -41,8 +41,9 @@ import SupervisorAccountOutlinedIcon from '@mui/icons-material/SupervisorAccount
 import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
 import WebAssetIcon from '@mui/icons-material/WebAsset';
-import { AppBreadcrumbItem } from '@tui/core';
-import { ReactElement, useMemo } from 'react';
+import type { AppBreadcrumbItem } from '@tui/core';
+import type { ReactElement } from 'react';
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
 

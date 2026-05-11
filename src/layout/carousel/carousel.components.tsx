@@ -7,6 +7,7 @@ import PageviewOutlinedIcon from '@mui/icons-material/PageviewOutlined';
 import RemoveIcon from '@mui/icons-material/Remove';
 import ZoomInIcon from '@mui/icons-material/ZoomIn';
 import ZoomOutIcon from '@mui/icons-material/ZoomOut';
+import type { Theme } from '@mui/material';
 import {
   alpha,
   Button,
@@ -16,18 +17,22 @@ import {
   Skeleton,
   Slider,
   styled,
-  Theme,
   Tooltip,
   useTheme
 } from '@mui/material';
+import { useBackgroundMode, useCarouselKeyboard, useImageFetch } from 'layout/carousel/carousel.hooks';
+import type {
+  BackgroundMode,
+  CarouselContainerProps,
+  CarouselItemProps,
+  Dragging
+} from 'layout/carousel/carousel.models';
+import { IMAGE_SIZE, MIN_IMAGE_SIZE_REM, NAV_BAR_HEIGHT, ZOOM_CLASS } from 'layout/carousel/carousel.models';
 import type { Image } from 'models/base/result_body';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router';
 import { Link } from 'react-router-dom';
-import { useBackgroundMode, useCarouselKeyboard, useImageFetch } from './carousel.hooks';
-import type { BackgroundMode, CarouselContainerProps, CarouselItemProps, Dragging } from './carousel.models';
-import { IMAGE_SIZE, MIN_IMAGE_SIZE_REM, NAV_BAR_HEIGHT, ZOOM_CLASS } from './carousel.models';
 
 //*****************************************************************************************
 // Styled Components
@@ -348,7 +353,7 @@ export const CarouselContainer = memo(({ images, index, onClose, open, setIndex 
     (value: number) => (event?: React.MouseEvent) => {
       event?.stopPropagation();
       if (!images || images.length <= 1 || isZooming) return;
-      setIndex(i => ((i as number) + value + images.length) % images.length);
+      setIndex(i => (i + value + images.length) % images.length);
     },
     [images, isZooming, setIndex]
   );
@@ -597,7 +602,7 @@ export const CarouselContainer = memo(({ images, index, onClose, open, setIndex 
                 min={10}
                 max={500}
                 size="small"
-                onChange={(_, newValue) => setZoom(Math.floor(newValue as number))}
+                onChange={(_, newValue) => setZoom(Math.floor(newValue))}
                 orientation="vertical"
                 sx={{ '& .MuiSlider-thumb': { boxShadow: 'none' } }}
               />

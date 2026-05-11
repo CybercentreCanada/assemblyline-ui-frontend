@@ -1,4 +1,4 @@
-import { HashPatternMap } from 'models/base/config';
+import type { HashPatternMap } from 'models/base/config';
 
 export const MD5_REGEX = /^[a-f0-9]{32}$/i;
 export const SHA1_REGEX = /^[a-f0-9]{40}$/i;

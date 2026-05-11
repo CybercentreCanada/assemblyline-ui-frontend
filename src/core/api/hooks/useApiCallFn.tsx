@@ -1,12 +1,12 @@
 import { DEFAULT_APP_PREFERENCE } from 'app/core.preference';
+import type { ApiRequest, ApiResponse } from 'core/api/api.models';
+import { isApiData } from 'core/api/api.utils';
 import { useAppConfig } from 'core/config';
 import { useAppSetInterfaceStore } from 'core/interface';
 import { useAppSnackbar } from 'core/snackbar/snackbar.hooks';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getXSRFCookie } from 'shared/utils/xsrf.utils';
-import type { ApiRequest, ApiResponse } from '../api.models';
-import { isApiData } from '../api.utils';
 
 export type UseApiCallFnProps<
   Response extends ApiResponse,

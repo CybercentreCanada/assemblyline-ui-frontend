@@ -1,8 +1,8 @@
+import { CarouselContainer } from 'layout/carousel/carousel.components';
+import { useAppCarouselState } from 'layout/carousel/carousel.hooks';
 import type { Image } from 'models/base/result_body';
 import type { PropsWithChildren } from 'react';
 import { createContext, memo, useContext } from 'react';
-import { CarouselContainer } from './carousel.components';
-import { useAppCarouselState } from './carousel.hooks';
 
 //*****************************************************************************************
 // AppCarouselContextProps

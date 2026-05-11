@@ -1,6 +1,6 @@
 import { DEFAULT_APP_PREFERENCE } from 'app/core.preference';
-import type { ApiQueryKey, ApiRequest } from '../api.models';
-import { queryClient } from '../api.providers';
+import type { ApiQueryKey, ApiRequest } from 'core/api/api.models';
+import { queryClient } from 'core/api/api.providers';
 
 /**
  * @name invalidateAPIQuery

@@ -1,5 +1,5 @@
-import type { ApiQueryKey, ApiRequest, ApiResponse } from '../api.models';
-import { queryClient } from '../api.providers';
+import type { ApiQueryKey, ApiRequest, ApiResponse } from 'core/api/api.models';
+import { queryClient } from 'core/api/api.providers';
 
 /**
  * @name isObject
@@ -52,5 +52,5 @@ export const updateAppQuery = <Request extends ApiRequests>(
         }
       }
     },
-    prev => (prev ? { ...prev, api_response: updater(prev.api_response as ApiResponses<Request>) } : prev)
+    prev => (prev ? { ...prev, api_response: updater(prev.api_response) } : prev)
   );

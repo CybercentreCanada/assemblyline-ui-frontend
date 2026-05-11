@@ -1,7 +1,7 @@
-import { APP_ROUTES } from 'app/app.routes';
+import type { APP_ROUTES } from 'app/app.routes';
+import type { createAppRoute } from 'core/routes/routes.factories';
 import type { PathParamKeyForPath } from 'features/path-params';
 import type { SearchParamBlueprintMap, SearchParamEngine, SearchParamValueMap } from 'features/search-params';
-import type { createAppRoute } from './routes.factories';
 
 //*****************************************************************************************
 // Create Route Types

@@ -2,11 +2,11 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { Typography } from '@mui/material';
 import { useApiQuery } from 'core/api';
 import { useAppSnackbar } from 'core/snackbar/snackbar.hooks';
+import { useLoginForm } from 'layout/auth/log-in/log-in.providers';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { decode, encode } from 'shared/utils/cbor';
 import { toArrayBuffer } from 'shared/utils/toArrayBuffer';
-import { useLoginForm } from '../log-in.providers';
 
 export const SecurityTokenLogin = memo(() => {
   const { t } = useTranslation(['login']);

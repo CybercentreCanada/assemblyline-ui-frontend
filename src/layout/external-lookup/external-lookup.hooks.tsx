@@ -1,10 +1,10 @@
 import { useAppConfig } from 'core/config';
 import { useAppInterfaceStore, useAppSetInterfaceStore } from 'core/interface';
 import { useAppSnackbar } from 'core/snackbar';
+import type { ExternalEnrichmentResults, ExternalEnrichmentState } from 'layout/external-lookup/external-lookup.models';
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import useMyAPI from 'shared/hooks/useMyAPI';
-import { ExternalEnrichmentResults, ExternalEnrichmentState } from './external-lookup.models';
 
 /** Manages external enrichment query state and results. */
 export type UseAppExternalLookup = {

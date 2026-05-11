@@ -1,7 +1,7 @@
+import type { AppSnackbarShowMessage, AppSnackbarVariant } from 'core/snackbar/snackbar.models';
 import type { OptionsObject, SnackbarMessage } from 'notistack';
 import { useSnackbar } from 'notistack';
 import { useCallback } from 'react';
-import type { AppSnackbarShowMessage, AppSnackbarVariant } from './snackbar.models';
 
 //*****************************************************************************************
 // useAppSnackbar

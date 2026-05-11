@@ -2,12 +2,12 @@ import { Avatar, Link, Typography, useTheme } from '@mui/material';
 import { useSaveAppConfig } from 'core/config/config.hooks';
 import { useAppInterfaceStore } from 'core/interface';
 import { useAppSetPreferenceStore } from 'core/preference';
+import { useLoginRequest, useLoginReset, useQuickLogin } from 'layout/auth/log-in/log-in.hooks';
+import { useLoginForm } from 'layout/auth/log-in/log-in.providers';
 import { memo, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router';
 import { Button } from 'ui/buttons/Button';
-import { useLoginRequest, useLoginReset, useQuickLogin } from '../log-in.hooks';
-import { useLoginForm } from '../log-in.providers';
 
 //*****************************************************************************************
 // SingleSignOn

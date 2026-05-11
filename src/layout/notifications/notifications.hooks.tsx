@@ -1,15 +1,14 @@
 import { useAppConfig } from 'core/config';
 import { useAppInterfaceStore, useAppSetInterfaceStore } from 'core/interface';
-import type { Configuration } from 'models/base/config';
-import { useCallback, useEffect, useMemo } from 'react';
-import type { MinimalService } from './notifications.models';
+import type { MinimalService } from 'layout/notifications/notifications.models';
 import {
   applyLegacyNotificationRules,
   fetchJSONNotifications,
   markItemsAsNewerThan,
   readLastOpenedAt,
   writeLastOpenedAt
-} from './notifications.utils';
+} from 'layout/notifications/notifications.utils';
+import { useCallback, useEffect, useMemo } from 'react';
 
 const EMPTY_FEED_URLS: string[] = [];
 const EMPTY_SERVICES: MinimalService[] = [];
@@ -24,7 +23,7 @@ const EMPTY_SERVICES: MinimalService[] = [];
  */
 export const useNotificationFeed = (): void => {
   const isAdmin = useAppConfig(s => Boolean(s?.user?.is_admin));
-  const configuration = useAppConfig(s => (s?.configuration || null) as Configuration | null);
+  const configuration = useAppConfig(s => s?.configuration || null);
   const feedUrls = useMemo(() => configuration?.ui?.rss_feeds ?? EMPTY_FEED_URLS, [configuration]);
 
   const setInterface = useAppSetInterfaceStore();

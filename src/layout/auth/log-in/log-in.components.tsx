@@ -1,9 +1,7 @@
 import type { TextFieldProps } from '@mui/material';
 import { CircularProgress, Divider, TextField, Typography, useTheme } from '@mui/material';
 import { useAppInterfaceStore } from 'core/interface';
-import { memo } from 'react';
-import { useTranslation } from 'react-i18next';
-import { useLoginForm } from './log-in.providers';
+import { useLoginForm } from 'layout/auth/log-in/log-in.providers';
 import {
   EMAIL_PATTERN,
   USERNAME_MIN_LENGTH,
@@ -12,7 +10,9 @@ import {
   validatePassword,
   validatePasswordConfirm,
   validateUsername
-} from './log-in.utils';
+} from 'layout/auth/log-in/log-in.utils';
+import { memo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 //*****************************************************************************************
 // Divider

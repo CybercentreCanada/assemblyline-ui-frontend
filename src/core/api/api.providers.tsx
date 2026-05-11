@@ -3,12 +3,12 @@ import { keepPreviousData, QueryClient } from '@tanstack/react-query';
 import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools';
 import type { PersistedClient } from '@tanstack/react-query-persist-client';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
+import type { ApiQueryKey } from 'core/api/api.models';
 import { useAppInterfaceStore } from 'core/interface';
 import { useAppPreferenceStore } from 'core/preference';
 import { compress, decompress } from 'lz-string';
 import type { PropsWithChildren } from 'react';
 import { Activity, memo, useEffect, useMemo } from 'react';
-import type { ApiQueryKey } from './api.models';
 
 //*****************************************************************************************
 // App API Debugger Layout

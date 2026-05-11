@@ -1,11 +1,11 @@
 import { deepmerge } from '@mui/utils';
-import { useCallback, useMemo, useState } from 'react';
-import { useAppConfig, useAppSetConfig } from './config.providers';
+import { useAppConfig, useAppSetConfig } from 'core/config/config.providers';
 import {
   APP_CONFIG_LOCAL_STORAGE_KEY,
   loadSettingsFromLocalStorage,
   saveSettingsFromLocalStorage
-} from './config.utils';
+} from 'core/config/config.utils';
+import { useCallback, useMemo, useState } from 'react';
 
 /**
  * @name useSaveAppConfig

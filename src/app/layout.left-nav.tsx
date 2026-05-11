@@ -30,19 +30,19 @@ import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
 import DataObjectOutlinedIcon from '@mui/icons-material/DataObjectOutlined';
 import NotificationImportantOutlinedIcon from '@mui/icons-material/NotificationImportantOutlined';
 import PublishOutlinedIcon from '@mui/icons-material/PublishOutlined';
+import { APP_ROUTES } from 'app/app.routes';
 import { useAppConfig } from 'core/config';
-import { AppLeftNavItem } from 'core/template';
+import type { AppLeftNavItem } from 'core/template';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
-import { APP_ROUTES } from './app.routes';
 
 export const useAppLeftNavMenu = () => {
   const { t } = useTranslation(['app']);
 
   const archiveEnabled = useAppConfig(s => s?.configuration?.datastore?.archive?.enabled || false);
   const c12nEnforce = useAppConfig(s => s?.c12nDef?.enforce || false);
-  const isAdmin = useAppConfig(s => Boolean((s?.user as any)?.is_admin));
+  const isAdmin = useAppConfig(s => Boolean(s?.user?.is_admin));
   const retrohuntEnabled = useAppConfig(s => s?.configuration?.retrohunt?.enabled || false);
   const systemType = useAppConfig(s => s?.configuration?.system?.type);
   const userRoles = useAppConfig(s => s?.user?.roles || []);

@@ -1,16 +1,13 @@
 import { AppErrorProvider } from 'core/error';
-import {
-  PATH_PARAM_BLUEPRINTS_MAP,
-  PathParamBlueprintMap,
-  RoutePath,
-  createPathParamsCodec
-} from 'features/path-params';
-import { SEARCH_PARAM_BLUEPRINTS_MAP, SearchParamBlueprintMap, SearchParamEngine } from 'features/search-params';
+import { DisabledBoundary, ForbiddenBoundary } from 'core/routes/routes.components';
+import type { RouteHash, RouteMeta } from 'core/routes/routes.models';
+import { AppRouteProvider } from 'core/routes/routes.providers';
+import type { PATH_PARAM_BLUEPRINTS_MAP, PathParamBlueprintMap, RoutePath } from 'features/path-params';
+import { createPathParamsCodec } from 'features/path-params';
+import type { SearchParamBlueprintMap } from 'features/search-params';
+import { SEARCH_PARAM_BLUEPRINTS_MAP, SearchParamEngine } from 'features/search-params';
 import type { ComponentType, MemoExoticComponent, ReactNode } from 'react';
 import { toElement } from 'shared/utils/app.utils';
-import { DisabledBoundary, ForbiddenBoundary } from './routes.components';
-import type { RouteHash, RouteMeta } from './routes.models';
-import { AppRouteProvider } from './routes.providers';
 
 //*****************************************************************************************
 // Create Route

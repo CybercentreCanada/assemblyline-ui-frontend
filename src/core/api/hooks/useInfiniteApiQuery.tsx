@@ -1,26 +1,26 @@
 import type { InfiniteData } from '@tanstack/react-query';
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
 import { DEFAULT_APP_PREFERENCE } from 'app/core.preference';
+import type { ApiQueryKey, ApiRequest, ApiResponse } from 'core/api/api.models';
+import { stableStringify } from 'core/api/api.utils';
+import type { UseApiCallFnProps } from 'core/api/hooks/useApiCallFn';
+import { useApiCallFn } from 'core/api/hooks/useApiCallFn';
 import { useMemo } from 'react';
-import type { ApiQueryKey, ApiRequest, ApiResponse } from '../api.models';
-import { stableStringify } from '../api.utils';
-import type { UseApiCallFnProps } from './useApiCallFn';
-import { useApiCallFn } from './useApiCallFn';
 
 export type UseInfiniteApiQueryProps<Response = unknown, Request extends ApiRequest = ApiRequest, Error = string> = {
   initialOffset?: number;
   getParams: (offset: number) => UseApiCallFnProps<ApiResponse<Response>, Request, ApiResponse<Error>>;
   getPreviousOffset?: (
     firstPage: ApiResponse<Response>,
-    allPages: Array<ApiResponse<Response>>,
+    allPages: ApiResponse<Response>[],
     firstPageParam: number,
-    allPageParams: Array<number>
+    allPageParams: number[]
   ) => number | undefined;
   getNextOffset?: (
     lastPage: ApiResponse<Response>,
-    allPages: Array<ApiResponse<Response>>,
+    allPages: ApiResponse<Response>[],
     lastPageParam: number,
-    allPageParams: Array<number>
+    allPageParams: number[]
   ) => number | undefined;
   allowCache?: boolean;
   retryAfter?: number;
@@ -52,7 +52,7 @@ export const useInfiniteApiQuery = <
   >(
     {
       queryKey: [base?.url, base?.method ?? 'GET', stableStringify(base?.body ?? null), allowCache],
-      queryFn: async ({ signal, pageParam }) => apiCallFn({ ...getParams(pageParam as number), signal }),
+      queryFn: async ({ signal, pageParam }) => apiCallFn({ ...getParams(pageParam), signal }),
       initialPageParam: initialOffset,
       getPreviousPageParam: (firstPage, allPages, firstPageParam, allPageParams) =>
         getPreviousOffset(firstPage, allPages, firstPageParam, allPageParams),

@@ -1,6 +1,6 @@
+import type { AppRoute } from 'core/routes/routes.models';
+import { useAppRouteStore } from 'core/routes/routes.providers';
 import type { SearchParamBlueprintMap, SearchParamEngine, SearchParamSnapshot } from 'features/search-params';
-import type { AppRoute } from './routes.models';
-import { useAppRouteStore } from './routes.providers';
 
 type RouteByPath<Path extends AppRoute['path']> = Extract<AppRoute, { path: Path }>;
 

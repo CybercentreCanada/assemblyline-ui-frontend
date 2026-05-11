@@ -1,4 +1,4 @@
-import type { ApiResponse, BlobResponse } from './api.models';
+import type { ApiResponse, BlobResponse } from 'core/api/api.models';
 
 /**
  * @name isObject
@@ -38,7 +38,7 @@ export const isApiData = (value: object): value is ApiResponse =>
  * @param responses - One or more response objects to search
  * @returns The first truthy value found, or null
  */
-// eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access
+
 export const getValue = (key: string, ...responses: Record<string, unknown>[]): unknown =>
   responses?.find(r => !!r?.[key])?.[key] || null;
 

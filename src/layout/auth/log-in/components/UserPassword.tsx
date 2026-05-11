@@ -1,9 +1,9 @@
 import { useAppInterfaceStore } from 'core/interface';
+import { PasswordInput, UsernameInput } from 'layout/auth/log-in/log-in.components';
+import { useLoginRequest } from 'layout/auth/log-in/log-in.hooks';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from 'ui/buttons/Button';
-import { PasswordInput, UsernameInput } from '../log-in.components';
-import { useLoginRequest } from '../log-in.hooks';
 
 //*****************************************************************************************
 // User Password Login

@@ -4,14 +4,14 @@ import { isApiData, stableStringify } from 'core/api';
 import { useAppConfig, useAppSetConfig, useSaveAppConfig } from 'core/config';
 import { useAppInterfaceStore, useAppSetInterfaceStore } from 'core/interface';
 import { useAppSnackbar } from 'core/snackbar';
+import type { LoginParamsProps } from 'layout/auth/auth.models';
+import { normalizeWhoAmI } from 'layout/auth/auth.utils';
 import type { WhoAmIProps } from 'models/api/user';
 import type { Configuration } from 'models/base/config';
 import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router';
 import { getXSRFCookie } from 'shared/utils/xsrf.utils';
-import type { LoginParamsProps } from './auth.models';
-import { normalizeWhoAmI } from './auth.utils';
 
 const DEFAULT_RETRY_TIME = 10_000;
 

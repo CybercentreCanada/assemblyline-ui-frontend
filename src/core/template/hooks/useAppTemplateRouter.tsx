@@ -1,5 +1,6 @@
-import { AppBreadcrumbItem, AppRouterAdapter } from '@tui/core';
-import { AppBreadcrumbRoute, useAppBreadcrumbs } from 'app/layout.breadcrumbs';
+import type { AppBreadcrumbItem, AppRouterAdapter } from '@tui/core';
+import type { AppBreadcrumbRoute } from 'app/layout.breadcrumbs';
+import { useAppBreadcrumbs } from 'app/layout.breadcrumbs';
 import { useCallback, useMemo } from 'react';
 import { Link, matchPath, useLocation, useNavigate } from 'react-router';
 

@@ -1,7 +1,5 @@
 import type { Theme } from '@mui/material';
 import { blue } from '@mui/material/colors';
-import type { Configuration } from 'models/base/config';
-import type { CSSProperties } from 'react';
 import type {
   JSONFeed,
   JSONFeedAuthor,
@@ -9,13 +7,15 @@ import type {
   JSONFeedItemAttachment,
   MinimalService,
   NotificationVersionType
-} from './notifications.models';
+} from 'layout/notifications/notifications.models';
 import {
   DEFAULT_JSON_FEED,
   DEFAULT_JSON_FEED_AUTHOR,
   DEFAULT_JSON_FEED_ITEM,
   DEFAULT_JSON_FEED_ITEM_ATTACHMENT
-} from './notifications.models';
+} from 'layout/notifications/notifications.models';
+import type { Configuration } from 'models/base/config';
+import type { CSSProperties } from 'react';
 
 const NOTIFICATIONS_LAST_OPENED_AT_KEY = 'notifications.lastOpenedAt';
 const ONE_YEAR_IN_MS = 365 * 24 * 60 * 60 * 1000;

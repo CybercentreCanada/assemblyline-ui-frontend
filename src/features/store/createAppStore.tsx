@@ -1,8 +1,10 @@
-import React, { createContext, PropsWithChildren, useCallback, useContext, useEffect, useRef } from 'react';
+import type { PropsWithChildren } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useRef } from 'react';
 import { useStore as useZustandStore } from 'zustand';
 import { devtools } from 'zustand/middleware';
 import { useShallow } from 'zustand/react/shallow';
-import { createStore, StoreApi } from 'zustand/vanilla';
+import type { StoreApi } from 'zustand/vanilla';
+import { createStore } from 'zustand/vanilla';
 
 export const createAppStore = <Store extends object>(initialState: Store) => {
   type StorePatch = Partial<Store> | ((state: Store) => Partial<Store>);

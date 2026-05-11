@@ -34,6 +34,14 @@ import { useAppConfig } from 'core/config';
 import { useAppInterfaceStore, useAppSetInterfaceStore } from 'core/interface';
 import { useAppSnackbar } from 'core/snackbar';
 import DOMPurify from 'dompurify';
+import {
+  useNotificationClose,
+  useNotificationFeed,
+  useNotificationNewCount,
+  useNotificationOpen
+} from 'layout/notifications/notifications.hooks';
+import type { JSONFeedAuthor, JSONFeedItem } from 'layout/notifications/notifications.models';
+import { formatDate, getBackgroundColor, getColor } from 'layout/notifications/notifications.utils';
 import type { SystemMessage } from 'models/api/user';
 import type { ChangeEvent, ReactNode } from 'react';
 import { memo, useCallback, useMemo } from 'react';
@@ -42,14 +50,6 @@ import Markdown from 'react-markdown';
 import { Button } from 'ui/buttons/Button';
 import { IconButton } from 'ui/buttons/IconButton';
 import { CustomChip } from 'ui/chips/CustomChip';
-import {
-  useNotificationClose,
-  useNotificationFeed,
-  useNotificationNewCount,
-  useNotificationOpen
-} from './notifications.hooks';
-import type { JSONFeedAuthor, JSONFeedItem } from './notifications.models';
-import { formatDate, getBackgroundColor, getColor } from './notifications.utils';
 
 //*****************************************************************************************
 // Constants

@@ -1,4 +1,4 @@
-import { ROLES } from 'models/base/user';
+import type { ROLES } from 'models/base/user';
 
 export type PossibleColor = 'default' | 'primary' | 'secondary' | 'info' | 'success' | 'warning' | 'error';
 

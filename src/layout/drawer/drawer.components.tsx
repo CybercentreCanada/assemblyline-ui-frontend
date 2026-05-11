@@ -2,11 +2,11 @@ import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import DoubleArrowOutlinedIcon from '@mui/icons-material/DoubleArrowOutlined';
 import { Drawer, styled, useMediaQuery, useTheme } from '@mui/material';
 import { useAppInterfaceStore, useAppSetInterfaceStore } from 'core/interface';
+import { useAppDrawerClose, useIsDrawerOpen } from 'layout/drawer/drawer.hooks';
 import type { CSSProperties, PropsWithChildren } from 'react';
 import { memo, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IconButton } from 'ui/buttons/IconButton';
-import { useAppDrawerClose, useIsDrawerOpen } from './drawer.hooks';
 
 const APP_DRAWER_WIDTHS: {
   xl: CSSProperties['width'];

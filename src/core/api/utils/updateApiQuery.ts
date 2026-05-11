@@ -1,5 +1,5 @@
-import type { ApiQueryKey, ApiRequest, ApiResponse } from '../api.models';
-import { queryClient } from '../api.providers';
+import type { ApiQueryKey, ApiRequest, ApiResponse } from 'core/api/api.models';
+import { queryClient } from 'core/api/api.providers';
 
 /**
  * @name updateAPIQuery
@@ -33,5 +33,5 @@ export const updateApiQuery = <T extends unknown = unknown>(
         }
       }
     },
-    prev => (prev ? { ...prev, api_response: update(prev.api_response as T) } : prev)
+    prev => (prev ? { ...prev, api_response: update(prev.api_response) } : prev)
   );

@@ -1,7 +1,7 @@
+import type { AppRouterStore } from 'core/router/router.models';
+import { DEFAULT_APP_ROUTER_PANEL, DEFAULT_APP_ROUTER_STORE } from 'core/router/router.models';
+import { addRoute, sanitizeRoutes } from 'core/router/router.utils';
 import { describe, expect, it } from 'vitest';
-import { DEFAULT_APP_ROUTER_PANEL, DEFAULT_APP_ROUTER_STORE } from './router.defaults';
-import { AppRouterStore } from './router.models';
-import { addRoute, sanitizeRoutes } from './router.utils';
 
 //*****************************************************************************************
 // sanitizeRoutes

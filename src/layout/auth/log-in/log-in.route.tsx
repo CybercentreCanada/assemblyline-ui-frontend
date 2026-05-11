@@ -1,17 +1,21 @@
 import { useTheme } from '@mui/material';
 import { createAppRoute } from 'core/routes';
+import { OneTimePassword } from 'layout/auth/log-in/components/OneTimePassword';
+import {
+  ResetPasswordConfirmation,
+  ResetPasswordLink,
+  ResetPasswordRequest
+} from 'layout/auth/log-in/components/ResetPassword';
+import { SecurityTokenLogin } from 'layout/auth/log-in/components/SecurityToken';
+import { SignUpConfirmation, SignUpLink, SignUpRequest } from 'layout/auth/log-in/components/SignUp';
+import { OAuthLogin, SAMLLogin, SingleSignOn } from 'layout/auth/log-in/components/SingleSignOn';
+import { UserPasswordLogin } from 'layout/auth/log-in/components/UserPassword';
+import { LoadingCard, LoginDivider } from 'layout/auth/log-in/log-in.components';
+import { useOAuthLogin, usePasswordResetEmail, useSAMLLogin, useSignUpEmail } from 'layout/auth/log-in/log-in.hooks';
+import { LoginFormProvider, useLoginForm } from 'layout/auth/log-in/log-in.providers';
 import { memo } from 'react';
 import { AppBanner, AppVerticalBanner } from 'ui/branding';
 import { PageCardCentered } from 'ui/pages/PageCardCentered';
-import { OneTimePassword } from './components/OneTimePassword';
-import { ResetPasswordConfirmation, ResetPasswordLink, ResetPasswordRequest } from './components/ResetPassword';
-import { SecurityTokenLogin } from './components/SecurityToken';
-import { SignUpConfirmation, SignUpLink, SignUpRequest } from './components/SignUp';
-import { OAuthLogin, SAMLLogin, SingleSignOn } from './components/SingleSignOn';
-import { UserPasswordLogin } from './components/UserPassword';
-import { LoadingCard, LoginDivider } from './log-in.components';
-import { useOAuthLogin, usePasswordResetEmail, useSAMLLogin, useSignUpEmail } from './log-in.hooks';
-import { LoginFormProvider, useLoginForm } from './log-in.providers';
 
 type LoginRequest = {
   user: string;

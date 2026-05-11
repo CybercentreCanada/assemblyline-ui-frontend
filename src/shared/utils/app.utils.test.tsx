@@ -1,5 +1,11 @@
+import {
+  deepCompare,
+  deepReconcile,
+  generateRandomUUID,
+  shallowCompareObject,
+  shallowReconcile
+} from 'shared/utils/app.utils';
 import { describe, expect, it } from 'vitest';
-import { deepCompare, deepReconcile, generateRandomUUID, shallowCompareObject, shallowReconcile } from './app.utils';
 
 //*****************************************************************************************
 // generateRandomUUID

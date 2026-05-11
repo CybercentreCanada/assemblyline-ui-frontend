@@ -1,11 +1,11 @@
-import type { Path } from 'react-router';
-import {
+import type {
   AppRoute,
   AppRouteLocation,
   CreatedAppRoute,
   CreatedAppRouteParamsMap,
   CreatedAppRoutes
-} from './routes.models';
+} from 'core/routes/routes.models';
+import type { Path } from 'react-router';
 
 /**
  * @name findAppRoute
@@ -35,7 +35,7 @@ export const buildRoutePathname = <Route extends AppRoute>(
   if (to?.path == null) return '';
 
   if (route?.params && to?.params) {
-    return route.params.stringify(to.params as never) as string;
+    return route.params.stringify(to.params as never);
   }
 
   if (to?.params) {

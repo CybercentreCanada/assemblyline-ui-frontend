@@ -1,7 +1,7 @@
-import type { ApiResponse } from '../api.models';
-import type { UseApiCallFnProps } from './useApiCallFn';
-import type { UseApiQueryProps } from './useApiQuery';
-import { useApiQuery } from './useApiQuery';
+import type { ApiResponse } from 'core/api/api.models';
+import type { UseApiCallFnProps } from 'core/api/hooks/useApiCallFn';
+import type { UseApiQueryProps } from 'core/api/hooks/useApiQuery';
+import { useApiQuery } from 'core/api/hooks/useApiQuery';
 
 export type UseAppQueryProps<Request extends ApiRequests> = {
   queryProps?: UseApiQueryProps<ApiResponses<Request>, Request, string>['queryProps'];

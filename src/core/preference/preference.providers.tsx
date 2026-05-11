@@ -1,9 +1,9 @@
 import { DEFAULT_APP_PREFERENCE } from 'app/core.preference';
+import { loadPreferenceFromLocalStorage, savePreferenceToLocalStorage } from 'core/preference/preference.utils';
 import { createAppStore } from 'features/store/createAppStore';
 import type { PropsWithChildren } from 'react';
 import { memo, useEffect, useRef } from 'react';
 import type { z } from 'zod';
-import { loadPreferenceFromLocalStorage, savePreferenceToLocalStorage } from './preference.utils';
 
 //*****************************************************************************************
 // App Preference Store

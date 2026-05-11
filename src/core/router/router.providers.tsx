@@ -1,12 +1,12 @@
 import { useAppPreferenceStore } from 'core/preference';
+import type { AppRouterState, AppRouterStore } from 'core/router/router.models';
+import { DEFAULT_APP_ROUTER_STORE } from 'core/router/router.models';
+import { locationToStore } from 'core/router/router.utils';
 import { createAppStore } from 'features/store/createAppStore';
 import type { PropsWithChildren } from 'react';
 import { memo, useEffect } from 'react';
 import type { Location } from 'react-router';
 import { BrowserRouter, useLocation } from 'react-router';
-import type { AppRouterState, AppRouterStore } from './router.models';
-import { DEFAULT_APP_ROUTER_STORE } from './router.models';
-import { locationToStore } from './router.utils';
 
 //*****************************************************************************************
 // App Router Store Provider

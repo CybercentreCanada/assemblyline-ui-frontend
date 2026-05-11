@@ -1,5 +1,5 @@
+import { stableStringify } from 'core/api/api.utils';
 import { useEffect, useMemo, useState } from 'react';
-import { stableStringify } from '../api.utils';
 
 export const useIsDebouncing = (delay: number | null = null, dependencies: readonly unknown[] = []): boolean => {
   const [bouncedDependencies, setBouncedDependencies] = useState<string | null>(null);

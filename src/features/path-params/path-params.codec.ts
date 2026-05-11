@@ -1,11 +1,11 @@
-import type { Location } from 'react-router';
-import {
+import type {
   PathParamBlueprint,
   PathParamBlueprintMap,
   PathParamBlueprintValues,
   PathParamCodec,
   RoutePath
-} from './path-params.models';
+} from 'features/path-params/path-params.models';
+import type { Location } from 'react-router';
 
 //*****************************************************************************************
 // Path Param Blueprints

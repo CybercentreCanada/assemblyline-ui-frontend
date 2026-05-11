@@ -1,8 +1,8 @@
-import { SystemMessage } from '@tui/notis';
-import { ClassificationAliases, ClassificationDefinition } from 'features/classification/classificationParser';
-import { CustomUser, Indexes } from 'models/api/user';
-import { Configuration } from 'models/base/config';
-import { UserSettings } from 'models/base/user_settings';
+import type { SystemMessage } from '@tui/notis';
+import type { ClassificationAliases, ClassificationDefinition } from 'features/classification/classificationParser';
+import type { CustomUser, Indexes } from 'models/api/user';
+import type { Configuration } from 'models/base/config';
+import type { UserSettings } from 'models/base/user_settings';
 
 declare global {
   type AppConfig = {

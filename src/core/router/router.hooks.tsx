@@ -1,10 +1,6 @@
 import { APP_ROUTES } from 'app/app.routes';
 import { useAppPreferenceStore } from 'core/preference';
-import type { AppRoute, AppRouteLocation, CreatedAppRouteParamsMap } from 'core/routes';
-import { buildRouteLocation, useAppRouteKey } from 'core/routes';
-import { useCallback, useMemo } from 'react';
-import { useNavigate } from 'react-router';
-import { useAppRouterStore, useAppSetRouterStore } from './router.providers';
+import { useAppRouterStore, useAppSetRouterStore } from 'core/router/router.providers';
 import {
   addRoute,
   findPanelKey,
@@ -13,7 +9,11 @@ import {
   storeToNavigate,
   updatePanel,
   updateRoute
-} from './router.utils';
+} from 'core/router/router.utils';
+import type { AppRoute, AppRouteLocation, CreatedAppRouteParamsMap } from 'core/routes';
+import { buildRouteLocation, useAppRouteKey } from 'core/routes';
+import { useCallback, useMemo } from 'react';
+import { useNavigate } from 'react-router';
 
 //*****************************************************************************************
 // useAppRouteLocation

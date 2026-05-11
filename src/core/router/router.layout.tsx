@@ -1,10 +1,11 @@
-import { AppRouteKeyProvider, AppRoutes, createAppRoute } from 'core/routes';
+import { useAppRouterStore } from 'core/router/router.providers';
+import { findNode } from 'core/router/router.utils';
+import type { createAppRoute } from 'core/routes';
+import { AppRouteKeyProvider, AppRoutes } from 'core/routes';
 import { InPortal, OutPortal } from 'features/portal';
 import type { PropsWithChildren } from 'react';
 import { memo } from 'react';
 import { useShallow } from 'zustand/react/shallow';
-import { useAppRouterStore } from './router.providers';
-import { findNode } from './router.utils';
 
 //*****************************************************************************************
 // App Router Panel

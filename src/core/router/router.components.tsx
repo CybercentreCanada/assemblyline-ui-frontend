@@ -1,9 +1,9 @@
+import { useAppNavigate, useAppRouteLocation } from 'core/router/router.hooks';
+import type { AppLinkProps } from 'core/router/router.models';
 import type { AppRoute } from 'core/routes';
 import type { ForwardedRef } from 'react';
 import { forwardRef, memo, useCallback } from 'react';
 import { Link } from 'react-router';
-import { useAppNavigate, useAppRouteLocation } from './router.hooks';
-import type { AppLinkProps } from './router.models';
 
 //*****************************************************************************************
 // App Link

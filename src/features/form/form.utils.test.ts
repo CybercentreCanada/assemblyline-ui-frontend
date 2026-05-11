@@ -1,4 +1,4 @@
-import { isObject } from './form.utils';
+import { isObject } from 'features/form/form.utils';
 import { expect } from 'vitest';
 
 describe('Test `Form Utilities`', () => {

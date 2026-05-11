@@ -1,4 +1,4 @@
-import { WhoAmI } from 'models/api/user';
+import type { WhoAmI } from 'models/api/user';
 
 /**
  * @name flatten

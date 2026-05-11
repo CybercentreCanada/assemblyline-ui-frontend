@@ -1,6 +1,6 @@
+import { loadPreferenceFromLocalStorage, savePreferenceToLocalStorage } from 'core/preference/preference.utils';
 import { describe, expect, it, vi } from 'vitest';
 import { z } from 'zod';
-import { loadPreferenceFromLocalStorage, savePreferenceToLocalStorage } from './preference.utils';
 
 const TestSchema = z.object({
   api: z

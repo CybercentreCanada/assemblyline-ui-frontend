@@ -1,13 +1,13 @@
-import { createReversePortalNode } from 'features/portal';
-import type { Location, NavigateOptions, To } from 'react-router';
-import { deepCompare, generateRandomUUID } from 'shared/utils/app.utils';
-import type { AppRouterState, AppRouterStore } from './router.models';
+import type { AppRouterState, AppRouterStore } from 'core/router/router.models';
 import {
   DEFAULT_APP_ROUTER_NODE,
   DEFAULT_APP_ROUTER_PANEL,
   DEFAULT_APP_ROUTER_ROUTE,
   ROUTER_STORE_EXAMPLE
-} from './router.models';
+} from 'core/router/router.models';
+import { createReversePortalNode } from 'features/portal';
+import type { Location, NavigateOptions, To } from 'react-router';
+import { deepCompare, generateRandomUUID } from 'shared/utils/app.utils';
 
 //*****************************************************************************************
 // Panel
@@ -1028,7 +1028,7 @@ export const parseLocationSearch = (store: AppRouterStore, location: Location<Ap
  */
 export const parseLocationState = (store: AppRouterStore, location: Location<AppRouterState>): AppRouterStore => {
   for (const [rawRouteKey, route] of Object.entries(location?.state?.routes || {})) {
-    let routeKey = rawRouteKey;
+    const routeKey = rawRouteKey;
     store = setRoute(store, routeKey, route);
   }
 

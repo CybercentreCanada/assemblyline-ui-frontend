@@ -1,6 +1,6 @@
+import { useTableOfContent } from 'features/table-of-content/TableOfContent';
 import type { DetailedHTMLProps, HTMLAttributes, ReactNode } from 'react';
 import { memo, useEffect, useId, useMemo } from 'react';
-import { useTableOfContent } from './TableOfContent';
 
 export type AnchorProps = DetailedHTMLProps<HTMLAttributes<HTMLDivElement>, HTMLDivElement> & {
   anchor?: string;

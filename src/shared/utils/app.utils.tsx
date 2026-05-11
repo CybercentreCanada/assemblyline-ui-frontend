@@ -1,4 +1,5 @@
-import React, { ComponentType, MemoExoticComponent, ReactNode } from 'react';
+import type { ComponentType, MemoExoticComponent, ReactNode } from 'react';
+import React from 'react';
 
 /**
  * @name generateRandomUUID

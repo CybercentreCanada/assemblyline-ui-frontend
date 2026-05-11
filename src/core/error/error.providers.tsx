@@ -1,7 +1,7 @@
+import { ErrorFallback } from 'core/error/error.components';
 import type { PropsWithChildren } from 'react';
 import { memo, useCallback } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';
-import { ErrorFallback } from './error.components';
 
 //*****************************************************************************************
 // AppErrorProvider
