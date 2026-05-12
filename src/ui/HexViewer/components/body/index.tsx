@@ -1,5 +1,5 @@
-import { useSelection } from 'components/visual/FileViewer/components/SelectionProvider';
-import type { StoreProps } from 'components/visual/HexViewer';
+import { useSelection } from 'ui/FileViewer/components/SelectionProvider';
+import type { StoreProps } from 'ui/HexViewer';
 import {
   HexRow,
   HexScrollBar,
@@ -9,7 +9,7 @@ import {
   useEventListener,
   useStore,
   WindowRow
-} from 'components/visual/HexViewer';
+} from 'ui/HexViewer';
 import type { KeyboardEvent, PropsWithChildren } from 'react';
 import React, { memo, useMemo, useRef } from 'react';
 import AutoSizer from 'react-virtualized-auto-sizer';

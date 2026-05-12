@@ -1,10 +1,13 @@
 import { AlertTitle, Skeleton } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
-import useALContext from 'components/hooks/useALContext';
-import type { SignatureIndexed } from 'components/models/base/signature';
-import type { SearchResult } from 'components/models/ui/search';
-import Classification from 'components/visual/Classification';
+import useALContext from 'deprecated/hooks/useALContext';
+import type { SearchResult } from 'models/api/search';
+import type { SignatureIndexed } from 'models/base/signature';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
+import Classification from 'ui/Classification';
 import {
   DivTable,
   DivTableBody,
@@ -13,13 +16,10 @@ import {
   DivTableRow,
   LinkRow,
   SortableHeaderCell
-} from 'components/visual/DivTable';
-import InformativeAlert from 'components/visual/InformativeAlert';
-import Moment from 'components/visual/Moment';
-import SignatureStatus from 'components/visual/SignatureStatus';
-import React from 'react';
-import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+} from 'ui/DivTable';
+import InformativeAlert from 'ui/InformativeAlert';
+import Moment from 'ui/Moment';
+import SignatureStatus from 'ui/SignatureStatus';
 
 type Props = {
   signatureResults: SearchResult<SignatureIndexed>;

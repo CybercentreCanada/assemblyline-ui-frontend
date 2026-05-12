@@ -1,7 +1,7 @@
 import { Skeleton, useTheme } from '@mui/material';
-import type { ActionableCustomChipProps } from 'components/visual/ActionableCustomChip';
-import ActionableCustomChip from 'components/visual/ActionableCustomChip';
 import React from 'react';
+import type { ActionableCustomChipProps } from 'ui/ActionableCustomChip';
+import ActionableCustomChip from 'ui/ActionableCustomChip';
 
 type ActionableChipListProps = {
   items: ActionableCustomChipProps[];

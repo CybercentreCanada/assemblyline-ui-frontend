@@ -1,11 +1,11 @@
 import { Skeleton } from '@mui/material';
-import useSafeResults from 'components/hooks/useSafeResults';
-import type { FileResult } from 'components/models/base/result';
-import type { Alternates } from 'components/models/ui/file';
-import ResultCard from 'components/visual/ResultCard';
-import SectionContainer from 'components/visual/SectionContainer';
+import useSafeResults from 'deprecated/hooks/useSafeResults';
+import type { Alternates } from 'models/api/file';
+import type { FileResult } from 'models/base/result';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import ResultCard from 'ui/ResultCard';
+import SectionContainer from 'ui/SectionContainer';
 
 type Props = {
   sid: string;

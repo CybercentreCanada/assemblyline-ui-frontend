@@ -2,7 +2,7 @@ import AdbIcon from '@mui/icons-material/Adb';
 import type { SxProps } from '@mui/material';
 import { ClickAwayListener, Fade, Paper, Popper, Tooltip, useTheme } from '@mui/material';
 import IconButton from '@mui/material/IconButton';
-import { isEnter, isEscape } from 'commons/components/utils/keyboard';
+import { isEnter, isEscape } from 'deprecated/utils/keyboard';
 import { default as React, useCallback, useState } from 'react';
 
 export type IconButtonPopperProps = {

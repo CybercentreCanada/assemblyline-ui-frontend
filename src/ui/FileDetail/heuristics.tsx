@@ -1,11 +1,11 @@
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import { Collapse, Divider, Grid, Skeleton, Typography, useTheme } from '@mui/material';
-import useHighlighter from 'components/hooks/useHighlighter';
-import type { Heuristics } from 'components/models/ui/file';
-import Heuristic from 'components/visual/Heuristic';
+import useHighlighter from 'deprecated/hooks/useHighlighter';
+import type { Heuristics } from 'models/api/file';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import Heuristic from 'ui/Heuristic';
 
 type HeuristicSectionProps = {
   heuristics: Heuristics;

@@ -1,7 +1,7 @@
 import { Skeleton, useTheme } from '@mui/material';
-import type { CustomChipProps } from 'components/visual/CustomChip';
-import CustomChip from 'components/visual/CustomChip';
 import React from 'react';
+import type { CustomChipProps } from 'ui/CustomChip';
+import CustomChip from 'ui/CustomChip';
 
 const ChipSkeleton = () => (
   <Skeleton variant="rectangular" height="24px" width="4rem" style={{ borderRadius: '16px', marginRight: '4px' }} />

@@ -5,10 +5,10 @@ import { Fade, ListItemButton, Paper, Popper, useTheme } from '@mui/material';
 import List from '@mui/material/List';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import { isEscape } from 'commons/components/utils/keyboard';
-import type { SearchType, StoreProps } from 'components/visual/HexViewer';
-import { useDispatch, useEventListener } from 'components/visual/HexViewer';
-import { TooltipIconButton } from 'components/visual/HexViewer/commons/components';
+import { isEscape } from 'deprecated/utils/keyboard';
+import type { SearchType, StoreProps } from 'ui/HexViewer';
+import { useDispatch, useEventListener } from 'ui/HexViewer';
+import { TooltipIconButton } from 'ui/HexViewer/commons/components';
 import React, { useCallback, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 

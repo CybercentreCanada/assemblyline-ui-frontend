@@ -1,8 +1,8 @@
-import type { Error } from 'components/models/base/error';
-import ErrorCard from 'components/visual/ErrorCard';
-import SectionContainer from 'components/visual/SectionContainer';
+import type { Error } from 'models/base/error';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import ErrorCard from 'ui/ErrorCard';
+import SectionContainer from 'ui/SectionContainer';
 
 type ErrorSectionProps = {
   errors: Error[];

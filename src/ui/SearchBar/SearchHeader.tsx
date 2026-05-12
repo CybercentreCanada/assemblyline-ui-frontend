@@ -14,14 +14,14 @@ import {
   useTheme
 } from '@mui/material';
 import PageContainer from 'commons/components/pages/PageContainer';
-import type { CustomChipProps } from 'components/visual/CustomChip';
-import CustomChip from 'components/visual/CustomChip';
-import type { SearchTextFieldProps } from 'components/visual/SearchBar/search-textfield';
-import SearchTextField from 'components/visual/SearchBar/search-textfield';
-import { SearchCount, TOTAL_TRACKED_RECORDS } from 'components/visual/SearchBar/SearchCount';
 import type { ReactNode } from 'react';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import type { CustomChipProps } from 'ui/CustomChip';
+import CustomChip from 'ui/CustomChip';
+import type { SearchTextFieldProps } from 'ui/SearchBar/search-textfield';
+import SearchTextField from 'ui/SearchBar/search-textfield';
+import { SearchCount, TOTAL_TRACKED_RECORDS } from 'ui/SearchBar/SearchCount';
 
 const Root = styled('div')(({ theme }) => ({
   // marginTop: theme.spacing(1),

@@ -1,5 +1,5 @@
 import type { SelectChangeEvent } from '@mui/material';
-import type { StoreProps } from 'components/visual/HexViewer';
+import type { StoreProps } from 'ui/HexViewer';
 import {
   getItems,
   getType,
@@ -9,7 +9,7 @@ import {
   SelectField,
   singleCharacterString,
   useStore
-} from 'components/visual/HexViewer';
+} from 'ui/HexViewer';
 import type { ChangeEvent } from 'react';
 import { default as React } from 'react';
 import { useTranslation } from 'react-i18next';

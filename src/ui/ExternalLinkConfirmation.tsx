@@ -1,6 +1,6 @@
 import type { LinkProps } from '@mui/material';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Link, Stack, Typography } from '@mui/material';
-import useALContext from 'components/hooks/useALContext';
+import useALContext from 'deprecated/hooks/useALContext';
 import { memo, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 

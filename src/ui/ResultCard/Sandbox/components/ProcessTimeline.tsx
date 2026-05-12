@@ -1,9 +1,9 @@
 import { alpha, useTheme } from '@mui/material/styles';
-import useALContext from 'components/hooks/useALContext';
-import type { SandboxBody as SandboxData, SandboxProcessItem } from 'components/models/base/result_body';
-import { getBackgroundColor, getProcessScore } from 'components/visual/ResultCard/Sandbox/sandbox.utils';
 import * as d3 from 'd3';
+import useALContext from 'deprecated/hooks/useALContext';
+import type { SandboxBody as SandboxData, SandboxProcessItem } from 'models/base/result_body';
 import React, { useEffect, useRef, useState } from 'react';
+import { getBackgroundColor, getProcessScore } from 'ui/ResultCard/Sandbox/sandbox.utils';
 
 type ProcessTimelineProps = {
   processes: SandboxProcessItem[];

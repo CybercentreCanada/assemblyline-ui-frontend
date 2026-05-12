@@ -8,13 +8,13 @@ import type { SvgIconProps } from '@mui/material';
 import { Box, styled, Tooltip, useTheme } from '@mui/material';
 import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
 import { TreeItem } from '@mui/x-tree-view/TreeItem';
-import useALContext from 'components/hooks/useALContext';
-import useSafeResults from 'components/hooks/useSafeResults';
-import type { ProcessTreeBody as ProcessTreeData } from 'components/models/base/result_body';
-import { humanReadableNumber } from 'helpers/utils';
+import useALContext from 'deprecated/hooks/useALContext';
+import useSafeResults from 'deprecated/hooks/useSafeResults';
+import type { ProcessTreeBody as ProcessTreeData } from 'models/base/result_body';
 import type { FC } from 'react';
 import React, { memo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { humanReadableNumber } from 'shared/utils/utils';
 
 const CounterItem = memo(
   styled('div')(({ theme }) => ({

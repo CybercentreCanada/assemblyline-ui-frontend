@@ -1,7 +1,7 @@
 import { useTheme } from '@mui/material';
-import { KVBody } from 'components/visual/ResultCard/kv_body';
-import TitleKey from 'components/visual/TitleKey';
 import React, { useMemo } from 'react';
+import { KVBody } from 'ui/ResultCard/kv_body';
+import TitleKey from 'ui/TitleKey';
 
 type DetailTableCellValueProps = {
   value?: unknown;

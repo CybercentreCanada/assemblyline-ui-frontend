@@ -2,12 +2,12 @@ import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import type { GridProps } from '@mui/material';
 import { Collapse, Divider, Grid, Skeleton, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
-import useSafeResults from 'components/hooks/useSafeResults';
-import type { Signature } from 'components/models/base/tagging';
-import type { Tags } from 'components/models/ui/file';
-import AutoHideTagList from 'components/visual/AutoHideTagList';
+import useSafeResults from 'deprecated/hooks/useSafeResults';
+import type { Tags } from 'models/api/file';
+import type { Signature } from 'models/base/tagging';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import AutoHideTagList from 'ui/AutoHideTagList';
 
 export interface TooltipGridProps extends Omit<GridProps, 'title'> {
   title?: React.ReactNode;

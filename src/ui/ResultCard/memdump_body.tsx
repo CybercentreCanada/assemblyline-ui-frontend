@@ -1,5 +1,5 @@
 import { styled } from '@mui/material';
-import type { MemDumpBody as MemDumpData } from 'components/models/base/result_body';
+import type { MemDumpBody as MemDumpData } from 'models/base/result_body';
 import { default as React } from 'react';
 
 const MemDumpContainer = styled('pre')(({ theme }) => ({

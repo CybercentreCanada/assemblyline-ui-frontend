@@ -1,6 +1,6 @@
 import { useTheme } from '@mui/material';
-import type { StoreProps } from 'components/visual/HexViewer';
-import { FoldingType, HexCell, HexOffset, HexSpacer, LAYOUT_SIZE, useStore } from 'components/visual/HexViewer';
+import type { StoreProps } from 'ui/HexViewer';
+import { FoldingType, HexCell, HexOffset, HexSpacer, LAYOUT_SIZE, useStore } from 'ui/HexViewer';
 import type { CSSProperties } from 'react';
 import React, { useMemo } from 'react';
 

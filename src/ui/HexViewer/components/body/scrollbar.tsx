@@ -1,8 +1,8 @@
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import { Button, Slider, useTheme } from '@mui/material';
-import type { StoreProps } from 'components/visual/HexViewer';
-import { useDispatch } from 'components/visual/HexViewer';
+import type { StoreProps } from 'ui/HexViewer';
+import { useDispatch } from 'ui/HexViewer';
 import { default as React } from 'react';
 
 export const WrappedHexScrollBar = ({ store }: StoreProps) => {

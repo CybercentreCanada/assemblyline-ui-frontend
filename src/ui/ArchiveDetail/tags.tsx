@@ -21,15 +21,19 @@ import {
 } from '@mui/material';
 import match from 'autosuggest-highlight/match';
 import parse from 'autosuggest-highlight/parse';
-import useALContext from 'components/hooks/useALContext';
-import useMyAPI from 'components/hooks/useMyAPI';
-import useMySnackbar from 'components/hooks/useMySnackbar';
-import useSafeResults from 'components/hooks/useSafeResults';
-import type { ResultIndexed } from 'components/models/base/result';
-import type { Signature, Tag } from 'components/models/base/tagging';
-import type { SearchResult } from 'components/models/ui/search';
-import ActionMenu from 'components/visual/ActionMenu';
-import Classification from 'components/visual/Classification';
+import useALContext from 'deprecated/hooks/useALContext';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useMySnackbar from 'deprecated/hooks/useMySnackbar';
+import useSafeResults from 'deprecated/hooks/useSafeResults';
+import type { SearchResult } from 'models/api/search';
+import type { ResultIndexed } from 'models/base/result';
+import type { Signature, Tag } from 'models/base/tagging';
+import React, { useCallback, useEffect, useMemo, useState, useTransition } from 'react';
+import { useTranslation } from 'react-i18next';
+import AutoSizer from 'react-virtualized-auto-sizer';
+import { safeFieldValue } from 'shared/utils/utils';
+import ActionMenu from 'ui/ActionMenu';
+import Classification from 'ui/Classification';
 import {
   GridLinkRow,
   GridTable,
@@ -38,16 +42,12 @@ import {
   GridTableHead,
   GridTableRow,
   SortableGridHeaderCell
-} from 'components/visual/GridTable';
-import InformativeAlert from 'components/visual/InformativeAlert';
-import SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
-import ResultsTable from 'components/visual/SearchResult/results';
-import SectionContainer from 'components/visual/SectionContainer';
-import Verdict from 'components/visual/Verdict';
-import { safeFieldValue } from 'helpers/utils';
-import React, { useCallback, useEffect, useMemo, useState, useTransition } from 'react';
-import { useTranslation } from 'react-i18next';
-import AutoSizer from 'react-virtualized-auto-sizer';
+} from 'ui/GridTable';
+import InformativeAlert from 'ui/InformativeAlert';
+import SimpleSearchQuery from 'ui/SearchBar/simple-search-query';
+import ResultsTable from 'ui/SearchResult/results';
+import SectionContainer from 'ui/SectionContainer';
+import Verdict from 'ui/Verdict';
 
 type Result = {
   tag_type: string;

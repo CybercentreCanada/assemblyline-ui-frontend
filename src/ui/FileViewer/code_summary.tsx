@@ -1,11 +1,11 @@
 import { Alert, CircularProgress, styled, Tooltip, useTheme } from '@mui/material';
-import { useAppUser } from 'commons/components/app/hooks';
-import useMyAPI from 'components/hooks/useMyAPI';
-import type { CustomUser } from 'components/models/ui/user';
-import ForbiddenPage from 'components/routes/403';
-import AIMarkdown from 'components/visual/AiMarkdown';
+import { useAppUser } from '@tui/core';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
+import type { CustomUser } from 'models/api/user';
+import { ForbiddenPage } from 'pages/forbidden/forbidden.route';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import AIMarkdown from 'ui/AiMarkdown';
 
 const Spinner = styled('div')(({ theme }) => ({
   textAlign: 'center',

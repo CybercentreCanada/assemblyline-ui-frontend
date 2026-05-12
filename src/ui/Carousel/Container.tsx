@@ -7,14 +7,14 @@ import CloseIcon from '@mui/icons-material/Close';
 import PageviewOutlinedIcon from '@mui/icons-material/PageviewOutlined';
 import RemoveIcon from '@mui/icons-material/Remove';
 import { CircularProgress, IconButton, Modal, Skeleton, Slider, Tooltip, alpha, styled, useTheme } from '@mui/material';
-import Carousel from 'commons/addons/carousel/Carousel';
-import useMyAPI from 'components/hooks/useMyAPI';
-import type { Image as ImageData } from 'components/models/base/result_body';
-import CarouselItem from 'components/visual/Carousel/Item';
+import Carousel from 'deprecated/components/Carousel';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
+import type { Image as ImageData } from 'models/base/result_body';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router';
 import { Link } from 'react-router-dom';
+import CarouselItem from 'ui/Carousel/Item';
 
 export type BackgroundMode = 'transparent' | 'light' | 'dark';
 

@@ -1,8 +1,8 @@
 import { Tooltip } from '@mui/material';
-import CustomChip from 'components/visual/CustomChip';
-import { priorityText } from 'helpers/utils';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { priorityText } from 'shared/utils/utils';
+import CustomChip from 'ui/CustomChip';
 
 type PriorityProps = {
   priority: number;

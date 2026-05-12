@@ -1,7 +1,7 @@
 import { Tooltip, useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
-import type { StoreProps } from 'components/visual/HexViewer';
-import { FieldPopper, NumericField, useDispatch } from 'components/visual/HexViewer';
+import type { StoreProps } from 'ui/HexViewer';
+import { FieldPopper, NumericField, useDispatch } from 'ui/HexViewer';
 import React, { useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 

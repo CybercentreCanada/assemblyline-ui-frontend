@@ -6,7 +6,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import InputLabel from '@mui/material/InputLabel';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import type { SxProps } from '@mui/material/styles';
-import { isArrowDown, isArrowUp, isEnter } from 'commons/components/utils/keyboard';
+import { isArrowDown, isArrowUp, isEnter } from 'deprecated/utils/keyboard';
 import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 export type NumericFieldProps = {

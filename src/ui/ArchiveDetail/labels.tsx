@@ -26,18 +26,18 @@ import {
 } from '@mui/material';
 import match from 'autosuggest-highlight/match';
 import parse from 'autosuggest-highlight/parse';
-import useALContext from 'components/hooks/useALContext';
-import useMyAPI from 'components/hooks/useMyAPI';
-import useMySnackbar from 'components/hooks/useMySnackbar';
-import type { LabelCategories } from 'components/models/base/file';
-import { DEFAULT_LABELS, LABELS_COLOR_MAP } from 'components/models/base/file';
-import { ChipList } from 'components/visual/ChipList';
-import CustomChip from 'components/visual/CustomChip';
-import { useDebounce } from 'components/visual/HexViewer';
-import SectionContainer from 'components/visual/SectionContainer';
-import type { PossibleColor } from 'helpers/colors';
+import useALContext from 'deprecated/hooks/useALContext';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useMySnackbar from 'deprecated/hooks/useMySnackbar';
+import type { LabelCategories } from 'models/base/file';
+import { DEFAULT_LABELS, LABELS_COLOR_MAP } from 'models/base/file';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import type { PossibleColor } from 'shared/models/colors';
+import { ChipList } from 'ui/ChipList';
+import CustomChip from 'ui/CustomChip';
+import { useDebounce } from 'ui/HexViewer';
+import SectionContainer from 'ui/SectionContainer';
 
 const LABELS: Record<keyof LabelCategories, { color: PossibleColor }> = {
   attribution: { color: 'primary' },

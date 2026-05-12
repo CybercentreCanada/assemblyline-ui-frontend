@@ -1,5 +1,5 @@
-import type { StoreProps } from 'components/visual/HexViewer';
-import { HexcodeBar, HexCursorBar, TextBar } from 'components/visual/HexViewer';
+import type { StoreProps } from 'ui/HexViewer';
+import { HexcodeBar, HexCursorBar, TextBar } from 'ui/HexViewer';
 import { memo } from 'react';
 
 export * from './cursorbar';

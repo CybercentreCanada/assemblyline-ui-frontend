@@ -1,5 +1,5 @@
 import { useTheme } from '@mui/material';
-import { LAYOUT_SIZE, useDispatch } from 'components/visual/HexViewer';
+import { LAYOUT_SIZE, useDispatch } from 'ui/HexViewer';
 import type { CSSProperties } from 'react';
 import React from 'react';
 

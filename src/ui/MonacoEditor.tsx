@@ -1,13 +1,13 @@
 import type { Monaco } from '@monaco-editor/react';
 import Editor, { DiffEditor, loader } from '@monaco-editor/react';
 import { useTheme } from '@mui/material';
-import { useAppTheme } from 'commons/components/app/hooks';
-import { useSelection } from 'components/visual/FileViewer/components/SelectionProvider';
+import { useAppTheme } from '@tui/core';
 import { registerYaraCompletionItemProvider, yaraConfig, yaraDef } from 'helpers/yara';
 import type { editor as MonacoEditorType } from 'monaco-editor';
 import React, { useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import AutoSizer from 'react-virtualized-auto-sizer';
+import { useSelection } from 'ui/FileViewer/components/SelectionProvider';
 
 loader.config({ paths: { vs: '/cdn/monaco_0.35.0/vs' } });
 

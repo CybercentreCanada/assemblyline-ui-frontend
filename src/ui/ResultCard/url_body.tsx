@@ -1,6 +1,6 @@
-import type { URLBody as URLData } from 'components/models/base/result_body';
-import { ExternalLinkConfirmation } from 'components/visual/ExternalLinkConfirmation';
+import type { URLBody as URLData } from 'models/base/result_body';
 import React from 'react';
+import { ExternalLinkConfirmation } from 'ui/ExternalLinkConfirmation';
 
 type Props = {
   body: URLData;

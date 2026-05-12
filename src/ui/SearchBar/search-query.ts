@@ -44,7 +44,12 @@ export const DEFAULT_SORT = 'reporting_ts desc';
 export default class SearchQuery {
   private params: URLSearchParams = null;
 
-  constructor(private path: string, baseSearch: string, private pageSize: number, setDefaults: boolean = true) {
+  constructor(
+    private path: string,
+    baseSearch: string,
+    private pageSize: number,
+    setDefaults: boolean = true
+  ) {
     this.params = new URLSearchParams(baseSearch);
     if (setDefaults) {
       if (!this.hasOffset()) {

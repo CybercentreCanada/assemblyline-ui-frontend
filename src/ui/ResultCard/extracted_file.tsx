@@ -14,17 +14,17 @@ import {
   Tooltip,
   useTheme
 } from '@mui/material';
-import useALContext from 'components/hooks/useALContext';
-import useMyAPI from 'components/hooks/useMyAPI';
-import useMySnackbar from 'components/hooks/useMySnackbar';
-import type { File } from 'components/models/base/result';
-import type { Submission } from 'components/models/base/submission';
 import { DEFAULT_TAB, TAB_OPTIONS } from 'components/routes/file/viewer';
-import { IconButton } from 'components/visual/Buttons/IconButton';
+import useALContext from 'deprecated/hooks/useALContext';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useMySnackbar from 'deprecated/hooks/useMySnackbar';
+import type { File } from 'models/base/result';
+import type { Submission } from 'models/base/submission';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
 import { Link } from 'react-router-dom';
+import { IconButton } from 'ui/buttons/IconButton';
 
 export type ExtractedFileProps = {
   file: File;

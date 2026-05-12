@@ -1,12 +1,12 @@
-import useALContext from 'components/hooks/useALContext';
-import useExternalLookup from 'components/hooks/useExternalLookup';
-import type { ExternalLinkType } from 'components/models/base/config';
-import ActionMenu from 'components/visual/ActionMenu';
-import type { CustomChipProps } from 'components/visual/CustomChip';
-import CustomChip from 'components/visual/CustomChip';
-import EnrichmentCustomChip, { BOREALIS_TYPE_MAP } from 'components/visual/EnrichmentCustomChip';
-import ExternalLinks from 'components/visual/ExternalSearch';
+import useALContext from 'deprecated/hooks/useALContext';
+import useExternalLookup from 'deprecated/hooks/useExternalLookup';
+import type { ExternalLinkType } from 'models/base/config';
 import React, { useCallback, useState } from 'react';
+import ActionMenu from 'ui/ActionMenu';
+import type { CustomChipProps } from 'ui/CustomChip';
+import CustomChip from 'ui/CustomChip';
+import EnrichmentCustomChip, { BOREALIS_TYPE_MAP } from 'ui/EnrichmentCustomChip';
+import ExternalLinks from 'ui/ExternalSearch';
 
 export type ActionableCustomChipProps = CustomChipProps & {
   category?: ExternalLinkType;

@@ -1,8 +1,8 @@
 import { FormControl, Grid, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
 import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
-import type { StoreProps } from 'components/visual/HexViewer';
-import { COLUMNS, NumericField, useDispatch, useStore } from 'components/visual/HexViewer';
+import type { StoreProps } from 'ui/HexViewer';
+import { COLUMNS, NumericField, useDispatch, useStore } from 'ui/HexViewer';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 

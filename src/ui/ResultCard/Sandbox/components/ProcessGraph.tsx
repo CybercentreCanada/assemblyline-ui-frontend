@@ -15,19 +15,19 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
-import useALContext from 'components/hooks/useALContext';
-import type { SandboxBody as SandboxData, SandboxProcessItem } from 'components/models/base/result_body';
-import { CustomChip } from 'components/visual/CustomChip';
-import type { ProcessItem, SandboxFilter } from 'components/visual/ResultCard/Sandbox/sandbox.utils';
+import useALContext from 'deprecated/hooks/useALContext';
+import type { SandboxBody as SandboxData, SandboxProcessItem } from 'models/base/result_body';
+import React, { useCallback, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { humanReadableNumber } from 'shared/utils/utils';
+import { CustomChip } from 'ui/CustomChip';
+import type { ProcessItem, SandboxFilter } from 'ui/ResultCard/Sandbox/sandbox.utils';
 import {
   buildProcessTree,
   getBackgroundColor,
   getDescendantPids,
   getProcessScore
-} from 'components/visual/ResultCard/Sandbox/sandbox.utils';
-import { humanReadableNumber } from 'helpers/utils';
-import React, { useCallback, useMemo, useState } from 'react';
-import { useTranslation } from 'react-i18next';
+} from 'ui/ResultCard/Sandbox/sandbox.utils';
 
 /* ----------------------------------------------------------------------------
  * ProcessStats

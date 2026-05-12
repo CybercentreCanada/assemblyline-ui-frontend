@@ -1,11 +1,15 @@
 import { AlertTitle, Skeleton, Tooltip } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
-import useALContext from 'components/hooks/useALContext';
-import type { Safelist } from 'components/models/base/safelist';
-import type { SearchResult } from 'components/models/ui/search';
-import Classification from 'components/visual/Classification';
-import CustomChip from 'components/visual/CustomChip';
+import useALContext from 'deprecated/hooks/useALContext';
+import type { SearchResult } from 'models/api/search';
+import type { Safelist } from 'models/base/safelist';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
+import { maxLenStr } from 'shared/utils/utils';
+import Classification from 'ui/Classification';
+import CustomChip from 'ui/CustomChip';
 import {
   DivTable,
   DivTableBody,
@@ -14,13 +18,9 @@ import {
   DivTableRow,
   LinkRow,
   SortableHeaderCell
-} from 'components/visual/DivTable';
-import InformativeAlert from 'components/visual/InformativeAlert';
-import Moment from 'components/visual/Moment';
-import { maxLenStr } from 'helpers/utils';
-import React from 'react';
-import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+} from 'ui/DivTable';
+import InformativeAlert from 'ui/InformativeAlert';
+import Moment from 'ui/Moment';
 
 type Props = {
   safelistResults: SearchResult<Safelist>;

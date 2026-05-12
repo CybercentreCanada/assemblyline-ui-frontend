@@ -1,14 +1,14 @@
 import { HIDE_EVENT_ID } from 'borealis-ui/dist/data/event';
-import useALContext from 'components/hooks/useALContext';
-import useHighlighter from 'components/hooks/useHighlighter';
-import useSafeResults from 'components/hooks/useSafeResults';
-import type { ActionMenuProps } from 'components/visual/ActionMenu';
-import ActionMenu from 'components/visual/ActionMenu';
-import CustomChip from 'components/visual/CustomChip';
-import EnrichmentCustomChip, { BOREALIS_TYPE_MAP } from 'components/visual/EnrichmentCustomChip';
-import ExternalLinks from 'components/visual/ExternalSearch';
-import type { PossibleColor } from 'helpers/colors';
+import useALContext from 'deprecated/hooks/useALContext';
+import useHighlighter from 'deprecated/hooks/useHighlighter';
+import useSafeResults from 'deprecated/hooks/useSafeResults';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import type { PossibleColor } from 'shared/utils/colors';
+import type { ActionMenuProps } from 'ui/ActionMenu';
+import ActionMenu from 'ui/ActionMenu';
+import CustomChip from 'ui/CustomChip';
+import EnrichmentCustomChip, { BOREALIS_TYPE_MAP } from 'ui/EnrichmentCustomChip';
+import ExternalLinks from 'ui/ExternalSearch';
 
 const STYLE = { height: 'auto', minHeight: '22px' };
 const initialMenuState = {

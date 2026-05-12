@@ -1,11 +1,11 @@
 import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
 import { AlertTitle, Box, IconButton, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
-import type { Childrens } from 'components/models/ui/file';
-import InformativeAlert from 'components/visual/InformativeAlert';
-import SectionContainer from 'components/visual/SectionContainer';
+import type { Childrens } from 'models/api/file';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
+import InformativeAlert from 'ui/InformativeAlert';
+import SectionContainer from 'ui/SectionContainer';
 
 type ChildrenSectionProps = {
   childrens: Childrens;

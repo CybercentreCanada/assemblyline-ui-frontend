@@ -1,6 +1,6 @@
-import type { KeyValueBody as KeyValueData } from 'components/models/base/result_body';
-import TitleKey from 'components/visual/TitleKey';
+import type { KeyValueBody as KeyValueData } from 'models/base/result_body';
 import { default as React } from 'react';
+import TitleKey from 'ui/TitleKey';
 
 type Props = {
   body: KeyValueData;

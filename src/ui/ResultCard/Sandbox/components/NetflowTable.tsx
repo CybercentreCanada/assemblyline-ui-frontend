@@ -1,16 +1,16 @@
 import { Tooltip, useTheme } from '@mui/material';
 import type { ColumnDef } from '@tanstack/react-table';
 import { createColumnHelper } from '@tanstack/react-table';
-import type { SandboxBody, SandboxNetflowItem } from 'components/models/base/result_body';
 import { DNS_RECORD_TYPES } from 'components/models/ontology/results/network';
-import CustomChip from 'components/visual/CustomChip';
-import { KVBody } from 'components/visual/ResultCard/kv_body';
-import { ProcessChip } from 'components/visual/ResultCard/Sandbox/common/ProcessChip';
-import { TableContainer } from 'components/visual/ResultCard/Sandbox/common/TableContainer';
-import { DetailTableCellValue, DetailTableRow } from 'components/visual/ResultCard/Sandbox/common/Tables';
-import { compareIPs, hasObjectData, type SandboxFilter } from 'components/visual/ResultCard/Sandbox/sandbox.utils';
+import type { SandboxBody, SandboxNetflowItem } from 'models/base/result_body';
 import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import CustomChip from 'ui/CustomChip';
+import { KVBody } from 'ui/ResultCard/kv_body';
+import { ProcessChip } from 'ui/ResultCard/Sandbox/common/ProcessChip';
+import { TableContainer } from 'ui/ResultCard/Sandbox/common/TableContainer';
+import { DetailTableCellValue, DetailTableRow } from 'ui/ResultCard/Sandbox/common/Tables';
+import { compareIPs, hasObjectData, type SandboxFilter } from 'ui/ResultCard/Sandbox/sandbox.utils';
 
 type NetflowTableProps = {
   body?: SandboxBody | null;

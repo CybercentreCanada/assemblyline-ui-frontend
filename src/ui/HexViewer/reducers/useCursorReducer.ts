@@ -1,4 +1,4 @@
-import { isArrowDown, isArrowLeft, isArrowRight, isArrowUp } from 'commons/components/utils/keyboard';
+import { isArrowDown, isArrowLeft, isArrowRight, isArrowUp } from 'deprecated/utils/keyboard';
 import { useCallback } from 'react';
 import type { ReducerHandler, Reducers, RenderHandler, Store, UseReducer } from '..';
 import {

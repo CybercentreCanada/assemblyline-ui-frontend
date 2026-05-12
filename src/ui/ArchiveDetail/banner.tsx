@@ -24,22 +24,22 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
-import useALContext from 'components/hooks/useALContext';
-import useMyAPI from 'components/hooks/useMyAPI';
-import useMySnackbar from 'components/hooks/useMySnackbar';
-import type { LabelCategories } from 'components/models/base/file';
-import type { File } from 'components/models/ui/file';
-import { FileDownloader } from 'components/visual/Buttons/FileDownloader';
-import Classification from 'components/visual/Classification';
-import CustomChip from 'components/visual/CustomChip';
-import InputDialog from 'components/visual/InputDialog';
-import Moment from 'components/visual/Moment';
-import { bytesToSize } from 'helpers/utils';
+import useALContext from 'deprecated/hooks/useALContext';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useMySnackbar from 'deprecated/hooks/useMySnackbar';
+import type { File } from 'models/api/file';
+import type { LabelCategories } from 'models/base/file';
 import type { CSSProperties } from 'react';
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
 import { Link } from 'react-router-dom';
+import { bytesToSize } from 'shared/utils/utils';
+import { FileDownloader } from 'ui/buttons/FileDownloader';
+import Classification from 'ui/Classification';
+import CustomChip from 'ui/CustomChip';
+import InputDialog from 'ui/InputDialog';
+import Moment from 'ui/Moment';
 
 const VERDICTS = {
   malicious: { className: 'malicious' },

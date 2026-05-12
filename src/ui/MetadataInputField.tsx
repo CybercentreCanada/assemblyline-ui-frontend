@@ -10,11 +10,11 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
-import useMyAPI from 'components/hooks/useMyAPI';
-import type { Metadata } from 'components/models/base/config';
-import DatePicker from 'components/visual/DatePicker';
-import { isURL } from 'helpers/utils';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
+import type { Metadata } from 'models/base/config';
 import { useEffect, useState } from 'react';
+import { isURL } from 'shared/utils/utils';
+import DatePicker from 'ui/DatePicker';
 
 interface MetadataInputFieldProps {
   name: string;

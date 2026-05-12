@@ -15,13 +15,13 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
-import { AppUserAvatar } from 'commons/components/topnav/UserProfile';
-import useALContext from 'components/hooks/useALContext';
-import type { Author, Comment, ReactionType } from 'components/models/base/file';
-import { REACTIONS_TYPES } from 'components/models/base/file';
-import Moment from 'components/visual/Moment';
+import { AppUserAvatar } from '@tui/core';
+import useALContext from 'deprecated/hooks/useALContext';
+import type { Author, Comment, ReactionType } from 'models/base/file';
+import { REACTIONS_TYPES } from 'models/base/file';
 import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import Moment from 'ui/Moment';
 
 type Props = {
   currentComment?: Comment;

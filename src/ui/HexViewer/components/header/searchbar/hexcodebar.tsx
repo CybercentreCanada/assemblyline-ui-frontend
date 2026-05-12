@@ -1,6 +1,6 @@
 import ClearIcon from '@mui/icons-material/Clear';
 import { Typography, useTheme } from '@mui/material';
-import type { StoreProps } from 'components/visual/HexViewer';
+import type { StoreProps } from 'ui/HexViewer';
 import {
   DelayedTextField,
   isWidthEqualUp,
@@ -8,7 +8,7 @@ import {
   TooltipIconButton,
   useDispatch,
   useEventListener
-} from 'components/visual/HexViewer';
+} from 'ui/HexViewer';
 import React, { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 

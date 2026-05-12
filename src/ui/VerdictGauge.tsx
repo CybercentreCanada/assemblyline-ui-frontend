@@ -1,7 +1,7 @@
 import { styled, Tooltip, useTheme } from '@mui/material';
-import type { SubmissionVerdict } from 'components/models/base/alert';
 import { scaleLinear } from 'd3-scale';
 import { arc } from 'd3-shape';
+import type { SubmissionVerdict } from 'models/base/alert';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 

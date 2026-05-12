@@ -1,17 +1,17 @@
 import { Divider, useTheme } from '@mui/material';
-import type { MultiBody as MultiData } from 'components/models/base/result_body';
-import { GraphBody } from 'components/visual/ResultCard/graph_body';
-import { ImageBody } from 'components/visual/ResultCard/image_body';
-import { JSONBody } from 'components/visual/ResultCard/json_body';
-import { KVBody } from 'components/visual/ResultCard/kv_body';
-import { MemDumpBody } from 'components/visual/ResultCard/memdump_body';
-import { OrderedKVBody } from 'components/visual/ResultCard/ordered_kv_body';
-import { ProcessTreeBody } from 'components/visual/ResultCard/process_tree_body';
-import { TblBody } from 'components/visual/ResultCard/table_body';
-import { TextBody } from 'components/visual/ResultCard/text_body';
-import { URLBody } from 'components/visual/ResultCard/url_body';
+import type { MultiBody as MultiData } from 'models/base/result_body';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { GraphBody } from 'ui/ResultCard/graph_body';
+import { ImageBody } from 'ui/ResultCard/image_body';
+import { JSONBody } from 'ui/ResultCard/json_body';
+import { KVBody } from 'ui/ResultCard/kv_body';
+import { MemDumpBody } from 'ui/ResultCard/memdump_body';
+import { OrderedKVBody } from 'ui/ResultCard/ordered_kv_body';
+import { ProcessTreeBody } from 'ui/ResultCard/process_tree_body';
+import { TblBody } from 'ui/ResultCard/table_body';
+import { TextBody } from 'ui/ResultCard/text_body';
+import { URLBody } from 'ui/ResultCard/url_body';
 
 type Props = {
   body: MultiData;

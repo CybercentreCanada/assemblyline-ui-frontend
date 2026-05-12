@@ -1,8 +1,8 @@
 import BrokenImageOutlinedIcon from '@mui/icons-material/BrokenImageOutlined';
 import { alpha, Button, CircularProgress, styled, Tooltip, useTheme } from '@mui/material';
-import useMyAPI from 'components/hooks/useMyAPI';
-import type { BackgroundMode } from 'components/visual/Carousel/Container';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
 import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
+import type { BackgroundMode } from 'ui/Carousel/Container';
 
 const Img = memo(
   styled('img')(({ theme }) => ({

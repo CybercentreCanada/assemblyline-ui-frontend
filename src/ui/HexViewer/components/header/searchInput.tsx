@@ -1,8 +1,8 @@
 import { useMediaQuery, useTheme } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
-import type { StoreProps } from 'components/visual/HexViewer';
-import { useDispatch } from 'components/visual/HexViewer';
+import type { StoreProps } from 'ui/HexViewer';
+import { useDispatch } from 'ui/HexViewer';
 import type { SyntheticEvent } from 'react';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';

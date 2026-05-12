@@ -33,21 +33,21 @@ import {
 } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
 import { blue } from '@mui/material/colors';
-import useALContext from 'components/hooks/useALContext';
-import useMyAPI from 'components/hooks/useMyAPI';
-import useMySnackbar from 'components/hooks/useMySnackbar';
-import type { Configuration } from 'components/models/base/config';
-import type { ServiceIndexed } from 'components/models/base/service';
-import type { SystemMessage } from 'components/models/ui/user';
-import ConfirmationDialog from 'components/visual/ConfirmationDialog';
-import NotificationItem from 'components/visual/Notification/NotificationItem';
-import type { JSONFeedItem } from 'components/visual/Notification/useNotificationFeed';
-import { useNotificationFeed } from 'components/visual/Notification/useNotificationFeed';
-import type { PossibleColor } from 'helpers/colors';
+import useALContext from 'deprecated/hooks/useALContext';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useMySnackbar from 'deprecated/hooks/useMySnackbar';
+import type { SystemMessage } from 'models/api/user';
+import type { Configuration } from 'models/base/config';
+import type { ServiceIndexed } from 'models/base/service';
 import 'moment-timezone';
 import type { ComponentProps, ComponentType, CSSProperties, ElementType } from 'react';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import type { PossibleColor } from 'shared/models/colors';
+import ConfirmationDialog from 'ui/ConfirmationDialog';
+import NotificationItem from 'ui/Notification/NotificationItem';
+import type { JSONFeedItem } from 'ui/Notification/useNotificationFeed';
+import { useNotificationFeed } from 'ui/Notification/useNotificationFeed';
 
 const Row = styled('div')(() => ({
   width: '100%',

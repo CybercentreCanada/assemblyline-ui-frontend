@@ -1,6 +1,6 @@
 import ReactJson from '@microlink/react-json-view';
 import { styled, useTheme } from '@mui/material';
-import type { JSONBody as JSONData } from 'components/models/base/result_body';
+import type { JSONBody as JSONData } from 'models/base/result_body';
 import { default as React } from 'react';
 
 const JSONContainer = styled('pre')(({ theme }) => ({

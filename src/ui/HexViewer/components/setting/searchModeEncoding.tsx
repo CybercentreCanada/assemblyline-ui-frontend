@@ -1,6 +1,6 @@
 import type { SelectChangeEvent } from '@mui/material';
-import type { StoreProps } from 'components/visual/HexViewer';
-import { getItems, getType, getValue, SelectField, useStore } from 'components/visual/HexViewer';
+import type { StoreProps } from 'ui/HexViewer';
+import { getItems, getType, getValue, SelectField, useStore } from 'ui/HexViewer';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 

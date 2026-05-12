@@ -2,9 +2,12 @@ import MoreHorizOutlinedIcon from '@mui/icons-material/MoreHorizOutlined';
 import { AlertTitle, IconButton, Skeleton } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
-import type { ApiKey, Role } from 'components/models/base/user';
-import type { SearchResult } from 'components/models/ui/search';
-import CustomChip from 'components/visual/CustomChip';
+import type { SearchResult } from 'models/api/search';
+import type { ApiKey, Role } from 'models/base/user';
+import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
+import CustomChip from 'ui/CustomChip';
 import {
   DivTable,
   DivTableBody,
@@ -13,12 +16,9 @@ import {
   DivTableRow,
   LinkRow,
   SortableHeaderCell
-} from 'components/visual/DivTable';
-import InformativeAlert from 'components/visual/InformativeAlert';
-import Moment from 'components/visual/Moment';
-import React, { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+} from 'ui/DivTable';
+import InformativeAlert from 'ui/InformativeAlert';
+import Moment from 'ui/Moment';
 
 const MAX_DISPLAY_ROLES = 5;
 

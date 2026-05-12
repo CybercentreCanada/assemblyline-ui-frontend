@@ -20,9 +20,9 @@ import {
   getSortedRowModel,
   useReactTable
 } from '@tanstack/react-table';
-import InformativeAlert from 'components/visual/InformativeAlert';
 import { t } from 'i18next';
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import InformativeAlert from 'ui/InformativeAlert';
 
 declare module '@tanstack/react-table' {
   interface ColumnMeta<TData extends RowData = RowData, TValue = unknown> {

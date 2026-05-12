@@ -1,7 +1,7 @@
 import AdbIcon from '@mui/icons-material/Adb';
 import type { SxProps } from '@mui/material';
 import { ClickAwayListener, Fade, Popper, useTheme } from '@mui/material';
-import { isEscape } from 'commons/components/utils/keyboard';
+import { isEscape } from 'deprecated/utils/keyboard';
 import type { CSSProperties } from 'react';
 import { default as React, forwardRef, useCallback, useImperativeHandle, useState } from 'react';
 import { TooltipIconButton } from '.';

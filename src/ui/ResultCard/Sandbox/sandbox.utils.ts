@@ -1,10 +1,6 @@
 import { alpha, type Theme } from '@mui/material';
-import type {
-  SandboxBody as SandboxData,
-  SandboxProcessItem,
-  SandboxSignatureItem
-} from 'components/models/base/result_body';
-import type { PossibleColor } from 'helpers/colors';
+import type { SandboxBody as SandboxData, SandboxProcessItem, SandboxSignatureItem } from 'models/base/result_body';
+import type { PossibleColor } from 'shared/models/colors';
 
 export const INTEGRITY_LEVEL_COLOR_MAP: Record<string, PossibleColor> = {
   system: 'primary',

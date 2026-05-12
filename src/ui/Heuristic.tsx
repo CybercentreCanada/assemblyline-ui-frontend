@@ -1,10 +1,10 @@
-import useALContext from 'components/hooks/useALContext';
-import useHighlighter from 'components/hooks/useHighlighter';
-import useSafeResults from 'components/hooks/useSafeResults';
-import ActionMenu from 'components/visual/ActionMenu';
-import CustomChip from 'components/visual/CustomChip';
-import type { PossibleColor } from 'helpers/colors';
+import useALContext from 'deprecated/hooks/useALContext';
+import useHighlighter from 'deprecated/hooks/useHighlighter';
+import useSafeResults from 'deprecated/hooks/useSafeResults';
 import React, { useCallback, useState } from 'react';
+import type { PossibleColor } from 'shared/models/colors';
+import ActionMenu from 'ui/ActionMenu';
+import CustomChip from 'ui/CustomChip';
 
 const STYLE = { height: 'auto', minHeight: '20px' };
 const initialMenuState = {

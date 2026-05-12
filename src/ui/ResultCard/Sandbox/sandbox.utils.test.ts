@@ -6,7 +6,7 @@ import type {
   SandboxNetworkSMTP,
   SandboxProcessItem,
   SandboxSignatureItem
-} from 'components/models/base/result_body';
+} from 'models/base/result_body';
 import {
   buildProcessTree,
   compareIPs,
@@ -15,7 +15,7 @@ import {
   getHighestProcessScore,
   getProcessScore,
   hasObjectData
-} from 'components/visual/ResultCard/Sandbox/sandbox.utils';
+} from 'ui/ResultCard/Sandbox/sandbox.utils';
 import { describe, expect, it } from 'vitest';
 
 const mockTheme: Theme = {

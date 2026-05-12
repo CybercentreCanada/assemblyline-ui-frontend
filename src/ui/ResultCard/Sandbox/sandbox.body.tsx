@@ -1,14 +1,14 @@
 import { useTheme } from '@mui/material';
-import type { SandboxBody as SandboxData } from 'components/models/base/result_body';
-import { CustomChip } from 'components/visual/CustomChip';
-import { NetflowTable } from 'components/visual/ResultCard/Sandbox/components/NetflowTable';
-import { ProcessGraph } from 'components/visual/ResultCard/Sandbox/components/ProcessGraph';
-import { ProcessTable } from 'components/visual/ResultCard/Sandbox/components/ProcessTable';
-import { SignatureTable } from 'components/visual/ResultCard/Sandbox/components/SignatureTable';
-import type { SandboxFilter } from 'components/visual/ResultCard/Sandbox/sandbox.utils';
-import { TabContainer } from 'components/visual/TabContainer';
+import type { SandboxBody as SandboxData } from 'models/base/result_body';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { CustomChip } from 'ui/CustomChip';
+import { NetflowTable } from 'ui/ResultCard/Sandbox/components/NetflowTable';
+import { ProcessGraph } from 'ui/ResultCard/Sandbox/components/ProcessGraph';
+import { ProcessTable } from 'ui/ResultCard/Sandbox/components/ProcessTable';
+import { SignatureTable } from 'ui/ResultCard/Sandbox/components/SignatureTable';
+import type { SandboxFilter } from 'ui/ResultCard/Sandbox/sandbox.utils';
+import { TabContainer } from 'ui/TabContainer';
 
 type LabelProps = {
   label?: string;

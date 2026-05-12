@@ -7,8 +7,8 @@ import {
   DialogContentText,
   DialogTitle
 } from '@mui/material';
-import Classification from 'components/visual/Classification';
 import { useTranslation } from 'react-i18next';
+import Classification from 'ui/Classification';
 
 export type ClassificationMismatchDialogProps = {
   open: boolean;

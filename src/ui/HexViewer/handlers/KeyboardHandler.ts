@@ -5,7 +5,7 @@ import {
   isArrowUp,
   isEnter,
   isEscape
-} from 'commons/components/utils/keyboard';
+} from 'deprecated/utils/keyboard';
 import type { KeyboardEvent } from 'react';
 
 export const isArrowKey = (event: KeyboardEvent) =>

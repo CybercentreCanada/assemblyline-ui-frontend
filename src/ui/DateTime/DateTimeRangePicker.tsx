@@ -30,12 +30,12 @@ import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
 import type { DateTimePickerProps } from '@mui/x-date-pickers/DateTimePicker';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
-import type { TimeSpan } from 'components/visual/DateTime/LuceneDateTime';
-import { LuceneDateTime, LuceneDateTimeGap, TIME_SPAN } from 'components/visual/DateTime/LuceneDateTime';
 import type { Moment } from 'moment';
 import moment from 'moment';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import type { TimeSpan } from 'ui/DateTime/LuceneDateTime';
+import { LuceneDateTime, LuceneDateTimeGap, TIME_SPAN } from 'ui/DateTime/LuceneDateTime';
 
 // This function updates the week start for the specified locale
 function configureMomentLocale(language: string) {

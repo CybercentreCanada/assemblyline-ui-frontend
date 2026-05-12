@@ -1,16 +1,16 @@
 import { useTheme } from '@mui/material';
 import type { ColumnDef } from '@tanstack/react-table';
 import { createColumnHelper } from '@tanstack/react-table';
-import type { SandboxBody, SandboxSignatureItem } from 'components/models/base/result_body';
-import Classification from 'components/visual/Classification';
-import CustomChip from 'components/visual/CustomChip';
-import { ProcessChip } from 'components/visual/ResultCard/Sandbox/common/ProcessChip';
-import { TableContainer } from 'components/visual/ResultCard/Sandbox/common/TableContainer';
-import { DetailTableCellValue, DetailTableRow } from 'components/visual/ResultCard/Sandbox/common/Tables';
-import type { SandboxFilter } from 'components/visual/ResultCard/Sandbox/sandbox.utils';
-import Verdict from 'components/visual/Verdict';
+import type { SandboxBody, SandboxSignatureItem } from 'models/base/result_body';
 import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import Classification from 'ui/Classification';
+import CustomChip from 'ui/CustomChip';
+import { ProcessChip } from 'ui/ResultCard/Sandbox/common/ProcessChip';
+import { TableContainer } from 'ui/ResultCard/Sandbox/common/TableContainer';
+import { DetailTableCellValue, DetailTableRow } from 'ui/ResultCard/Sandbox/common/Tables';
+import type { SandboxFilter } from 'ui/ResultCard/Sandbox/sandbox.utils';
+import Verdict from 'ui/Verdict';
 
 type FlatSignatures = SandboxSignatureItem & {
   flatAttacks?: Record<string, string[]>;

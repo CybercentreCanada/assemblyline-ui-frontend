@@ -8,13 +8,13 @@ import {
   TimelineSeparator
 } from '@mui/lab';
 import { Tooltip, Typography, useTheme } from '@mui/material';
-import useALContext from 'components/hooks/useALContext';
-import type { TimelineBody as TimelineData } from 'components/models/base/result_body';
-import type { PossibleColor } from 'helpers/colors';
-import { verdictToColor } from 'helpers/utils';
+import useALContext from 'deprecated/hooks/useALContext';
+import type { TimelineBody as TimelineData } from 'models/base/result_body';
 import React, { useMemo } from 'react';
 import { AiOutlineFile, AiOutlineFileImage, AiOutlineFileUnknown, AiOutlineFileZip } from 'react-icons/ai';
 import { BsFileEarmarkCode, BsFileLock, BsFileText, BsGlobe2, BsHddNetwork, BsTerminal } from 'react-icons/bs';
+import type { PossibleColor } from 'shared/models/colors';
+import { verdictToColor } from 'shared/utils/utils';
 
 const TYPE_ICON: Record<string, React.ReactNode> = {
   CODE: <BsFileEarmarkCode />,

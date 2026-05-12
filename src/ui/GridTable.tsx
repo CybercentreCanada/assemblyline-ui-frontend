@@ -7,12 +7,12 @@ import type {
   TableRowProps
 } from '@mui/material';
 import { Paper, Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel, styled } from '@mui/material';
-import type SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import type { FC } from 'react';
 import React, { forwardRef, memo } from 'react';
 import type { To } from 'react-router';
 import { useLocation, useNavigate } from 'react-router';
 import { Link } from 'react-router-dom';
+import type SimpleSearchQuery from 'ui/SearchBar/simple-search-query';
 
 interface StyledPaperProps extends PaperProps {
   component?: any;

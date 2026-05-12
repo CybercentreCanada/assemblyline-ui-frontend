@@ -1,10 +1,13 @@
 import { AlertTitle, Skeleton, Tooltip } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
-import useALContext from 'components/hooks/useALContext';
-import type { AlertIndexed } from 'components/models/base/alert';
-import type { SearchResult } from 'components/models/ui/search';
-import Classification from 'components/visual/Classification';
+import useALContext from 'deprecated/hooks/useALContext';
+import type { SearchResult } from 'models/api/search';
+import type { AlertIndexed } from 'models/base/alert';
+import React from 'react';
+import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
+import Classification from 'ui/Classification';
 import {
   DivTable,
   DivTableBody,
@@ -13,13 +16,10 @@ import {
   DivTableRow,
   LinkRow,
   SortableHeaderCell
-} from 'components/visual/DivTable';
-import InformativeAlert from 'components/visual/InformativeAlert';
-import Moment from 'components/visual/Moment';
-import Verdict from 'components/visual/Verdict';
-import React from 'react';
-import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+} from 'ui/DivTable';
+import InformativeAlert from 'ui/InformativeAlert';
+import Moment from 'ui/Moment';
+import Verdict from 'ui/Verdict';
 
 type Props = {
   alertResults: SearchResult<AlertIndexed>;

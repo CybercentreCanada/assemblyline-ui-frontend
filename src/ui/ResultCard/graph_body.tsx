@@ -1,6 +1,6 @@
 import { useTheme } from '@mui/material';
-import type { GraphBody as GraphData } from 'components/models/base/result_body';
 import { scaleLinear } from 'd3-scale';
+import type { GraphBody as GraphData } from 'models/base/result_body';
 import React, { useState } from 'react';
 
 type Props = {

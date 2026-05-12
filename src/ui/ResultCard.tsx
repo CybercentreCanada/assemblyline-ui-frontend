@@ -13,19 +13,19 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
-import useALContext from 'components/hooks/useALContext';
-import useHighlighter from 'components/hooks/useHighlighter';
-import useMyAPI from 'components/hooks/useMyAPI';
-import useSafeResults from 'components/hooks/useSafeResults';
-import type { AlternateResult, FileResult } from 'components/models/base/result';
-import Classification from 'components/visual/Classification';
-import Moment from 'components/visual/Moment';
-import ExtractedSection from 'components/visual/ResultCard/extracted';
-import ResultSection from 'components/visual/ResultCard/result_section';
-import SupplementarySection from 'components/visual/ResultCard/supplementary';
-import Verdict from 'components/visual/Verdict';
+import useALContext from 'deprecated/hooks/useALContext';
+import useHighlighter from 'deprecated/hooks/useHighlighter';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useSafeResults from 'deprecated/hooks/useSafeResults';
+import type { AlternateResult, FileResult } from 'models/base/result';
 import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import Classification from 'ui/Classification';
+import Moment from 'ui/Moment';
+import ExtractedSection from 'ui/ResultCard/extracted';
+import ResultSection from 'ui/ResultCard/result_section';
+import SupplementarySection from 'ui/ResultCard/supplementary';
+import Verdict from 'ui/Verdict';
 
 export const emptyResult = (result: FileResult) =>
   result.result.score === 0 &&

@@ -1,6 +1,6 @@
 import NavigationIcon from '@mui/icons-material/Navigation';
-import type { StoreProps } from 'components/visual/HexViewer';
-import { NumericField, PopperIconButton, useDispatch } from 'components/visual/HexViewer';
+import type { StoreProps } from 'ui/HexViewer';
+import { NumericField, PopperIconButton, useDispatch } from 'ui/HexViewer';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 

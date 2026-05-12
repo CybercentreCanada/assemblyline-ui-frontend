@@ -2,8 +2,8 @@ import ArrowDownward from '@mui/icons-material/ArrowDownward';
 import ArrowUpward from '@mui/icons-material/ArrowUpward';
 import ClearIcon from '@mui/icons-material/Clear';
 import { useTheme } from '@mui/material';
-import type { StoreProps } from 'components/visual/HexViewer';
-import { TooltipIconButton, useDispatch } from 'components/visual/HexViewer';
+import type { StoreProps } from 'ui/HexViewer';
+import { TooltipIconButton, useDispatch } from 'ui/HexViewer';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 

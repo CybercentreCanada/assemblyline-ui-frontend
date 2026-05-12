@@ -1,6 +1,6 @@
 import { Divider } from '@mui/material';
-import type { Badlist } from 'components/models/base/badlist';
-import type { Safelist } from 'components/models/base/safelist';
+import type { Badlist } from 'models/base/badlist';
+import type { Safelist } from 'models/base/safelist';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 

@@ -1,7 +1,7 @@
 import type { ReactJsonViewProps } from '@microlink/react-json-view';
 import ReactJson from '@microlink/react-json-view';
 import { useTheme } from '@mui/material';
-import { useAppTheme } from 'commons/components/app/hooks';
+import { useAppTheme } from '@tui/core';
 import React from 'react';
 
 const WrappedJSONEditor: React.FC<ReactJsonViewProps> = (inputProps: ReactJsonViewProps) => {

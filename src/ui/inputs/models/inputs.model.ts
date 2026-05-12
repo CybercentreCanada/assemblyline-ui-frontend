@@ -7,15 +7,15 @@ import type {
   TooltipProps,
   TypographyProps
 } from '@mui/material';
-import type { IconButtonProps } from 'components/visual/Buttons/IconButton';
+import type React from 'react';
+import type { IconButtonProps } from 'ui/buttons/IconButton';
 import type {
   Coercer,
   CoercersSchema,
   ValidationSchema,
   ValidationStatus,
   Validator
-} from 'components/visual/Inputs/utils/inputs.util.validation';
-import type React from 'react';
+} from 'ui/inputs/utils/inputs.util.validation';
 
 /**********************************************************************************************************************
  * Input Models

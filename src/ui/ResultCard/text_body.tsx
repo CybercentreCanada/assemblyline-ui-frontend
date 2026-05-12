@@ -1,4 +1,4 @@
-import type { TextBody as TextData } from 'components/models/base/result_body';
+import type { TextBody as TextData } from 'models/base/result_body';
 import { default as React } from 'react';
 
 type Props = {

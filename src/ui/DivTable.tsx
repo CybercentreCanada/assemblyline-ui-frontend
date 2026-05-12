@@ -9,11 +9,11 @@ import {
   TableRow,
   TableSortLabel
 } from '@mui/material';
-import type SimpleSearchQuery from 'components/visual/SearchBar/simple-search-query';
 import React from 'react';
 import type { To } from 'react-router';
 import { useLocation, useNavigate } from 'react-router';
 import { Link } from 'react-router-dom';
+import type SimpleSearchQuery from 'ui/SearchBar/simple-search-query';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   ['&.MuiTableCell-root']: {

@@ -1,10 +1,10 @@
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import { Box, Collapse, useTheme } from '@mui/material';
-import type { Error } from 'components/models/base/error';
-import Moment from 'components/visual/Moment';
+import type { Error } from 'models/base/error';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import Moment from 'ui/Moment';
 
 type Props = {
   error: Error;

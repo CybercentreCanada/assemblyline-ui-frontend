@@ -1,9 +1,9 @@
 import { Tooltip, useTheme } from '@mui/material';
-import useALContext from 'components/hooks/useALContext';
-import type { Verdict as VerdictType } from 'components/models/base/alert';
-import CustomChip from 'components/visual/CustomChip';
+import useALContext from 'deprecated/hooks/useALContext';
+import type { Verdict as VerdictType } from 'models/base/alert';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import CustomChip from 'ui/CustomChip';
 
 type VerdictProps = {
   verdict?: VerdictType;

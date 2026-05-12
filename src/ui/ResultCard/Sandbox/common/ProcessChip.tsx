@@ -1,5 +1,5 @@
 import { alpha, Typography, useTheme } from '@mui/material';
-import type { SandboxProcessItem } from 'components/models/base/result_body';
+import type { SandboxProcessItem } from 'models/base/result_body';
 import React from 'react';
 
 export type ProcessChipProps = {

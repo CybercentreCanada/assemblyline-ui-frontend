@@ -1,6 +1,6 @@
 import type { ButtonProps, PaperProps } from '@mui/material';
 import { Button, ClickAwayListener, Fade, Paper, Popper, useTheme } from '@mui/material';
-import { isEnter, isEscape } from 'commons/components/utils/keyboard';
+import { isEnter, isEscape } from 'deprecated/utils/keyboard';
 import { default as React, useCallback, useState } from 'react';
 
 export type ButtonPopperProps = {

@@ -1,4 +1,4 @@
-import { getASCIICharacter, getHexValue } from 'components/visual/HexViewer/handlers/HexHandler';
+import { getASCIICharacter, getHexValue } from 'ui/HexViewer/handlers/HexHandler';
 import { useCallback } from 'react';
 import type { ReducerHandler, Reducers, RenderHandler, Store, UseReducer } from '..';
 import {

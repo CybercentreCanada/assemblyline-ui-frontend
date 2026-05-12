@@ -1,7 +1,7 @@
 import ClearIcon from '@mui/icons-material/Clear';
 import { useTheme } from '@mui/material';
-import type { StoreProps } from 'components/visual/HexViewer';
-import { NumericField, TooltipIconButton, useDispatch, useEventListener } from 'components/visual/HexViewer';
+import type { StoreProps } from 'ui/HexViewer';
+import { NumericField, TooltipIconButton, useDispatch, useEventListener } from 'ui/HexViewer';
 import React, { useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 

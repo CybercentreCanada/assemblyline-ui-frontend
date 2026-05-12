@@ -1,5 +1,5 @@
 import { Tooltip, useTheme } from '@mui/material';
-import type { SubmissionVerdict } from 'components/models/base/alert';
+import type { SubmissionVerdict } from 'models/base/alert';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
