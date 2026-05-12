@@ -1,5 +1,5 @@
 import { Box, ClickAwayListener, InputBase, Typography, useMediaQuery, useTheme } from '@mui/material';
-import { insertText } from 'commons/addons/utils/browser';
+import { insertText } from 'deprecated/utils/browser';
 import { parseEvent } from 'deprecated/utils/keyboard';
 import type { Field, IndexDefinition } from 'models/api/user';
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
