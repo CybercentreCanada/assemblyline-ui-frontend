@@ -16,11 +16,13 @@ import {
   useTheme
 } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
+import useSafeResults from 'components/hooks/useSafeResults';
 import type { SandboxBody as SandboxData, SandboxProcessItem } from 'components/models/base/result_body';
 import { CustomChip } from 'components/visual/CustomChip';
 import type { ProcessItem, SandboxFilter } from 'components/visual/ResultCard/Sandbox/sandbox.utils';
 import {
   buildProcessTree,
+  filterSafelistedProcesses,
   getBackgroundColor,
   getBorderColor,
   getDescendantPids,
@@ -141,13 +143,18 @@ const ProcessTreeItem = React.memo(
   }: ProcessTreeItemProps) => {
     const theme = useTheme();
     const { configuration, scoreToVerdict } = useALContext();
+    const { showSafeResults } = useSafeResults();
 
-    const hasChildren = item.children?.length > 0;
+    const filteredChildren = useMemo(
+      () => filterSafelistedProcesses(item.children, showSafeResults),
+      [item.children, showSafeResults]
+    );
+    const hasChildren = filteredChildren?.length > 0;
     const isActive = activeValue?.includes(item?.pid) || false;
     const indent = theme.spacing((depth + 1) * 3);
 
     const processScore = useMemo(
-      () => (!item.safelisted ? (getProcessScore(item, body.signatures) ?? undefined) : undefined),
+      () => (item.safelisted ? undefined : (getProcessScore(item, body.signatures) ?? undefined)),
       [item, body.signatures]
     );
 
@@ -181,6 +188,8 @@ const ProcessTreeItem = React.memo(
         }),
       [onActiveChange]
     );
+
+    if (item.safelisted && !showSafeResults) return null;
 
     return (
       <>
@@ -315,7 +324,7 @@ const ProcessTreeItem = React.memo(
         {hasChildren && (
           <Collapse in={open} timeout={theme.transitions.duration.shortest}>
             <List disablePadding>
-              {item.children.map(child => (
+              {filteredChildren.map(child => (
                 <ProcessTreeItem
                   key={child.pid}
                   body={body}

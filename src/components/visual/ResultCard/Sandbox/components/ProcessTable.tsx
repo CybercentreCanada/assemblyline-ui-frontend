@@ -6,12 +6,14 @@ import CustomChip from 'components/visual/CustomChip';
 import { ProcessChip } from 'components/visual/ResultCard/Sandbox/common/ProcessChip';
 import { TableContainer } from 'components/visual/ResultCard/Sandbox/common/TableContainer';
 import { DetailTableCellValue } from 'components/visual/ResultCard/Sandbox/common/Tables';
-import type { SandboxFilter } from 'components/visual/ResultCard/Sandbox/sandbox.utils';
+import { getProcessMapByPid, type SandboxFilter } from 'components/visual/ResultCard/Sandbox/sandbox.utils';
 import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 type ProcessTableProps = {
   body?: SandboxBody | null;
+  data?: SandboxProcessItem[];
+  processByPid?: ReadonlyMap<number, SandboxProcessItem>;
   printable?: boolean;
   startTime?: number;
   filterValue?: SandboxFilter;
@@ -23,6 +25,8 @@ type ProcessTableProps = {
 export const ProcessTable = React.memo(
   ({
     body = null,
+    data,
+    processByPid: processByPidProp,
     printable = false,
     startTime,
     filterValue,
@@ -33,6 +37,13 @@ export const ProcessTable = React.memo(
     const { t } = useTranslation('sandboxResult');
     const theme = useTheme();
     const columnHelper = createColumnHelper<SandboxProcessItem>();
+
+    const processByPid = useMemo(
+      () => processByPidProp ?? getProcessMapByPid(body?.processes),
+      [body?.processes, processByPidProp]
+    );
+
+    const tableData = data ?? body?.processes ?? [];
 
     const columns = useMemo<ColumnDef<SandboxProcessItem>[]>(
       () => [
@@ -104,15 +115,16 @@ export const ProcessTable = React.memo(
         }),
         columnHelper.accessor(
           row => {
-            const parent = body?.processes?.find(p => p.pid === row.ppid);
+            const parent = processByPid.get(row.ppid);
             return parent ? [parent.image?.split(/[/\\]/).pop() ?? '', parent.pid] : null;
           },
           {
             id: 'parent_process',
             header: () => t('parent_process'),
             cell: ({ getValue }) => {
-              const parentPid = getValue()?.[1];
-              const parent = body?.processes?.find(p => p.pid === parentPid);
+              const parentPidRaw = getValue()?.[1];
+              const parentPid = typeof parentPidRaw === 'number' ? parentPidRaw : Number.NaN;
+              const parent = Number.isFinite(parentPid) ? processByPid.get(parentPid) : undefined;
               return parent ? <ProcessChip fullWidth process={parent} /> : null;
             },
             sortDescFirst: false,
@@ -122,7 +134,7 @@ export const ProcessTable = React.memo(
           }
         )
       ],
-      [t, theme.palette.text.secondary, startTime, body?.processes, columnHelper]
+      [t, theme.palette.text.secondary, startTime, processByPid, columnHelper]
     );
 
     const handleRowClick = useCallback(
@@ -138,7 +150,7 @@ export const ProcessTable = React.memo(
     return (
       <TableContainer
         columns={columns}
-        data={body?.processes ?? []}
+        data={tableData}
         initialSorting={[{ id: 'start_time', desc: false }]}
         printable={printable}
         filterValue={filterValue}
