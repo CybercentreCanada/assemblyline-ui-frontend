@@ -193,9 +193,6 @@ export type SandboxProcessItem = {
 
   /** The number of registry modification events associated with this process. */
   registry_count?: number;
-
-  /** Associated memory dumps with the process */
-  dumps?: string[];
 };
 
 /** Details of a DNS query observed during sandbox execution. */
