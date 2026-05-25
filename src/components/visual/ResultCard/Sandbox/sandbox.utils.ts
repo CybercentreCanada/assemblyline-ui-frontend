@@ -1,6 +1,7 @@
 import { alpha, type Theme } from '@mui/material';
 import type {
   SandboxBody as SandboxData,
+  SandboxNetflowItem,
   SandboxProcessItem,
   SandboxSignatureItem
 } from 'components/models/base/result_body';
@@ -19,6 +20,35 @@ export type ProcessItem = SandboxProcessItem & {
 
 // Filtered PIDs
 export type SandboxFilter = number[];
+
+export const getProcessMapByPid = (processes: readonly SandboxProcessItem[] = []): Map<number, SandboxProcessItem> =>
+  new Map(processes.map(process => [process.pid, process]));
+
+export const filterSafelistedProcesses = (
+  processes: readonly SandboxProcessItem[] = [],
+  showSafeResults = true
+): SandboxProcessItem[] => (showSafeResults ? [...processes] : processes.filter(process => !process.safelisted));
+
+export const getSafelistedProcessIds = (processes: readonly SandboxProcessItem[] = []): Set<number> =>
+  new Set(processes.filter(process => process.safelisted).map(process => process.pid));
+
+export const filterNetflowsBySafelistedProcesses = (
+  netflows: readonly SandboxNetflowItem[] = [],
+  safelistedProcessIds: ReadonlySet<number>,
+  showSafeResults = true
+): SandboxNetflowItem[] =>
+  showSafeResults
+    ? [...netflows]
+    : netflows.filter(netflow => netflow.process == null || !safelistedProcessIds.has(netflow.process));
+
+export const getVisibleProcessesByPids = (
+  pids: readonly number[] | undefined,
+  processByPid: ReadonlyMap<number, SandboxProcessItem>,
+  showSafeResults: boolean
+): SandboxProcessItem[] =>
+  (pids ?? [])
+    .map(pid => processByPid.get(pid))
+    .filter((process): process is SandboxProcessItem => !!process && (!process.safelisted || showSafeResults));
 
 /* ----------------------------------------------------------------------------
  * Checks if an object has any meaningful data.
@@ -151,6 +181,33 @@ export const getBackgroundColor = (
 
   const baseColor = colorMap[verdict] ?? null;
   return baseColor ? alpha(baseColor, opacity) : null;
+};
+
+/* ----------------------------------------------------------------------------
+ * Compute Border color based on heuristic verdict
+ * Matches the border colors used by StyledChip in `outlined` variant.
+ * -------------------------------------------------------------------------- */
+export const getBorderColor = (
+  theme: Theme,
+  scoreToVerdict: (score: number) => string,
+  score: number | undefined
+): string | null => {
+  const paletteMode = theme.palette.mode;
+
+  if (score === undefined) {
+    return paletteMode !== 'dark' ? theme.palette.success.dark : theme.palette.success.light;
+  }
+
+  const verdict = scoreToVerdict(score);
+  const colorMap: Record<string, string | null> = {
+    malicious: paletteMode === 'dark' ? theme.palette.error.dark : theme.palette.error.light,
+    highly_suspicious: paletteMode === 'dark' ? theme.palette.warning.dark : theme.palette.warning.light,
+    suspicious: paletteMode === 'dark' ? theme.palette.warning.dark : theme.palette.warning.light,
+    info: paletteMode === 'dark' ? '#616161' : '#999',
+    safe: paletteMode === 'dark' ? theme.palette.success.dark : theme.palette.success.light
+  };
+
+  return colorMap[verdict] ?? null;
 };
 
 // ──────────────────────────────────────────────────────────────

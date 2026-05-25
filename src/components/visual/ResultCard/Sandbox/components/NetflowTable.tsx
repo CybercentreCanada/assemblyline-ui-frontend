@@ -1,19 +1,26 @@
 import { Tooltip, useTheme } from '@mui/material';
 import type { ColumnDef } from '@tanstack/react-table';
 import { createColumnHelper } from '@tanstack/react-table';
-import type { SandboxBody, SandboxNetflowItem } from 'components/models/base/result_body';
+import type { SandboxBody, SandboxNetflowItem, SandboxProcessItem } from 'components/models/base/result_body';
 import { DNS_RECORD_TYPES } from 'components/models/ontology/results/network';
 import CustomChip from 'components/visual/CustomChip';
 import { KVBody } from 'components/visual/ResultCard/kv_body';
 import { ProcessChip } from 'components/visual/ResultCard/Sandbox/common/ProcessChip';
 import { TableContainer } from 'components/visual/ResultCard/Sandbox/common/TableContainer';
 import { DetailTableCellValue, DetailTableRow } from 'components/visual/ResultCard/Sandbox/common/Tables';
-import { compareIPs, hasObjectData, type SandboxFilter } from 'components/visual/ResultCard/Sandbox/sandbox.utils';
+import {
+  compareIPs,
+  getProcessMapByPid,
+  hasObjectData,
+  type SandboxFilter
+} from 'components/visual/ResultCard/Sandbox/sandbox.utils';
 import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 type NetflowTableProps = {
   body?: SandboxBody | null;
+  data?: SandboxNetflowItem[];
+  processByPid?: ReadonlyMap<number, SandboxProcessItem>;
   printable?: boolean;
   startTime?: number;
   filterValue?: SandboxFilter;
@@ -25,6 +32,8 @@ type NetflowTableProps = {
 export const NetflowTable = React.memo(
   ({
     body = null,
+    data,
+    processByPid: processByPidProp,
     printable = false,
     startTime,
     filterValue,
@@ -35,6 +44,13 @@ export const NetflowTable = React.memo(
     const { t } = useTranslation('sandboxResult');
     const theme = useTheme();
     const columnHelper = createColumnHelper<SandboxNetflowItem>();
+
+    const processByPid = useMemo(
+      () => processByPidProp ?? getProcessMapByPid(body?.processes),
+      [body?.processes, processByPidProp]
+    );
+
+    const tableData = data ?? body?.network_connections ?? [];
 
     const columns = useMemo<ColumnDef<SandboxNetflowItem>[]>(
       () => [
@@ -59,7 +75,7 @@ export const NetflowTable = React.memo(
         }),
         columnHelper.accessor(
           row => {
-            const process = body?.processes?.find(p => p.pid === row.process);
+            const process = processByPid.get(row.process);
             return process ? [process.image?.split(/[/\\]/).pop() ?? '', process.pid] : null;
           },
           {
@@ -67,8 +83,9 @@ export const NetflowTable = React.memo(
             header: () => t('process'),
             sortDescFirst: false,
             cell: ({ getValue }) => {
-              const pid = getValue()?.[1];
-              const process = body?.processes?.find(p => p.pid === pid);
+              const pidRaw = getValue()?.[1];
+              const pid = typeof pidRaw === 'number' ? pidRaw : Number.NaN;
+              const process = Number.isFinite(pid) ? processByPid.get(pid) : undefined;
               return process ? <ProcessChip short process={process} /> : null;
             },
             meta: { cellSx: { wordBreak: 'inherit !important' } }
@@ -219,7 +236,7 @@ export const NetflowTable = React.memo(
           }
         )
       ],
-      [columnHelper, theme.palette.text.secondary, t, startTime, body?.processes]
+      [columnHelper, theme.palette.text.secondary, t, startTime, processByPid]
     );
 
     const handleRowClick = useCallback(
@@ -235,7 +252,7 @@ export const NetflowTable = React.memo(
     return (
       <TableContainer
         columns={columns}
-        data={body?.network_connections ?? []}
+        data={tableData}
         initialSorting={[{ id: 'time_observed', desc: false }]}
         printable={printable}
         filterValue={filterValue}
