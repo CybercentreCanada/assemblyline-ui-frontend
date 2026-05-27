@@ -2,7 +2,7 @@ import { AppErrorProvider } from 'core/error';
 import { DisabledBoundary, ForbiddenBoundary } from 'core/routes/routes.components';
 import type { RouteHash, RouteMeta } from 'core/routes/routes.models';
 import { AppRouteProvider } from 'core/routes/routes.providers';
-import type { PATH_PARAM_BLUEPRINTS_MAP, PathParamBlueprintMap, RoutePath } from 'features/path-params';
+import type { PATH_PARAM_BLUEPRINTS_MAP, InferPathParamBlueprintMapFromPath, RoutePath } from 'features/path-params';
 import { createPathParamsCodec } from 'features/path-params';
 import type { SearchParamBlueprintMap } from 'features/search-params';
 import { SEARCH_PARAM_BLUEPRINTS_MAP, SearchParamEngine } from 'features/search-params';
@@ -17,7 +17,7 @@ import { toElement } from 'shared/utils/app.utils';
 
 export type CreateAppRouteProps<
   Path extends RoutePath,
-  Params extends PathParamBlueprintMap<Path>,
+  Params extends InferPathParamBlueprintMapFromPath<Path>,
   Search extends SearchParamBlueprintMap,
   Hash extends RouteHash
 > = {
@@ -42,7 +42,7 @@ export type CreateAppRouteProps<
 
 export const createAppRoute = <
   const Path extends RoutePath,
-  const Params extends PathParamBlueprintMap<Path>,
+  const Params extends InferPathParamBlueprintMapFromPath<Path>,
   const Search extends SearchParamBlueprintMap,
   const Hash extends RouteHash
 >({

@@ -1,11 +1,11 @@
 import type { AppRouterStore } from 'core/router/router.models';
 import type { RouteHash, RoutePath } from 'core/routes/routes.models';
-import type { PathParamBlueprintMap, PathParamCodec } from 'features/path-params';
-import type { SearchParamEngine, SearchParamSnapshot } from 'features/search-params';
+import type { InferPathParamCodecFromPath } from 'features/path-params';
+import type { SearchParamBlueprintMap, SearchParamEngine, SearchParamSnapshot } from 'features/search-params';
 import { createAppStore } from 'features/store/createAppStore';
 import { createStoreContext } from 'features/store/createStoreContext';
 import type { ReactNode } from 'react';
-import { memo, useCallback } from 'react';
+import { memo, useCallback, useMemo } from 'react';
 import type { Location } from 'react-router';
 import { useLocation } from 'react-router';
 
@@ -15,8 +15,8 @@ import { useLocation } from 'react-router';
 
 export type AppRouteStore<
   Path extends RoutePath = RoutePath,
-  Params extends PathParamCodec = PathParamCodec,
-  Search extends SearchParamSnapshot<unknown> = SearchParamSnapshot<unknown>,
+  Params extends InferPathParamCodecFromPath<Path> = InferPathParamCodecFromPath<Path>,
+  Search extends SearchParamSnapshot<SearchParamBlueprintMap> = SearchParamSnapshot<SearchParamBlueprintMap>,
   Hash extends RouteHash = RouteHash
 > = {
   /** Parsed hash value. */
@@ -29,8 +29,8 @@ export type AppRouteStore<
 
 const createDefaultAppRouteStore = <
   Path extends RoutePath,
-  Params extends PathParamCodec,
-  Search extends SearchParamSnapshot<unknown>,
+  Params extends InferPathParamCodecFromPath<Path>,
+  Search extends SearchParamSnapshot<SearchParamBlueprintMap>,
   Hash extends RouteHash
 >(): AppRouteStore<Path, Params, Search, Hash> => ({
   hash: null,
@@ -46,35 +46,42 @@ export const {
 
 export type AppRouteProviderProps<
   Path extends RoutePath,
-  Params extends PathParamBlueprintMap<Path>,
-  Search extends SearchParamEngine<unknown>,
+  Params extends InferPathParamCodecFromPath<Path>,
+  Search extends SearchParamEngine<SearchParamBlueprintMap>,
   Hash extends RouteHash
 > = {
   /** Provider children. */
   children: ReactNode;
-  /** Hash codec function. */
-  hash?: (hash: Location) => Hash;
   /** Path param codec. */
-  params?: PathParamCodec<Params>;
+  params?: Params;
   /** Search param engine. */
   search?: Search;
+  /** Hash codec function. */
+  hash?: (hash: string) => Hash;
 };
 
 export const AppRouteProvider = memo(function AppRouteProvider<
   const Path extends RoutePath,
-  const Params extends PathParamBlueprintMap<Path>,
-  const Search extends SearchParamEngine<unknown>,
+  const Params extends InferPathParamCodecFromPath<Path>,
+  const Search extends SearchParamEngine<SearchParamBlueprintMap>,
   const Hash extends RouteHash
 >({ children, params, search, hash }: AppRouteProviderProps<Path, Params, Search, Hash>) {
   const location = useLocation() as Location<unknown>;
 
-  const reset = useCallback(
-    () => ({
-      params: !params ? undefined : params.parse(location),
-      search: !search ? undefined : search.fromLocation(location).omit(search.getIgnoredKeys()),
-      hash: !hash ? undefined : hash(location)
-    }),
+  const locationKey = useMemo(
+    () => `${location.pathname}${location.search}${location.hash}${JSON.stringify(location.state)}`,
     [location]
+  );
+
+  const reset = useCallback(
+    () =>
+      ({
+        params: !params ? undefined : params.parse(location),
+        search: !search ? undefined : search.fromLocation(location).omit(search.getIgnoredKeys()),
+        hash: !hash ? undefined : hash(location.hash)
+      }) as unknown as Partial<AppRouteStore>,
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [hash, locationKey, params, search]
   );
 
   return <AppRouteStoreProvider data={reset}>{children}</AppRouteStoreProvider>;
@@ -118,7 +125,4 @@ AppRouteKeyProvider.displayName = 'AppRouteKeyProvider';
  * @description Returns the current route key from the nearest AppRouteKeyProvider.
  * @returns The current route key or null
  */
-export const useAppRouteKey = () => {
-  const context = useAppRouteKeyStore(s => s.routeKey);
-  return !context ? null : context;
-};
+export const useAppRouteKey = () => useAppRouteKeyStore(s => s.routeKey)?.[0] ?? null;

@@ -1,6 +1,5 @@
-import { removePanel, sanitizeAppRouterStore, storeToNavigate, useAppRouterStore } from 'core/router';
+import { useAppNavigate, useAppRouterStore } from 'core/router';
 import { useCallback } from 'react';
-import { useNavigate } from 'react-router';
 
 /**
  * @name useIsDrawerOpen
@@ -17,16 +16,9 @@ export const useIsDrawerOpen = (): boolean => {
  * @returns Callback to close the drawer
  */
 export const useAppDrawerClose = (): (() => void) => {
-  const routerNavigate = useNavigate();
-
-  const store = useAppRouterStore(s => s);
+  const navigate = useAppNavigate();
 
   return useCallback(() => {
-    let nextStore = removePanel(store, 1);
-    nextStore = sanitizeAppRouterStore(nextStore);
-    const nextLocation = storeToNavigate(nextStore);
-    if (nextLocation) {
-      routerNavigate(nextLocation.to, nextLocation.options);
-    }
-  }, [routerNavigate, store]);
+    navigate.closePanel(1);
+  }, [navigate]);
 };

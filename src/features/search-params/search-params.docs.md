@@ -170,7 +170,7 @@ clearDefaultParams();
 
 | File | Role |
 | ---- | ---- |
-| `search-params.models.tsx` | Type definitions: `ParamValues`, `ParamSource`, `ParamBlueprints`, `InferValue`, `SearchParamValueMap`, `SearchParamRuntimeMap` |
+| `search-params.models.tsx` | Type definitions: `SearchParamValue`, `SearchParamSource`, `SearchParamBlueprint`, `SearchParamBlueprintMap`, `SearchParamValueMap`, `InferSearchParamValueFromBlueprint`, `InferSearchParamValueMapFromBlueprintMap`, `InferSearchParamRuntimeFromBlueprint`, `InferSearchParamRuntimeMapFromBlueprintMap` |
 | `search-params.blueprints.tsx` | `BaseBlueprint<T>` abstract class + concrete classes: `BooleanBlueprint`, `NumberBlueprint`, `StringBlueprint`, `EnumBlueprint`, `FiltersBlueprint` |
 | `search-params.engines.tsx` | `SearchParamEngine` — orchestrates blueprints into full/delta/fromLocation resolution |
 | `search-params.snapshots.tsx` | `SearchParamSnapshot` — immutable value object with has/get/pick/omit/set/toLocationSearch/toLocationState |

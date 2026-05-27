@@ -1,64 +1,68 @@
 import type {
-  ParamBlueprints,
-  ParamValues,
-  SearchParamRuntimeMap,
-  SearchParamValueMap
+  InferSearchParamRuntimeMapFromBlueprintMap,
+  InferSearchParamValueMapFromBlueprintMap,
+  SearchParamBlueprintMap,
+  SearchParamRuntime,
+  SearchParamValue
 } from 'features/search-params/search-params.models';
-import type { ParamRuntime } from 'features/search-params/search-params.runtimes';
+import type { SetStateAction } from 'react';
 import type { Location } from 'react-router';
 
-export class SearchParamSnapshot<Blueprints extends Record<string, ParamBlueprints>> {
+export class SearchParamSnapshot<Blueprints extends SearchParamBlueprintMap> {
   constructor(
-    private runtimes: SearchParamRuntimeMap<Blueprints> = {} as SearchParamRuntimeMap<Blueprints>,
-    public values: SearchParamValueMap<Blueprints> = {} as SearchParamValueMap<Blueprints>
+    private runtimes: InferSearchParamRuntimeMapFromBlueprintMap<Blueprints> = {} as InferSearchParamRuntimeMapFromBlueprintMap<Blueprints>,
+    public values: InferSearchParamValueMapFromBlueprintMap<Blueprints> = {} as InferSearchParamValueMapFromBlueprintMap<Blueprints>
   ) {}
 
   private runtimeEntries() {
-    return Object.entries(this.runtimes) as [string, ParamRuntime][];
+    return Object.entries(this.runtimes) as [string, SearchParamRuntime][];
   }
 
-  private valuesEntries(values: SearchParamValueMap<Blueprints>) {
-    return Object.entries(values) as [string, ParamValues][];
+  private valuesEntries(values: InferSearchParamValueMapFromBlueprintMap<Blueprints>) {
+    return Object.entries(values) as [string, SearchParamValue][];
   }
 
   public defaults() {
     const values = this.runtimeEntries().reduce(
       (prev, [key, runtime]) => ({ ...prev, [key]: runtime.getDefaultValue() }),
-      {} as SearchParamValueMap<Blueprints>
+      {} as InferSearchParamValueMapFromBlueprintMap<Blueprints>
     );
     return new SearchParamSnapshot<Blueprints>(this.runtimes, values);
   }
 
-  public has<K extends keyof SearchParamValueMap<Blueprints>>(key: K, value: unknown = undefined): boolean {
+  public has<K extends keyof InferSearchParamValueMapFromBlueprintMap<Blueprints>>(
+    key: K,
+    value: unknown = undefined
+  ): boolean {
     const runtime = this.runtimes[key];
     if (!runtime) return false;
     return runtime.has(this.values?.[key], value);
   }
 
-  public get<K extends keyof SearchParamValueMap<Blueprints>>(key: K): SearchParamValueMap<Blueprints>[K] | null {
+  public get<K extends keyof InferSearchParamValueMapFromBlueprintMap<Blueprints>>(
+    key: K
+  ): InferSearchParamValueMapFromBlueprintMap<Blueprints>[K] | null {
     return this.has(key) ? this.values[key] : null;
   }
 
-  public pick<K extends keyof SearchParamValueMap<Blueprints>>(keys: K[]) {
+  public pick<K extends keyof InferSearchParamValueMapFromBlueprintMap<Blueprints>>(keys: K[]) {
     const values = this.valuesEntries(this.values).reduce(
       (prev, [k, v]) => (keys.includes(k as K) ? { ...prev, [k]: v } : prev),
-      {} as SearchParamValueMap<Blueprints>
+      {} as InferSearchParamValueMapFromBlueprintMap<Blueprints>
     );
     return new SearchParamSnapshot(this.runtimes, values);
   }
 
-  public omit<K extends keyof SearchParamValueMap<Blueprints>>(keys: K[]) {
+  public omit<K extends keyof InferSearchParamValueMapFromBlueprintMap<Blueprints>>(keys: K[]) {
     const values = this.valuesEntries(this.values).reduce(
       (prev, [k, v]) => (!keys.includes(k as K) ? { ...prev, [k as K]: v } : prev),
-      {} as SearchParamValueMap<Blueprints>
+      {} as InferSearchParamValueMapFromBlueprintMap<Blueprints>
     );
     return new SearchParamSnapshot(this.runtimes, values);
   }
 
   public set(
-    input:
-      | SearchParamValueMap<Blueprints>
-      | ((value: SearchParamValueMap<Blueprints>) => SearchParamValueMap<Blueprints>)
+    input: SetStateAction<InferSearchParamValueMapFromBlueprintMap<Blueprints>>
   ): SearchParamSnapshot<Blueprints> {
     const newValues = typeof input === 'function' ? input(this.values) : input;
     return new SearchParamSnapshot(this.runtimes, structuredClone(newValues));
@@ -68,7 +72,7 @@ export class SearchParamSnapshot<Blueprints extends Record<string, ParamBlueprin
     const values = this.runtimeEntries().reduce((prev, [, runtime]) => {
       if (runtime.getOrigin() !== 'search') return prev;
       return runtime.delta(prev, this.values);
-    }, {} as SearchParamValueMap<Blueprints>);
+    }, {} as InferSearchParamValueMapFromBlueprintMap<Blueprints>);
 
     return new SearchParamSnapshot(this.runtimes, values).toString();
   }
@@ -77,12 +81,12 @@ export class SearchParamSnapshot<Blueprints extends Record<string, ParamBlueprin
     const values = this.runtimeEntries().reduce((prev, [, runtime]) => {
       if (runtime.getOrigin() !== 'state') return prev;
       return runtime.delta(prev, this.values);
-    }, {} as SearchParamValueMap<Blueprints>);
+    }, {} as InferSearchParamValueMapFromBlueprintMap<Blueprints>);
 
     return new SearchParamSnapshot(this.runtimes, values).toObject();
   }
 
-  public toObject(): SearchParamValueMap<Blueprints> {
+  public toObject(): InferSearchParamValueMapFromBlueprintMap<Blueprints> {
     return structuredClone(this.values);
   }
 

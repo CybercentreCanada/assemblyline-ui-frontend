@@ -1,19 +1,22 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { BaseBlueprint } from 'features/search-params/search-params.blueprints';
+import type { BaseSearchParamBlueprint } from 'features/search-params/search-params.blueprints';
 import {
-  BooleanBlueprint,
-  EnumBlueprint,
-  FiltersBlueprint,
-  NumberBlueprint,
-  StringBlueprint
+  BooleanSearchParamBlueprint,
+  EnumSearchParamBlueprint,
+  FiltersSearchParamBlueprint,
+  NumberSearchParamBlueprint,
+  StringSearchParamBlueprint
 } from 'features/search-params/search-params.blueprints';
-import type { ParamValues } from 'features/search-params/search-params.models';
+import type { SearchParamValue } from 'features/search-params/search-params.models';
 
 /**
  * Factory that wraps a blueprint class and re-exposes its
  * protected methods as public runtime utilities.
  */
-export function Runtime<T extends ParamValues, B extends abstract new (...args: any[]) => BaseBlueprint<T>>(Base: B) {
+export function SearchParamRuntimeFactory<
+  T extends SearchParamValue,
+  B extends abstract new (...args: any[]) => BaseSearchParamBlueprint<T>
+>(Base: B) {
   abstract class Accessor extends Base {
     // Getters
     public override getDefaultValue = super.getDefaultValue;
@@ -42,15 +45,13 @@ export function Runtime<T extends ParamValues, B extends abstract new (...args: 
   return Accessor;
 }
 
-export type ParamRuntime = InstanceType<ReturnType<typeof Runtime>>;
-
 /**
  * Collection of runtime wrappers for each blueprint type.
  */
-export const PARAM_RUNTIMES = {
-  boolean: Runtime(BooleanBlueprint),
-  number: Runtime(NumberBlueprint),
-  string: Runtime(StringBlueprint),
-  filters: Runtime(FiltersBlueprint),
-  enum: Runtime(EnumBlueprint)
+export const SEARCH_PARAM_RUNTIME_MAP = {
+  boolean: SearchParamRuntimeFactory(BooleanSearchParamBlueprint),
+  number: SearchParamRuntimeFactory(NumberSearchParamBlueprint),
+  string: SearchParamRuntimeFactory(StringSearchParamBlueprint),
+  filters: SearchParamRuntimeFactory(FiltersSearchParamBlueprint),
+  enum: SearchParamRuntimeFactory(EnumSearchParamBlueprint)
 } as const;

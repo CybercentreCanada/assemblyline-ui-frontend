@@ -1,8 +1,7 @@
 import type {
-  PathParamBlueprint,
-  PathParamBlueprintMap,
-  PathParamBlueprintValues,
-  PathParamCodec,
+  InferPathParamBlueprintFromValue,
+  InferPathParamBlueprintMapFromPath,
+  InferPathParamValuesFromBlueprintMap,
   RoutePath
 } from 'features/path-params/path-params.models';
 import type { Location } from 'react-router';
@@ -11,12 +10,12 @@ import type { Location } from 'react-router';
 // Path Param Blueprints
 //*****************************************************************************************
 export const PATH_PARAM_BLUEPRINTS_MAP = {
-  string: (defaultValue = ''): PathParamBlueprint<string> => ({
+  string: (defaultValue = ''): InferPathParamBlueprintFromValue<string> => ({
     type: '',
     parse: value => (value === undefined ? defaultValue : value),
     stringify: value => String(value)
   }),
-  number: (defaultValue = 0): PathParamBlueprint<number> => ({
+  number: (defaultValue = 0): InferPathParamBlueprintFromValue<number> => ({
     type: 0,
     parse: value => {
       if (value === undefined) return defaultValue;
@@ -25,7 +24,7 @@ export const PATH_PARAM_BLUEPRINTS_MAP = {
     },
     stringify: value => String(value)
   }),
-  boolean: (defaultValue = false): PathParamBlueprint<boolean> => ({
+  boolean: (defaultValue = false): InferPathParamBlueprintFromValue<boolean> => ({
     type: false,
     parse: value => {
       if (value === undefined) return defaultValue;
@@ -41,18 +40,18 @@ export const PATH_PARAM_BLUEPRINTS_MAP = {
 // Create Path Param Codec
 //*****************************************************************************************
 export function createPathParamsCodec<const Path extends RoutePath>(basePath: Path) {
-  return function <const Blueprints extends PathParamBlueprintMap<Path>>(
+  return function <const Blueprints extends InferPathParamBlueprintMapFromPath<Path>>(
     input: (blueprints: typeof PATH_PARAM_BLUEPRINTS_MAP) => Blueprints
-  ): PathParamCodec<Blueprints> {
+  ) {
     const blueprints = input(PATH_PARAM_BLUEPRINTS_MAP);
     const blueprintKeys = Object.keys(blueprints);
 
-    const type: PathParamBlueprintValues<Blueprints> = {} as any;
+    const type: InferPathParamValuesFromBlueprintMap<Blueprints> = {} as any;
     for (const key of blueprintKeys) {
       type[key as keyof typeof type] = blueprints[key].type as any;
     }
 
-    const parse: PathParamCodec<Blueprints>['parse'] = (location: Location<any>) => {
+    const parse = (location: Location): InferPathParamValuesFromBlueprintMap<Blueprints> => {
       const safePathname = typeof location?.pathname === 'string' ? location?.pathname : '';
       const safeBasePath = typeof basePath === 'string' ? basePath : '';
       const raw: Record<string, string | undefined> = {};
@@ -77,7 +76,7 @@ export function createPathParamsCodec<const Path extends RoutePath>(basePath: Pa
         }
       }
 
-      const parsed = {} as PathParamBlueprintValues<Blueprints>;
+      const parsed = {} as InferPathParamValuesFromBlueprintMap<Blueprints>;
       for (const key of blueprintKeys) {
         const parser = blueprints[key];
         parsed[key as keyof typeof parsed] = parser ? (parser.parse(raw[key]) as any) : (raw[key] as any);
@@ -85,9 +84,9 @@ export function createPathParamsCodec<const Path extends RoutePath>(basePath: Pa
       return parsed;
     };
 
-    const stringify: PathParamCodec<Blueprints>['stringify'] = params => {
+    const stringify = (params: InferPathParamValuesFromBlueprintMap<Blueprints>): string => {
       const safeBasePath = typeof basePath === 'string' ? basePath : '';
-      const safeParams = (params ?? {}) as Partial<PathParamBlueprintValues<Blueprints>>;
+      const safeParams = (params ?? {}) as Partial<InferPathParamValuesFromBlueprintMap<Blueprints>>;
       const parts = safeBasePath.split('/');
 
       for (let index = 0; index < parts.length; index += 1) {

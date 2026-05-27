@@ -9,10 +9,10 @@ import {
   TableRow,
   TableSortLabel
 } from '@mui/material';
-import React from 'react';
-import type { To } from 'react-router';
+import { AppLink } from 'core/router';
+import type { AppLinkTo } from 'core/routes';
+import React, { memo } from 'react';
 import { useLocation, useNavigate } from 'react-router';
-import { Link } from 'react-router-dom';
 import type SimpleSearchQuery from 'ui/SearchBar/simple-search-query';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -111,15 +111,27 @@ export const SortableHeaderCell: React.FC<SortableHeaderCellProps> = ({
   );
 };
 
-interface LinkRowProps extends TableRowProps {
-  to: To;
-}
+type LinkRowProps<Path extends AppRoute['path'] = AppRoute['path']> = Omit<TableRowProps, 'component'> & {
+  to: AppLinkTo<Path>;
+};
 
-export const LinkRow = ({ children, to, ...other }: LinkRowProps) => (
-  <TableRow component={Link} {...other} to={to} style={{ cursor: 'pointer', textDecoration: 'none' }}>
-    {children}
-  </TableRow>
-);
+export const LinkRow = memo(function LinkRow<Path extends AppRoute['path'] = AppRoute['path']>({
+  children,
+  to,
+  ...other
+}: LinkRowProps<Path>) {
+  return (
+    <TableRow
+      {...(other as TableRowProps)}
+      {...(!to ? null : { to, component: AppLink })}
+      style={{ cursor: 'pointer', textDecoration: 'none' }}
+    >
+      {children}
+    </TableRow>
+  );
+}) as unknown as <Path extends AppRoute['path'] = AppRoute['path']>(props: LinkRowProps<Path>) => React.JSX.Element;
+
+(LinkRow as unknown as { displayName: string }).displayName = 'LinkRow';
 
 export const ExternalLinkRow = ({ children, href, ...other }) => (
   <TableRow

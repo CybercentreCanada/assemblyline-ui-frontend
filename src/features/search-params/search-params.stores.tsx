@@ -1,7 +1,11 @@
 import { shallowEqual } from 'features/prop-provider/props.utils';
 import { SearchParamEngine } from 'features/search-params/search-params.engines';
-import type { SearchParamBlueprintMap, SearchParamValueMap } from 'features/search-params/search-params.models';
+import type {
+  InferSearchParamValueMapFromBlueprintMap,
+  SearchParamBlueprintMap
+} from 'features/search-params/search-params.models';
 import { SearchParamSnapshot } from 'features/search-params/search-params.snapshots';
+import type { SetStateAction } from 'react';
 import React, {
   createContext,
   useCallback,
@@ -86,9 +90,7 @@ export const createSearchParamsStore = () => {
 
     const setSearchObject = useCallback(
       (
-        input:
-          | SearchParamValueMap<Blueprints>
-          | ((params: SearchParamValueMap<Blueprints>) => SearchParamValueMap<Blueprints>),
+        input: SetStateAction<InferSearchParamValueMapFromBlueprintMap<Blueprints>>,
         replace: NavigateOptions['replace'] = false
       ) => {
         const values = typeof input === 'function' ? input(snapshotRef.current.toObject()) : input;
@@ -106,7 +108,7 @@ export const createSearchParamsStore = () => {
     );
 
     const setDefaultParams = useCallback(
-      (value: SearchParamValueMap<Blueprints>) => {
+      (value: InferSearchParamValueMapFromBlueprintMap<Blueprints>) => {
         if (!storageKey) return;
         const search = engine.delta(value).omit(engine.getEphemeralKeys()).toParams();
         localStorage.setItem(storageKey, search.toString());

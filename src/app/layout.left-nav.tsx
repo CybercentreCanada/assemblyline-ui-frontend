@@ -52,14 +52,14 @@ export const useAppLeftNavMenu = () => {
       {
         id: 'submit',
         label: t('drawer.submit'),
-        to: { path: '/submit' },
+        to: { openRoute: { path: '/submit' } },
         routes: APP_ROUTES,
         icon: <PublishOutlinedIcon />
       },
       {
         id: 'submissions',
         label: t('drawer.submissions'),
-        to: { path: '/submissions' },
+        to: { openRoute: { path: '/submissions' } },
         routes: APP_ROUTES,
         icon: <ViewCarouselOutlined />,
         preventRender: !userRoles.includes('submission_view')
@@ -67,7 +67,7 @@ export const useAppLeftNavMenu = () => {
       {
         id: 'alerts',
         label: t('drawer.alerts'),
-        to: { path: '/alerts_redirect' },
+        to: { openRoute: { path: '/alerts_redirect' } },
         routes: APP_ROUTES,
         icon: <NotificationImportantOutlinedIcon />,
         preventRender: !userRoles.includes('alert_view')
@@ -75,7 +75,7 @@ export const useAppLeftNavMenu = () => {
       {
         id: 'archive',
         label: t('drawer.archive'),
-        to: { path: '/archive' },
+        to: { openRoute: { path: '/archive' } },
         routes: APP_ROUTES,
         icon: <ArchiveOutlinedIcon />,
         preventRender: !userRoles.includes('archive_view') || !archiveEnabled
@@ -83,7 +83,7 @@ export const useAppLeftNavMenu = () => {
       {
         id: 'retrohunt',
         label: t('drawer.retrohunt'),
-        to: { path: '/retrohunt' },
+        to: { openRoute: { path: '/retrohunt' } },
         routes: APP_ROUTES,
         icon: <DataObjectOutlinedIcon />,
         preventRender: !userRoles.includes('retrohunt_view') || !retrohuntEnabled
@@ -98,14 +98,14 @@ export const useAppLeftNavMenu = () => {
                 {
                   id: 'search.all',
                   label: t('drawer.search.all'),
-                  to: { path: '/search' },
+                  to: { openRoute: { path: '/search' } },
                   routes: APP_ROUTES,
                   icon: <Search />
                 },
                 {
                   id: 'search.alert',
                   label: t('drawer.search.alert'),
-                  to: { path: '/search/alert' },
+                  to: { openRoute: { path: '/search/alert' } },
                   routes: APP_ROUTES,
                   icon: <NotificationImportantOutlinedIcon />,
                   preventRender: !userRoles.includes('alert_view')
@@ -113,7 +113,7 @@ export const useAppLeftNavMenu = () => {
                 {
                   id: 'search.file',
                   label: t('drawer.search.file'),
-                  to: { path: '/search/file' },
+                  to: { openRoute: { path: '/search/file' } },
                   routes: APP_ROUTES,
                   icon: <ViewCarouselOutlined />,
                   preventRender: !userRoles.includes('submission_view')
@@ -121,7 +121,7 @@ export const useAppLeftNavMenu = () => {
                 {
                   id: 'search.result',
                   label: t('drawer.search.result'),
-                  to: { path: '/search/result' },
+                  to: { openRoute: { path: '/search/result' } },
                   routes: APP_ROUTES,
                   icon: <ViewCarouselOutlined />,
                   preventRender: !userRoles.includes('submission_view')
@@ -129,7 +129,7 @@ export const useAppLeftNavMenu = () => {
                 {
                   id: 'search.retrohunt',
                   label: t('drawer.search.retrohunt'),
-                  to: { path: '/search/retrohunt' },
+                  to: { openRoute: { path: '/search/retrohunt' } },
                   routes: APP_ROUTES,
                   icon: <DataObjectOutlinedIcon />,
                   preventRender: !userRoles.includes('retrohunt_view') || !retrohuntEnabled
@@ -137,7 +137,7 @@ export const useAppLeftNavMenu = () => {
                 {
                   id: 'search.signature',
                   label: t('drawer.search.signature'),
-                  to: { path: '/search/signature' },
+                  to: { openRoute: { path: '/search/signature' } },
                   routes: APP_ROUTES,
                   icon: <FingerprintOutlined />,
                   preventRender: !userRoles.includes('signature_view')
@@ -145,7 +145,7 @@ export const useAppLeftNavMenu = () => {
                 {
                   id: 'search.submission',
                   label: t('drawer.search.submission'),
-                  to: { path: '/search/submission' },
+                  to: { openRoute: { path: '/search/submission' } },
                   routes: APP_ROUTES,
                   icon: <ViewCarouselOutlined />,
                   preventRender: !userRoles.includes('submission_view')
@@ -161,7 +161,7 @@ export const useAppLeftNavMenu = () => {
       {
         id: 'dashboard',
         label: t('drawer.dashboard'),
-        to: { path: '/dashboard' },
+        to: { openRoute: { path: '/dashboard' } },
         routes: APP_ROUTES,
         icon: <DashboardOutlined />
       },
@@ -184,7 +184,7 @@ export const useAppLeftNavMenu = () => {
                 {
                   id: 'manage.badlist',
                   label: t('drawer.manage.badlist'),
-                  to: { path: '/manage/badlist' },
+                  to: { openRoute: { path: '/manage/badlist' } },
                   routes: APP_ROUTES,
                   icon: <BugReportOutlined />,
                   preventRender: !userRoles.includes('badlist_view')
@@ -192,7 +192,7 @@ export const useAppLeftNavMenu = () => {
                 {
                   id: 'manage.heuristics',
                   label: t('drawer.manage.heuristics'),
-                  to: { path: '/manage/heuristics' },
+                  to: { openRoute: { path: '/manage/heuristics' } },
                   routes: APP_ROUTES,
                   icon: <SimCardOutlined />,
                   preventRender: !userRoles.includes('heuristic_view')
@@ -200,7 +200,7 @@ export const useAppLeftNavMenu = () => {
                 {
                   id: 'manage.safelist',
                   label: t('drawer.manage.safelist'),
-                  to: { path: '/manage/safelist' },
+                  to: { openRoute: { path: '/manage/safelist' } },
                   routes: APP_ROUTES,
                   icon: <VerifiedUserOutlined />,
                   preventRender: !userRoles.includes('safelist_view')
@@ -208,7 +208,7 @@ export const useAppLeftNavMenu = () => {
                 {
                   id: 'manage.signatures',
                   label: t('drawer.manage.signatures'),
-                  to: { path: '/manage/signatures' },
+                  to: { openRoute: { path: '/manage/signatures' } },
                   routes: APP_ROUTES,
                   icon: <FingerprintOutlined />,
                   preventRender: !userRoles.includes('signature_view')
@@ -216,7 +216,7 @@ export const useAppLeftNavMenu = () => {
                 {
                   id: 'manage.source',
                   label: t('drawer.manage.source'),
-                  to: { path: '/manage/sources' },
+                  to: { openRoute: { path: '/manage/sources' } },
                   routes: APP_ROUTES,
                   icon: <CodeOutlined />,
                   preventRender: !userRoles.includes('signature_manage')
@@ -224,7 +224,7 @@ export const useAppLeftNavMenu = () => {
                 {
                   id: 'manage.workflow',
                   label: t('drawer.manage.workflow'),
-                  to: { path: '/manage/workflows' },
+                  to: { openRoute: { path: '/manage/workflows' } },
                   routes: APP_ROUTES,
                   icon: <BiNetworkChart />,
                   preventRender: !userRoles.includes('workflow_view')
@@ -243,63 +243,63 @@ export const useAppLeftNavMenu = () => {
                 {
                   id: 'adminmenu.apikeys',
                   label: t('adminmenu.apikeys'),
-                  to: { path: '/admin/apikeys' },
+                  to: { openRoute: { path: '/admin/apikeys' } },
                   routes: APP_ROUTES,
                   icon: <KeyOutlined />
                 },
                 {
                   id: 'adminmenu.errors',
                   label: t('adminmenu.errors'),
-                  to: { path: '/admin/errors' },
+                  to: { openRoute: { path: '/admin/errors' } },
                   routes: APP_ROUTES,
                   icon: <ErrorOutlineOutlined />
                 },
                 {
                   id: 'adminmenu.identify',
                   label: t('adminmenu.identify'),
-                  to: { path: '/admin/identify' },
+                  to: { openRoute: { path: '/admin/identify' } },
                   routes: APP_ROUTES,
                   icon: <FindInPageOutlined />
                 },
                 {
                   id: 'adminmenu.actions',
                   label: t('adminmenu.actions'),
-                  to: { path: '/admin/actions' },
+                  to: { openRoute: { path: '/admin/actions' } },
                   routes: APP_ROUTES,
                   icon: <PlaylistPlayOutlined />
                 },
                 {
                   id: 'adminmenu.services',
                   label: t('adminmenu.services'),
-                  to: { path: '/admin/services' },
+                  to: { openRoute: { path: '/admin/services' } },
                   routes: APP_ROUTES,
                   icon: <AccountTreeOutlined />
                 },
                 {
                   id: 'adminmenu.service_review',
                   label: t('adminmenu.service_review'),
-                  to: { path: '/admin/service_review' },
+                  to: { openRoute: { path: '/admin/service_review' } },
                   routes: APP_ROUTES,
                   icon: <CompareArrowsOutlined />
                 },
                 {
                   id: 'adminmenu.sitemap',
                   label: t('adminmenu.sitemap'),
-                  to: { path: '/admin/sitemap' },
+                  to: { openRoute: { path: '/admin/sitemap' } },
                   routes: APP_ROUTES,
                   icon: <MapOutlined />
                 },
                 {
                   id: 'adminmenu.tag_safelist',
                   label: t('adminmenu.tag_safelist'),
-                  to: { path: '/admin/tag_safelist' },
+                  to: { openRoute: { path: '/admin/tag_safelist' } },
                   routes: APP_ROUTES,
                   icon: <VerifiedUserOutlined />
                 },
                 {
                   id: 'adminmenu.users',
                   label: t('adminmenu.users'),
-                  to: { path: '/admin/users' },
+                  to: { openRoute: { path: '/admin/users' } },
                   routes: APP_ROUTES,
                   icon: <SupervisorAccountOutlined />
                 }
@@ -319,14 +319,14 @@ export const useAppLeftNavMenu = () => {
           {
             id: 'help.api',
             label: t('drawer.help.api'),
-            to: { path: '/help/api' },
+            to: { openRoute: { path: '/help/api' } },
             routes: APP_ROUTES,
             icon: <AssignmentOutlined />
           },
           {
             id: 'help.classification',
             label: t('drawer.help.classification'),
-            to: { path: '/help/classification' },
+            to: { openRoute: { path: '/help/classification' } },
             routes: APP_ROUTES,
             icon: <LabelOutlined />,
             preventRender: !c12nEnforce
@@ -334,21 +334,21 @@ export const useAppLeftNavMenu = () => {
           {
             id: 'help.configuration',
             label: t('drawer.help.configuration'),
-            to: { path: '/help/configuration' },
+            to: { openRoute: { path: '/help/configuration' } },
             routes: APP_ROUTES,
             icon: <SettingsApplicationsOutlined />
           },
           {
             id: 'help.search',
             label: t('drawer.help.search'),
-            to: { path: '/help/search' },
+            to: { openRoute: { path: '/help/search' } },
             routes: APP_ROUTES,
             icon: <Search />
           },
           {
             id: 'help.services',
             label: t('drawer.help.services'),
-            to: { path: '/help/services' },
+            to: { openRoute: { path: '/help/services' } },
             routes: APP_ROUTES,
             icon: <AccountTreeOutlined />
           }
@@ -364,28 +364,28 @@ export const useAppLeftNavMenu = () => {
                 {
                   id: 'development.api',
                   label: t('drawer.development.api'),
-                  to: { path: '/development/api' },
+                  to: { openRoute: { path: '/development/api' } },
                   routes: APP_ROUTES,
                   icon: <Api />
                 },
                 {
                   id: 'development.customize',
                   label: t('drawer.development.customize'),
-                  to: { path: '/development/customize' },
+                  to: { openRoute: { path: '/development/customize' } },
                   routes: APP_ROUTES,
                   icon: <Palette />
                 },
                 {
                   id: 'development.library',
                   label: t('drawer.development.library'),
-                  to: { path: '/development/library' },
+                  to: { openRoute: { path: '/development/library' } },
                   routes: APP_ROUTES,
                   icon: <LibraryBooks />
                 },
                 {
                   id: 'development.theme',
                   label: t('drawer.development.theme'),
-                  to: { path: '/development/theme' },
+                  to: { openRoute: { path: '/development/theme' } },
                   routes: APP_ROUTES,
                   icon: <Palette />
                 }

@@ -1,5 +1,6 @@
 export { AppLink } from './router.components';
-export { useAppNavigate, useAppRouteLocation } from './router.hooks';
+export type { AppLinkProps } from './router.components';
+export { useAppNavigate, useAppTo } from './router.hooks';
 export { AppRouterLayout, AppRouterNode, AppRouterPanel } from './router.layout';
 export {
   DEFAULT_APP_ROUTER_NODE,
@@ -9,8 +10,6 @@ export {
   DEFAULT_APP_ROUTER_STORE
 } from './router.models';
 export type {
-  AppLinkOptions,
-  AppLinkProps,
   AppRouterNode as AppRouterNodeType,
   AppRouterPanel as AppRouterPanelType,
   AppRouterRoute,
@@ -25,16 +24,53 @@ export {
   useAppSetRouterStore
 } from './router.providers';
 export {
+  addMissingNodes,
+  addNode,
   addRoute,
   addRouteToPanel,
+  addTab,
+  filterOrphanedNodes,
+  filterOrphanedRoutes,
+  filterPanelMissingRouteKeys,
   findNode,
+  findNodeKey,
+  findOldestNodeKey,
+  findPanel,
   findPanelKey,
+  findRoute,
+  findRouteKey,
+  getNextRouteFromKey,
+  getRouteFromKey,
+  getRouteFromPanelKey,
   insertLeftPanel,
   insertRightPanel,
-  locationToStore,
+  mergePanels,
+  moveTabbedRouteKey,
+  permanentTab,
+  refreshRouteAges,
+  removeEmptyPanel,
+  removeNode,
+  removeOldestNodes,
   removePanel,
+  removeRoute,
+  removeTab,
+  removeTabFromPanel,
   sanitizeAppRouterStore,
-  storeToNavigate,
+  sanitizeNodes,
+  sanitizePanels,
+  sanitizeRoutes,
+  setNode,
+  setPanel,
+  setPanelActiveRoute,
+  setPermanentRoute,
+  setPinnedRoute,
+  setRoute,
+  setUnpinnedRoute,
+  showPreviousTab,
+  updateNode,
   updatePanel,
-  updateRoute
+  updateRoute,
+  upsertNode,
+  upsertPanel,
+  upsertRoute
 } from './router.utils';

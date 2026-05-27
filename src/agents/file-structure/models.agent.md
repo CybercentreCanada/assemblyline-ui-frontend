@@ -25,24 +25,115 @@
 
 ## Naming Conventions
 
-| Suffix | Usage |
-|--------|-------|
-| `Props` | Component prop types |
-| `Store` | Zustand store types |
-| `Config` | Configuration types |
-| `SCREAMING_SNAKE_CASE` | Default constants, const arrays |
-| `PascalCase` | All type names |
+| Suffix                 | Usage                                           |
+| ---------------------- | ----------------------------------------------- |
+| `Props`                | Input parameters of a component or function     |
+| `ReturnType`           | Return type of a function (opposite of `Props`) |
+| `Store`                | Zustand store types                             |
+| `Config`               | Configuration types                             |
+| `SCREAMING_SNAKE_CASE` | Default constants, const arrays                 |
+| `PascalCase`           | All type names                                  |
+
+## Value-or-Updater Pattern
+
+When a parameter accepts either a direct value or a function that derives the next value from the previous one, use React's `SetStateAction<T>` from `react`:
+
+```typescript
+import type { SetStateAction } from 'react';
+
+// T | ((prev: T) => T)
+type NavigateTo = SetStateAction<To>;
+```
+
+- Prefer `SetStateAction<T>` over manually writing `T | ((prev: T) => T)`
+- Use it anywhere a setter accepts a value or updater callback (route navigation, store setters, etc.)
+
+## Collection & Generic Type Naming
+
+When modelling a collection of items and their derived types, use these suffixes consistently:
+
+| Prefix/Suffix             | Meaning                                                           | Example                                         |
+| ------------------------- | ----------------------------------------------------------------- | ----------------------------------------------- |
+| `Base` (prefix)           | Generic template shape from a factory (before narrowing)          | `BaseItem`, `BaseItems`                         |
+| `s` (plural)              | Array/tuple of all items                                          | `Items`, `Widgets`                              |
+| (singular)                | Union of items from the array (`Array[number]`)                   | `Item`, `Widget`                                |
+| `Infer<Thing>From<Model>` | Infer a type from another type via a generic                      | `InferItemFromId<I>`, `InferValueFromConfig<C>` |
+| `Map`                     | A keyed object/record whose values are instances of the item type | `WidgetMap`, `ConfigMap<C>`                     |
+| `Values`                  | Inferred runtime values derived from the map's blueprint types    | `WidgetValues<M>`, `ConfigValues<M>`            |
+
+### Rules
+
+- **`Map`** = a `Record<Key, Item>` where each value is the _definition/blueprint/runtime_ of a param
+- **`Values`** = a `{ [K]: InferValue<Map[K]> }` where each value is the _resolved runtime value_
+- **`Infer...From<Model>`** = infers/extracts a type from another type using the specified model as the generic input
+- **`Base`** = the generic template shape produced by a factory, before it is narrowed to specific instances
+- Always name with `Infer` prefix and `From` before the model: `InferThingFromModel<Key>` (e.g., `InferItemFromId<I>`, `InferValueFromConfig<C>`)
+
+## `typeof` Constants — Inline, Don't Alias
+
+When the resolved type of a constant is needed, use `typeof CONSTANT` inline rather than creating a named type alias:
+
+```typescript
+// ✅ Inline typeof at usage sites
+export type InferValueFromBlueprint<B extends (typeof BLUEPRINTS)[string]> = ...;
+const map: typeof SEARCH_PARAM_RUNTIME_MAP = ...;
+
+// ❌ Don't create a type alias that shadows the constant name
+export type SearchParamRuntimeMap = typeof SEARCH_PARAM_RUNTIME_MAP;
+```
+
+- A named `typeof` alias adds a name that's confusingly similar to the constant itself
+- Inline `typeof` makes the relationship explicit — readers see exactly what it derives from
+- Exception: if the same `typeof` expression is used in 5+ files, a named alias is acceptable
+
+## Base (Generic Template) vs Specific Implementation
+
+When a factory produces a generic shape and the app narrows it to specific instances:
+
+| Prefix | Meaning                                                             | Example                 |
+| ------ | ------------------------------------------------------------------- | ----------------------- |
+| `Base` | Generic template shape — the factory's return type before narrowing | `BaseItem`, `BaseItems` |
+| (none) | Specific registered instances — the app's actual implementations    | `Item`, `Items`         |
+
+### Rules
+
+- **`Base`** types are used in utility functions, library constraints, and factory return types
+- **Unprefixed** types are used in app-level code, hooks, and components that consume real instances
+- The `Base` type is always wider — the unprefixed type is always a subset
+- Derive unprefixed from the const array: `type Item = (typeof ITEMS)[number]`
+- Derive `Base` from the factory return type: `type BaseItem = ReturnType<typeof createItem>`
+
+### Example
+
+```typescript
+// Array (plural) — the full collection
+export const ITEMS = [itemA, itemB, itemC] as const;
+
+// Union (singular) — one item OR another
+export type Item = (typeof ITEMS)[number];
+
+// Map — keyed object containing definitions
+export type ItemMap = Record<string, Item>;
+
+// Values — inferred runtime values from the map
+export type ItemValues<M extends ItemMap> = {
+  [K in keyof M]: InferValue<M[K]>;
+};
+
+// Infer...From — infer a type from another type via a generic
+export type InferValueFromItem<I extends Item> = InferValue<I>;
+```
 
 ## Placement
 
-| Path | Purpose |
-|------|---------|
-| `<module>.models.ts` | Module-specific types |
-| `models/base/` | Backend mirror (assemblyline-base) |
-| `models/messages/` | Backend message models |
-| `models/ontology/` | Backend ontology models |
-| `models/api/` | API request/response types |
-| `shared/` | Generic TypeScript utility types |
+| Path                 | Purpose                            |
+| -------------------- | ---------------------------------- |
+| `<module>.models.ts` | Module-specific types              |
+| `models/base/`       | Backend mirror (assemblyline-base) |
+| `models/messages/`   | Backend message models             |
+| `models/ontology/`   | Backend ontology models            |
+| `models/api/`        | API request/response types         |
+| `shared/`            | Generic TypeScript utility types   |
 
 ## Type Template
 
@@ -74,7 +165,7 @@ export const DEFAULT_RECORD: Record = {
   createdAt: '',
   id: '',
   label: '',
-  score: 0,
+  score: 0
 };
 ```
 
@@ -99,7 +190,7 @@ export const STATUS_LABELS = {
   active: 'Active',
   archived: 'Archived',
   completed: 'Done',
-  pending: 'Waiting',
+  pending: 'Waiting'
 } as const;
 ```
 
@@ -109,7 +200,7 @@ export const STATUS_LABELS = {
 export const StoredConfigSchema = z.object({
   enabled: z.boolean(),
   label: z.string(),
-  maxItems: z.number(),
+  maxItems: z.number()
 });
 
 export type StoredConfig = z.infer<typeof StoredConfigSchema>;

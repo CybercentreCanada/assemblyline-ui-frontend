@@ -31,9 +31,23 @@ Well-typed models also serve as living documentation — reading a type definiti
 - Always use `type` over `interface` (consistency, union support, no declaration merging surprises)
 - Export all types that are used outside their file
 - Name types in `PascalCase`
-- Suffix prop types with `Props` (e.g., `<Name>Props`)
+- Suffix prop types with `Props` — input parameters of a component or function (e.g., `<Name>Props`)
+- Suffix return types with `ReturnType` — output of a function, opposite of `Props` (e.g., `<Name>ReturnType`)
 - Suffix store types with `Store` (e.g., `<Name>Store`)
 - Suffix config types with `Config` (e.g., `<Name>Config`)
+
+### Value-or-Updater Pattern (SetStateAction)
+
+When a parameter accepts either a direct value **or** a function that derives the next value from the previous one, use React's `SetStateAction<T>`:
+
+```typescript
+import type { SetStateAction } from 'react';
+
+// Equivalent to: To | ((prev: To) => To)
+type NavigateTo = SetStateAction<To>;
+```
+
+This pattern is common in route navigation, store setters, and any API where the caller can either provide a new value directly or compute it from the current value. Always prefer `SetStateAction<T>` over manually writing the union.
 
 ## Structure
 
@@ -156,6 +170,135 @@ export const STATUS_LABELS = {
   completed: 'Done',
   pending: 'Waiting',
 } as const;
+```
+
+## Collection & Generic Type Naming
+
+When modelling a collection of items and their derived types, use these suffixes consistently:
+
+| Prefix/Suffix       | Meaning                                                          | Example                                       |
+| ------------------- | ---------------------------------------------------------------- | --------------------------------------------- |
+| `Base` (prefix)     | Generic template shape from a factory (before narrowing)         | `BaseItem`, `BaseItems`                       |
+| `s` (plural)        | Array/tuple of all items                                         | `Items`, `Widgets`                            |
+| (singular)          | Union of items from the array (`Array[number]`)                  | `Item`, `Widget`                              |
+| `Infer<Thing>From<Model>` | Infer a type from another type via a generic | `InferItemFromId<I>`, `InferValueFromConfig<C>` |
+| `Map`               | Keyed record of definitions, blueprints, or runtimes             | `WidgetMap`, `ConfigMap<C>`                   |
+| `Values`            | Inferred runtime values derived from the map's types             | `WidgetValues<M>`, `ConfigValues<M>`          |
+
+### Distinction Between Map and Values
+
+- **`Map`** holds the *definitions/configuration* — the objects that describe structure or behavior. It's always a `Record<Key, Definition>`.
+- **`Values`** holds the *resolved output* — the actual runtime values inferred by applying each definition's type system. It's always `{ [K in keyof Map]: InferValue<Map[K]> }`.
+
+```typescript
+// Map — contains DEFINITIONS (the configuration objects)
+export type ConfigMap = Record<string, Config>;
+
+// Values — contains RESOLVED runtime values (string, number, boolean, etc.)
+export type ConfigValues<M extends ConfigMap> = {
+  [K in keyof M]: InferValue<M[K]>;
+};
+```
+
+### Inferring a Type From Another (Infer...From)
+
+When a generic type definition infers/extracts a type from another type, use the `Infer<Thing>From<Model>` pattern:
+
+- `Infer` prefix signals that the type is derived/computed from the generic input
+- `From` separates the output type from the input model
+- The model name tells you *what type* is being used as the source
+- Implemented via `Extract<Union, { field: Key }>`, conditional types, or template literal inference
+
+```typescript
+// Infer an Item from an Id
+export type InferItemFromId<I extends Id> = Extract<Item, { id: I }>;
+
+// Infer a Value from a Config
+export type InferValueFromConfig<C extends Config> = /* conditional type */;
+
+// Infer Keys from a Path string
+export type InferKeysFromPath<P extends Path> = /* infers keys from path string */;
+```
+
+### `typeof` Constants — Inline, Don't Alias
+
+When you need the TypeScript type of a runtime constant, prefer inlining `typeof CONSTANT` at usage sites rather than creating a named type alias:
+
+```typescript
+// ✅ Inline typeof — the relationship is explicit
+export type InferValueFromBlueprint<B extends (typeof BLUEPRINTS)[string]> = ...;
+const map: typeof SEARCH_PARAM_RUNTIME_MAP = ...;
+
+// ❌ Named alias shadows the constant name — confusing
+export type SearchParamRuntimeMap = typeof SEARCH_PARAM_RUNTIME_MAP;
+```
+
+**Why:**
+
+- A `PascalCase` type alias like `SearchParamRuntimeMap` looks nearly identical to the `SCREAMING_SNAKE` constant `SEARCH_PARAM_RUNTIME_MAP` — readers can't tell at a glance which is the type and which is the value.
+- Inline `typeof` makes the derivation visible — you always know the type comes from a runtime constant.
+- One fewer export to maintain and import.
+
+**Exception:** If the same `typeof CONSTANT` expression appears in 5+ files, a named alias is acceptable to reduce repetition.
+
+### Base (Generic Template) vs Specific Implementation
+
+When a factory function produces a generic shape and the app later narrows it to specific instances, use the `Base` **prefix** to distinguish the two levels:
+
+| Prefix | Meaning | When to use |
+| ------ | ------- | ----------- |
+| `Base` | Generic template shape — the factory's return type before narrowing | Utility functions, library constraints, factory signatures |
+| (none) | Specific registered instances — the app's actual implementations | App-level code, hooks, components consuming real instances |
+
+The `Base` type is always **wider** — it accepts any output of the factory. The unprefixed type is always a **narrower subset** — it only includes the items actually registered in your app.
+
+```typescript
+// Base — the generic template shape (any item the factory can produce)
+export type BaseItem = ReturnType<typeof createItem>;
+export type BaseItems = readonly BaseItem[];
+
+// Specific — the actual items registered in the app
+export const ITEMS = [itemA, itemB, itemC] as const;
+export type Items = typeof ITEMS;
+export type Item = Items[number];
+```
+
+**Usage pattern:**
+
+```typescript
+// Utilities accept the Base type — they work with any item
+export const findItem = (items: BaseItems, id: string): BaseItem | null => ...
+
+// App code uses the specific type — it knows exactly which items exist
+export const useCurrentItem = (): Item => ...
+```
+
+**Rules:**
+
+- Derive `Base` from the factory: `type BaseItem = ReturnType<typeof createItem>`
+- Derive the specific type from the const array: `type Item = (typeof ITEMS)[number]`
+- Use `Base` in reusable utilities that don't need to know which specific instances exist
+- Use the unprefixed type in app-level code that depends on the concrete set of instances
+
+### Full Example
+
+```typescript
+// Array (plural) — the full collection
+export const ITEMS = [itemA, itemB, itemC] as const;
+
+// Union (singular) — one item OR another
+export type Item = (typeof ITEMS)[number];
+
+// Map — keyed record of definitions
+export type ItemMap = Record<string, Item>;
+
+// Values — inferred runtime output
+export type ItemValues<M extends ItemMap> = {
+  [K in keyof M]: InferValue<M[K]>;
+};
+
+// Infer...From — infer a type from another type via a generic
+export type InferValueFromItem<I extends Item> = InferValue<I>;
 ```
 
 ## Generics

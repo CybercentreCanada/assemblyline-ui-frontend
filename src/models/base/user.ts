@@ -1,5 +1,4 @@
-// TODO: Migrate AppUser from commons/components/app/AppUserService
-type AppUser = any;
+import type { AppUser } from '@tui/core';
 
 export const TYPES = [
   'admin',

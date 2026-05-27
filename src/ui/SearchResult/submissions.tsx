@@ -2,14 +2,13 @@ import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
 import { AlertTitle, Skeleton, Tooltip } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
-import { useSearchParams } from 'components/core/SearchParams/createSearchParams';
-import type { SubmissionParams } from 'components/routes/submissions';
+import { useAppNavigate } from 'core/router';
+import { useAppSearchParams } from 'core/routes';
 import useALContext from 'deprecated/hooks/useALContext';
 import type { SearchResult } from 'models/api/search';
 import type { SubmissionIndexed } from 'models/base/submission';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
 import { maxLenStr } from 'shared/utils/utils';
 import Classification from 'ui/Classification';
 import CustomChip from 'ui/CustomChip';
@@ -35,7 +34,10 @@ type Props = {
 const WrappedSubmissionsTable: React.FC<Props> = ({ submissionResults, allowSort = true }) => {
   const { t } = useTranslation(['search']);
   const { c12nDef } = useALContext();
-  const { search, setSearchObject } = useSearchParams<SubmissionParams>();
+
+  const hasSearch = useAppSearchParams('/submissions', s => Boolean(s));
+
+  const navigate = useAppNavigate<'/submissions'>();
 
   return submissionResults ? (
     !!submissionResults?.total ? (
@@ -69,14 +71,14 @@ const WrappedSubmissionsTable: React.FC<Props> = ({ submissionResults, allowSort
           </DivTableHead>
           <DivTableBody>
             {submissionResults.items.map((submission, id) => (
-              <LinkRow
+              <LinkRow<'/submissions'>
                 key={`${submission.id}-${id}`}
-                component={Link}
-                to={
-                  submission.state === 'completed'
-                    ? `/submission/${submission.id}`
-                    : `/submission/detail/${submission.id}`
-                }
+                to={{
+                  openRoute:
+                    submission.state === 'completed'
+                      ? { path: '/submission/:id', params: { id: submission.id } }
+                      : { path: '/submission/detail/:id', params: { id: submission.id } }
+                }}
                 hover
                 style={{ textDecoration: 'none' }}
               >
@@ -92,7 +94,7 @@ const WrappedSubmissionsTable: React.FC<Props> = ({ submissionResults, allowSort
                 </DivTableCell>
                 <DivTableCell breakable>{maxLenStr(submission.params.description, 150)}</DivTableCell>
                 <DivTableCell style={{ whiteSpace: 'nowrap' }}>
-                  {!search ? (
+                  {!hasSearch ? (
                     submission.params.submitter
                   ) : (
                     <CustomChip
@@ -103,10 +105,10 @@ const WrappedSubmissionsTable: React.FC<Props> = ({ submissionResults, allowSort
                       onClick={event => {
                         event.preventDefault();
                         event.stopPropagation();
-                        setSearchObject(o => ({
-                          ...o,
+                        navigate.replaceSearchObject(s => ({
+                          ...s,
                           offset: 0,
-                          filters: [...o.filters, `params.submitter:"${submission.params.submitter}"`]
+                          filters: [...s.filters, `params.submitter:"${submission.params.submitter}"`]
                         }));
                       }}
                     />

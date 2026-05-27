@@ -8,7 +8,7 @@ import React from 'react';
  * @param size - Number of characters to include in the generated id
  * @returns A unique id not found in existingUUIDs
  */
-export const generateRandomUUID = (existingUUIDs: string[] = [], size: number = 16) => {
+export const generateRandomUUID = (existingUUIDs: string[] = [], size: number = 16): string => {
   let uuid = null;
 
   while (uuid === null || existingUUIDs.findIndex(u => u === uuid) >= 0) {
@@ -17,7 +17,7 @@ export const generateRandomUUID = (existingUUIDs: string[] = [], size: number = 
     uuid = raw.replace(/=/g, '').slice(0, Math.max(1, Math.trunc(size)));
   }
 
-  return uuid;
+  return uuid as string;
 };
 
 /**

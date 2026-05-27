@@ -33,6 +33,8 @@ import notFoundEN from 'pages/not-found/not-found.i18n.en.json';
 import notFoundFR from 'pages/not-found/not-found.i18n.fr.json';
 import settingsEN from 'pages/settings/settings.i18n.en.json';
 import settingsFR from 'pages/settings/settings.i18n.fr.json';
+import submissionsEN from 'pages/submissions/submissions.i18n.en.json';
+import submissionsFR from 'pages/submissions/submissions.i18n.fr.json';
 import submitEN from 'pages/submit/submit.i18n.en.json';
 import submitFR from 'pages/submit/submit.i18n.fr.json';
 import { initReactI18next } from 'react-i18next';
@@ -55,6 +57,7 @@ export const I18N_RESSOURCES = {
     notifications: notificationsEN,
     quota: quotaEN,
     settings: settingsEN,
+    submissions: submissionsEN,
     submit: submitEN,
     tos: tosEN
   },
@@ -73,6 +76,7 @@ export const I18N_RESSOURCES = {
     notifications: notificationsFR,
     quota: quotaFR,
     settings: settingsFR,
+    submissions: submissionsFR,
     submit: submitFR,
     tos: tosFR
   }

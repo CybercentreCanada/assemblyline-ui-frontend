@@ -1,5 +1,5 @@
 import { useAppConfig } from 'core/config';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 
 export const useALContext = () => {
   const s = useAppConfig(s => s);
@@ -34,10 +34,7 @@ export const useALContext = () => {
     ]
   );
 
-  return {
-    ...s,
-    scoreToVerdict
-  };
+  return useMemo(() => ({ ...s, scoreToVerdict }), [s, scoreToVerdict]);
 };
 
 export default useALContext;

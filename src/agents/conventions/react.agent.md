@@ -22,6 +22,15 @@
 
 - `useInsertionEffect` — reserved for CSS-in-JS libraries
 
+## TypeScript Generics — Partial Inference Not Supported
+
+TypeScript does not support partial type argument inference. When you explicitly specify any type parameter, remaining parameters use their **default**, not inference from arguments.
+
+- Never design a hook/function that requires the user to specify one generic while expecting another to be inferred
+- Prefer runtime arguments that drive full inference over explicit type parameters
+- If a type param exists only for narrowing (e.g., route path), provide it as a cheap runtime arg or use a two-step pattern
+- Acceptable workarounds: runtime discriminant argument, two-step hook (returns typed object), curried module-level factory
+
 ## Components — Use
 
 - `memo()` — required on every exported component

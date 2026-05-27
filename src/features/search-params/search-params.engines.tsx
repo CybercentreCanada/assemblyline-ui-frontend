@@ -1,42 +1,46 @@
 import {
-  BooleanBlueprint,
-  EnumBlueprint,
-  FiltersBlueprint,
-  NumberBlueprint,
-  StringBlueprint
+  BooleanSearchParamBlueprint,
+  EnumSearchParamBlueprint,
+  FiltersSearchParamBlueprint,
+  NumberSearchParamBlueprint,
+  StringSearchParamBlueprint
 } from 'features/search-params/search-params.blueprints';
 import type {
-  ParamBlueprints,
-  SearchParamRuntimeMap,
-  SearchParamValueMap
+  InferSearchParamRuntimeMapFromBlueprintMap,
+  InferSearchParamValueMapFromBlueprintMap,
+  SearchParamBlueprintMap,
+  SearchParamRuntime
 } from 'features/search-params/search-params.models';
-import type { ParamRuntime } from 'features/search-params/search-params.runtimes';
-import { PARAM_RUNTIMES } from 'features/search-params/search-params.runtimes';
+import { SEARCH_PARAM_RUNTIME_MAP } from 'features/search-params/search-params.runtimes';
 import { SearchParamSnapshot } from 'features/search-params/search-params.snapshots';
 import type { Location } from 'react-router';
 
-export class SearchParamEngine<Blueprints extends Record<string, ParamBlueprints>> {
-  private runtimes: SearchParamRuntimeMap<Blueprints>;
+export class SearchParamEngine<Blueprints extends SearchParamBlueprintMap> {
+  private runtimes: InferSearchParamRuntimeMapFromBlueprintMap<Blueprints>;
 
   constructor(blueprints: Blueprints) {
     this.runtimes = Object.entries(blueprints).reduce((prev, [key, bp]) => {
-      if (bp instanceof BooleanBlueprint) return { ...prev, [key]: new PARAM_RUNTIMES.boolean(key, bp) };
-      if (bp instanceof NumberBlueprint) return { ...prev, [key]: new PARAM_RUNTIMES.number(key, bp) };
-      if (bp instanceof StringBlueprint) return { ...prev, [key]: new PARAM_RUNTIMES.string(key, bp) };
-      if (bp instanceof FiltersBlueprint) return { ...prev, [key]: new PARAM_RUNTIMES.filters(key, bp) };
-      if (bp instanceof EnumBlueprint) return { ...prev, [key]: new PARAM_RUNTIMES.enum(key, bp) };
+      if (bp instanceof BooleanSearchParamBlueprint)
+        return { ...prev, [key]: new SEARCH_PARAM_RUNTIME_MAP.boolean(key, bp) };
+      if (bp instanceof NumberSearchParamBlueprint)
+        return { ...prev, [key]: new SEARCH_PARAM_RUNTIME_MAP.number(key, bp) };
+      if (bp instanceof StringSearchParamBlueprint)
+        return { ...prev, [key]: new SEARCH_PARAM_RUNTIME_MAP.string(key, bp) };
+      if (bp instanceof FiltersSearchParamBlueprint)
+        return { ...prev, [key]: new SEARCH_PARAM_RUNTIME_MAP.filters(key, bp) };
+      if (bp instanceof EnumSearchParamBlueprint) return { ...prev, [key]: new SEARCH_PARAM_RUNTIME_MAP.enum(key, bp) };
       return prev;
-    }, {} as SearchParamRuntimeMap<Blueprints>);
+    }, {} as InferSearchParamRuntimeMapFromBlueprintMap<Blueprints>);
   }
 
   private runtimeEntries() {
-    return Object.entries(this.runtimes) as [string, ParamRuntime][];
+    return Object.entries(this.runtimes) as [string, SearchParamRuntime][];
   }
 
   public getDefaultValues() {
     const values = this.runtimeEntries().reduce(
       (prev, [key, runtime]) => ({ ...prev, [key]: runtime.getDefaultValue() }),
-      {} as SearchParamValueMap<Blueprints>
+      {} as InferSearchParamValueMapFromBlueprintMap<Blueprints>
     );
     return new SearchParamSnapshot<Blueprints>(this.runtimes, values);
   }
@@ -45,7 +49,7 @@ export class SearchParamEngine<Blueprints extends Record<string, ParamBlueprints
     if (!values) return this;
     this.runtimes = this.runtimeEntries().reduce(
       (prev, [key, runtime]) => ({ ...prev, [key]: runtime.setDefaultValue(values) }),
-      {} as SearchParamRuntimeMap<Blueprints>
+      {} as InferSearchParamRuntimeMapFromBlueprintMap<Blueprints>
     );
     return this;
   }
@@ -71,19 +75,19 @@ export class SearchParamEngine<Blueprints extends Record<string, ParamBlueprints
     );
   }
 
-  public full(value: URLSearchParams | SearchParamValueMap<Blueprints>) {
+  public full(value: URLSearchParams | InferSearchParamValueMapFromBlueprintMap<Blueprints>) {
     const values = this.runtimeEntries().reduce(
       (prev, [, runtime]) => runtime.full(prev, value),
-      {} as SearchParamValueMap<Blueprints>
+      {} as InferSearchParamValueMapFromBlueprintMap<Blueprints>
     );
 
     return new SearchParamSnapshot<Blueprints>(this.runtimes, values);
   }
 
-  public delta(value: URLSearchParams | SearchParamValueMap<Blueprints>) {
+  public delta(value: URLSearchParams | InferSearchParamValueMapFromBlueprintMap<Blueprints>) {
     const values = this.runtimeEntries().reduce(
       (prev, [, runtime]) => runtime.delta(prev, value),
-      {} as SearchParamValueMap<Blueprints>
+      {} as InferSearchParamValueMapFromBlueprintMap<Blueprints>
     );
 
     return new SearchParamSnapshot<Blueprints>(this.runtimes, values);
@@ -92,7 +96,7 @@ export class SearchParamEngine<Blueprints extends Record<string, ParamBlueprints
   public fromLocation(location: Location, snapshot: SearchParamSnapshot<Blueprints> = null) {
     const values = this.runtimeEntries().reduce(
       (prev, [, runtime]) => runtime.fromLocation(prev, location, snapshot),
-      {} as SearchParamValueMap<Blueprints>
+      {} as InferSearchParamValueMapFromBlueprintMap<Blueprints>
     );
     return new SearchParamSnapshot<Blueprints>(this.runtimes, values);
   }

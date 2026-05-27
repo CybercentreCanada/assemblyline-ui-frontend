@@ -1,120 +1,281 @@
 import { APP_ROUTES } from 'app/app.routes';
 import { useAppPreferenceStore } from 'core/preference';
-import { useAppRouterStore, useAppSetRouterStore } from 'core/router/router.providers';
 import {
   addRoute,
+  DEFAULT_APP_ROUTER_ROUTE,
   findPanelKey,
+  getNextRouteFromKey,
+  getRouteFromKey,
   insertRightPanel,
+  removePanel,
   sanitizeAppRouterStore,
-  storeToNavigate,
   updatePanel,
-  updateRoute
-} from 'core/router/router.utils';
-import type { AppRoute, AppRouteLocation, CreatedAppRouteParamsMap } from 'core/routes';
-import { buildRouteLocation, useAppRouteKey } from 'core/routes';
+  updateRoute,
+  useAppRouterStore,
+  useAppSetRouterStore
+} from 'core/router';
+import type {
+  AppLinkTo,
+  AppLinkToOptions,
+  AppRouteLocation,
+  InferAppRouteSearchValuesFromPath,
+  InferAppRouteValuesFromRoute
+} from 'core/routes';
+import {
+  findAppRouteFromLocation,
+  getAppRouteValuesFromLocation,
+  getLocationFromAppRouteValues,
+  useAppRouteKey
+} from 'core/routes';
+import { findAppRouteFromValues, getAppLinkFromLocation } from 'core/routes/routes.utils';
+import type { SetStateAction } from 'react';
 import { useCallback, useMemo } from 'react';
-import { useNavigate } from 'react-router';
+import type { Location } from 'react-router';
+import { generateRandomUUID } from 'shared/utils/app.utils';
 
 //*****************************************************************************************
-// useAppRouteLocation
+// useAppTo
 //*****************************************************************************************
-export function useAppRouteLocation<const Route extends AppRoute>(
-  to: CreatedAppRouteParamsMap<Route>
-): AppRouteLocation {
-  return useMemo(() => buildRouteLocation(APP_ROUTES, to), [to]);
-}
-
-// //*****************************************************************************************
-// // useAppHref
-// //*****************************************************************************************
-// export function useAppRouteLocation<const Route extends AppRoute>(
-//   to: CreatedAppRouteParamsMap<Route>
-// ): AppRouteLocation {
-//   return useMemo(() => {
-//     if (!to) return null;
-
-//     const currentRoute = APP_ROUTES.find(r => r.path === to?.path);
-
-//     const pathname =
-//       !currentRoute?.params || !to?.params ? to.path : (currentRoute.params.stringify(to.params as never) as string);
-
-//     const search =
-//       !to?.search || !currentRoute?.search ? undefined : currentRoute.search.delta(to.search as never).toString();
-
-//     const hash = !to?.hash || !currentRoute?.hash ? undefined : String(currentRoute.hash(to.hash as never));
-
-//     return `${pathname}${!search ? '' : `?${search}`}${!hash ? '' : `#${hash}`}`;
-//   }, [to]);
-// }
-
-// //*****************************************************************************************
-// // useAppTo
-// //*****************************************************************************************
-// export function useAppTo<const Route extends AppRoute>(to: CreatedAppRouteParamsMap<Route>): LinkProps['to'] {
-//   const href = useAppHref(to);
-
-//   return useMemo(() => {
-//     if (!href) return null;
-
-//     const searchParams = new URLSearchParams();
-//     searchParams.append('p', href);
-//     return `/${searchParams.toString()}`;
-//   }, [href]);
-// }
-
-//*****************************************************************************************
-// useAppRouterNavigate
-//*****************************************************************************************
-export function useAppNavigate<const Route extends AppRoute>(): (to: CreatedAppRouteParamsMap<Route>) => void {
-  const routerNavigate = useNavigate();
+export function useAppTo<const Path extends AppRoute['path']>(to: AppLinkTo<Path>): AppRouteLocation {
   const routeKey = useAppRouteKey();
-  const store = useAppRouterStore(s => s);
-  const setStore = useAppSetRouterStore();
   const navigationStyle = useAppPreferenceStore(s => s?.router?.navigation);
 
-  return useCallback(
-    to => {
-      const { variant = 'open', panel = null } = to ?? ({} as never);
-      const { href, state } = buildRouteLocation(APP_ROUTES, to);
+  const [toKey, toValue] = useMemo(() => {
+    const entries = Object.entries(to as AppLinkToOptions<Path>);
+    return !entries.length ? [null, null] : entries[0];
+  }, [to]);
 
-      if (!href) return;
+  const previousLocation = useAppRouterStore(store => {
+    if (typeof toValue !== 'function') return DEFAULT_APP_ROUTER_ROUTE;
+    else if (toKey === 'openRoute') return getNextRouteFromKey(store, routeKey, navigationStyle);
+    else return getRouteFromKey(store, routeKey);
+  });
 
-      let nextStore = store;
-      let nextRouteKey = null;
+  return useMemo<AppRouteLocation>(() => {
+    if (!toKey || !previousLocation?.href) return { href: null, state: null };
 
-      const currentRouteKey = routeKey?.[0] ?? null;
+    const route = findAppRouteFromLocation(APP_ROUTES, previousLocation);
 
-      const currentPanelKey = findPanelKey(store, { routeKey: currentRouteKey });
-      let panelKey = currentPanelKey >= 0 ? currentPanelKey + 1 : 0;
+    switch (toKey) {
+      case 'openRoute': {
+        const previousRouteValues = getAppRouteValuesFromLocation(route, previousLocation);
+        const nextRouteValues = typeof toValue === 'function' ? toValue(previousRouteValues) : toValue;
+        const location = getLocationFromAppRouteValues(route, nextRouteValues);
+        return getAppLinkFromLocation(location);
+      }
 
-      if (variant === 'replace' && currentRouteKey) {
-        nextStore = updateRoute(nextStore, currentRouteKey, { href, state });
-      } else {
-        if (variant === 'to' && typeof panel === 'number') {
-          panelKey = Math.max(0, Math.trunc(panel));
+      case 'replaceRoute': {
+        const previousRouteValues = getAppRouteValuesFromLocation(route, previousLocation);
+        const nextRouteValues = typeof toValue === 'function' ? toValue(previousRouteValues) : toValue;
+        const location = getLocationFromAppRouteValues(route, nextRouteValues);
+        return getAppLinkFromLocation(location);
+      }
+
+      case 'replaceSearchObject': {
+        const previousRouteValues = getAppRouteValuesFromLocation(route, previousLocation);
+        const previousSearchObject = (previousRouteValues?.search ?? {}) as InferAppRouteSearchValuesFromPath<Path>;
+        const nextSearchObject =
+          typeof toValue === 'function'
+            ? (toValue as (prev: InferAppRouteSearchValuesFromPath<Path>) => InferAppRouteSearchValuesFromPath<Path>)(
+                previousSearchObject
+              )
+            : (toValue as InferAppRouteSearchValuesFromPath<Path>);
+
+        const nextRouteValues = {
+          ...(previousRouteValues as InferAppRouteValuesFromRoute<AppRoute>),
+          search: nextSearchObject
+        };
+        const location = getLocationFromAppRouteValues(
+          route,
+          nextRouteValues as InferAppRouteValuesFromRoute<AppRoute>
+        );
+        return getAppLinkFromLocation(location);
+      }
+
+      case 'replaceURLSearchParams': {
+        const url = new URL(previousLocation.href, 'http://localhost');
+        const prevSearch = new URLSearchParams(url.search);
+        const nextSearch: URLSearchParams =
+          typeof toValue === 'function'
+            ? (toValue as (prev: URLSearchParams) => URLSearchParams)(prevSearch)
+            : (toValue as URLSearchParams);
+
+        const searchStr = nextSearch.toString();
+        const tempLocation: Location = {
+          pathname: url.pathname,
+          search: searchStr ? `?${searchStr}` : '',
+          hash: url.hash,
+          state: previousLocation.state,
+          key: 'default'
+        };
+        const normalizedSearch = route?.search ? route.search.fromLocation(tempLocation).toObject() : null;
+        const previousRouteValues = getAppRouteValuesFromLocation(route, previousLocation);
+        const nextRouteValues = {
+          ...(previousRouteValues as InferAppRouteValuesFromRoute<AppRoute>),
+          search: normalizedSearch
+        };
+        const location = getLocationFromAppRouteValues(
+          route,
+          nextRouteValues as InferAppRouteValuesFromRoute<AppRoute>
+        );
+        return getAppLinkFromLocation(location);
+      }
+
+      default:
+        return { href: null, state: null };
+    }
+  }, [previousLocation, toKey, toValue]);
+}
+
+//*****************************************************************************************
+// useAppNavigate
+//*****************************************************************************************
+export function useAppNavigate<const Path extends AppRoute['path']>() {
+  const routeKey = useAppRouteKey();
+  const setRouterStore = useAppSetRouterStore();
+  const navigationStyle = useAppPreferenceStore(s => s?.router?.navigation);
+
+  const openRoute = useCallback(
+    (to: SetStateAction<InferAppRouteValuesFromRoute<AppRoute>>) =>
+      setRouterStore(store => {
+        debugger;
+        let nextLocation: AppRouteLocation = null;
+        const panelKey = findPanelKey(store, { routeKey });
+        if (typeof to !== 'function') {
+          const route = findAppRouteFromValues(APP_ROUTES, to);
+          nextLocation = getLocationFromAppRouteValues(route, to);
+        } else {
+          const previousLocation = getNextRouteFromKey(store, routeKey, navigationStyle);
+          const route = findAppRouteFromLocation(APP_ROUTES, previousLocation);
+          const previousRouteValues = getAppRouteValuesFromLocation(route, previousLocation);
+          const nextRouteValues = to(previousRouteValues);
+          nextLocation = getLocationFromAppRouteValues(route, nextRouteValues);
         }
 
-        [nextStore, nextRouteKey] = addRoute(store, { href, state });
+        if (!nextLocation.href) return store;
+
+        let [initialStore, nextRouteKey] = addRoute(store, nextLocation);
+        let [initialStore, nextPanelKey] = upsertPanel(store, panelKey, {
+          routeKey: nextRouteKey,
+          temporaryRouteKey: nextRouteKey
+        });
 
         if (navigationStyle === 'push') {
-          if (panelKey >= nextStore.panels.length)
-            [nextStore] = insertRightPanel(nextStore, panelKey, {
+          if (panelKey >= initialStore.panels.length)
+            [initialStore] = insertRightPanel(initialStore, panelKey, {
               routeKey: nextRouteKey,
               temporaryRouteKey: nextRouteKey
             });
           else
-            nextStore = updatePanel(nextStore, panelKey, { routeKey: nextRouteKey, temporaryRouteKey: nextRouteKey });
+            initialStore = updatePanel(initialStore, panelKey, {
+              routeKey: nextRouteKey,
+              temporaryRouteKey: nextRouteKey
+            });
         } else if (navigationStyle === 'loop') {
           // Loop navigation keeps current panel assignment by design.
         }
-      }
 
-      nextStore = sanitizeAppRouterStore(nextStore);
-
-      setStore(nextStore);
-      const nextLocation = storeToNavigate(nextStore);
-      if (nextLocation) routerNavigate(nextLocation.to, nextLocation.options);
-    },
-    [navigationStyle, routeKey, routerNavigate, store, setStore]
+        initialStore = sanitizeAppRouterStore(initialStore);
+        initialStore.id = generateRandomUUID();
+        return initialStore;
+      }),
+    [navigationStyle, routeKey, setRouterStore]
   );
+
+  const replaceRoute = useCallback(
+    (to: SetStateAction<InferAppRouteValuesFromRoute<AppRoute>>) =>
+      setRouterStore(store => {
+        const previousLocation = getRouteFromKey(store, routeKey);
+        const route = findAppRouteFromLocation(APP_ROUTES, previousLocation);
+        const previousRouteValues = getAppRouteValuesFromLocation(route, previousLocation);
+        const nextRouteValues = typeof to === 'function' ? to(previousRouteValues) : to;
+        const nextLocation = getLocationFromAppRouteValues(route, nextRouteValues);
+        store = updateRoute(store, routeKey, { ...nextLocation, age: -1 });
+        store = sanitizeAppRouterStore(store);
+        store.id = generateRandomUUID();
+        return store;
+      }),
+    [routeKey, setRouterStore]
+  );
+
+  const replaceSearchObject = useCallback(
+    (to: SetStateAction<InferAppRouteSearchValuesFromPath<Path>>) =>
+      setRouterStore(store => {
+        const previousLocation = getRouteFromKey(store, routeKey);
+        const route = findAppRouteFromLocation(APP_ROUTES, previousLocation);
+        const previousRouteValues = getAppRouteValuesFromLocation(route, previousLocation);
+        const previousSearchObject = (previousRouteValues?.search ?? {}) as InferAppRouteSearchValuesFromPath<Path>;
+        const nextSearchObject = typeof to === 'function' ? to(previousSearchObject) : to;
+        const nextRouteValues = {
+          ...(previousRouteValues as InferAppRouteValuesFromRoute<AppRoute>),
+          search: nextSearchObject
+        };
+        const nextLocation = getLocationFromAppRouteValues(
+          route,
+          nextRouteValues as InferAppRouteValuesFromRoute<AppRoute>
+        );
+
+        store = updateRoute(store, routeKey, { ...nextLocation, age: -1 });
+        store = sanitizeAppRouterStore(store);
+        store.id = generateRandomUUID();
+        return store;
+      }),
+    [routeKey, setRouterStore]
+  );
+
+  const replaceURLSearchParams = useCallback(
+    (to: SetStateAction<URLSearchParams>) =>
+      setRouterStore(store => {
+        const previousLocation = getRouteFromKey(store, routeKey);
+        const route = findAppRouteFromLocation(APP_ROUTES, previousLocation);
+        const previousRouteValues = getAppRouteValuesFromLocation(route, previousLocation);
+        const url = new URL(previousLocation.href || '', 'http://localhost');
+        const previousSearch = new URLSearchParams(url.search);
+        const nextSearch = typeof to === 'function' ? to(previousSearch) : to;
+
+        const searchStr = nextSearch.toString();
+        const tempLocation: Location = {
+          pathname: url.pathname,
+          search: searchStr ? `?${searchStr}` : '',
+          hash: url.hash,
+          state: previousLocation.state,
+          key: 'default'
+        };
+        const normalizedSearch = route?.search ? route.search.fromLocation(tempLocation).toObject() : null;
+
+        const nextRouteValues = {
+          ...(previousRouteValues as InferAppRouteValuesFromRoute<AppRoute>),
+          search: normalizedSearch
+        };
+        const nextLocation = getLocationFromAppRouteValues(
+          route,
+          nextRouteValues as InferAppRouteValuesFromRoute<AppRoute>
+        );
+
+        store = updateRoute(store, routeKey, { ...nextLocation, age: -1 });
+        store = sanitizeAppRouterStore(store);
+        store.id = generateRandomUUID();
+        return store;
+      }),
+    [routeKey, setRouterStore]
+  );
+
+  const closePanel = useCallback(
+    (panel: number) =>
+      setRouterStore(s => {
+        let nextStore = removePanel(s, panel);
+        nextStore = sanitizeAppRouterStore(nextStore);
+        nextStore.id = generateRandomUUID();
+        return nextStore;
+      }),
+    [setRouterStore]
+  );
+
+  return {
+    openRoute,
+    replaceRoute,
+    replaceSearchObject,
+    replaceURLSearchParams,
+    closePanel
+  };
 }

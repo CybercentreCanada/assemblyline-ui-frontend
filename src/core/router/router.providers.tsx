@@ -1,12 +1,11 @@
-import { useAppPreferenceStore } from 'core/preference';
 import type { AppRouterState, AppRouterStore } from 'core/router/router.models';
 import { DEFAULT_APP_ROUTER_STORE } from 'core/router/router.models';
-import { locationToStore } from 'core/router/router.utils';
+import { syncLocationToStore, syncStoreToLocation } from 'core/routes';
 import { createAppStore } from 'features/store/createAppStore';
 import type { PropsWithChildren } from 'react';
 import { memo, useEffect } from 'react';
 import type { Location } from 'react-router';
-import { BrowserRouter, useLocation } from 'react-router';
+import { BrowserRouter, useLocation, useNavigate } from 'react-router';
 
 //*****************************************************************************************
 // App Router Store Provider
@@ -14,32 +13,52 @@ import { BrowserRouter, useLocation } from 'react-router';
 export const {
   StoreProvider: AppRouterStoreProvider,
   useStore: useAppRouterStore,
-  useSetStore: useAppSetRouterStore
+  useSetStore: useAppSetRouterStore,
+  useStoreApi: useAppRouterStoreApi
 } = createAppStore<AppRouterStore>(DEFAULT_APP_ROUTER_STORE);
 
 AppRouterStoreProvider.displayName = 'AppRouterStoreProvider';
 
 //*****************************************************************************************
-// App Router Store Sync
+// App Router Sync
 //*****************************************************************************************
-export const AppRouterProvider = memo(({ children }: PropsWithChildren) => {
-  const location: Location<AppRouterState> = useLocation() as Location<AppRouterState>;
+export const AppRouterSync = memo(() => {
+  const location = useLocation() as Location<AppRouterState>;
+  const navigate = useNavigate();
+  const routerStoreApi = useAppRouterStoreApi();
+  const setRouterStore = useAppSetRouterStore();
 
-  const maxPanels = useAppPreferenceStore(s => s.router.maxPanels);
-  const maxNodes = useAppPreferenceStore(s => s.router.maxNodes);
-
-  const setRouter = useAppSetRouterStore();
-
+  // Sync React Router -> App Router Store
   useEffect(() => {
-    setRouter(s => {
-      // TODO: add a differs to only update the router store if there are changes
-      const store = locationToStore(s, location);
-      return { ...store, maxNodes: 2, maxPanels: 2 };
-    });
-  }, [location]);
+    if (!setRouterStore) return;
 
-  return children;
+    setRouterStore(store => syncLocationToStore(store, location));
+  }, [location, setRouterStore]);
+
+  // Sync App Router Store -> React Router
+  useEffect(() => {
+    if (!routerStoreApi) return;
+
+    return routerStoreApi.subscribe((store: AppRouterStore) => {
+      if (location.state?.id && location.state.id === store.id) return;
+
+      const nextNavigation = syncStoreToLocation(store, location);
+      if (nextNavigation) void navigate(nextNavigation.to, nextNavigation.options);
+    });
+  }, [location, navigate, routerStoreApi]);
+
+  return null;
 });
+
+//*****************************************************************************************
+// App Router Provider
+//*****************************************************************************************
+export const AppRouterProvider = memo(({ children }: PropsWithChildren) => (
+  <>
+    {children}
+    <AppRouterSync />
+  </>
+));
 
 AppRouterProvider.displayName = 'AppRouterProvider';
 

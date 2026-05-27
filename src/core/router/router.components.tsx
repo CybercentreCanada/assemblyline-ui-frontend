@@ -1,26 +1,37 @@
-import { useAppNavigate, useAppRouteLocation } from 'core/router/router.hooks';
-import type { AppLinkProps } from 'core/router/router.models';
-import type { AppRoute } from 'core/routes';
+import { useAppNavigate, useAppTo } from 'core/router';
+import type { AppLinkTo } from 'core/routes';
 import type { ForwardedRef } from 'react';
 import { forwardRef, memo, useCallback } from 'react';
+import type { LinkProps as RouterLinkProps } from 'react-router';
 import { Link } from 'react-router';
 
 //*****************************************************************************************
 // App Link
 //*****************************************************************************************
-export function WrappedAppLink<const Route extends AppRoute>(
-  { children, to = null, onClick = () => null, ...props }: AppLinkProps<Route>,
+
+export type AppLinkProps<Path extends AppRoute['path']> = Omit<
+  RouterLinkProps,
+  'to' | 'pathname' | 'search' | 'hash'
+> & {
+  to: AppLinkTo<Path>;
+};
+
+export function WrappedAppLink<const Path extends AppRoute['path']>(
+  { children, to, onClick, ...props }: AppLinkProps<Path>,
   ref: ForwardedRef<HTMLAnchorElement>
 ) {
-  const { href, state } = useAppRouteLocation(to);
-  const navigate = useAppNavigate();
+  const { href, state } = useAppTo<Path>(to);
+  const navigate = useAppNavigate<Path>();
 
   const handleClick = useCallback(
     (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
       event.preventDefault();
       event.stopPropagation();
-      navigate(to);
-      onClick(event);
+      if ('openRoute' in to) navigate.openRoute(to.openRoute);
+      else if ('replaceRoute' in to) navigate.replaceRoute(to.replaceRoute);
+      else if ('replaceSearchObject' in to) navigate.replaceSearchObject(to.replaceSearchObject);
+      else if ('replaceURLSearchParams' in to) navigate.replaceURLSearchParams(to.replaceURLSearchParams);
+      onClick?.(event);
     },
     [navigate, onClick, to]
   );
@@ -34,8 +45,8 @@ export function WrappedAppLink<const Route extends AppRoute>(
 
 WrappedAppLink.displayName = 'WrappedAppLink';
 
-export const AppLink = memo(forwardRef(WrappedAppLink)) as <const Route extends AppRoute>(
-  props: AppLinkProps<Route> & { ref?: ForwardedRef<HTMLAnchorElement> }
+export const AppLink = memo(forwardRef(WrappedAppLink)) as <const Path extends AppRoute['path']>(
+  props: AppLinkProps<Path> & { ref?: ForwardedRef<HTMLAnchorElement> }
 ) => React.JSX.Element | null;
 
 (AppLink as unknown as { displayName: string }).displayName = 'AppLink';

@@ -5,7 +5,6 @@ import { AppRouteKeyProvider, AppRoutes } from 'core/routes';
 import { InPortal, OutPortal } from 'features/portal';
 import type { PropsWithChildren } from 'react';
 import { memo } from 'react';
-import { useShallow } from 'zustand/react/shallow';
 
 //*****************************************************************************************
 // App Router Panel
@@ -64,7 +63,7 @@ export type AppRouterLayoutProps = PropsWithChildren & {
 };
 
 export const AppRouterLayout = memo(({ children, routes }: AppRouterLayoutProps) => {
-  const nodeKeys = useAppRouterStore(useShallow(s => Object.keys(s.nodes)));
+  const nodeKeys = useAppRouterStore(s => Object.keys(s.nodes));
 
   return (
     <>

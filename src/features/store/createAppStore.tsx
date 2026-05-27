@@ -6,6 +6,8 @@ import { useShallow } from 'zustand/react/shallow';
 import type { StoreApi } from 'zustand/vanilla';
 import { createStore } from 'zustand/vanilla';
 
+const FALLBACK_STORE = createStore(() => ({}));
+
 export const createAppStore = <Store extends object>(initialState: Store) => {
   type StorePatch = Partial<Store> | ((state: Store) => Partial<Store>);
 
@@ -37,7 +39,9 @@ export const createAppStore = <Store extends object>(initialState: Store) => {
       console.warn('[createAppStore] `useStore` called outside of StoreProvider.');
     }
 
-    return !store ? selector(initialState) : useZustandStore(store, useShallow(selector));
+    const value = useZustandStore((store ?? FALLBACK_STORE) as StoreApi<Store>, useShallow(selector));
+
+    return store ? value : selector(initialState);
   };
 
   const useSetStore = () => {
@@ -56,9 +60,12 @@ export const createAppStore = <Store extends object>(initialState: Store) => {
     );
   };
 
+  const useStoreApi = (): StoreApi<Store> => useContext(StoreContext);
+
   return {
     StoreProvider,
     useStore,
-    useSetStore
+    useSetStore,
+    useStoreApi
   };
 };

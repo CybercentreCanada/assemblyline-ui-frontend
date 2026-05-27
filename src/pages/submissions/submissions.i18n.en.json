@@ -1,0 +1,17 @@
+{
+  "detail": "Detail",
+  "filter": "Filter submissions...",
+  "filter.completed.add": "Add filter to show completed submissions",
+  "filter.completed.remove": "Remove filter to show completed submissions",
+  "filter.malicious.add": "Add filter to show malicious submissions",
+  "filter.malicious.remove": "Remove filter to show malicious submissions",
+  "filter.personal.add": "Add filter to show your submissions",
+  "filter.personal.remove": "Remove filter to show your submissions",
+  "filtered": "submission matching filter",
+  "filtereds": "submissions matching filter",
+  "report": "Report",
+  "searching": "Searching...",
+  "title": "Submissions",
+  "total": "submission",
+  "totals": "submissions"
+}

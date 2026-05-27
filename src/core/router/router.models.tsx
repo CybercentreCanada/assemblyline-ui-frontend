@@ -1,7 +1,6 @@
-import type { AppRoute, CreatedAppRouteParamsMap } from 'core/routes';
 import type { ReversePortalNode } from 'features/portal';
 import { createReversePortalNode } from 'features/portal';
-import type { LinkProps } from 'react-router';
+import { generateRandomUUID } from 'shared/utils/app.utils';
 
 //*****************************************************************************************
 // App Router
@@ -41,6 +40,8 @@ export type AppRouterRoute<State = unknown> = {
 
 /** Serializable subset of AppRouterStore for navigation state. */
 export type AppRouterState = {
+  /** Snapshot id for fast equality checks. */
+  id: AppRouterStore['id'];
   /** Panel configurations. */
   panels: AppRouterStore['panels'];
   /** Route entries. */
@@ -49,6 +50,7 @@ export type AppRouterState = {
 
 /** Full router store shape. */
 export type AppRouterStore = {
+  id: string;
   /** Maximum allowed portal nodes. */
   maxNodes: number;
   /** Maximum allowed panels. */
@@ -80,39 +82,25 @@ export const DEFAULT_APP_ROUTER_ROUTE: AppRouterRoute = {
 };
 
 export const DEFAULT_APP_ROUTER_STATE: AppRouterState = {
+  id: null,
   panels: [],
   routes: {}
 };
 
 export const DEFAULT_APP_ROUTER_STORE: AppRouterStore = {
-  maxNodes: 0,
-  maxPanels: 0,
+  id: generateRandomUUID(),
+  maxNodes: 2,
+  maxPanels: 2,
   nodes: {},
   panels: [],
   routes: {}
 };
 
 export const ROUTER_STORE_EXAMPLE: AppRouterStore = {
+  id: 'test',
   maxNodes: 0,
   maxPanels: 0,
   nodes: { default: { portal: createReversePortalNode(), routeKey: 'default' } },
   panels: [{ pinnedRouteKeys: [], routeKey: 'default', tabbedRouteKeys: [], temporaryRouteKey: 'default' }],
   routes: { default: { age: 0, href: '/submit', state: null } }
 };
-
-//*****************************************************************************************
-// App Router Link
-//*****************************************************************************************
-
-/** Variant options for navigation links. */
-export type AppLinkOptions =
-  | { panel?: never; variant?: 'open' }
-  | { panel?: never; variant?: 'replace' }
-  | { panel: number; variant?: 'to' };
-
-/** Props for the AppLink component. */
-export type AppLinkProps<Route extends AppRoute> = Omit<LinkProps, 'to' | 'pathname' | 'search' | 'hash'> &
-  AppLinkOptions & {
-    /** Route target configuration. */
-    to?: CreatedAppRouteParamsMap<Route>;
-  };

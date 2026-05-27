@@ -52,3 +52,27 @@ This file documents when and how to use React's built-in hooks and components wi
 |-----------|--------|
 | `lazy` | No code splitting — everything bundled upfront |
 | `Profiler` | Development only — never commit to codebase |
+
+## TypeScript Generics — Partial Inference Limitation
+
+TypeScript does **not** support partial type argument inference. When you explicitly provide any type parameter, the remaining ones use their defaults instead of being inferred from arguments.
+
+```typescript
+// ❌ SelectorOutput uses its default — NOT inferred from the selector
+const value = useHook<'/submissions'>(s => s.someField);
+
+// ✅ Let both type params infer from runtime arguments
+const value = useHook('/submissions', s => s.someField);
+
+// ✅ Two-step: fix Path in the hook call, narrow with property access
+const search = useSearchParams<'/submissions'>();
+const value = search.someField;
+```
+
+**Workarounds when you need to fix one type param explicitly:**
+
+1. **Don't specify type args** — use a runtime argument for inference (preferred)
+2. **Two-step hook** — hook returns the full typed object, narrow with property access (loses selector reactivity)
+3. **Curried factory** — create a typed hook per page at module level
+
+This is a [known TypeScript limitation](https://github.com/microsoft/TypeScript/issues/26242).
