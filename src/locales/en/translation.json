@@ -236,6 +236,8 @@
   "support.documentation": "Documentation",
   "support.email": "Contact Support",
   "theme": "Theme settings",
+  "theme.default.label": "Aurora",
+  "theme.nostalgia.label": "Nostalgia",
   "thememenu": "Theme",
   "thememenu.option.mui": "MaterialUI",
   "thememenu.option.solarized": "Solarized",
