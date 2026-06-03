@@ -22,12 +22,13 @@ import {
 } from '@mui/material';
 import MuiPopper from '@mui/material/Popper';
 import { styled } from '@mui/material/styles';
+import { fetchServerSentEvents } from '@tanstack/ai-client';
+import { useChat } from '@tanstack/ai-react';
 import type { AppUser } from 'commons/components/app/AppUserService';
 import { useAppUser } from 'commons/components/app/hooks';
 import AppAvatar from 'commons/components/display/AppAvatar';
 import { isEnter } from 'commons/components/utils/keyboard';
 import useALContext from 'components/hooks/useALContext';
-import useMyAPI from 'components/hooks/useMyAPI';
 import AIMarkdown from 'components/visual/AiMarkdown';
 import CustomChip from 'components/visual/CustomChip';
 import { ThinkingBadge } from 'components/visual/ThinkingBadge';
@@ -79,34 +80,27 @@ export interface AssistantInsightProps {
   value: string;
 }
 
-interface ContextMessageProps {
-  role: 'system' | 'user' | 'assistant';
-  content: string;
-  isError?: boolean;
-  isInsight?: boolean;
-}
-
 export const AssistantContext = React.createContext<AssistantContextProps>(null);
 
 function AssistantProvider({ children }: AssistantProviderProps) {
-  const { t, i18n } = useTranslation(['assistant']);
+  const { t } = useTranslation(['assistant']);
   const theme = useTheme();
   const appUser = useAppUser<AppUser>();
   const { user: currentUser, configuration } = useALContext();
-  const { apiCall } = useMyAPI();
 
   const [open, setOpen] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const [currentInsights, setCurrentInsights] = useState<AssistantInsightProps[]>([]);
-  const [thinking, setThinking] = useState(false);
-  const [currentContext, setCurrentContext] = useState<ContextMessageProps[]>([]);
-  const [currentHistory, setCurrentHistory] = useState<ContextMessageProps[]>([]);
-  const [currentInput, setCurrentInput] = useState<string>('');
   const [hasInsights, setHasInsights] = useState<boolean>(false);
   const upSM = useMediaQuery(theme.breakpoints.up('md'));
   const isXS = useMediaQuery(theme.breakpoints.only('xs'));
   const inputRef = useRef(null);
   const chatRef = useRef(null);
+  const [currentInput, setCurrentInput] = useState<string>('');
+
+  const { messages, sendMessage, isLoading, clear } = useChat({
+    connection: fetchServerSentEvents('/api/v4/assistant/chat')
+  });
 
   const assistantAllowed =
     currentUser && currentUser.roles.includes('assistant_use') && configuration && configuration.ui.ai.enabled;
@@ -127,134 +121,22 @@ function AssistantProvider({ children }: AssistantProviderProps) {
   };
 
   const askAssistant = () => {
-    const data = [...currentContext];
-    const history = [...currentHistory];
-    const newUserQuestion = { role: 'user' as const, content: currentInput };
-    data.push(newUserQuestion);
-    history.push(newUserQuestion);
-    setCurrentContext(data);
-    setCurrentHistory(history);
+    if (!currentInput.trim()) return;
+    sendMessage({ content: currentInput });
     setCurrentInput('');
-    apiCall({
-      method: 'POST',
-      body: data,
-      url: `/api/v4/assistant/?lang=${i18n.language === 'en' ? 'english' : 'french'}`,
-      onSuccess: api_data => {
-        setCurrentContext(api_data.api_response.trace);
-        setCurrentHistory([...history, ...api_data.api_response.trace.slice(-1)]);
-      },
-      onFailure: api_data =>
-        setCurrentHistory([...history, { role: 'assistant', content: api_data.api_error_message, isError: true }]),
-      onEnter: () => setThinking(true),
-      onFinalize: () => {
-        setThinking(false);
-
-        setTimeout(() => {
-          inputRef.current.focus();
-        }, 250);
-      }
-    });
   };
 
   const askAssistantWithInsight = (insight: AssistantInsightProps) => {
-    setCurrentHistory(history => [
-      ...history,
-      { role: 'system', content: `"Default system prompt for insight: ${insight.type}`, isInsight: true },
-      { role: 'user', content: `${t(`insight.${insight.type}`)}: ${insight.value}`, isInsight: true }
-    ]);
-    if (insight.type === 'submission' || insight.type === 'report') {
-      apiCall({
-        method: 'GET',
-        url: `/api/v4/submission/ai/${insight.value}/?lang=${i18n.language === 'en' ? 'english' : 'french'}&${
-          insight.type === 'report' ? 'detailed&' : ''
-        }with_trace`,
-        onSuccess: api_data => {
-          setCurrentContext(api_data.api_response.trace);
-          setCurrentHistory(history => [...history, ...api_data.api_response.trace.splice(-1)]);
-        },
-        onFailure: api_data =>
-          setCurrentHistory(history => [
-            ...history,
-            { role: 'assistant', content: api_data.api_error_message, isError: true }
-          ]),
-        onEnter: () => setThinking(true),
-        onFinalize: () => {
-          setThinking(false);
-
-          setTimeout(() => {
-            inputRef.current.focus();
-          }, 250);
-        }
-      });
-    } else if (insight.type === 'file') {
-      apiCall({
-        method: 'GET',
-        url: `/api/v4/file/ai/${insight.value}/?lang=${i18n.language === 'en' ? 'english' : 'french'}&with_trace`,
-        onSuccess: api_data => {
-          setCurrentContext(api_data.api_response.trace);
-          setCurrentHistory(history => [...history, ...api_data.api_response.trace.splice(-1)]);
-        },
-        onFailure: api_data =>
-          setCurrentHistory(history => [
-            ...history,
-            { role: 'assistant', content: api_data.api_error_message, isError: true }
-          ]),
-        onEnter: () => setThinking(true),
-        onFinalize: () => {
-          setThinking(false);
-
-          setTimeout(() => {
-            inputRef.current.focus();
-          }, 250);
-        }
-      });
-    } else if (insight.type === 'code') {
-      apiCall({
-        method: 'GET',
-        url: `/api/v4/file/code_summary/${insight.value}/?lang=${
-          i18n.language === 'en' ? 'english' : 'french'
-        }&with_trace`,
-        onSuccess: api_data => {
-          setCurrentContext(api_data.api_response.trace);
-          setCurrentHistory(history => [...history, ...api_data.api_response.trace.splice(-1)]);
-        },
-        onFailure: api_data =>
-          setCurrentHistory(history => [
-            ...history,
-            { role: 'assistant', content: api_data.api_error_message, isError: true }
-          ]),
-        onEnter: () => setThinking(true),
-        onFinalize: () => {
-          setThinking(false);
-
-          setTimeout(() => {
-            inputRef.current.focus();
-          }, 250);
-        }
-      });
-    }
-  };
-
-  const buildDefaultSystemMessage = (): ContextMessageProps => {
-    return {
-      role: 'system' as const,
-      content: null
-    };
+    const prompt = `${t(`insight.${insight.type}`)}: ${insight.value}`;
+    sendMessage({ content: prompt });
   };
 
   const clearAssistant = () => {
-    const defaultSystemPrompt = buildDefaultSystemMessage();
-    setCurrentContext([defaultSystemPrompt]);
-    setCurrentHistory([defaultSystemPrompt]);
+    clear();
   };
 
   const resetAssistant = () => {
-    const defaultSystemPrompt = buildDefaultSystemMessage();
-    const lastPrompt = currentHistory[currentHistory.length - 1];
-    setCurrentContext([defaultSystemPrompt]);
-    if (lastPrompt?.content !== defaultSystemPrompt.content) {
-      setCurrentHistory([...currentHistory, defaultSystemPrompt]);
-    }
+    clear();
   };
 
   const onKeyDown = (event: React.KeyboardEvent) => {
@@ -268,23 +150,9 @@ function AssistantProvider({ children }: AssistantProviderProps) {
   };
 
   useEffect(() => {
-    if (open && currentContext.length === 1) {
-      askAssistant();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open]);
-
-  useEffect(() => {
-    if (configuration) {
-      clearAssistant();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [configuration, i18n.language]);
-
-  useEffect(() => {
     if (chatRef && chatRef.current)
       chatRef.current.scrollTo({ top: chatRef.current.scrollHeight, left: 0, behavior: 'smooth' });
-  }, [currentHistory, thinking]);
+  }, [messages, isLoading]);
 
   useEffect(() => setHasInsights(currentInsights.length !== 0), [currentInsights]);
 
@@ -295,7 +163,7 @@ function AssistantProvider({ children }: AssistantProviderProps) {
       }, 50);
 
       setTimeout(() => {
-        inputRef.current.focus();
+        inputRef.current?.focus();
       }, 250);
     }
   }, [open]);
@@ -373,79 +241,39 @@ function AssistantProvider({ children }: AssistantProviderProps) {
                             overflow: 'auto'
                           }}
                         >
-                          {currentHistory
-                            .filter(message => message.content !== '')
-                            .map((message, id) =>
-                              message.role === 'system' ? (
-                                id !== 0 ? (
-                                  <div
-                                    key={id}
-                                    style={{
-                                      display: 'flex',
-                                      justifyContent: 'center',
-                                      marginTop: theme.spacing(2),
-                                      marginBottom: theme.spacing(1)
-                                    }}
-                                  >
-                                    <div
-                                      style={{
-                                        minWidth: '10rem',
-                                        maxWidth: '25rem',
-                                        textAlign: 'center',
-                                        flexGrow: 1,
-                                        color: theme.palette.text.disabled,
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        flexDirection: 'column'
-                                      }}
-                                    >
-                                      <Divider style={{ width: '100%' }} />
-                                      <span
-                                        style={{
-                                          marginTop: theme.spacing(-1.25),
-                                          backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#fafafa'
-                                        }}
-                                      >
-                                        &nbsp;&nbsp;&nbsp;{t('new_chat')}&nbsp;&nbsp;&nbsp;
-                                      </span>
-                                    </div>
-                                  </div>
-                                ) : null
+                          {messages.map(message => (
+                            <Stack
+                              key={message.id}
+                              direction={isXS ? 'column' : message.role === 'assistant' ? 'row' : 'row-reverse'}
+                              p={1}
+                              spacing={1}
+                              style={{ wordBreak: 'break-word' }}
+                            >
+                              {message.role === 'assistant' ? (
+                                <Avatar>
+                                  <SmartToyOutlinedIcon />
+                                </Avatar>
                               ) : (
-                                <Stack
-                                  key={id}
-                                  direction={isXS ? 'column' : message.role === 'assistant' ? 'row' : 'row-reverse'}
-                                  p={1}
-                                  spacing={1}
-                                  style={{ wordBreak: 'break-word' }}
-                                >
-                                  {message.role === 'assistant' ? (
-                                    <Avatar>
-                                      <SmartToyOutlinedIcon />
-                                    </Avatar>
-                                  ) : (
-                                    <AppAvatar url={appUser.user.avatar} email={appUser.user.email} />
-                                  )}
-                                  <Paper
-                                    sx={{
-                                      p: 0,
-                                      backgroundColor: message.isInsight
-                                        ? theme.palette.mode === 'dark'
-                                          ? '#414f65'
-                                          : '#BADDFB'
-                                        : message.isError
-                                          ? theme.palette.mode === 'dark'
-                                            ? '#4f1717'
-                                            : '#ffe2e2'
-                                          : theme.palette.background.paper
-                                    }}
-                                  >
-                                    <AIMarkdown markdown={message.content} truncated={false} dense />
-                                  </Paper>
-                                </Stack>
-                              )
-                            )}
-                          {thinking && (
+                                <AppAvatar url={appUser.user.avatar} email={appUser.user.email} />
+                              )}
+                              <Paper
+                                sx={{
+                                  p: 0,
+                                  backgroundColor: theme.palette.background.paper
+                                }}
+                              >
+                                <AIMarkdown
+                                  markdown={message.parts
+                                    .filter(p => p.type === 'text')
+                                    .map(p => p.content)
+                                    .join('')}
+                                  truncated={false}
+                                  dense
+                                />
+                              </Paper>
+                            </Stack>
+                          ))}
+                          {isLoading && (
                             <Stack direction="row" p={1} spacing={1} style={{ wordBreak: 'break-word' }}>
                               <Avatar>
                                 <SmartToyOutlinedIcon />
@@ -490,7 +318,7 @@ function AssistantProvider({ children }: AssistantProviderProps) {
                             onKeyDown={onKeyDown}
                             fullWidth
                             size="small"
-                            disabled={thinking}
+                            disabled={isLoading}
                             sx={{}}
                             margin="dense"
                             InputProps={{
@@ -501,7 +329,7 @@ function AssistantProvider({ children }: AssistantProviderProps) {
                                     <span>
                                       <Button
                                         onClick={askAssistant}
-                                        disabled={thinking || currentInput === ''}
+                                        disabled={isLoading || currentInput === ''}
                                         size="small"
                                         sx={{
                                           minWidth: 0,

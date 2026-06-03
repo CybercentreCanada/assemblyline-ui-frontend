@@ -51,6 +51,7 @@ services:
       - FRONTEND_HOST=${EXTERNAL_IP}
       - UI_HOST=${EXTERNAL_IP}
       - SOCKET_HOST=${EXTERNAL_IP}
+      - MCP_HOST=${EXTERNAL_IP}
       - FQDN=${EXTERNAL_IP}.nip.io
       - MAX_BODY_SIZE=100M
       - TEMPLATE=minimal

@@ -27,6 +27,8 @@
     "@mui/styles": "^5.11.9",
     "@mui/x-date-pickers": "^7.28.3",
     "@mui/x-tree-view": "^7.28.1",
+    "@tanstack/ai-client": "^0.15.2",
+    "@tanstack/ai-react": "^0.14.2",
     "@tanstack/query-sync-storage-persister": "^5.69.0",
     "@tanstack/react-form": "^1.23.8",
     "@tanstack/react-query": "^5.69.0",

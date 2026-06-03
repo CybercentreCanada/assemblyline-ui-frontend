@@ -144,6 +144,7 @@ function DrawerProvider({ children }: DrawerProviderProps) {
                 '@media print': {
                   display: 'none'
                 },
+                overflow: 'hidden',
                 transition: 'width 225ms cubic-bezier(0, 0, 0.2, 1) 0ms'
               }
             },

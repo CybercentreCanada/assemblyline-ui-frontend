@@ -53,6 +53,12 @@ importers:
       '@mui/x-tree-view':
         specifier: ^7.28.1
         version: 7.28.1(@emotion/react@11.14.0(@types/react@19.1.2)(react@19.2.3))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.1.2)(react@19.2.3))(@types/react@19.1.2)(react@19.2.3))(@mui/material@7.0.2(@emotion/react@11.14.0(@types/react@19.1.2)(react@19.2.3))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.1.2)(react@19.2.3))(@types/react@19.1.2)(react@19.2.3))(@types/react@19.1.2)(react-dom@19.2.3(react@19.2.3))(react@19.2.3))(@mui/system@7.0.2(@emotion/react@11.14.0(@types/react@19.1.2)(react@19.2.3))(@emotion/styled@11.14.0(@emotion/react@11.14.0(@types/react@19.1.2)(react@19.2.3))(@types/react@19.1.2)(react@19.2.3))(@types/react@19.1.2)(react@19.2.3))(@types/react@19.1.2)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      '@tanstack/ai-client':
+        specifier: ^0.15.2
+        version: 0.15.2
+      '@tanstack/ai-react':
+        specifier: ^0.14.2
+        version: 0.14.2(@tanstack/ai@0.26.0)(@types/react@19.1.2)(react@19.2.3)
       '@tanstack/query-sync-storage-persister':
         specifier: ^5.69.0
         version: 5.74.3
@@ -401,6 +407,9 @@ packages:
 
   '@adobe/css-tools@4.4.2':
     resolution: {integrity: sha512-baYZExFpsdkBNuvGKTKWCwKH57HRZLVtycZS05WTQNVOiXVSeAki3nU35zlRbToeMW8aHlJfyS+1C4BOv27q0A==}
+
+  '@ag-ui/core@0.0.52':
+    resolution: {integrity: sha512-Xo0bUaNV56EqylzcrAuhUkQX7et7+SZIrqZZtEByGwEq/I1EHny6ZMkWHLkKR7UNi0FJZwJyhKYmKJS3B2SEgA==}
 
   '@ampproject/remapping@2.3.0':
     resolution: {integrity: sha512-30iZtAPgz+LTIYoeivqYo853f02jBYSd5uGnGpkFV0M3xOt9aN73erkgYAmZU43x4VfqcnLxW9Kpg3R5LC4YYw==}
@@ -1716,6 +1725,9 @@ packages:
   '@socket.io/component-emitter@3.1.2':
     resolution: {integrity: sha512-9BCxFwvbGg/RsZK9tjXd8s4UcwR0MWeFQ1XEKIQVVvAGJyINdrqKMcTRyLoK8Rse1GjzLV9cwjWV1olXRWEXVA==}
 
+  '@standard-schema/spec@1.1.0':
+    resolution: {integrity: sha512-l2aFy5jALhniG5HgqrD6jXLi/rUWrKvqN/qJx6yoJsgKhblVd+iqqU4RCXavm/jPityDo5TCvKMnpjKnOriy0w==}
+
   '@swc/core-darwin-arm64@1.11.21':
     resolution: {integrity: sha512-v6gjw9YFWvKulCw3ZA1dY+LGMafYzJksm1mD4UZFZ9b36CyHFowYVYug1ajYRIRqEvvfIhHUNV660zTLoVFR8g==}
     engines: {node: '>=10'}
@@ -1791,9 +1803,38 @@ packages:
   '@swc/types@0.1.21':
     resolution: {integrity: sha512-2YEtj5HJVbKivud9N4bpPBAyZhj4S2Ipe5LkUG94alTpr7in/GU/EARgPAd3BwU+YOmFVJC2+kjqhGRi3r0ZpQ==}
 
+  '@tanstack/ai-client@0.15.2':
+    resolution: {integrity: sha512-ED7Ciq084v56yZUXQqOjye1RMEdkxIYsDSv8mm8v8nbwTtv0pw/GpEcC5qCudrq4r4YkjQtxIy1aJ3sQ31ichA==}
+
+  '@tanstack/ai-event-client@0.5.1':
+    resolution: {integrity: sha512-4/PD4ETHrfhaXo4ydLslEeYQ2M+JXfsBSVKm3t0CvQcNKdE+q11pi8OxHZnZCYzxI1EpbXLg4skENFMVsKp3ag==}
+    peerDependencies:
+      '@tanstack/ai': 0.26.0
+
+  '@tanstack/ai-react@0.14.2':
+    resolution: {integrity: sha512-LXNaCyMaLOdp7qIy3ptTcmInKbjN7oUpULqJe8rvwNOzaZHShVbaGJJerjCw9iiqDNjESbmEEMRgLEe4d54oVw==}
+    peerDependencies:
+      '@tanstack/ai': ^0.26.0
+      '@types/react': '>=18.0.0'
+      react: '>=18.0.0'
+
+  '@tanstack/ai@0.26.0':
+    resolution: {integrity: sha512-yNTGYLekEjEd4UTT7JMR8zWsFbwXSUM5iNDjTApmZi7dRAC9cggyn1+uNui3OzWLliTgKYLvnsQvrldbxbADaA==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      '@opentelemetry/api': '>=1.9.0'
+    peerDependenciesMeta:
+      '@opentelemetry/api':
+        optional: true
+
   '@tanstack/devtools-event-client@0.3.3':
     resolution: {integrity: sha512-RfV+OPV/M3CGryYqTue684u10jUt55PEqeBOnOtCe6tAmHI9Iqyc8nHeDhWPEV9715gShuauFVaMc9RiUVNdwg==}
     engines: {node: '>=18'}
+
+  '@tanstack/devtools-event-client@0.4.3':
+    resolution: {integrity: sha512-OZI6QyULw0FI0wjgmeYzCIfbgPsOEzwJtCpa69XrfLMtNXLGnz3d/dIabk7frg0TmHo+Ah49w5I4KC7Tufwsvw==}
+    engines: {node: '>=18'}
+    hasBin: true
 
   '@tanstack/eslint-plugin-query@5.73.3':
     resolution: {integrity: sha512-GmUtnOkRzDuNOq96g3eW5ADKC1nWfrM9RI0kRyQVr87rOl6y+PUgkuVaPxh3R2C0EVODxCS07b9aaWphidl/OA==}
@@ -4633,6 +4674,9 @@ packages:
   parse5@7.2.1:
     resolution: {integrity: sha512-BuBYQYlv1ckiPdQi/ohiivi9Sagc9JG+Ozs0r7b/0iK3sKmrb0b9FdWdBbOdx6hBCM/F9Ir82ofnBhtZOjCRPQ==}
 
+  partial-json@0.1.7:
+    resolution: {integrity: sha512-Njv/59hHaokb/hRUjce3Hdv12wd60MtM9Z5Olmn+nehe0QDAsRtRbJPvJ0Z91TusF0SuZRIvnM+S4l6EIP8leA==}
+
   path-exists@4.0.0:
     resolution: {integrity: sha512-ak9Qy5Q7jYb2Wwcey5Fpvg2KoAc/ZIhLSLOSBmRmygPsGwkVVt0fZa0qrtMz+m6tJTAHfZQ8FnmB4MG4LWy7/w==}
     engines: {node: '>=8'}
@@ -5786,6 +5830,9 @@ packages:
     engines: {node: '>=16.0.0'}
     hasBin: true
 
+  zod@3.25.76:
+    resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
+
   zustand@5.0.8:
     resolution: {integrity: sha512-gyPKpIaxY9XcO2vSMrLbiER7QMAMGOQZVRdJ6Zi782jkbzZygq5GI9nG8g+sMgitRtndwaBSl7uiqC49o1SSiw==}
     engines: {node: '>=12.20.0'}
@@ -5810,6 +5857,10 @@ packages:
 snapshots:
 
   '@adobe/css-tools@4.4.2': {}
+
+  '@ag-ui/core@0.0.52':
+    dependencies:
+      zod: 3.25.76
 
   '@ampproject/remapping@2.3.0':
     dependencies:
@@ -7188,6 +7239,8 @@ snapshots:
 
   '@socket.io/component-emitter@3.1.2': {}
 
+  '@standard-schema/spec@1.1.0': {}
+
   '@swc/core-darwin-arm64@1.11.21':
     optional: true
 
@@ -7240,7 +7293,37 @@ snapshots:
     dependencies:
       '@swc/counter': 0.1.3
 
+  '@tanstack/ai-client@0.15.2':
+    dependencies:
+      '@tanstack/ai': 0.26.0
+      '@tanstack/ai-event-client': 0.5.1(@tanstack/ai@0.26.0)
+    transitivePeerDependencies:
+      - '@opentelemetry/api'
+
+  '@tanstack/ai-event-client@0.5.1(@tanstack/ai@0.26.0)':
+    dependencies:
+      '@tanstack/ai': 0.26.0
+      '@tanstack/devtools-event-client': 0.4.3
+
+  '@tanstack/ai-react@0.14.2(@tanstack/ai@0.26.0)(@types/react@19.1.2)(react@19.2.3)':
+    dependencies:
+      '@tanstack/ai': 0.26.0
+      '@tanstack/ai-client': 0.15.2
+      '@types/react': 19.1.2
+      react: 19.2.3
+    transitivePeerDependencies:
+      - '@opentelemetry/api'
+
+  '@tanstack/ai@0.26.0':
+    dependencies:
+      '@ag-ui/core': 0.0.52
+      '@standard-schema/spec': 1.1.0
+      '@tanstack/ai-event-client': 0.5.1(@tanstack/ai@0.26.0)
+      partial-json: 0.1.7
+
   '@tanstack/devtools-event-client@0.3.3': {}
+
+  '@tanstack/devtools-event-client@0.4.3': {}
 
   '@tanstack/eslint-plugin-query@5.73.3(eslint@9.24.0(jiti@2.4.2))(typescript@5.8.3)':
     dependencies:
@@ -10755,6 +10838,8 @@ snapshots:
     dependencies:
       entities: 4.5.0
 
+  partial-json@0.1.7: {}
+
   path-exists@4.0.0: {}
 
   path-is-absolute@1.0.1: {}
@@ -12072,6 +12157,8 @@ snapshots:
       validator: 13.15.15
     optionalDependencies:
       commander: 11.1.0
+
+  zod@3.25.76: {}
 
   zustand@5.0.8(@types/react@19.1.2)(react@19.2.3)(use-sync-external-store@1.5.0(react@19.2.3)):
     optionalDependencies:
