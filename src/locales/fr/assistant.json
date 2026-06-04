@@ -1,5 +1,6 @@
 {
   "caveat": "Ce chatbot utilise un grand modèle de langage pour fournir des réponses à vos questions. Les réponses sont imprévisibles et ne reflètent pas toujours la réalité.",
+  "greeting": "Bonjour! Comment puis-je vous aider avec Assemblyline ou l'analyse de logiciels malveillants aujourd'hui?",
   "clear": "Effacer tout l'historique des discussions",
   "insight.code": "Analyser le code",
   "insight.file": "Résumer l'analyse du fichier",

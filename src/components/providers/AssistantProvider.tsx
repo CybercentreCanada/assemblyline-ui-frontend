@@ -241,6 +241,21 @@ function AssistantProvider({ children }: AssistantProviderProps) {
                             overflow: 'auto'
                           }}
                         >
+                          {messages.length === 0 && !isLoading && (
+                            <Stack
+                              direction={isXS ? 'column' : 'row'}
+                              p={1}
+                              spacing={1}
+                              style={{ wordBreak: 'break-word' }}
+                            >
+                              <Avatar>
+                                <SmartToyOutlinedIcon />
+                              </Avatar>
+                              <Paper sx={{ p: 0, backgroundColor: theme.palette.background.paper }}>
+                                <AIMarkdown markdown={t('greeting')} truncated={false} dense />
+                              </Paper>
+                            </Stack>
+                          )}
                           {messages.map(message => (
                             <Stack
                               key={message.id}
