@@ -1,4 +1,4 @@
-import { BorealisProvider } from 'borealis-ui';
+import { ClueProvider } from '@cccsaurora/clue-ui';
 import type {
   AppOverrideConfigs,
   AppPreferenceConfigs,
@@ -92,8 +92,8 @@ export const AppProviderInner = <U extends AppUser>({
         <AppErrorProvider>
           <AppUserProvider service={user}>
             <AppSnackbarProvider>
-              <BorealisProvider
-                baseURL={location.origin + '/api/v4/proxy/borealis'}
+              <ClueProvider
+                baseURL={location.origin + '/api/v4/proxy/clue'}
                 getToken={() => null}
                 chunkSize={200}
                 maxRequestCount={3}
@@ -123,7 +123,7 @@ export const AppProviderInner = <U extends AppUser>({
                     </HighlightProvider>
                   </AssistantProvider>
                 </AppUserProvider>
-              </BorealisProvider>
+              </ClueProvider>
             </AppSnackbarProvider>
           </AppUserProvider>
         </AppErrorProvider>

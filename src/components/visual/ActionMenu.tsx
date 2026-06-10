@@ -1,7 +1,6 @@
 import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
 import FingerprintOutlinedIcon from '@mui/icons-material/FingerprintOutlined';
-import LandscapeOutlinedIcon from '@mui/icons-material/LandscapeOutlined';
 import PublishOutlinedIcon from '@mui/icons-material/PublishOutlined';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import SelectAllOutlinedIcon from '@mui/icons-material/SelectAllOutlined';
@@ -20,7 +19,8 @@ import type { Safelist } from 'components/models/base/safelist';
 import type { ExternalEnrichmentResults } from 'components/providers/ExternalLookupProvider';
 import Classification from 'components/visual/Classification';
 import ClassificationMismatchDialog from 'components/visual/ClassificationMismatchDialog';
-import { BOREALIS_TYPE_MAP } from 'components/visual/EnrichmentCustomChip';
+import { ClueIcon } from 'components/visual/ClueActions';
+import { CLUE_TYPE_MAP } from 'components/visual/EnrichmentCustomChip';
 import InputDialog from 'components/visual/InputDialog';
 import SafeBadItem from 'components/visual/SafeBadItem';
 import { isAccessible } from 'helpers/classificationParser';
@@ -38,7 +38,7 @@ const SAFELIST_ICON = <VerifiedUserOutlinedIcon style={{ marginRight: '16px' }} 
 const SUBMIT_ICON = <PublishOutlinedIcon style={{ marginRight: '16px' }} />;
 const TRAVEL_EXPLORE_ICON = <TravelExploreOutlinedIcon style={{ marginRight: '16px' }} />;
 const SIGNATURE_ICON = <FingerprintOutlinedIcon style={{ marginRight: '16px' }} />;
-const BORELIS_ICON = <LandscapeOutlinedIcon style={{ marginRight: '16px' }} />;
+const CLUE_ICON = <ClueIcon style={{ marginRight: '16px' }} />;
 
 const EXTERNAL_ICON = <HiOutlineExternalLink style={{ marginRight: '16px', fontSize: '22px' }} />;
 
@@ -78,7 +78,7 @@ export type ActionMenuProps = {
   highlight_key?: string;
   maliciousness?: 'suspicious' | 'malicious' | 'safe' | 'info' | 'highly_suspicious';
   setState: (coordinates: Coordinates) => void;
-  setBorealisDetails?: (value: boolean) => void;
+  setClueDetails?: (value: boolean) => void;
 };
 
 const WrappedActionMenu = ({
@@ -91,7 +91,7 @@ const WrappedActionMenu = ({
   setState,
   highlight_key = null,
   maliciousness = null,
-  setBorealisDetails = null
+  setClueDetails = null
 }: ActionMenuProps) => {
   const { t } = useTranslation();
   const { user: currentUser, configuration: currentUserConfig, c12nDef } = useALContext();
@@ -245,10 +245,10 @@ const WrappedActionMenu = ({
     handleClose();
   }, [setBadlistDialog, handleClose]);
 
-  const handleBorealisDetails = useCallback(() => {
-    setBorealisDetails(true);
+  const handleClueDetails = useCallback(() => {
+    setClueDetails(true);
     handleClose();
-  }, [setBorealisDetails, handleClose]);
+  }, [setClueDetails, handleClose]);
 
   const addToBadlist = useCallback(() => {
     const data = {
@@ -412,15 +412,12 @@ const WrappedActionMenu = ({
           state.mouseY !== null && state.mouseX !== null ? { top: state.mouseY, left: state.mouseX } : undefined
         }
       >
-        {'borealis' in currentUserConfig.ui.api_proxies &&
-          type in BOREALIS_TYPE_MAP &&
-          value !== null &&
-          setBorealisDetails && (
-            <MenuItem id="borealisID" dense onClick={handleBorealisDetails}>
-              {BORELIS_ICON}
-              {t('borealis')}
-            </MenuItem>
-          )}
+        {'clue' in currentUserConfig.ui.api_proxies && type in CLUE_TYPE_MAP && value !== null && setClueDetails && (
+          <MenuItem id="clueID" dense onClick={handleClueDetails}>
+            {CLUE_ICON}
+            {t('clue')}
+          </MenuItem>
+        )}
 
         {category === 'tag' && type.startsWith('file.rule.') && currentUser.roles.includes('signature_view') && (
           <MenuItem

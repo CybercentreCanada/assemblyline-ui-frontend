@@ -1,11 +1,11 @@
-import { HIDE_EVENT_ID } from 'borealis-ui/dist/data/event';
+import { HIDE_EVENT_ID } from '@cccsaurora/clue-ui/data/event';
 import useALContext from 'components/hooks/useALContext';
 import useHighlighter from 'components/hooks/useHighlighter';
 import useSafeResults from 'components/hooks/useSafeResults';
 import type { ActionMenuProps } from 'components/visual/ActionMenu';
 import ActionMenu from 'components/visual/ActionMenu';
 import CustomChip from 'components/visual/CustomChip';
-import EnrichmentCustomChip, { BOREALIS_TYPE_MAP } from 'components/visual/EnrichmentCustomChip';
+import EnrichmentCustomChip, { CLUE_TYPE_MAP } from 'components/visual/EnrichmentCustomChip';
 import ExternalLinks from 'components/visual/ExternalSearch';
 import type { PossibleColor } from 'helpers/colors';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -48,7 +48,7 @@ const WrappedTag: React.FC<TagProps> = ({
   const { showSafeResults } = useSafeResults();
 
   const [state, setState] = useState<typeof initialMenuState>(initialMenuState);
-  const [showBorealisDetails, setShowBorealisDetails] = useState<boolean>(false);
+  const [showClueDetails, setShowClueDetails] = useState<boolean>(false);
 
   const maliciousness = useMemo<string>(() => {
     let v = lvl || scoreToVerdict(score);
@@ -80,13 +80,13 @@ const WrappedTag: React.FC<TagProps> = ({
 
   useEffect(() => {
     return () => {
-      setShowBorealisDetails(false);
+      setShowClueDetails(false);
       setState(initialMenuState);
       window.dispatchEvent(
         new CustomEvent(HIDE_EVENT_ID, {
           detail: {
             type: 'details',
-            value: { type: BOREALIS_TYPE_MAP[type as keyof typeof BOREALIS_TYPE_MAP], value: value },
+            value: { type: CLUE_TYPE_MAP[type as keyof typeof CLUE_TYPE_MAP], value: value },
             classification
           }
         })
@@ -106,12 +106,12 @@ const WrappedTag: React.FC<TagProps> = ({
           classification={classification}
           highlight_key={highlight_key}
           maliciousness={maliciousness as ActionMenuProps['maliciousness']}
-          setBorealisDetails={setShowBorealisDetails}
+          setClueDetails={setShowClueDetails}
         />
       )}
-      {'borealis' in configuration.ui.api_proxies && type in BOREALIS_TYPE_MAP && value !== null ? (
+      {'clue' in configuration.ui.api_proxies && type in CLUE_TYPE_MAP && value !== null ? (
         <EnrichmentCustomChip
-          dataType={BOREALIS_TYPE_MAP[type as keyof typeof BOREALIS_TYPE_MAP]}
+          dataType={CLUE_TYPE_MAP[type as keyof typeof CLUE_TYPE_MAP]}
           dataValue={value}
           dataClassification={classification}
           hideDetails={true}
@@ -123,8 +123,8 @@ const WrappedTag: React.FC<TagProps> = ({
           onClick={highlight_key ? handleClick : null}
           fullWidth={fullWidth}
           onContextMenu={handleMenuClick}
-          forceDetails={showBorealisDetails}
-          setForceDetails={setShowBorealisDetails}
+          forceDetails={showClueDetails}
+          setForceDetails={setShowClueDetails}
           icon={<ExternalLinks category="tag" type={type} value={value} />}
         />
       ) : (

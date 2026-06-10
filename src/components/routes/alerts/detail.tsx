@@ -1,3 +1,4 @@
+import { Fetcher } from '@cccsaurora/clue-ui';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import {
@@ -13,7 +14,6 @@ import {
   useTheme
 } from '@mui/material';
 import Alert from '@mui/material/Alert';
-import { Fetcher } from 'borealis-ui';
 import ListCarousel from 'commons/addons/lists/carousel/ListCarousel';
 import ListNavigator from 'commons/addons/lists/navigator/ListNavigator';
 import { useAppUser } from 'commons/components/app/hooks';

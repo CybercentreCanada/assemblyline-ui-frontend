@@ -1,7 +1,7 @@
+import { Fetcher } from '@cccsaurora/clue-ui';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { Button, Collapse, Divider, Grid, Skeleton, styled, Typography, useTheme } from '@mui/material';
-import { Fetcher } from 'borealis-ui';
 import useALContext from 'components/hooks/useALContext';
 import type { Metadata } from 'components/models/base/submission';
 import ActionableText from 'components/visual/ActionableText';

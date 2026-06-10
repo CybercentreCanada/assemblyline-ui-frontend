@@ -1,13 +1,13 @@
+import { EnrichedChip } from '@cccsaurora/clue-ui';
 import type { TooltipProps } from '@mui/material';
 import { Tooltip, styled } from '@mui/material';
 import { darken } from '@mui/material/styles';
-import { EnrichedChip } from 'borealis-ui';
 import type { CustomChipProps } from 'components/visual/CustomChip';
 import { COLOR_MAP, SIZE_MAP } from 'components/visual/CustomChip';
 import type { FC } from 'react';
 import { memo } from 'react';
 
-export const BOREALIS_TYPE_MAP = {
+export const CLUE_TYPE_MAP = {
   'network.static.ip': 'ip',
   'network.dynamic.ip': 'ip',
   'network.static.domain': 'domain',
