@@ -14,16 +14,14 @@ export const ExternalLinkConfirmation = memo(({ href, children, ...props }: Exte
 
   const [open, setOpen] = useState<boolean>(false);
 
+  /**
+   * Normalizes href and only allows relative links or absolute http/https URLs.
+   * Returns null when href is empty or uses a disallowed scheme.
+   */
   const url = useMemo(() => {
-    const str = href?.toString() || null;
-    // If the href is empty, then we won't render a link at all
+    const str = href?.toString();
     if (!str) return null;
-    // Relative path to the same domain is allowed
-    else if (str.startsWith('/')) return str;
-    // Absolute URLs must start with http:// or https://
-    else if (str.startsWith('https://') || str.startsWith('http://')) return str;
-    // Anything else is considered invalid and will not render a link
-    else return null;
+    return str.startsWith('/') || str.startsWith('http://') || str.startsWith('https://') ? str : null;
   }, [href]);
 
   const handleContinue = useCallback(() => {
