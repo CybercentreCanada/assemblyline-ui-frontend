@@ -419,7 +419,7 @@ export const calculateFileHash = (file: File): Promise<string> =>
  * @param value - Hash value.
  */
 export const getHashQuery = (type: string, value: string): string =>
-  type === 'file' ? `sha256:"${value}"` : `${type}:"${value}"`;
+  type === 'file' ? `sha256:"${value}"` : type === 'url' ? `uri_info.uri:"${value}"` : `${type}:"${value}"`;
 
 /**
  * @param settings - Profile settings.
