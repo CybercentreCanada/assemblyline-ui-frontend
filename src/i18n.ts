@@ -185,7 +185,7 @@ const resources = {
     submissions: submissionsEN,
     submit: submitEN,
     tos: tosEN,
-    translation: { ...clueEN, ...translationEN },
+    translation: translationEN,
     user: userEN
   },
   fr: {
@@ -248,7 +248,7 @@ const resources = {
     submissions: submissionsFR,
     submit: submitFR,
     tos: tosFR,
-    translation: { ...clueFR, ...translationFR },
+    translation: translationFR,
     user: userFR
   }
 };

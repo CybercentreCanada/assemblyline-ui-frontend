@@ -1,4 +1,4 @@
-import { ClueProvider } from '@cccsaurora/clue-ui';
+import { ClueDatabaseContext, ClueProvider } from '@cccsaurora/clue-ui';
 import type {
   AppOverrideConfigs,
   AppPreferenceConfigs,
@@ -20,13 +20,16 @@ import AppSnackbarProvider from 'commons/components/app/providers/AppSnackbarPro
 import { AppStyledEngineProvider } from 'commons/components/app/providers/AppStyledEngineProvider';
 import { AppThemesContext, AppThemesProvider } from 'commons/components/app/providers/AppThemesProvider';
 import AppUserProvider from 'commons/components/app/providers/AppUserProvider';
+import { WhoAmIProps } from 'components/models/ui/user';
 import AssistantProvider from 'components/providers/AssistantProvider';
 import CarouselProvider from 'components/providers/CarouselProvider';
 import DrawerProvider from 'components/providers/DrawerProvider';
 import { ExternalLookupProvider } from 'components/providers/ExternalLookupProvider';
 import HighlightProvider from 'components/providers/HighlightProvider';
+import JSONEditor from 'components/visual/JSONEditor';
 import i18n from 'i18n';
 import { useCallback, useContext, useMemo, type ReactNode } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export type AppProviderProps<U extends AppUser> = {
   overrides?: AppOverrideConfigs;
@@ -39,6 +42,14 @@ export type AppProviderProps<U extends AppUser> = {
   children: ReactNode;
 };
 
+export type CluePublicConfig = {
+  chunk_size?: number;
+  debug_logging?: boolean;
+  default_timeout?: number;
+  iconify_url?: string;
+  max_request_count?: number;
+};
+
 export const AppProviderInner = <U extends AppUser>({
   user,
   search,
@@ -47,6 +58,14 @@ export const AppProviderInner = <U extends AppUser>({
   overrides,
   children
 }: Omit<AppProviderProps<U>, 'theme'>) => {
+  const i18next = useTranslation('clue');
+  const database = useContext(ClueDatabaseContext);
+
+  const clueConfig = useMemo<CluePublicConfig>(
+    () => (user as unknown as WhoAmIProps)?.configuration?.ui?.api_proxies?.clue as CluePublicConfig,
+    [user]
+  );
+
   const {
     autoDetectColorScheme,
     current: theme,
@@ -94,11 +113,21 @@ export const AppProviderInner = <U extends AppUser>({
             <AppSnackbarProvider>
               <ClueProvider
                 baseURL={location.origin + '/api/v4/proxy/clue'}
-                getToken={() => null}
-                chunkSize={200}
-                maxRequestCount={3}
-                defaultTimeout={60}
-                debugLogging={false}
+                chunkSize={clueConfig?.chunk_size || 200}
+                database={database}
+                debugLogging={clueConfig?.debug_logging || false}
+                defaultTimeout={clueConfig?.default_timeout || 60}
+                i18next={i18next}
+                maxRequestCount={clueConfig?.max_request_count || 3}
+                ReactJson={JSONEditor}
+                {...(clueConfig?.iconify_url
+                  ? {
+                      customIconify: clueConfig?.iconify_url,
+                      publicIconify: false
+                    }
+                  : {
+                      publicIconify: true
+                    })}
               >
                 <AppUserProvider service={user}>
                   <AssistantProvider>
