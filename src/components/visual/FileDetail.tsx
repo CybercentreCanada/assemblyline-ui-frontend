@@ -277,6 +277,12 @@ const WrappedFileDetail: React.FC<Props> = ({
   }, [sha256, badlistReason, file]);
 
   useEffect(() => {
+    // Tracks whether this effect run is still current. If the component unmounts (e.g. the
+    // drawer is closed) or sha256/sid change before the request resolves, `active` flips to
+    // false and the stale onSuccess becomes a no-op. Without this, a late response would call
+    // scrollToTop() on the now-offscreen drawer, scrolling the whole layout into view.
+    let active = true;
+
     setFile(null);
 
     if (sid && sha256) {
@@ -285,6 +291,7 @@ const WrappedFileDetail: React.FC<Props> = ({
         url: `/api/v4/submission/${sid}/file/${sha256}/`,
         body: liveResultKeys ? { extra_result_keys: liveResultKeys } : null,
         onSuccess: api_data => {
+          if (!active) return;
           scrollToTop('drawerTop');
           setFile(patchFileDetails(api_data.api_response));
         }
@@ -293,11 +300,16 @@ const WrappedFileDetail: React.FC<Props> = ({
       apiCall<File>({
         url: `/api/v4/file/result/${sha256}/`,
         onSuccess: api_data => {
+          if (!active) return;
           scrollToTop('fileDetailTop');
           setFile(patchFileDetails(api_data.api_response));
         }
       });
     }
+
+    return () => {
+      active = false;
+    };
     // eslint-disable-next-line
   }, [sha256, sid]);
 
