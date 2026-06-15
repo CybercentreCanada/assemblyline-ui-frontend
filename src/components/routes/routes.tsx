@@ -1,6 +1,6 @@
+import type { SnackbarEvents } from '@cccsaurora/clue-ui';
+import { SNACKBAR_EVENT_ID } from '@cccsaurora/clue-ui';
 import { Typography } from '@mui/material';
-import type { SnackbarEvents } from 'borealis-ui/dist/data/event';
-import { SNACKBAR_EVENT_ID } from 'borealis-ui/dist/data/event';
 import RedirectSubmission from 'commons/components/utils/RedirectSubmission';
 import useALContext from 'components/hooks/useALContext';
 import useDrawer from 'components/hooks/useDrawer';
