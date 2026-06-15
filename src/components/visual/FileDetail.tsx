@@ -113,7 +113,7 @@ const WrappedFileDetail: React.FC<Props> = ({
     else return `/file/viewer/${file?.file_info?.sha256}/${tab}/${location.search}${location.hash}`;
   }, [file?.file_info?.sha256, location.hash, location.pathname, location.search]);
 
-  const elementInViewport = element => {
+  const elementInViewport = useCallback((element: HTMLElement) => {
     const bounding = element.getBoundingClientRect();
     const myElementHeight = element.offsetHeight;
     const myElementWidth = element.offsetWidth;
@@ -127,14 +127,19 @@ const WrappedFileDetail: React.FC<Props> = ({
       return true;
     }
     return false;
-  };
+  }, []);
 
-  const scrollToTop = scrollToItem => {
-    const element = document.getElementById(scrollToItem);
-    if (element && !elementInViewport(element)) {
-      element.scrollIntoView();
-    }
-  };
+  const scrollToTop = useCallback(
+    (scrollToItem: string) => {
+      if (!globalDrawerOpened) return;
+      const element = document.getElementById(scrollToItem);
+      if (element && !elementInViewport(element)) {
+        element.scrollIntoView();
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [elementInViewport]
+  );
 
   const patchFileDetails = (data: File) => {
     const newData = { ...data };
@@ -277,12 +282,6 @@ const WrappedFileDetail: React.FC<Props> = ({
   }, [sha256, badlistReason, file]);
 
   useEffect(() => {
-    // Tracks whether this effect run is still current. If the component unmounts (e.g. the
-    // drawer is closed) or sha256/sid change before the request resolves, `active` flips to
-    // false and the stale onSuccess becomes a no-op. Without this, a late response would call
-    // scrollToTop() on the now-offscreen drawer, scrolling the whole layout into view.
-    let active = true;
-
     setFile(null);
 
     if (sid && sha256) {
@@ -291,7 +290,6 @@ const WrappedFileDetail: React.FC<Props> = ({
         url: `/api/v4/submission/${sid}/file/${sha256}/`,
         body: liveResultKeys ? { extra_result_keys: liveResultKeys } : null,
         onSuccess: api_data => {
-          if (!active) return;
           scrollToTop('drawerTop');
           setFile(patchFileDetails(api_data.api_response));
         }
@@ -300,16 +298,11 @@ const WrappedFileDetail: React.FC<Props> = ({
       apiCall<File>({
         url: `/api/v4/file/result/${sha256}/`,
         onSuccess: api_data => {
-          if (!active) return;
           scrollToTop('fileDetailTop');
           setFile(patchFileDetails(api_data.api_response));
         }
       });
     }
-
-    return () => {
-      active = false;
-    };
     // eslint-disable-next-line
   }, [sha256, sid]);
 
