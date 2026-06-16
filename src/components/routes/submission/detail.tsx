@@ -569,7 +569,7 @@ function WrappedSubmissionDetail() {
       if (submission != null) {
         apiCall<Submission>({
           method: isProfile ? 'PUT' : 'GET',
-          url: `/api/v4/submit/${resubmit_type}/${submission.files[0].sha256}/?copy_sid=${submission.sid}`,
+          url: `/api/v4/submit/${resubmit_type}/${submission?.files?.[0]?.sha256}/?copy_sid=${submission.sid}`,
           onSuccess: api_data => {
             showSuccessMessage(t('submit.success'));
             resetLiveMode();
@@ -1260,24 +1260,26 @@ function WrappedSubmissionDetail() {
                     transformOrigin={{ vertical: 'top', horizontal: 'right' }}
                   >
                     <List disablePadding>
-                      <ListItemButton
-                        component={Link}
-                        to={`/submit?hash=${submission.files[0].sha256}`}
-                        state={{
-                          c12n: submission.classification,
-                          metadata: submission.metadata,
-                          params: {
-                            filetype_override: submission?.params?.filetype_override
-                          }
-                        }}
-                        dense
-                        onClick={() => setResubmitAnchor(null)}
-                      >
-                        <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
-                          <TuneOutlinedIcon />
-                        </ListItemIcon>
-                        <ListItemText primary={t('resubmit.modify')} />
-                      </ListItemButton>
+                      {submission?.files?.[0]?.sha256 && (
+                        <ListItemButton
+                          component={Link}
+                          to={`/submit?hash=${submission.files[0].sha256}`}
+                          state={{
+                            c12n: submission.classification,
+                            metadata: submission.metadata,
+                            params: {
+                              filetype_override: submission?.params?.filetype_override
+                            }
+                          }}
+                          dense
+                          onClick={() => setResubmitAnchor(null)}
+                        >
+                          <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
+                            <TuneOutlinedIcon />
+                          </ListItemIcon>
+                          <ListItemText primary={t('resubmit.modify')} />
+                        </ListItemButton>
+                      )}
                       <ListItemButton dense onClick={() => resubmitWithType('dynamic', false)}>
                         <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
                           <OndemandVideoOutlinedIcon />
