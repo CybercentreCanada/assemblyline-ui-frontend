@@ -1,5 +1,15 @@
+import { APP_ROUTES } from 'app/app.routes';
 import type { AppRouterState, AppRouterStore } from 'core/router';
-import { addNode, addRoute, insertRightPanel, sanitizeAppRouterStore, setPanel, setRoute } from 'core/router';
+import {
+  addNode,
+  addRoute,
+  insertRightPanel,
+  removePanel,
+  sanitizeAppRouterStore,
+  setPanel,
+  setRoute,
+  updateRoute
+} from 'core/router';
 import { ROUTER_STORE_EXAMPLE } from 'core/router/router.models';
 import type { AppRouteLocation, InferAppRouteValuesFromRoute } from 'core/routes/routes.models';
 import type { Location, NavigateOptions, To as NavigateTo } from 'react-router';
@@ -225,58 +235,133 @@ export const getAppRouteValuesFromLocation = function <const Route extends AppRo
 };
 
 //*****************************************************************************************
-// Location
+// Location Encoding
 //*****************************************************************************************
 
 /**
- * @name getAppLinkFromLocation
- * @description Wraps a route location into the panel URL format `/?p=<href>`.
- * @param location - Route location with href and state
- * @returns Panel-wrapped location, or null when href is empty
+ * @name getHashFragmentFromLocation
+ * @description Encodes a single route href into the hash-parameter grammar.
+ * Format: `${pathname}${%23-encoded-hash}${search}` (order: pathname, hash, search).
+ * Internal hash values are encoded as %23 to distinguish from the panel-splitting # character.
+ * @param location - Route location containing href and optional state
+ * @returns Encoded panel fragment, or null when href is empty
  */
-export const getAppLinkFromLocation = (location: AppRouteLocation): AppRouteLocation | null => {
-  if (!location.href) return null;
-  const sp = new URLSearchParams();
-  sp.append('p', location.href);
-  return { href: `/?${sp.toString()}`, state: location.state };
+export const getHashFragmentFromLocation = ({ href }: AppRouteLocation): string | null => {
+  if (!href) return null;
+
+  const url = new URL(href, 'http://localhost');
+  const pathname = url.pathname;
+  const hash = url.hash ? url.hash.slice(1) : '';
+  const search = url.search;
+
+  return `${pathname}${hash ? `%23${encodeURIComponent(hash)}` : ''}${search}`;
 };
 
 /**
- * @name parseLocationSearch
- * @description Builds routes/panels/nodes from `p` query params in location.search.
- * @param store - Current router store
- * @param location - React Router location
- * @returns Updated router store
+ * @name getAppLinkFromLocation
+ * @description Wraps a route location into the multi-panel hash URL format `/v1#<encoded-panel>`.
+ * Preserves the incoming location state as-is.
+ * @param location - Route location with href and state
+ * @returns Panel-wrapped location with v1 pathname and hash encoding, or null when href is empty
  */
-export const parseLocationSearch = (store: AppRouterStore, location: Location<AppRouterState>): AppRouterStore => {
-  const searchParams = new URLSearchParams(location.search ?? '');
-  const hrefValues = searchParams.getAll('p');
+export const getAppLinkFromLocation = ({ href, state }: AppRouteLocation): AppRouteLocation | null => {
+  if (!href) return null;
+  const fragment = getHashFragmentFromLocation({ href, state });
+  if (!fragment) return null;
+  return { href: `/v1#${fragment}`, state };
+};
 
-  for (const value of hrefValues) {
-    if (!value) continue;
+/**
+ * @name syncStoreToLocation
+ * @description Computes the navigation target from the store and compares it against the current location. Returns null when no navigation is needed.
+ * Uses the multi-panel hash grammar: `/v1#${panel1}#${panel2}#${panel3}`.
+ * Encodes each panel from its current route href and always includes current panels/routes in navigation state.
+ * @param store - Current router store state
+ * @param location - Current React Router location
+ * @returns Navigation payload ({ to, options }), or null if the location already matches
+ */
+export const syncStoreToLocation = (
+  store: AppRouterStore,
+  location: Location<AppRouterState>
+): { to: NavigateTo; options: NavigateOptions } => {
+  if (location.state?.id && location.state.id === store.id) return null;
 
-    try {
-      const decoded = decodeURIComponent(value);
-      const url = new URL(decoded, window.location.origin);
-      const href = `${url.pathname}${url.search}${url.hash}`;
-      let newRouteKey: string | null = null;
+  const hashFragment = store.panels
+    .map(panel => {
+      const route = store.routes[panel.routeKey];
+      return route?.href ? getHashFragmentFromLocation(route) : null;
+    })
+    .filter((f): f is string => f !== null)
+    .join('#');
 
-      [store, newRouteKey] = addRoute(store, { href });
-      [store] = addNode(store, { routeKey: newRouteKey });
-      [store] = insertRightPanel(store, null, { routeKey: newRouteKey, tabbedRouteKeys: [newRouteKey] });
-    } catch {
-      /* intentionally ignored — invalid href values are skipped */
+  return {
+    to: `/v1#${hashFragment}`,
+    options: { state: { id: store.id, panels: store.panels, routes: store.routes } }
+  };
+};
+
+//*****************************************************************************************
+// Location Decoding
+//*****************************************************************************************
+
+/**
+ * @name getLocationFromHashFragment
+ * @description Decodes a panel fragment into an AppRouteLocation by reconstructing an href,
+ * matching it to an app route, parsing route values, and re-stringifying through route codecs.
+ * Current implementation derives `%23` from the parsed pathname portion of `new URL(fragment, base)`.
+ * @param fragment - Encoded panel fragment
+ * @returns Normalized AppRouteLocation, or null on parse/route-match failure
+ */
+export const getLocationFromHashFragment = (fragment: string): AppRouteLocation | null => {
+  if (!fragment) return null;
+
+  try {
+    const hashIndex = fragment.indexOf('%23');
+    const searchIndex = fragment.indexOf('?');
+
+    let pathname = '';
+    let hash = '';
+    let search = '';
+
+    if (hashIndex !== -1 && (searchIndex === -1 || hashIndex < searchIndex)) {
+      // Has hash before search (or no search)
+      pathname = fragment.substring(0, hashIndex);
+      const afterHash = fragment.substring(hashIndex + 3); // skip %23
+      const searchIdx = afterHash.indexOf('?');
+      if (searchIdx !== -1) {
+        hash = decodeURIComponent(afterHash.substring(0, searchIdx));
+        search = afterHash.substring(searchIdx);
+      } else {
+        hash = decodeURIComponent(afterHash);
+      }
+    } else if (searchIndex !== -1) {
+      // Has search but no hash
+      pathname = fragment.substring(0, searchIndex);
+      search = fragment.substring(searchIndex);
+    } else {
+      // Just pathname
+      pathname = fragment;
     }
-  }
 
-  store = sanitizeAppRouterStore(store);
-  store.id = generateRandomUUID();
-  return store;
+    const href = `${pathname}${search}${hash ? `#${hash}` : ''}`;
+
+    const appRoute = findAppRouteFromLocation(APP_ROUTES, { href });
+    if (!appRoute) return null;
+
+    const appRouteValues = getAppRouteValuesFromLocation(appRoute, { href });
+    if (!appRouteValues) return null;
+
+    const location = getLocationFromAppRouteValues(appRoute, appRouteValues);
+    return location?.href ? location : null;
+  } catch {
+    return null;
+  }
 };
 
 /**
  * @name parseLocationState
  * @description Merges location.state routes and panels into the store using upsert helpers.
+ * Routes are set first, then panels are set, and extra existing panels are trimmed.
  * @param store - Current router store
  * @param location - React Router location
  * @returns Updated router store
@@ -301,8 +386,65 @@ export const parseLocationState = (store: AppRouterStore, location: Location<App
 };
 
 /**
+ * @name parseLocationHash
+ * @description Reconciles the router store against the multi-panel hash grammar by decoding
+ * each fragment into an AppRouteLocation, updating existing panel routes when href changes,
+ * adding missing panels for extra fragments, and removing trailing panels not present in hash.
+ * @param store - Current router store
+ * @param location - React Router location
+ * @returns Updated router store
+ */
+export const parseLocationHash = (store: AppRouterStore, location: Location<AppRouterState>): AppRouterStore => {
+  const hashFragment = location.hash ? location.hash.slice(1) : '';
+
+  if (!hashFragment) return store;
+
+  const locations = hashFragment
+    .split('#')
+    .filter(Boolean)
+    .map(fragment => getLocationFromHashFragment(fragment))
+    .filter((h): h is AppRouteLocation => !!h?.href);
+
+  if (!locations.length) return store;
+
+  for (let i = 0; i < locations.length; i++) {
+    const newLocation = locations[i];
+
+    if (i < store.panels.length) {
+      // Update the existing panel's route with validated/normalized href.
+      const routeKey = store.panels[i].routeKey;
+      const currentRoute = routeKey ? store.routes[routeKey] : null;
+      const currentHref = currentRoute?.href;
+
+      if (routeKey && currentRoute && newLocation.href !== currentHref) {
+        store = updateRoute(store, routeKey, { href: newLocation.href, state: newLocation.state ?? null, age: -1 });
+      }
+    } else {
+      // No panel at this position yet — create route, node, and panel.
+      let newRouteKey: string | null = null;
+      [store, newRouteKey] = addRoute(store, { href: newLocation.href, age: -1 });
+      [store] = addNode(store, { routeKey: newRouteKey });
+      [store] = insertRightPanel(store, store.panels.length - 1, {
+        routeKey: newRouteKey,
+        tabbedRouteKeys: [newRouteKey]
+      });
+    }
+  }
+
+  // Remove trailing panels that are no longer in the hash.
+  while (store.panels.length > locations.length) {
+    store = removePanel(store, store.panels.length - 1);
+  }
+
+  store = sanitizeAppRouterStore(store);
+  store.id = generateRandomUUID();
+  return store;
+};
+
+/**
  * @name syncLocationToStore
  * @description Computes the next router store from the current location. Returns null when the store already matches.
+ * Current precedence is: hash grammar first, then location state.
  * @param store - Current router store state
  * @param location - Current React Router location
  * @returns The next store state, or null if no update is needed
@@ -312,37 +454,11 @@ export const syncLocationToStore = (store: AppRouterStore, location: Location<Ap
 
   try {
     if (!!location.state) return parseLocationState(store, location);
-    else if (!!location.search) return parseLocationSearch(store, location);
+    else if (!!location.hash) return parseLocationHash(store, location);
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error('error parsing the location', e);
   }
 
   return { ...ROUTER_STORE_EXAMPLE, maxPanels: store.maxPanels, maxNodes: store.maxNodes };
-};
-
-/**
- * @name syncStoreToLocation
- * @description Computes the navigation target from the store and compares it against the current location. Returns null when no navigation is needed.
- * @param store - Current router store state
- * @param location - Current React Router location
- * @returns Navigation payload ({ to, options }), or null if the location already matches
- */
-export const syncStoreToLocation = (
-  store: AppRouterStore,
-  location: Location<AppRouterState>
-): { to: NavigateTo; options: NavigateOptions } => {
-  if (location.state?.id && location.state.id === store.id) return null;
-
-  const searchParams = new URLSearchParams();
-
-  store.panels.forEach(panel => {
-    searchParams.append('p', store.routes[panel.routeKey].href);
-  });
-
-  return {
-    // to: { search: `/?${searchParams.toString()}` },
-    to: `/?${searchParams.toString()}`,
-    options: { state: { id: store.id, panels: store.panels, routes: store.routes } }
-  };
 };

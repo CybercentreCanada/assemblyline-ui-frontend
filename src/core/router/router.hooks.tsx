@@ -3,14 +3,14 @@ import { useAppPreferenceStore } from 'core/preference';
 import {
   addRoute,
   DEFAULT_APP_ROUTER_ROUTE,
-  findPanelKey,
+  findNextPanelKey,
   getNextRouteFromKey,
   getRouteFromKey,
-  insertRightPanel,
+  getRouteFromPanelKey,
   removePanel,
   sanitizeAppRouterStore,
-  updatePanel,
   updateRoute,
+  upsertPanel,
   useAppRouterStore,
   useAppSetRouterStore
 } from 'core/router';
@@ -138,14 +138,13 @@ export function useAppNavigate<const Path extends AppRoute['path']>() {
   const openRoute = useCallback(
     (to: SetStateAction<InferAppRouteValuesFromRoute<AppRoute>>) =>
       setRouterStore(store => {
-        debugger;
+        const nextPanelKey = findNextPanelKey(store, routeKey, navigationStyle);
         let nextLocation: AppRouteLocation = null;
-        const panelKey = findPanelKey(store, { routeKey });
         if (typeof to !== 'function') {
           const route = findAppRouteFromValues(APP_ROUTES, to);
           nextLocation = getLocationFromAppRouteValues(route, to);
         } else {
-          const previousLocation = getNextRouteFromKey(store, routeKey, navigationStyle);
+          const previousLocation = getRouteFromPanelKey(store, nextPanelKey);
           const route = findAppRouteFromLocation(APP_ROUTES, previousLocation);
           const previousRouteValues = getAppRouteValuesFromLocation(route, previousLocation);
           const nextRouteValues = to(previousRouteValues);
@@ -154,30 +153,15 @@ export function useAppNavigate<const Path extends AppRoute['path']>() {
 
         if (!nextLocation.href) return store;
 
-        let [initialStore, nextRouteKey] = addRoute(store, nextLocation);
-        let [initialStore, nextPanelKey] = upsertPanel(store, panelKey, {
+        const [store1, nextRouteKey] = addRoute(store, nextLocation);
+        let [store2] = upsertPanel(store1, nextPanelKey, {
           routeKey: nextRouteKey,
           temporaryRouteKey: nextRouteKey
         });
 
-        if (navigationStyle === 'push') {
-          if (panelKey >= initialStore.panels.length)
-            [initialStore] = insertRightPanel(initialStore, panelKey, {
-              routeKey: nextRouteKey,
-              temporaryRouteKey: nextRouteKey
-            });
-          else
-            initialStore = updatePanel(initialStore, panelKey, {
-              routeKey: nextRouteKey,
-              temporaryRouteKey: nextRouteKey
-            });
-        } else if (navigationStyle === 'loop') {
-          // Loop navigation keeps current panel assignment by design.
-        }
-
-        initialStore = sanitizeAppRouterStore(initialStore);
-        initialStore.id = generateRandomUUID();
-        return initialStore;
+        store2 = sanitizeAppRouterStore(store2);
+        store2.id = generateRandomUUID();
+        return store2;
       }),
     [navigationStyle, routeKey, setRouterStore]
   );

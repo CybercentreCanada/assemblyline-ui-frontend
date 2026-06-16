@@ -32,6 +32,7 @@ export {
   filterOrphanedNodes,
   filterOrphanedRoutes,
   filterPanelMissingRouteKeys,
+  findNextPanelKey,
   findNode,
   findNodeKey,
   findOldestNodeKey,

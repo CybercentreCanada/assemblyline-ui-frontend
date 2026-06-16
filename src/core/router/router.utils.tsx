@@ -37,24 +37,25 @@ export const findPanelKey = (
   return -1;
 };
 
+/**
+ * @name findNextPanelKey
+ * @description Resolves the next target panel index from the current route panel and navigation style.
+ * When the route is outside all panels, defaults to the first panel.
+ * @param store - Router store
+ * @param routeKey - Current route key
+ * @param navigationStyle - Panel navigation strategy
+ * @returns Next target panel index
+ */
 export const findNextPanelKey = (
   store: AppRouterStore,
   routeKey: keyof AppRouterStore['routes'],
   navigationStyle: 'push' | 'loop' = 'push'
-): AppRouterStore['routes'][string] => {
+): number => {
   const currentPanelKey = findPanelKey(store, { routeKey });
-  if (currentPanelKey < 0 || currentPanelKey >= store.panels.length) return { href: null, state: null };
 
-  let nextPanelKey: number | null = currentPanelKey;
-
-  if (navigationStyle === 'push') {
-    nextPanelKey = currentPanelKey >= 0 ? currentPanelKey + 1 : 0;
-  } else if (navigationStyle === 'loop') {
-    nextPanelKey = currentPanelKey >= 0 ? currentPanelKey + 1 : 0;
-    nextPanelKey = nextPanelKey >= store.panels.length ? 0 : nextPanelKey;
-  }
-
-  return getRouteFromPanelKey(store, nextPanelKey);
+  if (navigationStyle === 'push') return currentPanelKey + 1;
+  else if (navigationStyle === 'loop') return currentPanelKey + 1 >= store.maxPanels ? 0 : currentPanelKey + 1;
+  else return 0;
 };
 
 /**
