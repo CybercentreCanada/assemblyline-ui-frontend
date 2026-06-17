@@ -1,4 +1,4 @@
-import { APP_ROUTES } from 'app/app.routes';
+import { APP_ROUTES } from 'app/core.routes';
 import { useAppPreferenceStore } from 'core/preference';
 import {
   addRoute,

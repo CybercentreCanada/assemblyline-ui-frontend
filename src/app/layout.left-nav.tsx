@@ -30,7 +30,7 @@ import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
 import DataObjectOutlinedIcon from '@mui/icons-material/DataObjectOutlined';
 import NotificationImportantOutlinedIcon from '@mui/icons-material/NotificationImportantOutlined';
 import PublishOutlinedIcon from '@mui/icons-material/PublishOutlined';
-import { APP_ROUTES } from 'app/app.routes';
+import { APP_ROUTES } from 'app/core.routes';
 import { useAppConfig } from 'core/config';
 import type { AppLeftNavItem } from 'core/template';
 import { useMemo } from 'react';

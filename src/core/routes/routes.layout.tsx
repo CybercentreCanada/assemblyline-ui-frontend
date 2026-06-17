@@ -1,4 +1,4 @@
-import { APP_ROUTES } from 'app/app.routes';
+import { APP_ROUTES } from 'app/core.routes';
 import type { AppRouteLocation } from 'core/routes/routes.models';
 import { NotFoundPage } from 'pages/not-found/not-found.route';
 import { memo, useMemo } from 'react';

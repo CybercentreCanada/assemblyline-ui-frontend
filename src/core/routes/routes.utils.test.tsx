@@ -1,4 +1,4 @@
-import { APP_ROUTES } from 'app/app.routes';
+import { APP_ROUTES } from 'app/core.routes';
 import type { AppRouterState, AppRouterStore } from 'core/router';
 import { DEFAULT_APP_ROUTER_STORE } from 'core/router';
 import {
@@ -401,31 +401,31 @@ describe('getAppLinkFromLocation', () => {
 
   it('returns null when href is empty', () => {
     const next = getAppLinkFromLocation({ href: null, state: null } as never);
-// getLocationFromHashFragment
-//*****************************************************************************************
-describe('getLocationFromHashFragment', () => {
-  it('decodes pathname/search/hash fragment into a normalized app location', () => {
-    const location = getLocationFromHashFragment('/submissions%23results?query=hello');
-    expect(location?.href).toBe('/submissions?query=hello#results');
-  });
+    // getLocationFromHashFragment
+    //*****************************************************************************************
+    describe('getLocationFromHashFragment', () => {
+      it('decodes pathname/search/hash fragment into a normalized app location', () => {
+        const location = getLocationFromHashFragment('/submissions%23results?query=hello');
+        expect(location?.href).toBe('/submissions?query=hello#results');
+      });
 
-  it('decodes fragment with no hash marker', () => {
-    const location = getLocationFromHashFragment('/submissions?query=hello');
-    expect(location?.href).toBe('/submissions?query=hello');
-  });
+      it('decodes fragment with no hash marker', () => {
+        const location = getLocationFromHashFragment('/submissions?query=hello');
+        expect(location?.href).toBe('/submissions?query=hello');
+      });
 
-  it('returns null for unknown route fragment', () => {
-    const location = getLocationFromHashFragment('/not-a-real-route%23x?query=hello');
-    expect(location).toBeNull();
-  });
+      it('returns null for unknown route fragment', () => {
+        const location = getLocationFromHashFragment('/not-a-real-route%23x?query=hello');
+        expect(location).toBeNull();
+      });
 
-  it('returns null for empty fragment input', () => {
-    const location = getLocationFromHashFragment('');
-    expect(location).toBeNull();
-  });
-});
+      it('returns null for empty fragment input', () => {
+        const location = getLocationFromHashFragment('');
+        expect(location).toBeNull();
+      });
+    });
 
-//*****************************************************************************************
+    //*****************************************************************************************
     expect(next).toBeNull();
   });
 

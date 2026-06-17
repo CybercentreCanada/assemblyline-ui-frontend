@@ -79,6 +79,6 @@ export const useAppPreferences = () => {
 
       // slots: { layout: AppDrawerContainer }
     }),
-    []
+    [leftnavMenu]
   );
 };
