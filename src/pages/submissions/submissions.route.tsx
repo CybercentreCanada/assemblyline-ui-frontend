@@ -26,13 +26,13 @@ type SearchResults = {
   total: number;
 };
 
-const SubmissionSearch = memo(() => {
+const Submissions = memo(() => {
   const { t } = useTranslation(['submissions']);
   const theme = useTheme();
   const { apiCall } = useMyAPI();
   const { user: currentUser, indexes } = useALContext();
 
-  const search = useAppSearchParams('/submissions', s => s);
+  const search = useAppSearchParams<'/submissions'>();
   const navigate = useAppNavigate<'/submissions'>();
 
   const [submissionResults, setSubmissionResults] = useState<SearchResults>(null);
@@ -156,8 +156,8 @@ const SubmissionSearch = memo(() => {
   );
 });
 
-export const SubmissionSearchRoute = createAppRoute({
-  component: SubmissionSearch,
+export const SubmissionsRoute = createAppRoute({
+  component: Submissions,
   path: '/submissions',
   search: s => ({
     query: s.string(''),

@@ -35,8 +35,7 @@ const WrappedSubmissionsTable: React.FC<Props> = ({ submissionResults, allowSort
   const { t } = useTranslation(['search']);
   const { c12nDef } = useALContext();
 
-  const hasSearch = useAppSearchParams('/submissions', s => Boolean(s));
-
+  const search = useAppSearchParams<'/submissions'>();
   const navigate = useAppNavigate<'/submissions'>();
 
   return submissionResults ? (
@@ -94,7 +93,7 @@ const WrappedSubmissionsTable: React.FC<Props> = ({ submissionResults, allowSort
                 </DivTableCell>
                 <DivTableCell breakable>{maxLenStr(submission.params.description, 150)}</DivTableCell>
                 <DivTableCell style={{ whiteSpace: 'nowrap' }}>
-                  {!hasSearch ? (
+                  {!Boolean(search) ? (
                     submission.params.submitter
                   ) : (
                     <CustomChip

@@ -9,21 +9,16 @@ import { LeftNav } from 'pages/settings/components/LeftNav';
 import { RightNav } from 'pages/settings/components/RightNav';
 import { ServicesSection } from 'pages/settings/components/Services';
 import { SubmissionOptionsSection, SubmissionProfileDescription } from 'pages/settings/components/Submission';
-import type { SettingsStore } from 'pages/settings/settings.form';
 import { FormProvider, useForm } from 'pages/settings/settings.form';
 import { initializeSettings, loadDefaultProfile, loadSubmissionProfile } from 'pages/settings/settings.utils';
 import { memo, useCallback, useEffect } from 'react';
 import { ForbiddenRedirect } from 'ui/layouts/ForbiddenRedirect';
 import { PageLayout } from 'ui/layouts/PageLayout';
 
-type Params = {
-  tab: SettingsStore['state']['tab'];
-};
-
 const WrappedSettingsRoute = memo(() => {
   const form = useForm();
   const { rootRef, headerRef } = useTableOfContent();
-  const tabParam = useAppPathParams('/settings/:tab', s => s.tab);
+  const { tab: tabParam } = useAppPathParams<'/settings/:tab'>();
   const currentUser = useAppConfig(s => s.user);
   const configuration = useAppConfig(s => s.configuration);
   const settings = useAppConfig(s => s.settings);

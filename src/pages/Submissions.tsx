@@ -16,11 +16,11 @@ Test.displayName = 'Test';
 export const SubmissionsPage = memo(() => {
   // const { fileID } = useParams();
 
-  const query = useAppPathParams('/submissions/:query', s => s.query);
+  const query = useAppPathParams<'/submissions/:query'>()?.query;
 
-  const offset = useAppSearchParams('/submissions/:query', s => s.get('offset'));
+  const offset = useAppSearchParams<'/submissions/:query'>()?.get?.('offset');
 
-  const [search] = useAppRouteStore(s => s.params);
+  const search = useAppRouteStore(s => s.params as unknown);
 
   // const queryParam = useParams<typeof SubmissionsRoute>()(s => s.query);
 
