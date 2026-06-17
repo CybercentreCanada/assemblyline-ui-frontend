@@ -1,5 +1,5 @@
-import { APP_ROUTES } from 'app/app.routes';
 import { i18n } from 'app/core.i18n';
+import { APP_ROUTES } from 'app/core.routes';
 import { AppApiProvider } from 'core/api';
 import { AppConfigStoreProvider } from 'core/config/config.providers';
 import { AppErrorProvider } from 'core/error';
