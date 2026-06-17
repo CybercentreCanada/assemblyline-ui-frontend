@@ -467,8 +467,7 @@ const WrappedContainerDialog = ({
                 reset={showReset(tempContainer, defaults, 'registry_type')}
                 options={[
                   { value: 'docker', primary: t('Docker') },
-                  { value: 'harbor', primary: t('Harbor') },
-                  { value: 'jfrog', primary: t('JFrog') }
+                  { value: 'harbor', primary: t('Harbor') }
                 ]}
                 onChange={(e, v: string) => handleContainerValueChange('registry_type', v)}
               />
