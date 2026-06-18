@@ -1,9 +1,14 @@
+import { AccountRoute } from 'pages/account/account.route';
 import { HelpAPIRoute } from 'pages/help/api/help-api.route';
 import { Page1Route } from 'pages/Page1';
 import { Page2Route } from 'pages/Page2';
-import { SettingsRoute } from 'pages/settings/settings.route';
+import { SettingsRootRoute, SettingsRoute } from 'pages/settings/settings.route';
+import { SubmissionDetailRoute } from 'pages/submission-detail/submission-detail.route';
+import { SubmissionRedirectRoute } from 'pages/submission-redirect/submission-redirect.route';
+import { SubmissionReportRoute } from 'pages/submission-report/submission-report.route';
 import { SubmissionsRoute } from 'pages/submissions/submissions.route';
 import { SubmitRoute } from 'pages/submit/submit.route';
+import { UserRoute } from 'pages/user/user.route';
 
 export const APP_ROUTES = [
   // Old
@@ -20,10 +25,16 @@ export const APP_ROUTES = [
   // ToSRoute
 
   // New
+  AccountRoute,
   HelpAPIRoute,
-  SubmitRoute,
+  SettingsRootRoute,
   SettingsRoute,
-  SubmissionsRoute
+  SubmissionDetailRoute,
+  SubmissionRedirectRoute,
+  SubmissionReportRoute,
+  SubmissionsRoute,
+  SubmitRoute,
+  UserRoute
 ] as const;
 
 declare global {

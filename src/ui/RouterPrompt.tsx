@@ -1,5 +1,4 @@
-import { useBlocker } from 'components/hooks/useBlocker';
-import { GD_EVENT_PREVENTED, GD_EVENT_PROCEED } from 'components/providers/DrawerProvider';
+import { useAppBlocker } from 'core/router';
 import useDrawer from 'deprecated/hooks/useDrawer';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -60,7 +59,7 @@ export function RouterPrompt(props) {
   }, [setDrawerClosePrompt]);
 
   // Setup route blocker
-  useBlocker(blocker, when && !cancel);
+  useAppBlocker(blocker, when && !cancel);
 
   // Unblock and allow transaction if successful
   const routeOnSuccess = useCallback(
@@ -69,6 +68,8 @@ export function RouterPrompt(props) {
         setCancel(true);
         window.dispatchEvent(new CustomEvent(GD_EVENT_PROCEED));
         if (currentTX) setTimeout(() => currentTX.retry(), 250);
+      } else if (currentTX?.reset) {
+        currentTX.reset();
       }
     },
     [currentTX]

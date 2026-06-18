@@ -1,8 +1,8 @@
 import { Tooltip, useTheme } from '@mui/material';
 import type { ColumnDef } from '@tanstack/react-table';
 import { createColumnHelper } from '@tanstack/react-table';
-import { DNS_RECORD_TYPES } from 'components/models/ontology/results/network';
 import type { SandboxBody, SandboxNetflowItem } from 'models/base/result_body';
+import { DNS_RECORD_TYPES } from 'models/ontology/results/network';
 import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import CustomChip from 'ui/CustomChip';

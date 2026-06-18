@@ -43,6 +43,7 @@ export const AppRouterSync = memo(() => {
       if (location.state?.id && location.state.id === store.id) return;
 
       const nextNavigation = syncStoreToLocation(store, location);
+
       if (nextNavigation) void navigate(nextNavigation.to, nextNavigation.options);
     });
   }, [location, navigate, routerStoreApi]);

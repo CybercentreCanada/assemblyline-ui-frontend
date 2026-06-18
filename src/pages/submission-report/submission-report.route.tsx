@@ -1,0 +1,337 @@
+import AssistantIcon from '@mui/icons-material/Assistant';
+import AssistantOutlinedIcon from '@mui/icons-material/AssistantOutlined';
+import InfoIcon from '@mui/icons-material/Info';
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import ListAltOutlinedIcon from '@mui/icons-material/ListAltOutlined';
+import PrintOutlinedIcon from '@mui/icons-material/PrintOutlined';
+import type { TooltipProps } from '@mui/material';
+import { Box, Grid, Skeleton, styled, Tooltip, Typography, useTheme } from '@mui/material';
+import { PageCenter } from '@tui/core';
+import { createAppRoute } from 'core/routes';
+import useALContext from 'deprecated/hooks/useALContext';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useMySnackbar from 'deprecated/hooks/useMySnackbar';
+import type { SubmissionReport } from 'models/api/submission_report';
+import { ForbiddenPage } from 'pages/forbidden/forbidden.route';
+import AISummarySection from 'pages/submission-detail/components/ai_summary';
+import Attack from 'pages/submission-report/components/attack';
+import AttributionBanner from 'pages/submission-report/components/attribution_banner';
+import FileTreeSection from 'pages/submission-report/components/file_tree';
+import GeneralInformation from 'pages/submission-report/components/general_info';
+import Heuristics from 'pages/submission-report/components/heuristics';
+import Metadata from 'pages/submission-report/components/metadata';
+import Tags from 'pages/submission-report/components/tags';
+import { memo, useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate, useParams } from 'react-router';
+import { filterObject } from 'shared/utils/utils';
+import { IconButton } from 'ui/buttons/IconButton';
+import Classification from 'ui/Classification';
+
+type ParamProps = {
+  id: string;
+};
+
+const NoPrintTooltip = memo(
+  styled(Tooltip)<TooltipProps>(() => ({
+    '@media print': {
+      display: 'none !important'
+    }
+  }))
+);
+
+const SubmissionReportPage = memo(() => {
+  const { t } = useTranslation(['submissionReport']);
+  const { id } = useParams<ParamProps>();
+  const { user: currentUser, c12nDef, configuration, settings } = useALContext();
+  const { showErrorMessage, showWarningMessage } = useMySnackbar();
+  const navigate = useNavigate();
+  const { apiCall } = useMyAPI();
+  const theme = useTheme();
+  const { addInsight, removeInsight } = useAppAssistant();
+
+  const [report, setReport] = useState<SubmissionReport>(null);
+  const [originalReport, setOriginalReport] = useState<SubmissionReport>(null);
+  const [showInfoContent, setShowInfoContent] = useState<boolean>(false);
+  const [useAIReport, setUseAIReport] = useState<boolean>(false);
+
+  const cleanupReport = useCallback(() => {
+    const recursiveFileTreeCleanup = (tree, impFiles) => {
+      for (const key of Object.keys(tree)) {
+        const data = tree[key];
+        // Cleanup children
+        recursiveFileTreeCleanup(data.children, impFiles);
+
+        // Check if current key needs cleaning
+        if (
+          data.score < configuration.submission.verdicts.suspicious &&
+          data.score >= configuration.submission.verdicts.info &&
+          Object.keys(data.children).length === 0
+        ) {
+          const idx = impFiles.indexOf(key);
+          if (idx !== -1) {
+            impFiles.splice(idx, 1);
+          }
+        }
+      }
+
+      return impFiles;
+    };
+
+    if (originalReport && !showInfoContent) {
+      // Cleanup attack matrix
+      const tempMatrix = { ...originalReport.attack_matrix };
+      for (const cat in tempMatrix) {
+        tempMatrix[cat] = filterObject(tempMatrix[cat], value => value.h_type !== 'info');
+        if (Object.keys(tempMatrix[cat]).length === 0) {
+          delete tempMatrix[cat];
+        }
+      }
+
+      // Cleanup heuristics
+      const tempHeur = { ...originalReport.heuristics, info: {} };
+      const tempHeurSec = { ...originalReport.heuristic_sections };
+      for (const key in tempHeurSec) {
+        tempHeurSec[key] = [
+          ...tempHeurSec[key].filter(
+            heur =>
+              heur.heuristic.score >= configuration.submission.verdicts.suspicious ||
+              heur.heuristic.score < configuration.submission.verdicts.info
+          )
+        ];
+      }
+
+      // Cleanup important files
+      const tempImpFiles = recursiveFileTreeCleanup(originalReport.file_tree, [...originalReport.important_files]);
+
+      // Cleanup tags
+      const tempTags = { ...originalReport.tags };
+      for (const cat in tempTags) {
+        for (const type in tempTags[cat]) {
+          tempTags[cat][type] = filterObject(tempTags[cat][type], value => value.h_type !== 'info');
+          if (Object.keys(tempTags[cat][type]).length === 0) {
+            delete tempTags[cat][type];
+          }
+        }
+        if (Object.keys(tempTags[cat]).length === 0) {
+          delete tempTags[cat];
+        }
+      }
+
+      setReport({
+        ...originalReport,
+        attack_matrix: tempMatrix,
+        heuristics: tempHeur,
+        heuristic_sections: tempHeurSec,
+        important_files: tempImpFiles,
+        tags: tempTags
+      });
+    } else {
+      setReport(originalReport);
+    }
+  }, [originalReport, showInfoContent, configuration]);
+
+  useEffect(() => {
+    if (currentUser.roles.includes('submission_view')) {
+      apiCall({
+        url: `/api/v4/submission/report/${id}/`,
+        onSuccess: api_data => {
+          setOriginalReport(api_data.api_response);
+        },
+        onFailure: api_data => {
+          if (api_data.api_status_code === 425) {
+            showWarningMessage(t('error.too_early'));
+            navigate(`/submission/detail/${id}`);
+          } else if (api_data.api_status_code === 404) {
+            showErrorMessage(t('error.notfound'));
+            navigate('/notfound');
+          } else {
+            showErrorMessage(api_data.api_error_message);
+          }
+        }
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (originalReport) {
+      cleanupReport();
+    }
+  }, [cleanupReport, originalReport, showInfoContent]);
+
+  useEffect(() => {
+    if (useAIReport) {
+      setShowInfoContent(false);
+    }
+  }, [useAIReport]);
+
+  useEffect(() => {
+    addInsight({ type: 'report', value: id });
+    addInsight({ type: 'submission', value: id });
+
+    return () => {
+      removeInsight({ type: 'report', value: id });
+      removeInsight({ type: 'submission', value: id });
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
+
+  useEffect(() => {
+    if (configuration.ui.ai.enabled) {
+      setUseAIReport(settings.executive_summary);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [settings]);
+
+  return currentUser.roles.includes('submission_view') ? (
+    <PageCenter margin={4} width="100%">
+      <Box
+        sx={{
+          '@media print': {
+            fontSize: '90%'
+          },
+          textAlign: 'left'
+        }}
+      >
+        {c12nDef.enforce && (
+          <div style={{ marginBottom: theme.spacing(4) }}>
+            <Classification size="tiny" c12n={report ? report.classification : null} />
+          </div>
+        )}
+        <div style={{ marginBottom: theme.spacing(4) }}>
+          <Grid container alignItems="center">
+            <Grid flexGrow={1}>
+              <div>
+                <Typography variant="h4">{t('title')}</Typography>
+                <Typography variant="caption">
+                  {report ? report.sid : <Skeleton style={{ width: '10rem' }} />}
+                </Typography>
+              </div>
+            </Grid>
+            <Grid size={{ xs: 'grow' }} className="print-only" style={{ textAlign: 'right' }}>
+              <img src="/images/banner.svg" alt="Assemblyline Banner" style={{ height: theme.spacing(8) }} />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 3 }} className="no-print">
+              <div style={{ textAlign: 'right' }}>
+                {report ? (
+                  <>
+                    {!useAIReport && (
+                      <NoPrintTooltip
+                        title={t(showInfoContent ? 'hide_info' : 'show_info')}
+                        PopperProps={{ disablePortal: true }}
+                      >
+                        <IconButton onClick={() => setShowInfoContent(!showInfoContent)} size="large">
+                          {showInfoContent ? <InfoIcon /> : <InfoOutlinedIcon />}
+                        </IconButton>
+                      </NoPrintTooltip>
+                    )}
+                    {configuration.ui.ai.enabled && (
+                      <NoPrintTooltip
+                        title={t(useAIReport ? 'use_not_ai' : 'use_ai')}
+                        PopperProps={{ disablePortal: true }}
+                      >
+                        <IconButton onClick={() => setUseAIReport(!useAIReport)} size="large">
+                          {useAIReport ? <AssistantIcon /> : <AssistantOutlinedIcon />}
+                        </IconButton>
+                      </NoPrintTooltip>
+                    )}
+                    <NoPrintTooltip title={t('print')} PopperProps={{ disablePortal: true }}>
+                      <IconButton onClick={() => window.print()} size="large">
+                        <PrintOutlinedIcon />
+                      </IconButton>
+                    </NoPrintTooltip>
+                    <Tooltip title={t('detail_view')}>
+                      <IconButton
+                        to={{ replaceRoute: { path: `/submission/detail/:id`, params: { id: report.sid } } }}
+                        size="large"
+                      >
+                        <ListAltOutlinedIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </>
+                ) : (
+                  <div style={{ display: 'inline-flex' }}>
+                    <Skeleton
+                      variant="circular"
+                      height="2.5rem"
+                      width="2.5rem"
+                      style={{ margin: theme.spacing(0.5) }}
+                    />
+                    {configuration.ui.ai.enabled && (
+                      <Skeleton
+                        variant="circular"
+                        height="2.5rem"
+                        width="2.5rem"
+                        style={{ margin: theme.spacing(0.5) }}
+                      />
+                    )}
+                    <Skeleton
+                      variant="circular"
+                      height="2.5rem"
+                      width="2.5rem"
+                      style={{ margin: theme.spacing(0.5) }}
+                    />
+                    <Skeleton
+                      variant="circular"
+                      height="2.5rem"
+                      width="2.5rem"
+                      style={{ margin: theme.spacing(0.5) }}
+                    />
+                  </div>
+                )}
+              </div>
+            </Grid>
+          </Grid>
+        </div>
+
+        <AttributionBanner report={report} />
+        <GeneralInformation report={report} />
+        {report && report.report_filtered && (
+          <div
+            style={{
+              marginTop: theme.spacing(4),
+              pageBreakAfter: 'avoid',
+              pageBreakInside: 'avoid'
+            }}
+          >
+            <Typography variant="subtitle1">
+              <b>**{t('warning')}</b>: {t('warning.text')}
+            </Typography>
+          </div>
+        )}
+        {report && report.report_partial && (
+          <div
+            style={{
+              marginTop: theme.spacing(4),
+              pageBreakAfter: 'avoid',
+              pageBreakInside: 'avoid'
+            }}
+          >
+            <Typography variant="subtitle1">
+              <b>**{t('warning')}</b>: {t('warning.partial')}
+            </Typography>
+          </div>
+        )}
+        <Metadata report={report} />
+        {useAIReport && (
+          <AISummarySection type={'submission' as const} id={report ? report.sid : null} noTitle detailed />
+        )}
+        {!useAIReport && <Heuristics report={report} />}
+        {!useAIReport && <Attack report={report} />}
+        <Tags report={report} />
+        <FileTreeSection report={report} />
+      </Box>
+    </PageCenter>
+  ) : (
+    <ForbiddenPage />
+  );
+});
+
+export const SubmissionReportRoute = createAppRoute({
+  component: SubmissionReportPage,
+  path: '/submission/report/:id',
+  params: s => ({
+    id: s.string()
+  })
+});

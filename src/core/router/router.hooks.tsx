@@ -29,8 +29,9 @@ import {
 } from 'core/routes';
 import { findAppRouteFromValues, getAppLinkFromLocation } from 'core/routes/routes.utils';
 import type { SetStateAction } from 'react';
-import { useCallback, useMemo } from 'react';
-import type { Location } from 'react-router';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
+import type { BlockerFunction, Location, NavigationType } from 'react-router';
+import { useBlocker } from 'react-router';
 import { generateRandomUUID } from 'shared/utils/app.utils';
 
 //*****************************************************************************************
@@ -42,7 +43,11 @@ export function useAppTo<const Path extends AppRoute['path']>(to: AppLinkTo<Path
 
   const [toKey, toValue] = useMemo(() => {
     const entries = Object.entries(to as AppLinkToOptions<Path>);
-    return !entries.length ? [null, null] : entries[0];
+    return (!entries.length ? [null, null] : entries[0]) as
+      | [null, null]
+      | ['openRoute' | 'replaceRoute', SetStateAction<InferAppRouteValuesFromRoute<AppRoute>>]
+      | ['replaceSearchObject', SetStateAction<InferAppRouteSearchValuesFromPath<Path>>]
+      | ['replaceURLSearchParams', SetStateAction<URLSearchParams>];
   }, [to]);
 
   const previousLocation = useAppRouterStore(store => {
@@ -52,7 +57,7 @@ export function useAppTo<const Path extends AppRoute['path']>(to: AppLinkTo<Path
   });
 
   return useMemo<AppRouteLocation>(() => {
-    if (!toKey || !previousLocation?.href) return { href: null, state: null };
+    if (!toKey) return { href: null, state: null };
 
     const route = findAppRouteFromLocation(APP_ROUTES, previousLocation);
 
@@ -74,12 +79,7 @@ export function useAppTo<const Path extends AppRoute['path']>(to: AppLinkTo<Path
       case 'replaceSearchObject': {
         const previousRouteValues = getAppRouteValuesFromLocation(route, previousLocation);
         const previousSearchObject = (previousRouteValues?.search ?? {}) as InferAppRouteSearchValuesFromPath<Path>;
-        const nextSearchObject =
-          typeof toValue === 'function'
-            ? (toValue as (prev: InferAppRouteSearchValuesFromPath<Path>) => InferAppRouteSearchValuesFromPath<Path>)(
-                previousSearchObject
-              )
-            : (toValue as InferAppRouteSearchValuesFromPath<Path>);
+        const nextSearchObject = typeof toValue === 'function' ? toValue(previousSearchObject) : toValue;
 
         const nextRouteValues = {
           ...(previousRouteValues as InferAppRouteValuesFromRoute<AppRoute>),
@@ -95,10 +95,7 @@ export function useAppTo<const Path extends AppRoute['path']>(to: AppLinkTo<Path
       case 'replaceURLSearchParams': {
         const url = new URL(previousLocation.href, 'http://localhost');
         const prevSearch = new URLSearchParams(url.search);
-        const nextSearch: URLSearchParams =
-          typeof toValue === 'function'
-            ? (toValue as (prev: URLSearchParams) => URLSearchParams)(prevSearch)
-            : (toValue as URLSearchParams);
+        const nextSearch: URLSearchParams = typeof toValue === 'function' ? toValue(prevSearch) : toValue;
 
         const searchStr = nextSearch.toString();
         const tempLocation: Location = {
@@ -130,13 +127,14 @@ export function useAppTo<const Path extends AppRoute['path']>(to: AppLinkTo<Path
 //*****************************************************************************************
 // useAppNavigate
 //*****************************************************************************************
+
 export function useAppNavigate<const Path extends AppRoute['path']>() {
   const routeKey = useAppRouteKey();
   const setRouterStore = useAppSetRouterStore();
   const navigationStyle = useAppPreferenceStore(s => s?.router?.navigation);
 
   const openRoute = useCallback(
-    (to: SetStateAction<InferAppRouteValuesFromRoute<AppRoute>>) =>
+    (to: SetStateAction<InferAppRouteValuesFromRoute<AppRoute>>, options: NavigationOptions = null) =>
       setRouterStore(store => {
         const nextPanelKey = findNextPanelKey(store, routeKey, navigationStyle);
         let nextLocation: AppRouteLocation = null;
@@ -167,13 +165,14 @@ export function useAppNavigate<const Path extends AppRoute['path']>() {
   );
 
   const replaceRoute = useCallback(
-    (to: SetStateAction<InferAppRouteValuesFromRoute<AppRoute>>) =>
+    (to: SetStateAction<InferAppRouteValuesFromRoute<AppRoute>>, options: NavigationOptions = null) =>
       setRouterStore(store => {
         const previousLocation = getRouteFromKey(store, routeKey);
-        const route = findAppRouteFromLocation(APP_ROUTES, previousLocation);
-        const previousRouteValues = getAppRouteValuesFromLocation(route, previousLocation);
-        const nextRouteValues = typeof to === 'function' ? to(previousRouteValues) : to;
-        const nextLocation = getLocationFromAppRouteValues(route, nextRouteValues);
+        const previousAppRoute = findAppRouteFromLocation(APP_ROUTES, previousLocation);
+        const previousAppRouteValues = getAppRouteValuesFromLocation(previousAppRoute, previousLocation);
+        const nextAppRouteValues = typeof to === 'function' ? to(previousAppRouteValues) : to;
+        const nextAppRoute = findAppRouteFromValues(APP_ROUTES, nextAppRouteValues);
+        const nextLocation = getLocationFromAppRouteValues(nextAppRoute, nextAppRouteValues);
         store = updateRoute(store, routeKey, { ...nextLocation, age: -1 });
         store = sanitizeAppRouterStore(store);
         store.id = generateRandomUUID();
@@ -183,7 +182,7 @@ export function useAppNavigate<const Path extends AppRoute['path']>() {
   );
 
   const replaceSearchObject = useCallback(
-    (to: SetStateAction<InferAppRouteSearchValuesFromPath<Path>>) =>
+    (to: SetStateAction<InferAppRouteSearchValuesFromPath<Path>>, options: NavigationOptions = null) =>
       setRouterStore(store => {
         const previousLocation = getRouteFromKey(store, routeKey);
         const route = findAppRouteFromLocation(APP_ROUTES, previousLocation);
@@ -208,7 +207,7 @@ export function useAppNavigate<const Path extends AppRoute['path']>() {
   );
 
   const replaceURLSearchParams = useCallback(
-    (to: SetStateAction<URLSearchParams>) =>
+    (to: SetStateAction<URLSearchParams>, options: NavigationOptions = null) =>
       setRouterStore(store => {
         const previousLocation = getRouteFromKey(store, routeKey);
         const route = findAppRouteFromLocation(APP_ROUTES, previousLocation);
@@ -262,4 +261,68 @@ export function useAppNavigate<const Path extends AppRoute['path']>() {
     replaceURLSearchParams,
     closePanel
   };
+}
+
+//*****************************************************************************************
+// useAppBlocker
+//*****************************************************************************************
+
+export type AppBlockerTransition = {
+  currentLocation: Location;
+  nextLocation: Location;
+  historyAction: NavigationType;
+  retry: () => void;
+  reset: () => void;
+};
+
+export type AppBlocker = (tx: AppBlockerTransition) => void;
+
+export function useAppBlocker(blocker: AppBlocker, when = true) {
+  const txArgsRef = useRef<Pick<AppBlockerTransition, 'currentLocation' | 'nextLocation' | 'historyAction'> | null>(
+    null
+  );
+  const handledLocationKeyRef = useRef<string | null>(null);
+
+  const shouldBlock = useCallback<BlockerFunction>(
+    ({ currentLocation, nextLocation, historyAction }) => {
+      txArgsRef.current = { currentLocation, nextLocation, historyAction };
+      return !!when;
+    },
+    [when]
+  );
+
+  const rrBlocker = useBlocker(shouldBlock);
+
+  useEffect(() => {
+    if (rrBlocker.state !== 'blocked') {
+      handledLocationKeyRef.current = null;
+      return;
+    }
+
+    const nextLocation = rrBlocker.location;
+    if (!nextLocation) return;
+
+    const locationKey = nextLocation.key || `${nextLocation.pathname}${nextLocation.search}${nextLocation.hash}`;
+    if (handledLocationKeyRef.current === locationKey) return;
+    handledLocationKeyRef.current = locationKey;
+
+    const txArgs = txArgsRef.current;
+    if (!txArgs) return;
+
+    blocker({
+      currentLocation: txArgs.currentLocation,
+      nextLocation,
+      historyAction: txArgs.historyAction,
+      retry: () => rrBlocker.proceed?.(),
+      reset: () => rrBlocker.reset?.()
+    });
+  }, [blocker, rrBlocker]);
+
+  useEffect(() => {
+    if (!when && rrBlocker.state === 'blocked') {
+      rrBlocker.reset?.();
+    }
+  }, [rrBlocker, when]);
+
+  return rrBlocker;
 }

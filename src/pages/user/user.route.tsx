@@ -23,25 +23,25 @@ import {
   useTheme
 } from '@mui/material';
 import Autocomplete from '@mui/material/Autocomplete';
-import Skeleton from '@mui/material/Skeleton';
 import { red } from '@mui/material/colors';
-import PageCenter from 'commons/components/pages/PageCenter';
-import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
-import useALContext from 'components/hooks/useALContext';
-import useMyAPI from 'components/hooks/useMyAPI';
-import useMySnackbar from 'components/hooks/useMySnackbar';
-import type { User } from 'components/models/base/user';
-import APIKeys from 'components/routes/user/api_keys';
-import Apps from 'components/routes/user/apps';
-import DisableOTP from 'components/routes/user/disable_otp';
-import OTP from 'components/routes/user/otp';
-import SecurityToken from 'components/routes/user/token';
-import Classification from 'components/visual/Classification';
-import ConfirmationDialog from 'components/visual/ConfirmationDialog';
-import CustomChip from 'components/visual/CustomChip';
-import React, { memo, useMemo, useRef, useState } from 'react';
+import Skeleton from '@mui/material/Skeleton';
+import { PageCenter } from '@tui/core';
+import { createAppRoute } from 'core/routes';
+import useALContext from 'deprecated/hooks/useALContext';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useMySnackbar from 'deprecated/hooks/useMySnackbar';
+import type { User } from 'models/base/user';
+import APIKeys from 'pages/user/components/api_keys';
+import Apps from 'pages/user/components/apps';
+import DisableOTP from 'pages/user/components/disable_otp';
+import OTP from 'pages/user/components/otp';
+import SecurityToken from 'pages/user/components/token';
+import React, { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useLocation, useNavigate, useParams } from 'react-router';
+import Classification from 'ui/Classification';
+import ConfirmationDialog from 'ui/ConfirmationDialog';
+import CustomChip from 'ui/CustomChip';
 
 type ParsedUser = Omit<
   User,
@@ -90,7 +90,11 @@ const ClickRow = ({ children, enabled, onClick, chevron = false, ...other }) => 
   </TableRow>
 );
 
-function User({ username = null }: UserProps) {
+type UserPageProps = {
+  username?: string | null;
+};
+
+export const UserPage = memo(({ username = null }: UserPageProps) => {
   const { t } = useTranslation(['user']);
   const theme = useTheme();
   const { id } = useParams<ParamProps>();
@@ -296,7 +300,7 @@ function User({ username = null }: UserProps) {
     }
   };
 
-  useEffectOnce(() => {
+  useEffect(() => {
     // Make interface editable
     setEditable(currentUser.is_admin || currentUser.roles.includes('self_manage'));
 
@@ -304,7 +308,8 @@ function User({ username = null }: UserProps) {
     reloadUser();
 
     getQuotas();
-  });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return !currentUser.is_admin && location.pathname.includes('/admin/') ? (
     <Navigate to="/forbidden" replace />
@@ -1071,6 +1076,16 @@ function User({ username = null }: UserProps) {
       </Grid>
     </PageCenter>
   );
-}
+});
 
-export default memo(User);
+//*****************************************************************************************
+// Forbidden Route
+//*****************************************************************************************
+
+export const UserRoute = createAppRoute({
+  component: UserPage,
+  path: '/user/:id',
+  params: s => ({
+    id: s.string()
+  })
+});

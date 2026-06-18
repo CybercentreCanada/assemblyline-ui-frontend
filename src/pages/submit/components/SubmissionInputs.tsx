@@ -727,7 +727,7 @@ AnalyzeButton.displayName = 'AnalyzeButton';
 export const FileSubmit = memo(({ onClick = () => null, ...props }: ButtonProps) => {
   const { t } = useTranslation(['submit']);
   const form = useForm();
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // TODO: to swap for useAppNavigate()
   const apiCall = useApiCallFn();
   const { closeSnackbar, showErrorMessage, showSuccessMessage } = useAppSnackbar();
   const settings = useAppConfig(s => s.settings);
@@ -844,7 +844,7 @@ FileSubmit.displayName = 'FileSubmit';
 const RawSubmit = memo(({ onClick = () => null, ...props }: ButtonProps) => {
   const { t } = useTranslation(['submit']);
   const form = useForm();
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // TODO: to swap for useAppNavigate()
   const apiCall = useApiCallFn();
   const { closeSnackbar, showErrorMessage, showSuccessMessage } = useAppSnackbar();
 
@@ -901,7 +901,7 @@ RawSubmit.displayName = 'RawSubmit';
 const HashSubmit = memo(({ onClick = () => null, ...props }: ButtonProps) => {
   const { t } = useTranslation(['submit']);
   const form = useForm();
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // TODO: to swap for useAppNavigate()
   const apiCall = useApiCallFn();
   const { closeSnackbar, showErrorMessage, showSuccessMessage } = useAppSnackbar();
 

@@ -1,6 +1,7 @@
-export { AppLink } from './router.components';
-export type { AppLinkProps } from './router.components';
-export { useAppNavigate, useAppTo } from './router.hooks';
+export { AppLink, AppNavigate } from './router.components';
+export type { AppLinkProps, AppNavigateProps } from './router.components';
+export { useAppBlocker, useAppNavigate, useAppTo } from './router.hooks';
+export type { AppBlocker, AppBlockerTransition } from './router.hooks';
 export { AppRouterLayout, AppRouterNode, AppRouterPanel } from './router.layout';
 export {
   DEFAULT_APP_ROUTER_NODE,

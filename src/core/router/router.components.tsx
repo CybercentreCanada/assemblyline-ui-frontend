@@ -1,7 +1,7 @@
 import { useAppNavigate, useAppTo } from 'core/router';
 import type { AppLinkTo } from 'core/routes';
 import type { ForwardedRef } from 'react';
-import { forwardRef, memo, useCallback } from 'react';
+import { forwardRef, memo, useCallback, useLayoutEffect, useRef } from 'react';
 import type { LinkProps as RouterLinkProps } from 'react-router';
 import { Link } from 'react-router';
 
@@ -50,3 +50,36 @@ export const AppLink = memo(forwardRef(WrappedAppLink)) as <const Path extends A
 ) => React.JSX.Element | null;
 
 (AppLink as unknown as { displayName: string }).displayName = 'AppLink';
+
+//*****************************************************************************************
+// App Navigate
+//*****************************************************************************************
+
+export type AppNavigateProps<Path extends AppRoute['path']> = {
+  to: AppLinkTo<Path>;
+};
+
+export function WrappedAppNavigate<const Path extends AppRoute['path']>({ to }: AppNavigateProps<Path>) {
+  const navigate = useAppNavigate<Path>();
+  const hasNavigatedRef = useRef<boolean>(false);
+
+  useLayoutEffect(() => {
+    if (hasNavigatedRef.current) return;
+    hasNavigatedRef.current = true;
+
+    if ('openRoute' in to) navigate.openRoute(to.openRoute);
+    else if ('replaceRoute' in to) navigate.replaceRoute(to.replaceRoute);
+    else if ('replaceSearchObject' in to) navigate.replaceSearchObject(to.replaceSearchObject);
+    else if ('replaceURLSearchParams' in to) navigate.replaceURLSearchParams(to.replaceURLSearchParams);
+  }, [navigate, to]);
+
+  return null;
+}
+
+WrappedAppNavigate.displayName = 'WrappedAppNavigate';
+
+export const AppNavigate = memo(WrappedAppNavigate) as <const Path extends AppRoute['path']>(
+  props: AppNavigateProps<Path>
+) => React.JSX.Element | null;
+
+(AppNavigate as unknown as { displayName: string }).displayName = 'AppNavigate';

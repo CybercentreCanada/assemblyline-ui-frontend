@@ -13,6 +13,7 @@ import {
   Fade,
   IconButton,
   Paper,
+  Popper,
   Stack,
   TextField,
   Tooltip,
@@ -20,13 +21,14 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import AppAvatar from 'commons/components/display/AppAvatar';
-import AIMarkdown from 'components/visual/AiMarkdown';
-import CustomChip from 'components/visual/CustomChip';
-import { ThinkingBadge } from 'components/visual/ThinkingBadge';
+import { AppAvatar } from '@tui/core';
 import { useAppInterfaceStore } from 'core/interface';
+import { t } from 'i18next';
+import { useAppAssistant } from 'layout/assistant/assistant.hooks';
 import { memo } from 'react';
-import { useAppAssistant } from './assistant.hooks';
+import AIMarkdown from 'ui/AiMarkdown';
+import CustomChip from 'ui/CustomChip';
+import { ThinkingBadge } from 'ui/ThinkingBadge';
 
 export const AppAssistantLayout = memo(() => {
   const theme = useTheme();
@@ -43,6 +45,8 @@ export const AppAssistantLayout = memo(() => {
   const hasInsights = useAppInterfaceStore(s => s.assistant.hasInsights);
 
   const { assistantAllowed, addInsight, removeInsight, toggleAssistant } = useAppAssistant();
+
+  return null;
 
   return (
     <>

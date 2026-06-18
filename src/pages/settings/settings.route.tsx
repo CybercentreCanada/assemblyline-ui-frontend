@@ -15,7 +15,7 @@ import { memo, useCallback, useEffect } from 'react';
 import { ForbiddenRedirect } from 'ui/layouts/ForbiddenRedirect';
 import { PageLayout } from 'ui/layouts/PageLayout';
 
-const WrappedSettingsRoute = memo(() => {
+const WrappedSettingsPage = memo(() => {
   const form = useForm();
   const { rootRef, headerRef } = useTableOfContent();
   const { tab: tabParam } = useAppPathParams<'/settings/:tab'>();
@@ -84,12 +84,12 @@ const WrappedSettingsRoute = memo(() => {
     />
   );
 });
-WrappedSettingsRoute.displayName = 'WrappedSettingsRoute';
+WrappedSettingsPage.displayName = 'WrappedSettingsPage';
 
 const SettingsPage = memo(() => (
   <TableOfContentProvider>
     <FormProvider>
-      <WrappedSettingsRoute />
+      <WrappedSettingsPage />
     </FormProvider>
   </TableOfContentProvider>
 ));
@@ -101,4 +101,9 @@ export const SettingsRoute = createAppRoute({
   params: s => ({
     tab: s.string()
   })
+});
+
+export const SettingsRootRoute = createAppRoute({
+  component: SettingsPage,
+  path: '/settings'
 });

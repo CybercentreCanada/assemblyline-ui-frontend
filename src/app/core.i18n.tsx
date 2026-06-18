@@ -33,10 +33,16 @@ import notFoundEN from 'pages/not-found/not-found.i18n.en.json';
 import notFoundFR from 'pages/not-found/not-found.i18n.fr.json';
 import settingsEN from 'pages/settings/settings.i18n.en.json';
 import settingsFR from 'pages/settings/settings.i18n.fr.json';
+import submissionDetailEN from 'pages/submission-detail/submission-detail.i18n.en.json';
+import submissionDetailFR from 'pages/submission-detail/submission-detail.i18n.fr.json';
+import submissionReportEN from 'pages/submission-report/submission-report.i18n.en.json';
+import submissionReportFR from 'pages/submission-report/submission-report.i18n.fr.json';
 import submissionsEN from 'pages/submissions/submissions.i18n.en.json';
 import submissionsFR from 'pages/submissions/submissions.i18n.fr.json';
 import submitEN from 'pages/submit/submit.i18n.en.json';
 import submitFR from 'pages/submit/submit.i18n.fr.json';
+import userEN from 'pages/user/user.i18n.en.json';
+import userFR from 'pages/user/user.i18n.fr.json';
 import { initReactI18next } from 'react-i18next';
 import inputsEN from 'ui/inputs/i18n/inputs.i18n.en.json';
 import inputsFR from 'ui/inputs/i18n/inputs.i18n.fr.json';
@@ -57,9 +63,12 @@ export const I18N_RESSOURCES = {
     notifications: notificationsEN,
     quota: quotaEN,
     settings: settingsEN,
+    submissionDetail: submissionDetailEN,
+    submissionReport: submissionReportEN,
     submissions: submissionsEN,
     submit: submitEN,
-    tos: tosEN
+    tos: tosEN,
+    user: userEN
   },
   fr: {
     api: apiFR,
@@ -76,9 +85,12 @@ export const I18N_RESSOURCES = {
     notifications: notificationsFR,
     quota: quotaFR,
     settings: settingsFR,
+    submissionDetail: submissionDetailFR,
+    submissionReport: submissionReportFR,
     submissions: submissionsFR,
     submit: submitFR,
-    tos: tosFR
+    tos: tosFR,
+    user: userFR
   }
 };
 
