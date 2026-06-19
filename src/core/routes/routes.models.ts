@@ -7,7 +7,6 @@ import type {
   SearchParamBlueprintMap,
   SearchParamEngine
 } from 'features/search-params';
-import type { SetStateAction } from 'react';
 
 //*****************************************************************************************
 // Create Route Types
@@ -121,39 +120,3 @@ export type InferAppRouteValuesFromPath<R extends AppRoute> =
 
 /** Result of a route guard check. */
 export type GuardResult = true | 'forbidden' | 'notfound' | `redirect:${string}`;
-
-//*****************************************************************************************
-// Parsed Route Location
-//*****************************************************************************************
-
-/** Structured output from parsing an href into route data. */
-export type ParsedRouteLocation = {
-  route: CreatedAppRoute | null;
-  pathname: string | null;
-  params: Record<string, unknown> | null;
-  search: unknown;
-  hash: string | null;
-};
-
-export type OpenRouteTo<Route extends AppRoute> =
-  | InferAppRouteValuesFromRoute<Route>
-  | ((prev: InferAppRouteValuesFromRoute<Route>) => InferAppRouteValuesFromRoute<Route>);
-
-export type ReplaceSearchTo<Path extends AppRoute['path']> =
-  | InferAppRouteSearchValuesFromPath<Path>
-  | ((prev: InferAppRouteSearchValuesFromPath<Path>) => InferAppRouteSearchValuesFromPath<Path>);
-
-export type AppRouteSearchFromPath<Path extends AppRoute['path']> = InferAppRouteSearchValuesFromPath<Path>;
-
-export type AppLinkTo<Path extends AppRoute['path']> =
-  | { openRoute: SetStateAction<InferAppRouteValuesFromRoute<AppRoute>> }
-  | { replaceRoute: SetStateAction<InferAppRouteValuesFromRoute<AppRoute>> }
-  | { replaceSearchObject: SetStateAction<InferAppRouteSearchValuesFromPath<Path>> }
-  | { replaceURLSearchParams: SetStateAction<URLSearchParams> };
-
-export type AppLinkToOptions<Path extends AppRoute['path']> = {
-  openRoute: SetStateAction<InferAppRouteValuesFromRoute<AppRoute>>;
-  replaceRoute: SetStateAction<InferAppRouteValuesFromRoute<AppRoute>>;
-  replaceSearchObject: SetStateAction<InferAppRouteSearchValuesFromPath<Path>>;
-  replaceURLSearchParams: SetStateAction<URLSearchParams>;
-};

@@ -1,5 +1,5 @@
-import type { AppRouteStore } from 'core/routes/routes.providers';
-import { useAppRouteStore } from 'core/routes/routes.providers';
+import type { AppRouteStore } from 'core/routes';
+import { useAppRouteStore } from 'core/routes';
 import type { InferPathParamBlueprintMapFromPath, InferPathParamValuesFromBlueprintMap } from 'features/path-params';
 import type { InferSearchParamSnapshotFromEngine } from 'features/search-params';
 

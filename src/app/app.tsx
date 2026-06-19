@@ -1,5 +1,4 @@
 import { i18n } from 'app/core.i18n';
-import { APP_ROUTES } from 'app/core.routes';
 import { AppApiProvider } from 'core/api';
 import { AppConfigStoreProvider } from 'core/config/config.providers';
 import { AppErrorProvider } from 'core/error';
@@ -111,7 +110,7 @@ import { memo, StrictMode } from 'react';
 
 export const AppLayout = memo(() => (
   <AppAuthLayout>
-    <AppRouterLayout routes={APP_ROUTES}>
+    <AppRouterLayout>
       <AppDrawerLayout content={<AppRouterPanel panelKey={1} />}>
         <AppTemplateLayout>
           <AppRouterPanel panelKey={0} />

@@ -1,6 +1,4 @@
-import { useAppRouterStore } from 'core/router/router.providers';
-import { findNode } from 'core/router/router.utils';
-import type { createAppRoute } from 'core/routes';
+import { findNode, useAppRouterStore } from 'core/router';
 import { AppRouteKeyProvider, AppRoutes } from 'core/routes';
 import { InPortal, OutPortal } from 'features/portal';
 import type { PropsWithChildren } from 'react';
@@ -30,11 +28,9 @@ AppRouterPanel.displayName = 'AppRouterPanel';
 export type AppRouterNodeProps = {
   /** Key identifying this node in the router store. */
   nodeKey: string;
-  /** Routes definition array. */
-  routes: readonly ReturnType<typeof createAppRoute>[];
 };
 
-export const AppRouterNode = memo(({ nodeKey, routes }: AppRouterNodeProps) => {
+export const AppRouterNode = memo(({ nodeKey }: AppRouterNodeProps) => {
   const routeKey = useAppRouterStore(s => s?.nodes?.[nodeKey]?.routeKey || undefined);
   const portal = useAppRouterStore(s => s?.nodes?.[nodeKey]?.portal || undefined);
   const href = useAppRouterStore(s => s?.routes?.[routeKey]?.href || undefined);
@@ -57,12 +53,9 @@ AppRouterNode.displayName = 'AppRouterNode';
 // App Router Layout
 //*****************************************************************************************
 
-export type AppRouterLayoutProps = PropsWithChildren & {
-  /** Routes definition array. */
-  routes: readonly ReturnType<typeof createAppRoute>[];
-};
+export type AppRouterLayoutProps = PropsWithChildren;
 
-export const AppRouterLayout = memo(({ children, routes }: AppRouterLayoutProps) => {
+export const AppRouterLayout = memo(({ children }: AppRouterLayoutProps) => {
   const nodeKeys = useAppRouterStore(s => Object.keys(s.nodes));
 
   return (
@@ -70,7 +63,7 @@ export const AppRouterLayout = memo(({ children, routes }: AppRouterLayoutProps)
       {children}
       <div style={{ display: 'none' }}>
         {nodeKeys.map(nodeKey => (
-          <AppRouterNode key={nodeKey} nodeKey={nodeKey} routes={routes} />
+          <AppRouterNode key={nodeKey} nodeKey={nodeKey} />
         ))}
       </div>
     </>

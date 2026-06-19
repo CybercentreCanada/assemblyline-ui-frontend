@@ -1,5 +1,5 @@
-import type { AppRouterState, AppRouterStore } from 'core/router/router.models';
-import { DEFAULT_APP_ROUTER_STORE } from 'core/router/router.models';
+import type { AppRouterState, AppRouterStore } from 'core/router';
+import { DEFAULT_APP_ROUTER_STORE } from 'core/router';
 import { syncLocationToStore, syncStoreToLocation } from 'core/routes';
 import { createAppStore } from 'features/store/createAppStore';
 import type { PropsWithChildren } from 'react';
@@ -27,26 +27,74 @@ export const AppRouterSync = memo(() => {
   const navigate = useNavigate();
   const routerStoreApi = useAppRouterStoreApi();
   const setRouterStore = useAppSetRouterStore();
+  // const appliedStoreIdRef = useRef<string | null>(null);
 
-  // Sync React Router -> App Router Store
+  // Sync Location -> App Router Store
   useEffect(() => {
     if (!setRouterStore) return;
 
     setRouterStore(store => syncLocationToStore(store, location));
   }, [location, setRouterStore]);
 
-  // Sync App Router Store -> React Router
+  // Sync App Router Store -> Location
   useEffect(() => {
     if (!routerStoreApi) return;
 
     return routerStoreApi.subscribe((store: AppRouterStore) => {
-      if (location.state?.id && location.state.id === store.id) return;
+      for (const [i] of store.panels.entries()) {
+        if (store.panels[i].navigation && !store.panels[i].blocker.isBlocked) {
+          switch (store.panels[i].navigation.type) {
+            case 'create':
+              // setRouterStore(s =>s)
+              break;
+            case 'update':
+              // setRouterStore(s =>s)
+              break;
+            case 'delete':
+              // setRouterStore(s =>s)
+              break;
+          }
+        }
+      }
 
-      const nextNavigation = syncStoreToLocation(store, location);
+      if (!location.state?.id || location.state.id !== store.id) {
+        const nextNavigation = syncStoreToLocation(store, location);
+        if (nextNavigation) void navigate(nextNavigation.to, nextNavigation.options);
+      }
 
-      if (nextNavigation) void navigate(nextNavigation.to, nextNavigation.options);
+      // if (appliedStoreIdRef.current && appliedStoreIdRef.current === store.id) {
+      //   appliedStoreIdRef.current = null;
+      //   return;
+      // }
+
+      // if (location.state?.id && location.state.id === store.id) return;
+
+      // const panelKey = store.panels.findIndex(panel => !!panel.navigation?.to);
+
+      // if (panelKey >= 0) {
+      //   if (store.panels[panelKey].blocker?.isBlocked) return;
+
+      //   const replace = !!store.panels[panelKey].navigation.replace;
+      //   let nextStore: AppRouterStore | null = null;
+
+      //   setRouterStore(currentStore => {
+      //     nextStore = applyPanelNavigation(currentStore, panelKey);
+      //     appliedStoreIdRef.current = nextStore.id;
+      //     return nextStore;
+      //   });
+
+      //   if (!nextStore) return;
+
+      //   const nextNavigation = syncStoreToLocation(nextStore, location);
+      //   if (nextNavigation) void navigate(nextNavigation.to, { ...nextNavigation.options, replace });
+      //   return;
+      // }
+
+      // const nextNavigation = syncStoreToLocation(store, location);
+
+      // if (nextNavigation) void navigate(nextNavigation.to, nextNavigation.options);
     });
-  }, [location, navigate, routerStoreApi]);
+  }, [location, navigate, routerStoreApi, setRouterStore]);
 
   return null;
 });

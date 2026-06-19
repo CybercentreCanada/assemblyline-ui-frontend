@@ -10,6 +10,7 @@ import useMyAPI from 'deprecated/hooks/useMyAPI';
 import type { IndexDefinition } from 'models/api/user';
 import type { SubmissionIndexed } from 'models/base/submission';
 import { ForbiddenPage } from 'pages/forbidden/forbidden.route';
+import SubmissionsTable from 'pages/search/components/submissions';
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { safeFieldValue } from 'shared/utils/utils';
@@ -17,7 +18,6 @@ import { PageContainer } from 'ui/pages/PageContainer';
 import { PageFullWidth } from 'ui/pages/PageFullWidth';
 import { DEFAULT_SUGGESTION } from 'ui/SearchBar/search-textfield';
 import SearchHeader from 'ui/SearchBar/SearchHeader';
-import SubmissionsTable from 'ui/SearchResult/submissions';
 
 type SearchResults = {
   items: SubmissionIndexed[];

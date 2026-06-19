@@ -1,5 +1,10 @@
-import type { AppRouterStore } from 'core/router/router.models';
-import { DEFAULT_APP_ROUTER_NODE, DEFAULT_APP_ROUTER_PANEL, DEFAULT_APP_ROUTER_ROUTE } from 'core/router/router.models';
+import type { AppRouterBlocker, AppRouterNavigation, AppRouterStore } from 'core/router';
+import {
+  DEFAULT_APP_ROUTER_NAVIGATION,
+  DEFAULT_APP_ROUTER_NODE,
+  DEFAULT_APP_ROUTER_PANEL,
+  DEFAULT_APP_ROUTER_ROUTE
+} from 'core/router';
 import { createReversePortalNode } from 'features/portal';
 import { deepCompare, generateRandomUUID } from 'shared/utils/app.utils';
 
@@ -607,7 +612,7 @@ export const getNextRouteFromKey = (
   navigationStyle: 'push' | 'loop' = 'push'
 ): AppRouterStore['routes'][string] => {
   const currentPanelKey = findPanelKey(store, { routeKey });
-  if (currentPanelKey < 0 || currentPanelKey >= store.panels.length) return { href: null, state: null };
+  if (currentPanelKey < 0 || currentPanelKey >= store.panels.length) return DEFAULT_APP_ROUTER_ROUTE;
 
   let nextPanelKey: number | null = currentPanelKey;
 
@@ -1047,5 +1052,306 @@ export const sanitizeAppRouterStore = (store: AppRouterStore): AppRouterStore =>
   store = sanitizePanels(store);
   store = sanitizeNodes(store);
   store = sanitizeRoutes(store);
+  return store;
+};
+
+// //*****************************************************************************************
+// // Panel Navigation Guards & Requests
+// //*****************************************************************************************
+
+// /**
+//  * @name registerPanelNavigationBlocker
+//  * @description Registers navigation blocker state for a specific panel.
+//  * @param store - Router store
+//  * @param panelKey - Target panel index
+//  * @param blocker - Navigation blocker to register
+//  * @returns Updated router store
+//  */
+// export const registerPanelNavigationBlocker = (
+//   store: AppRouterStore,
+//   panelKey: number,
+//   blocker: AppRouterPanelNavigationBlocker
+// ): AppRouterStore => {
+//   if (panelKey < 0 || panelKey >= store.panels.length) return store;
+
+//   store.panels[panelKey].navigationBlocker = {
+//     ...DEFAULT_APP_ROUTER_PANEL_NAVIGATION_BLOCKER,
+//     ...blocker,
+//     enabled: true
+//   };
+
+//   return store;
+// };
+
+// /**
+//  * @name unregisterPanelNavigationBlocker
+//  * @description Clears navigation blocker state for a specific panel.
+//  * @param store - Router store
+//  * @param panelKey - Target panel index
+//  * @returns Updated router store
+//  */
+// export const unregisterPanelNavigationBlocker = (store: AppRouterStore, panelKey: number): AppRouterStore => {
+//   if (panelKey < 0 || panelKey >= store.panels.length) return store;
+
+//   store.panels[panelKey].navigationBlocker = { ...DEFAULT_APP_ROUTER_PANEL_NAVIGATION_BLOCKER };
+//   return store;
+// };
+
+// /**
+//  * @name shouldPanelBlockNavigation
+//  * @description Checks whether a specific panel currently blocks navigation.
+//  * @param store - Router store
+//  * @param panelKey - Target panel index
+//  * @returns True when navigation should be blocked for this panel
+//  */
+// export const shouldPanelBlockNavigation = (store: AppRouterStore, panelKey: number): boolean => {
+//   if (panelKey < 0 || panelKey >= store.panels.length) return false;
+
+//   const blocker = store.panels[panelKey].navigationBlocker;
+//   if (!blocker.enabled || !blocker.shouldBlock) return false;
+
+//   return blocker.shouldBlock();
+// };
+
+// /**
+//  * @name setPanelNavigationRequest
+//  * @description Stores/updates panel-scoped navigation request state.
+//  * @param store - Router store
+//  * @param panelKey - Target panel index
+//  * @param request - Partial request payload
+//  * @returns Updated router store
+//  */
+// export const setPanelNavigationRequest = (
+//   store: AppRouterStore,
+//   panelKey: number,
+//   request: Partial<AppRouterPanelNavigationRequest>
+// ): AppRouterStore => {
+//   if (panelKey < 0 || panelKey >= store.panels.length) return store;
+
+//   store.panels[panelKey].navigationRequest = {
+//     ...DEFAULT_APP_ROUTER_PANEL_NAVIGATION_REQUEST,
+//     ...store.panels[panelKey].navigationRequest,
+//     ...request
+//   };
+
+//   if (!store.panels[panelKey].navigationRequest.id) {
+//     store.panels[panelKey].navigationRequest.id = generateRandomUUID();
+//   }
+
+//   return store;
+// };
+
+// /**
+//  * @name clearPanelNavigationRequest
+//  * @description Clears panel-scoped navigation request state.
+//  * @param store - Router store
+//  * @param panelKey - Target panel index
+//  * @returns Updated router store
+//  */
+// export const clearPanelNavigationRequest = (store: AppRouterStore, panelKey: number): AppRouterStore => {
+//   if (panelKey < 0 || panelKey >= store.panels.length) return store;
+
+//   store.panels[panelKey].navigationRequest = { ...DEFAULT_APP_ROUTER_PANEL_NAVIGATION_REQUEST };
+//   return store;
+// };
+
+// /**
+//  * @name setPanelNavigationOptions
+//  * @description Updates navigation options for a panel navigation request.
+//  * @param store - Router store
+//  * @param panelKey - Target panel index
+//  * @param options - Navigation options to set
+//  * @returns Updated router store
+//  */
+// export const setPanelNavigationOptions = (
+//   store: AppRouterStore,
+//   panelKey: number,
+//   options: AppNavigationOptions
+// ): AppRouterStore => {
+//   if (panelKey < 0 || panelKey >= store.panels.length) return store;
+
+//   store.panels[panelKey].navigationRequest.options = {
+//     ...store.panels[panelKey].navigationRequest.options,
+//     ...options
+//   };
+//   return store;
+// };
+
+// /**
+//  * @name resetPanelNavigationOptions
+//  * @description Resets navigation options for a panel navigation request.
+//  * @param store - Router store
+//  * @param panelKey - Target panel index
+//  * @returns Updated router store
+//  */
+// export const resetPanelNavigationOptions = (store: AppRouterStore, panelKey: number): AppRouterStore => {
+//   if (panelKey < 0 || panelKey >= store.panels.length) return store;
+
+//   store.panels[panelKey].navigationRequest.options = { replace: false };
+//   return store;
+// };
+
+/**
+ * @name shouldPanelBlockNavigation
+ * @description Checks whether a specific panel currently blocks navigation.
+ * @param store - Router store
+ * @param panelKey - Target panel index
+ * @returns True when navigation should be blocked for this panel
+ */
+export const shouldPanelBlockNavigation = (store: AppRouterStore, panelKey: number): boolean => {
+  if (panelKey < 0 || panelKey >= store.panels.length) return false;
+  return !!store.panels[panelKey].blocker?.isBlocked;
+};
+
+/**
+ * @name setPanelNavigationRequest
+ * @description Stores or updates the pending navigation proposal for a panel.
+ * @param store - Router store
+ * @param panelKey - Target panel index
+ * @param partialNavigation - Partial navigation payload
+ * @returns Updated router store
+ */
+export const setPanelNavigationRequest = (
+  store: AppRouterStore,
+  panelKey: number,
+  partialNavigation: Partial<AppRouterNavigation>
+): AppRouterStore => {
+  if (panelKey < 0 || panelKey >= store.panels.length) return store;
+
+  store.panels[panelKey].navigation = {
+    ...DEFAULT_APP_ROUTER_NAVIGATION,
+    ...store.panels[panelKey].navigation,
+    ...partialNavigation
+  };
+
+  return store;
+};
+
+/**
+ * @name clearPanelNavigationRequest
+ * @description Clears the pending navigation proposal for a panel.
+ * @param store - Router store
+ * @param panelKey - Target panel index
+ * @returns Updated router store
+ */
+export const clearPanelNavigationRequest = (store: AppRouterStore, panelKey: number): AppRouterStore => {
+  if (panelKey < 0 || panelKey >= store.panels.length) return store;
+
+  store.panels[panelKey].navigation = { ...DEFAULT_APP_ROUTER_NAVIGATION };
+  return store;
+};
+
+/**
+ * @name setPanelNavigationOptions
+ * @description Updates default navigation options on a panel proposal slot.
+ * @param store - Router store
+ * @param panelKey - Target panel index
+ * @param options - Navigation options to set
+ * @returns Updated router store
+ */
+export const setPanelNavigationOptions = (
+  store: AppRouterStore,
+  panelKey: number,
+  options: Partial<AppRouterNavigation>
+): AppRouterStore => {
+  if (panelKey < 0 || panelKey >= store.panels.length) return store;
+
+  store.panels[panelKey].navigation = {
+    ...store.panels[panelKey].navigation,
+    ...options
+  };
+  return store;
+};
+
+/**
+ * @name resetPanelNavigationOptions
+ * @description Resets panel navigation options while preserving the proposed target and type.
+ * @param store - Router store
+ * @param panelKey - Target panel index
+ * @returns Updated router store
+ */
+export const resetPanelNavigationOptions = (store: AppRouterStore, panelKey: number): AppRouterStore => {
+  if (panelKey < 0 || panelKey >= store.panels.length) return store;
+
+  store.panels[panelKey].navigation = {
+    ...store.panels[panelKey].navigation,
+    relative: DEFAULT_APP_ROUTER_NAVIGATION.relative,
+    replace: DEFAULT_APP_ROUTER_NAVIGATION.replace,
+    state: DEFAULT_APP_ROUTER_NAVIGATION.state
+  };
+
+  return store;
+};
+
+/**
+ * @name applyPanelNavigation
+ * @description Applies a panel navigation proposal to routes and clears the proposal slot.
+ * @param store - Router store
+ * @param panelKey - Target panel index
+ * @returns Updated router store
+ */
+export const applyPanelNavigation = (store: AppRouterStore, panelKey: number): AppRouterStore => {
+  if (panelKey < 0 || panelKey >= store.panels.length) return store;
+
+  const navigation = store.panels[panelKey].navigation;
+  if (!navigation?.to || typeof navigation.to !== 'string') return store;
+
+  if (navigation.type === 'open') {
+    const [store1, nextRouteKey] = addRoute(store, {
+      href: navigation.to,
+      state: navigation.state
+    });
+    const [store2] = upsertPanel(store1, panelKey, {
+      routeKey: nextRouteKey,
+      temporaryRouteKey: nextRouteKey
+    });
+    store = store2;
+  } else {
+    const routeKey = store.panels[panelKey].routeKey;
+
+    if (routeKey && routeKey in store.routes) {
+      store = updateRoute(store, routeKey, {
+        age: -1,
+        href: navigation.to,
+        state: navigation.state
+      });
+    } else {
+      const [store1, nextRouteKey] = addRoute(store, {
+        age: -1,
+        href: navigation.to,
+        state: navigation.state
+      });
+      const [store2] = upsertPanel(store1, panelKey, {
+        routeKey: nextRouteKey,
+        temporaryRouteKey: nextRouteKey
+      });
+      store = store2;
+    }
+  }
+
+  store = clearPanelNavigationRequest(store, panelKey);
+  store = sanitizeAppRouterStore(store);
+  store.id = generateRandomUUID();
+  return store;
+};
+
+//*****************************************************************************************
+// Blocker
+//*****************************************************************************************
+
+/**
+ * @name applyNavigationBlocker
+ * @description Applies the blocker values to the router store
+ * @returns Updated router store
+ */
+export const applyNavigationBlocker = (
+  store: AppRouterStore,
+  routeKey: keyof AppRouterStore['routes'],
+  shouldBlock: AppRouterBlocker['isBlocked'],
+  message: AppRouterBlocker['message'] = null
+): AppRouterStore => {
+  const panelKey = findPanelKey(store, { routeKey });
+  store.panels[panelKey].blocker.isBlocked = shouldBlock;
+  store.panels[panelKey].blocker.message = message;
   return store;
 };

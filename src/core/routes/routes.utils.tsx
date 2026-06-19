@@ -1,17 +1,28 @@
 import { APP_ROUTES } from 'app/core.routes';
-import type { AppRouterState, AppRouterStore } from 'core/router';
+import type {
+  AppLinkTo,
+  AppLinkToOptions,
+  AppLinkToTuple,
+  AppRouterNavigation,
+  AppRouterState,
+  AppRouterStore
+} from 'core/router';
 import {
   addNode,
   addRoute,
+  DEFAULT_APP_ROUTER_ROUTE,
+  DEFAULT_NAVIGATE_OPTIONS,
+  getNextRouteFromKey,
+  getRouteFromKey,
   insertRightPanel,
   removePanel,
+  ROUTER_STORE_EXAMPLE,
   sanitizeAppRouterStore,
   setPanel,
   setRoute,
   updateRoute
 } from 'core/router';
-import { ROUTER_STORE_EXAMPLE } from 'core/router/router.models';
-import type { AppRouteLocation, InferAppRouteValuesFromRoute } from 'core/routes/routes.models';
+import type { AppRouteLocation, InferAppRouteSearchValuesFromPath, InferAppRouteValuesFromRoute } from 'core/routes';
 import type { Location, NavigateOptions, To as NavigateTo } from 'react-router';
 import { matchPath } from 'react-router';
 import { generateRandomUUID } from 'shared/utils/app.utils';
@@ -286,6 +297,8 @@ export const syncStoreToLocation = (
 ): { to: NavigateTo; options: NavigateOptions } => {
   if (location.state?.id && location.state.id === store.id) return null;
 
+  const shouldReplaceHistory = store.panels.some(panel => !!panel?.navigation?.replace);
+
   const hashFragment = store.panels
     .map(panel => {
       const route = store.routes[panel.routeKey];
@@ -296,7 +309,10 @@ export const syncStoreToLocation = (
 
   return {
     to: `/v1#${hashFragment}`,
-    options: { state: { id: store.id, panels: store.panels, routes: store.routes } }
+    options: {
+      replace: shouldReplaceHistory,
+      state: { id: store.id, panels: store.panels, routes: store.routes }
+    }
   };
 };
 
@@ -461,4 +477,127 @@ export const syncLocationToStore = (store: AppRouterStore, location: Location<Ap
   }
 
   return { ...ROUTER_STORE_EXAMPLE, maxPanels: store.maxPanels, maxNodes: store.maxNodes };
+};
+
+//*****************************************************************************************
+// Navigation
+//*****************************************************************************************
+
+/**
+ * @name getAppLinkTo
+ * @description Breaks down the "to" object into its key and value for further processing
+ * @returns Updated router store
+ */
+export const getAppLinkTo = function <const Path extends AppRoute['path']>(to: AppLinkToOptions<Path>) {
+  return (Object.entries(to)?.[0] || [null, null]) as AppLinkToTuple<Path>;
+};
+
+/**
+ * @name getOpenRouteExternalHref
+ * @description Calculates the href prop to apply to an "a" tag so that the user can a single page on its own.
+ */
+
+export const getPreviousLocationFromRouter = function <
+  const Path extends AppRoute['path'],
+  const Key extends keyof AppLinkTo<Path>
+>(
+  toKey: Key,
+  toValue: AppLinkTo<Path>[Key],
+  routeKey: keyof AppRouterStore['routes'],
+  navigationStyle: 'push' | 'loop'
+) {
+  return function (store: AppRouterStore): AppRouterStore['routes'][string] {
+    if (!(toKey === 'replaceSearchObject' || toKey === 'replaceURLSearchParams' || typeof toValue === 'function'))
+      return DEFAULT_APP_ROUTER_ROUTE;
+    else if (toKey === 'openRoute') return getNextRouteFromKey(store, routeKey, navigationStyle);
+    else return getRouteFromKey(store, routeKey);
+  };
+};
+
+/**
+ * @name getExternalHrefFromNavigation
+ * @description Wraps a route location into the multi-panel hash URL format `/v1#<encoded-panel>`.
+ * Preserves the incoming location state as-is.
+ * @param location - Route location with href and state
+ * @returns Panel-wrapped location with v1 pathname and hash encoding, or null when href is empty
+ */
+export const getExternalHrefFromNavigation = ({ href, state }: AppRouterNavigation): AppRouteLocation['href'] => {
+  if (!href) return null;
+  const fragment = getHashFragmentFromLocation({ href, state });
+  return !fragment ? null : `/v1#${fragment}`;
+};
+
+/**
+ * @name getNavigationFromOpenRoute
+ * @description Calculates the href prop to apply to an "a" tag so that the user can a single page on its own.
+ */
+export const getNavigationFromOpenRoute = function <const Path extends AppRoute['path']>(
+  toValue: AppLinkTo<Path>['openRoute'],
+  prevLocation: AppRouterStore['routes'][string],
+  { replace }: NavigateOptions = DEFAULT_NAVIGATE_OPTIONS
+): AppRouterNavigation {
+  const prevRoute = findAppRouteFromLocation(APP_ROUTES, prevLocation);
+  const prevValues = getAppRouteValuesFromLocation(prevRoute, prevLocation);
+  const nextRoute = typeof toValue !== 'function' ? findAppRouteFromValues(APP_ROUTES, toValue) : prevRoute;
+  const nextValues = typeof toValue === 'function' ? toValue(prevValues) : toValue;
+  const nextLocation = getLocationFromAppRouteValues(nextRoute, nextValues);
+  return { href: nextLocation.href, state: nextLocation.state || null, replace, type: 'create' };
+};
+
+/**
+ * @name getNavigationFromReplaceRoute
+ * @description Calculates the href prop to apply to an "a" tag so that the user can a single page on its own.
+ */
+export const getNavigationFromReplaceRoute = function <const Path extends AppRoute['path']>(
+  toValue: AppLinkTo<Path>['replaceRoute'],
+  prevLocation: AppRouterStore['routes'][string],
+  { replace }: NavigateOptions = DEFAULT_NAVIGATE_OPTIONS
+): AppRouterNavigation {
+  const prevRoute = findAppRouteFromLocation(APP_ROUTES, prevLocation);
+  const prevValues = getAppRouteValuesFromLocation(prevRoute, prevLocation);
+  const nextRoute = typeof toValue !== 'function' ? findAppRouteFromValues(APP_ROUTES, toValue) : prevRoute;
+  const nextValues = typeof toValue === 'function' ? toValue(prevValues) : toValue;
+  const nextLocation = getLocationFromAppRouteValues(nextRoute, nextValues);
+  return { href: nextLocation.href, state: nextLocation.state || null, replace, type: 'update' };
+};
+
+/**
+ * @name getReplaceRouteExternalHref
+ * @description Calculates the href prop to apply to an "a" tag so that the user can a single page on its own.
+ */
+export const getNavigationFromReplaceSearchObject = function <const Path extends AppRoute['path']>(
+  toValue: AppLinkTo<Path>['replaceSearchObject'],
+  prevLocation: AppRouterStore['routes'][string],
+  { replace }: NavigateOptions = DEFAULT_NAVIGATE_OPTIONS
+): AppRouterNavigation {
+  const prevRoute = findAppRouteFromLocation(APP_ROUTES, prevLocation);
+  const prevValues = getAppRouteValuesFromLocation(prevRoute, prevLocation);
+  const prevSearchObject = prevValues.search as InferAppRouteSearchValuesFromPath<Path>;
+  const prevSearch = (prevRoute?.search?.full?.(prevSearchObject)?.toObject?.() ||
+    null) as InferAppRouteSearchValuesFromPath<Path>;
+  const nextSearchObject = typeof toValue === 'function' ? toValue(prevSearch) : toValue;
+  const nextSearch = prevRoute?.search?.delta?.(nextSearchObject)?.toObject?.() || null;
+  const nextValues = { ...prevValues, search: nextSearch };
+  const nextLocation = getLocationFromAppRouteValues(prevRoute, nextValues as InferAppRouteValuesFromRoute<AppRoute>);
+  return { href: nextLocation.href, state: nextLocation.state || null, replace, type: 'update' };
+};
+
+/**
+ * @name getReplaceRouteExternalHref
+ * @description Calculates the href prop to apply to an "a" tag so that the user can a single page on its own.
+ */
+export const getNavigationFromReplaceURLSearchParams = function <const Path extends AppRoute['path']>(
+  toValue: AppLinkTo<Path>['replaceURLSearchParams'],
+  prevLocation: AppRouterStore['routes'][string],
+  { replace }: NavigateOptions = DEFAULT_NAVIGATE_OPTIONS
+): AppRouterNavigation {
+  const prevRoute = findAppRouteFromLocation(APP_ROUTES, prevLocation);
+  const prevValues = getAppRouteValuesFromLocation(prevRoute, prevLocation);
+  const prevSearchObject = prevValues.search as InferAppRouteSearchValuesFromPath<Path>;
+  const prevSearch = prevRoute?.search?.full?.(prevSearchObject)?.toParams?.();
+  const nextSearchParams = typeof toValue === 'function' ? toValue(prevSearch) : toValue;
+  const nextSearch = prevRoute?.search?.delta?.(nextSearchParams)?.toObject?.() || null;
+  const nextValues = { ...prevValues, search: nextSearch };
+  const nextLocation = getLocationFromAppRouteValues(prevRoute, nextValues as InferAppRouteValuesFromRoute<AppRoute>);
+  return { href: nextLocation.href, state: nextLocation.state || null, replace, type: 'update' };
 };

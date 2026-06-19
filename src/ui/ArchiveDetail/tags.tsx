@@ -28,6 +28,7 @@ import useSafeResults from 'deprecated/hooks/useSafeResults';
 import type { SearchResult } from 'models/api/search';
 import type { ResultIndexed } from 'models/base/result';
 import type { Signature, Tag } from 'models/base/tagging';
+import ResultsTable from 'pages/search/components/results';
 import React, { useCallback, useEffect, useMemo, useState, useTransition } from 'react';
 import { useTranslation } from 'react-i18next';
 import AutoSizer from 'react-virtualized-auto-sizer';
@@ -45,7 +46,6 @@ import {
 } from 'ui/GridTable';
 import InformativeAlert from 'ui/InformativeAlert';
 import SimpleSearchQuery from 'ui/SearchBar/simple-search-query';
-import ResultsTable from 'ui/SearchResult/results';
 import SectionContainer from 'ui/SectionContainer';
 import Verdict from 'ui/Verdict';
 

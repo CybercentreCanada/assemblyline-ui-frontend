@@ -31,6 +31,8 @@ import helpAPIEN from 'pages/help/api/help-api.i18n.en.json';
 import helpAPIFR from 'pages/help/api/help-api.i18n.fr.json';
 import notFoundEN from 'pages/not-found/not-found.i18n.en.json';
 import notFoundFR from 'pages/not-found/not-found.i18n.fr.json';
+import searchEN from 'pages/search/search.i18n.en.json';
+import searchFR from 'pages/search/search.i18n.fr.json';
 import settingsEN from 'pages/settings/settings.i18n.en.json';
 import settingsFR from 'pages/settings/settings.i18n.fr.json';
 import submissionDetailEN from 'pages/submission-detail/submission-detail.i18n.en.json';
@@ -62,6 +64,7 @@ export const I18N_RESSOURCES = {
     logout: logoutEN,
     notifications: notificationsEN,
     quota: quotaEN,
+    search: searchEN,
     settings: settingsEN,
     submissionDetail: submissionDetailEN,
     submissionReport: submissionReportEN,
@@ -84,6 +87,7 @@ export const I18N_RESSOURCES = {
     logout: logoutFR,
     notifications: notificationsFR,
     quota: quotaFR,
+    search: searchFR,
     settings: settingsFR,
     submissionDetail: submissionDetailFR,
     submissionReport: submissionReportFR,

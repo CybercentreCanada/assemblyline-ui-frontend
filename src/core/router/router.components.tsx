@@ -1,5 +1,5 @@
-import { useAppNavigate, useAppTo } from 'core/router';
-import type { AppLinkTo } from 'core/routes';
+import type { AppLinkTo } from 'core/router';
+import { useAppExternalHref, useAppNavigate } from 'core/router';
 import type { ForwardedRef } from 'react';
 import { forwardRef, memo, useCallback, useLayoutEffect, useRef } from 'react';
 import type { LinkProps as RouterLinkProps } from 'react-router';
@@ -16,32 +16,65 @@ export type AppLinkProps<Path extends AppRoute['path']> = Omit<
   to: AppLinkTo<Path>;
 };
 
+// TODO
 export function WrappedAppLink<const Path extends AppRoute['path']>(
   { children, to, onClick, ...props }: AppLinkProps<Path>,
   ref: ForwardedRef<HTMLAnchorElement>
 ) {
-  const { href, state } = useAppTo<Path>(to);
+  const href = useAppExternalHref<Path>(to);
   const navigate = useAppNavigate<Path>();
 
   const handleClick = useCallback(
     (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
-      event.preventDefault();
-      event.stopPropagation();
-      if ('openRoute' in to) navigate.openRoute(to.openRoute);
-      else if ('replaceRoute' in to) navigate.replaceRoute(to.replaceRoute);
-      else if ('replaceSearchObject' in to) navigate.replaceSearchObject(to.replaceSearchObject);
-      else if ('replaceURLSearchParams' in to) navigate.replaceURLSearchParams(to.replaceURLSearchParams);
-      onClick?.(event);
+      if (onClick) onClick?.(event);
+      else {
+        event.preventDefault();
+        event.stopPropagation();
+
+        const [toKey, toValue] = Object.entries(to)?.[0] || [null, null];
+        navigate?.[toKey]?.(toValue);
+        // if ('openRoute' in to) navigate.openRoute(to.openRoute);
+        // else if ('replaceRoute' in to) navigate.replaceRoute(to.replaceRoute);
+        // else if ('replaceSearchObject' in to) navigate.replaceSearchObject(to.replaceSearchObject);
+        // else if ('replaceURLSearchParams' in to) navigate.replaceURLSearchParams(to.replaceURLSearchParams);
+      }
     },
     [navigate, onClick, to]
   );
 
   return (
-    <Link {...props} ref={ref} to={href} state={state} onClick={handleClick}>
+    <Link {...props} ref={ref} to={href} onClick={handleClick}>
       {children}
     </Link>
   );
 }
+
+// export function WrappedAppLink<const Path extends AppRoute['path']>(
+//   { children, to, onClick, ...props }: AppLinkProps<Path>,
+//   ref: ForwardedRef<HTMLAnchorElement>
+// ) {
+//   const { href, state } = useAppTo<Path>(to);
+//   const navigate = useAppNavigate<Path>();
+
+//   const handleClick = useCallback(
+//     (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
+//       event.preventDefault();
+//       event.stopPropagation();
+//       if ('openRoute' in to) navigate.openRoute(to.openRoute);
+//       else if ('replaceRoute' in to) navigate.replaceRoute(to.replaceRoute);
+//       else if ('replaceSearchObject' in to) navigate.replaceSearchObject(to.replaceSearchObject);
+//       else if ('replaceURLSearchParams' in to) navigate.replaceURLSearchParams(to.replaceURLSearchParams);
+//       onClick?.(event);
+//     },
+//     [navigate, onClick, to]
+//   );
+
+//   return (
+//     <Link {...props} ref={ref} to={href} state={state} onClick={handleClick}>
+//       {children}
+//     </Link>
+//   );
+// }
 
 WrappedAppLink.displayName = 'WrappedAppLink';
 

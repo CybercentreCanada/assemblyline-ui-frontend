@@ -4,15 +4,12 @@ export type { CreateAppRouteProps } from './routes.factories';
 export { useAppHashParams, useAppPathParams, useAppRoute, useAppSearchParams } from './routes.hooks';
 export { AppRoutes } from './routes.layout';
 export type {
-  AppLinkTo,
-  AppLinkToOptions,
   AppRouteLocation,
   CreatedAppRoute,
   CreatedAppRoutes,
   GuardResult,
   InferAppRouteSearchValuesFromPath,
   InferAppRouteValuesFromRoute,
-  ParsedRouteLocation,
   RouteHash,
   RouteMeta,
   RoutePath
@@ -30,7 +27,9 @@ export {
   findAppRouteFromLocation,
   findAppRouteFromValues,
   getAppLinkFromLocation,
+  getAppLinkTo,
   getAppRouteValuesFromLocation,
+  getExternalHrefFromNavigation,
   getHashFragmentFromLocation,
   getHashFromLocation,
   getLocationFromAppRouteValues,
@@ -39,7 +38,12 @@ export {
   getLocationPathFromAppRouteValues,
   getLocationSearchFromAppRouteValues,
   getLocationStateFromAppRouteValues,
+  getNavigationFromOpenRoute,
+  getNavigationFromReplaceRoute,
+  getNavigationFromReplaceSearchObject,
+  getNavigationFromReplaceURLSearchParams,
   getPathParamsFromLocation,
+  getPreviousLocationFromRouter,
   getSearchParamsFromLocation,
   parseLocationHash,
   parseLocationState,

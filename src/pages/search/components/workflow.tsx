@@ -3,7 +3,6 @@ import DoneIcon from '@mui/icons-material/Done';
 import { AlertTitle, Skeleton } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
-import { AlertPriority, AlertStatus } from 'components/routes/alerts/components/Components';
 import useALContext from 'deprecated/hooks/useALContext';
 import type { SearchResult } from 'models/api/search';
 import type { WorkflowIndexed } from 'models/base/workflow';
