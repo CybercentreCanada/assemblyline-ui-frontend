@@ -56,6 +56,42 @@ Routes are immutable URL entries stored by UUID key. Each route tracks an `href`
 7. react-router's `navigate()` is called with the serialized state
 8. On the receiving end, `AppRouterStoreSync` reads the location and hydrates the store
 
+### Synchronization Handshake
+
+The router maintains two-way sync between the store and the URL using a **versioning handshake** to prevent infinite loops:
+
+**Forward (Store → Location):**
+1. Component calls `navigate()` or stages a navigation request on a panel
+2. The store subscription fires (`routerStoreApi.subscribe`)
+3. `syncStoreToLocation(store, location)` generates a **new `store.id`** (UUID)
+4. It returns a navigation payload with `options.state.id = store.id` and `options.state.panels/routes`
+5. `navigate()` is called, updating `location.state`
+
+**Backward (Location → Store):**
+1. React Router updates the location (URL bar, history, etc.)
+2. The location effect fires (`useLocation()` dependency)
+3. `syncLocationToStore(store, location)` is called
+4. **Guard:** If `location.state.id === store.id`, return early (already synced)
+5. Otherwise, parse the location and stage navigation requests in the store
+6. The store subscription fires again, but now `syncStoreToLocation` sees `location.state.id === store.id` and returns `[null, null]`
+
+**Critical Guards:**
+- `syncStoreToLocation` checks: `if (!location?.state?.id || location.state.id === store.id || panelKey < 0) return [null, null];`
+- `syncLocationToStore` checks: `if (location.state?.id && location.state.id === store.id) return store;`
+- These must match the incoming location's `state.id` against the current `store.id` to prevent re-processing
+
+**Known Pitfalls — Can Cause Infinite Loops:**
+
+1. **Stale `location` in subscription closure** — If the store subscription effect has stale `location` in its closure (missing from deps), the id guard always compares new `store.id` against old `location.state.id`, which never match. Fix: include `location` in the effect's dependency array.
+
+2. **Re-staging in `parseLocationState`** — After `navigate()` writes new state to the location, if `syncLocationToStore` → `parseLocationState` re-stages navigation requests for all panels (via `setNavigation(..., type: 'update')`), the store changes again, the subscription fires, and the cycle restarts. Fix: only stage navigation if the route is genuinely different from what's already in the store (check current href against incoming href and skip `setNavigation` for routes that haven't changed).
+
+**For Maintainers:**
+When modifying sync logic, always verify:
+- The id guards are comparing the most recent location against the most recent store
+- `parseLocationState` only stages navigations for routes that have actually changed
+- The effect dependencies include `location` so stale closures don't defeat the guards
+
 ## 4. Configuration
 
 ### Provider Setup

@@ -9,17 +9,24 @@ import { generateRandomUUID } from 'shared/utils/app.utils';
 // To
 //*****************************************************************************************
 
+/** Route transition intents accepted by router link helpers. */
 export type AppLinkTo<Path extends AppRoute['path']> = {
+  /** Opens a route, typically in the next panel. */
   openRoute: SetStateAction<InferAppRouteValuesFromRoute<AppRoute>>;
+  /** Replaces the current route values. */
   replaceRoute: SetStateAction<InferAppRouteValuesFromRoute<AppRoute>>;
+  /** Replaces only route search values using typed objects. */
   replaceSearchObject: SetStateAction<InferAppRouteSearchValuesFromPath<Path>>;
+  /** Replaces only route search values using URLSearchParams. */
   replaceURLSearchParams: SetStateAction<URLSearchParams>;
 };
 
+/** Single-key object form for AppLinkTo transitions. */
 export type AppLinkToOptions<Path extends AppRoute['path']> = {
   [K in keyof AppLinkTo<Path>]: Record<K, AppLinkTo<Path>[K]>;
 }[keyof AppLinkTo<Path>];
 
+/** Tuple form `[key, value]` of the AppLinkTo transition union. */
 export type AppLinkToTuple<Path extends AppRoute['path']> =
   AppLinkTo<Path> extends infer T
     ? T extends Record<PropertyKey, unknown>
@@ -31,6 +38,7 @@ export type AppLinkToTuple<Path extends AppRoute['path']> =
 // To Options
 //*****************************************************************************************
 
+/** Default options for programmatic router navigation. */
 export const DEFAULT_NAVIGATE_OPTIONS: NavigateOptions = {
   replace: false
 };
@@ -55,10 +63,15 @@ export const DEFAULT_APP_ROUTER_BLOCKER: AppRouterBlocker = {
 // Navigation
 //*****************************************************************************************
 
+/** Navigation payload staged on a panel. */
 export type AppRouterNavigation = {
-  href: NavigateProps['to'];
+  /** Target href for this navigation. */
+  href: string;
+  /** Whether browser history should replace the current entry. */
   replace: NavigateProps['replace'];
+  /** Optional state payload sent with the navigation. */
   state: NavigateProps['state'];
+  /** Operation type used by router store reducers. */
   type: 'create' | 'update' | 'delete';
 };
 
@@ -163,6 +176,7 @@ export const DEFAULT_APP_ROUTER_STATE: AppRouterState = {
 
 /** Full router store shape. */
 export type AppRouterStore = {
+  /** Store revision id for sync checks. */
   id: string;
   /** Maximum allowed portal nodes. */
   maxNodes: number;
@@ -185,6 +199,7 @@ export const DEFAULT_APP_ROUTER_STORE: AppRouterStore = {
   routes: {}
 };
 
+/** Example router store shape used for parsing fallbacks and tests. */
 export const ROUTER_STORE_EXAMPLE: AppRouterStore = {
   id: 'test',
   maxNodes: 0,

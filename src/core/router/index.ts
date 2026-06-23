@@ -1,15 +1,8 @@
-export { AppLink, AppNavigate } from './router.components';
+export { AppLink, AppNavigate, WrappedAppLink, WrappedAppNavigate } from './router.components';
 export type { AppLinkProps, AppNavigateProps } from './router.components';
-export {
-  useAppBlocker,
-  useAppExternalHref,
-  useAppNavigate,
-  useAppTo,
-  useNavigationOptions,
-  usePendingNavigation
-} from './router.hooks';
-export type { AppBlocker, AppBlockerTransition } from './router.hooks';
+export { useAppBlocker, useAppExternalHref, useAppNavigate } from './router.hooks';
 export { AppRouterLayout, AppRouterNode, AppRouterPanel } from './router.layout';
+export type { AppRouterLayoutProps, AppRouterNodeProps, AppRouterPanelProps } from './router.layout';
 export {
   DEFAULT_APP_ROUTER_BLOCKER,
   DEFAULT_APP_ROUTER_NAVIGATION,
@@ -37,7 +30,9 @@ export {
   AppRouterProvider,
   AppRouterRootProvider,
   AppRouterStoreProvider,
+  AppRouterSync,
   useAppRouterStore,
+  useAppRouterStoreApi,
   useAppSetRouterStore
 } from './router.providers';
 export {
@@ -47,8 +42,7 @@ export {
   addRouteToPanel,
   addTab,
   applyNavigationBlocker,
-  applyPanelNavigation,
-  clearPanelNavigationRequest,
+  clearNavigation,
   filterOrphanedNodes,
   filterOrphanedRoutes,
   filterPanelMissingRouteKeys,
@@ -60,6 +54,7 @@ export {
   findPanelKey,
   findRoute,
   findRouteKey,
+  getNavigation,
   getNextRouteFromKey,
   getRouteFromKey,
   getRouteFromPanelKey,
@@ -76,21 +71,18 @@ export {
   removeRoute,
   removeTab,
   removeTabFromPanel,
-  resetPanelNavigationOptions,
   sanitizeAppRouterStore,
   sanitizeNodes,
   sanitizePanels,
   sanitizeRoutes,
+  setNavigation,
   setNode,
   setPanel,
   setPanelActiveRoute,
-  setPanelNavigationOptions,
-  setPanelNavigationRequest,
   setPermanentRoute,
   setPinnedRoute,
   setRoute,
   setUnpinnedRoute,
-  shouldPanelBlockNavigation,
   showPreviousTab,
   updateNode,
   updatePanel,

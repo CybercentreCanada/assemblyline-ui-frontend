@@ -10,7 +10,7 @@ const DefaultDisabledRouteFallback = memo(() => {
 
 DefaultDisabledRouteFallback.displayName = 'DefaultDisabledRouteFallback';
 
-type DisabledBoundaryProps = {
+export type DisabledBoundaryProps = {
   /** Condition or callback to determine disabled state. */
   disabled?: boolean | (() => boolean);
   /** Fallback component to render when disabled. */
@@ -37,7 +37,7 @@ const DefaultForbiddenRouteFallback = memo(() => {
 
 DefaultForbiddenRouteFallback.displayName = 'DefaultForbiddenRouteFallback';
 
-type ForbiddenBoundaryProps = {
+export type ForbiddenBoundaryProps = {
   /** Condition or callback to determine forbidden state. */
   forbidden?: boolean | (() => boolean);
   /** Fallback component to render when forbidden. */

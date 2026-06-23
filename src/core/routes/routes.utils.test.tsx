@@ -583,53 +583,80 @@ describe('syncLocationToStore', () => {
 // syncStoreToLocation (v1 hash grammar output)
 //*****************************************************************************************
 describe('syncStoreToLocation', () => {
-  it('returns null when location and store share the same id', () => {
+  it('returns [null, null] when location and store share the same id', () => {
     const store = createStore();
     store.id = 'same-id';
+    store.routes = { r1: { href: '/page1', state: null } };
+    store.panels = [
+      {
+        routeKey: 'r1',
+        tabbedRouteKeys: ['r1'],
+        pinnedRouteKeys: [],
+        temporaryRouteKey: null,
+        blocker: { isBlocked: false, message: null },
+        navigation: { href: '/submit', state: null, replace: false, type: 'update' }
+      } as never
+    ];
     const location = createRouterLocation({ state: { id: 'same-id', routes: {}, panels: [] } as AppRouterState });
 
-    const next = syncStoreToLocation(store, location);
-    expect(next).toBeNull();
+    const [nextStore, nextNavigation] = syncStoreToLocation(store, location);
+    expect(nextStore).toBeNull();
+    expect(nextNavigation).toBeNull();
   });
 
-  it('builds v1 hash navigation payload from panel routes', () => {
+  it('builds v1 hash navigation payload from staged panel navigation', () => {
     const store = createStore();
     store.id = 'store-sync-id';
     store.routes = {
-      r1: { href: '/page1', state: null },
-      r2: { href: '/submit', state: { source: 'x' } }
+      r1: { href: '/page1', state: null }
     };
     store.panels = [
-      { routeKey: 'r1', tabbedRouteKeys: ['r1'], pinnedRouteKeys: [], temporaryRouteKey: null },
-      { routeKey: 'r2', tabbedRouteKeys: ['r2'], pinnedRouteKeys: [], temporaryRouteKey: null }
+      {
+        routeKey: 'r1',
+        tabbedRouteKeys: ['r1'],
+        pinnedRouteKeys: [],
+        temporaryRouteKey: null,
+        blocker: { isBlocked: false, message: null },
+        navigation: { href: '/submit', state: { source: 'x' }, replace: false, type: 'update' }
+      } as never
     ];
 
     const location = createRouterLocation({ state: { id: 'other-id', routes: {}, panels: [] } as AppRouterState });
-    const next = syncStoreToLocation(store, location);
+    const [nextStore, nextNavigation] = syncStoreToLocation(store, location);
 
-    expect(next?.to).toBe('/v1#/page1#/submit');
-    const navigationState = next?.options?.state as {
+    expect(nextNavigation?.to).toBe('/v1#/submit');
+    expect(nextStore?.routes?.r1?.href).toBe('/submit');
+    const navigationState = nextNavigation?.options?.state as {
       id: string;
       panels: AppRouterStore['panels'];
       routes: AppRouterStore['routes'];
     };
 
-    expect(navigationState?.id).toBe('store-sync-id');
-    expect(navigationState?.panels).toEqual(store.panels);
+    expect(navigationState?.id).toBe(nextStore?.id);
+    expect(navigationState?.panels).toEqual(nextStore?.panels);
   });
 
-  it('encodes panel hash anchors as %23 in v1 format', () => {
+  it('keeps panel hash anchors in v1 fragment format', () => {
     const store = createStore();
     store.id = 'hash-test-id';
     store.routes = {
-      r1: { href: '/page#section', state: null }
+      r1: { href: '/page1', state: null }
     };
-    store.panels = [{ routeKey: 'r1', tabbedRouteKeys: ['r1'], pinnedRouteKeys: [], temporaryRouteKey: null }];
+    store.panels = [
+      {
+        routeKey: 'r1',
+        tabbedRouteKeys: ['r1'],
+        pinnedRouteKeys: [],
+        temporaryRouteKey: null,
+        blocker: { isBlocked: false, message: null },
+        navigation: { href: '/page#section', state: null, replace: false, type: 'update' }
+      } as never
+    ];
 
     const location = createRouterLocation();
-    const next = syncStoreToLocation(store, location);
+    const [, nextNavigation] = syncStoreToLocation(store, location);
 
-    expect(next?.to).toBe('/v1#/page%23section');
+    expect(nextNavigation?.to).toBe('/v1#/page#section');
   });
 
   it('returns v1 format with /v1 pathname and hash encoding', () => {
@@ -640,13 +667,27 @@ describe('syncStoreToLocation', () => {
       r2: { href: '/submit?mode=create', state: null }
     };
     store.panels = [
-      { routeKey: 'r1', tabbedRouteKeys: ['r1'], pinnedRouteKeys: [], temporaryRouteKey: null },
-      { routeKey: 'r2', tabbedRouteKeys: ['r2'], pinnedRouteKeys: [], temporaryRouteKey: null }
+      {
+        routeKey: 'r1',
+        tabbedRouteKeys: ['r1'],
+        pinnedRouteKeys: [],
+        temporaryRouteKey: null,
+        blocker: { isBlocked: false, message: null },
+        navigation: { href: '/submissions?query=test#results', state: null, replace: false, type: 'update' }
+      } as never,
+      {
+        routeKey: 'r2',
+        tabbedRouteKeys: ['r2'],
+        pinnedRouteKeys: [],
+        temporaryRouteKey: null,
+        blocker: { isBlocked: false, message: null },
+        navigation: null
+      } as never
     ];
 
     const location = createRouterLocation();
-    const next = syncStoreToLocation(store, location);
+    const [, nextNavigation] = syncStoreToLocation(store, location);
 
-    expect(next?.to).toBe('/v1#/submissions?query=test%23results#/submit?mode=create');
+    expect(nextNavigation?.to).toBe('/v1#/submissions?query=test#results#/submit?mode=create');
   });
 });

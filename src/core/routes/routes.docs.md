@@ -43,6 +43,16 @@ Search params use `features/search-params` which provides:
 
 Each mounted route gets its own scoped store (`AppRouteStore`) via `AppRouteProvider`. This store holds the current `params`, `search`, and `hash` parsed from the URL. Hooks read from this store using selectors, so components only re-render when their specific param changes.
 
+### Location State Handshake
+
+The route system participates in the router's synchronization handshake via `location.state`. When a route is navigated to:
+- `syncStoreToLocation()` encodes all routes and panels into `location.state`
+- This state includes a `state.id` (UUID) that acts as a version token
+- `syncLocationToStore()` reads the incoming `state.id` and compares it against the current `store.id` to prevent re-processing
+- Route params, search params, and hash are decoded from the state in `location` and made available through the route's scoped store
+
+This ensures that navigating to a link and then navigating back returns you to the exact same route state (params, search, hash) because it's fully encoded in the URL.
+
 ### Route Key
 
 Each route instance in the router system is identified by a UUID (`routeKey`). The `AppRouteKeyProvider` makes this key available to the route's component tree, allowing it to identify which router store entry it belongs to.

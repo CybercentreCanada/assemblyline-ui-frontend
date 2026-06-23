@@ -49,33 +49,6 @@ export function WrappedAppLink<const Path extends AppRoute['path']>(
   );
 }
 
-// export function WrappedAppLink<const Path extends AppRoute['path']>(
-//   { children, to, onClick, ...props }: AppLinkProps<Path>,
-//   ref: ForwardedRef<HTMLAnchorElement>
-// ) {
-//   const { href, state } = useAppTo<Path>(to);
-//   const navigate = useAppNavigate<Path>();
-
-//   const handleClick = useCallback(
-//     (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
-//       event.preventDefault();
-//       event.stopPropagation();
-//       if ('openRoute' in to) navigate.openRoute(to.openRoute);
-//       else if ('replaceRoute' in to) navigate.replaceRoute(to.replaceRoute);
-//       else if ('replaceSearchObject' in to) navigate.replaceSearchObject(to.replaceSearchObject);
-//       else if ('replaceURLSearchParams' in to) navigate.replaceURLSearchParams(to.replaceURLSearchParams);
-//       onClick?.(event);
-//     },
-//     [navigate, onClick, to]
-//   );
-
-//   return (
-//     <Link {...props} ref={ref} to={href} state={state} onClick={handleClick}>
-//       {children}
-//     </Link>
-//   );
-// }
-
 WrappedAppLink.displayName = 'WrappedAppLink';
 
 export const AppLink = memo(forwardRef(WrappedAppLink)) as <const Path extends AppRoute['path']>(

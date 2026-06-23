@@ -8,22 +8,25 @@ import type {
   AppRouterStore
 } from 'core/router';
 import {
-  addNode,
   addRoute,
+  clearNavigation,
   DEFAULT_APP_ROUTER_ROUTE,
   DEFAULT_NAVIGATE_OPTIONS,
   getNextRouteFromKey,
   getRouteFromKey,
+  getRouteFromPanelKey,
   insertRightPanel,
   removePanel,
   ROUTER_STORE_EXAMPLE,
   sanitizeAppRouterStore,
+  setNavigation,
   setPanel,
   setRoute,
+  updatePanel,
   updateRoute
 } from 'core/router';
 import type { AppRouteLocation, InferAppRouteSearchValuesFromPath, InferAppRouteValuesFromRoute } from 'core/routes';
-import type { Location, NavigateOptions, To as NavigateTo } from 'react-router';
+import type { Location, NavigateFunction, NavigateOptions } from 'react-router';
 import { matchPath } from 'react-router';
 import { generateRandomUUID } from 'shared/utils/app.utils';
 
@@ -265,7 +268,7 @@ export const getHashFragmentFromLocation = ({ href }: AppRouteLocation): string 
   const hash = url.hash ? url.hash.slice(1) : '';
   const search = url.search;
 
-  return `${pathname}${hash ? `%23${encodeURIComponent(hash)}` : ''}${search}`;
+  return `${pathname}${search}${hash ? `#${encodeURIComponent(hash)}` : ''}`;
 };
 
 /**
@@ -291,29 +294,60 @@ export const getAppLinkFromLocation = ({ href, state }: AppRouteLocation): AppRo
  * @param location - Current React Router location
  * @returns Navigation payload ({ to, options }), or null if the location already matches
  */
-export const syncStoreToLocation = (
-  store: AppRouterStore,
-  location: Location<AppRouterState>
-): { to: NavigateTo; options: NavigateOptions } => {
-  if (location.state?.id && location.state.id === store.id) return null;
+export const syncStoreToLocation = (store: AppRouterStore, navigate: NavigateFunction = () => null): AppRouterStore => {
+  let changes: boolean = false;
+  let panelKey: number = store.panels.length - 1;
 
-  const shouldReplaceHistory = store.panels.some(panel => !!panel?.navigation?.replace);
+  while (panelKey >= 0) {
+    const navigation = store.panels[panelKey].navigation;
+    const blocker = store.panels[panelKey].blocker;
+    if (navigation && !blocker.isBlocked) {
+      changes = true;
+      const replace = navigation.replace;
 
-  const hashFragment = store.panels
-    .map(panel => {
-      const route = store.routes[panel.routeKey];
-      return route?.href ? getHashFragmentFromLocation(route) : null;
-    })
-    .filter((f): f is string => f !== null)
-    .join('#');
+      switch (store.panels[panelKey].navigation.type) {
+        case 'create':
+          const [s, routeKey] = addRoute(store, { href: navigation.href, state: navigation.state });
+          store = updatePanel(s, panelKey, { routeKey });
+          store = clearNavigation(store, panelKey);
+          break;
+        case 'update':
+          const currentRouteKey = store.panels[panelKey].routeKey;
+          if (currentRouteKey && currentRouteKey in store.routes) {
+            store = updateRoute(store, currentRouteKey, { href: navigation.href, state: navigation.state });
+          } else {
+            const [s, routeKey] = addRoute(store, { href: navigation.href, state: navigation.state });
+            store = updatePanel(s, panelKey, { routeKey });
+          }
+          store = clearNavigation(store, panelKey);
+          break;
+        case 'delete':
+          store = removePanel(store, panelKey);
+          break;
+      }
 
-  return {
-    to: `/v1#${hashFragment}`,
-    options: {
-      replace: shouldReplaceHistory,
-      state: { id: store.id, panels: store.panels, routes: store.routes }
+      const hashFragment = store.panels
+        .map(panel => {
+          const route = store.routes[panel.routeKey];
+          return route?.href ? getHashFragmentFromLocation(route) : null;
+        })
+        .filter((f): f is string => f !== null)
+        .join('#');
+
+      void navigate(hashFragment ? `/v1#${hashFragment}` : '/v1', {
+        state: { id: store.id, panels: store.panels, routes: store.routes },
+        replace: replace
+      });
     }
-  };
+
+    panelKey--;
+  }
+
+  if (!changes) return null;
+
+  store = sanitizeAppRouterStore(store);
+  store.id = generateRandomUUID();
+  return store;
 };
 
 //*****************************************************************************************
@@ -329,55 +363,29 @@ export const syncStoreToLocation = (
  * @returns Normalized AppRouteLocation, or null on parse/route-match failure
  */
 export const getLocationFromHashFragment = (fragment: string): AppRouteLocation | null => {
-  if (!fragment) return null;
+  if (!fragment) return { href: null, state: null };
 
-  try {
-    const hashIndex = fragment.indexOf('%23');
-    const searchIndex = fragment.indexOf('?');
+  const hashIndex = fragment.indexOf('#');
+  if (hashIndex === -1) return { href: fragment, state: null };
 
-    let pathname = '';
-    let hash = '';
-    let search = '';
+  const pathname = fragment.slice(0, hashIndex);
+  const hashAndSearch = fragment.slice(hashIndex + 1);
+  const searchIndex = hashAndSearch.indexOf('?');
 
-    if (hashIndex !== -1 && (searchIndex === -1 || hashIndex < searchIndex)) {
-      // Has hash before search (or no search)
-      pathname = fragment.substring(0, hashIndex);
-      const afterHash = fragment.substring(hashIndex + 3); // skip %23
-      const searchIdx = afterHash.indexOf('?');
-      if (searchIdx !== -1) {
-        hash = decodeURIComponent(afterHash.substring(0, searchIdx));
-        search = afterHash.substring(searchIdx);
-      } else {
-        hash = decodeURIComponent(afterHash);
-      }
-    } else if (searchIndex !== -1) {
-      // Has search but no hash
-      pathname = fragment.substring(0, searchIndex);
-      search = fragment.substring(searchIndex);
-    } else {
-      // Just pathname
-      pathname = fragment;
-    }
+  const hash = searchIndex === -1 ? hashAndSearch : hashAndSearch.slice(0, searchIndex);
+  const search = searchIndex === -1 ? '' : hashAndSearch.slice(searchIndex);
 
-    const href = `${pathname}${search}${hash ? `#${hash}` : ''}`;
-
-    const appRoute = findAppRouteFromLocation(APP_ROUTES, { href });
-    if (!appRoute) return null;
-
-    const appRouteValues = getAppRouteValuesFromLocation(appRoute, { href });
-    if (!appRouteValues) return null;
-
-    const location = getLocationFromAppRouteValues(appRoute, appRouteValues);
-    return location?.href ? location : null;
-  } catch {
-    return null;
-  }
+  return {
+    href: `${pathname}${search}${hash ? `#${decodeURIComponent(hash)}` : ''}`,
+    state: null
+  };
 };
 
 /**
  * @name parseLocationState
- * @description Merges location.state routes and panels into the store using upsert helpers.
- * Routes are set first, then panels are set, and extra existing panels are trimmed.
+ * @description Stages router navigation requests from location.state without
+ * mutating routes/panels directly.
+ * Requests are staged as create/update for state panels and delete for trailing panels.
  * @param store - Current router store
  * @param location - React Router location
  * @returns Updated router store
@@ -404,8 +412,8 @@ export const parseLocationState = (store: AppRouterStore, location: Location<App
 /**
  * @name parseLocationHash
  * @description Reconciles the router store against the multi-panel hash grammar by decoding
- * each fragment into an AppRouteLocation, updating existing panel routes when href changes,
- * adding missing panels for extra fragments, and removing trailing panels not present in hash.
+ * each fragment into an AppRouteLocation and staging panel navigation requests.
+ * Requests are staged as create/update for parsed panels and delete for trailing panels.
  * @param store - Current router store
  * @param location - React Router location
  * @returns Updated router store
@@ -415,44 +423,46 @@ export const parseLocationHash = (store: AppRouterStore, location: Location<AppR
 
   if (!hashFragment) return store;
 
-  const locations = hashFragment
-    .split('#')
+  const panelFragments = hashFragment
+    .split('#/')
     .filter(Boolean)
-    .map(fragment => getLocationFromHashFragment(fragment))
+    .map((fragment, i) => (i === 0 ? fragment : `/${fragment}`));
+
+  const locations = panelFragments
+    .map(fragment => {
+      const location = getLocationFromHashFragment(fragment);
+      const appRoute = findAppRouteFromLocation(APP_ROUTES, location);
+      const appRouteValues = getAppRouteValuesFromLocation(appRoute, location);
+      return getLocationFromAppRouteValues(appRoute, appRouteValues);
+    })
     .filter((h): h is AppRouteLocation => !!h?.href);
 
-  if (!locations.length) return store;
+  if (!locations?.length) return store;
 
   for (let i = 0; i < locations.length; i++) {
-    const newLocation = locations[i];
-
-    if (i < store.panels.length) {
-      // Update the existing panel's route with validated/normalized href.
-      const routeKey = store.panels[i].routeKey;
-      const currentRoute = routeKey ? store.routes[routeKey] : null;
-      const currentHref = currentRoute?.href;
-
-      if (routeKey && currentRoute && newLocation.href !== currentHref) {
-        store = updateRoute(store, routeKey, { href: newLocation.href, state: newLocation.state ?? null, age: -1 });
-      }
+    if (i >= store.panels.length) {
+      [store] = insertRightPanel(store, i, { routeKey: null });
+      store = setNavigation(store, i, { ...locations[i], type: 'create' });
     } else {
-      // No panel at this position yet — create route, node, and panel.
-      let newRouteKey: string | null = null;
-      [store, newRouteKey] = addRoute(store, { href: newLocation.href, age: -1 });
-      [store] = addNode(store, { routeKey: newRouteKey });
-      [store] = insertRightPanel(store, store.panels.length - 1, {
-        routeKey: newRouteKey,
-        tabbedRouteKeys: [newRouteKey]
-      });
+      const currentRoute = getRouteFromPanelKey(store, i);
+      const currentAppRoute = findAppRouteFromLocation(APP_ROUTES, currentRoute);
+      const incomingAppRoute = findAppRouteFromLocation(APP_ROUTES, locations[i]);
+
+      if (locations[i].href === currentRoute.href) {
+        // skip
+      } else if (currentAppRoute && incomingAppRoute && currentAppRoute.path === incomingAppRoute.path) {
+        // Set the difference
+        store = setNavigation(store, i, { ...locations[i], type: 'update' });
+      } else {
+        store = setNavigation(store, i, { ...locations[i], type: 'create' });
+      }
     }
   }
 
-  // Remove trailing panels that are no longer in the hash.
-  while (store.panels.length > locations.length) {
-    store = removePanel(store, store.panels.length - 1);
+  for (let i = locations.length; i < store.panels.length; i++) {
+    store = setNavigation(store, i, { type: 'delete' });
   }
 
-  store = sanitizeAppRouterStore(store);
   store.id = generateRandomUUID();
   return store;
 };
