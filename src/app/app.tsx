@@ -1,10 +1,12 @@
 import { i18n } from 'app/core.i18n';
+import { APP_ROUTES } from 'app/core.routes';
 import { AppApiProvider } from 'core/api';
 import { AppConfigStoreProvider } from 'core/config/config.providers';
 import { AppErrorProvider } from 'core/error';
 import { AppInterfaceStoreProvider } from 'core/interface';
 import { AppPreferenceStoreProvider } from 'core/preference';
 import { AppRouterLayout, AppRouterPanel, AppRouterProvider, AppRouterRootProvider } from 'core/router';
+import { AppRouteValuesProvider } from 'core/routes';
 import { AppSnackbarProvider } from 'core/snackbar';
 import { AppTemplateLayout, AppTemplateProvider } from 'core/template';
 import { AppThemeProvider } from 'core/theme';
@@ -109,15 +111,18 @@ import { memo, StrictMode } from 'react';
 //*****************************************************************************************
 
 export const AppLayout = memo(() => (
-  <AppAuthLayout>
-    <AppRouterLayout>
-      <AppDrawerLayout content={<AppRouterPanel panelKey={1} />}>
-        <AppTemplateLayout>
-          <AppRouterPanel panelKey={0} />
-        </AppTemplateLayout>
-      </AppDrawerLayout>
-    </AppRouterLayout>
-  </AppAuthLayout>
+  // Maybe not necessary to have AppRouteValuesProvider
+  <AppRouteValuesProvider appRoutes={APP_ROUTES} routeKey={null}>
+    <AppAuthLayout>
+      <AppRouterLayout>
+        <AppDrawerLayout content={<AppRouterPanel panelKey={1} />}>
+          <AppTemplateLayout>
+            <AppRouterPanel panelKey={0} />
+          </AppTemplateLayout>
+        </AppDrawerLayout>
+      </AppRouterLayout>
+    </AppAuthLayout>
+  </AppRouteValuesProvider>
 ));
 
 AppLayout.displayName = 'AppLayout';

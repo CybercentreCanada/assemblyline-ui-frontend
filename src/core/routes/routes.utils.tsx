@@ -1,12 +1,5 @@
 import { APP_ROUTES } from 'app/core.routes';
-import type {
-  AppLinkTo,
-  AppLinkToOptions,
-  AppLinkToTuple,
-  AppRouterNavigation,
-  AppRouterState,
-  AppRouterStore
-} from 'core/router';
+import type { AppLinkTo, AppLinkToOptions, AppLinkToTuple, AppRouterNavigation, AppRouterStore } from 'core/router';
 import {
   addRoute,
   clearNavigation,
@@ -17,6 +10,7 @@ import {
   getRouteFromPanelKey,
   insertRightPanel,
   removePanel,
+  removeRoute,
   ROUTER_STORE_EXAMPLE,
   sanitizeAppRouterStore,
   setNavigation,
@@ -28,7 +22,7 @@ import {
 import type { AppRouteLocation, InferAppRouteSearchValuesFromPath, InferAppRouteValuesFromRoute } from 'core/routes';
 import type { Location, NavigateFunction, NavigateOptions } from 'react-router';
 import { matchPath } from 'react-router';
-import { generateRandomUUID } from 'shared/utils/app.utils';
+import { deepCompare, generateRandomUUID } from 'shared/utils/app.utils';
 
 //*****************************************************************************************
 // Find Routes
@@ -72,7 +66,7 @@ export const findAppRouteFromLocation = function <const Route extends AppRoute>(
  * @name buildRoutePathname
  * @description Resolves the pathname for a destination by stringifying typed path params through the route codec, or falling back to manual encoding when no codec is available.
  * @param route - Matched route definition, if found
- * @param to - Typed destination containing path and optional params
+ * @param values - Typed destination containing path and optional params
  * @returns Resolved pathname string
  */
 export const getLocationPathFromAppRouteValues = function <const Route extends AppRoute>(
@@ -100,7 +94,7 @@ export const getLocationPathFromAppRouteValues = function <const Route extends A
  * @description Serializes provided search params via the route search engine delta method.
  * Produces the query string content without a leading `?`.
  * @param route - Matched route definition, if found
- * @param to - Typed destination containing optional search values
+ * @param values - Typed destination containing optional search values
  * @returns Query string content, or empty string when no search delta is available
  */
 export const getLocationSearchFromAppRouteValues = function <const Route extends AppRoute>(
@@ -117,7 +111,7 @@ export const getLocationSearchFromAppRouteValues = function <const Route extends
  * @description Resolves and normalizes hash content for a destination.
  * Ensures the returned value excludes a leading `#` when non-empty.
  * @param route - Matched route definition, if found
- * @param to - Typed destination containing optional hash value
+ * @param values - Typed destination containing optional hash value
  * @returns Normalized hash string without `#`, or empty string when hash is absent
  */
 export const getLocationHashFromAppRouteValues = function <const Route extends AppRoute>(
@@ -135,7 +129,7 @@ export const getLocationHashFromAppRouteValues = function <const Route extends A
  * @description Builds route state from the same search delta used to create the query string.
  * This keeps URL search and navigation state in sync.
  * @param route - Matched route definition, if found
- * @param to - Typed destination containing optional search values
+ * @param values - Typed destination containing optional search values
  * @returns Route state object, or undefined when no state delta is available
  */
 export const getLocationStateFromAppRouteValues = function <const Route extends AppRoute>(
@@ -151,8 +145,8 @@ export const getLocationStateFromAppRouteValues = function <const Route extends 
  * @name buildRouteLocation
  * @description Builds the final route location payload for navigation from a typed destination.
  * Computes pathname, search, hash, and state in a single pass — the search delta is resolved once.
- * @param routes - Array of created route definitions
- * @param to - Typed destination containing path, optional params, search, and hash
+ * @param route - Matched route definition, if found
+ * @param values - Typed destination containing path, optional params, search, and hash
  * @returns Route location with `href` and `state`
  */
 export const getLocationFromAppRouteValues = function <const Route extends AppRoute>(
@@ -248,6 +242,68 @@ export const getAppRouteValuesFromLocation = function <const Route extends AppRo
   } as InferAppRouteValuesFromRoute<Route>;
 };
 
+export const deepLocationCompare = function (
+  routes: AppRoutes,
+  locationA: AppRouteLocation,
+  locationB: AppRouteLocation
+): 'same-path' | true | false {
+  if (!locationA.href || !locationB.href) return locationA.href === locationB.href;
+
+  const routeA = findAppRouteFromLocation(routes, locationA);
+  const routeB = findAppRouteFromLocation(routes, locationB);
+
+  if (routeA?.path === routeB?.path) {
+    const appValuesA = getAppRouteValuesFromLocation(routeA, locationA);
+    const appValuesB = getAppRouteValuesFromLocation(routeA, locationB);
+
+    if (deepCompare(appValuesA, appValuesB)) return true;
+
+    return 'same-path';
+  }
+
+  return false;
+};
+
+//*****************************************************************************************
+// Parser
+//*****************************************************************************************
+
+export const getLocationHrefFromStore = (store: AppRouterStore): string => {
+  void store;
+  return null;
+};
+
+export const getLocationStateFromStore = (store: AppRouterStore): AppRouterState => {
+  // Strip transient runtime state before serializing into location history.
+  // isBlocked/blockerMessage are set by mounted components and reset when they re-mount.
+  // navigation/pendingNavigation are resolved before this snapshot is written.
+  const routes: AppRouterStore['routes'] = Object.fromEntries(
+    Object.entries(store.routes).map(([key, { isBlocked, blockerMessage, ...route }]) => {
+      void isBlocked;
+      void blockerMessage;
+      return [key, route];
+    })
+  );
+  const panels: AppRouterStore['panels'] = store.panels.map(({ navigation, pendingNavigation, ...panel }) => {
+    void navigation;
+    void pendingNavigation;
+    return { ...panel, navigation: null, pendingNavigation: null };
+  });
+  return { id: store.id, panels, routes };
+};
+
+export const getStoreFromLocationHref = (store: AppRouterStore, location: AppRouteLocation): AppRouterStore => {
+  void store;
+  void location;
+  return null;
+};
+
+export const getStoreFromLocationState = (store: AppRouterStore, location: AppRouteLocation): AppRouterStore => {
+  void store;
+  void location;
+  return null;
+};
+
 //*****************************************************************************************
 // Location Encoding
 //*****************************************************************************************
@@ -255,20 +311,24 @@ export const getAppRouteValuesFromLocation = function <const Route extends AppRo
 /**
  * @name getHashFragmentFromLocation
  * @description Encodes a single route href into the hash-parameter grammar.
- * Format: `${pathname}${%23-encoded-hash}${search}` (order: pathname, hash, search).
- * Internal hash values are encoded as %23 to distinguish from the panel-splitting # character.
+ * Format: `${pathname}${search}${#encoded-hash}`.
+ * Internal hash values are URI-encoded to distinguish them from panel-splitting `#` separators.
  * @param location - Route location containing href and optional state
  * @returns Encoded panel fragment, or null when href is empty
  */
 export const getHashFragmentFromLocation = ({ href }: AppRouteLocation): string | null => {
   if (!href) return null;
 
-  const url = new URL(href, 'http://localhost');
-  const pathname = url.pathname;
-  const hash = url.hash ? url.hash.slice(1) : '';
-  const search = url.search;
+  try {
+    const url = new URL(href, 'http://localhost');
+    const pathname = url.pathname;
+    const hash = url.hash ? url.hash.slice(1) : '';
+    const search = url.search;
 
-  return `${pathname}${search}${hash ? `#${encodeURIComponent(hash)}` : ''}`;
+    return `${pathname}${search}${hash ? `#${encodeURIComponent(hash)}` : ''}`;
+  } catch {
+    return null;
+  }
 };
 
 /**
@@ -287,67 +347,68 @@ export const getAppLinkFromLocation = ({ href, state }: AppRouteLocation): AppRo
 
 /**
  * @name syncStoreToLocation
- * @description Computes the navigation target from the store and compares it against the current location. Returns null when no navigation is needed.
- * Uses the multi-panel hash grammar: `/v1#${panel1}#${panel2}#${panel3}`.
- * Encodes each panel from its current route href and always includes current panels/routes in navigation state.
+ * @description Applies staged panel navigations to the store.
+ * For each panel with a pending navigation:
+ * - If the active route has `isBlocked: true`, the navigation is held in `pendingNavigation`
+ *   instead of being applied. The `AppRouterPanel` component reads this to render its own
+ *   inline confirmation dialog — scoped to the panel's visual bounds, not full-screen.
+ * - Otherwise, the navigation is applied immediately and `navigate()` is called once with
+ *   the updated `/v1#...` hash and the full store snapshot as location state.
  * @param store - Current router store state
- * @param location - Current React Router location
- * @returns Navigation payload ({ to, options }), or null if the location already matches
+ * @param navigate - React Router navigate function used to push/replace URL updates
+ * @returns Updated store after applying one or more navigations, or null when no change occurred
  */
 export const syncStoreToLocation = (store: AppRouterStore, navigate: NavigateFunction = () => null): AppRouterStore => {
   let changes: boolean = false;
-  let panelKey: number = store.panels.length - 1;
 
-  while (panelKey >= 0) {
+  for (let panelKey = store.panels.length - 1; panelKey >= 0; panelKey--) {
     const navigation = store.panels[panelKey].navigation;
-    const blocker = store.panels[panelKey].blocker;
-    if (navigation && !blocker.isBlocked) {
+    if (!navigation) continue;
+
+    const activeRouteKey = store.panels[panelKey].routeKey;
+    const isBlocked = activeRouteKey ? (store.routes[activeRouteKey]?.isBlocked ?? false) : false;
+
+    if (isBlocked) {
+      // Hold navigation — the panel renders its own inline dialog from pendingNavigation.
+      store.panels[panelKey].pendingNavigation = navigation;
+      store.panels[panelKey].navigation = null;
       changes = true;
-      const replace = navigation.replace;
-
-      switch (store.panels[panelKey].navigation.type) {
-        case 'create':
-          const [s, routeKey] = addRoute(store, { href: navigation.href, state: navigation.state });
-          store = updatePanel(s, panelKey, { routeKey });
-          store = clearNavigation(store, panelKey);
-          break;
-        case 'update':
-          const currentRouteKey = store.panels[panelKey].routeKey;
-          if (currentRouteKey && currentRouteKey in store.routes) {
-            store = updateRoute(store, currentRouteKey, { href: navigation.href, state: navigation.state });
-          } else {
-            const [s, routeKey] = addRoute(store, { href: navigation.href, state: navigation.state });
-            store = updatePanel(s, panelKey, { routeKey });
-          }
-          store = clearNavigation(store, panelKey);
-          break;
-        case 'delete':
-          store = removePanel(store, panelKey);
-          break;
-      }
-
-      const hashFragment = store.panels
-        .map(panel => {
-          const route = store.routes[panel.routeKey];
-          return route?.href ? getHashFragmentFromLocation(route) : null;
-        })
-        .filter((f): f is string => f !== null)
-        .join('#');
-
-      void navigate(hashFragment ? `/v1#${hashFragment}` : '/v1', {
-        state: { id: store.id, panels: store.panels, routes: store.routes },
-        replace: replace
-      });
+      continue;
     }
 
-    panelKey--;
+    changes = true;
+    const replace = navigation.replace;
+
+    if (!navigation.href) {
+      store = removePanel(store, panelKey);
+    } else if (navigation.routeKey && navigation.routeKey in store.routes) {
+      store = updateRoute(store, navigation.routeKey, { href: navigation.href, state: navigation.state });
+      store = updatePanel(store, panelKey, { routeKey: navigation.routeKey });
+      store = clearNavigation(store, panelKey);
+    } else {
+      const [nextStore, routeKey] = addRoute(store, { href: navigation.href, state: navigation.state });
+      store = updatePanel(nextStore, panelKey, { routeKey });
+      store = clearNavigation(store, panelKey);
+    }
+
+    const hashFragment = store.panels
+      .map(panel => {
+        const route = store.routes[panel.routeKey];
+        return route?.href ? getHashFragmentFromLocation(route) : null;
+      })
+      .filter((f): f is string => f !== null)
+      .join('#');
+
+    store = sanitizeAppRouterStore(store);
+    store.id = generateRandomUUID();
+
+    void navigate(hashFragment ? `/v1#${hashFragment}` : '/v1', {
+      state: getLocationStateFromStore(store),
+      replace
+    });
   }
 
-  if (!changes) return null;
-
-  store = sanitizeAppRouterStore(store);
-  store.id = generateRandomUUID();
-  return store;
+  return changes ? store : null;
 };
 
 //*****************************************************************************************
@@ -356,11 +417,11 @@ export const syncStoreToLocation = (store: AppRouterStore, navigate: NavigateFun
 
 /**
  * @name getLocationFromHashFragment
- * @description Decodes a panel fragment into an AppRouteLocation by reconstructing an href,
- * matching it to an app route, parsing route values, and re-stringifying through route codecs.
- * Current implementation derives `%23` from the parsed pathname portion of `new URL(fragment, base)`.
+ * @description Decodes one panel fragment from the hash grammar back into an href.
+ * Splits the fragment into pathname, optional encoded hash, and optional search string.
+ * Returns a null href when encoded hash decoding throws.
  * @param fragment - Encoded panel fragment
- * @returns Normalized AppRouteLocation, or null on parse/route-match failure
+ * @returns Reconstructed AppRouteLocation
  */
 export const getLocationFromHashFragment = (fragment: string): AppRouteLocation | null => {
   if (!fragment) return { href: null, state: null };
@@ -375,37 +436,73 @@ export const getLocationFromHashFragment = (fragment: string): AppRouteLocation 
   const hash = searchIndex === -1 ? hashAndSearch : hashAndSearch.slice(0, searchIndex);
   const search = searchIndex === -1 ? '' : hashAndSearch.slice(searchIndex);
 
-  return {
-    href: `${pathname}${search}${hash ? `#${decodeURIComponent(hash)}` : ''}`,
-    state: null
-  };
+  try {
+    return {
+      href: `${pathname}${search}${hash ? `#${decodeURIComponent(hash)}` : ''}`,
+      state: null
+    };
+  } catch {
+    return { href: null, state: null };
+  }
 };
 
 /**
  * @name parseLocationState
- * @description Stages router navigation requests from location.state without
- * mutating routes/panels directly.
- * Requests are staged as create/update for state panels and delete for trailing panels.
+ * @description Reconciles `location.state` into store routes and panels directly.
+ * Removes routes missing from state, upserts provided routes/panels, trims extra panels,
+ * and updates the store id from `location.state.id` (or generates one if missing).
+ * Returns the original store reference when there is no effective diff.
  * @param store - Current router store
  * @param location - React Router location
  * @returns Updated router store
  */
 export const parseLocationState = (store: AppRouterStore, location: Location<AppRouterState>): AppRouterStore => {
-  for (const [rawRouteKey, route] of Object.entries(location?.state?.routes || {})) {
-    const routeKey = rawRouteKey;
-    store = setRoute(store, routeKey, route);
+  return store;
+
+  const nextState = location?.state;
+  const nextRoutes = nextState?.routes || {};
+  const nextPanels = nextState?.panels || [];
+  const nextId = nextState?.id ?? null;
+
+  if (store.id === nextId && deepCompare(store.routes, nextRoutes) && deepCompare(store.panels, nextPanels)) {
+    return store;
   }
 
-  const panels = location?.state?.panels || [];
-  for (let panelKey = 0; panelKey < panels.length; panelKey++) {
-    store = setPanel(store, panelKey, panels[panelKey]);
+  let didChange = false;
+
+  for (const routeKey of Object.keys(store.routes)) {
+    if (routeKey in nextRoutes) continue;
+    store = removeRoute(store, routeKey);
+    didChange = true;
   }
-  if (store.panels.length > panels.length) {
-    store.panels.splice(panels.length);
+
+  for (const [routeKey, route] of Object.entries(nextRoutes)) {
+    if (deepCompare(store.routes[routeKey], route)) continue;
+    store = setRoute(store, routeKey, route);
+    didChange = true;
   }
+
+  for (let panelKey = 0; panelKey < nextPanels.length; panelKey++) {
+    if (panelKey >= store.panels.length) {
+      store = setPanel(store, panelKey, nextPanels[panelKey]);
+      didChange = true;
+      continue;
+    }
+
+    if (deepCompare(store.panels[panelKey], nextPanels[panelKey])) continue;
+    store = setPanel(store, panelKey, nextPanels[panelKey]);
+    didChange = true;
+  }
+
+  if (store.panels.length > nextPanels.length) {
+    store.panels.splice(nextPanels.length);
+    didChange = true;
+  }
+
+  if (!didChange) return store;
 
   store = sanitizeAppRouterStore(store);
-  store.id = location.state?.id ?? generateRandomUUID();
+  store.id = nextId ?? generateRandomUUID();
   return store;
 };
 
@@ -431,7 +528,9 @@ export const parseLocationHash = (store: AppRouterStore, location: Location<AppR
   const locations = panelFragments
     .map(fragment => {
       const location = getLocationFromHashFragment(fragment);
+      if (!location?.href) return null;
       const appRoute = findAppRouteFromLocation(APP_ROUTES, location);
+      if (!appRoute) return location;
       const appRouteValues = getAppRouteValuesFromLocation(appRoute, location);
       return getLocationFromAppRouteValues(appRoute, appRouteValues);
     })
@@ -439,29 +538,37 @@ export const parseLocationHash = (store: AppRouterStore, location: Location<AppR
 
   if (!locations?.length) return store;
 
+  let didChange = false;
+
   for (let i = 0; i < locations.length; i++) {
     if (i >= store.panels.length) {
       [store] = insertRightPanel(store, i, { routeKey: null });
-      store = setNavigation(store, i, { ...locations[i], type: 'create' });
+      store = setNavigation(store, i, { ...locations[i], routeKey: null });
+      didChange = true;
     } else {
       const currentRoute = getRouteFromPanelKey(store, i);
-      const currentAppRoute = findAppRouteFromLocation(APP_ROUTES, currentRoute);
-      const incomingAppRoute = findAppRouteFromLocation(APP_ROUTES, locations[i]);
+      const compare = deepLocationCompare(APP_ROUTES, locations[i], currentRoute);
+      const currentRouteKey = store.panels[i].routeKey;
 
-      if (locations[i].href === currentRoute.href) {
-        // skip
-      } else if (currentAppRoute && incomingAppRoute && currentAppRoute.path === incomingAppRoute.path) {
-        // Set the difference
-        store = setNavigation(store, i, { ...locations[i], type: 'update' });
+      if (compare === 'same-path') {
+        store = setNavigation(store, i, { ...locations[i], routeKey: currentRouteKey });
+        didChange = true;
+      } else if (!compare) {
+        store = setNavigation(store, i, { ...locations[i], routeKey: null });
+        didChange = true;
       } else {
-        store = setNavigation(store, i, { ...locations[i], type: 'create' });
+        continue;
       }
     }
   }
 
   for (let i = locations.length; i < store.panels.length; i++) {
-    store = setNavigation(store, i, { type: 'delete' });
+    if (store.panels[i].navigation?.href === null) continue;
+    store = setNavigation(store, i, { href: null, routeKey: store.panels[i].routeKey, state: null });
+    didChange = true;
   }
+
+  if (!didChange) return store;
 
   store.id = generateRandomUUID();
   return store;
@@ -469,18 +576,20 @@ export const parseLocationHash = (store: AppRouterStore, location: Location<AppR
 
 /**
  * @name syncLocationToStore
- * @description Computes the next router store from the current location. Returns null when the store already matches.
- * Current precedence is: hash grammar first, then location state.
+ * @description Computes the next router store from the current location.
+ * Sync precedence is `location.state` first, then hash parsing.
+ * Returns the current store when no sync is needed, and falls back to the router example shape if parsing throws.
  * @param store - Current router store state
  * @param location - Current React Router location
- * @returns The next store state, or null if no update is needed
+ * @returns The next store state
  */
-export const syncLocationToStore = (store: AppRouterStore, location: Location<AppRouterState>): AppRouterStore => {
+export const syncLocationToStore = (store: AppRouterStore, location: Location<AppRouterNavigation>): AppRouterStore => {
   if (location.state?.id && location.state.id === store.id) return store;
+  if (!location.state && !location.hash) return store;
 
   try {
     if (!!location.state) return parseLocationState(store, location);
-    else if (!!location.hash) return parseLocationHash(store, location);
+    if (!!location.hash) return parseLocationHash(store, location);
   } catch (e) {
     // eslint-disable-next-line no-console
     console.error('error parsing the location', e);
@@ -495,16 +604,17 @@ export const syncLocationToStore = (store: AppRouterStore, location: Location<Ap
 
 /**
  * @name getAppLinkTo
- * @description Breaks down the "to" object into its key and value for further processing
- * @returns Updated router store
+ * @description Breaks down an AppLinkTo object into its first key/value pair.
+ * @returns Tuple of `[toKey, toValue]`, or `[null, null]` when `to` is empty
  */
 export const getAppLinkTo = function <const Path extends AppRoute['path']>(to: AppLinkToOptions<Path>) {
   return (Object.entries(to)?.[0] || [null, null]) as AppLinkToTuple<Path>;
 };
 
 /**
- * @name getOpenRouteExternalHref
- * @description Calculates the href prop to apply to an "a" tag so that the user can a single page on its own.
+ * @name getPreviousLocationFromRouter
+ * @description Returns a selector that resolves the previous route context used by functional navigation inputs.
+ * For non-functional updates, it returns the default empty route.
  */
 
 export const getPreviousLocationFromRouter = function <
@@ -531,7 +641,7 @@ export const getPreviousLocationFromRouter = function <
  * @param location - Route location with href and state
  * @returns Panel-wrapped location with v1 pathname and hash encoding, or null when href is empty
  */
-export const getExternalHrefFromNavigation = ({ href, state }: AppRouterNavigation): AppRouteLocation['href'] => {
+export const getExternalHrefFromNavigation = ({ href, state }: AppRouteLocation): AppRouteLocation['href'] => {
   if (!href) return null;
   const fragment = getHashFragmentFromLocation({ href, state });
   return !fragment ? null : `/v1#${fragment}`;
@@ -539,75 +649,78 @@ export const getExternalHrefFromNavigation = ({ href, state }: AppRouterNavigati
 
 /**
  * @name getNavigationFromOpenRoute
- * @description Calculates the href prop to apply to an "a" tag so that the user can a single page on its own.
+ * @description Builds a `create` navigation payload for opening a route in a new panel slot.
+ * Uses precomputed route definition and values to avoid recalculation.
  */
 export const getNavigationFromOpenRoute = function <const Path extends AppRoute['path']>(
   toValue: AppLinkTo<Path>['openRoute'],
-  prevLocation: AppRouterStore['routes'][string],
+  appRoute: AppRoute,
+  values: InferAppRouteValuesFromRoute<AppRoute>,
   { replace }: NavigateOptions = DEFAULT_NAVIGATE_OPTIONS
 ): AppRouterNavigation {
-  const prevRoute = findAppRouteFromLocation(APP_ROUTES, prevLocation);
-  const prevValues = getAppRouteValuesFromLocation(prevRoute, prevLocation);
-  const nextRoute = typeof toValue !== 'function' ? findAppRouteFromValues(APP_ROUTES, toValue) : prevRoute;
-  const nextValues = typeof toValue === 'function' ? toValue(prevValues) : toValue;
+  const nextRoute = typeof toValue !== 'function' ? findAppRouteFromValues(APP_ROUTES, toValue) : appRoute;
+  const nextValues = typeof toValue === 'function' ? toValue(values) : toValue;
   const nextLocation = getLocationFromAppRouteValues(nextRoute, nextValues);
-  return { href: nextLocation.href, state: nextLocation.state || null, replace, type: 'create' };
+  return { href: nextLocation.href, routeKey: null, state: nextLocation.state || null, replace };
 };
 
 /**
  * @name getNavigationFromReplaceRoute
- * @description Calculates the href prop to apply to an "a" tag so that the user can a single page on its own.
+ * @description Builds an `update` navigation payload that replaces the current route in place.
+ * Uses precomputed route definition and values to avoid recalculation.
  */
 export const getNavigationFromReplaceRoute = function <const Path extends AppRoute['path']>(
   toValue: AppLinkTo<Path>['replaceRoute'],
-  prevLocation: AppRouterStore['routes'][string],
+  appRoute: AppRoute,
+  values: InferAppRouteValuesFromRoute<AppRoute>,
+  routeKey: keyof AppRouterStore['routes'] = null,
   { replace }: NavigateOptions = DEFAULT_NAVIGATE_OPTIONS
 ): AppRouterNavigation {
-  const prevRoute = findAppRouteFromLocation(APP_ROUTES, prevLocation);
-  const prevValues = getAppRouteValuesFromLocation(prevRoute, prevLocation);
-  const nextRoute = typeof toValue !== 'function' ? findAppRouteFromValues(APP_ROUTES, toValue) : prevRoute;
-  const nextValues = typeof toValue === 'function' ? toValue(prevValues) : toValue;
+  const nextRoute = typeof toValue !== 'function' ? findAppRouteFromValues(APP_ROUTES, toValue) : appRoute;
+  const nextValues = typeof toValue === 'function' ? toValue(values) : toValue;
   const nextLocation = getLocationFromAppRouteValues(nextRoute, nextValues);
-  return { href: nextLocation.href, state: nextLocation.state || null, replace, type: 'update' };
+  return { href: nextLocation.href, routeKey, state: nextLocation.state || null, replace };
 };
 
 /**
- * @name getReplaceRouteExternalHref
- * @description Calculates the href prop to apply to an "a" tag so that the user can a single page on its own.
+ * @name getNavigationFromReplaceSearchObject
+ * @description Builds an `update` navigation payload by replacing search values with an object-based input.
+ * Uses precomputed route definition and values to avoid recalculation.
  */
 export const getNavigationFromReplaceSearchObject = function <const Path extends AppRoute['path']>(
   toValue: AppLinkTo<Path>['replaceSearchObject'],
-  prevLocation: AppRouterStore['routes'][string],
+  appRoute: AppRoute,
+  values: InferAppRouteValuesFromRoute<AppRoute>,
+  routeKey: keyof AppRouterStore['routes'] = null,
   { replace }: NavigateOptions = DEFAULT_NAVIGATE_OPTIONS
 ): AppRouterNavigation {
-  const prevRoute = findAppRouteFromLocation(APP_ROUTES, prevLocation);
-  const prevValues = getAppRouteValuesFromLocation(prevRoute, prevLocation);
-  const prevSearchObject = prevValues.search as InferAppRouteSearchValuesFromPath<Path>;
-  const prevSearch = (prevRoute?.search?.full?.(prevSearchObject)?.toObject?.() ||
+  const prevSearchObject = values.search as InferAppRouteSearchValuesFromPath<Path>;
+  const prevSearch = (appRoute?.search?.full?.(prevSearchObject)?.toObject?.() ||
     null) as InferAppRouteSearchValuesFromPath<Path>;
   const nextSearchObject = typeof toValue === 'function' ? toValue(prevSearch) : toValue;
-  const nextSearch = prevRoute?.search?.delta?.(nextSearchObject)?.toObject?.() || null;
-  const nextValues = { ...prevValues, search: nextSearch };
-  const nextLocation = getLocationFromAppRouteValues(prevRoute, nextValues as InferAppRouteValuesFromRoute<AppRoute>);
-  return { href: nextLocation.href, state: nextLocation.state || null, replace, type: 'update' };
+  const nextSearch = appRoute?.search?.delta?.(nextSearchObject)?.toObject?.() || null;
+  const nextValues = { ...values, search: nextSearch };
+  const nextLocation = getLocationFromAppRouteValues(appRoute, nextValues as InferAppRouteValuesFromRoute<AppRoute>);
+  return { href: nextLocation.href, routeKey, state: nextLocation.state || null, replace };
 };
 
 /**
- * @name getReplaceRouteExternalHref
- * @description Calculates the href prop to apply to an "a" tag so that the user can a single page on its own.
+ * @name getNavigationFromReplaceURLSearchParams
+ * @description Builds an `update` navigation payload by replacing search values with URLSearchParams input.
+ * Uses precomputed route definition and values to avoid recalculation.
  */
 export const getNavigationFromReplaceURLSearchParams = function <const Path extends AppRoute['path']>(
   toValue: AppLinkTo<Path>['replaceURLSearchParams'],
-  prevLocation: AppRouterStore['routes'][string],
+  appRoute: AppRoute,
+  values: InferAppRouteValuesFromRoute<AppRoute>,
+  routeKey: keyof AppRouterStore['routes'] = null,
   { replace }: NavigateOptions = DEFAULT_NAVIGATE_OPTIONS
 ): AppRouterNavigation {
-  const prevRoute = findAppRouteFromLocation(APP_ROUTES, prevLocation);
-  const prevValues = getAppRouteValuesFromLocation(prevRoute, prevLocation);
-  const prevSearchObject = prevValues.search as InferAppRouteSearchValuesFromPath<Path>;
-  const prevSearch = prevRoute?.search?.full?.(prevSearchObject)?.toParams?.();
+  const prevSearchObject = values.search as InferAppRouteSearchValuesFromPath<Path>;
+  const prevSearch = appRoute?.search?.full?.(prevSearchObject)?.toParams?.();
   const nextSearchParams = typeof toValue === 'function' ? toValue(prevSearch) : toValue;
-  const nextSearch = prevRoute?.search?.delta?.(nextSearchParams)?.toObject?.() || null;
-  const nextValues = { ...prevValues, search: nextSearch };
-  const nextLocation = getLocationFromAppRouteValues(prevRoute, nextValues as InferAppRouteValuesFromRoute<AppRoute>);
-  return { href: nextLocation.href, state: nextLocation.state || null, replace, type: 'update' };
+  const nextSearch = appRoute?.search?.delta?.(nextSearchParams)?.toObject?.() || null;
+  const nextValues = { ...values, search: nextSearch };
+  const nextLocation = getLocationFromAppRouteValues(appRoute, nextValues as InferAppRouteValuesFromRoute<AppRoute>);
+  return { href: nextLocation.href, routeKey, state: nextLocation.state || null, replace };
 };

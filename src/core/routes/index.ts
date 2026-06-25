@@ -19,20 +19,19 @@ export type {
   RoutePath
 } from './routes.models';
 export {
-  AppRouteKeyProvider,
-  AppRouteKeyStoreProvider,
   AppRouteProvider,
   AppRouteStoreProvider,
-  useAppRouteKey,
-  useAppRouteKeyStore,
+  AppRouteValuesProvider,
+  AppRouteValuesStoreProvider,
   useAppRouteSetStore,
-  useAppRouteStore
+  useAppRouteStore,
+  useAppRouteValuesStore
 } from './routes.providers';
 export type {
-  AppRouteKeyStore,
-  AppRouteKeyStoreProviderProps,
   AppRouteProviderProps,
-  AppRouteStore
+  AppRouteStore,
+  AppRouteValuesStore,
+  AppRouteValuesStoreProviderProps
 } from './routes.providers';
 export {
   findAppRouteFromLocation,

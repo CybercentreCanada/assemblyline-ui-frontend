@@ -2,7 +2,7 @@ import type { InferAppRouteSearchValuesFromPath, InferAppRouteValuesFromRoute } 
 import type { ReversePortalNode } from 'features/portal';
 import { createReversePortalNode } from 'features/portal';
 import type { SetStateAction } from 'react';
-import type { NavigateOptions, NavigateProps } from 'react-router';
+import type { NavigateOptions } from 'react-router';
 import { generateRandomUUID } from 'shared/utils/app.utils';
 
 //*****************************************************************************************
@@ -47,40 +47,10 @@ export const DEFAULT_NAVIGATE_OPTIONS: NavigateOptions = {
 // Blocker
 //*****************************************************************************************
 
-export type AppRouterBlocker = {
-  /** Whether the panel currently blocks this request. */
-  isBlocked: boolean;
-  /** Optional message to show in confirmation dialog. */
-  message?: string;
-};
+/** Route blocker registry keyed by route ids. */
+export type AppRouterBlockedRoutes = Record<keyof AppRouterStore['routes'], unknown>;
 
-export const DEFAULT_APP_ROUTER_BLOCKER: AppRouterBlocker = {
-  isBlocked: false,
-  message: null
-};
-
-//*****************************************************************************************
-// Navigation
-//*****************************************************************************************
-
-/** Navigation payload staged on a panel. */
-export type AppRouterNavigation = {
-  /** Target href for this navigation. */
-  href: string;
-  /** Whether browser history should replace the current entry. */
-  replace: NavigateProps['replace'];
-  /** Optional state payload sent with the navigation. */
-  state: NavigateProps['state'];
-  /** Operation type used by router store reducers. */
-  type: 'create' | 'update' | 'delete';
-};
-
-export const DEFAULT_APP_ROUTER_NAVIGATION: AppRouterNavigation = {
-  href: null,
-  replace: false,
-  state: null,
-  type: 'create'
-};
+export const DEFAULT_APP_ROUTER_BLOCKED_ROUTES: AppRouterBlockedRoutes = {};
 
 //*****************************************************************************************
 // Panel
@@ -88,14 +58,10 @@ export const DEFAULT_APP_ROUTER_NAVIGATION: AppRouterNavigation = {
 
 /** Represents a single panel in the multi-panel router. */
 export type AppRouterPanel = {
-  /** Current blocker state for this panel. */
-  blocker: AppRouterBlocker;
-  /** Current/pending navigation request for this panel. */
-  navigation: AppRouterNavigation;
-  /** Keys of pinned routes in this panel. */
-  pinnedRouteKeys: (keyof AppRouterStore['routes'])[];
   /** Currently active route key for this panel. */
   routeKey: keyof AppRouterStore['routes'];
+  /** Keys of pinned routes in this panel. */
+  pinnedRouteKeys: (keyof AppRouterStore['routes'])[];
   /** Keys of tabbed routes in this panel. */
   tabbedRouteKeys: (keyof AppRouterStore['routes'])[];
   /** Key of the temporary (unsaved) route. */
@@ -103,10 +69,8 @@ export type AppRouterPanel = {
 };
 
 export const DEFAULT_APP_ROUTER_PANEL: AppRouterPanel = {
-  blocker: DEFAULT_APP_ROUTER_BLOCKER,
-  navigation: DEFAULT_APP_ROUTER_NAVIGATION,
-  pinnedRouteKeys: [],
   routeKey: null,
+  pinnedRouteKeys: [],
   tabbedRouteKeys: [],
   temporaryRouteKey: null
 };
@@ -151,23 +115,26 @@ export const DEFAULT_APP_ROUTER_ROUTE: AppRouterRoute = {
 };
 
 //*****************************************************************************************
-// State
+// Navigate
 //*****************************************************************************************
 
 /** Serializable subset of AppRouterStore for navigation state. */
-export type AppRouterState = {
+export type AppRouterNavigation = {
   /** Snapshot id for fast equality checks. */
   id: AppRouterStore['id'];
   /** Panel configurations. */
   panels: AppRouterStore['panels'];
   /** Route entries. */
   routes: AppRouterStore['routes'];
+  /** Check if this navigation should replace the current history entry */
+  replace?: boolean;
 };
 
-export const DEFAULT_APP_ROUTER_STATE: AppRouterState = {
+export const DEFAULT_APP_ROUTER_NAVIGATION: AppRouterNavigation = {
   id: null,
   panels: [],
-  routes: {}
+  routes: {},
+  replace: false
 };
 
 //*****************************************************************************************
@@ -178,10 +145,14 @@ export const DEFAULT_APP_ROUTER_STATE: AppRouterState = {
 export type AppRouterStore = {
   /** Store revision id for sync checks. */
   id: string;
+  /** Route blocker registry keyed by route ids. */
+  blockedRoutes: AppRouterBlockedRoutes;
   /** Maximum allowed portal nodes. */
   maxNodes: number;
   /** Maximum allowed panels. */
   maxPanels: number;
+  /** Global navigation snapshot, if available. */
+  navigation: AppRouterNavigation | null;
   /** Portal node cache. */
   nodes: Record<string, AppRouterNode>;
   /** Panel configurations. */
@@ -192,8 +163,10 @@ export type AppRouterStore = {
 
 export const DEFAULT_APP_ROUTER_STORE: AppRouterStore = {
   id: generateRandomUUID(),
+  blockedRoutes: {},
   maxNodes: 2,
   maxPanels: 2,
+  navigation: null,
   nodes: {},
   panels: [],
   routes: {}
@@ -204,11 +177,11 @@ export const ROUTER_STORE_EXAMPLE: AppRouterStore = {
   id: 'test',
   maxNodes: 0,
   maxPanels: 0,
+  blockedRoutes: {},
+  navigation: null,
   nodes: { default: { portal: createReversePortalNode(), routeKey: 'default' } },
   panels: [
     {
-      blocker: DEFAULT_APP_ROUTER_BLOCKER,
-      navigation: null,
       pinnedRouteKeys: [],
       routeKey: 'default',
       tabbedRouteKeys: [],

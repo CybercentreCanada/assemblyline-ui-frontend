@@ -1,4 +1,4 @@
-import type { AppRouterBlocker, AppRouterNavigation, AppRouterStore } from 'core/router';
+import type { AppRouterNavigation, AppRouterStore } from 'core/router';
 import {
   DEFAULT_APP_ROUTER_NAVIGATION,
   DEFAULT_APP_ROUTER_NODE,
@@ -105,8 +105,7 @@ export const removeEmptyPanel = (store: AppRouterStore, panelKey: number): AppRo
     !store.panels[panelKey].routeKey &&
     !store.panels[panelKey].temporaryRouteKey &&
     !store.panels[panelKey].tabbedRouteKeys.length &&
-    !store.panels[panelKey].pinnedRouteKeys.length &&
-    !store.panels[panelKey].navigation
+    !store.panels[panelKey].pinnedRouteKeys.length
   ) {
     store.panels.splice(panelKey, 1);
   }
@@ -176,10 +175,11 @@ export const mergePanels = (store: AppRouterStore, panelKeyA: number, panelKeyB:
 
 /**
  * @name setPanel
- * @description Creates a new route entry and returns its generated key.
+ * @description Sets or replaces the panel at the provided index using panel defaults plus the supplied partial values.
  * @param store - Router store
- * @param partialRoute - Partial route payload
- * @returns Tuple of updated store and route key
+ * @param panelKey - Target panel index
+ * @param partialPanel - Partial panel payload
+ * @returns Updated router store
  */
 export const setPanel = (
   store: AppRouterStore,
@@ -440,10 +440,11 @@ export const updateNode = (
 
 /**
  * @name setNode
- * @description Creates a new route entry and returns its generated key.
+ * @description Sets or replaces a node by key using node defaults plus the supplied partial values.
  * @param store - Router store
- * @param partialRoute - Partial route payload
- * @returns Tuple of updated store and route key
+ * @param nodeKey - Target node key
+ * @param partialNode - Partial node payload
+ * @returns Updated router store
  */
 export const setNode = (
   store: AppRouterStore,
@@ -672,10 +673,11 @@ export const updateRoute = (
 
 /**
  * @name setRoute
- * @description Creates a new route entry and returns its generated key.
+ * @description Sets or replaces a route by key using route defaults plus the supplied partial values.
  * @param store - Router store
+ * @param routeKey - Target route key
  * @param partialRoute - Partial route payload
- * @returns Tuple of updated store and route key
+ * @returns Updated router store
  */
 export const setRoute = (
   store: AppRouterStore,
@@ -806,9 +808,9 @@ export const filterOrphanedRoutes = (store: AppRouterStore) => {
 
 /**
  * @name sanitizeRoutes
- * @description Collects all route keys currently referenced by panels and nodes, then removes unreferenced routes from the store.
+ * @description Removes orphaned routes and then recomputes route ages.
  * @param store - Router store
- * @returns Updated router store with orphaned routes removed
+ * @returns Updated router store
  */
 export const sanitizeRoutes = (store: AppRouterStore): AppRouterStore => {
   store = filterOrphanedRoutes(store);
@@ -1057,53 +1059,75 @@ export const sanitizeAppRouterStore = (store: AppRouterStore): AppRouterStore =>
 };
 
 //*****************************************************************************************
-// Blocker
+// Blocked Routes
 //*****************************************************************************************
 
 /**
- * @name applyNavigationBlocker
- * @description Applies the blocker values to the router store
+ * @name addBlocker
+ * @description Adds a blocker entry for a route key when the route exists and is not already blocked.
+ * @param store - Router store
+ * @param routeKey - Route key to block
  * @returns Updated router store
  */
-export const applyNavigationBlocker = (
-  store: AppRouterStore,
-  routeKey: keyof AppRouterStore['routes'],
-  shouldBlock: AppRouterBlocker['isBlocked']
-): AppRouterStore => {
-  const panelKey = findPanelKey(store, { routeKey });
-  store.panels[panelKey].blocker.isBlocked = shouldBlock;
+export const addBlockedRoute = (store: AppRouterStore, routeKey: keyof AppRouterStore['routes']): AppRouterStore => {
+  if (!(routeKey in store.routes) || routeKey in store.blockedRoutes) return store;
+  store.blockedRoutes[routeKey] = routeKey;
   return store;
+};
+
+/**
+ * @name removeBlocker
+ * @description Removes a blocker entry for a route key when it exists.
+ * @param store - Router store
+ * @param routeKey - Route key to unblock
+ * @returns Updated router store
+ */
+export const removeBlockedRoute = (store: AppRouterStore, routeKey: keyof AppRouterStore['routes']): AppRouterStore => {
+  if (!(routeKey in store.blockedRoutes)) return store;
+  delete store.blockedRoutes[routeKey];
+  return store;
+};
+
+/**
+ * @name hasBlockers
+ * @description Checks whether the router currently has any active blocker entries.
+ * @param store - Router store
+ * @returns True when at least one blocker exists, otherwise false
+ */
+export const hasBlockedRoutes = (store: AppRouterStore): boolean => {
+  return Object.keys(store.blockedRoutes).length > 0;
 };
 
 //*****************************************************************************************
 // Navigation
 //*****************************************************************************************
 
-export const setNavigation = (
-  store: AppRouterStore,
-  panelKey: number,
-  navigation: Partial<AppRouterNavigation>
-): AppRouterStore => {
-  if (panelKey < 0 || panelKey >= store.panels.length) return store;
-
-  store.panels[panelKey].navigation = {
-    ...DEFAULT_APP_ROUTER_NAVIGATION,
-    ...store.panels[panelKey].navigation,
-    ...navigation
-  };
-
+export const initializeNavigation = (store: AppRouterStore): AppRouterStore => {
+  store.navigation = { ...DEFAULT_APP_ROUTER_NAVIGATION, panels: store.panels, routes: store.routes };
   return store;
 };
 
-export const clearNavigation = (store: AppRouterStore, panelKey: number): AppRouterStore => {
-  if (panelKey < 0 || panelKey >= store.panels.length) return store;
-
-  store.panels[panelKey].navigation = null;
-
+/**
+ * @name setNavigation
+ * @description Stages a navigation request on a panel by merging the provided partial payload over the current panel navigation.
+ * @param store - Router store
+ * @param panelKey - Panel index to set navigation on
+ * @param navigation - Partial navigation payload to merge
+ * @returns Updated router store
+ */
+export const setNavigation = (store: AppRouterStore, navigation: Partial<AppRouterNavigation>): AppRouterStore => {
+  store.navigation = { ...DEFAULT_APP_ROUTER_NAVIGATION, ...navigation };
   return store;
 };
 
-export const getNavigation = (store: AppRouterStore, panelKey: number): AppRouterNavigation => {
-  if (panelKey < 0 || panelKey >= store.panels.length) return null;
-  return store.panels[panelKey].navigation;
+/**
+ * @name clearNavigation
+ * @description Clears the staged navigation request on a panel.
+ * @param store - Router store
+ * @param panelKey - Panel index to clear navigation on
+ * @returns Updated router store
+ */
+export const clearNavigation = (store: AppRouterStore): AppRouterStore => {
+  store.navigation = null;
+  return store;
 };

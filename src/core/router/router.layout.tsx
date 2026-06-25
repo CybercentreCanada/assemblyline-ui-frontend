@@ -1,5 +1,6 @@
+import { APP_ROUTES } from 'app/core.routes';
 import { findNode, useAppRouterStore } from 'core/router';
-import { AppRouteKeyProvider, AppRoutes } from 'core/routes';
+import { AppRoutes, AppRouteValuesProvider } from 'core/routes';
 import { InPortal, OutPortal } from 'features/portal';
 import type { PropsWithChildren } from 'react';
 import { memo } from 'react';
@@ -39,9 +40,9 @@ export const AppRouterNode = memo(({ nodeKey }: AppRouterNodeProps) => {
   return !routeKey || !href ? null : (
     <InPortal node={portal}>
       {/* <AppThemeProvider> */}
-      <AppRouteKeyProvider routeKey={routeKey}>
-        <AppRoutes href={href} state={state} />
-      </AppRouteKeyProvider>
+      <AppRouteValuesProvider appRoutes={APP_ROUTES} routeKey={routeKey}>
+        <AppRoutes appRoutes={APP_ROUTES} href={href} state={state} />
+      </AppRouteValuesProvider>
       {/* </AppThemeProvider> */}
     </InPortal>
   );

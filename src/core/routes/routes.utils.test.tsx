@@ -401,31 +401,6 @@ describe('getAppLinkFromLocation', () => {
 
   it('returns null when href is empty', () => {
     const next = getAppLinkFromLocation({ href: null, state: null } as never);
-    // getLocationFromHashFragment
-    //*****************************************************************************************
-    describe('getLocationFromHashFragment', () => {
-      it('decodes pathname/search/hash fragment into a normalized app location', () => {
-        const location = getLocationFromHashFragment('/submissions%23results?query=hello');
-        expect(location?.href).toBe('/submissions?query=hello#results');
-      });
-
-      it('decodes fragment with no hash marker', () => {
-        const location = getLocationFromHashFragment('/submissions?query=hello');
-        expect(location?.href).toBe('/submissions?query=hello');
-      });
-
-      it('returns null for unknown route fragment', () => {
-        const location = getLocationFromHashFragment('/not-a-real-route%23x?query=hello');
-        expect(location).toBeNull();
-      });
-
-      it('returns null for empty fragment input', () => {
-        const location = getLocationFromHashFragment('');
-        expect(location).toBeNull();
-      });
-    });
-
-    //*****************************************************************************************
     expect(next).toBeNull();
   });
 
@@ -441,6 +416,31 @@ describe('getAppLinkFromLocation', () => {
 });
 
 //*****************************************************************************************
+// getLocationFromHashFragment
+//*****************************************************************************************
+describe('getLocationFromHashFragment', () => {
+  it('decodes pathname/search/hash fragment into a normalized app location', () => {
+    const location = getLocationFromHashFragment('/submissions%23results?query=hello');
+    expect(location?.href).toBe('/submissions?query=hello#results');
+  });
+
+  it('decodes fragment with no hash marker', () => {
+    const location = getLocationFromHashFragment('/submissions?query=hello');
+    expect(location?.href).toBe('/submissions?query=hello');
+  });
+
+  it('returns null for malformed encoded hash fragments', () => {
+    const location = getLocationFromHashFragment('/submissions%23%zz?query=hello');
+    expect(location).toBeNull();
+  });
+
+  it('returns null for empty fragment input', () => {
+    const location = getLocationFromHashFragment('');
+    expect(location).toBeNull();
+  });
+});
+
+//*****************************************************************************************
 // parseLocationHash (v1 grammar parser)
 //*****************************************************************************************
 describe('parseLocationHash', () => {
@@ -452,6 +452,15 @@ describe('parseLocationHash', () => {
 
     expect(Object.values(next.routes).map(r => r.href)).toContain('/submissions');
     expect(next.panels).toHaveLength(1);
+  });
+
+  it('returns the same store when the hash already matches', () => {
+    const store = createStore();
+    const location = createRouterLocation({ hash: '/submissions' });
+    const parsed = parseLocationHash(store, location);
+    const next = parseLocationHash(parsed, location);
+
+    expect(next).toBe(parsed);
   });
 
   it('parses multi-panel v1 hash', () => {
@@ -484,6 +493,20 @@ describe('parseLocationState', () => {
     expect(next.routes.r1?.href).toBe('/page1');
     expect(next.panels).toHaveLength(1);
     expect(next.id).toBe('state-id-1');
+  });
+
+  it('returns the same store when the location state already matches', () => {
+    const store = createStore();
+    const location = createRouterLocation({
+      state: {
+        id: store.id,
+        routes: {},
+        panels: []
+      } as AppRouterState
+    });
+
+    const next = parseLocationState(store, location);
+    expect(next).toBe(store);
   });
 
   it('trims extra existing panels when new state has fewer panels', () => {
@@ -559,7 +582,15 @@ describe('syncLocationToStore', () => {
     expect((Object.values(next.routes) as { href: string }[]).map(r => r.href)).toContain('/page1');
   });
 
-  it('falls back to router example when parsing throws', () => {
+  it('returns the same store when there is no location state or hash to sync', () => {
+    const store = createStore();
+    const location = createRouterLocation();
+
+    const next = syncLocationToStore(store, location);
+    expect(next).toBe(store);
+  });
+
+  it('returns the same store when parsing throws', () => {
     const store = createStore();
     store.maxNodes = 7;
     store.maxPanels = 8;
@@ -573,9 +604,7 @@ describe('syncLocationToStore', () => {
 
     const location = createRouterLocation({ state: invalidState });
     const next = syncLocationToStore(store, location);
-    expect(next.id).toBe('test');
-    expect(next.maxNodes).toBe(7);
-    expect(next.maxPanels).toBe(8);
+    expect(next).toBe(store);
   });
 });
 
@@ -583,88 +612,19 @@ describe('syncLocationToStore', () => {
 // syncStoreToLocation (v1 hash grammar output)
 //*****************************************************************************************
 describe('syncStoreToLocation', () => {
-  it('returns [null, null] when location and store share the same id', () => {
+  it('returns null when no panel has staged navigation', () => {
     const store = createStore();
-    store.id = 'same-id';
-    store.routes = { r1: { href: '/page1', state: null } };
-    store.panels = [
-      {
-        routeKey: 'r1',
-        tabbedRouteKeys: ['r1'],
-        pinnedRouteKeys: [],
-        temporaryRouteKey: null,
-        blocker: { isBlocked: false, message: null },
-        navigation: { href: '/submit', state: null, replace: false, type: 'update' }
-      } as never
-    ];
-    const location = createRouterLocation({ state: { id: 'same-id', routes: {}, panels: [] } as AppRouterState });
+    const next = syncStoreToLocation(store, () => null);
 
-    const [nextStore, nextNavigation] = syncStoreToLocation(store, location);
-    expect(nextStore).toBeNull();
-    expect(nextNavigation).toBeNull();
+    expect(next).toBeNull();
   });
 
-  it('builds v1 hash navigation payload from staged panel navigation', () => {
-    const store = createStore();
-    store.id = 'store-sync-id';
-    store.routes = {
-      r1: { href: '/page1', state: null }
-    };
-    store.panels = [
-      {
-        routeKey: 'r1',
-        tabbedRouteKeys: ['r1'],
-        pinnedRouteKeys: [],
-        temporaryRouteKey: null,
-        blocker: { isBlocked: false, message: null },
-        navigation: { href: '/submit', state: { source: 'x' }, replace: false, type: 'update' }
-      } as never
-    ];
-
-    const location = createRouterLocation({ state: { id: 'other-id', routes: {}, panels: [] } as AppRouterState });
-    const [nextStore, nextNavigation] = syncStoreToLocation(store, location);
-
-    expect(nextNavigation?.to).toBe('/v1#/submit');
-    expect(nextStore?.routes?.r1?.href).toBe('/submit');
-    const navigationState = nextNavigation?.options?.state as {
-      id: string;
-      panels: AppRouterStore['panels'];
-      routes: AppRouterStore['routes'];
-    };
-
-    expect(navigationState?.id).toBe(nextStore?.id);
-    expect(navigationState?.panels).toEqual(nextStore?.panels);
-  });
-
-  it('keeps panel hash anchors in v1 fragment format', () => {
-    const store = createStore();
-    store.id = 'hash-test-id';
-    store.routes = {
-      r1: { href: '/page1', state: null }
-    };
-    store.panels = [
-      {
-        routeKey: 'r1',
-        tabbedRouteKeys: ['r1'],
-        pinnedRouteKeys: [],
-        temporaryRouteKey: null,
-        blocker: { isBlocked: false, message: null },
-        navigation: { href: '/page#section', state: null, replace: false, type: 'update' }
-      } as never
-    ];
-
-    const location = createRouterLocation();
-    const [, nextNavigation] = syncStoreToLocation(store, location);
-
-    expect(nextNavigation?.to).toBe('/v1#/page#section');
-  });
-
-  it('returns v1 format with /v1 pathname and hash encoding', () => {
+  it('drains one staged navigation request per pass', () => {
     const store = createStore();
     store.id = 'format-test-id';
     store.routes = {
-      r1: { href: '/submissions?query=test#results', state: null },
-      r2: { href: '/submit?mode=create', state: null }
+      r1: { href: '/page1', state: null },
+      r2: { href: '/page2', state: null }
     };
     store.panels = [
       {
@@ -672,22 +632,29 @@ describe('syncStoreToLocation', () => {
         tabbedRouteKeys: ['r1'],
         pinnedRouteKeys: [],
         temporaryRouteKey: null,
-        blocker: { isBlocked: false, message: null },
-        navigation: { href: '/submissions?query=test#results', state: null, replace: false, type: 'update' }
+        pendingNavigation: null,
+        navigation: { href: '/submit?x=1', routeKey: 'r1', state: { source: 'first' }, replace: false }
       } as never,
       {
         routeKey: 'r2',
         tabbedRouteKeys: ['r2'],
         pinnedRouteKeys: [],
         temporaryRouteKey: null,
-        blocker: { isBlocked: false, message: null },
-        navigation: null
+        pendingNavigation: null,
+        navigation: { href: '/submit?x=2', routeKey: 'r2', state: { source: 'second' }, replace: true }
       } as never
     ];
 
-    const location = createRouterLocation();
-    const [, nextNavigation] = syncStoreToLocation(store, location);
+    const calls: Array<{ to: string; replace?: boolean }> = [];
+    const next = syncStoreToLocation(store, (to, options) => {
+      calls.push({ to, replace: options?.replace });
+      return null;
+    } as never);
 
-    expect(nextNavigation?.to).toBe('/v1#/submissions?query=test#results#/submit?mode=create');
+    expect(calls).toHaveLength(1);
+    expect(calls[0].to).toBe('/v1#/page1#/submit?x=2');
+    expect(calls[0].replace).toBe(true);
+    expect(next?.panels[1].navigation).toBeNull();
+    expect(next?.panels[0].navigation?.href).toBe('/submit?x=1');
   });
 });

@@ -32,10 +32,10 @@ export const createAppStore = <Store extends object>(initialState: Store) => {
     return <StoreContext.Provider value={storeRef.current}>{children}</StoreContext.Provider>;
   });
 
-  const useStore = <T,>(selector: (state: Store) => T): T => {
+  const useStore = <T,>(selector: (state: Store) => T, hideWarnings: boolean = false): T => {
     const store = useContext(StoreContext);
 
-    if (!store) {
+    if (!store && !hideWarnings) {
       console.warn('[createAppStore] `useStore` called outside of StoreProvider.');
     }
 
@@ -44,19 +44,21 @@ export const createAppStore = <Store extends object>(initialState: Store) => {
     return store ? value : selector(initialState);
   };
 
-  const useSetStore = () => {
+  const useSetStore = (hideWarnings: boolean = false) => {
     const store = useContext(StoreContext);
 
     return useCallback(
       (patch: StorePatch) => {
         if (!store) {
-          console.warn('[createAppStore] `useSetStore` called outside of StoreProvider.');
+          if (!hideWarnings) {
+            console.warn('[createAppStore] `useSetStore` called outside of StoreProvider.');
+          }
           return;
         }
 
         store.setState(prev => ({ ...prev, ...(typeof patch === 'function' ? patch(prev) : patch) }));
       },
-      [store]
+      [hideWarnings, store]
     );
   };
 

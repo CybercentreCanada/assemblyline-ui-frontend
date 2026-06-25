@@ -1,4 +1,3 @@
-import { APP_ROUTES } from 'app/core.routes';
 import type { AppRouteLocation } from 'core/routes/routes.models';
 import { NotFoundPage } from 'pages/not-found/not-found.route';
 import { memo, useMemo } from 'react';
@@ -7,14 +6,16 @@ import { Route, Routes } from 'react-router';
 //*****************************************************************************************
 // App Routes
 //*****************************************************************************************
-export type AppRoutesProps = AppRouteLocation;
+export type AppRoutesProps = AppRouteLocation & {
+  appRoutes: AppRoutes;
+};
 
-export const AppRoutes = memo(({ href, state }: AppRoutesProps) => {
+export const AppRoutes = memo(({ appRoutes, href, state }: AppRoutesProps) => {
   const { pathname, search, hash } = useMemo(() => new URL(href, window.location.origin), [href]);
 
   return (
     <Routes location={{ pathname, search, hash, state }}>
-      {APP_ROUTES.map((route, i) => (
+      {appRoutes.map((route, i) => (
         <Route
           key={i}
           path={route.path}

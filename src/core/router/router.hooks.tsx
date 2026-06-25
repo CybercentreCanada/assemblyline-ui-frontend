@@ -1,43 +1,40 @@
-import { useAppPreferenceStore } from 'core/preference';
-import type { AppLinkTo, AppRouterNavigation } from 'core/router';
+import type { AppLinkTo } from 'core/router';
 import {
-  applyNavigationBlocker,
+  addBlockedRoute,
   DEFAULT_NAVIGATE_OPTIONS,
-  findNextPanelKey,
-  findPanelKey,
-  getRouteFromPanelKey,
+  removeBlockedRoute,
   setNavigation,
-  upsertPanel,
-  useAppRouterStore,
   useAppSetRouterStore
 } from 'core/router';
 import type { AppRouteLocation } from 'core/routes';
 import {
   getAppLinkTo,
   getExternalHrefFromNavigation,
+  getLocationFromAppRouteValues,
   getNavigationFromOpenRoute,
   getNavigationFromReplaceRoute,
   getNavigationFromReplaceSearchObject,
   getNavigationFromReplaceURLSearchParams,
-  getPreviousLocationFromRouter,
-  useAppRouteKey
+  useAppRouteValuesStore
 } from 'core/routes';
 import { useCallback, useEffect, useMemo } from 'react';
-import { type NavigateOptions } from 'react-router';
+import type { NavigateOptions } from 'react-router';
 
 //*****************************************************************************************
 // useAppBlocker
 //*****************************************************************************************
 
 export function useAppBlocker(shouldBlock: boolean | (() => boolean), dependencies: unknown[] = null) {
-  const routeKey = useAppRouteKey();
+  const routeKey = useAppRouteValuesStore(s => s.routeKey, true);
   const setRouterStore = useAppSetRouterStore();
 
   useEffect(
     () =>
-      setRouterStore(store =>
-        applyNavigationBlocker(store, routeKey, typeof shouldBlock === 'function' ? shouldBlock() : shouldBlock)
-      ),
+      setRouterStore(store => {
+        if (!routeKey) return store;
+        const isBlocked = typeof shouldBlock === 'function' ? shouldBlock() : shouldBlock;
+        return isBlocked ? addBlockedRoute(store, routeKey) : removeBlockedRoute(store, routeKey);
+      }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     dependencies || [routeKey, setRouterStore, shouldBlock]
   );
@@ -49,39 +46,55 @@ export function useAppBlocker(shouldBlock: boolean | (() => boolean), dependenci
 
 export function useAppExternalHref<const Path extends AppRoute['path']>(
   to: AppLinkTo<Path>,
-  options: NavigateOptions = DEFAULT_NAVIGATE_OPTIONS,
   dependencies: unknown[] = null
 ): AppRouteLocation['href'] {
-  const routeKey = useAppRouteKey();
-  const navigationStyle = useAppPreferenceStore(s => s?.router?.navigation);
-
   const [toKey, toValue] = useMemo(() => getAppLinkTo(to), [to]);
-  const prevLocation = useAppRouterStore(getPreviousLocationFromRouter(toKey, toValue, routeKey, navigationStyle));
+  const currentAppRoute = useAppRouteValuesStore(s => s.currentAppRoute, true);
+  const currentValues = useAppRouteValuesStore(s => s.currentValues, true);
+  const nextAppRoute = useAppRouteValuesStore(s => s.nextAppRoute, true);
+  const nextValues = useAppRouteValuesStore(s => s.nextValues, true);
 
   return useMemo<AppRouteLocation['href']>(
     () => {
       if (!toKey) return null;
 
-      let nextNavigation: AppRouterNavigation = null;
       switch (toKey) {
-        case 'openRoute':
-          nextNavigation = getNavigationFromOpenRoute(toValue, prevLocation, options);
-          break;
-        case 'replaceRoute':
-          nextNavigation = getNavigationFromReplaceRoute(toValue, prevLocation, options);
-          break;
-        case 'replaceSearchObject':
-          nextNavigation = getNavigationFromReplaceSearchObject(toValue, prevLocation, options);
-          break;
-        case 'replaceURLSearchParams':
-          nextNavigation = getNavigationFromReplaceURLSearchParams(toValue, prevLocation, options);
-          break;
+        case 'openRoute': {
+          const computedValues = typeof toValue === 'function' ? toValue(nextValues) : toValue;
+          const computedLocation = getLocationFromAppRouteValues(nextAppRoute, computedValues);
+          return getExternalHrefFromNavigation(computedLocation);
+        }
+        case 'replaceRoute': {
+          const computedValues = typeof toValue === 'function' ? toValue(currentValues) : toValue;
+          const computedLocation = getLocationFromAppRouteValues(currentAppRoute, computedValues);
+          return getExternalHrefFromNavigation(computedLocation);
+        }
+        case 'replaceSearchObject': {
+          const prevSearch = currentAppRoute?.search?.full?.(currentValues.search)?.toObject?.() || null;
+          const searchDelta = typeof toValue === 'function' ? toValue(prevSearch) : toValue;
+          const nextSearch = currentAppRoute?.search?.delta?.(searchDelta)?.toObject?.() || null;
+          const computedLocation = getLocationFromAppRouteValues(currentAppRoute, {
+            ...currentValues,
+            search: nextSearch
+          });
+          return getExternalHrefFromNavigation(computedLocation);
+        }
+        case 'replaceURLSearchParams': {
+          const prevParams = currentAppRoute?.search?.full?.(currentValues.search)?.toParams?.() || null;
+          const searchDelta = typeof toValue === 'function' ? toValue(prevParams) : toValue;
+          const nextSearch = currentAppRoute?.search?.delta?.(searchDelta)?.toObject?.() || null;
+          const computedLocation = getLocationFromAppRouteValues(currentAppRoute, {
+            ...currentValues,
+            search: nextSearch
+          });
+          return getExternalHrefFromNavigation(computedLocation);
+        }
+        default:
+          return null;
       }
-
-      return getExternalHrefFromNavigation(nextNavigation);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    dependencies || [options, prevLocation, toKey, toValue]
+    dependencies || [currentAppRoute, currentValues, nextAppRoute, nextValues, toKey, toValue]
   );
 }
 
@@ -90,63 +103,69 @@ export function useAppExternalHref<const Path extends AppRoute['path']>(
 //*****************************************************************************************
 
 export function useAppNavigate<const Path extends AppRoute['path']>() {
-  const routeKey = useAppRouteKey();
+  const routeKey = useAppRouteValuesStore(s => s.routeKey);
+  const currentAppRoute = useAppRouteValuesStore(s => s.currentAppRoute, true);
+  const currentValues = useAppRouteValuesStore(s => s.currentValues, true);
+  const nextAppRoute = useAppRouteValuesStore(s => s.nextAppRoute, true);
+  const nextValues = useAppRouteValuesStore(s => s.nextValues, true);
   const setRouterStore = useAppSetRouterStore();
-  const navigationStyle = useAppPreferenceStore(s => s?.router?.navigation);
 
   const openRoute = useCallback(
     (to: AppLinkTo<Path>['openRoute'], options: NavigateOptions = DEFAULT_NAVIGATE_OPTIONS) =>
       setRouterStore(store => {
-        const prevPanelKey = findNextPanelKey(store, routeKey, navigationStyle);
-        const prevLocation = getRouteFromPanelKey(store, prevPanelKey);
-        const nextNavigation = getNavigationFromOpenRoute(to, prevLocation, options);
-        let [store2, nextPanelKey] = upsertPanel(store, prevPanelKey, null);
-        store2 = setNavigation(store2, nextPanelKey, nextNavigation);
-        return store2;
+        const nextNavigation = getNavigationFromOpenRoute(to, nextAppRoute, nextValues, options);
+        return setNavigation(store, nextNavigation);
       }),
-    [navigationStyle, routeKey, setRouterStore]
+    [nextAppRoute, nextValues, setRouterStore]
   );
 
   const replaceRoute = useCallback(
     (to: AppLinkTo<Path>['replaceRoute'], options: NavigateOptions = DEFAULT_NAVIGATE_OPTIONS) =>
       setRouterStore(store => {
-        const panelKey = findPanelKey(store, { routeKey });
-        const prevLocation = getRouteFromPanelKey(store, panelKey);
-        const nextNavigation = getNavigationFromReplaceRoute(to, prevLocation, options);
-        store = setNavigation(store, panelKey, nextNavigation);
-        return store;
+        const nextNavigation = getNavigationFromReplaceRoute(to, currentAppRoute, currentValues, routeKey, options);
+        return setNavigation(store, nextNavigation);
       }),
-    [routeKey, setRouterStore]
+    [currentAppRoute, currentValues, routeKey, setRouterStore]
   );
 
   const replaceSearchObject = useCallback(
     (to: AppLinkTo<Path>['replaceSearchObject'], options: NavigateOptions = DEFAULT_NAVIGATE_OPTIONS) =>
       setRouterStore(store => {
-        const panelKey = findPanelKey(store, { routeKey });
-        const prevLocation = getRouteFromPanelKey(store, panelKey);
-        const nextNavigation = getNavigationFromReplaceSearchObject(to, prevLocation, options);
-        store = setNavigation(store, panelKey, nextNavigation);
-        return store;
+        const nextNavigation = getNavigationFromReplaceSearchObject(
+          to,
+          currentAppRoute,
+          currentValues,
+          routeKey,
+          options
+        );
+        return setNavigation(store, nextNavigation);
       }),
-    [routeKey, setRouterStore]
+    [currentAppRoute, currentValues, routeKey, setRouterStore]
   );
 
   const replaceURLSearchParams = useCallback(
-    (to: AppLinkTo<Path>['replaceURLSearchParams'], options: NavigateOptions = DEFAULT_NAVIGATE_OPTIONS) =>
+    (to: AppLinkTo<Path>['replaceURLSearchParams'], { replace = false }: NavigateOptions = DEFAULT_NAVIGATE_OPTIONS) =>
       setRouterStore(store => {
-        const panelKey = findPanelKey(store, { routeKey });
-        const prevLocation = getRouteFromPanelKey(store, panelKey);
-        const nextNavigation = getNavigationFromReplaceURLSearchParams(to, prevLocation, options);
-        store = setNavigation(store, panelKey, nextNavigation);
-        return store;
+        store = initializeNavigation(store);
+
+        const nextNavigation = getNavigationFromReplaceURLSearchParams(
+          to,
+          currentAppRoute,
+          currentValues,
+          routeKey,
+          options
+        );
+        return setNavigation(store, nextNavigation);
       }),
-    [routeKey, setRouterStore]
+    [currentAppRoute, currentValues, routeKey, setRouterStore]
   );
 
   const closePanel = useCallback(
-    (panelKey: number, { replace }: NavigateOptions = DEFAULT_NAVIGATE_OPTIONS) =>
+    (panelKey: number, { replace = false }: NavigateOptions = DEFAULT_NAVIGATE_OPTIONS) =>
       setRouterStore(store => {
-        store = setNavigation(store, panelKey, { type: 'delete', replace });
+        store = initializeNavigation(store);
+        store.navigation.panels.filter((_, i) => i !== panelKey);
+        store.navigation.replace = replace;
         return store;
       }),
     [setRouterStore]

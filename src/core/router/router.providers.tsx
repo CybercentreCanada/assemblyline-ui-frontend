@@ -1,4 +1,4 @@
-import type { AppRouterState, AppRouterStore } from 'core/router';
+import type { AppRouterNavigation, AppRouterStore } from 'core/router';
 import { DEFAULT_APP_ROUTER_STORE } from 'core/router';
 import { syncLocationToStore, syncStoreToLocation } from 'core/routes';
 import { createAppStore } from 'features/store/createAppStore';
@@ -23,7 +23,7 @@ AppRouterStoreProvider.displayName = 'AppRouterStoreProvider';
 // App Router Sync
 //*****************************************************************************************
 export const AppRouterSync = memo(() => {
-  const location = useLocation() as Location<AppRouterState>;
+  const location = useLocation() as Location<AppRouterNavigation>;
   const navigate = useNavigate();
   const routerStoreApi = useAppRouterStoreApi();
   const setRouterStore = useAppSetRouterStore();

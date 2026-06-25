@@ -1,11 +1,13 @@
+import { useAppPreferenceStore } from 'core/preference';
+import { findNextPanelKey, getRouteFromKey, getRouteFromPanelKey, useAppRouterStore } from 'core/router';
 import type { AppRouterStore } from 'core/router/router.models';
-import type { RouteHash, RoutePath } from 'core/routes/routes.models';
+import type { InferAppRouteValuesFromRoute, RouteHash, RoutePath } from 'core/routes';
+import { findAppRouteFromLocation, getAppRouteValuesFromLocation } from 'core/routes';
 import type { InferPathParamCodecFromPath } from 'features/path-params';
 import type { SearchParamBlueprintMap, SearchParamEngine, SearchParamSnapshot } from 'features/search-params';
 import { createAppStore } from 'features/store/createAppStore';
-import { createStoreContext } from 'features/store/createStoreContext';
 import type { ReactNode } from 'react';
-import { memo, useCallback, useMemo } from 'react';
+import { memo, useCallback, useEffect, useMemo } from 'react';
 import type { Location } from 'react-router';
 import { useLocation } from 'react-router';
 
@@ -90,39 +92,86 @@ export const AppRouteProvider = memo(function AppRouteProvider<
 AppRouteProvider.displayName = 'AppRouteProvider';
 
 //*****************************************************************************************
-// Route Key Provider
+// Route Values Provider
 //*****************************************************************************************
 
-export type AppRouteKeyStore = {
+export type AppRouteValuesStore = {
   /** Route key for this route context. */
   routeKey: keyof AppRouterStore['routes'];
+
+  /** Current route location snapshot from router store. */
+  currentRoute: AppRouterStore['routes'][string];
+  /** Current route definition resolved from APP_ROUTES. */
+  currentAppRoute: AppRoute;
+  /** Current typed route values derived from current route and location. */
+  currentValues: InferAppRouteValuesFromRoute<AppRoute>;
+
+  /** Next route location snapshot based on navigation style. */
+  nextRoute: AppRouterStore['routes'][string];
+  /** Next route definition resolved from APP_ROUTES. */
+  nextAppRoute: AppRoute;
+  /** Next typed route values derived from next route and location. */
+  nextValues: InferAppRouteValuesFromRoute<AppRoute>;
 };
 
-const createDefaultAppRouteKeyStore = (): AppRouteKeyStore => ({
-  routeKey: null
+const createDefaultAppRouteValuesStore = (): AppRouteValuesStore => ({
+  routeKey: null,
+  currentRoute: null,
+  currentAppRoute: null,
+  currentValues: null,
+  nextRoute: null,
+  nextAppRoute: null,
+  nextValues: null
 });
 
-export const { StoreProvider: AppRouteKeyStoreProvider, useStore: useAppRouteKeyStore } =
-  createStoreContext<AppRouteKeyStore>(createDefaultAppRouteKeyStore());
+export const {
+  StoreProvider: AppRouteValuesStoreProvider,
+  useStore: useAppRouteValuesStore,
+  useSetStore: useAppRouteValuesSetStore
+} = createAppStore<AppRouteValuesStore>(createDefaultAppRouteValuesStore());
 
-AppRouteKeyStoreProvider.displayName = 'AppRouteKeyStoreProvider';
+AppRouteValuesStoreProvider.displayName = 'AppRouteValuesStoreProvider';
 
-export type AppRouteKeyStoreProviderProps = {
+export type AppRouteValuesStoreProviderProps = {
   /** Provider children. */
   children: ReactNode;
+
+  appRoutes: AppRoutes;
+
   /** Route key to provide. */
   routeKey: keyof AppRouterStore['routes'];
 };
 
-export const AppRouteKeyProvider = memo(({ children, routeKey }: AppRouteKeyStoreProviderProps) => (
-  <AppRouteKeyStoreProvider data={{ routeKey }}>{children}</AppRouteKeyStoreProvider>
+const AppRouteValuesSync = memo(({ appRoutes, routeKey }: Omit<AppRouteValuesStoreProviderProps, 'children'>) => {
+  const navigationStyle = useAppPreferenceStore(s => s?.router?.navigation);
+
+  const currentRoute = useAppRouterStore(store => getRouteFromKey(store, routeKey));
+  const nextRoute = useAppRouterStore(store => {
+    const nextPanelKey = findNextPanelKey(store, routeKey, navigationStyle);
+    return getRouteFromPanelKey(store, nextPanelKey);
+  });
+
+  const setAppRouteValuesStore = useAppRouteValuesSetStore();
+
+  useEffect(() => {
+    setAppRouteValuesStore(s => {
+      s.currentAppRoute = findAppRouteFromLocation(appRoutes, currentRoute);
+      s.currentValues = getAppRouteValuesFromLocation(s.currentAppRoute, currentRoute);
+      s.nextRoute = nextRoute;
+      s.nextAppRoute = findAppRouteFromLocation(appRoutes, nextRoute);
+      s.nextValues = getAppRouteValuesFromLocation(s.nextAppRoute, nextRoute);
+      return s;
+    });
+  }, [appRoutes, currentRoute, navigationStyle, nextRoute, routeKey, setAppRouteValuesStore]);
+
+  return null;
+});
+
+export const AppRouteValuesProvider = memo(({ children, appRoutes, routeKey }: AppRouteValuesStoreProviderProps) => (
+  <AppRouteValuesStoreProvider data={null}>
+    <AppRouteValuesSync appRoutes={appRoutes} routeKey={routeKey} />
+    {children}
+  </AppRouteValuesStoreProvider>
 ));
 
-AppRouteKeyProvider.displayName = 'AppRouteKeyProvider';
-
-/**
- * @name useAppRouteKey
- * @description Returns the current route key from the nearest AppRouteKeyProvider.
- * @returns The current route key or null
- */
-export const useAppRouteKey = () => useAppRouteKeyStore(s => s.routeKey)?.[0] ?? null;
+AppRouteValuesProvider.displayName = 'AppRouteValuesProvider';

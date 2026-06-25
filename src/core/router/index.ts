@@ -4,12 +4,11 @@ export { useAppBlocker, useAppExternalHref, useAppNavigate } from './router.hook
 export { AppRouterLayout, AppRouterNode, AppRouterPanel } from './router.layout';
 export type { AppRouterLayoutProps, AppRouterNodeProps, AppRouterPanelProps } from './router.layout';
 export {
-  DEFAULT_APP_ROUTER_BLOCKER,
+  DEFAULT_APP_ROUTER_BLOCKED_ROUTES,
   DEFAULT_APP_ROUTER_NAVIGATION,
   DEFAULT_APP_ROUTER_NODE,
   DEFAULT_APP_ROUTER_PANEL,
   DEFAULT_APP_ROUTER_ROUTE,
-  DEFAULT_APP_ROUTER_STATE,
   DEFAULT_APP_ROUTER_STORE,
   DEFAULT_NAVIGATE_OPTIONS,
   ROUTER_STORE_EXAMPLE
@@ -18,12 +17,11 @@ export type {
   AppLinkTo,
   AppLinkToOptions,
   AppLinkToTuple,
-  AppRouterBlocker,
+  AppRouterBlockedRoutes,
   AppRouterNavigation,
   AppRouterNode as AppRouterNodeType,
   AppRouterPanel as AppRouterPanelType,
   AppRouterRoute,
-  AppRouterState,
   AppRouterStore
 } from './router.models';
 export {
@@ -36,12 +34,12 @@ export {
   useAppSetRouterStore
 } from './router.providers';
 export {
+  addBlockedRoute,
   addMissingNodes,
   addNode,
   addRoute,
   addRouteToPanel,
   addTab,
-  applyNavigationBlocker,
   clearNavigation,
   filterOrphanedNodes,
   filterOrphanedRoutes,
@@ -54,16 +52,18 @@ export {
   findPanelKey,
   findRoute,
   findRouteKey,
-  getNavigation,
   getNextRouteFromKey,
   getRouteFromKey,
   getRouteFromPanelKey,
+  hasBlockedRoutes,
+  initializeNavigation,
   insertLeftPanel,
   insertRightPanel,
   mergePanels,
   moveTabbedRouteKey,
   permanentTab,
   refreshRouteAges,
+  removeBlockedRoute,
   removeEmptyPanel,
   removeNode,
   removeOldestNodes,
