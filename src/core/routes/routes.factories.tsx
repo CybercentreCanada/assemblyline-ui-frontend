@@ -1,8 +1,7 @@
 import { AppErrorProvider } from 'core/error';
-import { DisabledBoundary, ForbiddenBoundary } from 'core/routes/routes.components';
-import type { RouteHash, RouteMeta } from 'core/routes/routes.models';
-import { AppRouteProvider } from 'core/routes/routes.providers';
-import type { PATH_PARAM_BLUEPRINTS_MAP, InferPathParamBlueprintMapFromPath, RoutePath } from 'features/path-params';
+import type { RouteHash, RouteMeta } from 'core/routes';
+import { DisabledBoundary, ForbiddenBoundary } from 'core/routes';
+import type { InferPathParamBlueprintMapFromPath, PATH_PARAM_BLUEPRINTS_MAP, RoutePath } from 'features/path-params';
 import { createPathParamsCodec } from 'features/path-params';
 import type { SearchParamBlueprintMap } from 'features/search-params';
 import { SEARCH_PARAM_BLUEPRINTS_MAP, SearchParamEngine } from 'features/search-params';
@@ -79,9 +78,9 @@ export const createAppRoute = <
       <AppErrorProvider>
         <DisabledBoundary disabled={disabled} FallbackComponent={disabledComponent}>
           <ForbiddenBoundary forbidden={forbidden} FallbackComponent={forbiddenComponent}>
-            <AppRouteProvider params={paramCodec} search={searchEngine} hash={hashCodec}>
-              {toElement(component)}
-            </AppRouteProvider>
+            {/* <AppRouteProvider params={paramCodec} search={searchEngine} hash={hashCodec}> */}
+            {toElement(component)}
+            {/* </AppRouteProvider> */}
           </ForbiddenBoundary>
         </DisabledBoundary>
       </AppErrorProvider>

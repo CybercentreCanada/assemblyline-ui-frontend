@@ -1,12 +1,19 @@
 import { i18n } from 'app/core.i18n';
 import { APP_ROUTES } from 'app/core.routes';
 import { AppApiProvider } from 'core/api';
-import { AppConfigStoreProvider } from 'core/config/config.providers';
+import { AppConfigStoreProvider } from 'core/config';
 import { AppErrorProvider } from 'core/error';
 import { AppInterfaceStoreProvider } from 'core/interface';
 import { AppPreferenceStoreProvider } from 'core/preference';
-import { AppRouterLayout, AppRouterPanel, AppRouterProvider, AppRouterRootProvider } from 'core/router';
-import { AppRouteValuesProvider } from 'core/routes';
+import {
+  AppNavigationProvider,
+  AppNavigationStoreProvider,
+  AppRouterLayout,
+  AppRouterPanel,
+  AppRouterProvider,
+  AppRouterStoreProvider
+} from 'core/router';
+import { AppLocationProvider, AppLocationStoreProvider } from 'core/routes';
 import { AppSnackbarProvider } from 'core/snackbar';
 import { AppTemplateLayout, AppTemplateProvider } from 'core/template';
 import { AppThemeProvider } from 'core/theme';
@@ -111,18 +118,15 @@ import { memo, StrictMode } from 'react';
 //*****************************************************************************************
 
 export const AppLayout = memo(() => (
-  // Maybe not necessary to have AppRouteValuesProvider
-  <AppRouteValuesProvider appRoutes={APP_ROUTES} routeKey={null}>
-    <AppAuthLayout>
-      <AppRouterLayout>
-        <AppDrawerLayout content={<AppRouterPanel panelKey={1} />}>
-          <AppTemplateLayout>
-            <AppRouterPanel panelKey={0} />
-          </AppTemplateLayout>
-        </AppDrawerLayout>
-      </AppRouterLayout>
-    </AppAuthLayout>
-  </AppRouteValuesProvider>
+  <AppAuthLayout>
+    <AppRouterLayout appRoutes={APP_ROUTES}>
+      <AppDrawerLayout content={<AppRouterPanel panelKey={1} />}>
+        <AppTemplateLayout>
+          <AppRouterPanel panelKey={0} />
+        </AppTemplateLayout>
+      </AppDrawerLayout>
+    </AppRouterLayout>
+  </AppAuthLayout>
 ));
 
 AppLayout.displayName = 'AppLayout';
@@ -137,11 +141,15 @@ const AppProviders = memo(({ children }: PropsWithChildren) => (
       <AppSnackbarProvider>
         <AppApiProvider>
           <AppRouterProvider>
-            <AppTemplateProvider i18n={i18n}>
-              <AppCarouselProvider>
-                <>{children}</>
-              </AppCarouselProvider>
-            </AppTemplateProvider>
+            <AppNavigationProvider>
+              <AppLocationProvider appRoutes={APP_ROUTES}>
+                <AppTemplateProvider i18n={i18n}>
+                  <AppCarouselProvider>
+                    <>{children}</>
+                  </AppCarouselProvider>
+                </AppTemplateProvider>
+              </AppLocationProvider>
+            </AppNavigationProvider>
           </AppRouterProvider>
         </AppApiProvider>
       </AppSnackbarProvider>
@@ -159,9 +167,13 @@ const AppStores = memo(({ children }: PropsWithChildren) => (
   <AppConfigStoreProvider>
     <AppInterfaceStoreProvider>
       <AppPreferenceStoreProvider>
-        <AppRouterRootProvider>
-          <>{children}</>
-        </AppRouterRootProvider>
+        <AppRouterStoreProvider>
+          <AppNavigationStoreProvider>
+            <AppLocationStoreProvider>
+              <>{children}</>
+            </AppLocationStoreProvider>
+          </AppNavigationStoreProvider>
+        </AppRouterStoreProvider>
       </AppPreferenceStoreProvider>
     </AppInterfaceStoreProvider>
   </AppConfigStoreProvider>

@@ -4,8 +4,9 @@ export { useAppBlocker, useAppExternalHref, useAppNavigate } from './router.hook
 export { AppRouterLayout, AppRouterNode, AppRouterPanel } from './router.layout';
 export type { AppRouterLayoutProps, AppRouterNodeProps, AppRouterPanelProps } from './router.layout';
 export {
+  DEFAULT_APP_LOCATION_STATE,
+  DEFAULT_APP_NAVIGATION_STORE,
   DEFAULT_APP_ROUTER_BLOCKED_ROUTES,
-  DEFAULT_APP_ROUTER_NAVIGATION,
   DEFAULT_APP_ROUTER_NODE,
   DEFAULT_APP_ROUTER_PANEL,
   DEFAULT_APP_ROUTER_ROUTE,
@@ -14,23 +15,26 @@ export {
   ROUTER_STORE_EXAMPLE
 } from './router.models';
 export type {
-  AppLinkTo,
-  AppLinkToOptions,
-  AppLinkToTuple,
+  AppLocationState,
+  AppNavigationStore,
   AppRouterBlockedRoutes,
-  AppRouterNavigation,
   AppRouterNode as AppRouterNodeType,
   AppRouterPanel as AppRouterPanelType,
   AppRouterRoute,
+  AppRouterState,
   AppRouterStore
 } from './router.models';
 export {
+  AppNavigationProvider,
+  AppNavigationStoreProvider,
+  AppNavigationSync,
   AppRouterProvider,
-  AppRouterRootProvider,
   AppRouterStoreProvider,
-  AppRouterSync,
+  useAppNavigationStore,
+  useAppNavigationStoreApi,
   useAppRouterStore,
   useAppRouterStoreApi,
+  useAppSetNavigationStore,
   useAppSetRouterStore
 } from './router.providers';
 export {
@@ -41,10 +45,12 @@ export {
   addRouteToPanel,
   addTab,
   clearNavigation,
+  cloneAppRouterStore,
   filterOrphanedNodes,
   filterOrphanedRoutes,
   filterPanelMissingRouteKeys,
   findNextPanelKey,
+  findNextRouteKey,
   findNode,
   findNodeKey,
   findOldestNodeKey,
@@ -52,6 +58,7 @@ export {
   findPanelKey,
   findRoute,
   findRouteKey,
+  getFirstRouteKey,
   getNextRouteFromKey,
   getRouteFromKey,
   getRouteFromPanelKey,
@@ -62,6 +69,7 @@ export {
   mergePanels,
   moveTabbedRouteKey,
   permanentTab,
+  reconcileRouterFromNavigation,
   refreshRouteAges,
   removeBlockedRoute,
   removeEmptyPanel,
@@ -75,7 +83,7 @@ export {
   sanitizeNodes,
   sanitizePanels,
   sanitizeRoutes,
-  setNavigation,
+  setNavigationFromRouter,
   setNode,
   setPanel,
   setPanelActiveRoute,

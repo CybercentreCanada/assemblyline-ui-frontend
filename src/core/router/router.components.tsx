@@ -1,5 +1,5 @@
-import type { AppLinkTo } from 'core/router';
 import { useAppExternalHref, useAppNavigate } from 'core/router';
+import type { InferNavigationValueFromPath } from 'core/routes';
 import type { ForwardedRef } from 'react';
 import { forwardRef, memo, useCallback, useLayoutEffect, useRef } from 'react';
 import type { LinkProps as RouterLinkProps } from 'react-router';
@@ -13,7 +13,7 @@ export type AppLinkProps<Path extends AppRoute['path']> = Omit<
   RouterLinkProps,
   'to' | 'pathname' | 'search' | 'hash'
 > & {
-  to: AppLinkTo<Path>;
+  to: InferNavigationValueFromPath<Path>;
 };
 
 // TODO
@@ -62,7 +62,7 @@ export const AppLink = memo(forwardRef(WrappedAppLink)) as <const Path extends A
 //*****************************************************************************************
 
 export type AppNavigateProps<Path extends AppRoute['path']> = {
-  to: AppLinkTo<Path>;
+  to: InferNavigationValueFromPath<Path>;
 };
 
 export function WrappedAppNavigate<const Path extends AppRoute['path']>({ to }: AppNavigateProps<Path>) {

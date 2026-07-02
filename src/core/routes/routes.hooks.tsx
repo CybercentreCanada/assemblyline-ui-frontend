@@ -1,68 +1,66 @@
-import type { AppRouteStore } from 'core/routes';
-import { useAppRouteStore } from 'core/routes';
-import type { InferPathParamBlueprintMapFromPath, InferPathParamValuesFromBlueprintMap } from 'features/path-params';
-import type { InferSearchParamSnapshotFromEngine } from 'features/search-params';
+import type {
+  InferHashParamValueFromPath,
+  InferPathParamValueFromPath,
+  InferSearchParamValueFromPath
+} from 'core/routes/routes.models';
+import type { AppRouteKeyStore } from 'core/routes/routes.providers';
+import { useAppLocationStore, useAppRouteKeyStore } from 'core/routes/routes.providers';
 
-type RouteByPath<Path extends AppRoute['path']> = Extract<AppRoute, { path: Path }>;
-
-//*****************************************************************************************
-// useAppPathParams
-//*****************************************************************************************
-
-export type PathParamValue<Path extends AppRoute['path'] = AppRoute['path']> = RouteByPath<Path>['params'] extends {
-  blueprints: infer Blueprints;
-}
-  ? Blueprints extends InferPathParamBlueprintMapFromPath<Path>
-    ? InferPathParamValuesFromBlueprintMap<Blueprints>
-    : AppRouteStore['params']
-  : AppRouteStore['params'];
-
-export function useAppPathParams<const Path extends AppRoute['path'] = AppRoute['path']>(): PathParamValue<Path> {
-  const context = useAppRouteStore(s => s.params as PathParamValue<Path>);
-  if (!context) return null;
+/**
+ * @name useAppRouteKey
+ * @description Returns the current route key from the route-key store.
+ * @returns Current route key, or null when no route context is available
+ */
+export function useAppRouteKey(): AppRouteKeyStore['routeKey'] {
+  const context = useAppRouteKeyStore(s => s.routeKey, true);
+  if (context == null) return null;
   return context;
 }
 
-//*****************************************************************************************
-// useAppSearchParams
-//*****************************************************************************************
-
-export type SearchParamValue<Path extends AppRoute['path'] = AppRoute['path']> =
-  Exclude<RouteByPath<Path>['search'], undefined> extends never
-    ? AppRouteStore['search']
-    : InferSearchParamSnapshotFromEngine<Exclude<RouteByPath<Path>['search'], undefined>>;
-
-export function useAppSearchParams<const Path extends AppRoute['path'] = AppRoute['path']>(): SearchParamValue<Path> {
-  const context = useAppRouteStore(s => s.search as SearchParamValue<Path>);
-  if (!context) return null;
+/**
+ * @name useAppPathParams
+ * @description Returns the parsed path params for the current route context.
+ * @returns Current route path params, or null when unavailable
+ */
+export function useAppPathParams<
+  const Path extends AppRoute['path'] = AppRoute['path']
+>(): InferPathParamValueFromPath<Path> {
+  const routeKey = useAppRouteKey();
+  const context = useAppLocationStore(s =>
+    routeKey ? (s?.[routeKey]?.params as InferPathParamValueFromPath<Path> | null) : null
+  );
+  if (context == null) return null;
   return context;
 }
 
-//*****************************************************************************************
-// useAppHashParams
-//*****************************************************************************************
-
-export type HashParamValue<Path extends AppRoute['path'] = AppRoute['path']> =
-  Exclude<RouteByPath<Path>['hash'], undefined> extends never
-    ? AppRouteStore['hash']
-    : Exclude<RouteByPath<Path>['hash'], undefined>;
-
-export function useAppHashParams<const Path extends AppRoute['path'] = AppRoute['path']>(): HashParamValue<Path> {
-  const context = useAppRouteStore(s => s.hash as HashParamValue<Path>);
-  if (!context) return null;
+/**
+ * @name useAppSearchParams
+ * @description Returns the parsed search params snapshot for the current route context.
+ * @returns Current route search params, or null when unavailable
+ */
+export function useAppSearchParams<
+  const Path extends AppRoute['path'] = AppRoute['path']
+>(): InferSearchParamValueFromPath<Path> {
+  const routeKey = useAppRouteKey();
+  const context = useAppLocationStore(s =>
+    routeKey ? (s?.[routeKey]?.search as InferSearchParamValueFromPath<Path>) : null
+  );
+  if (context == null) return null;
   return context;
 }
 
-//*****************************************************************************************
-// useAppRoute
-//*****************************************************************************************
-
-export function useAppRoute<const Path extends AppRoute['path'], const SelectorOutput>(
-  path: Path,
-  selector: (store: AppRouteStore) => SelectorOutput
-) {
-  void path;
-  const context = useAppRouteStore<SelectorOutput>(selector);
-  if (!context) return null;
+/**
+ * @name useAppHashParams
+ * @description Returns the parsed hash value for the current route context.
+ * @returns Current route hash value, or null when unavailable
+ */
+export function useAppHashParams<
+  const Path extends AppRoute['path'] = AppRoute['path']
+>(): InferHashParamValueFromPath<Path> {
+  const routeKey = useAppRouteKey();
+  const context = useAppLocationStore(s =>
+    routeKey ? (s?.[routeKey]?.hash as InferHashParamValueFromPath<Path>) : null
+  );
+  if (context == null) return null;
   return context;
 }

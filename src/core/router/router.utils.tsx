@@ -1,12 +1,14 @@
-import type { AppRouterNavigation, AppRouterStore } from 'core/router';
+import type { AppNavigationStore, AppRouterStore } from 'core/router';
 import {
-  DEFAULT_APP_ROUTER_NAVIGATION,
+  DEFAULT_APP_NAVIGATION_STORE,
   DEFAULT_APP_ROUTER_NODE,
   DEFAULT_APP_ROUTER_PANEL,
-  DEFAULT_APP_ROUTER_ROUTE
+  DEFAULT_APP_ROUTER_ROUTE,
+  DEFAULT_APP_ROUTER_STORE
 } from 'core/router';
 import { createReversePortalNode } from 'features/portal';
 import { deepCompare, generateRandomUUID } from 'shared/utils/app.utils';
+import { StoreApi } from 'zustand';
 
 //*****************************************************************************************
 // Panel
@@ -585,6 +587,29 @@ export const findRoute = (
   return key !== null ? store.routes[key] : null;
 };
 
+/**
+ * @name findNextRouteKey
+ * @description Finds the active route key from the next panel relative to the panel containing the provided route key.
+ * @param store - Router store
+ * @param routeKey - Current route key used as navigation origin
+ * @param navigationStyle - Panel navigation strategy
+ * @returns Active route key from the next panel, or null when unavailable
+ */
+export const findNextRouteKey = (
+  store: AppRouterStore,
+  routeKey: keyof AppRouterStore['routes'],
+  navigationStyle: 'push' | 'loop' = 'push'
+): keyof AppRouterStore['routes'] => {
+  const nextPanelKey = findNextPanelKey(store, routeKey, navigationStyle);
+
+  if (nextPanelKey < 0 || nextPanelKey >= store.panels.length) return null;
+
+  const nextRouteKey = store.panels[nextPanelKey]?.routeKey;
+  if (!nextRouteKey || !(nextRouteKey in store.routes)) return null;
+
+  return nextRouteKey;
+};
+
 export const getRouteFromKey = (
   store: AppRouterStore,
   routeKey: keyof AppRouterStore['routes']
@@ -629,6 +654,22 @@ export const getNextRouteFromKey = (
 };
 
 /**
+ * @name getFirstRouteKey
+ * @description Returns the active route key for the first panel when available.
+ * @param store - Router store
+ * @returns Active route key from panel index 0, or null when unavailable
+ */
+export const getFirstRouteKey = (store: AppRouterStore): keyof AppRouterStore['routes'] => {
+  const firstRouteKey = store.panels?.[0]?.routeKey;
+  if (!firstRouteKey || !(firstRouteKey in store.routes)) return null;
+  return firstRouteKey;
+};
+
+export const hasRoutes = (store: AppRouterStore | AppNavigationStore): boolean => {
+  return Object.keys(store?.routes || {}).length > 0;
+};
+
+/**
  * @name removeRoute
  * @description Removes a route by key when it exists.
  * @param store - Router store
@@ -666,6 +707,8 @@ export const updateRoute = (
 
   if (partialRoute && 'age' in partialRoute) {
     store.routes[routeKey].age = partialRoute.age;
+  } else {
+    store.routes[routeKey].age = 0;
   }
 
   return store;
@@ -697,9 +740,10 @@ export const setRoute = (
  */
 export const addRoute = (
   store: AppRouterStore,
-  partialRoute: Partial<AppRouterStore['routes'][string]>
+  partialRoute: Partial<AppRouterStore['routes'][string]>,
+  routeKey: keyof AppRouterStore['routes'] = null
 ): [AppRouterStore, keyof AppRouterStore['routes']] => {
-  const routeKey = generateRandomUUID(Object.keys(store.routes));
+  routeKey = routeKey || generateRandomUUID(Object.keys(store.routes));
   store.routes[routeKey] = { ...DEFAULT_APP_ROUTER_ROUTE, ...partialRoute };
   return [store, routeKey];
 };
@@ -741,7 +785,7 @@ export const upsertRoute = (
   partialRoute: Partial<AppRouterStore['routes'][string]>
 ): [AppRouterStore, keyof AppRouterStore['routes']] => {
   if (routeKey in store.routes) store = updateRoute(store, routeKey, partialRoute);
-  else [store, routeKey] = addRoute(store, partialRoute);
+  else [store, routeKey] = addRoute(store, partialRoute, routeKey);
   return [store, routeKey];
 };
 
@@ -1058,6 +1102,18 @@ export const sanitizeAppRouterStore = (store: AppRouterStore): AppRouterStore =>
   return store;
 };
 
+export const cloneAppRouterStore = (store: AppRouterStore): AppRouterStore =>
+  ({
+    id: store.id,
+    maxPanels: store.maxPanels,
+    panels: structuredClone(store.panels),
+    routes: structuredClone(store.routes)
+  }) as AppRouterStore;
+
+export const getAppRouterStateFromApi = (api: StoreApi<AppRouterStore>): AppRouterStore => {
+  return api?.getState() || DEFAULT_APP_ROUTER_STORE;
+};
+
 //*****************************************************************************************
 // Blocked Routes
 //*****************************************************************************************
@@ -1069,9 +1125,12 @@ export const sanitizeAppRouterStore = (store: AppRouterStore): AppRouterStore =>
  * @param routeKey - Route key to block
  * @returns Updated router store
  */
-export const addBlockedRoute = (store: AppRouterStore, routeKey: keyof AppRouterStore['routes']): AppRouterStore => {
+export const addBlockedRoute = (
+  store: AppNavigationStore,
+  routeKey: keyof AppNavigationStore['routes']
+): AppNavigationStore => {
   if (!(routeKey in store.routes) || routeKey in store.blockedRoutes) return store;
-  store.blockedRoutes[routeKey] = routeKey;
+  store.blockedRoutes[routeKey] = null;
   return store;
 };
 
@@ -1082,7 +1141,10 @@ export const addBlockedRoute = (store: AppRouterStore, routeKey: keyof AppRouter
  * @param routeKey - Route key to unblock
  * @returns Updated router store
  */
-export const removeBlockedRoute = (store: AppRouterStore, routeKey: keyof AppRouterStore['routes']): AppRouterStore => {
+export const removeBlockedRoute = (
+  store: AppNavigationStore,
+  routeKey: keyof AppNavigationStore['routes']
+): AppNavigationStore => {
   if (!(routeKey in store.blockedRoutes)) return store;
   delete store.blockedRoutes[routeKey];
   return store;
@@ -1094,30 +1156,65 @@ export const removeBlockedRoute = (store: AppRouterStore, routeKey: keyof AppRou
  * @param store - Router store
  * @returns True when at least one blocker exists, otherwise false
  */
-export const hasBlockedRoutes = (store: AppRouterStore): boolean => {
-  return Object.keys(store.blockedRoutes).length > 0;
+export const hasBlockedRoutes = (store: AppNavigationStore): boolean => {
+  return Object.keys(store?.blockedRoutes || {}).length > 0;
 };
 
 //*****************************************************************************************
 // Navigation
 //*****************************************************************************************
 
-export const initializeNavigation = (store: AppRouterStore): AppRouterStore => {
-  store.navigation = { ...DEFAULT_APP_ROUTER_NAVIGATION, panels: store.panels, routes: store.routes };
+export const initializeNavigation = (): AppNavigationStore => {
+  return DEFAULT_APP_NAVIGATION_STORE;
+};
+
+/**
+ * @name setNavigationFromRouter
+ * @description Copies the current router snapshot into the navigation store.
+ * Clones panels, their route-key arrays, and route entries so navigation edits do not leak back into router state.
+ * @param store - Navigation store
+ * @param router - Router store snapshot to stage from
+ * @returns Updated navigation store
+ */
+export const setNavigationFromRouter = (store: AppNavigationStore, router: AppRouterStore): AppNavigationStore => {
+  store.id = router.id;
+  store.panels = structuredClone(router.panels);
+  store.routes = structuredClone(router.routes);
   return store;
 };
 
 /**
- * @name setNavigation
- * @description Stages a navigation request on a panel by merging the provided partial payload over the current panel navigation.
- * @param store - Router store
- * @param panelKey - Panel index to set navigation on
- * @param navigation - Partial navigation payload to merge
+ * @name reconcileRouterFromNavigation
+ * @description Applies staged navigation into the router store with minimal in-place mutation.
+ * Only changed routes or panels are updated so unchanged references remain stable.
+ * @param store - Router store to mutate
+ * @param navigation - Navigation store snapshot to reconcile from
  * @returns Updated router store
  */
-export const setNavigation = (store: AppRouterStore, navigation: Partial<AppRouterNavigation>): AppRouterStore => {
-  store.navigation = { ...DEFAULT_APP_ROUTER_NAVIGATION, ...navigation };
-  return store;
+export const reconcileRouterFromNavigation = (
+  router: AppRouterStore,
+  navigation: AppNavigationStore
+): AppRouterStore => {
+  router.id = navigation.id;
+
+  for (const [routeKey, route] of Object.entries(navigation.routes)) {
+    [router] = upsertRoute(router, routeKey, route);
+  }
+
+  for (const routeKey of Object.keys(router.routes)) {
+    if (routeKey in navigation.routes) continue;
+    router = removeRoute(router, routeKey);
+  }
+
+  for (const [panelKey, panel] of navigation.panels.entries()) {
+    [router] = upsertPanel(router, panelKey, panel);
+  }
+
+  for (let panelKey = router.panels.length - 1; panelKey >= navigation.panels.length; panelKey--) {
+    router = removePanel(router, panelKey);
+  }
+
+  return router;
 };
 
 /**
@@ -1127,7 +1224,14 @@ export const setNavigation = (store: AppRouterStore, navigation: Partial<AppRout
  * @param panelKey - Panel index to clear navigation on
  * @returns Updated router store
  */
-export const clearNavigation = (store: AppRouterStore): AppRouterStore => {
-  store.navigation = null;
+export const clearNavigation = (store: AppNavigationStore): AppNavigationStore => {
+  store.id = null;
+  store.panels = [];
+  store.routes = {};
+  store.replace = false;
   return store;
+};
+
+export const getAppNavigationStateFromApi = (api: StoreApi<AppNavigationStore>): AppNavigationStore => {
+  return api?.getState() || DEFAULT_APP_NAVIGATION_STORE;
 };

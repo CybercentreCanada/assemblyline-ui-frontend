@@ -1,11 +1,12 @@
 import type { createPathParamsCodec } from 'features/path-params/path-params.codec';
+import type { RouteProps } from 'react-router';
 
 //*****************************************************************************************
 // Path Params Primitives
 //*****************************************************************************************
 
 /** A route path string, potentially containing `:param` segments. */
-export type RoutePath = string;
+export type RoutePath = RouteProps['path'];
 
 /** The set of primitive value types a path parameter can hold. */
 export type PathParamValue = string | number | boolean;

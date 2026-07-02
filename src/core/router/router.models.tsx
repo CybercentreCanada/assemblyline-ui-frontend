@@ -1,56 +1,7 @@
-import type { InferAppRouteSearchValuesFromPath, InferAppRouteValuesFromRoute } from 'core/routes';
 import type { ReversePortalNode } from 'features/portal';
 import { createReversePortalNode } from 'features/portal';
-import type { SetStateAction } from 'react';
 import type { NavigateOptions } from 'react-router';
 import { generateRandomUUID } from 'shared/utils/app.utils';
-
-//*****************************************************************************************
-// To
-//*****************************************************************************************
-
-/** Route transition intents accepted by router link helpers. */
-export type AppLinkTo<Path extends AppRoute['path']> = {
-  /** Opens a route, typically in the next panel. */
-  openRoute: SetStateAction<InferAppRouteValuesFromRoute<AppRoute>>;
-  /** Replaces the current route values. */
-  replaceRoute: SetStateAction<InferAppRouteValuesFromRoute<AppRoute>>;
-  /** Replaces only route search values using typed objects. */
-  replaceSearchObject: SetStateAction<InferAppRouteSearchValuesFromPath<Path>>;
-  /** Replaces only route search values using URLSearchParams. */
-  replaceURLSearchParams: SetStateAction<URLSearchParams>;
-};
-
-/** Single-key object form for AppLinkTo transitions. */
-export type AppLinkToOptions<Path extends AppRoute['path']> = {
-  [K in keyof AppLinkTo<Path>]: Record<K, AppLinkTo<Path>[K]>;
-}[keyof AppLinkTo<Path>];
-
-/** Tuple form `[key, value]` of the AppLinkTo transition union. */
-export type AppLinkToTuple<Path extends AppRoute['path']> =
-  AppLinkTo<Path> extends infer T
-    ? T extends Record<PropertyKey, unknown>
-      ? { [K in keyof T]-?: [K, T[K]] }[keyof T]
-      : never
-    : never;
-
-//*****************************************************************************************
-// To Options
-//*****************************************************************************************
-
-/** Default options for programmatic router navigation. */
-export const DEFAULT_NAVIGATE_OPTIONS: NavigateOptions = {
-  replace: false
-};
-
-//*****************************************************************************************
-// Blocker
-//*****************************************************************************************
-
-/** Route blocker registry keyed by route ids. */
-export type AppRouterBlockedRoutes = Record<keyof AppRouterStore['routes'], unknown>;
-
-export const DEFAULT_APP_ROUTER_BLOCKED_ROUTES: AppRouterBlockedRoutes = {};
 
 //*****************************************************************************************
 // Panel
@@ -115,70 +66,54 @@ export const DEFAULT_APP_ROUTER_ROUTE: AppRouterRoute = {
 };
 
 //*****************************************************************************************
-// Navigate
+// Location State
 //*****************************************************************************************
 
-/** Serializable subset of AppRouterStore for navigation state. */
-export type AppRouterNavigation = {
-  /** Snapshot id for fast equality checks. */
-  id: AppRouterStore['id'];
-  /** Panel configurations. */
-  panels: AppRouterStore['panels'];
-  /** Route entries. */
-  routes: AppRouterStore['routes'];
-  /** Check if this navigation should replace the current history entry */
-  replace?: boolean;
-};
-
-export const DEFAULT_APP_ROUTER_NAVIGATION: AppRouterNavigation = {
-  id: null,
-  panels: [],
-  routes: {},
-  replace: false
-};
-
-//*****************************************************************************************
-// Store
-//*****************************************************************************************
-
-/** Full router store shape. */
-export type AppRouterStore = {
+/** Full router store shape. Source of truth for runtime panel and route graph state. */
+export type AppLocationState = {
   /** Store revision id for sync checks. */
   id: string;
-  /** Route blocker registry keyed by route ids. */
-  blockedRoutes: AppRouterBlockedRoutes;
-  /** Maximum allowed portal nodes. */
-  maxNodes: number;
-  /** Maximum allowed panels. */
-  maxPanels: number;
-  /** Global navigation snapshot, if available. */
-  navigation: AppRouterNavigation | null;
-  /** Portal node cache. */
-  nodes: Record<string, AppRouterNode>;
   /** Panel configurations. */
   panels: AppRouterPanel[];
   /** Route entries keyed by unique ID. */
   routes: Record<string, AppRouterRoute>;
 };
 
-export const DEFAULT_APP_ROUTER_STORE: AppRouterStore = {
+export const DEFAULT_APP_LOCATION_STATE: AppLocationState = {
   id: generateRandomUUID(),
-  blockedRoutes: {},
-  maxNodes: 2,
-  maxPanels: 2,
-  navigation: null,
-  nodes: {},
   panels: [],
   routes: {}
 };
 
+//*****************************************************************************************
+// Router
+//*****************************************************************************************
+
+/** Full router store shape. Source of truth for runtime panel and route graph state. */
+// prettier-ignore
+export type AppRouterStore =
+  & AppLocationState
+  & {
+    /** Maximum allowed portal nodes. */
+    maxNodes: number;
+    /** Maximum allowed panels. */
+    maxPanels: number;
+    /** Portal node cache. */
+    nodes: Record<string, AppRouterNode>;
+  };
+
+export const DEFAULT_APP_ROUTER_STORE: AppRouterStore = {
+  ...DEFAULT_APP_LOCATION_STATE,
+  maxNodes: 2,
+  maxPanels: 2,
+  nodes: {}
+};
+
 /** Example router store shape used for parsing fallbacks and tests. */
 export const ROUTER_STORE_EXAMPLE: AppRouterStore = {
-  id: 'test',
+  id: 'default',
   maxNodes: 0,
   maxPanels: 0,
-  blockedRoutes: {},
-  navigation: null,
   nodes: { default: { portal: createReversePortalNode(), routeKey: 'default' } },
   panels: [
     {
@@ -189,4 +124,44 @@ export const ROUTER_STORE_EXAMPLE: AppRouterStore = {
     }
   ],
   routes: { default: { age: 0, href: '/submit', state: null } }
+};
+
+//*****************************************************************************************
+// Blocker
+//*****************************************************************************************
+
+/** Route blocker registry keyed by route ids. */
+export type AppRouterBlockedRoutes = Record<keyof AppRouterStore['routes'], unknown>;
+
+export const DEFAULT_APP_ROUTER_BLOCKED_ROUTES: AppRouterBlockedRoutes = {};
+
+//*****************************************************************************************
+// Navigate
+//*****************************************************************************************
+
+// prettier-ignore
+export type AppNavigationStore =
+  & AppLocationState
+  & {
+    /** Routes that are blocked from navigation */
+    blockedRoutes: Record<string, boolean>;
+    /** Check if this navigation should replace the current history entry */
+    replace?: boolean;
+  };
+
+export type AppRouterState = Pick<AppNavigationStore, 'id' | 'panels' | 'routes'>;
+
+export const DEFAULT_APP_NAVIGATION_STORE: AppNavigationStore = {
+  ...DEFAULT_APP_LOCATION_STATE,
+  blockedRoutes: {},
+  replace: false
+};
+
+//*****************************************************************************************
+// To Options
+//*****************************************************************************************
+
+/** Default options for programmatic router navigation. */
+export const DEFAULT_NAVIGATE_OPTIONS: NavigateOptions = {
+  replace: false
 };

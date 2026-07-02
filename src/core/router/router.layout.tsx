@@ -1,9 +1,10 @@
-import { APP_ROUTES } from 'app/core.routes';
 import { findNode, useAppRouterStore } from 'core/router';
-import { AppRoutes, AppRouteValuesProvider } from 'core/routes';
+import { AppRouteKeyProvider } from 'core/routes';
 import { InPortal, OutPortal } from 'features/portal';
+import { NotFoundPage } from 'pages/not-found/not-found.route';
 import type { PropsWithChildren } from 'react';
-import { memo } from 'react';
+import { memo, useMemo } from 'react';
+import { Route, Routes } from 'react-router';
 
 //*****************************************************************************************
 // App Router Panel
@@ -27,22 +28,37 @@ AppRouterPanel.displayName = 'AppRouterPanel';
 //*****************************************************************************************
 
 export type AppRouterNodeProps = {
+  appRoutes: AppRoutes;
   /** Key identifying this node in the router store. */
   nodeKey: string;
 };
 
-export const AppRouterNode = memo(({ nodeKey }: AppRouterNodeProps) => {
+export const AppRouterNode = memo(({ appRoutes, nodeKey }: AppRouterNodeProps) => {
   const routeKey = useAppRouterStore(s => s?.nodes?.[nodeKey]?.routeKey || undefined);
   const portal = useAppRouterStore(s => s?.nodes?.[nodeKey]?.portal || undefined);
   const href = useAppRouterStore(s => s?.routes?.[routeKey]?.href || undefined);
   const state = useAppRouterStore(s => s?.routes?.[routeKey]?.state || undefined);
 
+  const { pathname, search, hash } = useMemo(() => new URL(href, window.location.origin), [href]);
+
   return !routeKey || !href ? null : (
     <InPortal node={portal}>
       {/* <AppThemeProvider> */}
-      <AppRouteValuesProvider appRoutes={APP_ROUTES} routeKey={routeKey}>
-        <AppRoutes appRoutes={APP_ROUTES} href={href} state={state} />
-      </AppRouteValuesProvider>
+      <AppRouteKeyProvider routeKey={routeKey}>
+        <Routes location={{ pathname, search, hash, state }}>
+          {appRoutes.map((route, i) => (
+            <Route
+              key={i}
+              path={route.path}
+              element={route.element}
+              loader={() => {
+                console.log('loader');
+              }}
+            />
+          ))}
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+      </AppRouteKeyProvider>
       {/* </AppThemeProvider> */}
     </InPortal>
   );
@@ -54,9 +70,11 @@ AppRouterNode.displayName = 'AppRouterNode';
 // App Router Layout
 //*****************************************************************************************
 
-export type AppRouterLayoutProps = PropsWithChildren;
+export type AppRouterLayoutProps = PropsWithChildren & {
+  appRoutes: AppRoutes;
+};
 
-export const AppRouterLayout = memo(({ children }: AppRouterLayoutProps) => {
+export const AppRouterLayout = memo(({ appRoutes, children }: AppRouterLayoutProps) => {
   const nodeKeys = useAppRouterStore(s => Object.keys(s.nodes));
 
   return (
@@ -64,7 +82,7 @@ export const AppRouterLayout = memo(({ children }: AppRouterLayoutProps) => {
       {children}
       <div style={{ display: 'none' }}>
         {nodeKeys.map(nodeKey => (
-          <AppRouterNode key={nodeKey} nodeKey={nodeKey} />
+          <AppRouterNode key={nodeKey} appRoutes={appRoutes} nodeKey={nodeKey} />
         ))}
       </div>
     </>
