@@ -44,7 +44,7 @@ export function createPathParamsCodec<const Path extends RoutePath>(basePath: Pa
     input: (blueprints: typeof PATH_PARAM_BLUEPRINTS_MAP) => Blueprints
   ) {
     const blueprints = input(PATH_PARAM_BLUEPRINTS_MAP);
-    const blueprintKeys = Object.keys(blueprints);
+    const blueprintKeys = Object.keys(blueprints || {});
 
     const type: InferPathParamValuesFromBlueprintMap<Blueprints> = {} as any;
     for (const key of blueprintKeys) {

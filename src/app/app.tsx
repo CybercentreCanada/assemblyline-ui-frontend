@@ -119,7 +119,7 @@ import { memo, StrictMode } from 'react';
 
 export const AppLayout = memo(() => (
   <AppAuthLayout>
-    <AppRouterLayout appRoutes={APP_ROUTES}>
+    <AppRouterLayout>
       <AppDrawerLayout content={<AppRouterPanel panelKey={1} />}>
         <AppTemplateLayout>
           <AppRouterPanel panelKey={0} />
@@ -137,23 +137,23 @@ AppLayout.displayName = 'AppLayout';
 
 const AppProviders = memo(({ children }: PropsWithChildren) => (
   <AppThemeProvider>
-    <AppErrorProvider>
-      <AppSnackbarProvider>
-        <AppApiProvider>
-          <AppRouterProvider>
-            <AppNavigationProvider>
-              <AppLocationProvider appRoutes={APP_ROUTES}>
-                <AppTemplateProvider i18n={i18n}>
+    <AppTemplateProvider i18n={i18n}>
+      <AppErrorProvider>
+        <AppSnackbarProvider>
+          <AppApiProvider>
+            <AppRouterProvider>
+              <AppNavigationProvider>
+                <AppLocationProvider appRoutes={APP_ROUTES}>
                   <AppCarouselProvider>
                     <>{children}</>
                   </AppCarouselProvider>
-                </AppTemplateProvider>
-              </AppLocationProvider>
-            </AppNavigationProvider>
-          </AppRouterProvider>
-        </AppApiProvider>
-      </AppSnackbarProvider>
-    </AppErrorProvider>
+                </AppLocationProvider>
+              </AppNavigationProvider>
+            </AppRouterProvider>
+          </AppApiProvider>
+        </AppSnackbarProvider>
+      </AppErrorProvider>
+    </AppTemplateProvider>
   </AppThemeProvider>
 ));
 

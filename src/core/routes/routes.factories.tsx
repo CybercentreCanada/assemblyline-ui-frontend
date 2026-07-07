@@ -60,10 +60,12 @@ export const createAppRoute = <
 }: CreateAppRouteProps<Path, Params, Search, Hash>) => {
   void loading;
 
-  const paramCodec = !params ? undefined : createPathParamsCodec<Path>(path)(params);
+  const paramCodec = !params
+    ? createPathParamsCodec<Path>(path)(() => null)
+    : createPathParamsCodec<Path>(path)(params);
 
   const searchEngine = !search
-    ? undefined
+    ? new SearchParamEngine(null)
     : new SearchParamEngine(search(SEARCH_PARAM_BLUEPRINTS_MAP)).setDefaultValues(null);
 
   const hashCodec = hash ?? ((h: Location['hash']) => h as Hash);
@@ -71,7 +73,7 @@ export const createAppRoute = <
   return {
     path,
     params: paramCodec,
-    search: searchEngine,
+    search: searchEngine as SearchParamEngine<Search>,
     // search: !search ? undefined : searchEngine.fromLocation({ search: null } as any),
     hash: hashCodec,
     element: (

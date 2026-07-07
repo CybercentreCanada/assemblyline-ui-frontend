@@ -1,10 +1,46 @@
 import { findNode, useAppRouterStore } from 'core/router';
-import { AppRouteKeyProvider } from 'core/routes';
+import { AppRouteKeyProvider, findRouteDefinitionFromKey, useAppLocationStore } from 'core/routes';
 import { InPortal, OutPortal } from 'features/portal';
-import { NotFoundPage } from 'pages/not-found/not-found.route';
 import type { PropsWithChildren } from 'react';
-import { memo, useMemo } from 'react';
-import { Route, Routes } from 'react-router';
+import { memo } from 'react';
+
+//*****************************************************************************************
+// App Router Route
+//*****************************************************************************************
+
+export type AppRouterRouteProps = {
+  /** Key identifying this node in the router store. */
+  routeKey: string;
+};
+
+export const AppRouterRoute = memo(({ routeKey }: AppRouterRouteProps) => {
+  const element = useAppLocationStore(s => findRouteDefinitionFromKey(s, routeKey)?.element);
+  return !routeKey || !element ? null : <AppRouteKeyProvider routeKey={routeKey}>{element}</AppRouteKeyProvider>;
+});
+
+AppRouterRoute.displayName = 'AppRouterRoute';
+
+//*****************************************************************************************
+// App Router Node
+//*****************************************************************************************
+
+export type AppRouterNodeProps = {
+  /** Key identifying this node in the router store. */
+  nodeKey: string;
+};
+
+export const AppRouterNode = memo(({ nodeKey }: AppRouterNodeProps) => {
+  const routeKey = useAppRouterStore(s => s?.nodes?.[nodeKey]?.routeKey || undefined);
+  const portal = useAppRouterStore(s => s?.nodes?.[nodeKey]?.portal || undefined);
+
+  return !routeKey ? null : (
+    <InPortal node={portal}>
+      <AppRouterRoute routeKey={routeKey} />
+    </InPortal>
+  );
+});
+
+AppRouterNode.displayName = 'AppRouterNode';
 
 //*****************************************************************************************
 // App Router Panel
@@ -17,72 +53,24 @@ export type AppRouterPanelProps = {
 export const AppRouterPanel = memo(({ panelKey }: AppRouterPanelProps) => {
   const routeKey = useAppRouterStore(s => s?.panels?.[panelKey]?.routeKey || undefined);
   const portal = useAppRouterStore(s => findNode(s, { routeKey: routeKey })?.portal || undefined);
-
   return !portal ? <div>No node assigned</div> : <OutPortal node={portal} />;
 });
 
 AppRouterPanel.displayName = 'AppRouterPanel';
 
 //*****************************************************************************************
-// App Router Node
-//*****************************************************************************************
-
-export type AppRouterNodeProps = {
-  appRoutes: AppRoutes;
-  /** Key identifying this node in the router store. */
-  nodeKey: string;
-};
-
-export const AppRouterNode = memo(({ appRoutes, nodeKey }: AppRouterNodeProps) => {
-  const routeKey = useAppRouterStore(s => s?.nodes?.[nodeKey]?.routeKey || undefined);
-  const portal = useAppRouterStore(s => s?.nodes?.[nodeKey]?.portal || undefined);
-  const href = useAppRouterStore(s => s?.routes?.[routeKey]?.href || undefined);
-  const state = useAppRouterStore(s => s?.routes?.[routeKey]?.state || undefined);
-
-  const { pathname, search, hash } = useMemo(() => new URL(href, window.location.origin), [href]);
-
-  return !routeKey || !href ? null : (
-    <InPortal node={portal}>
-      {/* <AppThemeProvider> */}
-      <AppRouteKeyProvider routeKey={routeKey}>
-        <Routes location={{ pathname, search, hash, state }}>
-          {appRoutes.map((route, i) => (
-            <Route
-              key={i}
-              path={route.path}
-              element={route.element}
-              loader={() => {
-                console.log('loader');
-              }}
-            />
-          ))}
-          <Route path="*" element={<NotFoundPage />} />
-        </Routes>
-      </AppRouteKeyProvider>
-      {/* </AppThemeProvider> */}
-    </InPortal>
-  );
-});
-
-AppRouterNode.displayName = 'AppRouterNode';
-
-//*****************************************************************************************
 // App Router Layout
 //*****************************************************************************************
 
-export type AppRouterLayoutProps = PropsWithChildren & {
-  appRoutes: AppRoutes;
-};
-
-export const AppRouterLayout = memo(({ appRoutes, children }: AppRouterLayoutProps) => {
-  const nodeKeys = useAppRouterStore(s => Object.keys(s.nodes));
+export const AppRouterLayout = memo(({ children }: PropsWithChildren) => {
+  const nodeKeys = useAppRouterStore(s => Object.keys(s?.nodes || {}));
 
   return (
     <>
       {children}
       <div style={{ display: 'none' }}>
         {nodeKeys.map(nodeKey => (
-          <AppRouterNode key={nodeKey} appRoutes={appRoutes} nodeKey={nodeKey} />
+          <AppRouterNode key={nodeKey} nodeKey={nodeKey} />
         ))}
       </div>
     </>

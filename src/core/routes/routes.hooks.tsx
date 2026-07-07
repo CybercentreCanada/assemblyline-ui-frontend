@@ -1,10 +1,5 @@
-import type {
-  InferHashParamValueFromPath,
-  InferPathParamValueFromPath,
-  InferSearchParamValueFromPath
-} from 'core/routes/routes.models';
-import type { AppRouteKeyStore } from 'core/routes/routes.providers';
-import { useAppLocationStore, useAppRouteKeyStore } from 'core/routes/routes.providers';
+import type { AppRouteKeyStore, InferAppRouteSnapshotFromPath } from 'core/routes';
+import { findRouteSnapshotFromKey, useAppLocationStore, useAppRouteKeyStore } from 'core/routes';
 
 /**
  * @name useAppRouteKey
@@ -18,19 +13,31 @@ export function useAppRouteKey(): AppRouteKeyStore['routeKey'] {
 }
 
 /**
+ * @name useAppLocation
+ * @description Returns the current typed route location snapshot, or a selected value from it.
+ * @param selector - Optional selector applied to the current route snapshot
+ * @returns Current location snapshot or selected snapshot value
+ */
+export const useAppLocation = function <const Path extends AppRoute['path']>() {
+  const routeKey = useAppRouteKey();
+  const snapshot = useAppLocationStore(s => findRouteSnapshotFromKey<Path>(s, routeKey));
+
+  return function <Selected = InferAppRouteSnapshotFromPath<Path>>(
+    selector?: (location: InferAppRouteSnapshotFromPath<Path>) => Selected
+  ): Selected | InferAppRouteSnapshotFromPath<Path> | null {
+    if (snapshot == null) return null;
+    return selector ? selector(snapshot) : snapshot;
+  };
+};
+
+/**
  * @name useAppPathParams
  * @description Returns the parsed path params for the current route context.
  * @returns Current route path params, or null when unavailable
  */
-export function useAppPathParams<
-  const Path extends AppRoute['path'] = AppRoute['path']
->(): InferPathParamValueFromPath<Path> {
+export function useAppPathParams<const Path extends AppRoute['path']>() {
   const routeKey = useAppRouteKey();
-  const context = useAppLocationStore(s =>
-    routeKey ? (s?.[routeKey]?.params as InferPathParamValueFromPath<Path> | null) : null
-  );
-  if (context == null) return null;
-  return context;
+  return useAppLocationStore(s => findRouteSnapshotFromKey<Path>(s, routeKey)?.params);
 }
 
 /**
@@ -38,15 +45,9 @@ export function useAppPathParams<
  * @description Returns the parsed search params snapshot for the current route context.
  * @returns Current route search params, or null when unavailable
  */
-export function useAppSearchParams<
-  const Path extends AppRoute['path'] = AppRoute['path']
->(): InferSearchParamValueFromPath<Path> {
+export function useAppSearchParams<const Path extends AppRoute['path']>() {
   const routeKey = useAppRouteKey();
-  const context = useAppLocationStore(s =>
-    routeKey ? (s?.[routeKey]?.search as InferSearchParamValueFromPath<Path>) : null
-  );
-  if (context == null) return null;
-  return context;
+  return useAppLocationStore(s => findRouteSnapshotFromKey<Path>(s, routeKey)?.search);
 }
 
 /**
@@ -54,13 +55,7 @@ export function useAppSearchParams<
  * @description Returns the parsed hash value for the current route context.
  * @returns Current route hash value, or null when unavailable
  */
-export function useAppHashParams<
-  const Path extends AppRoute['path'] = AppRoute['path']
->(): InferHashParamValueFromPath<Path> {
+export function useAppHashParams<const Path extends AppRoute['path']>() {
   const routeKey = useAppRouteKey();
-  const context = useAppLocationStore(s =>
-    routeKey ? (s?.[routeKey]?.hash as InferHashParamValueFromPath<Path>) : null
-  );
-  if (context == null) return null;
-  return context;
+  return useAppLocationStore(s => findRouteSnapshotFromKey<Path>(s, routeKey)?.hash);
 }

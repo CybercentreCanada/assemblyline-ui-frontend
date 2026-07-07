@@ -19,7 +19,7 @@ export class SearchParamEngine<Blueprints extends SearchParamBlueprintMap> {
   private runtimes: InferSearchParamRuntimeMapFromBlueprintMap<Blueprints>;
 
   constructor(blueprints: Blueprints) {
-    this.runtimes = Object.entries(blueprints).reduce((prev, [key, bp]) => {
+    this.runtimes = Object.entries(blueprints || {}).reduce((prev, [key, bp]) => {
       if (bp instanceof BooleanSearchParamBlueprint)
         return { ...prev, [key]: new SEARCH_PARAM_RUNTIME_MAP.boolean(key, bp) };
       if (bp instanceof NumberSearchParamBlueprint)

@@ -1,5 +1,5 @@
-import { useAppExternalHref, useAppNavigate } from 'core/router';
-import type { InferNavigationValueFromPath } from 'core/routes';
+import type { InferNavigationInputFromPath } from 'core/router';
+import { getNavigationMapFromInput, useAppExternalHref, useAppNavigate } from 'core/router';
 import type { ForwardedRef } from 'react';
 import { forwardRef, memo, useCallback, useLayoutEffect, useRef } from 'react';
 import type { LinkProps as RouterLinkProps } from 'react-router';
@@ -13,33 +13,25 @@ export type AppLinkProps<Path extends AppRoute['path']> = Omit<
   RouterLinkProps,
   'to' | 'pathname' | 'search' | 'hash'
 > & {
-  to: InferNavigationValueFromPath<Path>;
+  to: InferNavigationInputFromPath<Path>;
 };
 
-// TODO
 export function WrappedAppLink<const Path extends AppRoute['path']>(
   { children, to, onClick, ...props }: AppLinkProps<Path>,
   ref: ForwardedRef<HTMLAnchorElement>
 ) {
   const href = useAppExternalHref<Path>(to);
-  const navigate = useAppNavigate<Path>();
+  const navigate = useAppNavigate();
 
   const handleClick = useCallback(
     (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
-      if (onClick) onClick?.(event);
-      else {
-        event.preventDefault();
-        event.stopPropagation();
-
-        const [toKey, toValue] = Object.entries(to)?.[0] || [null, null];
-        navigate?.[toKey]?.(toValue);
-        // if ('openRoute' in to) navigate.openRoute(to.openRoute);
-        // else if ('replaceRoute' in to) navigate.replaceRoute(to.replaceRoute);
-        // else if ('replaceSearchObject' in to) navigate.replaceSearchObject(to.replaceSearchObject);
-        // else if ('replaceURLSearchParams' in to) navigate.replaceURLSearchParams(to.replaceURLSearchParams);
-      }
+      event.preventDefault();
+      event.stopPropagation();
+      onClick?.(event);
+      navigate.run<Path>(to);
     },
-    [navigate, onClick, to]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [navigate, onClick, ...(getNavigationMapFromInput(to).dependencies ?? [to])]
   );
 
   return (
@@ -62,22 +54,21 @@ export const AppLink = memo(forwardRef(WrappedAppLink)) as <const Path extends A
 //*****************************************************************************************
 
 export type AppNavigateProps<Path extends AppRoute['path']> = {
-  to: InferNavigationValueFromPath<Path>;
+  to: InferNavigationInputFromPath<Path>;
 };
 
 export function WrappedAppNavigate<const Path extends AppRoute['path']>({ to }: AppNavigateProps<Path>) {
-  const navigate = useAppNavigate<Path>();
+  const navigate = useAppNavigate();
+
   const hasNavigatedRef = useRef<boolean>(false);
 
   useLayoutEffect(() => {
     if (hasNavigatedRef.current) return;
     hasNavigatedRef.current = true;
 
-    if ('openRoute' in to) navigate.openRoute(to.openRoute);
-    else if ('replaceRoute' in to) navigate.replaceRoute(to.replaceRoute);
-    else if ('replaceSearchObject' in to) navigate.replaceSearchObject(to.replaceSearchObject);
-    else if ('replaceURLSearchParams' in to) navigate.replaceURLSearchParams(to.replaceURLSearchParams);
-  }, [navigate, to]);
+    navigate.run<Path>(to);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [navigate, ...(getNavigationMapFromInput(to).dependencies ?? [to])]);
 
   return null;
 }

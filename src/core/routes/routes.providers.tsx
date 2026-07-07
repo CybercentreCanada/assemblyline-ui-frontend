@@ -1,16 +1,20 @@
 import type { AppRouterStore } from 'core/router';
 import { useAppRouterStoreApi } from 'core/router';
 import type { AppLocationStore } from 'core/routes';
-import { findAppRouteFromLocation, getSnapshotFromLocation } from 'core/routes';
+import { setRouteDefinitionsFromAppRoutes, syncRouteSnapshotsFromRouter } from 'core/routes';
 import { createAppStore } from 'features/store/createAppStore';
 import type { ReactNode } from 'react';
-import { memo, useEffect } from 'react';
+import { memo, useCallback, useEffect } from 'react';
+import type { StoreApi } from 'zustand';
 
 //*****************************************************************************************
 // App Location Provider
 //*****************************************************************************************
 
-export const DEFAULT_APP_LOCATION_STORE: AppLocationStore = {};
+export const DEFAULT_APP_LOCATION_STORE: AppLocationStore = {
+  definitions: null,
+  snapshots: {}
+};
 
 export const {
   StoreProvider: AppLocationStoreProvider,
@@ -21,47 +25,35 @@ export const {
 
 AppLocationStoreProvider.displayName = 'AppLocationStoreProvider';
 
+export const getAppLocationStateFromApi = (api: StoreApi<AppLocationStore>): AppLocationStore => {
+  return api?.getState() || DEFAULT_APP_LOCATION_STORE;
+};
+
 export type AppLocationProviderProps = {
+  /** All of the app's created routes */
+  appRoutes: AppRoutes;
   /** Provider children. */
   children: ReactNode;
-
-  appRoutes: AppRoutes;
 };
 
 const AppLocationSync = memo(({ appRoutes }: Omit<AppLocationProviderProps, 'children'>) => {
   const setLocationStore = useAppSetLocationStore();
   const routerStoreApi = useAppRouterStoreApi();
 
+  const commitRouterToLocation = useCallback(
+    (router: AppRouterStore) => setLocationStore(s => syncRouteSnapshotsFromRouter(s, router)),
+    [setLocationStore]
+  );
+
+  useEffect(() => {
+    setLocationStore(s => setRouteDefinitionsFromAppRoutes(s, appRoutes));
+  }, [appRoutes, setLocationStore]);
+
   useEffect(() => {
     if (!routerStoreApi) return;
-
-    const commitRouterToLocation = (router: AppRouterStore) =>
-      setLocationStore(location => {
-        const routerRouteKeys = new Set(Object.keys(router.routes));
-
-        for (const existingRouteKey of Object.keys(location)) {
-          if (routerRouteKeys.has(existingRouteKey)) continue;
-          delete location[existingRouteKey];
-        }
-
-        for (const [routeKey, route] of Object.entries(router.routes)) {
-          const id = `${route.href}${JSON.stringify(route.state)}`;
-          const previousSnapshot = location?.[routeKey] || null;
-          if (!previousSnapshot || previousSnapshot?.id === id) continue;
-          const appRoute = findAppRouteFromLocation(appRoutes, route);
-          location[routeKey] = getSnapshotFromLocation(appRoute, route);
-          location[routeKey].id = id;
-          location[routeKey].appRoute = appRoute;
-        }
-
-        return location;
-      });
-
-    const unsubscribe = routerStoreApi.subscribe(commitRouterToLocation);
     commitRouterToLocation(routerStoreApi.getState());
-
-    return unsubscribe;
-  }, [appRoutes, routerStoreApi, setLocationStore]);
+    return routerStoreApi.subscribe(router => commitRouterToLocation(router));
+  }, [commitRouterToLocation, routerStoreApi]);
 
   return null;
 });
