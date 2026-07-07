@@ -90,7 +90,7 @@ const WrappedResultSection: React.FC<Props> = ({
   const theme = useTheme();
   const { c12nDef } = useALContext();
   const { copy } = useClipboard();
-  const { getKey, hasKeys } = useHighlighter();
+  const { getKey, hasHighlightedKeys } = useHighlighter();
   const { showSafeResults } = useSafeResults();
 
   const [state, setState] = useState<{ mouseX: number; mouseY: number }>(null);
@@ -130,7 +130,7 @@ const WrappedResultSection: React.FC<Props> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [section]);
 
-  const highlighted = hasKeys(allTags);
+  const highlighted = hasHighlightedKeys(allTags);
 
   const handleMenuClick = useCallback(
     event => {
