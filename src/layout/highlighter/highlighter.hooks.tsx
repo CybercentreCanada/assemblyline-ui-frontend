@@ -1,11 +1,6 @@
 import { getAppInterfaceStateFromApi, useAppInterfaceStoreApi, useAppSetInterfaceStore } from 'core/interface';
 import type { HighlightMapProps } from 'layout/highlighter';
-import {
-  getHighlighterKey,
-  hasHighlighterKey,
-  hasHighlighterKeys,
-  toggleHighlighterKey
-} from 'layout/highlighter/highlighter.utils';
+import { getHighlighterKey, hasHighlighterKey, hasHighlighterKeys, toggleHighlighterKey } from 'layout/highlighter';
 import { useCallback } from 'react';
 
 /** Manages highlight state for tree/list components with high fan-out (1000+ consumers). */
@@ -17,7 +12,7 @@ export type UseAppHighlighter = {
   /** Checks if any key in a list is highlighted. */
   hasKeys: (keyList: string[]) => boolean;
   /** Toggles highlight state for a single key and recomputes related keys. */
-  triggerHighlight: (key: string) => void;
+  trigger: (key: string) => void;
   /** Replaces the key relation map and triggers related key recomputation. */
   setMap: (map: HighlightMapProps) => void;
 };
@@ -42,10 +37,7 @@ export const useAppHighlighter = (): UseAppHighlighter => {
     [interfaceApi]
   );
 
-  const triggerHighlight = useCallback(
-    (key: string) => setInterfaceStore(toggleHighlighterKey(key)),
-    [setInterfaceStore]
-  );
+  const trigger = useCallback((key: string) => setInterfaceStore(toggleHighlighterKey(key)), [setInterfaceStore]);
 
   const setMap = useCallback(
     (map: HighlightMapProps) =>
@@ -58,9 +50,9 @@ export const useAppHighlighter = (): UseAppHighlighter => {
 
   return {
     getKey: getHighlighterKey,
-    isHighlighted,
     hasKeys,
-    triggerHighlight,
-    setMap
+    isHighlighted,
+    setMap,
+    trigger
   };
 };

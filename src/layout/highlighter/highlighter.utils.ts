@@ -23,7 +23,7 @@ export const getHighlighterKey = (type: string, value: string): string => `${typ
  */
 export const hasHighlighterKey =
   (key: string) =>
-  (store: AppInterface): boolean => {
+  (store: AppInterfaceStore): boolean => {
     if (store.highlighter.links) return store.highlighter.keys.has(key) || store.highlighter.related.has(key);
     else return store.highlighter.keys.has(key);
   };
@@ -36,7 +36,7 @@ export const hasHighlighterKey =
  */
 export const hasHighlighterKeys =
   (keys: string[]) =>
-  (store: AppInterface): boolean =>
+  (store: AppInterfaceStore): boolean =>
     keys.some(item => hasHighlighterKey(item)(store));
 
 //*****************************************************************************************
@@ -51,7 +51,7 @@ export const hasHighlighterKeys =
  */
 export const toggleHighlighterKey =
   (key: string) =>
-  (store: AppInterface): AppInterface => {
+  (store: AppInterfaceStore): AppInterfaceStore => {
     if (!store.highlighter.keys.has(key)) {
       store.highlighter.keys.add(key);
     } else {
