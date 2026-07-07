@@ -6,7 +6,7 @@ import type { SystemMessage } from 'models/api/user';
 
 declare global {
   /** Transient UI state managed by the interface store — nothing is persisted. */
-  type AppInterface = {
+  type AppInterfaceStore = {
     assistant: {
       open: boolean;
       currentInsights: AssistantInsightProps[];
@@ -104,7 +104,7 @@ declare global {
   };
 }
 
-export const DEFAULT_APP_INTERFACE_STORE: AppInterface = {
+export const DEFAULT_APP_INTERFACE_STORE: AppInterfaceStore = {
   api: {
     showDevtools: false
   },

@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 declare global {
-  type AppPreference = z.infer<typeof APP_PREFERENCE_SCHEMA>;
+  type AppPreferenceStore = z.infer<typeof APP_PREFERENCE_SCHEMA>;
 }
 
 const API_PREFERENCE_SCHEMA = z.object({
@@ -58,4 +58,4 @@ export const APP_PREFERENCE_SCHEMA = z.object({
   theme: THEME_PREFERENCE_SCHEMA.catch(THEME_PREFERENCE_SCHEMA.parse({}))
 });
 
-export const DEFAULT_APP_PREFERENCE = APP_PREFERENCE_SCHEMA.parse({});
+export const DEFAULT_APP_PREFERENCE_STORE = APP_PREFERENCE_SCHEMA.parse({});

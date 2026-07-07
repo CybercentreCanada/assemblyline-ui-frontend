@@ -1,6 +1,6 @@
 import type { UndefinedInitialDataOptions } from '@tanstack/react-query';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { DEFAULT_APP_PREFERENCE } from 'app/core.preference';
+import { DEFAULT_APP_PREFERENCE_STORE } from 'app/core.preference';
 import type { ApiQueryKey, ApiResponse, BlobResponse } from 'core/api/api.models';
 import { getBlobResponse, isApiData, stableStringify } from 'core/api/api.utils';
 import { useAppConfig } from 'core/config';
@@ -28,7 +28,7 @@ export const useDownloadBlob = ({
   disabled,
   queryProps = null,
   reloadOnUnauthorize = true,
-  retryAfter = DEFAULT_APP_PREFERENCE.api.retryTime,
+  retryAfter = DEFAULT_APP_PREFERENCE_STORE.api.retryTime,
   url
 }: UseDownloadBlobProps) => {
   const queryClient = useQueryClient();
@@ -123,7 +123,7 @@ export const useDownloadBlob = ({
         }
 
         // Handle successful request
-        if (retryAfter !== DEFAULT_APP_PREFERENCE.api.retryTime) closeSnackbar();
+        if (retryAfter !== DEFAULT_APP_PREFERENCE_STORE.api.retryTime) closeSnackbar();
 
         // Handle all non-successful request
         if (res.status !== 200) {

@@ -1,6 +1,6 @@
 import type { UndefinedInitialDataOptions } from '@tanstack/react-query';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { DEFAULT_APP_PREFERENCE } from 'app/core.preference';
+import { DEFAULT_APP_PREFERENCE_STORE } from 'app/core.preference';
 import type { ApiQueryKey, ApiRequest, ApiResponse } from 'core/api/api.models';
 import { getApiResponse, stableStringify } from 'core/api/api.utils';
 import type { UseApiCallFnProps } from 'core/api/hooks/useApiCallFn';
@@ -29,7 +29,7 @@ export const useApiQuery = <
   disabled = false,
   method,
   queryProps = null,
-  retryAfter = DEFAULT_APP_PREFERENCE.api.retryTime,
+  retryAfter = DEFAULT_APP_PREFERENCE_STORE.api.retryTime,
   url,
   ...params
 }: UseApiQueryProps<Response, Request, Error>) => {

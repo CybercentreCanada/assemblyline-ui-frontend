@@ -6,7 +6,7 @@ import type { User } from 'models/base/user';
 import type { UserSettings } from 'models/base/user_settings';
 
 declare global {
-  type AppConfig = {
+  type AppConfigStore = {
     c12nDef?: ClassificationDefinition;
     classificationAliases?: ClassificationAliases;
     configuration?: Configuration;

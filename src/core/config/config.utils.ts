@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { StoreApi } from 'zustand';
 
 export const APP_CONFIG_LOCAL_STORAGE_KEY = 'al.settings';
 
@@ -6,6 +7,10 @@ export const APP_CONFIG_LOCAL_STORAGE_KEY = 'al.settings';
 const AppSettingsSchema = z.object({}).nullable().optional();
 
 type AppSettings = z.infer<typeof AppSettingsSchema>;
+
+export const getAppConfigStateFromApi = (api: StoreApi<AppConfigStore>): AppConfigStore => {
+  return api?.getState() || {};
+};
 
 //*****************************************************************************************
 // LocalStorage Persistence

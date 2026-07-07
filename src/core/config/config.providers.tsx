@@ -6,7 +6,8 @@ import { createAppStore } from 'features/store/createAppStore';
 export const {
   StoreProvider: AppConfigStoreProvider,
   useStore: useAppConfig,
-  useSetStore: useAppSetConfig
-} = createAppStore<AppConfig>({});
+  useSetStore: useAppSetConfig,
+  useStoreApi: useAppConfigStoreApi
+} = createAppStore<AppConfigStore>({});
 
 AppConfigStoreProvider.displayName = 'AppConfigStoreProvider';

@@ -1,4 +1,10 @@
+import { DEFAULT_APP_PREFERENCE_STORE } from 'app/core.preference';
 import type { z } from 'zod';
+import type { StoreApi } from 'zustand';
+
+export const getAppPreferenceStateFromApi = (api: StoreApi<AppPreferenceStore>): AppPreferenceStore => {
+  return api?.getState() || DEFAULT_APP_PREFERENCE_STORE;
+};
 
 //*****************************************************************************************
 // Persistence Utilities
@@ -39,10 +45,10 @@ const deepDiff = (current: Record<string, unknown>, defaults: Record<string, unk
  */
 export const savePreferenceToLocalStorage = (
   schema: z.ZodObject<z.ZodRawShape>,
-  preference: AppPreference,
+  preference: AppPreferenceStore,
   key: string
 ): void => {
-  const defaults = schema.parse({}) as Record<string, unknown>;
+  const defaults = schema.parse({});
   const diff = deepDiff(preference as unknown as Record<string, unknown>, defaults);
 
   if (Object.keys(diff).length === 0) localStorage.removeItem(key);
@@ -59,13 +65,13 @@ export const savePreferenceToLocalStorage = (
 export const loadPreferenceFromLocalStorage = (
   schema: z.ZodObject<z.ZodRawShape>,
   key: string
-): Partial<AppPreference> => {
+): Partial<AppPreferenceStore> => {
   try {
     const raw = localStorage.getItem(key);
     const stored = JSON.parse(raw) as unknown;
     const result = schema.parse({ ...(stored as Record<string, unknown>) });
-    return result as Partial<AppPreference>;
+    return result as Partial<AppPreferenceStore>;
   } catch {
-    return schema.parse({}) as Partial<AppPreference>;
+    return schema.parse({}) as Partial<AppPreferenceStore>;
   }
 };

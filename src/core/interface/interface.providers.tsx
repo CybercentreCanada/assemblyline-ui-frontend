@@ -8,7 +8,8 @@ import { createAppStore } from 'features/store/createAppStore';
 export const {
   StoreProvider: AppInterfaceStoreProvider,
   useStore: useAppInterfaceStore,
-  useSetStore: useAppSetInterfaceStore
-} = createAppStore<AppInterface>(DEFAULT_APP_INTERFACE_STORE);
+  useSetStore: useAppSetInterfaceStore,
+  useStoreApi: useAppInterfaceStoreApi
+} = createAppStore<AppInterfaceStore>(DEFAULT_APP_INTERFACE_STORE);
 
 AppInterfaceStoreProvider.displayName = 'AppInterfaceStoreProvider';

@@ -1,6 +1,6 @@
 import type { InfiniteData } from '@tanstack/react-query';
 import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query';
-import { DEFAULT_APP_PREFERENCE } from 'app/core.preference';
+import { DEFAULT_APP_PREFERENCE_STORE } from 'app/core.preference';
 import type { ApiQueryKey, ApiRequest, ApiResponse } from 'core/api/api.models';
 import { stableStringify } from 'core/api/api.utils';
 import type { UseApiCallFnProps } from 'core/api/hooks/useApiCallFn';
@@ -36,7 +36,7 @@ export const useInfiniteApiQuery = <
   getPreviousOffset = () => null,
   getNextOffset = () => null,
   allowCache = false,
-  retryAfter = DEFAULT_APP_PREFERENCE.api.retryTime
+  retryAfter = DEFAULT_APP_PREFERENCE_STORE.api.retryTime
 }: UseInfiniteApiQueryProps<Response, Request, Error>) => {
   const queryClient = useQueryClient();
   const apiCallFn = useApiCallFn<ApiResponse<Response>>();

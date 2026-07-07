@@ -1,4 +1,4 @@
-import { DEFAULT_APP_PREFERENCE } from 'app/core.preference';
+import { DEFAULT_APP_PREFERENCE_STORE } from 'app/core.preference';
 import { loadPreferenceFromLocalStorage, savePreferenceToLocalStorage } from 'core/preference/preference.utils';
 import { createAppStore } from 'features/store/createAppStore';
 import type { PropsWithChildren } from 'react';
@@ -11,8 +11,9 @@ import type { z } from 'zod';
 export const {
   StoreProvider: AppPreferenceStoreProvider,
   useStore: useAppPreferenceStore,
-  useSetStore: useAppSetPreferenceStore
-} = createAppStore<AppPreference>(DEFAULT_APP_PREFERENCE);
+  useSetStore: useAppSetPreferenceStore,
+  useStoreApi: useAppPreferenceStoreApi
+} = createAppStore<AppPreferenceStore>(DEFAULT_APP_PREFERENCE_STORE);
 
 AppPreferenceStoreProvider.displayName = 'AppPreferenceStoreProvider';
 

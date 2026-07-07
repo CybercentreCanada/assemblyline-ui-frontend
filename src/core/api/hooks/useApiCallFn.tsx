@@ -1,4 +1,4 @@
-import { DEFAULT_APP_PREFERENCE } from 'app/core.preference';
+import { DEFAULT_APP_PREFERENCE_STORE } from 'app/core.preference';
 import type { ApiRequest, ApiResponse } from 'core/api/api.models';
 import { isApiData } from 'core/api/api.utils';
 import { useAppConfig } from 'core/config';
@@ -44,7 +44,7 @@ export const useApiCallFn = <
       headers,
       method = 'GET',
       reloadOnUnauthorize = true,
-      retryAfter = DEFAULT_APP_PREFERENCE.api.retryTime,
+      retryAfter = DEFAULT_APP_PREFERENCE_STORE.api.retryTime,
       signal,
       url,
       onSuccess,
@@ -143,7 +143,7 @@ export const useApiCallFn = <
         }
 
         // success
-        if (retryAfter !== DEFAULT_APP_PREFERENCE.api.retryTime) closeSnackbar();
+        if (retryAfter !== DEFAULT_APP_PREFERENCE_STORE.api.retryTime) closeSnackbar();
 
         onSuccess?.(json as Response);
         return json as Response;
