@@ -107,22 +107,19 @@ export const DEFAULT_APP_LOCATION_STATE: AppLocationState = {
 export type AppRouterStore =
   & AppLocationState
   & {
-    /** Routes that are blocked from navigation */
-    blockedRoutes: AppRouterBlockedRoutes
+
     /** Portal node cache. */
     nodes: Record<string, AppRouterNode>;
   };
 
 export const DEFAULT_APP_ROUTER_STORE: AppRouterStore = {
   ...DEFAULT_APP_LOCATION_STATE,
-  blockedRoutes: {},
   nodes: {}
 };
 
 /** Example router store shape used for parsing fallbacks and tests. */
 export const ROUTER_STORE_EXAMPLE: AppRouterStore = {
   id: 'default',
-  blockedRoutes: DEFAULT_APP_ROUTER_BLOCKED_ROUTES,
   nodes: { default: { portal: createReversePortalNode(), routeKey: 'default' } },
   panels: [
     {
@@ -186,6 +183,8 @@ export const DEFAULT_NAVIGATE_OPTIONS: NavigateOptions = {
 export type AppNavigationStore =
   & AppLocationState
   & {
+        /** Routes that are blocked from navigation */
+    blockedRoutes: AppRouterBlockedRoutes
     /** Check if this navigation should replace the current history entry */
     replace?: boolean;
   };
@@ -194,5 +193,6 @@ export type AppRouterState = Pick<AppNavigationStore, 'id' | 'panels' | 'routes'
 
 export const DEFAULT_APP_NAVIGATION_STORE: AppNavigationStore = {
   ...DEFAULT_APP_LOCATION_STATE,
+  blockedRoutes: {},
   replace: false
 };

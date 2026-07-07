@@ -1,6 +1,14 @@
 export { AppLink, AppNavigate, WrappedAppLink, WrappedAppNavigate } from './router.components';
 export type { AppLinkProps, AppNavigateProps } from './router.components';
-export { useAppBlocker, useAppExternalHref, useAppNavigate } from './router.hooks';
+export {
+  useAppBlocker,
+  useAppBlockNavigation,
+  useAppBlockUnloadEvent,
+  useAppExternalHref,
+  useAppNavigate,
+  useAppSyncNavigationStoreFromLocation,
+  useAppSyncRouterStoreFromNavigation
+} from './router.hooks';
 export { AppRouterLayout, AppRouterNode, AppRouterPanel } from './router.layout';
 export type { AppRouterNodeProps, AppRouterPanelProps } from './router.layout';
 export {
@@ -34,6 +42,7 @@ export {
   AppNavigationSync,
   AppRouterProvider,
   AppRouterStoreProvider,
+  getAppNavigationStateFromApi,
   getAppRouterStateFromApi,
   useAppNavigationStore,
   useAppNavigationStoreApi,
@@ -49,11 +58,12 @@ export {
   addRoute,
   addRouteToPanel,
   addTab,
-  applyNavigationToRouterStore,
+  applyDefaultNavigationStore,
+  applyNavigationDispatch,
   areRouterStoreEqual,
   clearBlockedRoutes,
   clearNavigationStore,
-  cloneRouterStore,
+  cloneLocationStore,
   filterOrphanedNodes,
   filterOrphanedRoutes,
   filterPanelMissingRouteKeys,
@@ -68,10 +78,9 @@ export {
   findRouteKey,
   getFirstRouteKey,
   getHashFragmentsFromRouter,
-  getLocationFromHashFragment,
   getLocationStateFromRouter,
-  getNavigationFromLocation,
   getNavigationMapFromInput,
+  getNavigationStoreFromRouter,
   getNextRouteFromKey,
   getRouteFromKey,
   getRouteFromPanelKey,
@@ -81,8 +90,6 @@ export {
   insertRightPanel,
   mergePanels,
   moveTabbedRouteKey,
-  parseLocationHash,
-  parseLocationState,
   permanentTab,
   reconcileRouterFromNavigation,
   refreshRouteAges,
@@ -98,7 +105,6 @@ export {
   sanitizePanels,
   sanitizeRouterStore,
   sanitizeRoutes,
-  setNavigationStoreFromRouter,
   setNode,
   setPanel,
   setPanelActiveRoute,
@@ -108,9 +114,6 @@ export {
   setRoute,
   setUnpinnedRoute,
   showPreviousTab,
-  syncLocationToNavigationStore,
-  syncLocationToStore,
-  syncNavigationStoreToRouterStore,
   updateNode,
   updatePanel,
   updateRoute,

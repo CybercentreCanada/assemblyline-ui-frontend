@@ -1,5 +1,5 @@
 import type { AppRouteKeyStore, InferAppRouteSnapshotFromPath } from 'core/routes';
-import { findRouteSnapshotFromKey, useAppLocationStore, useAppRouteKeyStore } from 'core/routes';
+import { findRouteSnapshotFromKey, useAppRouteKeyStore, useAppRoutesRuntimeStore } from 'core/routes';
 
 /**
  * @name useAppRouteKey
@@ -20,7 +20,7 @@ export function useAppRouteKey(): AppRouteKeyStore['routeKey'] {
  */
 export const useAppLocation = function <const Path extends AppRoute['path']>() {
   const routeKey = useAppRouteKey();
-  const snapshot = useAppLocationStore(s => findRouteSnapshotFromKey<Path>(s, routeKey));
+  const snapshot = useAppRoutesRuntimeStore(s => findRouteSnapshotFromKey<Path>(s, routeKey));
 
   return function <Selected = InferAppRouteSnapshotFromPath<Path>>(
     selector?: (location: InferAppRouteSnapshotFromPath<Path>) => Selected
@@ -37,7 +37,7 @@ export const useAppLocation = function <const Path extends AppRoute['path']>() {
  */
 export function useAppPathParams<const Path extends AppRoute['path']>() {
   const routeKey = useAppRouteKey();
-  return useAppLocationStore(s => findRouteSnapshotFromKey<Path>(s, routeKey)?.params);
+  return useAppRoutesRuntimeStore(s => findRouteSnapshotFromKey<Path>(s, routeKey)?.params);
 }
 
 /**
@@ -47,7 +47,7 @@ export function useAppPathParams<const Path extends AppRoute['path']>() {
  */
 export function useAppSearchParams<const Path extends AppRoute['path']>() {
   const routeKey = useAppRouteKey();
-  return useAppLocationStore(s => findRouteSnapshotFromKey<Path>(s, routeKey)?.search);
+  return useAppRoutesRuntimeStore(s => findRouteSnapshotFromKey<Path>(s, routeKey)?.search);
 }
 
 /**
@@ -57,5 +57,5 @@ export function useAppSearchParams<const Path extends AppRoute['path']>() {
  */
 export function useAppHashParams<const Path extends AppRoute['path']>() {
   const routeKey = useAppRouteKey();
-  return useAppLocationStore(s => findRouteSnapshotFromKey<Path>(s, routeKey)?.hash);
+  return useAppRoutesRuntimeStore(s => findRouteSnapshotFromKey<Path>(s, routeKey)?.hash);
 }

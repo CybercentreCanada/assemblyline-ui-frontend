@@ -6,6 +6,7 @@ import { createPathParamsCodec } from 'features/path-params';
 import type { SearchParamBlueprintMap } from 'features/search-params';
 import { SEARCH_PARAM_BLUEPRINTS_MAP, SearchParamEngine } from 'features/search-params';
 import type { ComponentType, MemoExoticComponent, ReactNode } from 'react';
+import type { Location } from 'react-router';
 import { toElement } from 'shared/utils/app.utils';
 
 //*****************************************************************************************
@@ -61,11 +62,11 @@ export const createAppRoute = <
   void loading;
 
   const paramCodec = !params
-    ? createPathParamsCodec<Path>(path)(() => null)
+    ? (createPathParamsCodec<Path>(path)(() => null) as never)
     : createPathParamsCodec<Path>(path)(params);
 
   const searchEngine = !search
-    ? new SearchParamEngine(null)
+    ? (new SearchParamEngine(null) as never)
     : new SearchParamEngine(search(SEARCH_PARAM_BLUEPRINTS_MAP)).setDefaultValues(null);
 
   const hashCodec = hash ?? ((h: Location['hash']) => h as Hash);
@@ -73,7 +74,7 @@ export const createAppRoute = <
   return {
     path,
     params: paramCodec,
-    search: searchEngine as SearchParamEngine<Search>,
+    search: searchEngine,
     // search: !search ? undefined : searchEngine.fromLocation({ search: null } as any),
     hash: hashCodec,
     element: (

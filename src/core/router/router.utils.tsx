@@ -1,9 +1,6 @@
-import { DEFAULT_APP_PREFERENCE_STORE } from 'app/core.preference';
-import { APP_ROUTES } from 'app/core.routes';
 import type {
   AppLocationState,
   AppNavigationStore,
-  AppRouterRoute,
   AppRouterStore,
   InferNavigationInputFromPath,
   InferNavigationMapFromPath,
@@ -14,13 +11,10 @@ import {
   DEFAULT_APP_ROUTER_NODE,
   DEFAULT_APP_ROUTER_PANEL,
   DEFAULT_APP_ROUTER_ROUTE,
-  DEFAULT_APP_ROUTER_STORE,
   DEFAULT_NAVIGATE_OPTIONS
 } from 'core/router';
-import type { AppLocationStore, AppRouteLocation } from 'core/routes';
-import { findRouteDefinitionFromLocation, getAppRouteValuesFromLocation, sanitizeRouteLocation } from 'core/routes';
 import { createReversePortalNode } from 'features/portal';
-import type { Location, NavigateFunction } from 'react-router';
+import type { SetStateAction } from 'react';
 import { deepCompare, generateRandomUUID } from 'shared/utils/app.utils';
 
 //*****************************************************************************************
@@ -71,7 +65,7 @@ export const findNextPanelKey = function <const Store extends AppLocationState>(
   routeKey: RouteKeyOf<Store>,
   preferences: AppPreferenceStore
 ): number {
-  const currentPanelKey = findPanelKey(store, { routeKey });
+  const currentPanelKey = findPanelKey(store, { routeKey } as unknown as Partial<Store['panels'][number]>);
 
   if (preferences.router.navigation === 'push') return currentPanelKey + 1;
   else if (preferences.router.navigation === 'loop')
@@ -644,7 +638,8 @@ export const getRouteFromKey = function <const Store extends AppLocationState>(
   store: Store,
   routeKey: keyof Store['routes']
 ): Store['routes'][string] {
-  return routeKey in store.routes ? store.routes[routeKey] : DEFAULT_APP_ROUTER_ROUTE;
+  const route = routeKey in store.routes ? store.routes[routeKey as string] : DEFAULT_APP_ROUTER_ROUTE;
+  return route as Store['routes'][string];
 };
 
 /**
@@ -658,12 +653,12 @@ export const getRouteFromPanelKey = function <const Store extends AppLocationSta
   store: Store,
   panelKey: number
 ): Store['routes'][string] {
-  if (panelKey < 0 || panelKey >= store.panels.length) return DEFAULT_APP_ROUTER_ROUTE;
+  if (panelKey < 0 || panelKey >= store.panels.length) return DEFAULT_APP_ROUTER_ROUTE as Store['routes'][string];
 
   const routeKey = store.panels[panelKey]?.routeKey;
-  if (!routeKey || !(routeKey in store.routes)) return DEFAULT_APP_ROUTER_ROUTE;
+  if (!routeKey || !(routeKey in store.routes)) return DEFAULT_APP_ROUTER_ROUTE as Store['routes'][string];
 
-  return store.routes[routeKey] ?? DEFAULT_APP_ROUTER_ROUTE;
+  return (store.routes[routeKey] ?? DEFAULT_APP_ROUTER_ROUTE) as Store['routes'][string];
 };
 
 export const getNextRouteFromKey = function <const Store extends AppLocationState>(
@@ -671,8 +666,9 @@ export const getNextRouteFromKey = function <const Store extends AppLocationStat
   routeKey: keyof Store['routes'],
   preferences: AppPreferenceStore
 ): Store['routes'][string] {
-  const currentPanelKey = findPanelKey(store, { routeKey });
-  if (currentPanelKey < 0 || currentPanelKey >= store.panels.length) return DEFAULT_APP_ROUTER_ROUTE;
+  const currentPanelKey = findPanelKey(store, { routeKey } as Partial<Store['panels'][number]>);
+  if (currentPanelKey < 0 || currentPanelKey >= store.panels.length)
+    return DEFAULT_APP_ROUTER_ROUTE as Store['routes'][string];
 
   let nextPanelKey: number | null = currentPanelKey;
 
@@ -1074,7 +1070,7 @@ export const setPinnedRoute = function <const Store extends AppLocationState>(
     temporaryRouteKey: routeKey as Store['panels'][number]['temporaryRouteKey']
   } as Partial<Store['panels'][number]>);
   if (panelIndex >= 0) {
-    store.panels[panelIndex].pinnedRouteKeys.push(routeKey);
+    store.panels[panelIndex].pinnedRouteKeys.push(routeKey as Store['panels'][number]['routeKey']);
     store.panels[panelIndex].temporaryRouteKey = null;
   }
 
@@ -1082,8 +1078,10 @@ export const setPinnedRoute = function <const Store extends AppLocationState>(
     tabbedRouteKeys: [routeKey] as Store['panels'][number]['tabbedRouteKeys']
   } as Partial<Store['panels'][number]>);
   if (panelIndex >= 0) {
-    store.panels[panelIndex].pinnedRouteKeys.push(routeKey);
-    const index = store.panels[panelIndex].tabbedRouteKeys.findIndex(k => k === routeKey);
+    store.panels[panelIndex].pinnedRouteKeys.push(routeKey as Store['panels'][number]['routeKey']);
+    const index = store.panels[panelIndex].tabbedRouteKeys.findIndex(
+      k => k === (routeKey as Store['panels'][number]['routeKey'])
+    );
     store.panels[panelIndex].tabbedRouteKeys.splice(index, 1);
   }
 
@@ -1103,10 +1101,14 @@ export const setUnpinnedRoute = function <const Store extends AppLocationState>(
 ): Store {
   if (!(routeKey in store.routes)) return store;
 
-  const panelIndex = findPanelKey(store, { pinnedRouteKeys: [routeKey] });
+  const panelIndex = findPanelKey(store, {
+    pinnedRouteKeys: [routeKey as Store['panels'][number]['routeKey']]
+  } as unknown as Partial<Store['panels'][number]>);
   if (panelIndex >= 0) {
-    store.panels[panelIndex].tabbedRouteKeys.unshift(routeKey);
-    const index = store.panels[panelIndex].pinnedRouteKeys.findIndex(k => k === routeKey);
+    store.panels[panelIndex].tabbedRouteKeys.unshift(routeKey as Store['panels'][number]['routeKey']);
+    const index = store.panels[panelIndex].pinnedRouteKeys.findIndex(
+      k => k === (routeKey as Store['panels'][number]['routeKey'])
+    );
     store.panels[panelIndex].pinnedRouteKeys.splice(index, 1);
   }
 
@@ -1130,26 +1132,34 @@ export const moveTabbedRouteKey = function <const Store extends AppLocationState
   tabIndex: number,
   tab: 'pinned' | 'tab'
 ): Store {
-  if (
-    !(routeKey in store.routes) ||
-    panelKey < 0 ||
-    panelKey >= store.panels.length ||
-    (tab === 'tab' && (tabIndex < 0 || tabIndex >= store.panels[panelKey].tabbedRouteKeys.length))
-  )
-    return store;
+  if (!(routeKey in store.routes) || panelKey < 0 || panelKey >= store.panels.length) return store;
 
-  // Remove source
+  for (const panel of store.panels) {
+    if (panel.temporaryRouteKey === routeKey) {
+      panel.temporaryRouteKey = null;
+    }
 
-  // Add destination
-  if (tab === 'pinned') {
-    // TODO: implement pinned destination
-  } else {
-    // TODO: implement tab destination
+    const tabbedIndex = panel.tabbedRouteKeys.indexOf(routeKey as Store['panels'][number]['routeKey']);
+    if (tabbedIndex >= 0) {
+      panel.tabbedRouteKeys.splice(tabbedIndex, 1);
+    }
+
+    const pinnedIndex = panel.pinnedRouteKeys.indexOf(routeKey as Store['panels'][number]['routeKey']);
+    if (pinnedIndex >= 0) {
+      panel.pinnedRouteKeys.splice(pinnedIndex, 1);
+    }
   }
 
-  // Set it permanent
+  const destinationPanel = store.panels[panelKey];
+  destinationPanel.routeKey = routeKey as Store['panels'][number]['routeKey'];
 
-  // Set it in the panel
+  if (tab === 'pinned') {
+    const insertionIndex = Math.min(Math.max(0, Math.trunc(tabIndex)), destinationPanel.pinnedRouteKeys.length);
+    destinationPanel.pinnedRouteKeys.splice(insertionIndex, 0, routeKey as Store['panels'][number]['routeKey']);
+  } else {
+    const insertionIndex = Math.min(Math.max(0, Math.trunc(tabIndex)), destinationPanel.tabbedRouteKeys.length);
+    destinationPanel.tabbedRouteKeys.splice(insertionIndex, 0, routeKey as Store['panels'][number]['routeKey']);
+  }
 
   return store;
 };
@@ -1165,7 +1175,10 @@ export const moveTabbedRouteKey = function <const Store extends AppLocationState
  * @param routeKey - Route key to block
  * @returns Updated router store
  */
-export const addBlockedRoute = (store: AppRouterStore, routeKey: keyof AppRouterStore['routes']): AppRouterStore => {
+export const addBlockedRoute = (
+  store: AppNavigationStore,
+  routeKey: keyof AppNavigationStore['routes']
+): AppNavigationStore => {
   if (!(routeKey in store.routes) || routeKey in store.blockedRoutes) return store;
   store.blockedRoutes[routeKey] = null;
   return store;
@@ -1178,14 +1191,17 @@ export const addBlockedRoute = (store: AppRouterStore, routeKey: keyof AppRouter
  * @param routeKey - Route key to unblock
  * @returns Updated router store
  */
-export const removeBlockedRoute = (store: AppRouterStore, routeKey: keyof AppRouterStore['routes']): AppRouterStore => {
+export const removeBlockedRoute = (
+  store: AppNavigationStore,
+  routeKey: keyof AppNavigationStore['routes']
+): AppNavigationStore => {
   if (!(routeKey in store.blockedRoutes)) return store;
   delete store.blockedRoutes[routeKey];
   return store;
 };
 
-export const clearBlockedRoutes = (store: AppRouterStore): AppRouterStore => {
-  store.blockedRoutes = DEFAULT_APP_ROUTER_STORE.blockedRoutes;
+export const clearBlockedRoutes = (store: AppNavigationStore): AppNavigationStore => {
+  store.blockedRoutes = {};
   return store;
 };
 
@@ -1195,7 +1211,7 @@ export const clearBlockedRoutes = (store: AppRouterStore): AppRouterStore => {
  * @param store - Router store
  * @returns True when at least one blocker exists, otherwise false
  */
-export const hasBlockedRoutes = (store: AppRouterStore): boolean => {
+export const hasBlockedRoutes = (store: AppNavigationStore): boolean => {
   return Object.keys(store?.blockedRoutes || {}).length > 0;
 };
 
@@ -1214,12 +1230,19 @@ export const getNavigationMapFromInput = function <const Path extends AppRoute['
   } as InferNavigationMapFromPath<Path>;
 };
 
+export const applyNavigationDispatch = function <const Value>(
+  dispatch: SetStateAction<Value>,
+  prevValue: Value
+): Value {
+  return typeof dispatch === 'function' ? (dispatch as (prevState: Value) => Value)(prevValue) : dispatch;
+};
+
 //*****************************************************************************************
 // Router Store
 //*****************************************************************************************
 
 export const getHashFragmentsFromRouter = function <const Path extends AppRoute['path']>(
-  store: AppRouterStore
+  store: AppNavigationStore
 ): string[] {
   return store.panels
     .map(panel => {
@@ -1230,8 +1253,8 @@ export const getHashFragmentsFromRouter = function <const Path extends AppRoute[
       try {
         const url = new URL(route.href, 'http://localhost');
         const pathname = url.pathname;
-        const hash = url.hash ? url.hash.slice(1) : '';
         const search = url.search;
+        const hash = url.hash ? url.hash.slice(1) : '';
 
         return `${pathname}${search}${hash ? `#${encodeURIComponent(hash)}` : ''}`;
       } catch {
@@ -1242,7 +1265,7 @@ export const getHashFragmentsFromRouter = function <const Path extends AppRoute[
 };
 
 export const getLocationStateFromRouter = function <const Path extends AppRoute['path']>(
-  store: AppRouterStore
+  store: AppNavigationStore
 ): AppLocationState {
   return {
     id: store.id,
@@ -1280,13 +1303,13 @@ export const areRouterStoreEqual = (current: AppRouterStore, next: AppRouterStor
   return true;
 };
 
-export const cloneRouterStore = (store: AppRouterStore): AppRouterStore =>
-  ({
+export const cloneLocationStore = function <const Store extends AppLocationState>(store: Store): Store {
+  return {
     id: store.id,
-    blockedRoutes: structuredClone(store.blockedRoutes),
     panels: structuredClone(store.panels),
     routes: structuredClone(store.routes)
-  }) as AppRouterStore;
+  } as Store;
+};
 
 export const reconcileRouterFromNavigation = (
   router: AppRouterStore,
@@ -1322,36 +1345,6 @@ export const sanitizeRouterStore = (store: AppRouterStore, preferences: AppPrefe
   return store;
 };
 
-export const syncStoreToLocation = (
-  navigation: AppNavigationStore,
-  router: AppRouterStore,
-  preference: AppPreferenceStore,
-  navigate: NavigateFunction = () => null
-): AppRouterStore => {
-  let store = reconcileRouterFromNavigation(router, navigation, preference);
-
-  // Encode all panels into hash fragments
-  const hashFragments = store.panels
-    .map(panel => {
-      const route = store.routes[panel.routeKey];
-      return route?.href ? getHashFragmentFromLocation(route) : null;
-    })
-    .filter((f): f is string => f !== null);
-
-  const hashFragment = hashFragments.join('#');
-
-  store = sanitizeRouterStore(store, preference);
-
-  document.title = !hashFragments?.[0] ? 'Assemblyline 4' : `ALV4 | ${hashFragments?.[0]}`;
-
-  void navigate(hashFragment ? `/v1#${hashFragment}` : '/v1', {
-    state: getLocationStateFromStore(store),
-    replace: navigation?.replace || false
-  });
-
-  return store;
-};
-
 //*****************************************************************************************
 // Navigation Store
 //*****************************************************************************************
@@ -1360,7 +1353,19 @@ export const getDefaultNavigationStore = (): AppNavigationStore => {
   return DEFAULT_APP_NAVIGATION_STORE;
 };
 
-export const setNavigationStoreFromRouter = (store: AppNavigationStore, router: AppRouterStore): AppNavigationStore => {
+export const applyDefaultNavigationStore = (
+  store: AppNavigationStore,
+  preference: AppPreferenceStore
+): AppNavigationStore => {
+  if (store?.panels?.length > 0 && Object.entries(store?.routes || {}).length > 0) return store;
+
+  const [store1, nextRouteKey] = addRoute(store, { href: '/submit' });
+  [store] = upsertPanel(store1, 0, { routeKey: nextRouteKey }, preference);
+
+  return store;
+};
+
+export const getNavigationStoreFromRouter = (store: AppNavigationStore, router: AppRouterStore): AppNavigationStore => {
   store.id = router.id;
   store.panels = structuredClone(router.panels);
   store.routes = structuredClone(router.routes);
@@ -1386,532 +1391,4 @@ export const clearNavigationStore = (store: AppNavigationStore): AppNavigationSt
   store.routes = {};
   store.replace = false;
   return store;
-};
-
-export const setNavigationStoreFromLocations = (
-  store: AppNavigationStore,
-  locations: AppRouteLocation[]
-): AppNavigationStore => {
-  return store;
-};
-
-export const applyRouterToNavigation = (navigation: AppNavigationStore, router: AppRouterStore): AppNavigationStore => {
-  navigation.id = router.id;
-  navigation.panels = structuredClone(router.panels);
-  navigation.routes = structuredClone(router.routes);
-  return navigation;
-};
-
-export const getNavigationFromLocationState = (
-  navigation: AppNavigationStore,
-  router: AppRouterStore,
-  location: AppLocationStore,
-  url: Location<AppLocationState>
-): AppNavigationStore | null => {
-  const nextState = url.state;
-
-  navigation = applyRouterToNavigation(navigation, router);
-
-  for (const [routeKey, route] of Object.entries(nextState?.routes || {})) {
-    const nextRoute = sanitizeRouteLocation(location, route);
-    [navigation] = upsertRoute(navigation, routeKey, nextRoute);
-  }
-
-  for (const [nextPanelKey, nextPanel] of (nextState?.panels || []).entries()) {
-    [navigation] = upsertPanel(navigation, nextPanelKey, nextPanel, DEFAULT_APP_PREFERENCE_STORE);
-  }
-
-  for (let panelKey = (navigation?.panels?.length || 0) - 1; panelKey >= (nextState?.panels?.length || 0); panelKey--) {
-    navigation = removePanel(navigation, panelKey);
-  }
-
-  navigation.replace = true;
-  navigation.id = nextState.id || generateRandomUUID();
-
-  return navigation;
-};
-
-export const getNavigationFromLocationHash = (
-  navigation: AppNavigationStore,
-  router: AppRouterStore,
-  location: AppLocationStore,
-  url: Location<AppLocationState>
-): AppNavigationStore | null => {
-  const hashFragment = url.hash ? url.hash.slice(1) : '';
-  if (!hashFragment) return null;
-
-  navigation = applyRouterToNavigation(navigation, router);
-
-  let panelKey: number = -1;
-
-  for (const [i, fragment] of hashFragment.split('#/').entries()) {
-    let nextLocation = getLocationFromHashFragment(i === 0 ? fragment : `/${fragment}`);
-    nextLocation = sanitizeRouteLocation(location, nextLocation);
-    const nextAppRoute = findRouteDefinitionFromLocation(location, nextLocation);
-
-    if (!nextLocation?.href) continue;
-    panelKey++;
-
-    const currentRoute = getRouteFromPanelKey(navigation, panelKey);
-    const currentAppRoute = findRouteDefinitionFromLocation(location, currentRoute);
-
-    if (!!currentAppRoute?.path && currentAppRoute?.path === nextAppRoute?.path) {
-      navigation = updateRoute(navigation, navigation.panels[panelKey].routeKey, nextLocation);
-    } else {
-      const [nextStore, nextRouteKey] = addRoute(navigation, nextLocation);
-      navigation = updatePanel(nextStore, panelKey, { routeKey: nextRouteKey });
-    }
-  }
-
-  for (let i = navigation.panels.length - 1; i >= panelKey; i--) {
-    navigation = removePanel(navigation, i);
-  }
-
-  navigation.replace = false;
-  navigation.id = generateRandomUUID();
-
-  return navigation;
-};
-
-export const getNavigationFromLocationPath = (
-  navigation: AppNavigationStore,
-  router: AppRouterStore,
-  location: AppLocationStore,
-  url: Location<AppLocationState>
-): AppNavigationStore | null => {
-  // todo: implement legacy support here
-  return navigation;
-};
-
-export const getNavigationFromLocation = (
-  navigation: AppNavigationStore,
-  router: AppRouterStore,
-  location: AppLocationStore,
-  url: Location<AppLocationState>
-): AppNavigationStore | null => {
-  if (!url?.state && !url?.hash) return null;
-  if (url.state?.id && url.state.id === router.id) return null;
-
-  try {
-    if (!!url.state) {
-      return getNavigationFromLocationState(navigation, router, location, url);
-    } else if (url?.pathname === '/v1' && !!url?.hash) {
-      return getNavigationFromLocationHash(navigation, router, location, url);
-    } else {
-      return getNavigationFromLocationPath(navigation, router, location, url);
-    }
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.error('error parsing the location', e);
-  }
-
-  return null;
-};
-
-/**
- *
- * @param to
- *
- *
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- * @returns
- */
-
-//*****************************************************************************************
-// Location
-//*****************************************************************************************
-
-export const syncLocationToStore = (
-  navigation: AppNavigationStore,
-  router: AppRouterStore,
-  location: Location<AppLocationState>
-): Partial<AppNavigationStore> | null => {
-  if (!location?.state && !location?.hash) return null;
-  if (location.state?.id && location.state.id === router.id) return null;
-
-  try {
-    if (!!location.state) return parseLocationState(router, location);
-    if (!!location.hash) return parseLocationHash(navigation, router, location);
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.error('error parsing the location', e);
-  }
-
-  return null;
-};
-
-//*****************************************************************************************
-// Location Decoding
-//*****************************************************************************************
-
-/**
- * @name getLocationFromHashFragment
- * @description Decodes one panel fragment from the hash grammar back into an href.
- * Splits the fragment into pathname, optional encoded hash, and optional search string.
- * Returns a null href when encoded hash decoding throws.
- * @param fragment - Encoded panel fragment
- * @returns Reconstructed AppRouteLocation
- */
-export const getLocationFromHashFragment = (fragment: string): AppRouteLocation | null => {
-  if (!fragment) return { href: null, state: null };
-
-  const hashIndex = fragment.indexOf('#');
-  if (hashIndex === -1) return { href: fragment, state: null };
-
-  const pathname = fragment.slice(0, hashIndex);
-  const hashAndSearch = fragment.slice(hashIndex + 1);
-  const searchIndex = hashAndSearch.indexOf('?');
-
-  const hash = searchIndex === -1 ? hashAndSearch : hashAndSearch.slice(0, searchIndex);
-  const search = searchIndex === -1 ? '' : hashAndSearch.slice(searchIndex);
-
-  try {
-    return {
-      href: `${pathname}${search}${hash ? `#${decodeURIComponent(hash)}` : ''}`,
-      state: null
-    };
-  } catch {
-    return { href: null, state: null };
-  }
-};
-
-/**
- * @name parseLocationState
- * @description Reconciles `location.state` into store routes and panels directly.
- * @param store - Current router store
- * @param location - React Router location
- * @returns Updated router store
- */
-export const parseLocationState = (
-  router: AppRouterStore,
-  location: Location<AppLocationState>,
-  preference: AppPreferenceStore
-): Partial<AppNavigationStore> | null => {
-  const nextState = location.state;
-
-  let navigation = initializeNavigation();
-  navigation = setNavigationFromRouter(navigation, router);
-
-  for (const [nextRouteKey, nextRoute] of Object.entries(nextState?.routes || {})) {
-    [navigation] = upsertRoute(navigation, nextRouteKey, nextRoute);
-  }
-
-  for (const [nextPanelKey, nextPanel] of (nextState?.panels || []).entries()) {
-    [navigation] = upsertPanel(navigation, nextPanelKey, nextPanel, preference);
-  }
-
-  for (let panelKey = (navigation?.panels?.length || 0) - 1; panelKey >= (nextState?.panels?.length || 0); panelKey--) {
-    navigation = removePanel(navigation, panelKey);
-  }
-
-  navigation.replace = true;
-  navigation.id = nextState.id || generateRandomUUID();
-
-  return navigation;
-};
-
-/**
- * @name parseLocationHash
- * @description Reconciles the router store against the multi-panel hash grammar.
- * Decodes each fragment and reconstructs the panel layout.
- * @param store - Current router store
- * @param location - React Router location
- * @returns Updated router store
- */
-export const parseLocationHash = (
-  navigation: AppNavigationStore,
-  router: AppRouterStore,
-  location: Location<AppLocationState>
-): Partial<AppNavigationStore> | null => {
-  const hashFragment = location.hash ? location.hash.slice(1) : '';
-  if (!hashFragment) return null;
-
-  let store = setNavigationFromRouter(navigation, router);
-
-  let panelKey: number = -1;
-
-  for (const [i, fragment] of hashFragment.split('#/').entries()) {
-    const rawLocation = getLocationFromHashFragment(i === 0 ? fragment : `/${fragment}`);
-    const nextAppRoute = findAppRouteFromLocation(APP_ROUTES, rawLocation);
-    const nextAppRouteValues = getAppRouteValuesFromLocation(nextAppRoute, rawLocation);
-    const nextLocation = getLocationFromAppRouteValues(nextAppRoute, nextAppRouteValues);
-
-    if (!nextLocation?.href) continue;
-    panelKey++;
-
-    const currentRoute = getRouteFromPanelKey(navigation, panelKey);
-    const currentAppRoute = findAppRouteFromLocation(APP_ROUTES, currentRoute);
-
-    if (!!currentAppRoute?.path && currentAppRoute?.path === nextAppRoute?.path) {
-      store = updateRoute(store, navigation.panels[panelKey].routeKey, nextLocation);
-    } else {
-      const [nextStore, nextRouteKey] = addRoute(store, nextLocation);
-      store = updatePanel(nextStore, panelKey, { routeKey: nextRouteKey });
-    }
-  }
-
-  for (let i = navigation.panels.length - 1; i >= panelKey; i--) {
-    navigation = removePanel(navigation, i);
-  }
-
-  // const panelFragments = hashFragment
-  //   .split('#/')
-  //   .filter(Boolean)
-  //   .map((fragment, i) => (i === 0 ? fragment : `/${fragment}`));
-
-  // const normalizedLocations = panelFragments
-  //   .map(fragment => getLocationFromHashFragment(fragment))
-  //   .filter((routeLocation): routeLocation is AppRouteLocation => !!routeLocation?.href)
-  //   .map(routeLocation => {
-  //     const appRoute = findAppRouteFromLocation(APP_ROUTES, routeLocation);
-  //     if (!appRoute) return null;
-
-  //     const appRouteValues = getAppRouteValuesFromLocation(appRoute, routeLocation);
-  //     if (!appRouteValues) return null;
-
-  //     const normalized = getLocationFromAppRouteValues(appRoute, appRouteValues);
-  //     if (!normalized?.href) return null;
-
-  //     return {
-  //       appRoute,
-  //       location: normalized
-  //     };
-  //   })
-  //   .filter((entry): entry is { appRoute: AppRoute; location: AppRouteLocation } => !!entry?.location?.href);
-
-  // if (!normalizedLocations.length) return null;
-
-  // let navigation = initializeNavigation();
-  // navigation = setNavigationFromRouter(navigation, router);
-
-  // for (const [i, { appRoute: nextAppRoute, location: nextLocation }] of normalizedLocations.entries()) {
-  //   if (i < navigation?.panels?.length || 0) {
-  //     const currentRoute = getRouteFromPanelKey(navigation, i);
-  //     const currentAppRoute = findAppRouteFromLocation(APP_ROUTES, currentRoute);
-
-  //     if (nextAppRoute.path === currentAppRoute.path) {
-  //       navigation = updateRoute(navigation, navigation.panels[i].routeKey, nextLocation);
-  //     } else {
-  //       let [s, routeKey] = addRoute(navigation, nextLocation);
-  //       navigation = updatePanel(s, i, { routeKey });
-  //     }
-  //   } else {
-  //     let [s, routeKey] = addRoute(navigation, nextLocation);
-  //     [navigation] = insertRightPanel(s, i, { routeKey });
-  //   }
-  // }
-
-  // for (let panelKey = navigation.panels.length - 1; panelKey >= normalizedLocations.length; panelKey--) {
-  //   navigation = removePanel(navigation, panelKey);
-  // }
-
-  delete navigation.blockedRoutes;
-  navigation.replace = true;
-  navigation.id = generateRandomUUID();
-
-  return navigation;
-};
-
-/**
- * @name syncLocationToNavigationStore
- * @description Translates a React Router location into AppNavigationStore by applying state or hash parsing.
- * Acts as the navigation-specific counterpart to syncLocationToStore — operates on AppNavigationStore
- * instead of AppRouterStore so staged navigation state stays separate from the router graph.
- * @param store - Current navigation store state
- * @param location - Current React Router location
- * @returns The next navigation store state
- */
-const getLocationNavigationId = (location: Location<AppLocationState>): string =>
-  location.state?.id ?? location.key ?? `${location.pathname}${location.search}${location.hash}`;
-
-export const syncLocationToNavigationStore = (
-  store: AppNavigationStore,
-  location: Location<AppLocationState>
-): Partial<AppNavigationStore> | null => {
-  if (!location.state && !location.hash) return null;
-
-  try {
-    if (location.state) {
-      const nextState = location.state;
-      if (!nextState?.routes || !nextState?.panels) return null;
-      const nextId = nextState.id ?? getLocationNavigationId(location);
-      if (
-        store.id === nextId &&
-        deepCompare(store.routes, nextState.routes) &&
-        deepCompare(store.panels, nextState.panels)
-      )
-        return null;
-
-      return {
-        id: nextId,
-        panels: nextState.panels,
-        replace: false,
-        routes: nextState.routes
-      };
-    }
-
-    if (location.hash) {
-      const hashFragment = location.hash.slice(1);
-      if (!hashFragment) return null;
-
-      const panelFragments = hashFragment
-        .split('#/')
-        .filter(Boolean)
-        .map((fragment, i) => (i === 0 ? fragment : `/${fragment}`));
-
-      const locations = panelFragments
-        .map(fragment => getLocationFromHashFragment(fragment))
-        .filter((l): l is AppRouteLocation => !!l?.href);
-
-      if (!locations.length) return null;
-
-      const nextPanels = locations.map(loc => {
-        const currentPanel = store.panels.find(p => store.routes[p.routeKey]?.href === loc.href);
-        return currentPanel || { ...DEFAULT_APP_ROUTER_PANEL, routeKey: null };
-      });
-
-      const nextId = getLocationNavigationId(location);
-      if (store.id === nextId && deepCompare(store.panels, nextPanels)) return null;
-
-      return {
-        id: nextId,
-        panels: nextPanels
-      };
-    }
-  } catch (e) {
-    // eslint-disable-next-line no-console
-    console.error('error parsing the location into navigation store', e);
-  }
-
-  return null;
-};
-
-//*****************************************************************************************
-// Navigation
-//*****************************************************************************************
-
-const getNavigationAffectedRouteKeys = (navigationStore: AppNavigationStore, routerStore: AppRouterStore): string[] => {
-  const affectedRouteKeys = new Set<string>();
-  // Only check routes present in the navigation store — the apply is additive
-  // and does not remove existing router routes absent from navigation.
-  for (const routeKey of Object.keys(navigationStore.routes)) {
-    const previousRoute = routerStore.routes[routeKey] ?? null;
-    const nextRoute = navigationStore.routes[routeKey] ?? null;
-
-    if (!deepCompare(previousRoute, nextRoute)) affectedRouteKeys.add(routeKey);
-  }
-
-  const panelCount = Math.max(routerStore.panels.length, navigationStore.panels.length);
-  for (let panelIndex = 0; panelIndex < panelCount; panelIndex++) {
-    const previousRouteKey = routerStore.panels[panelIndex]?.routeKey ?? null;
-    const nextRouteKey = navigationStore.panels[panelIndex]?.routeKey ?? null;
-
-    if (previousRouteKey === nextRouteKey) continue;
-    if (previousRouteKey) affectedRouteKeys.add(previousRouteKey);
-    if (nextRouteKey) affectedRouteKeys.add(nextRouteKey);
-  }
-
-  return Array.from(affectedRouteKeys);
-};
-
-const getBlockedRouteKeysForNavigation = (
-  navigationStore: AppNavigationStore,
-  affectedRouteKeys: string[]
-): string[] => {
-  return affectedRouteKeys.filter(routeKey => !!navigationStore.blockedRoutes?.[routeKey]);
-};
-
-export type NavigationToRouterSyncResult = {
-  /** Whether any affected route is currently blocked. */
-  blocked: boolean;
-  /** Route keys that are blocking this commit. */
-  blockedRouteKeys: string[];
-};
-
-/**
- * @name syncNavigationStoreToRouterStore
- * @description Checks whether a staged navigation can be committed to the router store.
- * Returns a blocker assessment so the caller can decide to apply or defer the navigation.
- * Does not apply any changes itself — use applyNavigationToRouterStore for the actual merge.
- * @param navigationStore - Staged navigation store state
- * @param routerStore - Current router store state
- * @returns Blocker assessment result
- */
-export const syncNavigationStoreToRouterStore = (
-  navigationStore: AppNavigationStore,
-  routerStore: AppRouterStore
-): NavigationToRouterSyncResult => {
-  if (!navigationStore.routes || Object.keys(navigationStore.routes).length === 0) {
-    return { blocked: false, blockedRouteKeys: [] };
-  }
-
-  const affectedRouteKeys = getNavigationAffectedRouteKeys(navigationStore, routerStore);
-  const blockedRouteKeys = getBlockedRouteKeysForNavigation(navigationStore, affectedRouteKeys);
-
-  return {
-    blocked: blockedRouteKeys.length > 0,
-    blockedRouteKeys
-  };
-};
-
-/**
- * @name applyNavigationToRouterStore
- * @description Merges staged navigation state into the router store using field-level diffing.
- * Only creates new object references for routes or panels that actually changed,
- * preserving stable references for unchanged entries to minimize subscriber re-renders.
- * @param navStore - Staged navigation store state to merge from
- * @param routerStore - Current router store state to merge into
- * @returns Updated router store, or the same reference when nothing changed
- */
-export const applyNavigationToRouterStore = (
-  navStore: AppNavigationStore,
-  routerStore: AppRouterStore
-): AppRouterStore => {
-  let routesChanged = false;
-  const nextRoutes: Record<string, AppRouterRoute> = { ...routerStore.routes };
-
-  for (const [routeKey, navRoute] of Object.entries(navStore.routes)) {
-    if (!deepCompare(routerStore.routes[routeKey], navRoute)) {
-      nextRoutes[routeKey] = navRoute;
-      routesChanged = true;
-    }
-  }
-
-  const panelsChanged = !deepCompare(routerStore.panels, navStore.panels);
-  const idChanged = routerStore.id !== navStore.id;
-
-  if (!routesChanged && !panelsChanged && !idChanged) return routerStore;
-
-  return {
-    ...routerStore,
-    id: idChanged ? navStore.id : routerStore.id,
-    routes: routesChanged ? nextRoutes : routerStore.routes,
-    panels: panelsChanged ? navStore.panels : routerStore.panels
-  };
 };

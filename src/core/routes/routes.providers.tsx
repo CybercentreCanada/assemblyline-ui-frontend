@@ -1,53 +1,53 @@
 import type { AppRouterStore } from 'core/router';
 import { useAppRouterStoreApi } from 'core/router';
-import type { AppLocationStore } from 'core/routes';
-import { setRouteDefinitionsFromAppRoutes, syncRouteSnapshotsFromRouter } from 'core/routes';
+import type { AppRoutesRuntimeStore } from 'core/routes';
+import { setRouteSpecsFromAppRoutes, syncRouteSnapshotsFromRouter } from 'core/routes';
 import { createAppStore } from 'features/store/createAppStore';
 import type { ReactNode } from 'react';
 import { memo, useCallback, useEffect } from 'react';
 import type { StoreApi } from 'zustand';
 
 //*****************************************************************************************
-// App Location Provider
+// App Routes Runtime Provider
 //*****************************************************************************************
 
-export const DEFAULT_APP_LOCATION_STORE: AppLocationStore = {
-  definitions: null,
+export const DEFAULT_APP_ROUTES_RUNTIME_STORE: AppRoutesRuntimeStore = {
+  specs: null,
   snapshots: {}
 };
 
 export const {
-  StoreProvider: AppLocationStoreProvider,
-  useStore: useAppLocationStore,
-  useSetStore: useAppSetLocationStore,
-  useStoreApi: useAppLocationStoreApi
-} = createAppStore<AppLocationStore>(DEFAULT_APP_LOCATION_STORE);
+  StoreProvider: AppRoutesRuntimeStoreProvider,
+  useStore: useAppRoutesRuntimeStore,
+  useSetStore: useAppSetRoutesRuntimeStore,
+  useStoreApi: useAppRoutesRuntimeStoreApi
+} = createAppStore<AppRoutesRuntimeStore>(DEFAULT_APP_ROUTES_RUNTIME_STORE);
 
-AppLocationStoreProvider.displayName = 'AppLocationStoreProvider';
+AppRoutesRuntimeStoreProvider.displayName = 'AppRoutesRuntimeStoreProvider';
 
-export const getAppLocationStateFromApi = (api: StoreApi<AppLocationStore>): AppLocationStore => {
-  return api?.getState() || DEFAULT_APP_LOCATION_STORE;
+export const getAppRoutesRuntimeStateFromApi = (api: StoreApi<AppRoutesRuntimeStore>): AppRoutesRuntimeStore => {
+  return api?.getState() || DEFAULT_APP_ROUTES_RUNTIME_STORE;
 };
 
-export type AppLocationProviderProps = {
+export type AppRoutesRuntimeProviderProps = {
   /** All of the app's created routes */
   appRoutes: AppRoutes;
   /** Provider children. */
   children: ReactNode;
 };
 
-const AppLocationSync = memo(({ appRoutes }: Omit<AppLocationProviderProps, 'children'>) => {
-  const setLocationStore = useAppSetLocationStore();
+const AppRoutesRuntimeSync = memo(({ appRoutes }: Omit<AppRoutesRuntimeProviderProps, 'children'>) => {
+  const setRouteRuntimeStore = useAppSetRoutesRuntimeStore();
   const routerStoreApi = useAppRouterStoreApi();
 
   const commitRouterToLocation = useCallback(
-    (router: AppRouterStore) => setLocationStore(s => syncRouteSnapshotsFromRouter(s, router)),
-    [setLocationStore]
+    (router: AppRouterStore) => setRouteRuntimeStore(s => syncRouteSnapshotsFromRouter(s, router)),
+    [setRouteRuntimeStore]
   );
 
   useEffect(() => {
-    setLocationStore(s => setRouteDefinitionsFromAppRoutes(s, appRoutes));
-  }, [appRoutes, setLocationStore]);
+    setRouteRuntimeStore(s => setRouteSpecsFromAppRoutes(s, appRoutes));
+  }, [appRoutes, setRouteRuntimeStore]);
 
   useEffect(() => {
     if (!routerStoreApi) return;
@@ -58,16 +58,16 @@ const AppLocationSync = memo(({ appRoutes }: Omit<AppLocationProviderProps, 'chi
   return null;
 });
 
-AppLocationSync.displayName = 'AppLocationSync';
+AppRoutesRuntimeSync.displayName = 'AppRoutesRuntimeSync';
 
-export const AppLocationProvider = memo(({ children, appRoutes }: AppLocationProviderProps) => (
+export const AppRoutesRuntimeProvider = memo(({ children, appRoutes }: AppRoutesRuntimeProviderProps) => (
   <>
-    <AppLocationSync appRoutes={appRoutes} />
+    <AppRoutesRuntimeSync appRoutes={appRoutes} />
     {children}
   </>
 ));
 
-AppLocationProvider.displayName = 'AppLocationProvider';
+AppRoutesRuntimeProvider.displayName = 'AppRoutesRuntimeProvider';
 
 //*****************************************************************************************
 // App Route Key Provider

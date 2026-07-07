@@ -2,69 +2,80 @@ export { DisabledBoundary, ForbiddenBoundary } from './routes.components';
 export type { DisabledBoundaryProps, ForbiddenBoundaryProps } from './routes.components';
 export { createAppRoute } from './routes.factories';
 export type { CreateAppRouteProps } from './routes.factories';
-export { useAppHashParams, useAppPathParams, useAppRouteKey, useAppSearchParams } from './routes.hooks';
-export {
-  DEFAULT_APP_ROUTE_DEFINITION,
-  DEFAULT_APP_ROUTE_LOCATION,
-  DEFAULT_APP_ROUTE_SNAPSHOT,
-  DEFAULT_APP_ROUTE_VALUES
-} from './routes.models';
+export { useAppHashParams, useAppLocation, useAppPathParams, useAppRouteKey, useAppSearchParams } from './routes.hooks';
+export { DEFAULT_APP_ROUTE_LOCATION, DEFAULT_APP_ROUTE_SNAPSHOT, DEFAULT_APP_ROUTE_SPEC } from './routes.models';
 export type {
-  AppLocationStore,
-  AppRouteDefinition,
   AppRouteLocation,
+  AppRouteSpec,
+  AppRoutesRuntimeStore,
   GuardResult,
-  InferAppRouteDefinitionFromPath,
   InferAppRouteSearchValuesFromPath,
   InferAppRouteSnapshotFromPath,
+  InferAppRouteSpecFromPath,
   InferAppRouteValuesFromPath,
   RouteHash,
   RouteMeta
 } from './routes.models';
 export {
-  AppLocationProvider,
-  AppLocationStoreProvider,
   AppRouteKeyProvider,
   AppRouteKeyStoreProvider,
-  DEFAULT_APP_LOCATION_STORE,
-  getAppLocationStateFromApi,
-  useAppLocationStore,
-  useAppLocationStoreApi,
+  AppRoutesRuntimeProvider,
+  AppRoutesRuntimeStoreProvider,
+  DEFAULT_APP_ROUTES_RUNTIME_STORE,
+  getAppRoutesRuntimeStateFromApi,
   useAppRouteKeyStore,
-  useAppSetLocationStore
+  useAppRoutesRuntimeStore,
+  useAppRoutesRuntimeStoreApi,
+  useAppSetRoutesRuntimeStore
 } from './routes.providers';
-export type { AppLocationProviderProps, AppRouteKeyStore, AppRouteKeyStoreProviderProps } from './routes.providers';
+export type {
+  AppRouteKeyStore,
+  AppRouteKeyStoreProviderProps,
+  AppRoutesRuntimeProviderProps
+} from './routes.providers';
 export {
   addRouteSnapshot,
-  findRouteDefinitionFromKey,
-  findRouteDefinitionFromLocation,
-  findRouteDefinitionFromPath,
-  findRouteDefinitionFromSnapshot,
-  findRouteDefinitionFromValues,
+  applyRouteLocationSearchToSnapshot,
+  findAppRouteValuesFromKey,
   findRouteSnapshotFromKey,
-  getAppRouteValuesFromKey,
+  findRouteSpecFromKey,
+  findRouteSpecFromLocation,
+  findRouteSpecFromPath,
+  findRouteSpecFromSnapshot,
+  findRouteSpecFromValues,
   getAppRouteValuesFromLocation,
   getAppRouteValuesFromSnapshot,
   getDefaultAppRouteValues,
-  getDefaultRouteDefinition,
+  getDefaultLocation,
   getDefaultRouteLocation,
   getDefaultRouteSnapshot,
+  getDefaultRouteSpec,
   getExternalHrefFromLocation,
   getExternalHrefFromSnapshot,
+  getLocationFromRouteLocation,
+  getLocationFromSnapshot,
+  getLocationHashFromSnapshot,
+  getLocationPathnameFromSnapshot,
+  getLocationSearchFromSnapshot,
   getLocationsFromLegacyURL,
   getLocationsFromURLHash,
+  getLocationStateFromSnapshot,
+  getRouteIdFromLocation,
   getRouteLocationFromSnapshot,
   getRouteLocationFromValues,
   getRouteSnapshotFromLocation,
   getRouteSnapshotFromValues,
-  hashRouteLocation,
+  getSnapshotHashFromLocation,
+  getSnapshotParamsFromLocation,
+  getSnapshotSearchFromLocation,
+  hasDifferentSnapshot,
   parseLocationFromHashFragment,
   removeRouteSnapshot,
   removeRouteSnapshotFromKey,
   sanitizeAppRouteValues,
   sanitizeRouteLocation,
   sanitizeRouteSnapshot,
-  setRouteDefinitionsFromAppRoutes,
+  setRouteSpecsFromAppRoutes,
   syncRouteSnapshotsFromRouter,
   updateRouteSnapshot,
   upsertRouteSnapshot
