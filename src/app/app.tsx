@@ -17,6 +17,7 @@ import { AppLocationProvider, AppLocationStoreProvider } from 'core/routes';
 import { AppSnackbarProvider } from 'core/snackbar';
 import { AppTemplateLayout, AppTemplateProvider } from 'core/template';
 import { AppThemeProvider } from 'core/theme';
+import { AssistantProvider } from 'layout/assistant';
 import { AppAuthLayout } from 'layout/auth';
 import { AppCarouselProvider } from 'layout/carousel';
 import { AppDrawerLayout } from 'layout/drawer';
@@ -141,15 +142,17 @@ const AppProviders = memo(({ children }: PropsWithChildren) => (
       <AppErrorProvider>
         <AppSnackbarProvider>
           <AppApiProvider>
-            <AppRouterProvider>
-              <AppNavigationProvider>
-                <AppLocationProvider appRoutes={APP_ROUTES}>
-                  <AppCarouselProvider>
-                    <>{children}</>
-                  </AppCarouselProvider>
-                </AppLocationProvider>
-              </AppNavigationProvider>
-            </AppRouterProvider>
+            <AssistantProvider>
+              <AppRouterProvider>
+                <AppNavigationProvider>
+                  <AppLocationProvider appRoutes={APP_ROUTES}>
+                    <AppCarouselProvider>
+                      <>{children}</>
+                    </AppCarouselProvider>
+                  </AppLocationProvider>
+                </AppNavigationProvider>
+              </AppRouterProvider>
+            </AssistantProvider>
           </AppApiProvider>
         </AppSnackbarProvider>
       </AppErrorProvider>

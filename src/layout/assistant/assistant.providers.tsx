@@ -13,7 +13,6 @@ import {
   Fade,
   IconButton,
   Paper,
-  Popper,
   Stack,
   TextField,
   Tooltip,
@@ -21,35 +20,295 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import { AppAvatar } from '@tui/core';
-import { useAppInterfaceStore } from 'core/interface';
-import { t } from 'i18next';
-import { useAppAssistant } from 'layout/assistant/assistant.hooks';
-import { memo } from 'react';
+import MuiPopper from '@mui/material/Popper';
+import { styled } from '@mui/material/styles';
+import type { AppUser } from '@tui/core';
+import { AppAvatar, isEnter, useAppUser } from '@tui/core';
+import useALContext from 'deprecated/hooks/useALContext';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
+import React, { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import AIMarkdown from 'ui/AiMarkdown';
 import CustomChip from 'ui/CustomChip';
 import { ThinkingBadge } from 'ui/ThinkingBadge';
 
-export const AppAssistantLayout = memo(() => {
-  const theme = useTheme();
+const Popper = styled(MuiPopper)(() => ({
+  zIndex: 1,
+  '& > div': {
+    position: 'relative'
+  },
+  '&[data-popper-placement*="top"]': {
+    '& > div': {
+      marginBottom: 12
+    }
+  }
+}));
 
+const Arrow = styled('div')(({ theme }) => ({
+  position: 'absolute',
+  right: 18,
+  '&::before': {
+    content: '""',
+    margin: 'auto',
+    display: 'block',
+    width: 12,
+    height: 12,
+    backgroundColor: theme.palette.background.paper,
+    transform: 'translateY(-50%) rotate(45deg)',
+    boxShadow: '2px 2px 2px 0px rgb(0 0 0 / 25%)',
+    borderRadius: '3px 0px'
+  }
+}));
+
+export type AssistantContextProps = {
+  assistantAllowed: boolean;
+  hasInsights: boolean;
+  addInsight: (insigh: AssistantInsightProps) => void;
+  removeInsight: (insigh: AssistantInsightProps) => void;
+  toggleAssistant: (event: any) => void;
+};
+
+export interface AssistantProviderProps {
+  children: React.ReactNode;
+}
+
+export interface AssistantInsightProps {
+  type: 'file' | 'submission' | 'code' | 'report';
+  value: string;
+}
+
+interface ContextMessageProps {
+  role: 'system' | 'user' | 'assistant';
+  content: string;
+  isError?: boolean;
+  isInsight?: boolean;
+}
+
+export const AssistantContext = React.createContext<AssistantContextProps>(null);
+
+function AssistantProvider({ children }: AssistantProviderProps) {
+  const { t, i18n } = useTranslation(['assistant']);
+  const theme = useTheme();
+  const appUser = useAppUser<AppUser>();
+  const { user: currentUser, configuration } = useALContext();
+  const { apiCall } = useMyAPI();
+
+  const [open, setOpen] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [currentInsights, setCurrentInsights] = useState<AssistantInsightProps[]>([]);
+  const [thinking, setThinking] = useState(false);
+  const [currentContext, setCurrentContext] = useState<ContextMessageProps[]>([]);
+  const [currentHistory, setCurrentHistory] = useState<ContextMessageProps[]>([]);
+  const [currentInput, setCurrentInput] = useState<string>('');
+  const [hasInsights, setHasInsights] = useState<boolean>(false);
   const upSM = useMediaQuery(theme.breakpoints.up('md'));
   const isXS = useMediaQuery(theme.breakpoints.only('xs'));
+  const inputRef = useRef(null);
+  const chatRef = useRef(null);
 
-  const open = useAppInterfaceStore(s => s.assistant.open);
-  const currentInsights = useAppInterfaceStore(s => s.assistant.currentInsights);
-  const thinking = useAppInterfaceStore(s => s.assistant.thinking);
-  const currentContext = useAppInterfaceStore(s => s.assistant.currentContext);
-  const currentHistory = useAppInterfaceStore(s => s.assistant.currentHistory);
-  const currentInput = useAppInterfaceStore(s => s.assistant.currentInput);
-  const hasInsights = useAppInterfaceStore(s => s.assistant.hasInsights);
+  const assistantAllowed =
+    currentUser && currentUser.roles.includes('assistant_use') && configuration && configuration.ui.ai.enabled;
 
-  const { assistantAllowed, addInsight, removeInsight, toggleAssistant } = useAppAssistant();
+  const toggleAssistant = target => {
+    setAnchorEl(target);
+    setOpen(!open);
+  };
 
-  return null;
+  const addInsight = (insight: AssistantInsightProps) => {
+    setCurrentInsights(current =>
+      !current.some(i => i.type === insight.type && i.value === insight.value) ? [...current, insight] : current
+    );
+  };
+
+  const removeInsight = (insight: AssistantInsightProps) => {
+    setCurrentInsights(current => [...current.filter(i => !(i.type === insight.type && i.value === insight.value))]);
+  };
+
+  const askAssistant = () => {
+    const data = [...currentContext];
+    const history = [...currentHistory];
+    const newUserQuestion = { role: 'user' as const, content: currentInput };
+    data.push(newUserQuestion);
+    history.push(newUserQuestion);
+    setCurrentContext(data);
+    setCurrentHistory(history);
+    setCurrentInput('');
+    apiCall({
+      method: 'POST',
+      body: data,
+      url: `/api/v4/assistant/?lang=${i18n.language === 'en' ? 'english' : 'french'}`,
+      onSuccess: api_data => {
+        setCurrentContext(api_data.api_response.trace);
+        setCurrentHistory([...history, ...api_data.api_response.trace.slice(-1)]);
+      },
+      onFailure: api_data =>
+        setCurrentHistory([...history, { role: 'assistant', content: api_data.api_error_message, isError: true }]),
+      onEnter: () => setThinking(true),
+      onFinalize: () => {
+        setThinking(false);
+
+        setTimeout(() => {
+          inputRef.current.focus();
+        }, 250);
+      }
+    });
+  };
+
+  const askAssistantWithInsight = (insight: AssistantInsightProps) => {
+    setCurrentHistory(history => [
+      ...history,
+      { role: 'system', content: `"Default system prompt for insight: ${insight.type}`, isInsight: true },
+      { role: 'user', content: `${t(`insight.${insight.type}`)}: ${insight.value}`, isInsight: true }
+    ]);
+    if (insight.type === 'submission' || insight.type === 'report') {
+      apiCall({
+        method: 'GET',
+        url: `/api/v4/submission/ai/${insight.value}/?lang=${i18n.language === 'en' ? 'english' : 'french'}&${
+          insight.type === 'report' ? 'detailed&' : ''
+        }with_trace`,
+        onSuccess: api_data => {
+          setCurrentContext(api_data.api_response.trace);
+          setCurrentHistory(history => [...history, ...api_data.api_response.trace.splice(-1)]);
+        },
+        onFailure: api_data =>
+          setCurrentHistory(history => [
+            ...history,
+            { role: 'assistant', content: api_data.api_error_message, isError: true }
+          ]),
+        onEnter: () => setThinking(true),
+        onFinalize: () => {
+          setThinking(false);
+
+          setTimeout(() => {
+            inputRef.current.focus();
+          }, 250);
+        }
+      });
+    } else if (insight.type === 'file') {
+      apiCall({
+        method: 'GET',
+        url: `/api/v4/file/ai/${insight.value}/?lang=${i18n.language === 'en' ? 'english' : 'french'}&with_trace`,
+        onSuccess: api_data => {
+          setCurrentContext(api_data.api_response.trace);
+          setCurrentHistory(history => [...history, ...api_data.api_response.trace.splice(-1)]);
+        },
+        onFailure: api_data =>
+          setCurrentHistory(history => [
+            ...history,
+            { role: 'assistant', content: api_data.api_error_message, isError: true }
+          ]),
+        onEnter: () => setThinking(true),
+        onFinalize: () => {
+          setThinking(false);
+
+          setTimeout(() => {
+            inputRef.current.focus();
+          }, 250);
+        }
+      });
+    } else if (insight.type === 'code') {
+      apiCall({
+        method: 'GET',
+        url: `/api/v4/file/code_summary/${insight.value}/?lang=${
+          i18n.language === 'en' ? 'english' : 'french'
+        }&with_trace`,
+        onSuccess: api_data => {
+          setCurrentContext(api_data.api_response.trace);
+          setCurrentHistory(history => [...history, ...api_data.api_response.trace.splice(-1)]);
+        },
+        onFailure: api_data =>
+          setCurrentHistory(history => [
+            ...history,
+            { role: 'assistant', content: api_data.api_error_message, isError: true }
+          ]),
+        onEnter: () => setThinking(true),
+        onFinalize: () => {
+          setThinking(false);
+
+          setTimeout(() => {
+            inputRef.current.focus();
+          }, 250);
+        }
+      });
+    }
+  };
+
+  const buildDefaultSystemMessage = (): ContextMessageProps => {
+    return {
+      role: 'system' as const,
+      content: null
+    };
+  };
+
+  const clearAssistant = () => {
+    const defaultSystemPrompt = buildDefaultSystemMessage();
+    setCurrentContext([defaultSystemPrompt]);
+    setCurrentHistory([defaultSystemPrompt]);
+  };
+
+  const resetAssistant = () => {
+    const defaultSystemPrompt = buildDefaultSystemMessage();
+    const lastPrompt = currentHistory[currentHistory.length - 1];
+    setCurrentContext([defaultSystemPrompt]);
+    if (lastPrompt?.content !== defaultSystemPrompt.content) {
+      setCurrentHistory([...currentHistory, defaultSystemPrompt]);
+    }
+  };
+
+  const onKeyDown = (event: React.KeyboardEvent) => {
+    if (isEnter(event.key)) {
+      askAssistant();
+    }
+  };
+
+  const handleInputChange = event => {
+    setCurrentInput(event.target.value);
+  };
+
+  useEffect(() => {
+    if (open && currentContext.length === 1) {
+      askAssistant();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
+
+  useEffect(() => {
+    if (configuration) {
+      clearAssistant();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [configuration, i18n.language]);
+
+  useEffect(() => {
+    if (chatRef && chatRef.current)
+      chatRef.current.scrollTo({ top: chatRef.current.scrollHeight, left: 0, behavior: 'smooth' });
+  }, [currentHistory, thinking]);
+
+  useEffect(() => setHasInsights(currentInsights.length !== 0), [currentInsights]);
+
+  useEffect(() => {
+    if (open) {
+      setTimeout(() => {
+        if (chatRef && chatRef.current) chatRef.current.scrollTo(0, chatRef.current.scrollHeight);
+      }, 50);
+
+      setTimeout(() => {
+        inputRef.current.focus();
+      }, 250);
+    }
+  }, [open]);
 
   return (
-    <>
+    <AssistantContext.Provider
+      value={{
+        assistantAllowed,
+        addInsight,
+        hasInsights,
+        removeInsight,
+        toggleAssistant
+      }}
+    >
+      {children}
       {assistantAllowed && (
         <div
           className="no-print"
@@ -281,6 +540,8 @@ export const AppAssistantLayout = memo(() => {
           </Tooltip>
         </div>
       )}
-    </>
+    </AssistantContext.Provider>
   );
-});
+}
+
+export default AssistantProvider;
