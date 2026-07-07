@@ -1,20 +1,20 @@
 import type { ListItemIconProps, ListItemTextProps } from '@mui/material';
 import { ListItem, ListItemButton, ListItemIcon, ListItemText, useTheme } from '@mui/material';
 import type { LeftNavChildRenderProps } from '@tui/core';
+import type { InferNavigationInputFromPath } from 'core/router';
 import { AppLink } from 'core/router';
-import type { AppLinkTo } from 'core/routes';
 import type { JSX } from 'react';
 import { memo, useMemo } from 'react';
 
-export type LeftNavLinkProps<Path extends AppRoute['path'] = AppRoute['path']> = {
+export type LeftNavLinkProps<Path extends AppRoute['path']> = {
   icon?: ListItemIconProps['children'];
   navOpen: boolean;
   navProps?: LeftNavChildRenderProps;
   primary?: ListItemTextProps['primary'];
-  to?: AppLinkTo<Path>;
+  to?: InferNavigationInputFromPath<Path>;
 };
 
-function WrappedLeftNavRoute<const Path extends AppRoute['path'] = AppRoute['path']>({
+function WrappedLeftNavRoute<const Path extends AppRoute['path']>({
   icon,
   navOpen,
   navProps,
@@ -39,7 +39,7 @@ function WrappedLeftNavRoute<const Path extends AppRoute['path'] = AppRoute['pat
   );
 }
 
-export const LeftNavRoute = memo(WrappedLeftNavRoute) as <const Path extends AppRoute['path'] = AppRoute['path']>(
+export const LeftNavRoute = memo(WrappedLeftNavRoute) as <const Path extends AppRoute['path']>(
   props: LeftNavLinkProps<Path>
 ) => JSX.Element | null;
 

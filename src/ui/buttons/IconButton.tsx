@@ -1,7 +1,7 @@
 import type { IconButtonProps as MuiIconButtonProps, TooltipProps } from '@mui/material';
 import { IconButton as MuiIconButton, Skeleton, useTheme } from '@mui/material';
+import type { InferNavigationInputFromPath } from 'core/router';
 import { AppLink } from 'core/router';
-import type { AppLinkTo } from 'core/routes';
 import type { CSSProperties } from 'react';
 import { memo, useMemo } from 'react';
 import { getTextContent } from 'shared/utils/utils';
@@ -13,7 +13,7 @@ export type IconButtonProps<Path extends AppRoute['path']> = MuiIconButtonProps 
   loading?: boolean;
   preventRender?: boolean | (() => boolean);
   progress?: CircularProgressProps['progress'];
-  to?: AppLinkTo<Path>;
+  to?: InferNavigationInputFromPath<Path>;
   tooltip?: TooltipProps['title'];
   tooltipProps?: Omit<TooltipProps, 'children' | 'title'>;
 };

@@ -141,8 +141,8 @@ export const UserQuota = memo(() => {
   const { t } = useTranslation();
 
   const enforceQuota = useAppConfig(s => s.configuration.ui.enforce_quota);
-  const apiDailyQuota = useAppConfig(s => s.user.apiDailyQuota);
-  const submissionDailyQuota = useAppConfig(s => s.user.submissionDailyQuota);
+  const apiDailyQuota = useAppConfig(s => s.user.api_daily_quota);
+  const submissionDailyQuota = useAppConfig(s => s.user.submission_daily_quota);
   const apiQuotaRemaining = useAppInterfaceStore(s => s.quota.api);
   const submissionQuotaRemaining = useAppInterfaceStore(s => s.quota.submission);
 
@@ -439,7 +439,7 @@ const UserMenuHeader = memo(() => {
             </Typography>
             <div style={{ display: 'flex', justifyContent: 'end' }}>
               <IconButton
-                to={{ openRoute: { path: '/account' } }}
+                to={['openRoute', { path: '/account' }]}
                 size="large"
                 tooltip={t('usermenu.account')}
                 sx={{ color: theme.palette.text.primary }}
@@ -453,7 +453,7 @@ const UserMenuHeader = memo(() => {
                 <AccountCircleOutlinedIcon />
               </IconButton>
               <IconButton
-                to={{ openRoute: { path: '/settings/:tab', params: { tab: 'interface' } } }}
+                to={['openRoute', { path: '/settings/:tab', params: { tab: 'interface' } }]}
                 size="large"
                 tooltip={t('usermenu.settings')}
                 sx={{ color: theme.palette.text.primary }}

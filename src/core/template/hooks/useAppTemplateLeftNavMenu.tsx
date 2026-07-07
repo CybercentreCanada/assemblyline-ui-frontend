@@ -1,28 +1,27 @@
 import { Divider } from '@mui/material';
 import type { LeftNavMenuProps } from '@tui/core';
 import { useAppLeftNavMenu } from 'app/layout.left-nav';
-import type { AppLinkTo, createAppRoute } from 'core/routes';
+import type { InferNavigationInputFromPath } from 'core/router';
 import { LeftNavRoute } from 'layout/top-nav/LeftNavRoute';
 import { useCallback, useMemo } from 'react';
 
 type AppTemplateLeftNavMenuItem = LeftNavMenuProps['items'][number];
 
-export type AppLeftNavItem = {
+export type AppLeftNavItem<Path extends AppRoute['path'] = AppRoute['path']> = {
   divider?: boolean;
   icon?: LeftNavMenuProps['icon'];
   id: AppTemplateLeftNavMenuItem['id'];
   items?: AppLeftNavItem[] | null;
   label?: LeftNavMenuProps['label'];
   preventRender?: boolean;
-  routes?: readonly ReturnType<typeof createAppRoute>[];
-  to?: AppLinkTo<AppRoute['path']>;
+  to?: InferNavigationInputFromPath<Path>;
 };
 
 export const useAppTemplateLeftNavMenu = () => {
   const leftNav = useAppLeftNavMenu();
 
   const mapItem = useCallback((item: AppLeftNavItem): AppTemplateLeftNavMenuItem => {
-    const { divider = false, id, label, icon, to, routes, preventRender = false, items = null } = item;
+    const { divider = false, id, label, icon, to, preventRender = false, items = null } = item;
 
     if (divider) {
       return {

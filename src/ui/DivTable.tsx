@@ -9,10 +9,10 @@ import {
   TableRow,
   TableSortLabel
 } from '@mui/material';
-import { AppLink } from 'core/router';
-import type { AppLinkTo } from 'core/routes';
+import type { InferNavigationInputFromPath } from 'core/router';
+import { AppLink, useAppNavigate } from 'core/router';
+import { useAppSearchParams } from 'core/routes';
 import React, { memo } from 'react';
-import { useLocation, useNavigate } from 'react-router';
 import type SimpleSearchQuery from 'ui/SearchBar/simple-search-query';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
@@ -75,26 +75,23 @@ export const SortableHeaderCell: React.FC<SortableHeaderCellProps> = ({
   onSort = null,
   ...other
 }) => {
-  const location = useLocation();
-  const searchParams = new URLSearchParams(location.search);
-  const curSort = query ? query.get(sortName) : searchParams.get(sortName);
-  const navigate = useNavigate();
+  const search = useAppSearchParams<'/submissions'>();
+  const curSort = (search?.get?.(sortName as any) || '') as string;
+  const navigate = useAppNavigate<'/submissions'>();
   const active = curSort && curSort.indexOf(sortField) !== -1;
   const ascending = inverted ? 'desc' : 'asc';
   const descending = inverted ? 'asc' : 'desc';
   const dir = active && curSort.indexOf(ascending) !== -1 ? ascending : descending;
 
   const triggerSort = (event: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
-    if (curSort && curSort.indexOf(sortField) !== -1 && curSort.indexOf(ascending) === -1) {
-      searchParams.set(sortName, `${sortField} ${ascending}`);
-    } else {
-      searchParams.set(sortName, `${sortField} ${descending}`);
-    }
-
+    const nextSortValue =
+      curSort && curSort.indexOf(sortField) !== -1 && curSort.indexOf(ascending) === -1
+        ? `${sortField} ${ascending}`
+        : `${sortField} ${descending}`;
     if (onSort) {
-      onSort(event, { name: sortName, field: searchParams.get(sortName) });
+      onSort(event, { name: sortName, field: nextSortValue || null });
     } else {
-      navigate(`${location.pathname}?${searchParams.toString()}${location.hash}`);
+      navigate.replaceSearchObject(s => ({ ...s, [sortName]: nextSortValue }));
     }
   };
 
@@ -111,11 +108,11 @@ export const SortableHeaderCell: React.FC<SortableHeaderCellProps> = ({
   );
 };
 
-type LinkRowProps<Path extends AppRoute['path'] = AppRoute['path']> = Omit<TableRowProps, 'component'> & {
-  to: AppLinkTo<Path>;
+type LinkRowProps<Path extends AppRoute['path']> = Omit<TableRowProps, 'component'> & {
+  to: InferNavigationInputFromPath<Path>;
 };
 
-export const LinkRow = memo(function LinkRow<Path extends AppRoute['path'] = AppRoute['path']>({
+export const LinkRow = memo(function LinkRow<const Path extends AppRoute['path']>({
   children,
   to,
   ...other
@@ -129,7 +126,7 @@ export const LinkRow = memo(function LinkRow<Path extends AppRoute['path'] = App
       {children}
     </TableRow>
   );
-}) as unknown as <Path extends AppRoute['path'] = AppRoute['path']>(props: LinkRowProps<Path>) => React.JSX.Element;
+}) as unknown as <const Path extends AppRoute['path']>(props: LinkRowProps<Path>) => React.JSX.Element;
 
 (LinkRow as unknown as { displayName: string }).displayName = 'LinkRow';
 

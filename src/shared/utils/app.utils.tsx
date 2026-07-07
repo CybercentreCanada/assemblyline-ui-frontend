@@ -21,6 +21,24 @@ export const generateRandomUUID = (existingUUIDs: string[] = [], size: number = 
 };
 
 /**
+ * @name hashObject
+ * @description Produces a deterministic 32-bit FNV-1a hash from a JSON-serializable value.
+ * @param value - Input value to serialize and hash
+ * @returns Lowercase 8-character hexadecimal hash string
+ */
+export const hashObject = (value: unknown): string => {
+  const str = JSON.stringify(value);
+  let hash = 0x811c9dc5; // FNV-1a 32-bit offset basis
+
+  for (let i = 0; i < str.length; i++) {
+    hash ^= str.charCodeAt(i);
+    hash = Math.imul(hash, 0x01000193); // FNV prime
+  }
+
+  return (hash >>> 0).toString(16).padStart(8, '0');
+};
+
+/**
  * @name shallowObjectCompare
  * @description Compares two root objects shallowly by own keys and top-level values.
  * @param left - First root object to compare

@@ -1,7 +1,7 @@
 import type { ButtonProps as MuiButtonProps, TooltipProps } from '@mui/material';
 import { Button as MuiButton, Skeleton } from '@mui/material';
+import type { InferNavigationInputFromPath } from 'core/router';
 import { AppLink } from 'core/router';
-import type { AppLinkTo } from 'core/routes';
 import { memo, useMemo } from 'react';
 import { getTextContent } from 'shared/utils/utils';
 import { Tooltip } from 'ui/Tooltip';
@@ -11,7 +11,7 @@ export type ButtonProps<Path extends AppRoute['path']> = MuiButtonProps & {
   loading?: boolean;
   preventRender?: boolean | (() => boolean);
   progress?: boolean;
-  to?: AppLinkTo<Path>;
+  to?: InferNavigationInputFromPath<Path>;
   tooltip?: TooltipProps['title'];
   tooltipProps?: Omit<TooltipProps, 'children' | 'title'>;
 };
