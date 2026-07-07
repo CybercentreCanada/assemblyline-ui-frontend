@@ -52,7 +52,7 @@ const WrappedResultCard: React.FC<Props> = ({ result, sid, alternates = null, fo
   const [render, setRender] = useState<boolean>(!empty && displayedResult.result.score >= settings.expand_min_score);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [selected, setSelected] = useState<string>(null);
-  const { getKey, hasHighlightedKeys } = useHighlighter();
+  const { getKey, hasKeys } = useHighlighter();
   const { showSafeResults } = useSafeResults();
   const popper = Boolean(anchorEl);
 
@@ -173,7 +173,7 @@ const WrappedResultCard: React.FC<Props> = ({ result, sid, alternates = null, fo
           }
         }}
         style={{
-          backgroundColor: hasHighlightedKeys(allTags) ? (theme.palette.mode === 'dark' ? '#343a44' : '#d8e3ea') : null
+          backgroundColor: hasKeys(allTags) ? (theme.palette.mode === 'dark' ? '#343a44' : '#d8e3ea') : null
         }}
       >
         {c12nDef.enforce && <Classification c12n={displayedResult.classification} type="text" />}

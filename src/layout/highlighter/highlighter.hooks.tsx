@@ -1,5 +1,5 @@
-import { useAppInterfaceStore, useAppSetInterfaceStore } from 'core/interface';
-import type { HighlightMapProps } from 'layout/highlighter/highlighter.models';
+import { getAppInterfaceStateFromApi, useAppInterfaceStoreApi, useAppSetInterfaceStore } from 'core/interface';
+import type { HighlightMapProps } from 'layout/highlighter';
 import {
   getHighlighterKey,
   hasHighlighterKey,
@@ -30,15 +30,16 @@ export type UseAppHighlighter = {
  */
 export const useAppHighlighter = (): UseAppHighlighter => {
   const setInterfaceStore = useAppSetInterfaceStore();
+  const interfaceApi = useAppInterfaceStoreApi();
 
   const isHighlighted = useCallback(
-    (key: string): boolean => useAppInterfaceStore(hasHighlighterKey(key)),
-    [useAppInterfaceStore]
+    (key: string): boolean => hasHighlighterKey(key)(getAppInterfaceStateFromApi(interfaceApi)),
+    [interfaceApi]
   );
 
   const hasKeys = useCallback(
-    (keyList: string[]) => useAppInterfaceStore(hasHighlighterKeys(keyList)),
-    [useAppInterfaceStore]
+    (keyList: string[]) => hasHighlighterKeys(keyList)(getAppInterfaceStateFromApi(interfaceApi)),
+    [interfaceApi]
   );
 
   const triggerHighlight = useCallback(
