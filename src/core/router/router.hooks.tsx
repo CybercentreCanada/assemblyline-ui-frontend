@@ -398,7 +398,7 @@ export function useAppSyncNavigationStoreFromLocation() {
             nextStore = updateRoute(nextStore, nextStore.panels[panelKey].routeKey, nextLocation);
           } else {
             const [nextStore1, nextRouteKey] = addRoute(nextStore, nextLocation);
-            nextStore = updatePanel(nextStore1, panelKey, { routeKey: nextRouteKey });
+            [nextStore] = upsertPanel(nextStore1, panelKey, { routeKey: nextRouteKey }, preferenceState);
           }
         }
 
@@ -467,6 +467,9 @@ export function useAppSyncNavigationStoreFromLocation() {
   );
 
   useEffect(() => {
+    const runtimeState = getAppRoutesRuntimeStateFromApi(routesRuntimeStoreApi);
+    if (!Object.entries(runtimeState.specs || {}).length) return;
+
     const routerState = getAppRouterStateFromApi(routerStoreApi);
     if (location?.state?.id && location.state.id === routerState.id) return;
 
@@ -483,7 +486,8 @@ export function useAppSyncNavigationStoreFromLocation() {
     getNavigationFromLocationHash,
     getNavigationFromLocationState,
     location,
-    routerStoreApi
+    routerStoreApi,
+    routesRuntimeStoreApi
   ]);
 
   return null;
