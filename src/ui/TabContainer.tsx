@@ -64,94 +64,92 @@ type TabContainerProps<T extends TabElements> = TabsProps & {
   value?: keyof T;
 };
 
-export const TabContainer = React.memo(
-  <T extends TabElements>({
-    allowRender = false,
-    defaultTab: defaultTabProp = null,
-    paper = false,
-    stickyTop = null,
-    tabs,
-    value: valueProp = null,
-    onChange: onChangeProp = null,
-    sx = {},
-    ...props
-  }: TabContainerProps<T>): ReactElement => {
-    const theme = useTheme();
+export const TabContainer = React.memo(function <const T extends TabElements>({
+  allowRender = false,
+  defaultTab: defaultTabProp = null,
+  paper = false,
+  stickyTop = null,
+  tabs,
+  value: valueProp = null,
+  onChange: onChangeProp = null,
+  sx = {},
+  ...props
+}: TabContainerProps<T>): ReactElement {
+  const theme = useTheme();
 
-    const defaultTab = useMemo<keyof T>(
-      () => defaultTabProp || (Object.keys(tabs)[0] as keyof T),
-      [defaultTabProp, tabs]
-    );
+  const defaultTab = useMemo<keyof T>(
+    () => defaultTabProp || (Object.keys(tabs)[0] as keyof T),
+    [defaultTabProp, tabs]
+  );
 
-    const [tabState, setTabState] = useState<keyof T>(defaultTab);
+  const [tabState, setTabState] = useState<keyof T>(defaultTab);
 
-    const activeTab = useMemo<keyof T>(
-      () => (valueProp && valueProp in tabs && !tabs[valueProp]?.disabled ? valueProp : tabState),
-      [tabState, tabs, valueProp]
-    );
+  const activeTab = useMemo<keyof T>(
+    () => (valueProp && valueProp in tabs && !tabs[valueProp]?.disabled ? valueProp : tabState),
+    [tabState, tabs, valueProp]
+  );
 
-    const handleChange = useCallback(
-      (prev: keyof T) => (_: React.SyntheticEvent, next: keyof T) => {
-        const value = next in tabs && !tabs[next]?.disabled ? next : prev;
-        onChangeProp ? onChangeProp(_, value) : setTabState(value);
-      },
-      [onChangeProp, tabs]
-    );
+  const handleChange = useCallback(
+    (prev: keyof T) => (_: React.SyntheticEvent, next: keyof T) => {
+      const value = next in tabs && !tabs[next]?.disabled ? next : prev;
+      onChangeProp ? onChangeProp(_, value) : setTabState(value);
+    },
+    [onChangeProp, tabs]
+  );
 
-    const onTabChange = useCallback(
-      (value: keyof T) => {
-        const next = value in tabs && !tabs[value]?.disabled ? value : defaultTab;
-        onChangeProp ? onChangeProp(null, next) : setTabState(next);
-      },
-      [defaultTab, onChangeProp, tabs]
-    );
+  const onTabChange = useCallback(
+    (value: keyof T) => {
+      const next = value in tabs && !tabs[value]?.disabled ? value : defaultTab;
+      onChangeProp ? onChangeProp(null, next) : setTabState(next);
+    },
+    [defaultTab, onChangeProp, tabs]
+  );
 
-    return (
-      <TabContext.Provider value={{ onTabChange }}>
-        <div
-          style={{
-            backgroundColor: paper ? theme.palette.background.default : theme.palette.background.paper,
-            zIndex: 1000,
-            ...(stickyTop && {
-              position: 'sticky',
-              top: `${stickyTop}px`,
-              margin: '0 -4px',
-              padding: '0 4px'
-            })
+  return (
+    <TabContext.Provider value={{ onTabChange }}>
+      <div
+        style={{
+          backgroundColor: paper ? theme.palette.background.default : theme.palette.background.paper,
+          zIndex: 1000,
+          ...(stickyTop && {
+            position: 'sticky',
+            top: `${stickyTop}px`,
+            margin: '0 -4px',
+            padding: '0 4px'
+          })
+        }}
+      >
+        <Tabs
+          value={activeTab}
+          onChange={handleChange(activeTab)}
+          variant="scrollable"
+          scrollButtons="auto"
+          allowScrollButtonsMobile
+          textColor="primary"
+          indicatorColor="primary"
+          sx={{
+            backgroundColor: paper ? theme.palette.background.paper : theme.palette.background.default,
+            border: `1px solid ${theme.palette.divider}`,
+            my: 2,
+            ...sx
           }}
+          {...props}
         >
-          <Tabs
-            value={activeTab}
-            onChange={handleChange(activeTab)}
-            variant="scrollable"
-            scrollButtons="auto"
-            allowScrollButtonsMobile
-            textColor="primary"
-            indicatorColor="primary"
-            sx={{
-              backgroundColor: paper ? theme.palette.background.paper : theme.palette.background.default,
-              border: `1px solid ${theme.palette.divider}`,
-              my: 2,
-              ...sx
-            }}
-            {...props}
-          >
-            {Object.entries(tabs).map(([key, tab], i) =>
-              tab.preventRender ? null : (
-                <Tab key={i} tabIndex={0} role="button" value={key} sx={{ minWidth: 120 }} {...tab} />
-              )
-            )}
-          </Tabs>
-        </div>
+          {Object.entries(tabs).map(([key, tab], i) =>
+            tab.preventRender ? null : (
+              <Tab key={i} tabIndex={0} role="button" value={key} sx={{ minWidth: 120 }} {...tab} />
+            )
+          )}
+        </Tabs>
+      </div>
 
-        {Object.entries(tabs).map(([key, tab], i) =>
-          tab.disabled ? null : (
-            <TabContent key={i} open={activeTab === key} allowRender={allowRender}>
-              {tab.inner}
-            </TabContent>
-          )
-        )}
-      </TabContext.Provider>
-    );
-  }
-) as <T extends TabElements>(props: TabContainerProps<T>) => React.ReactNode;
+      {Object.entries(tabs).map(([key, tab], i) =>
+        tab.disabled ? null : (
+          <TabContent key={i} open={activeTab === key} allowRender={allowRender}>
+            {tab.inner}
+          </TabContent>
+        )
+      )}
+    </TabContext.Provider>
+  );
+}) as <T extends TabElements>(props: TabContainerProps<T>) => React.ReactNode;

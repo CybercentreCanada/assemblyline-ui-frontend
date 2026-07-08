@@ -1,0 +1,22 @@
+{
+  "analysing_code": "Demander aux robots de donner un sens à ce code...",
+  "code_summary": "Résumé du code",
+  "detail": "Détails de l'analyse du fichier",
+  "download": "Télécharger le fichier",
+  "error.truncated": "L'aperçu du fichier a été tronqué car sa taille dépasse la limite du système.",
+  "hide_analyse_code": "Masquer l'analyse du code par l'IA",
+  "linewrap.off": "Désactiver le retour à la ligne",
+  "linewrap.on": "Activer le retour à la ligne",
+  "powered_by_ai": "Propulsé par l'IA",
+  "powered_by_ai.tooltip": "Le résumé du code a été généré automatiquement par un modèle LLM, les résultats sont imprévisibles. Cliquez pour obtenir les nouveaux résultats du LLM...",
+  "related": "Soumissions connexes",
+  "show_analyse_code": "Afficher l'analyse du code par l'IA",
+  "submit.dynamic": "Soumettre pour analyse dynamique",
+  "submit.file": "Soumettre ce fichier avec le hachage suivant",
+  "submit.modify": "Ajuster les paramètres avant la soumission",
+  "submit.selection": "Soumettre la sélection suivante",
+  "submit.success": "La sélection a été soumise avec succès pour l’analyse dynamique. Vous allez être redirigé…",
+  "submit.with": "Soumettre avec",
+  "submit_content": "Soumettre le contenu actuel",
+  "title": "Visualisateur de Fichiers"
+}

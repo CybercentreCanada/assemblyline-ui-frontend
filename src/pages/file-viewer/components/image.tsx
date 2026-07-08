@@ -1,9 +1,8 @@
 import AddIcon from '@mui/icons-material/Add';
 import RemoveIcon from '@mui/icons-material/Remove';
 import { Alert, alpha, IconButton, LinearProgress, Slider, styled } from '@mui/material';
-import { useAppUser } from '@tui/core';
+import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
-import type { CustomUser } from 'models/api/user';
 import { ForbiddenPage } from 'pages/forbidden/forbidden.route';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
@@ -97,7 +96,7 @@ type Props = {
 
 const WrappedImageSection = ({ name = null, sha256 = null }: Props) => {
   const { apiCall } = useMyAPI();
-  const { user: currentUser } = useAppUser<CustomUser>();
+  const { user: currentUser } = useALContext();
 
   const [src, setSrc] = useState<string>(null);
   const [error, setError] = useState<string>(null);

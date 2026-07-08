@@ -48,6 +48,7 @@ The `PathParamKeyForPath<Path>` utility type recursively extracts `:param` segme
 | `string(defaultValue?)` | `''` | Returns raw segment or default |
 | `number(defaultValue?)` | `0` | `Number(value)`, falls back if `NaN` |
 | `boolean(defaultValue?)` | `false` | `'true'`/`'1'` → true, `'false'`/`'0'` → false |
+| `enum(values, defaultValue?)` | `values[0]` | Returns the value only when it exists in `values`, otherwise default |
 
 ### Creating a Codec
 
@@ -72,6 +73,13 @@ const codec = createPathParamsCodec('/files/:sha256/:section')(blueprints => ({
 
 // codec.parse(location) → { sha256: string, section: number }
 // codec.stringify({ sha256: 'abc', section: 2 }) → '/files/abc/2'
+
+const fileViewerCodec = createPathParamsCodec('/file/viewer/:id/:tab')(blueprints => ({
+  id: blueprints.string(),
+  tab: blueprints.enum(['ascii', 'code', 'strings', 'hex', 'image'], 'ascii')
+}));
+
+// fileViewerCodec.parse(location) → { id: string, tab: 'ascii' | 'code' | 'strings' | 'hex' | 'image' }
 ```
 
 ## 5. Usage

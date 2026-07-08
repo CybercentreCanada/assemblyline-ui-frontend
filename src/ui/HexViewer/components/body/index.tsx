@@ -1,4 +1,9 @@
-import { useSelection } from 'ui/FileViewer/components/SelectionProvider';
+import { useSelection } from 'pages/file-viewer/file-viewer.providers';
+import type { KeyboardEvent, PropsWithChildren } from 'react';
+import React, { memo, useMemo, useRef } from 'react';
+import AutoSizer from 'react-virtualized-auto-sizer';
+import type { FixedSizeListProps, ListOnItemsRenderedProps } from 'react-window';
+import { FixedSizeList } from 'react-window';
 import type { StoreProps } from 'ui/HexViewer';
 import {
   HexRow,
@@ -10,11 +15,6 @@ import {
   useStore,
   WindowRow
 } from 'ui/HexViewer';
-import type { KeyboardEvent, PropsWithChildren } from 'react';
-import React, { memo, useMemo, useRef } from 'react';
-import AutoSizer from 'react-virtualized-auto-sizer';
-import type { FixedSizeListProps, ListOnItemsRenderedProps } from 'react-window';
-import { FixedSizeList } from 'react-window';
 
 const List = FixedSizeList as unknown as React.FC<FixedSizeListProps<unknown> & { ref: unknown }>;
 

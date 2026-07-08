@@ -1,5 +1,6 @@
 import { AccountRoute } from 'pages/account/account.route';
 import { FileDetailRoute } from 'pages/file-detail/file-detail.route';
+import { FileViewerRootRoute, FileViewerRoute } from 'pages/file-viewer/file-viewer.route';
 import { HelpAPIRoute } from 'pages/help/api/help-api.route';
 import { Page1Route } from 'pages/Page1';
 import { Page2Route } from 'pages/Page2';
@@ -29,6 +30,8 @@ export const APP_ROUTES = [
   // New
   AccountRoute,
   FileDetailRoute,
+  FileViewerRootRoute,
+  FileViewerRoute,
   HelpAPIRoute,
   SearchRoute,
   SettingsRootRoute,

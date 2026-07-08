@@ -12,10 +12,9 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import { useAppUser } from '@tui/core';
+import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import useMySnackbar from 'deprecated/hooks/useMySnackbar';
-import type { CustomUser } from 'models/api/user';
 import type { editor } from 'monaco-editor';
 import { ForbiddenPage } from 'pages/forbidden/forbidden.route';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
@@ -88,7 +87,7 @@ const WrappedASCIISection: React.FC<Props> = ({
   const theme = useTheme();
   const { apiCall } = useMyAPI();
   const { showErrorMessage, closeSnackbar } = useMySnackbar();
-  const { user: currentUser } = useAppUser<CustomUser>();
+  const { user: currentUser } = useALContext();
 
   const [data, setData] = useState<string>(null);
   const [error, setError] = useState<string>(null);

@@ -1,41 +1,41 @@
-import { Alert, LinearProgress } from '@mui/material';
-import { useAppUser } from '@tui/core';
+import { Alert, LinearProgress, styled } from '@mui/material';
+import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import useMySnackbar from 'deprecated/hooks/useMySnackbar';
-import type { CustomUser } from 'models/api/user';
-import type { editor } from 'monaco-editor';
 import { ForbiddenPage } from 'pages/forbidden/forbidden.route';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import MonacoEditor, { LANGUAGE_SELECTOR } from 'ui/MonacoEditor';
+import { HexViewerApp } from 'ui/HexViewer';
+
+const Wrapper = styled('div')(({ theme }) => ({
+  backgroundColor: theme.palette.mode === 'dark' ? '#1e1e1e' : '#FAFAFA',
+  border: `1px solid ${theme.palette.divider}`,
+  padding: theme.spacing(1),
+  flexGrow: 1,
+  display: 'flex',
+  flexDirection: 'column',
+  paddingBottom: theme.spacing(2),
+  paddingTop: theme.spacing(2)
+}));
 
 type Props = {
   sha256: string;
-  type?: string;
-  options?: editor.IStandaloneEditorConstructionOptions;
   onDataTruncated?: (truncated: boolean) => void;
 };
 
-const WrappedStringsSection: React.FC<Props> = ({
-  sha256,
-  type: propType = null,
-  options = null,
-  onDataTruncated = () => null
-}) => {
+const WrappedHexSection: React.FC<Props> = ({ sha256, onDataTruncated = () => null }) => {
   const { t } = useTranslation(['fileViewer']);
   const { apiCall } = useMyAPI();
   const { showErrorMessage, closeSnackbar } = useMySnackbar();
-  const { user: currentUser } = useAppUser<CustomUser>();
+  const { user: currentUser } = useALContext();
 
   const [data, setData] = useState<string>(null);
   const [error, setError] = useState<string>(null);
 
-  const type = useMemo<string>(() => (propType && propType in LANGUAGE_SELECTOR ? propType : 'unknown'), [propType]);
-
   useEffect(() => {
     if (!sha256 || data) return;
     apiCall<{ content: string; truncated: boolean }>({
-      url: `/api/v4/file/strings/${sha256}/`,
+      url: `/api/v4/file/hex/${sha256}/?bytes_only=true`,
       allowCache: true,
       onEnter: () => {
         setData(null);
@@ -53,9 +53,7 @@ const WrappedStringsSection: React.FC<Props> = ({
   }, [data, sha256]);
 
   useEffect(() => {
-    return () => {
-      setData(null);
-    };
+    return () => setData(null);
   }, [sha256]);
 
   if (!currentUser.roles.includes('file_detail')) return <ForbiddenPage />;
@@ -63,13 +61,11 @@ const WrappedStringsSection: React.FC<Props> = ({
   else if (data === null) return <LinearProgress />;
   else
     return (
-      <MonacoEditor
-        value={data}
-        language={LANGUAGE_SELECTOR[type]}
-        options={{ links: false, readOnly: true, ...options }}
-      />
+      <Wrapper>
+        <HexViewerApp data={data} />
+      </Wrapper>
     );
 };
 
-export const StringsSection = React.memo(WrappedStringsSection);
-export default StringsSection;
+export const HexSection = React.memo(WrappedHexSection);
+export default HexSection;
