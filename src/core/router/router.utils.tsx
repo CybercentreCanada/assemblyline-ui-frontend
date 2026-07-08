@@ -698,6 +698,19 @@ export const hasRoutes = function <const Store extends AppLocationState>(store: 
   return Object.keys(store?.routes || {}).length > 0;
 };
 
+export const isRouteVisible = function <const Store extends AppLocationState>(
+  store: Store,
+  routeKey: RouteKeyOf<Store>
+): boolean {
+  if (!(routeKey in store.routes)) return false;
+
+  for (const panel of store.panels) {
+    if (panel?.routeKey === routeKey) return true;
+  }
+
+  return false;
+};
+
 /**
  * @name removeRoute
  * @description Removes a route by key when it exists.

@@ -88,6 +88,7 @@ export {
   hasRoutes,
   insertLeftPanel,
   insertRightPanel,
+  isRouteVisible,
   mergePanels,
   moveTabbedRouteKey,
   permanentTab,
