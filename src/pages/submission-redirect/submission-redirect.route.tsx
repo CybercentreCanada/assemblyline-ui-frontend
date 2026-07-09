@@ -8,9 +8,9 @@ const SubmissionRedirect = memo(() => {
   const { id } = useAppPathParams<'/submission/:id'>();
 
   return settings.submission_view === 'details' ? (
-    <AppNavigate to={{ replaceRoute: { path: `/submission/detail/:id`, params: { id } } }} replace />
+    <AppNavigate to={['replaceRoute', { path: `/submission/detail/:id`, params: { id } }, null, { replace: true }]} />
   ) : (
-    <AppNavigate to={{ replaceRoute: { path: `/submission/report/:id`, params: { id } } }} replace />
+    <AppNavigate to={['replaceRoute', { path: `/submission/report/:id`, params: { id } }, null, { replace: true }]} />
   );
 });
 

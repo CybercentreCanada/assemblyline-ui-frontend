@@ -70,14 +70,15 @@ const WrappedSubmissionsTable: React.FC<Props> = ({ submissionResults, allowSort
           </DivTableHead>
           <DivTableBody>
             {submissionResults.items.map((submission, id) => (
-              <LinkRow<'/submissions'>
+              <LinkRow
                 key={`${submission.id}-${id}`}
-                to={{
-                  openRoute:
-                    submission.state === 'completed'
-                      ? { path: '/submission/:id', params: { id: submission.id } }
-                      : { path: '/submission/detail/:id', params: { id: submission.id } }
-                }}
+                to={[
+                  'openRoute',
+                  submission.state === 'completed'
+                    ? { path: '/submission/:id', params: { id: submission.id } }
+                    : { path: '/submission/detail/:id', params: { id: submission.id } },
+                  [submission.id, submission.state]
+                ]}
                 hover
                 style={{ textDecoration: 'none' }}
               >

@@ -7,10 +7,11 @@ import PrintOutlinedIcon from '@mui/icons-material/PrintOutlined';
 import type { TooltipProps } from '@mui/material';
 import { Box, Grid, Skeleton, styled, Tooltip, Typography, useTheme } from '@mui/material';
 import { PageCenter } from '@tui/core';
-import { createAppRoute } from 'core/routes';
+import { createAppRoute, useAppPathParams } from 'core/routes';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import useMySnackbar from 'deprecated/hooks/useMySnackbar';
+import { useAppAssistant } from 'layout/assistant';
 import type { SubmissionReport } from 'models/api/submission_report';
 import { ForbiddenPage } from 'pages/forbidden/forbidden.route';
 import AISummarySection from 'pages/submission-detail/components/ai_summary';
@@ -23,14 +24,10 @@ import Metadata from 'pages/submission-report/components/metadata';
 import Tags from 'pages/submission-report/components/tags';
 import { memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate, useParams } from 'react-router';
+import { useNavigate } from 'react-router';
 import { filterObject } from 'shared/utils/utils';
 import { IconButton } from 'ui/buttons/IconButton';
 import Classification from 'ui/Classification';
-
-type ParamProps = {
-  id: string;
-};
 
 const NoPrintTooltip = memo(
   styled(Tooltip)<TooltipProps>(() => ({
@@ -42,7 +39,7 @@ const NoPrintTooltip = memo(
 
 const SubmissionReportPage = memo(() => {
   const { t } = useTranslation(['submissionReport']);
-  const { id } = useParams<ParamProps>();
+  const { id } = useAppPathParams<'/submission/report/:id'>();
   const { user: currentUser, c12nDef, configuration, settings } = useALContext();
   const { showErrorMessage, showWarningMessage } = useMySnackbar();
   const navigate = useNavigate();
@@ -243,7 +240,7 @@ const SubmissionReportPage = memo(() => {
                     </NoPrintTooltip>
                     <Tooltip title={t('detail_view')}>
                       <IconButton
-                        to={{ replaceRoute: { path: `/submission/detail/:id`, params: { id: report.sid } } }}
+                        to={['replaceRoute', { path: '/submission/detail/:id', params: { id: report.sid } }]}
                         size="large"
                       >
                         <ListAltOutlinedIcon />

@@ -3,10 +3,10 @@ import ExpandMore from '@mui/icons-material/ExpandMore';
 import { Collapse, Divider, Grid, Typography, useTheme } from '@mui/material';
 import useSafeResults from 'deprecated/hooks/useSafeResults';
 import type { Tags } from 'models/api/file';
+import { TooltipGrid } from 'pages/file-detail/components/tags';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import AutoHideTagList from 'ui/AutoHideTagList';
-import { TooltipGrid } from 'ui/FileDetail/tags';
 
 type Props = {
   tag_group: string;

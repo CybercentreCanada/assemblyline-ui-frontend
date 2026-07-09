@@ -35,7 +35,7 @@ import {
   useTheme
 } from '@mui/material';
 import Typography from '@mui/material/Typography';
-import { createAppRoute } from 'core/routes';
+import { createAppRoute, useAppPathParams } from 'core/routes';
 import useALContext from 'deprecated/hooks/useALContext';
 import useHighlighter from 'deprecated/hooks/useHighlighter';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
@@ -51,15 +51,18 @@ import type { ParsedErrors } from 'models/base/error';
 import type { Result } from 'models/base/result';
 import type { ParsedSubmission, Submission } from 'models/base/submission';
 import moment from 'moment';
+import Detection from 'pages/file-detail/components/detection';
+import { ForbiddenPage } from 'pages/forbidden/forbidden.route';
 import AISummarySection from 'pages/submission-detail/components/ai_summary';
 import AttackSection from 'pages/submission-detail/components/attack';
+import ErrorSection from 'pages/submission-detail/components/errors';
 import FileTreeSection from 'pages/submission-detail/components/file_tree';
 import InfoSection from 'pages/submission-detail/components/info';
 import MetaSection from 'pages/submission-detail/components/meta';
 import TagSection from 'pages/submission-detail/components/tags';
 import { memo, useCallback, useEffect, useMemo, useReducer, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate, useParams } from 'react-router';
+import { useNavigate } from 'react-router';
 import { Link } from 'react-router-dom';
 import { getErrorIDFromKey, getServiceFromKey } from 'shared/utils/errors';
 import { setNotifyFavicon } from 'shared/utils/utils';
@@ -110,15 +113,13 @@ const incrementReducer = (old: number, increment: number) => {
 const SubmissionDetail = memo(() => {
   const { t, i18n } = useTranslation(['submissionDetail']);
   const theme = useTheme();
-  const location = useLocation();
   const navigate = useNavigate();
   const { apiCall } = useMyAPI();
   const { addInsight, removeInsight } = useAppAssistant();
   const { showSuccessMessage, showErrorMessage } = useMySnackbar();
   const { user: currentUser, configuration: systemConfig, settings } = useALContext();
   const { setHighlightMap } = useHighlighter();
-  const { setGlobalDrawer, globalDrawerOpened } = useDrawer();
-  const { id, fid } = useParams<ParamProps>();
+  const { id } = useAppPathParams<'/submission/detail/:id'>();
 
   const [submission, setSubmission] = useState<ParsedSubmission>(null);
   const [summary, setSummary] = useState<SubmissionSummary>(null);
@@ -871,73 +872,6 @@ const SubmissionDetail = memo(() => {
   }, [watchQueue, socket, handleErrorMessage]);
 
   useEffect(() => {
-    if (submission !== null && !globalDrawerOpened && fid !== undefined) {
-      navigate(`/submission/detail/${id}`);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [globalDrawerOpened]);
-
-  useEffect(() => {
-    if (fid) {
-      if (liveResults) {
-        const curFileLiveResults = [];
-        const curFileLiveErrors = [];
-        Object.entries(liveResults.result).forEach(([resultKey, result]) => {
-          if (resultKey.startsWith(fid)) {
-            curFileLiveResults.push(result);
-          }
-        });
-        Object.entries(liveResults.error).forEach(([errorKey, error]) => {
-          if (errorKey.startsWith(fid)) {
-            curFileLiveErrors.push(error);
-          }
-        });
-        setGlobalDrawer(
-          <FileDetail
-            sha256={fid}
-            sid={id}
-            metadata={submission?.metadata}
-            liveResultKeys={liveResultKeys}
-            liveErrors={curFileLiveErrors}
-            force={submission && submission.max_score < 0}
-          />,
-          { hasMaximize: true }
-        );
-      } else {
-        setGlobalDrawer(
-          <FileDetail
-            sha256={fid}
-            sid={id}
-            metadata={submission?.metadata}
-            force={submission && submission.max_score < 0}
-          />,
-          {
-            hasMaximize: true
-          }
-        );
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fid, submission]);
-
-  useEffect(() => {
-    if (!fid && location.hash) {
-      setGlobalDrawer(<HeuristicDetail heur_id={location.hash.slice(1)} />);
-    }
-  }, [fid, location.hash, setGlobalDrawer]);
-
-  useEffect(() => {
-    if (!fid && !location.hash) setGlobalDrawer(null);
-  }, [fid, location.hash, setGlobalDrawer]);
-
-  useEffect(() => {
-    if (!fid && !globalDrawerOpened && location.hash) {
-      navigate(`${location.pathname}${location.search ? location.search : ''}`);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [fid, globalDrawerOpened]);
-
-  useEffect(() => {
     if (loadTrigger === 0) return;
 
     // eslint-disable-next-line no-console
@@ -1302,7 +1236,7 @@ const SubmissionDetail = memo(() => {
                 ? { loading: true }
                 : {
                     preventRender: submission.state !== 'completed',
-                    to: { replaceRoute: { path: '/submission/report/:id', params: { id: submission.sid } } }
+                    to: ['replaceRoute', { path: '/submission/report/:id', params: { id: submission.sid } }]
                   })}
             >
               <ChromeReaderModeOutlinedIcon />

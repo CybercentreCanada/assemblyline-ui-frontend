@@ -13,11 +13,11 @@ import {
   useTheme
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
-import type { Submission } from 'components/models/base/submission';
-import { getErrorIDFromKey, getErrorTypeFromKey, getHashFromKey, getServiceFromKey } from 'helpers/errors';
+import { AppLink } from 'core/router';
+import type { Submission } from 'models/base/submission';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
+import { getErrorIDFromKey, getErrorTypeFromKey, getHashFromKey, getServiceFromKey } from 'shared/utils/errors';
 
 const MAX_ERROR_COUNT = 500;
 
@@ -130,9 +130,9 @@ const Errors = ({ sid = null, service = null, errors = [] }: ErrorsProps) => {
           &nbsp;::&nbsp;
           <strong>
             <MaterialLink
-              component={Link}
+              component={AppLink}
               color={theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark}
-              to={`/submission/detail/${sid}/${getHashFromKey(errors[0])}`}
+              to={['openRoute', { path: '/file/detail/:id', params: { id: getHashFromKey(errors[0]) } }]}
             >
               {getHashFromKey(errors[0])}
             </MaterialLink>
@@ -173,9 +173,9 @@ const Errors = ({ sid = null, service = null, errors = [] }: ErrorsProps) => {
                     &nbsp;::&nbsp;
                     <strong>
                       <MaterialLink
-                        component={Link}
+                        component={AppLink}
                         color={theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark}
-                        to={`/submission/detail/${sid}/${getHashFromKey(error)}`}
+                        to={['openRoute', { path: '/file/detail/:id', params: { id: getHashFromKey(error) } }]}
                       >
                         {getHashFromKey(error)}
                       </MaterialLink>
