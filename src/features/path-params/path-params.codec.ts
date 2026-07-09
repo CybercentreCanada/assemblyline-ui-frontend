@@ -2,7 +2,6 @@ import type {
   InferPathParamBlueprintFromValue,
   InferPathParamBlueprintMapFromPath,
   InferPathParamValuesFromBlueprintMap,
-  PathParamValue,
   RoutePath
 } from 'features/path-params/path-params.models';
 import type { Location } from 'react-router';
@@ -35,7 +34,7 @@ export const PATH_PARAM_BLUEPRINTS_MAP = {
     },
     stringify: value => String(value)
   }),
-  enum: <const Values extends readonly [PathParamValue, ...PathParamValue[]]>(
+  enum: <const Values extends readonly [string | boolean | number, ...(string | boolean | number)[]]>(
     values: Values,
     defaultValue: Values[number] = values[0]
   ): InferPathParamBlueprintFromValue<Values[number]> => ({
