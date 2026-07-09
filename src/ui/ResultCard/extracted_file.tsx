@@ -14,12 +14,12 @@ import {
   Tooltip,
   useTheme
 } from '@mui/material';
-import { DEFAULT_TAB, TAB_OPTIONS } from 'components/routes/file/viewer';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import useMySnackbar from 'deprecated/hooks/useMySnackbar';
 import type { File } from 'models/base/result';
 import type { Submission } from 'models/base/submission';
+import { DEFAULT_TAB, TAB_OPTIONS } from 'pages/file-viewer/file-viewer.route';
 import React, { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';

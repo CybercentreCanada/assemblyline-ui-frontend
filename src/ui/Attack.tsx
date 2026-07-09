@@ -2,11 +2,10 @@ import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import SelectAllOutlinedIcon from '@mui/icons-material/SelectAllOutlined';
 import { Menu, MenuItem } from '@mui/material';
-import { useAppUser, useClipboard } from '@tui/core';
+import { useClipboard } from '@tui/core';
 import useALContext from 'deprecated/hooks/useALContext';
 import useHighlighter from 'deprecated/hooks/useHighlighter';
 import useSafeResults from 'deprecated/hooks/useSafeResults';
-import type { CustomUser } from 'models/api/user';
 import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
@@ -47,8 +46,7 @@ const WrappedAttack: React.FC<AttackProps> = ({
   const { isHighlighted, triggerHighlight } = useHighlighter();
   const { copy } = useClipboard();
   const { showSafeResults } = useSafeResults();
-  const { scoreToVerdict } = useALContext();
-  const { user: currentUser } = useAppUser<CustomUser>();
+  const { user: currentUser, scoreToVerdict } = useALContext();
 
   const handleClick = useCallback(() => triggerHighlight(highlight_key), [triggerHighlight, highlight_key]);
 

@@ -51,6 +51,9 @@ export type Error = {
   /** Response from the service */
   response: Response;
 
+  /** Severity of the error */
+  severity: 'error' | 'warning';
+
   /** SHA256 of file related to service error */
   sha256: string;
 
