@@ -6,11 +6,11 @@ export { useAppHashParams, useAppLocation, useAppPathParams, useAppRouteKey, use
 export { DEFAULT_APP_ROUTE_LOCATION, DEFAULT_APP_ROUTE_SNAPSHOT, DEFAULT_APP_ROUTE_SPEC } from './routes.models';
 export type {
   AppRouteLocation,
+  AppRouteLocationsStore,
   AppRouteSpec,
-  AppRoutesRuntimeStore,
   GuardResult,
+  InferAppRouteLocationFromPath,
   InferAppRouteSearchValuesFromPath,
-  InferAppRouteSnapshotFromPath,
   InferAppRouteSpecFromPath,
   InferAppRouteValuesFromPath,
   RouteHash,
@@ -19,19 +19,19 @@ export type {
 export {
   AppRouteKeyProvider,
   AppRouteKeyStoreProvider,
-  AppRoutesRuntimeProvider,
-  AppRoutesRuntimeStoreProvider,
-  DEFAULT_APP_ROUTES_RUNTIME_STORE,
-  getAppRoutesRuntimeStateFromApi,
+  AppRouteLocationsProvider,
+  AppRouteLocationsStoreProvider,
+  DEFAULT_APP_ROUTE_LOCATIONS_STORE,
+  getAppRouteLocationsStateFromApi,
   useAppRouteKeyStore,
-  useAppRoutesRuntimeStore,
-  useAppRoutesRuntimeStoreApi,
-  useAppSetRoutesRuntimeStore
+  useAppRouteLocationsStore,
+  useAppRouteLocationsStoreApi,
+  useAppSetRouteLocationsStore
 } from './routes.providers';
 export type {
   AppRouteKeyStore,
   AppRouteKeyStoreProviderProps,
-  AppRoutesRuntimeProviderProps
+  AppRouteLocationsProviderProps
 } from './routes.providers';
 export {
   addRouteSnapshot,

@@ -1,5 +1,5 @@
-import type { AppRouteKeyStore, InferAppRouteSnapshotFromPath } from 'core/routes';
-import { findRouteSnapshotFromKey, useAppRouteKeyStore, useAppRoutesRuntimeStore } from 'core/routes';
+import type { AppRouteKeyStore, InferAppRouteLocationFromPath } from 'core/routes';
+import { findRouteSnapshotFromKey, useAppRouteKeyStore, useAppRouteLocationsStore } from 'core/routes';
 
 /**
  * @name useAppRouteKey
@@ -20,11 +20,11 @@ export function useAppRouteKey(): AppRouteKeyStore['routeKey'] {
  */
 export const useAppLocation = function <const Path extends AppRoute['path']>() {
   const routeKey = useAppRouteKey();
-  const snapshot = useAppRoutesRuntimeStore(s => findRouteSnapshotFromKey<Path>(s, routeKey));
+  const snapshot = useAppRouteLocationsStore(s => findRouteSnapshotFromKey<Path>(s, routeKey));
 
-  return function <Selected = InferAppRouteSnapshotFromPath<Path>>(
-    selector?: (location: InferAppRouteSnapshotFromPath<Path>) => Selected
-  ): Selected | InferAppRouteSnapshotFromPath<Path> | null {
+  return function <Selected = InferAppRouteLocationFromPath<Path>>(
+    selector?: (location: InferAppRouteLocationFromPath<Path>) => Selected
+  ): Selected | InferAppRouteLocationFromPath<Path> | null {
     if (snapshot == null) return null;
     return selector ? selector(snapshot) : snapshot;
   };
@@ -37,7 +37,7 @@ export const useAppLocation = function <const Path extends AppRoute['path']>() {
  */
 export function useAppPathParams<const Path extends AppRoute['path']>() {
   const routeKey = useAppRouteKey();
-  return useAppRoutesRuntimeStore(s => findRouteSnapshotFromKey<Path>(s, routeKey)?.params);
+  return useAppRouteLocationsStore(s => findRouteSnapshotFromKey<Path>(s, routeKey)?.params);
 }
 
 /**
@@ -47,7 +47,7 @@ export function useAppPathParams<const Path extends AppRoute['path']>() {
  */
 export function useAppSearchParams<const Path extends AppRoute['path']>() {
   const routeKey = useAppRouteKey();
-  return useAppRoutesRuntimeStore(s => findRouteSnapshotFromKey<Path>(s, routeKey)?.search);
+  return useAppRouteLocationsStore(s => findRouteSnapshotFromKey<Path>(s, routeKey)?.search);
 }
 
 /**
@@ -57,5 +57,5 @@ export function useAppSearchParams<const Path extends AppRoute['path']>() {
  */
 export function useAppHashParams<const Path extends AppRoute['path']>() {
   const routeKey = useAppRouteKey();
-  return useAppRoutesRuntimeStore(s => findRouteSnapshotFromKey<Path>(s, routeKey)?.hash);
+  return useAppRouteLocationsStore(s => findRouteSnapshotFromKey<Path>(s, routeKey)?.hash);
 }

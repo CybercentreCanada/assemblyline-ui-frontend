@@ -49,7 +49,7 @@ import {
   findAppRouteValuesFromKey,
   findRouteSnapshotFromKey,
   findRouteSpecFromLocation,
-  getAppRoutesRuntimeStateFromApi,
+  getAppRouteLocationsStateFromApi,
   getExternalHrefFromLocation,
   getExternalHrefFromSnapshot,
   getRouteIdFromLocation,
@@ -57,33 +57,13 @@ import {
   getRouteLocationFromValues,
   sanitizeRouteLocation,
   useAppRouteKey,
-  useAppRoutesRuntimeStoreApi
+  useAppRouteLocationsStoreApi
 } from 'core/routes';
 import type { DependencyList } from 'react';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import type { Location, NavigateOptions } from 'react-router';
 import { useLocation, useNavigate } from 'react-router';
 import { generateRandomUUID } from 'shared/utils/app.utils';
-
-//*****************************************************************************************
-// useAppBlocker
-//*****************************************************************************************
-
-export function useAppBlocker(shouldBlock: boolean | (() => boolean), dependencies: DependencyList = null) {
-  const routeKey = useAppRouteKey();
-  const setNavigationStore = useAppSetNavigationStore();
-
-  useEffect(
-    () =>
-      setNavigationStore(store => {
-        if (!routeKey) return store;
-        const isBlocked = typeof shouldBlock === 'function' ? shouldBlock() : shouldBlock;
-        return isBlocked ? addBlockedRoute(store, routeKey) : removeBlockedRoute(store, routeKey);
-      }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    dependencies ? [routeKey, setNavigationStore, ...dependencies] : [routeKey, setNavigationStore, shouldBlock]
-  );
-}
 
 //*****************************************************************************************
 // useAppExternalHref
@@ -93,7 +73,7 @@ export function useAppExternalHref<const Path extends AppRoute['path']>(
   to: InferNavigationInputFromPath<Path>
 ): AppRouteLocation['href'] {
   const routeKey = useAppRouteKey();
-  const routesRuntimeStoreApi = useAppRoutesRuntimeStoreApi();
+  const routeLocationsStoreApi = useAppRouteLocationsStoreApi();
   const routerStoreApi = useAppRouterStoreApi();
   const preferenceStoreApi = useAppPreferenceStoreApi();
 
@@ -102,7 +82,7 @@ export function useAppExternalHref<const Path extends AppRoute['path']>(
       const { key, dispatch } = getNavigationMapFromInput(to);
       if (!key) return null;
 
-      const runtimeState = getAppRoutesRuntimeStateFromApi(routesRuntimeStoreApi);
+      const runtimeState = getAppRouteLocationsStateFromApi(routeLocationsStoreApi);
       const preferenceState = getAppPreferenceStateFromApi(preferenceStoreApi);
       const routerState = getAppRouterStateFromApi(routerStoreApi);
 
@@ -145,27 +125,27 @@ export function useAppExternalHref<const Path extends AppRoute['path']>(
 // useAppNavigate
 //*****************************************************************************************
 
-export function useAppNavigate<const SourcePath extends AppRoute['path']>() {
+export function useAppNavigate<const Origin extends AppRoute['path']>() {
   const routeKey = useAppRouteKey();
-  const routesRuntimeStoreApi = useAppRoutesRuntimeStoreApi();
+  const routeLocationsStoreApi = useAppRouteLocationsStoreApi();
   const routerStoreApi = useAppRouterStoreApi();
   const preferenceStoreApi = useAppPreferenceStoreApi();
   const setNavigationStore = useAppSetNavigationStore();
 
   const openRoute = useCallback(
-    function <const TargetPath extends AppRoute['path']>(
-      to: InferNavigationIntentFromPath<TargetPath>['openRoute'],
+    function <const Destination extends AppRoute['path']>(
+      to: InferNavigationIntentFromPath<Destination>['openRoute'],
       { replace = false }: NavigateOptions = DEFAULT_NAVIGATE_OPTIONS
     ) {
-      const runtimeState = getAppRoutesRuntimeStateFromApi(routesRuntimeStoreApi);
+      const runtimeState = getAppRouteLocationsStateFromApi(routeLocationsStoreApi);
       const preferenceState = getAppPreferenceStateFromApi(preferenceStoreApi);
       const routerState = getAppRouterStateFromApi(routerStoreApi);
 
       const nextRouteKey = findNextRouteKey(routerState, routeKey, preferenceState);
       const prevId = getRouteIdFromLocation(getRouteFromKey(routerState, nextRouteKey));
-      const prevAppRouteValues = findAppRouteValuesFromKey<TargetPath>(runtimeState, nextRouteKey);
+      const prevAppRouteValues = findAppRouteValuesFromKey<Destination>(runtimeState, nextRouteKey);
       const nextAppRouteValues = applyNavigationDispatch(to, prevAppRouteValues);
-      const nextLocation = getRouteLocationFromValues<TargetPath>(runtimeState, nextAppRouteValues);
+      const nextLocation = getRouteLocationFromValues<Destination>(runtimeState, nextAppRouteValues);
       const nextId = getRouteIdFromLocation(nextLocation);
 
       if (!nextLocation?.href || prevId === nextId) return;
@@ -181,22 +161,22 @@ export function useAppNavigate<const SourcePath extends AppRoute['path']>() {
         return store;
       });
     },
-    [preferenceStoreApi, routeKey, routesRuntimeStoreApi, routerStoreApi, setNavigationStore]
+    [preferenceStoreApi, routeKey, routeLocationsStoreApi, routerStoreApi, setNavigationStore]
   );
 
   const replaceRoute = useCallback(
     function (
-      to: InferNavigationIntentFromPath<SourcePath>['replaceRoute'],
+      to: InferNavigationIntentFromPath<Origin>['replaceRoute'],
       { replace = false }: NavigateOptions = DEFAULT_NAVIGATE_OPTIONS
     ) {
-      const runtimeState = getAppRoutesRuntimeStateFromApi(routesRuntimeStoreApi);
+      const runtimeState = getAppRouteLocationsStateFromApi(routeLocationsStoreApi);
       const preferenceState = getAppPreferenceStateFromApi(preferenceStoreApi);
       const routerState = getAppRouterStateFromApi(routerStoreApi);
 
       const prevId = getRouteIdFromLocation(getRouteFromKey(routerState, routeKey));
-      const prevAppRouteValues = findAppRouteValuesFromKey<SourcePath>(runtimeState, routeKey);
+      const prevAppRouteValues = findAppRouteValuesFromKey<Origin>(runtimeState, routeKey);
       const nextAppRouteValues = applyNavigationDispatch(to, prevAppRouteValues);
-      const nextLocation = getRouteLocationFromValues<SourcePath>(runtimeState, nextAppRouteValues);
+      const nextLocation = getRouteLocationFromValues<Origin>(runtimeState, nextAppRouteValues);
       const nextId = getRouteIdFromLocation(nextLocation);
 
       if (!nextLocation?.href || prevId === nextId) return;
@@ -210,22 +190,22 @@ export function useAppNavigate<const SourcePath extends AppRoute['path']>() {
         return store;
       });
     },
-    [preferenceStoreApi, routeKey, routesRuntimeStoreApi, routerStoreApi, setNavigationStore]
+    [preferenceStoreApi, routeKey, routeLocationsStoreApi, routerStoreApi, setNavigationStore]
   );
 
   const replaceSearchObject = useCallback(
     function (
-      to: InferNavigationIntentFromPath<SourcePath>['replaceSearchObject'],
+      to: InferNavigationIntentFromPath<Origin>['replaceSearchObject'],
       { replace = false }: NavigateOptions = DEFAULT_NAVIGATE_OPTIONS
     ) {
-      const runtimeState = getAppRoutesRuntimeStateFromApi(routesRuntimeStoreApi);
+      const runtimeState = getAppRouteLocationsStateFromApi(routeLocationsStoreApi);
       const preferenceState = getAppPreferenceStateFromApi(preferenceStoreApi);
       const routerState = getAppRouterStateFromApi(routerStoreApi);
 
       const prevId = getRouteIdFromLocation(getRouteFromKey(routerState, routeKey));
-      let snapshot = findRouteSnapshotFromKey<SourcePath>(runtimeState, routeKey);
+      let snapshot = findRouteSnapshotFromKey<Origin>(runtimeState, routeKey);
       const nextSearchObject = applyNavigationDispatch(to as never, snapshot.search.toObject());
-      snapshot = applyRouteLocationSearchToSnapshot<SourcePath>(runtimeState, snapshot, nextSearchObject as never);
+      snapshot = applyRouteLocationSearchToSnapshot<Origin>(runtimeState, snapshot, nextSearchObject as never);
       const nextLocation = getRouteLocationFromSnapshot(runtimeState, snapshot);
       const nextId = getRouteIdFromLocation(nextLocation);
 
@@ -240,22 +220,22 @@ export function useAppNavigate<const SourcePath extends AppRoute['path']>() {
         return store;
       });
     },
-    [preferenceStoreApi, routeKey, routesRuntimeStoreApi, routerStoreApi, setNavigationStore]
+    [preferenceStoreApi, routeKey, routeLocationsStoreApi, routerStoreApi, setNavigationStore]
   );
 
   const replaceURLSearchParams = useCallback(
     function (
-      to: InferNavigationIntentFromPath<SourcePath>['replaceURLSearchParams'],
+      to: InferNavigationIntentFromPath<Origin>['replaceURLSearchParams'],
       { replace = false }: NavigateOptions = DEFAULT_NAVIGATE_OPTIONS
     ) {
-      const runtimeState = getAppRoutesRuntimeStateFromApi(routesRuntimeStoreApi);
+      const runtimeState = getAppRouteLocationsStateFromApi(routeLocationsStoreApi);
       const preferenceState = getAppPreferenceStateFromApi(preferenceStoreApi);
       const routerState = getAppRouterStateFromApi(routerStoreApi);
 
       const prevId = getRouteIdFromLocation(getRouteFromKey(routerState, routeKey));
-      let snapshot = findRouteSnapshotFromKey<SourcePath>(runtimeState, routeKey);
+      let snapshot = findRouteSnapshotFromKey<Origin>(runtimeState, routeKey);
       const prevSearchParams = applyNavigationDispatch(to as never, snapshot.search.toParams());
-      snapshot = applyRouteLocationSearchToSnapshot<SourcePath>(runtimeState, snapshot, prevSearchParams);
+      snapshot = applyRouteLocationSearchToSnapshot<Origin>(runtimeState, snapshot, prevSearchParams);
       const nextLocation = getRouteLocationFromSnapshot(runtimeState, snapshot);
       const nextId = getRouteIdFromLocation(nextLocation);
 
@@ -270,12 +250,12 @@ export function useAppNavigate<const SourcePath extends AppRoute['path']>() {
         return store;
       });
     },
-    [preferenceStoreApi, routeKey, routesRuntimeStoreApi, routerStoreApi, setNavigationStore]
+    [preferenceStoreApi, routeKey, routeLocationsStoreApi, routerStoreApi, setNavigationStore]
   );
 
   const closePanel = useCallback(
     function (
-      panelKey: InferNavigationIntentFromPath<SourcePath>['closePanel'],
+      panelKey: InferNavigationIntentFromPath<Origin>['closePanel'],
       { replace = false }: NavigateOptions = DEFAULT_NAVIGATE_OPTIONS
     ) {
       const preferenceState = getAppPreferenceStateFromApi(preferenceStoreApi);
@@ -295,12 +275,12 @@ export function useAppNavigate<const SourcePath extends AppRoute['path']>() {
   );
 
   const run = useCallback(
-    function <const TargetPath extends AppRoute['path']>(to: InferNavigationInputFromPath<TargetPath>) {
-      const { key, dispatch, options } = getNavigationMapFromInput<TargetPath>(to);
+    function <const Destination extends AppRoute['path']>(to: InferNavigationInputFromPath<Destination>) {
+      const { key, dispatch, options } = getNavigationMapFromInput<Destination>(to);
 
       switch (key) {
         case 'openRoute':
-          openRoute<TargetPath>(dispatch, options);
+          openRoute<Destination>(dispatch, options);
           break;
         case 'replaceRoute':
           replaceRoute(dispatch, options);
@@ -330,7 +310,7 @@ export function useAppSyncNavigationStoreFromLocation() {
   const location = useLocation() as Location<AppLocationState>;
   const preferenceStoreApi = useAppPreferenceStoreApi();
   const routerStoreApi = useAppRouterStoreApi();
-  const routesRuntimeStoreApi = useAppRoutesRuntimeStoreApi();
+  const routeLocationsStoreApi = useAppRouteLocationsStoreApi();
   const setNavigationStore = useAppSetNavigationStore();
 
   const getNavigationFromLocationState = useCallback(
@@ -338,7 +318,7 @@ export function useAppSyncNavigationStoreFromLocation() {
       setNavigationStore(store => {
         const preferenceState = getAppPreferenceStateFromApi(preferenceStoreApi);
         const routerState = getAppRouterStateFromApi(routerStoreApi);
-        const runtimeState = getAppRoutesRuntimeStateFromApi(routesRuntimeStoreApi);
+        const runtimeState = getAppRouteLocationsStateFromApi(routeLocationsStoreApi);
 
         let nextStore = getNavigationStoreFromRouter(store, routerState);
 
@@ -368,7 +348,7 @@ export function useAppSyncNavigationStoreFromLocation() {
 
         return nextStore;
       }),
-    [location, preferenceStoreApi, routerStoreApi, routesRuntimeStoreApi, setNavigationStore]
+    [location, preferenceStoreApi, routerStoreApi, routeLocationsStoreApi, setNavigationStore]
   );
 
   const getNavigationFromLocationHash = useCallback(
@@ -376,7 +356,7 @@ export function useAppSyncNavigationStoreFromLocation() {
       setNavigationStore(store => {
         const preferenceState = getAppPreferenceStateFromApi(preferenceStoreApi);
         const routerState = getAppRouterStateFromApi(routerStoreApi);
-        const runtimeState = getAppRoutesRuntimeStateFromApi(routesRuntimeStoreApi);
+        const runtimeState = getAppRouteLocationsStateFromApi(routeLocationsStoreApi);
 
         let nextStore = getNavigationStoreFromRouter(store, routerState);
 
@@ -415,7 +395,7 @@ export function useAppSyncNavigationStoreFromLocation() {
 
         return nextStore;
       }),
-    [location, preferenceStoreApi, routerStoreApi, routesRuntimeStoreApi, setNavigationStore]
+    [location, preferenceStoreApi, routerStoreApi, routeLocationsStoreApi, setNavigationStore]
   );
 
   const getNavigationFromLegacyLocation = useCallback(
@@ -423,7 +403,7 @@ export function useAppSyncNavigationStoreFromLocation() {
       setNavigationStore(store => {
         const preferenceState = getAppPreferenceStateFromApi(preferenceStoreApi);
         const routerState = getAppRouterStateFromApi(routerStoreApi);
-        const runtimeState = getAppRoutesRuntimeStateFromApi(routesRuntimeStoreApi);
+        const runtimeState = getAppRouteLocationsStateFromApi(routeLocationsStoreApi);
 
         let nextStore = getNavigationStoreFromRouter(store, routerState);
 
@@ -463,11 +443,11 @@ export function useAppSyncNavigationStoreFromLocation() {
 
         return nextStore;
       }),
-    [location, preferenceStoreApi, routerStoreApi, routesRuntimeStoreApi, setNavigationStore]
+    [location, preferenceStoreApi, routerStoreApi, routeLocationsStoreApi, setNavigationStore]
   );
 
   useEffect(() => {
-    const runtimeState = getAppRoutesRuntimeStateFromApi(routesRuntimeStoreApi);
+    const runtimeState = getAppRouteLocationsStateFromApi(routeLocationsStoreApi);
     if (!Object.entries(runtimeState.specs || {}).length) return;
 
     const routerState = getAppRouterStateFromApi(routerStoreApi);
@@ -487,7 +467,7 @@ export function useAppSyncNavigationStoreFromLocation() {
     getNavigationFromLocationState,
     location,
     routerStoreApi,
-    routesRuntimeStoreApi
+    routeLocationsStoreApi
   ]);
 
   return null;
@@ -500,7 +480,7 @@ export function useAppSyncRouterStoreFromNavigation() {
   const navigate = useNavigate();
   const navigationStoreApi = useAppNavigationStoreApi();
   const preferenceStoreApi = useAppPreferenceStoreApi();
-  const routesRuntimeStoreApi = useAppRoutesRuntimeStoreApi();
+  const routeLocationsStoreApi = useAppRouteLocationsStoreApi();
   const setNavigationStore = useAppSetNavigationStore();
   const setRouterStore = useAppSetRouterStore();
 
@@ -509,7 +489,7 @@ export function useAppSyncRouterStoreFromNavigation() {
       if (!hasRoutes(navigation) || hasBlockedRoutes(navigation)) return;
 
       const preferenceState = getAppPreferenceStateFromApi(preferenceStoreApi);
-      const runtimeState = getAppRoutesRuntimeStateFromApi(routesRuntimeStoreApi);
+      const runtimeState = getAppRouteLocationsStateFromApi(routeLocationsStoreApi);
 
       const firstRoute = getRouteFromPanelKey(navigation, 0);
       const firstRouteSpec = findRouteSpecFromLocation(runtimeState, firstRoute);
@@ -528,7 +508,7 @@ export function useAppSyncRouterStoreFromNavigation() {
       });
       setNavigationStore(clearNavigationStore);
     },
-    [navigate, preferenceStoreApi, routesRuntimeStoreApi, setNavigationStore, setRouterStore]
+    [navigate, preferenceStoreApi, routeLocationsStoreApi, setNavigationStore, setRouterStore]
   );
 
   useEffect(() => {
@@ -537,6 +517,26 @@ export function useAppSyncRouterStoreFromNavigation() {
   }, [navigationStoreApi, updateRouterStoreFromNavigation]);
 
   return null;
+}
+
+//*****************************************************************************************
+// useAppBlocker
+//*****************************************************************************************
+
+export function useAppBlocker(shouldBlock: boolean | (() => boolean), dependencies: DependencyList = null) {
+  const routeKey = useAppRouteKey();
+  const setNavigationStore = useAppSetNavigationStore();
+
+  useEffect(
+    () =>
+      setNavigationStore(store => {
+        if (!routeKey) return store;
+        const isBlocked = typeof shouldBlock === 'function' ? shouldBlock() : shouldBlock;
+        return isBlocked ? addBlockedRoute(store, routeKey) : removeBlockedRoute(store, routeKey);
+      }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [routeKey, setNavigationStore, ...(dependencies ?? [shouldBlock])]
+  );
 }
 
 //*****************************************************************************************

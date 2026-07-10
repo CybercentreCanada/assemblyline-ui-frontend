@@ -150,11 +150,11 @@ export type InferNavigationIntentFromPath<Path extends AppRoute['path']> = {
   closePanel: number;
 };
 
-/** Tuple form `[key, value, dependencies?, options?]` for DX-friendly navigation intent metadata. */
+/** Tuple form `[Operation, value, dependencies?, options?]` for DX-friendly navigation intent metadata. */
 export type InferNavigationInputFromPath<Path extends AppRoute['path']> = {
-  [Key in keyof InferNavigationIntentFromPath<Path>]: readonly [
-    key: Key,
-    dispatch: InferNavigationIntentFromPath<Path>[Key],
+  [Operation in keyof InferNavigationIntentFromPath<Path>]: readonly [
+    Operation: Operation,
+    dispatch: InferNavigationIntentFromPath<Path>[Operation],
     dependencies?: DependencyList,
     options?: NavigateOptions
   ];
@@ -162,9 +162,9 @@ export type InferNavigationInputFromPath<Path extends AppRoute['path']> = {
 
 /** Normalized parsed navigation payload used by parseNavigationInput. */
 export type InferNavigationMapFromPath<Path extends AppRoute['path']> = {
-  [Key in keyof InferNavigationIntentFromPath<Path>]: {
-    key: Key;
-    dispatch: InferNavigationIntentFromPath<Path>[Key];
+  [Operation in keyof InferNavigationIntentFromPath<Path>]: {
+    Operation: Operation;
+    dispatch: InferNavigationIntentFromPath<Path>[Operation];
     dependencies: DependencyList | null;
     options: NavigateOptions | null;
   };

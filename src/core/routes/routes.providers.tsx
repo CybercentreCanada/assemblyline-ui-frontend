@@ -1,6 +1,6 @@
 import type { AppRouterStore } from 'core/router';
 import { useAppRouterStoreApi } from 'core/router';
-import type { AppRoutesRuntimeStore } from 'core/routes';
+import type { AppRouteLocationsStore } from 'core/routes';
 import { setRouteSpecsFromAppRoutes, syncRouteSnapshotsFromRouter } from 'core/routes';
 import { createAppStore } from 'features/store/createAppStore';
 import type { ReactNode } from 'react';
@@ -8,46 +8,46 @@ import { memo, useCallback, useEffect } from 'react';
 import type { StoreApi } from 'zustand';
 
 //*****************************************************************************************
-// App Routes Runtime Provider
+// App Route Locations Provider
 //*****************************************************************************************
 
-export const DEFAULT_APP_ROUTES_RUNTIME_STORE: AppRoutesRuntimeStore = {
+export const DEFAULT_APP_ROUTE_LOCATIONS_STORE: AppRouteLocationsStore = {
   specs: null,
-  snapshots: {}
+  locations: {}
 };
 
 export const {
-  StoreProvider: AppRoutesRuntimeStoreProvider,
-  useStore: useAppRoutesRuntimeStore,
-  useSetStore: useAppSetRoutesRuntimeStore,
-  useStoreApi: useAppRoutesRuntimeStoreApi
-} = createAppStore<AppRoutesRuntimeStore>(DEFAULT_APP_ROUTES_RUNTIME_STORE);
+  StoreProvider: AppRouteLocationsStoreProvider,
+  useStore: useAppRouteLocationsStore,
+  useSetStore: useAppSetRouteLocationsStore,
+  useStoreApi: useAppRouteLocationsStoreApi
+} = createAppStore<AppRouteLocationsStore>(DEFAULT_APP_ROUTE_LOCATIONS_STORE);
 
-AppRoutesRuntimeStoreProvider.displayName = 'AppRoutesRuntimeStoreProvider';
+AppRouteLocationsStoreProvider.displayName = 'AppRouteLocationsStoreProvider';
 
-export const getAppRoutesRuntimeStateFromApi = (api: StoreApi<AppRoutesRuntimeStore>): AppRoutesRuntimeStore => {
-  return api?.getState() || DEFAULT_APP_ROUTES_RUNTIME_STORE;
+export const getAppRouteLocationsStateFromApi = (api: StoreApi<AppRouteLocationsStore>): AppRouteLocationsStore => {
+  return api?.getState() || DEFAULT_APP_ROUTE_LOCATIONS_STORE;
 };
 
-export type AppRoutesRuntimeProviderProps = {
+export type AppRouteLocationsProviderProps = {
   /** All of the app's created routes */
   appRoutes: AppRoutes;
   /** Provider children. */
   children: ReactNode;
 };
 
-const AppRoutesRuntimeSync = memo(({ appRoutes }: Omit<AppRoutesRuntimeProviderProps, 'children'>) => {
-  const setRouteRuntimeStore = useAppSetRoutesRuntimeStore();
+const AppRouteLocationsSync = memo(({ appRoutes }: Omit<AppRouteLocationsProviderProps, 'children'>) => {
+  const setRouteLocationsStore = useAppSetRouteLocationsStore();
   const routerStoreApi = useAppRouterStoreApi();
 
   const commitRouterToLocation = useCallback(
-    (router: AppRouterStore) => setRouteRuntimeStore(s => syncRouteSnapshotsFromRouter(s, router)),
-    [setRouteRuntimeStore]
+    (router: AppRouterStore) => setRouteLocationsStore(s => syncRouteSnapshotsFromRouter(s, router)),
+    [setRouteLocationsStore]
   );
 
   useEffect(() => {
-    setRouteRuntimeStore(s => setRouteSpecsFromAppRoutes(s, appRoutes));
-  }, [appRoutes, setRouteRuntimeStore]);
+    setRouteLocationsStore(s => setRouteSpecsFromAppRoutes(s, appRoutes));
+  }, [appRoutes, setRouteLocationsStore]);
 
   useEffect(() => {
     if (!routerStoreApi) return;
@@ -58,16 +58,16 @@ const AppRoutesRuntimeSync = memo(({ appRoutes }: Omit<AppRoutesRuntimeProviderP
   return null;
 });
 
-AppRoutesRuntimeSync.displayName = 'AppRoutesRuntimeSync';
+AppRouteLocationsSync.displayName = 'AppRouteLocationsSync';
 
-export const AppRoutesRuntimeProvider = memo(({ children, appRoutes }: AppRoutesRuntimeProviderProps) => (
+export const AppRouteLocationsProvider = memo(({ children, appRoutes }: AppRouteLocationsProviderProps) => (
   <>
-    <AppRoutesRuntimeSync appRoutes={appRoutes} />
+    <AppRouteLocationsSync appRoutes={appRoutes} />
     {children}
   </>
 ));
 
-AppRoutesRuntimeProvider.displayName = 'AppRoutesRuntimeProvider';
+AppRouteLocationsProvider.displayName = 'AppRouteLocationsProvider';
 
 //*****************************************************************************************
 // App Route Key Provider

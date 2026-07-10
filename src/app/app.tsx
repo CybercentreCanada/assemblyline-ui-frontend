@@ -13,7 +13,7 @@ import {
   AppRouterProvider,
   AppRouterStoreProvider
 } from 'core/router';
-import { AppRoutesRuntimeProvider, AppRoutesRuntimeStoreProvider } from 'core/routes';
+import { AppRouteLocationsProvider, AppRouteLocationsStoreProvider } from 'core/routes';
 import { AppSnackbarProvider } from 'core/snackbar';
 import { AppTemplateLayout, AppTemplateProvider } from 'core/template';
 import { AppThemeProvider } from 'core/theme';
@@ -145,11 +145,11 @@ const AppProviders = memo(({ children }: PropsWithChildren) => (
             <AssistantProvider>
               <AppRouterProvider>
                 <AppNavigationProvider>
-                  <AppRoutesRuntimeProvider appRoutes={APP_ROUTES}>
+                  <AppRouteLocationsProvider appRoutes={APP_ROUTES}>
                     <AppCarouselProvider>
                       <>{children}</>
                     </AppCarouselProvider>
-                  </AppRoutesRuntimeProvider>
+                  </AppRouteLocationsProvider>
                 </AppNavigationProvider>
               </AppRouterProvider>
             </AssistantProvider>
@@ -172,9 +172,9 @@ const AppStores = memo(({ children }: PropsWithChildren) => (
       <AppPreferenceStoreProvider>
         <AppRouterStoreProvider>
           <AppNavigationStoreProvider>
-            <AppRoutesRuntimeStoreProvider>
+            <AppRouteLocationsStoreProvider>
               <>{children}</>
-            </AppRoutesRuntimeStoreProvider>
+            </AppRouteLocationsStoreProvider>
           </AppNavigationStoreProvider>
         </AppRouterStoreProvider>
       </AppPreferenceStoreProvider>

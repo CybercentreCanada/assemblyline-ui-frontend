@@ -1192,7 +1192,7 @@ export const addBlockedRoute = (
   store: AppNavigationStore,
   routeKey: keyof AppNavigationStore['routes']
 ): AppNavigationStore => {
-  if (!(routeKey in store.routes) || routeKey in store.blockedRoutes) return store;
+  if (!routeKey || routeKey in store.blockedRoutes) return store;
   store.blockedRoutes[routeKey] = null;
   return store;
 };

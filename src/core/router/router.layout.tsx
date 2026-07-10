@@ -1,5 +1,5 @@
 import { findNode, isRouteVisible, useAppRouterStore } from 'core/router';
-import { AppRouteKeyProvider, findRouteSpecFromKey, useAppRoutesRuntimeStore } from 'core/routes';
+import { AppRouteKeyProvider, findRouteSpecFromKey, useAppRouteLocationsStore } from 'core/routes';
 import { InPortal, OutPortal } from 'features/portal';
 import type { PropsWithChildren } from 'react';
 import { Activity, memo } from 'react';
@@ -14,7 +14,7 @@ export type AppRouterRouteProps = {
 };
 
 export const AppRouterRoute = memo(({ routeKey }: AppRouterRouteProps) => {
-  const element = useAppRoutesRuntimeStore(s => findRouteSpecFromKey(s, routeKey)?.element);
+  const element = useAppRouteLocationsStore(s => findRouteSpecFromKey(s, routeKey)?.element);
   const visible = useAppRouterStore(s => isRouteVisible(s, routeKey));
 
   return !routeKey || !element ? null : (

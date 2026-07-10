@@ -60,12 +60,12 @@ export type InferAppRouteSpecFromPath<Path extends AppRoute['path']> = {
 }[Path];
 
 //*****************************************************************************************
-// App Route Snapshot
+// App Route Location
 //*****************************************************************************************
 
 /** Snapshot of pre-calculated route values resolved from the current location state. */
 // prettier-ignore
-export type InferAppRouteSnapshotFromPath<Path extends AppRoute['path']> = {
+export type InferAppRouteLocationFromPath<Path extends AppRoute['path']> = {
   /** Stable location signature built from href and state. */
   id: string ;
 
@@ -83,7 +83,7 @@ export type InferAppRouteSnapshotFromPath<Path extends AppRoute['path']> = {
 };
 
 /** Default empty location snapshot for a route entry. */
-export const DEFAULT_APP_ROUTE_SNAPSHOT: InferAppRouteSnapshotFromPath<AppRoute['path']> = {
+export const DEFAULT_APP_ROUTE_SNAPSHOT: InferAppRouteLocationFromPath<AppRoute['path']> = {
   id: '',
   path: null,
   params: null,
@@ -129,13 +129,13 @@ export type InferAppRouteValuesFromPath<Path extends AppRoute["path"]> =
     : never
 
 //*****************************************************************************************
-// App Routes Runtime
+// App Route Locations
 //*****************************************************************************************
 
 /** Store containing route-keyed location snapshots for all open routes. */
-export type AppRoutesRuntimeStore = {
+export type AppRouteLocationsStore = {
   /** Full application route registry keyed by route path (canonical known routes, not only active ones). */
   specs: Record<AppRoute['path'], AppRoute>;
   /** Parsed snapshots keyed by router route key for currently active routes (latest params/search/hash). */
-  snapshots: Record<string, InferAppRouteSnapshotFromPath<AppRoute['path']>>;
+  locations: Record<string, InferAppRouteLocationFromPath<AppRoute['path']>>;
 };
