@@ -21,20 +21,7 @@ export const useAppTemplateLeftNavMenu = () => {
   const leftNav = useAppLeftNavMenu();
 
   const mapItem = useCallback((item: AppLeftNavItem): AppTemplateLeftNavMenuItem => {
-    const {
-      divider = false,
-      id,
-      label,
-      icon,
-      from,
-      here,
-      to,
-      at,
-      navOptions,
-      navDeps,
-      preventRender = false,
-      items = null
-    } = item;
+    const { divider = false, id, label, icon, nav, navDeps, preventRender = false, items = null } = item;
 
     if (divider) {
       return {
@@ -59,18 +46,7 @@ export const useAppTemplateLeftNavMenu = () => {
       type: 'slot',
       withProps: true,
       render: (navOpen, navProps) => (
-        <LeftNavRoute
-          primary={label}
-          from={from}
-          here={here}
-          to={to}
-          at={at}
-          navOptions={navOptions}
-          navDeps={navDeps}
-          icon={icon}
-          navOpen={navOpen}
-          navProps={navProps}
-        />
+        <LeftNavRoute primary={label} nav={nav} navDeps={navDeps} icon={icon} navOpen={navOpen} navProps={navProps} />
       )
     };
   }, []);

@@ -1,7 +1,7 @@
 import type { AppRouterStore } from 'core/router';
 import { useAppRouterStoreApi } from 'core/router';
 import type { AppLocationParamStore } from 'core/routes';
-import { getDefaultLocationParamStore, setRouteSpecsFromAppRoutes, syncRouteParamsFromRouter } from 'core/routes';
+import { setRouteSpecsFromAppRoutes, syncRouteParamsFromRouter } from 'core/routes';
 import { createAppStore } from 'features/store/createAppStore';
 import type { ReactNode } from 'react';
 import { memo, useCallback, useEffect } from 'react';
@@ -9,6 +9,10 @@ import { memo, useCallback, useEffect } from 'react';
 //*****************************************************************************************
 // App Location Param Provider
 //*****************************************************************************************
+
+export const getDefaultLocationParamStore = function (): AppLocationParamStore {
+  return { specs: null, params: {} };
+};
 
 export const {
   StoreProvider: AppLocationParamStoreProvider,

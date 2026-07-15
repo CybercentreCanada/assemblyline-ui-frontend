@@ -74,15 +74,15 @@ const WrappedSubmissionsTable: React.FC<Props> = ({ submissionResults, allowSort
             {submissionResults.items.map((submission, id) => (
               <LinkRow
                 key={`${submission.id}-${id}`}
-                to={{
-                  create: {
+                nav={s =>
+                  s.to().create({
                     route:
                       submission.state !== 'completed' || submissionView !== 'report'
                         ? '/submission/detail/:id'
                         : '/submission/report/:id',
                     path: { id: submission.id }
-                  }
-                }}
+                  })
+                }
                 navDeps={[submission.state, submissionView, submission.id]}
                 hover
                 style={{ textDecoration: 'none' }}

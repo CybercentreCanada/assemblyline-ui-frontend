@@ -9,8 +9,8 @@ import type { CircularProgressProps } from 'ui/buttons/CircularProgress';
 import { CircularProgress } from 'ui/buttons/CircularProgress';
 import { Tooltip } from 'ui/Tooltip';
 
-export type IconButtonProps<Path extends AppRoute['route']> = MuiIconButtonProps &
-  InferAppNavigationPropsFromPath<Path> & {
+export type IconButtonProps<Origin extends AppRoute['route']> = MuiIconButtonProps &
+  InferAppNavigationPropsFromPath<Origin> & {
     loading?: boolean;
     preventRender?: boolean | (() => boolean);
     progress?: CircularProgressProps['progress'];
@@ -18,7 +18,7 @@ export type IconButtonProps<Path extends AppRoute['route']> = MuiIconButtonProps
     tooltipProps?: Omit<TooltipProps, 'children' | 'title'>;
   };
 
-export const IconButton = memo(function <Path extends AppRoute['route'] = AppRoute['route']>({
+export const IconButton = memo(function <Origin extends AppRoute['route']>({
   children = null,
   color = null,
   disabled = false,
@@ -27,16 +27,12 @@ export const IconButton = memo(function <Path extends AppRoute['route'] = AppRou
   preventRender: preventRenderProp = false,
   progress = false,
   size = 'medium',
-  to = null,
-  here = null,
-  from = null,
-  at = null,
+  nav = null,
   navDeps = null,
-  navOptions = null,
   tooltip = null,
   tooltipProps = null,
   ...props
-}: IconButtonProps<Path>) {
+}: IconButtonProps<Origin>) {
   const theme = useTheme();
 
   const preventRender = useMemo<boolean>(
@@ -80,7 +76,7 @@ export const IconButton = memo(function <Path extends AppRoute['route'] = AppRou
         disabled={disabled || progress !== false}
         size={size}
         {...props}
-        {...(!to && !here && !from && !at ? null : { component: AppLink, to, here, from, at, navDeps, navOptions })}
+        {...(!nav ? null : { component: AppLink, nav, navDeps })}
         sx={{ height: 'fit-content', color: resolvedColor, ...props?.sx }}
       >
         {children}

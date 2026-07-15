@@ -1,3 +1,4 @@
+import type { useAppNavigate } from 'core/router';
 import type { InferAppRouteValuesFromPath } from 'core/routes';
 import type { ReversePortalNode } from 'features/portal';
 import { createReversePortalNode } from 'features/portal';
@@ -161,48 +162,20 @@ export const DEFAULT_APP_NAVIGATE_OPTIONS: AppNavigateOptions = {
   viewTransition: false
 };
 
-type ExactlyOneKey<T extends Record<string, unknown>> = {
-  [K in keyof T]: { [P in K]-?: T[P] } & { [P in Exclude<keyof T, K>]?: never };
-}[keyof T];
-
-export type InferAppNavigationOperationMapFromPath<Path extends AppRoute['route']> = {
+export type InferAppNavigationOperationMapFromPath<Origin extends AppRoute['route']> = {
   create:
     | InferAppRouteValuesFromPath<AppRoute['route']>
-    | ((props: InferAppRouteValuesFromPath<Path>) => InferAppRouteValuesFromPath<AppRoute['route']>);
+    | ((props: InferAppRouteValuesFromPath<Origin>) => InferAppRouteValuesFromPath<AppRoute['route']>);
   update:
     | InferAppRouteValuesFromPath<AppRoute['route']>
-    | ((props: InferAppRouteValuesFromPath<Path>) => InferAppRouteValuesFromPath<AppRoute['route']>);
-  delete: boolean | ((props: InferAppRouteValuesFromPath<Path>) => boolean);
+    | ((props: InferAppRouteValuesFromPath<Origin>) => InferAppRouteValuesFromPath<AppRoute['route']>);
+  delete: boolean | ((props: InferAppRouteValuesFromPath<Origin>) => boolean);
 };
 
-// export type InferAppNavigationOperationObjectFromPath<Path extends AppRoute['route']> = ExactlyOneKey<{
-//   create: InferAppNavigationOperationMapFromPath<Path>['create'];
-//   update: InferAppNavigationOperationMapFromPath<Path>['update'];
-//   delete: InferAppNavigationOperationMapFromPath<Path>['delete'];
-// }>;
-
-// export type AppNavigationTarget = 'from' | 'here' | 'to' | 'at';
-
-// export type AppNavigationOperation = 'create' | 'update' | 'delete';
-
-export type InferAppNavigationIntentMapFromPath<Path extends AppRoute['route']> = {
-  from: InferAppNavigationOperationMapFromPath<Path>;
-  here: InferAppNavigationOperationMapFromPath<Path>;
-  to: InferAppNavigationOperationMapFromPath<Path>;
-  at: { panelKey: number } & InferAppNavigationOperationMapFromPath<Path>;
-};
-
-export type InferAppNavigationPropsFromPath<Path extends AppRoute['route']> = {
+export type InferAppNavigationPropsFromPath<Origin extends AppRoute['route']> = {
+  nav?: (navigate: ReturnType<typeof useAppNavigate<Origin>>) => void;
   navDeps?: DependencyList;
-  navOptions?: AppNavigateOptions;
-} & Partial<
-  ExactlyOneKey<{
-    from: ExactlyOneKey<InferAppNavigationOperationMapFromPath<Path>>;
-    here: ExactlyOneKey<InferAppNavigationOperationMapFromPath<Path>>;
-    to: ExactlyOneKey<InferAppNavigationOperationMapFromPath<Path>>;
-    at: { panelKey: number } & ExactlyOneKey<InferAppNavigationOperationMapFromPath<Path>>;
-  }>
->;
+};
 
 //*****************************************************************************************
 // Navigation Store

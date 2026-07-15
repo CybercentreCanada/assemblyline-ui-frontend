@@ -1,14 +1,14 @@
 import type { ButtonProps as MuiButtonProps, TooltipProps } from '@mui/material';
 import { Button as MuiButton, Skeleton } from '@mui/material';
 import type { InferAppNavigationPropsFromPath } from 'core/router';
-import { AppLink, DEFAULT_APP_NAVIGATE_OPTIONS } from 'core/router';
+import { AppLink } from 'core/router';
 import { memo, useMemo } from 'react';
 import { getTextContent } from 'shared/utils/utils';
 import { Tooltip } from 'ui/Tooltip';
 import { CircularProgress } from 'ui/buttons/CircularProgress';
 
-export type ButtonProps<Path extends AppRoute['route']> = MuiButtonProps &
-  InferAppNavigationPropsFromPath<Path> & {
+export type ButtonProps<Origin extends AppRoute['route']> = MuiButtonProps &
+  InferAppNavigationPropsFromPath<Origin> & {
     loading?: boolean;
     preventRender?: boolean | (() => boolean);
     progress?: boolean;
@@ -16,7 +16,7 @@ export type ButtonProps<Path extends AppRoute['route']> = MuiButtonProps &
     tooltipProps?: Omit<TooltipProps, 'children' | 'title'>;
   };
 
-export const Button = memo(function <Path extends AppRoute['route'] = AppRoute['route']>({
+export const Button = memo(function <Origin extends AppRoute['route']>({
   children = null,
   disabled = false,
   id = null,
@@ -24,16 +24,12 @@ export const Button = memo(function <Path extends AppRoute['route'] = AppRoute['
   preventRender: preventRenderProp = false,
   progress = false,
   size = 'medium',
-  to = null,
-  here = null,
-  from = null,
-  at = null,
-  navOptions = DEFAULT_APP_NAVIGATE_OPTIONS,
+  nav = null,
   navDeps = null,
   tooltip = null,
   tooltipProps = null,
   ...props
-}: ButtonProps<Path>) {
+}: ButtonProps<Origin>) {
   const preventRender = useMemo<boolean>(
     () => (loading ? false : typeof preventRenderProp === 'function' ? preventRenderProp() : preventRenderProp),
     [loading, preventRenderProp]
@@ -59,7 +55,7 @@ export const Button = memo(function <Path extends AppRoute['route'] = AppRoute['
         id={id ?? getTextContent(children)}
         disabled={progress || disabled}
         size={size}
-        {...(!to && !here && !from && !at ? null : { component: AppLink, to, here, from, at, navOptions, navDeps })}
+        {...(!nav ? null : { component: AppLink, nav, navDeps })}
         {...props}
       >
         {children}

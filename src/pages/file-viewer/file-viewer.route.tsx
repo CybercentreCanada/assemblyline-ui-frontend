@@ -478,8 +478,7 @@ const FileViewerRootPage = React.memo(() => {
   const { id } = useAppPathParams<'/file/viewer/:id'>();
   return (
     <AppNavigate
-      to={{ update: { route: '/file/viewer/:id/:tab', path: { id, tab: null } } }}
-      navOptions={{ replace: true }}
+      nav={nav => nav.to({ replace: true }).update({ route: '/file/viewer/:id/:tab', path: { id, tab: null } })}
       navDeps={[id]}
     />
   );

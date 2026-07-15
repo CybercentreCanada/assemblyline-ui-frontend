@@ -108,29 +108,25 @@ export const SortableHeaderCell: React.FC<SortableHeaderCellProps> = ({
   );
 };
 
-type LinkRowProps<Path extends AppRoute['route']> = Omit<TableRowProps, 'component'> &
-  InferAppNavigationPropsFromPath<Path>;
+type LinkRowProps<Origin extends AppRoute['route']> = Omit<TableRowProps, 'component'> &
+  InferAppNavigationPropsFromPath<Origin>;
 
-export const LinkRow = memo(function LinkRow<const Path extends AppRoute['route']>({
+export const LinkRow = memo(function LinkRow<const Origin extends AppRoute['route']>({
   children,
-  to = null,
-  here = null,
-  from = null,
-  at = null,
+  nav = null,
   navDeps = null,
-  navOptions = null,
   ...other
-}: LinkRowProps<Path>) {
+}: LinkRowProps<Origin>) {
   return (
     <TableRow
       {...(other as TableRowProps)}
-      {...(!to && !here && !from && !at ? null : { component: AppLink, to, here, from, at, navDeps, navOptions })}
+      {...(!nav ? null : { component: AppLink, nav, navDeps })}
       style={{ cursor: 'pointer', textDecoration: 'none' }}
     >
       {children}
     </TableRow>
   );
-}) as unknown as <const Path extends AppRoute['route']>(props: LinkRowProps<Path>) => React.JSX.Element;
+}) as unknown as <const Origin extends AppRoute['route']>(props: LinkRowProps<Origin>) => React.JSX.Element;
 
 (LinkRow as unknown as { displayName: string }).displayName = 'LinkRow';
 

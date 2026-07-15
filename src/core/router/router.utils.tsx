@@ -1,15 +1,19 @@
-import type { AppLocationState, AppNavigationStore, AppRouterStore, RouteKeyOf } from 'core/router';
+import type {
+  AppLocationState,
+  AppNavigateOptions,
+  AppNavigationStore,
+  AppRouterStore,
+  InferAppNavigationOperationMapFromPath,
+  InferAppNavigationPropsFromPath,
+  RouteKeyOf
+} from 'core/router';
 import {
+  DEFAULT_APP_NAVIGATE_OPTIONS,
   DEFAULT_APP_NAVIGATION_STORE,
   DEFAULT_APP_ROUTER_NODE,
   DEFAULT_APP_ROUTER_PANEL,
   DEFAULT_APP_ROUTER_ROUTE
 } from 'core/router';
-import type {
-  InferAppNavigationIntentMapFromPath,
-  InferAppNavigationOperationMapFromPath,
-  InferAppNavigationPropsFromPath
-} from 'core/router/router.models';
 import { createReversePortalNode } from 'features/portal';
 import type { SetStateAction } from 'react';
 import { deepCompare, generateRandomUUID } from 'shared/utils/app.utils';
@@ -1270,117 +1274,73 @@ export const hasBlockedRoutes = (store: AppNavigationStore): boolean => {
 // Navigation
 //*****************************************************************************************
 
-export const getNavigationIntentFromProps = function <const Path extends AppRoute['route']>(
-  props: InferAppNavigationPropsFromPath<Path>
-): InferAppNavigationIntentMapFromPath<Path> {
-  return props as InferAppNavigationIntentMapFromPath<Path>;
+export type ExtractNavReturn<Origin extends AppRoute['route']> = {
+  target: 'from' | 'here' | 'to' | 'at' | null;
+  panelKey: number | null;
+  operation: 'create' | 'update' | 'delete' | null;
+  options: AppNavigateOptions;
+  dispatch:
+    | InferAppNavigationOperationMapFromPath<Origin>['create']
+    | InferAppNavigationOperationMapFromPath<Origin>['update']
+    | null;
 };
 
-type InferNavigationTargetIntent<Path extends AppRoute['route']> =
-  | { key: 'from'; values: InferAppNavigationOperationMapFromPath<Path>; panelKey?: null }
-  | { key: 'here'; values: InferAppNavigationOperationMapFromPath<Path>; panelKey?: null }
-  | { key: 'to'; values: InferAppNavigationOperationMapFromPath<Path>; panelKey?: null }
-  | { key: 'at'; values: InferAppNavigationOperationMapFromPath<Path>; panelKey: number }
-  | { key: null; values: null; panelKey?: null };
+export const resolveNavigationIntent = function <const Origin extends AppRoute['route']>(
+  nextNav: InferAppNavigationPropsFromPath<Origin>['nav']
+): ExtractNavReturn<Origin> {
+  if (!nextNav) {
+    return { target: null, panelKey: null, operation: null, options: DEFAULT_APP_NAVIGATE_OPTIONS, dispatch: null };
+  }
 
-export const getNavigationIntentFromInput = function <const Path extends AppRoute['route']>(
-  navigate: InferAppNavigationIntentMapFromPath<Path>
-): InferNavigationTargetIntent<Path> {
-  if (!navigate) return { key: null, values: null };
+  let target: ExtractNavReturn<Origin>['target'] = null;
+  let panelKey: number | null = null;
+  let options: AppNavigateOptions = DEFAULT_APP_NAVIGATE_OPTIONS;
+  let operation: ExtractNavReturn<Origin>['operation'] = null;
+  let dispatch: ExtractNavReturn<Origin>['dispatch'] = null;
 
-  if (navigate?.from != null) return { key: 'from', values: navigate.from, panelKey: null };
-  if (navigate?.here != null) return { key: 'here', values: navigate.here, panelKey: null };
-  if (navigate?.to != null) return { key: 'to', values: navigate.to, panelKey: null };
-  if (navigate?.at != null) return { key: 'at', values: navigate.at, panelKey: navigate.at.panelKey };
+  const buildCaptureOperations = (
+    key: 'from' | 'here' | 'to' | 'at',
+    atPanelKey: number | null,
+    operationOptions: AppNavigateOptions = DEFAULT_APP_NAVIGATE_OPTIONS
+  ) => ({
+    create: (operationDispatch: InferAppNavigationOperationMapFromPath<Origin>['create']) => {
+      target = key;
+      panelKey = atPanelKey;
+      options = operationOptions;
+      operation = 'create';
+      dispatch = operationDispatch;
+    },
+    update: (operationDispatch: InferAppNavigationOperationMapFromPath<Origin>['update']) => {
+      target = key;
+      panelKey = atPanelKey;
+      options = operationOptions;
+      operation = 'update';
+      dispatch = operationDispatch;
+    },
+    delete: () => {
+      target = key;
+      panelKey = atPanelKey;
+      options = operationOptions;
+      operation = 'delete';
+      dispatch = null;
+    }
+  });
 
-  return { key: null, values: null };
+  const navigationCapture: Parameters<NonNullable<InferAppNavigationPropsFromPath<Origin>['nav']>>[0] = {
+    from: (operationOptions: AppNavigateOptions = DEFAULT_APP_NAVIGATE_OPTIONS) =>
+      buildCaptureOperations('from', null, operationOptions),
+    here: (operationOptions: AppNavigateOptions = DEFAULT_APP_NAVIGATE_OPTIONS) =>
+      buildCaptureOperations('here', null, operationOptions),
+    to: (operationOptions: AppNavigateOptions = DEFAULT_APP_NAVIGATE_OPTIONS) =>
+      buildCaptureOperations('to', null, operationOptions),
+    at: (nextPanelKey: number, operationOptions: AppNavigateOptions = DEFAULT_APP_NAVIGATE_OPTIONS) =>
+      buildCaptureOperations('at', nextPanelKey, operationOptions)
+  };
+
+  nextNav(navigationCapture);
+
+  return { target, panelKey, operation, options, dispatch };
 };
-
-export const getOperationIntentFromNavigation = function <const Path extends AppRoute['route']>(
-  values: InferAppNavigationOperationMapFromPath<Path>
-):
-  | { operation: 'create'; dispatch: InferAppNavigationOperationMapFromPath<Path>['create'] }
-  | { operation: 'update'; dispatch: InferAppNavigationOperationMapFromPath<Path>['update'] }
-  | { operation: 'delete'; dispatch: InferAppNavigationOperationMapFromPath<Path>['delete'] }
-  | { operation: null; dispatch: null } {
-  if (!values) return { operation: null, dispatch: null };
-  if ('create' in values && values.create != null) return { operation: 'create', dispatch: values.create };
-  if ('update' in values && values.update != null) return { operation: 'update', dispatch: values.update };
-  if ('delete' in values && values.delete != null) return { operation: 'delete', dispatch: values.delete };
-
-  return { operation: null, dispatch: null };
-};
-
-// type InferAppNavigationDispatchFromPath<Path extends AppRoute['route']> =
-//   | NonNullable<InferAppNavigationPropsFromPath<Path>['from']>['create']
-//   | NonNullable<InferAppNavigationPropsFromPath<Path>['from']>['update']
-//   | NonNullable<InferAppNavigationPropsFromPath<Path>['from']>['delete'];
-
-// type OperationIntentResult<Path extends AppRoute['route']> = {
-//   operation: AppNavigationOperation | null;
-//   panelKey: number | null;
-//   dispatch: InferAppNavigationDispatchFromPath<Path> | null;
-//   options: AppNavigateOptions;
-//   dependencies: DependencyList | null;
-// };
-
-// const EMPTY_OPERATION_INTENT: Readonly<OperationIntentResult<AppRoute['route']>> = Object.freeze({
-//   operation: null,
-//   panelKey: null,
-//   dispatch: null,
-//   options: DEFAULT_APP_NAVIGATE_OPTIONS,
-//   dependencies: null
-// });
-
-// const getOperationFromNavigationValues = function <const Path extends AppRoute['route']>(
-//   values:
-//     | NonNullable<InferAppNavigationPropsFromPath<Path>['from']>
-//     | NonNullable<InferAppNavigationPropsFromPath<Path>['at']>
-// ):
-//   | { operation: 'create'; dispatch: NonNullable<InferAppNavigationPropsFromPath<Path>['from']>['create'] }
-//   | { operation: 'update'; dispatch: NonNullable<InferAppNavigationPropsFromPath<Path>['from']>['update'] }
-//   | { operation: 'delete'; dispatch: NonNullable<InferAppNavigationPropsFromPath<Path>['from']>['delete'] }
-//   | { operation: null; dispatch: null } {
-//   if ('create' in values && values.create != null) return { operation: 'create', dispatch: values.create };
-//   if ('update' in values && values.update != null) return { operation: 'update', dispatch: values.update };
-//   if ('delete' in values && values.delete != null) return { operation: 'delete', dispatch: values.delete };
-
-//   return { operation: null, dispatch: null };
-// };
-
-// export function getOperationIntentFromNav<const Path extends AppRoute['route']>(
-//   navigateKey: 'at',
-//   navigateValues: NonNullable<InferAppNavigationPropsFromPath<Path>['at']> | null | undefined
-// ): OperationIntentResult<Path>;
-// export function getOperationIntentFromNav<const Path extends AppRoute['route']>(
-//   navigateKey: 'from' | 'here' | 'to',
-//   navigateValues: NonNullable<InferAppNavigationPropsFromPath<Path>['from']> | null | undefined
-// ): OperationIntentResult<Path>;
-// export function getOperationIntentFromNav<const Path extends AppRoute['route']>(
-//   navigateKey: AppNavigationTarget,
-//   navigateValues:
-//     | NonNullable<InferAppNavigationPropsFromPath<Path>['from']>
-//     | NonNullable<InferAppNavigationPropsFromPath<Path>['at']>
-//     | null
-//     | undefined
-// ): OperationIntentResult<Path> {
-//   if (!navigateValues) return EMPTY_OPERATION_INTENT as OperationIntentResult<Path>;
-
-//   const { operation, dispatch } = getOperationFromNavigationValues(navigateValues);
-
-//   if (!operation || dispatch == null) return EMPTY_OPERATION_INTENT as OperationIntentResult<Path>;
-
-//   return {
-//     operation,
-//     panelKey:
-//       navigateKey === 'at'
-//         ? (navigateValues as NonNullable<InferAppNavigationPropsFromPath<Path>['at']>).panelKey
-//         : null,
-//     dispatch,
-//     options: DEFAULT_APP_NAVIGATE_OPTIONS,
-//     dependencies: null
-//   };
-// }
 
 export const applyNavigationDispatch = function <const Value>(
   dispatch: SetStateAction<Value>,
@@ -1393,7 +1353,7 @@ export const applyNavigationDispatch = function <const Value>(
 // Router Store
 //*****************************************************************************************
 
-export const getHashFragmentsFromRouter = function <const Path extends AppRoute['route']>(
+export const getHashFragmentsFromRouter = function <const Origin extends AppRoute['route']>(
   store: AppNavigationStore
 ): string[] {
   return store.panels
@@ -1416,7 +1376,7 @@ export const getHashFragmentsFromRouter = function <const Path extends AppRoute[
     .filter((f): f is string => f !== null);
 };
 
-export const getLocationStateFromRouter = function <const Path extends AppRoute['route']>(
+export const getLocationStateFromRouter = function <const Origin extends AppRoute['route']>(
   store: AppNavigationStore
 ): AppLocationState {
   return {
@@ -1533,7 +1493,7 @@ export const setPartialNavigationStore = (
   store.id = nextStore.id;
   store.panels = structuredClone(nextStore.panels);
   store.routes = structuredClone(nextStore.routes);
-  store.replace = nextStore.replace;
+  store.options.replace = nextStore.options.replace;
   return store;
 };
 
@@ -1541,6 +1501,6 @@ export const clearNavigationStore = (store: AppNavigationStore): AppNavigationSt
   store.id = null;
   store.panels = [];
   store.routes = {};
-  store.replace = false;
+  store.options.replace = false;
   return store;
 };
