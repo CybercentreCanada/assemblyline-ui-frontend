@@ -1,8 +1,7 @@
-import type { AppRouterState, AppRouterStore } from 'core/router';
+import type { AppRouterRoute, AppRouterState, AppRouterStore } from 'core/router';
 import type {
-  AppLocationParam,
   AppLocationParamStore,
-  InferAppLocationParamFromPath,
+  InferAppRouteParamFromPath,
   InferAppRouteSearchValuesFromPath,
   InferAppRouteSpecFromPath,
   InferAppRouteValuesFromPath
@@ -13,19 +12,28 @@ import { SearchParamEngine } from 'features/search-params';
 import type { Location } from 'react-router';
 import { matchPath } from 'react-router';
 import { hashObject } from 'shared/utils/app.utils';
+import type { StoreApi } from 'zustand/vanilla';
 
 //*****************************************************************************************
 // Route Specs
 //*****************************************************************************************
 
-export const getDefaultRouteSpec = function <const Path extends AppRoute['route']>() {
+export const getDefaultRouteSpec = function <const Path extends AppRoute['route']>(): InferAppRouteSpecFromPath<Path> {
   return {
+    element: null,
+    title: '',
+    icon: '',
+    component: '',
+
     route: null,
     path: createPathParamsCodec(null)(() => null),
     search: new SearchParamEngine<SearchParamBlueprintMap>(null),
     hash: (s: string | undefined) => s,
-    element: null
-  } as InferAppRouteSpecFromPath<Path>;
+    state: undefined,
+    temporary: undefined,
+
+    loader: false
+  } as unknown as InferAppRouteSpecFromPath<Path>;
 };
 
 export const findRouteSpecFromPath = function <const Path extends AppRoute['route']>(
@@ -39,27 +47,27 @@ export const findRouteSpecFromKey = function <const Path extends AppRoute['route
   store: AppLocationParamStore,
   routeKey: keyof AppRouterState['routes']
 ): InferAppRouteSpecFromPath<Path> {
-  const snapshot = store?.locations?.[routeKey];
-  return !snapshot?.route ? getDefaultRouteSpec() : findRouteSpecFromPath(store, snapshot.route as Path);
+  const params = store?.params?.[routeKey];
+  return !params?.route ? getDefaultRouteSpec() : findRouteSpecFromPath(store, params.route as Path);
 };
 
-export const findRouteSpecFromLocation = function <const Path extends AppRoute['route']>(
+export const findRouteSpecFromRoute = function <const Path extends AppRoute['route']>(
   store: AppLocationParamStore,
-  location: AppLocationParam
+  route: AppRouterRoute
 ): InferAppRouteSpecFromPath<Path> {
-  if (!location?.href) return getDefaultRouteSpec();
-  const { pathname } = new URL(location.href, 'http://localhost');
+  if (!route?.href) return getDefaultRouteSpec();
+  const { pathname } = new URL(route.href, 'http://localhost');
   const found = Object.values(store?.specs || {}).find(
     r => !!r?.route && !!matchPath({ path: r.route, end: true }, pathname)
   );
   return (found ?? getDefaultRouteSpec()) as InferAppRouteSpecFromPath<Path>;
 };
 
-export const findRouteSpecFromSnapshot = function <const Path extends AppRoute['route']>(
+export const findRouteSpecFromParam = function <const Path extends AppRoute['route']>(
   store: AppLocationParamStore,
-  snapshot: InferAppLocationParamFromPath<Path>
+  param: InferAppRouteParamFromPath<Path>
 ): InferAppRouteSpecFromPath<Path> {
-  return !snapshot?.route ? getDefaultRouteSpec() : findRouteSpecFromPath(store, snapshot.route);
+  return !param?.route ? getDefaultRouteSpec() : findRouteSpecFromPath(store, param.route);
 };
 
 export const findRouteSpecFromValues = function <const Path extends AppRoute['route']>(
@@ -70,76 +78,76 @@ export const findRouteSpecFromValues = function <const Path extends AppRoute['ro
 };
 
 //*****************************************************************************************
-// Location
+// Route Location
 //*****************************************************************************************
 
 export const getDefaultLocation = function (): Location {
   return { key: '', pathname: '', search: '', hash: '', state: undefined };
 };
 
-export const getLocationPathnameFromSnapshot = function <const Path extends AppRoute['route']>(
+export const getLocationPathnameFromParam = function <const Path extends AppRoute['route']>(
   spec: InferAppRouteSpecFromPath<Path>,
-  snapshot: InferAppLocationParamFromPath<Path>
+  param: InferAppRouteParamFromPath<Path>
 ): Location['pathname'] {
-  if (snapshot?.route == null) return '';
+  if (param?.route == null) return '';
 
-  if (spec?.path && snapshot?.path) {
-    return spec.path.stringify(snapshot.path as never);
+  if (spec?.path && param?.path) {
+    return spec.path.stringify(param.path as never);
   }
 
-  if (snapshot?.path) {
-    return Object.entries(snapshot.path).reduce(
+  if (param?.path) {
+    return Object.entries(param.path).reduce(
       (acc, [key, value]) => acc.replace(`:${key}`, encodeURIComponent(String(value))),
-      snapshot.route
+      param.route
     );
   }
 
-  return snapshot?.route;
+  return param?.route;
 };
 
-export const getLocationSearchFromSnapshot = function <const Path extends AppRoute['route']>(
+export const getLocationSearchFromParam = function <const Path extends AppRoute['route']>(
   spec: InferAppRouteSpecFromPath<Path>,
-  snapshot: InferAppLocationParamFromPath<Path>
+  param: InferAppRouteParamFromPath<Path>
 ): Location['search'] {
-  const delta = !spec?.search || spec?.search == null ? undefined : spec.search.delta(snapshot.search.toParams());
+  const delta = !spec?.search || spec?.search == null ? undefined : spec.search.delta(param.search.toParams());
   return !delta ? '' : delta.toLocationSearch();
 };
 
-export const getLocationHashFromSnapshot = function <const Path extends AppRoute['route']>(
+export const getLocationHashFromParam = function <const Path extends AppRoute['route']>(
   spec: InferAppRouteSpecFromPath<Path>,
-  snapshot: InferAppLocationParamFromPath<Path>
+  param: InferAppRouteParamFromPath<Path>
 ): Location['hash'] {
-  if (snapshot?.hash == null) return '';
+  if (param?.hash == null) return '';
 
-  const resolvedHash = !spec?.hash ? String(snapshot.hash) || '' : String(spec.hash(snapshot.hash as never)) || '';
+  const resolvedHash = !spec?.hash ? String(param.hash) || '' : String(spec.hash(param.hash as never)) || '';
   return resolvedHash.startsWith('#') ? resolvedHash.slice(1) : resolvedHash;
 };
 
-export const getLocationStateFromSnapshot = function <const Path extends AppRoute['route']>(
+export const getLocationStateFromParam = function <const Path extends AppRoute['route']>(
   spec: InferAppRouteSpecFromPath<Path>,
-  snapshot: InferAppLocationParamFromPath<Path>
-): AppLocationParam['state'] {
-  const delta = !spec?.search || spec?.search == null ? undefined : spec.search.delta(snapshot.search.toParams());
+  param: InferAppRouteParamFromPath<Path>
+): AppRouterRoute['state'] {
+  const delta = !spec?.search || spec?.search == null ? undefined : spec.search.delta(param.search.toParams());
   return !delta ? null : delta.toLocationState();
 };
 
-export const getLocationFromSnapshot = function <const Path extends AppRoute['route']>(
+export const getLocationFromParam = function <const Path extends AppRoute['route']>(
   store: AppLocationParamStore,
-  snapshot: InferAppLocationParamFromPath<Path>
+  param: InferAppRouteParamFromPath<Path>
 ): Location {
-  const spec = findRouteSpecFromSnapshot<Path>(store, snapshot);
+  const spec = findRouteSpecFromParam<Path>(store, param);
   if (!spec?.route) return getDefaultLocation();
 
   return {
     key: 'default',
-    pathname: getLocationPathnameFromSnapshot(spec, snapshot),
-    search: getLocationSearchFromSnapshot(spec, snapshot),
-    hash: getLocationHashFromSnapshot(spec, snapshot),
-    state: getLocationStateFromSnapshot(spec, snapshot)
+    pathname: getLocationPathnameFromParam(spec, param),
+    search: getLocationSearchFromParam(spec, param),
+    hash: getLocationHashFromParam(spec, param),
+    state: getLocationStateFromParam(spec, param)
   };
 };
 
-export const getLocationFromLocationParam = function (route: AppLocationParam): Location {
+export const getLocationFromRoute = function (route: AppRouterRoute): Location {
   const url = new URL(route.href, 'http://localhost');
   return {
     key: 'default',
@@ -151,34 +159,34 @@ export const getLocationFromLocationParam = function (route: AppLocationParam): 
 };
 
 //*****************************************************************************************
-// Route Location
+// Router Route
 //*****************************************************************************************
 
-export const getDefaultLocationParam = function (): AppLocationParam {
+export const getDefaultRouterRoute = function (): AppRouterRoute {
   return { href: '', state: null };
 };
 
-export const getRouteIdFromLocation = function (location: AppLocationParam): string {
-  return hashObject({ href: location?.href || '', state: location?.state || {} });
+export const getRouteIdFromRoute = function (route: AppRouterRoute): string {
+  return hashObject({ href: route?.href || '', state: route?.state || {} });
 };
 
-export const getLocationParamFromLocation = function (location: Location): AppLocationParam {
+export const getRouteFromLocation = function (location: Location): AppRouterRoute {
   return {
     href: `${location.pathname}${location.search ? `?${location.search}` : ''}${location.hash ? `#${location.hash}` : ''}`,
     state: location.state
   };
 };
 
-export const getLocationParamFromSnapshot = function <const Path extends AppRoute['route']>(
+export const getRouteFromParam = function <const Path extends AppRoute['route']>(
   store: AppLocationParamStore,
-  snapshot: InferAppLocationParamFromPath<Path>
-): AppLocationParam {
-  if (!snapshot?.route) return getDefaultLocationParam();
+  param: InferAppRouteParamFromPath<Path>
+): AppRouterRoute {
+  if (!param?.route) return getDefaultRouterRoute();
 
-  const spec = findRouteSpecFromSnapshot<Path>(store, snapshot);
-  if (!spec?.route) return getDefaultLocationParam();
+  const spec = findRouteSpecFromParam<Path>(store, param);
+  if (!spec?.route) return getDefaultRouterRoute();
 
-  const route = getLocationFromSnapshot(store, snapshot);
+  const route = getLocationFromParam(store, param);
 
   return {
     href: `${route.pathname}${route.search ? `?${route.search}` : ''}${route.hash ? `#${route.hash}` : ''}`,
@@ -186,106 +194,103 @@ export const getLocationParamFromSnapshot = function <const Path extends AppRout
   };
 };
 
-export const sanitizeLocationParam = function (
-  store: AppLocationParamStore,
-  location: AppLocationParam
-): AppLocationParam {
-  const snapshot = getRouteSnapshotFromLocation(store, location);
-  return !snapshot?.route ? getDefaultLocationParam() : getLocationParamFromSnapshot(store, snapshot);
+export const sanitizeRoute = function (store: AppLocationParamStore, route: AppRouterRoute): AppRouterRoute {
+  const param = getRouteParamFromRoute(store, route);
+  return !param?.route ? getDefaultRouterRoute() : getRouteFromParam(store, param);
 };
 
-export const getLocationParamFromValues = function <const Path extends AppRoute['route']>(
+export const getRouteLocationFromValues = function <const Path extends AppRoute['route']>(
   store: AppLocationParamStore,
   values: InferAppRouteValuesFromPath<Path>
-): AppLocationParam {
-  const snapshot = getRouteSnapshotFromValues(store, values);
-  return !snapshot?.route ? getDefaultLocationParam() : getLocationParamFromSnapshot(store, snapshot);
+): AppRouterRoute {
+  const param = getRouteParamFromValues(store, values);
+  return !param?.route ? getDefaultRouterRoute() : getRouteFromParam(store, param);
 };
 
 //*****************************************************************************************
 // External Href
 //*****************************************************************************************
 
-export const getExternalHrefFromLocation = function (
+export const getExternalHrefFromRoute = function (
   store: AppLocationParamStore,
-  location: AppLocationParam
-): AppLocationParam['href'] {
-  const next = sanitizeLocationParam(store, location);
+  route: AppRouterRoute
+): AppRouterRoute['href'] {
+  const next = sanitizeRoute(store, route);
   return !next?.href ? null : `/v1#${next.href}`;
 };
 
-export const getExternalHrefFromSnapshot = function <const Path extends AppRoute['route']>(
+export const getExternalHrefFromParam = function <const Path extends AppRoute['route']>(
   store: AppLocationParamStore,
-  snapshot: InferAppLocationParamFromPath<Path>
-): AppLocationParam['href'] {
-  const location = getLocationParamFromSnapshot(store, snapshot);
+  param: InferAppRouteParamFromPath<Path>
+): AppRouterRoute['href'] {
+  const location = getRouteFromParam(store, param);
   return !location?.href ? null : `/v1#${location.href}`;
 };
 
 //*****************************************************************************************
-// Route Snapshots
+// Route Param
 //*****************************************************************************************
 
-export const getDefaultRouteSnapshot = function <const Path extends AppRoute['route']>() {
-  return { id: '', route: null, path: null, search: null, hash: '' } as InferAppLocationParamFromPath<Path>;
+export const getDefaultRouteParam = function <const Path extends AppRoute['route']>() {
+  return { id: '', route: null, path: null, search: null, hash: '' } as InferAppRouteParamFromPath<Path>;
 };
 
-export const findRouteSnapshotFromKey = function <const Path extends AppRoute['route']>(
+export const findRouteParamFromKey = function <const Path extends AppRoute['route']>(
   store: AppLocationParamStore,
   routeKey: keyof AppRouterState['routes']
-): InferAppLocationParamFromPath<Path> {
-  return !(routeKey in (store?.locations || {}))
-    ? getDefaultRouteSnapshot<Path>()
-    : (store.locations[routeKey] as unknown as InferAppLocationParamFromPath<Path>);
+): InferAppRouteParamFromPath<Path> {
+  return !(routeKey in (store?.params || {}))
+    ? getDefaultRouteParam<Path>()
+    : (store.params[routeKey] as unknown as InferAppRouteParamFromPath<Path>);
 };
 
-export const getSnapshotParamsFromLocation = function <const Path extends AppRoute['route']>(
+export const getPathParamFromLocation = function <const Path extends AppRoute['route']>(
   spec: InferAppRouteSpecFromPath<Path>,
   location: Location
-): InferAppLocationParamFromPath<Path>['path'] {
-  return (!spec?.path ? null : spec.path.parse(location)) as InferAppLocationParamFromPath<Path>['path'];
+): InferAppRouteParamFromPath<Path>['path'] {
+  return (!spec?.path ? null : spec.path.parse(location)) as InferAppRouteParamFromPath<Path>['path'];
 };
 
-export const getSnapshotSearchFromLocation = function <const Path extends AppRoute['route']>(
+export const getSearchParamFromLocation = function <const Path extends AppRoute['route']>(
   spec: InferAppRouteSpecFromPath<Path>,
   location: Location
-): InferAppLocationParamFromPath<Path>['search'] {
-  return (!spec?.search ? null : spec.search.fromLocation(location)) as InferAppLocationParamFromPath<Path>['search'];
+): InferAppRouteParamFromPath<Path>['search'] {
+  return (!spec?.search ? null : spec.search.fromLocation(location)) as InferAppRouteParamFromPath<Path>['search'];
 };
 
-export const getSnapshotHashFromLocation = function <const Path extends AppRoute['route']>(
+export const getHashParamFromLocation = function <const Path extends AppRoute['route']>(
   spec: InferAppRouteSpecFromPath<Path>,
   location: Location
-): InferAppLocationParamFromPath<Path>['hash'] {
+): InferAppRouteParamFromPath<Path>['hash'] {
   const resolvedHash = !spec?.hash
     ? String(location?.hash ?? '')
     : String(spec.hash(location.hash as never) ?? location.hash ?? '');
 
   return resolvedHash.startsWith('#') ? resolvedHash.slice(1) : resolvedHash;
 };
-export const getRouteSnapshotFromLocation = function <const Path extends AppRoute['route']>(
+export const getRouteParamFromRoute = function <const Path extends AppRoute['route']>(
   store: AppLocationParamStore,
-  route: AppLocationParam
-): InferAppLocationParamFromPath<Path> {
-  const spec = findRouteSpecFromLocation(store, route);
-  if (!spec?.route || !route?.href) return getDefaultRouteSnapshot();
+  route: AppRouterRoute
+): InferAppRouteParamFromPath<Path> {
+  const spec = findRouteSpecFromRoute(store, route);
+  if (!spec?.route || !route?.href) return getDefaultRouteParam();
 
-  const location = getLocationFromLocationParam(route);
+  const location = getLocationFromRoute(route);
   return {
-    id: getRouteIdFromLocation(route),
+    id: getRouteIdFromRoute(route),
     route: spec.route,
-    path: getSnapshotParamsFromLocation(spec, location),
-    search: getSnapshotSearchFromLocation(spec, location),
-    hash: getSnapshotHashFromLocation(spec, location)
-  } as InferAppLocationParamFromPath<Path>;
+    path: getPathParamFromLocation(spec, location),
+    search: getSearchParamFromLocation(spec, location),
+    hash: getHashParamFromLocation(spec, location)
+  } as InferAppRouteParamFromPath<Path>;
 };
 
-export const getRouteSnapshotFromValues = function <const Path extends AppRoute['route']>(
+export const getRouteParamFromValues = function <const Path extends AppRoute['route']>(
   store: AppLocationParamStore,
   values: InferAppRouteValuesFromPath<Path>
-): InferAppLocationParamFromPath<Path> {
+): InferAppRouteParamFromPath<Path> {
   const spec = findRouteSpecFromValues(store, values);
-  if (!spec?.route || !values?.route) return getDefaultRouteSnapshot<Path>();
+  if (!spec?.route || !values?.route) return getDefaultRouteParam<Path>();
 
   const delta = !spec?.search || values?.search == null ? undefined : spec.search.delta(values.search as never);
   const next: Location = {
@@ -296,112 +301,112 @@ export const getRouteSnapshotFromValues = function <const Path extends AppRoute[
     state: (delta?.toLocationState as (() => unknown) | undefined)?.() ?? null
   };
 
-  const snapshot = {
-    ...getDefaultRouteSnapshot(),
+  const param = {
+    ...getDefaultRouteParam(),
     route: spec.route,
     path: spec.path?.parse?.(next) ?? null,
     search: spec.search?.fromLocation?.(next) ?? null,
     hash: next.hash.slice(1) || null
-  } as InferAppLocationParamFromPath<Path>;
+  } as InferAppRouteParamFromPath<Path>;
 
-  snapshot.id = getRouteIdFromLocation(getLocationParamFromLocation(next));
+  param.id = getRouteIdFromRoute(getRouteFromLocation(next));
 
-  return snapshot;
+  return param;
 };
 
-export const applyLocationParamSearchToSnapshot = function <const Path extends AppRoute['route']>(
+export const applySearchParamToRouteParam = function <const Path extends AppRoute['route']>(
   store: AppLocationParamStore,
-  snapshot: InferAppLocationParamFromPath<Path>,
+  param: InferAppRouteParamFromPath<Path>,
   search: URLSearchParams | InferAppRouteSearchValuesFromPath<Path>
-): InferAppLocationParamFromPath<Path> {
-  const spec = findRouteSpecFromSnapshot<Path>(store, snapshot);
-  if (!spec?.route || !snapshot?.route) return getDefaultRouteSnapshot<Path>();
+): InferAppRouteParamFromPath<Path> {
+  const spec = findRouteSpecFromParam<Path>(store, param);
+  if (!spec?.route || !param?.route) return getDefaultRouteParam<Path>();
 
-  snapshot.search = !search ? undefined : (spec.search.delta(search as never) as never);
-  const next = getLocationParamFromSnapshot(store, snapshot);
-  snapshot.id = getRouteIdFromLocation(next);
+  param.search = !search ? undefined : (spec.search.delta(search as never) as never);
+  const next = getRouteFromParam(store, param);
+  param.id = getRouteIdFromRoute(next);
 
-  return snapshot;
+  return param;
 };
 
-export const sanitizeRouteSnapshot = function <const Path extends AppRoute['route']>(
+export const sanitizeRouteParam = function <const Path extends AppRoute['route']>(
   store: AppLocationParamStore,
-  snapshot: InferAppLocationParamFromPath<Path>
-): InferAppLocationParamFromPath<Path> {
-  const spec = findRouteSpecFromSnapshot(store, snapshot);
-  if (!spec?.route) return getDefaultRouteSnapshot<Path>();
-  const location = getLocationParamFromSnapshot(store, snapshot);
-  return getRouteSnapshotFromLocation(store, location);
+  param: InferAppRouteParamFromPath<Path>
+): InferAppRouteParamFromPath<Path> {
+  const spec = findRouteSpecFromParam(store, param);
+  if (!spec?.route) return getDefaultRouteParam<Path>();
+  const route = getRouteFromParam(store, param);
+  return getRouteParamFromRoute(store, route);
 };
 
-export const addRouteSnapshot = function <const Path extends AppRoute['route']>(
+export const addRouteParam = function <const Path extends AppRoute['route']>(
   store: AppLocationParamStore,
-  routeKey: keyof AppLocationParamStore['locations'],
-  snapshot: InferAppLocationParamFromPath<Path>
+  routeKey: keyof AppLocationParamStore['params'],
+  param: InferAppRouteParamFromPath<Path>
 ): AppLocationParamStore {
-  if (routeKey in (store?.locations || {}) || !snapshot?.route) return store;
-  store.locations[routeKey] = snapshot as unknown as AppLocationParamStore['locations'][Path];
+  if (routeKey in (store?.params || {}) || !param?.route) return store;
+  store.params[routeKey] = param as unknown as AppLocationParamStore['params'][Path];
   return store;
 };
 
-export const hasDifferentSnapshot = function <const Path extends AppRoute['route']>(
+export const hasDifferentRouteParam = function <const Path extends AppRoute['route']>(
   store: AppLocationParamStore,
-  routeKey: keyof AppLocationParamStore['locations'],
-  snapshot: InferAppLocationParamFromPath<Path>
+  routeKey: keyof AppLocationParamStore['params'],
+  param: InferAppRouteParamFromPath<Path>
 ): boolean {
-  if (!(routeKey in (store?.locations || {})) || !snapshot?.route) return false;
+  if (!(routeKey in (store?.params || {})) || !param?.route) return false;
 
-  const id = getRouteIdFromLocation(getLocationParamFromSnapshot(store, snapshot));
+  const id = getRouteIdFromRoute(getRouteFromParam(store, param));
 
-  return store.locations[routeKey].id === id;
+  return store.params[routeKey].id === id;
 };
 
-export const updateRouteSnapshot = function <const Path extends AppRoute['route']>(
+export const updateRouteParam = function <const Path extends AppRoute['route']>(
   store: AppLocationParamStore,
-  routeKey: keyof AppLocationParamStore['locations'],
-  snapshot: InferAppLocationParamFromPath<Path>
+  routeKey: keyof AppLocationParamStore['params'],
+  param: InferAppRouteParamFromPath<Path>
 ): AppLocationParamStore {
-  if (!(routeKey in (store?.locations || {})) || !snapshot?.route) return store;
+  if (!(routeKey in (store?.params || {})) || !param?.route) return store;
 
-  const id = getRouteIdFromLocation(getLocationParamFromSnapshot(store, snapshot));
-  if (store.locations[routeKey].id === id) return store;
+  const id = getRouteIdFromRoute(getRouteFromParam(store, param));
+  if (store.params[routeKey].id === id) return store;
 
-  store.locations[routeKey].id = id;
-  store.locations[routeKey].route = snapshot.route;
-  store.locations[routeKey].path = snapshot.path;
-  store.locations[routeKey].search = snapshot.search;
-  store.locations[routeKey].hash = snapshot.hash;
+  store.params[routeKey].id = id;
+  store.params[routeKey].route = param.route;
+  store.params[routeKey].path = param.path;
+  store.params[routeKey].search = param.search;
+  store.params[routeKey].hash = param.hash;
 
   return store;
 };
 
-export const upsertRouteSnapshot = function <const Path extends AppRoute['route']>(
+export const upsertRouteParam = function <const Path extends AppRoute['route']>(
   store: AppLocationParamStore,
-  routeKey: keyof AppLocationParamStore['locations'],
-  snapshot: InferAppLocationParamFromPath<Path>
+  routeKey: keyof AppLocationParamStore['params'],
+  param: InferAppRouteParamFromPath<Path>
 ): AppLocationParamStore {
-  const nextSnapshot = sanitizeRouteSnapshot(store, snapshot);
-  if (routeKey in (store?.locations || {})) return updateRouteSnapshot(store, routeKey, nextSnapshot);
-  else return addRouteSnapshot(store, routeKey, nextSnapshot);
+  const nextParam = sanitizeRouteParam(store, param);
+  if (routeKey in (store?.params || {})) return updateRouteParam(store, routeKey, nextParam);
+  else return addRouteParam(store, routeKey, nextParam);
 };
 
-export const removeRouteSnapshot = function <const Path extends AppRoute['route']>(
+export const removeRouteParam = function <const Path extends AppRoute['route']>(
   store: AppLocationParamStore,
-  snapshot: InferAppLocationParamFromPath<Path>
+  param: InferAppRouteParamFromPath<Path>
 ): AppLocationParamStore {
-  for (const [routeKey, route] of Object.entries(store?.locations || {})) {
-    if (snapshot?.id && snapshot?.id === route?.id) delete store.locations[routeKey];
-    else if (snapshot?.route && snapshot?.route === route?.route) delete store.locations[routeKey];
+  for (const [routeKey, route] of Object.entries(store?.params || {})) {
+    if (param?.id && param?.id === route?.id) delete store.params[routeKey];
+    else if (param?.route && param?.route === route?.route) delete store.params[routeKey];
   }
   return store;
 };
 
-export const removeRouteSnapshotFromKey = function (
+export const removeRouteParamFromKey = function (
   store: AppLocationParamStore,
-  routeKey: keyof AppLocationParamStore['locations']
+  routeKey: keyof AppLocationParamStore['params']
 ): AppLocationParamStore {
-  if (routeKey in (store?.locations || {})) {
-    delete store.locations[routeKey];
+  if (routeKey in (store?.params || {})) {
+    delete store.params[routeKey];
   }
   return store;
 };
@@ -410,75 +415,70 @@ export const removeRouteSnapshotFromKey = function (
 // Route Values
 //*****************************************************************************************
 
-export const getDefaultAppRouteValues = function <
+export const getDefaultRouteValues = function <
   const Path extends AppRoute['route']
 >(): InferAppRouteValuesFromPath<Path> {
-  return {
-    path: null,
-    params: null,
-    search: null,
-    hash: null
-  } as InferAppRouteValuesFromPath<Path>;
+  return { path: null, params: null, search: null, hash: null } as InferAppRouteValuesFromPath<Path>;
 };
 
-export const sanitizeAppRouteValues = function <const Path extends AppRoute['route']>(
+export const sanitizeRouteValues = function <const Path extends AppRoute['route']>(
   store: AppLocationParamStore,
   values: InferAppRouteValuesFromPath<Path>
 ): InferAppRouteValuesFromPath<Path> {
-  const snapshot = getRouteSnapshotFromValues(store, values);
-  if (!snapshot?.route) return getDefaultAppRouteValues<Path>();
+  const param = getRouteParamFromValues(store, values);
+  if (!param?.route) return getDefaultRouteValues<Path>();
 
   return {
-    route: snapshot.route,
-    path: snapshot.path ?? null,
-    search: snapshot.search?.toObject?.() ?? null,
-    hash: snapshot.hash ?? null
+    route: param.route,
+    path: param.path ?? null,
+    search: param.search?.toObject?.() ?? null,
+    hash: param.hash ?? null
   } as InferAppRouteValuesFromPath<Path>;
 };
 
-export const findAppRouteValuesFromKey = function <const Path extends AppRoute['route']>(
+export const findRouteValuesFromKey = function <const Path extends AppRoute['route']>(
   store: AppLocationParamStore,
   routeKey: keyof AppRouterState['routes']
 ): InferAppRouteValuesFromPath<Path> {
-  const snapshot = findRouteSnapshotFromKey(store, routeKey);
-  if (!snapshot?.route) return getDefaultAppRouteValues<Path>();
+  const param = findRouteParamFromKey(store, routeKey);
+  if (!param?.route) return getDefaultRouteValues<Path>();
 
   return {
-    route: snapshot?.route || null,
-    path: snapshot?.path || null,
-    search: !snapshot.search ? null : snapshot.search.toObject(),
-    hash: snapshot?.hash || null
+    route: param?.route || null,
+    path: param?.path || null,
+    search: !param.search ? null : param.search.toObject(),
+    hash: param?.hash || null
   } as InferAppRouteValuesFromPath<Path>;
 };
 
-export const getAppRouteValuesFromSnapshot = function <const Path extends AppRoute['route']>(
+export const getRouteValuesFromParam = function <const Path extends AppRoute['route']>(
   store: AppLocationParamStore,
-  snapshot: InferAppLocationParamFromPath<Path>
+  param: InferAppRouteParamFromPath<Path>
 ): InferAppRouteValuesFromPath<Path> {
-  if (!snapshot?.route || !(snapshot.route in store.specs)) return getDefaultAppRouteValues<Path>();
+  if (!param?.route || !(param.route in store.specs)) return getDefaultRouteValues<Path>();
 
   return {
-    route: snapshot.route,
-    path: snapshot.path,
-    search: !snapshot.search ? null : snapshot.search.toObject(),
-    hash: snapshot.hash
+    route: param.route,
+    path: param.path,
+    search: !param.search ? null : param.search.toObject(),
+    hash: param.hash
   } as InferAppRouteValuesFromPath<Path>;
 };
 
-export const getAppRouteValuesFromLocation = function <const Path extends AppRoute['route']>(
+export const getRouteValuesFromRouteLocation = function <const Path extends AppRoute['route']>(
   store: AppLocationParamStore,
-  location: AppLocationParam
+  route: AppRouterRoute
 ): InferAppRouteValuesFromPath<Path> {
-  const spec = findRouteSpecFromLocation(store, location);
-  if (!spec?.route || !location?.href) return getDefaultAppRouteValues<Path>();
+  const spec = findRouteSpecFromRoute(store, route);
+  if (!spec?.route || !route?.href) return getDefaultRouteValues<Path>();
 
-  const snapshot = getRouteSnapshotFromLocation(store, location);
+  const param = getRouteParamFromRoute(store, route);
 
   return {
-    route: snapshot.route,
-    path: snapshot.path,
-    search: !snapshot.search ? null : snapshot.search.toObject(),
-    hash: snapshot.hash
+    route: param.route,
+    path: param.path,
+    search: !param.search ? null : param.search.toObject(),
+    hash: param.hash
   } as InferAppRouteValuesFromPath<Path>;
 };
 
@@ -486,7 +486,7 @@ export const getAppRouteValuesFromLocation = function <const Path extends AppRou
 // URL Decoding
 //*****************************************************************************************
 
-export const parseLocationFromHashFragment = function (fragment: string): AppLocationParam | null {
+export const parseRouteLocationFromHashFragment = function (fragment: string): AppRouterRoute | null {
   if (!fragment) return null;
 
   const hashIndex = fragment.indexOf('#');
@@ -509,26 +509,26 @@ export const parseLocationFromHashFragment = function (fragment: string): AppLoc
   }
 };
 
-export const getLocationsFromLegacyURL = (
+export const getRouteLocationsFromLegacyURL = (
   store: AppLocationParamStore,
   url: Location<AppRouterState>
-): AppLocationParam[] => {
+): AppRouterRoute[] => {
   if (!url?.pathname || url.pathname === '/v1') return [];
 
   const pathname = url.pathname === '/' ? '/submit' : url.pathname;
-  const location: AppLocationParam = {
+  const route: AppRouterRoute = {
     href: `${pathname}${url.search || ''}${url.hash || ''}`,
     state: url.state ?? null
   };
 
-  const normalized = sanitizeLocationParam(store, location);
+  const normalized = sanitizeRoute(store, route);
   return normalized?.href ? [normalized] : [];
 };
 
-export const getLocationsFromURLHash = (
+export const getRouteLocationsFromURLHash = (
   store: AppLocationParamStore,
   url: Location<AppRouterState>
-): AppLocationParam[] => {
+): AppRouterRoute[] => {
   if (url?.pathname !== '/v1' || !url?.hash) return [];
 
   const hashFragment = url.hash.slice(1);
@@ -537,15 +537,23 @@ export const getLocationsFromURLHash = (
   return hashFragment
     .split('#/')
     .map((fragment, index) => {
-      const location = parseLocationFromHashFragment(`${index === 0 ? '' : '/'}${fragment}`);
-      return sanitizeLocationParam(store, location);
+      const route = parseRouteLocationFromHashFragment(`${index === 0 ? '' : '/'}${fragment}`);
+      return sanitizeRoute(store, route);
     })
-    .filter((parsedLocation): parsedLocation is AppLocationParam => !!parsedLocation?.href);
+    .filter((parsedRoute): parsedRoute is AppRouterRoute => !!parsedRoute?.href);
 };
 
 //*****************************************************************************************
 // Location Store
 //*****************************************************************************************
+
+export const getDefaultLocationParamStore = function (): AppLocationParamStore {
+  return { specs: null, params: {} };
+};
+
+export const getAppLocationParamStateFromApi = (api: StoreApi<AppLocationParamStore>): AppLocationParamStore => {
+  return api?.getState() || getDefaultLocationParamStore();
+};
 
 export const setRouteSpecsFromAppRoutes = function (
   store: AppLocationParamStore,
@@ -555,20 +563,20 @@ export const setRouteSpecsFromAppRoutes = function (
   return store;
 };
 
-export const syncRouteSnapshotsFromRouter = function (
+export const syncRouteParamsFromRouter = function (
   store: AppLocationParamStore,
   router: AppRouterStore
 ): AppLocationParamStore {
-  for (const routeKey of Object.keys(store?.locations || {})) {
+  for (const routeKey of Object.keys(store?.params || {})) {
     if (!(routeKey in (router?.routes || {}))) {
-      store = removeRouteSnapshotFromKey(store, routeKey);
+      store = removeRouteParamFromKey(store, routeKey);
     }
   }
 
   for (const [routeKey, route] of Object.entries(router?.routes || {})) {
-    const snapshot = getRouteSnapshotFromLocation(store, route);
-    snapshot.id = getRouteIdFromLocation(route);
-    store = upsertRouteSnapshot(store, routeKey, snapshot);
+    const param = getRouteParamFromRoute(store, route);
+    param.id = getRouteIdFromRoute(route);
+    store = upsertRouteParam(store, routeKey, param);
   }
 
   return store;

@@ -5,7 +5,7 @@ import type { InferPathParamBlueprintMapFromPath, PATH_PARAM_BLUEPRINTS_MAP, Rou
 import { createPathParamsCodec } from 'features/path-params';
 import type { SearchParamBlueprintMap } from 'features/search-params';
 import { SEARCH_PARAM_BLUEPRINTS_MAP, SearchParamEngine } from 'features/search-params';
-import type { ComponentType, MemoExoticComponent, ReactNode } from 'react';
+import type { ComponentType, FC, MemoExoticComponent, ReactNode } from 'react';
 import type { Location } from 'react-router';
 import { toElement } from 'shared/utils/app.utils';
 
@@ -83,7 +83,7 @@ export const createAppRoute = <
 
   const hashCodec = hash ?? ((h: Location['hash']) => h as Hash);
 
-  (Component as never).displayName = route;
+  (Component as unknown as FC).displayName = route;
 
   return {
     title,

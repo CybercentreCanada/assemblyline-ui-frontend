@@ -1,33 +1,23 @@
 import type { AppRouterStore } from 'core/router';
 import { useAppRouterStoreApi } from 'core/router';
 import type { AppLocationParamStore } from 'core/routes';
-import { setRouteSpecsFromAppRoutes, syncRouteSnapshotsFromRouter } from 'core/routes';
+import { getDefaultLocationParamStore, setRouteSpecsFromAppRoutes, syncRouteParamsFromRouter } from 'core/routes';
 import { createAppStore } from 'features/store/createAppStore';
 import type { ReactNode } from 'react';
 import { memo, useCallback, useEffect } from 'react';
-import type { StoreApi } from 'zustand';
 
 //*****************************************************************************************
-// App Route Locations Provider
+// App Location Param Provider
 //*****************************************************************************************
-
-export const DEFAULT_APP_LOCATION_PARAM_STORE: AppLocationParamStore = {
-  specs: null,
-  locations: {}
-};
 
 export const {
   StoreProvider: AppLocationParamStoreProvider,
   useStore: useAppLocationParamStore,
   useSetStore: useAppSetLocationParamStore,
   useStoreApi: useAppLocationParamStoreApi
-} = createAppStore<AppLocationParamStore>(DEFAULT_APP_LOCATION_PARAM_STORE);
+} = createAppStore<AppLocationParamStore>(getDefaultLocationParamStore());
 
 AppLocationParamStoreProvider.displayName = 'AppLocationParamStoreProvider';
-
-export const getAppLocationParamStateFromApi = (api: StoreApi<AppLocationParamStore>): AppLocationParamStore => {
-  return api?.getState() || DEFAULT_APP_LOCATION_PARAM_STORE;
-};
 
 export type AppLocationParamProviderProps = {
   /** All of the app's created routes */
@@ -41,7 +31,7 @@ const AppLocationParamSync = memo(({ appRoutes }: Omit<AppLocationParamProviderP
   const routerStoreApi = useAppRouterStoreApi();
 
   const commitRouterToLocation = useCallback(
-    (router: AppRouterStore) => setLocationParamStore(s => syncRouteSnapshotsFromRouter(s, router)),
+    (router: AppRouterStore) => setLocationParamStore(s => syncRouteParamsFromRouter(s, router)),
     [setLocationParamStore]
   );
 
@@ -60,7 +50,7 @@ const AppLocationParamSync = memo(({ appRoutes }: Omit<AppLocationParamProviderP
 
 AppLocationParamSync.displayName = 'AppLocationParamSync';
 
-export const AppLocationParamProvider = memo(({ children, appRoutes }: AppLocationParamProviderProps) => (
+export const AppLocationParamProvider = memo(({ appRoutes, children }: AppLocationParamProviderProps) => (
   <>
     <AppLocationParamSync appRoutes={appRoutes} />
     {children}
