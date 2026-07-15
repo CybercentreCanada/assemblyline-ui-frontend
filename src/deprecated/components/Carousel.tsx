@@ -1,4 +1,4 @@
-import { isArrowDown, isArrowLeft, isArrowRight, isArrowUp, isEscape } from 'commons/components/utils/keyboard';
+import { isArrowDown, isArrowLeft, isArrowRight, isArrowUp, isEscape } from 'deprecated/utils/keyboard';
 import React, { useEffect, useRef } from 'react';
 
 export interface CarouselProps {
