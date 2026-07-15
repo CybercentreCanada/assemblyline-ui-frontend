@@ -49,5 +49,5 @@ ForbiddenPage.displayName = 'ForbiddenPage';
 
 export const ForbiddenRoute = createAppRoute({
   component: ForbiddenPage,
-  path: '/forbidden'
+  route: '/forbidden'
 });

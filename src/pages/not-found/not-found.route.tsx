@@ -32,5 +32,5 @@ NotFoundPage.displayName = 'NotFoundPage';
 
 export const NotFoundRoute = createAppRoute({
   component: NotFoundPage,
-  path: '/not-found'
+  route: '/not-found'
 });

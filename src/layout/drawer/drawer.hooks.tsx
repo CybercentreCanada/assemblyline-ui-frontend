@@ -19,6 +19,6 @@ export const useAppDrawerClose = (): (() => void) => {
   const navigate = useAppNavigate();
 
   return useCallback(() => {
-    navigate.closePanel(1);
+    navigate.at(1).delete(true);
   }, [navigate]);
 };

@@ -97,13 +97,13 @@ SettingsPage.displayName = 'SettingsPage';
 
 export const SettingsRoute = createAppRoute({
   component: SettingsPage,
-  path: '/settings/:tab',
-  params: s => ({
+  route: '/settings/:tab',
+  path: s => ({
     tab: s.string()
   })
 });
 
 export const SettingsRootRoute = createAppRoute({
   component: SettingsPage,
-  path: '/settings'
+  route: '/settings'
 });

@@ -42,5 +42,5 @@ QuotaPage.displayName = 'QuotaPage';
 
 export const QuotaRoute = createAppRoute({
   component: QuotaPage,
-  path: '/quota'
+  route: '/quota'
 });

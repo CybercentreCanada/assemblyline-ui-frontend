@@ -411,5 +411,5 @@ SubmitPage.displayName = 'SubmitPage';
 
 export const SubmitRoute = createAppRoute({
   component: SubmitPage,
-  path: '/submit'
+  route: '/submit'
 });

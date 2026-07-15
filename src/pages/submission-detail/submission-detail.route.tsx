@@ -1236,7 +1236,7 @@ const SubmissionDetail = memo(() => {
                 ? { loading: true }
                 : {
                     preventRender: submission.state !== 'completed',
-                    to: ['replaceRoute', { path: '/submission/report/:id', params: { id: submission.sid } }]
+                    here: { update: { route: '/submission/report/:id', path: { id: submission.sid } } }
                   })}
             >
               <ChromeReaderModeOutlinedIcon />
@@ -1435,8 +1435,8 @@ const SubmissionDetail = memo(() => {
 
 export const SubmissionDetailRoute = createAppRoute({
   component: SubmissionDetail,
-  path: '/submission/detail/:id',
-  params: s => ({
+  route: '/submission/detail/:id',
+  path: s => ({
     id: s.string()
   })
 });

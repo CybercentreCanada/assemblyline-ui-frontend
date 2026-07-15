@@ -1,5 +1,5 @@
 import { AppErrorProvider } from 'core/error';
-import type { RouteHash, RouteMeta } from 'core/routes';
+import type { DisabledBoundaryProps, ForbiddenBoundaryProps, RouteHash } from 'core/routes';
 import { DisabledBoundary, ForbiddenBoundary } from 'core/routes';
 import type { InferPathParamBlueprintMapFromPath, PATH_PARAM_BLUEPRINTS_MAP, RoutePath } from 'features/path-params';
 import { createPathParamsCodec } from 'features/path-params';
@@ -13,57 +13,69 @@ import { toElement } from 'shared/utils/app.utils';
 // Create Route
 //*****************************************************************************************
 
-// TODO: add a resize observer similar to useMediaQuery
-
 export type CreateAppRouteProps<
-  Path extends RoutePath,
-  Params extends InferPathParamBlueprintMapFromPath<Path>,
+  Route extends RoutePath,
+  Path extends InferPathParamBlueprintMapFromPath<Route>,
   Search extends SearchParamBlueprintMap,
-  Hash extends RouteHash
+  Hash extends RouteHash,
+  State extends object,
+  Temp extends object
 > = {
-  path: Path;
-  params?: (blueprints: typeof PATH_PARAM_BLUEPRINTS_MAP) => Params;
+  // Descriptions
+  title?: string;
+  icon?: ReactNode;
+  component: ReactNode | MemoExoticComponent<ComponentType<unknown>>;
+
+  // Parameters
+  route: Route;
+  path?: (blueprints: typeof PATH_PARAM_BLUEPRINTS_MAP) => Path;
   search?: (blueprints: typeof SEARCH_PARAM_BLUEPRINTS_MAP) => Search;
   hash?: (hash: Location['hash']) => Hash;
+  state?: State;
+  temporary?: Temp;
 
-  disabled?: boolean | (() => boolean);
-  forbidden?: boolean | (() => boolean);
-  loading?: boolean | ((args: unknown) => boolean);
-
-  component: ReactNode | MemoExoticComponent<ComponentType<unknown>>;
+  // Guards and Fallbacks
+  disabled?: DisabledBoundaryProps['disabled'];
+  forbidden?: ForbiddenBoundaryProps['forbidden'];
+  loader?: boolean | ((args: unknown) => void);
   disabledComponent?: ReactNode | MemoExoticComponent<ComponentType<unknown>>;
   errorComponent?: ReactNode | MemoExoticComponent<ComponentType<unknown>>;
   forbiddenComponent?: ReactNode | MemoExoticComponent<ComponentType<unknown>>;
   pendingComponent?: ReactNode | MemoExoticComponent<ComponentType<unknown>>;
   quotaExceededComponent?: ReactNode | MemoExoticComponent<ComponentType<unknown>>;
-
-  meta?: RouteMeta;
 };
 
 export const createAppRoute = <
-  const Path extends RoutePath,
-  const Params extends InferPathParamBlueprintMapFromPath<Path>,
+  const Route extends RoutePath,
+  const Path extends InferPathParamBlueprintMapFromPath<Route>,
   const Search extends SearchParamBlueprintMap,
-  const Hash extends RouteHash
+  const Hash extends RouteHash,
+  const State extends object,
+  const Temp extends object
 >({
+  title,
+  icon,
+  component: Component,
+
+  route,
   path,
-  params,
   search,
   hash,
+  state,
+  temporary,
 
-  loading,
+  loader,
   disabled,
   forbidden,
 
-  component,
   forbiddenComponent,
   disabledComponent
-}: CreateAppRouteProps<Path, Params, Search, Hash>) => {
-  void loading;
+}: CreateAppRouteProps<Route, Path, Search, Hash, State, Temp>) => {
+  void loader;
 
-  const paramCodec = !params
-    ? (createPathParamsCodec<Path>(path)(() => null) as never)
-    : createPathParamsCodec<Path>(path)(params);
+  const pathCodec = !path
+    ? (createPathParamsCodec<Route>(route)(() => null) as never)
+    : createPathParamsCodec<Route>(route)(path);
 
   const searchEngine = !search
     ? (new SearchParamEngine(null) as never)
@@ -71,18 +83,28 @@ export const createAppRoute = <
 
   const hashCodec = hash ?? ((h: Location['hash']) => h as Hash);
 
+  (Component as never).displayName = route;
+
   return {
-    path,
-    params: paramCodec,
+    title,
+    icon,
+    component: Component,
+
+    route,
+    path: pathCodec,
     search: searchEngine,
-    // search: !search ? undefined : searchEngine.fromLocation({ search: null } as any),
     hash: hashCodec,
+    state,
+    temporary,
+
+    loader,
+
     element: (
       <AppErrorProvider>
         <DisabledBoundary disabled={disabled} FallbackComponent={disabledComponent}>
           <ForbiddenBoundary forbidden={forbidden} FallbackComponent={forbiddenComponent}>
             {/* <AppRouteProvider params={paramCodec} search={searchEngine} hash={hashCodec}> */}
-            {toElement(component)}
+            {toElement(Component)}
             {/* </AppRouteProvider> */}
           </ForbiddenBoundary>
         </DisabledBoundary>

@@ -1,27 +1,40 @@
 import { Divider } from '@mui/material';
 import type { LeftNavMenuProps } from '@tui/core';
 import { useAppLeftNavMenu } from 'app/layout.left-nav';
-import type { InferNavigationInputFromPath } from 'core/router';
+import type { InferAppNavigationPropsFromPath } from 'core/router';
 import { LeftNavRoute } from 'layout/top-nav/LeftNavRoute';
 import { useCallback, useMemo } from 'react';
 
 type AppTemplateLeftNavMenuItem = LeftNavMenuProps['items'][number];
 
-export type AppLeftNavItem<Path extends AppRoute['path'] = AppRoute['path']> = {
-  divider?: boolean;
-  icon?: LeftNavMenuProps['icon'];
-  id: AppTemplateLeftNavMenuItem['id'];
-  items?: AppLeftNavItem[] | null;
-  label?: LeftNavMenuProps['label'];
-  preventRender?: boolean;
-  to?: InferNavigationInputFromPath<Path>;
-};
+export type AppLeftNavItem<Path extends AppRoute['route'] = AppRoute['route']> =
+  InferAppNavigationPropsFromPath<Path> & {
+    divider?: boolean;
+    icon?: LeftNavMenuProps['icon'];
+    id: AppTemplateLeftNavMenuItem['id'];
+    items?: AppLeftNavItem[] | null;
+    label?: LeftNavMenuProps['label'];
+    preventRender?: boolean;
+  };
 
 export const useAppTemplateLeftNavMenu = () => {
   const leftNav = useAppLeftNavMenu();
 
   const mapItem = useCallback((item: AppLeftNavItem): AppTemplateLeftNavMenuItem => {
-    const { divider = false, id, label, icon, to, preventRender = false, items = null } = item;
+    const {
+      divider = false,
+      id,
+      label,
+      icon,
+      from,
+      here,
+      to,
+      at,
+      navOptions,
+      navDeps,
+      preventRender = false,
+      items = null
+    } = item;
 
     if (divider) {
       return {
@@ -46,7 +59,18 @@ export const useAppTemplateLeftNavMenu = () => {
       type: 'slot',
       withProps: true,
       render: (navOpen, navProps) => (
-        <LeftNavRoute primary={label} to={to} icon={icon} navOpen={navOpen} navProps={navProps} />
+        <LeftNavRoute
+          primary={label}
+          from={from}
+          here={here}
+          to={to}
+          at={at}
+          navOptions={navOptions}
+          navDeps={navDeps}
+          icon={icon}
+          navOpen={navOpen}
+          navProps={navProps}
+        />
       )
     };
   }, []);

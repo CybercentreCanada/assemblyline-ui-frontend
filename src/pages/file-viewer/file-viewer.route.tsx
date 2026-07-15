@@ -25,7 +25,7 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import { AppNavigate, useAppNavigate } from 'core/router';
+import { AppLink, AppNavigate, useAppNavigate } from 'core/router';
 import { createAppRoute, useAppPathParams } from 'core/routes';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
@@ -42,7 +42,6 @@ import { SelectionProvider, useSelection } from 'pages/file-viewer/file-viewer.p
 import { ForbiddenPage } from 'pages/forbidden/forbidden.route';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
 import { FileDownloader } from 'ui/buttons/FileDownloader';
 import { IconButton } from 'ui/buttons/IconButton';
 import { PageFullSizeLayout } from 'ui/pages/PageFullSize';
@@ -107,7 +106,7 @@ const FileViewerPage = React.memo(() => {
         onSuccess: api_data => {
           showSuccessMessage(t('submit.success'));
           setTimeout(() => {
-            navigate.openRoute({ path: '/submission/detail/:id', params: { id: api_data.api_response.sid } });
+            navigate.to().create({ route: '/submission/detail/:id', path: { id: api_data.api_response.sid } });
           }, 500);
         }
       });
@@ -133,7 +132,7 @@ const FileViewerPage = React.memo(() => {
         onSuccess: api_data => {
           showSuccessMessage(t('submit.success'));
           setTimeout(() => {
-            navigate.openRoute({ path: '/submission/detail/:id', params: { id: api_data.api_response.sid } });
+            navigate.to().create({ route: '/submission/detail/:id', path: { id: api_data.api_response.sid } });
           }, 500);
         }
       });
@@ -286,7 +285,7 @@ const FileViewerPage = React.memo(() => {
                     </ListItem>
 
                     <ListItemButton
-                      component={Link}
+                      component={AppLink}
                       dense
                       onClick={() => setSubmitAnchor(null)}
                       {...(isSelection
@@ -342,11 +341,7 @@ const FileViewerPage = React.memo(() => {
             )}
             {currentUser.roles.includes('submission_view') && (
               <Tooltip title={t('detail')}>
-                <IconButton
-                  component={Link}
-                  to={['openRoute', { path: '/file/detail/:id', params: { id: sha256 } }]}
-                  size="large"
-                >
+                <IconButton to={{ create: { route: '/file/detail/:id', path: { id: sha256 } } }} size="large">
                   <DescriptionOutlinedIcon />
                 </IconButton>
               </Tooltip>
@@ -354,15 +349,13 @@ const FileViewerPage = React.memo(() => {
             {currentUser.roles.includes('submission_view') && (
               <Tooltip title={t('related')}>
                 <IconButton
-                  component={Link}
-                  to={[
-                    'openRoute',
-                    {
-                      path: '/search/:tab',
-                      params: { tab: 'submission' },
+                  to={{
+                    create: {
+                      route: '/search/:tab',
+                      path: { tab: 'submission' },
                       search: { query: 'files.sha256:${sha256} OR results:${sha256}* OR errors:${sha256}*' }
                     }
-                  ]}
+                  }}
                   size="large"
                 >
                   <ViewCarouselOutlinedIcon />
@@ -397,10 +390,9 @@ const FileViewerPage = React.memo(() => {
             defaultTab={DEFAULT_TAB}
             paper
             onChange={(_event, value: Tab) => {
-              navigate.replaceRoute(
-                { path: '/file/viewer/:id/:tab', params: { id: sha256, tab: value } },
-                { replace: true }
-              );
+              navigate
+                .here({ replace: true })
+                .update({ route: '/file/viewer/:id/:tab', path: { id: sha256, tab: value } });
               selection?.setSelection?.(null);
             }}
             tabs={{
@@ -475,8 +467,8 @@ const WrappedFileViewerPage = React.memo(() => (
 
 export const FileViewerRoute = createAppRoute({
   component: WrappedFileViewerPage,
-  path: '/file/viewer/:id/:tab',
-  params: s => ({
+  route: '/file/viewer/:id/:tab',
+  path: s => ({
     id: s.string(),
     tab: s.enum(TAB_OPTIONS, 'ascii')
   })
@@ -486,15 +478,17 @@ const FileViewerRootPage = React.memo(() => {
   const { id } = useAppPathParams<'/file/viewer/:id'>();
   return (
     <AppNavigate
-      to={['replaceRoute', { path: '/file/viewer/:id/:tab', params: { id, tab: null } }, [id], { replace: true }]}
+      to={{ update: { route: '/file/viewer/:id/:tab', path: { id, tab: null } } }}
+      navOptions={{ replace: true }}
+      navDeps={[id]}
     />
   );
 });
 
 export const FileViewerRootRoute = createAppRoute({
   component: FileViewerRootPage,
-  path: '/file/viewer/:id',
-  params: s => ({
+  route: '/file/viewer/:id',
+  path: s => ({
     id: s.string()
   })
 });

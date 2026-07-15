@@ -150,17 +150,18 @@ const WrappedFileTree: React.FC<FileTreeProps> = ({ tree, sid, defaultForceShown
               <span style={{ marginLeft: theme.spacing(3) }} />
             )}
             <Box
-              component={item.sha256 ? AppLink : 'span'}
-              to={`/file/detail/${item.sha256}`}
-              onClick={e => {
-                e.preventDefault();
-                if (item.sha256)
-                  navigate.openRoute({
-                    path: '/file/detail/:id',
-                    params: { id: item.sha256 },
-                    search: { name: encodeURIComponent(item.name[0]) }
-                  });
-              }}
+              {...(!item?.sha256
+                ? { component: 'span' }
+                : {
+                    component: AppLink,
+                    to: {
+                      create: {
+                        route: '/file/detail/:id',
+                        path: { id: item.sha256 },
+                        search: { name: encodeURIComponent(item.name[0]) }
+                      }
+                    }
+                  })}
               sx={{
                 cursor: 'pointer',
                 flexGrow: 1,

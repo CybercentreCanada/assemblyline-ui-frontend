@@ -2,6 +2,7 @@ import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
 import { AlertTitle, Skeleton, Tooltip } from '@mui/material';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
+import { useAppConfig } from 'core/config';
 import { useAppNavigate } from 'core/router';
 import { useAppSearchParams } from 'core/routes';
 import useALContext from 'deprecated/hooks/useALContext';
@@ -37,6 +38,7 @@ const WrappedSubmissionsTable: React.FC<Props> = ({ submissionResults, allowSort
 
   const search = useAppSearchParams<'/submissions'>();
   const navigate = useAppNavigate<'/submissions'>();
+  const submissionView = useAppConfig(s => s.settings.submission_view);
 
   return submissionResults ? (
     !!submissionResults?.total ? (
@@ -72,13 +74,16 @@ const WrappedSubmissionsTable: React.FC<Props> = ({ submissionResults, allowSort
             {submissionResults.items.map((submission, id) => (
               <LinkRow
                 key={`${submission.id}-${id}`}
-                to={[
-                  'openRoute',
-                  submission.state === 'completed'
-                    ? { path: '/submission/:id', params: { id: submission.id } }
-                    : { path: '/submission/detail/:id', params: { id: submission.id } },
-                  [submission.id, submission.state]
-                ]}
+                to={{
+                  create: {
+                    route:
+                      submission.state !== 'completed' || submissionView !== 'report'
+                        ? '/submission/detail/:id'
+                        : '/submission/report/:id',
+                    path: { id: submission.id }
+                  }
+                }}
+                navDeps={[submission.state, submissionView, submission.id]}
                 hover
                 style={{ textDecoration: 'none' }}
               >
@@ -105,10 +110,13 @@ const WrappedSubmissionsTable: React.FC<Props> = ({ submissionResults, allowSort
                       onClick={event => {
                         event.preventDefault();
                         event.stopPropagation();
-                        navigate.replaceSearchObject(s => ({
+                        navigate.here().update(s => ({
                           ...s,
-                          offset: 0,
-                          filters: [...s.filters, `params.submitter:"${submission.params.submitter}"`]
+                          search: {
+                            ...s.search,
+                            offset: 0,
+                            filters: [...s.search.filters, `params.submitter:"${submission.params.submitter}"`]
+                          }
                         }));
                       }}
                     />

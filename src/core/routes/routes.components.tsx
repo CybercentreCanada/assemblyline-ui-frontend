@@ -1,3 +1,4 @@
+import { useAppConfig } from 'core/config';
 import type { ComponentType, MemoExoticComponent, ReactNode } from 'react';
 import { memo } from 'react';
 
@@ -12,7 +13,7 @@ DefaultDisabledRouteFallback.displayName = 'DefaultDisabledRouteFallback';
 
 export type DisabledBoundaryProps = {
   /** Condition or callback to determine disabled state. */
-  disabled?: boolean | (() => boolean);
+  disabled?: boolean | ((config: AppConfigStore) => boolean);
   /** Fallback component to render when disabled. */
   FallbackComponent?: ReactNode | MemoExoticComponent<ComponentType<unknown>>;
   /** Children to render when not disabled. */
@@ -21,7 +22,8 @@ export type DisabledBoundaryProps = {
 
 export const DisabledBoundary = memo(
   ({ disabled = false, FallbackComponent = DefaultDisabledRouteFallback, children }: DisabledBoundaryProps) => {
-    return (typeof disabled === 'function' ? disabled() : disabled) ? <>{FallbackComponent}</> : <>{children}</>;
+    const isDisabled = useAppConfig(s => (typeof disabled === 'function' ? disabled(s) : disabled));
+    return isDisabled ? <>{FallbackComponent}</> : <>{children}</>;
   }
 );
 
@@ -39,7 +41,7 @@ DefaultForbiddenRouteFallback.displayName = 'DefaultForbiddenRouteFallback';
 
 export type ForbiddenBoundaryProps = {
   /** Condition or callback to determine forbidden state. */
-  forbidden?: boolean | (() => boolean);
+  forbidden?: boolean | ((config: AppConfigStore) => boolean);
   /** Fallback component to render when forbidden. */
   FallbackComponent?: ReactNode | MemoExoticComponent<ComponentType<unknown>>;
   /** Children to render when not forbidden. */
@@ -48,7 +50,8 @@ export type ForbiddenBoundaryProps = {
 
 export const ForbiddenBoundary = memo(
   ({ forbidden = false, FallbackComponent = DefaultForbiddenRouteFallback, children }: ForbiddenBoundaryProps) => {
-    return (typeof forbidden === 'function' ? forbidden() : forbidden) ? <>{FallbackComponent}</> : <>{children}</>;
+    const isForbidden = useAppConfig(s => (typeof forbidden === 'function' ? forbidden(s) : forbidden));
+    return isForbidden ? <>{FallbackComponent}</> : <>{children}</>;
   }
 );
 

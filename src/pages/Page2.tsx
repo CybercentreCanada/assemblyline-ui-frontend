@@ -29,6 +29,6 @@ Page2Page.displayName = 'Page2Page';
 
 export const Page2Route = createAppRoute({
   component: Page2Page,
-  path: '/page2/:fileID',
-  params: p => ({ fileID: p.string() })
+  route: '/page2/:fileID',
+  path: p => ({ fileID: p.string() })
 });

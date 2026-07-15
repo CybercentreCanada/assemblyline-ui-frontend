@@ -96,8 +96,8 @@ SubmissionsPage.displayName = 'SubmissionsPage';
 
 export const SubmissionsRoute = createAppRoute({
   component: SubmissionsPage,
-  path: '/submissions/:query',
-  params: s => ({
+  route: '/submissions/:query',
+  path: s => ({
     query: s.string()
   }),
   search: s => ({

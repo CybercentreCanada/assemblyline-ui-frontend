@@ -109,5 +109,5 @@ LoginPage.displayName = 'LoginPage';
 
 export const LoginRoute = createAppRoute({
   component: LoginPage,
-  path: '/login'
+  route: '/login'
 });

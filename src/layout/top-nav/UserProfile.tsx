@@ -439,7 +439,7 @@ const UserMenuHeader = memo(() => {
             </Typography>
             <div style={{ display: 'flex', justifyContent: 'end' }}>
               <IconButton
-                to={['openRoute', { path: '/account' }]}
+                to={{ create: { route: '/account' } }}
                 size="large"
                 tooltip={t('usermenu.account')}
                 sx={{ color: theme.palette.text.primary }}
@@ -453,7 +453,7 @@ const UserMenuHeader = memo(() => {
                 <AccountCircleOutlinedIcon />
               </IconButton>
               <IconButton
-                to={['openRoute', { path: '/settings/:tab', params: { tab: 'interface' } }]}
+                to={{ create: { route: '/settings/:tab', path: { tab: 'interface' } } }}
                 size="large"
                 tooltip={t('usermenu.settings')}
                 sx={{ color: theme.palette.text.primary }}

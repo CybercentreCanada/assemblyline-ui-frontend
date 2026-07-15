@@ -8,7 +8,6 @@ import TuneOutlinedIcon from '@mui/icons-material/TuneOutlined';
 import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
 import { List, ListItemButton, ListItemIcon, ListItemText, Popover, useTheme } from '@mui/material';
-import { InferNavigationInputFromPath } from 'core/router';
 import { createAppRoute, useAppPathParams, useAppSearchParams } from 'core/routes';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
@@ -29,7 +28,6 @@ import ParentSection from 'pages/file-detail/components/parents';
 import ResultSection from 'pages/file-detail/components/results';
 import TagSection from 'pages/file-detail/components/tags';
 import URIIdentificationSection from 'pages/file-detail/components/uriIdent';
-import { DEFAULT_TAB, TAB_OPTIONS } from 'pages/file-viewer/file-viewer.route';
 import { ForbiddenPage } from 'pages/forbidden/forbidden.route';
 import AISummarySection from 'pages/submission-detail/components/ai_summary';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -93,16 +91,6 @@ const FileDetailPage = React.memo(() => {
 
   const params = useMemo(() => new URLSearchParams(location.search), [location.search]);
   const fileName = useMemo(() => (file ? search.get('name') || sha256 : null), [file, search.toString(), sha256]);
-
-  const fileViewerPath = useMemo<InferNavigationInputFromPath<'/file/viewer/:id/:tab'>>(() => {
-    const tab = TAB_OPTIONS.find(option => location.pathname.indexOf(option) >= 0);
-    if (!location.pathname.startsWith('/file/viewer') || !tab)
-      return [
-        'openRoute',
-        { path: '/file/viewer/:id/:tab', params: { id: file?.file_info?.sha256, tab: DEFAULT_TAB } }
-      ];
-    else return ['openRoute', { path: '/file/viewer/:id/:tab', params: { id: file?.file_info?.sha256, tab: tab } }];
-  }, [file?.file_info?.sha256, location.hash, location.pathname, location.search]);
 
   const elementInViewport = element => {
     const bounding = element.getBoundingClientRect();
@@ -442,7 +430,15 @@ const FileDetailPage = React.memo(() => {
               <IconButton
                 loading={!file}
                 size="large"
-                to={fileViewerPath}
+                to={{
+                  create: prev => ({
+                    route: '/file/viewer/:id/:tab',
+                    path: {
+                      id: file?.file_info?.sha256,
+                      tab: prev.route === '/file/viewer/:id/:tab' ? prev.path.tab : null
+                    }
+                  })
+                }}
                 tooltip={t('file_viewer')}
                 preventRender={
                   !currentUser.roles.includes('file_detail') ||
@@ -576,8 +572,8 @@ const FileDetailPage = React.memo(() => {
 
 export const FileDetailRoute = createAppRoute({
   component: FileDetailPage,
-  path: '/file/detail/:id',
-  params: s => ({
+  route: '/file/detail/:id',
+  path: s => ({
     id: s.string()
   }),
   search: s => ({

@@ -62,4 +62,4 @@ export const Page1Page = memo(() => {
 
 Page1Page.displayName = 'Page1Page';
 
-export const Page1Route = createAppRoute({ path: '/page1', component: Page1Page });
+export const Page1Route = createAppRoute({ route: '/page1', component: Page1Page });

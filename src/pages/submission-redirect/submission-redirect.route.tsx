@@ -1,23 +1,28 @@
 import { AppNavigate } from 'core/router';
-import { createAppRoute, useAppPathParams } from 'core/routes';
+import { createAppRoute } from 'core/routes';
 import { useALContext } from 'deprecated/hooks/useALContext';
 import { memo } from 'react';
 
 const SubmissionRedirect = memo(() => {
   const { settings } = useALContext();
-  const { id } = useAppPathParams<'/submission/:id'>();
 
   return settings.submission_view === 'details' ? (
-    <AppNavigate to={['replaceRoute', { path: `/submission/detail/:id`, params: { id } }, null, { replace: true }]} />
+    <AppNavigate<'/submission/:id'>
+      here={{ update: prev => ({ route: '/submission/detail/:id', path: { id: prev.path.id } }) }}
+      navOptions={{ replace: true }}
+    />
   ) : (
-    <AppNavigate to={['replaceRoute', { path: `/submission/report/:id`, params: { id } }, null, { replace: true }]} />
+    <AppNavigate<'/submission/:id'>
+      here={{ update: prev => ({ route: '/submission/report/:id', path: { id: prev.path.id } }) }}
+      navOptions={{ replace: true }}
+    />
   );
 });
 
 export const SubmissionRedirectRoute = createAppRoute({
   component: SubmissionRedirect,
-  path: '/submission/:id',
-  params: s => ({
+  route: '/submission/:id',
+  path: s => ({
     id: s.string()
   })
 });

@@ -151,10 +151,10 @@ const routeKey = useAppRouteKey();
 ### Building Hrefs (in hooks/utils)
 
 ```typescript
-import { buildRouteLocation } from 'core/routes';
+import { buildLocationParam } from 'core/routes';
 import { APP_ROUTES } from 'app/app.routes';
 
-const { href, state } = buildRouteLocation(APP_ROUTES, {
+const { href, state } = buildLocationParam(APP_ROUTES, {
   path: '/alerts/:id',
   params: { id: '123' },
   search: { tab: 'details' }
@@ -168,12 +168,12 @@ const { href, state } = buildRouteLocation(APP_ROUTES, {
 
 | File | Role |
 | ---- | ---- |
-| `routes.models.ts` | Type definitions: `AppRoute`, `CreatedAppRoute`, `CreatedAppRouteParamsMap`, `AppRouteLocation` |
+| `routes.models.ts` | Type definitions: `AppRoute`, `CreatedAppRoute`, `CreatedAppRouteParamsMap`, `AppLocationParam` |
 | `routes.factories.tsx` | `createAppRoute` — builds a route object from path + options |
 | `routes.hooks.tsx` | `useAppPathParams`, `useAppSearchParams`, `useAppHashParams`, `useAppRoute` |
 | `routes.providers.tsx` | `AppRouteProvider` (per-route store), `AppRouteKeyProvider` (route identity) |
 | `routes.components.tsx` | `DisabledBoundary`, `ForbiddenBoundary` — route guard components |
-| `routes.utils.tsx` | `findAppRoute`, `buildRoutePathname`, `buildRouteSearch`, `buildRouteHash`, `buildRouteLocation` |
+| `routes.utils.tsx` | `findAppRoute`, `buildRoutePathname`, `buildRouteSearch`, `buildRouteHash`, `buildLocationParam` |
 | `routes.utils.test.tsx` | Unit tests for route building utilities |
 
 ### Utility Functions
@@ -185,7 +185,7 @@ const { href, state } = buildRouteLocation(APP_ROUTES, {
 | `buildRouteSearch` | Serializes search params via delta (only non-default values) |
 | `buildRouteHash` | Normalizes hash value through codec |
 | `buildRouteState` | Builds `location.state` from search delta for state-based navigation |
-| `buildRouteLocation` | Composes all of the above into a final `{ href, state }` payload |
+| `buildLocationParam` | Composes all of the above into a final `{ href, state }` payload |
 
 ### Related Modules
 

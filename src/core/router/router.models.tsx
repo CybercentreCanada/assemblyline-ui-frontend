@@ -1,8 +1,7 @@
-import type { InferAppRouteSearchValuesFromPath, InferAppRouteValuesFromPath } from 'core/routes';
+import type { InferAppRouteValuesFromPath } from 'core/routes';
 import type { ReversePortalNode } from 'features/portal';
 import { createReversePortalNode } from 'features/portal';
-import type { DependencyList, SetStateAction } from 'react';
-import type { NavigateOptions } from 'react-router';
+import type { DependencyList } from 'react';
 import { generateRandomUUID } from 'shared/utils/app.utils';
 
 //*****************************************************************************************
@@ -107,7 +106,6 @@ export const DEFAULT_APP_LOCATION_STATE: AppLocationState = {
 export type AppRouterStore =
   & AppLocationState
   & {
-
     /** Portal node cache. */
     nodes: Record<string, AppRouterNode>;
   };
@@ -136,44 +134,75 @@ export const ROUTER_STORE_EXAMPLE: AppRouterStore = {
 // Navigate
 //*****************************************************************************************
 
-/** Route transition intents accepted by router link helpers. */
-export type InferNavigationIntentFromPath<Path extends AppRoute['path']> = {
-  /** Opens a route, typically in the next panel. */
-  openRoute: SetStateAction<InferAppRouteValuesFromPath<Path>>;
-  /** Replaces the current route values. */
-  replaceRoute: SetStateAction<InferAppRouteValuesFromPath<Path>>;
-  /** Replaces only route search values using typed objects. */
-  replaceSearchObject: SetStateAction<InferAppRouteSearchValuesFromPath<Path>>;
-  /** Replaces only route search values using URLSearchParams. */
-  replaceURLSearchParams: SetStateAction<URLSearchParams>;
-  /** Closes the selected panel */
-  closePanel: number;
+export type AppNavigateOptions = {
+  // `replace` is a boolean that determines whether the navigation should replace the current history entry or push a new one.
+  replace?: boolean;
+  // `resetScroll` is a boolean that determines whether scroll position will be reset to 0,0 after the location is committed to browser history.
+  resetScroll?: boolean;
+  // `hashScrollIntoView` is a boolean or object that determines whether an id matching the hash will be scrolled into view after the location is committed to history.
+  hashScrollIntoView?: boolean;
+  // `viewTransition` is either a boolean or function that determines if and how the browser will call document.startViewTransition() when navigating.
+  viewTransition?: boolean;
+  // `ignoreBlocker` is a boolean that determines if navigation should ignore any blockers that might prevent it.
+  ignoreBlocker?: boolean;
+  // `reloadDocument` is a boolean that determines if navigation to a route inside of router will trigger a full page load instead of the traditional SPA navigation.
+  reloadDocument?: boolean;
+  // `href` is a string that can be used in place of `to` to navigate to a full built href, e.g. pointing to an external target.
+  href?: string;
 };
 
-/** Tuple form `[Operation, value, dependencies?, options?]` for DX-friendly navigation intent metadata. */
-export type InferNavigationInputFromPath<Path extends AppRoute['path']> = {
-  [Operation in keyof InferNavigationIntentFromPath<Path>]: readonly [
-    Operation: Operation,
-    dispatch: InferNavigationIntentFromPath<Path>[Operation],
-    dependencies?: DependencyList,
-    options?: NavigateOptions
-  ];
-}[keyof InferNavigationIntentFromPath<Path>];
-
-/** Normalized parsed navigation payload used by parseNavigationInput. */
-export type InferNavigationMapFromPath<Path extends AppRoute['path']> = {
-  [Operation in keyof InferNavigationIntentFromPath<Path>]: {
-    Operation: Operation;
-    dispatch: InferNavigationIntentFromPath<Path>[Operation];
-    dependencies: DependencyList | null;
-    options: NavigateOptions | null;
-  };
-}[keyof InferNavigationIntentFromPath<Path>];
-
-/** Default options for programmatic router navigation. */
-export const DEFAULT_NAVIGATE_OPTIONS: NavigateOptions = {
-  replace: false
+export const DEFAULT_APP_NAVIGATE_OPTIONS: AppNavigateOptions = {
+  hashScrollIntoView: false,
+  href: '',
+  ignoreBlocker: false,
+  reloadDocument: false,
+  replace: false,
+  resetScroll: false,
+  viewTransition: false
 };
+
+type ExactlyOneKey<T extends Record<string, unknown>> = {
+  [K in keyof T]: { [P in K]-?: T[P] } & { [P in Exclude<keyof T, K>]?: never };
+}[keyof T];
+
+export type InferAppNavigationOperationMapFromPath<Path extends AppRoute['route']> = {
+  create:
+    | InferAppRouteValuesFromPath<AppRoute['route']>
+    | ((props: InferAppRouteValuesFromPath<Path>) => InferAppRouteValuesFromPath<AppRoute['route']>);
+  update:
+    | InferAppRouteValuesFromPath<AppRoute['route']>
+    | ((props: InferAppRouteValuesFromPath<Path>) => InferAppRouteValuesFromPath<AppRoute['route']>);
+  delete: boolean | ((props: InferAppRouteValuesFromPath<Path>) => boolean);
+};
+
+// export type InferAppNavigationOperationObjectFromPath<Path extends AppRoute['route']> = ExactlyOneKey<{
+//   create: InferAppNavigationOperationMapFromPath<Path>['create'];
+//   update: InferAppNavigationOperationMapFromPath<Path>['update'];
+//   delete: InferAppNavigationOperationMapFromPath<Path>['delete'];
+// }>;
+
+// export type AppNavigationTarget = 'from' | 'here' | 'to' | 'at';
+
+// export type AppNavigationOperation = 'create' | 'update' | 'delete';
+
+export type InferAppNavigationIntentMapFromPath<Path extends AppRoute['route']> = {
+  from: InferAppNavigationOperationMapFromPath<Path>;
+  here: InferAppNavigationOperationMapFromPath<Path>;
+  to: InferAppNavigationOperationMapFromPath<Path>;
+  at: { panelKey: number } & InferAppNavigationOperationMapFromPath<Path>;
+};
+
+export type InferAppNavigationPropsFromPath<Path extends AppRoute['route']> = {
+  navDeps?: DependencyList;
+  navOptions?: AppNavigateOptions;
+} & Partial<
+  ExactlyOneKey<{
+    from: ExactlyOneKey<InferAppNavigationOperationMapFromPath<Path>>;
+    here: ExactlyOneKey<InferAppNavigationOperationMapFromPath<Path>>;
+    to: ExactlyOneKey<InferAppNavigationOperationMapFromPath<Path>>;
+    at: { panelKey: number } & ExactlyOneKey<InferAppNavigationOperationMapFromPath<Path>>;
+  }>
+>;
 
 //*****************************************************************************************
 // Navigation Store
@@ -183,10 +212,10 @@ export const DEFAULT_NAVIGATE_OPTIONS: NavigateOptions = {
 export type AppNavigationStore =
   & AppLocationState
   & {
-        /** Routes that are blocked from navigation */
+    /** Routes that are blocked from navigation */
     blockedRoutes: AppRouterBlockedRoutes
     /** Check if this navigation should replace the current history entry */
-    replace?: boolean;
+    options?: AppNavigateOptions;
   };
 
 export type AppRouterState = Pick<AppNavigationStore, 'id' | 'panels' | 'routes'>;
@@ -194,5 +223,5 @@ export type AppRouterState = Pick<AppNavigationStore, 'id' | 'panels' | 'routes'
 export const DEFAULT_APP_NAVIGATION_STORE: AppNavigationStore = {
   ...DEFAULT_APP_LOCATION_STATE,
   blockedRoutes: {},
-  replace: false
+  options: { ...DEFAULT_APP_NAVIGATE_OPTIONS }
 };

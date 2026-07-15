@@ -5,11 +5,11 @@ export type { CreateAppRouteProps } from './routes.factories';
 export { useAppHashParams, useAppLocation, useAppPathParams, useAppRouteKey, useAppSearchParams } from './routes.hooks';
 export { DEFAULT_APP_ROUTE_LOCATION, DEFAULT_APP_ROUTE_SNAPSHOT, DEFAULT_APP_ROUTE_SPEC } from './routes.models';
 export type {
+  AppLocationParamStore,
   AppRouteLocation,
-  AppRouteLocationsStore,
   AppRouteSpec,
   GuardResult,
-  InferAppRouteLocationFromPath,
+  InferAppLocationParamFromPath,
   InferAppRouteSearchValuesFromPath,
   InferAppRouteSpecFromPath,
   InferAppRouteValuesFromPath,
@@ -17,25 +17,25 @@ export type {
   RouteMeta
 } from './routes.models';
 export {
+  AppLocationParamProvider,
+  AppLocationParamStoreProvider,
   AppRouteKeyProvider,
   AppRouteKeyStoreProvider,
-  AppRouteLocationsProvider,
-  AppRouteLocationsStoreProvider,
-  DEFAULT_APP_ROUTE_LOCATIONS_STORE,
-  getAppRouteLocationsStateFromApi,
+  DEFAULT_APP_LOCATION_PARAM_STORE,
+  getAppLocationParamStateFromApi,
+  useAppLocationParamStore,
+  useAppLocationParamStoreApi,
   useAppRouteKeyStore,
-  useAppRouteLocationsStore,
-  useAppRouteLocationsStoreApi,
-  useAppSetRouteLocationsStore
+  useAppSetLocationParamStore
 } from './routes.providers';
 export type {
+  AppLocationParamProviderProps,
   AppRouteKeyStore,
-  AppRouteKeyStoreProviderProps,
-  AppRouteLocationsProviderProps
+  AppRouteKeyStoreProviderProps
 } from './routes.providers';
 export {
   addRouteSnapshot,
-  applyRouteLocationSearchToSnapshot,
+  applyLocationParamSearchToSnapshot,
   findAppRouteValuesFromKey,
   findRouteSnapshotFromKey,
   findRouteSpecFromKey,
@@ -47,22 +47,22 @@ export {
   getAppRouteValuesFromSnapshot,
   getDefaultAppRouteValues,
   getDefaultLocation,
-  getDefaultRouteLocation,
+  getDefaultLocationParam,
   getDefaultRouteSnapshot,
   getDefaultRouteSpec,
   getExternalHrefFromLocation,
   getExternalHrefFromSnapshot,
-  getLocationFromRouteLocation,
+  getLocationFromLocationParam,
   getLocationFromSnapshot,
   getLocationHashFromSnapshot,
+  getLocationParamFromSnapshot,
+  getLocationParamFromValues,
   getLocationPathnameFromSnapshot,
   getLocationSearchFromSnapshot,
   getLocationsFromLegacyURL,
   getLocationsFromURLHash,
   getLocationStateFromSnapshot,
   getRouteIdFromLocation,
-  getRouteLocationFromSnapshot,
-  getRouteLocationFromValues,
   getRouteSnapshotFromLocation,
   getRouteSnapshotFromValues,
   getSnapshotHashFromLocation,
@@ -73,7 +73,7 @@ export {
   removeRouteSnapshot,
   removeRouteSnapshotFromKey,
   sanitizeAppRouteValues,
-  sanitizeRouteLocation,
+  sanitizeLocationParam,
   sanitizeRouteSnapshot,
   setRouteSpecsFromAppRoutes,
   syncRouteSnapshotsFromRouter,

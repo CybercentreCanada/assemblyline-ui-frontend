@@ -13,17 +13,18 @@ export { AppRouterLayout, AppRouterNode, AppRouterPanel } from './router.layout'
 export type { AppRouterNodeProps, AppRouterPanelProps } from './router.layout';
 export {
   DEFAULT_APP_LOCATION_STATE,
+  DEFAULT_APP_NAVIGATE_OPTIONS,
   DEFAULT_APP_NAVIGATION_STORE,
   DEFAULT_APP_ROUTER_BLOCKED_ROUTES,
   DEFAULT_APP_ROUTER_NODE,
   DEFAULT_APP_ROUTER_PANEL,
   DEFAULT_APP_ROUTER_ROUTE,
   DEFAULT_APP_ROUTER_STORE,
-  DEFAULT_NAVIGATE_OPTIONS,
   ROUTER_STORE_EXAMPLE
 } from './router.models';
 export type {
   AppLocationState,
+  AppNavigateOptions,
   AppNavigationStore,
   AppRouterBlockedRoutes,
   AppRouterNode as AppRouterNodeType,
@@ -31,9 +32,9 @@ export type {
   AppRouterRoute,
   AppRouterState,
   AppRouterStore,
-  InferNavigationInputFromPath,
-  InferNavigationIntentFromPath,
-  InferNavigationMapFromPath,
+  InferAppNavigationIntentMapFromPath,
+  InferAppNavigationOperationMapFromPath,
+  InferAppNavigationPropsFromPath,
   RouteKeyOf
 } from './router.models';
 export {
@@ -74,14 +75,19 @@ export {
   findOldestNodeKey,
   findPanel,
   findPanelKey,
+  findPrevPanelKey,
   findRoute,
   findRouteKey,
+  getDefaultPanel,
   getFirstRouteKey,
   getHashFragmentsFromRouter,
   getLocationStateFromRouter,
-  getNavigationMapFromInput,
+  getNavigationIntentFromInput,
+  getNavigationIntentFromProps,
   getNavigationStoreFromRouter,
   getNextRouteFromKey,
+  getOperationIntentFromNavigation,
+  getPanel,
   getRouteFromKey,
   getRouteFromPanelKey,
   hasBlockedRoutes,

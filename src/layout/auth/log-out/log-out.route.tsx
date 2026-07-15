@@ -43,5 +43,5 @@ LogoutPage.displayName = 'LogoutPage';
 
 export const LogoutRoute = createAppRoute({
   component: LogoutPage,
-  path: '/logout'
+  route: '/logout'
 });

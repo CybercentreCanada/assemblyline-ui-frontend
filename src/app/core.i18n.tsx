@@ -25,6 +25,10 @@ import externalLookupEN from 'layout/external-lookup/external-lookup.i18n.en.jso
 import externalLookupFR from 'layout/external-lookup/external-lookup.i18n.fr.json';
 import notificationsEN from 'layout/notifications/notifications.i18n.en.json';
 import notificationsFR from 'layout/notifications/notifications.i18n.fr.json';
+import fileDetailEN from 'pages/file-detail/file-detail.i18n.en.json';
+import fileDetailFR from 'pages/file-detail/file-detail.i18n.fr.json';
+import fileViewerEN from 'pages/file-viewer/file-viewer.i18n.en.json';
+import fileViewerFR from 'pages/file-viewer/file-viewer.i18n.fr.json';
 import forbiddenEN from 'pages/forbidden/forbidden.i18n.en.json';
 import forbiddenFR from 'pages/forbidden/forbidden.i18n.fr.json';
 import helpAPIEN from 'pages/help/api/help-api.i18n.en.json';
@@ -57,6 +61,8 @@ export const I18N_RESSOURCES = {
     error403: forbiddenEN,
     error404: notFoundEN,
     externalLookup: externalLookupEN,
+    fileDetail: fileDetailEN,
+    fileViewer: fileViewerEN,
     helpAPI: helpAPIEN,
     inputs: inputsEN,
     locked: lockedEN,
@@ -80,6 +86,8 @@ export const I18N_RESSOURCES = {
     error403: forbiddenFR,
     error404: notFoundFR,
     externalLookup: externalLookupFR,
+    fileDetail: fileDetailFR,
+    fileViewer: fileViewerFR,
     helpAPI: helpAPIFR,
     inputs: inputsFR,
     locked: lockedFR,

@@ -45,10 +45,15 @@ const Submissions = memo(() => {
 
   const handleToggleFilter = useCallback(
     (filter: string) =>
-      navigate.replaceSearchObject(s => ({
+      navigate.here().update(s => ({
         ...s,
-        offset: 0,
-        filters: s.filters.includes(filter) ? s.filters.filter(f => f !== filter) : [...s.filters, filter]
+        search: {
+          ...s?.search,
+          offset: 0,
+          filters: s.search.filters.includes(filter)
+            ? s.search.filters.filter(f => f !== filter)
+            : [...s.search.filters, filter]
+        }
       })),
 
     [navigate]
@@ -88,7 +93,11 @@ const Submissions = memo(() => {
                 ? t(`filtered${submissionResults?.total === 1 ? '' : 's'}`)
                 : t(`total${submissionResults?.total === 1 ? '' : 's'}`)
             }
-            onChange={v => navigate.replaceURLSearchParams(v)}
+            onChange={v =>
+              navigate
+                .here()
+                .update(s => ({ ...s, search: { ...s.search, ...SubmissionsRoute.search.delta(v).toObject() } }))
+            }
             paramDefaults={search.defaults().toObject()}
             searchInputProps={{ placeholder: t('filter'), options: suggestions }}
             actionProps={[
@@ -158,7 +167,7 @@ const Submissions = memo(() => {
 
 export const SubmissionsRoute = createAppRoute({
   component: Submissions,
-  path: '/submissions',
+  route: '/submissions',
   search: s => ({
     query: s.string(''),
     offset: s.number(0).min(0).origin('snapshot').ephemeral(),

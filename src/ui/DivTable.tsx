@@ -9,7 +9,7 @@ import {
   TableRow,
   TableSortLabel
 } from '@mui/material';
-import type { InferNavigationInputFromPath } from 'core/router';
+import type { InferAppNavigationPropsFromPath } from 'core/router';
 import { AppLink, useAppNavigate } from 'core/router';
 import { useAppSearchParams } from 'core/routes';
 import React, { memo } from 'react';
@@ -91,7 +91,7 @@ export const SortableHeaderCell: React.FC<SortableHeaderCellProps> = ({
     if (onSort) {
       onSort(event, { name: sortName, field: nextSortValue || null });
     } else {
-      navigate.replaceSearchObject(s => ({ ...s, [sortName]: nextSortValue }));
+      navigate.here().update(s => ({ ...s, search: { ...s.search, [sortName]: nextSortValue } }));
     }
   };
 
@@ -108,25 +108,29 @@ export const SortableHeaderCell: React.FC<SortableHeaderCellProps> = ({
   );
 };
 
-type LinkRowProps<Path extends AppRoute['path']> = Omit<TableRowProps, 'component'> & {
-  to: InferNavigationInputFromPath<Path>;
-};
+type LinkRowProps<Path extends AppRoute['route']> = Omit<TableRowProps, 'component'> &
+  InferAppNavigationPropsFromPath<Path>;
 
-export const LinkRow = memo(function LinkRow<const Path extends AppRoute['path']>({
+export const LinkRow = memo(function LinkRow<const Path extends AppRoute['route']>({
   children,
-  to,
+  to = null,
+  here = null,
+  from = null,
+  at = null,
+  navDeps = null,
+  navOptions = null,
   ...other
 }: LinkRowProps<Path>) {
   return (
     <TableRow
       {...(other as TableRowProps)}
-      {...(!to ? null : { to, component: AppLink })}
+      {...(!to && !here && !from && !at ? null : { component: AppLink, to, here, from, at, navDeps, navOptions })}
       style={{ cursor: 'pointer', textDecoration: 'none' }}
     >
       {children}
     </TableRow>
   );
-}) as unknown as <const Path extends AppRoute['path']>(props: LinkRowProps<Path>) => React.JSX.Element;
+}) as unknown as <const Path extends AppRoute['route']>(props: LinkRowProps<Path>) => React.JSX.Element;
 
 (LinkRow as unknown as { displayName: string }).displayName = 'LinkRow';
 

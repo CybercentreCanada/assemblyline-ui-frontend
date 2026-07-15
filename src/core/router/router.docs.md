@@ -228,7 +228,7 @@ const setStore = useAppRouterSetStore();
 | `router.config.tsx` | Zod schema for config validation, `AppRouterConfig` type |
 | `router.defaults.tsx` | Default values for panels, nodes, routes, store; example store for fallback |
 | `router.providers.tsx` | `AppRouterProvider` (BrowserRouter + store sync), `useAppRouterStore`, `useAppRouterSetStore` |
-| `router.hooks.tsx` | `useAppNavigate` (main navigation hook), `useAppRouteLocation` (href builder) |
+| `router.hooks.tsx` | `useAppNavigate` (main navigation hook), `useAppLocationParam` (href builder) |
 | `router.components.tsx` | `AppLink` — type-safe link component |
 | `router.utils.tsx` | Pure functions for all store operations (panels, nodes, routes, tabs, serialization) |
 | `router.utils.test.tsx` | Unit tests for utility functions |

@@ -1084,8 +1084,8 @@ export const UserPage = memo(({ username = null }: UserPageProps) => {
 
 export const UserRoute = createAppRoute({
   component: UserPage,
-  path: '/user/:id',
-  params: s => ({
+  route: '/user/:id',
+  path: s => ({
     id: s.string()
   })
 });

@@ -132,7 +132,7 @@ const Errors = ({ sid = null, service = null, errors = [] }: ErrorsProps) => {
             <MaterialLink
               component={AppLink}
               color={theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark}
-              to={['openRoute', { path: '/file/detail/:id', params: { id: getHashFromKey(errors[0]) } }]}
+              to={{ create: { route: '/file/detail/:id', path: { id: getHashFromKey(errors[0]) } } }}
             >
               {getHashFromKey(errors[0])}
             </MaterialLink>
@@ -175,7 +175,7 @@ const Errors = ({ sid = null, service = null, errors = [] }: ErrorsProps) => {
                       <MaterialLink
                         component={AppLink}
                         color={theme.palette.mode === 'dark' ? theme.palette.error.light : theme.palette.error.dark}
-                        to={['openRoute', { path: '/file/detail/:id', params: { id: getHashFromKey(error) } }]}
+                        to={{ create: { route: '/file/detail/:id', path: { id: getHashFromKey(error) } } }}
                       >
                         {getHashFromKey(error)}
                       </MaterialLink>

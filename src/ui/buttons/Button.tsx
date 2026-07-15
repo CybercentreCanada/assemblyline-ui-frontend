@@ -1,22 +1,22 @@
 import type { ButtonProps as MuiButtonProps, TooltipProps } from '@mui/material';
 import { Button as MuiButton, Skeleton } from '@mui/material';
-import type { InferNavigationInputFromPath } from 'core/router';
-import { AppLink } from 'core/router';
+import type { InferAppNavigationPropsFromPath } from 'core/router';
+import { AppLink, DEFAULT_APP_NAVIGATE_OPTIONS } from 'core/router';
 import { memo, useMemo } from 'react';
 import { getTextContent } from 'shared/utils/utils';
 import { Tooltip } from 'ui/Tooltip';
 import { CircularProgress } from 'ui/buttons/CircularProgress';
 
-export type ButtonProps<Path extends AppRoute['path']> = MuiButtonProps & {
-  loading?: boolean;
-  preventRender?: boolean | (() => boolean);
-  progress?: boolean;
-  to?: InferNavigationInputFromPath<Path>;
-  tooltip?: TooltipProps['title'];
-  tooltipProps?: Omit<TooltipProps, 'children' | 'title'>;
-};
+export type ButtonProps<Path extends AppRoute['route']> = MuiButtonProps &
+  InferAppNavigationPropsFromPath<Path> & {
+    loading?: boolean;
+    preventRender?: boolean | (() => boolean);
+    progress?: boolean;
+    tooltip?: TooltipProps['title'];
+    tooltipProps?: Omit<TooltipProps, 'children' | 'title'>;
+  };
 
-export const Button = memo(function <Path extends AppRoute['path'] = AppRoute['path']>({
+export const Button = memo(function <Path extends AppRoute['route'] = AppRoute['route']>({
   children = null,
   disabled = false,
   id = null,
@@ -24,7 +24,12 @@ export const Button = memo(function <Path extends AppRoute['path'] = AppRoute['p
   preventRender: preventRenderProp = false,
   progress = false,
   size = 'medium',
-  to: toProp = null,
+  to = null,
+  here = null,
+  from = null,
+  at = null,
+  navOptions = DEFAULT_APP_NAVIGATE_OPTIONS,
+  navDeps = null,
   tooltip = null,
   tooltipProps = null,
   ...props
@@ -54,7 +59,7 @@ export const Button = memo(function <Path extends AppRoute['path'] = AppRoute['p
         id={id ?? getTextContent(children)}
         disabled={progress || disabled}
         size={size}
-        {...(!toProp ? null : { component: AppLink, to: toProp })}
+        {...(!to && !here && !from && !at ? null : { component: AppLink, to, here, from, at, navOptions, navDeps })}
         {...props}
       >
         {children}

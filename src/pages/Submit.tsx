@@ -129,4 +129,4 @@ export const SubmitPage = memo(() => {
 
 SubmitPage.displayName = 'SubmitPage';
 
-export const SubmitRoute = createAppRoute({ path: '/submit', component: SubmitPage });
+export const SubmitRoute = createAppRoute({ route: '/submit', component: SubmitPage });

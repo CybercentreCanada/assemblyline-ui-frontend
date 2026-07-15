@@ -1,25 +1,31 @@
 import type { ListItemIconProps, ListItemTextProps } from '@mui/material';
 import { ListItem, ListItemButton, ListItemIcon, ListItemText, useTheme } from '@mui/material';
 import type { LeftNavChildRenderProps } from '@tui/core';
-import type { InferNavigationInputFromPath } from 'core/router';
-import { AppLink } from 'core/router';
-import type { JSX } from 'react';
+import type { AppNavigateOptions, InferAppNavigationPropsFromPath } from 'core/router';
+import { AppLink, DEFAULT_APP_NAVIGATE_OPTIONS } from 'core/router';
+import type { DependencyList, JSX } from 'react';
 import { memo, useMemo } from 'react';
 
-export type LeftNavLinkProps<Path extends AppRoute['path']> = {
+export type LeftNavLinkProps<Path extends AppRoute['route']> = InferAppNavigationPropsFromPath<Path> & {
   icon?: ListItemIconProps['children'];
   navOpen: boolean;
   navProps?: LeftNavChildRenderProps;
   primary?: ListItemTextProps['primary'];
-  to?: InferNavigationInputFromPath<Path>;
+  navOptions: AppNavigateOptions;
+  navDeps: DependencyList;
 };
 
-function WrappedLeftNavRoute<const Path extends AppRoute['path']>({
+function WrappedLeftNavRoute<const Path extends AppRoute['route']>({
   icon,
   navOpen,
   navProps,
   primary,
-  to = null
+  from,
+  here,
+  to,
+  at,
+  navOptions = DEFAULT_APP_NAVIGATE_OPTIONS,
+  navDeps = null
 }: LeftNavLinkProps<Path>) {
   const theme = useTheme();
   const { active, level } = useMemo(() => navProps ?? { active: false, level: 0 }, [navProps]);
@@ -30,7 +36,7 @@ function WrappedLeftNavRoute<const Path extends AppRoute['path']>({
         dense={level > 0}
         selected={active}
         sx={{ minHeight: undefined, paddingLeft: level === 0 ? undefined : theme.spacing(navOpen ? 4 : 2) }}
-        {...(!to ? null : { component: AppLink, to })}
+        {...(!to && !here && !from && !at ? null : { component: AppLink, to, here, from, at, navDeps, navOptions })}
       >
         {icon && <ListItemIcon sx={{ color: 'inherit' }}>{icon}</ListItemIcon>}
         <ListItemText primary={primary} />
@@ -39,7 +45,7 @@ function WrappedLeftNavRoute<const Path extends AppRoute['path']>({
   );
 }
 
-export const LeftNavRoute = memo(WrappedLeftNavRoute) as <const Path extends AppRoute['path']>(
+export const LeftNavRoute = memo(WrappedLeftNavRoute) as <const Path extends AppRoute['route']>(
   props: LeftNavLinkProps<Path>
 ) => JSX.Element | null;
 

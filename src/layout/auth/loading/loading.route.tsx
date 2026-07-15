@@ -34,5 +34,5 @@ LoadingPage.displayName = 'LoadingPage';
 
 export const LoadingRoute = createAppRoute({
   component: LoadingPage,
-  path: '/loading'
+  route: '/loading'
 });

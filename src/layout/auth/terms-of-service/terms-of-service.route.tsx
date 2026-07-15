@@ -118,5 +118,5 @@ ToSPage.displayName = 'ToSPage';
 
 export const ToSRoute = createAppRoute({
   component: ToSPage,
-  path: '/tos'
+  route: '/tos'
 });

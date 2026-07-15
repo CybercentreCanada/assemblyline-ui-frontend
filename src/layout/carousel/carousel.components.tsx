@@ -20,6 +20,7 @@ import {
   Tooltip,
   useTheme
 } from '@mui/material';
+import { AppLink } from 'core/router';
 import { useBackgroundMode, useCarouselKeyboard, useImageFetch } from 'layout/carousel/carousel.hooks';
 import type {
   BackgroundMode,
@@ -32,7 +33,6 @@ import type { Image } from 'models/base/result_body';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router';
-import { Link } from 'react-router-dom';
 
 //*****************************************************************************************
 // Styled Components
@@ -621,8 +621,8 @@ export const CarouselContainer = memo(({ images, index, onClose, open, setIndex 
             </Info>
             <Tooltip title={t('view_file')} placement="bottom">
               <IconButton
-                component={Link}
-                to={`/file/viewer/${currentImage?.img}/image/${location.search}${location.hash}`}
+                component={AppLink}
+                to={{ create: { route: '/file/viewer/:id/:tab', path: { id: currentImage?.img, tab: 'image' } } }}
                 color="inherit"
                 style={{ marginLeft: '8px' }}
                 onClick={handleClose}

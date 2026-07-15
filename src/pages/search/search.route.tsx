@@ -38,7 +38,11 @@ import SearchResultCount from 'ui/SearchResultCount';
 
 const PAGE_SIZE = 25;
 
-type SearchIndexes = Pick<Indexes, 'submission' | 'file' | 'result' | 'signature' | 'alert' | 'retrohunt'>;
+export const INDEX_OPTIONS = ['submission', 'file', 'result', 'signature', 'alert', 'retrohunt'] as const;
+
+export type Index = (typeof INDEX_OPTIONS)[number];
+
+type SearchIndexes = Pick<Indexes, Index>;
 
 type Params = {
   id: string;
@@ -456,5 +460,19 @@ SearchPage.displayName = 'SearchPage';
 
 export const SearchRoute = createAppRoute({
   component: SearchPage,
-  path: '/search'
+  route: '/search/:index',
+  path: s => ({
+    index: s.enum(INDEX_OPTIONS, 'submission')
+  }),
+  search: s => ({
+    query: s.string('')
+  })
+});
+
+export const SearchRootRoute = createAppRoute({
+  component: SearchPage,
+  route: '/search',
+  search: s => ({
+    query: s.string('')
+  })
 });

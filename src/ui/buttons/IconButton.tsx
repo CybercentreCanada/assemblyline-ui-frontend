@@ -1,6 +1,6 @@
 import type { IconButtonProps as MuiIconButtonProps, TooltipProps } from '@mui/material';
 import { IconButton as MuiIconButton, Skeleton, useTheme } from '@mui/material';
-import type { InferNavigationInputFromPath } from 'core/router';
+import type { InferAppNavigationPropsFromPath } from 'core/router';
 import { AppLink } from 'core/router';
 import type { CSSProperties } from 'react';
 import { memo, useMemo } from 'react';
@@ -9,16 +9,16 @@ import type { CircularProgressProps } from 'ui/buttons/CircularProgress';
 import { CircularProgress } from 'ui/buttons/CircularProgress';
 import { Tooltip } from 'ui/Tooltip';
 
-export type IconButtonProps<Path extends AppRoute['path']> = MuiIconButtonProps & {
-  loading?: boolean;
-  preventRender?: boolean | (() => boolean);
-  progress?: CircularProgressProps['progress'];
-  to?: InferNavigationInputFromPath<Path>;
-  tooltip?: TooltipProps['title'];
-  tooltipProps?: Omit<TooltipProps, 'children' | 'title'>;
-};
+export type IconButtonProps<Path extends AppRoute['route']> = MuiIconButtonProps &
+  InferAppNavigationPropsFromPath<Path> & {
+    loading?: boolean;
+    preventRender?: boolean | (() => boolean);
+    progress?: CircularProgressProps['progress'];
+    tooltip?: TooltipProps['title'];
+    tooltipProps?: Omit<TooltipProps, 'children' | 'title'>;
+  };
 
-export const IconButton = memo(function <Path extends AppRoute['path'] = AppRoute['path']>({
+export const IconButton = memo(function <Path extends AppRoute['route'] = AppRoute['route']>({
   children = null,
   color = null,
   disabled = false,
@@ -27,7 +27,12 @@ export const IconButton = memo(function <Path extends AppRoute['path'] = AppRout
   preventRender: preventRenderProp = false,
   progress = false,
   size = 'medium',
-  to: toProp = null,
+  to = null,
+  here = null,
+  from = null,
+  at = null,
+  navDeps = null,
+  navOptions = null,
   tooltip = null,
   tooltipProps = null,
   ...props
@@ -75,7 +80,7 @@ export const IconButton = memo(function <Path extends AppRoute['path'] = AppRout
         disabled={disabled || progress !== false}
         size={size}
         {...props}
-        {...(!toProp ? null : { component: AppLink, to: toProp })}
+        {...(!to && !here && !from && !at ? null : { component: AppLink, to, here, from, at, navDeps, navOptions })}
         sx={{ height: 'fit-content', color: resolvedColor, ...props?.sx }}
       >
         {children}
