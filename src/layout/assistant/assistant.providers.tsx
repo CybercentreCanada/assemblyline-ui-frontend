@@ -26,6 +26,12 @@ import type { AppUser } from '@tui/core';
 import { AppAvatar, isEnter, useAppUser } from '@tui/core';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
+import type {
+  AssistantContextProps,
+  AssistantInsightProps,
+  AssistantProviderProps,
+  ContextMessageProps
+} from 'layout/assistant';
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import AIMarkdown from 'ui/AiMarkdown';
@@ -59,30 +65,6 @@ const Arrow = styled('div')(({ theme }) => ({
     borderRadius: '3px 0px'
   }
 }));
-
-export type AssistantContextProps = {
-  assistantAllowed: boolean;
-  hasInsights: boolean;
-  addInsight: (insigh: AssistantInsightProps) => void;
-  removeInsight: (insigh: AssistantInsightProps) => void;
-  toggleAssistant: (event: any) => void;
-};
-
-export interface AssistantProviderProps {
-  children: React.ReactNode;
-}
-
-export interface AssistantInsightProps {
-  type: 'file' | 'submission' | 'code' | 'report';
-  value: string;
-}
-
-interface ContextMessageProps {
-  role: 'system' | 'user' | 'assistant';
-  content: string;
-  isError?: boolean;
-  isInsight?: boolean;
-}
 
 export const AssistantContext = React.createContext<AssistantContextProps>(null);
 
