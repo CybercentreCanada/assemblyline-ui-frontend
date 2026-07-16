@@ -122,7 +122,12 @@ const SimilarItem: React.FC<SimilarItemProps> = ({ data, drawer }) => {
               <GridLinkRow
                 key={`${data.type}-${data.value}-${j}`}
                 hover
-                to={item?.from_archive ? `/archive/${item?.sha256}` : `/file/detail/${item?.sha256}`}
+                nav={nav =>
+                  item?.from_archive
+                    ? nav.to().create({ route: '/archive/:id', path: { id: item?.sha256 } })
+                    : nav.to().create({ route: '/file/detail/:id', path: { id: item?.sha256 } })
+                }
+                navDeps={[item?.from_archive, item?.sha256]}
               >
                 {hasArchived && (
                   <GridTableCell sx={{ '&.MuiTableCell-root>div': { justifyItems: 'flex-start' } }}>

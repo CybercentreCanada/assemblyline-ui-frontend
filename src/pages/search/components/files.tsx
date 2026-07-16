@@ -7,7 +7,6 @@ import type { SearchResult } from 'models/api/search';
 import type { FileIndexed } from 'models/base/file';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
 import Classification from 'ui/Classification';
 import {
   DivTable,
@@ -63,8 +62,8 @@ const WrappedFilesTable: React.FC<Props> = ({ fileResults, allowSort = true }) =
             {fileResults.items.map((file, id) => (
               <LinkRow
                 key={`${file.id}-${id}`}
-                component={Link}
-                to={`/file/detail/${file.sha256}`}
+                nav={nav => nav.to().create({ route: '/file/detail/:id', path: { id: file.sha256 } })}
+                navDeps={[file.sha256]}
                 hover
                 style={{ textDecoration: 'none' }}
               >

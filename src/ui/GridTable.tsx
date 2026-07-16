@@ -7,11 +7,11 @@ import type {
   TableRowProps
 } from '@mui/material';
 import { Paper, Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel, styled } from '@mui/material';
+import type { InferAppNavigationPropsFromPath } from 'core/router';
+import { AppLink, useAppNavigate } from 'core/router';
 import type { FC } from 'react';
 import React, { forwardRef, memo } from 'react';
-import type { To } from 'react-router';
-import { useLocation, useNavigate } from 'react-router';
-import { Link } from 'react-router-dom';
+import { useLocation } from 'react-router';
 import type SimpleSearchQuery from 'ui/SearchBar/simple-search-query';
 
 interface StyledPaperProps extends PaperProps {
@@ -131,14 +131,14 @@ export const GridTableRow: FC<GridTableRowProps> = memo(
   }))
 );
 
-export interface GridLinkRowProps extends GridTableRowProps {
-  component?: never;
-  to: To;
-}
+export type GridLinkRowProps<Origin extends AppRoute['route'] = AppRoute['route']> = GridTableRowProps &
+  InferAppNavigationPropsFromPath<Origin> & {
+    component?: never;
+  };
 
 export const GridLinkRow: FC<GridLinkRowProps> = memo(
-  styled(({ to, ...other }: GridLinkRowProps) => (
-    <GridTableRow {...(other as any)} component={Link} to={to} />
+  styled(({ nav = null, navDeps = null, ...other }: GridLinkRowProps) => (
+    <GridTableRow {...(other as GridLinkRowProps)} {...(!nav ? null : { component: AppLink, nav, navDeps })} />
   ))<GridLinkRowProps>(() => ({
     cursor: 'pointer',
     textDecoration: 'none'
@@ -212,7 +212,7 @@ export const SortableGridHeaderCell: FC<SortableGridHeaderCellProps> = memo(
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
     const curSort = query ? query.get(sortName) : searchParams.get(sortName);
-    const navigate = useNavigate();
+    const navigate = useAppNavigate();
     const active = curSort && curSort.indexOf(sortField) !== -1;
     const ascending = inverted ? 'asc' : 'desc';
     const descending = inverted ? 'desc' : 'asc';

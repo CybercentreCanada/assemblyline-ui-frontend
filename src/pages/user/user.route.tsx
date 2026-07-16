@@ -26,6 +26,7 @@ import Autocomplete from '@mui/material/Autocomplete';
 import { red } from '@mui/material/colors';
 import Skeleton from '@mui/material/Skeleton';
 import { PageCenter } from '@tui/core';
+import { useAppNavigate } from 'core/router';
 import { createAppRoute } from 'core/routes';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
@@ -38,7 +39,7 @@ import OTP from 'pages/user/components/otp';
 import SecurityToken from 'pages/user/components/token';
 import React, { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate, useLocation, useNavigate, useParams } from 'react-router';
+import { Navigate, useLocation, useParams } from 'react-router';
 import Classification from 'ui/Classification';
 import ConfirmationDialog from 'ui/ConfirmationDialog';
 import CustomChip from 'ui/CustomChip';
@@ -100,7 +101,7 @@ export const UserPage = memo(({ username = null }: UserPageProps) => {
   const { id } = useParams<ParamProps>();
   const location = useLocation();
   const inputRef = useRef(null);
-  const navigate = useNavigate();
+  const navigate = useAppNavigate();
   const { apiCall } = useMyAPI();
   const { user: currentUser, configuration, classificationAliases } = useALContext();
   const { showErrorMessage, showSuccessMessage, showWarningMessage } = useMySnackbar();
@@ -129,7 +130,7 @@ export const UserPage = memo(({ username = null }: UserPageProps) => {
       onSuccess: () => {
         showSuccessMessage(t('delete.success'));
         setTimeout(() => {
-          navigate('/admin/users');
+          navigate.to().create({ route: '/admin/users' });
         }, 500);
       },
       onEnter: () => setButtonLoading(true),

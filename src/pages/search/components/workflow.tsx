@@ -8,7 +8,6 @@ import type { SearchResult } from 'models/api/search';
 import type { WorkflowIndexed } from 'models/base/workflow';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
 import Classification from 'ui/Classification';
 import {
   DivTable,
@@ -53,8 +52,10 @@ const WrappedWorflowTable: React.FC<Props> = ({ workflowResults, setWorkflowID =
             {workflowResults.items.map((workflow, i) => (
               <LinkRow
                 key={`${workflow.workflow_id}-${i}`}
-                component={Link}
-                to={`/manage/workflow/detail/${workflow.workflow_id}`}
+                nav={nav =>
+                  nav.to().create({ route: '/manage/workflow/detail/:id', path: { id: workflow.workflow_id } })
+                }
+                navDeps={[workflow.workflow_id]}
                 onClick={event => {
                   if (setWorkflowID) {
                     event.preventDefault();

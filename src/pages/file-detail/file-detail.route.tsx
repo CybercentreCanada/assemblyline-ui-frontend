@@ -8,6 +8,7 @@ import TuneOutlinedIcon from '@mui/icons-material/TuneOutlined';
 import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
 import { List, ListItemButton, ListItemIcon, ListItemText, Popover, useTheme } from '@mui/material';
+import { AppLink, useAppNavigate } from 'core/router';
 import { createAppRoute, useAppPathParams, useAppSearchParams } from 'core/routes';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
@@ -32,8 +33,7 @@ import { ForbiddenPage } from 'pages/forbidden/forbidden.route';
 import AISummarySection from 'pages/submission-detail/components/ai_summary';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router';
-import { Link } from 'react-router-dom';
+import { useLocation } from 'react-router';
 import { FileDownloader } from 'ui/buttons/FileDownloader';
 import { IconButton } from 'ui/buttons/IconButton';
 import Classification from 'ui/Classification';
@@ -56,7 +56,7 @@ const FileDetailPage = React.memo(() => {
   const location = useLocation();
   const { id: sha256 } = useAppPathParams<'/file/detail/:id'>();
   const search = useAppSearchParams<'/file/detail/:id'>();
-  const navigate = useNavigate();
+  const navigate = useAppNavigate();
   const { apiCall } = useMyAPI();
   const { user: currentUser, c12nDef, configuration, settings } = useALContext();
   const { showSuccessMessage } = useMySnackbar();
@@ -141,7 +141,7 @@ const FileDetailPage = React.memo(() => {
         onSuccess: api_data => {
           showSuccessMessage(t('resubmit.success'));
           setTimeout(() => {
-            navigate(`/submission/detail/${api_data.api_response.sid}`);
+            navigate.to().create({ route: '/submission/detail/:id', path: { id: api_data.api_response.sid } });
           }, 500);
         }
       });
@@ -399,20 +399,19 @@ const FileDetailPage = React.memo(() => {
               <IconButton
                 loading={!file}
                 size="large"
-                to={
+                nav={
                   !file
                     ? null
-                    : [
-                        'openRoute',
-                        {
-                          path: '/search/:index',
-                          params: { index: 'submission' },
+                    : nav =>
+                        nav.to().create({
+                          route: '/search/:index',
+                          path: { index: 'submission' },
                           search: {
                             query: `files.sha256:${file.file_info.sha256} OR results:${file.file_info.sha256}* OR errors:${file.file_info.sha256}*`
                           }
-                        }
-                      ]
+                        })
                 }
+                navDeps={[file?.file_info?.sha256]}
                 tooltip={t('related')}
               >
                 <ViewCarouselOutlinedIcon />
@@ -430,15 +429,16 @@ const FileDetailPage = React.memo(() => {
               <IconButton
                 loading={!file}
                 size="large"
-                to={{
-                  create: prev => ({
+                nav={nav =>
+                  nav.to().create(prev => ({
                     route: '/file/viewer/:id/:tab',
                     path: {
                       id: file?.file_info?.sha256,
                       tab: prev.route === '/file/viewer/:id/:tab' ? prev.path.tab : null
                     }
-                  })
-                }}
+                  }))
+                }
+                navDeps={[file?.file_info?.sha256]}
                 tooltip={t('file_viewer')}
                 preventRender={
                   !currentUser.roles.includes('file_detail') ||
@@ -477,15 +477,21 @@ const FileDetailPage = React.memo(() => {
                 >
                   <List disablePadding>
                     <ListItemButton
-                      component={Link}
-                      to={`/submit?hash=${file.file_info.sha256}`}
-                      state={{
-                        c12n: file.file_info.classification,
-                        metadata: metadata,
-                        params: {
-                          filetype_override: filetype_override
-                        }
-                      }}
+                      component={AppLink}
+                      nav={nav =>
+                        nav.to().create({
+                          route: '/submit',
+                          search: { hash: file.file_info.sha256 },
+                          state: {
+                            c12n: file.file_info.classification,
+                            metadata: metadata,
+                            params: {
+                              filetype_override: filetype_override
+                            }
+                          }
+                        })
+                      }
+                      navDeps={[file.file_info.sha256, file.file_info.classification, metadata, filetype_override]}
                       dense
                       onClick={() => setResubmitAnchor(null)}
                     >

@@ -6,7 +6,6 @@ import type { SearchResult } from 'models/api/search';
 import type { SignatureIndexed } from 'models/base/signature';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
 import Classification from 'ui/Classification';
 import {
   DivTable,
@@ -69,8 +68,8 @@ const WrappedSignaturesTable: React.FC<Props> = ({ signatureResults, setSignatur
             {signatureResults.items.map((signature, i) => (
               <LinkRow
                 key={`${signature.id}-${i}`}
-                component={Link}
-                to={`/manage/signature/${signature.id}`}
+                nav={nav => nav.to().create({ route: '/manage/signature/:id', path: { id: signature.id } })}
+                navDeps={[signature.id]}
                 onClick={event => {
                   if (setSignatureID) {
                     event.preventDefault();

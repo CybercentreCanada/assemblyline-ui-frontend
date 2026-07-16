@@ -7,6 +7,7 @@ import PrintOutlinedIcon from '@mui/icons-material/PrintOutlined';
 import type { TooltipProps } from '@mui/material';
 import { Box, Grid, Skeleton, styled, Tooltip, Typography, useTheme } from '@mui/material';
 import { PageCenter } from '@tui/core';
+import { useAppNavigate } from 'core/router';
 import { createAppRoute, useAppPathParams } from 'core/routes';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
@@ -24,7 +25,6 @@ import Metadata from 'pages/submission-report/components/metadata';
 import Tags from 'pages/submission-report/components/tags';
 import { memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
 import { filterObject } from 'shared/utils/utils';
 import { IconButton } from 'ui/buttons/IconButton';
 import Classification from 'ui/Classification';
@@ -42,7 +42,7 @@ const SubmissionReportPage = memo(() => {
   const { id } = useAppPathParams<'/submission/report/:id'>();
   const { user: currentUser, c12nDef, configuration, settings } = useALContext();
   const { showErrorMessage, showWarningMessage } = useMySnackbar();
-  const navigate = useNavigate();
+  const navigate = useAppNavigate();
   const { apiCall } = useMyAPI();
   const theme = useTheme();
   const { addInsight, removeInsight } = useAppAssistant();
@@ -138,10 +138,10 @@ const SubmissionReportPage = memo(() => {
         onFailure: api_data => {
           if (api_data.api_status_code === 425) {
             showWarningMessage(t('error.too_early'));
-            navigate(`/submission/detail/${id}`);
+            navigate.to().create({ route: '/submission/detail/:id', path: { id } });
           } else if (api_data.api_status_code === 404) {
             showErrorMessage(t('error.notfound'));
-            navigate('/notfound');
+            navigate.to().create({ route: '/not-found' });
           } else {
             showErrorMessage(api_data.api_error_message);
           }
@@ -240,7 +240,9 @@ const SubmissionReportPage = memo(() => {
                     </NoPrintTooltip>
                     <Tooltip title={t('detail_view')}>
                       <IconButton
-                        to={['replaceRoute', { path: '/submission/detail/:id', params: { id: report.sid } }]}
+                        onClick={() =>
+                          navigate.here().create({ route: '/submission/detail/:id', path: { id: report.sid } })
+                        }
                         size="large"
                       >
                         <ListAltOutlinedIcon />

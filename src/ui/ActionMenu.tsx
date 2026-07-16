@@ -9,6 +9,7 @@ import TravelExploreOutlinedIcon from '@mui/icons-material/TravelExploreOutlined
 import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import { Divider, ListSubheader, Link as MaterialLink, Menu, MenuItem, Tooltip } from '@mui/material';
 import { useClipboard } from '@tui/core';
+import { AppLink } from 'core/router';
 import useALContext from 'deprecated/hooks/useALContext';
 import useExternalLookup from 'deprecated/hooks/useExternalLookup';
 import useHighlighter from 'deprecated/hooks/useHighlighter';
@@ -22,7 +23,6 @@ import type { Safelist } from 'models/base/safelist';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { HiOutlineExternalLink } from 'react-icons/hi';
-import { Link } from 'react-router-dom';
 import { getSHA256, getSubmitType, safeFieldValueURI, toTitleCase } from 'shared/utils/utils';
 import Classification from 'ui/Classification';
 import ClassificationMismatchDialog from 'ui/ClassificationMismatchDialog';
@@ -426,10 +426,17 @@ const WrappedActionMenu = ({
           <MenuItem
             id="sigID"
             dense
-            component={Link}
-            to={`/manage/signature/${type.substring(10)}/${value.substring(0, value.indexOf('.'))}/${value.substring(
-              value.indexOf('.') + 1
-            )}`}
+            component={AppLink}
+            nav={nav =>
+              nav.to().create({
+                route: '/manage/signature/:type/:source/:name',
+                path: {
+                  type: type.substring(10),
+                  source: value.substring(0, value.indexOf('.')),
+                  name: value.substring(value.indexOf('.') + 1)
+                }
+              })
+            }
           >
             {SIGNATURE_ICON}
             {t('goto_signature')}
@@ -442,13 +449,23 @@ const WrappedActionMenu = ({
         {currentUser.roles.includes('submission_view') && (
           <MenuItem
             dense
-            component={Link}
-            to={
+            component={AppLink}
+            nav={nav =>
               index
-                ? `/search${index}?query=${type}:${safeFieldValueURI(value)}`
-                : `/search${categoryIndex[category]}?query=${category === 'tag' && maliciousness === 'safe' ? 'result.sections.safelisted_tags.' : categoryPrefix[category]}${type}:${safeFieldValueURI(
-                    value
-                  )}`
+                ? nav.to().create({
+                    route: '/search/:index',
+                    path: { index },
+                    search: { query: `${type}:${safeFieldValueURI(value)}` }
+                  })
+                : nav.to().create({
+                    route: '/search/:index',
+                    path: { index: categoryIndex[category] },
+                    search: {
+                      query: `${category === 'tag' && maliciousness === 'safe' ? 'result.sections.safelisted_tags.' : categoryPrefix[category]}${type}:${safeFieldValueURI(
+                        value
+                      )}`
+                    }
+                  })
             }
             onClick={handleClose}
           >
@@ -488,12 +505,8 @@ const WrappedActionMenu = ({
           (submitType !== 'url' || (submitType === 'url' && !!currentUserConfig?.ui?.allow_url_submissions)) && (
             <MenuItem
               dense
-              component={Link}
-              to={`/submit`}
-              state={{
-                hash: value,
-                c12n: classification
-              }}
+              component={AppLink}
+              nav={nav => nav.to().create({ route: '/submit', state: { hash: value, c12n: classification } })}
             >
               {SUBMIT_ICON}
               {t('submit') + ` ${submitType.toUpperCase()}`}

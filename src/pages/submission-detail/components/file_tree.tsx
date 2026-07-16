@@ -154,13 +154,12 @@ const WrappedFileTree: React.FC<FileTreeProps> = ({ tree, sid, defaultForceShown
                 ? { component: 'span' }
                 : {
                     component: AppLink,
-                    to: {
-                      create: {
+                    nav: nav =>
+                      nav.to().create({
                         route: '/file/detail/:id',
                         path: { id: item.sha256 },
                         search: { name: encodeURIComponent(item.name[0]) }
-                      }
-                    }
+                      })
                   })}
               sx={{
                 cursor: 'pointer',

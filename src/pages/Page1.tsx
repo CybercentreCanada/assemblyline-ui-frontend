@@ -55,7 +55,7 @@ export const Page1Page = memo(() => {
     <div>
       <Links />
       <h1>Page 1</h1>
-      <Button to={{ path: '/subm', search: { query: '' } }}>asdasd</Button>
+      <Button nav={nav => nav.to().create({ route: '/subm', search: { query: '' } })}>asdasd</Button>
     </div>
   );
 });

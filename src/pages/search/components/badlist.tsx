@@ -6,8 +6,6 @@ import type { SearchResult } from 'models/api/search';
 import type { Badlist } from 'models/base/badlist';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate } from 'react-router';
-import { Link } from 'react-router-dom';
 import { maxLenStr } from 'shared/utils/utils';
 import Classification from 'ui/Classification';
 import CustomChip from 'ui/CustomChip';
@@ -31,8 +29,6 @@ type Props = {
 
 const WrappedBadlistTable: React.FC<Props> = ({ badlistResults, allowSort = true, isLoading = false }) => {
   const { t } = useTranslation(['search']);
-  const location = useLocation();
-  const navigate = useNavigate();
   const { c12nDef } = useALContext();
 
   return isLoading ? (
@@ -73,13 +69,9 @@ const WrappedBadlistTable: React.FC<Props> = ({ badlistResults, allowSort = true
           {badlistResults.items.map((sl_item, i) => (
             <LinkRow
               key={`${sl_item.id}-${i}`}
-              component={Link}
               hover
-              to={`/manage/badlist/${sl_item.id}`}
-              onClick={event => {
-                event.preventDefault();
-                navigate(`${location.pathname}${location.search || ''}#${sl_item.id}`);
-              }}
+              nav={nav => nav.to().create({ route: '/manage/badlist/:id', path: { id: sl_item.id } })}
+              navDeps={[sl_item.id]}
             >
               <DivTableCell>
                 <Tooltip title={sl_item.added}>

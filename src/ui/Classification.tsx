@@ -516,7 +516,7 @@ export const Classification = React.memo(
               <DialogActions>
                 <Button
                   color="secondary"
-                  to="/help/classification"
+                  nav={nav => nav.to().create({ route: '/help/classification' })}
                   variant="outlined"
                   onClick={() => setShowPicker(false)}
                 >

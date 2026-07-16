@@ -6,7 +6,6 @@ import type { SearchResult } from 'models/api/search';
 import type { Safelist } from 'models/base/safelist';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
 import { maxLenStr } from 'shared/utils/utils';
 import Classification from 'ui/Classification';
 import CustomChip from 'ui/CustomChip';
@@ -62,8 +61,8 @@ const WrappedSafelistTable: React.FC<Props> = ({ safelistResults, setSafelistID 
             {safelistResults.items.map((sl_item, i) => (
               <LinkRow
                 key={`${sl_item.id}-${i}`}
-                component={Link}
-                to={`/manage/safelist/${sl_item.id}`}
+                nav={nav => nav.to().create({ route: '/manage/safelist/:id', path: { id: sl_item.id } })}
+                navDeps={[sl_item.id]}
                 onClick={event => {
                   if (setSafelistID) {
                     event.preventDefault();

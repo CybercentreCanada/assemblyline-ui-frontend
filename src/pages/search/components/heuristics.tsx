@@ -6,7 +6,6 @@ import type { SearchResult } from 'models/api/search';
 import type { Heuristic } from 'models/base/heuristic';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
 import Classification from 'ui/Classification';
 import {
   DivTable,
@@ -65,8 +64,8 @@ const WrappedHeuristicsTable: React.FC<Props> = ({ heuristicResults, setHeuristi
             {heuristicResults.items.map((heuristic, i) => (
               <LinkRow
                 key={`${heuristic.heur_id}-${i}`}
-                component={Link}
-                to={`/manage/heuristic/${heuristic.heur_id}`}
+                nav={nav => nav.to().create({ route: '/manage/heuristic/:id', path: { id: `${heuristic.heur_id}` } })}
+                navDeps={[heuristic.heur_id]}
                 onClick={event => {
                   if (setHeuristicID) {
                     event.preventDefault();

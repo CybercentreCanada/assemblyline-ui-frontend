@@ -6,14 +6,14 @@ import ChevronRightOutlinedIcon from '@mui/icons-material/ChevronRightOutlined';
 import CloseIcon from '@mui/icons-material/Close';
 import PageviewOutlinedIcon from '@mui/icons-material/PageviewOutlined';
 import RemoveIcon from '@mui/icons-material/Remove';
-import { CircularProgress, IconButton, Modal, Skeleton, Slider, Tooltip, alpha, styled, useTheme } from '@mui/material';
+import { CircularProgress, Modal, Skeleton, Slider, Tooltip, alpha, styled, useTheme } from '@mui/material';
 import Carousel from 'deprecated/components/Carousel';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import type { Image as ImageData } from 'models/base/result_body';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router';
-import { Link } from 'react-router-dom';
+import { IconButton } from 'ui/buttons/IconButton';
 import CarouselItem from 'ui/Carousel/Item';
 
 export type BackgroundMode = 'transparent' | 'light' | 'dark';
@@ -637,8 +637,10 @@ const WrappedCarouselContainer = ({
                 </Info>
                 <Tooltip title={t('view_file')} placement="bottom">
                   <IconButton
-                    component={Link}
-                    to={`/file/viewer/${currentImage.img}/image/${location.search}${location.hash}`}
+                    nav={nav =>
+                      nav.to().create({ route: '/file/viewer/:id/:tab', path: { id: currentImage.img, tab: 'image' } })
+                    }
+                    navDeps={[currentImage.img]}
                     color="inherit"
                     // size="small"
                     style={{ marginLeft: '8px' }}

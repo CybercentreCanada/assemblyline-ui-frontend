@@ -341,7 +341,11 @@ const FileViewerPage = React.memo(() => {
             )}
             {currentUser.roles.includes('submission_view') && (
               <Tooltip title={t('detail')}>
-                <IconButton to={{ create: { route: '/file/detail/:id', path: { id: sha256 } } }} size="large">
+                <IconButton
+                  nav={nav => nav.to().create({ route: '/file/detail/:id', path: { id: sha256 } })}
+                  navDeps={[sha256]}
+                  size="large"
+                >
                   <DescriptionOutlinedIcon />
                 </IconButton>
               </Tooltip>
@@ -349,13 +353,14 @@ const FileViewerPage = React.memo(() => {
             {currentUser.roles.includes('submission_view') && (
               <Tooltip title={t('related')}>
                 <IconButton
-                  to={{
-                    create: {
-                      route: '/search/:tab',
-                      path: { tab: 'submission' },
-                      search: { query: 'files.sha256:${sha256} OR results:${sha256}* OR errors:${sha256}*' }
-                    }
-                  }}
+                  nav={nav =>
+                    nav.to().create({
+                      route: '/search/:index',
+                      path: { index: 'submission' },
+                      search: { query: `files.sha256:${sha256} OR results:${sha256}* OR errors:${sha256}*` }
+                    })
+                  }
+                  navDeps={[sha256]}
                   size="large"
                 >
                   <ViewCarouselOutlinedIcon />

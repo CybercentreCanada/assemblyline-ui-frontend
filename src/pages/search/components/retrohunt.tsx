@@ -7,7 +7,6 @@ import type { RetrohuntIndexed } from 'models/base/retrohunt';
 import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router';
-import { Link } from 'react-router-dom';
 import Classification from 'ui/Classification';
 import CustomChip from 'ui/CustomChip';
 import {
@@ -117,8 +116,8 @@ const WrappedRetrohuntTable: React.FC<Props> = ({
             {retrohuntResults.items.map((retrohunt, id) => (
               <LinkRow
                 key={`${retrohunt.id}-${id}`}
-                component={Link}
-                to={`/retrohunt/${retrohunt.key}`}
+                nav={nav => nav.to().create({ route: '/retrohunt/:id', path: { id: retrohunt.key } })}
+                navDeps={[retrohunt.key]}
                 onClick={event => {
                   if (!onRowClick) return;
                   event.preventDefault();

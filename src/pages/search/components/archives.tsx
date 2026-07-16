@@ -10,7 +10,6 @@ import type { FileIndexed, LabelCategories } from 'models/base/file';
 import { LABELS_COLOR_MAP } from 'models/base/file';
 import React, { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
 import { FileDownloader } from 'ui/buttons/FileDownloader';
 import Classification from 'ui/Classification';
 import CustomChip from 'ui/CustomChip';
@@ -144,8 +143,8 @@ const WrappedArchivesTable: React.FC<Props> = ({
             {fileResults.items.map((file, i) => (
               <LinkRow
                 key={`${file.sha256}-${i}`}
-                component={Link}
-                to={`/archive/${file.sha256}`}
+                nav={nav => nav.to().create({ route: '/archive/:id', path: { id: file.sha256 } })}
+                navDeps={[file.sha256]}
                 onClick={event => {
                   if (setFileID) {
                     event.preventDefault();

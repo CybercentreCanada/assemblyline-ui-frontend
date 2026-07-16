@@ -8,7 +8,6 @@ import type { ResultIndexed } from 'models/base/result';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router';
-import { Link } from 'react-router-dom';
 import Classification from 'ui/Classification';
 import {
   DivTable,
@@ -74,8 +73,13 @@ const WrappedResultsTable: React.FC<Props> = ({
             {resultResults.items.map((result, id) => (
               <LinkRow
                 key={`${result.id}-${id}`}
-                component={Link}
-                to={`/file/detail/${result.id.substring(0, 64)}${!allowHash ? '' : location.hash}`}
+                nav={nav =>
+                  nav.to().create({
+                    route: '/file/detail/:id',
+                    path: { id: result.id.substring(0, 64) }
+                  })
+                }
+                navDeps={[result.id]}
                 hover
                 style={{ textDecoration: 'none' }}
               >

@@ -1,6 +1,5 @@
-import { createAppRoute, useAppPathParams, useAppRouteStore, useAppSearchParams } from 'core/routes';
+import { useAppNavigate } from 'core/router';
 import { memo, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router';
 import { Links } from './Links';
 
 type TestProps = {
@@ -26,7 +25,7 @@ export const SubmissionsPage = memo(() => {
 
   // const search = useSearch<typeof SubmissionsRoute>();
 
-  const navigate = useNavigate();
+  const navigate = useAppNavigate();
 
   // const callback = useCallback(() => {
   //   navigate({

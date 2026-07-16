@@ -16,7 +16,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import { useApiCallFn } from 'core/api';
 import type { ApiResponse } from 'core/api/api.models';
 import { useAppConfig } from 'core/config';
-import { AppLink } from 'core/router';
+import { AppLink, useAppNavigate } from 'core/router';
 import { useAppSnackbar } from 'core/snackbar';
 import type { ApiResponseProps } from 'layout/auth/auth.models';
 import type { SearchResult } from 'models/api/search';
@@ -35,7 +35,6 @@ import {
 } from 'pages/submit/submit.utils';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
 import { generateRandomUUID } from 'shared/utils/app.utils';
 import { getSubmitType } from 'shared/utils/utils';
 import type { ButtonProps } from 'ui/buttons/Button';
@@ -610,7 +609,10 @@ export const FindButton = memo(() => {
                 <MuiButton
                   component={AppLink}
                   autoFocus
-                  to={{ path: '/file/detail/:id', params: { id: results?.items?.[0]?.sha256 ?? '' } }}
+                  nav={nav =>
+                    nav.to().create({ route: '/file/detail/:id', path: { id: results?.items?.[0]?.sha256 ?? '' } })
+                  }
+                  navDeps={[results?.items]}
                   disabled={fetching || !results?.items?.[0]?.sha256}
                   onClick={() => setOpen(false)}
                 >
@@ -727,7 +729,7 @@ AnalyzeButton.displayName = 'AnalyzeButton';
 export const FileSubmit = memo(({ onClick = () => null, ...props }: ButtonProps) => {
   const { t } = useTranslation(['submit']);
   const form = useForm();
-  const navigate = useNavigate(); // TODO: to swap for useAppNavigate()
+  const navigate = useAppNavigate();
   const apiCall = useApiCallFn();
   const { closeSnackbar, showErrorMessage, showSuccessMessage } = useAppSnackbar();
   const settings = useAppConfig(s => s.settings);
@@ -812,7 +814,10 @@ export const FileSubmit = memo(({ onClick = () => null, ...props }: ButtonProps)
           onSuccess: ({ api_response }: ApiResponse<{ started: boolean; sid: string }>) => {
             showSuccessMessage(`${t('upload.snackbar.success')} ${api_response.sid}`);
             form.setFieldValue('state.phase', 'redirecting');
-            setTimeout(() => navigate(`/submission/detail/${api_response.sid}`), 1000);
+            setTimeout(
+              () => navigate.to().create({ route: '/submission/detail/:id', path: { id: api_response.sid } }),
+              1000
+            );
           },
           onFailure: ({ api_status_code, api_error_message }) => {
             if ([400, 403, 404, 503].includes(api_status_code)) showErrorMessage(api_error_message);
@@ -844,7 +849,7 @@ FileSubmit.displayName = 'FileSubmit';
 const RawSubmit = memo(({ onClick = () => null, ...props }: ButtonProps) => {
   const { t } = useTranslation(['submit']);
   const form = useForm();
-  const navigate = useNavigate(); // TODO: to swap for useAppNavigate()
+  const navigate = useAppNavigate();
   const apiCall = useApiCallFn();
   const { closeSnackbar, showErrorMessage, showSuccessMessage } = useAppSnackbar();
 
@@ -874,7 +879,10 @@ const RawSubmit = memo(({ onClick = () => null, ...props }: ButtonProps) => {
         onSuccess: ({ api_response }: ApiResponse<{ started: boolean; sid: string }>) => {
           showSuccessMessage(`${t('upload.snackbar.success')} ${api_response.sid}`);
           form.setFieldValue('state.phase', 'redirecting');
-          setTimeout(() => navigate(`/submission/detail/${api_response.sid}`), 1000);
+          setTimeout(
+            () => navigate.to().create({ route: '/submission/detail/:id', path: { id: api_response.sid } }),
+            1000
+          );
         },
         onFailure: ({ api_error_message }) => {
           showErrorMessage(api_error_message);
@@ -901,7 +909,7 @@ RawSubmit.displayName = 'RawSubmit';
 const HashSubmit = memo(({ onClick = () => null, ...props }: ButtonProps) => {
   const { t } = useTranslation(['submit']);
   const form = useForm();
-  const navigate = useNavigate(); // TODO: to swap for useAppNavigate()
+  const navigate = useAppNavigate();
   const apiCall = useApiCallFn();
   const { closeSnackbar, showErrorMessage, showSuccessMessage } = useAppSnackbar();
 
@@ -930,7 +938,10 @@ const HashSubmit = memo(({ onClick = () => null, ...props }: ButtonProps) => {
         onSuccess: ({ api_response }: ApiResponse<{ started: boolean; sid: string }>) => {
           showSuccessMessage(`${t('upload.snackbar.success')} ${api_response.sid}`);
           form.setFieldValue('state.phase', 'redirecting');
-          setTimeout(() => navigate(`/submission/detail/${api_response.sid}`), 1000);
+          setTimeout(
+            () => navigate.to().create({ route: '/submission/detail/:id', path: { id: api_response.sid } }),
+            1000
+          );
         },
         onFailure: ({ api_error_message }) => {
           showErrorMessage(api_error_message);
@@ -1075,8 +1086,10 @@ export const ToS = memo(() => {
         {t('tos.terms1')}
         <i>{t('submit.button.editing.label')}</i>
         {t('tos.terms2')}
-        {/* TODO: /tos route typing - route exists but may not be in AppRoute union */}
-        <AppLink style={{ textDecoration: 'none', color: theme.palette.primary.main }} to={{ path: '/tos' } as never}>
+        <AppLink
+          style={{ textDecoration: 'none', color: theme.palette.primary.main }}
+          nav={nav => nav.to().create({ route: '/tos' })}
+        >
           {t('tos.terms3')}
         </AppLink>
         .

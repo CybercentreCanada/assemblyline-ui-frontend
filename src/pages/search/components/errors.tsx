@@ -11,7 +11,6 @@ import type { Error, ErrorType } from 'models/base/error';
 import type { ReactElement } from 'react';
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Link } from 'react-router-dom';
 import { bytesToSize } from 'shared/utils/utils';
 import {
   DivTable,
@@ -84,8 +83,8 @@ const WrappedErrorsTable: React.FC<Props> = ({ errorResults, setErrorKey = null,
             {errorResults.items.map((error, i) => (
               <LinkRow
                 key={`${error.id}-${i}`}
-                component={Link}
-                to={`/admin/errors/${error.id}`}
+                nav={nav => nav.to().create({ route: '/admin/errors/:id', path: { id: error.id } })}
+                navDeps={[error.id]}
                 onClick={event => {
                   if (setErrorKey) {
                     event.preventDefault();

@@ -2,6 +2,7 @@ import ArchiveIcon from '@mui/icons-material/Archive';
 import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
 import CenterFocusStrongOutlinedIcon from '@mui/icons-material/CenterFocusStrongOutlined';
 import { IconButton, Paper, Tab, Tabs, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
+import { AppLink, useAppNavigate } from 'core/router';
 import { createAppRoute } from 'core/routes';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
@@ -24,8 +25,7 @@ import SubmissionsTable from 'pages/search/components/submissions';
 import type { Dispatch, SetStateAction } from 'react';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useNavigate, useParams } from 'react-router';
-import { Link } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router';
 import { searchResultsDisplay } from 'shared/utils/utils';
 import Empty from 'ui/Empty';
 import { PageContainer } from 'ui/pages/PageContainer';
@@ -63,7 +63,7 @@ export const SearchPage = memo(({ index = null }: SearchPageProps) => {
   const [searching, setSearching] = useState<boolean>(false);
   const { indexes, user: currentUser, configuration } = useALContext();
   const location = useLocation();
-  const navigate = useNavigate();
+  const navigate = useAppNavigate();
   const theme = useTheme();
   const { apiCall } = useMyAPI();
   const [query, setQuery] = useState<SimpleSearchQuery>(null);
@@ -382,8 +382,14 @@ export const SearchPage = memo(({ index = null }: SearchPageProps) => {
                   <Tooltip title={t('focus_search')}>
                     <IconButton
                       size={downSM ? 'small' : 'medium'}
-                      component={Link}
-                      to={`/search/${tab}${location.search}`}
+                      component={AppLink}
+                      nav={nav =>
+                        nav.to().create({
+                          route: '/search/:index',
+                          path: { index: tab }
+                        })
+                      }
+                      navDeps={[tab, location.search]}
                     >
                       <CenterFocusStrongOutlinedIcon fontSize="small" />
                     </IconButton>

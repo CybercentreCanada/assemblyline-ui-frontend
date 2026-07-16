@@ -35,6 +35,7 @@ import {
   useTheme
 } from '@mui/material';
 import Typography from '@mui/material/Typography';
+import { AppLink, useAppNavigate } from 'core/router';
 import { createAppRoute, useAppPathParams } from 'core/routes';
 import useALContext from 'deprecated/hooks/useALContext';
 import useHighlighter from 'deprecated/hooks/useHighlighter';
@@ -62,8 +63,6 @@ import MetaSection from 'pages/submission-detail/components/meta';
 import TagSection from 'pages/submission-detail/components/tags';
 import { memo, useCallback, useEffect, useMemo, useReducer, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router';
-import { Link } from 'react-router-dom';
 import { getErrorIDFromKey, getServiceFromKey } from 'shared/utils/errors';
 import { setNotifyFavicon } from 'shared/utils/utils';
 import type { Socket } from 'socket.io-client';
@@ -113,7 +112,7 @@ const incrementReducer = (old: number, increment: number) => {
 const SubmissionDetail = memo(() => {
   const { t, i18n } = useTranslation(['submissionDetail']);
   const theme = useTheme();
-  const navigate = useNavigate();
+  const navigate = useAppNavigate();
   const { apiCall } = useMyAPI();
   const { addInsight, removeInsight } = useAppAssistant();
   const { showSuccessMessage, showErrorMessage } = useMySnackbar();
@@ -545,7 +544,7 @@ const SubmissionDetail = memo(() => {
           setSummary(null);
           setTree(null);
           setTimeout(() => {
-            navigate(`/submission/detail/${api_data.api_response.sid}`);
+            navigate.to().create({ route: '/submission/detail/:id', path: { id: api_data.api_response.sid } });
           }, 500);
         }
       });
@@ -567,7 +566,7 @@ const SubmissionDetail = memo(() => {
             setSummary(null);
             setTree(null);
             setTimeout(() => {
-              navigate(`/submission/detail/${api_data.api_response.sid}`);
+              navigate.to().create({ route: '/submission/detail/:id', path: { id: api_data.api_response.sid } });
             }, 500);
           }
         });
@@ -601,7 +600,7 @@ const SubmissionDetail = memo(() => {
           showSuccessMessage(t('delete.success'));
           setDeleteDialog(false);
           setTimeout(() => {
-            navigate('/submissions');
+            navigate.to().create({ route: '/submissions' });
           }, 500);
         },
         onEnter: () => setWaitingDialog(true),
@@ -1169,12 +1168,18 @@ const SubmissionDetail = memo(() => {
                   >
                     <List disablePadding>
                       <ListItemButton
-                        component={Link}
-                        to={`/submit?hash=${submission.files[0].sha256}`}
-                        state={{
-                          c12n: submission.classification,
-                          metadata: submission.metadata
-                        }}
+                        component={AppLink}
+                        nav={nav =>
+                          nav.to().create({
+                            route: '/submit',
+                            search: { hash: submission.files[0].sha256 },
+                            state: {
+                              c12n: submission.classification,
+                              metadata: submission.metadata
+                            }
+                          })
+                        }
+                        navDeps={[submission.files, submission.classification, submission.metadata]}
                         dense
                         onClick={() => setResubmitAnchor(null)}
                       >
@@ -1236,7 +1241,7 @@ const SubmissionDetail = memo(() => {
                 ? { loading: true }
                 : {
                     preventRender: submission.state !== 'completed',
-                    here: { update: { route: '/submission/report/:id', path: { id: submission.sid } } }
+                    nav: nav => nav.here().create({ route: '/submission/report/:id', path: { id: submission.sid } })
                   })}
             >
               <ChromeReaderModeOutlinedIcon />
@@ -1249,12 +1254,15 @@ const SubmissionDetail = memo(() => {
               <Typography variant="caption" component={'div'}>
                 <i>
                   <span>{t('psid')}: </span>
-                  <Link
+                  <AppLink
                     style={{ textDecoration: 'none', color: theme.palette.primary.main }}
-                    to={`/submission/detail/${submission.params.psid}`}
+                    nav={nav =>
+                      nav.to().create({ route: '/submission/detail/:id', path: { id: submission.params.psid } })
+                    }
+                    navDeps={[submission.params.psid]}
                   >
                     {submission.params.psid}
-                  </Link>
+                  </AppLink>
                 </i>
               </Typography>
             )}

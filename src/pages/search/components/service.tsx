@@ -9,7 +9,6 @@ import type { ServiceIndexed, ServiceUpdateData, ServiceUpdates } from 'models/b
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { HiOutlineExternalLink } from 'react-icons/hi';
-import { Link } from 'react-router-dom';
 import Classification from 'ui/Classification';
 import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow, LinkRow } from 'ui/DivTable';
 import InformativeAlert from 'ui/InformativeAlert';
@@ -47,8 +46,8 @@ const WrappedServiceTable: React.FC<Props> = ({ serviceResults, updates, setServ
             {serviceResults.map((result, i) => (
               <LinkRow
                 key={`${result.name}-${i}`}
-                component={Link}
-                to={`/admin/services/${result.name}`}
+                nav={nav => nav.to().create({ route: '/admin/services/:id', path: { id: result.name } })}
+                navDeps={[result.name]}
                 hover
                 onClick={event => {
                   if (setService) {
