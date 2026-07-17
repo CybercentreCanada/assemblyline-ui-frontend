@@ -10,6 +10,7 @@ import type {
   InferAppNavigationPropsFromPath,
   RouteKeyOf
 } from 'core/router';
+import { getDefaultNavigationStore } from 'core/router';
 import { createReversePortalNode } from 'features/portal';
 import type { SetStateAction } from 'react';
 import { deepCompare, generateRandomUUID, hashObjectKeyOrderIndependent } from 'shared/utils/app.utils';
@@ -1421,16 +1422,6 @@ export const applyNavigationDispatch = function <const Value>(
 // Router Store
 //*****************************************************************************************
 
-export const getDefaultRouterStore = function (store: Partial<AppRouterStore> = null): AppRouterStore {
-  return {
-    id: generateRandomUUID(),
-    panels: [],
-    nodes: {},
-    routes: {},
-    ...store
-  };
-};
-
 export const getHashFragmentsFromRouter = function (store: AppNavigationStore): string[] {
   return store.panels
     .map(panel => {
@@ -1534,18 +1525,6 @@ export const sanitizeRouterStore = (store: AppRouterStore, preferences: AppPrefe
 //*****************************************************************************************
 // Navigation Store
 //*****************************************************************************************
-
-export const getDefaultNavigationStore = (store: Partial<AppNavigationStore> = null): AppNavigationStore => {
-  return {
-    id: generateRandomUUID(),
-    panels: [],
-    nodes: {},
-    routes: {},
-    blockedRoutes: {},
-    options: getDefaultNavigateOptions(),
-    ...store
-  };
-};
 
 export const applyDefaultNavigationStore = (
   store: AppNavigationStore,

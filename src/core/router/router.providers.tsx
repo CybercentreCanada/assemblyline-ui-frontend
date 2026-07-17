@@ -1,7 +1,5 @@
 import type { AppNavigationStore, AppRouterStore } from 'core/router';
 import {
-  getDefaultNavigationStore,
-  getDefaultRouterStore,
   useAppBlockNavigation,
   useAppBlockUnloadEvent,
   useAppSyncNavigationStoreFromLocation,
@@ -11,11 +9,17 @@ import { createAppStore } from 'features/store/createAppStore';
 import type { PropsWithChildren } from 'react';
 import { memo } from 'react';
 import { BrowserRouter } from 'react-router';
+import { generateRandomUUID } from 'shared/utils/app.utils';
 import type { StoreApi } from 'zustand';
 
 //*****************************************************************************************
 // App Router Provider
 //*****************************************************************************************
+
+export const getDefaultRouterStore = function (store: Partial<AppRouterStore> = null): AppRouterStore {
+  return { id: generateRandomUUID(), panels: [], nodes: {}, routes: {}, ...store };
+};
+
 export const {
   StoreProvider: AppRouterStoreProvider,
   useStore: useAppRouterStore,
@@ -38,6 +42,27 @@ AppRouterProvider.displayName = 'AppRouterProvider';
 //*****************************************************************************************
 // App Navigation Provider
 //*****************************************************************************************
+
+export const getDefaultNavigationStore = (store: Partial<AppNavigationStore> = null): AppNavigationStore => {
+  return {
+    id: generateRandomUUID(),
+    panels: [],
+    nodes: {},
+    routes: {},
+    blockedRoutes: {},
+    options: {
+      hashScrollIntoView: false,
+      href: '',
+      ignoreBlocker: false,
+      reloadDocument: false,
+      replace: false,
+      resetScroll: false,
+      viewTransition: false,
+      ...store?.options
+    },
+    ...store
+  };
+};
 
 export const {
   StoreProvider: AppNavigationStoreProvider,

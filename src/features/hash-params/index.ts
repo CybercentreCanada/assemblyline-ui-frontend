@@ -1,4 +1,4 @@
-export { createHashParamCodec, HASH_PARAM_BLUEPRINTS } from './hash-params.codec';
+export { createHashParamCodec, getDefaultHashParamBlueprint, HASH_PARAM_BLUEPRINTS } from './hash-params.codec';
 export type {
   HashParamValue,
   InferHashParamBlueprintFromValue,

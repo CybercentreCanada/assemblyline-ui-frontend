@@ -1,4 +1,4 @@
-import { createStateParamBlueprint, createStateParamCodec } from 'features/state-params/state-params.codec';
+import { createStateParamBlueprint, createStateParamCodec } from 'features/state-params';
 import type { Location } from 'react-router';
 import { describe, expect, it } from 'vitest';
 

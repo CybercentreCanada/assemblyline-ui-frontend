@@ -1,21 +1,7 @@
-import type { StateParamShape, StateParamValue } from 'features/state-params/state-params.models';
+import type { InferStateParamBlueprintFromValue, StateParamShape, StateParamValue } from 'features/state-params';
 
 //*****************************************************************************************
-// Type Guards
-//*****************************************************************************************
-
-/**
- * @name isStateParamRecord
- * @description Narrows unknown values to object records allowed by state params.
- * @param value - Candidate value.
- * @returns True when value is a non-null object and not an array.
- */
-export const isStateParamRecord = function (value: unknown): value is Record<string, StateParamValue> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value);
-};
-
-//*****************************************************************************************
-// Cloning / Equality
+// Cloning
 //*****************************************************************************************
 
 /**
@@ -28,6 +14,35 @@ export const cloneStateParamValue = function <const Value extends StateParamValu
   if (value === null || typeof value !== 'object') return value;
   return structuredClone(value);
 };
+
+//*****************************************************************************************
+// Type Guards
+//*****************************************************************************************
+
+/**
+ * @name createDefaultStateParamBlueprint
+ * @description Creates a no-op state blueprint used as a safe fallback when no blueprint is provided.
+ * @returns Default state blueprint with empty object type and undefined delta output.
+ */
+export const createDefaultStateParamBlueprint = function <
+  const Value extends StateParamShape = StateParamShape
+>(): InferStateParamBlueprintFromValue<Value> {
+  return { type: {} as Value, full: () => cloneStateParamValue({} as Value), delta: () => undefined };
+};
+
+/**
+ * @name isStateParamRecord
+ * @description Narrows unknown values to object records allowed by state params.
+ * @param value - Candidate value.
+ * @returns True when value is a non-null object and not an array.
+ */
+export const isStateParamRecord = function (value: unknown): value is Record<string, StateParamValue> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+};
+
+//*****************************************************************************************
+// Cloning
+//*****************************************************************************************
 
 /**
  * @name areStateParamValuesEqual

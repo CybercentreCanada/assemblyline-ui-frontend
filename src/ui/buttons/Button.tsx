@@ -7,7 +7,7 @@ import { getTextContent } from 'shared/utils/utils';
 import { Tooltip } from 'ui/Tooltip';
 import { CircularProgress } from 'ui/buttons/CircularProgress';
 
-export type ButtonProps<Origin extends AppRoute['route']> = MuiButtonProps &
+export type ButtonProps<Origin extends AppRoute['route'] = AppRoute['route']> = MuiButtonProps &
   InferAppNavigationPropsFromPath<Origin> & {
     loading?: boolean;
     preventRender?: boolean | (() => boolean);

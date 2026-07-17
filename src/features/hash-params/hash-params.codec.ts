@@ -1,4 +1,4 @@
-import type { HashParamValue, InferHashParamBlueprintFromValue } from 'features/hash-params/hash-params.models';
+import type { HashParamValue, InferHashParamBlueprintFromValue } from 'features/hash-params';
 import type { Location } from 'react-router';
 
 //*****************************************************************************************
@@ -46,6 +46,21 @@ export const HASH_PARAM_BLUEPRINTS = {
   })
 };
 
+/**
+ * @name getDefaultHashParamBlueprint
+ * @description Returns a safe no-op hash blueprint used as a fallback when no blueprint is provided.
+ * @returns A blueprint with empty type, undefined parse result, and empty stringify output.
+ */
+export const getDefaultHashParamBlueprint = function <
+  const Value extends HashParamValue = HashParamValue
+>(): InferHashParamBlueprintFromValue<Value> {
+  return {
+    type: '' as unknown as Value,
+    parse: () => undefined,
+    stringify: () => ''
+  };
+};
+
 //*****************************************************************************************
 // Create Hash Param Codec
 //*****************************************************************************************
@@ -53,20 +68,12 @@ export const HASH_PARAM_BLUEPRINTS = {
 /**
  * Creates a codec for parsing and stringifying hash parameters.
  * Returns an object with methods to parse location hash and stringify parameter values.
- *
- * @example
- * const hashCodec = createHashParamCodec()(
- *   blueprint => blueprint.enum(['title', 'section-1', 'section-2'])
- * );
- *
- * const value = hashCodec.parse(location); // 'title' | 'section-1' | 'section-2' | undefined
- * const hash = hashCodec.stringify(value); // '#title' or ''
  */
 export function createHashParamCodec<const Value extends HashParamValue>() {
   return function <const Blueprint extends InferHashParamBlueprintFromValue<Value>>(
     input: (blueprints: typeof HASH_PARAM_BLUEPRINTS) => Blueprint
   ) {
-    const blueprint = input(HASH_PARAM_BLUEPRINTS);
+    const blueprint = input(HASH_PARAM_BLUEPRINTS) ?? (getDefaultHashParamBlueprint() as Blueprint);
 
     const type: Value = blueprint.type as never;
 
@@ -83,7 +90,7 @@ export function createHashParamCodec<const Value extends HashParamValue>() {
         decodedValue = rawValue;
       }
 
-      return blueprint.parse(decodedValue || undefined) as Value;
+      return blueprint.parse(decodedValue || undefined);
     };
 
     const stringify = (value: Value): string => {

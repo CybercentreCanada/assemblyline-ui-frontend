@@ -1,8 +1,18 @@
-import { createHashParamCodec } from 'features/hash-params/hash-params.codec';
+import { createHashParamCodec, getDefaultHashParamBlueprint } from 'features/hash-params';
 import type { Location } from 'react-router';
 import { describe, expect, it } from 'vitest';
 
 describe('hash-params.codec', () => {
+  describe('getDefaultHashParamBlueprint', () => {
+    it('returns a safe no-op hash blueprint', () => {
+      const blueprint = getDefaultHashParamBlueprint();
+
+      expect(blueprint.type).toBe('');
+      expect(blueprint.parse('abc')).toBeUndefined();
+      expect(blueprint.stringify('abc')).toBe('');
+    });
+  });
+
   describe('createHashParamCodec', () => {
     it('should parse enum hash values correctly', () => {
       const codec = createHashParamCodec()(blueprint => blueprint.enum(['title', 'section-1', 'section-2']));

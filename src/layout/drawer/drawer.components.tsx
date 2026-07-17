@@ -178,7 +178,7 @@ export const AppDrawerContainer = memo(({ children }: PropsWithChildren) => {
         width: contentWidth,
         transition
       }}
-      ModalProps={{ disableEnforceFocus: true }}
+      ModalProps={{ disableEnforceFocus: isXL }}
       onClose={handleClose}
       slotProps={{
         root: {

@@ -238,16 +238,18 @@ export const getExternalHrefFromParam = function <const Origin extends AppRoute[
 // Route Param
 //*****************************************************************************************
 
+const DEFAULT_ROUTE_PARAM = Object.freeze({
+  digest: '',
+  route: null,
+  path: null,
+  search: null,
+  hash: null,
+  state: null,
+  transient: null
+});
+
 export const getDefaultRouteParam = function <const Origin extends AppRoute['route']>() {
-  return {
-    digest: '',
-    route: null,
-    path: null,
-    search: null,
-    hash: null,
-    state: null,
-    transient: null
-  } as InferAppRouteParamFromPath<Origin>;
+  return DEFAULT_ROUTE_PARAM as InferAppRouteParamFromPath<Origin>;
 };
 
 export const findRouteParamFromKey = function <const Origin extends AppRoute['route']>(
@@ -255,7 +257,7 @@ export const findRouteParamFromKey = function <const Origin extends AppRoute['ro
   routeKey: keyof AppRouterState['routes']
 ): InferAppRouteParamFromPath<Origin> {
   return !(routeKey in (store?.params || {}))
-    ? getDefaultRouteParam<Origin>()
+    ? (DEFAULT_ROUTE_PARAM as InferAppRouteParamFromPath<Origin>)
     : (store.params[routeKey] as unknown as InferAppRouteParamFromPath<Origin>);
 };
 

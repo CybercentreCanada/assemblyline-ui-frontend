@@ -3,12 +3,13 @@ import type {
   InferStateParamFromBlueprint,
   InferStateParamInputFromBlueprint,
   StateParamShape
-} from 'features/state-params/state-params.models';
+} from 'features/state-params';
 import {
   cloneStateParamValue,
+  createDefaultStateParamBlueprint,
   getStateParamDeltaValues,
   mergeStateParamValues
-} from 'features/state-params/state.params.utils';
+} from 'features/state-params';
 import type { Location } from 'react-router';
 
 export const createStateParamBlueprint = function <const Value extends StateParamShape>(
@@ -25,7 +26,8 @@ export const createStateParamBlueprint = function <const Value extends StatePara
 export function createStateParamCodec<const Blueprint extends InferStateParamBlueprintFromValue>(
   input: (blueprint: typeof createStateParamBlueprint) => Blueprint
 ) {
-  const blueprint = input(createStateParamBlueprint);
+  const blueprint =
+    input(createStateParamBlueprint) ?? (createDefaultStateParamBlueprint() as InferStateParamBlueprintFromValue);
 
   const type: InferStateParamFromBlueprint<Blueprint> = cloneStateParamValue(blueprint.type) as never;
 

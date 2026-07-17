@@ -417,7 +417,7 @@ export const SubmitRoute = createAppRoute({
     classification: s.string(null),
     hash: s.string(null),
     profile: s.string(null),
-    metadata: s.object(null),
+    // metadata: s.object(null), // TODO: fix this
     raw: s.string(''),
     description: s.string(''),
     priority: s.number(null),

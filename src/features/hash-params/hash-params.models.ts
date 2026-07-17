@@ -1,4 +1,4 @@
-import type { createHashParamCodec } from 'features/hash-params/hash-params.codec';
+import type { createHashParamCodec } from 'features/hash-params';
 
 //*****************************************************************************************
 // Hash Params Primitives

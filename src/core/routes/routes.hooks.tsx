@@ -75,7 +75,9 @@ export const useAppLocation = function <const Origin extends AppRoute['route']>(
     return getPanel(s, nextPanelKey)?.routeKey ?? null;
   });
 
-  const param = useAppLocationParamStore(s => findRouteParamFromKey<Origin>(s, targetRouteKey));
+  const param = useAppLocationParamStore(s =>
+    !targetRouteKey ? null : findRouteParamFromKey<Origin>(s, targetRouteKey)
+  );
 
   return function <Selected = InferAppRouteParamFromPath<Origin>>(
     selector?: (location: InferAppRouteParamFromPath<Origin>) => Selected
@@ -120,15 +122,20 @@ export function useAppSearchSnapshot<const Origin extends AppRoute['route']>(): 
 > {
   const routeKey = useAppRouteKey();
 
-  return useAppLocationParamStore(s => {
-    const param = findRouteParamFromKey<Origin>(s, routeKey);
-    if (!param?.route || param?.search == null) return null as never;
+  const searchParam = useAppLocationParamStore(s =>
+    !routeKey ? null : findRouteParamFromKey<Origin>(s, routeKey)?.search
+  );
+  const searchEngine = useAppLocationParamStore(s =>
+    !routeKey ? null : findRouteSpecFromKey<Origin>(s, routeKey)?.search
+  );
 
-    const spec = findRouteSpecFromKey<Origin>(s, routeKey);
-    if (!spec?.search) return null as never;
+  return useMemo(() => {
+    if (!searchEngine || searchParam == null) {
+      return null as never;
+    }
 
-    return spec.search.full(param.search as never) as never;
-  });
+    return searchEngine.full(searchParam as never) as never;
+  }, [searchEngine, searchParam]);
 }
 
 /**

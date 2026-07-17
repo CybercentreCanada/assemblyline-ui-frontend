@@ -1,12 +1,34 @@
 import {
   areStateParamValuesEqual,
   cloneStateParamValue,
+  createDefaultStateParamBlueprint,
   getStateParamDeltaValue,
   getStateParamDeltaValues,
   isStateParamRecord,
   mergeStateParamValues
 } from 'features/state-params';
 import { describe, expect, it } from 'vitest';
+
+//*****************************************************************************************
+// createDefaultStateParamBlueprint
+//*****************************************************************************************
+describe('createDefaultStateParamBlueprint', () => {
+  it('creates a safe no-op blueprint', () => {
+    const blueprint = createDefaultStateParamBlueprint();
+
+    expect(blueprint.type).toEqual({});
+    expect(blueprint.full({ value: 1 })).toEqual({});
+    expect(blueprint.delta({ value: 1 })).toBeUndefined();
+  });
+
+  it('returns a cloned object from full', () => {
+    const blueprint = createDefaultStateParamBlueprint();
+    const next = blueprint.full(undefined);
+
+    expect(next).toEqual({});
+    expect(next).not.toBe(blueprint.type);
+  });
+});
 
 //*****************************************************************************************
 // isStateParamRecord

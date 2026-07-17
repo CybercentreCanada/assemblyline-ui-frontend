@@ -310,8 +310,9 @@ const WrappedSearchHeader = ({
   );
 
   useEffect(() => {
-    setQueryValue(params.get(queryKey));
-  }, [params, queryKey]);
+    const nextQueryValue = params.get(queryKey) ?? defaultQuery;
+    setQueryValue(prev => (prev === nextQueryValue ? prev : nextQueryValue));
+  }, [defaultQuery, params, queryKey]);
 
   useEffect(() => {
     if (!loading) getInputEl().focus();
