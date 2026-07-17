@@ -9,7 +9,7 @@ import {
   AppNavigationProvider,
   AppNavigationStoreProvider,
   AppRouterLayout,
-  AppRouterPanel,
+  AppRouterPanelLayout,
   AppRouterProvider,
   AppRouterStoreProvider
 } from 'core/router';
@@ -121,9 +121,9 @@ import { memo, StrictMode } from 'react';
 export const AppLayout = memo(() => (
   <AppAuthLayout>
     <AppRouterLayout>
-      <AppDrawerLayout content={<AppRouterPanel panelKey={1} />}>
+      <AppDrawerLayout content={<AppRouterPanelLayout panelKey={1} />}>
         <AppTemplateLayout>
-          <AppRouterPanel panelKey={0} />
+          <AppRouterPanelLayout panelKey={0} />
         </AppTemplateLayout>
       </AppDrawerLayout>
     </AppRouterLayout>

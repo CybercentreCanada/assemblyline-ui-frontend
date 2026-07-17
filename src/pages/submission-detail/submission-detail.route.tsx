@@ -53,7 +53,7 @@ import type { Result } from 'models/base/result';
 import type { ParsedSubmission, Submission } from 'models/base/submission';
 import moment from 'moment';
 import Detection from 'pages/file-detail/components/detection';
-import { ForbiddenPage } from 'pages/forbidden/forbidden.route';
+import { ForbiddenPage } from 'pages/forbidden/forbidden';
 import AISummarySection from 'pages/submission-detail/components/ai_summary';
 import AttackSection from 'pages/submission-detail/components/attack';
 import ErrorSection from 'pages/submission-detail/components/errors';
@@ -118,7 +118,7 @@ const SubmissionDetail = memo(() => {
   const { showSuccessMessage, showErrorMessage } = useMySnackbar();
   const { user: currentUser, configuration: systemConfig, settings } = useALContext();
   const { setHighlightMap } = useHighlighter();
-  const { id } = useAppPathParams<'/submission/detail/:id'>();
+  const { id = null } = useAppPathParams<'/submission/detail/:id'>();
 
   const [submission, setSubmission] = useState<ParsedSubmission>(null);
   const [summary, setSummary] = useState<SubmissionSummary>(null);
@@ -1446,5 +1446,7 @@ export const SubmissionDetailRoute = createAppRoute({
   route: '/submission/detail/:id',
   path: s => ({
     id: s.string()
-  })
+  }),
+
+  forbidden: s => !s.user.roles.includes('submission_view')
 });

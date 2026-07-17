@@ -9,26 +9,15 @@ export {
   useAppSyncNavigationStoreFromLocation,
   useAppSyncRouterStoreFromNavigation
 } from './router.hooks';
-export { AppRouterLayout, AppRouterNode, AppRouterPanel } from './router.layout';
-export type { AppRouterNodeProps, AppRouterPanelProps } from './router.layout';
-export {
-  DEFAULT_APP_LOCATION_STATE,
-  DEFAULT_APP_NAVIGATE_OPTIONS,
-  DEFAULT_APP_NAVIGATION_STORE,
-  DEFAULT_APP_ROUTER_BLOCKED_ROUTES,
-  DEFAULT_APP_ROUTER_NODE,
-  DEFAULT_APP_ROUTER_PANEL,
-  DEFAULT_APP_ROUTER_ROUTE,
-  DEFAULT_APP_ROUTER_STORE,
-  ROUTER_STORE_EXAMPLE
-} from './router.models';
+export { AppRouterLayout, AppRouterNodeLayout, AppRouterPanelLayout, AppRouterRouteLayout } from './router.layout';
+export type { AppRouterNodeLayoutProps, AppRouterPanelLayoutProps, AppRouterRouteLayoutProps } from './router.layout';
 export type {
   AppLocationState,
   AppNavigateOptions,
   AppNavigationStore,
   AppRouterBlockedRoutes,
-  AppRouterNode as AppRouterNodeType,
-  AppRouterPanel as AppRouterPanelType,
+  AppRouterNode,
+  AppRouterPanel,
   AppRouterRoute,
   AppRouterState,
   AppRouterStore,
@@ -61,6 +50,7 @@ export {
   applyDefaultNavigationStore,
   applyNavigationDispatch,
   areRouterStoreEqual,
+  captureScrollPositions,
   clearBlockedRoutes,
   clearNavigationStore,
   cloneLocationStore,
@@ -77,13 +67,20 @@ export {
   findPrevPanelKey,
   findRoute,
   findRouteKey,
-  getDefaultPanel,
+  findRouteKeyFromPanelKey,
+  getDefaultNavigateOptions,
+  getDefaultNavigationStore,
+  getDefaultRouterNode,
+  getDefaultRouterPanel,
+  getDefaultRouterRoute,
+  getDefaultRouterStore,
   getFirstRouteKey,
   getHashFragmentsFromRouter,
   getLocationStateFromRouter,
   getNavigationStoreFromRouter,
   getNextRouteFromKey,
   getPanel,
+  getRouteDigestFromRoute,
   getRouteFromKey,
   getRouteFromPanelKey,
   hasBlockedRoutes,
@@ -116,6 +113,7 @@ export {
   setPermanentRoute,
   setPinnedRoute,
   setRoute,
+  setRouteDigestFromKey,
   setUnpinnedRoute,
   showPreviousTab,
   updateNode,

@@ -26,5 +26,7 @@ export const SubmissionRedirectRoute = createAppRoute({
   route: '/submission/:id',
   path: s => ({
     id: s.string()
-  })
+  }),
+
+  forbidden: s => !s.user.roles.includes('submission_view')
 });

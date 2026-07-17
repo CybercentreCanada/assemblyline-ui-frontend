@@ -2,7 +2,7 @@ import HourglassEmptyOutlinedIcon from '@mui/icons-material/HourglassEmptyOutlin
 import { Typography, useTheme } from '@mui/material';
 import { useAppConfig } from 'core/config';
 import { createAppRoute } from 'core/routes';
-import { ForbiddenPage } from 'pages/forbidden/forbidden.route';
+import { ForbiddenPage } from 'pages/forbidden/forbidden';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { PageCenter } from 'ui/pages/PageCenter';

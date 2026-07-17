@@ -11,7 +11,7 @@ import {
 } from '@mui/material';
 import type { InferAppNavigationPropsFromPath } from 'core/router';
 import { AppLink, useAppNavigate } from 'core/router';
-import { useAppSearchParams } from 'core/routes';
+import { useAppSearchSnapshot } from 'core/routes';
 import React, { memo } from 'react';
 import type SimpleSearchQuery from 'ui/SearchBar/simple-search-query';
 
@@ -75,7 +75,7 @@ export const SortableHeaderCell: React.FC<SortableHeaderCellProps> = ({
   onSort = null,
   ...other
 }) => {
-  const search = useAppSearchParams<'/submissions'>();
+  const search = useAppSearchSnapshot<'/submissions'>();
   const curSort = (search?.get?.(sortName as any) || '') as string;
   const navigate = useAppNavigate<'/submissions'>();
   const active = curSort && curSort.indexOf(sortField) !== -1;

@@ -38,6 +38,175 @@ export const hashObject = (value: unknown): string => {
   return (hash >>> 0).toString(16).padStart(8, '0');
 };
 
+const FNV_OFFSET_32 = 0x811c9dc5;
+const FNV_PRIME_32 = 0x01000193;
+
+const hashString32 = (value: string): number => {
+  let hash = FNV_OFFSET_32;
+
+  for (let i = 0; i < value.length; i++) {
+    hash ^= value.charCodeAt(i);
+    hash = Math.imul(hash, FNV_PRIME_32);
+  }
+
+  return hash >>> 0;
+};
+
+const mixHash32 = (left: number, right: number): number => {
+  const mixed = (left ^ Math.imul(right, 0x9e3779b1)) >>> 0;
+  return Math.imul(mixed ^ (mixed >>> 16), 0x85ebca6b) >>> 0;
+};
+
+const hashPrimitive32 = (value: unknown): number => {
+  if (value === null) return hashString32('null');
+
+  switch (typeof value) {
+    case 'undefined':
+      return hashString32('undefined');
+    case 'boolean':
+      return hashString32(value ? 'true' : 'false');
+    case 'number': {
+      if (Number.isNaN(value)) return hashString32('number:NaN');
+      if (!Number.isFinite(value)) return hashString32(`number:${value}`);
+      const normalized = Object.is(value, -0) ? '-0' : `${value}`;
+      return hashString32(`number:${normalized}`);
+    }
+    case 'bigint':
+      return hashString32(`bigint:${value}`);
+    case 'string':
+      return hashString32(`string:${value}`);
+    case 'symbol':
+      return hashString32(`symbol:${String(value)}`);
+    case 'function':
+      return hashString32('function');
+    default:
+      return hashString32('unknown');
+  }
+};
+
+/**
+ * @name hashObjectKeyOrderIndependent
+ * @description Produces a deterministic 32-bit hash where plain-object key insertion order does not affect the result.
+ * Arrays remain order-sensitive.
+ * @param value - Input value to hash
+ * @returns Lowercase 8-character hexadecimal hash string
+ */
+export const hashObjectKeyOrderIndependent = (value: unknown): string => {
+  const activeNodes = new WeakSet<object>();
+
+  const hashValue = (current: unknown): number => {
+    if (current == null || typeof current !== 'object') {
+      return hashPrimitive32(current);
+    }
+
+    const currentObject = current;
+
+    if (activeNodes.has(currentObject)) {
+      throw new TypeError('Cannot hash circular structures.');
+    }
+
+    activeNodes.add(currentObject);
+
+    try {
+      if (Array.isArray(current)) {
+        let acc = hashString32('array:start');
+        for (const item of current) {
+          acc = mixHash32(acc, hashValue(item));
+        }
+        return mixHash32(acc, current.length >>> 0);
+      }
+
+      const proto = Object.getPrototypeOf(currentObject) as object | null;
+      const isPlainObject = proto === Object.prototype || proto === null;
+
+      if (!isPlainObject) {
+        return hashString32(`object:${Object.prototype.toString.call(currentObject)}`);
+      }
+
+      const objectValue = current as Record<string, unknown>;
+      let xorAcc = hashString32('object:xor');
+      let sumAcc = hashString32('object:sum');
+      let count = 0;
+
+      for (const key of Object.keys(objectValue)) {
+        const pairHash = mixHash32(hashString32(`key:${key}`), hashValue(objectValue[key]));
+
+        xorAcc = (xorAcc ^ pairHash) >>> 0;
+        sumAcc = (sumAcc + pairHash) >>> 0;
+        count++;
+      }
+
+      return mixHash32(mixHash32(xorAcc, sumAcc), count >>> 0);
+    } finally {
+      activeNodes.delete(currentObject);
+    }
+  };
+
+  return (hashValue(value) >>> 0).toString(16).padStart(8, '0');
+};
+
+/**
+ * @name sortObjectKeysDeep
+ * @description Sorts object keys alphabetically in-place, recursively across nested plain objects and array items.
+ * @param value - Value to recursively normalize
+ * @returns Same reference with all nested plain-object keys sorted alphabetically
+ */
+export const sortObjectKeysDeep = <T,>(value: T): T => {
+  if (value == null || typeof value !== 'object') {
+    return value;
+  }
+
+  if (Array.isArray(value)) {
+    for (const item of value) {
+      sortObjectKeysDeep(item);
+    }
+    return value;
+  }
+
+  const proto = Object.getPrototypeOf(value as object) as object | null;
+  const isPlainObject = proto === Object.prototype || proto === null;
+  if (!isPlainObject) {
+    return value;
+  }
+
+  const objectValue = value as Record<string, unknown>;
+  const keys = Object.keys(objectValue);
+
+  for (const key of keys) {
+    objectValue[key] = sortObjectKeysDeep(objectValue[key]);
+  }
+
+  let isSorted = true;
+  for (let i = 1; i < keys.length; i++) {
+    if (keys[i - 1] > keys[i]) {
+      isSorted = false;
+      break;
+    }
+  }
+
+  if (isSorted) {
+    return value;
+  }
+
+  const sortedKeys = [...keys].sort((left, right) => {
+    if (left > right) return 1;
+    if (left < right) return -1;
+    return 0;
+  });
+  const snapshot: Record<string, unknown> = {};
+
+  for (const key of keys) {
+    snapshot[key] = objectValue[key];
+    delete objectValue[key];
+  }
+
+  for (const key of sortedKeys) {
+    objectValue[key] = snapshot[key];
+  }
+
+  return value;
+};
+
 /**
  * @name shallowObjectCompare
  * @description Compares two root objects shallowly by own keys and top-level values.
@@ -173,11 +342,11 @@ export function deepReconcile<T extends Record<string, unknown>>(
  * @param initial - Initial baseline state used for restoration
  * @returns A reconciled object following deep-reconcile fallback precedence
  */
-export const toElement = (value: ReactNode | MemoExoticComponent<ComponentType<any>>) => {
+export const toElement = (value: ReactNode | MemoExoticComponent<ComponentType<unknown>>) => {
   if (React.isValidElement(value)) {
     return value;
   }
 
-  const Component = value as ComponentType<any>;
+  const Component = value as ComponentType<unknown>;
   return <Component />;
 };

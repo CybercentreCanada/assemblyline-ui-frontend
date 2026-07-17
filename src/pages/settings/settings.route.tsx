@@ -100,10 +100,14 @@ export const SettingsRoute = createAppRoute({
   route: '/settings/:tab',
   path: s => ({
     tab: s.string()
-  })
+  }),
+
+  forbidden: s => !s.user.is_admin && !s.user.roles.includes('self_manage')
 });
 
 export const SettingsRootRoute = createAppRoute({
   component: SettingsPage,
-  route: '/settings'
+  route: '/settings',
+
+  forbidden: s => !s.user.is_admin && !s.user.roles.includes('self_manage')
 });

@@ -15,16 +15,17 @@ import {
   clearBlockedRoutes,
   clearNavigationStore,
   cloneLocationStore,
-  DEFAULT_APP_NAVIGATE_OPTIONS,
   findNextPanelKey,
   findPanelKey,
   findPrevPanelKey,
   getAppNavigationStateFromApi,
   getAppRouterStateFromApi,
+  getDefaultNavigateOptions,
   getHashFragmentsFromRouter,
   getLocationStateFromRouter,
   getNavigationStoreFromRouter,
   getPanel,
+  getRouteDigestFromRoute,
   getRouteFromKey,
   getRouteFromPanelKey,
   hasBlockedRoutes,
@@ -52,7 +53,6 @@ import {
   getAppLocationParamStateFromApi,
   getExternalHrefFromRoute,
   getRouteFromValues,
-  getRouteIdFromRoute,
   sanitizeRoute,
   useAppLocationParamStoreApi,
   useAppRouteKey
@@ -61,7 +61,7 @@ import type { DependencyList } from 'react';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import type { Location, NavigateOptions } from 'react-router';
 import { useLocation, useNavigate } from 'react-router';
-import { generateRandomUUID } from 'shared/utils/app.utils';
+import { generateRandomUUID, hashObject } from 'shared/utils/app.utils';
 
 //*****************************************************************************************
 // useAppExternalHref
@@ -142,13 +142,13 @@ export function useAppNavigate<const Origin extends AppRoute['route']>() {
 
       const prevRouteKey = getPanel(routerState, destinationPanelKey).routeKey;
       const prevRoute = getRouteFromKey(routerState, prevRouteKey);
-      const prevId = getRouteIdFromRoute(prevRoute);
+      const prevDigest = getRouteDigestFromRoute(prevRoute);
       const prevRouteValues = findRouteValuesFromKey(locationState, prevRouteKey);
       const nextRouteValues = applyNavigationDispatch(dispatch, prevRouteValues);
       const nextRoute = getRouteFromValues(locationState, nextRouteValues);
-      const nextId = getRouteIdFromRoute(nextRoute);
+      const nextDigest = getRouteDigestFromRoute(nextRoute);
 
-      if (!nextRoute?.href || prevId === nextId) return;
+      if (!nextRoute?.href || prevDigest === nextDigest) return;
 
       setNavigationStore(store => {
         let nextRouter = cloneLocationStore(routerState);
@@ -175,13 +175,13 @@ export function useAppNavigate<const Origin extends AppRoute['route']>() {
 
       const prevRouteKey = getPanel(routerState, destinationPanelKey).routeKey;
       const prevRoute = getRouteFromKey(routerState, prevRouteKey);
-      const prevId = getRouteIdFromRoute(prevRoute);
+      const prevDigest = getRouteDigestFromRoute(prevRoute);
       const prevRouteValues = findRouteValuesFromKey(locationState, prevRouteKey);
       const nextRouteValues = applyNavigationDispatch(dispatch, prevRouteValues);
       const nextRoute = getRouteFromValues(locationState, nextRouteValues);
-      const nextId = getRouteIdFromRoute(nextRoute);
+      const nextDigest = getRouteDigestFromRoute(nextRoute);
 
-      if (!nextRoute?.href || prevId === nextId) return;
+      if (!nextRoute?.href || prevDigest === nextDigest) return;
 
       setNavigationStore(store => {
         let nextRouter = cloneLocationStore(routerState);
@@ -207,7 +207,7 @@ export function useAppNavigate<const Origin extends AppRoute['route']>() {
 
       const prevRouteKey = getPanel(routerState, destinationPanelKey).routeKey;
       const prevRouteValues = findRouteValuesFromKey(locationState, prevRouteKey);
-      const shouldClose = applyNavigationDispatch(dispatch, prevRouteValues);
+      const shouldClose = typeof dispatch === 'function' ? dispatch(prevRouteValues) : dispatch;
 
       if (!shouldClose) return;
 
@@ -242,7 +242,7 @@ export function useAppNavigate<const Origin extends AppRoute['route']>() {
 
   const from = useCallback(
     function <const Destination extends AppRoute['route'] = Origin>(
-      options: AppNavigateOptions = DEFAULT_APP_NAVIGATE_OPTIONS
+      options: AppNavigateOptions = getDefaultNavigateOptions()
     ) {
       const routerState = getAppRouterStateFromApi(routerStoreApi);
       const preferenceState = getAppPreferenceStateFromApi(preferenceStoreApi);
@@ -255,7 +255,7 @@ export function useAppNavigate<const Origin extends AppRoute['route']>() {
 
   const here = useCallback(
     function <const Destination extends AppRoute['route'] = Origin>(
-      options: AppNavigateOptions = DEFAULT_APP_NAVIGATE_OPTIONS
+      options: AppNavigateOptions = getDefaultNavigateOptions()
     ) {
       const routerState = getAppRouterStateFromApi(routerStoreApi);
 
@@ -267,7 +267,7 @@ export function useAppNavigate<const Origin extends AppRoute['route']>() {
 
   const to = useCallback(
     function <const Destination extends AppRoute['route'] = Origin>(
-      options: AppNavigateOptions = DEFAULT_APP_NAVIGATE_OPTIONS
+      options: AppNavigateOptions = getDefaultNavigateOptions()
     ) {
       const routerState = getAppRouterStateFromApi(routerStoreApi);
       const preferenceState = getAppPreferenceStateFromApi(preferenceStoreApi);
@@ -281,7 +281,7 @@ export function useAppNavigate<const Origin extends AppRoute['route']>() {
   const at = useCallback(
     function <const Destination extends AppRoute['route'] = Origin>(
       panelKey: number,
-      options: AppNavigateOptions = DEFAULT_APP_NAVIGATE_OPTIONS
+      options: AppNavigateOptions = getDefaultNavigateOptions()
     ) {
       return buildOperations<Destination>(panelKey, options);
     },
@@ -354,7 +354,12 @@ export function useAppSyncNavigationStoreFromLocation() {
         let panelKey: number = -1;
 
         for (const [i, fragment] of hashFragment.split('#/').entries()) {
-          const nextLocation = sanitizeRoute(locationState, { href: i === 0 ? fragment : `/${fragment}` });
+          const href = i === 0 ? fragment : `/${fragment}`;
+          const nextLocation = sanitizeRoute(locationState, {
+            digest: hashObject({ href, state: null }),
+            href,
+            state: null
+          });
           if (!nextLocation?.href) continue;
 
           panelKey++;
@@ -397,8 +402,10 @@ export function useAppSyncNavigationStoreFromLocation() {
         let nextStore = getNavigationStoreFromRouter(store, routerState);
 
         const pathname = location.pathname === '/' ? '/submit' : location.pathname;
+        const href = `${pathname}${location.search || ''}${location.hash || ''}`;
         const legacyLocation = sanitizeRoute(locationState, {
-          href: `${pathname}${location.search || ''}${location.hash || ''}`,
+          digest: hashObject({ href, state: location.state ?? null }),
+          href,
           state: location.state ?? null
         });
 

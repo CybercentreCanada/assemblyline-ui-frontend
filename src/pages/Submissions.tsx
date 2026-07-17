@@ -17,7 +17,7 @@ export const SubmissionsPage = memo(() => {
 
   const query = useAppPathParams<'/submissions/:query'>()?.query;
 
-  const offset = useAppSearchParams<'/submissions/:query'>()?.get?.('offset');
+  const offset = useAppSearchSnapshot<'/submissions/:query'>()?.get?.('offset');
 
   const search = useAppRouteStore(s => s.params as unknown);
 

@@ -14,7 +14,7 @@ import useMyAPI from 'deprecated/hooks/useMyAPI';
 import useMySnackbar from 'deprecated/hooks/useMySnackbar';
 import { useAppAssistant } from 'layout/assistant';
 import type { SubmissionReport } from 'models/api/submission_report';
-import { ForbiddenPage } from 'pages/forbidden/forbidden.route';
+import { ForbiddenPage } from 'pages/forbidden/forbidden';
 import AISummarySection from 'pages/submission-detail/components/ai_summary';
 import Attack from 'pages/submission-report/components/attack';
 import AttributionBanner from 'pages/submission-report/components/attribution_banner';
@@ -39,7 +39,7 @@ const NoPrintTooltip = memo(
 
 const SubmissionReportPage = memo(() => {
   const { t } = useTranslation(['submissionReport']);
-  const { id } = useAppPathParams<'/submission/report/:id'>();
+  const { id = null } = useAppPathParams<'/submission/report/:id'>();
   const { user: currentUser, c12nDef, configuration, settings } = useALContext();
   const { showErrorMessage, showWarningMessage } = useMySnackbar();
   const navigate = useAppNavigate();
@@ -332,5 +332,7 @@ export const SubmissionReportRoute = createAppRoute({
   route: '/submission/report/:id',
   path: s => ({
     id: s.string()
-  })
+  }),
+
+  forbidden: s => !s.user.roles.includes('submission_view')
 });

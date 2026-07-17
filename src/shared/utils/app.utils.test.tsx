@@ -2,10 +2,21 @@ import {
   deepCompare,
   deepReconcile,
   generateRandomUUID,
+  hashObjectKeyOrderIndependent,
   shallowCompareObject,
-  shallowReconcile
+  shallowReconcile,
+  sortObjectKeysDeep
 } from 'shared/utils/app.utils';
 import { describe, expect, it } from 'vitest';
+
+const createGetRandomValuesMock = (source: Uint8Array): typeof crypto.getRandomValues => {
+  return ((typedArray: Exclude<BufferSource, ArrayBuffer>) => {
+    if (typedArray instanceof Uint8Array) {
+      typedArray.set(source);
+    }
+    return typedArray;
+  }) as typeof crypto.getRandomValues;
+};
 
 //*****************************************************************************************
 // generateRandomUUID
@@ -25,20 +36,56 @@ describe('generateRandomUUID', () => {
 
     const spy = vi.spyOn(crypto, 'getRandomValues');
     spy
-      .mockImplementationOnce((typedArray: Uint8Array) => {
-        typedArray.set(firstBytes);
-        return typedArray;
-      })
-      .mockImplementationOnce((typedArray: Uint8Array) => {
-        typedArray.set(secondBytes);
-        return typedArray;
-      });
+      .mockImplementationOnce(createGetRandomValuesMock(firstBytes))
+      .mockImplementationOnce(createGetRandomValuesMock(secondBytes));
 
     const id = generateRandomUUID([firstId]);
 
     expect(id).toBe(secondId);
     expect(spy).toHaveBeenCalledTimes(2);
     spy.mockRestore();
+  });
+});
+
+//*****************************************************************************************
+// hashObjectKeyOrderIndependent
+//*****************************************************************************************
+describe('hashObjectKeyOrderIndependent', () => {
+  it('returns identical hashes for objects with different key insertion order', () => {
+    const left = {
+      b: 2,
+      a: {
+        y: 2,
+        x: 1
+      }
+    };
+    const right = {
+      a: {
+        x: 1,
+        y: 2
+      },
+      b: 2
+    };
+
+    expect(hashObjectKeyOrderIndependent(left)).toBe(hashObjectKeyOrderIndependent(right));
+  });
+
+  it('keeps array order significant', () => {
+    expect(hashObjectKeyOrderIndependent([1, 2, 3])).not.toBe(hashObjectKeyOrderIndependent([3, 2, 1]));
+  });
+
+  it('changes hash when value changes', () => {
+    const left = { a: 1, b: { c: 2 } };
+    const right = { a: 1, b: { c: 3 } };
+
+    expect(hashObjectKeyOrderIndependent(left)).not.toBe(hashObjectKeyOrderIndependent(right));
+  });
+
+  it('throws for circular structures', () => {
+    const value: Record<string, unknown> = { a: 1 };
+    value.self = value;
+
+    expect(() => hashObjectKeyOrderIndependent(value)).toThrow('Cannot hash circular structures.');
   });
 });
 
@@ -135,5 +182,55 @@ describe('deepReconcile', () => {
     const output = deepReconcile<T>({}, { a: 2, c: 9 }, { a: 1, b: 7 });
 
     expect(output).toEqual({ a: 1, b: 7, c: 9 });
+  });
+});
+
+//*****************************************************************************************
+// sortObjectKeysDeep
+//*****************************************************************************************
+describe('sortObjectKeysDeep', () => {
+  it('sorts keys alphabetically at all nested levels', () => {
+    const value = {
+      z: 1,
+      b: {
+        d: 4,
+        a: 1,
+        c: {
+          y: 2,
+          x: 1
+        }
+      },
+      a: 0
+    };
+
+    const result = sortObjectKeysDeep(value);
+
+    expect(result).toBe(value);
+    expect(Object.keys(result)).toEqual(['a', 'b', 'z']);
+    expect(Object.keys(result.b)).toEqual(['a', 'c', 'd']);
+    expect(Object.keys(result.b.c)).toEqual(['x', 'y']);
+  });
+
+  it('sorts object items inside arrays but preserves array order', () => {
+    const value = {
+      list: [
+        { b: 2, a: 1 },
+        { d: 4, c: 3 }
+      ]
+    };
+
+    const result = sortObjectKeysDeep(value);
+
+    expect(result.list).toHaveLength(2);
+    expect(Object.keys(result.list[0] as Record<string, unknown>)).toEqual(['a', 'b']);
+    expect(Object.keys(result.list[1] as Record<string, unknown>)).toEqual(['c', 'd']);
+  });
+
+  it('returns primitives and non-plain objects unchanged', () => {
+    const date = new Date('2026-01-01');
+
+    expect(sortObjectKeysDeep(123)).toBe(123);
+    expect(sortObjectKeysDeep('abc')).toBe('abc');
+    expect(sortObjectKeysDeep(date)).toBe(date);
   });
 });

@@ -2,7 +2,7 @@ import { Alert, LinearProgress, styled } from '@mui/material';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import useMySnackbar from 'deprecated/hooks/useMySnackbar';
-import { ForbiddenPage } from 'pages/forbidden/forbidden.route';
+import { ForbiddenPage } from 'pages/forbidden/forbidden';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { HexViewerApp } from 'ui/HexViewer';

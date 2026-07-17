@@ -9,7 +9,7 @@ import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
 import { List, ListItemButton, ListItemIcon, ListItemText, Popover, useTheme } from '@mui/material';
 import { AppLink, useAppNavigate } from 'core/router';
-import { createAppRoute, useAppPathParams, useAppSearchParams } from 'core/routes';
+import { createAppRoute, useAppPathParams, useAppSearchSnapshot } from 'core/routes';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import useMySnackbar from 'deprecated/hooks/useMySnackbar';
@@ -29,7 +29,7 @@ import ParentSection from 'pages/file-detail/components/parents';
 import ResultSection from 'pages/file-detail/components/results';
 import TagSection from 'pages/file-detail/components/tags';
 import URIIdentificationSection from 'pages/file-detail/components/uriIdent';
-import { ForbiddenPage } from 'pages/forbidden/forbidden.route';
+import { ForbiddenPage } from 'pages/forbidden/forbidden';
 import AISummarySection from 'pages/submission-detail/components/ai_summary';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -55,7 +55,7 @@ const FileDetailPage = React.memo(() => {
   const theme = useTheme();
   const location = useLocation();
   const { id: sha256 } = useAppPathParams<'/file/detail/:id'>();
-  const search = useAppSearchParams<'/file/detail/:id'>();
+  const search = useAppSearchSnapshot<'/file/detail/:id'>();
   const navigate = useAppNavigate();
   const { apiCall } = useMyAPI();
   const { user: currentUser, c12nDef, configuration, settings } = useALContext();
@@ -584,5 +584,9 @@ export const FileDetailRoute = createAppRoute({
   }),
   search: s => ({
     name: s.string(null)
-  })
+  }),
+
+  state: s => s({ test: 'asd' } as { test: string }),
+
+  forbidden: s => !s.user.roles.includes('submission_view')
 });

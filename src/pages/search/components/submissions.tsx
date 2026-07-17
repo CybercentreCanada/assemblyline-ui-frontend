@@ -4,7 +4,7 @@ import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
 import { useAppConfig } from 'core/config';
 import { useAppNavigate } from 'core/router';
-import { useAppSearchParams } from 'core/routes';
+import { useAppSearchSnapshot } from 'core/routes';
 import useALContext from 'deprecated/hooks/useALContext';
 import type { SearchResult } from 'models/api/search';
 import type { SubmissionIndexed } from 'models/base/submission';
@@ -36,7 +36,7 @@ const WrappedSubmissionsTable: React.FC<Props> = ({ submissionResults, allowSort
   const { t } = useTranslation(['search']);
   const { c12nDef } = useALContext();
 
-  const search = useAppSearchParams<'/submissions'>();
+  const search = useAppSearchSnapshot<'/submissions'>();
   const navigate = useAppNavigate<'/submissions'>();
   const submissionView = useAppConfig(s => s.settings.submission_view);
 

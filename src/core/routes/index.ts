@@ -2,7 +2,17 @@ export { DisabledBoundary, ForbiddenBoundary } from './routes.components';
 export type { DisabledBoundaryProps, ForbiddenBoundaryProps } from './routes.components';
 export { createAppRoute } from './routes.factories';
 export type { CreateAppRouteProps } from './routes.factories';
-export { useAppHashParams, useAppLocation, useAppPathParams, useAppRouteKey, useAppSearchParams } from './routes.hooks';
+export {
+  useAppHashParams,
+  useAppLocation,
+  useAppMediaQuery,
+  useAppPathParams,
+  useAppRouteKey,
+  useAppSearchParams,
+  useAppSearchSnapshot
+} from './routes.hooks';
+export { AppRouteLayoutProvider } from './routes.layout';
+export type { AppRouteLayoutProviderProps } from './routes.layout';
 export type {
   AppLocationParamStore,
   AppRouteSpec,
@@ -10,8 +20,7 @@ export type {
   InferAppRouteParamFromPath,
   InferAppRouteSearchValuesFromPath,
   InferAppRouteSpecFromPath,
-  InferAppRouteValuesFromPath,
-  RouteHash
+  InferAppRouteValuesFromPath
 } from './routes.models';
 export {
   AppLocationParamProvider,
@@ -32,6 +41,7 @@ export type {
 export {
   addRouteParam,
   applySearchParamToRouteParam,
+  evaluateMediaQuery,
   findRouteParamFromKey,
   findRouteSpecFromKey,
   findRouteSpecFromParam,
@@ -42,7 +52,6 @@ export {
   getAppLocationParamStateFromApi,
   getDefaultLocation,
   getDefaultRouteParam,
-  getDefaultRouterRoute,
   getDefaultRouteSpec,
   getDefaultRouteValues,
   getExternalHrefFromParam,
@@ -54,19 +63,22 @@ export {
   getLocationPathnameFromParam,
   getLocationSearchFromParam,
   getLocationStateFromParam,
+  getLocationTransientFromParam,
   getPathParamFromLocation,
   getRouteFromLocation,
   getRouteFromParam,
   getRouteFromValues,
-  getRouteIdFromRoute,
   getRouteLocationsFromLegacyURL,
   getRouteLocationsFromURLHash,
   getRouteParamFromRoute,
   getRouteParamFromValues,
   getRouteValuesFromParam,
   getRouteValuesFromRouteLocation,
-  getSearchParamFromLocation,
+  getSearchSnapshotFromLocation,
+  getStateParamFromLocation,
+  getTransientParamFromValue,
   hasDifferentRouteParam,
+  parseMediaQuery,
   parseRouteLocationFromHashFragment,
   removeRouteParam,
   removeRouteParamFromKey,
@@ -78,3 +90,4 @@ export {
   updateRouteParam,
   upsertRouteParam
 } from './routes.utils';
+export type { MediaQueryCondition } from './routes.utils';

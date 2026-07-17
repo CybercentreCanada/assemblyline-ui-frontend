@@ -33,6 +33,8 @@ import forbiddenEN from 'pages/forbidden/forbidden.i18n.en.json';
 import forbiddenFR from 'pages/forbidden/forbidden.i18n.fr.json';
 import helpAPIEN from 'pages/help/api/help-api.i18n.en.json';
 import helpAPIFR from 'pages/help/api/help-api.i18n.fr.json';
+import missingNodeEN from 'pages/missing-node/missing-node.i18n.en.json';
+import missingNodeFR from 'pages/missing-node/missing-node.i18n.fr.json';
 import notFoundEN from 'pages/not-found/not-found.i18n.en.json';
 import notFoundFR from 'pages/not-found/not-found.i18n.fr.json';
 import searchEN from 'pages/search/search.i18n.en.json';
@@ -68,6 +70,7 @@ export const I18N_RESSOURCES = {
     locked: lockedEN,
     login: loginEN,
     logout: logoutEN,
+    missingNode: missingNodeEN,
     notifications: notificationsEN,
     quota: quotaEN,
     search: searchEN,
@@ -93,6 +96,7 @@ export const I18N_RESSOURCES = {
     locked: lockedFR,
     login: loginFR,
     logout: logoutFR,
+    missingNode: missingNodeFR,
     notifications: notificationsFR,
     quota: quotaFR,
     search: searchFR,

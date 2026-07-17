@@ -1,4 +1,5 @@
-import React, { useEffect, useRef } from 'react';
+import type { ReactNode } from 'react';
+import { memo, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 
 //*****************************************************************************************
@@ -12,6 +13,7 @@ export type ReversePortalNode = {
 export const createReversePortalNode = (): ReversePortalNode => {
   const hostEl = document.createElement('div');
   hostEl.style.display = 'contents';
+  hostEl.setAttribute('data-testid', 'reverse-portal-host');
   let currentOutlet: HTMLElement | null = null;
 
   const setOutlet = (el: HTMLElement | null) => {
@@ -29,10 +31,10 @@ export const createReversePortalNode = (): ReversePortalNode => {
 
 export type InPortalProps = {
   node: ReversePortalNode;
-  children: React.ReactNode;
+  children: ReactNode;
 };
 
-export const InPortal = React.memo(({ node, children }: InPortalProps) => <>{createPortal(children, node.hostEl)}</>);
+export const InPortal = memo(({ node, children }: InPortalProps) => <>{createPortal(children, node.hostEl)}</>);
 
 InPortal.displayName = 'InPortal';
 
@@ -44,7 +46,7 @@ export type OutPortalProps = {
   node: ReversePortalNode;
 };
 
-export const OutPortal = React.memo(({ node }: OutPortalProps) => {
+export const OutPortal = memo(({ node }: OutPortalProps) => {
   const outletRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -52,7 +54,7 @@ export const OutPortal = React.memo(({ node }: OutPortalProps) => {
     return () => node.setOutlet(null);
   }, [node]);
 
-  return <div ref={outletRef} style={{ display: 'contents' }} />;
+  return <div data-testid="reverse-portal-outlet" ref={outletRef} style={{ display: 'contents' }} />;
 });
 
 OutPortal.displayName = 'OutPortal';

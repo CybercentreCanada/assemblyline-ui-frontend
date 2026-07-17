@@ -4,12 +4,12 @@ import PersonIcon from '@mui/icons-material/Person';
 import { useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import { useAppNavigate } from 'core/router';
-import { createAppRoute, useAppSearchParams } from 'core/routes';
+import { createAppRoute, useAppSearchSnapshot } from 'core/routes';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import type { IndexDefinition } from 'models/api/user';
 import type { SubmissionIndexed } from 'models/base/submission';
-import { ForbiddenPage } from 'pages/forbidden/forbidden.route';
+import { ForbiddenPage } from 'pages/forbidden/forbidden';
 import SubmissionsTable from 'pages/search/components/submissions';
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -32,7 +32,7 @@ const Submissions = memo(() => {
   const { apiCall } = useMyAPI();
   const { user: currentUser, indexes } = useALContext();
 
-  const search = useAppSearchParams<'/submissions'>();
+  const search = useAppSearchSnapshot<'/submissions'>();
   const navigate = useAppNavigate<'/submissions'>();
 
   const [submissionResults, setSubmissionResults] = useState<SearchResults>(null);
@@ -74,7 +74,7 @@ const Submissions = memo(() => {
     });
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentUser.roles, search.toString()]);
+  }, [currentUser.roles, search?.toString()]);
 
   return currentUser.roles.includes('submission_view') ? (
     <PageFullWidth margin={4}>
@@ -175,5 +175,7 @@ export const SubmissionsRoute = createAppRoute({
     sort: s.string('times.submitted desc').ephemeral(),
     filters: s.filters([]),
     track_total_hits: s.number(null).origin('snapshot').nullable().ephemeral()
-  })
+  }),
+
+  forbidden: s => !s.user.roles.includes('submission_view')
 });

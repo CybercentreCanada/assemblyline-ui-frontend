@@ -1,7 +1,7 @@
 import type { AppNavigationStore, AppRouterStore } from 'core/router';
 import {
-  DEFAULT_APP_NAVIGATION_STORE,
-  DEFAULT_APP_ROUTER_STORE,
+  getDefaultNavigationStore,
+  getDefaultRouterStore,
   useAppBlockNavigation,
   useAppBlockUnloadEvent,
   useAppSyncNavigationStoreFromLocation,
@@ -21,10 +21,10 @@ export const {
   useStore: useAppRouterStore,
   useSetStore: useAppSetRouterStore,
   useStoreApi: useAppRouterStoreApi
-} = createAppStore<AppRouterStore>(DEFAULT_APP_ROUTER_STORE);
+} = createAppStore<AppRouterStore>(getDefaultRouterStore());
 
 export const getAppRouterStateFromApi = (api: StoreApi<AppRouterStore>): AppRouterStore => {
-  return api?.getState() || DEFAULT_APP_ROUTER_STORE;
+  return api?.getState() || getDefaultRouterStore();
 };
 
 AppRouterStoreProvider.displayName = 'AppRouterStoreProvider';
@@ -44,10 +44,10 @@ export const {
   useStore: useAppNavigationStore,
   useSetStore: useAppSetNavigationStore,
   useStoreApi: useAppNavigationStoreApi
-} = createAppStore<AppNavigationStore>(DEFAULT_APP_NAVIGATION_STORE);
+} = createAppStore<AppNavigationStore>(getDefaultNavigationStore());
 
 export const getAppNavigationStateFromApi = (api: StoreApi<AppNavigationStore>): AppNavigationStore => {
-  return api?.getState() || DEFAULT_APP_NAVIGATION_STORE;
+  return api?.getState() || getDefaultNavigationStore();
 };
 
 AppNavigationStoreProvider.displayName = 'AppNavigationStoreProvider';

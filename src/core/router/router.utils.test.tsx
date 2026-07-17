@@ -1,7 +1,37 @@
-import type { AppRouterStore } from 'core/router/router.models';
-import { DEFAULT_APP_ROUTER_PANEL, DEFAULT_APP_ROUTER_STORE } from 'core/router/router.models';
-import { addRouteToPanel, findNextPanelKey, getRouteFromPanelKey, sanitizeRoutes } from 'core/router/router.utils';
+import type { AppRouterStore } from 'core/router';
+import {
+  addRouteToPanel,
+  findNextPanelKey,
+  getDefaultRouterPanel,
+  getDefaultRouterStore,
+  getRouteFromPanelKey,
+  sanitizeRoutes
+} from 'core/router';
+import { createReversePortalNode } from 'features/portal';
+import { hashObject } from 'shared/utils/app.utils';
 import { describe, expect, it } from 'vitest';
+
+/** Example router store shape used for parsing fallbacks and tests. */
+export const ROUTER_STORE_EXAMPLE: AppRouterStore = {
+  id: 'default',
+  nodes: { default: { portal: createReversePortalNode(), routeKey: 'default' } },
+  panels: [
+    {
+      pinnedRouteKeys: [],
+      routeKey: 'default',
+      tabbedRouteKeys: [],
+      temporaryRouteKey: 'default'
+    }
+  ],
+  routes: {
+    default: {
+      age: 0,
+      href: '/submit',
+      state: null,
+      digest: ''
+    }
+  }
+};
 
 //*****************************************************************************************
 // findNextPanelKey
@@ -9,70 +39,102 @@ import { describe, expect, it } from 'vitest';
 describe('findNextPanelKey', () => {
   it('returns first panel when route is outside all panels', () => {
     const store: AppRouterStore = {
-      ...DEFAULT_APP_ROUTER_STORE,
+      ...getDefaultRouterStore(),
       panels: [
-        { ...DEFAULT_APP_ROUTER_PANEL, routeKey: 'r1' },
-        { ...DEFAULT_APP_ROUTER_PANEL, routeKey: 'r2' }
+        { ...getDefaultRouterPanel(), routeKey: 'r1' },
+        { ...getDefaultRouterPanel(), routeKey: 'r2' }
       ],
       routes: {
-        r1: { href: '/page1', state: null },
-        r2: { href: '/page2', state: null },
-        outside: { href: '/outside', state: null }
+        r1: { digest: hashObject({ href: '/page1', state: null }), href: '/page1', state: null },
+        r2: { digest: hashObject({ href: '/page2', state: null }), href: '/page2', state: null },
+        outside: { digest: hashObject({ href: '/outside', state: null }), href: '/outside', state: null }
       }
     };
 
-    const nextPanelKey = findNextPanelKey(store, 'outside', 'push');
+    const preferences: AppPreferenceStore = {
+      api: {},
+      auth: {},
+      layout: {},
+      router: { maxPanels: 2, maxNodes: 2, navigation: 'push' },
+      safeResults: {}
+    };
+
+    const nextPanelKey = findNextPanelKey(store, 'outside', preferences);
     expect(nextPanelKey).toBe(0);
   });
 
   it('returns next panel index for push navigation', () => {
     const store: AppRouterStore = {
-      ...DEFAULT_APP_ROUTER_STORE,
+      ...getDefaultRouterStore(),
       panels: [
-        { ...DEFAULT_APP_ROUTER_PANEL, routeKey: 'r1' },
-        { ...DEFAULT_APP_ROUTER_PANEL, routeKey: 'r2' }
+        { ...getDefaultRouterPanel(), routeKey: 'r1' },
+        { ...getDefaultRouterPanel(), routeKey: 'r2' }
       ],
       routes: {
-        r1: { href: '/page1', state: null },
-        r2: { href: '/page2', state: null }
+        r1: { digest: hashObject({ href: '/page1', state: null }), href: '/page1', state: null },
+        r2: { digest: hashObject({ href: '/page2', state: null }), href: '/page2', state: null }
       }
     };
 
-    const nextPanelKey = findNextPanelKey(store, 'r1', 'push');
+    const preferences: AppPreferenceStore = {
+      api: {},
+      auth: {},
+      layout: {},
+      router: { maxPanels: 2, maxNodes: 2, navigation: 'push' },
+      safeResults: {}
+    };
+
+    const nextPanelKey = findNextPanelKey(store, 'r1', preferences);
     expect(nextPanelKey).toBe(1);
   });
 
   it('returns panel length for push navigation from the last panel', () => {
     const store: AppRouterStore = {
-      ...DEFAULT_APP_ROUTER_STORE,
+      ...getDefaultRouterStore(),
       panels: [
-        { ...DEFAULT_APP_ROUTER_PANEL, routeKey: 'r1' },
-        { ...DEFAULT_APP_ROUTER_PANEL, routeKey: 'r2' }
+        { ...getDefaultRouterPanel(), routeKey: 'r1' },
+        { ...getDefaultRouterPanel(), routeKey: 'r2' }
       ],
       routes: {
-        r1: { href: '/page1', state: null },
-        r2: { href: '/page2', state: null }
+        r1: { digest: hashObject({ href: '/page1', state: null }), href: '/page1', state: null },
+        r2: { digest: hashObject({ href: '/page2', state: null }), href: '/page2', state: null }
       }
     };
 
-    const nextPanelKey = findNextPanelKey(store, 'r2', 'push');
+    const preferences: AppPreferenceStore = {
+      api: {},
+      auth: {},
+      layout: {},
+      router: { maxPanels: 2, maxNodes: 2, navigation: 'push' },
+      safeResults: {}
+    };
+
+    const nextPanelKey = findNextPanelKey(store, 'r2', preferences);
     expect(nextPanelKey).toBe(2);
   });
 
   it('wraps to first panel for loop navigation from the last panel', () => {
     const store: AppRouterStore = {
-      ...DEFAULT_APP_ROUTER_STORE,
+      ...getDefaultRouterStore(),
       panels: [
-        { ...DEFAULT_APP_ROUTER_PANEL, routeKey: 'r1' },
-        { ...DEFAULT_APP_ROUTER_PANEL, routeKey: 'r2' }
+        { ...getDefaultRouterPanel(), routeKey: 'r1' },
+        { ...getDefaultRouterPanel(), routeKey: 'r2' }
       ],
       routes: {
-        r1: { href: '/page1', state: null },
-        r2: { href: '/page2', state: null }
+        r1: { digest: hashObject({ href: '/page1', state: null }), href: '/page1', state: null },
+        r2: { digest: hashObject({ href: '/page2', state: null }), href: '/page2', state: null }
       }
     };
 
-    const nextPanelKey = findNextPanelKey(store, 'r2', 'loop');
+    const preferences: AppPreferenceStore = {
+      api: {},
+      auth: {},
+      layout: {},
+      router: { maxPanels: 2, maxNodes: 2, navigation: 'loop' },
+      safeResults: {}
+    };
+
+    const nextPanelKey = findNextPanelKey(store, 'r2', preferences);
     expect(nextPanelKey).toBe(0);
   });
 });
@@ -83,11 +145,11 @@ describe('findNextPanelKey', () => {
 describe('sanitizeRoutes', () => {
   it('removes routes not referenced by panels or nodes', () => {
     const store: AppRouterStore = {
-      ...DEFAULT_APP_ROUTER_STORE,
-      panels: [{ ...DEFAULT_APP_ROUTER_PANEL, routeKey: 'r1' }],
+      ...getDefaultRouterStore(),
+      panels: [{ ...getDefaultRouterPanel(), routeKey: 'r1' }],
       routes: {
-        r1: { href: '/page1', state: null },
-        orphan: { href: '/orphan', state: null }
+        r1: { digest: hashObject({ href: '/page1', state: null }), href: '/page1', state: null },
+        orphan: { digest: hashObject({ href: '/orphan', state: null }), href: '/orphan', state: null }
       }
     };
 
@@ -98,7 +160,7 @@ describe('sanitizeRoutes', () => {
 
   it('keeps routes referenced by node keys', () => {
     const store: AppRouterStore = {
-      ...DEFAULT_APP_ROUTER_STORE,
+      ...getDefaultRouterStore(),
       nodes: {
         n1: {
           routeKey: 'from-node',
@@ -107,8 +169,8 @@ describe('sanitizeRoutes', () => {
         }
       },
       routes: {
-        'from-node': { href: '/from-node', state: null },
-        orphan: { href: '/orphan', state: null }
+        'from-node': { digest: hashObject({ href: '/from-node', state: null }), href: '/from-node', state: null },
+        orphan: { digest: hashObject({ href: '/orphan', state: null }), href: '/orphan', state: null }
       }
     };
 
@@ -124,12 +186,12 @@ describe('sanitizeRoutes', () => {
 describe('panel route helpers', () => {
   it('adds a route to panel and reads it back by panel key', () => {
     const store: AppRouterStore = {
-      ...DEFAULT_APP_ROUTER_STORE,
-      panels: [{ ...DEFAULT_APP_ROUTER_PANEL }],
+      ...getDefaultRouterStore(),
+      panels: [{ ...getDefaultRouterPanel() }],
       routes: {}
     };
 
-    const next = addRouteToPanel(store, 0, { href: '/submit', state: { source: 'test' } });
+    const next = addRouteToPanel(store, 0, { digest: '', href: '/submit', state: { source: 'test' } });
     const route = getRouteFromPanelKey(next, 0);
 
     expect(route.href).toBe('/submit');

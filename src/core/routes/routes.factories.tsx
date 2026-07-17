@@ -1,12 +1,19 @@
 import { AppErrorProvider } from 'core/error';
-import type { DisabledBoundaryProps, ForbiddenBoundaryProps, RouteHash } from 'core/routes';
+import type { DisabledBoundaryProps, ForbiddenBoundaryProps } from 'core/routes';
 import { DisabledBoundary, ForbiddenBoundary } from 'core/routes';
+import type { HASH_PARAM_BLUEPRINTS, HashParamValue, InferHashParamBlueprintFromValue } from 'features/hash-params';
+import { createHashParamCodec } from 'features/hash-params';
 import type { InferPathParamBlueprintMapFromPath, PATH_PARAM_BLUEPRINTS_MAP, RoutePath } from 'features/path-params';
 import { createPathParamsCodec } from 'features/path-params';
 import type { SearchParamBlueprintMap } from 'features/search-params';
 import { SEARCH_PARAM_BLUEPRINTS_MAP, SearchParamEngine } from 'features/search-params';
+import type {
+  InferStateParamBlueprintFromValue,
+  StateParamShape,
+  createStateParamBlueprint
+} from 'features/state-params';
+import { createStateParamCodec } from 'features/state-params';
 import type { ComponentType, FC, MemoExoticComponent, ReactNode } from 'react';
-import type { Location } from 'react-router';
 import { toElement } from 'shared/utils/app.utils';
 
 //*****************************************************************************************
@@ -17,9 +24,9 @@ export type CreateAppRouteProps<
   Route extends RoutePath,
   Path extends InferPathParamBlueprintMapFromPath<Route>,
   Search extends SearchParamBlueprintMap,
-  Hash extends RouteHash,
-  State extends object,
-  Temp extends object
+  Hash extends HashParamValue = never,
+  State extends StateParamShape = never,
+  Temp extends StateParamShape = never
 > = {
   // Descriptions
   title?: string;
@@ -30,9 +37,9 @@ export type CreateAppRouteProps<
   route: Route;
   path?: (blueprints: typeof PATH_PARAM_BLUEPRINTS_MAP) => Path;
   search?: (blueprints: typeof SEARCH_PARAM_BLUEPRINTS_MAP) => Search;
-  hash?: (hash: Location['hash']) => Hash;
-  state?: State;
-  temporary?: Temp;
+  hash?: (blueprints: typeof HASH_PARAM_BLUEPRINTS) => InferHashParamBlueprintFromValue<Hash>;
+  state?: (blueprint: typeof createStateParamBlueprint) => InferStateParamBlueprintFromValue<State>;
+  transient?: (blueprint: typeof createStateParamBlueprint) => InferStateParamBlueprintFromValue<Temp>;
 
   // Guards and Fallbacks
   disabled?: DisabledBoundaryProps['disabled'];
@@ -49,9 +56,9 @@ export const createAppRoute = <
   const Route extends RoutePath,
   const Path extends InferPathParamBlueprintMapFromPath<Route>,
   const Search extends SearchParamBlueprintMap,
-  const Hash extends RouteHash,
-  const State extends object,
-  const Temp extends object
+  const Hash extends HashParamValue = never,
+  const State extends StateParamShape = never,
+  const Temp extends StateParamShape = never
 >({
   title,
   icon,
@@ -62,7 +69,7 @@ export const createAppRoute = <
   search,
   hash,
   state,
-  temporary,
+  transient,
 
   loader,
   disabled,
@@ -81,7 +88,11 @@ export const createAppRoute = <
     ? (new SearchParamEngine(null) as never)
     : new SearchParamEngine(search(SEARCH_PARAM_BLUEPRINTS_MAP)).setDefaultValues(null);
 
-  const hashCodec = hash ?? ((h: Location['hash']) => h as Hash);
+  const hashCodec = !hash ? createHashParamCodec<never>()(() => null) : createHashParamCodec<Hash>()(hash);
+
+  const stateCodec = !state ? (createStateParamCodec(() => null) as never) : createStateParamCodec(state);
+
+  const transientCodec = !transient ? (createStateParamCodec(() => null) as never) : createStateParamCodec(transient);
 
   (Component as unknown as FC).displayName = route;
 
@@ -94,8 +105,8 @@ export const createAppRoute = <
     path: pathCodec,
     search: searchEngine,
     hash: hashCodec,
-    state,
-    temporary,
+    state: stateCodec,
+    transient: transientCodec,
 
     loader,
 
@@ -103,9 +114,7 @@ export const createAppRoute = <
       <AppErrorProvider>
         <DisabledBoundary disabled={disabled} FallbackComponent={disabledComponent}>
           <ForbiddenBoundary forbidden={forbidden} FallbackComponent={forbiddenComponent}>
-            {/* <AppRouteProvider params={paramCodec} search={searchEngine} hash={hashCodec}> */}
             {toElement(Component)}
-            {/* </AppRouteProvider> */}
           </ForbiddenBoundary>
         </DisabledBoundary>
       </AppErrorProvider>

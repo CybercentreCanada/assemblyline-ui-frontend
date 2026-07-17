@@ -39,7 +39,7 @@ import HexSection from 'pages/file-viewer/components/hex';
 import ImageSection from 'pages/file-viewer/components/image';
 import StringsSection from 'pages/file-viewer/components/strings';
 import { SelectionProvider, useSelection } from 'pages/file-viewer/file-viewer.providers';
-import { ForbiddenPage } from 'pages/forbidden/forbidden.route';
+import { ForbiddenPage } from 'pages/forbidden/forbidden';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FileDownloader } from 'ui/buttons/FileDownloader';
@@ -480,7 +480,7 @@ export const FileViewerRoute = createAppRoute({
 });
 
 const FileViewerRootPage = React.memo(() => {
-  const { id } = useAppPathParams<'/file/viewer/:id'>();
+  const { id = null } = useAppPathParams<'/file/viewer/:id'>();
   return (
     <AppNavigate
       nav={nav => nav.to({ replace: true }).update({ route: '/file/viewer/:id/:tab', path: { id, tab: null } })}
@@ -494,5 +494,7 @@ export const FileViewerRootRoute = createAppRoute({
   route: '/file/viewer/:id',
   path: s => ({
     id: s.string()
-  })
+  }),
+
+  forbidden: s => !s.user.roles.includes('file_detail')
 });

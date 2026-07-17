@@ -1,15 +1,12 @@
 import { useAppConfig } from 'core/config';
+import { ForbiddenPage } from 'pages/forbidden/forbidden';
+import { NotFoundPage } from 'pages/not-found/not-found';
 import type { ComponentType, MemoExoticComponent, ReactNode } from 'react';
 import { memo } from 'react';
 
 //*****************************************************************************************
 // DisabledBoundary
 //*****************************************************************************************
-const DefaultDisabledRouteFallback = memo(() => {
-  return 'disabled';
-});
-
-DefaultDisabledRouteFallback.displayName = 'DefaultDisabledRouteFallback';
 
 export type DisabledBoundaryProps = {
   /** Condition or callback to determine disabled state. */
@@ -21,7 +18,7 @@ export type DisabledBoundaryProps = {
 };
 
 export const DisabledBoundary = memo(
-  ({ disabled = false, FallbackComponent = DefaultDisabledRouteFallback, children }: DisabledBoundaryProps) => {
+  ({ disabled = false, FallbackComponent = <NotFoundPage />, children }: DisabledBoundaryProps) => {
     const isDisabled = useAppConfig(s => (typeof disabled === 'function' ? disabled(s) : disabled));
     return isDisabled ? <>{FallbackComponent}</> : <>{children}</>;
   }
@@ -33,12 +30,6 @@ DisabledBoundary.displayName = 'DisabledBoundary';
 // ForbiddenBoundary
 //*****************************************************************************************
 
-const DefaultForbiddenRouteFallback = memo(() => {
-  return 'forbidden';
-});
-
-DefaultForbiddenRouteFallback.displayName = 'DefaultForbiddenRouteFallback';
-
 export type ForbiddenBoundaryProps = {
   /** Condition or callback to determine forbidden state. */
   forbidden?: boolean | ((config: AppConfigStore) => boolean);
@@ -49,7 +40,7 @@ export type ForbiddenBoundaryProps = {
 };
 
 export const ForbiddenBoundary = memo(
-  ({ forbidden = false, FallbackComponent = DefaultForbiddenRouteFallback, children }: ForbiddenBoundaryProps) => {
+  ({ forbidden = false, FallbackComponent = <ForbiddenPage />, children }: ForbiddenBoundaryProps) => {
     const isForbidden = useAppConfig(s => (typeof forbidden === 'function' ? forbidden(s) : forbidden));
     return isForbidden ? <>{FallbackComponent}</> : <>{children}</>;
   }

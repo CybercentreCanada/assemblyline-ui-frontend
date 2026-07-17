@@ -1,15 +1,18 @@
 import type { AppRouterRoute, AppRouterState, AppRouterStore } from 'core/router';
-import {
-  getDefaultLocationParamStore,
-  type AppLocationParamStore,
-  type InferAppRouteParamFromPath,
-  type InferAppRouteSearchValuesFromPath,
-  type InferAppRouteSpecFromPath,
-  type InferAppRouteValuesFromPath
+import { getDefaultRouterRoute, getRouteDigestFromRoute } from 'core/router';
+import type {
+  AppLocationParamStore,
+  InferAppRouteParamFromPath,
+  InferAppRouteSearchValuesFromPath,
+  InferAppRouteSpecFromPath,
+  InferAppRouteValuesFromPath
 } from 'core/routes';
+import { getDefaultLocationParamStore } from 'core/routes';
+import { createHashParamCodec } from 'features/hash-params';
 import { createPathParamsCodec } from 'features/path-params';
 import type { SearchParamBlueprintMap } from 'features/search-params';
 import { SearchParamEngine } from 'features/search-params';
+import { createStateParamCodec, mergeStateParamValues } from 'features/state-params';
 import type { Location } from 'react-router';
 import { matchPath } from 'react-router';
 import { hashObject } from 'shared/utils/app.utils';
@@ -24,19 +27,19 @@ export const getDefaultRouteSpec = function <
 >(): InferAppRouteSpecFromPath<Origin> {
   return {
     element: null,
-    title: '',
-    icon: '',
-    component: '',
+    title: null,
+    icon: null,
+    component: null,
 
     route: null,
     path: createPathParamsCodec(null)(() => null),
     search: new SearchParamEngine<SearchParamBlueprintMap>(null),
-    hash: (s: string | undefined) => s,
-    state: undefined,
-    temporary: undefined,
+    hash: createHashParamCodec()(() => null),
+    state: createStateParamCodec(() => null),
+    transient: createStateParamCodec(() => null),
 
     loader: false
-  } as unknown as InferAppRouteSpecFromPath<Origin>;
+  } as InferAppRouteSpecFromPath<Origin>;
 };
 
 export const findRouteSpecFromPath = function <const Origin extends AppRoute['route']>(
@@ -112,7 +115,7 @@ export const getLocationSearchFromParam = function <const Origin extends AppRout
   spec: InferAppRouteSpecFromPath<Origin>,
   param: InferAppRouteParamFromPath<Origin>
 ): Location['search'] {
-  const delta = !spec?.search || spec?.search == null ? undefined : spec.search.delta(param.search.toParams());
+  const delta = !spec?.search || spec?.search == null ? undefined : spec.search.delta(param.search as never);
   return !delta ? '' : delta.toLocationSearch();
 };
 
@@ -122,7 +125,7 @@ export const getLocationHashFromParam = function <const Origin extends AppRoute[
 ): Location['hash'] {
   if (param?.hash == null) return '';
 
-  const resolvedHash = !spec?.hash ? String(param.hash) || '' : String(spec.hash(param.hash as never)) || '';
+  const resolvedHash = !spec?.hash ? '' : spec.hash.stringify(param.hash as never);
   return resolvedHash.startsWith('#') ? resolvedHash.slice(1) : resolvedHash;
 };
 
@@ -130,8 +133,16 @@ export const getLocationStateFromParam = function <const Origin extends AppRoute
   spec: InferAppRouteSpecFromPath<Origin>,
   param: InferAppRouteParamFromPath<Origin>
 ): AppRouterRoute['state'] {
-  const delta = !spec?.search || spec?.search == null ? undefined : spec.search.delta(param.search.toParams());
-  return !delta ? null : delta.toLocationState();
+  if (!spec?.state) return null;
+  return spec.state.delta(param.state as never);
+};
+
+export const getLocationTransientFromParam = function <const Origin extends AppRoute['route']>(
+  spec: InferAppRouteSpecFromPath<Origin>,
+  param: InferAppRouteParamFromPath<Origin>
+): AppRouterRoute['transient'] {
+  if (!spec?.transient) return null;
+  return spec.transient.delta(param.transient as never);
 };
 
 export const getLocationFromParam = function <const Origin extends AppRoute['route']>(
@@ -165,19 +176,10 @@ export const getLocationFromRoute = function (route: AppRouterRoute): Location {
 // Router Route
 //*****************************************************************************************
 
-export const getDefaultRouterRoute = function (): AppRouterRoute {
-  return { href: '', state: null };
-};
-
-export const getRouteIdFromRoute = function (route: AppRouterRoute): string {
-  return hashObject({ href: route?.href || '', state: route?.state || {} });
-};
-
 export const getRouteFromLocation = function (location: Location): AppRouterRoute {
-  return {
-    href: `${location.pathname}${location.search ? `?${location.search}` : ''}${location.hash ? `#${location.hash}` : ''}`,
-    state: location.state
-  };
+  const href = `${location.pathname}${location.search ? `?${location.search}` : ''}${location.hash ? `#${location.hash}` : ''}`;
+  const state = location.state as never;
+  return { digest: getRouteDigestFromRoute({ href, state }), href, state: state };
 };
 
 export const getRouteFromParam = function <const Origin extends AppRoute['route']>(
@@ -190,9 +192,11 @@ export const getRouteFromParam = function <const Origin extends AppRoute['route'
   if (!spec?.route) return getDefaultRouterRoute();
 
   const route = getLocationFromParam(store, param);
+  const href = `${route.pathname}${route.search ? `?${route.search}` : ''}${route.hash ? `#${route.hash}` : ''}`;
 
   return {
-    href: `${route.pathname}${route.search ? `?${route.search}` : ''}${route.hash ? `#${route.hash}` : ''}`,
+    digest: hashObject({ href, state: route.state || {} }),
+    href,
     state: route.state
   };
 };
@@ -235,7 +239,15 @@ export const getExternalHrefFromParam = function <const Origin extends AppRoute[
 //*****************************************************************************************
 
 export const getDefaultRouteParam = function <const Origin extends AppRoute['route']>() {
-  return { id: '', route: null, path: null, search: null, hash: '' } as InferAppRouteParamFromPath<Origin>;
+  return {
+    digest: '',
+    route: null,
+    path: null,
+    search: null,
+    hash: null,
+    state: null,
+    transient: null
+  } as InferAppRouteParamFromPath<Origin>;
 };
 
 export const findRouteParamFromKey = function <const Origin extends AppRoute['route']>(
@@ -254,23 +266,48 @@ export const getPathParamFromLocation = function <const Origin extends AppRoute[
   return (!spec?.path ? null : spec.path.parse(location)) as InferAppRouteParamFromPath<Origin>['path'];
 };
 
-export const getSearchParamFromLocation = function <const Origin extends AppRoute['route']>(
+export const getSearchSnapshotFromLocation = function <const Origin extends AppRoute['route']>(
   spec: InferAppRouteSpecFromPath<Origin>,
   location: Location
-): InferAppRouteParamFromPath<Origin>['search'] {
-  return (!spec?.search ? null : spec.search.fromLocation(location)) as InferAppRouteParamFromPath<Origin>['search'];
+): InferAppRouteParamFromPath<Origin>['searchSnapshot'] {
+  return (
+    !spec?.search ? spec.search.fromLocation(location) : spec.search.fromLocation(location)
+  ) as InferAppRouteParamFromPath<Origin>['searchSnapshot'];
 };
 
 export const getHashParamFromLocation = function <const Origin extends AppRoute['route']>(
   spec: InferAppRouteSpecFromPath<Origin>,
   location: Location
 ): InferAppRouteParamFromPath<Origin>['hash'] {
-  const resolvedHash = !spec?.hash
-    ? String(location?.hash ?? '')
-    : String(spec.hash(location.hash as never) ?? location.hash ?? '');
+  if (!spec?.hash) {
+    return null as InferAppRouteParamFromPath<Origin>['hash'];
+  }
 
-  return resolvedHash.startsWith('#') ? resolvedHash.slice(1) : resolvedHash;
+  return (spec.hash.parse(location) ?? null) as InferAppRouteParamFromPath<Origin>['hash'];
 };
+
+export const getStateParamFromLocation = function <const Origin extends AppRoute['route']>(
+  spec: InferAppRouteSpecFromPath<Origin>,
+  location: Location
+): InferAppRouteParamFromPath<Origin>['state'] {
+  if (!spec?.state) {
+    return null as InferAppRouteParamFromPath<Origin>['state'];
+  }
+
+  return spec.state.full(location) as InferAppRouteParamFromPath<Origin>['state'];
+};
+
+export const getTransientParamFromValue = function <const Origin extends AppRoute['route']>(
+  spec: InferAppRouteSpecFromPath<Origin>,
+  value: unknown
+): InferAppRouteParamFromPath<Origin>['transient'] {
+  if (!spec?.transient) {
+    return null as InferAppRouteParamFromPath<Origin>['transient'];
+  }
+
+  return spec.transient.full({ state: value } as Location) as InferAppRouteParamFromPath<Origin>['transient'];
+};
+
 export const getRouteParamFromRoute = function <const Origin extends AppRoute['route']>(
   store: AppLocationParamStore,
   route: AppRouterRoute
@@ -279,13 +316,18 @@ export const getRouteParamFromRoute = function <const Origin extends AppRoute['r
   if (!spec?.route || !route?.href) return getDefaultRouteParam();
 
   const location = getLocationFromRoute(route);
+  const searchSnapshot = getSearchSnapshotFromLocation(spec, location);
+
   return {
-    id: getRouteIdFromRoute(route),
+    digest: getRouteDigestFromRoute(route),
     route: spec.route,
     path: getPathParamFromLocation(spec, location),
-    search: getSearchParamFromLocation(spec, location),
-    hash: getHashParamFromLocation(spec, location)
-  } as InferAppRouteParamFromPath<Origin>;
+    search: searchSnapshot.toObject(),
+    searchSnapshot: searchSnapshot,
+    hash: getHashParamFromLocation(spec, location),
+    state: getStateParamFromLocation(spec, location),
+    transient: getTransientParamFromValue(spec, undefined)
+  } as unknown as InferAppRouteParamFromPath<Origin>;
 };
 
 export const getRouteParamFromValues = function <const Origin extends AppRoute['route']>(
@@ -296,12 +338,20 @@ export const getRouteParamFromValues = function <const Origin extends AppRoute['
   if (!spec?.route || !values?.route) return getDefaultRouteParam<Origin>();
 
   const delta = !spec?.search || values?.search == null ? undefined : spec.search.delta(values.search as never);
+  const hash = values?.hash == null ? '' : String(spec.hash?.stringify?.(values.hash as never) ?? values.hash).trim();
+  const routeState = !spec?.state ? null : spec.state.delta(values.state as never);
+  const searchState = (delta?.toLocationState as (() => unknown) | undefined)?.() ?? null;
   const next: Location = {
     key: 'default',
     pathname: spec.path?.stringify?.(values.path as never) ?? values.route,
     search: delta ? `?${delta.toLocationSearch()}` : '',
-    hash: values?.hash == null ? '' : `#${String(spec.hash?.(values.hash as never) ?? values.hash).replace(/^#/, '')}`,
-    state: (delta?.toLocationState as (() => unknown) | undefined)?.() ?? null
+    hash: !hash ? '' : hash.startsWith('#') ? hash : `#${hash}`,
+    state:
+      routeState == null
+        ? searchState
+        : searchState == null
+          ? routeState
+          : mergeStateParamValues(routeState as Record<string, never>, searchState)
   };
 
   const param = {
@@ -309,10 +359,12 @@ export const getRouteParamFromValues = function <const Origin extends AppRoute['
     route: spec.route,
     path: spec.path?.parse?.(next) ?? null,
     search: spec.search?.fromLocation?.(next) ?? null,
-    hash: next.hash.slice(1) || null
+    hash: getHashParamFromLocation(spec, next),
+    state: getStateParamFromLocation(spec, next),
+    transient: getTransientParamFromValue(spec, values.transient)
   } as InferAppRouteParamFromPath<Origin>;
 
-  param.id = getRouteIdFromRoute(getRouteFromLocation(next));
+  param.digest = getRouteDigestFromRoute(getRouteFromLocation(next));
 
   return param;
 };
@@ -327,7 +379,7 @@ export const applySearchParamToRouteParam = function <const Origin extends AppRo
 
   param.search = !search ? undefined : (spec.search.delta(search as never) as never);
   const next = getRouteFromParam(store, param);
-  param.id = getRouteIdFromRoute(next);
+  param.digest = getRouteDigestFromRoute(next);
 
   return param;
 };
@@ -359,9 +411,9 @@ export const hasDifferentRouteParam = function <const Origin extends AppRoute['r
 ): boolean {
   if (!(routeKey in (store?.params || {})) || !param?.route) return false;
 
-  const id = getRouteIdFromRoute(getRouteFromParam(store, param));
+  const digest = getRouteDigestFromRoute(getRouteFromParam(store, param));
 
-  return store.params[routeKey].id === id;
+  return store.params[routeKey].digest === digest;
 };
 
 export const updateRouteParam = function <const Origin extends AppRoute['route']>(
@@ -371,14 +423,16 @@ export const updateRouteParam = function <const Origin extends AppRoute['route']
 ): AppLocationParamStore {
   if (!(routeKey in (store?.params || {})) || !param?.route) return store;
 
-  const id = getRouteIdFromRoute(getRouteFromParam(store, param));
-  if (store.params[routeKey].id === id) return store;
+  const digest = getRouteDigestFromRoute(getRouteFromParam(store, param));
+  if (store.params[routeKey].digest === digest) return store;
 
-  store.params[routeKey].id = id;
+  store.params[routeKey].digest = digest;
   store.params[routeKey].route = param.route;
   store.params[routeKey].path = param.path;
   store.params[routeKey].search = param.search;
-  store.params[routeKey].hash = param.hash;
+  store.params[routeKey].hash = param.hash as AppLocationParamStore['params'][typeof routeKey]['hash'];
+  store.params[routeKey].state = param.state as AppLocationParamStore['params'][typeof routeKey]['state'];
+  store.params[routeKey].transient = param.transient as AppLocationParamStore['params'][typeof routeKey]['transient'];
 
   return store;
 };
@@ -398,7 +452,7 @@ export const removeRouteParam = function <const Origin extends AppRoute['route']
   param: InferAppRouteParamFromPath<Origin>
 ): AppLocationParamStore {
   for (const [routeKey, route] of Object.entries(store?.params || {})) {
-    if (param?.id && param?.id === route?.id) delete store.params[routeKey];
+    if (param?.digest && param?.digest === route?.digest) delete store.params[routeKey];
     else if (param?.route && param?.route === route?.route) delete store.params[routeKey];
   }
   return store;
@@ -421,7 +475,14 @@ export const removeRouteParamFromKey = function (
 export const getDefaultRouteValues = function <
   const Origin extends AppRoute['route']
 >(): InferAppRouteValuesFromPath<Origin> {
-  return { path: null, params: null, search: null, hash: null } as InferAppRouteValuesFromPath<Origin>;
+  return {
+    path: null,
+    params: null,
+    search: null,
+    hash: null,
+    state: null,
+    transient: null
+  } as InferAppRouteValuesFromPath<Origin>;
 };
 
 export const sanitizeRouteValues = function <const Origin extends AppRoute['route']>(
@@ -434,8 +495,10 @@ export const sanitizeRouteValues = function <const Origin extends AppRoute['rout
   return {
     route: param.route,
     path: param.path ?? null,
-    search: param.search?.toObject?.() ?? null,
-    hash: param.hash ?? null
+    search: param.search && 'toObject' in param.search ? (param.search as any).toObject() : null,
+    hash: param.hash ?? null,
+    state: param.state ?? null,
+    transient: param.transient ?? null
   } as InferAppRouteValuesFromPath<Origin>;
 };
 
@@ -449,8 +512,10 @@ export const findRouteValuesFromKey = function <const Origin extends AppRoute['r
   return {
     route: param?.route || null,
     path: param?.path || null,
-    search: !param.search ? null : param.search.toObject(),
-    hash: param?.hash || null
+    search: !param.search ? null : param.searchSnapshot.toObject(),
+    hash: param?.hash || null,
+    state: param?.state || null,
+    transient: param?.transient || null
   } as InferAppRouteValuesFromPath<Origin>;
 };
 
@@ -463,8 +528,10 @@ export const getRouteValuesFromParam = function <const Origin extends AppRoute['
   return {
     route: param.route,
     path: param.path,
-    search: !param.search ? null : param.search.toObject(),
-    hash: param.hash
+    search: !param.search ? null : param.searchSnapshot.toObject(),
+    hash: param.hash,
+    state: param.state,
+    transient: param.transient
   } as InferAppRouteValuesFromPath<Origin>;
 };
 
@@ -480,8 +547,10 @@ export const getRouteValuesFromRouteLocation = function <const Origin extends Ap
   return {
     route: param.route,
     path: param.path,
-    search: !param.search ? null : param.search.toObject(),
-    hash: param.hash
+    search: !param.search ? null : param.searchSnapshot.toObject(),
+    hash: param.hash,
+    state: param.state,
+    transient: param.transient
   } as InferAppRouteValuesFromPath<Origin>;
 };
 
@@ -493,7 +562,7 @@ export const parseRouteLocationFromHashFragment = function (fragment: string): A
   if (!fragment) return null;
 
   const hashIndex = fragment.indexOf('#');
-  if (hashIndex === -1) return { href: fragment, state: null };
+  if (hashIndex === -1) return { digest: hashObject({ href: fragment, state: null }), href: fragment, state: null };
 
   const pathname = fragment.slice(0, hashIndex);
   const hashAndSearch = fragment.slice(hashIndex + 1);
@@ -503,8 +572,10 @@ export const parseRouteLocationFromHashFragment = function (fragment: string): A
   const search = searchIndex === -1 ? '' : hashAndSearch.slice(searchIndex);
 
   try {
+    const href = `${pathname}${search}${hash ? `#${decodeURIComponent(hash)}` : ''}`;
     return {
-      href: `${pathname}${search}${hash ? `#${decodeURIComponent(hash)}` : ''}`,
+      digest: hashObject({ href, state: null }),
+      href,
       state: null
     };
   } catch {
@@ -519,8 +590,10 @@ export const getRouteLocationsFromLegacyURL = (
   if (!url?.pathname || url.pathname === '/v1') return [];
 
   const pathname = url.pathname === '/' ? '/submit' : url.pathname;
+  const href = `${pathname}${url.search || ''}${url.hash || ''}`;
   const route: AppRouterRoute = {
-    href: `${pathname}${url.search || ''}${url.hash || ''}`,
+    digest: hashObject({ href, state: url.state ?? null }),
+    href,
     state: url.state ?? null
   };
 
@@ -573,10 +646,71 @@ export const syncRouteParamsFromRouter = function (
   }
 
   for (const [routeKey, route] of Object.entries(router?.routes || {})) {
-    const param = getRouteParamFromRoute(store, route);
-    param.id = getRouteIdFromRoute(route);
+    const normalizedRoute: AppRouterRoute = {
+      digest: hashObject({ href: route?.href || '', state: route?.state || {} }),
+      ...route
+    };
+    const param = getRouteParamFromRoute(store, normalizedRoute);
+    const existingParam = routeKey in (store?.params || {}) ? store.params[routeKey] : null;
+    if (existingParam?.transient != null) {
+      param.transient = existingParam.transient as typeof param.transient;
+    }
+    param.digest = getRouteDigestFromRoute(normalizedRoute);
     store = upsertRouteParam(store, routeKey, param);
   }
 
   return store;
 };
+
+//*****************************************************************************************
+// Media Query Evaluation
+//*****************************************************************************************
+
+export type MediaQueryCondition = {
+  minWidth?: number;
+  maxWidth?: number;
+};
+
+/**
+ * @name parseMediaQuery
+ * @description Pre-parses a CSS media query string into condition objects for efficient repeated evaluation.
+ * Supports patterns like "(min-width:600px)", "(max-width:959px)", and compound queries with "and".
+ * Parsing is done once, allowing evaluateMediaQuery to run efficiently on every resize event.
+ * @param query - Media query string to parse
+ * @returns Array of conditions, or empty array if parsing fails
+ */
+export function parseMediaQuery(query: string): MediaQueryCondition[] {
+  const conditionStrings = query.match(/\([^)]+\)/g);
+  if (!conditionStrings) return [];
+
+  return conditionStrings.map(condition => {
+    const result: MediaQueryCondition = {};
+    const minWidthMatch = condition.match(/min-width:\s*(\d+)px/);
+    const maxWidthMatch = condition.match(/max-width:\s*(\d+)px/);
+
+    if (minWidthMatch?.[1]) {
+      result.minWidth = parseInt(minWidthMatch[1], 10);
+    }
+    if (maxWidthMatch?.[1]) {
+      result.maxWidth = parseInt(maxWidthMatch[1], 10);
+    }
+
+    return result;
+  });
+}
+
+/**
+ * @name evaluateMediaQuery
+ * @description Evaluates pre-parsed media query conditions against a given width.
+ * All conditions must pass (AND logic). This function is very fast since conditions are pre-parsed.
+ * @param conditions - Pre-parsed conditions from parseMediaQuery
+ * @param width - Container width in pixels to test against
+ * @returns Boolean indicating if the query matches the width
+ */
+export function evaluateMediaQuery(conditions: MediaQueryCondition[], width: number): boolean {
+  return conditions.every(condition => {
+    if (condition.minWidth !== undefined && width < condition.minWidth) return false;
+    if (condition.maxWidth !== undefined && width > condition.maxWidth) return false;
+    return true;
+  });
+}

@@ -2,7 +2,7 @@ import { Link, Skeleton, Typography, styled, useTheme } from '@mui/material';
 import { useApiMutation, useApiQuery } from 'core/api';
 import { useAppConfig } from 'core/config';
 import { createAppRoute } from 'core/routes';
-import { NotFoundPage } from 'pages/not-found/not-found.route';
+import { NotFoundPage } from 'pages/not-found/not-found';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import Markdown from 'react-markdown';

@@ -1,7 +1,7 @@
 import { Alert, CircularProgress, styled, Tooltip, useTheme } from '@mui/material';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
-import { ForbiddenPage } from 'pages/forbidden/forbidden.route';
+import { ForbiddenPage } from 'pages/forbidden/forbidden';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import AIMarkdown from 'ui/AiMarkdown';
