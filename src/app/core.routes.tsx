@@ -3,6 +3,7 @@ import { AlertDetailRoute } from 'pages/alert-detail/alert-detail.route';
 import { AlertsRedirectRoute } from 'pages/alerts-redirect/alerts-redirect.route';
 import { AlertsRoute } from 'pages/alerts/alerts.route';
 import { DevelopmentAPIRoute } from 'pages/development-api/development-api.route';
+import { DevelopmentCustomizeRoute } from 'pages/development-customize/development-customize.route';
 import { FileDetailRoute } from 'pages/file-detail/file-detail.route';
 import { FileViewerRootRoute, FileViewerRoute } from 'pages/file-viewer/file-viewer.route';
 import { HelpAPIRoute } from 'pages/help/api/help-api.route';
@@ -35,6 +36,7 @@ export const APP_ROUTES = [
   AlertsRedirectRoute,
   AlertsRoute,
   DevelopmentAPIRoute,
+  DevelopmentCustomizeRoute,
   FileDetailRoute,
   FileViewerRootRoute,
   FileViewerRoute,
