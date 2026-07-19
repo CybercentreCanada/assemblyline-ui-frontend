@@ -8,7 +8,7 @@ import { DevelopmentLibraryRoute } from 'pages/development-library/development-l
 import { DevelopmentThemeRoute } from 'pages/development-theme/development-theme.route';
 import { FileDetailRoute } from 'pages/file-detail/file-detail.route';
 import { FileViewerRootRoute, FileViewerRoute } from 'pages/file-viewer/file-viewer.route';
-import { HelpAPIRoute } from 'pages/help/api/help-api.route';
+import { HelpAPIRoute } from 'pages/help-api/help-api.route';
 import { SearchRootRoute, SearchRoute } from 'pages/search/search.route';
 import { SettingsRootRoute, SettingsRoute } from 'pages/settings/settings.route';
 import { SubmissionDetailRoute } from 'pages/submission-detail/submission-detail.route';
