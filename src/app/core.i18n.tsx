@@ -37,6 +37,8 @@ import forbiddenEN from 'pages/forbidden/forbidden.i18n.en.json';
 import forbiddenFR from 'pages/forbidden/forbidden.i18n.fr.json';
 import helpAPIEN from 'pages/help-api/help-api.i18n.en.json';
 import helpAPIFR from 'pages/help-api/help-api.i18n.fr.json';
+import helpClassificationEN from 'pages/help-classification/help-classification.i18n.en.json';
+import helpClassificationFR from 'pages/help-classification/help-classification.i18n.fr.json';
 import missingNodeEN from 'pages/missing-node/missing-node.i18n.en.json';
 import missingNodeFR from 'pages/missing-node/missing-node.i18n.fr.json';
 import notFoundEN from 'pages/not-found/not-found.i18n.en.json';
@@ -72,6 +74,7 @@ export const I18N_RESSOURCES = {
     fileDetail: fileDetailEN,
     fileViewer: fileViewerEN,
     helpAPI: helpAPIEN,
+    helpClassification: helpClassificationEN,
     inputs: inputsEN,
     locked: lockedEN,
     login: loginEN,
@@ -100,6 +103,7 @@ export const I18N_RESSOURCES = {
     fileDetail: fileDetailFR,
     fileViewer: fileViewerFR,
     helpAPI: helpAPIFR,
+    helpClassification: helpClassificationFR,
     inputs: inputsFR,
     locked: lockedFR,
     login: loginFR,
