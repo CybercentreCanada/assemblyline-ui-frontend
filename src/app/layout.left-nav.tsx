@@ -64,7 +64,7 @@ export const useAppLeftNavMenu = () => {
       {
         id: 'alerts',
         label: t('drawer.alerts'),
-        nav: nav => nav.to().create({ route: '/alerts_redirect' }),
+        nav: nav => nav.to().create({ route: '/alerts-redirect' }),
         icon: <NotificationImportantOutlinedIcon />,
         preventRender: !userRoles.includes('alert_view')
       },

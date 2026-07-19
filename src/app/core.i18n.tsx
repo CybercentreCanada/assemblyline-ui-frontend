@@ -25,6 +25,8 @@ import externalLookupEN from 'layout/external-lookup/external-lookup.i18n.en.jso
 import externalLookupFR from 'layout/external-lookup/external-lookup.i18n.fr.json';
 import notificationsEN from 'layout/notifications/notifications.i18n.en.json';
 import notificationsFR from 'layout/notifications/notifications.i18n.fr.json';
+import alertsEN from 'pages/alerts/alerts.i18n.en.json';
+import alertsFR from 'pages/alerts/alerts.i18n.fr.json';
 import fileDetailEN from 'pages/file-detail/file-detail.i18n.en.json';
 import fileDetailFR from 'pages/file-detail/file-detail.i18n.fr.json';
 import fileViewerEN from 'pages/file-viewer/file-viewer.i18n.en.json';
@@ -57,6 +59,7 @@ import inputsFR from 'ui/inputs/i18n/inputs.i18n.fr.json';
 
 export const I18N_RESSOURCES = {
   en: {
+    alerts: alertsEN,
     api: apiEN,
     app: appEN,
     error: errorEN,
@@ -83,6 +86,7 @@ export const I18N_RESSOURCES = {
     user: userEN
   },
   fr: {
+    alerts: alertsFR,
     api: apiFR,
     app: appFR,
     error: errorFR,
