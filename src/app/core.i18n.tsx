@@ -27,6 +27,8 @@ import notificationsEN from 'layout/notifications/notifications.i18n.en.json';
 import notificationsFR from 'layout/notifications/notifications.i18n.fr.json';
 import alertsEN from 'pages/alerts/alerts.i18n.en.json';
 import alertsFR from 'pages/alerts/alerts.i18n.fr.json';
+import dashboardEN from 'pages/dashboard/dashboard.i18n.en.json';
+import dashboardFR from 'pages/dashboard/dashboard.i18n.fr.json';
 import developmentAPIEN from 'pages/development-api/development-api.i18n.en.json';
 import developmentAPIFR from 'pages/development-api/development-api.i18n.fr.json';
 import fileDetailEN from 'pages/file-detail/file-detail.i18n.en.json';
@@ -72,6 +74,7 @@ export const I18N_RESSOURCES = {
     alerts: alertsEN,
     api: apiEN,
     app: appEN,
+    dashboard: dashboardEN,
     developmentAPI: developmentAPIEN,
     error: errorEN,
     error403: forbiddenEN,
@@ -104,6 +107,7 @@ export const I18N_RESSOURCES = {
     alerts: alertsFR,
     api: apiFR,
     app: appFR,
+    dashboard: dashboardFR,
     developmentAPI: developmentAPIFR,
     error: errorFR,
     error403: forbiddenFR,

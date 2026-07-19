@@ -51,7 +51,7 @@ export type Heartbeat = {
 
   last_hb: number;
 
-  scaler: unknown;
+  scaler: any;
 
   up: string[];
 
