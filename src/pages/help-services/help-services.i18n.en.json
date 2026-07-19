@@ -1,0 +1,9 @@
+{
+  "accepts": "Accepts",
+  "category": "Category",
+  "count": "services loaded in the system",
+  "disabled": "Disabled",
+  "rejects": "Rejects",
+  "stage": "Stage",
+  "title": "Service Listing"
+}
