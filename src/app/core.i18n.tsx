@@ -41,6 +41,8 @@ import helpClassificationEN from 'pages/help-classification/help-classification.
 import helpClassificationFR from 'pages/help-classification/help-classification.i18n.fr.json';
 import helpConfigurationEN from 'pages/help-configuration/help-configuration.i18n.en.json';
 import helpConfigurationFR from 'pages/help-configuration/help-configuration.i18n.fr.json';
+import helpSearchEN from 'pages/help-search/help-search.i18n.en.json';
+import helpSearchFR from 'pages/help-search/help-search.i18n.fr.json';
 import missingNodeEN from 'pages/missing-node/missing-node.i18n.en.json';
 import missingNodeFR from 'pages/missing-node/missing-node.i18n.fr.json';
 import notFoundEN from 'pages/not-found/not-found.i18n.en.json';
@@ -78,6 +80,7 @@ export const I18N_RESSOURCES = {
     helpAPI: helpAPIEN,
     helpClassification: helpClassificationEN,
     helpConfiguration: helpConfigurationEN,
+    helpSearch: helpSearchEN,
     inputs: inputsEN,
     locked: lockedEN,
     login: loginEN,
@@ -108,6 +111,7 @@ export const I18N_RESSOURCES = {
     helpAPI: helpAPIFR,
     helpClassification: helpClassificationFR,
     helpConfiguration: helpConfigurationFR,
+    helpSearch: helpSearchFR,
     inputs: inputsFR,
     locked: lockedFR,
     login: loginFR,
