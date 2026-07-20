@@ -208,6 +208,7 @@ export function useAppMediaQuery(query: string | ((theme: Theme) => string)): bo
 
     return () => {
       resizeObserver.disconnect();
+      (debouncedSetMatches as { cancel?: () => void })?.cancel?.();
     };
   }, [queryStr, routeKey, evaluateAndUpdate, debouncedSetMatches]);
 

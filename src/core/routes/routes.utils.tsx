@@ -27,7 +27,6 @@ export const getDefaultRouteSpec = function <
     title: { key: null, ns: null },
     icon: { primary: null, secondary: null },
     element: null,
-    component: null,
 
     route: null,
     path: createPathParamsCodec(null)(() => null),
@@ -111,7 +110,6 @@ export const updateRouteSpec = function <const Origin extends AppRoute['route']>
 
   if ('title' in nextSpec) currentSpec.title = nextSpec.title;
   if ('icon' in nextSpec) currentSpec.icon = nextSpec.icon;
-  if ('component' in nextSpec) currentSpec.component = nextSpec.component;
   if ('element' in nextSpec) currentSpec.element = nextSpec.element;
 
   if ('route' in nextSpec) currentSpec.route = nextSpec.route;
@@ -138,6 +136,12 @@ export const upsertRouteSpec = function <const Origin extends AppRoute['route']>
   else return addRouteSpec(store, spec);
 };
 
+/**
+ * @name removeRouteSpec
+ * @description Removes a route spec using a full route spec object.
+ * Use this overload when the caller already has a typed spec payload.
+ * For key-only workflows (e.g. sync/pruning), use `removeRouteSpecFromKey`.
+ */
 export const removeRouteSpec = function <const Origin extends AppRoute['route']>(
   store: AppLocationParamStore,
   spec: InferAppRouteValuesFromPath<Origin>
@@ -149,6 +153,11 @@ export const removeRouteSpec = function <const Origin extends AppRoute['route']>
   return store;
 };
 
+/**
+ * @name removeRouteSpecFromKey
+ * @description Removes a route spec directly by route key.
+ * Preferred for reconciliation and bulk sync operations where keys are enumerated.
+ */
 export const removeRouteSpecFromKey = function (
   store: AppLocationParamStore,
   specKey: keyof AppLocationParamStore['specs']
@@ -276,11 +285,6 @@ export const getRouteFromParam = function <const Origin extends AppRoute['route'
 //   return !param?.route ? getDefaultRouterRoute() : getRouteFromParam(store, param);
 // };
 
-export const sanitizeRoute = function (store: AppLocationParamStore, route: AppRouterRoute): AppRouterRoute {
-  const param = getRouteParamFromRoute(store, route);
-  return !param?.route ? getDefaultRouterRoute() : getRouteFromParam(store, param);
-};
-
 //*****************************************************************************************
 // Route Param
 //*****************************************************************************************
@@ -366,6 +370,11 @@ export const getRouteParamFromRoute = function <const Origin extends AppRoute['r
     state: getStateParamFromRoute<Origin>(spec, route),
     transient: getTransientParamFromValue<Origin>(spec, route)
   };
+};
+
+export const sanitizeRoute = function (store: AppLocationParamStore, route: AppRouterRoute): AppRouterRoute {
+  const param = getRouteParamFromRoute(store, route);
+  return !param?.route ? getDefaultRouterRoute() : getRouteFromParam(store, param);
 };
 
 // export const getRouteParamFromValues = function <const Origin extends AppRoute['route']>(

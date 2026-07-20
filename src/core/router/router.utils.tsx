@@ -22,9 +22,9 @@ import { generateRandomUUID, hashObjectKeyOrderIndependent } from 'shared/utils/
 export const getDefaultRouterPanel = function (panel: Partial<AppRouterPanel> = null): AppRouterPanel {
   return {
     routeKey: null,
-    pinnedRouteKeys: [],
-    tabbedRouteKeys: [],
-    temporaryRouteKey: null,
+    // pinnedRouteKeys: [],
+    // tabbedRouteKeys: [],
+    // temporaryRouteKey: null,
     ...panel
   };
 };
@@ -42,18 +42,18 @@ export const findPanelKey = function <const Store extends AppSharedRouterStore>(
 ): number {
   for (let i = 0; i < store.panels.length; i++) {
     if (partialPanel?.routeKey && store.panels[i].routeKey === partialPanel?.routeKey) return i;
-    else if (partialPanel?.temporaryRouteKey && store.panels[i].temporaryRouteKey === partialPanel?.temporaryRouteKey)
-      return i;
-    else if (
-      Array.isArray(partialPanel?.tabbedRouteKeys) &&
-      partialPanel?.tabbedRouteKeys.every(k => store.panels[i].tabbedRouteKeys.includes(k))
-    )
-      return i;
-    else if (
-      Array.isArray(partialPanel?.pinnedRouteKeys) &&
-      partialPanel?.pinnedRouteKeys.every(k => store.panels[i].pinnedRouteKeys.includes(k))
-    )
-      return i;
+    // else if (partialPanel?.temporaryRouteKey && store.panels[i].temporaryRouteKey === partialPanel?.temporaryRouteKey)
+    //   return i;
+    // else if (
+    //   Array.isArray(partialPanel?.tabbedRouteKeys) &&
+    //   partialPanel?.tabbedRouteKeys.every(k => store.panels[i].tabbedRouteKeys.includes(k))
+    // )
+    //   return i;
+    // else if (
+    //   Array.isArray(partialPanel?.pinnedRouteKeys) &&
+    //   partialPanel?.pinnedRouteKeys.every(k => store.panels[i].pinnedRouteKeys.includes(k))
+    // )
+    //   return i;
   }
 
   return -1;
@@ -69,9 +69,9 @@ export const findPanelKeyFromRouteKey = function <const Store extends AppSharedR
     const panel = store.panels[i];
 
     if (panel?.routeKey && panel.routeKey === routeKey) return i;
-    if (panel?.temporaryRouteKey && panel.temporaryRouteKey === routeKey) return i;
-    if (panel?.tabbedRouteKeys?.includes(routeKey)) return i;
-    if (panel?.pinnedRouteKeys?.includes(routeKey)) return i;
+    // if (panel?.temporaryRouteKey && panel.temporaryRouteKey === routeKey) return i;
+    // if (panel?.tabbedRouteKeys?.includes(routeKey)) return i;
+    // if (panel?.pinnedRouteKeys?.includes(routeKey)) return i;
   }
 
   return -1;
@@ -92,10 +92,11 @@ export const findPrevPanelKeyFromRouteKey = function <const Store extends AppSha
   preferences: AppPreferenceStore
 ): number {
   const currentPanelKey = findPanelKeyFromRouteKey(store, routeKey);
+  const originPanelKey = currentPanelKey < 0 ? 0 : currentPanelKey;
 
-  if (preferences.router.navigation === 'push') return currentPanelKey - 1;
+  if (preferences.router.navigation === 'push') return originPanelKey - 1;
   else if (preferences.router.navigation === 'loop')
-    return currentPanelKey - 1 < 0 ? preferences.router.maxPanels - 1 : currentPanelKey - 1;
+    return originPanelKey - 1 < 0 ? preferences.router.maxPanels - 1 : originPanelKey - 1;
   else return preferences.router.maxPanels - 1;
 };
 
@@ -177,12 +178,14 @@ export const removeEmptyPanel = function <const Store extends AppSharedRouterSto
 ): Store {
   if (panelKey < 0 || panelKey >= store?.panels?.length) return store;
 
-  if (
-    !store.panels[panelKey].routeKey &&
-    !store.panels[panelKey].temporaryRouteKey &&
-    !store.panels[panelKey].tabbedRouteKeys.length &&
-    !store.panels[panelKey].pinnedRouteKeys.length
-  ) {
+  //  if (
+  //   !store.panels[panelKey].routeKey &&
+  //   !store.panels[panelKey].temporaryRouteKey &&
+  //   !store.panels[panelKey].tabbedRouteKeys.length &&
+  //   !store.panels[panelKey].pinnedRouteKeys.length
+  // )
+
+  if (!store.panels[panelKey].routeKey) {
     store.panels.splice(panelKey, 1);
   }
 
@@ -208,17 +211,17 @@ export const updatePanel = function <const Store extends AppSharedRouterStore>(
     store.panels[panelKey].routeKey = partialPanel.routeKey;
   }
 
-  if (partialPanel && 'temporaryRouteKey' in partialPanel) {
-    store.panels[panelKey].temporaryRouteKey = partialPanel.temporaryRouteKey;
-  }
+  // if (partialPanel && 'temporaryRouteKey' in partialPanel) {
+  //   store.panels[panelKey].temporaryRouteKey = partialPanel.temporaryRouteKey;
+  // }
 
-  if (Array.isArray(partialPanel?.tabbedRouteKeys)) {
-    store.panels[panelKey].tabbedRouteKeys = partialPanel.tabbedRouteKeys;
-  }
+  // if (Array.isArray(partialPanel?.tabbedRouteKeys)) {
+  //   store.panels[panelKey].tabbedRouteKeys = partialPanel.tabbedRouteKeys;
+  // }
 
-  if (Array.isArray(partialPanel?.pinnedRouteKeys)) {
-    store.panels[panelKey].pinnedRouteKeys = partialPanel.pinnedRouteKeys;
-  }
+  // if (Array.isArray(partialPanel?.pinnedRouteKeys)) {
+  //   store.panels[panelKey].pinnedRouteKeys = partialPanel.pinnedRouteKeys;
+  // }
 
   return store;
 };
@@ -240,13 +243,17 @@ export const mergePanels = function <const Store extends AppSharedRouterStore>(
     return store;
   }
 
-  for (let i = store.panels[panelKeyA].tabbedRouteKeys.length - 1; i >= 0; i--) {
-    store.panels[panelKeyB].tabbedRouteKeys.unshift(store.panels[panelKeyA].tabbedRouteKeys[i]);
+  if (!store.panels[panelKeyB].routeKey && store.panels[panelKeyA].routeKey) {
+    store.panels[panelKeyB].routeKey = store.panels[panelKeyA].routeKey;
   }
 
-  for (let i = store.panels[panelKeyA].pinnedRouteKeys.length - 1; i >= 0; i--) {
-    store.panels[panelKeyB].pinnedRouteKeys.unshift(store.panels[panelKeyA].pinnedRouteKeys[i]);
-  }
+  // for (let i = store.panels[panelKeyA].tabbedRouteKeys.length - 1; i >= 0; i--) {
+  //   store.panels[panelKeyB].tabbedRouteKeys.unshift(store.panels[panelKeyA].tabbedRouteKeys[i]);
+  // }
+
+  // for (let i = store.panels[panelKeyA].pinnedRouteKeys.length - 1; i >= 0; i--) {
+  //   store.panels[panelKeyB].pinnedRouteKeys.unshift(store.panels[panelKeyA].pinnedRouteKeys[i]);
+  // }
 
   store.panels.splice(panelKeyA, 1);
 
@@ -355,21 +362,21 @@ export const filterPanelMissingRouteKeys = function <const Store extends AppShar
     store.panels[panelKey].routeKey = null;
   }
 
-  if (!(store.panels[panelKey].temporaryRouteKey in store.routes)) {
-    store.panels[panelKey].temporaryRouteKey = null;
-  }
+  // if (!(store.panels[panelKey].temporaryRouteKey in store.routes)) {
+  //   store.panels[panelKey].temporaryRouteKey = null;
+  // }
 
-  for (let i = store.panels[panelKey].tabbedRouteKeys.length - 1; i >= 0; i--) {
-    if (!(store.panels[panelKey].tabbedRouteKeys[i] in store.routes)) {
-      store.panels[panelKey].tabbedRouteKeys.splice(i, 1);
-    }
-  }
+  // for (let i = store.panels[panelKey].tabbedRouteKeys.length - 1; i >= 0; i--) {
+  //   if (!(store.panels[panelKey].tabbedRouteKeys[i] in store.routes)) {
+  //     store.panels[panelKey].tabbedRouteKeys.splice(i, 1);
+  //   }
+  // }
 
-  for (let i = store.panels[panelKey].pinnedRouteKeys.length - 1; i >= 0; i--) {
-    if (!(store.panels[panelKey].pinnedRouteKeys[i] in store.routes)) {
-      store.panels[panelKey].pinnedRouteKeys.splice(i, 1);
-    }
-  }
+  // for (let i = store.panels[panelKey].pinnedRouteKeys.length - 1; i >= 0; i--) {
+  //   if (!(store.panels[panelKey].pinnedRouteKeys[i] in store.routes)) {
+  //     store.panels[panelKey].pinnedRouteKeys.splice(i, 1);
+  //   }
+  // }
 
   return store;
 };
@@ -387,22 +394,22 @@ export const setPanelActiveRoute = function <const Store extends AppSharedRouter
 ): Store {
   if (panelKey < 0 || panelKey >= store?.panels?.length || store.panels[panelKey].routeKey) return store;
 
-  const panel = store.panels[panelKey];
-  let youngestRouteKey: AppRouterPanel['routeKey'] = null;
-  let youngestAge = Infinity;
-  const candidates = new Set([panel.temporaryRouteKey, ...panel.tabbedRouteKeys, ...panel.pinnedRouteKeys]);
+  // const panel = store.panels[panelKey];
+  // let youngestRouteKey: AppRouterPanel['routeKey'] = null;
+  // let youngestAge = Infinity;
+  // const candidates = new Set([panel.temporaryRouteKey, ...panel.tabbedRouteKeys, ...panel.pinnedRouteKeys]);
 
-  for (const candidate of candidates) {
-    if (!candidate || !(candidate in store.routes)) continue;
-    const age = store.routes[candidate].age;
-    if (age < youngestAge) {
-      youngestAge = age;
-      youngestRouteKey = candidate;
-    }
-  }
+  // for (const candidate of candidates) {
+  //   if (!candidate || !(candidate in store.routes)) continue;
+  //   const age = store.routes[candidate].age;
+  //   if (age < youngestAge) {
+  //     youngestAge = age;
+  //     youngestRouteKey = candidate;
+  //   }
+  // }
 
-  if (!youngestRouteKey) return store;
-  panel.routeKey = youngestRouteKey;
+  // if (!youngestRouteKey) return store;
+  // panel.routeKey = youngestRouteKey;
 
   return store;
 };
@@ -1053,7 +1060,6 @@ export const addRouteToPanel = function <const Store extends AppSharedRouterStor
   route.digest = getRouteDigestFromRoute(route);
   store.routes[newRouteKey] = route;
   store.panels[panelKey].routeKey = newRouteKey;
-  store.panels[panelKey].temporaryRouteKey = newRouteKey;
 
   return store;
 };
@@ -1083,9 +1089,14 @@ export const upsertRoute = function <const Store extends AppSharedRouterStore>(
  * @returns Updated router store
  */
 export const refreshRouteAges = function <const Store extends AppSharedRouterStore>(store: Store): Store {
+  const activeRouteKeys = new Set<string>();
+  for (const panel of store.panels) {
+    if (panel?.routeKey) activeRouteKeys.add(panel.routeKey);
+  }
+
   const orderedEntries = Object.entries(store.routes).sort(([routeKeyA, routeA], [routeKeyB, routeB]) => {
-    const aIsDisplayed = findPanelKey(store, { routeKey: routeKeyA }) >= 0;
-    const bIsDisplayed = findPanelKey(store, { routeKey: routeKeyB }) >= 0;
+    const aIsDisplayed = activeRouteKeys.has(routeKeyA);
+    const bIsDisplayed = activeRouteKeys.has(routeKeyB);
 
     if (aIsDisplayed !== bIsDisplayed) return aIsDisplayed ? -1 : 1;
     if (routeA.age !== routeB.age) return routeA.age - routeB.age;
@@ -1113,15 +1124,15 @@ export const filterOrphanedRoutes = function <const Store extends AppSharedRoute
 
     if (panel.routeKey) activeRoutes.add(panel.routeKey);
 
-    if (panel.temporaryRouteKey) activeRoutes.add(panel.temporaryRouteKey);
+    // if (panel.temporaryRouteKey) activeRoutes.add(panel.temporaryRouteKey);
 
-    if (panel.tabbedRouteKeys) {
-      for (const route of panel.tabbedRouteKeys) activeRoutes.add(route);
-    }
+    // if (panel.tabbedRouteKeys) {
+    //   for (const route of panel.tabbedRouteKeys) activeRoutes.add(route);
+    // }
 
-    if (panel.pinnedRouteKeys) {
-      for (const route of panel.pinnedRouteKeys) activeRoutes.add(route);
-    }
+    // if (panel.pinnedRouteKeys) {
+    //   for (const route of panel.pinnedRouteKeys) activeRoutes.add(route);
+    // }
   }
 
   for (const nodeKey in store.nodes) {
@@ -1775,7 +1786,13 @@ export const reconcileRouterFromNavigation = (
     router = removeRoute(router, routeKey);
   }
 
-  router.panels = structuredClone(navigation.panels);
+  for (let i = 0; i < navigation.panels.length; i++) {
+    router = setPanel(router, i, navigation.panels[i]);
+  }
+
+  for (let i = router.panels.length - 1; i >= navigation.panels.length; i--) {
+    router = removePanel(router, i);
+  }
 
   for (const [nodeKey, node] of Object.entries(navigation.nodes)) {
     router.nodes[nodeKey] = {
@@ -1820,15 +1837,61 @@ export const applyDefaultNavigationStore = (
 };
 
 export const getNavigationStoreFromRouter = (store: AppNavigationStore, router: AppRouterStore): AppNavigationStore => {
+  const cloneRoute = (route: AppRouterRoute): AppNavigationStore['routes'][string] => {
+    const nextRoute = {
+      ...route,
+      state: route?.state == null ? route?.state : structuredClone(route.state),
+      transient: route?.transient == null ? route?.transient : structuredClone(route.transient)
+    };
+
+    return nextRoute;
+  };
+
   store.id = router.id;
-  store.panels = structuredClone(router.panels);
-  store.routes = structuredClone(router.routes);
-  store.nodes = Object.fromEntries(
-    Object.entries(router.nodes).map(([nodeKey, node]) => [
-      nodeKey,
-      { routeKey: node.routeKey, lastUsedAt: node.lastUsedAt }
-    ])
-  );
+
+  for (let i = 0; i < router.panels.length; i++) {
+    store = setPanel(store, i, router.panels[i]);
+  }
+
+  for (let i = store.panels.length - 1; i >= router.panels.length; i--) {
+    store = removePanel(store, i);
+  }
+
+  for (const [routeKey, route] of Object.entries(router.routes)) {
+    const currentRoute = store.routes[routeKey];
+    const nextDigest = route?.digest || getRouteDigestFromRoute(route);
+
+    if (
+      currentRoute?.digest === nextDigest &&
+      currentRoute?.scroll === route?.scroll &&
+      currentRoute?.age === route?.age
+    ) {
+      continue;
+    }
+
+    [store] = upsertRoute(store, routeKey, cloneRoute(route));
+  }
+
+  for (const routeKey of Object.keys(store.routes)) {
+    if (routeKey in router.routes) continue;
+    store = removeRoute(store, routeKey);
+  }
+
+  for (const [nodeKey, node] of Object.entries(router.nodes)) {
+    const currentNode = store.nodes[nodeKey];
+
+    if (currentNode?.routeKey === node.routeKey && currentNode?.lastUsedAt === node.lastUsedAt) {
+      continue;
+    }
+
+    store.nodes[nodeKey] = { routeKey: node.routeKey, lastUsedAt: node.lastUsedAt };
+  }
+
+  for (const nodeKey of Object.keys(store.nodes)) {
+    if (nodeKey in router.nodes) continue;
+    store = removeNode(store, nodeKey);
+  }
+
   return store;
 };
 

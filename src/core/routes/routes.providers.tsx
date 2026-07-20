@@ -11,7 +11,7 @@ import { memo, useCallback, useEffect } from 'react';
 //*****************************************************************************************
 
 export const getDefaultLocationParamStore = function (): AppLocationParamStore {
-  return { specs: null, params: {} };
+  return { specs: {} as never, params: {} };
 };
 
 export const {

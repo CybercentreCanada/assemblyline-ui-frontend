@@ -106,7 +106,6 @@ export const createAppRoute = <
   return {
     title,
     icon,
-    component: Component,
 
     route,
     path: pathCodec,

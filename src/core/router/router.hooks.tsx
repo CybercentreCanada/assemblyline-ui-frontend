@@ -13,7 +13,6 @@ import {
   applyDefaultNavigationStore,
   applyNavigationDispatch,
   clearBlockedRoutes,
-  clearNavigationStore,
   findNextPanelKeyFromRouteKey,
   findPanelKeyFromRouteKey,
   findPrevPanelKeyFromRouteKey,
@@ -27,7 +26,6 @@ import {
   getNextTitleFromRoute,
   getRouteFromPanelKey,
   hasBlockedRoutes,
-  hasRoutes,
   reconcileRouterFromNavigation,
   removeBlockedRoute,
   removePanel,
@@ -181,7 +179,7 @@ export function useAppNavigate<const Origin extends AppRoute['route']>() {
 
       setNavigationStore(store => {
         store = getNavigationStoreFromRouter(store, routerState);
-        store = updateRoute(store, routeKey, nextRoute);
+        store = updateRoute(store, prevRouteKey, nextRoute);
         store = sanitizeRouterStore(store, preferenceState);
         store = setRouteScrollPositions(store);
         store.id = generateRandomUUID();
@@ -190,7 +188,7 @@ export function useAppNavigate<const Origin extends AppRoute['route']>() {
         return store;
       });
     },
-    [locationParamStoreApi, preferenceStoreApi, routeKey, routerStoreApi, setNavigationStore]
+    [locationParamStoreApi, preferenceStoreApi, routerStoreApi, setNavigationStore]
   );
 
   const del = useCallback(
@@ -350,7 +348,7 @@ export function useAppSyncNavigationStoreFromLocation() {
 
         let nextStore = getNavigationStoreFromRouter(store, routerState);
 
-        const hashFragment = location.hash ? location.hash.slice(1) : '';
+        const hashFragment = location.hash ? location.hash.slice(1) : '/submit';
 
         let panelKey: number = -1;
 
@@ -478,13 +476,14 @@ export function useAppSyncNavigationStoreFromLocation() {
 //*****************************************************************************************
 export function useAppSyncRouterStoreFromNavigation() {
   const navigate = useNavigate();
+  const routerStoreApi = useAppRouterStoreApi();
   const navigationStoreApi = useAppNavigationStoreApi();
-  const setNavigationStore = useAppSetNavigationStore();
   const setRouterStore = useAppSetRouterStore();
 
   const updateRouterStoreFromNavigation = useCallback(
     (navigation: AppNavigationStore) => {
-      if (!hasRoutes(navigation) || hasBlockedRoutes(navigation)) return;
+      const routerState = getAppRouterStateFromApi(routerStoreApi);
+      if (navigation.id === routerState.id || hasBlockedRoutes(navigation)) return;
 
       const nextTitle = navigation?.options?.nextTitle?.trim();
       document.title = nextTitle ? `ALV4 | ${nextTitle}` : 'Assemblyline 4';
@@ -495,11 +494,9 @@ export function useAppSyncRouterStoreFromNavigation() {
         state: getLocationStateFromRouter(navigation),
         replace: navigation?.options?.replace || false
       });
-
       setRouterStore(router => reconcileRouterFromNavigation(router, navigation));
-      setNavigationStore(clearNavigationStore);
     },
-    [navigate, setNavigationStore, setRouterStore]
+    [navigate, routerStoreApi, setRouterStore]
   );
 
   useEffect(() => {

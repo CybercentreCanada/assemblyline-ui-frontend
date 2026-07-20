@@ -12,12 +12,12 @@ import type { Location as ReactRouterLocation } from 'react-router';
 export type AppRouterPanel = {
   /** Currently active route key for this panel. */
   routeKey: keyof AppRouterStore['routes'];
-  /** Keys of pinned routes in this panel. */
-  pinnedRouteKeys: (keyof AppRouterStore['routes'])[];
-  /** Keys of tabbed routes in this panel. */
-  tabbedRouteKeys: (keyof AppRouterStore['routes'])[];
-  /** Key of the temporary (unsaved) route. */
-  temporaryRouteKey: keyof AppRouterStore['routes'];
+  // /** Keys of pinned routes in this panel. */
+  // pinnedRouteKeys: (keyof AppRouterStore['routes'])[];
+  // /** Keys of tabbed routes in this panel. */
+  // tabbedRouteKeys: (keyof AppRouterStore['routes'])[];
+  // /** Key of the temporary (unsaved) route. */
+  // temporaryRouteKey: keyof AppRouterStore['routes'];
 };
 
 //*****************************************************************************************
