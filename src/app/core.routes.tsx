@@ -1,4 +1,6 @@
 import { AccountRoute } from 'pages/account/account.route';
+import { AdminAPIKeyDetailRoute } from 'pages/admin-api-key-detail/admin-api-key-detail.route';
+import { AdminAPIKeysRoute } from 'pages/admin-api-keys/admin-api-keys.route';
 import { AlertDetailRoute } from 'pages/alert-detail/alert-detail.route';
 import { AlertRedirectRoute } from 'pages/alert-redirect/alert-redirect.route';
 import { AlertsRoute } from 'pages/alerts/alerts.route';
@@ -39,6 +41,8 @@ export const APP_ROUTES = [
 
   // New
   AccountRoute,
+  AdminAPIKeyDetailRoute,
+  AdminAPIKeysRoute,
   AlertDetailRoute,
   AlertRedirectRoute,
   AlertsRoute,
