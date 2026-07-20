@@ -27,6 +27,8 @@ import notificationsEN from 'layout/notifications/notifications.i18n.en.json';
 import notificationsFR from 'layout/notifications/notifications.i18n.fr.json';
 import adminAPIkeysEN from 'pages/admin-api-keys/admin-api-keys.i18n.en.json';
 import adminAPIkeysFR from 'pages/admin-api-keys/admin-api-keys.i18n.fr.json';
+import adminErrorViewerEN from 'pages/admin-error-viewer/admin-error-viewer.i18n.en.json';
+import adminErrorViewerFR from 'pages/admin-error-viewer/admin-error-viewer.i18n.fr.json';
 import alertsEN from 'pages/alerts/alerts.i18n.en.json';
 import alertsFR from 'pages/alerts/alerts.i18n.fr.json';
 import dashboardEN from 'pages/dashboard/dashboard.i18n.en.json';
@@ -68,16 +70,20 @@ import submitFR from 'pages/submit/submit.i18n.fr.json';
 import userEN from 'pages/user/user.i18n.en.json';
 import userFR from 'pages/user/user.i18n.fr.json';
 import { initReactI18next } from 'react-i18next';
+import dateTimeEN from 'ui/DateTime/datetime.i18n.en.json';
+import dateTimeFR from 'ui/DateTime/datetime.i18n.fr.json';
 import inputsEN from 'ui/inputs/i18n/inputs.i18n.en.json';
 import inputsFR from 'ui/inputs/i18n/inputs.i18n.fr.json';
 
 export const I18N_RESSOURCES = {
   en: {
     adminAPIkeys: adminAPIkeysEN,
+    adminErrorViewer: adminErrorViewerEN,
     alerts: alertsEN,
     api: apiEN,
     app: appEN,
     dashboard: dashboardEN,
+    dateTime: dateTimeEN,
     developmentAPI: developmentAPIEN,
     error: errorEN,
     error403: forbiddenEN,
@@ -108,10 +114,12 @@ export const I18N_RESSOURCES = {
   },
   fr: {
     adminAPIkeys: adminAPIkeysFR,
+    adminErrorViewer: adminErrorViewerFR,
     alerts: alertsFR,
     api: apiFR,
     app: appFR,
     dashboard: dashboardFR,
+    dateTime: dateTimeFR,
     developmentAPI: developmentAPIFR,
     error: errorFR,
     error403: forbiddenFR,

@@ -1,6 +1,8 @@
 import { AccountRoute } from 'pages/account/account.route';
 import { AdminAPIKeyDetailRoute } from 'pages/admin-api-key-detail/admin-api-key-detail.route';
 import { AdminAPIKeysRoute } from 'pages/admin-api-keys/admin-api-keys.route';
+import { AdminErrorDetailRoute } from 'pages/admin-error-detail/admin-error-detail.route';
+import { AdminErrorViewerRoute } from 'pages/admin-error-viewer/admin-error-viewer.route';
 import { AlertDetailRoute } from 'pages/alert-detail/alert-detail.route';
 import { AlertRedirectRoute } from 'pages/alert-redirect/alert-redirect.route';
 import { AlertsRoute } from 'pages/alerts/alerts.route';
@@ -43,6 +45,8 @@ export const APP_ROUTES = [
   AccountRoute,
   AdminAPIKeyDetailRoute,
   AdminAPIKeysRoute,
+  AdminErrorDetailRoute,
+  AdminErrorViewerRoute,
   AlertDetailRoute,
   AlertRedirectRoute,
   AlertsRoute,
