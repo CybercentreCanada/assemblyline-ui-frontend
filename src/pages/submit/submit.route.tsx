@@ -1,6 +1,6 @@
 import { Alert, Collapse, styled, useMediaQuery, useTheme } from '@mui/material';
 import { useAppConfig } from 'core/config';
-import { createAppRoute } from 'core/routes';
+import { createAppRoute, useAppLocation, useAppSearchSnapshot } from 'core/routes';
 import { useAppSnackbar } from 'core/snackbar';
 import type { Metadata } from 'models/base/submission';
 import { initializeSettings, loadDefaultProfile, loadSubmissionProfile } from 'pages/settings/settings.utils';
@@ -36,7 +36,6 @@ import {
 } from 'pages/submit/submit.utils';
 import { memo, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation } from 'react-router';
 import { generateRandomUUID } from 'shared/utils/app.utils';
 import { getSubmitType } from 'shared/utils/utils';
 import { AppBanner } from 'ui/branding/AppBanner';
@@ -114,7 +113,8 @@ const WrappedSubmitRoute = memo(() => {
   const { t, i18n } = useTranslation(['submit']);
   const theme = useTheme();
   const downMD = useMediaQuery(theme.breakpoints.down('md'));
-  const location = useLocation();
+  const location = useAppLocation<'/submit'>('here')();
+  const searchSnapshot = useAppSearchSnapshot<'/submit'>();
   const { closeSnackbar } = useAppSnackbar();
   const currentUser = useAppConfig(s => s.user);
   const configuration = useAppConfig(s => s.configuration);
@@ -256,8 +256,8 @@ const WrappedSubmitRoute = memo(() => {
     );
     form.setFieldValue('settings.default_external_sources', getDefaultExternalSources(settings, configuration));
 
-    const search = new URLSearchParams(location.search);
-    const state = location.state as SubmitState;
+    const search = searchSnapshot?.toParams() ?? new URLSearchParams();
+    const state = location.state || {};
 
     setClassificationFromURL(state, search);
     setHashFromURL(state, search);
@@ -273,7 +273,7 @@ const WrappedSubmitRoute = memo(() => {
     applyAutoURLServicesSelection();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [configuration, currentUser, settings]);
+  }, [configuration, currentUser, searchSnapshot, settings]);
 
   return (
     <PageCenter maxWidth={downMD ? '100%' : `${theme.breakpoints.values.md}px`} margin={3.5} width="100%">

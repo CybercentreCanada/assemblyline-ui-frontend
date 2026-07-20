@@ -1,4 +1,4 @@
-import HelpIcon from '@mui/icons-material/Help';
+import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 import { Typography, useTheme } from '@mui/material';
 import { createAppRoute } from 'core/routes';
 import { memo } from 'react';
@@ -16,7 +16,7 @@ export const MissingNodePage = memo(() => {
   return (
     <PageCenter width="65%" margin={4}>
       <div style={{ paddingTop: theme.spacing(10), fontSize: 200 }}>
-        <HelpIcon
+        <HelpOutlineOutlinedIcon
           style={{ color: theme.palette.mode === 'dark' ? theme.palette.warning.light : theme.palette.warning.dark }}
           fontSize="inherit"
         />
