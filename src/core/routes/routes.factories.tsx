@@ -29,8 +29,15 @@ export type CreateAppRouteProps<
   Temp extends StateParamShape = never
 > = {
   // Descriptions
-  title?: string;
-  icon?: ReactNode;
+  title?: {
+    ns: string;
+    key: string;
+  };
+
+  icon?: {
+    primary: ReactNode;
+    secondary?: ReactNode;
+  };
   component: ReactNode | MemoExoticComponent<ComponentType<unknown>>;
 
   // Parameters
@@ -109,6 +116,8 @@ export const createAppRoute = <
     transient: transientCodec,
 
     loader,
+    disabled,
+    forbidden,
 
     element: (
       <AppErrorProvider>

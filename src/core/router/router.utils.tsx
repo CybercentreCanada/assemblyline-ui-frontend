@@ -6,14 +6,14 @@ import type {
   AppRouterPanel,
   AppRouterRoute,
   AppRouterStore,
+  AppSharedRouterStore,
   InferAppNavigationOperationMapFromPath,
   InferAppNavigationPropsFromPath,
   RouteKeyOf
 } from 'core/router';
-import { getDefaultNavigationStore } from 'core/router';
 import { createReversePortalNode } from 'features/portal';
 import type { SetStateAction } from 'react';
-import { deepCompare, generateRandomUUID, hashObjectKeyOrderIndependent } from 'shared/utils/app.utils';
+import { generateRandomUUID, hashObjectKeyOrderIndependent } from 'shared/utils/app.utils';
 
 //*****************************************************************************************
 // Panel
@@ -36,7 +36,7 @@ export const getDefaultRouterPanel = function (panel: Partial<AppRouterPanel> = 
  * @param partialPanel - Partial panel matcher
  * @returns Matching panel index, or -1 when not found
  */
-export const findPanelKey = function <const Store extends AppLocationState>(
+export const findPanelKey = function <const Store extends AppSharedRouterStore>(
   store: Store,
   partialPanel: Partial<AppRouterPanel>
 ): number {
@@ -59,8 +59,26 @@ export const findPanelKey = function <const Store extends AppLocationState>(
   return -1;
 };
 
+export const findPanelKeyFromRouteKey = function <const Store extends AppSharedRouterStore>(
+  store: Store,
+  routeKey: RouteKeyOf<Store>
+): number {
+  if (!routeKey) return -1;
+
+  for (let i = 0; i < store.panels.length; i++) {
+    const panel = store.panels[i];
+
+    if (panel?.routeKey && panel.routeKey === routeKey) return i;
+    if (panel?.temporaryRouteKey && panel.temporaryRouteKey === routeKey) return i;
+    if (panel?.tabbedRouteKeys?.includes(routeKey)) return i;
+    if (panel?.pinnedRouteKeys?.includes(routeKey)) return i;
+  }
+
+  return -1;
+};
+
 /**
- * @name findPrevPanelKey
+ * @name findPrevPanelKeyFromRouteKey
  * @description Resolves the previous target panel index from the current route panel and navigation style.
  * When the route is outside all panels, defaults to the first panel.
  * @param store - Router store
@@ -68,12 +86,12 @@ export const findPanelKey = function <const Store extends AppLocationState>(
  * @param preferences.router.navigation - Panel navigation strategy
  * @returns Previous target panel index
  */
-export const findPrevPanelKey = function <const Store extends AppLocationState>(
+export const findPrevPanelKeyFromRouteKey = function <const Store extends AppSharedRouterStore>(
   store: Store,
   routeKey: RouteKeyOf<Store>,
   preferences: AppPreferenceStore
 ): number {
-  const currentPanelKey = findPanelKey(store, { routeKey });
+  const currentPanelKey = findPanelKeyFromRouteKey(store, routeKey);
 
   if (preferences.router.navigation === 'push') return currentPanelKey - 1;
   else if (preferences.router.navigation === 'loop')
@@ -82,7 +100,7 @@ export const findPrevPanelKey = function <const Store extends AppLocationState>(
 };
 
 /**
- * @name findNextPanelKey
+ * @name findNextPanelKeyFromRouteKey
  * @description Resolves the next target panel index from the current route panel and navigation style.
  * When the route is outside all panels, defaults to the first panel.
  * @param store - Router store
@@ -90,12 +108,12 @@ export const findPrevPanelKey = function <const Store extends AppLocationState>(
  * @param preferences.router.navigation - Panel navigation strategy
  * @returns Next target panel index
  */
-export const findNextPanelKey = function <const Store extends AppLocationState>(
+export const findNextPanelKeyFromRouteKey = function <const Store extends AppSharedRouterStore>(
   store: Store,
   routeKey: RouteKeyOf<Store>,
   preferences: AppPreferenceStore
 ): number {
-  const currentPanelKey = findPanelKey(store, { routeKey });
+  const currentPanelKey = findPanelKeyFromRouteKey(store, routeKey);
 
   if (preferences.router.navigation === 'push') return currentPanelKey + 1;
   else if (preferences.router.navigation === 'loop')
@@ -110,7 +128,7 @@ export const findNextPanelKey = function <const Store extends AppLocationState>(
  * @param partialPanel - Partial panel matcher
  * @returns Matching panel, or null when not found
  */
-export const findPanel = function <const Store extends AppLocationState>(
+export const findPanel = function <const Store extends AppSharedRouterStore>(
   store: Store,
   partialPanel: Partial<AppRouterPanel>
 ): AppRouterPanel {
@@ -125,7 +143,7 @@ export const findPanel = function <const Store extends AppLocationState>(
  * @param partialPanel - Partial panel matcher
  * @returns Matching panel, or null when not found
  */
-export const getPanel = function <const Store extends AppLocationState>(
+export const getPanel = function <const Store extends AppSharedRouterStore>(
   store: Store,
   panelKey: number
 ): AppRouterPanel {
@@ -140,7 +158,7 @@ export const getPanel = function <const Store extends AppLocationState>(
  * @param panelKey - Panel index to remove
  * @returns Updated router store
  */
-export const removePanel = function <const Store extends AppLocationState>(store: Store, panelKey: number): Store {
+export const removePanel = function <const Store extends AppSharedRouterStore>(store: Store, panelKey: number): Store {
   if (panelKey < 0 || panelKey >= store?.panels?.length) return store;
   store.panels.splice(panelKey, 1);
   return store;
@@ -153,7 +171,10 @@ export const removePanel = function <const Store extends AppLocationState>(store
  * @param panelKey - Panel index to evaluate
  * @returns Updated router store
  */
-export const removeEmptyPanel = function <const Store extends AppLocationState>(store: Store, panelKey: number): Store {
+export const removeEmptyPanel = function <const Store extends AppSharedRouterStore>(
+  store: Store,
+  panelKey: number
+): Store {
   if (panelKey < 0 || panelKey >= store?.panels?.length) return store;
 
   if (
@@ -176,7 +197,7 @@ export const removeEmptyPanel = function <const Store extends AppLocationState>(
  * @param partialPanel - Partial panel payload
  * @returns Updated router store
  */
-export const updatePanel = function <const Store extends AppLocationState>(
+export const updatePanel = function <const Store extends AppSharedRouterStore>(
   store: Store,
   panelKey: number,
   partialPanel: Partial<AppRouterPanel> = null
@@ -210,7 +231,7 @@ export const updatePanel = function <const Store extends AppLocationState>(
  * @param panelKeyB - Source panel index
  * @returns Updated router store
  */
-export const mergePanels = function <const Store extends AppLocationState>(
+export const mergePanels = function <const Store extends AppSharedRouterStore>(
   store: Store,
   panelKeyA: number,
   panelKeyB: number
@@ -240,7 +261,7 @@ export const mergePanels = function <const Store extends AppLocationState>(
  * @param partialPanel - Partial panel payload
  * @returns Updated router store
  */
-export const setPanel = function <const Store extends AppLocationState>(
+export const setPanel = function <const Store extends AppSharedRouterStore>(
   store: Store,
   panelKey: number,
   partialPanel: Partial<AppRouterPanel>
@@ -257,7 +278,7 @@ export const setPanel = function <const Store extends AppLocationState>(
  * @param partialPanel - Partial panel payload
  * @returns Tuple of updated store and inserted index
  */
-export const insertLeftPanel = function <const Store extends AppLocationState>(
+export const insertLeftPanel = function <const Store extends AppSharedRouterStore>(
   store: Store,
   panelKey: number = 0,
   partialPanel: Partial<AppRouterPanel> = null,
@@ -279,7 +300,7 @@ export const insertLeftPanel = function <const Store extends AppLocationState>(
  * @param partialPanel - Partial panel payload
  * @returns Tuple of updated store and inserted index
  */
-export const insertRightPanel = function <const Store extends AppLocationState>(
+export const insertRightPanel = function <const Store extends AppSharedRouterStore>(
   store: Store,
   sourcePanelKey: number = store.panels.length - 1,
   partialPanel: Partial<AppRouterPanel> = null,
@@ -306,7 +327,7 @@ export const insertRightPanel = function <const Store extends AppLocationState>(
  * @param partialPanel - Partial panel payload
  * @returns Tuple of updated store and resolved panel index
  */
-export const upsertPanel = function <const Store extends AppLocationState>(
+export const upsertPanel = function <const Store extends AppSharedRouterStore>(
   store: Store,
   panelKey: number = store.panels.length - 1,
   partialPanel: Partial<AppRouterPanel> = null,
@@ -324,7 +345,7 @@ export const upsertPanel = function <const Store extends AppLocationState>(
  * @param panelKey - Panel index to sanitize
  * @returns Updated router store
  */
-export const filterPanelMissingRouteKeys = function <const Store extends AppLocationState>(
+export const filterPanelMissingRouteKeys = function <const Store extends AppSharedRouterStore>(
   store: Store,
   panelKey: number
 ): Store {
@@ -360,7 +381,7 @@ export const filterPanelMissingRouteKeys = function <const Store extends AppLoca
  * @param panelKey - Panel index to update
  * @returns Updated router store
  */
-export const setPanelActiveRoute = function <const Store extends AppLocationState>(
+export const setPanelActiveRoute = function <const Store extends AppSharedRouterStore>(
   store: Store,
   panelKey: number
 ): Store {
@@ -392,7 +413,7 @@ export const setPanelActiveRoute = function <const Store extends AppLocationStat
  * @param store - Router store
  * @returns Updated router store
  */
-export const sanitizePanels = function <const Store extends AppLocationState>(
+export const sanitizePanels = function <const Store extends AppSharedRouterStore>(
   store: Store,
   preferences: AppPreferenceStore
 ): Store {
@@ -431,8 +452,10 @@ export const getDefaultRouterNode = function (node: Partial<AppRouterNode> = nul
  * @param store - Router store
  * @returns Oldest node key, or null
  */
-export const findOldestNodeKey = (store: AppRouterStore): keyof AppRouterStore['nodes'] => {
-  let oldestNodeKey: keyof AppRouterStore['nodes'] = null;
+export const findOldestNodeKey = function <const Store extends AppSharedRouterStore>(
+  store: Store
+): keyof Store['nodes'] {
+  let oldestNodeKey: keyof Store['nodes'] = null;
   let oldestAge = -Infinity;
 
   for (const nodeKey in store.nodes) {
@@ -455,10 +478,10 @@ export const findOldestNodeKey = (store: AppRouterStore): keyof AppRouterStore['
  * @param partialNode - Partial node matcher
  * @returns Matching node key, or null
  */
-export const findNodeKey = (
-  store: AppRouterStore,
+export const findNodeKey = function <const Store extends AppSharedRouterStore>(
+  store: Store,
   partialNode: Partial<AppRouterNode>
-): keyof AppRouterStore['nodes'] => {
+): keyof Store['nodes'] {
   const node = Object.entries(store?.nodes || {}).find(
     ([, node]) => partialNode?.routeKey && node?.routeKey === partialNode?.routeKey
   );
@@ -483,9 +506,12 @@ export const findNode = (store: AppRouterStore, partialNode: Partial<AppRouterNo
  * @param store - Router store
  * @returns Updated router store with one node removed when available
  */
-export const removeNode = (store: AppRouterStore, nodeKey: keyof AppRouterStore['nodes']): AppRouterStore => {
+export const removeNode = function <const Store extends AppSharedRouterStore>(
+  store: Store,
+  nodeKey: keyof Store['nodes']
+): Store {
   if (!(nodeKey in store.nodes)) return store;
-  delete store.nodes[nodeKey];
+  delete store.nodes[nodeKey as string];
   return store;
 };
 
@@ -572,7 +598,7 @@ export const upsertNode = (
  * @param store - Router store
  * @returns Updated router store
  */
-export const filterOrphanedNodes = (store: AppRouterStore): AppRouterStore => {
+export const filterOrphanedNodes = function <const Store extends AppSharedRouterStore>(store: Store): Store {
   Object.keys(store.nodes).forEach(nodeKey => {
     if (!(store.nodes[nodeKey].routeKey in store.routes)) {
       delete store.nodes[nodeKey];
@@ -588,11 +614,25 @@ export const filterOrphanedNodes = (store: AppRouterStore): AppRouterStore => {
  * @param store - Router store
  * @returns Updated router store
  */
-export const addMissingNodes = (store: AppRouterStore): AppRouterStore => {
+export const addMissingNodes = function <const Store extends AppSharedRouterStore>(store: Store): Store {
   for (const [, panel] of store.panels.entries()) {
     if (!panel.routeKey) continue;
     const nodeKey = findNodeKey(store, { routeKey: panel.routeKey });
-    if (nodeKey === null) [store] = addNode(store, { routeKey: panel.routeKey });
+    if (nodeKey !== null) continue;
+
+    const nextNodeKey = generateRandomUUID(Object.keys(store.nodes));
+    if ('blockedRoutes' in (store as Record<string, unknown>)) {
+      store.nodes[nextNodeKey] = {
+        routeKey: panel.routeKey,
+        lastUsedAt: Infinity
+      } as Store['nodes'][string];
+    } else {
+      store.nodes[nextNodeKey] = {
+        routeKey: panel.routeKey,
+        lastUsedAt: Infinity,
+        portal: createReversePortalNode()
+      } as unknown as Store['nodes'][string];
+    }
   }
 
   return store;
@@ -604,7 +644,10 @@ export const addMissingNodes = (store: AppRouterStore): AppRouterStore => {
  * @param store - Router store
  * @returns Updated router store
  */
-export const removeOldestNodes = (store: AppRouterStore, preferences: AppPreferenceStore): AppRouterStore => {
+export const removeOldestNodes = function <const Store extends AppSharedRouterStore>(
+  store: Store,
+  preferences: AppPreferenceStore
+): Store {
   while (Object.keys(store.nodes).length > preferences.router.maxPanels + preferences.router.maxNodes) {
     const nodeKey = findOldestNodeKey(store);
     store = removeNode(store, nodeKey);
@@ -619,7 +662,10 @@ export const removeOldestNodes = (store: AppRouterStore, preferences: AppPrefere
  * @param store - Router store
  * @returns Updated router store
  */
-export const sanitizeNodes = (store: AppRouterStore, preferences: AppPreferenceStore): AppRouterStore => {
+export const sanitizeNodes = function <const Store extends AppSharedRouterStore>(
+  store: Store,
+  preferences: AppPreferenceStore
+): Store {
   store = filterOrphanedNodes(store);
   store = addMissingNodes(store);
   store = removeOldestNodes(store, preferences);
@@ -652,31 +698,48 @@ export const getRouteDigestFromRoute = function (
   });
 };
 
-export const setRouteDigestFromKey = function (
+// export const setRouteDigestFromKey = function (
+//   store: AppRouterStore,
+//   routeKey: keyof AppRouterStore['routes']
+// ): AppRouterStore {
+//   if (!(routeKey in store.routes)) return store;
+
+//   const route = store.routes[routeKey];
+//   store.routes[routeKey].digest = getRouteDigestFromRoute(route);
+
+//   return store;
+// };
+
+export const shouldUpdateRoute = function (
   store: AppRouterStore,
-  routeKey: keyof AppRouterStore['routes']
-): AppRouterStore {
-  if (!(routeKey in store.routes)) return store;
+  routeKey: keyof AppRouterStore['routes'],
+  route: AppRouterRoute
+): boolean {
+  if (!route?.href) return false;
 
-  const route = store.routes[routeKey];
-  store.routes[routeKey].digest = getRouteDigestFromRoute(route);
+  const nextDigest = route.digest ?? getRouteDigestFromRoute(route);
 
-  return store;
+  if (!(routeKey in (store?.routes || {}))) return true;
+
+  const prevRoute = store.routes[routeKey];
+  const prevDigest = prevRoute?.digest ?? getRouteDigestFromRoute(prevRoute);
+
+  return prevDigest !== nextDigest;
 };
 
-/**
- * @name findRouteKey
- * @description Finds the key of a route in the store by deep value comparison.
- * @param store - Router store
- * @param route - Route value to find
- * @returns Matching route key, or null if none is found
- */
-export const findRouteKey = (store: AppRouterStore, route: AppRouterRoute): keyof AppRouterStore['routes'] => {
-  for (const routeKey in store.routes) {
-    if (deepCompare(route, store.routes[routeKey])) return routeKey;
-  }
-  return null;
-};
+// /**
+//  * @name findRouteKey
+//  * @description Finds the key of a route in the store by deep value comparison.
+//  * @param store - Router store
+//  * @param route - Route value to find
+//  * @returns Matching route key, or null if none is found
+//  */
+// export const findRouteKey = (store: AppRouterStore, route: AppRouterRoute): keyof AppRouterStore['routes'] => {
+//   for (const routeKey in store.routes) {
+//     if (deepCompare(route, store.routes[routeKey])) return routeKey;
+//   }
+//   return null;
+// };
 
 /**
  * @name findRouteKeyFromPanelKey
@@ -708,48 +771,61 @@ export const captureScrollPositions = (): Record<string, number> => {
   return positions;
 };
 
-/**
- * @name findRoute
- * @description Finds and returns a matching route object from the store by deep value comparison.
- * @param store - Router store
- * @param route - Route value to find
- * @returns Matching route object, or null if none is found
- */
-export const findRoute = (store: AppRouterStore, route: AppRouterRoute): AppRouterRoute => {
-  const key = findRouteKey(store, route);
-  return key !== null ? store.routes[key] : null;
+export const setRouteScrollPositions = function <const Store extends AppSharedRouterStore>(store: Store): Store {
+  const positions = captureScrollPositions();
+
+  for (const [routeKey, scroll] of Object.entries(positions)) {
+    if (!(routeKey in store.routes)) continue;
+    store.routes[routeKey].scroll = scroll;
+  }
+
+  return store;
 };
 
-/**
- * @name findNextRouteKey
- * @description Finds the active route key from the next panel relative to the panel containing the provided route key.
- * @param store - Router store
- * @param routeKey - Current route key used as navigation origin
- * @param preferences.router.navigation - Panel navigation strategy
- * @returns Active route key from the next panel, or null when unavailable
- */
-export const findNextRouteKey = (
-  store: AppRouterStore,
-  routeKey: keyof AppRouterStore['routes'],
-  preferences: AppPreferenceStore
-): keyof AppRouterStore['routes'] => {
-  const nextPanelKey = findNextPanelKey(store, routeKey, preferences);
+// /**
+//  * @name findRoute
+//  * @description Finds and returns a matching route object from the store by deep value comparison.
+//  * @param store - Router store
+//  * @param route - Route value to find
+//  * @returns Matching route object, or null if none is found
+//  */
+// export const findRoute = (store: AppRouterStore, route: AppRouterRoute): AppRouterRoute => {
+//   const key = findRouteKey(store, route);
+//   return key !== null ? store.routes[key] : null;
+// };
 
-  if (nextPanelKey < 0 || nextPanelKey >= store.panels.length) return null;
+// /**
+//  * @name findNextRouteKey
+//  * @description Finds the active route key from the next panel relative to the panel containing the provided route key.
+//  * @param store - Router store
+//  * @param routeKey - Current route key used as navigation origin
+//  * @param preferences.router.navigation - Panel navigation strategy
+//  * @returns Active route key from the next panel, or null when unavailable
+//  */
+// export const findNextRouteKey = (
+//   store: AppRouterStore,
+//   routeKey: keyof AppRouterStore['routes'],
+//   preferences: AppPreferenceStore
+// ): keyof AppRouterStore['routes'] => {
+//   const nextPanelKey = findNextPanelKeyFromRouteKey(store, routeKey, preferences);
 
-  const nextRouteKey = store.panels[nextPanelKey]?.routeKey;
-  if (!nextRouteKey || !(nextRouteKey in store.routes)) return null;
+//   if (nextPanelKey < 0 || nextPanelKey >= store.panels.length) return null;
 
-  return nextRouteKey;
-};
+//   const nextRouteKey = store.panels[nextPanelKey]?.routeKey;
+//   if (!nextRouteKey || !(nextRouteKey in store.routes)) return null;
 
-export const getRouteFromKey = function <const Store extends AppLocationState>(
-  store: Store,
-  routeKey: keyof Store['routes']
-): AppRouterRoute {
-  const route = routeKey in store.routes ? store.routes[routeKey as string] : getDefaultRouterRoute();
-  return route;
-};
+//   return nextRouteKey;
+// };
+
+// export const getRouteFromKey = function <const Store extends AppSharedRouterStore>(
+//   store: Store,
+//   routeKey: keyof Store['routes']
+// ): AppRouterRoute {
+//   const route = routeKey in store.routes ? store.routes[routeKey as string] : getDefaultRouterRoute();
+//   return route;
+// };
+
+// UNUSED: no call-sites found outside index re-exports.
 
 /**
  * @name getRouteFromPanelKey
@@ -758,7 +834,7 @@ export const getRouteFromKey = function <const Store extends AppLocationState>(
  * @param panelKey - Panel index whose active route should be returned
  * @returns Matching route object, or null when panel/route is missing
  */
-export const getRouteFromPanelKey = function <const Store extends AppLocationState>(
+export const getRouteFromPanelKey = function <const Store extends AppSharedRouterStore>(
   store: Store,
   panelKey: number
 ): AppRouterRoute {
@@ -770,54 +846,56 @@ export const getRouteFromPanelKey = function <const Store extends AppLocationSta
   return store.routes[routeKey] ?? getDefaultRouterRoute();
 };
 
-export const getNextRouteFromKey = function <const Store extends AppLocationState>(
-  store: Store,
-  routeKey: keyof Store['routes'],
-  preferences: AppPreferenceStore
-): AppRouterRoute {
-  const currentPanelKey = findPanelKey(store, { routeKey } as Partial<Store['panels'][number]>);
-  if (currentPanelKey < 0 || currentPanelKey >= store.panels.length) return getDefaultRouterRoute();
+// export const getNextRouteFromKey = function <const Store extends AppSharedRouterStore>(
+//   store: Store,
+//   routeKey: keyof Store['routes'],
+//   preferences: AppPreferenceStore
+// ): AppRouterRoute {
+//   const currentPanelKey = findPanelKey(store, { routeKey } as Partial<Store['panels'][number]>);
+//   if (currentPanelKey < 0 || currentPanelKey >= store.panels.length) return getDefaultRouterRoute();
 
-  let nextPanelKey: number | null = currentPanelKey;
+//   let nextPanelKey: number | null = currentPanelKey;
 
-  if (preferences.router.navigation === 'push') {
-    nextPanelKey = currentPanelKey >= 0 ? currentPanelKey + 1 : 0;
-  } else if (preferences.router.navigation === 'loop') {
-    nextPanelKey = currentPanelKey >= 0 ? currentPanelKey + 1 : 0;
-    nextPanelKey = nextPanelKey >= store.panels.length ? 0 : nextPanelKey;
-  }
+//   if (preferences.router.navigation === 'push') {
+//     nextPanelKey = currentPanelKey >= 0 ? currentPanelKey + 1 : 0;
+//   } else if (preferences.router.navigation === 'loop') {
+//     nextPanelKey = currentPanelKey >= 0 ? currentPanelKey + 1 : 0;
+//     nextPanelKey = nextPanelKey >= store.panels.length ? 0 : nextPanelKey;
+//   }
 
-  return getRouteFromPanelKey(store, nextPanelKey);
-};
+//   return getRouteFromPanelKey(store, nextPanelKey);
+// };
 
-/**
- * @name getFirstRouteKey
- * @description Returns the active route key for the first panel when available.
- * @param store - Router store
- * @returns Active route key from panel index 0, or null when unavailable
- */
-export const getFirstRouteKey = function <const Store extends AppLocationState>(store: Store): keyof Store['routes'] {
-  const firstRouteKey = store.panels?.[0]?.routeKey;
-  if (!firstRouteKey || !(firstRouteKey in store.routes)) return null;
-  return firstRouteKey;
-};
+// /**
+//  * @name getFirstRouteKey
+//  * @description Returns the active route key for the first panel when available.
+//  * @param store - Router store
+//  * @returns Active route key from panel index 0, or null when unavailable
+//  */
+// export const getFirstRouteKey = function <const Store extends AppSharedRouterStore>(
+//   store: Store
+// ): keyof Store['routes'] {
+//   const firstRouteKey = store.panels?.[0]?.routeKey;
+//   if (!firstRouteKey || !(firstRouteKey in store.routes)) return null;
+//   return firstRouteKey;
+// };
 
-export const hasRoutes = function <const Store extends AppLocationState>(store: Store): boolean {
+export const hasRoutes = function <const Store extends AppSharedRouterStore>(store: Store): boolean {
   return Object.keys(store?.routes || {}).length > 0;
 };
 
-export const isRouteVisible = function <const Store extends AppLocationState>(
-  store: Store,
-  routeKey: RouteKeyOf<Store>
-): boolean {
-  if (!(routeKey in store.routes)) return false;
+// export const isRouteVisible = function <const Store extends AppSharedRouterStore>(
+//   store: Store,
+//   routeKey: RouteKeyOf<Store>
+// ): boolean {
+//   if (!(routeKey in store.routes)) return false;
 
-  for (const panel of store.panels) {
-    if (panel?.routeKey === routeKey) return true;
-  }
+//   for (const panel of store.panels) {
+//     if (panel?.routeKey === routeKey) return true;
+//   }
 
-  return false;
-};
+//   return false;
+// };
 
 /**
  * @name removeRoute
@@ -826,7 +904,7 @@ export const isRouteVisible = function <const Store extends AppLocationState>(
  * @param routeKey - Route key to remove
  * @returns Updated router store
  */
-export const removeRoute = function <const Store extends AppLocationState>(
+export const removeRoute = function <const Store extends AppSharedRouterStore>(
   store: Store,
   routeKey: RouteKeyOf<Store>
 ): Store {
@@ -843,25 +921,42 @@ export const removeRoute = function <const Store extends AppLocationState>(
  * @param partialRoute - Partial route payload
  * @returns Updated router store
  */
-export const updateRoute = function <const Store extends AppLocationState>(
+export const updateRoute = function <const Store extends AppSharedRouterStore>(
   store: Store,
   routeKey: RouteKeyOf<Store>,
   partialRoute: Partial<AppRouterRoute> = null
 ): Store {
   if (!(routeKey in store.routes)) return store;
 
+  let shouldRefreshDigest = false;
+
   if (partialRoute && 'href' in partialRoute) {
     store.routes[routeKey].href = partialRoute.href;
+    shouldRefreshDigest = true;
   }
 
   if (partialRoute && 'state' in partialRoute) {
     store.routes[routeKey].state = partialRoute.state;
+    shouldRefreshDigest = true;
+  }
+
+  if (partialRoute && 'transient' in partialRoute) {
+    store.routes[routeKey].transient = partialRoute.transient;
+    shouldRefreshDigest = true;
+  }
+
+  if (partialRoute && 'scroll' in partialRoute) {
+    store.routes[routeKey].scroll = partialRoute.scroll;
   }
 
   if (partialRoute && 'age' in partialRoute) {
     store.routes[routeKey].age = partialRoute.age;
-  } else {
-    store.routes[routeKey].age = 0;
+  }
+
+  if (partialRoute && 'digest' in partialRoute) {
+    store.routes[routeKey].digest = partialRoute.digest;
+  } else if (shouldRefreshDigest || !store.routes[routeKey].digest) {
+    store.routes[routeKey].digest = getRouteDigestFromRoute(store.routes[routeKey]);
   }
 
   return store;
@@ -875,12 +970,47 @@ export const updateRoute = function <const Store extends AppLocationState>(
  * @param partialRoute - Partial route payload
  * @returns Updated router store
  */
-export const setRoute = function <const Store extends AppLocationState>(
+export const setRoute = function <const Store extends AppSharedRouterStore>(
   store: Store,
   routeKey: RouteKeyOf<Store>,
   partialRoute: Partial<AppRouterRoute>
 ): Store {
-  store.routes[routeKey] = { ...getDefaultRouterRoute(), ...partialRoute };
+  const route = getDefaultRouterRoute(partialRoute);
+  route.digest = getRouteDigestFromRoute(route);
+  store.routes[routeKey] = route;
+  return store;
+};
+
+/**
+ * @name updateRouteFromNavigationRoute
+ * @description Applies navigation route values into router route with digest-aware field updates.
+ * If digests match, href/state/transient are preserved while other fields still update.
+ */
+export const updateRouteFromNavigationRoute = function (
+  store: AppRouterStore,
+  routeKey: keyof AppRouterStore['routes'],
+  nextRoute: AppNavigationStore['routes'][string]
+): AppRouterStore {
+  if (!(routeKey in store.routes)) {
+    const route = getDefaultRouterRoute(nextRoute);
+    route.digest = nextRoute?.digest || getRouteDigestFromRoute(route);
+    store.routes[routeKey] = route;
+    return store;
+  }
+
+  const currentRoute = store.routes[routeKey];
+  const hasSameDigest = !!currentRoute?.digest && !!nextRoute?.digest && currentRoute.digest === nextRoute.digest;
+
+  if (!hasSameDigest) {
+    currentRoute.href = nextRoute.href;
+    currentRoute.state = nextRoute.state;
+    currentRoute.transient = nextRoute.transient;
+  }
+
+  currentRoute.age = nextRoute.age;
+  currentRoute.scroll = nextRoute.scroll;
+  currentRoute.digest = nextRoute.digest || currentRoute.digest || getRouteDigestFromRoute(currentRoute);
+
   return store;
 };
 
@@ -891,13 +1021,15 @@ export const setRoute = function <const Store extends AppLocationState>(
  * @param partialRoute - Partial route payload
  * @returns Tuple of updated store and route key
  */
-export const addRoute = function <const Store extends AppLocationState>(
+export const addRoute = function <const Store extends AppSharedRouterStore>(
   store: Store,
   partialRoute: Partial<AppRouterRoute>,
   routeKey: RouteKeyOf<Store> | null = null
 ): [Store, RouteKeyOf<Store>] {
   routeKey = routeKey || (generateRandomUUID(Object.keys(store.routes)) as RouteKeyOf<Store>);
-  store.routes[routeKey] = { ...getDefaultRouterRoute(), ...partialRoute };
+  const route = getDefaultRouterRoute(partialRoute);
+  route.digest = getRouteDigestFromRoute(route);
+  store.routes[routeKey] = route;
   return [store, routeKey];
 };
 
@@ -909,7 +1041,7 @@ export const addRoute = function <const Store extends AppLocationState>(
  * @param partialRoute - Partial route payload
  * @returns Updated router store
  */
-export const addRouteToPanel = function <const Store extends AppLocationState>(
+export const addRouteToPanel = function <const Store extends AppSharedRouterStore>(
   store: Store,
   panelKey: number,
   partialRoute: Partial<AppRouterRoute>
@@ -917,7 +1049,9 @@ export const addRouteToPanel = function <const Store extends AppLocationState>(
   if (store.panels.length === 0 || panelKey < 0 || panelKey >= store?.panels?.length) return store;
 
   const newRouteKey = generateRandomUUID(Object.keys(store.routes));
-  store.routes[newRouteKey] = { ...getDefaultRouterRoute(), ...partialRoute };
+  const route = getDefaultRouterRoute(partialRoute);
+  route.digest = getRouteDigestFromRoute(route);
+  store.routes[newRouteKey] = route;
   store.panels[panelKey].routeKey = newRouteKey;
   store.panels[panelKey].temporaryRouteKey = newRouteKey;
 
@@ -932,7 +1066,7 @@ export const addRouteToPanel = function <const Store extends AppLocationState>(
  * @param partialRoute - Partial route payload
  * @returns Tuple of updated store and resolved route key
  */
-export const upsertRoute = function <const Store extends AppLocationState>(
+export const upsertRoute = function <const Store extends AppSharedRouterStore>(
   store: Store,
   routeKey: RouteKeyOf<Store>,
   partialRoute: Partial<AppRouterRoute>
@@ -948,7 +1082,7 @@ export const upsertRoute = function <const Store extends AppLocationState>(
  * @param store - Router store
  * @returns Updated router store
  */
-export const refreshRouteAges = function <const Store extends AppLocationState>(store: Store): Store {
+export const refreshRouteAges = function <const Store extends AppSharedRouterStore>(store: Store): Store {
   const orderedEntries = Object.entries(store.routes).sort(([routeKeyA, routeA], [routeKeyB, routeB]) => {
     const aIsDisplayed = findPanelKey(store, { routeKey: routeKeyA }) >= 0;
     const bIsDisplayed = findPanelKey(store, { routeKey: routeKeyB }) >= 0;
@@ -971,7 +1105,7 @@ export const refreshRouteAges = function <const Store extends AppLocationState>(
  * @param store - Router store
  * @returns Updated router store with orphaned routes removed
  */
-export const filterOrphanedRoutes = function <const Store extends AppRouterStore>(store: Store): Store {
+export const filterOrphanedRoutes = function <const Store extends AppSharedRouterStore>(store: Store): Store {
   const activeRoutes = new Set<string>();
 
   for (const panel of store.panels) {
@@ -1009,7 +1143,7 @@ export const filterOrphanedRoutes = function <const Store extends AppRouterStore
  * @param store - Router store
  * @returns Updated router store
  */
-export const sanitizeRoutes = function <const Store extends AppRouterStore>(store: Store): Store {
+export const sanitizeRoutes = function <const Store extends AppSharedRouterStore>(store: Store): Store {
   store = filterOrphanedRoutes(store);
   store = refreshRouteAges(store);
   return store;
@@ -1019,261 +1153,261 @@ export const sanitizeRoutes = function <const Store extends AppRouterStore>(stor
 // Tabs
 //*****************************************************************************************
 
-/**
- * @name showPreviousTab
- * @description Placeholder for moving to a previous tab in a panel.
- * @param store - Router store
- * @param panelKey - Panel key context
- * @param source - Route source filter
- * @returns Router store (currently unchanged)
- */
-export const showPreviousTab = (
-  store: AppRouterStore,
-  _panelKey: keyof AppRouterStore['routes'],
-  _source: 'active' | 'temporary' | 'tabbed' | 'pinned' = null
-): AppRouterStore => {
-  void _panelKey;
-  void _source;
-  return store;
-};
+// /**
+//  * @name showPreviousTab
+//  * @description Placeholder for moving to a previous tab in a panel.
+//  * @param store - Router store
+//  * @param panelKey - Panel key context
+//  * @param source - Route source filter
+//  * @returns Router store (currently unchanged)
+//  */
+// export const showPreviousTab = (
+//   store: AppRouterStore,
+//   _panelKey: keyof AppRouterStore['routes'],
+//   _source: 'active' | 'temporary' | 'tabbed' | 'pinned' = null
+// ): AppRouterStore => {
+//   void _panelKey;
+//   void _source;
+//   return store;
+// };
 
-/**
- * @name removeTabFromPanel
- * @description Removes a route key from a single panel active/temporary/tabbed/pinned entries.
- * @param store - Router store
- * @param panelKey - Target panel index
- * @param routeKey - Route key to remove
- * @returns Updated router store
- */
-export const removeTabFromPanel = function <const Store extends AppLocationState>(
-  store: Store,
-  panelKey: number = null,
-  routeKey: RouteKeyOf<Store> | null = null
-): Store {
-  if (panelKey === null || panelKey < 0 || panelKey >= store?.panels?.length) return store;
-  const panel = store.panels[panelKey];
+// /**
+//  * @name removeTabFromPanel
+//  * @description Removes a route key from a single panel active/temporary/tabbed/pinned entries.
+//  * @param store - Router store
+//  * @param panelKey - Target panel index
+//  * @param routeKey - Route key to remove
+//  * @returns Updated router store
+//  */
+// export const removeTabFromPanel = function <const Store extends AppSharedRouterStore>(
+//   store: Store,
+//   panelKey: number = null,
+//   routeKey: RouteKeyOf<Store> | null = null
+// ): Store {
+//   if (panelKey === null || panelKey < 0 || panelKey >= store?.panels?.length) return store;
+//   const panel = store.panels[panelKey];
 
-  if (panel.routeKey === routeKey) panel.routeKey = null;
-  if (panel.temporaryRouteKey === routeKey) panel.temporaryRouteKey = null;
+//   if (panel.routeKey === routeKey) panel.routeKey = null;
+//   if (panel.temporaryRouteKey === routeKey) panel.temporaryRouteKey = null;
 
-  if (routeKey !== null) {
-    const tabbedIndex = panel.tabbedRouteKeys.indexOf(routeKey);
-    if (tabbedIndex >= 0) panel.tabbedRouteKeys.splice(tabbedIndex, 1);
-  }
+//   if (routeKey !== null) {
+//     const tabbedIndex = panel.tabbedRouteKeys.indexOf(routeKey);
+//     if (tabbedIndex >= 0) panel.tabbedRouteKeys.splice(tabbedIndex, 1);
+//   }
 
-  if (routeKey !== null) {
-    const pinnedIndex = panel.pinnedRouteKeys.indexOf(routeKey);
-    if (pinnedIndex >= 0) panel.pinnedRouteKeys.splice(pinnedIndex, 1);
-  }
+//   if (routeKey !== null) {
+//     const pinnedIndex = panel.pinnedRouteKeys.indexOf(routeKey);
+//     if (pinnedIndex >= 0) panel.pinnedRouteKeys.splice(pinnedIndex, 1);
+//   }
 
-  return store;
-};
+//   return store;
+// };
 
-/**
- * @name removeTab
- * @description Removes a route key from all panels' active/temporary/tabbed/pinned entries.
- * @param store - Router store
- * @param routeKey - Route key to remove
- * @returns Updated router store
- */
-export const removeTab = function <const Store extends AppLocationState>(
-  store: Store,
-  routeKey: RouteKeyOf<Store> | null = null
-): Store {
-  for (let i = 0; i < store.panels.length; i++) {
-    store = removeTabFromPanel(store, i, routeKey);
-  }
+// /**
+//  * @name removeTab
+//  * @description Removes a route key from all panels' active/temporary/tabbed/pinned entries.
+//  * @param store - Router store
+//  * @param routeKey - Route key to remove
+//  * @returns Updated router store
+//  */
+// export const removeTab = function <const Store extends AppSharedRouterStore>(
+//   store: Store,
+//   routeKey: RouteKeyOf<Store> | null = null
+// ): Store {
+//   for (let i = 0; i < store.panels.length; i++) {
+//     store = removeTabFromPanel(store, i, routeKey);
+//   }
 
-  return store;
-};
+//   return store;
+// };
 
-/**
- * @name addTab
- * @description Adds/sets a route in the chosen tab source of a panel.
- * @param store - Router store
- * @param panelKey - Target panel index
- * @param routeKey - Route key to add
- * @param source - Destination collection
- * @returns Updated router store
- */
-export const addTab = function <const Store extends AppLocationState>(
-  store: Store,
-  panelKey: number = -1,
-  routeKey: RouteKeyOf<Store> | null = null,
-  source: 'temporary' | 'tabbed' | 'pinned' = 'temporary'
-): Store {
-  if (panelKey < 0 || panelKey >= store?.panels?.length || !(routeKey in store.routes)) return store;
+// /**
+//  * @name addTab
+//  * @description Adds/sets a route in the chosen tab source of a panel.
+//  * @param store - Router store
+//  * @param panelKey - Target panel index
+//  * @param routeKey - Route key to add
+//  * @param source - Destination collection
+//  * @returns Updated router store
+//  */
+// export const addTab = function <const Store extends AppSharedRouterStore>(
+//   store: Store,
+//   panelKey: number = -1,
+//   routeKey: RouteKeyOf<Store> | null = null,
+//   source: 'temporary' | 'tabbed' | 'pinned' = 'temporary'
+// ): Store {
+//   if (panelKey < 0 || panelKey >= store?.panels?.length || !(routeKey in store.routes)) return store;
 
-  store.panels[panelKey].routeKey = routeKey;
+//   store.panels[panelKey].routeKey = routeKey;
 
-  switch (source) {
-    case 'temporary':
-      store.panels[panelKey].temporaryRouteKey = routeKey;
-      break;
-    case 'tabbed':
-      store.panels[panelKey].tabbedRouteKeys.push(routeKey);
-      break;
-    case 'pinned':
-      store.panels[panelKey].pinnedRouteKeys.push(routeKey);
-      break;
-  }
+//   switch (source) {
+//     case 'temporary':
+//       store.panels[panelKey].temporaryRouteKey = routeKey;
+//       break;
+//     case 'tabbed':
+//       store.panels[panelKey].tabbedRouteKeys.push(routeKey);
+//       break;
+//     case 'pinned':
+//       store.panels[panelKey].pinnedRouteKeys.push(routeKey);
+//       break;
+//   }
 
-  return store;
-};
+//   return store;
+// };
 
-/**
- * @name permanentTab
- * @description Converts a temporary route to a tabbed route and keeps it active.
- * @param store - Router store
- * @param routeKey - Route key to convert
- * @returns Updated router store
- */
-export const permanentTab = function <const Store extends AppLocationState>(
-  store: Store,
-  routeKey: RouteKeyOf<Store>
-): Store {
-  if (!(routeKey in store.routes)) return store;
+// /**
+//  * @name permanentTab
+//  * @description Converts a temporary route to a tabbed route and keeps it active.
+//  * @param store - Router store
+//  * @param routeKey - Route key to convert
+//  * @returns Updated router store
+//  */
+// export const permanentTab = function <const Store extends AppSharedRouterStore>(
+//   store: Store,
+//   routeKey: RouteKeyOf<Store>
+// ): Store {
+//   if (!(routeKey in store.routes)) return store;
 
-  const panelKey = findPanelKey(store, { temporaryRouteKey: routeKey });
-  if (panelKey < 0) return store;
-  store.panels[panelKey].routeKey = routeKey;
-  store.panels[panelKey].temporaryRouteKey = null;
-  store.panels[panelKey].tabbedRouteKeys.push(routeKey);
+//   const panelKey = findPanelKey(store, { temporaryRouteKey: routeKey });
+//   if (panelKey < 0) return store;
+//   store.panels[panelKey].routeKey = routeKey;
+//   store.panels[panelKey].temporaryRouteKey = null;
+//   store.panels[panelKey].tabbedRouteKeys.push(routeKey);
 
-  return store;
-};
+//   return store;
+// };
 
-/**
- * @name setPermanentRoute
- * @description Marks a route as permanent in the store.
- * @param store - Router store
- * @param routeKey - Route key to mark as permanent
- * @returns Updated router store with the route marked permanent
- */
-export const setPermanentRoute = function <const Store extends AppLocationState>(
-  store: Store,
-  routeKey: RouteKeyOf<Store>
-): Store {
-  if (!(routeKey in store.routes)) return store;
+// /**
+//  * @name setPermanentRoute
+//  * @description Marks a route as permanent in the store.
+//  * @param store - Router store
+//  * @param routeKey - Route key to mark as permanent
+//  * @returns Updated router store with the route marked permanent
+//  */
+// export const setPermanentRoute = function <const Store extends AppSharedRouterStore>(
+//   store: Store,
+//   routeKey: RouteKeyOf<Store>
+// ): Store {
+//   if (!(routeKey in store.routes)) return store;
 
-  const panelIndex = findPanelKey(store, { temporaryRouteKey: routeKey });
-  if (panelIndex < 0) return store;
-  store.panels[panelIndex].tabbedRouteKeys.push(store.panels[panelIndex].temporaryRouteKey);
-  store.panels[panelIndex].temporaryRouteKey = null;
+//   const panelIndex = findPanelKey(store, { temporaryRouteKey: routeKey });
+//   if (panelIndex < 0) return store;
+//   store.panels[panelIndex].tabbedRouteKeys.push(store.panels[panelIndex].temporaryRouteKey);
+//   store.panels[panelIndex].temporaryRouteKey = null;
 
-  return store;
-};
+//   return store;
+// };
 
-/**
- * @name setPinnedRoute
- * @description Pins a route by moving it from temporary/tabbed collections into the panel pinned collection.
- * @param store - Router store
- * @param routeKey - Route key to pin
- * @returns Updated router store with the route pinned where found
- */
-export const setPinnedRoute = function <const Store extends AppLocationState>(
-  store: Store,
-  routeKey: keyof Store['routes']
-): Store {
-  if (!(routeKey in store.routes)) return store;
+// /**
+//  * @name setPinnedRoute
+//  * @description Pins a route by moving it from temporary/tabbed collections into the panel pinned collection.
+//  * @param store - Router store
+//  * @param routeKey - Route key to pin
+//  * @returns Updated router store with the route pinned where found
+//  */
+// export const setPinnedRoute = function <const Store extends AppSharedRouterStore>(
+//   store: Store,
+//   routeKey: keyof Store['routes']
+// ): Store {
+//   if (!(routeKey in store.routes)) return store;
 
-  let panelIndex = findPanelKey(store, {
-    temporaryRouteKey: routeKey as Store['panels'][number]['temporaryRouteKey']
-  });
-  if (panelIndex >= 0) {
-    store.panels[panelIndex].pinnedRouteKeys.push(routeKey as AppRouterPanel['routeKey']);
-    store.panels[panelIndex].temporaryRouteKey = null;
-  }
+//   let panelIndex = findPanelKey(store, {
+//     temporaryRouteKey: routeKey as Store['panels'][number]['temporaryRouteKey']
+//   });
+//   if (panelIndex >= 0) {
+//     store.panels[panelIndex].pinnedRouteKeys.push(routeKey as AppRouterPanel['routeKey']);
+//     store.panels[panelIndex].temporaryRouteKey = null;
+//   }
 
-  panelIndex = findPanelKey(store, {
-    tabbedRouteKeys: [routeKey] as AppRouterPanel['tabbedRouteKeys']
-  });
-  if (panelIndex >= 0) {
-    store.panels[panelIndex].pinnedRouteKeys.push(routeKey as AppRouterPanel['routeKey']);
-    const index = store.panels[panelIndex].tabbedRouteKeys.findIndex(
-      k => k === (routeKey as AppRouterPanel['routeKey'])
-    );
-    store.panels[panelIndex].tabbedRouteKeys.splice(index, 1);
-  }
+//   panelIndex = findPanelKey(store, {
+//     tabbedRouteKeys: [routeKey] as AppRouterPanel['tabbedRouteKeys']
+//   });
+//   if (panelIndex >= 0) {
+//     store.panels[panelIndex].pinnedRouteKeys.push(routeKey as AppRouterPanel['routeKey']);
+//     const index = store.panels[panelIndex].tabbedRouteKeys.findIndex(
+//       k => k === (routeKey as AppRouterPanel['routeKey'])
+//     );
+//     store.panels[panelIndex].tabbedRouteKeys.splice(index, 1);
+//   }
 
-  return store;
-};
+//   return store;
+// };
 
-/**
- * @name setUnpinnedRoute
- * @description Unpins a route by removing it from pinned routes and inserting it at the start of tabbed routes.
- * @param store - Router store
- * @param routeKey - Route key to unpin
- * @returns Updated router store with the route unpinned
- */
-export const setUnpinnedRoute = function <const Store extends AppLocationState>(
-  store: Store,
-  routeKey: keyof Store['routes']
-): Store {
-  if (!(routeKey in store.routes)) return store;
+// /**
+//  * @name setUnpinnedRoute
+//  * @description Unpins a route by removing it from pinned routes and inserting it at the start of tabbed routes.
+//  * @param store - Router store
+//  * @param routeKey - Route key to unpin
+//  * @returns Updated router store with the route unpinned
+//  */
+// export const setUnpinnedRoute = function <const Store extends AppSharedRouterStore>(
+//   store: Store,
+//   routeKey: keyof Store['routes']
+// ): Store {
+//   if (!(routeKey in store.routes)) return store;
 
-  const panelIndex = findPanelKey(store, {
-    pinnedRouteKeys: [routeKey as AppRouterPanel['routeKey']]
-  });
-  if (panelIndex >= 0) {
-    store.panels[panelIndex].tabbedRouteKeys.unshift(routeKey as AppRouterPanel['routeKey']);
-    const index = store.panels[panelIndex].pinnedRouteKeys.findIndex(
-      k => k === (routeKey as AppRouterPanel['routeKey'])
-    );
-    store.panels[panelIndex].pinnedRouteKeys.splice(index, 1);
-  }
+//   const panelIndex = findPanelKey(store, {
+//     pinnedRouteKeys: [routeKey as AppRouterPanel['routeKey']]
+//   });
+//   if (panelIndex >= 0) {
+//     store.panels[panelIndex].tabbedRouteKeys.unshift(routeKey as AppRouterPanel['routeKey']);
+//     const index = store.panels[panelIndex].pinnedRouteKeys.findIndex(
+//       k => k === (routeKey as AppRouterPanel['routeKey'])
+//     );
+//     store.panels[panelIndex].pinnedRouteKeys.splice(index, 1);
+//   }
 
-  return store;
-};
+//   return store;
+// };
 
-/**
- * @name moveTabbedRouteKey
- * @description Placeholder for moving a route key between tab/pinned collections in a destination panel.
- * @param store - Router store
- * @param routeKey - Route key to move
- * @param panelKey - Destination panel index
- * @param tabIndex - Destination tab index
- * @param tab - Destination collection ('pinned' or 'tab')
- * @returns Router store (currently unchanged)
- */
-export const moveTabbedRouteKey = function <const Store extends AppLocationState>(
-  store: Store,
-  routeKey: keyof Store['routes'],
-  panelKey: number,
-  tabIndex: number,
-  tab: 'pinned' | 'tab'
-): Store {
-  if (!(routeKey in store.routes) || panelKey < 0 || panelKey >= store?.panels?.length) return store;
+// /**
+//  * @name moveTabbedRouteKey
+//  * @description Placeholder for moving a route key between tab/pinned collections in a destination panel.
+//  * @param store - Router store
+//  * @param routeKey - Route key to move
+//  * @param panelKey - Destination panel index
+//  * @param tabIndex - Destination tab index
+//  * @param tab - Destination collection ('pinned' or 'tab')
+//  * @returns Router store (currently unchanged)
+//  */
+// export const moveTabbedRouteKey = function <const Store extends AppSharedRouterStore>(
+//   store: Store,
+//   routeKey: keyof Store['routes'],
+//   panelKey: number,
+//   tabIndex: number,
+//   tab: 'pinned' | 'tab'
+// ): Store {
+//   if (!(routeKey in store.routes) || panelKey < 0 || panelKey >= store?.panels?.length) return store;
 
-  for (const panel of store.panels) {
-    if (panel.temporaryRouteKey === routeKey) {
-      panel.temporaryRouteKey = null;
-    }
+//   for (const panel of store.panels) {
+//     if (panel.temporaryRouteKey === routeKey) {
+//       panel.temporaryRouteKey = null;
+//     }
 
-    const tabbedIndex = panel.tabbedRouteKeys.indexOf(routeKey as AppRouterPanel['routeKey']);
-    if (tabbedIndex >= 0) {
-      panel.tabbedRouteKeys.splice(tabbedIndex, 1);
-    }
+//     const tabbedIndex = panel.tabbedRouteKeys.indexOf(routeKey as AppRouterPanel['routeKey']);
+//     if (tabbedIndex >= 0) {
+//       panel.tabbedRouteKeys.splice(tabbedIndex, 1);
+//     }
 
-    const pinnedIndex = panel.pinnedRouteKeys.indexOf(routeKey as AppRouterPanel['routeKey']);
-    if (pinnedIndex >= 0) {
-      panel.pinnedRouteKeys.splice(pinnedIndex, 1);
-    }
-  }
+//     const pinnedIndex = panel.pinnedRouteKeys.indexOf(routeKey as AppRouterPanel['routeKey']);
+//     if (pinnedIndex >= 0) {
+//       panel.pinnedRouteKeys.splice(pinnedIndex, 1);
+//     }
+//   }
 
-  const destinationPanel = store.panels[panelKey];
-  destinationPanel.routeKey = routeKey as Store['panels'][number]['routeKey'];
+//   const destinationPanel = store.panels[panelKey];
+//   destinationPanel.routeKey = routeKey as Store['panels'][number]['routeKey'];
 
-  if (tab === 'pinned') {
-    const insertionIndex = Math.min(Math.max(0, Math.trunc(tabIndex)), destinationPanel.pinnedRouteKeys.length);
-    destinationPanel.pinnedRouteKeys.splice(insertionIndex, 0, routeKey as AppRouterPanel['routeKey']);
-  } else {
-    const insertionIndex = Math.min(Math.max(0, Math.trunc(tabIndex)), destinationPanel.tabbedRouteKeys.length);
-    destinationPanel.tabbedRouteKeys.splice(insertionIndex, 0, routeKey as AppRouterPanel['routeKey']);
-  }
+//   if (tab === 'pinned') {
+//     const insertionIndex = Math.min(Math.max(0, Math.trunc(tabIndex)), destinationPanel.pinnedRouteKeys.length);
+//     destinationPanel.pinnedRouteKeys.splice(insertionIndex, 0, routeKey as AppRouterPanel['routeKey']);
+//   } else {
+//     const insertionIndex = Math.min(Math.max(0, Math.trunc(tabIndex)), destinationPanel.tabbedRouteKeys.length);
+//     destinationPanel.tabbedRouteKeys.splice(insertionIndex, 0, routeKey as AppRouterPanel['routeKey']);
+//   }
 
-  return store;
-};
+//   return store;
+// };
 
 //*****************************************************************************************
 // Blocked Routes
@@ -1443,6 +1577,144 @@ export const getHashFragmentsFromRouter = function (store: AppNavigationStore): 
     .filter((f): f is string => f !== null);
 };
 
+export const getNextTitleFromRoute = function (route: Pick<AppRouterRoute, 'href'>): string {
+  if (!route?.href) return null;
+
+  try {
+    const url = new URL(route.href, 'http://localhost');
+    const currentLocation = url.pathname.split('/').join(' ').trim();
+
+    if (!currentLocation) return null;
+    return `${currentLocation.charAt(0).toUpperCase()}${currentLocation.slice(1)}`;
+  } catch {
+    return null;
+  }
+};
+
+// export const getAppNavigationStoreFromRouterStore = function (
+//   navigation: AppNavigationStore,
+//   router: AppRouterStore
+// ): AppNavigationStore {
+//   navigation.id = router.id;
+
+//   for (let panelKey = 0; panelKey < router.panels.length; panelKey++) {
+//     const currentPanel = navigation.panels[panelKey];
+//     const nextPanel = router.panels[panelKey];
+
+//     if (currentPanel && deepCompare(currentPanel, nextPanel)) continue;
+//     navigation.panels[panelKey] = structuredClone(nextPanel);
+//   }
+
+//   for (let panelKey = navigation.panels.length - 1; panelKey >= router.panels.length; panelKey--) {
+//     navigation.panels.splice(panelKey, 1);
+//   }
+
+//   for (const [routeKey, nextRoute] of Object.entries(router.routes)) {
+//     const currentRoute = navigation.routes[routeKey];
+//     if (currentRoute && deepCompare(currentRoute, nextRoute)) continue;
+//     navigation.routes[routeKey] = structuredClone(nextRoute);
+//   }
+
+//   for (const routeKey of Object.keys(navigation.routes)) {
+//     if (routeKey in router.routes) continue;
+//     delete navigation.routes[routeKey];
+//   }
+
+//   for (const [nodeKey, node] of Object.entries(router.nodes)) {
+//     const nextNode = {
+//       routeKey: node.routeKey,
+//       lastUsedAt: node.lastUsedAt
+//     };
+
+//     if (nodeKey in navigation.nodes && deepCompare(navigation.nodes[nodeKey], nextNode)) continue;
+//     navigation.nodes[nodeKey] = nextNode;
+//   }
+
+//   for (const nodeKey of Object.keys(navigation.nodes)) {
+//     if (nodeKey in router.nodes) continue;
+//     delete navigation.nodes[nodeKey];
+//   }
+
+//   for (const routeKey of Object.keys(navigation.blockedRoutes)) {
+//     if (routeKey in navigation.routes) continue;
+//     navigation = removeBlockedRoute(navigation, routeKey);
+//   }
+
+//   return navigation;
+// };
+
+// export const getAppRouterStoreFromNavigationStore = function (
+//   router: AppRouterStore,
+//   navigation: AppNavigationStore
+// ): AppRouterStore {
+//   router.id = navigation.id;
+
+//   for (const [routeKey, nextRoute] of Object.entries(navigation.routes)) {
+//     const currentRoute = router.routes[routeKey];
+//     if (currentRoute && deepCompare(currentRoute, nextRoute)) continue;
+//     [router] = upsertRoute(router, routeKey, nextRoute);
+//   }
+
+//   for (const routeKey of Object.keys(router.routes)) {
+//     if (routeKey in navigation.routes) continue;
+//     router = removeRoute(router, routeKey);
+//   }
+
+//   for (let panelKey = 0; panelKey < navigation.panels.length; panelKey++) {
+//     const currentPanel = router.panels[panelKey];
+//     const nextPanel = navigation.panels[panelKey];
+
+//     if (currentPanel && deepCompare(currentPanel, nextPanel)) continue;
+//     router.panels[panelKey] = structuredClone(nextPanel);
+//   }
+
+//   for (let panelKey = router.panels.length - 1; panelKey >= navigation.panels.length; panelKey--) {
+//     router = removePanel(router, panelKey);
+//   }
+
+//   for (const [nodeKey, nextNode] of Object.entries(navigation.nodes)) {
+//     const currentNode = router.nodes[nodeKey];
+//     const nextRouteKey = nextNode.routeKey;
+
+//     if (currentNode && currentNode.routeKey === nextRouteKey && currentNode.lastUsedAt === nextNode.lastUsedAt) {
+//       continue;
+//     }
+
+//     [router] = upsertNode(router, nodeKey, {
+//       routeKey: nextRouteKey,
+//       lastUsedAt: nextNode.lastUsedAt,
+//       portal: currentNode?.portal || createReversePortalNode()
+//     });
+//   }
+
+//   for (const nodeKey of Object.keys(router.nodes)) {
+//     if (nodeKey in navigation.nodes) continue;
+//     router = removeNode(router, nodeKey);
+//   }
+
+//   router = filterOrphanedNodes(router);
+
+//   return router;
+// };
+
+// export const getAppLocationStateFromRouterStore = function (router: AppRouterStore): AppLocationState {
+//   const routes: AppLocationState['routes'] = {};
+
+//   for (const [routeKey, route] of Object.entries(router.routes)) {
+//     routes[routeKey] = {
+//       href: route.href,
+//       state: route.state,
+//       scroll: route.scroll
+//     };
+//   }
+
+//   return {
+//     id: router.id,
+//     panels: structuredClone(router.panels),
+//     routes
+//   };
+// };
+
 export const getLocationStateFromRouter = function (store: AppNavigationStore): AppLocationState {
   return {
     id: store.id,
@@ -1451,52 +1723,51 @@ export const getLocationStateFromRouter = function (store: AppNavigationStore): 
   };
 };
 
-export const areRouterStoreEqual = (current: AppRouterStore, next: AppRouterStore): boolean => {
-  const currentRouteKeys = Object.keys(current.routes);
-  const nextRouteKeys = Object.keys(next.routes);
+// export const areRouterStoreEqual = (current: AppRouterStore, next: AppRouterStore): boolean => {
+//   const currentRouteKeys = Object.keys(current.routes);
+//   const nextRouteKeys = Object.keys(next.routes);
 
-  if (currentRouteKeys.length !== nextRouteKeys.length) return false;
+//   if (currentRouteKeys.length !== nextRouteKeys.length) return false;
 
-  for (const routeKey of currentRouteKeys) {
-    if (!(routeKey in next.routes)) return false;
+//   for (const routeKey of currentRouteKeys) {
+//     if (!(routeKey in next.routes)) return false;
 
-    const currentRoute = current.routes[routeKey];
-    const nextRoute = next.routes[routeKey];
+//     const currentRoute = current.routes[routeKey];
+//     const nextRoute = next.routes[routeKey];
 
-    if (currentRoute?.age !== nextRoute?.age) return false;
-    if (currentRoute?.href !== nextRoute?.href) return false;
-    if (JSON.stringify(currentRoute?.state || {}) !== JSON.stringify(nextRoute?.state || {})) return false;
-  }
+//     if (currentRoute?.age !== nextRoute?.age) return false;
+//     if (currentRoute?.href !== nextRoute?.href) return false;
+//     if (JSON.stringify(currentRoute?.state || {}) !== JSON.stringify(nextRoute?.state || {})) return false;
+//   }
 
-  if (current.panels.length !== next.panels.length) return false;
+//   if (current.panels.length !== next.panels.length) return false;
 
-  for (let panelIndex = 0; panelIndex < current.panels.length; panelIndex++) {
-    const currentPanel = current.panels[panelIndex];
-    const nextPanel = next.panels[panelIndex];
+//   for (let panelIndex = 0; panelIndex < current.panels.length; panelIndex++) {
+//     const currentPanel = current.panels[panelIndex];
+//     const nextPanel = next.panels[panelIndex];
 
-    if (currentPanel?.routeKey !== nextPanel?.routeKey) return false;
-  }
+//     if (currentPanel?.routeKey !== nextPanel?.routeKey) return false;
+//   }
 
-  return true;
-};
+//   return true;
+// };
 
-export const cloneLocationStore = function <const Store extends AppLocationState>(store: Store): Store {
-  return {
-    id: store.id,
-    panels: structuredClone(store.panels),
-    routes: structuredClone(store.routes)
-  } as Store;
-};
+// export const cloneLocationStore = function <const Store extends AppSharedRouterStore>(store: Store): Store {
+//   return {
+//     id: store.id,
+//     panels: structuredClone(store.panels),
+//     routes: structuredClone(store.routes)
+//   } as Store;
+// };
 
 export const reconcileRouterFromNavigation = (
   router: AppRouterStore,
-  navigation: AppNavigationStore,
-  preferences: AppPreferenceStore
+  navigation: AppNavigationStore
 ): AppRouterStore => {
   router.id = navigation.id;
 
   for (const [routeKey, route] of Object.entries(navigation.routes)) {
-    [router] = upsertRoute(router, routeKey, route);
+    router = updateRouteFromNavigationRoute(router, routeKey, route);
   }
 
   for (const routeKey of Object.keys(router.routes)) {
@@ -1504,18 +1775,28 @@ export const reconcileRouterFromNavigation = (
     router = removeRoute(router, routeKey);
   }
 
-  for (const [panelKey, panel] of navigation.panels.entries()) {
-    [router] = upsertPanel(router, panelKey, panel, preferences);
+  router.panels = structuredClone(navigation.panels);
+
+  for (const [nodeKey, node] of Object.entries(navigation.nodes)) {
+    router.nodes[nodeKey] = {
+      routeKey: node.routeKey,
+      lastUsedAt: node.lastUsedAt,
+      portal: router.nodes[nodeKey]?.portal || createReversePortalNode()
+    };
   }
 
-  for (let panelKey = router.panels.length - 1; panelKey >= navigation.panels.length; panelKey--) {
-    router = removePanel(router, panelKey);
+  for (const nodeKey of Object.keys(router.nodes)) {
+    if (nodeKey in navigation.nodes) continue;
+    router = removeNode(router, nodeKey);
   }
 
   return router;
 };
 
-export const sanitizeRouterStore = (store: AppRouterStore, preferences: AppPreferenceStore): AppRouterStore => {
+export const sanitizeRouterStore = function <const Store extends AppSharedRouterStore>(
+  store: Store,
+  preferences: AppPreferenceStore
+): Store {
   store = sanitizePanels(store, preferences);
   store = sanitizeNodes(store, preferences);
   store = sanitizeRoutes(store);
@@ -1542,26 +1823,35 @@ export const getNavigationStoreFromRouter = (store: AppNavigationStore, router: 
   store.id = router.id;
   store.panels = structuredClone(router.panels);
   store.routes = structuredClone(router.routes);
+  store.nodes = Object.fromEntries(
+    Object.entries(router.nodes).map(([nodeKey, node]) => [
+      nodeKey,
+      { routeKey: node.routeKey, lastUsedAt: node.lastUsedAt }
+    ])
+  );
   return store;
 };
 
-export const setPartialNavigationStore = (
-  store: AppNavigationStore,
-  next: Partial<AppNavigationStore>
-): AppNavigationStore => {
-  const nextStore = getDefaultNavigationStore(next);
+// export const setPartialNavigationStore = (
+//   store: AppNavigationStore,
+//   next: Partial<AppNavigationStore>
+// ): AppNavigationStore => {
+//   const nextStore = getDefaultNavigationStore(next);
 
-  store.id = nextStore.id;
-  store.panels = structuredClone(nextStore.panels);
-  store.routes = structuredClone(nextStore.routes);
-  store.options.replace = nextStore.options.replace;
-  return store;
-};
+//   store.id = nextStore.id;
+//   store.panels = structuredClone(nextStore.panels);
+//   store.routes = structuredClone(nextStore.routes);
+//   store.options.replace = nextStore.options.replace;
+//   return store;
+// };
 
 export const clearNavigationStore = (store: AppNavigationStore): AppNavigationStore => {
   store.id = null;
   store.panels = [];
+  store.nodes = {};
   store.routes = {};
-  store.options.replace = false;
+  store.blockedRoutes = {};
+  store.options = getDefaultNavigateOptions();
+
   return store;
 };

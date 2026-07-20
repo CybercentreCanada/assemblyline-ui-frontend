@@ -2,6 +2,9 @@ import type { AppRouterStore } from 'core/router';
 import {
   addRouteToPanel,
   findNextPanelKey,
+  getAppLocationStateFromRouterStore,
+  getAppNavigationStoreFromRouterStore,
+  getAppRouterStoreFromNavigationStore,
   getDefaultRouterPanel,
   getDefaultRouterStore,
   getRouteFromPanelKey,
@@ -196,5 +199,142 @@ describe('panel route helpers', () => {
 
     expect(route.href).toBe('/submit');
     expect(route.state).toEqual({ source: 'test' });
+  });
+});
+
+//*****************************************************************************************
+// Store conversion helpers
+//*****************************************************************************************
+describe('store conversion helpers', () => {
+  it('reconciles AppNavigationStore from AppRouterStore', () => {
+    const router: AppRouterStore = {
+      ...getDefaultRouterStore(),
+      id: 'router-id',
+      panels: [{ ...getDefaultRouterPanel(), routeKey: 'r1' }],
+      nodes: {
+        n1: {
+          routeKey: 'r1',
+          portal: createReversePortalNode(),
+          lastUsedAt: 10
+        }
+      },
+      routes: {
+        r1: { digest: hashObject({ href: '/submit', state: null }), href: '/submit', state: null, age: 1 }
+      }
+    };
+
+    const navigation = {
+      id: 'old-id',
+      panels: [{ ...getDefaultRouterPanel(), routeKey: 'old' }],
+      nodes: {
+        n1: {
+          routeKey: 'old',
+          lastUsedAt: 1
+        }
+      },
+      routes: {
+        old: { digest: hashObject({ href: '/old', state: null }), href: '/old', state: null }
+      },
+      blockedRoutes: { stale: null },
+      options: {
+        hashScrollIntoView: false,
+        href: '',
+        ignoreBlocker: false,
+        reloadDocument: false,
+        replace: false,
+        resetScroll: false,
+        viewTransition: false
+      }
+    } as AppNavigationStore;
+
+    const nextNavigation = getAppNavigationStoreFromRouterStore(navigation, router);
+
+    expect(nextNavigation).toBe(navigation);
+    expect(navigation.id).toBe('router-id');
+    expect(navigation.panels[0].routeKey).toBe('r1');
+    expect(navigation.nodes.n1.routeKey).toBe('r1');
+    expect(navigation.nodes.n1.lastUsedAt).toBe(10);
+    expect(navigation.routes.r1.href).toBe('/submit');
+    expect('old' in navigation.routes).toBe(false);
+    expect('stale' in navigation.blockedRoutes).toBe(false);
+  });
+
+  it('reconciles AppRouterStore from AppNavigationStore', () => {
+    const navigation = {
+      id: 'navigation-id',
+      panels: [{ ...getDefaultRouterPanel(), routeKey: 'r1' }],
+      nodes: {
+        n1: {
+          routeKey: 'r1',
+          lastUsedAt: 20
+        }
+      },
+      routes: {
+        r1: { digest: hashObject({ href: '/submit', state: null }), href: '/submit', state: null, age: 2 }
+      },
+      blockedRoutes: {},
+      options: {
+        hashScrollIntoView: false,
+        href: '',
+        ignoreBlocker: false,
+        reloadDocument: false,
+        replace: false,
+        resetScroll: false,
+        viewTransition: false
+      }
+    } as AppNavigationStore;
+
+    const router: AppRouterStore = {
+      ...getDefaultRouterStore(),
+      id: 'old-router-id',
+      panels: [{ ...getDefaultRouterPanel(), routeKey: 'old' }],
+      nodes: {
+        stale: {
+          routeKey: 'old',
+          portal: createReversePortalNode(),
+          lastUsedAt: 5
+        }
+      },
+      routes: {
+        old: { digest: hashObject({ href: '/old', state: null }), href: '/old', state: null, age: 1 }
+      }
+    };
+
+    const nextRouter = getAppRouterStoreFromNavigationStore(router, navigation);
+
+    expect(nextRouter).toBe(router);
+    expect(router.id).toBe('navigation-id');
+    expect(router.panels[0].routeKey).toBe('r1');
+    expect(router.nodes.n1.routeKey).toBe('r1');
+    expect(router.nodes.n1.lastUsedAt).toBe(20);
+    expect(router.nodes.n1.portal).toBeDefined();
+    expect(router.routes.r1.href).toBe('/submit');
+    expect('old' in router.routes).toBe(false);
+    expect('stale' in router.nodes).toBe(false);
+  });
+
+  it('converts AppRouterStore to AppLocationState', () => {
+    const router: AppRouterStore = {
+      ...getDefaultRouterStore(),
+      id: 'router-location-id',
+      panels: [{ ...getDefaultRouterPanel(), routeKey: 'r1' }],
+      routes: {
+        r1: {
+          digest: hashObject({ href: '/submit', state: { foo: 'bar' } }),
+          href: '/submit',
+          state: { foo: 'bar' },
+          scroll: 15,
+          age: 3
+        }
+      }
+    };
+
+    const locationState = getAppLocationStateFromRouterStore(router);
+
+    expect(locationState.id).toBe('router-location-id');
+    expect(locationState.panels[0].routeKey).toBe('r1');
+    expect(locationState.routes.r1.href).toBe('/submit');
+    expect(locationState.routes.r1.state).toEqual({ foo: 'bar' });
+    expect(locationState.routes.r1.scroll).toBe(15);
   });
 });

@@ -12,7 +12,6 @@ export type AppRouteLayoutProviderProps = PropsWithChildren<{
 
 export const AppRouteLayoutProvider = memo(({ routeKey, children }: AppRouteLayoutProviderProps) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const lastScrollTopRef = useRef<number>(0);
   const lastPanelKeyRef = useRef<number>(-1);
 
   const scrollPosition = useAppRouterStore(s => s?.routes?.[routeKey]?.scroll ?? null);
@@ -54,9 +53,34 @@ export const AppRouteLayoutProvider = memo(({ routeKey, children }: AppRouteLayo
       // Priority 3: Scroll to top (targetScroll = 0, already set)
     }
 
-    scrollContainer.scrollTop = targetScroll;
-    lastScrollTopRef.current = targetScroll;
-    scrollContainer.style.visibility = 'visible';
+    let frameId = 0;
+    let attempts = 0;
+
+    const applyScroll = () => {
+      if (!scrollContainerRef.current) return;
+
+      scrollContainerRef.current.scrollTop = targetScroll;
+
+      // During panel migration, layout can settle on a later frame.
+      // Retry briefly until the desired offset is reachable.
+      const isApplied = targetScroll === 0 || Math.abs(scrollContainerRef.current.scrollTop - targetScroll) <= 1;
+      attempts += 1;
+
+      if (isApplied || attempts >= 6) {
+        scrollContainerRef.current.style.visibility = 'visible';
+        return;
+      }
+
+      frameId = window.requestAnimationFrame(applyScroll);
+    };
+
+    frameId = window.requestAnimationFrame(applyScroll);
+
+    return () => {
+      if (frameId) {
+        window.cancelAnimationFrame(frameId);
+      }
+    };
   }, [panelKey, scrollPosition, href]);
 
   return (

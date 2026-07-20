@@ -43,6 +43,8 @@ export type InferAppRouteTransientFromPath<Origin extends AppRoute['route']> =
 /** Snapshot of pre-calculated route values resolved from the current location state. */
 // prettier-ignore
 export type InferAppRouteParamFromPath<Origin extends AppRoute['route']> = {
+  /** router route digest value */
+  digest: string;
   /** Route path */
   route: Origin;
   /** Parsed path params derived from the current location. */

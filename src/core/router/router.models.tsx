@@ -106,6 +106,8 @@ export type AppNavigateOptions = {
   href?: string;
   // `ignoreBlocker` is a boolean that determines if navigation should ignore any blockers that might prevent it.
   ignoreBlocker?: boolean;
+  // `nextTitle` defines the next document title
+  nextTitle?: string;
   // `reloadDocument` is a boolean that determines if navigation to a route inside of router will trigger a full page load instead of the traditional SPA navigation.
   reloadDocument?: boolean;
   // `replace` is a boolean that determines whether the navigation should replace the current history entry or push a new one.
@@ -157,4 +159,16 @@ export type AppNavigationStore = {
   blockedRoutes: AppRouterBlockedRoutes;
   /** Check if this navigation should replace the current history entry */
   options?: AppNavigateOptions;
+};
+
+/**
+ * Compatible overlap between router and navigation stores.
+ * Keeps only shared keys and narrows each key to the mutually usable shape.
+ */
+export type AppSharedRouterStore = {
+  [Key in keyof AppRouterStore & keyof AppNavigationStore]: AppRouterStore[Key] extends AppNavigationStore[Key]
+    ? AppNavigationStore[Key]
+    : AppNavigationStore[Key] extends AppRouterStore[Key]
+      ? AppRouterStore[Key]
+      : never;
 };

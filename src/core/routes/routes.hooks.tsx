@@ -2,7 +2,13 @@ import type { Theme } from '@mui/material';
 import { useTheme } from '@mui/material';
 import { debounce } from '@tanstack/react-pacer';
 import { useAppPreferenceStore } from 'core/preference';
-import { findNextPanelKey, findPanelKey, findPrevPanelKey, getPanel, useAppRouterStore } from 'core/router';
+import {
+  findNextPanelKeyFromRouteKey,
+  findPanelKeyFromRouteKey,
+  findPrevPanelKeyFromRouteKey,
+  getPanel,
+  useAppRouterStore
+} from 'core/router';
 import type {
   AppRouteKeyStore,
   InferAppRouteParamFromPath,
@@ -11,8 +17,8 @@ import type {
 } from 'core/routes';
 import {
   evaluateMediaQuery,
-  findRouteParamFromKey,
   findRouteSpecFromKey,
+  getRouteParamFromKey,
   parseMediaQuery,
   useAppLocationParamStore,
   useAppRouteKeyStore
@@ -55,16 +61,16 @@ export const useAppLocation = function <const Origin extends AppRoute['route']>(
     switch (target) {
       case 'from':
         if (!preferences) return null;
-        nextPanelKey = findPrevPanelKey(s, routeKey, preferences);
+        nextPanelKey = findPrevPanelKeyFromRouteKey(s, routeKey, preferences);
         break;
 
       case 'here':
-        nextPanelKey = findPanelKey(s, { routeKey });
+        nextPanelKey = findPanelKeyFromRouteKey(s, routeKey);
         break;
 
       case 'to':
         if (!preferences) return null;
-        nextPanelKey = findNextPanelKey(s, routeKey, preferences);
+        nextPanelKey = findNextPanelKeyFromRouteKey(s, routeKey, preferences);
         break;
 
       case 'at':
@@ -76,7 +82,7 @@ export const useAppLocation = function <const Origin extends AppRoute['route']>(
   });
 
   const param = useAppLocationParamStore(s =>
-    !targetRouteKey ? null : findRouteParamFromKey<Origin>(s, targetRouteKey)
+    !targetRouteKey ? null : getRouteParamFromKey<Origin>(s, targetRouteKey)
   );
 
   return function <Selected = InferAppRouteParamFromPath<Origin>>(
@@ -96,7 +102,7 @@ export function useAppPathParams<
   const Origin extends AppRoute['route']
 >(): InferAppRouteValuesFromPath<Origin>['path'] {
   const routeKey = useAppRouteKey();
-  return useAppLocationParamStore(s => findRouteParamFromKey<Origin>(s, routeKey)?.path);
+  return useAppLocationParamStore(s => getRouteParamFromKey<Origin>(s, routeKey)?.path);
 }
 
 /**
@@ -108,7 +114,7 @@ export function useAppSearchParams<
   const Origin extends AppRoute['route']
 >(): InferAppRouteValuesFromPath<Origin>['search'] {
   const routeKey = useAppRouteKey();
-  return useAppLocationParamStore(s => findRouteParamFromKey<Origin>(s, routeKey)?.search);
+  return useAppLocationParamStore(s => getRouteParamFromKey<Origin>(s, routeKey)?.search);
 }
 
 /**
@@ -123,7 +129,7 @@ export function useAppSearchSnapshot<const Origin extends AppRoute['route']>(): 
   const routeKey = useAppRouteKey();
 
   const searchParam = useAppLocationParamStore(s =>
-    !routeKey ? null : findRouteParamFromKey<Origin>(s, routeKey)?.search
+    !routeKey ? null : getRouteParamFromKey<Origin>(s, routeKey)?.search
   );
   const searchEngine = useAppLocationParamStore(s =>
     !routeKey ? null : findRouteSpecFromKey<Origin>(s, routeKey)?.search
@@ -147,7 +153,7 @@ export function useAppHashParams<const Origin extends AppRoute['route']>():
   | InferAppRouteParamFromPath<Origin>['hash']
   | undefined {
   const routeKey = useAppRouteKey();
-  return useAppLocationParamStore(s => findRouteParamFromKey<Origin>(s, routeKey)?.hash);
+  return useAppLocationParamStore(s => getRouteParamFromKey<Origin>(s, routeKey)?.hash);
 }
 
 /**
