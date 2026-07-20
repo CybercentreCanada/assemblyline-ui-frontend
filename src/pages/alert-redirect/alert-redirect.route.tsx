@@ -6,7 +6,7 @@ import { SearchParser } from 'pages/alerts/utils/SearchParser';
 import { memo, useMemo } from 'react';
 import { Navigate } from 'react-router';
 
-export const AlertsRedirectPage = memo(() => {
+export const AlertRedirectPage = memo(() => {
   const parser = useMemo(() => new SearchParser<AlertSearchParams>(ALERT_DEFAULT_PARAMS, { enforced: ['rows'] }), []);
   const storageData = useMemo(() => new URLSearchParams(localStorage.getItem(ALERT_STORAGE_KEY) || ''), []);
   const search = useMemo(() => parser.deltaParams(storageData), [parser, storageData]);
@@ -28,7 +28,7 @@ export const AlertsRedirectPage = memo(() => {
   else return <Navigate to={`/alerts?${search.toString()}`} replace />;
 });
 
-export const AlertsRedirectRoute = createAppRoute({
-  component: AlertsRedirectPage,
+export const AlertRedirectRoute = createAppRoute({
+  component: AlertRedirectPage,
   route: '/alerts-redirect'
 });

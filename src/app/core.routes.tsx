@@ -1,6 +1,6 @@
 import { AccountRoute } from 'pages/account/account.route';
 import { AlertDetailRoute } from 'pages/alert-detail/alert-detail.route';
-import { AlertsRedirectRoute } from 'pages/alerts-redirect/alerts-redirect.route';
+import { AlertRedirectRoute } from 'pages/alert-redirect/alert-redirect.route';
 import { AlertsRoute } from 'pages/alerts/alerts.route';
 import { DashboardRoute } from 'pages/dashboard/dashboard.route';
 import { DevelopmentAPIRoute } from 'pages/development-api/development-api.route';
@@ -40,7 +40,7 @@ export const APP_ROUTES = [
   // New
   AccountRoute,
   AlertDetailRoute,
-  AlertsRedirectRoute,
+  AlertRedirectRoute,
   AlertsRoute,
   DashboardRoute,
   DevelopmentAPIRoute,
