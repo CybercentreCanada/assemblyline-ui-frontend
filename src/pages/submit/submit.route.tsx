@@ -257,7 +257,7 @@ const WrappedSubmitRoute = memo(() => {
     form.setFieldValue('settings.default_external_sources', getDefaultExternalSources(settings, configuration));
 
     const search = searchSnapshot?.toParams() ?? new URLSearchParams();
-    const state = location.state || {};
+    const state = (location.state || {}) as SubmitState;
 
     setClassificationFromURL(state, search);
     setHashFromURL(state, search);
