@@ -230,10 +230,12 @@ export const getRouteFromParam = function <const Origin extends AppRoute['route'
   store: AppLocationParamStore,
   param: InferAppRouteParamFromPath<Origin>
 ): AppRouterRoute {
-  if (!param?.route) return getNotFoundRouterRoute(param);
+  if (!param?.route)
+    return getNotFoundRouterRoute({ route: param?.route, path: param?.path, search: param?.search, hash: param?.hash });
 
   const spec = findRouteSpecFromParam<Origin>(store, param);
-  if (!spec?.route) return getNotFoundRouterRoute(param);
+  if (!spec?.route)
+    return getNotFoundRouterRoute({ route: param?.route, path: param?.path, search: param?.search, hash: param?.hash });
 
   const pathname = getLocationPathnameFromParam(spec, param);
   const [search, state, transient] = getLocationSearchFromParam(spec, param);
@@ -258,7 +260,8 @@ export const getRouteFromLocation = function (
   const href = `${location.pathname}${location.search || ''}${location.hash || ''}`;
   const route = getDefaultRouterRoute({ href, state: location.state });
   const spec = findRouteSpecFromRoute(store, route);
-  if (!spec?.route) return getNotFoundRouterRoute(route);
+  if (!spec?.route)
+    return getNotFoundRouterRoute({ href: route?.href, state: route?.state, transient: route?.transient });
 
   route.digest = getRouteDigestFromRoute(route);
   return route;
@@ -400,7 +403,9 @@ export const getRouteParamFromRoute = function <const Origin extends AppRoute['r
 
 export const sanitizeRoute = function (store: AppLocationParamStore, route: AppRouterRoute): AppRouterRoute {
   const param = getRouteParamFromRoute(store, route);
-  return !param?.route ? getNotFoundRouterRoute(route) : getRouteFromParam(store, param);
+  return !param?.route
+    ? getNotFoundRouterRoute({ route: param?.route, path: param?.path, search: param?.search, hash: param?.hash })
+    : getRouteFromParam(store, param);
 };
 
 // export const getRouteParamFromValues = function <const Origin extends AppRoute['route']>(

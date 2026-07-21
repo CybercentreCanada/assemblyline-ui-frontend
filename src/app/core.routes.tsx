@@ -18,6 +18,7 @@ import { HelpClassificationRoute } from 'pages/help-classification/help-classifi
 import { HelpConfigurationRoute } from 'pages/help-configuration/help-configuration.route';
 import { HelpSearchRoute } from 'pages/help-search/help-search.route';
 import { HelpServicesRoute } from 'pages/help-services/help-services.route';
+import { NotFoundRoute } from 'pages/not-found/not-found.route';
 import { SearchRootRoute, SearchRoute } from 'pages/search/search.route';
 import { SettingsRootRoute, SettingsRoute } from 'pages/settings/settings.route';
 import { SubmissionDetailRoute } from 'pages/submission-detail/submission-detail.route';
@@ -63,6 +64,7 @@ export const APP_ROUTES = [
   HelpConfigurationRoute,
   HelpSearchRoute,
   HelpServicesRoute,
+  NotFoundRoute,
   SearchRootRoute,
   SearchRoute,
   SettingsRootRoute,

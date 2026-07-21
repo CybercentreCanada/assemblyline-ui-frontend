@@ -2,5 +2,7 @@
   "description": "La page que vous recherchez est introuvable ...",
   "dl.alt": "Link mort",
   "dl.description": "On dirait que ce 'Link' est mort...",
+  "values.none": "Aucune valeur de route n'a ete fournie.",
+  "values.unserializable": "Impossible de serialiser les valeurs de route non resolues.",
   "title": "404: Introuvable"
 }

@@ -695,14 +695,14 @@ export const getDefaultRouterRoute = function (route: Partial<AppRouterRoute> = 
   };
 };
 
-export const getNotFoundRouterRoute = function (value: unknown = null): AppRouterRoute {
+export const getNotFoundRouterRoute = function (values: object = null): AppRouterRoute {
   return {
     age: 0,
-    digest: null,
+    digest: 'not-found',
     href: '/not-found',
     scroll: null,
     state: null,
-    transient: value
+    transient: { values: { ...values } }
   };
 };
 

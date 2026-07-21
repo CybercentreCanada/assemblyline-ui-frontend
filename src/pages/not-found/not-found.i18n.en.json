@@ -2,5 +2,7 @@
   "description": "The page you are looking for cannot be found...",
   "dl.alt": "Dead Link",
   "dl.description": "Looks like this 'Link' is dead...",
+  "values.none": "No route values were provided.",
+  "values.unserializable": "Unable to serialize unresolved route values.",
   "title": "404: Not found"
 }

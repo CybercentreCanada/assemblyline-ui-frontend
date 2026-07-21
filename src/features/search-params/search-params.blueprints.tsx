@@ -686,6 +686,10 @@ export class ObjectSearchParamBlueprint<
   }
 
   private mergeValue(base: O, next: O): O {
+    if (!this.isObjectValue(next)) {
+      return this.clone(base);
+    }
+
     const merged = this.clone(base) as unknown as Record<string, unknown>;
 
     for (const [key, nextValue] of Object.entries(next as Record<string, unknown>)) {
@@ -716,6 +720,10 @@ export class ObjectSearchParamBlueprint<
   }
 
   private deltaValue(base: O, next: O): Partial<O> {
+    if (!this.isObjectValue(next)) {
+      return {} as Partial<O>;
+    }
+
     const delta = {} as Partial<O>;
 
     for (const [key, value] of Object.entries(next)) {
@@ -780,6 +788,19 @@ export class ObjectSearchParamBlueprint<
     params: URLSearchParams | InferSearchParamValueMapFromBlueprintMap<SearchParamBlueprints>
   ): InferSearchParamValueMapFromBlueprintMap<SearchParamBlueprints> {
     const value = this.get(params);
+    if (value === null || value === undefined) {
+      if (!this._locked && this.isNullable()) {
+        (prev as Record<string, SearchParamValue>)[this._key] = null;
+        return prev;
+      }
+
+      if (this.valid(this._defaultValue)) {
+        (prev as Record<string, SearchParamValue>)[this._key] = this.clone(this._defaultValue);
+      }
+
+      return prev;
+    }
+
     if (!this._locked && this.valid(value)) {
       (prev as Record<string, SearchParamValue>)[this._key] = this.mergeValue(this._defaultValue || ({} as O), value);
       return prev;
@@ -798,6 +819,13 @@ export class ObjectSearchParamBlueprint<
   ): InferSearchParamValueMapFromBlueprintMap<SearchParamBlueprints> {
     const value = this.get(params);
     if (this._locked || !this.valid(value)) return prev;
+
+    if (value === null || value === undefined) {
+      if (!this.isEqual(this._defaultValue, null)) {
+        (prev as Record<string, SearchParamValue>)[this._key] = null;
+      }
+      return prev;
+    }
 
     const delta = this.deltaValue(this._defaultValue || ({} as O), value);
     if (Object.keys(delta).length === 0) return prev;
