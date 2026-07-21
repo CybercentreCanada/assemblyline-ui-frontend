@@ -695,6 +695,17 @@ export const getDefaultRouterRoute = function (route: Partial<AppRouterRoute> = 
   };
 };
 
+export const getNotFoundRouterRoute = function (value: unknown = null): AppRouterRoute {
+  return {
+    age: 0,
+    digest: null,
+    href: '/not-found',
+    scroll: null,
+    state: null,
+    transient: value
+  };
+};
+
 export const getRouteDigestFromRoute = function (
   route: Pick<AppRouterRoute, 'href' | 'state' | 'transient'>
 ): AppRouterRoute['digest'] {
@@ -1478,11 +1489,14 @@ export const hasBlockedRoutes = (store: AppNavigationStore): boolean => {
 export type ExtractNavReturn<Origin extends AppRoute['route']> = {
   target: 'from' | 'here' | 'to' | 'at' | null;
   panelKey: number | null;
-  operation: 'create' | 'update' | 'delete' | null;
+  operation: 'create' | 'update' | 'search' | 'only' | 'closePanel' | null;
   options: AppNavigateOptions;
   dispatch:
     | InferAppNavigationOperationMapFromPath<Origin>['create']
     | InferAppNavigationOperationMapFromPath<Origin>['update']
+    | InferAppNavigationOperationMapFromPath<Origin>['search']
+    | InferAppNavigationOperationMapFromPath<Origin>['only']
+    | InferAppNavigationOperationMapFromPath<Origin>['closePanel']
     | null;
 };
 
@@ -1531,12 +1545,26 @@ export const resolveNavigationIntent = function <const Origin extends AppRoute['
       operation = 'update';
       dispatch = operationDispatch;
     },
-    delete: () => {
+    search: (operationDispatch: InferAppNavigationOperationMapFromPath<Origin>['search']) => {
       target = key;
       panelKey = atPanelKey;
       options = operationOptions;
-      operation = 'delete';
-      dispatch = null;
+      operation = 'search';
+      dispatch = operationDispatch;
+    },
+    only: (operationDispatch: InferAppNavigationOperationMapFromPath<Origin>['only']) => {
+      target = key;
+      panelKey = atPanelKey;
+      options = operationOptions;
+      operation = 'only';
+      dispatch = operationDispatch;
+    },
+    closePanel: (operationDispatch: InferAppNavigationOperationMapFromPath<Origin>['closePanel']) => {
+      target = key;
+      panelKey = atPanelKey;
+      options = operationOptions;
+      operation = 'closePanel';
+      dispatch = operationDispatch;
     }
   });
 

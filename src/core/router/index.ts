@@ -1,5 +1,5 @@
-export { AppLink, AppNavigate, WrappedAppLink, WrappedAppNavigate } from './router.components';
-export type { AppLinkProps, AppNavigateProps } from './router.components';
+export { AppLink, AppNavigate, AppNavigateBlocker, WrappedAppLink, WrappedAppNavigate } from './router.components';
+export type { AppLinkProps, AppNavigateBlockerProps, AppNavigateProps } from './router.components';
 export {
   useAppBlocker,
   useAppBlockNavigation,
@@ -22,6 +22,7 @@ export type {
   AppRouterState,
   AppRouterStore,
   AppSharedRouterStore,
+  InferAppNavigationInputFromPath,
   InferAppNavigationOperationMapFromPath,
   InferAppNavigationPropsFromPath,
   RouteKeyOf
@@ -74,6 +75,7 @@ export {
   getLocationStateFromRouter,
   getNavigationStoreFromRouter,
   getNextTitleFromRoute,
+  getNotFoundRouterRoute,
   getPanel,
   getRouteDigestFromRoute,
   getRouteFromPanelKey,
@@ -104,7 +106,9 @@ export {
   updateNode,
   updatePanel,
   updateRoute,
+  updateRouteFromNavigationRoute,
   upsertNode,
   upsertPanel,
   upsertRoute
 } from './router.utils';
+export type { ExtractNavReturn } from './router.utils';

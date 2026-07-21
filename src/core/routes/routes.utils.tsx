@@ -1,5 +1,5 @@
-import type { AppRouterRoute, AppRouterState, AppRouterStore } from 'core/router';
-import { getDefaultRouterRoute, getRouteDigestFromRoute } from 'core/router';
+import type { AppRouterRoute, AppRouterState, AppRouterStore, InferAppNavigationInputFromPath } from 'core/router';
+import { getDefaultRouterRoute, getNotFoundRouterRoute, getRouteDigestFromRoute } from 'core/router';
 import type {
   AppLocationParamStore,
   InferAppRouteParamFromPath,
@@ -11,7 +11,7 @@ import { createHashParamCodec } from 'features/hash-params';
 import { createPathParamsCodec } from 'features/path-params';
 import type { SearchParamBlueprintMap, SearchParamValueMap } from 'features/search-params';
 import { SearchParamEngine } from 'features/search-params';
-import type { Location } from 'react-router';
+import type { Location, Location as ReactRouterLocation } from 'react-router';
 import { matchPath } from 'react-router';
 import type { StoreApi } from 'zustand/vanilla';
 
@@ -230,10 +230,10 @@ export const getRouteFromParam = function <const Origin extends AppRoute['route'
   store: AppLocationParamStore,
   param: InferAppRouteParamFromPath<Origin>
 ): AppRouterRoute {
-  if (!param?.route) return getDefaultRouterRoute(); // TODO: change this to not-found
+  if (!param?.route) return getNotFoundRouterRoute(param);
 
   const spec = findRouteSpecFromParam<Origin>(store, param);
-  if (!spec?.route) return getDefaultRouterRoute(); // TODO: change this to not-found
+  if (!spec?.route) return getNotFoundRouterRoute(param);
 
   const pathname = getLocationPathnameFromParam(spec, param);
   const [search, state, transient] = getLocationSearchFromParam(spec, param);
@@ -247,6 +247,70 @@ export const getRouteFromParam = function <const Origin extends AppRoute['route'
 
   route.digest = getRouteDigestFromRoute(route);
   return route;
+};
+
+export const getRouteFromLocation = function (
+  store: AppLocationParamStore,
+  location: ReactRouterLocation
+): AppRouterRoute {
+  if (!location?.pathname) return getNotFoundRouterRoute(location);
+
+  const href = `${location.pathname}${location.search || ''}${location.hash || ''}`;
+  const route = getDefaultRouterRoute({ href, state: location.state });
+  const spec = findRouteSpecFromRoute(store, route);
+  if (!spec?.route) return getNotFoundRouterRoute(route);
+
+  route.digest = getRouteDigestFromRoute(route);
+  return route;
+};
+
+export const getRouteFromURL = function (store: AppLocationParamStore, url: string): AppRouterRoute {
+  if (!url?.trim()) return getNotFoundRouterRoute({ url });
+
+  try {
+    const parsed = new URL(url, 'http://localhost');
+    return getRouteFromLocation(store, {
+      key: 'default',
+      pathname: parsed.pathname,
+      search: parsed.search,
+      hash: parsed.hash,
+      state: null
+    });
+  } catch {
+    return getNotFoundRouterRoute({ url });
+  }
+};
+
+export const isNavigationInputRouteParam = function <const Origin extends AppRoute['route']>(
+  input: InferAppNavigationInputFromPath<Origin>
+): input is InferAppRouteValuesFromPath<Origin> {
+  if (typeof input !== 'object' || input == null) return false;
+  if (!('route' in input)) return false;
+  return typeof input.route === 'string';
+};
+
+export const isNavigationInputLocation = function <const Origin extends AppRoute['route']>(
+  input: InferAppNavigationInputFromPath<Origin>
+): input is ReactRouterLocation {
+  if (typeof input !== 'object' || input == null) return false;
+  if (!('pathname' in input) || !('search' in input) || !('hash' in input)) return false;
+  return typeof input.pathname === 'string' && typeof input.search === 'string' && typeof input.hash === 'string';
+};
+
+export const isNavigationInputString = function <const Origin extends AppRoute['route']>(
+  input: InferAppNavigationInputFromPath<Origin>
+): input is string {
+  return typeof input === 'string';
+};
+
+export const getRouteFromInput = function <const Origin extends AppRoute['route']>(
+  store: AppLocationParamStore,
+  input: InferAppNavigationInputFromPath<Origin>
+): AppRouterRoute {
+  if (isNavigationInputString<Origin>(input)) return getRouteFromURL(store, input);
+  else if (isNavigationInputLocation<Origin>(input)) return getRouteFromLocation(store, input);
+  else if (isNavigationInputRouteParam<Origin>(input)) return getRouteFromParam<Origin>(store, input as never);
+  else return getNotFoundRouterRoute(input);
 };
 
 // export const getRouteFromLocation = function (location: Location): AppRouterRoute {
@@ -336,7 +400,7 @@ export const getRouteParamFromRoute = function <const Origin extends AppRoute['r
 
 export const sanitizeRoute = function (store: AppLocationParamStore, route: AppRouterRoute): AppRouterRoute {
   const param = getRouteParamFromRoute(store, route);
-  return !param?.route ? getDefaultRouterRoute() : getRouteFromParam(store, param);
+  return !param?.route ? getNotFoundRouterRoute(route) : getRouteFromParam(store, param);
 };
 
 // export const getRouteParamFromValues = function <const Origin extends AppRoute['route']>(

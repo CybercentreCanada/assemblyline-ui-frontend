@@ -20,6 +20,7 @@ import {
   getAppNavigationStateFromApi,
   getAppRouterStateFromApi,
   getDefaultNavigateOptions,
+  getDefaultRouterRoute,
   getHashFragmentsFromRouter,
   getLocationStateFromRouter,
   getNavigationStoreFromRouter,
@@ -30,13 +31,9 @@ import {
   removeBlockedRoute,
   removePanel,
   resolveNavigationIntent,
-  sanitizeNodes,
-  sanitizePanels,
   sanitizeRouterStore,
-  sanitizeRoutes,
   setRouteScrollPositions,
   shouldUpdateRoute,
-  updatePanel,
   updateRoute,
   upsertPanel,
   upsertRoute,
@@ -45,21 +42,25 @@ import {
   useAppSetNavigationStore,
   useAppSetRouterStore
 } from 'core/router';
+import type { InferAppRouteSpecFromPath } from 'core/routes';
 import {
+  findRouteSpecFromKey,
   findRouteSpecFromRoute,
   getAppLocationParamStateFromApi,
   getExternalHrefFromRoute,
+  getRouteFromInput,
   getRouteFromParam,
   getRouteParamFromKey,
   sanitizeRoute,
   useAppLocationParamStoreApi,
   useAppRouteKey
 } from 'core/routes';
+import type { InferSearchParamSnapshotFromEngine } from 'features/search-params';
 import type { DependencyList } from 'react';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import type { Location, NavigateOptions } from 'react-router';
 import { useLocation, useNavigate } from 'react-router';
-import { generateRandomUUID, hashObject } from 'shared/utils/app.utils';
+import { generateRandomUUID } from 'shared/utils/app.utils';
 
 //*****************************************************************************************
 // useAppExternalHref
@@ -85,7 +86,8 @@ export const useAppExternalHref = function <const Origin extends AppRoute['route
       const { target, panelKey, operation, options, dispatch } = resolveNavigationIntent<Origin>(nav);
 
       if (options?.href) return options.href;
-      if (!target || !operation || operation === 'delete' || !dispatch) return null;
+      if (!target || !operation) return null;
+      if (operation === 'closePanel' || !dispatch) return null;
 
       const locationState = getAppLocationParamStateFromApi(locationParamStoreApi);
       const preferenceState = getAppPreferenceStateFromApi(preferenceStoreApi);
@@ -93,9 +95,45 @@ export const useAppExternalHref = function <const Origin extends AppRoute['route
 
       const resolveHref = (resolvedPanelKey: number): AppRouterRoute['href'] => {
         const prevRouteKey = findRouteKeyFromPanelKey(routerState, resolvedPanelKey);
+        const prevRoute = routerState.routes?.[prevRouteKey];
         const prevRouteParams = getRouteParamFromKey<Origin>(locationState, prevRouteKey);
-        const nextRouteParams = applyNavigationDispatch(dispatch, prevRouteParams as never) as never;
-        const nextRoute = getRouteFromParam(locationState, nextRouteParams);
+        if (!prevRoute || !prevRouteParams) return null;
+
+        if (operation === 'search') {
+          const prevRouteSpec = findRouteSpecFromKey<Origin>(locationState, prevRouteKey);
+          const prevSnapshot = prevRouteSpec.search.fromRoute(
+            prevRoute.href,
+            prevRoute.state,
+            prevRoute.transient
+          ) as InferSearchParamSnapshotFromEngine<InferAppRouteSpecFromPath<Origin>['search']>;
+
+          const nextSnapshot = applyNavigationDispatch(
+            dispatch as InferAppNavigationOperationMapFromPath<Origin>['search'],
+            prevSnapshot
+          );
+
+          const nextRouteParam = {
+            ...prevRouteParams,
+            search: nextSnapshot.toObject()
+          };
+
+          const nextRoute = getRouteFromParam(locationState, nextRouteParam as never);
+          return getExternalHrefFromRoute(locationState, nextRoute);
+        }
+
+        const nextRouteInput = applyNavigationDispatch(
+          dispatch as
+            | InferAppNavigationOperationMapFromPath<Origin>['create']
+            | InferAppNavigationOperationMapFromPath<Origin>['update']
+            | InferAppNavigationOperationMapFromPath<Origin>['only'],
+          prevRouteParams as never
+        ) as never;
+
+        const nextRoute =
+          operation === 'only'
+            ? getRouteFromParam(locationState, nextRouteInput)
+            : getRouteFromInput(locationState, nextRouteInput);
+
         return getExternalHrefFromRoute(locationState, nextRoute);
       };
 
@@ -141,7 +179,7 @@ export function useAppNavigate<const Origin extends AppRoute['route']>() {
       const prevRouteKey = findRouteKeyFromPanelKey(routerState, destinationPanelKey);
       const prevRouteParam = getRouteParamFromKey<Origin>(locationState, prevRouteKey);
       const nextRouteParam = applyNavigationDispatch(dispatch, prevRouteParam as never) as never;
-      const nextRoute = getRouteFromParam<Destination>(locationState, nextRouteParam);
+      const nextRoute = getRouteFromInput<Destination>(locationState, nextRouteParam);
 
       if (!shouldUpdateRoute(routerState, prevRouteKey, nextRoute)) return;
 
@@ -173,7 +211,7 @@ export function useAppNavigate<const Origin extends AppRoute['route']>() {
       const prevRouteKey = findRouteKeyFromPanelKey(routerState, destinationPanelKey);
       const prevRouteParam = getRouteParamFromKey<Origin>(locationState, prevRouteKey);
       const nextRouteParam = applyNavigationDispatch(dispatch, prevRouteParam as never) as never;
-      const nextRoute = getRouteFromParam<Destination>(locationState, nextRouteParam);
+      const nextRoute = getRouteFromInput<Destination>(locationState, nextRouteParam);
 
       if (!shouldUpdateRoute(routerState, prevRouteKey, nextRoute)) return;
 
@@ -191,10 +229,82 @@ export function useAppNavigate<const Origin extends AppRoute['route']>() {
     [locationParamStoreApi, preferenceStoreApi, routerStoreApi, setNavigationStore]
   );
 
-  const del = useCallback(
+  const search = useCallback(
     function <const Destination extends AppRoute['route'] = Origin>(
       destinationPanelKey: number,
-      dispatch: InferAppNavigationOperationMapFromPath<Destination>['delete'],
+      dispatch: InferAppNavigationOperationMapFromPath<Destination>['search'],
+      options: AppNavigateOptions
+    ) {
+      const locationState = getAppLocationParamStateFromApi(locationParamStoreApi);
+      const preferenceState = getAppPreferenceStateFromApi(preferenceStoreApi);
+      const routerState = getAppRouterStateFromApi(routerStoreApi);
+
+      const prevRouteKey = findRouteKeyFromPanelKey(routerState, destinationPanelKey);
+      const prevRoute = getRouteFromPanelKey(routerState, destinationPanelKey);
+      const prevRouteParam = getRouteParamFromKey<Origin>(locationState, prevRouteKey);
+      const prevRouteSpec = findRouteSpecFromKey<Origin>(locationState, prevRouteKey);
+
+      const prevSearchSnapshot = prevRouteSpec.search.fromRoute(prevRoute.href, prevRoute.state, prevRoute.transient);
+      const nextSearchSnapshot = applyNavigationDispatch(dispatch, prevSearchSnapshot);
+
+      const nextRouteParam = { ...prevRouteParam, search: nextSearchSnapshot.toObject() };
+      const nextRoute = getRouteFromParam<Destination>(locationState, nextRouteParam as never);
+
+      if (!shouldUpdateRoute(routerState, prevRouteKey, nextRoute)) return;
+
+      setNavigationStore(store => {
+        store = getNavigationStoreFromRouter(store, routerState);
+        store = updateRoute(store, prevRouteKey, nextRoute);
+        store = sanitizeRouterStore(store, preferenceState);
+        store = setRouteScrollPositions(store);
+        store.id = generateRandomUUID();
+        store.options = options;
+        store.options.nextTitle = getNextTitleFromRoute(nextRoute);
+        return store;
+      });
+    },
+    [locationParamStoreApi, preferenceStoreApi, routerStoreApi, setNavigationStore]
+  );
+
+  const only = useCallback(
+    function <const Destination extends AppRoute['route'] = Origin>(
+      destinationPanelKey: number,
+      dispatch: InferAppNavigationOperationMapFromPath<Destination>['only'],
+      options: AppNavigateOptions
+    ) {
+      const locationState = getAppLocationParamStateFromApi(locationParamStoreApi);
+      const preferenceState = getAppPreferenceStateFromApi(preferenceStoreApi);
+      const routerState = getAppRouterStateFromApi(routerStoreApi);
+
+      const prevRouteKey = findRouteKeyFromPanelKey(routerState, destinationPanelKey);
+      const prevRouteParam = getRouteParamFromKey<Origin>(locationState, prevRouteKey);
+      const nextRouteParam = applyNavigationDispatch(dispatch, prevRouteParam as never) as never;
+      const nextRoute = getRouteFromParam<Destination>(locationState, nextRouteParam);
+
+      setNavigationStore(store => {
+        store = getNavigationStoreFromRouter(store, routerState);
+        const [nextStore, nextRouteKey] = addRoute(store, nextRoute);
+        [store] = upsertPanel(nextStore, 0, { routeKey: nextRouteKey }, preferenceState);
+
+        for (let panelKey = store.panels.length - 1; panelKey > 0; panelKey--) {
+          store = removePanel(store, panelKey);
+        }
+
+        store = sanitizeRouterStore(store, preferenceState);
+        store = setRouteScrollPositions(store);
+        store.id = generateRandomUUID();
+        store.options = options;
+        store.options.nextTitle = getNextTitleFromRoute(nextRoute);
+        return store;
+      });
+    },
+    [locationParamStoreApi, preferenceStoreApi, routerStoreApi, setNavigationStore]
+  );
+
+  const closePanel = useCallback(
+    function <const Destination extends AppRoute['route'] = Origin>(
+      destinationPanelKey: number,
+      dispatch: InferAppNavigationOperationMapFromPath<Destination>['closePanel'] = true,
       options: AppNavigateOptions
     ) {
       const locationState = getAppLocationParamStateFromApi(locationParamStoreApi);
@@ -231,11 +341,15 @@ export function useAppNavigate<const Origin extends AppRoute['route']>() {
           create<Destination>(destinationPanelKey, dispatch, options),
         update: (dispatch: InferAppNavigationOperationMapFromPath<Destination>['update']) =>
           update<Destination>(destinationPanelKey, dispatch, options),
-        delete: (dispatch: InferAppNavigationOperationMapFromPath<Destination>['delete']) =>
-          del<Destination>(destinationPanelKey, dispatch, options)
+        only: (dispatch: InferAppNavigationOperationMapFromPath<Destination>['only']) =>
+          only<Destination>(destinationPanelKey, dispatch, options),
+        search: (dispatch: InferAppNavigationOperationMapFromPath<Destination>['search']) =>
+          search<Destination>(destinationPanelKey, dispatch, options),
+        closePanel: (dispatch: InferAppNavigationOperationMapFromPath<Destination>['closePanel']) =>
+          closePanel<Destination>(destinationPanelKey, dispatch, options)
       };
     },
-    [create, update, del]
+    [closePanel, create, only, search, update]
   );
 
   const from = useCallback(
@@ -278,7 +392,7 @@ export function useAppNavigate<const Origin extends AppRoute['route']>() {
 
   const at = useCallback(
     function <const Destination extends AppRoute['route'] = Origin>(
-      panelKey: number,
+      panelKey: number = 0,
       options: AppNavigateOptions = getDefaultNavigateOptions()
     ) {
       return buildOperations<Destination>(panelKey, options);
@@ -307,34 +421,32 @@ export function useAppSyncNavigationStoreFromLocation() {
         const routerState = getAppRouterStateFromApi(routerStoreApi);
         const locationState = getAppLocationParamStateFromApi(locationParamStoreApi);
 
-        let nextStore = getNavigationStoreFromRouter(store, routerState);
+        store = getNavigationStoreFromRouter(store, routerState);
 
         for (const [routeKey, route] of Object.entries(location.state?.routes || {})) {
-          const nextRoute = sanitizeRoute(locationState, route);
-          [nextStore] = upsertRoute(nextStore, routeKey, nextRoute);
+          const nextRoute = sanitizeRoute(locationState, getDefaultRouterRoute(route));
+          [store] = upsertRoute(store, routeKey, nextRoute);
         }
 
         for (const [nextPanelKey, nextPanel] of (location.state?.panels || []).entries()) {
-          [nextStore] = upsertPanel(nextStore, nextPanelKey, nextPanel, preferenceState);
+          [store] = upsertPanel(store, nextPanelKey, nextPanel, preferenceState);
         }
 
         for (
-          let panelKey = (nextStore?.panels?.length || 0) - 1;
+          let panelKey = (store?.panels?.length || 0) - 1;
           panelKey >= (location.state?.panels?.length || 0);
           panelKey--
         ) {
-          nextStore = removePanel(nextStore, panelKey);
+          store = removePanel(store, panelKey);
         }
 
-        nextStore.options.replace = true;
-        nextStore.id = location.state?.id || generateRandomUUID();
+        store.options.replace = true;
+        store.id = location.state?.id || generateRandomUUID();
 
-        nextStore = sanitizePanels(nextStore, preferenceState) as never;
-        nextStore = sanitizeNodes(nextStore, preferenceState);
-        nextStore = sanitizeRoutes(nextStore as never);
-        nextStore = applyDefaultNavigationStore(nextStore, preferenceState);
+        store = sanitizeRouterStore(store, preferenceState);
+        store = applyDefaultNavigationStore(store, preferenceState);
 
-        return nextStore;
+        return store;
       }),
     [location, preferenceStoreApi, routerStoreApi, locationParamStoreApi, setNavigationStore]
   );
@@ -346,7 +458,7 @@ export function useAppSyncNavigationStoreFromLocation() {
         const routerState = getAppRouterStateFromApi(routerStoreApi);
         const locationState = getAppLocationParamStateFromApi(locationParamStoreApi);
 
-        let nextStore = getNavigationStoreFromRouter(store, routerState);
+        store = getNavigationStoreFromRouter(store, routerState);
 
         const hashFragment = location.hash ? location.hash.slice(1) : '/submit';
 
@@ -354,40 +466,34 @@ export function useAppSyncNavigationStoreFromLocation() {
 
         for (const [i, fragment] of hashFragment.split('#/').entries()) {
           const href = i === 0 ? fragment : `/${fragment}`;
-          const nextLocation = sanitizeRoute(locationState, {
-            digest: hashObject({ href, state: null }),
-            href,
-            state: null
-          });
-          if (!nextLocation?.href) continue;
+          const nextRoute = sanitizeRoute(locationState, getDefaultRouterRoute({ href }));
+          if (!nextRoute?.href) continue;
 
           panelKey++;
 
-          const prevLocation = getRouteFromPanelKey(routerState, panelKey);
-          const prevSpec = findRouteSpecFromRoute(locationState, prevLocation);
-          const nextSpec = findRouteSpecFromRoute(locationState, nextLocation);
+          const prevRoute = getRouteFromPanelKey(routerState, panelKey);
+          const prevSpec = findRouteSpecFromRoute(locationState, prevRoute);
+          const nextSpec = findRouteSpecFromRoute(locationState, nextRoute);
 
           if (!!nextSpec?.path && nextSpec?.path === prevSpec?.path) {
-            nextStore = updateRoute(nextStore, nextStore.panels[panelKey].routeKey, nextLocation);
+            store = updateRoute(store, store.panels[panelKey].routeKey, nextRoute);
           } else {
-            const [nextStore1, nextRouteKey] = addRoute(nextStore, nextLocation);
-            [nextStore] = upsertPanel(nextStore1, panelKey, { routeKey: nextRouteKey }, preferenceState);
+            const [store1, nextRouteKey] = addRoute(store, nextRoute);
+            [store] = upsertPanel(store1, panelKey, { routeKey: nextRouteKey }, preferenceState);
           }
         }
 
-        for (let i = nextStore.panels.length - 1; i > panelKey; i--) {
-          nextStore = removePanel(nextStore, i);
+        for (let i = store.panels.length - 1; i > panelKey; i--) {
+          store = removePanel(store, i);
         }
 
-        nextStore.options.replace = false;
-        nextStore.id = generateRandomUUID();
+        store.options.replace = false;
+        store.id = generateRandomUUID();
 
-        nextStore = sanitizePanels(nextStore, preferenceState) as never;
-        nextStore = sanitizeNodes(nextStore, preferenceState);
-        nextStore = sanitizeRoutes(nextStore as never);
-        nextStore = applyDefaultNavigationStore(nextStore, preferenceState);
+        store = sanitizeRouterStore(store, preferenceState);
+        store = applyDefaultNavigationStore(store, preferenceState);
 
-        return nextStore;
+        return store;
       }),
     [location, preferenceStoreApi, routerStoreApi, locationParamStoreApi, setNavigationStore]
   );
@@ -399,46 +505,36 @@ export function useAppSyncNavigationStoreFromLocation() {
         const routerState = getAppRouterStateFromApi(routerStoreApi);
         const locationState = getAppLocationParamStateFromApi(locationParamStoreApi);
 
-        let nextStore = getNavigationStoreFromRouter(store, routerState);
+        store = getNavigationStoreFromRouter(store, routerState);
 
         const pathname = location.pathname === '/' ? '/submit' : location.pathname;
         const href = `${pathname}${location.search || ''}${location.hash || ''}`;
-        const legacyLocation = sanitizeRoute(locationState, {
-          digest: hashObject({ href, state: location.state ?? null }),
-          href,
-          state: location.state ?? null
-        });
+        const legacyRoute = sanitizeRoute(locationState, getDefaultRouterRoute({ href, state: location.state }));
 
-        if (!legacyLocation?.href) return nextStore;
+        if (!legacyRoute?.href) return store;
 
-        const nextSpec = findRouteSpecFromRoute(locationState, legacyLocation);
-        const prevLocation = getRouteFromPanelKey(nextStore, 0);
+        const nextSpec = findRouteSpecFromRoute(locationState, legacyRoute);
+        const prevLocation = getRouteFromPanelKey(store, 0);
         const prevSpec = findRouteSpecFromRoute(locationState, prevLocation);
 
-        if (!!nextSpec?.path && nextSpec?.path === prevSpec?.path && !!nextStore?.panels?.[0]?.routeKey) {
-          nextStore = updateRoute(nextStore, nextStore.panels[0].routeKey, legacyLocation);
+        if (!!nextSpec?.path && nextSpec?.path === prevSpec?.path && !!store?.panels?.[0]?.routeKey) {
+          store = updateRoute(store, store.panels[0].routeKey, legacyRoute);
         } else {
-          const [nextStore1, nextRouteKey] = addRoute(nextStore, legacyLocation);
-          if ((nextStore1?.panels?.length || 0) > 0) {
-            nextStore = updatePanel(nextStore1, 0, { routeKey: nextRouteKey });
-          } else {
-            [nextStore] = upsertPanel(nextStore1, 0, { routeKey: nextRouteKey }, preferenceState);
-          }
+          const [store1, nextRouteKey] = addRoute(store, legacyRoute);
+          [store] = upsertPanel(store1, 0, { routeKey: nextRouteKey }, preferenceState);
         }
 
-        for (let panelKey = nextStore.panels.length - 1; panelKey > 0; panelKey--) {
-          nextStore = removePanel(nextStore, panelKey);
+        for (let panelKey = store.panels.length - 1; panelKey > 0; panelKey--) {
+          store = removePanel(store, panelKey);
         }
 
-        nextStore.options.replace = true;
-        nextStore.id = generateRandomUUID();
+        store.options.replace = true;
+        store.id = generateRandomUUID();
 
-        nextStore = sanitizePanels(nextStore, preferenceState) as never;
-        nextStore = sanitizeNodes(nextStore, preferenceState);
-        nextStore = sanitizeRoutes(nextStore as never);
-        nextStore = applyDefaultNavigationStore(nextStore, preferenceState);
+        store = sanitizeRouterStore(store, preferenceState);
+        store = applyDefaultNavigationStore(store, preferenceState);
 
-        return nextStore;
+        return store;
       }),
     [location, preferenceStoreApi, routerStoreApi, locationParamStoreApi, setNavigationStore]
   );

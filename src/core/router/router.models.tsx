@@ -1,6 +1,7 @@
 import type { useAppNavigate } from 'core/router';
-import type { InferAppRouteValuesFromPath } from 'core/routes';
+import type { InferAppRouteSpecFromPath, InferAppRouteValuesFromPath } from 'core/routes';
 import type { ReversePortalNode } from 'features/portal';
+import type { InferSearchParamSnapshotFromEngine } from 'features/search-params';
 import type { DependencyList } from 'react';
 import type { Location as ReactRouterLocation } from 'react-router';
 
@@ -118,21 +119,27 @@ export type AppNavigateOptions = {
   viewTransition?: boolean;
 };
 
+export type InferAppNavigationInputFromPath<Origin extends AppRoute['route']> =
+  | InferAppRouteValuesFromPath<Origin>
+  | string
+  | ReactRouterLocation;
+
 export type InferAppNavigationOperationMapFromPath<Origin extends AppRoute['route']> = {
   create:
-    | InferAppRouteValuesFromPath<AppRoute['route']>
-    | string
-    | ReactRouterLocation
-    | ((
-        props: InferAppRouteValuesFromPath<Origin>
-      ) => InferAppRouteValuesFromPath<AppRoute['route']> | string | ReactRouterLocation);
+    | InferAppNavigationInputFromPath<Origin>
+    | ((props: InferAppRouteValuesFromPath<Origin>) => InferAppNavigationInputFromPath<Origin>);
   update:
-    | InferAppRouteValuesFromPath<AppRoute['route']>
-    | string
-    | ReactRouterLocation
+    | InferAppNavigationInputFromPath<Origin>
+    | ((props: InferAppRouteValuesFromPath<Origin>) => InferAppNavigationInputFromPath<Origin>);
+  search:
+    | InferSearchParamSnapshotFromEngine<InferAppRouteSpecFromPath<Origin>['search']>
     | ((
-        props: InferAppRouteValuesFromPath<Origin>
-      ) => InferAppRouteValuesFromPath<AppRoute['route']> | string | ReactRouterLocation);
+        props: InferSearchParamSnapshotFromEngine<InferAppRouteSpecFromPath<Origin>['search']>
+      ) => InferSearchParamSnapshotFromEngine<InferAppRouteSpecFromPath<Origin>['search']>);
+  only:
+    | InferAppNavigationInputFromPath<Origin>
+    | ((props: InferAppRouteValuesFromPath<Origin>) => InferAppNavigationInputFromPath<Origin>);
+  closePanel: boolean | ((props: InferAppRouteValuesFromPath<Origin>) => boolean);
   delete: boolean | ((props: InferAppRouteValuesFromPath<Origin>) => boolean);
 };
 
