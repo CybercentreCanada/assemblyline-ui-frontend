@@ -7,12 +7,6 @@ import type { InferPathParamBlueprintMapFromPath, PATH_PARAM_BLUEPRINTS_MAP, Rou
 import { createPathParamsCodec } from 'features/path-params';
 import type { SearchParamBlueprintMap } from 'features/search-params';
 import { SEARCH_PARAM_BLUEPRINTS_MAP, SearchParamEngine } from 'features/search-params';
-import type {
-  InferStateParamBlueprintFromValue,
-  StateParamShape,
-  createStateParamBlueprint
-} from 'features/state-params';
-import { createStateParamCodec } from 'features/state-params';
 import type { ComponentType, FC, MemoExoticComponent, ReactNode } from 'react';
 import { toElement } from 'shared/utils/app.utils';
 
@@ -24,9 +18,7 @@ export type CreateAppRouteProps<
   Route extends RoutePath,
   Path extends InferPathParamBlueprintMapFromPath<Route>,
   Search extends SearchParamBlueprintMap,
-  Hash extends HashParamValue = never,
-  State extends StateParamShape = never,
-  Temp extends StateParamShape = never
+  Hash extends HashParamValue = never
 > = {
   // Descriptions
   title?: {
@@ -45,8 +37,6 @@ export type CreateAppRouteProps<
   path?: (blueprints: typeof PATH_PARAM_BLUEPRINTS_MAP) => Path;
   search?: (blueprints: typeof SEARCH_PARAM_BLUEPRINTS_MAP) => Search;
   hash?: (blueprints: typeof HASH_PARAM_BLUEPRINTS) => InferHashParamBlueprintFromValue<Hash>;
-  state?: (blueprint: typeof createStateParamBlueprint) => InferStateParamBlueprintFromValue<State>;
-  transient?: (blueprint: typeof createStateParamBlueprint) => InferStateParamBlueprintFromValue<Temp>;
 
   // Guards and Fallbacks
   disabled?: DisabledBoundaryProps['disabled'];
@@ -63,9 +53,7 @@ export const createAppRoute = <
   const Route extends RoutePath,
   const Path extends InferPathParamBlueprintMapFromPath<Route>,
   const Search extends SearchParamBlueprintMap,
-  const Hash extends HashParamValue = never,
-  const State extends StateParamShape = never,
-  const Temp extends StateParamShape = never
+  const Hash extends HashParamValue = never
 >({
   title,
   icon,
@@ -75,8 +63,6 @@ export const createAppRoute = <
   path,
   search,
   hash,
-  state,
-  transient,
 
   loader,
   disabled,
@@ -84,7 +70,7 @@ export const createAppRoute = <
 
   forbiddenComponent,
   disabledComponent
-}: CreateAppRouteProps<Route, Path, Search, Hash, State, Temp>) => {
+}: CreateAppRouteProps<Route, Path, Search, Hash>) => {
   void loader;
 
   const pathCodec = !path
@@ -97,10 +83,6 @@ export const createAppRoute = <
 
   const hashCodec = !hash ? createHashParamCodec<never>()(() => null) : createHashParamCodec<Hash>()(hash);
 
-  const stateCodec = !state ? (createStateParamCodec(() => null) as never) : createStateParamCodec(state);
-
-  const transientCodec = !transient ? (createStateParamCodec(() => null) as never) : createStateParamCodec(transient);
-
   (Component as unknown as FC).displayName = route;
 
   return {
@@ -111,8 +93,6 @@ export const createAppRoute = <
     path: pathCodec,
     search: searchEngine,
     hash: hashCodec,
-    state: stateCodec,
-    transient: transientCodec,
 
     loader,
     disabled,

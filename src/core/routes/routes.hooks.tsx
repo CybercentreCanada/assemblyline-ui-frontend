@@ -136,11 +136,8 @@ export function useAppSearchSnapshot<const Origin extends AppRoute['route']>(): 
   );
 
   return useMemo(() => {
-    if (!searchEngine || searchParam == null) {
-      return null as never;
-    }
-
-    return searchEngine.full(searchParam as never) as never;
+    if (!searchEngine || !searchParam) return null as never;
+    else return searchEngine.full(searchParam as never) as never;
   }, [searchEngine, searchParam]);
 }
 

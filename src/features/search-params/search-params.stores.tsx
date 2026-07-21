@@ -1,10 +1,6 @@
 import { shallowEqual } from 'features/prop-provider/props.utils';
-import { SearchParamEngine } from 'features/search-params/search-params.engines';
-import type {
-  InferSearchParamValueMapFromBlueprintMap,
-  SearchParamBlueprintMap
-} from 'features/search-params/search-params.models';
-import { SearchParamSnapshot } from 'features/search-params/search-params.snapshots';
+import type { InferSearchParamValueMapFromBlueprintMap, SearchParamBlueprintMap } from 'features/search-params';
+import { SearchParamEngine, SearchParamSnapshot } from 'features/search-params';
 import type { SetStateAction } from 'react';
 import React, {
   createContext,
@@ -76,7 +72,7 @@ export const createSearchParamsStore = () => {
       ) => {
         const values = typeof input === 'function' ? input(snapshotRef.current.toParams()) : input;
         set(engine.full(values));
-        navigate(
+        void navigate(
           {
             pathname: window.location.pathname,
             search: snapshotRef.current.toLocationSearch(),
@@ -95,7 +91,7 @@ export const createSearchParamsStore = () => {
       ) => {
         const values = typeof input === 'function' ? input(snapshotRef.current.toObject()) : input;
         set(engine.full(values));
-        navigate(
+        void navigate(
           {
             pathname: window.location.pathname,
             search: snapshotRef.current.toLocationSearch(),

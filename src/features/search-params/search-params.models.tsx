@@ -4,16 +4,23 @@ import type {
   EnumSearchParamBlueprint,
   FiltersSearchParamBlueprint,
   NumberSearchParamBlueprint,
-  StringSearchParamBlueprint
-} from 'features/search-params/search-params.blueprints';
-import type { SearchParamEngine } from 'features/search-params/search-params.engines';
-import type {
+  ObjectSearchParamBlueprint,
   SEARCH_PARAM_RUNTIME_MAP,
-  SearchParamRuntimeFactory
-} from 'features/search-params/search-params.runtimes';
-import type { SearchParamSnapshot } from 'features/search-params/search-params.snapshots';
+  SearchParamEngine,
+  SearchParamRuntimeFactory,
+  SearchParamSnapshot,
+  StringSearchParamBlueprint
+} from 'features/search-params';
 
-export type SearchParamSource = 'search' | 'state' | 'snapshot';
+export type SearchParamSource = 'search' | 'state' | 'transient';
+
+export type EnumParamValue = string | number | boolean;
+
+export type ObjectParamPrimitive = string | number | boolean | null;
+
+export type ObjectParamShape = ObjectParamPrimitive | { [key: string]: ObjectParamPrimitive } | ObjectParamPrimitive[];
+
+export type ObjectParamValue = Record<string, ObjectParamShape>;
 
 //*****************************************************************************************
 // Search Param Blueprints
@@ -25,7 +32,8 @@ type SearchParamBlueprint =
   | NumberSearchParamBlueprint
   | StringSearchParamBlueprint
   | FiltersSearchParamBlueprint
-  | EnumSearchParamBlueprint<readonly string[]>;
+  | ObjectSearchParamBlueprint<any>
+  | EnumSearchParamBlueprint<readonly [EnumParamValue, ...EnumParamValue[]]>;
 
 export type SearchParamBlueprintMap = Record<string, SearchParamBlueprint>;
 
@@ -33,7 +41,7 @@ export type SearchParamBlueprintMap = Record<string, SearchParamBlueprint>;
 // Search Param Values
 //*****************************************************************************************
 
-export type SearchParamValue = null | boolean | number | string | string[];
+export type SearchParamValue = null | boolean | number | string | string[] | ObjectParamValue;
 
 export type SearchParamValueMap = Record<string, SearchParamValue>;
 
@@ -46,6 +54,7 @@ export type InferSearchParamValueFromBlueprint<B extends SearchParamBlueprint> =
         Blueprint extends NumberSearchParamBlueprint ? number :
         Blueprint extends StringSearchParamBlueprint ? string :
         Blueprint extends FiltersSearchParamBlueprint ? string[] :
+        Blueprint extends ObjectSearchParamBlueprint<infer O> ? O :
         Blueprint extends EnumSearchParamBlueprint<infer T> ? T[number] :
         never
       : never
@@ -68,6 +77,7 @@ export type InferSearchParamRuntimeFromBlueprint<B extends SearchParamBlueprint>
         Blueprint extends NumberSearchParamBlueprint ? (typeof SEARCH_PARAM_RUNTIME_MAP)['number']["prototype"] & NumberSearchParamBlueprint :
         Blueprint extends StringSearchParamBlueprint ? (typeof SEARCH_PARAM_RUNTIME_MAP)['string']["prototype"] & StringSearchParamBlueprint :
         Blueprint extends FiltersSearchParamBlueprint ? (typeof SEARCH_PARAM_RUNTIME_MAP)['filters']["prototype"] & FiltersSearchParamBlueprint :
+        Blueprint extends ObjectSearchParamBlueprint<any> ? (typeof SEARCH_PARAM_RUNTIME_MAP)['object']["prototype"] & ObjectSearchParamBlueprint :
         Blueprint extends EnumSearchParamBlueprint<any> ? (typeof SEARCH_PARAM_RUNTIME_MAP)['enum']["prototype"] & EnumSearchParamBlueprint<any> :
         never
       : never

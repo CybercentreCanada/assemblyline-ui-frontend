@@ -1,36 +1,59 @@
-import {
-  BooleanSearchParamBlueprint,
-  EnumSearchParamBlueprint,
-  FiltersSearchParamBlueprint,
-  NumberSearchParamBlueprint,
-  StringSearchParamBlueprint
-} from 'features/search-params/search-params.blueprints';
 import type {
   InferSearchParamRuntimeMapFromBlueprintMap,
   InferSearchParamValueMapFromBlueprintMap,
   SearchParamBlueprintMap,
   SearchParamRuntime
-} from 'features/search-params/search-params.models';
-import { SEARCH_PARAM_RUNTIME_MAP } from 'features/search-params/search-params.runtimes';
-import { SearchParamSnapshot } from 'features/search-params/search-params.snapshots';
+} from 'features/search-params';
+import {
+  BooleanSearchParamBlueprint,
+  EnumSearchParamBlueprint,
+  FiltersSearchParamBlueprint,
+  NumberSearchParamBlueprint,
+  ObjectSearchParamBlueprint,
+  SEARCH_PARAM_RUNTIME_MAP,
+  SearchParamSnapshot,
+  StringSearchParamBlueprint
+} from 'features/search-params';
 import type { Location } from 'react-router';
 
 export class SearchParamEngine<Blueprints extends SearchParamBlueprintMap> {
   private runtimes: InferSearchParamRuntimeMapFromBlueprintMap<Blueprints>;
 
   constructor(blueprints: Blueprints) {
-    this.runtimes = Object.entries(blueprints || {}).reduce((prev, [key, bp]) => {
-      if (bp instanceof BooleanSearchParamBlueprint)
-        return { ...prev, [key]: new SEARCH_PARAM_RUNTIME_MAP.boolean(key, bp) };
-      if (bp instanceof NumberSearchParamBlueprint)
-        return { ...prev, [key]: new SEARCH_PARAM_RUNTIME_MAP.number(key, bp) };
-      if (bp instanceof StringSearchParamBlueprint)
-        return { ...prev, [key]: new SEARCH_PARAM_RUNTIME_MAP.string(key, bp) };
-      if (bp instanceof FiltersSearchParamBlueprint)
-        return { ...prev, [key]: new SEARCH_PARAM_RUNTIME_MAP.filters(key, bp) };
-      if (bp instanceof EnumSearchParamBlueprint) return { ...prev, [key]: new SEARCH_PARAM_RUNTIME_MAP.enum(key, bp) };
-      return prev;
-    }, {} as InferSearchParamRuntimeMapFromBlueprintMap<Blueprints>);
+    const runtimes = {} as InferSearchParamRuntimeMapFromBlueprintMap<Blueprints>;
+
+    for (const [key, bp] of Object.entries(blueprints || {})) {
+      if (bp instanceof BooleanSearchParamBlueprint) {
+        (runtimes as Record<string, SearchParamRuntime>)[key] = new SEARCH_PARAM_RUNTIME_MAP.boolean(key, bp);
+        continue;
+      }
+
+      if (bp instanceof NumberSearchParamBlueprint) {
+        (runtimes as Record<string, SearchParamRuntime>)[key] = new SEARCH_PARAM_RUNTIME_MAP.number(key, bp);
+        continue;
+      }
+
+      if (bp instanceof StringSearchParamBlueprint) {
+        (runtimes as Record<string, SearchParamRuntime>)[key] = new SEARCH_PARAM_RUNTIME_MAP.string(key, bp);
+        continue;
+      }
+
+      if (bp instanceof FiltersSearchParamBlueprint) {
+        (runtimes as Record<string, SearchParamRuntime>)[key] = new SEARCH_PARAM_RUNTIME_MAP.filters(key, bp);
+        continue;
+      }
+
+      if (bp instanceof ObjectSearchParamBlueprint) {
+        (runtimes as Record<string, SearchParamRuntime>)[key] = new SEARCH_PARAM_RUNTIME_MAP.object(key, bp);
+        continue;
+      }
+
+      if (bp instanceof EnumSearchParamBlueprint) {
+        (runtimes as Record<string, SearchParamRuntime>)[key] = new SEARCH_PARAM_RUNTIME_MAP.enum(key, bp);
+      }
+    }
+
+    this.runtimes = runtimes;
   }
 
   private runtimeEntries() {
@@ -38,66 +61,82 @@ export class SearchParamEngine<Blueprints extends SearchParamBlueprintMap> {
   }
 
   public getDefaultValues() {
-    const values = this.runtimeEntries().reduce(
-      (prev, [key, runtime]) => ({ ...prev, [key]: runtime.getDefaultValue() }),
-      {} as InferSearchParamValueMapFromBlueprintMap<Blueprints>
-    );
+    const values = {} as InferSearchParamValueMapFromBlueprintMap<Blueprints>;
+    for (const [key, runtime] of this.runtimeEntries()) {
+      (values as Record<string, unknown>)[key] = runtime.getDefaultValue();
+    }
     return new SearchParamSnapshot<Blueprints>(this.runtimes, values);
   }
 
   public setDefaultValues(values: URLSearchParams = new URLSearchParams()) {
     if (!values) return this;
-    this.runtimes = this.runtimeEntries().reduce(
-      (prev, [key, runtime]) => ({ ...prev, [key]: runtime.setDefaultValue(values) }),
-      {} as InferSearchParamRuntimeMapFromBlueprintMap<Blueprints>
-    );
+
+    const runtimes = {} as InferSearchParamRuntimeMapFromBlueprintMap<Blueprints>;
+    for (const [key, runtime] of this.runtimeEntries()) {
+      (runtimes as Record<string, SearchParamRuntime>)[key] = runtime.setDefaultValue(values);
+    }
+
+    this.runtimes = runtimes;
     return this;
   }
 
   public getEphemeralKeys() {
-    return this.runtimeEntries().reduce(
-      (prev, [key, runtime]) => (runtime.isEphemeral() ? [...prev, key] : prev),
-      [] as string[]
-    );
+    const keys: string[] = [];
+    for (const [key, runtime] of this.runtimeEntries()) {
+      if (runtime.isEphemeral()) keys.push(key);
+    }
+    return keys;
   }
 
   public getIgnoredKeys() {
-    return this.runtimeEntries().reduce(
-      (prev, [key, runtime]) => (runtime.isIgnored() ? [...prev, key] : prev),
-      [] as string[]
-    );
+    const keys: string[] = [];
+    for (const [key, runtime] of this.runtimeEntries()) {
+      if (runtime.isIgnored()) keys.push(key);
+    }
+    return keys;
   }
 
   public getLockedKeys() {
-    return this.runtimeEntries().reduce(
-      (prev, [key, runtime]) => (runtime.isLocked() ? [...prev, key] : prev),
-      [] as string[]
-    );
+    const keys: string[] = [];
+    for (const [key, runtime] of this.runtimeEntries()) {
+      if (runtime.isLocked()) keys.push(key);
+    }
+    return keys;
   }
 
   public full(value: URLSearchParams | InferSearchParamValueMapFromBlueprintMap<Blueprints>) {
-    const values = this.runtimeEntries().reduce(
-      (prev, [, runtime]) => runtime.full(prev, value),
-      {} as InferSearchParamValueMapFromBlueprintMap<Blueprints>
-    );
+    const values = {} as InferSearchParamValueMapFromBlueprintMap<Blueprints>;
+    for (const [, runtime] of this.runtimeEntries()) {
+      runtime.full(values, value);
+    }
 
     return new SearchParamSnapshot<Blueprints>(this.runtimes, values);
   }
 
   public delta(value: URLSearchParams | InferSearchParamValueMapFromBlueprintMap<Blueprints>) {
-    const values = this.runtimeEntries().reduce(
-      (prev, [, runtime]) => runtime.delta(prev, value),
-      {} as InferSearchParamValueMapFromBlueprintMap<Blueprints>
-    );
+    const values = {} as InferSearchParamValueMapFromBlueprintMap<Blueprints>;
+    for (const [, runtime] of this.runtimeEntries()) {
+      runtime.delta(values, value);
+    }
 
     return new SearchParamSnapshot<Blueprints>(this.runtimes, values);
   }
 
   public fromLocation(location: Location, snapshot: SearchParamSnapshot<Blueprints> = null) {
-    const values = this.runtimeEntries().reduce(
-      (prev, [, runtime]) => runtime.fromLocation(prev, location, snapshot),
-      {} as InferSearchParamValueMapFromBlueprintMap<Blueprints>
-    );
+    const values = {} as InferSearchParamValueMapFromBlueprintMap<Blueprints>;
+    for (const [, runtime] of this.runtimeEntries()) {
+      runtime.fromLocation(values, location, snapshot);
+    }
+
+    return new SearchParamSnapshot<Blueprints>(this.runtimes, values);
+  }
+
+  public fromRoute(href: string, state: unknown = null, transient: unknown = null) {
+    const values = {} as InferSearchParamValueMapFromBlueprintMap<Blueprints>;
+    for (const [, runtime] of this.runtimeEntries()) {
+      runtime.fromRoute(values, href, state, transient);
+    }
+
     return new SearchParamSnapshot<Blueprints>(this.runtimes, values);
   }
 }

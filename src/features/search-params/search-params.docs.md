@@ -14,7 +14,7 @@ Comprehensive URL search parameter management system. Handles typed reading, wri
 - **Ephemeral params** — Params marked `ephemeral` are excluded from persistence
 - **Ignored params** — Params marked `ignored` don't trigger re-renders when they change
 - **Locked params** — Params marked `locked` always resolve to their default regardless of URL input
-- **Builder pattern** — Blueprints use fluent chainable methods (`.defaultValue()`, `.ephemeral()`, `.locked()`, `.origin()`)
+- **Builder pattern** — Blueprints use fluent chainable methods (`.defaultValue()`, `.ephemeral()`, `.locked()`, `.source()`)
 - **Number clamping** — `NumberBlueprint` supports `.min()` / `.max()` bounds
 - **Filter expressions** — `FiltersBlueprint` supports `NOT()` and `!()` prefix wrappers with deduplication
 
@@ -28,7 +28,7 @@ A class extending `BaseBlueprint<T>` that defines:
 - **Default value** — What to use when the param is missing or invalid
 - **Parse** — Convert a raw string from the URL into the typed value
 - **Valid** — Check if a parsed value is acceptable
-- **Origin** — Where to resolve the value from (`'search'` | `'state'` | `'snapshot'`)
+- **Source** — Where to resolve the value from (`'search'` | `'state'` | `'transient'`)
 
 Available blueprint classes:
 
@@ -57,8 +57,8 @@ Available blueprint classes:
 - `get(key)` — Get a single param value
 - `pick(keys)` / `omit(keys)` — Create a subset snapshot
 - `set(input)` — Create a new snapshot with updated values (functional or direct)
-- `toLocationSearch()` — Serialize to `?key=value` string (delta of `search`-origin params only)
-- `toLocationState()` — Serialize to `location.state` object (delta of `state`-origin params only)
+- `toLocationSearch()` — Serialize to `?key=value` string (delta of `search`-source params only)
+- `toLocationState()` — Serialize to `location.state` object (delta of `state`-source params only)
 - `toParams()` → `URLSearchParams`
 - `toString()` → sorted query string
 
@@ -101,9 +101,9 @@ const PARAMS = {
 | `.ignored()` | Changes don't trigger snapshot difference detection |
 | `.locked()` | Always returns default regardless of URL value |
 | `.nullable()` | Allows `null` as a valid value |
-| `.origin('search' \| 'state' \| 'snapshot')` | Source for value resolution |
+| `.source('search' \| 'state' \| 'transient')` | Source for value resolution |
 | `.min(n)` / `.max(n)` | Number bounds (NumberBlueprint only) |
-| `.options([...])` | Valid values list (EnumBlueprint only) |
+| `.options(valueList)` | Valid values list (EnumBlueprint only) |
 | `.not(prefix)` / `.omit(prefix)` | Prefix expressions (FiltersBlueprint only) |
 
 ## 5. Usage (Consumer API)
@@ -138,7 +138,11 @@ const { setSearchObject } = useSearchParams();
 setSearchObject({ page: 2, sort: 'name' });
 
 // Functional update
-setSearchObject(prev => ({ ...prev, page: prev.page + 1 }));
+setSearchObject(prev => {
+  const next = structuredClone(prev);
+  next.page = prev.page + 1;
+  return next;
+});
 
 // With replace (no history entry)
 setSearchObject({ page: 1 }, true);

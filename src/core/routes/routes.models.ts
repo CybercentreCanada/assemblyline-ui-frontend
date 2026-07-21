@@ -30,12 +30,6 @@ export type InferAppRouteSearchValuesFromPath<Origin extends AppRoute['route']> 
 export type InferAppRouteHashFromPath<Origin extends AppRoute['route']> =
   NonNullable<InferAppRouteSpecFromPath<Origin>['hash']> extends { type: infer Hash } ? Hash | null : never;
 
-export type InferAppRouteStateFromPath<Origin extends AppRoute['route']> =
-  NonNullable<InferAppRouteSpecFromPath<Origin>['state']> extends { type: infer State } ? State : never;
-
-export type InferAppRouteTransientFromPath<Origin extends AppRoute['route']> =
-  NonNullable<InferAppRouteSpecFromPath<Origin>['transient']> extends { type: infer Temp } ? Temp : never;
-
 //*****************************************************************************************
 // App Route Param
 //*****************************************************************************************
@@ -57,11 +51,6 @@ export type InferAppRouteParamFromPath<Origin extends AppRoute['route']> = {
             : InferSearchParamValueMapFromEngine<InferAppRouteSpecFromPath<Origin>['search']>;
   /** Parsed hash value derived from the current location. */
   hash: InferAppRouteHashFromPath<Origin>;
-  /** Parsed route state derived from the current location state and route defaults. */
-  state: InferAppRouteStateFromPath<Origin>;
-  /** Parsed transient data derived from route defaults and in-memory navigation values. */
-  transient: InferAppRouteTransientFromPath<Origin>;
-
 };
 
 //*****************************************************************************************
@@ -91,16 +80,6 @@ export type InferAppRouteValuesFromPath<Origin extends AppRoute['route']> =
             [InferAppRouteHashFromPath<Origin>] extends [never]
               ? { hash?: never }
               : { hash?: InferAppRouteHashFromPath<Origin> }
-          )
-        & (
-            [InferAppRouteStateFromPath<Origin>] extends [never]
-              ? { state?: never }
-              : { state?: Partial<InferAppRouteStateFromPath<Origin>> }
-          )
-        & (
-            [InferAppRouteTransientFromPath<Origin>] extends [never]
-              ? { transient?: never }
-              : { transient?: Partial<InferAppRouteTransientFromPath<Origin>> }
           )
         )
       : never

@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type { BaseSearchParamBlueprint } from 'features/search-params/search-params.blueprints';
+import type { BaseSearchParamBlueprint, SearchParamValue } from 'features/search-params';
 import {
   BooleanSearchParamBlueprint,
   EnumSearchParamBlueprint,
   FiltersSearchParamBlueprint,
+  ObjectSearchParamBlueprint,
   NumberSearchParamBlueprint,
   StringSearchParamBlueprint
-} from 'features/search-params/search-params.blueprints';
-import type { SearchParamValue } from 'features/search-params/search-params.models';
+} from 'features/search-params';
 
 /**
  * Factory that wraps a blueprint class and re-exposes its
@@ -24,7 +24,7 @@ export function SearchParamRuntimeFactory<
     public override isIgnored = super.isIgnored;
     public override isLocked = super.isLocked;
     public override isNullable = super.isNullable;
-    public override getOrigin = super.getOrigin;
+    public override getSource = super.getSource;
 
     // Setters
     public override setDefaultValue = super.setDefaultValue;
@@ -53,5 +53,6 @@ export const SEARCH_PARAM_RUNTIME_MAP = {
   number: SearchParamRuntimeFactory(NumberSearchParamBlueprint),
   string: SearchParamRuntimeFactory(StringSearchParamBlueprint),
   filters: SearchParamRuntimeFactory(FiltersSearchParamBlueprint),
+  object: SearchParamRuntimeFactory(ObjectSearchParamBlueprint),
   enum: SearchParamRuntimeFactory(EnumSearchParamBlueprint)
 } as const;
