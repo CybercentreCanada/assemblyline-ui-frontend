@@ -4,8 +4,8 @@ import {
   BooleanSearchParamBlueprint,
   EnumSearchParamBlueprint,
   FiltersSearchParamBlueprint,
-  ObjectSearchParamBlueprint,
   NumberSearchParamBlueprint,
+  ObjectSearchParamBlueprint,
   StringSearchParamBlueprint
 } from 'features/search-params';
 
@@ -37,6 +37,7 @@ export function SearchParamRuntimeFactory<
     public override full = super.full;
     public override delta = super.delta;
     public override fromLocation = super.fromLocation;
+    public override fromRoute = super.fromRoute;
 
     // Resolvers
     public override toParams = super.toParams;

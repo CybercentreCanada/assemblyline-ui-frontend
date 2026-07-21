@@ -241,7 +241,7 @@ export abstract class BaseSearchParamBlueprint<T extends SearchParamValue> {
     return prev;
   }
 
-  public fromRoute<SearchParamBlueprints extends SearchParamBlueprintMap>(
+  protected fromRoute<SearchParamBlueprints extends SearchParamBlueprintMap>(
     prev: InferSearchParamValueMapFromBlueprintMap<SearchParamBlueprints>,
     href: string = '',
     state: unknown = null,
