@@ -75,11 +75,14 @@ export type ContentWithTOCItemProps = {
 };
 
 const ContentWithTOCItem: React.FC<ContentWithTOCItemProps> = ({ translation, item }) => {
-  const hash = useAppHashParams();
   const { t } = useTranslation([translation]);
-  const currentHash = hash && hash !== '' ? hash.substring(1) : null;
-  const active = currentHash && currentHash.startsWith(item.id) ? 'active' : null;
+  const hashFragment = useAppHashParams();
   const { user: currentUser } = useALContext();
+
+  const active = useMemo(
+    () => (hashFragment && hashFragment.startsWith(item.id) ? 'active' : null),
+    [hashFragment, item.id]
+  );
 
   return (
     (!item.is_admin || (currentUser.is_admin && item.is_admin)) && (
@@ -124,7 +127,7 @@ const WrappedContentWithTOC: React.FC<ContentWithTOCProps> = ({
 
   useEffect(() => {
     if (hash && hash !== '') {
-      const scrollElement = document.getElementById(hash.substring(1));
+      const scrollElement = document.getElementById(hash);
       if (scrollElement) {
         // If element exists already, use native scrollIntoView.
         scrollElement.scrollIntoView(true);

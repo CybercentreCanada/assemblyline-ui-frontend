@@ -23,11 +23,13 @@ export const AppRouterRouteLayout = memo(({ routeKey }: AppRouterRouteLayoutProp
   const element = useAppLocationParamStore(s => findRouteSpecFromKey(s, routeKey)?.element);
 
   return !routeKey || !element ? null : (
-    <AppRouteLayoutProvider routeKey={routeKey}>
-      {/* <Activity mode={visible ? 'visible' : 'hidden'}> */}
-      <AppRouteKeyProvider routeKey={routeKey}>{element}</AppRouteKeyProvider>
-      {/* </Activity> */}
-    </AppRouteLayoutProvider>
+    <AppRouteKeyProvider routeKey={routeKey}>
+      <AppRouteLayoutProvider routeKey={routeKey}>
+        {/* <Activity mode={visible ? 'visible' : 'hidden'}> */}
+        {element}
+        {/* </Activity> */}
+      </AppRouteLayoutProvider>
+    </AppRouteKeyProvider>
   );
 });
 
