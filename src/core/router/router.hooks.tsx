@@ -360,13 +360,11 @@ export function useAppNavigate<const Origin extends AppRoute['path']>() {
   );
 
   const here = useCallback(
-    function <const Destination extends AppRoute['path'] = Origin>(
-      options: AppNavigateOptions = getDefaultNavigateOptions()
-    ) {
+    function (options: AppNavigateOptions = getDefaultNavigateOptions()) {
       const routerState = getAppRouterStateFromApi(routerStoreApi);
 
       const originPanelKey = findPanelKeyFromPageKey(routerState, pageKey);
-      return buildOperations<Destination>(originPanelKey, options);
+      return buildOperations<Origin>(originPanelKey, options);
     },
     [buildOperations, pageKey, routerStoreApi]
   );

@@ -472,8 +472,8 @@ const WrappedFileViewerPage = React.memo(() => (
 
 export const FileViewerRoute = createAppRoute({
   component: WrappedFileViewerPage,
-  route: '/file/viewer/:id/:tab',
-  path: s => ({
+  path: '/file/viewer/:id/:tab',
+  params: s => ({
     id: s.string(),
     tab: s.enum(TAB_OPTIONS, 'ascii')
   })
@@ -491,8 +491,8 @@ const FileViewerRootPage = React.memo(() => {
 
 export const FileViewerRootRoute = createAppRoute({
   component: FileViewerRootPage,
-  route: '/file/viewer/:id',
-  path: s => ({
+  path: '/file/viewer/:id',
+  params: s => ({
     id: s.string()
   }),
 

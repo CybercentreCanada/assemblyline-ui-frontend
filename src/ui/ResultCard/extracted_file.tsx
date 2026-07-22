@@ -132,8 +132,11 @@ export const ExtractedFile: React.FC<ExtractedFileProps> = React.memo(({ file, d
                   nav={nav =>
                     nav.to().create({
                       route: '/submit',
-                      search: { hash: file.sha256, description: `Inspection of file: ${file.name}` },
-                      state: { c12n: file.classification }
+                      search: {
+                        hash: file.sha256,
+                        description: `Inspection of file: ${file.name}`,
+                        classification: file.classification
+                      }
                     })
                   }
                   navDeps={[file.sha256, file.name, file.classification]}
@@ -168,7 +171,7 @@ export const ExtractedFile: React.FC<ExtractedFileProps> = React.memo(({ file, d
         <Tooltip title={`${t('view_file')}: ${file.name}`} placement="left">
           <IconButton
             nav={nav =>
-              nav.to().create(prev => ({
+              nav.to<'/file/viewer/:id/:tab'>().create(prev => ({
                 route: '/file/viewer/:id/:tab',
                 path: { id: file?.sha256, tab: prev.route === '/file/viewer/:id/:tab' ? prev.path.tab : null }
               }))

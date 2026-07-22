@@ -228,9 +228,8 @@ AdminErrorDetailPage.displayName = 'AdminErrorDetailPage';
 
 export const AdminErrorDetailRoute = createAppRoute({
   component: AdminErrorDetailPage,
-  route: '/admin/errors/:id',
-
-  path: s => ({ id: s.string() }),
+  path: '/admin/errors/:id',
+  params: s => ({ id: s.string() }),
 
   forbidden: s => !s.user.is_admin
 });

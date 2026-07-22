@@ -131,7 +131,7 @@ export const WrappedDevelopmentLibraryPage = memo(() => (
 
 export const DevelopmentLibraryRoute = createAppRoute({
   component: WrappedDevelopmentLibraryPage,
-  route: '/development/library',
+  path: '/development/library',
   search: s => ({
     tab: s.enum(['datetime', 'inputs', 'layout', 'list', 'list_inputs'] as LibraryFormStore['state']['tab'][], null)
   }),

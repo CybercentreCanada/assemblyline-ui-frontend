@@ -3,5 +3,5 @@ import { ForbiddenPage } from 'pages/forbidden/forbidden';
 
 export const ForbiddenRoute = createAppRoute({
   component: ForbiddenPage,
-  route: '/forbidden'
+  path: '/forbidden'
 });

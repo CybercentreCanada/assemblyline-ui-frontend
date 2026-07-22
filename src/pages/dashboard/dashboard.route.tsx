@@ -1761,5 +1761,5 @@ export const DashboardPage = memo(() => {
 
 export const DashboardRoute = createAppRoute({
   component: DashboardPage,
-  route: '/dashboard'
+  path: '/dashboard'
 });

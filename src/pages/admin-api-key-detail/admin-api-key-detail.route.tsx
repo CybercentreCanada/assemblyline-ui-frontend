@@ -71,7 +71,7 @@ export const AdminAPIKeyDetailPage = memo(() => {
       onSuccess: () => {
         setDeleteDialog(false);
         showSuccessMessage(t('delete.success'));
-        navigate.here().delete(true);
+        navigate.here().closePanel(true);
       },
       onEnter: () => {
         setLoading(true);
@@ -127,7 +127,7 @@ export const AdminAPIKeyDetailPage = memo(() => {
         open={deleteDialog}
         handleClose={() => {
           setDeleteDialog(false);
-          navigate.here().delete(true);
+          navigate.here().closePanel(true);
         }}
         handleAccept={() => handleDelete()}
         title={t('delete.title')}
@@ -358,8 +358,8 @@ AdminAPIKeyDetailPage.displayName = 'AdminAPIKeyDetailPage';
 
 export const AdminAPIKeyDetailRoute = createAppRoute({
   component: AdminAPIKeyDetailPage,
-  route: '/admin/apikeys/:id',
-  path: s => ({ id: s.string(null) }),
+  path: '/admin/apikeys/:id',
+  params: s => ({ id: s.string(null) }),
 
   forbidden: s => !s.user.is_admin
 });

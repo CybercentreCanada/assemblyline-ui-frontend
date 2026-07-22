@@ -131,7 +131,7 @@ export const GridTableRow: FC<GridTableRowProps> = memo(
   }))
 );
 
-export type GridLinkRowProps<Origin extends AppRoute['route'] = AppRoute['route']> = GridTableRowProps &
+export type GridLinkRowProps<Origin extends AppRoute['path'] = AppRoute['path']> = GridTableRowProps &
   InferAppNavigationPropsFromPath<Origin> & {
     component?: never;
   };

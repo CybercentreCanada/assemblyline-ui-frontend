@@ -1035,8 +1035,8 @@ const WrappedAlertDetailPage = memo((props: Props) => (
 
 export const AlertDetailRoute = createAppRoute({
   component: WrappedAlertDetailPage,
-  route: '/alert/:id',
-  path: s => ({
+  path: '/alert/:id',
+  params: s => ({
     id: s.string()
   })
 });

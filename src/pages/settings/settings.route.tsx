@@ -97,8 +97,8 @@ SettingsPage.displayName = 'SettingsPage';
 
 export const SettingsRoute = createAppRoute({
   component: SettingsPage,
-  route: '/settings/:tab',
-  path: s => ({
+  path: '/settings/:tab',
+  params: s => ({
     tab: s.string()
   }),
 
@@ -107,7 +107,7 @@ export const SettingsRoute = createAppRoute({
 
 export const SettingsRootRoute = createAppRoute({
   component: SettingsPage,
-  route: '/settings',
+  path: '/settings',
 
   forbidden: s => !s.user.is_admin && !s.user.roles.includes('self_manage')
 });

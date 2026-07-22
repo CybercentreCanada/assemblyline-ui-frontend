@@ -292,22 +292,21 @@ AdminErrorViewerPage.displayName = 'AdminErrorViewerPage';
 
 export const AdminErrorViewerRoute = createAppRoute({
   component: AdminErrorViewerPage,
-  route: '/admin/errors',
-
+  path: '/admin/errors',
   search: s => ({
     query: s.string(''),
-    offset: s.number(0).min(0).origin('snapshot').ephemeral(),
-    rows: s.number(25).locked().origin('snapshot').ephemeral(),
+    offset: s.number(0).min(0).source('transient').ephemeral(),
+    rows: s.number(25).locked().source('transient').ephemeral(),
     sort: s.string('created desc').ephemeral(),
     start: s.string('now-4d'),
     end: s.string('now'),
     gap: s.string('4h'),
     filters: s.filters([]),
     track_total_hits: s.number(10000).nullable().ephemeral(),
-    mincount: s.number(0).min(0).origin('snapshot').ephemeral(),
+    mincount: s.number(0).min(0).source('transient').ephemeral(),
     use_archive: s.boolean(false),
     archive_only: s.boolean(false),
-    timeout: s.string('').origin('snapshot').ephemeral()
+    timeout: s.string('').source('transient').ephemeral()
   }),
 
   forbidden: s => !s.user.is_admin

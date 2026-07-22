@@ -167,14 +167,14 @@ const Submissions = memo(() => {
 
 export const SubmissionsRoute = createAppRoute({
   component: Submissions,
-  route: '/submissions',
+  path: '/submissions',
   search: s => ({
     query: s.string(''),
-    offset: s.number(0).min(0).origin('snapshot').ephemeral(),
-    rows: s.number(25).locked().origin('snapshot').ephemeral(),
+    offset: s.number(0).min(0).source('transient').ephemeral(),
+    rows: s.number(25).locked().source('transient').ephemeral(),
     sort: s.string('times.submitted desc').ephemeral(),
     filters: s.filters([]),
-    track_total_hits: s.number(null).origin('snapshot').nullable().ephemeral()
+    track_total_hits: s.number(null).source('transient').nullable().ephemeral()
   }),
 
   forbidden: s => !s.user.roles.includes('submission_view')

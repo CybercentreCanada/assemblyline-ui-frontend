@@ -578,15 +578,13 @@ const FileDetailPage = React.memo(() => {
 
 export const FileDetailRoute = createAppRoute({
   component: FileDetailPage,
-  route: '/file/detail/:id',
-  path: s => ({
+  path: '/file/detail/:id',
+  params: s => ({
     id: s.string()
   }),
   search: s => ({
     name: s.string(null)
   }),
-
-  state: s => s({ test: 'asd' } as { test: string }),
 
   forbidden: s => !s.user.roles.includes('submission_view')
 });

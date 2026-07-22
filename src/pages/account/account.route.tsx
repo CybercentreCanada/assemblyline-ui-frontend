@@ -16,5 +16,5 @@ AccountPage.displayName = 'AccountPage';
 
 export const AccountRoute = createAppRoute({
   component: AccountPage,
-  route: '/account'
+  path: '/account'
 });

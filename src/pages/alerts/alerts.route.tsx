@@ -299,5 +299,5 @@ export const WrappedAlertsPage = memo(() => (
 
 export const AlertsRoute = createAppRoute({
   component: WrappedAlertsPage,
-  route: '/alerts'
+  path: '/alerts'
 });

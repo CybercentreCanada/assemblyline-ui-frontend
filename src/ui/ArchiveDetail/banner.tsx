@@ -539,8 +539,10 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
                           nav={nav =>
                             nav.to().create({
                               route: '/submit',
-                              search: { hash: file.file_info.sha256 },
-                              state: { c12n: file.file_info.classification }
+                              search: {
+                                hash: file.file_info.sha256,
+                                classification: file.file_info.classification
+                              }
                             })
                           }
                           navDeps={[file?.file_info?.sha256, file?.file_info?.classification]}

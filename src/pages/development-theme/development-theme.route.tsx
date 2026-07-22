@@ -322,7 +322,7 @@ export const DevelopmentThemePage = memo(() => {
 
 export const DevelopmentThemeRoute = createAppRoute({
   component: DevelopmentThemePage,
-  route: '/development/theme',
+  path: '/development/theme',
 
   forbidden: s => !s.user.is_admin || !['development', 'staging'].includes(s.configuration.system.type)
 });

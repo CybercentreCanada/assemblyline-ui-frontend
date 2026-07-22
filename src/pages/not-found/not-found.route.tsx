@@ -7,7 +7,7 @@ import { NotFoundPage } from 'pages/not-found/not-found';
 
 export const NotFoundRoute = createAppRoute({
   component: NotFoundPage,
-  route: '/not-found',
+  path: '/not-found',
   search: s => ({
     values: s.object(null).source('transient').ephemeral().ignored().nullable()
   })

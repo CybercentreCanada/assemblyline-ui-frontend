@@ -155,8 +155,7 @@ AdminAPIKeysPage.displayName = 'AdminAPIKeysPage';
 
 export const AdminAPIKeysRoute = createAppRoute({
   component: AdminAPIKeysPage,
-  route: '/admin/apikeys',
-
+  path: '/admin/apikeys',
   search: s => ({
     query: s.string(''),
     offset: s.number(0).min(0).ephemeral(),

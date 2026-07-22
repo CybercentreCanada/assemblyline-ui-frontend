@@ -39,5 +39,5 @@ MissingNodePage.displayName = 'MissingNodePage';
 
 export const MissingNodeRoute = createAppRoute({
   component: MissingNodePage,
-  route: '/missing-node'
+  path: '/missing-node'
 });

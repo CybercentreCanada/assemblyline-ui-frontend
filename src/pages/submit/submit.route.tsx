@@ -411,8 +411,7 @@ SubmitPage.displayName = 'SubmitPage';
 
 export const SubmitRoute = createAppRoute({
   component: SubmitPage,
-  route: '/submit',
-
+  path: '/submit',
   search: s => ({
     classification: s.string(null),
     hash: s.string(null),
@@ -423,7 +422,5 @@ export const SubmitRoute = createAppRoute({
     priority: s.number(null),
     ttl: s.number(null),
     'params.filetype_override': s.string(null)
-  }),
-
-  state: s => s({} as SubmitState)
+  })
 });

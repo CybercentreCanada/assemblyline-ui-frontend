@@ -170,7 +170,7 @@ const WrappedDevelopmentCustomizePage = memo(() => (
 
 export const DevelopmentCustomizeRoute = createAppRoute({
   component: WrappedDevelopmentCustomizePage,
-  route: '/development/customize',
+  path: '/development/customize',
 
   forbidden: s => !s.user.is_admin || !['development', 'staging'].includes(s.configuration.system.type)
 });

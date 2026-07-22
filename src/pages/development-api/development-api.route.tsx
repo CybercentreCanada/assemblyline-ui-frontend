@@ -385,7 +385,7 @@ export const DevelopmentAPIPage = memo(() => {
 
 export const DevelopmentAPIRoute = createAppRoute({
   component: DevelopmentAPIPage,
-  route: '/development/api',
+  path: '/development/api',
 
   forbidden: s => !s.user.is_admin || !['development', 'staging'].includes(s.configuration.system.type)
 });

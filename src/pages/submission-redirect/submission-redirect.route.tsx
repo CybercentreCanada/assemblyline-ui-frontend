@@ -23,8 +23,8 @@ const SubmissionRedirect = memo(() => {
 
 export const SubmissionRedirectRoute = createAppRoute({
   component: SubmissionRedirect,
-  route: '/submission/:id',
-  path: s => ({
+  path: '/submission/:id',
+  params: s => ({
     id: s.string()
   }),
 

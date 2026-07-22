@@ -462,5 +462,5 @@ HelpAPIPage.displayName = 'HelpAPIPage';
 
 export const HelpAPIRoute = createAppRoute({
   component: HelpAPIPage,
-  route: '/help/api'
+  path: '/help/api'
 });

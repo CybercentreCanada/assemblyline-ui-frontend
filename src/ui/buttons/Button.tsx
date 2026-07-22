@@ -7,7 +7,7 @@ import { getTextContent } from 'shared/utils/utils';
 import { Tooltip } from 'ui/Tooltip';
 import { CircularProgress } from 'ui/buttons/CircularProgress';
 
-export type ButtonProps<Origin extends AppRoute['route'] = AppRoute['route']> = MuiButtonProps &
+export type ButtonProps<Origin extends AppRoute['path'] = AppRoute['path']> = MuiButtonProps &
   InferAppNavigationPropsFromPath<Origin> & {
     loading?: boolean;
     preventRender?: boolean | (() => boolean);
@@ -16,7 +16,7 @@ export type ButtonProps<Origin extends AppRoute['route'] = AppRoute['route']> = 
     tooltipProps?: Omit<TooltipProps, 'children' | 'title'>;
   };
 
-export const Button = memo(function <Origin extends AppRoute['route']>({
+export const Button = memo(function <Origin extends AppRoute['path']>({
   children = null,
   disabled = false,
   id = null,

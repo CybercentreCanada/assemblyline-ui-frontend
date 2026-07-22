@@ -329,8 +329,8 @@ const SubmissionReportPage = memo(() => {
 
 export const SubmissionReportRoute = createAppRoute({
   component: SubmissionReportPage,
-  route: '/submission/report/:id',
-  path: s => ({
+  path: '/submission/report/:id',
+  params: s => ({
     id: s.string()
   }),
 

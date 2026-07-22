@@ -288,5 +288,5 @@ export const HelpClassificationPage = memo(() => {
 
 export const HelpClassificationRoute = createAppRoute({
   component: HelpClassificationPage,
-  route: '/help/classification'
+  path: '/help/classification'
 });

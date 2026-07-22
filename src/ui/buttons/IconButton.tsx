@@ -9,7 +9,7 @@ import type { CircularProgressProps } from 'ui/buttons/CircularProgress';
 import { CircularProgress } from 'ui/buttons/CircularProgress';
 import { Tooltip } from 'ui/Tooltip';
 
-export type IconButtonProps<Origin extends AppRoute['route'] = AppRoute['route']> = MuiIconButtonProps &
+export type IconButtonProps<Origin extends AppRoute['path'] = AppRoute['path']> = MuiIconButtonProps &
   InferAppNavigationPropsFromPath<Origin> & {
     loading?: boolean;
     preventRender?: boolean | (() => boolean);
@@ -18,7 +18,7 @@ export type IconButtonProps<Origin extends AppRoute['route'] = AppRoute['route']
     tooltipProps?: Omit<TooltipProps, 'children' | 'title'>;
   };
 
-export const IconButton = memo(function <Origin extends AppRoute['route']>({
+export const IconButton = memo(function <Origin extends AppRoute['path']>({
   children = null,
   color = null,
   disabled = false,

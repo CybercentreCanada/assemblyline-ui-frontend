@@ -466,8 +466,8 @@ SearchPage.displayName = 'SearchPage';
 
 export const SearchRoute = createAppRoute({
   component: SearchPage,
-  route: '/search/:index',
-  path: s => ({
+  path: '/search/:index',
+  params: s => ({
     index: s.enum(INDEX_OPTIONS, 'submission')
   }),
   search: s => ({
@@ -477,7 +477,7 @@ export const SearchRoute = createAppRoute({
 
 export const SearchRootRoute = createAppRoute({
   component: SearchPage,
-  route: '/search',
+  path: '/search',
   search: s => ({
     query: s.string('')
   })
