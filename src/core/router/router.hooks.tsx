@@ -3,40 +3,40 @@ import type {
   AppLocationState,
   AppNavigateOptions,
   AppNavigationStore,
-  AppRouterRoute,
+  AppRouterPage,
   InferAppNavigationOperationMapFromPath,
   InferAppNavigationPropsFromPath
 } from 'core/router';
 import {
-  addBlockedRoute,
-  addRoute,
+  addBlockedPage,
+  addPage,
   applyDefaultNavigationStore,
   applyNavigationDispatch,
-  clearBlockedRoutes,
-  findNextPanelKeyFromRouteKey,
-  findPanelKeyFromRouteKey,
-  findPrevPanelKeyFromRouteKey,
-  findRouteKeyFromPanelKey,
+  clearBlockedPages,
+  findNextPanelKeyFromPageKey,
+  findPageKeyFromPanelKey,
+  findPanelKeyFromPageKey,
+  findPrevPanelKeyFromPageKey,
   getAppNavigationStateFromApi,
   getAppRouterStateFromApi,
   getDefaultNavigateOptions,
-  getDefaultRouterRoute,
+  getDefaultRouterPage,
   getHashFragmentsFromRouter,
   getLocationStateFromRouter,
   getNavigationStoreFromRouter,
-  getNextTitleFromRoute,
-  getRouteFromPanelKey,
-  hasBlockedRoutes,
+  getNextTitleFromPage,
+  getPageFromPanelKey,
+  hasBlockedPages,
   reconcileRouterFromNavigation,
-  removeBlockedRoute,
+  removeBlockedPage,
   removePanel,
   resolveNavigationIntent,
   sanitizeRouterStore,
-  setRouteScrollPositions,
-  shouldUpdateRoute,
-  updateRoute,
+  setPageScrollPositions,
+  shouldUpdatePage,
+  updatePage,
+  upsertPage,
   upsertPanel,
-  upsertRoute,
   useAppNavigationStoreApi,
   useAppRouterStoreApi,
   useAppSetNavigationStore,
@@ -45,15 +45,15 @@ import {
 import type { InferAppRouteSpecFromPath } from 'core/routes';
 import {
   findRouteSpecFromKey,
-  findRouteSpecFromRoute,
+  findRouteSpecFromPage,
   getAppLocationParamStateFromApi,
-  getExternalHrefFromRoute,
-  getRouteFromInput,
-  getRouteFromParam,
+  getExternalHrefFromPage,
+  getPageFromInput,
+  getPageFromParam,
   getRouteParamFromKey,
-  sanitizeRoute,
+  sanitizePage,
   useAppLocationParamStoreApi,
-  useAppRouteKey
+  useAppPageKey
 } from 'core/routes';
 import type { InferSearchParamSnapshotFromEngine } from 'features/search-params';
 import type { DependencyList } from 'react';
@@ -75,13 +75,13 @@ import { generateRandomUUID } from 'shared/utils/app.utils';
 export const useAppExternalHref = function <const Origin extends AppRoute['route']>(
   nav: InferAppNavigationPropsFromPath<Origin>['nav'],
   navDeps: DependencyList
-): AppRouterRoute['href'] {
-  const routeKey = useAppRouteKey();
+): AppRouterPage['href'] {
+  const pageKey = useAppPageKey();
   const locationParamStoreApi = useAppLocationParamStoreApi();
   const routerStoreApi = useAppRouterStoreApi();
   const preferenceStoreApi = useAppPreferenceStoreApi();
 
-  return useMemo<AppRouterRoute['href']>(
+  return useMemo<AppRouterPage['href']>(
     () => {
       const { target, panelKey, operation, options, dispatch } = resolveNavigationIntent<Origin>(nav);
 
@@ -93,18 +93,18 @@ export const useAppExternalHref = function <const Origin extends AppRoute['route
       const preferenceState = getAppPreferenceStateFromApi(preferenceStoreApi);
       const routerState = getAppRouterStateFromApi(routerStoreApi);
 
-      const resolveHref = (resolvedPanelKey: number): AppRouterRoute['href'] => {
-        const prevRouteKey = findRouteKeyFromPanelKey(routerState, resolvedPanelKey);
-        const prevRoute = routerState.routes?.[prevRouteKey];
-        const prevRouteParams = getRouteParamFromKey<Origin>(locationState, prevRouteKey);
-        if (!prevRoute || !prevRouteParams) return null;
+      const resolveHref = (resolvedPanelKey: number): AppRouterPage['href'] => {
+        const prevPageKey = findPageKeyFromPanelKey(routerState, resolvedPanelKey);
+        const prevPage = routerState.pages?.[prevPageKey];
+        const prevPageParams = getRouteParamFromKey<Origin>(locationState, prevPageKey);
+        if (!prevPage || !prevPageParams) return null;
 
         if (operation === 'search') {
-          const prevRouteSpec = findRouteSpecFromKey<Origin>(locationState, prevRouteKey);
-          const prevSnapshot = prevRouteSpec.search.fromRoute(
-            prevRoute.href,
-            prevRoute.state,
-            prevRoute.transient
+          const prevPageSpec = findRouteSpecFromKey<Origin>(locationState, prevPageKey);
+          const prevSnapshot = prevPageSpec.search.fromRoute(
+            prevPage.href,
+            prevPage.state,
+            prevPage.transient
           ) as InferSearchParamSnapshotFromEngine<InferAppRouteSpecFromPath<Origin>['search']>;
 
           const nextSnapshot = applyNavigationDispatch(
@@ -112,38 +112,38 @@ export const useAppExternalHref = function <const Origin extends AppRoute['route
             prevSnapshot
           );
 
-          const nextRouteParam = {
-            ...prevRouteParams,
+          const nextPageParam = {
+            ...prevPageParams,
             search: nextSnapshot.toObject()
           };
 
-          const nextRoute = getRouteFromParam(locationState, nextRouteParam as never);
-          return getExternalHrefFromRoute(locationState, nextRoute);
+          const nextPage = getPageFromParam(locationState, nextPageParam as never);
+          return getExternalHrefFromPage(locationState, nextPage);
         }
 
-        const nextRouteInput = applyNavigationDispatch(
+        const nextPageInput = applyNavigationDispatch(
           dispatch as
             | InferAppNavigationOperationMapFromPath<Origin>['create']
             | InferAppNavigationOperationMapFromPath<Origin>['update']
             | InferAppNavigationOperationMapFromPath<Origin>['only'],
-          prevRouteParams as never
+          prevPageParams as never
         ) as never;
 
-        const nextRoute =
+        const nextPage =
           operation === 'only'
-            ? getRouteFromParam(locationState, nextRouteInput)
-            : getRouteFromInput(locationState, nextRouteInput);
+            ? getPageFromParam(locationState, nextPageInput)
+            : getPageFromInput(locationState, nextPageInput);
 
-        return getExternalHrefFromRoute(locationState, nextRoute);
+        return getExternalHrefFromPage(locationState, nextPage);
       };
 
       switch (target) {
         case 'from':
-          return resolveHref(findPrevPanelKeyFromRouteKey(routerState, routeKey, preferenceState));
+          return resolveHref(findPrevPanelKeyFromPageKey(routerState, pageKey, preferenceState));
         case 'here':
-          return resolveHref(findPanelKeyFromRouteKey(routerState, routeKey));
+          return resolveHref(findPanelKeyFromPageKey(routerState, pageKey));
         case 'to':
-          return resolveHref(findNextPanelKeyFromRouteKey(routerState, routeKey, preferenceState));
+          return resolveHref(findNextPanelKeyFromPageKey(routerState, pageKey, preferenceState));
         case 'at':
           return panelKey == null ? null : resolveHref(panelKey);
         default:
@@ -151,7 +151,7 @@ export const useAppExternalHref = function <const Origin extends AppRoute['route
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [routeKey, ...(navDeps ?? [nav])]
+    [pageKey, ...(navDeps ?? [nav])]
   );
 };
 
@@ -160,7 +160,7 @@ export const useAppExternalHref = function <const Origin extends AppRoute['route
 //*****************************************************************************************
 
 export function useAppNavigate<const Origin extends AppRoute['route']>() {
-  const routeKey = useAppRouteKey();
+  const pageKey = useAppPageKey();
   const locationParamStoreApi = useAppLocationParamStoreApi();
   const routerStoreApi = useAppRouterStoreApi();
   const preferenceStoreApi = useAppPreferenceStoreApi();
@@ -176,22 +176,22 @@ export function useAppNavigate<const Origin extends AppRoute['route']>() {
       const preferenceState = getAppPreferenceStateFromApi(preferenceStoreApi);
       const routerState = getAppRouterStateFromApi(routerStoreApi);
 
-      const prevRouteKey = findRouteKeyFromPanelKey(routerState, destinationPanelKey);
-      const prevRouteParam = getRouteParamFromKey<Origin>(locationState, prevRouteKey);
-      const nextRouteParam = applyNavigationDispatch(dispatch, prevRouteParam as never) as never;
-      const nextRoute = getRouteFromInput<Destination>(locationState, nextRouteParam);
+      const prevPageKey = findPageKeyFromPanelKey(routerState, destinationPanelKey);
+      const prevPageParam = getRouteParamFromKey<Origin>(locationState, prevPageKey);
+      const nextPageParam = applyNavigationDispatch(dispatch, prevPageParam as never) as never;
+      const nextPage = getPageFromInput<Destination>(locationState, nextPageParam);
 
-      if (!shouldUpdateRoute(routerState, prevRouteKey, nextRoute)) return;
+      if (!shouldUpdatePage(routerState, prevPageKey, nextPage)) return;
 
       setNavigationStore(store => {
         store = getNavigationStoreFromRouter(store, routerState);
-        const [nextStore, nextRouteKey] = addRoute(store, nextRoute);
-        [store] = upsertPanel(nextStore, destinationPanelKey, { routeKey: nextRouteKey }, preferenceState);
+        const [nextStore, nextPageKey] = addPage(store, nextPage);
+        [store] = upsertPanel(nextStore, destinationPanelKey, { pageKey: nextPageKey }, preferenceState);
         store = sanitizeRouterStore(store, preferenceState);
-        store = setRouteScrollPositions(store);
+        store = setPageScrollPositions(store);
         store.id = generateRandomUUID();
         store.options = options;
-        store.options.nextTitle = getNextTitleFromRoute(nextRoute);
+        store.options.nextTitle = getNextTitleFromPage(nextPage);
         return store;
       });
     },
@@ -208,21 +208,21 @@ export function useAppNavigate<const Origin extends AppRoute['route']>() {
       const preferenceState = getAppPreferenceStateFromApi(preferenceStoreApi);
       const routerState = getAppRouterStateFromApi(routerStoreApi);
 
-      const prevRouteKey = findRouteKeyFromPanelKey(routerState, destinationPanelKey);
-      const prevRouteParam = getRouteParamFromKey<Origin>(locationState, prevRouteKey);
-      const nextRouteParam = applyNavigationDispatch(dispatch, prevRouteParam as never) as never;
-      const nextRoute = getRouteFromInput<Destination>(locationState, nextRouteParam);
+      const prevPageKey = findPageKeyFromPanelKey(routerState, destinationPanelKey);
+      const prevPageParam = getRouteParamFromKey<Origin>(locationState, prevPageKey);
+      const nextPageParam = applyNavigationDispatch(dispatch, prevPageParam as never) as never;
+      const nextPage = getPageFromInput<Destination>(locationState, nextPageParam);
 
-      if (!shouldUpdateRoute(routerState, prevRouteKey, nextRoute)) return;
+      if (!shouldUpdatePage(routerState, prevPageKey, nextPage)) return;
 
       setNavigationStore(store => {
         store = getNavigationStoreFromRouter(store, routerState);
-        store = updateRoute(store, prevRouteKey, nextRoute);
+        store = updatePage(store, prevPageKey, nextPage);
         store = sanitizeRouterStore(store, preferenceState);
-        store = setRouteScrollPositions(store);
+        store = setPageScrollPositions(store);
         store.id = generateRandomUUID();
         store.options = options;
-        store.options.nextTitle = getNextTitleFromRoute(nextRoute);
+        store.options.nextTitle = getNextTitleFromPage(nextPage);
         return store;
       });
     },
@@ -239,27 +239,27 @@ export function useAppNavigate<const Origin extends AppRoute['route']>() {
       const preferenceState = getAppPreferenceStateFromApi(preferenceStoreApi);
       const routerState = getAppRouterStateFromApi(routerStoreApi);
 
-      const prevRouteKey = findRouteKeyFromPanelKey(routerState, destinationPanelKey);
-      const prevRoute = getRouteFromPanelKey(routerState, destinationPanelKey);
-      const prevRouteParam = getRouteParamFromKey<Origin>(locationState, prevRouteKey);
-      const prevRouteSpec = findRouteSpecFromKey<Origin>(locationState, prevRouteKey);
+      const prevPageKey = findPageKeyFromPanelKey(routerState, destinationPanelKey);
+      const prevPage = getPageFromPanelKey(routerState, destinationPanelKey);
+      const prevPageParam = getRouteParamFromKey<Origin>(locationState, prevPageKey);
+      const prevPageSpec = findRouteSpecFromKey<Origin>(locationState, prevPageKey);
 
-      const prevSearchSnapshot = prevRouteSpec.search.fromRoute(prevRoute.href, prevRoute.state, prevRoute.transient);
+      const prevSearchSnapshot = prevPageSpec.search.fromRoute(prevPage.href, prevPage.state, prevPage.transient);
       const nextSearchSnapshot = applyNavigationDispatch(dispatch, prevSearchSnapshot);
 
-      const nextRouteParam = { ...prevRouteParam, search: nextSearchSnapshot.toObject() };
-      const nextRoute = getRouteFromParam<Destination>(locationState, nextRouteParam as never);
+      const nextPageParam = { ...prevPageParam, search: nextSearchSnapshot.toObject() };
+      const nextPage = getPageFromParam<Destination>(locationState, nextPageParam as never);
 
-      if (!shouldUpdateRoute(routerState, prevRouteKey, nextRoute)) return;
+      if (!shouldUpdatePage(routerState, prevPageKey, nextPage)) return;
 
       setNavigationStore(store => {
         store = getNavigationStoreFromRouter(store, routerState);
-        store = updateRoute(store, prevRouteKey, nextRoute);
+        store = updatePage(store, prevPageKey, nextPage);
         store = sanitizeRouterStore(store, preferenceState);
-        store = setRouteScrollPositions(store);
+        store = setPageScrollPositions(store);
         store.id = generateRandomUUID();
         store.options = options;
-        store.options.nextTitle = getNextTitleFromRoute(nextRoute);
+        store.options.nextTitle = getNextTitleFromPage(nextPage);
         return store;
       });
     },
@@ -276,25 +276,25 @@ export function useAppNavigate<const Origin extends AppRoute['route']>() {
       const preferenceState = getAppPreferenceStateFromApi(preferenceStoreApi);
       const routerState = getAppRouterStateFromApi(routerStoreApi);
 
-      const prevRouteKey = findRouteKeyFromPanelKey(routerState, destinationPanelKey);
-      const prevRouteParam = getRouteParamFromKey<Origin>(locationState, prevRouteKey);
-      const nextRouteParam = applyNavigationDispatch(dispatch, prevRouteParam as never) as never;
-      const nextRoute = getRouteFromParam<Destination>(locationState, nextRouteParam);
+      const prevPageKey = findPageKeyFromPanelKey(routerState, destinationPanelKey);
+      const prevPageParam = getRouteParamFromKey<Origin>(locationState, prevPageKey);
+      const nextPageParam = applyNavigationDispatch(dispatch, prevPageParam as never) as never;
+      const nextPage = getPageFromParam<Destination>(locationState, nextPageParam);
 
       setNavigationStore(store => {
         store = getNavigationStoreFromRouter(store, routerState);
-        const [nextStore, nextRouteKey] = addRoute(store, nextRoute);
-        [store] = upsertPanel(nextStore, 0, { routeKey: nextRouteKey }, preferenceState);
+        const [nextStore, nextPageKey] = addPage(store, nextPage);
+        [store] = upsertPanel(nextStore, 0, { pageKey: nextPageKey }, preferenceState);
 
         for (let panelKey = store.panels.length - 1; panelKey > 0; panelKey--) {
           store = removePanel(store, panelKey);
         }
 
         store = sanitizeRouterStore(store, preferenceState);
-        store = setRouteScrollPositions(store);
+        store = setPageScrollPositions(store);
         store.id = generateRandomUUID();
         store.options = options;
-        store.options.nextTitle = getNextTitleFromRoute(nextRoute);
+        store.options.nextTitle = getNextTitleFromPage(nextPage);
         return store;
       });
     },
@@ -311,9 +311,9 @@ export function useAppNavigate<const Origin extends AppRoute['route']>() {
       const preferenceState = getAppPreferenceStateFromApi(preferenceStoreApi);
       const routerState = getAppRouterStateFromApi(routerStoreApi);
 
-      const prevRouteKey = findRouteKeyFromPanelKey(routerState, destinationPanelKey);
-      const prevRouteParam = getRouteParamFromKey<Origin>(locationState, prevRouteKey);
-      const shouldClose = typeof dispatch === 'function' ? dispatch(prevRouteParam as never) : dispatch;
+      const prevPageKey = findPageKeyFromPanelKey(routerState, destinationPanelKey);
+      const prevPageParam = getRouteParamFromKey<Origin>(locationState, prevPageKey);
+      const shouldClose = typeof dispatch === 'function' ? dispatch(prevPageParam as never) : dispatch;
 
       if (!shouldClose) return;
 
@@ -321,10 +321,10 @@ export function useAppNavigate<const Origin extends AppRoute['route']>() {
         store = getNavigationStoreFromRouter(store, routerState);
         store = removePanel(store, destinationPanelKey);
         store = sanitizeRouterStore(store, preferenceState);
-        store = setRouteScrollPositions(store);
+        store = setPageScrollPositions(store);
         store.id = generateRandomUUID();
         store.options = options;
-        store.options.nextTitle = getNextTitleFromRoute(null);
+        store.options.nextTitle = getNextTitleFromPage(null);
         return store;
       });
     },
@@ -359,10 +359,10 @@ export function useAppNavigate<const Origin extends AppRoute['route']>() {
       const routerState = getAppRouterStateFromApi(routerStoreApi);
       const preferenceState = getAppPreferenceStateFromApi(preferenceStoreApi);
 
-      const destinationPanelKey = findPrevPanelKeyFromRouteKey(routerState, routeKey, preferenceState);
+      const destinationPanelKey = findPrevPanelKeyFromPageKey(routerState, pageKey, preferenceState);
       return buildOperations<Destination>(destinationPanelKey, options);
     },
-    [buildOperations, preferenceStoreApi, routeKey, routerStoreApi]
+    [buildOperations, preferenceStoreApi, pageKey, routerStoreApi]
   );
 
   const here = useCallback(
@@ -371,10 +371,10 @@ export function useAppNavigate<const Origin extends AppRoute['route']>() {
     ) {
       const routerState = getAppRouterStateFromApi(routerStoreApi);
 
-      const originPanelKey = findPanelKeyFromRouteKey(routerState, routeKey);
+      const originPanelKey = findPanelKeyFromPageKey(routerState, pageKey);
       return buildOperations<Destination>(originPanelKey, options);
     },
-    [buildOperations, routeKey, routerStoreApi]
+    [buildOperations, pageKey, routerStoreApi]
   );
 
   const to = useCallback(
@@ -384,10 +384,10 @@ export function useAppNavigate<const Origin extends AppRoute['route']>() {
       const routerState = getAppRouterStateFromApi(routerStoreApi);
       const preferenceState = getAppPreferenceStateFromApi(preferenceStoreApi);
 
-      const destinationPanelKey = findNextPanelKeyFromRouteKey(routerState, routeKey, preferenceState);
+      const destinationPanelKey = findNextPanelKeyFromPageKey(routerState, pageKey, preferenceState);
       return buildOperations<Destination>(destinationPanelKey, options);
     },
-    [buildOperations, preferenceStoreApi, routeKey, routerStoreApi]
+    [buildOperations, preferenceStoreApi, pageKey, routerStoreApi]
   );
 
   const at = useCallback(
@@ -423,9 +423,9 @@ export function useAppSyncNavigationStoreFromLocation() {
 
         store = getNavigationStoreFromRouter(store, routerState);
 
-        for (const [routeKey, route] of Object.entries(location.state?.routes || {})) {
-          const nextRoute = sanitizeRoute(locationState, getDefaultRouterRoute(route));
-          [store] = upsertRoute(store, routeKey, nextRoute);
+        for (const [pageKey, route] of Object.entries(location.state?.pages || {})) {
+          const nextPage = sanitizePage(locationState, getDefaultRouterPage(route));
+          [store] = upsertPage(store, pageKey, nextPage);
         }
 
         for (const [nextPanelKey, nextPanel] of (location.state?.panels || []).entries()) {
@@ -466,20 +466,20 @@ export function useAppSyncNavigationStoreFromLocation() {
 
         for (const [i, fragment] of hashFragment.split('#/').entries()) {
           const href = i === 0 ? fragment : `/${fragment}`;
-          const nextRoute = sanitizeRoute(locationState, getDefaultRouterRoute({ href }));
-          if (!nextRoute?.href) continue;
+          const nextPage = sanitizePage(locationState, getDefaultRouterPage({ href }));
+          if (!nextPage?.href) continue;
 
           panelKey++;
 
-          const prevRoute = getRouteFromPanelKey(routerState, panelKey);
-          const prevSpec = findRouteSpecFromRoute(locationState, prevRoute);
-          const nextSpec = findRouteSpecFromRoute(locationState, nextRoute);
+          const prevPage = getPageFromPanelKey(routerState, panelKey);
+          const prevSpec = findRouteSpecFromPage(locationState, prevPage);
+          const nextSpec = findRouteSpecFromPage(locationState, nextPage);
 
           if (!!nextSpec?.path && nextSpec?.path === prevSpec?.path) {
-            store = updateRoute(store, store.panels[panelKey].routeKey, nextRoute);
+            store = updatePage(store, store.panels[panelKey].pageKey, nextPage);
           } else {
-            const [store1, nextRouteKey] = addRoute(store, nextRoute);
-            [store] = upsertPanel(store1, panelKey, { routeKey: nextRouteKey }, preferenceState);
+            const [store1, nextPageKey] = addPage(store, nextPage);
+            [store] = upsertPanel(store1, panelKey, { pageKey: nextPageKey }, preferenceState);
           }
         }
 
@@ -509,19 +509,19 @@ export function useAppSyncNavigationStoreFromLocation() {
 
         const pathname = location.pathname === '/' ? '/submit' : location.pathname;
         const href = `${pathname}${location.search || ''}${location.hash || ''}`;
-        const legacyRoute = sanitizeRoute(locationState, getDefaultRouterRoute({ href, state: location.state }));
+        const legacyRoute = sanitizePage(locationState, getDefaultRouterPage({ href, state: location.state }));
 
         if (!legacyRoute?.href) return store;
 
-        const nextSpec = findRouteSpecFromRoute(locationState, legacyRoute);
-        const prevLocation = getRouteFromPanelKey(store, 0);
-        const prevSpec = findRouteSpecFromRoute(locationState, prevLocation);
+        const nextSpec = findRouteSpecFromPage(locationState, legacyRoute);
+        const prevLocation = getPageFromPanelKey(store, 0);
+        const prevSpec = findRouteSpecFromPage(locationState, prevLocation);
 
-        if (!!nextSpec?.path && nextSpec?.path === prevSpec?.path && !!store?.panels?.[0]?.routeKey) {
-          store = updateRoute(store, store.panels[0].routeKey, legacyRoute);
+        if (!!nextSpec?.path && nextSpec?.path === prevSpec?.path && !!store?.panels?.[0]?.pageKey) {
+          store = updatePage(store, store.panels[0].pageKey, legacyRoute);
         } else {
-          const [store1, nextRouteKey] = addRoute(store, legacyRoute);
-          [store] = upsertPanel(store1, 0, { routeKey: nextRouteKey }, preferenceState);
+          const [store1, nextPageKey] = addPage(store, legacyRoute);
+          [store] = upsertPanel(store1, 0, { pageKey: nextPageKey }, preferenceState);
         }
 
         for (let panelKey = store.panels.length - 1; panelKey > 0; panelKey--) {
@@ -579,7 +579,7 @@ export function useAppSyncRouterStoreFromNavigation() {
   const updateRouterStoreFromNavigation = useCallback(
     (navigation: AppNavigationStore) => {
       const routerState = getAppRouterStateFromApi(routerStoreApi);
-      if (navigation.id === routerState.id || hasBlockedRoutes(navigation)) return;
+      if (navigation.id === routerState.id || hasBlockedPages(navigation)) return;
 
       const nextTitle = navigation?.options?.nextTitle?.trim();
       document.title = nextTitle ? `ALV4 | ${nextTitle}` : 'Assemblyline 4';
@@ -608,18 +608,18 @@ export function useAppSyncRouterStoreFromNavigation() {
 //*****************************************************************************************
 
 export function useAppBlocker(shouldBlock: boolean | (() => boolean), dependencies: DependencyList = null) {
-  const routeKey = useAppRouteKey();
+  const pageKey = useAppPageKey();
   const setNavigationStore = useAppSetNavigationStore();
 
   useEffect(
     () =>
       setNavigationStore(store => {
-        if (!routeKey) return store;
+        if (!pageKey) return store;
         const isBlocked = typeof shouldBlock === 'function' ? shouldBlock() : shouldBlock;
-        return isBlocked ? addBlockedRoute(store, routeKey) : removeBlockedRoute(store, routeKey);
+        return isBlocked ? addBlockedPage(store, pageKey) : removeBlockedPage(store, pageKey);
       }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [routeKey, setNavigationStore, ...(dependencies ?? [shouldBlock])]
+    [pageKey, setNavigationStore, ...(dependencies ?? [shouldBlock])]
   );
 }
 
@@ -632,7 +632,7 @@ export function useAppBlockUnloadEvent() {
   const handleBeforeUnload = useCallback(
     (event: BeforeUnloadEvent) => {
       const navigationState = getAppNavigationStateFromApi(navigationStoreApi);
-      if (!hasBlockedRoutes(navigationState)) return;
+      if (!hasBlockedPages(navigationState)) return;
       event.preventDefault();
       event.returnValue = '';
     },
@@ -661,7 +661,7 @@ export function useAppBlockNavigation() {
   const onNavigationChange = useCallback(
     (store: AppNavigationStore) => {
       const routerState = getAppRouterStateFromApi(routerStoreApi);
-      const hasBlockers = hasBlockedRoutes(store);
+      const hasBlockers = hasBlockedPages(store);
       if (!hasBlockers) {
         lastPromptedNavigationIdRef.current = null;
         return;
@@ -679,7 +679,7 @@ export function useAppBlockNavigation() {
       const shouldLeave = window.confirm('You have unsaved changes. Leave this page and discard them?');
       if (!shouldLeave) return;
 
-      setNavigationStore(clearBlockedRoutes);
+      setNavigationStore(clearBlockedPages);
       lastPromptedNavigationIdRef.current = null;
     },
     [routerStoreApi, setNavigationStore]

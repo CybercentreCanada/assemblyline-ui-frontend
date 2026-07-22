@@ -3,14 +3,14 @@ import { useTheme } from '@mui/material';
 import { debounce } from '@tanstack/react-pacer';
 import { useAppPreferenceStore } from 'core/preference';
 import {
-  findNextPanelKeyFromRouteKey,
-  findPanelKeyFromRouteKey,
-  findPrevPanelKeyFromRouteKey,
+  findNextPanelKeyFromPageKey,
+  findPanelKeyFromPageKey,
+  findPrevPanelKeyFromPageKey,
   getPanel,
   useAppRouterStore
 } from 'core/router';
 import type {
-  AppRouteKeyStore,
+  AppPageKeyStore,
   InferAppRouteParamFromPath,
   InferAppRouteSpecFromPath,
   InferAppRouteValuesFromPath
@@ -21,18 +21,18 @@ import {
   getRouteParamFromKey,
   parseMediaQuery,
   useAppLocationParamStore,
-  useAppRouteKeyStore
+  useAppPageKeyStore
 } from 'core/routes';
 import type { InferSearchParamSnapshotFromEngine } from 'features/search-params';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 /**
- * @name useAppRouteKey
+ * @name useAppPageKey
  * @description Returns the current route key from the route-key store.
  * @returns Current route key, or null when no route context is available
  */
-export function useAppRouteKey(): AppRouteKeyStore['routeKey'] {
-  const context = useAppRouteKeyStore(s => s.routeKey, true);
+export function useAppPageKey(): AppPageKeyStore['pageKey'] {
+  const context = useAppPageKeyStore(s => s.pageKey, true);
   if (context == null) return null;
   return context;
 }
@@ -50,27 +50,27 @@ export const useAppLocation = function <const Origin extends AppRoute['route']>(
   target: 'from' | 'here' | 'to' | 'at' = 'here',
   panelKey: number = null
 ) {
-  const routeKey = useAppRouteKey();
+  const pageKey = useAppPageKey();
   const preferences = useAppPreferenceStore(s => (target === 'from' || target === 'to' ? s : null));
 
   const targetRouteKey = useAppRouterStore(s => {
-    if (!routeKey) return null;
+    if (!pageKey) return null;
 
     let nextPanelKey: number = null;
 
     switch (target) {
       case 'from':
         if (!preferences) return null;
-        nextPanelKey = findPrevPanelKeyFromRouteKey(s, routeKey, preferences);
+        nextPanelKey = findPrevPanelKeyFromPageKey(s, pageKey, preferences);
         break;
 
       case 'here':
-        nextPanelKey = findPanelKeyFromRouteKey(s, routeKey);
+        nextPanelKey = findPanelKeyFromPageKey(s, pageKey);
         break;
 
       case 'to':
         if (!preferences) return null;
-        nextPanelKey = findNextPanelKeyFromRouteKey(s, routeKey, preferences);
+        nextPanelKey = findNextPanelKeyFromPageKey(s, pageKey, preferences);
         break;
 
       case 'at':
@@ -78,7 +78,7 @@ export const useAppLocation = function <const Origin extends AppRoute['route']>(
         break;
     }
 
-    return getPanel(s, nextPanelKey)?.routeKey ?? null;
+    return getPanel(s, nextPanelKey)?.pageKey ?? null;
   });
 
   const param = useAppLocationParamStore(s =>
@@ -101,8 +101,8 @@ export const useAppLocation = function <const Origin extends AppRoute['route']>(
 export function useAppPathParams<
   const Origin extends AppRoute['route']
 >(): InferAppRouteValuesFromPath<Origin>['path'] {
-  const routeKey = useAppRouteKey();
-  return useAppLocationParamStore(s => getRouteParamFromKey<Origin>(s, routeKey)?.path);
+  const pageKey = useAppPageKey();
+  return useAppLocationParamStore(s => getRouteParamFromKey<Origin>(s, pageKey)?.path);
 }
 
 /**
@@ -113,8 +113,8 @@ export function useAppPathParams<
 export function useAppSearchParams<
   const Origin extends AppRoute['route']
 >(): InferAppRouteValuesFromPath<Origin>['search'] {
-  const routeKey = useAppRouteKey();
-  return useAppLocationParamStore(s => getRouteParamFromKey<Origin>(s, routeKey)?.search);
+  const pageKey = useAppPageKey();
+  return useAppLocationParamStore(s => getRouteParamFromKey<Origin>(s, pageKey)?.search);
 }
 
 /**
@@ -126,13 +126,13 @@ export function useAppSearchParams<
 export function useAppSearchSnapshot<const Origin extends AppRoute['route']>(): InferSearchParamSnapshotFromEngine<
   InferAppRouteSpecFromPath<Origin>['search']
 > {
-  const routeKey = useAppRouteKey();
+  const pageKey = useAppPageKey();
 
   const searchParam = useAppLocationParamStore(s =>
-    !routeKey ? null : getRouteParamFromKey<Origin>(s, routeKey)?.search
+    !pageKey ? null : getRouteParamFromKey<Origin>(s, pageKey)?.search
   );
   const searchEngine = useAppLocationParamStore(s =>
-    !routeKey ? null : findRouteSpecFromKey<Origin>(s, routeKey)?.search
+    !pageKey ? null : findRouteSpecFromKey<Origin>(s, pageKey)?.search
   );
 
   return useMemo(() => {
@@ -149,8 +149,8 @@ export function useAppSearchSnapshot<const Origin extends AppRoute['route']>(): 
 export function useAppHashParams<const Origin extends AppRoute['route']>():
   | InferAppRouteParamFromPath<Origin>['hash']
   | undefined {
-  const routeKey = useAppRouteKey();
-  return useAppLocationParamStore(s => getRouteParamFromKey<Origin>(s, routeKey)?.hash);
+  const pageKey = useAppPageKey();
+  return useAppLocationParamStore(s => getRouteParamFromKey<Origin>(s, pageKey)?.hash);
 }
 
 /**
@@ -163,7 +163,7 @@ export function useAppHashParams<const Origin extends AppRoute['route']>():
  */
 export function useAppMediaQuery(query: string | ((theme: Theme) => string)): boolean {
   const theme = useTheme();
-  const routeKey = useAppRouteKey();
+  const pageKey = useAppPageKey();
   const [matches, setMatches] = useState<boolean>(false);
 
   const queryStr = typeof query === 'function' ? query(theme) : query;
@@ -185,12 +185,12 @@ export function useAppMediaQuery(query: string | ((theme: Theme) => string)): bo
   );
 
   useEffect(() => {
-    if (!routeKey) {
+    if (!pageKey) {
       setMatches(false);
       return;
     }
 
-    const scrollContainer = document.getElementById(`route-layout-${routeKey}`);
+    const scrollContainer = document.getElementById(`page-layout-${pageKey}`);
     if (!scrollContainer) {
       setMatches(false);
       return;
@@ -207,7 +207,7 @@ export function useAppMediaQuery(query: string | ((theme: Theme) => string)): bo
       resizeObserver.disconnect();
       (debouncedSetMatches as { cancel?: () => void })?.cancel?.();
     };
-  }, [queryStr, routeKey, evaluateAndUpdate, debouncedSetMatches]);
+  }, [queryStr, pageKey, evaluateAndUpdate, debouncedSetMatches]);
 
   return matches;
 }

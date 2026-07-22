@@ -67,25 +67,26 @@ AppLocationParamProvider.displayName = 'AppLocationParamProvider';
 // App Route Key Provider
 //*****************************************************************************************
 
-export type AppRouteKeyStore = {
+export type AppPageKeyStore = {
   /** Route key for this route context, or null when no route context is available. */
-  routeKey: keyof AppRouterStore['routes'] | null;
+  pageKey: keyof AppRouterStore['pages'] | null;
 };
 
-export const { StoreProvider: AppRouteKeyStoreProvider, useStore: useAppRouteKeyStore } =
-  createAppStore<AppRouteKeyStore>({ routeKey: null });
+export const { StoreProvider: AppPageKeyStoreProvider, useStore: useAppPageKeyStore } = createAppStore<AppPageKeyStore>(
+  { pageKey: null }
+);
 
-AppRouteKeyStoreProvider.displayName = 'AppRouteKeyStoreProvider';
+AppPageKeyStoreProvider.displayName = 'AppPageKeyStoreProvider';
 
-export type AppRouteKeyStoreProviderProps = {
+export type AppPageKeyStoreProviderProps = {
   /** Provider children. */
   children: ReactNode;
   /** Route key to provide. */
-  routeKey: keyof AppRouterStore['routes'];
+  pageKey: keyof AppRouterStore['pages'];
 };
 
-export const AppRouteKeyProvider = memo(({ children, routeKey }: AppRouteKeyStoreProviderProps) => (
-  <AppRouteKeyStoreProvider data={{ routeKey }}>{children}</AppRouteKeyStoreProvider>
+export const AppPageKeyProvider = memo(({ children, pageKey }: AppPageKeyStoreProviderProps) => (
+  <AppPageKeyStoreProvider data={{ pageKey }}>{children}</AppPageKeyStoreProvider>
 ));
 
-AppRouteKeyProvider.displayName = 'AppRouteKeyProvider';
+AppPageKeyProvider.displayName = 'AppPageKeyProvider';

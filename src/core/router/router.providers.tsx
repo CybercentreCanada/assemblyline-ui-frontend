@@ -17,7 +17,7 @@ import type { StoreApi } from 'zustand';
 //*****************************************************************************************
 
 export const getDefaultRouterStore = function (store: Partial<AppRouterStore> = null): AppRouterStore {
-  return { id: generateRandomUUID(), panels: [], nodes: {}, routes: {}, ...store };
+  return { id: generateRandomUUID(), panels: [], nodes: {}, pages: {}, ...store };
 };
 
 export const {
@@ -48,8 +48,8 @@ export const getDefaultNavigationStore = (store: Partial<AppNavigationStore> = n
     id: generateRandomUUID(),
     panels: [],
     nodes: {},
-    routes: {},
-    blockedRoutes: {},
+    pages: {},
+    blockedPages: {},
     options: {
       hashScrollIntoView: false,
       href: '',

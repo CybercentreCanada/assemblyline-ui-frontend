@@ -55,7 +55,7 @@ This ensures that navigating to a link and then navigating back returns you to t
 
 ### Route Key
 
-Each route instance in the router system is identified by a UUID (`routeKey`). The `AppRouteKeyProvider` makes this key available to the route's component tree, allowing it to identify which router store entry it belongs to.
+Each route instance in the router system is identified by a UUID (`routeKey`). The `AppPageKeyProvider` makes this key available to the route's component tree, allowing it to identify which router store entry it belongs to.
 
 ## 4. Configuration
 
@@ -142,10 +142,10 @@ const { id, tab } = useAppRoute('/alerts/:id', store => ({
 ### Getting the Current Route Key
 
 ```typescript
-import { useAppRouteKey } from 'core/routes';
+import { useAppPageKey } from 'core/routes';
 
 // Returns the UUID key for this route instance in the router store
-const routeKey = useAppRouteKey();
+const pageKey = useAppPageKey();
 ```
 
 ### Building Hrefs (in hooks/utils)
@@ -171,7 +171,7 @@ const { href, state } = buildLocationParam(APP_ROUTES, {
 | `routes.models.ts` | Type definitions: `AppRoute`, `CreatedAppRoute`, `CreatedAppRouteParamsMap`, `AppLocationParam` |
 | `routes.factories.tsx` | `createAppRoute` — builds a route object from path + options |
 | `routes.hooks.tsx` | `useAppPathParams`, `useAppSearchParams`, `useAppHashParams`, `useAppRoute` |
-| `routes.providers.tsx` | `AppRouteProvider` (per-route store), `AppRouteKeyProvider` (route identity) |
+| `routes.providers.tsx` | `AppRouteProvider` (per-route store), `AppPageKeyProvider` (route identity) |
 | `routes.components.tsx` | `DisabledBoundary`, `ForbiddenBoundary` — route guard components |
 | `routes.utils.tsx` | `findAppRoute`, `buildRoutePathname`, `buildRouteSearch`, `buildRouteHash`, `buildLocationParam` |
 | `routes.utils.test.tsx` | Unit tests for route building utilities |

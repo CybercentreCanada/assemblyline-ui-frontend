@@ -12,13 +12,13 @@ import type { Location as ReactRouterLocation } from 'react-router';
 /** Represents a single panel in the multi-panel router. */
 export type AppRouterPanel = {
   /** Currently active route key for this panel. */
-  routeKey: keyof AppRouterStore['routes'];
+  pageKey: keyof AppRouterStore['pages'];
   // /** Keys of pinned routes in this panel. */
-  // pinnedRouteKeys: (keyof AppRouterStore['routes'])[];
+  // pinnedPageKeys: (keyof AppRouterStore['pages'])[];
   // /** Keys of tabbed routes in this panel. */
-  // tabbedRouteKeys: (keyof AppRouterStore['routes'])[];
+  // tabbedPageKeys: (keyof AppRouterStore['pages'])[];
   // /** Key of the temporary (unsaved) route. */
-  // temporaryRouteKey: keyof AppRouterStore['routes'];
+  // temporaryPageKey: keyof AppRouterStore['pages'];
 };
 
 //*****************************************************************************************
@@ -32,37 +32,37 @@ export type AppRouterNode = {
   /** Reverse portal node reference. */
   portal: ReversePortalNode;
   /** Route key this node renders. */
-  routeKey: keyof AppRouterStore['routes'];
+  pageKey: keyof AppRouterStore['pages'];
 };
 
 //*****************************************************************************************
-// Route
+// Page
 //*****************************************************************************************
 
-/** Represents a single route entry in the router. */
-export type AppRouterRoute<State = unknown, Transient = unknown> = {
+/** Represents a single page entry in the router. */
+export type AppRouterPage<State = unknown, Transient = unknown> = {
   /** Deterministic content-addressable hash generated from {href, state}. Enables fast route identity comparison. */
   digest: string;
-  /** Full href string for this route. */
+  /** Full href string for this page. */
   href: string;
-  /** Route state payload. */
+  /** Page state payload. */
   state?: State;
-  /** Route transient payload. */
+  /** Page transient payload. */
   transient?: Transient;
   /** Age counter for eviction priority. */
   age?: number;
-  /** Scroll position for this route. */
+  /** Scroll position for this page. */
   scroll?: number;
 };
 
-export type RouteKeyOf<Store extends AppLocationState> = Extract<keyof Store['routes'], string>;
+export type PageKeyOf<Store extends AppLocationState> = Extract<keyof Store['pages'], string>;
 
 //*****************************************************************************************
 // Blocker
 //*****************************************************************************************
 
 /** Route blocker registry keyed by route ids. */
-export type AppRouterBlockedRoutes = Record<keyof AppRouterStore['routes'], unknown>;
+export type AppRouterBlockedPages = Record<keyof AppRouterStore['pages'], unknown>;
 
 //*****************************************************************************************
 // Location State
@@ -74,11 +74,11 @@ export type AppLocationState = {
   id: string;
   /** Panel configurations. */
   panels: AppRouterPanel[];
-  /** Route entries keyed by unique ID. */
-  routes: Record<string, Pick<AppRouterRoute, 'href' | 'state' | 'scroll'>>;
+  /** Page entries keyed by unique ID. */
+  pages: Record<string, Pick<AppRouterPage, 'href' | 'state' | 'scroll'>>;
 };
 
-export type AppRouterState = Pick<AppNavigationStore, 'id' | 'panels' | 'routes'>;
+export type AppRouterState = Pick<AppNavigationStore, 'id' | 'panels' | 'pages'>;
 
 //*****************************************************************************************
 // Router
@@ -92,8 +92,8 @@ export type AppRouterStore = {
   panels: AppRouterPanel[];
   /** Portal node cache. */
   nodes: Record<string, AppRouterNode>;
-  /** Route entries keyed by unique ID. */
-  routes: Record<string, AppRouterRoute>;
+  /** Page entries keyed by unique ID. */
+  pages: Record<string, AppRouterPage>;
 };
 
 //*****************************************************************************************
@@ -160,10 +160,10 @@ export type AppNavigationStore = {
   panels: AppRouterPanel[];
   /** Portal node cache. */
   nodes: Record<string, Omit<AppRouterNode, 'portal'>>;
-  /** Route entries keyed by unique ID. */
-  routes: Record<string, AppRouterRoute>;
-  /** Routes that are blocked from navigation */
-  blockedRoutes: AppRouterBlockedRoutes;
+  /** Page entries keyed by unique ID. */
+  pages: Record<string, AppRouterPage>;
+  /** Pages that are blocked from navigation */
+  blockedPages: AppRouterBlockedPages;
   /** Check if this navigation should replace the current history entry */
   options?: AppNavigateOptions;
 };

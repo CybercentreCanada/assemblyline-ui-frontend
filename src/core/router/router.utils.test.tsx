@@ -1,14 +1,14 @@
-import type { AppRouterStore } from 'core/router';
+import type { AppNavigationStore, AppRouterStore } from 'core/router';
 import {
-  addRouteToPanel,
-  findNextPanelKey,
-  getAppLocationStateFromRouterStore,
-  getAppNavigationStoreFromRouterStore,
-  getAppRouterStoreFromNavigationStore,
+  addPageToPanel,
+  findNextPanelKeyFromPageKey,
   getDefaultRouterPanel,
   getDefaultRouterStore,
-  getRouteFromPanelKey,
-  sanitizeRoutes
+  getLocationStateFromRouter,
+  getNavigationStoreFromRouter,
+  getPageFromPanelKey,
+  reconcileRouterFromNavigation,
+  sanitizePages
 } from 'core/router';
 import { createReversePortalNode } from 'features/portal';
 import { hashObject } from 'shared/utils/app.utils';
@@ -17,16 +17,13 @@ import { describe, expect, it } from 'vitest';
 /** Example router store shape used for parsing fallbacks and tests. */
 export const ROUTER_STORE_EXAMPLE: AppRouterStore = {
   id: 'default',
-  nodes: { default: { portal: createReversePortalNode(), routeKey: 'default' } },
+  nodes: { default: { portal: createReversePortalNode(), pageKey: 'default' } },
   panels: [
     {
-      pinnedRouteKeys: [],
-      routeKey: 'default',
-      tabbedRouteKeys: [],
-      temporaryRouteKey: 'default'
+      pageKey: 'default'
     }
   ],
-  routes: {
+  pages: {
     default: {
       age: 0,
       href: '/submit',
@@ -44,10 +41,10 @@ describe('findNextPanelKey', () => {
     const store: AppRouterStore = {
       ...getDefaultRouterStore(),
       panels: [
-        { ...getDefaultRouterPanel(), routeKey: 'r1' },
-        { ...getDefaultRouterPanel(), routeKey: 'r2' }
+        { ...getDefaultRouterPanel(), pageKey: 'r1' },
+        { ...getDefaultRouterPanel(), pageKey: 'r2' }
       ],
-      routes: {
+      pages: {
         r1: { digest: hashObject({ href: '/page1', state: null }), href: '/page1', state: null },
         r2: { digest: hashObject({ href: '/page2', state: null }), href: '/page2', state: null },
         outside: { digest: hashObject({ href: '/outside', state: null }), href: '/outside', state: null }
@@ -62,7 +59,7 @@ describe('findNextPanelKey', () => {
       safeResults: {}
     };
 
-    const nextPanelKey = findNextPanelKey(store, 'outside', preferences);
+    const nextPanelKey = findNextPanelKeyFromPageKey(store, 'outside', preferences);
     expect(nextPanelKey).toBe(0);
   });
 
@@ -70,10 +67,10 @@ describe('findNextPanelKey', () => {
     const store: AppRouterStore = {
       ...getDefaultRouterStore(),
       panels: [
-        { ...getDefaultRouterPanel(), routeKey: 'r1' },
-        { ...getDefaultRouterPanel(), routeKey: 'r2' }
+        { ...getDefaultRouterPanel(), pageKey: 'r1' },
+        { ...getDefaultRouterPanel(), pageKey: 'r2' }
       ],
-      routes: {
+      pages: {
         r1: { digest: hashObject({ href: '/page1', state: null }), href: '/page1', state: null },
         r2: { digest: hashObject({ href: '/page2', state: null }), href: '/page2', state: null }
       }
@@ -87,7 +84,7 @@ describe('findNextPanelKey', () => {
       safeResults: {}
     };
 
-    const nextPanelKey = findNextPanelKey(store, 'r1', preferences);
+    const nextPanelKey = findNextPanelKeyFromPageKey(store, 'r1', preferences);
     expect(nextPanelKey).toBe(1);
   });
 
@@ -95,10 +92,10 @@ describe('findNextPanelKey', () => {
     const store: AppRouterStore = {
       ...getDefaultRouterStore(),
       panels: [
-        { ...getDefaultRouterPanel(), routeKey: 'r1' },
-        { ...getDefaultRouterPanel(), routeKey: 'r2' }
+        { ...getDefaultRouterPanel(), pageKey: 'r1' },
+        { ...getDefaultRouterPanel(), pageKey: 'r2' }
       ],
-      routes: {
+      pages: {
         r1: { digest: hashObject({ href: '/page1', state: null }), href: '/page1', state: null },
         r2: { digest: hashObject({ href: '/page2', state: null }), href: '/page2', state: null }
       }
@@ -112,7 +109,7 @@ describe('findNextPanelKey', () => {
       safeResults: {}
     };
 
-    const nextPanelKey = findNextPanelKey(store, 'r2', preferences);
+    const nextPanelKey = findNextPanelKeyFromPageKey(store, 'r2', preferences);
     expect(nextPanelKey).toBe(2);
   });
 
@@ -120,10 +117,10 @@ describe('findNextPanelKey', () => {
     const store: AppRouterStore = {
       ...getDefaultRouterStore(),
       panels: [
-        { ...getDefaultRouterPanel(), routeKey: 'r1' },
-        { ...getDefaultRouterPanel(), routeKey: 'r2' }
+        { ...getDefaultRouterPanel(), pageKey: 'r1' },
+        { ...getDefaultRouterPanel(), pageKey: 'r2' }
       ],
-      routes: {
+      pages: {
         r1: { digest: hashObject({ href: '/page1', state: null }), href: '/page1', state: null },
         r2: { digest: hashObject({ href: '/page2', state: null }), href: '/page2', state: null }
       }
@@ -137,7 +134,7 @@ describe('findNextPanelKey', () => {
       safeResults: {}
     };
 
-    const nextPanelKey = findNextPanelKey(store, 'r2', preferences);
+    const nextPanelKey = findNextPanelKeyFromPageKey(store, 'r2', preferences);
     expect(nextPanelKey).toBe(0);
   });
 });
@@ -149,16 +146,16 @@ describe('sanitizeRoutes', () => {
   it('removes routes not referenced by panels or nodes', () => {
     const store: AppRouterStore = {
       ...getDefaultRouterStore(),
-      panels: [{ ...getDefaultRouterPanel(), routeKey: 'r1' }],
-      routes: {
+      panels: [{ ...getDefaultRouterPanel(), pageKey: 'r1' }],
+      pages: {
         r1: { digest: hashObject({ href: '/page1', state: null }), href: '/page1', state: null },
         orphan: { digest: hashObject({ href: '/orphan', state: null }), href: '/orphan', state: null }
       }
     };
 
-    const next = sanitizeRoutes(store);
-    expect(next.routes.r1).toBeDefined();
-    expect(next.routes.orphan).toBeUndefined();
+    const next = sanitizePages(store);
+    expect(next.pages.r1).toBeDefined();
+    expect(next.pages.orphan).toBeUndefined();
   });
 
   it('keeps routes referenced by node keys', () => {
@@ -166,36 +163,36 @@ describe('sanitizeRoutes', () => {
       ...getDefaultRouterStore(),
       nodes: {
         n1: {
-          routeKey: 'from-node',
+          pageKey: 'from-node',
           portal: { hostEl: document.createElement('div'), setOutlet: () => {} },
           lastUsedAt: 1
         }
       },
-      routes: {
+      pages: {
         'from-node': { digest: hashObject({ href: '/from-node', state: null }), href: '/from-node', state: null },
         orphan: { digest: hashObject({ href: '/orphan', state: null }), href: '/orphan', state: null }
       }
     };
 
-    const next = sanitizeRoutes(store);
-    expect(next.routes['from-node']).toBeDefined();
-    expect(next.routes.orphan).toBeUndefined();
+    const next = sanitizePages(store);
+    expect(next.pages['from-node']).toBeDefined();
+    expect(next.pages.orphan).toBeUndefined();
   });
 });
 
 //*****************************************************************************************
-// addRouteToPanel / getRouteFromPanelKey
+// addRouteToPanel / getPageFromPanelKey
 //*****************************************************************************************
 describe('panel route helpers', () => {
   it('adds a route to panel and reads it back by panel key', () => {
     const store: AppRouterStore = {
       ...getDefaultRouterStore(),
       panels: [{ ...getDefaultRouterPanel() }],
-      routes: {}
+      pages: {}
     };
 
-    const next = addRouteToPanel(store, 0, { digest: '', href: '/submit', state: { source: 'test' } });
-    const route = getRouteFromPanelKey(next, 0);
+    const next = addPageToPanel(store, 0, { digest: '', href: '/submit', state: { source: 'test' } });
+    const route = getPageFromPanelKey(next, 0);
 
     expect(route.href).toBe('/submit');
     expect(route.state).toEqual({ source: 'test' });
@@ -210,32 +207,32 @@ describe('store conversion helpers', () => {
     const router: AppRouterStore = {
       ...getDefaultRouterStore(),
       id: 'router-id',
-      panels: [{ ...getDefaultRouterPanel(), routeKey: 'r1' }],
+      panels: [{ ...getDefaultRouterPanel(), pageKey: 'r1' }],
       nodes: {
         n1: {
-          routeKey: 'r1',
+          pageKey: 'r1',
           portal: createReversePortalNode(),
           lastUsedAt: 10
         }
       },
-      routes: {
+      pages: {
         r1: { digest: hashObject({ href: '/submit', state: null }), href: '/submit', state: null, age: 1 }
       }
     };
 
     const navigation = {
       id: 'old-id',
-      panels: [{ ...getDefaultRouterPanel(), routeKey: 'old' }],
+      panels: [{ ...getDefaultRouterPanel(), pageKey: 'old' }],
       nodes: {
         n1: {
-          routeKey: 'old',
+          pageKey: 'old',
           lastUsedAt: 1
         }
       },
-      routes: {
+      pages: {
         old: { digest: hashObject({ href: '/old', state: null }), href: '/old', state: null }
       },
-      blockedRoutes: { stale: null },
+      blockedPages: { stale: null },
       options: {
         hashScrollIntoView: false,
         href: '',
@@ -247,32 +244,32 @@ describe('store conversion helpers', () => {
       }
     } as AppNavigationStore;
 
-    const nextNavigation = getAppNavigationStoreFromRouterStore(navigation, router);
+    const nextNavigation = getNavigationStoreFromRouter(navigation, router);
 
     expect(nextNavigation).toBe(navigation);
     expect(navigation.id).toBe('router-id');
-    expect(navigation.panels[0].routeKey).toBe('r1');
-    expect(navigation.nodes.n1.routeKey).toBe('r1');
+    expect(navigation.panels[0].pageKey).toBe('r1');
+    expect(navigation.nodes.n1.pageKey).toBe('r1');
     expect(navigation.nodes.n1.lastUsedAt).toBe(10);
-    expect(navigation.routes.r1.href).toBe('/submit');
-    expect('old' in navigation.routes).toBe(false);
-    expect('stale' in navigation.blockedRoutes).toBe(false);
+    expect(navigation.pages.r1.href).toBe('/submit');
+    expect('old' in navigation.pages).toBe(false);
+    expect('stale' in navigation.blockedPages).toBe(false);
   });
 
   it('reconciles AppRouterStore from AppNavigationStore', () => {
     const navigation = {
       id: 'navigation-id',
-      panels: [{ ...getDefaultRouterPanel(), routeKey: 'r1' }],
+      panels: [{ ...getDefaultRouterPanel(), pageKey: 'r1' }],
       nodes: {
         n1: {
-          routeKey: 'r1',
+          pageKey: 'r1',
           lastUsedAt: 20
         }
       },
-      routes: {
+      pages: {
         r1: { digest: hashObject({ href: '/submit', state: null }), href: '/submit', state: null, age: 2 }
       },
-      blockedRoutes: {},
+      blockedPages: {},
       options: {
         hashScrollIntoView: false,
         href: '',
@@ -287,29 +284,29 @@ describe('store conversion helpers', () => {
     const router: AppRouterStore = {
       ...getDefaultRouterStore(),
       id: 'old-router-id',
-      panels: [{ ...getDefaultRouterPanel(), routeKey: 'old' }],
+      panels: [{ ...getDefaultRouterPanel(), pageKey: 'old' }],
       nodes: {
         stale: {
-          routeKey: 'old',
+          pageKey: 'old',
           portal: createReversePortalNode(),
           lastUsedAt: 5
         }
       },
-      routes: {
+      pages: {
         old: { digest: hashObject({ href: '/old', state: null }), href: '/old', state: null, age: 1 }
       }
     };
 
-    const nextRouter = getAppRouterStoreFromNavigationStore(router, navigation);
+    const nextPager = reconcileRouterFromNavigation(router, navigation);
 
-    expect(nextRouter).toBe(router);
+    expect(nextPager).toBe(router);
     expect(router.id).toBe('navigation-id');
-    expect(router.panels[0].routeKey).toBe('r1');
-    expect(router.nodes.n1.routeKey).toBe('r1');
+    expect(router.panels[0].pageKey).toBe('r1');
+    expect(router.nodes.n1.pageKey).toBe('r1');
     expect(router.nodes.n1.lastUsedAt).toBe(20);
     expect(router.nodes.n1.portal).toBeDefined();
-    expect(router.routes.r1.href).toBe('/submit');
-    expect('old' in router.routes).toBe(false);
+    expect(router.pages.r1.href).toBe('/submit');
+    expect('old' in router.pages).toBe(false);
     expect('stale' in router.nodes).toBe(false);
   });
 
@@ -317,8 +314,8 @@ describe('store conversion helpers', () => {
     const router: AppRouterStore = {
       ...getDefaultRouterStore(),
       id: 'router-location-id',
-      panels: [{ ...getDefaultRouterPanel(), routeKey: 'r1' }],
-      routes: {
+      panels: [{ ...getDefaultRouterPanel(), pageKey: 'r1' }],
+      pages: {
         r1: {
           digest: hashObject({ href: '/submit', state: { foo: 'bar' } }),
           href: '/submit',
@@ -329,12 +326,31 @@ describe('store conversion helpers', () => {
       }
     };
 
-    const locationState = getAppLocationStateFromRouterStore(router);
+    const navigation = getNavigationStoreFromRouter(
+      {
+        id: '',
+        panels: [],
+        nodes: {},
+        pages: {},
+        blockedPages: {},
+        options: {
+          hashScrollIntoView: false,
+          href: '',
+          ignoreBlocker: false,
+          reloadDocument: false,
+          replace: false,
+          resetScroll: false,
+          viewTransition: false
+        }
+      },
+      router
+    );
+    const locationState = getLocationStateFromRouter(navigation);
 
     expect(locationState.id).toBe('router-location-id');
-    expect(locationState.panels[0].routeKey).toBe('r1');
-    expect(locationState.routes.r1.href).toBe('/submit');
-    expect(locationState.routes.r1.state).toEqual({ foo: 'bar' });
-    expect(locationState.routes.r1.scroll).toBe(15);
+    expect(locationState.panels[0].pageKey).toBe('r1');
+    expect(locationState.pages.r1.href).toBe('/submit');
+    expect(locationState.pages.r1.state).toEqual({ foo: 'bar' });
+    expect(locationState.pages.r1.scroll).toBe(15);
   });
 });

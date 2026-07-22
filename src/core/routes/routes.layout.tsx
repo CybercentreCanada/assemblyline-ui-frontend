@@ -1,22 +1,22 @@
 import { findPanelKey, useAppRouterStore } from 'core/router';
+import { useAppHashParams } from 'core/routes';
 import type { PropsWithChildren } from 'react';
 import { memo, useEffect, useRef } from 'react';
-import { useAppHashParams } from './routes.hooks';
 
 //*****************************************************************************************
 // Route Layout Provider
 //*****************************************************************************************
 
 export type AppRouteLayoutProviderProps = PropsWithChildren<{
-  routeKey: string;
+  pageKey: string;
 }>;
 
-export const AppRouteLayoutProvider = memo(({ routeKey, children }: AppRouteLayoutProviderProps) => {
+export const AppRouteLayoutProvider = memo(({ pageKey, children }: AppRouteLayoutProviderProps) => {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  const scrollPosition = useAppRouterStore(s => s?.routes?.[routeKey]?.scroll ?? null);
+  const scrollPosition = useAppRouterStore(s => s?.pages?.[pageKey]?.scroll ?? null);
   const hashFragment = useAppHashParams();
-  const panelKey = useAppRouterStore(s => findPanelKey(s, { routeKey }));
+  const panelKey = useAppRouterStore(s => findPanelKey(s, { pageKey }));
 
   useEffect(() => {
     if (!scrollContainerRef.current || !scrollPosition) return;
@@ -76,8 +76,8 @@ export const AppRouteLayoutProvider = memo(({ routeKey, children }: AppRouteLayo
 
   return (
     <div
-      id={`route-layout-${routeKey}`}
-      data-testid="route-layout-scroll-container"
+      id={`page-layout-${pageKey}`}
+      data-testid="page-layout-scroll-container"
       ref={scrollContainerRef}
       style={{
         display: 'flex',
