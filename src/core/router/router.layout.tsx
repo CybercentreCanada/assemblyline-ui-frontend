@@ -1,10 +1,5 @@
 import { findNode, findPageKeyFromPanelKey, useAppRouterStore } from 'core/router';
-import {
-  AppPageKeyProvider,
-  AppRouteLayoutProvider,
-  findRouteSpecFromKey,
-  useAppLocationParamStore
-} from 'core/routes';
+import { AppPageKeyProvider, AppRouteLayoutProvider, findAppRouteFromKey, useAppLocationParamStore } from 'core/routes';
 import { InPortal, OutPortal } from 'features/portal';
 import { MissingNodePage } from 'pages/missing-node/missing-node.route';
 import type { PropsWithChildren } from 'react';
@@ -20,7 +15,7 @@ export type AppRouterPageLayoutProps = {
 };
 
 export const AppRouterPageLayout = memo(({ pageKey }: AppRouterPageLayoutProps) => {
-  const element = useAppLocationParamStore(s => findRouteSpecFromKey(s, pageKey)?.element);
+  const element = useAppLocationParamStore(s => findAppRouteFromKey(s, pageKey)?.element);
 
   return !pageKey || !element ? null : (
     <AppPageKeyProvider pageKey={pageKey}>

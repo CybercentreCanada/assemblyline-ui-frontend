@@ -15,12 +15,11 @@ export { AppRouteLayoutProvider } from './routes.layout';
 export type { AppRouteLayoutProviderProps } from './routes.layout';
 export type {
   AppLocationParamStore,
-  AppRouteSpec,
   GuardResult,
+  InferAppLocationFromPath,
+  InferAppRouteFromPath,
   InferAppRouteParamFromPath,
-  InferAppRouteSearchValuesFromPath,
-  InferAppRouteSpecFromPath,
-  InferAppRouteValuesFromPath
+  InferAppRouteSearchValuesFromPath
 } from './routes.models';
 export {
   AppLocationParamProvider,
@@ -35,17 +34,17 @@ export {
 } from './routes.providers';
 export type { AppLocationParamProviderProps, AppPageKeyStore, AppPageKeyStoreProviderProps } from './routes.providers';
 export {
+  addAppRoute,
   addRouteParam,
   addRouteParamFromPage,
-  addRouteSpec,
   evaluateMediaQuery,
-  findRouteSpecFromKey,
-  findRouteSpecFromPage,
-  findRouteSpecFromParam,
-  findRouteSpecFromPath,
+  findAppRouteFromKey,
+  findAppRouteFromPage,
+  findAppRouteFromParam,
+  findAppRouteFromPath,
   getAppLocationParamStateFromApi,
+  getDefaultAppRoute,
   getDefaultRouteParam,
-  getDefaultRouteSpec,
   getExternalHrefFromPage,
   getExternalHrefFromParam,
   getHashParamFromLocation,
@@ -65,17 +64,17 @@ export {
   isNavigationInputRouteParam,
   isNavigationInputString,
   parseMediaQuery,
+  removeAppRoute,
+  removeAppRouteFromKey,
   removeRouteParamFromKey,
-  removeRouteSpec,
-  removeRouteSpecFromKey,
   sanitizePage,
-  setRouteSpecsFromAppRoutes,
+  setAppRouteFromAppRoutes,
   syncRouteParamsFromRouter,
+  updateAppRoute,
   updateRouteParam,
   updateRouteParamFromPage,
-  updateRouteSpec,
+  upsertAppRoute,
   upsertRouteParam,
-  upsertRouteParamFromPage,
-  upsertRouteSpec
+  upsertRouteParamFromPage
 } from './routes.utils';
 export type { MediaQueryCondition } from './routes.utils';

@@ -1,4 +1,3 @@
-import type { createAppRoute } from 'core/routes';
 import { type InferPathParamKeyFromPath } from 'features/path-params';
 import type { InferSearchParamKeysFromEngine, InferSearchParamValueMapFromEngine } from 'features/search-params';
 
@@ -10,25 +9,23 @@ import type { InferSearchParamKeysFromEngine, InferSearchParamValueMapFromEngine
 export type GuardResult = true | 'forbidden' | 'notfound' | `redirect:${string}`;
 
 //*****************************************************************************************
-// App Route Spec
+// App Route
 //*****************************************************************************************
 
-export type AppRouteSpec = ReturnType<typeof createAppRoute>;
-
 /** Infers the registered app route definition that matches a specific path literal. */
-export type InferAppRouteSpecFromPath<Origin extends AppRoute['route']> = {
-  [R in AppRoute as R['route']]: R;
+export type InferAppRouteFromPath<Origin extends AppRoute['path']> = {
+  [R in AppRoute as R['path']]: R;
 }[Origin];
 
 /** Infers the typed search-value object accepted by a route's search engine for a specific path. */
-export type InferAppRouteSearchValuesFromPath<Origin extends AppRoute['route']> = [
-  InferSearchParamKeysFromEngine<InferAppRouteSpecFromPath<Origin>['search']>
+export type InferAppRouteSearchValuesFromPath<Origin extends AppRoute['path']> = [
+  InferSearchParamKeysFromEngine<InferAppRouteFromPath<Origin>['search']>
 ] extends [never]
   ? never
-  : InferSearchParamValueMapFromEngine<InferAppRouteSpecFromPath<Origin>['search']>;
+  : InferSearchParamValueMapFromEngine<InferAppRouteFromPath<Origin>['search']>;
 
-export type InferAppRouteHashFromPath<Origin extends AppRoute['route']> =
-  NonNullable<InferAppRouteSpecFromPath<Origin>['hash']> extends { type: infer Hash } ? Hash | null : never;
+export type InferAppRouteHashFromPath<Origin extends AppRoute['path']> =
+  NonNullable<InferAppRouteFromPath<Origin>['hash']> extends { type: infer Hash } ? Hash | null : never;
 
 //*****************************************************************************************
 // App Route Param
@@ -36,7 +33,7 @@ export type InferAppRouteHashFromPath<Origin extends AppRoute['route']> =
 
 /** Snapshot of pre-calculated route values resolved from the current location state. */
 // prettier-ignore
-export type InferAppRouteParamFromPath<Origin extends AppRoute['route']> = {
+export type InferAppLocationFromPath<Origin extends AppRoute['path']> = {
   /** router route digest value */
   digest: string;
   /** Route path */
@@ -44,11 +41,11 @@ export type InferAppRouteParamFromPath<Origin extends AppRoute['route']> = {
   /** Parsed path params derived from the current location. */
   path: [InferPathParamKeyFromPath<Origin>] extends [never]
             ? null
-            : NonNullable<InferAppRouteSpecFromPath<Origin>['path']>['type'];
+            : NonNullable<InferAppRouteFromPath<Origin>['params']>['type'];
   /** Parsed search params derived from the current location. */
-  search: [InferSearchParamKeysFromEngine<InferAppRouteSpecFromPath<Origin>['search']>] extends [never]
+  search: [InferSearchParamKeysFromEngine<InferAppRouteFromPath<Origin>['search']>] extends [never]
             ? null
-            : InferSearchParamValueMapFromEngine<InferAppRouteSpecFromPath<Origin>['search']>;
+            : InferSearchParamValueMapFromEngine<InferAppRouteFromPath<Origin>['search']>;
   /** Parsed hash value derived from the current location. */
   hash: InferAppRouteHashFromPath<Origin>;
 };
@@ -59,9 +56,9 @@ export type InferAppRouteParamFromPath<Origin extends AppRoute['route']> = {
 
 /** Infers the full typed route-value payload for a specific path literal. */
 // prettier-ignore
-export type InferAppRouteValuesFromPath<Origin extends AppRoute['route']> =
+export type InferAppRouteParamFromPath<Origin extends AppRoute['path']> =
   Origin extends infer AppOrigin
-    ? AppOrigin extends AppRoute['route']
+    ? AppOrigin extends AppRoute['path']
       ? (
         & {
             route: AppOrigin;
@@ -69,12 +66,12 @@ export type InferAppRouteValuesFromPath<Origin extends AppRoute['route']> =
         & (
             [InferPathParamKeyFromPath<Origin>] extends [never]
               ? { path?: never }
-              : { path: NonNullable<InferAppRouteSpecFromPath<Origin>['path']>['type'] }
+              : { path: NonNullable<InferAppRouteFromPath<Origin>['params']>['type'] }
           )
         & (
-            [InferSearchParamKeysFromEngine<InferAppRouteSpecFromPath<Origin>["search"]>] extends [never]
+            [InferSearchParamKeysFromEngine<InferAppRouteFromPath<Origin>["search"]>] extends [never]
               ? { search?: never }
-              : { search?:  InferSearchParamValueMapFromEngine<InferAppRouteSpecFromPath<Origin>["search"]> }
+              : { search?:  InferSearchParamValueMapFromEngine<InferAppRouteFromPath<Origin>["search"]> }
           )
         & (
             [InferAppRouteHashFromPath<Origin>] extends [never]
@@ -92,7 +89,7 @@ export type InferAppRouteValuesFromPath<Origin extends AppRoute['route']> =
 /** Store containing route-keyed location snapshots for all open routes. */
 export type AppLocationParamStore = {
   /** Full application route registry keyed by route path (canonical known routes, not only active ones). */
-  specs: Record<AppRoute['route'], AppRoute>;
-  /** Parsed snapshots keyed by router route key for currently active routes (latest params/search/hash). */
-  params: Record<string, InferAppRouteParamFromPath<AppRoute['route']>>;
+  routes: Record<AppRoute['path'], AppRoute>;
+  /** Parsed snapshots keyed by router page key for currently active pages (latest params/search/hash). */
+  locations: Record<string, InferAppLocationFromPath<AppRoute['path']>>;
 };

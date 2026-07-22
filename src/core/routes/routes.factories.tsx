@@ -15,8 +15,8 @@ import { toElement } from 'shared/utils/app.utils';
 //*****************************************************************************************
 
 export type CreateAppRouteProps<
-  Route extends RoutePath,
-  Path extends InferPathParamBlueprintMapFromPath<Route>,
+  Path extends RoutePath,
+  Params extends InferPathParamBlueprintMapFromPath<Path>,
   Search extends SearchParamBlueprintMap,
   Hash extends HashParamValue = never
 > = {
@@ -33,8 +33,8 @@ export type CreateAppRouteProps<
   component: ReactNode | MemoExoticComponent<ComponentType<unknown>>;
 
   // Parameters
-  route: Route;
-  path?: (blueprints: typeof PATH_PARAM_BLUEPRINTS_MAP) => Path;
+  path: Path;
+  params?: (blueprints: typeof PATH_PARAM_BLUEPRINTS_MAP) => Params;
   search?: (blueprints: typeof SEARCH_PARAM_BLUEPRINTS_MAP) => Search;
   hash?: (blueprints: typeof HASH_PARAM_BLUEPRINTS) => InferHashParamBlueprintFromValue<Hash>;
 
@@ -59,8 +59,8 @@ export const createAppRoute = <
   icon,
   component: Component,
 
-  route,
   path,
+  params,
   search,
   hash,
 
@@ -73,9 +73,9 @@ export const createAppRoute = <
 }: CreateAppRouteProps<Route, Path, Search, Hash>) => {
   void loader;
 
-  const pathCodec = !path
-    ? (createPathParamsCodec<Route>(route)(() => null) as never)
-    : createPathParamsCodec<Route>(route)(path);
+  const pathCodec = !params
+    ? (createPathParamsCodec<Route>(path)(() => null) as never)
+    : createPathParamsCodec<Route>(path)(params);
 
   const searchEngine = !search
     ? (new SearchParamEngine(null) as never)
@@ -83,14 +83,14 @@ export const createAppRoute = <
 
   const hashCodec = !hash ? createHashParamCodec<never>()(() => null) : createHashParamCodec<Hash>()(hash);
 
-  (Component as unknown as FC).displayName = route;
+  (Component as unknown as FC).displayName = path;
 
   return {
     title,
     icon,
 
-    route,
-    path: pathCodec,
+    path,
+    params: pathCodec,
     search: searchEngine,
     hash: hashCodec,
 

@@ -1,5 +1,5 @@
 import type { useAppNavigate } from 'core/router';
-import type { InferAppRouteSpecFromPath, InferAppRouteValuesFromPath } from 'core/routes';
+import type { InferAppRouteFromPath, InferAppRouteParamFromPath } from 'core/routes';
 import type { ReversePortalNode } from 'features/portal';
 import type { InferSearchParamSnapshotFromEngine } from 'features/search-params';
 import type { DependencyList } from 'react';
@@ -119,31 +119,31 @@ export type AppNavigateOptions = {
   viewTransition?: boolean;
 };
 
-export type InferAppNavigationInputFromPath<Origin extends AppRoute['route']> =
-  | InferAppRouteValuesFromPath<Origin>
+export type InferAppNavigationInputFromPath<Origin extends AppRoute['path']> =
+  | InferAppRouteParamFromPath<Origin>
   | string
   | ReactRouterLocation;
 
-export type InferAppNavigationOperationMapFromPath<Origin extends AppRoute['route']> = {
+export type InferAppNavigationOperationMapFromPath<Origin extends AppRoute['path']> = {
   create:
     | InferAppNavigationInputFromPath<Origin>
-    | ((props: InferAppRouteValuesFromPath<Origin>) => InferAppNavigationInputFromPath<Origin>);
+    | ((props: InferAppRouteParamFromPath<Origin>) => InferAppNavigationInputFromPath<Origin>);
   update:
     | InferAppNavigationInputFromPath<Origin>
-    | ((props: InferAppRouteValuesFromPath<Origin>) => InferAppNavigationInputFromPath<Origin>);
+    | ((props: InferAppRouteParamFromPath<Origin>) => InferAppNavigationInputFromPath<Origin>);
   search:
-    | InferSearchParamSnapshotFromEngine<InferAppRouteSpecFromPath<Origin>['search']>
+    | InferSearchParamSnapshotFromEngine<InferAppRouteFromPath<Origin>['search']>
     | ((
-        props: InferSearchParamSnapshotFromEngine<InferAppRouteSpecFromPath<Origin>['search']>
-      ) => InferSearchParamSnapshotFromEngine<InferAppRouteSpecFromPath<Origin>['search']>);
+        props: InferSearchParamSnapshotFromEngine<InferAppRouteFromPath<Origin>['search']>
+      ) => InferSearchParamSnapshotFromEngine<InferAppRouteFromPath<Origin>['search']>);
   only:
     | InferAppNavigationInputFromPath<Origin>
-    | ((props: InferAppRouteValuesFromPath<Origin>) => InferAppNavigationInputFromPath<Origin>);
-  closePanel: boolean | ((props: InferAppRouteValuesFromPath<Origin>) => boolean);
-  delete: boolean | ((props: InferAppRouteValuesFromPath<Origin>) => boolean);
+    | ((props: InferAppRouteParamFromPath<Origin>) => InferAppNavigationInputFromPath<Origin>);
+  closePanel: boolean | ((props: InferAppRouteParamFromPath<Origin>) => boolean);
+  delete: boolean | ((props: InferAppRouteParamFromPath<Origin>) => boolean);
 };
 
-export type InferAppNavigationPropsFromPath<Origin extends AppRoute['route']> = {
+export type InferAppNavigationPropsFromPath<Origin extends AppRoute['path']> = {
   nav?: (navigate: ReturnType<typeof useAppNavigate<Origin>>) => void;
   navDeps?: DependencyList;
 };

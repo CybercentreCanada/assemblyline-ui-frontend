@@ -42,10 +42,9 @@ import {
   useAppSetNavigationStore,
   useAppSetRouterStore
 } from 'core/router';
-import type { InferAppRouteSpecFromPath } from 'core/routes';
 import {
-  findRouteSpecFromKey,
-  findRouteSpecFromPage,
+  findAppRouteFromKey,
+  findAppRouteFromPage,
   getAppLocationParamStateFromApi,
   getExternalHrefFromPage,
   getPageFromInput,
@@ -55,7 +54,6 @@ import {
   useAppLocationParamStoreApi,
   useAppPageKey
 } from 'core/routes';
-import type { InferSearchParamSnapshotFromEngine } from 'features/search-params';
 import type { DependencyList } from 'react';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
 import type { Location, NavigateOptions } from 'react-router';
@@ -72,7 +70,7 @@ import { generateRandomUUID } from 'shared/utils/app.utils';
  *              the current router state without triggering navigation.
  * @returns External href string, or null when nav is absent, a delete, or a noop.
  */
-export const useAppExternalHref = function <const Origin extends AppRoute['route']>(
+export const useAppExternalHref = function <const Origin extends AppRoute['path']>(
   nav: InferAppNavigationPropsFromPath<Origin>['nav'],
   navDeps: DependencyList
 ): AppRouterPage['href'] {
@@ -100,15 +98,11 @@ export const useAppExternalHref = function <const Origin extends AppRoute['route
         if (!prevPage || !prevPageParams) return null;
 
         if (operation === 'search') {
-          const prevPageSpec = findRouteSpecFromKey<Origin>(locationState, prevPageKey);
-          const prevSnapshot = prevPageSpec.search.fromRoute(
-            prevPage.href,
-            prevPage.state,
-            prevPage.transient
-          ) as InferSearchParamSnapshotFromEngine<InferAppRouteSpecFromPath<Origin>['search']>;
+          const prevAppRoute = findAppRouteFromKey<Origin>(locationState, prevPageKey);
+          const prevSnapshot = prevAppRoute.search.fromRoute(prevPage.href, prevPage.state, prevPage.transient);
 
           const nextSnapshot = applyNavigationDispatch(
-            dispatch as InferAppNavigationOperationMapFromPath<Origin>['search'],
+            dispatch as typeof prevSnapshot | ((snapshot: typeof prevSnapshot) => typeof prevSnapshot),
             prevSnapshot
           );
 
@@ -159,7 +153,7 @@ export const useAppExternalHref = function <const Origin extends AppRoute['route
 // useAppNavigate
 //*****************************************************************************************
 
-export function useAppNavigate<const Origin extends AppRoute['route']>() {
+export function useAppNavigate<const Origin extends AppRoute['path']>() {
   const pageKey = useAppPageKey();
   const locationParamStoreApi = useAppLocationParamStoreApi();
   const routerStoreApi = useAppRouterStoreApi();
@@ -167,7 +161,7 @@ export function useAppNavigate<const Origin extends AppRoute['route']>() {
   const setNavigationStore = useAppSetNavigationStore();
 
   const create = useCallback(
-    function <const Destination extends AppRoute['route'] = Origin>(
+    function <const Destination extends AppRoute['path'] = Origin>(
       destinationPanelKey: number,
       dispatch: InferAppNavigationOperationMapFromPath<Destination>['create'],
       options: AppNavigateOptions
@@ -199,7 +193,7 @@ export function useAppNavigate<const Origin extends AppRoute['route']>() {
   );
 
   const update = useCallback(
-    function <const Destination extends AppRoute['route'] = Origin>(
+    function <const Destination extends AppRoute['path'] = Origin>(
       destinationPanelKey: number,
       dispatch: InferAppNavigationOperationMapFromPath<Destination>['update'],
       options: AppNavigateOptions
@@ -230,7 +224,7 @@ export function useAppNavigate<const Origin extends AppRoute['route']>() {
   );
 
   const search = useCallback(
-    function <const Destination extends AppRoute['route'] = Origin>(
+    function <const Destination extends AppRoute['path'] = Origin>(
       destinationPanelKey: number,
       dispatch: InferAppNavigationOperationMapFromPath<Destination>['search'],
       options: AppNavigateOptions
@@ -242,9 +236,9 @@ export function useAppNavigate<const Origin extends AppRoute['route']>() {
       const prevPageKey = findPageKeyFromPanelKey(routerState, destinationPanelKey);
       const prevPage = getPageFromPanelKey(routerState, destinationPanelKey);
       const prevPageParam = getRouteParamFromKey<Origin>(locationState, prevPageKey);
-      const prevPageSpec = findRouteSpecFromKey<Origin>(locationState, prevPageKey);
+      const prevAppRoute = findAppRouteFromKey<Origin>(locationState, prevPageKey);
 
-      const prevSearchSnapshot = prevPageSpec.search.fromRoute(prevPage.href, prevPage.state, prevPage.transient);
+      const prevSearchSnapshot = prevAppRoute.search.fromRoute(prevPage.href, prevPage.state, prevPage.transient);
       const nextSearchSnapshot = applyNavigationDispatch(dispatch, prevSearchSnapshot);
 
       const nextPageParam = { ...prevPageParam, search: nextSearchSnapshot.toObject() };
@@ -267,7 +261,7 @@ export function useAppNavigate<const Origin extends AppRoute['route']>() {
   );
 
   const only = useCallback(
-    function <const Destination extends AppRoute['route'] = Origin>(
+    function <const Destination extends AppRoute['path'] = Origin>(
       destinationPanelKey: number,
       dispatch: InferAppNavigationOperationMapFromPath<Destination>['only'],
       options: AppNavigateOptions
@@ -302,7 +296,7 @@ export function useAppNavigate<const Origin extends AppRoute['route']>() {
   );
 
   const closePanel = useCallback(
-    function <const Destination extends AppRoute['route'] = Origin>(
+    function <const Destination extends AppRoute['path'] = Origin>(
       destinationPanelKey: number,
       dispatch: InferAppNavigationOperationMapFromPath<Destination>['closePanel'] = true,
       options: AppNavigateOptions
@@ -332,7 +326,7 @@ export function useAppNavigate<const Origin extends AppRoute['route']>() {
   );
 
   const buildOperations = useCallback(
-    function <const Destination extends AppRoute['route'] = Origin>(
+    function <const Destination extends AppRoute['path'] = Origin>(
       destinationPanelKey: number,
       options: NavigateOptions
     ) {
@@ -353,7 +347,7 @@ export function useAppNavigate<const Origin extends AppRoute['route']>() {
   );
 
   const from = useCallback(
-    function <const Destination extends AppRoute['route'] = Origin>(
+    function <const Destination extends AppRoute['path'] = Origin>(
       options: AppNavigateOptions = getDefaultNavigateOptions()
     ) {
       const routerState = getAppRouterStateFromApi(routerStoreApi);
@@ -366,7 +360,7 @@ export function useAppNavigate<const Origin extends AppRoute['route']>() {
   );
 
   const here = useCallback(
-    function <const Destination extends AppRoute['route'] = Origin>(
+    function <const Destination extends AppRoute['path'] = Origin>(
       options: AppNavigateOptions = getDefaultNavigateOptions()
     ) {
       const routerState = getAppRouterStateFromApi(routerStoreApi);
@@ -378,7 +372,7 @@ export function useAppNavigate<const Origin extends AppRoute['route']>() {
   );
 
   const to = useCallback(
-    function <const Destination extends AppRoute['route'] = Origin>(
+    function <const Destination extends AppRoute['path'] = Origin>(
       options: AppNavigateOptions = getDefaultNavigateOptions()
     ) {
       const routerState = getAppRouterStateFromApi(routerStoreApi);
@@ -391,7 +385,7 @@ export function useAppNavigate<const Origin extends AppRoute['route']>() {
   );
 
   const at = useCallback(
-    function <const Destination extends AppRoute['route'] = Origin>(
+    function <const Destination extends AppRoute['path'] = Origin>(
       panelKey: number = 0,
       options: AppNavigateOptions = getDefaultNavigateOptions()
     ) {
@@ -472,10 +466,10 @@ export function useAppSyncNavigationStoreFromLocation() {
           panelKey++;
 
           const prevPage = getPageFromPanelKey(routerState, panelKey);
-          const prevSpec = findRouteSpecFromPage(locationState, prevPage);
-          const nextSpec = findRouteSpecFromPage(locationState, nextPage);
+          const prevRoute = findAppRouteFromPage(locationState, prevPage);
+          const nextRoute = findAppRouteFromPage(locationState, nextPage);
 
-          if (!!nextSpec?.path && nextSpec?.path === prevSpec?.path) {
+          if (!!nextRoute?.path && nextRoute?.path === prevRoute?.path) {
             store = updatePage(store, store.panels[panelKey].pageKey, nextPage);
           } else {
             const [store1, nextPageKey] = addPage(store, nextPage);
@@ -513,11 +507,11 @@ export function useAppSyncNavigationStoreFromLocation() {
 
         if (!legacyRoute?.href) return store;
 
-        const nextSpec = findRouteSpecFromPage(locationState, legacyRoute);
-        const prevLocation = getPageFromPanelKey(store, 0);
-        const prevSpec = findRouteSpecFromPage(locationState, prevLocation);
+        const nextRoute = findAppRouteFromPage(locationState, legacyRoute);
+        const prevPage = getPageFromPanelKey(store, 0);
+        const prevRoute = findAppRouteFromPage(locationState, prevPage);
 
-        if (!!nextSpec?.path && nextSpec?.path === prevSpec?.path && !!store?.panels?.[0]?.pageKey) {
+        if (!!nextRoute?.path && nextRoute?.path === prevRoute?.path && !!store?.panels?.[0]?.pageKey) {
           store = updatePage(store, store.panels[0].pageKey, legacyRoute);
         } else {
           const [store1, nextPageKey] = addPage(store, legacyRoute);
@@ -542,7 +536,7 @@ export function useAppSyncNavigationStoreFromLocation() {
   useEffect(() => {
     const locationState = getAppLocationParamStateFromApi(locationParamStoreApi);
 
-    if (!Object.entries(locationState.specs || {}).length) return;
+    if (!Object.entries(locationState.routes || {}).length) return;
 
     const routerState = getAppRouterStateFromApi(routerStoreApi);
     if (location?.state?.id && location.state.id === routerState.id) return;

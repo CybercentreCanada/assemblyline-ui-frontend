@@ -9,10 +9,10 @@ import { Link } from 'react-router';
 // App Link
 //*****************************************************************************************
 
-export type AppLinkProps<Origin extends AppRoute['route']> = InferAppNavigationPropsFromPath<Origin> &
+export type AppLinkProps<Origin extends AppRoute['path']> = InferAppNavigationPropsFromPath<Origin> &
   Omit<RouterLinkProps, 'to' | 'pathname' | 'search' | 'hash'>;
 
-export function WrappedAppLink<const Origin extends AppRoute['route']>(
+export function WrappedAppLink<const Origin extends AppRoute['path']>(
   { children, nav = null, navDeps = null, onClick, ...props }: AppLinkProps<Origin>,
   ref: ForwardedRef<HTMLAnchorElement>
 ) {
@@ -41,7 +41,7 @@ export function WrappedAppLink<const Origin extends AppRoute['route']>(
 
 WrappedAppLink.displayName = 'WrappedAppLink';
 
-export const AppLink = memo(forwardRef(WrappedAppLink)) as <const Origin extends AppRoute['route']>(
+export const AppLink = memo(forwardRef(WrappedAppLink)) as <const Origin extends AppRoute['path']>(
   props: AppLinkProps<Origin> & { ref?: ForwardedRef<HTMLAnchorElement> }
 ) => React.JSX.Element | null;
 
@@ -51,9 +51,9 @@ export const AppLink = memo(forwardRef(WrappedAppLink)) as <const Origin extends
 // App Navigate
 //*****************************************************************************************
 
-export type AppNavigateProps<Origin extends AppRoute['route']> = InferAppNavigationPropsFromPath<Origin>;
+export type AppNavigateProps<Origin extends AppRoute['path']> = InferAppNavigationPropsFromPath<Origin>;
 
-export function WrappedAppNavigate<const Origin extends AppRoute['route']>({
+export function WrappedAppNavigate<const Origin extends AppRoute['path']>({
   nav,
   navDeps = null
 }: AppNavigateProps<Origin>) {
@@ -74,7 +74,7 @@ export function WrappedAppNavigate<const Origin extends AppRoute['route']>({
 
 WrappedAppNavigate.displayName = 'WrappedAppNavigate';
 
-export const AppNavigate = memo(WrappedAppNavigate) as <const Origin extends AppRoute['route']>(
+export const AppNavigate = memo(WrappedAppNavigate) as <const Origin extends AppRoute['path']>(
   props: AppNavigateProps<Origin>
 ) => React.JSX.Element | null;
 

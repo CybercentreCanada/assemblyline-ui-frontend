@@ -1486,7 +1486,7 @@ export const hasBlockedPages = (store: AppNavigationStore): boolean => {
 // Navigation
 //*****************************************************************************************
 
-export type ExtractNavReturn<Origin extends AppRoute['route']> = {
+export type ExtractNavReturn<Origin extends AppRoute['path']> = {
   target: 'from' | 'here' | 'to' | 'at' | null;
   panelKey: number | null;
   operation: 'create' | 'update' | 'search' | 'only' | 'closePanel' | null;
@@ -1513,7 +1513,7 @@ export const getDefaultNavigateOptions = function (options: Partial<AppNavigateO
   };
 };
 
-export const resolveNavigationIntent = function <const Origin extends AppRoute['route']>(
+export const resolveNavigationIntent = function <const Origin extends AppRoute['path']>(
   nextNav: InferAppNavigationPropsFromPath<Origin>['nav']
 ): ExtractNavReturn<Origin> {
   if (!nextNav) {
