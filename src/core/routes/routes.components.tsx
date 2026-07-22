@@ -1,8 +1,8 @@
 import { useAppConfig } from 'core/config';
-import { ForbiddenPage } from 'pages/forbidden/forbidden';
-import { NotFoundPage } from 'pages/not-found/not-found';
 import type { ComponentType, MemoExoticComponent, ReactNode } from 'react';
 import { memo } from 'react';
+import { ForbiddenPage } from 'routes/forbidden/forbidden';
+import { NotFoundPage } from 'routes/not-found/not-found';
 
 //*****************************************************************************************
 // DisabledBoundary

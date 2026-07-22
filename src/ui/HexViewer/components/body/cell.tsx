@@ -1,8 +1,8 @@
 import { useTheme } from '@mui/material';
 import clsx from 'clsx';
-import { useSelection } from 'pages/file-viewer/file-viewer.providers';
 import type { CSSProperties } from 'react';
 import React from 'react';
+import { useSelection } from 'routes/file-viewer/file-viewer.providers';
 import type { CellType, StoreProps } from 'ui/HexViewer';
 import { getCellClasses, getHexValue, getTextValue, LAYOUT_SIZE, useDispatch } from 'ui/HexViewer';
 

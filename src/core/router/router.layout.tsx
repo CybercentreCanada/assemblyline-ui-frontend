@@ -1,9 +1,9 @@
 import { findNode, findPageKeyFromPanelKey, useAppRouterStore } from 'core/router';
 import { AppPageKeyProvider, AppRouteLayoutProvider, findAppRouteFromKey, useAppLocationParamStore } from 'core/routes';
 import { InPortal, OutPortal } from 'features/portal';
-import { MissingNodePage } from 'pages/missing-node/missing-node.route';
 import type { PropsWithChildren } from 'react';
 import { memo } from 'react';
+import { MissingNodePage } from 'routes/missing-node/missing-node.route';
 
 //*****************************************************************************************
 // App Router Page
