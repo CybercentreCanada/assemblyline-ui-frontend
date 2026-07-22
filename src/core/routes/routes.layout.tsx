@@ -72,7 +72,7 @@ export const AppRouteLayoutProvider = memo(({ pageKey, children }: AppRouteLayou
     return () => {
       if (frameId) window.cancelAnimationFrame(frameId);
     };
-  }, [hashFragment]);
+  }, [hashFragment, panelKey]);
 
   return (
     <div
