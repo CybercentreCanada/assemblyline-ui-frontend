@@ -31,6 +31,7 @@ import {
   removeBlockedPage,
   removePanel,
   resolveNavigationIntent,
+  resolveNotFoundPage,
   sanitizeRouterStore,
   setPageScrollPositions,
   shouldUpdatePage,
@@ -173,7 +174,9 @@ export function useAppNavigate<const Origin extends AppRoute['path']>() {
       const prevPageKey = findPageKeyFromPanelKey(routerState, destinationPanelKey);
       const prevPageParam = getRouteParamFromKey<Origin>(locationState, prevPageKey);
       const nextPageParam = applyNavigationDispatch(dispatch, prevPageParam as never) as never;
-      const nextPage = getPageFromInput<Destination>(locationState, nextPageParam);
+      const nextPageInput = getPageFromInput<Destination>(locationState, nextPageParam);
+      const context = { operation: 'create', originPageKey: prevPageKey, targetPanelKey: destinationPanelKey };
+      const nextPage = resolveNotFoundPage(nextPageInput, nextPageParam, context);
 
       if (!shouldUpdatePage(routerState, prevPageKey, nextPage)) return;
 
@@ -205,7 +208,9 @@ export function useAppNavigate<const Origin extends AppRoute['path']>() {
       const prevPageKey = findPageKeyFromPanelKey(routerState, destinationPanelKey);
       const prevPageParam = getRouteParamFromKey<Origin>(locationState, prevPageKey);
       const nextPageParam = applyNavigationDispatch(dispatch, prevPageParam as never) as never;
-      const nextPage = getPageFromInput<Destination>(locationState, nextPageParam);
+      const nextPageInput = getPageFromInput<Destination>(locationState, nextPageParam);
+      const context = { operation: 'update', originPageKey: prevPageKey, targetPanelKey: destinationPanelKey };
+      const nextPage = resolveNotFoundPage(nextPageInput, nextPageParam, context);
 
       if (!shouldUpdatePage(routerState, prevPageKey, nextPage)) return;
 
@@ -242,7 +247,9 @@ export function useAppNavigate<const Origin extends AppRoute['path']>() {
       const nextSearchSnapshot = applyNavigationDispatch(dispatch, prevSearchSnapshot);
 
       const nextPageParam = { ...prevPageParam, search: nextSearchSnapshot.toObject() };
-      const nextPage = getPageFromParam<Destination>(locationState, nextPageParam as never);
+      const nextPageInput = getPageFromParam<Destination>(locationState, nextPageParam as never);
+      const context = { operation: 'search', originPageKey: prevPageKey, targetPanelKey: destinationPanelKey };
+      const nextPage = resolveNotFoundPage(nextPageInput, nextPageParam, context);
 
       if (!shouldUpdatePage(routerState, prevPageKey, nextPage)) return;
 
@@ -273,7 +280,9 @@ export function useAppNavigate<const Origin extends AppRoute['path']>() {
       const prevPageKey = findPageKeyFromPanelKey(routerState, destinationPanelKey);
       const prevPageParam = getRouteParamFromKey<Origin>(locationState, prevPageKey);
       const nextPageParam = applyNavigationDispatch(dispatch, prevPageParam as never) as never;
-      const nextPage = getPageFromParam<Destination>(locationState, nextPageParam);
+      const nextPageInput = getPageFromParam<Destination>(locationState, nextPageParam);
+      const context = { operation: 'only', originPageKey: prevPageKey, targetPanelKey: destinationPanelKey };
+      const nextPage = resolveNotFoundPage(nextPageInput, nextPageParam, context);
 
       setNavigationStore(store => {
         store = getNavigationStoreFromRouter(store, routerState);
@@ -416,7 +425,9 @@ export function useAppSyncNavigationStoreFromLocation() {
         store = getNavigationStoreFromRouter(store, routerState);
 
         for (const [pageKey, route] of Object.entries(location.state?.pages || {})) {
-          const nextPage = sanitizePage(locationState, getDefaultRouterPage(route));
+          const nextPageInput = sanitizePage(locationState, getDefaultRouterPage(route));
+          const context = { operation: 'sync-location-state', pageKey };
+          const nextPage = resolveNotFoundPage(nextPageInput, route, context);
           [store] = upsertPage(store, pageKey, nextPage);
         }
 
@@ -458,7 +469,9 @@ export function useAppSyncNavigationStoreFromLocation() {
 
         for (const [i, fragment] of hashFragment.split('#/').entries()) {
           const href = i === 0 ? fragment : `/${fragment}`;
-          const nextPage = sanitizePage(locationState, getDefaultRouterPage({ href }));
+          const nextPageInput = sanitizePage(locationState, getDefaultRouterPage({ href }));
+          const context = { operation: 'sync-location-hash', panelKey: i };
+          const nextPage = resolveNotFoundPage(nextPageInput, { href }, context);
           if (!nextPage?.href) continue;
 
           panelKey++;
@@ -501,7 +514,9 @@ export function useAppSyncNavigationStoreFromLocation() {
 
         const pathname = location.pathname === '/' ? '/submit' : location.pathname;
         const href = `${pathname}${location.search || ''}${location.hash || ''}`;
-        const legacyRoute = sanitizePage(locationState, getDefaultRouterPage({ href, state: location.state }));
+        const nextPageInput = sanitizePage(locationState, getDefaultRouterPage({ href, state: location.state }));
+        const context = { operation: 'sync-legacy-location' };
+        const legacyRoute = resolveNotFoundPage(nextPageInput, { href, state: location.state }, context);
 
         if (!legacyRoute?.href) return store;
 

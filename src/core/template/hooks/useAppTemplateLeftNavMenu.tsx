@@ -7,15 +7,14 @@ import { useCallback, useMemo } from 'react';
 
 type AppTemplateLeftNavMenuItem = LeftNavMenuProps['items'][number];
 
-export type AppLeftNavItem<Path extends AppRoute['route'] = AppRoute['route']> =
-  InferAppNavigationPropsFromPath<Path> & {
-    divider?: boolean;
-    icon?: LeftNavMenuProps['icon'];
-    id: AppTemplateLeftNavMenuItem['id'];
-    items?: AppLeftNavItem[] | null;
-    label?: LeftNavMenuProps['label'];
-    preventRender?: boolean;
-  };
+export type AppLeftNavItem<Path extends AppRoute['path'] = AppRoute['path']> = InferAppNavigationPropsFromPath<Path> & {
+  divider?: boolean;
+  icon?: LeftNavMenuProps['icon'];
+  id: AppTemplateLeftNavMenuItem['id'];
+  items?: AppLeftNavItem[] | null;
+  label?: LeftNavMenuProps['label'];
+  preventRender?: boolean;
+};
 
 export const useAppTemplateLeftNavMenu = () => {
   const leftNav = useAppLeftNavMenu();

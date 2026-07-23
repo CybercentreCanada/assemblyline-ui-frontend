@@ -6,14 +6,14 @@ import { AppLink } from 'core/router';
 import type { JSX } from 'react';
 import { memo, useMemo } from 'react';
 
-export type LeftNavLinkProps<Origin extends AppRoute['route']> = InferAppNavigationPropsFromPath<Origin> & {
+export type LeftNavLinkProps<Origin extends AppRoute['path']> = InferAppNavigationPropsFromPath<Origin> & {
   icon?: ListItemIconProps['children'];
   navOpen: boolean;
   navProps?: LeftNavChildRenderProps;
   primary?: ListItemTextProps['primary'];
 };
 
-function WrappedLeftNavRoute<const Origin extends AppRoute['route']>({
+function WrappedLeftNavRoute<const Origin extends AppRoute['path']>({
   icon,
   navOpen,
   navProps,
@@ -39,7 +39,7 @@ function WrappedLeftNavRoute<const Origin extends AppRoute['route']>({
   );
 }
 
-export const LeftNavRoute = memo(WrappedLeftNavRoute) as <const Origin extends AppRoute['route']>(
+export const LeftNavRoute = memo(WrappedLeftNavRoute) as <const Origin extends AppRoute['path']>(
   props: LeftNavLinkProps<Origin>
 ) => JSX.Element | null;
 

@@ -22,9 +22,13 @@ export type {
   AppRouterState,
   AppRouterStore,
   AppSharedRouterStore,
+  ExtractNavReturn,
   InferAppNavigationInputFromPath,
   InferAppNavigationOperationMapFromPath,
   InferAppNavigationPropsFromPath,
+  NotFoundDetailItem,
+  NotFoundDetailLabels,
+  NotFoundDiagnostics,
   PageKeyOf
 } from './router.models';
 export {
@@ -75,6 +79,8 @@ export {
   getLocationStateFromRouter,
   getNavigationStoreFromRouter,
   getNextTitleFromPage,
+  getNotFoundDetails,
+  getNotFoundPreviewHref,
   getNotFoundRouterPage,
   getPageDigestFromPage,
   getPageFromPanelKey,
@@ -83,6 +89,7 @@ export {
   hasPages,
   insertLeftPanel,
   insertRightPanel,
+  isNotFoundRouterPage,
   mergePanels,
   reconcileRouterFromNavigation,
   refreshPageAges,
@@ -93,6 +100,7 @@ export {
   removePage,
   removePanel,
   resolveNavigationIntent,
+  resolveNotFoundPage,
   sanitizeNodes,
   sanitizePages,
   sanitizePanels,
@@ -111,4 +119,3 @@ export {
   upsertPage,
   upsertPanel
 } from './router.utils';
-export type { ExtractNavReturn } from './router.utils';

@@ -1,5 +1,5 @@
 import type { AppRouterPage, AppRouterState, AppRouterStore, InferAppNavigationInputFromPath } from 'core/router';
-import { getDefaultRouterPage, getNotFoundRouterPage, getPageDigestFromPage } from 'core/router/router.utils';
+import { getDefaultRouterPage, getPageDigestFromPage, isNotFoundRouterPage } from 'core/router/router.utils';
 import type {
   AppLocationParamStore,
   InferAppLocationFromPath,
@@ -40,7 +40,7 @@ export const findAppRouteFromPath = function <const Origin extends AppRoute['pat
   store: AppLocationParamStore,
   path: Origin
 ): InferAppRouteFromPath<Origin> {
-  return store?.routes?.[path] ?? getDefaultAppRoute();
+  return (store?.routes?.[path] as InferAppRouteFromPath<Origin>) ?? getDefaultAppRoute();
 };
 
 export const findAppRouteFromKey = function <const Origin extends AppRoute['path']>(
@@ -55,12 +55,17 @@ export const findAppRouteFromPage = function <const Origin extends AppRoute['pat
   store: AppLocationParamStore,
   page: AppRouterPage
 ): InferAppRouteFromPath<Origin> {
+  if (isNotFoundRouterPage(page)) {
+    const notFoundRoute = store?.routes?.['/not-found'];
+    return (notFoundRoute as InferAppRouteFromPath<Origin>) ?? getDefaultAppRoute();
+  }
+
   if (!page?.href) return getDefaultAppRoute();
   const { pathname } = new URL(page.href, 'http://localhost');
   const found = Object.values(store?.routes || {}).find(
     r => !!r?.path && !!matchPath({ path: r.path, end: true }, pathname)
   );
-  return found ?? getDefaultAppRoute();
+  return (found as InferAppRouteFromPath<Origin>) ?? getDefaultAppRoute();
 };
 
 export const findAppRouteFromParam = function <const Origin extends AppRoute['path']>(
@@ -172,7 +177,7 @@ export const setAppRouteFromAppRoutes = function (
     store = upsertAppRoute(store, route);
   }
 
-  for (const routeKey of Object.keys(store.routes || {})) {
+  for (const routeKey of Object.keys(store.routes || {}) as (keyof AppLocationParamStore['routes'])[]) {
     if (!nextPageKeys.has(routeKey)) {
       store = removeAppRouteFromKey(store, routeKey);
     }
@@ -182,7 +187,7 @@ export const setAppRouteFromAppRoutes = function (
 };
 
 //*****************************************************************************************
-// Router Route
+// Router Page
 //*****************************************************************************************
 
 export const getLocationPathnameFromParam = function <const Origin extends AppRoute['path']>(
@@ -220,7 +225,7 @@ export const getLocationHashFromParam = function <const Origin extends AppRoute[
 ): Location['hash'] {
   if (param?.hash == null) return '';
 
-  const resolvedHash = !route?.hash ? '' : route.hash.stringify(param.hash);
+  const resolvedHash = !route?.hash ? '' : route.hash.stringify(param.hash as never);
   return resolvedHash.startsWith('#') ? resolvedHash.slice(1) : resolvedHash;
 };
 
@@ -228,12 +233,10 @@ export const getPageFromParam = function <const Origin extends AppRoute['path']>
   store: AppLocationParamStore,
   param: InferAppLocationFromPath<Origin>
 ): AppRouterPage {
-  if (!param?.route)
-    return getNotFoundRouterPage({ route: param?.route, path: param?.path, search: param?.search, hash: param?.hash });
+  if (!param?.route) return getDefaultRouterPage();
 
   const route = findAppRouteFromParam<Origin>(store, param);
-  if (!route?.path)
-    return getNotFoundRouterPage({ route: param?.route, path: param?.path, search: param?.search, hash: param?.hash });
+  if (!route?.path) return getDefaultRouterPage();
 
   const pathname = getLocationPathnameFromParam(route, param);
   const [search, state, transient] = getLocationSearchFromParam(route, param);
@@ -253,19 +256,19 @@ export const getPageFromLocation = function (
   store: AppLocationParamStore,
   location: ReactRouterLocation
 ): AppRouterPage {
-  if (!location?.pathname) return getNotFoundRouterPage(location);
+  if (!location?.pathname) return getDefaultRouterPage();
 
   const href = `${location.pathname}${location.search || ''}${location.hash || ''}`;
   const page = getDefaultRouterPage({ href, state: location.state });
   const route = findAppRouteFromPage(store, page);
-  if (!route?.path) return getNotFoundRouterPage({ href: page?.href, state: page?.state, transient: page?.transient });
+  if (!route?.path) return getDefaultRouterPage();
 
   page.digest = getPageDigestFromPage(page);
   return page;
 };
 
 export const getPageFromURL = function (store: AppLocationParamStore, url: string): AppRouterPage {
-  if (!url?.trim()) return getNotFoundRouterPage({ url });
+  if (!url?.trim()) return getDefaultRouterPage();
 
   try {
     const parsed = new URL(url, 'http://localhost');
@@ -277,7 +280,7 @@ export const getPageFromURL = function (store: AppLocationParamStore, url: strin
       state: null
     });
   } catch {
-    return getNotFoundRouterPage({ url });
+    return getDefaultRouterPage();
   }
 };
 
@@ -310,7 +313,7 @@ export const getPageFromInput = function <const Origin extends AppRoute['path']>
   if (isNavigationInputString<Origin>(input)) return getPageFromURL(store, input);
   else if (isNavigationInputLocation<Origin>(input)) return getPageFromLocation(store, input);
   else if (isNavigationInputRouteParam<Origin>(input)) return getPageFromParam<Origin>(store, input);
-  else return getNotFoundRouterPage(input);
+  else return getDefaultRouterPage();
 };
 
 // export const getRouteFromLocation = function (location: Location): AppRouterRoute {
@@ -377,7 +380,7 @@ export const getHashParamFromLocation = function <const Origin extends AppRoute[
   route: InferAppRouteFromPath<Origin>,
   location: Location
 ): InferAppLocationFromPath<Origin>['hash'] {
-  return !route?.hash ? (null as InferAppLocationFromPath<Origin>['hash']) : route.hash.parse(location);
+  return !route?.hash ? null : (route.hash.parse(location) as InferAppLocationFromPath<Origin>['hash']);
 };
 
 export const getRouteParamFromPage = function <const Origin extends AppRoute['path']>(
@@ -399,10 +402,14 @@ export const getRouteParamFromPage = function <const Origin extends AppRoute['pa
 };
 
 export const sanitizePage = function (store: AppLocationParamStore, page: AppRouterPage): AppRouterPage {
+  if (isNotFoundRouterPage(page)) {
+    const nextPage = getDefaultRouterPage(page);
+    nextPage.digest = page?.digest || getPageDigestFromPage(nextPage);
+    return nextPage;
+  }
+
   const param = getRouteParamFromPage(store, page);
-  return !param?.route
-    ? getNotFoundRouterPage({ route: param?.route, path: param?.path, search: param?.search, hash: param?.hash })
-    : getPageFromParam(store, param);
+  return !param?.route ? getDefaultRouterPage() : getPageFromParam(store, param);
 };
 
 // export const getRouteParamFromValues = function <const Origin extends AppRoute['path']>(
@@ -507,7 +514,7 @@ export const updateRouteParam = function <const Origin extends AppRoute['path']>
   if ('route' in param) store.locations[pageKey].route = param.route;
   if ('path' in param) store.locations[pageKey].path = param.path;
   if ('search' in param) store.locations[pageKey].search = param.search;
-  if ('hash' in param) store.locations[pageKey].hash = param.hash;
+  if ('hash' in param) store.locations[pageKey].hash = param.hash as never;
 
   return store;
 };

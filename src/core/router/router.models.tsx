@@ -78,6 +78,8 @@ export type AppLocationState = {
   pages: Record<string, Pick<AppRouterPage, 'href' | 'state' | 'scroll'>>;
 };
 
+export type AppLocation = ReactRouterLocation<AppLocationState>;
+
 export type AppRouterState = Pick<AppNavigationStore, 'id' | 'panels' | 'pages'>;
 
 //*****************************************************************************************
@@ -146,6 +148,57 @@ export type InferAppNavigationOperationMapFromPath<Origin extends AppRoute['path
 export type InferAppNavigationPropsFromPath<Origin extends AppRoute['path']> = {
   nav?: (navigate: ReturnType<typeof useAppNavigate<Origin>>) => void;
   navDeps?: DependencyList;
+};
+
+export type ExtractNavReturn<Origin extends AppRoute['path']> = {
+  target: 'from' | 'here' | 'to' | 'at' | null;
+  panelKey: number | null;
+  operation: 'create' | 'update' | 'search' | 'only' | 'closePanel' | null;
+  options: AppNavigateOptions;
+  dispatch:
+    | InferAppNavigationOperationMapFromPath<Origin>['create']
+    | InferAppNavigationOperationMapFromPath<Origin>['update']
+    | InferAppNavigationOperationMapFromPath<Origin>['search']
+    | InferAppNavigationOperationMapFromPath<Origin>['only']
+    | InferAppNavigationOperationMapFromPath<Origin>['closePanel']
+    | null;
+};
+
+//*****************************************************************************************
+// Not Found
+//*****************************************************************************************
+
+/** Diagnostics payload used by the not-found page UI. */
+export type NotFoundDiagnostics = {
+  attemptedHref?: string;
+  attemptedInput?: unknown;
+  attemptedPage?: Partial<AppRouterPage>;
+  operation?: string;
+  originPageKey?: string;
+  pageKey?: string;
+  panelKey?: number | string;
+  targetPanelKey?: number | string;
+};
+
+export type NotFoundDetailLabels = {
+  attemptedHref: string;
+  operation: string;
+  originPageKey: string;
+  pageAge: string;
+  pageDigest: string;
+  pageHref: string;
+  pageKey: string;
+  pageScroll: string;
+  pageState: string;
+  pageTransient: string;
+  panelKey: string;
+  targetPanelKey: string;
+};
+
+export type NotFoundDetailItem = {
+  label: string;
+  value: string;
+  pre?: boolean;
 };
 
 //*****************************************************************************************
