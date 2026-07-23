@@ -2,8 +2,9 @@
   "error": "error",
   "error.button": "Try again",
   "error.chunk": "Reloading the application to fix a loading error...",
-  "error.description": "This is the error we've got:",
-  "error.hideStack": "Hide Stack",
-  "error.showStack": "Show Stack",
+  "error.description": "Please inform the system administrators of the issue below to have it resolved.",
+  "error.hideStack": "Hide stack",
+  "error.reload": "Reload page",
+  "error.showStack": "Show stack",
   "error.title": "There is definitely a 'bug' here!"
 }

@@ -163,91 +163,93 @@ ExpandMore.displayName = 'ExpandMore';
 // ErrorFallback
 //*****************************************************************************************
 
-export const ErrorFallback = memo(({ error, resetErrorBoundary }: FallbackProps) => {
-  const { t } = useTranslation(['error']);
-  const theme = useTheme();
-  const [expanded, setExpanded] = useState<boolean>(false);
-  const downSM = useMediaQuery(theme.breakpoints.down('md'));
+export const ErrorFallback = memo(
+  ({ error = { name: null, message: null, stack: null }, resetErrorBoundary }: FallbackProps) => {
+    const { t } = useTranslation(['error']);
+    const theme = useTheme();
+    const [expanded, setExpanded] = useState<boolean>(false);
+    const downSM = useMediaQuery(theme.breakpoints.down('md'));
 
-  const handleExpandToggle = useCallback(() => {
-    setExpanded(e => !e);
-  }, []);
+    const handleExpandToggle = useCallback(() => {
+      setExpanded(e => !e);
+    }, []);
 
-  useEffect(() => {
-    if (error.name === 'ChunkLoadError') {
-      setTimeout(() => window.location.reload(), 5000);
-    }
-  }, [error]);
+    useEffect(() => {
+      if (error.name === 'ChunkLoadError') {
+        setTimeout(() => window.location.reload(), 5000);
+      }
+    }, [error]);
 
-  return error.name === 'ChunkLoadError' ? (
-    <div
-      data-testid="error-fallback"
-      role="alert"
-      style={{
-        textAlign: 'center',
-        position: 'fixed',
-        top: '50%',
-        left: '50%',
-        transform: 'translate(-50%, -50%)'
-      }}
-    >
-      <Typography children={t('error.chunk')} variant="body1" gutterBottom />
-      <LinearProgress />
-    </div>
-  ) : (
-    <div data-testid="error-fallback" role="alert" style={{ display: 'flex', justifyContent: 'center' }}>
-      <PageCenter margin={4}>
-        <BugContainer>
-          <Bug fontSize="inherit" />
-        </BugContainer>
-        <Typography children={t('error.title')} variant={downSM ? 'h4' : 'h3'} gutterBottom />
-        <Typography children={t('error.description')} variant={downSM ? 'body1' : 'h6'} gutterBottom />
-        <Paper
-          variant="outlined"
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignContent: 'center',
-            justifyContent: 'center',
-            alignItems: 'center',
-            padding: theme.spacing(2),
-            width: '100%'
-          }}
-        >
-          <Typography
-            data-testid="error-message"
-            children={error.message}
-            variant="inherit"
-            component="pre"
-            sx={{ paddingTop: theme.spacing(1), whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}
-          />
-          <Button onClick={handleExpandToggle} sx={{ margin: theme.spacing(1), color: theme.palette.primary.main }}>
-            {expanded ? t('error.hideStack') : t('error.showStack')}
-            <ExpandMore expand={expanded} aria-expanded={expanded} aria-label="show more">
-              <ExpandMoreIcon />
-            </ExpandMore>
-          </Button>
-          <Collapse in={expanded} timeout="auto" unmountOnExit>
+    return error.name === 'ChunkLoadError' ? (
+      <div
+        data-testid="error-fallback"
+        role="alert"
+        style={{
+          textAlign: 'center',
+          position: 'fixed',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)'
+        }}
+      >
+        <Typography children={t('error.chunk')} variant="body1" gutterBottom />
+        <LinearProgress />
+      </div>
+    ) : (
+      <div data-testid="error-fallback" role="alert" style={{ display: 'flex', justifyContent: 'center' }}>
+        <PageCenter margin={4}>
+          <BugContainer>
+            <Bug fontSize="inherit" />
+          </BugContainer>
+          <Typography children={t('error.title')} variant={downSM ? 'h4' : 'h3'} gutterBottom />
+          <Typography children={t('error.description')} variant={downSM ? 'body1' : 'h6'} gutterBottom />
+          <Paper
+            variant="outlined"
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignContent: 'center',
+              justifyContent: 'center',
+              alignItems: 'center',
+              padding: theme.spacing(2),
+              width: '100%'
+            }}
+          >
             <Typography
-              data-testid="error-stack"
-              children={error.stack}
+              data-testid="error-message"
+              children={error.message}
               variant="inherit"
               component="pre"
-              sx={{
-                textAlign: 'left',
-                whiteSpace: 'pre-wrap',
-                wordBreak: 'break-word',
-                paddingBottom: theme.spacing(1)
-              }}
+              sx={{ paddingTop: theme.spacing(1), whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}
             />
-          </Collapse>
-        </Paper>
-        <Button onClick={resetErrorBoundary} style={{ margin: theme.spacing(4) }} color="primary">
-          {t('error.button')}
-        </Button>
-      </PageCenter>
-    </div>
-  );
-});
+            <Button onClick={handleExpandToggle} sx={{ margin: theme.spacing(1), color: theme.palette.primary.main }}>
+              {expanded ? t('error.hideStack') : t('error.showStack')}
+              <ExpandMore expand={expanded} aria-expanded={expanded} aria-label="show more">
+                <ExpandMoreIcon />
+              </ExpandMore>
+            </Button>
+            <Collapse in={expanded} timeout="auto" unmountOnExit>
+              <Typography
+                data-testid="error-stack"
+                children={error.stack}
+                variant="inherit"
+                component="pre"
+                sx={{
+                  textAlign: 'left',
+                  whiteSpace: 'pre-wrap',
+                  wordBreak: 'break-word',
+                  paddingBottom: theme.spacing(1)
+                }}
+              />
+            </Collapse>
+          </Paper>
+          <Button onClick={resetErrorBoundary} style={{ margin: theme.spacing(4) }} color="primary">
+            {t('error.button')}
+          </Button>
+        </PageCenter>
+      </div>
+    );
+  }
+);
 
 ErrorFallback.displayName = 'ErrorFallback';

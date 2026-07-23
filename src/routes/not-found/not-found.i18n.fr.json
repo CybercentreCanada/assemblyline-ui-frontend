@@ -1,8 +1,8 @@
 {
-  "description": "La page que vous recherchez est introuvable ...",
-  "dl.alt": "Link mort",
-  "dl.description": "On dirait que ce 'Link' est mort...",
-  "values.none": "Aucune valeur de route n'a ete fournie.",
-  "values.unserializable": "Impossible de serialiser les valeurs de route non resolues.",
-  "title": "404: Introuvable"
+  "description": "La route demandée est introuvable. Partagez les détails du lien ci-dessous avec les administrateurs système si cela vous semble inattendu.",
+  "dl.alt": "Lien mort",
+  "dl.description": "On dirait que ce lien est mort...",
+  "title": "Cette page a pris un mauvais virage",
+  "values.none": "Aucune valeur de route n'a été fournie.",
+  "values.unserializable": "Impossible de sérialiser les valeurs de route non résolues."
 }

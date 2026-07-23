@@ -1,4 +1,5 @@
-import { Paper, Typography, useTheme } from '@mui/material';
+import WrongLocationOutlinedIcon from '@mui/icons-material/WrongLocationOutlined';
+import { Paper, Typography, useMediaQuery, useTheme } from '@mui/material';
 import { useAppSearchParams } from 'core/routes';
 import { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -11,6 +12,7 @@ import { PageCenter } from 'ui/pages/PageCenter';
 export const NotFoundPage = memo(() => {
   const { t } = useTranslation(['error404']);
   const theme = useTheme();
+  const downSM = useMediaQuery(theme.breakpoints.down('md'));
 
   const search = useAppSearchParams<'/not-found'>();
 
@@ -26,11 +28,14 @@ export const NotFoundPage = memo(() => {
 
   return (
     <PageCenter width="65%" margin={4}>
-      <div style={{ paddingTop: theme.spacing(10), paddingBottom: theme.spacing(6) }}>
-        <Typography variant="h1">{t('title')}</Typography>
+      <div style={{ paddingTop: theme.spacing(10), fontSize: 200, color: theme.palette.secondary.main }}>
+        <WrongLocationOutlinedIcon fontSize="inherit" />
       </div>
-      <div>
-        <Typography variant="h6">{t('description')}</Typography>
+      <div style={{ paddingBottom: theme.spacing(2) }}>
+        <Typography children={t('title')} variant={downSM ? 'h4' : 'h3'} gutterBottom />
+      </div>
+      <div style={{ width: '100%', maxWidth: '720px', margin: '0 auto' }}>
+        <Typography children={t('description')} variant={downSM ? 'body1' : 'h6'} gutterBottom />
       </div>
 
       <Paper

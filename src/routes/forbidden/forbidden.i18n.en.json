@@ -1,5 +1,6 @@
 {
-  "disabled": "Your account has been disabled...",
-  "not_allowed": "You are not allowed to view this page...",
-  "title": "403: Forbidden"
+  "description": "You are not allowed to view this page. Contact the system administrators if you require access to this route.",
+  "disabled.description": "This feature is currently disabled by policy or configuration. Contact the system administrators if this seems unexpected.",
+  "disabled.title": "This feature is taking a nap",
+  "title": "Nice try, this door is locked"
 }

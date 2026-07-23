@@ -2,7 +2,6 @@ import { useAppConfig } from 'core/config';
 import type { ComponentType, MemoExoticComponent, ReactNode } from 'react';
 import { memo } from 'react';
 import { ForbiddenPage } from 'routes/forbidden/forbidden';
-import { NotFoundPage } from 'routes/not-found/not-found';
 
 //*****************************************************************************************
 // DisabledBoundary
@@ -18,7 +17,7 @@ export type DisabledBoundaryProps = {
 };
 
 export const DisabledBoundary = memo(
-  ({ disabled = false, FallbackComponent = <NotFoundPage />, children }: DisabledBoundaryProps) => {
+  ({ disabled = false, FallbackComponent = <ForbiddenPage disabled />, children }: DisabledBoundaryProps) => {
     const isDisabled = useAppConfig(s => (typeof disabled === 'function' ? disabled(s) : disabled));
     return isDisabled ? <>{FallbackComponent}</> : <>{children}</>;
   }

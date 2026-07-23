@@ -1,3 +1,7 @@
+import { CrashRoute } from 'core/error/error.route';
+import { LockedRoute } from 'layout/auth/locked/locked.route';
+import { QuotaRoute } from 'layout/auth/quota/quota.route';
+import { ToSRoute } from 'layout/auth/terms-of-service/terms-of-service.route';
 import { AccountRoute } from 'routes/account/account.route';
 import { AdminAPIKeyDetailRoute } from 'routes/admin-api-key-detail/admin-api-key-detail.route';
 import { AdminAPIKeysRoute } from 'routes/admin-api-keys/admin-api-keys.route';
@@ -13,11 +17,13 @@ import { DevelopmentLibraryRoute } from 'routes/development-library/development-
 import { DevelopmentThemeRoute } from 'routes/development-theme/development-theme.route';
 import { FileDetailRoute } from 'routes/file-detail/file-detail.route';
 import { FileViewerRootRoute, FileViewerRoute } from 'routes/file-viewer/file-viewer.route';
+import { DisabledRoute, ForbiddenRoute } from 'routes/forbidden/forbidden.route';
 import { HelpAPIRoute } from 'routes/help-api/help-api.route';
 import { HelpClassificationRoute } from 'routes/help-classification/help-classification.route';
 import { HelpConfigurationRoute } from 'routes/help-configuration/help-configuration.route';
 import { HelpSearchRoute } from 'routes/help-search/help-search.route';
 import { HelpServicesRoute } from 'routes/help-services/help-services.route';
+import { MissingNodeRoute } from 'routes/missing-node/missing-node.route';
 import { NotFoundRoute } from 'routes/not-found/not-found.route';
 import { SearchRootRoute, SearchRoute } from 'routes/search/search.route';
 import { SettingsRootRoute, SettingsRoute } from 'routes/settings/settings.route';
@@ -56,15 +62,21 @@ export const APP_ROUTES = [
   DevelopmentCustomizeRoute,
   DevelopmentLibraryRoute,
   DevelopmentThemeRoute,
+  DisabledRoute,
+  CrashRoute,
   FileDetailRoute,
   FileViewerRootRoute,
   FileViewerRoute,
+  ForbiddenRoute,
   HelpAPIRoute,
   HelpClassificationRoute,
   HelpConfigurationRoute,
   HelpSearchRoute,
   HelpServicesRoute,
+  LockedRoute,
+  MissingNodeRoute,
   NotFoundRoute,
+  QuotaRoute,
   SearchRootRoute,
   SearchRoute,
   SettingsRootRoute,
@@ -74,6 +86,7 @@ export const APP_ROUTES = [
   SubmissionReportRoute,
   SubmissionsRoute,
   SubmitRoute,
+  ToSRoute,
   UserRoute
 ] as const;
 
