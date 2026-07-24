@@ -1,10 +1,6 @@
 import type { AppNavigationStore, AppRouterStore } from 'core/router';
-import {
-  useAppBlockNavigation,
-  useAppBlockUnloadEvent,
-  useAppSyncNavigationStoreFromLocation,
-  useAppSyncRouterStoreFromNavigation
-} from 'core/router';
+import { useAppSyncNavigationStoreFromLocation, useAppSyncRouterStoreFromNavigation } from 'core/router';
+import { AppNavigationBlocker } from 'core/router/router.components';
 import { createAppStore } from 'features/store/createAppStore';
 import type { PropsWithChildren } from 'react';
 import { memo } from 'react';
@@ -77,24 +73,16 @@ export const getAppNavigationStateFromApi = (api: StoreApi<AppNavigationStore>):
 
 AppNavigationStoreProvider.displayName = 'AppNavigationStoreProvider';
 
-export const AppNavigationSync = memo(() => {
+export const AppNavigationProvider = memo(({ children }: PropsWithChildren) => {
   useAppSyncNavigationStoreFromLocation();
   useAppSyncRouterStoreFromNavigation();
-  return null;
+
+  return (
+    <>
+      <AppNavigationBlocker />
+      {children}
+    </>
+  );
 });
-
-export const AppNavigationBlocker = memo(({ children }: PropsWithChildren) => {
-  useAppBlockNavigation();
-  useAppBlockUnloadEvent();
-
-  return <>{children}</>;
-});
-
-export const AppNavigationProvider = memo(({ children }: PropsWithChildren) => (
-  <AppNavigationBlocker>
-    <AppNavigationSync />
-    {children}
-  </AppNavigationBlocker>
-));
 
 AppNavigationProvider.displayName = 'AppNavigationProvider';

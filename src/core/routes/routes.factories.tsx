@@ -30,6 +30,7 @@ export type CreateAppRouteProps<
     primary: ReactNode;
     secondary?: ReactNode;
   };
+  ancestor?: RoutePath | null;
   component: ReactNode | MemoExoticComponent<ComponentType<unknown>>;
 
   // Parameters
@@ -57,6 +58,7 @@ export const createAppRoute = <
 >({
   title,
   icon,
+  ancestor,
   component: Component,
 
   path,
@@ -88,6 +90,7 @@ export const createAppRoute = <
   return {
     title,
     icon,
+    ancestor,
 
     path,
     params: pathCodec,

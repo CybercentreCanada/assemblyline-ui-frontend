@@ -61,8 +61,10 @@ export type PageKeyOf<Store extends AppLocationState> = Extract<keyof Store['pag
 // Blocker
 //*****************************************************************************************
 
+export type AppRouterBlockedReason = 'unsaved_changes' | 'data_loss_on_leave' | 'external_leave_risk' | null;
+
 /** Route blocker registry keyed by route ids. */
-export type AppRouterBlockedPages = Record<keyof AppRouterStore['pages'], unknown>;
+export type AppRouterBlockedPages = Record<keyof AppRouterStore['pages'], AppRouterBlockedReason>;
 
 //*****************************************************************************************
 // Location State

@@ -232,7 +232,13 @@ describe('store conversion helpers', () => {
       pages: {
         old: { digest: hashObject({ href: '/old', state: null }), href: '/old', state: null }
       },
-      blockedPages: { stale: null },
+      blockedPages: {
+        stale: {
+          reasons: {
+            unsaved_changes: true
+          }
+        }
+      },
       options: {
         hashScrollIntoView: false,
         href: '',

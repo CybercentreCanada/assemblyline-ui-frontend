@@ -9,6 +9,8 @@ import apiEN from 'core/api/api.i18n.en.json';
 import apiFR from 'core/api/api.i18n.fr.json';
 import errorEN from 'core/error/error.i18n.en.json';
 import errorFR from 'core/error/error.i18n.fr.json';
+import routerEN from 'core/router/router.i18n.en.json';
+import routerFR from 'core/router/router.i18n.fr.json';
 import i18n from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
 import lockedEN from 'layout/auth/locked/locked.i18n.en.json';
@@ -103,6 +105,7 @@ export const I18N_RESSOURCES = {
     missingNode: missingNodeEN,
     notifications: notificationsEN,
     quota: quotaEN,
+    router: routerEN,
     search: searchEN,
     settings: settingsEN,
     submissionDetail: submissionDetailEN,
@@ -139,6 +142,7 @@ export const I18N_RESSOURCES = {
     missingNode: missingNodeFR,
     notifications: notificationsFR,
     quota: quotaFR,
+    router: routerFR,
     search: searchFR,
     settings: settingsFR,
     submissionDetail: submissionDetailFR,

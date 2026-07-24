@@ -3,12 +3,12 @@ import type {
   AppLocationState,
   AppNavigateOptions,
   AppNavigationStore,
+  AppRouterBlockedReason,
   AppRouterPage,
   InferAppNavigationOperationMapFromPath,
   InferAppNavigationPropsFromPath
 } from 'core/router';
 import {
-  addBlockedPage,
   addPage,
   applyDefaultNavigationStore,
   applyNavigationDispatch,
@@ -27,18 +27,21 @@ import {
   getNextTitleFromPage,
   getPageFromPanelKey,
   hasBlockedPages,
+  isPageVisible,
   reconcileRouterFromNavigation,
   removeBlockedPage,
   removePanel,
   resolveNavigationIntent,
   resolveNotFoundPage,
   sanitizeRouterStore,
+  setBlockedPage,
   setPageScrollPositions,
   shouldUpdatePage,
   updatePage,
   upsertPage,
   upsertPanel,
   useAppNavigationStoreApi,
+  useAppRouterStore,
   useAppRouterStoreApi,
   useAppSetNavigationStore,
   useAppSetRouterStore
@@ -586,7 +589,7 @@ export function useAppSyncRouterStoreFromNavigation() {
   const updateRouterStoreFromNavigation = useCallback(
     (navigation: AppNavigationStore) => {
       const routerState = getAppRouterStateFromApi(routerStoreApi);
-      if (navigation.id === routerState.id || hasBlockedPages(navigation)) return;
+      if (navigation.id === routerState.id || hasBlockedPages(navigation, routerState)) return;
 
       const nextTitle = navigation?.options?.nextTitle?.trim();
       document.title = nextTitle ? `ALV4 | ${nextTitle}` : 'Assemblyline 4';
@@ -614,19 +617,23 @@ export function useAppSyncRouterStoreFromNavigation() {
 // useAppBlocker
 //*****************************************************************************************
 
-export function useAppBlocker(shouldBlock: boolean | (() => boolean), dependencies: DependencyList = null) {
+export function useAppBlocker(
+  shouldBlock: AppRouterBlockedReason | (() => AppRouterBlockedReason),
+  dependencies: DependencyList = null
+) {
   const pageKey = useAppPageKey();
   const setNavigationStore = useAppSetNavigationStore();
+  const isVisible = useAppRouterStore(s => isPageVisible(s, pageKey));
 
   useEffect(
     () =>
       setNavigationStore(store => {
-        if (!pageKey) return store;
-        const isBlocked = typeof shouldBlock === 'function' ? shouldBlock() : shouldBlock;
-        return isBlocked ? addBlockedPage(store, pageKey) : removeBlockedPage(store, pageKey);
+        if (!pageKey || !isVisible) return removeBlockedPage(store, pageKey);
+        const reason = typeof shouldBlock === 'function' ? shouldBlock() : shouldBlock;
+        return setBlockedPage(store, pageKey, reason);
       }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [pageKey, setNavigationStore, ...(dependencies ?? [shouldBlock])]
+    [isVisible, pageKey, setNavigationStore, ...(dependencies ?? [shouldBlock])]
   );
 }
 
@@ -635,15 +642,17 @@ export function useAppBlocker(shouldBlock: boolean | (() => boolean), dependenci
 //*****************************************************************************************
 export function useAppBlockUnloadEvent() {
   const navigationStoreApi = useAppNavigationStoreApi();
+  const routerStoreApi = useAppRouterStoreApi();
 
   const handleBeforeUnload = useCallback(
     (event: BeforeUnloadEvent) => {
       const navigationState = getAppNavigationStateFromApi(navigationStoreApi);
-      if (!hasBlockedPages(navigationState)) return;
+      const routerState = getAppRouterStateFromApi(routerStoreApi);
+      if (!hasBlockedPages(navigationState, routerState)) return;
       event.preventDefault();
       event.returnValue = '';
     },
-    [navigationStoreApi]
+    [navigationStoreApi, routerStoreApi]
   );
 
   useEffect(() => {
@@ -668,7 +677,7 @@ export function useAppBlockNavigation() {
   const onNavigationChange = useCallback(
     (store: AppNavigationStore) => {
       const routerState = getAppRouterStateFromApi(routerStoreApi);
-      const hasBlockers = hasBlockedPages(store);
+      const hasBlockers = hasBlockedPages(store, routerState);
       if (!hasBlockers) {
         lastPromptedNavigationIdRef.current = null;
         return;

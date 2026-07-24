@@ -1,4 +1,4 @@
-export { AppLink, AppNavigate, WrappedAppLink, WrappedAppNavigate } from './router.components';
+export { AppLink, AppNavigate, AppNavigationBlocker, WrappedAppLink, WrappedAppNavigate } from './router.components';
 export type { AppLinkProps, AppNavigateProps } from './router.components';
 export {
   useAppBlocker,
@@ -16,6 +16,7 @@ export type {
   AppNavigateOptions,
   AppNavigationStore,
   AppRouterBlockedPages,
+  AppRouterBlockedReason,
   AppRouterNode,
   AppRouterPage,
   AppRouterPanel,
@@ -34,7 +35,6 @@ export type {
 export {
   AppNavigationProvider,
   AppNavigationStoreProvider,
-  AppNavigationSync,
   AppRouterProvider,
   AppRouterStoreProvider,
   getAppNavigationStateFromApi,
@@ -71,6 +71,8 @@ export {
   findPanelKey,
   findPanelKeyFromPageKey,
   findPrevPanelKeyFromPageKey,
+  formatNotFoundDiagnosticValue,
+  getBlockedPages,
   getDefaultNavigateOptions,
   getDefaultRouterNode,
   getDefaultRouterPage,
@@ -90,6 +92,7 @@ export {
   insertLeftPanel,
   insertRightPanel,
   isNotFoundRouterPage,
+  isPageVisible,
   mergePanels,
   reconcileRouterFromNavigation,
   refreshPageAges,
@@ -105,6 +108,7 @@ export {
   sanitizePages,
   sanitizePanels,
   sanitizeRouterStore,
+  setBlockedPage,
   setNode,
   setPage,
   setPageScrollPositions,

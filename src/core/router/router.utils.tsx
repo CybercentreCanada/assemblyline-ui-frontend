@@ -2,6 +2,7 @@ import type {
   AppLocationState,
   AppNavigateOptions,
   AppNavigationStore,
+  AppRouterBlockedReason,
   AppRouterNode,
   AppRouterPage,
   AppRouterPanel,
@@ -708,6 +709,15 @@ export const getPageDigestFromPage = function (
   });
 };
 
+export const getPage = function <const Store extends AppSharedRouterStore>(
+  store: Store,
+  pageKey: PageKeyOf<Store>
+): AppRouterPage {
+  const pages: Store['pages'] = store.pages || {};
+  if (!pageKey || !(pageKey in pages)) return getDefaultRouterPage();
+  return pages[pageKey] ?? getDefaultRouterPage();
+};
+
 // export const setPageDigestFromKey = function (
 //   store: AppRouterStore,
 //   pageKey: keyof AppRouterStore['pages']
@@ -894,18 +904,18 @@ export const hasPages = function <const Store extends AppSharedRouterStore>(stor
   return Object.keys(store?.pages || {}).length > 0;
 };
 
-// export const isPageVisible = function <const Store extends AppSharedRouterStore>(
-//   store: Store,
-//   pageKey: PageKeyOf<Store>
-// ): boolean {
-//   if (!(pageKey in store.pages)) return false;
+export const isPageVisible = function <const Store extends AppSharedRouterStore>(
+  store: Store,
+  pageKey: PageKeyOf<Store>
+): boolean {
+  if (!(pageKey in store.pages)) return false;
 
-//   for (const panel of store.panels) {
-//     if (panel?.pageKey === pageKey) return true;
-//   }
+  for (const panel of store.panels) {
+    if (panel?.pageKey === pageKey) return true;
+  }
 
-//   return false;
-// };
+  return false;
+};
 
 /**
  * @name removePage
@@ -1600,10 +1610,11 @@ export const getNotFoundDetails = (
  */
 export const addBlockedPage = (
   store: AppNavigationStore,
-  pageKey: keyof AppNavigationStore['pages']
+  pageKey: keyof AppNavigationStore['pages'],
+  reason: AppRouterBlockedReason = 'unsaved_changes'
 ): AppNavigationStore => {
-  if (!pageKey || pageKey in store.blockedPages) return store;
-  store.blockedPages[pageKey] = null;
+  if (!pageKey) return store;
+  store.blockedPages[pageKey] = reason;
   return store;
 };
 
@@ -1623,6 +1634,19 @@ export const removeBlockedPage = (
   return store;
 };
 
+export const setBlockedPage = (
+  store: AppNavigationStore,
+  pageKey: keyof AppNavigationStore['pages'],
+  reason: AppRouterBlockedReason
+): AppNavigationStore => {
+  if (reason) return addBlockedPage(store, pageKey, reason);
+  else return removeBlockedPage(store, pageKey);
+};
+
+export const getBlockedPages = (store: AppNavigationStore) => {
+  return !Object.keys(store.blockedPages || {}).length ? [] : Object.entries(store.blockedPages);
+};
+
 export const clearBlockedPages = (store: AppNavigationStore): AppNavigationStore => {
   store.blockedPages = {};
   return store;
@@ -1630,12 +1654,20 @@ export const clearBlockedPages = (store: AppNavigationStore): AppNavigationStore
 
 /**
  * @name hasBlockers
- * @description Checks whether the router currently has any active blocker entries.
- * @param store - Router store
- * @returns True when at least one blocker exists, otherwise false
+ * @description Checks whether any blocked page has diverged between the navigation store and router store.
+ * @param navigation - Navigation store
+ * @param router - Router store
+ * @returns True when at least one blocked page digest differs, otherwise false
  */
-export const hasBlockedPages = (store: AppNavigationStore): boolean => {
-  return Object.keys(store?.blockedPages || {}).length > 0;
+export const hasBlockedPages = (navigation: AppNavigationStore, router: AppRouterStore): boolean => {
+  return Object.keys(navigation?.blockedPages || {}).some(pageKey => {
+    const navigationPage = getPage(navigation, pageKey);
+    const routerPage = getPage(router, pageKey);
+    const navigationPanel = findPanelKeyFromPageKey(navigation, pageKey);
+    const routerPanel = findPanelKeyFromPageKey(router, pageKey);
+
+    return navigationPage?.digest !== routerPage?.digest || navigationPanel !== routerPanel;
+  });
 };
 
 //*****************************************************************************************
