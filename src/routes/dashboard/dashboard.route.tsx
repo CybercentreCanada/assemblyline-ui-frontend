@@ -1,3 +1,4 @@
+import DashboardOutlinedIcon from '@mui/icons-material/DashboardOutlined';
 import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import PauseCircleOutlineIcon from '@mui/icons-material/PauseCircleOutline';
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
@@ -1760,6 +1761,14 @@ export const DashboardPage = memo(() => {
 });
 
 export const DashboardRoute = createAppRoute({
+  title: {
+    ns: 'app',
+    key: 'drawer.dashboard'
+  },
+  icon: {
+    primary: <DashboardOutlinedIcon />
+  },
+  ancestor: null,
   component: DashboardPage,
   path: '/dashboard'
 });

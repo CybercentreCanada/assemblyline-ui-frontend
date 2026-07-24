@@ -5,6 +5,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import CloudDownloadOutlinedIcon from '@mui/icons-material/CloudDownloadOutlined';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ListAltOutlinedIcon from '@mui/icons-material/ListAltOutlined';
 import OndemandVideoOutlinedIcon from '@mui/icons-material/OndemandVideoOutlined';
 import PauseCircleOutlineOutlinedIcon from '@mui/icons-material/PauseCircleOutlineOutlined';
 import PlayCircleOutlineIcon from '@mui/icons-material/PlayCircleOutline';
@@ -1442,6 +1443,14 @@ const SubmissionDetail = memo(() => {
 });
 
 export const SubmissionDetailRoute = createAppRoute({
+  title: {
+    ns: 'app',
+    key: 'breadcrumb.submission.detail'
+  },
+  icon: {
+    primary: <ListAltOutlinedIcon />
+  },
+  ancestor: '/submissions',
   component: SubmissionDetail,
   path: '/submission/detail/:id',
   params: s => ({

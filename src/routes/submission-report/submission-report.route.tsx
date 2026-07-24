@@ -1,5 +1,6 @@
 import AssistantIcon from '@mui/icons-material/Assistant';
 import AssistantOutlinedIcon from '@mui/icons-material/AssistantOutlined';
+import ChromeReaderModeOutlinedIcon from '@mui/icons-material/ChromeReaderModeOutlined';
 import InfoIcon from '@mui/icons-material/Info';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import ListAltOutlinedIcon from '@mui/icons-material/ListAltOutlined';
@@ -328,6 +329,14 @@ const SubmissionReportPage = memo(() => {
 });
 
 export const SubmissionReportRoute = createAppRoute({
+  title: {
+    ns: 'app',
+    key: 'breadcrumb.submission.report'
+  },
+  icon: {
+    primary: <ChromeReaderModeOutlinedIcon />
+  },
+  ancestor: '/submissions',
   component: SubmissionReportPage,
   path: '/submission/report/:id',
   params: s => ({

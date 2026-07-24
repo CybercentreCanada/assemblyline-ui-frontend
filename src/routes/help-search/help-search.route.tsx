@@ -1,3 +1,4 @@
+import SearchIcon from '@mui/icons-material/Search';
 import type { CardProps } from '@mui/material';
 import {
   Box,
@@ -515,6 +516,14 @@ export const HelpSearchPage = memo(() => {
 });
 
 export const HelpSearchRoute = createAppRoute({
+  title: {
+    ns: 'app',
+    key: 'drawer.help.search'
+  },
+  icon: {
+    primary: <SearchIcon />
+  },
+  ancestor: '/help',
   component: HelpSearchPage,
   path: '/help/search',
   hash: s => s.string(null)

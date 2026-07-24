@@ -1,4 +1,5 @@
 import DeleteOutlineOutlinedIcon from '@mui/icons-material/DeleteOutlineOutlined';
+import KeyOutlinedIcon from '@mui/icons-material/KeyOutlined';
 import {
   Button,
   CircularProgress,
@@ -357,6 +358,14 @@ AdminAPIKeyDetailPage.displayName = 'AdminAPIKeyDetailPage';
 //*****************************************************************************************
 
 export const AdminAPIKeyDetailRoute = createAppRoute({
+  title: {
+    ns: 'app',
+    key: 'adminmenu.apikeys'
+  },
+  icon: {
+    primary: <KeyOutlinedIcon />
+  },
+  ancestor: '/admin/apikeys',
   component: AdminAPIKeyDetailPage,
   path: '/admin/apikeys/:id',
   params: s => ({ id: s.string(null) }),

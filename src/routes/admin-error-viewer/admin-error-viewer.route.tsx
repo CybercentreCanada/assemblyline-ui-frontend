@@ -1,4 +1,5 @@
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
+import ErrorOutlineOutlinedIcon from '@mui/icons-material/ErrorOutlineOutlined';
 import PanToolOutlinedIcon from '@mui/icons-material/PanToolOutlined';
 import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
 import { Grid, Typography, useTheme } from '@mui/material';
@@ -291,6 +292,14 @@ AdminErrorViewerPage.displayName = 'AdminErrorViewerPage';
 //*****************************************************************************************
 
 export const AdminErrorViewerRoute = createAppRoute({
+  title: {
+    ns: 'app',
+    key: 'adminmenu.errors'
+  },
+  icon: {
+    primary: <ErrorOutlineOutlinedIcon />
+  },
+  ancestor: null,
   component: AdminErrorViewerPage,
   path: '/admin/errors',
   search: s => ({

@@ -1,3 +1,4 @@
+import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import CheckOutlinedIcon from '@mui/icons-material/CheckOutlined';
 import ClearOutlinedIcon from '@mui/icons-material/ClearOutlined';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -461,6 +462,14 @@ HelpAPIPage.displayName = 'HelpAPIPage';
 //*****************************************************************************************
 
 export const HelpAPIRoute = createAppRoute({
+  title: {
+    ns: 'app',
+    key: 'drawer.help.api'
+  },
+  icon: {
+    primary: <AssignmentOutlinedIcon />
+  },
+  ancestor: '/help',
   component: HelpAPIPage,
   path: '/help/api'
 });

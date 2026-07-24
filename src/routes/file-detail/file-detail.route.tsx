@@ -1,4 +1,5 @@
 import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
+import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import OndemandVideoOutlinedIcon from '@mui/icons-material/OndemandVideoOutlined';
@@ -577,6 +578,14 @@ const FileDetailPage = React.memo(() => {
 });
 
 export const FileDetailRoute = createAppRoute({
+  title: {
+    ns: 'app',
+    key: 'breadcrumb.file.detail'
+  },
+  icon: {
+    primary: <DescriptionOutlinedIcon />
+  },
+  ancestor: null,
   component: FileDetailPage,
   path: '/file/detail/:id',
   params: s => ({

@@ -1,3 +1,4 @@
+import PaletteIcon from '@mui/icons-material/Palette';
 import { Box, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, useTheme } from '@mui/material';
 import { createAppRoute } from 'core/routes';
 import { memo, Profiler } from 'react';
@@ -169,6 +170,14 @@ const WrappedDevelopmentCustomizePage = memo(() => (
 ));
 
 export const DevelopmentCustomizeRoute = createAppRoute({
+  title: {
+    ns: 'app',
+    key: 'drawer.development.customize'
+  },
+  icon: {
+    primary: <PaletteIcon />
+  },
+  ancestor: '/development',
   component: WrappedDevelopmentCustomizePage,
   path: '/development/customize',
 

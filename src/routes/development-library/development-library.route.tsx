@@ -1,3 +1,4 @@
+import LibraryBooksIcon from '@mui/icons-material/LibraryBooks';
 import { useAppNavigate } from 'core/router';
 import { createAppRoute, useAppSearchParams } from 'core/routes';
 import { TableOfContentProvider, useTableOfContent } from 'features/table-of-content/TableOfContent';
@@ -130,6 +131,14 @@ export const WrappedDevelopmentLibraryPage = memo(() => (
 ));
 
 export const DevelopmentLibraryRoute = createAppRoute({
+  title: {
+    ns: 'app',
+    key: 'drawer.development.library'
+  },
+  icon: {
+    primary: <LibraryBooksIcon />
+  },
+  ancestor: '/development',
   component: WrappedDevelopmentLibraryPage,
   path: '/development/library',
   search: s => ({

@@ -1,3 +1,4 @@
+import LabelOutlinedIcon from '@mui/icons-material/LabelOutlined';
 import { Skeleton, Typography, useTheme } from '@mui/material';
 import { createAppRoute } from 'core/routes';
 import { useALContext } from 'deprecated/hooks/useALContext';
@@ -287,6 +288,14 @@ export const HelpClassificationPage = memo(() => {
 });
 
 export const HelpClassificationRoute = createAppRoute({
+  title: {
+    ns: 'app',
+    key: 'drawer.help.classification'
+  },
+  icon: {
+    primary: <LabelOutlinedIcon />
+  },
+  ancestor: '/help',
   component: HelpClassificationPage,
   path: '/help/classification'
 });

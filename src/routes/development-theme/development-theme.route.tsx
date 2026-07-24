@@ -1,5 +1,6 @@
 import AddPhotoAlternateOutlinedIcon from '@mui/icons-material/AddPhotoAlternateOutlined';
 import FileOpenIcon from '@mui/icons-material/FileOpen';
+import PaletteIcon from '@mui/icons-material/Palette';
 import { Button, IconButton, Stack, Switch, useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import { createAppRoute } from 'core/routes';
@@ -321,6 +322,14 @@ export const DevelopmentThemePage = memo(() => {
 });
 
 export const DevelopmentThemeRoute = createAppRoute({
+  title: {
+    ns: 'app',
+    key: 'drawer.development.theme'
+  },
+  icon: {
+    primary: <PaletteIcon />
+  },
+  ancestor: '/development',
   component: DevelopmentThemePage,
   path: '/development/theme',
 

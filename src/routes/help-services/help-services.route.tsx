@@ -1,3 +1,4 @@
+import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined';
 import { Card, CardHeader, Grid, Typography, useTheme } from '@mui/material';
 import Skeleton from '@mui/material/Skeleton';
 import { createAppRoute } from 'core/routes';
@@ -128,6 +129,14 @@ export const HelpServicesPage = memo(() => {
 });
 
 export const HelpServicesRoute = createAppRoute({
+  title: {
+    ns: 'app',
+    key: 'drawer.help.services'
+  },
+  icon: {
+    primary: <AccountTreeOutlinedIcon />
+  },
+  ancestor: '/help',
   component: HelpServicesPage,
   path: '/help/services'
 });

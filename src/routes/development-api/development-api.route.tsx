@@ -1,5 +1,6 @@
 import type { Monaco } from '@monaco-editor/react';
 import Editor, { loader } from '@monaco-editor/react';
+import ApiIcon from '@mui/icons-material/Api';
 import { Button, Grid, Paper, Skeleton, Typography, useTheme } from '@mui/material';
 import type { Method } from 'core/api';
 import { useApiMutation, useAppQuery } from 'core/api';
@@ -384,6 +385,14 @@ export const DevelopmentAPIPage = memo(() => {
 });
 
 export const DevelopmentAPIRoute = createAppRoute({
+  title: {
+    ns: 'app',
+    key: 'drawer.development.api'
+  },
+  icon: {
+    primary: <ApiIcon />
+  },
+  ancestor: '/development',
   component: DevelopmentAPIPage,
   path: '/development/api',
 

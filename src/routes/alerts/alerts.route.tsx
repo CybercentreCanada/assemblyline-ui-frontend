@@ -1,4 +1,5 @@
 import AddIcon from '@mui/icons-material/Add';
+import NotificationImportantOutlinedIcon from '@mui/icons-material/NotificationImportantOutlined';
 import { AlertTitle, useMediaQuery, useTheme } from '@mui/material';
 import { useAppNavigate } from 'core/router';
 import { createAppRoute } from 'core/routes';
@@ -298,6 +299,14 @@ export const WrappedAlertsPage = memo(() => (
 ));
 
 export const AlertsRoute = createAppRoute({
+  title: {
+    ns: 'app',
+    key: 'drawer.alerts'
+  },
+  icon: {
+    primary: <NotificationImportantOutlinedIcon />
+  },
+  ancestor: null,
   component: WrappedAlertsPage,
   path: '/alerts'
 });

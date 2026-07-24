@@ -1,6 +1,7 @@
 import AssignmentTurnedInIcon from '@mui/icons-material/AssignmentTurnedIn';
 import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
 import PersonIcon from '@mui/icons-material/Person';
+import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
 import { useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import { useAppNavigate } from 'core/router';
@@ -166,6 +167,14 @@ const Submissions = memo(() => {
 });
 
 export const SubmissionsRoute = createAppRoute({
+  title: {
+    ns: 'app',
+    key: 'drawer.submissions'
+  },
+  icon: {
+    primary: <ViewCarouselOutlinedIcon />
+  },
+  ancestor: null,
   component: Submissions,
   path: '/submissions',
   search: s => ({

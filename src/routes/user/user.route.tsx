@@ -1,3 +1,4 @@
+import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import ChevronRightOutlinedIcon from '@mui/icons-material/ChevronRightOutlined';
 import CloseIcon from '@mui/icons-material/Close';
 import {
@@ -1084,6 +1085,14 @@ export const UserPage = memo(({ username = null }: UserPageProps) => {
 //*****************************************************************************************
 
 export const UserRoute = createAppRoute({
+  title: {
+    ns: 'app',
+    key: 'adminmenu.users'
+  },
+  icon: {
+    primary: <AccountCircleOutlinedIcon />
+  },
+  ancestor: '/users',
   component: UserPage,
   path: '/user/:id',
   params: s => ({

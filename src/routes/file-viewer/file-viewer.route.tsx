@@ -5,6 +5,7 @@ import ErrorOutlineIcon from '@mui/icons-material/ErrorOutline';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import OndemandVideoOutlinedIcon from '@mui/icons-material/OndemandVideoOutlined';
+import PageviewOutlinedIcon from '@mui/icons-material/PageviewOutlined';
 import TuneOutlinedIcon from '@mui/icons-material/TuneOutlined';
 import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
 import WrapTextOutlinedIcon from '@mui/icons-material/WrapTextOutlined';
@@ -471,6 +472,14 @@ const WrappedFileViewerPage = React.memo(() => (
 ));
 
 export const FileViewerRoute = createAppRoute({
+  title: {
+    ns: 'app',
+    key: 'breadcrumb.file.viewer'
+  },
+  icon: {
+    primary: <PageviewOutlinedIcon />
+  },
+  ancestor: null,
   component: WrappedFileViewerPage,
   path: '/file/viewer/:id/:tab',
   params: s => ({
@@ -490,6 +499,14 @@ const FileViewerRootPage = React.memo(() => {
 });
 
 export const FileViewerRootRoute = createAppRoute({
+  title: {
+    ns: 'app',
+    key: 'breadcrumb.file.viewer'
+  },
+  icon: {
+    primary: <PageviewOutlinedIcon />
+  },
+  ancestor: null,
   component: FileViewerRootPage,
   path: '/file/viewer/:id',
   params: s => ({

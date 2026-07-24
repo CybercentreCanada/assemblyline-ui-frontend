@@ -1,5 +1,6 @@
 import CancelOutlinedIcon from '@mui/icons-material/CancelOutlined';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
+import ListOutlinedIcon from '@mui/icons-material/ListOutlined';
 import PageviewOutlinedIcon from '@mui/icons-material/PageviewOutlined';
 import PanToolOutlinedIcon from '@mui/icons-material/PanToolOutlined';
 import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined';
@@ -227,6 +228,14 @@ AdminErrorDetailPage.displayName = 'AdminErrorDetailPage';
 //*****************************************************************************************
 
 export const AdminErrorDetailRoute = createAppRoute({
+  title: {
+    ns: 'app',
+    key: 'breadcrumb.heuristic.detail'
+  },
+  icon: {
+    primary: <ListOutlinedIcon />
+  },
+  ancestor: '/admin/errors',
   component: AdminErrorDetailPage,
   path: '/admin/errors/:id',
   params: s => ({ id: s.string() }),

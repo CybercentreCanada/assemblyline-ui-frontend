@@ -1,3 +1,4 @@
+import SettingsApplicationsOutlinedIcon from '@mui/icons-material/SettingsApplicationsOutlined';
 import { Grid, Skeleton, Typography, useTheme } from '@mui/material';
 import { createAppRoute } from 'core/routes';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
@@ -234,6 +235,14 @@ export const HelpConfigurationPage = memo(() => {
 });
 
 export const HelpConfigurationRoute = createAppRoute({
+  title: {
+    ns: 'app',
+    key: 'drawer.help.configuration'
+  },
+  icon: {
+    primary: <SettingsApplicationsOutlinedIcon />
+  },
+  ancestor: '/help',
   component: HelpConfigurationPage,
   path: '/help/configuration'
 });

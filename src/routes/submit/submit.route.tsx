@@ -1,3 +1,4 @@
+import PublishOutlinedIcon from '@mui/icons-material/PublishOutlined';
 import { Alert, Collapse, styled, useMediaQuery, useTheme } from '@mui/material';
 import { useAppConfig } from 'core/config';
 import { createAppRoute, useAppLocation, useAppSearchSnapshot } from 'core/routes';
@@ -410,6 +411,14 @@ const SubmitPage = memo(() => (
 SubmitPage.displayName = 'SubmitPage';
 
 export const SubmitRoute = createAppRoute({
+  title: {
+    ns: 'app',
+    key: 'drawer.submit'
+  },
+  icon: {
+    primary: <PublishOutlinedIcon />
+  },
+  ancestor: null,
   component: SubmitPage,
   path: '/submit',
   search: s => ({

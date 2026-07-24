@@ -1,5 +1,6 @@
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import BallotOutlinedIcon from '@mui/icons-material/BallotOutlined';
 import {
   Box,
   Button,
@@ -1034,6 +1035,14 @@ const WrappedAlertDetailPage = memo((props: Props) => (
 ));
 
 export const AlertDetailRoute = createAppRoute({
+  title: {
+    ns: 'app',
+    key: 'breadcrumb.alert.detail'
+  },
+  icon: {
+    primary: <BallotOutlinedIcon />
+  },
+  ancestor: '/alerts',
   component: WrappedAlertDetailPage,
   path: '/alert/:id',
   params: s => ({

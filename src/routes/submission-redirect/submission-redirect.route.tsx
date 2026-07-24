@@ -1,3 +1,4 @@
+import ListAltOutlinedIcon from '@mui/icons-material/ListAltOutlined';
 import { AppNavigate } from 'core/router';
 import { createAppRoute } from 'core/routes';
 import { useALContext } from 'deprecated/hooks/useALContext';
@@ -22,6 +23,14 @@ const SubmissionRedirect = memo(() => {
 });
 
 export const SubmissionRedirectRoute = createAppRoute({
+  title: {
+    ns: 'app',
+    key: 'breadcrumb.submission.detail'
+  },
+  icon: {
+    primary: <ListAltOutlinedIcon />
+  },
+  ancestor: '/submissions',
   component: SubmissionRedirect,
   path: '/submission/:id',
   params: s => ({

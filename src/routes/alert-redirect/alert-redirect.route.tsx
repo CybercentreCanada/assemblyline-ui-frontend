@@ -5,6 +5,7 @@ import { Navigate } from 'react-router';
 import type { AlertSearchParams } from 'routes/alerts/alerts.route';
 import { ALERT_DEFAULT_PARAMS, ALERT_STORAGE_KEY } from 'routes/alerts/alerts.route';
 import { SearchParser } from 'routes/alerts/utils/SearchParser';
+import NotificationImportantOutlinedIcon from '@mui/icons-material/NotificationImportantOutlined';
 
 export const AlertRedirectPage = memo(() => {
   const parser = useMemo(() => new SearchParser<AlertSearchParams>(ALERT_DEFAULT_PARAMS, { enforced: ['rows'] }), []);
@@ -29,6 +30,14 @@ export const AlertRedirectPage = memo(() => {
 });
 
 export const AlertRedirectRoute = createAppRoute({
+  title: {
+    ns: 'app',
+    key: 'drawer.alerts'
+  },
+  icon: {
+    primary: <NotificationImportantOutlinedIcon />
+  },
+  ancestor: null,
   component: AlertRedirectPage,
   path: '/alerts-redirect'
 });

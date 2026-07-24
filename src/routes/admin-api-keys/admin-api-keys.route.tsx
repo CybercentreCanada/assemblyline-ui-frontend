@@ -1,3 +1,4 @@
+import KeyOutlinedIcon from '@mui/icons-material/KeyOutlined';
 import PersonIcon from '@mui/icons-material/Person';
 import { Grid, Typography, useTheme } from '@mui/material';
 import { useAppNavigate } from 'core/router';
@@ -10,7 +11,7 @@ import type { ApiKey } from 'models/base/user';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate } from 'react-router';
-import ApikeysTable from 'routes/search/components/apikeys';
+import { ApikeysTable } from 'routes/search/components/apikeys';
 import { safeFieldValue } from 'shared/utils/utils';
 import { PageContainer } from 'ui/pages/PageContainer';
 import { PageFullWidth } from 'ui/pages/PageFullWidth';
@@ -154,6 +155,14 @@ AdminAPIKeysPage.displayName = 'AdminAPIKeysPage';
 //*****************************************************************************************
 
 export const AdminAPIKeysRoute = createAppRoute({
+  title: {
+    ns: 'app',
+    key: 'adminmenu.apikeys'
+  },
+  icon: {
+    primary: <KeyOutlinedIcon />
+  },
+  ancestor: null,
   component: AdminAPIKeysPage,
   path: '/admin/apikeys',
   search: s => ({

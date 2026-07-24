@@ -1,3 +1,4 @@
+import AccountCircleOutlinedIcon from '@mui/icons-material/AccountCircleOutlined';
 import { createAppRoute } from 'core/routes';
 import useALContext from 'deprecated/hooks/useALContext';
 import { memo } from 'react';
@@ -15,6 +16,14 @@ export const AccountPage = memo(({ disabled = false }: AccountPageProps) => {
 AccountPage.displayName = 'AccountPage';
 
 export const AccountRoute = createAppRoute({
+  title: {
+    ns: 'app',
+    key: 'usermenu.account'
+  },
+  icon: {
+    primary: <AccountCircleOutlinedIcon />
+  },
+  ancestor: null,
   component: AccountPage,
   path: '/account'
 });

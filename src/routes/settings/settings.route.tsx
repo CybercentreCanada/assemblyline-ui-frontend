@@ -1,3 +1,4 @@
+import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import { useAppConfig } from 'core/config';
 import { createAppRoute, useAppPathParams } from 'core/routes';
 import { TableOfContentProvider, useTableOfContent } from 'features/table-of-content/TableOfContent';
@@ -96,6 +97,14 @@ const SettingsPage = memo(() => (
 SettingsPage.displayName = 'SettingsPage';
 
 export const SettingsRoute = createAppRoute({
+  title: {
+    ns: 'app',
+    key: 'usermenu.settings'
+  },
+  icon: {
+    primary: <SettingsOutlinedIcon />
+  },
+  ancestor: null,
   component: SettingsPage,
   path: '/settings/:tab',
   params: s => ({
@@ -106,6 +115,14 @@ export const SettingsRoute = createAppRoute({
 });
 
 export const SettingsRootRoute = createAppRoute({
+  title: {
+    ns: 'app',
+    key: 'usermenu.settings'
+  },
+  icon: {
+    primary: <SettingsOutlinedIcon />
+  },
+  ancestor: null,
   component: SettingsPage,
   path: '/settings',
 

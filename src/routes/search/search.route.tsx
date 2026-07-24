@@ -1,6 +1,7 @@
 import ArchiveIcon from '@mui/icons-material/Archive';
 import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
 import CenterFocusStrongOutlinedIcon from '@mui/icons-material/CenterFocusStrongOutlined';
+import SearchIcon from '@mui/icons-material/Search';
 import { IconButton, Paper, Tab, Tabs, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
 import { AppLink, useAppNavigate } from 'core/router';
 import { createAppRoute } from 'core/routes';
@@ -465,6 +466,14 @@ SearchPage.displayName = 'SearchPage';
 //*****************************************************************************************
 
 export const SearchRoute = createAppRoute({
+  title: {
+    ns: 'app',
+    key: 'drawer.search'
+  },
+  icon: {
+    primary: <SearchIcon />
+  },
+  ancestor: null,
   component: SearchPage,
   path: '/search/:index',
   params: s => ({
@@ -476,6 +485,14 @@ export const SearchRoute = createAppRoute({
 });
 
 export const SearchRootRoute = createAppRoute({
+  title: {
+    ns: 'app',
+    key: 'drawer.search'
+  },
+  icon: {
+    primary: <SearchIcon />
+  },
+  ancestor: null,
   component: SearchPage,
   path: '/search',
   search: s => ({

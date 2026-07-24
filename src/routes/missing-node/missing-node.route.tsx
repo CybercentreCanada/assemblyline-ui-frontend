@@ -1,4 +1,5 @@
 import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined';
+import LinkOffIcon from '@mui/icons-material/LinkOff';
 import { Typography, useMediaQuery, useTheme } from '@mui/material';
 import { createAppRoute } from 'core/routes';
 import { memo } from 'react';
@@ -36,6 +37,14 @@ MissingNodePage.displayName = 'MissingNodePage';
 //*****************************************************************************************
 
 export const MissingNodeRoute = createAppRoute({
+  title: {
+    ns: 'missingNode',
+    key: 'title'
+  },
+  icon: {
+    primary: <LinkOffIcon />
+  },
+  ancestor: null,
   component: MissingNodePage,
   path: '/missing-node'
 });
