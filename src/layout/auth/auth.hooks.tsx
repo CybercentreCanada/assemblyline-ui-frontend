@@ -98,7 +98,7 @@ export const useAuthQuery = () => {
     {
       queryKey: ['/api/v4/user/whoami/', 'GET', stableStringify(null), allowCache],
       enabled: !isAuthenticating,
-      retry: (failureCount, error) => failureCount < 1 || error?.api_status_code === 502,
+      retry: (failureCount, error) => failureCount < 3 || error?.api_status_code === 502,
       retryDelay: failureCount => Math.min(retryAfter * (failureCount + 1), 10000),
       queryFn: async ({ signal }) => {
         // Reject if the query is not enabled
@@ -138,7 +138,7 @@ export const useAuthQuery = () => {
           return Promise.reject({
             api_error_message: t('unreachable'),
             api_response: '',
-            api_server_version: systemConfig.system.version,
+            api_server_version: systemConfig?.system?.version,
             api_status_code: 502
           });
         }
@@ -150,7 +150,7 @@ export const useAuthQuery = () => {
           json = {
             api_error_message: res.statusText || t('invalid'),
             api_response: null as unknown as Configuration | LoginParamsProps | WhoAmIProps,
-            api_server_version: systemConfig.system.version,
+            api_server_version: systemConfig?.system?.version,
             api_status_code: res.status
           };
         }
@@ -182,7 +182,7 @@ export const useAuthQuery = () => {
           return Promise.reject({
             api_error_message: t('invalid'),
             api_response: '',
-            api_server_version: systemConfig.system.version,
+            api_server_version: systemConfig?.system?.version,
             api_status_code: 400
           });
         }
