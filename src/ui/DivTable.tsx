@@ -68,7 +68,6 @@ type SortableHeaderCellProps = TableCellProps & {
 export const SortableHeaderCell: React.FC<SortableHeaderCellProps> = ({
   allowSort = true,
   children,
-  query = null,
   sortField,
   sortName = 'sort',
   inverted = false,
@@ -91,7 +90,7 @@ export const SortableHeaderCell: React.FC<SortableHeaderCellProps> = ({
     if (onSort) {
       onSort(event, { name: sortName, field: nextSortValue || null });
     } else {
-      navigate.here().update(s => ({ ...s, search: { ...s.search, [sortName]: nextSortValue } }));
+      navigate.here().search(s => ({ ...s, [sortName]: nextSortValue }) as never);
     }
   };
 

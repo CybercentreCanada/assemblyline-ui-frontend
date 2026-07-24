@@ -6,8 +6,9 @@ import TableContainer from '@mui/material/TableContainer';
 import useALContext from 'deprecated/hooks/useALContext';
 import type { SearchResult } from 'models/api/search';
 import type { WorkflowIndexed } from 'models/base/workflow';
-import React from 'react';
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { AlertPriority, AlertStatus } from 'routes/alerts/components/Components';
 import Classification from 'ui/Classification';
 import {
   DivTable,
@@ -21,31 +22,57 @@ import {
 import InformativeAlert from 'ui/InformativeAlert';
 import Moment from 'ui/Moment';
 
-type Props = {
+export type WorflowTableProps = {
   workflowResults: SearchResult<WorkflowIndexed>;
-  setWorkflowID?: (id: string) => void;
+  allowSort?: boolean;
+  onRowClick?: (event: React.MouseEvent<HTMLElement>, workflow: WorkflowIndexed) => void;
 };
 
-const WrappedWorflowTable: React.FC<Props> = ({ workflowResults, setWorkflowID = null }) => {
-  const { t } = useTranslation(['search']);
-  const { c12nDef } = useALContext();
+export const WorflowTable = memo(
+  ({ workflowResults, allowSort = true, onRowClick = () => null }: WorflowTableProps) => {
+    const { t } = useTranslation(['search']);
+    const { c12nDef } = useALContext();
 
-  return workflowResults ? (
-    workflowResults.total !== 0 ? (
+    return !workflowResults ? (
+      <Skeleton variant="rectangular" sx={{ height: '6rem', borderRadius: '4px' }} />
+    ) : !workflowResults?.total ? (
+      <div style={{ width: '100%' }}>
+        <InformativeAlert>
+          <AlertTitle>{t('no_workflows_title')}</AlertTitle>
+          {t('no_results_desc')}
+        </InformativeAlert>
+      </div>
+    ) : (
       <TableContainer component={Paper}>
         <DivTable>
           <DivTableHead>
             <DivTableRow>
-              <SortableHeaderCell sortField="creation_date">{t('header.created')}</SortableHeaderCell>
-              <SortableHeaderCell sortField="last_seen">{t('header.lasttimeseen')}</SortableHeaderCell>
-              <SortableHeaderCell sortField="name">{t('header.name')}</SortableHeaderCell>
-              <SortableHeaderCell sortField="priority">{t('header.priority')}</SortableHeaderCell>
-              <SortableHeaderCell sortField="status">{t('header.status')}</SortableHeaderCell>
-              <SortableHeaderCell sortField="hit_count">{t('header.hit_count')}</SortableHeaderCell>
+              <SortableHeaderCell sortField="creation_date" allowSort={allowSort}>
+                {t('header.created')}
+              </SortableHeaderCell>
+              <SortableHeaderCell sortField="last_seen" allowSort={allowSort}>
+                {t('header.lasttimeseen')}
+              </SortableHeaderCell>
+              <SortableHeaderCell sortField="name" allowSort={allowSort}>
+                {t('header.name')}
+              </SortableHeaderCell>
+              <SortableHeaderCell sortField="priority" allowSort={allowSort}>
+                {t('header.priority')}
+              </SortableHeaderCell>
+              <SortableHeaderCell sortField="status" allowSort={allowSort}>
+                {t('header.status')}
+              </SortableHeaderCell>
+              <SortableHeaderCell sortField="hit_count" allowSort={allowSort}>
+                {t('header.hit_count')}
+              </SortableHeaderCell>
               {c12nDef.enforce && (
-                <SortableHeaderCell sortField="classification">{t('header.classification')}</SortableHeaderCell>
+                <SortableHeaderCell sortField="classification" allowSort={allowSort}>
+                  {t('header.classification')}
+                </SortableHeaderCell>
               )}
-              <SortableHeaderCell sortField="enabled">{t('header.enabled')}</SortableHeaderCell>
+              <SortableHeaderCell sortField="enabled" allowSort={allowSort}>
+                {t('header.enabled')}
+              </SortableHeaderCell>
             </DivTableRow>
           </DivTableHead>
           <DivTableBody>
@@ -56,12 +83,7 @@ const WrappedWorflowTable: React.FC<Props> = ({ workflowResults, setWorkflowID =
                   nav.to().create({ route: '/manage/workflow/detail/:id', path: { id: workflow.workflow_id } })
                 }
                 navDeps={[workflow.workflow_id]}
-                onClick={event => {
-                  if (setWorkflowID) {
-                    event.preventDefault();
-                    setWorkflowID(workflow.workflow_id);
-                  }
-                }}
+                onClick={event => onRowClick(event, workflow)}
                 hover
               >
                 <DivTableCell>
@@ -96,18 +118,6 @@ const WrappedWorflowTable: React.FC<Props> = ({ workflowResults, setWorkflowID =
           </DivTableBody>
         </DivTable>
       </TableContainer>
-    ) : (
-      <div style={{ width: '100%' }}>
-        <InformativeAlert>
-          <AlertTitle>{t('no_workflows_title')}</AlertTitle>
-          {t('no_results_desc')}
-        </InformativeAlert>
-      </div>
-    )
-  ) : (
-    <Skeleton variant="rectangular" style={{ height: '6rem', borderRadius: '4px' }} />
-  );
-};
-
-const WorflowTable = React.memo(WrappedWorflowTable);
-export default WorflowTable;
+    );
+  }
+);

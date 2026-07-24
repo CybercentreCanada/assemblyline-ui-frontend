@@ -4,7 +4,7 @@ import TableContainer from '@mui/material/TableContainer';
 import useALContext from 'deprecated/hooks/useALContext';
 import type { SearchResult } from 'models/api/search';
 import type { Safelist } from 'models/base/safelist';
-import React from 'react';
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { maxLenStr } from 'shared/utils/utils';
 import Classification from 'ui/Classification';
@@ -21,18 +21,27 @@ import {
 import InformativeAlert from 'ui/InformativeAlert';
 import Moment from 'ui/Moment';
 
-type Props = {
+export type SafelistTableProps = {
   safelistResults: SearchResult<Safelist>;
-  setSafelistID?: (id: string) => void;
   allowSort?: boolean;
+  onRowClick?: (event: React.MouseEvent<HTMLElement>, item: Safelist) => void;
 };
 
-const WrappedSafelistTable: React.FC<Props> = ({ safelistResults, setSafelistID = null, allowSort = true }) => {
-  const { t } = useTranslation(['search']);
-  const { c12nDef } = useALContext();
+export const SafelistTable = memo(
+  ({ safelistResults, allowSort = true, onRowClick = () => null }: SafelistTableProps) => {
+    const { t } = useTranslation(['search']);
+    const { c12nDef } = useALContext();
 
-  return safelistResults ? (
-    safelistResults.total !== 0 ? (
+    return !safelistResults ? (
+      <Skeleton variant="rectangular" sx={{ height: '6rem', borderRadius: '4px' }} />
+    ) : !safelistResults?.total ? (
+      <div style={{ width: '100%' }}>
+        <InformativeAlert>
+          <AlertTitle>{t('no_safelist_title')}</AlertTitle>
+          {t('no_results_desc')}
+        </InformativeAlert>
+      </div>
+    ) : (
       <TableContainer component={Paper}>
         <DivTable>
           <DivTableHead>
@@ -63,12 +72,7 @@ const WrappedSafelistTable: React.FC<Props> = ({ safelistResults, setSafelistID 
                 key={`${sl_item.id}-${i}`}
                 nav={nav => nav.to().create({ route: '/manage/safelist/:id', path: { id: sl_item.id } })}
                 navDeps={[sl_item.id]}
-                onClick={event => {
-                  if (setSafelistID) {
-                    event.preventDefault();
-                    setSafelistID(sl_item.id);
-                  }
-                }}
+                onClick={event => onRowClick(event, sl_item)}
                 hover
               >
                 <DivTableCell>
@@ -107,18 +111,6 @@ const WrappedSafelistTable: React.FC<Props> = ({ safelistResults, setSafelistID 
           </DivTableBody>
         </DivTable>
       </TableContainer>
-    ) : (
-      <div style={{ width: '100%' }}>
-        <InformativeAlert>
-          <AlertTitle>{t('no_safelist_title')}</AlertTitle>
-          {t('no_results_desc')}
-        </InformativeAlert>
-      </div>
-    )
-  ) : (
-    <Skeleton variant="rectangular" style={{ height: '6rem', borderRadius: '4px' }} />
-  );
-};
-
-const SafelistTable = React.memo(WrappedSafelistTable);
-export default SafelistTable;
+    );
+  }
+);

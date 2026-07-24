@@ -5,7 +5,7 @@ import TableContainer from '@mui/material/TableContainer';
 import useALContext from 'deprecated/hooks/useALContext';
 import type { SearchResult } from 'models/api/search';
 import type { FileIndexed } from 'models/base/file';
-import React from 'react';
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import Classification from 'ui/Classification';
 import {
@@ -20,18 +20,27 @@ import {
 import InformativeAlert from 'ui/InformativeAlert';
 import Moment from 'ui/Moment';
 
-type Props = {
+export type FilesTableProps = {
   fileResults: SearchResult<FileIndexed>;
   allowSort?: boolean;
+  onRowClick?: (event: React.MouseEvent<HTMLElement>, file: FileIndexed) => void;
 };
 
-const WrappedFilesTable: React.FC<Props> = ({ fileResults, allowSort = true }) => {
+export const FilesTable = memo(({ fileResults, allowSort = true, onRowClick = () => null }: FilesTableProps) => {
   const { t } = useTranslation(['search']);
   const { c12nDef } = useALContext();
 
-  return fileResults ? (
-    fileResults.total !== 0 ? (
-      <TableContainer component={Paper}>
+  return !fileResults ? (
+    <Skeleton variant="rectangular" sx={{ height: '6rem', borderRadius: '4px' }} />
+  ) : !fileResults?.total ? (
+    <div style={{ width: '100%' }}>
+      <InformativeAlert>
+        <AlertTitle>{t('no_files_title')}</AlertTitle>
+        {t('no_results_desc')}
+      </InformativeAlert>
+    </div>
+  ) : (
+    <TableContainer component={Paper}>
         <DivTable>
           <DivTableHead>
             <DivTableRow>
@@ -64,6 +73,7 @@ const WrappedFilesTable: React.FC<Props> = ({ fileResults, allowSort = true }) =
                 key={`${file.id}-${id}`}
                 nav={nav => nav.to().create({ route: '/file/detail/:id', path: { id: file.sha256 } })}
                 navDeps={[file.sha256]}
+                onClick={event => onRowClick(event, file)}
                 hover
                 style={{ textDecoration: 'none' }}
               >
@@ -95,18 +105,5 @@ const WrappedFilesTable: React.FC<Props> = ({ fileResults, allowSort = true }) =
           </DivTableBody>
         </DivTable>
       </TableContainer>
-    ) : (
-      <div style={{ width: '100%' }}>
-        <InformativeAlert>
-          <AlertTitle>{t('no_files_title')}</AlertTitle>
-          {t('no_results_desc')}
-        </InformativeAlert>
-      </div>
-    )
-  ) : (
-    <Skeleton variant="rectangular" style={{ height: '6rem', borderRadius: '4px' }} />
   );
-};
-
-const FilesTable = React.memo(WrappedFilesTable);
-export default FilesTable;
+});

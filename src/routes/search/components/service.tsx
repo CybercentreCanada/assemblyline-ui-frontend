@@ -6,27 +6,36 @@ import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
 import useALContext from 'deprecated/hooks/useALContext';
 import type { ServiceIndexed, ServiceUpdateData, ServiceUpdates } from 'models/base/service';
-import React from 'react';
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { HiOutlineExternalLink } from 'react-icons/hi';
 import Classification from 'ui/Classification';
 import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow, LinkRow } from 'ui/DivTable';
 import InformativeAlert from 'ui/InformativeAlert';
 
-type Props = {
+export type ServiceTableProps = {
   serviceResults: ServiceIndexed[];
   updates: ServiceUpdates;
-  setService: (svc: string) => void;
   onUpdate: (svc: string, updateData: ServiceUpdateData) => void;
+  onRowClick?: (event: React.MouseEvent<HTMLElement>, service: ServiceIndexed) => void;
 };
 
-const WrappedServiceTable: React.FC<Props> = ({ serviceResults, updates, setService, onUpdate }) => {
-  const { t } = useTranslation(['search']);
-  const { c12nDef } = useALContext();
-  const theme = useTheme();
+export const ServiceTable = memo(
+  ({ serviceResults, updates, onUpdate, onRowClick = () => null }: ServiceTableProps) => {
+    const { t } = useTranslation(['search']);
+    const { c12nDef } = useALContext();
+    const theme = useTheme();
 
-  return serviceResults && updates ? (
-    serviceResults.length !== 0 ? (
+    return !serviceResults || !updates ? (
+      <Skeleton variant="rectangular" sx={{ height: '6rem', borderRadius: '4px' }} />
+    ) : !serviceResults?.length ? (
+      <div style={{ width: '100%' }}>
+        <InformativeAlert>
+          <AlertTitle>{t('no_services_title')}</AlertTitle>
+          {t('no_services_desc')}
+        </InformativeAlert>
+      </div>
+    ) : (
       <TableContainer component={Paper}>
         <DivTable>
           <DivTableHead>
@@ -49,12 +58,7 @@ const WrappedServiceTable: React.FC<Props> = ({ serviceResults, updates, setServ
                 nav={nav => nav.to().create({ route: '/admin/services/:id', path: { id: result.name } })}
                 navDeps={[result.name]}
                 hover
-                onClick={event => {
-                  if (setService) {
-                    event.preventDefault();
-                    setService(result.name);
-                  }
-                }}
+                onClick={event => onRowClick(event, result)}
               >
                 <DivTableCell>{result.name}</DivTableCell>
                 <DivTableCell>{result.version}</DivTableCell>
@@ -136,18 +140,6 @@ const WrappedServiceTable: React.FC<Props> = ({ serviceResults, updates, setServ
           </DivTableBody>
         </DivTable>
       </TableContainer>
-    ) : (
-      <div style={{ width: '100%' }}>
-        <InformativeAlert>
-          <AlertTitle>{t('no_services_title')}</AlertTitle>
-          {t('no_services_desc')}
-        </InformativeAlert>
-      </div>
-    )
-  ) : (
-    <Skeleton variant="rectangular" style={{ height: '6rem', borderRadius: '4px' }} />
-  );
-};
-
-const ServiceTable = React.memo(WrappedServiceTable);
-export default ServiceTable;
+    );
+  }
+);

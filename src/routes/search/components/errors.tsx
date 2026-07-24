@@ -9,7 +9,7 @@ import TableContainer from '@mui/material/TableContainer';
 import type { SearchResult } from 'models/api/search';
 import type { Error, ErrorType } from 'models/base/error';
 import type { ReactElement } from 'react';
-import React, { useMemo } from 'react';
+import { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { bytesToSize } from 'shared/utils/utils';
 import {
@@ -26,13 +26,13 @@ import Moment from 'ui/Moment';
 
 const MAX_MESSAGE_SIZE = 2500;
 
-type Props = {
+export type ErrorsTableProps = {
   errorResults: SearchResult<Error>;
-  setErrorKey?: (key: string) => void;
   allowSort?: boolean;
+  onRowClick?: (event: React.MouseEvent<HTMLElement>, error: Error) => void;
 };
 
-const WrappedErrorsTable: React.FC<Props> = ({ errorResults, setErrorKey = null, allowSort = true }) => {
+export const ErrorsTable = memo(({ errorResults, allowSort = true, onRowClick = () => null }: ErrorsTableProps) => {
   const { t } = useTranslation(['adminErrorViewer']);
   const theme = useTheme();
 
@@ -58,90 +58,78 @@ const WrappedErrorsTable: React.FC<Props> = ({ errorResults, setErrorKey = null,
     [theme.palette.action.active]
   );
 
-  return errorResults ? (
-    errorResults.total !== 0 ? (
-      <TableContainer component={Paper}>
-        <DivTable size="small">
-          <DivTableHead>
-            <DivTableRow style={{ whiteSpace: 'nowrap' }}>
-              <SortableHeaderCell sortField="created" allowSort={allowSort}>
-                {t('header.time')}
-              </SortableHeaderCell>
-              <SortableHeaderCell sortField="response.service_name" allowSort={allowSort}>
-                {t('header.service')}
-              </SortableHeaderCell>
-              <DivTableCell>{t('header.message')}</DivTableCell>
-              <SortableHeaderCell sortField="severity" allowSort={allowSort}>
-                {t('header.severity')}
-              </SortableHeaderCell>
-              <SortableHeaderCell sortField="type" allowSort={allowSort}>
-                {t('header.type')}
-              </SortableHeaderCell>
-            </DivTableRow>
-          </DivTableHead>
-          <DivTableBody>
-            {errorResults.items.map((error, i) => (
-              <LinkRow
-                key={`${error.id}-${i}`}
-                nav={nav => nav.to().create({ route: '/admin/errors/:id', path: { id: error.id } })}
-                navDeps={[error.id]}
-                onClick={event => {
-                  if (setErrorKey) {
-                    event.preventDefault();
-                    setErrorKey(error.id);
-                  }
-                }}
-                hover
-              >
-                <DivTableCell style={{ whiteSpace: 'nowrap' }}>
-                  <Tooltip title={error.created}>
-                    <div>
-                      <Moment variant="fromNow">{error.created}</Moment>
-                    </div>
-                  </Tooltip>
-                </DivTableCell>
-                <DivTableCell style={{ whiteSpace: 'nowrap' }}>{error.response.service_name}</DivTableCell>
-                <DivTableCell style={{ wordBreak: 'break-word' }}>
-                  {error.response.message.length > MAX_MESSAGE_SIZE ? (
-                    <>
-                      <span>{error.response.message.slice(0, MAX_MESSAGE_SIZE)}... </span>
-                      <span style={{ color: theme.palette.secondary.main }}>
-                        {`(${bytesToSize(
-                          new Blob([error.response.message.slice(MAX_MESSAGE_SIZE)]).size
-                        )} ${t('more')})`}
-                      </span>
-                    </>
-                  ) : (
-                    <span>{error.response.message}</span>
-                  )}
-                </DivTableCell>
-                <DivTableCell style={{ whiteSpace: 'nowrap' }}>
-                  <Tooltip title={t(`severity.${error.severity}`)}>
-                    <span>{severityMap?.[error?.severity]}</span>
-                  </Tooltip>
-                </DivTableCell>
-                <DivTableCell style={{ whiteSpace: 'nowrap' }}>
-                  <Tooltip title={t(`type.${error.type}`)}>
-                    <span>{typeMap?.[error?.type]}</span>
-                  </Tooltip>
-                </DivTableCell>
-              </LinkRow>
-            ))}
-          </DivTableBody>
-        </DivTable>
-      </TableContainer>
-    ) : (
-      <div style={{ width: '100%' }}>
-        <InformativeAlert>
-          <AlertTitle>{t('no_errors_title')}</AlertTitle>
-          {t('no_results_desc')}
-        </InformativeAlert>
-      </div>
-    )
+  return !errorResults ? (
+    <Skeleton variant="rectangular" sx={{ height: '6rem', borderRadius: '4px' }} />
+  ) : !errorResults?.total ? (
+    <div style={{ width: '100%' }}>
+      <InformativeAlert>
+        <AlertTitle>{t('no_errors_title')}</AlertTitle>
+        {t('no_results_desc')}
+      </InformativeAlert>
+    </div>
   ) : (
-    <Skeleton variant="rectangular" style={{ height: '6rem', borderRadius: '4px' }} />
+    <TableContainer component={Paper}>
+      <DivTable size="small">
+        <DivTableHead>
+          <DivTableRow style={{ whiteSpace: 'nowrap' }}>
+            <SortableHeaderCell sortField="created" allowSort={allowSort}>
+              {t('header.time')}
+            </SortableHeaderCell>
+            <SortableHeaderCell sortField="response.service_name" allowSort={allowSort}>
+              {t('header.service')}
+            </SortableHeaderCell>
+            <DivTableCell>{t('header.message')}</DivTableCell>
+            <SortableHeaderCell sortField="severity" allowSort={allowSort}>
+              {t('header.severity')}
+            </SortableHeaderCell>
+            <SortableHeaderCell sortField="type" allowSort={allowSort}>
+              {t('header.type')}
+            </SortableHeaderCell>
+          </DivTableRow>
+        </DivTableHead>
+        <DivTableBody>
+          {errorResults.items.map((error, i) => (
+            <LinkRow
+              key={`${error.id}-${i}`}
+              nav={nav => nav.to().create({ route: '/admin/errors/:id', path: { id: error.id } })}
+              navDeps={[error.id]}
+              onClick={event => onRowClick(event, error)}
+              hover
+            >
+              <DivTableCell style={{ whiteSpace: 'nowrap' }}>
+                <Tooltip title={error.created}>
+                  <div>
+                    <Moment variant="fromNow">{error.created}</Moment>
+                  </div>
+                </Tooltip>
+              </DivTableCell>
+              <DivTableCell style={{ whiteSpace: 'nowrap' }}>{error.response.service_name}</DivTableCell>
+              <DivTableCell style={{ wordBreak: 'break-word' }}>
+                {error.response.message.length > MAX_MESSAGE_SIZE ? (
+                  <>
+                    <span>{error.response.message.slice(0, MAX_MESSAGE_SIZE)}... </span>
+                    <span style={{ color: theme.palette.secondary.main }}>
+                      {`(${bytesToSize(new Blob([error.response.message.slice(MAX_MESSAGE_SIZE)]).size)} ${t('more')})`}
+                    </span>
+                  </>
+                ) : (
+                  <span>{error.response.message}</span>
+                )}
+              </DivTableCell>
+              <DivTableCell style={{ whiteSpace: 'nowrap' }}>
+                <Tooltip title={t(`severity.${error.severity}`)}>
+                  <span>{severityMap?.[error?.severity]}</span>
+                </Tooltip>
+              </DivTableCell>
+              <DivTableCell style={{ whiteSpace: 'nowrap' }}>
+                <Tooltip title={t(`type.${error.type}`)}>
+                  <span>{typeMap?.[error?.type]}</span>
+                </Tooltip>
+              </DivTableCell>
+            </LinkRow>
+          ))}
+        </DivTableBody>
+      </DivTable>
+    </TableContainer>
   );
-};
-
-const ErrorsTable = React.memo(WrappedErrorsTable);
-export default ErrorsTable;
+});

@@ -13,7 +13,7 @@ import type { Error } from 'models/base/error';
 import { memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate } from 'react-router';
-import ErrorsTable from 'routes/search/components/errors';
+import { ErrorsTable } from 'routes/search/components/errors';
 import { safeFieldValue } from 'shared/utils/utils';
 import { DateTimeRangePicker } from 'ui/DateTime/DateTimeRangePicker';
 import { LuceneDateTime, LuceneDateTimeGap } from 'ui/DateTime/LuceneDateTime';

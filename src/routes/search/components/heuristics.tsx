@@ -4,7 +4,7 @@ import TableContainer from '@mui/material/TableContainer';
 import useALContext from 'deprecated/hooks/useALContext';
 import type { SearchResult } from 'models/api/search';
 import type { Heuristic } from 'models/base/heuristic';
-import React from 'react';
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import Classification from 'ui/Classification';
 import {
@@ -19,18 +19,27 @@ import {
 import InformativeAlert from 'ui/InformativeAlert';
 import Moment from 'ui/Moment';
 
-type Props = {
+export type HeuristicsTableProps = {
   heuristicResults: SearchResult<Heuristic>;
-  setHeuristicID?: (id: string) => void;
   allowSort?: boolean;
+  onRowClick?: (event: React.MouseEvent<HTMLElement>, heuristic: Heuristic) => void;
 };
 
-const WrappedHeuristicsTable: React.FC<Props> = ({ heuristicResults, setHeuristicID = null, allowSort = true }) => {
-  const { t } = useTranslation(['search']);
-  const { c12nDef } = useALContext();
+export const HeuristicsTable = memo(
+  ({ heuristicResults, allowSort = true, onRowClick = () => null }: HeuristicsTableProps) => {
+    const { t } = useTranslation(['search']);
+    const { c12nDef } = useALContext();
 
-  return heuristicResults ? (
-    heuristicResults.total !== 0 ? (
+    return !heuristicResults ? (
+      <Skeleton variant="rectangular" sx={{ height: '6rem', borderRadius: '4px' }} />
+    ) : !heuristicResults?.total ? (
+      <div style={{ width: '100%' }}>
+        <InformativeAlert>
+          <AlertTitle>{t('no_heuristics_title')}</AlertTitle>
+          {t('no_results_desc')}
+        </InformativeAlert>
+      </div>
+    ) : (
       <TableContainer component={Paper}>
         <DivTable>
           <DivTableHead>
@@ -66,12 +75,7 @@ const WrappedHeuristicsTable: React.FC<Props> = ({ heuristicResults, setHeuristi
                 key={`${heuristic.heur_id}-${i}`}
                 nav={nav => nav.to().create({ route: '/manage/heuristic/:id', path: { id: `${heuristic.heur_id}` } })}
                 navDeps={[heuristic.heur_id]}
-                onClick={event => {
-                  if (setHeuristicID) {
-                    event.preventDefault();
-                    setHeuristicID(heuristic.heur_id);
-                  }
-                }}
+                onClick={event => onRowClick(event, heuristic)}
                 hover
               >
                 <DivTableCell>{heuristic.heur_id}</DivTableCell>
@@ -96,18 +100,6 @@ const WrappedHeuristicsTable: React.FC<Props> = ({ heuristicResults, setHeuristi
           </DivTableBody>
         </DivTable>
       </TableContainer>
-    ) : (
-      <div style={{ width: '100%' }}>
-        <InformativeAlert>
-          <AlertTitle>{t('no_heuristics_title')}</AlertTitle>
-          {t('no_results_desc')}
-        </InformativeAlert>
-      </div>
-    )
-  ) : (
-    <Skeleton variant="rectangular" style={{ height: '6rem', borderRadius: '4px' }} />
-  );
-};
-
-const HeuristicsTable = React.memo(WrappedHeuristicsTable);
-export default HeuristicsTable;
+    );
+  }
+);

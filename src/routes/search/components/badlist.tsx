@@ -4,7 +4,7 @@ import TableContainer from '@mui/material/TableContainer';
 import useALContext from 'deprecated/hooks/useALContext';
 import type { SearchResult } from 'models/api/search';
 import type { Badlist } from 'models/base/badlist';
-import React from 'react';
+import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { maxLenStr } from 'shared/utils/utils';
 import Classification from 'ui/Classification';
@@ -21,18 +21,18 @@ import {
 import InformativeAlert from 'ui/InformativeAlert';
 import Moment from 'ui/Moment';
 
-type Props = {
+export type BadlistTableProps = {
   badlistResults: SearchResult<Badlist>;
   allowSort?: boolean;
-  isLoading?: boolean;
+  onRowClick?: (event: React.MouseEvent<HTMLElement>, item: Badlist) => void;
 };
 
-const WrappedBadlistTable: React.FC<Props> = ({ badlistResults, allowSort = true, isLoading = false }) => {
+export const BadlistTable = memo(({ badlistResults, allowSort = true, onRowClick = () => null }: BadlistTableProps) => {
   const { t } = useTranslation(['search']);
   const { c12nDef } = useALContext();
 
-  return isLoading ? (
-    <Skeleton variant="rectangular" style={{ height: '6rem', borderRadius: '4px' }} />
+  return !badlistResults ? (
+    <Skeleton variant="rectangular" sx={{ height: '6rem', borderRadius: '4px' }} />
   ) : !badlistResults?.total ? (
     <div style={{ width: '100%' }}>
       <InformativeAlert>
@@ -72,6 +72,7 @@ const WrappedBadlistTable: React.FC<Props> = ({ badlistResults, allowSort = true
               hover
               nav={nav => nav.to().create({ route: '/manage/badlist/:id', path: { id: sl_item.id } })}
               navDeps={[sl_item.id]}
+              onClick={event => onRowClick(event, sl_item)}
             >
               <DivTableCell>
                 <Tooltip title={sl_item.added}>
@@ -110,7 +111,4 @@ const WrappedBadlistTable: React.FC<Props> = ({ badlistResults, allowSort = true
       </DivTable>
     </TableContainer>
   );
-};
-
-const BadlistTable = React.memo(WrappedBadlistTable);
-export default BadlistTable;
+});

@@ -13,7 +13,7 @@ import type { SubmissionIndexed } from 'models/base/submission';
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ForbiddenPage } from 'routes/forbidden/forbidden';
-import SubmissionsTable from 'routes/search/components/submissions';
+import { SubmissionsTable } from 'routes/search/components/submissions';
 import { safeFieldValue } from 'shared/utils/utils';
 import { PageContainer } from 'ui/pages/PageContainer';
 import { PageFullWidth } from 'ui/pages/PageFullWidth';

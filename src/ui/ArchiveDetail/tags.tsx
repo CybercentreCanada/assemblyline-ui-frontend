@@ -31,7 +31,7 @@ import type { Signature, Tag } from 'models/base/tagging';
 import React, { useCallback, useEffect, useMemo, useState, useTransition } from 'react';
 import { useTranslation } from 'react-i18next';
 import AutoSizer from 'react-virtualized-auto-sizer';
-import ResultsTable from 'routes/search/components/results';
+import { ResultsTable } from 'routes/search/components/results';
 import { safeFieldValue } from 'shared/utils/utils';
 import ActionMenu from 'ui/ActionMenu';
 import Classification from 'ui/Classification';
