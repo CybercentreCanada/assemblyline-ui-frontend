@@ -251,7 +251,7 @@ const useMyAPI = (): UseMyAPIReturn => {
           return {
             api_error_message: t('api.unreachable'),
             api_response: '',
-            api_server_version: systemConfig.system.version,
+            api_server_version: systemConfig?.system?.version,
             api_status_code: 502
           };
         }
@@ -260,7 +260,7 @@ const useMyAPI = (): UseMyAPIReturn => {
       .catch(() => ({
         api_error_message: t('api.invalid'),
         api_response: '',
-        api_server_version: systemConfig.system.version,
+        api_server_version: systemConfig?.system?.version,
         api_status_code: 400
       }))
       .then((api_data: APIResponseProps<SuccessData | FailureData>) => {
@@ -378,7 +378,7 @@ const useMyAPI = (): UseMyAPIReturn => {
           return {
             api_error_message: t('api.unreachable'),
             api_response: '',
-            api_server_version: systemConfig.system.version,
+            api_server_version: systemConfig?.system?.version,
             api_status_code: res.status
           };
         } else if (res.status === 200) {
@@ -387,7 +387,7 @@ const useMyAPI = (): UseMyAPIReturn => {
           return {
             api_error_message: '',
             api_response: res.body,
-            api_server_version: systemConfig.system.version,
+            api_server_version: systemConfig?.system?.version,
             api_status_code: res.status,
             filename: filename,
             size: parseInt(res.headers.get('Content-Length')),
@@ -399,7 +399,7 @@ const useMyAPI = (): UseMyAPIReturn => {
       .catch(() => ({
         api_error_message: t('api.invalid'),
         api_response: '',
-        api_server_version: systemConfig.system.version,
+        api_server_version: systemConfig?.system?.version,
         api_status_code: 400
       }))
       .then((api_data: APIResponseProps<SuccessData | FailureData>) => {

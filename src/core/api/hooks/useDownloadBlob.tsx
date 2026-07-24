@@ -79,7 +79,7 @@ export const useDownloadBlob = ({
           return Promise.reject({
             api_error_message: t('unreachable'),
             api_response: '',
-            api_server_version: systemConfig.system.version,
+            api_server_version: systemConfig?.system?.version,
             api_status_code: 502
           });
         }
@@ -92,7 +92,7 @@ export const useDownloadBlob = ({
           return Promise.reject({
             api_error_message: t('invalid'),
             api_response: '',
-            api_server_version: systemConfig.system.version,
+            api_server_version: systemConfig?.system?.version,
             api_status_code: 400
           });
         }
@@ -134,7 +134,7 @@ export const useDownloadBlob = ({
         return Promise.resolve({
           api_error_message: '',
           api_response: res.body,
-          api_server_version: systemConfig.system.version,
+          api_server_version: systemConfig?.system?.version,
           api_status_code: res.status,
           filename: getFileName(res.headers.get('Content-Disposition')),
           size: parseInt(res.headers.get('Content-Length')),

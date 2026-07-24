@@ -99,7 +99,7 @@ export const useBootstrapQuery = ({
           return Promise.reject({
             api_error_message: t('unreachable'),
             api_response: '',
-            api_server_version: systemConfig.system.version,
+            api_server_version: systemConfig?.system?.version,
             api_status_code: 502
           });
         }
@@ -113,7 +113,7 @@ export const useBootstrapQuery = ({
           return Promise.reject({
             api_error_message: t('invalid'),
             api_response: '',
-            api_server_version: systemConfig.system.version,
+            api_server_version: systemConfig?.system?.version,
             api_status_code: 400
           });
         }

@@ -101,7 +101,7 @@ export const useApiCallFn = <
             {
               api_error_message: t('unreachable'),
               api_response: '',
-              api_server_version: systemConfig.system.version,
+              api_server_version: systemConfig?.system?.version,
               api_status_code: 502
             },
             t('unreachable')
@@ -114,7 +114,7 @@ export const useApiCallFn = <
             {
               api_error_message: t('invalid'),
               api_response: '',
-              api_server_version: systemConfig.system.version,
+              api_server_version: systemConfig?.system?.version,
               api_status_code: 400
             },
             t('invalid')
