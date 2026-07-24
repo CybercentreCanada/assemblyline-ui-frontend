@@ -90,7 +90,7 @@ export const SortableHeaderCell: React.FC<SortableHeaderCellProps> = ({
     if (onSort) {
       onSort(event, { name: sortName, field: nextSortValue || null });
     } else {
-      navigate.here().search(s => ({ ...s, [sortName]: nextSortValue }) as never);
+      navigate.here().search(search => search.set(s => ({ ...s, [sortName]: nextSortValue })));
     }
   };
 
