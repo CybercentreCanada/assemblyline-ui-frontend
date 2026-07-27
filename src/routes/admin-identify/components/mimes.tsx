@@ -1,0 +1,171 @@
+import Editor, { DiffEditor, loader } from '@monaco-editor/react';
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Skeleton, useTheme } from '@mui/material';
+import { useAppTheme } from '@tui/core';
+import useMyAPI from 'deprecated/hooks/useMyAPI';
+import useMySnackbar from 'deprecated/hooks/useMySnackbar';
+import { memo, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import ReactResizeDetector from 'react-resize-detector';
+import { PageHeader } from 'ui/layouts/PageHeader';
+
+loader.config({ paths: { vs: '/cdn/monaco_0.35.0/vs' } });
+
+export type MimesProps = {
+  reload: (defValue?: boolean, autoOpen?: (open: boolean) => void) => void;
+  mimesFile: string | null;
+  originalMimesFile: string | null;
+  setMimesFile: (value: string | null | undefined) => void;
+};
+
+export const Mimes = memo(({ reload, mimesFile, originalMimesFile, setMimesFile }: MimesProps) => {
+  const { t, i18n } = useTranslation(['adminIdentify']);
+  const theme = useTheme();
+  const containerEL = useRef<HTMLDivElement>(null);
+  const containerDialogEL = useRef<HTMLDivElement>(null);
+  const [open, setOpen] = useState(false);
+  const { showSuccessMessage } = useMySnackbar();
+  const { apiCall } = useMyAPI();
+  const { isDark: isDarkTheme } = useAppTheme();
+
+  useEffect(() => {
+    if (!mimesFile) reload();
+    // I cannot find a way to hot switch monaco editor's locale but at least I can load
+    // the right language on first load...
+    if (i18n.language === 'fr') {
+      loader.config({ 'vs/nls': { availableLanguages: { '*': 'fr' } } });
+    } else {
+      loader.config({ 'vs/nls': { availableLanguages: { '*': '' } } });
+    }
+  }, []);
+
+  const saveChanges = tagData => {
+    setOpen(false);
+    apiCall({
+      method: 'PUT',
+      url: '/api/v4/system/identify/mimes/',
+      body: tagData,
+      onSuccess: api_data => {
+        reload();
+        showSuccessMessage(t('save.success.mimes'));
+      }
+    });
+  };
+
+  const onMount = editor => {
+    editor.focus();
+  };
+
+  return (
+    <>
+      <Dialog open={open} onClose={() => setOpen(false)} aria-labelledby="dialog-title" fullWidth maxWidth="md">
+        <DialogTitle id="dialog-title">{t('save.title')}</DialogTitle>
+        <DialogContent>
+          <div style={{ border: `1px solid ${theme.palette.divider}` }}>
+            <ReactResizeDetector handleWidth targetRef={containerDialogEL}>
+              {({ width }) => (
+                <div ref={containerDialogEL}>
+                  <DiffEditor
+                    language="mimes"
+                    theme={isDarkTheme ? 'vs-dark' : 'vs'}
+                    original={originalMimesFile}
+                    width={width}
+                    height="50vh"
+                    loading={t('loading.mimes')}
+                    modified={mimesFile}
+                    options={{ links: false, renderSideBySide: false, readOnly: true }}
+                  />
+                </div>
+              )}
+            </ReactResizeDetector>
+          </div>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpen(false)} color="secondary">
+            {t('save.cancelText')}
+          </Button>
+          <Button onClick={() => saveChanges(mimesFile)} color="primary">
+            {t('save.acceptText')}
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <PageHeader
+        primary={t('title.mimes')}
+        slotProps={{
+          root: { style: { marginBottom: theme.spacing(1) } },
+          primary: { variant: 'h5' },
+          actions: { spacing: 1 }
+        }}
+        actions={
+          <>
+            <Button key="reset" size="small" variant="outlined" onClick={() => reload(true, setOpen)}>
+              {t('reset')}
+            </Button>
+            <Button
+              key="undo"
+              size="small"
+              variant="contained"
+              onClick={() => setMimesFile(originalMimesFile)}
+              disabled={mimesFile === originalMimesFile}
+            >
+              {t('undo')}
+            </Button>
+            <Button
+              key="save"
+              variant="contained"
+              size="small"
+              color="primary"
+              disabled={mimesFile === originalMimesFile}
+              onClick={() => setOpen(true)}
+            >
+              {t('save')}
+            </Button>
+          </>
+        }
+      />
+
+      <div
+        ref={containerEL}
+        style={{
+          flexGrow: 1,
+          border: `1px solid ${theme.palette.divider}`,
+          position: 'relative'
+        }}
+      >
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            bottom: 0,
+            left: 0,
+            right: 0
+          }}
+        >
+          <ReactResizeDetector handleHeight handleWidth targetRef={containerEL}>
+            {({ width, height }) => (
+              <div ref={containerEL}>
+                {mimesFile !== null ? (
+                  <>
+                    <Editor
+                      language="yaml"
+                      width={width}
+                      height={height}
+                      theme={isDarkTheme ? 'vs-dark' : 'vs'}
+                      loading={t('loading.mimes')}
+                      value={mimesFile}
+                      onChange={setMimesFile}
+                      onMount={onMount}
+                      options={{ links: false }}
+                    />
+                  </>
+                ) : (
+                  <Skeleton width={width} height={height} variant="rectangular" animation="wave" />
+                )}
+              </div>
+            )}
+          </ReactResizeDetector>
+        </div>
+      </div>
+    </>
+  );
+});

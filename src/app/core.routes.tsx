@@ -7,6 +7,7 @@ import { AdminAPIKeyDetailRoute } from 'routes/admin-api-key-detail/admin-api-ke
 import { AdminAPIKeysRoute } from 'routes/admin-api-keys/admin-api-keys.route';
 import { AdminErrorDetailRoute } from 'routes/admin-error-detail/admin-error-detail.route';
 import { AdminErrorViewerRoute } from 'routes/admin-error-viewer/admin-error-viewer.route';
+import { AdminIdentifyRoute } from 'routes/admin-identify/admin-identify.route';
 import { AlertDetailRoute } from 'routes/alert-detail/alert-detail.route';
 import { AlertRedirectRoute } from 'routes/alert-redirect/alert-redirect.route';
 import { AlertsRoute } from 'routes/alerts/alerts.route';
@@ -54,16 +55,17 @@ export const APP_ROUTES = [
   AdminAPIKeysRoute,
   AdminErrorDetailRoute,
   AdminErrorViewerRoute,
+  AdminIdentifyRoute,
   AlertDetailRoute,
   AlertRedirectRoute,
   AlertsRoute,
+  CrashRoute,
   DashboardRoute,
   DevelopmentAPIRoute,
   DevelopmentCustomizeRoute,
   DevelopmentLibraryRoute,
   DevelopmentThemeRoute,
   DisabledRoute,
-  CrashRoute,
   FileDetailRoute,
   FileViewerRootRoute,
   FileViewerRoute,

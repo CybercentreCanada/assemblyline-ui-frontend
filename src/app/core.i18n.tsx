@@ -32,6 +32,8 @@ import adminAPIkeysEN from 'routes/admin-api-keys/admin-api-keys.i18n.en.json';
 import adminAPIkeysFR from 'routes/admin-api-keys/admin-api-keys.i18n.fr.json';
 import adminErrorViewerEN from 'routes/admin-error-viewer/admin-error-viewer.i18n.en.json';
 import adminErrorViewerFR from 'routes/admin-error-viewer/admin-error-viewer.i18n.fr.json';
+import adminIdentifyEN from 'routes/admin-identify/admin-identify.i18n.en.json';
+import adminIdentifyFR from 'routes/admin-identify/admin-identify.i18n.fr.json';
 import alertsEN from 'routes/alerts/alerts.i18n.en.json';
 import alertsFR from 'routes/alerts/alerts.i18n.fr.json';
 import dashboardEN from 'routes/dashboard/dashboard.i18n.en.json';
@@ -81,6 +83,7 @@ export const I18N_RESSOURCES = {
   en: {
     adminAPIkeys: adminAPIkeysEN,
     adminErrorViewer: adminErrorViewerEN,
+    adminIdentify: adminIdentifyEN,
     alerts: alertsEN,
     api: apiEN,
     app: appEN,
@@ -118,6 +121,7 @@ export const I18N_RESSOURCES = {
   fr: {
     adminAPIkeys: adminAPIkeysFR,
     adminErrorViewer: adminErrorViewerFR,
+    adminIdentify: adminIdentifyFR,
     alerts: alertsFR,
     api: apiFR,
     app: appFR,
