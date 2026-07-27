@@ -106,6 +106,7 @@ export const AppNavigationBlocker = memo(() => {
   const setNavigationStore = useAppSetNavigationStore();
 
   const [open, setOpen] = useState<boolean>(false);
+  const acceptButtonRef = useRef<HTMLButtonElement>(null);
 
   const shouldClearBlockedPages = useRef<boolean>(false);
 
@@ -149,6 +150,10 @@ export const AppNavigationBlocker = memo(() => {
     setNavigationStore(clearBlockedPages);
   }, [setNavigationStore]);
 
+  const handleDialogEntered = useCallback(() => {
+    requestAnimationFrame(() => acceptButtonRef.current?.focus());
+  }, []);
+
   const handleNavigationChange = useCallback(
     (store: AppNavigationStore) => {
       const routerState = getAppRouterStateFromApi(routerStoreApi);
@@ -187,6 +192,7 @@ export const AppNavigationBlocker = memo(() => {
       onClose={handleCancel}
       slotProps={{
         transition: {
+          onEntered: handleDialogEntered,
           onExited: handleDialogExited
         }
       }}
@@ -206,7 +212,7 @@ export const AppNavigationBlocker = memo(() => {
         <Button onClick={handleCancel} color="secondary">
           {t('router_prompt_cancel')}
         </Button>
-        <Button onClick={handleAccept} color="primary" autoFocus>
+        <Button ref={acceptButtonRef} onClick={handleAccept} color="primary" autoFocus>
           {t('router_prompt_accept')}
         </Button>
       </DialogActions>

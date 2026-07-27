@@ -117,3 +117,12 @@ export type InferSearchParamSnapshotFromEngine<Engine extends SearchParamEngine<
 //*****************************************************************************************
 
 export type SearchParamRuntime = InstanceType<ReturnType<typeof SearchParamRuntimeFactory>>;
+
+export type InferSearchParamKeysFromSnapshot<Snapshot extends SearchParamSnapshot<any>> =
+  Snapshot extends SearchParamSnapshot<infer BlueprintMap>
+    ? BlueprintMap extends SearchParamBlueprintMap
+      ? SearchParamBlueprintMap extends BlueprintMap
+        ? never
+        : keyof BlueprintMap
+      : never
+    : never;

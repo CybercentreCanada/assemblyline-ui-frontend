@@ -165,7 +165,7 @@ export function useAppNavigate<const Origin extends AppRoute['path']>() {
   const setNavigationStore = useAppSetNavigationStore();
 
   const create = useCallback(
-    function <const Destination extends AppRoute['path'] = Origin>(
+    function <const Destination extends AppRoute['path']>(
       destinationPanelKey: number,
       dispatch: InferAppNavigationOperationMapFromPath<Destination>['create'],
       options: AppNavigateOptions
@@ -199,7 +199,7 @@ export function useAppNavigate<const Origin extends AppRoute['path']>() {
   );
 
   const update = useCallback(
-    function <const Destination extends AppRoute['path'] = Origin>(
+    function <const Destination extends AppRoute['path']>(
       destinationPanelKey: number,
       dispatch: InferAppNavigationOperationMapFromPath<Destination>['update'],
       options: AppNavigateOptions
@@ -232,7 +232,7 @@ export function useAppNavigate<const Origin extends AppRoute['path']>() {
   );
 
   const search = useCallback(
-    function <const Destination extends AppRoute['path'] = Origin>(
+    function <const Destination extends AppRoute['path']>(
       destinationPanelKey: number,
       dispatch: InferAppNavigationOperationMapFromPath<Destination>['search'],
       options: AppNavigateOptions
@@ -271,7 +271,7 @@ export function useAppNavigate<const Origin extends AppRoute['path']>() {
   );
 
   const only = useCallback(
-    function <const Destination extends AppRoute['path'] = Origin>(
+    function <const Destination extends AppRoute['path']>(
       destinationPanelKey: number,
       dispatch: InferAppNavigationOperationMapFromPath<Destination>['only'],
       options: AppNavigateOptions
@@ -308,7 +308,7 @@ export function useAppNavigate<const Origin extends AppRoute['path']>() {
   );
 
   const closePanel = useCallback(
-    function <const Destination extends AppRoute['path'] = Origin>(
+    function <const Destination extends AppRoute['path']>(
       destinationPanelKey: number,
       dispatch: InferAppNavigationOperationMapFromPath<Destination>['closePanel'] = true,
       options: AppNavigateOptions
@@ -338,10 +338,7 @@ export function useAppNavigate<const Origin extends AppRoute['path']>() {
   );
 
   const buildOperations = useCallback(
-    function <const Destination extends AppRoute['path'] = Origin>(
-      destinationPanelKey: number,
-      options: NavigateOptions
-    ) {
+    function <const Destination extends AppRoute['path']>(destinationPanelKey: number, options: NavigateOptions) {
       return {
         create: (dispatch: InferAppNavigationOperationMapFromPath<Destination>['create']) =>
           create<Destination>(destinationPanelKey, dispatch, options),
@@ -359,9 +356,7 @@ export function useAppNavigate<const Origin extends AppRoute['path']>() {
   );
 
   const from = useCallback(
-    function <const Destination extends AppRoute['path'] = Origin>(
-      options: AppNavigateOptions = getDefaultNavigateOptions()
-    ) {
+    function <const Destination extends AppRoute['path']>(options: AppNavigateOptions = getDefaultNavigateOptions()) {
       const routerState = getAppRouterStateFromApi(routerStoreApi);
       const preferenceState = getAppPreferenceStateFromApi(preferenceStoreApi);
 
@@ -382,9 +377,7 @@ export function useAppNavigate<const Origin extends AppRoute['path']>() {
   );
 
   const to = useCallback(
-    function <const Destination extends AppRoute['path'] = Origin>(
-      options: AppNavigateOptions = getDefaultNavigateOptions()
-    ) {
+    function <const Destination extends AppRoute['path']>(options: AppNavigateOptions = getDefaultNavigateOptions()) {
       const routerState = getAppRouterStateFromApi(routerStoreApi);
       const preferenceState = getAppPreferenceStateFromApi(preferenceStoreApi);
 
@@ -395,7 +388,7 @@ export function useAppNavigate<const Origin extends AppRoute['path']>() {
   );
 
   const at = useCallback(
-    function <const Destination extends AppRoute['path'] = Origin>(
+    function <const Destination extends AppRoute['path']>(
       panelKey: number = 0,
       options: AppNavigateOptions = getDefaultNavigateOptions()
     ) {
