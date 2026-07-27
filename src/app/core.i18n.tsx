@@ -28,6 +28,8 @@ import externalLookupFR from 'layout/external-lookup/external-lookup.i18n.fr.jso
 import notificationsEN from 'layout/notifications/notifications.i18n.en.json';
 import notificationsFR from 'layout/notifications/notifications.i18n.fr.json';
 import { initReactI18next } from 'react-i18next';
+import adminActionsEN from 'routes/admin-actions/admin-actions.i18n.en.json';
+import adminActionsFR from 'routes/admin-actions/admin-actions.i18n.fr.json';
 import adminAPIkeysEN from 'routes/admin-api-keys/admin-api-keys.i18n.en.json';
 import adminAPIkeysFR from 'routes/admin-api-keys/admin-api-keys.i18n.fr.json';
 import adminErrorViewerEN from 'routes/admin-error-viewer/admin-error-viewer.i18n.en.json';
@@ -81,6 +83,7 @@ import inputsFR from 'ui/inputs/i18n/inputs.i18n.fr.json';
 
 export const I18N_RESSOURCES = {
   en: {
+    adminActions: adminActionsEN,
     adminAPIkeys: adminAPIkeysEN,
     adminErrorViewer: adminErrorViewerEN,
     adminIdentify: adminIdentifyEN,
@@ -119,6 +122,7 @@ export const I18N_RESSOURCES = {
     user: userEN
   },
   fr: {
+    adminActions: adminActionsFR,
     adminAPIkeys: adminAPIkeysFR,
     adminErrorViewer: adminErrorViewerFR,
     adminIdentify: adminIdentifyFR,

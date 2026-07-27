@@ -3,6 +3,7 @@ import { LockedRoute } from 'layout/auth/locked/locked.route';
 import { QuotaRoute } from 'layout/auth/quota/quota.route';
 import { ToSRoute } from 'layout/auth/terms-of-service/terms-of-service.route';
 import { AccountRoute } from 'routes/account/account.route';
+import { AdminActionsRoute } from 'routes/admin-actions/admin-actions.route';
 import { AdminAPIKeyDetailRoute } from 'routes/admin-api-key-detail/admin-api-key-detail.route';
 import { AdminAPIKeysRoute } from 'routes/admin-api-keys/admin-api-keys.route';
 import { AdminErrorDetailRoute } from 'routes/admin-error-detail/admin-error-detail.route';
@@ -51,6 +52,7 @@ export const APP_ROUTES = [
 
   // New
   AccountRoute,
+  AdminActionsRoute,
   AdminAPIKeyDetailRoute,
   AdminAPIKeysRoute,
   AdminErrorDetailRoute,
