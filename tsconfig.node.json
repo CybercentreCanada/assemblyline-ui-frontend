@@ -4,8 +4,6 @@
     "skipLibCheck": true,
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "verbatimModuleSyntax": true,
-    "moduleDetection": "force",
     "allowSyntheticDefaultImports": true
   },
   "include": ["vite.config.mts"]
