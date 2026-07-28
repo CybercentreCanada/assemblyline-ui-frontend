@@ -74,6 +74,10 @@ import manageBadlistDetailEN from 'routes/manage-badlist-detail/manage-badlist-d
 import manageBadlistDetailFR from 'routes/manage-badlist-detail/manage-badlist-detail.i18n.fr.json';
 import manageBadlistsEN from 'routes/manage-badlists/manage-badlists.i18n.en.json';
 import manageBadlistsFR from 'routes/manage-badlists/manage-badlists.i18n.fr.json';
+import manageHeuristicDetailEN from 'routes/manage-heuristic-detail/manage-heuristic-detail.i18n.en.json';
+import manageHeuristicDetailFR from 'routes/manage-heuristic-detail/manage-heuristic-detail.i18n.fr.json';
+import manageHeuristicsEN from 'routes/manage-heuristics/manage-heuristics.i18n.en.json';
+import manageHeuristicsFR from 'routes/manage-heuristics/manage-heuristics.i18n.fr.json';
 import missingNodeEN from 'routes/missing-node/missing-node.i18n.en.json';
 import missingNodeFR from 'routes/missing-node/missing-node.i18n.fr.json';
 import notFoundEN from 'routes/not-found/not-found.i18n.en.json';
@@ -132,6 +136,8 @@ export const I18N_RESSOURCES = {
     manageBadlistAdd: manageBadlistAddEN,
     manageBadlistDetail: manageBadlistDetailEN,
     manageBadlists: manageBadlistsEN,
+    manageHeuristicDetail: manageHeuristicDetailEN,
+    manageHeuristics: manageHeuristicsEN,
     missingNode: missingNodeEN,
     notifications: notificationsEN,
     quota: quotaEN,
@@ -179,6 +185,8 @@ export const I18N_RESSOURCES = {
     manageBadlistAdd: manageBadlistAddFR,
     manageBadlistDetail: manageBadlistDetailFR,
     manageBadlists: manageBadlistsFR,
+    manageHeuristicDetail: manageHeuristicDetailFR,
+    manageHeuristics: manageHeuristicsFR,
     missingNode: missingNodeFR,
     notifications: notificationsFR,
     quota: quotaFR,

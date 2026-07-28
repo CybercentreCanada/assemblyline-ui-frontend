@@ -73,7 +73,7 @@ export const HeuristicsTable = memo(
             {heuristicResults.items.map((heuristic, i) => (
               <LinkRow
                 key={`${heuristic.heur_id}-${i}`}
-                nav={nav => nav.to().create({ route: '/manage/heuristic/:id', path: { id: `${heuristic.heur_id}` } })}
+                nav={nav => nav.to().create({ route: '/manage/heuristic/detail/:id', path: { id: heuristic.heur_id } })}
                 navDeps={[heuristic.heur_id]}
                 onClick={event => onRowClick(event, heuristic)}
                 hover
