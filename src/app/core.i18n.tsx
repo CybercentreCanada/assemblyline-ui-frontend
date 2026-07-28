@@ -38,6 +38,8 @@ import adminIdentifyEN from 'routes/admin-identify/admin-identify.i18n.en.json';
 import adminIdentifyFR from 'routes/admin-identify/admin-identify.i18n.fr.json';
 import adminServiceReviewEN from 'routes/admin-service-review/admin-service-review.i18n.en.json';
 import adminServiceReviewFR from 'routes/admin-service-review/admin-service-review.i18n.fr.json';
+import adminServicesEN from 'routes/admin-services/admin-services.i18n.en.json';
+import adminServicesFR from 'routes/admin-services/admin-services.i18n.fr.json';
 import adminSiteMapEN from 'routes/admin-sitemap/admin-sitemap.i18n.en.json';
 import adminSiteMapFR from 'routes/admin-sitemap/admin-sitemap.i18n.fr.json';
 import adminTagSafelistEN from 'routes/admin-tag-safelist/admin-tag-safelist.i18n.en.json';
@@ -96,6 +98,7 @@ export const I18N_RESSOURCES = {
     adminErrorViewer: adminErrorViewerEN,
     adminIdentify: adminIdentifyEN,
     adminServiceReview: adminServiceReviewEN,
+    adminServices: adminServicesEN,
     adminSiteMap: adminSiteMapEN,
     adminTagSafelist: adminTagSafelistEN,
     adminUsers: adminUsersEN,
@@ -139,6 +142,7 @@ export const I18N_RESSOURCES = {
     adminErrorViewer: adminErrorViewerFR,
     adminIdentify: adminIdentifyFR,
     adminServiceReview: adminServiceReviewFR,
+    adminServices: adminServicesFR,
     adminSiteMap: adminSiteMapFR,
     adminTagSafelist: adminTagSafelistFR,
     adminUsers: adminUsersFR,

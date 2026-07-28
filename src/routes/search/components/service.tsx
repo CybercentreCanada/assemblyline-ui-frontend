@@ -55,7 +55,7 @@ export const ServiceTable = memo(
             {serviceResults.map((result, i) => (
               <LinkRow
                 key={`${result.name}-${i}`}
-                nav={nav => nav.to().create({ route: '/admin/services/:id', path: { id: result.name } })}
+                nav={nav => nav.to().create({ route: '/admin/services/:svc', path: { svc: result.name } })}
                 navDeps={[result.name]}
                 hover
                 onClick={event => onRowClick(event, result)}
