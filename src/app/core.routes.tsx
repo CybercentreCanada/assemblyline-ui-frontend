@@ -30,6 +30,9 @@ import { HelpClassificationRoute } from 'routes/help-classification/help-classif
 import { HelpConfigurationRoute } from 'routes/help-configuration/help-configuration.route';
 import { HelpSearchRoute } from 'routes/help-search/help-search.route';
 import { HelpServicesRoute } from 'routes/help-services/help-services.route';
+import { ManageBadlistAddRoute } from 'routes/manage-badlist-add/manage-badlist-add.route';
+import { ManageBadlistDetailRoute } from 'routes/manage-badlist-detail/manage-badlist-detail.route';
+import { ManageBadlistsRoute } from 'routes/manage-badlists/manage-badlists.route';
 import { MissingNodeRoute } from 'routes/missing-node/missing-node.route';
 import { NotFoundRoute } from 'routes/not-found/not-found.route';
 import { SearchRootRoute, SearchRoute } from 'routes/search/search.route';
@@ -90,6 +93,9 @@ export const APP_ROUTES = [
   HelpSearchRoute,
   HelpServicesRoute,
   LockedRoute,
+  ManageBadlistAddRoute,
+  ManageBadlistDetailRoute,
+  ManageBadlistsRoute,
   MissingNodeRoute,
   NotFoundRoute,
   QuotaRoute,

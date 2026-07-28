@@ -70,7 +70,7 @@ export const BadlistTable = memo(({ badlistResults, allowSort = true, onRowClick
             <LinkRow
               key={`${sl_item.id}-${i}`}
               hover
-              nav={nav => nav.to().create({ route: '/manage/badlist/:id', path: { id: sl_item.id } })}
+              nav={nav => nav.to().create({ route: '/manage/badlist/detail/:id', path: { id: sl_item.id } })}
               navDeps={[sl_item.id]}
               onClick={event => onRowClick(event, sl_item)}
             >

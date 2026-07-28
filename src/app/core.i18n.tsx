@@ -68,6 +68,12 @@ import helpSearchEN from 'routes/help-search/help-search.i18n.en.json';
 import helpSearchFR from 'routes/help-search/help-search.i18n.fr.json';
 import helpServicesEN from 'routes/help-services/help-services.i18n.en.json';
 import helpServicesFR from 'routes/help-services/help-services.i18n.fr.json';
+import manageBadlistAddEN from 'routes/manage-badlist-add/manage-badlist-add.i18n.en.json';
+import manageBadlistAddFR from 'routes/manage-badlist-add/manage-badlist-add.i18n.fr.json';
+import manageBadlistDetailEN from 'routes/manage-badlist-detail/manage-badlist-detail.i18n.en.json';
+import manageBadlistDetailFR from 'routes/manage-badlist-detail/manage-badlist-detail.i18n.fr.json';
+import manageBadlistsEN from 'routes/manage-badlists/manage-badlists.i18n.en.json';
+import manageBadlistsFR from 'routes/manage-badlists/manage-badlists.i18n.fr.json';
 import missingNodeEN from 'routes/missing-node/missing-node.i18n.en.json';
 import missingNodeFR from 'routes/missing-node/missing-node.i18n.fr.json';
 import notFoundEN from 'routes/not-found/not-found.i18n.en.json';
@@ -123,6 +129,9 @@ export const I18N_RESSOURCES = {
     locked: lockedEN,
     login: loginEN,
     logout: logoutEN,
+    manageBadlistAdd: manageBadlistAddEN,
+    manageBadlistDetail: manageBadlistDetailEN,
+    manageBadlists: manageBadlistsEN,
     missingNode: missingNodeEN,
     notifications: notificationsEN,
     quota: quotaEN,
@@ -167,6 +176,9 @@ export const I18N_RESSOURCES = {
     locked: lockedFR,
     login: loginFR,
     logout: logoutFR,
+    manageBadlistAdd: manageBadlistAddFR,
+    manageBadlistDetail: manageBadlistDetailFR,
+    manageBadlists: manageBadlistsFR,
     missingNode: missingNodeFR,
     notifications: notificationsFR,
     quota: quotaFR,
