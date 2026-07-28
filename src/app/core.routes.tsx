@@ -8,6 +8,7 @@ import { AdminAPIKeysRoute } from 'routes/admin-api-keys/admin-api-keys.route';
 import { AdminErrorDetailRoute } from 'routes/admin-error-detail/admin-error-detail.route';
 import { AdminErrorViewerRoute } from 'routes/admin-error-viewer/admin-error-viewer.route';
 import { AdminIdentifyRoute } from 'routes/admin-identify/admin-identify.route';
+import { AdminServiceReviewRoute } from 'routes/admin-service-review/admin-service-review.route';
 import { AdminSitemapRoute } from 'routes/admin-sitemap/admin-sitemap.route';
 import { AdminTagSafelistRoute } from 'routes/admin-tag-safelist/admin-tag-safelist.route';
 import { AdminUsersRoute } from 'routes/admin-users/admin-users.route';
@@ -60,6 +61,7 @@ export const APP_ROUTES = [
   AdminErrorDetailRoute,
   AdminErrorViewerRoute,
   AdminIdentifyRoute,
+  AdminServiceReviewRoute,
   AdminSitemapRoute,
   AdminTagSafelistRoute,
   AdminUserDetailRoute,
