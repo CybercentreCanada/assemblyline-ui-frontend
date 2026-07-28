@@ -84,6 +84,10 @@ import manageSafelistDetailEN from 'routes/manage-safelist-detail/manage-safelis
 import manageSafelistDetailFR from 'routes/manage-safelist-detail/manage-safelist-detail.i18n.fr.json';
 import manageSafelistsEN from 'routes/manage-safelists/manage-safelists.i18n.en.json';
 import manageSafelistsFR from 'routes/manage-safelists/manage-safelists.i18n.fr.json';
+import manageWorkflowDetailEN from 'routes/manage-workflow-detail/manage-workflow-detail.i18n.en.json';
+import manageWorkflowDetailFR from 'routes/manage-workflow-detail/manage-workflow-detail.i18n.fr.json';
+import manageWorkflowsEN from 'routes/manage-workflows/manage-workflows.i18n.en.json';
+import manageWorkflowsFR from 'routes/manage-workflows/manage-workflows.i18n.fr.json';
 import missingNodeEN from 'routes/missing-node/missing-node.i18n.en.json';
 import missingNodeFR from 'routes/missing-node/missing-node.i18n.fr.json';
 import notFoundEN from 'routes/not-found/not-found.i18n.en.json';
@@ -147,6 +151,8 @@ export const I18N_RESSOURCES = {
     manageSafelistAdd: manageSafelistAddEN,
     manageSafelistDetail: manageSafelistDetailEN,
     manageSafelists: manageSafelistsEN,
+    manageWorkflowDetail: manageWorkflowDetailEN,
+    manageWorkflows: manageWorkflowsEN,
     missingNode: missingNodeEN,
     notifications: notificationsEN,
     quota: quotaEN,
@@ -199,6 +205,8 @@ export const I18N_RESSOURCES = {
     manageSafelistAdd: manageSafelistAddFR,
     manageSafelistDetail: manageSafelistDetailFR,
     manageSafelists: manageSafelistsFR,
+    manageWorkflowDetail: manageWorkflowDetailFR,
+    manageWorkflows: manageWorkflowsFR,
     missingNode: missingNodeFR,
     notifications: notificationsFR,
     quota: quotaFR,

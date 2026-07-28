@@ -38,6 +38,12 @@ import { ManageHeuristicsRoute } from 'routes/manage-heuristics/manage-heuristic
 import { ManageSafelistAddRoute } from 'routes/manage-safelist-add/manage-safelist-add.route';
 import { ManageSafelistDetailRoute } from 'routes/manage-safelist-detail/manage-safelist-detail.route';
 import { ManageSafelistsRoute } from 'routes/manage-safelists/manage-safelists.route';
+import {
+  ManageWorkflowCreateRootRoute,
+  ManageWorkflowCreateRoute
+} from 'routes/manage-workflow-create/manage-workflow-create.route';
+import { ManageWorkflowDetailRoute } from 'routes/manage-workflow-detail/manage-workflow-detail.route';
+import { ManageWorkflowsRoute } from 'routes/manage-workflows/manage-workflows.route';
 import { MissingNodeRoute } from 'routes/missing-node/missing-node.route';
 import { NotFoundRoute } from 'routes/not-found/not-found.route';
 import { SearchRootRoute, SearchRoute } from 'routes/search/search.route';
@@ -106,6 +112,10 @@ export const APP_ROUTES = [
   ManageSafelistAddRoute,
   ManageSafelistDetailRoute,
   ManageSafelistsRoute,
+  ManageWorkflowCreateRootRoute,
+  ManageWorkflowCreateRoute,
+  ManageWorkflowDetailRoute,
+  ManageWorkflowsRoute,
   MissingNodeRoute,
   NotFoundRoute,
   QuotaRoute,

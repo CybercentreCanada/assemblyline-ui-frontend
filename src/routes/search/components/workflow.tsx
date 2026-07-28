@@ -22,14 +22,14 @@ import {
 import InformativeAlert from 'ui/InformativeAlert';
 import Moment from 'ui/Moment';
 
-export type WorflowTableProps = {
+export type WorkflowTableProps = {
   workflowResults: SearchResult<WorkflowIndexed>;
   allowSort?: boolean;
   onRowClick?: (event: React.MouseEvent<HTMLElement>, workflow: WorkflowIndexed) => void;
 };
 
-export const WorflowTable = memo(
-  ({ workflowResults, allowSort = true, onRowClick = () => null }: WorflowTableProps) => {
+export const WorkflowTable = memo(
+  ({ workflowResults, allowSort = true, onRowClick = () => null }: WorkflowTableProps) => {
     const { t } = useTranslation(['search']);
     const { c12nDef } = useALContext();
 

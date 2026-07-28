@@ -1,0 +1,346 @@
+import CheckIcon from '@mui/icons-material/Check';
+import CreateOutlinedIcon from '@mui/icons-material/CreateOutlined';
+import DoDisturbAltOutlinedIcon from '@mui/icons-material/DoDisturbAltOutlined';
+import { Grid, useTheme } from '@mui/material';
+import { useApiMutation, useApiQuery } from 'core/api';
+import { useAppBlocker, useAppNavigate } from 'core/router';
+import { createAppRoute, useAppPathParams, useAppSearchParams } from 'core/routes';
+import useALContext from 'deprecated/hooks/useALContext';
+import useMySnackbar from 'deprecated/hooks/useMySnackbar';
+import _ from 'lodash';
+import type { SearchResult } from 'models/api/search';
+import type { Alert } from 'models/base/alert';
+import type { Priority, Status, Workflow } from 'models/base/workflow';
+import { LABELS, PRIORITIES, STATUSES } from 'models/base/workflow';
+import { memo, useEffect, useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { IconButton } from 'ui/buttons/IconButton';
+import Classification from 'ui/Classification';
+import { CheckboxInput } from 'ui/inputs/CheckboxInput';
+import { ChipsInput } from 'ui/inputs/ChipsInput';
+import { SelectInput } from 'ui/inputs/SelectInput';
+import { TextAreaInput } from 'ui/inputs/TextAreaInput';
+import { TextInput } from 'ui/inputs/TextInput';
+import { PageHeader } from 'ui/layouts/PageHeader';
+import { PageCenter } from 'ui/pages/PageCenter';
+
+export const ManageWorkflowCreatePage = memo(() => {
+  const { t } = useTranslation(['manageWorkflowDetail']);
+  const paramID = useAppPathParams<'/manage/workflow/create/:id' | '/manage/workflow/create'>()?.id;
+  const theme = useTheme();
+  const navigate = useAppNavigate<'/manage/workflow/create/:id' | '/manage/workflow/create'>();
+  const search = useAppSearchParams<'/manage/workflow/create'>();
+  const { c12nDef, configuration, user: currentUser } = useALContext();
+  const { showSuccessMessage, showErrorMessage } = useMySnackbar();
+
+  const [workflow, setWorkflow] = useState<Workflow>(null);
+  const [originalWorkflow, setOriginalWorkflow] = useState<Workflow>(null);
+  const [runWorkflow, setRunWorkflow] = useState<boolean>(false);
+
+  const defaultWorkflow = useMemo<Workflow>(
+    () => ({
+      classification: c12nDef.UNRESTRICTED,
+      creation_date: undefined,
+      creator: '',
+      description: '',
+      edited_by: '',
+      enabled: true,
+      hit_count: 0,
+      id: '',
+      labels: [],
+      last_edit: undefined,
+      name: '',
+      origin: configuration.ui.fqdn,
+      priority: '',
+      query: '',
+      status: ''
+    }),
+    [c12nDef.UNRESTRICTED, configuration.ui.fqdn]
+  );
+
+  const modified = useMemo<boolean>(() => !_.isEqual(workflow, originalWorkflow), [originalWorkflow, workflow]);
+
+  useAppBlocker(() => (modified ? 'unsaved_changes' : null), [modified]);
+
+  const handleAdd = useApiMutation<[Workflow, boolean], { success: boolean; workflow_id: string }>(
+    (wf: Workflow, run: boolean) => ({
+      url: `/api/v4/workflow/?run_workflow=${run}`,
+      method: 'PUT',
+      body: {
+        ...wf,
+        priority: !wf.priority ? null : wf.priority,
+        status: !wf.status ? null : wf.status
+      },
+      disabled: !currentUser.roles.includes('workflow_manage'),
+      onSuccess: ({ api_response }) => {
+        showSuccessMessage(t('add.success'));
+        setTimeout(() => window.dispatchEvent(new CustomEvent('reloadWorkflows')), 1000);
+        setTimeout(() => window.dispatchEvent(new CustomEvent('alertRefresh', null)), 1500);
+        navigate.here().create({ route: '/manage/workflow/detail/:id', path: { id: api_response.workflow_id } });
+      }
+    })
+  );
+
+  const handleUpdate = useApiMutation<[Workflow, boolean], { success: boolean; workflow_id: string }>(
+    (wf: Workflow, run: boolean) => ({
+      url: `/api/v4/workflow/${paramID}/?run_workflow=${run}`,
+      method: 'POST',
+      body: {
+        ...wf,
+        priority: !wf.priority ? null : wf.priority,
+        status: !wf.status ? null : wf.status
+      },
+      disabled: !currentUser.roles.includes('workflow_manage'),
+      onSuccess: () => {
+        showSuccessMessage(t('update.success'));
+        setTimeout(() => window.dispatchEvent(new CustomEvent('reloadWorkflows')), 1000);
+        navigate.here().create({ route: '/manage/workflow/detail/:id', path: { id: paramID } });
+      }
+    })
+  );
+
+  const handleFetch = useApiQuery<Workflow>({
+    url: `/api/v4/workflow/${paramID}/`,
+    disabled: !paramID || !currentUser.roles.includes('workflow_manage') || !originalWorkflow,
+    onSuccess: ({ api_response }) => {
+      const wf = {
+        ...api_response,
+        status: api_response.status || '',
+        priority: api_response.priority || '',
+        enabled: api_response.enabled === undefined ? true : api_response.enabled
+      } as Workflow;
+      setWorkflow(wf);
+      setOriginalWorkflow(wf);
+    },
+    onFailure: api_data => {
+      showErrorMessage(api_data.api_error_message);
+      navigate.here().closePanel(true);
+    }
+  });
+
+  useEffect(() => {
+    setOriginalWorkflow(defaultWorkflow);
+    setWorkflow(defaultWorkflow);
+  }, [defaultWorkflow]);
+
+  useEffect(() => {
+    setWorkflow(previousWorkflow => {
+      if (!previousWorkflow) return previousWorkflow;
+
+      return {
+        ...previousWorkflow,
+        ...(typeof search.classification === 'string' && { classification: search.classification }),
+        ...(typeof search.name === 'string' && { name: search.name }),
+        ...(typeof search.query === 'string' && { query: search.query }),
+        ...(Array.isArray(search.labels) && { labels: search.labels }),
+        ...(PRIORITIES.includes(search.priority as Priority) && { priority: search.priority as Priority }),
+        ...(STATUSES.includes(search.status as Status) && { status: search.status as Status }),
+        ...(typeof search.enabled === 'boolean' && { enabled: search.enabled })
+      };
+    });
+  }, [search]);
+
+  const handleResults = useApiQuery<SearchResult<Alert>>({
+    url: `/api/v4/search/alert/?query=${encodeURIComponent(workflow?.query)}&rows=10&track_total_hits=true`,
+    disabled: !workflow?.query || !currentUser.roles.includes('alert_view'),
+    delay: 400,
+    onFailure: () => null
+  });
+
+  const disabled = useMemo<boolean>(
+    () =>
+      !modified ||
+      handleAdd.isPending ||
+      handleFetch.isFetching ||
+      handleUpdate.isPending ||
+      workflow?.name === '' ||
+      workflow?.query === '' ||
+      handleResults.isDebouncing ||
+      handleResults.isFetching ||
+      !!handleResults.error,
+    [
+      modified,
+      handleAdd.isPending,
+      handleFetch.isFetching,
+      handleUpdate.isPending,
+      workflow?.name,
+      workflow?.query,
+      handleResults.isDebouncing,
+      handleResults.isFetching,
+      handleResults.error
+    ]
+  );
+
+  return (
+    <PageCenter margin={2} width="100%">
+      {/* <RouterPrompt when={modified && !loading} /> */}
+
+      {c12nDef.enforce && (
+        <div style={{ paddingBottom: theme.spacing(2) }}>
+          <Classification
+            type="picker"
+            format="long"
+            c12n={!workflow ? null : workflow.classification}
+            setClassification={v => setWorkflow(wf => ({ ...wf, classification: v }))}
+          />
+        </div>
+      )}
+
+      <PageHeader
+        primary={t(paramID ? 'edit.title' : 'add.title')}
+        secondary={paramID}
+        secondaryLoading={!workflow}
+        slotProps={{
+          root: { style: { marginBottom: theme.spacing(2) } }
+        }}
+        actions={
+          <>
+            {paramID ? (
+              <>
+                <IconButton
+                  tooltip={t('cancel.button')}
+                  color="error"
+                  onClick={() =>
+                    navigate.here().create({ route: '/manage/workflow/detail/:id', path: { id: paramID } })
+                  }
+                >
+                  <DoDisturbAltOutlinedIcon />
+                </IconButton>
+
+                <IconButton
+                  tooltip={t('update.button')}
+                  color="success"
+                  disabled={disabled}
+                  onClick={() => handleUpdate.mutate(workflow, runWorkflow)}
+                >
+                  <CheckIcon />
+                </IconButton>
+              </>
+            ) : (
+              <IconButton
+                tooltip={t('add.button')}
+                color="success"
+                disabled={disabled}
+                onClick={() => handleAdd.mutate(workflow, runWorkflow)}
+              >
+                <CheckIcon />
+              </IconButton>
+            )}
+          </>
+        }
+      />
+
+      <Grid container spacing={2} textAlign="start">
+        <Grid size={{ xs: 12 }}>
+          <TextInput
+            label={t('name')}
+            loading={!workflow || handleFetch.isFetching}
+            value={!workflow ? null : workflow.name}
+            coercers={c => c.required()}
+            validators={v => v.required()}
+            onChange={(event, value) => setWorkflow(wf => ({ ...wf, name: value }))}
+          />
+        </Grid>
+
+        <Grid size={{ xs: 12 }}>
+          <TextAreaInput
+            label={t('query')}
+            loading={!workflow || handleFetch.isFetching}
+            value={!workflow ? null : workflow.query}
+            progress={handleResults.isDebouncing || handleResults.isFetching ? t('query.validating') : null}
+            coercers={c => c.required()}
+            validators={v => v.required()}
+            validate={() => (handleResults.error ? { status: 'error', message: handleResults.error } : null)}
+            minRows={1}
+            maxRows={5}
+            onChange={(event, value) => setWorkflow(wf => ({ ...wf, query: value }))}
+          />
+        </Grid>
+
+        <Grid size={{ xs: 12 }}>
+          <ChipsInput
+            label={t('labels')}
+            loading={!workflow || handleFetch.isFetching}
+            value={!workflow ? null : workflow.labels}
+            options={LABELS}
+            onChange={(event, value) => setWorkflow(wf => ({ ...wf, labels: value.map(v => v.toUpperCase()) }))}
+            isOptionEqualToValue={(option: string, value: string) => option.toUpperCase() === value.toUpperCase()}
+          />
+        </Grid>
+
+        <Grid size={{ xs: 12, sm: 6 }}>
+          <SelectInput
+            label={t('priority')}
+            loading={!workflow || handleFetch.isFetching}
+            value={!workflow ? null : workflow.priority}
+            options={PRIORITIES.map(v => ({ primary: t(`priority.${v || 'null'}`), value: v }))}
+            onChange={(event, value: Priority) => setWorkflow(wf => ({ ...wf, priority: value }))}
+          />
+        </Grid>
+
+        <Grid size={{ xs: 12, sm: 6 }}>
+          <SelectInput
+            label={t('status')}
+            loading={!workflow || handleFetch.isFetching}
+            value={!workflow ? null : workflow.status}
+            options={STATUSES.map(v => ({ primary: t(`status.${v || 'null'}`), value: v }))}
+            onChange={(event, value: Status) => setWorkflow(wf => ({ ...wf, status: value }))}
+          />
+        </Grid>
+
+        <Grid size={{ xs: 12 }}>
+          <CheckboxInput
+            label={`${t('backport_workflow_prompt')} ${handleResults.data?.total || 0} ${t('backport_workflow_matching')}`}
+            loading={!workflow || handleFetch.isFetching}
+            preventRender={!!paramID}
+            value={runWorkflow}
+            onChange={(event, value) => setRunWorkflow(() => value)}
+          />
+        </Grid>
+      </Grid>
+    </PageCenter>
+  );
+});
+
+export const ManageWorkflowCreateRoute = createAppRoute({
+  title: {
+    ns: 'app',
+    key: 'breadcrumb.workflow.create'
+  },
+  icon: {
+    primary: <CreateOutlinedIcon />
+  },
+  ancestor: '/manage/workflows',
+  component: ManageWorkflowCreatePage,
+  path: '/manage/workflow/create/:id',
+  params: s => ({
+    id: s.string()
+  }),
+
+  forbidden: s => !s.user.roles.includes('workflow_manage')
+});
+
+export const ManageWorkflowCreateRootRoute = createAppRoute({
+  title: {
+    ns: 'app',
+    key: 'breadcrumb.workflow.create'
+  },
+  icon: {
+    primary: <CreateOutlinedIcon />
+  },
+  ancestor: '/manage/workflows',
+  component: ManageWorkflowCreatePage,
+  path: '/manage/workflow/create',
+
+  search: s => ({
+    classification: s.string('').source('transient').ephemeral(),
+    name: s.string('').source('transient').ephemeral(),
+    query: s.string('').source('transient').ephemeral(),
+    labels: s.filters([]).source('transient').ephemeral(),
+    priority: s.string('').source('transient').ephemeral(),
+    status: s.string('').source('transient').ephemeral(),
+    enabled: s.boolean(true).source('transient').ephemeral()
+  }),
+
+  forbidden: s => !s.user.roles.includes('workflow_manage')
+});
