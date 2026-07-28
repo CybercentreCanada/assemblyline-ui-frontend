@@ -90,7 +90,7 @@ type UserPageProps = {
 export const UserPage = memo(({ username = null }: UserPageProps) => {
   const { t } = useTranslation(['user']);
   const theme = useTheme();
-  const id = useAppPathParams<'/user/:id'>()?.id;
+  const id = useAppPathParams<'/admin/users/:id'>()?.id;
   const inputRef = useRef(null);
   const navigate = useAppNavigate();
   const { apiCall } = useMyAPI();
