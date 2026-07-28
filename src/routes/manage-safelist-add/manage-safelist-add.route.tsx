@@ -1,7 +1,6 @@
 import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
 import {
   Button,
-  Chip,
   CircularProgress,
   FormControl,
   FormControlLabel,
@@ -19,14 +18,14 @@ import { createAppRoute } from 'core/routes';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import useMySnackbar from 'deprecated/hooks/useMySnackbar';
-import type { Badlist } from 'models/base/badlist';
+import { HASHES } from 'models/base/badlist';
+import type { Safelist } from 'models/base/safelist';
 import {
-  ATTRIBUTION_TYPES,
-  DEFAULT_BADLIST,
-  DEFAULT_BADLIST_FILE,
-  DEFAULT_BADLIST_TAG,
-  HASHES
-} from 'models/base/badlist';
+  DEFAULT_SAFELIST,
+  DEFAULT_SAFELIST_FILE,
+  DEFAULT_SAFELIST_SIGNATURE,
+  DEFAULT_SAFELIST_TAG
+} from 'models/base/safelist';
 import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { HASH_MAP, MD5_REGEX, SHA1_REGEX, SHA256_REGEX, SSDEEP_REGEX, TLSH_REGEX } from 'shared/utils/constant';
@@ -34,10 +33,10 @@ import Classification from 'ui/Classification';
 import DatePicker from 'ui/DatePicker';
 import { PageFullWidth } from 'ui/pages/PageFullWidth';
 
-export const ManageBadlistAddPage = memo(() => {
-  const { t } = useTranslation(['manageBadlistAdd']);
+export const ManageSafelistAddPage = memo(() => {
+  const { t } = useTranslation(['manageSafelistAdd']);
   const theme = useTheme();
-  const [badlist, setBadlist] = useState<Badlist>(DEFAULT_BADLIST);
+  const [safelist, setSafelist] = useState<Safelist>(DEFAULT_SAFELIST);
   const [waiting, setWaiting] = useState<boolean>(false);
   const [ready, setReady] = useState<boolean>(false);
   const [modified, setModified] = useState<boolean>(false);
@@ -56,9 +55,9 @@ export const ManageBadlistAddPage = memo(() => {
       .filter(k => k.indexOf('result.sections.tags') !== -1)
       .map(k => k.slice(21));
     setPossibleTags(tempTags);
-    setBadlist({
-      ...badlist,
-      sources: [{ ...badlist.sources[0], name: currentUser.username, classification: c12nDef.UNRESTRICTED }]
+    setSafelist({
+      ...safelist,
+      sources: [{ ...safelist.sources[0], name: currentUser.username, classification: c12nDef.UNRESTRICTED }]
     });
     apiCall({
       url: `/api/v4/help/constants/`,
@@ -72,83 +71,97 @@ export const ManageBadlistAddPage = memo(() => {
 
   useEffect(() => {
     // If there are no type selected
-    if (!badlist?.type) {
+    if (!safelist?.type) {
       setReady(false);
       return;
     }
 
     // Once the user selected the type we will lock the react router
-    if (badlist?.type) {
+    if (safelist?.type) {
       setModified(true);
     }
 
     // If there are no reason
-    if (badlist?.sources[0].reason[0] === '') {
+    if (safelist?.sources[0].reason[0] === '') {
       setReady(false);
       return;
     }
 
     // Tag specific checks
-    if (badlist?.type === 'tag') {
+    if (safelist?.type === 'tag') {
       // Type not in the list of valid tags
-      if (!possibleTags.includes(badlist?.tag.type)) {
+      if (!possibleTags.includes(safelist?.tag.type)) {
         setReady(false);
         return;
       }
       // There are no tag value
-      if (!badlist?.tag.value) {
+      if (!safelist?.tag.value) {
+        setReady(false);
+        return;
+      }
+    }
+    // Signature specific checks
+    if (safelist?.type === 'signature') {
+      // There are no signature name
+      if (!safelist?.signature.name) {
         setReady(false);
         return;
       }
     }
     // File specific checks
-    else if (badlist?.type === 'file') {
+    else if (safelist?.type === 'file') {
       // There is not at least one hash
-      if (!badlist?.hashes) {
+      if (!safelist?.hashes?.md5 && !safelist?.hashes?.sha1 && !safelist?.hashes?.sha256) {
         setReady(false);
         return;
       }
 
       // Invalid MD5 hash
-      if (badlist?.hashes?.md5 && !badlist.hashes.md5.match(MD5_REGEX)) {
+      if (safelist?.hashes?.md5 && !safelist.hashes.md5.match(MD5_REGEX)) {
         setReady(false);
         return;
       }
 
       // Invalid SHA1 hash
-      if (badlist?.hashes?.sha1 && !badlist.hashes.sha1.match(SHA1_REGEX)) {
+      if (safelist?.hashes?.sha1 && !safelist.hashes.sha1.match(SHA1_REGEX)) {
         setReady(false);
         return;
       }
 
       // Invalid SHA256 hash
-      if (badlist?.hashes?.sha256 && !badlist.hashes.sha256.match(SHA256_REGEX)) {
+      if (safelist?.hashes?.sha256 && !safelist.hashes.sha256.match(SHA256_REGEX)) {
         setReady(false);
         return;
       }
 
       // Invalid SSDEEP hash
-      if (badlist?.hashes?.ssdeep && !badlist.hashes.ssdeep.match(SSDEEP_REGEX)) {
+      if (safelist?.hashes?.ssdeep && !safelist.hashes.ssdeep.match(SSDEEP_REGEX)) {
         setReady(false);
         return;
       }
 
       // Invalid TLSH hash
-      if (badlist?.hashes?.tlsh && !badlist.hashes.tlsh.match(TLSH_REGEX)) {
+      if (safelist?.hashes?.tlsh && !safelist.hashes.tlsh.match(TLSH_REGEX)) {
         setReady(false);
         return;
       }
     }
 
     setReady(true);
-  }, [badlist, possibleTags]);
+  }, [safelist, possibleTags]);
 
-  const cleanBadlist = () => {
-    const data = { ...badlist };
+  const cleanSafelist = () => {
+    const data = { ...safelist };
     if (data.type === 'tag') {
-      delete data.hashes;
       delete data.file;
+      delete data.hashes;
+      delete data.signature;
+    } else if (data.type === 'signature') {
+      delete data.file;
+      delete data.hashes;
+      delete data.tag;
     } else if (data.type === 'file') {
+      delete data.signature;
       delete data.tag;
       if (data.file.name[0] === '') {
         data.file.name = [];
@@ -165,17 +178,17 @@ export const ManageBadlistAddPage = memo(() => {
     return data;
   };
 
-  const saveBadlist = () => {
+  const saveSafelist = () => {
     apiCall({
-      url: `/api/v4/badlist/`,
+      url: `/api/v4/safelist/`,
       method: 'POST',
-      body: cleanBadlist(),
+      body: cleanSafelist(),
       onSuccess: resp => {
         setModified(false);
         showSuccessMessage(t('add.success'));
         setTimeout(() => {
-          navigate.here().create({ route: '/manage/badlist/detail/:id', path: { id: resp.api_response.hash } });
-          window.dispatchEvent(new CustomEvent('reloadBadlist'));
+          navigate.here().create({ route: '/manage/safelist/detail/:id', path: { id: resp.api_response.hash } });
+          window.dispatchEvent(new CustomEvent('reloadSafelist'));
         }, 1000);
       },
       onEnter: () => setWaiting(true),
@@ -184,8 +197,13 @@ export const ManageBadlistAddPage = memo(() => {
   };
 
   const handleTypeChange = event => {
-    const extras = event.target.value === 'tag' ? DEFAULT_BADLIST_TAG : DEFAULT_BADLIST_FILE;
-    setBadlist({ ...badlist, ...extras, type: event.target.value });
+    const extras =
+      event.target.value === 'tag'
+        ? DEFAULT_SAFELIST_TAG
+        : event.target.value === 'signature'
+          ? DEFAULT_SAFELIST_SIGNATURE
+          : DEFAULT_SAFELIST_FILE;
+    setSafelist({ ...safelist, ...extras, type: event.target.value });
   };
 
   return (
@@ -202,7 +220,7 @@ export const ManageBadlistAddPage = memo(() => {
           zIndex: 10
         }}
       >
-        <Button variant="contained" onClick={saveBadlist} disabled={!ready || waiting}>
+        <Button variant="contained" onClick={saveSafelist} disabled={!ready || waiting}>
           {t('save')}
           {waiting && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
         </Button>
@@ -218,19 +236,20 @@ export const ManageBadlistAddPage = memo(() => {
               row
               aria-labelledby="type-radio-buttons-group-label"
               name="type-radio-buttons-group"
-              value={badlist.type}
+              value={safelist.type}
               onChange={handleTypeChange}
             >
               <FormControlLabel value="file" control={<Radio />} label={t('file')} />
               <FormControlLabel value="tag" control={<Radio />} label={t('tag')} />
+              <FormControlLabel value="signature" control={<Radio />} label={t('signature')} />
             </RadioGroup>
           </FormControl>
         </Grid>
-        {badlist?.type === 'tag' && (
+        {safelist?.type === 'tag' && (
           <Grid container size={{ xs: 12 }}>
             <Typography variant="h6">{t('information.tag')}</Typography>
             <Grid container spacing={1} width="100%">
-              <Grid size={{ xs: 12, md: 6 }} paddingLeft={theme.spacing(1)}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <FormControl fullWidth required>
                   <FormLabel id="tag-type-label">{t('tag.type.title')}</FormLabel>
                   <Autocomplete
@@ -238,7 +257,7 @@ export const ManageBadlistAddPage = memo(() => {
                     aria-labelledby="tag-type-label"
                     options={possibleTags}
                     fullWidth
-                    onChange={(_, value) => setBadlist({ ...badlist, tag: { ...badlist.tag, type: value } })}
+                    onChange={(_, value) => setSafelist({ ...safelist, tag: { ...safelist.tag, type: value } })}
                     clearIcon={false}
                     size="small"
                     renderInput={params => <TextField {...params} />}
@@ -250,8 +269,10 @@ export const ManageBadlistAddPage = memo(() => {
                   <FormLabel id="tag-value-label">{t('tag.value.title')}</FormLabel>
                   <TextField
                     aria-labelledby="tag-value-label"
-                    value={badlist?.tag?.value}
-                    onChange={event => setBadlist({ ...badlist, tag: { ...badlist.tag, value: event.target.value } })}
+                    value={safelist?.tag?.value}
+                    onChange={event =>
+                      setSafelist({ ...safelist, tag: { ...safelist.tag, value: event.target.value } })
+                    }
                     variant="outlined"
                     size="small"
                     fullWidth
@@ -261,17 +282,37 @@ export const ManageBadlistAddPage = memo(() => {
             </Grid>
           </Grid>
         )}
-        {badlist?.type === 'file' && (
+        {safelist?.type === 'signature' && (
+          <Grid container size={{ xs: 12 }}>
+            <Typography variant="h6">{t('information.signature')}</Typography>
+            <Grid container spacing={1} width="100%">
+              <Grid size={{ xs: 12 }}>
+                <FormControl fullWidth required>
+                  <FormLabel id="signature-label">{t('signature.name.title')}</FormLabel>
+                  <TextField
+                    aria-labelledby="signature-name-label"
+                    value={safelist?.signature?.name}
+                    onChange={event => setSafelist({ ...safelist, signature: { name: event.target.value } })}
+                    variant="outlined"
+                    size="small"
+                    fullWidth
+                  />
+                </FormControl>
+              </Grid>
+            </Grid>
+          </Grid>
+        )}
+        {safelist?.type === 'file' && (
           <>
-            <Grid container size={{ xs: 12 }} width="100%">
+            <Grid container size={{ xs: 12 }}>
               <Typography variant="h6">{t('file.prop')}</Typography>
               <Grid container spacing={1} width="100%" paddingLeft={theme.spacing(1)}>
                 <Grid size={{ xs: 12 }}>
                   <FormLabel>{t('file.name')}</FormLabel>
                   <TextField
-                    value={badlist?.file?.name[0]}
+                    value={safelist?.file?.name[0]}
                     onChange={event =>
-                      setBadlist({ ...badlist, file: { ...badlist.file, name: [event.target.value] } })
+                      setSafelist({ ...safelist, file: { ...safelist.file, name: [event.target.value] } })
                     }
                     variant="outlined"
                     size="small"
@@ -283,7 +324,7 @@ export const ManageBadlistAddPage = memo(() => {
                   <Autocomplete
                     options={fileTypes}
                     fullWidth
-                    onChange={(_, value) => setBadlist({ ...badlist, file: { ...badlist.file, type: value } })}
+                    onChange={(_, value) => setSafelist({ ...safelist, file: { ...safelist.file, type: value } })}
                     clearOnBlur
                     disableClearable
                     size="small"
@@ -295,9 +336,9 @@ export const ManageBadlistAddPage = memo(() => {
                   <FormLabel>{t('file.size')}</FormLabel>
                   <TextField
                     type="number"
-                    value={badlist?.file?.size}
+                    value={safelist?.file?.size}
                     onChange={event =>
-                      setBadlist({ ...badlist, file: { ...badlist.file, size: parseInt(event.target.value) } })
+                      setSafelist({ ...safelist, file: { ...safelist.file, size: parseInt(event.target.value) } })
                     }
                     variant="outlined"
                     size="small"
@@ -306,18 +347,18 @@ export const ManageBadlistAddPage = memo(() => {
                 </Grid>
               </Grid>
             </Grid>
-            <Grid container size={{ xs: 12 }} width="100%" paddingTop={theme.spacing(2)}>
+            <Grid container size={{ xs: 12 }} paddingTop={theme.spacing(2)}>
               <Typography variant="h6">{t('file.hashes')}</Typography>
-              <Grid container spacing={1} paddingLeft={theme.spacing(1)}>
-                {badlist?.type === 'file' &&
+              <Grid container spacing={1} width="100%" paddingLeft={theme.spacing(1)}>
+                {safelist?.type === 'file' &&
                   HASHES.map((hash, idx) => (
                     <Grid key={idx} size={{ xs: 12, md: 6 }}>
                       <FormLabel>{hash.toUpperCase()}</FormLabel>
                       <TextField
-                        error={!!(badlist?.hashes[hash] && !badlist?.hashes[hash].match(HASH_MAP[hash]))}
-                        value={badlist?.hashes[hash]}
+                        error={!!(safelist?.hashes[hash] && !safelist?.hashes[hash].match(HASH_MAP[hash]))}
+                        value={safelist?.hashes[hash]}
                         onChange={event =>
-                          setBadlist({ ...badlist, hashes: { ...badlist.hashes, [hash]: event.target.value } })
+                          setSafelist({ ...safelist, hashes: { ...safelist.hashes, [hash]: event.target.value } })
                         }
                         variant="outlined"
                         size="small"
@@ -329,8 +370,8 @@ export const ManageBadlistAddPage = memo(() => {
             </Grid>
           </>
         )}
-        {badlist?.type && (
-          <Grid container size={{ xs: 12 }} width="100%" paddingTop={theme.spacing(2)}>
+        {safelist?.type && (
+          <Grid container size={{ xs: 12 }} paddingTop={theme.spacing(2)}>
             <Typography variant="h6">{t('details')}</Typography>
             <Grid container spacing={1} width="100%">
               <Grid size={{ xs: 12, md: 9 }}>
@@ -338,27 +379,30 @@ export const ManageBadlistAddPage = memo(() => {
                   <FormLabel id="reason-label">{t('reason.title')}</FormLabel>
                   <TextField
                     aria-labelledby="reason-label"
-                    value={badlist.sources[0].reason}
+                    value={safelist.sources[0].reason}
                     onChange={event =>
-                      setBadlist({ ...badlist, sources: [{ ...badlist.sources[0], reason: [event.target.value] }] })
+                      setSafelist({ ...safelist, sources: [{ ...safelist.sources[0], reason: [event.target.value] }] })
                     }
                     variant="outlined"
                     size="small"
                     fullWidth
                     InputProps={{
-                      // TODO: add paddingRight: theme.spacing(0.5) to end adornedEnd
                       endAdornment: (
                         <Classification
                           type="picker"
-                          c12n={badlist.sources[0].classification}
+                          c12n={safelist.sources[0].classification}
                           setClassification={classification =>
-                            setBadlist({
-                              ...badlist,
-                              sources: [{ ...badlist.sources[0], classification: classification }]
+                            setSafelist({
+                              ...safelist,
+                              sources: [{ ...safelist.sources[0], classification: classification }]
                             })
                           }
                         />
                       )
+                      // TODO
+                      // classes: {
+                      //   adornedEnd: classes.endAdornment
+                      // }
                     }}
                   />
                 </FormControl>
@@ -368,8 +412,8 @@ export const ManageBadlistAddPage = memo(() => {
                   <FormLabel id="expiry_ts-label">{t('expiry.title')}</FormLabel>
                   <DatePicker
                     aria-labelledby="expiry_ts-label"
-                    date={badlist.expiry_ts}
-                    setDate={date => setBadlist({ ...badlist, expiry_ts: date })}
+                    date={safelist.expiry_ts}
+                    setDate={date => setSafelist({ ...safelist, expiry_ts: date })}
                     type="input"
                     minDateTomorrow
                   />
@@ -378,64 +422,22 @@ export const ManageBadlistAddPage = memo(() => {
             </Grid>
           </Grid>
         )}
-        {badlist?.type && (
-          <>
-            <Grid container size={{ xs: 12 }} width="100%" paddingTop={theme.spacing(2)}>
-              <Typography variant="h6">{t('attribution')}</Typography>
-              <Grid container spacing={1} width="100%" paddingLeft={theme.spacing(1)}>
-                {ATTRIBUTION_TYPES.map((atype, idx) => (
-                  <Grid key={idx} size={{ xs: 12, md: 6 }}>
-                    <FormLabel id="tag-value-label">{t(`attribution.${atype}.title`)}</FormLabel>
-                    <Autocomplete
-                      size="small"
-                      multiple
-                      freeSolo
-                      options={[]}
-                      value={badlist.attribution[atype]}
-                      renderInput={params => <TextField {...params} />}
-                      renderTags={(value, getTagProps) =>
-                        value.map((option, index) => (
-                          <Chip
-                            key={index}
-                            size="small"
-                            variant="outlined"
-                            label={option}
-                            {...getTagProps({ index })}
-                          />
-                        ))
-                      }
-                      onChange={(_, value) =>
-                        setBadlist({
-                          ...badlist,
-                          attribution: {
-                            ...badlist.attribution,
-                            [atype]: [...new Set(value.map(x => x.toUpperCase()))]
-                          }
-                        })
-                      }
-                    />
-                  </Grid>
-                ))}
-              </Grid>
-            </Grid>
-          </>
-        )}
       </Grid>
     </PageFullWidth>
   );
 });
 
-export const ManageBadlistAddRoute = createAppRoute({
+export const ManageSafelistAddRoute = createAppRoute({
   title: {
     ns: 'app',
-    key: 'drawer.manage.badlist.add'
+    key: 'drawer.manage.safelist.add'
   },
   icon: {
     primary: <BugReportOutlinedIcon />
   },
-  ancestor: '/manage',
-  component: ManageBadlistAddPage,
-  path: '/manage/badlist/add',
+  ancestor: '/manage/safelists',
+  component: ManageSafelistAddPage,
+  path: '/manage/safelist/add',
 
-  forbidden: s => !s.user.roles.includes('badlist_view')
+  forbidden: s => !s.user.roles.includes('safelist_view')
 });

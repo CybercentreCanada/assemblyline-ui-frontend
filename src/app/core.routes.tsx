@@ -35,6 +35,9 @@ import { ManageBadlistDetailRoute } from 'routes/manage-badlist-detail/manage-ba
 import { ManageBadlistsRoute } from 'routes/manage-badlists/manage-badlists.route';
 import { ManageHeuristicDetailRoute } from 'routes/manage-heuristic-detail/manage-heuristic-detail.route';
 import { ManageHeuristicsRoute } from 'routes/manage-heuristics/manage-heuristics.route';
+import { ManageSafelistAddRoute } from 'routes/manage-safelist-add/manage-safelist-add.route';
+import { ManageSafelistDetailRoute } from 'routes/manage-safelist-detail/manage-safelist-detail.route';
+import { ManageSafelistsRoute } from 'routes/manage-safelists/manage-safelists.route';
 import { MissingNodeRoute } from 'routes/missing-node/missing-node.route';
 import { NotFoundRoute } from 'routes/not-found/not-found.route';
 import { SearchRootRoute, SearchRoute } from 'routes/search/search.route';
@@ -100,6 +103,9 @@ export const APP_ROUTES = [
   ManageBadlistsRoute,
   ManageHeuristicDetailRoute,
   ManageHeuristicsRoute,
+  ManageSafelistAddRoute,
+  ManageSafelistDetailRoute,
+  ManageSafelistsRoute,
   MissingNodeRoute,
   NotFoundRoute,
   QuotaRoute,

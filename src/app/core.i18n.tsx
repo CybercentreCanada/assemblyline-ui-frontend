@@ -78,6 +78,12 @@ import manageHeuristicDetailEN from 'routes/manage-heuristic-detail/manage-heuri
 import manageHeuristicDetailFR from 'routes/manage-heuristic-detail/manage-heuristic-detail.i18n.fr.json';
 import manageHeuristicsEN from 'routes/manage-heuristics/manage-heuristics.i18n.en.json';
 import manageHeuristicsFR from 'routes/manage-heuristics/manage-heuristics.i18n.fr.json';
+import manageSafelistAddEN from 'routes/manage-safelist-add/manage-safelist-add.i18n.en.json';
+import manageSafelistAddFR from 'routes/manage-safelist-add/manage-safelist-add.i18n.fr.json';
+import manageSafelistDetailEN from 'routes/manage-safelist-detail/manage-safelist-detail.i18n.en.json';
+import manageSafelistDetailFR from 'routes/manage-safelist-detail/manage-safelist-detail.i18n.fr.json';
+import manageSafelistsEN from 'routes/manage-safelists/manage-safelists.i18n.en.json';
+import manageSafelistsFR from 'routes/manage-safelists/manage-safelists.i18n.fr.json';
 import missingNodeEN from 'routes/missing-node/missing-node.i18n.en.json';
 import missingNodeFR from 'routes/missing-node/missing-node.i18n.fr.json';
 import notFoundEN from 'routes/not-found/not-found.i18n.en.json';
@@ -138,6 +144,9 @@ export const I18N_RESSOURCES = {
     manageBadlists: manageBadlistsEN,
     manageHeuristicDetail: manageHeuristicDetailEN,
     manageHeuristics: manageHeuristicsEN,
+    manageSafelistAdd: manageSafelistAddEN,
+    manageSafelistDetail: manageSafelistDetailEN,
+    manageSafelists: manageSafelistsEN,
     missingNode: missingNodeEN,
     notifications: notificationsEN,
     quota: quotaEN,
@@ -187,6 +196,9 @@ export const I18N_RESSOURCES = {
     manageBadlists: manageBadlistsFR,
     manageHeuristicDetail: manageHeuristicDetailFR,
     manageHeuristics: manageHeuristicsFR,
+    manageSafelistAdd: manageSafelistAddFR,
+    manageSafelistDetail: manageSafelistDetailFR,
+    manageSafelists: manageSafelistsFR,
     missingNode: missingNodeFR,
     notifications: notificationsFR,
     quota: quotaFR,

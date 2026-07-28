@@ -70,7 +70,7 @@ export const SafelistTable = memo(
             {safelistResults.items.map((sl_item, i) => (
               <LinkRow
                 key={`${sl_item.id}-${i}`}
-                nav={nav => nav.to().create({ route: '/manage/safelist/:id', path: { id: sl_item.id } })}
+                nav={nav => nav.to().create({ route: '/manage/safelist/detail/:id', path: { id: sl_item.id } })}
                 navDeps={[sl_item.id]}
                 onClick={event => onRowClick(event, sl_item)}
                 hover
