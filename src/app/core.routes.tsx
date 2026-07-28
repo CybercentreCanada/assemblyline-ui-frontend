@@ -2,13 +2,13 @@ import { CrashRoute } from 'core/error/error.route';
 import { LockedRoute } from 'layout/auth/locked/locked.route';
 import { QuotaRoute } from 'layout/auth/quota/quota.route';
 import { ToSRoute } from 'layout/auth/terms-of-service/terms-of-service.route';
-import { AccountRoute } from 'routes/account/account.route';
 import { AdminActionsRoute } from 'routes/admin-actions/admin-actions.route';
 import { AdminAPIKeyDetailRoute } from 'routes/admin-api-key-detail/admin-api-key-detail.route';
 import { AdminAPIKeysRoute } from 'routes/admin-api-keys/admin-api-keys.route';
 import { AdminErrorDetailRoute } from 'routes/admin-error-detail/admin-error-detail.route';
 import { AdminErrorViewerRoute } from 'routes/admin-error-viewer/admin-error-viewer.route';
 import { AdminIdentifyRoute } from 'routes/admin-identify/admin-identify.route';
+import { AdminUsersRoute } from 'routes/admin-users/admin-users.route';
 import { AlertDetailRoute } from 'routes/alert-detail/alert-detail.route';
 import { AlertRedirectRoute } from 'routes/alert-redirect/alert-redirect.route';
 import { AlertsRoute } from 'routes/alerts/alerts.route';
@@ -34,7 +34,7 @@ import { SubmissionRedirectRoute } from 'routes/submission-redirect/submission-r
 import { SubmissionReportRoute } from 'routes/submission-report/submission-report.route';
 import { SubmissionsRoute } from 'routes/submissions/submissions.route';
 import { SubmitRoute } from 'routes/submit/submit.route';
-import { UserRoute } from 'routes/user/user.route';
+import { AccountRoute, AdminUserDetailRoute } from 'routes/user/user.route';
 
 export const APP_ROUTES = [
   // Old
@@ -58,6 +58,8 @@ export const APP_ROUTES = [
   AdminErrorDetailRoute,
   AdminErrorViewerRoute,
   AdminIdentifyRoute,
+  AdminUserDetailRoute,
+  AdminUsersRoute,
   AlertDetailRoute,
   AlertRedirectRoute,
   AlertsRoute,
@@ -90,8 +92,7 @@ export const APP_ROUTES = [
   SubmissionReportRoute,
   SubmissionsRoute,
   SubmitRoute,
-  ToSRoute,
-  UserRoute
+  ToSRoute
 ] as const;
 
 declare global {

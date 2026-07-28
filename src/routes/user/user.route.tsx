@@ -26,16 +26,14 @@ import {
 import Autocomplete from '@mui/material/Autocomplete';
 import { red } from '@mui/material/colors';
 import Skeleton from '@mui/material/Skeleton';
-import { PageCenter } from '@tui/core';
-import { useAppNavigate } from 'core/router';
-import { createAppRoute } from 'core/routes';
+import { useAppBlocker, useAppNavigate } from 'core/router';
+import { createAppRoute, useAppPathParams } from 'core/routes';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import useMySnackbar from 'deprecated/hooks/useMySnackbar';
 import type { User } from 'models/base/user';
 import React, { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate, useLocation, useParams } from 'react-router';
 import APIKeys from 'routes/user/components/api_keys';
 import Apps from 'routes/user/components/apps';
 import DisableOTP from 'routes/user/components/disable_otp';
@@ -44,6 +42,7 @@ import SecurityToken from 'routes/user/components/token';
 import Classification from 'ui/Classification';
 import ConfirmationDialog from 'ui/ConfirmationDialog';
 import CustomChip from 'ui/CustomChip';
+import { PageCenter } from 'ui/pages/PageCenter';
 
 type ParsedUser = Omit<
   User,
@@ -58,14 +57,6 @@ type ParsedUser = Omit<
   submission_async_quota?: User['submission_async_quota'] | string;
   submission_daily_quota?: User['submission_daily_quota'] | string;
   submission_quota?: User['submission_quota'] | string;
-};
-
-type UserProps = {
-  username?: string | null;
-};
-
-type ParamProps = {
-  id: string;
 };
 
 const DeleteButton = memo(
@@ -99,8 +90,7 @@ type UserPageProps = {
 export const UserPage = memo(({ username = null }: UserPageProps) => {
   const { t } = useTranslation(['user']);
   const theme = useTheme();
-  const { id } = useParams<ParamProps>();
-  const location = useLocation();
+  const id = useAppPathParams<'/user/:id'>()?.id;
   const inputRef = useRef(null);
   const navigate = useAppNavigate();
   const { apiCall } = useMyAPI();
@@ -123,6 +113,8 @@ export const UserPage = memo(({ username = null }: UserPageProps) => {
   const sp6 = theme.spacing(6);
 
   const classificationAliasesValues = useMemo(() => Object.entries(classificationAliases), [classificationAliases]);
+
+  useAppBlocker(() => (modified ? 'unsaved_changes' : null), [modified]);
 
   const doDeleteUser = () => {
     apiCall({
@@ -313,9 +305,7 @@ export const UserPage = memo(({ username = null }: UserPageProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return !currentUser.is_admin && location.pathname.includes('/admin/') ? (
-    <Navigate to="/forbidden" replace />
-  ) : (
+  return (
     <PageCenter margin={4} width="100%">
       <React.Fragment key="right">
         <Drawer anchor="right" open={drawerOpen} onClose={() => setDrawerOpen(false)}>
@@ -1052,8 +1042,6 @@ export const UserPage = memo(({ username = null }: UserPageProps) => {
             </TableContainer>
           )}
 
-          {/* <RouterPrompt when={modified} /> */}
-
           {user && modified ? (
             <div
               style={{
@@ -1081,21 +1069,49 @@ export const UserPage = memo(({ username = null }: UserPageProps) => {
 });
 
 //*****************************************************************************************
-// Forbidden Route
+// Admin User Detail Route
 //*****************************************************************************************
 
-export const UserRoute = createAppRoute({
+export const AdminUserDetailRoute = createAppRoute({
   title: {
     ns: 'app',
-    key: 'adminmenu.users'
+    key: '{:id}'
   },
   icon: {
     primary: <AccountCircleOutlinedIcon />
   },
   ancestor: '/users',
   component: UserPage,
-  path: '/user/:id',
+  path: '/admin/users/:id',
   params: s => ({
     id: s.string()
-  })
+  }),
+
+  forbidden: s => !s.user.is_admin
+});
+
+//*****************************************************************************************
+// Admin User Detail Route
+//*****************************************************************************************
+
+export const AccountPage = memo(() => {
+  const { user: currentUser } = useALContext();
+  return <UserPage username={currentUser.username} />;
+});
+
+AccountPage.displayName = 'AccountPage';
+
+export const AccountRoute = createAppRoute({
+  title: {
+    ns: 'app',
+    key: 'usermenu.account'
+  },
+  icon: {
+    primary: <AccountCircleOutlinedIcon />
+  },
+  ancestor: null,
+  component: AccountPage,
+  path: '/account',
+
+  forbidden: s => !s.user.roles.includes('self_manage')
 });
