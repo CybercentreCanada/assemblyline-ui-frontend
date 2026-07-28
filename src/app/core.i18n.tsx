@@ -84,6 +84,10 @@ import manageSafelistDetailEN from 'routes/manage-safelist-detail/manage-safelis
 import manageSafelistDetailFR from 'routes/manage-safelist-detail/manage-safelist-detail.i18n.fr.json';
 import manageSafelistsEN from 'routes/manage-safelists/manage-safelists.i18n.en.json';
 import manageSafelistsFR from 'routes/manage-safelists/manage-safelists.i18n.fr.json';
+import manageSignatureDetailEN from 'routes/manage-signature-detail/manage-signature-detail.i18n.en.json';
+import manageSignatureDetailFR from 'routes/manage-signature-detail/manage-signature-detail.i18n.fr.json';
+import manageSignaturesEN from 'routes/manage-signatures/manage-signatures.i18n.en.json';
+import manageSignaturesFR from 'routes/manage-signatures/manage-signatures.i18n.fr.json';
 import manageWorkflowDetailEN from 'routes/manage-workflow-detail/manage-workflow-detail.i18n.en.json';
 import manageWorkflowDetailFR from 'routes/manage-workflow-detail/manage-workflow-detail.i18n.fr.json';
 import manageWorkflowsEN from 'routes/manage-workflows/manage-workflows.i18n.en.json';
@@ -151,6 +155,8 @@ export const I18N_RESSOURCES = {
     manageSafelistAdd: manageSafelistAddEN,
     manageSafelistDetail: manageSafelistDetailEN,
     manageSafelists: manageSafelistsEN,
+    manageSignatureDetail: manageSignatureDetailEN,
+    manageSignatures: manageSignaturesEN,
     manageWorkflowDetail: manageWorkflowDetailEN,
     manageWorkflows: manageWorkflowsEN,
     missingNode: missingNodeEN,
@@ -205,6 +211,8 @@ export const I18N_RESSOURCES = {
     manageSafelistAdd: manageSafelistAddFR,
     manageSafelistDetail: manageSafelistDetailFR,
     manageSafelists: manageSafelistsFR,
+    manageSignatureDetail: manageSignatureDetailFR,
+    manageSignatures: manageSignaturesFR,
     manageWorkflowDetail: manageWorkflowDetailFR,
     manageWorkflows: manageWorkflowsFR,
     missingNode: missingNodeFR,

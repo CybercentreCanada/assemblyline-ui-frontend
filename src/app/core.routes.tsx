@@ -39,6 +39,11 @@ import { ManageSafelistAddRoute } from 'routes/manage-safelist-add/manage-safeli
 import { ManageSafelistDetailRoute } from 'routes/manage-safelist-detail/manage-safelist-detail.route';
 import { ManageSafelistsRoute } from 'routes/manage-safelists/manage-safelists.route';
 import {
+  ManageSignatureDetailRoute,
+  ManageSignatureDetailRoute2
+} from 'routes/manage-signature-detail/manage-signature-detail.route';
+import { ManageSignaturesRoute } from 'routes/manage-signatures/manage-signatures.route';
+import {
   ManageWorkflowCreateRootRoute,
   ManageWorkflowCreateRoute
 } from 'routes/manage-workflow-create/manage-workflow-create.route';
@@ -112,6 +117,9 @@ export const APP_ROUTES = [
   ManageSafelistAddRoute,
   ManageSafelistDetailRoute,
   ManageSafelistsRoute,
+  ManageSignatureDetailRoute,
+  ManageSignatureDetailRoute2,
+  ManageSignaturesRoute,
   ManageWorkflowCreateRootRoute,
   ManageWorkflowCreateRoute,
   ManageWorkflowDetailRoute,

@@ -77,7 +77,7 @@ export const SignaturesTable = memo(
             {signatureResults.items.map((signature, i) => (
               <LinkRow
                 key={`${signature.id}-${i}`}
-                nav={nav => nav.to().create({ route: '/manage/signature/:id', path: { id: signature.id } })}
+                nav={nav => nav.to().create({ route: '/manage/signature/detail/:id', path: { id: signature.id } })}
                 navDeps={[signature.id]}
                 onClick={event => onRowClick(event, signature)}
                 hover
