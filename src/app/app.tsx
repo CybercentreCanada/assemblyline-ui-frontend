@@ -17,7 +17,7 @@ import { AppLocationParamProvider, AppLocationParamStoreProvider } from 'core/ro
 import { AppSnackbarProvider } from 'core/snackbar';
 import { AppTemplateLayout, AppTemplateProvider } from 'core/template';
 import { AppThemeProvider } from 'core/theme';
-import { AssistantProvider } from 'layout/assistant';
+import { AppAssistantLayout, AppAssistantProvider, AppAssistantStoreProvider } from 'layout/assistant';
 import { AppAuthLayout } from 'layout/auth';
 import { AppCarouselProvider } from 'layout/carousel';
 import { AppDrawerLayout } from 'layout/drawer';
@@ -120,13 +120,15 @@ import { memo, StrictMode } from 'react';
 
 export const AppLayout = memo(() => (
   <AppAuthLayout>
-    <AppRouterLayout>
-      <AppDrawerLayout content={<AppRouterPanelLayout panelKey={1} />}>
-        <AppTemplateLayout>
-          <AppRouterPanelLayout panelKey={0} />
-        </AppTemplateLayout>
-      </AppDrawerLayout>
-    </AppRouterLayout>
+    <AppAssistantLayout>
+      <AppRouterLayout>
+        <AppDrawerLayout content={<AppRouterPanelLayout panelKey={1} />}>
+          <AppTemplateLayout>
+            <AppRouterPanelLayout panelKey={0} />
+          </AppTemplateLayout>
+        </AppDrawerLayout>
+      </AppRouterLayout>
+    </AppAssistantLayout>
   </AppAuthLayout>
 ));
 
@@ -142,7 +144,7 @@ const AppProviders = memo(({ children }: PropsWithChildren) => (
       <AppErrorProvider>
         <AppSnackbarProvider>
           <AppApiProvider>
-            <AssistantProvider>
+            <AppAssistantProvider>
               <AppRouterProvider>
                 <AppNavigationProvider>
                   <AppLocationParamProvider appRoutes={APP_ROUTES}>
@@ -152,7 +154,7 @@ const AppProviders = memo(({ children }: PropsWithChildren) => (
                   </AppLocationParamProvider>
                 </AppNavigationProvider>
               </AppRouterProvider>
-            </AssistantProvider>
+            </AppAssistantProvider>
           </AppApiProvider>
         </AppSnackbarProvider>
       </AppErrorProvider>
@@ -173,7 +175,9 @@ const AppStores = memo(({ children }: PropsWithChildren) => (
         <AppRouterStoreProvider>
           <AppNavigationStoreProvider>
             <AppLocationParamStoreProvider>
-              <>{children}</>
+              <AppAssistantStoreProvider>
+                <>{children}</>
+              </AppAssistantStoreProvider>
             </AppLocationParamStoreProvider>
           </AppNavigationStoreProvider>
         </AppRouterStoreProvider>

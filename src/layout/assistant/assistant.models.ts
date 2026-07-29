@@ -7,7 +7,7 @@ export type AssistantContextProps = {
   hasInsights: boolean;
   addInsight: (insigh: AssistantInsightProps) => void;
   removeInsight: (insigh: AssistantInsightProps) => void;
-  toggleAssistant: (event: any) => void;
+  toggleAssistant: () => void;
 };
 
 export type AssistantInsightProps = {

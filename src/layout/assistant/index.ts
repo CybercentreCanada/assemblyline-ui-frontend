@@ -5,4 +5,5 @@ export type {
   AssistantProviderProps,
   ContextMessageProps
 } from './assistant.models';
-export { default as AppAssistantLayout, AssistantContext, default as AssistantProvider } from './assistant.providers';
+export { AppAssistantContext, AppAssistantLayout, AppAssistantProvider } from './assistant.providers';
+export { AppAssistantStoreProvider, useAppAssistantStore, useAppAssistantStoreApi } from './assistant.store';
