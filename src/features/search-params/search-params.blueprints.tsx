@@ -667,8 +667,11 @@ export class ObjectSearchParamBlueprint<
   private isShape(value: unknown): value is O[string] {
     return (
       this.isPrimitive(value) ||
-      this.isFlatObject(value) ||
-      (Array.isArray(value) && value.every(v => this.isPrimitive(v)))
+      (Array.isArray(value) && value.every(v => this.isShape(v))) ||
+      (typeof value === 'object' &&
+        value !== null &&
+        !Array.isArray(value) &&
+        Object.values(value).every(v => this.isShape(v)))
     );
   }
 
@@ -687,7 +690,7 @@ export class ObjectSearchParamBlueprint<
 
   private mergeValue(base: O, next: O): O {
     if (!this.isObjectValue(next)) {
-      return this.clone(base);
+      return this.clone(next);
     }
 
     const merged = this.clone(base) as unknown as Record<string, unknown>;
@@ -823,6 +826,13 @@ export class ObjectSearchParamBlueprint<
     if (value === null || value === undefined) {
       if (!this.isEqual(this._defaultValue, null)) {
         (prev as Record<string, SearchParamValue>)[this._key] = null;
+      }
+      return prev;
+    }
+
+    if (!this.isObjectValue(value)) {
+      if (!this.isEqual(this._defaultValue, value)) {
+        (prev as Record<string, SearchParamValue>)[this._key] = value;
       }
       return prev;
     }

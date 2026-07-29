@@ -1,4 +1,4 @@
-import { findNode, findPageKeyFromPanelKey, useAppRouterStore } from 'core/router';
+import { findNode, findNodeFromKey, findPageKeyFromPanelKey, useAppRouterStore } from 'core/router';
 import { AppPageKeyProvider, AppRouteLayoutProvider, findAppRouteFromKey, useAppLocationParamStore } from 'core/routes';
 import { InPortal, OutPortal } from 'features/portal';
 import type { PropsWithChildren } from 'react';
@@ -40,12 +40,11 @@ export type AppRouterNodeLayoutProps = {
 };
 
 export const AppRouterNodeLayout = memo(({ nodeKey }: AppRouterNodeLayoutProps) => {
-  const pageKey = useAppRouterStore(s => s?.nodes?.[nodeKey]?.pageKey || undefined);
-  const portal = useAppRouterStore(s => s?.nodes?.[nodeKey]?.portal || undefined);
+  const node = useAppRouterStore(s => findNodeFromKey(s, nodeKey));
 
-  return !pageKey ? null : (
-    <InPortal node={portal}>
-      <AppRouterPageLayout pageKey={pageKey} />
+  return !node.pageKey ? null : (
+    <InPortal node={node.portal}>
+      <AppRouterPageLayout pageKey={node.pageKey} />
     </InPortal>
   );
 });

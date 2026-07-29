@@ -64,6 +64,7 @@ export {
   filterPanelMissingPageKeys,
   findNextPanelKeyFromPageKey,
   findNode,
+  findNodeFromKey,
   findNodeKey,
   findOldestNodeKey,
   findPageKeyFromPanelKey,

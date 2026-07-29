@@ -18,7 +18,7 @@ export type EnumParamValue = string | number | boolean;
 
 export type ObjectParamPrimitive = string | number | boolean | null;
 
-export type ObjectParamShape = ObjectParamPrimitive | { [key: string]: ObjectParamPrimitive } | ObjectParamPrimitive[];
+export type ObjectParamShape = ObjectParamPrimitive | ObjectParamShape[] | { [key: string]: ObjectParamShape };
 
 export type ObjectParamValue = Record<string, ObjectParamShape>;
 

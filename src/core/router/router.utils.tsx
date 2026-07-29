@@ -511,6 +511,11 @@ export const findNode = (store: AppRouterStore, partialNode: Partial<AppRouterNo
   return store.nodes?.[nodeKey] ?? null;
 };
 
+export const findNodeFromKey = (store: AppRouterStore, nodeKey: string): AppRouterNode => {
+  if (nodeKey in (store?.nodes || {})) return store.nodes[nodeKey];
+  return getDefaultRouterNode();
+};
+
 /**
  * @name removeNode
  * @description Removes a node from the store.
