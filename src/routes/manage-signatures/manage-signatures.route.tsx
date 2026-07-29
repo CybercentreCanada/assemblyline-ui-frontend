@@ -124,7 +124,11 @@ export const ManageSignaturesPage = memo(() => {
                 ? t(`filtered${signatureResults?.total === 1 ? '' : 's'}`)
                 : t(`total${signatureResults?.total === 1 ? '' : 's'}`)
             }
-            onChange={v => ManageSignaturesRoute.search.delta(v).toObject()}
+            onChange={v =>
+              navigate
+                .here()
+                .update(s => ({ ...s, search: { ...s.search, ...ManageSignaturesRoute.search.delta(v).toObject() } }))
+            }
             paramDefaults={search.defaults().toObject()}
             searchInputProps={{ placeholder: t('filter'), options: suggestions }}
             actionProps={[

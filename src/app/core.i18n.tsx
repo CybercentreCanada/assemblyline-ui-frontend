@@ -96,6 +96,8 @@ import missingNodeEN from 'routes/missing-node/missing-node.i18n.en.json';
 import missingNodeFR from 'routes/missing-node/missing-node.i18n.fr.json';
 import notFoundEN from 'routes/not-found/not-found.i18n.en.json';
 import notFoundFR from 'routes/not-found/not-found.i18n.fr.json';
+import retrohuntEN from 'routes/retrohunt/retrohunt.i18n.en.json';
+import retrohuntFR from 'routes/retrohunt/retrohunt.i18n.fr.json';
 import searchEN from 'routes/search/search.i18n.en.json';
 import searchFR from 'routes/search/search.i18n.fr.json';
 import settingsEN from 'routes/settings/settings.i18n.en.json';
@@ -162,6 +164,7 @@ export const I18N_RESSOURCES = {
     missingNode: missingNodeEN,
     notifications: notificationsEN,
     quota: quotaEN,
+    retrohunt: retrohuntEN,
     router: routerEN,
     search: searchEN,
     settings: settingsEN,
@@ -218,6 +221,7 @@ export const I18N_RESSOURCES = {
     missingNode: missingNodeFR,
     notifications: notificationsFR,
     quota: quotaFR,
+    retrohunt: retrohuntFR,
     router: routerFR,
     search: searchFR,
     settings: settingsFR,

@@ -184,7 +184,9 @@ export const AdminErrorViewerPage = memo(() => {
                 : t(`total${errorResults?.total === 1 ? '' : 's'}`)
             }
             onChange={v =>
-              navigate.here().update(s => ({ ...s, search: AdminErrorViewerRoute.search.full(v).toObject() }))
+              navigate
+                .here()
+                .update(s => ({ ...s, search: { ...s.search, ...AdminErrorViewerRoute.search.full(v).toObject() } }))
             }
             searchInputProps={{ placeholder: t('filter'), options: suggestions }}
             actionProps={[

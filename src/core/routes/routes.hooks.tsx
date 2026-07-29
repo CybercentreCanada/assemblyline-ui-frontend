@@ -18,6 +18,7 @@ import type {
 import {
   evaluateMediaQuery,
   findAppRouteFromKey,
+  getDefaultRouteParam,
   getRouteParamFromKey,
   parseMediaQuery,
   useAppLocationParamStore,
@@ -82,14 +83,13 @@ export const useAppLocation = function <const Origin extends AppRoute['path']>(
   });
 
   const param = useAppLocationParamStore(s =>
-    !targetRouteKey ? null : getRouteParamFromKey<Origin>(s, targetRouteKey)
+    !targetRouteKey ? getDefaultRouteParam<Origin>() : getRouteParamFromKey<Origin>(s, targetRouteKey)
   );
 
   return function <Selected = InferAppLocationFromPath<Origin>>(
-    selector?: (location: InferAppLocationFromPath<Origin>) => Selected
-  ): Selected | InferAppLocationFromPath<Origin> | null {
-    if (param == null) return null;
-    return selector ? selector(param) : param;
+    selector: (location: InferAppLocationFromPath<Origin>) => Selected = param => param as Selected
+  ): Selected {
+    return selector(param);
   };
 };
 

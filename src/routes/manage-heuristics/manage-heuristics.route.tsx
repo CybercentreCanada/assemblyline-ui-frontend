@@ -1,6 +1,7 @@
 import SimCardOutlinedIcon from '@mui/icons-material/SimCardOutlined';
 import { useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
+import { useAppNavigate } from 'core/router';
 import { createAppRoute, useAppSearchSnapshot } from 'core/routes';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
@@ -18,6 +19,7 @@ import SearchHeader from 'ui/SearchBar/SearchHeader';
 export const ManageHeuristicsPage = memo(() => {
   const { t } = useTranslation(['manageHeuristics']);
   const theme = useTheme();
+  const navigate = useAppNavigate<'/manage/heuristics'>();
   const { apiCall } = useMyAPI();
   const { indexes, user: currentUser } = useALContext();
   const search = useAppSearchSnapshot<'/manage/heuristics'>();
@@ -69,7 +71,11 @@ export const ManageHeuristicsPage = memo(() => {
                 ? t(`filtered${heuristicResults?.total === 1 ? '' : 's'}`)
                 : t(`total${heuristicResults?.total === 1 ? '' : 's'}`)
             }
-            onChange={v => ManageHeuristicsRoute.search.delta(v).toObject()}
+            onChange={v =>
+              navigate
+                .here()
+                .update(s => ({ ...s, search: { ...s.search, ...ManageHeuristicsRoute.search.delta(v).toObject() } }))
+            }
             paramDefaults={search.defaults().toObject()}
             searchInputProps={{ placeholder: t('filter'), options: suggestions }}
           />

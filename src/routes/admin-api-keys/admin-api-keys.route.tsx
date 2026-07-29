@@ -118,7 +118,11 @@ export const AdminAPIKeysPage = React.memo(() => {
                 ? t(`filtered${apikeySearchResults?.total === 1 ? '' : 's'}`)
                 : t(`total${apikeySearchResults?.total === 1 ? '' : 's'}`)
             }
-            onChange={v => navigate.here().update(s => ({ ...s, search: AdminAPIKeysRoute.search.full(v).toObject() }))}
+            onChange={v =>
+              navigate
+                .here()
+                .update(s => ({ ...s, search: { ...s.search, ...AdminAPIKeysRoute.search.full(v).toObject() } }))
+            }
             paramDefaults={search.defaults().toObject()}
             searchInputProps={{ placeholder: t('filter'), options: suggestions }}
             actionProps={[

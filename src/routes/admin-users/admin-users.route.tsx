@@ -111,7 +111,11 @@ export const AdminUsersPage = memo(() => {
                 ? t(`filtered${userResults?.total === 1 ? '' : 's'}`)
                 : t(`total${userResults?.total === 1 ? '' : 's'}`)
             }
-            onChange={v => navigate.here().update(s => ({ ...s, search: AdminUsersRoute.search.full(v).toObject() }))}
+            onChange={v =>
+              navigate
+                .here()
+                .update(s => ({ ...s, search: { ...s.search, ...AdminUsersRoute.search.full(v).toObject() } }))
+            }
             paramDefaults={search.defaults().toObject()}
             searchInputProps={{ placeholder: t('filter'), options: suggestions }}
             actionProps={[

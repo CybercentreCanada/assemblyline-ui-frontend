@@ -88,7 +88,11 @@ export const ManageBadlistsPage = memo(() => {
                 ? t(`filtered${badlists.data?.total === 1 ? '' : 's'}`)
                 : t(`total${badlists.data?.total === 1 ? '' : 's'}`)
             }
-            onChange={v => ManageBadlistsRoute.search.delta(v).toObject()}
+            onChange={v =>
+              navigate
+                .here()
+                .update(s => ({ ...s, search: { ...s.search, ...ManageBadlistsRoute.search.delta(v).toObject() } }))
+            }
             paramDefaults={search.defaults().toObject()}
             searchInputProps={{ placeholder: t('filter'), options: suggestions }}
             actionProps={[

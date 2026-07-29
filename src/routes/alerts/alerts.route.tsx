@@ -230,10 +230,9 @@ export const AlertsPage = memo(() => {
           placeholder={t('search.placeholder')}
           defaultValue={{ rows: 25 }}
           paramKeys={{ query: 'q' }}
-          onChange={v => {
-            // eslint-disable-next-line @typescript-eslint/no-use-before-define
-            navigate.here<'/alerts'>().update(s => ({ ...s, search: AlertsRoute.search.delta(v).toObject() }));
-          }}
+          onChange={v =>
+            navigate.here().update(s => ({ ...s, search: { ...s.search, ...AlertsRoute.search.delta(v).toObject() } }))
+          }
           disableFilterList
           disablePagination
           disableTotalResults

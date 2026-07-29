@@ -51,6 +51,9 @@ import { ManageWorkflowDetailRoute } from 'routes/manage-workflow-detail/manage-
 import { ManageWorkflowsRoute } from 'routes/manage-workflows/manage-workflows.route';
 import { MissingNodeRoute } from 'routes/missing-node/missing-node.route';
 import { NotFoundRoute } from 'routes/not-found/not-found.route';
+import { RetrohuntCreateRoute } from 'routes/retrohunt-create/retrohunt-create.route';
+import { RetrohuntDetailRoute } from 'routes/retrohunt-detail/retrohunt-detail.route';
+import { RetrohuntRoute } from 'routes/retrohunt/retrohunt.route';
 import { SearchRootRoute, SearchRoute } from 'routes/search/search.route';
 import { SettingsRootRoute, SettingsRoute } from 'routes/settings/settings.route';
 import { SubmissionDetailRoute } from 'routes/submission-detail/submission-detail.route';
@@ -127,6 +130,9 @@ export const APP_ROUTES = [
   MissingNodeRoute,
   NotFoundRoute,
   QuotaRoute,
+  RetrohuntCreateRoute,
+  RetrohuntDetailRoute,
+  RetrohuntRoute,
   SearchRootRoute,
   SearchRoute,
   SettingsRootRoute,

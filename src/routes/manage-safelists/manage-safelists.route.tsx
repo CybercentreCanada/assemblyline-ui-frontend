@@ -119,7 +119,11 @@ export const ManageSafelistsPage = memo(() => {
                 ? t(`filtered${safelistResults?.total === 1 ? '' : 's'}`)
                 : t(`total${safelistResults?.total === 1 ? '' : 's'}`)
             }
-            onChange={v => ManageSafelistsRoute.search.delta(v).toObject()}
+            onChange={v =>
+              navigate
+                .here()
+                .update(s => ({ ...s, search: { ...s.search, ...ManageSafelistsRoute.search.delta(v).toObject() } }))
+            }
             paramDefaults={search.defaults().toObject()}
             searchInputProps={{ placeholder: t('filter'), options: suggestions }}
             actionProps={[

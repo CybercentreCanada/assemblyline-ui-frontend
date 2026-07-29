@@ -367,7 +367,9 @@ export function useAppNavigate<const Origin extends AppRoute['path']>() {
   );
 
   const here = useCallback(
-    function <const Destination extends AppRoute['path']>(options: AppNavigateOptions = getDefaultNavigateOptions()) {
+    function <const Destination extends AppRoute['path'] = Origin>(
+      options: AppNavigateOptions = getDefaultNavigateOptions()
+    ) {
       const routerState = getAppRouterStateFromApi(routerStoreApi);
 
       const originPanelKey = findPanelKeyFromPageKey(routerState, pageKey);
