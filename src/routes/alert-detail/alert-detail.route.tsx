@@ -1,6 +1,6 @@
+import BallotOutlinedIcon from '@mui/icons-material/BallotOutlined';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import BallotOutlinedIcon from '@mui/icons-material/BallotOutlined';
 import {
   Box,
   Button,
@@ -15,7 +15,7 @@ import {
 } from '@mui/material';
 import Alert from '@mui/material/Alert';
 import { Fetcher } from 'borealis-ui';
-import { createAppRoute } from 'core/routes';
+import { createAppRoute, useAppLocation, useAppPathParams, useAppSearchSnapshot } from 'core/routes';
 import ListCarousel from 'deprecated/components/lists/carousel/ListCarousel';
 import ListNavigator from 'deprecated/components/lists/navigator/ListNavigator';
 import useALContext from 'deprecated/hooks/useALContext';
@@ -23,11 +23,10 @@ import useClipboard from 'deprecated/hooks/useClipboard';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import { useAssistant } from 'layout/assistant';
 import type { AlertItem } from 'models/base/alert';
-import React, { memo, useCallback, useEffect, useState } from 'react';
+import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BsClipboard } from 'react-icons/bs';
-import { useParams } from 'react-router';
-import { ALERT_DEFAULT_PARAMS, ALERT_SIMPLELIST_ID } from 'routes/alerts/alerts.route';
+import { ALERT_SIMPLELIST_ID } from 'routes/alerts/alerts.route';
 import AlertActions, {
   AlertBadlist,
   AlertGroup,
@@ -44,7 +43,6 @@ import {
   AutoHideChipList,
   SkeletonInline
 } from 'routes/alerts/components/Components';
-import { SearchParamsProvider } from 'routes/alerts/contexts/SearchParamsContext';
 import { ForbiddenPage } from 'routes/forbidden/forbidden';
 import { verdictToColor } from 'shared/utils/utils';
 import { ActionableChipList } from 'ui/ActionableChipList';
@@ -89,45 +87,33 @@ const ClipboardIcon = memo(
   }))
 );
 
-type Params = {
-  id?: string;
-};
-
-type Props = {
-  id?: string;
-  alert?: AlertItem;
-  inDrawer?: boolean;
-  defaults?: string;
-  search?: string;
-};
-
-export const AlertDetailPage = memo(({ id: propId = null, alert: propAlert = null, inDrawer = false }: Props) => {
+export const AlertDetailPage = memo(() => {
   const { t } = useTranslation(['alerts']);
   const theme = useTheme();
   const { apiCall } = useMyAPI();
   const { copy } = useClipboard();
   const { addInsight, removeInsight } = useAssistant();
   const { c12nDef, configuration, user: currentUser } = useALContext();
-  const { id: paramId } = useParams<Params>();
+  const paramId = useAppPathParams<'/alert/:id'>()?.id;
+  const search = useAppSearchSnapshot<'/alert/:id'>();
+  const inDrawer = useAppLocation('from')(s => s.route === '/alerts');
 
-  const [alert, setAlert] = useState<AlertItem>(null);
+  const [fetchedAlert, setFetchedAlert] = useState<AlertItem>(null);
   const [metaOpen, setMetaOpen] = useState<boolean>(false);
 
   const upSM = useMediaQuery(theme.breakpoints.up('sm'));
 
+  const alert = useMemo(() => fetchedAlert || search.get('alert') || null, [fetchedAlert, search]);
+
   useEffect(() => {
-    if (!currentUser.roles.includes('alert_view')) {
-      return;
-    } else if (propAlert) {
-      setAlert(propAlert);
-    } else {
-      apiCall({
-        url: `/api/v4/alert/${inDrawer ? propId.split('?')[0] : paramId}/`,
-        onSuccess: ({ api_response }) => setAlert(api_response)
-      });
-    }
+    if (!currentUser.roles.includes('alert_view') || search.get('alert')) return;
+
+    apiCall({
+      url: `/api/v4/alert/${paramId}/`,
+      onSuccess: ({ api_response }) => setFetchedAlert(api_response)
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentUser.roles, inDrawer, paramId, propAlert, propId]);
+  }, [currentUser.roles, paramId]);
 
   useEffect(() => {
     if (alert) {
@@ -152,7 +138,7 @@ export const AlertDetailPage = memo(({ id: propId = null, alert: propAlert = nul
 
   useEffect(() => {
     const update = ({ detail }: CustomEvent<Partial<AlertItem>[]>) => {
-      setAlert(a => {
+      setFetchedAlert(a => {
         const item = detail.find(i => a.alert_id === i.alert_id);
         return item ? { ...a, ...item } : a;
       });
@@ -1024,15 +1010,7 @@ export const AlertDetailPage = memo(({ id: propId = null, alert: propAlert = nul
   );
 });
 
-const WrappedAlertDetailPage = memo((props: Props) => (
-  <SearchParamsProvider
-    defaultValue={ALERT_DEFAULT_PARAMS}
-    hidden={['rows', 'offset', 'tc_start', 'track_total_hits']}
-    enforced={['rows']}
-  >
-    <AlertDetailPage {...props} />
-  </SearchParamsProvider>
-));
+AlertDetailPage.displayName = 'AlertDetailPage';
 
 export const AlertDetailRoute = createAppRoute({
   title: {
@@ -1043,9 +1021,15 @@ export const AlertDetailRoute = createAppRoute({
     primary: <BallotOutlinedIcon />
   },
   ancestor: '/alerts',
-  component: WrappedAlertDetailPage,
+  component: memo(() => <AlertDetailPage />),
   path: '/alert/:id',
   params: s => ({
     id: s.string()
+  }),
+  search: s => ({
+    alert: s
+      .object(null as AlertItem)
+      .nullable()
+      .source('transient')
   })
 });

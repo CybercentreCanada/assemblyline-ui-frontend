@@ -18,14 +18,13 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
+import { useAppNavigate } from 'core/router';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import useMySnackbar from 'deprecated/hooks/useMySnackbar';
 import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { AlertSearchParams } from 'routes/alerts/alerts.route';
 import { useAlerts } from 'routes/alerts/contexts/AlertsContext';
-import { useSearchParams } from 'routes/alerts/contexts/SearchParamsContext';
 import { ChipList } from 'ui/ChipList';
 import Classification from 'ui/Classification';
 import ConfirmationDialog from 'ui/ConfirmationDialog';
@@ -59,7 +58,6 @@ type AddFavoriteProps = {
 const AddFavorite: React.FC<AddFavoriteProps> = React.memo(
   ({ favorite, global = false, show = true, onSuccess }: AddFavoriteProps) => {
     const { t } = useTranslation('favorites');
-    const theme = useTheme();
     const { apiCall } = useMyAPI();
     const { c12nDef, user: currentUser } = useALContext();
     const { showSuccessMessage, showErrorMessage } = useMySnackbar();
@@ -152,7 +150,6 @@ type UpdateFavoriteProps = {
 const UpdateFavorite: React.FC<UpdateFavoriteProps> = React.memo(
   ({ favorite, globalFavorites, userFavorites, global = false, show = true, onSuccess }: UpdateFavoriteProps) => {
     const { t } = useTranslation('favorites');
-    const theme = useTheme();
     const { apiCall } = useMyAPI();
     const { c12nDef, user: currentUser } = useALContext();
     const { showSuccessMessage, showErrorMessage } = useMySnackbar();
@@ -256,7 +253,6 @@ type DeleteFavoriteProps = {
 const DeleteFavorite: React.FC<DeleteFavoriteProps> = React.memo(
   ({ favorite, global = false, show = true, onSuccess }: DeleteFavoriteProps) => {
     const { t } = useTranslation('favorites');
-    const theme = useTheme();
     const { apiCall } = useMyAPI();
     const { user: currentUser } = useALContext();
     const { showSuccessMessage, showErrorMessage } = useMySnackbar();
@@ -332,11 +328,11 @@ const DeleteFavorite: React.FC<DeleteFavoriteProps> = React.memo(
 
 const WrappedAlertFavorites = () => {
   const { t } = useTranslation('favorites');
+  const navigate = useAppNavigate<'/alerts'>();
   const theme = useTheme();
   const { c12nDef } = useALContext();
   const { user: currentUser } = useALContext();
   const { userFavorites, globalFavorites, defaultFavorite, updateFavorite, deleteFavorite } = useAlerts();
-  const { setSearchObject } = useSearchParams<AlertSearchParams>();
 
   const [currentFavorite, setCurrentFavorite] = useState<Favorite>(defaultFavorite);
   const [currentGlobal, setCurrentGlobal] = useState<boolean>(false);
@@ -368,32 +364,41 @@ const WrappedAlertFavorites = () => {
 
   const handleUpdateFavorites = useCallback(
     (nextFavorite: Favorite, prevFavorite: Favorite, global: boolean) => {
-      setSearchObject(v => ({
-        ...v,
-        offset: 0,
-        fq: v.fq.map(f => (f !== prevFavorite.query ? f : nextFavorite.query))
+      navigate.here<'/alerts'>().update(s => ({
+        ...s,
+        search: {
+          ...s.search,
+          offset: 0,
+          fq: s.search.fq.map(f => (f !== prevFavorite.query ? f : nextFavorite.query))
+        }
       }));
       updateFavorite(nextFavorite, global);
       setCurrentFavorite(defaultFavorite);
     },
-    [defaultFavorite, setSearchObject, updateFavorite]
+    [defaultFavorite, navigate, updateFavorite]
   );
 
   const handleDeleteFavorites = useCallback(
     (favorite: Favorite, global: boolean) => {
-      setSearchObject(v => ({ ...v, offset: 0, fq: v.fq.filter(f => f !== favorite.query) }));
+      navigate.here<'/alerts'>().update(s => ({
+        ...s,
+        search: { ...s.search, offset: 0, fq: s.search.fq.filter(f => f !== favorite.query) }
+      }));
       deleteFavorite(favorite, global);
       setCurrentFavorite(defaultFavorite);
     },
-    [defaultFavorite, deleteFavorite, setSearchObject]
+    [defaultFavorite, deleteFavorite, navigate]
   );
 
   const handleFavoriteClick = useCallback(
     (favorite: Favorite) => {
-      setSearchObject(v => ({ ...v, offset: 0, fq: [...v.fq, favorite.query] }));
+      navigate.here<'/alerts'>().update(s => ({
+        ...s,
+        search: { ...s.search, offset: 0, fq: [...s.search.fq, favorite.query] }
+      }));
       setOpen(false);
     },
-    [setSearchObject]
+    [navigate]
   );
 
   const handleEditClick = useCallback(

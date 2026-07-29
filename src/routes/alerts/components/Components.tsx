@@ -23,7 +23,7 @@ import {
 } from '@mui/material';
 import type { AlertItem, DetailedItem } from 'models/base/alert';
 import type { ReactNode } from 'react';
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
 import { HiOutlineExternalLink } from 'react-icons/hi';
@@ -33,7 +33,6 @@ import { ActionableChipList } from 'ui/ActionableChipList';
 import type { ActionableCustomChipProps } from 'ui/ActionableCustomChip';
 import type { CustomChipProps } from 'ui/CustomChip';
 import CustomChip from 'ui/CustomChip';
-import type { GridLinkRowProps } from 'ui/GridTable';
 import { GridLinkRow, GridTable, GridTableBody, GridTableCell, GridTableHead, GridTableRow } from 'ui/GridTable';
 import Moment from 'ui/Moment';
 
@@ -354,23 +353,11 @@ export const AlertEventsTable: React.FC<AlertEventsTableProps> = React.memo(
     const { t } = useTranslation('alerts');
     const theme = useTheme();
 
-    const Row = useCallback<React.FC<GridLinkRowProps>>(
-      ({ to, children, ...others }) =>
-        to ? (
-          <GridLinkRow to={to} onClick={() => setViewHistory(false)} {...others}>
-            {children}
-          </GridLinkRow>
-        ) : (
-          <GridTableRow {...others}>{children}</GridTableRow>
-        ),
-      [setViewHistory]
-    );
-
     return (
       viewHistory && (
         <Dialog
           open={viewHistory}
-          onClose={(_event, reason) => setViewHistory(false)}
+          onClose={() => setViewHistory(false)}
           aria-labelledby="alert-dialog-title"
           aria-describedby="alert-dialog-description"
           maxWidth="xl"
@@ -406,15 +393,20 @@ export const AlertEventsTable: React.FC<AlertEventsTableProps> = React.memo(
                       .reverse()
                       .map((event, i) => {
                         return (
-                          <Row
+                          <GridLinkRow
                             key={`GridTable-row-${i}`}
                             hover
                             tabIndex={-1}
-                            to={
-                              event.entity_type === 'workflow' && event.entity_id !== 'DEFAULT'
-                                ? `/manage/workflow/detail/${event.entity_id}`
-                                : null
-                            }
+                            {...(event.entity_type === 'workflow' && event.entity_id !== 'DEFAULT'
+                              ? {
+                                  nav: nav =>
+                                    nav
+                                      .to()
+                                      .create({ route: '/manage/workflow/detail/:id', path: { id: event.entity_id } }),
+                                  navDeps: [event.entity_type, event.entity_id],
+                                  onClick: () => setViewHistory(false)
+                                }
+                              : null)}
                           >
                             <GridTableCell style={{ borderColor: theme.palette.divider }}>
                               <Tooltip title={event.ts}>
@@ -478,7 +470,7 @@ export const AlertEventsTable: React.FC<AlertEventsTableProps> = React.memo(
                                 </Tooltip>
                               ) : null}
                             </GridTableCell>
-                          </Row>
+                          </GridLinkRow>
                         );
                       })}
                   </GridTableBody>

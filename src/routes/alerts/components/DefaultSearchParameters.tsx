@@ -13,15 +13,13 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
+import { useAppSearchSnapshot } from 'core/routes';
 import useMySnackbar from 'deprecated/hooks/useMySnackbar';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { AlertSearchParams } from 'routes/alerts/alerts.route';
-import { ALERT_DEFAULT_PARAMS, ALERT_STORAGE_KEY } from 'routes/alerts/alerts.route';
+import { ALERT_STORAGE_KEY, AlertsRoute } from 'routes/alerts/alerts.route';
 import AlertFiltersSelected from 'routes/alerts/components/FiltersSelected';
-import { useSearchParams } from 'routes/alerts/contexts/SearchParamsContext';
-import type { SearchResult } from 'routes/alerts/utils/SearchParser';
-import { SearchParser } from 'routes/alerts/utils/SearchParser';
 
 const IGNORED_PARAMETERS: (keyof AlertSearchParams)[] = [
   'q',
@@ -37,36 +35,28 @@ const WrappedAlertDefaultSearchParameters = () => {
   const { t } = useTranslation('alerts');
   const theme = useTheme();
   const { showSuccessMessage } = useMySnackbar();
-  const { search } = useSearchParams<AlertSearchParams>();
+  const search = useAppSearchSnapshot<'/alerts'>();
 
   const [storageData, setStorageData] = useState<string>(null);
   const [open, setOpen] = useState<boolean>(false);
   const [fromStorage, seFromStorage] = useState<boolean>(() => !!localStorage.getItem(ALERT_STORAGE_KEY));
 
-  const parser = useMemo(() => new SearchParser<AlertSearchParams>(ALERT_DEFAULT_PARAMS, { enforced: ['rows'] }), []);
-
-  const defaults = useMemo<SearchResult<AlertSearchParams>>(
-    () => parser.fullParams(storageData).filter(k => ['fq', 'group_by', 'sort', 'tc'].includes(k)),
-    [parser, storageData]
+  const defaults = useMemo(
+    () => AlertsRoute.search.full(new URLSearchParams(storageData ?? '')).pick(['fq', 'group_by', 'sort', 'tc']),
+    [storageData]
   );
 
-  const filteredSearch = useMemo<SearchResult<AlertSearchParams>>(
-    () => search.filter(k => ['fq', 'group_by', 'sort', 'tc'].includes(k)),
-    [search]
-  );
+  const filteredSearch = useMemo(() => search.pick(['fq', 'group_by', 'sort', 'tc']), [search]);
 
   const isSameParams = useMemo<boolean>(
     () => filteredSearch.toString() === defaults.toString(),
     [defaults, filteredSearch]
   );
 
-  const onDefaultChange = useCallback(
-    (value: URLSearchParams) => {
-      const params = parser.deltaParams(value).filter(k => !IGNORED_PARAMETERS.includes(k));
-      localStorage.setItem(ALERT_STORAGE_KEY, params.toString());
-    },
-    [parser]
-  );
+  const onDefaultChange = useCallback((value: URLSearchParams) => {
+    const params = AlertsRoute.search.delta(value).omit(IGNORED_PARAMETERS);
+    localStorage.setItem(ALERT_STORAGE_KEY, params.toString());
+  }, []);
 
   const onDefaultClear = useCallback(() => {
     localStorage.removeItem(ALERT_STORAGE_KEY);

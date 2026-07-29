@@ -24,27 +24,26 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
+import type { InferAppNavigationPropsFromPath } from 'core/router';
+import { AppLink, useAppNavigate } from 'core/router';
+import { useAppSearchSnapshot } from 'core/routes';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import useMySnackbar from 'deprecated/hooks/useMySnackbar';
-import type { To } from 'history';
+import type { InferSearchParamValueMapFromEngine } from 'features/search-params';
 import type { AlertItem } from 'models/base/alert';
-import type { CSSProperties } from 'react';
+import type { CSSProperties, PropsWithChildren } from 'react';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
-import { useLocation } from 'react-router';
-import { Link } from 'react-router-dom';
-import type { AlertSearchParams } from 'routes/alerts/alerts.route';
+import type { AlertsRoute } from 'routes/alerts/alerts.route';
 import { AlertEventsTable } from 'routes/alerts/components/Components';
 import AlertFiltersSelected from 'routes/alerts/components/FiltersSelected';
 import { AlertWorkflowDrawer } from 'routes/alerts/components/Workflows';
-import { useSearchParams } from 'routes/alerts/contexts/SearchParamsContext';
-import type { SearchResult } from 'routes/alerts/utils/SearchParser';
 import { getValueFromPath } from 'shared/utils/utils';
 import ConfirmationDialog from 'ui/ConfirmationDialog';
 
-type AlertActionButtonProps = {
+type AlertActionButtonProps = InferAppNavigationPropsFromPath<AppRoute['path']> & {
   authorized?: boolean;
   color?: CSSProperties['color'];
   disabled?: boolean;
@@ -54,7 +53,6 @@ type AlertActionButtonProps = {
   permanent?: boolean;
   showSkeleton?: boolean;
   speedDial?: boolean;
-  to?: To;
   tooltipTitle?: string;
   vertical?: boolean;
   onClick?: React.MouseEventHandler;
@@ -71,15 +69,23 @@ const AlertActionButton: React.FC<AlertActionButtonProps> = React.memo(
     permanent = false,
     showSkeleton = false,
     speedDial = false,
-    to = null,
+    nav: navProp = null,
+    navDeps: navDepsProp = null,
     tooltipTitle = '',
     vertical = false,
     onClick = () => null
   }: AlertActionButtonProps) => {
     const theme = useTheme();
 
-    const Wrapper = useCallback<React.FC<{ children: React.ReactNode; href: To }>>(
-      ({ children, href }) => (href ? <Link to={href}>{children}</Link> : <div>{children}</div>),
+    const Wrapper = useCallback<React.FC<PropsWithChildren<InferAppNavigationPropsFromPath<AppRoute['path']>>>>(
+      ({ children, nav, navDeps }) =>
+        nav ? (
+          <AppLink nav={nav} navDeps={navDeps}>
+            {children}
+          </AppLink>
+        ) : (
+          <div>{children}</div>
+        ),
       []
     );
 
@@ -88,7 +94,7 @@ const AlertActionButton: React.FC<AlertActionButtonProps> = React.memo(
     else if (!authorized) return null;
     else if (speedDial)
       return (
-        <Wrapper href={to}>
+        <Wrapper {...(!navProp ? null : { nav: navProp, navDeps: navDepsProp })}>
           <SpeedDialAction
             icon={
               <>
@@ -118,7 +124,7 @@ const AlertActionButton: React.FC<AlertActionButtonProps> = React.memo(
         <Tooltip title={tooltipTitle}>
           <span>
             <IconButton
-              href={!to ? null : typeof to === 'string' ? to : `${to.pathname}${to.search}${to.hash}`}
+              {...(!navProp ? null : { nav: navProp, navDeps: navDepsProp })}
               disabled={disabled || loading}
               size="large"
               onClick={disabled || loading ? null : onClick}
@@ -201,7 +207,8 @@ export const AlertGroup: React.FC<AlertActionProps> = React.memo(
     const { t } = useTranslation(['alerts']);
     const theme = useTheme();
     const { user: currentUser } = useALContext();
-    const { search, setSearchObject } = useSearchParams<AlertSearchParams>();
+    const search = useAppSearchSnapshot<'/alerts'>();
+    const navigate = useAppNavigate<'/alerts'>();
 
     const groupBy = useMemo<string>(() => {
       const g = search.get('group_by');
@@ -230,9 +237,13 @@ export const AlertGroup: React.FC<AlertActionProps> = React.memo(
           if (!groupBy) return;
 
           window.dispatchEvent(
-            new CustomEvent<Partial<AlertSearchParams>>('alertRefresh', { detail: { group_by: '', fq: [groupBy] } })
+            new CustomEvent<Partial<InferSearchParamValueMapFromEngine<typeof AlertsRoute.search>>>('alertRefresh', {
+              detail: { group_by: '', fq: [groupBy] }
+            })
           );
-          setSearchObject(p => ({ ...p, offset: 0, group_by: '', fq: [...p.fq, groupBy] }));
+          navigate
+            .here<'/alerts'>()
+            .update(s => ({ ...s, search: { ...s.search, offset: 0, group_by: '', fq: [...s.search.fq, groupBy] } }));
         }}
       />
     );
@@ -253,19 +264,19 @@ export const AlertOwnership: React.FC<AlertActionProps> = React.memo(
     const { apiCall } = useMyAPI();
     const { user: currentUser } = useALContext();
     const { showErrorMessage, showSuccessMessage } = useMySnackbar();
-    const { search } = useSearchParams<AlertSearchParams>();
+    const search = useAppSearchSnapshot<'/alerts'>();
 
     const [confirmation, setConfirmation] = useState<boolean>(false);
     const [waiting, setWaiting] = useState<boolean>(false);
 
-    const query = useMemo<SearchResult<AlertSearchParams>>(() => {
+    const query = useMemo(() => {
       if (!alert) return null;
       return search
         .set(p => {
           const f = `${p.group_by}:${getValueFromPath(alert, p.group_by) as string}`;
           return { ...p, q: p.group_by ? f : `alert_id:${alert.alert_id}` };
         })
-        .filter(k => ['tc', 'tc_start', 'fq', 'q'].includes(k));
+        .pick(['tc', 'tc_start', 'fq', 'q']);
     }, [alert, search]);
 
     const handleTakeOwnership = useCallback(
@@ -390,7 +401,8 @@ export const AlertSubmission: React.FC<AlertActionProps> = React.memo(
     return (
       <AlertActionButton
         tooltipTitle={t('submission')}
-        to={`/submission/${alert?.sid}`}
+        nav={nav => nav.to().create({ route: '/submission/:id', path: { id: alert?.sid } })}
+        navDeps={[alert?.sid]}
         open={open}
         vertical={vertical}
         permanent={permanent}
@@ -420,11 +432,11 @@ export const AlertWorkflow: React.FC<AlertWorkflowProps> = React.memo(
     const { t } = useTranslation(['alerts']);
     const theme = useTheme();
     const { user: currentUser } = useALContext();
-    const { search } = useSearchParams<AlertSearchParams>();
+    const search = useAppSearchSnapshot<'/alerts'>();
 
     const [openWorkflow, setOpenWorkflow] = useState<boolean>(false);
 
-    const filteredSearch = useMemo<SearchResult<AlertSearchParams>>(() => {
+    const filteredSearch = useMemo(() => {
       if (!alert) return null;
       return search.set(p => ({
         ...p,
@@ -635,7 +647,7 @@ type Props = {
 const WrappedAlertActions = ({ alert, inDrawer = false }: Props) => {
   const { t } = useTranslation('alerts');
   const theme = useTheme();
-  const location = useLocation();
+  const search = useAppSearchSnapshot<'/alerts'>();
   const { user: currentUser } = useALContext();
 
   const [open, setOpen] = useState<boolean>(false);
@@ -647,6 +659,7 @@ const WrappedAlertActions = ({ alert, inDrawer = false }: Props) => {
 
   const vertical = useMemo<boolean>(() => inDrawer && !upSM, [inDrawer, upSM]);
   const permanent = useMemo<boolean>(() => inDrawer && upSM, [inDrawer, upSM]);
+  const searchKey = useMemo(() => search.toString(), [search]);
 
   useEffect(() => {
     if (open || permanent) setRender(true);
@@ -657,11 +670,11 @@ const WrappedAlertActions = ({ alert, inDrawer = false }: Props) => {
   }, []);
 
   useEffect(() => {
-    if (location.search !== prevSearch.current) {
+    if (searchKey !== prevSearch.current) {
       setOpen(false);
-      prevSearch.current = location.search;
+      prevSearch.current = searchKey;
     }
-  }, [location.search]);
+  }, [searchKey]);
 
   if (
     !currentUser.roles.includes('submission_view') &&

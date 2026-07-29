@@ -2,17 +2,16 @@ import AddIcon from '@mui/icons-material/Add';
 import NotificationImportantOutlinedIcon from '@mui/icons-material/NotificationImportantOutlined';
 import { AlertTitle, useMediaQuery, useTheme } from '@mui/material';
 import { useAppNavigate } from 'core/router';
-import { createAppRoute } from 'core/routes';
+import { createAppRoute, useAppSearchSnapshot } from 'core/routes';
 import SimpleList from 'deprecated/components/lists/simplelist/SimpleList';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
+import type { InferSearchParamValueMapFromEngine } from 'features/search-params';
 import type { IndexDefinition } from 'models/api/user';
 import type { Alert, AlertIndexed, AlertItem } from 'models/base/alert';
-import type { Workflow } from 'models/base/workflow';
-import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BiNetworkChart } from 'react-icons/bi';
-import { useLocation } from 'react-router';
 import AlertActions from 'routes/alerts/components/Actions';
 import AlertDefaultSearchParameters from 'routes/alerts/components/DefaultSearchParameters';
 import AlertFavorites from 'routes/alerts/components/Favorites';
@@ -22,9 +21,6 @@ import { AlertSearchResults } from 'routes/alerts/components/Results';
 import SearchHeader from 'routes/alerts/components/SearchHeader';
 import AlertWorkflows from 'routes/alerts/components/Workflows';
 import { AlertsProvider } from 'routes/alerts/contexts/AlertsContext';
-import { SearchParamsProvider, useSearchParams } from 'routes/alerts/contexts/SearchParamsContext';
-import type { SearchParams } from 'routes/alerts/utils/SearchParams';
-import type { SearchResult } from 'routes/alerts/utils/SearchParser';
 import { ForbiddenPage } from 'routes/forbidden/forbidden';
 import { IconButton } from 'ui/buttons/IconButton';
 import InformativeAlert from 'ui/InformativeAlert';
@@ -54,31 +50,14 @@ export const ALERT_SIMPLELIST_ID = 'al.alerts.simplelist';
 
 export const ALERT_STORAGE_KEY = 'alert.search';
 
-export const ALERT_DEFAULT_PARAMS = {
-  fq: [],
-  group_by: 'file.sha256',
-  no_delay: false,
-  offset: 0,
-  q: '',
-  rows: PAGE_SIZE,
-  sort: 'reporting_ts desc',
-  tc_start: '',
-  tc: '4d',
-  track_total_hits: 10000,
-  refresh: false
-};
-
-export type AlertSearchParams = SearchParams<typeof ALERT_DEFAULT_PARAMS>;
-
-const WrappedAlertsContent = () => {
+export const AlertsPage = memo(() => {
   const { t } = useTranslation('alerts');
   const theme = useTheme();
-  const location = useLocation();
-  const navigate = useAppNavigate();
+  const navigate = useAppNavigate<'/alerts'>();
+  const search = useAppSearchSnapshot<'/alerts'>();
+
   const { apiCall } = useMyAPI();
   const { indexes, user: currentUser } = useALContext();
-  const { search, setSearchParams, setSearchObject } = useSearchParams<AlertSearchParams>();
-
   const [alerts, setAlerts] = useState<AlertItem[]>([]);
   const [countedTotal, setCountedTotal] = useState<number>(0);
   const [total, setTotal] = useState<number>(0);
@@ -92,10 +71,10 @@ const WrappedAlertsContent = () => {
   const suggestions = useMemo<IndexDefinition>(() => ({ ...indexes.alert, ...DEFAULT_SUGGESTION }), [indexes]);
 
   const handleFetch = useCallback(
-    (body: SearchResult<AlertSearchParams>) => {
+    (body: typeof search) => {
       if (!currentUser.roles.includes('alert_view')) return;
 
-      const query = body.filter((k, v) => !['tc_start'].includes(k)).toParams();
+      const query = body.omit(['tc_start']).toParams();
       query.sort();
       if (query.toString() === prevSearch.current) return;
       prevSearch.current = query.toString();
@@ -103,7 +82,7 @@ const WrappedAlertsContent = () => {
       const groupBy = query.get('group_by');
       const pathname = groupBy !== '' ? `/api/v4/alert/grouped/${groupBy}/` : `/api/v4/alert/list/`;
 
-      let query2 = body.filter((k, v) => !['refresh'].includes(k));
+      let query2 = body.omit(['refresh']);
       if (Number(query2.get('offset') || 0) === 0) {
         query2 = query2.set(o => ({ ...o, tc_start: '' }));
         setScrollReset(true);
@@ -114,7 +93,9 @@ const WrappedAlertsContent = () => {
         method: 'GET',
         onSuccess: ({ api_response }) => {
           if ('tc_start' in api_response) {
-            setSearchObject(o => ({ ...o, tc_start: api_response.tc_start }));
+            navigate
+              .here<'/alerts'>()
+              .update(s => ({ ...s, search: { ...s.search, tc_start: api_response.tc_start } }));
           }
 
           const max = api_response.offset + api_response.rows;
@@ -139,14 +120,14 @@ const WrappedAlertsContent = () => {
       });
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [currentUser.roles, setSearchObject]
+    [currentUser.roles, navigate]
   );
 
   const handleSelectedItemChange = useCallback(
     (item: Alert) => {
       if (!item) return;
       if (isLGDown) document.getElementById(ALERT_SIMPLELIST_ID).blur();
-      navigate.to().create({ route: '/alert/:id', path: { id: item.alert_id } });
+      navigate.to().create({ route: '/alert/:id', path: { id: item.alert_id }, search: { alert: item as never } });
     },
     [isLGDown, navigate]
   );
@@ -161,8 +142,7 @@ const WrappedAlertsContent = () => {
       .map(v => ([' or ', ' and '].some(a => v.toLowerCase().includes(a)) ? `(${v})` : v))
       .join(' AND ');
 
-    const state: Partial<Workflow> = { query };
-    navigate.to().create({ route: '/workflow-create', state });
+    navigate.to().create({ route: '/manage/workflow/create', search: { query } });
   }, [currentUser.roles, navigate, search]);
 
   useEffect(() => {
@@ -171,14 +151,17 @@ const WrappedAlertsContent = () => {
 
   useEffect(() => {
     if (!!search.get('group_by')) return;
-    else if (!alerts || alerts.length === 0) setSearchObject(v => ({ ...v, tc_start: '' }));
+    else if (!alerts || alerts.length === 0)
+      navigate.here<'/alerts'>().update(s => ({ ...s, search: { ...s.search, tc_start: '' } }));
     else {
       const dates = alerts.map(a => new Date(a.reporting_ts));
       const min = Math.max.apply(null, dates) as string;
-      setSearchObject(o => ({ ...o, tc_start: new Date(min).toISOString() }));
+      navigate.here<'/alerts'>().update(s => ({
+        ...s,
+        search: { ...s.search, tc_start: new Date(min).toISOString() }
+      }));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [alerts]);
+  }, [alerts, navigate, search]);
 
   useEffect(() => {
     const update = ({ detail }: CustomEvent<Alert[]>) => {
@@ -197,15 +180,21 @@ const WrappedAlertsContent = () => {
   }, []);
 
   useEffect(() => {
-    const refresh = ({ detail = null }: CustomEvent<AlertSearchParams>) => {
-      setSearchObject(o => ({ ...o, ...detail, offset: 0, refresh: !o.refresh, fq: [...(detail?.fq || []), ...o.fq] }));
+    const refresh = ({ detail = null }: CustomEvent<InferSearchParamValueMapFromEngine<typeof AlertsRoute.search>>) => {
+      navigate.here<'/alerts'>().update(s => ({
+        ...s,
+        ...detail,
+        offset: 0,
+        refresh: !s.search.refresh,
+        fq: [...(detail?.fq || []), ...s.search.fq]
+      }));
     };
 
     window.addEventListener('alertRefresh', refresh);
     return () => {
       window.removeEventListener('alertRefresh', refresh);
     };
-  }, [setSearchObject]);
+  }, [navigate]);
 
   if (!currentUser.roles.includes('alert_view')) return <ForbiddenPage />;
   else
@@ -241,7 +230,10 @@ const WrappedAlertsContent = () => {
           placeholder={t('search.placeholder')}
           defaultValue={{ rows: 25 }}
           paramKeys={{ query: 'q' }}
-          onChange={v => setSearchParams(v)}
+          onChange={v => {
+            // eslint-disable-next-line @typescript-eslint/no-use-before-define
+            navigate.here<'/alerts'>().update(s => ({ ...s, search: AlertsRoute.search.delta(v).toObject() }));
+          }}
           disableFilterList
           disablePagination
           disableTotalResults
@@ -273,7 +265,11 @@ const WrappedAlertsContent = () => {
               </InformativeAlert>
             </div>
           }
-          onLoadNext={() => setSearchObject(v => ({ ...v, offset: v.offset + v.rows }))}
+          onLoadNext={() =>
+            navigate
+              .here<'/alerts'>()
+              .update(s => ({ ...s, search: { ...s.search, offset: s.search.offset + s.search.rows } }))
+          }
           onCursorChange={handleSelectedItemChange}
           onItemSelected={handleSelectedItemChange}
           onRenderActions={(item: AlertItem) => <AlertActions alert={item} />}
@@ -282,21 +278,7 @@ const WrappedAlertsContent = () => {
         </SimpleList>
       </PageFullWidth>
     );
-};
-
-export const AlertsContent = React.memo(WrappedAlertsContent);
-
-export const WrappedAlertsPage = memo(() => (
-  <SearchParamsProvider
-    defaultValue={ALERT_DEFAULT_PARAMS}
-    hidden={['rows', 'offset', 'tc_start', 'track_total_hits']}
-    enforced={['rows']}
-  >
-    <AlertsProvider>
-      <AlertsContent />
-    </AlertsProvider>
-  </SearchParamsProvider>
-));
+});
 
 export const AlertsRoute = createAppRoute({
   title: {
@@ -307,6 +289,31 @@ export const AlertsRoute = createAppRoute({
     primary: <NotificationImportantOutlinedIcon />
   },
   ancestor: null,
-  component: WrappedAlertsPage,
-  path: '/alerts'
+  component: memo(() => (
+    <AlertsProvider>
+      <AlertsPage />
+    </AlertsProvider>
+  )),
+  path: '/alerts',
+  search: s => ({
+    q: s.string(''),
+    offset: s.number(0).min(0).source('transient').ephemeral(),
+    rows: s.number(PAGE_SIZE).locked().source('transient').ephemeral(),
+    sort: s.string('reporting_ts desc'),
+    group_by: s.string('file.sha256'),
+    fq: s.filters([]),
+
+    no_delay: s.boolean(false),
+
+    tc_start: s.string('').source('transient').ephemeral(),
+    tc: s.string('4d'),
+    track_total_hits: s.number(null).source('transient').nullable().ephemeral(),
+    refresh: s.boolean(false).ephemeral()
+  })
 });
+
+export type AlertSearchParams = {
+  -readonly [K in keyof InferSearchParamValueMapFromEngine<
+    typeof AlertsRoute.search
+  >]: InferSearchParamValueMapFromEngine<typeof AlertsRoute.search>[K];
+};
