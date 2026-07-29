@@ -42,6 +42,8 @@ import {
   ManageSignatureDetailRoute,
   ManageSignatureDetailRoute2
 } from 'routes/manage-signature-detail/manage-signature-detail.route';
+import { ManageSignatureSourceDetailRoute } from 'routes/manage-signature-source-detail/manage-signature-source-detail.route';
+import { ManageSignatureSourcesRoute } from 'routes/manage-signature-sources/manage-signature-sources.route';
 import { ManageSignaturesRoute } from 'routes/manage-signatures/manage-signatures.route';
 import {
   ManageWorkflowCreateRootRoute,
@@ -122,6 +124,8 @@ export const APP_ROUTES = [
   ManageSafelistsRoute,
   ManageSignatureDetailRoute,
   ManageSignatureDetailRoute2,
+  ManageSignatureSourceDetailRoute,
+  ManageSignatureSourcesRoute,
   ManageSignaturesRoute,
   ManageWorkflowCreateRootRoute,
   ManageWorkflowCreateRoute,

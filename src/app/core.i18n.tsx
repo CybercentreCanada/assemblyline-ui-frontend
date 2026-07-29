@@ -86,6 +86,8 @@ import manageSafelistsEN from 'routes/manage-safelists/manage-safelists.i18n.en.
 import manageSafelistsFR from 'routes/manage-safelists/manage-safelists.i18n.fr.json';
 import manageSignatureDetailEN from 'routes/manage-signature-detail/manage-signature-detail.i18n.en.json';
 import manageSignatureDetailFR from 'routes/manage-signature-detail/manage-signature-detail.i18n.fr.json';
+import manageSignatureSourcesEN from 'routes/manage-signature-sources/manage-signature-sources.i18n.en.json';
+import manageSignatureSourcesFR from 'routes/manage-signature-sources/manage-signature-sources.i18n.fr.json';
 import manageSignaturesEN from 'routes/manage-signatures/manage-signatures.i18n.en.json';
 import manageSignaturesFR from 'routes/manage-signatures/manage-signatures.i18n.fr.json';
 import manageWorkflowDetailEN from 'routes/manage-workflow-detail/manage-workflow-detail.i18n.en.json';
@@ -159,6 +161,7 @@ export const I18N_RESSOURCES = {
     manageSafelists: manageSafelistsEN,
     manageSignatureDetail: manageSignatureDetailEN,
     manageSignatures: manageSignaturesEN,
+    manageSignatureSources: manageSignatureSourcesEN,
     manageWorkflowDetail: manageWorkflowDetailEN,
     manageWorkflows: manageWorkflowsEN,
     missingNode: missingNodeEN,
@@ -216,6 +219,7 @@ export const I18N_RESSOURCES = {
     manageSafelists: manageSafelistsFR,
     manageSignatureDetail: manageSignatureDetailFR,
     manageSignatures: manageSignaturesFR,
+    manageSignatureSources: manageSignatureSourcesFR,
     manageWorkflowDetail: manageWorkflowDetailFR,
     manageWorkflows: manageWorkflowsFR,
     missingNode: missingNodeFR,
