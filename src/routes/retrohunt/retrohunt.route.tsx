@@ -2,9 +2,9 @@ import AddCircleOutlineOutlinedIcon from '@mui/icons-material/AddCircleOutlineOu
 import DataObjectOutlinedIcon from '@mui/icons-material/DataObjectOutlined';
 import PersonIcon from '@mui/icons-material/Person';
 import TimerOutlinedIcon from '@mui/icons-material/TimerOutlined';
-import { Pagination, Typography, useMediaQuery, useTheme } from '@mui/material';
+import { useTheme } from '@mui/material';
 import { useAppNavigate } from 'core/router';
-import { createAppRoute } from 'core/routes';
+import { createAppRoute, useAppSearchSnapshot } from 'core/routes';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import type { SearchResult } from 'models/api/search';
@@ -12,53 +12,36 @@ import type { IndexDefinition } from 'models/api/user';
 import type { RetrohuntIndexed, RetrohuntProgress } from 'models/base/retrohunt';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation } from 'react-router';
 import { RetrohuntTable } from 'routes/search/components/retrohunt';
 import type { Socket } from 'socket.io-client';
 import { io } from 'socket.io-client';
 import { IconButton } from 'ui/buttons/IconButton';
-import { ChipList } from 'ui/ChipList';
 import { PageHeader } from 'ui/layouts/PageHeader';
 import { PageContainer } from 'ui/pages/PageContainer';
 import { PageFullWidth } from 'ui/pages/PageFullWidth';
-import SearchBar from 'ui/SearchBar/search-bar';
 import { DEFAULT_SUGGESTION } from 'ui/SearchBar/search-textfield';
-import SearchResultCount from 'ui/SearchResultCount';
-import type SimpleSearchQuery from '/ui/SearchBar/simple-search-query';
+import SearchHeader from 'ui/SearchBar/SearchHeader';
 
-const PAGE_SIZE = 25;
-const MAX_TRACKED_RECORDS = 10000;
 const SOCKETIO_NAMESPACE = '/retrohunt';
 
 export const RetrohuntPage = memo(() => {
   const { t } = useTranslation(['retrohunt']);
   const theme = useTheme();
-  const location = useLocation();
-  const navigate = useAppNavigate();
+  const search = useAppSearchSnapshot<'/retrohunt'>();
+  const navigate = useAppNavigate<'/retrohunt'>();
   const { apiCall } = useMyAPI();
 
   const { user: currentUser, indexes, configuration } = useALContext();
-  const downSM = useMediaQuery(theme.breakpoints.down('md'));
 
   const [retrohuntResults, setRetrohuntResults] = useState<SearchResult<RetrohuntIndexed>>(null);
-  const [query, setQuery] = useState<SimpleSearchQuery>(null);
   const [searching, setSearching] = useState<boolean>(false);
 
-  const filterValue = useRef<string>('');
   const sio = useRef<Socket<any, any>>(null);
   const resultListeners = useRef<string[]>([]);
 
   const suggestions = useMemo<IndexDefinition>(
     () => ({ ...indexes.retrohunt, ...DEFAULT_SUGGESTION }),
     [indexes.retrohunt]
-  );
-
-  const pageCount = useMemo<number>(
-    () =>
-      retrohuntResults && 'total' in retrohuntResults
-        ? Math.ceil(Math.min(retrohuntResults.total, MAX_TRACKED_RECORDS) / PAGE_SIZE)
-        : 0,
-    [retrohuntResults]
   );
 
   const last24hDate = useMemo<string>(
@@ -70,49 +53,34 @@ export const RetrohuntPage = memo(() => {
     []
   );
 
-  const hasFilter = useCallback((filter: string) => query?.getAll('filters')?.includes(filter), [query]);
-
   const handleToggleFilter = useCallback(
-    (filter: string) => {
-      if (query?.getAll('filters')?.includes(filter)) query.remove('filters', filter);
-      else query.add('filters', filter);
+    (filter: string) =>
+      navigate.here<'/retrohunt'>().update(s => ({
+        ...s,
+        search: {
+          ...s?.search,
+          offset: 0,
+          filters: s.search.filters.includes(filter)
+            ? s.search.filters.filter(f => f !== filter)
+            : [...s.search.filters, filter]
+        }
+      })),
 
-      navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-    },
-    [location.hash, location.pathname, navigate, query]
-  );
-
-  const handleQueryChange = useCallback(
-    (key: string, value: string | number) => {
-      query.set(key, value);
-      const q = new SimpleSearchQuery(query.toString(), DEFAULT_QUERY);
-      navigate(`${location.pathname}?${q.getDeltaString()}${location.hash}`);
-    },
-    [location.hash, location.pathname, navigate, query]
-  );
-
-  const handleQueryRemove = useCallback(
-    (key: string | string[]) => {
-      if (typeof key === 'string') query.delete(key);
-      else key.forEach(k => query.delete(k));
-      const q = new SimpleSearchQuery(query.toString(), DEFAULT_QUERY);
-      navigate(`${location.pathname}?${q.getDeltaString()}${location.hash}`);
-    },
-    [location.hash, location.pathname, navigate, query]
+    [navigate]
   );
 
   const handleReload = useCallback(
-    (curQuery: SimpleSearchQuery) => {
-      if (curQuery && currentUser.roles.includes('retrohunt_view') && configuration?.retrohunt?.enabled) {
+    (curSearch: typeof search) => {
+      if (curSearch && currentUser.roles.includes('retrohunt_view') && configuration?.retrohunt?.enabled) {
         apiCall({
           method: 'POST',
           url: `/api/v4/retrohunt/`,
-          body: curQuery.getParams(),
+          body: curSearch.toObject(),
           onSuccess: api_data => {
             const { items, total, rows, offset } = api_data.api_response;
             if (items.length === 0 && offset !== 0 && offset >= total) {
-              curQuery.set('offset', Math.floor(total / rows) * rows);
-              handleReload(curQuery);
+              curSearch.set(s => ({ ...s, offset: Math.floor(total / rows) * rows }));
+              handleReload(curSearch);
             } else {
               setRetrohuntResults(api_data.api_response);
             }
@@ -126,49 +94,19 @@ export const RetrohuntPage = memo(() => {
     [configuration?.retrohunt?.enabled, currentUser.roles]
   );
 
-  const handleCreateRetrohunt = useCallback(
-    (retrohunt: Partial<Retrohunt>) => {
-      navigate(`${location.pathname}${location.search}#${retrohunt?.key}`);
-    },
-    [location.pathname, location.search, navigate]
-  );
-
-  const handleOpenCreatePage = useCallback(() => {
-    if (currentUser.roles.includes('retrohunt_run') && configuration?.retrohunt?.enabled) {
-      setGlobalDrawer(<RetrohuntCreate isDrawer onCreateRetrohunt={handleCreateRetrohunt} />, { hasMaximize: true });
-      navigate(`${location.pathname}?${query.getDeltaString()}`);
-    }
-  }, [
-    configuration?.retrohunt?.enabled,
-    currentUser.roles,
-    handleCreateRetrohunt,
-    location.pathname,
-    navigate,
-    query,
-    setGlobalDrawer
-  ]);
-
-  const handleRowClick = useCallback(
-    (item: RetrohuntIndexed) => {
-      const hashSearch = new URL(`${window.location.origin}/${location.hash.slice(1)}`);
-      navigate(`${location.pathname}${location.search}#${item?.key}${hashSearch.search}`);
-    },
-    [location, navigate]
-  );
-
   useEffect(() => {
-    if (query) handleReload(query);
-  }, [handleReload, query]);
+    if (search) handleReload(search);
+  }, [handleReload, search]);
 
   useEffect(() => {
     function reload() {
-      handleReload(query);
+      handleReload(search);
     }
     window.addEventListener('reloadRetrohunts', reload);
     return () => {
       window.removeEventListener('reloadRetrohunts', reload);
     };
-  }, [handleReload, query]);
+  }, [handleReload, search]);
 
   useEffect(() => {
     const socket = io(SOCKETIO_NAMESPACE);
@@ -249,7 +187,7 @@ export const RetrohuntPage = memo(() => {
             preventRender={!currentUser.roles.includes('retrohunt_run')}
             size="large"
             tooltip={t('tooltip.add')}
-            onClick={handleOpenCreatePage}
+            onClick={() => navigate.to().create({ route: '/retrohunt/create' })}
           >
             <AddCircleOutlineOutlinedIcon />
           </IconButton>
@@ -258,105 +196,49 @@ export const RetrohuntPage = memo(() => {
 
       <PageContainer isSticky>
         <div style={{ paddingTop: theme.spacing(1) }}>
-          <SearchBar
-            initValue={query ? query.get('query', '') : ''}
-            placeholder={t('filter')}
-            searching={searching}
-            suggestions={suggestions}
-            onValueChange={value => {
-              filterValue.current = value;
-            }}
-            onClear={() => handleQueryRemove(['query', 'rows', 'offset'])}
-            onSearch={() => {
-              if (filterValue.current !== '') {
-                handleQueryChange('query', filterValue.current);
-                handleQueryChange('offset', 0);
-              } else handleQueryRemove(['query', 'rows', 'offset']);
-            }}
-            buttons={[
+          <SearchHeader
+            params={search.toParams()}
+            loading={searching}
+            results={retrohuntResults}
+            resultLabel={
+              search.get('query') || search.get('filters')?.length
+                ? t(`filtered${retrohuntResults?.total === 1 ? '' : 's'}`)
+                : t(`total${retrohuntResults?.total === 1 ? '' : 's'}`)
+            }
+            onChange={v =>
+              navigate
+                .here()
+                .update(s => ({ ...s, search: { ...s.search, ...RetrohuntRoute.search.delta(v).toObject() } }))
+            }
+            paramDefaults={search.defaults().toObject()}
+            searchInputProps={{ placeholder: t('filter'), options: suggestions }}
+            actionProps={[
               {
-                icon: <PersonIcon fontSize={downSM ? 'small' : 'medium'} />,
-                tooltip: hasFilter(`creator:${currentUser.username}`)
-                  ? t('filter.creator_self.remove')
-                  : t('filter.creator_self.add'),
-                props: {
-                  color: hasFilter(`creator:${currentUser.username}`) ? 'primary' : 'default',
+                tooltip: {
+                  title: search.has('filters', `creator:${currentUser.username}`)
+                    ? t('filter.creator_self.remove')
+                    : t('filter.creator_self.add')
+                },
+                icon: { children: <PersonIcon /> },
+                button: {
+                  color: search.has('filters', `creator:${currentUser.username}`) ? 'primary' : 'default',
                   onClick: () => handleToggleFilter(`creator:${currentUser.username}`)
                 }
               },
               {
-                icon: <TimerOutlinedIcon fontSize={downSM ? 'small' : 'medium'} />,
-                tooltip: hasFilter(`completed_time:>=${last24hDate}`)
-                  ? t('filter.completed_last_24.remove')
-                  : t('filter.completed_last_24.add'),
-                props: {
-                  color: hasFilter(`completed_time:>=${last24hDate}`) ? 'primary' : 'default',
+                tooltip: {
+                  title: search.has('filters', `completed_time:>=${last24hDate}`)
+                    ? t('filter.completed_last_24.remove')
+                    : t('filter.completed_last_24.add')
+                },
+                icon: { children: <TimerOutlinedIcon /> },
+                button: {
+                  color: search.has('filters', `completed_time:>=${last24hDate}`) ? 'primary' : 'default',
                   onClick: () => handleToggleFilter(`completed_time:>=${last24hDate}`)
                 }
               }
             ]}
-          >
-            {retrohuntResults !== null && (
-              <div
-                style={{
-                  fontStyle: 'italic',
-                  paddingTop: theme.spacing(0.5),
-                  display: 'flex',
-                  flexWrap: 'wrap',
-                  justifyContent: 'flex-end'
-                }}
-              >
-                {retrohuntResults.total !== 0 && (
-                  <Typography variant="subtitle1" color="secondary" style={{ flexGrow: 1 }}>
-                    {searching ? (
-                      <span>{t('searching')}</span>
-                    ) : (
-                      <span>
-                        <SearchResultCount count={retrohuntResults.total} />
-                        {query.get('query') || query.get('filters')
-                          ? t(`filtered${retrohuntResults.total === 1 ? '' : 's'}`)
-                          : t(`total${retrohuntResults.total === 1 ? '' : 's'}`)}
-                      </span>
-                    )}
-                  </Typography>
-                )}
-
-                {pageCount > 1 && (
-                  <Pagination
-                    page={Math.ceil(1 + query.get('offset') / PAGE_SIZE)}
-                    onChange={(e, value) => handleQueryChange('offset', (value - 1) * PAGE_SIZE)}
-                    count={pageCount}
-                    shape="rounded"
-                    size="small"
-                  />
-                )}
-              </div>
-            )}
-
-            {query && (
-              <div>
-                <ChipList
-                  items={query.getAll('filters', []).map(v => ({
-                    variant: 'outlined',
-                    label: `${v}`,
-                    color: v.indexOf('NOT ') === 0 ? 'error' : null,
-                    onClick: () => {
-                      query.replace(
-                        'filters',
-                        v,
-                        v.indexOf('NOT ') === 0 ? v.substring(5, v.length - 1) : `NOT (${v})`
-                      );
-                      navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-                    },
-                    onDelete: () => {
-                      query.remove('filters', v);
-                      navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
-                    }
-                  }))}
-                />
-              </div>
-            )}
-          </SearchBar>
+          />
         </div>
       </PageContainer>
 
@@ -392,7 +274,8 @@ export const RetrohuntRoute = createAppRoute({
     fl: s.string(
       'indices,classification,search_classification,creator,description,expiry_ts,start_group,end_group,created_time,started_time,completed_time,key,raw_query,yara_signature,finished,truncated'
     ),
-    filters: s.filters([])
+    filters: s.filters([]),
+    track_total_hits: s.number(null).source('transient').nullable().ephemeral()
   }),
   disabled: s => !s.configuration?.retrohunt?.enabled,
   forbidden: s => !s.user.roles.includes('retrohunt_view')
