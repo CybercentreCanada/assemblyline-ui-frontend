@@ -401,7 +401,7 @@ export class EnumSearchParamBlueprint<
   }
 
   private check(value: unknown): value is O[number] {
-    return Array.isArray(this._options) && this._options.includes(v => v === value);
+    return Array.isArray(this._options) && this._options.includes(value as O[number]);
   }
 
   protected override parse(value: unknown): O[number] {

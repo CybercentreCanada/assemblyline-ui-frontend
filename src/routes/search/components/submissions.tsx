@@ -4,7 +4,6 @@ import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
 import { useAppConfig } from 'core/config';
 import { useAppNavigate } from 'core/router';
-import { useAppSearchSnapshot } from 'core/routes';
 import useALContext from 'deprecated/hooks/useALContext';
 import type { SearchResult } from 'models/api/search';
 import type { SubmissionIndexed } from 'models/base/submission';
@@ -30,15 +29,15 @@ import Verdict from 'ui/Verdict';
 export type SubmissionsTableProps = {
   submissionResults: SearchResult<SubmissionIndexed>;
   allowSort?: boolean;
+  ignoreFilters?: boolean;
   onRowClick?: (event: React.MouseEvent<HTMLElement>, submission: SubmissionIndexed) => void;
 };
 
 export const SubmissionsTable = memo(
-  ({ submissionResults, allowSort = true, onRowClick = () => null }: SubmissionsTableProps) => {
+  ({ submissionResults, allowSort = true, ignoreFilters = false, onRowClick = () => null }: SubmissionsTableProps) => {
     const { t } = useTranslation(['search']);
     const { c12nDef } = useALContext();
 
-    const search = useAppSearchSnapshot<'/submissions'>();
     const navigate = useAppNavigate<'/submissions'>();
     const submissionView = useAppConfig(s => s.settings.submission_view);
 
@@ -110,7 +109,7 @@ export const SubmissionsTable = memo(
                 </DivTableCell>
                 <DivTableCell breakable>{maxLenStr(submission.params.description, 150)}</DivTableCell>
                 <DivTableCell style={{ whiteSpace: 'nowrap' }}>
-                  {!Boolean(search) ? (
+                  {ignoreFilters ? (
                     submission.params.submitter
                   ) : (
                     <CustomChip

@@ -2,11 +2,11 @@ import ArchiveIcon from '@mui/icons-material/Archive';
 import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
 import CenterFocusStrongOutlinedIcon from '@mui/icons-material/CenterFocusStrongOutlined';
 import SearchIcon from '@mui/icons-material/Search';
-import { IconButton, Paper, Tab, Tabs, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
+import { IconButton, Pagination, Paper, Tab, Tabs, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
+import { useApiQuery } from 'core/api';
 import { AppLink, useAppNavigate } from 'core/router';
-import { createAppRoute } from 'core/routes';
+import { createAppRoute, useAppPathParams, useAppSearchSnapshot } from 'core/routes';
 import useALContext from 'deprecated/hooks/useALContext';
-import useMyAPI from 'deprecated/hooks/useMyAPI';
 import useMySnackbar from 'deprecated/hooks/useMySnackbar';
 import type { SearchResult } from 'models/api/search';
 import type { IndexDefinition, Indexes } from 'models/api/user';
@@ -17,10 +17,10 @@ import type { RetrohuntIndexed } from 'models/base/retrohunt';
 import type { SignatureIndexed } from 'models/base/signature';
 import type { SubmissionIndexed } from 'models/base/submission';
 import type { Role } from 'models/base/user';
-import type { Dispatch, SetStateAction } from 'react';
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import type React from 'react';
+import { memo, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useParams } from 'react-router';
+import { ForbiddenPage } from 'routes/forbidden/forbidden';
 import { AlertsTable } from 'routes/search/components/alerts';
 import { FilesTable } from 'routes/search/components/files';
 import { ResultsTable } from 'routes/search/components/results';
@@ -33,11 +33,7 @@ import { PageContainer } from 'ui/pages/PageContainer';
 import { PageFullWidth } from 'ui/pages/PageFullWidth';
 import SearchBar from 'ui/SearchBar/search-bar';
 import { DEFAULT_SUGGESTION } from 'ui/SearchBar/search-textfield';
-import SimpleSearchQuery from 'ui/SearchBar/simple-search-query';
-import SearchPager from 'ui/SearchPager';
 import SearchResultCount from 'ui/SearchResultCount';
-
-const PAGE_SIZE = 25;
 
 export const INDEX_OPTIONS = ['submission', 'file', 'result', 'signature', 'alert', 'retrohunt'] as const;
 
@@ -45,70 +41,24 @@ export type Index = (typeof INDEX_OPTIONS)[number];
 
 type SearchIndexes = Pick<Indexes, Index>;
 
-type Params = {
-  id: string;
-};
-
 //*****************************************************************************************
 // Search Page
 //*****************************************************************************************
 
-type SearchPageProps = {
-  index?: string | null;
-};
-
-export const SearchPage = memo(({ index = null }: SearchPageProps) => {
-  const { id } = useParams<Params>();
+export const SearchPage = () => {
   const { t } = useTranslation(['search']);
-  const [pageSize] = useState<number>(PAGE_SIZE);
-  const [searching, setSearching] = useState<boolean>(false);
-  const { indexes, user: currentUser, configuration } = useALContext();
-  const location = useLocation();
-  const navigate = useAppNavigate();
   const theme = useTheme();
-  const { apiCall } = useMyAPI();
-  const [query, setQuery] = useState<SimpleSearchQuery>(null);
-  const [searchSuggestion, setSearchSuggestion] = useState<IndexDefinition>(null);
-  const [tab, setTab] = useState(null);
+  const id = useAppPathParams<'/search/:index'>()?.index;
+  const search = useAppSearchSnapshot<'/search/:index'>();
+  const navigate = useAppNavigate();
+  const { indexes, user: currentUser, configuration } = useALContext();
   const { showErrorMessage } = useMySnackbar();
+
+  const index = search.get('index');
+
   const downSM = useMediaQuery(theme.breakpoints.down('md'));
 
-  // Result lists
-  const [submissionResults, setSubmissionResults] = useState<SearchResult<SubmissionIndexed>>(null);
-  const [fileResults, setFileResults] = useState<SearchResult<FileIndexed>>(null);
-  const [resultResults, setResultResults] = useState<SearchResult<ResultIndexed>>(null);
-  const [signatureResults, setSignatureResults] = useState<SearchResult<SignatureIndexed>>(null);
-  const [alertResults, setAlertResults] = useState<SearchResult<AlertIndexed>>(null);
-  const [retrohuntResults, setRetrohuntResults] = useState<SearchResult<RetrohuntIndexed>>(null);
-
-  // Current index
-  const currentIndex = index || id;
-
-  const stateMap = useMemo<Record<keyof SearchIndexes, Dispatch<SetStateAction<SearchResult<unknown>>>>>(
-    () => ({
-      submission: setSubmissionResults,
-      file: setFileResults,
-      result: setResultResults,
-      signature: setSignatureResults,
-      alert: setAlertResults,
-      retrohunt: setRetrohuntResults
-    }),
-    []
-  );
-
-  const resMap = useMemo<Record<keyof SearchIndexes, SearchResult<unknown>>>(
-    () => ({
-      submission: submissionResults,
-      file: fileResults,
-      result: resultResults,
-      signature: signatureResults,
-      alert: alertResults,
-      retrohunt: retrohuntResults
-    }),
-    [alertResults, fileResults, resultResults, retrohuntResults, signatureResults, submissionResults]
-  );
-
-  const permissionMap = useMemo<Record<keyof SearchIndexes, Role>>(
+  const permissionMap = useMemo<Record<Index, Role>>(
     () => ({
       submission: 'submission_view',
       file: 'submission_view',
@@ -120,47 +70,20 @@ export const SearchPage = memo(({ index = null }: SearchPageProps) => {
     []
   );
 
-  const queryValue = useRef<string>('');
+  const tab = useMemo<Index>(() => {
+    const nextAvailableTab = () => {
+      for (const curTab of [...Object.keys(permissionMap)] as Index[]) {
+        if (currentUser.roles.includes(permissionMap[curTab])) return curTab;
+      }
+      return 'submission';
+    };
 
-  const handleChangeTab = useCallback(
-    (event, newTab) => {
-      navigate(`${location.pathname}?${query.toString()}#${newTab}`);
-    },
-    [location.pathname, navigate, query]
-  );
+    return id || index || nextAvailableTab();
+  }, [currentUser.roles, id, index, permissionMap]);
 
-  const onClear = useCallback(() => {
-    query.delete('query');
-    navigate(`${location.pathname}?${query.toString()}${location.hash}`);
-  }, [location.hash, location.pathname, navigate, query]);
-
-  const onSearch = useCallback(() => {
-    if (queryValue.current !== '') {
-      query.set('query', queryValue.current);
-      navigate(`${location.pathname}?${query.toString()}${location.hash}`);
-    } else {
-      onClear();
-    }
-  }, [location.hash, location.pathname, navigate, onClear, query]);
-
-  const onFilterValueChange = useCallback((inputValue: string) => {
-    queryValue.current = inputValue;
-  }, []);
-
-  const resetResults = useCallback(() => {
-    setAlertResults(null);
-    setFileResults(null);
-    setResultResults(null);
-    setRetrohuntResults(null);
-    setSignatureResults(null);
-    setSubmissionResults(null);
-  }, []);
-
-  useEffect(() => {
-    // On index change we need to update the search suggestion
+  const suggestions = useMemo(() => {
     let indexFields: IndexDefinition = {};
     if (index || id) {
-      // Retrieve the fields specific to the index of interest
       indexFields = indexes?.[(index || id) as keyof Indexes] || {};
     } else {
       indexFields = Object.values(indexes).reduce(
@@ -171,82 +94,117 @@ export const SearchPage = memo(({ index = null }: SearchPageProps) => {
         {}
       );
     }
-    setSearchSuggestion({ ...indexFields, ...DEFAULT_SUGGESTION });
-  }, [index, id, indexes, permissionMap, currentUser.roles]);
+    return { ...indexFields, ...DEFAULT_SUGGESTION };
+  }, [id, index, indexes]);
 
-  useEffect(() => {
-    // On location.search change we need to change the query object and reset the results
-    setQuery(new SimpleSearchQuery(location.search, `rows=${pageSize}&offset=0&filters=NOT%20to_be_deleted:true`));
-    resetResults();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [location.search, pageSize]);
+  const getBody = useCallback(
+    (value: Index) =>
+      index === value
+        ? search.pick(['query', 'offset', 'rows', 'sort', 'use_archive']).toObject()
+        : search
+            .omit(['index'])
+            .set(s => ({ ...s, ...search.defaults().pick(['offset', 'rows', 'sort']).toObject() }))
+            .pick(['query', 'offset', 'rows', 'sort', 'use_archive'])
+            .toObject(),
+    [index, search]
+  );
 
-  useEffect(() => {
-    const nextAvailableTab = () => {
-      for (const curTab of [...Object.keys(stateMap)]) {
-        if (currentUser.roles.includes(permissionMap[curTab])) return curTab;
-      }
-      return 'submission';
-    };
-    // On location.hash change, we need to change the tab
-    const newTab = location.hash.substring(1, location.hash.length) || index || id || nextAvailableTab();
-    setTab(newTab);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id, index, location.hash]);
-
-  useEffect(() => {
-    if (query) {
-      queryValue.current = query.get('query', '');
-      if (query.get('query')) {
-        const searchList = [];
-        if (!currentIndex) {
-          searchList.push(...Object.keys(stateMap));
-        } else {
-          searchList.push(tab);
-          if (!searching) setSearching(true);
-        }
-        for (const searchIndex of searchList) {
-          // Do no perform search if user has no rights
-          if (
-            !currentUser.roles.includes(permissionMap[searchIndex]) ||
-            (searchIndex === 'retrohunt' && !configuration.retrohunt.enabled)
-          )
-            continue;
-
-          apiCall({
-            method: 'POST',
-            url: `/api/v4/search/${searchIndex}/`,
-            body: { ...query.getParams(), rows: pageSize, offset: 0 },
-            onSuccess: api_data => {
-              stateMap[searchIndex](api_data.api_response);
-            },
-            onFailure: api_data => {
-              if (index || id || !api_data.api_error_message.includes('Rewrite first')) {
-                showErrorMessage(api_data.api_error_message);
-              } else {
-                stateMap[searchIndex]({ total: 0, offset: 0, items: [], rows: pageSize });
-              }
-            },
-            onFinalize: () => {
-              if (currentIndex) {
-                setSearching(false);
-              }
-            }
-          });
-        }
+  const submissionResults = useApiQuery<SearchResult<SubmissionIndexed>>({
+    url: `/api/v4/search/submission/`,
+    method: 'POST',
+    disabled: !currentUser.roles.includes('submission_view') || (!!id && id !== 'submission') || !search.get('query'),
+    body: getBody('submission'),
+    onFailure: api_data => {
+      if (index || id || !api_data.api_error_message.includes('Rewrite first')) {
+        showErrorMessage(api_data.api_error_message);
       }
     }
-    // eslint-disable-next-line
-  }, [query]);
+  });
 
-  const TabSpacer = useCallback(props => <div style={{ flexGrow: 1 }} />, []);
+  const fileResults = useApiQuery<SearchResult<FileIndexed>>({
+    url: `/api/v4/search/file/`,
+    method: 'POST',
+    disabled: !currentUser.roles.includes('submission_view') || (!!id && id !== 'file') || !search.get('query'),
+    body: getBody('file'),
+    onFailure: api_data => {
+      if (index || id || !api_data.api_error_message.includes('Rewrite first')) {
+        showErrorMessage(api_data.api_error_message);
+      }
+    }
+  });
 
-  const SpecialTab = useCallback(({ children, ...otherProps }) => children, []);
+  const resultResults = useApiQuery<SearchResult<ResultIndexed>>({
+    url: `/api/v4/search/result/`,
+    method: 'POST',
+    disabled: !currentUser.roles.includes('submission_view') || (!!id && id !== 'result') || !search.get('query'),
+    body: getBody('result'),
+    onFailure: api_data => {
+      if (index || id || !api_data.api_error_message.includes('Rewrite first')) {
+        showErrorMessage(api_data.api_error_message);
+      }
+    }
+  });
 
-  return (currentIndex && !currentUser.roles.includes(permissionMap[index || id])) ||
-    (!currentIndex && Object.values(permissionMap).every(val => !currentUser.roles.includes(val))) ||
-    (currentIndex === 'retrohunt' && !configuration.retrohunt.enabled) ? (
-    <SearchPage />
+  const signatureResults = useApiQuery<SearchResult<SignatureIndexed>>({
+    url: `/api/v4/search/signature/`,
+    method: 'POST',
+    disabled: !currentUser.roles.includes('signature_view') || (!!id && id !== 'signature') || !search.get('query'),
+    body: getBody('signature'),
+    onFailure: api_data => {
+      if (index || id || !api_data.api_error_message.includes('Rewrite first')) {
+        showErrorMessage(api_data.api_error_message);
+      }
+    }
+  });
+
+  const alertResults = useApiQuery<SearchResult<AlertIndexed>>({
+    url: `/api/v4/search/alert/`,
+    method: 'POST',
+    disabled: !currentUser.roles.includes('alert_view') || (!!id && id !== 'alert') || !search.get('query'),
+    body: getBody('alert'),
+    onFailure: api_data => {
+      if (index || id || !api_data.api_error_message.includes('Rewrite first')) {
+        showErrorMessage(api_data.api_error_message);
+      }
+    }
+  });
+
+  const retrohuntResults = useApiQuery<SearchResult<RetrohuntIndexed>>({
+    url: `/api/v4/search/retrohunt/`,
+    method: 'POST',
+    disabled:
+      !currentUser.roles.includes('retrohunt_view') ||
+      !configuration?.retrohunt?.enabled ||
+      (!!id && id !== 'retrohunt') ||
+      !search.get('query'),
+    body: getBody('retrohunt'),
+    onFailure: api_data => {
+      if (index || id || !api_data.api_error_message.includes('Rewrite first')) {
+        showErrorMessage(api_data.api_error_message);
+      }
+    }
+  });
+
+  const resMap = useMemo<Record<Index, SearchResult<unknown>>>(
+    () => ({
+      submission: submissionResults.data,
+      file: fileResults.data,
+      result: resultResults.data,
+      signature: signatureResults.data,
+      alert: alertResults.data,
+      retrohunt: retrohuntResults.data
+    }),
+    [alertResults, fileResults, resultResults, retrohuntResults, signatureResults, submissionResults]
+  );
+
+  const TabSpacer = useCallback(() => <div style={{ flexGrow: 1 }} />, []);
+
+  const SpecialTab = useCallback(({ children }: { children: React.ReactNode }) => children, []);
+
+  return (id && !currentUser.roles.includes(permissionMap[(index || id) as keyof SearchIndexes])) ||
+    (!id && Object.values(permissionMap).every(val => !currentUser.roles.includes(val))) ||
+    (id === 'retrohunt' && !configuration.retrohunt.enabled) ? (
+    <ForbiddenPage />
   ) : (
     <PageFullWidth margin={4}>
       <div style={{ paddingBottom: theme.spacing(2), textAlign: 'left', width: '100%' }}>
@@ -256,36 +214,38 @@ export const SearchPage = memo(({ index = null }: SearchPageProps) => {
       <PageContainer isSticky>
         <div style={{ paddingTop: theme.spacing(1) }}>
           <SearchBar
-            initValue={query ? query.get('query', '') : ''}
-            searching={searching}
+            initValue={search ? search.get('query') : ''}
+            // searching={searching}
             placeholder={t(`search_${index || id || 'all'}`)}
-            suggestions={searchSuggestion}
-            onValueChange={onFilterValueChange}
-            onClear={onClear}
-            onSearch={onSearch}
+            suggestions={suggestions}
+            onClear={() =>
+              navigate.here<'/search/:index'>().update(s => ({ ...s, search: { ...s.search, query: '', offset: 0 } }))
+            }
+            onSearch={value =>
+              navigate
+                .here<'/search/:index'>()
+                .update(s => ({ ...s, search: { ...s.search, query: value, offset: 0 } }))
+            }
             buttons={
               configuration.datastore.archive.enabled &&
               currentUser.roles.includes('archive_view') &&
-              ['submission', 'result', 'file', 'all'].includes(index || id || 'all')
+              ['submission', 'result', 'file', 'all'].includes((index || id || 'all') as string)
                 ? [
                     {
                       icon:
-                        query && query.get('use_archive') === 'true' ? (
+                        search && search.get('use_archive') ? (
                           <ArchiveIcon fontSize={downSM ? 'small' : 'medium'} />
                         ) : (
                           <ArchiveOutlinedIcon fontSize={downSM ? 'small' : 'medium'} />
                         ),
                       tooltip:
-                        query && query.get('use_archive') === 'true'
-                          ? t('use_archive.turn_off')
-                          : t('use_archive.turn_on'),
+                        search && search.get('use_archive') ? t('use_archive.turn_off') : t('use_archive.turn_on'),
                       props: {
                         onClick: () => {
-                          query.set(
-                            'use_archive',
-                            !query.has('use_archive') ? 'true' : query.get('use_archive') === 'false'
-                          );
-                          navigate(`${location.pathname}?${query.getDeltaString()}${location.hash}`);
+                          navigate.here<'/search/:index'>().update(s => ({
+                            ...s,
+                            search: { ...s.search, offset: 0, use_archive: !s.search.use_archive }
+                          }));
                         }
                       }
                     }
@@ -294,11 +254,15 @@ export const SearchPage = memo(({ index = null }: SearchPageProps) => {
             }
           />
 
-          {!currentIndex && query && query.get('query') && (
+          {!id && search.get('query') && (
             <Paper square style={{ marginBottom: theme.spacing(0.5) }}>
               <Tabs
                 value={tab}
-                onChange={handleChangeTab}
+                onChange={(e, v: Index) =>
+                  navigate
+                    .here<'/search/:index'>()
+                    .update(s => ({ ...s, search: { ...s.search, index: v, offset: 0, sort: null } }))
+                }
                 allowScrollButtonsMobile
                 indicatorColor="primary"
                 scrollButtons="auto"
@@ -324,45 +288,45 @@ export const SearchPage = memo(({ index = null }: SearchPageProps) => {
                   }
                 }}
               >
-                {currentUser.roles.includes(permissionMap.submission) ? (
+                {currentUser.roles.includes('submission_view') ? (
                   <Tab
                     label={`${t('submission')} (${
-                      submissionResults ? searchResultsDisplay(submissionResults.total) : '...'
+                      !submissionResults.isPending ? searchResultsDisplay(submissionResults.data.total) : '...'
                     })`}
                     value="submission"
                   />
                 ) : (
                   <Empty />
                 )}
-                {currentUser.roles.includes(permissionMap.file) ? (
+                {currentUser.roles.includes('submission_view') ? (
                   <Tab
-                    label={`${t('file')} (${fileResults ? searchResultsDisplay(fileResults.total) : '...'})`}
+                    label={`${t('file')} (${!fileResults.isPending ? searchResultsDisplay(fileResults.data.total) : '...'})`}
                     value="file"
                   />
                 ) : (
                   <Empty />
                 )}
-                {currentUser.roles.includes(permissionMap.result) ? (
+                {currentUser.roles.includes('submission_view') ? (
                   <Tab
-                    label={`${t('result')} (${resultResults ? searchResultsDisplay(resultResults.total) : '...'})`}
+                    label={`${t('result')} (${!resultResults.isPending ? searchResultsDisplay(resultResults.data.total) : '...'})`}
                     value="result"
                   />
                 ) : (
                   <Empty />
                 )}
-                {currentUser.roles.includes(permissionMap.signature) ? (
+                {currentUser.roles.includes('signature_view') ? (
                   <Tab
                     label={`${t('signature')} (${
-                      signatureResults ? searchResultsDisplay(signatureResults.total) : '...'
+                      !signatureResults.isPending ? searchResultsDisplay(signatureResults.data.total) : '...'
                     })`}
                     value="signature"
                   />
                 ) : (
                   <Empty />
                 )}
-                {currentUser.roles.includes(permissionMap.alert) ? (
+                {currentUser.roles.includes('alert_view') ? (
                   <Tab
-                    label={`${t('alert')} (${alertResults ? searchResultsDisplay(alertResults.total) : '...'})`}
+                    label={`${t('alert')} (${!alertResults.isPending ? searchResultsDisplay(alertResults.data.total) : '...'})`}
                     value="alert"
                   />
                 ) : (
@@ -371,7 +335,7 @@ export const SearchPage = memo(({ index = null }: SearchPageProps) => {
                 {currentUser.roles.includes(permissionMap.retrohunt) && configuration.retrohunt.enabled ? (
                   <Tab
                     label={`${t('retrohunt')} (${
-                      retrohuntResults ? searchResultsDisplay(retrohuntResults.total) : '...'
+                      !retrohuntResults.isPending ? searchResultsDisplay(retrohuntResults.data.total) : '...'
                     })`}
                     value="retrohunt"
                   />
@@ -385,10 +349,11 @@ export const SearchPage = memo(({ index = null }: SearchPageProps) => {
                       size={downSM ? 'small' : 'medium'}
                       component={AppLink}
                       nav={nav =>
-                        nav.to().create({
+                        nav.here().create(s => ({
                           route: '/search/:index',
-                          path: { index: tab }
-                        })
+                          path: { index: tab },
+                          search: { ...s.search, index: null }
+                        }))
                       }
                       navDeps={[tab, location.search]}
                     >
@@ -408,7 +373,7 @@ export const SearchPage = memo(({ index = null }: SearchPageProps) => {
               justifyContent: 'flex-end'
             }}
           >
-            {resMap[tab] && resMap[tab].total !== 0 && currentIndex && (
+            {resMap[tab] && resMap[tab].total !== 0 && id && (
               <div
                 style={{
                   paddingLeft: theme.spacing(1),
@@ -421,43 +386,37 @@ export const SearchPage = memo(({ index = null }: SearchPageProps) => {
               </div>
             )}
             <div style={{ flexGrow: 1 }} />
-            {resMap[tab] && (
-              <SearchPager
-                total={resMap[tab].total}
-                setResults={stateMap[tab]}
-                page={resMap[tab].offset / resMap[tab].rows + 1}
-                pageSize={pageSize}
-                index={tab}
-                query={query}
-                setSearching={setSearching}
+            {resMap[tab] && resMap[tab].total > search.get('rows') && (
+              <Pagination
+                page={(search.get('offset') ?? 0) / search.get('rows') + 1}
+                count={Math.ceil(Math.min(resMap[tab].total, 10000) / search.get('rows'))}
+                shape="rounded"
+                size="small"
+                onChange={(_e, page) =>
+                  navigate
+                    .here<'/search/:index'>()
+                    .update(s => ({ ...s, search: { ...s.search, offset: (page - 1) * search.get('rows') } }))
+                }
               />
             )}
           </div>
         </div>
       </PageContainer>
-      <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
-        {tab === 'alert' && query && query.get('query') && (
-          <AlertsTable alertResults={alertResults} allowSort={!!currentIndex} />
-        )}
-        {tab === 'file' && query && query.get('query') && (
-          <FilesTable fileResults={fileResults} allowSort={!!currentIndex} />
-        )}
-        {tab === 'result' && query && query.get('query') && (
-          <ResultsTable resultResults={resultResults} allowSort={!!currentIndex} />
-        )}
-        {tab === 'retrohunt' && query && query.get('query') && (
-          <RetrohuntTable retrohuntResults={retrohuntResults} allowSort={!!currentIndex} />
-        )}
-        {tab === 'signature' && query && query.get('query') && (
-          <SignaturesTable signatureResults={signatureResults} allowSort={!!currentIndex} />
-        )}
-        {tab === 'submission' && query && query.get('query') && (
-          <SubmissionsTable submissionResults={submissionResults} allowSort={!!currentIndex} />
-        )}
-      </div>
+      {search.get('query') && (
+        <div
+          style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}
+        >
+          {tab === 'alert' && <AlertsTable alertResults={alertResults.data} />}
+          {tab === 'file' && <FilesTable fileResults={fileResults.data} />}
+          {tab === 'result' && <ResultsTable resultResults={resultResults.data} />}
+          {tab === 'retrohunt' && <RetrohuntTable retrohuntResults={retrohuntResults.data} />}
+          {tab === 'signature' && <SignaturesTable signatureResults={signatureResults.data} />}
+          {tab === 'submission' && <SubmissionsTable submissionResults={submissionResults.data} ignoreFilters />}
+        </div>
+      )}
     </PageFullWidth>
   );
-});
+};
 
 SearchPage.displayName = 'SearchPage';
 
@@ -474,13 +433,18 @@ export const SearchRoute = createAppRoute({
     primary: <SearchIcon />
   },
   ancestor: null,
-  component: SearchPage,
+  component: memo(() => <SearchPage />),
   path: '/search/:index',
   params: s => ({
     index: s.enum(INDEX_OPTIONS, 'submission')
   }),
   search: s => ({
-    query: s.string('')
+    index: s.enum(null, INDEX_OPTIONS).nullable(),
+    query: s.string(''),
+    offset: s.number(0).min(0).source('transient').ephemeral(),
+    rows: s.number(25).locked().source('transient').ephemeral(),
+    sort: s.string(null).ephemeral(),
+    use_archive: s.boolean(false)
   })
 });
 
@@ -493,9 +457,14 @@ export const SearchRootRoute = createAppRoute({
     primary: <SearchIcon />
   },
   ancestor: null,
-  component: SearchPage,
+  component: memo(() => <SearchPage />),
   path: '/search',
   search: s => ({
-    query: s.string('')
+    index: s.enum(null, INDEX_OPTIONS).nullable(),
+    query: s.string(''),
+    offset: s.number(0).min(0).source('transient').ephemeral(),
+    rows: s.number(25).locked().source('transient').ephemeral(),
+    sort: s.string(null).ephemeral(),
+    use_archive: s.boolean(false)
   })
 });
