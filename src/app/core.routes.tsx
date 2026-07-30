@@ -14,9 +14,13 @@ import { AdminServicesRoute } from 'routes/admin-services/admin-services.route';
 import { AdminSitemapRoute } from 'routes/admin-sitemap/admin-sitemap.route';
 import { AdminTagSafelistRoute } from 'routes/admin-tag-safelist/admin-tag-safelist.route';
 import { AdminUsersRoute } from 'routes/admin-users/admin-users.route';
+import { AdminRoute } from 'routes/admin/admin.route';
 import { AlertDetailRoute } from 'routes/alert-detail/alert-detail.route';
 import { AlertRedirectRoute } from 'routes/alert-redirect/alert-redirect.route';
 import { AlertsRoute } from 'routes/alerts/alerts.route';
+import { ArchiveDetailRootRoute, ArchiveDetailRoute } from 'routes/archive-detail/archive-detail.route';
+import { ArchivesRoute } from 'routes/archives/archives.route';
+import { AuthorizeRoute } from 'routes/authorize/authorize.route';
 import { DashboardRoute } from 'routes/dashboard/dashboard.route';
 import { DevelopmentAPIRoute } from 'routes/development-api/development-api.route';
 import { DevelopmentCustomizeRoute } from 'routes/development-customize/development-customize.route';
@@ -30,6 +34,7 @@ import { HelpClassificationRoute } from 'routes/help-classification/help-classif
 import { HelpConfigurationRoute } from 'routes/help-configuration/help-configuration.route';
 import { HelpSearchRoute } from 'routes/help-search/help-search.route';
 import { HelpServicesRoute } from 'routes/help-services/help-services.route';
+import { HelpRoute } from 'routes/help/help.route';
 import { ManageBadlistAddRoute } from 'routes/manage-badlist-add/manage-badlist-add.route';
 import { ManageBadlistDetailRoute } from 'routes/manage-badlist-detail/manage-badlist-detail.route';
 import { ManageBadlistsRoute } from 'routes/manage-badlists/manage-badlists.route';
@@ -51,6 +56,7 @@ import {
 } from 'routes/manage-workflow-create/manage-workflow-create.route';
 import { ManageWorkflowDetailRoute } from 'routes/manage-workflow-detail/manage-workflow-detail.route';
 import { ManageWorkflowsRoute } from 'routes/manage-workflows/manage-workflows.route';
+import { ManageRoute } from 'routes/manage/manage.route';
 import { MissingNodeRoute } from 'routes/missing-node/missing-node.route';
 import { NotFoundRoute } from 'routes/not-found/not-found.route';
 import { RetrohuntCreateRoute } from 'routes/retrohunt-create/retrohunt-create.route';
@@ -58,6 +64,8 @@ import { RetrohuntDetailRoute } from 'routes/retrohunt-detail/retrohunt-detail.r
 import { RetrohuntRoute } from 'routes/retrohunt/retrohunt.route';
 import { SearchRootRoute, SearchRoute } from 'routes/search/search.route';
 import { SettingsRootRoute, SettingsRoute } from 'routes/settings/settings.route';
+import { StatisticsHeuristicsRoute } from 'routes/statistics-heuristics/statistics-heuristics.route';
+import { StatisticsSignaturesRoute } from 'routes/statistics-signatures/statistics-signatures.route';
 import { SubmissionDetailRoute } from 'routes/submission-detail/submission-detail.route';
 import { SubmissionRedirectRoute } from 'routes/submission-redirect/submission-redirect.route';
 import { SubmissionReportRoute } from 'routes/submission-report/submission-report.route';
@@ -87,6 +95,7 @@ export const APP_ROUTES = [
   AdminErrorDetailRoute,
   AdminErrorViewerRoute,
   AdminIdentifyRoute,
+  AdminRoute,
   AdminServiceDetailRoute,
   AdminServiceReviewRoute,
   AdminServicesRoute,
@@ -97,6 +106,10 @@ export const APP_ROUTES = [
   AlertDetailRoute,
   AlertRedirectRoute,
   AlertsRoute,
+  ArchiveDetailRoute,
+  ArchiveDetailRootRoute,
+  ArchivesRoute,
+  AuthorizeRoute,
   CrashRoute,
   DashboardRoute,
   DevelopmentAPIRoute,
@@ -111,6 +124,7 @@ export const APP_ROUTES = [
   HelpAPIRoute,
   HelpClassificationRoute,
   HelpConfigurationRoute,
+  HelpRoute,
   HelpSearchRoute,
   HelpServicesRoute,
   LockedRoute,
@@ -119,6 +133,7 @@ export const APP_ROUTES = [
   ManageBadlistsRoute,
   ManageHeuristicDetailRoute,
   ManageHeuristicsRoute,
+  ManageRoute,
   ManageSafelistAddRoute,
   ManageSafelistDetailRoute,
   ManageSafelistsRoute,
@@ -141,6 +156,8 @@ export const APP_ROUTES = [
   SearchRoute,
   SettingsRootRoute,
   SettingsRoute,
+  StatisticsHeuristicsRoute,
+  StatisticsSignaturesRoute,
   SubmissionDetailRoute,
   SubmissionRedirectRoute,
   SubmissionReportRoute,

@@ -13,6 +13,8 @@ import routerEN from 'core/router/router.i18n.en.json';
 import routerFR from 'core/router/router.i18n.fr.json';
 import i18n from 'i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
+import assistantEN from 'layout/assistant/assistant.i18n.en.json';
+import assistantFR from 'layout/assistant/assistant.i18n.fr.json';
 import lockedEN from 'layout/auth/locked/locked.i18n.en.json';
 import lockedFR from 'layout/auth/locked/locked.i18n.fr.json';
 import loginEN from 'layout/auth/log-in/log-in.i18n.en.json';
@@ -23,6 +25,10 @@ import quotaEN from 'layout/auth/quota/quota.i18n.en.json';
 import quotaFR from 'layout/auth/quota/quota.i18n.fr.json';
 import tosEN from 'layout/auth/terms-of-service/terms-of-service.i18n.en.json';
 import tosFR from 'layout/auth/terms-of-service/terms-of-service.i18n.fr.json';
+import borealisEN from 'layout/borealis/borealis.i18n.en.json';
+import borealisFR from 'layout/borealis/borealis.i18n.fr.json';
+import carouselEN from 'layout/carousel/carousel.i18n.en.json';
+import carouselFR from 'layout/carousel/carousel.i18n.fr.json';
 import externalLookupEN from 'layout/external-lookup/external-lookup.i18n.en.json';
 import externalLookupFR from 'layout/external-lookup/external-lookup.i18n.fr.json';
 import notificationsEN from 'layout/notifications/notifications.i18n.en.json';
@@ -48,6 +54,12 @@ import adminUsersEN from 'routes/admin-users/admin-users.i18n.en.json';
 import adminUsersFR from 'routes/admin-users/admin-users.i18n.fr.json';
 import alertsEN from 'routes/alerts/alerts.i18n.en.json';
 import alertsFR from 'routes/alerts/alerts.i18n.fr.json';
+import favoritesEN from 'routes/alerts/components/favorites.i18n.en.json';
+import favoritesFR from 'routes/alerts/components/favorites.i18n.fr.json';
+import archivesEN from 'routes/archives/archives.i18n.en.json';
+import archivesFR from 'routes/archives/archives.i18n.fr.json';
+import authorizeEN from 'routes/authorize/authorize.i18n.en.json';
+import authorizeFR from 'routes/authorize/authorize.i18n.fr.json';
 import dashboardEN from 'routes/dashboard/dashboard.i18n.en.json';
 import dashboardFR from 'routes/dashboard/dashboard.i18n.fr.json';
 import developmentAPIEN from 'routes/development-api/development-api.i18n.en.json';
@@ -104,6 +116,10 @@ import searchEN from 'routes/search/search.i18n.en.json';
 import searchFR from 'routes/search/search.i18n.fr.json';
 import settingsEN from 'routes/settings/settings.i18n.en.json';
 import settingsFR from 'routes/settings/settings.i18n.fr.json';
+import statisticsHeuristicsEN from 'routes/statistics-heuristics/statistics-heuristics.i18n.en.json';
+import statisticsHeuristicsFR from 'routes/statistics-heuristics/statistics-heuristics.i18n.fr.json';
+import statisticsSignaturesEN from 'routes/statistics-signatures/statistics-signatures.i18n.en.json';
+import statisticsSignaturesFR from 'routes/statistics-signatures/statistics-signatures.i18n.fr.json';
 import submissionDetailEN from 'routes/submission-detail/submission-detail.i18n.en.json';
 import submissionDetailFR from 'routes/submission-detail/submission-detail.i18n.fr.json';
 import submissionReportEN from 'routes/submission-report/submission-report.i18n.en.json';
@@ -116,8 +132,12 @@ import userEN from 'routes/user/user.i18n.en.json';
 import userFR from 'routes/user/user.i18n.fr.json';
 import dateTimeEN from 'ui/DateTime/datetime.i18n.en.json';
 import dateTimeFR from 'ui/DateTime/datetime.i18n.fr.json';
+import hexViewerEN from 'ui/HexViewer/hex-viewer.i18n.en.json';
+import hexViewerFR from 'ui/HexViewer/hex-viewer.i18n.fr.json';
 import inputsEN from 'ui/inputs/i18n/inputs.i18n.en.json';
 import inputsFR from 'ui/inputs/i18n/inputs.i18n.fr.json';
+import sandboxEN from 'ui/ResultCard/Sandbox/sandbox.i18n.en.json';
+import sandboxFR from 'ui/ResultCard/Sandbox/sandbox.i18n.fr.json';
 
 export const I18N_RESSOURCES = {
   en: {
@@ -133,6 +153,11 @@ export const I18N_RESSOURCES = {
     alerts: alertsEN,
     api: apiEN,
     app: appEN,
+    archive: archivesEN,
+    assistant: assistantEN,
+    authorize: authorizeEN,
+    borealis: borealisEN,
+    carousel: carouselEN,
     dashboard: dashboardEN,
     dateTime: dateTimeEN,
     developmentAPI: developmentAPIEN,
@@ -140,6 +165,7 @@ export const I18N_RESSOURCES = {
     error403: forbiddenEN,
     error404: notFoundEN,
     externalLookup: externalLookupEN,
+    favorites: favoritesEN,
     fileDetail: fileDetailEN,
     fileViewer: fileViewerEN,
     helpAPI: helpAPIEN,
@@ -147,6 +173,7 @@ export const I18N_RESSOURCES = {
     helpConfiguration: helpConfigurationEN,
     helpSearch: helpSearchEN,
     helpServices: helpServicesEN,
+    hexViewer: hexViewerEN,
     inputs: inputsEN,
     locked: lockedEN,
     login: loginEN,
@@ -169,8 +196,11 @@ export const I18N_RESSOURCES = {
     quota: quotaEN,
     retrohunt: retrohuntEN,
     router: routerEN,
+    sandbox: sandboxEN,
     search: searchEN,
     settings: settingsEN,
+    statisticsHeuristics: statisticsHeuristicsEN,
+    statisticsSignatures: statisticsSignaturesEN,
     submissionDetail: submissionDetailEN,
     submissionReport: submissionReportEN,
     submissions: submissionsEN,
@@ -191,6 +221,11 @@ export const I18N_RESSOURCES = {
     alerts: alertsFR,
     api: apiFR,
     app: appFR,
+    archive: archivesFR,
+    assistant: assistantFR,
+    authorize: authorizeFR,
+    borealis: borealisFR,
+    carousel: carouselFR,
     dashboard: dashboardFR,
     dateTime: dateTimeFR,
     developmentAPI: developmentAPIFR,
@@ -198,6 +233,7 @@ export const I18N_RESSOURCES = {
     error403: forbiddenFR,
     error404: notFoundFR,
     externalLookup: externalLookupFR,
+    favorites: favoritesFR,
     fileDetail: fileDetailFR,
     fileViewer: fileViewerFR,
     helpAPI: helpAPIFR,
@@ -205,6 +241,7 @@ export const I18N_RESSOURCES = {
     helpConfiguration: helpConfigurationFR,
     helpSearch: helpSearchFR,
     helpServices: helpServicesFR,
+    hexViewer: hexViewerFR,
     inputs: inputsFR,
     locked: lockedFR,
     login: loginFR,
@@ -227,8 +264,11 @@ export const I18N_RESSOURCES = {
     quota: quotaFR,
     retrohunt: retrohuntFR,
     router: routerFR,
+    sandbox: sandboxFR,
     search: searchFR,
     settings: settingsFR,
+    statisticsHeuristics: statisticsHeuristicsFR,
+    statisticsSignatures: statisticsSignaturesFR,
     submissionDetail: submissionDetailFR,
     submissionReport: submissionReportFR,
     submissions: submissionsFR,

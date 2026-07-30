@@ -303,7 +303,7 @@ export const ArchiveDetailRoute = createAppRoute({
   icon: {
     primary: <DescriptionOutlinedIcon />
   },
-  ancestor: '/archives',
+  ancestor: null,
   component: ArchiveDetailPage,
   path: '/archive/:id/:tab',
   params: s => ({
@@ -322,7 +322,7 @@ export const ArchiveDetailRootRoute = createAppRoute({
   icon: {
     primary: <DescriptionOutlinedIcon />
   },
-  ancestor: '/archives',
+  ancestor: null,
   component: ArchiveDetailPage,
   path: '/archive/:id',
   params: s => ({

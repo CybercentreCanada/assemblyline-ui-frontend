@@ -301,7 +301,7 @@ export const AdminErrorViewerRoute = createAppRoute({
   icon: {
     primary: <ErrorOutlineOutlinedIcon />
   },
-  ancestor: null,
+  ancestor: '/admin',
   component: AdminErrorViewerPage,
   path: '/admin/errors',
   search: s => ({

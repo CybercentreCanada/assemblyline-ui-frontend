@@ -166,7 +166,7 @@ export const AdminAPIKeysRoute = createAppRoute({
   icon: {
     primary: <KeyOutlinedIcon />
   },
-  ancestor: null,
+  ancestor: '/admin',
   component: AdminAPIKeysPage,
   path: '/admin/apikeys',
   search: s => ({

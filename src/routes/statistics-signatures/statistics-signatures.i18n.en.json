@@ -1,0 +1,11 @@
+{
+  "avg": "Avg Score",
+  "classification": "Classification",
+  "count": "Count",
+  "max": "Max Score",
+  "min": "Min Score",
+  "name": "Name",
+  "source": "Source",
+  "title": "Signatures Statistics",
+  "type": "Type"
+}

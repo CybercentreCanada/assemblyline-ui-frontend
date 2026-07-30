@@ -1080,7 +1080,7 @@ export const AdminUserDetailRoute = createAppRoute({
   icon: {
     primary: <AccountCircleOutlinedIcon />
   },
-  ancestor: '/users',
+  ancestor: '/admin/users',
   component: UserPage,
   path: '/admin/users/:id',
   params: s => ({
