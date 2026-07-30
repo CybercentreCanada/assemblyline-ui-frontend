@@ -19,6 +19,7 @@ import { AppTemplateLayout, AppTemplateProvider } from 'core/template';
 import { AppThemeProvider } from 'core/theme';
 import { AppAssistantLayout, AppAssistantProvider, AppAssistantStoreProvider } from 'layout/assistant';
 import { AppAuthLayout } from 'layout/auth';
+import { AppBorealisProvider } from 'layout/borealis';
 import { AppCarouselProvider } from 'layout/carousel';
 import { AppDrawerLayout } from 'layout/drawer';
 import type { PropsWithChildren } from 'react';
@@ -148,9 +149,11 @@ const AppProviders = memo(({ children }: PropsWithChildren) => (
               <AppRouterProvider>
                 <AppNavigationProvider>
                   <AppLocationParamProvider appRoutes={APP_ROUTES}>
-                    <AppCarouselProvider>
-                      <>{children}</>
-                    </AppCarouselProvider>
+                    <AppBorealisProvider>
+                      <AppCarouselProvider>
+                        <>{children}</>
+                      </AppCarouselProvider>
+                    </AppBorealisProvider>
                   </AppLocationParamProvider>
                 </AppNavigationProvider>
               </AppRouterProvider>
