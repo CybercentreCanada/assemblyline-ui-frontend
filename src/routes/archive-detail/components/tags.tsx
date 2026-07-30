@@ -299,14 +299,12 @@ const WrappedArchivedTagSection: React.FC<Props> = ({
                           <SortableGridHeaderCell
                             allowSort
                             children={t('type')}
-                            query={query}
                             sortField="tag_type"
                             onSort={handleSort}
                           />
                           <SortableGridHeaderCell
                             allowSort
                             children={t('verdict')}
-                            query={query}
                             sortField="h_type"
                             inverted
                             onSort={handleSort}
@@ -314,7 +312,6 @@ const WrappedArchivedTagSection: React.FC<Props> = ({
                           <SortableGridHeaderCell
                             allowSort
                             children={t('value')}
-                            query={query}
                             sortField="value"
                             onSort={handleSort}
                           />
@@ -322,7 +319,6 @@ const WrappedArchivedTagSection: React.FC<Props> = ({
                             <SortableGridHeaderCell
                               allowSort
                               children={t('classification')}
-                              query={query}
                               sortField="classification"
                               onSort={handleSort}
                             />
@@ -615,7 +611,7 @@ const WrappedRow: React.FC<RowProps> = ({
           <Collapse in={open && resultResults?.total > 0} timeout="auto" onEnter={() => setRender(true)}>
             {render && (
               <div style={{ paddingTop: theme.spacing(2), paddingBottom: theme.spacing(2) }}>
-                <ResultsTable resultResults={resultResults} allowSort={false} allowHash />
+                <ResultsTable resultResults={resultResults} allowSort={false} />
               </div>
             )}
           </Collapse>

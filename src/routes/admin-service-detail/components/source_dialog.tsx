@@ -4,7 +4,7 @@ import type { UpdateSource } from 'models/base/service';
 import { DEFAULT_SOURCE } from 'models/base/service';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { SourceDetail } from 'routes/manage-signature-sources-detail/manage-signature-sources-detail.route';
+import { SourceDetail } from 'routes/manage-signature-source-detail/manage-signature-source-detail.route';
 
 type Props = {
   open: boolean;

@@ -16,7 +16,7 @@ const WrappedAppRoot = ({ data = '' }: DataProps) => {
   }, [data, dispatch]);
 
   // Theme
-  const { theme: appTheme } = useAppTheme();
+  const { mode: appTheme } = useAppTheme();
   React.useEffect(() => {
     update.store.mode.setTheme(appTheme as ModeTheme);
   }, [appTheme, update]);

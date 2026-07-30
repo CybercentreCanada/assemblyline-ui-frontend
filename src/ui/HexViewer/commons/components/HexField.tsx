@@ -2,8 +2,7 @@ import FormControl from '@mui/material/FormControl';
 import InputLabel from '@mui/material/InputLabel';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import type { SxProps } from '@mui/material/styles';
-import { useEffectOnce } from 'commons/components/utils/hooks/useEffectOnce';
-import React, { useCallback, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 export type HexFieldProps = {
   id?: string;
@@ -36,7 +35,7 @@ export const WrappedHexField = ({
     console.log(event.type, paste, inputRef.current.selectionStart);
   }, []);
 
-  useEffectOnce(() => {
+  useEffect(() => {
     inputRef.current.addEventListener('mousedown', onMouseDown);
     inputRef.current.addEventListener('keydown', onKeyDown);
     inputRef.current.addEventListener('keypress', onKeyPress);
@@ -47,14 +46,14 @@ export const WrappedHexField = ({
       inputRef.current.removeEventListener('keypress', onKeyPress);
       inputRef.current.removeEventListener('paste', onPaste);
     };
-  });
+  }, []);
 
-  useEffectOnce(() => {
+  useEffect(() => {
     inputRef.current.addEventListener('mousedown', onMouseDown);
     inputRef.current.addEventListener('keydown', onKeyDown);
     inputRef.current.addEventListener('keypress', onKeyPress);
     inputRef.current.addEventListener('paste', onPaste);
-  });
+  }, []);
 
   return (
     <FormControl fullWidth={true} variant="outlined" size="small" sx={{ ...slotSX?.formControl }}>

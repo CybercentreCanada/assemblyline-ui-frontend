@@ -8,19 +8,7 @@ import RemoveIcon from '@mui/icons-material/Remove';
 import ZoomInIcon from '@mui/icons-material/ZoomIn';
 import ZoomOutIcon from '@mui/icons-material/ZoomOut';
 import type { Theme } from '@mui/material';
-import {
-  alpha,
-  Button,
-  CircularProgress,
-  IconButton,
-  Modal,
-  Skeleton,
-  Slider,
-  styled,
-  Tooltip,
-  useTheme
-} from '@mui/material';
-import { AppLink } from 'core/router';
+import { alpha, Button, CircularProgress, Modal, Skeleton, Slider, styled, Tooltip, useTheme } from '@mui/material';
 import { useBackgroundMode, useCarouselKeyboard, useImageFetch } from 'layout/carousel/carousel.hooks';
 import type {
   BackgroundMode,
@@ -32,7 +20,7 @@ import { IMAGE_SIZE, MIN_IMAGE_SIZE_REM, NAV_BAR_HEIGHT, ZOOM_CLASS } from 'layo
 import type { Image } from 'models/base/result_body';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation } from 'react-router';
+import { IconButton } from 'ui/buttons/IconButton';
 
 //*****************************************************************************************
 // Styled Components
@@ -316,7 +304,6 @@ CarouselItem.displayName = 'CarouselItem';
 export const CarouselContainer = memo(({ images, index, onClose, open, setIndex }: CarouselContainerProps) => {
   const { t } = useTranslation(['carousel']);
   const theme = useTheme();
-  const location = useLocation();
 
   const { data: thumbData, fetchImage: fetchThumb } = useImageFetch();
   const { data: imgData, fetchImage: fetchImg, loading } = useImageFetch();
@@ -621,8 +608,9 @@ export const CarouselContainer = memo(({ images, index, onClose, open, setIndex 
             </Info>
             <Tooltip title={t('view_file')} placement="bottom">
               <IconButton
-                component={AppLink}
-                to={{ create: { route: '/file/viewer/:id/:tab', path: { id: currentImage?.img, tab: 'image' } } }}
+                nav={nav =>
+                  nav.to().create({ route: '/file/viewer/:id/:tab', path: { id: currentImage?.img, tab: 'image' } })
+                }
                 color="inherit"
                 style={{ marginLeft: '8px' }}
                 onClick={handleClose}

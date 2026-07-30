@@ -215,7 +215,7 @@ export const getLocationSearchFromParam = function <const Origin extends AppRout
   route: InferAppRouteFromPath<Origin>,
   param: InferAppLocationFromPath<Origin>
 ): [Location['search'], SearchParamValueMap, SearchParamValueMap] {
-  const delta = !route?.search || route?.search == null ? undefined : route.search.delta(param.search as never);
+  const delta = !route?.search || route?.search == null ? undefined : route.search.delta(param.search);
   return !delta ? [null, null, null] : [delta.toLocationSearch(), delta.toLocationState(), delta.toLocationTransient()];
 };
 

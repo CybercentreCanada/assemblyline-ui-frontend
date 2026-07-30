@@ -133,7 +133,7 @@ export const useApiCallFn = <
 
         // unauthorized
         if (res.status === 401 && reloadOnUnauthorize) {
-          // window.location.reload();
+          window.location.reload();
           return rejectWith(json);
         }
 

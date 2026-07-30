@@ -10,13 +10,17 @@ const SubmissionRedirect = memo(() => {
   return settings.submission_view === 'details' ? (
     <AppNavigate<'/submission/:id'>
       nav={nav =>
-        nav.here({ replace: true }).update(s => ({ route: '/submission/detail/:id', path: { id: s.path.id } }))
+        nav
+          .here<'/submission/detail/:id'>({ replace: true })
+          .update(s => ({ route: '/submission/detail/:id', path: { id: s.path.id } }))
       }
     />
   ) : (
     <AppNavigate<'/submission/:id'>
       nav={nav =>
-        nav.here({ replace: true }).update(s => ({ route: '/submission/report/:id', path: { id: s.path.id } }))
+        nav
+          .here<'/submission/report/:id'>({ replace: true })
+          .update(s => ({ route: '/submission/report/:id', path: { id: s.path.id } }))
       }
     />
   );

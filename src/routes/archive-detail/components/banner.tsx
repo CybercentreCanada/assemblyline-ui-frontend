@@ -24,6 +24,7 @@ import {
   useTheme
 } from '@mui/material';
 import { AppLink, useAppNavigate } from 'core/router';
+import { useAppSearchSnapshot } from 'core/routes';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import useMySnackbar from 'deprecated/hooks/useMySnackbar';
@@ -32,7 +33,6 @@ import type { LabelCategories } from 'models/base/file';
 import type { CSSProperties } from 'react';
 import React, { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation } from 'react-router';
 import { bytesToSize } from 'shared/utils/utils';
 import { FileDownloader } from 'ui/buttons/FileDownloader';
 import { IconButton } from 'ui/buttons/IconButton';
@@ -152,7 +152,7 @@ type Props = {
 const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid = null, force = false }) => {
   const { t } = useTranslation(['fileDetail', 'archive']);
   const theme = useTheme();
-  const location = useLocation();
+  const search = useAppSearchSnapshot<'/archive/:id'>();
   const navigate = useAppNavigate();
   const { apiCall } = useMyAPI();
   const { showSuccessMessage } = useMySnackbar();
@@ -167,8 +167,7 @@ const WrappedArchiveBanner: React.FC<Props> = ({ sha256 = null, file = null, sid
   const [showMoreLabels, setShowMoreLabels] = useState<boolean>(false);
   const [collapseLabels, setCollapseLabels] = useState<boolean>(false);
 
-  const params = new URLSearchParams(location.search);
-  const fileName = file ? params.get('name') || sha256 : null;
+  const fileName = file ? search.get('name') || sha256 : null;
   const popoverOpen = Boolean(resubmitAnchor);
 
   const ref = useRef<HTMLDivElement>(null);

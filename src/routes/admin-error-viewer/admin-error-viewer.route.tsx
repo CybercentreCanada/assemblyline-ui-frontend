@@ -12,7 +12,6 @@ import type { IndexDefinition } from 'models/api/user';
 import type { Error } from 'models/base/error';
 import { memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate } from 'react-router';
 import { ErrorsTable } from 'routes/search/components/errors';
 import { safeFieldValue } from 'shared/utils/utils';
 import { DateTimeRangePicker } from 'ui/DateTime/DateTimeRangePicker';
@@ -100,10 +99,7 @@ export const AdminErrorViewerPage = memo(() => {
       method: 'POST',
       body: body
         .pick(['query', 'mincount', 'filters', 'timeout', 'use_archive', 'archive_only'])
-        .set(s => {
-          s.mincount = 1;
-          return s;
-        })
+        .set(s => ({ ...s, mincount: 1 }))
         .toObject(),
       onSuccess: ({ api_response }) =>
         setNames(
@@ -120,10 +116,7 @@ export const AdminErrorViewerPage = memo(() => {
       method: 'POST',
       body: body
         .pick(['query', 'mincount', 'filters', 'timeout', 'use_archive', 'archive_only'])
-        .set(s => {
-          s.mincount = 1;
-          return s;
-        })
+        .set(s => ({ ...s, mincount: 1 }))
         .toObject(),
       onSuccess: ({ api_response }) =>
         setTypes(
@@ -146,7 +139,7 @@ export const AdminErrorViewerPage = memo(() => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return currentUser.is_admin ? (
+  return (
     <PageFullWidth margin={4}>
       <div
         style={{
@@ -282,8 +275,6 @@ export const AdminErrorViewerPage = memo(() => {
         <ErrorsTable errorResults={errorResults} />
       </div>
     </PageFullWidth>
-  ) : (
-    <Navigate to="/forbidden" replace />
   );
 });
 

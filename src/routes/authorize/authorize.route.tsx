@@ -8,9 +8,9 @@ import { SCOPES } from 'models/base/user';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
+import { getXSRFCookie } from 'shared/utils/xsrf.utils';
 import { AppVerticalBanner } from 'ui/branding/AppVerticalBanner';
 import { PageCardCentered } from 'ui/pages/PageCardCentered';
-import { getXSRFCookie } from 'shared/utils/xsrf.utils';
 
 const VALID_SCOPES: Omit<Scope, 'c'>[] = SCOPES.filter(s => s !== 'c');
 
@@ -46,7 +46,11 @@ export const AppRegistrationPage = memo(() => {
                 {t('button.back')}
               </Button>
             </>
-          ) : !rUrl || !clientID || (!scope && !roles) || !server || (scope && VALID_SCOPES.indexOf(scope as Scope) === -1) ? (
+          ) : !rUrl ||
+            !clientID ||
+            (!scope && !roles) ||
+            !server ||
+            (scope && VALID_SCOPES.indexOf(scope as Scope) === -1) ? (
             <>
               <div style={{ marginBottom: '3rem' }}>{t('invalid')}</div>
               <Button variant="contained" color="primary" onClick={() => navigate(-1)}>

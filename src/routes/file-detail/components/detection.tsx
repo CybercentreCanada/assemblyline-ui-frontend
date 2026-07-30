@@ -168,7 +168,7 @@ const WrappedHeuristic: React.FC<HeuristicProps> = ({ name, id, sections, level,
             <IconButton
               component={AppLink}
               size="small"
-              nav={nav => nav.to().create({ route: '/manage/heuristic/:id', path: { id: `${id}` } })}
+              nav={nav => nav.to().create({ route: '/manage/heuristic/detail/:id', path: { id } })}
               navDeps={[id]}
               color="inherit"
             >

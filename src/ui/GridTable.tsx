@@ -9,10 +9,9 @@ import type {
 import { Paper, Table, TableBody, TableCell, TableHead, TableRow, TableSortLabel, styled } from '@mui/material';
 import type { InferAppNavigationPropsFromPath } from 'core/router';
 import { AppLink, useAppNavigate } from 'core/router';
+import { useAppSearchSnapshot } from 'core/routes';
 import type { FC } from 'react';
 import React, { forwardRef, memo } from 'react';
-import { useLocation } from 'react-router';
-import type SimpleSearchQuery from 'ui/SearchBar/simple-search-query';
 
 interface StyledPaperProps extends PaperProps {
   component?: any;
@@ -191,7 +190,6 @@ export const GridTableCell: FC<GridTableCellProps> = memo(
 
 interface SortableGridHeaderCellProps extends GridTableCellProps {
   allowSort?: boolean;
-  query?: SimpleSearchQuery;
   sortField: string;
   sortName?: string;
   inverted?: boolean;
@@ -202,33 +200,34 @@ export const SortableGridHeaderCell: FC<SortableGridHeaderCellProps> = memo(
   ({
     allowSort = true,
     children,
-    query = null,
     sortField,
-    sortName = 'sort',
+    sortName: sortNameProp = 'sort',
     inverted = false,
     onSort = null,
     ...other
   }: SortableGridHeaderCellProps) => {
-    const location = useLocation();
-    const searchParams = new URLSearchParams(location.search);
-    const curSort = query ? query.get(sortName) : searchParams.get(sortName);
+    const search = useAppSearchSnapshot<'/search'>();
     const navigate = useAppNavigate();
+
+    const sortName = sortNameProp as 'sort';
+    const curSort = search.get(sortName as 'sort');
     const active = curSort && curSort.indexOf(sortField) !== -1;
     const ascending = inverted ? 'asc' : 'desc';
     const descending = inverted ? 'desc' : 'asc';
     const dir = active && curSort.indexOf(ascending) !== -1 ? ascending : descending;
 
     const triggerSort = (event: React.MouseEvent<HTMLSpanElement, MouseEvent>) => {
-      if (curSort && curSort.indexOf(sortField) !== -1 && curSort.indexOf(ascending) === -1) {
-        searchParams.set(sortName, `${sortField} ${ascending}`);
-      } else {
-        searchParams.set(sortName, `${sortField} ${descending}`);
-      }
+      const nextSearch =
+        curSort && curSort.indexOf(sortField) !== -1 && curSort.indexOf(ascending) === -1
+          ? search.set(s => ({ ...s, [sortName]: `${sortField} ${ascending}` }))
+          : search.set(s => ({ ...s, [sortName]: `${sortField} ${ascending}` }));
 
       if (onSort) {
-        onSort(event, { name: sortName, field: searchParams.get(sortName) });
+        onSort(event, { name: sortName, field: nextSearch.get(sortName) });
       } else {
-        navigate(`${location.pathname}?${searchParams.toString()}${location.hash}`);
+        navigate
+          .here<'/search'>()
+          .update(s => ({ ...s, search: { ...s.search, [sortName]: nextSearch.get(sortName) } }));
       }
     };
 

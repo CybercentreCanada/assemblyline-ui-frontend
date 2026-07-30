@@ -28,13 +28,13 @@ import type { ServiceIndexed, ServiceUpdateData, ServiceUpdates } from 'models/b
 import type { ChangeEvent } from 'react';
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import CommunityServiceTable from 'routes/admin-services/components/CommunityServiceTable';
+import NewServiceTable from 'routes/admin-services/components/NewServiceTable';
 import { ServiceTable } from 'routes/search/components/service';
 import { FileDownloader } from 'ui/buttons/FileDownloader';
 import ConfirmationDialog from 'ui/ConfirmationDialog';
 import { PageHeader } from 'ui/layouts/PageHeader';
 import { PageFullWidth } from 'ui/pages/PageFullWidth';
-import CommunityServiceTable from 'ui/ServiceManagement/CommunityServiceTable';
-import NewServiceTable from 'ui/ServiceManagement/NewServiceTable';
 
 export const AdminServicesPage = memo(() => {
   const { t } = useTranslation(['adminServices']);

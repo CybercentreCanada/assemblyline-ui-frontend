@@ -355,7 +355,7 @@ export const SelectListInputOptionMenuItem = React.memo(
             <IconButton
               color="secondary"
               tabIndex={-1}
-              to={helpLink}
+              nav={nav => nav.to().create(helpLink)}
               tooltip={
                 <>
                   <span style={{ color: theme.palette.text.secondary }}>{t('adornment.help.tooltip')}</span>

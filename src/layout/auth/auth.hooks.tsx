@@ -6,7 +6,7 @@ import { useAppInterfaceStore, useAppSetInterfaceStore } from 'core/interface';
 import { useAppSnackbar } from 'core/snackbar';
 import type { LoginParamsProps } from 'layout/auth/auth.models';
 import { normalizeWhoAmI } from 'layout/auth/auth.utils';
-import type { WhoAmIProps } from 'models/api/user';
+import type { WhoAmI, WhoAmIProps } from 'models/api/user';
 import type { Configuration } from 'models/base/config';
 import { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -226,7 +226,7 @@ export const useAuthQuery = () => {
           const user = json.api_response as WhoAmIProps;
 
           // Set the current user
-          setConfig(s => ({ ...s, ...normalizeWhoAmI(json.api_response) }));
+          setConfig(s => ({ ...s, ...normalizeWhoAmI(json.api_response as unknown as WhoAmI) }));
 
           // Mark the interface ready
           // TODO

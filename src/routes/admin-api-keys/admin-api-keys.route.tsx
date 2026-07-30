@@ -10,7 +10,6 @@ import type { IndexDefinition } from 'models/api/user';
 import type { ApiKey } from 'models/base/user';
 import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate } from 'react-router';
 import { ApikeysTable } from 'routes/search/components/apikeys';
 import { safeFieldValue } from 'shared/utils/utils';
 import { PageContainer } from 'ui/pages/PageContainer';
@@ -97,7 +96,7 @@ export const AdminAPIKeysPage = React.memo(() => {
     };
   }, [navigate]);
 
-  return currentUser.is_admin ? (
+  return (
     <PageFullWidth margin={4}>
       <div style={{ paddingBottom: theme.spacing(2) }}>
         <Grid container alignItems="center">
@@ -147,8 +146,6 @@ export const AdminAPIKeysPage = React.memo(() => {
         <ApikeysTable apikeySearchResults={apikeySearchResults} />
       </div>
     </PageFullWidth>
-  ) : (
-    <Navigate to="/forbidden" replace />
   );
 });
 

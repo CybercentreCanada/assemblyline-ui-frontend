@@ -1,4 +1,4 @@
-import type { Method } from 'components/models/utils/request';
+import type { Method } from 'core/api';
 
 export type Request = {
   comment?: string;

@@ -1,7 +1,7 @@
 import { useTheme } from '@mui/material';
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import remarkGfm from 'remark-gfm';
 
 export type MarkdownProps = {
@@ -83,6 +83,7 @@ export const Markdown = React.memo(({ children, slotProps }: MarkdownProps) => {
         li: ({ children }) => <li>{children}</li>,
         em: ({ children }) => <em>{children}</em>,
         a: ({ href, children }) => (
+          // TODO: use the AppLink to show the external site warning
           <Link to={href || ''} style={{ color: theme.palette.primary.main, textDecoration: 'underline' }}>
             {children}
           </Link>

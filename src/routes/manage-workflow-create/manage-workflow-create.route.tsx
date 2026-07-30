@@ -76,7 +76,9 @@ export const ManageWorkflowCreatePage = memo(() => {
         showSuccessMessage(t('add.success'));
         setTimeout(() => window.dispatchEvent(new CustomEvent('reloadWorkflows')), 1000);
         setTimeout(() => window.dispatchEvent(new CustomEvent('alertRefresh', null)), 1500);
-        navigate.here().create({ route: '/manage/workflow/detail/:id', path: { id: api_response.workflow_id } });
+        navigate
+          .here<'/manage/workflow/detail/:id'>()
+          .create({ route: '/manage/workflow/detail/:id', path: { id: api_response.workflow_id } });
       }
     })
   );
@@ -94,7 +96,9 @@ export const ManageWorkflowCreatePage = memo(() => {
       onSuccess: () => {
         showSuccessMessage(t('update.success'));
         setTimeout(() => window.dispatchEvent(new CustomEvent('reloadWorkflows')), 1000);
-        navigate.here().create({ route: '/manage/workflow/detail/:id', path: { id: paramID } });
+        navigate
+          .here<'/manage/workflow/detail/:id'>()
+          .create({ route: '/manage/workflow/detail/:id', path: { id: paramID } });
       }
     })
   );
@@ -201,7 +205,9 @@ export const ManageWorkflowCreatePage = memo(() => {
                   tooltip={t('cancel.button')}
                   color="error"
                   onClick={() =>
-                    navigate.here().create({ route: '/manage/workflow/detail/:id', path: { id: paramID } })
+                    navigate
+                      .here<'/manage/workflow/detail/:id'>()
+                      .create({ route: '/manage/workflow/detail/:id', path: { id: paramID } })
                   }
                 >
                   <DoDisturbAltOutlinedIcon />

@@ -119,7 +119,7 @@ const SubmissionReportPage = memo(() => {
       setReport({
         ...originalReport,
         attack_matrix: tempMatrix,
-        heuristics: tempHeur,
+        heuristics: tempHeur as any,
         heuristic_sections: tempHeurSec,
         important_files: tempImpFiles,
         tags: tempTags

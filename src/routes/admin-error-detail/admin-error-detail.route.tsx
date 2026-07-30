@@ -15,7 +15,6 @@ import type { ReactElement } from 'react';
 import { memo, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { BsClipboard } from 'react-icons/bs';
-import { Navigate } from 'react-router';
 import { FileDownloader } from 'ui/buttons/FileDownloader';
 import { IconButton } from 'ui/buttons/IconButton';
 import Moment from 'ui/Moment';
@@ -77,7 +76,7 @@ export const AdminErrorDetailPage = memo(() => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key]);
 
-  return currentUser.is_admin ? (
+  return (
     <PageCenter margin={!key ? 2 : 4} width="100%">
       {error && (
         <div
@@ -216,8 +215,6 @@ export const AdminErrorDetailPage = memo(() => {
         </div>
       )}
     </PageCenter>
-  ) : (
-    <Navigate to="/forbidden" replace />
   );
 });
 

@@ -1,7 +1,7 @@
+import { AppNavigate } from 'core/router';
 import useALContext from 'deprecated/hooks/useALContext';
 import type { Role } from 'models/base/user';
 import React from 'react';
-import { Navigate } from 'react-router';
 import { ForbiddenPage } from 'routes/forbidden/forbidden';
 
 export type ForbiddenRedirectProps = {
@@ -18,7 +18,7 @@ export const ForbiddenRedirect: React.FC<ForbiddenRedirectProps> = React.memo(
     return enabled || roles.every(r => currentUser.roles.includes(r)) ? (
       children
     ) : redirect ? (
-      <Navigate to="/forbidden" replace />
+      <AppNavigate nav={nav => nav.here({ replace: true }).update({ route: '/forbidden' })} />
     ) : (
       <ForbiddenPage />
     );

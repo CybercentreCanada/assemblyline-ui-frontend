@@ -10,6 +10,11 @@ import type { File } from 'models/api/file';
 import type { Section } from 'models/base/result';
 import { memo, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import ArchiveBanner from 'routes/archive-detail/components/banner';
+import CommentSection from 'routes/archive-detail/components/comments';
+import LabelSection from 'routes/archive-detail/components/labels';
+import SimilarSection from 'routes/archive-detail/components/similar';
+import ArchivedTagSection from 'routes/archive-detail/components/tags';
 import AttackSection from 'routes/file-detail/components/attacks';
 import ChildrenSection from 'routes/file-detail/components/childrens';
 import Detection from 'routes/file-detail/components/detection';
@@ -27,11 +32,6 @@ import HexSection from 'routes/file-viewer/components/hex';
 import ImageSection from 'routes/file-viewer/components/image';
 import StringsSection from 'routes/file-viewer/components/strings';
 import AISummarySection from 'routes/submission-detail/components/ai_summary';
-import ArchiveBanner from 'ui/ArchiveDetail/banner';
-import CommentSection from 'ui/ArchiveDetail/comments';
-import LabelSection from 'ui/ArchiveDetail/labels';
-import SimilarSection from 'ui/ArchiveDetail/similar';
-import ArchivedTagSection from 'ui/ArchiveDetail/tags';
 import Classification from 'ui/Classification';
 import InformativeAlert from 'ui/InformativeAlert';
 import { PageCenter } from 'ui/pages/PageCenter';
@@ -327,6 +327,9 @@ export const ArchiveDetailRootRoute = createAppRoute({
   path: '/archive/:id',
   params: s => ({
     id: s.string()
+  }),
+  search: s => ({
+    name: s.string(null).nullable()
   }),
   disabled: s => !s.configuration?.datastore?.archive?.enabled,
   forbidden: s => !s.user.roles.includes('archive_view')

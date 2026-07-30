@@ -21,9 +21,8 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
+import { AppLink, type InferAppNavigationPropsFromPath } from 'core/router';
 import React, { memo, useCallback, useMemo, useState } from 'react';
-import type { LinkProps } from 'react-router-dom';
-import { Link } from 'react-router-dom';
 
 type PageNavigationDrawerProps = {
   open: DrawerProps['open'];
@@ -54,18 +53,18 @@ const PageNavigationDrawer = memo(
   }
 );
 
-export type PageNavigationItemProp = ListItemProps & {
-  active?: boolean;
-  checkboxProps?: CheckboxProps;
-  preventRender?: boolean;
-  primary: React.ReactNode;
-  primaryProps?: ListItemTextProps['primaryTypographyProps'];
-  readOnly?: boolean;
-  subheader?: boolean;
-  to?: LinkProps['to'];
-  variant?: DrawerProps['anchor'];
-  onPageNavigation?: (e: React.MouseEvent<HTMLElement>, props: PageNavigationItemProp) => void;
-};
+export type PageNavigationItemProp = InferAppNavigationPropsFromPath<AppRoute['path']> &
+  ListItemProps & {
+    active?: boolean;
+    checkboxProps?: CheckboxProps;
+    preventRender?: boolean;
+    primary: React.ReactNode;
+    primaryProps?: ListItemTextProps['primaryTypographyProps'];
+    readOnly?: boolean;
+    subheader?: boolean;
+    variant?: DrawerProps['anchor'];
+    onPageNavigation?: (e: React.MouseEvent<HTMLElement>, props: PageNavigationItemProp) => void;
+  };
 
 export const PageNavigationItem = React.memo((props: PageNavigationItemProp) => {
   const theme = useTheme();
@@ -80,7 +79,8 @@ export const PageNavigationItem = React.memo((props: PageNavigationItemProp) => 
     primaryProps,
     readOnly = false,
     subheader = false,
-    to,
+    nav,
+    navDeps,
     variant = 'left',
     onPageNavigation,
     ...listItemProps
@@ -158,8 +158,7 @@ export const PageNavigationItem = React.memo((props: PageNavigationItemProp) => 
         id={computedId}
         className={active ? 'Active' : ''}
         onClick={handleClick}
-        component={to ? Link : 'div'}
-        to={to || undefined}
+        {...(!nav ? { component: 'div' } : { component: AppLink, nav, navDeps })}
         sx={{
           pl: subheader ? 1.5 : 3,
           ...(active ? {} : { ml: '1px' }),

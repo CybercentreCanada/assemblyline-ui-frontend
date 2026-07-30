@@ -1,10 +1,10 @@
 import BrokenImageOutlinedIcon from '@mui/icons-material/BrokenImageOutlined';
-import { Badge, Button, CircularProgress, Tooltip, useTheme } from '@mui/material';
+import { Badge, CircularProgress, Tooltip, useTheme } from '@mui/material';
 import useCarousel from 'deprecated/hooks/useCarousel';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import type { Image, ImageBody } from 'models/base/result_body';
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Button } from 'ui/buttons/Button';
 
 type ImageInlineBodyProps = {
   body: ImageBody;
@@ -98,8 +98,8 @@ const WrappedImageItem = ({
     <div>
       <Tooltip title={alt}>
         <Button
-          component={Link}
-          to={`/file/viewer/${to}/image/`}
+          // TODO: this will open the nav since the onClick doesn't prevent the navigation
+          nav={nav => nav.to().create({ route: '/file/viewer/:id/:tab', path: { id: to, tab: 'image' } })}
           color="secondary"
           onClick={event => {
             event.preventDefault();
