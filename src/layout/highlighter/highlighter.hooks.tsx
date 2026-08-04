@@ -1,4 +1,9 @@
-import { getAppInterfaceStateFromApi, useAppInterfaceStoreApi, useAppSetInterfaceStore } from 'core/interface';
+import {
+  getAppInterfaceStateFromApi,
+  useAppInterfaceStore,
+  useAppInterfaceStoreApi,
+  useAppSetInterfaceStore
+} from 'core/interface';
 import type { HighlightMapProps } from 'layout/highlighter';
 import { getHighlighterKey, hasHighlighterKey, hasHighlighterKeys, toggleHighlighterKey } from 'layout/highlighter';
 import { useCallback } from 'react';
@@ -55,4 +60,12 @@ export const useAppHighlighter = (): UseAppHighlighter => {
     setMap,
     trigger
   };
+};
+
+export const useAppIsHighlighted = function (key: string | (() => string)) {
+  return useAppInterfaceStore(s => hasHighlighterKey(typeof key === 'function' ? key() : key)(s));
+};
+
+export const useAppHasHighlightedKeys = function (keyList: string[] | (() => string[])) {
+  return useAppInterfaceStore(s => hasHighlighterKeys(typeof keyList === 'function' ? keyList() : keyList)(s));
 };

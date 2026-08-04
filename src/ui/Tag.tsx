@@ -2,6 +2,7 @@ import { HIDE_EVENT_ID } from 'borealis-ui/dist/data/event';
 import useALContext from 'deprecated/hooks/useALContext';
 import useHighlighter from 'deprecated/hooks/useHighlighter';
 import useSafeResults from 'deprecated/hooks/useSafeResults';
+import { useAppIsHighlighted } from 'layout/highlighter/highlighter.hooks';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import type { PossibleColor } from 'shared/utils/colors';
 import type { ActionMenuProps } from 'ui/ActionMenu';
@@ -44,11 +45,13 @@ const WrappedTag: React.FC<TagProps> = ({
   label = null
 }) => {
   const { scoreToVerdict, configuration } = useALContext();
-  const { isHighlighted, triggerHighlight } = useHighlighter();
+  const { triggerHighlight } = useHighlighter();
   const { showSafeResults } = useSafeResults();
 
   const [state, setState] = useState<typeof initialMenuState>(initialMenuState);
   const [showBorealisDetails, setShowBorealisDetails] = useState<boolean>(false);
+
+  const highlighted = useAppIsHighlighted(highlight_key);
 
   const maliciousness = useMemo<string>(() => {
     let v = lvl || scoreToVerdict(score);
@@ -119,7 +122,7 @@ const WrappedTag: React.FC<TagProps> = ({
           label={label ? label : short_type ? `[${short_type.toUpperCase()}] ${value}` : value}
           size="tiny"
           type="rounded"
-          color={highlight_key && isHighlighted(highlight_key) ? 'primary' : color}
+          color={highlight_key && highlighted ? 'primary' : color}
           onClick={highlight_key ? handleClick : null}
           fullWidth={fullWidth}
           onContextMenu={handleMenuClick}
@@ -133,7 +136,7 @@ const WrappedTag: React.FC<TagProps> = ({
           variant="outlined"
           size="tiny"
           type="rounded"
-          color={highlight_key && isHighlighted(highlight_key) ? 'primary' : color}
+          color={highlight_key && highlighted ? 'primary' : color}
           label={label ? label : short_type ? `[${short_type.toUpperCase()}] ${value}` : value}
           style={STYLE}
           onClick={highlight_key ? handleClick : null}

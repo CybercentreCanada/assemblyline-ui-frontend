@@ -1,6 +1,7 @@
 import useALContext from 'deprecated/hooks/useALContext';
 import useHighlighter from 'deprecated/hooks/useHighlighter';
 import useSafeResults from 'deprecated/hooks/useSafeResults';
+import { useAppIsHighlighted } from 'layout/highlighter/highlighter.hooks';
 import React, { useCallback, useState } from 'react';
 import type { PossibleColor } from 'shared/models/colors';
 import ActionMenu from 'ui/ActionMenu';
@@ -36,9 +37,11 @@ const WrappedHeuristic: React.FC<HeuristicProps> = ({
   force = false
 }) => {
   const [state, setState] = useState(initialMenuState);
-  const { isHighlighted, triggerHighlight } = useHighlighter();
+  const { triggerHighlight } = useHighlighter();
   const { scoreToVerdict } = useALContext();
   const { showSafeResults } = useSafeResults();
+
+  const highlighted = useAppIsHighlighted(highlight_key);
 
   const handleClick = useCallback(() => triggerHighlight(highlight_key), [triggerHighlight, highlight_key]);
 
@@ -80,7 +83,7 @@ const WrappedHeuristic: React.FC<HeuristicProps> = ({
         variant="outlined"
         size="tiny"
         type="rounded"
-        color={highlight_key && isHighlighted(highlight_key) ? 'primary' : color}
+        color={highlight_key && highlighted ? 'primary' : color}
         label={show_type ? (signature ? `[SIGNATURE] ${text}` : `[HEURISTIC] ${text}`) : text}
         style={STYLE}
         onClick={highlight_key ? handleClick : null}

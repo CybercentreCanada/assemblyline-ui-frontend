@@ -7,6 +7,7 @@ import { AppLink } from 'core/router';
 import useALContext from 'deprecated/hooks/useALContext';
 import useHighlighter from 'deprecated/hooks/useHighlighter';
 import useSafeResults from 'deprecated/hooks/useSafeResults';
+import { useAppIsHighlighted } from 'layout/highlighter/highlighter.hooks';
 import React, { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { PossibleColor } from 'shared/utils/colors';
@@ -43,10 +44,12 @@ const WrappedAttack: React.FC<AttackProps> = ({
 }) => {
   const { t } = useTranslation();
   const [state, setState] = useState(initialMenuState);
-  const { isHighlighted, triggerHighlight } = useHighlighter();
+  const { triggerHighlight } = useHighlighter();
   const { copy } = useClipboard();
   const { showSafeResults } = useSafeResults();
   const { user: currentUser, scoreToVerdict } = useALContext();
+
+  const highlighted = useAppIsHighlighted(highlight_key);
 
   const handleClick = useCallback(() => triggerHighlight(highlight_key), [triggerHighlight, highlight_key]);
 
@@ -101,13 +104,11 @@ const WrappedAttack: React.FC<AttackProps> = ({
             dense
             onClick={handleClose}
             nav={nav =>
-              nav
-                .to()
-                .create({
-                  route: '/search/:index',
-                  path: { index: 'result' },
-                  search: { query: `result.sections.heuristic.attack.pattern:${safeFieldValueURI(text)}` }
-                })
+              nav.to().create({
+                route: '/search/:index',
+                path: { index: 'result' },
+                search: { query: `result.sections.heuristic.attack.pattern:${safeFieldValueURI(text)}` }
+              })
             }
           >
             {SEARCH_ICON}
@@ -124,7 +125,7 @@ const WrappedAttack: React.FC<AttackProps> = ({
         size="tiny"
         type="rounded"
         variant="outlined"
-        color={highlight_key && isHighlighted(highlight_key) ? 'primary' : color}
+        color={highlight_key && highlighted ? 'primary' : color}
         label={show_type ? `[ATT&CK] ${text}` : text}
         style={STYLE}
         onClick={highlight_key ? handleClick : null}

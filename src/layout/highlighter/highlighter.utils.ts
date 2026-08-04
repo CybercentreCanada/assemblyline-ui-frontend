@@ -52,23 +52,27 @@ export const hasHighlighterKeys =
 export const toggleHighlighterKey =
   (key: string) =>
   (store: AppInterfaceStore): AppInterfaceStore => {
-    if (!store.highlighter.keys.has(key)) {
-      store.highlighter.keys.add(key);
+    const nextKeys = new Set(store.highlighter.keys);
+    if (!nextKeys.has(key)) {
+      nextKeys.add(key);
     } else {
-      store.highlighter.keys.delete(key);
+      nextKeys.delete(key);
     }
 
+    const nextRelated = new Set<string>();
     if (store.highlighter.links) {
-      store.highlighter.related.clear();
-      store.highlighter.keys.forEach(item => {
+      nextKeys.forEach(item => {
         const items = store.highlighter.links[item];
-        if (items) {
-          for (const val of items) {
-            store.highlighter.related.add(val);
-          }
+        if (!items) return;
+
+        for (const val of items) {
+          nextRelated.add(val);
         }
       });
     }
+
+    store.highlighter.keys = nextKeys;
+    store.highlighter.related = nextRelated;
 
     return store;
   };

@@ -2,9 +2,10 @@ import OpenInNewOutlinedIcon from '@mui/icons-material/OpenInNewOutlined';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import SelectAllOutlinedIcon from '@mui/icons-material/SelectAllOutlined';
 import { Box, Collapse, IconButton, Skeleton, Tooltip, useTheme } from '@mui/material';
-import { AppLink, useAppNavigate } from 'core/router';
+import { AppLink } from 'core/router';
 import useHighlighter from 'deprecated/hooks/useHighlighter';
 import useSafeResults from 'deprecated/hooks/useSafeResults';
+import { useAppIsHighlighted } from 'layout/highlighter/highlighter.hooks';
 import type { File } from 'models/api/file';
 import type { HeuristicLevel } from 'models/base/heuristic';
 import { HEURISTIC_LEVELS } from 'models/base/heuristic';
@@ -30,12 +31,11 @@ const WrappedHeuristic: React.FC<HeuristicProps> = ({ name, id, sections, level,
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [render, setRender] = useState(false);
-  const { isHighlighted, triggerHighlight, getKey } = useHighlighter();
+  const { triggerHighlight, getKey } = useHighlighter();
   const theme = useTheme();
-  const navigate = useAppNavigate();
   const { showSafeResults } = useSafeResults();
 
-  const highlighted = isHighlighted(getKey('heuristic', id));
+  const highlighted = useAppIsHighlighted(getKey('heuristic', id));
 
   const stopPropagating = useCallback(event => event.stopPropagation(), []);
 
