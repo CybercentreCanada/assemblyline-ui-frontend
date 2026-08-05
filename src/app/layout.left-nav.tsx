@@ -51,34 +51,34 @@ export const useAppLeftNavMenu = () => {
       {
         id: 'submit',
         label: t('drawer.submit'),
-        nav: nav => nav.to().create({ route: '/submit' }),
+        nav: nav => nav.to().only({ route: '/submit' }),
         icon: <PublishOutlinedIcon />
       },
       {
         id: 'submissions',
         label: t('drawer.submissions'),
-        nav: nav => nav.to().create({ route: '/submissions' }),
+        nav: nav => nav.to().only({ route: '/submissions' }),
         icon: <ViewCarouselOutlined />,
         preventRender: !userRoles.includes('submission_view')
       },
       {
         id: 'alerts',
         label: t('drawer.alerts'),
-        nav: nav => nav.to().create({ route: '/alerts-redirect' }),
+        nav: nav => nav.to().only({ route: '/alerts-redirect' }),
         icon: <NotificationImportantOutlinedIcon />,
         preventRender: !userRoles.includes('alert_view')
       },
       {
         id: 'archive',
         label: t('drawer.archive'),
-        nav: nav => nav.to().create({ route: '/archives' }),
+        nav: nav => nav.to().only({ route: '/archives' }),
         icon: <ArchiveOutlinedIcon />,
         preventRender: !userRoles.includes('archive_view') || !archiveEnabled
       },
       {
         id: 'retrohunt',
         label: t('drawer.retrohunt'),
-        nav: nav => nav.to().create({ route: '/retrohunt' }),
+        nav: nav => nav.to().only({ route: '/retrohunt' }),
         icon: <DataObjectOutlinedIcon />,
         preventRender: !userRoles.includes('retrohunt_view') || !retrohuntEnabled
       },
@@ -92,48 +92,48 @@ export const useAppLeftNavMenu = () => {
                 {
                   id: 'search.all',
                   label: t('drawer.search.all'),
-                  nav: nav => nav.to().create({ route: '/search' }),
+                  nav: nav => nav.to().only({ route: '/search' }),
                   icon: <Search />
                 },
                 {
                   id: 'search.alert',
                   label: t('drawer.search.alert'),
-                  nav: nav => nav.to().create({ route: '/search/:index', path: { index: 'alert' } }),
+                  nav: nav => nav.to().only({ route: '/search/:index', path: { index: 'alert' } }),
                   icon: <NotificationImportantOutlinedIcon />,
                   preventRender: !userRoles.includes('alert_view')
                 },
                 {
                   id: 'search.file',
                   label: t('drawer.search.file'),
-                  nav: nav => nav.to().create({ route: '/search/:index', path: { index: 'file' } }),
+                  nav: nav => nav.to().only({ route: '/search/:index', path: { index: 'file' } }),
                   icon: <ViewCarouselOutlined />,
                   preventRender: !userRoles.includes('submission_view')
                 },
                 {
                   id: 'search.result',
                   label: t('drawer.search.result'),
-                  nav: nav => nav.to().create({ route: '/search/:index', path: { index: 'result' } }),
+                  nav: nav => nav.to().only({ route: '/search/:index', path: { index: 'result' } }),
                   icon: <ViewCarouselOutlined />,
                   preventRender: !userRoles.includes('submission_view')
                 },
                 {
                   id: 'search.retrohunt',
                   label: t('drawer.search.retrohunt'),
-                  nav: nav => nav.to().create({ route: '/search/:index', path: { index: 'retrohunt' } }),
+                  nav: nav => nav.to().only({ route: '/search/:index', path: { index: 'retrohunt' } }),
                   icon: <DataObjectOutlinedIcon />,
                   preventRender: !userRoles.includes('retrohunt_view') || !retrohuntEnabled
                 },
                 {
                   id: 'search.signature',
                   label: t('drawer.search.signature'),
-                  nav: nav => nav.to().create({ route: '/search/:index', path: { index: 'signature' } }),
+                  nav: nav => nav.to().only({ route: '/search/:index', path: { index: 'signature' } }),
                   icon: <FingerprintOutlined />,
                   preventRender: !userRoles.includes('signature_view')
                 },
                 {
                   id: 'search.submission',
                   label: t('drawer.search.submission'),
-                  nav: nav => nav.to().create({ route: '/search/:index', path: { index: 'submission' } }),
+                  nav: nav => nav.to().only({ route: '/search/:index', path: { index: 'submission' } }),
                   icon: <ViewCarouselOutlined />,
                   preventRender: !userRoles.includes('submission_view')
                 }
@@ -148,7 +148,7 @@ export const useAppLeftNavMenu = () => {
       {
         id: 'dashboard',
         label: t('drawer.dashboard'),
-        nav: nav => nav.to().create({ route: '/dashboard' }),
+        nav: nav => nav.to().only({ route: '/dashboard' }),
         icon: <DashboardOutlined />
       },
       ...(userRoles.some(role =>
@@ -170,42 +170,42 @@ export const useAppLeftNavMenu = () => {
                 {
                   id: 'manage.badlist',
                   label: t('drawer.manage.badlist'),
-                  nav: nav => nav.to().create({ route: '/manage/badlists' }),
+                  nav: nav => nav.to().only({ route: '/manage/badlists' }),
                   icon: <BugReportOutlined />,
                   preventRender: !userRoles.includes('badlist_view')
                 },
                 {
                   id: 'manage.heuristics',
                   label: t('drawer.manage.heuristics'),
-                  nav: nav => nav.to().create({ route: '/manage/heuristics' }),
+                  nav: nav => nav.to().only({ route: '/manage/heuristics' }),
                   icon: <SimCardOutlined />,
                   preventRender: !userRoles.includes('heuristic_view')
                 },
                 {
                   id: 'manage.safelist',
                   label: t('drawer.manage.safelist'),
-                  nav: nav => nav.to().create({ route: '/manage/safelists' }),
+                  nav: nav => nav.to().only({ route: '/manage/safelists' }),
                   icon: <VerifiedUserOutlined />,
                   preventRender: !userRoles.includes('safelist_view')
                 },
                 {
                   id: 'manage.signatures',
                   label: t('drawer.manage.signatures'),
-                  nav: nav => nav.to().create({ route: '/manage/signatures' }),
+                  nav: nav => nav.to().only({ route: '/manage/signatures' }),
                   icon: <FingerprintOutlined />,
                   preventRender: !userRoles.includes('signature_view')
                 },
                 {
                   id: 'manage.source',
                   label: t('drawer.manage.source'),
-                  nav: nav => nav.to().create({ route: '/manage/sources' }),
+                  nav: nav => nav.to().only({ route: '/manage/sources' }),
                   icon: <CodeOutlined />,
                   preventRender: !userRoles.includes('signature_manage')
                 },
                 {
                   id: 'manage.workflow',
                   label: t('drawer.manage.workflow'),
-                  nav: nav => nav.to().create({ route: '/manage/workflows' }),
+                  nav: nav => nav.to().only({ route: '/manage/workflows' }),
                   icon: <BiNetworkChart />,
                   preventRender: !userRoles.includes('workflow_view')
                 }
@@ -223,55 +223,55 @@ export const useAppLeftNavMenu = () => {
                 {
                   id: 'adminmenu.apikeys',
                   label: t('adminmenu.apikeys'),
-                  nav: nav => nav.to().create({ route: '/admin/apikeys' }),
+                  nav: nav => nav.to().only({ route: '/admin/apikeys' }),
                   icon: <KeyOutlined />
                 },
                 {
                   id: 'adminmenu.errors',
                   label: t('adminmenu.errors'),
-                  nav: nav => nav.to().create({ route: '/admin/errors' }),
+                  nav: nav => nav.to().only({ route: '/admin/errors' }),
                   icon: <ErrorOutlineOutlined />
                 },
                 {
                   id: 'adminmenu.identify',
                   label: t('adminmenu.identify'),
-                  nav: nav => nav.to().create({ route: '/admin/identify' }),
+                  nav: nav => nav.to().only({ route: '/admin/identify' }),
                   icon: <FindInPageOutlined />
                 },
                 {
                   id: 'adminmenu.actions',
                   label: t('adminmenu.actions'),
-                  nav: nav => nav.to().create({ route: '/admin/actions' }),
+                  nav: nav => nav.to().only({ route: '/admin/actions' }),
                   icon: <PlaylistPlayOutlined />
                 },
                 {
                   id: 'adminmenu.services',
                   label: t('adminmenu.services'),
-                  nav: nav => nav.to().create({ route: '/admin/services' }),
+                  nav: nav => nav.to().only({ route: '/admin/services' }),
                   icon: <AccountTreeOutlined />
                 },
                 {
                   id: 'adminmenu.service_review',
                   label: t('adminmenu.service_review'),
-                  nav: nav => nav.to().create({ route: '/admin/service_review' }),
+                  nav: nav => nav.to().only({ route: '/admin/service_review' }),
                   icon: <CompareArrowsOutlined />
                 },
                 {
                   id: 'adminmenu.sitemap',
                   label: t('adminmenu.sitemap'),
-                  nav: nav => nav.to().create({ route: '/admin/sitemap' }),
+                  nav: nav => nav.to().only({ route: '/admin/sitemap' }),
                   icon: <MapOutlined />
                 },
                 {
                   id: 'adminmenu.tag_safelist',
                   label: t('adminmenu.tag_safelist'),
-                  nav: nav => nav.to().create({ route: '/admin/tag_safelist' }),
+                  nav: nav => nav.to().only({ route: '/admin/tag_safelist' }),
                   icon: <VerifiedUserOutlined />
                 },
                 {
                   id: 'adminmenu.users',
                   label: t('adminmenu.users'),
-                  nav: nav => nav.to().create({ route: '/admin/users' }),
+                  nav: nav => nav.to().only({ route: '/admin/users' }),
                   icon: <SupervisorAccountOutlined />
                 }
               ]
@@ -290,32 +290,32 @@ export const useAppLeftNavMenu = () => {
           {
             id: 'help.api',
             label: t('drawer.help.api'),
-            nav: nav => nav.to().create({ route: '/help/api' }),
+            nav: nav => nav.to().only({ route: '/help/api' }),
             icon: <AssignmentOutlined />
           },
           {
             id: 'help.classification',
             label: t('drawer.help.classification'),
-            nav: nav => nav.to().create({ route: '/help/classification' }),
+            nav: nav => nav.to().only({ route: '/help/classification' }),
             icon: <LabelOutlined />,
             preventRender: !c12nEnforce
           },
           {
             id: 'help.configuration',
             label: t('drawer.help.configuration'),
-            nav: nav => nav.to().create({ route: '/help/configuration' }),
+            nav: nav => nav.to().only({ route: '/help/configuration' }),
             icon: <SettingsApplicationsOutlined />
           },
           {
             id: 'help.search',
             label: t('drawer.help.search'),
-            nav: nav => nav.to().create({ route: '/help/search' }),
+            nav: nav => nav.to().only({ route: '/help/search' }),
             icon: <Search />
           },
           {
             id: 'help.services',
             label: t('drawer.help.services'),
-            nav: nav => nav.to().create({ route: '/help/services' }),
+            nav: nav => nav.to().only({ route: '/help/services' }),
             icon: <AccountTreeOutlined />
           }
         ]
@@ -330,25 +330,25 @@ export const useAppLeftNavMenu = () => {
                 {
                   id: 'development.api',
                   label: t('drawer.development.api'),
-                  nav: nav => nav.to().create({ route: '/development/api' }),
+                  nav: nav => nav.to().only({ route: '/development/api' }),
                   icon: <Api />
                 },
                 {
                   id: 'development.customize',
                   label: t('drawer.development.customize'),
-                  nav: nav => nav.to().create({ route: '/development/customize' }),
+                  nav: nav => nav.to().only({ route: '/development/customize' }),
                   icon: <Palette />
                 },
                 {
                   id: 'development.library',
                   label: t('drawer.development.library'),
-                  nav: nav => nav.to().create({ route: '/development/library' }),
+                  nav: nav => nav.to().only({ route: '/development/library' }),
                   icon: <LibraryBooks />
                 },
                 {
                   id: 'development.theme',
                   label: t('drawer.development.theme'),
-                  nav: nav => nav.to().create({ route: '/development/theme' }),
+                  nav: nav => nav.to().only({ route: '/development/theme' }),
                   icon: <Palette />
                 }
               ]

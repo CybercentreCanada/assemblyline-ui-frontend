@@ -29,6 +29,8 @@ import borealisEN from 'layout/borealis/borealis.i18n.en.json';
 import borealisFR from 'layout/borealis/borealis.i18n.fr.json';
 import carouselEN from 'layout/carousel/carousel.i18n.en.json';
 import carouselFR from 'layout/carousel/carousel.i18n.fr.json';
+import drawerEN from 'layout/drawer/drawer.i18n.en.json';
+import drawerFR from 'layout/drawer/drawer.i18n.fr.json';
 import externalLookupEN from 'layout/external-lookup/external-lookup.i18n.en.json';
 import externalLookupFR from 'layout/external-lookup/external-lookup.i18n.fr.json';
 import notificationsEN from 'layout/notifications/notifications.i18n.en.json';
@@ -161,6 +163,7 @@ export const I18N_RESSOURCES = {
     dashboard: dashboardEN,
     dateTime: dateTimeEN,
     developmentAPI: developmentAPIEN,
+    drawer: drawerEN,
     error: errorEN,
     error403: forbiddenEN,
     error404: notFoundEN,
@@ -229,6 +232,7 @@ export const I18N_RESSOURCES = {
     dashboard: dashboardFR,
     dateTime: dateTimeFR,
     developmentAPI: developmentAPIFR,
+    drawer: drawerFR,
     error: errorFR,
     error403: forbiddenFR,
     error404: notFoundFR,

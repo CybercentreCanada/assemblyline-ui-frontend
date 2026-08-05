@@ -1,7 +1,8 @@
 import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import DoubleArrowOutlinedIcon from '@mui/icons-material/DoubleArrowOutlined';
 import { Drawer, styled, useMediaQuery, useTheme } from '@mui/material';
-import { useAppInterfaceStore, useAppSetInterfaceStore } from 'core/interface';
+import { useAppInterfaceStore } from 'core/interface';
+import { useAppNavigate } from 'core/router';
 import { useAppDrawerClose, useIsDrawerOpen } from 'layout/drawer/drawer.hooks';
 import type { CSSProperties, PropsWithChildren } from 'react';
 import { memo, useCallback, useMemo } from 'react';
@@ -67,8 +68,11 @@ AppDrawerActions.displayName = 'AppDrawerActions';
 
 export const AppDrawerCloseButton = memo(() => {
   const { t } = useTranslation(['drawer']);
+  const navigate = useAppNavigate();
 
-  const handleClose = useAppDrawerClose();
+  const handleClose = useCallback(() => {
+    navigate.at(1).closePanel(true);
+  }, [navigate]);
 
   return (
     <IconButton tooltip={t('close')} size="large" onClick={handleClose}>
@@ -83,38 +87,15 @@ export const AppDrawerMaximizeButton = memo(() => {
   const { t } = useTranslation(['drawer']);
   const theme = useTheme();
   const isXL = useMediaQuery(theme.breakpoints.only('xl'));
+  const navigate = useAppNavigate();
 
-  const isMaximized = useAppInterfaceStore(s => s.drawer.maximized);
-
-  const setInterfaceStore = useAppSetInterfaceStore();
-
-  const transition = useMemo<CSSProperties['transition']>(
-    () =>
-      `${theme.transitions.create(['width'], {
-        duration: theme.transitions.duration.shortest,
-        easing: theme.transitions.easing.easeOut
-      })} !important`,
-    [theme]
-  );
-
-  const handleMaximize = useCallback(() => {
-    setInterfaceStore(s => {
-      s.drawer.maximized = !s.drawer.maximized;
-      return s;
-    });
-  }, [setInterfaceStore]);
+  const handleMoveToLeft = useCallback(() => {
+    navigate.at(0).closePanel(true);
+  }, [navigate]);
 
   return !isXL ? null : (
-    <IconButton tooltip={isMaximized ? t('minimize') : t('maximize')} size="large" onClick={handleMaximize}>
-      <DoubleArrowOutlinedIcon
-        sx={{
-          transform: 'rotate(180deg)',
-          transition,
-          ...(isMaximized && {
-            transform: 'rotate(0deg)'
-          })
-        }}
-      />
+    <IconButton tooltip={t('moveToLeft')} size="large" onClick={handleMoveToLeft}>
+      <DoubleArrowOutlinedIcon sx={{ transform: 'rotate(180deg)' }} />
     </IconButton>
   );
 });
