@@ -16,6 +16,7 @@ import DialogTitle from '@mui/material/DialogTitle';
 import { useApiCallFn } from 'core/api';
 import type { ApiResponse } from 'core/api/api.models';
 import { useAppConfig } from 'core/config';
+import { useAppSetInterfaceStore } from 'core/interface';
 import { AppLink, useAppNavigate } from 'core/router';
 import { useAppSnackbar } from 'core/snackbar';
 import type { ApiResponseProps } from 'layout/auth/auth.models';
@@ -733,6 +734,7 @@ export const FileSubmit = memo(({ onClick = () => null, ...props }: ButtonProps)
   const apiCall = useApiCallFn();
   const { closeSnackbar, showErrorMessage, showSuccessMessage } = useAppSnackbar();
   const settings = useAppConfig(s => s.settings);
+  const setInterfaceStore = useAppSetInterfaceStore();
 
   const warnOnUnload = useCallback((warn: boolean) => {
     window.onbeforeunload = warn ? () => true : null;
@@ -778,14 +780,21 @@ export const FileSubmit = memo(({ onClick = () => null, ...props }: ButtonProps)
         try {
           const data = JSON.parse(api_data) as ApiResponseProps<unknown>;
           if ('api_status_code' in data) {
-            if (
-              data.api_status_code === 401 ||
-              (data.api_status_code === 503 &&
-                data.api_error_message.includes('quota') &&
-                data.api_error_message.includes('daily') &&
-                data.api_error_message.includes('API'))
+            if (data.api_status_code === 401) {
+              setInterfaceStore(s => {
+                s.auth.mode = 'logout';
+                return s;
+              });
+            } else if (
+              data.api_status_code === 503 &&
+              data.api_error_message.includes('quota') &&
+              data.api_error_message.includes('daily') &&
+              data.api_error_message.includes('API')
             ) {
-              window.location.reload();
+              setInterfaceStore(s => {
+                s.auth.mode = 'quota';
+                return s;
+              });
             } else handleCancel();
             showErrorMessage(t('upload.snackbar.file.upload_fail'));
           }

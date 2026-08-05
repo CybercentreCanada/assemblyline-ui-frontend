@@ -101,7 +101,10 @@ export const useDownloadBlob = ({
 
         // Reload when the user has exceeded their daily API call quota.
         if (res.status === 503 && ['API', 'quota', 'daily'].every(v => error.includes(v))) {
-          window.location.reload();
+          setInterfaceStore(s => {
+            s.auth.mode = 'quota';
+            return s;
+          });
           return Promise.reject(json);
         }
 
@@ -112,7 +115,10 @@ export const useDownloadBlob = ({
 
         // Reload when the user is not logged in
         if (res.status === 401 && reloadOnUnauthorize) {
-          window.location.reload();
+          setInterfaceStore(s => {
+            s.auth.mode = 'logout';
+            return s;
+          });
           return Promise.reject(json);
         }
 

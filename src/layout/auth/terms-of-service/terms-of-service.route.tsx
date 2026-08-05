@@ -1,6 +1,7 @@
 import { Link, Skeleton, Typography, styled, useTheme } from '@mui/material';
 import { useApiMutation, useApiQuery } from 'core/api';
 import { useAppConfig } from 'core/config';
+import { useAppSetInterfaceStore } from 'core/interface';
 import { createAppRoute } from 'core/routes';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -35,15 +36,15 @@ export const ToSPage = memo(() => {
 
   const currentUser = useAppConfig(s => s.user);
   const configuration = useAppConfig(s => s.configuration);
-
-  const handleCancel = useApiMutation(() => ({
-    url: '/api/v4/auth/logout/',
-    onSuccess: () => window.location.reload()
-  }));
+  const setInterfaceStore = useAppSetInterfaceStore();
 
   const handleAccept = useApiMutation(() => ({
     url: `/api/v4/user/tos/${currentUser.username}/`,
-    onSuccess: () => window.location.reload()
+    onSuccess: () =>
+      setInterfaceStore(s => {
+        s.auth.mode = 'app';
+        return s;
+      })
   }));
 
   const { data: tos } = useApiQuery<string>({ url: '/api/v4/help/tos/', disabled: !configuration?.ui?.tos });
@@ -83,8 +84,8 @@ export const ToSPage = memo(() => {
               <div>
                 <Button
                   color="primary"
-                  disabled={handleAccept.isPending || handleCancel.isPending}
-                  progress={handleAccept.isPending || handleCancel.isPending}
+                  disabled={handleAccept.isPending}
+                  progress={handleAccept.isPending}
                   style={{ marginTop: '3rem', marginBottom: '3rem' }}
                   variant="contained"
                   onClick={handleAccept.mutate}
@@ -93,11 +94,16 @@ export const ToSPage = memo(() => {
                 </Button>
                 <Button
                   color="secondary"
-                  disabled={handleAccept.isPending || handleCancel.isPending}
-                  progress={handleAccept.isPending || handleCancel.isPending}
+                  disabled={handleAccept.isPending}
+                  progress={handleAccept.isPending}
                   style={{ marginLeft: '1rem', marginTop: '3rem', marginBottom: '3rem' }}
                   variant="contained"
-                  onClick={handleCancel.mutate}
+                  onClick={() => {
+                    setInterfaceStore(s => {
+                      s.auth.mode = 'logout';
+                      return s;
+                    });
+                  }}
                 >
                   {t('logout')}
                 </Button>

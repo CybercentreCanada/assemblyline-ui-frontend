@@ -1,4 +1,5 @@
 {
   "description": "You have reached your daily quota. Contact the system administrators if you believe this is a mistake.",
+  "logout": "Logout",
   "title": "Whoa, your quota meter is maxed out"
 }

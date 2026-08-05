@@ -18,6 +18,7 @@ export const LogoutPage = memo(() => {
     url: '/api/v4/auth/logout/',
     method: 'GET',
     onExit: () => {
+      sessionStorage.clear();
       invalidateApiQuery(({ url }) => '/api/v4/user/whoami/' === url, 0);
     }
   });

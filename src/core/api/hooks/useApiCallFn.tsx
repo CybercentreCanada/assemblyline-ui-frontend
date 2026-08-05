@@ -124,7 +124,10 @@ export const useApiCallFn = <
         // quota exceeded
         if (res.status === 503) {
           if (['API', 'quota', 'daily'].every(v => error.includes(v))) {
-            window.location.reload();
+            setInterfaceStore(s => {
+              s.auth.mode = 'quota';
+              return s;
+            });
           }
           if (['quota', 'submission'].every(v => error.includes(v))) {
             return rejectWith(json);
@@ -133,7 +136,10 @@ export const useApiCallFn = <
 
         // unauthorized
         if (res.status === 401 && reloadOnUnauthorize) {
-          window.location.reload();
+          setInterfaceStore(s => {
+            s.auth.mode = 'logout';
+            return s;
+          });
           return rejectWith(json);
         }
 

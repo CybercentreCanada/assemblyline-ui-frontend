@@ -1,8 +1,10 @@
 import SpeedOutlinedIcon from '@mui/icons-material/SpeedOutlined';
 import { Typography, useMediaQuery, useTheme } from '@mui/material';
+import { useAppSetInterfaceStore } from 'core/interface';
 import { createAppRoute } from 'core/routes';
-import { memo } from 'react';
+import { memo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Button } from 'ui/buttons/Button';
 import { PageCenter } from 'ui/pages/PageCenter';
 
 //*****************************************************************************************
@@ -12,6 +14,15 @@ export const QuotaPage = memo(() => {
   const { t } = useTranslation(['quota']);
   const theme = useTheme();
   const downSM = useMediaQuery(theme.breakpoints.down('md'));
+
+  const setInterfaceStore = useAppSetInterfaceStore();
+
+  const handleLogout = useCallback(() => {
+    setInterfaceStore(s => {
+      s.auth.mode = 'logout';
+      return s;
+    });
+  }, [setInterfaceStore]);
 
   return (
     <PageCenter width="65%" margin={4}>
@@ -23,6 +34,11 @@ export const QuotaPage = memo(() => {
       </div>
       <div style={{ width: '100%', maxWidth: '720px', margin: '0 auto' }}>
         <Typography children={t('description')} variant={downSM ? 'body1' : 'h6'} gutterBottom />
+      </div>
+      <div style={{ paddingTop: theme.spacing(2) }}>
+        <Button color="secondary" variant="contained" onClick={handleLogout}>
+          {t('logout')}
+        </Button>
       </div>
     </PageCenter>
   );
