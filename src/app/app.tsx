@@ -25,6 +25,8 @@ import { AppDrawerLayout } from 'layout/drawer';
 import type { PropsWithChildren } from 'react';
 import { memo, StrictMode } from 'react';
 
+// TODO: remove dead dependencies like: node-forge, md5, history, fontsource-roboto, styled-components, @mui/styled-engine-sc
+
 /**
  * MyAPP:
  * BrowserRouter

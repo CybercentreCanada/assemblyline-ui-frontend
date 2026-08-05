@@ -15,6 +15,8 @@ import { PageLayout } from 'ui/layouts/PageLayout';
 import type { PageNavigationItemProp } from 'ui/layouts/PageNavigation';
 import { PageNavigation } from 'ui/layouts/PageNavigation';
 
+// TODO: this whole code should be lazy loaded as it is expensive to be part of the core core.
+
 // Component types only, so switching tabs doesn't build every section's JSX up front.
 const LIBRARY_SECTIONS = {
   datetime: DateTimeSection,

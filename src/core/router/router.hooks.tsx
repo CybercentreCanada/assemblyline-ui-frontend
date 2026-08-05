@@ -452,6 +452,7 @@ export function useAppSyncNavigationStoreFromLocation() {
     [location, preferenceStoreApi, routerStoreApi, locationParamStoreApi, setNavigationStore]
   );
 
+  // TODO: The existence of /v1 should not be necessary and should just show the submit page with just "/" as it was the case in the old implementation.
   const getNavigationFromLocationHash = useCallback(
     () =>
       setNavigationStore(store => {
@@ -501,6 +502,7 @@ export function useAppSyncNavigationStoreFromLocation() {
     [location, preferenceStoreApi, routerStoreApi, locationParamStoreApi, setNavigationStore]
   );
 
+  // TODO: Add a lookup table to convert the legacy url with the new URL
   const getNavigationFromLegacyLocation = useCallback(
     () =>
       setNavigationStore(store => {

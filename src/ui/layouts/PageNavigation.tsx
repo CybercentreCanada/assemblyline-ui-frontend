@@ -21,7 +21,8 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
-import { AppLink, type InferAppNavigationPropsFromPath } from 'core/router';
+import type { InferAppNavigationPropsFromPath } from 'core/router';
+import { AppLink } from 'core/router';
 import React, { memo, useCallback, useMemo, useState } from 'react';
 
 type PageNavigationDrawerProps = {

@@ -141,6 +141,8 @@ import inputsFR from 'ui/inputs/i18n/inputs.i18n.fr.json';
 import sandboxEN from 'ui/ResultCard/Sandbox/sandbox.i18n.en.json';
 import sandboxFR from 'ui/ResultCard/Sandbox/sandbox.i18n.fr.json';
 
+// TODO: Add lazy loading on the french translation
+
 export const I18N_RESSOURCES = {
   en: {
     adminActions: adminActionsEN,
