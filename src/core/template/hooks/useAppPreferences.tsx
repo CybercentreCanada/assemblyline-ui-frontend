@@ -3,11 +3,11 @@ import type { AppPreferenceConfigs } from '@tui/core';
 import { AppBreadcrumbs } from 'core/template/components/Breadcrumbs';
 import { DocumentationButton } from 'core/template/components/DocumentationButton';
 import { EmailButton } from 'core/template/components/EmailButton';
-import { QuickSearch } from 'core/template/components/QuickSearch';
 import { UserProfile } from 'core/template/components/UserProfile';
 import { useGetTemplateLeftNavMenu } from 'core/template/template.hooks';
 import type { AppLeftNavItem } from 'core/template/template.models';
 import { Notifications } from 'layout/notifications';
+import { QuickSearch } from 'layout/quick-search';
 import { useMemo } from 'react';
 
 export type UseAppPreferencesProps = {

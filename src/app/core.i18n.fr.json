@@ -190,8 +190,6 @@
   "quick.navigation": "Navigation Rapide",
   "quick.navigation.no.result": "Aucune correspondance trouvée.",
   "quick.navigation.text.field.label": "Recherche...",
-  "quicksearch.aria": "recherche",
-  "quicksearch.placeholder": "Recherche ...",
   "quota.description": "L'accès au système vous est refusé parce que vous avez dépassé votre quota quotidien. Contactez les administrateurs système si vous pensez qu'il s'agit d'une erreur.",
   "quota.title": "Quota dépassé",
   "quotas": "Quotas quotidiens utilisés",

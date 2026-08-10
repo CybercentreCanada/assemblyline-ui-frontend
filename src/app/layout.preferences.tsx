@@ -40,13 +40,6 @@ export const useAppTemplatePreferences = () =>
                   icon: <ExitToAppIcon />
                 },
                 {
-                  // i18nKey: 'usermenu',
-                  // title: 'usermenu',
-                  // route: 'usermenu',
-                  // icon: null,
-                  element: <>{'test'}</>
-                },
-                {
                   i18nKey: 'usermenu',
                   title: 'usermenu',
                   route: 'usermenu',

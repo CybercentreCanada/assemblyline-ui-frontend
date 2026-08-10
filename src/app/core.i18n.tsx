@@ -35,6 +35,8 @@ import externalLookupEN from 'layout/external-lookup/external-lookup.i18n.en.jso
 import externalLookupFR from 'layout/external-lookup/external-lookup.i18n.fr.json';
 import notificationsEN from 'layout/notifications/notifications.i18n.en.json';
 import notificationsFR from 'layout/notifications/notifications.i18n.fr.json';
+import quickSearchEN from 'layout/quick-search/quick-search.i18n.en.json';
+import quickSearchFR from 'layout/quick-search/quick-search.i18n.fr.json';
 import { initReactI18next } from 'react-i18next';
 import adminActionsEN from 'routes/admin-actions/admin-actions.i18n.en.json';
 import adminActionsFR from 'routes/admin-actions/admin-actions.i18n.fr.json';
@@ -198,6 +200,7 @@ export const I18N_RESSOURCES = {
     manageWorkflows: manageWorkflowsEN,
     missingNode: missingNodeEN,
     notifications: notificationsEN,
+    quicksearch: quickSearchEN,
     quota: quotaEN,
     retrohunt: retrohuntEN,
     router: routerEN,
@@ -267,6 +270,7 @@ export const I18N_RESSOURCES = {
     manageWorkflows: manageWorkflowsFR,
     missingNode: missingNodeFR,
     notifications: notificationsFR,
+    quicksearch: quickSearchFR,
     quota: quotaFR,
     retrohunt: retrohuntFR,
     router: routerFR,

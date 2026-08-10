@@ -2,6 +2,7 @@ import type { AppTheme } from '@tui/core';
 import type { AssistantInsightProps, ContextMessageProps } from 'layout/assistant';
 import type { ExternalEnrichmentState } from 'layout/external-lookup';
 import type { JSONFeedItem } from 'layout/notifications';
+import type { QuickSearchItem } from 'layout/quick-search';
 import type { SystemMessage } from 'models/api/user';
 
 declare global {
@@ -101,6 +102,23 @@ declare global {
       /** Whether the user menu popover is open. */
       open: boolean;
     };
+    /** Topnav quick search state. */
+    quicksearch: {
+      /** Current input value. */
+      value: string;
+      /** Whether a search request is in flight. */
+      searching: boolean;
+      /** Whether the results dropdown/dialog is open. */
+      menu: boolean;
+      /** Display mode: inline dropdown or fullscreen dialog. */
+      mode: 'inline' | 'fullscreen';
+      /** Whether the input currently has focus. */
+      focused: boolean;
+      /** Whether selecting a result or pressing enter resets the input. */
+      autoReset: boolean;
+      /** Search results, or null before a search has been made. */
+      items: QuickSearchItem[] | null;
+    };
   };
 }
 
@@ -156,6 +174,15 @@ export const DEFAULT_APP_INTERFACE_STORE: AppInterfaceStore = {
   },
   usermenu: {
     open: false
+  },
+  quicksearch: {
+    value: '',
+    searching: false,
+    menu: false,
+    mode: 'inline',
+    focused: false,
+    autoReset: true,
+    items: null
   },
   assistant: {
     open: false,

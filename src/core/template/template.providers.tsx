@@ -46,7 +46,6 @@ export const AppTemplateLayout = memo(({ children, preferences, leftNav }: AppTe
 
   // const myPreferences: AppPreferenceConfigs = useMyPreferences();
   // const myUser: AppUserService<User> = useMyUser();
-  // const mySearch: AppSearchService<SearchItem> = useMySearch();
   // const myAccessibility = useMyAccessibility();
   // const myNotification = useMyNotification();
   // const myApps = useMyApps();
@@ -59,7 +58,6 @@ export const AppTemplateLayout = memo(({ children, preferences, leftNav }: AppTe
       preferences={appPreferences}
       router={appTemplateRouter}
       user={appTemplateUser}
-
       // preferences={null}
       // sitemap={{}}
       // theme={{}}
@@ -68,7 +66,6 @@ export const AppTemplateLayout = memo(({ children, preferences, leftNav }: AppTe
       // preferences={myPreferences}
       // theme={myTheme}
       // sitemap={mySitemap}
-      // search={mySearch}
       // user={myUser}
     >
       <Inner>{children}</Inner>
