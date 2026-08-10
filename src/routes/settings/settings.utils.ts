@@ -1,10 +1,8 @@
 /* eslint-disable @typescript-eslint/prefer-for-of */
-import _ from 'lodash';
+import lodashIsEqual from 'lodash/isEqual';
 import type { CustomUser } from 'models/api/user';
 import type { Submission, SubmissionProfileParams } from 'models/base/config';
 import type { UserSettings } from 'models/base/user_settings';
-
-// TODO: Don't use _ from lodash, instead use the specific library from lodash.
 
 /**
  * Keys that belong to the "interface" part of user settings.
@@ -547,7 +545,7 @@ export const hasDifferentPreviousSubmissionValues = (out: ProfileSettings): bool
     const cur = out[key];
     if (!cur) continue;
     if (Array.isArray(cur.value) && Array.isArray(cur.prev)) {
-      if (!_.isEqual([...cur.value].sort(), [...cur.prev].sort())) return true;
+      if (!lodashIsEqual([...cur.value].sort(), [...cur.prev].sort())) return true;
     } else {
       if (cur.value !== cur.prev) return true;
     }
@@ -575,7 +573,7 @@ export const hasDifferentPreviousSubmissionValues = (out: ProfileSettings): bool
   }
 
   // initial_data deep compare using structural equality
-  if (out?.initial_data?.value && !_.isEqual(out.initial_data.value, out.initial_data.prev)) {
+  if (out?.initial_data?.value && !lodashIsEqual(out.initial_data.value, out.initial_data.prev)) {
     return true;
   }
 

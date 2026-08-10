@@ -7,7 +7,7 @@ import { useAppBlocker, useAppNavigate } from 'core/router';
 import { createAppRoute, useAppPathParams, useAppSearchParams } from 'core/routes';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMySnackbar from 'deprecated/hooks/useMySnackbar';
-import _ from 'lodash';
+import lodashIsEqual from 'lodash/isEqual';
 import type { SearchResult } from 'models/api/search';
 import type { Alert } from 'models/base/alert';
 import type { Priority, Status, Workflow } from 'models/base/workflow';
@@ -58,7 +58,7 @@ export const ManageWorkflowCreatePage = memo(() => {
     [c12nDef.UNRESTRICTED, configuration.ui.fqdn]
   );
 
-  const modified = useMemo<boolean>(() => !_.isEqual(workflow, originalWorkflow), [originalWorkflow, workflow]);
+  const modified = useMemo<boolean>(() => !lodashIsEqual(workflow, originalWorkflow), [originalWorkflow, workflow]);
 
   useAppBlocker(() => (modified ? 'unsaved_changes' : null), [modified]);
 

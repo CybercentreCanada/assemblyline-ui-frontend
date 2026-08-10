@@ -7,7 +7,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import { useApiCallFn } from 'core/api';
 import { useAppConfig } from 'core/config';
-import _ from 'lodash';
+import lodashOmit from 'lodash/omit';
 import type { Metadata, MetadataFieldTypeMap } from 'models/base/config';
 import { Fragment, memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -91,14 +91,14 @@ export const MetadataParam = memo(({ name, metadata, loading, disabled, editing 
     (value: unknown) => {
       form.setFieldValue('metadata.data', m => {
         const prev = m ?? {};
-        return value == null || value === '' ? _.omit(prev, name) : { ...prev, [name]: value };
+        return value == null || value === '' ? lodashOmit(prev, name) : { ...prev, [name]: value };
       });
     },
     [form, name]
   );
 
   const handleReset = useCallback(() => {
-    form.setFieldValue('metadata.data', m => _.omit(m ?? {}, name));
+    form.setFieldValue('metadata.data', m => lodashOmit(m ?? {}, name));
   }, [form, name]);
 
   useEffect(() => {
