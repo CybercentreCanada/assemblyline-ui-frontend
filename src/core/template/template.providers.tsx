@@ -2,12 +2,12 @@ import { useAppSwitcher } from '@tui/apps';
 import type { AppPreferenceConfigs } from '@tui/core';
 import { AppProvider, AppRoot, useAppLayout, useAppUser } from '@tui/core';
 import { useAppPreferenceStore } from 'core/preference';
-import type { AppLeftNavItem } from 'core/template';
 import { useAppPreferences } from 'core/template/hooks/useAppPreferences';
 import { useAppTemplateRouter } from 'core/template/hooks/useAppTemplateRouter';
 import { useAppTemplateUser } from 'core/template/hooks/useAppTemplateUser';
 import { useAppTemplateThemeMode } from 'core/template/template.hooks';
 import type { i18n } from 'i18next';
+import type { AppLeftNavItem } from 'layout/left-nav';
 import type { PropsWithChildren } from 'react';
 import { memo, useEffect } from 'react';
 

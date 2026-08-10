@@ -2,13 +2,9 @@ import { Divider } from '@mui/material';
 import type { LeftNavMenuItem } from '@tui/core';
 import type { AppLocationParamStore } from 'core/routes';
 import { findAppRouteFromPath } from 'core/routes';
-import { LeftNavRoute } from 'core/template/components/LeftNavRoute';
-import type { AppLeftNavItem } from 'core/template/template.models';
 import type { TFunction } from 'i18next';
-
-//*****************************************************************************************
-// Left Nav
-//*****************************************************************************************
+import { LeftNavRoute } from 'layout/left-nav/left-nav.components';
+import type { AppLeftNavItem } from 'layout/left-nav/left-nav.models';
 
 /**
  * @name isRouteHidden

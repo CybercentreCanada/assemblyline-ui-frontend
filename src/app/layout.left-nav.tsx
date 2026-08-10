@@ -1,4 +1,4 @@
-import type { AppLeftNavItem } from 'core/template';
+import type { AppLeftNavItem } from 'layout/left-nav';
 import { useMemo } from 'react';
 
 //*****************************************************************************************
