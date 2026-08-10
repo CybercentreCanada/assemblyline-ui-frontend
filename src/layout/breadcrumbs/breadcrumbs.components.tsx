@@ -11,7 +11,7 @@ import {
   useAppLocationParamStore,
   useAppLocationParamStoreApi
 } from 'core/routes';
-import { getAncestorAppRoutes } from 'core/template/template.utils';
+import { getAncestorAppRoutes, splitItems } from 'layout/breadcrumbs/breadcrumbs.utils';
 import { memo, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -114,10 +114,10 @@ export type BreadcrumbsEllipsisProps = {
 };
 
 export const BreadcrumbsEllipsis = memo(({ onClick, expanded }: BreadcrumbsEllipsisProps) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation(['breadcrumbs']);
 
   return (
-    <Tooltip title={t(expanded ? 'tooltip.breadcrumbs.min' : 'tooltip.breadcrumbs.max')}>
+    <Tooltip title={t(expanded ? 'min' : 'max')}>
       <MoreHoriz
         fontSize="small"
         sx={{ verticalAlign: 'bottom', marginTop: '5px', display: 'inline-flex', '&:hover': { cursor: 'pointer' } }}
@@ -128,33 +128,6 @@ export const BreadcrumbsEllipsis = memo(({ onClick, expanded }: BreadcrumbsEllip
 });
 
 BreadcrumbsEllipsis.displayName = 'BreadcrumbsEllipsis';
-
-//*****************************************************************************************
-// Split Items
-//*****************************************************************************************
-
-/**
- * @name splitItems
- * @description Splits the breadcrumb trail into leading/trailing slices around an optional ellipsis, matching the deprecated BreadcrumbList behaviour.
- * @param routes - Full breadcrumb trail, root first
- * @param itemsBeforeCount - Max routes to show before the ellipsis
- * @param itemsAfterCount - Max routes to show after the ellipsis when collapsed
- * @param expanded - Whether the ellipsis has been expanded to reveal every item
- * @returns Leading routes, trailing routes, and whether an ellipsis is needed
- */
-const splitItems = (
-  routes: AppRoute[],
-  itemsBeforeCount: number,
-  itemsAfterCount: number,
-  expanded: boolean
-): { before: AppRoute[]; after: AppRoute[]; hasEllipsis: boolean } => {
-  const hasEllipsis = routes.length > itemsBeforeCount + itemsAfterCount;
-  if (!hasEllipsis) return { before: [], after: routes, hasEllipsis: false };
-
-  const before = routes.slice(0, itemsBeforeCount);
-  const after = expanded ? routes.slice(itemsBeforeCount) : routes.slice(routes.length - itemsAfterCount);
-  return { before, after, hasEllipsis: true };
-};
 
 //*****************************************************************************************
 // App Breadcrumbs

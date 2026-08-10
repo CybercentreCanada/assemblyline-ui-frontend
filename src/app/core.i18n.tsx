@@ -27,6 +27,8 @@ import tosEN from 'layout/auth/terms-of-service/terms-of-service.i18n.en.json';
 import tosFR from 'layout/auth/terms-of-service/terms-of-service.i18n.fr.json';
 import borealisEN from 'layout/borealis/borealis.i18n.en.json';
 import borealisFR from 'layout/borealis/borealis.i18n.fr.json';
+import breadcrumbsEN from 'layout/breadcrumbs/breadcrumbs.i18n.en.json';
+import breadcrumbsFR from 'layout/breadcrumbs/breadcrumbs.i18n.fr.json';
 import carouselEN from 'layout/carousel/carousel.i18n.en.json';
 import carouselFR from 'layout/carousel/carousel.i18n.fr.json';
 import drawerEN from 'layout/drawer/drawer.i18n.en.json';
@@ -163,6 +165,7 @@ export const I18N_RESSOURCES = {
     assistant: assistantEN,
     authorize: authorizeEN,
     borealis: borealisEN,
+    breadcrumbs: breadcrumbsEN,
     carousel: carouselEN,
     dashboard: dashboardEN,
     dateTime: dateTimeEN,
@@ -233,6 +236,7 @@ export const I18N_RESSOURCES = {
     assistant: assistantFR,
     authorize: authorizeFR,
     borealis: borealisFR,
+    breadcrumbs: breadcrumbsFR,
     carousel: carouselFR,
     dashboard: dashboardFR,
     dateTime: dateTimeFR,

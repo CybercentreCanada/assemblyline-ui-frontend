@@ -7,29 +7,6 @@ import type { AppLeftNavItem } from 'core/template/template.models';
 import type { TFunction } from 'i18next';
 
 //*****************************************************************************************
-// Breadcrumbs
-//*****************************************************************************************
-
-/**
- * @name getAncestorAppRoutes
- * @description Walks a route's `ancestor` chain and returns the full breadcrumb trail, from root to the route itself.
- * @param route - Route to start the walk from
- * @param store - Location param store used to resolve each ancestor by path
- * @returns Ordered routes, starting with the root ancestor and ending with `route`
- */
-export const getAncestorAppRoutes = (store: AppLocationParamStore, route: AppRoute): AppRoute[] => {
-  const chain: AppRoute[] = [];
-  let current = route;
-
-  while (current?.path) {
-    chain.unshift(current);
-    current = current.ancestor ? findAppRouteFromPath(store, current.ancestor as never) : null;
-  }
-
-  return chain;
-};
-
-//*****************************************************************************************
 // Left Nav
 //*****************************************************************************************
 

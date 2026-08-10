@@ -405,8 +405,6 @@ export const QuickSearch = memo(() => {
 
   if (!showQuickSearch) return null;
 
-  console.log(items);
-
   return (
     <ClickAwayListener onClickAway={handleClose}>
       <QuickSearchRoot

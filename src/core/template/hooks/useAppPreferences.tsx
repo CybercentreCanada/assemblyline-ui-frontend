@@ -1,11 +1,11 @@
 import { AppSwitcher } from '@tui/apps';
 import type { AppPreferenceConfigs } from '@tui/core';
-import { AppBreadcrumbs } from 'core/template/components/Breadcrumbs';
 import { DocumentationButton } from 'core/template/components/DocumentationButton';
 import { EmailButton } from 'core/template/components/EmailButton';
 import { UserProfile } from 'core/template/components/UserProfile';
 import { useGetTemplateLeftNavMenu } from 'core/template/template.hooks';
 import type { AppLeftNavItem } from 'core/template/template.models';
+import { AppBreadcrumbs } from 'layout/breadcrumbs';
 import { Notifications } from 'layout/notifications';
 import { QuickSearch } from 'layout/quick-search';
 import { useMemo } from 'react';
