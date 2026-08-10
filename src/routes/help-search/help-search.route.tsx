@@ -516,15 +516,17 @@ export const HelpSearchPage = memo(() => {
 });
 
 export const HelpSearchRoute = createAppRoute({
-  title: {
-    ns: 'app',
-    key: 'drawer.help.search'
-  },
-  icon: {
-    primary: <SearchIcon />
-  },
-  ancestor: '/help',
   component: HelpSearchPage,
+
   path: '/help/search',
-  hash: s => s.string(null)
+  hash: s => s.string(null),
+
+  ancestor: '/help',
+  shortname: () => ({ i18nKey: 'drawer.help.search', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'drawer.help.search', ns: 'app' }),
+  shorticon: () => <SearchIcon />,
+  fullicon: () => <SearchIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
 });

@@ -1,4 +1,5 @@
 import { Button, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Stack } from '@mui/material';
+import { getAppConfigStateFromApi, useAppConfigStoreApi } from 'core/config';
 import type { AppNavigationStore, InferAppNavigationPropsFromPath } from 'core/router';
 import {
   clearBlockedPages,
@@ -12,7 +13,12 @@ import {
   useAppRouterStoreApi,
   useAppSetNavigationStore
 } from 'core/router';
-import { findAppRouteFromKey, getAppLocationParamStateFromApi, useAppLocationParamStoreApi } from 'core/routes';
+import {
+  findAppRouteFromKey,
+  getAppLocationParamStateFromApi,
+  getRouteParamFromKey,
+  useAppLocationParamStoreApi
+} from 'core/routes';
 import type { ForwardedRef } from 'react';
 import { forwardRef, memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -100,6 +106,7 @@ export const AppNavigate = memo(WrappedAppNavigate) as <const Origin extends App
 
 export const AppNavigationBlocker = memo(() => {
   const { t } = useTranslation(['router']);
+  const configStoreApi = useAppConfigStoreApi();
   const locationParamStoreApi = useAppLocationParamStoreApi();
   const navigationStoreApi = useAppNavigationStoreApi();
   const routerStoreApi = useAppRouterStoreApi();
@@ -117,7 +124,10 @@ export const AppNavigationBlocker = memo(() => {
     return getBlockedPages(navigationState)
       .map(([pageKey, reason]) => {
         const route = findAppRouteFromKey(locationState, pageKey);
-        const title = t(route.title.key, { ns: route.title.ns });
+        const routeParam = getRouteParamFromKey(locationState, pageKey);
+        const configState = getAppConfigStateFromApi(configStoreApi);
+        const name = route.fullname(routeParam as never, configState);
+        const title = name && t(name.i18nKey, { ns: name.ns });
 
         switch (reason) {
           case 'unsaved_changes':
@@ -132,7 +142,7 @@ export const AppNavigationBlocker = memo(() => {
       })
       .filter(Boolean);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, locationParamStoreApi, navigationStoreApi, t]);
+  }, [configStoreApi, open, locationParamStoreApi, navigationStoreApi, t]);
 
   const handleCancel = useCallback(() => {
     setOpen(false);

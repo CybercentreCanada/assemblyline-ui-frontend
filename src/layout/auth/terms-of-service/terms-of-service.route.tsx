@@ -1,3 +1,4 @@
+import ReceiptOutlinedIcon from '@mui/icons-material/ReceiptOutlined';
 import { Link, Skeleton, Typography, styled, useTheme } from '@mui/material';
 import { useApiMutation, useApiQuery } from 'core/api';
 import { useAppConfig } from 'core/config';
@@ -124,5 +125,15 @@ ToSPage.displayName = 'ToSPage';
 
 export const ToSRoute = createAppRoute({
   component: ToSPage,
-  path: '/tos'
+
+  path: '/tos',
+
+  ancestor: null,
+  shortname: () => ({ i18nKey: 'breadcrumb.tos', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'breadcrumb.tos', ns: 'app' }),
+  shorticon: () => <ReceiptOutlinedIcon />,
+  fullicon: () => <ReceiptOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
 });

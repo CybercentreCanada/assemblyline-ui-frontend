@@ -90,17 +90,9 @@ export const ManageHeuristicsPage = memo(() => {
 });
 
 export const ManageHeuristicsRoute = createAppRoute({
-  title: {
-    ns: 'app',
-    key: 'drawer.manage.heuristics'
-  },
-  icon: {
-    primary: <SimCardOutlinedIcon />
-  },
-  ancestor: '/manage',
   component: ManageHeuristicsPage,
-  path: '/manage/heuristics',
 
+  path: '/manage/heuristics',
   search: s => ({
     query: s.string(''),
     offset: s.number(0).min(0).source('transient').ephemeral(),
@@ -110,5 +102,12 @@ export const ManageHeuristicsRoute = createAppRoute({
     track_total_hits: s.number(10000).nullable().ephemeral()
   }),
 
-  forbidden: s => !s.user.roles.includes('heuristic_view')
+  ancestor: '/manage',
+  shortname: () => ({ i18nKey: 'drawer.manage.heuristics', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'drawer.manage.heuristics', ns: 'app' }),
+  shorticon: () => <SimCardOutlinedIcon />,
+  fullicon: () => <SimCardOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.roles.includes('heuristic_view')
 });

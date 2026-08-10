@@ -37,14 +37,16 @@ MissingNodePage.displayName = 'MissingNodePage';
 //*****************************************************************************************
 
 export const MissingNodeRoute = createAppRoute({
-  title: {
-    ns: 'missingNode',
-    key: 'title'
-  },
-  icon: {
-    primary: <LinkOffIcon />
-  },
-  ancestor: null,
   component: MissingNodePage,
-  path: '/missing-node'
+
+  path: '/missing-node',
+
+  ancestor: null,
+  shortname: () => ({ i18nKey: 'title', ns: 'missingNode' }),
+  fullname: () => ({ i18nKey: 'title', ns: 'missingNode' }),
+  shorticon: () => <LinkOffIcon />,
+  fullicon: () => <LinkOffIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
 });

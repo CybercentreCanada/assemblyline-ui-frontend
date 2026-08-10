@@ -1443,19 +1443,19 @@ const SubmissionDetail = memo(() => {
 });
 
 export const SubmissionDetailRoute = createAppRoute({
-  title: {
-    ns: 'app',
-    key: 'breadcrumb.submission.detail'
-  },
-  icon: {
-    primary: <ListAltOutlinedIcon />
-  },
-  ancestor: '/submissions',
   component: SubmissionDetail,
+
   path: '/submission/detail/:id',
   params: s => ({
     id: s.string()
   }),
 
-  forbidden: s => !s.user.roles.includes('submission_view')
+  ancestor: '/submissions',
+  shortname: location => ({ i18nKey: location?.path?.id ?? 'breadcrumb.submission.detail', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'breadcrumb.submission.detail', ns: 'app' }),
+  shorticon: () => <ListAltOutlinedIcon />,
+  fullicon: () => <ListAltOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.roles.includes('submission_view')
 });

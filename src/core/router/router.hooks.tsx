@@ -1,3 +1,4 @@
+import { getAppConfigStateFromApi, useAppConfigStoreApi } from 'core/config';
 import { getAppPreferenceStateFromApi, useAppPreferenceStoreApi } from 'core/preference';
 import type {
   AppLocationState,
@@ -24,8 +25,8 @@ import {
   getHashFragmentsFromRouter,
   getLocationStateFromRouter,
   getNavigationStoreFromRouter,
-  getNextTitleFromPage,
   getPageFromPanelKey,
+  getTitlesFromNavigation,
   hasBlockedPages,
   isPageVisible,
   reconcileRouterFromNavigation,
@@ -60,6 +61,7 @@ import {
 } from 'core/routes';
 import type { DependencyList } from 'react';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { Location, NavigateOptions } from 'react-router';
 import { useLocation, useNavigate } from 'react-router';
 import { generateRandomUUID } from 'shared/utils/app.utils';
@@ -191,7 +193,6 @@ export function useAppNavigate<const Origin extends AppRoute['path']>() {
         store = setPageScrollPositions(store);
         store.id = generateRandomUUID();
         store.options = options;
-        store.options.nextTitle = getNextTitleFromPage(nextPage);
         return store;
       });
     },
@@ -224,7 +225,6 @@ export function useAppNavigate<const Origin extends AppRoute['path']>() {
         store = setPageScrollPositions(store);
         store.id = generateRandomUUID();
         store.options = options;
-        store.options.nextTitle = getNextTitleFromPage(nextPage);
         return store;
       });
     },
@@ -263,7 +263,6 @@ export function useAppNavigate<const Origin extends AppRoute['path']>() {
         store = setPageScrollPositions(store);
         store.id = generateRandomUUID();
         store.options = options;
-        store.options.nextTitle = getNextTitleFromPage(nextPage);
         return store;
       });
     },
@@ -300,7 +299,6 @@ export function useAppNavigate<const Origin extends AppRoute['path']>() {
         store = setPageScrollPositions(store);
         store.id = generateRandomUUID();
         store.options = options;
-        store.options.nextTitle = getNextTitleFromPage(nextPage);
         return store;
       });
     },
@@ -330,7 +328,6 @@ export function useAppNavigate<const Origin extends AppRoute['path']>() {
         store = setPageScrollPositions(store);
         store.id = generateRandomUUID();
         store.options = options;
-        store.options.nextTitle = getNextTitleFromPage(null);
         return store;
       });
     },
@@ -579,17 +576,24 @@ export function useAppSyncNavigationStoreFromLocation() {
 //*****************************************************************************************
 export function useAppSyncRouterStoreFromNavigation() {
   const navigate = useNavigate();
-  const routerStoreApi = useAppRouterStoreApi();
+  const { t } = useTranslation();
+  const configStoreApi = useAppConfigStoreApi();
+  const locationParamStoreApi = useAppLocationParamStoreApi();
   const navigationStoreApi = useAppNavigationStoreApi();
+  const routerStoreApi = useAppRouterStoreApi();
   const setRouterStore = useAppSetRouterStore();
 
   const updateRouterStoreFromNavigation = useCallback(
     (navigation: AppNavigationStore) => {
+      const configState = getAppConfigStateFromApi(configStoreApi);
+      const locationState = getAppLocationParamStateFromApi(locationParamStoreApi);
       const routerState = getAppRouterStateFromApi(routerStoreApi);
+
       if (navigation.id === routerState.id || hasBlockedPages(navigation, routerState)) return;
 
+      const titles = getTitlesFromNavigation(navigation, locationState, configState, t);
       const nextTitle = navigation?.options?.nextTitle?.trim();
-      document.title = nextTitle ? `ALV4 | ${nextTitle}` : 'Assemblyline 4';
+      document.title = nextTitle ? nextTitle : titles?.length > 0 ? titles.join(' | ') : 'Assemblyline 4';
 
       const fragments = getHashFragmentsFromRouter(navigation);
 
@@ -599,7 +603,7 @@ export function useAppSyncRouterStoreFromNavigation() {
       });
       setRouterStore(router => reconcileRouterFromNavigation(router, navigation));
     },
-    [navigate, routerStoreApi, setRouterStore]
+    [configStoreApi, locationParamStoreApi, navigate, routerStoreApi, setRouterStore, t]
   );
 
   useEffect(() => {

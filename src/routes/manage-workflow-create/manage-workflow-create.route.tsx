@@ -309,35 +309,27 @@ export const ManageWorkflowCreatePage = memo(() => {
 });
 
 export const ManageWorkflowCreateRoute = createAppRoute({
-  title: {
-    ns: 'app',
-    key: 'breadcrumb.workflow.create'
-  },
-  icon: {
-    primary: <CreateOutlinedIcon />
-  },
-  ancestor: '/manage/workflows',
   component: ManageWorkflowCreatePage,
+
   path: '/manage/workflow/create/:id',
   params: s => ({
     id: s.string()
   }),
 
-  forbidden: s => !s.user.roles.includes('workflow_manage')
+  ancestor: '/manage/workflows',
+  shortname: () => ({ i18nKey: 'breadcrumb.workflow.create', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'breadcrumb.workflow.create', ns: 'app' }),
+  shorticon: () => <CreateOutlinedIcon />,
+  fullicon: () => <CreateOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.roles.includes('workflow_manage')
 });
 
 export const ManageWorkflowCreateRootRoute = createAppRoute({
-  title: {
-    ns: 'app',
-    key: 'breadcrumb.workflow.create'
-  },
-  icon: {
-    primary: <CreateOutlinedIcon />
-  },
-  ancestor: '/manage/workflows',
   component: ManageWorkflowCreatePage,
-  path: '/manage/workflow/create',
 
+  path: '/manage/workflow/create',
   search: s => ({
     classification: s.string('').source('transient').ephemeral(),
     name: s.string('').source('transient').ephemeral(),
@@ -348,5 +340,12 @@ export const ManageWorkflowCreateRootRoute = createAppRoute({
     enabled: s.boolean(true).source('transient').ephemeral()
   }),
 
-  forbidden: s => !s.user.roles.includes('workflow_manage')
+  ancestor: '/manage/workflows',
+  shortname: () => ({ i18nKey: 'breadcrumb.workflow.create', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'breadcrumb.workflow.create', ns: 'app' }),
+  shorticon: () => <CreateOutlinedIcon />,
+  fullicon: () => <CreateOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.roles.includes('workflow_manage')
 });

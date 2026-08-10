@@ -97,34 +97,34 @@ const SettingsPage = memo(() => (
 SettingsPage.displayName = 'SettingsPage';
 
 export const SettingsRoute = createAppRoute({
-  title: {
-    ns: 'app',
-    key: 'usermenu.settings'
-  },
-  icon: {
-    primary: <SettingsOutlinedIcon />
-  },
-  ancestor: null,
   component: SettingsPage,
+
   path: '/settings/:tab',
   params: s => ({
     tab: s.string()
   }),
 
-  forbidden: s => !s.user.is_admin && !s.user.roles.includes('self_manage')
+  ancestor: null,
+  shortname: () => ({ i18nKey: 'usermenu.settings', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'usermenu.settings', ns: 'app' }),
+  shorticon: () => <SettingsOutlinedIcon />,
+  fullicon: () => <SettingsOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.is_admin && !config.user.roles.includes('self_manage')
 });
 
 export const SettingsRootRoute = createAppRoute({
-  title: {
-    ns: 'app',
-    key: 'usermenu.settings'
-  },
-  icon: {
-    primary: <SettingsOutlinedIcon />
-  },
-  ancestor: null,
   component: SettingsPage,
+
   path: '/settings',
 
-  forbidden: s => !s.user.is_admin && !s.user.roles.includes('self_manage')
+  ancestor: null,
+  shortname: () => ({ i18nKey: 'usermenu.settings', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'usermenu.settings', ns: 'app' }),
+  shorticon: () => <SettingsOutlinedIcon />,
+  fullicon: () => <SettingsOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.is_admin && !config.user.roles.includes('self_manage')
 });

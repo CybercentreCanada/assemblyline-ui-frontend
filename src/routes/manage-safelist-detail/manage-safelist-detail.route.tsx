@@ -535,19 +535,19 @@ export const ManageSafelistDetailPage = memo(() => {
 });
 
 export const ManageSafelistDetailRoute = createAppRoute({
-  title: {
-    ns: 'app',
-    key: 'drawer.manage.safelist.detail'
-  },
-  icon: {
-    primary: <ListOutlinedIcon />
-  },
-  ancestor: '/manage/safelists',
   component: ManageSafelistDetailPage,
+
   path: '/manage/safelist/detail/:id',
   params: s => ({
     id: s.string()
   }),
 
-  forbidden: s => !s.user.roles.includes('safelist_view')
+  ancestor: '/manage/safelists',
+  shortname: location => ({ i18nKey: location?.path?.id ?? 'drawer.manage.safelist.detail', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'drawer.manage.safelist.detail', ns: 'app' }),
+  shorticon: () => <ListOutlinedIcon />,
+  fullicon: () => <ListOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.roles.includes('safelist_view')
 });

@@ -285,15 +285,8 @@ AdminErrorViewerPage.displayName = 'AdminErrorViewerPage';
 //*****************************************************************************************
 
 export const AdminErrorViewerRoute = createAppRoute({
-  title: {
-    ns: 'app',
-    key: 'adminmenu.errors'
-  },
-  icon: {
-    primary: <ErrorOutlineOutlinedIcon />
-  },
-  ancestor: '/admin',
   component: AdminErrorViewerPage,
+
   path: '/admin/errors',
   search: s => ({
     query: s.string(''),
@@ -311,5 +304,12 @@ export const AdminErrorViewerRoute = createAppRoute({
     timeout: s.string('').source('transient').ephemeral()
   }),
 
-  forbidden: s => !s.user.is_admin
+  ancestor: '/admin',
+  shortname: () => ({ i18nKey: 'adminmenu.errors', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'adminmenu.errors', ns: 'app' }),
+  shorticon: () => <ErrorOutlineOutlinedIcon />,
+  fullicon: () => <ErrorOutlineOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.is_admin
 });

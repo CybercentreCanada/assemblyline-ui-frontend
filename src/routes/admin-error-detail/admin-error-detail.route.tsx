@@ -225,17 +225,17 @@ AdminErrorDetailPage.displayName = 'AdminErrorDetailPage';
 //*****************************************************************************************
 
 export const AdminErrorDetailRoute = createAppRoute({
-  title: {
-    ns: 'app',
-    key: 'breadcrumb.heuristic.detail'
-  },
-  icon: {
-    primary: <ListOutlinedIcon />
-  },
-  ancestor: '/admin/errors',
   component: AdminErrorDetailPage,
+
   path: '/admin/errors/:id',
   params: s => ({ id: s.string() }),
 
-  forbidden: s => !s.user.is_admin
+  ancestor: '/admin/errors',
+  shortname: location => ({ i18nKey: location?.path?.id ?? 'breadcrumb.heuristic.detail', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'breadcrumb.heuristic.detail', ns: 'app' }),
+  shorticon: () => <ListOutlinedIcon />,
+  fullicon: () => <ListOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.is_admin
 });

@@ -1,18 +1,10 @@
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
-import { AppSwitcher } from '@tui/apps';
 import type { AppPreferenceConfigs } from '@tui/core';
-import { useAppTemplateLeftNavMenu } from 'core/template';
-import { Notifications } from 'layout/notifications';
-import { DocumentationButton } from 'layout/top-nav/DocumentationButton';
-import { EmailButton } from 'layout/top-nav/EmailButton';
-import { UserProfile } from 'layout/top-nav/UserProfile';
 import { useMemo } from 'react';
 
-export const useAppPreferences = () => {
-  const leftnavMenu = useAppTemplateLeftNavMenu();
-
-  return useMemo<AppPreferenceConfigs>(
-    (): AppPreferenceConfigs => ({
+export const useAppTemplatePreferences = () =>
+  useMemo<AppPreferenceConfigs>(
+    () => ({
       brand: {
         application: 'Assemblyline',
         appName: 'Assemblyline',
@@ -22,18 +14,20 @@ export const useAppPreferences = () => {
         }
       },
       appLink: '/',
-      allowBreadcrumbs: true,
+      allowBreadcrumbs: false,
+      allowQuickSearch: false,
+      allowReset: false,
+      allowThemeSelection: false,
+      allowFocusMode: false,
+      allowDensitySelection: false,
       topnav: {
         hideUserAvatar: true,
         slots: {
+          breadcrumbs: {
+            left: null
+          },
           search: {
-            right: [
-              <DocumentationButton key="documentation" />,
-              <EmailButton key="email" />,
-              <Notifications key="notifications" />,
-              <AppSwitcher key="app-switcher" />,
-              <UserProfile key="user-profile" />
-            ]
+            right: null
           }
         },
         profile: {
@@ -75,10 +69,10 @@ export const useAppPreferences = () => {
           }
         }
       },
-      leftnav: { menus: leftnavMenu, width: 240 }
-
-      // slots: { layout: AppDrawerContainer }
+      leftnav: {
+        menus: [],
+        width: 240
+      }
     }),
-    [leftnavMenu]
+    []
   );
-};

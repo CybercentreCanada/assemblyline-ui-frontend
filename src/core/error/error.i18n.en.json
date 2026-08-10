@@ -2,6 +2,7 @@
   "error": "error",
   "error.button": "Try again",
   "error.chunk": "Reloading the application to fix a loading error...",
+  "error.crash": "Crash",
   "error.description": "Please inform the system administrators of the issue below to have it resolved.",
   "error.hideStack": "Hide stack",
   "error.reload": "Reload page",

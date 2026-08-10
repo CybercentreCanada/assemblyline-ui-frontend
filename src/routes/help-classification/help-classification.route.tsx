@@ -288,14 +288,16 @@ export const HelpClassificationPage = memo(() => {
 });
 
 export const HelpClassificationRoute = createAppRoute({
-  title: {
-    ns: 'app',
-    key: 'drawer.help.classification'
-  },
-  icon: {
-    primary: <LabelOutlinedIcon />
-  },
-  ancestor: '/help',
   component: HelpClassificationPage,
-  path: '/help/classification'
+
+  path: '/help/classification',
+
+  ancestor: '/help',
+  shortname: () => ({ i18nKey: 'drawer.help.classification', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'drawer.help.classification', ns: 'app' }),
+  shorticon: () => <LabelOutlinedIcon />,
+  fullicon: () => <LabelOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
 });

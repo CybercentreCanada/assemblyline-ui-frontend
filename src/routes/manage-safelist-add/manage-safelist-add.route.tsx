@@ -428,16 +428,16 @@ export const ManageSafelistAddPage = memo(() => {
 });
 
 export const ManageSafelistAddRoute = createAppRoute({
-  title: {
-    ns: 'app',
-    key: 'drawer.manage.safelist.add'
-  },
-  icon: {
-    primary: <BugReportOutlinedIcon />
-  },
-  ancestor: '/manage/safelists',
   component: ManageSafelistAddPage,
+
   path: '/manage/safelist/add',
 
-  forbidden: s => !s.user.roles.includes('safelist_view')
+  ancestor: '/manage/safelists',
+  shortname: () => ({ i18nKey: 'drawer.manage.safelist.add', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'drawer.manage.safelist.add', ns: 'app' }),
+  shorticon: () => <BugReportOutlinedIcon />,
+  fullicon: () => <BugReportOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.roles.includes('safelist_view')
 });

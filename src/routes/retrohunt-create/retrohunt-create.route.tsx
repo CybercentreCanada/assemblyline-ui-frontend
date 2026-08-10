@@ -278,16 +278,16 @@ export const RetrohuntCreatePage = memo(() => {
 });
 
 export const RetrohuntCreateRoute = createAppRoute({
-  title: {
-    ns: 'app',
-    key: 'drawer.retrohunt'
-  },
-  icon: {
-    primary: <DataObjectOutlinedIcon />
-  },
-  ancestor: '/retrohunt',
   component: RetrohuntCreatePage,
+
   path: '/retrohunt/create',
-  disabled: s => !s.configuration?.retrohunt?.enabled,
-  forbidden: s => !s.user.roles.includes('retrohunt_run')
+
+  ancestor: '/retrohunt',
+  shortname: () => ({ i18nKey: 'drawer.retrohunt', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'drawer.retrohunt', ns: 'app' }),
+  shorticon: () => <DataObjectOutlinedIcon />,
+  fullicon: () => <DataObjectOutlinedIcon />,
+
+  disabled: (_location, config) => !config.configuration?.retrohunt?.enabled,
+  forbidden: (_location, config) => !config.user.roles.includes('retrohunt_run')
 });

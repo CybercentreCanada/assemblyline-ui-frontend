@@ -1,9 +1,9 @@
-import { useTableOfContent } from 'features/table-of-content/TableOfContent';
 import { useAppConfig } from 'core/config';
-import { useForm } from '../settings.form';
-import { PageNavigation, PageNavigationItem } from 'ui/layouts/PageNavigation';
+import { useTableOfContent } from 'features/table-of-content/TableOfContent';
 import { memo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useForm } from 'routes/settings/settings.form';
+import { PageNavigation, PageNavigationItem } from 'ui/layouts/PageNavigation';
 
 export const RightNav = memo(() => {
   const { t } = useTranslation(['settings']);

@@ -12,7 +12,9 @@ import { Patterns } from 'routes/admin-identify/components/patterns';
 import { Yara } from 'routes/admin-identify/components/yara';
 import { PageFullSizeLayout } from 'ui/pages/PageFullSize';
 
-loader.config({ paths: { vs: '/cdn/monaco_0.35.0/vs' } });
+loader.config({
+  paths: { vs: '/cdn/monaco_0.35.0/vs' }
+});
 
 const TabContent = styled('div')(({ theme }) => ({
   flexGrow: 1,
@@ -186,16 +188,16 @@ export const AdminIdentifyPage = memo(() => {
 });
 
 export const AdminIdentifyRoute = createAppRoute({
-  title: {
-    ns: 'app',
-    key: 'adminmenu.identify'
-  },
-  icon: {
-    primary: <FindInPageOutlinedIcon />
-  },
-  ancestor: '/admin',
   component: AdminIdentifyPage,
+
   path: '/admin/identify',
 
-  forbidden: s => !s.user.is_admin
+  ancestor: '/admin',
+  shortname: () => ({ i18nKey: 'adminmenu.identify', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'adminmenu.identify', ns: 'app' }),
+  shorticon: () => <FindInPageOutlinedIcon />,
+  fullicon: () => <FindInPageOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.is_admin
 });

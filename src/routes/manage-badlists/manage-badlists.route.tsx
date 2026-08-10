@@ -137,15 +137,8 @@ export const ManageBadlistsPage = memo(() => {
 });
 
 export const ManageBadlistsRoute = createAppRoute({
-  title: {
-    ns: 'app',
-    key: 'drawer.manage.badlist'
-  },
-  icon: {
-    primary: <BugReportOutlinedIcon />
-  },
-  ancestor: '/manage',
   component: ManageBadlistsPage,
+
   path: '/manage/badlists',
   search: s => ({
     query: s.string(''),
@@ -157,5 +150,12 @@ export const ManageBadlistsRoute = createAppRoute({
     refresh: s.boolean(false).source('transient').ephemeral()
   }),
 
-  forbidden: s => !s.user.roles.includes('badlist_view')
+  ancestor: '/manage',
+  shortname: () => ({ i18nKey: 'drawer.manage.badlist', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'drawer.manage.badlist', ns: 'app' }),
+  shorticon: () => <BugReportOutlinedIcon />,
+  fullicon: () => <BugReportOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.roles.includes('badlist_view')
 });

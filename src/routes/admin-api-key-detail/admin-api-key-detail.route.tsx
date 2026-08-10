@@ -358,17 +358,17 @@ AdminAPIKeyDetailPage.displayName = 'AdminAPIKeyDetailPage';
 //*****************************************************************************************
 
 export const AdminAPIKeyDetailRoute = createAppRoute({
-  title: {
-    ns: 'app',
-    key: 'adminmenu.apikeys'
-  },
-  icon: {
-    primary: <KeyOutlinedIcon />
-  },
-  ancestor: '/admin/apikeys',
   component: AdminAPIKeyDetailPage,
+
   path: '/admin/apikeys/:id',
   params: s => ({ id: s.string(null) }),
 
-  forbidden: s => !s.user.is_admin
+  ancestor: '/admin/apikeys',
+  shortname: location => ({ i18nKey: location?.path?.id ?? 'adminmenu.apikeys', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'adminmenu.apikey', ns: 'app' }),
+  shorticon: () => <KeyOutlinedIcon />,
+  fullicon: () => <KeyOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.is_admin
 });

@@ -20,6 +20,7 @@ import type { Error } from 'models/base/error';
 import type { Submission } from 'models/base/submission';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useLocation } from 'react-router';
 import AttackSection from 'routes/file-detail/components/attacks';
 import ChildrenSection from 'routes/file-detail/components/childrens';
 import Detection from 'routes/file-detail/components/detection';
@@ -577,15 +578,8 @@ const FileDetailPage = React.memo(() => {
 });
 
 export const FileDetailRoute = createAppRoute({
-  title: {
-    ns: 'app',
-    key: 'breadcrumb.file.detail'
-  },
-  icon: {
-    primary: <DescriptionOutlinedIcon />
-  },
-  ancestor: null,
   component: FileDetailPage,
+
   path: '/file/detail/:id',
   params: s => ({
     id: s.string()
@@ -594,5 +588,12 @@ export const FileDetailRoute = createAppRoute({
     name: s.string(null)
   }),
 
-  forbidden: s => !s.user.roles.includes('submission_view')
+  ancestor: null,
+  shortname: () => ({ i18nKey: 'breadcrumb.file.detail', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'breadcrumb.file.detail', ns: 'app' }),
+  shorticon: () => <DescriptionOutlinedIcon />,
+  fullicon: () => <DescriptionOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.roles.includes('submission_view')
 });

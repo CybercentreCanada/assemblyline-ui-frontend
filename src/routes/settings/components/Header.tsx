@@ -2,9 +2,9 @@ import { Alert, Tooltip, Typography, useTheme } from '@mui/material';
 import { invalidateApiQuery, useApiMutation } from 'core/api';
 import { useAppConfig } from 'core/config';
 import { useAppSnackbar } from 'core/snackbar';
-import { Button } from 'ui/buttons/Button';
-import { PageHeader } from 'ui/layouts/PageHeader';
-import { useForm } from '../settings.form';
+import { memo } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useForm } from 'routes/settings/settings.form';
 import {
   hasDifferentDefaultSubmissionValues,
   hasDifferentPreviousSubmissionValues,
@@ -12,10 +12,9 @@ import {
   resetDefaultSubmissionValues,
   resetPreviousSubmissionValues,
   updatePreviousSubmissionValues
-} from '../settings.utils';
-// import { RouterPrompt } from 'ui/navigation/RouterPrompt';
-import { memo } from 'react';
-import { useTranslation } from 'react-i18next';
+} from 'routes/settings/settings.utils';
+import { Button } from 'ui/buttons/Button';
+import { PageHeader } from 'ui/layouts/PageHeader';
 
 export const HeaderSection = memo(() => {
   const { t } = useTranslation(['settings', 'submit']);

@@ -1,5 +1,5 @@
-export { DisabledBoundary, ForbiddenBoundary } from './routes.components';
-export type { DisabledBoundaryProps, ForbiddenBoundaryProps } from './routes.components';
+export { DisabledBoundary, ForbiddenBoundary, RouteName } from './routes.components';
+export type { DisabledBoundaryProps, ForbiddenBoundaryProps, RouteNameProps } from './routes.components';
 export { createAppRoute } from './routes.factories';
 export type { CreateAppRouteProps } from './routes.factories';
 export {
@@ -8,6 +8,7 @@ export {
   useAppMediaQuery,
   useAppPageKey,
   useAppPathParams,
+  useAppRoute,
   useAppSearchParams,
   useAppSearchSnapshot
 } from './routes.hooks';
@@ -16,6 +17,7 @@ export type { AppRouteLayoutProviderProps } from './routes.layout';
 export type {
   AppLocationParamStore,
   GuardResult,
+  InferAppLocationFromParams,
   InferAppLocationFromPath,
   InferAppRouteFromPath,
   InferAppRouteParamFromPath,

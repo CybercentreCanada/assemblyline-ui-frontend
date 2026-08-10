@@ -154,15 +154,8 @@ export const AdminUsersPage = memo(() => {
 });
 
 export const AdminUsersRoute = createAppRoute({
-  title: {
-    ns: 'app',
-    key: 'adminmenu.users'
-  },
-  icon: {
-    primary: <SupervisorAccountOutlinedIcon />
-  },
-  ancestor: '/admin',
   component: AdminUsersPage,
+
   path: '/admin/users',
   search: s => ({
     query: s.string(''),
@@ -174,5 +167,12 @@ export const AdminUsersRoute = createAppRoute({
     refresh: s.boolean(false).source('transient').ephemeral()
   }),
 
-  forbidden: s => !s.user.is_admin
+  ancestor: '/admin',
+  shortname: () => ({ i18nKey: 'adminmenu.users', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'adminmenu.users', ns: 'app' }),
+  shorticon: () => <SupervisorAccountOutlinedIcon />,
+  fullicon: () => <SupervisorAccountOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.is_admin
 });

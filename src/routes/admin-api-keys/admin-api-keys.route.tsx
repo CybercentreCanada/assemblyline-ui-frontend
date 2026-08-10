@@ -156,15 +156,8 @@ AdminAPIKeysPage.displayName = 'AdminAPIKeysPage';
 //*****************************************************************************************
 
 export const AdminAPIKeysRoute = createAppRoute({
-  title: {
-    ns: 'app',
-    key: 'adminmenu.apikeys'
-  },
-  icon: {
-    primary: <KeyOutlinedIcon />
-  },
-  ancestor: '/admin',
   component: AdminAPIKeysPage,
+
   path: '/admin/apikeys',
   search: s => ({
     query: s.string(''),
@@ -176,5 +169,12 @@ export const AdminAPIKeysRoute = createAppRoute({
     refresh: s.boolean(false).ephemeral()
   }),
 
-  forbidden: s => !s.user.is_admin
+  ancestor: '/admin',
+  shortname: () => ({ i18nKey: 'adminmenu.apikeys', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'adminmenu.apikeys', ns: 'app' }),
+  shorticon: () => <KeyOutlinedIcon />,
+  fullicon: () => <KeyOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.is_admin
 });

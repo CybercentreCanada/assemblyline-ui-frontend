@@ -14,7 +14,9 @@ import { Button } from 'ui/buttons/Button';
 import { PageHeader } from 'ui/layouts/PageHeader';
 import { PageFullSizeLayout } from 'ui/pages/PageFullSize';
 
-loader.config({ paths: { vs: '/cdn/monaco_0.35.0/vs' } });
+loader.config({
+  paths: { vs: '/cdn/monaco_0.35.0/vs' }
+});
 
 export const AdminActionsPage = memo(() => {
   const { t, i18n } = useTranslation(['adminActions']);
@@ -184,16 +186,16 @@ export const AdminActionsPage = memo(() => {
 });
 
 export const AdminActionsRoute = createAppRoute({
-  title: {
-    ns: 'app',
-    key: 'adminmenu.actions'
-  },
-  icon: {
-    primary: <PlaylistPlayOutlinedIcon />
-  },
-  ancestor: '/admin',
   component: AdminActionsPage,
+
   path: '/admin/actions',
 
-  forbidden: s => !s.user.is_admin
+  ancestor: '/admin',
+  shortname: () => ({ i18nKey: 'adminmenu.actions', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'adminmenu.actions', ns: 'app' }),
+  shorticon: () => <PlaylistPlayOutlinedIcon />,
+  fullicon: () => <PlaylistPlayOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.is_admin
 });

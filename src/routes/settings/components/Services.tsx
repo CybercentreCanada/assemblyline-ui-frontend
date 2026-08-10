@@ -1,15 +1,15 @@
 import { useTheme } from '@mui/material';
-import type { SettingsStore } from '../settings.form';
-import { useForm } from '../settings.form';
+import { memo, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
+import type { SettingsStore } from 'routes/settings/settings.form';
+import { useForm } from 'routes/settings/settings.form';
 import { PageSection } from 'ui/layouts/PageSection';
-import { List } from 'ui/list/List';
-import { ListHeader } from 'ui/list/ListHeader';
 import { BooleanListInput } from 'ui/list-inputs/BooleanListInput';
 import { NumberListInput } from 'ui/list-inputs/NumberListInput';
 import { SelectListInput } from 'ui/list-inputs/SelectListInput';
 import { TextListInput } from 'ui/list-inputs/TextListInput';
-import { memo, useCallback } from 'react';
-import { useTranslation } from 'react-i18next';
+import { List } from 'ui/list/List';
+import { ListHeader } from 'ui/list/ListHeader';
 
 type ParameterProps = {
   customize: boolean;
@@ -229,76 +229,74 @@ type CategoryProps = {
   loading: boolean;
 };
 
-const Category = memo(
-  ({ cat_id = null, customize = false, disabled = false, loading = false }: CategoryProps) => {
-    const theme = useTheme();
-    const form = useForm();
+const Category = memo(({ cat_id = null, customize = false, disabled = false, loading = false }: CategoryProps) => {
+  const theme = useTheme();
+  const form = useForm();
 
-    const handleChange = useCallback(
-      (selected: boolean) => {
-        form.setFieldValue('settings', s => {
-          const category = s?.services?.[cat_id];
-          if (!category) return s;
+  const handleChange = useCallback(
+    (selected: boolean) => {
+      form.setFieldValue('settings', s => {
+        const category = s?.services?.[cat_id];
+        if (!category) return s;
 
-          category.selected = selected;
-          category.services = category.services.map(srv => ({ ...srv, selected }));
-          return s;
-        });
-      },
-      [form, cat_id]
-    );
+        category.selected = selected;
+        category.services = category.services.map(srv => ({ ...srv, selected }));
+        return s;
+      });
+    },
+    [form, cat_id]
+  );
 
-    return (
-      <div style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(0.5) }}>
-        <form.Subscribe
-          selector={state => {
-            const cat = state.values.settings.services?.[cat_id];
-            const list = state.values.settings.services?.[cat_id]?.services?.map(svr => svr?.selected);
-            return [
-              cat.name,
-              cat.selected,
-              cat.default,
-              cat.restricted,
-              !list.every(i => i) && list.some(i => i)
-            ] as const;
-          }}
-          children={([name, selected, defaultValue, restricted, indeterminate]) => (
-            <ListHeader
-              id={name}
-              anchorProps={{ subheader: true }}
-              primary={name}
-              checked={selected}
-              indeterminate={indeterminate}
-              divider
-              anchor
-              overflowHidden
-              reset={defaultValue !== null && selected !== defaultValue}
-              onChange={!customize && restricted ? undefined : () => handleChange(!selected)}
-              onReset={!customize && restricted ? undefined : () => handleChange(defaultValue)}
-              slotProps={{ primary: { color: theme.palette.text.secondary } }}
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(0.5) }}>
+      <form.Subscribe
+        selector={state => {
+          const cat = state.values.settings.services?.[cat_id];
+          const list = state.values.settings.services?.[cat_id]?.services?.map(svr => svr?.selected);
+          return [
+            cat.name,
+            cat.selected,
+            cat.default,
+            cat.restricted,
+            !list.every(i => i) && list.some(i => i)
+          ] as const;
+        }}
+        children={([name, selected, defaultValue, restricted, indeterminate]) => (
+          <ListHeader
+            id={name}
+            anchorProps={{ subheader: true }}
+            primary={name}
+            checked={selected}
+            indeterminate={indeterminate}
+            divider
+            anchor
+            overflowHidden
+            reset={defaultValue !== null && selected !== defaultValue}
+            onChange={!customize && restricted ? undefined : () => handleChange(!selected)}
+            onReset={!customize && restricted ? undefined : () => handleChange(defaultValue)}
+            slotProps={{ primary: { color: theme.palette.text.secondary } }}
+          />
+        )}
+      />
+
+      <form.Subscribe
+        selector={state => state.values.settings.services?.[cat_id]?.services}
+        children={services =>
+          (Array.isArray(services) ? services : []).map((service, svr_id) => (
+            <Service
+              key={`${service.name}-${svr_id}`}
+              cat_id={cat_id}
+              svr_id={svr_id}
+              customize={customize}
+              disabled={disabled}
+              loading={loading}
             />
-          )}
-        />
-
-        <form.Subscribe
-          selector={state => state.values.settings.services?.[cat_id]?.services}
-          children={services =>
-            (Array.isArray(services) ? services : []).map((service, svr_id) => (
-              <Service
-                key={`${service.name}-${svr_id}`}
-                cat_id={cat_id}
-                svr_id={svr_id}
-                customize={customize}
-                disabled={disabled}
-                loading={loading}
-              />
-            ))
-          }
-        />
-      </div>
-    );
-  }
-);
+          ))
+        }
+      />
+    </div>
+  );
+});
 
 Category.displayName = 'Category';
 

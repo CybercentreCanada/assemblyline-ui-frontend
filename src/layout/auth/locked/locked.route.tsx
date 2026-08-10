@@ -52,5 +52,15 @@ LockedPage.displayName = 'LockedPage';
 
 export const LockedRoute = createAppRoute({
   component: LockedPage,
-  path: '/locked'
+
+  path: '/locked',
+
+  ancestor: null,
+  shortname: () => ({ i18nKey: 'locked', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'locked', ns: 'app' }),
+  shorticon: () => <HourglassEmptyOutlinedIcon />,
+  fullicon: () => <HourglassEmptyOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
 });

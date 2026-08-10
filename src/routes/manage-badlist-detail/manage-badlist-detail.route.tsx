@@ -629,19 +629,19 @@ export const ManageBadlistDetailPage = memo(() => {
 });
 
 export const ManageBadlistDetailRoute = createAppRoute({
-  title: {
-    ns: 'app',
-    key: 'drawer.manage.badlist.detail'
-  },
-  icon: {
-    primary: <BugReportOutlinedIcon />
-  },
-  ancestor: '/manage',
   component: ManageBadlistDetailPage,
+
   path: '/manage/badlist/detail/:id',
   params: s => ({
     id: s.string()
   }),
 
-  forbidden: s => !s.user.roles.includes('badlist_view')
+  ancestor: '/manage/badlists',
+  shortname: location => ({ i18nKey: location?.path?.id ?? 'breadcrumb.badlist.detail', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'breadcrumb.badlist.detail', ns: 'app' }),
+  shorticon: () => <BugReportOutlinedIcon />,
+  fullicon: () => <BugReportOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.roles.includes('badlist_view')
 });

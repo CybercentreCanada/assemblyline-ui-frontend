@@ -167,15 +167,8 @@ const Submissions = memo(() => {
 });
 
 export const SubmissionsRoute = createAppRoute({
-  title: {
-    ns: 'app',
-    key: 'drawer.submissions'
-  },
-  icon: {
-    primary: <ViewCarouselOutlinedIcon />
-  },
-  ancestor: null,
   component: Submissions,
+
   path: '/submissions',
   search: s => ({
     query: s.string(''),
@@ -186,5 +179,12 @@ export const SubmissionsRoute = createAppRoute({
     track_total_hits: s.number(null).source('transient').nullable().ephemeral()
   }),
 
-  forbidden: s => !s.user.roles.includes('submission_view')
+  ancestor: null,
+  shortname: () => ({ i18nKey: 'drawer.submissions', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'drawer.submissions', ns: 'app' }),
+  shorticon: () => <ViewCarouselOutlinedIcon />,
+  fullicon: () => <ViewCarouselOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.roles.includes('submission_view')
 });

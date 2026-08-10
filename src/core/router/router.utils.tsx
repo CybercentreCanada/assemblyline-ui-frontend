@@ -15,7 +15,10 @@ import type {
   NotFoundDetailLabels,
   PageKeyOf
 } from 'core/router';
+import type { AppLocationParamStore } from 'core/routes';
+import { findAppRouteFromPage, getRouteParamFromPage } from 'core/routes';
 import { createReversePortalNode } from 'features/portal';
+import type { TFunction } from 'i18next';
 import type { SetStateAction } from 'react';
 import { generateRandomUUID, hashObjectKeyOrderIndependent } from 'shared/utils/app.utils';
 
@@ -1795,19 +1798,50 @@ export const getHashFragmentsFromRouter = function (store: AppNavigationStore): 
     .filter((f): f is string => f !== null);
 };
 
-export const getNextTitleFromPage = function (page: Pick<AppRouterPage, 'href'>): string {
-  if (!page?.href) return null;
+export const getTitlesFromNavigation = function (
+  navigation: AppNavigationStore,
+  locationParam: AppLocationParamStore,
+  config: AppConfigStore,
+  t: TFunction
+): string[] {
+  return navigation.panels
+    .map(panel => {
+      if (!panel?.pageKey) return null;
 
-  try {
-    const url = new URL(page.href, 'http://localhost');
-    const currentLocation = url.pathname.split('/').join(' ').trim();
+      const page = navigation.pages?.[panel.pageKey];
+      if (!page?.href) return null;
 
-    if (!currentLocation) return null;
-    return `${currentLocation.charAt(0).toUpperCase()}${currentLocation.slice(1)}`;
-  } catch {
-    return null;
-  }
+      const route = findAppRouteFromPage(locationParam, page);
+      if (!route?.path || typeof route.fullname !== 'function') return null;
+
+      const location = getRouteParamFromPage(locationParam, page);
+      if (!location?.route) return null;
+
+      const name = route.fullname(location as never, config);
+      if (!name) return null;
+
+      const title = t(name.i18nKey, { ns: name.ns });
+      if (typeof title !== 'string') return null;
+
+      const trimmedTitle = title.trim();
+      return trimmedTitle || null;
+    })
+    .filter((title): title is string => Boolean(title));
 };
+
+// export const getNextTitleFromPage = function (page: Pick<AppRouterPage, 'href'>): string {
+//   if (!page?.href) return null;
+
+//   try {
+//     const url = new URL(page.href, 'http://localhost');
+//     const currentLocation = url.pathname.split('/').join(' ').trim();
+
+//     if (!currentLocation) return null;
+//     return `${currentLocation.charAt(0).toUpperCase()}${currentLocation.slice(1)}`;
+//   } catch {
+//     return null;
+//   }
+// };
 
 // export const getAppNavigationStoreFromRouterStore = function (
 //   navigation: AppNavigationStore,

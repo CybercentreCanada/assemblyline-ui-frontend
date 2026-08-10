@@ -256,15 +256,8 @@ export const RetrohuntPage = memo(() => {
 });
 
 export const RetrohuntRoute = createAppRoute({
-  title: {
-    ns: 'app',
-    key: 'drawer.retrohunt'
-  },
-  icon: {
-    primary: <DataObjectOutlinedIcon />
-  },
-  ancestor: null,
   component: RetrohuntPage,
+
   path: '/retrohunt',
   search: s => ({
     query: s.string(''),
@@ -277,6 +270,13 @@ export const RetrohuntRoute = createAppRoute({
     filters: s.filters([]),
     track_total_hits: s.number(null).source('transient').nullable().ephemeral()
   }),
-  disabled: s => !s.configuration?.retrohunt?.enabled,
-  forbidden: s => !s.user.roles.includes('retrohunt_view')
+
+  ancestor: null,
+  shortname: () => ({ i18nKey: 'drawer.retrohunt', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'drawer.retrohunt', ns: 'app' }),
+  shorticon: () => <DataObjectOutlinedIcon />,
+  fullicon: () => <DataObjectOutlinedIcon />,
+
+  disabled: (_location, config) => !config.configuration?.retrohunt?.enabled,
+  forbidden: (_location, config) => !config.user.roles.includes('retrohunt_view')
 });

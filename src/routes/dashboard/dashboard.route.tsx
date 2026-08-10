@@ -1761,14 +1761,16 @@ export const DashboardPage = memo(() => {
 });
 
 export const DashboardRoute = createAppRoute({
-  title: {
-    ns: 'app',
-    key: 'drawer.dashboard'
-  },
-  icon: {
-    primary: <DashboardOutlinedIcon />
-  },
-  ancestor: null,
   component: DashboardPage,
-  path: '/dashboard'
+
+  path: '/dashboard',
+
+  ancestor: null,
+  shortname: () => ({ i18nKey: 'drawer.dashboard', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'drawer.dashboard', ns: 'app' }),
+  shorticon: () => <DashboardOutlinedIcon />,
+  fullicon: () => <DashboardOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
 });

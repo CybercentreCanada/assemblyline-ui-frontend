@@ -462,14 +462,16 @@ HelpAPIPage.displayName = 'HelpAPIPage';
 //*****************************************************************************************
 
 export const HelpAPIRoute = createAppRoute({
-  title: {
-    ns: 'app',
-    key: 'drawer.help.api'
-  },
-  icon: {
-    primary: <AssignmentOutlinedIcon />
-  },
-  ancestor: '/help',
   component: HelpAPIPage,
-  path: '/help/api'
+
+  path: '/help/api',
+
+  ancestor: '/help',
+  shortname: () => ({ i18nKey: 'drawer.help.api', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'drawer.help.api', ns: 'app' }),
+  shorticon: () => <AssignmentOutlinedIcon />,
+  fullicon: () => <AssignmentOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
 });

@@ -296,34 +296,27 @@ export const ArchiveDetailPage = memo(() => {
 });
 
 export const ArchiveDetailRoute = createAppRoute({
-  title: {
-    ns: 'app',
-    key: 'breadcrumb.archive.detail'
-  },
-  icon: {
-    primary: <DescriptionOutlinedIcon />
-  },
-  ancestor: null,
   component: ArchiveDetailPage,
+
   path: '/archive/:id/:tab',
   params: s => ({
     id: s.string(),
     tab: s.enum(TAB_OPTIONS, DEFAULT_TAB)
   }),
-  disabled: s => !s.configuration?.datastore?.archive?.enabled,
-  forbidden: s => !s.user.roles.includes('archive_view')
+
+  ancestor: '/archives',
+  shortname: () => ({ i18nKey: 'breadcrumb.archive.detail', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'breadcrumb.archive.detail', ns: 'app' }),
+  shorticon: () => <DescriptionOutlinedIcon />,
+  fullicon: () => <DescriptionOutlinedIcon />,
+
+  disabled: (_location, config) => !config.configuration?.datastore?.archive?.enabled,
+  forbidden: (_location, config) => !config.user.roles.includes('archive_view')
 });
 
 export const ArchiveDetailRootRoute = createAppRoute({
-  title: {
-    ns: 'app',
-    key: 'breadcrumb.archive.detail'
-  },
-  icon: {
-    primary: <DescriptionOutlinedIcon />
-  },
-  ancestor: null,
   component: ArchiveDetailPage,
+
   path: '/archive/:id',
   params: s => ({
     id: s.string()
@@ -331,6 +324,13 @@ export const ArchiveDetailRootRoute = createAppRoute({
   search: s => ({
     name: s.string(null).nullable()
   }),
-  disabled: s => !s.configuration?.datastore?.archive?.enabled,
-  forbidden: s => !s.user.roles.includes('archive_view')
+
+  ancestor: '/archives',
+  shortname: () => ({ i18nKey: 'breadcrumb.archive.detail', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'breadcrumb.archive.detail', ns: 'app' }),
+  shorticon: () => <DescriptionOutlinedIcon />,
+  fullicon: () => <DescriptionOutlinedIcon />,
+
+  disabled: (_location, config) => !config.configuration?.datastore?.archive?.enabled,
+  forbidden: (_location, config) => !config.user.roles.includes('archive_view')
 });

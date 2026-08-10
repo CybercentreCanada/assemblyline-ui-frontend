@@ -48,7 +48,9 @@ import { IconButton } from 'ui/buttons/IconButton';
 import { PageFullSizeLayout } from 'ui/pages/PageFullSize';
 import { TabContainer } from 'ui/TabContainer';
 
-loader.config({ paths: { vs: '/cdn/monaco_0.35.0/vs' } });
+loader.config({
+  paths: { vs: '/cdn/monaco_0.35.0/vs' }
+});
 
 const TabContent = styled('div')(({ theme }) => ({
   flexGrow: 1,
@@ -472,20 +474,22 @@ const WrappedFileViewerPage = React.memo(() => (
 ));
 
 export const FileViewerRoute = createAppRoute({
-  title: {
-    ns: 'app',
-    key: 'breadcrumb.file.viewer'
-  },
-  icon: {
-    primary: <PageviewOutlinedIcon />
-  },
-  ancestor: null,
   component: WrappedFileViewerPage,
+
   path: '/file/viewer/:id/:tab',
   params: s => ({
     id: s.string(),
     tab: s.enum(TAB_OPTIONS, 'ascii')
-  })
+  }),
+
+  ancestor: null,
+  shortname: () => ({ i18nKey: 'breadcrumb.file.viewer', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'breadcrumb.file.viewer', ns: 'app' }),
+  shorticon: () => <PageviewOutlinedIcon />,
+  fullicon: () => <PageviewOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
 });
 
 const FileViewerRootPage = React.memo(() => {
@@ -499,19 +503,19 @@ const FileViewerRootPage = React.memo(() => {
 });
 
 export const FileViewerRootRoute = createAppRoute({
-  title: {
-    ns: 'app',
-    key: 'breadcrumb.file.viewer'
-  },
-  icon: {
-    primary: <PageviewOutlinedIcon />
-  },
-  ancestor: null,
   component: FileViewerRootPage,
+
   path: '/file/viewer/:id',
   params: s => ({
     id: s.string()
   }),
 
-  forbidden: s => !s.user.roles.includes('file_detail')
+  ancestor: null,
+  shortname: () => ({ i18nKey: 'breadcrumb.file.viewer', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'breadcrumb.file.viewer', ns: 'app' }),
+  shorticon: () => <PageviewOutlinedIcon />,
+  fullicon: () => <PageviewOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.roles.includes('file_detail')
 });

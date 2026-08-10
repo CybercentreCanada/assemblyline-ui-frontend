@@ -172,16 +172,16 @@ export const AdminSiteMapPage = memo(() => {
 });
 
 export const AdminSitemapRoute = createAppRoute({
-  title: {
-    ns: 'app',
-    key: 'adminmenu.sitemap'
-  },
-  icon: {
-    primary: <MapOutlinedIcon />
-  },
-  ancestor: '/admin',
   component: AdminSiteMapPage,
+
   path: '/admin/sitemap',
 
-  forbidden: s => !s.user.is_admin
+  ancestor: '/admin',
+  shortname: () => ({ i18nKey: 'adminmenu.sitemap', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'adminmenu.sitemap', ns: 'app' }),
+  shorticon: () => <MapOutlinedIcon />,
+  fullicon: () => <MapOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.is_admin
 });

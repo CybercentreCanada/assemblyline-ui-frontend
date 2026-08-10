@@ -1,3 +1,4 @@
+import KeyOutlinedIcon from '@mui/icons-material/KeyOutlined';
 import { Backdrop, Button, Typography, useTheme } from '@mui/material';
 import { createAppRoute } from 'core/routes';
 import useALContext from 'deprecated/hooks/useALContext';
@@ -119,5 +120,15 @@ export const AppRegistrationPage = memo(() => {
 
 export const AuthorizeRoute = createAppRoute({
   component: AppRegistrationPage,
-  path: '/authorize'
+
+  path: '/authorize',
+
+  ancestor: null,
+  shortname: () => ({ i18nKey: 'access', ns: 'authorize' }),
+  fullname: () => ({ i18nKey: 'access', ns: 'authorize' }),
+  shorticon: () => <KeyOutlinedIcon />,
+  fullicon: () => <KeyOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
 });

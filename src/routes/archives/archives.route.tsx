@@ -106,12 +106,10 @@ export const ArchivesPage = memo(() => {
 
   const handleRowClick = useCallback(
     (_event: React.MouseEvent<HTMLElement>, file: FileIndexed) => {
-      navigate
-        .to()
-        .create(s => ({
-          route: '/archive/:id',
-          path: { id: file.sha256, tab: s.route === '/archive/:id/:tab' ? s.path.tab : null }
-        }));
+      navigate.to().create(s => ({
+        route: '/archive/:id',
+        path: { id: file.sha256, tab: s.route === '/archive/:id/:tab' ? s.path.tab : null }
+      }));
     },
     [navigate]
   );
@@ -423,15 +421,8 @@ export const ArchivesPage = memo(() => {
 });
 
 export const ArchivesRoute = createAppRoute({
-  title: {
-    ns: 'app',
-    key: 'drawer.archive'
-  },
-  icon: {
-    primary: <ArchiveOutlinedIcon />
-  },
-  ancestor: null,
   component: ArchivesPage,
+
   path: '/archives',
   search: s => ({
     query: s.string(''),
@@ -443,6 +434,13 @@ export const ArchivesRoute = createAppRoute({
     supplementary: s.boolean(false),
     track_total_hits: s.number(null).source('transient').nullable().ephemeral()
   }),
-  disabled: s => !s.configuration?.datastore?.archive?.enabled,
-  forbidden: s => !s.user.roles.includes('archive_view')
+
+  ancestor: null,
+  shortname: () => ({ i18nKey: 'drawer.archive', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'drawer.archive', ns: 'app' }),
+  shorticon: () => <ArchiveOutlinedIcon />,
+  fullicon: () => <ArchiveOutlinedIcon />,
+
+  disabled: (_location, config) => !config.configuration?.datastore?.archive?.enabled,
+  forbidden: (_location, config) => !config.user.roles.includes('archive_view')
 });

@@ -1,7 +1,9 @@
 import { CrashRoute } from 'core/error/error.route';
+import { LoadingRoute } from 'layout/auth/loading/loading.route';
 import { LockedRoute } from 'layout/auth/locked/locked.route';
 import { QuotaRoute } from 'layout/auth/quota/quota.route';
 import { ToSRoute } from 'layout/auth/terms-of-service/terms-of-service.route';
+import { useMemo } from 'react';
 import { AdminActionsRoute } from 'routes/admin-actions/admin-actions.route';
 import { AdminAPIKeyDetailRoute } from 'routes/admin-api-key-detail/admin-api-key-detail.route';
 import { AdminAPIKeysRoute } from 'routes/admin-api-keys/admin-api-keys.route';
@@ -26,6 +28,7 @@ import { DevelopmentAPIRoute } from 'routes/development-api/development-api.rout
 import { DevelopmentCustomizeRoute } from 'routes/development-customize/development-customize.route';
 import { DevelopmentLibraryRoute } from 'routes/development-library/development-library.route';
 import { DevelopmentThemeRoute } from 'routes/development-theme/development-theme.route';
+import { DevelopmentRoute } from 'routes/development/development.route';
 import { FileDetailRoute } from 'routes/file-detail/file-detail.route';
 import { FileViewerRootRoute, FileViewerRoute } from 'routes/file-viewer/file-viewer.route';
 import { DisabledRoute, ForbiddenRoute } from 'routes/forbidden/forbidden.route';
@@ -73,21 +76,7 @@ import { SubmissionsRoute } from 'routes/submissions/submissions.route';
 import { SubmitRoute } from 'routes/submit/submit.route';
 import { AccountRoute, AdminUserDetailRoute } from 'routes/user/user.route';
 
-export const APP_ROUTES = [
-  // Old
-
-  // Page1Route,
-  // Page2Route,
-  // SubmissionsRoute,
-  // ForbiddenRoute,
-  // LoadingRoute,
-  // LockedRoute,
-  // LoginRoute,
-  // NotFoundRoute,
-  // QuotaRoute,
-  // ToSRoute
-
-  // New
+const APP_ROUTES = [
   AccountRoute,
   AdminActionsRoute,
   AdminAPIKeyDetailRoute,
@@ -115,6 +104,7 @@ export const APP_ROUTES = [
   DevelopmentAPIRoute,
   DevelopmentCustomizeRoute,
   DevelopmentLibraryRoute,
+  DevelopmentRoute,
   DevelopmentThemeRoute,
   DisabledRoute,
   FileDetailRoute,
@@ -127,6 +117,7 @@ export const APP_ROUTES = [
   HelpRoute,
   HelpSearchRoute,
   HelpServicesRoute,
+  LoadingRoute,
   LockedRoute,
   ManageBadlistAddRoute,
   ManageBadlistDetailRoute,
@@ -170,3 +161,5 @@ declare global {
   type AppRoutes = typeof APP_ROUTES;
   type AppRoute = AppRoutes[number];
 }
+
+export const useAppRoutes = () => useMemo(() => APP_ROUTES, []);

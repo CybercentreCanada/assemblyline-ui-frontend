@@ -19,21 +19,27 @@ import type { StoreApi } from 'zustand/vanilla';
 // App Routes
 //*****************************************************************************************
 
+const DEFAULT_APP_ROUTE = {
+  element: null,
+
+  path: null,
+  params: createPathParamsCodec(null)(() => null),
+  search: new SearchParamEngine<SearchParamBlueprintMap>(null),
+  hash: createHashParamCodec()(() => null),
+
+  ancestor: null,
+  shortname: (() => null) as unknown,
+  fullname: (() => null) as unknown,
+  shorticon: (() => null) as unknown,
+  fullicon: (() => null) as unknown,
+
+  disabled: true,
+  forbidden: true,
+  loader: false
+} as InferAppRouteFromPath<never>;
+
 export const getDefaultAppRoute = function <const Origin extends AppRoute['path']>(): InferAppRouteFromPath<Origin> {
-  return {
-    title: { key: null, ns: null },
-    icon: { primary: null, secondary: null },
-    element: null,
-
-    path: null,
-    params: createPathParamsCodec(null)(() => null),
-    search: new SearchParamEngine<SearchParamBlueprintMap>(null),
-    hash: createHashParamCodec()(() => null),
-
-    disabled: true,
-    forbidden: true,
-    loader: false
-  } as InferAppRouteFromPath<Origin>;
+  return DEFAULT_APP_ROUTE as InferAppRouteFromPath<Origin>;
 };
 
 export const findAppRouteFromPath = function <const Origin extends AppRoute['path']>(
@@ -108,8 +114,10 @@ export const updateAppRoute = function <const Origin extends AppRoute['path']>(
   const currentRoute = store.routes[path];
   const nextRoute = route;
 
-  if ('title' in nextRoute) currentRoute.title = nextRoute.title;
-  if ('icon' in nextRoute) currentRoute.icon = nextRoute.icon;
+  if ('shortname' in nextRoute) currentRoute.shortname = nextRoute.shortname;
+  if ('fullname' in nextRoute) currentRoute.fullname = nextRoute.fullname;
+  if ('shorticon' in nextRoute) currentRoute.shorticon = nextRoute.shorticon;
+  if ('fullicon' in nextRoute) currentRoute.fullicon = nextRoute.fullicon;
   if ('element' in nextRoute) currentRoute.element = nextRoute.element;
 
   if ('path' in nextRoute) currentRoute.path = nextRoute.path;

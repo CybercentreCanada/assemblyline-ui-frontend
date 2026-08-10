@@ -81,16 +81,16 @@ export const StatisticsSignaturesPage = memo(() => {
 });
 
 export const StatisticsSignaturesRoute = createAppRoute({
-  title: {
-    ns: 'statisticsSignatures',
-    key: 'title'
-  },
-  icon: {
-    primary: <BarChartOutlinedIcon />
-  },
-  ancestor: '/manage/signatures',
   component: StatisticsSignaturesPage,
+
   path: '/manage/statistics/signatures',
 
-  forbidden: s => !s.user.roles.includes('signature_view')
+  ancestor: '/manage/signatures',
+  shortname: () => ({ i18nKey: 'title', ns: 'statisticsSignatures' }),
+  fullname: () => ({ i18nKey: 'title', ns: 'statisticsSignatures' }),
+  shorticon: () => <BarChartOutlinedIcon />,
+  fullicon: () => <BarChartOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.roles.includes('signature_view')
 });

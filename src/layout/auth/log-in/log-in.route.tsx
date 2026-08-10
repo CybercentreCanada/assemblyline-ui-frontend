@@ -1,3 +1,4 @@
+import LoginOutlinedIcon from '@mui/icons-material/LoginOutlined';
 import { useTheme } from '@mui/material';
 import { createAppRoute } from 'core/routes';
 import { OneTimePassword } from 'layout/auth/log-in/components/OneTimePassword';
@@ -109,5 +110,15 @@ LoginPage.displayName = 'LoginPage';
 
 export const LoginRoute = createAppRoute({
   component: LoginPage,
-  path: '/login'
+
+  path: '/login',
+
+  ancestor: null,
+  shortname: () => ({ i18nKey: 'login', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'login', ns: 'app' }),
+  shorticon: () => <LoginOutlinedIcon />,
+  fullicon: () => <LoginOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
 });

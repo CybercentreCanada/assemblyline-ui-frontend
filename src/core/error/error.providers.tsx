@@ -1,4 +1,4 @@
-import { ErrorFallback } from 'core/error/error.components';
+import { ErrorFallback } from 'core/error';
 import type { PropsWithChildren } from 'react';
 import { memo, useCallback } from 'react';
 import { ErrorBoundary } from 'react-error-boundary';

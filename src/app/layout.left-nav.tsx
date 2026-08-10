@@ -1,361 +1,77 @@
-import {
-  AccountTreeOutlined,
-  Api,
-  AssignmentOutlined,
-  BugReportOutlined,
-  BuildOutlined,
-  BusinessOutlined,
-  Code,
-  CodeOutlined,
-  CompareArrowsOutlined,
-  DashboardOutlined,
-  ErrorOutlineOutlined,
-  FindInPageOutlined,
-  FingerprintOutlined,
-  HelpOutlineOutlined,
-  KeyOutlined,
-  LabelOutlined,
-  LibraryBooks,
-  MapOutlined,
-  Palette,
-  PlaylistPlayOutlined,
-  Search,
-  SettingsApplicationsOutlined,
-  SimCardOutlined,
-  SupervisorAccountOutlined,
-  VerifiedUserOutlined,
-  ViewCarouselOutlined
-} from '@mui/icons-material';
-import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
-import DataObjectOutlinedIcon from '@mui/icons-material/DataObjectOutlined';
-import NotificationImportantOutlinedIcon from '@mui/icons-material/NotificationImportantOutlined';
-import PublishOutlinedIcon from '@mui/icons-material/PublishOutlined';
-import { useAppConfig } from 'core/config';
 import type { AppLeftNavItem } from 'core/template';
 import { useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
-import { BiNetworkChart } from 'react-icons/bi';
 
-export const useAppLeftNavMenu = () => {
-  const { t } = useTranslation(['app']);
+//*****************************************************************************************
+// App Template Left Nav
+//*****************************************************************************************
 
-  const archiveEnabled = useAppConfig(s => s?.configuration?.datastore?.archive?.enabled || false);
-  const c12nEnforce = useAppConfig(s => s?.c12nDef?.enforce || false);
-  const isAdmin = useAppConfig(s => Boolean(s?.user?.is_admin));
-  const retrohuntEnabled = useAppConfig(s => s?.configuration?.retrohunt?.enabled || false);
-  const systemType = useAppConfig(s => s?.configuration?.system?.type);
-  const userRoles = useAppConfig(s => s?.user?.roles || []);
-
-  return useMemo<AppLeftNavItem[]>(
-    (): AppLeftNavItem[] => [
+export const useAppTemplateLeftNav = () =>
+  useMemo<AppLeftNavItem[]>(
+    () => [
+      { link: { route: '/submit' } },
+      { link: { route: '/submissions' } },
+      { link: { route: '/alerts-redirect' } },
+      { link: { route: '/archives' } },
+      { link: { route: '/retrohunt' } },
       {
-        id: 'submit',
-        label: t('drawer.submit'),
-        nav: nav => nav.to().only({ route: '/submit' }),
-        icon: <PublishOutlinedIcon />
-      },
-      {
-        id: 'submissions',
-        label: t('drawer.submissions'),
-        nav: nav => nav.to().only({ route: '/submissions' }),
-        icon: <ViewCarouselOutlined />,
-        preventRender: !userRoles.includes('submission_view')
-      },
-      {
-        id: 'alerts',
-        label: t('drawer.alerts'),
-        nav: nav => nav.to().only({ route: '/alerts-redirect' }),
-        icon: <NotificationImportantOutlinedIcon />,
-        preventRender: !userRoles.includes('alert_view')
-      },
-      {
-        id: 'archive',
-        label: t('drawer.archive'),
-        nav: nav => nav.to().only({ route: '/archives' }),
-        icon: <ArchiveOutlinedIcon />,
-        preventRender: !userRoles.includes('archive_view') || !archiveEnabled
-      },
-      {
-        id: 'retrohunt',
-        label: t('drawer.retrohunt'),
-        nav: nav => nav.to().only({ route: '/retrohunt' }),
-        icon: <DataObjectOutlinedIcon />,
-        preventRender: !userRoles.includes('retrohunt_view') || !retrohuntEnabled
-      },
-      ...(userRoles.some(role => ['alert_view', 'signature_view', 'submission_view', 'retrohunt_view'].includes(role))
-        ? [
-            {
-              id: 'search',
-              label: t('drawer.search'),
-              icon: <Search />,
-              items: [
-                {
-                  id: 'search.all',
-                  label: t('drawer.search.all'),
-                  nav: nav => nav.to().only({ route: '/search' }),
-                  icon: <Search />
-                },
-                {
-                  id: 'search.alert',
-                  label: t('drawer.search.alert'),
-                  nav: nav => nav.to().only({ route: '/search/:index', path: { index: 'alert' } }),
-                  icon: <NotificationImportantOutlinedIcon />,
-                  preventRender: !userRoles.includes('alert_view')
-                },
-                {
-                  id: 'search.file',
-                  label: t('drawer.search.file'),
-                  nav: nav => nav.to().only({ route: '/search/:index', path: { index: 'file' } }),
-                  icon: <ViewCarouselOutlined />,
-                  preventRender: !userRoles.includes('submission_view')
-                },
-                {
-                  id: 'search.result',
-                  label: t('drawer.search.result'),
-                  nav: nav => nav.to().only({ route: '/search/:index', path: { index: 'result' } }),
-                  icon: <ViewCarouselOutlined />,
-                  preventRender: !userRoles.includes('submission_view')
-                },
-                {
-                  id: 'search.retrohunt',
-                  label: t('drawer.search.retrohunt'),
-                  nav: nav => nav.to().only({ route: '/search/:index', path: { index: 'retrohunt' } }),
-                  icon: <DataObjectOutlinedIcon />,
-                  preventRender: !userRoles.includes('retrohunt_view') || !retrohuntEnabled
-                },
-                {
-                  id: 'search.signature',
-                  label: t('drawer.search.signature'),
-                  nav: nav => nav.to().only({ route: '/search/:index', path: { index: 'signature' } }),
-                  icon: <FingerprintOutlined />,
-                  preventRender: !userRoles.includes('signature_view')
-                },
-                {
-                  id: 'search.submission',
-                  label: t('drawer.search.submission'),
-                  nav: nav => nav.to().only({ route: '/search/:index', path: { index: 'submission' } }),
-                  icon: <ViewCarouselOutlined />,
-                  preventRender: !userRoles.includes('submission_view')
-                }
-              ]
-            }
-          ]
-        : []),
-      {
-        id: 'divider.1',
-        divider: true
-      },
-      {
-        id: 'dashboard',
-        label: t('drawer.dashboard'),
-        nav: nav => nav.to().only({ route: '/dashboard' }),
-        icon: <DashboardOutlined />
-      },
-      ...(userRoles.some(role =>
-        [
-          'badlist_view',
-          'heuristic_view',
-          'safelist_view',
-          'signature_view',
-          'signature_manage',
-          'workflow_view'
-        ].includes(role)
-      )
-        ? [
-            {
-              id: 'manage',
-              label: t('drawer.manage'),
-              icon: <BuildOutlined />,
-              items: [
-                {
-                  id: 'manage.badlist',
-                  label: t('drawer.manage.badlist'),
-                  nav: nav => nav.to().only({ route: '/manage/badlists' }),
-                  icon: <BugReportOutlined />,
-                  preventRender: !userRoles.includes('badlist_view')
-                },
-                {
-                  id: 'manage.heuristics',
-                  label: t('drawer.manage.heuristics'),
-                  nav: nav => nav.to().only({ route: '/manage/heuristics' }),
-                  icon: <SimCardOutlined />,
-                  preventRender: !userRoles.includes('heuristic_view')
-                },
-                {
-                  id: 'manage.safelist',
-                  label: t('drawer.manage.safelist'),
-                  nav: nav => nav.to().only({ route: '/manage/safelists' }),
-                  icon: <VerifiedUserOutlined />,
-                  preventRender: !userRoles.includes('safelist_view')
-                },
-                {
-                  id: 'manage.signatures',
-                  label: t('drawer.manage.signatures'),
-                  nav: nav => nav.to().only({ route: '/manage/signatures' }),
-                  icon: <FingerprintOutlined />,
-                  preventRender: !userRoles.includes('signature_view')
-                },
-                {
-                  id: 'manage.source',
-                  label: t('drawer.manage.source'),
-                  nav: nav => nav.to().only({ route: '/manage/sources' }),
-                  icon: <CodeOutlined />,
-                  preventRender: !userRoles.includes('signature_manage')
-                },
-                {
-                  id: 'manage.workflow',
-                  label: t('drawer.manage.workflow'),
-                  nav: nav => nav.to().only({ route: '/manage/workflows' }),
-                  icon: <BiNetworkChart />,
-                  preventRender: !userRoles.includes('workflow_view')
-                }
-              ]
-            }
-          ]
-        : []),
-      ...(isAdmin
-        ? [
-            {
-              id: 'adminmenu',
-              label: t('adminmenu'),
-              icon: <BusinessOutlined />,
-              items: [
-                {
-                  id: 'adminmenu.apikeys',
-                  label: t('adminmenu.apikeys'),
-                  nav: nav => nav.to().only({ route: '/admin/apikeys' }),
-                  icon: <KeyOutlined />
-                },
-                {
-                  id: 'adminmenu.errors',
-                  label: t('adminmenu.errors'),
-                  nav: nav => nav.to().only({ route: '/admin/errors' }),
-                  icon: <ErrorOutlineOutlined />
-                },
-                {
-                  id: 'adminmenu.identify',
-                  label: t('adminmenu.identify'),
-                  nav: nav => nav.to().only({ route: '/admin/identify' }),
-                  icon: <FindInPageOutlined />
-                },
-                {
-                  id: 'adminmenu.actions',
-                  label: t('adminmenu.actions'),
-                  nav: nav => nav.to().only({ route: '/admin/actions' }),
-                  icon: <PlaylistPlayOutlined />
-                },
-                {
-                  id: 'adminmenu.services',
-                  label: t('adminmenu.services'),
-                  nav: nav => nav.to().only({ route: '/admin/services' }),
-                  icon: <AccountTreeOutlined />
-                },
-                {
-                  id: 'adminmenu.service_review',
-                  label: t('adminmenu.service_review'),
-                  nav: nav => nav.to().only({ route: '/admin/service_review' }),
-                  icon: <CompareArrowsOutlined />
-                },
-                {
-                  id: 'adminmenu.sitemap',
-                  label: t('adminmenu.sitemap'),
-                  nav: nav => nav.to().only({ route: '/admin/sitemap' }),
-                  icon: <MapOutlined />
-                },
-                {
-                  id: 'adminmenu.tag_safelist',
-                  label: t('adminmenu.tag_safelist'),
-                  nav: nav => nav.to().only({ route: '/admin/tag_safelist' }),
-                  icon: <VerifiedUserOutlined />
-                },
-                {
-                  id: 'adminmenu.users',
-                  label: t('adminmenu.users'),
-                  nav: nav => nav.to().only({ route: '/admin/users' }),
-                  icon: <SupervisorAccountOutlined />
-                }
-              ]
-            }
-          ]
-        : []),
-      {
-        id: 'divider.2',
-        divider: true
-      },
-      {
-        id: 'help',
-        label: t('drawer.help'),
-        icon: <HelpOutlineOutlined />,
+        link: { route: '/search' },
         items: [
-          {
-            id: 'help.api',
-            label: t('drawer.help.api'),
-            nav: nav => nav.to().only({ route: '/help/api' }),
-            icon: <AssignmentOutlined />
-          },
-          {
-            id: 'help.classification',
-            label: t('drawer.help.classification'),
-            nav: nav => nav.to().only({ route: '/help/classification' }),
-            icon: <LabelOutlined />,
-            preventRender: !c12nEnforce
-          },
-          {
-            id: 'help.configuration',
-            label: t('drawer.help.configuration'),
-            nav: nav => nav.to().only({ route: '/help/configuration' }),
-            icon: <SettingsApplicationsOutlined />
-          },
-          {
-            id: 'help.search',
-            label: t('drawer.help.search'),
-            nav: nav => nav.to().only({ route: '/help/search' }),
-            icon: <Search />
-          },
-          {
-            id: 'help.services',
-            label: t('drawer.help.services'),
-            nav: nav => nav.to().only({ route: '/help/services' }),
-            icon: <AccountTreeOutlined />
-          }
+          { link: { route: '/search' } },
+          { link: { route: '/search/:index', path: { index: 'alert' } } },
+          { link: { route: '/search/:index', path: { index: 'file' } } },
+          { link: { route: '/search/:index', path: { index: 'result' } } },
+          { link: { route: '/search/:index', path: { index: 'retrohunt' } } },
+          { link: { route: '/search/:index', path: { index: 'signature' } } },
+          { link: { route: '/search/:index', path: { index: 'submission' } } }
+        ] as const
+      },
+      { divider: true },
+      { link: { route: '/dashboard' } },
+      {
+        link: { route: '/manage' },
+        items: [
+          { link: { route: '/manage/badlists' } },
+          { link: { route: '/manage/heuristics' } },
+          { link: { route: '/manage/safelists' } },
+          { link: { route: '/manage/signatures' } },
+          { link: { route: '/manage/sources' } },
+          { link: { route: '/manage/workflows' } }
         ]
       },
-      ...(isAdmin && (systemType === 'development' || systemType === 'staging')
-        ? [
-            {
-              id: 'development',
-              label: t('drawer.development'),
-              icon: <Code />,
-              items: [
-                {
-                  id: 'development.api',
-                  label: t('drawer.development.api'),
-                  nav: nav => nav.to().only({ route: '/development/api' }),
-                  icon: <Api />
-                },
-                {
-                  id: 'development.customize',
-                  label: t('drawer.development.customize'),
-                  nav: nav => nav.to().only({ route: '/development/customize' }),
-                  icon: <Palette />
-                },
-                {
-                  id: 'development.library',
-                  label: t('drawer.development.library'),
-                  nav: nav => nav.to().only({ route: '/development/library' }),
-                  icon: <LibraryBooks />
-                },
-                {
-                  id: 'development.theme',
-                  label: t('drawer.development.theme'),
-                  nav: nav => nav.to().only({ route: '/development/theme' }),
-                  icon: <Palette />
-                }
-              ]
-            }
-          ]
-        : [])
+      {
+        link: { route: '/admin' },
+        items: [
+          { link: { route: '/admin/apikeys' } },
+          { link: { route: '/admin/errors' } },
+          { link: { route: '/admin/identify' } },
+          { link: { route: '/admin/actions' } },
+          { link: { route: '/admin/services' } },
+          { link: { route: '/admin/service_review' } },
+          { link: { route: '/admin/sitemap' } },
+          { link: { route: '/admin/tag_safelist' } },
+          { link: { route: '/admin/users' } }
+        ]
+      },
+      { divider: true },
+      {
+        link: { route: '/help' },
+        items: [
+          { link: { route: '/help/api' } },
+          { link: { route: '/help/classification' } },
+          { link: { route: '/help/configuration' } },
+          { link: { route: '/help/search' } },
+          { link: { route: '/help/services' } }
+        ]
+      },
+      {
+        link: { route: '/development' },
+        items: [
+          { link: { route: '/development/api' } },
+          { link: { route: '/development/customize' } },
+          { link: { route: '/development/library' } },
+          { link: { route: '/development/theme' } }
+        ]
+      }
     ],
-    [t, archiveEnabled, c12nEnforce, isAdmin, retrohuntEnabled, systemType, userRoles]
+    []
   );
-};

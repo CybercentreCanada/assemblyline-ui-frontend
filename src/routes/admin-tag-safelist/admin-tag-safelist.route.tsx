@@ -13,7 +13,9 @@ import ReactResizeDetector from 'react-resize-detector';
 import { PageHeader } from 'ui/layouts/PageHeader';
 import { PageFullSizeLayout } from 'ui/pages/PageFullSize';
 
-loader.config({ paths: { vs: '/cdn/monaco_0.35.0/vs' } });
+loader.config({
+  paths: { vs: '/cdn/monaco_0.35.0/vs' }
+});
 
 export const AdminTagSafelistPage = memo(() => {
   const { t, i18n } = useTranslation(['adminTagSafelist']);
@@ -187,16 +189,16 @@ export const AdminTagSafelistPage = memo(() => {
 });
 
 export const AdminTagSafelistRoute = createAppRoute({
-  title: {
-    ns: 'app',
-    key: 'adminmenu.tag_safelist'
-  },
-  icon: {
-    primary: <VerifiedUserOutlinedIcon />
-  },
-  ancestor: '/admin',
   component: AdminTagSafelistPage,
+
   path: '/admin/tag_safelist',
 
-  forbidden: s => !s.user.is_admin
+  ancestor: '/admin',
+  shortname: () => ({ i18nKey: 'adminmenu.tag_safelist', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'adminmenu.tag_safelist', ns: 'app' }),
+  shorticon: () => <VerifiedUserOutlinedIcon />,
+  fullicon: () => <VerifiedUserOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.is_admin
 });

@@ -1,5 +1,7 @@
 import { i18n } from 'app/core.i18n';
-import { APP_ROUTES } from 'app/core.routes';
+import { useAppRoutes } from 'app/core.routes';
+import { useAppTemplateLeftNav } from 'app/layout.left-nav';
+import { useAppTemplatePreferences } from 'app/layout.preferences';
 import { AppApiProvider } from 'core/api';
 import { AppConfigStoreProvider } from 'core/config';
 import { AppErrorProvider } from 'core/error';
@@ -121,19 +123,24 @@ import { memo, StrictMode } from 'react';
 // App Layouts
 //*****************************************************************************************
 
-export const AppLayout = memo(() => (
-  <AppAuthLayout>
-    <AppAssistantLayout>
-      <AppRouterLayout>
-        <AppDrawerLayout content={<AppRouterPanelLayout panelKey={1} />}>
-          <AppTemplateLayout>
-            <AppRouterPanelLayout panelKey={0} />
-          </AppTemplateLayout>
-        </AppDrawerLayout>
-      </AppRouterLayout>
-    </AppAssistantLayout>
-  </AppAuthLayout>
-));
+export const AppLayout = memo(() => {
+  const leftNav = useAppTemplateLeftNav();
+  const preferences = useAppTemplatePreferences();
+
+  return (
+    <AppAuthLayout>
+      <AppAssistantLayout>
+        <AppRouterLayout>
+          <AppDrawerLayout content={<AppRouterPanelLayout panelKey={1} />}>
+            <AppTemplateLayout leftNav={leftNav} preferences={preferences}>
+              <AppRouterPanelLayout panelKey={0} />
+            </AppTemplateLayout>
+          </AppDrawerLayout>
+        </AppRouterLayout>
+      </AppAssistantLayout>
+    </AppAuthLayout>
+  );
+});
 
 AppLayout.displayName = 'AppLayout';
 
@@ -141,31 +148,35 @@ AppLayout.displayName = 'AppLayout';
 // App Providers
 //*****************************************************************************************
 
-const AppProviders = memo(({ children }: PropsWithChildren) => (
-  <AppThemeProvider>
-    <AppTemplateProvider i18n={i18n}>
-      <AppErrorProvider>
-        <AppSnackbarProvider>
-          <AppApiProvider>
-            <AppAssistantProvider>
-              <AppRouterProvider>
-                <AppNavigationProvider>
-                  <AppLocationParamProvider appRoutes={APP_ROUTES}>
-                    <AppBorealisProvider>
-                      <AppCarouselProvider>
-                        <>{children}</>
-                      </AppCarouselProvider>
-                    </AppBorealisProvider>
-                  </AppLocationParamProvider>
-                </AppNavigationProvider>
-              </AppRouterProvider>
-            </AppAssistantProvider>
-          </AppApiProvider>
-        </AppSnackbarProvider>
-      </AppErrorProvider>
-    </AppTemplateProvider>
-  </AppThemeProvider>
-));
+const AppProviders = memo(({ children }: PropsWithChildren) => {
+  const routes = useAppRoutes();
+
+  return (
+    <AppThemeProvider>
+      <AppTemplateProvider i18n={i18n}>
+        <AppErrorProvider>
+          <AppSnackbarProvider>
+            <AppApiProvider>
+              <AppAssistantProvider>
+                <AppRouterProvider>
+                  <AppNavigationProvider>
+                    <AppLocationParamProvider routes={routes}>
+                      <AppBorealisProvider>
+                        <AppCarouselProvider>
+                          <>{children}</>
+                        </AppCarouselProvider>
+                      </AppBorealisProvider>
+                    </AppLocationParamProvider>
+                  </AppNavigationProvider>
+                </AppRouterProvider>
+              </AppAssistantProvider>
+            </AppApiProvider>
+          </AppSnackbarProvider>
+        </AppErrorProvider>
+      </AppTemplateProvider>
+    </AppThemeProvider>
+  );
+});
 
 AppProviders.displayName = 'AppProviders';
 

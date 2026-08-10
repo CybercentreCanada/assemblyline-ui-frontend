@@ -93,6 +93,17 @@ export const useAppTemplateRouter = () => {
   );
 
   return useMemo<AppRouterAdapter>(
+    () => ({
+      Link,
+      navigate,
+      location: { pathname: null, search: null, hash: null },
+      matchPath: () => false,
+      breadcrumbs: () => []
+    }),
+    [navigate]
+  );
+
+  return useMemo<AppRouterAdapter>(
     (): AppRouterAdapter => ({
       Link,
       location,

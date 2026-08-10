@@ -1,7 +1,9 @@
 import { useAppSwitcher } from '@tui/apps';
+import type { AppPreferenceConfigs } from '@tui/core';
 import { AppProvider, AppRoot, useAppLayout, useAppUser } from '@tui/core';
-import { useAppPreferences } from 'app/layout.preferences';
 import { useAppPreferenceStore } from 'core/preference';
+import type { AppLeftNavItem } from 'core/template';
+import { useAppPreferences } from 'core/template/hooks/useAppPreferences';
 import { useAppTemplateRouter } from 'core/template/hooks/useAppTemplateRouter';
 import { useAppTemplateUser } from 'core/template/hooks/useAppTemplateUser';
 import { useAppTemplateThemeMode } from 'core/template/template.hooks';
@@ -34,7 +36,12 @@ const Inner = ({ children }: PropsWithChildren) => {
 // App Auth Store
 //*****************************************************************************************
 
-export const AppTemplateLayout = memo(({ children }: PropsWithChildren) => {
+export type AppTemplateLayoutProps = PropsWithChildren<{
+  preferences: AppPreferenceConfigs;
+  leftNav: AppLeftNavItem[];
+}>;
+
+export const AppTemplateLayout = memo(({ children, preferences, leftNav }: AppTemplateLayoutProps) => {
   // const cookies = parseTuiClientCookies();
 
   // const myPreferences: AppPreferenceConfigs = useMyPreferences();
@@ -43,7 +50,7 @@ export const AppTemplateLayout = memo(({ children }: PropsWithChildren) => {
   // const myAccessibility = useMyAccessibility();
   // const myNotification = useMyNotification();
   // const myApps = useMyApps();
-  const appPreferences = useAppPreferences();
+  const appPreferences = useAppPreferences({ preferences, leftNav });
   const appTemplateRouter = useAppTemplateRouter();
   const appTemplateUser = useAppTemplateUser();
 
@@ -72,14 +79,14 @@ export const AppTemplateLayout = memo(({ children }: PropsWithChildren) => {
 AppTemplateLayout.displayName = 'AppTemplateLayout';
 
 //*****************************************************************************************
-// App Auth Store
+// App Template Store Provider
 //*****************************************************************************************
 
-export type AppLayoutProviderProps = PropsWithChildren & {
+export type AppTemplateProviderProps = PropsWithChildren<{
   i18n: i18n;
-};
+}>;
 
-export const AppTemplateProvider = memo(({ children, i18n }: AppLayoutProviderProps) => {
+export const AppTemplateProvider = memo(({ children, i18n }: AppTemplateProviderProps) => {
   const autoHideAppbar = useAppPreferenceStore(s => s.layout.autoHideAppbar);
   const density = useAppPreferenceStore(s => s.layout.density);
   const drawerOpen = useAppPreferenceStore(s => s.layout.drawerOpen);

@@ -411,15 +411,8 @@ const SubmitPage = memo(() => (
 SubmitPage.displayName = 'SubmitPage';
 
 export const SubmitRoute = createAppRoute({
-  title: {
-    ns: 'app',
-    key: 'drawer.submit'
-  },
-  icon: {
-    primary: <PublishOutlinedIcon />
-  },
-  ancestor: null,
   component: SubmitPage,
+
   path: '/submit',
   search: s => ({
     classification: s.string(null),
@@ -431,5 +424,14 @@ export const SubmitRoute = createAppRoute({
     priority: s.number(null),
     ttl: s.number(null),
     'params.filetype_override': s.string(null)
-  })
+  }),
+
+  ancestor: null,
+  shortname: () => ({ i18nKey: 'drawer.submit', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'drawer.submit', ns: 'app' }),
+  shorticon: () => <PublishOutlinedIcon />,
+  fullicon: () => <PublishOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
 });

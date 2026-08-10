@@ -5,11 +5,14 @@ import type { InferAppNavigationPropsFromPath } from 'core/router';
 import { AppLink } from 'core/router';
 import type { JSX } from 'react';
 import { memo, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 export type LeftNavLinkProps<Origin extends AppRoute['path']> = InferAppNavigationPropsFromPath<Origin> & {
   icon?: ListItemIconProps['children'];
+  i18nKey?: string;
   navOpen: boolean;
   navProps?: LeftNavChildRenderProps;
+  ns?: string;
   primary?: ListItemTextProps['primary'];
 };
 
@@ -17,10 +20,13 @@ function WrappedLeftNavRoute<const Origin extends AppRoute['path']>({
   icon,
   navOpen,
   navProps,
-  primary,
+  i18nKey,
+  ns,
   nav,
-  navDeps = null
+  navDeps = null,
+  primary
 }: LeftNavLinkProps<Origin>) {
+  const { t } = useTranslation(ns);
   const theme = useTheme();
   const { active, level } = useMemo(() => navProps ?? { active: false, level: 0 }, [navProps]);
 
@@ -33,7 +39,7 @@ function WrappedLeftNavRoute<const Origin extends AppRoute['path']>({
         {...(!nav ? null : { component: AppLink, nav, navDeps })}
       >
         {icon && <ListItemIcon sx={{ color: 'inherit' }}>{icon}</ListItemIcon>}
-        <ListItemText primary={primary} />
+        <ListItemText primary={i18nKey ? t(i18nKey) : primary} />
       </ListItemButton>
     </ListItem>
   );

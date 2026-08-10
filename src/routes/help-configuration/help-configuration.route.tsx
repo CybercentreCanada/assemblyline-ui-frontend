@@ -235,14 +235,16 @@ export const HelpConfigurationPage = memo(() => {
 });
 
 export const HelpConfigurationRoute = createAppRoute({
-  title: {
-    ns: 'app',
-    key: 'drawer.help.configuration'
-  },
-  icon: {
-    primary: <SettingsApplicationsOutlinedIcon />
-  },
-  ancestor: '/help',
   component: HelpConfigurationPage,
-  path: '/help/configuration'
+
+  path: '/help/configuration',
+
+  ancestor: '/help',
+  shortname: () => ({ i18nKey: 'drawer.help.configuration', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'drawer.help.configuration', ns: 'app' }),
+  shorticon: () => <SettingsApplicationsOutlinedIcon />,
+  fullicon: () => <SettingsApplicationsOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
 });

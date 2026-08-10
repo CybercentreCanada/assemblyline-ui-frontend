@@ -2,6 +2,7 @@
   "error": "erreur",
   "error.button": "Réessayer",
   "error.chunk": "Rechargement de l'application pour corriger une erreur de chargement...",
+  "error.crash": "Plantage",
   "error.description": "Veuillez informer les administrateurs système du problème ci-dessous afin qu'il soit corrigé.",
   "error.hideStack": "Masquer la pile",
   "error.reload": "Recharger la page",

@@ -329,19 +329,19 @@ const SubmissionReportPage = memo(() => {
 });
 
 export const SubmissionReportRoute = createAppRoute({
-  title: {
-    ns: 'app',
-    key: 'breadcrumb.submission.report'
-  },
-  icon: {
-    primary: <ChromeReaderModeOutlinedIcon />
-  },
-  ancestor: '/submissions',
   component: SubmissionReportPage,
+
   path: '/submission/report/:id',
   params: s => ({
     id: s.string()
   }),
 
-  forbidden: s => !s.user.roles.includes('submission_view')
+  ancestor: '/submissions',
+  shortname: location => ({ i18nKey: location?.path?.id ?? 'breadcrumb.submission.report', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'breadcrumb.submission.report', ns: 'app' }),
+  shorticon: () => <ChromeReaderModeOutlinedIcon />,
+  fullicon: () => <ChromeReaderModeOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.roles.includes('submission_view')
 });

@@ -25,12 +25,12 @@ AppLocationParamStoreProvider.displayName = 'AppLocationParamStoreProvider';
 
 export type AppLocationParamProviderProps = {
   /** All of the app's created routes */
-  appRoutes: AppRoutes;
+  routes: AppRoutes;
   /** Provider children. */
   children: ReactNode;
 };
 
-const AppLocationParamSync = memo(({ appRoutes }: Omit<AppLocationParamProviderProps, 'children'>) => {
+const AppLocationParamSync = memo(({ routes }: Omit<AppLocationParamProviderProps, 'children'>) => {
   const setLocationParamStore = useAppSetLocationParamStore();
   const routerStoreApi = useAppRouterStoreApi();
 
@@ -40,8 +40,8 @@ const AppLocationParamSync = memo(({ appRoutes }: Omit<AppLocationParamProviderP
   );
 
   useEffect(() => {
-    setLocationParamStore(s => setAppRouteFromAppRoutes(s, appRoutes));
-  }, [appRoutes, setLocationParamStore]);
+    setLocationParamStore(s => setAppRouteFromAppRoutes(s, routes));
+  }, [routes, setLocationParamStore]);
 
   useEffect(() => {
     if (!routerStoreApi) return;
@@ -54,9 +54,9 @@ const AppLocationParamSync = memo(({ appRoutes }: Omit<AppLocationParamProviderP
 
 AppLocationParamSync.displayName = 'AppLocationParamSync';
 
-export const AppLocationParamProvider = memo(({ appRoutes, children }: AppLocationParamProviderProps) => (
+export const AppLocationParamProvider = memo(({ routes, children }: AppLocationParamProviderProps) => (
   <>
-    <AppLocationParamSync appRoutes={appRoutes} />
+    <AppLocationParamSync routes={routes} />
     {children}
   </>
 ));

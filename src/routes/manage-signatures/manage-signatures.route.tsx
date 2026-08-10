@@ -167,15 +167,8 @@ export const ManageSignaturesPage = memo(() => {
 });
 
 export const ManageSignaturesRoute = createAppRoute({
-  title: {
-    ns: 'app',
-    key: 'drawer.manage.signatures'
-  },
-  icon: {
-    primary: <FingerprintOutlinedIcon />
-  },
-  ancestor: '/manage',
   component: ManageSignaturesPage,
+
   path: '/manage/signatures',
   search: s => ({
     query: s.string(''),
@@ -187,5 +180,12 @@ export const ManageSignaturesRoute = createAppRoute({
     refresh: s.boolean(false).source('transient').ephemeral()
   }),
 
-  forbidden: s => !s.user.roles.includes('signature_view')
+  ancestor: '/manage',
+  shortname: () => ({ i18nKey: 'drawer.manage.signatures', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'drawer.manage.signatures', ns: 'app' }),
+  shorticon: () => <FingerprintOutlinedIcon />,
+  fullicon: () => <FingerprintOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.roles.includes('signature_view')
 });

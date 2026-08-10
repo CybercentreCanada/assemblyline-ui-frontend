@@ -473,16 +473,16 @@ export const ManageSignatureSourcesPage = memo(() => {
 });
 
 export const ManageSignatureSourcesRoute = createAppRoute({
-  title: {
-    ns: 'app',
-    key: 'drawer.manage.source'
-  },
-  icon: {
-    primary: <CodeOutlinedIcon />
-  },
-  ancestor: '/manage',
   component: ManageSignatureSourcesPage,
+
   path: '/manage/sources',
 
-  forbidden: s => !s.user.roles.includes('signature_manage')
+  ancestor: '/manage',
+  shortname: () => ({ i18nKey: 'drawer.manage.source', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'drawer.manage.source', ns: 'app' }),
+  shorticon: () => <CodeOutlinedIcon />,
+  fullicon: () => <CodeOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.roles.includes('signature_manage')
 });

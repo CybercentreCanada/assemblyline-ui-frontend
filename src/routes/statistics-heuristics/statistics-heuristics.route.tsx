@@ -78,16 +78,16 @@ export const StatisticsHeuristicsPage = memo(() => {
 });
 
 export const StatisticsHeuristicsRoute = createAppRoute({
-  title: {
-    ns: 'statisticsHeuristics',
-    key: 'title'
-  },
-  icon: {
-    primary: <BarChartOutlinedIcon />
-  },
-  ancestor: '/manage/heuristics',
   component: StatisticsHeuristicsPage,
+
   path: '/manage/statistics/heuristics',
 
-  forbidden: s => !s.user.roles.includes('heuristic_view')
+  ancestor: '/manage/heuristics',
+  shortname: () => ({ i18nKey: 'title', ns: 'statisticsHeuristics' }),
+  fullname: () => ({ i18nKey: 'title', ns: 'statisticsHeuristics' }),
+  shorticon: () => <BarChartOutlinedIcon />,
+  fullicon: () => <BarChartOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.roles.includes('heuristic_view')
 });

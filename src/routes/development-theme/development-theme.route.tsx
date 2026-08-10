@@ -316,16 +316,16 @@ export const DevelopmentThemePage = memo(() => {
 });
 
 export const DevelopmentThemeRoute = createAppRoute({
-  title: {
-    ns: 'app',
-    key: 'drawer.development.theme'
-  },
-  icon: {
-    primary: <PaletteIcon />
-  },
-  ancestor: '/development',
   component: DevelopmentThemePage,
+
   path: '/development/theme',
 
-  forbidden: s => !s.user.is_admin || !['development', 'staging'].includes(s.configuration.system.type)
+  ancestor: '/development',
+  shortname: () => ({ i18nKey: 'drawer.development.theme', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'drawer.development.theme', ns: 'app' }),
+  shorticon: () => <PaletteIcon />,
+  fullicon: () => <PaletteIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.is_admin || !['development', 'staging'].includes(config.configuration.system.type)
 });

@@ -43,7 +43,9 @@ import Moment from 'ui/Moment';
 import { PageCenter } from 'ui/pages/PageCenter';
 import SignatureStatus from 'ui/SignatureStatus';
 
-loader.config({ paths: { vs: '/cdn/monaco_0.35.0/vs' } });
+loader.config({
+  paths: { vs: '/cdn/monaco_0.35.0/vs' }
+});
 
 const LANG_SELECTOR = {
   yara: 'yara',
@@ -653,33 +655,26 @@ export const ManageSignatureDetailPage = memo(() => {
 });
 
 export const ManageSignatureDetailRoute = createAppRoute({
-  title: {
-    ns: 'app',
-    key: 'breadcrumb.signature.detail'
-  },
-  icon: {
-    primary: <ListOutlinedIcon />
-  },
-  ancestor: '/manage/signatures',
   component: ManageSignatureDetailPage,
+
   path: '/manage/signature/detail/:id',
   params: s => ({
     id: s.string()
   }),
 
-  forbidden: s => !s.user.roles.includes('signature_view')
+  ancestor: '/manage/signatures',
+  shortname: location => ({ i18nKey: location?.path?.id ?? 'breadcrumb.signature.detail', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'breadcrumb.signature.detail', ns: 'app' }),
+  shorticon: () => <ListOutlinedIcon />,
+  fullicon: () => <ListOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.roles.includes('signature_view')
 });
 
 export const ManageSignatureDetailRoute2 = createAppRoute({
-  title: {
-    ns: 'app',
-    key: 'breadcrumb.signature.detail'
-  },
-  icon: {
-    primary: <ListOutlinedIcon />
-  },
-  ancestor: '/manage/signatures',
   component: ManageSignatureDetailPage,
+
   path: '/manage/signature/detail/:type/:source/:name',
   params: s => ({
     type: s.string(),
@@ -687,5 +682,12 @@ export const ManageSignatureDetailRoute2 = createAppRoute({
     name: s.string()
   }),
 
-  forbidden: s => !s.user.roles.includes('signature_view')
+  ancestor: '/manage/signatures',
+  shortname: location => ({ i18nKey: location?.path?.name ?? 'breadcrumb.signature.detail', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'breadcrumb.signature.detail', ns: 'app' }),
+  shorticon: () => <ListOutlinedIcon />,
+  fullicon: () => <ListOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.roles.includes('signature_view')
 });

@@ -1,5 +1,5 @@
 import { AppErrorProvider } from 'core/error';
-import type { DisabledBoundaryProps, ForbiddenBoundaryProps } from 'core/routes';
+import type { InferAppLocationFromParams } from 'core/routes';
 import { DisabledBoundary, ForbiddenBoundary } from 'core/routes';
 import type { HASH_PARAM_BLUEPRINTS, HashParamValue, InferHashParamBlueprintFromValue } from 'features/hash-params';
 import { createHashParamCodec } from 'features/hash-params';
@@ -7,7 +7,7 @@ import type { InferPathParamBlueprintMapFromPath, PATH_PARAM_BLUEPRINTS_MAP, Rou
 import { createPathParamsCodec } from 'features/path-params';
 import type { SearchParamBlueprintMap } from 'features/search-params';
 import { SEARCH_PARAM_BLUEPRINTS_MAP, SearchParamEngine } from 'features/search-params';
-import type { ComponentType, FC, MemoExoticComponent, ReactNode } from 'react';
+import type { ComponentType, FC, MemoExoticComponent, ReactElement } from 'react';
 import { toElement } from 'shared/utils/app.utils';
 
 //*****************************************************************************************
@@ -20,18 +20,7 @@ export type CreateAppRouteProps<
   Search extends SearchParamBlueprintMap,
   Hash extends HashParamValue = never
 > = {
-  // Descriptions
-  title?: {
-    ns: string;
-    key: string;
-  };
-
-  icon?: {
-    primary: ReactNode;
-    secondary?: ReactNode;
-  };
-  ancestor?: RoutePath | null;
-  component: ReactNode | MemoExoticComponent<ComponentType<unknown>>;
+  component: ReactElement | MemoExoticComponent<ComponentType<unknown>>;
 
   // Parameters
   path: Path;
@@ -39,15 +28,23 @@ export type CreateAppRouteProps<
   search?: (blueprints: typeof SEARCH_PARAM_BLUEPRINTS_MAP) => Search;
   hash?: (blueprints: typeof HASH_PARAM_BLUEPRINTS) => InferHashParamBlueprintFromValue<Hash>;
 
+  // Presentation
+  ancestor?: RoutePath | null;
+  shortname: (
+    location: InferAppLocationFromParams<Path, Params, Search, Hash>,
+    config: AppConfigStore
+  ) => { i18nKey: string; ns: string };
+  fullname: (
+    location: InferAppLocationFromParams<Path, Params, Search, Hash>,
+    config: AppConfigStore
+  ) => { i18nKey: string; ns: string };
+  shorticon: (location: InferAppLocationFromParams<Path, Params, Search, Hash>, config: AppConfigStore) => ReactElement;
+  fullicon: (location: InferAppLocationFromParams<Path, Params, Search, Hash>, config: AppConfigStore) => ReactElement;
+
   // Guards and Fallbacks
-  disabled?: DisabledBoundaryProps['disabled'];
-  forbidden?: ForbiddenBoundaryProps['forbidden'];
   loader?: boolean | ((args: unknown) => void);
-  disabledComponent?: ReactNode | MemoExoticComponent<ComponentType<unknown>>;
-  errorComponent?: ReactNode | MemoExoticComponent<ComponentType<unknown>>;
-  forbiddenComponent?: ReactNode | MemoExoticComponent<ComponentType<unknown>>;
-  pendingComponent?: ReactNode | MemoExoticComponent<ComponentType<unknown>>;
-  quotaExceededComponent?: ReactNode | MemoExoticComponent<ComponentType<unknown>>;
+  disabled?: (location: InferAppLocationFromParams<Path, Params, Search, Hash>, config: AppConfigStore) => boolean;
+  forbidden?: (location: InferAppLocationFromParams<Path, Params, Search, Hash>, config: AppConfigStore) => boolean;
 };
 
 export const createAppRoute = <
@@ -56,9 +53,6 @@ export const createAppRoute = <
   const Search extends SearchParamBlueprintMap,
   const Hash extends HashParamValue = never
 >({
-  title,
-  icon,
-  ancestor,
   component: Component,
 
   path,
@@ -66,12 +60,15 @@ export const createAppRoute = <
   search,
   hash,
 
+  ancestor,
+  shortname,
+  fullname,
+  shorticon,
+  fullicon,
+
   loader,
   disabled,
-  forbidden,
-
-  forbiddenComponent,
-  disabledComponent
+  forbidden
 }: CreateAppRouteProps<Route, Path, Search, Hash>) => {
   void loader;
 
@@ -88,14 +85,16 @@ export const createAppRoute = <
   (Component as unknown as FC).displayName = path;
 
   return {
-    title,
-    icon,
-    ancestor,
-
     path,
     params: pathCodec,
     search: searchEngine,
     hash: hashCodec,
+
+    ancestor,
+    shortname,
+    fullname,
+    shorticon,
+    fullicon,
 
     loader,
     disabled,
@@ -103,10 +102,8 @@ export const createAppRoute = <
 
     element: (
       <AppErrorProvider>
-        <DisabledBoundary disabled={disabled} FallbackComponent={disabledComponent}>
-          <ForbiddenBoundary forbidden={forbidden} FallbackComponent={forbiddenComponent}>
-            {toElement(Component)}
-          </ForbiddenBoundary>
+        <DisabledBoundary disabled={disabled}>
+          <ForbiddenBoundary forbidden={forbidden}>{toElement(Component)}</ForbiddenBoundary>
         </DisabledBoundary>
       </AppErrorProvider>
     )

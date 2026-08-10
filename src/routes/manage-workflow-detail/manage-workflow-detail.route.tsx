@@ -221,19 +221,19 @@ export const ManageWorkflowDetailPage = memo(() => {
 });
 
 export const ManageWorkflowDetailRoute = createAppRoute({
-  title: {
-    ns: 'app',
-    key: 'breadcrumb.workflow.detail'
-  },
-  icon: {
-    primary: <ListOutlinedIcon />
-  },
-  ancestor: '/manage/workflows',
   component: ManageWorkflowDetailPage,
+
   path: '/manage/workflow/detail/:id',
   params: s => ({
     id: s.string()
   }),
 
-  forbidden: s => !s.user.roles.includes('workflow_view')
+  ancestor: '/manage/workflows',
+  shortname: () => ({ i18nKey: 'breadcrumb.workflow.detail', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'breadcrumb.workflow.detail', ns: 'app' }),
+  shorticon: () => <ListOutlinedIcon />,
+  fullicon: () => <ListOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.roles.includes('workflow_view')
 });

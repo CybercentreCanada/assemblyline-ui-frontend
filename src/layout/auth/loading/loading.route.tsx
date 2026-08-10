@@ -1,3 +1,4 @@
+import PendingOutlinedIcon from '@mui/icons-material/PendingOutlined';
 import { CircularProgress, useTheme } from '@mui/material';
 import { createAppRoute } from 'core/routes';
 import { memo } from 'react';
@@ -34,5 +35,15 @@ LoadingPage.displayName = 'LoadingPage';
 
 export const LoadingRoute = createAppRoute({
   component: LoadingPage,
-  path: '/loading'
+
+  path: '/loading',
+
+  ancestor: null,
+  shortname: () => ({ i18nKey: 'loading', ns: 'alerts' }),
+  fullname: () => ({ i18nKey: 'loading', ns: 'alerts' }),
+  shorticon: () => <PendingOutlinedIcon />,
+  fullicon: () => <PendingOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
 });

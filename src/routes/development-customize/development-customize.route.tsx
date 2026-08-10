@@ -1,4 +1,4 @@
-import PaletteIcon from '@mui/icons-material/Palette';
+import DataObjectOutlinedIcon from '@mui/icons-material/DataObjectOutlined';
 import { Box, FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, useTheme } from '@mui/material';
 import { createAppRoute } from 'core/routes';
 import { memo, Profiler } from 'react';
@@ -170,16 +170,16 @@ const WrappedDevelopmentCustomizePage = memo(() => (
 ));
 
 export const DevelopmentCustomizeRoute = createAppRoute({
-  title: {
-    ns: 'app',
-    key: 'drawer.development.customize'
-  },
-  icon: {
-    primary: <PaletteIcon />
-  },
-  ancestor: '/development',
   component: WrappedDevelopmentCustomizePage,
+
   path: '/development/customize',
 
-  forbidden: s => !s.user.is_admin || !['development', 'staging'].includes(s.configuration.system.type)
+  ancestor: '/development',
+  shortname: () => ({ i18nKey: 'drawer.development.customize', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'drawer.development.customize', ns: 'app' }),
+  shorticon: () => <DataObjectOutlinedIcon />,
+  fullicon: () => <DataObjectOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.is_admin || !['development', 'staging'].includes(config.configuration.system.type)
 });

@@ -1013,15 +1013,8 @@ export const AlertDetailPage = memo(() => {
 AlertDetailPage.displayName = 'AlertDetailPage';
 
 export const AlertDetailRoute = createAppRoute({
-  title: {
-    ns: 'app',
-    key: 'breadcrumb.alert.detail'
-  },
-  icon: {
-    primary: <BallotOutlinedIcon />
-  },
-  ancestor: '/alerts',
   component: memo(() => <AlertDetailPage />),
+
   path: '/alert/:id',
   params: s => ({
     id: s.string()
@@ -1031,5 +1024,14 @@ export const AlertDetailRoute = createAppRoute({
       .object(null as AlertItem)
       .nullable()
       .source('transient')
-  })
+  }),
+
+  ancestor: '/alerts',
+  shortname: () => ({ i18nKey: 'breadcrumb.alert.detail', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'breadcrumb.alert.detail', ns: 'app' }),
+  shorticon: () => <BallotOutlinedIcon />,
+  fullicon: () => <BallotOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
 });

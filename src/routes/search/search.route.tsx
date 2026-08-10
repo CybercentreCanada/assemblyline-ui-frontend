@@ -1,6 +1,10 @@
+import { FingerprintOutlined, ViewCarouselOutlined } from '@mui/icons-material';
 import ArchiveIcon from '@mui/icons-material/Archive';
 import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
 import CenterFocusStrongOutlinedIcon from '@mui/icons-material/CenterFocusStrongOutlined';
+import DataObjectOutlinedIcon from '@mui/icons-material/DataObjectOutlined';
+import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
+import NotificationImportantOutlinedIcon from '@mui/icons-material/NotificationImportantOutlined';
 import SearchIcon from '@mui/icons-material/Search';
 import { IconButton, Pagination, Paper, Tab, Tabs, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
 import { useApiQuery } from 'core/api';
@@ -201,7 +205,7 @@ export const SearchPage = () => {
 
   const SpecialTab = useCallback(({ children }: { children: React.ReactNode }) => children, []);
 
-  return (id && !currentUser.roles.includes(permissionMap[(index || id) as keyof SearchIndexes])) ||
+  return (id && !currentUser.roles.includes(permissionMap[index || id])) ||
     (!id && Object.values(permissionMap).every(val => !currentUser.roles.includes(val))) ||
     (id === 'retrohunt' && !configuration.retrohunt.enabled) ? (
     <ForbiddenPage />
@@ -349,7 +353,7 @@ export const SearchPage = () => {
                       size={downSM ? 'small' : 'medium'}
                       component={AppLink}
                       nav={nav =>
-                        nav.here().create(s => ({
+                        nav.here<'/search/:index'>().create(s => ({
                           route: '/search/:index',
                           path: { index: tab },
                           search: { ...s.search, index: null }
@@ -425,15 +429,8 @@ SearchPage.displayName = 'SearchPage';
 //*****************************************************************************************
 
 export const SearchRoute = createAppRoute({
-  title: {
-    ns: 'app',
-    key: 'drawer.search'
-  },
-  icon: {
-    primary: <SearchIcon />
-  },
-  ancestor: null,
   component: memo(() => <SearchPage />),
+
   path: '/search/:index',
   params: s => ({
     index: s.enum(INDEX_OPTIONS, 'submission')
@@ -445,19 +442,55 @@ export const SearchRoute = createAppRoute({
     rows: s.number(25).locked().source('transient').ephemeral(),
     sort: s.string(null).ephemeral(),
     use_archive: s.boolean(false)
-  })
+  }),
+
+  ancestor: '/search',
+  shortname: location => {
+    switch (location?.path?.index) {
+      case 'alert':
+        return { i18nKey: 'drawer.search.alert', ns: 'app' };
+      case 'file':
+        return { i18nKey: 'drawer.search.file', ns: 'app' };
+      case 'result':
+        return { i18nKey: 'drawer.search.result', ns: 'app' };
+      case 'retrohunt':
+        return { i18nKey: 'drawer.search.retrohunt', ns: 'app' };
+      case 'signature':
+        return { i18nKey: 'drawer.search.signature', ns: 'app' };
+      case 'submission':
+        return { i18nKey: 'drawer.search.submission', ns: 'app' };
+      default:
+        return { i18nKey: 'drawer.search', ns: 'app' };
+    }
+  },
+  fullname: () => ({ i18nKey: 'drawer.search', ns: 'app' }),
+  shorticon: location => {
+    switch (location?.path?.index) {
+      case 'alert':
+        return <NotificationImportantOutlinedIcon />;
+      case 'file':
+        return <DescriptionOutlinedIcon />;
+      case 'result':
+        return <DescriptionOutlinedIcon />;
+      case 'retrohunt':
+        return <DataObjectOutlinedIcon />;
+      case 'signature':
+        return <FingerprintOutlined />;
+      case 'submission':
+        return <ViewCarouselOutlined />;
+      default:
+        return <SearchIcon />;
+    }
+  },
+  fullicon: () => <SearchIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
 });
 
 export const SearchRootRoute = createAppRoute({
-  title: {
-    ns: 'app',
-    key: 'drawer.search'
-  },
-  icon: {
-    primary: <SearchIcon />
-  },
-  ancestor: null,
   component: memo(() => <SearchPage />),
+
   path: '/search',
   search: s => ({
     index: s.enum(null, INDEX_OPTIONS).nullable(),
@@ -466,5 +499,14 @@ export const SearchRootRoute = createAppRoute({
     rows: s.number(25).locked().source('transient').ephemeral(),
     sort: s.string(null).ephemeral(),
     use_archive: s.boolean(false)
-  })
+  }),
+
+  ancestor: null,
+  shortname: () => ({ i18nKey: 'drawer.search', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'drawer.search', ns: 'app' }),
+  shorticon: () => <SearchIcon />,
+  fullicon: () => <SearchIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
 });

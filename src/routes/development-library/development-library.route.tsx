@@ -111,19 +111,19 @@ export const DevelopmentLibraryPage = memo(() => (
 ));
 
 export const DevelopmentLibraryRoute = createAppRoute({
-  title: {
-    ns: 'app',
-    key: 'drawer.development.library'
-  },
-  icon: {
-    primary: <LibraryBooksIcon />
-  },
-  ancestor: '/development',
   component: DevelopmentLibraryPage,
+
   path: '/development/library',
   search: s => ({
     tab: s.enum(null, ['datetime', 'inputs', 'layout', 'list', 'list_inputs'])
   }),
 
-  forbidden: s => !s.user.is_admin || !['development', 'staging'].includes(s.configuration.system.type)
+  ancestor: '/development',
+  shortname: () => ({ i18nKey: 'drawer.development.library', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'drawer.development.library', ns: 'app' }),
+  shorticon: () => <LibraryBooksIcon />,
+  fullicon: () => <LibraryBooksIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.is_admin || !['development', 'staging'].includes(config.configuration.system.type)
 });

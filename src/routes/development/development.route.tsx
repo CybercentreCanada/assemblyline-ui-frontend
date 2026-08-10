@@ -1,4 +1,4 @@
-import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
+import { Code } from '@mui/icons-material';
 import LinkIcon from '@mui/icons-material/Link';
 import { Button, useTheme } from '@mui/material';
 import { useAppTemplateLeftNav } from 'app/layout.left-nav';
@@ -14,7 +14,7 @@ import {
 import React, { memo, useMemo } from 'react';
 import { PageCenter } from 'ui/pages/PageCenter';
 
-export const HelpPage = memo(() => {
+export const DevelopmentPage = memo(() => {
   const theme = useTheme();
   const configStoreApi = useAppConfigStoreApi();
   const locationParamStoreApi = useAppLocationParamStoreApi();
@@ -23,7 +23,7 @@ export const HelpPage = memo(() => {
   const items = useMemo(() => {
     const configState = getAppConfigStateFromApi(configStoreApi);
     const locationState = getAppLocationParamStateFromApi(locationParamStoreApi);
-    const section = leftNav.find(item => item.link?.route === '/help');
+    const section = leftNav.find(item => item.link?.route === '/development');
 
     return (section?.items ?? []).map(item => {
       const route = item.link?.route ? findAppRouteFromPath(locationState, item.link.route as never) : null;
@@ -74,17 +74,18 @@ export const HelpPage = memo(() => {
   );
 });
 
-export const HelpRoute = createAppRoute({
-  component: HelpPage,
+export const DevelopmentRoute = createAppRoute({
+  component: DevelopmentPage,
 
-  path: '/help',
+  path: '/development',
 
   ancestor: null,
-  shortname: () => ({ i18nKey: 'drawer.help', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'drawer.help', ns: 'app' }),
-  shorticon: () => <HelpOutlineOutlinedIcon />,
-  fullicon: () => <HelpOutlineOutlinedIcon />,
+  shortname: () => ({ i18nKey: 'drawer.development', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'drawer.development', ns: 'app' }),
+  shorticon: () => <Code />,
+  fullicon: () => <Code />,
 
   disabled: () => false,
-  forbidden: () => false
+  forbidden: (_location, config) =>
+    !config.user.is_admin || !['development', 'staging'].includes(config.configuration.system.type)
 });

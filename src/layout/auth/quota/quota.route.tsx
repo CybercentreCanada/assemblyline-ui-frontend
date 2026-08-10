@@ -52,5 +52,15 @@ QuotaPage.displayName = 'QuotaPage';
 
 export const QuotaRoute = createAppRoute({
   component: QuotaPage,
-  path: '/quota'
+
+  path: '/quota',
+
+  ancestor: null,
+  shortname: () => ({ i18nKey: 'quota', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'quota', ns: 'app' }),
+  shorticon: () => <SpeedOutlinedIcon />,
+  fullicon: () => <SpeedOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
 });

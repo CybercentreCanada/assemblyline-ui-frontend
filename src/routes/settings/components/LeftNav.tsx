@@ -1,9 +1,9 @@
 import { useAppConfig } from 'core/config';
 import { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useForm } from 'routes/settings/settings.form';
+import { getProfileNames } from 'routes/settings/settings.utils';
 import { PageNavigation } from 'ui/layouts/PageNavigation';
-import { useForm } from '../settings.form';
-import { getProfileNames } from '../settings.utils';
 
 export const LeftNav = memo(() => {
   const { t } = useTranslation(['settings']);
@@ -23,11 +23,8 @@ export const LeftNav = memo(() => {
       return {
         primary: displayName,
         active: false,
-        to: {
-          path: `/settings/:tab`,
-          params: { tab: name },
-          variant: 'replace'
-        }
+        name: name,
+        nav: nav => nav.here({ replace: true }).update({ route: '/settings/:tab', path: { tab: name } })
       };
     });
   }, [settings, configuration, t]);
@@ -39,14 +36,10 @@ export const LeftNav = memo(() => {
           {
             primary: t('interface'),
             active: !tab || tab === 'interface',
-            to: {
-              path: '/settings/:tab',
-              params: { tab: 'interface' },
-              variant: 'replace'
-            }
+            nav: nav => nav.here({ replace: true }).update({ route: '/settings/:tab', path: { tab: 'interface' } })
           },
           { primary: t('profiles'), subheader: true, readOnly: true },
-          ...profileOptions.map(opt => ({ ...opt, active: opt.to.params.tab.endsWith(tab) }))
+          ...profileOptions.map(opt => ({ ...opt, active: opt.name.endsWith(tab) }))
         ];
 
         return (

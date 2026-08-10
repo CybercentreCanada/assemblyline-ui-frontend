@@ -280,19 +280,12 @@ export const AlertsPage = memo(() => {
 });
 
 export const AlertsRoute = createAppRoute({
-  title: {
-    ns: 'app',
-    key: 'drawer.alerts'
-  },
-  icon: {
-    primary: <NotificationImportantOutlinedIcon />
-  },
-  ancestor: null,
   component: memo(() => (
     <AlertsProvider>
       <AlertsPage />
     </AlertsProvider>
   )),
+
   path: '/alerts',
   search: s => ({
     q: s.string(''),
@@ -308,7 +301,16 @@ export const AlertsRoute = createAppRoute({
     tc: s.string('4d'),
     track_total_hits: s.number(null).source('transient').nullable().ephemeral(),
     refresh: s.boolean(false).ephemeral()
-  })
+  }),
+
+  ancestor: null,
+  shortname: () => ({ i18nKey: 'drawer.alerts', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'drawer.alerts', ns: 'app' }),
+  shorticon: () => <NotificationImportantOutlinedIcon />,
+  fullicon: () => <NotificationImportantOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
 });
 
 export type AlertSearchParams = {

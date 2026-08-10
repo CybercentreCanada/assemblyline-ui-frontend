@@ -359,15 +359,8 @@ export const AdminServiceReviewPage = memo(() => {
 });
 
 export const AdminServiceReviewRoute = createAppRoute({
-  title: {
-    ns: 'app',
-    key: 'adminmenu.service_review'
-  },
-  icon: {
-    primary: <CompareArrowsOutlinedIcon />
-  },
-  ancestor: '/admin',
   component: AdminServiceReviewPage,
+
   path: '/admin/service_review',
   search: s => ({
     service: s.string(''),
@@ -375,5 +368,12 @@ export const AdminServiceReviewRoute = createAppRoute({
     v2: s.string('')
   }),
 
-  forbidden: s => !s.user.is_admin
+  ancestor: '/admin',
+  shortname: () => ({ i18nKey: 'adminmenu.service_review', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'adminmenu.service_review', ns: 'app' }),
+  shorticon: () => <CompareArrowsOutlinedIcon />,
+  fullicon: () => <CompareArrowsOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.is_admin
 });

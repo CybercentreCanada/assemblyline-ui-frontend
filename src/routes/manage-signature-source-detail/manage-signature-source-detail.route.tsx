@@ -641,15 +641,8 @@ export const ManageSignatureSourceDetailPage = memo(() => {
 });
 
 export const ManageSignatureSourceDetailRoute = createAppRoute({
-  title: {
-    ns: 'app',
-    key: 'drawer.manage.source'
-  },
-  icon: {
-    primary: null
-  },
-  ancestor: '/manage/sources',
   component: ManageSignatureSourceDetailPage,
+
   path: '/manage/source/:id',
   params: s => ({
     id: s.string()
@@ -660,5 +653,12 @@ export const ManageSignatureSourceDetailRoute = createAppRoute({
     generatesSignatures: s.boolean(null as UpdateConfig['generates_signatures']).source('transient')
   }),
 
-  forbidden: s => !s.user.roles.includes('signature_manage')
+  ancestor: '/manage/sources',
+  shortname: location => ({ i18nKey: location?.path?.id ?? 'drawer.manage.source', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'drawer.manage.source', ns: 'app' }),
+  shorticon: () => null,
+  fullicon: () => null,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.roles.includes('signature_manage')
 });

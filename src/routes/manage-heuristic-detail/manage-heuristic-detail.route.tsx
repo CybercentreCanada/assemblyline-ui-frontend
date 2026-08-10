@@ -278,19 +278,19 @@ export const ManageHeuristicDetailPage = memo(() => {
 });
 
 export const ManageHeuristicDetailRoute = createAppRoute({
-  title: {
-    ns: 'app',
-    key: 'breadcrumb.heuristic.detail'
-  },
-  icon: {
-    primary: <ListOutlinedIcon />
-  },
-  ancestor: '/manage/heuristics',
   component: ManageHeuristicDetailPage,
+
   path: '/manage/heuristic/detail/:id',
   params: s => ({
     id: s.string()
   }),
 
-  forbidden: s => !s.user.roles.includes('heuristic_view')
+  ancestor: '/manage/heuristics',
+  shortname: location => ({ i18nKey: location?.path?.id ?? 'breadcrumb.heuristic.detail', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'breadcrumb.heuristic.detail', ns: 'app' }),
+  shorticon: () => <ListOutlinedIcon />,
+  fullicon: () => <ListOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.roles.includes('heuristic_view')
 });

@@ -129,14 +129,16 @@ export const HelpServicesPage = memo(() => {
 });
 
 export const HelpServicesRoute = createAppRoute({
-  title: {
-    ns: 'app',
-    key: 'drawer.help.services'
-  },
-  icon: {
-    primary: <AccountTreeOutlinedIcon />
-  },
-  ancestor: '/help',
   component: HelpServicesPage,
-  path: '/help/services'
+
+  path: '/help/services',
+
+  ancestor: '/help',
+  shortname: () => ({ i18nKey: 'drawer.help.services', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'drawer.help.services', ns: 'app' }),
+  shorticon: () => <AccountTreeOutlinedIcon />,
+  fullicon: () => <AccountTreeOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
 });

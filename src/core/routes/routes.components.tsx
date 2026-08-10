@@ -1,7 +1,27 @@
 import { useAppConfig } from 'core/config';
+import { getRouteParamFromKey, useAppLocationParamStore, useAppPageKey } from 'core/routes';
 import type { ComponentType, MemoExoticComponent, ReactNode } from 'react';
 import { memo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ForbiddenPage } from 'routes/forbidden/forbidden';
+
+//*****************************************************************************************
+// RouteName
+//*****************************************************************************************
+
+export type RouteNameProps = {
+  /** Route path fallback, shown when no name is resolved. */
+  fallback?: ReactNode;
+  /** Result of a route's `shortname`/`fullname` resolver. */
+  name?: { i18nKey: string; ns: string };
+};
+
+export const RouteName = memo(({ fallback = null, name }: RouteNameProps) => {
+  const { t } = useTranslation(name.ns);
+  return !name ? <>{fallback}</> : <>{t(name.i18nKey)}</>;
+});
+
+RouteName.displayName = 'RouteName';
 
 //*****************************************************************************************
 // DisabledBoundary
@@ -9,7 +29,7 @@ import { ForbiddenPage } from 'routes/forbidden/forbidden';
 
 export type DisabledBoundaryProps = {
   /** Condition or callback to determine disabled state. */
-  disabled?: boolean | ((config: AppConfigStore) => boolean);
+  disabled?: (location: unknown, config: AppConfigStore) => boolean;
   /** Fallback component to render when disabled. */
   FallbackComponent?: ReactNode | MemoExoticComponent<ComponentType<unknown>>;
   /** Children to render when not disabled. */
@@ -17,8 +37,10 @@ export type DisabledBoundaryProps = {
 };
 
 export const DisabledBoundary = memo(
-  ({ disabled = false, FallbackComponent = <ForbiddenPage disabled />, children }: DisabledBoundaryProps) => {
-    const isDisabled = useAppConfig(s => (typeof disabled === 'function' ? disabled(s) : disabled));
+  ({ disabled = () => false, FallbackComponent = <ForbiddenPage disabled />, children }: DisabledBoundaryProps) => {
+    const pageKey = useAppPageKey();
+    const params = useAppLocationParamStore(s => getRouteParamFromKey(s, pageKey));
+    const isDisabled = useAppConfig(s => disabled(params, s));
     return isDisabled ? <>{FallbackComponent}</> : <>{children}</>;
   }
 );
@@ -31,7 +53,7 @@ DisabledBoundary.displayName = 'DisabledBoundary';
 
 export type ForbiddenBoundaryProps = {
   /** Condition or callback to determine forbidden state. */
-  forbidden?: boolean | ((config: AppConfigStore) => boolean);
+  forbidden?: (location: unknown, config: AppConfigStore) => boolean;
   /** Fallback component to render when forbidden. */
   FallbackComponent?: ReactNode | MemoExoticComponent<ComponentType<unknown>>;
   /** Children to render when not forbidden. */
@@ -39,8 +61,10 @@ export type ForbiddenBoundaryProps = {
 };
 
 export const ForbiddenBoundary = memo(
-  ({ forbidden = false, FallbackComponent = <ForbiddenPage />, children }: ForbiddenBoundaryProps) => {
-    const isForbidden = useAppConfig(s => (typeof forbidden === 'function' ? forbidden(s) : forbidden));
+  ({ forbidden = () => false, FallbackComponent = <ForbiddenPage />, children }: ForbiddenBoundaryProps) => {
+    const pageKey = useAppPageKey();
+    const params = useAppLocationParamStore(s => getRouteParamFromKey(s, pageKey));
+    const isForbidden = useAppConfig(s => forbidden(params, s));
     return isForbidden ? <>{FallbackComponent}</> : <>{children}</>;
   }
 );

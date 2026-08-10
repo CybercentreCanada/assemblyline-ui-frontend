@@ -24,7 +24,9 @@ import CustomChip from 'ui/CustomChip';
 import { PageHeader } from 'ui/layouts/PageHeader';
 import { PageFullSizeLayout } from 'ui/pages/PageFullSize';
 
-loader.config({ paths: { vs: '/cdn/monaco_0.35.0/vs' } });
+loader.config({
+  paths: { vs: '/cdn/monaco_0.35.0/vs' }
+});
 
 export const DevelopmentAPIPage = memo(() => {
   const { t } = useTranslation(['developmentAPI', 'user']);
@@ -381,16 +383,17 @@ export const DevelopmentAPIPage = memo(() => {
 });
 
 export const DevelopmentAPIRoute = createAppRoute({
-  title: {
-    ns: 'app',
-    key: 'drawer.development.api'
-  },
-  icon: {
-    primary: <ApiIcon />
-  },
-  ancestor: '/development',
   component: DevelopmentAPIPage,
+
   path: '/development/api',
 
-  forbidden: s => !s.user.is_admin || !['development', 'staging'].includes(s.configuration.system.type)
+  ancestor: '/development',
+  shortname: () => ({ i18nKey: 'drawer.development.api', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'drawer.development.api', ns: 'app' }),
+  shorticon: () => <ApiIcon />,
+  fullicon: () => <ApiIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) =>
+    !config.user.is_admin || !['development', 'staging'].includes(config.configuration.system.type)
 });

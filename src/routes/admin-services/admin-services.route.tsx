@@ -499,16 +499,16 @@ export const AdminServicesPage = memo(() => {
 });
 
 export const AdminServicesRoute = createAppRoute({
-  title: {
-    ns: 'app',
-    key: 'adminmenu.services'
-  },
-  icon: {
-    primary: <AccountTreeOutlinedIcon />
-  },
-  ancestor: '/admin',
   component: AdminServicesPage,
+
   path: '/admin/services',
 
-  forbidden: s => !s.user.is_admin
+  ancestor: '/admin',
+  shortname: () => ({ i18nKey: 'adminmenu.services', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'adminmenu.services', ns: 'app' }),
+  shorticon: () => <AccountTreeOutlinedIcon />,
+  fullicon: () => <AccountTreeOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.is_admin
 });

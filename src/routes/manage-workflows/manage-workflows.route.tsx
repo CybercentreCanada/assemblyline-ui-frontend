@@ -168,15 +168,8 @@ export const ManageWorkflowsPage = memo(() => {
 });
 
 export const ManageWorkflowsRoute = createAppRoute({
-  title: {
-    ns: 'app',
-    key: 'drawer.manage.workflow'
-  },
-  icon: {
-    primary: <BiNetworkChart />
-  },
-  ancestor: '/manage',
   component: ManageWorkflowsPage,
+
   path: '/manage/workflows',
   search: s => ({
     query: s.string(''),
@@ -188,5 +181,12 @@ export const ManageWorkflowsRoute = createAppRoute({
     refresh: s.boolean(false).source('transient').ephemeral()
   }),
 
-  forbidden: s => !s.user.roles.includes('workflow_view')
+  ancestor: '/manage',
+  shortname: () => ({ i18nKey: 'drawer.manage.workflow', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'drawer.manage.workflow', ns: 'app' }),
+  shorticon: () => <BiNetworkChart />,
+  fullicon: () => <BiNetworkChart />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.roles.includes('workflow_view')
 });

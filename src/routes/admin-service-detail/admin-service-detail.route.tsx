@@ -353,19 +353,19 @@ export const AdminServiceDetailPage = memo(() => {
 });
 
 export const AdminServiceDetailRoute = createAppRoute({
-  title: {
-    ns: 'app',
-    key: '{:svc}'
-  },
-  icon: {
-    primary: <WebAssetIcon />
-  },
-  ancestor: '/admin',
   component: AdminServiceDetailPage,
+
   path: '/admin/services/:svc',
   params: s => ({
     svc: s.string()
   }),
 
-  forbidden: s => !s.user.is_admin
+  ancestor: '/admin/services',
+  shortname: location => ({ i18nKey: location?.path?.svc ?? 'breadcrumb.alert.detail', ns: 'app' }),
+  fullname: () => ({ i18nKey: '{:svc}', ns: 'app' }),
+  shorticon: () => <WebAssetIcon />,
+  fullicon: () => <WebAssetIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.is_admin
 });

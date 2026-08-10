@@ -168,15 +168,8 @@ export const ManageSafelistsPage = memo(() => {
 });
 
 export const ManageSafelistsRoute = createAppRoute({
-  title: {
-    ns: 'app',
-    key: 'drawer.manage.safelist'
-  },
-  icon: {
-    primary: <VerifiedUserOutlinedIcon />
-  },
-  ancestor: '/manage',
   component: ManageSafelistsPage,
+
   path: '/manage/safelists',
   search: s => ({
     query: s.string(''),
@@ -188,5 +181,12 @@ export const ManageSafelistsRoute = createAppRoute({
     refresh: s.boolean(false).source('transient').ephemeral()
   }),
 
-  forbidden: s => !s.user.roles.includes('safelist_view')
+  ancestor: '/manage',
+  shortname: () => ({ i18nKey: 'drawer.manage.safelist', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'drawer.manage.safelist', ns: 'app' }),
+  shorticon: () => <VerifiedUserOutlinedIcon />,
+  fullicon: () => <VerifiedUserOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.roles.includes('safelist_view')
 });

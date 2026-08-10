@@ -30,14 +30,16 @@ export const AlertRedirectPage = memo(() => {
 });
 
 export const AlertRedirectRoute = createAppRoute({
-  title: {
-    ns: 'app',
-    key: 'drawer.alerts'
-  },
-  icon: {
-    primary: <NotificationImportantOutlinedIcon />
-  },
-  ancestor: null,
   component: AlertRedirectPage,
-  path: '/alerts-redirect'
+
+  path: '/alerts-redirect',
+
+  ancestor: null,
+  shortname: () => ({ i18nKey: 'drawer.alerts', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'drawer.alerts', ns: 'app' }),
+  shorticon: () => <NotificationImportantOutlinedIcon />,
+  fullicon: () => <NotificationImportantOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
 });

@@ -1073,21 +1073,21 @@ export const UserPage = memo(({ username = null }: UserPageProps) => {
 //*****************************************************************************************
 
 export const AdminUserDetailRoute = createAppRoute({
-  title: {
-    ns: 'app',
-    key: '{:id}'
-  },
-  icon: {
-    primary: <AccountCircleOutlinedIcon />
-  },
-  ancestor: '/admin/users',
   component: UserPage,
+
   path: '/admin/users/:id',
   params: s => ({
     id: s.string()
   }),
 
-  forbidden: s => !s.user.is_admin
+  ancestor: '/admin/users',
+  shortname: location => ({ i18nKey: location?.path?.id ?? 'breadcrumb.alert.detail', ns: 'app' }),
+  fullname: () => ({ i18nKey: '{:id}', ns: 'app' }),
+  shorticon: () => <AccountCircleOutlinedIcon />,
+  fullicon: () => <AccountCircleOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.is_admin
 });
 
 //*****************************************************************************************
@@ -1102,16 +1102,16 @@ export const AccountPage = memo(() => {
 AccountPage.displayName = 'AccountPage';
 
 export const AccountRoute = createAppRoute({
-  title: {
-    ns: 'app',
-    key: 'usermenu.account'
-  },
-  icon: {
-    primary: <AccountCircleOutlinedIcon />
-  },
-  ancestor: null,
   component: AccountPage,
+
   path: '/account',
 
-  forbidden: s => !s.user.roles.includes('self_manage')
+  ancestor: null,
+  shortname: () => ({ i18nKey: 'usermenu.account', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'usermenu.account', ns: 'app' }),
+  shorticon: () => <AccountCircleOutlinedIcon />,
+  fullicon: () => <AccountCircleOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: (_location, config) => !config.user.roles.includes('self_manage')
 });
