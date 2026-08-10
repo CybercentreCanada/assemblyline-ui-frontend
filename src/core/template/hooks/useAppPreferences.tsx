@@ -2,12 +2,12 @@ import { AppSwitcher } from '@tui/apps';
 import type { AppPreferenceConfigs } from '@tui/core';
 import { DocumentationButton } from 'core/template/components/DocumentationButton';
 import { EmailButton } from 'core/template/components/EmailButton';
-import { UserProfile } from 'core/template/components/UserProfile';
 import { AppBreadcrumbs } from 'layout/breadcrumbs';
 import type { AppLeftNavItem } from 'layout/left-nav';
 import { useGetTemplateLeftNavMenu } from 'layout/left-nav';
 import { Notifications } from 'layout/notifications';
 import { QuickSearch } from 'layout/quick-search';
+import { UserProfile } from 'layout/user-menu';
 import { useMemo } from 'react';
 
 export type UseAppPreferencesProps = {

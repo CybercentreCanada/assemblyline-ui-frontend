@@ -410,7 +410,7 @@ export const QuickSearch = memo(() => {
       <QuickSearchRoot
         ref={rootRef}
         menuOpen={menu}
-        style={{ width: '100%', marginRight: isPhoneMode ? 0 : theme.spacing(1) }}
+        style={{ marginRight: isPhoneMode ? 0 : theme.spacing(1), ...(isTabletMode && { width: '100%' }) }}
       >
         {isPhoneMode ? (
           <Tooltip
