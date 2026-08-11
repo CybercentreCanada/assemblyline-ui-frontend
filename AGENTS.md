@@ -30,7 +30,7 @@ Before generating or modifying code, read and follow the AI rules in `src/agents
 
 ## Git Commit Messages
 
-When asked to write a commit message, run `git diff --cached --stat` and `git diff --cached` to inspect all staged changes. Then produce a message as:
+When asked to write a commit message, run `git diff --cached --stat` and `git diff --cached` to inspect all staged changes. Never run `git commit` or otherwise commit on the user's behalf — only output the message, pasted as-is inside a markdown code block. Then produce a message as:
 
 - A single flat bullet-point list (no title line, no paragraphs, no grouping)
 - One bullet per logical change

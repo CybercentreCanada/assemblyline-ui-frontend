@@ -1,8 +1,8 @@
-import { useMediaQuery } from '@mui/material';
-import { useAppSwitcher } from '@tui/apps';
 import type { AppPreferenceConfigs, AppRouterAdapter, AppUserService } from '@tui/core';
 import { AppProvider, AppRoot, useAppLayout, useAppUser } from '@tui/core';
+import { useAppInterfaceStore } from 'core/interface';
 import { useAppPreferenceStore } from 'core/preference';
+import { useAppTemplateThemeInitializer, useAppTemplateThemeMode, useAppTemplateThemePatcher } from 'core/template';
 import type { i18n } from 'i18next';
 import type { PropsWithChildren } from 'react';
 import { memo, useEffect, useMemo } from 'react';
@@ -14,7 +14,6 @@ import { memo, useEffect, useMemo } from 'react';
 const Inner = ({ children }: PropsWithChildren) => {
   const appLayout = useAppLayout();
   const { isReady } = useAppUser();
-  const { setItems, items } = useAppSwitcher();
 
   useEffect(() => {
     isReady();
@@ -85,20 +84,16 @@ export const AppTemplateProvider = memo(({ children, i18n }: AppTemplateProvider
   const lang = useAppPreferenceStore(s => s.layout.lang);
   const layout = useAppPreferenceStore(s => s.layout.layout);
   const themeID = useAppPreferenceStore(s => s.layout.theme);
+  const initialized = useAppInterfaceStore(s => s.theme.initialized);
+  const skin = useAppInterfaceStore(s => s.theme.skin);
 
-  // const mode = useAppTemplateThemeMode();
-  // const skin = useAppInterfaceStore(s => s.theme.skin);
-  // const themes = useMemo(() => (skin ? [skin] : []), [skin]);
+  useAppTemplateThemeInitializer();
+  const mode = useAppTemplateThemeMode();
+  useAppTemplateThemePatcher();
 
-  const requestedMode = useAppPreferenceStore(s => s.layout.mode);
-  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
+  const themes = useMemo(() => (skin ? [skin] : undefined), [skin]);
 
-  const mode = useMemo(
-    () => (requestedMode === 'system' ? (prefersDarkMode ? 'dark' : 'light') : requestedMode),
-    [requestedMode, prefersDarkMode]
-  );
-
-  return (
+  return !initialized ? null : (
     <AppRoot
       cookies={{
         autoHideAppbar,
@@ -109,10 +104,10 @@ export const AppTemplateProvider = memo(({ children, i18n }: AppTemplateProvider
         mode,
         showBreadcrumbs: false,
         showQuickSearch: false,
-        theme: themeID
+        theme: skin?.id ?? themeID
       }}
       i18n={i18n}
-      // themes={themes}
+      themes={themes}
     >
       {children}
     </AppRoot>

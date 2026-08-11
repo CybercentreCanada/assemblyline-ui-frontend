@@ -21,7 +21,6 @@ import {
 import { AppLocationParamProvider, AppLocationParamStoreProvider } from 'core/routes';
 import { AppSnackbarProvider } from 'core/snackbar';
 import { AppTemplateLayout, AppTemplateProvider } from 'core/template';
-import { AppThemeProvider } from 'core/theme';
 import { AppAssistantLayout, AppAssistantProvider } from 'layout/assistant';
 import { AppAuthLayout } from 'layout/auth';
 import { AppBorealisProvider } from 'layout/borealis';
@@ -157,31 +156,29 @@ const AppProviders = memo(({ children }: PropsWithChildren) => {
   const routes = useAppRoutes();
 
   return (
-    <AppThemeProvider>
-      <AppSwitcherProvider apps={apps}>
-        <AppTemplateProvider i18n={i18n}>
-          <AppErrorProvider>
-            <AppSnackbarProvider>
-              <AppApiProvider>
-                <AppAssistantProvider>
-                  <AppRouterProvider>
-                    <AppNavigationProvider>
-                      <AppLocationParamProvider routes={routes}>
-                        <AppBorealisProvider>
-                          <AppCarouselProvider>
-                            <>{children}</>
-                          </AppCarouselProvider>
-                        </AppBorealisProvider>
-                      </AppLocationParamProvider>
-                    </AppNavigationProvider>
-                  </AppRouterProvider>
-                </AppAssistantProvider>
-              </AppApiProvider>
-            </AppSnackbarProvider>
-          </AppErrorProvider>
-        </AppTemplateProvider>
-      </AppSwitcherProvider>
-    </AppThemeProvider>
+    <AppSwitcherProvider apps={apps}>
+      <AppTemplateProvider i18n={i18n}>
+        <AppErrorProvider>
+          <AppSnackbarProvider>
+            <AppApiProvider>
+              <AppAssistantProvider>
+                <AppRouterProvider>
+                  <AppNavigationProvider>
+                    <AppLocationParamProvider routes={routes}>
+                      <AppBorealisProvider>
+                        <AppCarouselProvider>
+                          <>{children}</>
+                        </AppCarouselProvider>
+                      </AppBorealisProvider>
+                    </AppLocationParamProvider>
+                  </AppNavigationProvider>
+                </AppRouterProvider>
+              </AppAssistantProvider>
+            </AppApiProvider>
+          </AppSnackbarProvider>
+        </AppErrorProvider>
+      </AppTemplateProvider>
+    </AppSwitcherProvider>
   );
 });
 

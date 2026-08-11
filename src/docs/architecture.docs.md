@@ -64,7 +64,7 @@ The foundational systems that the entire application depends on. These are frame
 - [`router/`](../core/router/router.docs.md) — Custom multi-panel router system (panels, nodes, LRU cache, reverse portals, navigation utilities)
 - [`routes/`](../core/routes/routes.docs.md) — Route definitions, route guards, lazy loading configuration
 - [`snackbar/`](../core/snackbar/snackbar.docs.md) — Toast notification system (success, error, info messages)
-- [`theme/`](../core/theme/theme.docs.md) — Theme provider, dark/light mode toggle, theme utilities
+- [`template/`](../core/template/template.docs.md) — App template/theme provider, TUI `AppRoot` integration, layout preferences
 
 ### `features/` — Reusable Domain-Agnostic Capabilities
 
