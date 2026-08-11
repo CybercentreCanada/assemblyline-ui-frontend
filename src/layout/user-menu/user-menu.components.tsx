@@ -20,20 +20,11 @@ import {
   useTheme
 } from '@mui/material';
 import type { SelectChangeEvent } from '@mui/material/Select';
-import {
-  AppAvatar,
-  AppUserAvatar,
-  useAppBar,
-  useAppBreadcrumbs,
-  useAppLanguage,
-  useAppLayout,
-  useAppPreferences,
-  useAppQuickSearch,
-  useAppTheme
-} from '@tui/core';
+import { AppAvatar, AppUserAvatar, useAppLanguage, useAppPreferences, useAppTheme } from '@tui/core';
 import { useAppConfig } from 'core/config';
 import { useAppInterfaceStore, useAppSetInterfaceStore } from 'core/interface';
 import { useAppPreferenceStore, useAppSetPreferenceStore } from 'core/preference';
+import { useAppSafeResults } from 'layout/safe-results';
 import { forwardRef, memo, useCallback, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { IconButton } from 'ui/buttons/IconButton';
@@ -117,7 +108,7 @@ const QuotaBar = memo(({ label, remaining, total }: QuotaBarProps) => {
 
   return (
     <Tooltip title={`${remaining} remaining`} placement="left">
-      <ListItem disableGutters>
+      <ListItem>
         <div style={{ display: 'flex', alignItems: 'center', width: '100%', gap: theme.spacing(2) }}>
           <Typography variant="body2" sx={{ whiteSpace: 'nowrap', minWidth: 'fit-content' }}>
             {label}
@@ -206,114 +197,107 @@ UserLanguage.displayName = 'UserLanguage';
 //*****************************************************************************************
 export const UserPersonalization = memo(() => {
   const { t } = useTranslation();
-  const theme = useTheme();
 
-  const quicksearch = useAppQuickSearch();
-  const layout = useAppLayout();
-  const breadcrumbs = useAppBreadcrumbs();
-  const appbar = useAppBar();
-  const {
-    allowTranslate,
-    allowPersonalization,
-    allowLayoutSelection,
-    allowQuickSearch,
-    allowBreadcrumbs,
-    allowAutoHideTopbar,
-    allowReset,
-    allowThemeSelection,
-    allowDensitySelection
-  } = useAppPreferences();
+  const layoutMode = useAppPreferenceStore(s => s.layout.layout);
+  const autoHideAppbar = useAppPreferenceStore(s => s.layout.autoHideAppbar);
+  const showQuickSearch = useAppPreferenceStore(s => s.layout.showQuickSearch);
+  const showBreadcrumbs = useAppPreferenceStore(s => s.layout.showBreadcrumbs);
+  const { showSafeResults, toggleShowSafeResults } = useAppSafeResults();
 
-  const setTemplateStore = useAppSetInterfaceStore();
+  const setPreferenceStore = useAppSetPreferenceStore();
+  const setInterfaceStore = useAppSetInterfaceStore();
 
-  const isSmDown = useMediaQuery(theme.breakpoints.down('sm'));
+  const toggleLayoutMode = useCallback(() => {
+    setPreferenceStore(s => {
+      s.layout.layout = s.layout.layout === 'top' ? 'side' : 'top';
+      return s;
+    });
+    setInterfaceStore(s => {
+      s.usermenu.open = false;
+      return s;
+    });
+  }, [setPreferenceStore, setInterfaceStore]);
 
-  return !allowPersonalization ? null : (
+  const toggleShowQuickSearch = useCallback(() => {
+    setPreferenceStore(s => {
+      s.layout.showQuickSearch = !s.layout.showQuickSearch;
+      return s;
+    });
+  }, [setPreferenceStore]);
+
+  const toggleAutoHideAppbar = useCallback(() => {
+    setPreferenceStore(s => {
+      s.layout.autoHideAppbar = !s.layout.autoHideAppbar;
+      return s;
+    });
+  }, [setPreferenceStore]);
+
+  const toggleShowBreadcrumbs = useCallback(() => {
+    setPreferenceStore(s => {
+      s.layout.showBreadcrumbs = !s.layout.showBreadcrumbs;
+      return s;
+    });
+  }, [setPreferenceStore]);
+
+  return (
     <>
       <Divider />
       <List dense subheader={<ListSubheader disableSticky>{t('personalization')}</ListSubheader>}>
-        {allowLayoutSelection && (
-          <ListItem
-            disablePadding
-            secondaryAction={
-              <Switch
-                edge="end"
-                checked={layout.current === 'top'}
-                onClick={() => {
-                  layout.toggle();
-                  setTemplateStore(s => {
-                    s.usermenu.open = false;
-                    return s;
-                  });
-                }}
-              />
-            }
+        <ListItem
+          disablePadding
+          secondaryAction={<Switch edge="end" checked={layoutMode === 'top'} onClick={toggleLayoutMode} />}
+        >
+          <ListItemButton id="personalization-sticky" onClick={toggleLayoutMode}>
+            <ListItemText>{t('personalization.sticky')}</ListItemText>
+          </ListItemButton>
+        </ListItem>
+
+        <ListItem
+          disablePadding
+          secondaryAction={<Switch edge="end" checked={showQuickSearch} onClick={toggleShowQuickSearch} />}
+        >
+          <ListItemButton onClick={toggleShowQuickSearch} id="personalization-quicksearch">
+            <ListItemText>{t('personalization.quicksearch')}</ListItemText>
+          </ListItemButton>
+        </ListItem>
+
+        <ListItem
+          disablePadding
+          secondaryAction={
+            <Switch
+              edge="end"
+              disabled={layoutMode === 'top'}
+              checked={autoHideAppbar && layoutMode !== 'top'}
+              onClick={toggleAutoHideAppbar}
+            />
+          }
+        >
+          <ListItemButton
+            disabled={layoutMode === 'top'}
+            onClick={toggleAutoHideAppbar}
+            id="personalization-autohideappbar"
           >
-            <ListItemButton
-              id="personalization-sticky"
-              onClick={() => {
-                layout.toggle();
-                setTemplateStore(s => {
-                  s.usermenu.open = false;
-                  return s;
-                });
-              }}
-            >
-              <ListItemText>{t('personalization.sticky')}</ListItemText>
-            </ListItemButton>
-          </ListItem>
-        )}
-        {allowQuickSearch && !isSmDown && (
-          <ListItem
-            disablePadding
-            secondaryAction={<Switch edge="end" checked={quicksearch.show} onClick={quicksearch.toggle} />}
-          >
-            <ListItemButton onClick={quicksearch.toggle}>
-              <ListItemText>{t('personalization.quicksearch')}</ListItemText>
-            </ListItemButton>
-          </ListItem>
-        )}
-        {allowAutoHideTopbar && (
-          <ListItem
-            disablePadding
-            secondaryAction={
-              <Switch
-                edge="end"
-                disabled={layout.current === 'top'}
-                checked={appbar.autoHide && layout.current !== 'top'}
-                onClick={appbar.toggleAutoHide}
-              />
-            }
-          >
-            <ListItemButton
-              disabled={layout.current === 'top'}
-              onClick={appbar.toggleAutoHide}
-              id="personalization-autohideappbar"
-            >
-              <ListItemText>{t('personalization.autohideappbar')}</ListItemText>
-            </ListItemButton>
-          </ListItem>
-        )}
-        {allowBreadcrumbs && !isSmDown && (
-          <ListItem
-            disablePadding
-            secondaryAction={<Switch edge="end" checked={breadcrumbs.show} onClick={breadcrumbs.toggle} />}
-          >
-            <ListItemButton onClick={breadcrumbs.toggle} id="personalization-showbreadcrumbs">
-              <ListItemText>{t('personalization.showbreadcrumbs')}</ListItemText>
-            </ListItemButton>
-          </ListItem>
-        )}
-        {allowBreadcrumbs && !isSmDown && (
-          <ListItem
-            disablePadding
-            secondaryAction={<Switch edge="end" checked={breadcrumbs.show} onClick={breadcrumbs.toggle} />}
-          >
-            <ListItemButton onClick={breadcrumbs.toggle} id="personalization-showsaferesults">
-              <ListItemText>{t('personalization.showsaferesults')}</ListItemText>
-            </ListItemButton>
-          </ListItem>
-        )}
+            <ListItemText>{t('personalization.autohideappbar')}</ListItemText>
+          </ListItemButton>
+        </ListItem>
+
+        <ListItem
+          disablePadding
+          secondaryAction={<Switch edge="end" checked={showBreadcrumbs} onClick={toggleShowBreadcrumbs} />}
+        >
+          <ListItemButton onClick={toggleShowBreadcrumbs} id="personalization-showbreadcrumbs">
+            <ListItemText>{t('personalization.showbreadcrumbs')}</ListItemText>
+          </ListItemButton>
+        </ListItem>
+
+        <ListItem
+          disablePadding
+          secondaryAction={<Switch edge="end" checked={showSafeResults} onClick={toggleShowSafeResults} />}
+        >
+          <ListItemButton onClick={toggleShowSafeResults} id="personalization-showsaferesults">
+            <ListItemText>{t('personalization.showsaferesults')}</ListItemText>
+          </ListItemButton>
+        </ListItem>
       </List>
     </>
   );
@@ -329,9 +313,7 @@ export const UserTheme = memo(() => {
 
   const { mode, toggleMode: toggleThemeMode } = useAppTheme();
 
-  const { allowThemeSelection } = useAppPreferences();
-
-  const themeMode = useAppPreferenceStore(s => s.theme.mode);
+  const themeMode = useAppPreferenceStore(s => s.layout.mode);
 
   const setPreferenceStore = useAppSetPreferenceStore();
 
@@ -343,7 +325,7 @@ export const UserTheme = memo(() => {
       if (value === themeMode) return;
 
       setPreferenceStore(s => {
-        s.theme.mode = value;
+        s.layout.mode = value;
         return s;
       });
 
@@ -356,7 +338,7 @@ export const UserTheme = memo(() => {
     [mode, prefersDarkMode, setPreferenceStore, themeMode, toggleThemeMode]
   );
 
-  return !allowThemeSelection ? null : (
+  return (
     <>
       <Divider />
       <List dense subheader={<ListSubheader disableSticky>{t('thememenu')}</ListSubheader>}>

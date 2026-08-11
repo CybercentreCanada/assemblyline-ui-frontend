@@ -17,7 +17,7 @@ export type UseAppSafeResults = {
 export const useAppSafeResults = (): UseAppSafeResults => {
   const setAppPreferences = useAppSetPreferenceStore();
 
-  const showSafeResults = useAppPreferenceStore(s => s.safeResults.show || true);
+  const showSafeResults = useAppPreferenceStore(s => s.safeResults.show ?? true);
 
   const toggleShowSafeResults = useCallback(() => {
     setAppPreferences(s => {

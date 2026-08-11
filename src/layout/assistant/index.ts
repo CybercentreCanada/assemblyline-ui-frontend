@@ -6,4 +6,3 @@ export type {
   ContextMessageProps
 } from './assistant.models';
 export { AppAssistantContext, AppAssistantLayout, AppAssistantProvider } from './assistant.providers';
-export { AppAssistantStoreProvider, useAppAssistantStore, useAppAssistantStoreApi } from './assistant.store';

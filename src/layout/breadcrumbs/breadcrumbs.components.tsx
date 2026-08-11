@@ -1,6 +1,7 @@
 import { MoreHoriz } from '@mui/icons-material';
 import { Link, Breadcrumbs as MuiBreadcrumbs, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
 import { getAppConfigStateFromApi, useAppConfigStoreApi } from 'core/config';
+import { useAppPreferenceStore } from 'core/preference';
 import type { InferAppNavigationPropsFromPath } from 'core/router';
 import { AppLink, getPageFromPanelKey, useAppRouterStore } from 'core/router';
 import {
@@ -136,6 +137,7 @@ BreadcrumbsEllipsis.displayName = 'BreadcrumbsEllipsis';
 export const AppBreadcrumbs = memo(() => {
   const theme = useTheme();
   const locationParamStoreApi = useAppLocationParamStoreApi();
+  const showBreadcrumbs = useAppPreferenceStore(store => store.layout.showBreadcrumbs);
 
   const [expanded, setExpanded] = useState<boolean>(false);
 
@@ -162,7 +164,7 @@ export const AppBreadcrumbs = memo(() => {
   const last = after[after.length - 1];
   const middle = after.slice(0, -1);
 
-  return (
+  return !showBreadcrumbs ? null : (
     <MuiBreadcrumbs
       aria-label="breadcrumb"
       maxItems={1000}

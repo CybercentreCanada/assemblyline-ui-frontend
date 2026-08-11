@@ -1,4 +1,3 @@
-import { DEFAULT_APP_INTERFACE_STORE } from 'app/core.interface';
 import { createAppStore } from 'features/store/createAppStore';
 
 //*****************************************************************************************
@@ -10,6 +9,6 @@ export const {
   useStore: useAppInterfaceStore,
   useSetStore: useAppSetInterfaceStore,
   useStoreApi: useAppInterfaceStoreApi
-} = createAppStore<AppInterfaceStore>(DEFAULT_APP_INTERFACE_STORE);
+} = createAppStore<AppInterfaceStore>(null);
 
 AppInterfaceStoreProvider.displayName = 'AppInterfaceStoreProvider';

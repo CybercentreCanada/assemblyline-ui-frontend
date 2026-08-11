@@ -1,7 +1,7 @@
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 import LinkIcon from '@mui/icons-material/Link';
 import { Button, useTheme } from '@mui/material';
-import { useAppTemplateLeftNav } from 'app/layout.left-nav';
+import { useAppTemplateLeftNav } from 'app/core.template';
 import { getAppConfigStateFromApi, useAppConfigStoreApi } from 'core/config';
 import { AppLink } from 'core/router';
 import {

@@ -274,11 +274,9 @@ QuickSearchResult.displayName = 'QuickSearchResult';
 //*****************************************************************************************
 
 export const QuickSearch = memo(() => {
-  const theme = useTheme();
   const { t } = useTranslation(['quicksearch']);
-  const rootRef = useRef<HTMLDivElement>(null);
-  const isPhoneMode = useMediaQuery(theme.breakpoints.only('xs'));
-  const isTabletMode = useMediaQuery(theme.breakpoints.only('sm'));
+  const theme = useTheme();
+  const navigate = useAppNavigate();
 
   const showQuickSearch = useAppPreferenceStore(store => store.layout.showQuickSearch);
   const value = useAppInterfaceStore(store => store.quicksearch.value);
@@ -290,8 +288,11 @@ export const QuickSearch = memo(() => {
   const items = useAppInterfaceStore(store => store.quicksearch.items);
   const setInterfaceStore = useAppSetInterfaceStore();
 
-  const navigate = useAppNavigate();
+  const rootRef = useRef<HTMLDivElement>(null);
   const requestId = useRef<number>(0);
+
+  const isPhoneMode = useMediaQuery(theme.breakpoints.only('xs'));
+  const isTabletMode = useMediaQuery(theme.breakpoints.only('sm'));
 
   const patch = useCallback(
     (next: Partial<AppInterfaceStore['quicksearch']>) => {

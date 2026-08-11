@@ -2,9 +2,9 @@ import type { ThemeProviderProps } from '@mui/material';
 import { createTheme, CssBaseline, StyledEngineProvider, ThemeProvider, useMediaQuery } from '@mui/material';
 import { useAppInterfaceStore, useAppSetInterfaceStore } from 'core/interface';
 import { useAppPreferenceStore } from 'core/preference';
+import { mergeThemeConfigs } from 'core/theme/theme.utils';
 import type { PropsWithChildren } from 'react';
 import { memo, useEffect, useMemo } from 'react';
-import { mergeThemeConfigs } from './theme.utils';
 
 //*****************************************************************************************
 // App Theme Provider

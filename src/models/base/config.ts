@@ -1,5 +1,4 @@
-// TODO: Migrate AppSwitcherItem from commons/components/app/AppConfigs
-type AppSwitcherItem = any;
+import type { AppSwitcherItem } from '@tui/apps';
 import type { ServiceSelection } from 'models/base/submission';
 import type { ACL, Role, Type } from 'models/base/user';
 

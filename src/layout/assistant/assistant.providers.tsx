@@ -23,11 +23,11 @@ import {
 import MuiPopper from '@mui/material/Popper';
 import { styled } from '@mui/material/styles';
 import { AppAvatar } from '@tui/core';
+import { useAppInterfaceStore, useAppSetInterfaceStore } from 'core/interface';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import { isEnter } from 'deprecated/utils/keyboard';
 import type { AssistantContextProps, AssistantInsightProps, ContextMessageProps } from 'layout/assistant';
-import { useAppAssistantStore, useAppAssistantStoreApi } from 'layout/assistant/assistant.store';
 import type { PropsWithChildren } from 'react';
 import React, { createContext, memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -68,8 +68,8 @@ export const AppAssistantContext = createContext<AssistantContextProps>(null);
 export const AppAssistantProvider = memo(({ children }: PropsWithChildren) => {
   const { user: currentUser, configuration } = useALContext();
 
-  const storeApi = useAppAssistantStoreApi();
-  const hasInsights = useAppAssistantStore(s => s.insights?.length > 0);
+  const setInterface = useAppSetInterfaceStore();
+  const hasInsights = useAppInterfaceStore(s => s.assistant.currentInsights.length > 0);
 
   const assistantAllowed = useMemo<boolean>(
     () => !!(currentUser?.roles.includes('assistant_use') && configuration?.ui.ai.enabled),
@@ -77,27 +77,34 @@ export const AppAssistantProvider = memo(({ children }: PropsWithChildren) => {
   );
 
   const toggleAssistant = useCallback(() => {
-    storeApi?.setState(prev => ({ open: !prev.open }));
-  }, [storeApi]);
+    setInterface(s => {
+      s.assistant.open = !s.assistant.open;
+      return s;
+    });
+  }, [setInterface]);
 
   const addInsight = useCallback(
     (insight: AssistantInsightProps) => {
-      storeApi?.setState(prev => ({
-        insights: prev.insights.some(i => i.type === insight.type && i.value === insight.value)
-          ? prev.insights
-          : [...prev.insights, insight]
-      }));
+      setInterface(s => {
+        if (!s.assistant.currentInsights.some(i => i.type === insight.type && i.value === insight.value)) {
+          s.assistant.currentInsights = [...s.assistant.currentInsights, insight];
+        }
+        return s;
+      });
     },
-    [storeApi]
+    [setInterface]
   );
 
   const removeInsight = useCallback(
     (insight: AssistantInsightProps) => {
-      storeApi?.setState(prev => ({
-        insights: prev.insights.filter(i => !(i.type === insight.type && i.value === insight.value))
-      }));
+      setInterface(s => {
+        s.assistant.currentInsights = s.assistant.currentInsights.filter(
+          i => !(i.type === insight.type && i.value === insight.value)
+        );
+        return s;
+      });
     },
-    [storeApi]
+    [setInterface]
   );
 
   const contextValue = useMemo(
@@ -116,16 +123,17 @@ export const AppAssistantLayout = memo(({ children }: PropsWithChildren) => {
   const { user: currentUser, configuration } = useALContext();
   const { apiCall } = useMyAPI();
 
-  const currentInsights = useAppAssistantStore(s => s.insights);
-  const hasInsights = useAppAssistantStore(s => s.insights?.length > 0);
-  const open = useAppAssistantStore(s => s.open);
-  const storeApi = useAppAssistantStoreApi();
+  const currentInsights = useAppInterfaceStore(s => s.assistant.currentInsights);
+  const hasInsights = useAppInterfaceStore(s => s.assistant.currentInsights.length > 0);
+  const open = useAppInterfaceStore(s => s.assistant.open);
+  const thinking = useAppInterfaceStore(s => s.assistant.thinking);
+  const currentContext = useAppInterfaceStore(s => s.assistant.currentContext);
+  const currentHistory = useAppInterfaceStore(s => s.assistant.currentHistory);
+  const currentInput = useAppInterfaceStore(s => s.assistant.currentInput);
+
+  const setInterface = useAppSetInterfaceStore();
 
   const [anchorEl, setAnchorEl] = useState(null);
-  const [thinking, setThinking] = useState<boolean>(false);
-  const [currentContext, setCurrentContext] = useState<ContextMessageProps[]>([]);
-  const [currentHistory, setCurrentHistory] = useState<ContextMessageProps[]>([]);
-  const [currentInput, setCurrentInput] = useState<string>('');
 
   const inputRef = useRef(null);
   const chatRef = useRef(null);
@@ -141,10 +149,20 @@ export const AppAssistantLayout = memo(({ children }: PropsWithChildren) => {
   const toggleAssistant = useCallback(
     (target: EventTarget) => {
       setAnchorEl(target);
-      storeApi?.setState(prev => ({ open: !prev.open }));
+      setInterface(s => {
+        s.assistant.open = !s.assistant.open;
+        return s;
+      });
     },
-    [storeApi]
+    [setInterface]
   );
+
+  const closeAssistant = useCallback(() => {
+    setInterface(s => {
+      s.assistant.open = false;
+      return s;
+    });
+  }, [setInterface]);
 
   const askAssistant = useCallback(() => {
     const data = [...currentContext];
@@ -152,37 +170,61 @@ export const AppAssistantLayout = memo(({ children }: PropsWithChildren) => {
     const newUserQuestion = { role: 'user' as const, content: currentInput };
     data.push(newUserQuestion);
     history.push(newUserQuestion);
-    setCurrentContext(data);
-    setCurrentHistory(history);
-    setCurrentInput('');
+
+    setInterface(s => {
+      s.assistant.currentContext = data;
+      s.assistant.currentHistory = history;
+      s.assistant.currentInput = '';
+      return s;
+    });
+
     apiCall({
       method: 'POST',
       body: data,
       url: `/api/v4/assistant/?lang=${i18n.language === 'en' ? 'english' : 'french'}`,
       onSuccess: api_data => {
-        setCurrentContext(api_data.api_response.trace);
-        setCurrentHistory([...history, ...api_data.api_response.trace.slice(-1)]);
+        setInterface(s => {
+          s.assistant.currentContext = api_data.api_response.trace;
+          s.assistant.currentHistory = [...history, ...api_data.api_response.trace.slice(-1)];
+          return s;
+        });
       },
       onFailure: api_data =>
-        setCurrentHistory([...history, { role: 'assistant', content: api_data.api_error_message, isError: true }]),
-      onEnter: () => setThinking(true),
+        setInterface(s => {
+          s.assistant.currentHistory = [
+            ...history,
+            { role: 'assistant', content: api_data.api_error_message, isError: true }
+          ];
+          return s;
+        }),
+      onEnter: () =>
+        setInterface(s => {
+          s.assistant.thinking = true;
+          return s;
+        }),
       onFinalize: () => {
-        setThinking(false);
+        setInterface(s => {
+          s.assistant.thinking = false;
+          return s;
+        });
 
         setTimeout(() => {
           inputRef.current.focus();
         }, 250);
       }
     });
-  }, [currentContext, currentHistory, currentInput, i18n.language]);
+  }, [currentContext, currentHistory, currentInput, i18n.language, setInterface]);
 
   const askAssistantWithInsight = useCallback(
     (insight: AssistantInsightProps) => {
-      setCurrentHistory(history => [
-        ...history,
-        { role: 'system', content: `"Default system prompt for insight: ${insight.type}`, isInsight: true },
-        { role: 'user', content: `${t(`insight.${insight.type}`)}: ${insight.value}`, isInsight: true }
-      ]);
+      setInterface(s => {
+        s.assistant.currentHistory = [
+          ...s.assistant.currentHistory,
+          { role: 'system', content: `"Default system prompt for insight: ${insight.type}`, isInsight: true },
+          { role: 'user', content: `${t(`insight.${insight.type}`)}: ${insight.value}`, isInsight: true }
+        ];
+        return s;
+      });
       if (insight.type === 'submission' || insight.type === 'report') {
         apiCall({
           method: 'GET',
@@ -190,17 +232,30 @@ export const AppAssistantLayout = memo(({ children }: PropsWithChildren) => {
             insight.type === 'report' ? 'detailed&' : ''
           }with_trace`,
           onSuccess: api_data => {
-            setCurrentContext(api_data.api_response.trace);
-            setCurrentHistory(history => [...history, ...api_data.api_response.trace.splice(-1)]);
+            setInterface(s => {
+              s.assistant.currentContext = api_data.api_response.trace;
+              s.assistant.currentHistory = [...s.assistant.currentHistory, ...api_data.api_response.trace.splice(-1)];
+              return s;
+            });
           },
           onFailure: api_data =>
-            setCurrentHistory(history => [
-              ...history,
-              { role: 'assistant', content: api_data.api_error_message, isError: true }
-            ]),
-          onEnter: () => setThinking(true),
+            setInterface(s => {
+              s.assistant.currentHistory = [
+                ...s.assistant.currentHistory,
+                { role: 'assistant', content: api_data.api_error_message, isError: true }
+              ];
+              return s;
+            }),
+          onEnter: () =>
+            setInterface(s => {
+              s.assistant.thinking = true;
+              return s;
+            }),
           onFinalize: () => {
-            setThinking(false);
+            setInterface(s => {
+              s.assistant.thinking = false;
+              return s;
+            });
 
             setTimeout(() => {
               inputRef.current.focus();
@@ -212,17 +267,30 @@ export const AppAssistantLayout = memo(({ children }: PropsWithChildren) => {
           method: 'GET',
           url: `/api/v4/file/ai/${insight.value}/?lang=${i18n.language === 'en' ? 'english' : 'french'}&with_trace`,
           onSuccess: api_data => {
-            setCurrentContext(api_data.api_response.trace);
-            setCurrentHistory(history => [...history, ...api_data.api_response.trace.splice(-1)]);
+            setInterface(s => {
+              s.assistant.currentContext = api_data.api_response.trace;
+              s.assistant.currentHistory = [...s.assistant.currentHistory, ...api_data.api_response.trace.splice(-1)];
+              return s;
+            });
           },
           onFailure: api_data =>
-            setCurrentHistory(history => [
-              ...history,
-              { role: 'assistant', content: api_data.api_error_message, isError: true }
-            ]),
-          onEnter: () => setThinking(true),
+            setInterface(s => {
+              s.assistant.currentHistory = [
+                ...s.assistant.currentHistory,
+                { role: 'assistant', content: api_data.api_error_message, isError: true }
+              ];
+              return s;
+            }),
+          onEnter: () =>
+            setInterface(s => {
+              s.assistant.thinking = true;
+              return s;
+            }),
           onFinalize: () => {
-            setThinking(false);
+            setInterface(s => {
+              s.assistant.thinking = false;
+              return s;
+            });
 
             setTimeout(() => {
               inputRef.current.focus();
@@ -236,17 +304,30 @@ export const AppAssistantLayout = memo(({ children }: PropsWithChildren) => {
             i18n.language === 'en' ? 'english' : 'french'
           }&with_trace`,
           onSuccess: api_data => {
-            setCurrentContext(api_data.api_response.trace);
-            setCurrentHistory(history => [...history, ...api_data.api_response.trace.splice(-1)]);
+            setInterface(s => {
+              s.assistant.currentContext = api_data.api_response.trace;
+              s.assistant.currentHistory = [...s.assistant.currentHistory, ...api_data.api_response.trace.splice(-1)];
+              return s;
+            });
           },
           onFailure: api_data =>
-            setCurrentHistory(history => [
-              ...history,
-              { role: 'assistant', content: api_data.api_error_message, isError: true }
-            ]),
-          onEnter: () => setThinking(true),
+            setInterface(s => {
+              s.assistant.currentHistory = [
+                ...s.assistant.currentHistory,
+                { role: 'assistant', content: api_data.api_error_message, isError: true }
+              ];
+              return s;
+            }),
+          onEnter: () =>
+            setInterface(s => {
+              s.assistant.thinking = true;
+              return s;
+            }),
           onFinalize: () => {
-            setThinking(false);
+            setInterface(s => {
+              s.assistant.thinking = false;
+              return s;
+            });
 
             setTimeout(() => {
               inputRef.current.focus();
@@ -255,7 +336,7 @@ export const AppAssistantLayout = memo(({ children }: PropsWithChildren) => {
         });
       }
     },
-    [i18n.language, t]
+    [i18n.language, setInterface, t]
   );
 
   const buildDefaultSystemMessage = useCallback(
@@ -265,18 +346,24 @@ export const AppAssistantLayout = memo(({ children }: PropsWithChildren) => {
 
   const clearAssistant = useCallback(() => {
     const defaultSystemPrompt = buildDefaultSystemMessage();
-    setCurrentContext([defaultSystemPrompt]);
-    setCurrentHistory([defaultSystemPrompt]);
-  }, [buildDefaultSystemMessage]);
+    setInterface(s => {
+      s.assistant.currentContext = [defaultSystemPrompt];
+      s.assistant.currentHistory = [defaultSystemPrompt];
+      return s;
+    });
+  }, [buildDefaultSystemMessage, setInterface]);
 
   const resetAssistant = useCallback(() => {
     const defaultSystemPrompt = buildDefaultSystemMessage();
     const lastPrompt = currentHistory[currentHistory.length - 1];
-    setCurrentContext([defaultSystemPrompt]);
-    if (lastPrompt?.content !== defaultSystemPrompt.content) {
-      setCurrentHistory([...currentHistory, defaultSystemPrompt]);
-    }
-  }, [buildDefaultSystemMessage, currentHistory]);
+    setInterface(s => {
+      s.assistant.currentContext = [defaultSystemPrompt];
+      if (lastPrompt?.content !== defaultSystemPrompt.content) {
+        s.assistant.currentHistory = [...currentHistory, defaultSystemPrompt];
+      }
+      return s;
+    });
+  }, [buildDefaultSystemMessage, currentHistory, setInterface]);
 
   const onKeyDown = useCallback(
     (event: React.KeyboardEvent) => {
@@ -287,9 +374,15 @@ export const AppAssistantLayout = memo(({ children }: PropsWithChildren) => {
     [askAssistant]
   );
 
-  const handleInputChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-    setCurrentInput(event.target.value);
-  }, []);
+  const handleInputChange = useCallback(
+    (event: React.ChangeEvent<HTMLInputElement>) => {
+      setInterface(s => {
+        s.assistant.currentInput = event.target.value;
+        return s;
+      });
+    },
+    [setInterface]
+  );
 
   useEffect(() => {
     if (open && currentContext.length === 1) {
@@ -336,7 +429,7 @@ export const AppAssistantLayout = memo(({ children }: PropsWithChildren) => {
             zIndex: 1300
           }}
         >
-          <Backdrop open={open} onClick={() => storeApi?.setState({ open: false })}>
+          <Backdrop open={open} onClick={closeAssistant}>
             <Popper
               sx={{
                 zIndex: 1301,

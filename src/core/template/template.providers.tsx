@@ -1,15 +1,11 @@
+import { useMediaQuery } from '@mui/material';
 import { useAppSwitcher } from '@tui/apps';
-import type { AppPreferenceConfigs } from '@tui/core';
+import type { AppPreferenceConfigs, AppRouterAdapter, AppUserService } from '@tui/core';
 import { AppProvider, AppRoot, useAppLayout, useAppUser } from '@tui/core';
 import { useAppPreferenceStore } from 'core/preference';
-import { useAppPreferences } from 'core/template/hooks/useAppPreferences';
-import { useAppTemplateRouter } from 'core/template/hooks/useAppTemplateRouter';
-import { useAppTemplateUser } from 'core/template/hooks/useAppTemplateUser';
-import { useAppTemplateThemeMode } from 'core/template/template.hooks';
 import type { i18n } from 'i18next';
-import type { AppLeftNavItem } from 'layout/left-nav';
 import type { PropsWithChildren } from 'react';
-import { memo, useEffect } from 'react';
+import { memo, useEffect, useMemo } from 'react';
 
 //*****************************************************************************************
 // App Auth Store
@@ -37,11 +33,13 @@ const Inner = ({ children }: PropsWithChildren) => {
 //*****************************************************************************************
 
 export type AppTemplateLayoutProps = PropsWithChildren<{
-  preferences: AppPreferenceConfigs;
-  leftNav: AppLeftNavItem[];
+  preferences?: AppPreferenceConfigs;
+  router: AppRouterAdapter;
+  // search?: AppSearchService;
+  user?: AppUserService<unknown>;
 }>;
 
-export const AppTemplateLayout = memo(({ children, preferences, leftNav }: AppTemplateLayoutProps) => {
+export const AppTemplateLayout = memo(({ children, preferences, router, user }: AppTemplateLayoutProps) => {
   // const cookies = parseTuiClientCookies();
 
   // const myPreferences: AppPreferenceConfigs = useMyPreferences();
@@ -49,15 +47,12 @@ export const AppTemplateLayout = memo(({ children, preferences, leftNav }: AppTe
   // const myAccessibility = useMyAccessibility();
   // const myNotification = useMyNotification();
   // const myApps = useMyApps();
-  const appPreferences = useAppPreferences({ preferences, leftNav });
-  const appTemplateRouter = useAppTemplateRouter();
-  const appTemplateUser = useAppTemplateUser();
 
   return (
     <AppProvider
-      preferences={appPreferences}
-      router={appTemplateRouter}
-      user={appTemplateUser}
+      preferences={preferences}
+      router={router}
+      user={user}
       // preferences={null}
       // sitemap={{}}
       // theme={{}}
@@ -89,13 +84,19 @@ export const AppTemplateProvider = memo(({ children, i18n }: AppTemplateProvider
   const drawerOpen = useAppPreferenceStore(s => s.layout.drawerOpen);
   const lang = useAppPreferenceStore(s => s.layout.lang);
   const layout = useAppPreferenceStore(s => s.layout.layout);
-  const showBreadcrumbs = useAppPreferenceStore(s => s.layout.showBreadcrumbs);
-  const showQuickSearch = useAppPreferenceStore(s => s.layout.showQuickSearch);
   const themeID = useAppPreferenceStore(s => s.layout.theme);
 
-  const mode = useAppTemplateThemeMode();
+  // const mode = useAppTemplateThemeMode();
   // const skin = useAppInterfaceStore(s => s.theme.skin);
   // const themes = useMemo(() => (skin ? [skin] : []), [skin]);
+
+  const requestedMode = useAppPreferenceStore(s => s.layout.mode);
+  const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
+
+  const mode = useMemo(
+    () => (requestedMode === 'system' ? (prefersDarkMode ? 'dark' : 'light') : requestedMode),
+    [requestedMode, prefersDarkMode]
+  );
 
   return (
     <AppRoot
@@ -106,8 +107,8 @@ export const AppTemplateProvider = memo(({ children, i18n }: AppTemplateProvider
         lang,
         layout,
         mode,
-        showBreadcrumbs,
-        showQuickSearch,
+        showBreadcrumbs: false,
+        showQuickSearch: false,
         theme: themeID
       }}
       i18n={i18n}

@@ -73,7 +73,7 @@ import { SubmissionDetailRoute } from 'routes/submission-detail/submission-detai
 import { SubmissionRedirectRoute } from 'routes/submission-redirect/submission-redirect.route';
 import { SubmissionReportRoute } from 'routes/submission-report/submission-report.route';
 import { SubmissionsRoute } from 'routes/submissions/submissions.route';
-import { SubmitRoute } from 'routes/submit/submit.route';
+import { SubmitRootRoute, SubmitRoute } from 'routes/submit/submit.route';
 import { AccountRoute, AdminUserDetailRoute } from 'routes/user/user.route';
 
 const APP_ROUTES = [
@@ -153,6 +153,7 @@ const APP_ROUTES = [
   SubmissionRedirectRoute,
   SubmissionReportRoute,
   SubmissionsRoute,
+  SubmitRootRoute,
   SubmitRoute,
   ToSRoute
 ] as const;

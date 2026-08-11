@@ -435,3 +435,29 @@ export const SubmitRoute = createAppRoute({
   disabled: () => false,
   forbidden: () => false
 });
+
+export const SubmitRootRoute = createAppRoute({
+  component: SubmitPage,
+
+  path: '/',
+  search: s => ({
+    classification: s.string(null),
+    hash: s.string(null),
+    profile: s.string(null),
+    // metadata: s.object(null), // TODO: fix this
+    raw: s.string(''),
+    description: s.string(''),
+    priority: s.number(null),
+    ttl: s.number(null),
+    'params.filetype_override': s.string(null)
+  }),
+
+  ancestor: null,
+  shortname: () => ({ i18nKey: 'drawer.submit', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'drawer.submit', ns: 'app' }),
+  shorticon: () => <PublishOutlinedIcon />,
+  fullicon: () => <PublishOutlinedIcon />,
+
+  disabled: () => false,
+  forbidden: () => false
+});

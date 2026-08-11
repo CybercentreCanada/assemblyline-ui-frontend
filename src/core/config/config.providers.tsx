@@ -8,6 +8,6 @@ export const {
   useStore: useAppConfig,
   useSetStore: useAppSetConfig,
   useStoreApi: useAppConfigStoreApi
-} = createAppStore<AppConfigStore>({});
+} = createAppStore<AppConfigStore>(null);
 
 AppConfigStoreProvider.displayName = 'AppConfigStoreProvider';

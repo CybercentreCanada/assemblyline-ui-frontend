@@ -1,9 +1,12 @@
+import { AppSwitcherProvider } from '@tui/apps';
+import { DEFAULT_APP_CONFIG_STORE } from 'app/core.config';
 import { i18n } from 'app/core.i18n';
+import { DEFAULT_APP_INTERFACE_STORE } from 'app/core.interface';
+import { DEFAULT_APP_PREFERENCE_STORE } from 'app/core.preference';
 import { useAppRoutes } from 'app/core.routes';
-import { useAppTemplateLeftNav } from 'app/layout.left-nav';
-import { useAppTemplatePreferences } from 'app/layout.preferences';
+import { useAppTemplatePreferences, useAppTemplateRouter, useAppTemplateUser } from 'app/core.template';
 import { AppApiProvider } from 'core/api';
-import { AppConfigStoreProvider } from 'core/config';
+import { AppConfigStoreProvider, useAppConfig } from 'core/config';
 import { AppErrorProvider } from 'core/error';
 import { AppInterfaceStoreProvider } from 'core/interface';
 import { AppPreferenceStoreProvider } from 'core/preference';
@@ -19,7 +22,7 @@ import { AppLocationParamProvider, AppLocationParamStoreProvider } from 'core/ro
 import { AppSnackbarProvider } from 'core/snackbar';
 import { AppTemplateLayout, AppTemplateProvider } from 'core/template';
 import { AppThemeProvider } from 'core/theme';
-import { AppAssistantLayout, AppAssistantProvider, AppAssistantStoreProvider } from 'layout/assistant';
+import { AppAssistantLayout, AppAssistantProvider } from 'layout/assistant';
 import { AppAuthLayout } from 'layout/auth';
 import { AppBorealisProvider } from 'layout/borealis';
 import { AppCarouselProvider } from 'layout/carousel';
@@ -124,15 +127,16 @@ import { memo, StrictMode } from 'react';
 //*****************************************************************************************
 
 export const AppLayout = memo(() => {
-  const leftNav = useAppTemplateLeftNav();
   const preferences = useAppTemplatePreferences();
+  const router = useAppTemplateRouter();
+  const user = useAppTemplateUser();
 
   return (
     <AppAuthLayout>
       <AppAssistantLayout>
         <AppRouterLayout>
           <AppDrawerLayout content={<AppRouterPanelLayout panelKey={1} />}>
-            <AppTemplateLayout leftNav={leftNav} preferences={preferences}>
+            <AppTemplateLayout preferences={preferences} router={router} user={user}>
               <AppRouterPanelLayout panelKey={0} />
             </AppTemplateLayout>
           </AppDrawerLayout>
@@ -149,31 +153,34 @@ AppLayout.displayName = 'AppLayout';
 //*****************************************************************************************
 
 const AppProviders = memo(({ children }: PropsWithChildren) => {
+  const apps = useAppConfig(s => s?.configuration?.ui?.apps || []);
   const routes = useAppRoutes();
 
   return (
     <AppThemeProvider>
-      <AppTemplateProvider i18n={i18n}>
-        <AppErrorProvider>
-          <AppSnackbarProvider>
-            <AppApiProvider>
-              <AppAssistantProvider>
-                <AppRouterProvider>
-                  <AppNavigationProvider>
-                    <AppLocationParamProvider routes={routes}>
-                      <AppBorealisProvider>
-                        <AppCarouselProvider>
-                          <>{children}</>
-                        </AppCarouselProvider>
-                      </AppBorealisProvider>
-                    </AppLocationParamProvider>
-                  </AppNavigationProvider>
-                </AppRouterProvider>
-              </AppAssistantProvider>
-            </AppApiProvider>
-          </AppSnackbarProvider>
-        </AppErrorProvider>
-      </AppTemplateProvider>
+      <AppSwitcherProvider apps={apps}>
+        <AppTemplateProvider i18n={i18n}>
+          <AppErrorProvider>
+            <AppSnackbarProvider>
+              <AppApiProvider>
+                <AppAssistantProvider>
+                  <AppRouterProvider>
+                    <AppNavigationProvider>
+                      <AppLocationParamProvider routes={routes}>
+                        <AppBorealisProvider>
+                          <AppCarouselProvider>
+                            <>{children}</>
+                          </AppCarouselProvider>
+                        </AppBorealisProvider>
+                      </AppLocationParamProvider>
+                    </AppNavigationProvider>
+                  </AppRouterProvider>
+                </AppAssistantProvider>
+              </AppApiProvider>
+            </AppSnackbarProvider>
+          </AppErrorProvider>
+        </AppTemplateProvider>
+      </AppSwitcherProvider>
     </AppThemeProvider>
   );
 });
@@ -185,15 +192,13 @@ AppProviders.displayName = 'AppProviders';
 //*****************************************************************************************
 
 const AppStores = memo(({ children }: PropsWithChildren) => (
-  <AppConfigStoreProvider>
-    <AppInterfaceStoreProvider>
-      <AppPreferenceStoreProvider>
+  <AppConfigStoreProvider data={DEFAULT_APP_CONFIG_STORE}>
+    <AppInterfaceStoreProvider data={DEFAULT_APP_INTERFACE_STORE}>
+      <AppPreferenceStoreProvider data={DEFAULT_APP_PREFERENCE_STORE}>
         <AppRouterStoreProvider>
           <AppNavigationStoreProvider>
             <AppLocationParamStoreProvider>
-              <AppAssistantStoreProvider>
-                <>{children}</>
-              </AppAssistantStoreProvider>
+              <>{children}</>
             </AppLocationParamStoreProvider>
           </AppNavigationStoreProvider>
         </AppRouterStoreProvider>
