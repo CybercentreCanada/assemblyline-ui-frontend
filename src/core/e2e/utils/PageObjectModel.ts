@@ -52,18 +52,4 @@ export abstract class PageObjectModel {
       await Promise.all(this.locators().map(locator => expect(locator).toBeVisible({ timeout })));
     });
   }
-
-  async monitorForError(options: WaitForOptions = {}) {
-    await test.step(`Expecting the ${this.name} to be ${options.state ?? 'visible'}`, async () => {
-      const visible = await this.isVisible(options);
-      expect(visible, `Expected ${this.name} to be visible at ${this.page.url()}`).toBeTruthy();
-    });
-  }
-
-  async monitorForNoError(options: WaitForOptions = {}) {
-    await test.step(`Expecting the ${this.name} to not be ${options.state ?? 'visible'}`, async () => {
-      const visible = await this.isVisible(options);
-      expect(visible, `Unexpected ${this.name} appeared at ${this.page.url()}`).toBeFalsy();
-    });
-  }
 }

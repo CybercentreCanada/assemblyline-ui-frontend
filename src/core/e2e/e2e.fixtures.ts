@@ -2,23 +2,25 @@
 import type { Browser, BrowserContext, Page } from '@playwright/test';
 import { test as base } from '@playwright/test';
 import { RESULTS_DIR } from 'app/spec.constant';
-import type { ErrorDetectionPages } from 'core/e2e/e2e.fallbacks';
-import { createErrorDetectionPages } from 'core/e2e/e2e.fallbacks';
 import type { PlaywrightArgs } from 'core/e2e/e2e.models';
 import { APIFixture } from 'core/e2e/utils/APIFixture';
+import { CrashPage } from 'core/error/error.pom';
 import { SnackbarContext } from 'core/snackbar/snackbar.pom';
 import { LoginPage } from 'layout/auth/log-in/log-in.pom';
+import { TermsOfServicePage } from 'layout/auth/terms-of-service/terms-of-service.pom';
 import path from 'path';
 import { DevelopmentLibraryInputsPage } from 'routes/development-library/development-library.pom';
+import { ForbiddenPage } from 'routes/forbidden/forbidden.pom';
 import { WorkflowCreatePage } from 'routes/manage-workflow-create/manage-workflow-create.pom';
 import { WorkflowDetailPage } from 'routes/manage-workflow-detail/manage-workflow-detail.pom';
 import { WorkflowsPage } from 'routes/manage-workflows/manage-workflows.pom';
+import { NotFoundPage } from 'routes/not-found/not-found.pom';
 import { SubmissionDetailPage } from 'routes/submission-detail/submission-detail.pom';
 import { SubmissionReportPage } from 'routes/submission-report/submission-report.pom';
 import { SubmitPage } from 'routes/submit/submit.pom';
 import { AccountPage } from 'routes/user/user.pom';
 
-type UserSession = ErrorDetectionPages & {
+type UserSession = {
   // Fixture
   api: APIFixture;
   context: BrowserContext;
@@ -26,6 +28,12 @@ type UserSession = ErrorDetectionPages & {
 
   // Context
   snackbarContext: SnackbarContext;
+
+  // Error detection
+  crashPage: CrashPage;
+  forbiddenPage: ForbiddenPage;
+  notFoundPage: NotFoundPage;
+  tosPage: TermsOfServicePage;
 
   // Pages
   accountPage: AccountPage;
@@ -61,7 +69,10 @@ async function setupBundle({ browser, browserName, user }: SetupBundle): Promise
     snackbarContext: new SnackbarContext(page),
 
     // Error detection
-    ...createErrorDetectionPages(page),
+    crashPage: new CrashPage(page),
+    forbiddenPage: new ForbiddenPage(page),
+    notFoundPage: new NotFoundPage(page),
+    tosPage: new TermsOfServicePage(page),
 
     // Pages
     accountPage: new AccountPage(page),

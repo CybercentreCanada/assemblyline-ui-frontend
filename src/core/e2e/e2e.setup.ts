@@ -6,11 +6,14 @@ import {
   TEST_USER_PASSWORD,
   TEST_USER_USERNAME
 } from 'app/spec.constant';
-import { createErrorDetectionPages } from 'core/e2e/e2e.fallbacks';
 import { test } from 'core/e2e/e2e.fixtures';
+import { CrashPage } from 'core/error/error.pom';
 import fs from 'fs';
 import { LoginPage } from 'layout/auth/log-in/log-in.pom';
+import { TermsOfServicePage } from 'layout/auth/terms-of-service/terms-of-service.pom';
 import path from 'path';
+import { ForbiddenPage } from 'routes/forbidden/forbidden.pom';
+import { NotFoundPage } from 'routes/not-found/not-found.pom';
 import { SubmitPage } from 'routes/submit/submit.pom';
 
 type LoginAndSaveProps = {
@@ -32,7 +35,10 @@ test.describe('Authentication setup', () => {
     const submitPage = new SubmitPage(page);
     const loginPage = new LoginPage(page);
 
-    const { crashPage, forbiddenPage, notFoundPage, tosPage } = createErrorDetectionPages(page);
+    const crashPage = new CrashPage(page);
+    const forbiddenPage = new ForbiddenPage(page);
+    const notFoundPage = new NotFoundPage(page);
+    const tosPage = new TermsOfServicePage(page);
 
     void crashPage.monitorForNoError();
     void forbiddenPage.monitorForNoError();
