@@ -1,5 +1,5 @@
 // TODO: change syntax to "import type {theme}" to avoid potential problems like type-only imports being incorrectly bundled.
-import { useBorealis } from 'borealis-ui';
+import { useClue } from '@cccsaurora/clue-ui';
 import type { AppPreferenceConfigs, AppSiteMapConfigs, AppTheme } from 'commons/components/app/AppConfigs';
 import AppProvider from 'commons/components/app/AppProvider';
 import type { AppUserService } from 'commons/components/app/AppUserService';
@@ -37,7 +37,7 @@ const MyAppMain = () => {
   const samlData = getSAMLData();
   const { setUser, setConfiguration, user, configuration } = useALContext();
   const { setReady: setAppLayoutReady } = useAppLayout();
-  const { setReady: setBorealisReady, setCustomIconify } = useBorealis();
+  const { setReady: setClueReady, setCustomIconify } = useClue();
   const { setItems } = useAppSwitcher();
 
   const [renderedApp, setRenderedApp] = useState<PossibleApps>(
@@ -55,12 +55,12 @@ const MyAppMain = () => {
   );
 
   const setReady = useCallback(
-    (layout: boolean, borealis: boolean, iconifyUrl: string = null) => {
+    (layout: boolean, clue: boolean, iconifyUrl: string = null) => {
       setAppLayoutReady(layout);
-      setBorealisReady(borealis);
+      setClueReady(clue);
       setCustomIconify(iconifyUrl);
     },
-    [setAppLayoutReady, setBorealisReady, setCustomIconify]
+    [setAppLayoutReady, setClueReady, setCustomIconify]
   );
 
   useEffect(() => {

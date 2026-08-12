@@ -1,7 +1,7 @@
+import { Fetcher, useClueFetcherSelector } from '@cccsaurora/clue-ui';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { Button, Collapse, Divider, Grid, Skeleton, styled, Typography, useTheme } from '@mui/material';
-import { Fetcher } from 'borealis-ui';
 import useALContext from 'components/hooks/useALContext';
 import type { Metadata } from 'components/models/base/submission';
 import ActionableText from 'components/visual/ActionableText';
@@ -33,7 +33,9 @@ const WrappedMetaSection: React.FC<Props> = ({ metadata, classification }) => {
   const { t } = useTranslation(['submissionDetail']);
   const theme = useTheme();
   const { user: currentUser, configuration } = useALContext();
-  const [metaOpen, setMetaOpen] = useState(false);
+  const fetchers = useClueFetcherSelector(s => s.fetchers);
+
+  const [metaOpen, setMetaOpen] = useState<boolean>(false);
 
   return !metadata || Object.keys(metadata).length !== 0 ? (
     <div style={{ paddingTop: theme.spacing(2) }}>
@@ -144,7 +146,7 @@ const WrappedMetaSection: React.FC<Props> = ({ metadata, classification }) => {
               </Collapse>
             )}
         </div>
-        {metadata?.eml_path && (
+        {metadata?.eml_path && fetchers && (
           <div>
             <Fetcher
               fetcherId="email-preview.preview"

@@ -1,5 +1,5 @@
-import borealisEN from 'borealis-ui/dist/en/translation.json';
-import borealisFR from 'borealis-ui/dist/fr/translation.json';
+import clueEN from '@cccsaurora/clue-ui/en/translation.json';
+import clueFR from '@cccsaurora/clue-ui/fr/translation.json';
 import developmentAPIEN from 'components/routes/development/api/development_api.i18n.en.json';
 import developmentAPIFR from 'components/routes/development/api/development_api.i18n.fr.json';
 import settingsEN from 'components/routes/settings/settings.i18n.en.json';
@@ -140,8 +140,8 @@ const resources = {
     archive: archiveEN,
     assistant: assistantEN,
     authorize: authorizeEN,
-    borealis: borealisEN,
     carousel: carouselEN,
+    clue: clueEN,
     dashboard: dashboardEN,
     dateTime: dateTimeEN,
     developmentAPI: developmentAPIEN,
@@ -174,8 +174,8 @@ const resources = {
     manageWorkflowDetail: manageWorkflowDetailEN,
     manageWorkflows: manageWorkflowsEN,
     notification: notificationEN,
-    sandboxResult: sandboxResultEN,
     retrohunt: retrohuntEN,
+    sandboxResult: sandboxResultEN,
     search: searchEN,
     settings: settingsEN,
     statisticsHeuristics: statisticsHeuristicsEN,
@@ -203,8 +203,8 @@ const resources = {
     archive: archiveFR,
     assistant: assistantFR,
     authorize: authorizeFR,
-    borealis: borealisFR,
     carousel: carouselFR,
+    clue: clueFR,
     dashboard: dashboardFR,
     dateTime: dateTimeFR,
     developmentAPI: developmentAPIFR,
@@ -237,8 +237,8 @@ const resources = {
     manageWorkflowDetail: manageWorkflowDetailFR,
     manageWorkflows: manageWorkflowsFR,
     notification: notificationFR,
-    sandboxResult: sandboxResultFR,
     retrohunt: retrohuntFR,
+    sandboxResult: sandboxResultFR,
     search: searchFR,
     settings: settingsFR,
     statisticsHeuristics: statisticsHeuristicsFR,
