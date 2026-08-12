@@ -80,7 +80,7 @@ const SubmissionSearch = () => {
     });
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentUser.roles, search]);
+  }, [currentUser.roles, search.toString()]);
 
   return currentUser.roles.includes('submission_view') ? (
     <PageFullWidth margin={4}>
