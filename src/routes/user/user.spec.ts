@@ -1,5 +1,5 @@
-import { MEDIUM_TIMEOUT } from 'app/core.spec';
-import { test } from 'core/spec/shared/fixtures';
+import { MEDIUM_TIMEOUT } from 'app/spec.constant';
+import { test } from 'core/e2e/e2e.fixtures';
 import type { WhoAmIProps } from 'models/api/user';
 
 test.describe('Account page', () => {

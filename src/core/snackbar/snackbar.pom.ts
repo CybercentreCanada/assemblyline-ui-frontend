@@ -1,7 +1,7 @@
 import type { Locator, Page } from '@playwright/test';
-import { MEDIUM_TIMEOUT } from 'app/core.spec';
-import { expect, test } from 'core/spec/shared/fixtures';
-import type { WaitForOptions } from 'core/spec/shared/models';
+import { MEDIUM_TIMEOUT } from 'app/spec.constant';
+import type { WaitForOptions } from 'core/e2e/e2e.models';
+import { expect, test } from 'core/e2e/e2e.fixtures';
 
 type SnackbarVariant = 'success' | 'error' | 'warning' | 'info';
 

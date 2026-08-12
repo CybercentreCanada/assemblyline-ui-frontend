@@ -1,5 +1,5 @@
-import { LONG_TIMEOUT } from 'app/core.spec';
-import { test } from 'core/spec/shared/fixtures';
+import { LONG_TIMEOUT } from 'app/spec.constant';
+import { test } from 'core/e2e/e2e.fixtures';
 
 test.describe('Development Library Inputs page', () => {
   test.beforeAll(async ({ adminSession }) => {

@@ -1,5 +1,5 @@
 import type { Locator, Page } from '@playwright/test';
-import { expect } from 'core/spec/shared/fixtures';
+import { expect } from 'core/e2e/e2e.fixtures';
 
 export class RadioInput {
   private root: Locator;

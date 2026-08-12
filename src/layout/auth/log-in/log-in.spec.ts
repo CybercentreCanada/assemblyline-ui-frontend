@@ -1,6 +1,6 @@
 import type { Page } from '@playwright/test';
-import { LONG_TIMEOUT, SHORT_TIMEOUT, TEST_USER_PASSWORD, TEST_USER_USERNAME } from 'app/core.spec';
-import { expect, test } from 'core/spec/shared/fixtures';
+import { LONG_TIMEOUT, SHORT_TIMEOUT, TEST_USER_PASSWORD, TEST_USER_USERNAME } from 'app/spec.constant';
+import { expect, test } from 'core/e2e/e2e.fixtures';
 
 test.describe('Login and Logout page', () => {
   let page: Page;

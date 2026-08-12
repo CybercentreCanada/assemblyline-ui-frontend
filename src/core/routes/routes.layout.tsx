@@ -79,12 +79,12 @@ export const AppRouteLayoutProvider = memo(({ pageKey, children }: AppRouteLayou
       id={`page-layout-${pageKey}`}
       data-testid="page-layout-scroll-container"
       ref={scrollContainerRef}
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        height: '100%',
-        overflow: 'auto'
-      }}
+      // style={{
+      //   display: 'flex',
+      //   flexDirection: 'column',
+      //   height: '100%',
+      //   overflow: 'auto'
+      // }}
     >
       {children}
     </div>

@@ -1,4 +1,4 @@
-import { test } from 'core/spec/shared/fixtures';
+import { test } from 'core/e2e/e2e.fixtures';
 
 test.describe.skip('Workflows page', () => {
   test('should detect the Workflows page', async ({ adminSession }) => {

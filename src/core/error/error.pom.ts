@@ -1,9 +1,9 @@
 import type { Locator, Page } from '@playwright/test';
-import { SHORT_TIMEOUT } from 'app/core.spec';
-import { expect, test } from 'core/spec/shared/fixtures';
-import type { WaitForOptions } from 'core/spec/shared/models';
-import { ComponentObjectModel } from 'core/spec/utils/ComponentObjectModel';
-import { PageObjectModel } from 'core/spec/utils/PageObjectModel';
+import { SHORT_TIMEOUT } from 'app/spec.constant';
+import type { WaitForOptions } from 'core/e2e/e2e.models';
+import { expect, test } from 'core/e2e/e2e.fixtures';
+import { ComponentObjectModel } from 'core/e2e/utils/ComponentObjectModel';
+import { PageObjectModel } from 'core/e2e/utils/PageObjectModel';
 
 export class ErrorBoundaryError extends Error {
   constructor(message: string | null, stack: string | null) {

@@ -1,5 +1,5 @@
-import { SHORT_TIMEOUT } from 'app/core.spec';
-import { expect, test } from 'core/spec/shared/fixtures';
+import { SHORT_TIMEOUT } from 'app/spec.constant';
+import { expect, test } from 'core/e2e/e2e.fixtures';
 
 test.describe('Crash page', () => {
   test('should trigger the ErrorBoundary when crashing', async ({ userSession }) => {

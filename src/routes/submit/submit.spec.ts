@@ -1,5 +1,5 @@
-import { LONG_TIMEOUT, MEDIUM_TIMEOUT, MOCKS_DIR } from 'app/core.spec';
-import { test } from 'core/spec/shared/fixtures';
+import { LONG_TIMEOUT, MEDIUM_TIMEOUT, MOCKS_DIR } from 'app/spec.constant';
+import { test } from 'core/e2e/e2e.fixtures';
 import path from 'path';
 
 test.describe('Submit Page', () => {

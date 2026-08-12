@@ -1,7 +1,7 @@
 import type { Locator, Page } from '@playwright/test';
-import { MEDIUM_TIMEOUT } from 'app/core.spec';
-import type { WaitForOptions } from 'core/spec/shared/models';
-import { PageObjectModel } from 'core/spec/utils/PageObjectModel';
+import { MEDIUM_TIMEOUT } from 'app/spec.constant';
+import type { WaitForOptions } from 'core/e2e/e2e.models';
+import { PageObjectModel } from 'core/e2e/utils/PageObjectModel';
 
 // Input POMs
 import { CheckboxInput } from 'ui/inputs/pom/CheckboxInput.pom';

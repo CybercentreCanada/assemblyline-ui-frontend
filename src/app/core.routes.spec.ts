@@ -1,4 +1,4 @@
-import { expect, test } from 'core/spec/shared/fixtures';
+import { expect, test } from 'core/e2e/e2e.fixtures';
 
 // Replace route parameters with dummy test values
 const routes = [

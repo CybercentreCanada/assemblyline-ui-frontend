@@ -1,18 +1,8 @@
 import type { Locator, Page } from '@playwright/test';
-import { SHORT_TIMEOUT } from 'app/core.spec';
-import { expect, test } from 'core/spec/shared/fixtures';
-import type { WaitForOptions } from 'core/spec/shared/models';
-import { PageObjectModel } from 'core/spec/utils/PageObjectModel';
-
-export class TermsOfServicesError extends Error {
-  visible: boolean;
-
-  constructor(visible: boolean) {
-    super(null);
-    this.name = 'TermsOfServiceError';
-    this.visible = visible;
-  }
-}
+import { SHORT_TIMEOUT } from 'app/spec.constant';
+import type { WaitForOptions } from 'core/e2e/e2e.models';
+import { test } from 'core/e2e/e2e.fixtures';
+import { PageObjectModel } from 'core/e2e/utils/PageObjectModel';
 
 export class TermsOfServicePage extends PageObjectModel {
   readonly header: Locator;
@@ -32,42 +22,12 @@ export class TermsOfServicePage extends PageObjectModel {
   }
 
   async waitForPage({ state = 'visible', timeout = 0 }: WaitForOptions = {}) {
-    await Promise.all([this.header.waitFor({ state, timeout })]);
+    await this.header.waitFor({ state, timeout });
   }
 
-  async waitForFallback({ state = 'visible', timeout = 0 }: WaitForOptions = {}): Promise<TermsOfServicesError> {
-    return await test.step(`Waiting for ${this.name} fallback to become ${state}`, async () => {
-      try {
-        await this.waitForPage({ state, timeout });
-        throw new TermsOfServicesError(true);
-      } catch (err) {
-        if (err instanceof TermsOfServicesError) {
-          return err;
-        }
-      }
-      return new TermsOfServicesError(false);
-    });
-  }
-
-  async monitorForError({ state = 'visible', timeout = 0 }: WaitForOptions = {}) {
-    return await test.step(`Expecting the ${this.name} to be ${state}`, async () => {
-      const { visible } = await this.waitForFallback({ state, timeout });
-      expect(visible, `Expected ${this.name} to be visible!`).toBeTruthy();
-    });
-  }
-
-  async monitorForNoError({ state = 'visible', timeout = 0 }: WaitForOptions = {}) {
-    return await test.step(`Expecting the ${this.name} to not be ${state}`, async () => {
-      await this.waitForFallback({ state, timeout }).then(({ visible }) => {
-        expect(visible, `Unexpected ${this.name} appeared!`).toBeFalsy();
-      });
-    });
-  }
-
-  async acceptIfVisible({ state = 'visible', timeout = 0 }: WaitForOptions = {}) {
-    return await test.step(`Accepting the ${this.name} when it is ${state}`, async () => {
-      const { visible } = await this.waitForFallback({ state, timeout });
-      if (visible) {
+  async acceptIfVisible(options: WaitForOptions = {}) {
+    return await test.step(`Accepting the ${this.name} when visible`, async () => {
+      if (await this.isVisible(options)) {
         await this.acceptButton.click({ timeout: SHORT_TIMEOUT });
       }
     });

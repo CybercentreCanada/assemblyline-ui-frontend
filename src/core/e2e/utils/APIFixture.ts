@@ -1,5 +1,5 @@
 import type { Page } from '@playwright/test';
-import { test } from 'core/spec/shared/fixtures';
+import { test } from 'core/e2e/e2e.fixtures';
 import type { APIResponseProps } from 'deprecated/hooks/useMyAPI';
 
 type Response<T> = {

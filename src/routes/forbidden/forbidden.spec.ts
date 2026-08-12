@@ -1,4 +1,4 @@
-import { test } from 'core/spec/shared/fixtures';
+import { test } from 'core/e2e/e2e.fixtures';
 
 test.describe('Forbidden page', () => {
   test('should detect the forbidden page', async ({ userSession }) => {

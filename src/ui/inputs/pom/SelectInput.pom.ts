@@ -1,7 +1,7 @@
 import type { Locator, Page } from '@playwright/test';
 import { expect } from '@playwright/test';
-import { SHORT_TIMEOUT } from 'app/core.spec';
-import { test } from 'core/spec/shared/fixtures';
+import { SHORT_TIMEOUT } from 'app/spec.constant';
+import { test } from 'core/e2e/e2e.fixtures';
 
 export type SelectOptions = readonly { label: string; value: string }[];
 

@@ -1,7 +1,7 @@
 import type { Locator, Page } from '@playwright/test';
-import { LONG_TIMEOUT, MEDIUM_TIMEOUT } from 'app/core.spec';
-import { expect, test } from 'core/spec/shared/fixtures';
-import type { PlaywrightArgs, WaitForOptions } from 'core/spec/shared/models';
+import { LONG_TIMEOUT, MEDIUM_TIMEOUT } from 'app/spec.constant';
+import type { PlaywrightArgs, WaitForOptions } from 'core/e2e/e2e.models';
+import { expect, test } from 'core/e2e/e2e.fixtures';
 
 export abstract class PageObjectModel {
   constructor(
@@ -26,7 +26,7 @@ export abstract class PageObjectModel {
 
   async goto(...params: string[]) {
     await test.step(`Navigating to the ${this.name}`, async () => {
-      await this.page.goto(this.route, { timeout: LONG_TIMEOUT });
+      await this.page.goto(`/v1#${this.route}`, { timeout: LONG_TIMEOUT });
     });
   }
 
@@ -50,6 +50,20 @@ export abstract class PageObjectModel {
   async expectToBeVisible({ timeout = MEDIUM_TIMEOUT }: WaitForOptions = {}) {
     await test.step(`Expect the ${this.name} to become visible`, async () => {
       await Promise.all(this.locators().map(locator => expect(locator).toBeVisible({ timeout })));
+    });
+  }
+
+  async monitorForError(options: WaitForOptions = {}) {
+    await test.step(`Expecting the ${this.name} to be ${options.state ?? 'visible'}`, async () => {
+      const visible = await this.isVisible(options);
+      expect(visible, `Expected ${this.name} to be visible at ${this.page.url()}`).toBeTruthy();
+    });
+  }
+
+  async monitorForNoError(options: WaitForOptions = {}) {
+    await test.step(`Expecting the ${this.name} to not be ${options.state ?? 'visible'}`, async () => {
+      const visible = await this.isVisible(options);
+      expect(visible, `Unexpected ${this.name} appeared at ${this.page.url()}`).toBeFalsy();
     });
   }
 }

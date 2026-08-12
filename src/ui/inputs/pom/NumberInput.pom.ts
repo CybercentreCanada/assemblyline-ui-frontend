@@ -1,6 +1,6 @@
 import type { Page } from '@playwright/test';
-import { MEDIUM_TIMEOUT, SHORT_TIMEOUT } from 'app/core.spec';
-import { expect, test } from 'core/spec/shared/fixtures';
+import { MEDIUM_TIMEOUT, SHORT_TIMEOUT } from 'app/spec.constant';
+import { expect, test } from 'core/e2e/e2e.fixtures';
 import { BaseInput } from 'ui/inputs/pom/Input.pom';
 
 export class NumberInput extends BaseInput {

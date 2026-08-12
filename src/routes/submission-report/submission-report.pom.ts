@@ -1,13 +1,22 @@
 import type { Locator, Page } from '@playwright/test';
+import { MEDIUM_TIMEOUT } from 'app/spec.constant';
+import type { WaitForOptions } from 'core/e2e/e2e.models';
+import { PageObjectModel } from 'core/e2e/utils/PageObjectModel';
 
-export class SubmissionReportPage {
-  readonly title: Locator;
+export class SubmissionReportPage extends PageObjectModel {
+  private readonly title: Locator;
 
-  constructor(private readonly page: Page) {
+  constructor(page: Page) {
+    super(page, 'Submission Report page', '/submission/report/:sid');
+
     this.title = page.getByRole('heading', { name: /Submission Report/i });
   }
 
-  async goto(sid: string) {
-    await this.page.goto(`/submission/report/${sid}`);
+  locators(): Locator[] {
+    return [this.title];
+  }
+
+  async waitForPage({ state = 'visible', timeout = MEDIUM_TIMEOUT }: WaitForOptions = {}) {
+    await this.title.waitFor({ state, timeout });
   }
 }

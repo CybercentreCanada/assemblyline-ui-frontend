@@ -1,6 +1,6 @@
 import type { Locator, Page } from '@playwright/test';
-import { MEDIUM_TIMEOUT } from 'app/core.spec';
-import { expect, test } from 'core/spec/shared/fixtures';
+import { MEDIUM_TIMEOUT } from 'app/spec.constant';
+import { expect, test } from 'core/e2e/e2e.fixtures';
 
 export abstract class BaseInput {
   protected root: Locator;

@@ -1,8 +1,8 @@
 import type { Locator, Page } from '@playwright/test';
-import { SHORT_TIMEOUT } from 'app/core.spec';
-import { test } from 'core/spec/shared/fixtures';
-import type { WaitForOptions } from 'core/spec/shared/models';
-import { PageObjectModel } from 'core/spec/utils/PageObjectModel';
+import { SHORT_TIMEOUT } from 'app/spec.constant';
+import type { WaitForOptions } from 'core/e2e/e2e.models';
+import { test } from 'core/e2e/e2e.fixtures';
+import { PageObjectModel } from 'core/e2e/utils/PageObjectModel';
 import path from 'path';
 import { SelectInput } from 'ui/inputs/pom/SelectInput.pom';
 import { TextInput } from 'ui/inputs/pom/TextInput.pom';
