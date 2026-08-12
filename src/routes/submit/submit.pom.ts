@@ -1,7 +1,7 @@
 import type { Locator, Page } from '@playwright/test';
 import { SHORT_TIMEOUT } from 'app/spec.constant';
-import type { WaitForOptions } from 'core/e2e/e2e.models';
 import { test } from 'core/e2e/e2e.fixtures';
+import type { WaitForOptions } from 'core/e2e/e2e.models';
 import { PageObjectModel } from 'core/e2e/utils/PageObjectModel';
 import path from 'path';
 import { SelectInput } from 'ui/inputs/pom/SelectInput.pom';
@@ -45,11 +45,11 @@ export class SubmitPage extends PageObjectModel {
   }
 
   locators(): Locator[] {
-    return [this.bannerImage];
+    return [this.fileDropper];
   }
 
   async waitForPage({ state = 'visible', timeout = 0 }: WaitForOptions = {}) {
-    await this.bannerImage.waitFor({ state, timeout });
+    await this.fileDropper.waitFor({ state, timeout });
   }
 
   async switchTab(tabLabel: 'File' | 'Hash/URL') {

@@ -35,7 +35,7 @@ test.describe('Login and Logout page', () => {
     });
 
     await test.step('Opening the User Menu', async () => {
-      await page.getByRole('button', { name: 'User Menu' }).click({ timeout: SHORT_TIMEOUT });
+      await page.getByRole('button', { name: 'user-menu' }).click({ timeout: SHORT_TIMEOUT });
     });
 
     await test.step('Clicking the Logout button', async () => {

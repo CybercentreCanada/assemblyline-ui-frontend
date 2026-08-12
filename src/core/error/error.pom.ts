@@ -1,7 +1,7 @@
 import type { Locator, Page } from '@playwright/test';
 import { SHORT_TIMEOUT } from 'app/spec.constant';
-import type { WaitForOptions } from 'core/e2e/e2e.models';
 import { expect, test } from 'core/e2e/e2e.fixtures';
+import type { WaitForOptions } from 'core/e2e/e2e.models';
 import { ComponentObjectModel } from 'core/e2e/utils/ComponentObjectModel';
 import { PageObjectModel } from 'core/e2e/utils/PageObjectModel';
 
@@ -23,7 +23,7 @@ export class ErrorBoundary extends ComponentObjectModel {
     super(page, 'ErrorBoundary');
     this.errorFallback = page.locator('[data-testid="error-fallback"]');
     this.errorMessage = this.errorFallback.locator('[data-testid="error-message"]');
-    this.showStackButton = this.errorFallback.getByRole('button', { name: 'Show Stack' });
+    this.showStackButton = this.errorFallback.getByRole('button', { name: 'Show stack' });
     this.errorStack = this.errorFallback.locator('[data-testid="error-stack"]');
   }
 
@@ -92,7 +92,7 @@ export class CrashPage extends PageObjectModel {
     super(page, 'Crash page', '/crash');
     this.errorFallback = page.locator('[data-testid="error-fallback"]');
     this.errorMessage = this.errorFallback.locator('[data-testid="error-message"]');
-    this.showStackButton = this.errorFallback.getByRole('button', { name: 'Show Stack' });
+    this.showStackButton = this.errorFallback.getByRole('button', { name: 'Show stack' });
     this.errorStack = this.errorFallback.locator('[data-testid="error-stack"]');
   }
 

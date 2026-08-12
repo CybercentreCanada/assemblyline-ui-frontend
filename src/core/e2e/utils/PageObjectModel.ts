@@ -1,7 +1,7 @@
 import type { Locator, Page } from '@playwright/test';
 import { LONG_TIMEOUT, MEDIUM_TIMEOUT } from 'app/spec.constant';
-import type { PlaywrightArgs, WaitForOptions } from 'core/e2e/e2e.models';
 import { expect, test } from 'core/e2e/e2e.fixtures';
+import type { PlaywrightArgs, WaitForOptions } from 'core/e2e/e2e.models';
 
 export abstract class PageObjectModel {
   constructor(

@@ -9,8 +9,8 @@ export class NotFoundPage extends PageObjectModel {
   constructor(page: Page) {
     super(page, 'Not Found page', '*');
 
-    this.deadLinkTitle = page.getByText(`404: Not found`);
-    this.deadLinkDescription = page.getByText(`The page you are looking for cannot be found...`, { exact: true });
+    this.deadLinkTitle = page.getByRole('heading', { name: 'This page took a wrong turn' });
+    this.deadLinkDescription = page.getByRole('heading', { name: /The route you requested could not be found/ });
   }
 
   locators(): Locator[] {

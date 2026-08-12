@@ -9,8 +9,8 @@ export class ForbiddenPage extends PageObjectModel {
   constructor(page: Page) {
     super(page, 'Forbidden page', '/forbidden');
 
-    this.forbiddenTitle = page.getByText('403: Forbidden', { exact: true });
-    this.forbiddenMessage = page.getByText('You are not allowed to view this page...', { exact: true });
+    this.forbiddenTitle = page.getByRole('heading', { name: 'Nice try, this door is locked' });
+    this.forbiddenMessage = page.getByRole('heading', { name: /You are not allowed to view this page/ });
   }
 
   locators(): Locator[] {

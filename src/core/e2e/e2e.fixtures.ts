@@ -2,11 +2,11 @@
 import type { Browser, BrowserContext, Page } from '@playwright/test';
 import { test as base } from '@playwright/test';
 import { RESULTS_DIR } from 'app/spec.constant';
-import { SnackbarContext } from 'core/snackbar/snackbar.pom';
 import type { ErrorDetectionPages } from 'core/e2e/e2e.fallbacks';
-import type { PlaywrightArgs } from 'core/e2e/e2e.models';
 import { createErrorDetectionPages } from 'core/e2e/e2e.fallbacks';
+import type { PlaywrightArgs } from 'core/e2e/e2e.models';
 import { APIFixture } from 'core/e2e/utils/APIFixture';
+import { SnackbarContext } from 'core/snackbar/snackbar.pom';
 import { LoginPage } from 'layout/auth/log-in/log-in.pom';
 import path from 'path';
 import { DevelopmentLibraryInputsPage } from 'routes/development-library/development-library.pom';
