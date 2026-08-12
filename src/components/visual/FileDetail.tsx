@@ -113,29 +113,6 @@ const WrappedFileDetail: React.FC<Props> = ({
     else return `/file/viewer/${file?.file_info?.sha256}/${tab}/${location.search}${location.hash}`;
   }, [file?.file_info?.sha256, location.hash, location.pathname, location.search]);
 
-  const elementInViewport = element => {
-    const bounding = element.getBoundingClientRect();
-    const myElementHeight = element.offsetHeight;
-    const myElementWidth = element.offsetWidth;
-
-    if (
-      bounding.top >= -myElementHeight &&
-      bounding.left >= -myElementWidth &&
-      bounding.right <= (window.innerWidth || document.documentElement.clientWidth) + myElementWidth &&
-      bounding.bottom <= (window.innerHeight || document.documentElement.clientHeight) + myElementHeight
-    ) {
-      return true;
-    }
-    return false;
-  };
-
-  const scrollToTop = scrollToItem => {
-    const element = document.getElementById(scrollToItem);
-    if (element && !elementInViewport(element)) {
-      element.scrollIntoView();
-    }
-  };
-
   const patchFileDetails = (data: File) => {
     const newData = { ...data };
     newData.results.sort((a, b) => (a.response.service_name > b.response.service_name ? 1 : -1));
@@ -277,6 +254,8 @@ const WrappedFileDetail: React.FC<Props> = ({
   }, [sha256, badlistReason, file]);
 
   useEffect(() => {
+    let active = true;
+
     setFile(null);
 
     if (sid && sha256) {
@@ -285,7 +264,7 @@ const WrappedFileDetail: React.FC<Props> = ({
         url: `/api/v4/submission/${sid}/file/${sha256}/`,
         body: liveResultKeys ? { extra_result_keys: liveResultKeys } : null,
         onSuccess: api_data => {
-          scrollToTop('drawerTop');
+          if (!active) return;
           setFile(patchFileDetails(api_data.api_response));
         }
       });
@@ -293,11 +272,15 @@ const WrappedFileDetail: React.FC<Props> = ({
       apiCall<File>({
         url: `/api/v4/file/result/${sha256}/`,
         onSuccess: api_data => {
-          scrollToTop('fileDetailTop');
+          if (!active) return;
           setFile(patchFileDetails(api_data.api_response));
         }
       });
     }
+
+    return () => {
+      active = false;
+    };
     // eslint-disable-next-line
   }, [sha256, sid]);
 
