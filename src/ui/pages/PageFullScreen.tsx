@@ -1,8 +1,10 @@
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
 import FullscreenExitIcon from '@mui/icons-material/FullscreenExit';
 import { IconButton, Tooltip, useTheme } from '@mui/material';
-import { useAppBar, useAppBarHeight, useAppLayout, useFullscreenStatus } from '@tui/core';
+import { useFullscreenStatus } from '@tui/core';
 import browser from 'browser-detect';
+import { useAppInterfaceStore } from 'core/interface';
+import { useAppPreferenceStore } from 'core/preference';
 import { memo, useCallback, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { PageContent } from 'ui/pages/PageContent';
@@ -29,17 +31,14 @@ const PageFullscreen = ({
 }: PageFullscreenProps) => {
   const { t } = useTranslation();
   const theme = useTheme();
-  const appBarHeight = useAppBarHeight();
-  const layout = useAppLayout();
-  const appbar = useAppBar();
+  const barWillHide = useAppPreferenceStore(s => (s?.template?.layout !== 'top' ? s?.template?.autoHideAppbar : null));
+  const appBarHeight = useAppInterfaceStore(s => s?.template?.appBarHeight);
 
   const maximizableElement = useRef(null);
 
   let isFullscreen = false;
   let setIsFullscreen: (() => void) | null = null;
   let supportsFullscreen = true;
-
-  const barWillHide = layout?.current !== 'top' && appbar?.autoHide;
 
   const isFirefox = useMemo(() => browser().name === 'firefox', []);
 

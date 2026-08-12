@@ -1,6 +1,6 @@
 import Editor, { DiffEditor, loader } from '@monaco-editor/react';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Skeleton, useTheme } from '@mui/material';
-import { useAppTheme } from '@tui/core';
+import { useAppTemplateThemeMode } from 'core/template';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import useMySnackbar from 'deprecated/hooks/useMySnackbar';
 import { memo, useEffect, useRef, useState } from 'react';
@@ -69,7 +69,7 @@ export const LibMagic = memo(({ reload, magicFile, originalMagicFile, setMagicFi
   const [open, setOpen] = useState(false);
   const { showSuccessMessage } = useMySnackbar();
   const { apiCall } = useMyAPI();
-  const { isDark } = useAppTheme();
+  const themeMode = useAppTemplateThemeMode();
 
   useEffect(() => {
     if (!magicFile) reload();
@@ -121,7 +121,7 @@ export const LibMagic = memo(({ reload, magicFile, originalMagicFile, setMagicFi
                 <div ref={containerDialogEL}>
                   <DiffEditor
                     language="magic"
-                    theme={isDark ? 'vs-dark' : 'vs'}
+                    theme={themeMode === 'dark' ? 'vs-dark' : 'vs'}
                     original={originalMagicFile}
                     width={width}
                     height="50vh"
@@ -204,7 +204,7 @@ export const LibMagic = memo(({ reload, magicFile, originalMagicFile, setMagicFi
                       language="magic"
                       width={width}
                       height={height}
-                      theme={isDark ? 'vs-dark' : 'vs'}
+                      theme={themeMode === 'dark' ? 'vs-dark' : 'vs'}
                       loading={t('loading.magic')}
                       value={magicFile}
                       onChange={setMagicFile}

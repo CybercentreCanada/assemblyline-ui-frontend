@@ -137,7 +137,7 @@ BreadcrumbsEllipsis.displayName = 'BreadcrumbsEllipsis';
 export const AppBreadcrumbs = memo(() => {
   const theme = useTheme();
   const locationParamStoreApi = useAppLocationParamStoreApi();
-  const showBreadcrumbs = useAppPreferenceStore(store => store.layout.showBreadcrumbs);
+  const showBreadcrumbs = useAppPreferenceStore(store => store.template.showBreadcrumbs);
 
   const [expanded, setExpanded] = useState<boolean>(false);
 

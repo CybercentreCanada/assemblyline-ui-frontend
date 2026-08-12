@@ -1,12 +1,13 @@
 import type { ReactJsonViewProps } from '@microlink/react-json-view';
 import ReactJson from '@microlink/react-json-view';
 import { useTheme } from '@mui/material';
-import { useAppTheme } from '@tui/core';
+import { useAppTemplateThemeMode } from 'core/template';
 import React from 'react';
 
 const WrappedJSONEditor: React.FC<ReactJsonViewProps> = (inputProps: ReactJsonViewProps) => {
   const theme = useTheme();
-  const { isDark: isDarkTheme } = useAppTheme();
+  const themeMode = useAppTemplateThemeMode();
+  const isDarkTheme = themeMode === 'dark';
 
   const jsonTheme = {
     base00: 'transparent', // Background

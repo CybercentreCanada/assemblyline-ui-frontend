@@ -8,20 +8,27 @@ import type { SystemMessage } from 'models/api/user';
 declare global {
   /** Transient UI state managed by the interface store — nothing is persisted. */
   type AppInterfaceStore = {
-    assistant: {
-      open: boolean;
-      currentInsights: AssistantInsightProps[];
-      thinking: boolean;
-      currentContext: ContextMessageProps[];
-      currentHistory: ContextMessageProps[];
-      currentInput: string;
-      hasInsights: boolean;
-    };
-
     /** API developer tools configuration. */
     api: {
       /** Whether to show React Query devtools panel. */
       showDevtools: boolean;
+    };
+    /** AI assistant panel state. */
+    assistant: {
+      /** Current context messages passed to the assistant. */
+      currentContext: ContextMessageProps[];
+      /** Current conversation history shown in the panel. */
+      currentHistory: ContextMessageProps[];
+      /** Current value of the assistant input field. */
+      currentInput: string;
+      /** Insight cards surfaced by the assistant. */
+      currentInsights: AssistantInsightProps[];
+      /** Whether there are active insights to display. */
+      hasInsights: boolean;
+      /** Whether the assistant panel is open. */
+      open: boolean;
+      /** Whether the assistant is awaiting a response. */
+      thinking: boolean;
     };
     /** Authentication state machine data. */
     auth: {
@@ -53,10 +60,10 @@ declare global {
     };
     /** Highlighter state used across detail/section components. */
     highlighter: {
-      /** Map of key to related keys that should be highlighted together. */
-      links: Record<string, string[]>;
       /** Directly highlighted keys. */
       keys: Set<string>;
+      /** Map of key to related keys that should be highlighted together. */
+      links: Record<string, string[]>;
       /** Derived related highlighted keys from `highlightMap`. */
       related: Set<string>;
     };
@@ -88,6 +95,28 @@ declare global {
       /** Submission quota. */
       submission: number;
     };
+    /** Topnav quick search state. */
+    quicksearch: {
+      /** Whether selecting a result or pressing enter resets the input. */
+      autoReset: boolean;
+      /** Whether the input currently has focus. */
+      focused: boolean;
+      /** Search results, or null before a search has been made. */
+      items: QuickSearchItem[] | null;
+      /** Whether the results dropdown/dialog is open. */
+      menu: boolean;
+      /** Display mode: inline dropdown or fullscreen dialog. */
+      mode: 'inline' | 'fullscreen';
+      /** Whether a search request is in flight. */
+      searching: boolean;
+      /** Current input value. */
+      value: string;
+    };
+    /** Template-level runtime measurements. */
+    template: {
+      /** Last measured appbar height in pixels. */
+      appBarHeight: number;
+    };
     /** Theme skin and initialization state. */
     theme: {
       /** Whether to inject MUI styles first (for CSS override ordering). */
@@ -102,29 +131,21 @@ declare global {
       /** Whether the user menu popover is open. */
       open: boolean;
     };
-    /** Topnav quick search state. */
-    quicksearch: {
-      /** Current input value. */
-      value: string;
-      /** Whether a search request is in flight. */
-      searching: boolean;
-      /** Whether the results dropdown/dialog is open. */
-      menu: boolean;
-      /** Display mode: inline dropdown or fullscreen dialog. */
-      mode: 'inline' | 'fullscreen';
-      /** Whether the input currently has focus. */
-      focused: boolean;
-      /** Whether selecting a result or pressing enter resets the input. */
-      autoReset: boolean;
-      /** Search results, or null before a search has been made. */
-      items: QuickSearchItem[] | null;
-    };
   };
 }
 
 export const DEFAULT_APP_INTERFACE_STORE: AppInterfaceStore = {
   api: {
     showDevtools: false
+  },
+  assistant: {
+    currentContext: [],
+    currentHistory: [],
+    currentInput: '',
+    currentInsights: [],
+    hasInsights: false,
+    open: false,
+    thinking: false
   },
   auth: {
     disableWhoAmI: false,
@@ -143,8 +164,8 @@ export const DEFAULT_APP_INTERFACE_STORE: AppInterfaceStore = {
     enrichment: {}
   },
   highlighter: {
-    links: {},
     keys: new Set(),
+    links: {},
     related: new Set()
   },
   notifications: {
@@ -167,6 +188,18 @@ export const DEFAULT_APP_INTERFACE_STORE: AppInterfaceStore = {
     api: 0,
     submission: 0
   },
+  quicksearch: {
+    autoReset: true,
+    focused: false,
+    items: null,
+    menu: false,
+    mode: 'inline',
+    searching: false,
+    value: ''
+  },
+  template: {
+    appBarHeight: -1
+  },
   theme: {
     injectFirst: false,
     initialized: false,
@@ -174,23 +207,5 @@ export const DEFAULT_APP_INTERFACE_STORE: AppInterfaceStore = {
   },
   usermenu: {
     open: false
-  },
-  quicksearch: {
-    value: '',
-    searching: false,
-    menu: false,
-    mode: 'inline',
-    focused: false,
-    autoReset: true,
-    items: null
-  },
-  assistant: {
-    open: false,
-    currentInsights: [],
-    thinking: false,
-    currentContext: [],
-    currentHistory: [],
-    currentInput: '',
-    hasInsights: false
   }
 };

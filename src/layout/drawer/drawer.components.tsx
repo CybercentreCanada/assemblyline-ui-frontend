@@ -2,6 +2,7 @@ import CloseOutlinedIcon from '@mui/icons-material/CloseOutlined';
 import DoubleArrowOutlinedIcon from '@mui/icons-material/DoubleArrowOutlined';
 import { Drawer, styled, useMediaQuery, useTheme } from '@mui/material';
 import { useAppInterfaceStore } from 'core/interface';
+import { useAppPreferenceStore } from 'core/preference';
 import { useAppNavigate } from 'core/router';
 import { useAppDrawerClose, useIsDrawerOpen } from 'layout/drawer/drawer.hooks';
 import type { CSSProperties, PropsWithChildren } from 'react';
@@ -55,14 +56,35 @@ export const AppDrawerContent = memo(
 
 AppDrawerContent.displayName = 'AppDrawerContent';
 
-export const AppDrawerActions = memo(
-  styled('div')(({ theme }) => ({
-    display: 'flex',
-    flexDirection: 'row',
-    columnGap: theme.spacing(1),
-    padding: theme.spacing(1)
-  }))
-);
+export const AppDrawerActions = memo(({ children }: PropsWithChildren) => {
+  const theme = useTheme();
+
+  const autoHideAppbar = useAppPreferenceStore(s => s.template.autoHideAppbar);
+  const layout = useAppPreferenceStore(s => s.template.layout);
+  const appBarHeight = useAppInterfaceStore(s => s.template.appBarHeight);
+
+  const isSticky = layout === 'top' || !autoHideAppbar;
+
+  return (
+    <div
+      style={{
+        height: appBarHeight,
+        display: 'flex',
+        flexDirection: 'row',
+        columnGap: theme.spacing(1),
+        padding: theme.spacing(1),
+        zIndex: theme.zIndex.appBar,
+        backgroundColor: layout === 'top' ? theme.palette.background.paper : theme.palette.background.default,
+        ...(isSticky && {
+          position: 'sticky',
+          top: 0
+        })
+      }}
+    >
+      {children}
+    </div>
+  );
+});
 
 AppDrawerActions.displayName = 'AppDrawerActions';
 
@@ -171,6 +193,7 @@ export const AppDrawerContainer = memo(({ children }: PropsWithChildren) => {
         },
         paper: {
           sx: {
+            backgroundColor: theme.palette.background.default,
             boxShadow: 'none',
             backgroundImage: 'none',
             width: drawerWidth,

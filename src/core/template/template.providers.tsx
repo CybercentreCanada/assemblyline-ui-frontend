@@ -2,7 +2,12 @@ import type { AppPreferenceConfigs, AppRouterAdapter, AppUserService } from '@tu
 import { AppProvider, AppRoot, useAppLayout, useAppUser } from '@tui/core';
 import { useAppInterfaceStore } from 'core/interface';
 import { useAppPreferenceStore } from 'core/preference';
-import { useAppTemplateThemeInitializer, useAppTemplateThemeMode, useAppTemplateThemePatcher } from 'core/template';
+import {
+  useAppTemplateBarHeight,
+  useAppTemplateThemeInitializer,
+  useAppTemplateThemeMode,
+  useAppTemplateThemePatcher
+} from 'core/template';
 import type { i18n } from 'i18next';
 import type { PropsWithChildren } from 'react';
 import { memo, useEffect, useMemo } from 'react';
@@ -78,19 +83,20 @@ export type AppTemplateProviderProps = PropsWithChildren<{
 }>;
 
 export const AppTemplateProvider = memo(({ children, i18n }: AppTemplateProviderProps) => {
-  const autoHideAppbar = useAppPreferenceStore(s => s.layout.autoHideAppbar);
-  const density = useAppPreferenceStore(s => s.layout.density);
-  const drawerOpen = useAppPreferenceStore(s => s.layout.drawerOpen);
-  const lang = useAppPreferenceStore(s => s.layout.lang);
-  const layout = useAppPreferenceStore(s => s.layout.layout);
-  const themeID = useAppPreferenceStore(s => s.layout.theme);
+  const autoHideAppbar = useAppPreferenceStore(s => s.template.autoHideAppbar);
+  const density = useAppPreferenceStore(s => s.template.density);
+  const drawerOpen = useAppPreferenceStore(s => s.template.drawerOpen);
+  const lang = useAppPreferenceStore(s => s.template.lang);
+  const layout = useAppPreferenceStore(s => s.template.layout);
+  const themeID = useAppPreferenceStore(s => s.template.theme);
   const initialized = useAppInterfaceStore(s => s.theme.initialized);
   const skin = useAppInterfaceStore(s => s.theme.skin);
 
   useAppTemplateThemeInitializer();
-  const mode = useAppTemplateThemeMode();
   useAppTemplateThemePatcher();
+  useAppTemplateBarHeight();
 
+  const mode = useAppTemplateThemeMode();
   const themes = useMemo(() => (skin ? [skin] : undefined), [skin]);
 
   return !initialized ? null : (

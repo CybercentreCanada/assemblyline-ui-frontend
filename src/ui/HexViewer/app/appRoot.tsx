@@ -1,5 +1,5 @@
 import { useMediaQuery, useTheme } from '@mui/material';
-import { useAppTheme } from '@tui/core';
+import { useAppTemplateThemeMode } from 'core/template';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import 'ui/HexViewer/styles/hex.css';
@@ -16,10 +16,10 @@ const WrappedAppRoot = ({ data = '' }: DataProps) => {
   }, [data, dispatch]);
 
   // Theme
-  const { mode: appTheme } = useAppTheme();
+  const themeMode = useAppTemplateThemeMode();
   React.useEffect(() => {
-    update.store.mode.setTheme(appTheme as ModeTheme);
-  }, [appTheme, update]);
+    update.store.mode.setTheme(themeMode as ModeTheme);
+  }, [themeMode, update]);
 
   // Language
   const { i18n } = useTranslation(['hexViewer']);

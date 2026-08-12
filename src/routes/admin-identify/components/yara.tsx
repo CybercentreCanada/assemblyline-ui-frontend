@@ -1,6 +1,6 @@
 import Editor, { DiffEditor, loader } from '@monaco-editor/react';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Skeleton, useTheme } from '@mui/material';
-import { useAppTheme } from '@tui/core';
+import { useAppTemplateThemeMode } from 'core/template';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import useMySnackbar from 'deprecated/hooks/useMySnackbar';
 import { memo, useEffect, useRef, useState } from 'react';
@@ -26,7 +26,7 @@ export const Yara = memo(({ reload, yaraFile, originalYaraFile, setYaraFile }: Y
   const [open, setOpen] = useState(false);
   const { showSuccessMessage } = useMySnackbar();
   const { apiCall } = useMyAPI();
-  const { isDark: isDarkTheme } = useAppTheme();
+  const themeMode = useAppTemplateThemeMode();
 
   useEffect(() => {
     if (!yaraFile) reload();
@@ -80,7 +80,7 @@ export const Yara = memo(({ reload, yaraFile, originalYaraFile, setYaraFile }: Y
                 <div ref={containerDialogEL}>
                   <DiffEditor
                     language="yara"
-                    theme={isDarkTheme ? 'vs-dark' : 'vs'}
+                    theme={themeMode === 'dark' ? 'vs-dark' : 'vs'}
                     original={originalYaraFile}
                     width={width}
                     height="50vh"
@@ -165,7 +165,7 @@ export const Yara = memo(({ reload, yaraFile, originalYaraFile, setYaraFile }: Y
                       language="yara"
                       width={width}
                       height={height}
-                      theme={isDarkTheme ? 'vs-dark' : 'vs'}
+                      theme={themeMode === 'dark' ? 'vs-dark' : 'vs'}
                       loading={t('loading.yara')}
                       value={yaraFile}
                       onChange={setYaraFile}

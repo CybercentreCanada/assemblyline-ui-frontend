@@ -1,5 +1,5 @@
 import { styled, useTheme } from '@mui/material';
-import { useAppBar, useAppLayout } from '@tui/core';
+import { useAppPreferenceStore } from 'core/preference';
 import { AppLink } from 'core/router';
 import { useAppHashParams } from 'core/routes';
 import useALContext from 'deprecated/hooks/useALContext';
@@ -119,8 +119,8 @@ const WrappedContentWithTOC: React.FC<ContentWithTOCProps> = ({
   titleI18nKey = 'toc',
   topI18nKey = 'top'
 }) => {
-  const { autoHide: autoHideAppbar } = useAppBar();
-  const { current: currentLayout } = useAppLayout();
+  const autoHideAppbar = useAppPreferenceStore(s => s?.template?.autoHideAppbar);
+  const currentLayout = useAppPreferenceStore(s => s?.template?.layout);
   const theme = useTheme();
   const hash = useAppHashParams();
   const { t } = useTranslation([translation]);

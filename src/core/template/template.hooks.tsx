@@ -3,7 +3,7 @@ import type { TuiCookies } from '@tui/core';
 import { useAppInterfaceStore, useAppSetInterfaceStore } from 'core/interface';
 import { useAppPreferenceStore } from 'core/preference';
 import { parseAppThemeFromLegacy } from 'core/template';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useLayoutEffect, useMemo } from 'react';
 
 //*****************************************************************************************
 // App Template Theme Initializer
@@ -50,7 +50,7 @@ export const useAppTemplateThemeInitializer = (): void => {
  * @returns The resolved `light`/`dark` mode
  */
 export const useAppTemplateThemeMode = (): TuiCookies['mode'] => {
-  const requestedMode = useAppPreferenceStore(s => s.layout.mode);
+  const requestedMode = useAppPreferenceStore(s => s.template.mode);
 
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
 
@@ -75,7 +75,7 @@ export const useAppTemplateThemeMode = (): TuiCookies['mode'] => {
  * @returns Nothing
  */
 export const useAppTemplateThemePatcher = (): void => {
-  const layout = useAppPreferenceStore(s => s.layout.layout);
+  const layout = useAppPreferenceStore(s => s.template.layout);
   const initialized = useAppInterfaceStore(s => s.theme.initialized);
   const skin = useAppInterfaceStore(s => s.theme.skin);
   const auth = useAppInterfaceStore(s => s.auth.mode === 'app');
@@ -113,4 +113,56 @@ export const useAppTemplateThemePatcher = (): void => {
       document.getElementById('appbar')?.style.removeProperty('background-color');
     };
   }, [auth, initialized, layout, skin]);
+};
+
+export const APPBAR_READY_EVENT = 'tui.event.appbar.ready';
+
+//*****************************************************************************************
+// App Template Bar Height Updater
+//*****************************************************************************************
+
+/**
+ * @name useAppBarHeight
+ * @description Tracks the current `#appbar` height and persists it to the interface store
+ * so all consumers read a consistent value.
+ * @returns Current appbar height in pixels, or `-1` before first measurement
+ */
+export const useAppTemplateBarHeight = (): number => {
+  const height = useAppInterfaceStore(s => s.template.appBarHeight);
+  const setInterfaceStore = useAppSetInterfaceStore();
+
+  useLayoutEffect(() => {
+    const updateHeight = () => {
+      const appbar = document.getElementById('appbar');
+      if (!appbar) return;
+
+      const nextHeight = appbar.getBoundingClientRect().height;
+
+      setInterfaceStore(s => {
+        if (s.template.appBarHeight === nextHeight) return s;
+        s.template.appBarHeight = nextHeight;
+        return s;
+      });
+    };
+
+    updateHeight();
+
+    let observer: ResizeObserver | null = null;
+    const appbar = document.getElementById('appbar');
+    if (appbar && typeof ResizeObserver !== 'undefined') {
+      observer = new ResizeObserver(updateHeight);
+      observer.observe(appbar);
+    }
+
+    window.addEventListener('resize', updateHeight);
+    window.addEventListener(APPBAR_READY_EVENT, updateHeight);
+
+    return () => {
+      observer?.disconnect();
+      window.removeEventListener('resize', updateHeight);
+      window.removeEventListener(APPBAR_READY_EVENT, updateHeight);
+    };
+  }, [setInterfaceStore]);
+
+  return height;
 };

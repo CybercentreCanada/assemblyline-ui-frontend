@@ -278,7 +278,7 @@ export const QuickSearch = memo(() => {
   const theme = useTheme();
   const navigate = useAppNavigate();
 
-  const showQuickSearch = useAppPreferenceStore(store => store.layout.showQuickSearch);
+  const showQuickSearch = useAppPreferenceStore(store => store.template.showQuickSearch);
   const value = useAppInterfaceStore(store => store.quicksearch.value);
   const searching = useAppInterfaceStore(store => store.quicksearch.searching);
   const menu = useAppInterfaceStore(store => store.quicksearch.menu);

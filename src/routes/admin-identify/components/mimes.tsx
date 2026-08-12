@@ -1,6 +1,6 @@
 import Editor, { DiffEditor, loader } from '@monaco-editor/react';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Skeleton, useTheme } from '@mui/material';
-import { useAppTheme } from '@tui/core';
+import { useAppTemplateThemeMode } from 'core/template';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import useMySnackbar from 'deprecated/hooks/useMySnackbar';
 import { memo, useEffect, useRef, useState } from 'react';
@@ -25,7 +25,7 @@ export const Mimes = memo(({ reload, mimesFile, originalMimesFile, setMimesFile 
   const [open, setOpen] = useState(false);
   const { showSuccessMessage } = useMySnackbar();
   const { apiCall } = useMyAPI();
-  const { isDark: isDarkTheme } = useAppTheme();
+  const themeMode = useAppTemplateThemeMode();
 
   useEffect(() => {
     if (!mimesFile) reload();
@@ -66,7 +66,7 @@ export const Mimes = memo(({ reload, mimesFile, originalMimesFile, setMimesFile 
                 <div ref={containerDialogEL}>
                   <DiffEditor
                     language="mimes"
-                    theme={isDarkTheme ? 'vs-dark' : 'vs'}
+                    theme={themeMode === 'dark' ? 'vs-dark' : 'vs'}
                     original={originalMimesFile}
                     width={width}
                     height="50vh"
@@ -150,7 +150,7 @@ export const Mimes = memo(({ reload, mimesFile, originalMimesFile, setMimesFile 
                       language="yaml"
                       width={width}
                       height={height}
-                      theme={isDarkTheme ? 'vs-dark' : 'vs'}
+                      theme={themeMode === 'dark' ? 'vs-dark' : 'vs'}
                       loading={t('loading.mimes')}
                       value={mimesFile}
                       onChange={setMimesFile}

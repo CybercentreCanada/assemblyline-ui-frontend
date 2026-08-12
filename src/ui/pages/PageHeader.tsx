@@ -1,7 +1,8 @@
 import type { TypographyProps } from '@mui/material';
 import { Skeleton, Typography, useTheme } from '@mui/material';
-import { useAppBar, useAppBarHeight, useAppLayout } from '@tui/core';
 import { useAppConfig } from 'core/config';
+import { useAppInterfaceStore } from 'core/interface';
+import { useAppPreferenceStore } from 'core/preference';
 import type { CSSProperties, DetailedHTMLProps, HTMLAttributes, ReactNode } from 'react';
 import { memo, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import type { ClassificationProps } from 'ui/Classification';
@@ -47,9 +48,10 @@ export const PageHeader = memo(
     onClassificationChange = null
   }: PageHeaderProps) => {
     const theme = useTheme();
-    const layout = useAppLayout();
-    const appbar = useAppBar();
-    const appBarHeight = useAppBarHeight();
+    const barWillHide = useAppPreferenceStore(s =>
+      s?.template?.layout !== 'top' ? s?.template?.autoHideAppbar : null
+    );
+    const appBarHeight = useAppInterfaceStore(s => s?.template?.appBarHeight);
 
     const c12nDef = useAppConfig(s => s?.c12nDef);
 
@@ -58,11 +60,6 @@ export const PageHeader = memo(
     const containerRef = useRef<HTMLDivElement>(null);
     const primaryRef = useRef<HTMLSpanElement>(null);
     const actionsRef = useRef<HTMLDivElement>(null);
-
-    const barWillHide = useMemo(
-      () => (layout?.current !== 'top' ? appbar?.autoHide : null),
-      [layout?.current, appbar?.autoHide]
-    );
 
     const {
       root = {},

@@ -1,7 +1,7 @@
 import type { Monaco } from '@monaco-editor/react';
 import Editor, { DiffEditor, loader } from '@monaco-editor/react';
 import { useTheme } from '@mui/material';
-import { useAppTheme } from '@tui/core';
+import { useAppTemplateThemeMode } from 'core/template';
 import type { editor as MonacoEditorType } from 'monaco-editor';
 import React, { useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -180,7 +180,7 @@ const WrappedMonacoEditor: React.FC<EditorProps | DiffEditorProps> = ({
   const { t, i18n } = useTranslation();
   const theme = useTheme();
   const selection = useSelection();
-  const { isDark: isDarkTheme } = useAppTheme();
+  const themeMode = useAppTemplateThemeMode();
 
   const editorRef = useRef<MonacoEditorType.IStandaloneCodeEditor | null>(null);
 
@@ -254,7 +254,7 @@ const WrappedMonacoEditor: React.FC<EditorProps | DiffEditorProps> = ({
                 language={language}
                 width={width}
                 height={height}
-                theme={isDarkTheme ? 'vs-dark' : 'vs'}
+                theme={themeMode === 'dark' ? 'vs-dark' : 'vs'}
                 original={language === 'json' && beautify ? beautifyJSON(original) : original}
                 modified={language === 'json' && beautify ? beautifyJSON(modified) : modified}
                 loading={t('loading')}
@@ -265,7 +265,7 @@ const WrappedMonacoEditor: React.FC<EditorProps | DiffEditorProps> = ({
                 language={language}
                 width={width}
                 height={height}
-                theme={isDarkTheme ? 'vs-dark' : 'vs'}
+                theme={themeMode === 'dark' ? 'vs-dark' : 'vs'}
                 loading={t('loading')}
                 value={language === 'json' && beautify ? beautifyJSON(value) : value}
                 onChange={v => onChange(v)}

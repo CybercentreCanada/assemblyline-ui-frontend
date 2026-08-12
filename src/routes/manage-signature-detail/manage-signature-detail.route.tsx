@@ -18,9 +18,9 @@ import {
   useTheme
 } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
-import { useAppTheme } from '@tui/core';
 import { useAppBlocker, useAppNavigate } from 'core/router';
 import { createAppRoute, useAppPathParams } from 'core/routes';
+import { useAppTemplateThemeMode } from 'core/template';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import useMySnackbar from 'deprecated/hooks/useMySnackbar';
@@ -224,7 +224,7 @@ export const ManageSignatureDetailPage = memo(() => {
   const { showSuccessMessage, showErrorMessage } = useMySnackbar();
   const { apiCall } = useMyAPI();
   const { user: currentUser, c12nDef } = useALContext();
-  const { isDark: isDarkTheme } = useAppTheme();
+  const themeMode = useAppTemplateThemeMode();
   // const editorRef = useRef(null);
 
   useAppBlocker(() => (modified ? 'unsaved_changes' : null), [modified]);
@@ -532,7 +532,7 @@ export const ManageSignatureDetailPage = memo(() => {
                   language={LANG_SELECTOR[signature.type] || 'plaintext'}
                   width="100%"
                   height="450px"
-                  theme={isDarkTheme ? 'vs-dark' : 'vs'}
+                  theme={themeMode === 'dark' ? 'vs-dark' : 'vs'}
                   loading={t('loading.yara')}
                   value={signature.data}
                   beforeMount={beforeMount}

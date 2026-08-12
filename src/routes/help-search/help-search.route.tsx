@@ -12,7 +12,7 @@ import {
   Typography,
   useTheme
 } from '@mui/material';
-import { useAppBar, useAppLayout } from '@tui/core';
+import { useAppPreferenceStore } from 'core/preference';
 import { createAppRoute } from 'core/routes';
 import type { ContentWithTOCItemDef } from 'deprecated/components/toc/Toc';
 import ContentWithTOC from 'deprecated/components/toc/Toc';
@@ -86,8 +86,8 @@ const StyledTableCell = memo(
 function Paragraph({ id, children }) {
   const theme = useTheme();
 
-  const { autoHide: autoHideAppbar } = useAppBar();
-  const { current: currentLayout } = useAppLayout();
+  const autoHideAppbar = useAppPreferenceStore(s => s?.template?.autoHideAppbar);
+  const currentLayout = useAppPreferenceStore(s => s?.template?.layout);
 
   return (
     <Box

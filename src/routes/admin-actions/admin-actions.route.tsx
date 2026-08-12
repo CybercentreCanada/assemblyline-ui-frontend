@@ -1,9 +1,9 @@
 import Editor, { DiffEditor, loader } from '@monaco-editor/react';
 import PlaylistPlayOutlinedIcon from '@mui/icons-material/PlaylistPlayOutlined';
 import { Dialog, DialogActions, DialogContent, DialogTitle, Skeleton, useTheme } from '@mui/material';
-import { useAppTheme } from '@tui/core';
 import { useAppBlocker } from 'core/router';
 import { createAppRoute } from 'core/routes';
+import { useAppTemplateThemeMode } from 'core/template';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import useMySnackbar from 'deprecated/hooks/useMySnackbar';
@@ -29,7 +29,7 @@ export const AdminActionsPage = memo(() => {
   const { showSuccessMessage } = useMySnackbar();
   const { apiCall } = useMyAPI();
   const { user: currentUser } = useALContext();
-  const { isDark: isDarkTheme } = useAppTheme();
+  const themeMode = useAppTemplateThemeMode();
 
   useEffect(() => {
     reload(false);
@@ -117,7 +117,7 @@ export const AdminActionsPage = memo(() => {
                 <div ref={containerDialogEL}>
                   <DiffEditor
                     language="yaml"
-                    theme={isDarkTheme ? 'vs-dark' : 'vs'}
+                    theme={themeMode === 'dark' ? 'vs-dark' : 'vs'}
                     original={originalActions}
                     width={width}
                     height="50vh"
@@ -165,7 +165,7 @@ export const AdminActionsPage = memo(() => {
                       language="yaml"
                       width={width}
                       height={height}
-                      theme={isDarkTheme ? 'vs-dark' : 'vs'}
+                      theme={themeMode === 'dark' ? 'vs-dark' : 'vs'}
                       loading={t('loading')}
                       value={actions}
                       onChange={setActions}

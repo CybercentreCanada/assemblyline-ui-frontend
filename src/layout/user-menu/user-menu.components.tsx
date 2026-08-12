@@ -20,7 +20,7 @@ import {
   useTheme
 } from '@mui/material';
 import type { SelectChangeEvent } from '@mui/material/Select';
-import { AppAvatar, AppUserAvatar, useAppLanguage, useAppPreferences, useAppTheme } from '@tui/core';
+import { AppAvatar, AppUserAvatar, useAppTheme } from '@tui/core';
 import { useAppConfig } from 'core/config';
 import { useAppInterfaceStore, useAppSetInterfaceStore } from 'core/interface';
 import { useAppPreferenceStore, useAppSetPreferenceStore } from 'core/preference';
@@ -163,14 +163,24 @@ export const UserLanguage = memo(() => {
   const { t } = useTranslation();
   const theme = useTheme();
 
-  const { isFR, toggle: toggleLanguage } = useAppLanguage();
-  const { allowTranslate } = useAppPreferences();
+  const lang = useAppPreferenceStore(s => s?.template?.lang);
+  const allowTranslate = useAppPreferenceStore(s => s?.template?.allowTranslate);
+  const setPreferenceStore = useAppSetPreferenceStore();
 
   return !allowTranslate ? null : (
     <>
       <Divider />
       <List dense subheader={<ListSubheader disableSticky>{t('app.language')}</ListSubheader>}>
-        <ListItemButton id="language" dense onClick={toggleLanguage}>
+        <ListItemButton
+          id="language"
+          dense
+          onClick={() =>
+            setPreferenceStore(s => {
+              s.template.lang = s.template.lang === 'fr' ? 'en' : 'fr';
+              return s;
+            })
+          }
+        >
           <div
             style={{
               display: 'flex',
@@ -181,7 +191,7 @@ export const UserLanguage = memo(() => {
             }}
           >
             <Typography variant="body2">English</Typography>
-            <Switch checked={isFR()} name="langSwitch" />
+            <Switch checked={lang === 'fr'} name="langSwitch" />
             <Typography variant="body2">Français</Typography>
           </div>
         </ListItemButton>
@@ -198,10 +208,10 @@ UserLanguage.displayName = 'UserLanguage';
 export const UserPersonalization = memo(() => {
   const { t } = useTranslation();
 
-  const layoutMode = useAppPreferenceStore(s => s.layout.layout);
-  const autoHideAppbar = useAppPreferenceStore(s => s.layout.autoHideAppbar);
-  const showQuickSearch = useAppPreferenceStore(s => s.layout.showQuickSearch);
-  const showBreadcrumbs = useAppPreferenceStore(s => s.layout.showBreadcrumbs);
+  const layoutMode = useAppPreferenceStore(s => s.template.layout);
+  const autoHideAppbar = useAppPreferenceStore(s => s.template.autoHideAppbar);
+  const showQuickSearch = useAppPreferenceStore(s => s.template.showQuickSearch);
+  const showBreadcrumbs = useAppPreferenceStore(s => s.template.showBreadcrumbs);
   const { showSafeResults, toggleShowSafeResults } = useAppSafeResults();
 
   const setPreferenceStore = useAppSetPreferenceStore();
@@ -209,7 +219,7 @@ export const UserPersonalization = memo(() => {
 
   const toggleLayoutMode = useCallback(() => {
     setPreferenceStore(s => {
-      s.layout.layout = s.layout.layout === 'top' ? 'side' : 'top';
+      s.template.layout = s.template.layout === 'top' ? 'side' : 'top';
       return s;
     });
     setInterfaceStore(s => {
@@ -220,21 +230,21 @@ export const UserPersonalization = memo(() => {
 
   const toggleShowQuickSearch = useCallback(() => {
     setPreferenceStore(s => {
-      s.layout.showQuickSearch = !s.layout.showQuickSearch;
+      s.template.showQuickSearch = !s.template.showQuickSearch;
       return s;
     });
   }, [setPreferenceStore]);
 
   const toggleAutoHideAppbar = useCallback(() => {
     setPreferenceStore(s => {
-      s.layout.autoHideAppbar = !s.layout.autoHideAppbar;
+      s.template.autoHideAppbar = !s.template.autoHideAppbar;
       return s;
     });
   }, [setPreferenceStore]);
 
   const toggleShowBreadcrumbs = useCallback(() => {
     setPreferenceStore(s => {
-      s.layout.showBreadcrumbs = !s.layout.showBreadcrumbs;
+      s.template.showBreadcrumbs = !s.template.showBreadcrumbs;
       return s;
     });
   }, [setPreferenceStore]);
@@ -313,7 +323,7 @@ export const UserTheme = memo(() => {
 
   const { mode, toggleMode: toggleThemeMode } = useAppTheme();
 
-  const themeMode = useAppPreferenceStore(s => s.layout.mode);
+  const themeMode = useAppPreferenceStore(s => s.template.mode);
 
   const setPreferenceStore = useAppSetPreferenceStore();
 
@@ -325,7 +335,7 @@ export const UserTheme = memo(() => {
       if (value === themeMode) return;
 
       setPreferenceStore(s => {
-        s.layout.mode = value;
+        s.template.mode = value;
         return s;
       });
 

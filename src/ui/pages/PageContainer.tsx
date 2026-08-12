@@ -1,7 +1,8 @@
 import type { ButtonProps, IconButtonProps } from '@mui/material';
 import { AppBar, Button, IconButton, Toolbar, Tooltip, useTheme } from '@mui/material';
-import { useAppBar, useAppBarHeight, useAppLayout } from '@tui/core';
-import { memo, useMemo } from 'react';
+import { useAppInterfaceStore } from 'core/interface';
+import { useAppPreferenceStore } from 'core/preference';
+import { memo } from 'react';
 
 export type PageHeaderAction = {
   key?: string;
@@ -38,14 +39,12 @@ export const PageContainer = memo(
     elevation = 0
   }: PageHeaderProps) => {
     const theme = useTheme();
-    const layout = useAppLayout();
-    const appbar = useAppBar();
-    const appBarHeight = useAppBarHeight();
 
-    const barWillHide = useMemo(
-      () => (layout?.current !== 'top' ? appbar?.autoHide : null),
-      [appbar?.autoHide, layout]
+    const barWillHide = useAppPreferenceStore(s =>
+      s?.template?.layout !== 'top' ? s?.template?.autoHideAppbar : null
     );
+    const appBarHeight = useAppInterfaceStore(s => s?.template?.appBarHeight);
+
     const computedTop = top !== null ? top : isSticky ? (barWillHide ? 0 : appBarHeight) : null;
 
     return (

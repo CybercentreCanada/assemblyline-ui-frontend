@@ -1,6 +1,6 @@
 import Editor, { DiffEditor, loader } from '@monaco-editor/react';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Skeleton, useTheme } from '@mui/material';
-import { useAppTheme } from '@tui/core';
+import { useAppTemplateThemeMode } from 'core/template';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import useMySnackbar from 'deprecated/hooks/useMySnackbar';
 import { memo, useEffect, useRef, useState } from 'react';
@@ -25,7 +25,7 @@ export const Patterns = memo(({ reload, patternsFile, originalPatternsFile, setP
   const [open, setOpen] = useState(false);
   const { showSuccessMessage } = useMySnackbar();
   const { apiCall } = useMyAPI();
-  const { isDark: isDarkTheme } = useAppTheme();
+  const themeMode = useAppTemplateThemeMode();
 
   useEffect(() => {
     if (!patternsFile) reload();
@@ -66,7 +66,7 @@ export const Patterns = memo(({ reload, patternsFile, originalPatternsFile, setP
                 <div ref={containerDialogEL}>
                   <DiffEditor
                     language="patterns"
-                    theme={isDarkTheme ? 'vs-dark' : 'vs'}
+                    theme={themeMode === 'dark' ? 'vs-dark' : 'vs'}
                     original={originalPatternsFile}
                     width={width}
                     height="50vh"
@@ -150,7 +150,7 @@ export const Patterns = memo(({ reload, patternsFile, originalPatternsFile, setP
                       language="yaml"
                       width={width}
                       height={height}
-                      theme={isDarkTheme ? 'vs-dark' : 'vs'}
+                      theme={themeMode === 'dark' ? 'vs-dark' : 'vs'}
                       loading={t('loading.patterns')}
                       value={patternsFile}
                       onChange={setPatternsFile}
