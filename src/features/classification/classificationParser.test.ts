@@ -1,7 +1,10 @@
 /* eslint-disable no-console */
 import type { ClassificationDefinition, ClassificationParts } from 'features/classification/classificationParser';
 import {
+  applyAliases,
   applyClassificationRules,
+  canSeeGroups,
+  canSeeRequired,
   getLevelText,
   getMaxClassification,
   getParts,
@@ -848,5 +851,49 @@ describe('`applyClassificationRules` should correctly identify incorrect combina
       groups: [],
       subgroups: []
     });
+  });
+});
+
+describe('canSeeRequired', () => {
+  it('returns true when no required values are given', () => {
+    expect(canSeeRequired(['AC'], [])).toBe(true);
+  });
+
+  it('returns true when the user has all required values', () => {
+    expect(canSeeRequired(['AC', 'LE'], ['AC'])).toBe(true);
+  });
+
+  it('returns false when the user is missing a required value', () => {
+    expect(canSeeRequired(['AC'], ['AC', 'LE'])).toBe(false);
+  });
+});
+
+describe('canSeeGroups', () => {
+  it('returns true when no groups are given', () => {
+    expect(canSeeGroups(['A'], [])).toBe(true);
+  });
+
+  it('returns true when the user has at least one of the given groups', () => {
+    expect(canSeeGroups(['A', 'B'], ['B', 'X'])).toBe(true);
+  });
+
+  it('returns false when the user has none of the given groups', () => {
+    expect(canSeeGroups(['A'], ['B', 'X'])).toBe(false);
+  });
+});
+
+describe('applyAliases', () => {
+  it('replaces matching alias keys with the long name', () => {
+    const aliases = { L0: { name: 'LEVEL ZERO', short_name: 'LZ' } };
+    expect(applyAliases('L0//A', aliases as never, 'long')).toBe('LEVEL ZERO//A');
+  });
+
+  it('replaces matching alias keys with the short name', () => {
+    const aliases = { L0: { name: 'LEVEL ZERO', short_name: 'LZ' } };
+    expect(applyAliases('L0//A', aliases as never, 'short')).toBe('LZ//A');
+  });
+
+  it('returns the classification unchanged when there are no aliases', () => {
+    expect(applyAliases('L0//A', {}, 'long')).toBe('L0//A');
   });
 });

@@ -1,6 +1,12 @@
-import { loadPreferenceFromLocalStorage, savePreferenceToLocalStorage } from 'core/preference/preference.utils';
+import { DEFAULT_APP_PREFERENCE_STORE } from 'app/core.preference';
+import {
+  getAppPreferenceStateFromApi,
+  loadPreferenceFromLocalStorage,
+  savePreferenceToLocalStorage
+} from 'core/preference/preference.utils';
 import { describe, expect, it, vi } from 'vitest';
 import { z } from 'zod';
+import type { StoreApi } from 'zustand';
 
 const TestSchema = z.object({
   api: z
@@ -18,6 +24,28 @@ const TestSchema = z.object({
 });
 
 const STORAGE_KEY = 'test.preference';
+
+//*****************************************************************************************
+// getAppPreferenceStateFromApi
+//*****************************************************************************************
+describe('getAppPreferenceStateFromApi', () => {
+  it('returns the state from the store api', () => {
+    const state = { api: { gcTime: 1 } } as unknown as AppPreferenceStore;
+    const api = { getState: () => state } as StoreApi<AppPreferenceStore>;
+    expect(getAppPreferenceStateFromApi(api)).toBe(state);
+  });
+
+  it('falls back to defaults when the api has no state', () => {
+    const api = { getState: () => undefined } as unknown as StoreApi<AppPreferenceStore>;
+    expect(getAppPreferenceStateFromApi(api)).toBe(DEFAULT_APP_PREFERENCE_STORE);
+  });
+
+  it('falls back to defaults when the api is null', () => {
+    expect(getAppPreferenceStateFromApi(null as unknown as StoreApi<AppPreferenceStore>)).toBe(
+      DEFAULT_APP_PREFERENCE_STORE
+    );
+  });
+});
 
 //*****************************************************************************************
 // savePreferenceToLocalStorage

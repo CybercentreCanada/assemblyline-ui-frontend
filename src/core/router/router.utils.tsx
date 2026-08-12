@@ -938,6 +938,11 @@ export const removePage = function <const Store extends AppSharedRouterStore>(
 ): Store {
   if (!(pageKey in store.pages)) return store;
   delete store.pages[pageKey];
+
+  if ('blockedPages' in (store as Record<string, unknown>)) {
+    delete (store as unknown as AppNavigationStore).blockedPages[pageKey as string];
+  }
+
   return store;
 };
 
@@ -2112,6 +2117,14 @@ export const getNavigationStoreFromRouter = (store: AppNavigationStore, router: 
   for (const pageKey of Object.keys(store.pages)) {
     if (pageKey in router.pages) continue;
     store = removePage(store, pageKey);
+  }
+
+  if ('blockedPages' in (store as Record<string, unknown>)) {
+    const navigationStore = store as unknown as AppNavigationStore;
+    for (const pageKey of Object.keys(navigationStore.blockedPages)) {
+      if (pageKey in router.pages) continue;
+      delete navigationStore.blockedPages[pageKey];
+    }
   }
 
   for (const [nodeKey, node] of Object.entries(router.nodes)) {

@@ -1,7 +1,6 @@
-import { MOCK_PROFILES } from 'tests/mocks/profiles';
-import { MOCK_SETTINGS } from 'tests/mocks/setting';
-import { MOCK_ADMIN, MOCK_USER } from 'tests/mocks/user';
-
+import { MOCK_PROFILES } from 'models/mocks/profiles';
+import { MOCK_SETTINGS } from 'models/mocks/setting';
+import { MOCK_ADMIN, MOCK_USER } from 'models/mocks/user';
 import {
   getProfileNames,
   getValidValue,
@@ -16,8 +15,7 @@ import {
   resetDefaultSubmissionValues,
   resetPreviousSubmissionValues,
   updatePreviousSubmissionValues
-} from './settings.utils';
-
+} from 'routes/settings/settings.utils';
 import { describe, expect, it } from 'vitest';
 
 /* ------------------------------------------------------------------------- */

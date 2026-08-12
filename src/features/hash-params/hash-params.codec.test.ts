@@ -85,5 +85,18 @@ describe('hash-params.codec', () => {
       const location2: Location = { pathname: '/test', hash: 'title', search: '', state: null, key: 'default' };
       expect(codec.parse(location2)).toBe('title');
     });
+
+    it('should parse and stringify string hash values, falling back to the default', () => {
+      const codec = createHashParamCodec()(blueprint => blueprint.string('fallback'));
+
+      const location1: Location = { pathname: '/test', hash: '#custom', search: '', state: null, key: 'default' };
+      expect(codec.parse(location1)).toBe('custom');
+
+      const location2: Location = { pathname: '/test', hash: '', search: '', state: null, key: 'default' };
+      expect(codec.parse(location2)).toBe('fallback');
+
+      expect(codec.stringify('custom')).toBe('#custom');
+      expect(codec.stringify('fallback')).toBe('');
+    });
   });
 });

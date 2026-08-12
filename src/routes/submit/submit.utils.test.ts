@@ -1,10 +1,8 @@
 import type { UserSettings } from 'models/base/user_settings';
+import { MOCK_CONFIGURATION } from 'models/mocks/configuration';
+import { MOCK_SETTINGS } from 'models/mocks/setting';
 import { initializeSettings } from 'routes/settings/settings.utils';
-import { generateRandomUUID } from 'shared/utils/app.utils';
-import { MOCK_CONFIGURATION } from 'tests/mocks/configuration';
-import { MOCK_SETTINGS } from 'tests/mocks/setting';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
-import type { SubmitStore } from './submit.form';
+import type { SubmitStore } from 'routes/submit/submit.form';
 import {
   calculateFileHash,
   getDefaultExternalSources,
@@ -15,7 +13,9 @@ import {
   isValidJSON,
   isValidMetadata,
   parseSubmitProfile
-} from './submit.utils';
+} from 'routes/submit/submit.utils';
+import { generateRandomUUID } from 'shared/utils/app.utils';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 // ------------------------ Helpers -----------------------------------------
 const clone = <T>(x: T) => JSON.parse(JSON.stringify(x)) as T;
