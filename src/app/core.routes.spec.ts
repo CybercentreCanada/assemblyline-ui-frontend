@@ -1,3 +1,4 @@
+import type { Page } from '@playwright/test';
 import { expect, test } from 'core/e2e/e2e.fixtures';
 
 // Replace route parameters with dummy test values
@@ -71,9 +72,46 @@ const routes = [
   '/tos'
 ];
 
-test.skip('Route Smoke Tests', () => {
+const routeToSnapshotName = (route: string): string => {
+  const normalized = route === '/' ? 'root' : route.slice(1);
+  const safeName = normalized.replace(/[^a-zA-Z0-9_-]/g, '_');
+  return `route-${safeName}.png`;
+};
+
+const waitForVisualReady = async (page: Page) => {
+  await page.waitForLoadState('domcontentloaded');
+  await expect(page.locator('body')).toBeVisible();
+
+  const signingInText = page.getByText('Signing you in...');
+  if ((await signingInText.count()) > 0) {
+    await expect(signingInText.first()).toBeHidden({ timeout: 30_000 });
+  }
+
+  await expect
+    .poll(
+      async () =>
+        await page.evaluate(() => {
+          const isVisible = (el: Element) => {
+            const html = el as HTMLElement;
+            const style = window.getComputedStyle(html);
+            const rect = html.getBoundingClientRect();
+            return style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0;
+          };
+
+          return Array.from(document.querySelectorAll('[role="progressbar"]')).filter(isVisible).length;
+        }),
+      { message: 'Waiting for loading indicators to disappear', timeout: 30_000 }
+    )
+    .toBe(0);
+
+  await page.evaluate(
+    () => new Promise<void>(resolve => requestAnimationFrame(() => requestAnimationFrame(() => resolve())))
+  );
+};
+
+test.describe('Route Smoke Tests', () => {
   for (const route of routes) {
-    test(`should load ${route} without errors`, async ({ page }) => {
+    test(`should load ${route} without errors and match snapshot`, async ({ page }) => {
       const errors: string[] = [];
 
       page.on('console', msg => {
@@ -82,13 +120,20 @@ test.skip('Route Smoke Tests', () => {
         }
       });
 
-      const response = await page.goto(route, { waitUntil: 'networkidle' });
+      const response = await page.goto(route, { waitUntil: 'domcontentloaded' });
       expect(response, `No response for ${route}`).not.toBeNull();
 
       const status = response.status();
       expect(status, `Unexpected status for ${route}`).toBeLessThan(400);
 
       expect(errors, `Console errors for ${route}: ${errors.join('\n')}`).toHaveLength(0);
+
+      await waitForVisualReady(page);
+
+      await expect(page).toHaveScreenshot(routeToSnapshotName(route), {
+        animations: 'disabled',
+        fullPage: true
+      });
     });
   }
 });
