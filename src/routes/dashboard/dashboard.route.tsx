@@ -6,6 +6,7 @@ import SpeedOutlinedIcon from '@mui/icons-material/SpeedOutlined';
 import type { CardProps, SwitchProps, TooltipProps } from '@mui/material';
 import { Card, Grid, Skeleton, styled, Switch, Tooltip, Typography, useTheme } from '@mui/material';
 import { createAppRoute } from 'core/routes';
+import { AppPageFullWidth } from 'core/template';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import type { AlerterMessage } from 'models/messages/alerter_heartbeat';
@@ -26,7 +27,6 @@ import io from 'socket.io-client';
 import ArcGauge from 'ui/ArcGauge';
 import type { CustomChipProps } from 'ui/CustomChip';
 import { CustomChip } from 'ui/CustomChip';
-import { PageFullWidth } from 'ui/pages/PageFullWidth';
 
 const NAMESPACE = '/status';
 
@@ -1671,7 +1671,7 @@ export const DashboardPage = memo(() => {
   }, []);
 
   return (
-    <PageFullWidth margin={4}>
+    <AppPageFullWidth>
       <Typography gutterBottom color="primary" variant="h2" align="center">
         {t('title')}
       </Typography>
@@ -1756,7 +1756,7 @@ export const DashboardPage = memo(() => {
             </Grid>
           ))}
       </Grid>
-    </PageFullWidth>
+    </AppPageFullWidth>
   );
 });
 

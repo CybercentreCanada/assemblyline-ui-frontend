@@ -1,9 +1,9 @@
 import BedtimeOutlinedIcon from '@mui/icons-material/BedtimeOutlined';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import { Typography, useMediaQuery, useTheme } from '@mui/material';
+import { AppPageCenter } from 'core/template';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { PageCenter } from 'ui/pages/PageCenter';
 
 type ForbiddenPageProps = {
   disabled?: boolean;
@@ -15,7 +15,7 @@ export const ForbiddenPage = memo(({ disabled = false }: ForbiddenPageProps) => 
   const downSM = useMediaQuery(theme.breakpoints.down('md'));
 
   return (
-    <PageCenter width="65%" margin={4}>
+    <AppPageCenter>
       <div style={{ paddingTop: theme.spacing(10), fontSize: 200, color: theme.palette.secondary.main }}>
         {disabled ? <BedtimeOutlinedIcon fontSize="inherit" /> : <LockOutlinedIcon fontSize="inherit" />}
       </div>
@@ -33,7 +33,7 @@ export const ForbiddenPage = memo(({ disabled = false }: ForbiddenPageProps) => 
           gutterBottom
         />
       </div>
-    </PageCenter>
+    </AppPageCenter>
   );
 });
 

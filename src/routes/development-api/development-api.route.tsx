@@ -5,6 +5,7 @@ import { Button, Grid, Paper, Skeleton, Typography, useTheme } from '@mui/materi
 import type { Method } from 'core/api';
 import { useApiMutation, useAppQuery } from 'core/api';
 import { createAppRoute } from 'core/routes';
+import { AppPageFullSize } from 'core/template';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMySnackbar from 'deprecated/hooks/useMySnackbar';
 import type { ApiDocumentation } from 'models/api';
@@ -22,7 +23,6 @@ import {
 } from 'routes/development-api/development-api.utils';
 import CustomChip from 'ui/CustomChip';
 import { PageHeader } from 'ui/layouts/PageHeader';
-import { PageFullSizeLayout } from 'ui/pages/PageFullSize';
 
 loader.config({
   paths: { vs: '/cdn/monaco_0.35.0/vs' }
@@ -194,7 +194,7 @@ export const DevelopmentAPIPage = memo(() => {
   }, [currentRoute, request]);
 
   return (
-    <PageFullSizeLayout margin={4}>
+    <AppPageFullSize>
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', rowGap: theme.spacing(2) }}>
         <PageHeader
           primary={t('title')}
@@ -378,7 +378,7 @@ export const DevelopmentAPIPage = memo(() => {
           </div>
         )}
       </div>
-    </PageFullSizeLayout>
+    </AppPageFullSize>
   );
 });
 

@@ -7,9 +7,9 @@ import ListAltOutlinedIcon from '@mui/icons-material/ListAltOutlined';
 import PrintOutlinedIcon from '@mui/icons-material/PrintOutlined';
 import type { TooltipProps } from '@mui/material';
 import { Box, Grid, Skeleton, styled, Tooltip, Typography, useTheme } from '@mui/material';
-import { PageCenter } from '@tui/core';
 import { useAppNavigate } from 'core/router';
 import { createAppRoute, useAppPathParams } from 'core/routes';
+import { AppPageCenter } from 'core/template';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import useMySnackbar from 'deprecated/hooks/useMySnackbar';
@@ -183,7 +183,7 @@ const SubmissionReportPage = memo(() => {
   }, [settings]);
 
   return currentUser.roles.includes('submission_view') ? (
-    <PageCenter margin={4} width="100%">
+    <AppPageCenter>
       <Box
         sx={{
           '@media print': {
@@ -322,7 +322,7 @@ const SubmissionReportPage = memo(() => {
         <Tags report={report} />
         <FileTreeSection report={report} />
       </Box>
-    </PageCenter>
+    </AppPageCenter>
   ) : (
     <ForbiddenPage />
   );

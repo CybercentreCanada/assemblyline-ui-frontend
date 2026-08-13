@@ -10,11 +10,11 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
+import { AppPageCenter } from 'core/template';
 import { memo, useCallback, useEffect, useState } from 'react';
 import type { FallbackProps } from 'react-error-boundary';
 import { useTranslation } from 'react-i18next';
 import { GiSpottedBug } from 'react-icons/gi';
-import { PageCenter } from 'ui/pages/PageCenter';
 
 //*****************************************************************************************
 // BugContainer
@@ -197,7 +197,7 @@ export const ErrorFallback = memo(
       </div>
     ) : (
       <div data-testid="error-fallback" role="alert" style={{ display: 'flex', justifyContent: 'center' }}>
-        <PageCenter margin={4}>
+        <AppPageCenter>
           <BugContainer>
             <Bug fontSize="inherit" />
           </BugContainer>
@@ -246,7 +246,7 @@ export const ErrorFallback = memo(
           <Button onClick={resetErrorBoundary} style={{ margin: theme.spacing(4) }} color="primary">
             {t('error.button')}
           </Button>
-        </PageCenter>
+        </AppPageCenter>
       </div>
     );
   }

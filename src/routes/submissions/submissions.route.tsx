@@ -6,6 +6,7 @@ import { useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import { useAppNavigate } from 'core/router';
 import { createAppRoute, useAppSearchSnapshot } from 'core/routes';
+import { AppPageContainer, AppPageFullWidth } from 'core/template';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import type { IndexDefinition } from 'models/api/user';
@@ -15,8 +16,6 @@ import { useTranslation } from 'react-i18next';
 import { ForbiddenPage } from 'routes/forbidden/forbidden';
 import { SubmissionsTable } from 'routes/search/components/submissions';
 import { safeFieldValue } from 'shared/utils/utils';
-import { PageContainer } from 'ui/pages/PageContainer';
-import { PageFullWidth } from 'ui/pages/PageFullWidth';
 import { DEFAULT_SUGGESTION } from 'ui/SearchBar/search-textfield';
 import SearchHeader from 'ui/SearchBar/SearchHeader';
 
@@ -78,12 +77,12 @@ const Submissions = memo(() => {
   }, [currentUser.roles, search?.toString()]);
 
   return currentUser.roles.includes('submission_view') ? (
-    <PageFullWidth margin={4}>
+    <AppPageFullWidth>
       <div style={{ paddingBottom: theme.spacing(2) }}>
         <Typography variant="h4">{t('title')}</Typography>
       </div>
 
-      <PageContainer isSticky>
+      <AppPageContainer isSticky>
         <div style={{ paddingTop: theme.spacing(1) }}>
           <SearchHeader
             params={search.toParams()}
@@ -155,12 +154,12 @@ const Submissions = memo(() => {
             ]}
           />
         </div>
-      </PageContainer>
+      </AppPageContainer>
 
       <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
         <SubmissionsTable submissionResults={submissionResults} />
       </div>
-    </PageFullWidth>
+    </AppPageFullWidth>
   ) : (
     <ForbiddenPage />
   );

@@ -1,11 +1,11 @@
 import SettingsApplicationsOutlinedIcon from '@mui/icons-material/SettingsApplicationsOutlined';
 import { Grid, Skeleton, Typography, useTheme } from '@mui/material';
 import { createAppRoute } from 'core/routes';
+import { AppPageFullWidth } from 'core/template';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CustomChip } from 'ui/CustomChip';
-import { PageFullWidth } from 'ui/pages/PageFullWidth';
 
 export const HelpConfigurationPage = memo(() => {
   const { apiCall } = useMyAPI();
@@ -43,7 +43,7 @@ export const HelpConfigurationPage = memo(() => {
   }, []);
 
   return (
-    <PageFullWidth margin={4}>
+    <AppPageFullWidth>
       <div style={{ textAlign: 'left' }}>
         <div style={{ marginBottom: theme.spacing(4) }}>
           <Typography variant="h4">{t('title')}</Typography>
@@ -230,7 +230,7 @@ export const HelpConfigurationPage = memo(() => {
           </div>
         </div>
       </div>
-    </PageFullWidth>
+    </AppPageFullWidth>
   );
 });
 

@@ -4,13 +4,12 @@ import { useApiMutation, useApiQuery } from 'core/api';
 import { useAppConfig } from 'core/config';
 import { useAppSetInterfaceStore } from 'core/interface';
 import { createAppRoute } from 'core/routes';
+import { AppBanner, AppPageCenter } from 'core/template';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import Markdown from 'react-markdown';
 import { NotFoundPage } from 'routes/not-found/not-found';
-import { AppBanner } from 'ui/branding/AppBanner';
 import { Button } from 'ui/buttons/Button';
-import { PageCenter } from 'ui/pages/PageCenter';
 
 //*****************************************************************************************
 // ToS Page
@@ -53,7 +52,7 @@ export const ToSPage = memo(() => {
   return !configuration?.ui?.tos ? (
     <NotFoundPage />
   ) : (
-    <PageCenter margin={4} width="100%">
+    <AppPageCenter>
       <TosContainer>
         <AppBanner />
         <div style={{ marginBottom: theme.spacing(6), textAlign: 'left' }}>
@@ -113,7 +112,7 @@ export const ToSPage = memo(() => {
           </>
         )}
       </TosContainer>
-    </PageCenter>
+    </AppPageCenter>
   );
 });
 

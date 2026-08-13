@@ -3,6 +3,7 @@ import { Alert, Collapse, styled, useMediaQuery, useTheme } from '@mui/material'
 import { useAppConfig } from 'core/config';
 import { createAppRoute, useAppLocation, useAppSearchSnapshot } from 'core/routes';
 import { useAppSnackbar } from 'core/snackbar';
+import { AppBanner, AppPageCenter } from 'core/template';
 import type { Metadata } from 'models/base/submission';
 import { memo, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -39,8 +40,6 @@ import {
 } from 'routes/submit/submit.utils';
 import { generateRandomUUID } from 'shared/utils/app.utils';
 import { getSubmitType } from 'shared/utils/utils';
-import { AppBanner } from 'ui/branding/AppBanner';
-import { PageCenter } from 'ui/pages/PageCenter';
 import { TabContainer } from 'ui/TabContainer';
 
 type AdjustProps = { adjust: boolean };
@@ -277,7 +276,7 @@ const WrappedSubmitRoute = memo(() => {
   }, [configuration, currentUser, searchSnapshot, settings]);
 
   return (
-    <PageCenter maxWidth={downMD ? '100%' : `${theme.breakpoints.values.md}px`} margin={3.5} width="100%">
+    <AppPageCenter style={{ maxWidth: downMD ? '100%' : `${theme.breakpoints.values.md}px` }}>
       <div style={{ marginTop: theme.spacing(4), marginBottom: theme.spacing(4) }}>
         <AppBanner />
       </div>
@@ -392,7 +391,7 @@ const WrappedSubmitRoute = memo(() => {
       />
 
       <div style={{ height: '200px' }} />
-    </PageCenter>
+    </AppPageCenter>
   );
 });
 

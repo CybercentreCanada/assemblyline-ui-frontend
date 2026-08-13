@@ -38,8 +38,10 @@ import {
 import Typography from '@mui/material/Typography';
 import { AppLink, useAppNavigate } from 'core/router';
 import { createAppRoute, useAppPathParams } from 'core/routes';
+import { AppPageCenter } from 'core/template';
 import useALContext from 'deprecated/hooks/useALContext';
-import useHighlighter, { HighlighMapProps } from 'deprecated/hooks/useHighlighter';
+import type { HighlighMapProps } from 'deprecated/hooks/useHighlighter';
+import useHighlighter from 'deprecated/hooks/useHighlighter';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import useMySnackbar from 'deprecated/hooks/useMySnackbar';
 import { useAppAssistant } from 'layout/assistant';
@@ -71,9 +73,8 @@ import io from 'socket.io-client';
 import { FileDownloader } from 'ui/buttons/FileDownloader';
 import { IconButton } from 'ui/buttons/IconButton';
 import ConfirmationDialog from 'ui/ConfirmationDialog';
+import { PageHeader } from 'ui/layouts/PageHeader';
 import MetadataInputField from 'ui/MetadataInputField';
-import { PageCenter } from 'ui/pages/PageCenter';
-import { PageHeader } from 'ui/pages/PageHeader';
 import VerdictBar from 'ui/VerdictBar';
 
 const NAMESPACE = '/live_submission';
@@ -951,7 +952,7 @@ const SubmissionDetail = memo(() => {
   }, [id]);
 
   return currentUser.roles.includes('submission_view') ? (
-    <PageCenter margin={4} width="100%">
+    <AppPageCenter>
       <ConfirmationDialog
         open={deleteDialog}
         handleClose={() => setDeleteDialog(false)}
@@ -1436,7 +1437,7 @@ const SubmissionDetail = memo(() => {
         )}
         <FileTreeSection tree={tree} sid={id} baseFiles={baseFiles} force={submission && submission.max_score < 0} />
       </div>
-    </PageCenter>
+    </AppPageCenter>
   ) : (
     <ForbiddenPage />
   );

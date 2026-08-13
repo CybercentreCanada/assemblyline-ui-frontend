@@ -1,13 +1,13 @@
 import BarChartOutlinedIcon from '@mui/icons-material/BarChartOutlined';
 import { Skeleton, Typography, useTheme } from '@mui/material';
 import { createAppRoute } from 'core/routes';
+import { AppPageFullWidth } from 'core/template';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Cell } from 'ui/Table/enhanced_table';
 import EnhancedTable from 'ui/Table/enhanced_table';
-import { PageFullWidth } from 'ui/pages/PageFullWidth';
 
 type SignatureStat = {
   id: string;
@@ -60,7 +60,7 @@ export const StatisticsSignaturesPage = memo(() => {
   }
 
   return (
-    <PageFullWidth margin={4}>
+    <AppPageFullWidth>
       <div style={{ paddingBottom: theme.spacing(2) }}>
         <Typography variant="h4">{t('title')}</Typography>
       </div>
@@ -76,7 +76,7 @@ export const StatisticsSignaturesPage = memo(() => {
       ) : (
         <Skeleton height="10rem" />
       )}
-    </PageFullWidth>
+    </AppPageFullWidth>
   );
 });
 

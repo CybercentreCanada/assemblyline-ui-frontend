@@ -15,6 +15,7 @@ import {
 import Autocomplete from '@mui/material/Autocomplete';
 import { useAppBlocker, useAppNavigate } from 'core/router';
 import { createAppRoute } from 'core/routes';
+import { AppPageFullWidth } from 'core/template';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import useMySnackbar from 'deprecated/hooks/useMySnackbar';
@@ -31,7 +32,6 @@ import { useTranslation } from 'react-i18next';
 import { HASH_MAP, MD5_REGEX, SHA1_REGEX, SHA256_REGEX, SSDEEP_REGEX, TLSH_REGEX } from 'shared/utils/constant';
 import Classification from 'ui/Classification';
 import DatePicker from 'ui/DatePicker';
-import { PageFullWidth } from 'ui/pages/PageFullWidth';
 
 export const ManageSafelistAddPage = memo(() => {
   const { t } = useTranslation(['manageSafelistAdd']);
@@ -207,29 +207,18 @@ export const ManageSafelistAddPage = memo(() => {
   };
 
   return (
-    <PageFullWidth margin={4}>
-      <div
-        style={{
-          alignItems: 'start',
-          display: 'flex',
-          float: 'right',
-          marginTop: theme.spacing(-8),
-          marginRight: theme.spacing(-1),
-          position: 'sticky',
-          top: theme.spacing(2),
-          zIndex: 10
-        }}
-      >
-        <Button variant="contained" onClick={saveSafelist} disabled={!ready || waiting}>
-          {t('save')}
-          {waiting && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
-        </Button>
-      </div>
+    <AppPageFullWidth>
       <Grid container spacing={2}>
         <Grid size={{ xs: 'grow' }}>
           <Typography variant="h4">{t('title')}</Typography>
         </Grid>
-        <Grid size={{ xs: 12, md: 'auto' }} alignSelf="end">
+        <Grid size={{ xs: 'auto' }}>
+          <Button variant="contained" onClick={saveSafelist} disabled={!ready || waiting}>
+            {t('save')}
+            {waiting && <CircularProgress size={24} sx={{ position: 'absolute' }} />}
+          </Button>
+        </Grid>
+        <Grid size={{ xs: 12 }} alignSelf="end" sx={{ display: 'flex', justifyContent: 'end' }}>
           <FormControl required>
             <FormLabel id="type-radio-buttons-group-label">{t('type.title')}</FormLabel>
             <RadioGroup
@@ -423,7 +412,7 @@ export const ManageSafelistAddPage = memo(() => {
           </Grid>
         )}
       </Grid>
-    </PageFullWidth>
+    </AppPageFullWidth>
   );
 });
 

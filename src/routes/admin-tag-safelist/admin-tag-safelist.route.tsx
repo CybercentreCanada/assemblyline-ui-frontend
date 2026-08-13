@@ -3,7 +3,7 @@ import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, Skeleton, useTheme } from '@mui/material';
 import { useAppBlocker } from 'core/router';
 import { createAppRoute } from 'core/routes';
-import { useAppTemplateThemeMode } from 'core/template';
+import { AppPageFullSize, useAppTemplateThemeMode } from 'core/template';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import useMySnackbar from 'deprecated/hooks/useMySnackbar';
@@ -11,7 +11,6 @@ import { memo, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ReactResizeDetector from 'react-resize-detector';
 import { PageHeader } from 'ui/layouts/PageHeader';
-import { PageFullSizeLayout } from 'ui/pages/PageFullSize';
 
 loader.config({
   paths: { vs: '/cdn/monaco_0.35.0/vs' }
@@ -80,7 +79,7 @@ export const AdminTagSafelistPage = memo(() => {
   };
 
   return (
-    <PageFullSizeLayout margin={4}>
+    <AppPageFullSize>
       <PageHeader
         primary={t('title')}
         slotProps={{
@@ -184,7 +183,7 @@ export const AdminTagSafelistPage = memo(() => {
           </ReactResizeDetector>
         </div>
       </div>
-    </PageFullSizeLayout>
+    </AppPageFullSize>
   );
 });
 

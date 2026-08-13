@@ -10,6 +10,7 @@ import { Grid, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/materia
 import Badge from '@mui/material/Badge';
 import { useAppBlocker, useAppNavigate } from 'core/router';
 import { createAppRoute, useAppPathParams, useAppSearchSnapshot } from 'core/routes';
+import { AppPageCenter } from 'core/template';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import useMySnackbar from 'deprecated/hooks/useMySnackbar';
@@ -529,7 +530,7 @@ export const ManageSignatureSourceDetailPage = memo(() => {
 
   return (
     source && (
-      <div style={{ paddingTop: theme.spacing(2) }}>
+      <AppPageCenter>
         <ConfirmationDialog
           open={deleteDialog}
           handleClose={() => setDeleteDialog(false)}
@@ -635,7 +636,7 @@ export const ManageSignatureSourceDetailPage = memo(() => {
           setModified={setModified}
           showDetails={false}
         />
-      </div>
+      </AppPageCenter>
     )
   );
 });

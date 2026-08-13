@@ -4,7 +4,7 @@ import { useAppInterfaceStore } from 'core/interface';
 import { useAppPreferenceStore } from 'core/preference';
 import useALContext from 'deprecated/hooks/useALContext';
 import type { CSSProperties, DetailedHTMLProps, HTMLAttributes, ReactNode } from 'react';
-import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { memo, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import type { ClassificationProps } from 'ui/Classification';
 import { Classification } from 'ui/Classification';
 
@@ -31,7 +31,7 @@ export type PageHeaderProps = {
   };
 };
 
-export const PageHeader: React.FC<PageHeaderProps> = React.memo(
+export const PageHeader = memo(
   ({
     actions = null,
     classification: classificationProp,
@@ -46,13 +46,10 @@ export const PageHeader: React.FC<PageHeaderProps> = React.memo(
     top = null,
     wrapStart = false,
     onClassificationChange = null
-  }) => {
+  }: PageHeaderProps) => {
     const theme = useTheme();
-
-    const barWillHide = useAppPreferenceStore(s =>
-      s?.template?.layout !== 'top' ? s?.template?.autoHideAppbar : null
-    );
-    const appBarHeight = useAppInterfaceStore(s => s?.template?.appBarHeight);
+    const barWillHide = useAppPreferenceStore(s => s.template.layout !== 'top' && s.template.autoHideAppbar);
+    const appBarHeight = useAppInterfaceStore(s => s.template.appBarHeight);
 
     const { c12nDef } = useALContext();
 

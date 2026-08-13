@@ -80,7 +80,9 @@ export const AppRouteLayoutProvider = memo(({ pageKey, children }: AppRouteLayou
       data-testid="page-layout-scroll-container"
       ref={scrollContainerRef}
       style={{
-        flex: 1
+        flex: 1,
+        display: 'flex',
+        flexDirection: 'column'
       }}
     >
       {children}

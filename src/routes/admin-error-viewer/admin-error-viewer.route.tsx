@@ -5,6 +5,7 @@ import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined
 import { Grid, Typography, useTheme } from '@mui/material';
 import { useAppNavigate } from 'core/router';
 import { createAppRoute, useAppSearchSnapshot } from 'core/routes';
+import { AppPageContainer, AppPageFullWidth } from 'core/template';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import type { FacetResult, HistogramResult, SearchResult } from 'models/api/search';
@@ -18,8 +19,6 @@ import { DateTimeRangePicker } from 'ui/DateTime/DateTimeRangePicker';
 import { LuceneDateTime, LuceneDateTimeGap } from 'ui/DateTime/LuceneDateTime';
 import Histogram from 'ui/Histogram';
 import LineGraph from 'ui/LineGraph';
-import { PageContainer } from 'ui/pages/PageContainer';
-import { PageFullWidth } from 'ui/pages/PageFullWidth';
 import { DEFAULT_SUGGESTION } from 'ui/SearchBar/search-textfield';
 import SearchHeader from 'ui/SearchBar/SearchHeader';
 
@@ -140,7 +139,7 @@ export const AdminErrorViewerPage = memo(() => {
   }, []);
 
   return (
-    <PageFullWidth margin={4}>
+    <AppPageFullWidth>
       <div
         style={{
           width: '100%',
@@ -165,7 +164,7 @@ export const AdminErrorViewerPage = memo(() => {
         />
       </div>
 
-      <PageContainer isSticky>
+      <AppPageContainer isSticky>
         <div style={{ paddingTop: theme.spacing(1) }}>
           <SearchHeader
             params={search.toParams()}
@@ -220,7 +219,7 @@ export const AdminErrorViewerPage = memo(() => {
             ]}
           />
         </div>
-      </PageContainer>
+      </AppPageContainer>
 
       {errorResults !== null && errorResults.total !== 0 && (
         <Grid container spacing={2}>
@@ -274,7 +273,7 @@ export const AdminErrorViewerPage = memo(() => {
       <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
         <ErrorsTable errorResults={errorResults} />
       </div>
-    </PageFullWidth>
+    </AppPageFullWidth>
   );
 });
 

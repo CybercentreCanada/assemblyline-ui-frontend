@@ -4,12 +4,12 @@ import PaletteIcon from '@mui/icons-material/Palette';
 import { Button, IconButton, Stack, Switch, useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import { createAppRoute } from 'core/routes';
+import { AppPageCenter } from 'core/template';
 import { memo } from 'react';
 import { AlertExtendedScan, AlertPriority, AlertStatus } from 'routes/alerts/components/Components';
 import Classification from 'ui/Classification';
 import CustomChip from 'ui/CustomChip';
 import AssemblylineIcon from 'ui/Icons';
-import { PageCenter } from 'ui/pages/PageCenter';
 import Priority from 'ui/Priority';
 import SignatureStatus from 'ui/SignatureStatus';
 import SubmissionState from 'ui/SubmissionState';
@@ -21,7 +21,7 @@ export const DevelopmentThemePage = memo(() => {
   const theme = useTheme();
 
   return (
-    <PageCenter width="65%" margin={4}>
+    <AppPageCenter>
       <Stack alignItems="center" spacing={2}>
         <Typography variant="h4">Icons</Typography>
         <AssemblylineIcon sx={{ width: '192px', height: '192px' }} />
@@ -311,7 +311,7 @@ export const DevelopmentThemePage = memo(() => {
           ))}
         </Stack>
       </Stack>
-    </PageCenter>
+    </AppPageCenter>
   );
 });
 
@@ -327,5 +327,6 @@ export const DevelopmentThemeRoute = createAppRoute({
   fullicon: () => <PaletteIcon />,
 
   disabled: () => false,
-  forbidden: (_location, config) => !config.user.is_admin || !['development', 'staging'].includes(config.configuration.system.type)
+  forbidden: (_location, config) =>
+    !config.user.is_admin || !['development', 'staging'].includes(config.configuration.system.type)
 });

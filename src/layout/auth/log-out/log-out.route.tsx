@@ -2,10 +2,9 @@ import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import { CircularProgress, Typography, useTheme } from '@mui/material';
 import { invalidateApiQuery, useApiQuery } from 'core/api';
 import { createAppRoute } from 'core/routes';
+import { AppPageCardCentered, AppVerticalBanner } from 'core/template';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AppVerticalBanner } from 'ui/branding/AppVerticalBanner';
-import { PageCardCentered } from 'ui/pages/PageCardCentered';
 
 //*****************************************************************************************
 // Logout Page
@@ -25,7 +24,7 @@ export const LogoutPage = memo(() => {
   });
 
   return (
-    <PageCardCentered>
+    <AppPageCardCentered>
       <div style={{ textAlign: 'center' }}>
         <AppVerticalBanner />
         <div style={{ marginBottom: theme.spacing(3) }}>
@@ -33,7 +32,7 @@ export const LogoutPage = memo(() => {
         </div>
         <CircularProgress size={24} />
       </div>
-    </PageCardCentered>
+    </AppPageCardCentered>
   );
 });
 

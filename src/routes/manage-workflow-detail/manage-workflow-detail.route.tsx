@@ -2,6 +2,7 @@ import ListOutlinedIcon from '@mui/icons-material/ListOutlined';
 import { Grid, Skeleton, Typography, useTheme } from '@mui/material';
 import { useApiQuery } from 'core/api';
 import { createAppRoute, useAppPathParams } from 'core/routes';
+import { AppPageCenter } from 'core/template';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMySnackbar from 'deprecated/hooks/useMySnackbar';
 import type { Workflow } from 'models/base/workflow';
@@ -24,7 +25,6 @@ import { TextAreaInput } from 'ui/inputs/TextAreaInput';
 import { TextInput } from 'ui/inputs/TextInput';
 import { PageHeader } from 'ui/layouts/PageHeader';
 import Moment from 'ui/Moment';
-import { PageCenter } from 'ui/pages/PageCenter';
 
 export const ManageWorkflowDetailPage = memo(() => {
   const { t } = useTranslation(['manageWorkflowDetail']);
@@ -42,7 +42,7 @@ export const ManageWorkflowDetailPage = memo(() => {
   });
 
   return (
-    <PageCenter margin={2} width="100%">
+    <AppPageCenter>
       {c12nDef.enforce && (
         <div style={{ paddingBottom: theme.spacing(2) }}>
           <Classification type="outlined" c12n={workflow.isFetching ? null : workflow.data.classification} />
@@ -216,7 +216,7 @@ export const ManageWorkflowDetailPage = memo(() => {
           </>
         )}
       </div>
-    </PageCenter>
+    </AppPageCenter>
   );
 });
 
@@ -229,7 +229,7 @@ export const ManageWorkflowDetailRoute = createAppRoute({
   }),
 
   ancestor: '/manage/workflows',
-  shortname: () => ({ i18nKey: 'breadcrumb.workflow.detail', ns: 'app' }),
+  shortname: location => ({ i18nKey: location?.path?.id ?? 'breadcrumb.workflow.detail', ns: 'app' }),
   fullname: () => ({ i18nKey: 'breadcrumb.workflow.detail', ns: 'app' }),
   shorticon: () => <ListOutlinedIcon />,
   fullicon: () => <ListOutlinedIcon />,

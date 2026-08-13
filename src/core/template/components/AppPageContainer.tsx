@@ -4,7 +4,7 @@ import { useAppInterfaceStore } from 'core/interface';
 import { useAppPreferenceStore } from 'core/preference';
 import { memo } from 'react';
 
-export type PageHeaderAction = {
+export type AppPageContainerAction = {
   key?: string;
   title?: string;
   tooltip?: string;
@@ -14,11 +14,11 @@ export type PageHeaderAction = {
   btnProp?: ButtonProps | IconButtonProps;
 };
 
-export type PageHeaderProps = {
+export type AppPageContainerProps = {
   children?: React.ReactNode;
   left?: React.ReactNode;
   right?: React.ReactNode;
-  actions?: PageHeaderAction[];
+  actions?: AppPageContainerAction[];
   isSticky?: boolean;
   top?: number;
   elevation?: number;
@@ -26,7 +26,7 @@ export type PageHeaderProps = {
   className?: string;
 };
 
-export const PageContainer = memo(
+export const AppPageContainer = memo(
   ({
     children,
     left,
@@ -37,15 +37,13 @@ export const PageContainer = memo(
     isSticky = false,
     top = null,
     elevation = 0
-  }: PageHeaderProps) => {
+  }: AppPageContainerProps) => {
     const theme = useTheme();
 
-    const barWillHide = useAppPreferenceStore(s =>
-      s?.template?.layout !== 'top' ? s?.template?.autoHideAppbar : null
-    );
-    const appBarHeight = useAppInterfaceStore(s => s?.template?.appBarHeight);
+    const appBarAutoHides = useAppPreferenceStore(s => s.template.layout !== 'top' && s.template.autoHideAppbar);
+    const appBarHeight = useAppInterfaceStore(s => s.template.appBarHeight);
 
-    const computedTop = top !== null ? top : isSticky ? (barWillHide ? 0 : appBarHeight) : null;
+    const computedTop = top !== null ? top : isSticky ? (appBarAutoHides ? 0 : appBarHeight) : null;
 
     return (
       <AppBar
@@ -123,4 +121,4 @@ export const PageContainer = memo(
   }
 );
 
-PageContainer.displayName = 'PageContainer';
+AppPageContainer.displayName = 'AppPageContainer';

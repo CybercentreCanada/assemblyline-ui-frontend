@@ -10,6 +10,7 @@ import VpnKeyOutlinedIcon from '@mui/icons-material/VpnKeyOutlined';
 import { Card, Collapse, Divider, Grid, Skeleton, styled, Tooltip, Typography, useTheme } from '@mui/material';
 import { useAppNavigate } from 'core/router';
 import { createAppRoute } from 'core/routes';
+import { AppPageFullWidth } from 'core/template';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import useMySnackbar from 'deprecated/hooks/useMySnackbar';
@@ -22,7 +23,6 @@ import { IconButton } from 'ui/buttons/IconButton';
 import Classification from 'ui/Classification';
 import { PageHeader } from 'ui/layouts/PageHeader';
 import Moment from 'ui/Moment';
-import { PageFullWidth } from 'ui/pages/PageFullWidth';
 
 const CardCaption = memo(
   styled('div')(() => ({
@@ -432,7 +432,7 @@ export const ManageSignatureSourcesPage = memo(() => {
   }, [reload]);
 
   return (
-    <PageFullWidth margin={4}>
+    <AppPageFullWidth>
       <div style={{ textAlign: 'left' }}>
         <PageHeader
           primary={t('title')}
@@ -468,7 +468,7 @@ export const ManageSignatureSourcesPage = memo(() => {
               </div>
             ))}
       </div>
-    </PageFullWidth>
+    </AppPageFullWidth>
   );
 });
 

@@ -3,6 +3,7 @@ import PersonIcon from '@mui/icons-material/Person';
 import { Grid, Typography, useTheme } from '@mui/material';
 import { useAppNavigate } from 'core/router';
 import { createAppRoute, useAppSearchSnapshot } from 'core/routes';
+import { AppPageContainer, AppPageFullWidth } from 'core/template';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import type { SearchResult } from 'models/api/search';
@@ -12,8 +13,6 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ApikeysTable } from 'routes/search/components/apikeys';
 import { safeFieldValue } from 'shared/utils/utils';
-import { PageContainer } from 'ui/pages/PageContainer';
-import { PageFullWidth } from 'ui/pages/PageFullWidth';
 import { DEFAULT_SUGGESTION } from 'ui/SearchBar/search-textfield';
 import SearchHeader from 'ui/SearchBar/SearchHeader';
 
@@ -97,7 +96,7 @@ export const AdminAPIKeysPage = React.memo(() => {
   }, [navigate]);
 
   return (
-    <PageFullWidth margin={4}>
+    <AppPageFullWidth>
       <div style={{ paddingBottom: theme.spacing(2) }}>
         <Grid container alignItems="center">
           <Grid flexGrow={1}>
@@ -106,7 +105,7 @@ export const AdminAPIKeysPage = React.memo(() => {
         </Grid>
       </div>
 
-      <PageContainer isSticky>
+      <AppPageContainer isSticky>
         <div style={{ paddingTop: theme.spacing(1) }}>
           <SearchHeader
             params={search.toParams()}
@@ -140,12 +139,12 @@ export const AdminAPIKeysPage = React.memo(() => {
             ]}
           />
         </div>
-      </PageContainer>
+      </AppPageContainer>
 
       <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
         <ApikeysTable apikeySearchResults={apikeySearchResults} />
       </div>
-    </PageFullWidth>
+    </AppPageFullWidth>
   );
 });
 

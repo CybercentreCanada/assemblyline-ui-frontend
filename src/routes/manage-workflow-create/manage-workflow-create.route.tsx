@@ -5,6 +5,7 @@ import { Grid, useTheme } from '@mui/material';
 import { useApiMutation, useApiQuery } from 'core/api';
 import { useAppBlocker, useAppNavigate } from 'core/router';
 import { createAppRoute, useAppPathParams, useAppSearchParams } from 'core/routes';
+import { AppPageCenter } from 'core/template';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMySnackbar from 'deprecated/hooks/useMySnackbar';
 import lodashIsEqual from 'lodash/isEqual';
@@ -22,7 +23,6 @@ import { SelectInput } from 'ui/inputs/SelectInput';
 import { TextAreaInput } from 'ui/inputs/TextAreaInput';
 import { TextInput } from 'ui/inputs/TextInput';
 import { PageHeader } from 'ui/layouts/PageHeader';
-import { PageCenter } from 'ui/pages/PageCenter';
 
 export const ManageWorkflowCreatePage = memo(() => {
   const { t } = useTranslation(['manageWorkflowDetail']);
@@ -176,7 +176,7 @@ export const ManageWorkflowCreatePage = memo(() => {
   );
 
   return (
-    <PageCenter margin={2} width="100%">
+    <AppPageCenter>
       {/* <RouterPrompt when={modified && !loading} /> */}
 
       {c12nDef.enforce && (
@@ -184,7 +184,7 @@ export const ManageWorkflowCreatePage = memo(() => {
           <Classification
             type="picker"
             format="long"
-            c12n={!workflow ? null : workflow.classification}
+            c12n={workflow.classification}
             setClassification={v => setWorkflow(wf => ({ ...wf, classification: v }))}
           />
         </div>
@@ -304,7 +304,7 @@ export const ManageWorkflowCreatePage = memo(() => {
           />
         </Grid>
       </Grid>
-    </PageCenter>
+    </AppPageCenter>
   );
 });
 
@@ -317,7 +317,7 @@ export const ManageWorkflowCreateRoute = createAppRoute({
   }),
 
   ancestor: '/manage/workflows',
-  shortname: () => ({ i18nKey: 'breadcrumb.workflow.create', ns: 'app' }),
+  shortname: location => ({ i18nKey: location?.path?.id ?? 'breadcrumb.workflow.create', ns: 'app' }),
   fullname: () => ({ i18nKey: 'breadcrumb.workflow.create', ns: 'app' }),
   shorticon: () => <CreateOutlinedIcon />,
   fullicon: () => <CreateOutlinedIcon />,

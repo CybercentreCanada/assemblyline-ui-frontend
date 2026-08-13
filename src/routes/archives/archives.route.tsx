@@ -6,6 +6,7 @@ import { Chip, Grid, MenuItem, Pagination, Select, Tooltip, Typography, useMedia
 import FormControl from '@mui/material/FormControl';
 import { useAppNavigate } from 'core/router';
 import { createAppRoute, useAppSearchSnapshot } from 'core/routes';
+import { AppPageContainer, AppPageFullWidth } from 'core/template';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import useMySnackbar from 'deprecated/hooks/useMySnackbar';
@@ -19,8 +20,6 @@ import { safeFieldValue } from 'shared/utils/utils';
 import { ChipList } from 'ui/ChipList';
 import Histogram from 'ui/Histogram';
 import LineGraph from 'ui/LineGraph';
-import { PageContainer } from 'ui/pages/PageContainer';
-import { PageFullWidth } from 'ui/pages/PageFullWidth';
 import SearchBar from 'ui/SearchBar/search-bar';
 import { DEFAULT_SUGGESTION } from 'ui/SearchBar/search-textfield';
 import SearchResultCount from 'ui/SearchResultCount';
@@ -213,7 +212,7 @@ export const ArchivesPage = memo(() => {
   }, [handleReload]);
 
   return (
-    <PageFullWidth margin={4}>
+    <AppPageFullWidth>
       <Grid container spacing={2} style={{ paddingBottom: theme.spacing(2) }}>
         <Grid size={{ xs: 12, md: 8, xl: 10 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: theme.spacing(1) }}>
@@ -246,7 +245,7 @@ export const ArchivesPage = memo(() => {
         </Grid>
       </Grid>
 
-      <PageContainer isSticky>
+      <AppPageContainer isSticky>
         <div style={{ paddingTop: theme.spacing(1) }}>
           <SearchBar
             initValue={search.get('query')}
@@ -355,7 +354,7 @@ export const ArchivesPage = memo(() => {
             </div>
           </SearchBar>
         </div>
-      </PageContainer>
+      </AppPageContainer>
 
       {fileResults !== null && fileResults.total !== 0 && (
         <Grid container spacing={2}>
@@ -416,7 +415,7 @@ export const ArchivesPage = memo(() => {
       >
         <ArchivesTable fileResults={fileResults} onLabelClick={handleLabelClick} onRowClick={handleRowClick} />
       </div>
-    </PageFullWidth>
+    </AppPageFullWidth>
   );
 });
 

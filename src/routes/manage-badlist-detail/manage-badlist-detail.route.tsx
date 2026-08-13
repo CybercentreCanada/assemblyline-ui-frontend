@@ -9,6 +9,7 @@ import { Divider, Grid, MenuItem, Skeleton, TextField, Tooltip, Typography, useT
 import { invalidateAppQuery, updateAppQuery, useAppMutation, useAppQuery } from 'core/api';
 import { useAppNavigate } from 'core/router';
 import { createAppRoute, useAppPathParams } from 'core/routes';
+import { AppPageCenter } from 'core/template';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMySnackbar from 'deprecated/hooks/useMySnackbar';
 import type { Badlist } from 'models/base/badlist';
@@ -25,7 +26,6 @@ import Histogram from 'ui/Histogram';
 import InputDialog from 'ui/InputDialog';
 import { PageHeader } from 'ui/layouts/PageHeader';
 import Moment from 'ui/Moment';
-import { PageCenter } from 'ui/pages/PageCenter';
 
 export const ManageBadlistDetailPage = memo(() => {
   const { t } = useTranslation(['manageBadlistDetail']);
@@ -152,7 +152,7 @@ export const ManageBadlistDetailPage = memo(() => {
   }));
 
   return (
-    <PageCenter margin={4} width="100%">
+    <AppPageCenter>
       <ConfirmationDialog
         open={deleteDialog}
         handleClose={() => setDeleteDialog(false)}
@@ -624,7 +624,7 @@ export const ManageBadlistDetailPage = memo(() => {
           )}
         </Grid>
       </div>
-    </PageCenter>
+    </AppPageCenter>
   );
 });
 

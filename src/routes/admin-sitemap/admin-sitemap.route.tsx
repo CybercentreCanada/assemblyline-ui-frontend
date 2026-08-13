@@ -15,6 +15,7 @@ import {
   useTheme
 } from '@mui/material';
 import { createAppRoute } from 'core/routes';
+import { AppPageFullWidth } from 'core/template';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import type { SiteMapResponse } from 'models/api';
@@ -24,7 +25,6 @@ import { useTranslation } from 'react-i18next';
 import type { PossibleColor } from 'shared/utils/colors';
 import CustomChip from 'ui/CustomChip';
 import { PageHeader } from 'ui/layouts/PageHeader';
-import { PageFullWidth } from 'ui/pages/PageFullWidth';
 
 const StyledTableCell = memo(
   styled(TableCell)(({ theme }) => ({
@@ -102,7 +102,7 @@ export const AdminSiteMapPage = memo(() => {
   }, [currentUser.is_admin]);
 
   return (
-    <PageFullWidth margin={4}>
+    <AppPageFullWidth>
       <PageHeader
         primary={t('title')}
         secondary={() => `${siteMap.length} ${t('caption')}`}
@@ -167,7 +167,7 @@ export const AdminSiteMapPage = memo(() => {
       ) : (
         <Skeleton variant="rectangular" height="10rem" style={{ borderRadius: '4px' }} />
       )}
-    </PageFullWidth>
+    </AppPageFullWidth>
   );
 });
 

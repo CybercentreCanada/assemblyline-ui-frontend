@@ -1,6 +1,7 @@
 import KeyOutlinedIcon from '@mui/icons-material/KeyOutlined';
 import { Backdrop, Button, Typography, useTheme } from '@mui/material';
 import { createAppRoute } from 'core/routes';
+import { AppPageCardCentered, AppVerticalBanner } from 'core/template';
 import useALContext from 'deprecated/hooks/useALContext';
 import useAppUser from 'deprecated/hooks/useAppUser';
 import type { CustomUser } from 'models/api/user';
@@ -10,8 +11,6 @@ import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
 import { getXSRFCookie } from 'shared/utils/xsrf.utils';
-import { AppVerticalBanner } from 'ui/branding/AppVerticalBanner';
-import { PageCardCentered } from 'ui/pages/PageCardCentered';
 
 const VALID_SCOPES: Omit<Scope, 'c'>[] = SCOPES.filter(s => s !== 'c');
 
@@ -37,7 +36,7 @@ export const AppRegistrationPage = memo(() => {
 
   return (
     <Backdrop open style={{ backgroundColor: theme.palette.background.default, zIndex: 10000 }} transitionDuration={0}>
-      <PageCardCentered>
+      <AppPageCardCentered>
         <AppVerticalBanner />
         <div style={{ display: 'flex', flexDirection: 'column', textAlign: 'center', justifyContent: 'center' }}>
           {!currentUser.roles.includes('obo_access') ? (
@@ -113,7 +112,7 @@ export const AppRegistrationPage = memo(() => {
             </>
           )}
         </div>
-      </PageCardCentered>
+      </AppPageCardCentered>
     </Backdrop>
   );
 });

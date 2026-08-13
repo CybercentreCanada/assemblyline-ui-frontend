@@ -11,6 +11,7 @@ import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
 import { List, ListItemButton, ListItemIcon, ListItemText, Popover, useTheme } from '@mui/material';
 import { AppLink, useAppNavigate } from 'core/router';
 import { createAppRoute, useAppPathParams, useAppSearchSnapshot } from 'core/routes';
+import { AppPageCenter } from 'core/template';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import useMySnackbar from 'deprecated/hooks/useMySnackbar';
@@ -39,8 +40,7 @@ import { FileDownloader } from 'ui/buttons/FileDownloader';
 import { IconButton } from 'ui/buttons/IconButton';
 import Classification from 'ui/Classification';
 import InputDialog from 'ui/InputDialog';
-import { PageCenter } from 'ui/pages/PageCenter';
-import { PageHeader } from 'ui/pages/PageHeader';
+import { PageHeader } from 'ui/layouts/PageHeader';
 import { emptyResult } from 'ui/ResultCard';
 
 const FileDetailPage = React.memo(() => {
@@ -342,7 +342,7 @@ const FileDetailPage = React.memo(() => {
   // }, [insideDrawer, globalDrawerOpened]);
 
   return currentUser.roles.includes('submission_view') ? (
-    <PageCenter margin={4} width="100%">
+    <AppPageCenter>
       <div id="fileDetailTop" ref={ref} style={{ textAlign: 'left' }}>
         <InputDialog
           open={safelistDialog}
@@ -571,7 +571,7 @@ const FileDetailPage = React.memo(() => {
           <ErrorSection errors={file ? file.errors : null} />
         </div>
       </div>
-    </PageCenter>
+    </AppPageCenter>
   ) : (
     <ForbiddenPage />
   );

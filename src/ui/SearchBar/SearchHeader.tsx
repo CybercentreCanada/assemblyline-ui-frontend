@@ -13,12 +13,12 @@ import {
   useMediaQuery,
   useTheme
 } from '@mui/material';
+import { AppPageContainer } from 'core/template';
 import type { ReactNode } from 'react';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { CustomChipProps } from 'ui/CustomChip';
 import CustomChip from 'ui/CustomChip';
-import { PageContainer } from 'ui/pages/PageContainer';
 import type { SearchTextFieldProps } from 'ui/SearchBar/search-textfield';
 import SearchTextField from 'ui/SearchBar/search-textfield';
 import { SearchCount, TOTAL_TRACKED_RECORDS } from 'ui/SearchBar/SearchCount';
@@ -319,7 +319,7 @@ const WrappedSearchHeader = ({
   }, [getInputEl, loading]);
 
   return (
-    <PageContainer isSticky={isSticky}>
+    <AppPageContainer isSticky={isSticky}>
       <Root ref={rootRef}>
         <SearchWrapper ref={inputRef}>
           <SearchContainer>
@@ -482,7 +482,7 @@ const WrappedSearchHeader = ({
         {/** Other Components */}
         {children && <Container>{children}</Container>}
       </Root>
-    </PageContainer>
+    </AppPageContainer>
   );
 };
 

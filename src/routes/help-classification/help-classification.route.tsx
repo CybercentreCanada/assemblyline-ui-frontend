@@ -1,12 +1,12 @@
 import LabelOutlinedIcon from '@mui/icons-material/LabelOutlined';
 import { Skeleton, Typography, useTheme } from '@mui/material';
 import { createAppRoute } from 'core/routes';
+import { AppPageCenter } from 'core/template';
 import { useALContext } from 'deprecated/hooks/useALContext';
 import { memo, type ReactNode } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
 import { NotFoundPage } from 'routes/not-found/not-found';
 import { Classification } from 'ui/Classification';
-import { PageCenter } from 'ui/pages/PageCenter';
 
 const BoldText = ({ children }: { children?: ReactNode }) => <strong>{children}</strong>;
 
@@ -21,7 +21,7 @@ export const HelpClassificationPage = memo(() => {
   const sp4 = theme.spacing(4);
 
   return c12nDef.enforce ? (
-    <PageCenter margin={4} width="100%" textAlign="left">
+    <AppPageCenter style={{ textAlign: 'left' }}>
       <div style={{ marginBottom: theme.spacing(4) }}>
         <Typography variant="h4">{t('title')}</Typography>
       </div>
@@ -281,7 +281,7 @@ export const HelpClassificationPage = memo(() => {
           <Trans ns="helpClassification" i18nKey="validation_subgroups_note" components={{ bold: <BoldText /> }} />
         </Typography>
       </div>
-    </PageCenter>
+    </AppPageCenter>
   ) : (
     <NotFoundPage />
   );

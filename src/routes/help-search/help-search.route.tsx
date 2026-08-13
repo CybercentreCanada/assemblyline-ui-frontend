@@ -14,6 +14,7 @@ import {
 } from '@mui/material';
 import { useAppPreferenceStore } from 'core/preference';
 import { createAppRoute } from 'core/routes';
+import { AppPageCenter } from 'core/template';
 import type { ContentWithTOCItemDef } from 'deprecated/components/toc/Toc';
 import ContentWithTOC from 'deprecated/components/toc/Toc';
 import { useALContext } from 'deprecated/hooks/useALContext';
@@ -21,7 +22,6 @@ import { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import CustomChip from 'ui/CustomChip';
 import { PageHeader } from 'ui/layouts/PageHeader';
-import { PageCenter } from 'ui/pages/PageCenter';
 
 const Toc: ContentWithTOCItemDef[] = [
   { id: 'overview' },
@@ -135,7 +135,7 @@ export const HelpSearchPage = memo(() => {
   const { indexes } = useALContext();
 
   return (
-    <PageCenter margin={4} width="100%" textAlign="left">
+    <AppPageCenter style={{ textAlign: 'left' }}>
       <ContentWithTOC translation="helpSearch" items={Toc}>
         <PageHeader primary={t('title')} secondary={t('subtitle')} />
 
@@ -511,7 +511,7 @@ export const HelpSearchPage = memo(() => {
           </Padded>
         </Paragraph>
       </ContentWithTOC>
-    </PageCenter>
+    </AppPageCenter>
   );
 });
 

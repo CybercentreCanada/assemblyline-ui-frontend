@@ -7,6 +7,7 @@ import { Button, CircularProgress, Paper, Skeleton, Tab, useTheme } from '@mui/m
 import { invalidateApiQuery } from 'core/api';
 import { useAppBlocker, useAppNavigate } from 'core/router';
 import { createAppRoute, useAppPathParams } from 'core/routes';
+import { AppPageCenter } from 'core/template';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import useMySnackbar from 'deprecated/hooks/useMySnackbar';
@@ -25,7 +26,6 @@ import ConfirmationDialog from 'ui/ConfirmationDialog';
 import CustomChip from 'ui/CustomChip';
 import Empty from 'ui/Empty';
 import { PageHeader } from 'ui/layouts/PageHeader';
-import { PageCenter } from 'ui/pages/PageCenter';
 
 type TabType = 'general' | 'docker' | 'updater' | 'params';
 
@@ -183,7 +183,7 @@ export const AdminServiceDetailPage = memo(() => {
   }, [configuration?.ui?.services_feed, fetchJSONNotifications, setServiceFeeds]);
 
   return (
-    <PageCenter margin={!svc ? 2 : 4} width="100%" textAlign="left">
+    <AppPageCenter>
       <ConfirmationDialog
         open={deleteDialog}
         handleClose={() => setDeleteDialog(false)}
@@ -348,7 +348,7 @@ export const AdminServiceDetailPage = memo(() => {
           </Button>
         </div>
       ) : null}
-    </PageCenter>
+    </AppPageCenter>
   );
 });
 
@@ -361,8 +361,8 @@ export const AdminServiceDetailRoute = createAppRoute({
   }),
 
   ancestor: '/admin/services',
-  shortname: location => ({ i18nKey: location?.path?.svc ?? 'breadcrumb.alert.detail', ns: 'app' }),
-  fullname: () => ({ i18nKey: '{:svc}', ns: 'app' }),
+  shortname: location => ({ i18nKey: location?.path?.svc ?? 'breadcrumb.service.detail', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'breadcrumb.service.detail', ns: 'app' }),
   shorticon: () => <WebAssetIcon />,
   fullicon: () => <WebAssetIcon />,
 

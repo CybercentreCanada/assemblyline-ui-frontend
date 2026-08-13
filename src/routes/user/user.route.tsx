@@ -28,6 +28,7 @@ import { red } from '@mui/material/colors';
 import Skeleton from '@mui/material/Skeleton';
 import { useAppBlocker, useAppNavigate } from 'core/router';
 import { createAppRoute, useAppPathParams } from 'core/routes';
+import { AppPageCenter } from 'core/template';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import useMySnackbar from 'deprecated/hooks/useMySnackbar';
@@ -42,7 +43,6 @@ import SecurityToken from 'routes/user/components/token';
 import Classification from 'ui/Classification';
 import ConfirmationDialog from 'ui/ConfirmationDialog';
 import CustomChip from 'ui/CustomChip';
-import { PageCenter } from 'ui/pages/PageCenter';
 
 type ParsedUser = Omit<
   User,
@@ -306,7 +306,7 @@ export const UserPage = memo(({ username = null }: UserPageProps) => {
   }, []);
 
   return (
-    <PageCenter margin={4} width="100%">
+    <AppPageCenter>
       <React.Fragment key="right">
         <Drawer anchor="right" open={drawerOpen} onClose={() => setDrawerOpen(false)}>
           <div style={{ alignSelf: 'flex-end' }}>
@@ -1064,7 +1064,7 @@ export const UserPage = memo(({ username = null }: UserPageProps) => {
           ) : null}
         </Grid>
       </Grid>
-    </PageCenter>
+    </AppPageCenter>
   );
 });
 
@@ -1081,8 +1081,8 @@ export const AdminUserDetailRoute = createAppRoute({
   }),
 
   ancestor: '/admin/users',
-  shortname: location => ({ i18nKey: location?.path?.id ?? 'breadcrumb.alert.detail', ns: 'app' }),
-  fullname: () => ({ i18nKey: '{:id}', ns: 'app' }),
+  shortname: location => ({ i18nKey: location?.path?.id ?? 'breadcrumb.user.detail', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'breadcrumb.user.detail', ns: 'app' }),
   shorticon: () => <AccountCircleOutlinedIcon />,
   fullicon: () => <AccountCircleOutlinedIcon />,
 

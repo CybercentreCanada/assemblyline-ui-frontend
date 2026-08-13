@@ -108,7 +108,10 @@ const AlertActionButton: React.FC<AlertActionButtonProps> = React.memo(
             FabProps={{
               disabled: disabled || loading,
               size: permanent ? 'medium' : 'small',
-              sx: { ...(permanent && { '&.Mui-disabled': { backgroundColor: 'initial' } }) },
+              sx: {
+                backgroundColor: 'background.default',
+                ...(permanent && { '&.Mui-disabled': { backgroundColor: 'initial' } })
+              },
               style: {
                 boxShadow: permanent ? theme.shadows[0] : null,
                 margin: permanent ? '8px 2px 8px 2px' : null,

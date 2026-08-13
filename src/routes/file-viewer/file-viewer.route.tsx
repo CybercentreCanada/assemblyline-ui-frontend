@@ -28,6 +28,7 @@ import {
 } from '@mui/material';
 import { AppLink, AppNavigate, useAppNavigate } from 'core/router';
 import { createAppRoute, useAppPathParams } from 'core/routes';
+import { AppPageFullSize } from 'core/template';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import useMySnackbar from 'deprecated/hooks/useMySnackbar';
@@ -45,7 +46,6 @@ import { SelectionProvider, useSelection } from 'routes/file-viewer/file-viewer.
 import { ForbiddenPage } from 'routes/forbidden/forbidden';
 import { FileDownloader } from 'ui/buttons/FileDownloader';
 import { IconButton } from 'ui/buttons/IconButton';
-import { PageFullSizeLayout } from 'ui/pages/PageFullSize';
 import { TabContainer } from 'ui/TabContainer';
 
 loader.config({
@@ -186,7 +186,7 @@ const FileViewerPage = React.memo(() => {
   }, [codeAllowed]);
 
   return currentUser.roles.includes('file_detail') ? (
-    <PageFullSizeLayout margin={4}>
+    <AppPageFullSize>
       <Grid container alignItems="center">
         <Grid flexGrow={1}>
           <Typography variant="h4">{t('title')}</Typography>
@@ -461,7 +461,7 @@ const FileViewerPage = React.memo(() => {
           />
         </div>
       )}
-    </PageFullSizeLayout>
+    </AppPageFullSize>
   ) : (
     <ForbiddenPage />
   );

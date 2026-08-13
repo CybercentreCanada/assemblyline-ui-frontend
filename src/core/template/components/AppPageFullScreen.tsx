@@ -7,9 +7,8 @@ import { useAppInterfaceStore } from 'core/interface';
 import { useAppPreferenceStore } from 'core/preference';
 import { memo, useCallback, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { PageContent } from 'ui/pages/PageContent';
 
-export type PageFullscreenProps = {
+export type AppPageFullScreenProps = {
   children: React.ReactNode;
   margin?: number;
   mb?: number;
@@ -28,13 +27,13 @@ const PageFullscreen = ({
   mr = 2,
   mt = 2,
   fsIconPos = 'sticky'
-}: PageFullscreenProps) => {
+}: AppPageFullScreenProps) => {
   const { t } = useTranslation();
   const theme = useTheme();
-  const barWillHide = useAppPreferenceStore(s => (s?.template?.layout !== 'top' ? s?.template?.autoHideAppbar : null));
-  const appBarHeight = useAppInterfaceStore(s => s?.template?.appBarHeight);
+  const appBarAutoHides = useAppPreferenceStore(s => s.template.layout !== 'top' && s.template.autoHideAppbar);
+  const appBarHeight = useAppInterfaceStore(s => s.template.appBarHeight);
 
-  const maximizableElement = useRef(null);
+  const maximizableElement = useRef<HTMLDivElement>(null);
 
   let isFullscreen = false;
   let setIsFullscreen: (() => void) | null = null;
@@ -54,9 +53,9 @@ const PageFullscreen = ({
     }
   }, [setIsFullscreen]);
 
-  const handleExitFullscreen = () => {
-    document.exitFullscreen();
-  };
+  const handleExitFullscreen = useCallback(() => {
+    void document.exitFullscreen();
+  }, []);
 
   return (
     <div
@@ -66,7 +65,15 @@ const PageFullscreen = ({
         overflowY: isFullscreen ? 'auto' : 'unset'
       }}
     >
-      <PageContent margin={margin} mb={mb} ml={ml} mr={mr} mt={mt}>
+      <div
+        style={{
+          ...(margin !== null && { margin: margin }),
+          ...(mt !== undefined && { marginTop: mt }),
+          ...(mb !== undefined && { marginBottom: mb }),
+          ...(ml !== undefined && { marginLeft: ml }),
+          ...(mr !== undefined && { marginRight: mr })
+        }}
+      >
         <div
           style={{
             position: fsIconPos,
@@ -75,7 +82,7 @@ const PageFullscreen = ({
             paddingTop: 16,
             paddingRight: 16,
             zIndex: theme.zIndex.appBar + 1,
-            top: barWillHide || isFullscreen ? 0 : appBarHeight,
+            top: appBarAutoHides || isFullscreen ? 0 : appBarHeight,
             right: 0,
             ...(!isFirefox
               ? null
@@ -103,11 +110,11 @@ const PageFullscreen = ({
           )}
         </div>
         {children}
-      </PageContent>
+      </div>
     </div>
   );
 };
 
-export const PageFullScreen = memo(PageFullscreen);
+export const AppPageFullScreen = memo(PageFullscreen);
 
-PageFullScreen.displayName = 'PageFullScreen';
+AppPageFullScreen.displayName = 'AppPageFullScreen';

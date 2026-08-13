@@ -3,6 +3,7 @@ import FindInPageOutlinedIcon from '@mui/icons-material/FindInPageOutlined';
 import { Alert, Box, Grid, Paper, styled, Tab, Tabs, Typography, useTheme } from '@mui/material';
 import { useAppBlocker } from 'core/router';
 import { createAppRoute } from 'core/routes';
+import { AppPageFullSize } from 'core/template';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -10,7 +11,6 @@ import { LibMagic } from 'routes/admin-identify/components/libmagic';
 import { Mimes } from 'routes/admin-identify/components/mimes';
 import { Patterns } from 'routes/admin-identify/components/patterns';
 import { Yara } from 'routes/admin-identify/components/yara';
-import { PageFullSizeLayout } from 'ui/pages/PageFullSize';
 
 loader.config({
   paths: { vs: '/cdn/monaco_0.35.0/vs' }
@@ -110,7 +110,7 @@ export const AdminIdentifyPage = memo(() => {
   };
 
   return (
-    <PageFullSizeLayout margin={4}>
+    <AppPageFullSize>
       <div style={{ marginBottom: theme.spacing(2), textAlign: 'left' }}>
         <Grid container alignItems="center" spacing={1}>
           <Grid size={{ xs: 12 }}>
@@ -183,7 +183,7 @@ export const AdminIdentifyPage = memo(() => {
           </TabContent>
         )}
       </div>
-    </PageFullSizeLayout>
+    </AppPageFullSize>
   );
 });
 

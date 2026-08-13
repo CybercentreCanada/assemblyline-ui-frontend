@@ -1,6 +1,7 @@
 import LoginOutlinedIcon from '@mui/icons-material/LoginOutlined';
 import { useTheme } from '@mui/material';
 import { createAppRoute } from 'core/routes';
+import { AppBanner, AppPageCardCentered, AppVerticalBanner } from 'core/template';
 import { OneTimePassword } from 'layout/auth/log-in/components/OneTimePassword';
 import {
   ResetPasswordConfirmation,
@@ -15,9 +16,6 @@ import { LoadingCard, LoginDivider } from 'layout/auth/log-in/log-in.components'
 import { useOAuthLogin, usePasswordResetEmail, useSAMLLogin, useSignUpEmail } from 'layout/auth/log-in/log-in.hooks';
 import { LoginFormProvider, useLoginForm } from 'layout/auth/log-in/log-in.providers';
 import { memo } from 'react';
-import { AppBanner } from 'ui/branding/AppBanner';
-import { AppVerticalBanner } from 'ui/branding/AppVerticalBanner';
-import { PageCardCentered } from 'ui/pages/PageCardCentered';
 
 type LoginRequest = {
   user: string;
@@ -41,7 +39,7 @@ const LoginPageContent = memo(() => {
   useSAMLLogin();
 
   return (
-    <PageCardCentered>
+    <AppPageCardCentered>
       <div style={{ display: 'flex', flexDirection: 'column', rowGap: theme.spacing(2) }}>
         <form.Subscribe selector={s => s.values.mode}>
           {mode => (
@@ -87,7 +85,7 @@ const LoginPageContent = memo(() => {
           )}
         </form.Subscribe>
       </div>
-    </PageCardCentered>
+    </AppPageCardCentered>
   );
 });
 

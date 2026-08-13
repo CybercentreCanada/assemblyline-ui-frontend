@@ -6,6 +6,7 @@ import type { TypographyProps } from '@mui/material';
 import { Grid, MenuItem, Select, Skeleton, Typography, useTheme } from '@mui/material';
 import FormControl from '@mui/material/FormControl';
 import { createAppRoute, useAppSearchSnapshot } from 'core/routes';
+import { AppPageFullWidth } from 'core/template';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import type { ServiceStats as ServiceStatsData } from 'models/api/service';
@@ -16,7 +17,6 @@ import { useTranslation } from 'react-i18next';
 import { getVersionQuery } from 'shared/utils/utils';
 import { IconButton } from 'ui/buttons/IconButton';
 import LineGraph from 'ui/LineGraph';
-import { PageFullWidth } from 'ui/pages/PageFullWidth';
 
 // TODO: version doesn't seem to be set correctly
 type ServiceStats = ServiceStatsData & { version: string };
@@ -273,7 +273,7 @@ export const AdminServiceReviewPage = memo(() => {
   }, []);
 
   return (
-    <PageFullWidth margin={4}>
+    <AppPageFullWidth>
       <Grid
         container
         alignItems="center"
@@ -354,7 +354,7 @@ export const AdminServiceReviewPage = memo(() => {
           </Grid>
         </>
       )}
-    </PageFullWidth>
+    </AppPageFullWidth>
   );
 });
 

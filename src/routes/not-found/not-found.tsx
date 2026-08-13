@@ -3,9 +3,9 @@ import WrongLocationOutlinedIcon from '@mui/icons-material/WrongLocationOutlined
 import { Button, Collapse, Paper, styled, SvgIcon, Typography, useMediaQuery, useTheme } from '@mui/material';
 import { getNotFoundDetails, getNotFoundPreviewHref } from 'core/router';
 import { useAppSearchParams } from 'core/routes';
+import { AppPageCenter } from 'core/template';
 import { memo, useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { PageCenter } from 'ui/pages/PageCenter';
 
 const ExpandMore = styled(SvgIcon, {
   shouldForwardProp: prop => prop !== 'expand'
@@ -68,7 +68,7 @@ export const NotFoundPage = memo(() => {
   );
 
   return (
-    <PageCenter width="65%" margin={4}>
+    <AppPageCenter>
       <div style={{ paddingTop: theme.spacing(10), fontSize: 200, color: theme.palette.secondary.main }}>
         <WrongLocationOutlinedIcon fontSize="inherit" />
       </div>
@@ -142,7 +142,7 @@ export const NotFoundPage = memo(() => {
           </>
         )}
       </Paper>
-    </PageCenter>
+    </AppPageCenter>
   );
 });
 

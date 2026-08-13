@@ -9,12 +9,12 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableSortLabel from '@mui/material/TableSortLabel';
 import { alpha, useTheme } from '@mui/material/styles';
+import { AppPageContainer } from 'core/template';
 import Throttler from 'deprecated/utils/throttler';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Classification from 'ui/Classification';
 import { DivTable, DivTableBody, DivTableCell, DivTableHead, DivTableRow, LinkRow } from 'ui/DivTable';
-import { PageContainer } from 'ui/pages/PageContainer';
 
 const throttler = new Throttler(250);
 
@@ -194,7 +194,7 @@ const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
   const theme = useTheme();
 
   return (
-    <PageContainer isSticky>
+    <AppPageContainer isSticky>
       <Grid container size="grow">
         <Grid size={{ xs: 12, md: 6 }}>
           <Box
@@ -265,7 +265,7 @@ const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
           />
         </Grid>
       </Grid>
-    </PageContainer>
+    </AppPageContainer>
   );
 };
 

@@ -2,9 +2,9 @@ import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined';
 import LinkOffIcon from '@mui/icons-material/LinkOff';
 import { Typography, useMediaQuery, useTheme } from '@mui/material';
 import { createAppRoute } from 'core/routes';
+import { AppPageCenter } from 'core/template';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { PageCenter } from 'ui/pages/PageCenter';
 
 //*****************************************************************************************
 // Missing Node Page
@@ -16,7 +16,7 @@ export const MissingNodePage = memo(() => {
   const downSM = useMediaQuery(theme.breakpoints.down('md'));
 
   return (
-    <PageCenter width="65%" margin={4}>
+    <AppPageCenter>
       <div style={{ paddingTop: theme.spacing(10), fontSize: 200, color: theme.palette.secondary.main }}>
         <AccountTreeOutlinedIcon fontSize="inherit" />
       </div>
@@ -26,7 +26,7 @@ export const MissingNodePage = memo(() => {
       <div style={{ width: '100%', maxWidth: '720px', margin: '0 auto' }}>
         <Typography children={t('description')} variant={downSM ? 'body1' : 'h6'} gutterBottom />
       </div>
-    </PageCenter>
+    </AppPageCenter>
   );
 });
 

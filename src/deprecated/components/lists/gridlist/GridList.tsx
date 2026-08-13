@@ -1,4 +1,5 @@
 import { Grid, useTheme } from '@mui/material';
+import { AppPageCenter } from 'core/template';
 import useListKeyboard from 'deprecated/components/lists/hooks/useListKeyboard';
 import useListNavigator from 'deprecated/components/lists/hooks/useListNavigator';
 import type { LineItem } from 'deprecated/components/lists/item/ListItemBase';
@@ -9,7 +10,6 @@ import { Inner, Outer, ProgressCt, ProgressSpinner } from 'deprecated/components
 import type { TableListMoreConfig } from 'deprecated/components/lists/table/TableListMoreBtn';
 import TableListMoreBtn from 'deprecated/components/lists/table/TableListMoreBtn';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { PageCenter } from 'ui/pages/PageCenter';
 
 interface Breakpoints {
   xs?: 1 | 2 | 3 | 4 | 6 | 12;
@@ -155,9 +155,9 @@ export default function GridList<T extends LineItem>({
               ))}
         </Grid>
         {moreConfig && (
-          <PageCenter>
+          <AppPageCenter>
             <TableListMoreBtn {...moreConfig} />
-          </PageCenter>
+          </AppPageCenter>
         )}
       </Inner>
     </Outer>

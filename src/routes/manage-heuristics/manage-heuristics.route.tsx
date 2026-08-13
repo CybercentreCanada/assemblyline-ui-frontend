@@ -3,6 +3,7 @@ import { useTheme } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import { useAppNavigate } from 'core/router';
 import { createAppRoute, useAppSearchSnapshot } from 'core/routes';
+import { AppPageContainer, AppPageFullWidth } from 'core/template';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import type { SearchResult } from 'models/api/search';
@@ -11,8 +12,6 @@ import type { Heuristic } from 'models/base/heuristic';
 import { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { HeuristicsTable } from 'routes/search/components/heuristics';
-import { PageContainer } from 'ui/pages/PageContainer';
-import { PageFullWidth } from 'ui/pages/PageFullWidth';
 import { DEFAULT_SUGGESTION } from 'ui/SearchBar/search-textfield';
 import SearchHeader from 'ui/SearchBar/SearchHeader';
 
@@ -55,12 +54,12 @@ export const ManageHeuristicsPage = memo(() => {
   }, [handleReload, search.toString()]);
 
   return (
-    <PageFullWidth margin={4}>
+    <AppPageFullWidth>
       <div style={{ paddingBottom: theme.spacing(2) }}>
         <Typography variant="h4">{t('title')}</Typography>
       </div>
 
-      <PageContainer isSticky>
+      <AppPageContainer isSticky>
         <div style={{ paddingTop: theme.spacing(1) }}>
           <SearchHeader
             params={search.toParams()}
@@ -80,12 +79,12 @@ export const ManageHeuristicsPage = memo(() => {
             searchInputProps={{ placeholder: t('filter'), options: suggestions }}
           />
         </div>
-      </PageContainer>
+      </AppPageContainer>
 
       <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
         <HeuristicsTable heuristicResults={heuristicResults} />
       </div>
-    </PageFullWidth>
+    </AppPageFullWidth>
   );
 });
 

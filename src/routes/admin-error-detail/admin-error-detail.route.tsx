@@ -7,6 +7,7 @@ import ReportProblemOutlinedIcon from '@mui/icons-material/ReportProblemOutlined
 import ViewCarouselOutlinedIcon from '@mui/icons-material/ViewCarouselOutlined';
 import { Card, Grid, styled, Tooltip, Typography, useMediaQuery, useTheme } from '@mui/material';
 import { createAppRoute, useAppPathParams } from 'core/routes';
+import { AppPageCenter } from 'core/template';
 import useALContext from 'deprecated/hooks/useALContext';
 import useClipboard from 'deprecated/hooks/useClipboard';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
@@ -18,7 +19,6 @@ import { BsClipboard } from 'react-icons/bs';
 import { FileDownloader } from 'ui/buttons/FileDownloader';
 import { IconButton } from 'ui/buttons/IconButton';
 import Moment from 'ui/Moment';
-import { PageCenter } from 'ui/pages/PageCenter';
 
 const StyledBsClipboard = styled(BsClipboard)(({ theme }) => ({
   marginRight: theme.spacing(1),
@@ -77,7 +77,7 @@ export const AdminErrorDetailPage = memo(() => {
   }, [key]);
 
   return (
-    <PageCenter margin={!key ? 2 : 4} width="100%">
+    <AppPageCenter>
       {error && (
         <div
           style={{
@@ -214,7 +214,7 @@ export const AdminErrorDetailPage = memo(() => {
           </Grid>
         </div>
       )}
-    </PageCenter>
+    </AppPageCenter>
   );
 });
 
@@ -231,8 +231,8 @@ export const AdminErrorDetailRoute = createAppRoute({
   params: s => ({ id: s.string() }),
 
   ancestor: '/admin/errors',
-  shortname: location => ({ i18nKey: location?.path?.id ?? 'breadcrumb.heuristic.detail', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'breadcrumb.heuristic.detail', ns: 'app' }),
+  shortname: location => ({ i18nKey: location?.path?.id ?? 'breadcrumb.error.detail', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'breadcrumb.error.detail', ns: 'app' }),
   shorticon: () => <ListOutlinedIcon />,
   fullicon: () => <ListOutlinedIcon />,
 

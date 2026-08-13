@@ -2,13 +2,13 @@ import AccountTreeOutlinedIcon from '@mui/icons-material/AccountTreeOutlined';
 import { Card, CardHeader, Grid, Typography, useTheme } from '@mui/material';
 import Skeleton from '@mui/material/Skeleton';
 import { createAppRoute } from 'core/routes';
+import { AppPageFullWidth } from 'core/template';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import { memo, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import Classification from 'ui/Classification';
 import CustomChip from 'ui/CustomChip';
 import { PageHeader } from 'ui/layouts/PageHeader';
-import { PageFullWidth } from 'ui/pages/PageFullWidth';
 
 function ServiceCard({ service }) {
   const { t } = useTranslation(['helpServices']);
@@ -97,7 +97,7 @@ export const HelpServicesPage = memo(() => {
   }, []);
 
   return (
-    <PageFullWidth margin={4}>
+    <AppPageFullWidth>
       <PageHeader
         primary={t('title')}
         secondary={() => `${services.length} ${t('count')}`}
@@ -124,7 +124,7 @@ export const HelpServicesPage = memo(() => {
           ))}
         </Grid>
       )}
-    </PageFullWidth>
+    </AppPageFullWidth>
   );
 });
 

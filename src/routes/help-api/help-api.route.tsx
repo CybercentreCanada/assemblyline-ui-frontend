@@ -20,11 +20,11 @@ import type { SelectChangeEvent } from '@mui/material/Select';
 import { useApiQuery } from 'core/api';
 import { useAppConfig } from 'core/config';
 import { createAppRoute } from 'core/routes';
+import { AppPageFullWidth } from 'core/template';
 import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CustomChip } from 'ui/CustomChip';
-import { PageFullWidth } from 'ui/pages/PageFullWidth';
-import { PageHeader } from 'ui/pages/PageHeader';
+import { PageHeader } from 'ui/layouts/PageHeader';
 
 const apiHeight = '48px';
 
@@ -180,7 +180,7 @@ export const HelpAPIPage = React.memo(() => {
   const enforceQuota = useMemo(() => Boolean(configuration?.ui?.enforce_quota), [configuration?.ui?.enforce_quota]);
 
   return (
-    <PageFullWidth margin={4}>
+    <AppPageFullWidth>
       <div style={{ textAlign: 'left' }}>
         <PageHeader
           primary={t('title')}
@@ -451,7 +451,7 @@ export const HelpAPIPage = React.memo(() => {
           </div>
         )}
       </div>
-    </PageFullWidth>
+    </AppPageFullWidth>
   );
 });
 

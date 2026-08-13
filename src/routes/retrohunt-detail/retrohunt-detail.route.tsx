@@ -8,6 +8,7 @@ import { AlertTitle, Divider, Grid, Paper, Skeleton, styled, Tooltip, Typography
 import TableContainer from '@mui/material/TableContainer';
 import { useAppNavigate } from 'core/router';
 import { createAppRoute, useAppPathParams, useAppSearchSnapshot } from 'core/routes';
+import { AppPageFullSize } from 'core/template';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import type { SearchResult } from 'models/api/search';
@@ -38,7 +39,6 @@ import { PageHeader } from 'ui/layouts/PageHeader';
 import LineGraph from 'ui/LineGraph';
 import Moment from 'ui/Moment';
 import MonacoEditor from 'ui/MonacoEditor';
-import { PageCenter } from 'ui/pages/PageCenter';
 import { DEFAULT_SUGGESTION } from 'ui/SearchBar/search-textfield';
 import SearchHeader from 'ui/SearchBar/SearchHeader';
 import SteppedProgress from 'ui/SteppedProgress';
@@ -242,7 +242,7 @@ export const RetrohuntDetailPage = memo(() => {
   else if (!currentUser.roles.includes('retrohunt_view')) return <ForbiddenPage />;
   else
     return (
-      <PageCenter margin={4} width="100%">
+      <AppPageFullSize>
         <Grid container flexDirection="column" flexWrap="nowrap" flex={1} rowGap={2} marginBottom={theme.spacing(4)}>
           {c12nDef.enforce && (
             <Grid paddingBottom={1}>
@@ -617,7 +617,7 @@ export const RetrohuntDetailPage = memo(() => {
             }}
           />
         </Grid>
-      </PageCenter>
+      </AppPageFullSize>
     );
 });
 
@@ -638,8 +638,8 @@ export const RetrohuntDetailRoute = createAppRoute({
   }),
 
   ancestor: '/retrohunt',
-  shortname: location => ({ i18nKey: location?.path?.id ?? 'breadcrumb.workflow.detail', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'breadcrumb.workflow.detail', ns: 'app' }),
+  shortname: location => ({ i18nKey: location?.path?.id ?? 'breadcrumb.retrohunt.detail', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'breadcrumb.retrohunt.detail', ns: 'app' }),
   shorticon: () => <ListOutlinedIcon />,
   fullicon: () => <ListOutlinedIcon />,
 

@@ -2,10 +2,10 @@ import HourglassEmptyOutlinedIcon from '@mui/icons-material/HourglassEmptyOutlin
 import { Typography, useMediaQuery, useTheme } from '@mui/material';
 import { useAppConfig } from 'core/config';
 import { createAppRoute } from 'core/routes';
+import { AppPageCenter } from 'core/template';
 import { memo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ForbiddenPage } from 'routes/forbidden/forbidden';
-import { PageCenter } from 'ui/pages/PageCenter';
 
 //*****************************************************************************************
 // Locked Page
@@ -22,7 +22,7 @@ export const LockedPage = memo(() => {
   return (
     <>
       {tos ? (
-        <PageCenter width="65%" margin={4}>
+        <AppPageCenter>
           <div style={{ paddingTop: theme.spacing(10), fontSize: 200, color: theme.palette.secondary.main }}>
             <HourglassEmptyOutlinedIcon fontSize="inherit" />
           </div>
@@ -36,7 +36,7 @@ export const LockedPage = memo(() => {
               gutterBottom
             />
           </div>
-        </PageCenter>
+        </AppPageCenter>
       ) : (
         <ForbiddenPage disabled />
       )}

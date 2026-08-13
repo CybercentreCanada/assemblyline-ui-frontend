@@ -16,6 +16,7 @@ import {
 import Alert from '@mui/material/Alert';
 import { Fetcher } from 'borealis-ui';
 import { createAppRoute, useAppLocation, useAppPathParams, useAppSearchSnapshot } from 'core/routes';
+import { AppPageFullWidth } from 'core/template';
 import ListCarousel from 'deprecated/components/lists/carousel/ListCarousel';
 import ListNavigator from 'deprecated/components/lists/navigator/ListNavigator';
 import useALContext from 'deprecated/hooks/useALContext';
@@ -51,7 +52,6 @@ import { ChipSkeleton, ChipSkeletonInline } from 'ui/ChipList';
 import Classification from 'ui/Classification';
 import CustomChip from 'ui/CustomChip';
 import { ImageInline } from 'ui/image_inline';
-import { PageFullWidth } from 'ui/pages/PageFullWidth';
 import Verdict from 'ui/Verdict';
 import VerdictBar from 'ui/VerdictBar';
 
@@ -162,11 +162,11 @@ export const AlertDetailPage = memo(() => {
               display: 'flex',
               float: 'right',
               height: theme.spacing(8),
-              marginTop: theme.spacing(-8),
-              marginRight: theme.spacing(-1),
+              marginTop: theme.spacing(-12),
+              marginRight: theme.spacing(1),
               position: 'sticky',
               top: theme.spacing(1),
-              zIndex: 10
+              zIndex: theme.zIndex.appBar + 1
             }}
           >
             <AlertActions alert={alertProp} inDrawer={drawer} />
@@ -182,7 +182,7 @@ export const AlertDetailPage = memo(() => {
 
   return currentUser.roles.includes('alert_view') ? (
     <Wrapper alert={alert} drawer={inDrawer}>
-      <PageFullWidth margin={inDrawer ? 1 : 4}>
+      <AppPageFullWidth>
         {c12nDef.enforce && (
           <div style={{ display: 'flex', alignItems: 'center', marginBottom: theme.spacing(2) }}>
             <div style={{ flex: 1 }}>
@@ -1003,7 +1003,7 @@ export const AlertDetailPage = memo(() => {
             </>
           )}
         </div>
-      </PageFullWidth>
+      </AppPageFullWidth>
     </Wrapper>
   ) : (
     <ForbiddenPage />
@@ -1027,7 +1027,7 @@ export const AlertDetailRoute = createAppRoute({
   }),
 
   ancestor: '/alerts',
-  shortname: () => ({ i18nKey: 'breadcrumb.alert.detail', ns: 'app' }),
+  shortname: location => ({ i18nKey: location?.path?.id ?? 'breadcrumb.alert.detail', ns: 'app' }),
   fullname: () => ({ i18nKey: 'breadcrumb.alert.detail', ns: 'app' }),
   shorticon: () => <BallotOutlinedIcon />,
   fullicon: () => <BallotOutlinedIcon />,

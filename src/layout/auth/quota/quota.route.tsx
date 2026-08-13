@@ -2,10 +2,10 @@ import SpeedOutlinedIcon from '@mui/icons-material/SpeedOutlined';
 import { Typography, useMediaQuery, useTheme } from '@mui/material';
 import { useAppSetInterfaceStore } from 'core/interface';
 import { createAppRoute } from 'core/routes';
+import { AppPageCenter } from 'core/template';
 import { memo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Button } from 'ui/buttons/Button';
-import { PageCenter } from 'ui/pages/PageCenter';
 
 //*****************************************************************************************
 // Quota Page
@@ -25,7 +25,7 @@ export const QuotaPage = memo(() => {
   }, [setInterfaceStore]);
 
   return (
-    <PageCenter width="65%" margin={4}>
+    <AppPageCenter>
       <div style={{ paddingTop: theme.spacing(10), fontSize: 200, color: theme.palette.secondary.main }}>
         <SpeedOutlinedIcon fontSize="inherit" />
       </div>
@@ -40,7 +40,7 @@ export const QuotaPage = memo(() => {
           {t('logout')}
         </Button>
       </div>
-    </PageCenter>
+    </AppPageCenter>
   );
 });
 

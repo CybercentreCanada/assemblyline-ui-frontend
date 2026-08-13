@@ -14,6 +14,7 @@ import {
 } from '@mui/material';
 import { useAppNavigate } from 'core/router';
 import { createAppRoute, useAppPathParams } from 'core/routes';
+import { AppPageCenter } from 'core/template';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import useMySnackbar from 'deprecated/hooks/useMySnackbar';
@@ -28,7 +29,6 @@ import CustomChip from 'ui/CustomChip';
 import DatePicker from 'ui/DatePicker';
 import { PageHeader } from 'ui/layouts/PageHeader';
 import Moment from 'ui/Moment';
-import { PageCenter } from 'ui/pages/PageCenter';
 
 //*****************************************************************************************
 // AdminAPIKeyDetail Page
@@ -123,7 +123,7 @@ export const AdminAPIKeyDetailPage = memo(() => {
   }, [id, handleReload]);
 
   return currentUser.is_admin ? (
-    <PageCenter margin={!id ? 2 : 4} width="100%">
+    <AppPageCenter>
       <ConfirmationDialog
         open={deleteDialog}
         handleClose={() => {
@@ -345,7 +345,7 @@ export const AdminAPIKeyDetailPage = memo(() => {
           </Button>
         </div>
       ) : null}
-    </PageCenter>
+    </AppPageCenter>
   ) : (
     <ForbiddenPage />
   );

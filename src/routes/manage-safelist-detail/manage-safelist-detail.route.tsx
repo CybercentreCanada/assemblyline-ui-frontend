@@ -7,6 +7,7 @@ import YoutubeSearchedForIcon from '@mui/icons-material/YoutubeSearchedFor';
 import { Divider, Grid, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
 import { useAppNavigate } from 'core/router';
 import { createAppRoute, useAppPathParams } from 'core/routes';
+import { AppPageCenter } from 'core/template';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import useMySnackbar from 'deprecated/hooks/useMySnackbar';
@@ -21,7 +22,6 @@ import DatePicker from 'ui/DatePicker';
 import Histogram from 'ui/Histogram';
 import { PageHeader } from 'ui/layouts/PageHeader';
 import Moment from 'ui/Moment';
-import { PageCenter } from 'ui/pages/PageCenter';
 
 export const ManageSafelistDetailPage = memo(() => {
   const { t } = useTranslation(['manageSafelistDetail']);
@@ -181,7 +181,7 @@ export const ManageSafelistDetailPage = memo(() => {
   };
 
   return (
-    <PageCenter margin={4} width="100%">
+    <AppPageCenter>
       <ConfirmationDialog
         open={deleteDialog}
         handleClose={() => setDeleteDialog(false)}
@@ -530,7 +530,7 @@ export const ManageSafelistDetailPage = memo(() => {
           )}
         </Grid>
       </div>
-    </PageCenter>
+    </AppPageCenter>
   );
 });
 

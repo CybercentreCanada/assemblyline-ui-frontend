@@ -19,6 +19,7 @@ import {
 } from '@mui/material';
 import { invalidateApiQuery } from 'core/api';
 import { createAppRoute } from 'core/routes';
+import { AppPageFullWidth } from 'core/template';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import useMySnackbar from 'deprecated/hooks/useMySnackbar';
@@ -34,7 +35,6 @@ import { ServiceTable } from 'routes/search/components/service';
 import { FileDownloader } from 'ui/buttons/FileDownloader';
 import ConfirmationDialog from 'ui/ConfirmationDialog';
 import { PageHeader } from 'ui/layouts/PageHeader';
-import { PageFullWidth } from 'ui/pages/PageFullWidth';
 
 export const AdminServicesPage = memo(() => {
   const { t } = useTranslation(['adminServices']);
@@ -284,7 +284,7 @@ export const AdminServicesPage = memo(() => {
   }, [installingServices, showErrorMessage, showInfoMessage, showSuccessMessage, t]);
 
   return (
-    <PageFullWidth margin={4}>
+    <AppPageFullWidth>
       <ConfirmationDialog
         open={restoreConfirmation}
         handleClose={() => setRestoreConfirmation(false)}
@@ -494,7 +494,7 @@ export const AdminServicesPage = memo(() => {
           onInstall={onInstallServices}
         />
       </div>
-    </PageFullWidth>
+    </AppPageFullWidth>
   );
 });
 

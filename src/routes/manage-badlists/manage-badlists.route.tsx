@@ -7,6 +7,7 @@ import { useTheme } from '@mui/material';
 import { useAppQuery } from 'core/api';
 import { useAppNavigate } from 'core/router';
 import { createAppRoute, useAppSearchSnapshot } from 'core/routes';
+import { AppPageContainer, AppPageFullWidth } from 'core/template';
 import useALContext from 'deprecated/hooks/useALContext';
 import type { IndexDefinition } from 'models/api/user';
 import { memo, useCallback, useMemo } from 'react';
@@ -14,8 +15,6 @@ import { useTranslation } from 'react-i18next';
 import { BadlistTable } from 'routes/search/components/badlist';
 import { IconButton } from 'ui/buttons/IconButton';
 import { PageHeader } from 'ui/layouts/PageHeader';
-import { PageContainer } from 'ui/pages/PageContainer';
-import { PageFullWidth } from 'ui/pages/PageFullWidth';
 import { DEFAULT_SUGGESTION } from 'ui/SearchBar/search-textfield';
 import SearchHeader from 'ui/SearchBar/SearchHeader';
 
@@ -58,7 +57,7 @@ export const ManageBadlistsPage = memo(() => {
   );
 
   return (
-    <PageFullWidth margin={4}>
+    <AppPageFullWidth>
       <PageHeader
         primary={t('title')}
         slotProps={{
@@ -77,7 +76,7 @@ export const ManageBadlistsPage = memo(() => {
         }
       />
 
-      <PageContainer isSticky>
+      <AppPageContainer isSticky>
         <div style={{ paddingTop: theme.spacing(1) }}>
           <SearchHeader
             params={search.toParams()}
@@ -127,12 +126,12 @@ export const ManageBadlistsPage = memo(() => {
             ]}
           />
         </div>
-      </PageContainer>
+      </AppPageContainer>
 
       <div style={{ paddingTop: theme.spacing(2), paddingLeft: theme.spacing(0.5), paddingRight: theme.spacing(0.5) }}>
         <BadlistTable badlistResults={badlists.data} />
       </div>
-    </PageFullWidth>
+    </AppPageFullWidth>
   );
 });
 

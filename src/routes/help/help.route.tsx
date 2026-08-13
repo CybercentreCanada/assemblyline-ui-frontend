@@ -11,8 +11,8 @@ import {
   RouteName,
   useAppLocationParamStoreApi
 } from 'core/routes';
+import { AppPageCenter } from 'core/template';
 import React, { memo, useMemo } from 'react';
-import { PageCenter } from 'ui/pages/PageCenter';
 
 export const HelpPage = memo(() => {
   const theme = useTheme();
@@ -37,7 +37,7 @@ export const HelpPage = memo(() => {
   }, [configStoreApi, locationParamStoreApi, leftNav]);
 
   return (
-    <PageCenter margin={4} width="100%">
+    <AppPageCenter>
       <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-around' }}>
         {items.map((item, i) => {
           const icon = React.isValidElement(item.icon)
@@ -70,7 +70,7 @@ export const HelpPage = memo(() => {
           );
         })}
       </div>
-    </PageCenter>
+    </AppPageCenter>
   );
 });
 

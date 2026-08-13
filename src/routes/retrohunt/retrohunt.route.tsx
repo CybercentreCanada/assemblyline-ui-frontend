@@ -5,6 +5,7 @@ import TimerOutlinedIcon from '@mui/icons-material/TimerOutlined';
 import { useTheme } from '@mui/material';
 import { useAppNavigate } from 'core/router';
 import { createAppRoute, useAppSearchSnapshot } from 'core/routes';
+import { AppPageContainer, AppPageFullWidth } from 'core/template';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import type { SearchResult } from 'models/api/search';
@@ -17,8 +18,6 @@ import type { Socket } from 'socket.io-client';
 import { io } from 'socket.io-client';
 import { IconButton } from 'ui/buttons/IconButton';
 import { PageHeader } from 'ui/layouts/PageHeader';
-import { PageContainer } from 'ui/pages/PageContainer';
-import { PageFullWidth } from 'ui/pages/PageFullWidth';
 import { DEFAULT_SUGGESTION } from 'ui/SearchBar/search-textfield';
 import SearchHeader from 'ui/SearchBar/SearchHeader';
 
@@ -175,7 +174,7 @@ export const RetrohuntPage = memo(() => {
   }, [retrohuntResults]);
 
   return (
-    <PageFullWidth margin={4}>
+    <AppPageFullWidth>
       <PageHeader
         primary={t('title')}
         slotProps={{
@@ -194,7 +193,7 @@ export const RetrohuntPage = memo(() => {
         }
       />
 
-      <PageContainer isSticky>
+      <AppPageContainer isSticky>
         <div style={{ paddingTop: theme.spacing(1) }}>
           <SearchHeader
             params={search.toParams()}
@@ -240,7 +239,7 @@ export const RetrohuntPage = memo(() => {
             ]}
           />
         </div>
-      </PageContainer>
+      </AppPageContainer>
 
       <div
         style={{
@@ -251,7 +250,7 @@ export const RetrohuntPage = memo(() => {
       >
         <RetrohuntTable retrohuntResults={retrohuntResults} />
       </div>
-    </PageFullWidth>
+    </AppPageFullWidth>
   );
 });
 

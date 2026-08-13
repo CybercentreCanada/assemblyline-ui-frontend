@@ -14,6 +14,7 @@ import {
 } from '@mui/material';
 import { useAppBlocker, useAppNavigate } from 'core/router';
 import { createAppRoute } from 'core/routes';
+import { AppPageFullSize } from 'core/template';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import useMySnackbar from 'deprecated/hooks/useMySnackbar';
@@ -24,7 +25,6 @@ import Classification from 'ui/Classification';
 import ConfirmationDialog from 'ui/ConfirmationDialog';
 import { PageHeader } from 'ui/layouts/PageHeader';
 import MonacoEditor from 'ui/MonacoEditor';
-import { PageFullSizeLayout } from 'ui/pages/PageFullSize';
 
 type RetrohuntData = Pick<
   Retrohunt,
@@ -131,7 +131,7 @@ export const RetrohuntCreatePage = memo(() => {
   }, []);
 
   return (
-    <PageFullSizeLayout margin={2}>
+    <AppPageFullSize>
       <ConfirmationDialog
         open={isConfirmationOpen}
         handleClose={() => setIsConfirmationOpen(false)}
@@ -273,7 +273,7 @@ export const RetrohuntCreatePage = memo(() => {
           </Grid>
         </Grid>
       </Grid>
-    </PageFullSizeLayout>
+    </AppPageFullSize>
   );
 });
 
@@ -283,8 +283,8 @@ export const RetrohuntCreateRoute = createAppRoute({
   path: '/retrohunt/create',
 
   ancestor: '/retrohunt',
-  shortname: () => ({ i18nKey: 'drawer.retrohunt', ns: 'app' }),
-  fullname: () => ({ i18nKey: 'drawer.retrohunt', ns: 'app' }),
+  shortname: () => ({ i18nKey: 'drawer.retrohunt.create', ns: 'app' }),
+  fullname: () => ({ i18nKey: 'drawer.retrohunt.create', ns: 'app' }),
   shorticon: () => <DataObjectOutlinedIcon />,
   fullicon: () => <DataObjectOutlinedIcon />,
 

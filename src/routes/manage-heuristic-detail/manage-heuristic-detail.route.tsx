@@ -3,6 +3,7 @@ import YoutubeSearchedForIcon from '@mui/icons-material/YoutubeSearchedFor';
 import type { PaperProps } from '@mui/material';
 import { Grid, Paper, Skeleton, styled, Typography, useTheme } from '@mui/material';
 import { createAppRoute, useAppPathParams } from 'core/routes';
+import { AppPageCenter } from 'core/template';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import type { Heuristic } from 'models/base/heuristic';
@@ -17,7 +18,6 @@ import Classification from 'ui/Classification';
 import Histogram from 'ui/Histogram';
 import { PageHeader } from 'ui/layouts/PageHeader';
 import Moment from 'ui/Moment';
-import { PageCenter } from 'ui/pages/PageCenter';
 
 const Preview = memo(
   styled(({ component = 'pre', variant = 'outlined', ...props }: PaperProps) => (
@@ -97,7 +97,7 @@ export const ManageHeuristicDetailPage = memo(() => {
   }, [heuristic]);
 
   return (
-    <PageCenter margin={4} width="100%">
+    <AppPageCenter>
       {c12nDef.enforce && (
         <div style={{ paddingBottom: theme.spacing(4) }}>
           <Classification size="tiny" c12n={heuristic ? heuristic.classification : null} />
@@ -273,7 +273,7 @@ export const ManageHeuristicDetailPage = memo(() => {
           )}
         </Grid>
       </div>
-    </PageCenter>
+    </AppPageCenter>
   );
 });
 

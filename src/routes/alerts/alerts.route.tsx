@@ -3,6 +3,7 @@ import NotificationImportantOutlinedIcon from '@mui/icons-material/NotificationI
 import { AlertTitle, useMediaQuery, useTheme } from '@mui/material';
 import { useAppNavigate } from 'core/router';
 import { createAppRoute, useAppSearchSnapshot } from 'core/routes';
+import { AppPageFullWidth } from 'core/template';
 import SimpleList from 'deprecated/components/lists/simplelist/SimpleList';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
@@ -25,7 +26,6 @@ import { ForbiddenPage } from 'routes/forbidden/forbidden';
 import { IconButton } from 'ui/buttons/IconButton';
 import InformativeAlert from 'ui/InformativeAlert';
 import { PageHeader } from 'ui/layouts/PageHeader';
-import { PageFullWidth } from 'ui/pages/PageFullWidth';
 import { DEFAULT_SUGGESTION } from 'ui/SearchBar/search-textfield';
 
 type ListResponse = {
@@ -199,7 +199,7 @@ export const AlertsPage = memo(() => {
   if (!currentUser.roles.includes('alert_view')) return <ForbiddenPage />;
   else
     return (
-      <PageFullWidth margin={4}>
+      <AppPageFullWidth>
         <PageHeader
           primary={t('alerts')}
           slotProps={{
@@ -275,7 +275,7 @@ export const AlertsPage = memo(() => {
         >
           {(item: Alert) => <AlertListItem item={item} />}
         </SimpleList>
-      </PageFullWidth>
+      </AppPageFullWidth>
     );
 });
 

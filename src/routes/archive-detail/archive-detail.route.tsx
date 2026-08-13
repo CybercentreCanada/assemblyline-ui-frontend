@@ -2,6 +2,7 @@ import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import { AlertTitle, useMediaQuery, useTheme } from '@mui/material';
 import { useAppNavigate } from 'core/router';
 import { createAppRoute, useAppPathParams } from 'core/routes';
+import { AppPageCenter, AppPageFullSize } from 'core/template';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import useMySnackbar from 'deprecated/hooks/useMySnackbar';
@@ -34,8 +35,6 @@ import StringsSection from 'routes/file-viewer/components/strings';
 import AISummarySection from 'routes/submission-detail/components/ai_summary';
 import Classification from 'ui/Classification';
 import InformativeAlert from 'ui/InformativeAlert';
-import { PageCenter } from 'ui/pages/PageCenter';
-import { PageFullSize } from 'ui/pages/PageFullSize';
 import { emptyResult } from 'ui/ResultCard';
 import { TabContainer } from 'ui/TabContainer';
 
@@ -143,8 +142,8 @@ export const ArchiveDetailPage = memo(() => {
   }, [codeAllowed]);
 
   return (
-    <PageCenter width="100%" height="100%" textAlign="left">
-      <PageFullSize>
+    <AppPageCenter>
+      <AppPageFullSize>
         {c12nDef.enforce && (
           <div style={{ paddingBottom: theme.spacing(2), paddingTop: theme.spacing(0) }}>
             <Classification size="tiny" c12n={file ? file.file_info.classification : null} />
@@ -290,8 +289,8 @@ export const ArchiveDetailPage = memo(() => {
             }
           }}
         />
-      </PageFullSize>
-    </PageCenter>
+      </AppPageFullSize>
+    </AppPageCenter>
   );
 });
 

@@ -20,7 +20,7 @@ import {
 import FormControl from '@mui/material/FormControl';
 import { useAppBlocker, useAppNavigate } from 'core/router';
 import { createAppRoute, useAppPathParams } from 'core/routes';
-import { useAppTemplateThemeMode } from 'core/template';
+import { AppPageCenter, useAppTemplateThemeMode } from 'core/template';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMyAPI from 'deprecated/hooks/useMyAPI';
 import useMySnackbar from 'deprecated/hooks/useMySnackbar';
@@ -40,7 +40,6 @@ import ConfirmationDialog from 'ui/ConfirmationDialog';
 import Histogram from 'ui/Histogram';
 import { PageHeader } from 'ui/layouts/PageHeader';
 import Moment from 'ui/Moment';
-import { PageCenter } from 'ui/pages/PageCenter';
 import SignatureStatus from 'ui/SignatureStatus';
 
 loader.config({
@@ -392,7 +391,7 @@ export const ManageSignatureDetailPage = memo(() => {
   };
 
   return (
-    <PageCenter margin={!id && !type && !name && !source ? 2 : 4} width="100%">
+    <AppPageCenter>
       <ConfirmationDialog
         open={deleteDialog}
         handleClose={() => setDeleteDialog(false)}
@@ -650,7 +649,7 @@ export const ManageSignatureDetailPage = memo(() => {
           }}
         />
       </div>
-    </PageCenter>
+    </AppPageCenter>
   );
 });
 
