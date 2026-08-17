@@ -2076,7 +2076,7 @@ export const applyDefaultNavigationStore = (
 ): AppNavigationStore => {
   if (store?.panels?.length > 0 && Object.entries(store?.pages || {}).length > 0) return store;
 
-  const [store1, nextPageKey] = addPage(store, { href: '/submit' });
+  const [store1, nextPageKey] = addPage(store, { href: '/' });
   [store] = upsertPanel(store1, 0, { pageKey: nextPageKey }, preference);
 
   return store;

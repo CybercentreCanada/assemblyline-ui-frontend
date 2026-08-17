@@ -24,8 +24,8 @@ Status legend:
 - 🟡 Define a typed risk taxonomy for navigation requests: `unsaved_changes`, `transient_loss_on_leave`, `state_or_transient_loss_on_new_tab`, and `external_leave_risk`.
 - 🟡 Add a central way to annotate and aggregate risk reasons for a page so risks are discoverable and debuggable from router/navigation state.
 - 🟡 Verify that pending navigations remain in the Navigation Store until accepted or cancelled, including risk metadata.
-- 🟡 Support navigation with raw string destinations in addition to app route values (for `create`/`update` flows).
-- 🟡 Support passing React Router `Location` objects to `navigate.create/update` and parse them into app route values (legacy fallback, lower type safety).
+- ✅ Support navigation with raw string destinations in addition to app route values (for `create`/`update` flows).
+- ✅ Support passing React Router `Location` objects to `navigate.create/update` and parse them into app route values (legacy fallback, lower type safety).
 - 🟡 Implement and verify all `AppNavigateOptions` fields end-to-end (`hashScrollIntoView`, `href`, `ignoreBlocker`, `reloadDocument`, `replace`, `resetScroll`, `viewTransition`).
 - 🟡 Extend navigation options so callers can explicitly bypass selected risk guards when consequences are understood (for example `ignoreRisk` by reason and `forceProceed`).
 - 🟡 Add route-level loader execution in `createAppRoute` at navigation start (before page render) to prefetch API data with TanStack Query so data is available earlier in the pipeline.
@@ -103,14 +103,14 @@ Status legend:
 - ✅ Support Not Mounted pages.
 - ✅ Determine how authorization requirements are expressed in route definitions.
 - ✅ Support disabled pages.
-- 🟡 Start setting the `forbidden` parameter in `createAppRoute` on pages and continue rolling it out across the remaining routes.
-- 🟡 Show the Not Found route when no route matches during route resolution.
-- 🟡 Show the Not Found page when an invalid page is calculated during routing, instead of filtering that page out.
+- ✅ Start setting the `forbidden` parameter in `createAppRoute` on pages and continue rolling it out across the remaining routes.
+- ✅ Show the Not Found route when no route matches during route resolution.
+- ✅ Show the Not Found page when an invalid page is calculated during routing, instead of filtering that page out.
 - ⬜ Define page accessibility requirements.
-- ⬜ Add fallback page handling when an invalid page is provided (or define and implement all potential fallback pages).
+- ✅ Add fallback page handling when an invalid page is provided (or define and implement all potential fallback pages).
 - ⬜ In AppLocationParamProvider, add configurable fallback overrides for Not Found and Forbidden pages.
-- ⬜ Add blocked-page reason support so the UI can explain why access/navigation was blocked.
-- ⬜ Add wildcard-like route fallback support (similar to React Router `*`) so navigating to a route not present in the spec registry resolves to the Not Found page.
+- ✅ Add blocked-page reason support so the UI can explain why access/navigation was blocked.
+- ✅ Add wildcard-like route fallback support (similar to React Router `*`) so navigating to a route not present in the spec registry resolves to the Not Found page.
 ## ⚙️ Priority 7 – Search Parameter Defaults
 
 - ⬜ Verify pages can define default search parameter values.

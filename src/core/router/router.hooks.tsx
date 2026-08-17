@@ -101,7 +101,9 @@ export const useAppExternalHref = function <const Origin extends AppRoute['path'
         const prevPageKey = findPageKeyFromPanelKey(routerState, resolvedPanelKey);
         const prevPage = routerState.pages?.[prevPageKey];
         const prevPageParams = getRouteParamFromKey<Origin>(locationState, prevPageKey);
-        if (!prevPage || !prevPageParams) return null;
+
+        if (operation === 'search' && (!prevPage || !prevPageParams)) return null;
+        if (operation !== 'search' && typeof dispatch === 'function' && !prevPageParams) return null;
 
         if (operation === 'search') {
           const prevAppRoute = findAppRouteFromKey<Origin>(locationState, prevPageKey);
@@ -459,7 +461,7 @@ export function useAppSyncNavigationStoreFromLocation() {
 
         store = getNavigationStoreFromRouter(store, routerState);
 
-        const hashFragment = location.hash ? location.hash.slice(1) : '/submit';
+        const hashFragment = location.hash ? location.hash.slice(1) : '';
 
         let panelKey: number = -1;
 
@@ -509,7 +511,7 @@ export function useAppSyncNavigationStoreFromLocation() {
 
         store = getNavigationStoreFromRouter(store, routerState);
 
-        const pathname = location.pathname === '/' ? '/submit' : location.pathname;
+        const pathname = location.pathname === '/' ? '/' : location.pathname;
         const href = `${pathname}${location.search || ''}${location.hash || ''}`;
         const nextPageInput = sanitizePage(locationState, getDefaultRouterPage({ href, state: location.state }));
         const context = { operation: 'sync-legacy-location' };

@@ -473,6 +473,7 @@ const WrappedFileViewerPage = React.memo(() => (
   </SelectionProvider>
 ));
 
+// TODO: it shows the /:tab at the end where it shouldn't. if the tab value is null, it will show null where it should have shown "ascii" as the default value
 export const FileViewerRoute = createAppRoute({
   component: WrappedFileViewerPage,
 

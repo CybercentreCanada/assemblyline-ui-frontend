@@ -178,7 +178,7 @@ export const ManageWorkflowCreatePage = memo(() => {
   return (
     <AppPageCenter>
       {/* <RouterPrompt when={modified && !loading} /> */}
-
+      {/**Fix the classification coming from the search params */}
       {c12nDef.enforce && (
         <div style={{ paddingBottom: theme.spacing(2) }}>
           <Classification

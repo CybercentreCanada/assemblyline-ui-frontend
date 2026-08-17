@@ -14,6 +14,8 @@ import { getXSRFCookie } from 'shared/utils/xsrf.utils';
 
 const VALID_SCOPES: Omit<Scope, 'c'>[] = SCOPES.filter(s => s !== 'c');
 
+// TODO: makes sure this works properly
+// TODO: using the browser's navigate back button back on that page doesn't work for some reason,
 export const AppRegistrationPage = memo(() => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -53,6 +55,7 @@ export const AppRegistrationPage = memo(() => {
             (scope && VALID_SCOPES.indexOf(scope as Scope) === -1) ? (
             <>
               <div style={{ marginBottom: '3rem' }}>{t('invalid')}</div>
+              {/** TODO: fix this, so that navigating either navigates back or brings you back to the login page */}
               <Button variant="contained" color="primary" onClick={() => navigate(-1)}>
                 {t('button.back')}
               </Button>

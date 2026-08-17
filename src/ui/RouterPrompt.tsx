@@ -1,9 +1,9 @@
-import { useAppBlocker } from 'core/router';
 import useDrawer from 'deprecated/hooks/useDrawer';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ConfirmationDialog from 'ui/ConfirmationDialog';
 
+// TODO: remove all instances of RouterPrompt
 export function RouterPrompt(props) {
   const {
     when,
