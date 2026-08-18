@@ -1,7 +1,7 @@
 import { findPanelKey, useAppRouterStore } from 'core/router';
 import { useAppHashParams } from 'core/routes';
 import type { PropsWithChildren } from 'react';
-import { memo, useEffect, useRef } from 'react';
+import { memo, useEffect } from 'react';
 
 //*****************************************************************************************
 // Route Layout Provider
@@ -12,23 +12,28 @@ export type AppRouteLayoutProviderProps = PropsWithChildren<{
 }>;
 
 export const AppRouteLayoutProvider = memo(({ pageKey, children }: AppRouteLayoutProviderProps) => {
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-
-  const scrollPosition = useAppRouterStore(s => s?.pages?.[pageKey]?.scroll ?? null);
+  const scrollPosition = useAppRouterStore(s => s?.pages?.[pageKey]?.scroll ?? 0);
   const hashFragment = useAppHashParams();
   const panelKey = useAppRouterStore(s => findPanelKey(s, { pageKey }));
 
   useEffect(() => {
-    if (!scrollContainerRef.current || !scrollPosition) return;
+    const scrollContainer =
+      panelKey === 0
+        ? document.getElementById('app-scrollct')
+        : panelKey === 1
+          ? document.getElementById('drawer-scrollct')
+          : null;
+
+    if (!scrollContainer || scrollPosition == null) return;
 
     let frameId = 0;
     let attempts = 0;
 
     const applyScroll = () => {
-      if (!scrollContainerRef.current) return;
+      if (!scrollContainer) return;
 
-      scrollContainerRef.current.scrollTop = scrollPosition;
-      const isApplied = scrollPosition === 0 || Math.abs(scrollContainerRef.current.scrollTop - scrollPosition) <= 1;
+      scrollContainer.scrollTop = scrollPosition;
+      const isApplied = Math.abs(scrollContainer.scrollTop - scrollPosition) <= 1;
       attempts += 1;
 
       if (isApplied || attempts >= 6) return;
@@ -45,22 +50,29 @@ export const AppRouteLayoutProvider = memo(({ pageKey, children }: AppRouteLayou
   }, [panelKey]);
 
   useEffect(() => {
-    if (!scrollContainerRef.current || !hashFragment) return;
+    const scrollContainer =
+      panelKey === 0
+        ? document.getElementById('app-scrollct')
+        : panelKey === 1
+          ? document.getElementById('drawer-scrollct')
+          : null;
 
-    const targetElement = scrollContainerRef.current.querySelector(`#${hashFragment}`);
+    if (!scrollContainer || !hashFragment) return;
+
+    const targetElement = scrollContainer.querySelector(`#${hashFragment}`);
     if (!targetElement) return;
 
     const elementRect = targetElement.getBoundingClientRect();
-    const containerRect = scrollContainerRef.current.getBoundingClientRect();
-    const targetScroll = elementRect.top - containerRect.top + scrollContainerRef.current.scrollTop;
+    const containerRect = scrollContainer.getBoundingClientRect();
+    const targetScroll = elementRect.top - containerRect.top + scrollContainer.scrollTop;
 
     let frameId = 0;
     let attempts = 0;
 
     const applyScroll = () => {
-      if (!scrollContainerRef.current) return;
-      scrollContainerRef.current.scrollTop = targetScroll;
-      const isApplied = targetScroll === 0 || Math.abs(scrollContainerRef.current.scrollTop - targetScroll) <= 1;
+      if (!scrollContainer) return;
+      scrollContainer.scrollTop = targetScroll;
+      const isApplied = Math.abs(scrollContainer.scrollTop - targetScroll) <= 1;
       attempts += 1;
 
       if (isApplied || attempts >= 6) return;
@@ -74,20 +86,7 @@ export const AppRouteLayoutProvider = memo(({ pageKey, children }: AppRouteLayou
     };
   }, [hashFragment, panelKey]);
 
-  return (
-    <div
-      id={`page-layout-${pageKey}`}
-      data-testid="page-layout-scroll-container"
-      ref={scrollContainerRef}
-      style={{
-        flex: 1,
-        display: 'flex',
-        flexDirection: 'column'
-      }}
-    >
-      {children}
-    </div>
-  );
+  return <>{children}</>;
 });
 
 AppRouteLayoutProvider.displayName = 'AppRouteLayoutProvider';

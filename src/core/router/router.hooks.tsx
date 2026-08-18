@@ -190,10 +190,10 @@ export function useAppNavigate<const Origin extends AppRoute['path']>() {
 
       setNavigationStore(store => {
         store = getNavigationStoreFromRouter(store, routerState);
+        store = setPageScrollPositions(store);
         const [nextStore, nextPageKey] = addPage(store, nextPage);
         [store] = upsertPanel(nextStore, destinationPanelKey, { pageKey: nextPageKey }, preferenceState);
         store = sanitizeRouterStore(store, preferenceState);
-        store = setPageScrollPositions(store);
         store.id = generateRandomUUID();
         store.options = options;
         return store;
@@ -223,9 +223,9 @@ export function useAppNavigate<const Origin extends AppRoute['path']>() {
 
       setNavigationStore(store => {
         store = getNavigationStoreFromRouter(store, routerState);
+        store = setPageScrollPositions(store);
         store = updatePage(store, prevPageKey, nextPage);
         store = sanitizeRouterStore(store, preferenceState);
-        store = setPageScrollPositions(store);
         store.id = generateRandomUUID();
         store.options = options;
         return store;
@@ -261,9 +261,9 @@ export function useAppNavigate<const Origin extends AppRoute['path']>() {
 
       setNavigationStore(store => {
         store = getNavigationStoreFromRouter(store, routerState);
+        store = setPageScrollPositions(store);
         store = updatePage(store, prevPageKey, nextPage);
         store = sanitizeRouterStore(store, preferenceState);
-        store = setPageScrollPositions(store);
         store.id = generateRandomUUID();
         store.options = options;
         return store;
@@ -291,6 +291,7 @@ export function useAppNavigate<const Origin extends AppRoute['path']>() {
 
       setNavigationStore(store => {
         store = getNavigationStoreFromRouter(store, routerState);
+        store = setPageScrollPositions(store);
         const [nextStore, nextPageKey] = addPage(store, nextPage);
         [store] = upsertPanel(nextStore, 0, { pageKey: nextPageKey }, preferenceState);
 
@@ -299,7 +300,6 @@ export function useAppNavigate<const Origin extends AppRoute['path']>() {
         }
 
         store = sanitizeRouterStore(store, preferenceState);
-        store = setPageScrollPositions(store);
         store.id = generateRandomUUID();
         store.options = options;
         return store;
@@ -326,9 +326,9 @@ export function useAppNavigate<const Origin extends AppRoute['path']>() {
 
       setNavigationStore(store => {
         store = getNavigationStoreFromRouter(store, routerState);
+        store = setPageScrollPositions(store);
         store = removePanel(store, destinationPanelKey);
         store = sanitizeRouterStore(store, preferenceState);
-        store = setPageScrollPositions(store);
         store.id = generateRandomUUID();
         store.options = options;
         return store;
@@ -452,7 +452,6 @@ export function useAppSyncNavigationStoreFromLocation() {
     [location, preferenceStoreApi, routerStoreApi, locationParamStoreApi, setNavigationStore]
   );
 
-  // TODO: The existence of /v1 should not be necessary and should just show the submit page with just "/" as it was the case in the old implementation.
   const getNavigationFromLocationHash = useCallback(
     () =>
       setNavigationStore(store => {
@@ -589,8 +588,8 @@ export function useAppSyncNavigationStoreFromLocation() {
 // useAppSyncLocationToNavigationStore
 //*****************************************************************************************
 export function useAppSyncRouterStoreFromNavigation() {
-  const navigate = useNavigate();
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const configStoreApi = useAppConfigStoreApi();
   const locationParamStoreApi = useAppLocationParamStoreApi();
   const navigationStoreApi = useAppNavigationStoreApi();

@@ -81,7 +81,7 @@ import {
 import { getPage, resolveLegacyLocation } from 'core/router/router.utils';
 import { createReversePortalNode } from 'features/portal';
 import { hashObject } from 'shared/utils/app.utils';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 const makePreferences = (overrides: Partial<AppPreferenceStore['router']> = {}): AppPreferenceStore => ({
   ...DEFAULT_APP_PREFERENCE_STORE,
@@ -829,17 +829,17 @@ describe('findPageKeyFromPanelKey', () => {
 });
 
 describe('captureScrollPositions', () => {
-  it('returns an empty object when there are no page layout elements', () => {
-    expect(captureScrollPositions()).toEqual({});
+  it('returns null positions when the panel scroll elements are missing', () => {
+    expect(captureScrollPositions()).toEqual([null, null]);
   });
 
-  it('captures scrollTop keyed by pageKey from matching DOM elements', () => {
+  it('captures scrollTop by panel index', () => {
     const el = document.createElement('div');
-    el.id = 'page-layout-r1';
+    el.id = 'app-scrollct';
     Object.defineProperty(el, 'scrollTop', { value: 42, configurable: true });
     document.body.appendChild(el);
 
-    expect(captureScrollPositions()).toEqual({ r1: 42 });
+    expect(captureScrollPositions()).toEqual([42, null]);
 
     document.body.removeChild(el);
   });
@@ -848,11 +848,11 @@ describe('captureScrollPositions', () => {
 describe('setPageScrollPositions', () => {
   it('applies captured scroll positions to matching pages', () => {
     const el = document.createElement('div');
-    el.id = 'page-layout-r1';
+    el.id = 'app-scrollct';
     Object.defineProperty(el, 'scrollTop', { value: 88, configurable: true });
     document.body.appendChild(el);
 
-    const store = { ...getDefaultRouterStore(), pages: { r1: makePage('/r1') } };
+    const store = { ...getDefaultRouterStore(), panels: [{ pageKey: 'r1' }], pages: { r1: makePage('/r1') } };
     const next = setPageScrollPositions(store);
     expect(next.pages.r1.scroll).toBe(88);
 
@@ -862,6 +862,25 @@ describe('setPageScrollPositions', () => {
   it('ignores scroll positions for pages not in the store', () => {
     const store = { ...getDefaultRouterStore(), pages: {} };
     expect(() => setPageScrollPositions(store)).not.toThrow();
+  });
+
+  it('captures panel scroll using the pre-navigation page keys', () => {
+    const app = document.createElement('div');
+    Object.defineProperty(app, 'scrollTop', { value: 123, configurable: true });
+    const getElementById = vi
+      .spyOn(document, 'getElementById')
+      .mockImplementation(id => (id === 'app-scrollct' ? app : null));
+
+    const store = {
+      ...getDefaultNavigationStore(),
+      panels: [{ pageKey: 'previous' }],
+      pages: { previous: makePage('/previous') }
+    };
+
+    setPageScrollPositions(store);
+
+    expect(store.pages.previous.scroll).toBe(123);
+    getElementById.mockRestore();
   });
 });
 

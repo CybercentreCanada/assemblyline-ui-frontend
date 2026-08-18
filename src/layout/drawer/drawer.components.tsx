@@ -192,6 +192,7 @@ export const AppDrawerContainer = memo(({ children }: PropsWithChildren) => {
           }
         },
         paper: {
+          id: 'drawer-scrollct',
           sx: {
             backgroundColor: theme.palette.background.default,
             boxShadow: 'none',

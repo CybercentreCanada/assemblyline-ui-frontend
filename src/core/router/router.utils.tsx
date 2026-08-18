@@ -788,21 +788,24 @@ export const findPageKeyFromPanelKey = (store: AppRouterStore, panelKey: number)
  * Call this before navigation to preserve scroll state across page transitions.
  * @returns Object mapping pageKey to scrollTop value
  */
-export const captureScrollPositions = (): Record<string, number> => {
-  const positions: Record<string, number> = {};
-  document.querySelectorAll('[id^="page-layout-"]').forEach(el => {
-    const id = el.id;
-    const pageKey = id.replace('page-layout-', '');
-    const scrollContainer = el as HTMLDivElement;
-    positions[pageKey] = scrollContainer.scrollTop;
-  });
+export const captureScrollPositions = (): number[] => {
+  const positions: number[] = [null, null];
+
+  const appRoot = document.getElementById('app-scrollct');
+  if (appRoot) positions[0] = appRoot.scrollTop;
+
+  const drawerRoot = document.getElementById('drawer-scrollct');
+  if (drawerRoot) positions[1] = drawerRoot.scrollTop;
+
   return positions;
 };
 
 export const setPageScrollPositions = function <const Store extends AppSharedRouterStore>(store: Store): Store {
   const positions = captureScrollPositions();
 
-  for (const [pageKey, scroll] of Object.entries(positions)) {
+  for (const [panelKey, scroll] of positions.entries()) {
+    const pageKey = store.panels[panelKey]?.pageKey;
+    if (!pageKey || scroll == null) continue;
     if (!(pageKey in store.pages)) continue;
     store.pages[pageKey].scroll = scroll;
   }
@@ -1972,6 +1975,7 @@ export const getTitlesFromNavigation = function (
 //   };
 // };
 
+//TODO: fix this so that it doesn't get the full content of the pages stored in the location
 export const getLocationStateFromRouter = function (store: AppNavigationStore): AppLocationState {
   return {
     id: store.id,
@@ -2076,7 +2080,7 @@ export const applyDefaultNavigationStore = (
 ): AppNavigationStore => {
   if (store?.panels?.length > 0 && Object.entries(store?.pages || {}).length > 0) return store;
 
-  const [store1, nextPageKey] = addPage(store, { href: '/' });
+  const [store1, nextPageKey] = addPage(store, { href: '/submit' });
   [store] = upsertPanel(store1, 0, { pageKey: nextPageKey }, preference);
 
   return store;

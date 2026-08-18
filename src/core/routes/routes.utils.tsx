@@ -417,7 +417,11 @@ export const sanitizePage = function (store: AppLocationParamStore, page: AppRou
   }
 
   const param = getRouteParamFromPage(store, page);
-  return !param?.route ? getDefaultRouterPage() : getPageFromParam(store, param);
+  if (!param?.route) return getDefaultRouterPage();
+
+  const nextPage = getPageFromParam(store, param);
+  nextPage.scroll = page?.scroll || 0;
+  return nextPage;
 };
 
 // export const getRouteParamFromValues = function <const Origin extends AppRoute['path']>(
