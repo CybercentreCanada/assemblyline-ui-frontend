@@ -37,13 +37,13 @@ export type Response = {
 /** Error Model used by Error Viewer */
 export type Error = {
   /** Archiving timestamp (Deprecated) */
-  archive_ts?: string & Date;
+  archive_ts?: string;
 
   /** Error creation timestamp */
-  created: string & Date;
+  created: string;
 
   /** Expiry timestamp */
-  expiry_ts?: string | Date;
+  expiry_ts?: string;
 
   /** ID of the error */
   id: string;

@@ -37,7 +37,7 @@ import {
 } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import { AppLink, useAppNavigate } from 'core/router';
-import { createAppRoute, useAppPathParams } from 'core/routes';
+import { createAppRoute, useAppLocation, useAppPathParams } from 'core/routes';
 import { AppPageCenter } from 'core/template';
 import useALContext from 'deprecated/hooks/useALContext';
 import type { HighlighMapProps } from 'deprecated/hooks/useHighlighter';
@@ -80,11 +80,6 @@ import VerdictBar from 'ui/VerdictBar';
 const NAMESPACE = '/live_submission';
 const MESSAGE_TIMEOUT = 5000;
 const OUTSTANDING_TRIGGER_COUNT = 4;
-
-type ParamProps = {
-  id: string;
-  fid?: string;
-};
 
 const resultReducer = (currentResults: MultipleKeys, newResults: MultipleKeys) => {
   if (newResults === null) return null;
@@ -149,6 +144,8 @@ const SubmissionDetail = memo(() => {
   const [processedKeys, setProcessedKeys] = useReducer(messageReducer, []);
   const [liveResults, setLiveResults] = useReducer(resultReducer, null);
   const [loadTrigger, incrementLoadTrigger] = useReducer(incrementReducer, 0);
+
+  const fid = useAppLocation<'/file/detail/:id'>('to')(s => (s.route === '/file/detail/:id' ? s.path.id : null));
 
   const popoverOpen = Boolean(resubmitAnchor);
 
@@ -873,6 +870,44 @@ const SubmissionDetail = memo(() => {
   }, [watchQueue, socket, handleErrorMessage]);
 
   useEffect(() => {
+    if (fid) {
+      if (liveResults) {
+        const curFileLiveResults = [];
+        const curFileLiveErrors = [];
+        Object.entries(liveResults.result).forEach(([resultKey, result]) => {
+          if (resultKey.startsWith(fid)) {
+            curFileLiveResults.push(result);
+          }
+        });
+        Object.entries(liveResults.error).forEach(([errorKey, error]) => {
+          if (errorKey.startsWith(fid)) {
+            curFileLiveErrors.push(error);
+          }
+        });
+
+        navigate.to<'/file/detail/:id'>({ replace: true }).update(s => ({
+          ...s,
+          search: {
+            metadata: submission?.metadata,
+            liveResultKeys: liveResultKeys,
+            liveErrors: curFileLiveErrors,
+            force: submission && submission.max_score < 0
+          }
+        }));
+      } else {
+        navigate.to<'/file/detail/:id'>({ replace: true }).update(s => ({
+          ...s,
+          search: {
+            metadata: submission?.metadata,
+            force: submission && submission.max_score < 0
+          }
+        }));
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fid, submission]);
+
+  useEffect(() => {
     if (loadTrigger === 0) return;
 
     // eslint-disable-next-line no-console
@@ -1174,9 +1209,9 @@ const SubmissionDetail = memo(() => {
                         nav={nav =>
                           nav.to().create({
                             route: '/submit',
-                            search: { hash: submission.files[0].sha256 },
-                            state: {
-                              c12n: submission.classification,
+                            search: {
+                              classification: submission.classification,
+                              hash: submission.files[0].sha256,
                               metadata: submission.metadata
                             }
                           })

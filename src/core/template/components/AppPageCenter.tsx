@@ -5,13 +5,22 @@ import { forwardRef, memo } from 'react';
 export type AppPageCenterProps = PropsWithChildren<{ style?: CSSProperties }>;
 
 export const AppPageCenter = memo(
-  forwardRef<HTMLDivElement, AppPageCenterProps>(({ children, style = null }: AppPageCenterProps) => {
+  forwardRef<HTMLDivElement, AppPageCenterProps>(({ children, style = null }: AppPageCenterProps, ref) => {
     const theme = useTheme();
 
     const divider = useMediaQuery(theme.breakpoints.up('md')) ? 1 : 2;
 
     return (
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+      <div
+        ref={ref}
+        style={{
+          flex: 1,
+          minHeight: 0,
+          display: 'flex',
+          flexDirection: 'column',
+          backgroundColor: theme.palette.background.default
+        }}
+      >
         <div
           style={{
             width: '100%',

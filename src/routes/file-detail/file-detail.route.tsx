@@ -21,7 +21,6 @@ import type { Error } from 'models/base/error';
 import type { Submission } from 'models/base/submission';
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useLocation } from 'react-router';
 import AttackSection from 'routes/file-detail/components/attacks';
 import ChildrenSection from 'routes/file-detail/components/childrens';
 import Detection from 'routes/file-detail/components/detection';
@@ -44,22 +43,13 @@ import { PageHeader } from 'ui/layouts/PageHeader';
 import { emptyResult } from 'ui/ResultCard';
 
 const FileDetailPage = React.memo(() => {
-  // TODO: Add this back in
-  const sid: string = null;
-  const metadata: Record<string, string> = null;
-  const liveResultKeys: string[] = null;
-  const liveErrors: Error[] = null;
-  const force: boolean = false;
-  const filetype_override: string = null;
-
   const { t } = useTranslation(['fileDetail']);
   const theme = useTheme();
-  const location = useLocation();
   const { id: sha256 } = useAppPathParams<'/file/detail/:id'>();
   const search = useAppSearchSnapshot<'/file/detail/:id'>();
   const navigate = useAppNavigate();
   const { apiCall } = useMyAPI();
-  const { user: currentUser, c12nDef, configuration, settings } = useALContext();
+  const { user: currentUser, configuration, settings } = useALContext();
   const { showSuccessMessage } = useMySnackbar();
   const { addInsight, removeInsight } = useAssistant();
 
@@ -71,14 +61,16 @@ const FileDetailPage = React.memo(() => {
   const [waitingDialog, setWaitingDialog] = useState<boolean>(false);
   const [resubmitAnchor, setResubmitAnchor] = useState(null);
   const [promotedSections, setPromotedSections] = useState([]);
-  const [insideDrawer, setInsideDrawer] = useState<boolean>(null);
-  const [loaded, setLoaded] = useState<boolean>(false);
-  const [heuristics, setHeuristics] = useState<string[]>([]);
+
+  const sid = useMemo(() => search?.get('sid'), [search?.get('sid')]);
+  const metadata = useMemo(() => search?.get('metadata'), [search?.get('metadata')]);
+  const liveResultKeys = useMemo(() => search?.get('liveResultKeys'), [search?.get('liveResultKeys')]);
+  const liveErrors = useMemo(() => search?.get('liveErrors'), [search?.get('liveErrors')]);
+  const force = useMemo(() => search?.get('force'), [search?.get('force')]);
 
   const ref = useRef(null);
 
   const sp2 = useMemo(() => theme.spacing(2), [theme]);
-  const sp4 = useMemo(() => theme.spacing(4), [theme]);
 
   const popoverOpen = Boolean(resubmitAnchor);
 
@@ -90,8 +82,7 @@ const FileDetailPage = React.memo(() => {
     return profileMap;
   }, [configuration]);
 
-  const params = useMemo(() => new URLSearchParams(location.search), [location.search]);
-  const fileName = useMemo(() => (file ? search.get('name') || sha256 : null), [file, search.toString(), sha256]);
+  const fileName = useMemo(() => (file ? search.get('name') || sha256 : null), [file, search?.toString(), sha256]);
 
   const elementInViewport = element => {
     const bounding = element.getBoundingClientRect();
@@ -122,15 +113,6 @@ const FileDetailPage = React.memo(() => {
     newData.emptys = data.results.filter(result => emptyResult(result));
     newData.results = data.results.filter(result => !emptyResult(result));
     newData.errors = liveErrors ? [...data.errors, ...liveErrors] : data.errors;
-
-    // Compile a simplified list of heuristics for later reference
-    const heurs = [];
-    Object.values(newData?.heuristics || {}).map(hs => {
-      hs.map(h => {
-        heurs.push(h[0]);
-      });
-    });
-    setHeuristics(heurs);
     return newData;
   };
 
@@ -313,34 +295,6 @@ const FileDetailPage = React.memo(() => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [file]);
 
-  // useEffect(() => {
-  //   setInsideDrawer(document.getElementById('drawerContent')?.contains(ref.current) || false);
-  // }, [file]);
-
-  // useEffect(() => {
-  //   if (insideDrawer === false) {
-  //     setLoaded(true);
-  //     if (!location.hash) {
-  //       setGlobalDrawer(null);
-  //     } else if (file) {
-  //       // Set the drawer content based on the hash
-  //       const id = location.hash.slice(1);
-  //       if (heuristics.includes(id)) {
-  //         setGlobalDrawer(<HeuristicDetail heur_id={id} />);
-  //       } else {
-  //         setGlobalDrawer(<SignatureDetail signature_id={id} />);
-  //       }
-  //     }
-  //   }
-  // }, [insideDrawer, location.hash, setGlobalDrawer, file]);
-
-  // useEffect(() => {
-  //   if (loaded && insideDrawer === false && !globalDrawerOpened && location.hash) {
-  //     navigate(`${location.pathname}${location.search ? location.search : ''}`);
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [insideDrawer, globalDrawerOpened]);
-
   return currentUser.roles.includes('submission_view') ? (
     <AppPageCenter>
       <div id="fileDetailTop" ref={ref} style={{ textAlign: 'left' }}>
@@ -482,17 +436,14 @@ const FileDetailPage = React.memo(() => {
                       nav={nav =>
                         nav.to().create({
                           route: '/submit',
-                          search: { hash: file.file_info.sha256 },
-                          state: {
-                            c12n: file.file_info.classification,
-                            metadata: metadata,
-                            params: {
-                              filetype_override: filetype_override
-                            }
+                          search: {
+                            classification: file.file_info.classification,
+                            hash: file.file_info.sha256,
+                            metadata: metadata
                           }
                         })
                       }
-                      navDeps={[file.file_info.sha256, file.file_info.classification, metadata, filetype_override]}
+                      navDeps={[file.file_info.sha256, file.file_info.classification, metadata]}
                       dense
                       onClick={() => setResubmitAnchor(null)}
                     >
@@ -545,11 +496,7 @@ const FileDetailPage = React.memo(() => {
           {file?.file_info?.type.startsWith('uri/') ? (
             <URIIdentificationSection fileinfo={file ? file.file_info : null} promotedSections={promotedSections} />
           ) : (
-            <IdentificationSection
-              fileinfo={file ? file.file_info : null}
-              promotedSections={promotedSections}
-              filetype_override={filetype_override}
-            />
+            <IdentificationSection fileinfo={file ? file.file_info : null} promotedSections={promotedSections} />
           )}
           <FrequencySection seen={file ? file.file_info?.seen : null} />
           <MetadataSection metadata={file ? file.metadata : null} />
@@ -585,7 +532,12 @@ export const FileDetailRoute = createAppRoute({
     id: s.string()
   }),
   search: s => ({
-    name: s.string(null)
+    force: s.boolean(false).source('transient'),
+    liveErrors: s.object(null as Error[]).source('transient'),
+    liveResultKeys: s.object(null as string[]).source('transient'),
+    metadata: s.object(null as Record<string, string>).source('transient'),
+    name: s.string(null),
+    sid: s.string(null).source('transient')
   }),
 
   ancestor: null,

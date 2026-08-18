@@ -1,6 +1,7 @@
 import type {
   EnumParamValue,
   InferSearchParamValueMapFromBlueprintMap,
+  ObjectParamShape,
   ObjectParamValue,
   SearchParamBlueprintMap,
   SearchParamSnapshot,
@@ -664,7 +665,7 @@ export class ObjectSearchParamBlueprint<
     );
   }
 
-  private isShape(value: unknown): value is O[string] {
+  private isShape(value: unknown): value is ObjectParamShape {
     return (
       this.isPrimitive(value) ||
       (Array.isArray(value) && value.every(v => this.isShape(v))) ||
@@ -677,10 +678,8 @@ export class ObjectSearchParamBlueprint<
 
   private isObjectValue(value: unknown): value is O {
     return (
-      typeof value === 'object' &&
-      value !== null &&
-      !Array.isArray(value) &&
-      Object.values(value).every(v => this.isShape(v))
+      (Array.isArray(value) && value.every(v => this.isShape(v))) ||
+      (typeof value === 'object' && value !== null && Object.values(value).every(v => this.isShape(v)))
     );
   }
 
@@ -692,6 +691,8 @@ export class ObjectSearchParamBlueprint<
     if (!this.isObjectValue(next)) {
       return this.clone(next);
     }
+
+    if (Array.isArray(next)) return this.clone(next);
 
     const merged = this.clone(base) as unknown as Record<string, unknown>;
 
@@ -730,7 +731,7 @@ export class ObjectSearchParamBlueprint<
     const delta = {} as Partial<O>;
 
     for (const [key, value] of Object.entries(next)) {
-      const baseValue = base[key];
+      const baseValue = (base as Record<string, ObjectParamShape>)[key];
 
       if (this.isFlatObject(baseValue) && this.isFlatObject(value)) {
         const nested: Record<string, string | number | boolean | null> = {};
@@ -837,10 +838,17 @@ export class ObjectSearchParamBlueprint<
       return prev;
     }
 
+    if (Array.isArray(value)) {
+      if (!this.isEqual(this._defaultValue, value)) {
+        (prev as Record<string, SearchParamValue>)[this._key] = value;
+      }
+      return prev;
+    }
+
     const delta = this.deltaValue(this._defaultValue || ({} as O), value);
     if (Object.keys(delta).length === 0) return prev;
 
-    (prev as Record<string, SearchParamValue>)[this._key] = delta;
+    (prev as Record<string, SearchParamValue>)[this._key] = delta as unknown as SearchParamValue;
     return prev;
   }
 

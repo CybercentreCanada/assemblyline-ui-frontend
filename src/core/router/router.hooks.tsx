@@ -602,7 +602,8 @@ export function useAppSyncRouterStoreFromNavigation() {
       const locationState = getAppLocationParamStateFromApi(locationParamStoreApi);
       const routerState = getAppRouterStateFromApi(routerStoreApi);
 
-      if (navigation.id === routerState.id || hasBlockedPages(navigation, routerState)) return;
+      if (navigation.id === routerState.id) return;
+      if (hasBlockedPages(navigation, routerState) && !navigation.options?.ignoreBlocker) return;
 
       const titles = getTitlesFromNavigation(navigation, locationState, configState, t);
       const nextTitle = navigation?.options?.nextTitle?.trim();
@@ -692,6 +693,10 @@ export function useAppBlockNavigation() {
     (store: AppNavigationStore) => {
       const routerState = getAppRouterStateFromApi(routerStoreApi);
       const hasBlockers = hasBlockedPages(store, routerState);
+      if (store.options?.ignoreBlocker) {
+        lastPromptedNavigationIdRef.current = null;
+        return;
+      }
       if (!hasBlockers) {
         lastPromptedNavigationIdRef.current = null;
         return;

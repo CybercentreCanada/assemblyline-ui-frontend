@@ -93,7 +93,6 @@ export const InputFormControl = React.memo(({ children }: { children: React.Reac
       error={isError}
       color={color}
       onSubmit={(e: React.SyntheticEvent) => e.preventDefault()}
-      {...(readOnly && !disabled && { isFocused: null })}
       {...formControlProps}
       sx={{
         ...(color && {

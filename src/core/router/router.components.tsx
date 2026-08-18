@@ -167,6 +167,10 @@ export const AppNavigationBlocker = memo(() => {
   const handleNavigationChange = useCallback(
     (store: AppNavigationStore) => {
       const routerState = getAppRouterStateFromApi(routerStoreApi);
+      if (store.options?.ignoreBlocker) {
+        setOpen(false);
+        return;
+      }
       if (hasBlockedPages(store, routerState) && store.id !== routerState.id) setOpen(true);
       else setOpen(false);
     },

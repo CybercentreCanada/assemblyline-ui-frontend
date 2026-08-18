@@ -1,11 +1,11 @@
 import PublishOutlinedIcon from '@mui/icons-material/PublishOutlined';
 import { Alert, Collapse, styled, useMediaQuery, useTheme } from '@mui/material';
 import { useAppConfig } from 'core/config';
-import { createAppRoute, useAppLocation, useAppSearchSnapshot } from 'core/routes';
+import { createAppRoute, useAppSearchSnapshot } from 'core/routes';
 import { useAppSnackbar } from 'core/snackbar';
 import { AppBanner, AppPageCenter } from 'core/template';
 import type { Metadata } from 'models/base/submission';
-import { memo, useCallback, useEffect } from 'react';
+import { Activity, memo, useCallback, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { initializeSettings, loadDefaultProfile, loadSubmissionProfile } from 'routes/settings/settings.utils';
 import { ServiceParameters } from 'routes/submit/components/ServiceParameters';
@@ -28,13 +28,12 @@ import {
 } from 'routes/submit/components/SubmissionInputs';
 import { SubmissionMetadata } from 'routes/submit/components/SubmissionMetadata';
 import { SubmissionOptions } from 'routes/submit/components/SubmissionOptions';
-import type { SubmitState, SubmitStore } from 'routes/submit/submit.form';
+import type { SubmitStore } from 'routes/submit/submit.form';
 import { FLOW, FormProvider, useForm } from 'routes/submit/submit.form';
 import {
   calculateFileHash,
   getDefaultExternalSources,
   getPreferredSubmissionProfile,
-  isValidJSON,
   switchProfile,
   useAutoURLServicesSelection
 } from 'routes/submit/submit.utils';
@@ -112,33 +111,33 @@ const RightPanel = styled('div')<AdjustProps>(({ theme, adjust }) => ({
 const WrappedSubmitRoute = memo(() => {
   const { t, i18n } = useTranslation(['submit']);
   const theme = useTheme();
-  const downMD = useMediaQuery(theme.breakpoints.down('md'));
-  const location = useAppLocation<'/submit'>('here')();
-  const searchSnapshot = useAppSearchSnapshot<'/submit'>();
   const { closeSnackbar } = useAppSnackbar();
-  const currentUser = useAppConfig(s => s.user);
-  const configuration = useAppConfig(s => s.configuration);
-  const settings = useAppConfig(s => s.settings);
+
   const form = useForm();
+
+  const configuration = useAppConfig(s => s.configuration);
+  const currentUser = useAppConfig(s => s.user);
+  const settings = useAppConfig(s => s.settings);
+
+  const search = useAppSearchSnapshot<'/submit'>();
+
+  const downMD = useMediaQuery(theme.breakpoints.down('md'));
 
   const applyAutoURLServicesSelection = useAutoURLServicesSelection();
 
   const setClassificationFromURL = useCallback(
-    (state: SubmitState, search: URLSearchParams) => {
-      if (state?.c12n) {
-        form.setFieldValue('settings.classification.value', state.c12n);
-      } else {
-        const c12 = search.get('classification');
-        if (c12) form.setFieldValue('settings.classification.value', c12);
-      }
+    (s: typeof search) => {
+      const c12n = s.get('classification');
+      if (c12n == null) return;
+      form.setFieldValue('settings.classification.value', c12n);
     },
     [form]
   );
 
   const setHashFromURL = useCallback(
-    (state: SubmitState, search: URLSearchParams) => {
-      const raw = state?.hash || search.get('hash');
-      if (!raw) return;
+    (s: typeof search) => {
+      const raw = s.get('hash');
+      if (raw == null) return;
 
       const [type, value] = getSubmitType(raw, configuration);
       form.setFieldValue('state.tab', 'hash');
@@ -149,25 +148,18 @@ const WrappedSubmitRoute = memo(() => {
   );
 
   const setMetadataFromURL = useCallback(
-    (state: SubmitState, search: URLSearchParams) => {
-      if (state?.metadata && typeof state.metadata === 'object' && Object.keys(state.metadata).length > 0) {
-        form.setFieldValue('metadata.data', state.metadata);
-        return;
-      }
-
-      const raw = search.get('metadata');
-      if (isValidJSON(raw)) {
-        const metadata = JSON.parse(raw) as Metadata;
-        form.setFieldValue('metadata.data', metadata);
-      }
+    (s: typeof search) => {
+      const raw = s.get('metadata') as Metadata;
+      if (raw == null) return;
+      form.setFieldValue('metadata.data', raw);
     },
     [form]
   );
 
   const setProfileFromURL = useCallback(
-    (state: SubmitState, search: URLSearchParams) => {
-      const name = state?.profile || search.get('profile');
-      if (!name || !(name in settings.submission_profiles)) return;
+    (s: typeof search) => {
+      const name = s.get('profile');
+      if (name == null || !(name in settings.submission_profiles)) return;
 
       form.setFieldValue('state.profile', name);
       form.setFieldValue('settings', s => switchProfile(s, configuration, settings, currentUser, name));
@@ -176,9 +168,9 @@ const WrappedSubmitRoute = memo(() => {
   );
 
   const setRawFromURL = useCallback(
-    (state: SubmitState, search: URLSearchParams) => {
-      const raw = state?.raw || search.get('raw');
-      if (!raw) return;
+    (s: typeof search) => {
+      const raw = s.get('raw');
+      if (raw == null) return;
 
       const encoder = new TextEncoder();
       const tempFile = new File([encoder.encode(raw)], 'file.txt', { type: 'text/plain;charset=utf-8' });
@@ -194,40 +186,34 @@ const WrappedSubmitRoute = memo(() => {
   );
 
   const setDescriptionFromURL = useCallback(
-    (state: SubmitState, search: URLSearchParams) => {
-      const desc = state?.description || search.get('description');
-      if (!desc) return;
+    (s: typeof search) => {
+      const desc = s.get('description');
+      if (desc == null) return;
       form.setFieldValue('settings.description.value', desc);
     },
     [form]
   );
 
   const setPriorityFromURL = useCallback(
-    (state: SubmitState, search: URLSearchParams) => {
-      const priority = state?.priority || search.get('priority');
-      if (!priority) return;
-      const val = Number.parseInt(priority, 10);
-      if (val === 500 || val === 1000 || val === 1500) {
-        form.setFieldValue('settings.priority.value', val);
-      }
+    (s: typeof search) => {
+      const priority = s.get('priority');
+      if (priority == null) return;
+      form.setFieldValue('settings.priority.value', priority);
     },
     [form]
   );
 
   const setTTLFromURL = useCallback(
-    (state: SubmitState, search: URLSearchParams) => {
-      const ttl = state?.ttl || search.get('ttl');
-      if (!ttl) return;
-
-      const val = Number.parseInt(ttl, 10);
-      if (Number.isNaN(val)) return;
+    (s: typeof search) => {
+      const ttl = s.get('ttl');
+      if (ttl == null) return;
 
       const maxDTL = configuration.submission.max_dtl;
       const max = maxDTL !== 0 ? maxDTL : 365;
       const min = maxDTL !== 0 ? 1 : 0;
 
-      if (val >= min && val <= max) {
-        form.setFieldValue('settings.ttl.value', val);
+      if (ttl >= min && ttl <= max) {
+        form.setFieldValue('settings.ttl.value', ttl);
       }
     },
     [configuration, form]
@@ -256,24 +242,21 @@ const WrappedSubmitRoute = memo(() => {
     );
     form.setFieldValue('settings.default_external_sources', getDefaultExternalSources(settings, configuration));
 
-    const search = searchSnapshot?.toParams() ?? new URLSearchParams();
-    const state = (location.state || {}) as SubmitState;
-
-    setClassificationFromURL(state, search);
-    setHashFromURL(state, search);
-    setMetadataFromURL(state, search);
-    setProfileFromURL(state, search);
-    setRawFromURL(state, search);
-    setDescriptionFromURL(state, search);
-    setPriorityFromURL(state, search);
-    setTTLFromURL(state, search);
+    setClassificationFromURL(search);
+    setHashFromURL(search);
+    setMetadataFromURL(search);
+    setProfileFromURL(search);
+    setRawFromURL(search);
+    setDescriptionFromURL(search);
+    setPriorityFromURL(search);
+    setTTLFromURL(search);
 
     form.setFieldValue('state.phase', 'editing');
 
     applyAutoURLServicesSelection();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [configuration, currentUser, searchSnapshot, settings]);
+  }, [configuration, currentUser, search?.toString(), settings]);
 
   return (
     <AppPageCenter style={{ maxWidth: downMD ? '100%' : `${theme.breakpoints.values.md}px` }}>
@@ -378,11 +361,13 @@ const WrappedSubmitRoute = memo(() => {
                     }
                   }}
                 >
-                  <CustomizabilityAlert />
-                  <SubmissionOptions />
-                  <SubmissionData />
-                  <ServiceParameters />
-                  <SubmissionMetadata />
+                  <Activity mode={adjust ? 'visible' : 'hidden'}>
+                    <CustomizabilityAlert />
+                    <SubmissionOptions />
+                    <SubmissionData />
+                    <ServiceParameters />
+                    <SubmissionMetadata />
+                  </Activity>
                 </Collapse>
               )}
             </RightPanel>
@@ -414,15 +399,15 @@ export const SubmitRoute = createAppRoute({
 
   path: '/submit',
   search: s => ({
-    classification: s.string(null),
+    classification: s.string(null).source('transient'),
+    description: s.string('').source('transient'),
+    filetype: s.string(null).source('transient'),
     hash: s.string(null),
-    profile: s.string(null),
-    // metadata: s.object(null), // TODO: fix this
-    raw: s.string(''),
-    description: s.string(''),
-    priority: s.number(null),
-    ttl: s.number(null),
-    'params.filetype_override': s.string(null)
+    metadata: s.object(null).source('transient'),
+    priority: s.number(null).source('transient'),
+    profile: s.string(null).source('transient'),
+    raw: s.string('').source('transient'),
+    ttl: s.number(null).source('transient')
   }),
 
   ancestor: null,
@@ -440,15 +425,15 @@ export const SubmitRootRoute = createAppRoute({
 
   path: '/',
   search: s => ({
-    classification: s.string(null),
+    classification: s.string(null).source('transient').nullable(),
+    description: s.string('').source('transient').nullable(),
+    filetype: s.string(null).source('transient').nullable(),
     hash: s.string(null),
-    profile: s.string(null),
-    // metadata: s.object(null), // TODO: fix this
-    raw: s.string(''),
-    description: s.string(''),
-    priority: s.number(null),
-    ttl: s.number(null),
-    'params.filetype_override': s.string(null)
+    metadata: s.object(null).source('transient').nullable(),
+    priority: s.enum(null, [500, 1000, 1500]).source('transient').nullable(),
+    profile: s.string(null).source('transient').nullable(),
+    raw: s.string('').source('transient').nullable(),
+    ttl: s.number(null).source('transient').nullable()
   }),
 
   ancestor: null,

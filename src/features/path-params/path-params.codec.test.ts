@@ -99,6 +99,12 @@ describe('PATH_PARAM_BLUEPRINTS_MAP.enum', () => {
     const blueprint = PATH_PARAM_BLUEPRINTS_MAP.enum([1, 2, 3] as const);
     expect(blueprint.stringify(2)).toBe('2');
   });
+
+  it('stringifies invalid values to the configured default', () => {
+    const blueprint = PATH_PARAM_BLUEPRINTS_MAP.enum(['ascii', 'code'] as const, 'ascii');
+    expect(blueprint.stringify(null as never)).toBe('ascii');
+    expect(blueprint.stringify('invalid' as never)).toBe('ascii');
+  });
 });
 
 //*****************************************************************************************

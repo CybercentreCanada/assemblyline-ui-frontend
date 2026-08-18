@@ -20,7 +20,7 @@ export type ObjectParamPrimitive = string | number | boolean | null;
 
 export type ObjectParamShape = ObjectParamPrimitive | ObjectParamShape[] | { [key: string]: ObjectParamShape };
 
-export type ObjectParamValue = Record<string, ObjectParamShape>;
+export type ObjectParamValue = Record<string, ObjectParamShape> | ObjectParamShape[];
 
 //*****************************************************************************************
 // Search Param Blueprints

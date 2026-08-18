@@ -83,7 +83,6 @@ const TimelineBodyComponent: React.FC<Props> = ({ body }) => {
             <TimelineItem key={title + idx}>
               {opposite && (
                 <TimelineOppositeContent
-                  variant="body2"
                   sx={{
                     alignSelf: 'center',
                     whiteSpace: 'nowrap',
@@ -91,7 +90,9 @@ const TimelineBodyComponent: React.FC<Props> = ({ body }) => {
                     textOverflow: 'ellipsis'
                   }}
                 >
-                  {opposite}
+                  <Typography variant="body2" component="span">
+                    {opposite}
+                  </Typography>
                 </TimelineOppositeContent>
               )}
 

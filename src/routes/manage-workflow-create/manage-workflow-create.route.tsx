@@ -4,7 +4,7 @@ import DoDisturbAltOutlinedIcon from '@mui/icons-material/DoDisturbAltOutlined';
 import { Grid, useTheme } from '@mui/material';
 import { useApiMutation, useApiQuery } from 'core/api';
 import { useAppBlocker, useAppNavigate } from 'core/router';
-import { createAppRoute, useAppPathParams, useAppSearchParams } from 'core/routes';
+import { createAppRoute, useAppPathParams, useAppSearchSnapshot } from 'core/routes';
 import { AppPageCenter } from 'core/template';
 import useALContext from 'deprecated/hooks/useALContext';
 import useMySnackbar from 'deprecated/hooks/useMySnackbar';
@@ -29,7 +29,7 @@ export const ManageWorkflowCreatePage = memo(() => {
   const paramID = useAppPathParams<'/manage/workflow/create/:id' | '/manage/workflow/create'>()?.id;
   const theme = useTheme();
   const navigate = useAppNavigate<'/manage/workflow/create/:id' | '/manage/workflow/create'>();
-  const search = useAppSearchParams<'/manage/workflow/create'>();
+  const search = useAppSearchSnapshot<'/manage/workflow/create'>();
   const { c12nDef, configuration, user: currentUser } = useALContext();
   const { showSuccessMessage, showErrorMessage } = useMySnackbar();
 
@@ -77,7 +77,7 @@ export const ManageWorkflowCreatePage = memo(() => {
         setTimeout(() => window.dispatchEvent(new CustomEvent('reloadWorkflows')), 1000);
         setTimeout(() => window.dispatchEvent(new CustomEvent('alertRefresh', null)), 1500);
         navigate
-          .here<'/manage/workflow/detail/:id'>()
+          .here<'/manage/workflow/detail/:id'>({ ignoreBlocker: true })
           .create({ route: '/manage/workflow/detail/:id', path: { id: api_response.workflow_id } });
       }
     })
@@ -97,7 +97,7 @@ export const ManageWorkflowCreatePage = memo(() => {
         showSuccessMessage(t('update.success'));
         setTimeout(() => window.dispatchEvent(new CustomEvent('reloadWorkflows')), 1000);
         navigate
-          .here<'/manage/workflow/detail/:id'>()
+          .here<'/manage/workflow/detail/:id'>({ ignoreBlocker: true })
           .create({ route: '/manage/workflow/detail/:id', path: { id: paramID } });
       }
     })
@@ -128,21 +128,23 @@ export const ManageWorkflowCreatePage = memo(() => {
   }, [defaultWorkflow]);
 
   useEffect(() => {
-    setWorkflow(previousWorkflow => {
-      if (!previousWorkflow) return previousWorkflow;
+    setWorkflow(prev => {
+      if (!prev) return prev;
 
       return {
-        ...previousWorkflow,
-        ...(typeof search.classification === 'string' && { classification: search.classification }),
-        ...(typeof search.name === 'string' && { name: search.name }),
-        ...(typeof search.query === 'string' && { query: search.query }),
-        ...(Array.isArray(search.labels) && { labels: search.labels }),
-        ...(PRIORITIES.includes(search.priority as Priority) && { priority: search.priority as Priority }),
-        ...(STATUSES.includes(search.status as Status) && { status: search.status as Status }),
-        ...(typeof search.enabled === 'boolean' && { enabled: search.enabled })
+        ...prev,
+        ...(search.get('classification') && { classification: search.get('classification') }),
+        ...(search.get('name') && { name: search.get('name') }),
+        ...(search.get('query') && { query: search.get('query') }),
+        ...(Array.isArray(search.get('labels')) && { labels: search.get('labels') }),
+        ...(PRIORITIES.includes(search.get('priority') as Priority) && {
+          priority: search.get('priority') as Priority
+        }),
+        ...(STATUSES.includes(search.get('status') as Status) && { status: search.get('status') as Status }),
+        ...(typeof search.get('enabled') === 'boolean' && { enabled: search.get('enabled') })
       };
     });
-  }, [search]);
+  }, [search?.toString()]);
 
   const handleResults = useApiQuery<SearchResult<Alert>>({
     url: `/api/v4/search/alert/?query=${encodeURIComponent(workflow?.query)}&rows=10&track_total_hits=true`,
@@ -178,13 +180,13 @@ export const ManageWorkflowCreatePage = memo(() => {
   return (
     <AppPageCenter>
       {/* <RouterPrompt when={modified && !loading} /> */}
-      {/**Fix the classification coming from the search params */}
+
       {c12nDef.enforce && (
         <div style={{ paddingBottom: theme.spacing(2) }}>
           <Classification
             type="picker"
             format="long"
-            c12n={workflow.classification}
+            c12n={workflow?.classification || ''}
             setClassification={v => setWorkflow(wf => ({ ...wf, classification: v }))}
           />
         </div>

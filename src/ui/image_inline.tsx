@@ -64,7 +64,7 @@ type ImageItemProps = {
   to?: string;
   count?: number;
   size?: 'small' | 'medium' | 'large';
-  onImageClick: (event: React.MouseEvent<HTMLAnchorElement, MouseEvent>, index: number) => void;
+  onImageClick: (event: React.MouseEvent<HTMLAnchorElement | HTMLButtonElement, MouseEvent>, index: number) => void;
 };
 
 const WrappedImageItem = ({

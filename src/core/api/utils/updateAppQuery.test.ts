@@ -12,7 +12,7 @@ describe('updateAppQuery', () => {
 
     updateAppQuery(
       { url: '/api/foo' } as never,
-      (prev: never) => ({ ...prev, count: (prev as never as { count: number }).count + 1 }) as never
+      ((prev: { count: number }) => ({ ...prev, count: prev.count + 1 })) as never
     );
 
     expect(queryClient.getQueryData(['/api/foo/1', 'GET', 'null', true])).toEqual({ api_response: { count: 2 } });

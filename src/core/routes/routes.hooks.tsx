@@ -25,7 +25,12 @@ import {
   useAppLocationParamStore,
   useAppPageKeyStore
 } from 'core/routes';
-import type { InferSearchParamSnapshotFromEngine } from 'features/search-params';
+import type {
+  InferSearchParamSnapshotFromEngine,
+  SearchParamBlueprintMap,
+  SearchParamEngine,
+  SearchParamValueMap
+} from 'features/search-params';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
 /**
@@ -189,8 +194,13 @@ export function useAppSearchSnapshot<const Origin extends AppRoute['path']>(): I
   );
 
   return useMemo(() => {
-    if (!searchEngine) return null as never;
-    else return searchEngine.full(searchParam as never) as never;
+    if (!searchEngine)
+      return null as unknown as InferSearchParamSnapshotFromEngine<InferAppRouteFromPath<Origin>['search']>;
+
+    const engine = searchEngine as SearchParamEngine<SearchParamBlueprintMap>;
+    return engine.full(searchParam as SearchParamValueMap) as unknown as InferSearchParamSnapshotFromEngine<
+      InferAppRouteFromPath<Origin>['search']
+    >;
   }, [searchEngine, searchParam]);
 }
 

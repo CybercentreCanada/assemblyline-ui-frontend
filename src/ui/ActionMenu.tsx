@@ -507,7 +507,7 @@ const WrappedActionMenu = ({
             <MenuItem
               dense
               component={AppLink}
-              nav={nav => nav.to().create({ route: '/submit', state: { hash: value, c12n: classification } })}
+              nav={nav => nav.to().create({ route: '/submit', search: { hash: value, classification } })}
             >
               {SUBMIT_ICON}
               {t('submit') + ` ${submitType.toUpperCase()}`}

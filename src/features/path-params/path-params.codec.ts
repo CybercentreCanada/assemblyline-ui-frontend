@@ -46,7 +46,12 @@ export const PATH_PARAM_BLUEPRINTS_MAP = {
       }
       return defaultValue;
     },
-    stringify: value => String(value)
+    stringify: value => {
+      for (const candidate of values) {
+        if (String(candidate) === String(value)) return String(candidate);
+      }
+      return String(defaultValue);
+    }
   })
 };
 

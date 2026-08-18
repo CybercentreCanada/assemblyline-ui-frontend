@@ -1,3 +1,4 @@
+import type { AppUser } from '@tui/core';
 import type { SystemMessage } from '@tui/notis';
 import type { ClassificationAliases, ClassificationDefinition } from 'features/classification/classificationParser';
 import type { Indexes } from 'models/api/user';
@@ -6,6 +7,12 @@ import type { User } from 'models/base/user';
 import type { UserSettings } from 'models/base/user_settings';
 
 declare global {
+  type CustomUser = AppUser &
+    User & {
+      default_view?: string;
+      dynamic_group: string | null;
+    };
+
   type AppConfigStore = {
     c12nDef?: ClassificationDefinition;
     classificationAliases?: ClassificationAliases;
@@ -14,7 +21,7 @@ declare global {
     indexes?: Indexes;
     settings?: UserSettings;
     systemMessage?: SystemMessage;
-    user?: User;
+    user?: CustomUser;
   };
 }
 
@@ -74,12 +81,13 @@ const DEFAULT_INDEXES: Indexes = {
   workflow: {}
 };
 
-const DEFAULT_USER: User = {
+const DEFAULT_USER: CustomUser = {
   api_quota: 0,
   apikeys: {},
   apps: {},
   can_impersonate: false,
   classification: '',
+  dynamic_group: null,
   groups: [],
   id: '',
   is_active: false,
