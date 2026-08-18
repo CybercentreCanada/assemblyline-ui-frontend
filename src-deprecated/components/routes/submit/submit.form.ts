@@ -18,6 +18,9 @@ export type SubmitState = {
   profile?: string | null;
   raw?: string | null;
   ttl?: string | null;
+  params?: {
+    filetype_override?: string | null;
+  };
 };
 
 /**

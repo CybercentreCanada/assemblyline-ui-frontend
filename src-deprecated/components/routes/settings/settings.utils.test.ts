@@ -148,7 +148,12 @@ describe('initializeSettings', () => {
   it('initializes PROFILE_KEYS', () => {
     const out = init();
     PROFILE_KEYS.forEach(k => {
-      expect(out[k]).toEqual({ value: null, prev: null, default: null, restricted: true });
+      expect(out[k]).toEqual({
+        value: null,
+        prev: null,
+        default: null,
+        restricted: k === 'filetype_override' ? false : true
+      });
     });
   });
 

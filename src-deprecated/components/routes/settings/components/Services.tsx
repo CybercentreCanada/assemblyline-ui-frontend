@@ -173,6 +173,7 @@ const Service = React.memo(({ cat_id, svr_id, customize, disabled, loading }: Se
             checked={selected}
             anchor
             overflowHidden
+            defaultValue={defaultValue}
             reset={defaultValue !== null && selected !== defaultValue}
             onChange={!customize && restricted ? undefined : () => handleChange(!selected)}
             onReset={!customize && restricted ? undefined : () => handleChange(defaultValue)}
@@ -272,6 +273,7 @@ const Category = React.memo(
               divider
               anchor
               overflowHidden
+              defaultValue={defaultValue}
               reset={defaultValue !== null && selected !== defaultValue}
               onChange={!customize && restricted ? undefined : () => handleChange(!selected)}
               onReset={!customize && restricted ? undefined : () => handleChange(defaultValue)}

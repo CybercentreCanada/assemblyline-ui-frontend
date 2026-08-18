@@ -4,6 +4,7 @@ import type { BodyFormat, SectionBody } from 'models/base/result_body';
 import type { ReactNode } from 'react';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import { bytesToSize } from 'shared/utils/utils';
 import { ImageInlineBody } from 'ui/image_inline';
 import Moment from 'ui/Moment';
 import { GraphBody } from 'ui/ResultCard/graph_body';
@@ -263,7 +264,25 @@ function WrappedGeneralInformation({ report }: Props) {
               <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
                 <span style={{ fontWeight: 500 }}>{t('file.type')}</span>
               </Grid>
-              <Grid size={{ xs: 8, sm: 9, lg: 10 }}>{report ? report?.file_info?.type : <Skeleton />}</Grid>
+              <Grid size={{ xs: 8, sm: 9, lg: 10 }}>
+                {report ? (
+                  report?.params?.filetype_override ? (
+                    <>
+                      <span style={{ paddingRight: theme.spacing(0.5) }}>{`${report.params.filetype_override}`}</span>
+                      <span
+                        style={{
+                          textDecoration: 'line-through',
+                          color: theme.palette.text.disabled
+                        }}
+                      >{`${report.file_info.type}`}</span>
+                    </>
+                  ) : (
+                    report?.file_info?.type
+                  )
+                ) : (
+                  <Skeleton />
+                )}
+              </Grid>
 
               <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
                 <span style={{ fontWeight: 500 }}>{t('file.mime')}</span>
@@ -278,7 +297,16 @@ function WrappedGeneralInformation({ report }: Props) {
               <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
                 <span style={{ fontWeight: 500 }}>{t('file.size')}</span>
               </Grid>
-              <Grid size={{ xs: 8, sm: 9, lg: 10 }}>{report ? report?.file_info?.size : <Skeleton />}</Grid>
+              <Grid size={{ xs: 8, sm: 9, lg: 10 }}>
+                {!report ? (
+                  <Skeleton />
+                ) : !report?.file_info?.size ? null : (
+                  <span>
+                    {report?.file_info?.size}
+                    <span>{` (${bytesToSize(report?.file_info?.size)})`}</span>
+                  </span>
+                )}
+              </Grid>
 
               <Grid size={{ xs: 4, sm: 3, lg: 2 }}>
                 <span style={{ fontWeight: 500 }}>{t('file.md5')}</span>

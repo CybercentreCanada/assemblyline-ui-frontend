@@ -26,10 +26,10 @@ import {
   ListItemIcon,
   ListItemText,
   Popover,
+  Popper,
   Radio,
   RadioGroup,
   Skeleton,
-  Snackbar,
   Stack,
   Tooltip,
   Typography,
@@ -62,6 +62,7 @@ import FileTreeSection from 'components/routes/submission/detail/file_tree';
 import InfoSection from 'components/routes/submission/detail/info';
 import MetaSection from 'components/routes/submission/detail/meta';
 import TagSection from 'components/routes/submission/detail/tags';
+import { Button } from 'components/visual/Buttons/Button';
 import { FileDownloader } from 'components/visual/Buttons/FileDownloader';
 import { IconButton } from 'components/visual/Buttons/IconButton';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
@@ -73,7 +74,7 @@ import VerdictBar from 'components/visual/VerdictBar';
 import { getErrorIDFromKey, getServiceFromKey } from 'helpers/errors';
 import { setNotifyFavicon } from 'helpers/utils';
 import moment from 'moment';
-import React, { useCallback, useEffect, useMemo, useReducer, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useReducer, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate, useParams } from 'react-router';
 import { Link } from 'react-router-dom';
@@ -136,7 +137,7 @@ function WrappedSubmissionDetail() {
   const [configuration, setConfiguration] = useState<Configuration>(null);
   const [liveErrors, setLiveErrors] = useState<string[]>(null);
   const [liveTagMap, setLiveTagMap] = useState<SubmissionTags>(null);
-  const [outstanding, setOutstanding] = useState<OutstandingServices>(null);
+  const [outstanding, setOutstanding] = useState<OutstandingServices>({ test: 2 });
   const [liveStatus, setLiveStatus] = useState<LiveStatus>('queued');
   const [socket, setSocket] = useState<Socket>(null);
   const [loadInterval, setLoadInterval] = useState<NodeJS.Timeout>(null);
@@ -148,12 +149,15 @@ function WrappedSubmissionDetail() {
   const [baseFiles, setBaseFiles] = useState<string[]>([]);
   const [archivingMetadata, setArchivingMetadata] = useState<Record<string, ArchiverMetadata>>({});
   const [archivingUseAlternateDtl, setArchivingUseAlternateDtl] = useState<'true' | 'false'>('false');
+  const [outstandingOpen, setOutstandingOpen] = useState<boolean>(false);
 
   const [liveResultKeys, setLiveResultKeys] = useReducer(messageReducer, []);
   const [liveErrorKeys, setLiveErrorKeys] = useReducer(messageReducer, []);
   const [processedKeys, setProcessedKeys] = useReducer(messageReducer, []);
   const [liveResults, setLiveResults] = useReducer(resultReducer, null);
   const [loadTrigger, incrementLoadTrigger] = useReducer(incrementReducer, 0);
+
+  const anchorRef = useRef<HTMLDivElement>(null);
 
   const popoverOpen = Boolean(resubmitAnchor);
 
@@ -565,7 +569,7 @@ function WrappedSubmissionDetail() {
       if (submission != null) {
         apiCall<Submission>({
           method: isProfile ? 'PUT' : 'GET',
-          url: `/api/v4/submit/${resubmit_type}/${submission.files[0].sha256}/?copy_sid=${submission.sid}`,
+          url: `/api/v4/submit/${resubmit_type}/${submission?.files?.[0]?.sha256}/?copy_sid=${submission.sid}`,
           onSuccess: api_data => {
             showSuccessMessage(t('submit.success'));
             resetLiveMode();
@@ -840,11 +844,6 @@ function WrappedSubmissionDetail() {
     setLiveErrorKeys([data.msg]);
   }, []);
 
-  const resetOutstanding = useCallback(() => {
-    setLastSuccessfulTrigger(loadTrigger);
-    setOutstanding(null);
-  }, [loadTrigger]);
-
   useEffect(
     () => () => {
       if (loadInterval) clearInterval(loadInterval);
@@ -907,6 +906,7 @@ function WrappedSubmissionDetail() {
             liveResultKeys={liveResultKeys}
             liveErrors={curFileLiveErrors}
             force={submission && submission.max_score < 0}
+            filetype_override={submission?.files?.[0]?.sha256 !== fid ? null : submission?.params?.filetype_override}
           />,
           { hasMaximize: true }
         );
@@ -917,6 +917,7 @@ function WrappedSubmissionDetail() {
             sid={id}
             metadata={submission?.metadata}
             force={submission && submission.max_score < 0}
+            filetype_override={submission?.files?.[0]?.sha256 !== fid ? null : submission?.params?.filetype_override}
           />,
           {
             hasMaximize: true
@@ -972,6 +973,14 @@ function WrappedSubmissionDetail() {
       loadTrigger >= lastSuccessfulTrigger + OUTSTANDING_TRIGGER_COUNT &&
       loadTrigger % OUTSTANDING_TRIGGER_COUNT === 0
     ) {
+      setOutstandingOpen(true);
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loadTrigger]);
+
+  useEffect(() => {
+    if (loadTrigger !== null && outstandingOpen) {
       // eslint-disable-next-line no-console
       console.debug('LIVE :: Finding out oustanding services...');
 
@@ -1008,9 +1017,8 @@ function WrappedSubmissionDetail() {
         }
       });
     }
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loadTrigger]);
+  }, [lastSuccessfulTrigger, outstandingOpen]);
 
   useEffect(() => {
     addInsight({ type: 'report', value: id });
@@ -1111,12 +1119,23 @@ function WrappedSubmissionDetail() {
           .filter(metakey => systemConfig.submission.metadata.archive[metakey].required)
           .some(metakey => !Object.keys(archivingMetadata).includes(metakey))}
       />
-      {outstanding && Object.keys(outstanding).length > 0 && (
-        <Snackbar
-          anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+
+      <div ref={anchorRef} style={{ width: '100%' }} />
+      {outstandingOpen && outstanding && Object.keys(outstanding).length > 0 && (
+        <Popper
+          anchorEl={anchorRef.current}
+          placement="bottom-end"
           open={outstanding !== null}
-          key="outstanding"
-          style={{ top: theme.spacing(8), zIndex: 100 }}
+          disablePortal
+          style={{ zIndex: 100 }}
+          modifiers={[
+            {
+              name: 'offset',
+              options: {
+                offset: [0, 64]
+              }
+            }
+          ]}
         >
           <Alert
             elevation={6}
@@ -1127,7 +1146,7 @@ function WrappedSubmissionDetail() {
                 aria-label="close"
                 color="inherit"
                 size="small"
-                onClick={resetOutstanding}
+                onClick={() => setOutstandingOpen(false)}
                 style={{ alignSelf: 'start' }}
               >
                 <CloseIcon fontSize="inherit" />
@@ -1152,7 +1171,7 @@ function WrappedSubmissionDetail() {
               </Grid>
             ))}
           </Alert>
-        </Snackbar>
+        </Popper>
       )}
 
       <PageHeader
@@ -1241,21 +1260,26 @@ function WrappedSubmissionDetail() {
                     transformOrigin={{ vertical: 'top', horizontal: 'right' }}
                   >
                     <List disablePadding>
-                      <ListItemButton
-                        component={Link}
-                        to={`/submit?hash=${submission.files[0].sha256}`}
-                        state={{
-                          c12n: submission.classification,
-                          metadata: submission.metadata
-                        }}
-                        dense
-                        onClick={() => setResubmitAnchor(null)}
-                      >
-                        <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
-                          <TuneOutlinedIcon />
-                        </ListItemIcon>
-                        <ListItemText primary={t('resubmit.modify')} />
-                      </ListItemButton>
+                      {submission?.files?.[0]?.sha256 && (
+                        <ListItemButton
+                          component={Link}
+                          to={`/submit?hash=${submission.files[0].sha256}`}
+                          state={{
+                            c12n: submission.classification,
+                            metadata: submission.metadata,
+                            params: {
+                              filetype_override: submission?.params?.filetype_override
+                            }
+                          }}
+                          dense
+                          onClick={() => setResubmitAnchor(null)}
+                        >
+                          <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
+                            <TuneOutlinedIcon />
+                          </ListItemIcon>
+                          <ListItemText primary={t('resubmit.modify')} />
+                        </ListItemButton>
+                      )}
                       <ListItemButton dense onClick={() => resubmitWithType('dynamic', false)}>
                         <ListItemIcon style={{ minWidth: theme.spacing(4.5) }}>
                           <OndemandVideoOutlinedIcon />
@@ -1337,33 +1361,51 @@ function WrappedSubmissionDetail() {
                 style={{
                   width: '100%',
                   maxWidth: theme.breakpoints.values.sm,
-                  display: 'flex',
                   color: theme.palette.mode === 'dark' ? theme.palette.primary.light : theme.palette.primary.dark,
                   paddingBottom: theme.spacing(3),
                   paddingTop: theme.spacing(2)
                 }}
               >
-                {liveStatus === 'processing' ? (
-                  <PlayCircleOutlineIcon
-                    style={{
-                      height: theme.spacing(3),
-                      width: theme.spacing(3),
-                      marginRight: theme.spacing(1)
-                    }}
-                  />
-                ) : (
-                  <PauseCircleOutlineOutlinedIcon
-                    style={{
-                      height: theme.spacing(3),
-                      width: theme.spacing(3),
-                      marginRight: theme.spacing(1)
-                    }}
-                  />
-                )}
-                <div style={{ width: '100%' }}>
-                  {t(liveStatus)}
-                  <LinearProgress />
-                </div>
+                <Button
+                  disabled
+                  sx={{
+                    color: `${theme.palette.mode === 'dark' ? theme.palette.primary.light : theme.palette.primary.dark} !important`,
+                    display: 'flex',
+                    fontWeight: 'normal',
+                    padding: 0,
+                    textAlign: 'left',
+                    textTransform: 'none',
+                    width: '100%'
+                  }}
+                  {...(outstanding &&
+                    Object.keys(outstanding).length > 0 && {
+                      disabled: false,
+                      tooltip: t('outstanding_services.show'),
+                      onClick: () => setOutstandingOpen(true)
+                    })}
+                >
+                  {liveStatus === 'processing' ? (
+                    <PlayCircleOutlineIcon
+                      style={{
+                        height: theme.spacing(3),
+                        width: theme.spacing(3),
+                        marginRight: theme.spacing(1)
+                      }}
+                    />
+                  ) : (
+                    <PauseCircleOutlineOutlinedIcon
+                      style={{
+                        height: theme.spacing(3),
+                        width: theme.spacing(3),
+                        marginRight: theme.spacing(1)
+                      }}
+                    />
+                  )}
+                  <div style={{ width: '100%' }}>
+                    {t(liveStatus)}
+                    <LinearProgress />
+                  </div>
+                </Button>
               </div>
             )}
           </>
@@ -1499,7 +1541,13 @@ function WrappedSubmissionDetail() {
         {submission && submission.state !== 'completed' && liveErrorKeys.length !== 0 && liveErrors !== null && (
           <ErrorSection sid={id} errors={liveErrors} />
         )}
-        <FileTreeSection tree={tree} sid={id} baseFiles={baseFiles} force={submission && submission.max_score < 0} />
+        <FileTreeSection
+          tree={tree}
+          sid={id}
+          baseFiles={baseFiles}
+          force={submission && submission.max_score < 0}
+          filetype_override={submission?.params?.filetype_override}
+        />
       </div>
     </PageCenter>
   ) : (

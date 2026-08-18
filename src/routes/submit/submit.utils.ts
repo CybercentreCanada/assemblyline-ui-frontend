@@ -7,9 +7,9 @@ import type { UserSettings } from 'models/base/user_settings';
 import { useCallback, useRef } from 'react';
 import type { InterfaceKey, ProfileKey, ProfileSettings } from 'routes/settings/settings.utils';
 import { getValidValue, INTERFACE_KEYS, PROFILE_KEYS } from 'routes/settings/settings.utils';
+import type { AutoURLServiceIndices, SubmitStore } from 'routes/submit/submit.form';
+import { useForm } from 'routes/submit/submit.form';
 import { isURL } from 'shared/utils/utils';
-import type { AutoURLServiceIndices, SubmitStore } from './submit.form';
-import { useForm } from './submit.form';
 
 /**
  * @param settings - User settings.
@@ -90,7 +90,7 @@ export const loadDefaultProfile = (
 
       target.value = val;
       target.prev = val;
-      target.default = null;
+      target.default = val;
       target.restricted = !canCustomize;
     }
   }
@@ -134,7 +134,7 @@ export const loadDefaultProfile = (
 
       param.value = finalValue;
       param.prev = finalValue;
-      param.default = settingsParam?.default ?? param.default;
+      param.default = finalValue;
       param.restricted = !canCustomize;
     }
   }
@@ -203,19 +203,17 @@ export const loadSubmissionProfile = (
   for (const key of PROFILE_KEYS) {
     if (key === 'classification') continue;
     const val = profileDef[key as keyof typeof profileDef];
-    const defaultVal = profileMeta?.params?.[key as keyof typeof profileMeta.params];
     const restricted = !customize && profileMeta?.restricted_params?.submission?.includes(key);
 
     const target = out[key];
 
     (target as any).value = val;
     (target as any).prev = val;
-    (target as any).default = getValidValue(defaultVal);
+    (target as any).default = val;
     (target as any).restricted = restricted;
   }
 
   const excluded = profileMeta?.params?.services?.excluded || [];
-  const defaults = profileMeta?.params?.services?.selected || [];
   const selected = profileDef.services?.selected || [];
 
   for (let i = 0; i < out.services.length; i++) {
@@ -224,11 +222,10 @@ export const loadSubmissionProfile = (
 
     const sel = selected.includes(name);
     const restr = !customize && excluded.includes(name);
-    const def = defaults.includes(name);
 
     cat.selected = sel;
     cat.restricted = restr;
-    cat.default = def;
+    cat.default = sel;
     cat.prev = sel;
 
     for (let j = 0; j < cat.services.length; j++) {
@@ -240,11 +237,9 @@ export const loadSubmissionProfile = (
 
       const r = !customize && (excluded.includes(n) || excluded.includes(c));
 
-      const d = defaults.includes(n) || defaults.includes(c);
-
       svr.selected = s;
       svr.restricted = r;
-      svr.default = d;
+      svr.default = s;
       svr.prev = s;
     }
   }
@@ -260,16 +255,13 @@ export const loadSubmissionProfile = (
 
       const settingsParam = settingsSpec?.params?.find(p => p.name === param.name);
 
-      const profileDefault = profileMeta?.params?.service_spec?.[svr.name]?.[param.name];
-
       const isRestricted = !customize && profileMeta?.restricted_params?.[svr.name]?.includes(param.name);
 
       const newValue = getValidValue(profileValue, settingsParam?.value, param.value);
 
       param.value = newValue;
       param.prev = newValue;
-
-      param.default = getValidValue(profileDefault, settingsParam?.default, param.default);
+      param.default = newValue;
 
       param.restricted = isRestricted;
     }
@@ -427,7 +419,7 @@ export const calculateFileHash = (file: File): Promise<string> =>
  * @param value - Hash value.
  */
 export const getHashQuery = (type: string, value: string): string =>
-  type === 'file' ? `sha256:"${value}"` : `${type}:"${value}"`;
+  type === 'file' ? `sha256:"${value}"` : type === 'url' ? `uri_info.uri:"${value}"` : `${type}:"${value}"`;
 
 /**
  * @param settings - Profile settings.
@@ -544,12 +536,14 @@ export const useAutoURLServicesSelection = () => {
   const addSelection = useCallback(() => {
     const added: AutoURLServiceIndices = [];
 
+    const profile = form.getFieldValue('state.profile');
+
     form.setFieldValue('settings.services', categories =>
       categories.map((cat, ci) => {
         const services = cat.services.map((svc, si) => {
           if (autoNames.includes(svc.name)) {
             added.push([ci, si]);
-            return { ...svc, selected: true };
+            return { ...svc, selected: profile === 'default' ? true : svc.selected };
           }
           return svc;
         });
@@ -608,10 +602,8 @@ export const useAutoURLServicesSelection = () => {
     }
 
     if (currHasURL) {
-      console.log('addSelection');
       addSelection();
     } else if (prevHasURL && !currHasURL) {
-      console.log('removeSelection');
       removeSelection();
     }
 

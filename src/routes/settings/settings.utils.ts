@@ -25,6 +25,7 @@ export const PROFILE_KEYS = [
   'classification',
   'deep_scan',
   'description',
+  'filetype_override',
   'generate_alert',
   'ignore_cache',
   'ignore_filtering',
@@ -146,6 +147,9 @@ export const initializeSettings = (settings: UserSettings | null): ProfileSettin
   for (const key of PROFILE_KEYS) {
     (out as unknown)[key] = { default: null, value: null, prev: null, restricted: true };
   }
+
+  // File type override shouldn't be restricted by default since it's commonly used in profiles and not a critical setting
+  out.filetype_override.restricted = false;
 
   // Services: clone, sort, and enrich
   out.services = (Array.isArray(settings.services) ? [...settings.services] : [])

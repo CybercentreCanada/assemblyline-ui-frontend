@@ -62,11 +62,12 @@ const FileDetailPage = React.memo(() => {
   const [resubmitAnchor, setResubmitAnchor] = useState(null);
   const [promotedSections, setPromotedSections] = useState([]);
 
-  const sid = useMemo(() => search?.get('sid'), [search?.get('sid')]);
-  const metadata = useMemo(() => search?.get('metadata'), [search?.get('metadata')]);
-  const liveResultKeys = useMemo(() => search?.get('liveResultKeys'), [search?.get('liveResultKeys')]);
-  const liveErrors = useMemo(() => search?.get('liveErrors'), [search?.get('liveErrors')]);
+  const filetypeOverride = useMemo(() => search?.get('filetypeOverride'), [search?.get('filetypeOverride')]);
   const force = useMemo(() => search?.get('force'), [search?.get('force')]);
+  const liveErrors = useMemo(() => search?.get('liveErrors'), [search?.get('liveErrors')]);
+  const liveResultKeys = useMemo(() => search?.get('liveResultKeys'), [search?.get('liveResultKeys')]);
+  const metadata = useMemo(() => search?.get('metadata'), [search?.get('metadata')]);
+  const sid = useMemo(() => search?.get('sid'), [search?.get('sid')]);
 
   const ref = useRef(null);
 
@@ -83,29 +84,6 @@ const FileDetailPage = React.memo(() => {
   }, [configuration]);
 
   const fileName = useMemo(() => (file ? search.get('name') || sha256 : null), [file, search?.toString(), sha256]);
-
-  const elementInViewport = element => {
-    const bounding = element.getBoundingClientRect();
-    const myElementHeight = element.offsetHeight;
-    const myElementWidth = element.offsetWidth;
-
-    if (
-      bounding.top >= -myElementHeight &&
-      bounding.left >= -myElementWidth &&
-      bounding.right <= (window.innerWidth || document.documentElement.clientWidth) + myElementWidth &&
-      bounding.bottom <= (window.innerHeight || document.documentElement.clientHeight) + myElementHeight
-    ) {
-      return true;
-    }
-    return false;
-  };
-
-  const scrollToTop = scrollToItem => {
-    const element = document.getElementById(scrollToItem);
-    if (element && !elementInViewport(element)) {
-      element.scrollIntoView();
-    }
-  };
 
   const patchFileDetails = (data: File) => {
     const newData = { ...data };
@@ -239,6 +217,8 @@ const FileDetailPage = React.memo(() => {
   }, [sha256, badlistReason, file]);
 
   useEffect(() => {
+    let active = true;
+
     setFile(null);
 
     if (sid && sha256) {
@@ -247,7 +227,7 @@ const FileDetailPage = React.memo(() => {
         url: `/api/v4/submission/${sid}/file/${sha256}/`,
         body: liveResultKeys ? { extra_result_keys: liveResultKeys } : null,
         onSuccess: api_data => {
-          scrollToTop('drawerTop');
+          if (!active) return;
           setFile(patchFileDetails(api_data.api_response));
         }
       });
@@ -255,11 +235,15 @@ const FileDetailPage = React.memo(() => {
       apiCall<File>({
         url: `/api/v4/file/result/${sha256}/`,
         onSuccess: api_data => {
-          scrollToTop('fileDetailTop');
+          if (!active) return;
           setFile(patchFileDetails(api_data.api_response));
         }
       });
     }
+
+    return () => {
+      active = false;
+    };
     // eslint-disable-next-line
   }, [sha256, sid]);
 
@@ -438,6 +422,7 @@ const FileDetailPage = React.memo(() => {
                           route: '/submit',
                           search: {
                             classification: file.file_info.classification,
+                            filetypeOverride: filetypeOverride,
                             hash: file.file_info.sha256,
                             metadata: metadata
                           }
@@ -496,7 +481,11 @@ const FileDetailPage = React.memo(() => {
           {file?.file_info?.type.startsWith('uri/') ? (
             <URIIdentificationSection fileinfo={file ? file.file_info : null} promotedSections={promotedSections} />
           ) : (
-            <IdentificationSection fileinfo={file ? file.file_info : null} promotedSections={promotedSections} />
+            <IdentificationSection
+              fileinfo={file ? file.file_info : null}
+              promotedSections={promotedSections}
+              filetypeOverride={filetypeOverride}
+            />
           )}
           <FrequencySection seen={file ? file.file_info?.seen : null} />
           <MetadataSection metadata={file ? file.metadata : null} />
@@ -532,6 +521,7 @@ export const FileDetailRoute = createAppRoute({
     id: s.string()
   }),
   search: s => ({
+    filetypeOverride: s.string(null).source('transient'),
     force: s.boolean(false).source('transient'),
     liveErrors: s.object(null as Error[]).source('transient'),
     liveResultKeys: s.object(null as string[]).source('transient'),

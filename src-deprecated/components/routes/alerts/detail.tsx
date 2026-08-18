@@ -1,3 +1,4 @@
+import { Fetcher, useClueFetcherSelector } from '@cccsaurora/clue-ui';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import {
@@ -13,7 +14,6 @@ import {
   useTheme
 } from '@mui/material';
 import Alert from '@mui/material/Alert';
-import { Fetcher } from 'borealis-ui';
 import ListCarousel from 'commons/addons/lists/carousel/ListCarousel';
 import ListNavigator from 'commons/addons/lists/navigator/ListNavigator';
 import { useAppUser } from 'commons/components/app/hooks';
@@ -110,6 +110,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
   const { c12nDef, configuration } = useALContext();
   const { id: paramId } = useParams<Params>();
   const { user: currentUser } = useAppUser<CustomUser>();
+  const fetchers = useClueFetcherSelector(s => s.fetchers);
 
   const [alert, setAlert] = useState<AlertItem>(null);
   const [metaOpen, setMetaOpen] = useState<boolean>(false);
@@ -542,7 +543,7 @@ const WrappedAlertDetailContent = ({ id: propId = null, alert: propAlert = null,
                       )}
                   </pre>
                 </div>
-                {alert?.metadata?.eml_path && (
+                {alert?.metadata?.eml_path && fetchers && (
                   <div>
                     <Fetcher
                       fetcherId="email-preview.preview"

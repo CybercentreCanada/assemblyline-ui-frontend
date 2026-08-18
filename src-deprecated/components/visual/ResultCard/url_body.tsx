@@ -20,7 +20,8 @@ const WrappedURLBody = ({ body }: Props) => {
         listStyleType: 'none',
         paddingInlineStart: 0,
         marginBlockStart: '0.25rem',
-        marginBlockEnd: '0.25rem'
+        marginBlockEnd: '0.25rem',
+        wordWrap: 'break-word'
       }}
     >
       {arr.map((item, id) => (

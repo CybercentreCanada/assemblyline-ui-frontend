@@ -1,3 +1,5 @@
+import clueEN from '@cccsaurora/clue-ui/en/translation.json';
+import clueFR from '@cccsaurora/clue-ui/fr/translation.json';
 import { addTranslations as addA11yTranslations } from '@tui/a11y';
 import { addTranslations as addClassiTranslations } from '@tui/classi';
 import { addTranslations as addCoreTranslations } from '@tui/core';
@@ -25,8 +27,6 @@ import quotaEN from 'layout/auth/quota/quota.i18n.en.json';
 import quotaFR from 'layout/auth/quota/quota.i18n.fr.json';
 import tosEN from 'layout/auth/terms-of-service/terms-of-service.i18n.en.json';
 import tosFR from 'layout/auth/terms-of-service/terms-of-service.i18n.fr.json';
-import borealisEN from 'layout/borealis/borealis.i18n.en.json';
-import borealisFR from 'layout/borealis/borealis.i18n.fr.json';
 import breadcrumbsEN from 'layout/breadcrumbs/breadcrumbs.i18n.en.json';
 import breadcrumbsFR from 'layout/breadcrumbs/breadcrumbs.i18n.fr.json';
 import carouselEN from 'layout/carousel/carousel.i18n.en.json';
@@ -164,9 +164,9 @@ export const I18N_RESSOURCES = {
     archive: archivesEN,
     assistant: assistantEN,
     authorize: authorizeEN,
-    borealis: borealisEN,
     breadcrumbs: breadcrumbsEN,
     carousel: carouselEN,
+    clue: clueEN,
     dashboard: dashboardEN,
     dateTime: dateTimeEN,
     developmentAPI: developmentAPIEN,
@@ -235,9 +235,9 @@ export const I18N_RESSOURCES = {
     archive: archivesFR,
     assistant: assistantFR,
     authorize: authorizeFR,
-    borealis: borealisFR,
     breadcrumbs: breadcrumbsFR,
     carousel: carouselFR,
+    clue: clueFR,
     dashboard: dashboardFR,
     dateTime: dateTimeFR,
     developmentAPI: developmentAPIFR,

@@ -1,15 +1,20 @@
 import { useTheme } from '@mui/material';
 import type { ColumnDef } from '@tanstack/react-table';
 import { createColumnHelper } from '@tanstack/react-table';
-import type { SandboxBody, SandboxSignatureItem } from 'components/models/base/result_body';
+import useSafeResults from 'components/hooks/useSafeResults';
+import type { SandboxBody, SandboxProcessItem, SandboxSignatureItem } from 'components/models/base/result_body';
 import Classification from 'components/visual/Classification';
 import CustomChip from 'components/visual/CustomChip';
 import { ProcessChip } from 'components/visual/ResultCard/Sandbox/common/ProcessChip';
 import { TableContainer } from 'components/visual/ResultCard/Sandbox/common/TableContainer';
 import { DetailTableCellValue, DetailTableRow } from 'components/visual/ResultCard/Sandbox/common/Tables';
-import type { SandboxFilter } from 'components/visual/ResultCard/Sandbox/sandbox.utils';
+import {
+  getProcessMapByPid,
+  getVisibleProcessesByPids,
+  type SandboxFilter
+} from 'components/visual/ResultCard/Sandbox/sandbox.utils';
 import Verdict from 'components/visual/Verdict';
-import React, { useMemo } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 type FlatSignatures = SandboxSignatureItem & {
@@ -18,28 +23,44 @@ type FlatSignatures = SandboxSignatureItem & {
 
 type SignatureTableProps = {
   body?: SandboxBody;
+  processByPid?: ReadonlyMap<number, SandboxProcessItem>;
+  showSafeResults?: boolean;
   printable?: boolean;
   force?: boolean;
   filterValue?: SandboxFilter;
   activeValue?: SandboxFilter;
   preventRender?: boolean;
   getRowCount?: (count: number) => void;
-  onActiveChange?: React.Dispatch<React.SetStateAction<SandboxFilter>>;
   onFilterChange?: React.Dispatch<React.SetStateAction<SandboxFilter>>;
 };
 
 export const SignatureTable = React.memo(
   ({
     body = null,
+    processByPid: processByPidProp,
+    showSafeResults: showSafeResultsProp,
     printable = false,
     filterValue,
     activeValue,
     preventRender,
-    getRowCount = () => null
+    getRowCount = () => null,
+    onFilterChange = () => null
   }: SignatureTableProps) => {
     const { t } = useTranslation('sandboxResult');
     const theme = useTheme();
+    const { showSafeResults: showSafeResultsContext } = useSafeResults();
+    const showSafeResults = showSafeResultsProp ?? showSafeResultsContext;
     const columnHelper = createColumnHelper<FlatSignatures>();
+
+    const processByPid = useMemo(
+      () => processByPidProp ?? getProcessMapByPid(body?.processes),
+      [body?.processes, processByPidProp]
+    );
+
+    const getVisibleProcesses = useCallback(
+      (pids?: number[]) => getVisibleProcessesByPids(pids, processByPid, showSafeResults),
+      [processByPid, showSafeResults]
+    );
 
     const renderChipList = (items?: string[], type?: 'rounded' | 'round' | 'square') =>
       items?.map((label, i) => <CustomChip key={i} label={label} size="tiny" variant="outlined" type={type} />);
@@ -59,13 +80,10 @@ export const SignatureTable = React.memo(
           id: 'processes',
           enableSorting: false,
           header: () => t('processes'),
-          cell: info => (
-            <>
-              {info
-                .getValue()
-                ?.map(pid => <ProcessChip key={pid} short process={body.processes.find(p => p.pid === pid)} />)}
-            </>
-          ),
+          cell: info =>
+            getVisibleProcesses(info.getValue())?.map(process => (
+              <ProcessChip key={process.pid} short process={process} />
+            )),
           meta: {
             colStyle: { width: '1%' },
             cellSx: { whiteSpace: 'nowrap', wordBreak: 'inherit !important' }
@@ -135,7 +153,18 @@ export const SignatureTable = React.memo(
           }
         })
       ],
-      [body.processes, columnHelper, t, theme.palette.text.secondary]
+      [columnHelper, getVisibleProcesses, t, theme.palette.text.secondary]
+    );
+
+    const handleRowClick = useCallback(
+      (row: SandboxSignatureItem) =>
+        onFilterChange(prev => {
+          const current = prev ?? [];
+          if (!row?.pid?.length) return current;
+          const isSelected = row.pid.every(v => current.includes(v));
+          return isSelected ? current.filter(v => !row.pid.includes(v)) : [...new Set([...current, ...row.pid])];
+        }),
+      [onFilterChange]
     );
 
     return (
@@ -148,7 +177,8 @@ export const SignatureTable = React.memo(
         activeValue={activeValue}
         preventRender={preventRender}
         getRowCount={getRowCount}
-        isRowFiltered={(row, value) => row.pid?.includes(value.pid)}
+        isRowFiltered={(row, value) => (!value?.length ? true : value?.every(v => row?.pid?.includes(v) || false))}
+        onRowClick={handleRowClick}
       />
     );
   }

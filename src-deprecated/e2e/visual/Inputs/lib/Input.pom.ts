@@ -25,7 +25,7 @@ export abstract class BaseInput {
 
   async resetValue() {
     await test.step(`Reset ${this.type} "${this.id}" using the reset button`, async () => {
-      const resetButton = this.root.locator(`button[aria-label="${this.id}-reset"]`);
+      const resetButton = this.root.locator(`button[aria-label="${this.id}-reset-adornment"]`);
       await resetButton.click({ timeout: MEDIUM_TIMEOUT });
     });
   }
@@ -51,7 +51,7 @@ export abstract class BaseInput {
 
   async expectToHaveReset({ timeout = MEDIUM_TIMEOUT } = {}) {
     await test.step(`Expect ${this.type} "${this.id}" to have reset`, async () => {
-      const resetButton = this.root.locator(`button[aria-label="${this.id}-reset"]`);
+      const resetButton = this.root.locator(`button[aria-label="${this.id}-reset-adornment"]`);
       await expect(resetButton).toBeVisible({ timeout });
     });
   }

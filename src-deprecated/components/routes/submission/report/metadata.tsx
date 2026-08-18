@@ -1,7 +1,7 @@
+import { Fetcher, useClueFetcherSelector } from '@cccsaurora/clue-ui';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
 import { Button, Collapse, Divider, Skeleton, styled, Typography, useTheme } from '@mui/material';
-import { Fetcher } from 'borealis-ui';
 import useALContext from 'components/hooks/useALContext';
 import type { SubmissionReport } from 'components/models/ui/submission_report';
 import React, { useState } from 'react';
@@ -31,7 +31,9 @@ function WrappedMetadata({ report }: Props) {
   const { t } = useTranslation(['submissionReport']);
   const { user: currentUser, configuration } = useALContext();
   const theme = useTheme();
-  const [metaOpen, setMetaOpen] = useState(false);
+  const fetchers = useClueFetcherSelector(s => s.fetchers);
+
+  const [metaOpen, setMetaOpen] = useState<boolean>(false);
 
   return (
     (!report || Object.keys(report.metadata).length !== 0) && (
@@ -175,7 +177,7 @@ function WrappedMetadata({ report }: Props) {
                 </Collapse>
               )}
           </div>
-          {report?.metadata?.eml_path && (
+          {report?.metadata?.eml_path && fetchers && (
             <div>
               <Fetcher
                 fetcherId="email-preview.preview"

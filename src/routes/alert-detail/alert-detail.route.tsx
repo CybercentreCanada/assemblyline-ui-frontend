@@ -1,3 +1,4 @@
+import { Fetcher, useClueFetcherSelector } from '@cccsaurora/clue-ui';
 import BallotOutlinedIcon from '@mui/icons-material/BallotOutlined';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
@@ -14,7 +15,6 @@ import {
   useTheme
 } from '@mui/material';
 import Alert from '@mui/material/Alert';
-import { Fetcher } from 'borealis-ui';
 import { createAppRoute, useAppLocation, useAppPathParams, useAppSearchSnapshot } from 'core/routes';
 import { AppPageFullWidth } from 'core/template';
 import ListCarousel from 'deprecated/components/lists/carousel/ListCarousel';
@@ -97,6 +97,7 @@ export const AlertDetailPage = memo(() => {
   const paramId = useAppPathParams<'/alert/:id'>()?.id;
   const search = useAppSearchSnapshot<'/alert/:id'>();
   const inDrawer = useAppLocation('from')(s => s.route === '/alerts');
+  const fetchers = useClueFetcherSelector(s => s.fetchers);
 
   const [fetchedAlert, setFetchedAlert] = useState<AlertItem>(null);
   const [metaOpen, setMetaOpen] = useState<boolean>(false);
@@ -527,7 +528,7 @@ export const AlertDetailPage = memo(() => {
                       )}
                   </pre>
                 </div>
-                {alert?.metadata?.eml_path && (
+                {alert?.metadata?.eml_path && fetchers && (
                   <div>
                     <Fetcher
                       fetcherId="email-preview.preview"

@@ -117,6 +117,8 @@ const WrappedInfoSection: React.FC<Props> = ({ submission }) => {
                 sx={{
                   fontWeight: 500,
                   textTransform: 'none',
+                  justifyContent: 'flex-start',
+                  textAlign: 'left',
                   padding: `${theme.spacing(0.5)} ${theme.spacing(1)} ${theme.spacing(0.5)} ${theme.spacing(0)}`
                 }}
                 endIcon={

@@ -4,7 +4,7 @@ import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import { Box, Button, Collapse, Divider, IconButton, Skeleton, Tooltip, Typography, useTheme } from '@mui/material';
-import { AppLink, useAppNavigate } from 'core/router';
+import { AppLink } from 'core/router';
 import useHighlighter from 'deprecated/hooks/useHighlighter';
 import useSafeResults from 'deprecated/hooks/useSafeResults';
 import type { SubmissionTree, Tree } from 'models/api/submission';
@@ -27,9 +27,16 @@ type FileTreeSectionProps = {
   sid: string;
   baseFiles: string[];
   force?: boolean;
+  filetypeOverride?: string;
 };
 
-const WrappedFileTreeSection: React.FC<FileTreeSectionProps> = ({ tree, sid, baseFiles, force = false }) => {
+const WrappedFileTreeSection: React.FC<FileTreeSectionProps> = ({
+  tree,
+  sid,
+  baseFiles,
+  force = false,
+  filetypeOverride = null
+}) => {
   const { t } = useTranslation(['submissionDetail']);
   const [open, setOpen] = useState(true);
   const theme = useTheme();
@@ -67,7 +74,13 @@ const WrappedFileTreeSection: React.FC<FileTreeSectionProps> = ({ tree, sid, bas
       <Collapse in={open} timeout="auto">
         <div style={{ paddingTop: sp2 }}>
           {tree !== null ? (
-            <FileTree tree={tree} sid={sid} force={force} defaultForceShown={forcedShown} />
+            <FileTree
+              tree={tree}
+              sid={sid}
+              force={force}
+              filetypeOverride={filetypeOverride}
+              defaultForceShown={forcedShown}
+            />
           ) : (
             Array.from({ length: 3 }).map((_, i) => (
               <div style={{ display: 'flex' }} key={i}>
@@ -87,12 +100,18 @@ type FileTreeProps = {
   sid: string;
   force: boolean;
   defaultForceShown: string[];
+  filetypeOverride?: string;
 };
 
-const WrappedFileTree: React.FC<FileTreeProps> = ({ tree, sid, defaultForceShown, force = false }) => {
+const WrappedFileTree: React.FC<FileTreeProps> = ({
+  tree,
+  sid,
+  defaultForceShown,
+  force = false,
+  filetypeOverride = null
+}) => {
   const { t } = useTranslation(['submissionDetail']);
   const theme = useTheme();
-  const navigate = useAppNavigate();
   const { isHighlighted } = useHighlighter();
   const { showSafeResults } = useSafeResults();
 
@@ -158,7 +177,7 @@ const WrappedFileTree: React.FC<FileTreeProps> = ({ tree, sid, defaultForceShown
                       nav.to().create({
                         route: '/file/detail/:id',
                         path: { id: item.sha256 },
-                        search: { name: encodeURIComponent(item.name[0]) }
+                        search: { name: item.name[0] }
                       })
                   })}
               sx={{
@@ -183,7 +202,26 @@ const WrappedFileTree: React.FC<FileTreeProps> = ({ tree, sid, defaultForceShown
                   <span style={{ paddingRight: '4px', unicodeBidi: 'isolate-override' }}>
                     {item.name.sort().join(' | ')}
                   </span>
-                  <span style={{ fontSize: '80%', color: theme.palette.text.secondary }}>{`[${item.type}]`}</span>
+                  {filetypeOverride ? (
+                    <>
+                      <span
+                        style={{
+                          fontSize: '80%',
+                          color: theme.palette.text.secondary,
+                          paddingRight: theme.spacing(0.5)
+                        }}
+                      >{`[${filetypeOverride}]`}</span>
+                      <span
+                        style={{
+                          fontSize: '80%',
+                          color: theme.palette.text.disabled,
+                          textDecoration: 'line-through'
+                        }}
+                      >{`[${item.type}]`}</span>
+                    </>
+                  ) : (
+                    <span style={{ fontSize: '80%', color: theme.palette.text.secondary }}>{`[${item.type}]`}</span>
+                  )}
                 </span>
               </div>
             </Box>

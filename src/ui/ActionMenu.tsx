@@ -1,13 +1,12 @@
 import AssignmentOutlinedIcon from '@mui/icons-material/AssignmentOutlined';
 import BugReportOutlinedIcon from '@mui/icons-material/BugReportOutlined';
 import FingerprintOutlinedIcon from '@mui/icons-material/FingerprintOutlined';
-import LandscapeOutlinedIcon from '@mui/icons-material/LandscapeOutlined';
 import PublishOutlinedIcon from '@mui/icons-material/PublishOutlined';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import SelectAllOutlinedIcon from '@mui/icons-material/SelectAllOutlined';
 import TravelExploreOutlinedIcon from '@mui/icons-material/TravelExploreOutlined';
 import VerifiedUserOutlinedIcon from '@mui/icons-material/VerifiedUserOutlined';
-import { Divider, ListSubheader, Link as MaterialLink, Menu, MenuItem, Tooltip } from '@mui/material';
+import { Divider, ListSubheader, Link as MaterialLink, Menu, MenuItem, SvgIcon, Tooltip } from '@mui/material';
 import { useClipboard } from '@tui/core';
 import { AppLink } from 'core/router';
 import useALContext from 'deprecated/hooks/useALContext';
@@ -27,7 +26,7 @@ import type { Index } from 'routes/search/search.route';
 import { getSHA256, getSubmitType, safeFieldValueURI, toTitleCase } from 'shared/utils/utils';
 import Classification from 'ui/Classification';
 import ClassificationMismatchDialog from 'ui/ClassificationMismatchDialog';
-import { BOREALIS_TYPE_MAP } from 'ui/EnrichmentCustomChip';
+import { CLUE_TYPE_MAP } from 'ui/EnrichmentCustomChip';
 import InputDialog from 'ui/InputDialog';
 import SafeBadItem from 'ui/SafeBadItem';
 
@@ -39,7 +38,14 @@ const SAFELIST_ICON = <VerifiedUserOutlinedIcon style={{ marginRight: '16px' }} 
 const SUBMIT_ICON = <PublishOutlinedIcon style={{ marginRight: '16px' }} />;
 const TRAVEL_EXPLORE_ICON = <TravelExploreOutlinedIcon style={{ marginRight: '16px' }} />;
 const SIGNATURE_ICON = <FingerprintOutlinedIcon style={{ marginRight: '16px' }} />;
-const BORELIS_ICON = <LandscapeOutlinedIcon style={{ marginRight: '16px' }} />;
+const CLUE_ICON = (
+  <SvgIcon viewBox="8 5.8 40 52.5" style={{ marginRight: '16px' }}>
+    <path
+      id="puzzle-piece"
+      d="M41.1,26c1.46-.17,2.93.19,4.13,1.01.66.45,1.38.69,2.07.69h.12c.32,0,.58-.26.58-.58v-7.48c0-.79-.64-1.43-1.43-1.43h-7.48c-.91,0-1.65-.74-1.65-1.65v-.12c0-.91.3-1.84.87-2.67.69-1.01.97-2.18.83-3.41-.26-2.29-2.12-4.14-4.41-4.39-1.45-.16-2.84.28-3.92,1.25-1.06.95-1.67,2.31-1.67,3.74,0,1.04.32,2.04.92,2.89.54.76.82,1.7.82,2.72,0,.91-.74,1.65-1.65,1.65h-7.48c-.79,0-1.43.64-1.43,1.43v7.48c0,.91-.74,1.65-1.65,1.65h-.12c-.91,0-1.84-.3-2.67-.87-1.01-.69-2.18-.97-3.41-.83-2.29.26-4.14,2.12-4.39,4.41-.16,1.45.28,2.84,1.25,3.92.95,1.06,2.31,1.67,3.74,1.67,1.04,0,2.04-.32,2.89-.92.76-.54,1.61-.82,2.46-.82h.26c.91,0,1.65.74,1.65,1.65v7.48c0,.79.64,1.43,1.43,1.43h7.48c.91,0,1.65.74,1.65,1.65v.12c0,.91-.3,1.84-.87,2.67-.69,1-.97,2.18-.83,3.41.26,2.29,2.12,4.14,4.41,4.39,1.45.16,2.84-.28,3.92-1.25,1.06-.95,1.67-2.31,1.67-3.74,0-1.04-.32-2.04-.92-2.89-.54-.76-.82-1.7-.82-2.72,0-.91.74-1.65,1.65-1.65h7.48c.79,0,1.43-.64,1.43-1.43v-7.48c0-.32-.26-.58-.58-.58-.8,0-1.52.22-2.1.63-1.03.73-2.24,1.12-3.5,1.12-1.73,0-3.38-.74-4.53-2.02-1.15-1.29-1.7-3.01-1.51-4.74.31-2.78,2.55-5.03,5.33-5.35Z"
+    />
+  </SvgIcon>
+);
 
 const EXTERNAL_ICON = <HiOutlineExternalLink style={{ marginRight: '16px', fontSize: '22px' }} />;
 
@@ -79,7 +85,7 @@ export type ActionMenuProps = {
   highlight_key?: string;
   maliciousness?: 'suspicious' | 'malicious' | 'safe' | 'info' | 'highly_suspicious';
   setState: (coordinates: Coordinates) => void;
-  setBorealisDetails?: (value: boolean) => void;
+  setClueDetails?: (value: boolean) => void;
 };
 
 const WrappedActionMenu = ({
@@ -92,7 +98,7 @@ const WrappedActionMenu = ({
   setState,
   highlight_key = null,
   maliciousness = null,
-  setBorealisDetails = null
+  setClueDetails = null
 }: ActionMenuProps) => {
   const { t } = useTranslation();
   const { user: currentUser, configuration: currentUserConfig, c12nDef } = useALContext();
@@ -246,10 +252,10 @@ const WrappedActionMenu = ({
     handleClose();
   }, [setBadlistDialog, handleClose]);
 
-  const handleBorealisDetails = useCallback(() => {
-    setBorealisDetails(true);
+  const handleClueDetails = useCallback(() => {
+    setClueDetails(true);
     handleClose();
-  }, [setBorealisDetails, handleClose]);
+  }, [setClueDetails, handleClose]);
 
   const addToBadlist = useCallback(() => {
     const data = {
@@ -413,15 +419,12 @@ const WrappedActionMenu = ({
           state.mouseY !== null && state.mouseX !== null ? { top: state.mouseY, left: state.mouseX } : undefined
         }
       >
-        {'borealis' in currentUserConfig.ui.api_proxies &&
-          type in BOREALIS_TYPE_MAP &&
-          value !== null &&
-          setBorealisDetails && (
-            <MenuItem id="borealisID" dense onClick={handleBorealisDetails}>
-              {BORELIS_ICON}
-              {t('borealis')}
-            </MenuItem>
-          )}
+        {'clue' in currentUserConfig.ui.api_proxies && type in CLUE_TYPE_MAP && value !== null && setClueDetails && (
+          <MenuItem id="clueID" dense onClick={handleClueDetails}>
+            {CLUE_ICON}
+            {t('clue')}
+          </MenuItem>
+        )}
 
         {category === 'tag' && type.startsWith('file.rule.') && currentUser.roles.includes('signature_view') && (
           <MenuItem

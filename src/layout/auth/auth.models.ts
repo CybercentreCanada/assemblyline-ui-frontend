@@ -80,7 +80,7 @@ export type BootstrapProps = {
   /** Callback to set login parameters. */
   setLoginParams: (params: LoginParamsProps) => void;
   /** Callback to mark the application ready. */
-  setReady: (layout: boolean, borealis: boolean, iconifyUrl: string) => void;
+  setReady: (layout: boolean, clue: boolean, iconifyUrl: string) => void;
   /** Callback to set the current user. */
   setUser: (user: WhoAmIProps) => void;
   /** Callback to switch the active rendered app. */

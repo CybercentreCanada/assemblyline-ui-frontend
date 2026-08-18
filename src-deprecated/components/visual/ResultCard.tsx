@@ -1,18 +1,6 @@
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
-import {
-  Box,
-  Button,
-  ClickAwayListener,
-  Collapse,
-  Fade,
-  MenuItem,
-  MenuList,
-  Paper,
-  Popper,
-  Typography,
-  useTheme
-} from '@mui/material';
+import { Box, Button, Collapse, Menu, MenuItem, Typography, useTheme } from '@mui/material';
 import useALContext from 'components/hooks/useALContext';
 import useHighlighter from 'components/hooks/useHighlighter';
 import useMyAPI from 'components/hooks/useMyAPI';
@@ -54,7 +42,7 @@ const WrappedResultCard: React.FC<Props> = ({ result, sid, alternates = null, fo
   const [selected, setSelected] = useState<string>(null);
   const { getKey, hasHighlightedKeys } = useHighlighter();
   const { showSafeResults } = useSafeResults();
-  const popper = Boolean(anchorEl);
+  const menuOpen = Boolean(anchorEl);
 
   const allTags = useMemo(() => {
     const tagList = [];
@@ -126,38 +114,34 @@ const WrappedResultCard: React.FC<Props> = ({ result, sid, alternates = null, fo
         borderRadius: '4px'
       }}
     >
-      <Popper
-        open={popper}
+      <Menu
+        open={menuOpen}
         anchorEl={anchorEl}
-        placement="bottom-end"
-        transition
+        onClose={() => setAnchorEl(null)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+        transformOrigin={{ vertical: 'top', horizontal: 'right' }}
+        transitionDuration={theme.transitions.duration.shortest}
+        slotProps={{
+          list: { dense: true },
+          backdrop: { invisible: true }
+        }}
         sx={{ zIndex: theme.zIndex.drawer + 1 }}
       >
-        {({ TransitionProps }) => (
-          <Fade {...TransitionProps}>
-            <Paper>
-              <ClickAwayListener onClickAway={() => setAnchorEl(null)}>
-                <MenuList dense>
-                  <MenuItem disabled={selected === null} onClick={() => setSelected(null)}>
-                    <span style={{ paddingRight: theme.spacing(2) }}>
-                      {`${result.response.service_version} :: [${result.result.score}]`}
-                    </span>
-                    <Moment format="YYYY-MM-DD HH:mm:ss">{result.created}</Moment>
-                  </MenuItem>
-                  {alternates.map(alt => (
-                    <MenuItem disabled={selected === alt.id} key={alt.id} onClick={() => setSelected(alt.id)}>
-                      <span style={{ paddingRight: theme.spacing(2) }}>
-                        {`${alt.response.service_version} :: [${alt.result.score}]`}
-                      </span>
-                      <Moment format="YYYY-MM-DD HH:mm:ss">{alt.created}</Moment>
-                    </MenuItem>
-                  ))}
-                </MenuList>
-              </ClickAwayListener>
-            </Paper>
-          </Fade>
-        )}
-      </Popper>
+        <MenuItem disabled={selected === null} onClick={() => setSelected(null)}>
+          <span style={{ paddingRight: theme.spacing(2) }}>
+            {`${result.response.service_version} :: [${result.result.score}]`}
+          </span>
+          <Moment format="YYYY-MM-DD HH:mm:ss">{result.created}</Moment>
+        </MenuItem>
+        {alternates?.map(alt => (
+          <MenuItem disabled={selected === alt.id} key={alt.id} onClick={() => setSelected(alt.id)}>
+            <span style={{ paddingRight: theme.spacing(2) }}>
+              {`${alt.response.service_version} :: [${alt.result.score}]`}
+            </span>
+            <Moment format="YYYY-MM-DD HH:mm:ss">{alt.created}</Moment>
+          </MenuItem>
+        ))}
+      </Menu>
       <Box
         onClick={handleClick}
         sx={{

@@ -39,6 +39,7 @@ import SecurityToken from 'components/routes/user/token';
 import Classification from 'components/visual/Classification';
 import ConfirmationDialog from 'components/visual/ConfirmationDialog';
 import CustomChip from 'components/visual/CustomChip';
+import { RouterPrompt } from 'components/visual/RouterPrompt';
 import React, { memo, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, useLocation, useNavigate, useParams } from 'react-router';
@@ -1045,7 +1046,7 @@ function User({ username = null }: UserProps) {
             </TableContainer>
           )}
 
-          {/* <RouterPrompt when={modified} /> */}
+          <RouterPrompt when={modified} />
 
           {user && modified ? (
             <div

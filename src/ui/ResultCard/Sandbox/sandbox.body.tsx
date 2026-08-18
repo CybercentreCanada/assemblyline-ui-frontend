@@ -1,4 +1,5 @@
 import { useTheme } from '@mui/material';
+import { useAppSafeResults } from 'layout/safe-results';
 import type { SandboxBody as SandboxData } from 'models/base/result_body';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -7,7 +8,13 @@ import { NetflowTable } from 'ui/ResultCard/Sandbox/components/NetflowTable';
 import { ProcessGraph } from 'ui/ResultCard/Sandbox/components/ProcessGraph';
 import { ProcessTable } from 'ui/ResultCard/Sandbox/components/ProcessTable';
 import { SignatureTable } from 'ui/ResultCard/Sandbox/components/SignatureTable';
-import type { SandboxFilter } from 'ui/ResultCard/Sandbox/sandbox.utils';
+import {
+  filterNetflowsBySafelistedProcesses,
+  filterSafelistedProcesses,
+  getProcessMapByPid,
+  getSafelistedProcessIds,
+  type SandboxFilter
+} from 'ui/ResultCard/Sandbox/sandbox.utils';
 import { TabContainer } from 'ui/TabContainer';
 
 type LabelProps = {
@@ -59,6 +66,7 @@ export type SandboxBodyProps = {
 
 export const SandboxBody = React.memo(({ body, printable = false }: SandboxBodyProps) => {
   const { t } = useTranslation('sandboxResult');
+  const { showSafeResults } = useAppSafeResults();
 
   const [tab, setTab] = useState<TabKey | undefined>();
   const [filterValue, setFilterValue] = useState<SandboxFilter>();
@@ -68,6 +76,20 @@ export const SandboxBody = React.memo(({ body, printable = false }: SandboxBodyP
     const time = body?.analysis_information?.analysis_metadata?.start_time;
     return time ? new Date(time).getTime() : undefined;
   }, [body]);
+
+  const processByPid = useMemo(() => getProcessMapByPid(body?.processes), [body?.processes]);
+
+  const safelistedProcessIds = useMemo(() => getSafelistedProcessIds(body?.processes), [body?.processes]);
+
+  const filteredProcesses = useMemo(
+    () => filterSafelistedProcesses(body?.processes, showSafeResults),
+    [body?.processes, showSafeResults]
+  );
+
+  const filteredNetflows = useMemo(
+    () => filterNetflowsBySafelistedProcesses(body?.network_connections, safelistedProcessIds, showSafeResults),
+    [body?.network_connections, safelistedProcessIds, showSafeResults]
+  );
 
   const handleRowCountChange = useCallback(
     (key: TabKey) => (count: number) => setRowCounts(prev => ({ ...prev, [key]: count || 0 })),
@@ -115,6 +137,8 @@ export const SandboxBody = React.memo(({ body, printable = false }: SandboxBodyP
                 inner: (
                   <ProcessTable
                     body={body}
+                    data={filteredProcesses}
+                    processByPid={processByPid}
                     preventRender={tab !== 'processes'}
                     printable={printable}
                     startTime={startTime}
@@ -133,6 +157,8 @@ export const SandboxBody = React.memo(({ body, printable = false }: SandboxBodyP
                 inner: (
                   <NetflowTable
                     body={body}
+                    data={filteredNetflows}
+                    processByPid={processByPid}
                     preventRender={tab !== 'netflows'}
                     printable={printable}
                     startTime={startTime}
@@ -149,6 +175,8 @@ export const SandboxBody = React.memo(({ body, printable = false }: SandboxBodyP
                 inner: (
                   <SignatureTable
                     body={body}
+                    processByPid={processByPid}
+                    showSafeResults={showSafeResults}
                     preventRender={tab !== 'signatures'}
                     printable={printable}
                     filterValue={filterValue}

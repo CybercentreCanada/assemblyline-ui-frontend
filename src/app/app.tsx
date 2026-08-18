@@ -23,8 +23,8 @@ import { AppSnackbarProvider } from 'core/snackbar';
 import { AppTemplateLayout, AppTemplateProvider } from 'core/template';
 import { AppAssistantLayout, AppAssistantProvider } from 'layout/assistant';
 import { AppAuthLayout } from 'layout/auth';
-import { AppBorealisProvider } from 'layout/borealis';
 import { AppCarouselProvider } from 'layout/carousel';
+import { AppClueProvider } from 'layout/clue';
 import { AppDrawerLayout } from 'layout/drawer';
 import type { PropsWithChildren } from 'react';
 import { memo, StrictMode } from 'react';
@@ -165,11 +165,11 @@ const AppProviders = memo(({ children }: PropsWithChildren) => {
                 <AppRouterProvider>
                   <AppNavigationProvider>
                     <AppLocationParamProvider routes={routes}>
-                      <AppBorealisProvider>
+                      <AppClueProvider>
                         <AppCarouselProvider>
                           <>{children}</>
                         </AppCarouselProvider>
-                      </AppBorealisProvider>
+                      </AppClueProvider>
                     </AppLocationParamProvider>
                   </AppNavigationProvider>
                 </AppRouterProvider>

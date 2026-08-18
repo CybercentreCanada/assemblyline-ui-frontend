@@ -191,11 +191,12 @@ const Service: React.FC<ServiceProps> = React.memo(({ cat_id, svr_id, service })
         <CollapseSection
           header={({ open, setOpen }) => (
             <CheckboxInput
-              id={service.name}
-              label={service.name}
+              defaultValue={defaultValue}
               disabled={disabled || !isEditing || (!customize && restricted)}
               endAdornment={!external ? null : <OpenInNewOutlinedIcon style={{ fontSize: 'small' }} />}
               expand={!hasParams ? null : open}
+              id={service.name}
+              label={service.name}
               preventRender={!customize && restricted && !selected}
               reset={defaultValue !== null && selected !== defaultValue}
               value={selected}
@@ -285,11 +286,12 @@ const Category = React.memo(({ cat_id, category }: CategoryProps) => {
         <CollapseSection
           header={({ open, setOpen }) => (
             <CheckboxInput
-              label={category.name}
+              defaultValue={defaultValue}
               disabled={disabled || !isEditing || (!customize && restricted)}
               divider
               expand={open}
               indeterminate={indeterminate}
+              label={category.name}
               preventRender={!customize && restricted && !selected && !indeterminate}
               reset={defaultValue !== null && selected !== defaultValue}
               value={selected}

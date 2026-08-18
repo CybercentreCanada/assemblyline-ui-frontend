@@ -71,9 +71,15 @@ const routes = [
   '/tos'
 ];
 
-test.skip('Route Smoke Tests', () => {
+const routeToSnapshotName = (route: string): string => {
+  const normalized = route === '/' ? 'root' : route.slice(1);
+  const safeName = normalized.replace(/[^a-zA-Z0-9_-]/g, '_');
+  return `route-${safeName}.png`;
+};
+
+test.describe('Route Smoke Tests', () => {
   for (const route of routes) {
-    test(`should load ${route} without errors`, async ({ page }) => {
+    test(`should load ${route} without errors and match snapshot`, async ({ page }) => {
       const errors: string[] = [];
 
       page.on('console', msg => {
@@ -89,6 +95,11 @@ test.skip('Route Smoke Tests', () => {
       expect(status, `Unexpected status for ${route}`).toBeLessThan(400);
 
       expect(errors, `Console errors for ${route}: ${errors.join('\n')}`).toHaveLength(0);
+
+      await expect(page).toHaveScreenshot(routeToSnapshotName(route), {
+        animations: 'disabled',
+        fullPage: true
+      });
     });
   }
 });

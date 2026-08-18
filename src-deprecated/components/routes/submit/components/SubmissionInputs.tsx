@@ -780,6 +780,8 @@ export const FileSubmit = React.memo(({ onClick = () => null, ...props }: Button
         }
       });
 
+
+
       FLOW.on('progress', () => {
         form.setFieldValue('state.progress', Math.trunc(FLOW.progress() * 100));
       });

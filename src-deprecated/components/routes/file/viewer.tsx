@@ -153,7 +153,7 @@ const WrappedFileViewer = () => {
       onSuccess: api_data => {
         setType(api_data.api_response.type);
         setImageAllowed(api_data.api_response.is_section_image === true);
-        if (api_data.api_response.type.indexOf('code/') === 0) {
+        if (api_data.api_response.type.indexOf('code/') === 0 || api_data.api_response.type == 'text/plain') {
           setCodeAllowed(configuration.ui.ai.enabled);
         } else {
           setCodeAllowed(false);

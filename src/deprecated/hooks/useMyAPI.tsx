@@ -53,7 +53,7 @@ type BootstrapProps = {
   setConfiguration: (cfg: Configuration) => void;
   setLoginParams: (params: LoginParamsProps) => void;
   setUser: (user: WhoAmIProps) => void;
-  setReady: (layout: boolean, borealis: boolean, iconifyUrl: string) => void;
+  setReady: (layout: boolean, clue: boolean, iconifyUrl: string) => void;
   retryAfter?: number;
 };
 
@@ -156,8 +156,8 @@ const useMyAPI = (): UseMyAPIReturn => {
           // Mark the interface ready
           setReady(
             true,
-            'borealis' in user.configuration.ui.api_proxies,
-            user.configuration?.ui?.api_proxies?.borealis?.custom_iconify || null
+            'clue' in user.configuration.ui.api_proxies,
+            user.configuration?.ui?.api_proxies?.clue?.custom_iconify || null
           );
 
           // Render appropriate page

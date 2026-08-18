@@ -100,6 +100,7 @@ const Param = memo(({ param_id, spec_id, service }: ParamProps) => {
     />
   );
 });
+
 Param.displayName = 'Param';
 
 type ServiceProps = {
@@ -192,11 +193,12 @@ const Service = memo(({ cat_id, svr_id, service }: ServiceProps) => {
         <CollapseSection
           header={({ open, setOpen }) => (
             <CheckboxInput
-              id={service.name}
-              label={service.name}
+              defaultValue={defaultValue}
               disabled={disabled || !isEditing || (!customize && restricted)}
               endAdornment={!external ? null : <OpenInNewOutlinedIcon style={{ fontSize: 'small' }} />}
               expand={!hasParams ? null : open}
+              id={service.name}
+              label={service.name}
               preventRender={!customize && restricted && !selected}
               reset={defaultValue !== null && selected !== defaultValue}
               value={selected}
@@ -244,6 +246,7 @@ const Service = memo(({ cat_id, svr_id, service }: ServiceProps) => {
     />
   );
 });
+
 Service.displayName = 'Service';
 
 type CategoryProps = {
@@ -287,11 +290,12 @@ const Category = memo(({ cat_id, category }: CategoryProps) => {
         <CollapseSection
           header={({ open, setOpen }) => (
             <CheckboxInput
-              label={category.name}
+              defaultValue={defaultValue}
               disabled={disabled || !isEditing || (!customize && restricted)}
               divider
               expand={open}
               indeterminate={indeterminate}
+              label={category.name}
               preventRender={!customize && restricted && !selected && !indeterminate}
               reset={defaultValue !== null && selected !== defaultValue}
               value={selected}
@@ -313,6 +317,7 @@ const Category = memo(({ cat_id, category }: CategoryProps) => {
     />
   );
 });
+
 Category.displayName = 'Category';
 
 export const ServiceParameters = memo(() => {
@@ -334,4 +339,5 @@ export const ServiceParameters = memo(() => {
     </div>
   );
 });
+
 ServiceParameters.displayName = 'ServiceParameters';

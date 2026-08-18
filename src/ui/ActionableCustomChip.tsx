@@ -5,7 +5,7 @@ import React, { useCallback, useState } from 'react';
 import ActionMenu from 'ui/ActionMenu';
 import type { CustomChipProps } from 'ui/CustomChip';
 import CustomChip from 'ui/CustomChip';
-import EnrichmentCustomChip, { BOREALIS_TYPE_MAP } from 'ui/EnrichmentCustomChip';
+import EnrichmentCustomChip, { CLUE_TYPE_MAP } from 'ui/EnrichmentCustomChip';
 import ExternalLinks from 'ui/ExternalSearch';
 
 export type ActionableCustomChipProps = CustomChipProps & {
@@ -61,9 +61,9 @@ const WrappedActionableCustomChip: React.FC<ActionableCustomChipProps> = ({
           classification={classification}
         />
       )}
-      {'borealis' in configuration.ui.api_proxies && data_type in BOREALIS_TYPE_MAP && label !== null ? (
+      {'clue' in configuration.ui.api_proxies && data_type in CLUE_TYPE_MAP && label !== null ? (
         <EnrichmentCustomChip
-          dataType={BOREALIS_TYPE_MAP[data_type]}
+          dataType={CLUE_TYPE_MAP[data_type]}
           dataValue={label}
           dataClassification={classification}
           icon={<ExternalLinks category={category} type={data_type} value={label} round={variant === 'outlined'} />}

@@ -53,6 +53,7 @@ type Props = {
   liveResultKeys?: string[];
   liveErrors?: Error[];
   force?: boolean;
+  filetype_override?: string;
 };
 
 const WrappedFileDetail: React.FC<Props> = ({
@@ -61,7 +62,8 @@ const WrappedFileDetail: React.FC<Props> = ({
   metadata = null,
   liveResultKeys = null,
   liveErrors = null,
-  force = false
+  force = false,
+  filetype_override = null
 }) => {
   const { t } = useTranslation(['fileDetail']);
   const theme = useTheme();
@@ -110,29 +112,6 @@ const WrappedFileDetail: React.FC<Props> = ({
       return `/file/viewer/${file?.file_info?.sha256}/${DEFAULT_TAB}/${location.search}${location.hash}`;
     else return `/file/viewer/${file?.file_info?.sha256}/${tab}/${location.search}${location.hash}`;
   }, [file?.file_info?.sha256, location.hash, location.pathname, location.search]);
-
-  const elementInViewport = element => {
-    const bounding = element.getBoundingClientRect();
-    const myElementHeight = element.offsetHeight;
-    const myElementWidth = element.offsetWidth;
-
-    if (
-      bounding.top >= -myElementHeight &&
-      bounding.left >= -myElementWidth &&
-      bounding.right <= (window.innerWidth || document.documentElement.clientWidth) + myElementWidth &&
-      bounding.bottom <= (window.innerHeight || document.documentElement.clientHeight) + myElementHeight
-    ) {
-      return true;
-    }
-    return false;
-  };
-
-  const scrollToTop = scrollToItem => {
-    const element = document.getElementById(scrollToItem);
-    if (element && !elementInViewport(element)) {
-      element.scrollIntoView();
-    }
-  };
 
   const patchFileDetails = (data: File) => {
     const newData = { ...data };
@@ -275,6 +254,8 @@ const WrappedFileDetail: React.FC<Props> = ({
   }, [sha256, badlistReason, file]);
 
   useEffect(() => {
+    let active = true;
+
     setFile(null);
 
     if (sid && sha256) {
@@ -283,7 +264,7 @@ const WrappedFileDetail: React.FC<Props> = ({
         url: `/api/v4/submission/${sid}/file/${sha256}/`,
         body: liveResultKeys ? { extra_result_keys: liveResultKeys } : null,
         onSuccess: api_data => {
-          scrollToTop('drawerTop');
+          if (!active) return;
           setFile(patchFileDetails(api_data.api_response));
         }
       });
@@ -291,11 +272,15 @@ const WrappedFileDetail: React.FC<Props> = ({
       apiCall<File>({
         url: `/api/v4/file/result/${sha256}/`,
         onSuccess: api_data => {
-          scrollToTop('fileDetailTop');
+          if (!active) return;
           setFile(patchFileDetails(api_data.api_response));
         }
       });
     }
+
+    return () => {
+      active = false;
+    };
     // eslint-disable-next-line
   }, [sha256, sid]);
 
@@ -430,7 +415,7 @@ const WrappedFileDetail: React.FC<Props> = ({
             <FileDownloader
               link={() =>
                 `/api/v4/file/download/${file.file_info.sha256}/?${
-                  fileName && file.file_info.sha256 !== fileName ? `name=${fileName}&` : ''
+                  fileName && file.file_info.sha256 !== fileName ? `name=${encodeURIComponent(fileName)}&` : ''
                 }${sid ? `sid=${sid}&` : ''}`
               }
               loading={!file}
@@ -443,7 +428,10 @@ const WrappedFileDetail: React.FC<Props> = ({
               size="large"
               to={fileViewerPath}
               tooltip={t('file_viewer')}
-              preventRender={!currentUser.roles.includes('file_detail')}
+              preventRender={
+                !currentUser.roles.includes('file_detail') ||
+                (file?.file_info?.type.startsWith('uri/') && !currentUser.is_admin)
+              }
             >
               <PageviewOutlinedIcon />
             </IconButton>
@@ -481,7 +469,10 @@ const WrappedFileDetail: React.FC<Props> = ({
                     to={`/submit?hash=${file.file_info.sha256}`}
                     state={{
                       c12n: file.file_info.classification,
-                      metadata: metadata
+                      metadata: metadata,
+                      params: {
+                        filetype_override: filetype_override
+                      }
                     }}
                     dense
                     onClick={() => setResubmitAnchor(null)}
@@ -535,7 +526,11 @@ const WrappedFileDetail: React.FC<Props> = ({
         {file?.file_info?.type.startsWith('uri/') ? (
           <URIIdentificationSection fileinfo={file ? file.file_info : null} promotedSections={promotedSections} />
         ) : (
-          <IdentificationSection fileinfo={file ? file.file_info : null} promotedSections={promotedSections} />
+          <IdentificationSection
+            fileinfo={file ? file.file_info : null}
+            promotedSections={promotedSections}
+            filetype_override={filetype_override}
+          />
         )}
         <FrequencySection seen={file ? file.file_info?.seen : null} />
         <MetadataSection metadata={file ? file.metadata : null} />

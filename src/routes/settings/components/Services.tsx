@@ -173,6 +173,7 @@ const Service = memo(({ cat_id, svr_id, customize, disabled, loading }: ServiceP
             checked={selected}
             anchor
             overflowHidden
+            defaultValue={defaultValue}
             reset={defaultValue !== null && selected !== defaultValue}
             onChange={!customize && restricted ? undefined : () => handleChange(!selected)}
             onReset={!customize && restricted ? undefined : () => handleChange(defaultValue)}
@@ -271,6 +272,7 @@ const Category = memo(({ cat_id = null, customize = false, disabled = false, loa
             divider
             anchor
             overflowHidden
+            defaultValue={defaultValue}
             reset={defaultValue !== null && selected !== defaultValue}
             onChange={!customize && restricted ? undefined : () => handleChange(!selected)}
             onReset={!customize && restricted ? undefined : () => handleChange(defaultValue)}

@@ -1,4 +1,5 @@
 import { Typography, useTheme } from '@mui/material';
+import { useApiQuery } from 'core/api';
 import { useAppConfig } from 'core/config';
 import { memo, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -22,6 +23,13 @@ export const SubmissionOptions = memo(() => {
     ],
     [t]
   );
+
+  const { data } = useApiQuery<{ file_types: [string, string[]][] }>({
+    url: '/api/v4/help/constants/',
+    method: 'GET'
+  });
+
+  const fileTypes = useMemo(() => (!data ? [] : data?.file_types?.map(i => i?.[0])?.filter(i => i !== '*')), [data]);
 
   return (
     <div>
@@ -77,6 +85,33 @@ export const SubmissionOptions = memo(() => {
                 )}
               />
 
+              <form.Subscribe
+                selector={state => {
+                  const param = state.values.settings.filetype_override;
+                  return [param.value, param.default, param.restricted] as const;
+                }}
+                children={([value, defaultValue, restricted]) => (
+                  <TextInput
+                    label={t('options.submission.filetype_override.label')}
+                    value={value}
+                    defaultValue={defaultValue}
+                    loading={loading}
+                    disabled={disabled || !isEditing || (!customize && restricted)}
+                    preventRender={!customize && restricted}
+                    reset={value !== defaultValue}
+                    placeholder={t('options.submission.filetype_override.placeholder')}
+                    options={fileTypes}
+                    onChange={(_, v) => form.setFieldValue('settings.filetype_override.value', v)}
+                    onReset={() => form.setFieldValue('settings.filetype_override.value', defaultValue)}
+                    validate={v =>
+                      v && !fileTypes.includes(v)
+                        ? { status: 'error', message: t('options.submission.filetype_override.validate.error') }
+                        : null
+                    }
+                    slotProps={{ root: { style: { marginBottom: theme.spacing(1) } } }}
+                  />
+                )}
+              />
               <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'nowrap', columnGap: theme.spacing(1) }}>
                 <form.Subscribe
                   selector={state => {
@@ -255,4 +290,5 @@ export const SubmissionOptions = memo(() => {
     </div>
   );
 });
+
 SubmissionOptions.displayName = 'SubmissionOptions';

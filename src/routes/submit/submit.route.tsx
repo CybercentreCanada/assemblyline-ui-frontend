@@ -219,6 +219,15 @@ const WrappedSubmitRoute = memo(() => {
     [configuration, form]
   );
 
+  const setFileTypeFromURL = useCallback(
+    (s: typeof search) => {
+      const fileType = s.get('filetypeOverride');
+      if (!fileType) return;
+      form.setFieldValue('settings.filetype_override.value', fileType);
+    },
+    [form]
+  );
+
   useEffect(() => {
     closeSnackbar();
 
@@ -250,6 +259,7 @@ const WrappedSubmitRoute = memo(() => {
     setDescriptionFromURL(search);
     setPriorityFromURL(search);
     setTTLFromURL(search);
+    setFileTypeFromURL(search);
 
     form.setFieldValue('state.phase', 'editing');
 
@@ -401,7 +411,7 @@ export const SubmitRoute = createAppRoute({
   search: s => ({
     classification: s.string(null).source('transient'),
     description: s.string('').source('transient'),
-    filetype: s.string(null).source('transient'),
+    filetypeOverride: s.string(null).source('transient'),
     hash: s.string(null),
     metadata: s.object(null).source('transient'),
     priority: s.number(null).source('transient'),
@@ -427,7 +437,7 @@ export const SubmitRootRoute = createAppRoute({
   search: s => ({
     classification: s.string(null).source('transient').nullable(),
     description: s.string('').source('transient').nullable(),
-    filetype: s.string(null).source('transient').nullable(),
+    filetypeOverride: s.string(null).source('transient').nullable(),
     hash: s.string(null),
     metadata: s.object(null).source('transient').nullable(),
     priority: s.enum(null, [500, 1000, 1500]).source('transient').nullable(),

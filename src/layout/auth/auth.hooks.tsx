@@ -1,5 +1,5 @@
+import { useClue } from '@cccsaurora/clue-ui';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useBorealis } from 'borealis-ui';
 import type { ApiQueryKey, ApiResponse } from 'core/api';
 import { isApiData, stableStringify } from 'core/api';
 import { useAppConfig, useAppSetConfig, useSaveAppConfig } from 'core/config';
@@ -77,7 +77,7 @@ export const useAuthQuery = () => {
   const queryClient = useQueryClient();
   const { t } = useTranslation(['api']);
   const { showErrorMessage, closeSnackbar } = useAppSnackbar();
-  const { setReady: setBorealisReady, setCustomIconify } = useBorealis();
+  const { setReady: setClueReady, setCustomIconify } = useClue();
 
   const systemConfig = useAppConfig(s => s?.configuration);
 
@@ -231,8 +231,8 @@ export const useAuthQuery = () => {
           setConfig(s => ({ ...s, ...normalizeWhoAmI(json.api_response as unknown as WhoAmI) }));
 
           // Mark the interface ready
-          setBorealisReady('borealis' in user.configuration.ui.api_proxies);
-          setCustomIconify(user.configuration?.ui?.api_proxies?.borealis?.custom_iconify || null);
+          setClueReady('clue' in user.configuration.ui.api_proxies);
+          setCustomIconify(user.configuration?.ui?.api_proxies?.clue?.custom_iconify || null);
 
           // Render appropriate page
           if (!user.agrees_with_tos && user.configuration.ui.tos) {
