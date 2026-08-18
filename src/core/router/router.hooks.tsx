@@ -32,6 +32,7 @@ import {
   reconcileRouterFromNavigation,
   removeBlockedPage,
   removePanel,
+  resolveLegacyLocation,
   resolveNavigationIntent,
   resolveNotFoundPage,
   sanitizeRouterStore,
@@ -501,7 +502,6 @@ export function useAppSyncNavigationStoreFromLocation() {
     [location, preferenceStoreApi, routerStoreApi, locationParamStoreApi, setNavigationStore]
   );
 
-  // TODO: Add a lookup table to convert the legacy url with the new URL
   const getNavigationFromLegacyLocation = useCallback(
     () =>
       setNavigationStore(store => {
@@ -511,26 +511,38 @@ export function useAppSyncNavigationStoreFromLocation() {
 
         store = getNavigationStoreFromRouter(store, routerState);
 
-        const pathname = location.pathname === '/' ? '/' : location.pathname;
-        const href = `${pathname}${location.search || ''}${location.hash || ''}`;
-        const nextPageInput = sanitizePage(locationState, getDefaultRouterPage({ href, state: location.state }));
-        const context = { operation: 'sync-legacy-location' };
-        const legacyRoute = resolveNotFoundPage(nextPageInput, { href, state: location.state }, context);
+        const mapping = resolveLegacyLocation(location.pathname, location.search || '', location.hash || '') as Record<
+          number,
+          string
+        > | null;
+        if (!mapping) return store;
 
-        if (!legacyRoute?.href) return store;
+        const panelEntries = Object.entries(mapping)
+          .map(([key, href]) => [Number(key), href] as const)
+          .sort((a, b) => a[0] - b[0]);
+        const lastPanelKey = panelEntries[panelEntries.length - 1]?.[0] ?? -1;
 
-        const nextRoute = findAppRouteFromPage(locationState, legacyRoute);
-        const prevPage = getPageFromPanelKey(store, 0);
-        const prevRoute = findAppRouteFromPage(locationState, prevPage);
+        for (const [panelKey, href] of panelEntries) {
+          const prevPage = getPageFromPanelKey(store, panelKey);
+          if (prevPage?.href === href) continue;
 
-        if (!!nextRoute?.path && nextRoute?.path === prevRoute?.path && !!store?.panels?.[0]?.pageKey) {
-          store = updatePage(store, store.panels[0].pageKey, legacyRoute);
-        } else {
-          const [store1, nextPageKey] = addPage(store, legacyRoute);
-          [store] = upsertPanel(store1, 0, { pageKey: nextPageKey }, preferenceState);
+          const nextPageInput = sanitizePage(locationState, getDefaultRouterPage({ href, state: location.state }));
+          const context = { operation: 'sync-legacy-location', panelKey };
+          const legacyRoute = resolveNotFoundPage(nextPageInput, { href, state: location.state }, context);
+          if (!legacyRoute?.href) continue;
+
+          const nextRoute = findAppRouteFromPage(locationState, legacyRoute);
+          const prevRoute = findAppRouteFromPage(locationState, prevPage);
+
+          if (!!nextRoute?.path && nextRoute?.path === prevRoute?.path && !!store?.panels?.[panelKey]?.pageKey) {
+            store = updatePage(store, store.panels[panelKey].pageKey, legacyRoute);
+          } else {
+            const [store1, nextPageKey] = addPage(store, legacyRoute);
+            [store] = upsertPanel(store1, panelKey, { pageKey: nextPageKey }, preferenceState);
+          }
         }
 
-        for (let panelKey = store.panels.length - 1; panelKey > 0; panelKey--) {
+        for (let panelKey = store.panels.length - 1; panelKey > lastPanelKey; panelKey--) {
           store = removePanel(store, panelKey);
         }
 

@@ -103,6 +103,7 @@ export {
   removeOldestNodes,
   removePage,
   removePanel,
+  resolveLegacyLocation,
   resolveNavigationIntent,
   resolveNotFoundPage,
   sanitizeNodes,

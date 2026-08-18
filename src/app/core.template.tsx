@@ -182,7 +182,7 @@ export const useAppTemplatePreferences = () => {
           light: '/images/noswoop.svg'
         }
       },
-      appLink: '/v1',
+      appLink: '/v1#/',
       allowBreadcrumbs: false,
       allowQuickSearch: false,
       allowAutoHideTopbar: true,
