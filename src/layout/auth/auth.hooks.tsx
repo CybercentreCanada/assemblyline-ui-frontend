@@ -2,8 +2,9 @@ import { useClue } from '@cccsaurora/clue-ui';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import type { ApiQueryKey, ApiResponse } from 'core/api';
 import { isApiData, stableStringify } from 'core/api';
-import { useAppConfig, useAppSetConfig, useSaveAppConfig } from 'core/config';
+import { useAppConfigStore, useAppSetConfigStore } from 'core/config';
 import { useAppInterfaceStore, useAppSetInterfaceStore } from 'core/interface';
+import { useAppSavePreference } from 'core/preference';
 import { useAppSnackbar } from 'core/snackbar';
 import type { LoginParamsProps } from 'layout/auth/auth.models';
 import { normalizeWhoAmI } from 'layout/auth/auth.utils';
@@ -22,10 +23,10 @@ const DEFAULT_RETRY_TIME = 10_000;
  * @returns Score-to-verdict mapping function
  */
 export const useScoreToVerdict = () => {
-  const malicious = useAppConfig(s => s.configuration.submission.verdicts.malicious);
-  const highlySuspicious = useAppConfig(s => s.configuration.submission.verdicts.highly_suspicious);
-  const suspicious = useAppConfig(s => s.configuration.submission.verdicts.suspicious);
-  const info = useAppConfig(s => s.configuration.submission.verdicts.info);
+  const malicious = useAppConfigStore(s => s.configuration.submission.verdicts.malicious);
+  const highlySuspicious = useAppConfigStore(s => s.configuration.submission.verdicts.highly_suspicious);
+  const suspicious = useAppConfigStore(s => s.configuration.submission.verdicts.suspicious);
+  const info = useAppConfigStore(s => s.configuration.submission.verdicts.info);
 
   return useCallback(
     (score: number | null) => {
@@ -45,9 +46,9 @@ export const useScoreToVerdict = () => {
  * @returns Boolean indicating readiness
  */
 export const useIsAppReady = () => {
-  const agreesWithTos = useAppConfig(s => s?.user?.agrees_with_tos);
-  const isActive = useAppConfig(s => s?.user?.is_active);
-  const tos = useAppConfig(s => s?.configuration?.ui?.tos);
+  const agreesWithTos = useAppConfigStore(s => s?.user?.agrees_with_tos);
+  const isActive = useAppConfigStore(s => s?.user?.is_active);
+  const tos = useAppConfigStore(s => s?.configuration?.ui?.tos);
 
   return useMemo(() => isActive && (agreesWithTos || !tos), [agreesWithTos, isActive, tos]);
 };
@@ -79,13 +80,13 @@ export const useAuthQuery = () => {
   const { showErrorMessage, closeSnackbar } = useAppSnackbar();
   const { setReady: setClueReady, setCustomIconify } = useClue();
 
-  const systemConfig = useAppConfig(s => s?.configuration);
+  const configuration = useAppConfigStore(s => s?.configuration);
 
   const setInterfaceStore = useAppSetInterfaceStore();
-  const setConfig = useAppSetConfig();
+  const setConfigStore = useAppSetConfigStore();
 
   const isAuthenticating = useIsAuthenticating();
-  const saveSettings = useSaveAppConfig();
+  const savePreference = useAppSavePreference();
 
   const disabled = false;
   const retryAfter = 10 * 1000;
@@ -140,7 +141,7 @@ export const useAuthQuery = () => {
           return Promise.reject({
             api_error_message: t('unreachable'),
             api_response: '',
-            api_server_version: systemConfig?.system?.version,
+            api_server_version: configuration?.system?.version,
             api_status_code: 502
           });
         }
@@ -152,7 +153,7 @@ export const useAuthQuery = () => {
           json = {
             api_error_message: res.statusText || t('invalid'),
             api_response: null as unknown as Configuration | LoginParamsProps | WhoAmIProps,
-            api_server_version: systemConfig?.system?.version,
+            api_server_version: configuration?.system?.version,
             api_status_code: res.status
           };
         }
@@ -170,7 +171,7 @@ export const useAuthQuery = () => {
             return s;
           });
           sessionStorage.clear();
-          saveSettings();
+          savePreference();
           return Promise.reject(json);
         }
 
@@ -184,7 +185,7 @@ export const useAuthQuery = () => {
           return Promise.reject({
             api_error_message: t('invalid'),
             api_response: '',
-            api_server_version: systemConfig?.system?.version,
+            api_server_version: configuration?.system?.version,
             api_status_code: 400
           });
         }
@@ -199,7 +200,7 @@ export const useAuthQuery = () => {
             return s;
           });
 
-          setConfig(s => {
+          setConfigStore(s => {
             if (json.api_response) s.configuration = json.api_response as Configuration;
 
             return s;
@@ -228,7 +229,7 @@ export const useAuthQuery = () => {
           const user = json.api_response as WhoAmIProps;
 
           // Set the current user
-          setConfig(s => ({ ...s, ...normalizeWhoAmI(json.api_response as unknown as WhoAmI) }));
+          setConfigStore(s => ({ ...s, ...normalizeWhoAmI(json.api_response as unknown as WhoAmI) }));
 
           // Mark the interface ready
           setClueReady('clue' in user.configuration.ui.api_proxies);

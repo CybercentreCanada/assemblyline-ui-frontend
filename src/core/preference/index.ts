@@ -1,3 +1,4 @@
+export { useAppLoadPreference, useAppSavePreference } from './preference.hooks';
 export {
   AppPreferenceProvider,
   AppPreferenceStoreProvider,

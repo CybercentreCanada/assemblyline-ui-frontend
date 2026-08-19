@@ -1,6 +1,9 @@
 import { APP_PREFERENCE_SCHEMA, DEFAULT_APP_PREFERENCE_STORE } from 'app/core.preference';
-import { getAppPreferenceStateFromApi } from 'core/preference/preference.providers';
-import { loadPreferenceFromLocalStorage, savePreferenceToLocalStorage } from 'core/preference/preference.utils';
+import {
+  getAppPreferenceStateFromApi,
+  loadPreferenceFromLocalStorage,
+  savePreferenceToLocalStorage
+} from 'core/preference';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { z } from 'zod';
 import type { StoreApi } from 'zustand';
